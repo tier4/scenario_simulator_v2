@@ -20,13 +20,13 @@ OpenSCENARIO:
         CatalogReference: &SAMPLE_VEHICLE
           catalogName: sample_vehicle
           entryName: sample_vehicle
-      - name: car_1
+      - name: car_same_front
         CatalogReference: *SAMPLE_VEHICLE
-      - name: car_2
+      - name: car_right_front
         CatalogReference: *SAMPLE_VEHICLE
-      - name: car_3
+      - name: car_right_back
         CatalogReference: *SAMPLE_VEHICLE
-      - name: car_4
+      - name: car_same_back
         CatalogReference: *SAMPLE_VEHICLE
   Storyboard:
     Init:
@@ -39,7 +39,7 @@ OpenSCENARIO:
                     LanePosition: &EGO_LANE_POSITION
                       roadId: ""
                       laneId: 34513
-                      s: 10
+                      s: 15
                       offset: 0
                       Orientation:
                         type: relative
@@ -55,7 +55,7 @@ OpenSCENARIO:
                     SpeedActionTarget:
                       AbsoluteTargetSpeed:
                         value: 0
-          - entityRef: car_1
+          - entityRef: car_same_front
             PrivateAction:
               - TeleportAction:
                   Position:
@@ -63,7 +63,7 @@ OpenSCENARIO:
                       << : *EGO_LANE_POSITION
                       s: 20
               - LongitudinalAction: *SPEED_ACTION_ZERO
-          - entityRef: car_2
+          - entityRef: car_right_front
             PrivateAction:
               - TeleportAction:
                   Position:
@@ -72,22 +72,22 @@ OpenSCENARIO:
                       laneId: 34462
                       s: 20
               - LongitudinalAction: *SPEED_ACTION_ZERO
-          - entityRef: car_3
+          - entityRef: car_right_back
             PrivateAction:
               - TeleportAction:
                   Position:
                     LanePosition:
                       << : *EGO_LANE_POSITION
                       laneId: 34462
-                      s: 5
+                      s: 10
               - LongitudinalAction: *SPEED_ACTION_ZERO
-          - entityRef: car_4
+          - entityRef: car_same_back
             PrivateAction:
               - TeleportAction:
                   Position:
                     LanePosition:
                       << : *EGO_LANE_POSITION
-                      s: 5
+                      s: 10
               - LongitudinalAction: *SPEED_ACTION_ZERO
     Story:
       - name: story
@@ -103,106 +103,6 @@ OpenSCENARIO:
                 Maneuver:
                   - name: maneuver
                     Event:
-                      - name: success
-                        priority: parallel
-                        Action:
-                          - name: ""
-                            UserDefinedAction:
-                              CustomCommandAction:
-                                type: exitSuccess
-                        StartTrigger:
-                          ConditionGroup:
-                            - Condition:
-                                - name: ""
-                                  delay: 0
-                                  conditionEdge: none
-                                  ByEntityCondition:
-                                    TriggeringEntities:
-                                      triggeringEntitiesRule: all
-                                      EntityRef:
-                                        - entityRef: ego
-                                    EntityCondition:
-                                      RelativeClearanceCondition:
-                                        EntityRef:
-                                          - entityRef: car_1
-                                        distanceBackward: 0
-                                        distanceForward: 9
-                                        freeSpace: false
-                                        oppositeLanes: false
-                                - name: ""
-                                  delay: 0
-                                  conditionEdge: none
-                                  ByEntityCondition:
-                                    TriggeringEntities:
-                                      triggeringEntitiesRule: all
-                                      EntityRef:
-                                        - entityRef: ego
-                                    EntityCondition:
-                                      RelativeClearanceCondition:
-                                        EntityRef:
-                                          - entityRef: car_1
-                                        distanceBackward: 0
-                                        distanceForward: 9
-                                        freeSpace: false
-                                        oppositeLanes: false
-                                - name: ""
-                                  delay: 0
-                                  conditionEdge: none
-                                  ByEntityCondition:
-                                    TriggeringEntities:
-                                      triggeringEntitiesRule: all
-                                      EntityRef:
-                                        - entityRef: car_3
-                                        - entityRef: car_4
-                                    EntityCondition:
-                                      RelativeDistanceCondition:
-                                        coordinateSystem: lane
-                                        entityRef: ego
-                                        freespace: false # True: distance is measured between closest bounding box points. False: reference point distance is used.
-                                        relativeDistanceType: longitudinal
-                                        rule: equalTo
-                                        value: 10
-                                - name: ""
-                                  delay: 0
-                                  conditionEdge: none
-                                  ByEntityCondition:
-                                    TriggeringEntities:
-                                      triggeringEntitiesRule: all
-                                      EntityRef:
-                                        - entityRef: car_1
-                                        - entityRef: car_3
-                                    EntityCondition:
-                                      RelativeDistanceCondition:
-                                        coordinateSystem: lane
-                                        entityRef: ego
-                                        freespace: false # True: distance is measured between closest bounding box points. False: reference point distance is used.
-                                        relativeDistanceType: lateral
-                                        rule: equalTo
-                                        value: -1.5
-                                - name: ""
-                                  delay: 0
-                                  conditionEdge: none
-                                  ByEntityCondition:
-                                    TriggeringEntities:
-                                      triggeringEntitiesRule: all
-                                      EntityRef:
-                                        - entityRef: car_2
-                                        - entityRef: car_4
-                                    EntityCondition:
-                                      RelativeDistanceCondition:
-                                        coordinateSystem: lane
-                                        entityRef: ego
-                                        freespace: false # True: distance is measured between closest bounding box points. False: reference point distance is used.
-                                        relativeDistanceType: lateral
-                                        rule: equalTo
-                                        value: 0.5
-                                - name: ""
-                                  delay: 0
-                                  conditionEdge: none
-                                  ByValueCondition:
-                                    SimulationTimeCondition:
-                                      value: 10
-                                      rule: greaterThan
                       - name: failure
                         priority: parallel
                         Action:
@@ -213,13 +113,141 @@ OpenSCENARIO:
                         StartTrigger:
                           ConditionGroup:
                             - Condition:
-                                - name: ""
+                                - name: "check all car is in range(not clear) means the condition is false"
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: all
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      RelativeClearanceCondition:
+                                        distanceBackward: 7
+                                        distanceForward: 7
+                                        freeSpace: false
+                                        oppositeLanes: false
+                            - Condition:
+                                - name: "check not all car is in range(not clear) means the condition is false"
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: all
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      RelativeClearanceCondition:
+                                        distanceBackward: 7
+                                        distanceForward: 0
+                                        freeSpace: false
+                                        oppositeLanes: false
+                            - Condition:
+                                - name: "timeout"
                                   delay: 0
                                   conditionEdge: none
                                   ByValueCondition:
                                     SimulationTimeCondition:
-                                      value: 20
+                                      value: 1
                                       rule: greaterThan
+                      - name: success
+                        priority: parallel
+                        Action:
+                          - name: ""
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitSuccess
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: "check clear with all cars in narrower longitudinal range"
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: all
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      RelativeClearanceCondition:
+                                        distanceBackward: 3
+                                        distanceForward: 3
+                                        freeSpace: false
+                                        oppositeLanes: false
+                                - name: "check back is clear with front cars"
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: all
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      RelativeClearanceCondition:
+                                        EntityRef:
+                                          - entityRef: car_same_front
+                                          - entityRef: car_right_front
+                                        distanceBackward: 7
+                                        distanceForward: 0
+                                        freeSpace: false
+                                        oppositeLanes: false
+                                - name: "check front is clear with back cars"
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: all
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      RelativeClearanceCondition:
+                                        EntityRef:
+                                          - entityRef: car_right_back
+                                          - entityRef: car_same_back
+                                        distanceBackward: 0
+                                        distanceForward: 7
+                                        freeSpace: false
+                                        oppositeLanes: false
+                                - name: "check right is clear with cars in the same lane"
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: all
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      RelativeClearanceCondition:
+                                        EntityRef:
+                                          - entityRef: car_same_front
+                                          - entityRef: car_same_back
+                                        distanceBackward: 7
+                                        distanceForward: 7
+                                        freeSpace: false
+                                        oppositeLanes: false
+                                        RelativeLaneRange:
+                                          - from: -1
+                                            to: -1
+                                - name: "check same lane is clear with cars in the right lane"
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: all
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      RelativeClearanceCondition:
+                                        EntityRef:
+                                          - entityRef: car_right_front
+                                          - entityRef: car_right_back
+                                        distanceBackward: 7
+                                        distanceForward: 7
+                                        freeSpace: false
+                                        oppositeLanes: false
+                                        RelativeLaneRange:
+                                          - from: 0
+                                            to: 0
             StartTrigger:
               ConditionGroup:
                 - Condition:
