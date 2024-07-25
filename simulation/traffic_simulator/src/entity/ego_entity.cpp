@@ -138,13 +138,6 @@ auto EgoEntity::getEntityTypename() const -> const std::string &
   return result;
 }
 
-auto EgoEntity::getEntityType() const -> const traffic_simulator_msgs::msg::EntityType &
-{
-  static traffic_simulator_msgs::msg::EntityType type;
-  type.type = traffic_simulator_msgs::msg::EntityType::EGO;
-  return type;
-}
-
 auto EgoEntity::getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle>
 {
   return std::nullopt;
@@ -332,12 +325,13 @@ auto EgoEntity::setVelocityLimit(double value) -> void  //
 
 auto EgoEntity::setMapPose(const geometry_msgs::msg::Pose & map_pose) -> void
 {
-  const auto unique_route_lanelets = traffic_simulator::helper::getUniqueValues(getRouteLanelets());
-  status_.setMapPose(map_pose);
+  auto entity_status = static_cast<EntityStatus>(status_);
+  entity_status.pose = map_pose;
+  entity_status.lanelet_pose_valid = false;
   // prefer current lanelet on Autoware side
   const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
-    status_.getMapPose(), status_.getBoundingBox(), unique_route_lanelets, false,
-    getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
+    status_.getMapPose(), status_.getBoundingBox(), helper::getUniqueValues(getRouteLanelets()),
+    false, getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
   setCanonicalizedStatus(
     CanonicalizedEntityStatus(static_cast<EntityStatus>(status_), canonicalized_lanelet_pose));
 }

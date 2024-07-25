@@ -84,8 +84,6 @@ public:
 
   auto getMaxDeceleration() const -> double override;
 
-  auto getEntityType() const -> const traffic_simulator_msgs::msg::EntityType & override;
-
   auto getEntityTypename() const -> const std::string & override;
 
   auto getGoalPoses() -> std::vector<geometry_msgs::msg::Pose> override;

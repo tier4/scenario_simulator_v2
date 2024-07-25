@@ -19,6 +19,7 @@
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/boolean.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
+#include <openscenario_interpreter/syntax/entity.hpp>
 #include <openscenario_interpreter/syntax/lane_change_target.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <openscenario_interpreter/syntax/transition_dynamics.hpp>
@@ -52,7 +53,7 @@ struct LaneChangeAction : private Scope,
 
   explicit LaneChangeAction(const pugi::xml_node &, Scope &);
 
-  std::unordered_map<String, Boolean> accomplishments;
+  std::unordered_map<Entity, Boolean> accomplishments;
 
   /*  */ auto accomplished() -> bool;
 

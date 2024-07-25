@@ -29,7 +29,8 @@ public:
      const traffic_simulator_msgs::msg::ActionStatus &),
     ());
   MOCK_METHOD(void, requestSpeedChange, (double, bool), ());
-  MOCK_METHOD(const traffic_simulator::CanonicalizedEntityStatus &, getStatus, (), (const));
+  MOCK_METHOD(
+    const traffic_simulator::CanonicalizedEntityStatus &, getCanonicalizedStatus, (), (const));
 
   // Ego member functions
   MOCK_METHOD(void, engage, (), ());
@@ -238,12 +239,12 @@ TEST(TestExecutor, UpdateNoNPCs)
     .InSequence(sequence)
     .WillOnce(::testing::Return(1.0));
   EXPECT_CALL(*MockAPI, getEntityMock).Times(1).InSequence(sequence);
-  EXPECT_CALL(*mock_ego, getStatus)
+  EXPECT_CALL(*mock_ego, getCanonicalizedStatus)
     .Times(1)
     .InSequence(sequence)
     .WillOnce(::testing::ReturnRef(status));
   EXPECT_CALL(*MockAPI, getEntityMock).Times(1).InSequence(sequence);
-  EXPECT_CALL(*mock_ego, getStatus)
+  EXPECT_CALL(*mock_ego, getCanonicalizedStatus)
     .Times(1)
     .InSequence(sequence)
     .WillOnce(::testing::ReturnRef(status));
