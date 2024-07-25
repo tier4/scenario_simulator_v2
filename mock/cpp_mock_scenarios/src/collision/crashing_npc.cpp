@@ -51,24 +51,24 @@ private:
   }
   void onInitialize() override
   {
-    api_.spawn(
+    auto ego_entity = api_.spawn(
       "ego",
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
         34741, 0.0, 0.0, api_.getHdmapUtils()),
       getVehicleParameters());
-    api_.setLinearVelocity("ego", 0.0);
-    api_.requestSpeedChange("ego", 15, true);
+    ego_entity->setLinearVelocity(0.0);
+    ego_entity->requestSpeedChange(15, true);
     traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter;
     behavior_parameter.see_around = false;
-    api_.setBehaviorParameter("ego", behavior_parameter);
+    ego_entity->setBehaviorParameter(behavior_parameter);
 
-    api_.spawn(
+    auto npc_entity = api_.spawn(
       "npc",
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
         34741, 10.0, 0.0, api_.getHdmapUtils()),
       getVehicleParameters());
-    api_.setLinearVelocity("npc", 0.0);
-    api_.requestSpeedChange("npc", 5, true);
+    npc_entity->setLinearVelocity(0.0);
+    npc_entity->requestSpeedChange(5, true);
   }
 };
 }  // namespace cpp_mock_scenarios

@@ -52,12 +52,17 @@ private:
         stop(cpp_mock_scenarios::Result::FAILURE);  // LCOV_EXCL_LINE
       }
       for (const auto & name : names) {
-        if (const auto entity = api_.getEntity(name)) {
+        const auto entity = api_.getEntity(name);
+        if (const auto lanelet_pose = entity->getCanonicalizedLaneletPose(); not lanelet_pose) {
+          stop(cpp_mock_scenarios::Result::FAILURE);  // LCOV_EXCL_LINE
+        } else {
           const bool valid_vehicle_lanelet =
-            api_.isInLanelet(name, static_cast<lanelet::Id>(34705), 50.0) ||
-            api_.isInLanelet(name, static_cast<lanelet::Id>(34696), 50.0);
+            traffic_simulator::pose::isInLanelet(
+              lanelet_pose.value(), 34705, 50.0, api_.getHdmapUtils()) ||
+            traffic_simulator::pose::isInLanelet(
+              lanelet_pose.value(), 34696, 50.0, api_.getHdmapUtils());
 
-          if (!entity->laneMatchingSucceed() || !valid_vehicle_lanelet || !isVehicle(name)) {
+          if (!valid_vehicle_lanelet || !isVehicle(name)) {
             stop(cpp_mock_scenarios::Result::FAILURE);  // LCOV_EXCL_LINE
           }
         }
@@ -81,13 +86,13 @@ private:
       ,
       false, true, true, 0);
 
-    api_.spawn(
+    auto ego_entity = api_.spawn(
       "ego",
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
         34570, 0.0, 0.0, api_.getHdmapUtils()),
       getVehicleParameters());
-    api_.setLinearVelocity("ego", 0.0);
-    api_.requestSpeedChange("ego", 0.0, true);
+    ego_entity->setLinearVelocity(0.0);
+    ego_entity->requestSpeedChange(0.0, true);
   }
 };
 }  // namespace cpp_mock_scenarios

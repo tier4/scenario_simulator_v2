@@ -44,14 +44,12 @@ private:
   auto lateralDistance(const std::string & from_entity_name, const std::string & to_entity_name)
     -> std::optional<double>
   {
-    if (const auto from_entity = api_.getEntity(from_entity_name);
-        from_entity && from_entity->laneMatchingSucceed()) {
-      if (const auto to_entity = api_.getEntity(to_entity_name);
-          to_entity && to_entity->laneMatchingSucceed()) {
-        return traffic_simulator::distance::lateralDistance(
-          from_entity->getCanonicalizedLaneletPose().value(),
-          to_entity->getCanonicalizedLaneletPose().value(), false, api_.getHdmapUtils());
-      }
+    const auto from_entity = api_.getEntity(from_entity_name);
+    const auto to_entity = api_.getEntity(to_entity_name);
+    if (from_entity->isInLanelet() && to_entity->isInLanelet()) {
+      return traffic_simulator::distance::lateralDistance(
+        from_entity->getCanonicalizedLaneletPose().value(),
+        to_entity->getCanonicalizedLaneletPose().value(), false, api_.getHdmapUtils());
     }
     return std::nullopt;
   };
@@ -60,16 +58,14 @@ private:
     const std::string & from_entity_name, const std::string & to_entity_name,
     const double matching_distance) -> std::optional<double>
   {
-    if (const auto from_entity = api_.getEntity(from_entity_name)) {
-      if (const auto to_entity = api_.getEntity(to_entity_name)) {
-        auto from_entity_lanelet_pose = from_entity->getCanonicalizedLaneletPose(matching_distance);
-        auto to_entity_lanelet_pose = to_entity->getCanonicalizedLaneletPose(matching_distance);
-        if (from_entity_lanelet_pose && to_entity_lanelet_pose) {
-          return traffic_simulator::distance::lateralDistance(
-            from_entity_lanelet_pose.value(), to_entity_lanelet_pose.value(), false,
-            api_.getHdmapUtils());
-        }
-      }
+    auto from_entity_lanelet_pose =
+      api_.getEntity(from_entity_name)->getCanonicalizedLaneletPose(matching_distance);
+    auto to_entity_lanelet_pose =
+      api_.getEntity(to_entity_name)->getCanonicalizedLaneletPose(matching_distance);
+    if (from_entity_lanelet_pose && to_entity_lanelet_pose) {
+      return traffic_simulator::distance::lateralDistance(
+        from_entity_lanelet_pose.value(), to_entity_lanelet_pose.value(), false,
+        api_.getHdmapUtils());
     }
     return std::nullopt;
   };
@@ -78,15 +74,12 @@ private:
     const std::string & from_entity_name, const std::string & to_entity_name)
     -> std::optional<double>
   {
-    if (const auto from_entity = api_.getEntity(from_entity_name);
-        from_entity && from_entity->laneMatchingSucceed()) {
-      if (const auto to_entity = api_.getEntity(to_entity_name);
-          to_entity && to_entity->laneMatchingSucceed()) {
-        return traffic_simulator::distance::longitudinalDistance(
-          from_entity->getCanonicalizedLaneletPose().value(),
-          to_entity->getCanonicalizedLaneletPose().value(), false, true, false,
-          api_.getHdmapUtils());
-      }
+    const auto from_entity = api_.getEntity(from_entity_name);
+    const auto to_entity = api_.getEntity(to_entity_name);
+    if (from_entity->isInLanelet() && to_entity->isInLanelet()) {
+      return traffic_simulator::distance::longitudinalDistance(
+        from_entity->getCanonicalizedLaneletPose().value(),
+        to_entity->getCanonicalizedLaneletPose().value(), false, true, false, api_.getHdmapUtils());
     }
     return std::nullopt;
   }
@@ -142,29 +135,29 @@ private:
   }
   void onInitialize() override
   {
-    api_.spawn(
+    auto ego_entity = api_.spawn(
       "ego",
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
         34513, 5.0, 0.0, api_.getHdmapUtils()),
       getVehicleParameters());
-    api_.setLinearVelocity("ego", 10);
-    api_.requestSpeedChange("ego", 3, true);
+    ego_entity->setLinearVelocity(10);
+    ego_entity->requestSpeedChange(3, true);
 
-    api_.spawn(
+    auto front_entity = api_.spawn(
       "front",
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
         34513, 10.0, 1.0, api_.getHdmapUtils()),
       getVehicleParameters());
-    api_.setLinearVelocity("front", 10);
-    api_.requestSpeedChange("front", 3, true);
+    front_entity->setLinearVelocity(10);
+    front_entity->requestSpeedChange(3, true);
 
-    api_.spawn(
+    auto behind_entity = api_.spawn(
       "behind",
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
         34513, 0.0, -1.0, api_.getHdmapUtils()),
       getVehicleParameters());
-    api_.setLinearVelocity("behind", 10);
-    api_.requestSpeedChange("behind", 3, true);
+    behind_entity->setLinearVelocity(10);
+    behind_entity->requestSpeedChange(3, true);
   }
 };
 }  // namespace cpp_mock_scenarios

@@ -39,30 +39,30 @@ private:
   bool canceled = false;
   void onUpdate() override
   {
-    if (api_.reachPosition(
-          "ego",
+    const auto ego_entity = api_.getEntity("ego");
+    if (ego_entity->isInPosition(
           traffic_simulator::helper::constructCanonicalizedLaneletPose(
             34513, 30, 0, api_.getHdmapUtils()),
           3.0)) {
-      api_.cancelRequest("ego");
+      ego_entity->cancelRequest();
       canceled = true;
     }
-    if (api_.isInLanelet("ego", 34507, 0.1)) {
+    if (ego_entity->isInLanelet(34507, 0.1)) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
   }
   void onInitialize() override
   {
-    api_.spawn(
+    auto ego_entity = api_.spawn(
       "ego",
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
         34513, 0.0, 0.0, api_.getHdmapUtils()),
       getVehicleParameters());
-    api_.setLinearVelocity("ego", 7);
-    api_.requestSpeedChange("ego", 7, true);
+    ego_entity->setLinearVelocity(7);
+    ego_entity->requestSpeedChange(7, true);
     const geometry_msgs::msg::Pose goal_pose = traffic_simulator::pose::toMapPose(
       traffic_simulator::helper::constructLaneletPose(34408, 0.0, 0.0), api_.getHdmapUtils());
-    api_.requestAcquirePosition("ego", goal_pose);
+    ego_entity->requestAcquirePosition(goal_pose);
   }
 };
 }  // namespace cpp_mock_scenarios
