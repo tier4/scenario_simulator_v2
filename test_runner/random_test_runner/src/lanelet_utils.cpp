@@ -21,10 +21,10 @@
 #include <lanelet2_routing/RoutingCost.h>
 #include <lanelet2_traffic_rules/TrafficRulesFactory.h>
 
+#include <autoware_lanelet2_extension/projection/mgrs_projector.hpp>
 #include <geographic_msgs/msg/geo_point.hpp>
 #include <geometry/vector3/normalize.hpp>
 #include <geometry/vector3/operator.hpp>
-#include <lanelet2_extension/projection/mgrs_projector.hpp>
 #include <optional>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 
