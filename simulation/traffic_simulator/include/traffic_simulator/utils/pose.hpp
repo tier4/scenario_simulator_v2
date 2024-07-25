@@ -32,11 +32,20 @@ auto canonicalize(
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
   -> std::optional<CanonicalizedLaneletPose>;
 
+auto canonicalize(
+  const std::vector<LaneletPose> & lanelet_pose,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+  -> std::optional<std::vector<CanonicalizedLaneletPose>>;
+
 auto toMapPose(const CanonicalizedLaneletPose & lanelet_pose) -> geometry_msgs::msg::Pose;
 
 auto toMapPose(
   const LaneletPose & lanelet_pose,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> geometry_msgs::msg::Pose;
+
+auto toLaneletPose(
+  const geometry_msgs::msg::Pose & map_pose, const bool include_crosswalk,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<LaneletPose>;
 
 auto toCanonicalizedLaneletPose(
   const geometry_msgs::msg::Pose & map_pose, const bool include_crosswalk,

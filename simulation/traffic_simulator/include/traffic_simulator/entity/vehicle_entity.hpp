@@ -99,13 +99,13 @@ public:
 
   auto onUpdate(const double current_time, const double step_time) -> void override;
 
-  void requestAcquirePosition(const CanonicalizedLaneletPose &);
+  void requestAcquirePosition(const LaneletPose &);
 
   void requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose) override;
 
   void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) override;
 
-  void requestAssignRoute(const std::vector<CanonicalizedLaneletPose> &) override;
+  void requestAssignRoute(const std::vector<LaneletPose> &) override;
 
   auto requestFollowTrajectory(
     const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &) -> void override;

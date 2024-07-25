@@ -356,13 +356,12 @@ auto API::checkCollision(
 }
 
 auto API::laneletRelativeYaw(
-  const std::string & entity_name, const CanonicalizedLaneletPose & lanelet_pose) const
-  -> std::optional<double>
+  const std::string & entity_name, const LaneletPose & lanelet_pose) const -> std::optional<double>
 {
   const auto entity = getEntity(entity_name);
   if (
     const auto relative_pose =
-      pose::relativePose(entity->getMapPose(), pose::toMapPose(lanelet_pose))) {
+      pose::relativePose(entity->getMapPose(), pose::toMapPose(lanelet_pose, getHdmapUtils()))) {
     return math::geometry::convertQuaternionToEulerAngle(relative_pose.value().orientation).z;
   } else {
     return std::nullopt;
@@ -456,28 +455,32 @@ auto API::relativeLaneletPose(
 }
 
 auto API::relativeLaneletPose(
-  const std::string & from_entity_name, const CanonicalizedLaneletPose & to_lanelet_pose,
+  const std::string & from_entity_name, const LaneletPose & to_lanelet_pose,
   const bool allow_lane_change) -> std::optional<LaneletPose>
 {
   const auto from_entity = getEntity(from_entity_name);
+  const auto to_canonicalized_lanelet_pose =
+    CanonicalizedLaneletPose(to_lanelet_pose, getHdmapUtils());
   if (from_entity->isInLanelet()) {
     return pose::relativeLaneletPose(
-      from_entity->getCanonicalizedLaneletPose().value(), to_lanelet_pose, allow_lane_change,
-      getHdmapUtils());
+      from_entity->getCanonicalizedLaneletPose().value(), to_canonicalized_lanelet_pose,
+      allow_lane_change, getHdmapUtils());
   } else {
     return std::nullopt;
   }
 }
 
 auto API::relativeLaneletPose(
-  const CanonicalizedLaneletPose & from_lanelet_pose, const std::string & to_entity_name,
+  const LaneletPose & from_lanelet_pose, const std::string & to_entity_name,
   const bool allow_lane_change) -> std::optional<LaneletPose>
 {
   const auto to_entity = getEntity(to_entity_name);
+  const auto from_canonicalized_lanelet_pose =
+    CanonicalizedLaneletPose(from_lanelet_pose, getHdmapUtils());
   if (to_entity->isInLanelet()) {
     return pose::relativeLaneletPose(
-      from_lanelet_pose, to_entity->getCanonicalizedLaneletPose().value(), allow_lane_change,
-      getHdmapUtils());
+      from_canonicalized_lanelet_pose, to_entity->getCanonicalizedLaneletPose().value(),
+      allow_lane_change, getHdmapUtils());
   } else {
     return std::nullopt;
   }
@@ -500,14 +503,16 @@ auto API::boundingBoxRelativeLaneletPose(
 }
 
 auto API::boundingBoxRelativeLaneletPose(
-  const std::string & from_entity_name, const CanonicalizedLaneletPose & to_lanelet_pose,
+  const std::string & from_entity_name, const LaneletPose & to_lanelet_pose,
   const bool allow_lane_change) -> std::optional<LaneletPose>
 {
   const auto from_entity = getEntity(from_entity_name);
+  const auto to_canonicalized_lanelet_pose =
+    CanonicalizedLaneletPose(to_lanelet_pose, getHdmapUtils());
   if (from_entity->isInLanelet()) {
     return pose::boundingBoxRelativeLaneletPose(
       from_entity->getCanonicalizedLaneletPose().value(), from_entity->getBoundingBox(),
-      to_lanelet_pose, traffic_simulator_msgs::msg::BoundingBox(), allow_lane_change,
+      to_canonicalized_lanelet_pose, traffic_simulator_msgs::msg::BoundingBox(), allow_lane_change,
       getHdmapUtils());
   } else {
     return std::nullopt;

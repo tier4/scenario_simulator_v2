@@ -94,7 +94,7 @@ void CppScenarioNode::stop(Result result, const std::string & description)
 
 void CppScenarioNode::spawnEgoEntity(
   const traffic_simulator::CanonicalizedLaneletPose & spawn_lanelet_pose,
-  const std::vector<traffic_simulator::CanonicalizedLaneletPose> & goal_lanelet_poses,
+  const std::vector<traffic_simulator::LaneletPose> & goal_lanelet_poses,
   const traffic_simulator_msgs::msg::VehicleParameters & parameters)
 {
   api_.updateFrame();

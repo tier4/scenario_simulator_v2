@@ -57,7 +57,7 @@ private:
     spawnEgoEntity(
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
         34621, 10.0, 0.0, api_.getHdmapUtils()),
-      {goal_pose}, getVehicleParameters());
+      {static_cast<traffic_simulator::msgs::LaneletPose>(goal_pose)}, getVehicleParameters());
   }
 
 private:

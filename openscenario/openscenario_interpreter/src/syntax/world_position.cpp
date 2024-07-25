@@ -33,7 +33,7 @@ WorldPosition::WorldPosition(const pugi::xml_node & node, Scope & scope)
 
 WorldPosition::operator NativeLanePosition() const
 {
-  return convert<NativeLanePosition>(static_cast<NativeWorldPosition>(*this));
+  return convertToNativeLanePosition(static_cast<NativeWorldPosition>(*this));
 }
 
 WorldPosition::operator NativeWorldPosition() const

@@ -164,8 +164,7 @@ TEST_F(MiscObjectEntityTest_HdMapUtils, requestAssignRoute_laneletPose)
         hdmap_utils_ptr, makeCanonicalizedLaneletPose(hdmap_utils_ptr, 120659), makeBoundingBox(),
         0.0, entity_name, traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
       hdmap_utils_ptr, traffic_simulator_msgs::msg::MiscObjectParameters{})
-      .requestAssignRoute(std::vector<traffic_simulator::lanelet_pose::CanonicalizedLaneletPose>{
-        makeCanonicalizedLaneletPose(hdmap_utils_ptr, 120660)}),
+      .requestAssignRoute({makeLaneletPose(120660)}),
     common::SemanticError);
 }
 
@@ -200,7 +199,7 @@ TEST_F(MiscObjectEntityTest_HdMapUtils, requestAcquirePosition_laneletPose)
         hdmap_utils_ptr, makeCanonicalizedLaneletPose(hdmap_utils_ptr, 120659), makeBoundingBox(),
         0.0, entity_name, traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
       hdmap_utils_ptr, traffic_simulator_msgs::msg::MiscObjectParameters{})
-      .requestAcquirePosition(makeCanonicalizedLaneletPose(hdmap_utils_ptr, 120660)),
+      .requestAcquirePosition(makeLaneletPose(120660)),
     common::SemanticError);
 }
 

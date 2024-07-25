@@ -31,7 +31,7 @@ using NativeWorldPosition = geometry_msgs::msg::Pose;
 
 using NativeRelativeWorldPosition = NativeWorldPosition;
 
-using NativeLanePosition = traffic_simulator::CanonicalizedLaneletPose;
+using NativeLanePosition = traffic_simulator::LaneletPose;
 
 using NativeRelativeLanePosition = traffic_simulator::LaneletPose;
 
@@ -68,24 +68,18 @@ public:
   class CoordinateSystemConversion
   {
   protected:
-    static auto canonicalize(const traffic_simulator::LaneletPose & non_canonicalized)
-      -> NativeLanePosition
-    {
-      return NativeLanePosition(non_canonicalized, core->getHdmapUtils());
-    }
-
-    template <typename T, typename std::enable_if_t<std::is_same_v<T, NativeLanePosition>, int> = 0>
-    static auto convert(const NativeWorldPosition & pose) -> NativeLanePosition
+    static auto convertToNativeLanePosition(const geometry_msgs::msg::Pose & map_pose)
+      -> traffic_simulator::LaneletPose
     {
       constexpr bool include_crosswalk{false};
       if (
-        const auto result = traffic_simulator::pose::toCanonicalizedLaneletPose(
-          pose, include_crosswalk, core->getHdmapUtils())) {
+        const auto result = traffic_simulator::pose::toLaneletPose(
+          map_pose, include_crosswalk, core->getHdmapUtils())) {
         return result.value();
       } else {
         throw Error(
-          "The specified WorldPosition = [", pose.position.x, ", ", pose.position.y, ", ",
-          pose.position.z,
+          "The specified WorldPosition = [", map_pose.position.x, ", ", map_pose.position.y, ", ",
+          map_pose.position.z,
           "] could not be approximated to the proper Lane. Perhaps the "
           "WorldPosition points to a location where multiple lanes overlap, and "
           "there are at least two or more candidates for a LanePosition that "
@@ -95,11 +89,10 @@ public:
       }
     }
 
-    template <
-      typename T, typename std::enable_if_t<std::is_same_v<T, NativeWorldPosition>, int> = 0>
-    static auto convert(const NativeLanePosition & native_lane_position) -> NativeWorldPosition
+    static auto convertToNativeWorldPosition(const traffic_simulator::LaneletPose & lanelet_pose)
+      -> geometry_msgs::msg::Pose
     {
-      return traffic_simulator::pose::toMapPose(native_lane_position);
+      return traffic_simulator::pose::toMapPose(lanelet_pose, core->getHdmapUtils());
     }
 
     template <typename FirstType, typename SecondType>
@@ -283,7 +276,7 @@ public:
 
     // other necessary now
     static auto makeNativeRelativeWorldPosition(
-      const NativeWorldPosition & from_map_pose, const std::string & to_entity_name)
+      const geometry_msgs::msg::Pose & from_map_pose, const std::string & to_entity_name)
     {
       if (core->isEntitySpawned(to_entity_name)) {
         if (const auto relative_pose = core->relativePose(from_map_pose, to_entity_name)) {
@@ -300,7 +293,8 @@ public:
     template <typename... Ts>
     static auto applyAcquirePositionAction(const std::string & entity_name, Ts &&... xs)
     {
-      return core->getEntity(entity_name)->requestAcquirePosition(std::forward<decltype(xs)>(xs)...);
+      return core->getEntity(entity_name)
+        ->requestAcquirePosition(std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>
@@ -447,8 +441,8 @@ public:
       }
     }
 
-    static auto applyAssignRouteAction(
-      const std::string & entity_name, Ts &&... xs)
+    template <typename... Ts>
+    static auto applyAssignRouteAction(const std::string & entity_name, Ts &&... xs)
     {
       return core->getEntity(entity_name)->requestAssignRoute(std::forward<decltype(xs)>(xs)...);
     }
@@ -583,7 +577,7 @@ public:
     }
 
     static auto evaluateRelativeHeading(
-      const std::string & entity_name, const traffic_simulator::CanonicalizedLaneletPose & lanelet_pose)
+      const std::string & entity_name, const traffic_simulator::LaneletPose & lanelet_pose)
     {
       if (core->isEntitySpawned(entity_name)) {
         if (const auto relative_yaw = core->laneletRelativeYaw(entity_name, lanelet_pose)) {

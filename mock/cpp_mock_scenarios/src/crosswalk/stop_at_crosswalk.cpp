@@ -80,11 +80,9 @@ private:
       getVehicleParameters());
     ego_entity->setLinearVelocity(10);
     ego_entity->requestSpeedChange(8, true);
-    ego_entity->requestAssignRoute(std::vector<traffic_simulator::CanonicalizedLaneletPose>{
-      traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34675, 0.0, 0.0, api_.getHdmapUtils()),
-      traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34690, 0.0, 0.0, api_.getHdmapUtils())});
+    ego_entity->requestAssignRoute(
+      {traffic_simulator::helper::constructLaneletPose(34675, 0.0, 0.0),
+       traffic_simulator::helper::constructLaneletPose(34690, 0.0, 0.0)});
 
     auto bob_entity = api_.spawn(
       "bob",

@@ -49,7 +49,7 @@ public:
   }
   void spawnEgoEntity(
     const traffic_simulator::CanonicalizedLaneletPose & spawn_lanelet_pose,
-    const std::vector<traffic_simulator::CanonicalizedLaneletPose> & goal_lanelet_pose,
+    const std::vector<traffic_simulator::LaneletPose> & goal_lanelet_pose,
     const traffic_simulator_msgs::msg::VehicleParameters & parameters);
 
 protected:

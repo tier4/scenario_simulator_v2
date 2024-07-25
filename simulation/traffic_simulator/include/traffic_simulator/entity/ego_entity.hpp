@@ -90,11 +90,11 @@ public:
 
   void onUpdate(double current_time, double step_time) override;
 
-  void requestAcquirePosition(const CanonicalizedLaneletPose &) override;
+  void requestAcquirePosition(const LaneletPose &) override;
 
   void requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose) override;
 
-  void requestAssignRoute(const std::vector<CanonicalizedLaneletPose> &) override;
+  void requestAssignRoute(const std::vector<LaneletPose> &) override;
 
   void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) override;
 

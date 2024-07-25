@@ -72,7 +72,7 @@ public:
 
   auto onUpdate(const double current_time, const double step_time) -> void override;
 
-  void requestAcquirePosition(const CanonicalizedLaneletPose & lanelet_pose) override;
+  void requestAcquirePosition(const LaneletPose & lanelet_pose) override;
 
   void requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose) override;
 
@@ -96,7 +96,7 @@ public:
 
   void setDecelerationRateLimit(double deceleration) override;
 
-  void requestAssignRoute(const std::vector<CanonicalizedLaneletPose> & waypoints) override;
+  void requestAssignRoute(const std::vector<LaneletPose> & waypoints) override;
 
   void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) override;
 

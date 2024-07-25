@@ -133,8 +133,7 @@ public:
   /*   */ auto isInPosition(
     const geometry_msgs::msg::Pose & target_pose, const double tolerance) const -> bool;
 
-  /*   */ auto isInPosition(
-    const CanonicalizedLaneletPose & lanelet_pose, const double tolerance) const -> bool;
+  /*   */ auto isInPosition(const LaneletPose & lanelet_pose, const double tolerance) const -> bool;
 
   /*   */ auto isInLanelet() const -> bool { return status_.isInLanelet(); };
 
@@ -160,11 +159,11 @@ public:
 
   /*   */ void resetDynamicConstraints();
 
-  virtual void requestAcquirePosition(const CanonicalizedLaneletPose &) = 0;
+  virtual void requestAcquirePosition(const LaneletPose &) = 0;
 
   virtual void requestAcquirePosition(const geometry_msgs::msg::Pose &) = 0;
 
-  virtual void requestAssignRoute(const std::vector<CanonicalizedLaneletPose> &) = 0;
+  virtual void requestAssignRoute(const std::vector<LaneletPose> &) = 0;
 
   virtual void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) = 0;
 

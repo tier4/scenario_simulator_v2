@@ -160,9 +160,7 @@ private:
       if (
         !api_.isEntitySpawned(entity_name) &&
         !ego_entity->isInPosition(
-          traffic_simulator::helper::constructCanonicalizedLaneletPose(
-            34576, 25.0, 0.0, api_.getHdmapUtils()),
-          5.0)) {
+          traffic_simulator::helper::constructLaneletPose(34576, 25.0, 0.0), 5.0)) {
         std::normal_distribution<> offset_distribution(
           0.0, params_.random_parameters.crossing_pedestrian.offset_variance);
         std::uniform_real_distribution<> speed_distribution(
@@ -188,8 +186,7 @@ private:
     }
 
     {
-      const auto trigger_position = traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34621, 10, 0.0, api_.getHdmapUtils());
+      const auto trigger_position = traffic_simulator::helper::constructLaneletPose(34621, 10, 0.0);
       const auto entity_name = "spawn_nearby_ego";
       if (ego_entity->isInPosition(trigger_position, 20.0) && !api_.isEntitySpawned(entity_name)) {
         api_.spawn(
@@ -220,9 +217,7 @@ private:
     spawnEgoEntity(
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
         34621, 10.0, 0.0, api_.getHdmapUtils()),
-      {traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34606, 0.0, 0.0, api_.getHdmapUtils())},
-      getVehicleParameters());
+      {traffic_simulator::helper::constructLaneletPose(34606, 0.0, 0.0)}, getVehicleParameters());
     const auto parking_outside_entity = api_.spawn(
       "parking_outside",
       traffic_simulator::pose::transformRelativePoseToGlobal(

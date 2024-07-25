@@ -231,8 +231,7 @@ public:
   auto checkCollision(
     const std::string & first_entity_name, const std::string & second_entity_name) const -> bool;
 
-  auto laneletRelativeYaw(
-    const std::string & entity_name, const CanonicalizedLaneletPose & lanelet_pose) const
+  auto laneletRelativeYaw(const std::string & entity_name, const LaneletPose & lanelet_pose) const
     -> std::optional<double>;
 
   auto timeHeadway(const std::string & from_entity_name, const std::string & to_entity_name)
@@ -265,11 +264,11 @@ public:
     const bool allow_lane_change) -> std::optional<LaneletPose>;
 
   auto relativeLaneletPose(
-    const std::string & from_entity_name, const CanonicalizedLaneletPose & to_lanelet_pose,
+    const std::string & from_entity_name, const LaneletPose & to_lanelet_pose,
     const bool allow_lane_change) -> std::optional<LaneletPose>;
 
   auto relativeLaneletPose(
-    const CanonicalizedLaneletPose & from_lanelet_pose, const std::string & to_entity_name,
+    const LaneletPose & from_lanelet_pose, const std::string & to_entity_name,
     const bool allow_lane_change) -> std::optional<LaneletPose>;
 
   auto boundingBoxRelativeLaneletPose(
@@ -277,7 +276,7 @@ public:
     const bool allow_lane_change) -> std::optional<LaneletPose>;
 
   auto boundingBoxRelativeLaneletPose(
-    const std::string & from_entity_name, const CanonicalizedLaneletPose & to_lanelet_pose,
+    const std::string & from_entity_name, const LaneletPose & to_lanelet_pose,
     const bool allow_lane_change) -> std::optional<LaneletPose>;
 
   // traffics, lanelet
