@@ -61,7 +61,7 @@ OpenSCENARIO:
                   Position:
                     LanePosition: &CAR_1_LANE_POSITION
                       << : *EGO_LANE_POSITION
-                      s: 20
+                      s: 25
               - LongitudinalAction: *SPEED_ACTION_ZERO
           - entityRef: car_right_front
             PrivateAction:
@@ -70,7 +70,7 @@ OpenSCENARIO:
                     LanePosition: &CAR_2_LANE_POSITION
                       << : *EGO_LANE_POSITION
                       laneId: 34462
-                      s: 20
+                      s: 25
               - LongitudinalAction: *SPEED_ACTION_ZERO
           - entityRef: car_right_back
             PrivateAction:
@@ -124,7 +124,7 @@ OpenSCENARIO:
                                     EntityCondition:
                                       RelativeClearanceCondition:
                                         distanceBackward: 7
-                                        distanceForward: 7
+                                        distanceForward: 12
                                         freeSpace: false
                                         oppositeLanes: false
                             - Condition:
@@ -171,7 +171,7 @@ OpenSCENARIO:
                                     EntityCondition:
                                       RelativeClearanceCondition:
                                         distanceBackward: 3
-                                        distanceForward: 3
+                                        distanceForward: 8
                                         freeSpace: false
                                         oppositeLanes: false
                                 - name: "check back is clear with front cars"
@@ -205,7 +205,7 @@ OpenSCENARIO:
                                           - entityRef: car_right_back
                                           - entityRef: car_same_back
                                         distanceBackward: 0
-                                        distanceForward: 7
+                                        distanceForward: 12
                                         freeSpace: false
                                         oppositeLanes: false
                                 - name: "check right is clear with cars in the same lane"
@@ -222,7 +222,7 @@ OpenSCENARIO:
                                           - entityRef: car_same_front
                                           - entityRef: car_same_back
                                         distanceBackward: 7
-                                        distanceForward: 7
+                                        distanceForward: 12
                                         freeSpace: false
                                         oppositeLanes: false
                                         RelativeLaneRange:
@@ -242,7 +242,7 @@ OpenSCENARIO:
                                           - entityRef: car_right_front
                                           - entityRef: car_right_back
                                         distanceBackward: 7
-                                        distanceForward: 7
+                                        distanceForward: 12
                                         freeSpace: false
                                         oppositeLanes: false
                                         RelativeLaneRange:
