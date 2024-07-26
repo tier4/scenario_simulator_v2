@@ -41,7 +41,7 @@ RelativeClearanceCondition::RelativeClearanceCondition(
             [&](const auto & triggering_entity) {
               return triggering_entity.name() == entity.first;
             }) == triggering_entities.entity_refs.end()) {
-          entities.emplace_back(name);
+          entities.emplace_back(entity.first);
         }
       }
     }
