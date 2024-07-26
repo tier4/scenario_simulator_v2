@@ -40,7 +40,9 @@ inline namespace syntax
      <xsd:attribute name="freeSpace" type="Boolean" use="required"/>
    </xsd:complexType>
 */
-struct RelativeClearanceCondition : private Scope, private SimulatorCore::ConditionEvaluation
+struct RelativeClearanceCondition : private Scope,
+                                    private SimulatorCore::ConditionEvaluation,
+                                    private SimulatorCore::NonStandardOperation
 {
   /*
      	Longitudinal distance behind reference point of the entity to be checked along lane centerline of the current lane of the triggering entity. Orientation of entity towards lane determines backward direction. Velocity of entity is irrelevant. Unit: [m]. Range: [0..inf[. Default if omitted: 0

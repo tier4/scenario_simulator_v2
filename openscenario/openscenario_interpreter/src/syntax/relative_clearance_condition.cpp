@@ -68,30 +68,44 @@ auto RelativeClearanceCondition::description() const -> String
 auto RelativeClearanceCondition::evaluate() -> Object
 {
   return asBoolean(triggering_entities.apply([&](const auto & triggering_entity) {
-    return std::all_of(entity_refs.begin(), entity_refs.end(), [&](const auto & entity) {
-      auto is_in_lateral_range = [&]() {
-        // The lanes to be checked to left and right of the triggering entity (positive to the y-axis). If omitted: all lanes are checked.
-        if (relative_lane_range.empty()) {
-          return true;
-        } else {
-          auto relative_lateral_lane =
-            evaluateLateralRelativeLanes(triggering_entity, entity, RoutingAlgorithm::shortest);
-          return std::any_of(
-            relative_lane_range.begin(), relative_lane_range.end(), [&](const auto & range) {
-              return range.from <= relative_lateral_lane && range.to >= relative_lateral_lane;
-            });
-        }
-      };
+    return std::all_of(
+      entity_refs.begin(), entity_refs.end(),
+      [&, is_back =
+            (std::abs(evaluateRelativeHeading(triggering_entity)) > M_2_PI)](const auto & entity) {
+        auto is_in_lateral_range = [&]() {
+          // The lanes to be checked to left and right of the triggering entity (positive to the y-axis). If omitted: all lanes are checked.
+          if (relative_lane_range.empty()) {
+            return true;
+          } else {
+            if (auto relative_lateral_lane = evaluateLateralRelativeLanes(
+                  triggering_entity, entity, RoutingAlgorithm::shortest);
+                relative_lateral_lane.has_value()) {
+              if (is_back) {
+                relative_lateral_lane.value() = -relative_lateral_lane.value();
+              }
+              return std::any_of(
+                relative_lane_range.begin(), relative_lane_range.end(), [&](const auto & range) {
+                  return range.from <= relative_lateral_lane.value() &&
+                         range.to >= relative_lateral_lane.value();
+                });
+            } else {
+              throw common::Error("Relative lateral lane is not available");
+            }
+          }
+        };
 
-      auto is_in_longitudinal_range = [&]() {
-        auto relative_lane_position =
-          getRelativeLanePosition(triggering_entity, entity, free_space);
-        if (relative_lane_position.s < 0) {
-          return std::abs(relative_lane_position.s) <= distance_backward;
-        } else {
-          return relative_lane_position.s <= distance_forward;
-        }
-      };
+        auto is_in_longitudinal_range = [&]() {
+          auto relative_longitudinal =
+            getRelativeLanePosition(triggering_entity, entity, free_space).s;
+          if (is_back) {
+            relative_longitudinal = -relative_longitudinal;
+          }
+          if (relative_longitudinal < 0) {
+            return std::abs(relative_longitudinal) <= distance_backward;
+          } else {
+            return relative_longitudinal <= distance_forward;
+          }
+        };
 
       auto lat_ok = is_in_lateral_range();
       auto lon_ok = is_in_longitudinal_range();
