@@ -40,7 +40,7 @@ files = [
 docutils = "*"
 pyparsing = "*"
 python-dateutil = "*"
-setuptools = "*"
+setuptools = "65.5.0"
 
 [package.extras]
 test = ["flake8", "flake8-blind-except", "flake8-builtins", "flake8-class-newline", "flake8-comprehensions", "flake8-deprecated", "flake8-docstrings", "flake8-import-order", "flake8-quotes", "pytest"]
