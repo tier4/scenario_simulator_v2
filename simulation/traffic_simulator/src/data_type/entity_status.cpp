@@ -90,6 +90,17 @@ auto CanonicalizedEntityStatus::set(
   set(status, getLaneletIds(), matching_distance, hdmap_utils_ptr);
 }
 
+auto CanonicalizedEntityStatus::setAction(const std::string & action) -> void
+{
+  entity_status_.action_status.current_action = action;
+}
+
+auto CanonicalizedEntityStatus::getActionStatus() const noexcept
+  -> const traffic_simulator_msgs::msg::ActionStatus &
+{
+  return entity_status_.action_status;
+}
+
 auto CanonicalizedEntityStatus::laneMatchingSucceed() const noexcept -> bool
 {
   return canonicalized_lanelet_pose_.has_value();
@@ -169,11 +180,6 @@ auto CanonicalizedEntityStatus::getAccel() const noexcept -> const geometry_msgs
 auto CanonicalizedEntityStatus::setLinearJerk(double linear_jerk) -> void
 {
   entity_status_.action_status.linear_jerk = linear_jerk;
-}
-
-auto CanonicalizedEntityStatus::setAction(const std::string & action) -> void
-{
-  entity_status_.action_status.current_action = action;
 }
 
 auto CanonicalizedEntityStatus::getLinearJerk() const noexcept -> double

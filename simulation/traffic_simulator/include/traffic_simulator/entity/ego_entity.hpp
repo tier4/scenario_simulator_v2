@@ -69,7 +69,7 @@ public:
 
   auto getCurrentAction() const -> std::string override;
 
-  auto getCurrentPose() const -> geometry_msgs::msg::Pose;
+  auto getCurrentPose() const -> const geometry_msgs::msg::Pose &;
 
   auto getDefaultDynamicConstraints() const
     -> const traffic_simulator_msgs::msg::DynamicConstraints & override;
@@ -135,9 +135,9 @@ public:
   template <typename... Ts>
   auto setStatus(Ts &&... xs)
   {
-    if (status_.getTime() > 0 && not isControlledBySimulator()) {
+    if (status_->getTime() > 0 && not isControlledBySimulator()) {
       THROW_SEMANTIC_ERROR(
-        "You cannot set entity status to the ego vehicle named ", std::quoted(status_.getName()),
+        "You cannot set entity status to the ego vehicle named ", std::quoted(status_->getName()),
         " after starting scenario.");
     } else {
       EntityBase::setStatus(std::forward<decltype(xs)>(xs)...);
