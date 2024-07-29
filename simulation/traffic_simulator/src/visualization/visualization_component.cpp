@@ -124,18 +124,20 @@ const visualization_msgs::msg::MarkerArray VisualizationComponent::generateMarke
   constexpr auto default_quaternion = rosidl_runtime_cpp::MessageInitialization::DEFAULTS_ONLY;
   auto ret = visualization_msgs::msg::MarkerArray();
   auto stamp = get_clock()->now();
-  std_msgs::msg::ColorRGBA color;
-  switch (status.type.type) {
-    case status.type.EGO:
-      color = color_names::makeColorMsg("limegreen", 0.99);
-      break;
-    case status.type.PEDESTRIAN:
-      color = color_names::makeColorMsg("orange", 0.99);
-      break;
-    case status.type.VEHICLE:
-      color = color_names::makeColorMsg("lightskyblue", 0.99);
-      break;
-  }
+
+  const auto color = [&]() {
+    switch (status.type.type) {
+      case status.type.EGO:
+        return color_names::makeColorMsg("limegreen", 0.99);
+      case status.type.PEDESTRIAN:
+        return color_names::makeColorMsg("orange", 0.99);
+      case status.type.VEHICLE:
+        return color_names::makeColorMsg("lightskyblue", 0.99);
+      default:
+      case status.type.MISC_OBJECT:
+        return color_names::makeColorMsg("magenta", 0.99);
+    }
+  }();
 
   if (goal_pose.size() != 0) {
     goal_pose_max_size = std::max(goal_pose_max_size, int(goal_pose.size()));
