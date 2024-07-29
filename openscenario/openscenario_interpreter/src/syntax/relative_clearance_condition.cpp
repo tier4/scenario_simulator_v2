@@ -107,10 +107,10 @@ auto RelativeClearanceCondition::evaluate() -> Object
           }
         };
 
-      auto lat_ok = is_in_lateral_range();
-      auto lon_ok = is_in_longitudinal_range();
-      return not(lat_ok && lon_ok);
-    });
+        auto lat_ok = is_in_lateral_range();
+        auto lon_ok = is_in_longitudinal_range();
+        return not(lat_ok && lon_ok);
+      });
   }));
 }
 
