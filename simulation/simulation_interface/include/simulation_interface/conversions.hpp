@@ -23,6 +23,9 @@
 #include <traffic_simulator_msgs.pb.h>
 
 #include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
+#include <autoware_auto_perception_msgs/msg/traffic_light.hpp>
+#include <autoware_auto_perception_msgs/msg/traffic_signal.hpp>
+#include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
 #include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
 #include <builtin_interfaces/msg/duration.hpp>
 #include <builtin_interfaces/msg/time.hpp>
@@ -184,6 +187,18 @@ auto toProto(
     autoware_auto_control_msgs::msg::AckermannControlCommand,
     autoware_auto_vehicle_msgs::msg::GearCommand> &,
   traffic_simulator_msgs::VehicleCommand &) -> void;
+
+auto toProto(
+  const autoware_auto_perception_msgs::msg::TrafficLight & message,
+  simulation_api_schema::TrafficLight & proto) -> void;
+
+auto toProto(
+  const autoware_auto_perception_msgs::msg::TrafficSignal & message,
+  simulation_api_schema::TrafficSignal & proto) -> void;
+
+auto toProto(
+  const autoware_auto_perception_msgs::msg::TrafficSignalArray & message,
+  simulation_api_schema::UpdateTrafficLightsRequest & proto) -> void;
 
 template <typename TrafficLightBulbMessageType>
 auto toMsg(
