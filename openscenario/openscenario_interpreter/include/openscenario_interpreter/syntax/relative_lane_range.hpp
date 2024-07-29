@@ -16,8 +16,8 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_LANE_RANGE_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/integer.hpp>
 #include <pugixml.hpp>
-#include <traffic_simulator/data_type/lane_change.hpp>
 
 namespace openscenario_interpreter
 {
