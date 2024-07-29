@@ -12,19 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHTS_MARKER_PUBLISHER_HPP
-#define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHTS_MARKER_PUBLISHER_HPP
+#ifndef TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MARKER_PUBLISHER_HPP
+#define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MARKER_PUBLISHER_HPP
 
 #include <rclcpp/rclcpp.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light.hpp>
 
 namespace traffic_simulator
 {
-class TrafficLightsMarkerPublisher
+class TrafficLightMarkerPublisher
 {
 public:
   template <typename NodeTypePointer>
-  explicit TrafficLightsMarkerPublisher(
+  explicit TrafficLightMarkerPublisher(
     const NodeTypePointer & node_ptr, const std::string & frame = "map")
   : frame_(frame),
     clock_ptr_(node_ptr->get_clock()),
@@ -44,4 +44,4 @@ private:
   const rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr publisher_;
 };
 }  // namespace traffic_simulator
-#endif  // TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHTS_MARKER_PUBLISHER_HPP
+#endif  // TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MARKER_PUBLISHER_HPP

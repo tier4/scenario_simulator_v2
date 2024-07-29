@@ -17,8 +17,8 @@
 
 #include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
 #include <autoware_perception_msgs/msg/traffic_signal_array.hpp>
+#include <traffic_simulator/traffic_lights/traffic_light_publisher.hpp>
 #include <traffic_simulator/traffic_lights/traffic_lights_base.hpp>
-#include <traffic_simulator/traffic_lights/traffic_lights_publisher.hpp>
 
 namespace traffic_simulator
 {
