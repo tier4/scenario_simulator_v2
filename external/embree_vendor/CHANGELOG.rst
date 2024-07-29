@@ -24,6 +24,9 @@ Changelog for package embree_vendor
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+3.4.0 (2024-07-26)
+------------------
+
 3.3.0 (2024-07-23)
 ------------------
 * Merge branch 'master' into feature/interpreter/entity_selection
