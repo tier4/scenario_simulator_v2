@@ -33,8 +33,14 @@ inline namespace syntax
 */
 struct RelativeLaneRange
 {
+  /*
+     The lower limit of the range. Range: [-inf, inf[. Default if omitted: -inf
+   */
   const Integer from;
 
+  /*
+     The upper limit of the range. Range: ]-inf, inf]. Default if omitted: +inf
+   */
   const Integer to;
 
   explicit RelativeLaneRange(const pugi::xml_node &, Scope &);

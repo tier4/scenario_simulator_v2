@@ -20,7 +20,8 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 RelativeLaneRange::RelativeLaneRange(const pugi::xml_node & node, Scope & scope)
-: from(readAttribute<Integer>("from", node, scope)), to(readAttribute<Integer>("to", node, scope))
+: from(readAttribute<Integer>("from", node, scope, -Integer::infinity())),
+  to(readAttribute<Integer>("to", node, scope, Integer::infinity()))
 {
 }
 }  // namespace syntax
