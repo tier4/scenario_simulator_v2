@@ -30,7 +30,7 @@ public:
     const NodeTypePointer & node_ptr, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils)
   : TrafficLightsBase(node_ptr, hdmap_utils),
     backward_compatible_publisher_ptr_(
-      std::make_unique<TrafficLightsPublisher<traffic_simulator_msgs::msg::TrafficLightArrayV1>>(
+      std::make_unique<TrafficLightPublisher<traffic_simulator_msgs::msg::TrafficLightArrayV1>>(
         node_ptr, "/simulation/traffic_lights"))
   {
   }
@@ -47,7 +47,7 @@ private:
     marker_publisher_ptr_->drawMarkers(traffic_lights_map_);
   }
 
-  const std::unique_ptr<TrafficLightsPublisherBase> backward_compatible_publisher_ptr_;
+  const std::unique_ptr<TrafficLightPublisherBase> backward_compatible_publisher_ptr_;
 };
 
 class V2ITrafficLights : public TrafficLightsBase
@@ -81,7 +81,7 @@ private:
   template <typename NodeTypePointer>
   auto makePublisher(
     const NodeTypePointer & node_ptr, const std::string & architecture_type,
-    const std::string & topic_name) -> std::unique_ptr<TrafficLightsPublisherBase>
+    const std::string & topic_name) -> std::unique_ptr<TrafficLightPublisherBase>
   {
     /*
        Here autoware_perception_msgs is used for all awf/universe/....
@@ -93,7 +93,7 @@ private:
     */
     if (architecture_type.find("awf/universe") != std::string::npos) {
       return std::make_unique<
-        TrafficLightsPublisher<autoware_perception_msgs::msg::TrafficSignalArray>>(
+        TrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>>(
         node_ptr, topic_name);
     } else {
       throw common::SemanticError(
@@ -102,8 +102,8 @@ private:
     }
   }
 
-  const std::unique_ptr<TrafficLightsPublisherBase> publisher_ptr_;
-  const std::unique_ptr<TrafficLightsPublisherBase> legacy_topic_publisher_ptr_;
+  const std::unique_ptr<TrafficLightPublisherBase> publisher_ptr_;
+  const std::unique_ptr<TrafficLightPublisherBase> legacy_topic_publisher_ptr_;
 };
 
 class TrafficLights

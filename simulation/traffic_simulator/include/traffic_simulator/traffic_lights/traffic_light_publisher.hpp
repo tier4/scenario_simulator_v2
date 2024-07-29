@@ -24,22 +24,22 @@
 
 namespace traffic_simulator
 {
-class TrafficLightsPublisherBase
+class TrafficLightPublisherBase
 {
 public:
   virtual auto publish(const TrafficLightsBase & traffic_lights) const -> void = 0;
-  virtual ~TrafficLightsPublisherBase() = default;
+  virtual ~TrafficLightPublisherBase() = default;
 };
 
 template <typename MessageType>
-class TrafficLightsPublisher : public TrafficLightsPublisherBase
+class TrafficLightPublisher : public TrafficLightPublisherBase
 {
 public:
   template <typename NodeTypePointer>
-  explicit TrafficLightsPublisher(
+  explicit TrafficLightPublisher(
     const NodeTypePointer & node_ptr, const std::string & topic_name,
     const std::string & frame = "camera_link")
-  : TrafficLightsPublisherBase(),
+  : TrafficLightPublisherBase(),
     frame_(frame),
     clock_ptr_(node_ptr->get_clock()),
     traffic_light_state_array_publisher_(rclcpp::create_publisher<MessageType>(
@@ -47,7 +47,7 @@ public:
   {
   }
 
-  ~TrafficLightsPublisher() override = default;
+  ~TrafficLightPublisher() override = default;
 
   auto publish(const TrafficLightsBase & traffic_lights) const -> void override;
 
