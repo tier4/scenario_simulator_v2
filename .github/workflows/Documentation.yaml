@@ -31,19 +31,19 @@ jobs:
 
       - name: show setuptools version
         run: pip show setuptools
-
-      - name: install specific version of setuptools
-        run: pip install setuptools==70.1.0
-
-      - name: show setuptools version
-        run: pip show setuptools
         
       - uses: abatilo/actions-poetry@v2
         with:
           poetry-version: "1.5.1"
 
+      - name: show setuptools version
+        run: pip show setuptools
+
       - name: install
         run: poetry install --no-interaction
+
+      - name: show setuptools version
+        run: pip show setuptools
 
       - name: Generate documentation
         run: poetry run mkdocs build
