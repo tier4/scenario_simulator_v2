@@ -35,6 +35,8 @@ struct Integer
 
   explicit Integer(const std::string &);
 
+  static auto infinity() noexcept -> Integer;
+
   auto operator+=(const double &) -> Integer &;
 
   auto operator*=(const double &) -> Integer &;

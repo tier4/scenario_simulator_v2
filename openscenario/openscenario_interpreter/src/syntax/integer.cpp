@@ -34,6 +34,11 @@ Integer::Integer(const std::string & s)
   }
 }
 
+auto Integer::infinity() noexcept -> Integer
+{
+  return static_cast<Integer>(std::numeric_limits<value_type>::infinity());
+}
+
 auto Integer::operator+=(const double & rhs) -> Integer &
 {
   data += rhs;
