@@ -53,10 +53,12 @@ auto FollowTrajectoryAction::accomplished() -> bool
   } else {
     return std::all_of(
       std::begin(accomplishments), std::end(accomplishments), [this](auto && accomplishment) {
-        auto is_running = [this](auto &&... xs) {
+        auto is_running = [this](const auto & actor) {
           if (trajectory_ref.trajectory.as<Trajectory>().shape.is<Polyline>()) {
-            return evaluateCurrentState(std::forward<decltype(xs)>(xs)...) ==
-                   "follow_polyline_trajectory";
+            auto evaluation = actor.apply([&](const auto & object) {
+              return evaluateCurrentState(object) == "follow_polyline_trajectory";
+            });
+            return not evaluation.size() or evaluation.min();
           } else {
             return false;
           }
@@ -112,7 +114,7 @@ auto FollowTrajectoryAction::start() -> void
     parameter->closed = trajectory_ref.trajectory.as<Trajectory>().closed;
     parameter->shape = repack_trajectory();
 
-    applyFollowTrajectoryAction(actor, parameter);
+    actor.apply([&](const auto & object) { applyFollowTrajectoryAction(object, parameter); });
   }
 }
 }  // namespace syntax

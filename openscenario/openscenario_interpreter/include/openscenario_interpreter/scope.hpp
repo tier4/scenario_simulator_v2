@@ -22,7 +22,7 @@
 #include <memory>
 #include <openscenario_interpreter/name.hpp>
 #include <openscenario_interpreter/syntax/catalog_locations.hpp>
-#include <openscenario_interpreter/syntax/entity_ref.hpp>
+#include <openscenario_interpreter/syntax/entity.hpp>
 #include <openscenario_interpreter/utility/demangle.hpp>
 #include <unordered_map>
 #include <utility>
@@ -190,7 +190,7 @@ class Scope
 public:
   const std::string name;
 
-  std::list<EntityRef> actors;
+  std::list<Entity> actors;
 
   double seed;  // NOTE: `seed` is used only for sharing randomSeed in Stochastic now
 
