@@ -5,16 +5,6 @@ It is possible to modify the speed of simulation (the speed of time published on
 - from the start of the simulation (using parameter),
 - during the simulation (using the GUI slider).
 
-
-!!! Warning
-    Parameter `use_sim_time` of `openscenario_interpreter` is false by default and should not be modified.
-
-    | use_sim_time launch parameter | /clock time published by SS2 | AWF Autoware Time  |
-    |-------------------------------|------------------------------|---------------------|
-    | false (default)               | walltime                     | walltime            |
-    | true (not supported)          | -                            | -                   |
-
-
 ## Use parameter
 
  - When you run simulations on the command line, add an `global_real_time_factor`  parameter with a custom value (the default is 1.0). 
@@ -48,3 +38,41 @@ It is possible to modify the speed of simulation (the speed of time published on
 <video width="1080" controls muted>
     <source src="/image/realtime_factor/video.mp4" type="video/mp4">
 </video>
+
+
+## Configure `use_sim_time` parameter
+
+Parameter `use_sim_time` of `openscenario_interpreter` is true by default and can be modified by passing it using command line.
+
+
+   ```bash
+   ros2 launch scenario_test_runner scenario_test_runner.launch.py \
+   architecture_type:=awf/universe \
+   record:=false \
+   scenario:='$(find-pkg-share scenario_test_runner)/scenario/sample.yaml' \
+   sensor_model:=sample_sensor_kit \
+   vehicle_model:=sample_vehicle \
+   global_real_time_factor:="0.5" \
+   use_sim_time:=False
+   ``` 
+
+However, this impacts the time published on the `/clock` topic and the time used by `Autoware`.
+Details are shown in the table below:
+
+| use_sim_time launch parameter | /clock time published by SS2 | AWF Autoware Time      |
+| ----------------------------- | ---------------------------- | ---------------------- |
+| false                         | walltime                     | walltime from /clock   |
+| true (default)                | simulation                   | simulation from /clock |
+
+Below are also some bullet points explaining the impact of the `use_sim_time` parameter on `SS2` and `Autoware`:
+
+ - **`use_sim_time:=True` passed using command line (default value)**
+    - Both Autoware and SS2 are launched with `use_sim_time=true`. 
+    - Time published on `/clock` is the **simulation time** (starting from 0). 
+    - Time published on `/clock` **can be** controlled by RViz plugin. 
+    - Simulation time **can be** controlled by RViz plugin.
+ - **`use_sim_time:=False` passed using command line**
+     - Both Autoware and SS2 are launched with `use_sim_time=false`. 
+     - Time published on `/clock` is the **walltime**. 
+     - Time published on `/clock` **cannot be** controlled by RViz plugin. 
+     - Simulation time **can be** controlled by RViz plugin.
