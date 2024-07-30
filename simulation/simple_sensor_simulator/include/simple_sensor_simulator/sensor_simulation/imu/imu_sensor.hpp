@@ -17,6 +17,7 @@
 
 #include <simulation_api_schema.pb.h>
 
+#include <array>
 #include <geometry_msgs/msg/accel.hpp>
 #include <geometry_msgs/msg/twist.hpp>
 #include <random>
@@ -32,10 +33,16 @@ class ImuSensorBase
 public:
   explicit ImuSensorBase(const simulation_api_schema::ImuSensorConfiguration & configuration)
   : add_gravity_(configuration.add_gravity()),
-    add_noise_(configuration.add_noise()),
-    noise_standard_deviation_(add_noise_ ? configuration.noise_standard_deviation() : 0.0),
+    noise_standard_deviation_orientation_(configuration.noise_standard_deviation_orientation()),
+    noise_standard_deviation_twist_(configuration.noise_standard_deviation_twist()),
+    noise_standard_deviation_acceleration_(configuration.noise_standard_deviation_acceleration()),
     random_generator_(configuration.use_seed() ? configuration.seed() : std::random_device{}()),
-    noise_distribution_(0.0, noise_standard_deviation_)
+    noise_distribution_orientation_(0.0, noise_standard_deviation_orientation_),
+    noise_distribution_twist_(0.0, noise_standard_deviation_twist_),
+    noise_distribution_acceleration_(0.0, noise_standard_deviation_acceleration_),
+    orientation_covariance_(calculateCovariance(noise_standard_deviation_orientation_)),
+    angular_velocity_covariance_(calculateCovariance(noise_standard_deviation_twist_)),
+    linear_acceleration_covariance_(calculateCovariance(noise_standard_deviation_acceleration_))
   {
   }
 
@@ -47,10 +54,21 @@ public:
 
 protected:
   const bool add_gravity_;
-  const bool add_noise_;
-  const double noise_standard_deviation_;
+  const double noise_standard_deviation_orientation_;
+  const double noise_standard_deviation_twist_;
+  const double noise_standard_deviation_acceleration_;
   mutable std::mt19937 random_generator_;
-  mutable std::normal_distribution<> noise_distribution_;
+  mutable std::normal_distribution<> noise_distribution_orientation_;
+  mutable std::normal_distribution<> noise_distribution_twist_;
+  mutable std::normal_distribution<> noise_distribution_acceleration_;
+  const std::array<double, 9> orientation_covariance_;
+  const std::array<double, 9> angular_velocity_covariance_;
+  const std::array<double, 9> linear_acceleration_covariance_;
+
+  auto calculateCovariance(const double stddev) const -> std::array<double, 9>
+  {
+    return {std::pow(stddev, 2), 0, 0, 0, std::pow(stddev, 2), 0, 0, 0, std::pow(stddev, 2)};
+  };
 };
 
 template <typename MessageType>
@@ -60,7 +78,10 @@ public:
   explicit ImuSensor(
     const simulation_api_schema::ImuSensorConfiguration & configuration,
     const typename rclcpp::Publisher<MessageType>::SharedPtr & publisher)
-  : ImuSensorBase(configuration), entity_name_(configuration.entity()), publisher_(publisher)
+  : ImuSensorBase(configuration),
+    entity_name_(configuration.entity()),
+    frame_id_(configuration.frame_id()),
+    publisher_(publisher)
   {
   }
 
@@ -85,6 +106,7 @@ private:
     const traffic_simulator_msgs::msg::EntityStatus & status) const -> const MessageType;
 
   const std::string entity_name_;
+  const std::string frame_id_;
   const typename rclcpp::Publisher<MessageType>::SharedPtr publisher_;
 };
 }  // namespace simple_sensor_simulator

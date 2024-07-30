@@ -16,6 +16,7 @@
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2/LinearMath/Transform.h>
 
+#include <algorithm>
 #include <geometry/quaternion/euler_to_quaternion.hpp>
 #include <geometry/quaternion/quaternion_to_euler.hpp>
 #include <simple_sensor_simulator/sensor_simulation/imu/imu_sensor.hpp>
@@ -27,25 +28,30 @@ auto ImuSensor<sensor_msgs::msg::Imu>::generateMessage(
   const rclcpp::Time & current_ros_time,
   const traffic_simulator_msgs::msg::EntityStatus & status) const -> const sensor_msgs::msg::Imu
 {
-  const auto applyNoise = [&](geometry_msgs::msg::Vector3 & v) {
-    v.x += noise_distribution_(random_generator_);
-    v.y += noise_distribution_(random_generator_);
-    v.z += noise_distribution_(random_generator_);
-  };
+  const auto applyNoise =
+    [&](geometry_msgs::msg::Vector3 & v, std::normal_distribution<> & distribution) {
+      v.x += distribution(random_generator_);
+      v.y += distribution(random_generator_);
+      v.z += distribution(random_generator_);
+    };
 
   auto imu_msg = sensor_msgs::msg::Imu();
   imu_msg.header.stamp = current_ros_time;
-  imu_msg.header.frame_id = "tamagawa/imu_link";
+  imu_msg.header.frame_id = frame_id_;
 
   auto orientation_rpy = math::geometry::convertQuaternionToEulerAngle(status.pose.orientation);
   auto twist = status.action_status.twist;
   auto accel = status.action_status.accel;
 
   // Apply noise
-  if (add_noise_) {
-    applyNoise(orientation_rpy);
-    applyNoise(twist.angular);
-    applyNoise(accel.linear);
+  if (noise_standard_deviation_orientation_ > 0.0) {
+    applyNoise(orientation_rpy, noise_distribution_orientation_);
+  }
+  if (noise_standard_deviation_twist_ > 0.0) {
+    applyNoise(twist.angular, noise_distribution_twist_);
+  }
+  if (noise_standard_deviation_acceleration_ > 0.0) {
+    applyNoise(accel.linear, noise_distribution_acceleration_);
   }
 
   // Apply gravity
@@ -70,15 +76,15 @@ auto ImuSensor<sensor_msgs::msg::Imu>::generateMessage(
   imu_msg.linear_acceleration.z = accel.linear.z;
 
   // Set covariance
-  imu_msg.orientation_covariance = {std::pow(noise_standard_deviation_, 2), 0, 0, 0,
-                                    std::pow(noise_standard_deviation_, 2), 0, 0, 0,
-                                    std::pow(noise_standard_deviation_, 2)};
-  imu_msg.angular_velocity_covariance = {std::pow(noise_standard_deviation_, 2), 0, 0, 0,
-                                         std::pow(noise_standard_deviation_, 2), 0, 0, 0,
-                                         std::pow(noise_standard_deviation_, 2)};
-  imu_msg.linear_acceleration_covariance = {std::pow(noise_standard_deviation_, 2), 0, 0, 0,
-                                            std::pow(noise_standard_deviation_, 2), 0, 0, 0,
-                                            std::pow(noise_standard_deviation_, 2)};
+  std::copy(
+    orientation_covariance_.begin(), orientation_covariance_.end(),
+    imu_msg.orientation_covariance.data());
+  std::copy(
+    angular_velocity_covariance_.begin(), angular_velocity_covariance_.end(),
+    imu_msg.angular_velocity_covariance.data());
+  std::copy(
+    linear_acceleration_covariance_.begin(), linear_acceleration_covariance_.end(),
+    imu_msg.linear_acceleration_covariance.data());
   return imu_msg;
 }
 }  // namespace simple_sensor_simulator
