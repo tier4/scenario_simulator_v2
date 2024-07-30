@@ -230,7 +230,7 @@ auto ScenarioSimulator::spawnVehicleEntity(
     simulation_interface::toMsg(req.pose(), initial_status.pose);
     ego_entity_simulation_ = std::make_shared<vehicle_simulation::EgoEntitySimulation>(
       initial_status, parameters, step_time_, hdmap_utils_,
-      get_parameter_or("use_sim_time", rclcpp::Parameter("use_sim_time", false)),
+      get_parameter_or("use_sim_time", rclcpp::Parameter("use_sim_time", true)),
       get_consider_acceleration_by_road_slope());
   } else {
     vehicles_.emplace_back(req.parameters());
