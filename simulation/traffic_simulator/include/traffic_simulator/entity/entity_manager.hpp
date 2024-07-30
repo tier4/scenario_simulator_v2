@@ -43,6 +43,7 @@
 #include <traffic_simulator/traffic_lights/traffic_light_marker_publisher.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_publisher.hpp>
 #include <traffic_simulator/utils/node_parameters.hpp>
+#include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/entity_status_with_trajectory_array.hpp>
@@ -246,27 +247,6 @@ public:
   }
 
   // clang-format off
-#define FORWARD_TO_HDMAP_UTILS(NAME)                                  \
-  /*!                                                                 \
-   @brief Forward to arguments to the HDMapUtils::NAME function.      \
-   @return return value of the HDMapUtils::NAME function.             \
-   @note This function was defined by FORWARD_TO_HDMAP_UTILS macro.   \
-   */                                                                 \
-  template <typename... Ts>                                           \
-  decltype(auto) NAME(Ts &&... xs) const                              \
-  {                                                                   \
-    return hdmap_utils_ptr_->NAME(std::forward<decltype(xs)>(xs)...); \
-  }                                                                   \
-  static_assert(true, "")
-  // clang-format on
-
-  FORWARD_TO_HDMAP_UTILS(getLaneletLength);
-  FORWARD_TO_HDMAP_UTILS(toLaneletPose);
-  // FORWARD_TO_HDMAP_UTILS(toMapPose);
-
-#undef FORWARD_TO_HDMAP_UTILS
-
-  // clang-format off
 #define FORWARD_TO_ENTITY(IDENTIFIER, ...)                                       \
   /*!                                                                            \
    @brief Forward to arguments to the EntityBase::IDENTIFIER function.           \
@@ -284,7 +264,6 @@ public:
   // clang-format on
 
   FORWARD_TO_ENTITY(asFieldOperatorApplication, const);
-  FORWARD_TO_ENTITY(fillLaneletPose, const);
   FORWARD_TO_ENTITY(get2DPolygon, const);
   FORWARD_TO_ENTITY(getBehaviorParameter, const);
   FORWARD_TO_ENTITY(getBoundingBox, const);
@@ -296,10 +275,7 @@ public:
   FORWARD_TO_ENTITY(getEntityType, const);
   FORWARD_TO_ENTITY(reachPosition, const);
   FORWARD_TO_ENTITY(getEntityTypename, const);
-  FORWARD_TO_ENTITY(getLaneletPose, const);
   FORWARD_TO_ENTITY(getLinearJerk, const);
-  FORWARD_TO_ENTITY(getMapPose, const);
-  FORWARD_TO_ENTITY(getMapPoseFromRelativePose, const);
   FORWARD_TO_ENTITY(getRouteLanelets, const);
   FORWARD_TO_ENTITY(getStandStillDuration, const);
   FORWARD_TO_ENTITY(getTraveledDistance, const);
@@ -355,7 +331,8 @@ public:
   void broadcastTransform(
     const geometry_msgs::msg::PoseStamped & pose, const bool static_transform = true);
 
-  bool checkCollision(const std::string & name0, const std::string & name1);
+  bool checkCollision(
+    const std::string & first_entity_name, const std::string & second_entity_name);
 
   bool despawnEntity(const std::string & name);
 
@@ -436,7 +413,7 @@ public:
    */
   void resetBehaviorPlugin(const std::string & name, const std::string & behavior_plugin_name);
 
-  auto setEntityStatus(const std::string & name, const CanonicalizedEntityStatus &) -> void;
+  auto setEntityStatus(const std::string & name, const CanonicalizedEntityStatus & status) -> void;
 
   void setVerbose(const bool verbose);
 
@@ -444,7 +421,13 @@ public:
   auto spawnEntity(
     const std::string & name, const Pose & pose, const Parameters & parameters, Ts &&... xs)
   {
-    auto makeEntityStatus = [&]() {
+    static_assert(
+      std::disjunction<
+        std::is_same<Pose, CanonicalizedLaneletPose>,
+        std::is_same<Pose, geometry_msgs::msg::Pose>>::value,
+      "Pose must be of type CanonicalizedLaneletPose or geometry_msgs::msg::Pose");
+
+    auto makeEntityStatus = [&]() -> CanonicalizedEntityStatus {
       EntityStatus entity_status;
 
       if constexpr (std::is_same_v<std::decay_t<Entity>, EgoEntity>) {
@@ -465,55 +448,43 @@ public:
       }
 
       entity_status.subtype = parameters.subtype;
-
       entity_status.time = getCurrentTime();
-
       entity_status.name = name;
-
       entity_status.bounding_box = parameters.bounding_box;
-
       entity_status.action_status = traffic_simulator_msgs::msg::ActionStatus();
       entity_status.action_status.current_action = "waiting for initialize";
 
-      if constexpr (std::is_same_v<std::decay_t<Pose>, CanonicalizedLaneletPose>) {
-        entity_status.pose = toMapPose(pose);
-        entity_status.lanelet_pose = static_cast<LaneletPose>(pose);
-        entity_status.lanelet_pose_valid = true;
-      } else {
-        /// @note If the entity is pedestrian or misc object, we have to consider matching to crosswalk lanelet.
-        if (const auto lanelet_pose = toLaneletPose(
-              pose, parameters.bounding_box,
-              entity_status.type.type == traffic_simulator_msgs::msg::EntityType::PEDESTRIAN ||
-                entity_status.type.type == traffic_simulator_msgs::msg::EntityType::MISC_OBJECT,
-              [](const auto & parameters) {
-                if constexpr (std::is_same_v<
-                                std::decay_t<Parameters>,
-                                traffic_simulator_msgs::msg::VehicleParameters>) {
-                  return std::max(
-                           parameters.axles.front_axle.track_width,
-                           parameters.axles.rear_axle.track_width) *
-                           0.5 +
-                         1.0;
-                } else {
-                  return parameters.bounding_box.dimensions.y * 0.5 + 1.0;
-                }
-              }(parameters));
-            lanelet_pose) {
-          entity_status.lanelet_pose = *lanelet_pose;
-          entity_status.lanelet_pose_valid = true;
-          /// @note fix z, roll and pitch to fitting to the lanelet
-          if (getParameter<bool>(node_parameters_, "consider_pose_by_road_slope", false)) {
-            entity_status.pose = hdmap_utils_ptr_->toMapPose(*lanelet_pose).pose;
-          } else {
-            entity_status.pose = pose;
-          }
-        } else {
-          entity_status.lanelet_pose_valid = false;
-          entity_status.pose = pose;
-        }
-      }
+      const auto include_crosswalk = [](const auto & entity_type) {
+        return (traffic_simulator_msgs::msg::EntityType::PEDESTRIAN == entity_type.type) ||
+               (traffic_simulator_msgs::msg::EntityType::MISC_OBJECT == entity_type.type);
+      }(entity_status.type);
 
-      return CanonicalizedEntityStatus(entity_status, hdmap_utils_ptr_);
+      const auto matching_distance = [](const auto & parameters) {
+        if constexpr (std::is_same_v<
+                        std::decay_t<Parameters>, traffic_simulator_msgs::msg::VehicleParameters>) {
+          return std::max(
+                   parameters.axles.front_axle.track_width,
+                   parameters.axles.rear_axle.track_width) *
+                   0.5 +
+                 1.0;
+        } else {
+          return parameters.bounding_box.dimensions.y * 0.5 + 1.0;
+        }
+      }(parameters);
+
+      if constexpr (std::is_same_v<std::decay_t<Pose>, LaneletPose>) {
+        THROW_SYNTAX_ERROR(
+          "LaneletPose is not supported type as pose argument. Only CanonicalizedLaneletPose and "
+          "msg::Pose are supported as pose argument of EntityManager::spawnEntity().");
+      } else if constexpr (std::is_same_v<std::decay_t<Pose>, CanonicalizedLaneletPose>) {
+        entity_status.pose = toMapPose(pose);
+        return CanonicalizedEntityStatus(entity_status, pose);
+      } else if constexpr (std::is_same_v<std::decay_t<Pose>, geometry_msgs::msg::Pose>) {
+        entity_status.pose = pose;
+        const auto canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
+          pose, parameters.bounding_box, include_crosswalk, matching_distance, hdmap_utils_ptr_);
+        return CanonicalizedEntityStatus(entity_status, canonicalized_lanelet_pose);
+      }
     };
 
     if (const auto [iter, success] = entities_.emplace(
@@ -531,8 +502,6 @@ public:
       THROW_SEMANTIC_ERROR("Entity ", std::quoted(name), " is already exists.");
     }
   }
-
-  auto toMapPose(const CanonicalizedLaneletPose &) const -> const geometry_msgs::msg::Pose;
 
   template <typename MessageT, typename... Args>
   auto createPublisher(Args &&... args)

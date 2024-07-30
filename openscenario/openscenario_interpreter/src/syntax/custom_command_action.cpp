@@ -191,7 +191,7 @@ struct ApplyWalkStraightAction : public CustomCommand, private SimulatorCore::Ac
     }
 
     for (const auto & actor : scope.actors) {
-      applyWalkStraightAction(actor);
+      actor.apply([&](const auto & object) { applyWalkStraightAction(object); });
     }
   };
 };
