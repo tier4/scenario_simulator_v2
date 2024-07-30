@@ -46,5 +46,5 @@ It is possible to modify the speed of simulation (the speed of time published on
 - The process of adding the panel is also visible in the video:
 
 <video width="1080" controls muted>
-    <source src="../../../image/realtime_factor/video.mp4" type="video/mp4">
+    <source src="/image/realtime_factor/video.mp4" type="video/mp4">
 </video>
