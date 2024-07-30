@@ -30,7 +30,7 @@ auto AcquirePositionAction::start() -> void
 {
   const auto acquire_position = overload(
     [](const WorldPosition & position, auto && actor) {
-      return applyAcquirePositionAction(actor, static_cast<geometry_msgs::msg::Pose>(position));
+      return applyAcquirePositionAction(actor, static_cast<NativeWorldPosition>(position));
     },
     [](const RelativeWorldPosition & position, auto && actor) {
       return applyAcquirePositionAction(actor, static_cast<NativeLanePosition>(position));
@@ -43,7 +43,7 @@ auto AcquirePositionAction::start() -> void
     });
 
   for (const auto & actor : actors) {
-    apply<void>(acquire_position, position, actor);
+    actor.apply([&](const auto & object) { apply<void>(acquire_position, position, object); });
   }
 }
 }  // namespace syntax

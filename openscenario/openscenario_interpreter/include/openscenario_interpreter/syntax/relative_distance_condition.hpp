@@ -18,32 +18,36 @@
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/coordinate_system.hpp>
+#include <openscenario_interpreter/syntax/entity.hpp>
 #include <openscenario_interpreter/syntax/relative_distance_type.hpp>
+#include <openscenario_interpreter/syntax/routing_algorithm.hpp>
 #include <openscenario_interpreter/syntax/rule.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <openscenario_interpreter/syntax/triggering_entities.hpp>
 #include <pugixml.hpp>
+#include <valarray>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- RelativeDistanceCondition (OpenSCENARIO 1.1) ---------------------------
- *
- *  The current relative distance of a triggering entity/entities to a
- *  reference entity is compared to a given value. The logical operator used
- *  for comparison is defined in the rule attribute.
- *
- *  <xsd:complexType name="RelativeDistanceCondition">
- *    <xsd:attribute name="coordinateSystem" type="CoordinateSystem"/>
- *    <xsd:attribute name="entityRef" type="String" use="required"/>
- *    <xsd:attribute name="freespace" type="Boolean" use="required"/>
- *    <xsd:attribute name="relativeDistanceType" type="RelativeDistanceType" use="required"/>
- *    <xsd:attribute name="rule" type="Rule" use="required"/>
- *    <xsd:attribute name="value" type="Double" use="required"/>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   RelativeDistanceCondition (OpenSCENARIO XML 1.3)
+
+   The current relative distance of a triggering entity/entities to a reference
+   entity is compared to a given value. The logical operator used for comparison
+   is defined in the rule attribute.
+
+   <xsd:complexType name="RelativeDistanceCondition">
+     <xsd:attribute name="entityRef" type="String" use="required"/>
+     <xsd:attribute name="freespace" type="Boolean" use="required"/>
+     <xsd:attribute name="relativeDistanceType" type="RelativeDistanceType" use="required"/>
+     <xsd:attribute name="rule" type="Rule" use="required"/>
+     <xsd:attribute name="value" type="Double" use="required"/>
+     <xsd:attribute name="coordinateSystem" type="CoordinateSystem"/>
+     <xsd:attribute name="routingAlgorithm" type="RoutingAlgorithm"/>
+   </xsd:complexType>
+*/
 struct RelativeDistanceCondition : private Scope, private SimulatorCore::ConditionEvaluation
 {
   /*
@@ -55,7 +59,7 @@ struct RelativeDistanceCondition : private Scope, private SimulatorCore::Conditi
   /*
      Reference entity.
   */
-  const String entity_ref;
+  const Entity entity_ref;
 
   /*
      True: distance is measured between closest bounding box points.
@@ -70,6 +74,11 @@ struct RelativeDistanceCondition : private Scope, private SimulatorCore::Conditi
   const RelativeDistanceType relative_distance_type;
 
   /*
+     Algorithm for path selection/calculation between two positions across roads. Only relevant, if CoordinateSystem is "road"/"lane". Default value if omitted: "undefined".
+  */
+  const RoutingAlgorithm routing_algorithm;
+
+  /*
      The operator (less, greater, equal).
   */
   const Rule rule;
@@ -81,13 +90,17 @@ struct RelativeDistanceCondition : private Scope, private SimulatorCore::Conditi
 
   const TriggeringEntities triggering_entities;
 
-  std::vector<Double> results;  // for description
+  std::vector<std::valarray<double>> results;  // for description
+
+  const bool consider_z;
 
   explicit RelativeDistanceCondition(const pugi::xml_node &, Scope &, const TriggeringEntities &);
 
   auto description() const -> String;
 
-  template <CoordinateSystem::value_type, RelativeDistanceType::value_type, Boolean::value_type>
+  template <
+    CoordinateSystem::value_type, RelativeDistanceType::value_type, RoutingAlgorithm::value_type,
+    Boolean::value_type>
   auto distance(const EntityRef &) -> double
   {
     throw SyntaxError(__FILE__, ":", __LINE__);
@@ -98,20 +111,24 @@ struct RelativeDistanceCondition : private Scope, private SimulatorCore::Conditi
   auto evaluate() -> Object;
 };
 
-// NOTE: Ignore spell miss due to OpenSCENARIO standard.
+// Ignore spell miss due to OpenSCENARIO standard.
 // cspell: ignore euclidian
 
 // clang-format off
-template <> auto RelativeDistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, false>(const EntityRef &) -> double;
-template <> auto RelativeDistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, true >(const EntityRef &) -> double;
-template <> auto RelativeDistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::lateral,           false>(const EntityRef &) -> double;
-template <> auto RelativeDistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::lateral,           true >(const EntityRef &) -> double;
-template <> auto RelativeDistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::longitudinal,      false>(const EntityRef &) -> double;
-template <> auto RelativeDistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::longitudinal,      true >(const EntityRef &) -> double;
-template <> auto RelativeDistanceCondition::distance<CoordinateSystem::lane,   RelativeDistanceType::lateral,           false>(const EntityRef &) -> double;
-template <> auto RelativeDistanceCondition::distance<CoordinateSystem::lane,   RelativeDistanceType::lateral,           true >(const EntityRef &) -> double;
-template <> auto RelativeDistanceCondition::distance<CoordinateSystem::lane,   RelativeDistanceType::longitudinal,      false>(const EntityRef &) -> double;
-template <> auto RelativeDistanceCondition::distance<CoordinateSystem::lane,   RelativeDistanceType::longitudinal,      true >(const EntityRef &) -> double;
+template <> auto RelativeDistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, RoutingAlgorithm::undefined, false>(const EntityRef &) -> double;
+template <> auto RelativeDistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, RoutingAlgorithm::undefined, true >(const EntityRef &) -> double;
+template <> auto RelativeDistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::lateral,           RoutingAlgorithm::undefined, false>(const EntityRef &) -> double;
+template <> auto RelativeDistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::lateral,           RoutingAlgorithm::undefined, true >(const EntityRef &) -> double;
+template <> auto RelativeDistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::longitudinal,      RoutingAlgorithm::undefined, false>(const EntityRef &) -> double;
+template <> auto RelativeDistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::longitudinal,      RoutingAlgorithm::undefined, true >(const EntityRef &) -> double;
+template <> auto RelativeDistanceCondition::distance<CoordinateSystem::lane,   RelativeDistanceType::lateral,           RoutingAlgorithm::undefined, false>(const EntityRef &) -> double;
+template <> auto RelativeDistanceCondition::distance<CoordinateSystem::lane,   RelativeDistanceType::lateral,           RoutingAlgorithm::undefined, true >(const EntityRef &) -> double;
+template <> auto RelativeDistanceCondition::distance<CoordinateSystem::lane,   RelativeDistanceType::longitudinal,      RoutingAlgorithm::undefined, false>(const EntityRef &) -> double;
+template <> auto RelativeDistanceCondition::distance<CoordinateSystem::lane,   RelativeDistanceType::longitudinal,      RoutingAlgorithm::undefined, true >(const EntityRef &) -> double;
+template <> auto RelativeDistanceCondition::distance<CoordinateSystem::lane,   RelativeDistanceType::lateral,           RoutingAlgorithm::shortest,  false>(const EntityRef &) -> double;
+template <> auto RelativeDistanceCondition::distance<CoordinateSystem::lane,   RelativeDistanceType::lateral,           RoutingAlgorithm::shortest,  true >(const EntityRef &) -> double;
+template <> auto RelativeDistanceCondition::distance<CoordinateSystem::lane,   RelativeDistanceType::longitudinal,      RoutingAlgorithm::shortest,  false>(const EntityRef &) -> double;
+template <> auto RelativeDistanceCondition::distance<CoordinateSystem::lane,   RelativeDistanceType::longitudinal,      RoutingAlgorithm::shortest,  true >(const EntityRef &) -> double;
 // clang-format on
 }  // namespace syntax
 }  // namespace openscenario_interpreter

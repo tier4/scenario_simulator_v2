@@ -25,9 +25,9 @@ inline namespace syntax
 {
 static_assert(std::is_standard_layout<Double>::value, "");
 
-static_assert(not std::is_trivial<Double>::value, "");
+static_assert(std::is_trivial<Double>::value, "");
 
-Double::Double(value_type value) { data = value; }
+Double::Double(value_type value) : data(value) {}
 
 Double::Double(const std::string & s)
 try {
@@ -97,7 +97,7 @@ auto operator>>(std::istream & is, Double & datum) -> std::istream &
 
 auto operator<<(std::ostream & os, const Double & datum) -> std::ostream &
 {
-  return os << std::fixed << datum.data;
+  return os << std::fixed << std::setprecision(30) << datum.data;
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -16,7 +16,6 @@
 #define GEOMETRY__SPLINE__HERMITE_CURVE_HPP_
 
 #include <gtest/gtest.h>
-#include <quaternion_operation/quaternion_operation.h>
 
 #include <geometry/solver/polynomial_solver.hpp>
 #include <geometry_msgs/msg/point.hpp>
@@ -48,7 +47,8 @@ public:
   std::vector<geometry_msgs::msg::Point> getTrajectory(size_t num_points = 30) const;
   const std::vector<geometry_msgs::msg::Point> getTrajectory(
     double start_s, double end_s, double resolution, bool denormalize_s = false) const;
-  const geometry_msgs::msg::Pose getPose(double s, bool denormalize_s = false) const;
+  const geometry_msgs::msg::Pose getPose(
+    double s, bool denormalize_s = false, bool fill_pitch = true) const;
   const geometry_msgs::msg::Point getPoint(double s, bool denormalize_s = false) const;
   const geometry_msgs::msg::Vector3 getTangentVector(double s, bool denormalize_s = false) const;
   const geometry_msgs::msg::Vector3 getNormalVector(double s, bool denormalize_s = false) const;

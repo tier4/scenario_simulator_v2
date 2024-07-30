@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
-
 #include <boost/assert.hpp>
 #include <boost/assign/list_of.hpp>
 #include <boost/geometry.hpp>
@@ -39,8 +37,8 @@ bool checkCollision2D(
   }
   namespace bg = boost::geometry;
   typedef bg::model::d2::point_xy<double> bg_point;
-  const bg::model::polygon<bg_point> poly0 = math::geometry::get2DPolygon(pose0, bbox0);
-  const bg::model::polygon<bg_point> poly1 = math::geometry::get2DPolygon(pose1, bbox1);
+  const bg::model::polygon<bg_point> poly0 = math::geometry::toPolygon2D(pose0, bbox0);
+  const bg::model::polygon<bg_point> poly1 = math::geometry::toPolygon2D(pose1, bbox1);
   if (bg::intersects(poly0, poly1)) {
     return true;
   }

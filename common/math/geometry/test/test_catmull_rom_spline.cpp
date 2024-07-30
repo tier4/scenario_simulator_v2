@@ -14,6 +14,7 @@
 
 #include <gtest/gtest.h>
 
+#include <geometry/quaternion/euler_to_quaternion.hpp>
 #include <geometry/spline/catmull_rom_spline.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 
@@ -27,6 +28,14 @@ math::geometry::CatmullRomSpline makeLine()
 {
   const std::vector<geometry_msgs::msg::Point> points{
     makePoint(0.0, 0.0), makePoint(1.0, 3.0), makePoint(2.0, 6.0)};
+  return math::geometry::CatmullRomSpline(points);
+}
+
+/// @brief Helper function generating sloped line: p(0,0,0)-> p(1,3,1) -> p(2,6,2)
+math::geometry::CatmullRomSpline makeSlopedLine()
+{
+  const std::vector<geometry_msgs::msg::Point> points{
+    makePoint(0.0, 0.0, 0.0), makePoint(1.0, 3.0, 1.0), makePoint(2.0, 6.0, 2.0)};
   return math::geometry::CatmullRomSpline(points);
 }
 
@@ -462,13 +471,34 @@ TEST(CatmullRomSpline, getPoseLine)
   EXPECT_POINT_NEAR(pose.position, makePoint(1.5, 4.5), EPS);
   EXPECT_QUATERNION_NEAR(
     pose.orientation,
-    quaternion_operation::convertEulerAngleToQuaternion(makeVector(0.0, 0.0, std::atan(3.0))), EPS);
+    math::geometry::convertEulerAngleToQuaternion(makeVector(0.0, 0.0, std::atan(3.0))), EPS);
+}
+
+TEST(CatmullRomSpline, getPoseLineWithPitch)
+{
+  const math::geometry::CatmullRomSpline spline = makeSlopedLine();
+  const auto pose = spline.getPose(std::hypot(1.5, 4.5, 1.5), true);
+  EXPECT_POINT_NEAR(pose.position, makePoint(1.5, 4.5, 1.5), EPS);
+  EXPECT_QUATERNION_NEAR(
+    pose.orientation,
+    math::geometry::convertEulerAngleToQuaternion(
+      makeVector(0.0, std::atan2(-1.0, std::sqrt(1.0 + 3.0 * 3.0)), std::atan(3.0))),
+    EPS);
 }
 
 TEST(CatmullRomSpline, getPoseCurve)
 {
   const math::geometry::CatmullRomSpline spline = makeCurve();
   const auto pose = spline.getPose(1.5);
+  constexpr double eps = 0.02;
+  EXPECT_POINT_NEAR(pose.position, makePoint(1.0, 1.0), eps);
+  EXPECT_QUATERNION_NEAR(pose.orientation, geometry_msgs::msg::Quaternion(), eps);
+}
+
+TEST(CatmullRomSpline, getPoseCurveWithPitch)
+{
+  const math::geometry::CatmullRomSpline spline = makeCurve();
+  const auto pose = spline.getPose(1.5, true);
   constexpr double eps = 0.02;
   EXPECT_POINT_NEAR(pose.position, makePoint(1.0, 1.0), eps);
   EXPECT_QUATERNION_NEAR(pose.orientation, geometry_msgs::msg::Quaternion(), eps);

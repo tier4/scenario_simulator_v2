@@ -42,12 +42,11 @@
   </table>
  */
 
-#include <quaternion_operation/quaternion_operation.h>
-
 #include <algorithm>
 #include <cmath>
 #include <color_names/color_names.hpp>
 #include <geometry/spline/catmull_rom_spline.hpp>
+#include <geometry/transform.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
 #include <string>
@@ -125,18 +124,20 @@ const visualization_msgs::msg::MarkerArray VisualizationComponent::generateMarke
   constexpr auto default_quaternion = rosidl_runtime_cpp::MessageInitialization::DEFAULTS_ONLY;
   auto ret = visualization_msgs::msg::MarkerArray();
   auto stamp = get_clock()->now();
-  std_msgs::msg::ColorRGBA color;
-  switch (status.type.type) {
-    case status.type.EGO:
-      color = color_names::makeColorMsg("limegreen", 0.99);
-      break;
-    case status.type.PEDESTRIAN:
-      color = color_names::makeColorMsg("orange", 0.99);
-      break;
-    case status.type.VEHICLE:
-      color = color_names::makeColorMsg("lightskyblue", 0.99);
-      break;
-  }
+
+  const auto color = [&]() {
+    switch (status.type.type) {
+      case status.type.EGO:
+        return color_names::makeColorMsg("limegreen", 0.99);
+      case status.type.PEDESTRIAN:
+        return color_names::makeColorMsg("orange", 0.99);
+      case status.type.VEHICLE:
+        return color_names::makeColorMsg("lightskyblue", 0.99);
+      default:
+      case status.type.MISC_OBJECT:
+        return color_names::makeColorMsg("magenta", 0.99);
+    }
+  }();
 
   if (goal_pose.size() != 0) {
     goal_pose_max_size = std::max(goal_pose_max_size, int(goal_pose.size()));
@@ -205,12 +206,11 @@ const visualization_msgs::msg::MarkerArray VisualizationComponent::generateMarke
   }
 
   visualization_msgs::msg::Marker bbox;
-  bbox.header.frame_id = status.name;
+  bbox.header.frame_id = "map";
   bbox.header.stamp = stamp;
   bbox.ns = status.name;
   bbox.id = 0;
   bbox.action = bbox.ADD;
-  bbox.pose.orientation = geometry_msgs::msg::Quaternion(default_quaternion);
   bbox.type = bbox.LINE_LIST;
   bbox.lifetime = rclcpp::Duration::from_seconds(0.1);
   geometry_msgs::msg::Point p0, p1, p2, p3, p4, p5, p6, p7;
@@ -218,34 +218,42 @@ const visualization_msgs::msg::MarkerArray VisualizationComponent::generateMarke
   p0.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5;
   p0.y = status.bounding_box.center.y + status.bounding_box.dimensions.y * 0.5;
   p0.z = status.bounding_box.center.z + status.bounding_box.dimensions.z * 0.5;
+  p0 = math::geometry::transformPoint(status.pose, p0);
 
   p1.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5;
   p1.y = status.bounding_box.center.y + status.bounding_box.dimensions.y * 0.5;
   p1.z = status.bounding_box.center.z - status.bounding_box.dimensions.z * 0.5;
+  p1 = math::geometry::transformPoint(status.pose, p1);
 
   p2.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5;
   p2.y = status.bounding_box.center.y - status.bounding_box.dimensions.y * 0.5;
   p2.z = status.bounding_box.center.z + status.bounding_box.dimensions.z * 0.5;
+  p2 = math::geometry::transformPoint(status.pose, p2);
 
   p3.x = status.bounding_box.center.x - status.bounding_box.dimensions.x * 0.5;
   p3.y = status.bounding_box.center.y + status.bounding_box.dimensions.y * 0.5;
   p3.z = status.bounding_box.center.z + status.bounding_box.dimensions.z * 0.5;
+  p3 = math::geometry::transformPoint(status.pose, p3);
 
   p4.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5;
   p4.y = status.bounding_box.center.y - status.bounding_box.dimensions.y * 0.5;
   p4.z = status.bounding_box.center.z - status.bounding_box.dimensions.z * 0.5;
+  p4 = math::geometry::transformPoint(status.pose, p4);
 
   p5.x = status.bounding_box.center.x - status.bounding_box.dimensions.x * 0.5;
   p5.y = status.bounding_box.center.y + status.bounding_box.dimensions.y * 0.5;
   p5.z = status.bounding_box.center.z - status.bounding_box.dimensions.z * 0.5;
+  p5 = math::geometry::transformPoint(status.pose, p5);
 
   p6.x = status.bounding_box.center.x - status.bounding_box.dimensions.x * 0.5;
   p6.y = status.bounding_box.center.y - status.bounding_box.dimensions.y * 0.5;
   p6.z = status.bounding_box.center.z + status.bounding_box.dimensions.z * 0.5;
+  p6 = math::geometry::transformPoint(status.pose, p6);
 
   p7.x = status.bounding_box.center.x - status.bounding_box.dimensions.x * 0.5;
   p7.y = status.bounding_box.center.y - status.bounding_box.dimensions.y * 0.5;
   p7.z = status.bounding_box.center.z - status.bounding_box.dimensions.z * 0.5;
+  p7 = math::geometry::transformPoint(status.pose, p7);
 
   bbox.points.emplace_back(p0);
   bbox.points.emplace_back(p3);
@@ -302,7 +310,7 @@ const visualization_msgs::msg::MarkerArray VisualizationComponent::generateMarke
   ret.markers.emplace_back(bbox);
 
   visualization_msgs::msg::Marker text;
-  text.header.frame_id = status.name;
+  text.header.frame_id = "map";
   text.header.stamp = stamp;
   text.ns = status.name;
   text.id = 1;
@@ -311,7 +319,8 @@ const visualization_msgs::msg::MarkerArray VisualizationComponent::generateMarke
   text.pose.position.y = status.bounding_box.center.y;
   text.pose.position.z =
     status.bounding_box.center.z + status.bounding_box.dimensions.z * 0.5 + 1.0;
-  text.pose.orientation = geometry_msgs::msg::Quaternion(default_quaternion);
+  text.pose.position = math::geometry::transformPoint(status.pose, text.pose.position);
+  text.pose.orientation = status.pose.orientation;
   text.type = text.TEXT_VIEW_FACING;
   text.scale.x = 0.0;
   text.scale.y = 0.0;
@@ -322,7 +331,7 @@ const visualization_msgs::msg::MarkerArray VisualizationComponent::generateMarke
   ret.markers.emplace_back(text);
 
   visualization_msgs::msg::Marker arrow;
-  arrow.header.frame_id = status.name;
+  arrow.header.frame_id = "map";
   arrow.header.stamp = stamp;
   arrow.ns = status.name;
   arrow.id = 2;
@@ -335,19 +344,22 @@ const visualization_msgs::msg::MarkerArray VisualizationComponent::generateMarke
   pf.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5 + 1.0;
   pf.y = status.bounding_box.center.y;
   pf.z = status.bounding_box.center.z - status.bounding_box.dimensions.z * 0.5;
+  pf = math::geometry::transformPoint(status.pose, pf);
 
   pl.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5 + 1.0 -
          arrow_size * arrow_ratio;
   pl.y = status.bounding_box.center.y + arrow_size;
   pl.z = status.bounding_box.center.z - status.bounding_box.dimensions.z * 0.5;
+  pl = math::geometry::transformPoint(status.pose, pl);
 
   pr.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5 + 1.0 -
          arrow_size * arrow_ratio;
   pr.y = status.bounding_box.center.y - arrow_size;
   pr.z = status.bounding_box.center.z - status.bounding_box.dimensions.z * 0.5;
+  pr = math::geometry::transformPoint(status.pose, pr);
   arrow.points = {pf, pl, pr};
   arrow.colors = {color};
-  arrow.pose.orientation = geometry_msgs::msg::Quaternion(default_quaternion);
+  arrow.pose.orientation = status.pose.orientation;
   arrow.type = arrow.TRIANGLE_LIST;
   arrow.scale.x = 1.0;
   arrow.scale.y = 1.0;
@@ -357,13 +369,14 @@ const visualization_msgs::msg::MarkerArray VisualizationComponent::generateMarke
   ret.markers.emplace_back(arrow);
 
   visualization_msgs::msg::Marker text_action;
-  text_action.header.frame_id = status.name;
+  text_action.header.frame_id = "map";
   text_action.header.stamp = stamp;
   text_action.ns = status.name;
   text_action.id = 3;
   text_action.action = text_action.ADD;
-  text_action.pose.position = status.bounding_box.center;
-  text_action.pose.orientation = geometry_msgs::msg::Quaternion(default_quaternion);
+  text_action.pose.position =
+    math::geometry::transformPoint(status.pose, status.bounding_box.center);
+  text_action.pose.orientation = status.pose.orientation;
   text_action.type = text_action.TEXT_VIEW_FACING;
   text_action.scale.x = 0.0;
   text_action.scale.y = 0.0;

@@ -29,15 +29,15 @@
 #include <tf2/LinearMath/Matrix3x3.h>
 
 #include <autoware_auto_mapping_msgs/msg/had_map_bin.hpp>
+#include <autoware_lanelet2_extension/utility/message_conversion.hpp>
+#include <autoware_lanelet2_extension/utility/query.hpp>
+#include <autoware_lanelet2_extension/utility/utilities.hpp>
 #include <boost/filesystem.hpp>
 #include <geographic_msgs/msg/geo_point.hpp>
 #include <geometry/spline/catmull_rom_spline.hpp>
 #include <geometry/spline/catmull_rom_spline_interface.hpp>
 #include <geometry/spline/hermite_curve.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
-#include <lanelet2_extension/utility/message_conversion.hpp>
-#include <lanelet2_extension/utility/query.hpp>
-#include <lanelet2_extension/utility/utilities.hpp>
 #include <map>
 #include <memory>
 #include <optional>
@@ -168,9 +168,12 @@ public:
 
   auto getLaneletPolygon(const lanelet::Id) const -> std::vector<geometry_msgs::msg::Point>;
 
+  auto getLanelets(const lanelet::Ids &) const -> lanelet::Lanelets;
+
   auto getLateralDistance(
     const traffic_simulator_msgs::msg::LaneletPose & from,
-    const traffic_simulator_msgs::msg::LaneletPose & to) const -> std::optional<double>;
+    const traffic_simulator_msgs::msg::LaneletPose & to, bool allow_lane_change = false) const
+    -> std::optional<double>;
 
   auto getLeftBound(const lanelet::Id) const -> std::vector<geometry_msgs::msg::Point>;
 
@@ -180,7 +183,8 @@ public:
 
   auto getLongitudinalDistance(
     const traffic_simulator_msgs::msg::LaneletPose & from,
-    const traffic_simulator_msgs::msg::LaneletPose & to) const -> std::optional<double>;
+    const traffic_simulator_msgs::msg::LaneletPose & to, bool allow_lane_change = false) const
+    -> std::optional<double>;
 
   auto getNearbyLaneletIds(
     const geometry_msgs::msg::Point &, const double distance_threshold,
@@ -223,7 +227,8 @@ public:
 
   auto getRightOfWayLaneletIds(const lanelet::Id) const -> lanelet::Ids;
 
-  auto getRoute(const lanelet::Id from, const lanelet::Id to) const -> lanelet::Ids;
+  auto getRoute(const lanelet::Id from, const lanelet::Id to, bool allow_lane_change = false) const
+    -> lanelet::Ids;
 
   auto getSpeedLimit(const lanelet::Ids &) const -> double;
 
@@ -266,8 +271,8 @@ public:
 
   auto matchToLane(
     const geometry_msgs::msg::Pose &, const traffic_simulator_msgs::msg::BoundingBox &,
-    const bool include_crosswalk, const double reduction_ratio = 0.8) const
-    -> std::optional<lanelet::Id>;
+    const bool include_crosswalk, const double matching_distance = 1.0,
+    const double reduction_ratio = 0.8) const -> std::optional<lanelet::Id>;
 
   auto toLaneletPose(
     const geometry_msgs::msg::Pose &, const bool include_crosswalk,
@@ -277,6 +282,11 @@ public:
   auto toLaneletPose(
     const geometry_msgs::msg::Pose &, const lanelet::Ids &,
     const double matching_distance = 1.0) const
+    -> std::optional<traffic_simulator_msgs::msg::LaneletPose>;
+
+  auto toLaneletPose(
+    const geometry_msgs::msg::Point &, const traffic_simulator_msgs::msg::BoundingBox &,
+    const bool include_crosswalk, const double matching_distance = 1.0) const
     -> std::optional<traffic_simulator_msgs::msg::LaneletPose>;
 
   auto toLaneletPose(
@@ -298,8 +308,8 @@ public:
   auto toMapPoints(const lanelet::Id, const std::vector<double> & s) const
     -> std::vector<geometry_msgs::msg::Point>;
 
-  auto toMapPose(const traffic_simulator_msgs::msg::LaneletPose &) const
-    -> geometry_msgs::msg::PoseStamped;
+  auto toMapPose(const traffic_simulator_msgs::msg::LaneletPose &, const bool fill_pitch = true)
+    const -> geometry_msgs::msg::PoseStamped;
 
 private:
   /** @defgroup cache
@@ -357,8 +367,6 @@ private:
     const geometry_msgs::msg::Pose & from, const traffic_simulator_msgs::msg::LaneletPose & to,
     const traffic_simulator::lane_change::TrajectoryShape,
     const double tangent_vector_size = 100) const -> math::geometry::HermiteCurve;
-
-  auto getLanelets(const lanelet::Ids &) const -> lanelet::Lanelets;
 
   auto getNextRoadShoulderLanelet(const lanelet::Id) const -> lanelet::Ids;
 

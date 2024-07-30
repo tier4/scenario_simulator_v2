@@ -25,6 +25,7 @@
 #include <string>
 #include <traffic_simulator/api/configuration.hpp>
 #include <traffic_simulator/entity/vehicle_entity.hpp>
+#include <traffic_simulator/utils/node_parameters.hpp>
 #include <traffic_simulator_msgs/msg/entity_type.hpp>
 #include <vector>
 
@@ -36,7 +37,8 @@ class EgoEntity : public VehicleEntity
 {
   const std::unique_ptr<concealer::FieldOperatorApplication> field_operator_application;
 
-  static auto makeFieldOperatorApplication(const Configuration &)
+  static auto makeFieldOperatorApplication(
+    const Configuration &, const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr &)
     -> std::unique_ptr<concealer::FieldOperatorApplication>;
 
   bool is_controlled_by_simulator_{false};
@@ -50,7 +52,8 @@ public:
   explicit EgoEntity(
     const std::string & name, const CanonicalizedEntityStatus &,
     const std::shared_ptr<hdmap_utils::HdMapUtils> &,
-    const traffic_simulator_msgs::msg::VehicleParameters &, const Configuration &);
+    const traffic_simulator_msgs::msg::VehicleParameters &, const Configuration &,
+    const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr &);
 
   explicit EgoEntity(EgoEntity &&) = delete;
 
@@ -110,7 +113,14 @@ public:
     const speed_change::RelativeTargetSpeed &, const speed_change::Transition,
     const speed_change::Constraint, const bool continuous) -> void override;
 
+  void requestClearRoute() override;
+
   auto isControlledBySimulator() const -> bool override;
+
+  auto setControlledBySimulator(bool state) -> void override
+  {
+    is_controlled_by_simulator_ = state;
+  }
 
   auto setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &)
     -> void override;
@@ -123,8 +133,6 @@ public:
   auto setVelocityLimit(double) -> void override;
 
   auto setMapPose(const geometry_msgs::msg::Pose & map_pose) -> void override;
-
-  auto fillLaneletPose(CanonicalizedEntityStatus & status) -> void override;
 };
 }  // namespace entity
 }  // namespace traffic_simulator

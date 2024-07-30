@@ -85,7 +85,13 @@ public:
 
   auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter;
 
+  auto getMaxAcceleration() const -> double override;
+
+  auto getMaxDeceleration() const -> double override;
+
   void setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &);
+
+  void setVelocityLimit(double linear_velocity) override;
 
   void setAccelerationLimit(double acceleration) override;
 
@@ -114,8 +120,6 @@ public:
   auto getGoalPoses() -> std::vector<CanonicalizedLaneletPose> override;
 
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
-
-  auto fillLaneletPose(CanonicalizedEntityStatus & status) -> void override;
 
   const std::string plugin_name;
 

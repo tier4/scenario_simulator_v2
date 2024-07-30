@@ -1,16 +1,12 @@
 {
-  "ignorePaths": [
-    "*.drawio",
-    "*/**/CHANGELOG.rst",
-    "openscenario/openscenario_utility/openscenario_utility/resources/*.xsd"
-  ],
+  "ignorePaths": ["*.drawio", "*/**/CHANGELOG.rst", "*.xsd"],
   "words": [
     "ARGN",
     "AUTORCC",
     "Canonicalized",
     "canonicalizing",
     "classname",
-    "classname",
+    "Cmyk",
     "Dawid",
     "DBOOST",
     "DBUILD",
@@ -45,6 +41,8 @@
     "TESTRANDOMIZER",
     "travelling",
     "Tschirnhaus",
+    "xerces",
+    "xercesc",
     "yamacir-kit"
   ]
 }

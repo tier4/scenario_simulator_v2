@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
-
 #include <algorithm>
 #include <behavior_tree_plugin/pedestrian/follow_lane_action.hpp>
 #include <iostream>
@@ -45,8 +43,7 @@ BT::NodeStatus FollowLaneAction::tick()
     setOutput("updated_status", entity_status);
     return BT::NodeStatus::RUNNING;
   }
-  auto following_lanelets =
-    hdmap_utils->getFollowingLanelets(entity_status->getLaneletPose().lanelet_id);
+  auto following_lanelets = hdmap_utils->getFollowingLanelets(entity_status->getLaneletId());
   if (!target_speed) {
     target_speed = hdmap_utils->getSpeedLimit(following_lanelets);
   }

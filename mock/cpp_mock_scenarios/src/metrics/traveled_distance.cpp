@@ -12,24 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
-
 #include <ament_index_cpp/get_package_share_directory.hpp>
+#include <cmath>
 #include <cpp_mock_scenarios/catalogs.hpp>
 #include <cpp_mock_scenarios/cpp_scenario_node.hpp>
+#include <limits>
+#include <memory>
 #include <rclcpp/rclcpp.hpp>
+#include <string>
 #include <traffic_simulator/api/api.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
+#include <vector>
 
 #include "rclcpp/logger.hpp"
 #include "rclcpp/logging.hpp"
-
-// headers in STL
-#include <cmath>
-#include <limits>
-#include <memory>
-#include <string>
-#include <vector>
 
 namespace cpp_mock_scenarios
 {
@@ -48,7 +44,11 @@ private:
   void onUpdate() override
   {
     // LCOV_EXCL_START
-    const auto lanelet_pose = api_.getLaneletPose("ego");
+    const auto entity = api_.getEntity("ego");
+    if (!entity) {
+      stop(cpp_mock_scenarios::Result::FAILURE);
+    }
+    const auto lanelet_pose = entity->getCanonicalizedLaneletPose();
     const auto traveled_distance = api_.getTraveledDistance("ego");
     if (!lanelet_pose) {
       stop(cpp_mock_scenarios::Result::FAILURE);
@@ -68,7 +68,9 @@ private:
   void onInitialize() override
   {
     api_.spawn(
-      "ego", api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34741, 0, 0)),
+      "ego",
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(
+        34741, 0.0, 0.0, api_.getHdmapUtils()),
       getVehicleParameters());
     api_.setLinearVelocity("ego", 3);
     api_.requestSpeedChange("ego", 3, true);

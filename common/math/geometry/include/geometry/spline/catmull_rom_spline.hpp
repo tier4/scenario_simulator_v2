@@ -39,7 +39,7 @@ public:
   auto getPoint(const double s, const double offset) const -> geometry_msgs::msg::Point;
   auto getTangentVector(const double s) const -> geometry_msgs::msg::Vector3;
   auto getNormalVector(const double s) const -> geometry_msgs::msg::Vector3;
-  auto getPose(const double s) const -> geometry_msgs::msg::Pose;
+  auto getPose(const double s, const bool fill_pitch = true) const -> geometry_msgs::msg::Pose;
   auto getTrajectory(
     const double start_s, const double end_s, const double resolution,
     const double offset = 0.0) const -> std::vector<geometry_msgs::msg::Point>;

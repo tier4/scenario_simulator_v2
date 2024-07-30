@@ -21,9 +21,10 @@
 #include <lanelet2_routing/RoutingCost.h>
 #include <lanelet2_traffic_rules/TrafficRulesFactory.h>
 
+#include <autoware_lanelet2_extension/projection/mgrs_projector.hpp>
 #include <geographic_msgs/msg/geo_point.hpp>
-#include <geometry/linear_algebra.hpp>
-#include <lanelet2_extension/projection/mgrs_projector.hpp>
+#include <geometry/vector3/normalize.hpp>
+#include <geometry/vector3/operator.hpp>
 #include <optional>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 
@@ -49,9 +50,9 @@ LaneletUtils::LaneletUtils(const boost::filesystem::path & filename)
 std::vector<int64_t> LaneletUtils::getLaneletIds() { return hdmap_utils_ptr_->getLaneletIds(); }
 
 geometry_msgs::msg::PoseStamped LaneletUtils::toMapPose(
-  traffic_simulator_msgs::msg::LaneletPose lanelet_pose)
+  const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose, const bool fill_pitch)
 {
-  return hdmap_utils_ptr_->toMapPose(lanelet_pose);
+  return hdmap_utils_ptr_->toMapPose(lanelet_pose, fill_pitch);
 }
 
 std::vector<int64_t> LaneletUtils::getRoute(int64_t from_lanelet_id, int64_t to_lanelet_id)
@@ -93,6 +94,9 @@ std::optional<traffic_simulator_msgs::msg::LaneletPose> LaneletUtils::getOpposit
   // TODO: Multiple same-direction lane support
   // TODO: Find lane width for current s value
 
+  using math::geometry::operator*;
+  using math::geometry::operator+;
+
   if (!lanelet_map_ptr_->laneletLayer.exists(pose.lanelet_id)) {
     return {};
   }
@@ -118,7 +122,7 @@ std::optional<traffic_simulator_msgs::msg::LaneletPose> LaneletUtils::getOpposit
   perpendicular_vector.z = 0.0;
   perpendicular_vector = math::geometry::normalize(perpendicular_vector);
 
-  geometry_msgs::msg::Point global_position_p = toMapPose(pose).pose.position;
+  geometry_msgs::msg::Point global_position_p = toMapPose(pose, false).pose.position;
   geometry_msgs::msg::Vector3 global_position;
   global_position.x = global_position_p.x;
   global_position.y = global_position_p.y;

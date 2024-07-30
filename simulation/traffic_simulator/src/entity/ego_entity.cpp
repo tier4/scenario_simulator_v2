@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
-
 #include <boost/lexical_cast.hpp>
 #include <concealer/autoware_universe.hpp>
 #include <concealer/field_operator_application_for_autoware_universe.hpp>
@@ -24,6 +22,7 @@
 #include <system_error>
 #include <thread>
 #include <traffic_simulator/entity/ego_entity.hpp>
+#include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 #include <tuple>
 #include <unordered_map>
@@ -34,36 +33,25 @@ namespace traffic_simulator
 {
 namespace entity
 {
-/// @todo find some shared space for this function
-template <typename T>
-static auto getParameter(const std::string & name, T value = {})
-{
-  rclcpp::Node node{"get_parameter", "simulation"};
-
-  if (!node.has_parameter(name)) {
-    node.declare_parameter<T>(name, value);
-  }
-  node.get_parameter<T>(name, value);
-
-  return value;
-}
-
-auto EgoEntity::makeFieldOperatorApplication(const Configuration & configuration)
+auto EgoEntity::makeFieldOperatorApplication(
+  const Configuration & configuration,
+  const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node_parameters)
   -> std::unique_ptr<concealer::FieldOperatorApplication>
 {
-  if (const auto architecture_type = getParameter<std::string>("architecture_type", "awf/universe");
+  if (const auto architecture_type =
+        getParameter<std::string>(node_parameters, "architecture_type", "awf/universe");
       architecture_type.find("awf/universe") != std::string::npos) {
-    std::string rviz_config = getParameter<std::string>("rviz_config", "");
-    return getParameter<bool>("launch_autoware", true)
+    std::string rviz_config = getParameter<std::string>(node_parameters, "rviz_config", "");
+    return getParameter<bool>(node_parameters, "launch_autoware", true)
              ? std::make_unique<
                  concealer::FieldOperatorApplicationFor<concealer::AutowareUniverse>>(
-                 getParameter<std::string>("autoware_launch_package"),
-                 getParameter<std::string>("autoware_launch_file"),
+                 getParameter<std::string>(node_parameters, "autoware_launch_package"),
+                 getParameter<std::string>(node_parameters, "autoware_launch_file"),
                  "map_path:=" + configuration.map_path.string(),
                  "lanelet2_map_file:=" + configuration.getLanelet2MapFile(),
                  "pointcloud_map_file:=" + configuration.getPointCloudMapFile(),
-                 "sensor_model:=" + getParameter<std::string>("sensor_model"),
-                 "vehicle_model:=" + getParameter<std::string>("vehicle_model"),
+                 "sensor_model:=" + getParameter<std::string>(node_parameters, "sensor_model"),
+                 "vehicle_model:=" + getParameter<std::string>(node_parameters, "vehicle_model"),
                  "rviz_config:=" + ((rviz_config == "")
                                       ? configuration.rviz_config_path.string()
                                       : Configuration::Pathname(rviz_config).string()),
@@ -71,7 +59,8 @@ auto EgoEntity::makeFieldOperatorApplication(const Configuration & configuration
                  "perception/enable_traffic_light:=" +
                    std::string((architecture_type >= "awf/universe/20230906") ? "true" : "false"),
                  "use_sim_time:=" +
-                   std::string(getParameter<bool>("use_sim_time") ? "true" : "false"))
+                   std::string(
+                     getParameter<bool>(node_parameters, "use_sim_time", true) ? "true" : "false"))
              : std::make_unique<
                  concealer::FieldOperatorApplicationFor<concealer::AutowareUniverse>>();
   } else {
@@ -84,9 +73,10 @@ EgoEntity::EgoEntity(
   const std::string & name, const CanonicalizedEntityStatus & entity_status,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
   const traffic_simulator_msgs::msg::VehicleParameters & parameters,
-  const Configuration & configuration)
+  const Configuration & configuration,
+  const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node_parameters)
 : VehicleEntity(name, entity_status, hdmap_utils_ptr, parameters),
-  field_operator_application(makeFieldOperatorApplication(configuration))
+  field_operator_application(makeFieldOperatorApplication(configuration, node_parameters))
 {
 }
 
@@ -160,8 +150,13 @@ void EgoEntity::onUpdate(double current_time, double step_time)
       const auto updated_status = traffic_simulator::follow_trajectory::makeUpdatedStatus(
         static_cast<traffic_simulator::EntityStatus>(status_), *polyline_trajectory_,
         behavior_parameter_, hdmap_utils_ptr_, step_time,
+        getDefaultMatchingDistanceForLaneletPoseCalculation(),
         target_speed_ ? target_speed_.value() : status_.getTwist().linear.x)) {
-      setStatus(CanonicalizedEntityStatus(*updated_status, hdmap_utils_ptr_));
+      // prefer the current lanelet
+      const auto canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
+        updated_status.value().pose, status_.getBoundingBox(), status_.getLaneletIds(), false,
+        getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
+      setStatus(CanonicalizedEntityStatus(*updated_status, canonicalized_lanelet_pose));
     } else {
       is_controlled_by_simulator_ = false;
     }
@@ -263,6 +258,8 @@ auto EgoEntity::requestSpeedChange(
     "purposes only.");
 }
 
+void EgoEntity::requestClearRoute() { field_operator_application->clearRoute(); }
+
 auto EgoEntity::getDefaultDynamicConstraints() const
   -> const traffic_simulator_msgs::msg::DynamicConstraints &
 {
@@ -292,43 +289,15 @@ auto EgoEntity::setVelocityLimit(double value) -> void  //
   field_operator_application->setVelocityLimit(value);
 }
 
-auto EgoEntity::fillLaneletPose(CanonicalizedEntityStatus & status) -> void
-{
-  EntityBase::fillLaneletPose(status, false);
-}
-
 auto EgoEntity::setMapPose(const geometry_msgs::msg::Pose & map_pose) -> void
 {
-  const auto unique_route_lanelets = traffic_simulator::helper::getUniqueValues(getRouteLanelets());
-  std::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
-  if (unique_route_lanelets.empty()) {
-    lanelet_pose = hdmap_utils_ptr_->toLaneletPose(
-      map_pose, getBoundingBox(), false, getDefaultMatchingDistanceForLaneletPoseCalculation());
-  } else {
-    lanelet_pose = hdmap_utils_ptr_->toLaneletPose(
-      map_pose, unique_route_lanelets, getDefaultMatchingDistanceForLaneletPoseCalculation());
-    if (!lanelet_pose) {
-      lanelet_pose = hdmap_utils_ptr_->toLaneletPose(
-        map_pose, getBoundingBox(), false, getDefaultMatchingDistanceForLaneletPoseCalculation());
-    }
-  }
-  geometry_msgs::msg::Pose map_pose_z_fixed = map_pose;
   auto status = static_cast<EntityStatus>(status_);
-  if (lanelet_pose) {
-    math::geometry::CatmullRomSpline spline(
-      hdmap_utils_ptr_->getCenterPoints(lanelet_pose->lanelet_id));
-    if (const auto s_value = spline.getSValue(map_pose)) {
-      map_pose_z_fixed.position.z = spline.getPoint(s_value.value()).z;
-    }
-    status.pose = map_pose_z_fixed;
-    status.lanelet_pose_valid = true;
-    status.lanelet_pose = lanelet_pose.value();
-  } else {
-    status.pose = map_pose;
-    status.lanelet_pose_valid = false;
-    status.lanelet_pose = LaneletPose();
-  }
-  status_ = CanonicalizedEntityStatus(status, hdmap_utils_ptr_);
+  status.pose = map_pose;
+  const auto unique_route_lanelets = traffic_simulator::helper::getUniqueValues(getRouteLanelets());
+  const auto canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
+    map_pose, status_.getBoundingBox(), unique_route_lanelets, false,
+    getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
+  status_ = CanonicalizedEntityStatus(status, canonicalized_lanelet_pose);
 }
 }  // namespace entity
 }  // namespace traffic_simulator

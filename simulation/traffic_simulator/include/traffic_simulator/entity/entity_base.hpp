@@ -31,6 +31,7 @@
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/job/job_list.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
+#include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
@@ -100,24 +101,6 @@ public:
 
   virtual auto getCurrentAction() const -> std::string = 0;
 
-  /*   */ auto getDistanceToLaneBound() -> double;
-
-  /*   */ auto getDistanceToLaneBound(lanelet::Id lanelet_id) const -> double;
-
-  /*   */ auto getDistanceToLaneBound(const lanelet::Ids &) const -> double;
-
-  /*   */ auto getDistanceToLeftLaneBound() -> double;
-
-  /*   */ auto getDistanceToLeftLaneBound(lanelet::Id lanelet_id) const -> double;
-
-  /*   */ auto getDistanceToLeftLaneBound(const lanelet::Ids &) const -> double;
-
-  /*   */ auto getDistanceToRightLaneBound() -> double;
-
-  /*   */ auto getDistanceToRightLaneBound(lanelet::Id lanelet_id) const -> double;
-
-  /*   */ auto getDistanceToRightLaneBound(const lanelet::Ids &) const -> double;
-
   virtual auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter = 0;
 
   virtual auto getDefaultDynamicConstraints() const
@@ -129,21 +112,23 @@ public:
 
   virtual auto getGoalPoses() -> std::vector<CanonicalizedLaneletPose> = 0;
 
-  /*   */ auto getLaneletPose() const -> std::optional<CanonicalizedLaneletPose>;
+  /*   */ auto getCanonicalizedLaneletPose() const -> std::optional<CanonicalizedLaneletPose>;
 
-  /*   */ auto getLaneletPose(double matching_distance) const
+  /*   */ auto getCanonicalizedLaneletPose(double matching_distance) const
     -> std::optional<CanonicalizedLaneletPose>;
 
   /*   */ auto getMapPoseFromRelativePose(const geometry_msgs::msg::Pose &) const
     -> geometry_msgs::msg::Pose;
+
+  virtual auto getMaxAcceleration() const -> double = 0;
+
+  virtual auto getMaxDeceleration() const -> double = 0;
 
   virtual auto getDefaultMatchingDistanceForLaneletPoseCalculation() const -> double;
 
   virtual auto getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle> = 0;
 
   virtual auto getRouteLanelets(double horizon = 100) -> lanelet::Ids = 0;
-
-  virtual auto fillLaneletPose(CanonicalizedEntityStatus & status) -> void = 0;
 
   virtual auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray = 0;
 
@@ -184,7 +169,11 @@ public:
 
   virtual void requestSpeedChange(const speed_change::RelativeTargetSpeed &, bool);
 
+  virtual void requestClearRoute();
+
   virtual auto isControlledBySimulator() const -> bool;
+
+  virtual auto setControlledBySimulator(bool) -> void;
 
   virtual auto requestFollowTrajectory(
     const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &) -> void;
@@ -203,9 +192,6 @@ public:
 
   virtual void setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &) = 0;
 
-  /*   */ void setEntityTypeList(
-    const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> &);
-
   /*   */ void setOtherStatus(const std::unordered_map<std::string, CanonicalizedEntityStatus> &);
 
   virtual auto setStatus(const CanonicalizedEntityStatus &) -> void;
@@ -221,7 +207,7 @@ public:
     double min_velocity, double max_velocity, double min_acceleration, double max_acceleration,
     double min_jerk, double max_jerk) -> void;
 
-  virtual auto setVelocityLimit(double) -> void;
+  virtual auto setVelocityLimit(double) -> void = 0;
 
   virtual auto setMapPose(const geometry_msgs::msg::Pose & map_pose) -> void;
 
@@ -229,7 +215,9 @@ public:
 
   /*   */ auto setAcceleration(const geometry_msgs::msg::Accel & accel) -> void;
 
-  virtual void startNpcLogic();
+  /*   */ auto setLinearJerk(const double liner_jerk) -> void;
+
+  virtual void startNpcLogic(const double current_time);
 
   /*   */ void stopAtCurrentPosition();
 
@@ -239,8 +227,18 @@ public:
 
   /*   */ auto updateTraveledDistance(const double step_time) -> double;
 
-  virtual auto fillLaneletPose(CanonicalizedEntityStatus & status, bool include_crosswalk)
-    -> void final;
+  /*   */ bool reachPosition(
+    const geometry_msgs::msg::Pose & target_pose, const double tolerance) const;
+
+  /*   */ bool reachPosition(
+    const CanonicalizedLaneletPose & lanelet_pose, const double tolerance) const;
+
+  /*   */ bool reachPosition(const std::string & target_name, const double tolerance) const;
+
+  /*   */ auto requestSynchronize(
+    const std::string & target_name, const CanonicalizedLaneletPose & target_sync_pose,
+    const CanonicalizedLaneletPose & entity_target, const double target_speed,
+    const double tolerance) -> bool;
 
   const std::string name;
 
@@ -257,9 +255,10 @@ protected:
   bool npc_logic_started_ = false;
   double stand_still_duration_ = 0.0;
   double traveled_distance_ = 0.0;
+  double prev_job_duration_ = 0.0;
+  double step_time_ = 0.0;
 
   std::unordered_map<std::string, CanonicalizedEntityStatus> other_status_;
-  std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> entity_type_list_;
 
   std::optional<double> target_speed_;
   traffic_simulator::job::JobList job_list_;

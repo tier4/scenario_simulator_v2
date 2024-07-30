@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
-
+#include <algorithm>
+#include <geometry/quaternion/get_rotation_matrix.hpp>
 #include <memory>
 #include <nav_msgs/msg/occupancy_grid.hpp>
 #include <optional>
@@ -39,11 +39,19 @@ geometry_msgs::Pose OccupancyGridSensorBase::getSensorPose(
 }
 
 const std::vector<std::string> OccupancyGridSensorBase::getDetectedObjects(
-  const std::vector<traffic_simulator_msgs::EntityStatus> & status) const
+  const std::vector<traffic_simulator_msgs::EntityStatus> & status,
+  const std::vector<std::string> & lidar_detected_entities) const
 {
   std::vector<std::string> detected_entities;
   const auto pose = getSensorPose(status);
   for (const auto & s : status) {
+    if (const auto has_detected =
+          std::find(lidar_detected_entities.begin(), lidar_detected_entities.end(), s.name()) !=
+          lidar_detected_entities.end();
+        !has_detected) {
+      continue;
+    }
+
     double distance = std::hypot(
       s.pose().position().x() - pose.position().x(), s.pose().position().y() - pose.position().y(),
       s.pose().position().z() - pose.position().z());
@@ -57,7 +65,7 @@ const std::vector<std::string> OccupancyGridSensorBase::getDetectedObjects(
 template <>
 auto OccupancyGridSensor<nav_msgs::msg::OccupancyGrid>::getOccupancyGrid(
   const std::vector<traffic_simulator_msgs::EntityStatus> & status, const rclcpp::Time & stamp,
-  const std::vector<std::string> & lidar_detected_entity) -> nav_msgs::msg::OccupancyGrid
+  const std::vector<std::string> & lidar_detected_entities) -> nav_msgs::msg::OccupancyGrid
 {
   // check if entities in `status` have unique names
   {
@@ -82,6 +90,13 @@ auto OccupancyGridSensor<nav_msgs::msg::OccupancyGrid>::getOccupancyGrid(
       throw SimulationRuntimeError("Failed to calculate ego pose with north up.");
     }
     simulation_interface::toMsg(ego->pose(), ego_pose_north_up);
+    /**
+     * @note
+     * There is no problem with the yaw axis being north-up, but unless the pitch and roll axes are
+     * adjusted to the slope of the road surface, the grid map will not project the obstacles correctly.
+     * However, the current implementation of autoware.universe does not consider the roll and pitch axes,
+     * so it is not considered here either.
+     */
     ego_pose_north_up.orientation = geometry_msgs::msg::Quaternion();
   }
 
@@ -89,10 +104,10 @@ auto OccupancyGridSensor<nav_msgs::msg::OccupancyGrid>::getOccupancyGrid(
   auto detected_entities = std::set<std::string>();
   {
     if (configuration_.filter_by_range()) {
-      auto v = getDetectedObjects(status);
+      auto v = getDetectedObjects(status, lidar_detected_entities);
       detected_entities.insert(v.begin(), v.end());
     } else {
-      detected_entities.insert(lidar_detected_entity.begin(), lidar_detected_entity.end());
+      detected_entities.insert(lidar_detected_entities.begin(), lidar_detected_entities.end());
     }
   }
 
@@ -110,7 +125,7 @@ auto OccupancyGridSensor<nav_msgs::msg::OccupancyGrid>::getOccupancyGrid(
         simulation_interface::toMsg(s.pose(), pose);
         auto point = geometry_msgs::msg::Point();
         simulation_interface::toMsg(s.bounding_box().center(), point);
-        auto rotation = quaternion_operation::getRotationMatrix(pose.orientation);
+        auto rotation = math::geometry::getRotationMatrix(pose.orientation);
         auto center = (rotation * Eigen::Vector3d(point.x, point.y, point.z)).eval();
 
         pose.position.x += center.x();

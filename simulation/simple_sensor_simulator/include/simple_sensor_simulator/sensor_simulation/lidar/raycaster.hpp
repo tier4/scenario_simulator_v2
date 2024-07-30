@@ -15,10 +15,11 @@
 #ifndef SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__LIDAR__RAYCASTER_HPP_
 #define SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__LIDAR__RAYCASTER_HPP_
 
-#include <embree3/rtcore.h>
+#include <embree4/rtcore.h>
 #include <pcl_conversions/pcl_conversions.h>
-#include <quaternion_operation/quaternion_operation.h>
 
+#include <geometry/quaternion/euler_to_quaternion.hpp>
+#include <geometry/quaternion/get_rotation_matrix.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
 #include <memory>
@@ -76,15 +77,14 @@ private:
 
   static void intersect(
     int thread_id, int thread_count, RTCScene scene,
-    pcl::PointCloud<pcl::PointXYZI>::Ptr thread_cloud, RTCIntersectContext context,
-    geometry_msgs::msg::Pose origin,
+    pcl::PointCloud<pcl::PointXYZI>::Ptr thread_cloud, geometry_msgs::msg::Pose origin,
     std::reference_wrapper<std::set<unsigned int>> ref_thread_detected_ids, double max_distance,
     double min_distance,
     std::reference_wrapper<const std::vector<Eigen::Matrix3d>> ref_rotation_matrices)
   {
     auto & rotation_matrices = ref_rotation_matrices.get();
     auto & thread_detected_ids = ref_thread_detected_ids.get();
-    const auto orientation_matrix = quaternion_operation::getRotationMatrix(origin.orientation);
+    const auto orientation_matrix = math::geometry::getRotationMatrix(origin.orientation);
     for (unsigned int i = thread_id; i < rotation_matrices.size(); i += thread_count) {
       RTCRayHit rayhit = {};
       rayhit.ray.org_x = origin.position.x;
@@ -101,7 +101,7 @@ private:
       rayhit.ray.dir_y = rotation_mat(1);
       rayhit.ray.dir_z = rotation_mat(2);
       rayhit.hit.geomID = RTC_INVALID_GEOMETRY_ID;
-      rtcIntersect1(scene, &context, &rayhit);
+      rtcIntersect1(scene, &rayhit);
 
       if (rayhit.hit.geomID != RTC_INVALID_GEOMETRY_ID) {
         double distance = rayhit.ray.tfar;

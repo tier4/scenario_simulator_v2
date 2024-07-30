@@ -30,6 +30,13 @@ CppScenarioNode::CppScenarioNode(
   get_parameter<std::string>("junit_path", junit_path_);
   declare_parameter<double>("timeout", 10.0);
   get_parameter<double>("timeout", timeout_);
+
+  traffic_simulator::lanelet_pose::CanonicalizedLaneletPose::setConsiderPoseByRoadSlope([&]() {
+    if (not has_parameter("consider_pose_by_road_slope")) {
+      declare_parameter("consider_pose_by_road_slope", false);
+    }
+    return get_parameter("consider_pose_by_road_slope").as_bool();
+  }());
 }
 
 void CppScenarioNode::update()
@@ -93,6 +100,7 @@ void CppScenarioNode::spawnEgoEntity(
   api_.updateFrame();
   std::this_thread::sleep_for(std::chrono::duration<double>(1.0 / 20.0));
   api_.spawn("ego", spawn_lanelet_pose, parameters, traffic_simulator::VehicleBehavior::autoware());
+  api_.asFieldOperatorApplication("ego").declare_parameter<bool>("allow_goal_modification", true);
   api_.attachLidarSensor("ego", 0.0);
 
   api_.attachDetectionSensor("ego", 200.0, true, 0.0, 0, 0.0, 0.0);
@@ -100,7 +108,7 @@ void CppScenarioNode::spawnEgoEntity(
   api_.attachOccupancyGridSensor([this] {
     simulation_api_schema::OccupancyGridSensorConfiguration configuration;
     // clang-format off
-      configuration.set_architecture_type(getParameter<std::string>("architecture_type", "awf/universe"));
+      configuration.set_architecture_type(api_.getROS2Parameter<std::string>("architecture_type", "awf/universe"));
       configuration.set_entity("ego");
       configuration.set_filter_by_range(true);
       configuration.set_height(200);
@@ -112,30 +120,15 @@ void CppScenarioNode::spawnEgoEntity(
     return configuration;
   }());
   api_.requestAssignRoute("ego", goal_lanelet_poses);
+
   using namespace std::chrono_literals;
-  std::atomic<bool> initialized(false);
-  auto initialize_thread = std::thread([&]() {
-    while (!api_.asFieldOperatorApplication("ego").engaged()) {
-      api_.updateFrame();
-      std::this_thread::sleep_for(std::chrono::duration<double>(1.0 / 20.0));
-    }
-    initialized.store(true);
-  });
-  std::atomic<bool> engaged(false);
-  auto engage_thread = std::thread([&]() {
-    while (!api_.asFieldOperatorApplication("ego").engaged()) {
+  while (!api_.asFieldOperatorApplication("ego").engaged()) {
+    if (api_.asFieldOperatorApplication("ego").engageable()) {
       api_.asFieldOperatorApplication("ego").engage();
-      std::this_thread::sleep_for(1000ms);
     }
-    engaged.store(true);
-  });
-  while (!api_.asFieldOperatorApplication("ego").engaged() &&
-         !(initialized.load() && engaged.load())) {
-    // RCLCPP_INFO_STREAM(get_logger(), "Waiting for Autoware initialization...");
+    api_.updateFrame();
     std::this_thread::sleep_for(std::chrono::duration<double>(1.0 / 20.0));
   }
-  initialize_thread.join();
-  engage_thread.join();
 }
 
 void CppScenarioNode::checkConfiguration(const traffic_simulator::Configuration & configuration)

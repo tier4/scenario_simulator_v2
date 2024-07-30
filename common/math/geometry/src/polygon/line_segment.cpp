@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
-
 #include <cmath>
 #include <geometry/polygon/line_segment.hpp>
+#include <geometry/quaternion/euler_to_quaternion.hpp>
 #include <geometry/transform.hpp>
 #include <geometry/vector3/hypot.hpp>
 #include <geometry/vector3/operator.hpp>
@@ -93,18 +92,23 @@ auto LineSegment::getPoint(const double s, const bool denormalize_s) const
  * @brief Get pose on the line segment from s value. Orientation of thee return value was calculated from the vector of the line segment.
  * @param s Normalized s value in coordinate along line segment.
  * @param denormalize_s If true, s value should be normalized in range [0,1]. If false, s value is not normalized.
+ * @param fill_pitch If true, the pitch value of the orientation is filled. If false, the pitch value of the orientation is 0.
+ *        This parameter is introduced for backward-compatibility.
  * @return geometry_msgs::msg::Pose 
  */
-auto LineSegment::getPose(const double s, const bool denormalize_s) const
+auto LineSegment::getPose(const double s, const bool denormalize_s, const bool fill_pitch) const
   -> geometry_msgs::msg::Pose
 {
   return geometry_msgs::build<geometry_msgs::msg::Pose>()
     .position(getPoint(s, denormalize_s))
-    .orientation([this]() -> geometry_msgs::msg::Quaternion {
+    .orientation([this, fill_pitch]() -> geometry_msgs::msg::Quaternion {
       const auto tangent_vec = getVector();
-      return quaternion_operation::convertEulerAngleToQuaternion(
-        geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0.0).y(0.0).z(
-          std::atan2(tangent_vec.y, tangent_vec.x)));
+      return math::geometry::convertEulerAngleToQuaternion(
+        geometry_msgs::build<geometry_msgs::msg::Vector3>()
+          .x(0.0)
+          .y(
+            fill_pitch ? std::atan2(-tangent_vec.z, std::hypot(tangent_vec.x, tangent_vec.y)) : 0.0)
+          .z(std::atan2(tangent_vec.y, tangent_vec.x)));
     }());
 }
 
@@ -247,7 +251,13 @@ auto LineSegment::getIntersection2D(const LineSegment & line) const
 
 auto LineSegment::getVector() const -> geometry_msgs::msg::Vector3
 {
-  return end_point - start_point;
+  using math::geometry::operator-;
+  const auto result_pt = end_point - start_point;
+  auto result = geometry_msgs::msg::Vector3();
+  result.x = result_pt.x;
+  result.y = result_pt.y;
+  result.z = result_pt.z;
+  return result;
 }
 
 /**

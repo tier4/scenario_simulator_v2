@@ -12,11 +12,11 @@ We use ZeroMQ Inter-Process communication to communicate with your simulator and
 We use [ZeroMQ](https://zeromq.org/) in order to communicate with the simulator and interpreter.
 We use Request/Reply sockets in order to run the simulators synchronously.
 
-<iframe 
-  class="hatenablogcard" 
-  style="width:100%;height:155px;max-width:450px;" 
-  title="embree" 
-  src="https://hatenablog-parts.com/embed?url=https://zeromq.org/" 
+<iframe
+  class="hatenablogcard"
+  style="width:100%;height:155px;max-width:450px;"
+  title="embree"
+  src="https://hatenablog-parts.com/embed?url=https://zeromq.org/"
   width="300" height="150" frameborder="0" scrolling="no">
 </iframe>
 
@@ -42,7 +42,6 @@ sequenceDiagram
     Simple Sensor Simulator ->-Traffic Simulator : AttachOccupancyGridSensorResponse
     Traffic Simulator ->+ Simple Sensor Simulator : AttachPseudoTrafficLightDetectorRequest
     Simple Sensor Simulator ->-Traffic Simulator : AttachPseudoTrafficLightDetectorResponse
-OccupancyGridSensor
     loop every frame
       Traffic Simulator ->+ Simple Sensor Simulator : UpdateEntityStatusRequest
       Simple Sensor Simulator ->-Traffic Simulator : UpdateEntityStatusResponse

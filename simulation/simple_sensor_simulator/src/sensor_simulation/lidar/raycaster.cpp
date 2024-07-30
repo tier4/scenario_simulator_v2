@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
-
 #include <algorithm>
 #include <iostream>
 #include <simple_sensor_simulator/sensor_simulation/lidar/lidar_sensor.hpp>
@@ -61,7 +59,7 @@ void Raycaster::setDirection(
     configuration.horizontal_resolution());
   rotation_matrices_.clear();
   for (const auto & q : quat_directions) {
-    rotation_matrices_.push_back(quaternion_operation::getRotationMatrix(q));
+    rotation_matrices_.push_back(math::geometry::getRotationMatrix(q));
   }
 }
 
@@ -83,7 +81,7 @@ std::vector<geometry_msgs::msg::Quaternion> Raycaster::getDirections(
         rpy.x = 0;
         rpy.y = vertical_angle;
         rpy.z = horizontal_angle;
-        auto quat = quaternion_operation::convertEulerAngleToQuaternion(rpy);
+        auto quat = math::geometry::convertEulerAngleToQuaternion(rpy);
         directions.emplace_back(quat);
       }
     }
@@ -119,12 +117,11 @@ const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
   std::vector<pcl::PointCloud<pcl::PointXYZI>::Ptr> thread_cloud(thread_count);
 
   rtcCommitScene(scene_);
-  RTCIntersectContext context;
   for (unsigned int i = 0; i < threads.size(); ++i) {
     thread_cloud[i] = pcl::PointCloud<pcl::PointXYZI>::Ptr(new pcl::PointCloud<pcl::PointXYZI>());
     threads[i] = std::thread(
-      intersect, i, thread_count, scene_, thread_cloud[i], context, origin,
-      std::ref(thread_detected_ids[i]), max_distance, min_distance, std::ref(rotation_matrices_));
+      intersect, i, thread_count, scene_, thread_cloud[i], origin, std::ref(thread_detected_ids[i]),
+      max_distance, min_distance, std::ref(rotation_matrices_));
   }
   for (unsigned int i = 0; i < threads.size(); ++i) {
     threads[i].join();

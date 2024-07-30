@@ -22,6 +22,7 @@
 #include <openscenario_interpreter/syntax/rule.hpp>
 #include <openscenario_interpreter/syntax/triggering_entities.hpp>
 #include <pugixml.hpp>
+#include <valarray>
 
 namespace openscenario_interpreter
 {
@@ -47,7 +48,9 @@ struct ReachPositionCondition : private SimulatorCore::CoordinateSystemConversio
 
   const TriggeringEntities triggering_entities;
 
-  std::vector<Double> results;  // for description
+  std::vector<std::valarray<double>> results;  // for description
+
+  const bool consider_z;
 
   explicit ReachPositionCondition(const pugi::xml_node &, Scope &, const TriggeringEntities &);
 

@@ -13,10 +13,10 @@
 // limitations under the License.
 
 #include <gtest/gtest.h>
-#include <quaternion_operation/quaternion_operation.h>
 
 #include <cmath>
 #include <geometry/polygon/line_segment.hpp>
+#include <geometry/quaternion/euler_to_quaternion.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 
 #include "expect_eq_macros.hpp"
@@ -310,7 +310,7 @@ TEST(LineSegment, getSValue_parallel)
   const auto s = line.getSValue(
     makePose(
       1.0, 0.0, 0.0,
-      quaternion_operation::convertEulerAngleToQuaternion(makeVector(0.0, 0.0, M_PI_4 * 3.0))),
+      math::geometry::convertEulerAngleToQuaternion(makeVector(0.0, 0.0, M_PI_4 * 3.0))),
     1000.0, false);
   EXPECT_FALSE(s);
 }
@@ -321,7 +321,7 @@ TEST(LineSegment, getSValue_parallelDenormalize)
   const auto s = line.getSValue(
     makePose(
       1.0, 0.0, 0.0,
-      quaternion_operation::convertEulerAngleToQuaternion(makeVector(0.0, 0.0, M_PI_4 * 3.0))),
+      math::geometry::convertEulerAngleToQuaternion(makeVector(0.0, 0.0, M_PI_4 * 3.0))),
     1000.0, true);
   EXPECT_FALSE(s);
 }
@@ -387,10 +387,16 @@ TEST(LineSegment, GetPose)
     /// Orientation should be defined by the direction of the `line`, so the orientation should be parallel to the z axis.
     // [Snippet_getPose_with_s_0]
     EXPECT_POSE_EQ(
-      line.getPose(0, false),
+      line.getPose(0, false, false),
       geometry_msgs::build<geometry_msgs::msg::Pose>()
         .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0))
         .orientation(geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0).y(0).z(0).w(1)));
+    EXPECT_POSE_EQ(
+      line.getPose(0, false, true),
+      geometry_msgs::build<geometry_msgs::msg::Pose>()
+        .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0))
+        .orientation(math::geometry::convertEulerAngleToQuaternion(
+          geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0).y(-M_PI * 0.5).z(0))));
     // [Snippet_getPose_with_s_0]
     /// @snippet test/test_line_segment.cpp Snippet_getPose_with_s_0
 
@@ -398,10 +404,16 @@ TEST(LineSegment, GetPose)
     /// Orientation should be defined by the direction of the `line`, so the orientation should be parallel to the z axis.
     // [Snippet_getPose_with_s_1]
     EXPECT_POSE_EQ(
-      line.getPose(1, false),
+      line.getPose(1, false, false),
       geometry_msgs::build<geometry_msgs::msg::Pose>()
         .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(1))
         .orientation(geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0).y(0).z(0).w(1)));
+    EXPECT_POSE_EQ(
+      line.getPose(1, false, true),
+      geometry_msgs::build<geometry_msgs::msg::Pose>()
+        .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(1))
+        .orientation(math::geometry::convertEulerAngleToQuaternion(
+          geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0).y(-M_PI * 0.5).z(0))));
     // [Snippet_getPose_with_s_1]
     /// @snippet test/test_line_segment.cpp Snippet_getPose_with_s_1
   }

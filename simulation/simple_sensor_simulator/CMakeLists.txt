@@ -54,7 +54,6 @@ ament_auto_add_library(simple_sensor_simulator_component SHARED
   src/vehicle_simulation/vehicle_model/sim_model_interface.cpp
 )
 target_link_libraries(simple_sensor_simulator_component
-  embree3
   pthread
   sodium
   zmq
@@ -86,6 +85,7 @@ EXPORT export_simple_sensor_simulator_component
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
-endif()
 
+  add_subdirectory(test)
+endif()
 ament_auto_package()
