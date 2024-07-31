@@ -23,7 +23,8 @@
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/traffic_lights/configurable_rate_updater.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light.hpp>
-#include <traffic_simulator/traffic_lights/traffic_lights_marker_publisher.hpp>
+#include <traffic_simulator/traffic_lights/traffic_light_marker_publisher.hpp>
+#include <traffic_simulator_msgs/msg/traffic_light_array_v1.hpp>
 #include <unordered_map>
 #include <vector>
 
@@ -43,7 +44,7 @@ public:
     const NodeTypePointer & node_ptr, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils)
   : hdmap_utils_(hdmap_utils),
     clock_ptr_(node_ptr->get_clock()),
-    marker_publisher_ptr_(std::make_unique<TrafficLightsMarkerPublisher>(node_ptr)),
+    marker_publisher_ptr_(std::make_unique<TrafficLightMarkerPublisher>(node_ptr)),
     rate_updater_(node_ptr, [this]() { update(); })
   {
   }
@@ -76,6 +77,8 @@ public:
   auto generateAutowareAutoPerceptionMsg() const
     -> autoware_auto_perception_msgs::msg::TrafficSignalArray;
 
+  auto generateTrafficSimulatorV1Msg() const -> traffic_simulator_msgs::msg::TrafficLightArrayV1;
+
 protected:
   virtual auto update() const -> void = 0;
 
@@ -92,7 +95,7 @@ protected:
   const rclcpp::Clock::SharedPtr clock_ptr_;
 
   std::unordered_map<lanelet::Id, TrafficLight> traffic_lights_map_;
-  const std::unique_ptr<TrafficLightsMarkerPublisher> marker_publisher_ptr_;
+  const std::unique_ptr<TrafficLightMarkerPublisher> marker_publisher_ptr_;
   ConfigurableRateUpdater rate_updater_;
 };
 }  // namespace traffic_simulator

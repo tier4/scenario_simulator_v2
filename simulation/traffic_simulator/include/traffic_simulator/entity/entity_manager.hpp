@@ -40,14 +40,15 @@
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/traffic/traffic_sink.hpp>
 #include <traffic_simulator/traffic_lights/configurable_rate_updater.hpp>
+#include <traffic_simulator/traffic_lights/traffic_light_marker_publisher.hpp>
+#include <traffic_simulator/traffic_lights/traffic_light_publisher.hpp>
 #include <traffic_simulator/traffic_lights/traffic_lights.hpp>
-#include <traffic_simulator/traffic_lights/traffic_lights_marker_publisher.hpp>
-#include <traffic_simulator/traffic_lights/traffic_lights_publisher.hpp>
 #include <traffic_simulator/utils/node_parameters.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/entity_status_with_trajectory_array.hpp>
+#include <traffic_simulator_msgs/msg/traffic_light_array_v1.hpp>
 #include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
 #include <type_traits>
 #include <unordered_map>
@@ -232,7 +233,7 @@ public:
       } else {
         std::vector<geometry_msgs::msg::Pose> poses;
         for (const auto & lanelet_pose : getGoalPoses<CanonicalizedLaneletPose>(name)) {
-          poses.push_back(toMapPose(lanelet_pose));
+          poses.push_back(pose::toMapPose(lanelet_pose));
         }
         return poses;
       }
@@ -260,6 +261,12 @@ public:
     const std::string & name, const Pose & pose, const Parameters & parameters,
     const double current_time, Ts &&... xs)
   {
+    static_assert(
+      std::disjunction<
+        std::is_same<Pose, CanonicalizedLaneletPose>,
+        std::is_same<Pose, geometry_msgs::msg::Pose>>::value,
+      "Pose must be of type CanonicalizedLaneletPose or geometry_msgs::msg::Pose");
+
     auto makeEntityStatus = [&]() -> CanonicalizedEntityStatus {
       EntityStatus entity_status;
 
@@ -307,10 +314,11 @@ public:
           "LaneletPose is not supported type as pose argument. Only CanonicalizedLaneletPose and "
           "msg::Pose are supported as pose argument of EntityManager::spawnEntity().");
       } else if constexpr (std::is_same_v<std::decay_t<Pose>, CanonicalizedLaneletPose>) {
-        entity_status.pose = toMapPose(pose);
+        entity_status.pose = pose::toMapPose(pose);
         return CanonicalizedEntityStatus(entity_status, pose);
       } else if constexpr (std::is_same_v<std::decay_t<Pose>, geometry_msgs::msg::Pose>) {
-        const auto canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
+        entity_status.pose = pose;
+        const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
           pose, parameters.bounding_box, include_crosswalk, matching_distance, hdmap_utils_ptr_);
         return CanonicalizedEntityStatus(entity_status, canonicalized_lanelet_pose);
       }

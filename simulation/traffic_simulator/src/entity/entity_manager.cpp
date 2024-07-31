@@ -37,8 +37,11 @@ namespace traffic_simulator
 {
 namespace entity
 {
-void EntityManager::broadcastEntityTransform()
+auto EntityManager::broadcastEntityTransform() -> void
 {
+  static bool is_send = false;
+  static geometry_msgs::msg::Pose pose;
+
   using math::geometry::operator/;
   using math::geometry::operator*;
   using math::geometry::operator+=;
@@ -55,26 +58,30 @@ void EntityManager::broadcastEntityTransform()
         /**
            * @note This is the intended implementation.
            * It is easier to create rviz config if the name "ego" is fixed,
-           * so the frame_id “ego” is issued regardless of the name of the ego entity.
+           * so the frame_id "ego" is issued regardless of the name of the ego entity.
            */
         .header(std_msgs::build<std_msgs::msg::Header>().stamp(clock_ptr_->now()).frame_id("ego"))
         .pose(getEntity(getEgoName())->getMapPose()),
       true);
   }
-  if (const auto names = getEntityNames(); !names.empty()) {
+  if (!names.empty()) {
+    if (!is_send) {
+      pose = geometry_msgs::build<geometry_msgs::msg::Pose>()
+               .position(std::accumulate(
+                 names.begin(), names.end(), geometry_msgs::msg::Point(),
+                 [this, names](geometry_msgs::msg::Point point, const std::string & name) {
+                   point += getEntity(name)->getMapPose().position *
+                            (1.0 / static_cast<double>(names.size()));
+                   return point;
+                 }))
+               .orientation(geometry_msgs::msg::Quaternion());
+      is_send = true;
+    }
     broadcastTransform(
       geometry_msgs::build<geometry_msgs::msg::PoseStamped>()
         .header(
           std_msgs::build<std_msgs::msg::Header>().stamp(clock_ptr_->now()).frame_id("entities"))
-        .pose(geometry_msgs::build<geometry_msgs::msg::Pose>()
-                .position(std::accumulate(
-                  names.begin(), names.end(), geometry_msgs::msg::Point(),
-                  [this, names](geometry_msgs::msg::Point & point, const std::string & name) {
-                    return point +=
-                           (getEntity(name)->getMapPose().position *
-                            (1.0 / static_cast<double>(names.size())));
-                  }))
-                .orientation(geometry_msgs::msg::Quaternion())),
+        .pose(pose),
       true);
   }
 }
@@ -232,7 +239,7 @@ void EntityManager::resetBehaviorPlugin(
   const std::string & name, const std::string & behavior_plugin_name)
 {
   const auto reference_entity = getEntity(name);
-  const CanonicalizedEntityStatus status = reference_entity->getStatus();
+  const CanonicalizedEntityStatus status = reference_entity->getCanonicalizedStatus();
   const auto behavior_parameter = reference_entity->getBehaviorParameter();
   if (reference_entity->is<EgoEntity>()) {
     THROW_SEMANTIC_ERROR(
@@ -284,7 +291,7 @@ auto EntityManager::updateNpcLogic(
   } else if (const auto ego_entity = std::dynamic_pointer_cast<const EgoEntity>(entity)) {
     ego_entity->updateFieldOperatorApplication();
   }
-  return entity->getStatus();
+  return entity->getCanonicalizedStatus();
 }
 
 void EntityManager::update(const double current_time, const double step_time)
@@ -299,7 +306,7 @@ void EntityManager::update(const double current_time, const double step_time)
   }
   std::unordered_map<std::string, CanonicalizedEntityStatus> all_status;
   for (auto && [name, entity] : entities_) {
-    all_status.emplace(name, entity->getStatus());
+    all_status.emplace(name, entity->getCanonicalizedStatus());
   }
   for (auto && [name, entity] : entities_) {
     entity->setOtherStatus(all_status);

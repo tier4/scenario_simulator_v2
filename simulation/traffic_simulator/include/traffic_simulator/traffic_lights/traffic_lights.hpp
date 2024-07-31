@@ -17,8 +17,8 @@
 
 #include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
 #include <autoware_perception_msgs/msg/traffic_signal_array.hpp>
+#include <traffic_simulator/traffic_lights/traffic_light_publisher.hpp>
 #include <traffic_simulator/traffic_lights/traffic_lights_base.hpp>
-#include <traffic_simulator/traffic_lights/traffic_lights_publisher.hpp>
 
 namespace traffic_simulator
 {
@@ -28,7 +28,10 @@ public:
   template <typename NodeTypePointer>
   ConventionalTrafficLights(
     const NodeTypePointer & node_ptr, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils)
-  : TrafficLightsBase(node_ptr, hdmap_utils)
+  : TrafficLightsBase(node_ptr, hdmap_utils),
+    backward_compatible_publisher_ptr_(
+      std::make_unique<TrafficLightPublisher<traffic_simulator_msgs::msg::TrafficLightArrayV1>>(
+        node_ptr, "/simulation/traffic_lights"))
   {
   }
 
@@ -37,11 +40,14 @@ public:
 private:
   auto update() const -> void
   {
+    backward_compatible_publisher_ptr_->publish(*this);
     if (isAnyTrafficLightChanged()) {
       marker_publisher_ptr_->deleteMarkers();
     }
     marker_publisher_ptr_->drawMarkers(traffic_lights_map_);
   }
+
+  const std::unique_ptr<TrafficLightPublisherBase> backward_compatible_publisher_ptr_;
 };
 
 class V2ITrafficLights : public TrafficLightsBase
@@ -75,7 +81,7 @@ private:
   template <typename NodeTypePointer>
   auto makePublisher(
     const NodeTypePointer & node_ptr, const std::string & architecture_type,
-    const std::string & topic_name) -> std::unique_ptr<TrafficLightsPublisherBase>
+    const std::string & topic_name) -> std::unique_ptr<TrafficLightPublisherBase>
   {
     /*
        Here autoware_perception_msgs is used for all awf/universe/....
@@ -87,7 +93,7 @@ private:
     */
     if (architecture_type.find("awf/universe") != std::string::npos) {
       return std::make_unique<
-        TrafficLightsPublisher<autoware_perception_msgs::msg::TrafficSignalArray>>(
+        TrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>>(
         node_ptr, topic_name);
     } else {
       throw common::SemanticError(
@@ -96,8 +102,8 @@ private:
     }
   }
 
-  const std::unique_ptr<TrafficLightsPublisherBase> publisher_ptr_;
-  const std::unique_ptr<TrafficLightsPublisherBase> legacy_topic_publisher_ptr_;
+  const std::unique_ptr<TrafficLightPublisherBase> publisher_ptr_;
+  const std::unique_ptr<TrafficLightPublisherBase> legacy_topic_publisher_ptr_;
 };
 
 class TrafficLights

@@ -79,14 +79,12 @@ private:
         if (const auto lanelet_pose = entity->getCanonicalizedLaneletPose(); not lanelet_pose) {
           stop(cpp_mock_scenarios::Result::FAILURE);  // LCOV_EXCL_LINE
         } else {
-          const bool is_vehicle =
-            entity->getEntityType().type == traffic_simulator_msgs::msg::EntityType::VEHICLE;
           const bool valid_vehicle_lanelet =
             traffic_simulator::pose::isInLanelet(
               lanelet_pose.value(), 34705, 50.0, api_.getHdmapUtils()) ||
             traffic_simulator::pose::isInLanelet(
               lanelet_pose.value(), 34696, 50.0, api_.getHdmapUtils());
-          if (!valid_vehicle_lanelet || !is_vehicle) {
+          if (!valid_vehicle_lanelet || !isVehicle(name)) {
             stop(cpp_mock_scenarios::Result::FAILURE);  // LCOV_EXCL_LINE
           }
         }

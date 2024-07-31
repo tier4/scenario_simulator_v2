@@ -83,13 +83,6 @@ auto VehicleEntity::getBehaviorParameter() const -> traffic_simulator_msgs::msg:
   return behavior_plugin_ptr_->getBehaviorParameter();
 }
 
-auto VehicleEntity::getEntityType() const -> const traffic_simulator_msgs::msg::EntityType &
-{
-  static traffic_simulator_msgs::msg::EntityType type;
-  type.type = traffic_simulator_msgs::msg::EntityType::VEHICLE;
-  return type;
-}
-
 auto VehicleEntity::getEntityTypename() const -> const std::string &
 {
   static const std::string result = "VehicleEntity";
@@ -156,7 +149,7 @@ auto VehicleEntity::onUpdate(const double current_time, const double step_time) 
   setStatus(*behavior_plugin_ptr_->getUpdatedStatus());
   /// @note setStatus() is not skipped even if isAtEndOfLanelets return true
   if (const auto canonicalized_lanelet_pose = status_.getCanonicalizedLaneletPose()) {
-    if (isAtEndOfLanelets(canonicalized_lanelet_pose.value(), hdmap_utils_ptr_)) {
+    if (pose::isAtEndOfLanelets(canonicalized_lanelet_pose.value(), hdmap_utils_ptr_)) {
       stopAtCurrentPosition();
       updateStandStillDuration(step_time);
       updateTraveledDistance(step_time);
@@ -182,7 +175,7 @@ void VehicleEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_
 {
   behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
   if (
-    const auto canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
+    const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
       map_pose, status_.getBoundingBox(), false,
       getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_)) {
     requestAcquirePosition(canonicalized_lanelet_pose.value());
@@ -210,7 +203,7 @@ void VehicleEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pos
   std::vector<CanonicalizedLaneletPose> route;
   for (const auto & waypoint : waypoints) {
     if (
-      const auto canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
+      const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
         waypoint, status_.getBoundingBox(), false,
         getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_)) {
       route.emplace_back(canonicalized_lanelet_pose.value());
@@ -229,7 +222,7 @@ auto VehicleEntity::requestFollowTrajectory(
   std::vector<CanonicalizedLaneletPose> waypoints;
   for (const auto & vertex : parameter->shape.vertices) {
     if (
-      const auto canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
+      const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
         vertex.position, status_.getBoundingBox(), false,
         getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_)) {
       waypoints.emplace_back(canonicalized_lanelet_pose.value());
@@ -255,6 +248,20 @@ void VehicleEntity::requestLaneChange(const traffic_simulator::lane_change::Para
 {
   behavior_plugin_ptr_->setRequest(behavior::Request::LANE_CHANGE);
   behavior_plugin_ptr_->setLaneChangeParameters(parameter);
+}
+
+auto VehicleEntity::getMaxAcceleration() const -> double
+{
+  return std::clamp(
+    getBehaviorParameter().dynamic_constraints.max_acceleration, 0.0,
+    vehicle_parameters.performance.max_acceleration);
+}
+
+auto VehicleEntity::getMaxDeceleration() const -> double
+{
+  return std::clamp(
+    getBehaviorParameter().dynamic_constraints.max_deceleration, 0.0,
+    vehicle_parameters.performance.max_deceleration);
 }
 
 void VehicleEntity::setVelocityLimit(double linear_velocity)

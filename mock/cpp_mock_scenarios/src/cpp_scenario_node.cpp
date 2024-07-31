@@ -132,6 +132,18 @@ void CppScenarioNode::spawnEgoEntity(
   }
 }
 
+auto CppScenarioNode::isVehicle(const std::string & name) const -> bool
+{
+  return api_.getEntity(name)->getEntityType().type ==
+         traffic_simulator_msgs::msg::EntityType::VEHICLE;
+}
+
+auto CppScenarioNode::isPedestrian(const std::string & name) const -> bool
+{
+  return api_.getEntity(name)->getEntityType().type ==
+         traffic_simulator_msgs::msg::EntityType::PEDESTRIAN;
+}
+
 void CppScenarioNode::checkConfiguration(const traffic_simulator::Configuration & configuration)
 {
   try {

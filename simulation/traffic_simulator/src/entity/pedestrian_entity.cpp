@@ -70,7 +70,7 @@ void PedestrianEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::
   std::vector<CanonicalizedLaneletPose> route;
   for (const auto & waypoint : waypoints) {
     if (
-      const auto canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
+      const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
         waypoint, status_.getBoundingBox(), true,
         getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_)) {
       route.emplace_back(canonicalized_lanelet_pose.value());
@@ -146,7 +146,7 @@ void PedestrianEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & m
 {
   behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
   if (
-    const auto canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
+    const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
       map_pose, status_.getBoundingBox(), true,
       getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_)) {
     requestAcquirePosition(canonicalized_lanelet_pose.value());
@@ -159,13 +159,6 @@ void PedestrianEntity::cancelRequest()
 {
   behavior_plugin_ptr_->setRequest(behavior::Request::NONE);
   route_planner_.cancelRoute();
-}
-
-auto PedestrianEntity::getEntityType() const -> const traffic_simulator_msgs::msg::EntityType &
-{
-  static traffic_simulator_msgs::msg::EntityType type;
-  type.type = traffic_simulator_msgs::msg::EntityType::PEDESTRIAN;
-  return type;
 }
 
 auto PedestrianEntity::getEntityTypename() const -> const std::string &
@@ -191,6 +184,16 @@ void PedestrianEntity::setBehaviorParameter(
   const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter)
 {
   behavior_plugin_ptr_->setBehaviorParameter(behavior_parameter);
+}
+
+auto PedestrianEntity::getMaxAcceleration() const -> double
+{
+  return getBehaviorParameter().dynamic_constraints.max_acceleration;
+}
+
+auto PedestrianEntity::getMaxDeceleration() const -> double
+{
+  return getBehaviorParameter().dynamic_constraints.max_deceleration;
 }
 
 void PedestrianEntity::setVelocityLimit(double linear_velocity)
@@ -256,7 +259,7 @@ auto PedestrianEntity::onUpdate(const double current_time, const double step_tim
   setStatus(*behavior_plugin_ptr_->getUpdatedStatus());
   /// @note setStatus() is not skipped even if isAtEndOfLanelets return true
   if (const auto canonicalized_lanelet_pose = status_.getCanonicalizedLaneletPose()) {
-    if (isAtEndOfLanelets(canonicalized_lanelet_pose.value(), hdmap_utils_ptr_)) {
+    if (pose::isAtEndOfLanelets(canonicalized_lanelet_pose.value(), hdmap_utils_ptr_)) {
       stopAtCurrentPosition();
       updateStandStillDuration(step_time);
       updateTraveledDistance(step_time);

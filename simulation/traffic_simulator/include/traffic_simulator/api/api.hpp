@@ -72,7 +72,7 @@ public:
       std::make_shared<entity::EntityManager>(node, configuration, node_parameters_)),
     traffic_lights_ptr_(std::make_shared<TrafficLights>(
       node, entity_manager_ptr_->getHdmapUtils(),
-      getParameter<std::string>(node_parameters_, "architecture_type", "awf/universe"))),
+      getROS2Parameter<std::string>("architecture_type", "awf/universe"))),
     traffic_controller_ptr_(std::make_shared<traffic::TrafficController>(
       entity_manager_ptr_->getHdmapUtils(),
       [this]() { return entity_manager_ptr_->getEntityNames(); },
@@ -300,6 +300,8 @@ public:
     return traffic_lights_ptr_->getConventionalTrafficLights();
   }
 
+  auto getEntity(const std::string & name) const -> std::shared_ptr<entity::EntityBase>;
+
   // clang-format off
 #define FORWARD_TO_ENTITY_MANAGER(NAME)                                    \
   /*!                                                                      \
@@ -319,7 +321,6 @@ public:
   FORWARD_TO_ENTITY_MANAGER(isEntitySpawned);
   FORWARD_TO_ENTITY_MANAGER(getEgoEntity);
   FORWARD_TO_ENTITY_MANAGER(getEgoName);
-  FORWARD_TO_ENTITY_MANAGER(getEntity);
   FORWARD_TO_ENTITY_MANAGER(getEntityNames);
   FORWARD_TO_ENTITY_MANAGER(getEntityOrNullptr);
   FORWARD_TO_ENTITY_MANAGER(getHdmapUtils);

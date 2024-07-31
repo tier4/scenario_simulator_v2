@@ -66,8 +66,6 @@ public:
 
   void appendDebugMarker(visualization_msgs::msg::MarkerArray & marker_array) override;
 
-  auto getEntityType() const -> const traffic_simulator_msgs::msg::EntityType & override;
-
   auto getEntityTypename() const -> const std::string & override;
 
   auto onUpdate(const double current_time, const double step_time) -> void override;
@@ -83,6 +81,10 @@ public:
   void setTrafficLights(const std::shared_ptr<traffic_simulator::TrafficLightsBase> & ptr) override;
 
   auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter;
+
+  auto getMaxAcceleration() const -> double override;
+
+  auto getMaxDeceleration() const -> double override;
 
   void setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &);
 

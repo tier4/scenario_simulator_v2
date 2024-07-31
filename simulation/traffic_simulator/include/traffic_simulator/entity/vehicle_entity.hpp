@@ -80,7 +80,9 @@ public:
 
   auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter override;
 
-  auto getEntityType() const -> const traffic_simulator_msgs::msg::EntityType & override;
+  auto getMaxAcceleration() const -> double override;
+
+  auto getMaxDeceleration() const -> double override;
 
   auto getEntityTypename() const -> const std::string & override;
 
