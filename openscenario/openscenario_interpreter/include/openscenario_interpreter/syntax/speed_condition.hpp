@@ -22,6 +22,7 @@
 #include <openscenario_interpreter/syntax/rule.hpp>
 #include <openscenario_interpreter/syntax/triggering_entities.hpp>
 #include <pugixml.hpp>
+#include <valarray>
 
 namespace openscenario_interpreter
 {
@@ -61,14 +62,14 @@ struct SpeedCondition : private Scope, private SimulatorCore::ConditionEvaluatio
 
   const TriggeringEntities triggering_entities;
 
-  std::vector<Double> evaluations;  // for description
+  std::vector<std::valarray<double>> results;  // for description
 
   explicit SpeedCondition(const pugi::xml_node &, Scope &, const TriggeringEntities &);
 
   auto description() const -> String;
 
   static auto evaluate(
-    const Entities *, const EntityRef &, const std::optional<DirectionalDimension> & = std::nullopt)
+    const Entities *, const Entity &, const std::optional<DirectionalDimension> & = std::nullopt)
     -> double;
 
   auto evaluate() -> Object;

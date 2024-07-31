@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ENTITIES_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/entity.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <pugixml.hpp>
 
@@ -43,7 +44,7 @@ struct Entities : private std::unordered_map<std::string, Object>
 
   explicit Entities(const pugi::xml_node &, Scope &);
 
-  auto isAdded(const EntityRef &) const -> bool;
+  auto isAdded(const Entity &) const -> bool;
 
   auto ref(const EntityRef &) const -> Object;
 };

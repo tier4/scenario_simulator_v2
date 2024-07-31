@@ -14,6 +14,7 @@
 
 #include <geometry/vector3/norm.hpp>
 #include <openscenario_interpreter/syntax/entities.hpp>
+#include <openscenario_interpreter/syntax/entity_selection.hpp>
 #include <openscenario_interpreter/syntax/relative_speed_condition.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <openscenario_interpreter/utility/print.hpp>
@@ -25,13 +26,16 @@ inline namespace syntax
 RelativeSpeedCondition::RelativeSpeedCondition(
   const pugi::xml_node & node, Scope & scope, const TriggeringEntities & triggering_entities)
 : Scope(scope),
-  entity_ref(readAttribute<EntityRef>("entityRef", node, scope)),
+  entity_ref(readAttribute<String>("entityRef", node, scope), scope),
   rule(readAttribute<Rule>("rule", node, scope)),
   value(readAttribute<Double>("value", node, scope)),
   direction(readAttribute<DirectionalDimension>("direction", node, scope, std::nullopt)),
   triggering_entities(triggering_entities),
-  evaluations(triggering_entities.entity_refs.size(), Double::nan())
+  evaluations(triggering_entities.entity_refs.size(), {Double::nan()})
 {
+  if (entity_ref.is<EntitySelection>()) {
+    throw SyntaxError("EntitySelection is not allowed in RelativeSpeedCondition.entityRef");
+  }
 }
 
 auto RelativeSpeedCondition::description() const -> String
@@ -54,10 +58,12 @@ auto RelativeSpeedCondition::description() const -> String
 }
 
 auto RelativeSpeedCondition::evaluate(
-  const Entities * entities, const EntityRef & triggering_entity, const EntityRef & entity_ref,
+  const Entities * entities, const Entity & triggering_entity, const Entity & entity_ref,
   const std::optional<DirectionalDimension> & direction) -> double
 {
-  if (entities->isAdded(triggering_entity) and entities->isAdded(entity_ref)) {
+  if (
+    triggering_entity.apply([&](const auto & each) { return entities->isAdded(each); }).min() and
+    entities->isAdded(entity_ref)) {
     if (const auto v = evaluateRelativeSpeed(triggering_entity, entity_ref); direction) {
       switch (*direction) {
         case DirectionalDimension::longitudinal:
@@ -81,9 +87,11 @@ auto RelativeSpeedCondition::evaluate() -> Object
 {
   evaluations.clear();
 
-  return asBoolean(triggering_entities.apply([this](auto && triggering_entity) {
-    evaluations.push_back(evaluate(global().entities, triggering_entity, entity_ref, direction));
-    return std::invoke(rule, evaluations.back(), value);
+  return asBoolean(triggering_entities.apply([this](const auto & triggering_entity) {
+    evaluations.push_back(triggering_entity.apply([this](const auto & triggering_entity) {
+      return evaluate(global().entities, triggering_entity, entity_ref, direction);
+    }));
+    return not evaluations.back().size() or std::invoke(rule, evaluations.back(), value).min();
   }));
 }
 }  // namespace syntax

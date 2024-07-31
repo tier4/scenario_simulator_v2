@@ -32,7 +32,7 @@ SpeedCondition::SpeedCondition(
   value(readAttribute<Double>("value", node, scope)),
   direction(readAttribute<DirectionalDimension>("direction", node, scope, std::nullopt)),
   triggering_entities(triggering_entities),
-  evaluations(triggering_entities.entity_refs.size(), Double::nan())
+  results(triggering_entities.entity_refs.size(), {Double::nan()})
 {
 }
 
@@ -42,7 +42,7 @@ auto SpeedCondition::description() const -> String
 
   description << triggering_entities.description() << "'s speed = ";
 
-  print_to(description, evaluations);
+  print_to(description, results);
 
   description << " " << rule << " " << value << "?";
 
@@ -50,7 +50,7 @@ auto SpeedCondition::description() const -> String
 }
 
 auto SpeedCondition::evaluate(
-  const Entities * entities, const EntityRef & triggering_entity,
+  const Entities * entities, const Entity & triggering_entity,
   const std::optional<DirectionalDimension> & direction) -> double
 {
   if (entities->isAdded(triggering_entity)) {
@@ -75,11 +75,13 @@ auto SpeedCondition::evaluate(
 
 auto SpeedCondition::evaluate() -> Object
 {
-  evaluations.clear();
+  results.clear();
 
   return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
-    evaluations.push_back(evaluate(global().entities, triggering_entity));
-    return std::invoke(rule, evaluations.back(), value);
+    results.push_back(triggering_entity.apply([&](const auto & triggering_entity) {
+      return evaluate(global().entities, triggering_entity);
+    }));
+    return not results.back().size() or std::invoke(rule, results.back(), value).min();
   }));
 }
 }  // namespace syntax

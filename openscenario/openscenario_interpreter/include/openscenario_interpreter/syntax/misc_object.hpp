@@ -19,6 +19,7 @@
 #include <openscenario_interpreter/syntax/bounding_box.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/misc_object_category.hpp>
+#include <openscenario_interpreter/syntax/object_type.hpp>
 #include <openscenario_interpreter/syntax/parameter_declarations.hpp>
 #include <openscenario_interpreter/syntax/properties.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
@@ -46,6 +47,8 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct MiscObject : public Scope
 {
+  static constexpr ObjectType object_type{ObjectType::miscellaneous};
+
   const Double mass;  // Mass of the miscellaneous object. Unit: Kg; Range: [0..inf[.
 
   const MiscObjectCategory misc_object_category;  // Categorization of the miscellaneous object.

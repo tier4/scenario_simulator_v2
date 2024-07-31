@@ -46,7 +46,7 @@ struct RelativeSpeedCondition : private Scope, private SimulatorCore::ConditionE
   /*
      Reference entity.
   */
-  const EntityRef entity_ref;
+  const Entity entity_ref;
 
   /*
      The operator (less, greater, equal).
@@ -66,14 +66,14 @@ struct RelativeSpeedCondition : private Scope, private SimulatorCore::ConditionE
 
   const TriggeringEntities triggering_entities;
 
-  std::vector<Double> evaluations;
+  std::vector<std::valarray<double>> evaluations;
 
   explicit RelativeSpeedCondition(const pugi::xml_node &, Scope &, const TriggeringEntities &);
 
   auto description() const -> String;
 
   static auto evaluate(
-    const Entities *, const EntityRef &, const EntityRef &,
+    const Entities *, const Entity &, const Entity &,
     const std::optional<DirectionalDimension> & = std::nullopt) -> double;
 
   auto evaluate() -> Object;

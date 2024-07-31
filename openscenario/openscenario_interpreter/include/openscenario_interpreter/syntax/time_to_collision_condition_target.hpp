@@ -16,8 +16,6 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__TIME_TO_COLLISION_CONDITION_TARGET_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
-#include <openscenario_interpreter/syntax/entity_ref.hpp>
-#include <openscenario_interpreter/syntax/position.hpp>
 #include <pugixml.hpp>
 
 namespace openscenario_interpreter
@@ -39,14 +37,7 @@ inline namespace syntax
 */
 struct TimeToCollisionConditionTarget : public ComplexType
 {
-  explicit TimeToCollisionConditionTarget(const pugi::xml_node & node, Scope & scope)
-  // clang-format off
-  : ComplexType(choice(node,
-      std::make_pair( "Position", [&](auto && node) { return make< Position>(std::forward<decltype(node)>(node), scope); }),
-      std::make_pair("EntityRef", [&](auto && node) { return make<EntityRef>(std::forward<decltype(node)>(node), scope); })))
-  // clang-format on
-  {
-  }
+  explicit TimeToCollisionConditionTarget(const pugi::xml_node &, Scope &);
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

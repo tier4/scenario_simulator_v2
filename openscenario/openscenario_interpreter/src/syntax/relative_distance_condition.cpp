@@ -32,7 +32,7 @@ RelativeDistanceCondition::RelativeDistanceCondition(
 : Scope(scope),
   coordinate_system(
     readAttribute<CoordinateSystem>("coordinateSystem", node, scope, CoordinateSystem::entity)),
-  entity_ref(readAttribute<String>("entityRef", node, scope)),
+  entity_ref(readAttribute<String>("entityRef", node, scope), scope),
   freespace(readAttribute<Boolean>("freespace", node, scope)),
   relative_distance_type(readAttribute<RelativeDistanceType>("relativeDistanceType", node, scope)),
   routing_algorithm(
@@ -40,7 +40,7 @@ RelativeDistanceCondition::RelativeDistanceCondition(
   rule(readAttribute<Rule>("rule", node, scope)),
   value(readAttribute<Double>("value", node, scope)),
   triggering_entities(triggering_entities),
-  results(triggering_entities.entity_refs.size(), Double::nan())
+  results(triggering_entities.entity_refs.size(), {Double::nan()})
 {
   std::set<RoutingAlgorithm::value_type> supported = {
     RoutingAlgorithm::value_type::shortest, RoutingAlgorithm::value_type::undefined};
@@ -317,7 +317,7 @@ auto RelativeDistanceCondition::distance<
 #define DISTANCE(...) distance<__VA_ARGS__>(triggering_entity, entity_ref)
 
 auto RelativeDistanceCondition::evaluate(
-  const Entities * entities, const EntityRef & triggering_entity, const EntityRef & entity_ref,
+  const Entities * entities, const Entity & triggering_entity, const Entity & entity_ref,
   CoordinateSystem coordinate_system, RelativeDistanceType relative_distance_type,
   RoutingAlgorithm routing_algorithm, Boolean freespace) -> double
 {
@@ -334,10 +334,12 @@ auto RelativeDistanceCondition::evaluate() -> Object
   results.clear();
 
   return asBoolean(triggering_entities.apply([&](const auto & triggering_entity) {
-    results.push_back(evaluate(
-      global().entities, triggering_entity, entity_ref, coordinate_system, relative_distance_type,
-      routing_algorithm, freespace));
-    return rule(static_cast<double>(results.back()), value);
+    results.push_back(triggering_entity.apply([&](const auto & triggering_entity) {
+      return evaluate(
+        global().entities, triggering_entity, entity_ref, coordinate_system, relative_distance_type,
+        routing_algorithm, freespace);
+    }));
+    return not results.back().size() or rule(results.back(), value).min();
   }));
 }
 }  // namespace syntax

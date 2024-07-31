@@ -81,7 +81,7 @@ struct TimeToCollisionCondition : private Scope, private SimulatorCore::Conditio
 
   const TriggeringEntities triggering_entities;
 
-  std::vector<Double> evaluations;
+  std::vector<std::valarray<double>> evaluations;
 
   explicit TimeToCollisionCondition(
     const pugi::xml_node & node, Scope & scope, const TriggeringEntities & triggering_entities)
@@ -98,7 +98,7 @@ struct TimeToCollisionCondition : private Scope, private SimulatorCore::Conditio
     routing_algorithm(readAttribute<RoutingAlgorithm>(
       "routingAlgorithm", node, scope, RoutingAlgorithm::undefined)),
     triggering_entities(triggering_entities),
-    evaluations(triggering_entities.entity_refs.size(), Double::nan())
+    evaluations(triggering_entities.entity_refs.size(), {Double::nan()})
   {
   }
 
@@ -118,28 +118,28 @@ struct TimeToCollisionCondition : private Scope, private SimulatorCore::Conditio
   }
 
   static auto evaluate(
-    const Entities * entities, const EntityRef & triggering_entity,
+    const Entities * entities, const Entity & triggering_entity,
     const TimeToCollisionConditionTarget & time_to_collision_condition_target,
     CoordinateSystem coordinate_system, RelativeDistanceType relative_distance_type,
     RoutingAlgorithm routing_algorithm, Boolean freespace)
   {
-    if (time_to_collision_condition_target.is<EntityRef>()) {
+    if (time_to_collision_condition_target.is<Entity>()) {
       const auto relative_distance = RelativeDistanceCondition::evaluate(
-        entities,                                            //
-        triggering_entity,                                   //
-        time_to_collision_condition_target.as<EntityRef>(),  //
-        coordinate_system,                                   //
-        relative_distance_type,                              //
-        routing_algorithm,                                   //
+        entities,                                         //
+        triggering_entity,                                //
+        time_to_collision_condition_target.as<Entity>(),  //
+        coordinate_system,                                //
+        relative_distance_type,                           //
+        routing_algorithm,                                //
         freespace);
 
       const auto relative_speed = RelativeSpeedCondition::evaluate(
         entities,           //
         triggering_entity,  //
-        time_to_collision_condition_target.as<EntityRef>());
+        time_to_collision_condition_target.as<Entity>());
 
-      std::cerr << "RELATIVE DISTANCE = " << relative_distance
-                << ", RELATIVE SPEED = " << relative_speed << std::endl;
+      // std::cerr << "RELATIVE DISTANCE = " << relative_distance
+      //           << ", RELATIVE SPEED = " << relative_speed << std::endl;
 
       return relative_distance / relative_speed;
     } else {
@@ -154,7 +154,7 @@ struct TimeToCollisionCondition : private Scope, private SimulatorCore::Conditio
 
       const auto speed = SpeedCondition::evaluate(entities, triggering_entity);
 
-      std::cerr << "DISTANCE = " << distance << ", RELATIVE SPEED = " << speed << std::endl;
+      // std::cerr << "DISTANCE = " << distance << ", RELATIVE SPEED = " << speed << std::endl;
 
       return distance / speed;
     }
@@ -164,11 +164,13 @@ struct TimeToCollisionCondition : private Scope, private SimulatorCore::Conditio
   {
     evaluations.clear();
 
-    return asBoolean(triggering_entities.apply([this](auto && triggering_entity) {
-      evaluations.push_back(evaluate(
-        global().entities, triggering_entity, time_to_collision_condition_target, coordinate_system,
-        relative_distance_type, routing_algorithm, freespace));
-      return std::invoke(rule, evaluations.back(), value);
+    return asBoolean(triggering_entities.apply([this](const auto & triggering_entity) {
+      evaluations.push_back(triggering_entity.apply([this](const auto & triggering_entity) {
+        return evaluate(
+          global().entities, triggering_entity, time_to_collision_condition_target,
+          coordinate_system, relative_distance_type, routing_algorithm, freespace);
+      }));
+      return not evaluations.back().size() or std::invoke(rule, evaluations.back(), value).min();
     }));
   }
 };

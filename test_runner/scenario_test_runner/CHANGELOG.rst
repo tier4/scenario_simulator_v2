@@ -35,6 +35,57 @@ Changelog for package scenario_test_runner
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+3.4.1 (2024-07-30)
+------------------
+* Merge branch 'master' into doc/open_scenario_support
+* Contributors: Tatsuya Yamasaki
+
+3.4.0 (2024-07-26)
+------------------
+* Merge pull request `#1325 <https://github.com/tier4/scenario_simulator_v2/issues/1325>`_ from tier4/feature/interpreter/lidar-configuration
+  Feature/interpreter/lidar configuration
+* Add a test scenario for `ObjectController`'s pseudo LiDAR property
+* Contributors: Masaya Kataoka, yamacir-kit
+
+3.3.0 (2024-07-23)
+------------------
+* Merge pull request `#1059 <https://github.com/tier4/scenario_simulator_v2/issues/1059>`_ from tier4/feature/interpreter/entity_selection
+  Add `EntitySelection`
+* Merge branch 'master' into feature/interpreter/entity_selection
+* Update workflow.txt
+* Merge branch 'master' into feature/interpreter/entity_selection
+* Merge branch 'master' into feature/interpreter/entity_selection
+* Merge branch 'master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Merge branch 'feature/interpreter/entity_selection' into feature/interpreter/refactoring_entity
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/refactoring_entity
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Fix typo
+* Add test for LaneChangeAction
+* Add test for TimeHeadwayCondition
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Add test for ReachPositionCondition
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Add test for (Relative)DistanceCondition
+* Add test for StandStillCondition
+* Add test for AccelerationCondition
+* Add test scenario for EntitySelection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Contributors: Shota Minami, Tatsuya Yamasaki
+
 3.2.0 (2024-07-18)
 ------------------
 * Merge remote-tracking branch 'origin/master' into fix/spawn_position_of_map_pose

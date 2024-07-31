@@ -9,6 +9,22 @@ Changelog for package simple_cross_map
 * Merge branch 'master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+3.4.1 (2024-07-30)
+------------------
+* Merge branch 'master' into doc/open_scenario_support
+* Contributors: Tatsuya Yamasaki
+
+3.4.0 (2024-07-26)
+------------------
+
+3.3.0 (2024-07-23)
+------------------
+* Merge branch 'master' into feature/interpreter/entity_selection
+* Merge branch 'master' into feature/interpreter/entity_selection
+* Merge branch 'master' into feature/interpreter/entity_selection
+* Merge branch 'master' into feature/interpreter/entity_selection
+* Contributors: Tatsuya Yamasaki
+
 3.2.0 (2024-07-18)
 ------------------
 * Merge remote-tracking branch 'origin/master' into fix/spawn_position_of_map_pose

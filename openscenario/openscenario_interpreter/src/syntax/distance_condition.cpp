@@ -46,7 +46,7 @@ DistanceCondition::DistanceCondition(
   value(readAttribute<Double>("value", node, scope)),
   position(readElement<Position>("Position", node, scope)),
   triggering_entities(triggering_entities),
-  results(triggering_entities.entity_refs.size(), Double::nan())
+  results(triggering_entities.entity_refs.size(), {Double::nan()})
 {
   std::set<RoutingAlgorithm::value_type> supported = {
     RoutingAlgorithm::value_type::shortest, RoutingAlgorithm::value_type::undefined};
@@ -609,10 +609,12 @@ auto DistanceCondition::evaluate() -> Object
   results.clear();
 
   return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
-    results.push_back(evaluate(
-      global().entities, triggering_entity, position, coordinate_system, relative_distance_type,
-      routing_algorithm, freespace));
-    return rule(static_cast<double>(results.back()), value);
+    results.push_back(triggering_entity.apply([&](const auto & triggering_entity) {
+      return evaluate(
+        global().entities, triggering_entity, position, coordinate_system, relative_distance_type,
+        routing_algorithm, freespace);
+    }));
+    return not results.back().size() or rule(results.back(), value).min();
   }));
 }
 }  // namespace syntax
