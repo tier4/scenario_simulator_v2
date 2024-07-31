@@ -50,12 +50,14 @@ If `continuous` is set to `false`, job to accelerate to target speed will be del
 When `constraint` is set to `LONGITUDINAL_ACCELERATION`, the entity will accelerate to the target speed with acceleration rate you set.
 - If `transition` is set to `LINEAR`, the entity will accelerate to the target speed linearly.
 - If `transition` is set to `AUTO`, it will change the maximum acceleration speed of the entity and append the job to change the target speed of the npc to the job queue. After the npc reaches the target speed, it will change the maximum acceleration speed back to the original value.
-- If `transition` is set to `STEP`, it
+- If `transition` is set to `STEP`, it will
 
 
 When `constraint` is set to `TIME`, the entity will accelerate to the target speed by the time you set.
 When `constraint` is set to `NONE`, is will append the job to change the target_speed of the npc to the job queue.
 
+`change target speed` block in the below figure is the highest priority compared to other blocks.
+If target speed is set somewhere else, the entity will try to change the speed to the target speed under acceleration/deceleration constraints set by the user or if not by the default value.
 ![requestSpeedChange](../images/Longitudinal_control/requestSpeedChange.png)
 
 
