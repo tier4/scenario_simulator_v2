@@ -165,5 +165,4 @@ public:
 };
 }  // namespace entity
 }  // namespace traffic_simulator
-
 #endif  // TRAFFIC_SIMULATOR__ENTITY__EGO_ENTITY_HPP_
