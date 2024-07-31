@@ -55,12 +55,29 @@ auto RelativeClearanceCondition::description() const -> String
 {
   std::stringstream description;
 
-  description << triggering_entities.description()
-              << "'s have relative clearance to given entities [";
+  description << triggering_entities.description() << " have clearances to given entities [";
 
   print_to(description, entity_refs);
 
-  description << "]?";
+  description << "] with relative longitudinal ranges ( forward: " << distance_forward
+              << ", backward: " << distance_backward << " ) and relative lateral ranges [";
+
+  if (relative_lane_range.empty()) {
+    description << "all lanes";
+  } else {
+    for (auto range = relative_lane_range.begin(); range != relative_lane_range.end(); range++) {
+      description << ((range != relative_lane_range.begin()) ? std::string(", ") : std::string(""))
+                  << range->from << " to " << range->to;
+    }
+  }
+
+  description << "] ";
+
+  if (opposite_lanes) {
+    description << " including opposite lanes?";
+  } else {
+    description << " excluding opposite lanes?";
+  }
 
   return description.str();
 }
