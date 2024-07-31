@@ -53,17 +53,16 @@ private:
   }
   void onInitialize() override
   {
-    api_.spawn(
+    auto ego_entity = api_.spawn(
       "ego",
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
         34513, 0.0, 0.0, api_.getHdmapUtils()),
       getVehicleParameters());
-    auto entity = api_.getEntity("ego");
-    entity->setLinearVelocity(7);
-    entity->requestSpeedChange(7, true);
+    ego_entity->setLinearVelocity(7);
+    ego_entity->requestSpeedChange(7, true);
     const geometry_msgs::msg::Pose goal_pose = traffic_simulator::pose::toMapPose(
       traffic_simulator::helper::constructLaneletPose(34408, 0.0, 0.0), api_.getHdmapUtils());
-    entity->requestAcquirePosition(goal_pose);
+    ego_entity->requestAcquirePosition(goal_pose);
   }
 };
 }  // namespace cpp_mock_scenarios

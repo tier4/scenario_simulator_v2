@@ -51,15 +51,14 @@ private:
 
   void onInitialize() override
   {
-    api_.spawn(
+    auto ego_entity = api_.spawn(
       "ego",
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
         34741, 0.0, 0.0, api_.getHdmapUtils()),
       getVehicleParameters());
-    auto entity = api_.getEntity("ego");
-    entity->setLinearVelocity(0);
-    entity->setVelocityLimit(5.0);
-    entity->requestSpeedChange(
+    ego_entity->setLinearVelocity(0);
+    ego_entity->setVelocityLimit(5.0);
+    ego_entity->requestSpeedChange(
       10.0, traffic_simulator::speed_change::Transition::LINEAR,
       traffic_simulator::speed_change::Constraint(
         traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 10.0),
