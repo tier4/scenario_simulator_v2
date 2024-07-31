@@ -16,6 +16,7 @@
 #include <memory>
 #include <string>
 #include <traffic_simulator/entity/pedestrian_entity.hpp>
+#include <traffic_simulator/utils/pose.hpp>
 #include <vector>
 
 namespace traffic_simulator
@@ -68,9 +69,11 @@ void PedestrianEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::
 {
   std::vector<CanonicalizedLaneletPose> route;
   for (const auto & waypoint : waypoints) {
-    const auto lanelet_waypoint = hdmap_utils_ptr_->toLaneletPose(waypoint, getBoundingBox(), true);
-    if (lanelet_waypoint) {
-      route.emplace_back(CanonicalizedLaneletPose(lanelet_waypoint.value(), hdmap_utils_ptr_));
+    if (
+      const auto canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
+        waypoint, status_.getBoundingBox(), true,
+        getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_)) {
+      route.emplace_back(canonicalized_lanelet_pose.value());
     } else {
       THROW_SEMANTIC_ERROR("Waypoint of pedestrian entity should be on lane.");
     }
@@ -106,9 +109,8 @@ auto PedestrianEntity::getDefaultDynamicConstraints() const
 
 auto PedestrianEntity::getRouteLanelets(double horizon) -> lanelet::Ids
 {
-  if (status_.laneMatchingSucceed()) {
-    return route_planner_.getRouteLanelets(
-      CanonicalizedLaneletPose(status_.getLaneletPose(), hdmap_utils_ptr_), horizon);
+  if (const auto canonicalized_lanelet_pose = status_.getCanonicalizedLaneletPose()) {
+    return route_planner_.getRouteLanelets(canonicalized_lanelet_pose.value(), horizon);
   } else {
     return {};
   }
@@ -146,9 +148,11 @@ void PedestrianEntity::requestAcquirePosition(const CanonicalizedLaneletPose & l
 void PedestrianEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose)
 {
   behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
-  if (const auto lanelet_pose = hdmap_utils_ptr_->toLaneletPose(map_pose, getBoundingBox(), true);
-      lanelet_pose) {
-    requestAcquirePosition(CanonicalizedLaneletPose(lanelet_pose.value(), hdmap_utils_ptr_));
+  if (
+    const auto canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
+      map_pose, status_.getBoundingBox(), true,
+      getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_)) {
+    requestAcquirePosition(canonicalized_lanelet_pose.value());
   } else {
     THROW_SEMANTIC_ERROR("Goal of the pedestrian entity should be on lane.");
   }
@@ -190,6 +194,16 @@ void PedestrianEntity::setBehaviorParameter(
   const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter)
 {
   behavior_plugin_ptr_->setBehaviorParameter(behavior_parameter);
+}
+
+auto PedestrianEntity::getMaxAcceleration() const -> double
+{
+  return getBehaviorParameter().dynamic_constraints.max_acceleration;
+}
+
+auto PedestrianEntity::getMaxDeceleration() const -> double
+{
+  return getBehaviorParameter().dynamic_constraints.max_deceleration;
 }
 
 void PedestrianEntity::setVelocityLimit(double linear_velocity)
@@ -242,11 +256,6 @@ void PedestrianEntity::setDecelerationRateLimit(double deceleration_rate)
   setBehaviorParameter(behavior_parameter);
 }
 
-auto PedestrianEntity::fillLaneletPose(CanonicalizedEntityStatus & status) -> void
-{
-  EntityBase::fillLaneletPose(status, true);
-}
-
 void PedestrianEntity::onUpdate(double current_time, double step_time)
 {
   EntityBase::onUpdate(current_time, step_time);
@@ -258,11 +267,8 @@ void PedestrianEntity::onUpdate(double current_time, double step_time)
     behavior_plugin_ptr_->setRouteLanelets(getRouteLanelets());
     behavior_plugin_ptr_->update(current_time, step_time);
     auto status_updated = behavior_plugin_ptr_->getUpdatedStatus();
-    if (status_updated->laneMatchingSucceed()) {
-      const auto lanelet_pose = status_updated->getLaneletPose();
-      if (
-        hdmap_utils_ptr_->getFollowingLanelets(lanelet_pose.lanelet_id).size() == 1 &&
-        hdmap_utils_ptr_->getLaneletLength(lanelet_pose.lanelet_id) <= lanelet_pose.s) {
+    if (const auto canonicalized_lanelet_pose = status_updated->getCanonicalizedLaneletPose()) {
+      if (isAtEndOfLanelets(canonicalized_lanelet_pose.value(), hdmap_utils_ptr_)) {
         stopAtCurrentPosition();
         updateStandStillDuration(step_time);
         updateTraveledDistance(step_time);
