@@ -31,7 +31,7 @@ ReachPositionCondition::ReachPositionCondition(
   position(readElement<Position>("Position", node, scope)),
   compare(Rule::lessThan),
   triggering_entities(triggering_entities),
-  results(triggering_entities.entity_refs.size(), Double::nan()),
+  results(triggering_entities.entity_refs.size(), {Double::nan()}),
   consider_z([]() {
     rclcpp::Node node{"get_parameter", "simulation"};
     node.declare_parameter("consider_pose_by_road_slope", false);
@@ -87,8 +87,9 @@ auto ReachPositionCondition::evaluate() -> Object
   results.clear();
 
   return asBoolean(triggering_entities.apply([&](const auto & triggering_entity) {
-    results.push_back(apply<Double>(distance, position, triggering_entity));
-    return compare(results.back(), tolerance);
+    results.push_back(triggering_entity.apply(
+      [&](const auto & object) { return apply<double>(distance, position, object); }));
+    return not results.back().size() or compare(results.back(), tolerance).min();
   }));
 }
 }  // namespace syntax

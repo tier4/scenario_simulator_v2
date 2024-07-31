@@ -24,7 +24,7 @@
 #include <openscenario_interpreter/syntax/catalog_locations.hpp>
 
 #ifndef PARAMETER_VALUE_DISTRIBUTION_ONLY
-#include <openscenario_interpreter/syntax/entity_ref.hpp>
+#include <openscenario_interpreter/syntax/entity.hpp>
 #endif  // PARAMETER_VALUE_DISTRIBUTION_ONLY
 
 #include <openscenario_interpreter/utility/demangle.hpp>
@@ -196,7 +196,7 @@ public:
   const std::string name;
 
 #ifndef PARAMETER_VALUE_DISTRIBUTION_ONLY
-  std::list<EntityRef> actors;
+  std::list<Entity> actors;
 #endif  // PARAMETER_VALUE_DISTRIBUTION_ONLY
 
   // NOTE: `random_engine` is used only for sharing random number generator in Stochastic now
