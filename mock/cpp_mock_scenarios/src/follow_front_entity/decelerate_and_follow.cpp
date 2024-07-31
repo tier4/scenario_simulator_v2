@@ -63,7 +63,7 @@ private:
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
         34741, 0.0, 0.0, api_.getHdmapUtils()),
       getVehicleParameters());
-    api_.getEntity("ego")->setLinearVelocity(15);
+    ego_entity->setLinearVelocity(15);
 
     auto npc_entity = api_.spawn(
       "npc",

@@ -156,6 +156,7 @@ private:
     auto obstacle_entity = api_.spawn(
       "obstacle", traffic_simulator::helper::constructPose(10, 5, 0, 0, 0, -1.57),
       getMiscObjectParameters());
+
     obstacle_entity->setStatus(
       ego_entity->getMapPose(), traffic_simulator::helper::constructPose(10, 5, 0, 0, 0, -1.57),
       traffic_simulator::helper::constructActionStatus());

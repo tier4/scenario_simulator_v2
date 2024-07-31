@@ -73,7 +73,7 @@ public:
     }
   }
 
-  template <typename T>
+  template <typename EntityType>
   /*   */ auto as() const -> std::shared_ptr<const EntityType>
   {
     if (auto derived = std::dynamic_pointer_cast<const EntityType>(shared_from_this()); !derived) {
