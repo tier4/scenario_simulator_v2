@@ -18,7 +18,7 @@
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/boolean.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
-#include <openscenario_interpreter/syntax/entity_ref.hpp>
+#include <openscenario_interpreter/syntax/entity.hpp>
 #include <openscenario_interpreter/syntax/speed_target_value_type.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <pugixml.hpp>
@@ -39,7 +39,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct RelativeTargetSpeed
 {
-  const String entity_ref;
+  const Entity entity_ref;
 
   const Double value;
 

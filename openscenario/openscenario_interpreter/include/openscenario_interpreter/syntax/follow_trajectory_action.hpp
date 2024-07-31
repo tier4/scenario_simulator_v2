@@ -17,6 +17,7 @@
 
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
+#include <openscenario_interpreter/syntax/entity.hpp>
 #include <openscenario_interpreter/syntax/time_reference.hpp>
 #include <openscenario_interpreter/syntax/trajectory_following_mode.hpp>
 #include <openscenario_interpreter/syntax/trajectory_ref.hpp>
@@ -66,7 +67,7 @@ struct FollowTrajectoryAction : private Scope,
 
   const TrajectoryRef trajectory_ref;
 
-  std::unordered_map<String, Boolean> accomplishments;
+  std::unordered_map<Entity, Boolean> accomplishments;
 
   explicit FollowTrajectoryAction(const pugi::xml_node &, Scope &);
 
