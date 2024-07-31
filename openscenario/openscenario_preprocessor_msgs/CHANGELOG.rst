@@ -21,6 +21,11 @@ Changelog for package openscenario_preprocessor_msgs
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+3.4.1 (2024-07-30)
+------------------
+* Merge branch 'master' into doc/open_scenario_support
+* Contributors: Tatsuya Yamasaki
+
 3.4.0 (2024-07-26)
 ------------------
 

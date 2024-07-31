@@ -119,6 +119,9 @@ private:
   auto despawnEntity(const simulation_api_schema::DespawnEntityRequest &)
     -> simulation_api_schema::DespawnEntityResponse;
 
+  auto attachImuSensor(const simulation_api_schema::AttachImuSensorRequest &)
+    -> simulation_api_schema::AttachImuSensorResponse;
+
   auto attachDetectionSensor(const simulation_api_schema::AttachDetectionSensorRequest &)
     -> simulation_api_schema::AttachDetectionSensorResponse;
 
