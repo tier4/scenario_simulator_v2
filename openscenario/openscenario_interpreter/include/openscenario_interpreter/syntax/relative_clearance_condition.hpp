@@ -45,7 +45,7 @@ struct RelativeClearanceCondition : private Scope,
                                     private SimulatorCore::NonStandardOperation
 {
   /*
-     	Longitudinal distance behind reference point of the entity to be checked along lane centerline of the current lane of the triggering entity. Orientation of entity towards lane determines backward direction. Velocity of entity is irrelevant. Unit: [m]. Range: [0..inf[. Default if omitted: 0
+     Longitudinal distance behind reference point of the entity to be checked along lane centerline of the current lane of the triggering entity. Orientation of entity towards lane determines backward direction. Velocity of entity is irrelevant. Unit: [m]. Range: [0..inf[. Default if omitted: 0
   */
   const Double distance_backward;
 
@@ -55,7 +55,7 @@ struct RelativeClearanceCondition : private Scope,
   const Double distance_forward;
 
   /*
-     	If false, then entityRefs are only considered to be on the lane if their reference point is within the checked area; otherwise the whole bounding box is considered.
+     If false, then entityRefs are only considered to be on the lane if their reference point is within the checked area; otherwise the whole bounding box is considered.
   */
   const Boolean free_space;
 
