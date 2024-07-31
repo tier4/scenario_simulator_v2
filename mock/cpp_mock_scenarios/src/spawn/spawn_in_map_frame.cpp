@@ -41,7 +41,7 @@ private:
     const auto map_pose = traffic_simulator::pose::toMapPose(
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
         120545, 0.0, 0.0, api_.getHdmapUtils()));
-    if (api_.reachPosition("ego", map_pose, 0.1)) {
+    if (api_.getEntity("ego")->reachPosition(map_pose, 0.1)) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     } else {
       stop(cpp_mock_scenarios::Result::FAILURE);

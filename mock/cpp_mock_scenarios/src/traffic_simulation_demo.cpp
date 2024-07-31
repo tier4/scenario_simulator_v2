@@ -163,7 +163,7 @@ private:
       "obstacle", traffic_simulator::helper::constructPose(10, 5, 0, 0, 0, -1.57),
       getMiscObjectParameters());
     api_.getEntity("obstacle")
-      ->setCanonicalizedStatus(
+      ->setStatus(
         ego_entity->getMapPose(), traffic_simulator::helper::constructPose(10, 5, 0, 0, 0, -1.57),
         traffic_simulator::helper::constructActionStatus());
 
