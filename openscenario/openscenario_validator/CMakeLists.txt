@@ -15,7 +15,7 @@ target_include_directories(validate PUBLIC
   $<INSTALL_INTERFACE:include>)
 
 ament_export_include_directories(include)
-ament_export_dependencies(XercesC ament_index_cpp)
+ament_export_dependencies(XercesC)
 
 install(DIRECTORY include/
   DESTINATION include)
