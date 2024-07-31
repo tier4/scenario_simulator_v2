@@ -52,7 +52,7 @@ FollowFrontEntityAction::calculateObstacle(const traffic_simulator_msgs::msg::Wa
 
 const traffic_simulator_msgs::msg::WaypointsArray FollowFrontEntityAction::calculateWaypoints()
 {
-  if (!entity_status->laneMatchingSucceed()) {
+  if (!entity_status->isInLanelet()) {
     THROW_SIMULATION_ERROR("failed to assign lane");
   }
   if (entity_status->getTwist().linear.x >= 0) {

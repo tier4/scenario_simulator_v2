@@ -53,13 +53,17 @@ private:
       }
       unsigned int vehicle_count = 0u, pedestrian_count = 0u;
       for (const auto & name : names) {
-        if (const auto entity = api_.getEntity(name)) {
+        const auto entity = api_.getEntity(name);
+        if (const auto lanelet_pose = entity->getCanonicalizedLaneletPose(); not lanelet_pose) {
+          stop(cpp_mock_scenarios::Result::FAILURE);  // LCOV_EXCL_LINE
+        } else {
           const bool valid_vehicle_lanelet =
-            api_.isInLanelet(name, static_cast<lanelet::Id>(34705), 50.0) ||
-            api_.isInLanelet(name, static_cast<lanelet::Id>(34696), 50.0);
-
-          const bool valid_pedestrian_lanelet =
-            api_.isInLanelet(name, static_cast<lanelet::Id>(34385), 10.0);
+            traffic_simulator::pose::isInLanelet(
+              lanelet_pose.value(), 34705, 50.0, api_.getHdmapUtils()) ||
+            traffic_simulator::pose::isInLanelet(
+              lanelet_pose.value(), 34696, 50.0, api_.getHdmapUtils());
+          const bool valid_pedestrian_lanelet = traffic_simulator::pose::isInLanelet(
+            lanelet_pose.value(), 34385, 10.0, api_.getHdmapUtils());
 
           if (isVehicle(name)) {
             ++vehicle_count;
@@ -68,12 +72,8 @@ private:
           }
 
           if (
-            // clang-format off
-          !entity->laneMatchingSucceed() ||
-          (isVehicle(name) && !valid_vehicle_lanelet) ||
-          (isPedestrian(name) && !valid_pedestrian_lanelet))
-          // clang-format on
-          {
+            (isVehicle(name) && !valid_vehicle_lanelet) ||
+            (isPedestrian(name) && !valid_pedestrian_lanelet)) {
             stop(cpp_mock_scenarios::Result::FAILURE);  // LCOV_EXCL_LINE
           }
         }
@@ -119,8 +119,9 @@ private:
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
         34570, 0.0, 0.0, api_.getHdmapUtils()),
       getVehicleParameters());
-    api_.setLinearVelocity("ego", 0.0);
-    api_.requestSpeedChange("ego", 0.0, true);
+    auto ego_entity = api_.getEntity("ego");
+    ego_entity->setLinearVelocity(0.0);
+    ego_entity->requestSpeedChange(0.0, true);
   }
 };
 }  // namespace cpp_mock_scenarios

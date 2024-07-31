@@ -77,10 +77,45 @@ EgoEntity::EgoEntity(
 {
 }
 
-auto EgoEntity::asFieldOperatorApplication() const -> concealer::FieldOperatorApplication &
+auto EgoEntity::engage() -> void { field_operator_application->engage(); }
+
+auto EgoEntity::isEngaged() const -> bool { return field_operator_application->engaged(); }
+
+auto EgoEntity::isEngageable() const -> bool { return field_operator_application->engageable(); }
+
+auto EgoEntity::replanRoute(const std::vector<geometry_msgs::msg::PoseStamped> & route) -> void
 {
-  assert(field_operator_application);
-  return *field_operator_application;
+  field_operator_application->clearRoute();
+  field_operator_application->plan(route);
+  field_operator_application->engage();
+}
+
+auto EgoEntity::sendCooperateCommand(const std::string & module_name, const std::string & command)
+  -> void
+{
+  field_operator_application->sendCooperateCommand(module_name, command);
+}
+
+auto EgoEntity::requestAutoModeForCooperation(const std::string & module_name, bool enable) -> void
+{
+  field_operator_application->requestAutoModeForCooperation(module_name, enable);
+}
+
+auto EgoEntity::getMinimumRiskManeuverBehaviorName() const -> std::string
+{
+  return field_operator_application->getMinimumRiskManeuverBehaviorName();
+}
+auto EgoEntity::getMinimumRiskManeuverStateName() const -> std::string
+{
+  return field_operator_application->getMinimumRiskManeuverStateName();
+}
+auto EgoEntity::getEmergencyStateName() const -> std::string
+{
+  return field_operator_application->getEmergencyStateName();
+}
+auto EgoEntity::getTurnIndicatorsCommandName() const -> const std::string
+{
+  return boost::lexical_cast<std::string>(field_operator_application->getTurnIndicatorsCommand());
 }
 
 auto EgoEntity::getCurrentAction() const -> std::string
@@ -290,11 +325,14 @@ auto EgoEntity::setVelocityLimit(double value) -> void  //
 
 auto EgoEntity::setMapPose(const geometry_msgs::msg::Pose & map_pose) -> void
 {
+  status_.setMapPose(map_pose);
   auto entity_status = static_cast<EntityStatus>(status_);
-  entity_status.pose = map_pose;
   entity_status.lanelet_pose_valid = false;
   // prefer current lanelet on Autoware side
-  setStatus(entity_status, helper::getUniqueValues(getRouteLanelets()));
+  const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
+    status_.getMapPose(), status_.getBoundingBox(), helper::getUniqueValues(getRouteLanelets()),
+    false, getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
+  setCanonicalizedStatus(CanonicalizedEntityStatus(entity_status, canonicalized_lanelet_pose));
 }
 }  // namespace entity
 }  // namespace traffic_simulator
