@@ -28,19 +28,20 @@ Set functions directly changes the speed, acceleration, or deceleration of the e
 ### requestSpeedChange
 By using `API::requestSpeedChange`, you can change the speed of the entity.
 MiscObjectEntity can not be controlled by this API.
+For EgoEntity, speed can only be changed before the simulation starts.
+API takes several types of value sets. Description of each type is as follows.
 
+#### Values
 | Value        | Type   | Description                                                    |
 | ------------ | ------ | -------------------------------------------------------------- |
 | name         | string | Name of the entity.                                            |
 | target_speed | double | Target speed of the entity.                                    |
 | continuous   | bool   | If true the entity will keep the speed until the next command. |
-#### EgoEntity
-`target_speed` will be set as initial target speed of the EgoEntity only before the scenario starts.
 
-#### Other entity
 The function will change entities `target_speed` to given immediately.
 If `continuous` is set to `false`, job to accelerate to target speed will be deleted after the velocity has reached the target speed. If set to `true`, the entity will keep the speed until the next longitudinal control command ordered. It will accelerate on maximum acceleration rate set previously.
 
+#### Values
 | Value        | Type                     | Description                                                    |
 | ------------ | ------------------------ | -------------------------------------------------------------- |
 | name         | string                   | Name of the entity.                                            |
@@ -49,10 +50,6 @@ If `continuous` is set to `false`, job to accelerate to target speed will be del
 | constraint   | speed_change::Constraint | Constraint type.                                               |
 | continuous   | bool                     | If true the entity will keep the speed until the next command. |
 
-#### EgoEntity
-`target_speed` will be set as initial target speed of the EgoEntity only before the scenario starts.
-
-#### Other entity
 If `continuous` is set to `false`, job to accelerate to target speed will be deleted after the velocity has reached the target speed. If set to `true`, the entity will keep the speed until the next longitudinal control command ordered.
 
 ##### Longitudinal Acceleration
@@ -94,12 +91,22 @@ flowchart LR
     B -- NONE ---> O[[ChangeTargetSpeed]];
 ```
 
+#### Values
+By using `speed_change::RelativeTargetSpeed` you can set the target speed of the entity relative to another entity.
 | Value        | Type                              | Description                                                    |
 | ------------ | --------------------------------- | -------------------------------------------------------------- |
 | name         | string                            | Name of the entity.                                            |
 | target_speed | speed_change::RelativeTargetSpeed | Relative target speed.                                         |
 | continuous   | bool                              | If true the entity will keep the speed until the next command. |
 
+If `continuous` is set to `false`, job to accelerate to target speed will be deleted after the velocity has reached the target speed. If set to `true`, the entity will keep the speed until the next longitudinal control command ordered.
+
+`target_speed.reference_entity_name` is the name of the entity that the target speed is relative to. The target speed of the entity will be same as the target speed of the reference entity.
+- By setting `target_speed.type` to `DELTA`, you can set the target speed of the entity to be the target speed of the reference entity plus the value of `target_speed.value`.
+- By setting `target_speed.type` to `FACTOR`, you can set the target speed of the entity to be the target speed of the reference entity multiplied by the value of `target_speed.value`.
+
+#### Values
+By using `speed_change::RelativeTargetSpeed` you can set the target speed of the entity relative to another entity.
 | Value        | Type                              | Description                                                    |
 | ------------ | --------------------------------- | -------------------------------------------------------------- |
 | name         | string                            | Name of the entity.                                            |
@@ -107,6 +114,7 @@ flowchart LR
 | transition   | speed_change::Transition          | Transition type.                                               |
 | constraint   | speed_change::Constraint          | Constraint type.                                               |
 | continuous   | bool                              | If true the entity will keep the speed until the next command. |
+It works the same as explained before.
 
 ### requestSynchronize
 By using `API::requestSynchronize`, you can request the entity to adjust speed to stop at the designated lanelet by the time target entity crosses the another designated lanelet.
@@ -120,16 +128,20 @@ By using `API::requestSynchronize`, you can request the entity to adjust speed t
 | target_speed     | Target speed for controlling entity (meter per second).                |
 | tolerance        | Tolerance for how much margin to accept to stop at the target (meter). |
 
+![requestSynchronize](images/Longitudinal_control/synchronizedAction.png)
+As shown in the image, the entity will adjust it's speed to `target_speed` on `entity_target` at the time the target entity crosses the `target_sync_pose`. `tolerance` is the margin of error for the entity to stop at the `entity_target`. The target entity could be set by giving the name of the entity as `target_name`.
+
 ### setLinearVelocity
-By using `API::setLinearVelocity`, you can set the linear velocity of the entity.
+By using `API::setLinearVelocity`, you can set the linear velocity of the entity immediately. It will ignore the physics of the entity and set the value directly.
 
 | Value           | Type   | Description                    |
 | --------------- | ------ | ------------------------------ |
 | name            | string | Name of the entity.            |
 | linear_velocity | double | Linear velocity of the entity. |
 
+
 ### setTwist
-By using `API::setTwist`, you can set the twist of the entity.
+By using `API::setTwist`, you can set the twist of the entity immediately. It will ignore the physics of the entity and set the value directly.
 
 | Value | Type                      | Description          |
 | ----- | ------------------------- | -------------------- |
@@ -138,7 +150,7 @@ By using `API::setTwist`, you can set the twist of the entity.
 
 ### setAcceleration
 
-By using `API::setAcceleration`, you can set the acceleration of the entity.
+By using `API::setAcceleration`, you can set the acceleration of the entity immediately. It will ignore the physics of the entity and set the value directly.
 
 | Value        | Type                      | Description                 |
 | ------------ | ------------------------- | --------------------------- |
@@ -147,7 +159,7 @@ By using `API::setAcceleration`, you can set the acceleration of the entity.
 
 ### setAccelerationLimit
 
-By using `API::setAccelerationLimit`, you can set the acceleration limit of the entity.
+By using `API::setAccelerationLimit`, you can set the acceleration limit of the entity immediately.
 
 | Value        | Type   | Description                       |
 | ------------ | ------ | --------------------------------- |
@@ -156,7 +168,7 @@ By using `API::setAccelerationLimit`, you can set the acceleration limit of the 
 
 ### setAccelerationRateLimit
 
-By using `API::setAccelerationRateLimit`, you can set the acceleration rate limit of the entity.
+By using `API::setAccelerationRateLimit`, you can set the acceleration rate limit of the entity immediately.
 
 | Value             | Type   | Description                            |
 | ----------------- | ------ | -------------------------------------- |
@@ -165,7 +177,7 @@ By using `API::setAccelerationRateLimit`, you can set the acceleration rate limi
 
 ### setDecelerationLimit
 
-By using `API::setDecelerationLimit`, you can set the deceleration limit of the entity.
+By using `API::setDecelerationLimit`, you can set the deceleration limit of the entity immediately.
 
 | Value        | Type   | Description                       |
 | ------------ | ------ | --------------------------------- |
@@ -174,7 +186,7 @@ By using `API::setDecelerationLimit`, you can set the deceleration limit of the 
 
 ### setDecelerationRateLimit
 
-By using `API::setDecelerationRateLimit`, you can set the deceleration rate limit of the entity.
+By using `API::setDecelerationRateLimit`, you can set the deceleration rate limit of the entity immediately.
 
 | Value             | Type   | Description                            |
 | ----------------- | ------ | -------------------------------------- |
@@ -183,7 +195,7 @@ By using `API::setDecelerationRateLimit`, you can set the deceleration rate limi
 
 ### setVelocityLimit
 
-By using `API::setVelocityLimit`, you can set the velocity limit of the entity.
+By using `API::setVelocityLimit`, you can set the velocity limit of the entity immediately.
 
 | Value           | Type   | Description                   |
 | --------------- | ------ | ----------------------------- |
