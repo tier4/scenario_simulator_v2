@@ -35,6 +35,7 @@ include_directories(
 ament_auto_add_library(simple_sensor_simulator_component SHARED
   src/sensor_simulation/detection_sensor/detection_sensor.cpp
   src/sensor_simulation/lidar/lidar_sensor.cpp
+  src/sensor_simulation/imu/imu_sensor.cpp
   src/sensor_simulation/lidar/raycaster.cpp
   src/sensor_simulation/occupancy_grid/occupancy_grid_sensor.cpp
   src/sensor_simulation/occupancy_grid/occupancy_grid_builder.cpp

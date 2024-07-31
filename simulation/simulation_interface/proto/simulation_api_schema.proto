@@ -34,6 +34,20 @@ message PseudoTrafficLightDetectorConfiguration {
 }
 
 /**
+ * Parameter configuration of the imu sensor
+ **/
+ message ImuSensorConfiguration {
+  string entity = 1;                                // Name of the entity which you want to attach imu.
+  string frame_id = 2;                              // Frame ID for the IMU sensor
+  bool add_gravity = 3;                             // If true, gravity will be added to the acceleration vector
+  bool use_seed = 4;                                // If true, as seed will be used the passed value, if not it will be random
+  int32 seed = 5;                                   // Seed for random number generator
+  double noise_standard_deviation_orientation = 6;  // The standard deviation for orientation noise (normal distribution, mean = 0.0)
+  double noise_standard_deviation_twist = 7;        // The standard deviation for angular velocity noise (normal distribution, mean = 0.0)
+  double noise_standard_deviation_acceleration = 8; // The standard deviation for linear acceleration noise (normal distribution, mean = 0.0)
+}
+
+/**
  * Parameter configuration of the lidar sensor
  **/
 message LidarConfiguration {
@@ -200,6 +214,20 @@ message UpdateEntityStatusResponse {
 }
 
 /**
+ * Requests attaching a imu sensor to the target entity.
+ **/
+ message AttachImuSensorRequest {
+  ImuSensorConfiguration configuration = 1; // Configuration of the imu sensor.
+}
+
+/**
+ * Requests attaching a imu sensor to the target entity.
+ **/
+ message AttachImuSensorResponse {
+  Result result = 1; // Result of [AttachImuSensorRequest](#AttachImuSensorRequest)
+}
+
+/**
  * Requests attaching a traffic light detector emulator.
  **/
 message AttachPseudoTrafficLightDetectorRequest {
@@ -342,6 +370,7 @@ message SimulationRequest {
     UpdateTrafficLightsRequest update_traffic_lights = 11;
     AttachPseudoTrafficLightDetectorRequest attach_pseudo_traffic_light_detector = 13;
     UpdateStepTimeRequest update_step_time = 14;
+    AttachImuSensorRequest attach_imu_sensor = 15;
   }
 }
 
@@ -364,5 +393,6 @@ message SimulationResponse {
     UpdateTrafficLightsResponse update_traffic_lights = 11;
     AttachPseudoTrafficLightDetectorResponse attach_pseudo_traffic_light_detector = 13;
     UpdateStepTimeResponse update_step_time = 14;
+    AttachImuSensorResponse attach_imu_sensor = 15;
   }
 }
