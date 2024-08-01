@@ -53,14 +53,13 @@ private:
       }
       for (const auto & name : names) {
         const auto entity = api_.getEntity(name);
-        if (const auto lanelet_pose = entity->getCanonicalizedLaneletPose(); not lanelet_pose) {
+        if (!entity->isInLanelet()) {
           stop(cpp_mock_scenarios::Result::FAILURE);  // LCOV_EXCL_LINE
         } else {
           const bool is_pedestrian =
             entity->getEntityType().type == traffic_simulator_msgs::msg::EntityType::PEDESTRIAN;
 
-          const bool valid_pedestrian_lanelet = traffic_simulator::pose::isInLanelet(
-            lanelet_pose.value(), 34385, 10.0, api_.getHdmapUtils());
+          const bool valid_pedestrian_lanelet = entity->isInLanelet(34385, 10.0);
 
           if (!valid_pedestrian_lanelet || !is_pedestrian) {
             stop(cpp_mock_scenarios::Result::FAILURE);  // LCOV_EXCL_LINE
@@ -88,9 +87,7 @@ private:
       false, true, true, 0);
 
     auto ego_entity = api_.spawn(
-      "ego",
-      traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34570, 0.0, 0.0, api_.getHdmapUtils()),
+      "ego", traffic_simulator::helper::constructLaneletPose(34570, 0.0, 0.0),
       getVehicleParameters());
     ego_entity->setLinearVelocity(0.0);
     ego_entity->requestSpeedChange(0.0, true);

@@ -562,11 +562,6 @@ void EntityBase::setOtherStatus(
   other_status_.erase(name);
 }
 
-auto EntityBase::setCanonicalizedStatus(const CanonicalizedEntityStatus & status) -> void
-{
-  status_.set(status);
-}
-
 auto EntityBase::setStatus(const EntityStatus & status, const lanelet::Ids & lanelet_ids) -> void
 {
   status_.set(
@@ -609,23 +604,16 @@ auto EntityBase::setStatus(
 }
 
 auto EntityBase::setStatus(
-  const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
-  const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
-{
-  auto status = static_cast<EntityStatus>(getStatus());
-  status.action_status = action_status;
-  status.pose = static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose);
-  status.lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose);
-  status.lanelet_pose_valid = true;
-  setCanonicalizedStatus(CanonicalizedEntityStatus(status, canonicalized_lanelet_pose));
-}
-
-auto EntityBase::setStatus(
   const LaneletPose & lanelet_pose, const traffic_simulator_msgs::msg::ActionStatus & action_status)
   -> void
 {
   if (const auto canonicalized_lanelet_pose = pose::canonicalize(lanelet_pose, hdmap_utils_ptr_)) {
-    setStatus(canonicalized_lanelet_pose.value(), action_status);
+    auto entity_status = static_cast<EntityStatus>(getStatus());
+    entity_status.action_status = action_status;
+    entity_status.pose = static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose.value());
+    entity_status.lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose.value());
+    entity_status.lanelet_pose_valid = true;
+    setStatus(entity_status);
   } else {
     std::stringstream ss;
     ss << "Status can not be set. lanelet pose: " << lanelet_pose << " is not canonicalizable for ";
@@ -740,23 +728,6 @@ auto EntityBase::updateTraveledDistance(const double step_time) -> double
   return traveled_distance_ += std::abs(getCurrentTwist().linear.x) * step_time;
 }
 
-bool EntityBase::reachPosition(const std::string & target_name, const double tolerance) const
-{
-  return reachPosition(other_status_.find(target_name)->second.getMapPose(), tolerance);
-}
-
-bool EntityBase::reachPosition(
-  const geometry_msgs::msg::Pose & target_pose, const double tolerance) const
-{
-  return math::geometry::getDistance(getMapPose(), target_pose) < tolerance;
-}
-
-bool EntityBase::reachPosition(
-  const CanonicalizedLaneletPose & lanelet_pose, const double tolerance) const
-{
-  return reachPosition(static_cast<geometry_msgs::msg::Pose>(lanelet_pose), tolerance);
-}
-
 /***
  * @brief Request synchronize the entity with the target entity.
  * @param target_name The name of the target entity.
@@ -767,9 +738,8 @@ bool EntityBase::reachPosition(
 */
 
 auto EntityBase::requestSynchronize(
-  const std::string & target_name, const CanonicalizedLaneletPose & target_sync_pose,
-  const CanonicalizedLaneletPose & entity_target, const double target_speed, const double tolerance)
-  -> bool
+  const std::string & target_name, const LaneletPose & target_sync_pose,
+  const LaneletPose & entity_target, const double target_speed, const double tolerance) -> bool
 {
   if (traffic_simulator_msgs::msg::EntityType::EGO == getEntityType().type) {
     THROW_SYNTAX_ERROR("Request synchronize is only for non-ego entities.");
@@ -782,7 +752,7 @@ auto EntityBase::requestSynchronize(
   }
 
   ///@brief Check if the entity has already arrived to the target lanelet.
-  if (reachPosition(entity_target, tolerance)) {
+  if (isInPosition(entity_target, tolerance)) {
     if (this->getStatus().getTwist().linear.x < target_speed + getMaxAcceleration() * step_time_) {
     } else {
       RCLCPP_WARN_ONCE(
@@ -804,7 +774,8 @@ auto EntityBase::requestSynchronize(
       }
 
       const auto entity_distance = longitudinalDistance(
-        entity_lanelet_pose.value(), entity_target, true, true, true, hdmap_utils_ptr_);
+        entity_lanelet_pose.value(), CanonicalizedLaneletPose(entity_target, hdmap_utils_ptr_),
+        true, true, true, hdmap_utils_ptr_);
       if (!entity_distance.has_value()) {
         THROW_SEMANTIC_ERROR(
           "Failed to get distance between entity and target lanelet pose. Check if the entity has "
@@ -818,8 +789,9 @@ auto EntityBase::requestSynchronize(
           : other_status_.find(target_name)->second.getLaneletPose();
 
       const auto target_entity_distance = longitudinalDistance(
-        CanonicalizedLaneletPose(target_entity_lanelet_pose, hdmap_utils_ptr_), target_sync_pose,
-        true, true, true, hdmap_utils_ptr_);
+        CanonicalizedLaneletPose(target_entity_lanelet_pose, hdmap_utils_ptr_),
+        CanonicalizedLaneletPose(target_sync_pose, hdmap_utils_ptr_), true, true, true,
+        hdmap_utils_ptr_);
       if (!target_entity_distance.has_value() || target_entity_distance.value() < 0) {
         RCLCPP_WARN_ONCE(
           rclcpp::get_logger("traffic_simulator"),

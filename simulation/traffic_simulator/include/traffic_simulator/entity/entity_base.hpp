@@ -201,6 +201,10 @@ public:
 
   virtual void requestSpeedChange(const speed_change::RelativeTargetSpeed &, bool);
 
+  /*   */ auto requestSynchronize(
+    const std::string & target_name, const LaneletPose & target_sync_pose,
+    const LaneletPose & entity_target, const double target_speed, const double tolerance) -> bool;
+
   virtual void requestClearRoute();
 
   virtual auto isControlledBySimulator() const -> bool;
@@ -226,8 +230,6 @@ public:
 
   /*   */ void setOtherStatus(const std::unordered_map<std::string, CanonicalizedEntityStatus> &);
 
-  /*   */ auto setCanonicalizedStatus(const CanonicalizedEntityStatus &) -> void;
-
   virtual auto setStatus(const EntityStatus & status) -> void;
 
   virtual auto setStatus(const EntityStatus & status, const lanelet::Ids & lanelet_ids) -> void;
@@ -246,11 +248,6 @@ public:
     const geometry_msgs::msg::Pose & reference_pose,
     const geometry_msgs::msg::Point & relative_position,
     const geometry_msgs::msg::Vector3 & relative_rpy,
-    const traffic_simulator_msgs::msg::ActionStatus & action_status =
-      helper::constructActionStatus()) -> void;
-
-  virtual auto setStatus(
-    const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
     const traffic_simulator_msgs::msg::ActionStatus & action_status =
       helper::constructActionStatus()) -> void;
 
@@ -288,19 +285,6 @@ public:
   /*   */ auto updateStandStillDuration(const double step_time) -> double;
 
   /*   */ auto updateTraveledDistance(const double step_time) -> double;
-
-  /*   */ bool reachPosition(
-    const geometry_msgs::msg::Pose & target_pose, const double tolerance) const;
-
-  /*   */ bool reachPosition(
-    const CanonicalizedLaneletPose & lanelet_pose, const double tolerance) const;
-
-  /*   */ bool reachPosition(const std::string & target_name, const double tolerance) const;
-
-  /*   */ auto requestSynchronize(
-    const std::string & target_name, const CanonicalizedLaneletPose & target_sync_pose,
-    const CanonicalizedLaneletPose & entity_target, const double target_speed,
-    const double tolerance) -> bool;
 
   const std::string name;
 

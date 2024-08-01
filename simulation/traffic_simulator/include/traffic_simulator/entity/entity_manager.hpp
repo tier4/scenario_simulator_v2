@@ -111,12 +111,6 @@ public:
     const std::string & name, const PoseType & pose, const ParametersType & parameters,
     const double current_time, Ts &&... xs) -> std::shared_ptr<entity::EntityBase>
   {
-    static_assert(
-      std::disjunction<
-        std::is_same<PoseType, CanonicalizedLaneletPose>,
-        std::is_same<PoseType, geometry_msgs::msg::Pose>>::value,
-      "Pose must be of type CanonicalizedLaneletPose or geometry_msgs::msg::Pose");
-
     auto makeEntityStatus = [&]() -> CanonicalizedEntityStatus {
       EntityStatus entity_status;
 
@@ -161,14 +155,17 @@ public:
       }(parameters);
 
       if constexpr (std::is_same_v<std::decay_t<PoseType>, LaneletPose>) {
-        THROW_SYNTAX_ERROR(
-          "LaneletPose is not supported type as pose argument. Only CanonicalizedLaneletPose and "
-          "msg::Pose are supported as pose argument of EntityManager::spawnEntity().");
+        entity_status.pose = pose::toMapPose(pose, hdmap_utils_ptr_);
+        // here bounding_box and matching_distance are not used to adjust LaneletPose
+        // it is just rewritten, assuming that in the scenario is right, alternatively:
+        // toCanonicalizedLaneletPose(entity_status.pose, parameters.bounding_box,
+        // {pose.lanelet_id}, include_crosswalk, matching_distance, hdmap_utils_ptr_);
+        return CanonicalizedEntityStatus(entity_status, pose::canonicalize(pose, hdmap_utils_ptr_));
       } else if constexpr (std::is_same_v<std::decay_t<PoseType>, CanonicalizedLaneletPose>) {
-        entity_status.pose = toMapPose(pose);
+        entity_status.pose = pose::toMapPose(pose);
         return CanonicalizedEntityStatus(entity_status, pose);
       } else if constexpr (std::is_same_v<std::decay_t<PoseType>, geometry_msgs::msg::Pose>) {
-        const auto canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
+        const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
           pose, parameters.bounding_box, include_crosswalk, matching_distance, hdmap_utils_ptr_);
         return CanonicalizedEntityStatus(entity_status, canonicalized_lanelet_pose);
       }

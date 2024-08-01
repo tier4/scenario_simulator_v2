@@ -337,14 +337,11 @@ auto EgoEntity::setVelocityLimit(double value) -> void  //
 
 auto EgoEntity::setMapPose(const geometry_msgs::msg::Pose & map_pose) -> void
 {
-  const auto unique_route_lanelets = traffic_simulator::helper::getUniqueValues(getRouteLanelets());
-  status_.setMapPose(map_pose);
+  auto entity_status = static_cast<EntityStatus>(status_);
+  entity_status.pose = map_pose;
+  entity_status.lanelet_pose_valid = false;
   // prefer current lanelet on Autoware side
-  const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
-    status_.getMapPose(), status_.getBoundingBox(), unique_route_lanelets, false,
-    getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
-  setCanonicalizedStatus(
-    CanonicalizedEntityStatus(static_cast<EntityStatus>(status_), canonicalized_lanelet_pose));
+  setStatus(entity_status, helper::getUniqueValues(getRouteLanelets()));
 }
 }  // namespace entity
 }  // namespace traffic_simulator
