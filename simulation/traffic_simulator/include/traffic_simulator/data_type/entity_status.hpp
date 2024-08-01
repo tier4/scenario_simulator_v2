@@ -53,10 +53,7 @@ public:
   auto getMapPose() const noexcept -> const geometry_msgs::msg::Pose &;
   auto setMapPose(const geometry_msgs::msg::Pose & pose) -> void;
 
-  auto getLaneletRelativeYaw() const -> std::optional<double>
-  {
-    return isInLanelet() ? std::make_optional<double>(getLaneletPose().rpy.z) : (std::nullopt);
-  }
+  auto getLaneletRelativeYaw() const -> std::optional<double>;
 
   auto getTwist() const noexcept -> const geometry_msgs::msg::Twist &;
   auto setTwist(const geometry_msgs::msg::Twist & twist) -> void;
