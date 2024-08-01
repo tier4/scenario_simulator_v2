@@ -67,6 +67,7 @@ private:
   DEFINE_FUNCTION_TYPE(SpawnMiscObjectEntity);
   DEFINE_FUNCTION_TYPE(DespawnEntity);
   DEFINE_FUNCTION_TYPE(UpdateEntityStatus);
+  DEFINE_FUNCTION_TYPE(AttachImuSensor);
   DEFINE_FUNCTION_TYPE(AttachLidarSensor);
   DEFINE_FUNCTION_TYPE(AttachDetectionSensor);
   DEFINE_FUNCTION_TYPE(AttachOccupancyGridSensor);
@@ -78,7 +79,7 @@ private:
 
   std::tuple<
     Initialize, UpdateFrame, SpawnVehicleEntity, SpawnPedestrianEntity, SpawnMiscObjectEntity,
-    DespawnEntity, UpdateEntityStatus, AttachLidarSensor, AttachDetectionSensor,
+    DespawnEntity, UpdateEntityStatus, AttachImuSensor, AttachLidarSensor, AttachDetectionSensor,
     AttachOccupancyGridSensor, UpdateTrafficLights, AttachPseudoTrafficLightDetector,
     UpdateStepTime>
     functions_;
