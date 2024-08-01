@@ -25,6 +25,7 @@
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <simple_sensor_simulator/sensor_simulation/detection_sensor/detection_sensor.hpp>
+#include <simple_sensor_simulator/sensor_simulation/imu/imu_sensor.hpp>
 #include <simple_sensor_simulator/sensor_simulation/lidar/lidar_sensor.hpp>
 #include <simple_sensor_simulator/sensor_simulation/occupancy_grid/occupancy_grid_sensor.hpp>
 #include <simple_sensor_simulator/sensor_simulation/traffic_lights/traffic_lights_detector.hpp>
@@ -114,12 +115,22 @@ public:
     }
   }
 
+  auto attachImuSensor(
+    const double /*current_simulation_time*/,
+    const simulation_api_schema::ImuSensorConfiguration & configuration, rclcpp::Node & node)
+    -> void
+  {
+    imu_sensors_.push_back(std::make_unique<ImuSensor<sensor_msgs::msg::Imu>>(
+      configuration, node.create_publisher<sensor_msgs::msg::Imu>("/sensing/imu/imu_data", 1)));
+  }
+
   auto updateSensorFrame(
     double current_simulation_time, const rclcpp::Time & current_ros_time,
     const std::vector<traffic_simulator_msgs::EntityStatus> &,
     const simulation_api_schema::UpdateTrafficLightsRequest &) -> void;
 
 private:
+  std::vector<std::unique_ptr<ImuSensorBase>> imu_sensors_;
   std::vector<std::unique_ptr<LidarSensorBase>> lidar_sensors_;
   std::vector<std::unique_ptr<DetectionSensorBase>> detection_sensors_;
   std::vector<std::unique_ptr<OccupancyGridSensorBase>> occupancy_grid_sensors_;
