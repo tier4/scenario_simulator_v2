@@ -145,25 +145,8 @@ auto DistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, RoutingAlgorithm::undefined,
   false>(const EntityRef & triggering_entity) const -> double
 {
-  return apply<double>(
-    overload(
-      [&](const WorldPosition & position) {
-        return euclideanDistance(
-          triggering_entity, static_cast<NativeWorldPosition>(position), consider_z);
-      },
-      [&](const RelativeWorldPosition & position) {
-        return euclideanDistance(
-          triggering_entity, static_cast<NativeWorldPosition>(position), consider_z);
-      },
-      [&](const RelativeObjectPosition & position) {
-        return euclideanDistance(
-          triggering_entity, static_cast<NativeWorldPosition>(position), consider_z);
-      },
-      [&](const LanePosition & position) {
-        return euclideanDistance(
-          triggering_entity, static_cast<NativeWorldPosition>(position), consider_z);
-      }),
-    position);
+  return euclideanDistance(
+    triggering_entity, static_cast<NativeWorldPosition>(position), consider_z);
 }
 
 template <>
@@ -171,25 +154,8 @@ auto DistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, RoutingAlgorithm::undefined,
   true>(const EntityRef & triggering_entity) const -> double
 {
-  return apply<double>(
-    overload(
-      [&](const WorldPosition & position) {
-        return euclideanBoundingBoxDistance(
-          triggering_entity, static_cast<NativeWorldPosition>(position), consider_z);
-      },
-      [&](const RelativeWorldPosition & position) {
-        return euclideanBoundingBoxDistance(
-          triggering_entity, static_cast<NativeWorldPosition>(position), consider_z);
-      },
-      [&](const RelativeObjectPosition & position) {
-        return euclideanBoundingBoxDistance(
-          triggering_entity, static_cast<NativeWorldPosition>(position), consider_z);
-      },
-      [&](const LanePosition & position) {
-        return euclideanBoundingBoxDistance(
-          triggering_entity, static_cast<NativeWorldPosition>(position), consider_z);
-      }),
-    position);
+  return euclideanBoundingBoxDistance(
+    triggering_entity, static_cast<NativeWorldPosition>(position), consider_z);
 }
 
 template <>
@@ -197,21 +163,7 @@ auto DistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::lateral, RoutingAlgorithm::undefined, false>(
   const EntityRef & triggering_entity) const -> double
 {
-  return apply<double>(
-    overload(
-      [&](const WorldPosition & position) {
-        return lateralEntityDistance(triggering_entity, static_cast<NativeWorldPosition>(position));
-      },
-      [&](const RelativeWorldPosition & position) {
-        return lateralEntityDistance(triggering_entity, static_cast<NativeWorldPosition>(position));
-      },
-      [&](const RelativeObjectPosition & position) {
-        return lateralEntityDistance(triggering_entity, static_cast<NativeWorldPosition>(position));
-      },
-      [&](const LanePosition & position) {
-        return lateralEntityDistance(triggering_entity, static_cast<NativeWorldPosition>(position));
-      }),
-    position);
+  return lateralEntityDistance(triggering_entity, static_cast<NativeWorldPosition>(position));
 }
 
 template <>
@@ -219,25 +171,8 @@ auto DistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::lateral, RoutingAlgorithm::undefined, true>(
   const EntityRef & triggering_entity) const -> double
 {
-  return apply<double>(
-    overload(
-      [&](const WorldPosition & position) {
-        return lateralEntityBoundingBoxDistance(
-          triggering_entity, static_cast<NativeWorldPosition>(position));
-      },
-      [&](const RelativeWorldPosition & position) {
-        return lateralEntityBoundingBoxDistance(
-          triggering_entity, static_cast<NativeWorldPosition>(position));
-      },
-      [&](const RelativeObjectPosition & position) {
-        return lateralEntityBoundingBoxDistance(
-          triggering_entity, static_cast<NativeWorldPosition>(position));
-      },
-      [&](const LanePosition & position) {
-        return lateralEntityBoundingBoxDistance(
-          triggering_entity, static_cast<NativeWorldPosition>(position));
-      }),
-    position);
+  return lateralEntityBoundingBoxDistance(
+    triggering_entity, static_cast<NativeWorldPosition>(position));
 }
 
 template <>
@@ -245,25 +180,7 @@ auto DistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::longitudinal, RoutingAlgorithm::undefined, false>(
   const EntityRef & triggering_entity) const -> double
 {
-  return apply<double>(
-    overload(
-      [&](const WorldPosition & position) {
-        return longitudinalEntityDistance(
-          triggering_entity, static_cast<NativeWorldPosition>(position));
-      },
-      [&](const RelativeWorldPosition & position) {
-        return longitudinalEntityDistance(
-          triggering_entity, static_cast<NativeWorldPosition>(position));
-      },
-      [&](const RelativeObjectPosition & position) {
-        return longitudinalEntityDistance(
-          triggering_entity, static_cast<NativeWorldPosition>(position));
-      },
-      [&](const LanePosition & position) {
-        return longitudinalEntityDistance(
-          triggering_entity, static_cast<NativeWorldPosition>(position));
-      }),
-    position);
+  return longitudinalEntityDistance(triggering_entity, static_cast<NativeWorldPosition>(position));
 }
 
 template <>
@@ -271,25 +188,8 @@ auto DistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::longitudinal, RoutingAlgorithm::undefined, true>(
   const EntityRef & triggering_entity) const -> double
 {
-  return apply<double>(
-    overload(
-      [&](const WorldPosition & position) {
-        return longitudinalEntityBoundingBoxDistance(
-          triggering_entity, static_cast<NativeWorldPosition>(position));
-      },
-      [&](const RelativeWorldPosition & position) {
-        return longitudinalEntityBoundingBoxDistance(
-          triggering_entity, static_cast<NativeWorldPosition>(position));
-      },
-      [&](const RelativeObjectPosition & position) {
-        return longitudinalEntityBoundingBoxDistance(
-          triggering_entity, static_cast<NativeWorldPosition>(position));
-      },
-      [&](const LanePosition & position) {
-        return longitudinalEntityBoundingBoxDistance(
-          triggering_entity, static_cast<NativeWorldPosition>(position));
-      }),
-    position);
+  return longitudinalEntityBoundingBoxDistance(
+    triggering_entity, static_cast<NativeWorldPosition>(position));
 }
 
 template <>
@@ -297,37 +197,11 @@ auto DistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::lateral, RoutingAlgorithm::undefined, false>(
   const EntityRef & triggering_entity) const -> double
 {
-  return apply<double>(
-    overload(
-      [&](const WorldPosition & position) {
-        if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
-          return lateralLaneDistance(triggering_entity, static_cast<NativeLanePosition>(position));
-        } else {
-          return std::numeric_limits<double>::quiet_NaN();
-        }
-      },
-      [&](const RelativeWorldPosition & position) {
-        if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
-          return lateralLaneDistance(triggering_entity, static_cast<NativeLanePosition>(position));
-        } else {
-          return std::numeric_limits<double>::quiet_NaN();
-        }
-      },
-      [&](const RelativeObjectPosition & position) {
-        if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
-          return lateralLaneDistance(triggering_entity, static_cast<NativeLanePosition>(position));
-        } else {
-          return std::numeric_limits<double>::quiet_NaN();
-        }
-      },
-      [&](const LanePosition & position) {
-        if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
-          return lateralLaneDistance(triggering_entity, static_cast<NativeLanePosition>(position));
-        } else {
-          return std::numeric_limits<double>::quiet_NaN();
-        }
-      }),
-    position);
+  if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
+    return lateralLaneDistance(triggering_entity, static_cast<NativeLanePosition>(position));
+  } else {
+    return std::numeric_limits<double>::quiet_NaN();
+  }
 }
 
 template <>
@@ -335,41 +209,12 @@ auto DistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::lateral, RoutingAlgorithm::undefined, true>(
   const EntityRef & triggering_entity) const -> double
 {
-  return apply<double>(
-    overload(
-      [&](const WorldPosition & position) {
-        if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
-          return lateralLaneBoundingBoxDistance(
-            triggering_entity, static_cast<NativeLanePosition>(position));
-        } else {
-          return std::numeric_limits<double>::quiet_NaN();
-        }
-      },
-      [&](const RelativeWorldPosition & position) {
-        if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
-          return lateralLaneBoundingBoxDistance(
-            triggering_entity, static_cast<NativeLanePosition>(position));
-        } else {
-          return std::numeric_limits<double>::quiet_NaN();
-        }
-      },
-      [&](const RelativeObjectPosition & position) {
-        if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
-          return lateralLaneBoundingBoxDistance(
-            triggering_entity, static_cast<NativeLanePosition>(position));
-        } else {
-          return std::numeric_limits<double>::quiet_NaN();
-        }
-      },
-      [&](const LanePosition & position) {
-        if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
-          return lateralLaneBoundingBoxDistance(
-            triggering_entity, static_cast<NativeLanePosition>(position));
-        } else {
-          return std::numeric_limits<double>::quiet_NaN();
-        }
-      }),
-    position);
+  if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
+    return lateralLaneBoundingBoxDistance(
+      triggering_entity, static_cast<NativeLanePosition>(position));
+  } else {
+    return std::numeric_limits<double>::quiet_NaN();
+  }
 }
 
 template <>
@@ -377,41 +222,11 @@ auto DistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::longitudinal, RoutingAlgorithm::undefined, false>(
   const EntityRef & triggering_entity) const -> double
 {
-  return apply<double>(
-    overload(
-      [&](const WorldPosition & position) {
-        if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
-          return longitudinalLaneDistance(
-            triggering_entity, static_cast<NativeLanePosition>(position));
-        } else {
-          return std::numeric_limits<double>::quiet_NaN();
-        }
-      },
-      [&](const RelativeWorldPosition & position) {
-        if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
-          return longitudinalLaneDistance(
-            triggering_entity, static_cast<NativeLanePosition>(position));
-        } else {
-          return std::numeric_limits<double>::quiet_NaN();
-        }
-      },
-      [&](const RelativeObjectPosition & position) {
-        if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
-          return longitudinalLaneDistance(
-            triggering_entity, static_cast<NativeLanePosition>(position));
-        } else {
-          return std::numeric_limits<double>::quiet_NaN();
-        }
-      },
-      [&](const LanePosition & position) {
-        if (global().entities->ref(triggering_entity).template as<ScenarioObject>().is_added) {
-          return longitudinalLaneDistance(
-            triggering_entity, static_cast<NativeLanePosition>(position));
-        } else {
-          return std::numeric_limits<double>::quiet_NaN();
-        }
-      }),
-    position);
+  if (global().entities->ref(triggering_entity).template as<ScenarioObject>().is_added) {
+    return longitudinalLaneDistance(triggering_entity, static_cast<NativeLanePosition>(position));
+  } else {
+    return std::numeric_limits<double>::quiet_NaN();
+  }
 }
 
 template <>
@@ -419,41 +234,12 @@ auto DistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::longitudinal, RoutingAlgorithm::undefined, true>(
   const EntityRef & triggering_entity) const -> double
 {
-  return apply<double>(
-    overload(
-      [&](const WorldPosition & position) {
-        if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
-          return longitudinalLaneBoundingBoxDistance(
-            triggering_entity, static_cast<NativeLanePosition>(position));
-        } else {
-          return std::numeric_limits<double>::quiet_NaN();
-        }
-      },
-      [&](const RelativeWorldPosition & position) {
-        if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
-          return longitudinalLaneBoundingBoxDistance(
-            triggering_entity, static_cast<NativeLanePosition>(position));
-        } else {
-          return std::numeric_limits<double>::quiet_NaN();
-        }
-      },
-      [&](const RelativeObjectPosition & position) {
-        if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
-          return longitudinalLaneBoundingBoxDistance(
-            triggering_entity, static_cast<NativeLanePosition>(position));
-        } else {
-          return std::numeric_limits<double>::quiet_NaN();
-        }
-      },
-      [&](const LanePosition & position) {
-        if (global().entities->ref(triggering_entity).template as<ScenarioObject>().is_added) {
-          return longitudinalLaneBoundingBoxDistance(
-            triggering_entity, static_cast<NativeLanePosition>(position));
-        } else {
-          return std::numeric_limits<double>::quiet_NaN();
-        }
-      }),
-    position);
+  if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
+    return longitudinalLaneBoundingBoxDistance(
+      triggering_entity, static_cast<NativeLanePosition>(position));
+  } else {
+    return std::numeric_limits<double>::quiet_NaN();
+  }
 }
 
 template <>
@@ -461,45 +247,12 @@ auto DistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::lateral, RoutingAlgorithm::shortest, false>(
   const EntityRef & triggering_entity) const -> double
 {
-  return apply<double>(
-    overload(
-      [&](const WorldPosition & position) {
-        if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
-          return std::abs(lateralLaneDistance(
-            triggering_entity, static_cast<NativeLanePosition>(position),
-            RoutingAlgorithm::shortest));
-        } else {
-          return std::numeric_limits<double>::quiet_NaN();
-        }
-      },
-      [&](const RelativeWorldPosition & position) {
-        if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
-          return std::abs(lateralLaneDistance(
-            triggering_entity, static_cast<NativeLanePosition>(position),
-            RoutingAlgorithm::shortest));
-        } else {
-          return std::numeric_limits<double>::quiet_NaN();
-        }
-      },
-      [&](const RelativeObjectPosition & position) {
-        if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
-          return std::abs(lateralLaneDistance(
-            triggering_entity, static_cast<NativeLanePosition>(position),
-            RoutingAlgorithm::shortest));
-        } else {
-          return std::numeric_limits<double>::quiet_NaN();
-        }
-      },
-      [&](const LanePosition & position) {
-        if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
-          return std::abs(lateralLaneDistance(
-            triggering_entity, static_cast<NativeLanePosition>(position),
-            RoutingAlgorithm::shortest));
-        } else {
-          return std::numeric_limits<double>::quiet_NaN();
-        }
-      }),
-    position);
+  if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
+    return std::abs(lateralLaneDistance(
+      triggering_entity, static_cast<NativeLanePosition>(position), RoutingAlgorithm::shortest));
+  } else {
+    return std::numeric_limits<double>::quiet_NaN();
+  }
 }
 
 template <>
@@ -507,45 +260,12 @@ auto DistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::lateral, RoutingAlgorithm::shortest, true>(
   const EntityRef & triggering_entity) const -> double
 {
-  return apply<double>(
-    overload(
-      [&](const WorldPosition & position) {
-        if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
-          return std::abs(lateralLaneBoundingBoxDistance(
-            triggering_entity, static_cast<NativeLanePosition>(position),
-            RoutingAlgorithm::shortest));
-        } else {
-          return std::numeric_limits<double>::quiet_NaN();
-        }
-      },
-      [&](const RelativeWorldPosition & position) {
-        if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
-          return std::abs(lateralLaneBoundingBoxDistance(
-            triggering_entity, static_cast<NativeLanePosition>(position),
-            RoutingAlgorithm::shortest));
-        } else {
-          return std::numeric_limits<double>::quiet_NaN();
-        }
-      },
-      [&](const RelativeObjectPosition & position) {
-        if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
-          return std::abs(lateralLaneBoundingBoxDistance(
-            triggering_entity, static_cast<NativeLanePosition>(position),
-            RoutingAlgorithm::shortest));
-        } else {
-          return std::numeric_limits<double>::quiet_NaN();
-        }
-      },
-      [&](const LanePosition & position) {
-        if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
-          return std::abs(lateralLaneBoundingBoxDistance(
-            triggering_entity, static_cast<NativeLanePosition>(position),
-            RoutingAlgorithm::shortest));
-        } else {
-          return std::numeric_limits<double>::quiet_NaN();
-        }
-      }),
-    position);
+  if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
+    return std::abs(lateralLaneBoundingBoxDistance(
+      triggering_entity, static_cast<NativeLanePosition>(position), RoutingAlgorithm::shortest));
+  } else {
+    return std::numeric_limits<double>::quiet_NaN();
+  }
 }
 
 template <>
@@ -553,45 +273,12 @@ auto DistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::longitudinal, RoutingAlgorithm::shortest, false>(
   const EntityRef & triggering_entity) const -> double
 {
-  return apply<double>(
-    overload(
-      [&](const WorldPosition & position) {
-        if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
-          return std::abs(longitudinalLaneDistance(
-            triggering_entity, static_cast<NativeLanePosition>(position),
-            RoutingAlgorithm::shortest));
-        } else {
-          return std::numeric_limits<double>::quiet_NaN();
-        }
-      },
-      [&](const RelativeWorldPosition & position) {
-        if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
-          return std::abs(longitudinalLaneDistance(
-            triggering_entity, static_cast<NativeLanePosition>(position),
-            RoutingAlgorithm::shortest));
-        } else {
-          return std::numeric_limits<double>::quiet_NaN();
-        }
-      },
-      [&](const RelativeObjectPosition & position) {
-        if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
-          return std::abs(longitudinalLaneDistance(
-            triggering_entity, static_cast<NativeLanePosition>(position),
-            RoutingAlgorithm::shortest));
-        } else {
-          return std::numeric_limits<double>::quiet_NaN();
-        }
-      },
-      [&](const LanePosition & position) {
-        if (global().entities->ref(triggering_entity).template as<ScenarioObject>().is_added) {
-          return std::abs(longitudinalLaneDistance(
-            triggering_entity, static_cast<NativeLanePosition>(position),
-            RoutingAlgorithm::shortest));
-        } else {
-          return std::numeric_limits<double>::quiet_NaN();
-        }
-      }),
-    position);
+  if (global().entities->ref(triggering_entity).template as<ScenarioObject>().is_added) {
+    return std::abs(longitudinalLaneDistance(
+      triggering_entity, static_cast<NativeLanePosition>(position), RoutingAlgorithm::shortest));
+  } else {
+    return std::numeric_limits<double>::quiet_NaN();
+  }
 }
 
 template <>
@@ -599,45 +286,12 @@ auto DistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::longitudinal, RoutingAlgorithm::shortest, true>(
   const EntityRef & triggering_entity) const -> double
 {
-  return apply<double>(
-    overload(
-      [&](const WorldPosition & position) {
-        if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
-          return std::abs(longitudinalLaneBoundingBoxDistance(
-            triggering_entity, static_cast<NativeLanePosition>(position),
-            RoutingAlgorithm::shortest));
-        } else {
-          return std::numeric_limits<double>::quiet_NaN();
-        }
-      },
-      [&](const RelativeWorldPosition & position) {
-        if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
-          return std::abs(longitudinalLaneBoundingBoxDistance(
-            triggering_entity, static_cast<NativeLanePosition>(position),
-            RoutingAlgorithm::shortest));
-        } else {
-          return std::numeric_limits<double>::quiet_NaN();
-        }
-      },
-      [&](const RelativeObjectPosition & position) {
-        if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
-          return std::abs(longitudinalLaneBoundingBoxDistance(
-            triggering_entity, static_cast<NativeLanePosition>(position),
-            RoutingAlgorithm::shortest));
-        } else {
-          return std::numeric_limits<double>::quiet_NaN();
-        }
-      },
-      [&](const LanePosition & position) {
-        if (global().entities->ref(triggering_entity).template as<ScenarioObject>().is_added) {
-          return std::abs(longitudinalLaneBoundingBoxDistance(
-            triggering_entity, static_cast<NativeLanePosition>(position),
-            RoutingAlgorithm::shortest));
-        } else {
-          return std::numeric_limits<double>::quiet_NaN();
-        }
-      }),
-    position);
+  if (global().entities->ref(triggering_entity).template as<ScenarioObject>().is_added) {
+    return std::abs(longitudinalLaneBoundingBoxDistance(
+      triggering_entity, static_cast<NativeLanePosition>(position), RoutingAlgorithm::shortest));
+  } else {
+    return std::numeric_limits<double>::quiet_NaN();
+  }
 }
 
 auto DistanceCondition::evaluate() -> Object

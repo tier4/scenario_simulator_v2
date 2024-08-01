@@ -62,29 +62,12 @@ static double hypot(const double x, const double y, const double z, const bool c
 auto ReachPositionCondition::evaluate() -> Object
 {
   // TODO USE DistanceCondition::distance
-  const auto distance = overload(
-    [&](const WorldPosition & position, auto && triggering_entity) {
-      return euclideanDistance(
-        triggering_entity, static_cast<geometry_msgs::msg::Pose>(position), consider_z);
-    },
-    [&](const RelativeWorldPosition & position, auto && triggering_entity) {
-      return euclideanDistance(
-        triggering_entity, static_cast<geometry_msgs::msg::Pose>(position), consider_z);
-    },
-    [&](const RelativeObjectPosition & position, auto && triggering_entity) {
-      return euclideanDistance(
-        triggering_entity, static_cast<geometry_msgs::msg::Pose>(position), consider_z);
-    },
-    [&](const LanePosition & position, auto && triggering_entity) {
-      return euclideanDistance(
-        triggering_entity, static_cast<geometry_msgs::msg::Pose>(position), consider_z);
-    });
-
   results.clear();
-
   return asBoolean(triggering_entities.apply([&](const auto & triggering_entity) {
-    results.push_back(triggering_entity.apply(
-      [&](const auto & object) { return apply<double>(distance, position, object); }));
+    results.push_back(triggering_entity.apply([&](const auto & object) {
+      const auto pose = static_cast<geometry_msgs::msg::Pose>(position);
+      return euclideanDistance(object, pose, consider_z);
+    }));
     return not results.back().size() or compare(results.back(), tolerance).min();
   }));
 }
