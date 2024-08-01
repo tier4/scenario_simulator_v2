@@ -39,7 +39,8 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-class UserDefinedValueCondition : private SimulatorCore::NonStandardOperation
+class UserDefinedValueCondition : private SimulatorCore::NonStandardOperation,
+                                  private SimulatorCore::ConditionEvaluation
 {
   Object result;
 

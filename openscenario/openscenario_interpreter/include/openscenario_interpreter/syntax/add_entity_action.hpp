@@ -34,9 +34,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct AddEntityAction : private Scope,
-                         private SimulatorCore::ActionApplication,
-                         private SimulatorCore::NonStandardOperation
+struct AddEntityAction : private Scope, private SimulatorCore::ActionApplication
 {
   const Position position;
 

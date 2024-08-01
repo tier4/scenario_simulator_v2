@@ -34,7 +34,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Waypoint : private SimulatorCore::CoordinateSystemConversion
+struct Waypoint
 {
   const RouteStrategy route_strategy;
 

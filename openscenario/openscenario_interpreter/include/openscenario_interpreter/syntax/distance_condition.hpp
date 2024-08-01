@@ -60,7 +60,7 @@ inline namespace syntax
      <xsd:attribute name="routingAlgorithm" type="RoutingAlgorithm"/>
    </xsd:complexType>
 */
-struct DistanceCondition : private Scope, private SimulatorCore::ConditionEvaluation
+struct DistanceCondition : private Scope, private SimulatorCore::DistanceConditionEvaluation
 {
   /*
      Definition of the coordinate system to be used for calculations. If not

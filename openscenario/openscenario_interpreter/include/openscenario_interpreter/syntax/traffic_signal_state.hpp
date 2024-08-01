@@ -32,7 +32,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct TrafficSignalState : private SimulatorCore::NonStandardOperation
+struct TrafficSignalState : private SimulatorCore::TrafficLightsOperation
 {
   /* ---- NOTE -----------------------------------------------------------------
    *
