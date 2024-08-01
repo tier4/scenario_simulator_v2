@@ -205,6 +205,14 @@ auto API::setEntityStatus(
   setEntityStatus(name, reference_entity_name, relative_pose, action_status);
 }
 
+auto API::attachImuSensor(
+  const std::string &, const simulation_api_schema::ImuSensorConfiguration & configuration) -> bool
+{
+  simulation_api_schema::AttachImuSensorRequest req;
+  *req.mutable_configuration() = configuration;
+  return zeromq_client_.call(req).result().success();
+}
+
 bool API::attachPseudoTrafficLightDetector(
   const simulation_api_schema::PseudoTrafficLightDetectorConfiguration & configuration)
 {

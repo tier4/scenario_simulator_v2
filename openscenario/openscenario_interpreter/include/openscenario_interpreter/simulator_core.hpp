@@ -334,6 +334,19 @@ public:
       }());
 
       if (controller.isAutoware()) {
+        core->attachImuSensor(entity_ref, [&]() {
+          simulation_api_schema::ImuSensorConfiguration configuration;
+          configuration.set_entity(entity_ref);
+          configuration.set_frame_id("tamagawa/imu_link");
+          configuration.set_add_gravity(true);
+          configuration.set_use_seed(true);
+          configuration.set_seed(0);
+          configuration.set_noise_standard_deviation_orientation(0.01);
+          configuration.set_noise_standard_deviation_twist(0.01);
+          configuration.set_noise_standard_deviation_acceleration(0.01);
+          return configuration;
+        }());
+
         core->attachLidarSensor([&]() {
           simulation_api_schema::LidarConfiguration configuration;
 
