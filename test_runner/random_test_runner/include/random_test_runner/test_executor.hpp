@@ -153,13 +153,15 @@ public:
       auto current_time = api_->getCurrentTime();
 
       if (!std::isnan(current_time)) {
-        if (goal_reached_metric_.isGoalReached(api_->getEntity(ego_name_)->getStatus())) {
+        if (goal_reached_metric_.isGoalReached(
+              api_->getEntity(ego_name_)->getCanonicalizedStatus())) {
           scenario_completed_ = true;
         }
 
         bool timeout_reached = current_time >= test_timeout_;
         if (timeout_reached) {
-          if (!goal_reached_metric_.isGoalReached(api_->getEntity(ego_name_)->getStatus())) {
+          if (!goal_reached_metric_.isGoalReached(
+                api_->getEntity(ego_name_)->getCanonicalizedStatus())) {
             RCLCPP_INFO(logger_, "Timeout reached");
             error_reporter_.reportTimeout();
           }
@@ -180,9 +182,10 @@ public:
       }
 
       if (almost_standstill_metric_.isAlmostStandingStill(
-            api_->getEntity(ego_name_)->getStatus())) {
+            api_->getEntity(ego_name_)->getCanonicalizedStatus())) {
         RCLCPP_INFO(logger_, "Standstill duration exceeded");
-        if (goal_reached_metric_.isGoalReached(api_->getEntity(ego_name_)->getStatus())) {
+        if (goal_reached_metric_.isGoalReached(
+              api_->getEntity(ego_name_)->getCanonicalizedStatus())) {
           RCLCPP_INFO(logger_, "Goal reached, standstill expected");
         } else {
           error_reporter_.reportStandStill();

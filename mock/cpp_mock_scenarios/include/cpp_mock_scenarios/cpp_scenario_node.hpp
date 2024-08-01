@@ -52,6 +52,10 @@ public:
     const std::vector<traffic_simulator::LaneletPose> & goal_lanelet_pose,
     const traffic_simulator_msgs::msg::VehicleParameters & parameters);
 
+  auto isVehicle(const std::string & name) const -> bool;
+
+  auto isPedestrian(const std::string & name) const -> bool;
+
 protected:
   traffic_simulator::API api_;
   common::junit::JUnit5 junit_;

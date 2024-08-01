@@ -61,7 +61,7 @@ private:
     auto ego_entity = api_.spawn(
       "ego", traffic_simulator::helper::constructLaneletPose(34741, 0.0, 0.0),
       getVehicleParameters());
-    api_.getEntity("ego")->setLinearVelocity(15);
+    ego_entity->setLinearVelocity(15);
 
     auto npc_entity = api_.spawn(
       "npc", traffic_simulator::helper::constructLaneletPose(34741, 15.0, 0.0),

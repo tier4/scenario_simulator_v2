@@ -79,11 +79,9 @@ private:
         if (!entity->isInLanelet()) {
           stop(cpp_mock_scenarios::Result::FAILURE);  // LCOV_EXCL_LINE
         } else {
-          const bool is_vehicle =
-            entity->getEntityType().type == traffic_simulator_msgs::msg::EntityType::VEHICLE;
           const bool valid_vehicle_lanelet =
             entity->isInLanelet(34705, 50.0) || entity->isInLanelet(34696, 50.0);
-          if (!valid_vehicle_lanelet || !is_vehicle) {
+          if (!valid_vehicle_lanelet || !isVehicle(name)) {
             stop(cpp_mock_scenarios::Result::FAILURE);  // LCOV_EXCL_LINE
           }
         }

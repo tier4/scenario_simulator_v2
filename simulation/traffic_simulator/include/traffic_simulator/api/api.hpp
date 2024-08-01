@@ -311,6 +311,13 @@ public:
     const bool allow_spawn_outside_lane = false, const bool require_footprint_fitting = false,
     const bool random_orientation = false, std::optional<int> random_seed = std::nullopt) -> void;
 
+  auto getV2ITrafficLights() { return traffic_lights_ptr_->getV2ITrafficLights(); }
+
+  auto getConventionalTrafficLights()
+  {
+    return traffic_lights_ptr_->getConventionalTrafficLights();
+  }
+
 private:
   auto updateTimeInSim() -> bool;
 

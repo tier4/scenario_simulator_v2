@@ -55,7 +55,7 @@ auto constructCanonicalizedLaneletPose(
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> CanonicalizedLaneletPose
 {
   if (
-    auto canonicalized_lanelet_pose = canonicalize(
+    auto canonicalized_lanelet_pose = pose::canonicalize(
       traffic_simulator::helper::constructLaneletPose(lanelet_id, s, offset, roll, pitch, yaw),
       hdmap_utils_ptr)) {
     return canonicalized_lanelet_pose.value();

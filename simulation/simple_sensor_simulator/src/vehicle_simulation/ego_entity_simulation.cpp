@@ -473,6 +473,9 @@ auto EgoEntitySimulation::setStatus(const traffic_simulator_msgs::msg::EntitySta
                                    vehicle_parameters.axles.rear_axle.track_width) *
                                    0.5 +
                                  1.0;
+  /// @note Ego uses the unique_route_lanelets get from Autoware, instead of the current lanelet_id
+  /// value from EntityStatus, therefore canonicalization has to be done in advance,
+  /// not inside CanonicalizedEntityStatus
   const auto canonicalized_lanelet_pose = traffic_simulator::pose::toCanonicalizedLaneletPose(
     status.pose, status.bounding_box, unique_route_lanelets, false, matching_distance,
     hdmap_utils_ptr_);

@@ -69,7 +69,7 @@ auto EntityManager::update(const double current_time, const double step_time) ->
   }
   std::unordered_map<std::string, CanonicalizedEntityStatus> all_status;
   for (auto && [name, entity] : entities_) {
-    all_status.emplace(name, entity->getStatus());
+    all_status.emplace(name, entity->getCanonicalizedStatus());
   }
   for (auto && [name, entity] : entities_) {
     entity->setOtherStatus(all_status);
@@ -124,7 +124,7 @@ auto EntityManager::updateNpcLogic(
   } else if (const auto ego_entity = std::dynamic_pointer_cast<const EgoEntity>(entity)) {
     ego_entity->updateFieldOperatorApplication();
   }
-  return entity->getStatus();
+  return entity->getCanonicalizedStatus();
 }
 
 auto EntityManager::updateHdmapMarker() -> void
@@ -306,7 +306,7 @@ auto EntityManager::resetBehaviorPlugin(
   const std::string & name, const std::string & behavior_plugin_name) -> void
 {
   const auto reference_entity = getEntity(name);
-  const CanonicalizedEntityStatus status = reference_entity->getStatus();
+  const CanonicalizedEntityStatus status = reference_entity->getCanonicalizedStatus();
   const auto behavior_parameter = reference_entity->getBehaviorParameter();
   if (reference_entity->is<EgoEntity>()) {
     THROW_SEMANTIC_ERROR(

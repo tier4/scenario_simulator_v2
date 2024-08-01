@@ -471,19 +471,27 @@ public:
       return core->getEntity(entity_name)->requestSpeedChange(std::forward<decltype(xs)>(xs)...);
     }
 
-    template <typename... Ts>
-    static auto applyTeleportAction(const std::string & entity_name, Ts &&... xs)
+    template <
+      typename PoseType, typename... Ts,
+      typename = std::enable_if_t<
+        std::is_same_v<std::decay_t<PoseType>, geometry_msgs::msg::Pose> ||
+        std::is_same_v<std::decay_t<PoseType>, traffic_simulator::LaneletPose> ||
+        std::is_same_v<std::decay_t<PoseType>, traffic_simulator::CanonicalizedLaneletPose>>>
+    static auto applyTeleportAction(const std::string & name, const PoseType & pose, Ts &&... xs)
     {
-      return core->getEntity(entity_name)->setStatus(std::forward<decltype(xs)>(xs)...);
+      return core->getEntity(name)->setStatus(pose, std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>
     static auto applyTeleportAction(
-      const std::string & entity_name, const std::string & reference_entity_name, Ts &&... xs)
+      const std::string & name, const std::string & reference_entity_name, Ts &&... xs)
     {
-      return core->getEntity(entity_name)
-        ->setStatus(
-          core->getEntity(reference_entity_name)->getMapPose(), std::forward<decltype(xs)>(xs)...);
+      if (const auto reference_entity = core->getEntityOrNullptr(reference_entity_name)) {
+        return core->getEntity(name)->setStatus(
+          reference_entity->getMapPose(), std::forward<decltype(xs)>(xs)...);
+      } else {
+        throw Error("Reference entity \"", reference_entity_name, "\" does not exist");
+      }
     }
 
     static auto applyWalkStraightAction(const std::string & entity_name)

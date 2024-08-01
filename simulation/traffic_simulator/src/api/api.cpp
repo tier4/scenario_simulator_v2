@@ -90,7 +90,7 @@ auto API::updateEntitiesStatusInSim() -> bool
   req.set_npc_logic_started(entity_manager_ptr_->isNpcLogicStarted());
   for (const auto & entity_name : entity_manager_ptr_->getEntityNames()) {
     const auto entity = entity_manager_ptr_->getEntity(entity_name);
-    const auto entity_status = static_cast<EntityStatus>(entity->getStatus());
+    const auto entity_status = static_cast<EntityStatus>(entity->getCanonicalizedStatus());
     simulation_interface::toProto(entity_status, *req.add_status());
     if (entity->is<entity::EgoEntity>()) {
       req.set_overwrite_ego_status(entity->isControlledBySimulator());
@@ -101,7 +101,7 @@ auto API::updateEntitiesStatusInSim() -> bool
   if (auto res = zeromq_client_.call(req); res.result().success()) {
     for (const auto & res_status : res.status()) {
       auto entity = entity_manager_ptr_->getEntity(res_status.name());
-      auto entity_status = static_cast<EntityStatus>(entity->getStatus());
+      auto entity_status = static_cast<EntityStatus>(entity->getCanonicalizedStatus());
       simulation_interface::toMsg(res_status.pose(), entity_status.pose);
       simulation_interface::toMsg(res_status.action_status(), entity_status.action_status);
 
@@ -290,7 +290,7 @@ auto API::respawn(
     // read status from EntityManager, then send it to SimpleSensorSimulator
     simulation_api_schema::UpdateEntityStatusRequest req;
     simulation_interface::toProto(
-      static_cast<EntityStatus>(entity_manager_ptr_->getEntity(name)->getStatus()),
+      static_cast<EntityStatus>(entity_manager_ptr_->getEntity(name)->getCanonicalizedStatus()),
       *req.add_status());
     req.set_npc_logic_started(entity_manager_ptr_->isNpcLogicStarted());
     req.set_overwrite_ego_status(ego_entity->isControlledBySimulator());
@@ -309,7 +309,7 @@ auto API::respawn(
         res_name + "\".");
     } else {
       // if valid, set response in EntityManager, then plan path and engage
-      auto entity_status = static_cast<EntityStatus>(ego_entity->getStatus());
+      auto entity_status = static_cast<EntityStatus>(ego_entity->getCanonicalizedStatus());
       simulation_interface::toMsg(res_status->pose(), entity_status.pose);
       simulation_interface::toMsg(res_status->action_status(), entity_status.action_status);
       ego_entity->setMapPose(entity_status.pose);

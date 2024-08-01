@@ -71,7 +71,7 @@ auto EntityBase::getCanonicalizedLaneletPose(double matching_distance) const
   }(getEntityType());
 
   // prefer the current lanelet
-  return toCanonicalizedLaneletPose(
+  return pose::toCanonicalizedLaneletPose(
     status_.getMapPose(), status_.getBoundingBox(), status_.getLaneletIds(), include_crosswalk,
     matching_distance, hdmap_utils_ptr_);
 }
@@ -122,7 +122,8 @@ auto EntityBase::isTargetSpeedReached(double target_speed) const -> bool
 auto EntityBase::isTargetSpeedReached(const speed_change::RelativeTargetSpeed & target_speed) const
   -> bool
 {
-  return isTargetSpeedReached(target_speed.getAbsoluteValue(getStatus(), other_status_));
+  return isTargetSpeedReached(
+    target_speed.getAbsoluteValue(getCanonicalizedStatus(), other_status_));
 }
 
 auto EntityBase::onUpdate(const double /*current_time*/, const double step_time) -> void
@@ -149,8 +150,8 @@ auto EntityBase::requestLaneChange(const lane_change::Direction & direction) -> 
 {
   if (isInLanelet()) {
     if (
-      const auto target =
-        hdmap_utils_ptr_->getLaneChangeableLaneletId(getStatus().getLaneletId(), direction)) {
+      const auto target = hdmap_utils_ptr_->getLaneChangeableLaneletId(
+        getCanonicalizedStatus().getLaneletId(), direction)) {
       requestLaneChange(target.value());
     }
   }
@@ -176,7 +177,7 @@ void EntityBase::requestLaneChange(
         "Source entity does not assigned to lanelet. Please check source entity name : ", name,
         " exists on lane.");
     }
-    reference_lanelet_id = getStatus().getLaneletId();
+    reference_lanelet_id = status_.getLaneletId();
   } else {
     if (other_status_.find(target.entity_name) == other_status_.end()) {
       THROW_SEMANTIC_ERROR(
@@ -354,8 +355,8 @@ void EntityBase::requestSpeedChangeWithConstantAcceleration(
          * @brief Checking if the entity reaches target speed.
          */
         [this, target_speed, acceleration](double) {
-          double diff =
-            target_speed.getAbsoluteValue(getStatus(), other_status_) - getCurrentTwist().linear.x;
+          double diff = target_speed.getAbsoluteValue(getCanonicalizedStatus(), other_status_) -
+                        getCurrentTwist().linear.x;
           /**
            * @brief Hard coded parameter, threshold for difference
            */
@@ -382,7 +383,7 @@ void EntityBase::requestSpeedChangeWithConstantAcceleration(
     }
     case speed_change::Transition::STEP: {
       requestSpeedChange(target_speed, continuous);
-      setLinearVelocity(target_speed.getAbsoluteValue(getStatus(), other_status_));
+      setLinearVelocity(target_speed.getAbsoluteValue(getCanonicalizedStatus(), other_status_));
       break;
     }
   }
@@ -405,17 +406,19 @@ void EntityBase::requestSpeedChangeWithTimeConstraint(
   switch (transition) {
     case speed_change::Transition::LINEAR: {
       requestSpeedChangeWithTimeConstraint(
-        target_speed.getAbsoluteValue(getStatus(), other_status_), transition, acceleration_time);
+        target_speed.getAbsoluteValue(getCanonicalizedStatus(), other_status_), transition,
+        acceleration_time);
       break;
     }
     case speed_change::Transition::AUTO: {
       requestSpeedChangeWithTimeConstraint(
-        target_speed.getAbsoluteValue(getStatus(), other_status_), transition, acceleration_time);
+        target_speed.getAbsoluteValue(getCanonicalizedStatus(), other_status_), transition,
+        acceleration_time);
       break;
     }
     case speed_change::Transition::STEP: {
       requestSpeedChange(target_speed, false);
-      setLinearVelocity(target_speed.getAbsoluteValue(getStatus(), other_status_));
+      setLinearVelocity(target_speed.getAbsoluteValue(getCanonicalizedStatus(), other_status_));
       break;
     }
   }
@@ -500,7 +503,7 @@ void EntityBase::requestSpeedChange(
         if (other_status_.find(target_speed.reference_entity_name) == other_status_.end()) {
           return true;
         }
-        target_speed_ = target_speed.getAbsoluteValue(getStatus(), other_status_);
+        target_speed_ = target_speed.getAbsoluteValue(getCanonicalizedStatus(), other_status_);
         return false;
       },
       [this]() {}, job::Type::LINEAR_VELOCITY, true, job::Event::POST_UPDATE);
@@ -514,7 +517,7 @@ void EntityBase::requestSpeedChange(
           return true;
         }
         if (isTargetSpeedReached(target_speed)) {
-          target_speed_ = target_speed.getAbsoluteValue(getStatus(), other_status_);
+          target_speed_ = target_speed.getAbsoluteValue(getCanonicalizedStatus(), other_status_);
           return true;
         }
         return false;
@@ -568,7 +571,7 @@ auto EntityBase::setStatus(const EntityStatus & status, const lanelet::Ids & lan
     status, lanelet_ids, getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
 }
 
-void EntityBase::setStatus(const EntityStatus & status)
+auto EntityBase::setStatus(const EntityStatus & status) -> void
 {
   status_.set(status, getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
 }
@@ -577,7 +580,7 @@ auto EntityBase::setStatus(
   const geometry_msgs::msg::Pose & map_pose,
   const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
 {
-  EntityStatus status = static_cast<EntityStatus>(getStatus());
+  EntityStatus status = static_cast<EntityStatus>(getCanonicalizedStatus());
   status.pose = map_pose;
   status.action_status = action_status;
   setStatus(status);
@@ -608,7 +611,7 @@ auto EntityBase::setStatus(
   -> void
 {
   if (const auto canonicalized_lanelet_pose = pose::canonicalize(lanelet_pose, hdmap_utils_ptr_)) {
-    auto entity_status = static_cast<EntityStatus>(getStatus());
+    auto entity_status = static_cast<EntityStatus>(status_);
     entity_status.action_status = action_status;
     entity_status.pose = static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose.value());
     entity_status.lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose.value());
@@ -753,7 +756,7 @@ auto EntityBase::requestSynchronize(
 
   ///@brief Check if the entity has already arrived to the target lanelet.
   if (isInPosition(entity_target, tolerance)) {
-    if (this->getStatus().getTwist().linear.x < target_speed + getMaxAcceleration() * step_time_) {
+    if (getCurrentTwist().linear.x < target_speed + getMaxAcceleration() * step_time_) {
     } else {
       RCLCPP_WARN_ONCE(
         rclcpp::get_logger("traffic_simulator"),
@@ -803,7 +806,7 @@ auto EntityBase::requestSynchronize(
 
       const auto target_entity_velocity =
         other_status_.find(target_name)->second.getTwist().linear.x;
-      const auto entity_velocity = this->getStatus().getTwist().linear.x;
+      const auto entity_velocity = getCurrentTwist().linear.x;
       const auto target_entity_arrival_time =
         (std::abs(target_entity_velocity) > std::numeric_limits<double>::epsilon())
           ? target_entity_distance.value() / target_entity_velocity

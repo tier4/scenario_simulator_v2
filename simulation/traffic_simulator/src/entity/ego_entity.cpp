@@ -138,13 +138,6 @@ auto EgoEntity::getEntityTypename() const -> const std::string &
   return result;
 }
 
-auto EgoEntity::getEntityType() const -> const traffic_simulator_msgs::msg::EntityType &
-{
-  static traffic_simulator_msgs::msg::EntityType type;
-  type.type = traffic_simulator_msgs::msg::EntityType::EGO;
-  return type;
-}
-
 auto EgoEntity::getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle>
 {
   return std::nullopt;

@@ -57,24 +57,19 @@ private:
         if (!entity->isInLanelet()) {
           stop(cpp_mock_scenarios::Result::FAILURE);  // LCOV_EXCL_LINE
         } else {
-          const bool is_vehicle =
-            entity->getEntityType().type == traffic_simulator_msgs::msg::EntityType::VEHICLE;
-          const bool is_pedestrian =
-            entity->getEntityType().type == traffic_simulator_msgs::msg::EntityType::PEDESTRIAN;
-
           const bool valid_vehicle_lanelet =
             entity->isInLanelet(34705, 50.0) || entity->isInLanelet(34696, 50.0);
           const bool valid_pedestrian_lanelet = entity->isInLanelet(34385, 10.0);
 
-          if (is_vehicle) {
+          if (isVehicle(name)) {
             ++vehicle_count;
-          } else if (is_pedestrian) {
+          } else if (isPedestrian(name)) {
             ++pedestrian_count;
           }
 
           if (
-            (is_vehicle && !valid_vehicle_lanelet) ||
-            (is_pedestrian && !valid_pedestrian_lanelet)) {
+            (isVehicle(name) && !valid_vehicle_lanelet) ||
+            (isPedestrian(name) && !valid_pedestrian_lanelet)) {
             stop(cpp_mock_scenarios::Result::FAILURE);  // LCOV_EXCL_LINE
           }
         }

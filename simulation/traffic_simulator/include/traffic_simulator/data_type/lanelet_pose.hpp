@@ -37,6 +37,7 @@ public:
   CanonicalizedLaneletPose & operator=(const CanonicalizedLaneletPose & obj);
   explicit operator LaneletPose() const noexcept { return lanelet_pose_; }
   explicit operator geometry_msgs::msg::Pose() const noexcept { return map_pose_; }
+  auto getLaneletPose() const -> const LaneletPose & { return lanelet_pose_; }
   auto hasAlternativeLaneletPose() const -> bool { return lanelet_poses_.size() > 1; }
   auto getAlternativeLaneletPoseBaseOnShortestRouteFrom(
     LaneletPose from, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,

@@ -73,7 +73,7 @@ public:
     }
   }
 
-  template <typename T>
+  template <typename EntityType>
   /*   */ auto as() const -> std::shared_ptr<const EntityType>
   {
     if (auto derived = std::dynamic_pointer_cast<const EntityType>(shared_from_this()); !derived) {
@@ -97,19 +97,20 @@ public:
    */                                                         \
   /*   */ auto get##NAME() const noexcept->TYPE { return RETURN_VARIABLE; }
 
-  DEFINE_GETTER(BoundingBox,              traffic_simulator_msgs::msg::BoundingBox,        static_cast<EntityStatus>(getStatus()).bounding_box)
-  DEFINE_GETTER(CurrentAccel,             geometry_msgs::msg::Accel,                       static_cast<EntityStatus>(getStatus()).action_status.accel)
-  DEFINE_GETTER(CurrentTwist,             geometry_msgs::msg::Twist,                       static_cast<EntityStatus>(getStatus()).action_status.twist)
-  DEFINE_GETTER(DynamicConstraints,       traffic_simulator_msgs::msg::DynamicConstraints, getBehaviorParameter().dynamic_constraints)
-  DEFINE_GETTER(EntityStatusBeforeUpdate, const CanonicalizedEntityStatus &,               status_before_update_)
-  DEFINE_GETTER(EntitySubtype,            traffic_simulator_msgs::msg::EntitySubtype,      static_cast<EntityStatus>(getStatus()).subtype)
-  DEFINE_GETTER(LinearJerk,               double,                                          static_cast<EntityStatus>(getStatus()).action_status.linear_jerk)
-  DEFINE_GETTER(MapPose,                  geometry_msgs::msg::Pose,                        static_cast<EntityStatus>(getStatus()).pose)
-  DEFINE_GETTER(StandStillDuration,       double,                                          stand_still_duration_)
-  DEFINE_GETTER(LaneletRelativeYaw,       std::optional<double>,                           getStatus().getLaneletRelativeYaw()) 
-  DEFINE_GETTER(Status,                   const CanonicalizedEntityStatus &,               status_)
-  DEFINE_GETTER(TraveledDistance,         double,                                          traveled_distance_)
-  DEFINE_GETTER(Name,                     const std::string &,                             getStatus().getName())
+  DEFINE_GETTER(BoundingBox,                     const traffic_simulator_msgs::msg::BoundingBox &,   status_.getBoundingBox())
+  DEFINE_GETTER(CanonicalizedStatus,             const CanonicalizedEntityStatus &,                  status_)
+  DEFINE_GETTER(CanonicalizedStatusBeforeUpdate, const CanonicalizedEntityStatus &,                  status_before_update_)
+  DEFINE_GETTER(CurrentAccel,                    const geometry_msgs::msg::Accel &,                  status_.getAccel())
+  DEFINE_GETTER(CurrentTwist,                    const geometry_msgs::msg::Twist &,                  status_.getTwist())
+  DEFINE_GETTER(DynamicConstraints,              traffic_simulator_msgs::msg::DynamicConstraints,    getBehaviorParameter().dynamic_constraints)
+  DEFINE_GETTER(EntitySubtype,                   const traffic_simulator_msgs::msg::EntitySubtype &, status_.getSubtype())
+  DEFINE_GETTER(EntityType,                      const traffic_simulator_msgs::msg::EntityType &,    status_.getType())
+  DEFINE_GETTER(LinearJerk,                      double,                                             status_.getLinearJerk())
+  DEFINE_GETTER(MapPose,                         const geometry_msgs::msg::Pose &,                   status_.getMapPose())
+  DEFINE_GETTER(StandStillDuration,              double,                                             stand_still_duration_)
+  DEFINE_GETTER(LaneletRelativeYaw,              std::optional<double>,                              status_.getLaneletRelativeYaw()) 
+  DEFINE_GETTER(TraveledDistance,                double,                                             traveled_distance_)
+  DEFINE_GETTER(Name,                            const std::string &,                                status_.getName())
 
   // clang-format on
 #undef DEFINE_GETTER
@@ -122,8 +123,6 @@ public:
 
   virtual auto getDefaultDynamicConstraints() const
     -> const traffic_simulator_msgs::msg::DynamicConstraints & = 0;
-
-  virtual auto getEntityType() const -> const traffic_simulator_msgs::msg::EntityType & = 0;
 
   virtual auto getEntityTypename() const -> const std::string & = 0;
 
@@ -145,9 +144,6 @@ public:
 
   /*   */ auto getCanonicalizedLaneletPose(double matching_distance) const
     -> std::optional<CanonicalizedLaneletPose>;
-
-  /*   */ auto getMapPoseFromRelativePose(const geometry_msgs::msg::Pose &) const
-    -> geometry_msgs::msg::Pose;
 
   virtual auto getMaxAcceleration() const -> double = 0;
 
