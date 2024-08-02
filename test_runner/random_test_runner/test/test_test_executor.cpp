@@ -190,7 +190,6 @@ TEST(TestExecutor, InitializeWithNoNPCs)
     MockAPI, getTestDescription(), JunitXmlReporterTestCase(test_case), 20.0,
     ArchitectureType::AWF_UNIVERSE, rclcpp::get_logger("test_executor_test"));
 
-  EXPECT_CALL(*MockAPI, getHdmapUtilsMock).Times(1).InSequence(sequence);
   EXPECT_CALL(*MockAPI, updateFrame).Times(1).InSequence(sequence);
   EXPECT_CALL(
     *MockAPI,
