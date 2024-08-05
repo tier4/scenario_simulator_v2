@@ -106,7 +106,7 @@ OpenSCENARIO:
                                   conditionEdge: none
                                   ByValueCondition:
                                     SimulationTimeCondition:
-                                      value: 120
+                                      value: 180
                                       rule: greaterThan
                             - Condition:
                                 - name: ''
@@ -148,7 +148,7 @@ OpenSCENARIO:
                                 - *COUNT_UP
                                 - *COUNT_UP
                                 - *COUNT_UP
-                                - *COUNT_UP
+                                - *COUNT_UP # 10
 
                                 - *COUNT_UP
                                 - *COUNT_UP
@@ -159,7 +159,7 @@ OpenSCENARIO:
                                 - *COUNT_UP
                                 - *COUNT_UP
                                 - *COUNT_UP
-                                - *COUNT_UP
+                                - *COUNT_UP # 20
 
                                 - *COUNT_UP
                                 - *COUNT_UP
@@ -170,7 +170,139 @@ OpenSCENARIO:
                                 - *COUNT_UP
                                 - *COUNT_UP
                                 - *COUNT_UP
+                                - *COUNT_UP # 30
+
                                 - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP # 40
+
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP # 50
+
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP # 60
+
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP # 70
+
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP # 80
+
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP # 90
+
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP # 100
+
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP # 110
+
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP # 120
+
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP # 130
+
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP # 140
+
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP # 150
                         Action:
                           - name: ''
                             UserDefinedAction:
