@@ -395,7 +395,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::getWaypoints() const
 }
 
 auto FieldOperatorApplicationFor<AutowareUniverse>::getTurnIndicatorsCommand() const
-  -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand
+  -> autoware_vehicle_msgs::msg::TurnIndicatorsCommand
 {
   return getTurnIndicatorsCommandImpl();
 }
@@ -479,6 +479,22 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::requestAutoModeForCooperatio
       "FieldOperatorApplicationFor<AutowareUniverse>::requestAutoModeForCooperation is not "
       "supported in this environment, because rtc_auto_mode_manager is present.");
   }
+}
+
+auto FieldOperatorApplicationFor<AutowareUniverse>::enableAutowareControl() -> void
+{
+  task_queue.delay([this]() {
+    auto request = std::make_shared<autoware_adapi_v1_msgs::srv::ChangeOperationMode::Request>();
+    requestEnableAutowareControl(request);
+  });
+}
+
+auto FieldOperatorApplicationFor<AutowareUniverse>::disableAutowareControl() -> void
+{
+  task_queue.delay([this]() {
+    auto request = std::make_shared<autoware_adapi_v1_msgs::srv::ChangeOperationMode::Request>();
+    requestDisableAutowareControl(request);
+  });
 }
 
 auto FieldOperatorApplicationFor<AutowareUniverse>::receiveEmergencyState(

@@ -17,8 +17,6 @@
 
 #include <simulation_api_schema.pb.h>
 
-#include <autoware_auto_vehicle_msgs/msg/vehicle_control_command.hpp>
-#include <autoware_auto_vehicle_msgs/msg/vehicle_state_command.hpp>
 #include <boost/variant.hpp>
 #include <cassert>
 #include <memory>
