@@ -16,8 +16,8 @@
 
 #include <geometry/spline/hermite_curve.hpp>
 
-#include "expect_eq_macros.hpp"
-#include "test_utils.hpp"
+#include "../expect_eq_macros.hpp"
+#include "../test_utils.hpp"
 
 constexpr double EPS = 1e-3;
 
