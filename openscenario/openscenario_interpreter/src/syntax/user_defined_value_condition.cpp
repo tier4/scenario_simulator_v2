@@ -33,47 +33,71 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 template <typename T>
-struct MagicSubscription : private rclcpp::Node, public T
+struct MagicSubscription : public T
 {
-  std::promise<void> promise;
+  struct Subscriber
+  {
+    rclcpp::Node node;
 
-  std::thread thread;
+    std::atomic_bool stop_requested = false;
 
-  std::exception_ptr thrown;
+    std::promise<void> promise;
+
+    std::future<void> future;
+
+    std::thread thread;
+
+    explicit Subscriber()
+    : node("magic_subscription"),
+      future(promise.get_future()),
+      thread(
+        [this](std::promise<void> promise) {
+          while (rclcpp::ok() and not stop_requested) {
+            try {
+              rclcpp::spin_some(node.get_node_base_interface());
+            } catch (...) {
+              promise.set_exception(std::current_exception());
+            }
+          }
+        },
+        std::move(promise))
+    {
+    }
+  };
+
+  static auto subscriber() -> auto &
+  {
+    static std::unique_ptr<Subscriber> subscriber = nullptr;
+
+    if (not subscriber) {
+      subscriber = std::make_unique<Subscriber>();
+    }
+
+    return subscriber;
+  }
 
   typename rclcpp::Subscription<T>::SharedPtr subscription;
 
-public:
-  explicit MagicSubscription(const std::string & node_name, const std::string & topic_name)
-  : rclcpp::Node(node_name),
-    thread(
-      [this](auto future) {
-        while (rclcpp::ok() and
-               future.wait_for(std::chrono::milliseconds(1)) == std::future_status::timeout) {
-          try {
-            rclcpp::spin_some(get_node_base_interface());
-          } catch (...) {
-            thrown = std::current_exception();
-          }
-        }
-      },
-      std::move(promise.get_future())),
-    subscription(create_subscription<T>(topic_name, 1, [this](const typename T::SharedPtr message) {
-      static_cast<T &>(*this) = *message;
-    }))
+  static inline std::size_t count = 0;
+
+  explicit MagicSubscription(const std::string & topic_name)
+  : subscription(subscriber()->node.template create_subscription<T>(
+      topic_name, 1, [this, count = count++](const typename T::SharedPtr message) {
+        static_cast<T &>(*this) = *message;
+      }))
   {
   }
 
   ~MagicSubscription()
   {
-    if (thread.joinable()) {
-      promise.set_value();
-      thread.join();
+    if (
+      not --count and subscriber()->thread.joinable() and
+      not subscriber()->stop_requested.exchange(true)) {
+      subscriber()->thread.join();
+      subscriber().reset();
     }
   }
 };
-
-uint64_t UserDefinedValueCondition::magic_subscription_counter = 0;
 
 UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node, Scope & scope)
 : name(readAttribute<String>("name", node, scope)),
@@ -134,9 +158,7 @@ UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node
     using tier4_simulation_msgs::msg::UserDefinedValueType;
 
     evaluate_value =
-      [&, current_message = std::make_shared<MagicSubscription<UserDefinedValue>>(
-            result.str(1) + "_subscription_" + std::to_string(++magic_subscription_counter),
-            result.str(0))]() {
+      [this, message = std::make_shared<MagicSubscription<UserDefinedValue>>(result.str(0))]() {
         auto evaluate = [](const auto & user_defined_value) {
           switch (user_defined_value.type.data) {
             case UserDefinedValueType::BOOLEAN:
@@ -158,7 +180,7 @@ UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node
           }
         };
 
-        return not current_message->value.empty() ? evaluate(*current_message) : unspecified;
+        return message->value.empty() ? unspecified : evaluate(*message);
       };
 #else
     throw SyntaxError(
