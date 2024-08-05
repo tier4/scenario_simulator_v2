@@ -20,14 +20,13 @@
 #endif
 
 #include <autoware_adapi_v1_msgs/msg/mrm_state.hpp>
+#include <autoware_adapi_v1_msgs/srv/change_operation_mode.hpp>
 #include <autoware_adapi_v1_msgs/srv/clear_route.hpp>
 #include <autoware_adapi_v1_msgs/srv/initialize_localization.hpp>
 #include <autoware_adapi_v1_msgs/srv/set_route_points.hpp>
-#include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
-#include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
-#include <autoware_auto_planning_msgs/msg/path_with_lane_id.hpp>
-#include <autoware_auto_system_msgs/msg/emergency_state.hpp>
-#include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
+#include <autoware_control_msgs/msg/control.hpp>
+#include <autoware_perception_msgs/msg/traffic_signal_array.hpp>
+#include <autoware_vehicle_msgs/msg/gear_command.hpp>
 #include <concealer/autoware_universe.hpp>
 #include <concealer/field_operator_application.hpp>
 #include <concealer/publisher_wrapper.hpp>
@@ -38,6 +37,7 @@
 #include <tier4_external_api_msgs/msg/emergency.hpp>
 #include <tier4_external_api_msgs/srv/engage.hpp>
 #include <tier4_external_api_msgs/srv/set_velocity_limit.hpp>
+#include <tier4_planning_msgs/msg/path_with_lane_id.hpp>
 #include <tier4_planning_msgs/msg/trajectory.hpp>
 #include <tier4_rtc_msgs/msg/cooperate_status_array.hpp>
 #include <tier4_rtc_msgs/srv/auto_mode_with_module.hpp>
@@ -54,7 +54,7 @@ class FieldOperatorApplicationFor<AutowareUniverse>
   friend class TransitionAssertion<FieldOperatorApplicationFor<AutowareUniverse>>;
 
   // clang-format off
-  SubscriberWrapper<autoware_auto_control_msgs::msg::AckermannControlCommand>     getAckermannControlCommand;
+  SubscriberWrapper<autoware_control_msgs::msg::Control>     getCommand;
   SubscriberWrapper<tier4_system_msgs::msg::AutowareState, ThreadSafety::safe>    getAutowareState;
   SubscriberWrapper<tier4_rtc_msgs::msg::CooperateStatusArray>                    getCooperateStatusArray;
   SubscriberWrapper<tier4_external_api_msgs::msg::Emergency>                      getEmergencyState;
@@ -63,7 +63,7 @@ class FieldOperatorApplicationFor<AutowareUniverse>
 #endif
   SubscriberWrapper<autoware_adapi_v1_msgs::msg::MrmState>                        getMrmState;
   SubscriberWrapper<tier4_planning_msgs::msg::Trajectory>                         getTrajectory;
-  SubscriberWrapper<autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand>       getTurnIndicatorsCommandImpl;
+  SubscriberWrapper<autoware_vehicle_msgs::msg::TurnIndicatorsCommand>       getTurnIndicatorsCommandImpl;
 
   ServiceWithValidation<autoware_adapi_v1_msgs::srv::ClearRoute>                  requestClearRoute;
   ServiceWithValidation<tier4_rtc_msgs::srv::CooperateCommands>                   requestCooperateCommands;
@@ -72,6 +72,8 @@ class FieldOperatorApplicationFor<AutowareUniverse>
   ServiceWithValidation<autoware_adapi_v1_msgs::srv::SetRoutePoints>              requestSetRoutePoints;
   ServiceWithValidation<tier4_rtc_msgs::srv::AutoModeWithModule>                  requestSetRtcAutoMode;
   ServiceWithValidation<tier4_external_api_msgs::srv::SetVelocityLimit>           requestSetVelocityLimit;
+  ServiceWithValidation<autoware_adapi_v1_msgs::srv::ChangeOperationMode>         requestEnableAutowareControl;
+  ServiceWithValidation<autoware_adapi_v1_msgs::srv::ChangeOperationMode>         requestDisableAutowareControl;
   // clang-format on
 
   tier4_rtc_msgs::msg::CooperateStatusArray latest_cooperate_status_array;
@@ -107,14 +109,14 @@ protected:
   auto sendSIGINT() -> void override;
 
 public:
-  SubscriberWrapper<autoware_auto_planning_msgs::msg::PathWithLaneId> getPathWithLaneId;
+  SubscriberWrapper<tier4_planning_msgs::msg::PathWithLaneId> getPathWithLaneId;
 
 public:
   template <typename... Ts>
   CONCEALER_PUBLIC explicit FieldOperatorApplicationFor(Ts &&... xs)
   : FieldOperatorApplication(std::forward<decltype(xs)>(xs)...),
     // clang-format off
-    getAckermannControlCommand("/control/command/control_cmd", *this),
+    getCommand("/control/command/control_cmd", *this),
     getAutowareState("/api/iv_msgs/autoware/state", *this),
     getCooperateStatusArray("/api/external/get/rtc_status", *this, [this](const auto & v) { latest_cooperate_status_array = v; }),
     getEmergencyState("/api/external/get/emergency", *this, [this](const auto & v) { receiveEmergencyState(v); }),
@@ -132,7 +134,9 @@ public:
     // NOTE: /api/routing/set_route_points takes a long time to return. But the specified duration is not decided by any technical reasons.
     requestSetRoutePoints("/api/routing/set_route_points", *this, std::chrono::seconds(10)),
     requestSetRtcAutoMode("/api/external/set/rtc_auto_mode", *this),
-    requestSetVelocityLimit("/api/autoware/set/velocity_limit", *this)
+    requestSetVelocityLimit("/api/autoware/set/velocity_limit", *this),
+    requestEnableAutowareControl("/api/operation_mode/enable_autoware_control", *this),
+    requestDisableAutowareControl("/api/operation_mode/disable_autoware_control", *this)
   // clang-format on
   {
   }
@@ -150,7 +154,7 @@ public:
   auto getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray override;
 
   auto getTurnIndicatorsCommand() const
-    -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand override;
+    -> autoware_vehicle_msgs::msg::TurnIndicatorsCommand override;
 
   auto getEmergencyStateName() const -> std::string override;
 
@@ -171,6 +175,10 @@ public:
   auto sendCooperateCommand(const std::string &, const std::string &) -> void override;
 
   auto setVelocityLimit(double) -> void override;
+
+  auto enableAutowareControl() -> void override;
+
+  auto disableAutowareControl() -> void override;
 };
 }  // namespace concealer
 
