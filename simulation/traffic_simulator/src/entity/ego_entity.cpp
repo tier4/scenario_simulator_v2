@@ -103,6 +103,21 @@ auto EgoEntity::getEntityTypename() const -> const std::string &
   return result;
 }
 
+auto EgoEntity::getGoalPoses() -> std::vector<CanonicalizedLaneletPose>
+{
+  std::vector<CanonicalizedLaneletPose> lanelet_pose;
+
+  if (const auto universe =
+        dynamic_cast<concealer::FieldOperatorApplicationFor<concealer::AutowareUniverse> *>(
+          field_operator_application.get());
+      universe) {
+    lanelet_pose.push_back(traffic_simulator::pose::toLaneletPose(
+                             universe->getAutowareMissionRoute().goal_pose, false, hdmap_utils_ptr_)
+                             .value());
+  }
+  return lanelet_pose;
+}
+
 auto EgoEntity::getEntityType() const -> const traffic_simulator_msgs::msg::EntityType &
 {
   static traffic_simulator_msgs::msg::EntityType type;
