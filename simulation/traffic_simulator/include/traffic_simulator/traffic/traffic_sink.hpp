@@ -50,7 +50,8 @@ public:
   const double radius;
   const geometry_msgs::msg::Point position;
   void execute(const double current_time, const double step_time) override;
-  auto makeDebugMarker(visualization_msgs::msg::MarkerArray & marker_array) const -> void override;
+  auto appendDebugMarker(visualization_msgs::msg::MarkerArray & marker_array) const
+    -> void override;
 
 private:
   const std::function<std::vector<std::string>(void)> get_entity_names_function;

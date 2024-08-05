@@ -64,7 +64,8 @@ void TrafficSink::execute(
   }
 }
 
-auto TrafficSink::makeDebugMarker(visualization_msgs::msg::MarkerArray & marker_array) const -> void
+auto TrafficSink::appendDebugMarker(visualization_msgs::msg::MarkerArray & marker_array) const
+  -> void
 {
   const auto lanelet_text = std::to_string(lanelet_id);
   visualization_msgs::msg::Marker traffic_sink_marker;

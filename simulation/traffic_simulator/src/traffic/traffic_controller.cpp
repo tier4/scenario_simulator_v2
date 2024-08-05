@@ -79,7 +79,7 @@ auto TrafficController::makeDebugMarker() const -> const visualization_msgs::msg
   static const auto marker_array = [&]() {
     visualization_msgs::msg::MarkerArray marker_array;
     for (size_t i = 0; i < modules_.size(); ++i) {
-      modules_[i]->makeDebugMarker(marker_array);
+      modules_[i]->appendDebugMarker(marker_array);
     }
     return marker_array;
   }();
