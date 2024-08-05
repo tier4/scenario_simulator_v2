@@ -19,8 +19,8 @@
 #include <geometry/quaternion/euler_to_quaternion.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 
-#include "expect_eq_macros.hpp"
-#include "test_utils.hpp"
+#include "../expect_eq_macros.hpp"
+#include "../test_utils.hpp"
 
 TEST(LineSegment, initializeDifferentPoints)
 {

@@ -18,8 +18,8 @@
 #include <geometry/quaternion/make_quaternion.hpp>
 #include <geometry/quaternion/operator.hpp>
 
-#include "expect_eq_macros.hpp"
-#include "test_utils.hpp"
+#include "../expect_eq_macros.hpp"
+#include "../test_utils.hpp"
 
 constexpr double EPS = 1e-6;
 
