@@ -290,6 +290,12 @@ auto EgoEntity::requestSpeedChange(
     "purposes only.");
 }
 
+auto EgoEntity::requestSynchronize(
+  const std::string &, const LaneletPose &, const LaneletPose &, const double, const double) -> bool
+{
+  THROW_SYNTAX_ERROR("Request synchronize is only for non-ego entities.");
+}
+
 void EgoEntity::requestClearRoute() { field_operator_application->clearRoute(); }
 
 auto EgoEntity::getDefaultDynamicConstraints() const
