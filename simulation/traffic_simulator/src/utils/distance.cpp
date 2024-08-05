@@ -16,6 +16,7 @@
 #include <geometry/distance.hpp>
 #include <geometry/transform.hpp>
 #include <traffic_simulator/utils/distance.hpp>
+#include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 
 namespace traffic_simulator
@@ -104,8 +105,8 @@ auto longitudinalDistance(
       for (const auto & to_pose : to_poses) {
         if (
           const auto distance = longitudinalDistance(
-            CanonicalizedLaneletPose(from_pose, hdmap_utils_ptr),
-            CanonicalizedLaneletPose(to_pose, hdmap_utils_ptr), false, include_opposite_direction,
+            pose::canonicalize(from_pose, hdmap_utils_ptr),
+            pose::canonicalize(to_pose, hdmap_utils_ptr), false, include_opposite_direction,
             allow_lane_change, hdmap_utils_ptr)) {
           distances.emplace_back(distance.value());
         }

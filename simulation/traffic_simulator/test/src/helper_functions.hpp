@@ -84,7 +84,7 @@ auto makeCanonicalizedLaneletPose(
   const double s = 0.0, const double offset = 0.0)
   -> traffic_simulator::lanelet_pose::CanonicalizedLaneletPose
 {
-  return traffic_simulator::lanelet_pose::CanonicalizedLaneletPose(
+  return traffic_simulator::pose::canonicalize(
     traffic_simulator::helper::constructLaneletPose(id, s, offset), hdmap_utils);
 }
 

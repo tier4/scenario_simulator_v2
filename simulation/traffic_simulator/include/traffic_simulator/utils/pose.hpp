@@ -29,13 +29,12 @@ auto quietNaNLaneletPose() -> LaneletPose;
 // Conversions
 auto canonicalize(
   const LaneletPose & lanelet_pose,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
-  -> std::optional<CanonicalizedLaneletPose>;
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> CanonicalizedLaneletPose;
 
 auto canonicalize(
   const std::vector<LaneletPose> & lanelet_pose,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
-  -> std::optional<std::vector<CanonicalizedLaneletPose>>;
+  -> std::vector<CanonicalizedLaneletPose>;
 
 auto toMapPose(const CanonicalizedLaneletPose & lanelet_pose) -> geometry_msgs::msg::Pose;
 

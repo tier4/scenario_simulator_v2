@@ -85,11 +85,8 @@ auto EntityBase::isInPosition(
 auto EntityBase::isInPosition(const LaneletPose & lanelet_pose, const double tolerance) const
   -> bool
 {
-  if (const auto canonicalized_lanelet_pose = pose::canonicalize(lanelet_pose, hdmap_utils_ptr_)) {
-    return isInPosition(
-      static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose.value()), tolerance);
-  }
-  return false;
+  const auto canonicalized_lanelet_pose = pose::canonicalize(lanelet_pose, hdmap_utils_ptr_);
+  return isInPosition(static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose), tolerance);
 }
 
 auto EntityBase::isInLanelet(const lanelet::Id lanelet_id, std::optional<double> tolerance) const
@@ -610,18 +607,13 @@ auto EntityBase::setStatus(
   const LaneletPose & lanelet_pose, const traffic_simulator_msgs::msg::ActionStatus & action_status)
   -> void
 {
-  if (const auto canonicalized_lanelet_pose = pose::canonicalize(lanelet_pose, hdmap_utils_ptr_)) {
-    auto entity_status = static_cast<EntityStatus>(status_);
-    entity_status.action_status = action_status;
-    entity_status.pose = static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose.value());
-    entity_status.lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose.value());
-    entity_status.lanelet_pose_valid = true;
-    setStatus(entity_status);
-  } else {
-    std::stringstream ss;
-    ss << "Status can not be set. lanelet pose: " << lanelet_pose << " is not canonicalizable for ";
-    THROW_SEMANTIC_ERROR(ss.str(), " entity named: ", std::quoted(name), ".");
-  }
+  const auto canonicalized_lanelet_pose = pose::canonicalize(lanelet_pose, hdmap_utils_ptr_);
+  auto entity_status = static_cast<EntityStatus>(status_);
+  entity_status.action_status = action_status;
+  entity_status.pose = static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose);
+  entity_status.lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose);
+  entity_status.lanelet_pose_valid = true;
+  setStatus(entity_status);
 }
 
 auto EntityBase::setLinearVelocity(const double linear_velocity) -> void
@@ -743,6 +735,10 @@ auto EntityBase::requestSynchronize(
   const std::string & target_name, const LaneletPose & target_sync_pose,
   const LaneletPose & entity_target, const double target_speed, const double tolerance) -> bool
 {
+  const auto canonicalized_target_sync_pose =
+    pose::canonicalize(target_sync_pose, hdmap_utils_ptr_);
+  const auto canonicalized_entity_target = pose::canonicalize(entity_target, hdmap_utils_ptr_);
+
   if (tolerance == 0) {
     RCLCPP_WARN_ONCE(
       rclcpp::get_logger("traffic_simulator"),
@@ -760,16 +756,6 @@ auto EntityBase::requestSynchronize(
     }
     target_speed_ = target_speed;
     return true;
-  }
-
-  const auto canonicalized_target_sync_pose =
-    pose::canonicalize(target_sync_pose, hdmap_utils_ptr_);
-  const auto canonicalized_entity_target = pose::canonicalize(entity_target, hdmap_utils_ptr_);
-  if (!canonicalized_target_sync_pose || !canonicalized_entity_target) {
-    std::stringstream ss;
-    ss << "requestSynchronize(): any of the passed lanelet poses: " << target_sync_pose << " or "
-       << entity_target << " is empty (not filled),";
-    THROW_SEMANTIC_ERROR(ss.str(), " entity named: ", std::quoted(name), ".");
   }
 
   job_list_.append(
@@ -792,7 +778,7 @@ auto EntityBase::requestSynchronize(
           "requestSynchronize(): Failed to get lanelet pose of the target entity: ",
           std::quoted(target_name));
       } else if (const auto distance_to_entity_target_pose = longitudinalDistance(
-                   canonicalized_lanelet_pose.value(), canonicalized_entity_target.value(),
+                   canonicalized_lanelet_pose.value(), canonicalized_entity_target,
                    include_adjacent_lanelet, include_opposite_direction, allow_lane_change,
                    hdmap_utils_ptr_);
                  !distance_to_entity_target_pose.has_value()) {
@@ -801,9 +787,9 @@ auto EntityBase::requestSynchronize(
           "Check if the entity ",
           std::quoted(name), "has already passed the target lanelet.");
       } else if (const auto distance_to_target_sync_pose = longitudinalDistance(
-                   target_entity_canonicalized_lanelet_pose.value(),
-                   canonicalized_target_sync_pose.value(), include_adjacent_lanelet,
-                   include_opposite_direction, allow_lane_change, hdmap_utils_ptr_);
+                   target_entity_canonicalized_lanelet_pose.value(), canonicalized_target_sync_pose,
+                   include_adjacent_lanelet, include_opposite_direction, allow_lane_change,
+                   hdmap_utils_ptr_);
                  !distance_to_target_sync_pose.has_value() ||
                  distance_to_target_sync_pose.value() < 0) {
         RCLCPP_WARN_ONCE(

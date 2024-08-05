@@ -46,11 +46,20 @@ auto quietNaNLaneletPose() -> LaneletPose
 
 auto canonicalize(
   const LaneletPose & lanelet_pose,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
-  -> std::optional<CanonicalizedLaneletPose>
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> CanonicalizedLaneletPose
 {
+  auto isInfOrNan = [](auto x) constexpr { return std::isinf(x) or std::isnan(x); };
   if (lanelet_pose == LaneletPose()) {
-    return std::nullopt;
+    std::stringstream ss;
+    ss << lanelet_pose;
+    THROW_SEMANTIC_ERROR(ss.str(), " has default value - is not filled.");
+  } else if (
+    isInfOrNan(lanelet_pose.lanelet_id) || isInfOrNan(lanelet_pose.s) ||
+    isInfOrNan(lanelet_pose.offset) || isInfOrNan(lanelet_pose.rpy.x) ||
+    isInfOrNan(lanelet_pose.rpy.y) || isInfOrNan(lanelet_pose.rpy.z)) {
+    std::stringstream ss;
+    ss << lanelet_pose;
+    THROW_SEMANTIC_ERROR(ss.str(), " has NaN or inf value.");
   } else {
     return CanonicalizedLaneletPose(lanelet_pose, hdmap_utils_ptr);
   }
@@ -59,15 +68,11 @@ auto canonicalize(
 auto canonicalize(
   const std::vector<LaneletPose> & lanelet_poses,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
-  -> std::optional<std::vector<CanonicalizedLaneletPose>>
+  -> std::vector<CanonicalizedLaneletPose>
 {
   std::vector<CanonicalizedLaneletPose> canonicalized_lanelet_poses;
   for (const auto & lanelet_pose : lanelet_poses) {
-    if (const auto canonicalized_lanelet_pose = canonicalize(lanelet_pose, hdmap_utils_ptr)) {
-      canonicalized_lanelet_poses.push_back(canonicalized_lanelet_pose.value());
-    } else {
-      return std::nullopt;
-    }
+    canonicalized_lanelet_poses.push_back(pose::canonicalize(lanelet_pose, hdmap_utils_ptr));
   }
   return canonicalized_lanelet_poses;
 }
@@ -94,12 +99,12 @@ auto toLaneletPose(
   if (
     const auto lanelet_pose =
       hdmap_utils_ptr->toLaneletPose(map_pose, include_crosswalk, matching_distance)) {
-    if (
-      const auto canonicalized_lanelet_pose = canonicalize(lanelet_pose.value(), hdmap_utils_ptr)) {
-      return static_cast<LaneletPose>(canonicalized_lanelet_pose.value());
-    }
+    const auto canonicalized_lanelet_pose =
+      pose::canonicalize(lanelet_pose.value(), hdmap_utils_ptr);
+    return static_cast<LaneletPose>(canonicalized_lanelet_pose);
+  } else {
+    return std::nullopt;
   }
-  return std::nullopt;
 }
 
 auto toCanonicalizedLaneletPose(
@@ -227,7 +232,7 @@ auto relativeLaneletPose(
   if (const auto lateral_distance = lateralDistance(from, to, allow_lane_change, hdmap_utils_ptr)) {
     position.offset = lateral_distance.value();
   }
-  return CanonicalizedLaneletPose(position, hdmap_utils_ptr);
+  return pose::canonicalize(position, hdmap_utils_ptr);
 }
 
 auto boundingBoxRelativeLaneletPose(
@@ -254,7 +259,7 @@ auto boundingBoxRelativeLaneletPose(
       from, from_bounding_box, to, to_bounding_box, allow_lane_change, hdmap_utils_ptr)) {
     position.offset = lateral_bounding_box_distance.value();
   }
-  return CanonicalizedLaneletPose(position, hdmap_utils_ptr);
+  return pose::canonicalize(position, hdmap_utils_ptr);
 }
 
 auto isInLanelet(
@@ -343,7 +348,7 @@ auto transformToCanonicalizedLaneletPose(
         const auto end_of_road_lanelet_id =
           std::get<std::optional<lanelet::Id>>(canonicalized_tuple)) {
         if (lanelet_pose.value().s < 0) {
-          return CanonicalizedLaneletPose(
+          return pose::canonicalize(
             traffic_simulator_msgs::build<LaneletPose>()
               .lanelet_id(end_of_road_lanelet_id.value())
               .s(0.0)
@@ -351,7 +356,7 @@ auto transformToCanonicalizedLaneletPose(
               .rpy(lanelet_pose.value().rpy),
             hdmap_utils_ptr);
         } else {
-          return CanonicalizedLaneletPose(
+          return pose::canonicalize(
             traffic_simulator_msgs::build<LaneletPose>()
               .lanelet_id(end_of_road_lanelet_id.value())
               .s(hdmap_utils_ptr->getLaneletLength(end_of_road_lanelet_id.value()))

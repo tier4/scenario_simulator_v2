@@ -78,14 +78,10 @@ auto CanonicalizedLaneletPose::canonicalize(
       hdmap_utils->canonicalizeLaneletPose(may_non_canonicalized_lanelet_pose))) {
     return canonicalized.value();
   } else {
+    std::stringstream ss;
+    ss << may_non_canonicalized_lanelet_pose;
     THROW_SEMANTIC_ERROR(
-      "Lanelet pose (id=", may_non_canonicalized_lanelet_pose.lanelet_id,
-      ",s=", may_non_canonicalized_lanelet_pose.s,
-      ",offset=", may_non_canonicalized_lanelet_pose.offset,
-      ",rpy.x=", may_non_canonicalized_lanelet_pose.rpy.x,
-      ",rpy.y=", may_non_canonicalized_lanelet_pose.rpy.y,
-      ",rpy.z=", may_non_canonicalized_lanelet_pose.rpy.z,
-      ") is invalid, please check lanelet length and connection.");
+      ss.str(), " is invalid, please check lanelet length, connection and entity route.");
   }
 }
 
@@ -98,14 +94,10 @@ auto CanonicalizedLaneletPose::canonicalize(
       hdmap_utils->canonicalizeLaneletPose(may_non_canonicalized_lanelet_pose, route_lanelets))) {
     return canonicalized.value();
   } else {
+    std::stringstream ss;
+    ss << may_non_canonicalized_lanelet_pose;
     THROW_SEMANTIC_ERROR(
-      "Lanelet pose (id=", may_non_canonicalized_lanelet_pose.lanelet_id,
-      ",s=", may_non_canonicalized_lanelet_pose.s,
-      ",offset=", may_non_canonicalized_lanelet_pose.offset,
-      ",rpy.x=", may_non_canonicalized_lanelet_pose.rpy.x,
-      ",rpy.y=", may_non_canonicalized_lanelet_pose.rpy.y,
-      ",rpy.z=", may_non_canonicalized_lanelet_pose.rpy.z,
-      ") is invalid, please check lanelet length, connection and entity route.");
+      ss.str(), " is invalid, please check lanelet length, connection and entity route.");
   }
 }
 
