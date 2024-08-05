@@ -286,7 +286,9 @@ auto EgoEntity::setMapPose(const geometry_msgs::msg::Pose & map_pose) -> void
   entity_status.pose = map_pose;
   entity_status.lanelet_pose_valid = false;
   // prefer current lanelet on Autoware side
-  setStatus(entity_status, helper::getUniqueValues(getRouteLanelets()));
+  status_->set(
+    entity_status, helper::getUniqueValues(getRouteLanelets()),
+    getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
 }
 }  // namespace entity
 }  // namespace traffic_simulator
