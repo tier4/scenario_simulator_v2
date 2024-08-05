@@ -210,7 +210,7 @@ auto boundingBoxRelativePose(
 auto relativeLaneletPose(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
   const bool allow_lane_change, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
-  -> LaneletPose
+  -> CanonicalizedLaneletPose
 {
   constexpr bool include_adjacent_lanelet{false};
   constexpr bool include_opposite_direction{true};
@@ -227,7 +227,7 @@ auto relativeLaneletPose(
   if (const auto lateral_distance = lateralDistance(from, to, allow_lane_change, hdmap_utils_ptr)) {
     position.offset = lateral_distance.value();
   }
-  return position;
+  return CanonicalizedLaneletPose(position, hdmap_utils_ptr);
 }
 
 auto boundingBoxRelativeLaneletPose(
@@ -235,7 +235,7 @@ auto boundingBoxRelativeLaneletPose(
   const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
   const CanonicalizedLaneletPose & to,
   const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box, const bool allow_lane_change,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> LaneletPose
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> CanonicalizedLaneletPose
 {
   constexpr bool include_adjacent_lanelet{false};
   constexpr bool include_opposite_direction{true};
@@ -254,7 +254,7 @@ auto boundingBoxRelativeLaneletPose(
       from, from_bounding_box, to, to_bounding_box, allow_lane_change, hdmap_utils_ptr)) {
     position.offset = lateral_bounding_box_distance.value();
   }
-  return position;
+  return CanonicalizedLaneletPose(position, hdmap_utils_ptr);
 }
 
 auto isInLanelet(

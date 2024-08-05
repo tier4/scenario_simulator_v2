@@ -111,6 +111,10 @@ public:
     const speed_change::RelativeTargetSpeed &, const speed_change::Transition,
     const speed_change::Constraint, const bool continuous) -> void override;
 
+  virtual auto requestSynchronize(
+    const std::string & target_name, const LaneletPose & target_sync_pose,
+    const LaneletPose & entity_target, const double target_speed, const double tolerance) -> bool;
+
   void requestClearRoute() override;
 
   auto isControlledBySimulator() const -> bool override;

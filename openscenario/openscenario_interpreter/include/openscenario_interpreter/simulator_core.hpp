@@ -249,7 +249,7 @@ public:
         if (
           const auto pose = core->relativeLaneletPose(
             from_pose_or_entity_name, to_pose_or_entity_name, allow_lane_change)) {
-          return pose.value().offset;
+          return pose->getLaneletPose().offset;
         }
       }
       return std::numeric_limits<double>::quiet_NaN();
@@ -265,7 +265,7 @@ public:
         if (
           const auto pose = core->relativeLaneletPose(
             from_pose_or_entity_name, to_pose_or_entity_name, allow_lane_change)) {
-          return pose.value().s;
+          return pose->getLaneletPose().s;
         }
       }
       return std::numeric_limits<double>::quiet_NaN();
@@ -281,7 +281,7 @@ public:
         if (
           const auto pose = core->boundingBoxRelativeLaneletPose(
             from_pose_or_entity_name, to_pose_or_entity_name, allow_lane_change)) {
-          return pose.value().offset;
+          return pose->getLaneletPose().offset;
         }
       }
       return std::numeric_limits<double>::quiet_NaN();
@@ -297,7 +297,7 @@ public:
         if (
           const auto pose = core->boundingBoxRelativeLaneletPose(
             from_pose_or_entity_name, to_pose_or_entity_name, allow_lane_change)) {
-          return pose.value().s;
+          return pose->getLaneletPose().s;
         }
       }
       return std::numeric_limits<double>::quiet_NaN();

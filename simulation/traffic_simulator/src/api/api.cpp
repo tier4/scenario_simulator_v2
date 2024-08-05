@@ -437,7 +437,7 @@ auto API::relativePose(
 
 auto API::relativeLaneletPose(
   const std::string & from_entity_name, const std::string & to_entity_name,
-  const bool allow_lane_change) -> std::optional<LaneletPose>
+  const bool allow_lane_change) -> std::optional<CanonicalizedLaneletPose>
 {
   const auto from_entity = getEntity(from_entity_name);
   const auto to_entity = getEntity(to_entity_name);
@@ -452,7 +452,7 @@ auto API::relativeLaneletPose(
 
 auto API::relativeLaneletPose(
   const std::string & from_entity_name, const LaneletPose & to_lanelet_pose,
-  const bool allow_lane_change) -> std::optional<LaneletPose>
+  const bool allow_lane_change) -> std::optional<CanonicalizedLaneletPose>
 {
   const auto from_entity = getEntity(from_entity_name);
   const auto to_canonicalized_lanelet_pose =
@@ -468,7 +468,7 @@ auto API::relativeLaneletPose(
 
 auto API::relativeLaneletPose(
   const LaneletPose & from_lanelet_pose, const std::string & to_entity_name,
-  const bool allow_lane_change) -> std::optional<LaneletPose>
+  const bool allow_lane_change) -> std::optional<CanonicalizedLaneletPose>
 {
   const auto to_entity = getEntity(to_entity_name);
   const auto from_canonicalized_lanelet_pose =
@@ -484,7 +484,7 @@ auto API::relativeLaneletPose(
 
 auto API::boundingBoxRelativeLaneletPose(
   const std::string & from_entity_name, const std::string & to_entity_name,
-  const bool allow_lane_change) -> std::optional<LaneletPose>
+  const bool allow_lane_change) -> std::optional<CanonicalizedLaneletPose>
 {
   const auto from_entity = getEntity(from_entity_name);
   const auto to_entity = getEntity(to_entity_name);
@@ -500,7 +500,7 @@ auto API::boundingBoxRelativeLaneletPose(
 
 auto API::boundingBoxRelativeLaneletPose(
   const std::string & from_entity_name, const LaneletPose & to_lanelet_pose,
-  const bool allow_lane_change) -> std::optional<LaneletPose>
+  const bool allow_lane_change) -> std::optional<CanonicalizedLaneletPose>
 {
   const auto from_entity = getEntity(from_entity_name);
   const auto to_canonicalized_lanelet_pose =
