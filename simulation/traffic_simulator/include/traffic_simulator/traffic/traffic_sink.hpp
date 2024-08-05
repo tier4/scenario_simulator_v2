@@ -26,6 +26,8 @@
 #ifndef TRAFFIC_SIMULATOR__TRAFFIC__TRAFFIC_SINK_HPP_
 #define TRAFFIC_SIMULATOR__TRAFFIC__TRAFFIC_SINK_HPP_
 
+#include <lanelet2_core/geometry/Lanelet.h>
+
 #include <functional>
 #include <geometry_msgs/msg/pose.hpp>
 #include <string>
@@ -40,13 +42,16 @@ class TrafficSink : public TrafficModuleBase
 {
 public:
   explicit TrafficSink(
-    double radius, const geometry_msgs::msg::Point & position,
+    lanelet::Id lanelet_id, double radius, const geometry_msgs::msg::Point & position,
     const std::function<std::vector<std::string>(void)> & get_entity_names_function,
     const std::function<geometry_msgs::msg::Pose(const std::string &)> & get_entity_pose_function,
     const std::function<void(std::string)> & despawn_function);
+  const lanelet::Id lanelet_id;
   const double radius;
   const geometry_msgs::msg::Point position;
   void execute(const double current_time, const double step_time) override;
+  auto appendDebugMarker(visualization_msgs::msg::MarkerArray & marker_array) const
+    -> void override;
 
 private:
   const std::function<std::vector<std::string>(void)> get_entity_names_function;

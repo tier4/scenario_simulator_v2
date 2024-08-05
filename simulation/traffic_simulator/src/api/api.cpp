@@ -355,6 +355,7 @@ bool API::updateFrame()
   clock_.update();
   clock_pub_->publish(clock_.getCurrentRosTimeAsMsg());
   debug_marker_pub_->publish(entity_manager_ptr_->makeDebugMarker());
+  debug_marker_pub_->publish(traffic_controller_ptr_->makeDebugMarker());
   return true;
 }
 
