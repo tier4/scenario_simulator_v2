@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__POISSON_DISTRIBUTION_HPP_
-#define OPENSCENARIO_INTERPRETER__POISSON_DISTRIBUTION_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__POISSON_DISTRIBUTION_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__POISSON_DISTRIBUTION_HPP_
 
+#include <openscenario_interpreter/parameter_distribution.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/range.hpp>
@@ -24,17 +25,21 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- PoissonDistribution 1.2 ------------------------------------------------
- *
- *  <xsd:complexType name="PoissonDistribution">
- *    <xsd:sequence>
- *      <xsd:element name="Range" type="Range"/>
- *    </xsd:sequence>
- *    <xsd:attribute name="expectedValue" type="Double" use="required"/>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
-struct PoissonDistribution : public ComplexType, private Scope
+/*
+   PoissonDistribution (OpenSCENARIO XML 1.3)
+
+   Poisson distribution which can be applied to a single parameter.
+
+   <xsd:complexType name="PoissonDistribution">
+     <xsd:sequence>
+       <xsd:element name="Range" type="Range" minOccurs="0"/>
+     </xsd:sequence>
+     <xsd:attribute name="expectedValue" type="Double" use="required"/>
+   </xsd:complexType>
+*/
+struct PoissonDistribution : public ComplexType,
+                             private Scope,
+                             public StochasticParameterDistributionBase
 {
   const Range range;
 
@@ -42,12 +47,10 @@ struct PoissonDistribution : public ComplexType, private Scope
 
   std::poisson_distribution<> distribute;
 
-  std::mt19937 random_engine;
-
   explicit PoissonDistribution(const pugi::xml_node &, Scope & scope);
 
-  auto evaluate() -> Object;
+  auto derive() -> Object override;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
-#endif  // OPENSCENARIO_INTERPRETER__POISSON_DISTRIBUTION_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__POISSON_DISTRIBUTION_HPP_
