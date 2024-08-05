@@ -17,6 +17,7 @@
 #include <cmath>
 #include <geometry/polygon/line_segment.hpp>
 #include <geometry/quaternion/euler_to_quaternion.hpp>
+#include <geometry/quaternion/quaternion_to_euler.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 
 #include "../expect_eq_macros.hpp"
@@ -326,97 +327,120 @@ TEST(LineSegment, getSValue_parallelDenormalize)
   EXPECT_FALSE(s);
 }
 
-/// @brief In this test case, testing the `LineSegment::getPoint` function can find the point on the line segment with start point (x,y,z) = (0,0,0) and end point (x,y,z) = (1,1,1) in the cartesian coordinate system. (variable name `line`).
-TEST(LineSegment, GetPoint)
+TEST(LineSegment, GetPoint_outOfBounds_denormalized)
 {
-  {
-    math::geometry::LineSegment line(
-      geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0),
-      geometry_msgs::build<geometry_msgs::msg::Point>().x(1).y(1).z(1));
-    /// @note If s = 0 and denormalize_s = false, the return value of the `getPoint` function should be a start point of the `line`.
-    /// If the `denormalize_s = false`, the return value `s` of the function is normalized and in range `s = [0,1]`.
-    // [Snippet_getPoint_with_s_0]
-    EXPECT_POINT_EQ(
-      line.getPoint(0, false), geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0));
-    // [Snippet_getPoint_with_s_0]
-    /// @snippet test/test_line_segment.cpp Snippet_getPoint_with_s_0
+  const auto line =
+    math::geometry::LineSegment(makePoint(-1.0, -2.0, 1.0), makePoint(3.0, 2.0, -1.0));
+  ASSERT_DOUBLE_EQ(line.getLength(), 6.0);
 
-    /// @note If s = 0 and denormalize_s = false, the return value of the `LineSegment::getPoint` function should be a end point of the `line`.
-    /// If the `denormalize_s = false`, the return value `s` of the function is normalized and in range `s = [0,1]`.
-    // [Snippet_getPoint_with_s_1]
-    EXPECT_POINT_EQ(
-      line.getPoint(1, false), geometry_msgs::build<geometry_msgs::msg::Point>().x(1).y(1).z(1));
-    // [Snippet_getPoint_with_s_1]
-    /// @snippet test/test_line_segment.cpp Snippet_getPoint_with_s_1
-
-    /// @note If s = sqrt(3) and denormalize_s = true, the return value of the `LineSegment::getPoint` function should be a end point of the `line`.
-    /// If the `denormalize_s = true`, the return value `s` is denormalized and it returns the value `s` times the length of the curve.
-    // [Snippet_getPoint_with_sqrt_3_denormalized]
-    EXPECT_POINT_EQ(
-      line.getPoint(std::sqrt(3), true),
-      geometry_msgs::build<geometry_msgs::msg::Point>().x(1).y(1).z(1));
-    // [Snippet_getPoint_with_sqrt_3_denormalized]
-    /// @snippet test/test_line_segment.cpp Snippet_getPoint_with_sqrt_3_denormalized
-
-    /// @note If s is not in range s = [0,1], testing the `LineSegment::getPoint` function can throw error. If s is not in range s = [0,1], it means the point is not on the line.
-    // [Snippet_getPoint_out_of_range]
-    EXPECT_THROW(line.getPoint(2, false), common::SimulationError);
-    EXPECT_THROW(line.getPoint(-1, false), common::SimulationError);
-    // [Snippet_getPoint_out_of_range]
-    /// @snippet test/test_line_segment.cpp Snippet_getPoint_out_of_range
-
-    /// @note If s is not in range s = [0,sqrt(3)] and denormalize, testing the `LineSegment::getPoint` function can throw error. If s is not in range s = [0,sqrt(3)], it means the point is not on the line.
-    // [Snippet_getPoint_out_of_range_with_denormalize]
-    EXPECT_THROW(line.getPoint(2, true), common::SimulationError);
-    EXPECT_THROW(line.getPoint(-1, true), common::SimulationError);
-    EXPECT_NO_THROW(line.getPoint(0, true));
-    EXPECT_NO_THROW(line.getPoint(std::sqrt(3.0), true));
-    // [Snippet_getPoint_out_of_range_with_denormalize]
-    /// @snippet test/test_line_segment.cpp Snippet_getPoint_out_of_range_with_denormalize
-  }
+  EXPECT_THROW(line.getPoint(7.0, true), common::SimulationError);
+  EXPECT_THROW(line.getPoint(-1.0, true), common::SimulationError);
 }
 
-/// @brief In this test case, testing the `LineSegment::getPose` function can find the pose on the line segment with start point (x,y,z) = (0,0,0) and end point (x,y,z) = (0,0,1) in the cartesian coordinate system. (variable name `line`).
-TEST(LineSegment, GetPose)
+TEST(LineSegment, GetPoint_outOfBounds_normalized)
 {
-  {
-    math::geometry::LineSegment line(
-      geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0),
-      geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(1));
-    /// @note When the `s = 0`(1st argument of the `LineSegment::getPose` function), the return value of the `LineSegment::getPose` function should be a start point of the `line`.
-    /// Orientation should be defined by the direction of the `line`, so the orientation should be parallel to the z axis.
-    // [Snippet_getPose_with_s_0]
-    EXPECT_POSE_EQ(
-      line.getPose(0, false, false),
-      geometry_msgs::build<geometry_msgs::msg::Pose>()
-        .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0))
-        .orientation(geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0).y(0).z(0).w(1)));
-    EXPECT_POSE_EQ(
-      line.getPose(0, false, true),
-      geometry_msgs::build<geometry_msgs::msg::Pose>()
-        .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0))
-        .orientation(math::geometry::convertEulerAngleToQuaternion(
-          geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0).y(-M_PI * 0.5).z(0))));
-    // [Snippet_getPose_with_s_0]
-    /// @snippet test/test_line_segment.cpp Snippet_getPose_with_s_0
+  const auto line =
+    math::geometry::LineSegment(makePoint(-1.0, -2.0, 1.0), makePoint(3.0, 2.0, -1.0));
+  ASSERT_DOUBLE_EQ(line.getLength(), 6.0);
 
-    /// @note When the `s = 1`(1st argument of the `LineSegment::getPose` function), the return value of the `LineSegment::getPose` function should be an end point of the `line`.
-    /// Orientation should be defined by the direction of the `line`, so the orientation should be parallel to the z axis.
-    // [Snippet_getPose_with_s_1]
-    EXPECT_POSE_EQ(
-      line.getPose(1, false, false),
-      geometry_msgs::build<geometry_msgs::msg::Pose>()
-        .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(1))
-        .orientation(geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0).y(0).z(0).w(1)));
-    EXPECT_POSE_EQ(
-      line.getPose(1, false, true),
-      geometry_msgs::build<geometry_msgs::msg::Pose>()
-        .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(1))
-        .orientation(math::geometry::convertEulerAngleToQuaternion(
-          geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0).y(-M_PI * 0.5).z(0))));
-    // [Snippet_getPose_with_s_1]
-    /// @snippet test/test_line_segment.cpp Snippet_getPose_with_s_1
-  }
+  EXPECT_THROW(line.getPoint(1.1, false), common::SimulationError);
+  EXPECT_THROW(line.getPoint(-0.1, false), common::SimulationError);
+}
+
+TEST(LineSegment, GetPoint_inside_denormalized)
+{
+  const auto line =
+    math::geometry::LineSegment(makePoint(-1.0, -2.0, 1.0), makePoint(3.0, 2.0, -1.0));
+  ASSERT_DOUBLE_EQ(line.getLength(), 6.0);
+
+  EXPECT_POINT_EQ(line.getPoint(0.0, true), makePoint(-1.0, -2.0, 1.0));
+  EXPECT_POINT_EQ(line.getPoint(3.0, true), makePoint(1.0, 0.0, 0.0));
+  EXPECT_POINT_EQ(line.getPoint(6.0, true), makePoint(3.0, 2.0, -1.0));
+}
+
+TEST(LineSegment, GetPoint_inside_normalized)
+{
+  const auto line =
+    math::geometry::LineSegment(makePoint(-1.0, -2.0, 1.0), makePoint(3.0, 2.0, -1.0));
+  ASSERT_DOUBLE_EQ(line.getLength(), 6.0);
+
+  EXPECT_POINT_EQ(line.getPoint(0.0, false), makePoint(-1.0, -2.0, 1.0));
+  EXPECT_POINT_EQ(line.getPoint(0.5, false), makePoint(1.0, 0.0, 0.0));
+  EXPECT_POINT_EQ(line.getPoint(1.0, false), makePoint(3.0, 2.0, -1.0));
+}
+
+TEST(LineSegment, getPose_denormalized)
+{
+  const auto line =
+    math::geometry::LineSegment(makePoint(-1.0, -2.0, 0.0), makePoint(3.0, 2.0, 4.0));
+  const double length = 4.0 * std::sqrt(3.0);
+  ASSERT_DOUBLE_EQ(line.getLength(), length);
+
+  EXPECT_POSE_EQ(
+    line.getPose(0.0 * length, true, false),
+    makePose(
+      -1.0, -2.0, 0.0,
+      math::geometry::convertEulerAngleToQuaternion(makeVector(0.0, 0.0, M_PI_4))));
+
+  EXPECT_POSE_EQ(
+    line.getPose(0.5 * length, true, false),
+    makePose(
+      1.0, 0.0, 2.0, math::geometry::convertEulerAngleToQuaternion(makeVector(0.0, 0.0, M_PI_4))));
+
+  EXPECT_POSE_EQ(
+    line.getPose(1.0 * length, true, false),
+    makePose(
+      3.0, 2.0, 4.0, math::geometry::convertEulerAngleToQuaternion(makeVector(0.0, 0.0, M_PI_4))));
+}
+
+TEST(LineSegment, getPose_normalized)
+{
+  const auto line =
+    math::geometry::LineSegment(makePoint(-1.0, -2.0, 0.0), makePoint(3.0, 2.0, 4.0));
+  const double length = 4.0 * std::sqrt(3.0);
+  ASSERT_DOUBLE_EQ(line.getLength(), length);
+
+  EXPECT_POSE_EQ(
+    line.getPose(0.0, false, false),
+    makePose(
+      -1.0, -2.0, 0.0,
+      math::geometry::convertEulerAngleToQuaternion(makeVector(0.0, 0.0, M_PI_4))));
+
+  EXPECT_POSE_EQ(
+    line.getPose(0.5, false, false),
+    makePose(
+      1.0, 0.0, 2.0, math::geometry::convertEulerAngleToQuaternion(makeVector(0.0, 0.0, M_PI_4))));
+
+  EXPECT_POSE_EQ(
+    line.getPose(1.0, false, false),
+    makePose(
+      3.0, 2.0, 4.0, math::geometry::convertEulerAngleToQuaternion(makeVector(0.0, 0.0, M_PI_4))));
+}
+
+TEST(LineSegment, getPose_pitch)
+{
+  const auto line = math::geometry::LineSegment(
+    makePoint(-1.0, -2.0, 0.0 * std::sqrt(2.0)), makePoint(3.0, 2.0, 4.0 * std::sqrt(2.0)));
+  const double length = 8.0;
+  ASSERT_DOUBLE_EQ(line.getLength(), length);
+
+  EXPECT_POSE_EQ(
+    line.getPose(0.0 * length, true, true),
+    makePose(
+      -1.0, -2.0, 0.0 * std::sqrt(2.0),
+      math::geometry::convertEulerAngleToQuaternion(makeVector(0.0, -M_PI_4, M_PI_4))));
+
+  EXPECT_POSE_EQ(
+    line.getPose(0.5 * length, true, true),
+    makePose(
+      1.0, 0.0, 2.0 * std::sqrt(2.0),
+      math::geometry::convertEulerAngleToQuaternion(makeVector(0.0, -M_PI_4, M_PI_4))));
+
+  EXPECT_POSE_EQ(
+    line.getPose(1.0 * length, true, true),
+    makePose(
+      3.0, 2.0, 4.0 * std::sqrt(2.0),
+      math::geometry::convertEulerAngleToQuaternion(makeVector(0.0, -M_PI_4, M_PI_4))));
 }
 
 /// @brief In this test case, we check collision with the point and the line segment with start point (x,y,z) = (0,-1,0) and end point (x,y,z) = (0,1,0) in the cartesian coordinate system. (variable name `line`).
