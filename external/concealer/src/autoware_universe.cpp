@@ -16,6 +16,7 @@
 
 namespace concealer
 {
+using autoware_auto_vehicle_msgs::srv::ControlModeCommand;
 AutowareUniverse::AutowareUniverse()
 : getAckermannControlCommand("/control/command/control_cmd", *this),
   getGearCommandImpl("/control/command/gear_cmd", *this),
@@ -29,6 +30,26 @@ AutowareUniverse::AutowareUniverse()
   setControlModeReport("/vehicle/status/control_mode", *this),
   setVelocityReport("/vehicle/status/velocity_status", *this),
   setTurnIndicatorsReport("/vehicle/status/turn_indicators_status", *this),
+  control_mode_request_server(create_service<ControlModeCommand>(
+    "/control/control_mode_request",
+    [this](
+      const ControlModeCommand::Request::SharedPtr request,
+      ControlModeCommand::Response::SharedPtr response) {
+      using autoware_auto_vehicle_msgs::msg::ControlModeReport;
+      if (request->mode == ControlModeCommand::Request::AUTONOMOUS) {
+        current_control_mode.store(ControlModeReport::AUTONOMOUS);
+        response->success = true;
+      } else if (request->mode == ControlModeCommand::Request::MANUAL) {
+        /*
+          NOTE:
+            MANUAL request will come when a remote override is triggered.
+            But scenario_simulator_v2 don't support a remote override for now.
+        */
+        response->success = false;
+      } else {
+        response->success = false;
+      }
+    })),
   // Autoware.Universe requires localization topics to send data at 50Hz
   localization_update_timer(rclcpp::create_timer(
     this, get_clock(), std::chrono::milliseconds(20), [this]() { updateLocalization(); })),
@@ -109,11 +130,7 @@ auto AutowareUniverse::updateLocalization() -> void
 
 auto AutowareUniverse::updateVehicleState() -> void
 {
-  setControlModeReport([this]() {
-    autoware_auto_vehicle_msgs::msg::ControlModeReport message;
-    message.mode = autoware_auto_vehicle_msgs::msg::ControlModeReport::AUTONOMOUS;
-    return message;
-  }());
+  setControlModeReport(getControlModeReport());
 
   setGearReport([this]() {
     autoware_auto_vehicle_msgs::msg::GearReport message;
@@ -178,5 +195,23 @@ auto AutowareUniverse::getRouteLanelets() const -> std::vector<std::int64_t>
     std::copy(point.lane_ids.begin(), point.lane_ids.end(), std::back_inserter(ids));
   }
   return ids;
+}
+
+auto AutowareUniverse::getControlModeReport() const
+  -> autoware_auto_vehicle_msgs::msg::ControlModeReport
+{
+  autoware_auto_vehicle_msgs::msg::ControlModeReport message;
+  message.mode = current_control_mode.load();
+  return message;
+}
+
+auto AutowareUniverse::setAutonomousMode() -> void
+{
+  current_control_mode.store(autoware_auto_vehicle_msgs::msg::ControlModeReport::AUTONOMOUS);
+}
+
+auto AutowareUniverse::setManualMode() -> void
+{
+  current_control_mode.store(autoware_auto_vehicle_msgs::msg::ControlModeReport::MANUAL);
 }
 }  // namespace concealer

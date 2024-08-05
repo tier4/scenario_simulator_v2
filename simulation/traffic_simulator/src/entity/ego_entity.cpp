@@ -155,6 +155,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
         getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
       setStatus(CanonicalizedEntityStatus(*updated_status, canonicalized_lanelet_pose));
     } else {
+      field_operator_application->enableAutowareControl();
       is_controlled_by_simulator_ = false;
     }
   }
