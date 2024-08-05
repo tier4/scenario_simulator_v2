@@ -203,8 +203,6 @@ public:
 
   auto getEntity(const std::string & name) const -> std::shared_ptr<entity::EntityBase>;
 
-  auto getEntityOrNullptr(const std::string & name) const -> std::shared_ptr<entity::EntityBase>;
-
   // entities - respawn, despawn, reset
   /**
    * @brief Reset behavior plugin of the target entity.

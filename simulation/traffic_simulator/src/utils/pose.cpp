@@ -63,8 +63,8 @@ auto canonicalize(
 {
   std::vector<CanonicalizedLaneletPose> canonicalized_lanelet_poses;
   for (const auto & lanelet_pose : lanelet_poses) {
-    if (const auto canonicalzied_lanelet_pose = canonicalize(lanelet_pose, hdmap_utils_ptr)) {
-      canonicalized_lanelet_poses.push_back(canonicalzied_lanelet_pose.value());
+    if (const auto canonicalized_lanelet_pose = canonicalize(lanelet_pose, hdmap_utils_ptr)) {
+      canonicalized_lanelet_poses.push_back(canonicalized_lanelet_pose.value());
     } else {
       return std::nullopt;
     }
@@ -88,10 +88,12 @@ auto toMapPose(
 
 auto toLaneletPose(
   const geometry_msgs::msg::Pose & map_pose, const bool include_crosswalk,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<LaneletPose>
+  const double matching_distance, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+  -> std::optional<LaneletPose>
 {
-  /// @todo here matching_distance should be passed
-  if (const auto lanelet_pose = hdmap_utils_ptr->toLaneletPose(map_pose, include_crosswalk)) {
+  if (
+    const auto lanelet_pose =
+      hdmap_utils_ptr->toLaneletPose(map_pose, include_crosswalk, matching_distance)) {
     if (
       const auto canonicalized_lanelet_pose = canonicalize(lanelet_pose.value(), hdmap_utils_ptr)) {
       return static_cast<LaneletPose>(canonicalized_lanelet_pose.value());

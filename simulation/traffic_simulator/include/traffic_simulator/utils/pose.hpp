@@ -45,7 +45,8 @@ auto toMapPose(
 
 auto toLaneletPose(
   const geometry_msgs::msg::Pose & map_pose, const bool include_crosswalk,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<LaneletPose>;
+  const double matching_distance, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+  -> std::optional<LaneletPose>;
 
 auto toCanonicalizedLaneletPose(
   const geometry_msgs::msg::Pose & map_pose, const bool include_crosswalk,

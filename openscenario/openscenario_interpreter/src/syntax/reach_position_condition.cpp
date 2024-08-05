@@ -62,6 +62,7 @@ static double hypot(const double x, const double y, const double z, const bool c
 auto ReachPositionCondition::evaluate() -> Object
 {
   // TODO USE DistanceCondition::distance
+  /// @note here is no check if entity exists
   results.clear();
   return asBoolean(triggering_entities.apply([&](const auto & triggering_entity) {
     results.push_back(triggering_entity.apply([&](const auto & object) {

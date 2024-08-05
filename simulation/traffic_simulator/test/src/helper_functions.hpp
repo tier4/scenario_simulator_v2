@@ -70,11 +70,11 @@ auto makeHdMapUtilsSharedPointer() -> std::shared_ptr<hdmap_utils::HdMapUtils>
       .altitude(0.0));
 }
 
-auto makeLaneletPose(const long int lane_id, const double s = 0)
+auto makeLaneletPose(const int lanelet_id, const double s = 0)
   -> traffic_simulator_msgs::msg::LaneletPose
 {
   traffic_simulator_msgs::msg::LaneletPose lanelet_pose;
-  lanelet_pose.lanelet_id = lane_id;
+  lanelet_pose.lanelet_id = lanelet_id;
   lanelet_pose.s = s;
   return lanelet_pose;
 }

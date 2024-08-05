@@ -46,7 +46,9 @@ class API
 {
 public:
   template <typename NodeT, typename AllocatorT = std::allocator<void>, typename... Ts>
-  explicit API(NodeT && node, const Configuration & configuration, Ts &&... xs)
+  explicit API(
+    NodeT && node, const Configuration & configuration, const double realtime_factor,
+    const double frame_rate)
   : configuration_(configuration),
     node_parameters_(
       rclcpp::node_interfaces::get_node_parameters_interface(std::forward<NodeT>(node))),
@@ -55,7 +57,7 @@ public:
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
     debug_marker_pub_(rclcpp::create_publisher<visualization_msgs::msg::MarkerArray>(
       node, "debug_marker", rclcpp::QoS(100), rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
-    clock_(getROS2Parameter<bool>("use_sim_time", true), std::forward<decltype(xs)>(xs)...),
+    clock_(getROS2Parameter<bool>("use_sim_time", true), realtime_factor, frame_rate),
     zeromq_client_(
       simulation_interface::protocol, configuration.simulator_host,
       getROS2Parameter<int>("port", 5555)),
@@ -212,8 +214,6 @@ public:
   auto getEntityNames() const -> std::vector<std::string>;
 
   auto getEntity(const std::string & name) const -> std::shared_ptr<entity::EntityBase>;
-
-  auto getEntityOrNullptr(const std::string & name) const -> std::shared_ptr<entity::EntityBase>;
 
   // entities - respawn, despawn, reset
   auto resetBehaviorPlugin(const std::string & name, const std::string & behavior_plugin_name)

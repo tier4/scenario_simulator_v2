@@ -130,12 +130,6 @@ auto RelativeDistanceCondition::distance<
   }
 }
 
-// @todo: after checking all the scenario work well with consider_z = true, remove this function and use std::hypot(x,y,z)
-static double hypot(const double x, const double y, const double z, const bool consider_z)
-{
-  return consider_z ? std::hypot(x, y, z) : std::hypot(x, y);
-}
-
 template <>
 auto RelativeDistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, RoutingAlgorithm::undefined,

@@ -58,6 +58,7 @@ RelativeObjectPosition::operator NativeWorldPosition() const
   world_origin_pose.orientation.z = 0;
   world_origin_pose.orientation.w = 1;
 
+  /// @note here is no check if entity exists
   const auto reference_pose_in_world =
     makeNativeRelativeWorldPosition(world_origin_pose, entity_ref);
 

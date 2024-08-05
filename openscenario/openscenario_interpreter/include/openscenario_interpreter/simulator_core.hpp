@@ -29,7 +29,7 @@ namespace openscenario_interpreter
 {
 using NativeWorldPosition = geometry_msgs::msg::Pose;
 
-using NativeRelativeWorldPosition = NativeWorldPosition;
+using NativeRelativeWorldPosition = geometry_msgs::msg::Pose;
 
 using NativeLanePosition = traffic_simulator::LaneletPose;
 
@@ -40,19 +40,20 @@ class SimulatorCore
   static inline std::unique_ptr<traffic_simulator::API> core = nullptr;
 
 public:
-  template <typename Node, typename... Ts>
+  template <typename NodeType>
   static auto activate(
-    const Node & node, const traffic_simulator::Configuration & configuration, Ts &&... xs) -> void
+    const NodeType & node, const traffic_simulator::Configuration & configuration,
+    const double realtime_factor, const double frame_rate) -> void
   {
     if (not active()) {
-      core = std::make_unique<traffic_simulator::API>(
-        node, configuration, std::forward<decltype(xs)>(xs)...);
+      core =
+        std::make_unique<traffic_simulator::API>(node, configuration, realtime_factor, frame_rate);
     } else {
       throw Error("The simulator core has already been instantiated.");
     }
   }
 
-  static auto activateNonUserDefinedControllers() { return core->startNpcLogic(); }
+  static auto activateNonUserDefinedControllers() -> void { core->startNpcLogic(); }
 
   static auto active() -> bool { return static_cast<bool>(core); }
 
@@ -74,10 +75,11 @@ public:
       -> const traffic_simulator::LaneletPose
     {
       constexpr bool include_crosswalk{false};
+      constexpr double matching_distance{1.0};
       if (
-        const auto result = traffic_simulator::pose::toLaneletPose(
-          map_pose, include_crosswalk, core->getHdmapUtils())) {
-        return result.value();
+        const auto lanelet_pose = traffic_simulator::pose::toLaneletPose(
+          map_pose, include_crosswalk, matching_distance, core->getHdmapUtils())) {
+        return lanelet_pose.value();
       } else {
         throw Error(
           "The specified WorldPosition = [", map_pose.position.x, ", ", map_pose.position.y, ", ",
@@ -87,7 +89,8 @@ public:
           "there are at least two or more candidates for a LanePosition that "
           "can be approximated to that WorldPosition. This issue can be "
           "resolved by strictly specifying the location using LanePosition "
-          "instead of WorldPosition");
+          "instead of WorldPosition. Used: include_crosswalk==",
+          include_crosswalk, ", matching_distance==", matching_distance, ".");
       }
     }
 
@@ -101,18 +104,25 @@ public:
       const geometry_msgs::msg::Pose & from_map_pose, const std::string & to_entity_name)
       -> const geometry_msgs::msg::Pose
     {
-      if (core->isEntitySpawned(to_entity_name)) {
-        if (const auto relative_pose = core->relativePose(from_map_pose, to_entity_name)) {
-          return relative_pose.value();
-        }
+      if (!core->isEntitySpawned(to_entity_name)) {
+        throw Error("Reference entity ", std::quoted(to_entity_name), " not exist.");
+      } else if (const auto relative_pose = core->relativePose(from_map_pose, to_entity_name);
+                 !relative_pose) {
+        throw Error(
+          "Cannot transform WorldPosition = [", from_map_pose.position.x, ", ",
+          from_map_pose.position.y, ", ", from_map_pose.position.z, "] in relation to ",
+          std::quoted(to_entity_name), " pose.");
+      } else {
+        return relative_pose.value();
       }
-      return traffic_simulator::pose::quietNaNPose();
     }
   };
 
   class DistanceConditionEvaluation
   {
   private:
+    /// @note this function is necessary because on the OpenScenarioInterpreter side
+    /// there is sometimes no check if the eniity (triggering, reference) exists
     template <typename FirstType, typename SecondType>
     static auto prerequisite(
       const FirstType & from_pose_or_entity_name, const SecondType & to_pose_or_entity_name) -> bool
@@ -297,17 +307,19 @@ public:
   class ActionApplication
   {
   protected:
-    template <typename... Ts>
-    static auto applyAddEntityAction(const std::string & entity_name, Ts &&... xs) -> bool
+    template <typename PoseType, typename ParamsType>
+    static auto applyAddEntityAction(
+      const std::string & entity_name, const PoseType & pose, const ParamsType & parameters,
+      const std::string & behavior, const std::string & model3d) -> bool
     {
-      return static_cast<bool>(core->spawn(entity_name, std::forward<decltype(xs)>(xs)...));
+      return static_cast<bool>(core->spawn(entity_name, pose, parameters, behavior, model3d));
     }
 
     /// @note this is called during AddEntityAction
-    template <typename Performance, typename Properties>
+    template <typename PerformanceType, typename PropertiesType>
     static auto activatePerformanceAssertion(
-      const std::string & entity_name, const Performance & performance,
-      const Properties & properties) -> void
+      const std::string & entity_name, const PerformanceType & performance,
+      const PropertiesType & properties) -> void
     {
       core->getEntity(entity_name)
         ->activateOutOfRangeJob(
@@ -322,9 +334,9 @@ public:
       return core->despawn(entity_name);
     }
 
-    template <typename Controller>
+    template <typename ControllerType>
     static auto applyAssignControllerAction(
-      const std::string & entity_name, Controller && controller) -> void
+      const std::string & entity_name, ControllerType && controller) -> void
     {
       auto entity = core->getEntity(entity_name);
       entity->setVelocityLimit(controller.properties.template get<Double>(
@@ -438,12 +450,8 @@ public:
     static auto applyTeleportAction(
       const std::string & name, const std::string & reference_entity_name, Ts &&... xs) -> void
     {
-      if (const auto reference_entity = core->getEntityOrNullptr(reference_entity_name)) {
-        core->getEntity(name)->setStatus(
-          reference_entity->getMapPose(), std::forward<decltype(xs)>(xs)...);
-      } else {
-        throw Error("Reference entity ", std::quoted(reference_entity_name), " does not exist");
-      }
+      core->getEntity(name)->setStatus(
+        core->getEntity(reference_entity_name)->getMapPose(), std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>
@@ -487,7 +495,7 @@ public:
       const std::string & entity_name, const DynamicConstraints & dynamic_constraints) -> void
     {
       auto entity = core->getEntity(entity_name);
-      return entity->setBehaviorParameter([&]() {
+      entity->setBehaviorParameter([&]() {
         auto behavior_parameter = entity->getBehaviorParameter();
         if (not std::isinf(dynamic_constraints.max_speed)) {
           behavior_parameter.dynamic_constraints.max_speed = dynamic_constraints.max_speed;
@@ -527,17 +535,29 @@ public:
 
     static auto evaluateStandStill(const std::string & entity_name) -> double
     {
-      return core->getEntity(entity_name)->getStandStillDuration();
+      if (core->isEntitySpawned(entity_name)) {
+        return core->getEntity(entity_name)->getStandStillDuration();
+      } else {
+        return std::numeric_limits<double>::quiet_NaN();
+      }
     }
 
     static auto evaluateSpeed(const std::string & entity_name) -> double
     {
-      return core->getEntity(entity_name)->getCurrentTwist().linear.x;
+      if (core->isEntitySpawned(entity_name)) {
+        return core->getEntity(entity_name)->getCurrentTwist().linear.x;
+      } else {
+        return std::numeric_limits<double>::quiet_NaN();
+      }
     }
 
     static auto evaluateAcceleration(const std::string & entity_name) -> double
     {
-      return core->getEntity(entity_name)->getCurrentAccel().linear.x;
+      if (core->isEntitySpawned(entity_name)) {
+        return core->getEntity(entity_name)->getCurrentAccel().linear.x;
+      } else {
+        return std::numeric_limits<double>::quiet_NaN();
+      }
     }
 
     static auto evaluateCollisionCondition(
@@ -562,9 +582,13 @@ public:
     }
 
     // Evaluate - user defined condition
-    static auto evaluateCurrentState(const std::string & entity_name) -> std::string
+    static auto evaluateCurrentState(const std::string & entity_name) -> const std::string
     {
-      return core->getEntity(entity_name)->getCurrentAction();
+      if (core->isEntitySpawned(entity_name)) {
+        return core->getEntity(entity_name)->getCurrentAction();
+      } else {
+        return "not spawned";
+      }
     }
 
     static auto evaluateRelativeHeading(
@@ -595,7 +619,7 @@ public:
   protected:
     static auto engage(const std::string & ego_name) -> void
     {
-      return core->getEgoEntity(ego_name)->engage();
+      core->getEgoEntity(ego_name)->engage();
     }
 
     static auto isEngageable(const std::string & ego_name) -> bool
@@ -612,25 +636,26 @@ public:
       -> void
     {
       /// @note here ego name is not passed from OpenScenarioInterpreter, it uses first found
-      return core->getEgoEntity()->sendCooperateCommand(module_name, command);
+      core->getEgoEntity()->sendCooperateCommand(module_name, command);
     }
 
-    static auto getMinimumRiskManeuverBehaviorName(const std::string & ego_name) -> std::string
+    static auto getMinimumRiskManeuverBehaviorName(const std::string & ego_name)
+      -> const std::string
     {
       return core->getEgoEntity(ego_name)->getMinimumRiskManeuverBehaviorName();
     }
 
-    static auto getMinimumRiskManeuverStateName(const std::string & ego_name) -> std::string
+    static auto getMinimumRiskManeuverStateName(const std::string & ego_name) -> const std::string
     {
       return core->getEgoEntity(ego_name)->getMinimumRiskManeuverStateName();
     }
 
-    static auto getEmergencyStateName(const std::string & ego_name) -> std::string
+    static auto getEmergencyStateName(const std::string & ego_name) -> const std::string
     {
       return core->getEgoEntity(ego_name)->getEmergencyStateName();
     }
 
-    static auto getTurnIndicatorsCommandName(const std::string & ego_name) -> std::string
+    static auto getTurnIndicatorsCommandName(const std::string & ego_name) -> const std::string
     {
       return core->getEgoEntity(ego_name)->getTurnIndicatorsCommandName();
     }
@@ -642,14 +667,13 @@ public:
     static auto setConventionalTrafficLightsState(
       const lanelet::Id lanelet_id, const std::string & state) -> void
     {
-      return core->getConventionalTrafficLights()->setTrafficLightsState(lanelet_id, state);
+      core->getConventionalTrafficLights()->setTrafficLightsState(lanelet_id, state);
     }
 
     static auto setConventionalTrafficLightConfidence(
       const lanelet::Id lanelet_id, const double confidence) -> void
     {
-      return core->getConventionalTrafficLights()->setTrafficLightsConfidence(
-        lanelet_id, confidence);
+      core->getConventionalTrafficLights()->setTrafficLightsConfidence(lanelet_id, confidence);
     }
 
     static auto getConventionalTrafficLightsComposedState(const lanelet::Id lanelet_id)
@@ -666,18 +690,18 @@ public:
 
     static auto resetConventionalTrafficLightPublishRate(const double update_rate) -> void
     {
-      return core->getConventionalTrafficLights()->resetUpdate(update_rate);
+      core->getConventionalTrafficLights()->resetUpdate(update_rate);
     }
 
     static auto setV2ITrafficLightsState(const lanelet::Id lanelet_id, const std::string & state)
       -> void
     {
-      return core->getV2ITrafficLights()->setTrafficLightsState(lanelet_id, state);
+      core->getV2ITrafficLights()->setTrafficLightsState(lanelet_id, state);
     }
 
     static auto resetV2ITrafficLightPublishRate(const double update_rate) -> void
     {
-      return core->getV2ITrafficLights()->resetUpdate(update_rate);
+      core->getV2ITrafficLights()->resetUpdate(update_rate);
     }
   };
 };

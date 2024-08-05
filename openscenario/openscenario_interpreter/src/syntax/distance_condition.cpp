@@ -145,8 +145,12 @@ auto DistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, RoutingAlgorithm::undefined,
   false>(const EntityRef & triggering_entity) const -> double
 {
-  return euclideanDistance(
-    triggering_entity, static_cast<NativeWorldPosition>(position), consider_z);
+  if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
+    return euclideanDistance(
+      triggering_entity, static_cast<NativeWorldPosition>(position), consider_z);
+  } else {
+    return std::numeric_limits<double>::quiet_NaN();
+  }
 }
 
 template <>
@@ -154,8 +158,12 @@ auto DistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, RoutingAlgorithm::undefined,
   true>(const EntityRef & triggering_entity) const -> double
 {
-  return euclideanBoundingBoxDistance(
-    triggering_entity, static_cast<NativeWorldPosition>(position), consider_z);
+  if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
+    return euclideanBoundingBoxDistance(
+      triggering_entity, static_cast<NativeWorldPosition>(position), consider_z);
+  } else {
+    return std::numeric_limits<double>::quiet_NaN();
+  }
 }
 
 template <>
@@ -163,7 +171,11 @@ auto DistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::lateral, RoutingAlgorithm::undefined, false>(
   const EntityRef & triggering_entity) const -> double
 {
-  return lateralEntityDistance(triggering_entity, static_cast<NativeWorldPosition>(position));
+  if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
+    return lateralEntityDistance(triggering_entity, static_cast<NativeWorldPosition>(position));
+  } else {
+    return std::numeric_limits<double>::quiet_NaN();
+  }
 }
 
 template <>
@@ -171,8 +183,12 @@ auto DistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::lateral, RoutingAlgorithm::undefined, true>(
   const EntityRef & triggering_entity) const -> double
 {
-  return lateralEntityBoundingBoxDistance(
-    triggering_entity, static_cast<NativeWorldPosition>(position));
+  if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
+    return lateralEntityBoundingBoxDistance(
+      triggering_entity, static_cast<NativeWorldPosition>(position));
+  } else {
+    return std::numeric_limits<double>::quiet_NaN();
+  }
 }
 
 template <>
@@ -180,7 +196,12 @@ auto DistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::longitudinal, RoutingAlgorithm::undefined, false>(
   const EntityRef & triggering_entity) const -> double
 {
-  return longitudinalEntityDistance(triggering_entity, static_cast<NativeWorldPosition>(position));
+  if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
+    return longitudinalEntityDistance(
+      triggering_entity, static_cast<NativeWorldPosition>(position));
+  } else {
+    return std::numeric_limits<double>::quiet_NaN();
+  }
 }
 
 template <>
@@ -188,8 +209,12 @@ auto DistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::longitudinal, RoutingAlgorithm::undefined, true>(
   const EntityRef & triggering_entity) const -> double
 {
-  return longitudinalEntityBoundingBoxDistance(
-    triggering_entity, static_cast<NativeWorldPosition>(position));
+  if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
+    return longitudinalEntityBoundingBoxDistance(
+      triggering_entity, static_cast<NativeWorldPosition>(position));
+  } else {
+    return std::numeric_limits<double>::quiet_NaN();
+  }
 }
 
 template <>

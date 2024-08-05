@@ -263,11 +263,6 @@ auto API::getEntity(const std::string & name) const -> std::shared_ptr<entity::E
   return entity_manager_ptr_->getEntity(name);
 }
 
-auto API::getEntityOrNullptr(const std::string & name) const -> std::shared_ptr<entity::EntityBase>
-{
-  return entity_manager_ptr_->getEntityOrNullptr(name);
-}
-
 // entities - respawn, despawn, reset
 auto API::resetBehaviorPlugin(const std::string & name, const std::string & behavior_plugin_name)
   -> void
@@ -359,9 +354,10 @@ auto API::laneletRelativeYaw(
   const std::string & entity_name, const LaneletPose & lanelet_pose) const -> std::optional<double>
 {
   const auto entity = getEntity(entity_name);
+  const auto canonicalized_lanelet_pose = CanonicalizedLaneletPose(lanelet_pose, getHdmapUtils());
   if (
-    const auto relative_pose =
-      pose::relativePose(entity->getMapPose(), pose::toMapPose(lanelet_pose, getHdmapUtils()))) {
+    const auto relative_pose = pose::relativePose(
+      entity->getMapPose(), static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose))) {
     return math::geometry::convertQuaternionToEulerAngle(relative_pose.value().orientation).z;
   } else {
     return std::nullopt;
