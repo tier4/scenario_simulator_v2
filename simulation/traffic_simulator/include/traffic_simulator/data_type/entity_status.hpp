@@ -70,7 +70,6 @@ public:
   auto getLaneletId() const noexcept -> lanelet::Id;
   auto getLaneletIds() const noexcept -> lanelet::Ids;
   auto getLaneletPose() const noexcept -> const LaneletPose &;
-  ;
   auto getCanonicalizedLaneletPose() const noexcept
     -> const std::optional<CanonicalizedLaneletPose> &;
 
