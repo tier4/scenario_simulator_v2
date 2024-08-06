@@ -54,6 +54,9 @@ TEST(Vector3, hypot_customVector)
   EXPECT_DOUBLE_EQ(math::geometry::hypot(vec0, vec1), 6.0);
 }
 
+/**
+ * @note Test function correctness with parameter that is ros message vector.
+ */
 TEST(Vector3, norm_msgVector)
 {
   geometry_msgs::msg::Vector3 vec0 = makeVector(1.0, 2.0, 3.0);
@@ -190,6 +193,9 @@ TEST(Vector3, additionAssignment_customVector)
   EXPECT_VECTOR3_EQ(vec0, makeVector(0.0, 0.0, 2.0));
 }
 
+/**
+ * @note Test function correctness when one of the vectors has length of 0.
+ */
 TEST(Vector3, normalize_zeroLength)
 {
   geometry_msgs::msg::Vector3 vec;

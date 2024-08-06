@@ -70,6 +70,9 @@ TEST(LineSegment, initializeVectorZeroLength)
   EXPECT_POINT_EQ(line_segment.end_point, point);
 }
 
+/**
+ * @note Test error throwing when s is out of bounds.
+ */
 TEST(LineSegment, getPoint_outOfBounds_denormalized)
 {
   const auto line =
@@ -80,6 +83,9 @@ TEST(LineSegment, getPoint_outOfBounds_denormalized)
   EXPECT_THROW(line.getPoint(-1.0, true), common::SimulationError);
 }
 
+/**
+ * @note Test error throwing when normalized s is out of bounds.
+ */
 TEST(LineSegment, getPoint_outOfBounds_normalized)
 {
   const auto line =
@@ -90,6 +96,9 @@ TEST(LineSegment, getPoint_outOfBounds_normalized)
   EXPECT_THROW(line.getPoint(-0.1, false), common::SimulationError);
 }
 
+/**
+ * @note Test calculation correctness when s is out of bounds.
+ */
 TEST(LineSegment, getPoint_inside_denormalized)
 {
   const auto line =
@@ -101,6 +110,9 @@ TEST(LineSegment, getPoint_inside_denormalized)
   EXPECT_POINT_EQ(line.getPoint(6.0, true), makePoint(3.0, 2.0, -1.0));
 }
 
+/**
+ * @note Test calculation correctness when normalized s is out of bounds.
+ */
 TEST(LineSegment, getPoint_inside_normalized)
 {
   const auto line =
@@ -112,6 +124,9 @@ TEST(LineSegment, getPoint_inside_normalized)
   EXPECT_POINT_EQ(line.getPoint(1.0, false), makePoint(3.0, 2.0, -1.0));
 }
 
+/**
+ * @note Test calculation correctness with denormalized s.
+ */
 TEST(LineSegment, getPose_denormalized)
 {
   const auto line =
@@ -136,6 +151,9 @@ TEST(LineSegment, getPose_denormalized)
       3.0, 2.0, 4.0, math::geometry::convertEulerAngleToQuaternion(makeVector(0.0, 0.0, M_PI_4))));
 }
 
+/**
+ * @note Test calculation correctness with normalized s.
+ */
 TEST(LineSegment, getPose_normalized)
 {
   const auto line =
@@ -160,6 +178,9 @@ TEST(LineSegment, getPose_normalized)
       3.0, 2.0, 4.0, math::geometry::convertEulerAngleToQuaternion(makeVector(0.0, 0.0, M_PI_4))));
 }
 
+/**
+ * @note Test pitch calculation correctness with fill_pitch = true.
+ */
 TEST(LineSegment, getPose_pitch)
 {
   const auto line = math::geometry::LineSegment(
@@ -206,6 +227,9 @@ TEST(LineSegment, isIntersect2DIdentical)
   EXPECT_TRUE(line.isIntersect2D(line));
 }
 
+/**
+ * @note Test function behavior with a point on the line.
+ */
 TEST(LineSegment, isIntersect2D_pointInside)
 {
   const auto line =
@@ -215,6 +239,9 @@ TEST(LineSegment, isIntersect2D_pointInside)
   EXPECT_TRUE(line.isIntersect2D(makePoint(0.0, -1.0, 0.0)));
 }
 
+/**
+ * @note Test function behavior with a point outside of the line.
+ */
 TEST(LineSegment, isIntersect2D_pointOutside)
 {
   const auto line =
@@ -227,6 +254,9 @@ TEST(LineSegment, isIntersect2D_pointOutside)
   EXPECT_FALSE(line.isIntersect2D(makePoint(4.0, 0.0, 0.0)));
 }
 
+/**
+ * @note Test function behavior with a point that is collinear and external to the line.
+ */
 TEST(LineSegment, isIntersect2D_pointCollinear)
 {
   const auto line =
@@ -239,6 +269,9 @@ TEST(LineSegment, isIntersect2D_pointCollinear)
   EXPECT_FALSE(line.isIntersect2D(makePoint(4.0, 3.0, 0.0)));
 }
 
+/**
+ * @note Test function behavior with a point on an end of the line.
+ */
 TEST(LineSegment, isIntersect2D_pointOnEnd)
 {
   const auto line =
@@ -251,6 +284,9 @@ TEST(LineSegment, isIntersect2D_pointOnEnd)
   EXPECT_TRUE(line.isIntersect2D(makePoint(3.0, 2.0, -5.0)));
 }
 
+/**
+ * @note Test result correctness with a line intersecting with a vertical line.
+ */
 TEST(LineSegment, getIntersection2DSValue_line_vertical)
 {
   const auto line =
@@ -269,6 +305,9 @@ TEST(LineSegment, getIntersection2DSValue_line_vertical)
   }
 }
 
+/**
+ * @note Test result correctness with a line intersecting with a horizontal line.
+ */
 TEST(LineSegment, getIntersection2DSValue_line_horizontal)
 {
   const auto line =
@@ -287,6 +326,9 @@ TEST(LineSegment, getIntersection2DSValue_line_horizontal)
   }
 }
 
+/**
+ * @note Test result correctness with lines intersecting at the start and end of a line.
+ */
 TEST(LineSegment, getIntersection2DSValue_line_bounds)
 {
   const auto line =
@@ -305,6 +347,9 @@ TEST(LineSegment, getIntersection2DSValue_line_bounds)
   }
 }
 
+/**
+ * @note Test result correctness with a line outside of the line.
+ */
 TEST(LineSegment, getIntersection2DSValue_line_outside)
 {
   const auto line =
@@ -323,6 +368,9 @@ TEST(LineSegment, getIntersection2DSValue_line_outside)
       .has_value());
 }
 
+/**
+ * @note Test result correctness when lines are collinear.
+ */
 TEST(LineSegment, getIntersection2DSValue_line_collinear)
 {
   const auto line =
@@ -337,6 +385,9 @@ TEST(LineSegment, getIntersection2DSValue_line_collinear)
       .has_value());
 }
 
+/**
+ * @note Test result correctness with a point inside a vertical line.
+ */
 TEST(LineSegment, getIntersection2DSValue_point_vertical)
 {
   const auto line =
@@ -360,6 +411,9 @@ TEST(LineSegment, getIntersection2DSValue_point_vertical)
   }
 }
 
+/**
+ * @note Test result correctness with a point inside a horizontal line.
+ */
 TEST(LineSegment, getIntersection2DSValue_point_horizontal)
 {
   const auto line =
@@ -383,6 +437,9 @@ TEST(LineSegment, getIntersection2DSValue_point_horizontal)
   }
 }
 
+/**
+ * @note Test result correctness with points at the start and end of a line.
+ */
 TEST(LineSegment, getIntersection2DSValue_point_bounds)
 {
   const auto line =
@@ -419,6 +476,9 @@ TEST(LineSegment, getIntersection2DSValue_point_bounds)
   }
 }
 
+/**
+ * @note Test result correctness with a point outside of the line.
+ */
 TEST(LineSegment, getIntersection2DSValue_point_outside)
 {
   const auto line =
@@ -447,6 +507,9 @@ TEST(LineSegment, getIntersection2DDisjoint)
   EXPECT_FALSE(line0.getIntersection2D(line1));
 }
 
+/**
+ * @note Test function behavior with two intersecting lines.
+ */
 TEST(LineSegment, getIntersection2DIntersect)
 {
   const auto line0 = math::geometry::LineSegment(makePoint(0.0, 0.0), makePoint(1.0, 1.0));
@@ -461,6 +524,9 @@ TEST(LineSegment, getIntersection2DIntersect)
   EXPECT_POINT_EQ(p1.value(), makePoint(0.5, 0.5));
 }
 
+/**
+ * @note Test function behavior with two identical lines.
+ */
 TEST(LineSegment, getIntersection2DIdentical)
 {
   const auto line = math::geometry::LineSegment(makePoint(0.0, 0.0), makePoint(1.0, 1.0));

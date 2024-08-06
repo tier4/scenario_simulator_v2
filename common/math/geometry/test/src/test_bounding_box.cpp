@@ -46,6 +46,9 @@ TEST(BoundingBox, getPointsFromBboxCustom)
   EXPECT_POINT_EQ(points[3], makePoint(6.5, -2.0, 1.0));
 }
 
+/**
+ * @note Test obtaining polygon from bounding box with no transformation applied.
+ */
 TEST(BoundingBox, toPolygon2D_zeroPose)
 {
   geometry_msgs::msg::Pose pose;
@@ -61,6 +64,9 @@ TEST(BoundingBox, toPolygon2D_zeroPose)
   EXPECT_BOOST_POINT_2D_AND_POINT_EQ(poly.outer()[4], makePoint(1.0, 1.0));
 }
 
+/**
+ * @note Test obtaining polygon from bounding box with only translation applied.
+ */
 TEST(BoundingBox, toPolygon2D_onlyTranslation)
 {
   geometry_msgs::msg::Pose pose = makePose(1.0, 2.0);
@@ -76,6 +82,9 @@ TEST(BoundingBox, toPolygon2D_onlyTranslation)
   EXPECT_BOOST_POINT_2D_AND_POINT_EQ(poly.outer()[4], makePoint(2.0, 3.0));
 }
 
+/**
+ * @note Test obtaining polygon from bounding box with full transformation applied (translation + rotation).
+ */
 TEST(BoundingBox, toPolygon2D_fullPose)
 {
   geometry_msgs::msg::Pose pose = makePose(1.0, 2.0);
