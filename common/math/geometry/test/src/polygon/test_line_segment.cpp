@@ -97,6 +97,27 @@ TEST(LineSegment, getIntersection2DDisjoint)
   EXPECT_FALSE(line0.getIntersection2D(line1));
 }
 
+TEST(LineSegment, getIntersection2DIntersect)
+{
+  const auto line0 = math::geometry::LineSegment(makePoint(0.0, 0.0), makePoint(1.0, 1.0));
+  const auto line1 = math::geometry::LineSegment(makePoint(1.0, 0.0), makePoint(0.0, 1.0));
+
+  const auto p0 = line0.getIntersection2D(line1);
+  const auto p1 = line1.getIntersection2D(line0);
+
+  ASSERT_TRUE(p0.has_value());
+  ASSERT_TRUE(p1.has_value());
+  EXPECT_POINT_EQ(p0.value(), makePoint(0.5, 0.5));
+  EXPECT_POINT_EQ(p1.value(), makePoint(0.5, 0.5));
+}
+
+TEST(LineSegment, getIntersection2DIdentical)
+{
+  const auto line = math::geometry::LineSegment(makePoint(0.0, 0.0), makePoint(1.0, 1.0));
+
+  EXPECT_THROW(line.getIntersection2D(line), common::SimulationError);
+}
+
 TEST(LineSegment, getVector)
 {
   const math::geometry::LineSegment line(makePoint(1.0, 2.0, 3.0), makePoint(2.0, 3.0, 4.0));
