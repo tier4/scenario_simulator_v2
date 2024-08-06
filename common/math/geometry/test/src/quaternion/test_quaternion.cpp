@@ -23,6 +23,9 @@
 
 constexpr double EPS = 1e-6;
 
+/**
+ * @note Test result correctness with a basic example.
+ */
 TEST(Quaternion, operator_addition)
 {
   using math::geometry::operator+;
@@ -33,6 +36,9 @@ TEST(Quaternion, operator_addition)
   EXPECT_QUATERNION_EQ(ans, math::geometry::makeQuaternion(0, 2, 0, 2))
 }
 
+/**
+ * @note Test result correctness with a basic example.
+ */
 TEST(Quaternion, operator_subtraction)
 {
   using math::geometry::operator-;
@@ -43,6 +49,9 @@ TEST(Quaternion, operator_subtraction)
   EXPECT_QUATERNION_EQ(ans, math::geometry::makeQuaternion(0, 0, 0, 0))
 }
 
+/**
+ * @note Test result correctness with a basic example.
+ */
 TEST(Quaternion, operator_multiplication)
 {
   using math::geometry::operator*;
@@ -53,6 +62,9 @@ TEST(Quaternion, operator_multiplication)
   EXPECT_QUATERNION_EQ(ans, math::geometry::makeQuaternion(0, 2, 0, 0))
 }
 
+/**
+ * @note Test result correctness with a basic example.
+ */
 TEST(Quaternion, operator_additionAssignment)
 {
   using math::geometry::operator+=;
