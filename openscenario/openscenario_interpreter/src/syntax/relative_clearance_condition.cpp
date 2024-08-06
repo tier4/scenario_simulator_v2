@@ -32,22 +32,7 @@ RelativeClearanceCondition::RelativeClearanceCondition(
   free_space(readAttribute<Boolean>("freeSpace", node, scope)),
   opposite_lanes(readAttribute<Boolean>("oppositeLanes", node, scope)),
   relative_lane_range(readElements<RelativeLaneRange, 0>("RelativeLaneRange", node, scope)),
-  entity_refs([&]() {
-    auto entities = readElements<EntityRef, 0>("EntityRef", node, scope);
-    if (entities.empty()) {
-      for (const auto & entity : *global().entities) {
-        if (
-          std::find_if(
-            triggering_entities.entity_refs.begin(), triggering_entities.entity_refs.end(),
-            [&](const auto & triggering_entity) {
-              return triggering_entity.name() == entity.first;
-            }) == triggering_entities.entity_refs.end()) {
-          entities.emplace_back(entity.first);
-        }
-      }
-    }
-    return entities;
-  }()),
+  entity_refs(readElements<EntityRef, 0>("EntityRef", node, scope)),
   triggering_entities(triggering_entities)
 {
 }
@@ -85,9 +70,27 @@ auto RelativeClearanceCondition::description() const -> String
 
 auto RelativeClearanceCondition::evaluate() -> Object
 {
+  auto target_entities = [&]() {
+    if (not entity_refs.empty()) {
+      return entity_refs;
+    } else {
+      std::list<EntityRef> entities;
+      for (const auto & entity : *global().entities) {
+        if (
+          std::find_if(
+            triggering_entities.entity_refs.begin(), triggering_entities.entity_refs.end(),
+            [&](const auto & triggering_entity) {
+              return triggering_entity.name() == entity.first;
+            }) == triggering_entities.entity_refs.end()) {
+          entities.emplace_back(entity.first);
+        }
+      }
+      return entities;
+    }
+  }();
   return asBoolean(triggering_entities.apply([&](const auto & triggering_entity) {
     return std::all_of(
-      entity_refs.begin(), entity_refs.end(),
+      target_entities.begin(), target_entities.end(),
       [&, is_back =
             (std::abs(evaluateRelativeHeading(triggering_entity)) >
              0.5 * boost::math::constants::pi<double>())](const auto & entity) {
