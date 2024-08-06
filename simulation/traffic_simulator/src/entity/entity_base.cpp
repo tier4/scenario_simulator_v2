@@ -740,19 +740,21 @@ auto EntityBase::requestSynchronize(
   const auto canonicalized_entity_target = pose::canonicalize(entity_target, hdmap_utils_ptr_);
 
   if (tolerance == 0) {
-    RCLCPP_WARN_ONCE(
+    RCLCPP_WARN_STREAM_ONCE(
       rclcpp::get_logger("traffic_simulator"),
-      "requestSynchronize(): the tolerance is set to 0.0. This may cause the entity ",
-      std::quoted(name), " to never reach the target lanelet.");
+      "requestSynchronize(): the tolerance is set to 0.0. This may cause the entity "
+        << std::quoted(name) << " to never reach the target lanelet.");
   }
 
   ///@brief Check if the entity has already arrived to the target lanelet.
   if (isInPosition(entity_target, tolerance)) {
     if (getCurrentTwist().linear.x < target_speed + getMaxAcceleration() * step_time_) {
     } else {
-      RCLCPP_WARN_ONCE(
-        rclcpp::get_logger("traffic_simulator"), "requestSynchronize(): the entity ",
-        std::quoted(name), " has already arrived to the target lanelet, it is not nearly stopped.");
+      RCLCPP_WARN_STREAM_ONCE(
+        rclcpp::get_logger("traffic_simulator"),
+        "requestSynchronize(): the entity "
+          << std::quoted(name)
+          << " has already arrived to the target lanelet, it is not nearly stopped.");
     }
     target_speed_ = target_speed;
     return true;
@@ -792,11 +794,11 @@ auto EntityBase::requestSynchronize(
                    hdmap_utils_ptr_);
                  !distance_to_target_sync_pose.has_value() ||
                  distance_to_target_sync_pose.value() < 0) {
-        RCLCPP_WARN_ONCE(
+        RCLCPP_WARN_STREAM_ONCE(
           rclcpp::get_logger("traffic_simulator"),
-          "requestSynchronize(): Failed to get distance between target entity and target lanelet "
-          "pose or the distance is negative. Check if target entity ",
-          std::quoted(target_name), " has already passed the target lanelet.");
+          "requestSynchronize(): Failed to get distance between target entity and target "
+            << "lanelet pose or the distance is negative. Check if target entity "
+            << std::quoted(target_name) << " has already passed the target lanelet.");
         return true;
       } else {
         const auto target_entity_velocity =
