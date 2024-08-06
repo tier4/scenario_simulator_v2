@@ -346,8 +346,9 @@ auto API::checkCollision(
     return math::geometry::checkCollision2D(
       first_entity->getMapPose(), first_entity->getBoundingBox(), second_entity->getMapPose(),
       second_entity->getBoundingBox());
+  } else {
+    return false;
   }
-  return false;
 }
 
 auto API::laneletRelativeYaw(
@@ -383,11 +384,15 @@ auto API::timeHeadway(const std::string & from_entity_name, const std::string & 
 auto API::boundingBoxDistance(
   const std::string & from_entity_name, const std::string & to_entity_name) -> std::optional<double>
 {
-  const auto from_entity = getEntity(from_entity_name);
-  const auto to_entity = getEntity(to_entity_name);
-  return distance::boundingBoxDistance(
-    from_entity->getMapPose(), from_entity->getBoundingBox(), to_entity->getMapPose(),
-    to_entity->getBoundingBox());
+  if (from_entity_name != to_entity_name) {
+    const auto from_entity = getEntity(from_entity_name);
+    const auto to_entity = getEntity(to_entity_name);
+    return distance::boundingBoxDistance(
+      from_entity->getMapPose(), from_entity->getBoundingBox(), to_entity->getMapPose(),
+      to_entity->getBoundingBox());
+  } else {
+    return std::nullopt;
+  }
 }
 
 auto API::boundingBoxRelativePose(
@@ -404,19 +409,27 @@ auto API::boundingBoxRelativePose(
   const std::string & from_entity_name, const std::string & to_entity_name)
   -> std::optional<geometry_msgs::msg::Pose>
 {
-  const auto from_entity = getEntity(from_entity_name);
-  const auto to_entity = getEntity(to_entity_name);
-  return pose::boundingBoxRelativePose(
-    from_entity->getMapPose(), from_entity->getBoundingBox(), to_entity->getMapPose(),
-    to_entity->getBoundingBox());
+  if (from_entity_name != to_entity_name) {
+    const auto from_entity = getEntity(from_entity_name);
+    const auto to_entity = getEntity(to_entity_name);
+    return pose::boundingBoxRelativePose(
+      from_entity->getMapPose(), from_entity->getBoundingBox(), to_entity->getMapPose(),
+      to_entity->getBoundingBox());
+  } else {
+    return std::nullopt;
+  }
 }
 
 auto API::relativePose(const std::string & from_entity_name, const std::string & to_entity_name)
   -> std::optional<geometry_msgs::msg::Pose>
 {
-  const auto from_entity = getEntity(from_entity_name);
-  const auto to_entity = getEntity(to_entity_name);
-  return pose::relativePose(from_entity->getMapPose(), to_entity->getMapPose());
+  if (from_entity_name != to_entity_name) {
+    const auto from_entity = getEntity(from_entity_name);
+    const auto to_entity = getEntity(to_entity_name);
+    return pose::relativePose(from_entity->getMapPose(), to_entity->getMapPose());
+  } else {
+    return std::nullopt;
+  }
 }
 
 auto API::relativePose(
@@ -441,13 +454,14 @@ auto API::relativeLaneletPose(
 {
   const auto from_entity = getEntity(from_entity_name);
   const auto to_entity = getEntity(to_entity_name);
-  if (from_entity->isInLanelet() && to_entity->isInLanelet()) {
-    return pose::relativeLaneletPose(
-      from_entity->getCanonicalizedLaneletPose().value(),
-      to_entity->getCanonicalizedLaneletPose().value(), allow_lane_change, getHdmapUtils());
-  } else {
-    return std::nullopt;
+  if (from_entity_name != to_entity_name) {
+    if (from_entity->isInLanelet() && to_entity->isInLanelet()) {
+      return pose::relativeLaneletPose(
+        from_entity->getCanonicalizedLaneletPose().value(),
+        to_entity->getCanonicalizedLaneletPose().value(), allow_lane_change, getHdmapUtils());
+    }
   }
+  return std::nullopt;
 }
 
 auto API::relativeLaneletPose(
@@ -486,14 +500,15 @@ auto API::boundingBoxRelativeLaneletPose(
 {
   const auto from_entity = getEntity(from_entity_name);
   const auto to_entity = getEntity(to_entity_name);
-  if (from_entity->isInLanelet() && to_entity->isInLanelet()) {
-    return pose::boundingBoxRelativeLaneletPose(
-      from_entity->getCanonicalizedLaneletPose().value(), from_entity->getBoundingBox(),
-      to_entity->getCanonicalizedLaneletPose().value(), to_entity->getBoundingBox(),
-      allow_lane_change, getHdmapUtils());
-  } else {
-    return std::nullopt;
+  if (from_entity_name != to_entity_name) {
+    if (from_entity->isInLanelet() && to_entity->isInLanelet()) {
+      return pose::boundingBoxRelativeLaneletPose(
+        from_entity->getCanonicalizedLaneletPose().value(), from_entity->getBoundingBox(),
+        to_entity->getCanonicalizedLaneletPose().value(), to_entity->getBoundingBox(),
+        allow_lane_change, getHdmapUtils());
+    }
   }
+  return std::nullopt;
 }
 
 auto API::boundingBoxRelativeLaneletPose(
