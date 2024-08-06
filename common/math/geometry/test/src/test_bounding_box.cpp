@@ -46,7 +46,7 @@ TEST(BoundingBox, getPointsFromBboxCustom)
   EXPECT_POINT_EQ(points[3], makePoint(6.5, -2.0, 1.0));
 }
 
-TEST(BoundingBox, get2DPolygonZeroPose)
+TEST(BoundingBox, toPolygon2D_zeroPose)
 {
   geometry_msgs::msg::Pose pose;
   traffic_simulator_msgs::msg::BoundingBox bounding_box = makeBbox(2.0, 2.0, 2.0);
@@ -61,7 +61,7 @@ TEST(BoundingBox, get2DPolygonZeroPose)
   EXPECT_BOOST_POINT_2D_AND_POINT_EQ(poly.outer()[4], makePoint(1.0, 1.0));
 }
 
-TEST(BoundingBox, get2DPolygonOnlyTranslation)
+TEST(BoundingBox, toPolygon2D_onlyTranslation)
 {
   geometry_msgs::msg::Pose pose = makePose(1.0, 2.0);
   traffic_simulator_msgs::msg::BoundingBox bounding_box = makeBbox(2.0, 2.0, 2.0);
@@ -76,7 +76,7 @@ TEST(BoundingBox, get2DPolygonOnlyTranslation)
   EXPECT_BOOST_POINT_2D_AND_POINT_EQ(poly.outer()[4], makePoint(2.0, 3.0));
 }
 
-TEST(BoundingBox, get2DPolygonFullPose)
+TEST(BoundingBox, toPolygon2D_fullPose)
 {
   geometry_msgs::msg::Pose pose = makePose(1.0, 2.0);
   pose.orientation = math::geometry::convertEulerAngleToQuaternion(
