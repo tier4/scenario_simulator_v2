@@ -320,7 +320,7 @@ TEST(HermiteCurveTest, getSValue)
   EXPECT_NEAR(s2.value(), 1.0, EPS);
 }
 
-TEST(HermiteCurveTest, getSValueAutoscale)
+TEST(HermiteCurveTest, getSValueDenormalized)
 {
   const auto curve = makeLine2();
 
