@@ -503,7 +503,7 @@ TEST(HermiteCurveTest, getTangentVector4)
   EXPECT_DOUBLE_EQ(curve.getTangentVector(0.5, false).y / norm, 1.0 / std::sqrt(2.0));
 }
 
-TEST(HermiteCurveTest, getTangentVectorAutoscale1)
+TEST(HermiteCurveTest, getTangentVectorDenormalized1)
 {  //p(0,0) v(1,0)-> p(1,1) v(0,1)
   const auto curve = makeCurve1();
   constexpr double eps = 0.1;
@@ -513,7 +513,7 @@ TEST(HermiteCurveTest, getTangentVectorAutoscale1)
   EXPECT_NEAR(curve.getTangentVector(0.75, true).y / norm, 1.0 / std::sqrt(2.0), eps);
 }
 
-TEST(HermiteCurveTest, getTangentVectorAutoscale2)
+TEST(HermiteCurveTest, getTangentVectorDenormalized2)
 {  //p(0,0) v(1,0)-> p(1,-1) v(0,-1)
   const auto curve = makeCurve2();
   constexpr double eps = 0.1;
@@ -523,7 +523,7 @@ TEST(HermiteCurveTest, getTangentVectorAutoscale2)
   EXPECT_NEAR(curve.getTangentVector(0.75, true).y / norm, -1.0 / std::sqrt(2.0), eps);
 }
 
-TEST(HermiteCurveTest, getTangentVectorAutoscale3)
+TEST(HermiteCurveTest, getTangentVectorDenormalized3)
 {  //p(1,1) v(0,-1)-> p(0,0) v(-1,0)
   const auto curve = makeCurve3();
   constexpr double eps = 0.1;
@@ -533,7 +533,7 @@ TEST(HermiteCurveTest, getTangentVectorAutoscale3)
   EXPECT_NEAR(curve.getTangentVector(0.75, true).y / norm, -1.0 / std::sqrt(2.0), eps);
 }
 
-TEST(HermiteCurveTest, getTangentVectorAutoscale4)
+TEST(HermiteCurveTest, getTangentVectorDenormalized4)
 {  //p(1,-1) v(0,1)-> p(0,0) v(-1,0)
   const auto curve = makeCurve4();
   constexpr double eps = 0.1;
@@ -579,7 +579,7 @@ TEST(HermiteCurveTest, getNormalVector4)
   EXPECT_DOUBLE_EQ(curve.getNormalVector(0.5, false).y / norm, -1.0 / std::sqrt(2.0));
 }
 
-TEST(HermiteCurveTest, getNormalVectorAutoscale1)
+TEST(HermiteCurveTest, getNormalVectorDenormalized1)
 {  //p(0,0) v(1,0)-> p(1,1) v(0,1)
   const auto curve = makeCurve1();
   constexpr double eps = 0.1;
@@ -589,7 +589,7 @@ TEST(HermiteCurveTest, getNormalVectorAutoscale1)
   EXPECT_NEAR(curve.getNormalVector(0.75, true).y / norm, 1.0 / std::sqrt(2.0), eps);
 }
 
-TEST(HermiteCurveTest, getNormalVectorAutoscale2)
+TEST(HermiteCurveTest, getNormalVectorDenormalized2)
 {  //p(0,0) v(1,0)-> p(1,-1) v(0,-1)
   const auto curve = makeCurve2();
   constexpr double eps = 0.1;
@@ -599,7 +599,7 @@ TEST(HermiteCurveTest, getNormalVectorAutoscale2)
   EXPECT_NEAR(curve.getNormalVector(0.75, true).y / norm, 1.0 / std::sqrt(2.0), eps);
 }
 
-TEST(HermiteCurveTest, getNormalVectorAutoscale3)
+TEST(HermiteCurveTest, getNormalVectorDenormalized3)
 {  //p(1,1) v(0,-1)-> p(0,0) v(-1,0)
   const auto curve = makeCurve3();
   constexpr double eps = 0.1;
@@ -609,7 +609,7 @@ TEST(HermiteCurveTest, getNormalVectorAutoscale3)
   EXPECT_NEAR(curve.getNormalVector(0.75, true).y / norm, -1.0 / std::sqrt(2.0), eps);
 }
 
-TEST(HermiteCurveTest, getNormalVectorAutoscale4)
+TEST(HermiteCurveTest, getNormalVectorDenormalized4)
 {  //p(1,-1) v(0,1)-> p(0,0) v(-1,0)
   const auto curve = makeCurve4();
   constexpr double eps = 0.1;
