@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <boost/math/constants/constants.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/entities.hpp>
@@ -88,7 +89,8 @@ auto RelativeClearanceCondition::evaluate() -> Object
     return std::all_of(
       entity_refs.begin(), entity_refs.end(),
       [&, is_back =
-            (std::abs(evaluateRelativeHeading(triggering_entity)) > M_2_PI)](const auto & entity) {
+            (std::abs(evaluateRelativeHeading(triggering_entity)) >
+             0.5 * boost::math::constants::pi<double>())](const auto & entity) {
         auto is_in_lateral_range = [&]() {
           // The lanes to be checked to left and right of the triggering entity (positive to the y-axis). If omitted: all lanes are checked.
           if (relative_lane_range.empty()) {
