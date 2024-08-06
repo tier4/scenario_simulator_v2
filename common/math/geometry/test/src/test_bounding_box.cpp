@@ -51,17 +51,17 @@ TEST(BoundingBox, getPointsFromBboxCustom)
  */
 TEST(BoundingBox, toPolygon2D_zeroPose)
 {
-  geometry_msgs::msg::Pose pose;
-  traffic_simulator_msgs::msg::BoundingBox bounding_box = makeBbox(2.0, 2.0, 2.0);
-  boost::geometry::model::polygon<boost::geometry::model::d2::point_xy<double>> poly =
-    math::geometry::toPolygon2D(pose, bounding_box);
-  EXPECT_EQ(poly.inners().size(), size_t(0));
-  EXPECT_EQ(poly.outer().size(), size_t(5));
-  EXPECT_BOOST_POINT_2D_AND_POINT_EQ(poly.outer()[0], makePoint(1.0, 1.0));
-  EXPECT_BOOST_POINT_2D_AND_POINT_EQ(poly.outer()[1], makePoint(-1.0, 1.0));
-  EXPECT_BOOST_POINT_2D_AND_POINT_EQ(poly.outer()[2], makePoint(-1.0, -1.0));
-  EXPECT_BOOST_POINT_2D_AND_POINT_EQ(poly.outer()[3], makePoint(1.0, -1.0));
-  EXPECT_BOOST_POINT_2D_AND_POINT_EQ(poly.outer()[4], makePoint(1.0, 1.0));
+  const auto pose = geometry_msgs::msg::Pose();
+  const auto bounding_box = makeBbox(2.0, 2.0, 2.0);
+  const auto polygon = math::geometry::toPolygon2D(pose, bounding_box);
+
+  ASSERT_EQ(polygon.inners().size(), static_cast<std::size_t>(0));
+  ASSERT_EQ(polygon.outer().size(), static_cast<std::size_t>(5));
+  EXPECT_BOOST_POINT_2D_AND_POINT_EQ(polygon.outer()[0], makePoint(1.0, 1.0));
+  EXPECT_BOOST_POINT_2D_AND_POINT_EQ(polygon.outer()[1], makePoint(-1.0, 1.0));
+  EXPECT_BOOST_POINT_2D_AND_POINT_EQ(polygon.outer()[2], makePoint(-1.0, -1.0));
+  EXPECT_BOOST_POINT_2D_AND_POINT_EQ(polygon.outer()[3], makePoint(1.0, -1.0));
+  EXPECT_BOOST_POINT_2D_AND_POINT_EQ(polygon.outer()[4], makePoint(1.0, 1.0));
 }
 
 /**
@@ -69,17 +69,17 @@ TEST(BoundingBox, toPolygon2D_zeroPose)
  */
 TEST(BoundingBox, toPolygon2D_onlyTranslation)
 {
-  geometry_msgs::msg::Pose pose = makePose(1.0, 2.0);
-  traffic_simulator_msgs::msg::BoundingBox bounding_box = makeBbox(2.0, 2.0, 2.0);
-  boost::geometry::model::polygon<boost::geometry::model::d2::point_xy<double>> poly =
-    math::geometry::toPolygon2D(pose, bounding_box);
-  EXPECT_EQ(poly.inners().size(), size_t(0));
-  EXPECT_EQ(poly.outer().size(), size_t(5));
-  EXPECT_BOOST_POINT_2D_AND_POINT_EQ(poly.outer()[0], makePoint(2.0, 3.0));
-  EXPECT_BOOST_POINT_2D_AND_POINT_EQ(poly.outer()[1], makePoint(0.0, 3.0));
-  EXPECT_BOOST_POINT_2D_AND_POINT_EQ(poly.outer()[2], makePoint(0.0, 1.0));
-  EXPECT_BOOST_POINT_2D_AND_POINT_EQ(poly.outer()[3], makePoint(2.0, 1.0));
-  EXPECT_BOOST_POINT_2D_AND_POINT_EQ(poly.outer()[4], makePoint(2.0, 3.0));
+  const auto pose = makePose(1.0, 2.0);
+  const auto bounding_box = makeBbox(2.0, 2.0, 2.0);
+  const auto polygon = math::geometry::toPolygon2D(pose, bounding_box);
+
+  ASSERT_EQ(polygon.inners().size(), static_cast<std::size_t>(0));
+  ASSERT_EQ(polygon.outer().size(), static_cast<std::size_t>(5));
+  EXPECT_BOOST_POINT_2D_AND_POINT_EQ(polygon.outer()[0], makePoint(2.0, 3.0));
+  EXPECT_BOOST_POINT_2D_AND_POINT_EQ(polygon.outer()[1], makePoint(0.0, 3.0));
+  EXPECT_BOOST_POINT_2D_AND_POINT_EQ(polygon.outer()[2], makePoint(0.0, 1.0));
+  EXPECT_BOOST_POINT_2D_AND_POINT_EQ(polygon.outer()[3], makePoint(2.0, 1.0));
+  EXPECT_BOOST_POINT_2D_AND_POINT_EQ(polygon.outer()[4], makePoint(2.0, 3.0));
 }
 
 /**
@@ -87,21 +87,23 @@ TEST(BoundingBox, toPolygon2D_onlyTranslation)
  */
 TEST(BoundingBox, toPolygon2D_fullPose)
 {
-  geometry_msgs::msg::Pose pose = makePose(1.0, 2.0);
-  pose.orientation = math::geometry::convertEulerAngleToQuaternion(
-    geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0.0).y(0.0).z(30.0 * M_PI / 180.0));
-  traffic_simulator_msgs::msg::BoundingBox bounding_box = makeBbox(2.0, 2.0, 2.0);
-  boost::geometry::model::polygon<boost::geometry::model::d2::point_xy<double>> poly =
-    math::geometry::toPolygon2D(pose, bounding_box);
-  EXPECT_EQ(poly.inners().size(), size_t(0));
-  EXPECT_EQ(poly.outer().size(), size_t(5));
+  const auto pose = makePose(
+    1.0, 2.0, 0.0,
+    math::geometry::convertEulerAngleToQuaternion(
+      geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0.0).y(0.0).z(30.0 * M_PI / 180.0)));
+
+  const auto bounding_box = makeBbox(2.0, 2.0, 2.0);
+  const auto polygon = math::geometry::toPolygon2D(pose, bounding_box);
+  ASSERT_EQ(polygon.inners().size(), static_cast<std::size_t>(0));
+  ASSERT_EQ(polygon.outer().size(), static_cast<std::size_t>(5));
+
   const double x = std::sqrt(2.0) * std::cos((30.0 + 45.0) * M_PI / 180.0);
   const double y = std::sqrt(2.0) * std::sin((30.0 + 45.0) * M_PI / 180.0);
-  EXPECT_BOOST_POINT_2D_AND_POINT_EQ(poly.outer()[0], makePoint(x + 1.0, y + 2.0));
-  EXPECT_BOOST_POINT_2D_AND_POINT_EQ(poly.outer()[1], makePoint(-y + 1.0, x + 2.0));
-  EXPECT_BOOST_POINT_2D_AND_POINT_EQ(poly.outer()[2], makePoint(-x + 1.0, -y + 2.0));
-  EXPECT_BOOST_POINT_2D_AND_POINT_EQ(poly.outer()[3], makePoint(y + 1.0, -x + 2.0));
-  EXPECT_BOOST_POINT_2D_AND_POINT_EQ(poly.outer()[4], makePoint(x + 1.0, y + 2.0));
+  EXPECT_BOOST_POINT_2D_AND_POINT_EQ(polygon.outer()[0], makePoint(x + 1.0, y + 2.0));
+  EXPECT_BOOST_POINT_2D_AND_POINT_EQ(polygon.outer()[1], makePoint(-y + 1.0, x + 2.0));
+  EXPECT_BOOST_POINT_2D_AND_POINT_EQ(polygon.outer()[2], makePoint(-x + 1.0, -y + 2.0));
+  EXPECT_BOOST_POINT_2D_AND_POINT_EQ(polygon.outer()[3], makePoint(y + 1.0, -x + 2.0));
+  EXPECT_BOOST_POINT_2D_AND_POINT_EQ(polygon.outer()[4], makePoint(x + 1.0, y + 2.0));
 }
 
 TEST(BoundingBox, getPolygonDistanceWithCollision)
