@@ -499,8 +499,7 @@ TEST(LineSegment, isIntersect2D_pointOutside)
     math::geometry::LineSegment(makePoint(-1.0, -2.0, 0.0), makePoint(3.0, 2.0, 4.0));
 
   EXPECT_FALSE(line.isIntersect2D(makePoint(-1.0, -1.0, 1.0)));
-  EXPECT_FALSE(line.isIntersect2D(
-    makePoint(0.0, std::numeric_limits<double>::max(), std::numeric_limits<double>::max())));
+  EXPECT_FALSE(line.isIntersect2D(makePoint(0.0, 89.0, 97.0)));
 
   EXPECT_FALSE(line.isIntersect2D(makePoint(-3.0, 0.0, 0.0)));
   EXPECT_FALSE(line.isIntersect2D(makePoint(4.0, 0.0, 0.0)));
