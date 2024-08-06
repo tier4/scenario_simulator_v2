@@ -57,7 +57,7 @@ TEST(Quaternion, operator_additionAssignment)
 {
   using math::geometry::operator+=;
 
-  const auto q1 = math::geometry::makeQuaternion(0, 1, 0, 1);
+  auto q1 = math::geometry::makeQuaternion(0, 1, 0, 1);
   const auto q2 = math::geometry::makeQuaternion(0, 1, 0, 1);
   q1 += q2;
   EXPECT_QUATERNION_EQ(q1, math::geometry::makeQuaternion(0, 2, 0, 2))
