@@ -20,7 +20,6 @@
 
 TEST(TrafficLightManager, getIds)
 {
-  const auto node = std::make_shared<rclcpp::Node>("getIds");
   std::string path =
     ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm";
   geographic_msgs::msg::GeoPoint origin;
@@ -37,7 +36,6 @@ TEST(TrafficLightManager, getIds)
 
 TEST(TrafficLightManager, setColor)
 {
-  const auto node = std::make_shared<rclcpp::Node>("setColor");
   std::string path =
     ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm";
   geographic_msgs::msg::GeoPoint origin;
@@ -65,7 +63,6 @@ TEST(TrafficLightManager, setColor)
 
 TEST(TrafficLightManager, setArrow)
 {
-  const auto node = std::make_shared<rclcpp::Node>("setArrow");
   std::string path =
     ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm";
   geographic_msgs::msg::GeoPoint origin;
@@ -93,6 +90,5 @@ TEST(TrafficLightManager, setArrow)
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);
-  rclcpp::init(argc, argv);
   return RUN_ALL_TESTS();
 }
