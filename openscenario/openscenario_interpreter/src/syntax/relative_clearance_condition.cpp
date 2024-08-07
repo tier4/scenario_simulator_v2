@@ -93,7 +93,7 @@ auto RelativeClearanceCondition::evaluate() -> Object
       target_entities.begin(), target_entities.end(),
       [&, is_back =
             (std::abs(evaluateRelativeHeading(triggering_entity)) >
-             0.5 * boost::math::constants::pi<double>())](const auto & entity) {
+             boost::math::constants::half_pi<double>())](const auto & entity) {
         auto is_in_lateral_range = [&]() {
           // The lanes to be checked to left and right of the triggering entity (positive to the y-axis). If omitted: all lanes are checked.
           if (relative_lane_range.empty()) {
