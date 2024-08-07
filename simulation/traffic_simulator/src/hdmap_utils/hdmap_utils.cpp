@@ -229,20 +229,14 @@ auto HdMapUtils::countLaneChanges(
       const auto & current = route[i];
 
       if (auto followings = getNextLaneletIds(previous);
-          std::find_if(followings.begin(), followings.end(), [&current](const auto & lanelet) {
-            return lanelet == current;
-          }) == followings.end()) {
+          std::find(followings.begin(), followings.end(), current) == followings.end()) {
         traffic_simulator_msgs::msg::EntityType type;
         type.type = traffic_simulator_msgs::msg::EntityType::VEHICLE;
         if (auto lefts = getLeftLaneletIds(previous, type);
-            std::find_if(lefts.begin(), lefts.end(), [&current](const auto & lanelet) {
-              return lanelet == current;
-            }) != lefts.end()) {
+            std::find(lefts.begin(), lefts.end(), current) != lefts.end()) {
           lane_changes.first++;
         } else if (auto rights = getRightLaneletIds(previous, type);
-                   std::find_if(rights.begin(), rights.end(), [&current](const auto & lanelet) {
-                     return lanelet == current;
-                   }) != rights.end()) {
+                   std::find(rights.begin(), rights.end(), current) != rights.end()) {
           lane_changes.second++;
         }
       }
