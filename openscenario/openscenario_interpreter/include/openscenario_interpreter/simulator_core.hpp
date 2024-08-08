@@ -256,6 +256,28 @@ public:
       }
       return traffic_simulator::pose::quietNaNPose();
     }
+
+    static auto evaluateLateralRelativeLanes(
+      const std::string & from_entity_name, const std::string & to_entity_name,
+      const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined) -> int
+    {
+      if (const auto from_entity = core->getEntity(from_entity_name)) {
+        if (const auto to_entity = core->getEntity(to_entity_name)) {
+          const bool allow_lane_change =
+            (routing_algorithm == RoutingAlgorithm::value_type::shortest);
+          if (
+            auto lane_changes = traffic_simulator::distance::countLaneChanges(
+              from_entity->getCanonicalizedLaneletPose().value(),
+              to_entity->getCanonicalizedLaneletPose().value(), allow_lane_change,
+              core->getHdmapUtils())) {
+            return lane_changes.value().first - lane_changes.value().second;
+          }
+        }
+      }
+      throw common::Error(
+        "Failed to evaluate lateral relative lanes between ", from_entity_name, " and ",
+        to_entity_name);
+    }
   };
 
   class ActionApplication  // OpenSCENARIO 1.1.1 Section 3.1.5

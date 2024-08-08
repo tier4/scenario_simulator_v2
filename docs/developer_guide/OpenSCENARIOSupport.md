@@ -310,7 +310,7 @@ Currently, the only way to know the result of the simulation is by viewing the s
 | EndOfRoadCondition                           | unimplemented     |                                            |
 | Entities                                     | 1.3 (partial)     | [detail](#Entities)                        |
 | EntityAction                                 | 1.3               |                                            |
-| EntityCondition                              | 1.1 (partial)     | [detail](#EntityCondition)                 |
+| EntityCondition                              | 1.3 (partial)     | [detail](#EntityCondition)                 |
 | EntityDistribution                           | unimplemented     |                                            |
 | EntityDistributionEntry                      | unimplemented     |                                            |
 | EntityObject                                 | 1.3 (partial)     | [detail](#EntityObject)                    |
@@ -425,11 +425,11 @@ Currently, the only way to know the result of the simulation is by viewing the s
 | ReachPositionCondition                       | 1.1               | [detail](#ReachPositionCondition)          |
 | ReferenceContext                             | 1.3 (partial)     | [detail](#ReferenceContext)                |
 | RelativeAngleCondition                       | unimplemented     |                                            |
-| RelativeClearanceCondition                   | unimplemented     |                                            |
+| RelativeClearanceCondition                   | 1.3 (partial)     | [detail](#RelativeClearanceCondition)      |
 | RelativeDistanceCondition                    | 1.3 (partial)     | [detail](#RelativeDistanceCondition)       |
 | RelativeDistanceType                         | 1.3               | [detail](#RelativeDistanceType)            |
 | RelativeLanePosition                         | unimplemented     |                                            |
-| RelativeLaneRange                            | unimplemented     |                                            |
+| RelativeLaneRange                            | 1.3               |                                            |
 | RelativeObjectPosition                       | 1.3               |                                            |
 | RelativeRoadPosition                         | unimplemented     |                                            |
 | RelativeSpeedCondition                       | unimplemented     |                                            |
@@ -643,9 +643,8 @@ Currently, the only way to know the result of the simulation is by viewing the s
 
 #### EntityCondition
 
-- Properties `EndOfRoadCondition`, `OffroadCondition`, `TimeToCollisionCondition`, `RelativeDistanceCondition`, and `TraveledDistanceCondition` are **not** supported.
+- Properties `EndOfRoadCondition`, `OffroadCondition`, `TimeToCollisionCondition`, `RelativeDistanceCondition`, `TraveledDistanceCondition`, `AngleCondition`, and `RelativeAngleCondition` are **not** supported.
 - Property `ReachPositionCondition` deprecated in version 1.2 is still supported.
-- Properties `AngleCondition` and `RelativeAngleCondition` created in version 1.3 are **not** supported.
 
 #### EntityObject
 
@@ -764,6 +763,11 @@ Currently, the only way to know the result of the simulation is by viewing the s
 #### ReferenceContext
 
 - Enumeration literal `absolute` is **not** supported.
+
+#### RelativeClearanceCondition
+
+- Property `oppositeLanes` is ignored.
+  - The simulator behaves as if `oppositeLanes` is `false`.
 
 #### RelativeDistanceCondition
 
