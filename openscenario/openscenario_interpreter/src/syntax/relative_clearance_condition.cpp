@@ -16,7 +16,9 @@
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/entities.hpp>
+#include <openscenario_interpreter/syntax/entity_selection.hpp>
 #include <openscenario_interpreter/syntax/relative_clearance_condition.hpp>
+#include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <openscenario_interpreter/utility/print.hpp>
 #include <unordered_map>
 
@@ -32,7 +34,7 @@ RelativeClearanceCondition::RelativeClearanceCondition(
   free_space(readAttribute<Boolean>("freeSpace", node, scope)),
   opposite_lanes(readAttribute<Boolean>("oppositeLanes", node, scope)),
   relative_lane_range(readElements<RelativeLaneRange, 0>("RelativeLaneRange", node, scope)),
-  entity_refs(readElements<EntityRef, 0>("EntityRef", node, scope)),
+  entity_refs(readElements<Entity, 0>("EntityRef", node, scope)),
   triggering_entities(triggering_entities)
 {
 }
@@ -70,69 +72,109 @@ auto RelativeClearanceCondition::description() const -> String
 
 auto RelativeClearanceCondition::evaluate() -> Object
 {
-  auto target_entities = [&]() {
-    if (not entity_refs.empty()) {
-      return entity_refs;
-    } else {
-      std::list<EntityRef> entities;
-      for (const auto & entity : *global().entities) {
-        if (
-          std::find_if(
-            triggering_entities.entity_refs.begin(), triggering_entities.entity_refs.end(),
-            [&](const auto & triggering_entity) {
-              return triggering_entity.name() == entity.first;
-            }) == triggering_entities.entity_refs.end()) {
-          entities.emplace_back(entity.first);
+  auto is_relative_clearance_exist = [&](
+                                       const auto & triggering_entity, const auto & target_entity) {
+    auto is_back =
+      (std::abs(evaluateRelativeHeading(triggering_entity)) >
+       boost::math::constants::half_pi<double>());
+    auto is_in_lateral_range = [&]() {
+      // The lanes to be checked to left and right of the triggering entity (positive to the y-axis). If omitted: all lanes are checked.
+      if (relative_lane_range.empty()) {
+        return true;
+      } else {
+        if (auto relative_lateral_lane = evaluateLateralRelativeLanes(
+              triggering_entity, target_entity, RoutingAlgorithm::shortest);
+            relative_lateral_lane.has_value()) {
+          if (is_back) {
+            relative_lateral_lane.value() = -relative_lateral_lane.value();
+          }
+          return std::any_of(
+            relative_lane_range.begin(), relative_lane_range.end(), [&](const auto & range) {
+              return range.from <= relative_lateral_lane.value() &&
+                     range.to >= relative_lateral_lane.value();
+            });
+        } else {
+          throw common::Error("Relative lateral lane is not available");
         }
       }
-      return entities;
-    }
-  }();
-  return asBoolean(triggering_entities.apply([&](const auto & triggering_entity) {
-    return std::all_of(
-      target_entities.begin(), target_entities.end(),
-      [&, is_back =
-            (std::abs(evaluateRelativeHeading(triggering_entity)) >
-             boost::math::constants::half_pi<double>())](const auto & entity) {
-        auto is_in_lateral_range = [&]() {
-          // The lanes to be checked to left and right of the triggering entity (positive to the y-axis). If omitted: all lanes are checked.
-          if (relative_lane_range.empty()) {
+    };
+
+    auto is_in_longitudinal_range = [&]() {
+      auto relative_longitudinal =
+        getRelativeLanePosition(triggering_entity, target_entity, free_space).s;
+      if (is_back) {
+        relative_longitudinal = -relative_longitudinal;
+      }
+      if (relative_longitudinal < 0) {
+        return std::abs(relative_longitudinal) <= distance_backward;
+      } else {
+        return relative_longitudinal <= distance_forward;
+      }
+    };
+
+    auto lat_ok = is_in_lateral_range();
+    auto lon_ok = is_in_longitudinal_range();
+    return not(lat_ok && lon_ok);
+  };
+
+  return asBoolean(triggering_entities.apply([&](const auto & triggering_scenario_object) {
+    assert(triggering_scenario_object.is<ScenarioObject>());
+    if (not entity_refs.empty()) {
+      return std::all_of(
+        entity_refs.begin(), entity_refs.end(), [&](const auto & target_entity_ref) {
+          const auto & target_entity = global().entities->ref(target_entity_ref);
+          if (target_entity.template is<ScenarioObject>()) {
+            return is_relative_clearance_exist(
+              triggering_scenario_object, target_entity.template as<ScenarioObject>().name);
+            ;
+          } else if (target_entity.template is<EntitySelection>()) {  //
+            auto target_scenario_objects = target_entity.template as<EntitySelection>().objects();
+            return std::all_of(
+              target_scenario_objects.begin(), target_scenario_objects.end(),
+              [&](const auto & target_scenario_object) {
+                return is_relative_clearance_exist(
+                  triggering_scenario_object, target_scenario_object.name());
+              });
+          } else {
+            throw common::Error(
+              "Unexpected entity interface is detected. RelativeClearanceCondition expects "
+              "ScenarioObject or EntitySelection.");
+          }
+        });
+    } else {
+      return std::all_of(
+        global().entities->begin(), global().entities->end(),
+        [&](const auto & target_candidate_entity) {
+          if (not target_candidate_entity.second.template is<ScenarioObject>()) {
             return true;
           } else {
-            if (auto relative_lateral_lane = evaluateLateralRelativeLanes(
-                  triggering_entity, entity, RoutingAlgorithm::shortest);
-                relative_lateral_lane.has_value()) {
-              if (is_back) {
-                relative_lateral_lane.value() = -relative_lateral_lane.value();
-              }
-              return std::any_of(
-                relative_lane_range.begin(), relative_lane_range.end(), [&](const auto & range) {
-                  return range.from <= relative_lateral_lane.value() &&
-                         range.to >= relative_lateral_lane.value();
+            const ScenarioObject & target_candidate_scenario_object =
+              target_candidate_entity.second.template as<ScenarioObject>();
+            // exclude entities included in TriggeringEntities
+            auto is_target_candidate_scenario_object_in_triggering_entities =
+              [&](const ScenarioObject & target_candidate) -> bool {
+              bool is_included = false;
+              triggering_entities.apply(
+                [target_candidate, &is_included](const auto & triggering_scenario_object) {
+                  assert(triggering_scenario_object.is<ScenarioObject>());
+                  if (triggering_scenario_object.name() == target_candidate.name) {
+                    is_included = true;
+                  }
+                  return true;
                 });
+              return is_included;
+            };
+            if (is_target_candidate_scenario_object_in_triggering_entities(
+                  target_candidate_scenario_object)) {
+              return true;
             } else {
-              throw common::Error("Relative lateral lane is not available");
+              const auto & target_scenario_object = target_candidate_scenario_object;
+              return is_relative_clearance_exist(
+                triggering_scenario_object, target_scenario_object.name);
             }
           }
-        };
-
-        auto is_in_longitudinal_range = [&]() {
-          auto relative_longitudinal =
-            getRelativeLanePosition(triggering_entity, entity, free_space).s;
-          if (is_back) {
-            relative_longitudinal = -relative_longitudinal;
-          }
-          if (relative_longitudinal < 0) {
-            return std::abs(relative_longitudinal) <= distance_backward;
-          } else {
-            return relative_longitudinal <= distance_forward;
-          }
-        };
-
-        auto lat_ok = is_in_lateral_range();
-        auto lon_ok = is_in_longitudinal_range();
-        return not(lat_ok && lon_ok);
-      });
+        });
+    }
   }));
 }
 

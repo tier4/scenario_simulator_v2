@@ -72,7 +72,7 @@ struct RelativeClearanceCondition : private Scope,
   /*
      Constraint to check only specific entities. If it is not used then all entities are considered.
   */
-  const std::list<EntityRef> entity_refs;
+  const std::list<Entity> entity_refs;
 
   const TriggeringEntities triggering_entities;
 
