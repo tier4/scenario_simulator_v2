@@ -45,8 +45,6 @@ class UserDefinedValueCondition : private SimulatorCore::NonStandardOperation
 
   std::function<Object()> evaluate_value;
 
-  static uint64_t magic_subscription_counter;
-
 public:
   const String name;
 

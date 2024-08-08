@@ -33,47 +33,77 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 template <typename T>
-struct MagicSubscription : private rclcpp::Node, public T
+struct MagicSubscription : private T
 {
-  std::promise<void> promise;
+  struct Node : public rclcpp::Node
+  {
+    std::atomic_bool stop_requested = false;
 
-  std::thread thread;
+    std::mutex mutex;
 
-  std::exception_ptr thrown;
+    std::exception_ptr thrown;
 
-  typename rclcpp::Subscription<T>::SharedPtr subscription;
+    std::thread thread;
 
-public:
-  explicit MagicSubscription(const std::string & node_name, const std::string & topic_name)
-  : rclcpp::Node(node_name),
-    thread(
-      [this](auto future) {
-        while (rclcpp::ok() and
-               future.wait_for(std::chrono::milliseconds(1)) == std::future_status::timeout) {
+    explicit Node()
+    : rclcpp::Node("magic_subscription"), thread([this]() {
+        while (rclcpp::ok() and not stop_requested) {
           try {
             rclcpp::spin_some(get_node_base_interface());
           } catch (...) {
+            auto lock = std::lock_guard(mutex);
             thrown = std::current_exception();
           }
         }
-      },
-      std::move(promise.get_future())),
-    subscription(create_subscription<T>(topic_name, 1, [this](const typename T::SharedPtr message) {
-      static_cast<T &>(*this) = *message;
-    }))
+      })
+    {
+    }
+
+    ~Node()
+    {
+      if (thread.joinable() and not stop_requested.exchange(true)) {
+        thread.join();
+      }
+    }
+
+    auto rethrow()
+    {
+      if (auto lock = std::lock_guard(mutex); thrown) {
+        std::rethrow_exception(thrown);
+      }
+    }
+  };
+
+  static inline std::size_t count = 0;
+
+  static inline std::unique_ptr<Node> node = nullptr;
+
+  typename rclcpp::Subscription<T>::SharedPtr subscription;
+
+  explicit MagicSubscription(const std::string & topic_name)
   {
+    if (not count++) {
+      node = std::make_unique<Node>();
+    }
+
+    subscription = node->template create_subscription<T>(
+      topic_name, rclcpp::QoS(1).best_effort(),
+      [this](const typename T::SharedPtr message) { static_cast<T &>(*this) = *message; });
   }
 
   ~MagicSubscription()
   {
-    if (thread.joinable()) {
-      promise.set_value();
-      thread.join();
+    if (not --count) {
+      node.reset();
     }
   }
-};
 
-uint64_t UserDefinedValueCondition::magic_subscription_counter = 0;
+  auto get() const -> const auto &
+  {
+    node->rethrow();
+    return static_cast<const T &>(*this);
+  }
+};
 
 UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node, Scope & scope)
 : name(readAttribute<String>("name", node, scope)),
@@ -134,31 +164,29 @@ UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node
     using tier4_simulation_msgs::msg::UserDefinedValueType;
 
     evaluate_value =
-      [&, current_message = std::make_shared<MagicSubscription<UserDefinedValue>>(
-            result.str(1) + "_subscription_" + std::to_string(++magic_subscription_counter),
-            result.str(0))]() {
-        auto evaluate = [](const auto & user_defined_value) {
-          switch (user_defined_value.type.data) {
+      [this, subscriber = std::make_shared<MagicSubscription<UserDefinedValue>>(result.str(0))]() {
+        if (const auto message = subscriber->get(); message.value.empty()) {
+          return unspecified;
+        } else {
+          switch (message.type.data) {
             case UserDefinedValueType::BOOLEAN:
-              return make<Boolean>(user_defined_value.value);
+              return make<Boolean>(message.value);
             case UserDefinedValueType::DATE_TIME:
-              return make<String>(user_defined_value.value);
+              return make<String>(message.value);
             case UserDefinedValueType::DOUBLE:
-              return make<Double>(user_defined_value.value);
+              return make<Double>(message.value);
             case UserDefinedValueType::INTEGER:
-              return make<Integer>(user_defined_value.value);
+              return make<Integer>(message.value);
             case UserDefinedValueType::STRING:
-              return make<String>(user_defined_value.value);
+              return make<String>(message.value);
             case UserDefinedValueType::UNSIGNED_INT:
-              return make<UnsignedInt>(user_defined_value.value);
+              return make<UnsignedInt>(message.value);
             case UserDefinedValueType::UNSIGNED_SHORT:
-              return make<UnsignedShort>(user_defined_value.value);
+              return make<UnsignedShort>(message.value);
             default:
               return unspecified;
           }
-        };
-
-        return not current_message->value.empty() ? evaluate(*current_message) : unspecified;
+        }
       };
 #else
     throw SyntaxError(
