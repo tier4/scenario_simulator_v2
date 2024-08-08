@@ -111,8 +111,20 @@ auto RelativeClearanceCondition::evaluate() -> Object
     };
 
     auto is_in_longitudinal_range = [&]() {
-      auto relative_longitudinal =
-        getRelativeLanePosition(triggering_entity, target_entity, free_space).s;
+      auto relative_longitudinal = [&]() {
+        if (free_space) {
+          return static_cast<traffic_simulator::LaneletPose>(
+                   makeNativeBoundingBoxRelativeLanePosition(
+                     triggering_entity, target_entity, RoutingAlgorithm::shortest))
+            .s;
+        } else {
+          return static_cast<traffic_simulator::LaneletPose>(
+                   makeNativeRelativeLanePosition(
+                     triggering_entity, target_entity, RoutingAlgorithm::shortest))
+            .s;
+        }
+      }();
+
       if (is_back) {
         relative_longitudinal = -relative_longitudinal;
       }
@@ -187,19 +199,6 @@ auto RelativeClearanceCondition::evaluate() -> Object
         });
     }
   }));
-}
-
-auto RelativeClearanceCondition::getRelativeLanePosition(
-  const EntityRef & triggering_entity, const EntityRef & entity, bool use_bounding_box) const
-  -> traffic_simulator::LaneletPose
-{
-  if (use_bounding_box) {
-    return static_cast<traffic_simulator::LaneletPose>(makeNativeBoundingBoxRelativeLanePosition(
-      triggering_entity, entity, RoutingAlgorithm::shortest));
-  } else {
-    return static_cast<traffic_simulator::LaneletPose>(
-      makeNativeRelativeLanePosition(triggering_entity, entity, RoutingAlgorithm::shortest));
-  }
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

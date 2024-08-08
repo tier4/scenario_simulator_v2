@@ -81,10 +81,6 @@ struct RelativeClearanceCondition : private Scope,
   auto description() const -> String;
 
   auto evaluate() -> Object;
-
-  [[nodiscard]] auto getRelativeLanePosition(
-    const EntityRef & triggering_entity, const EntityRef & entity, bool use_bounding_box) const
-    -> traffic_simulator::LaneletPose;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
