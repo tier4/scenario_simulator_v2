@@ -25,6 +25,7 @@
 #include <traffic_simulator/simulation_clock/simulation_clock.hpp>
 #include <traffic_simulator/traffic/traffic_controller.hpp>
 #include <traffic_simulator/traffic/traffic_source.hpp>
+#include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 
 namespace traffic_simulator
@@ -259,25 +260,25 @@ public:
     const std::string & from_entity_name, const std::string & to_entity_name)
     -> std::optional<geometry_msgs::msg::Pose>;
 
-  auto relativeLaneletPose(
+  auto laneletDistance(
     const std::string & from_entity_name, const std::string & to_entity_name,
-    const bool allow_lane_change) -> std::optional<CanonicalizedLaneletPose>;
+    const bool allow_lane_change) -> LaneletDistance;
 
-  auto relativeLaneletPose(
+  auto laneletDistance(
     const std::string & from_entity_name, const LaneletPose & to_lanelet_pose,
-    const bool allow_lane_change) -> std::optional<CanonicalizedLaneletPose>;
+    const bool allow_lane_change) -> LaneletDistance;
 
-  auto relativeLaneletPose(
+  auto laneletDistance(
     const LaneletPose & from_lanelet_pose, const std::string & to_entity_name,
-    const bool allow_lane_change) -> std::optional<CanonicalizedLaneletPose>;
+    const bool allow_lane_change) -> LaneletDistance;
 
-  auto boundingBoxRelativeLaneletPose(
+  auto boundingBoxLaneletDistance(
     const std::string & from_entity_name, const std::string & to_entity_name,
-    const bool allow_lane_change) -> std::optional<CanonicalizedLaneletPose>;
+    const bool allow_lane_change) -> LaneletDistance;
 
-  auto boundingBoxRelativeLaneletPose(
+  auto boundingBoxLaneletDistance(
     const std::string & from_entity_name, const LaneletPose & to_lanelet_pose,
-    const bool allow_lane_change) -> std::optional<CanonicalizedLaneletPose>;
+    const bool allow_lane_change) -> LaneletDistance;
 
   // traffics, lanelet
   auto getHdmapUtils() const -> const std::shared_ptr<hdmap_utils::HdMapUtils> &;

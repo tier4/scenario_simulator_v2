@@ -17,7 +17,6 @@
 #include <geometry/intersection/collision.hpp>
 #include <geometry/quaternion/quaternion_to_euler.hpp>
 #include <traffic_simulator/api/api.hpp>
-#include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 
 namespace traffic_simulator
@@ -448,82 +447,82 @@ auto API::relativePose(
   return pose::relativePose(from_map_pose, to_entity->getMapPose());
 }
 
-auto API::relativeLaneletPose(
+auto API::laneletDistance(
   const std::string & from_entity_name, const std::string & to_entity_name,
-  const bool allow_lane_change) -> std::optional<CanonicalizedLaneletPose>
+  const bool allow_lane_change) -> LaneletDistance
 {
   const auto from_entity = getEntity(from_entity_name);
   const auto to_entity = getEntity(to_entity_name);
   if (from_entity_name != to_entity_name) {
     if (from_entity->isInLanelet() && to_entity->isInLanelet()) {
-      return pose::relativeLaneletPose(
+      return distance::laneletDistance(
         from_entity->getCanonicalizedLaneletPose().value(),
         to_entity->getCanonicalizedLaneletPose().value(), allow_lane_change, getHdmapUtils());
     }
   }
-  return std::nullopt;
+  return LaneletDistance();
 }
 
-auto API::relativeLaneletPose(
+auto API::laneletDistance(
   const std::string & from_entity_name, const LaneletPose & to_lanelet_pose,
-  const bool allow_lane_change) -> std::optional<CanonicalizedLaneletPose>
+  const bool allow_lane_change) -> LaneletDistance
 {
   const auto canonicalized_lanelet_pose = pose::canonicalize(to_lanelet_pose, getHdmapUtils());
   const auto from_entity = getEntity(from_entity_name);
   if (from_entity->isInLanelet()) {
-    return pose::relativeLaneletPose(
+    return distance::laneletDistance(
       from_entity->getCanonicalizedLaneletPose().value(), canonicalized_lanelet_pose,
       allow_lane_change, getHdmapUtils());
   } else {
-    return std::nullopt;
+    return LaneletDistance();
   }
 }
 
-auto API::relativeLaneletPose(
+auto API::laneletDistance(
   const LaneletPose & from_lanelet_pose, const std::string & to_entity_name,
-  const bool allow_lane_change) -> std::optional<CanonicalizedLaneletPose>
+  const bool allow_lane_change) -> LaneletDistance
 {
   const auto canonicalized_lanelet_pose = pose::canonicalize(from_lanelet_pose, getHdmapUtils());
   const auto to_entity = getEntity(to_entity_name);
   if (to_entity->isInLanelet()) {
-    return pose::relativeLaneletPose(
+    return distance::laneletDistance(
       canonicalized_lanelet_pose, to_entity->getCanonicalizedLaneletPose().value(),
       allow_lane_change, getHdmapUtils());
   } else {
-    return std::nullopt;
+    return LaneletDistance();
   }
 }
 
-auto API::boundingBoxRelativeLaneletPose(
+auto API::boundingBoxLaneletDistance(
   const std::string & from_entity_name, const std::string & to_entity_name,
-  const bool allow_lane_change) -> std::optional<CanonicalizedLaneletPose>
+  const bool allow_lane_change) -> LaneletDistance
 {
   const auto from_entity = getEntity(from_entity_name);
   const auto to_entity = getEntity(to_entity_name);
   if (from_entity_name != to_entity_name) {
     if (from_entity->isInLanelet() && to_entity->isInLanelet()) {
-      return pose::boundingBoxRelativeLaneletPose(
+      return distance::boundingBoxLaneletDistance(
         from_entity->getCanonicalizedLaneletPose().value(), from_entity->getBoundingBox(),
         to_entity->getCanonicalizedLaneletPose().value(), to_entity->getBoundingBox(),
         allow_lane_change, getHdmapUtils());
     }
   }
-  return std::nullopt;
+  return LaneletDistance();
 }
 
-auto API::boundingBoxRelativeLaneletPose(
+auto API::boundingBoxLaneletDistance(
   const std::string & from_entity_name, const LaneletPose & to_lanelet_pose,
-  const bool allow_lane_change) -> std::optional<CanonicalizedLaneletPose>
+  const bool allow_lane_change) -> LaneletDistance
 {
   const auto canonicalized_lanelet_pose = pose::canonicalize(to_lanelet_pose, getHdmapUtils());
   const auto from_entity = getEntity(from_entity_name);
   if (from_entity->isInLanelet()) {
-    return pose::boundingBoxRelativeLaneletPose(
+    return distance::boundingBoxLaneletDistance(
       from_entity->getCanonicalizedLaneletPose().value(), from_entity->getBoundingBox(),
       canonicalized_lanelet_pose, traffic_simulator_msgs::msg::BoundingBox(), allow_lane_change,
       getHdmapUtils());
   } else {
-    return std::nullopt;
+    return LaneletDistance();
   }
 }
 

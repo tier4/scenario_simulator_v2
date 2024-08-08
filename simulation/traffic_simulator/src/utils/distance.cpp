@@ -123,6 +123,29 @@ auto longitudinalDistance(
   }
 }
 
+auto laneletDistance(
+  const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
+  const bool allow_lane_change, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+  -> LaneletDistance
+{
+  constexpr bool include_adjacent_lanelet{false};
+  constexpr bool include_opposite_direction{true};
+
+  LaneletDistance lanelet_distance;
+  // here the s and offset are intentionally assigned independently, even if
+  // it is not possible to calculate one of them - it happens that one is sufficient
+  if (
+    const auto longitudinal_distance = longitudinalDistance(
+      from, to, include_adjacent_lanelet, include_opposite_direction, allow_lane_change,
+      hdmap_utils_ptr)) {
+    lanelet_distance.longitudinal = longitudinal_distance.value();
+  }
+  if (const auto lateral_distance = lateralDistance(from, to, allow_lane_change, hdmap_utils_ptr)) {
+    lanelet_distance.lateral = lateral_distance.value();
+  }
+  return lanelet_distance;
+}
+
 auto boundingBoxDistance(
   const geometry_msgs::msg::Pose & from,
   const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
@@ -185,6 +208,33 @@ auto boundingBoxLaneLongitudinalDistance(
     return longitudinal_distance.value() + bounding_box_distance;
   }
   return std::nullopt;
+}
+
+auto boundingBoxLaneletDistance(
+  const CanonicalizedLaneletPose & from,
+  const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
+  const CanonicalizedLaneletPose & to,
+  const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box, const bool allow_lane_change,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> LaneletDistance
+{
+  constexpr bool include_adjacent_lanelet{false};
+  constexpr bool include_opposite_direction{true};
+
+  LaneletDistance lanelet_distance;
+  // here the s and offset are intentionally assigned independently, even if
+  // it is not possible to calculate one of them - it happens that one is sufficient
+  if (
+    const auto longitudinal_bounding_box_distance = boundingBoxLaneLongitudinalDistance(
+      from, from_bounding_box, to, to_bounding_box, include_adjacent_lanelet,
+      include_opposite_direction, allow_lane_change, hdmap_utils_ptr)) {
+    lanelet_distance.longitudinal = longitudinal_bounding_box_distance.value();
+  }
+  if (
+    const auto lateral_bounding_box_distance = boundingBoxLaneLateralDistance(
+      from, from_bounding_box, to, to_bounding_box, allow_lane_change, hdmap_utils_ptr)) {
+    lanelet_distance.lateral = lateral_bounding_box_distance.value();
+  }
+  return lanelet_distance;
 }
 
 auto distanceToLeftLaneBound(

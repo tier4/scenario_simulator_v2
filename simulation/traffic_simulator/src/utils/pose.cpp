@@ -212,56 +212,6 @@ auto boundingBoxRelativePose(
   return std::nullopt;
 }
 
-auto relativeLaneletPose(
-  const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
-  const bool allow_lane_change, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
-  -> CanonicalizedLaneletPose
-{
-  constexpr bool include_adjacent_lanelet{false};
-  constexpr bool include_opposite_direction{true};
-
-  LaneletPose position = quietNaNLaneletPose();
-  // here the s and offset are intentionally assigned independently, even if
-  // it is not possible to calculate one of them - it happens that one is sufficient
-  if (
-    const auto longitudinal_distance = longitudinalDistance(
-      from, to, include_adjacent_lanelet, include_opposite_direction, allow_lane_change,
-      hdmap_utils_ptr)) {
-    position.s = longitudinal_distance.value();
-  }
-  if (const auto lateral_distance = lateralDistance(from, to, allow_lane_change, hdmap_utils_ptr)) {
-    position.offset = lateral_distance.value();
-  }
-  return pose::canonicalize(position, hdmap_utils_ptr);
-}
-
-auto boundingBoxRelativeLaneletPose(
-  const CanonicalizedLaneletPose & from,
-  const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
-  const CanonicalizedLaneletPose & to,
-  const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box, const bool allow_lane_change,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> CanonicalizedLaneletPose
-{
-  constexpr bool include_adjacent_lanelet{false};
-  constexpr bool include_opposite_direction{true};
-
-  LaneletPose position = quietNaNLaneletPose();
-  // here the s and offset are intentionally assigned independently, even if
-  // it is not possible to calculate one of them - it happens that one is sufficient
-  if (
-    const auto longitudinal_bounding_box_distance = boundingBoxLaneLongitudinalDistance(
-      from, from_bounding_box, to, to_bounding_box, include_adjacent_lanelet,
-      include_opposite_direction, allow_lane_change, hdmap_utils_ptr)) {
-    position.s = longitudinal_bounding_box_distance.value();
-  }
-  if (
-    const auto lateral_bounding_box_distance = boundingBoxLaneLateralDistance(
-      from, from_bounding_box, to, to_bounding_box, allow_lane_change, hdmap_utils_ptr)) {
-    position.offset = lateral_bounding_box_distance.value();
-  }
-  return pose::canonicalize(position, hdmap_utils_ptr);
-}
-
 auto isInLanelet(
   const CanonicalizedLaneletPose & canonicalized_lanelet_pose, const lanelet::Id lanelet_id,
   const double tolerance, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> bool

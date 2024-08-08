@@ -246,10 +246,10 @@ public:
     {
       const bool allow_lane_change = (routing_algorithm == RoutingAlgorithm::value_type::shortest);
       if (prerequisite(from_pose_or_entity_name, to_pose_or_entity_name)) {
-        if (
-          const auto pose = core->relativeLaneletPose(
-            from_pose_or_entity_name, to_pose_or_entity_name, allow_lane_change)) {
-          return pose->getLaneletPose().offset;
+        if (const auto lanelet_distance = core->laneletDistance(
+              from_pose_or_entity_name, to_pose_or_entity_name, allow_lane_change);
+            lanelet_distance.lateral) {
+          return lanelet_distance.lateral.value();
         }
       }
       return std::numeric_limits<double>::quiet_NaN();
@@ -262,10 +262,10 @@ public:
     {
       const bool allow_lane_change = (routing_algorithm == RoutingAlgorithm::value_type::shortest);
       if (prerequisite(from_pose_or_entity_name, to_pose_or_entity_name)) {
-        if (
-          const auto pose = core->relativeLaneletPose(
-            from_pose_or_entity_name, to_pose_or_entity_name, allow_lane_change)) {
-          return pose->getLaneletPose().s;
+        if (const auto lanelet_distance = core->laneletDistance(
+              from_pose_or_entity_name, to_pose_or_entity_name, allow_lane_change);
+            lanelet_distance.longitudinal) {
+          return lanelet_distance.longitudinal.value();
         }
       }
       return std::numeric_limits<double>::quiet_NaN();
@@ -278,10 +278,10 @@ public:
     {
       const bool allow_lane_change = (routing_algorithm == RoutingAlgorithm::value_type::shortest);
       if (prerequisite(from_pose_or_entity_name, to_pose_or_entity_name)) {
-        if (
-          const auto pose = core->boundingBoxRelativeLaneletPose(
-            from_pose_or_entity_name, to_pose_or_entity_name, allow_lane_change)) {
-          return pose->getLaneletPose().offset;
+        if (const auto lanelet_distance = core->boundingBoxLaneletDistance(
+              from_pose_or_entity_name, to_pose_or_entity_name, allow_lane_change);
+            lanelet_distance.lateral) {
+          return lanelet_distance.lateral.value();
         }
       }
       return std::numeric_limits<double>::quiet_NaN();
@@ -294,10 +294,10 @@ public:
     {
       const bool allow_lane_change = (routing_algorithm == RoutingAlgorithm::value_type::shortest);
       if (prerequisite(from_pose_or_entity_name, to_pose_or_entity_name)) {
-        if (
-          const auto pose = core->boundingBoxRelativeLaneletPose(
-            from_pose_or_entity_name, to_pose_or_entity_name, allow_lane_change)) {
-          return pose->getLaneletPose().s;
+        if (const auto lanelet_distance = core->boundingBoxLaneletDistance(
+              from_pose_or_entity_name, to_pose_or_entity_name, allow_lane_change);
+            lanelet_distance.longitudinal) {
+          return lanelet_distance.longitudinal.value();
         }
       }
       return std::numeric_limits<double>::quiet_NaN();
