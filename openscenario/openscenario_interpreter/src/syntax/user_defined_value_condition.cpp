@@ -33,69 +33,75 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 template <typename T>
-struct MagicSubscription : public T
+struct MagicSubscription : private T
 {
-  struct Subscriber
+  struct Node : public rclcpp::Node
   {
-    rclcpp::Node node;
-
     std::atomic_bool stop_requested = false;
 
-    std::promise<void> promise;
+    std::mutex mutex;
 
-    std::future<void> future;
+    std::exception_ptr thrown;
 
     std::thread thread;
 
-    explicit Subscriber()
-    : node("magic_subscription"),
-      future(promise.get_future()),
-      thread(
-        [this](std::promise<void> promise) {
-          while (rclcpp::ok() and not stop_requested) {
-            try {
-              rclcpp::spin_some(node.get_node_base_interface());
-            } catch (...) {
-              promise.set_exception(std::current_exception());
-            }
+    explicit Node()
+    : rclcpp::Node("magic_subscription"), thread([this]() {
+        while (rclcpp::ok() and not stop_requested) {
+          try {
+            rclcpp::spin_some(get_node_base_interface());
+          } catch (...) {
+            auto lock = std::lock_guard(mutex);
+            thrown = std::current_exception();
           }
-        },
-        std::move(promise))
+        }
+      })
     {
+    }
+
+    ~Node()
+    {
+      if (thread.joinable() and not stop_requested.exchange(true)) {
+        thread.join();
+      }
+    }
+
+    auto rethrow()
+    {
+      if (auto lock = std::lock_guard(mutex); thrown) {
+        std::rethrow_exception(thrown);
+      }
     }
   };
 
-  static auto subscriber() -> auto &
-  {
-    static std::unique_ptr<Subscriber> subscriber = nullptr;
+  static inline std::size_t count = 0;
 
-    if (not subscriber) {
-      subscriber = std::make_unique<Subscriber>();
-    }
-
-    return subscriber;
-  }
+  static inline std::unique_ptr<Node> node = nullptr;
 
   typename rclcpp::Subscription<T>::SharedPtr subscription;
 
-  static inline std::size_t count = 0;
-
   explicit MagicSubscription(const std::string & topic_name)
-  : subscription(subscriber()->node.template create_subscription<T>(
-      topic_name, 1, [this, count = count++](const typename T::SharedPtr message) {
-        static_cast<T &>(*this) = *message;
-      }))
   {
+    if (not count++) {
+      node = std::make_unique<Node>();
+    }
+
+    subscription = node->template create_subscription<T>(
+      topic_name, 1,
+      [this](const typename T::SharedPtr message) { static_cast<T &>(*this) = *message; });
   }
 
   ~MagicSubscription()
   {
-    if (
-      not --count and subscriber()->thread.joinable() and
-      not subscriber()->stop_requested.exchange(true)) {
-      subscriber()->thread.join();
-      subscriber().reset();
+    if (not --count) {
+      node.reset();
     }
+  }
+
+  auto get() const -> const auto &
+  {
+    node->rethrow();
+    return static_cast<const T &>(*this);
   }
 };
 
@@ -158,29 +164,29 @@ UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node
     using tier4_simulation_msgs::msg::UserDefinedValueType;
 
     evaluate_value =
-      [this, message = std::make_shared<MagicSubscription<UserDefinedValue>>(result.str(0))]() {
-        auto evaluate = [](const auto & user_defined_value) {
-          switch (user_defined_value.type.data) {
+      [this, subscriber = std::make_shared<MagicSubscription<UserDefinedValue>>(result.str(0))]() {
+        if (const auto message = subscriber->get(); message.value.empty()) {
+          return unspecified;
+        } else {
+          switch (message.type.data) {
             case UserDefinedValueType::BOOLEAN:
-              return make<Boolean>(user_defined_value.value);
+              return make<Boolean>(message.value);
             case UserDefinedValueType::DATE_TIME:
-              return make<String>(user_defined_value.value);
+              return make<String>(message.value);
             case UserDefinedValueType::DOUBLE:
-              return make<Double>(user_defined_value.value);
+              return make<Double>(message.value);
             case UserDefinedValueType::INTEGER:
-              return make<Integer>(user_defined_value.value);
+              return make<Integer>(message.value);
             case UserDefinedValueType::STRING:
-              return make<String>(user_defined_value.value);
+              return make<String>(message.value);
             case UserDefinedValueType::UNSIGNED_INT:
-              return make<UnsignedInt>(user_defined_value.value);
+              return make<UnsignedInt>(message.value);
             case UserDefinedValueType::UNSIGNED_SHORT:
-              return make<UnsignedShort>(user_defined_value.value);
+              return make<UnsignedShort>(message.value);
             default:
               return unspecified;
           }
-        };
-
-        return message->value.empty() ? unspecified : evaluate(*message);
+        }
       };
 #else
     throw SyntaxError(
