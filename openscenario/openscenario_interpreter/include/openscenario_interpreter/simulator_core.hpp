@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SIMULATOR_CORE_HPP_
 
 #include <geometry/quaternion/quaternion_to_euler.hpp>
+#include <geometry/vector3/operator.hpp>
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/syntax/boolean.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
@@ -509,7 +510,6 @@ public:
       return core->checkCollision(std::forward<decltype(xs)>(xs)...);
     }
 
-    template <typename... Ts>
     static auto evaluateBoundingBoxEuclideanDistance(
       const std::string & from_entity_name,
       const std::string & to_entity_name)  // for RelativeDistanceCondition
@@ -527,6 +527,13 @@ public:
       return std::numeric_limits<double>::quiet_NaN();
     }
 
+    template <typename T, typename U>
+    static auto evaluateRelativeSpeed(const T & x, const U & y)
+    {
+      using math::geometry::operator-;
+      return core->getCurrentTwist(x).linear - core->getCurrentTwist(y).linear;
+    }
+
     template <typename... Ts>
     static auto evaluateSimulationTime(Ts &&... xs) -> double
     {
@@ -540,7 +547,7 @@ public:
     template <typename... Ts>
     static auto evaluateSpeed(Ts &&... xs)
     {
-      return core->getCurrentTwist(std::forward<decltype(xs)>(xs)...).linear.x;
+      return core->getCurrentTwist(std::forward<decltype(xs)>(xs)...).linear;
     }
 
     template <typename... Ts>

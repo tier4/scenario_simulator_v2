@@ -13,48 +13,58 @@
 // limitations under the License.
 
 #include <geometry/vector3/norm.hpp>
-#include <openscenario_interpreter/reader/attribute.hpp>
-#include <openscenario_interpreter/scope.hpp>
-#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/entities.hpp>
+#include <openscenario_interpreter/syntax/entity_selection.hpp>
+#include <openscenario_interpreter/syntax/relative_speed_condition.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
-#include <openscenario_interpreter/syntax/speed_condition.hpp>
 #include <openscenario_interpreter/utility/print.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-SpeedCondition::SpeedCondition(
+RelativeSpeedCondition::RelativeSpeedCondition(
   const pugi::xml_node & node, Scope & scope, const TriggeringEntities & triggering_entities)
 : Scope(scope),
+  entity_ref(readAttribute<String>("entityRef", node, scope), scope),
   rule(readAttribute<Rule>("rule", node, scope)),
   value(readAttribute<Double>("value", node, scope)),
   direction(readAttribute<DirectionalDimension>("direction", node, scope, std::nullopt)),
   triggering_entities(triggering_entities),
-  results(triggering_entities.entity_refs.size(), {Double::nan()})
+  evaluations(triggering_entities.entity_refs.size(), {Double::nan()})
 {
+  if (entity_ref.is<EntitySelection>()) {
+    throw SyntaxError("EntitySelection is not allowed in RelativeSpeedCondition.entityRef");
+  }
 }
 
-auto SpeedCondition::description() const -> String
+auto RelativeSpeedCondition::description() const -> String
 {
-  std::stringstream description;
+  auto description = std::stringstream();
 
-  description << triggering_entities.description() << "'s speed = ";
+  description << triggering_entities.description() << "'s relative ";
 
-  print_to(description, results);
+  if (direction) {
+    description << *direction << " ";
+  }
+
+  description << "speed to given entity " << entity_ref << " = ";
+
+  print_to(description, evaluations);
 
   description << " " << rule << " " << value << "?";
 
   return description.str();
 }
 
-auto SpeedCondition::evaluate(
-  const Entities * entities, const Entity & triggering_entity,
+auto RelativeSpeedCondition::evaluate(
+  const Entities * entities, const Entity & triggering_entity, const Entity & entity_ref,
   const std::optional<DirectionalDimension> & direction) -> double
 {
-  if (entities->isAdded(triggering_entity)) {
-    if (const auto v = evaluateSpeed(triggering_entity); direction) {
+  if (
+    triggering_entity.apply([&](const auto & each) { return entities->isAdded(each); }).min() and
+    entities->isAdded(entity_ref)) {
+    if (const auto v = evaluateRelativeSpeed(triggering_entity, entity_ref); direction) {
       switch (*direction) {
         case DirectionalDimension::longitudinal:
           return v.x;
@@ -73,15 +83,15 @@ auto SpeedCondition::evaluate(
   }
 }
 
-auto SpeedCondition::evaluate() -> Object
+auto RelativeSpeedCondition::evaluate() -> Object
 {
-  results.clear();
+  evaluations.clear();
 
-  return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
-    results.push_back(triggering_entity.apply([&](const auto & triggering_entity) {
-      return evaluate(global().entities, triggering_entity);
+  return asBoolean(triggering_entities.apply([this](const auto & triggering_entity) {
+    evaluations.push_back(triggering_entity.apply([this](const auto & triggering_entity) {
+      return evaluate(global().entities, triggering_entity, entity_ref, direction);
     }));
-    return not results.back().size() or std::invoke(rule, results.back(), value).min();
+    return not evaluations.back().size() or std::invoke(rule, evaluations.back(), value).min();
   }));
 }
 }  // namespace syntax
