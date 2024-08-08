@@ -259,8 +259,7 @@ public:
 
     static auto evaluateLateralRelativeLanes(
       const std::string & from_entity_name, const std::string & to_entity_name,
-      const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined)
-      -> std::optional<int>
+      const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined) -> int
     {
       if (const auto from_entity = core->getEntity(from_entity_name)) {
         if (const auto to_entity = core->getEntity(to_entity_name)) {
@@ -275,7 +274,9 @@ public:
           }
         }
       }
-      return std::nullopt;
+      throw common::Error(
+        "Failed to evaluate lateral relative lanes between ", from_entity_name, " and ",
+        to_entity_name);
     }
   };
 

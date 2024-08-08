@@ -92,19 +92,21 @@ auto RelativeClearanceCondition::evaluate() -> Object
       if (relative_lane_range.empty()) {
         return true;
       } else {
-        if (auto relative_lateral_lane = evaluateLateralRelativeLanes(
-              triggering_entity, target_entity, RoutingAlgorithm::shortest);
-            relative_lateral_lane.has_value()) {
-          if (is_back) {
-            relative_lateral_lane.value() = -relative_lateral_lane.value();
-          }
-          return std::any_of(
-            relative_lane_range.begin(), relative_lane_range.end(), [&](const auto & range) {
-              return range.evaluate(relative_lateral_lane.value());
-            });
-        } else {
-          throw common::Error("Relative lateral lane is not available");
+        int relative_lateral_lane;
+        try {
+          relative_lateral_lane = evaluateLateralRelativeLanes(
+            triggering_entity, target_entity, RoutingAlgorithm::shortest);
+        } catch (const std::exception &) {
+          // occurring errors means that the target entity is not in the specified range,
+          // under the assumption that relative lane range is defined in routable range .
+          return false;
         }
+        if (is_back) {
+          relative_lateral_lane = -relative_lateral_lane;
+        }
+        return std::any_of(
+          relative_lane_range.begin(), relative_lane_range.end(),
+          [&](const auto & range) { return range.evaluate(relative_lateral_lane); });
       }
     };
 
