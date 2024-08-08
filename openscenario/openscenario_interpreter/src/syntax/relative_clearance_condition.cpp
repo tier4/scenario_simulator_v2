@@ -170,6 +170,8 @@ auto RelativeClearanceCondition::evaluate() -> Object
         [&](const auto & target_candidate_entity) {
           if (not target_candidate_entity.second.template is<ScenarioObject>()) {
             return true;
+          } else if (not target_candidate_entity.second.template as<ScenarioObject>().is_added) {
+            return true;
           } else {
             const ScenarioObject & target_candidate_scenario_object =
               target_candidate_entity.second.template as<ScenarioObject>();
