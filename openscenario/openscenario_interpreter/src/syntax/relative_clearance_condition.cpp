@@ -54,8 +54,18 @@ auto RelativeClearanceCondition::description() const -> String
     description << "all lanes";
   } else {
     for (auto range = relative_lane_range.begin(); range != relative_lane_range.end(); range++) {
-      description << ((range != relative_lane_range.begin()) ? std::string(", ") : std::string(""))
-                  << range->from << " to " << range->to;
+      description << ((range != relative_lane_range.begin()) ? std::string(", ") : std::string(""));
+      if (range->from) {
+        if (range->to) {
+          description << range->from.value() << " to " << range->to.value();
+        } else {
+          description << range->from.value() << "or more";
+        }
+      } else {
+        if (range->to) {
+          description << range->to.value() << " or less";
+        }
+      }
     }
   }
 
@@ -90,8 +100,7 @@ auto RelativeClearanceCondition::evaluate() -> Object
           }
           return std::any_of(
             relative_lane_range.begin(), relative_lane_range.end(), [&](const auto & range) {
-              return range.from <= relative_lateral_lane.value() &&
-                     range.to >= relative_lateral_lane.value();
+              return range.evaluate(relative_lateral_lane.value());
             });
         } else {
           throw common::Error("Relative lateral lane is not available");

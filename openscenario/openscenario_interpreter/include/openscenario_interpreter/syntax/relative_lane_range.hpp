@@ -17,6 +17,7 @@
 
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/integer.hpp>
+#include <optional>
 #include <pugixml.hpp>
 
 namespace openscenario_interpreter
@@ -36,14 +37,16 @@ struct RelativeLaneRange
   /*
      The lower limit of the range. Range: [-inf, inf[. Default if omitted: -inf
    */
-  const Integer from;
+  const std::optional<Integer> from;
 
   /*
      The upper limit of the range. Range: ]-inf, inf]. Default if omitted: +inf
    */
-  const Integer to;
+  const std::optional<Integer> to;
 
   explicit RelativeLaneRange(const pugi::xml_node &, Scope &);
+
+  auto evaluate(Integer::value_type value) const -> bool;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
