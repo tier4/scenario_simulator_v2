@@ -38,9 +38,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Storyboard : public Scope,
-                    public StoryboardElement,
-                    private SimulatorCore::NonStandardOperation
+struct Storyboard : public Scope, public StoryboardElement
 {
   Init init;
 

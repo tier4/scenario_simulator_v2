@@ -188,7 +188,7 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
               engage();
               waiting_for_engagement_to_be_completed = true;  // NOTE: DIRTY HACK!!!
             } else if (engaged()) {
-              activateNonUserDefinedControllers();
+              SimulatorCore::activateNonUserDefinedControllers();
               waiting_for_engagement_to_be_completed = false;  // NOTE: DIRTY HACK!!!
             }
           } else if (currentScenarioDefinition()) {

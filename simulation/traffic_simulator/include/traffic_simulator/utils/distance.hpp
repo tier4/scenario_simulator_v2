@@ -22,7 +22,13 @@ namespace traffic_simulator
 {
 inline namespace distance
 {
-// Lateral
+// Lanelet
+struct LaneletDistance
+{
+  std::optional<double> longitudinal{std::nullopt};
+  std::optional<double> lateral{std::nullopt};
+};
+
 auto lateralDistance(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
   bool allow_lane_change, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
@@ -33,11 +39,15 @@ auto lateralDistance(
   double matching_distance, bool allow_lane_change,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<double>;
 
-// Longitudinal
 auto longitudinalDistance(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
   bool include_adjacent_lanelet, bool include_opposite_direction, bool allow_lane_change,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<double>;
+
+auto laneletDistance(
+  const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
+  const bool allow_lane_change, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+  -> LaneletDistance;
 
 // BoundingBox
 auto boundingBoxDistance(
@@ -60,6 +70,13 @@ auto boundingBoxLaneLongitudinalDistance(
   const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box, bool include_adjacent_lanelet,
   bool include_opposite_direction, bool allow_lane_change,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<double>;
+
+auto boundingBoxLaneletDistance(
+  const CanonicalizedLaneletPose & from,
+  const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
+  const CanonicalizedLaneletPose & to,
+  const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box, const bool allow_lane_change,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> LaneletDistance;
 
 // Bounds
 auto distanceToLaneBound(
