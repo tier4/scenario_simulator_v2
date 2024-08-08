@@ -87,7 +87,7 @@ struct MagicSubscription : private T
     }
 
     subscription = node->template create_subscription<T>(
-      topic_name, 1,
+      topic_name, rclcpp::QoS(1).best_effort(),
       [this](const typename T::SharedPtr message) { static_cast<T &>(*this) = *message; });
   }
 
