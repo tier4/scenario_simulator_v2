@@ -103,13 +103,6 @@ auto EgoEntity::getEntityTypename() const -> const std::string &
   return result;
 }
 
-auto EgoEntity::getEntityType() const -> const traffic_simulator_msgs::msg::EntityType &
-{
-  static traffic_simulator_msgs::msg::EntityType type;
-  type.type = traffic_simulator_msgs::msg::EntityType::EGO;
-  return type;
-}
-
 auto EgoEntity::getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle>
 {
   return std::nullopt;
@@ -131,7 +124,10 @@ auto EgoEntity::getRouteLanelets(double /*unused horizon*/) -> lanelet::Ids
   return ids;
 }
 
-auto EgoEntity::getCurrentPose() const -> geometry_msgs::msg::Pose { return status_.getMapPose(); }
+auto EgoEntity::getCurrentPose() const -> const geometry_msgs::msg::Pose &
+{
+  return status_->getMapPose();
+}
 
 auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray
 {
@@ -144,19 +140,20 @@ void EgoEntity::onUpdate(double current_time, double step_time)
 
   if (is_controlled_by_simulator_ && npc_logic_started_) {
     if (
-      const auto updated_status = traffic_simulator::follow_trajectory::makeUpdatedStatus(
-        static_cast<traffic_simulator::EntityStatus>(status_), *polyline_trajectory_,
-        behavior_parameter_, hdmap_utils_ptr_, step_time,
-        getDefaultMatchingDistanceForLaneletPoseCalculation(),
-        target_speed_ ? target_speed_.value() : status_.getTwist().linear.x)) {
-      // prefer the current lanelet
-      const auto canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
-        updated_status.value().pose, status_.getBoundingBox(), status_.getLaneletIds(), false,
-        getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
-      setStatus(CanonicalizedEntityStatus(*updated_status, canonicalized_lanelet_pose));
+      const auto non_canonicalized_updated_status =
+        traffic_simulator::follow_trajectory::makeUpdatedStatus(
+          static_cast<traffic_simulator::EntityStatus>(*status_), *polyline_trajectory_,
+          behavior_parameter_, hdmap_utils_ptr_, step_time,
+          getDefaultMatchingDistanceForLaneletPoseCalculation(),
+          target_speed_ ? target_speed_.value() : status_->getTwist().linear.x)) {
+      // prefer current lanelet on ss2 side
+      setStatus(non_canonicalized_updated_status.value(), status_->getLaneletIds());
     } else {
       is_controlled_by_simulator_ = false;
     }
+  }
+  if (not is_controlled_by_simulator_) {
+    updateEntityStatusTimestamp(current_time + step_time);
   }
 
   updateStandStillDuration(step_time);
@@ -288,13 +285,13 @@ auto EgoEntity::setVelocityLimit(double value) -> void  //
 
 auto EgoEntity::setMapPose(const geometry_msgs::msg::Pose & map_pose) -> void
 {
-  auto status = static_cast<EntityStatus>(status_);
-  status.pose = map_pose;
-  const auto unique_route_lanelets = traffic_simulator::helper::getUniqueValues(getRouteLanelets());
-  const auto canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
-    map_pose, status_.getBoundingBox(), unique_route_lanelets, false,
+  auto entity_status = static_cast<EntityStatus>(*status_);
+  entity_status.pose = map_pose;
+  entity_status.lanelet_pose_valid = false;
+  // prefer current lanelet on Autoware side
+  status_->set(
+    entity_status, helper::getUniqueValues(getRouteLanelets()),
     getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
-  status_ = CanonicalizedEntityStatus(status, canonicalized_lanelet_pose);
 }
 }  // namespace entity
 }  // namespace traffic_simulator
