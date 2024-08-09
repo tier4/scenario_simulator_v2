@@ -14,7 +14,9 @@
 
 #include "test_primitive.hpp"
 
+#include <geometry_msgs/msg/point.hpp>
 #include <limits>
+#include <vector>
 
 #include "../../utils/expect_eq_macros.hpp"
 
@@ -24,8 +26,8 @@
 TEST_F(PrimitiveTest, addToScene_sample)
 {
   const std::vector<Vertex> expected_vertices = {
-    {0.0f, 1.0f, -1.0f}, {2.0f, 1.0f, -1.0f}, {0.0f, 3.0f, -1.0f}, {2.0f, 3.0f, -1.0f},
-    {0.0f, 1.0f, 1.0f},  {2.0f, 1.0f, 1.0f},  {0.0f, 3.0f, 1.0f},  {2.0f, 3.0f, 1.0f}};
+    {0.0f, 1.0f, -1.0f}, {0.0f, 1.0f, 1.0f}, {0.0f, 3.0f, -1.0f}, {0.0f, 3.0f, 1.0f},
+    {2.0f, 1.0f, -1.0f}, {2.0f, 1.0f, 1.0f}, {2.0f, 3.0f, -1.0f}, {2.0f, 3.0f, 1.0f}};
   const auto expected_triangles = primitive_->getTriangles();
 
   RTCDevice device = rtcNewDevice(nullptr);
@@ -60,15 +62,15 @@ TEST_F(PrimitiveTest, addToScene_sample)
 }
 
 /**
- * @note Test function behavior with vertices and triangles set to only zeros.
+ * @note Test function behavior with vertices set to only zeros.
  */
 TEST_F(PrimitiveTest, addToScene_zeros)
 {
-  const std::vector<Triangle> expected_triangles = {{0, 0, 0}};
-  const std::vector<Vertex> expected_vertices = {{1.0f, 2.0f, 0.0f}};
+  const std::vector<Triangle> expected_triangles = {{0, 1, 2}};
+  const std::vector<Vertex> expected_vertices = {{0.0f, 0.0f, 0.0f}};
 
-  primitive_->setVertices({{0.0f, 0.0f, 0.0f}});
-  primitive_->setTriangles(expected_triangles);
+  primitive_ =
+    std::make_unique<Box>(0.0f, 0.0f, 0.0f, utils::makePose(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0));
 
   RTCDevice device = rtcNewDevice(nullptr);
   RTCScene scene = rtcNewScene(device);
@@ -106,9 +108,9 @@ TEST_F(PrimitiveTest, addToScene_zeros)
  */
 TEST_F(PrimitiveTest, getTriangles)
 {
-  const std::vector<Triangle> expected_triangles = {{0, 1, 2}, {1, 3, 2}, {4, 5, 6}, {5, 7, 6},
-                                                    {0, 1, 4}, {1, 5, 4}, {2, 3, 6}, {3, 7, 6},
-                                                    {0, 2, 4}, {2, 6, 4}, {1, 3, 5}, {3, 7, 5}};
+  const std::vector<Triangle> expected_triangles = {{0, 1, 2}, {1, 3, 2}, {4, 6, 5}, {5, 6, 7},
+                                                    {0, 4, 1}, {1, 4, 5}, {2, 3, 6}, {3, 7, 6},
+                                                    {0, 2, 4}, {2, 6, 4}, {1, 5, 3}, {3, 5, 7}};
 
   const auto triangles = primitive_->getTriangles();
 
@@ -119,14 +121,13 @@ TEST_F(PrimitiveTest, getTriangles)
 }
 
 /**
- * @note Test basic functionality. Test obtaining vertex correctness with a sample vertex and a non
- * trivial Primitive pose - the goal is to test transformation of vertex elements.
+ * @note Test basic functionality. Test obtaining vertexes correctness.
  */
 TEST_F(PrimitiveTest, getVertex)
 {
   const std::vector<Vertex> expected_vertices = {
-    {0.0f, 1.0f, -1.0f}, {2.0f, 1.0f, -1.0f}, {0.0f, 3.0f, -1.0f}, {2.0f, 3.0f, -1.0f},
-    {0.0f, 1.0f, 1.0f},  {2.0f, 1.0f, 1.0f},  {0.0f, 3.0f, 1.0f},  {2.0f, 3.0f, 1.0f}};
+    {0.0f, 1.0f, -1.0f}, {0.0f, 1.0f, 1.0f}, {0.0f, 3.0f, -1.0f}, {0.0f, 3.0f, 1.0f},
+    {2.0f, 1.0f, -1.0f}, {2.0f, 1.0f, 1.0f}, {2.0f, 3.0f, -1.0f}, {2.0f, 3.0f, 1.0f}};
 
   const auto vertices = primitive_->getVertex();
 
@@ -207,7 +208,8 @@ TEST_F(PrimitiveTest, getMin_withTransform)
  */
 TEST_F(PrimitiveTest, getMin_empty)
 {
-  primitive_->setVertices(std::vector<Vertex>{});
+  primitive_ = std::make_unique<Primitive>("Unknown", pose_);
+
   const auto min_x = primitive_->getMin(math::geometry::Axis::X);
 
   EXPECT_FALSE(min_x.has_value());
@@ -243,7 +245,8 @@ TEST_F(PrimitiveTest, getMax_withTransform)
  */
 TEST_F(PrimitiveTest, getMax_empty)
 {
-  primitive_->setVertices(std::vector<Vertex>{});
+  primitive_ = std::make_unique<Primitive>("Unknown", pose_);
+
   const auto max_x = primitive_->getMax(math::geometry::Axis::X);
 
   EXPECT_FALSE(max_x.has_value());

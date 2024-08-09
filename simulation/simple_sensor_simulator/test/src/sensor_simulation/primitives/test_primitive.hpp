@@ -17,76 +17,26 @@
 
 #include <gtest/gtest.h>
 
-#include <geometry_msgs/msg/point.hpp>
-#include <geometry_msgs/msg/pose.hpp>
-#include <geometry_msgs/msg/quaternion.hpp>
+#include <memory>
+#include <simple_sensor_simulator/sensor_simulation/primitives/box.hpp>
 #include <simple_sensor_simulator/sensor_simulation/primitives/primitive.hpp>
-#include <vector>
 
 #include "../../utils/helper_functions.hpp"
 
 using namespace simple_sensor_simulator::primitives;
 using namespace simple_sensor_simulator;
 
-namespace simple_sensor_simulator
-{
-namespace primitives
-{
-
-class DummyPrimitive : public Primitive
-{
-public:
-  DummyPrimitive(const std::string & type, const geometry_msgs::msg::Pose & pose)
-  : Primitive(type, pose)
-  {
-  }
-
-  auto setVertices(const std::vector<Vertex> & vertices) -> void { vertices_ = vertices; }
-  auto setTriangles(const std::vector<Triangle> & triangles) -> void { triangles_ = triangles; }
-
-  auto getVerticesSize() const -> size_t { return vertices_.size(); }
-  auto getTrianglesSize() const -> size_t { return triangles_.size(); }
-
-  auto getVertices() const -> const std::vector<Vertex> & { return vertices_; }
-  auto getTriangles() const -> const std::vector<Triangle> & { return triangles_; }
-};
-
-}  // namespace primitives
-}  // namespace simple_sensor_simulator
-
 class PrimitiveTest : public ::testing::Test
 {
 protected:
   PrimitiveTest()
   : pose_(utils::makePose(1.0, 2.0, 0.0, 0.0, 0.0, 0.0, 1.0)),
-    primitive_(std::make_unique<DummyPrimitive>("DummyPrimitive", pose_))
+    primitive_(std::make_unique<Box>(2.0f, 2.0f, 2.0f, pose_))
   {
-    primitive_->setVertices(
-      {{-1.0f, -1.0f, -1.0f},
-       {1.0f, -1.0f, -1.0f},
-       {-1.0f, 1.0f, -1.0f},
-       {1.0f, 1.0f, -1.0f},
-       {-1.0f, -1.0f, 1.0f},
-       {1.0f, -1.0f, 1.0f},
-       {-1.0f, 1.0f, 1.0f},
-       {1.0f, 1.0f, 1.0f}});
-    primitive_->setTriangles(
-      {{0, 1, 2},
-       {1, 3, 2},
-       {4, 5, 6},
-       {5, 7, 6},
-       {0, 1, 4},
-       {1, 5, 4},
-       {2, 3, 6},
-       {3, 7, 6},
-       {0, 2, 4},
-       {2, 6, 4},
-       {1, 3, 5},
-       {3, 7, 5}});
   }
 
   geometry_msgs::msg::Pose pose_;
-  std::unique_ptr<DummyPrimitive> primitive_;
+  std::unique_ptr<Primitive> primitive_;
 };
 
 #endif  // SIMPLE_SENSOR_SIMULATOR__TEST__TEST_PRIMITIVE_HPP_
