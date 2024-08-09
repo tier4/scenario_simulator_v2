@@ -76,8 +76,8 @@ TEST_F(RaycasterTest, setDirection_oneBox)
     box_name_, box_depth_, box_width_, box_height_, box_pose_);
 
   simulation_api_schema::LidarConfiguration config;
-  config.add_vertical_angles(0.0);                  // Only one vertical angle for a horizontal ring
-  config.set_horizontal_resolution(degToRad(1.0));  // Set horizontal resolution to 1 degree
+  config.add_vertical_angles(0.0);  // Only one vertical angle for a horizontal ring
+  config.set_horizontal_resolution(utils::degToRad(1.0));  // Set horizontal resolution to 1 degree
 
   raycaster_->setDirection(config);
 
@@ -103,13 +103,7 @@ TEST_F(RaycasterTest, setDirection_manyBoxes)
   for (int i = 0; i < num_boxes; ++i) {
     const double angle = i * angle_increment;
     const auto box_pose =
-      geometry_msgs::build<geometry_msgs::msg::Pose>()
-        .position(geometry_msgs::build<geometry_msgs::msg::Point>()
-                    .x(radius * cos(angle))
-                    .y(radius * sin(angle))
-                    .z(0.0))
-        .orientation(
-          geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0.0).y(0.0).z(0.0).w(1.0));
+      utils::makePose(radius * cos(angle), radius * sin(angle), 0.0, 0.0, 0.0, 0.0, 1.0);
 
     const std::string name = "box" + std::to_string(i);
     raycaster_->addPrimitive<primitives::Box>(name, box_depth_, box_width_, box_height_, box_pose);
@@ -117,7 +111,7 @@ TEST_F(RaycasterTest, setDirection_manyBoxes)
 
   simulation_api_schema::LidarConfiguration config;
   config.add_vertical_angles(0.0);  // Only one vertical angle for a horizontal ring
-  config.set_horizontal_resolution(degToRad(5.0));
+  config.set_horizontal_resolution(utils::degToRad(5.0));
 
   raycaster_->setDirection(config);
 
