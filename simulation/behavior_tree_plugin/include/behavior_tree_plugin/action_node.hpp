@@ -118,7 +118,6 @@ protected:
   double step_time;
   double default_matching_distance_for_lanelet_pose_calculation;
   std::optional<double> target_speed;
-  std::shared_ptr<traffic_simulator::EntityStatus> non_canonicalized_updated_status;
   EntityStatusDict other_entity_status;
   lanelet::Ids route_lanelets;
 
