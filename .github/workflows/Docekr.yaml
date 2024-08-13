@@ -20,6 +20,8 @@ jobs:
         # See also https://github.com/tier4/scenario_simulator_v2/pull/1295
         # arch: [amd64, arm64]
     steps:
+      - name: echo github.event_name
+        run: echo '${{ github.event_name }}'
       - name: Free Disk Space (Ubuntu)
         uses: jlumbroso/free-disk-space@main
         with:
