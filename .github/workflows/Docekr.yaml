@@ -5,6 +5,7 @@ on:
       - master
   push:
     tags:
+      - '*.*.*'
 
 jobs:
   push_docker:
