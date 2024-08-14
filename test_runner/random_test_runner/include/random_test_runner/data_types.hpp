@@ -166,7 +166,7 @@ struct fmt::formatter<TestDescription>
     fmt::format_to(
       ctx.out(),
       "ego_start_position: {} ego_goal_position: {} "
-      "ego_goal_pose: {}\nnpc_descriptions:",
+      "ego_goal_pose: {} npc_descriptions:",
       v.ego_start_position, v.ego_goal_position, v.ego_goal_pose);
     for (size_t idx = 0; idx < v.npcs_descriptions.size(); idx++) {
       fmt::format_to(ctx.out(), "[{}]: {}\n", idx, v.npcs_descriptions[idx]);
