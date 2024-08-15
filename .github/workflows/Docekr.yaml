@@ -1,11 +1,19 @@
 name: Docker
 on:
   pull_request:
-    branches:
-      - master
+    paths:
+      - "**"
+      - "!docs/**"
+      - "!README.md"
+      - "!CONTRIBUTING.md"
+      - "!.github/**"
+      - ".github/workflows/Docker.yaml"
+      - "!mkdocs.yml"
+      - "!pyproject.toml"
+      - "!poetry.lock"
   push:
     tags:
-      - '*.*.*'
+      - '*'
 
 jobs:
   push_docker:
