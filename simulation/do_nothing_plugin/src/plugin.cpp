@@ -111,10 +111,14 @@ auto interpolateEntityStatusFromPolylineTrajectory(
     return interpolated_entity_status;
   };
 
-  if ((current_time + step_time) <= trajectory->shape.vertices.begin()->time) {
+  if (
+    (current_time + step_time) <=
+    (trajectory->base_time + trajectory->shape.vertices.begin()->time)) {
     return std::nullopt;
   }
-  if (trajectory->shape.vertices.back().time <= (current_time + step_time)) {
+  if (
+    (trajectory->base_time + trajectory->shape.vertices.back().time) <=
+    (current_time + step_time)) {
     return interpolate_entity_status(
       1, *std::prev(trajectory->shape.vertices.end(), 2),
       *std::prev(trajectory->shape.vertices.end(), 1));
