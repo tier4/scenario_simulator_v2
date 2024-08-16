@@ -14,7 +14,6 @@
 
 #include <gtest/gtest.h>
 
-#include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
 
 #include "../helper_functions.hpp"
@@ -26,13 +25,19 @@ int main(int argc, char ** argv)
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
+class CanonicalizedLaneletPoseTest : public testing::Test
+{
+protected:
+  CanonicalizedLaneletPoseTest() : hdmap_utils(makeHdMapUtilsSharedPointer()) {}
+
+  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils;
+};
 
 /**
  * @note Test constructor behavior with route_lanelets argument present when canonicalization function fails.
  */
-TEST(CanonicalizedLaneletPose, CanonicalizedLaneletPose_withRoute_invalid)
+TEST_F(CanonicalizedLaneletPoseTest, CanonicalizedLaneletPose_withRoute_invalid)
 {
-  auto hdmap_utils = makeHdMapUtilsSharedPointer();
   EXPECT_THROW(
     CanonicalizedLaneletPose(
       traffic_simulator::helper::constructLaneletPose(120576, 14.6356, 0.0), lanelet::Ids{},
@@ -43,9 +48,8 @@ TEST(CanonicalizedLaneletPose, CanonicalizedLaneletPose_withRoute_invalid)
 /**
  * @note Test constructor behavior with route_lanelets argument present when canonicalization function succeeds
  */
-TEST(CanonicalizedLaneletPose, CanonicalizedLaneletPose_withRoute)
+TEST_F(CanonicalizedLaneletPoseTest, CanonicalizedLaneletPose_withRoute)
 {
-  auto hdmap_utils = makeHdMapUtilsSharedPointer();
   std::shared_ptr<CanonicalizedLaneletPose> pose;
   EXPECT_NO_THROW(
     pose = std::make_shared<CanonicalizedLaneletPose>(
@@ -59,9 +63,8 @@ TEST(CanonicalizedLaneletPose, CanonicalizedLaneletPose_withRoute)
 /**
  * @note Test constructor behavior with route_lanelets argument absent when canonicalization function fails
  */
-TEST(CanonicalizedLaneletPose, CanonicalizedLaneletPose_withoutRoute_invalid)
+TEST_F(CanonicalizedLaneletPoseTest, CanonicalizedLaneletPose_withoutRoute_invalid)
 {
-  auto hdmap_utils = makeHdMapUtilsSharedPointer();
   EXPECT_THROW(
     CanonicalizedLaneletPose(
       traffic_simulator::helper::constructLaneletPose(120576, 0.0, 0.0), hdmap_utils),
@@ -71,9 +74,8 @@ TEST(CanonicalizedLaneletPose, CanonicalizedLaneletPose_withoutRoute_invalid)
 /**
  * @note Test constructor behavior with route_lanelets argument absent when canonicalization function succeeds
  */
-TEST(CanonicalizedLaneletPose, CanonicalizedLaneletPose_withoutRoute)
+TEST_F(CanonicalizedLaneletPoseTest, CanonicalizedLaneletPose_withoutRoute)
 {
-  auto hdmap_utils = makeHdMapUtilsSharedPointer();
   std::shared_ptr<CanonicalizedLaneletPose> pose;
   EXPECT_NO_THROW(
     pose = std::make_shared<CanonicalizedLaneletPose>(
@@ -86,12 +88,11 @@ TEST(CanonicalizedLaneletPose, CanonicalizedLaneletPose_withoutRoute)
 /**
  * @note Test copy constructor behavior
  */
-TEST(CanonicalizedLaneletPose, CanonicalizedLaneletPose_copyConstructor)
+TEST_F(CanonicalizedLaneletPoseTest, CanonicalizedLaneletPose_copyConstructor)
 {
-  auto hdmap_utils = makeHdMapUtilsSharedPointer();
-  CanonicalizedLaneletPose pose(
+  const CanonicalizedLaneletPose pose(
     traffic_simulator::helper::constructLaneletPose(120659, 0.0, 0.0), hdmap_utils);
-  CanonicalizedLaneletPose pose_copy(pose);
+  const CanonicalizedLaneletPose pose_copy(pose);
   EXPECT_LANELET_POSE_EQ(
     static_cast<traffic_simulator::LaneletPose>(pose),
     static_cast<traffic_simulator::LaneletPose>(CanonicalizedLaneletPose(pose)));
@@ -100,13 +101,12 @@ TEST(CanonicalizedLaneletPose, CanonicalizedLaneletPose_copyConstructor)
 /**
  * @note Test move constructor behavior
  */
-TEST(CanonicalizedLaneletPose, CanonicalizedLaneletPose_moveConstructor)
+TEST_F(CanonicalizedLaneletPoseTest, CanonicalizedLaneletPose_moveConstructor)
 {
-  auto hdmap_utils = makeHdMapUtilsSharedPointer();
-  CanonicalizedLaneletPose pose(
+  const CanonicalizedLaneletPose pose(
     traffic_simulator::helper::constructLaneletPose(120659, 0.0, 0.0), hdmap_utils);
-  CanonicalizedLaneletPose pose2(pose);
-  CanonicalizedLaneletPose pose_move = std::move(pose2);
+  const CanonicalizedLaneletPose pose2(pose);
+  const CanonicalizedLaneletPose pose_move = std::move(pose2);
   EXPECT_LANELET_POSE_EQ(
     static_cast<traffic_simulator::LaneletPose>(pose),
     static_cast<traffic_simulator::LaneletPose>(pose_move));
@@ -115,10 +115,9 @@ TEST(CanonicalizedLaneletPose, CanonicalizedLaneletPose_moveConstructor)
 /**
  * @note Test copy assignment operator behavior
  */
-TEST(CanonicalizedLaneletPose, copyAssignment)
+TEST_F(CanonicalizedLaneletPoseTest, copyAssignment)
 {
-  auto hdmap_utils = makeHdMapUtilsSharedPointer();
-  CanonicalizedLaneletPose pose(
+  const CanonicalizedLaneletPose pose(
     traffic_simulator::helper::constructLaneletPose(120659, 0.0, 0.0), hdmap_utils);
   CanonicalizedLaneletPose pose_assign(
     traffic_simulator::helper::constructLaneletPose(34468, 0.0, 0.0), hdmap_utils);
@@ -133,12 +132,12 @@ TEST(CanonicalizedLaneletPose, copyAssignment)
 /**
  * @note Test conversion operator behavior using static_cast<LaneletPose>
  */
-TEST(CanonicalizedLaneletPose, conversionLaneletPose)
+TEST_F(CanonicalizedLaneletPoseTest, conversionLaneletPose)
 {
-  auto hdmap_utils = makeHdMapUtilsSharedPointer();
-  CanonicalizedLaneletPose pose(
+  const CanonicalizedLaneletPose pose(
     traffic_simulator::helper::constructLaneletPose(120659, 0.0, 0.0), hdmap_utils);
-  traffic_simulator::LaneletPose pose_casted = static_cast<traffic_simulator::LaneletPose>(pose);
+  const traffic_simulator::LaneletPose pose_casted =
+    static_cast<traffic_simulator::LaneletPose>(pose);
 
   EXPECT_EQ(pose_casted.lanelet_id, 120659);
   EXPECT_DOUBLE_EQ(pose_casted.s, 0.0);
@@ -149,13 +148,12 @@ TEST(CanonicalizedLaneletPose, conversionLaneletPose)
 /**
  * @note Test conversion operator behavior using static_cast<Pose>
  */
-TEST(CanonicalizedLaneletPose, conversionPose)
+TEST_F(CanonicalizedLaneletPoseTest, conversionPose)
 {
-  auto hdmap_utils = makeHdMapUtilsSharedPointer();
-  CanonicalizedLaneletPose pose(
+  const CanonicalizedLaneletPose pose(
     traffic_simulator::helper::constructLaneletPose(120659, 0.0, 0.0), hdmap_utils);
 
-  geometry_msgs::msg::Pose pose1 =
+  const geometry_msgs::msg::Pose pose1 =
     makePose(makePoint(3822.3815, 73784.9618, -1.761), makeQuaternionFromYaw(2.060578777273));
 
   EXPECT_POSE_NEAR(static_cast<geometry_msgs::msg::Pose>(pose), pose1, 0.01);
@@ -164,10 +162,9 @@ TEST(CanonicalizedLaneletPose, conversionPose)
 /**
  * @note Test function behavior when alternative poses are present
  */
-TEST(CanonicalizedLaneletPose, hasAlternativeLaneletPose_true)
+TEST_F(CanonicalizedLaneletPoseTest, hasAlternativeLaneletPose_true)
 {
-  auto hdmap_utils = makeHdMapUtilsSharedPointer();
-  CanonicalizedLaneletPose pose(
+  const CanonicalizedLaneletPose pose(
     traffic_simulator::helper::constructLaneletPose(120659, -10.0, 0.0), hdmap_utils);
 
   EXPECT_TRUE(pose.hasAlternativeLaneletPose());
@@ -176,10 +173,9 @@ TEST(CanonicalizedLaneletPose, hasAlternativeLaneletPose_true)
 /**
  * @note Test function behavior when alternative poses are absent
  */
-TEST(CanonicalizedLaneletPose, hasAlternativeLaneletPose_false)
+TEST_F(CanonicalizedLaneletPoseTest, hasAlternativeLaneletPose_false)
 {
-  auto hdmap_utils = makeHdMapUtilsSharedPointer();
-  CanonicalizedLaneletPose pose(
+  const CanonicalizedLaneletPose pose(
     traffic_simulator::helper::constructLaneletPose(120659, 10.0, 0.0), hdmap_utils);
 
   EXPECT_FALSE(pose.hasAlternativeLaneletPose());
@@ -188,16 +184,18 @@ TEST(CanonicalizedLaneletPose, hasAlternativeLaneletPose_false)
 /**
  * @note Test function behavior when there are no lanelet_poses
  */
-TEST(CanonicalizedLaneletPose, getAlternativeLaneletPoseBaseOnShortestRouteFrom_empty)
+TEST_F(CanonicalizedLaneletPoseTest, getAlternativeLaneletPoseBaseOnShortestRouteFrom_empty)
 {
-  auto hdmap_utils = makeHdMapUtilsSharedPointer();
-  CanonicalizedLaneletPose pose(
+  const CanonicalizedLaneletPose pose(
     traffic_simulator::helper::constructLaneletPose(120659, 20.0, 0.0), hdmap_utils);
   const auto from1 = traffic_simulator::helper::constructLaneletPose(34603, 10.0, 0.0);
   const auto from2 = traffic_simulator::helper::constructLaneletPose(34579, 10.0, 0.0);
 
   const auto result1 = pose.getAlternativeLaneletPoseBaseOnShortestRouteFrom(from1, hdmap_utils);
   const auto result2 = pose.getAlternativeLaneletPoseBaseOnShortestRouteFrom(from2, hdmap_utils);
+
+  ASSERT_TRUE(result1);
+  ASSERT_TRUE(result2);
 
   EXPECT_EQ(result1.value().lanelet_id, 120659);
   EXPECT_EQ(result2.value().lanelet_id, 120659);
@@ -206,9 +204,8 @@ TEST(CanonicalizedLaneletPose, getAlternativeLaneletPoseBaseOnShortestRouteFrom_
 /**
  * @note Test function behavior when there is only one lanelet_pose
  */
-TEST(CanonicalizedLaneletPose, getAlternativeLaneletPoseBaseOnShortestRouteFrom_single)
+TEST_F(CanonicalizedLaneletPoseTest, getAlternativeLaneletPoseBaseOnShortestRouteFrom_single)
 {
-  auto hdmap_utils = makeHdMapUtilsSharedPointer();
   CanonicalizedLaneletPose pose(
     traffic_simulator::helper::constructLaneletPose(34666, -20.0, 0.0), hdmap_utils);
   const auto from1 = traffic_simulator::helper::constructLaneletPose(34603, 10.0, 0.0);
@@ -217,6 +214,9 @@ TEST(CanonicalizedLaneletPose, getAlternativeLaneletPoseBaseOnShortestRouteFrom_
   const auto result1 = pose.getAlternativeLaneletPoseBaseOnShortestRouteFrom(from1, hdmap_utils);
   const auto result2 = pose.getAlternativeLaneletPoseBaseOnShortestRouteFrom(from2, hdmap_utils);
 
+  ASSERT_TRUE(result1);
+  ASSERT_TRUE(result2);
+
   EXPECT_EQ(result1.value().lanelet_id, 34603);
   EXPECT_EQ(result2.value().lanelet_id, 34603);
 }
@@ -224,9 +224,8 @@ TEST(CanonicalizedLaneletPose, getAlternativeLaneletPoseBaseOnShortestRouteFrom_
 /**
  * @note Test function behavior when there are multiple lanelet_poses
  */
-TEST(CanonicalizedLaneletPose, getAlternativeLaneletPoseBaseOnShortestRouteFrom_multiple)
+TEST_F(CanonicalizedLaneletPoseTest, getAlternativeLaneletPoseBaseOnShortestRouteFrom_multiple)
 {
-  auto hdmap_utils = makeHdMapUtilsSharedPointer();
   CanonicalizedLaneletPose pose(
     traffic_simulator::helper::constructLaneletPose(120659, -20.0, 0.0), hdmap_utils);
   const auto from1 = traffic_simulator::helper::constructLaneletPose(34603, 10.0, 0.0);
@@ -234,6 +233,9 @@ TEST(CanonicalizedLaneletPose, getAlternativeLaneletPoseBaseOnShortestRouteFrom_
 
   const auto result1 = pose.getAlternativeLaneletPoseBaseOnShortestRouteFrom(from1, hdmap_utils);
   const auto result2 = pose.getAlternativeLaneletPoseBaseOnShortestRouteFrom(from2, hdmap_utils);
+
+  ASSERT_TRUE(result1);
+  ASSERT_TRUE(result2);
 
   EXPECT_EQ(result1.value().lanelet_id, 34603);
   EXPECT_EQ(result2.value().lanelet_id, 34579);
@@ -260,16 +262,15 @@ TEST(CanonicalizedLaneletPose, setConsiderPoseByRoadSlope)
 /**
  * @note Test operator calculation correctness with CanonicalizedLaneletPose of lesser, equal and greater lanelet_id
  */
-TEST(CanonicalizedLaneletPose, operatorLessEqual)
+TEST_F(CanonicalizedLaneletPoseTest, operatorLessEqual)
 {
-  auto hdmap_utils = makeHdMapUtilsSharedPointer();
-  CanonicalizedLaneletPose pose(
+  const CanonicalizedLaneletPose pose(
     traffic_simulator::helper::constructLaneletPose(120659, 5.0, 0.0), hdmap_utils);
-  CanonicalizedLaneletPose pose_equal(
+  const CanonicalizedLaneletPose pose_equal(
     traffic_simulator::helper::constructLaneletPose(120659, 5.0, 0.0), hdmap_utils);
-  CanonicalizedLaneletPose pose_less(
+  const CanonicalizedLaneletPose pose_less(
     traffic_simulator::helper::constructLaneletPose(120659, 0.0, 0.0), hdmap_utils);
-  CanonicalizedLaneletPose pose_greater(
+  const CanonicalizedLaneletPose pose_greater(
     traffic_simulator::helper::constructLaneletPose(120659, 6.0, 0.0), hdmap_utils);
 
   EXPECT_TRUE(pose_less <= pose);
@@ -280,16 +281,15 @@ TEST(CanonicalizedLaneletPose, operatorLessEqual)
 /**
  * @note Test operator calculation correctness with CanonicalizedLaneletPose of lesser, equal and greater lanelet_id
  */
-TEST(CanonicalizedLaneletPose, operatorLess)
+TEST_F(CanonicalizedLaneletPoseTest, operatorLess)
 {
-  auto hdmap_utils = makeHdMapUtilsSharedPointer();
-  CanonicalizedLaneletPose pose(
+  const CanonicalizedLaneletPose pose(
     traffic_simulator::helper::constructLaneletPose(120659, 5.0, 0.0), hdmap_utils);
-  CanonicalizedLaneletPose pose_equal(
+  const CanonicalizedLaneletPose pose_equal(
     traffic_simulator::helper::constructLaneletPose(120659, 5.0, 0.0), hdmap_utils);
-  CanonicalizedLaneletPose pose_less(
+  const CanonicalizedLaneletPose pose_less(
     traffic_simulator::helper::constructLaneletPose(120659, 0.0, 0.0), hdmap_utils);
-  CanonicalizedLaneletPose pose_greater(
+  const CanonicalizedLaneletPose pose_greater(
     traffic_simulator::helper::constructLaneletPose(120659, 6.0, 0.0), hdmap_utils);
 
   EXPECT_TRUE(pose_less < pose);
@@ -300,16 +300,15 @@ TEST(CanonicalizedLaneletPose, operatorLess)
 /**
  * @note Test operator calculation correctness with CanonicalizedLaneletPose of lesser, equal and greater lanelet_id
  */
-TEST(CanonicalizedLaneletPose, operatorGreaterEqual)
+TEST_F(CanonicalizedLaneletPoseTest, operatorGreaterEqual)
 {
-  auto hdmap_utils = makeHdMapUtilsSharedPointer();
-  CanonicalizedLaneletPose pose(
+  const CanonicalizedLaneletPose pose(
     traffic_simulator::helper::constructLaneletPose(120659, 5.0, 0.0), hdmap_utils);
-  CanonicalizedLaneletPose pose_equal(
+  const CanonicalizedLaneletPose pose_equal(
     traffic_simulator::helper::constructLaneletPose(120659, 5.0, 0.0), hdmap_utils);
-  CanonicalizedLaneletPose pose_less(
+  const CanonicalizedLaneletPose pose_less(
     traffic_simulator::helper::constructLaneletPose(120659, 0.0, 0.0), hdmap_utils);
-  CanonicalizedLaneletPose pose_greater(
+  const CanonicalizedLaneletPose pose_greater(
     traffic_simulator::helper::constructLaneletPose(120659, 6.0, 0.0), hdmap_utils);
 
   EXPECT_FALSE(pose_less >= pose);
@@ -320,16 +319,15 @@ TEST(CanonicalizedLaneletPose, operatorGreaterEqual)
 /**
  * @note Test operator calculation correctness with CanonicalizedLaneletPose of lesser, equal and greater lanelet_id
  */
-TEST(CanonicalizedLaneletPose, operatorGreater)
+TEST_F(CanonicalizedLaneletPoseTest, operatorGreater)
 {
-  auto hdmap_utils = makeHdMapUtilsSharedPointer();
-  CanonicalizedLaneletPose pose(
+  const CanonicalizedLaneletPose pose(
     traffic_simulator::helper::constructLaneletPose(120659, 5.0, 0.0), hdmap_utils);
-  CanonicalizedLaneletPose pose_equal(
+  const CanonicalizedLaneletPose pose_equal(
     traffic_simulator::helper::constructLaneletPose(120659, 5.0, 0.0), hdmap_utils);
-  CanonicalizedLaneletPose pose_less(
+  const CanonicalizedLaneletPose pose_less(
     traffic_simulator::helper::constructLaneletPose(120659, 0.0, 0.0), hdmap_utils);
-  CanonicalizedLaneletPose pose_greater(
+  const CanonicalizedLaneletPose pose_greater(
     traffic_simulator::helper::constructLaneletPose(120659, 6.0, 0.0), hdmap_utils);
 
   EXPECT_FALSE(pose_less > pose);
@@ -340,12 +338,11 @@ TEST(CanonicalizedLaneletPose, operatorGreater)
 /**
  * @note Test function behavior when provided two poses occupying the same lanelet_id
  */
-TEST(CanonicalizedLaneletPose, isSameLaneletId_withPose_same)
+TEST_F(CanonicalizedLaneletPoseTest, isSameLaneletId_withPose_same)
 {
-  auto hdmap_utils = makeHdMapUtilsSharedPointer();
-  CanonicalizedLaneletPose pose1(
+  const CanonicalizedLaneletPose pose1(
     traffic_simulator::helper::constructLaneletPose(120659, 0.0, 0.0), hdmap_utils);
-  CanonicalizedLaneletPose pose2(
+  const CanonicalizedLaneletPose pose2(
     traffic_simulator::helper::constructLaneletPose(120659, 1.0, 0.0), hdmap_utils);
 
   EXPECT_TRUE(traffic_simulator::isSameLaneletId(pose1, pose2));
@@ -354,10 +351,9 @@ TEST(CanonicalizedLaneletPose, isSameLaneletId_withPose_same)
 /**
  * @note Test function behavior when provided two poses occupying different lanelet_ids
  */
-TEST(CanonicalizedLaneletPose, isSameLaneletId_withPose_different)
+TEST_F(CanonicalizedLaneletPoseTest, isSameLaneletId_withPose_different)
 {
-  auto hdmap_utils = makeHdMapUtilsSharedPointer();
-  CanonicalizedLaneletPose pose1(
+  const CanonicalizedLaneletPose pose1(
     traffic_simulator::helper::constructLaneletPose(120659, 0.0, 0.0), hdmap_utils);
   CanonicalizedLaneletPose pose2(
     traffic_simulator::helper::constructLaneletPose(34606, 1.0, 0.0), hdmap_utils);
@@ -368,10 +364,9 @@ TEST(CanonicalizedLaneletPose, isSameLaneletId_withPose_different)
 /**
  * @note Test function behavior when provided with a pose having lanelt_id equal to the lanelet_id argument
  */
-TEST(CanonicalizedLaneletPose, isSameLaneletId_withLanelet_same)
+TEST_F(CanonicalizedLaneletPoseTest, isSameLaneletId_withLanelet_same)
 {
-  auto hdmap_utils = makeHdMapUtilsSharedPointer();
-  CanonicalizedLaneletPose pose(
+  const CanonicalizedLaneletPose pose(
     traffic_simulator::helper::constructLaneletPose(120659, 0.0, 0.0), hdmap_utils);
 
   EXPECT_TRUE(traffic_simulator::isSameLaneletId(pose, 120659));
@@ -380,10 +375,9 @@ TEST(CanonicalizedLaneletPose, isSameLaneletId_withLanelet_same)
 /**
  * @note Test function behavior when provided with a pose having lanelet_id different to the lanelet_id argument
  */
-TEST(CanonicalizedLaneletPose, isSameLaneletId_withLanelet_different)
+TEST_F(CanonicalizedLaneletPoseTest, isSameLaneletId_withLanelet_different)
 {
-  auto hdmap_utils = makeHdMapUtilsSharedPointer();
-  CanonicalizedLaneletPose pose(
+  const CanonicalizedLaneletPose pose(
     traffic_simulator::helper::constructLaneletPose(120659, 0.0, 0.0), hdmap_utils);
 
   EXPECT_FALSE(traffic_simulator::isSameLaneletId(pose, 34606));
