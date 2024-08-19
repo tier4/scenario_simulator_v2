@@ -9,6 +9,9 @@ Changelog for package simple_cross_map
 * Merge branch 'master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+3.4.3 (2024-08-19)
+------------------
+
 3.4.2 (2024-08-05)
 ------------------
 * Merge commit 'c1cab6eb1ece2df58982f50a78fef5a5ecaa7234' into doc/longitudinal-control
