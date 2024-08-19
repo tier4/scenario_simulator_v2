@@ -20,6 +20,12 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light.hpp>
 
+using TrafficLight = traffic_simulator::TrafficLight;
+using Color = TrafficLight::Color;
+using Status = TrafficLight::Status;
+using Shape = TrafficLight::Shape;
+using Bulb = TrafficLight::Bulb;
+
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);
@@ -31,8 +37,6 @@ int main(int argc, char ** argv)
  */
 TEST(Color, Color)
 {
-  using Color = traffic_simulator::TrafficLight::Color;
-
   {
     const auto color = Color("green");
 
@@ -85,13 +89,12 @@ TEST(Color, Color)
  */
 TEST(Color, make)
 {
-  using Color = traffic_simulator::TrafficLight::Color;
   {
     const auto color = Color::make("green");
 
     EXPECT_TRUE(color == Color::green);
     EXPECT_TRUE(color.is(Color::green));
-    EXPECT_TRUE(boost::lexical_cast<Color>("green") == Color::green);
+    EXPECT_TRUE(boost::lexical_cast<Color>(color) == Color::green);
     EXPECT_TRUE(boost::lexical_cast<std::string>(color) == "green");
   }
 
@@ -100,7 +103,7 @@ TEST(Color, make)
 
     EXPECT_TRUE(color == Color::yellow);
     EXPECT_TRUE(color.is(Color::yellow));
-    EXPECT_TRUE(boost::lexical_cast<Color>("yellow") == Color::yellow);
+    EXPECT_TRUE(boost::lexical_cast<Color>(color) == Color::yellow);
     EXPECT_TRUE(boost::lexical_cast<std::string>(color) == "yellow");
   }
 
@@ -109,7 +112,7 @@ TEST(Color, make)
 
     EXPECT_TRUE(color == Color::red);
     EXPECT_TRUE(color.is(Color::red));
-    EXPECT_TRUE(boost::lexical_cast<Color>("red") == Color::red);
+    EXPECT_TRUE(boost::lexical_cast<Color>(color) == Color::red);
     EXPECT_TRUE(boost::lexical_cast<std::string>(color) == "red");
   }
 
@@ -118,7 +121,7 @@ TEST(Color, make)
 
     EXPECT_TRUE(color == Color::white);
     EXPECT_TRUE(color.is(Color::white));
-    EXPECT_TRUE(boost::lexical_cast<Color>("white") == Color::white);
+    EXPECT_TRUE(boost::lexical_cast<Color>(color) == Color::white);
     EXPECT_TRUE(boost::lexical_cast<std::string>(color) == "white");
   }
 
@@ -127,7 +130,7 @@ TEST(Color, make)
 
     EXPECT_TRUE(color == Color::yellow);
     EXPECT_TRUE(color.is(Color::yellow));
-    EXPECT_TRUE(boost::lexical_cast<Color>("amber") == Color::yellow);
+    EXPECT_TRUE(boost::lexical_cast<Color>(color) == Color::yellow);
     EXPECT_TRUE(boost::lexical_cast<std::string>(color) == "yellow");
   }
 }
@@ -145,8 +148,6 @@ TEST(Color, make_wrong)
  */
 TEST(Status, Status)
 {
-  using Status = traffic_simulator::TrafficLight::Status;
-
   {
     const auto status = Status("solidOn");
 
@@ -189,14 +190,12 @@ TEST(Status, Status)
  */
 TEST(Status, make)
 {
-  using Status = traffic_simulator::TrafficLight::Status;
-
   {
     const auto status = Status::make("solidOn");
 
     EXPECT_TRUE(status == Status::solid_on);
     EXPECT_TRUE(status.is(Status::solid_on));
-    EXPECT_TRUE(boost::lexical_cast<Status>("solidOn") == Status::solid_on);
+    EXPECT_TRUE(boost::lexical_cast<Status>(status) == Status::solid_on);
     EXPECT_TRUE(boost::lexical_cast<std::string>(status) == "solidOn");
   }
 
@@ -205,7 +204,7 @@ TEST(Status, make)
 
     EXPECT_TRUE(status == Status::solid_off);
     EXPECT_TRUE(status.is(Status::solid_off));
-    EXPECT_TRUE(boost::lexical_cast<Status>("solidOff") == Status::solid_off);
+    EXPECT_TRUE(boost::lexical_cast<Status>(status) == Status::solid_off);
     EXPECT_TRUE(boost::lexical_cast<std::string>(status) == "solidOff");
   }
 
@@ -214,7 +213,7 @@ TEST(Status, make)
 
     EXPECT_TRUE(status == Status::flashing);
     EXPECT_TRUE(status.is(Status::flashing));
-    EXPECT_TRUE(boost::lexical_cast<Status>("flashing") == Status::flashing);
+    EXPECT_TRUE(boost::lexical_cast<Status>(status) == Status::flashing);
     EXPECT_TRUE(boost::lexical_cast<std::string>(status) == "flashing");
   }
 
@@ -223,7 +222,7 @@ TEST(Status, make)
 
     EXPECT_TRUE(status == Status::unknown);
     EXPECT_TRUE(status.is(Status::unknown));
-    EXPECT_TRUE(boost::lexical_cast<Status>("unknown") == Status::unknown);
+    EXPECT_TRUE(boost::lexical_cast<Status>(status) == Status::unknown);
     EXPECT_TRUE(boost::lexical_cast<std::string>(status) == "unknown");
   }
 }
@@ -241,8 +240,6 @@ TEST(Status, make_wrong)
  */
 TEST(Shape, Shape)
 {
-  using Shape = traffic_simulator::TrafficLight::Shape;
-
   {
     const auto shape = Shape("circle");
 
@@ -359,8 +356,6 @@ TEST(Shape, Shape)
  */
 TEST(Shape, make)
 {
-  using Shape = traffic_simulator::TrafficLight::Shape;
-
   {
     const auto shape = Shape::make("circle");
 
@@ -481,16 +476,10 @@ TEST(Shape, make_wrong)
 }
 
 /**
- * @note Test object creation correcness.
+ * @note Test hashing function. An object must be assigned the same hash every time.
  */
-TEST(Bulb, Bulb)
+TEST(Bulb, hash)
 {
-  using TrafficLight = traffic_simulator::TrafficLight;
-  using Color = TrafficLight::Color;
-  using Status = TrafficLight::Status;
-  using Shape = TrafficLight::Shape;
-  using Bulb = TrafficLight::Bulb;
-
   // clang-format off
   static_assert(Bulb(Color::green,  Status::solid_on,  Shape::circle     ).hash() == 0b0000'0000'0000'0000'0000'0000'0000'0000);
   static_assert(Bulb(Color::yellow, Status::solid_on,  Shape::circle     ).hash() == 0b0000'0001'0000'0000'0000'0000'0000'0000);
@@ -513,7 +502,13 @@ TEST(Bulb, Bulb)
   static_assert(Bulb(Color::green,  Status::solid_on,  Shape::lower_right).hash() == 0b0000'0000'0000'0000'0000'0101'0000'0010);
   static_assert(Bulb(Color::green,  Status::solid_on,  Shape::upper_right).hash() == 0b0000'0000'0000'0000'0000'0011'0000'0010);
   // clang-format on
+}
 
+/**
+ * @note Test basic functionality. Test Bulb comparisons with different configurations.
+ */
+TEST(Bulb, is)
+{
   {
     constexpr auto bulb = Bulb(Color::red, Status::flashing, Shape::circle);
 
@@ -583,11 +578,6 @@ TEST(Bulb, Bulb)
  */
 TEST(Bulb, make)
 {
-  using TrafficLight = traffic_simulator::TrafficLight;
-  using Color = TrafficLight::Color;
-  using Status = TrafficLight::Status;
-  using Shape = TrafficLight::Shape;
-  using Bulb = TrafficLight::Bulb;
   {
     constexpr auto bulb = Bulb(Color::red, Status::flashing, Shape::circle);
 
@@ -657,8 +647,6 @@ TEST(Bulb, make)
  */
 TEST(Bulb, make_wrong)
 {
-  using Bulb = traffic_simulator::TrafficLight::Bulb;
-
   EXPECT_THROW(Bulb("red flashing wrong_shape"), common::SyntaxError);
   EXPECT_THROW(Bulb("red wrong_status circle"), common::SyntaxError);
   EXPECT_THROW(Bulb("wrong_color flashing circle"), common::SyntaxError);
@@ -671,11 +659,6 @@ TEST(Bulb, make_wrong)
  */
 TEST(Bulb, operator_TrafficLight)
 {
-  using Color = traffic_simulator::TrafficLight::Color;
-  using Status = traffic_simulator::TrafficLight::Status;
-  using Shape = traffic_simulator::TrafficLight::Shape;
-  using Bulb = traffic_simulator::TrafficLight::Bulb;
-
   {
     constexpr auto bulb = Bulb(Color::red, Status::flashing, Shape::circle);
     std::ostringstream oss;
@@ -747,11 +730,6 @@ protected:
  */
 TEST_F(TrafficLightTest, contains_colorStatusShape)
 {
-  using TrafficLight = traffic_simulator::TrafficLight;
-  using Color = TrafficLight::Color;
-  using Status = TrafficLight::Status;
-  using Shape = TrafficLight::Shape;
-
   {
     auto traffic_light = TrafficLight(34802, map_manager);
 
@@ -779,11 +757,6 @@ TEST_F(TrafficLightTest, contains_colorStatusShape)
  */
 TEST_F(TrafficLightTest, set_valid)
 {
-  using TrafficLight = traffic_simulator::TrafficLight;
-  using Color = TrafficLight::Color;
-  using Status = TrafficLight::Status;
-  using Shape = TrafficLight::Shape;
-
   auto traffic_light = TrafficLight(34802, map_manager);
 
   traffic_light.set("red flashing circle, green solidOn right");

@@ -81,8 +81,10 @@ TEST(helper, constructRPYfromQuaternion)
     EXPECT_VECTOR3_EQ(default_rpy, default_vec);
   }
   {
-    const auto vec =
-      geometry_msgs::build<geometry_msgs::msg::Vector3>().x(-M_PI / 3.0).y(-M_PI / 6.0).z(M_PI / 2);
+    const auto vec = geometry_msgs::build<geometry_msgs::msg::Vector3>()
+                       .x(-M_PI / 3.0)
+                       .y(-M_PI / 6.0)
+                       .z(M_PI / 2.0);
     const auto rpy = traffic_simulator::helper::constructRPYfromQuaternion(
       geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(-0.183).y(-0.5).z(0.5).w(0.683));
     EXPECT_VECTOR3_NEAR(rpy, vec, 1.0e-3);
@@ -100,8 +102,8 @@ TEST(helper, constructPose)
       .orientation(
         geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(-0.183).y(-0.5).z(0.5).w(0.683));
 
-  const auto result_pose =
-    traffic_simulator::helper::constructPose(43.0, 47.0, 53.0, -M_PI / 3.0, -M_PI / 6.0, M_PI / 2);
+  const auto result_pose = traffic_simulator::helper::constructPose(
+    43.0, 47.0, 53.0, -M_PI / 3.0, -M_PI / 6.0, M_PI / 2.0);
 
   EXPECT_POSE_NEAR(result_pose, actual_pose, 1.0e-3);
 }
@@ -130,7 +132,7 @@ TEST(helper, constructDetectionSensorConfiguration)
   actual_configuration.set_update_duration(3.0);
 
   const auto result_configuration =
-    traffic_simulator::helper::constructDetectionSensorConfiguration("ego", "test", 3);
+    traffic_simulator::helper::constructDetectionSensorConfiguration("ego", "test", 3.0);
 
   EXPECT_DETECTION_SENSOR_CONFIGURATION_EQ(result_configuration, actual_configuration);
 }
