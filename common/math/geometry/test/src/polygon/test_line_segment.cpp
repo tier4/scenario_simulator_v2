@@ -238,7 +238,7 @@ TEST(LineSegment, isIntersect2D_collinear)
   EXPECT_FALSE(line.isIntersect2D(
     math::geometry::LineSegment(makePoint(3.0, 5.0, 0.0), makePoint(5.0, 7.0, 0.0))));
   EXPECT_FALSE(line.isIntersect2D(
-    math::geometry::LineSegment(makePoint(-3.0, -1.0, 0.0), makePoint(-1.0, 1.0, 0.0))));
+    math::geometry::LineSegment(makePoint(-3.0, -1.0, 0.0), makePoint(-2.0, 0.0, 0.0))));
 }
 
 /**
