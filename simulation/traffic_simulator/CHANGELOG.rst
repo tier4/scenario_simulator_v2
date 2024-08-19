@@ -21,6 +21,9 @@ Changelog for package traffic_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+3.4.3 (2024-08-19)
+------------------
+
 3.4.2 (2024-08-05)
 ------------------
 * Merge branch 'master' into doc/longitudinal-control
