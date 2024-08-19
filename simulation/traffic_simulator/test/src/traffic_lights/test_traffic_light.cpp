@@ -33,7 +33,7 @@ int main(int argc, char ** argv)
 }
 
 /**
- * @note Test object creation correcness.
+ * @note Test object creation correctness.
  */
 TEST(Color, Color)
 {
@@ -144,7 +144,7 @@ TEST(Color, make_wrong)
 }
 
 /**
- * @note Test object creation correcness.
+ * @note Test object creation correctness.
  */
 TEST(Status, Status)
 {
@@ -236,7 +236,7 @@ TEST(Status, make_wrong)
 }
 
 /**
- * @note Test object creation correcness.
+ * @note Test object creation correctness.
  */
 TEST(Shape, Shape)
 {
