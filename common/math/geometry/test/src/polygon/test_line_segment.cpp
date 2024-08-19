@@ -230,7 +230,6 @@ TEST(LineSegment, isIntersect2DIdentical)
 /**
  * @note Test function behavior with two disjoint, collinear lines.
  */
-
 TEST(LineSegment, isIntersect2D_collinear)
 {
   const auto line =
