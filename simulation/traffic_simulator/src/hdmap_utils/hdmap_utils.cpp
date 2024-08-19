@@ -224,7 +224,7 @@ auto HdMapUtils::countLaneChanges(
     return std::nullopt;
   } else {
     std::pair<int, int> lane_changes{0, 0};
-    for (size_t i = 1; i < route.size(); ++i) {
+    for (std::size_t i = 1; i < route.size(); ++i) {
       const auto & previous = route[i - 1];
       const auto & current = route[i];
 
