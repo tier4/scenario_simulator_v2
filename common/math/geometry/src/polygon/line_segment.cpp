@@ -120,7 +120,17 @@ auto LineSegment::getPose(const double s, const bool denormalize_s, const bool f
  */
 auto LineSegment::isIntersect2D(const geometry_msgs::msg::Point & point) const -> bool
 {
-  return getIntersection2DSValue(point, true) ? true : false;
+  const bool x_outside = ((point.x - start_point.x) * (end_point.x - point.x) < 0.0);
+  const bool y_outside = ((point.y - start_point.y) * (end_point.y - point.y) < 0.0);
+  if (x_outside || y_outside) {
+    return false;
+  }
+  const double dx = end_point.x - start_point.x;
+  const double dy = end_point.y - start_point.y;
+  const double squared_length = dx * dx + dy * dy;
+  const double cross_product = (point.y - start_point.y) * dx - (point.x - start_point.x) * dy;
+  constexpr double tolerance = std::numeric_limits<double>::epsilon();
+  return cross_product * cross_product <= squared_length * tolerance * tolerance;
 }
 
 auto LineSegment::getSValue(
@@ -170,32 +180,9 @@ auto LineSegment::isIntersect2D(const LineSegment & l0) const -> bool
 auto LineSegment::getIntersection2DSValue(
   const geometry_msgs::msg::Point & point, const bool denormalize_s) const -> std::optional<double>
 {
-  const auto get_s_normalized = [this](const auto & point) -> std::optional<double> {
-    const auto get_s_from_x = [this](const auto & point) {
-      const auto s = (point.x - start_point.x) / (end_point.x - start_point.x);
-      return 0 <= s && s <= 1 ? s : std::optional<double>();
-    };
-    const auto get_s_from_y = [this](const auto & point) {
-      const auto s = (point.y - start_point.y) / (end_point.y - start_point.y);
-      return 0 <= s && s <= 1 ? s : std::optional<double>();
-    };
-    constexpr double epsilon = std::numeric_limits<double>::epsilon();
-    if (std::abs(end_point.x - start_point.x) <= epsilon) {
-      if (std::abs(end_point.y - start_point.y) <= epsilon) {
-        /// @note If start_point and end_point is a same point, checking the point is same as end_point or not.
-        return (std::abs(end_point.x - point.x) <= epsilon &&
-                std::abs(end_point.y - point.y) <= epsilon)
-                 ? std::optional<double>(0)
-                 : std::optional<double>();
-      }
-      /// @note If the line segment is parallel to y axis, calculate s value from y axis value.
-      return std::abs(point.x - start_point.x) <= epsilon ? get_s_from_y(point)
-                                                          : std::optional<double>();
-    }
-    /// @note If the line segment is not parallel to x and y axis, calculate s value from x axis value.
-    return get_s_from_x(point);
-  };
-  return denormalize_s ? denormalize(get_s_normalized(point)) : get_s_normalized(point);
+  if (not isIntersect2D(point)) return std::nullopt;
+  const double distance = std::hypot(point.x - start_point.x, point.y - start_point.y);
+  return denormalize_s ? std::make_optional(distance) : std::make_optional(distance / getLength());
 }
 
 /**
