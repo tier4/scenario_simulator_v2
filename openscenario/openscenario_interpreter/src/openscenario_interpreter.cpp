@@ -36,7 +36,7 @@ namespace openscenario_interpreter
 Interpreter::Interpreter(const rclcpp::NodeOptions & options)
 : rclcpp_lifecycle::LifecycleNode("openscenario_interpreter", options),
   publisher_of_context(create_publisher<Context>("context", rclcpp::QoS(1).transient_local())),
-  publisher_of_params(create_publisher<std_msgs::msg::String>("/iteration_paramters", rclcpp::QoS(1).transient_local())),
+  publisher_of_params(create_publisher<std_msgs::msg::String>("test_iteration_parameters", rclcpp::QoS(1).transient_local())),
   local_frame_rate(30),
   local_real_time_factor(1.0),
   osc_path(""),
@@ -123,16 +123,14 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
 
       if (script->category.is<ScenarioDefinition>()) {
         scenarios = {std::dynamic_pointer_cast<ScenarioDefinition>(script->category)};
-        params_str.data.clear();
-        params_str.data = "Parameter declarations for this scenario iteration:\n";
-        std::cout << "Parameter declarations for this scenario iteration:" << std::endl;
+        // get and log parameters used in this test iteration
+        test_iteration_params_str.data.clear();
+        test_iteration_params_str.data = "Parameter declarations for this scenario iteration:\n";
         for (const auto & pd : currentScenarioDefinition()->parameter_declarations) {
-          params_str.data.append(pd.name);
-          params_str.data.append(" = ");
-          params_str.data.append(pd.value);
-          params_str.data.append("\n");
-          std::cout << pd.name << " = " << pd.value << std::endl;
+          test_iteration_params_str.data.append(pd.name + " = " + pd.value + "\n");
         }
+        RCLCPP_INFO_STREAM(get_logger(), test_iteration_params_str.data);
+
       } else if (script->category.is<ParameterValueDistribution>()) {
         throw Error(
           "ParameterValueDistribution cannot be processed by openscenario_interpreter alone. "
@@ -191,7 +189,7 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
     withExceptionHandler(
       [this](auto &&...) {
         publishCurrentContext();
-        publisher_of_params->publish(params_str);
+        publisher_of_params->publish(test_iteration_params_str);
         deactivate();
       },
       [this]() {
@@ -213,7 +211,7 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
           SimulatorCore::update();
 
           publishCurrentContext();
-          publisher_of_params->publish(params_str);
+          publisher_of_params->publish(test_iteration_params_str);
         });
       });
   };
