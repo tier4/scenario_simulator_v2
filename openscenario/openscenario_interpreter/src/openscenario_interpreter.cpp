@@ -36,6 +36,7 @@ namespace openscenario_interpreter
 Interpreter::Interpreter(const rclcpp::NodeOptions & options)
 : rclcpp_lifecycle::LifecycleNode("openscenario_interpreter", options),
   publisher_of_context(create_publisher<Context>("context", rclcpp::QoS(1).transient_local())),
+  publisher_of_params(create_publisher<std_msgs::msg::String>("/iteration_paramters", rclcpp::QoS(1).transient_local())),
   local_frame_rate(30),
   local_real_time_factor(1.0),
   osc_path(""),
@@ -122,6 +123,16 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
 
       if (script->category.is<ScenarioDefinition>()) {
         scenarios = {std::dynamic_pointer_cast<ScenarioDefinition>(script->category)};
+        params_str.data.clear();
+        params_str.data = "Parameter declarations for this scenario iteration:\n";
+        std::cout << "Parameter declarations for this scenario iteration:" << std::endl;
+        for (const auto & pd : currentScenarioDefinition()->parameter_declarations) {
+          params_str.data.append(pd.name);
+          params_str.data.append(" = ");
+          params_str.data.append(pd.value);
+          params_str.data.append("\n");
+          std::cout << pd.name << " = " << pd.value << std::endl;
+        }
       } else if (script->category.is<ParameterValueDistribution>()) {
         throw Error(
           "ParameterValueDistribution cannot be processed by openscenario_interpreter alone. "
@@ -175,10 +186,12 @@ auto Interpreter::engaged() const -> bool
 
 auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 {
+  
   auto evaluate_storyboard = [this]() {
     withExceptionHandler(
       [this](auto &&...) {
         publishCurrentContext();
+        publisher_of_params->publish(params_str);
         deactivate();
       },
       [this]() {
@@ -200,6 +213,7 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
           SimulatorCore::update();
 
           publishCurrentContext();
+          publisher_of_params->publish(params_str);
         });
       });
   };
@@ -237,8 +251,11 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
         execution_timer.clear();
 
         publisher_of_context->on_activate();
+        publisher_of_params->on_activate();
+        
 
         assert(publisher_of_context->is_activated());
+        assert(publisher_of_params->is_activated());
 
         if (currentScenarioDefinition()) {
           currentScenarioDefinition()->storyboard.init.evaluateInstantaneousActions();
@@ -307,6 +324,11 @@ auto Interpreter::reset() -> void
   if (publisher_of_context->is_activated()) {
     publisher_of_context->on_deactivate();
   }
+
+    if (publisher_of_params->is_activated()) {
+    publisher_of_params->on_deactivate();
+  }
+
 
   if (not has_parameter("initialize_duration")) {
     declare_parameter<int>("initialize_duration", 30);
