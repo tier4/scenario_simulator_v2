@@ -21,6 +21,15 @@ Changelog for package random_test_runner
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+3.4.4 (2024-08-20)
+------------------
+* Merge pull request `#1345 <https://github.com/tier4/scenario_simulator_v2/issues/1345>`_ from tier4/newline-character-literal
+  Avoid false detection of newline character literals by spell check.
+* Lipsticks
+* Add a comment explaining the background of the hack
+* Split the string “\nnpc” into “\n” and “npc”.
+* Contributors: Masaya Kataoka, yamacir-kit
+
 3.4.3 (2024-08-19)
 ------------------
 
