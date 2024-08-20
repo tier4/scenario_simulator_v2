@@ -2864,6 +2864,17 @@ Visualization Manager:
           Value: true
           Value Scale: 35
           Width: 2000
+        - Class: openscenario_visualization/VisualizationParameters
+          Enabled: false
+          Left: 300
+          Length: 1000
+          Name: Test Iteration Parameters 
+          Text Color: 255; 255; 255
+          Top: 0
+          Topic: /iteration_paramters
+          Value: true
+          Value Scale: 11
+          Width: 1000
         - Class: rviz_default_plugins/MarkerArray
           Enabled: true
           Name: Debug Marker
