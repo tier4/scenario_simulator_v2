@@ -21,6 +21,9 @@ Changelog for package openscenario_preprocessor
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+3.4.4 (2024-08-20)
+------------------
+
 3.4.3 (2024-08-19)
 ------------------
 
