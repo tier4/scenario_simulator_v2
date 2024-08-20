@@ -34,6 +34,13 @@ ament_auto_add_library(${PROJECT_NAME} SHARED
 
 target_link_libraries(${PROJECT_NAME} Boost::filesystem glog pugixml)
 
+target_precompile_headers(${PROJECT_NAME}
+  PUBLIC
+    "<nlohmann/json.hpp>"
+    "<rclcpp/rclcpp.hpp>"
+    "<traffic_simulator/api/api.hpp>"
+    "<pugixml.hpp>")
+
 # ------------------------------------------------------------------------------
 #  openscenario_interpreter_node
 # ------------------------------------------------------------------------------
