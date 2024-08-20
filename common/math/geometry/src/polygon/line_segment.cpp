@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <cmath>
+#include <geometry/intersection/intersection.hpp>
 #include <geometry/polygon/line_segment.hpp>
 #include <geometry/quaternion/euler_to_quaternion.hpp>
 #include <geometry/transform.hpp>
@@ -144,22 +145,7 @@ auto LineSegment::getSValue(
  */
 auto LineSegment::isIntersect2D(const LineSegment & l0) const -> bool
 {
-  double s, t;
-  s = (l0.start_point.x - l0.end_point.x) * (start_point.y - l0.start_point.y) -
-      (l0.start_point.y - l0.end_point.y) * (start_point.x - l0.start_point.x);
-  t = (l0.start_point.x - l0.end_point.x) * (end_point.y - l0.start_point.y) -
-      (l0.start_point.y - l0.end_point.y) * (end_point.x - l0.start_point.x);
-  if (s * t > 0) {
-    return false;
-  }
-  s = (start_point.x - end_point.x) * (l0.start_point.y - start_point.y) -
-      (start_point.y - end_point.y) * (l0.start_point.x - start_point.x);
-  t = (start_point.x - end_point.x) * (l0.end_point.y - start_point.y) -
-      (start_point.y - end_point.y) * (l0.end_point.x - start_point.x);
-  if (s * t > 0) {
-    return false;
-  }
-  return true;
+  return math::geometry::isIntersect2D(*this, l0);
 }
 
 /**
