@@ -83,7 +83,7 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode,
 
   bool waiting_for_engagement_to_be_completed = false;  // NOTE: DIRTY HACK!!!
   
-  std_msgs::msg::String params_str = std_msgs::msg::String();
+  std_msgs::msg::String test_iteration_params_str = std_msgs::msg::String();
 
 public:
   OPENSCENARIO_INTERPRETER_PUBLIC

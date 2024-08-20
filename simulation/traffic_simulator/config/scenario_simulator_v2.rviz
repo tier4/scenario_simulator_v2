@@ -2871,7 +2871,7 @@ Visualization Manager:
           Name: Test Iteration Parameters 
           Text Color: 255; 255; 255
           Top: 0
-          Topic: /iteration_paramters
+          Topic: /simulation/test_iteration_parameters
           Value: true
           Value Scale: 11
           Width: 1000

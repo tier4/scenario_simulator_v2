@@ -46,27 +46,6 @@
 
 namespace openscenario_visualization
 {
-// struct Condition
-// {
-//   std::string current_evaluation;
-//   std::string current_value;
-//   std::string type;
-// };
-
-// struct ConditionGroup
-// {
-//   std::vector<Condition> conditions;
-// };
-
-// struct ConditionGroups
-// {
-//   std::string groups_name;
-//   std::vector<ConditionGroup> condition_groups;
-// };
-
-// using nlohmann::json;
-// using openscenario_interpreter_msgs::msg::Context;
-// using ConditionGroupsCollection = std::vector<ConditionGroups>;
 
 class VisualizationParametersDisplay : public rviz_common::Display
 {
@@ -98,13 +77,8 @@ protected:
   rviz_common::properties::FloatProperty * property_value_scale_;
 
 private:
-  //void loadConditionGroups(const std_msgs::msg::String::ConstSharedPtr msg_ptr);
-  //void processStory(const YAML::Node & story);
-  //void processManeuver(const YAML::Node & maneuver);
-  //void processEvent(const YAML::Node & event);
-  rclcpp::Subscription<std_msgs::msg::String>::SharedPtr simulation_context_sub_;
+  rclcpp::Subscription<std_msgs::msg::String>::SharedPtr test_iteration_params_sub_;
   std_msgs::msg::String::ConstSharedPtr last_msg_ptr_;
-  //std::shared_ptr<ConditionGroupsCollection> condition_groups_collection_ptr_;
 };
 
 }  // namespace openscenario_visualization
