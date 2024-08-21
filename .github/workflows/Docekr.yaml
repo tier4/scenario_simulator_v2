@@ -12,8 +12,6 @@ on:
       - "!pyproject.toml"
       - "!poetry.lock"
   release:
-    types: [published]
-
 
 jobs:
   push_docker:
