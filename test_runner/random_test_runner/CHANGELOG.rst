@@ -21,6 +21,32 @@ Changelog for package random_test_runner
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+3.4.4 (2024-08-20)
+------------------
+* Merge pull request `#1345 <https://github.com/tier4/scenario_simulator_v2/issues/1345>`_ from tier4/newline-character-literal
+  Avoid false detection of newline character literals by spell check.
+* Lipsticks
+* Add a comment explaining the background of the hack
+* Split the string “\nnpc” into “\n” and “npc”.
+* Contributors: Masaya Kataoka, yamacir-kit
+
+3.4.3 (2024-08-19)
+------------------
+
+3.4.2 (2024-08-05)
+------------------
+* Merge commit 'c1cab6eb1ece2df58982f50a78fef5a5ecaa7234' into doc/longitudinal-control
+* Merge branch 'master' into feat/RJD-1199-add-imu-sensor-to-simple-sensor-simulator
+* Merge branch 'master' into feat/RJD-1199-add-imu-sensor-to-simple-sensor-simulator
+* Merge branch 'master' into feat/RJD-1199-add-imu-sensor-to-simple-sensor-simulator
+* Merge branch 'master' into feat/RJD-1199-add-imu-sensor-to-simple-sensor-simulator
+* Merge branch 'master' into doc/longitudinal-control
+* Merge branch 'master' into doc/longitudinal-control
+* Merge branch 'master' into feat/RJD-1199-add-imu-sensor-to-simple-sensor-simulator
+* Merge branch 'master' into doc/longitudinal-control
+* Merge branch 'master' into feat/RJD-1199-add-imu-sensor-to-simple-sensor-simulator
+* Contributors: Masaya Kataoka, SzymonParapura, koki suzuki
+
 3.4.1 (2024-07-30)
 ------------------
 * Merge branch 'master' into doc/open_scenario_support
