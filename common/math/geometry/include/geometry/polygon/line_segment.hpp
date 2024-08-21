@@ -43,7 +43,7 @@ public:
   auto getPose(const double s, const bool denormalize_s = false, const bool fill_pitch = true) const
     -> geometry_msgs::msg::Pose;
   auto isIntersect2D(const geometry_msgs::msg::Point & point) const -> bool;
-  auto isIntersect2D(const LineSegment & l0) const -> bool;
+  auto isIntersect2D(const LineSegment & line) const -> bool;
   auto getIntersection2DSValue(
     const geometry_msgs::msg::Point & point, const bool denormalize_s = false) const
     -> std::optional<double>;
@@ -66,8 +66,12 @@ public:
   auto getSquaredDistanceVector(
     const geometry_msgs::msg::Point & point, const double s, const bool denormalize_s = false) const
     -> geometry_msgs::msg::Vector3;
+  auto isInBounds2D(const geometry_msgs::msg::Point & point) const -> bool;
+  auto relativePointPosition2D(const geometry_msgs::msg::Point & point) const -> int;
 
 private:
+  const double length;
+  const double length2D;
   auto denormalize(const std::optional<double> & s, const bool throw_error_on_out_of_range = true)
     const -> std::optional<double>;
   auto denormalize(const double s) const -> double;

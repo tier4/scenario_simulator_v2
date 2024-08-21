@@ -29,14 +29,18 @@ namespace geometry
 {
 LineSegment::LineSegment(
   const geometry_msgs::msg::Point & start_point, const geometry_msgs::msg::Point & end_point)
-: start_point(start_point), end_point(end_point)
+: start_point(start_point),
+  end_point(end_point),
+  length(hypot(end_point, start_point)),
+  length2D(std::hypot(end_point.x - start_point.x, end_point.y - start_point.y))
 {
 }
 
 LineSegment::LineSegment(
   const geometry_msgs::msg::Point & start_point, const geometry_msgs::msg::Vector3 & vec,
   double length)
-: start_point(start_point), end_point([&]() -> geometry_msgs::msg::Point {
+: start_point(start_point),
+  end_point([&]() -> geometry_msgs::msg::Point {
     geometry_msgs::msg::Point ret;
     double vec_size = std::hypot(vec.x, vec.y);
     if (vec_size == 0.0) {
@@ -50,7 +54,9 @@ LineSegment::LineSegment(
     ret.y = start_point.y + vec.y / vec_size * length;
     ret.z = start_point.z + vec.z / vec_size * length;
     return ret;
-  }())
+  }()),
+  length(hypot(end_point, start_point)),
+  length2D(std::hypot(end_point.x - start_point.x, end_point.y - start_point.y))
 {
 }
 
@@ -117,7 +123,7 @@ auto LineSegment::getPose(const double s, const bool denormalize_s, const bool f
  * @brief Checking the intersection with 1 line segment and 1 point in 2D (x,y) coordinate. Ignore z axis.
  * @param point point you want to check intersection.
  * @return true Intersection detected.
- * @return false Intersection does not detected.
+ * @return false Intersection not detected.
  */
 auto LineSegment::isIntersect2D(const geometry_msgs::msg::Point & point) const -> bool
 {
@@ -126,12 +132,10 @@ auto LineSegment::isIntersect2D(const geometry_msgs::msg::Point & point) const -
   if (x_outside || y_outside) {
     return false;
   }
-  const double dx = end_point.x - start_point.x;
-  const double dy = end_point.y - start_point.y;
-  const double squared_length = dx * dx + dy * dy;
-  const double cross_product = (point.y - start_point.y) * dx - (point.x - start_point.x) * dy;
+  const double cross_product = (point.y - start_point.y) * (end_point.x - start_point.x) -
+                               (point.x - start_point.x) * (end_point.y - start_point.y);
   constexpr double tolerance = std::numeric_limits<double>::epsilon();
-  return cross_product * cross_product <= squared_length * tolerance * tolerance;
+  return std::abs(cross_product) <= get2DLength() * tolerance;
 }
 
 auto LineSegment::getSValue(
@@ -149,13 +153,13 @@ auto LineSegment::getSValue(
 
 /**
  * @brief Checking the intersection with 2 line segments in 2D (x,y) coordinate. Ignore z axis.
- * @param l0 line segments you want to check intersection.
+ * @param line line segments you want to check intersection.
  * @return true Intersection detected.
- * @return false Intersection does not detected.
+ * @return false Intersection not detected.
  */
-auto LineSegment::isIntersect2D(const LineSegment & l0) const -> bool
+auto LineSegment::isIntersect2D(const LineSegment & line) const -> bool
 {
-  return math::geometry::isIntersect2D(*this, l0);
+  return math::geometry::isIntersect2D(*this, line);
 }
 
 /**
@@ -166,9 +170,13 @@ auto LineSegment::isIntersect2D(const LineSegment & l0) const -> bool
 auto LineSegment::getIntersection2DSValue(
   const geometry_msgs::msg::Point & point, const bool denormalize_s) const -> std::optional<double>
 {
-  if (not isIntersect2D(point)) return std::nullopt;
-  const double distance = std::hypot(point.x - start_point.x, point.y - start_point.y);
-  return denormalize_s ? std::make_optional(distance) : std::make_optional(distance / getLength());
+  if (isIntersect2D(point)) {
+    const double distance = std::hypot(point.x - start_point.x, point.y - start_point.y);
+    return denormalize_s ? std::make_optional(distance)
+                         : std::make_optional(distance / get2DLength());
+  } else {
+    return std::nullopt;
+  }
 }
 
 /**
@@ -224,13 +232,10 @@ auto LineSegment::getIntersection2D(const LineSegment & line) const
 
 auto LineSegment::getVector() const -> geometry_msgs::msg::Vector3
 {
-  using math::geometry::operator-;
-  const auto result_pt = end_point - start_point;
-  auto result = geometry_msgs::msg::Vector3();
-  result.x = result_pt.x;
-  result.y = result_pt.y;
-  result.z = result_pt.z;
-  return result;
+  return geometry_msgs::build<geometry_msgs::msg::Vector3>()
+    .x(end_point.x - start_point.x)
+    .y(end_point.y - start_point.y)
+    .z(end_point.z - start_point.z);
 }
 
 /**
@@ -244,7 +249,7 @@ auto LineSegment::getNormalVector() const -> geometry_msgs::msg::Vector3
   return geometry_msgs::build<geometry_msgs::msg::Vector3>()
     .x(tangent_vec.x * std::cos(theta) - tangent_vec.y * std::sin(theta))
     .y(tangent_vec.x * std::sin(theta) + tangent_vec.y * std::cos(theta))
-    .z(0);
+    .z(0.0);
 }
 
 auto LineSegment::get2DVector() const -> geometry_msgs::msg::Vector3
@@ -252,15 +257,12 @@ auto LineSegment::get2DVector() const -> geometry_msgs::msg::Vector3
   return geometry_msgs::build<geometry_msgs::msg::Vector3>()
     .x(end_point.x - start_point.x)
     .y(end_point.y - start_point.y)
-    .z(0);
+    .z(0.0);
 }
 
-auto LineSegment::get2DLength() const -> double
-{
-  return std::hypot(end_point.x - start_point.x, end_point.y - start_point.y);
-}
+auto LineSegment::get2DLength() const -> double { return length2D; }
 
-auto LineSegment::getLength() const -> double { return hypot(end_point, start_point); }
+auto LineSegment::getLength() const -> double { return length; }
 
 auto LineSegment::getSlope() const -> double
 {
@@ -357,6 +359,44 @@ auto getLineSegments(
     }
     return seg;
   }
+}
+
+/**
+ * @brief Checks if the given point lies within the bounding box of the line segment.
+ * @param point Points you want to test.
+ * @return 
+ * - `true` if the points is within the bounds.
+ * - `false` otherwise.
+ */
+auto LineSegment::isInBounds2D(const geometry_msgs::msg::Point & point) const -> bool
+{
+  return (
+    point.x >= std::min(start_point.x, end_point.x) &&
+    point.x <= std::max(start_point.x, end_point.x) &&
+    point.y >= std::min(start_point.y, end_point.y) &&
+    point.y <= std::max(start_point.y, end_point.y));
+}
+
+/**
+ * @brief Determines the relative position of a point with respect to the line segment.
+ * 
+ * This method computes the relative position of a given point with respect to the line segment defined by 
+ * `start_point` and `end_point` using a cross product. The result indicates on which side of the line 
+ * segment the point lies.
+ * 
+ * @param point The point to be evaluated.
+ * @return 
+ *  - `1` if the point is to the left of the line segment (when moving from `start_point` to `end_point`).
+ *  - `-1` if the point is to the right of the line segment.
+ *  - `0` if the point is collinear with the line segment (i.e., lies exactly on the line defined by 
+ *    `start_point` and `end_point`).
+ */
+auto LineSegment::relativePointPosition2D(const geometry_msgs::msg::Point & point) const -> int
+{
+  constexpr double tolerance = std::numeric_limits<double>::epsilon();
+  const double determinant = (end_point.y - start_point.y) * (point.x - end_point.x) -
+                             (end_point.x - start_point.x) * (point.y - end_point.y);
+  return static_cast<int>(determinant > tolerance) - static_cast<int>(determinant < -tolerance);
 }
 
 }  // namespace geometry

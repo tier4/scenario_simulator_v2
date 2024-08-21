@@ -21,44 +21,23 @@ namespace geometry
 {
 bool isIntersect2D(const LineSegment & line0, const LineSegment & line1)
 {
-  using Point = geometry_msgs::msg::Point;
+  const auto &p0 = line0.start_point, &q0 = line0.end_point;
+  const auto &p1 = line1.start_point, &q1 = line1.end_point;
 
-  const auto p0 = line0.start_point, q0 = line0.end_point;
-  const auto p1 = line1.start_point, q1 = line1.end_point;
+  const int relative_position_p0 = line1.relativePointPosition2D(p0);
+  const int relative_position_q0 = line1.relativePointPosition2D(q0);
+  const int relative_position_p1 = line0.relativePointPosition2D(p1);
+  const int relative_position_q1 = line0.relativePointPosition2D(q1);
 
-  constexpr auto within_bounding_box =
-    [](const Point & start, const Point & end, const Point & to_check) -> bool {
-    const bool x_inside = ((to_check.x - start.x) * (end.x - to_check.x) >= 0.0);
-    const bool y_inside = ((to_check.y - start.y) * (end.y - to_check.y) >= 0.0);
-    return x_inside && y_inside;
-  };
-
-  constexpr auto orientation =
-    [](const Point & start, const Point & end, const Point & to_check) -> double {
-    return (end.y - start.y) * (to_check.x - end.x) - (end.x - start.x) * (to_check.y - end.y);
-  };
-
-  constexpr auto sign = [](const double x) -> int {
-    constexpr double tolerance = 1.0e-10;
-    if (x > +tolerance) return +1;
-    if (x < -tolerance) return -1;
-    return 0;
-  };
-
-  const int ori_p0 = sign(orientation(p1, q1, p0));
-  const int ori_q0 = sign(orientation(p1, q1, q0));
-  const int ori_p1 = sign(orientation(p0, q0, p1));
-  const int ori_q1 = sign(orientation(p0, q0, q1));
-
-  // Special case
-  // If the lines are collinear; they intersect if and only if their bounding boxes overlap
-  if (ori_p1 == 0 && ori_q1 == 0 && ori_p0 == 0 && ori_q0 == 0) {
-    return within_bounding_box(p0, q0, p1) || within_bounding_box(p0, q0, p1) ||
-           within_bounding_box(p1, q1, p0) || within_bounding_box(p1, q1, p0);
+  if (
+    relative_position_p1 == 0 && relative_position_q1 == 0 && relative_position_p0 == 0 &&
+    relative_position_q0 == 0) {
+    return line0.isInBounds2D(p1) || line0.isInBounds2D(q1) || line1.isInBounds2D(p0) ||
+           line1.isInBounds2D(q0);
+  } else {
+    return relative_position_p1 != relative_position_q1 &&
+           relative_position_p0 != relative_position_q0;
   }
-
-  // General case
-  return ori_p1 != ori_q1 && ori_p0 != ori_q0;
 }
 
 bool isIntersect2D(const std::vector<LineSegment> & lines)
