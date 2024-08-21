@@ -71,7 +71,9 @@ public:
 
 private:
   const double length;
-  const double length2D;
+  const double length_2d;
+  const geometry_msgs::msg::Vector3 vector;
+  const geometry_msgs::msg::Vector3 vector_2d;
   auto denormalize(const std::optional<double> & s, const bool throw_error_on_out_of_range = true)
     const -> std::optional<double>;
   auto denormalize(const double s) const -> double;

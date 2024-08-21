@@ -32,16 +32,22 @@ LineSegment::LineSegment(
 : start_point(start_point),
   end_point(end_point),
   length(hypot(end_point, start_point)),
-  length2D(std::hypot(end_point.x - start_point.x, end_point.y - start_point.y))
+  length_2d(std::hypot(end_point.x - start_point.x, end_point.y - start_point.y)),
+  vector(geometry_msgs::build<geometry_msgs::msg::Vector3>()
+           .x(end_point.x - start_point.x)
+           .y(end_point.y - start_point.y)
+           .z(end_point.z - start_point.z)),
+  vector_2d(geometry_msgs::build<geometry_msgs::msg::Vector3>()
+              .x(end_point.x - start_point.x)
+              .y(end_point.y - start_point.y)
+              .z(0.0))
 {
 }
 
 LineSegment::LineSegment(
   const geometry_msgs::msg::Point & start_point, const geometry_msgs::msg::Vector3 & vec,
-  double length)
-: start_point(start_point),
-  end_point([&]() -> geometry_msgs::msg::Point {
-    geometry_msgs::msg::Point ret;
+  const double length)
+: LineSegment::LineSegment(start_point, [&]() -> geometry_msgs::msg::Point {
     double vec_size = std::hypot(vec.x, vec.y);
     if (vec_size == 0.0) {
       THROW_SIMULATION_ERROR(
@@ -50,13 +56,11 @@ LineSegment::LineSegment(
         "This message is not originally intended to be displayed, if you see it, please "
         "contact the developer of traffic_simulator.");
     }
-    ret.x = start_point.x + vec.x / vec_size * length;
-    ret.y = start_point.y + vec.y / vec_size * length;
-    ret.z = start_point.z + vec.z / vec_size * length;
-    return ret;
-  }()),
-  length(hypot(end_point, start_point)),
-  length2D(std::hypot(end_point.x - start_point.x, end_point.y - start_point.y))
+    return geometry_msgs::build<geometry_msgs::msg::Point>()
+      .x(start_point.x + vec.x / vec_size * length)
+      .y(start_point.y + vec.y / vec_size * length)
+      .z(start_point.z + vec.z / vec_size * length);
+  }())
 {
 }
 
@@ -74,8 +78,8 @@ auto LineSegment::getPoint(const double s, const bool denormalize_s) const
   const double s_normalized = denormalize_s ? s / getLength() : s;
   if (0 <= s_normalized && s_normalized <= 1) {
     return geometry_msgs::build<geometry_msgs::msg::Point>()
-      .x(start_point.x + (end_point.x - start_point.x) * s_normalized)
-      .y(start_point.y + (end_point.y - start_point.y) * s_normalized)
+      .x(start_point.x + get2DVector().x * s_normalized)
+      .y(start_point.y + get2DVector().y * s_normalized)
       .z(start_point.z + (end_point.z - start_point.z) * s_normalized);
   }
   if (denormalize_s) {
@@ -128,8 +132,8 @@ auto LineSegment::getPose(const double s, const bool denormalize_s, const bool f
 auto LineSegment::isIntersect2D(const geometry_msgs::msg::Point & point) const -> bool
 {
   if (isInBounds2D(point)) {
-    const double cross_product = (point.y - start_point.y) * (end_point.x - start_point.x) -
-                                 (point.x - start_point.x) * (end_point.y - start_point.y);
+    const double cross_product =
+      (point.y - start_point.y) * get2DVector().x - (point.x - start_point.x) * get2DVector().y;
     constexpr double tolerance = std::numeric_limits<double>::epsilon();
     return std::abs(cross_product) <= get2DLength() * tolerance;
   } else {
@@ -229,13 +233,7 @@ auto LineSegment::getIntersection2D(const LineSegment & line) const
            : std::optional<geometry_msgs::msg::Point>();
 }
 
-auto LineSegment::getVector() const -> geometry_msgs::msg::Vector3
-{
-  return geometry_msgs::build<geometry_msgs::msg::Vector3>()
-    .x(end_point.x - start_point.x)
-    .y(end_point.y - start_point.y)
-    .z(end_point.z - start_point.z);
-}
+auto LineSegment::getVector() const -> geometry_msgs::msg::Vector3 { return vector; }
 
 /**
  * @brief Get normal vector of the line segment.
@@ -251,22 +249,13 @@ auto LineSegment::getNormalVector() const -> geometry_msgs::msg::Vector3
     .z(0.0);
 }
 
-auto LineSegment::get2DVector() const -> geometry_msgs::msg::Vector3
-{
-  return geometry_msgs::build<geometry_msgs::msg::Vector3>()
-    .x(end_point.x - start_point.x)
-    .y(end_point.y - start_point.y)
-    .z(0.0);
-}
+auto LineSegment::get2DVector() const -> geometry_msgs::msg::Vector3 { return vector_2d; }
 
-auto LineSegment::get2DLength() const -> double { return length2D; }
+auto LineSegment::get2DLength() const -> double { return length_2d; }
 
 auto LineSegment::getLength() const -> double { return length; }
 
-auto LineSegment::getSlope() const -> double
-{
-  return (end_point.y - start_point.y) / (end_point.x - start_point.x);
-}
+auto LineSegment::getSlope() const -> double { return get2DVector().y / get2DVector().x; }
 
 /**
  * @brief Get squared distance (Square of euclidean distance) between specified 3D point and specified 3D point on line segment in 2D. (x,y)
@@ -393,8 +382,8 @@ auto LineSegment::isInBounds2D(const geometry_msgs::msg::Point & point) const ->
 auto LineSegment::relativePointPosition2D(const geometry_msgs::msg::Point & point) const -> int
 {
   constexpr double tolerance = std::numeric_limits<double>::epsilon();
-  const double determinant = (end_point.y - start_point.y) * (point.x - end_point.x) -
-                             (end_point.x - start_point.x) * (point.y - end_point.y);
+  const double determinant =
+    get2DVector().y * (point.x - end_point.x) - get2DVector().x * (point.y - end_point.y);
   return static_cast<int>(determinant > tolerance) - static_cast<int>(determinant < -tolerance);
 }
 
