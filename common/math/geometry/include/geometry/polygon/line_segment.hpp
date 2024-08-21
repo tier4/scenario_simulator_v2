@@ -29,6 +29,9 @@ namespace geometry
 class LineSegment
 {
 public:
+  const geometry_msgs::msg::Point start_point;
+  const geometry_msgs::msg::Point end_point;
+
   LineSegment(
     const geometry_msgs::msg::Point & start_point, const geometry_msgs::msg::Point & end_point);
   LineSegment(
@@ -36,8 +39,6 @@ public:
     double length);
   ~LineSegment();
   LineSegment & operator=(const LineSegment &);
-  const geometry_msgs::msg::Point start_point;
-  const geometry_msgs::msg::Point end_point;
   auto getPoint(const double s, const bool denormalize_s = false) const
     -> geometry_msgs::msg::Point;
   auto getPose(const double s, const bool denormalize_s = false, const bool fill_pitch = true) const
@@ -54,9 +55,9 @@ public:
   auto getSValue(
     const geometry_msgs::msg::Pose & pose, double threshold_distance, bool denormalize_s) const
     -> std::optional<double>;
-  auto getVector() const -> geometry_msgs::msg::Vector3;
+  auto getVector() const -> const geometry_msgs::msg::Vector3 &;
   auto getNormalVector() const -> geometry_msgs::msg::Vector3;
-  auto get2DVector() const -> geometry_msgs::msg::Vector3;
+  auto get2DVector() const -> const geometry_msgs::msg::Vector3 &;
   auto getLength() const -> double;
   auto get2DLength() const -> double;
   auto getSlope() const -> double;
@@ -74,6 +75,7 @@ private:
   const double length_2d;
   const geometry_msgs::msg::Vector3 vector;
   const geometry_msgs::msg::Vector3 vector_2d;
+
   auto denormalize(const std::optional<double> & s, const bool throw_error_on_out_of_range = true)
     const -> std::optional<double>;
   auto denormalize(const double s) const -> double;

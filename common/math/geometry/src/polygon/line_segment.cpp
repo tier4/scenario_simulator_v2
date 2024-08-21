@@ -76,7 +76,7 @@ auto LineSegment::getPoint(const double s, const bool denormalize_s) const
   -> geometry_msgs::msg::Point
 {
   const double s_normalized = denormalize_s ? s / getLength() : s;
-  if (0 <= s_normalized && s_normalized <= 1) {
+  if (0.0 <= s_normalized && s_normalized <= 1.0) {
     return geometry_msgs::build<geometry_msgs::msg::Point>()
       .x(start_point.x + get2DVector().x * s_normalized)
       .y(start_point.y + get2DVector().y * s_normalized)
@@ -113,13 +113,12 @@ auto LineSegment::getPose(const double s, const bool denormalize_s, const bool f
   return geometry_msgs::build<geometry_msgs::msg::Pose>()
     .position(getPoint(s, denormalize_s))
     .orientation([this, fill_pitch]() -> geometry_msgs::msg::Quaternion {
-      const auto tangent_vec = getVector();
       return math::geometry::convertEulerAngleToQuaternion(
         geometry_msgs::build<geometry_msgs::msg::Vector3>()
           .x(0.0)
           .y(
-            fill_pitch ? std::atan2(-tangent_vec.z, std::hypot(tangent_vec.x, tangent_vec.y)) : 0.0)
-          .z(std::atan2(tangent_vec.y, tangent_vec.x)));
+            fill_pitch ? std::atan2(-getVector().z, std::hypot(getVector().x, getVector().y)) : 0.0)
+          .z(std::atan2(getVector().y, getVector().x)));
     }());
 }
 
@@ -148,9 +147,11 @@ auto LineSegment::getSValue(
   return getIntersection2DSValue(
     LineSegment(
       math::geometry::transformPoint(
-        pose, geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(threshold_distance).z(0)),
+        pose,
+        geometry_msgs::build<geometry_msgs::msg::Point>().x(0.0).y(threshold_distance).z(0.0)),
       math::geometry::transformPoint(
-        pose, geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(-threshold_distance).z(0))),
+        pose,
+        geometry_msgs::build<geometry_msgs::msg::Point>().x(0.0).y(-threshold_distance).z(0.0))),
     denormalize_s);
 }
 
@@ -200,9 +201,9 @@ auto LineSegment::getIntersection2DSValue(const LineSegment & line, const bool d
     const double det = (start_point.x - end_point.x) * (line.end_point.y - line.start_point.y) -
                        (line.end_point.x - line.start_point.x) * (start_point.y - end_point.y);
     const double s =
-      1 - ((line.end_point.y - line.start_point.y) * (line.end_point.x - end_point.x) +
-           (line.start_point.x - line.end_point.x) * (line.end_point.y - end_point.y)) /
-            det;
+      1.0 - ((line.end_point.y - line.start_point.y) * (line.end_point.x - end_point.x) +
+             (line.start_point.x - line.end_point.x) * (line.end_point.y - end_point.y)) /
+              det;
     if (std::isnan(s)) {
       THROW_SIMULATION_ERROR(
         "One line segment is on top of the other. So determinant is zero.",
@@ -210,7 +211,7 @@ auto LineSegment::getIntersection2DSValue(const LineSegment & line, const bool d
         "This message is not originally intended to be displayed, if you see it, please "
         "contact the developer of traffic_simulator.");
     }
-    return (-s_tolerance <= s && s <= 1 + s_tolerance)
+    return (-s_tolerance <= s && s <= 1.0 + s_tolerance)
              ? std::optional<double>(std::clamp(s, 0.0, 1.0))
              : std::optional<double>();
   };
@@ -233,7 +234,7 @@ auto LineSegment::getIntersection2D(const LineSegment & line) const
            : std::optional<geometry_msgs::msg::Point>();
 }
 
-auto LineSegment::getVector() const -> geometry_msgs::msg::Vector3 { return vector; }
+auto LineSegment::getVector() const -> const geometry_msgs::msg::Vector3 & { return vector; }
 
 /**
  * @brief Get normal vector of the line segment.
@@ -241,15 +242,14 @@ auto LineSegment::getVector() const -> geometry_msgs::msg::Vector3 { return vect
  */
 auto LineSegment::getNormalVector() const -> geometry_msgs::msg::Vector3
 {
-  geometry_msgs::msg::Vector3 tangent_vec = getVector();
   double theta = M_PI / 2.0;
   return geometry_msgs::build<geometry_msgs::msg::Vector3>()
-    .x(tangent_vec.x * std::cos(theta) - tangent_vec.y * std::sin(theta))
-    .y(tangent_vec.x * std::sin(theta) + tangent_vec.y * std::cos(theta))
+    .x(getVector().x * std::cos(theta) - getVector().y * std::sin(theta))
+    .y(getVector().x * std::sin(theta) + getVector().y * std::cos(theta))
     .z(0.0);
 }
 
-auto LineSegment::get2DVector() const -> geometry_msgs::msg::Vector3 { return vector_2d; }
+auto LineSegment::get2DVector() const -> const geometry_msgs::msg::Vector3 & { return vector_2d; }
 
 auto LineSegment::get2DLength() const -> double { return length_2d; }
 
@@ -300,7 +300,7 @@ auto LineSegment::denormalize(
   const std::optional<double> & s, const bool throw_error_on_out_of_range) const
   -> std::optional<double>
 {
-  if (!throw_error_on_out_of_range && s && !(0 <= s.value() && s.value() <= 1)) {
+  if (!throw_error_on_out_of_range && s && !(0.0 <= s.value() && s.value() <= 1.0)) {
     return std::optional<double>();
   }
   return s ? denormalize(s.value()) : std::optional<double>();
@@ -313,7 +313,7 @@ auto LineSegment::denormalize(
  */
 auto LineSegment::denormalize(const double s) const -> double
 {
-  if (0 <= s && s <= 1) {
+  if (0.0 <= s && s <= 1.0) {
     return s * getLength();
   }
   THROW_SIMULATION_ERROR(
