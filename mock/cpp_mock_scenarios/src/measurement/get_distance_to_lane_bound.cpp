@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
-
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <cpp_mock_scenarios/catalogs.hpp>
 #include <cpp_mock_scenarios/cpp_scenario_node.hpp>
@@ -21,6 +19,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <string>
 #include <traffic_simulator/api/api.hpp>
+#include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <vector>
 
@@ -45,18 +44,23 @@ private:
     if (api_.getCurrentTime() >= 10.0) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
-    const auto distance = api_.getDistanceToLaneBound("ego");
-    // LCOV_EXCL_START
-    if (distance <= 0.4 && distance >= 0.52) {
-      stop(cpp_mock_scenarios::Result::FAILURE);
+    if (auto ego_entity = api_.getEntity("ego")) {
+      const auto distance = traffic_simulator::distance::distanceToLaneBound(
+        ego_entity->getMapPose(), ego_entity->getBoundingBox(), ego_entity->getRouteLanelets(),
+        api_.getHdmapUtils());
+      // LCOV_EXCL_START
+      if (distance <= 0.4 && distance >= 0.52) {
+        stop(cpp_mock_scenarios::Result::FAILURE);
+      }
+      // LCOV_EXCL_STOP
     }
-    // LCOV_EXCL_STOP
   }
   void onInitialize() override
   {
     api_.spawn(
       "ego",
-      api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34513, 5, 0, 0, 0, 0)),
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(
+        34513, 5.0, 0.0, api_.getHdmapUtils()),
       getVehicleParameters());
     api_.setLinearVelocity("ego", 10);
     api_.requestSpeedChange("ego", 3, true);

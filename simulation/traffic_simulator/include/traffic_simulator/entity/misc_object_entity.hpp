@@ -65,8 +65,6 @@ public:
     THROW_SEMANTIC_ERROR("getRouteLanelets function cannot not use in MiscObjectEntity");
   }
 
-  auto fillLaneletPose(CanonicalizedEntityStatus &) -> void override;
-
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override
   {
     return traffic_simulator_msgs::msg::WaypointsArray();
@@ -113,6 +111,16 @@ public:
   void setDecelerationLimit(double) override {}
 
   void setDecelerationRateLimit(double) override {}
+
+  auto getMaxAcceleration() const -> double override
+  {
+    THROW_SEMANTIC_ERROR("getMaxAcceleration function cannot not use in MiscObjectEntity");
+  }
+
+  auto getMaxDeceleration() const -> double override
+  {
+    THROW_SEMANTIC_ERROR("getMaxDeceleration function cannot not use in MiscObjectEntity");
+  }
 };
 }  // namespace entity
 }  // namespace traffic_simulator

@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
-
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <cpp_mock_scenarios/catalogs.hpp>
 #include <cpp_mock_scenarios/cpp_scenario_node.hpp>
@@ -21,6 +19,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <string>
 #include <traffic_simulator/api/api.hpp>
+#include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <vector>
 
@@ -40,17 +39,69 @@ public:
 
 private:
   bool requested = false;
+
+  /// @todo it should be separated into the API helper collection for the cpp_mock_scenario
+  auto lateralDistance(const std::string & from_entity_name, const std::string & to_entity_name)
+    -> std::optional<double>
+  {
+    if (const auto from_entity = api_.getEntity(from_entity_name);
+        from_entity && from_entity->laneMatchingSucceed()) {
+      if (const auto to_entity = api_.getEntity(to_entity_name);
+          to_entity && to_entity->laneMatchingSucceed()) {
+        return traffic_simulator::distance::lateralDistance(
+          from_entity->getCanonicalizedLaneletPose().value(),
+          to_entity->getCanonicalizedLaneletPose().value(), false, api_.getHdmapUtils());
+      }
+    }
+    return std::nullopt;
+  };
+
+  auto lateralDistance(
+    const std::string & from_entity_name, const std::string & to_entity_name,
+    const double matching_distance) -> std::optional<double>
+  {
+    if (const auto from_entity = api_.getEntity(from_entity_name)) {
+      if (const auto to_entity = api_.getEntity(to_entity_name)) {
+        auto from_entity_lanelet_pose = from_entity->getCanonicalizedLaneletPose(matching_distance);
+        auto to_entity_lanelet_pose = to_entity->getCanonicalizedLaneletPose(matching_distance);
+        if (from_entity_lanelet_pose && to_entity_lanelet_pose) {
+          return traffic_simulator::distance::lateralDistance(
+            from_entity_lanelet_pose.value(), to_entity_lanelet_pose.value(), false,
+            api_.getHdmapUtils());
+        }
+      }
+    }
+    return std::nullopt;
+  };
+
+  auto longitudinalDistance(
+    const std::string & from_entity_name, const std::string & to_entity_name)
+    -> std::optional<double>
+  {
+    if (const auto from_entity = api_.getEntity(from_entity_name);
+        from_entity && from_entity->laneMatchingSucceed()) {
+      if (const auto to_entity = api_.getEntity(to_entity_name);
+          to_entity && to_entity->laneMatchingSucceed()) {
+        return traffic_simulator::distance::longitudinalDistance(
+          from_entity->getCanonicalizedLaneletPose().value(),
+          to_entity->getCanonicalizedLaneletPose().value(), false, true, false,
+          api_.getHdmapUtils());
+      }
+    }
+    return std::nullopt;
+  }
+
   void onUpdate() override
   {
     if (api_.getCurrentTime() >= 10.0) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
-    const auto distance_to_front = api_.getLongitudinalDistance("ego", "front");
-    const auto distance_to_behind = api_.getLongitudinalDistance("ego", "behind");
-    const auto lateral_none = api_.getLateralDistance("ego", "front", 0.1);
-    const auto lateral_about_one = api_.getLateralDistance("ego", "front", 1.5);
-    const auto lateral_to_front = api_.getLateralDistance("ego", "front");
-    const auto lateral_to_behind = api_.getLateralDistance("ego", "behind");
+    const auto distance_to_front = longitudinalDistance("ego", "front");
+    const auto distance_to_behind = longitudinalDistance("ego", "behind");
+    const auto lateral_none = lateralDistance("ego", "front", 0.1);
+    const auto lateral_about_one = lateralDistance("ego", "front", 1.5);
+    const auto lateral_to_front = lateralDistance("ego", "front");
+    const auto lateral_to_behind = lateralDistance("ego", "behind");
     // LCOV_EXCL_START
     if (lateral_none) {
       return stop(cpp_mock_scenarios::Result::FAILURE);
@@ -93,21 +144,24 @@ private:
   {
     api_.spawn(
       "ego",
-      api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34513, 5, 0, 0, 0, 0)),
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(
+        34513, 5.0, 0.0, api_.getHdmapUtils()),
       getVehicleParameters());
     api_.setLinearVelocity("ego", 10);
     api_.requestSpeedChange("ego", 3, true);
 
     api_.spawn(
       "front",
-      api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34513, 10, 1, 0, 0, 0)),
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(
+        34513, 10.0, 1.0, api_.getHdmapUtils()),
       getVehicleParameters());
     api_.setLinearVelocity("front", 10);
     api_.requestSpeedChange("front", 3, true);
 
     api_.spawn(
       "behind",
-      api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34513, 0, -1, 0, 0, 0)),
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(
+        34513, 0.0, -1.0, api_.getHdmapUtils()),
       getVehicleParameters());
     api_.setLinearVelocity("behind", 10);
     api_.requestSpeedChange("behind", 3, true);

@@ -19,10 +19,12 @@
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/boolean.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
+#include <openscenario_interpreter/syntax/entity.hpp>
 #include <openscenario_interpreter/syntax/rule.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <openscenario_interpreter/syntax/triggering_entities.hpp>
 #include <pugixml.hpp>
+#include <valarray>
 
 namespace openscenario_interpreter
 {
@@ -45,7 +47,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct TimeHeadwayCondition : private SimulatorCore::ConditionEvaluation
 {
-  const String entity_ref;
+  const Entity entity_ref;
 
   const Double value;
 
@@ -57,7 +59,7 @@ struct TimeHeadwayCondition : private SimulatorCore::ConditionEvaluation
 
   const TriggeringEntities triggering_entities;
 
-  std::vector<Double> results;  // for description
+  std::vector<std::valarray<double>> results;  // for description
 
   explicit TimeHeadwayCondition(const pugi::xml_node &, Scope &, const TriggeringEntities &);
 

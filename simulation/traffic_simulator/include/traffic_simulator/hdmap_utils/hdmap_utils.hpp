@@ -29,15 +29,15 @@
 #include <tf2/LinearMath/Matrix3x3.h>
 
 #include <autoware_auto_mapping_msgs/msg/had_map_bin.hpp>
+#include <autoware_lanelet2_extension/utility/message_conversion.hpp>
+#include <autoware_lanelet2_extension/utility/query.hpp>
+#include <autoware_lanelet2_extension/utility/utilities.hpp>
 #include <boost/filesystem.hpp>
 #include <geographic_msgs/msg/geo_point.hpp>
 #include <geometry/spline/catmull_rom_spline.hpp>
 #include <geometry/spline/catmull_rom_spline_interface.hpp>
 #include <geometry/spline/hermite_curve.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
-#include <lanelet2_extension/utility/message_conversion.hpp>
-#include <lanelet2_extension/utility/query.hpp>
-#include <lanelet2_extension/utility/utilities.hpp>
 #include <map>
 #include <memory>
 #include <optional>
@@ -168,6 +168,8 @@ public:
 
   auto getLaneletPolygon(const lanelet::Id) const -> std::vector<geometry_msgs::msg::Point>;
 
+  auto getLanelets(const lanelet::Ids &) const -> lanelet::Lanelets;
+
   auto getLateralDistance(
     const traffic_simulator_msgs::msg::LaneletPose & from,
     const traffic_simulator_msgs::msg::LaneletPose & to, bool allow_lane_change = false) const
@@ -283,6 +285,11 @@ public:
     -> std::optional<traffic_simulator_msgs::msg::LaneletPose>;
 
   auto toLaneletPose(
+    const geometry_msgs::msg::Point &, const traffic_simulator_msgs::msg::BoundingBox &,
+    const bool include_crosswalk, const double matching_distance = 1.0) const
+    -> std::optional<traffic_simulator_msgs::msg::LaneletPose>;
+
+  auto toLaneletPose(
     const geometry_msgs::msg::Pose &, const traffic_simulator_msgs::msg::BoundingBox &,
     const bool include_crosswalk, const double matching_distance = 1.0) const
     -> std::optional<traffic_simulator_msgs::msg::LaneletPose>;
@@ -360,8 +367,6 @@ private:
     const geometry_msgs::msg::Pose & from, const traffic_simulator_msgs::msg::LaneletPose & to,
     const traffic_simulator::lane_change::TrajectoryShape,
     const double tangent_vector_size = 100) const -> math::geometry::HermiteCurve;
-
-  auto getLanelets(const lanelet::Ids &) const -> lanelet::Lanelets;
 
   auto getNextRoadShoulderLanelet(const lanelet::Id) const -> lanelet::Ids;
 

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <cmath>
+#include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
@@ -45,13 +46,19 @@ DistanceCondition::DistanceCondition(
   value(readAttribute<Double>("value", node, scope)),
   position(readElement<Position>("Position", node, scope)),
   triggering_entities(triggering_entities),
-  results(triggering_entities.entity_refs.size(), Double::nan()),
+  results(triggering_entities.entity_refs.size(), {Double::nan()}),
   consider_z([]() {
     rclcpp::Node node{"get_parameter", "simulation"};
     node.declare_parameter("consider_pose_by_road_slope", false);
     return node.get_parameter("consider_pose_by_road_slope").as_bool();
   }())
 {
+  std::set<RoutingAlgorithm::value_type> supported = {
+    RoutingAlgorithm::value_type::shortest, RoutingAlgorithm::value_type::undefined};
+  if (supported.find(routing_algorithm) == supported.end()) {
+    throw UNSUPPORTED_ENUMERATION_VALUE_SPECIFIED(
+      DistanceCondition, boost::lexical_cast<std::string>(routing_algorithm));
+  }
 }
 
 auto DistanceCondition::description() const -> std::string
@@ -742,8 +749,9 @@ auto DistanceCondition::evaluate() -> Object
   results.clear();
 
   return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
-    results.push_back(distance(triggering_entity));
-    return rule(static_cast<double>(results.back()), value);
+    results.push_back(
+      triggering_entity.apply([&](const auto & object) { return distance(object); }));
+    return not results.back().size() or rule(results.back(), value).min();
   }));
 }
 }  // namespace syntax

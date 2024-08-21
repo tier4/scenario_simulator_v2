@@ -80,6 +80,10 @@ public:
 
   auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter override;
 
+  auto getMaxAcceleration() const -> double override;
+
+  auto getMaxDeceleration() const -> double override;
+
   auto getEntityType() const -> const traffic_simulator_msgs::msg::EntityType & override;
 
   auto getEntityTypename() const -> const std::string & override;
@@ -123,8 +127,6 @@ public:
 
   void setTrafficLightManager(
     const std::shared_ptr<traffic_simulator::TrafficLightManager> &) override;
-
-  auto fillLaneletPose(CanonicalizedEntityStatus & status) -> void override;
 
   const traffic_simulator_msgs::msg::VehicleParameters vehicle_parameters;
 

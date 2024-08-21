@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/syntax/entities.hpp>  // TEMPORARY (TODO REMOVE THIS LINE)
 #include <openscenario_interpreter/syntax/relative_distance_condition.hpp>
@@ -30,7 +31,7 @@ RelativeDistanceCondition::RelativeDistanceCondition(
 : Scope(scope),
   coordinate_system(
     readAttribute<CoordinateSystem>("coordinateSystem", node, scope, CoordinateSystem::entity)),
-  entity_ref(readAttribute<String>("entityRef", node, scope)),
+  entity_ref(readAttribute<String>("entityRef", node, scope), scope),
   freespace(readAttribute<Boolean>("freespace", node, scope)),
   relative_distance_type(readAttribute<RelativeDistanceType>("relativeDistanceType", node, scope)),
   routing_algorithm(
@@ -38,13 +39,19 @@ RelativeDistanceCondition::RelativeDistanceCondition(
   rule(readAttribute<Rule>("rule", node, scope)),
   value(readAttribute<Double>("value", node, scope)),
   triggering_entities(triggering_entities),
-  results(triggering_entities.entity_refs.size(), Double::nan()),
+  results(triggering_entities.entity_refs.size(), {Double::nan()}),
   consider_z([]() {
     rclcpp::Node node{"get_parameter", "simulation"};
     node.declare_parameter("consider_pose_by_road_slope", false);
     return node.get_parameter("consider_pose_by_road_slope").as_bool();
   }())
 {
+  std::set<RoutingAlgorithm::value_type> supported = {
+    RoutingAlgorithm::value_type::shortest, RoutingAlgorithm::value_type::undefined};
+  if (supported.find(routing_algorithm) == supported.end()) {
+    throw UNSUPPORTED_ENUMERATION_VALUE_SPECIFIED(
+      RelativeDistanceCondition, boost::lexical_cast<std::string>(routing_algorithm));
+  }
 }
 
 auto RelativeDistanceCondition::description() const -> String
@@ -411,8 +418,9 @@ auto RelativeDistanceCondition::evaluate() -> Object
   results.clear();
 
   return asBoolean(triggering_entities.apply([&](const auto & triggering_entity) {
-    results.push_back(distance(triggering_entity));
-    return rule(static_cast<double>(results.back()), value);
+    results.push_back(
+      triggering_entity.apply([&](const auto & object) { return distance(object); }));
+    return not results.back().size() or rule(results.back(), value).min();
   }));
 }
 }  // namespace syntax
