@@ -35,6 +35,25 @@ Changelog for package scenario_test_runner
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+3.5.0 (2024-08-21)
+------------------
+* Merge pull request `#1316 <https://github.com/tier4/scenario_simulator_v2/issues/1316>`_ from tier4/relative-clearance-condition
+* Merge branch 'master' into relative-clearance-condition
+* Merge branch 'master' into relative-clearance-condition
+* feat: add test scenarios for RelativeClearanceCondition to CI test
+* Merge branch 'master' into relative-clearance-condition
+* Merge branch 'master' into relative-clearance-condition
+* Merge remote-tracking branch 'origin/master' into relative-clearance-condition
+* Add ByEntityCondition.EntityCondition.RelativeClearanceCondition-back.yaml
+* Update ByEntityCondition.EntityCondition.RelativeClearanceCondition.yaml to be a better test
+* Update ByEntityCondition.EntityCondition.RelativeClearanceCondition.yaml to check RelativeClearanceCondition in more detail
+* Merge remote-tracking branch 'origin/master' into relative-clearance-condition
+* Merge remote-tracking branch 'origin/relative-clearance-condition' into relative-clearance-condition
+* Merge branch 'master' into relative-clearance-condition
+* feat: add ByEntityCondition.EntityCondition.RelativeClearanceCondition.yaml
+* Merge remote-tracking branch 'origin/master' into relative-clearance-condition
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
 3.4.4 (2024-08-20)
 ------------------
 

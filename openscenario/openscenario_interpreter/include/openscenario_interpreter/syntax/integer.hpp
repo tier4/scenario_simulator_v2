@@ -35,6 +35,10 @@ struct Integer
 
   explicit Integer(const std::string &);
 
+  static auto max() noexcept -> Integer;
+
+  static auto min() noexcept -> Integer;
+
   auto operator+=(const double &) -> Integer &;
 
   auto operator*=(const double &) -> Integer &;
