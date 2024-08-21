@@ -21,6 +21,33 @@ Changelog for package traffic_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+3.5.0 (2024-08-21)
+------------------
+* Merge pull request `#1316 <https://github.com/tier4/scenario_simulator_v2/issues/1316>`_ from tier4/relative-clearance-condition
+* Merge branch 'master' into relative-clearance-condition
+* refactor: use std::size_t instead of raw size_t
+  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
+* Merge branch 'master' into relative-clearance-condition
+* refactor: use std::find instead of std::find_if
+* Merge branch 'master' into relative-clearance-condition
+* Merge branch 'master' into relative-clearance-condition
+* Merge branch 'master' into relative-clearance-condition
+* Merge remote-tracking branch 'origin/master' into relative-clearance-condition
+* Merge remote-tracking branch 'origin/master' into relative-clearance-condition
+* fix tests for HdMapUtils::countLaneChanges
+* Merge remote-tracking branch 'origin/relative-clearance-condition' into relative-clearance-condition
+* Implement HdMapUtils::countLaneChanges
+* Implement HdMapUtils::countLaneChangesAlongRoute
+* Merge branch 'master' into relative-clearance-condition
+* Merge remote-tracking branch 'origin/master' into relative-clearance-condition
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
+3.4.4 (2024-08-20)
+------------------
+
+3.4.3 (2024-08-19)
+------------------
+
 3.4.2 (2024-08-05)
 ------------------
 * Merge branch 'master' into doc/longitudinal-control
