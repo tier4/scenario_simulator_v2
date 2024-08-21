@@ -127,15 +127,14 @@ auto LineSegment::getPose(const double s, const bool denormalize_s, const bool f
  */
 auto LineSegment::isIntersect2D(const geometry_msgs::msg::Point & point) const -> bool
 {
-  const bool x_outside = ((point.x - start_point.x) * (end_point.x - point.x) < 0.0);
-  const bool y_outside = ((point.y - start_point.y) * (end_point.y - point.y) < 0.0);
-  if (x_outside || y_outside) {
+  if (isInBounds2D(point)) {
+    const double cross_product = (point.y - start_point.y) * (end_point.x - start_point.x) -
+                                 (point.x - start_point.x) * (end_point.y - start_point.y);
+    constexpr double tolerance = std::numeric_limits<double>::epsilon();
+    return std::abs(cross_product) <= get2DLength() * tolerance;
+  } else {
     return false;
   }
-  const double cross_product = (point.y - start_point.y) * (end_point.x - start_point.x) -
-                               (point.x - start_point.x) * (end_point.y - start_point.y);
-  constexpr double tolerance = std::numeric_limits<double>::epsilon();
-  return std::abs(cross_product) <= get2DLength() * tolerance;
 }
 
 auto LineSegment::getSValue(
