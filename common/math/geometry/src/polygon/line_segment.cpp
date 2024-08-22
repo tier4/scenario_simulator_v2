@@ -112,14 +112,11 @@ auto LineSegment::getPose(const double s, const bool denormalize_s, const bool f
 {
   return geometry_msgs::build<geometry_msgs::msg::Pose>()
     .position(getPoint(s, denormalize_s))
-    .orientation([this, fill_pitch]() -> geometry_msgs::msg::Quaternion {
-      return math::geometry::convertEulerAngleToQuaternion(
-        geometry_msgs::build<geometry_msgs::msg::Vector3>()
-          .x(0.0)
-          .y(
-            fill_pitch ? std::atan2(-getVector().z, std::hypot(getVector().x, getVector().y)) : 0.0)
-          .z(std::atan2(getVector().y, getVector().x)));
-    }());
+    .orientation(math::geometry::convertEulerAngleToQuaternion(
+      geometry_msgs::build<geometry_msgs::msg::Vector3>()
+        .x(0.0)
+        .y(fill_pitch ? std::atan2(-getVector().z, std::hypot(getVector().x, getVector().y)) : 0.0)
+        .z(std::atan2(getVector().y, getVector().x))));
 }
 
 /**
