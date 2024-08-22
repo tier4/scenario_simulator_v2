@@ -24,6 +24,14 @@ Changelog for package openscenario_utility
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+3.5.1 (2024-08-22)
+------------------
+* Merge branch 'master' into feat/RJD-1283-add-traffic-controller-visualization
+* Merge branch 'master' into feat/RJD-1283-add-traffic-controller-visualization
+* Merge branch 'master' into feat/RJD-1283-add-traffic-controller-visualization
+* Merge branch 'master' into feat/RJD-1283-add-traffic-controller-visualization
+* Contributors: Dawid Moszyński, Tatsuya Yamasaki
+
 3.5.0 (2024-08-21)
 ------------------
 * Merge branch 'master' into relative-clearance-condition
