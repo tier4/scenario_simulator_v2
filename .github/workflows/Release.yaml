@@ -142,3 +142,12 @@ jobs:
               repo: context.repo.repo,
               ref: `heads/${context.payload.pull_request.head.ref}`,
             })
+
+      - name: Kick docker build action
+        if: github.event.pull_request.merged == true
+        run: |
+          curl -X POST \
+          -H "Accept: application/vnd.github.v3+json" \
+          -H "Authorization: token ${{ secrets.PAT }}" \
+          https://api.github.com/repos/${{ github.repository }}/actions/workflows/target-workflow.yml/dispatches \
+          -d '{"ref":"main", "inputs": {"version":"${{ steps.new_version.outputs.new_version }}"}}'

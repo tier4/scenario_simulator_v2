@@ -10,7 +10,11 @@ on:
       - "!mkdocs.yml"
       - "!pyproject.toml"
       - "!poetry.lock"
-  release:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: version of the scenario_simulator_v2
+        required: true
 
 jobs:
   push_docker:
@@ -61,7 +65,7 @@ jobs:
             ${{ matrix.rosdistro }}_base_${{ matrix.arch }}
 
       - name: Build and push (${{ matrix.arch }})
-        if: github.event_name != 'pull_request'
+        if: github.event_name == 'workflow_dispatch'
         uses: docker/bake-action@v3
         with:
           files: |
@@ -70,7 +74,7 @@ jobs:
           set: |
             *.cache-to=type=gha,mode=max
             *.cache-from=type=gha
-            *.tags=ghcr.io/tier4/scenario_simulator_v2:humble-${{ github.event.release.tag_name }}
+            *.tags=ghcr.io/tier4/scenario_simulator_v2:humble-${{ github.event.inputs.version }}
           push: true
           targets: |
             ${{ matrix.rosdistro }}_base_${{ matrix.arch }}
