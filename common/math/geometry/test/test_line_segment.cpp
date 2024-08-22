@@ -270,44 +270,44 @@ TEST(LineSegment, getLineSegmentsVectorIdentical_closeStartEnd)
   EXPECT_POINT_EQ(lines[3].end_point, point);
 }
 
-TEST(LineSegment, getSValue)
+TEST(LineSegment, get2DSValue)
 {
   math::geometry::LineSegment line(makePoint(0.0, 0.0, 0.0), makePoint(3.0, 3.0, 3.0));
-  const auto s = line.getSValue(makePose(2.0, 2.0, 2.0), 1.0, false);
+  const auto s = line.get2DSValue(makePose(2.0, 2.0, 2.0), 1.0, false);
   EXPECT_TRUE(s);
   if (s) {
     EXPECT_DOUBLE_EQ(s.value(), 2.0 / 3.0);
   }
 }
 
-TEST(LineSegment, getSValue_denormalize)
+TEST(LineSegment, get2DSValue_denormalize)
 {
   math::geometry::LineSegment line(makePoint(0.0, 0.0, 0.0), makePoint(3.0, 3.0, 3.0));
-  const auto s = line.getSValue(makePose(2.0, 2.0, 2.0), 1.0, true);
+  const auto s = line.get2DSValue(makePose(2.0, 2.0, 2.0), 1.0, true);
   EXPECT_TRUE(s);
   if (s) {
-    EXPECT_DOUBLE_EQ(s.value(), std::hypot(2.0, 2.0, 2.0));
+    EXPECT_DOUBLE_EQ(s.value(), std::hypot(2.0, 2.0));
   }
 }
 
-TEST(LineSegment, getSValue_outOfRange)
+TEST(LineSegment, get2DSValue_outOfRange)
 {
   math::geometry::LineSegment line(makePoint(0.0, 0.0, 0.0), makePoint(3.0, 3.0, 3.0));
-  const auto s = line.getSValue(makePose(4.0, 4.0, 4.0), 1.0, false);
+  const auto s = line.get2DSValue(makePose(4.0, 4.0, 4.0), 1.0, false);
   EXPECT_FALSE(s);
 }
 
-TEST(LineSegment, getSValue_outOfRangeDenormalize)
+TEST(LineSegment, get2DSValue_outOfRangeDenormalize)
 {
   math::geometry::LineSegment line(makePoint(0.0, 0.0, 0.0), makePoint(3.0, 3.0, 3.0));
-  const auto s = line.getSValue(makePose(4.0, 4.0, 4.0), 1.0, true);
+  const auto s = line.get2DSValue(makePose(4.0, 4.0, 4.0), 1.0, true);
   EXPECT_FALSE(s);
 }
 
-TEST(LineSegment, getSValue_parallel)
+TEST(LineSegment, get2DSValue_parallel)
 {
   math::geometry::LineSegment line(makePoint(0.0, 0.0, 0.0), makePoint(3.0, 3.0, 0.0));
-  const auto s = line.getSValue(
+  const auto s = line.get2DSValue(
     makePose(
       1.0, 0.0, 0.0,
       math::geometry::convertEulerAngleToQuaternion(makeVector(0.0, 0.0, M_PI_4 * 3.0))),
@@ -315,10 +315,10 @@ TEST(LineSegment, getSValue_parallel)
   EXPECT_FALSE(s);
 }
 
-TEST(LineSegment, getSValue_parallelDenormalize)
+TEST(LineSegment, get2DSValue_parallelDenormalize)
 {
   math::geometry::LineSegment line(makePoint(0.0, 0.0, 0.0), makePoint(3.0, 3.0, 0.0));
-  const auto s = line.getSValue(
+  const auto s = line.get2DSValue(
     makePose(
       1.0, 0.0, 0.0,
       math::geometry::convertEulerAngleToQuaternion(makeVector(0.0, 0.0, M_PI_4 * 3.0))),

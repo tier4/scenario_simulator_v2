@@ -14,6 +14,7 @@
 
 #include <geometry/intersection/intersection.hpp>
 #include <optional>
+#include <scenario_simulator_exception/exception.hpp>
 
 namespace math
 {
@@ -55,21 +56,34 @@ bool isIntersect2D(const std::vector<LineSegment> & lines)
 std::optional<geometry_msgs::msg::Point> getIntersection2D(
   const LineSegment & line0, const LineSegment & line1)
 {
-  if (!isIntersect2D(line0, line1)) {
+  if (not line0.isIntersect2D(line1)) {
     return std::nullopt;
   }
-  const auto det =
-    (line0.start_point.x - line0.end_point.x) * (line1.end_point.y - line1.start_point.y) -
-    (line1.end_point.x - line1.start_point.x) * (line0.start_point.y - line0.end_point.y);
-  const auto t =
-    ((line1.end_point.y - line1.start_point.y) * (line1.end_point.x - line0.end_point.x) +
-     (line1.start_point.x - line1.end_point.x) * (line1.end_point.y - line0.end_point.y)) /
-    det;
-  geometry_msgs::msg::Point point;
-  point.x = t * line0.start_point.x + (1.0 - t) * line0.end_point.x;
-  point.y = t * line0.start_point.y + (1.0 - t) * line0.end_point.y;
-  point.z = t * line0.start_point.z + (1.0 - t) * line0.end_point.z;
-  return point;
+  // 'line0' represented as a0x + b0y = c0
+  const double a0 = line0.get2DVector().y;
+  const double b0 = -line0.get2DVector().x;
+  const double c0 = a0 * line0.start_point.x + b0 * line0.start_point.y;
+
+  // 'line1' represented as a1x + b1y = c1
+  const double a1 = line1.get2DVector().y;
+  const double b1 = -line1.get2DVector().x;
+  const double c1 = a1 * line1.start_point.x + b1 * line1.start_point.y;
+
+  const double determinant = a0 * b1 - a1 * b0;
+
+  if (std::abs(determinant) < 1.0e-10) {
+    // The lines do intersect, but they are collinear and overlap.
+    THROW_SIMULATION_ERROR(
+      "Line segments are collinear. So determinant is zero.",
+      "If this message was displayed, something completely unexpected happens.",
+      "This message is not originally intended to be displayed, if you see it, please "
+      "contact the developer of traffic_simulator.");
+  } else {
+    return geometry_msgs::build<geometry_msgs::msg::Point>()
+      .x((b1 * c0 - b0 * c1) / determinant)
+      .y((a0 * c1 - a1 * c0) / determinant)
+      .z(0.0);
+  }
 }
 
 std::vector<geometry_msgs::msg::Point> getIntersection2D(const std::vector<LineSegment> & lines)
