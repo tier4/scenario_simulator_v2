@@ -156,16 +156,16 @@ TEST(LineSegment, get2DLengthZeroLength)
   EXPECT_DOUBLE_EQ(line.get2DLength(), 0.0);
 }
 
-TEST(LineSegment, getSlope)
+TEST(LineSegment, get2DVectorSlope)
 {
   const math::geometry::LineSegment line(makePoint(1.0, 2.0, 3.0), makePoint(3.0, 3.0, 4.0));
-  EXPECT_DOUBLE_EQ(line.getSlope(), 0.5);
+  EXPECT_DOUBLE_EQ(line.get2DVectorSlope(), 0.5);
 }
 
-TEST(LineSegment, getSlopeZeroLength)
+TEST(LineSegment, get2DVectorSlopeZeroLength)
 {
   const math::geometry::LineSegment line(makePoint(1.0, 2.0, 3.0), makePoint(1.0, 2.0, 3.0));
-  EXPECT_TRUE(std::isnan(line.getSlope()));
+  EXPECT_THROW(line.get2DVectorSlope(), common::SimulationError);
 }
 
 TEST(LineSegment, getSquaredDistanceIn2D)

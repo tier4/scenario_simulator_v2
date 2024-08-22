@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <geometry/intersection/intersection.hpp>
+#include <limits>
 #include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 
@@ -71,7 +72,7 @@ std::optional<geometry_msgs::msg::Point> getIntersection2D(
 
   const double determinant = a0 * b1 - a1 * b0;
 
-  if (std::abs(determinant) < 1.0e-10) {
+  if (std::abs(determinant) <= std::numeric_limits<double>::epsilon()) {
     // The lines do intersect, but they are collinear and overlap.
     THROW_SIMULATION_ERROR(
       "Line segments are collinear. So determinant is zero.",

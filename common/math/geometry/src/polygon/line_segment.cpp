@@ -48,7 +48,7 @@ LineSegment::LineSegment(
   const geometry_msgs::msg::Point & start_point, const geometry_msgs::msg::Vector3 & vec,
   const double length)
 : LineSegment::LineSegment(start_point, [&]() -> geometry_msgs::msg::Point {
-    if (double vec_size = std::hypot(vec.x, vec.y); vec_size == 0.0) {
+    if (const double vec_size = std::hypot(vec.x, vec.y); vec_size == 0.0) {
       THROW_SIMULATION_ERROR(
         "Invalid vector is specified, while constructing LineSegment. ",
         "The vector should have a non zero length to initialize the line segment correctly. ",
@@ -171,6 +171,8 @@ auto LineSegment::isIntersect2D(const LineSegment & line) const -> bool
 auto LineSegment::get2DIntersectionSValue(
   const geometry_msgs::msg::Point & point, const bool denormalize_s) const -> std::optional<double>
 {
+  // Note: We check for an SValue along the line.
+  // The term "2D" in the function name specifically refers to the intersection point, not SValue.
   if (isIntersect2D(point)) {
     const double proportion_2d =
       std::hypot(point.x - start_point.x, point.y - start_point.y) / get2DLength();
@@ -216,7 +218,7 @@ auto LineSegment::getVector() const -> const geometry_msgs::msg::Vector3 & { ret
  */
 auto LineSegment::getNormalVector() const -> geometry_msgs::msg::Vector3
 {
-  double theta = M_PI / 2.0;
+  const double theta = M_PI / 2.0;
   return geometry_msgs::build<geometry_msgs::msg::Vector3>()
     .x(getVector().x * std::cos(theta) - getVector().y * std::sin(theta))
     .y(getVector().x * std::sin(theta) + getVector().y * std::cos(theta))
@@ -229,7 +231,13 @@ auto LineSegment::get2DLength() const -> double { return length_2d; }
 
 auto LineSegment::getLength() const -> double { return length; }
 
-auto LineSegment::getSlope() const -> double { return get2DVector().y / get2DVector().x; }
+auto LineSegment::get2DVectorSlope() const -> double
+{
+  if (get2DVector().x <= std::numeric_limits<double>::epsilon()) {
+    THROW_SIMULATION_ERROR("Slope of a vertical line is undefined");
+  }
+  return get2DVector().y / get2DVector().x;
+}
 
 /**
  * @brief Get squared distance (Square of euclidean distance) between specified 3D point and specified 3D point on line segment in 2D. (x,y)
