@@ -277,10 +277,10 @@ auto LineSegment::denormalize(
   const std::optional<double> & s, const bool throw_error_on_out_of_range) const
   -> std::optional<double>
 {
-  if (!throw_error_on_out_of_range && s && !(0.0 <= s.value() && s.value() <= 1.0)) {
+  if (!throw_error_on_out_of_range && s.has_value() && !(0.0 <= s.value() && s.value() <= 1.0)) {
     return std::nullopt;
   }
-  return s ? std::make_optional<double>(denormalize(s.value())) : std::nullopt;
+  return s.has_value() ? std::make_optional<double>(denormalize(s.value())) : std::nullopt;
 }
 
 /**
