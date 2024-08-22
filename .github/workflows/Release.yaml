@@ -36,7 +36,7 @@ jobs:
         uses: levonet/action-restore-branch@master
 
       - name: Install bloom
-        run: apt update && apt install -y python3-bloom git
+        run: apt update && apt install -y python3-bloom git curl
 
       - name: Checkout
         uses: actions/checkout@v4
