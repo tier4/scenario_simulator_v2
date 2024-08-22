@@ -235,8 +235,9 @@ auto LineSegment::get2DVectorSlope() const -> double
 {
   if (get2DVector().x <= std::numeric_limits<double>::epsilon()) {
     THROW_SIMULATION_ERROR("Slope of a vertical line is undefined");
+  } else {
+    return get2DVector().y / get2DVector().x;
   }
-  return get2DVector().y / get2DVector().x;
 }
 
 /**
@@ -284,8 +285,9 @@ auto LineSegment::denormalize(
 {
   if (!s.has_value() || (!throw_error_on_out_of_range && !(0.0 <= s.value() && s.value() <= 1.0))) {
     return std::nullopt;
+  } else {
+    return std::make_optional<double>(denormalize(s.value()));
   }
-  return std::make_optional<double>(denormalize(s.value()));
 }
 
 /**
