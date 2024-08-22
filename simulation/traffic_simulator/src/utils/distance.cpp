@@ -45,6 +45,15 @@ auto lateralDistance(
   }
 }
 
+auto countLaneChanges(
+  const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
+  bool allow_lane_change, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+  -> std::optional<std::pair<int, int>>
+{
+  return hdmap_utils_ptr->countLaneChanges(
+    static_cast<LaneletPose>(from), static_cast<LaneletPose>(to), allow_lane_change);
+}
+
 auto longitudinalDistance(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
   bool include_adjacent_lanelet, bool include_opposite_direction, bool allow_lane_change,
