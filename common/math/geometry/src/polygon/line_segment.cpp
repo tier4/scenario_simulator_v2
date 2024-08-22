@@ -140,11 +140,11 @@ auto LineSegment::isIntersect2D(const geometry_msgs::msg::Point & point) const -
   }
 }
 
-auto LineSegment::get2DSValue(
+auto LineSegment::getSValue(
   const geometry_msgs::msg::Pose & pose, double threshold_distance, bool denormalize_s) const
   -> std::optional<double>
 {
-  return getIntersection2DSValue(
+  return get2DIntersectionSValue(
     LineSegment(
       math::geometry::transformPoint(
         pose,
@@ -171,13 +171,14 @@ auto LineSegment::isIntersect2D(const LineSegment & line) const -> bool
  * @param point point of you want to find intersection.
  * @return std::optional<double> 
  */
-auto LineSegment::getIntersection2DSValue(
+auto LineSegment::get2DIntersectionSValue(
   const geometry_msgs::msg::Point & point, const bool denormalize_s) const -> std::optional<double>
 {
   if (isIntersect2D(point)) {
-    const double distance = std::hypot(point.x - start_point.x, point.y - start_point.y);
-    return denormalize_s ? std::make_optional(distance)
-                         : std::make_optional(distance / get2DLength());
+    const double proportion_2d =
+      std::hypot(point.x - start_point.x, point.y - start_point.y) / get2DLength();
+    return denormalize_s ? std::make_optional(proportion_2d * getLength())
+                         : std::make_optional(proportion_2d);
   } else {
     return std::nullopt;
   }
@@ -189,11 +190,11 @@ auto LineSegment::getIntersection2DSValue(
  * @param denormalize_s If true, s value should be normalized in range [0,1]. If false, s value is not normalized.
  * @return std::optional<double> 
  */
-auto LineSegment::getIntersection2DSValue(const LineSegment & line, const bool denormalize_s) const
+auto LineSegment::get2DIntersectionSValue(const LineSegment & line, const bool denormalize_s) const
   -> std::optional<double>
 {
   if (const auto point = getIntersection2D(line); point.has_value()) {
-    return getIntersection2DSValue(point.value(), denormalize_s);
+    return get2DIntersectionSValue(point.value(), denormalize_s);
   } else {
     return std::nullopt;
   }

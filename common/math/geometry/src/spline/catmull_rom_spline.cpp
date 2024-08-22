@@ -316,7 +316,7 @@ auto CatmullRomSpline::getCollisionPointsIn2D(
           "This message is not originally intended to be displayed, if you see it, please "
           "contact the developer of traffic_simulator.");
       }
-      if (const auto s = line_segments_[0].getIntersection2DSValue(line, true)) {
+      if (const auto s = line_segments_[0].get2DIntersectionSValue(line, true)) {
         s_value_candidates.insert(s.value());
       }
     }
@@ -425,7 +425,7 @@ auto CatmullRomSpline::getSValue(
           "This message is not originally intended to be displayed, if you see it, please "
           "contact the developer of traffic_simulator.");
       }
-      return line_segments_[0].get2DSValue(pose, threshold_distance, true);
+      return line_segments_[0].getSValue(pose, threshold_distance, true);
     default:
       double s = 0;
       for (size_t i = 0; i < curves_.size(); i++) {

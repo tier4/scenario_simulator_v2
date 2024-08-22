@@ -45,14 +45,14 @@ public:
     -> geometry_msgs::msg::Pose;
   auto isIntersect2D(const geometry_msgs::msg::Point & point) const -> bool;
   auto isIntersect2D(const LineSegment & line) const -> bool;
-  auto getIntersection2DSValue(
+  auto get2DIntersectionSValue(
     const geometry_msgs::msg::Point & point, const bool denormalize_s = false) const
     -> std::optional<double>;
-  auto getIntersection2DSValue(const LineSegment & line, const bool denormalize_s = false) const
+  auto get2DIntersectionSValue(const LineSegment & line, const bool denormalize_s = false) const
     -> std::optional<double>;
   auto getIntersection2D(const LineSegment & line) const
     -> std::optional<geometry_msgs::msg::Point>;
-  auto get2DSValue(
+  auto getSValue(
     const geometry_msgs::msg::Pose & pose, double threshold_distance, bool denormalize_s) const
     -> std::optional<double>;
   auto getVector() const -> const geometry_msgs::msg::Vector3 &;
