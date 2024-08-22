@@ -171,8 +171,7 @@ auto LineSegment::isIntersect2D(const LineSegment & line) const -> bool
 auto LineSegment::get2DIntersectionSValue(
   const geometry_msgs::msg::Point & point, const bool denormalize_s) const -> std::optional<double>
 {
-  // Note: We check for an SValue along the line.
-  // The term "2D" in the function name specifically refers to the intersection point, not SValue.
+  /// @note This function checks for an SValue along the line. The term "2D" in the function name specifically refers to the intersection point, not SValue.
   if (isIntersect2D(point)) {
     const double proportion_2d =
       std::hypot(point.x - start_point.x, point.y - start_point.y) / get2DLength();
