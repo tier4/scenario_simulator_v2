@@ -41,10 +41,12 @@ public:
 
   template <typename NodeInterface>
   SubscriberWrapper(
-    const std::string & topic, NodeInterface & autoware_interface,
+    const std::string & topic, const rclcpp::QoS & quality_of_service,
+    NodeInterface & autoware_interface,
     const std::function<void(const MessageType &)> & callback = {})
   : subscription(autoware_interface.template create_subscription<MessageType>(
-      topic, 1, [this, callback](const typename MessageType::ConstSharedPtr message) {
+      topic, quality_of_service,
+      [this, callback](const typename MessageType::ConstSharedPtr message) {
         if constexpr (thread_safety == ThreadSafety::safe) {
           std::atomic_store(&current_value, message);
           if (current_value and callback) {
