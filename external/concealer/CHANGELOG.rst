@@ -21,6 +21,16 @@ Changelog for package concealer
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+3.5.2 (2024-08-23)
+------------------
+* Merge pull request `#1338 <https://github.com/tier4/scenario_simulator_v2/issues/1338>`_ from tier4/fix/interpreter/user-defined-value-condition
+  Fix/interpreter/user defined value condition
+* Merge branch 'master' into fix/interpreter/user-defined-value-condition
+* Merge branch 'master' into fix/interpreter/user-defined-value-condition
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/user-defined-value-condition
+* Change QoS of `/api/localization/initialization_state` to transient local
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
 3.5.1 (2024-08-22)
 ------------------
 * Merge branch 'master' into feat/RJD-1283-add-traffic-controller-visualization
