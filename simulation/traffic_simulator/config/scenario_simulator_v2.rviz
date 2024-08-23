@@ -33,8 +33,7 @@ Visualization Manager:
           Show Arrows: true
           Show Axes: true
           Show Names: true
-          Tree:
-            {}
+          Tree: {}
           Update Interval: 0
           Value: false
         - Alpha: 0.5
@@ -293,8 +292,7 @@ Visualization Manager:
         - Class: rviz_default_plugins/MarkerArray
           Enabled: false
           Name: Lanelet2VectorMap
-          Namespaces:
-            {}
+          Namespaces: {}
           Topic:
             Depth: 5
             Durability Policy: Transient Local
@@ -560,8 +558,7 @@ Visualization Manager:
             - Class: rviz_default_plugins/MarkerArray
               Enabled: true
               Name: MonteCarloInitialPose
-              Namespaces:
-                {}
+              Namespaces: {}
               Topic:
                 Depth: 5
                 Durability Policy: Volatile
@@ -787,8 +784,7 @@ Visualization Manager:
                 - Class: rviz_default_plugins/MarkerArray
                   Enabled: false
                   Name: Maneuver
-                  Namespaces:
-                    {}
+                  Namespaces: {}
                   Topic:
                     Depth: 5
                     Durability Policy: Volatile
@@ -819,8 +815,7 @@ Visualization Manager:
             - Class: rviz_default_plugins/MarkerArray
               Enabled: true
               Name: MapBasedDetectionResult
-              Namespaces:
-                {}
+              Namespaces: {}
               Topic:
                 Depth: 5
                 Durability Policy: Volatile
@@ -864,8 +859,7 @@ Visualization Manager:
             - Class: rviz_default_plugins/MarkerArray
               Enabled: true
               Name: RouteArea
-              Namespaces:
-                {}
+              Namespaces: {}
               Topic:
                 Depth: 5
                 Durability Policy: Transient Local
@@ -1761,8 +1755,7 @@ Visualization Manager:
                     - Class: rviz_default_plugins/MarkerArray
                       Enabled: false
                       Name: Bound
-                      Namespaces:
-                        {}
+                      Namespaces: {}
                       Topic:
                         Depth: 5
                         Durability Policy: Volatile
@@ -1775,8 +1768,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: true
                           Name: VirtualWall (Avoidance)
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -1787,8 +1779,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: true
                           Name: VirtualWall (AvoidanceByLC)
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -1799,8 +1790,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: true
                           Name: VirtualWall (LaneChangeRight)
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -1811,8 +1801,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: true
                           Name: VirtualWall (LaneChangeLeft)
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -1823,8 +1812,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: true
                           Name: VirtualWall (ExtLaneChangeRight)
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -1835,8 +1823,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: true
                           Name: VirtualWall (ExtLaneChangeLeft)
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -1847,8 +1834,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: true
                           Name: VirtualWall (GoalPlanner)
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -1859,8 +1845,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: true
                           Name: VirtualWall (StartPlanner)
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -1871,8 +1856,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: true
                           Name: VirtualWall (BlindSpot)
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -1883,8 +1867,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: true
                           Name: VirtualWall (Crosswalk)
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -1895,8 +1878,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: true
                           Name: VirtualWall (Walkway)
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -1907,8 +1889,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: true
                           Name: VirtualWall (DetectionArea)
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -1919,8 +1900,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: true
                           Name: VirtualWall (Intersection)
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -1931,8 +1911,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: true
                           Name: VirtualWall (MergeFromPrivateArea)
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -1943,8 +1922,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: true
                           Name: VirtualWall (NoStoppingArea)
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -1955,8 +1933,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: true
                           Name: VirtualWall (OcclusionSpot)
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -1967,8 +1944,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: true
                           Name: VirtualWall (StopLine)
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -1979,8 +1955,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: true
                           Name: VirtualWall (TrafficLight)
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -1991,8 +1966,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: true
                           Name: VirtualWall (VirtualTrafficLight)
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -2003,8 +1977,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: true
                           Name: VirtualWall (RunOut)
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -2015,8 +1988,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: true
                           Name: VirtualWall (SpeedBump)
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -2027,8 +1999,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: true
                           Name: VirtualWall (OutOfLane)
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -2039,8 +2010,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: true
                           Name: VirtualWall (NoDrivableLane)
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -2051,8 +2021,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: true
                           Name: VirtualWall (DynamicObstacleStop)
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -2067,8 +2036,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: false
                           Name: Arrow
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -2079,8 +2047,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: false
                           Name: Crosswalk
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -2091,8 +2058,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: false
                           Name: Intersection
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -2129,8 +2095,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: false
                           Name: Blind Spot
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -2141,8 +2106,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: false
                           Name: TrafficLight
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -2153,8 +2117,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: false
                           Name: VirtualTrafficLight
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -2165,8 +2128,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: false
                           Name: StopLine
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -2177,8 +2139,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: false
                           Name: DetectionArea
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -2189,8 +2150,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: false
                           Name: OcclusionSpot
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -2201,8 +2161,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: false
                           Name: NoStoppingArea
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -2213,8 +2172,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: false
                           Name: RunOut
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -2225,8 +2183,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: false
                           Name: Avoidance
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -2237,8 +2194,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: false
                           Name: LaneChange
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -2249,8 +2205,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: false
                           Name: LaneFollowing
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -2261,8 +2216,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: false
                           Name: GoalPlanner
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -2273,8 +2227,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: false
                           Name: StartPlanner
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -2285,8 +2238,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: false
                           Name: SideShift
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -2297,8 +2249,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: false
                           Name: SpeedBump
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -2309,8 +2260,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: false
                           Name: OutOfLane
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -2321,8 +2271,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: false
                           Name: DynamicAvoidance
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -2333,8 +2282,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: false
                           Name: NoDrivableLane
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -2345,8 +2293,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: false
                           Name: DynamicObstacleStop
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -2361,8 +2308,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: false
                           Name: Info (Avoidance)
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -2373,8 +2319,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: false
                           Name: Info (AvoidanceByLC)
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -2385,8 +2330,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: false
                           Name: Info (LaneChangeLeft)
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -2397,8 +2341,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: false
                           Name: Info (LaneChangeRight)
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -2409,8 +2352,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: false
                           Name: Info (ExtLaneChangeLeft)
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -2421,8 +2363,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: false
                           Name: Info (ExtLaneChangeRight)
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -2433,8 +2374,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: false
                           Name: Info (GoalPlanner)
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -2445,8 +2385,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: false
                           Name: Info (StartPlanner)
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -2457,8 +2396,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: false
                           Name: Info (DynamicAvoidance)
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -2522,8 +2460,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: true
                           Name: VirtualWall (ObstacleStop)
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -2534,8 +2471,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: true
                           Name: VirtualWall (SurroundObstacle)
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -2546,8 +2482,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: true
                           Name: VirtualWall (ObstacleAvoidance)
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -2558,8 +2493,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: true
                           Name: VirtualWall (ObstacleCruise)
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -2576,8 +2510,7 @@ Visualization Manager:
                             - Class: rviz_default_plugins/MarkerArray
                               Enabled: true
                               Name: SurroundObstacleCheck
-                              Namespaces:
-                                {}
+                              Namespaces: {}
                               Topic:
                                 Depth: 5
                                 Durability Policy: Volatile
@@ -2629,8 +2562,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: false
                           Name: ObstacleStop
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -2643,8 +2575,7 @@ Visualization Manager:
                             - Class: rviz_default_plugins/MarkerArray
                               Enabled: true
                               Name: CruiseVirtualWall
-                              Namespaces:
-                                {}
+                              Namespaces: {}
                               Topic:
                                 Depth: 5
                                 Durability Policy: Volatile
@@ -2655,8 +2586,7 @@ Visualization Manager:
                             - Class: rviz_default_plugins/MarkerArray
                               Enabled: true
                               Name: SlowDownVirtualWall
-                              Namespaces:
-                                {}
+                              Namespaces: {}
                               Topic:
                                 Depth: 5
                                 Durability Policy: Volatile
@@ -2667,8 +2597,7 @@ Visualization Manager:
                             - Class: rviz_default_plugins/MarkerArray
                               Enabled: true
                               Name: DebugMarker
-                              Namespaces:
-                                {}
+                              Namespaces: {}
                               Topic:
                                 Depth: 5
                                 Durability Policy: Volatile
@@ -2681,8 +2610,7 @@ Visualization Manager:
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: false
                           Name: ObstacleAvoidance
-                          Namespaces:
-                            {}
+                          Namespaces: {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -2786,8 +2714,7 @@ Visualization Manager:
             - Class: rviz_default_plugins/MarkerArray
               Enabled: true
               Name: PlanningErrorMarker
-              Namespaces:
-                {}
+              Namespaces: {}
               Topic:
                 Depth: 5
                 Durability Policy: Volatile
@@ -2849,8 +2776,7 @@ Visualization Manager:
         - Class: rviz_default_plugins/MarkerArray
           Enabled: false
           Name: Debug/MPC
-          Namespaces:
-            {}
+          Namespaces: {}
           Topic:
             Depth: 5
             Durability Policy: Volatile
@@ -2861,8 +2787,7 @@ Visualization Manager:
         - Class: rviz_default_plugins/MarkerArray
           Enabled: false
           Name: Debug/PurePursuit
-          Namespaces:
-            {}
+          Namespaces: {}
           Topic:
             Depth: 5
             Durability Policy: Volatile
@@ -2873,8 +2798,7 @@ Visualization Manager:
         - Class: rviz_default_plugins/MarkerArray
           Enabled: false
           Name: Debug/AEB
-          Namespaces:
-            {}
+          Namespaces: {}
           Topic:
             Depth: 5
             Durability Policy: Volatile
@@ -2889,8 +2813,7 @@ Visualization Manager:
         - Class: rviz_default_plugins/MarkerArray
           Enabled: true
           Name: Debug Marker
-          Namespaces:
-            {}
+          Namespaces: {}
           Topic:
             Depth: 5
             Durability Policy: Volatile
@@ -2901,8 +2824,7 @@ Visualization Manager:
         - Class: rviz_default_plugins/MarkerArray
           Enabled: true
           Name: Entity Marker
-          Namespaces:
-            {}
+          Namespaces: {}
           Topic:
             Depth: 5
             Durability Policy: Volatile
@@ -2913,8 +2835,7 @@ Visualization Manager:
         - Class: rviz_default_plugins/MarkerArray
           Enabled: true
           Name: Lanelet Marker
-          Namespaces:
-            {}
+          Namespaces: {}
           Topic:
             Depth: 5
             Durability Policy: Transient Local
@@ -2925,8 +2846,7 @@ Visualization Manager:
         - Class: rviz_default_plugins/MarkerArray
           Enabled: true
           Name: Traffic Light Marker
-          Namespaces:
-            {}
+          Namespaces: {}
           Topic:
             Depth: 5
             Durability Policy: Volatile
@@ -2948,8 +2868,7 @@ Visualization Manager:
         - Class: rviz_default_plugins/MarkerArray
           Enabled: true
           Name: Debug Marker
-          Namespaces:
-            {}
+          Namespaces: {}
           Topic:
             Depth: 5
             Durability Policy: Volatile
