@@ -8,7 +8,9 @@ OpenSCENARIO:
   ParameterDeclarations:
     ParameterDeclaration: []
   CatalogLocations:
-    CatalogLocation: []
+    VehicleCatalog:
+      Directory:
+        path: $(ros2 pkg prefix --share openscenario_experimental_catalog)/vehicle
   RoadNetwork:
     LogicFile:
       filepath: $(find-pkg-share kashiwanoha_map)/map
@@ -17,45 +19,32 @@ OpenSCENARIO:
   Entities:
     ScenarioObject:
       - name: ego
-        Vehicle:
-          name: ''
-          vehicleCategory: car
-          BoundingBox:
-            Center:
-              x: 0
-              y: 0
-              z: 1.25
-            Dimensions:
-              width: 2.25
-              length: 4.77
-              height: 2.5
-          Performance:
-            maxSpeed: 50
-            maxAcceleration: INF
-            maxDeceleration: INF
-          Axles:
-            FrontAxle:
-              maxSteering: 0.5236
-              wheelDiameter: 0.6
-              trackWidth: 4
-              positionX: 1
-              positionZ: 0.3
-            RearAxle:
-              maxSteering: 0.5236
-              wheelDiameter: 0.6
-              trackWidth: 4
-              positionX: 0
-              positionZ: 0.3
-          Properties:
-            Property: []
+        CatalogReference:
+          catalogName: sample_vehicle
+          entryName: sample_vehicle
         ObjectController:
           Controller:
             name: ''
             Properties:
               Property:
-                - { name: isEgo,    value: 'true' }
-                - { name: maxJerk,  value:  1.5   }
-                - { name: minJerk,  value: -1.5   }
+                - name: isEgo
+                  value: 'true'
+      - name: barricade
+        MiscObject:
+          mass: 1.0
+          miscObjectCategory: obstacle
+          name: ''
+          BoundingBox:
+            Center:
+              x: 0
+              y: 0
+              z: 0
+            Dimensions:
+              width: 10
+              length: 1
+              height: 10
+          Properties:
+            Property: []
   Storyboard:
     Init:
       Actions:
@@ -69,33 +58,30 @@ OpenSCENARIO:
                       laneId: '34513'
                       s: 0
                       offset: 0
-                      Orientation:
+                      Orientation: &ORIENTATION_ZERO
                         type: relative
                         h: 0
                         p: 0
                         r: 0
               - RoutingAction:
                   AcquirePositionAction:
-                    Position:
+                    Position: &EGO_DESTINATION
                       LanePosition:
                         roadId: ''
                         laneId: '34507'
                         s: 50
                         offset: 0
-                        Orientation:
-                          type: relative
-                          h: 0
-                          p: 0
-                          r: 0
-              - LongitudinalAction:
-                  SpeedAction:
-                    SpeedActionDynamics:
-                      dynamicsDimension: time
-                      value: 0
-                      dynamicsShape: step
-                    SpeedActionTarget:
-                      AbsoluteTargetSpeed:
-                        value: 2.778
+                        Orientation: *ORIENTATION_ZERO
+          - entityRef: barricade
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: 34513
+                      s: 20
+                      offset: 0
+                      Orientation: *ORIENTATION_ZERO
     Story:
       - name: ''
         Act:
@@ -120,7 +106,7 @@ OpenSCENARIO:
                                   conditionEdge: none
                                   ByValueCondition:
                                     SimulationTimeCondition:
-                                      value: 120
+                                      value: 180
                                       rule: greaterThan
                             - Condition:
                                 - name: ''
@@ -133,26 +119,8 @@ OpenSCENARIO:
                                         - entityRef: ego
                                     EntityCondition:
                                       ReachPositionCondition:
-                                        Position:
-                                          LanePosition:
-                                            roadId: ''
-                                            laneId: '34507'
-                                            s: 50
-                                            offset: 0
-                                            Orientation:
-                                              type: relative
-                                              h: 0
-                                              p: 0
-                                              r: 0
+                                        Position: *EGO_DESTINATION
                                         tolerance: 0.5
-                                - name: ''
-                                  delay: 0
-                                  conditionEdge: none
-                                  ByValueCondition:
-                                    UserDefinedValueCondition:
-                                      name: ego.currentState
-                                      rule: equalTo
-                                      value: ArrivedGoal
                         Action:
                           - name: ''
                             UserDefinedAction:
@@ -163,23 +131,178 @@ OpenSCENARIO:
                         StartTrigger:
                           ConditionGroup:
                             - Condition:
-                                - name: ''
+                                - &COUNT_UP
+                                  name: ''
                                   delay: 0
                                   conditionEdge: none
                                   ByValueCondition:
                                     UserDefinedValueCondition:
-                                      name: /count_up
-                                      value: 500
+                                      name: /count_up # ros2 run openscenario_interpreter_example count_up
+                                      value: 100
                                       rule: greaterThan
-                            # - Condition:
-                                - name: ''
-                                  delay: 0
-                                  conditionEdge: none
-                                  ByValueCondition:
-                                    UserDefinedValueCondition:
-                                      name: /timeout
-                                      value: true
-                                      rule: equalTo
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP # 10
+
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP # 20
+
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP # 30
+
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP # 40
+
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP # 50
+
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP # 60
+
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP # 70
+
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP # 80
+
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP # 90
+
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP # 100
+
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP # 110
+
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP # 120
+
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP # 130
+
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP # 140
+
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP
+                                - *COUNT_UP # 150
                         Action:
                           - name: ''
                             UserDefinedAction:

@@ -17,11 +17,12 @@
 namespace concealer
 {
 AutowareUniverse::AutowareUniverse()
-: getAckermannControlCommand("/control/command/control_cmd", *this),
-  getGearCommandImpl("/control/command/gear_cmd", *this),
-  getTurnIndicatorsCommand("/control/command/turn_indicators_cmd", *this),
+: getAckermannControlCommand("/control/command/control_cmd", rclcpp::QoS(1), *this),
+  getGearCommandImpl("/control/command/gear_cmd", rclcpp::QoS(1), *this),
+  getTurnIndicatorsCommand("/control/command/turn_indicators_cmd", rclcpp::QoS(1), *this),
   getPathWithLaneId(
-    "/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", *this),
+    "/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", rclcpp::QoS(1),
+    *this),
   setAcceleration("/localization/acceleration", *this),
   setOdometry("/localization/kinematic_state", *this),
   setSteeringReport("/vehicle/status/steering_status", *this),

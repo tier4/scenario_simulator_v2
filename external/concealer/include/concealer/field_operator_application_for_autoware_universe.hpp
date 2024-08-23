@@ -20,6 +20,7 @@
 #endif
 
 #include <autoware_adapi_v1_msgs/msg/mrm_state.hpp>
+#include <autoware_adapi_v1_msgs/srv/clear_route.hpp>
 #include <autoware_adapi_v1_msgs/srv/initialize_localization.hpp>
 #include <autoware_adapi_v1_msgs/srv/set_route_points.hpp>
 #include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
@@ -64,6 +65,7 @@ class FieldOperatorApplicationFor<AutowareUniverse>
   SubscriberWrapper<tier4_planning_msgs::msg::Trajectory>                         getTrajectory;
   SubscriberWrapper<autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand>       getTurnIndicatorsCommandImpl;
 
+  ServiceWithValidation<autoware_adapi_v1_msgs::srv::ClearRoute>                  requestClearRoute;
   ServiceWithValidation<tier4_rtc_msgs::srv::CooperateCommands>                   requestCooperateCommands;
   ServiceWithValidation<tier4_external_api_msgs::srv::Engage>                     requestEngage;
   ServiceWithValidation<autoware_adapi_v1_msgs::srv::InitializeLocalization>      requestInitialPose;
@@ -112,24 +114,25 @@ public:
   CONCEALER_PUBLIC explicit FieldOperatorApplicationFor(Ts &&... xs)
   : FieldOperatorApplication(std::forward<decltype(xs)>(xs)...),
     // clang-format off
-    getAckermannControlCommand("/control/command/control_cmd", *this),
-    getAutowareState("/api/iv_msgs/autoware/state", *this),
-    getCooperateStatusArray("/api/external/get/rtc_status", *this, [this](const auto & v) { latest_cooperate_status_array = v; }),
-    getEmergencyState("/api/external/get/emergency", *this, [this](const auto & v) { receiveEmergencyState(v); }),
+    getAckermannControlCommand("/control/command/control_cmd", rclcpp::QoS(1), *this),
+    getAutowareState("/api/iv_msgs/autoware/state", rclcpp::QoS(1), *this),
+    getCooperateStatusArray("/api/external/get/rtc_status", rclcpp::QoS(1), *this, [this](const auto & v) { latest_cooperate_status_array = v; }),
+    getEmergencyState("/api/external/get/emergency", rclcpp::QoS(1), *this, [this](const auto & v) { receiveEmergencyState(v); }),
 #if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)
-    getLocalizationState("/api/localization/initialization_state", *this),
+    getLocalizationState("/api/localization/initialization_state", rclcpp::QoS(1).transient_local(), *this),
 #endif
-    getMrmState("/api/fail_safe/mrm_state", *this, [this](const auto & v) { receiveMrmState(v); }),
-    getTrajectory("/api/iv_msgs/planning/scenario_planning/trajectory", *this),
-    getTurnIndicatorsCommandImpl("/control/command/turn_indicators_cmd", *this),
+    getMrmState("/api/fail_safe/mrm_state", rclcpp::QoS(1), *this, [this](const auto & v) { receiveMrmState(v); }),
+    getPathWithLaneId("/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", rclcpp::QoS(1), *this),
+    getTrajectory("/api/iv_msgs/planning/scenario_planning/trajectory", rclcpp::QoS(1), *this),
+    getTurnIndicatorsCommandImpl("/control/command/turn_indicators_cmd", rclcpp::QoS(1), *this),
+    requestClearRoute("/api/routing/clear_route", *this),
     requestCooperateCommands("/api/external/set/rtc_commands", *this),
     requestEngage("/api/external/set/engage", *this),
     requestInitialPose("/api/localization/initialize", *this),
     // NOTE: /api/routing/set_route_points takes a long time to return. But the specified duration is not decided by any technical reasons.
     requestSetRoutePoints("/api/routing/set_route_points", *this, std::chrono::seconds(10)),
     requestSetRtcAutoMode("/api/external/set/rtc_auto_mode", *this),
-    requestSetVelocityLimit("/api/autoware/set/velocity_limit", *this),
-    getPathWithLaneId("/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", *this)
+    requestSetVelocityLimit("/api/autoware/set/velocity_limit", *this)
   // clang-format on
   {
   }
