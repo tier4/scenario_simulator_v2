@@ -81,22 +81,20 @@ auto LineSegment::getPoint(const double s, const bool denormalize_s) const
       .x(start_point.x + getVector().x * s_normalized)
       .y(start_point.y + getVector().y * s_normalized)
       .z(start_point.z + getVector().z * s_normalized);
+  } else if (denormalize_s) {
+    THROW_SIMULATION_ERROR(
+      "Invalid S value is specified, while getting point on a line segment.",
+      "The range of s_normalized value should be in range [0,", getLength(), "].",
+      "But, your values are = ", s, " and length = ", getLength(),
+      " This message is not originally intended to be displayed, if you see it, please "
+      "contact the developer of traffic_simulator.");
   } else {
-    if (denormalize_s) {
-      THROW_SIMULATION_ERROR(
-        "Invalid S value is specified, while getting point on a line segment.",
-        "The range of s_normalized value should be in range [0,", getLength(), "].",
-        "But, your values are = ", s, " and length = ", getLength(),
-        " This message is not originally intended to be displayed, if you see it, please "
-        "contact the developer of traffic_simulator.");
-    } else {
-      THROW_SIMULATION_ERROR(
-        "Invalid S value is specified, while getting point on a line segment.",
-        "The range of s_normalized value should be in range [0,1].", "But, your values are = ", s,
-        " and length = ", getLength(),
-        " This message is not originally intended to be displayed, if you see it, please "
-        "contact the developer of traffic_simulator.");
-    }
+    THROW_SIMULATION_ERROR(
+      "Invalid S value is specified, while getting point on a line segment.",
+      "The range of s_normalized value should be in range [0,1].", "But, your values are = ", s,
+      " and length = ", getLength(),
+      " This message is not originally intended to be displayed, if you see it, please "
+      "contact the developer of traffic_simulator.");
   }
 }
 
