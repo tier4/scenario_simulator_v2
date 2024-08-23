@@ -81,21 +81,22 @@ auto LineSegment::getPoint(const double s, const bool denormalize_s) const
       .x(start_point.x + getVector().x * s_normalized)
       .y(start_point.y + getVector().y * s_normalized)
       .z(start_point.z + getVector().z * s_normalized);
-  }
-  if (denormalize_s) {
-    THROW_SIMULATION_ERROR(
-      "Invalid S value is specified, while getting point on a line segment.",
-      "The range of s_normalized value should be in range [0,", getLength(), "].",
-      "But, your values are = ", s, " and length = ", getLength(),
-      " This message is not originally intended to be displayed, if you see it, please "
-      "contact the developer of traffic_simulator.");
   } else {
-    THROW_SIMULATION_ERROR(
-      "Invalid S value is specified, while getting point on a line segment.",
-      "The range of s_normalized value should be in range [0,1].", "But, your values are = ", s,
-      " and length = ", getLength(),
-      " This message is not originally intended to be displayed, if you see it, please "
-      "contact the developer of traffic_simulator.");
+    if (denormalize_s) {
+      THROW_SIMULATION_ERROR(
+        "Invalid S value is specified, while getting point on a line segment.",
+        "The range of s_normalized value should be in range [0,", getLength(), "].",
+        "But, your values are = ", s, " and length = ", getLength(),
+        " This message is not originally intended to be displayed, if you see it, please "
+        "contact the developer of traffic_simulator.");
+    } else {
+      THROW_SIMULATION_ERROR(
+        "Invalid S value is specified, while getting point on a line segment.",
+        "The range of s_normalized value should be in range [0,1].", "But, your values are = ", s,
+        " and length = ", getLength(),
+        " This message is not originally intended to be displayed, if you see it, please "
+        "contact the developer of traffic_simulator.");
+    }
   }
 }
 
@@ -171,7 +172,11 @@ auto LineSegment::isIntersect2D(const LineSegment & line) const -> bool
 auto LineSegment::get2DIntersectionSValue(
   const geometry_msgs::msg::Point & point, const bool denormalize_s) const -> std::optional<double>
 {
-  /// @note This function checks for an SValue along the line. The term "2D" in the function name specifically refers to the intersection point, not SValue.
+  /// @note This function checks for an SValue along the line.
+  /// The term "2D" in the function name specifically refers to the intersection point, not the SValue.
+  /// Therefore, the intersection is determined by disregarding the z-coordinate, hence the term "2D."
+  /// After finding the intersection, we calculate its position using a proportion.
+  /// Finally, we multiply this proportion by the actual 3D length to obtain the total SValue.
   if (isIntersect2D(point)) {
     const double proportion_2d =
       std::hypot(point.x - start_point.x, point.y - start_point.y) / get2DLength();
@@ -298,11 +303,12 @@ auto LineSegment::denormalize(const double s) const -> double
 {
   if (0.0 <= s && s <= 1.0) {
     return s * getLength();
+  } else {
+    THROW_SIMULATION_ERROR(
+      "Invalid normalized s value, s = ", s, ", S value should be in range [0,1].",
+      "This message is not originally intended to be displayed, if you see it, please "
+      "contact the developer of traffic_simulator.");
   }
-  THROW_SIMULATION_ERROR(
-    "Invalid normalized s value, s = ", s, ", S value should be in range [0,1].",
-    "This message is not originally intended to be displayed, if you see it, please "
-    "contact the developer of traffic_simulator.");
 }
 
 LineSegment & LineSegment::operator=(const LineSegment &) { return *this; }
