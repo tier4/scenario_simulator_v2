@@ -81,7 +81,7 @@ def launch_setup(context, *args, **kwargs):
     scenario                            = LaunchConfiguration("scenario",                               default=Path("/dev/null"))
     sensor_model                        = LaunchConfiguration("sensor_model",                           default="")
     sigterm_timeout                     = LaunchConfiguration("sigterm_timeout",                        default=8)
-    use_sim_time                        = LaunchConfiguration("use_sim_time",                           default=True)
+    use_sim_time                        = LaunchConfiguration("use_sim_time",                           default=False)
     vehicle_model                       = LaunchConfiguration("vehicle_model",                          default="")
     # fmt: on
 
