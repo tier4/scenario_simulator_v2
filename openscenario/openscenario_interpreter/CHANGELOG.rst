@@ -32,6 +32,14 @@ Changelog for package openscenario_interpreter
 * add publish_empty_context parameter
 * Contributors: Masaya Kataoka
 
+3.5.3 (2024-08-26)
+------------------
+* Merge branch 'master' into RJD-1278/traffic_simulator-update
+* Merge branch 'master' into RJD-1278/traffic_simulator-update
+* Merge branch 'master' into RJD-1278/traffic_simulator-update
+* Merge branch 'master' into RJD-1278/traffic_simulator-update
+* Contributors: Michał Ciasnocha
+
 3.5.2 (2024-08-23)
 ------------------
 * Merge pull request `#1338 <https://github.com/tier4/scenario_simulator_v2/issues/1338>`_ from tier4/fix/interpreter/user-defined-value-condition
