@@ -42,7 +42,7 @@ It is possible to modify the speed of simulation (the speed of time published on
 
 ## Configure `use_sim_time` parameter
 
-Parameter `use_sim_time` of `openscenario_interpreter` is true by default and can be modified by passing it using command line.
+Parameter `use_sim_time` of `openscenario_interpreter` is **false** by default and can be modified by passing it using command line.
 
 
    ```bash
@@ -53,7 +53,7 @@ Parameter `use_sim_time` of `openscenario_interpreter` is true by default and ca
    sensor_model:=sample_sensor_kit \
    vehicle_model:=sample_vehicle \
    global_real_time_factor:="0.5" \
-   use_sim_time:=False
+   use_sim_time:=true
    ``` 
 
 However, this impacts the time published on the `/clock` topic and the time used by `Autoware`.
