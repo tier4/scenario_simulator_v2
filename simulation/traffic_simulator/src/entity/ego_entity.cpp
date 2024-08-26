@@ -60,7 +60,7 @@ auto EgoEntity::makeFieldOperatorApplication(
                    std::string((architecture_type >= "awf/universe/20230906") ? "true" : "false"),
                  "use_sim_time:=" +
                    std::string(
-                     getParameter<bool>(node_parameters, "use_sim_time", true) ? "true" : "false"))
+                     getParameter<bool>(node_parameters, "use_sim_time", false) ? "true" : "false"))
              : std::make_unique<
                  concealer::FieldOperatorApplicationFor<concealer::AutowareUniverse>>();
   } else {
