@@ -21,6 +21,63 @@ Changelog for package traffic_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+3.5.3 (2024-08-26)
+------------------
+* Merge pull request `#1340 <https://github.com/tier4/scenario_simulator_v2/issues/1340>`_ from tier4/RJD-1278/traffic_simulator-update
+  Rjd 1278/traffic simulator update
+* Merge branch 'master' into RJD-1278/traffic_simulator-update
+* Merge branch 'master' into RJD-1278/traffic_simulator-update
+* Merge branch 'master' into RJD-1278/traffic_simulator-update
+* Merge branch 'master' into RJD-1278/traffic_simulator-update
+* spellcheck
+* review changes
+* test_traffic_light.cpp refactor, sort
+* test_traffic_lights_manager.cpp refactor
+* remove ros nodes
+* test_simulation_clock.cpp refacton
+* refactor test_helper.cpp file
+* Contributors: Masaya Kataoka, Michał Ciasnocha, robomic
+
+3.5.2 (2024-08-23)
+------------------
+* Merge branch 'master' into fix/interpreter/user-defined-value-condition
+* Merge branch 'master' into fix/interpreter/user-defined-value-condition
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/user-defined-value-condition
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+3.5.1 (2024-08-22)
+------------------
+* Merge pull request `#1335 <https://github.com/tier4/scenario_simulator_v2/issues/1335>`_ from tier4/feat/RJD-1283-add-traffic-controller-visualization
+  feat(traffic_controller, api): add rviz marker for TrafficSink
+* Merge branch 'master' into feat/RJD-1283-add-traffic-controller-visualization
+* Merge branch 'master' into feat/RJD-1283-add-traffic-controller-visualization
+* Merge branch 'master' into feat/RJD-1283-add-traffic-controller-visualization
+* ref(traffic_controller): rename make->appendDebugMarker
+* Merge branch 'master' into feat/RJD-1283-add-traffic-controller-visualization
+* feat(traffic_controller, api): add rviz marker for TrafficSink
+* Contributors: Dawid Moszynski, Dawid Moszyński, Tatsuya Yamasaki
+
+3.5.0 (2024-08-21)
+------------------
+* Merge pull request `#1316 <https://github.com/tier4/scenario_simulator_v2/issues/1316>`_ from tier4/relative-clearance-condition
+* Merge branch 'master' into relative-clearance-condition
+* refactor: use std::size_t instead of raw size_t
+  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
+* Merge branch 'master' into relative-clearance-condition
+* refactor: use std::find instead of std::find_if
+* Merge branch 'master' into relative-clearance-condition
+* Merge branch 'master' into relative-clearance-condition
+* Merge branch 'master' into relative-clearance-condition
+* Merge remote-tracking branch 'origin/master' into relative-clearance-condition
+* Merge remote-tracking branch 'origin/master' into relative-clearance-condition
+* fix tests for HdMapUtils::countLaneChanges
+* Merge remote-tracking branch 'origin/relative-clearance-condition' into relative-clearance-condition
+* Implement HdMapUtils::countLaneChanges
+* Implement HdMapUtils::countLaneChangesAlongRoute
+* Merge branch 'master' into relative-clearance-condition
+* Merge remote-tracking branch 'origin/master' into relative-clearance-condition
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
 3.4.4 (2024-08-20)
 ------------------
 
