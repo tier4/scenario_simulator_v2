@@ -152,4 +152,4 @@ jobs:
             -H "Authorization: token ${{ secrets.BLOOM_GITHUB_TOKEN }}" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
             https://api.github.com/repos/merge-queue-testing/scenario_simulator_v2/actions/workflows/Docker.yaml/dispatches \
-            -d '{\"ref\":\"master\",\"inputs\":{\"version\":\"${{ steps.new_version.outputs.new_version }}\"}}'
+            -d '{"ref":"master","inputs":{"version":"${{ steps.new_version.outputs.new_version }}"}}'
