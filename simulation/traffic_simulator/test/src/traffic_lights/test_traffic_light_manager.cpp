@@ -18,16 +18,33 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
 
-TEST(TrafficLightManager, getIds)
+class TrafficLightManagerTest : public testing::Test
 {
-  const auto node = std::make_shared<rclcpp::Node>("getIds");
-  std::string path =
-    ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm";
-  geographic_msgs::msg::GeoPoint origin;
-  origin.latitude = 35.61836750154;
-  origin.longitude = 139.78066608243;
-  const auto hdmap_utils_ptr = std::make_shared<hdmap_utils::HdMapUtils>(path, origin);
-  traffic_simulator::TrafficLightManager manager(hdmap_utils_ptr);
+protected:
+  TrafficLightManagerTest()
+  : manager(std::make_shared<hdmap_utils::HdMapUtils>(
+      ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm",
+      geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
+        .latitude(35.61836750154)
+        .longitude(139.78066608243)
+        .altitude(0.0)))
+  {
+  }
+  traffic_simulator::TrafficLightManager manager;
+};
+
+int main(int argc, char ** argv)
+{
+  testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
+}
+
+/**
+ * @note Test basic functionality. Test obtaining traffic light functionality
+ * with a non-existant laneletId. A traffic light should be created.
+ */
+TEST_F(TrafficLightManagerTest, getTrafficLight)
+{
   manager.getTrafficLight(34836);
   EXPECT_FALSE(manager.getTrafficLights().find(34836) == std::end(manager.getTrafficLights()));
   manager.getTrafficLight(34802);
@@ -35,20 +52,15 @@ TEST(TrafficLightManager, getIds)
   EXPECT_EQ(manager.getTrafficLights().size(), static_cast<std::size_t>(2));
 }
 
-TEST(TrafficLightManager, setColor)
+/**
+ * @note Test basic functionality. Test adding a bulb to a specific traffic light with only a color specified.
+ */
+TEST_F(TrafficLightManagerTest, getTrafficLights_setColor)
 {
-  const auto node = std::make_shared<rclcpp::Node>("setColor");
-  std::string path =
-    ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm";
-  geographic_msgs::msg::GeoPoint origin;
-  origin.latitude = 35.61836750154;
-  origin.longitude = 139.78066608243;
-  const auto hdmap_utils_ptr = std::make_shared<hdmap_utils::HdMapUtils>(path, origin);
-  traffic_simulator::TrafficLightManager manager(hdmap_utils_ptr);
+  using Color = traffic_simulator::TrafficLight::Color;
+  using Status = traffic_simulator::TrafficLight::Status;
+  using Shape = traffic_simulator::TrafficLight::Shape;
   for (const auto & [id, traffic_light] : manager.getTrafficLights()) {
-    using Color = traffic_simulator::TrafficLight::Color;
-    using Status = traffic_simulator::TrafficLight::Status;
-    using Shape = traffic_simulator::TrafficLight::Shape;
     manager.getTrafficLight(id).clear();
     manager.getTrafficLight(id).emplace(Color::green);
     EXPECT_TRUE(
@@ -63,20 +75,15 @@ TEST(TrafficLightManager, setColor)
   }
 }
 
-TEST(TrafficLightManager, setArrow)
+/**
+ * @note Test basic functionality. Test adding a bulb to a specific traffic light with all parameters specified.
+ */
+TEST_F(TrafficLightManagerTest, getTrafficLights_setArrow)
 {
-  const auto node = std::make_shared<rclcpp::Node>("setArrow");
-  std::string path =
-    ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm";
-  geographic_msgs::msg::GeoPoint origin;
-  origin.latitude = 35.61836750154;
-  origin.longitude = 139.78066608243;
-  const auto hdmap_utils_ptr = std::make_shared<hdmap_utils::HdMapUtils>(path, origin);
-  traffic_simulator::TrafficLightManager manager(hdmap_utils_ptr);
+  using Color = traffic_simulator::TrafficLight::Color;
+  using Status = traffic_simulator::TrafficLight::Status;
+  using Shape = traffic_simulator::TrafficLight::Shape;
   for (const auto & [id, traffic_light] : manager.getTrafficLights()) {
-    using Color = traffic_simulator::TrafficLight::Color;
-    using Status = traffic_simulator::TrafficLight::Status;
-    using Shape = traffic_simulator::TrafficLight::Shape;
     manager.getTrafficLight(id).clear();
     manager.getTrafficLight(id).emplace(Color::green, Status::solid_on, Shape::left);
     EXPECT_TRUE(manager.getTrafficLight(id).contains(Color::green, Status::solid_on, Shape::left));
@@ -88,11 +95,4 @@ TEST(TrafficLightManager, setArrow)
     manager.getTrafficLight(id).emplace(Color::green, Status::solid_on, Shape::up);
     EXPECT_TRUE(manager.getTrafficLight(id).contains(Color::green, Status::solid_on, Shape::up));
   }
-}
-
-int main(int argc, char ** argv)
-{
-  testing::InitGoogleTest(&argc, argv);
-  rclcpp::init(argc, argv);
-  return RUN_ALL_TESTS();
 }
