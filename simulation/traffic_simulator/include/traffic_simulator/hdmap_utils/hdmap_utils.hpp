@@ -78,6 +78,11 @@ public:
     const lanelet::Id, const double s, const lanelet::Ids &,
     const double forward_distance = 20) const -> std::vector<geometry_msgs::msg::Point>;
 
+  auto countLaneChanges(
+    const traffic_simulator_msgs::msg::LaneletPose & from,
+    const traffic_simulator_msgs::msg::LaneletPose & to, bool allow_lane_change) const
+    -> std::optional<std::pair<int, int>>;
+
   auto filterLaneletIds(const lanelet::Ids &, const char subtype[]) const -> lanelet::Ids;
 
   auto generateMarker() const -> visualization_msgs::msg::MarkerArray;

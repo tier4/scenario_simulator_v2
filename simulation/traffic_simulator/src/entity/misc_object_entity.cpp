@@ -35,7 +35,7 @@ auto MiscObjectEntity::onUpdate(const double /*current_time*/, const double step
   if (npc_logic_started_) {
     updateStandStillDuration(step_time);
   }
-  status_before_update_.set(status_);
+  status_before_update_.set(*status_);
 }
 
 auto MiscObjectEntity::getCurrentAction() const -> std::string
@@ -43,7 +43,7 @@ auto MiscObjectEntity::getCurrentAction() const -> std::string
   if (not npc_logic_started_) {
     return "waiting";
   } else {
-    return static_cast<EntityStatus>(status_).action_status.current_action;
+    return static_cast<EntityStatus>(*status_).action_status.current_action;
   }
 }
 
