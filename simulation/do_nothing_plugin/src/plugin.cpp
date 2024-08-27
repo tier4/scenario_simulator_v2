@@ -103,20 +103,21 @@ auto interpolateEntityStatusFromPolylineTrajectory(
     const double angular_velocity =
       math::geometry::convertQuaternionToEulerAngle(
         math::geometry::getRotation(v0.position.orientation, v1.position.orientation))
-        .z;
+        .z /
+      (v1.time - v0.time);
     const auto angular_acceleration =
       (entity_status->getTwist().angular.x - angular_velocity) / (v1.time - v0.time);
 
     interpolated_entity_status.action_status.twist =
       geometry_msgs::build<geometry_msgs::msg::Twist>()
         .linear(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(linear_velocity).y(0).z(0))
-        .angular(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(angular_velocity).y(0).z(0));
+        .angular(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0).y(0).z(angular_velocity));
     interpolated_entity_status.action_status.accel =
       geometry_msgs::build<geometry_msgs::msg::Accel>()
         .linear(
           geometry_msgs::build<geometry_msgs::msg::Vector3>().x(linear_acceleration).y(0).z(0))
         .angular(
-          geometry_msgs::build<geometry_msgs::msg::Vector3>().x(angular_acceleration).y(0).z(0));
+          geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0).y(0).z(angular_acceleration));
     interpolated_entity_status.action_status.linear_jerk = linear_jerk;
     return interpolated_entity_status;
   };
