@@ -268,7 +268,7 @@ auto EgoEntity::setBehaviorParameter(
 
 auto EgoEntity::requestSpeedChange(double value, bool /* continuous */) -> void
 {
-  if (status_.getTime() > 0.0) {
+  if (status_->getTime() > 0.0) {
     THROW_SEMANTIC_ERROR("You cannot set target speed to the ego vehicle after starting scenario.");
   } else {
     target_speed_ = value;
