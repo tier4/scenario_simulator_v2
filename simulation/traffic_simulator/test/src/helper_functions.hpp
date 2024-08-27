@@ -122,25 +122,31 @@ auto makeEntityStatus(
 
 auto makeCanonicalizedEntityStatus(
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils,
-  traffic_simulator::lanelet_pose::CanonicalizedLaneletPose pose,
+  traffic_simulator::lanelet_pose::CanonicalizedLaneletPose canonicalized_lanelet_pose,
   traffic_simulator_msgs::msg::BoundingBox bbox, const double speed = 0.0,
   const std::string name = "default_entity_name",
   const uint8_t type = traffic_simulator_msgs::msg::EntityType::VEHICLE)
   -> traffic_simulator::entity_status::CanonicalizedEntityStatus
 {
   return traffic_simulator::entity_status::CanonicalizedEntityStatus(
-    makeEntityStatus(hdmap_utils, pose, bbox, speed, name, type), hdmap_utils);
+    makeEntityStatus(hdmap_utils, canonicalized_lanelet_pose, bbox, speed, name, type),
+    canonicalized_lanelet_pose);
 }
 
 auto makeCanonicalizedEntityStatus(
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils, geometry_msgs::msg::Pose pose,
-  traffic_simulator_msgs::msg::BoundingBox bbox, const double speed = 0.0,
-  const std::string name = "default_entity_name",
+  traffic_simulator_msgs::msg::BoundingBox bbox, const double matching_distance = 1.0,
+  const double speed = 0.0, const std::string name = "default_entity_name",
   const uint8_t type = traffic_simulator_msgs::msg::EntityType::VEHICLE)
   -> traffic_simulator::entity_status::CanonicalizedEntityStatus
 {
+  const auto include_crosswalk =
+    (traffic_simulator_msgs::msg::EntityType::PEDESTRIAN == type ||
+     traffic_simulator_msgs::msg::EntityType::MISC_OBJECT == type);
+  const auto canonicalized_lanelet_pose = traffic_simulator::pose::toCanonicalizedLaneletPose(
+    pose, bbox, include_crosswalk, matching_distance, hdmap_utils);
   return traffic_simulator::entity_status::CanonicalizedEntityStatus(
-    makeEntityStatus(hdmap_utils, pose, bbox, speed, name, type), hdmap_utils);
+    makeEntityStatus(hdmap_utils, pose, bbox, speed, name, type), canonicalized_lanelet_pose);
 }
 
 #endif  // TRAFFIC_SIMULATOR__TEST__ENTITY_HELPER_FUNCTIONS_HPP_
