@@ -175,17 +175,13 @@ auto EntityManager::getEntity(const std::string & name) const
   }
 };
 
-auto EntityManager::getEntityStatus(const std::string & name) const -> CanonicalizedEntityStatus
+auto EntityManager::getEntityStatus(const std::string & name) const
+  -> const CanonicalizedEntityStatus &
 {
-  if (const auto iter = entities_.find(name); iter == entities_.end()) {
-    THROW_SEMANTIC_ERROR("entity ", std::quoted(name), " does not exist.");
+  if (const auto entity = getEntity(name)) {
+    return entity->getCanonicalizedStatus();
   } else {
-    auto entity_status = static_cast<EntityStatus>(iter->second->getStatus());
-    assert(entity_status.name == name && "The entity name in status is different from key!");
-    entity_status.action_status.current_action = getCurrentAction(name);
-    entity_status.time = current_time_;
-    return CanonicalizedEntityStatus(
-      entity_status, iter->second->getStatus().getCanonicalizedLaneletPose());
+    THROW_SEMANTIC_ERROR("entity ", std::quoted(name), " does not exist.");
   }
 }
 
@@ -289,7 +285,7 @@ void EntityManager::requestLaneChange(
   if (const auto entity = getEntity(name); entity && entity->laneMatchingSucceed()) {
     if (
       const auto target = hdmap_utils_ptr_->getLaneChangeableLaneletId(
-        entity->getStatus().getLaneletId(), direction)) {
+        entity->getCanonicalizedStatus().getLaneletId(), direction)) {
       requestLaneChange(name, target.value());
     }
   }
@@ -298,7 +294,7 @@ void EntityManager::requestLaneChange(
 void EntityManager::resetBehaviorPlugin(
   const std::string & name, const std::string & behavior_plugin_name)
 {
-  const auto status = getEntityStatus(name);
+  const auto & status = getEntityStatus(name);
   const auto behavior_parameter = getBehaviorParameter(name);
   if (is<EgoEntity>(name)) {
     THROW_SEMANTIC_ERROR(
@@ -370,18 +366,6 @@ void EntityManager::requestSpeedChange(
   return entities_.at(name)->requestSpeedChange(target_speed, transition, constraint, continuous);
 }
 
-auto EntityManager::setEntityStatus(
-  const std::string & name, const CanonicalizedEntityStatus & status) -> void
-{
-  if (is<EgoEntity>(name) && getCurrentTime() > 0 && not isControlledBySimulator(name)) {
-    THROW_SEMANTIC_ERROR(
-      "You cannot set entity status to the ego vehicle name ", std::quoted(name),
-      " after starting scenario.");
-  } else {
-    entities_.at(name)->setStatus(status);
-  }
-}
-
 void EntityManager::setVerbose(const bool verbose)
 {
   configuration.verbose = verbose;
@@ -396,7 +380,7 @@ auto EntityManager::updateNpcLogic(const std::string & name) -> const Canonicali
     std::cout << "update " << name << " behavior" << std::endl;
   }
   entities_[name]->onUpdate(current_time_, step_time_);
-  return entities_[name]->getStatus();
+  return entities_[name]->getCanonicalizedStatus();
 }
 
 void EntityManager::update(const double current_time, const double step_time)
@@ -413,7 +397,7 @@ void EntityManager::update(const double current_time, const double step_time)
   }
   std::unordered_map<std::string, CanonicalizedEntityStatus> all_status;
   for (auto && [name, entity] : entities_) {
-    all_status.emplace(name, entity->getStatus());
+    all_status.emplace(name, entity->getCanonicalizedStatus());
   }
   for (auto && [name, entity] : entities_) {
     entity->setOtherStatus(all_status);
@@ -439,6 +423,7 @@ void EntityManager::update(const double current_time, const double step_time)
       status_with_trajectory.obstacle_find = false;
     }
     status_with_trajectory.status = static_cast<EntityStatus>(status);
+    status_with_trajectory.status.time = current_time + step_time;
     status_with_trajectory.name = name;
     status_with_trajectory.time = current_time + step_time;
     status_array_msg.data.emplace_back(status_with_trajectory);
