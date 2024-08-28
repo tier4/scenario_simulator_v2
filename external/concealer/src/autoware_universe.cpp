@@ -16,7 +16,6 @@
 
 namespace concealer
 {
-using autoware_auto_vehicle_msgs::srv::ControlModeCommand;
 AutowareUniverse::AutowareUniverse()
 : getAckermannControlCommand("/control/command/control_cmd", rclcpp::QoS(1), *this),
   getGearCommandImpl("/control/command/gear_cmd", rclcpp::QoS(1), *this),
@@ -36,7 +35,6 @@ AutowareUniverse::AutowareUniverse()
     [this](
       const ControlModeCommand::Request::SharedPtr request,
       ControlModeCommand::Response::SharedPtr response) {
-      using autoware_auto_vehicle_msgs::msg::ControlModeReport;
       if (request->mode == ControlModeCommand::Request::AUTONOMOUS) {
         current_control_mode.store(ControlModeReport::AUTONOMOUS);
         response->success = true;
@@ -103,7 +101,7 @@ auto AutowareUniverse::getSteeringAngle() const -> double
 auto AutowareUniverse::updateLocalization() -> void
 {
   setAcceleration([this]() {
-    geometry_msgs::msg::AccelWithCovarianceStamped message;
+    AccelWithCovarianceStamped message;
     message.header.stamp = get_clock()->now();
     message.header.frame_id = "/base_link";
     message.accel.accel = current_acceleration.load();
@@ -134,14 +132,14 @@ auto AutowareUniverse::updateVehicleState() -> void
   setControlModeReport(getControlModeReport());
 
   setGearReport([this]() {
-    autoware_auto_vehicle_msgs::msg::GearReport message;
+    GearReport message;
     message.stamp = get_clock()->now();
     message.report = getGearCommand().command;
     return message;
   }());
 
   setSteeringReport([this]() {
-    autoware_auto_vehicle_msgs::msg::SteeringReport message;
+    SteeringReport message;
     message.stamp = get_clock()->now();
     message.steering_tire_angle = getSteeringAngle();
     return message;
@@ -149,7 +147,7 @@ auto AutowareUniverse::updateVehicleState() -> void
 
   setVelocityReport([this]() {
     const auto twist = current_twist.load();
-    autoware_auto_vehicle_msgs::msg::VelocityReport message;
+    VelocityReport message;
     message.header.stamp = get_clock()->now();
     message.header.frame_id = "base_link";
     message.longitudinal_velocity = twist.linear.x;
@@ -159,21 +157,17 @@ auto AutowareUniverse::updateVehicleState() -> void
   }());
 
   setTurnIndicatorsReport([this]() {
-    autoware_auto_vehicle_msgs::msg::TurnIndicatorsReport message;
+    TurnIndicatorsReport message;
     message.stamp = get_clock()->now();
     message.report = getTurnIndicatorsCommand().command;
     return message;
   }());
 }
 
-auto AutowareUniverse::getGearCommand() const -> autoware_auto_vehicle_msgs::msg::GearCommand
-{
-  return getGearCommandImpl();
-}
+auto AutowareUniverse::getGearCommand() const -> GearCommand { return getGearCommandImpl(); }
 
 auto AutowareUniverse::getGearSign() const -> double
 {
-  using autoware_auto_vehicle_msgs::msg::GearCommand;
   /// @todo Add support for GearCommand::NONE to return 0.0
   /// @sa https://github.com/autowarefoundation/autoware.universe/blob/main/simulator/simple_planning_simulator/src/simple_planning_simulator/simple_planning_simulator_core.cpp#L475
   return getGearCommand().command == GearCommand::REVERSE or
@@ -182,9 +176,7 @@ auto AutowareUniverse::getGearSign() const -> double
            : 1.0;
 }
 
-auto AutowareUniverse::getVehicleCommand() const -> std::tuple<
-  autoware_auto_control_msgs::msg::AckermannControlCommand,
-  autoware_auto_vehicle_msgs::msg::GearCommand>
+auto AutowareUniverse::getVehicleCommand() const -> std::tuple<AckermannControlCommand, GearCommand>
 {
   return std::make_tuple(getAckermannControlCommand(), getGearCommand());
 }
@@ -198,21 +190,20 @@ auto AutowareUniverse::getRouteLanelets() const -> std::vector<std::int64_t>
   return ids;
 }
 
-auto AutowareUniverse::getControlModeReport() const
-  -> autoware_auto_vehicle_msgs::msg::ControlModeReport
+auto AutowareUniverse::getControlModeReport() const -> ControlModeReport
 {
-  autoware_auto_vehicle_msgs::msg::ControlModeReport message;
+  ControlModeReport message;
   message.mode = current_control_mode.load();
   return message;
 }
 
 auto AutowareUniverse::setAutonomousMode() -> void
 {
-  current_control_mode.store(autoware_auto_vehicle_msgs::msg::ControlModeReport::AUTONOMOUS);
+  current_control_mode.store(ControlModeReport::AUTONOMOUS);
 }
 
 auto AutowareUniverse::setManualMode() -> void
 {
-  current_control_mode.store(autoware_auto_vehicle_msgs::msg::ControlModeReport::MANUAL);
+  current_control_mode.store(ControlModeReport::MANUAL);
 }
 }  // namespace concealer
