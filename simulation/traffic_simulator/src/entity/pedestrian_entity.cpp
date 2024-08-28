@@ -12,12 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <traffic_simulator/entity/pedestrian_entity.hpp>
-#include <traffic_simulator/utils/pose.hpp>
-
 #include <algorithm>
 #include <memory>
 #include <string>
+#include <traffic_simulator/entity/pedestrian_entity.hpp>
+#include <traffic_simulator/utils/pose.hpp>
 #include <vector>
 
 namespace traffic_simulator
@@ -254,8 +253,7 @@ auto PedestrianEntity::onUpdate(const double current_time, const double step_tim
   behavior_plugin_ptr_->setCanonicalizedEntityStatus(status_);
   behavior_plugin_ptr_->setTargetSpeed(target_speed_);
   behavior_plugin_ptr_->setRouteLanelets(getRouteLanelets());
-  /// @note CanonicalizedEntityStatus is updated here, it is not skipped even if isAtEndOfLanelets
-  /// return true
+  /// @note CanonicalizedEntityStatus is updated here, it is not skipped even if isAtEndOfLanelets return true
   behavior_plugin_ptr_->update(current_time, step_time);
   if (const auto canonicalized_lanelet_pose = status_->getCanonicalizedLaneletPose()) {
     if (pose::isAtEndOfLanelets(canonicalized_lanelet_pose.value(), hdmap_utils_ptr_)) {

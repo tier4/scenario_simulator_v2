@@ -12,14 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <traffic_simulator/entity/vehicle_entity.hpp>
-#include <traffic_simulator/utils/pose.hpp>
-
-#include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
-
 #include <algorithm>
 #include <memory>
 #include <string>
+#include <traffic_simulator/entity/vehicle_entity.hpp>
+#include <traffic_simulator/utils/pose.hpp>
+#include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
 #include <vector>
 
 namespace traffic_simulator
@@ -147,8 +145,7 @@ auto VehicleEntity::onUpdate(const double current_time, const double step_time) 
     }
   }
   behavior_plugin_ptr_->setReferenceTrajectory(spline_);
-  /// @note CanonicalizedEntityStatus is updated here, it is not skipped even if isAtEndOfLanelets
-  /// return true
+  /// @note CanonicalizedEntityStatus is updated here, it is not skipped even if isAtEndOfLanelets return true
   behavior_plugin_ptr_->update(current_time, step_time);
   if (const auto canonicalized_lanelet_pose = status_->getCanonicalizedLaneletPose()) {
     if (pose::isAtEndOfLanelets(canonicalized_lanelet_pose.value(), hdmap_utils_ptr_)) {
