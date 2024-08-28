@@ -134,7 +134,7 @@ auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsAr
   return field_operator_application->getWaypoints();
 }
 
-void EgoEntity::onUpdate(double current_time, double step_time)
+auto EgoEntity::onUpdate(const double current_time, const double step_time) -> void
 {
   EntityBase::onUpdate(current_time, step_time);
 
@@ -266,15 +266,22 @@ auto EgoEntity::setBehaviorParameter(
   behavior_parameter_ = behavior_parameter;
 }
 
-void EgoEntity::requestSpeedChange(double value, bool)
+auto EgoEntity::requestSpeedChange(double value, bool /* continuous */) -> void
 {
-  target_speed_ = value;
-  field_operator_application->restrictTargetSpeed(value);
+  if (status_->getTime() > 0.0) {
+    THROW_SEMANTIC_ERROR("You cannot set target speed to the ego vehicle after starting scenario.");
+  } else {
+    target_speed_ = value;
+    field_operator_application->restrictTargetSpeed(value);
+  }
 }
 
-void EgoEntity::requestSpeedChange(
-  const speed_change::RelativeTargetSpeed & /*target_speed*/, bool /*continuous*/)
+auto EgoEntity::requestSpeedChange(
+  const speed_change::RelativeTargetSpeed & /*target_speed*/, bool /*continuous*/) -> void
 {
+  THROW_SEMANTIC_ERROR(
+    "The traffic_simulator's request to set speed to the Ego type entity is for initialization "
+    "purposes only.");
 }
 
 auto EgoEntity::setVelocityLimit(double value) -> void  //

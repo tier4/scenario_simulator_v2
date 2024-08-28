@@ -26,7 +26,7 @@ MiscObjectEntity::MiscObjectEntity(
 {
 }
 
-void MiscObjectEntity::onUpdate(double, double step_time)
+auto MiscObjectEntity::onUpdate(const double /*current_time*/, const double step_time) -> void
 {
   setTwist(geometry_msgs::msg::Twist());
   setAcceleration(geometry_msgs::msg::Accel());
