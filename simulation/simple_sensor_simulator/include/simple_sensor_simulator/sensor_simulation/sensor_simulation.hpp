@@ -113,11 +113,11 @@ public:
         std::make_shared<traffic_simulator::TrafficLightPublisher<Message>>(
           "/perception/traffic_light_recognition/internal/traffic_signals", &node, hdmap_utils)));
 #if __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)
-    } else if(configuration.architecture_type() == "awf/universe/20240605"){
+    } else if (configuration.architecture_type() == "awf/universe/20240605") {
       using Message = autoware_perception_msgs::msg::TrafficLightGroupArray;
       traffic_lights_detectors_.push_back(std::make_unique<traffic_lights::TrafficLightsDetector>(
-          std::make_shared<traffic_simulator::TrafficLightPublisher<Message>>(
-              "/perception/traffic_light_recognition/internal/traffic_signals", &node, hdmap_utils)));
+        std::make_shared<traffic_simulator::TrafficLightPublisher<Message>>(
+          "/perception/traffic_light_recognition/internal/traffic_signals", &node, hdmap_utils)));
 #endif
     } else {
       std::stringstream ss;

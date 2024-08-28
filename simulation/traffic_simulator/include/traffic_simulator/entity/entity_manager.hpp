@@ -147,7 +147,7 @@ public:
         TrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>>(
         std::forward<decltype(xs)>(xs)...);
 #if __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)
-    } else if(architecture_type == "awf/universe/20240605"){
+    } else if (architecture_type == "awf/universe/20240605") {
       return std::make_shared<
         TrafficLightPublisher<autoware_perception_msgs::msg::TrafficLightGroupArray>>(
         std::forward<decltype(xs)>(xs)...);
