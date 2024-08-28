@@ -69,7 +69,7 @@ public:
 
   auto getCurrentAction() const -> std::string override;
 
-  auto getCurrentPose() const -> geometry_msgs::msg::Pose;
+  auto getCurrentPose() const -> const geometry_msgs::msg::Pose &;
 
   auto getDefaultDynamicConstraints() const
     -> const traffic_simulator_msgs::msg::DynamicConstraints & override;
@@ -77,8 +77,6 @@ public:
   auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter override;
 
   auto getEntityStatus(const double, const double) const -> const CanonicalizedEntityStatus;
-
-  auto getEntityType() const -> const traffic_simulator_msgs::msg::EntityType & override;
 
   auto getEntityTypename() const -> const std::string & override;
 
@@ -88,7 +86,7 @@ public:
 
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
 
-  void onUpdate(double current_time, double step_time) override;
+  auto onUpdate(const double current_time, const double step_time) -> void override;
 
   void requestAcquirePosition(const CanonicalizedLaneletPose &) override;
 
@@ -133,6 +131,18 @@ public:
   auto setVelocityLimit(double) -> void override;
 
   auto setMapPose(const geometry_msgs::msg::Pose & map_pose) -> void override;
+
+  template <typename... Ts>
+  auto setStatus(Ts &&... xs)
+  {
+    if (status_->getTime() > 0 && not isControlledBySimulator()) {
+      THROW_SEMANTIC_ERROR(
+        "You cannot set entity status to the ego vehicle named ", std::quoted(status_->getName()),
+        " after starting scenario.");
+    } else {
+      EntityBase::setStatus(std::forward<decltype(xs)>(xs)...);
+    }
+  }
 };
 }  // namespace entity
 }  // namespace traffic_simulator
