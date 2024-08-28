@@ -21,6 +21,32 @@ Changelog for package traffic_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+4.0.2 (2024-08-28)
+------------------
+* Merge pull request `#1356 <https://github.com/tier4/scenario_simulator_v2/issues/1356>`_ from tier4/RJD-1056-remove-current-time-step-time
+  Remove unused data members: current_time step_time
+* Merge branch 'master' into RJD-1056-remove-current-time-step-time
+* Fix after using pointer to store entity status
+* Merge branch 'master' into RJD-1056-remove-current-time-step-time
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-current-time-step-time
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-current-time-step-time
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-current-time-step-time
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-current-time-step-time
+* Resolve conflicts with stored time
+* Merge remote-tracking branch 'origin/ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-current-time-step-time
+* Trailing return type
+* Correct style - add else
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-current-time-step-time
+* Add const to time argument in behavior
+* Add const to time argument
+* Use member instead of getter
+* Revert to previous macro definition
+* Move requestSpeedChange time check responsibility to EgoEntity and simplify
+* Correct style
+* Remove step_time\_ and current_time\_ data members from EntityManager
+  Adjust the code so that the time is managed in API only
+* Contributors: DMoszynski, Dawid Moszynski, Dawid Moszyński, Masaya Kataoka, Mateusz Palczuk
+
 4.0.1 (2024-08-28)
 ------------------
 * Merge pull request `#1354 <https://github.com/tier4/scenario_simulator_v2/issues/1354>`_ from tier4/fix/follow_trajectory
