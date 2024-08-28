@@ -21,6 +21,13 @@ Changelog for package openscenario_interpreter_msgs
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+4.0.1 (2024-08-28)
+------------------
+* Merge branch 'master' into fix/follow_trajectory
+* Merge branch 'master' into fix/follow_trajectory
+* Merge remote-tracking branch 'origin' into fix/follow_trajectory
+* Contributors: Masaya Kataoka
+
 4.0.0 (2024-08-27)
 ------------------
 * Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
