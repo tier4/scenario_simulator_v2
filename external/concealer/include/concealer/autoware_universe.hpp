@@ -63,7 +63,7 @@ class AutowareUniverse : public Autoware
 
   std::atomic<bool> is_stop_requested = false;
 
-  std::atomic<uint8_t> current_control_mode =
+  std::atomic<std::uint8_t> current_control_mode =
     autoware_auto_vehicle_msgs::msg::ControlModeReport::AUTONOMOUS;
 
   std::atomic<bool> is_thrown = false;
