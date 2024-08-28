@@ -9,6 +9,23 @@ Changelog for package simple_cross_map
 * Merge branch 'master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+4.0.0 (2024-08-27)
+------------------
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge remote-tracking branch 'origin/master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Contributors: DMoszynski, Dawid Moszynski, Dawid Moszyński, Mateusz Palczuk, Tatsuya Yamasaki
+
 3.5.5 (2024-08-27)
 ------------------
 * Merge branch 'master' into fix/distance-with-lane-change

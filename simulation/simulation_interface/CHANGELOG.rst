@@ -21,6 +21,39 @@ Changelog for package simulation_interface
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+4.0.0 (2024-08-27)
+------------------
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge remote-tracking branch 'origin/master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge remote-tracking branch 'origin/ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' of https://github.com/tier4/scenario_simulator_v2 into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* fix(conversions, behavior_plugin_base): add new line at the end
+* ref(traffic_simulator, behavior_tree_plugin): revert unnecessary changes
+* feat(traffic_simulator): use CanonicalizedEntityStatus only with single constructor
+* Merge remote-tracking branch 'origin/ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Contributors: DMoszynski, Dawid Moszynski, Dawid Moszyński, Mateusz Palczuk, Tatsuya Yamasaki
+
 3.5.5 (2024-08-27)
 ------------------
 * Merge branch 'master' into fix/distance-with-lane-change
