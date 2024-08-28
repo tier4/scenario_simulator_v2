@@ -54,6 +54,7 @@ auto countLaneChanges(
     static_cast<LaneletPose>(from), static_cast<LaneletPose>(to), allow_lane_change);
 }
 
+/// @sa https://github.com/tier4/scenario_simulator_v2/blob/729e4e6372cdba60e377ae097d032905b80763a9/docs/developer_guide/lane_pose_calculation/GetLongitudinalDistance.md
 auto longitudinalDistance(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
   bool include_adjacent_lanelet, bool include_opposite_direction, bool allow_lane_change,
@@ -86,22 +87,19 @@ auto longitudinalDistance(
       return std::nullopt;
     }
   } else {
-    /// @todo here matching_distance should be passed
-    constexpr double matching_distance = 5.0;
     /**
-     * @brief hard coded parameter!! 5.0 is a matching distance of the toLaneletPoses function.
-     * A matching distance of about 1.5 lane widths is given as the matching distance to match the
+     * @brief A matching distance of about 1.5*lane widths is given as the matching distance to match the
      * Entity present on the adjacent Lanelet.
+     * The length of the horizontal bar must intersect with the adjacent lanelet, 
+     * so it is always 10m regardless of the entity type.
      */
+    constexpr double matching_distance = 5.0;
+
     auto from_poses = hdmap_utils_ptr->toLaneletPoses(
       static_cast<geometry_msgs::msg::Pose>(from), static_cast<LaneletPose>(from).lanelet_id,
       matching_distance, include_opposite_direction);
     from_poses.emplace_back(from);
-    /**
-     * @brief hard coded parameter!! 5.0 is a matching distance of the toLaneletPoses function.
-     * A matching distance of about 1.5 lane widths is given as the matching distance to match the
-     * Entity present on the adjacent Lanelet.
-     */
+
     auto to_poses = hdmap_utils_ptr->toLaneletPoses(
       static_cast<geometry_msgs::msg::Pose>(to), static_cast<LaneletPose>(to).lanelet_id,
       matching_distance, include_opposite_direction);

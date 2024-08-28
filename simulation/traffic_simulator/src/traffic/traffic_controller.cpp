@@ -58,8 +58,8 @@ void TrafficController::autoSink()
     if (hdmap_utils_->getNextLaneletIds(lanelet_id).empty()) {
       LaneletPose lanelet_pose;
       lanelet_pose.lanelet_id = lanelet_id;
-      lanelet_pose.s = laneletLength(lanelet_id, hdmap_utils_);
-      const auto pose = toMapPose(lanelet_pose, hdmap_utils_);
+      lanelet_pose.s = pose::laneletLength(lanelet_id, hdmap_utils_);
+      const auto pose = pose::toMapPose(lanelet_pose, hdmap_utils_);
       addModule<traffic_simulator::traffic::TrafficSink>(
         lanelet_id, 1, pose.position, get_entity_names_function, get_entity_pose_function,
         despawn_function);
