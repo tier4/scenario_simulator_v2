@@ -52,19 +52,14 @@ private:
         stop(cpp_mock_scenarios::Result::FAILURE);  // LCOV_EXCL_LINE
       }
       for (const auto & name : names) {
-        const traffic_simulator::CanonicalizedEntityStatus entity_status =
-          api_.getEntityStatus(name);
+        if (const auto entity = api_.getEntity(name)) {
+          const bool valid_vehicle_lanelet =
+            api_.isInLanelet(name, static_cast<lanelet::Id>(34705), 50.0) ||
+            api_.isInLanelet(name, static_cast<lanelet::Id>(34696), 50.0);
 
-        const bool is_vehicle =
-          static_cast<traffic_simulator_msgs::msg::EntityStatus>(entity_status).type.type ==
-          traffic_simulator_msgs::msg::EntityType::VEHICLE;
-
-        const bool valid_vehicle_lanelet =
-          api_.isInLanelet(name, static_cast<lanelet::Id>(34705), 50.0) ||
-          api_.isInLanelet(name, static_cast<lanelet::Id>(34696), 50.0);
-
-        if (!entity_status.laneMatchingSucceed() || !valid_vehicle_lanelet || !is_vehicle) {
-          stop(cpp_mock_scenarios::Result::FAILURE);  // LCOV_EXCL_LINE
+          if (!entity->laneMatchingSucceed() || !valid_vehicle_lanelet || !isVehicle(name)) {
+            stop(cpp_mock_scenarios::Result::FAILURE);  // LCOV_EXCL_LINE
+          }
         }
       }
       stop(cpp_mock_scenarios::Result::SUCCESS);
