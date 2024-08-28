@@ -109,6 +109,21 @@ protected:
 
   hdmap_utils::HdMapUtils hdmap_utils;
 };
+class HdMapUtilsTest_KashiwanohaMap : public testing::Test
+{
+protected:
+  HdMapUtilsTest_KashiwanohaMap()
+  : hdmap_utils(hdmap_utils::HdMapUtils(
+      ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map/lanelet2_map.osm",
+      geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
+        .latitude(0.0)
+        .longitude(0.0)
+        .altitude(0.0)))
+  {
+  }
+
+  hdmap_utils::HdMapUtils hdmap_utils;
+};
 /**
  * @note Test basic functionality.
  * Test initialization correctness with a correct path to a lanelet map.
@@ -445,6 +460,46 @@ TEST_F(HdMapUtilsTest_StandardMap, CanonicalizeAll)
   EXPECT_EQ(canonicalized_lanelet_poses.size(), static_cast<std::size_t>(1));
   EXPECT_EQ(canonicalized_lanelet_poses[0].lanelet_id, 34981);
   EXPECT_EQ(canonicalized_lanelet_poses[0].s, non_canonicalized_lanelet_s);
+}
+
+/**
+ * @note Testcase for countLaneChanges() function
+ */
+TEST_F(HdMapUtilsTest_FourTrackHighwayMap, CountLaneChangesAlongRoute)
+{
+  using traffic_simulator::helper::constructLaneletPose;
+  EXPECT_EQ(
+    hdmap_utils.countLaneChanges(
+      constructLaneletPose(3002176, 0), constructLaneletPose(3002175, 0), true),
+    std::make_pair(1, 0));
+  EXPECT_EQ(
+    hdmap_utils.countLaneChanges(
+      constructLaneletPose(3002176, 0), constructLaneletPose(3002182, 0), true),
+    std::make_pair(1, 0));
+  EXPECT_EQ(
+    hdmap_utils.countLaneChanges(
+      constructLaneletPose(3002176, 0), constructLaneletPose(199, 0), true),
+    std::make_pair(1, 0));
+  EXPECT_EQ(
+    hdmap_utils.countLaneChanges(
+      constructLaneletPose(3002176, 0), constructLaneletPose(3002176, 0), true),
+    std::make_pair(0, 0));
+  EXPECT_EQ(
+    hdmap_utils.countLaneChanges(
+      constructLaneletPose(3002176, 0), constructLaneletPose(200, 0), true),
+    std::make_pair(0, 0));
+  EXPECT_EQ(
+    hdmap_utils.countLaneChanges(
+      constructLaneletPose(3002176, 0), constructLaneletPose(201, 0), true),
+    std::make_pair(0, 1));
+  EXPECT_EQ(
+    hdmap_utils.countLaneChanges(
+      constructLaneletPose(3002176, 0), constructLaneletPose(202, 0), true),
+    std::make_pair(0, 2));
+  EXPECT_EQ(
+    hdmap_utils.countLaneChanges(
+      constructLaneletPose(3002176, 0), constructLaneletPose(206, 0), true),
+    std::make_pair(0, 2));
 }
 
 /**
@@ -1982,6 +2037,19 @@ TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLongitudinalDistance_differentLane
 
   EXPECT_FALSE(
     hdmap_utils.getLongitudinalDistance(pose_from.value(), pose_to.value(), false).has_value());
+}
+
+/**
+ * @note Test for the corner-case fixed in https://github.com/tier4/scenario_simulator_v2/pull/1348.
+ */
+TEST_F(HdMapUtilsTest_KashiwanohaMap, getLongitudinalDistance_PullRequest1348)
+{
+  auto pose_from = traffic_simulator::helper::constructLaneletPose(34468, 10.0);
+  auto pose_to = traffic_simulator::helper::constructLaneletPose(34795, 5.0);
+
+  EXPECT_NO_THROW(EXPECT_DOUBLE_EQ(
+    hdmap_utils.getLongitudinalDistance(pose_from, pose_to, true).value(),
+    54.18867466433655977198213804513216018676757812500000));
 }
 
 /**

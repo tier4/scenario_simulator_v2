@@ -406,6 +406,7 @@ void EntityManager::update(const double current_time, const double step_time)
       status_with_trajectory.obstacle_find = false;
     }
     status_with_trajectory.status = static_cast<EntityStatus>(status);
+    status_with_trajectory.status.time = current_time + step_time;
     status_with_trajectory.name = name;
     status_with_trajectory.time = current_time + step_time;
     status_array_msg.data.emplace_back(status_with_trajectory);
