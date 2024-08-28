@@ -3,19 +3,21 @@
 `scenario_simulator_v2` simulates the manual override of Autoware, with `FollowTrajectoryAction`.
 During the executing `FollowTrajectoryAction`, the control of the ego entity is taken over from Autoware to the `FollowTrajectoryAction`.
 
-## 2 triggers to override Autoware
+## 3 types of override for Autoware
 
-There are 2 triggers to override Autoware.
-One is hardware triggers like a steering and a brake pedal, physically triggered by safety operators.
+There are 3 types of override for Autoware.
 
-Another one is a software trigger via ROS 2 services or topics, like a remote override.
-
-These triggers are received by vehicle interface in autoware driven autonomous vehicles.
+- Local: Manually control the vehicle from nearby with some device such as a joystick.
+  - This is one of operation modes.
+- Remote: Manually control the vehicle from a web application on the cloud.
+  - This is one of operation modes.
+- Direct: Manually control the vehicle from handle, brake and/or accel directly.
+  - Please note that this is not a operation mode but a control mode of vehicle interface.
 
 ## override simulation in scenario_simulator_v2
 
 vehicle interface simulation is a part of the ego vehicle simulation feature in `scenario_simulator_v2`.
-`scenario_simulator_v2` simulates a hardware override triggered by safety operators when a scenario commands overriding the ego vehicle by `FollowTrajectoryAction`.
+`scenario_simulator_v2` simulates a `Direct` override triggered by safety operators when a scenario commands overriding the ego vehicle by `FollowTrajectoryAction`.
 
 ## 3 steps scenario_simulator_v2 takes to simulate the overrides
 
