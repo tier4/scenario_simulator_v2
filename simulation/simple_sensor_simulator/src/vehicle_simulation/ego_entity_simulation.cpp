@@ -464,6 +464,8 @@ auto EgoEntitySimulation::getStatus() const -> const traffic_simulator_msgs::msg
 auto EgoEntitySimulation::setStatus(const traffic_simulator_msgs::msg::EntityStatus & status)
   -> void
 {
+  /// @note The lanelet matching algorithm should be equivalent to the one used in
+  /// EgoEntity::setStatus
   const auto unique_route_lanelets =
     traffic_simulator::helper::getUniqueValues(autoware->getRouteLanelets());
   const auto matching_distance = std::max(
@@ -471,10 +473,13 @@ auto EgoEntitySimulation::setStatus(const traffic_simulator_msgs::msg::EntitySta
                                    vehicle_parameters.axles.rear_axle.track_width) *
                                    0.5 +
                                  1.0;
+  /// @note Ego uses the unique_route_lanelets get from Autoware, instead of the current lanelet_id
+  /// value from EntityStatus, therefore canonicalization has to be done in advance,
+  /// not inside CanonicalizedEntityStatus
   const auto canonicalized_lanelet_pose = traffic_simulator::pose::toCanonicalizedLaneletPose(
     status.pose, status.bounding_box, unique_route_lanelets, false, matching_distance,
     hdmap_utils_ptr_);
-  status_ = traffic_simulator::CanonicalizedEntityStatus(status, canonicalized_lanelet_pose);
+  status_.set(traffic_simulator::CanonicalizedEntityStatus(status, canonicalized_lanelet_pose));
   setAutowareStatus();
 }
 
