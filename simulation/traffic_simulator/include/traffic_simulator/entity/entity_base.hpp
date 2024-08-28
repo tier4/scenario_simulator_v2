@@ -128,9 +128,9 @@ public:
 
   virtual auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray = 0;
 
-  virtual void onUpdate(double current_time, double step_time);
+  virtual auto onUpdate(const double current_time, const double step_time) -> void;
 
-  virtual void onPostUpdate(double current_time, double step_time);
+  virtual auto onPostUpdate(const double current_time, const double step_time) -> void;
 
   /*   */ void resetDynamicConstraints();
 
