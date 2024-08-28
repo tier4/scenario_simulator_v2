@@ -22,7 +22,7 @@ auto FollowPolylineTrajectoryAction::calculateWaypoints()
   -> const traffic_simulator_msgs::msg::WaypointsArray
 {
   auto waypoints = traffic_simulator_msgs::msg::WaypointsArray();
-  waypoints.waypoints.push_back(entity_status->getMapPose().position);
+  waypoints.waypoints.push_back(canonicalized_entity_status->getMapPose().position);
   for (const auto & vertex : polyline_trajectory->shape.vertices) {
     waypoints.waypoints.push_back(vertex.position.position);
   }
@@ -60,12 +60,8 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
     if (target_speed.has_value()) {
       return target_speed.value();
     } else {
-      return entity_status->getTwist().linear.x;
+      return canonicalized_entity_status->getTwist().linear.x;
     }
-  };
-
-  auto getMatchingDistance = [&]() -> double {
-    return entity_status->getBoundingBox().dimensions.y * 0.5 + 1.0;
   };
 
   if (getBlackBoardValues();
@@ -74,17 +70,16 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
       not getInput<decltype(target_speed)>("target_speed", target_speed) or
       not polyline_trajectory) {
     return BT::NodeStatus::FAILURE;
-  } else if (std::isnan(entity_status->getTime())) {
+  } else if (std::isnan(canonicalized_entity_status->getTime())) {
     THROW_SIMULATION_ERROR(
-      "Time in entity_status is NaN - FollowTrajectoryAction does not support such case.");
+      "Time in canonicalized_entity_status is NaN - FollowTrajectoryAction does not support such "
+      "case.");
   } else if (
-    const auto updated_status = traffic_simulator::follow_trajectory::makeUpdatedStatus(
-      static_cast<traffic_simulator::EntityStatus>(*entity_status), *polyline_trajectory,
-      behavior_parameter, hdmap_utils, step_time, getMatchingDistance(), getTargetSpeed())) {
-    setOutput(
-      "updated_status",
-      std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(
-        traffic_simulator::CanonicalizedEntityStatus(*updated_status, hdmap_utils)));
+    const auto entity_status_updated = traffic_simulator::follow_trajectory::makeUpdatedStatus(
+      static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status),
+      *polyline_trajectory, behavior_parameter, hdmap_utils, step_time,
+      default_matching_distance_for_lanelet_pose_calculation, getTargetSpeed())) {
+    setCanonicalizedEntityStatus(entity_status_updated.value());
     setOutput("waypoints", calculateWaypoints());
     setOutput("obstacle", calculateObstacle(calculateWaypoints()));
     return BT::NodeStatus::RUNNING;
