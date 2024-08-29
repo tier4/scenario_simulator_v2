@@ -134,11 +134,17 @@ auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsAr
   return field_operator_application->getWaypoints();
 }
 
+void EgoEntity::updateFieldOperatorApplication() const
+{
+  field_operator_application->rethrow();
+  field_operator_application->spinSome();
+}
+
 void EgoEntity::onUpdate(double current_time, double step_time)
 {
   EntityBase::onUpdate(current_time, step_time);
 
-  if (is_controlled_by_simulator_ && npc_logic_started_) {
+  if (is_controlled_by_simulator_) {
     if (
       const auto non_canonicalized_updated_status =
         traffic_simulator::follow_trajectory::makeUpdatedStatus(
@@ -159,9 +165,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
 
   updateStandStillDuration(step_time);
   updateTraveledDistance(step_time);
-
-  field_operator_application->rethrow();
-  field_operator_application->spinSome();
+  updateFieldOperatorApplication();
 
   EntityBase::onPostUpdate(current_time, step_time);
 }
@@ -268,15 +272,22 @@ auto EgoEntity::setBehaviorParameter(
   behavior_parameter_ = behavior_parameter;
 }
 
-void EgoEntity::requestSpeedChange(double value, bool)
+auto EgoEntity::requestSpeedChange(double value, bool /* continuous */) -> void
 {
-  target_speed_ = value;
-  field_operator_application->restrictTargetSpeed(value);
+  if (status_->getTime() > 0.0) {
+    THROW_SEMANTIC_ERROR("You cannot set target speed to the ego vehicle after starting scenario.");
+  } else {
+    target_speed_ = value;
+    field_operator_application->restrictTargetSpeed(value);
+  }
 }
 
-void EgoEntity::requestSpeedChange(
-  const speed_change::RelativeTargetSpeed & /*target_speed*/, bool /*continuous*/)
+auto EgoEntity::requestSpeedChange(
+  const speed_change::RelativeTargetSpeed & /*target_speed*/, bool /*continuous*/) -> void
 {
+  THROW_SEMANTIC_ERROR(
+    "The traffic_simulator's request to set speed to the Ego type entity is for initialization "
+    "purposes only.");
 }
 
 auto EgoEntity::setVelocityLimit(double value) -> void  //

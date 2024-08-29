@@ -13,6 +13,8 @@
 // limitations under the License.
 
 #include <do_nothing_plugin/plugin.hpp>
+#include <geometry/quaternion/get_rotation.hpp>
+#include <geometry/quaternion/quaternion_to_euler.hpp>
 #include <geometry/quaternion/slerp.hpp>
 #include <geometry/vector3/hypot.hpp>
 #include <geometry/vector3/operator.hpp>
@@ -98,23 +100,36 @@ auto interpolateEntityStatusFromPolylineTrajectory(
     const auto linear_jerk =
       (entity_status->getAccel().linear.x - linear_acceleration) / (v1.time - v0.time);
 
+    const double angular_velocity =
+      math::geometry::convertQuaternionToEulerAngle(
+        math::geometry::getRotation(v0.position.orientation, v1.position.orientation))
+        .z /
+      (v1.time - v0.time);
+    const auto angular_acceleration =
+      (entity_status->getTwist().angular.x - angular_velocity) / (v1.time - v0.time);
+
     interpolated_entity_status.action_status.twist =
       geometry_msgs::build<geometry_msgs::msg::Twist>()
         .linear(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(linear_velocity).y(0).z(0))
-        .angular(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0).y(0).z(0));
+        .angular(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0).y(0).z(angular_velocity));
     interpolated_entity_status.action_status.accel =
       geometry_msgs::build<geometry_msgs::msg::Accel>()
         .linear(
           geometry_msgs::build<geometry_msgs::msg::Vector3>().x(linear_acceleration).y(0).z(0))
-        .angular(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0).y(0).z(0));
+        .angular(
+          geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0).y(0).z(angular_acceleration));
     interpolated_entity_status.action_status.linear_jerk = linear_jerk;
     return interpolated_entity_status;
   };
 
-  if ((current_time + step_time) <= trajectory->shape.vertices.begin()->time) {
+  if (
+    (current_time + step_time) <=
+    (trajectory->base_time + trajectory->shape.vertices.begin()->time)) {
     return std::nullopt;
   }
-  if (trajectory->shape.vertices.back().time <= (current_time + step_time)) {
+  if (
+    (trajectory->base_time + trajectory->shape.vertices.back().time) <=
+    (current_time + step_time)) {
     return interpolate_entity_status(
       1, *std::prev(trajectory->shape.vertices.end(), 2),
       *std::prev(trajectory->shape.vertices.end(), 1));

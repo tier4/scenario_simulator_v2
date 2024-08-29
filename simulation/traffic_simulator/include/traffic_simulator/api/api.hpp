@@ -144,10 +144,10 @@ public:
       if (behavior == VehicleBehavior::autoware()) {
         return entity_manager_ptr_->entityExists(name) or
                entity_manager_ptr_->spawnEntity<entity::EgoEntity>(
-                 name, pose, parameters, configuration, node_parameters_);
+                 name, pose, parameters, getCurrentTime(), configuration, node_parameters_);
       } else {
         return entity_manager_ptr_->spawnEntity<entity::VehicleEntity>(
-          name, pose, parameters, behavior);
+          name, pose, parameters, getCurrentTime(), behavior);
       }
     };
 
@@ -182,7 +182,7 @@ public:
   {
     auto register_to_entity_manager = [&]() {
       return entity_manager_ptr_->spawnEntity<entity::PedestrianEntity>(
-        name, pose, parameters, behavior);
+        name, pose, parameters, getCurrentTime(), behavior);
     };
 
     auto register_to_environment_simulator = [&]() {
@@ -211,7 +211,8 @@ public:
     const std::string & model3d = "")
   {
     auto register_to_entity_manager = [&]() {
-      return entity_manager_ptr_->spawnEntity<entity::MiscObjectEntity>(name, pose, parameters);
+      return entity_manager_ptr_->spawnEntity<entity::MiscObjectEntity>(
+        name, pose, parameters, getCurrentTime());
     };
 
     auto register_to_environment_simulator = [&]() {

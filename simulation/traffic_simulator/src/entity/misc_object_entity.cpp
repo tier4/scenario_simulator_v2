@@ -26,25 +26,19 @@ MiscObjectEntity::MiscObjectEntity(
 {
 }
 
-void MiscObjectEntity::onUpdate(double, double step_time)
+auto MiscObjectEntity::onUpdate(const double /*current_time*/, const double step_time) -> void
 {
   setTwist(geometry_msgs::msg::Twist());
   setAcceleration(geometry_msgs::msg::Accel());
   setLinearJerk(0.0);
   setAction("static");
-  if (npc_logic_started_) {
-    updateStandStillDuration(step_time);
-  }
+  updateStandStillDuration(step_time);
   status_before_update_.set(*status_);
 }
 
 auto MiscObjectEntity::getCurrentAction() const -> std::string
 {
-  if (not npc_logic_started_) {
-    return "waiting";
-  } else {
-    return static_cast<EntityStatus>(*status_).action_status.current_action;
-  }
+  return static_cast<EntityStatus>(*status_).action_status.current_action;
 }
 
 auto MiscObjectEntity::getBehaviorParameter() const
