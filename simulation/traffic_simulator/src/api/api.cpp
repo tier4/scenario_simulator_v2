@@ -360,11 +360,12 @@ bool API::updateFrame()
 
 void API::startNpcLogic()
 {
-  if (isNpcLogicStarted()) {
+  if (entity_manager_ptr_->isNpcLogicStarted()) {
     THROW_SIMULATION_ERROR("NPC logics are already started.");
+  } else {
+    clock_.start();
+    entity_manager_ptr_->startNpcLogic(getCurrentTime());
   }
-  clock_.start();
-  entity_manager_ptr_->startNpcLogic(getCurrentTime());
 }
 
 void API::requestLaneChange(const std::string & name, const lanelet::Id & lanelet_id)

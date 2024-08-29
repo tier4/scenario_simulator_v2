@@ -59,11 +59,7 @@ void VehicleEntity::cancelRequest()
 
 auto VehicleEntity::getCurrentAction() const -> std::string
 {
-  if (not npc_logic_started_) {
-    return "waiting";
-  } else {
-    return behavior_plugin_ptr_->getCurrentAction();
-  }
+  return behavior_plugin_ptr_->getCurrentAction();
 }
 
 auto VehicleEntity::getDefaultDynamicConstraints() const
@@ -114,9 +110,6 @@ auto VehicleEntity::getRouteLanelets(double horizon) -> lanelet::Ids
 
 auto VehicleEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray
 {
-  if (!npc_logic_started_) {
-    return traffic_simulator_msgs::msg::WaypointsArray();
-  }
   try {
     return behavior_plugin_ptr_->getWaypoints();
   } catch (const std::runtime_error & e) {
@@ -133,40 +126,38 @@ auto VehicleEntity::getWaypoints() -> const traffic_simulator_msgs::msg::Waypoin
 auto VehicleEntity::onUpdate(const double current_time, const double step_time) -> void
 {
   EntityBase::onUpdate(current_time, step_time);
-  if (npc_logic_started_) {
-    behavior_plugin_ptr_->setOtherEntityStatus(other_status_);
-    behavior_plugin_ptr_->setCanonicalizedEntityStatus(status_);
-    behavior_plugin_ptr_->setTargetSpeed(target_speed_);
-    auto route_lanelets = getRouteLanelets();
-    behavior_plugin_ptr_->setRouteLanelets(route_lanelets);
 
-    // recalculate spline only when input data changes
-    if (previous_route_lanelets_ != route_lanelets) {
-      previous_route_lanelets_ = route_lanelets;
-      try {
-        spline_ = std::make_shared<math::geometry::CatmullRomSpline>(
-          hdmap_utils_ptr_->getCenterPoints(route_lanelets));
-      } catch (const common::scenario_simulator_exception::SemanticError & error) {
-        // reset the ptr when spline cannot be calculated
-        spline_.reset();
-      }
+  behavior_plugin_ptr_->setOtherEntityStatus(other_status_);
+  behavior_plugin_ptr_->setCanonicalizedEntityStatus(status_);
+  behavior_plugin_ptr_->setTargetSpeed(target_speed_);
+  auto route_lanelets = getRouteLanelets();
+  behavior_plugin_ptr_->setRouteLanelets(route_lanelets);
+
+  // recalculate spline only when input data changes
+  if (previous_route_lanelets_ != route_lanelets) {
+    previous_route_lanelets_ = route_lanelets;
+    try {
+      spline_ = std::make_shared<math::geometry::CatmullRomSpline>(
+        hdmap_utils_ptr_->getCenterPoints(route_lanelets));
+    } catch (const common::scenario_simulator_exception::SemanticError & error) {
+      // reset the ptr when spline cannot be calculated
+      spline_.reset();
     }
-    behavior_plugin_ptr_->setReferenceTrajectory(spline_);
-    /// @note CanonicalizedEntityStatus is updated here, it is not skipped even if isAtEndOfLanelets return true
-    behavior_plugin_ptr_->update(current_time, step_time);
-    if (const auto canonicalized_lanelet_pose = status_->getCanonicalizedLaneletPose()) {
-      if (pose::isAtEndOfLanelets(canonicalized_lanelet_pose.value(), hdmap_utils_ptr_)) {
-        stopAtCurrentPosition();
-        updateStandStillDuration(step_time);
-        updateTraveledDistance(step_time);
-        return;
-      }
-    }
-    updateStandStillDuration(step_time);
-    updateTraveledDistance(step_time);
-  } else {
-    updateEntityStatusTimestamp(current_time);
   }
+  behavior_plugin_ptr_->setReferenceTrajectory(spline_);
+  /// @note CanonicalizedEntityStatus is updated here, it is not skipped even if isAtEndOfLanelets return true
+  behavior_plugin_ptr_->update(current_time, step_time);
+  if (const auto canonicalized_lanelet_pose = status_->getCanonicalizedLaneletPose()) {
+    if (pose::isAtEndOfLanelets(canonicalized_lanelet_pose.value(), hdmap_utils_ptr_)) {
+      stopAtCurrentPosition();
+      updateStandStillDuration(step_time);
+      updateTraveledDistance(step_time);
+      return;
+    }
+  }
+  updateStandStillDuration(step_time);
+  updateTraveledDistance(step_time);
+
   EntityBase::onPostUpdate(current_time, step_time);
 }
 
