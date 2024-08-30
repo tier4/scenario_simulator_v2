@@ -59,20 +59,20 @@ Parameter `use_sim_time` of `openscenario_interpreter` is **false** by default a
 However, this impacts the time published on the `/clock` topic and the time used by `Autoware`.
 Details are shown in the table below:
 
-| use_sim_time launch parameter | /clock time published by SS2 | AWF Autoware Time      |
-| ----------------------------- | ---------------------------- | ---------------------- |
-| false                         | walltime                     | walltime from /clock   |
-| true (default)                | simulation                   | simulation from /clock |
+| use_sim_time launch parameter | /clock time published by scenario_simulator_v2 | AWF Autoware Time      |
+| ----------------------------- | ---------------------------------------------- | ---------------------- |
+| false                         | walltime                                       | walltime from /clock   |
+| true (default)                | simulation                                     | simulation from /clock |
 
-Below are also some bullet points explaining the impact of the `use_sim_time` parameter on `SS2` and `Autoware`:
+Below are also some bullet points explaining the impact of the `use_sim_time` parameter on `scenario_simulator_v2` and `Autoware`:
 
  - **`use_sim_time:=True` passed using command line (default value)**
-    - Both Autoware and SS2 are launched with `use_sim_time=true`. 
+    - Both Autoware and scenario_simulator_v2 are launched with `use_sim_time=true`. 
     - Time published on `/clock` is the **simulation time** (starting from 0). 
     - Time published on `/clock` **can be** controlled by RViz plugin. 
     - Simulation time **can be** controlled by RViz plugin.
  - **`use_sim_time:=False` passed using command line**
-     - Both Autoware and SS2 are launched with `use_sim_time=false`. 
+     - Both Autoware and scenario_simulator_v2 are launched with `use_sim_time=false`. 
      - Time published on `/clock` is the **walltime**. 
      - Time published on `/clock` **cannot be** controlled by RViz plugin. 
      - Simulation time **can be** controlled by RViz plugin.
