@@ -137,11 +137,17 @@ auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsAr
   return field_operator_application->getWaypoints();
 }
 
-auto EgoEntity::onUpdate(const double current_time, const double step_time) -> void
+void EgoEntity::updateFieldOperatorApplication() const
+{
+  field_operator_application->rethrow();
+  field_operator_application->spinSome();
+}
+
+void EgoEntity::onUpdate(double current_time, double step_time)
 {
   EntityBase::onUpdate(current_time, step_time);
 
-  if (is_controlled_by_simulator_ && npc_logic_started_) {
+  if (is_controlled_by_simulator_) {
     if (
       const auto non_canonicalized_updated_status =
         traffic_simulator::follow_trajectory::makeUpdatedStatus(
@@ -161,9 +167,7 @@ auto EgoEntity::onUpdate(const double current_time, const double step_time) -> v
 
   updateStandStillDuration(step_time);
   updateTraveledDistance(step_time);
-
-  field_operator_application->rethrow();
-  field_operator_application->spinSome();
+  updateFieldOperatorApplication();
 
   EntityBase::onPostUpdate(current_time, step_time);
 }

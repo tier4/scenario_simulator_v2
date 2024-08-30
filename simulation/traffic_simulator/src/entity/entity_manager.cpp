@@ -211,10 +211,11 @@ const std::string EntityManager::getEgoName() const
 auto EntityManager::getObstacle(const std::string & name)
   -> std::optional<traffic_simulator_msgs::msg::Obstacle>
 {
-  if (!npc_logic_started_) {
+  if (not npc_logic_started_) {
     return std::nullopt;
+  } else {
+    return entities_.at(name)->getObstacle();
   }
-  return entities_.at(name)->getObstacle();
 }
 
 auto EntityManager::getPedestrianParameters(const std::string & name) const
@@ -242,10 +243,11 @@ auto EntityManager::getVehicleParameters(const std::string & name) const
 auto EntityManager::getWaypoints(const std::string & name)
   -> traffic_simulator_msgs::msg::WaypointsArray
 {
-  if (!npc_logic_started_) {
+  if (not npc_logic_started_) {
     return traffic_simulator_msgs::msg::WaypointsArray();
+  } else {
+    return entities_.at(name)->getWaypoints();
   }
-  return entities_.at(name)->getWaypoints();
 }
 
 bool EntityManager::isEgoSpawned() const
@@ -319,6 +321,19 @@ void EntityManager::resetBehaviorPlugin(
   setBehaviorParameter(name, behavior_parameter);
 }
 
+auto EntityManager::getCurrentAction(const std::string & name) const -> std::string
+{
+  if (const auto entity = getEntity(name)) {
+    if (not npc_logic_started_ and not is<EgoEntity>(name)) {
+      return "waiting";
+    } else {
+      return entity->getCurrentAction();
+    }
+  } else {
+    THROW_SEMANTIC_ERROR("entity : ", name, "does not exist");
+  }
+}
+
 bool EntityManager::trafficLightsChanged()
 {
   return conventional_traffic_light_manager_ptr_->hasAnyLightChanged() or
@@ -340,8 +355,17 @@ auto EntityManager::updateNpcLogic(
   if (configuration.verbose) {
     std::cout << "update " << name << " behavior" << std::endl;
   }
-  entities_[name]->onUpdate(current_time, step_time);
-  return entities_[name]->getCanonicalizedStatus();
+  if (const auto entity = getEntity(name)) {
+    // Update npc completely if logic has started, otherwise update Autoware only - if it is Ego
+    if (npc_logic_started_) {
+      entity->onUpdate(current_time, step_time);
+    } else if (const auto ego_entity = std::dynamic_pointer_cast<const EgoEntity>(entity)) {
+      ego_entity->updateFieldOperatorApplication();
+    }
+    return entity->getCanonicalizedStatus();
+  } else {
+    THROW_SEMANTIC_ERROR("entity ", std::quoted(name), " does not exist.");
+  }
 }
 
 void EntityManager::update(const double current_time, const double step_time)
@@ -406,12 +430,12 @@ void EntityManager::updateHdmapMarker()
   lanelet_marker_pub_ptr_->publish(markers);
 }
 
-void EntityManager::startNpcLogic(const double current_time)
+auto EntityManager::startNpcLogic(const double current_time) -> void
 {
   npc_logic_started_ = true;
 
   for ([[maybe_unused]] auto && [name, entity] : entities_) {
-    entity->startNpcLogic(current_time);
+    entity->updateEntityStatusTimestamp(current_time);
   }
 }
 }  // namespace entity
