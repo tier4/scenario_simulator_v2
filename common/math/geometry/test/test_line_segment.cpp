@@ -99,13 +99,13 @@ TEST(LineSegment, getIntersection2DDisjoint)
 TEST(LineSegment, getVector)
 {
   const math::geometry::LineSegment line(makePoint(1.0, 2.0, 3.0), makePoint(2.0, 3.0, 4.0));
-  EXPECT_VECTOR3_EQ(line.getVector(), makeVector(1.0, 1.0, 1.0));
+  EXPECT_VECTOR3_EQ(line.vector, makeVector(1.0, 1.0, 1.0));
 }
 
 TEST(LineSegment, getVectorZeroLength)
 {
   const math::geometry::LineSegment line(makePoint(1.0, 2.0, 3.0), makePoint(1.0, 2.0, 3.0));
-  EXPECT_VECTOR3_EQ(line.getVector(), makeVector(0.0, 0.0, 0.0));
+  EXPECT_VECTOR3_EQ(line.vector, makeVector(0.0, 0.0, 0.0));
 }
 
 TEST(LineSegment, getNormalVector)
@@ -123,37 +123,37 @@ TEST(LineSegment, getNormalVector_zeroLength)
 TEST(LineSegment, get2DVector)
 {
   const math::geometry::LineSegment line(makePoint(1.0, 2.0, 3.0), makePoint(2.0, 3.0, 4.0));
-  EXPECT_VECTOR3_EQ(line.get2DVector(), makeVector(1.0, 1.0, 0.0));
+  EXPECT_VECTOR3_EQ(line.vector_2d, makeVector(1.0, 1.0, 0.0));
 }
 
 TEST(LineSegment, get2DVectorZeroLength)
 {
   const math::geometry::LineSegment line(makePoint(1.0, 2.0, 3.0), makePoint(1.0, 2.0, 3.0));
-  EXPECT_VECTOR3_EQ(line.get2DVector(), makeVector(0.0, 0.0, 0.0));
+  EXPECT_VECTOR3_EQ(line.vector_2d, makeVector(0.0, 0.0, 0.0));
 }
 
 TEST(LineSegment, getLength)
 {
   const math::geometry::LineSegment line(makePoint(1.0, 2.0, 3.0), makePoint(2.0, 3.0, 4.0));
-  EXPECT_DOUBLE_EQ(line.getLength(), std::sqrt(3.0));
+  EXPECT_DOUBLE_EQ(line.length, std::sqrt(3.0));
 }
 
 TEST(LineSegment, getLengthZeroLength)
 {
   const math::geometry::LineSegment line(makePoint(1.0, 2.0, 3.0), makePoint(1.0, 2.0, 3.0));
-  EXPECT_DOUBLE_EQ(line.getLength(), 0.0);
+  EXPECT_DOUBLE_EQ(line.length, 0.0);
 }
 
 TEST(LineSegment, get2DLength)
 {
   const math::geometry::LineSegment line(makePoint(1.0, 2.0, 3.0), makePoint(2.0, 3.0, 4.0));
-  EXPECT_DOUBLE_EQ(line.get2DLength(), std::sqrt(2.0));
+  EXPECT_DOUBLE_EQ(line.length_2d, std::sqrt(2.0));
 }
 
 TEST(LineSegment, get2DLengthZeroLength)
 {
   const math::geometry::LineSegment line(makePoint(1.0, 2.0, 3.0), makePoint(1.0, 2.0, 3.0));
-  EXPECT_DOUBLE_EQ(line.get2DLength(), 0.0);
+  EXPECT_DOUBLE_EQ(line.length_2d, 0.0);
 }
 
 TEST(LineSegment, get2DVectorSlope)

@@ -61,13 +61,13 @@ std::optional<geometry_msgs::msg::Point> getIntersection2D(
     return std::nullopt;
   } else {
     // 'line0' represented as a0x + b0y = c0
-    const double a0 = line0.get2DVector().y;
-    const double b0 = -line0.get2DVector().x;
+    const double a0 = line0.vector_2d.y;
+    const double b0 = -line0.vector_2d.x;
     const double c0 = a0 * line0.start_point.x + b0 * line0.start_point.y;
 
     // 'line1' represented as a1x + b1y = c1
-    const double a1 = line1.get2DVector().y;
-    const double b1 = -line1.get2DVector().x;
+    const double a1 = line1.vector_2d.y;
+    const double b1 = -line1.vector_2d.x;
     const double c1 = a1 * line1.start_point.x + b1 * line1.start_point.y;
 
     const double determinant = a0 * b1 - a1 * b0;

@@ -31,8 +31,6 @@ LineSegment::LineSegment(
   const geometry_msgs::msg::Point & start_point, const geometry_msgs::msg::Point & end_point)
 : start_point(start_point),
   end_point(end_point),
-  length(hypot(end_point, start_point)),
-  length_2d(std::hypot(end_point.x - start_point.x, end_point.y - start_point.y)),
   vector(geometry_msgs::build<geometry_msgs::msg::Vector3>()
            .x(end_point.x - start_point.x)
            .y(end_point.y - start_point.y)
@@ -40,7 +38,9 @@ LineSegment::LineSegment(
   vector_2d(geometry_msgs::build<geometry_msgs::msg::Vector3>()
               .x(end_point.x - start_point.x)
               .y(end_point.y - start_point.y)
-              .z(0.0))
+              .z(0.0)),
+  length(hypot(end_point, start_point)),
+  length_2d(std::hypot(end_point.x - start_point.x, end_point.y - start_point.y))
 {
 }
 
@@ -75,24 +75,24 @@ LineSegment::~LineSegment() {}
 auto LineSegment::getPoint(const double s, const bool denormalize_s) const
   -> geometry_msgs::msg::Point
 {
-  const double s_normalized = denormalize_s ? s / getLength() : s;
+  const double s_normalized = denormalize_s ? s / length : s;
   if (0.0 <= s_normalized && s_normalized <= 1.0) {
     return geometry_msgs::build<geometry_msgs::msg::Point>()
-      .x(start_point.x + getVector().x * s_normalized)
-      .y(start_point.y + getVector().y * s_normalized)
-      .z(start_point.z + getVector().z * s_normalized);
+      .x(start_point.x + vector.x * s_normalized)
+      .y(start_point.y + vector.y * s_normalized)
+      .z(start_point.z + vector.z * s_normalized);
   } else if (denormalize_s) {
     THROW_SIMULATION_ERROR(
       "Invalid S value is specified, while getting point on a line segment.",
-      "The range of s_normalized value should be in range [0,", getLength(), "].",
-      "But, your values are = ", s, " and length = ", getLength(),
+      "The range of s_normalized value should be in range [0,", length, "].",
+      "But, your values are = ", s, " and length = ", length,
       " This message is not originally intended to be displayed, if you see it, please "
       "contact the developer of traffic_simulator.");
   } else {
     THROW_SIMULATION_ERROR(
       "Invalid S value is specified, while getting point on a line segment.",
       "The range of s_normalized value should be in range [0,1].", "But, your values are = ", s,
-      " and length = ", getLength(),
+      " and length = ", length,
       " This message is not originally intended to be displayed, if you see it, please "
       "contact the developer of traffic_simulator.");
   }
@@ -114,8 +114,8 @@ auto LineSegment::getPose(const double s, const bool denormalize_s, const bool f
     .orientation(math::geometry::convertEulerAngleToQuaternion(
       geometry_msgs::build<geometry_msgs::msg::Vector3>()
         .x(0.0)
-        .y(fill_pitch ? std::atan2(-getVector().z, std::hypot(getVector().x, getVector().y)) : 0.0)
-        .z(std::atan2(getVector().y, getVector().x))));
+        .y(fill_pitch ? std::atan2(-vector.z, std::hypot(vector.x, vector.y)) : 0.0)
+        .z(std::atan2(vector.y, vector.x))));
 }
 
 /**
@@ -128,9 +128,9 @@ auto LineSegment::isIntersect2D(const geometry_msgs::msg::Point & point) const -
 {
   if (isInBounds2D(point)) {
     const double cross_product =
-      (point.y - start_point.y) * get2DVector().x - (point.x - start_point.x) * get2DVector().y;
+      (point.y - start_point.y) * vector_2d.x - (point.x - start_point.x) * vector_2d.y;
     constexpr double tolerance = std::numeric_limits<double>::epsilon();
-    return std::abs(cross_product) <= get2DLength() * tolerance;
+    return std::abs(cross_product) <= length_2d * tolerance;
   } else {
     return false;
   }
@@ -177,8 +177,8 @@ auto LineSegment::get2DIntersectionSValue(
   /// Finally, we multiply this proportion by the actual 3D length to obtain the total SValue.
   if (isIntersect2D(point)) {
     const double proportion_2d =
-      std::hypot(point.x - start_point.x, point.y - start_point.y) / get2DLength();
-    return denormalize_s ? std::make_optional(proportion_2d * getLength())
+      std::hypot(point.x - start_point.x, point.y - start_point.y) / length_2d;
+    return denormalize_s ? std::make_optional(proportion_2d * length)
                          : std::make_optional(proportion_2d);
   } else {
     return std::nullopt;
@@ -212,8 +212,6 @@ auto LineSegment::getIntersection2D(const LineSegment & line) const
   return math::geometry::getIntersection2D(*this, line);
 }
 
-auto LineSegment::getVector() const -> const geometry_msgs::msg::Vector3 & { return vector; }
-
 /**
  * @brief Get normal vector of the line segment.
  * @return geometry_msgs::msg::Vector3 
@@ -222,23 +220,17 @@ auto LineSegment::getNormalVector() const -> geometry_msgs::msg::Vector3
 {
   const double theta = M_PI / 2.0;
   return geometry_msgs::build<geometry_msgs::msg::Vector3>()
-    .x(getVector().x * std::cos(theta) - getVector().y * std::sin(theta))
-    .y(getVector().x * std::sin(theta) + getVector().y * std::cos(theta))
+    .x(vector.x * std::cos(theta) - vector.y * std::sin(theta))
+    .y(vector.x * std::sin(theta) + vector.y * std::cos(theta))
     .z(0.0);
 }
 
-auto LineSegment::get2DVector() const -> const geometry_msgs::msg::Vector3 & { return vector_2d; }
-
-auto LineSegment::get2DLength() const -> double { return length_2d; }
-
-auto LineSegment::getLength() const -> double { return length; }
-
 auto LineSegment::get2DVectorSlope() const -> double
 {
-  if (get2DVector().x <= std::numeric_limits<double>::epsilon()) {
+  if (vector_2d.x <= std::numeric_limits<double>::epsilon()) {
     THROW_SIMULATION_ERROR("Slope of a vertical line is undefined");
   } else {
-    return get2DVector().y / get2DVector().x;
+    return vector_2d.y / vector_2d.x;
   }
 }
 
@@ -300,7 +292,7 @@ auto LineSegment::denormalize(
 auto LineSegment::denormalize(const double s) const -> double
 {
   if (0.0 <= s && s <= 1.0) {
-    return s * getLength();
+    return s * length;
   } else {
     THROW_SIMULATION_ERROR(
       "Invalid normalized s value, s = ", s, ", S value should be in range [0,1].",
@@ -370,7 +362,7 @@ auto LineSegment::relativePointPosition2D(const geometry_msgs::msg::Point & poin
 {
   constexpr double tolerance = std::numeric_limits<double>::epsilon();
   const double determinant =
-    get2DVector().y * (point.x - end_point.x) - get2DVector().x * (point.y - end_point.y);
+    vector_2d.y * (point.x - end_point.x) - vector_2d.x * (point.y - end_point.y);
   return static_cast<int>(determinant > tolerance) - static_cast<int>(determinant < -tolerance);
 }
 
