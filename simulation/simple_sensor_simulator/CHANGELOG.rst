@@ -21,6 +21,24 @@ Changelog for package simple_sensor_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+4.0.4 (2024-09-02)
+------------------
+* Merge pull request `#1301 <https://github.com/tier4/scenario_simulator_v2/issues/1301>`_ from tier4/feature/simple_sensor_simulator_unit_tests_lidar
+  Test: [RJD-937] to Implement Unit tests on simple_sensor_simulator
+* Merge branch 'master' into feature/simple_sensor_simulator_unit_tests_lidar
+* Test: [RJD-937] to Implement Unit tests on simple_sensor_simulator
+  - Removed dummy class
+  - Updated unit tests
+* Merge branch 'master' into feature/simple_sensor_simulator_unit_tests_lidar
+* Merge branch 'master' into feature/simple_sensor_simulator_unit_tests_lidar
+* Test: [RJD-937] to Implement Unit tests on simple_sensor_simulator
+  - Added missed header file
+* Test: [RJD-937] to Implement Unit tests on simple_sensor_simulator
+  - Added unit tests to LidarSensor
+  - Addede unit tests to Primitive
+  - Refactored Raycaster unit tests
+* Contributors: Masaya Kataoka, SzymonParapura
+
 4.0.3 (2024-08-29)
 ------------------
 * Merge pull request `#1358 <https://github.com/tier4/scenario_simulator_v2/issues/1358>`_ from tier4/RJD-1056-remove-npc-logic-started
