@@ -26,6 +26,8 @@
 #ifndef TRAFFIC_SIMULATOR__TRAFFIC__TRAFFIC_MODULE_BASE_HPP_
 #define TRAFFIC_SIMULATOR__TRAFFIC__TRAFFIC_MODULE_BASE_HPP_
 
+#include <visualization_msgs/msg/marker_array.hpp>
+
 namespace traffic_simulator
 {
 namespace traffic
@@ -35,6 +37,7 @@ class TrafficModuleBase
 public:
   TrafficModuleBase() {}
   virtual void execute(const double current_time, const double step_time) = 0;
+  virtual auto appendDebugMarker(visualization_msgs::msg::MarkerArray &) const -> void{};
 };
 }  // namespace traffic
 }  // namespace traffic_simulator
