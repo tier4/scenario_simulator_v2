@@ -45,12 +45,13 @@ EgoEntitySimulation::EgoEntitySimulation(
   vehicle_model_type_(getVehicleModelType()),
   vehicle_model_ptr_(makeSimulationModel(vehicle_model_type_, step_time, parameters)),
   status_(initial_status, std::nullopt),
+  initial_pose_(status_.getMapPose()),
+  initial_rotation_matrix_(math::geometry::getRotationMatrix(initial_pose_.orientation)),
   consider_acceleration_by_road_slope_(consider_acceleration_by_road_slope),
   hdmap_utils_ptr_(hdmap_utils),
   vehicle_parameters(parameters)
 {
   setStatus(initial_status);
-  initial_pose_ = status_.getMapPose();
   autoware->set_parameter(use_sim_time);
 }
 
@@ -232,17 +233,16 @@ auto EgoEntitySimulation::overwrite(
      considered unchangeable and stored in an additional variable
      world_relative_position_ that is used in calculations.
   */
-  world_relative_position_ = getRotationMatrix(initial_pose_.orientation).transpose() *
-                             Eigen::Vector3d(
-                               status.pose.position.x - initial_pose_.position.x,
-                               status.pose.position.y - initial_pose_.position.y,
-                               status.pose.position.z - initial_pose_.position.z);
+  world_relative_position_ =
+    initial_rotation_matrix_.transpose() * Eigen::Vector3d(
+                                             status.pose.position.x - initial_pose_.position.x,
+                                             status.pose.position.y - initial_pose_.position.y,
+                                             status.pose.position.z - initial_pose_.position.z);
 
   if (is_npc_logic_started) {
     const auto yaw = [&]() {
       const auto q = Eigen::Quaterniond(
-        getRotationMatrix(initial_pose_.orientation).transpose() *
-        getRotationMatrix(status.pose.orientation));
+        initial_rotation_matrix_.transpose() * getRotationMatrix(status.pose.orientation));
       geometry_msgs::msg::Quaternion relative_orientation;
       relative_orientation.x = q.x();
       relative_orientation.y = q.y();
@@ -296,7 +296,7 @@ void EgoEntitySimulation::update(
      considered unchangeable and stored in an additional variable
      world_relative_position_ that is used in calculations.
   */
-  world_relative_position_ = getRotationMatrix(initial_pose_.orientation).transpose() *
+  world_relative_position_ = initial_rotation_matrix_.transpose() *
                              Eigen::Vector3d(
                                status_.getMapPose().position.x - initial_pose_.position.x,
                                status_.getMapPose().position.y - initial_pose_.position.y,
@@ -414,7 +414,8 @@ auto EgoEntitySimulation::getCurrentPose(const double pitch_angle = 0.) const
 {
   using math::geometry::operator*;
   const auto relative_position =
-    math::geometry::getRotationMatrix(initial_pose_.orientation) * world_relative_position_;
+    Eigen::Vector3d(initial_rotation_matrix_ * world_relative_position_);
+
   const auto relative_orientation = math::geometry::convertEulerAngleToQuaternion(
     geometry_msgs::build<geometry_msgs::msg::Vector3>()
       .x(0)
