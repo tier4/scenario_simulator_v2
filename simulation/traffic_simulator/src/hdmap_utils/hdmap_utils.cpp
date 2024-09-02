@@ -214,6 +214,37 @@ auto HdMapUtils::canonicalizeLaneletPose(
   return {canonicalized, std::nullopt};
 }
 
+auto HdMapUtils::countLaneChanges(
+  const traffic_simulator_msgs::msg::LaneletPose & from,
+  const traffic_simulator_msgs::msg::LaneletPose & to, bool allow_lane_change) const
+  -> std::optional<std::pair<int, int>>
+{
+  const auto route = getRoute(from.lanelet_id, to.lanelet_id, allow_lane_change);
+  if (route.empty()) {
+    return std::nullopt;
+  } else {
+    std::pair<int, int> lane_changes{0, 0};
+    for (std::size_t i = 1; i < route.size(); ++i) {
+      const auto & previous = route[i - 1];
+      const auto & current = route[i];
+
+      if (auto followings = getNextLaneletIds(previous);
+          std::find(followings.begin(), followings.end(), current) == followings.end()) {
+        traffic_simulator_msgs::msg::EntityType type;
+        type.type = traffic_simulator_msgs::msg::EntityType::VEHICLE;
+        if (auto lefts = getLeftLaneletIds(previous, type);
+            std::find(lefts.begin(), lefts.end(), current) != lefts.end()) {
+          lane_changes.first++;
+        } else if (auto rights = getRightLaneletIds(previous, type);
+                   std::find(rights.begin(), rights.end(), current) != rights.end()) {
+          lane_changes.second++;
+        }
+      }
+    }
+    return lane_changes;
+  }
+}
+
 auto HdMapUtils::getLaneletIds() const -> lanelet::Ids
 {
   lanelet::Ids ids;
@@ -1560,9 +1591,9 @@ auto HdMapUtils::getLongitudinalDistance(
 
       /// @note "first lanelet before the lane change" case
       if (route[i] == from.lanelet_id) {
-        distance += getLaneletLength(route[i + 1]) - from.s;
+        distance -= from.s;
         if (route[i + 1] == to.lanelet_id) {
-          distance -= getLaneletLength(route[i + 1]) - to.s;
+          distance += to.s;
           return distance;
         }
       }

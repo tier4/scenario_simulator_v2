@@ -23,7 +23,8 @@ namespace traffic_simulator
 {
 namespace longitudinal_speed_planning
 {
-LongitudinalSpeedPlanner::LongitudinalSpeedPlanner(double step_time, const std::string & entity)
+LongitudinalSpeedPlanner::LongitudinalSpeedPlanner(
+  const double step_time, const std::string & entity)
 : step_time(step_time), entity(entity)
 {
 }
