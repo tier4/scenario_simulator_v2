@@ -40,7 +40,7 @@ TEST_F(CanonicalizedLaneletPoseTest, CanonicalizedLaneletPose_withRoute_invalid)
 {
   EXPECT_THROW(
     CanonicalizedLaneletPose(
-      traffic_simulator::helper::constructLaneletPose(120576, 14.6356, 0.0), lanelet::Ids{},
+      traffic_simulator::helper::constructLaneletPose(100000000000, 0.0, 0.0), lanelet::Ids{},
       hdmap_utils),
     std::runtime_error);
 }
@@ -67,7 +67,7 @@ TEST_F(CanonicalizedLaneletPoseTest, CanonicalizedLaneletPose_withoutRoute_inval
 {
   EXPECT_THROW(
     CanonicalizedLaneletPose(
-      traffic_simulator::helper::constructLaneletPose(120576, 0.0, 0.0), hdmap_utils),
+      traffic_simulator::helper::constructLaneletPose(100000000000, 0.0, 0.0), hdmap_utils),
     std::runtime_error);
 }
 
