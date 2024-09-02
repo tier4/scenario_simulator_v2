@@ -23,27 +23,38 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- EntityCondition --------------------------------------------------------
- *
- *  <xsd:complexType name="EntityCondition">
- *    <xsd:choice>
- *      <xsd:element name="EndOfRoadCondition" type="EndOfRoadCondition"/>
- *      <xsd:element name="CollisionCondition" type="CollisionCondition"/>
- *      <xsd:element name="OffroadCondition" type="OffroadCondition"/>
- *      <xsd:element name="TimeHeadwayCondition" type="TimeHeadwayCondition"/>
- *      <xsd:element name="TimeToCollisionCondition" type="TimeToCollisionCondition"/>
- *      <xsd:element name="AccelerationCondition" type="AccelerationCondition"/>
- *      <xsd:element name="StandStillCondition" type="StandStillCondition"/>
- *      <xsd:element name="SpeedCondition" type="SpeedCondition"/>
- *      <xsd:element name="RelativeSpeedCondition" type="RelativeSpeedCondition"/>
- *      <xsd:element name="TraveledDistanceCondition" type="TraveledDistanceCondition"/>
- *      <xsd:element name="ReachPositionCondition" type="ReachPositionCondition"/>
- *      <xsd:element name="DistanceCondition" type="DistanceCondition"/>
- *      <xsd:element name="RelativeDistanceCondition" type="RelativeDistanceCondition"/>
- *    </xsd:choice>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   EntityCondition (OpenSCENARIO XML 1.3)
+
+   Defines a specific condition on an entity.
+
+   <xsd:complexType name="EntityCondition">
+     <xsd:choice>
+       <xsd:element name="EndOfRoadCondition" type="EndOfRoadCondition"/>
+       <xsd:element name="CollisionCondition" type="CollisionCondition"/>
+       <xsd:element name="OffroadCondition" type="OffroadCondition"/>
+       <xsd:element name="TimeHeadwayCondition" type="TimeHeadwayCondition"/>
+       <xsd:element name="TimeToCollisionCondition" type="TimeToCollisionCondition"/>
+       <xsd:element name="AccelerationCondition" type="AccelerationCondition"/>
+       <xsd:element name="StandStillCondition" type="StandStillCondition"/>
+       <xsd:element name="SpeedCondition" type="SpeedCondition"/>
+       <xsd:element name="RelativeSpeedCondition" type="RelativeSpeedCondition"/>
+       <xsd:element name="TraveledDistanceCondition" type="TraveledDistanceCondition"/>
+       <xsd:element name="ReachPositionCondition" type="ReachPositionCondition">
+         <xsd:annotation>
+           <xsd:appinfo>
+             deprecated
+           </xsd:appinfo>
+         </xsd:annotation>
+       </xsd:element>
+       <xsd:element name="DistanceCondition" type="DistanceCondition"/>
+       <xsd:element name="RelativeDistanceCondition" type="RelativeDistanceCondition"/>
+       <xsd:element name="RelativeClearanceCondition" type="RelativeClearanceCondition"/>
+       <xsd:element name="AngleCondition" type="AngleCondition"/>
+       <xsd:element name="RelativeAngleCondition" type="RelativeAngleCondition"/>
+     </xsd:choice>
+   </xsd:complexType>
+ */
 struct EntityCondition : public ComplexType
 {
   explicit EntityCondition(const pugi::xml_node &, Scope &, const TriggeringEntities &);

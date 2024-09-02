@@ -38,13 +38,6 @@ public:
   auto getDefaultDynamicConstraints() const
     -> const traffic_simulator_msgs::msg::DynamicConstraints & override;
 
-  auto getEntityType() const -> const traffic_simulator_msgs::msg::EntityType & override
-  {
-    static traffic_simulator_msgs::msg::EntityType type;
-    type.type = traffic_simulator_msgs::msg::EntityType::MISC_OBJECT;
-    return type;
-  }
-
   auto getEntityTypename() const -> const std::string & override
   {
     static const std::string result = "MiscObjectEntity";
