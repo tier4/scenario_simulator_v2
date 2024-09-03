@@ -77,7 +77,7 @@ TEST(LineSegment, getPoint_outOfBounds_denormalized)
 {
   const auto line =
     math::geometry::LineSegment(makePoint(-1.0, -2.0, 1.0), makePoint(3.0, 2.0, -1.0));
-  ASSERT_DOUBLE_EQ(line.getLength(), 6.0);
+  ASSERT_DOUBLE_EQ(line.length, 6.0);
 
   EXPECT_THROW(line.getPoint(7.0, true), common::SimulationError);
   EXPECT_THROW(line.getPoint(-1.0, true), common::SimulationError);
@@ -90,7 +90,7 @@ TEST(LineSegment, getPoint_outOfBounds_normalized)
 {
   const auto line =
     math::geometry::LineSegment(makePoint(-1.0, -2.0, 1.0), makePoint(3.0, 2.0, -1.0));
-  ASSERT_DOUBLE_EQ(line.getLength(), 6.0);
+  ASSERT_DOUBLE_EQ(line.length, 6.0);
 
   EXPECT_THROW(line.getPoint(1.1, false), common::SimulationError);
   EXPECT_THROW(line.getPoint(-0.1, false), common::SimulationError);
@@ -103,7 +103,7 @@ TEST(LineSegment, getPoint_inside_denormalized)
 {
   const auto line =
     math::geometry::LineSegment(makePoint(-1.0, -2.0, 1.0), makePoint(3.0, 2.0, -1.0));
-  ASSERT_DOUBLE_EQ(line.getLength(), 6.0);
+  ASSERT_DOUBLE_EQ(line.length, 6.0);
 
   EXPECT_POINT_EQ(line.getPoint(0.0, true), makePoint(-1.0, -2.0, 1.0));
   EXPECT_POINT_EQ(line.getPoint(3.0, true), makePoint(1.0, 0.0, 0.0));
@@ -117,7 +117,7 @@ TEST(LineSegment, getPoint_inside_normalized)
 {
   const auto line =
     math::geometry::LineSegment(makePoint(-1.0, -2.0, 1.0), makePoint(3.0, 2.0, -1.0));
-  ASSERT_DOUBLE_EQ(line.getLength(), 6.0);
+  ASSERT_DOUBLE_EQ(line.length, 6.0);
 
   EXPECT_POINT_EQ(line.getPoint(0.0, false), makePoint(-1.0, -2.0, 1.0));
   EXPECT_POINT_EQ(line.getPoint(0.5, false), makePoint(1.0, 0.0, 0.0));
@@ -132,7 +132,7 @@ TEST(LineSegment, getPose_denormalized)
   const auto line =
     math::geometry::LineSegment(makePoint(-1.0, -2.0, 0.0), makePoint(3.0, 2.0, 4.0));
   const double length = 4.0 * std::sqrt(3.0);
-  ASSERT_DOUBLE_EQ(line.getLength(), length);
+  ASSERT_DOUBLE_EQ(line.length, length);
 
   EXPECT_POSE_EQ(
     line.getPose(0.0 * length, true, false),
@@ -159,7 +159,7 @@ TEST(LineSegment, getPose_normalized)
   const auto line =
     math::geometry::LineSegment(makePoint(-1.0, -2.0, 0.0), makePoint(3.0, 2.0, 4.0));
   const double length = 4.0 * std::sqrt(3.0);
-  ASSERT_DOUBLE_EQ(line.getLength(), length);
+  ASSERT_DOUBLE_EQ(line.length, length);
 
   EXPECT_POSE_EQ(
     line.getPose(0.0, false, false),
@@ -186,7 +186,7 @@ TEST(LineSegment, getPose_pitch)
   const auto line = math::geometry::LineSegment(
     makePoint(-1.0, -2.0, 0.0 * std::sqrt(2.0)), makePoint(3.0, 2.0, 4.0 * std::sqrt(2.0)));
   const double length = 8.0;
-  ASSERT_DOUBLE_EQ(line.getLength(), length);
+  ASSERT_DOUBLE_EQ(line.length, length);
 
   EXPECT_POSE_EQ(
     line.getPose(0.0 * length, true, true),
@@ -301,18 +301,18 @@ TEST(LineSegment, isIntersect2D_pointOnEnd)
 /**
  * @note Test result correctness with a line intersecting with a vertical line.
  */
-TEST(LineSegment, getIntersection2DSValue_line_vertical)
+TEST(LineSegment, get2DIntersectionSValue_line_vertical)
 {
   const auto line =
     math::geometry::LineSegment(makePoint(-1.0, -2.0, 0.0), makePoint(-1.0, 2.0, 0.0));
   {
-    const auto s_value = line.getIntersection2DSValue(
+    const auto s_value = line.get2DIntersectionSValue(
       math::geometry::LineSegment(makePoint(-2.0, -2.0, 0.0), makePoint(1.0, 1.0, 0.0)), true);
     ASSERT_TRUE(s_value.has_value());
     EXPECT_DOUBLE_EQ(s_value.value(), 1.0);
   }
   {
-    const auto s_value = line.getIntersection2DSValue(
+    const auto s_value = line.get2DIntersectionSValue(
       math::geometry::LineSegment(makePoint(-2.0, -2.0, 0.0), makePoint(1.0, 1.0, 0.0)), false);
     ASSERT_TRUE(s_value.has_value());
     EXPECT_DOUBLE_EQ(s_value.value(), 0.25);
@@ -322,18 +322,18 @@ TEST(LineSegment, getIntersection2DSValue_line_vertical)
 /**
  * @note Test result correctness with a line intersecting with a horizontal line.
  */
-TEST(LineSegment, getIntersection2DSValue_line_horizontal)
+TEST(LineSegment, get2DIntersectionSValue_line_horizontal)
 {
   const auto line =
     math::geometry::LineSegment(makePoint(-1.0, 2.0, 0.0), makePoint(1.0, 2.0, 0.0));
   {
-    const auto s_value = line.getIntersection2DSValue(
+    const auto s_value = line.get2DIntersectionSValue(
       math::geometry::LineSegment(makePoint(-1.0, 0.0, 0.0), makePoint(1.0, 4.0, 0.0)), true);
     ASSERT_TRUE(s_value.has_value());
     EXPECT_DOUBLE_EQ(s_value.value(), 1.0);
   }
   {
-    const auto s_value = line.getIntersection2DSValue(
+    const auto s_value = line.get2DIntersectionSValue(
       math::geometry::LineSegment(makePoint(-1.0, 0.0, 0.0), makePoint(1.0, 4.0, 0.0)), false);
     ASSERT_TRUE(s_value.has_value());
     EXPECT_DOUBLE_EQ(s_value.value(), 0.5);
@@ -343,18 +343,18 @@ TEST(LineSegment, getIntersection2DSValue_line_horizontal)
 /**
  * @note Test result correctness with lines intersecting at the start and end of a line.
  */
-TEST(LineSegment, getIntersection2DSValue_line_bounds)
+TEST(LineSegment, get2DIntersectionSValue_line_bounds)
 {
   const auto line =
     math::geometry::LineSegment(makePoint(-1.0, 1.0, 0.0), makePoint(1.0, 3.0, 0.0));
   {
-    const auto s_value = line.getIntersection2DSValue(
+    const auto s_value = line.get2DIntersectionSValue(
       math::geometry::LineSegment(makePoint(-2.0, 2.0, 0.0), makePoint(0.0, 0.0, 0.0)), false);
     ASSERT_TRUE(s_value.has_value());
     EXPECT_DOUBLE_EQ(s_value.value(), 0.0);
   }
   {
-    const auto s_value = line.getIntersection2DSValue(
+    const auto s_value = line.get2DIntersectionSValue(
       math::geometry::LineSegment(makePoint(1.0, 3.0, 0.0), makePoint(2.0, 2.0, 0.0)), false);
     ASSERT_TRUE(s_value.has_value());
     EXPECT_DOUBLE_EQ(s_value.value(), 1.0);
@@ -364,20 +364,20 @@ TEST(LineSegment, getIntersection2DSValue_line_bounds)
 /**
  * @note Test result correctness with a line outside of the line.
  */
-TEST(LineSegment, getIntersection2DSValue_line_outside)
+TEST(LineSegment, get2DIntersectionSValue_line_outside)
 {
   const auto line =
     math::geometry::LineSegment(makePoint(-1.0, 1.0, 0.0), makePoint(1.0, 3.0, 0.0));
 
   EXPECT_FALSE(
     line
-      .getIntersection2DSValue(
+      .get2DIntersectionSValue(
         math::geometry::LineSegment(makePoint(-2.0, 1.0, 0.0), makePoint(0.0, 0.0, 0.0)), false)
       .has_value());
 
   EXPECT_FALSE(
     line
-      .getIntersection2DSValue(
+      .get2DIntersectionSValue(
         math::geometry::LineSegment(makePoint(1.0, 4.0, 0.0), makePoint(2.0, 2.0, 0.0)), false)
       .has_value());
 }
@@ -385,16 +385,16 @@ TEST(LineSegment, getIntersection2DSValue_line_outside)
 /**
  * @note Test result correctness when lines are collinear.
  */
-TEST(LineSegment, getIntersection2DSValue_line_collinear)
+TEST(LineSegment, get2DIntersectionSValue_line_collinear)
 {
   const auto line =
     math::geometry::LineSegment(makePoint(-1.0, 1.0, 0.0), makePoint(1.0, 3.0, 0.0));
 
-  EXPECT_THROW(line.getIntersection2DSValue(line, false), common::SimulationError);
+  EXPECT_THROW(line.get2DIntersectionSValue(line, false), common::SimulationError);
 
   EXPECT_FALSE(
     line
-      .getIntersection2DSValue(
+      .get2DIntersectionSValue(
         math::geometry::LineSegment(makePoint(3.0, 5.0, 0.0), makePoint(5.0, 7.0, 0.0)), false)
       .has_value());
 }
@@ -402,116 +402,116 @@ TEST(LineSegment, getIntersection2DSValue_line_collinear)
 /**
  * @note Test result correctness with a point inside a vertical line.
  */
-TEST(LineSegment, getIntersection2DSValue_point_vertical)
+TEST(LineSegment, get2DIntersectionSValue_point_vertical)
 {
   const auto line =
     math::geometry::LineSegment(makePoint(-1.0, -2.0, 0.0), makePoint(-1.0, 2.0, 0.0));
 
   {
-    const auto s_value = line.getIntersection2DSValue(makePoint(-1.0, 0.0, 0.0), true);
+    const auto s_value = line.get2DIntersectionSValue(makePoint(-1.0, 0.0, 0.0), true);
     ASSERT_TRUE(s_value.has_value());
     EXPECT_DOUBLE_EQ(s_value.value(), 2.0);
   }
   {
-    const auto s_value = line.getIntersection2DSValue(makePoint(-1.0, 0.0, 0.0), false);
+    const auto s_value = line.get2DIntersectionSValue(makePoint(-1.0, 0.0, 0.0), false);
     ASSERT_TRUE(s_value.has_value());
     EXPECT_DOUBLE_EQ(s_value.value(), 0.5);
   }
   {
-    EXPECT_FALSE(line.getIntersection2DSValue(makePoint(-101.0, 0.0, 0.0), true).has_value());
-    EXPECT_FALSE(line.getIntersection2DSValue(makePoint(103.0, 0.0, 0.0), false).has_value());
-    EXPECT_FALSE(line.getIntersection2DSValue(makePoint(-1.0, -107.0, 0.0), true).has_value());
-    EXPECT_FALSE(line.getIntersection2DSValue(makePoint(-1.0, 109.0, 0.0), false).has_value());
+    EXPECT_FALSE(line.get2DIntersectionSValue(makePoint(-101.0, 0.0, 0.0), true).has_value());
+    EXPECT_FALSE(line.get2DIntersectionSValue(makePoint(103.0, 0.0, 0.0), false).has_value());
+    EXPECT_FALSE(line.get2DIntersectionSValue(makePoint(-1.0, -107.0, 0.0), true).has_value());
+    EXPECT_FALSE(line.get2DIntersectionSValue(makePoint(-1.0, 109.0, 0.0), false).has_value());
   }
 }
 
 /**
  * @note Test result correctness with a point inside a horizontal line.
  */
-TEST(LineSegment, getIntersection2DSValue_point_horizontal)
+TEST(LineSegment, get2DIntersectionSValue_point_horizontal)
 {
   const auto line =
     math::geometry::LineSegment(makePoint(-1.0, 2.0, 0.0), makePoint(1.0, 2.0, 0.0));
 
   {
-    const auto s_value = line.getIntersection2DSValue(makePoint(0.0, 2.0, 0.0), true);
+    const auto s_value = line.get2DIntersectionSValue(makePoint(0.0, 2.0, 0.0), true);
     ASSERT_TRUE(s_value.has_value());
     EXPECT_DOUBLE_EQ(s_value.value(), 1.0);
   }
   {
-    const auto s_value = line.getIntersection2DSValue(makePoint(0.0, 2.0, 0.0), false);
+    const auto s_value = line.get2DIntersectionSValue(makePoint(0.0, 2.0, 0.0), false);
     ASSERT_TRUE(s_value.has_value());
     EXPECT_DOUBLE_EQ(s_value.value(), 0.5);
   }
   {
-    EXPECT_FALSE(line.getIntersection2DSValue(makePoint(-113.0, 2.0, 0.0), true).has_value());
-    EXPECT_FALSE(line.getIntersection2DSValue(makePoint(127.0, 2.0, 0.0), false).has_value());
-    EXPECT_FALSE(line.getIntersection2DSValue(makePoint(0.0, -131.0, 0.0), true).has_value());
-    EXPECT_FALSE(line.getIntersection2DSValue(makePoint(0.0, 137.0, 0.0), false).has_value());
+    EXPECT_FALSE(line.get2DIntersectionSValue(makePoint(-113.0, 2.0, 0.0), true).has_value());
+    EXPECT_FALSE(line.get2DIntersectionSValue(makePoint(127.0, 2.0, 0.0), false).has_value());
+    EXPECT_FALSE(line.get2DIntersectionSValue(makePoint(0.0, -131.0, 0.0), true).has_value());
+    EXPECT_FALSE(line.get2DIntersectionSValue(makePoint(0.0, 137.0, 0.0), false).has_value());
   }
 }
 
 /**
  * @note Test result correctness with points at the start and end of a line.
  */
-TEST(LineSegment, getIntersection2DSValue_point_bounds)
+TEST(LineSegment, get2DIntersectionSValue_point_bounds)
 {
   const auto line =
     math::geometry::LineSegment(makePoint(-2.0, -2.0, 0.0), makePoint(1.0, 4.0, 0.0));
 
   {
-    const auto s_value = line.getIntersection2DSValue(makePoint(-2.0, -2.0, 0.0), true);
+    const auto s_value = line.get2DIntersectionSValue(makePoint(-2.0, -2.0, 0.0), true);
     ASSERT_TRUE(s_value.has_value());
     EXPECT_DOUBLE_EQ(s_value.value(), 0.0);
   }
   {
-    const auto s_value = line.getIntersection2DSValue(makePoint(-2.0, -2.0, 0.0), false);
+    const auto s_value = line.get2DIntersectionSValue(makePoint(-2.0, -2.0, 0.0), false);
     ASSERT_TRUE(s_value.has_value());
     EXPECT_DOUBLE_EQ(s_value.value(), 0.0);
   }
   {
-    EXPECT_FALSE(line.getIntersection2DSValue(makePoint(-139.0, -2.0, 0.0), true).has_value());
-    EXPECT_FALSE(line.getIntersection2DSValue(makePoint(149.0, -2.0, 0.0), false).has_value());
+    EXPECT_FALSE(line.get2DIntersectionSValue(makePoint(-139.0, -2.0, 0.0), true).has_value());
+    EXPECT_FALSE(line.get2DIntersectionSValue(makePoint(149.0, -2.0, 0.0), false).has_value());
   }
 
   {
-    const auto s_value = line.getIntersection2DSValue(makePoint(1.0, 4.0, 0.0), true);
+    const auto s_value = line.get2DIntersectionSValue(makePoint(1.0, 4.0, 0.0), true);
     ASSERT_TRUE(s_value.has_value());
     EXPECT_DOUBLE_EQ(s_value.value(), 3.0 * std::sqrt(5));
   }
   {
-    const auto s_value = line.getIntersection2DSValue(makePoint(1.0, 4.0, 0.0), false);
+    const auto s_value = line.get2DIntersectionSValue(makePoint(1.0, 4.0, 0.0), false);
     ASSERT_TRUE(s_value.has_value());
     EXPECT_DOUBLE_EQ(s_value.value(), 1.0);
   }
   {
-    EXPECT_FALSE(line.getIntersection2DSValue(makePoint(-151.0, 4.0, 0.0), true).has_value());
-    EXPECT_FALSE(line.getIntersection2DSValue(makePoint(157.0, 4.0, 0.0), false).has_value());
+    EXPECT_FALSE(line.get2DIntersectionSValue(makePoint(-151.0, 4.0, 0.0), true).has_value());
+    EXPECT_FALSE(line.get2DIntersectionSValue(makePoint(157.0, 4.0, 0.0), false).has_value());
   }
 }
 
 /**
  * @note Test result correctness with a point outside of the line.
  */
-TEST(LineSegment, getIntersection2DSValue_point_outside)
+TEST(LineSegment, get2DIntersectionSValue_point_outside)
 {
   const auto line =
     math::geometry::LineSegment(makePoint(-2.0, -2.0, 0.0), makePoint(1.0, 4.0, 0.0));
 
-  EXPECT_FALSE(line.getIntersection2DSValue(makePoint(-3.0, 1.0, 0.0), true).has_value());
-  EXPECT_FALSE(line.getIntersection2DSValue(makePoint(-1.0, 1.0, 0.0), true).has_value());
-  EXPECT_FALSE(line.getIntersection2DSValue(makePoint(0.0, 1.0, 0.0), true).has_value());
-  EXPECT_FALSE(line.getIntersection2DSValue(makePoint(2.0, 1.0, 0.0), true).has_value());
+  EXPECT_FALSE(line.get2DIntersectionSValue(makePoint(-3.0, 1.0, 0.0), true).has_value());
+  EXPECT_FALSE(line.get2DIntersectionSValue(makePoint(-1.0, 1.0, 0.0), true).has_value());
+  EXPECT_FALSE(line.get2DIntersectionSValue(makePoint(0.0, 1.0, 0.0), true).has_value());
+  EXPECT_FALSE(line.get2DIntersectionSValue(makePoint(2.0, 1.0, 0.0), true).has_value());
 
-  EXPECT_FALSE(line.getIntersection2DSValue(makePoint(-0.5, -5.0, 0.0), true).has_value());
-  EXPECT_FALSE(line.getIntersection2DSValue(makePoint(-0.5, -1.0, 0.0), true).has_value());
-  EXPECT_FALSE(line.getIntersection2DSValue(makePoint(-0.5, 3.0, 0.0), true).has_value());
-  EXPECT_FALSE(line.getIntersection2DSValue(makePoint(-0.5, 7.0, 0.0), true).has_value());
+  EXPECT_FALSE(line.get2DIntersectionSValue(makePoint(-0.5, -5.0, 0.0), true).has_value());
+  EXPECT_FALSE(line.get2DIntersectionSValue(makePoint(-0.5, -1.0, 0.0), true).has_value());
+  EXPECT_FALSE(line.get2DIntersectionSValue(makePoint(-0.5, 3.0, 0.0), true).has_value());
+  EXPECT_FALSE(line.get2DIntersectionSValue(makePoint(-0.5, 7.0, 0.0), true).has_value());
 
-  EXPECT_FALSE(line.getIntersection2DSValue(makePoint(7.0, 7.0, 0.0), true).has_value());
-  EXPECT_FALSE(line.getIntersection2DSValue(makePoint(7.0, -7.0, 0.0), true).has_value());
-  EXPECT_FALSE(line.getIntersection2DSValue(makePoint(-7.0, 7.0, 0.0), true).has_value());
-  EXPECT_FALSE(line.getIntersection2DSValue(makePoint(-7.0, -7.0, 0.0), true).has_value());
+  EXPECT_FALSE(line.get2DIntersectionSValue(makePoint(7.0, 7.0, 0.0), true).has_value());
+  EXPECT_FALSE(line.get2DIntersectionSValue(makePoint(7.0, -7.0, 0.0), true).has_value());
+  EXPECT_FALSE(line.get2DIntersectionSValue(makePoint(-7.0, 7.0, 0.0), true).has_value());
+  EXPECT_FALSE(line.get2DIntersectionSValue(makePoint(-7.0, -7.0, 0.0), true).has_value());
 }
 
 TEST(LineSegment, getIntersection2DDisjoint)
@@ -607,13 +607,13 @@ TEST(LineSegment, getSValue_parallelDenormalize)
 TEST(LineSegment, getVector)
 {
   const math::geometry::LineSegment line(makePoint(1.0, 2.0, 3.0), makePoint(2.0, 3.0, 4.0));
-  EXPECT_VECTOR3_EQ(line.getVector(), makeVector(1.0, 1.0, 1.0));
+  EXPECT_VECTOR3_EQ(line.vector, makeVector(1.0, 1.0, 1.0));
 }
 
 TEST(LineSegment, getVectorZeroLength)
 {
   const math::geometry::LineSegment line(makePoint(1.0, 2.0, 3.0), makePoint(1.0, 2.0, 3.0));
-  EXPECT_VECTOR3_EQ(line.getVector(), makeVector(0.0, 0.0, 0.0));
+  EXPECT_VECTOR3_EQ(line.vector, makeVector(0.0, 0.0, 0.0));
 }
 
 TEST(LineSegment, getNormalVector)
@@ -631,49 +631,49 @@ TEST(LineSegment, getNormalVector_zeroLength)
 TEST(LineSegment, get2DVector)
 {
   const math::geometry::LineSegment line(makePoint(1.0, 2.0, 3.0), makePoint(2.0, 3.0, 4.0));
-  EXPECT_VECTOR3_EQ(line.get2DVector(), makeVector(1.0, 1.0, 0.0));
+  EXPECT_VECTOR3_EQ(line.vector_2d, makeVector(1.0, 1.0, 0.0));
 }
 
 TEST(LineSegment, get2DVectorZeroLength)
 {
   const math::geometry::LineSegment line(makePoint(1.0, 2.0, 3.0), makePoint(1.0, 2.0, 3.0));
-  EXPECT_VECTOR3_EQ(line.get2DVector(), makeVector(0.0, 0.0, 0.0));
+  EXPECT_VECTOR3_EQ(line.vector_2d, makeVector(0.0, 0.0, 0.0));
 }
 
 TEST(LineSegment, getLength)
 {
   const math::geometry::LineSegment line(makePoint(1.0, 2.0, 3.0), makePoint(2.0, 3.0, 4.0));
-  EXPECT_DOUBLE_EQ(line.getLength(), std::sqrt(3.0));
+  EXPECT_DOUBLE_EQ(line.length, std::sqrt(3.0));
 }
 
 TEST(LineSegment, getLengthZeroLength)
 {
   const math::geometry::LineSegment line(makePoint(1.0, 2.0, 3.0), makePoint(1.0, 2.0, 3.0));
-  EXPECT_DOUBLE_EQ(line.getLength(), 0.0);
+  EXPECT_DOUBLE_EQ(line.length, 0.0);
 }
 
 TEST(LineSegment, get2DLength)
 {
   const math::geometry::LineSegment line(makePoint(1.0, 2.0, 3.0), makePoint(2.0, 3.0, 4.0));
-  EXPECT_DOUBLE_EQ(line.get2DLength(), std::sqrt(2.0));
+  EXPECT_DOUBLE_EQ(line.length_2d, std::sqrt(2.0));
 }
 
 TEST(LineSegment, get2DLengthZeroLength)
 {
   const math::geometry::LineSegment line(makePoint(1.0, 2.0, 3.0), makePoint(1.0, 2.0, 3.0));
-  EXPECT_DOUBLE_EQ(line.get2DLength(), 0.0);
+  EXPECT_DOUBLE_EQ(line.length_2d, 0.0);
 }
 
-TEST(LineSegment, getSlope)
+TEST(LineSegment, get2DVectorSlope)
 {
   const math::geometry::LineSegment line(makePoint(1.0, 2.0, 3.0), makePoint(3.0, 3.0, 4.0));
-  EXPECT_DOUBLE_EQ(line.getSlope(), 0.5);
+  EXPECT_DOUBLE_EQ(line.get2DVectorSlope(), 0.5);
 }
 
-TEST(LineSegment, getSlopeZeroLength)
+TEST(LineSegment, get2DVectorSlopeZeroLength)
 {
   const math::geometry::LineSegment line(makePoint(1.0, 2.0, 3.0), makePoint(1.0, 2.0, 3.0));
-  EXPECT_TRUE(std::isnan(line.getSlope()));
+  EXPECT_THROW(line.get2DVectorSlope(), common::SimulationError);
 }
 
 TEST(LineSegment, getSquaredDistanceIn2D)
