@@ -21,6 +21,24 @@ Changelog for package traffic_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+4.1.1 (2024-09-03)
+------------------
+* Merge pull request `#1207 <https://github.com/tier4/scenario_simulator_v2/issues/1207>`_ from tier4/fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* feat(use_sim_time): set default as false
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge remote-tracking branch 'origin/master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into doc/RJD-1273-add-realtime-factor-doc
+* use_sim_time used in concealer initialization
+* Contributors: Dawid Moszynski, Dawid Moszyński, Kotaro Yoshimoto, Paweł Lech
+
 4.1.0 (2024-09-03)
 ------------------
 * Merge branch 'master' into RJD-1278/fix-line-segment

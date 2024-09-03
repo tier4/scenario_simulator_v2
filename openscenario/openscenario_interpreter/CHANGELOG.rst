@@ -32,6 +32,21 @@ Changelog for package openscenario_interpreter
 * add publish_empty_context parameter
 * Contributors: Masaya Kataoka
 
+4.1.1 (2024-09-03)
+------------------
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge remote-tracking branch 'origin/master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into doc/RJD-1273-add-realtime-factor-doc
+* Contributors: Dawid Moszynski, Dawid Moszyński, Kotaro Yoshimoto
+
 4.1.0 (2024-09-03)
 ------------------
 * Merge branch 'master' into RJD-1278/fix-line-segment
