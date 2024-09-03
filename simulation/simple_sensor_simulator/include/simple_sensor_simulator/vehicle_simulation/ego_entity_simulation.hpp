@@ -92,10 +92,11 @@ public:
     const bool consider_acceleration_by_road_slope);
 
   auto overwrite(
-    const traffic_simulator_msgs::msg::EntityStatus & status, double current_scenario_time,
-    double step_time, bool npc_logic_started) -> void;
+    const traffic_simulator_msgs::msg::EntityStatus & status, const double current_time,
+    const double step_time, bool is_npc_logic_started) -> void;
 
-  auto update(double time, double step_time, bool npc_logic_started) -> void;
+  auto update(const double current_time, const double step_time, const bool is_npc_logic_started)
+    -> void;
 
   auto requestSpeedChange(double value) -> void;
 
@@ -103,7 +104,7 @@ public:
 
   auto setStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> void;
 
-  auto updateStatus(double time, double step_time) -> void;
+  auto updateStatus(const double current_time, const double step_time) -> void;
 };
 }  // namespace vehicle_simulation
 
