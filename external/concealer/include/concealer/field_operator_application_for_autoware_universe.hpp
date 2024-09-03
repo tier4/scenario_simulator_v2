@@ -29,6 +29,7 @@
 #include <autoware_auto_planning_msgs/msg/path_with_lane_id.hpp>
 #include <autoware_auto_system_msgs/msg/emergency_state.hpp>
 #include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
+#include <concealer/autoware_state_dispatcher.hpp>
 #include <concealer/autoware_universe.hpp>
 #include <concealer/field_operator_application.hpp>
 #include <concealer/publisher_wrapper.hpp>
@@ -49,11 +50,8 @@ namespace concealer
 {
 template <>
 class FieldOperatorApplicationFor<AutowareUniverse>
-: public FieldOperatorApplication,
-  public TransitionAssertion<FieldOperatorApplicationFor<AutowareUniverse>>
+: public FieldOperatorApplication
 {
-  friend class TransitionAssertion<FieldOperatorApplicationFor<AutowareUniverse>>;
-
   // clang-format off
   SubscriberWrapper<autoware_auto_control_msgs::msg::AckermannControlCommand>     getAckermannControlCommand;
   SubscriberWrapper<tier4_system_msgs::msg::AutowareState, ThreadSafety::safe>    getAutowareState;
@@ -76,6 +74,8 @@ class FieldOperatorApplicationFor<AutowareUniverse>
   ServiceWithValidation<autoware_adapi_v1_msgs::srv::ChangeOperationMode>         requestEnableAutowareControl;
   ServiceWithValidation<autoware_adapi_v1_msgs::srv::ChangeOperationMode>         requestDisableAutowareControl;
   // clang-format on
+
+  AutowareStateDispatcher<tier4_system_msgs::msg::AutowareState> autoware_state_dispatcher;
 
   tier4_rtc_msgs::msg::CooperateStatusArray latest_cooperate_status_array;
 
@@ -118,7 +118,7 @@ public:
   : FieldOperatorApplication(std::forward<decltype(xs)>(xs)...),
     // clang-format off
     getAckermannControlCommand("/control/command/control_cmd", rclcpp::QoS(1), *this),
-    getAutowareState("/api/iv_msgs/autoware/state", rclcpp::QoS(1), *this),
+    getAutowareState("/api/iv_msgs/autoware/state", rclcpp::QoS(1), *this, [this](const auto & v) { autoware_state_dispatcher.onAutowareState(v, now()); }),
     getCooperateStatusArray("/api/external/get/rtc_status", rclcpp::QoS(1), *this, [this](const auto & v) { latest_cooperate_status_array = v; }),
     getEmergencyState("/api/external/get/emergency", rclcpp::QoS(1), *this, [this](const auto & v) { receiveEmergencyState(v); }),
 #if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)
