@@ -194,7 +194,7 @@ def launch_setup(context, *args, **kwargs):
             namespace="simulation",
             output="screen",
             on_exit=ShutdownOnce(),
-            parameters=make_parameters() + [{"use_sim_time": True}],
+            parameters=make_parameters() + [{"use_sim_time": use_sim_time}],
             condition=IfCondition(launch_simple_sensor_simulator),
         ),
         # The `name` keyword overrides the name for all created nodes, so duplicated nodes appear.
