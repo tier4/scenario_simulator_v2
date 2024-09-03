@@ -16,6 +16,7 @@
 
 #include <cmath>
 #include <geometry/intersection/intersection.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 
 #include "expect_eq_macros.hpp"
 #include "test_utils.hpp"
@@ -108,9 +109,7 @@ TEST(Intersection, getIntersection2DIntersectVector)
 TEST(Intersection, getIntersection2DIdentical)
 {
   math::geometry::LineSegment line(makePoint(0.0, 0.0), makePoint(1.0, 1.0));
-  auto ans = math::geometry::getIntersection2D(line, line);
-  EXPECT_TRUE(ans);
-  EXPECT_POINT_NAN(ans.value());
+  EXPECT_THROW(math::geometry::getIntersection2D(line, line), common::SimulationError);
 }
 
 TEST(Intersection, getIntersection2DIdenticalVector)
@@ -121,14 +120,7 @@ TEST(Intersection, getIntersection2DIdenticalVector)
   lines.push_back(line);
   lines.push_back(line);
 
-  auto ans = math::geometry::getIntersection2D(lines);
-  EXPECT_EQ(ans.size(), size_t(6));
-  EXPECT_POINT_NAN(ans[0]);
-  EXPECT_POINT_NAN(ans[1]);
-  EXPECT_POINT_NAN(ans[2]);
-  EXPECT_POINT_NAN(ans[3]);
-  EXPECT_POINT_NAN(ans[4]);
-  EXPECT_POINT_NAN(ans[5]);
+  EXPECT_THROW(math::geometry::getIntersection2D(lines), common::SimulationError);
 }
 
 TEST(Intersection, getIntersection2DEmptyVector)
