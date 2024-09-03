@@ -253,7 +253,8 @@ TEST(distance, longitudinalDistance_noAdjacent_noOpposite_noChange_false)
 TEST(distance, longitudinalDistance_noAdjacent_noOpposite_noChange)
 {
   auto hdmap_utils_ptr = std::make_shared<hdmap_utils::HdMapUtils>(
-    ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm",
+    ament_index_cpp::get_package_share_directory("traffic_simulator") +
+      "/map/standard_map/lanelet2_map.osm",
     geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
       .latitude(35.61836750154)
       .longitude(139.78066608243)
@@ -327,3 +328,120 @@ TEST(distance, longitudinalDistance_adjacent_noOpposite_noChange)
     EXPECT_NEAR(result.value(), approx_distance, tolerance);
   }
 }
+
+/**
+ * @note Test calculation correctness with include_adjacent_lanelet = false,
+ * include_opposite_direction = false, allow_lane_change = true
+ * in an impossible scenario, e.g. no path.
+ */
+TEST(distance, longitudinalDistance_noAdjacent_noOpposite_change_false)
+{
+  auto hdmap_utils_ptr = std::make_shared<hdmap_utils::HdMapUtils>(
+    ament_index_cpp::get_package_share_directory("traffic_simulator") +
+      "/map/four_track_highway/lanelet2_map.osm",
+    geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
+      .latitude(35.22312494055522)
+      .longitude(138.8024583466017)
+      .altitude(0.0));
+
+  {
+    const auto pose_from = traffic_simulator::toCanonicalizedLaneletPose(
+      makePose(81595.47, 49982.80, 100.0), false, hdmap_utils_ptr);
+    const auto pose_to = traffic_simulator::toCanonicalizedLaneletPose(
+      makePose(81599.34, 50022.34, 100.0), false, hdmap_utils_ptr);
+    const auto result = traffic_simulator::distance::longitudinalDistance(
+      pose_from.value(), pose_to.value(), false, false, true, hdmap_utils_ptr);
+    EXPECT_FALSE(result.has_value());
+  }
+  {
+    const auto pose_from = traffic_simulator::toCanonicalizedLaneletPose(
+      makePose(81612.35, 50015.63, 280.0), false, hdmap_utils_ptr);
+    const auto pose_to = traffic_simulator::toCanonicalizedLaneletPose(
+      makePose(81612.95, 49991.30, 280.0), false, hdmap_utils_ptr);
+    const auto result = traffic_simulator::distance::longitudinalDistance(
+      pose_from.value(), pose_to.value(), false, false, true, hdmap_utils_ptr);
+    EXPECT_FALSE(result.has_value());
+  }
+}
+
+/**
+ * @note Test calculation correctness with include_adjacent_lanelet = false,
+ * include_opposite_direction = false, allow_lane_change = true
+ * in a scenario that meets those criteria.
+ */
+TEST(distance, longitudinalDistance_noAdjacent_noOpposite_change)
+{
+  auto hdmap_utils_ptr = std::make_shared<hdmap_utils::HdMapUtils>(
+    ament_index_cpp::get_package_share_directory("traffic_simulator") +
+      "/map/four_track_highway/lanelet2_map.osm",
+    geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
+      .latitude(35.22312494055522)
+      .longitude(138.8024583466017)
+      .altitude(0.0));
+  {
+    const auto pose_from = traffic_simulator::toCanonicalizedLaneletPose(
+      makePose(81592.96, 49997.94, 100.0), false, hdmap_utils_ptr);
+    const auto pose_to = traffic_simulator::toCanonicalizedLaneletPose(
+      makePose(81570.56, 50141.75, 100.0), false, hdmap_utils_ptr);
+    constexpr double approx_distance = 145.0;
+    constexpr double tolerance = 1.0;
+    const auto result = traffic_simulator::distance::longitudinalDistance(
+      pose_from.value(), pose_to.value(), false, false, true, hdmap_utils_ptr);
+    ASSERT_TRUE(result.has_value());
+    EXPECT_NEAR(result.value(), approx_distance, tolerance);
+  }
+  {
+    const auto pose_from = traffic_simulator::toCanonicalizedLaneletPose(
+      makePose(81587.31, 50165.57, 100.0), false, hdmap_utils_ptr);
+    const auto pose_to = traffic_simulator::toCanonicalizedLaneletPose(
+      makePose(81610.25, 49988.59, 100.0), false, hdmap_utils_ptr);
+    constexpr double approx_distance = 178.0;
+    constexpr double tolerance = 1.0;
+    const auto result = traffic_simulator::distance::longitudinalDistance(
+      pose_from.value(), pose_to.value(), false, false, true, hdmap_utils_ptr);
+    ASSERT_TRUE(result.has_value());
+    EXPECT_NEAR(result.value(), approx_distance, tolerance);
+  }
+}
+
+/**
+ * @note Test calculation correctness with include_adjacent_lanelet = true,
+ * include_opposite_direction = false, allow_lane_change = true
+ * in an impossible scenario, e.g. no path.
+ */
+TEST(distance, longitudinalDistance_adjacent_noOpposite_change_false) {}
+
+/**
+ * @note Test calculation correctness with include_adjacent_lanelet = true,
+ * include_opposite_direction = false, allow_lane_change = true
+ * in a scenario that meets those criteria.
+ */
+TEST(distance, longitudinalDistance_adjacent_noOpposite_change) {}
+
+/**
+ * @note Test calculation correctness with include_adjacent_lanelet = true,
+ * include_opposite_direction = true, allow_lane_change = false
+ * in an impossible scenario, e.g. no path.
+ */
+TEST(distance, longitudinalDistance_adjacent_opposite_noChange_false) {}
+
+/**
+ * @note Test calculation correctness with include_adjacent_lanelet = true,
+ * include_opposite_direction = true, allow_lane_change = false
+ * in a scenario that meets those criteria.
+ */
+TEST(distance, longitudinalDistance_adjacent_opposite_noChange) {}
+
+/**
+ * @note Test calculation correctness with include_adjacent_lanelet = true,
+ * include_opposite_direction = true, allow_lane_change = true
+ * in an impossible scenario, e.g. no path.
+ */
+TEST(distance, longitudinalDistance_adjacent_opposite_change_false) {}
+
+/**
+ * @note Test calculation correctness with include_adjacent_lanelet = true,
+ * include_opposite_direction = true, allow_lane_change = true
+ * in a scenario that meets those criteria.
+ */
+TEST(distance, longitudinalDistance_adjacent_opposite_change) {}
