@@ -60,6 +60,10 @@ def default_autoware_launch_file_of(architecture_type):
     }[architecture_type]
 
 
+def default_rviz_config_file():
+    return Path(get_package_share_directory("traffic_simulator")) / "config/scenario_simulator_v2.rviz"
+
+
 def launch_setup(context, *args, **kwargs):
     # fmt: off
     architecture_type                   = LaunchConfiguration("architecture_type",                      default="awf/universe/20230906")
@@ -79,7 +83,7 @@ def launch_setup(context, *args, **kwargs):
     port                                = LaunchConfiguration("port",                                   default=5555)
     publish_empty_context               = LaunchConfiguration("publish_empty_context",                  default=False)
     record                              = LaunchConfiguration("record",                                 default=True)
-    rviz_config                         = LaunchConfiguration("rviz_config",                            default="")
+    rviz_config                         = LaunchConfiguration("rviz_config",                            default=default_rviz_config_file())
     scenario                            = LaunchConfiguration("scenario",                               default=Path("/dev/null"))
     sensor_model                        = LaunchConfiguration("sensor_model",                           default="")
     sigterm_timeout                     = LaunchConfiguration("sigterm_timeout",                        default=8)
@@ -144,9 +148,10 @@ def launch_setup(context, *args, **kwargs):
             if (pattern.match(each[0])):
                 list_of_string.append(each[0][9:] + ":=" + each[1])
 
-        parameters += [
-            {"autoware.": list_of_string}
-        ]
+        if list_of_string != []:
+            parameters += [
+                {"autoware.": list_of_string}
+            ]
 
         return parameters
 
@@ -245,13 +250,7 @@ def launch_setup(context, *args, **kwargs):
             name="rviz2",
             output={"stderr": "log", "stdout": "log"},
             condition=IfCondition(launch_rviz),
-            arguments=[
-                "-d",
-                str(
-                    Path(get_package_share_directory("traffic_simulator"))
-                    / "config/scenario_simulator_v2.rviz"
-                ),
-            ],
+            arguments=["-d", str(default_rviz_config_file())],
         ),
     ]
 

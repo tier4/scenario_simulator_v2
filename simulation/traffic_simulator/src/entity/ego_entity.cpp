@@ -41,8 +41,6 @@ auto EgoEntity::makeFieldOperatorApplication(
   if (const auto architecture_type =
         getParameter<std::string>(node_parameters, "architecture_type", "awf/universe");
       architecture_type.find("awf/universe") != std::string::npos) {
-    const auto rviz_config = getParameter<std::string>(node_parameters, "rviz_config", "");
-
     auto parameters = getParameter<std::vector<std::string>>(node_parameters, "autoware.", {});
 
     // clang-format off
@@ -51,7 +49,7 @@ auto EgoEntity::makeFieldOperatorApplication(
     parameters.push_back("pointcloud_map_file:=" + configuration.getPointCloudMapFile());
     parameters.push_back("sensor_model:=" + getParameter<std::string>(node_parameters, "sensor_model"));
     parameters.push_back("vehicle_model:=" + getParameter<std::string>(node_parameters, "vehicle_model"));
-    parameters.push_back("rviz_config:=" + (rviz_config.empty() ? configuration.rviz_config_path.string() : rviz_config));
+    parameters.push_back("rviz_config:=" + getParameter<std::string>(node_parameters, "rviz_config"));
     parameters.push_back("scenario_simulation:=true");
     parameters.push_back("use_foa:=false");
     parameters.push_back("perception/enable_traffic_light:=" + std::string((architecture_type >= "awf/universe/20230906") ? "true" : "false"));
