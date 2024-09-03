@@ -39,7 +39,9 @@ public:
 
   std::string getState(const TAutowareState & message) const { return message.state; }
 
-  void registerTask(const std::string state, std::function<void()> task, rclcpp::Duration interval = rclcpp::Duration(0, 0))
+  void registerTask(
+    const std::string state, std::function<void()> task,
+    rclcpp::Duration interval = rclcpp::Duration(0, 0))
   {
     tasks[state].push_back(Task(std::move(task), interval));
   }
@@ -60,7 +62,7 @@ private:
       for (auto & task : it->second) {
         task(now);
       }
-    }else{
+    } else {
       std::cout << "No task for state: " << state << std::endl;
     }
   }
@@ -87,8 +89,8 @@ private:
         int64_t duration_nanoseconds = now.nanoseconds() - next_execution.nanoseconds();
         int64_t interval_nanoseconds = interval.nanoseconds();
         next_execution =
-          now +
-          rclcpp::Duration::from_nanoseconds(interval_nanoseconds - (duration_nanoseconds % interval_nanoseconds));
+          now + rclcpp::Duration::from_nanoseconds(
+                  interval_nanoseconds - (duration_nanoseconds % interval_nanoseconds));
       }
     }
   };

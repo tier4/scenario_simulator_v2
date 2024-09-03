@@ -49,8 +49,7 @@
 namespace concealer
 {
 template <>
-class FieldOperatorApplicationFor<AutowareUniverse>
-: public FieldOperatorApplication
+class FieldOperatorApplicationFor<AutowareUniverse> : public FieldOperatorApplication
 {
   // clang-format off
   SubscriberWrapper<autoware_auto_control_msgs::msg::AckermannControlCommand>     getAckermannControlCommand;
