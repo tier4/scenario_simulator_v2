@@ -36,8 +36,7 @@ EntityBase::EntityBase(
   verbose(true),
   status_(std::make_shared<CanonicalizedEntityStatus>(entity_status)),
   status_before_update_(*status_),
-  hdmap_utils_ptr_(hdmap_utils_ptr),
-  npc_logic_started_(false)
+  hdmap_utils_ptr_(hdmap_utils_ptr)
 {
   if (name != static_cast<EntityStatus>(entity_status).name) {
     THROW_SIMULATION_ERROR(
@@ -101,7 +100,7 @@ auto EntityBase::isTargetSpeedReached(const speed_change::RelativeTargetSpeed & 
     target_speed.getAbsoluteValue(getCanonicalizedStatus(), other_status_));
 }
 
-void EntityBase::onUpdate(double /*current_time*/, double step_time)
+auto EntityBase::onUpdate(const double /*current_time*/, const double step_time) -> void
 {
   job_list_.update(step_time, job::Event::PRE_UPDATE);
   step_time_ = step_time;
@@ -111,7 +110,7 @@ void EntityBase::onUpdate(double /*current_time*/, double step_time)
       step_time, name);
 }
 
-void EntityBase::onPostUpdate(double /*current_time*/, double step_time)
+auto EntityBase::onPostUpdate(const double /*current_time*/, const double step_time) -> void
 {
   job_list_.update(step_time, job::Event::POST_UPDATE);
 }
@@ -626,12 +625,6 @@ void EntityBase::activateOutOfRangeJob(
     [this]() {}, job::Type::OUT_OF_RANGE, true, job::Event::POST_UPDATE);
 }
 
-void EntityBase::startNpcLogic(const double current_time)
-{
-  updateEntityStatusTimestamp(current_time);
-  npc_logic_started_ = true;
-}
-
 void EntityBase::stopAtCurrentPosition()
 {
   status_->setTwist(geometry_msgs::msg::Twist());
@@ -646,20 +639,16 @@ void EntityBase::updateEntityStatusTimestamp(const double current_time)
 
 auto EntityBase::updateStandStillDuration(const double step_time) -> double
 {
-  if (
-    npc_logic_started_ and
-    std::abs(getCurrentTwist().linear.x) <= std::numeric_limits<double>::epsilon()) {
+  if (std::abs(getCurrentTwist().linear.x) <= std::numeric_limits<double>::epsilon()) {
     return stand_still_duration_ += step_time;
+  } else {
+    return stand_still_duration_ = 0.0;
   }
-  return stand_still_duration_ = 0.0;
 }
 
 auto EntityBase::updateTraveledDistance(const double step_time) -> double
 {
-  if (npc_logic_started_) {
-    traveled_distance_ += std::abs(getCurrentTwist().linear.x) * step_time;
-  }
-  return traveled_distance_;
+  return traveled_distance_ += std::abs(getCurrentTwist().linear.x) * step_time;
 }
 
 bool EntityBase::reachPosition(const std::string & target_name, const double tolerance) const

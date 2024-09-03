@@ -147,8 +147,6 @@ bool EntityManager::entityExists(const std::string & name)
   return entities_.find(name) != std::end(entities_);
 }
 
-auto EntityManager::getCurrentTime() const noexcept -> double { return current_time_; }
-
 auto EntityManager::getEntityNames() const -> const std::vector<std::string>
 {
   std::vector<std::string> names{};
@@ -213,10 +211,11 @@ const std::string EntityManager::getEgoName() const
 auto EntityManager::getObstacle(const std::string & name)
   -> std::optional<traffic_simulator_msgs::msg::Obstacle>
 {
-  if (!npc_logic_started_) {
+  if (not npc_logic_started_) {
     return std::nullopt;
+  } else {
+    return entities_.at(name)->getObstacle();
   }
-  return entities_.at(name)->getObstacle();
 }
 
 auto EntityManager::getPedestrianParameters(const std::string & name) const
@@ -229,8 +228,6 @@ auto EntityManager::getPedestrianParameters(const std::string & name) const
     "EntityType: ", getEntityTypename(name), ", does not have pedestrian parameter.",
     "Please check description of the scenario and entity type of the Entity: " + name);
 }
-
-auto EntityManager::getStepTime() const noexcept -> double { return step_time_; }
 
 auto EntityManager::getVehicleParameters(const std::string & name) const
   -> const traffic_simulator_msgs::msg::VehicleParameters &
@@ -246,10 +243,11 @@ auto EntityManager::getVehicleParameters(const std::string & name) const
 auto EntityManager::getWaypoints(const std::string & name)
   -> traffic_simulator_msgs::msg::WaypointsArray
 {
-  if (!npc_logic_started_) {
+  if (not npc_logic_started_) {
     return traffic_simulator_msgs::msg::WaypointsArray();
+  } else {
+    return entities_.at(name)->getWaypoints();
   }
-  return entities_.at(name)->getWaypoints();
 }
 
 bool EntityManager::isEgoSpawned() const
@@ -306,11 +304,13 @@ void EntityManager::resetBehaviorPlugin(
   } else if (is<VehicleEntity>(name)) {
     const auto parameters = getVehicleParameters(name);
     despawnEntity(name);
-    spawnEntity<VehicleEntity>(name, status.getMapPose(), parameters, behavior_plugin_name);
+    spawnEntity<VehicleEntity>(
+      name, status.getMapPose(), parameters, status.getTime(), behavior_plugin_name);
   } else if (is<PedestrianEntity>(name)) {
     const auto parameters = getPedestrianParameters(name);
     despawnEntity(name);
-    spawnEntity<PedestrianEntity>(name, status.getMapPose(), parameters, behavior_plugin_name);
+    spawnEntity<PedestrianEntity>(
+      name, status.getMapPose(), parameters, status.getTime(), behavior_plugin_name);
   } else {
     THROW_SIMULATION_ERROR(
       "Entity :", name, "is unkown entity type.", "Please contact to developer.");
@@ -321,49 +321,23 @@ void EntityManager::resetBehaviorPlugin(
   setBehaviorParameter(name, behavior_parameter);
 }
 
+auto EntityManager::getCurrentAction(const std::string & name) const -> std::string
+{
+  if (const auto entity = getEntity(name)) {
+    if (not npc_logic_started_ and not is<EgoEntity>(name)) {
+      return "waiting";
+    } else {
+      return entity->getCurrentAction();
+    }
+  } else {
+    THROW_SEMANTIC_ERROR("entity : ", name, "does not exist");
+  }
+}
+
 bool EntityManager::trafficLightsChanged()
 {
   return conventional_traffic_light_manager_ptr_->hasAnyLightChanged() or
          v2i_traffic_light_manager_ptr_->hasAnyLightChanged();
-}
-
-void EntityManager::requestSpeedChange(
-  const std::string & name, double target_speed, bool continuous)
-{
-  if (is<EgoEntity>(name) && getCurrentTime() > 0) {
-    THROW_SEMANTIC_ERROR("You cannot set target speed to the ego vehicle after starting scenario.");
-  }
-  return entities_.at(name)->requestSpeedChange(target_speed, continuous);
-}
-
-void EntityManager::requestSpeedChange(
-  const std::string & name, const double target_speed, const speed_change::Transition transition,
-  const speed_change::Constraint constraint, const bool continuous)
-{
-  if (is<EgoEntity>(name) && getCurrentTime() > 0) {
-    THROW_SEMANTIC_ERROR("You cannot set target speed to the ego vehicle after starting scenario.");
-  }
-  return entities_.at(name)->requestSpeedChange(target_speed, transition, constraint, continuous);
-}
-
-void EntityManager::requestSpeedChange(
-  const std::string & name, const speed_change::RelativeTargetSpeed & target_speed, bool continuous)
-{
-  if (is<EgoEntity>(name) && getCurrentTime() > 0) {
-    THROW_SEMANTIC_ERROR("You cannot set target speed to the ego vehicle after starting scenario.");
-  }
-  return entities_.at(name)->requestSpeedChange(target_speed, continuous);
-}
-
-void EntityManager::requestSpeedChange(
-  const std::string & name, const speed_change::RelativeTargetSpeed & target_speed,
-  const speed_change::Transition transition, const speed_change::Constraint constraint,
-  const bool continuous)
-{
-  if (is<EgoEntity>(name) && getCurrentTime() > 0) {
-    THROW_SEMANTIC_ERROR("You cannot set target speed to the ego vehicle after starting scenario.");
-  }
-  return entities_.at(name)->requestSpeedChange(target_speed, transition, constraint, continuous);
 }
 
 void EntityManager::setVerbose(const bool verbose)
@@ -374,21 +348,30 @@ void EntityManager::setVerbose(const bool verbose)
   }
 }
 
-auto EntityManager::updateNpcLogic(const std::string & name) -> const CanonicalizedEntityStatus &
+auto EntityManager::updateNpcLogic(
+  const std::string & name, const double current_time, const double step_time)
+  -> const CanonicalizedEntityStatus &
 {
   if (configuration.verbose) {
     std::cout << "update " << name << " behavior" << std::endl;
   }
-  entities_[name]->onUpdate(current_time_, step_time_);
-  return entities_[name]->getCanonicalizedStatus();
+  if (const auto entity = getEntity(name)) {
+    // Update npc completely if logic has started, otherwise update Autoware only - if it is Ego
+    if (npc_logic_started_) {
+      entity->onUpdate(current_time, step_time);
+    } else if (const auto ego_entity = std::dynamic_pointer_cast<const EgoEntity>(entity)) {
+      ego_entity->updateFieldOperatorApplication();
+    }
+    return entity->getCanonicalizedStatus();
+  } else {
+    THROW_SEMANTIC_ERROR("entity ", std::quoted(name), " does not exist.");
+  }
 }
 
 void EntityManager::update(const double current_time, const double step_time)
 {
   traffic_simulator::helper::StopWatch<std::chrono::milliseconds> stop_watch_update(
     "EntityManager::update", configuration.verbose);
-  step_time_ = step_time;
-  current_time_ = current_time;
   setVerbose(configuration.verbose);
   if (npc_logic_started_) {
     conventional_traffic_light_updater_.createTimer(
@@ -404,7 +387,7 @@ void EntityManager::update(const double current_time, const double step_time)
   }
   all_status.clear();
   for (auto && [name, entity] : entities_) {
-    all_status.emplace(name, updateNpcLogic(name));
+    all_status.emplace(name, updateNpcLogic(name, current_time, step_time));
   }
   for (auto && [name, entity] : entities_) {
     entity->setOtherStatus(all_status);
@@ -423,6 +406,7 @@ void EntityManager::update(const double current_time, const double step_time)
       status_with_trajectory.obstacle_find = false;
     }
     status_with_trajectory.status = static_cast<EntityStatus>(status);
+    status_with_trajectory.status.time = current_time + step_time;
     status_with_trajectory.name = name;
     status_with_trajectory.time = current_time + step_time;
     status_array_msg.data.emplace_back(status_with_trajectory);
@@ -432,7 +416,6 @@ void EntityManager::update(const double current_time, const double step_time)
   if (configuration.verbose) {
     stop_watch_update.print();
   }
-  current_time_ += step_time;
 }
 
 void EntityManager::updateHdmapMarker()
@@ -447,14 +430,12 @@ void EntityManager::updateHdmapMarker()
   lanelet_marker_pub_ptr_->publish(markers);
 }
 
-void EntityManager::startNpcLogic(const double current_time)
+auto EntityManager::startNpcLogic(const double current_time) -> void
 {
   npc_logic_started_ = true;
 
-  current_time_ = current_time;
-
   for ([[maybe_unused]] auto && [name, entity] : entities_) {
-    entity->startNpcLogic(current_time_);
+    entity->updateEntityStatusTimestamp(current_time);
   }
 }
 }  // namespace entity
