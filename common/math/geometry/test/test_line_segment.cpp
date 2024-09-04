@@ -99,13 +99,13 @@ TEST(LineSegment, getIntersection2DDisjoint)
 TEST(LineSegment, getVector)
 {
   const math::geometry::LineSegment line(makePoint(1.0, 2.0, 3.0), makePoint(2.0, 3.0, 4.0));
-  EXPECT_VECTOR3_EQ(line.getVector(), makeVector(1.0, 1.0, 1.0));
+  EXPECT_VECTOR3_EQ(line.vector, makeVector(1.0, 1.0, 1.0));
 }
 
 TEST(LineSegment, getVectorZeroLength)
 {
   const math::geometry::LineSegment line(makePoint(1.0, 2.0, 3.0), makePoint(1.0, 2.0, 3.0));
-  EXPECT_VECTOR3_EQ(line.getVector(), makeVector(0.0, 0.0, 0.0));
+  EXPECT_VECTOR3_EQ(line.vector, makeVector(0.0, 0.0, 0.0));
 }
 
 TEST(LineSegment, getNormalVector)
@@ -123,49 +123,49 @@ TEST(LineSegment, getNormalVector_zeroLength)
 TEST(LineSegment, get2DVector)
 {
   const math::geometry::LineSegment line(makePoint(1.0, 2.0, 3.0), makePoint(2.0, 3.0, 4.0));
-  EXPECT_VECTOR3_EQ(line.get2DVector(), makeVector(1.0, 1.0, 0.0));
+  EXPECT_VECTOR3_EQ(line.vector_2d, makeVector(1.0, 1.0, 0.0));
 }
 
 TEST(LineSegment, get2DVectorZeroLength)
 {
   const math::geometry::LineSegment line(makePoint(1.0, 2.0, 3.0), makePoint(1.0, 2.0, 3.0));
-  EXPECT_VECTOR3_EQ(line.get2DVector(), makeVector(0.0, 0.0, 0.0));
+  EXPECT_VECTOR3_EQ(line.vector_2d, makeVector(0.0, 0.0, 0.0));
 }
 
 TEST(LineSegment, getLength)
 {
   const math::geometry::LineSegment line(makePoint(1.0, 2.0, 3.0), makePoint(2.0, 3.0, 4.0));
-  EXPECT_DOUBLE_EQ(line.getLength(), std::sqrt(3.0));
+  EXPECT_DOUBLE_EQ(line.length, std::sqrt(3.0));
 }
 
 TEST(LineSegment, getLengthZeroLength)
 {
   const math::geometry::LineSegment line(makePoint(1.0, 2.0, 3.0), makePoint(1.0, 2.0, 3.0));
-  EXPECT_DOUBLE_EQ(line.getLength(), 0.0);
+  EXPECT_DOUBLE_EQ(line.length, 0.0);
 }
 
 TEST(LineSegment, get2DLength)
 {
   const math::geometry::LineSegment line(makePoint(1.0, 2.0, 3.0), makePoint(2.0, 3.0, 4.0));
-  EXPECT_DOUBLE_EQ(line.get2DLength(), std::sqrt(2.0));
+  EXPECT_DOUBLE_EQ(line.length_2d, std::sqrt(2.0));
 }
 
 TEST(LineSegment, get2DLengthZeroLength)
 {
   const math::geometry::LineSegment line(makePoint(1.0, 2.0, 3.0), makePoint(1.0, 2.0, 3.0));
-  EXPECT_DOUBLE_EQ(line.get2DLength(), 0.0);
+  EXPECT_DOUBLE_EQ(line.length_2d, 0.0);
 }
 
-TEST(LineSegment, getSlope)
+TEST(LineSegment, get2DVectorSlope)
 {
   const math::geometry::LineSegment line(makePoint(1.0, 2.0, 3.0), makePoint(3.0, 3.0, 4.0));
-  EXPECT_DOUBLE_EQ(line.getSlope(), 0.5);
+  EXPECT_DOUBLE_EQ(line.get2DVectorSlope(), 0.5);
 }
 
-TEST(LineSegment, getSlopeZeroLength)
+TEST(LineSegment, get2DVectorSlopeZeroLength)
 {
   const math::geometry::LineSegment line(makePoint(1.0, 2.0, 3.0), makePoint(1.0, 2.0, 3.0));
-  EXPECT_TRUE(std::isnan(line.getSlope()));
+  EXPECT_THROW(line.get2DVectorSlope(), common::SimulationError);
 }
 
 TEST(LineSegment, getSquaredDistanceIn2D)
@@ -464,109 +464,109 @@ TEST(LineSegment, isIntersect2D)
 }
 
 /// @brief In this test case, we check collision with the line segment with start point (x,y,z) = (0,-1,0) and end point (x,y,z) = (0,1,0) in the cartesian coordinate system. (variable name `line`).
-TEST(LineSegment, getIntersection2DSValue)
+TEST(LineSegment, get2DIntersectionSValue)
 {
   {
     math::geometry::LineSegment line(
       geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(-1).z(0),
       geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(1).z(0));
     /**
-     * @note Testing the `LineSegment::getIntersection2DSValue` function can find a collision with the point with (x,y,z) = (0,0,0) in the cartesian coordinate system.
+     * @note Testing the `LineSegment::get2DIntersectionSValue` function can find a collision with the point with (x,y,z) = (0,0,0) in the cartesian coordinate system.
      * In the frenet coordinate system along the `line`, the s value should be 0.5.
      * If so, the variable `collision_s` should be `std::optional<double>(0.5)`.
      */
-    // [Snippet_getIntersection2DSValue_with_point_0_0_0]
+    // [Snippet_get2DIntersectionSValue_with_point_0_0_0]
     {
-      const auto collision_s = line.getIntersection2DSValue(
+      const auto collision_s = line.get2DIntersectionSValue(
         geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0), false);
       EXPECT_TRUE(collision_s);
       if (collision_s) {
         EXPECT_DOUBLE_EQ(collision_s.value(), 0.5);
       }
     }
-    // [Snippet_getIntersection2DSValue_with_point_0_0_0]
-    /// @snippet test/test_line_segment.cpp Snippet_getIntersection2DSValue_with_point_0_0_0
+    // [Snippet_get2DIntersectionSValue_with_point_0_0_0]
+    /// @snippet test/test_line_segment.cpp Snippet_get2DIntersectionSValue_with_point_0_0_0
 
     /**
-     * @note Testing the `LineSegment::getIntersection2DSValue` function can find a collision with the point with (x,y,z) = (0,1,0) in the cartesian coordinate system.
+     * @note Testing the `LineSegment::get2DIntersectionSValue` function can find a collision with the point with (x,y,z) = (0,1,0) in the cartesian coordinate system.
      * In the frenet coordinate system along the `line`, the s value should be 1.0.
      * If so, the variable `collision_s` should be `std::optional<double>(1.0)`.
      */
-    // [Snippet_getIntersection2DSValue_with_point_0_1_0]
+    // [Snippet_get2DIntersectionSValue_with_point_0_1_0]
     {
-      const auto collision_s = line.getIntersection2DSValue(
+      const auto collision_s = line.get2DIntersectionSValue(
         geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(1).z(0), false);
       EXPECT_TRUE(collision_s);
       if (collision_s) {
         EXPECT_DOUBLE_EQ(collision_s.value(), 1.0);
       }
     }
-    // [Snippet_getIntersection2DSValue_with_point_0_1_0]
-    /// @snippet test/test_line_segment.cpp Snippet_getIntersection2DSValue_with_point_0_1_0
+    // [Snippet_get2DIntersectionSValue_with_point_0_1_0]
+    /// @snippet test/test_line_segment.cpp Snippet_get2DIntersectionSValue_with_point_0_1_0
 
     /**
-     * @note Testing the `LineSegment::getIntersection2DSValue` function can find a collision with the point with (x,y,z) = (0,1,0) in the cartesian coordinate system.
+     * @note Testing the `LineSegment::get2DIntersectionSValue` function can find a collision with the point with (x,y,z) = (0,1,0) in the cartesian coordinate system.
      * In the frenet coordinate system along the `line`, the s value should be 1.0.
-     * And, the 2nd argument of the `LineSegment::getIntersection2DSValue` (denormalized_s) is true, so the return value should be 1.0 (normalized s value.) * 2.0 (length of the `line`) = 2.0.
+     * And, the 2nd argument of the `LineSegment::get2DIntersectionSValue` (denormalized_s) is true, so the return value should be 1.0 (normalized s value.) * 2.0 (length of the `line`) = 2.0.
      * If so, the variable `collision_s` should be `std::optional<double>(2.0)`.
      */
-    // [Snippet_getIntersection2DSValue_with_point_0_1_0_denormalized]
+    // [Snippet_get2DIntersectionSValue_with_point_0_1_0_denormalized]
     {
-      const auto collision_s = line.getIntersection2DSValue(
+      const auto collision_s = line.get2DIntersectionSValue(
         geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(1).z(0), true);
       EXPECT_TRUE(collision_s);
       if (collision_s) {
         EXPECT_DOUBLE_EQ(collision_s.value(), 2.0);
       }
     }
-    // [Snippet_getIntersection2DSValue_with_point_0_1_0_denormalized]
-    /// @snippet test/test_line_segment.cpp Snippet_getIntersection2DSValue_with_point_0_1_0_denormalized
+    // [Snippet_get2DIntersectionSValue_with_point_0_1_0_denormalized]
+    /// @snippet test/test_line_segment.cpp Snippet_get2DIntersectionSValue_with_point_0_1_0_denormalized
 
     /**
-     * @note Testing the `LineSegment::getIntersection2DSValue` function can find a collision with the point with (x,y,z) = (0,0,0) in the cartesian coordinate system.
+     * @note Testing the `LineSegment::get2DIntersectionSValue` function can find a collision with the point with (x,y,z) = (0,0,0) in the cartesian coordinate system.
      * In the frenet coordinate system along the `line`, the s value should be 0.5.
-     * And, the 2nd argument of the `LineSegment::getIntersection2DSValue` (denormalized_s) is true, so the return value should be 0.5 (normalized s value.) * 2.0 (length of the `line`) = 1.0.
+     * And, the 2nd argument of the `LineSegment::get2DIntersectionSValue` (denormalized_s) is true, so the return value should be 0.5 (normalized s value.) * 2.0 (length of the `line`) = 1.0.
      * If so, the variable `collision_s` should be `std::optional<double>(1.0)`.
      */
-    // [Snippet_getIntersection2DSValue_with_point_0_0_0_denormalized]
+    // [Snippet_get2DIntersectionSValue_with_point_0_0_0_denormalized]
     {
-      const auto collision_s = line.getIntersection2DSValue(
+      const auto collision_s = line.get2DIntersectionSValue(
         geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0), true);
       EXPECT_TRUE(collision_s);
       if (collision_s) {
         EXPECT_DOUBLE_EQ(collision_s.value(), 1.0);
       }
     }
-    // [Snippet_getIntersection2DSValue_with_point_0_0_0_denormalized]
-    /// @snippet test/test_line_segment.cpp Snippet_getIntersection2DSValue_with_point_0_0_0_denormalized
+    // [Snippet_get2DIntersectionSValue_with_point_0_0_0_denormalized]
+    /// @snippet test/test_line_segment.cpp Snippet_get2DIntersectionSValue_with_point_0_0_0_denormalized
 
     /**
-     * @note Testing the `LineSegment::getIntersection2DSValue` function can find that the point with (x,y,z) = (1,0,0) in the cartesian coordinate system does not collide to `line.`.
+     * @note Testing the `LineSegment::get2DIntersectionSValue` function can find that the point with (x,y,z) = (1,0,0) in the cartesian coordinate system does not collide to `line.`.
      * If the function works valid, the variable `collision_s` should be `std::nullopt`.
      */
-    // [Snippet_getIntersection2DSValue_with_point_1_0_0]
+    // [Snippet_get2DIntersectionSValue_with_point_1_0_0]
     {
-      const auto collision_s = line.getIntersection2DSValue(
+      const auto collision_s = line.get2DIntersectionSValue(
         geometry_msgs::build<geometry_msgs::msg::Point>().x(1).y(0).z(0), false);
       EXPECT_FALSE(collision_s);
     }
-    // [Snippet_getIntersection2DSValue_with_point_1_0_0]
-    /// @snippet test/test_line_segment.cpp Snippet_getIntersection2DSValue_with_point_1_0_0
+    // [Snippet_get2DIntersectionSValue_with_point_1_0_0]
+    /// @snippet test/test_line_segment.cpp Snippet_get2DIntersectionSValue_with_point_1_0_0
 
     {  // parallel no denormalize
       EXPECT_THROW(
-        line.getIntersection2DSValue(
+        line.get2DIntersectionSValue(
           math::geometry::LineSegment(makePoint(0.0, -1.0), makePoint(0.0, 1.0)), false),
         common::SimulationError);
     }
     {  // parallel denormalize
       EXPECT_THROW(
-        line.getIntersection2DSValue(
+        line.get2DIntersectionSValue(
           math::geometry::LineSegment(makePoint(0.0, -1.0), makePoint(0.0, 1.0)), true),
         common::SimulationError);
     }
     {  // intersect no denormalize
-      const auto collision_s = line.getIntersection2DSValue(
+      const auto collision_s = line.get2DIntersectionSValue(
         math::geometry::LineSegment(makePoint(-1.0, 0.5), makePoint(1.0, 0.5)), false);
       EXPECT_TRUE(collision_s);
       if (collision_s) {
@@ -574,7 +574,7 @@ TEST(LineSegment, getIntersection2DSValue)
       }
     }
     {  // intersect denormalize
-      const auto collision_s = line.getIntersection2DSValue(
+      const auto collision_s = line.get2DIntersectionSValue(
         math::geometry::LineSegment(makePoint(-1.0, 0.5), makePoint(1.0, 0.5)), true);
       EXPECT_TRUE(collision_s);
       if (collision_s) {
@@ -582,12 +582,12 @@ TEST(LineSegment, getIntersection2DSValue)
       }
     }
     {  // no intersect no denormalize
-      const auto collision_s = line.getIntersection2DSValue(
+      const auto collision_s = line.get2DIntersectionSValue(
         math::geometry::LineSegment(makePoint(-1.0, 1.5), makePoint(1.0, 1.5)), false);
       EXPECT_FALSE(collision_s);
     }
     {  // no intersect denormalize
-      const auto collision_s = line.getIntersection2DSValue(
+      const auto collision_s = line.get2DIntersectionSValue(
         math::geometry::LineSegment(makePoint(-1.0, 1.5), makePoint(1.0, 1.5)), true);
       EXPECT_FALSE(collision_s);
     }
