@@ -133,12 +133,16 @@ def launch_setup(context, *args, **kwargs):
             {"rviz_config": rviz_config},
             {"sensor_model": sensor_model},
             {"sigterm_timeout": sigterm_timeout},
+            {"use_sim_time": use_sim_time},
             {"vehicle_model": vehicle_model},
         ]
 
         parameters += make_vehicle_parameters()
 
-        if (it := [item[0][9:] + ':=' + item[1] for item in context.launch_configurations.items() if item[0][:9] == 'autoware.']) != []:
+        def make_prefixed_parameters():
+            return [item[0][9:] + ':=' + item[1] for item in context.launch_configurations.items() if item[0][:9] == 'autoware.']
+
+        if (it := make_prefixed_parameters()) != []:
             parameters += [{"autoware.": it}]
 
         return parameters
@@ -201,7 +205,7 @@ def launch_setup(context, *args, **kwargs):
             namespace="simulation",
             output="screen",
             on_exit=ShutdownOnce(),
-            parameters=make_parameters() + [{"use_sim_time": use_sim_time}],
+            parameters=make_parameters(),
             condition=IfCondition(launch_simple_sensor_simulator),
         ),
         # The `name` keyword overrides the name for all created nodes, so duplicated nodes appear.
@@ -214,7 +218,7 @@ def launch_setup(context, *args, **kwargs):
             executable="openscenario_interpreter_node",
             namespace="simulation",
             output="screen",
-            parameters=[{"use_sim_time": use_sim_time}]+make_parameters(),
+            parameters=make_parameters(),
             prefix=make_launch_prefix(),
             on_exit=ShutdownOnce(),
         ),
