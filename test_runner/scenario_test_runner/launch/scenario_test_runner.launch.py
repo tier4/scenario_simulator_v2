@@ -31,8 +31,6 @@ from pathlib import Path
 
 from scenario_test_runner.shutdown_once import ShutdownOnce
 
-import re
-
 
 def architecture_types():
     return ["awf/universe", "awf/universe/20230906"]
@@ -140,18 +138,8 @@ def launch_setup(context, *args, **kwargs):
 
         parameters += make_vehicle_parameters()
 
-        list_of_string = []
-
-        pattern = re.compile("[Aa]utoware\..*")
-
-        for each in context.launch_configurations.items():
-            if (pattern.match(each[0])):
-                list_of_string.append(each[0][9:] + ":=" + each[1])
-
-        if list_of_string != []:
-            parameters += [
-                {"autoware.": list_of_string}
-            ]
+        if (it := [item[0][9:] + ':=' + item[1] for item in context.launch_configurations.items() if item[0][:9] == 'autoware.']) != []:
+            parameters += [{"autoware.": it}]
 
         return parameters
 
