@@ -41,8 +41,6 @@ auto EgoEntity::makeFieldOperatorApplication(
   if (const auto architecture_type =
         getParameter<std::string>(node_parameters, "architecture_type", "awf/universe");
       architecture_type.find("awf/universe") != std::string::npos) {
-    auto boolalpha = [](bool value) { return std::string(value ? "true" : "false"); };
-
     auto parameters = getParameter<std::vector<std::string>>(node_parameters, "autoware.", {});
 
     // clang-format off
@@ -54,8 +52,8 @@ auto EgoEntity::makeFieldOperatorApplication(
     parameters.push_back("rviz_config:=" + getParameter<std::string>(node_parameters, "rviz_config"));
     parameters.push_back("scenario_simulation:=true");
     parameters.push_back("use_foa:=false");
-    parameters.push_back("perception/enable_traffic_light:=" + boolalpha(architecture_type >= "awf/universe/20230906"));
-    parameters.push_back("use_sim_time:=" + boolalpha(getParameter<bool>(node_parameters, "use_sim_time", false)));
+    parameters.push_back("perception/enable_traffic_light:=" + std::string(architecture_type >= "awf/universe/20230906" ? "true" : "false"));
+    parameters.push_back("use_sim_time:=" + std::string(getParameter<bool>(node_parameters, "use_sim_time", false) ? "true" : "false"));
     // clang-format on
 
     return getParameter<bool>(node_parameters, "launch_autoware", true)

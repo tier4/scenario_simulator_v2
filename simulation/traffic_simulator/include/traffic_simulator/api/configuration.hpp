@@ -16,7 +16,6 @@
 #define TRAFFIC_SIMULATOR__API__CONFIGURATION_HPP_
 
 #include <algorithm>
-#include <ament_index_cpp/get_package_share_directory.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/range/iterator_range.hpp>
