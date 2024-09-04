@@ -137,27 +137,25 @@ def launch_setup(context, *args, **kwargs):
             {"vehicle_model": vehicle_model},
         ]
 
-        parameters += make_vehicle_parameters()
+        def collect_vehicle_parameters():
+            if vehicle_model_name := vehicle_model.perform(context):
+                description = get_package_share_directory(vehicle_model_name + "_description")
+                return [
+                    description + "/config/vehicle_info.param.yaml",
+                    description + "/config/simulator_model.param.yaml",
+                ]
+            else:
+                return []
 
-        def make_prefixed_parameters():
+        if (it := collect_vehicle_parameters()) != []:
+            parameters += it
+
+        def collect_prefixed_parameters():
             return [item[0][9:] + ':=' + item[1] for item in context.launch_configurations.items() if item[0][:9] == 'autoware.']
 
-        if (it := make_prefixed_parameters()) != []:
+        if (it := collect_prefixed_parameters()) != []:
             parameters += [{"autoware.": it}]
 
-        return parameters
-
-    def make_vehicle_parameters():
-        parameters = []
-
-        def description():
-            return get_package_share_directory(
-                vehicle_model.perform(context) + "_description"
-            )
-
-        if vehicle_model.perform(context):
-            parameters.append(description() + "/config/vehicle_info.param.yaml")
-            parameters.append(description() + "/config/simulator_model.param.yaml")
         return parameters
 
     return [
