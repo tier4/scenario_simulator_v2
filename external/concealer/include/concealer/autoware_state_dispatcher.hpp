@@ -48,9 +48,11 @@ public:
 
   void unregisterTask(std::string state) { tasks.erase(state); }
 
-  void unregisterAllTasks() { tasks.clear(); }
+  void requestUnregisterAllTasks() { task_clear_requested.store(true); }
 
 private:
+  void unregisterAllTasks() { tasks.clear(); }
+
   void onStateChanged(const std::string & pre_state, const std::string & state)
   {
     std::cout << "AutowareState changed from " << pre_state << " to " << state << std::endl;
@@ -58,6 +60,10 @@ private:
 
   void executeTask(std::string state, const rclcpp::Time & now)
   {
+    if (task_clear_requested.load()) {
+      unregisterAllTasks();
+      task_clear_requested.store(false);
+    }
     if (auto it = tasks.find(state); it != tasks.end()) {
       for (auto & task : it->second) {
         task(now);
@@ -96,6 +102,8 @@ private:
   };
 
   std::unordered_map<std::string, std::vector<Task>> tasks;
+
+  std::atomic<bool> task_clear_requested = false;
 };
 
 #endif  // CONCEALER__AUTOWARE_STATE_DISPATCHER_HPP_
