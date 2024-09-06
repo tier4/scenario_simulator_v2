@@ -194,8 +194,8 @@ TEST_F(CanonicalizedLaneletPoseTest, getAlternativeLaneletPoseBaseOnShortestRout
   const auto result1 = pose.getAlternativeLaneletPoseBaseOnShortestRouteFrom(from1, hdmap_utils);
   const auto result2 = pose.getAlternativeLaneletPoseBaseOnShortestRouteFrom(from2, hdmap_utils);
 
-  ASSERT_TRUE(result1);
-  ASSERT_TRUE(result2);
+  ASSERT_TRUE(result1.has_value());
+  ASSERT_TRUE(result2.has_value());
 
   EXPECT_EQ(result1.value().lanelet_id, 120659);
   EXPECT_EQ(result2.value().lanelet_id, 120659);
@@ -214,8 +214,8 @@ TEST_F(CanonicalizedLaneletPoseTest, getAlternativeLaneletPoseBaseOnShortestRout
   const auto result1 = pose.getAlternativeLaneletPoseBaseOnShortestRouteFrom(from1, hdmap_utils);
   const auto result2 = pose.getAlternativeLaneletPoseBaseOnShortestRouteFrom(from2, hdmap_utils);
 
-  ASSERT_TRUE(result1);
-  ASSERT_TRUE(result2);
+  ASSERT_TRUE(result1.has_value());
+  ASSERT_TRUE(result2.has_value());
 
   EXPECT_EQ(result1.value().lanelet_id, 34603);
   EXPECT_EQ(result2.value().lanelet_id, 34603);
@@ -234,8 +234,8 @@ TEST_F(CanonicalizedLaneletPoseTest, getAlternativeLaneletPoseBaseOnShortestRout
   const auto result1 = pose.getAlternativeLaneletPoseBaseOnShortestRouteFrom(from1, hdmap_utils);
   const auto result2 = pose.getAlternativeLaneletPoseBaseOnShortestRouteFrom(from2, hdmap_utils);
 
-  ASSERT_TRUE(result1);
-  ASSERT_TRUE(result2);
+  ASSERT_TRUE(result1.has_value());
+  ASSERT_TRUE(result2.has_value());
 
   EXPECT_EQ(result1.value().lanelet_id, 34603);
   EXPECT_EQ(result2.value().lanelet_id, 34579);
