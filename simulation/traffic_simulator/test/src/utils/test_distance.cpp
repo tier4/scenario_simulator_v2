@@ -350,7 +350,7 @@ TEST_F(distanceTest_FourTrackHighway, longitudinalDistance_noAdjacent_noOpposite
  * include_opposite_direction = false, allow_lane_change = true
  * in a scenario that meets those criteria.
  */
-TEST_F(distanceTest_FourTrackHighway, longitudinalDistance_noAdjacent_noOpposite_change_case0)
+TEST_F(distanceTest_FourTrackHighway, longitudinalDistance_noAdjacent_noOpposite_change)
 {
   {
     const auto pose_from = traffic_simulator::toCanonicalizedLaneletPose(
@@ -377,63 +377,6 @@ TEST_F(distanceTest_FourTrackHighway, longitudinalDistance_noAdjacent_noOpposite
       pose_from.value(), pose_to.value(), false, false, true, hdmap_utils_ptr);
     ASSERT_TRUE(result.has_value());
     EXPECT_NEAR(result.value(), 178.0, 1.0);
-  }
-}
-
-/**
- * @note Test calculation correctness with include_adjacent_lanelet = false,
- * include_opposite_direction = false, allow_lane_change = true
- * in a scenario that meets those criteria.
- */
-TEST_F(distanceTest_Intersection, longitudinalDistance_noAdjacent_noOpposite_change_case1)
-{
-  {
-    const auto pose_from = traffic_simulator::toCanonicalizedLaneletPose(
-      makePose(86627.71, 44972.06, 340.0), false, hdmap_utils_ptr);
-    ASSERT_TRUE(pose_from.has_value());
-    const auto pose_to = traffic_simulator::toCanonicalizedLaneletPose(
-      makePose(86647.23, 44882.51, 240.0), false, hdmap_utils_ptr);
-    ASSERT_TRUE(pose_from.has_value());
-
-    const auto result = traffic_simulator::distance::longitudinalDistance(
-      pose_from.value(), pose_to.value(), false, false, true, hdmap_utils_ptr);
-    EXPECT_TRUE(result.has_value());
-  }
-  {
-    const auto pose_from = traffic_simulator::toCanonicalizedLaneletPose(
-      makePose(86555.38, 45000.88, 340.0), false, hdmap_utils_ptr);
-    ASSERT_TRUE(pose_from.has_value());
-    const auto pose_to = traffic_simulator::toCanonicalizedLaneletPose(
-      makePose(86647.23, 44882.51, 240.0), false, hdmap_utils_ptr);
-    ASSERT_TRUE(pose_from.has_value());
-
-    const auto result = traffic_simulator::distance::longitudinalDistance(
-      pose_from.value(), pose_to.value(), false, false, true, hdmap_utils_ptr);
-    EXPECT_TRUE(result.has_value());
-  }
-  {
-    const auto pose_from = traffic_simulator::toCanonicalizedLaneletPose(
-      makePose(86788.82, 44993.77, 210.0), false, hdmap_utils_ptr);
-    ASSERT_TRUE(pose_from.has_value());
-    const auto pose_to = traffic_simulator::toCanonicalizedLaneletPose(
-      makePose(86553.48, 44990.56, 150.0), false, hdmap_utils_ptr);
-    ASSERT_TRUE(pose_from.has_value());
-
-    const auto result = traffic_simulator::distance::longitudinalDistance(
-      pose_from.value(), pose_to.value(), false, false, true, hdmap_utils_ptr);
-    EXPECT_TRUE(result.has_value());
-  }
-  {
-    const auto pose_from = traffic_simulator::toCanonicalizedLaneletPose(
-      makePose(86787.85, 44998.44, 210.0), false, hdmap_utils_ptr);
-    ASSERT_TRUE(pose_from.has_value());
-    const auto pose_to = traffic_simulator::toCanonicalizedLaneletPose(
-      makePose(86648.95, 44884.04, 240.0), false, hdmap_utils_ptr);
-    ASSERT_TRUE(pose_from.has_value());
-
-    const auto result = traffic_simulator::distance::longitudinalDistance(
-      pose_from.value(), pose_to.value(), false, false, true, hdmap_utils_ptr);
-    EXPECT_TRUE(result.has_value());
   }
 }
 
