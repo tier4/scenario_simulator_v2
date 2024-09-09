@@ -21,6 +21,9 @@ Changelog for package status_monitor
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+4.2.0 (2024-09-09)
+------------------
+
 4.1.1 (2024-09-03)
 ------------------
 * Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
