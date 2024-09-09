@@ -277,7 +277,6 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::initialize(
     tier4_system_msgs::msg::AutowareState::INITIALIZING_VEHICLE,
     [this, initial_pose]() {
       initialize_was_called = true;
-    //      if (not std::exchange(initialize_was_called, true)) {
 
 #if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)
       if (
@@ -301,7 +300,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::initialize(
         return;
       }
     },
-    rclcpp::Duration::from_seconds(10.0));
+    rclcpp::Duration::from_seconds(1.0));
 }
 
 auto FieldOperatorApplicationFor<AutowareUniverse>::plan(
