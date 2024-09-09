@@ -60,9 +60,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          PR_BRANCH="pr-${{ github.event.pull_request.number }}"
-          git fetch origin "pull/${{ github.event.pull_request.number }}/head:$PR_BRANCH"
-          git push origin "$PR_BRANCH"
+          git remote add fork ${{ github.event.pull_request.head.repo.full_name }}
+          git checkout fork ${{ github.event.pull_request.head.ref }}
+          git push origin ${{ github.event.pull_request.head.ref }}
+          git checkout origin master
 
       - name: Get old version
         id: old_version
