@@ -184,12 +184,8 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
       [this]() {
         withTimeoutHandler(defaultTimeoutHandler(), [this]() {
           if (std::isnan(evaluateSimulationTime())) {
-            if (not waiting_for_engagement_to_be_completed and engageable()) {
-              engage();
-              waiting_for_engagement_to_be_completed = true;  // NOTE: DIRTY HACK!!!
-            } else if (engaged()) {
+            if (engaged()) {
               activateNonUserDefinedControllers();
-              waiting_for_engagement_to_be_completed = false;  // NOTE: DIRTY HACK!!!
             }
           } else if (currentScenarioDefinition()) {
             currentScenarioDefinition()->evaluate();

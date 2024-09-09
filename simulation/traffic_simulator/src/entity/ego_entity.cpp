@@ -211,7 +211,7 @@ void EgoEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &
   if (not field_operator_application->initialized()) {
     field_operator_application->initialize(getMapPose());
     field_operator_application->plan(route);
-    // NOTE: engage() will be executed at simulation-time 0.
+    field_operator_application->engage();
   } else {
     field_operator_application->plan(route);
     field_operator_application->engage();
