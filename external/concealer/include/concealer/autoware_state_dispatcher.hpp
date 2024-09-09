@@ -107,9 +107,13 @@ private:
 
         int64_t duration_nanoseconds = now.nanoseconds() - next_execution.nanoseconds();
         int64_t interval_nanoseconds = interval.nanoseconds();
-        next_execution =
-          now + rclcpp::Duration::from_nanoseconds(
-                  interval_nanoseconds - (duration_nanoseconds % interval_nanoseconds));
+        if (interval_nanoseconds != 0) {
+          next_execution =
+            now + rclcpp::Duration::from_nanoseconds(
+                    interval_nanoseconds - (duration_nanoseconds % interval_nanoseconds));
+        } else {
+          next_execution = now;
+        }
       }
     }
   };
