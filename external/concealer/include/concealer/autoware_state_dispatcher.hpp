@@ -16,6 +16,7 @@
 #define CONCEALER__AUTOWARE_STATE_DISPATCHER_HPP_
 
 #include <functional>
+#include <future>
 #include <iostream>
 #include <rclcpp/rclcpp.hpp>
 #include <unordered_map>
@@ -68,8 +69,6 @@ private:
       for (auto & task : it->second) {
         task(now);
       }
-    } else {
-      std::cout << "No task for state: " << state << std::endl;
     }
   }
 
@@ -77,20 +76,34 @@ private:
 
   struct Task
   {
-    std::function<void()> task;
+    std::function<void()> task_function;
+
     rclcpp::Duration interval;
+
     rclcpp::Time next_execution;
 
+    std::future<void> future;
+
     Task(std::function<void()> t, rclcpp::Duration i)
-    : task(std::move(t)), interval(i), next_execution(rclcpp::Time(0, 0, RCL_ROS_TIME))
+    : task_function(std::move(t)), interval(i), next_execution(rclcpp::Time(0, 0, RCL_ROS_TIME))
     {
     }
 
     void operator()(const rclcpp::Time & now)
     {
+      if (
+        future.valid() and future.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+        future.get();
+      }
+
       if (now >= next_execution) {
-        std::cout << "Executing task" << std::endl;
-        task();
+        if (not future.valid()) {
+          // pop new task
+          auto task = std::packaged_task<void()>(task_function);
+          future = task.get_future();
+          auto worker = std::thread(std::move(task));
+          worker.detach();
+        }
 
         int64_t duration_nanoseconds = now.nanoseconds() - next_execution.nanoseconds();
         int64_t interval_nanoseconds = interval.nanoseconds();
