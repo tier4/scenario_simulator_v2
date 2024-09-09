@@ -21,6 +21,15 @@ Changelog for package traffic_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+4.2.0 (2024-09-09)
+------------------
+* Merge pull request `#1362 <https://github.com/tier4/scenario_simulator_v2/issues/1362>`_ from tier4/feature/ros2-parameter-forwarding
+* Cleanup
+* Move parameter `use_sim_time` into function `make_parameters`
+* Remove data member `traffic_simulator::Configuration::rviz_config_path`
+* Add feature to forward parameters prefixed with `autoware.` to Autoware
+* Contributors: Kotaro Yoshimoto, yamacir-kit
+
 4.1.1 (2024-09-03)
 ------------------
 * Merge pull request `#1207 <https://github.com/tier4/scenario_simulator_v2/issues/1207>`_ from tier4/fix/use-sim-time-for-real-time-factor-control
