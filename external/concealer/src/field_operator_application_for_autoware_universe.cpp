@@ -368,7 +368,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::engage() -> void
       }
     });
   autoware_state_dispatcher.registerTask(tier4_system_msgs::msg::AutowareState::DRIVING, [this]() {
-    autoware_state_dispatcher.unregisterAllTasks();
+    autoware_state_dispatcher.requestUnregisterAllTasks();
   });
 }
 
