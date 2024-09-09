@@ -1547,6 +1547,10 @@ auto HdMapUtils::getLongitudinalDistance(
   if (route.empty()) {
     return std::nullopt;
   }
+  for (const auto & id : route) {
+    printf("%ld ", id);
+  }
+  printf("\n");
   double distance = 0;
 
   auto with_lane_change = [this](
