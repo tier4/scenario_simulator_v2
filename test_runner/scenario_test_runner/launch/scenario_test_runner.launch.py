@@ -58,6 +58,10 @@ def default_autoware_launch_file_of(architecture_type):
     }[architecture_type]
 
 
+def default_rviz_config_file():
+    return Path(get_package_share_directory("traffic_simulator")) / "config/scenario_simulator_v2.rviz"
+
+
 def launch_setup(context, *args, **kwargs):
     # fmt: off
     architecture_type                   = LaunchConfiguration("architecture_type",                      default="awf/universe/20230906")
@@ -77,7 +81,7 @@ def launch_setup(context, *args, **kwargs):
     port                                = LaunchConfiguration("port",                                   default=5555)
     publish_empty_context               = LaunchConfiguration("publish_empty_context",                  default=False)
     record                              = LaunchConfiguration("record",                                 default=True)
-    rviz_config                         = LaunchConfiguration("rviz_config",                            default="")
+    rviz_config                         = LaunchConfiguration("rviz_config",                            default=default_rviz_config_file())
     scenario                            = LaunchConfiguration("scenario",                               default=Path("/dev/null"))
     sensor_model                        = LaunchConfiguration("sensor_model",                           default="")
     sigterm_timeout                     = LaunchConfiguration("sigterm_timeout",                        default=8)
@@ -129,22 +133,29 @@ def launch_setup(context, *args, **kwargs):
             {"rviz_config": rviz_config},
             {"sensor_model": sensor_model},
             {"sigterm_timeout": sigterm_timeout},
+            {"use_sim_time": use_sim_time},
             {"vehicle_model": vehicle_model},
         ]
-        parameters += make_vehicle_parameters()
-        return parameters
 
-    def make_vehicle_parameters():
-        parameters = []
+        def collect_vehicle_parameters():
+            if vehicle_model_name := vehicle_model.perform(context):
+                description = get_package_share_directory(vehicle_model_name + "_description")
+                return [
+                    description + "/config/vehicle_info.param.yaml",
+                    description + "/config/simulator_model.param.yaml",
+                ]
+            else:
+                return []
 
-        def description():
-            return get_package_share_directory(
-                vehicle_model.perform(context) + "_description"
-            )
+        if (it := collect_vehicle_parameters()) != []:
+            parameters += it
 
-        if vehicle_model.perform(context):
-            parameters.append(description() + "/config/vehicle_info.param.yaml")
-            parameters.append(description() + "/config/simulator_model.param.yaml")
+        def collect_prefixed_parameters():
+            return [item[0][9:] + ':=' + item[1] for item in context.launch_configurations.items() if item[0][:9] == 'autoware.']
+
+        if (it := collect_prefixed_parameters()) != []:
+            parameters += [{"autoware.": it}]
+
         return parameters
 
     return [
@@ -192,7 +203,7 @@ def launch_setup(context, *args, **kwargs):
             namespace="simulation",
             output="screen",
             on_exit=ShutdownOnce(),
-            parameters=make_parameters() + [{"use_sim_time": True}],
+            parameters=make_parameters(),
             condition=IfCondition(launch_simple_sensor_simulator),
         ),
         # The `name` keyword overrides the name for all created nodes, so duplicated nodes appear.
@@ -205,7 +216,7 @@ def launch_setup(context, *args, **kwargs):
             executable="openscenario_interpreter_node",
             namespace="simulation",
             output="screen",
-            parameters=[{"use_sim_time": use_sim_time}]+make_parameters(),
+            parameters=make_parameters(),
             prefix=make_launch_prefix(),
             on_exit=ShutdownOnce(),
         ),
@@ -229,13 +240,7 @@ def launch_setup(context, *args, **kwargs):
             name="rviz2",
             output={"stderr": "log", "stdout": "log"},
             condition=IfCondition(launch_rviz),
-            arguments=[
-                "-d",
-                str(
-                    Path(get_package_share_directory("traffic_simulator"))
-                    / "config/scenario_simulator_v2.rviz"
-                ),
-            ],
+            arguments=["-d", str(default_rviz_config_file())],
         ),
     ]
 
