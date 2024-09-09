@@ -55,6 +55,15 @@ jobs:
           git config --global credential.helper ${{ secrets.GITHUB_TOKEN }}
           git config pull.rebase false
 
+      - name: Copy branch to upstream
+        if: github.event.pull_request.head.repo.full_name != github.repository
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_BRANCH="pr-${{ github.event.pull_request.number }}"
+          git fetch origin "pull/${{ github.event.pull_request.number }}/head:$PR_BRANCH"
+          git push origin "$PR_BRANCH"
+
       - name: Get old version
         id: old_version
         run: |
