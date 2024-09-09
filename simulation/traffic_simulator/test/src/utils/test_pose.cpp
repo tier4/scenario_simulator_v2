@@ -42,39 +42,39 @@ protected:
 };
 
 /**
- * @note test created object values
+ * @note Test created object values.
  */
 TEST(pose, quietNaNPose)
 {
   const auto pose = traffic_simulator::pose::quietNaNPose();
 
-  EXPECT_TRUE(isnan(pose.position.x));
-  EXPECT_TRUE(isnan(pose.position.y));
-  EXPECT_TRUE(isnan(pose.position.z));
+  EXPECT_TRUE(std::isnan(pose.position.x));
+  EXPECT_TRUE(std::isnan(pose.position.y));
+  EXPECT_TRUE(std::isnan(pose.position.z));
 
-  EXPECT_EQ(pose.orientation.x, 0);
-  EXPECT_EQ(pose.orientation.y, 0);
-  EXPECT_EQ(pose.orientation.z, 0);
-  EXPECT_EQ(pose.orientation.w, 1);
+  EXPECT_DOUBLE_EQ(pose.orientation.x, 0.0);
+  EXPECT_DOUBLE_EQ(pose.orientation.y, 0.0);
+  EXPECT_DOUBLE_EQ(pose.orientation.z, 0.0);
+  EXPECT_DOUBLE_EQ(pose.orientation.w, 1.0);
 }
 
 /**
- * @note test created object values
+ * @note Test created object values.
  */
 TEST(pose, quietNaNLaneletPose)
 {
   const auto pose = traffic_simulator::pose::quietNaNLaneletPose();
 
   EXPECT_EQ(pose.lanelet_id, std::numeric_limits<std::int64_t>::max());
-  EXPECT_TRUE(isnan(pose.s));
-  EXPECT_TRUE(isnan(pose.offset));
-  EXPECT_TRUE(isnan(pose.rpy.x));
-  EXPECT_TRUE(isnan(pose.rpy.y));
-  EXPECT_TRUE(isnan(pose.rpy.z));
+  EXPECT_TRUE(std::isnan(pose.s));
+  EXPECT_TRUE(std::isnan(pose.offset));
+  EXPECT_TRUE(std::isnan(pose.rpy.x));
+  EXPECT_TRUE(std::isnan(pose.rpy.y));
+  EXPECT_TRUE(std::isnan(pose.rpy.z));
 }
 
 /**
- * @note test canonicalization with a default constructed LaneletPose
+ * @note Test canonicalization with a default constructed LaneletPose.
  */
 TEST_F(PoseTest, canonicalize_default)
 {
@@ -85,7 +85,7 @@ TEST_F(PoseTest, canonicalize_default)
 }
 
 /**
- * @note test canonicalization with an invalid LaneletPose
+ * @note Test canonicalization with an invalid LaneletPose.
  */
 TEST_F(PoseTest, canonicalize_invalid)
 {
@@ -96,7 +96,7 @@ TEST_F(PoseTest, canonicalize_invalid)
 }
 
 /**
- * @note test canonicalization with a valid constructed LaneletPose
+ * @note Test canonicalization with a valid constructed LaneletPose.
  */
 TEST_F(PoseTest, canonicalize_valid)
 {
@@ -110,7 +110,7 @@ TEST_F(PoseTest, canonicalize_valid)
 }
 
 /**
- * @note test conversion to geometry_msgs::msg::Pose from CanonicalizedLaneletPose
+ * @note Test conversion to geometry_msgs::msg::Pose from CanonicalizedLaneletPose.
  */
 TEST_F(PoseTest, toMapPose_CanonicalizedLaneletPose)
 {
@@ -119,13 +119,13 @@ TEST_F(PoseTest, toMapPose_CanonicalizedLaneletPose)
 
   const geometry_msgs::msg::Pose pose = makePose(
     makePoint(81585.1622, 50176.9202, 34.2595),
-    geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0).y(0).z(-0.6397).w(0.7686));
+    geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0.0).y(0.0).z(-0.6397).w(0.7686));
 
   EXPECT_POSE_NEAR(traffic_simulator::pose::toMapPose(canonicalized_pose), pose, 0.01);
 }
 
 /**
- * @note test conversion to geometry_msgs::msg::Pose from LaneletPose with HdMapUtils pointer
+ * @note Test conversion to geometry_msgs::msg::Pose from LaneletPose with HdMapUtils pointer.
  */
 TEST_F(PoseTest, toMapPose_LaneletPose)
 {
@@ -139,7 +139,7 @@ TEST_F(PoseTest, toMapPose_LaneletPose)
 }
 
 /**
- * @note test function behavior with a pose that can be canonicalized
+ * @note Test function behavior with a pose that can be canonicalized.
  */
 TEST_F(PoseTest, toCanonicalizedLaneletPose_noBoundingBox_noRoute_valid)
 {
@@ -159,7 +159,7 @@ TEST_F(PoseTest, toCanonicalizedLaneletPose_noBoundingBox_noRoute_valid)
 }
 
 /**
- * @note test function behavior with a pose that can not be canonicalized
+ * @note Test function behavior with a pose that can not be canonicalized.
  */
 TEST_F(PoseTest, toCanonicalizedLaneletPose_noBoundingBox_noRoute_invalid)
 {
@@ -170,7 +170,7 @@ TEST_F(PoseTest, toCanonicalizedLaneletPose_noBoundingBox_noRoute_invalid)
 }
 
 /**
- * @note test function behavior with a pose that can be canonicalized
+ * @note Test function behavior with a pose that can be canonicalized.
  */
 TEST_F(PoseTest, toCanonicalizedLaneletPose_BoundingBox_noRoute_valid)
 {
@@ -190,7 +190,7 @@ TEST_F(PoseTest, toCanonicalizedLaneletPose_BoundingBox_noRoute_valid)
 }
 
 /**
- * @note test function behavior with a pose that can not be canonicalized, matching distance too large
+ * @note Test function behavior with a pose that can not be canonicalized, matching distance too large.
  */
 TEST_F(PoseTest, toCanonicalizedLaneletPose_BoundingBox_noRoute_invalid)
 {
@@ -206,7 +206,7 @@ TEST_F(PoseTest, toCanonicalizedLaneletPose_BoundingBox_noRoute_invalid)
 }
 
 /**
- * @note test function behavior with an empty unique_route_lanelets vector and a pose that can not be canonicalized
+ * @note Test function behavior with an empty unique_route_lanelets vector and a pose that can not be canonicalized.
  */
 TEST_F(PoseTest, toCanonicalizedLaneletPose_BoundingBox_route_emptyInvalid)
 {
@@ -214,12 +214,12 @@ TEST_F(PoseTest, toCanonicalizedLaneletPose_BoundingBox_route_emptyInvalid)
 
   EXPECT_EQ(
     traffic_simulator::pose::toCanonicalizedLaneletPose(
-      pose, makeBoundingBox(), {}, true, 1.0, hdmap_utils),
+      pose, makeBoundingBox(), lanelet::Ids{}, true, 1.0, hdmap_utils),
     std::nullopt);
 }
 
 /**
- * @note test function behavior with an empty unique_route_lanelets vector and a pose that can be canonicalized
+ * @note Test function behavior with an empty unique_route_lanelets vector and a pose that can be canonicalized.
  */
 TEST_F(PoseTest, toCanonicalizedLaneletPose_BoundingBox_route_emptyValid)
 {
@@ -239,7 +239,7 @@ TEST_F(PoseTest, toCanonicalizedLaneletPose_BoundingBox_route_emptyValid)
 }
 
 /**
- * @note test function behavior with a non empty unique_route_lanelets vector and a pose that can not be canonicalized
+ * @note Test function behavior with a non empty unique_route_lanelets vector and a pose that can not be canonicalized.
  */
 TEST_F(PoseTest, toCanonicalizedLaneletPose_BoundingBox_route_nonEmptyInvalid)
 {
@@ -252,7 +252,7 @@ TEST_F(PoseTest, toCanonicalizedLaneletPose_BoundingBox_route_nonEmptyInvalid)
 }
 
 /**
- * @note test function behavior with a non empty unique_route_lanelets vector and a pose that can be canonicalized
+ * @note Test function behavior with a non empty unique_route_lanelets vector and a pose that can be canonicalized.
  */
 TEST_F(PoseTest, toCanonicalizedLaneletPose_BoundingBox_route_nonEmptyValid)
 {
@@ -272,7 +272,7 @@ TEST_F(PoseTest, toCanonicalizedLaneletPose_BoundingBox_route_nonEmptyValid)
 }
 
 /**
- * @note test calculation correctness with a non trivial example
+ * @note Test calculation correctness with a non trivial example.
  */
 TEST(pose, transformRelativePoseToGlobal)
 {
@@ -287,12 +287,12 @@ TEST(pose, transformRelativePoseToGlobal)
 }
 
 /**
- * @note test calculation correctness when only one pose is zeroed, the goal is to obtain a pose equal to the second argument
+ * @note Test calculation correctness when only one pose is zeroed, the goal is to obtain a pose equal to the second argument.
  */
 TEST(pose, relativePose_poses_zeros)
 {
-  const auto from = makePose(makePoint(0, 0, 0));
-  const auto to = makePose(makePoint(10, 51, 2));
+  const auto from = makePose(makePoint(0.0, 0.0, 0.0));
+  const auto to = makePose(makePoint(10.0, 51.0, 2.0));
   const auto relative = traffic_simulator::pose::relativePose(from, to);
 
   ASSERT_TRUE(relative.has_value());
@@ -300,12 +300,12 @@ TEST(pose, relativePose_poses_zeros)
 }
 
 /**
- * @note test calculation correctness when both poses are zeroed
+ * @note Test calculation correctness when both poses are zeroed.
  */
 TEST(pose, relativePose_poses_zero)
 {
-  const auto from = makePose(makePoint(0, 0, 0));
-  const auto to = makePose(makePoint(0, 0, 0));
+  const auto from = makePose(makePoint(0.0, 0.0, 0.0));
+  const auto to = makePose(makePoint(0.0, 0.0, 0.0));
   const auto relative = traffic_simulator::pose::relativePose(from, to);
 
   ASSERT_TRUE(relative.has_value());
@@ -313,7 +313,7 @@ TEST(pose, relativePose_poses_zero)
 }
 
 /**
- * @note ttest calculation correctness with a non trivial example
+ * @note ttest calculation correctness with a non trivial example.
  */
 TEST(pose, relativePose_poses_complex)
 {
@@ -328,7 +328,7 @@ TEST(pose, relativePose_poses_complex)
 }
 
 /**
- * @note test calculation correctness with the overload
+ * @note Test calculation correctness with the overload.
  */
 TEST_F(PoseTest, relativePose_first)
 {
@@ -348,7 +348,7 @@ TEST_F(PoseTest, relativePose_first)
 }
 
 /**
- * @note test calculation correctness with the overload
+ * @note Test calculation correctness with the overload.
  */
 TEST_F(PoseTest, relativePose_second)
 {
@@ -367,54 +367,54 @@ TEST_F(PoseTest, relativePose_second)
 }
 
 /**
- * @note test calculation correctness when bounding boxes are disjoint
+ * @note Test calculation correctness when bounding boxes are disjoint.
  */
 TEST_F(PoseTest, boundingBoxRelativePose_disjoint)
 {
   const auto pose_relative = makePose(makePoint(0.1108, -20.5955, 0.0));
   const auto from = makePose(makePoint(81600.3967, 50094.4298, 34.6759));
   const auto to = makePose(makePoint(81604.5076, 50071.8343, 40.8482));
-  const auto boundingBox = makeBoundingBox();
+  const auto bounding_box = makeBoundingBox();
 
   const auto relative =
-    traffic_simulator::pose::boundingBoxRelativePose(from, boundingBox, to, boundingBox);
+    traffic_simulator::pose::boundingBoxRelativePose(from, bounding_box, to, bounding_box);
 
   ASSERT_TRUE(relative.has_value());
   EXPECT_POSE_NEAR(pose_relative, relative.value(), 0.01);
 }
 
 /**
- * @note test calculation correctness when bounding boxes share an edge
+ * @note Test calculation correctness when bounding boxes share an edge.
  */
 TEST_F(PoseTest, boundingBoxRelativePose_commonEdge)
 {
   const auto from = makePose(makePoint(81600, 50094, 34));
   const auto to = makePose(makePoint(81601, 50094, 34));
-  const auto boundingBox = makeSmallBoundingBox();
+  const auto bounding_box = makeSmallBoundingBox();
 
   const auto relative =
-    traffic_simulator::pose::boundingBoxRelativePose(from, boundingBox, to, boundingBox);
+    traffic_simulator::pose::boundingBoxRelativePose(from, bounding_box, to, bounding_box);
 
   EXPECT_FALSE(relative.has_value());
 }
 
 /**
- * @note test calculation correctness when bounding boxes intersect
+ * @note Test calculation correctness when bounding boxes intersect.
  */
 TEST_F(PoseTest, boundingBoxRelativePose_intersect)
 {
   const auto from = makePose(makePoint(81600, 50094, 34));
   const auto to = makePose(makePoint(81600.5, 50094, 34));
-  const auto boundingBox = makeSmallBoundingBox();
+  const auto bounding_box = makeSmallBoundingBox();
 
   const auto relative =
-    traffic_simulator::pose::boundingBoxRelativePose(from, boundingBox, to, boundingBox);
+    traffic_simulator::pose::boundingBoxRelativePose(from, bounding_box, to, bounding_box);
 
   EXPECT_FALSE(relative.has_value());
 }
 
 /**
- * @note test s-value calculation correctness when longitudinal distance between the poses can not be calculated
+ * @note Test s-value calculation correctness when longitudinal distance between the poses can not be calculated.
  */
 TEST_F(PoseTest, relativeLaneletPose_s_invalid)
 {
@@ -425,11 +425,11 @@ TEST_F(PoseTest, relativeLaneletPose_s_invalid)
 
   const auto relative = traffic_simulator::pose::relativeLaneletPose(from, to, false, hdmap_utils);
 
-  EXPECT_TRUE(isnan(relative.s));
+  EXPECT_TRUE(std::isnan(relative.s));
 }
 
 /**
- * @note test s-value calculation correctness when longitudinal distance between the poses can be calculated
+ * @note Test s-value calculation correctness when longitudinal distance between the poses can be calculated.
  */
 TEST_F(PoseTest, relativeLaneletPose_s_valid)
 {
@@ -444,7 +444,7 @@ TEST_F(PoseTest, relativeLaneletPose_s_valid)
 }
 
 /**
- * @note test offset-value calculation correctness when lateral distance between the poses can not be calculated
+ * @note Test offset-value calculation correctness when lateral distance between the poses can not be calculated.
  */
 TEST_F(PoseTest, relativeLaneletPose_offset_invalid)
 {
@@ -455,11 +455,11 @@ TEST_F(PoseTest, relativeLaneletPose_offset_invalid)
 
   const auto relative = traffic_simulator::pose::relativeLaneletPose(from, to, false, hdmap_utils);
 
-  EXPECT_TRUE(isnan(relative.offset));
+  EXPECT_TRUE(std::isnan(relative.offset));
 }
 
 /**
- * @note test offset-value calculation correctness when lateral distance between the poses can be calculated
+ * @note Test offset-value calculation correctness when lateral distance between the poses can be calculated.
  */
 TEST_F(PoseTest, relativeLaneletPose_offset_valid)
 {
@@ -474,7 +474,7 @@ TEST_F(PoseTest, relativeLaneletPose_offset_valid)
 }
 
 /**
- * @note test s-value calculation correctness when longitudinal distance between the poses can not be calculated 
+ * @note Test s-value calculation correctness when longitudinal distance between the poses can not be calculated.
  */
 TEST_F(PoseTest, boundingBoxRelativeLaneletPose_s_invalid)
 {
@@ -482,16 +482,16 @@ TEST_F(PoseTest, boundingBoxRelativeLaneletPose_s_invalid)
     traffic_simulator::helper::constructCanonicalizedLaneletPose(195, 0.0, 0.0, hdmap_utils);
   const auto to =
     traffic_simulator::helper::constructCanonicalizedLaneletPose(196, 0.0, 1.0, hdmap_utils);
-  const auto boundingBox = makeBoundingBox();
+  const auto bounding_box = makeBoundingBox();
 
   const auto relative = traffic_simulator::pose::boundingBoxRelativeLaneletPose(
-    from, boundingBox, to, boundingBox, false, hdmap_utils);
+    from, bounding_box, to, bounding_box, false, hdmap_utils);
 
-  EXPECT_TRUE(isnan(relative.s));
+  EXPECT_TRUE(std::isnan(relative.s));
 }
 
 /**
- * @note test s-value calculation correctness when longitudinal distance between the poses can be calculated
+ * @note Test s-value calculation correctness when longitudinal distance between the poses can be calculated.
  */
 TEST_F(PoseTest, boundingBoxRelativeLaneletPose_s_valid)
 {
@@ -499,16 +499,16 @@ TEST_F(PoseTest, boundingBoxRelativeLaneletPose_s_valid)
     traffic_simulator::helper::constructCanonicalizedLaneletPose(195, 0.0, 0.0, hdmap_utils);
   const auto to =
     traffic_simulator::helper::constructCanonicalizedLaneletPose(3002163, 0.0, 0.0, hdmap_utils);
-  const auto boundingBox = makeBoundingBox();
+  const auto bounding_box = makeBoundingBox();
 
   const auto relative = traffic_simulator::pose::boundingBoxRelativeLaneletPose(
-    from, boundingBox, to, boundingBox, false, hdmap_utils);
+    from, bounding_box, to, bounding_box, false, hdmap_utils);
 
   EXPECT_NEAR(relative.s, 103.74, 0.01);
 }
 
 /**
- * @note test offset-value calculation correctness when lateral distance between the poses can not be calculated
+ * @note Test offset-value calculation correctness when lateral distance between the poses can not be calculated.
  */
 TEST_F(PoseTest, boundingBoxRelativeLaneletPose_offset_invalid)
 {
@@ -516,16 +516,16 @@ TEST_F(PoseTest, boundingBoxRelativeLaneletPose_offset_invalid)
     traffic_simulator::helper::constructCanonicalizedLaneletPose(195, 0.0, 0.0, hdmap_utils);
   const auto to =
     traffic_simulator::helper::constructCanonicalizedLaneletPose(196, 0.0, 1.0, hdmap_utils);
-  const auto boundingBox = makeBoundingBox();
+  const auto bounding_box = makeBoundingBox();
 
   const auto relative = traffic_simulator::pose::boundingBoxRelativeLaneletPose(
-    from, boundingBox, to, boundingBox, false, hdmap_utils);
+    from, bounding_box, to, bounding_box, false, hdmap_utils);
 
-  EXPECT_TRUE(isnan(relative.s));
+  EXPECT_TRUE(std::isnan(relative.s));
 }
 
 /**
- * @note test offset-value calculation correctness when lateral distance between the poses can be calculated
+ * @note Test offset-value calculation correctness when lateral distance between the poses can be calculated.
  */
 TEST_F(PoseTest, boundingBoxRelativeLaneletPose_offset_valid)
 {
@@ -533,16 +533,16 @@ TEST_F(PoseTest, boundingBoxRelativeLaneletPose_offset_valid)
     traffic_simulator::helper::constructCanonicalizedLaneletPose(195, 0.0, -1.0, hdmap_utils);
   const auto to =
     traffic_simulator::helper::constructCanonicalizedLaneletPose(3002163, 0.0, 1.0, hdmap_utils);
-  const auto boundingBox = makeBoundingBox();
+  const auto bounding_box = makeBoundingBox();
 
   const auto relative = traffic_simulator::pose::boundingBoxRelativeLaneletPose(
-    from, boundingBox, to, boundingBox, false, hdmap_utils);
+    from, bounding_box, to, bounding_box, false, hdmap_utils);
 
   EXPECT_EQ(relative.offset, 0.0);
 }
 
 /**
- * @note test calculation correctness when the pose lies within the lanelet
+ * @note Test calculation correctness when the pose lies within the lanelet.
  */
 TEST_F(PoseTest, isInLanelet_inside)
 {
@@ -553,7 +553,7 @@ TEST_F(PoseTest, isInLanelet_inside)
 }
 
 /**
- * @note test calculation correctness when the pose lies outside the front of the llanelet, distance greater than the tolerance
+ * @note Test calculation correctness when the pose lies outside the front of the lanelet, distance greater than the tolerance.
  */
 TEST_F(PoseTest, isInLanelet_outsideFrontFar)
 {
@@ -564,7 +564,7 @@ TEST_F(PoseTest, isInLanelet_outsideFrontFar)
 }
 
 /**
- * @note test calculation correctness when the pose lies outside the front of the llanelet, distance smaller than the tolerance
+ * @note Test calculation correctness when the pose lies outside the front of the lanelet, distance smaller than the tolerance.
  */
 TEST_F(PoseTest, isInLanelet_outsideFrontClose)
 {
@@ -575,7 +575,7 @@ TEST_F(PoseTest, isInLanelet_outsideFrontClose)
 }
 
 /**
- * @note test calculation correctness when the pose lies outside the back of the llanelet, distance greater than the tolerance
+ * @note Test calculation correctness when the pose lies outside the back of the lanelet, distance greater than the tolerance.
  */
 TEST_F(PoseTest, isInLanelet_outsideBackFar)
 {
@@ -586,7 +586,7 @@ TEST_F(PoseTest, isInLanelet_outsideBackFar)
 }
 
 /**
- * @note test calculation correctness when the pose lies outside the back of the lanelet, distance smaller than the tolerance
+ * @note Test calculation correctness when the pose lies outside the back of the lanelet, distance smaller than the tolerance.
  */
 TEST_F(PoseTest, isInLanelet_outsideBackClose)
 {
@@ -597,7 +597,7 @@ TEST_F(PoseTest, isInLanelet_outsideBackClose)
 }
 
 /**
- * @note test calculation correctness when there are no following lanelets and the pose lies within the lanelet
+ * @note Test calculation correctness when there are no following lanelets and the pose lies within the lanelet.
  */
 TEST_F(PoseTest, isAtEndOfLanelets_noFollowing_within)
 {
@@ -608,7 +608,7 @@ TEST_F(PoseTest, isAtEndOfLanelets_noFollowing_within)
 }
 
 /**
- * @note test calculation correctness when there is a single following lanelet and the pose lies within the lanelet
+ * @note Test calculation correctness when there is a single following lanelet and the pose lies within the lanelet.
  */
 TEST_F(PoseTest, isAtEndOfLanelets_singleFollowing_within)
 {
@@ -619,7 +619,7 @@ TEST_F(PoseTest, isAtEndOfLanelets_singleFollowing_within)
 }
 
 /**
- * @note  test calculation correctness when there is a signle following lanelet and the pose lies after the end of the lanelet
+ * @note Test calculation correctness when there is a signle following lanelet and the pose lies after the end of the lanelet.
  */
 TEST_F(PoseTest, isAtEndOfLanelets_singleFollowing_outside)
 {
@@ -630,7 +630,7 @@ TEST_F(PoseTest, isAtEndOfLanelets_singleFollowing_outside)
 }
 
 /**
- * @note test calculation correctness when there are multiple following lanelets and the pose lies within the lanelet
+ * @note Test calculation correctness when there are multiple following lanelets and the pose lies within the lanelet.
  */
 TEST_F(PoseTest, isAtEndOfLanelets_multipleFollowing_within)
 {
@@ -641,7 +641,7 @@ TEST_F(PoseTest, isAtEndOfLanelets_multipleFollowing_within)
 }
 
 /**
- * @note test calculation correctness when there are multiple following lanelets and the pose lies after the end of the lanelet
+ * @note Test calculation correctness when there are multiple following lanelets and the pose lies after the end of the lanelet.
  */
 TEST_F(PoseTest, isAtEndOfLanelets_multipleFollowing_outside)
 {
@@ -652,7 +652,7 @@ TEST_F(PoseTest, isAtEndOfLanelets_multipleFollowing_outside)
 }
 
 /**
- * @note test function behavior when non existent lanelet::Id has been passed
+ * @note Test function behavior when non existent lanelet::Id has been passed.
  */
 TEST_F(PoseTest, laneletLength_invalid)
 {
@@ -661,7 +661,7 @@ TEST_F(PoseTest, laneletLength_invalid)
 }
 
 /**
- * @note test calculation correctness when a correct lanelet::Id has been passed
+ * @note Test calculation correctness when a correct lanelet::Id has been passed.
  */
 TEST_F(PoseTest, laneletLength_valid)
 {
