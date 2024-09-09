@@ -362,7 +362,7 @@ TEST_F(CanonicalizedLaneletPoseTest, isSameLaneletId_withPose_different)
 }
 
 /**
- * @note Test function behavior when provided with a pose having lanelt_id equal to the lanelet_id argument
+ * @note Test function behavior when provided with a pose having lanelet_id equal to the lanelet_id argument
  */
 TEST_F(CanonicalizedLaneletPoseTest, isSameLaneletId_withLanelet_same)
 {
