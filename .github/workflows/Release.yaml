@@ -33,7 +33,9 @@ jobs:
       new_version: ${{ steps.new_version.outputs.new_version }}
     steps:
       - name: Restore branch
+        if: github.event.pull_request.merged == true
         uses: levonet/action-restore-branch@master
+        continue-on-error: true
 
       - name: Install bloom
         run: apt update && apt install -y python3-bloom git curl
@@ -52,6 +54,16 @@ jobs:
           git config --global --add safe.directory /__w/scenario_simulator_v2/scenario_simulator_v2
           git config --global credential.helper ${{ secrets.GITHUB_TOKEN }}
           git config pull.rebase false
+
+      - name: Copy branch to upstream
+        if: github.event.pull_request.head.repo.full_name != github.repository
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git remote add fork ${{ github.event.pull_request.head.repo.full_name }}
+          git checkout fork ${{ github.event.pull_request.head.ref }}
+          git push origin ${{ github.event.pull_request.head.ref }}
+          git checkout origin master
 
       - name: Get old version
         id: old_version
