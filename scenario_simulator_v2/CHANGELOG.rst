@@ -21,6 +21,15 @@ Changelog for package scenario_simulator_v2
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+4.2.1 (2024-09-09)
+------------------
+* Merge branch 'master' into fix/release_action
+* Merge branch 'master' into fix/release_action
+* Merge branch 'master' into fix/release_action
+* Merge branch 'master' into fix/release_action
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/release_action
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, hakuturu583
+
 4.2.0 (2024-09-09)
 ------------------
 
