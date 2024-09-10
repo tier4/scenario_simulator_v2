@@ -19,6 +19,7 @@
 #include <chrono>
 #include <concealer/field_operator_application.hpp>
 #include <rclcpp/rclcpp.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <tier4_external_api_msgs/msg/response_status.hpp>
 #include <tier4_rtc_msgs/srv/auto_mode_with_module.hpp>

@@ -28,7 +28,6 @@
 #include <concealer/autoware_stream.hpp>
 #include <concealer/launch.hpp>
 #include <concealer/task_queue.hpp>
-#include <concealer/transition_assertion.hpp>
 #include <concealer/visibility.hpp>
 #include <exception>
 #include <geometry_msgs/msg/accel.hpp>
