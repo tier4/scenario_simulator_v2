@@ -17,7 +17,7 @@
 #include <geometry/intersection/collision.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 
-#include "test_utils.hpp"
+#include "../test_utils.hpp"
 
 TEST(Collision, DifferentHeight)
 {

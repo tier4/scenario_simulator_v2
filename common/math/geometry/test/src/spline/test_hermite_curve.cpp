@@ -16,8 +16,8 @@
 
 #include <geometry/spline/hermite_curve.hpp>
 
-#include "expect_eq_macros.hpp"
-#include "test_utils.hpp"
+#include "../expect_eq_macros.hpp"
+#include "../test_utils.hpp"
 
 constexpr double EPS = 1e-3;
 
@@ -320,7 +320,10 @@ TEST(HermiteCurveTest, getSValue)
   EXPECT_NEAR(s2.value(), 1.0, EPS);
 }
 
-TEST(HermiteCurveTest, getSValueAutoscale)
+/**
+ * @note Test function correctness with parameter denormalize_s = true.
+ */
+TEST(HermiteCurveTest, getSValueDenormalized)
 {
   const auto curve = makeLine2();
 
@@ -503,7 +506,10 @@ TEST(HermiteCurveTest, getTangentVector4)
   EXPECT_DOUBLE_EQ(curve.getTangentVector(0.5, false).y / norm, 1.0 / std::sqrt(2.0));
 }
 
-TEST(HermiteCurveTest, getTangentVectorAutoscale1)
+/**
+ * @note Test function correctness with parameter denormalize_s = true with different curves.
+ */
+TEST(HermiteCurveTest, getTangentVectorDenormalized1)
 {  //p(0,0) v(1,0)-> p(1,1) v(0,1)
   const auto curve = makeCurve1();
   constexpr double eps = 0.1;
@@ -513,7 +519,10 @@ TEST(HermiteCurveTest, getTangentVectorAutoscale1)
   EXPECT_NEAR(curve.getTangentVector(0.75, true).y / norm, 1.0 / std::sqrt(2.0), eps);
 }
 
-TEST(HermiteCurveTest, getTangentVectorAutoscale2)
+/**
+ * @note Test function correctness with parameter denormalize_s = true with different curves.
+ */
+TEST(HermiteCurveTest, getTangentVectorDenormalized2)
 {  //p(0,0) v(1,0)-> p(1,-1) v(0,-1)
   const auto curve = makeCurve2();
   constexpr double eps = 0.1;
@@ -523,7 +532,10 @@ TEST(HermiteCurveTest, getTangentVectorAutoscale2)
   EXPECT_NEAR(curve.getTangentVector(0.75, true).y / norm, -1.0 / std::sqrt(2.0), eps);
 }
 
-TEST(HermiteCurveTest, getTangentVectorAutoscale3)
+/**
+ * @note Test function correctness with parameter denormalize_s = true with different curves.
+ */
+TEST(HermiteCurveTest, getTangentVectorDenormalized3)
 {  //p(1,1) v(0,-1)-> p(0,0) v(-1,0)
   const auto curve = makeCurve3();
   constexpr double eps = 0.1;
@@ -533,7 +545,10 @@ TEST(HermiteCurveTest, getTangentVectorAutoscale3)
   EXPECT_NEAR(curve.getTangentVector(0.75, true).y / norm, -1.0 / std::sqrt(2.0), eps);
 }
 
-TEST(HermiteCurveTest, getTangentVectorAutoscale4)
+/**
+ * @note Test function correctness with parameter denormalize_s = true with different curves.
+ */
+TEST(HermiteCurveTest, getTangentVectorDenormalized4)
 {  //p(1,-1) v(0,1)-> p(0,0) v(-1,0)
   const auto curve = makeCurve4();
   constexpr double eps = 0.1;
@@ -579,7 +594,10 @@ TEST(HermiteCurveTest, getNormalVector4)
   EXPECT_DOUBLE_EQ(curve.getNormalVector(0.5, false).y / norm, -1.0 / std::sqrt(2.0));
 }
 
-TEST(HermiteCurveTest, getNormalVectorAutoscale1)
+/**
+ * @note Test function correctness with parameter denormalize_s = true with different curves.
+ */
+TEST(HermiteCurveTest, getNormalVectorDenormalized1)
 {  //p(0,0) v(1,0)-> p(1,1) v(0,1)
   const auto curve = makeCurve1();
   constexpr double eps = 0.1;
@@ -589,7 +607,10 @@ TEST(HermiteCurveTest, getNormalVectorAutoscale1)
   EXPECT_NEAR(curve.getNormalVector(0.75, true).y / norm, 1.0 / std::sqrt(2.0), eps);
 }
 
-TEST(HermiteCurveTest, getNormalVectorAutoscale2)
+/**
+ * @note Test function correctness with parameter denormalize_s = true with different curves.
+ */
+TEST(HermiteCurveTest, getNormalVectorDenormalized2)
 {  //p(0,0) v(1,0)-> p(1,-1) v(0,-1)
   const auto curve = makeCurve2();
   constexpr double eps = 0.1;
@@ -599,7 +620,10 @@ TEST(HermiteCurveTest, getNormalVectorAutoscale2)
   EXPECT_NEAR(curve.getNormalVector(0.75, true).y / norm, 1.0 / std::sqrt(2.0), eps);
 }
 
-TEST(HermiteCurveTest, getNormalVectorAutoscale3)
+/**
+ * @note Test function correctness with parameter denormalize_s = true with different curves.
+ */
+TEST(HermiteCurveTest, getNormalVectorDenormalized3)
 {  //p(1,1) v(0,-1)-> p(0,0) v(-1,0)
   const auto curve = makeCurve3();
   constexpr double eps = 0.1;
@@ -609,7 +633,10 @@ TEST(HermiteCurveTest, getNormalVectorAutoscale3)
   EXPECT_NEAR(curve.getNormalVector(0.75, true).y / norm, -1.0 / std::sqrt(2.0), eps);
 }
 
-TEST(HermiteCurveTest, getNormalVectorAutoscale4)
+/**
+ * @note Test function correctness with parameter denormalize_s = true with different curves.
+ */
+TEST(HermiteCurveTest, getNormalVectorDenormalized4)
 {  //p(1,-1) v(0,1)-> p(0,0) v(-1,0)
   const auto curve = makeCurve4();
   constexpr double eps = 0.1;
