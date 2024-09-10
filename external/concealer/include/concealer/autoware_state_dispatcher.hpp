@@ -42,7 +42,8 @@ public:
 
   void registerTask(
     const std::string state, std::function<void()> task,
-    rclcpp::Duration interval = rclcpp::Duration(0, 0))
+    rclcpp::Duration interval =
+      rclcpp::Duration::from_nanoseconds(std::numeric_limits<rcl_duration_value_t>::max()))
   {
     tasks[state].push_back(Task(std::move(task), interval));
   }

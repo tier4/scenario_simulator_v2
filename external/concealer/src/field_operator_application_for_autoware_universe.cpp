@@ -356,7 +356,8 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::clearRoute() -> void
 auto FieldOperatorApplicationFor<AutowareUniverse>::engage() -> void
 {
   autoware_state_dispatcher.registerTask(
-    tier4_system_msgs::msg::AutowareState::WAITING_FOR_ENGAGE, [this]() {
+    tier4_system_msgs::msg::AutowareState::WAITING_FOR_ENGAGE,
+    [this]() {
       auto request = std::make_shared<tier4_external_api_msgs::srv::Engage::Request>();
       request->engage = true;
       try {
@@ -365,7 +366,8 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::engage() -> void
         // ignore timeout error because this service is validated by Autoware state transition.
         return;
       }
-    });
+    },
+    rclcpp::Duration::from_seconds(1.0));
   autoware_state_dispatcher.registerTask(tier4_system_msgs::msg::AutowareState::DRIVING, [this]() {
     autoware_state_dispatcher.requestUnregisterAllTasks();
   });
