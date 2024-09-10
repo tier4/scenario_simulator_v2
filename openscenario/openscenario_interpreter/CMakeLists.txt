@@ -41,8 +41,15 @@ target_precompile_headers(${PROJECT_NAME}
     "<traffic_simulator/api/api.hpp>"
     "<pugixml.hpp>"
 
+    "<openscenario_interpreter/error.hpp>"
+    "<openscenario_interpreter/expression.hpp>"
+    "<openscenario_interpreter/name.hpp>"
     "<openscenario_interpreter/object.hpp>"
-    "<openscenario_interpreter/scope.hpp>")
+    "<openscenario_interpreter/openscenario_interpreter.hpp>"
+    "<openscenario_interpreter/pointer.hpp>"
+    "<openscenario_interpreter/record.hpp>"
+    "<openscenario_interpreter/scope.hpp>"
+    "<openscenario_interpreter/simulator_core.hpp>")
 
 # ------------------------------------------------------------------------------
 #  openscenario_interpreter_node
