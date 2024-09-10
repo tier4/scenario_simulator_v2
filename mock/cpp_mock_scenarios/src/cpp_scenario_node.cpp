@@ -31,8 +31,8 @@ CppScenarioNode::CppScenarioNode(
 {
   declare_parameter<std::string>("junit_path", "/tmp");
   get_parameter<std::string>("junit_path", junit_path_);
-  declare_parameter<double>("timeout", 10.0);
-  get_parameter<double>("timeout", timeout_);
+  declare_parameter<int>("global_timeout", 10.0);
+  get_parameter<int>("global_timeout", timeout_);
 
   traffic_simulator::lanelet_pose::CanonicalizedLaneletPose::setConsiderPoseByRoadSlope([&]() {
     if (not has_parameter("consider_pose_by_road_slope")) {
