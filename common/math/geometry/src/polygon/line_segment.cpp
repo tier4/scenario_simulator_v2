@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <cmath>
+#include <geometry/intersection/intersection.hpp>
 #include <geometry/polygon/line_segment.hpp>
 #include <geometry/quaternion/euler_to_quaternion.hpp>
 #include <geometry/transform.hpp>
@@ -28,27 +29,37 @@ namespace geometry
 {
 LineSegment::LineSegment(
   const geometry_msgs::msg::Point & start_point, const geometry_msgs::msg::Point & end_point)
-: start_point(start_point), end_point(end_point)
+: start_point(start_point),
+  end_point(end_point),
+  vector(geometry_msgs::build<geometry_msgs::msg::Vector3>()
+           .x(end_point.x - start_point.x)
+           .y(end_point.y - start_point.y)
+           .z(end_point.z - start_point.z)),
+  vector_2d(geometry_msgs::build<geometry_msgs::msg::Vector3>()
+              .x(end_point.x - start_point.x)
+              .y(end_point.y - start_point.y)
+              .z(0.0)),
+  length(hypot(end_point, start_point)),
+  length_2d(std::hypot(end_point.x - start_point.x, end_point.y - start_point.y))
 {
 }
 
 LineSegment::LineSegment(
   const geometry_msgs::msg::Point & start_point, const geometry_msgs::msg::Vector3 & vec,
-  double length)
-: start_point(start_point), end_point([&]() -> geometry_msgs::msg::Point {
-    geometry_msgs::msg::Point ret;
-    double vec_size = std::hypot(vec.x, vec.y);
-    if (vec_size == 0.0) {
+  const double length)
+: LineSegment::LineSegment(start_point, [&]() -> geometry_msgs::msg::Point {
+    if (const double vec_size = std::hypot(vec.x, vec.y); vec_size == 0.0) {
       THROW_SIMULATION_ERROR(
         "Invalid vector is specified, while constructing LineSegment. ",
         "The vector should have a non zero length to initialize the line segment correctly. ",
         "This message is not originally intended to be displayed, if you see it, please "
         "contact the developer of traffic_simulator.");
+    } else {
+      return geometry_msgs::build<geometry_msgs::msg::Point>()
+        .x(start_point.x + vec.x / vec_size * length)
+        .y(start_point.y + vec.y / vec_size * length)
+        .z(start_point.z + vec.z / vec_size * length);
     }
-    ret.x = start_point.x + vec.x / vec_size * length;
-    ret.y = start_point.y + vec.y / vec_size * length;
-    ret.z = start_point.z + vec.z / vec_size * length;
-    return ret;
   }())
 {
 }
@@ -64,25 +75,24 @@ LineSegment::~LineSegment() {}
 auto LineSegment::getPoint(const double s, const bool denormalize_s) const
   -> geometry_msgs::msg::Point
 {
-  const double s_normalized = denormalize_s ? s / getLength() : s;
-  if (0 <= s_normalized && s_normalized <= 1) {
+  const double s_normalized = denormalize_s ? s / length : s;
+  if (0.0 <= s_normalized && s_normalized <= 1.0) {
     return geometry_msgs::build<geometry_msgs::msg::Point>()
-      .x(start_point.x + (end_point.x - start_point.x) * s_normalized)
-      .y(start_point.y + (end_point.y - start_point.y) * s_normalized)
-      .z(start_point.z + (end_point.z - start_point.z) * s_normalized);
-  }
-  if (denormalize_s) {
+      .x(start_point.x + vector.x * s_normalized)
+      .y(start_point.y + vector.y * s_normalized)
+      .z(start_point.z + vector.z * s_normalized);
+  } else if (denormalize_s) {
     THROW_SIMULATION_ERROR(
       "Invalid S value is specified, while getting point on a line segment.",
-      "The range of s_normalized value should be in range [0,", getLength(), "].",
-      "But, your values are = ", s, " and length = ", getLength(),
+      "The range of s_normalized value should be in range [0,", length, "].",
+      "But, your values are = ", s, " and length = ", length,
       " This message is not originally intended to be displayed, if you see it, please "
       "contact the developer of traffic_simulator.");
   } else {
     THROW_SIMULATION_ERROR(
       "Invalid S value is specified, while getting point on a line segment.",
       "The range of s_normalized value should be in range [0,1].", "But, your values are = ", s,
-      " and length = ", getLength(),
+      " and length = ", length,
       " This message is not originally intended to be displayed, if you see it, please "
       "contact the developer of traffic_simulator.");
   }
@@ -101,65 +111,55 @@ auto LineSegment::getPose(const double s, const bool denormalize_s, const bool f
 {
   return geometry_msgs::build<geometry_msgs::msg::Pose>()
     .position(getPoint(s, denormalize_s))
-    .orientation([this, fill_pitch]() -> geometry_msgs::msg::Quaternion {
-      const auto tangent_vec = getVector();
-      return math::geometry::convertEulerAngleToQuaternion(
-        geometry_msgs::build<geometry_msgs::msg::Vector3>()
-          .x(0.0)
-          .y(
-            fill_pitch ? std::atan2(-tangent_vec.z, std::hypot(tangent_vec.x, tangent_vec.y)) : 0.0)
-          .z(std::atan2(tangent_vec.y, tangent_vec.x)));
-    }());
+    .orientation(math::geometry::convertEulerAngleToQuaternion(
+      geometry_msgs::build<geometry_msgs::msg::Vector3>()
+        .x(0.0)
+        .y(fill_pitch ? std::atan2(-vector.z, std::hypot(vector.x, vector.y)) : 0.0)
+        .z(std::atan2(vector.y, vector.x))));
 }
 
 /**
  * @brief Checking the intersection with 1 line segment and 1 point in 2D (x,y) coordinate. Ignore z axis.
  * @param point point you want to check intersection.
  * @return true Intersection detected.
- * @return false Intersection does not detected.
+ * @return false Intersection not detected.
  */
 auto LineSegment::isIntersect2D(const geometry_msgs::msg::Point & point) const -> bool
 {
-  return getIntersection2DSValue(point, true) ? true : false;
+  if (isInBounds2D(point)) {
+    const double cross_product =
+      (point.y - start_point.y) * vector_2d.x - (point.x - start_point.x) * vector_2d.y;
+    constexpr double tolerance = std::numeric_limits<double>::epsilon();
+    return std::abs(cross_product) <= length_2d * tolerance;
+  } else {
+    return false;
+  }
 }
 
 auto LineSegment::getSValue(
   const geometry_msgs::msg::Pose & pose, double threshold_distance, bool denormalize_s) const
   -> std::optional<double>
 {
-  return getIntersection2DSValue(
+  return get2DIntersectionSValue(
     LineSegment(
       math::geometry::transformPoint(
-        pose, geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(threshold_distance).z(0)),
+        pose,
+        geometry_msgs::build<geometry_msgs::msg::Point>().x(0.0).y(threshold_distance).z(0.0)),
       math::geometry::transformPoint(
-        pose, geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(-threshold_distance).z(0))),
+        pose,
+        geometry_msgs::build<geometry_msgs::msg::Point>().x(0.0).y(-threshold_distance).z(0.0))),
     denormalize_s);
 }
 
 /**
  * @brief Checking the intersection with 2 line segments in 2D (x,y) coordinate. Ignore z axis.
- * @param l0 line segments you want to check intersection.
+ * @param line line segments you want to check intersection.
  * @return true Intersection detected.
- * @return false Intersection does not detected.
+ * @return false Intersection not detected.
  */
-auto LineSegment::isIntersect2D(const LineSegment & l0) const -> bool
+auto LineSegment::isIntersect2D(const LineSegment & line) const -> bool
 {
-  double s, t;
-  s = (l0.start_point.x - l0.end_point.x) * (start_point.y - l0.start_point.y) -
-      (l0.start_point.y - l0.end_point.y) * (start_point.x - l0.start_point.x);
-  t = (l0.start_point.x - l0.end_point.x) * (end_point.y - l0.start_point.y) -
-      (l0.start_point.y - l0.end_point.y) * (end_point.x - l0.start_point.x);
-  if (s * t > 0) {
-    return false;
-  }
-  s = (start_point.x - end_point.x) * (l0.start_point.y - start_point.y) -
-      (start_point.y - end_point.y) * (l0.start_point.x - start_point.x);
-  t = (start_point.x - end_point.x) * (l0.end_point.y - start_point.y) -
-      (start_point.y - end_point.y) * (l0.end_point.x - start_point.x);
-  if (s * t > 0) {
-    return false;
-  }
-  return true;
+  return math::geometry::isIntersect2D(*this, line);
 }
 
 /**
@@ -167,35 +167,22 @@ auto LineSegment::isIntersect2D(const LineSegment & l0) const -> bool
  * @param point point of you want to find intersection.
  * @return std::optional<double> 
  */
-auto LineSegment::getIntersection2DSValue(
+auto LineSegment::get2DIntersectionSValue(
   const geometry_msgs::msg::Point & point, const bool denormalize_s) const -> std::optional<double>
 {
-  const auto get_s_normalized = [this](const auto & point) -> std::optional<double> {
-    const auto get_s_from_x = [this](const auto & point) {
-      const auto s = (point.x - start_point.x) / (end_point.x - start_point.x);
-      return 0 <= s && s <= 1 ? s : std::optional<double>();
-    };
-    const auto get_s_from_y = [this](const auto & point) {
-      const auto s = (point.y - start_point.y) / (end_point.y - start_point.y);
-      return 0 <= s && s <= 1 ? s : std::optional<double>();
-    };
-    constexpr double epsilon = std::numeric_limits<double>::epsilon();
-    if (std::abs(end_point.x - start_point.x) <= epsilon) {
-      if (std::abs(end_point.y - start_point.y) <= epsilon) {
-        /// @note If start_point and end_point is a same point, checking the point is same as end_point or not.
-        return (std::abs(end_point.x - point.x) <= epsilon &&
-                std::abs(end_point.y - point.y) <= epsilon)
-                 ? std::optional<double>(0)
-                 : std::optional<double>();
-      }
-      /// @note If the line segment is parallel to y axis, calculate s value from y axis value.
-      return std::abs(point.x - start_point.x) <= epsilon ? get_s_from_y(point)
-                                                          : std::optional<double>();
-    }
-    /// @note If the line segment is not parallel to x and y axis, calculate s value from x axis value.
-    return get_s_from_x(point);
-  };
-  return denormalize_s ? denormalize(get_s_normalized(point)) : get_s_normalized(point);
+  /// @note This function checks for an SValue along the line.
+  /// The term "2D" in the function name specifically refers to the intersection point, not the SValue.
+  /// Therefore, the intersection is determined by disregarding the z-coordinate, hence the term "2D."
+  /// After finding the intersection, we calculate its position using a proportion.
+  /// Finally, we multiply this proportion by the actual 3D length to obtain the total SValue.
+  if (isIntersect2D(point)) {
+    const double proportion_2d =
+      std::hypot(point.x - start_point.x, point.y - start_point.y) / length_2d;
+    return denormalize_s ? std::make_optional(proportion_2d * length)
+                         : std::make_optional(proportion_2d);
+  } else {
+    return std::nullopt;
+  }
 }
 
 /**
@@ -204,33 +191,14 @@ auto LineSegment::getIntersection2DSValue(
  * @param denormalize_s If true, s value should be normalized in range [0,1]. If false, s value is not normalized.
  * @return std::optional<double> 
  */
-auto LineSegment::getIntersection2DSValue(const LineSegment & line, const bool denormalize_s) const
+auto LineSegment::get2DIntersectionSValue(const LineSegment & line, const bool denormalize_s) const
   -> std::optional<double>
 {
-  /// @note Hard coded parameter, this parameter describes the tolerance of the range of s value (-s_tolerance ~ 1.0 + s_tolerance)
-  constexpr double s_tolerance = 1e-10;
-  const auto get_s_normalized = [this](const auto & line) -> std::optional<double> {
-    if (!isIntersect2D(line)) {
-      return std::optional<double>();
-    }
-    const double det = (start_point.x - end_point.x) * (line.end_point.y - line.start_point.y) -
-                       (line.end_point.x - line.start_point.x) * (start_point.y - end_point.y);
-    const double s =
-      1 - ((line.end_point.y - line.start_point.y) * (line.end_point.x - end_point.x) +
-           (line.start_point.x - line.end_point.x) * (line.end_point.y - end_point.y)) /
-            det;
-    if (std::isnan(s)) {
-      THROW_SIMULATION_ERROR(
-        "One line segment is on top of the other. So determinant is zero.",
-        "If this message was displayed, something completely unexpected happens.",
-        "This message is not originally intended to be displayed, if you see it, please "
-        "contact the developer of traffic_simulator.");
-    }
-    return (-s_tolerance <= s && s <= 1 + s_tolerance)
-             ? std::optional<double>(std::clamp(s, 0.0, 1.0))
-             : std::optional<double>();
-  };
-  return denormalize_s ? denormalize(get_s_normalized(line)) : get_s_normalized(line);
+  if (const auto point = getIntersection2D(line); point.has_value()) {
+    return get2DIntersectionSValue(point.value(), denormalize_s);
+  } else {
+    return std::nullopt;
+  }
 }
 
 /**
@@ -241,23 +209,7 @@ auto LineSegment::getIntersection2DSValue(const LineSegment & line, const bool d
 auto LineSegment::getIntersection2D(const LineSegment & line) const
   -> std::optional<geometry_msgs::msg::Point>
 {
-  const auto s = getIntersection2DSValue(line, false);
-  return s ? geometry_msgs::build<geometry_msgs::msg::Point>()
-               .x(s.value() * start_point.x + (1.0 - s.value()) * end_point.x)
-               .y(s.value() * start_point.y + (1.0 - s.value()) * end_point.y)
-               .z(s.value() * start_point.z + (1.0 - s.value()) * end_point.z)
-           : std::optional<geometry_msgs::msg::Point>();
-}
-
-auto LineSegment::getVector() const -> geometry_msgs::msg::Vector3
-{
-  using math::geometry::operator-;
-  const auto result_pt = end_point - start_point;
-  auto result = geometry_msgs::msg::Vector3();
-  result.x = result_pt.x;
-  result.y = result_pt.y;
-  result.z = result_pt.z;
-  return result;
+  return math::geometry::getIntersection2D(*this, line);
 }
 
 /**
@@ -266,32 +218,20 @@ auto LineSegment::getVector() const -> geometry_msgs::msg::Vector3
  */
 auto LineSegment::getNormalVector() const -> geometry_msgs::msg::Vector3
 {
-  geometry_msgs::msg::Vector3 tangent_vec = getVector();
-  double theta = M_PI / 2.0;
+  const double theta = M_PI / 2.0;
   return geometry_msgs::build<geometry_msgs::msg::Vector3>()
-    .x(tangent_vec.x * std::cos(theta) - tangent_vec.y * std::sin(theta))
-    .y(tangent_vec.x * std::sin(theta) + tangent_vec.y * std::cos(theta))
-    .z(0);
+    .x(vector.x * std::cos(theta) - vector.y * std::sin(theta))
+    .y(vector.x * std::sin(theta) + vector.y * std::cos(theta))
+    .z(0.0);
 }
 
-auto LineSegment::get2DVector() const -> geometry_msgs::msg::Vector3
+auto LineSegment::get2DVectorSlope() const -> double
 {
-  return geometry_msgs::build<geometry_msgs::msg::Vector3>()
-    .x(end_point.x - start_point.x)
-    .y(end_point.y - start_point.y)
-    .z(0);
-}
-
-auto LineSegment::get2DLength() const -> double
-{
-  return std::hypot(end_point.x - start_point.x, end_point.y - start_point.y);
-}
-
-auto LineSegment::getLength() const -> double { return hypot(end_point, start_point); }
-
-auto LineSegment::getSlope() const -> double
-{
-  return (end_point.y - start_point.y) / (end_point.x - start_point.x);
+  if (vector_2d.x <= std::numeric_limits<double>::epsilon()) {
+    THROW_SIMULATION_ERROR("Slope of a vertical line is undefined");
+  } else {
+    return vector_2d.y / vector_2d.x;
+  }
 }
 
 /**
@@ -337,10 +277,11 @@ auto LineSegment::denormalize(
   const std::optional<double> & s, const bool throw_error_on_out_of_range) const
   -> std::optional<double>
 {
-  if (!throw_error_on_out_of_range && s && !(0 <= s.value() && s.value() <= 1)) {
-    return std::optional<double>();
+  if (!s.has_value() || (!throw_error_on_out_of_range && !(0.0 <= s.value() && s.value() <= 1.0))) {
+    return std::nullopt;
+  } else {
+    return std::make_optional<double>(denormalize(s.value()));
   }
-  return s ? denormalize(s.value()) : std::optional<double>();
 }
 
 /**
@@ -350,13 +291,14 @@ auto LineSegment::denormalize(
  */
 auto LineSegment::denormalize(const double s) const -> double
 {
-  if (0 <= s && s <= 1) {
-    return s * getLength();
+  if (0.0 <= s && s <= 1.0) {
+    return s * length;
+  } else {
+    THROW_SIMULATION_ERROR(
+      "Invalid normalized s value, s = ", s, ", S value should be in range [0,1].",
+      "This message is not originally intended to be displayed, if you see it, please "
+      "contact the developer of traffic_simulator.");
   }
-  THROW_SIMULATION_ERROR(
-    "Invalid normalized s value, s = ", s, ", S value should be in range [0,1].",
-    "This message is not originally intended to be displayed, if you see it, please "
-    "contact the developer of traffic_simulator.");
 }
 
 LineSegment & LineSegment::operator=(const LineSegment &) { return *this; }
@@ -384,6 +326,44 @@ auto getLineSegments(
     }
     return seg;
   }
+}
+
+/**
+ * @brief Checks if the given point lies within the bounding box of the line segment.
+ * @param point Points you want to test.
+ * @return 
+ * - `true` if the points is within the bounds.
+ * - `false` otherwise.
+ */
+auto LineSegment::isInBounds2D(const geometry_msgs::msg::Point & point) const -> bool
+{
+  return (
+    point.x >= std::min(start_point.x, end_point.x) &&
+    point.x <= std::max(start_point.x, end_point.x) &&
+    point.y >= std::min(start_point.y, end_point.y) &&
+    point.y <= std::max(start_point.y, end_point.y));
+}
+
+/**
+ * @brief Determines the relative position of a point with respect to the line segment.
+ * 
+ * This method computes the relative position of a given point with respect to the line segment defined by 
+ * `start_point` and `end_point` using a cross product. The result indicates on which side of the line 
+ * segment the point lies.
+ * 
+ * @param point The point to be evaluated.
+ * @return 
+ *  - `1` if the point is to the left of the line segment (when moving from `start_point` to `end_point`).
+ *  - `-1` if the point is to the right of the line segment.
+ *  - `0` if the point is collinear with the line segment (i.e., lies exactly on the line defined by 
+ *    `start_point` and `end_point`).
+ */
+auto LineSegment::relativePointPosition2D(const geometry_msgs::msg::Point & point) const -> int
+{
+  constexpr double tolerance = std::numeric_limits<double>::epsilon();
+  const double determinant =
+    vector_2d.y * (point.x - end_point.x) - vector_2d.x * (point.y - end_point.y);
+  return static_cast<int>(determinant > tolerance) - static_cast<int>(determinant < -tolerance);
 }
 
 }  // namespace geometry
