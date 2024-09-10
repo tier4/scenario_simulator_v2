@@ -166,6 +166,7 @@ def launch_setup(context, *args, **kwargs):
             {"global_real_time_factor": global_real_time_factor},
             {"global_frame_rate": global_frame_rate},
             {"global_timeout": global_timeout},
+            {"junit_path": junit_path},
         ]
         parameters += make_vehicle_parameters()
         return parameters
