@@ -22,7 +22,10 @@ CppScenarioNode::CppScenarioNode(
   const std::string & lanelet2_map_file, const std::string & scenario_filename, const bool verbose,
   const rclcpp::NodeOptions & option)
 : Node(node_name, option),
-  api_(this, configure(map_path, lanelet2_map_file, scenario_filename, verbose), 1.0, 20),
+  api_(
+    this, configure(map_path, lanelet2_map_file, scenario_filename, verbose),
+    declare_parameter<double>("global_real_time_factor", 1.0),
+    declare_parameter<double>("global_frame_rate", 20.0)),
   scenario_filename_(scenario_filename),
   exception_expect_(false)
 {
