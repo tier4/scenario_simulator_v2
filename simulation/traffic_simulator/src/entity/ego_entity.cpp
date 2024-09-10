@@ -139,7 +139,6 @@ auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsAr
 
 void EgoEntity::updateFieldOperatorApplication() const
 {
-  field_operator_application->rethrow();
   field_operator_application->spinSome();
 }
 

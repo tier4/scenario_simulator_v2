@@ -24,7 +24,6 @@ FieldOperatorApplicationFor<AutowareUniverse>::~FieldOperatorApplicationFor()
 {
   shutdownAutoware();
   // All tasks should be complete before the services used in them will be deinitialized.
-  task_queue.stopAndJoin();
 }
 
 template <auto N, typename Tuples>
@@ -373,13 +372,11 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::engage() -> void
 
 auto FieldOperatorApplicationFor<AutowareUniverse>::engageable() const -> bool
 {
-  rethrow();
   return isWaitingForEngage();
 }
 
 auto FieldOperatorApplicationFor<AutowareUniverse>::engaged() const -> bool
 {
-  rethrow();
   return isDriving();
 }
 

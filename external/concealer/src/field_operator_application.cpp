@@ -158,8 +158,6 @@ auto FieldOperatorApplication::getTurnIndicatorsCommand() const
   turn_indicators_command.stamp = now();
   return turn_indicators_command;
 }
-
-auto FieldOperatorApplication::rethrow() const -> void { task_queue.rethrow(); }
 }  // namespace concealer
 
 namespace autoware_auto_vehicle_msgs::msg

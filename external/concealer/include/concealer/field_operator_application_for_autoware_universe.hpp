@@ -35,7 +35,6 @@
 #include <concealer/publisher_wrapper.hpp>
 #include <concealer/service_with_validation.hpp>
 #include <concealer/subscriber_wrapper.hpp>
-#include <concealer/task_queue.hpp>
 #include <geometry_msgs/msg/pose_with_covariance_stamped.hpp>
 #include <tier4_external_api_msgs/msg/emergency.hpp>
 #include <tier4_external_api_msgs/srv/engage.hpp>
