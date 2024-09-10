@@ -94,6 +94,8 @@ def default_autoware_launch_file_of(architecture_type):
         "awf/universe/20230906": "planning_simulator.launch.xml",
     }[architecture_type]
 
+def default_rviz_config_file():
+    return Path(get_package_share_directory("traffic_simulator")) / "config/scenario_simulator_v2.rviz"
 
 def launch_setup(context, *args, **kwargs):
     # fmt: off
@@ -113,7 +115,7 @@ def launch_setup(context, *args, **kwargs):
     port                                = LaunchConfiguration("port",                                   default=5555)
     publish_empty_context               = LaunchConfiguration("publish_empty_context",                  default=False)
     record                              = LaunchConfiguration("record",                                 default=False)
-    rviz_config                         = LaunchConfiguration("rviz_config",                            default="")
+    rviz_config                         = LaunchConfiguration("rviz_config",                            default=default_rviz_config_file())
     scenario                            = LaunchConfiguration("scenario",                               default=Path("/dev/null"))
     sensor_model                        = LaunchConfiguration("sensor_model",                           default="")
     sigterm_timeout                     = LaunchConfiguration("sigterm_timeout",                        default=8)
@@ -246,13 +248,7 @@ def launch_setup(context, *args, **kwargs):
             name="rviz2",
             output={"stderr": "log", "stdout": "log"},
             condition=IfCondition(launch_rviz),
-            arguments=[
-                "-d",
-                str(
-                    Path(get_package_share_directory("traffic_simulator"))
-                    / "config/scenario_simulator_v2.rviz"
-                ),
-            ],
+            arguments=["-d", str(default_rviz_config_file())],
         ),
         RegisterEventHandler(event_handler=io_handler),
         RegisterEventHandler(event_handler=shutdown_handler),
