@@ -98,33 +98,27 @@ private:
 
     void operator()(const rclcpp::Time & now)
     {
-      if (
-        future.valid() and future.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
-        future.get();
-        if (
-          interval ==
-          rclcpp::Duration::from_nanoseconds(std::numeric_limits<rcl_duration_value_t>::max())) {
-          available = false;
-        }
-      }
-
       if (now >= next_execution) {
-        if (not future.valid()) {
-          // pop new task
-          auto task = std::packaged_task<void()>(task_function);
-          future = task.get_future();
-          auto worker = std::thread(std::move(task));
-          worker.detach();
-        }
+        if (
+          not future.valid() or
+          future.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+          future = std::async(std::launch::async, task_function);
+          int64_t duration_nanoseconds = now.nanoseconds() - next_execution.nanoseconds();
+          int64_t interval_nanoseconds = interval.nanoseconds();
+          if (interval_nanoseconds != 0) {
+            next_execution =
+              now + rclcpp::Duration::from_nanoseconds(
+                      interval_nanoseconds - (duration_nanoseconds % interval_nanoseconds));
+          } else {
+            next_execution = now;
+          }
 
-        int64_t duration_nanoseconds = now.nanoseconds() - next_execution.nanoseconds();
-        int64_t interval_nanoseconds = interval.nanoseconds();
-        if (interval_nanoseconds != 0) {
-          next_execution =
-            now + rclcpp::Duration::from_nanoseconds(
-                    interval_nanoseconds - (duration_nanoseconds % interval_nanoseconds));
-        } else {
-          next_execution = now;
+          // If the interval is set to the maximum value, the task will not be executed again.
+          if (
+            interval ==
+            rclcpp::Duration::from_nanoseconds(std::numeric_limits<rcl_duration_value_t>::max())) {
+            available = false;
+          }
         }
       }
     }
