@@ -264,7 +264,8 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::sendCooperateCommand(
     request->stamp = latest_cooperate_status_array.stamp;
     request->commands.push_back(cooperate_command);
 
-    task_queue.delay([this, request]() { requestCooperateCommands(request); });
+    autoware_state_dispatcher.registerTaskForCurrentState(
+      [this, request]() { requestCooperateCommands(request); });
 
     used_cooperate_statuses.push_back(*cooperate_status);
   }
@@ -348,7 +349,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::plan(
 
 auto FieldOperatorApplicationFor<AutowareUniverse>::clearRoute() -> void
 {
-  task_queue.delay([this] {
+  autoware_state_dispatcher.registerTaskForCurrentState([this] {
     requestClearRoute(std::make_shared<autoware_adapi_v1_msgs::srv::ClearRoute::Request>());
   });
 }
@@ -451,7 +452,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::sendSIGINT() -> void  //
 
 auto FieldOperatorApplicationFor<AutowareUniverse>::setVelocityLimit(double velocity_limit) -> void
 {
-  task_queue.delay([this, velocity_limit]() {
+  autoware_state_dispatcher.registerTaskForCurrentState([this, velocity_limit]() {
     auto request = std::make_shared<tier4_external_api_msgs::srv::SetVelocityLimit::Request>();
     request->velocity = velocity_limit;
     // We attempt to resend the service up to 30 times, but this number of times was determined by
@@ -466,7 +467,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::requestAutoModeForCooperatio
   // Note: The implementation of this function will not work properly
   //       if the `rtc_auto_mode_manager` package is present.
   if (not isPackageExists("rtc_auto_mode_manager")) {
-    task_queue.delay([this, module_name, enable]() {
+    autoware_state_dispatcher.registerTaskForCurrentState([this, module_name, enable]() {
       auto request = std::make_shared<tier4_rtc_msgs::srv::AutoModeWithModule::Request>();
       request->module.type = toModuleType<tier4_rtc_msgs::msg::Module>(module_name);
       request->enable = enable;
@@ -483,7 +484,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::requestAutoModeForCooperatio
 
 auto FieldOperatorApplicationFor<AutowareUniverse>::enableAutowareControl() -> void
 {
-  task_queue.delay([this]() {
+  autoware_state_dispatcher.registerTaskForCurrentState([this]() {
     auto request = std::make_shared<autoware_adapi_v1_msgs::srv::ChangeOperationMode::Request>();
     requestEnableAutowareControl(request);
   });
@@ -491,7 +492,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::enableAutowareControl() -> v
 
 auto FieldOperatorApplicationFor<AutowareUniverse>::disableAutowareControl() -> void
 {
-  task_queue.delay([this]() {
+  autoware_state_dispatcher.registerTaskForCurrentState([this]() {
     auto request = std::make_shared<autoware_adapi_v1_msgs::srv::ChangeOperationMode::Request>();
     requestDisableAutowareControl(request);
   });

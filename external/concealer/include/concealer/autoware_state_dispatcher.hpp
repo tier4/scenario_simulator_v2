@@ -48,6 +48,12 @@ public:
     tasks[state].push_back(Task(std::move(task), interval));
   }
 
+  void registerTaskForCurrentState(
+    std::function<void()> task, rclcpp::Duration interval = rclcpp::Duration::from_nanoseconds(
+                                  std::numeric_limits<rcl_duration_value_t>::max()))
+  {
+    registerTask(getState(last_message), std::move(task), interval);
+  }
 
 private:
   void onStateChanged(const std::string & pre_state, const std::string & state)
@@ -61,8 +67,8 @@ private:
     if (auto current_task_list = tasks.find(state); current_task_list != tasks.end()) {
       for (auto task = current_task_list->second.begin();
            task != current_task_list->second.end();) {
-        if (task.available) {
-          task(now);
+        if (task->available) {
+          (*task)(now);
           ++task;
         } else {
           task = current_task_list->second.erase(task);
