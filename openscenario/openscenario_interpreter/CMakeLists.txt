@@ -39,7 +39,10 @@ target_precompile_headers(${PROJECT_NAME}
     "<nlohmann/json.hpp>"
     "<rclcpp/rclcpp.hpp>"
     "<traffic_simulator/api/api.hpp>"
-    "<pugixml.hpp>")
+    "<pugixml.hpp>"
+
+    "<openscenario_interpreter/object.hpp>"
+    "<openscenario_interpreter/scope.hpp>")
 
 # ------------------------------------------------------------------------------
 #  openscenario_interpreter_node
