@@ -18,47 +18,59 @@
 #include <geometry/quaternion/make_quaternion.hpp>
 #include <geometry/quaternion/operator.hpp>
 
-#include "expect_eq_macros.hpp"
-#include "test_utils.hpp"
+#include "../expect_eq_macros.hpp"
+#include "../test_utils.hpp"
 
 constexpr double EPS = 1e-6;
 
-TEST(Quaternion, testCase1)
+/**
+ * @note Test result correctness with a basic example.
+ */
+TEST(Quaternion, operator_addition)
 {
   using math::geometry::operator+;
 
-  auto q1 = math::geometry::makeQuaternion(0, 1, 0, 1);
-  auto q2 = math::geometry::makeQuaternion(0, 1, 0, 1);
-  auto ans = q1 + q2;
+  const auto q1 = math::geometry::makeQuaternion(0, 1, 0, 1);
+  const auto q2 = math::geometry::makeQuaternion(0, 1, 0, 1);
+  const auto ans = q1 + q2;
   EXPECT_QUATERNION_EQ(ans, math::geometry::makeQuaternion(0, 2, 0, 2))
 }
 
-TEST(Quaternion, testCase2)
+/**
+ * @note Test result correctness with a basic example.
+ */
+TEST(Quaternion, operator_subtraction)
 {
   using math::geometry::operator-;
 
-  auto q1 = math::geometry::makeQuaternion(0, 1, 0, 1);
-  auto q2 = math::geometry::makeQuaternion(0, 1, 0, 1);
-  auto ans = q1 - q2;
+  const auto q1 = math::geometry::makeQuaternion(0, 1, 0, 1);
+  const auto q2 = math::geometry::makeQuaternion(0, 1, 0, 1);
+  const auto ans = q1 - q2;
   EXPECT_QUATERNION_EQ(ans, math::geometry::makeQuaternion(0, 0, 0, 0))
 }
 
-TEST(Quaternion, testCase3)
+/**
+ * @note Test result correctness with a basic example.
+ */
+TEST(Quaternion, operator_multiplication)
 {
   using math::geometry::operator*;
 
-  auto q1 = math::geometry::makeQuaternion(0, 1, 0, 1);
-  auto q2 = math::geometry::makeQuaternion(0, 1, 0, 1);
-  auto ans = q1 * q2;
+  const auto q1 = math::geometry::makeQuaternion(0, 1, 0, 1);
+  const auto q2 = math::geometry::makeQuaternion(0, 1, 0, 1);
+  const auto ans = q1 * q2;
   EXPECT_QUATERNION_EQ(ans, math::geometry::makeQuaternion(0, 2, 0, 0))
 }
 
-TEST(Quaternion, testCase4)
+/**
+ * @note Test result correctness with a basic example.
+ */
+TEST(Quaternion, operator_additionAssignment)
 {
   using math::geometry::operator+=;
 
   auto q1 = math::geometry::makeQuaternion(0, 1, 0, 1);
-  auto q2 = math::geometry::makeQuaternion(0, 1, 0, 1);
+  const auto q2 = math::geometry::makeQuaternion(0, 1, 0, 1);
   q1 += q2;
   EXPECT_QUATERNION_EQ(q1, math::geometry::makeQuaternion(0, 2, 0, 2))
 }
