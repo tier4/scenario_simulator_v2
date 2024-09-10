@@ -48,27 +48,25 @@ public:
     tasks[state].push_back(Task(std::move(task), interval));
   }
 
-  void unregisterTask(std::string state) { tasks.erase(state); }
-
-  void requestUnregisterAllTasks() { task_clear_requested.store(true); }
 
 private:
-  void unregisterAllTasks() { tasks.clear(); }
-
   void onStateChanged(const std::string & pre_state, const std::string & state)
   {
     std::cout << "AutowareState changed from " << pre_state << " to " << state << std::endl;
+    tasks.erase(pre_state);  // unregister old tasks when state changes
   }
 
   void executeTask(std::string state, const rclcpp::Time & now)
   {
-    if (task_clear_requested.load()) {
-      unregisterAllTasks();
-      task_clear_requested.store(false);
-    }
-    if (auto it = tasks.find(state); it != tasks.end()) {
-      for (auto & task : it->second) {
-        task(now);
+    if (auto current_task_list = tasks.find(state); current_task_list != tasks.end()) {
+      for (auto task = current_task_list->second.begin();
+           task != current_task_list->second.end();) {
+        if (task.available) {
+          task(now);
+          ++task;
+        } else {
+          task = current_task_list->second.erase(task);
+        }
       }
     }
   }
@@ -85,6 +83,8 @@ private:
 
     std::future<void> future;
 
+    bool available = true;
+
     Task(std::function<void()> t, rclcpp::Duration i)
     : task_function(std::move(t)), interval(i), next_execution(rclcpp::Time(0, 0, RCL_ROS_TIME))
     {
@@ -95,6 +95,11 @@ private:
       if (
         future.valid() and future.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
         future.get();
+        if (
+          interval ==
+          rclcpp::Duration::from_nanoseconds(std::numeric_limits<rcl_duration_value_t>::max())) {
+          available = false;
+        }
       }
 
       if (now >= next_execution) {
@@ -120,8 +125,6 @@ private:
   };
 
   std::unordered_map<std::string, std::vector<Task>> tasks;
-
-  std::atomic<bool> task_clear_requested = false;
 };
 
 #endif  // CONCEALER__AUTOWARE_STATE_DISPATCHER_HPP_

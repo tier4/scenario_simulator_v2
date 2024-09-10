@@ -368,9 +368,6 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::engage() -> void
       }
     },
     rclcpp::Duration::from_seconds(1.0));
-  autoware_state_dispatcher.registerTask(tier4_system_msgs::msg::AutowareState::DRIVING, [this]() {
-    autoware_state_dispatcher.requestUnregisterAllTasks();
-  });
 }
 
 auto FieldOperatorApplicationFor<AutowareUniverse>::engageable() const -> bool
