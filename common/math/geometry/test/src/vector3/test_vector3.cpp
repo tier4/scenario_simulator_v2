@@ -54,6 +54,9 @@ TEST(Vector3, hypot_customVector)
   EXPECT_DOUBLE_EQ(math::geometry::hypot(vec0, vec1), 6.0);
 }
 
+/**
+ * @note Test function correctness with parameter that is ros message vector.
+ */
 TEST(Vector3, norm_msgVector)
 {
   geometry_msgs::msg::Vector3 vec0 = makeVector(1.0, 2.0, 3.0);
@@ -75,6 +78,12 @@ TEST(Vector3, normalize_msgVector)
   const double norm = std::sqrt(14.0);
   EXPECT_VECTOR3_EQ(
     math::geometry::normalize(vec0), makeVector(1.0 / norm, 2.0 / norm, 3.0 / norm));
+
+  geometry_msgs::msg::Vector3 vec1;
+  EXPECT_DOUBLE_EQ(math::geometry::norm(vec1), 0.0);
+
+  geometry_msgs::msg::Vector3 vec2 = makeVector(1.0, 0.0, 3.0);
+  EXPECT_DOUBLE_EQ(math::geometry::norm(vec2), std::sqrt(10.0));
 }
 
 TEST(Vector3, normalize_customVector)
@@ -184,25 +193,16 @@ TEST(Vector3, additionAssignment_customVector)
   EXPECT_VECTOR3_EQ(vec0, makeVector(0.0, 0.0, 2.0));
 }
 
-TEST(Vector3, vector3_getSizeZero)
-{
-  geometry_msgs::msg::Vector3 vec;
-  EXPECT_DOUBLE_EQ(math::geometry::norm(vec), 0.0);
-}
-
-TEST(Vector3, vector3_getSize)
-{
-  geometry_msgs::msg::Vector3 vec = makeVector(1.0, 0.0, 3.0);
-  EXPECT_DOUBLE_EQ(math::geometry::norm(vec), std::sqrt(10.0));
-}
-
-TEST(Vector3, vector3_normalizeZero)
+/**
+ * @note Test function correctness when one of the vectors has length of 0.
+ */
+TEST(Vector3, normalize_zeroLength)
 {
   geometry_msgs::msg::Vector3 vec;
   EXPECT_THROW(math::geometry::normalize(vec), common::SimulationError);
 }
 
-TEST(Vector3, vector3_normalize)
+TEST(Vector3, normalize)
 {
   geometry_msgs::msg::Vector3 vec = makeVector(1.0, 0.0, 3.0);
   vec = math::geometry::normalize(vec);
