@@ -21,6 +21,9 @@ Changelog for package kashiwanoha_map
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+4.2.1 (2024-09-10)
+------------------
+
 4.2.0 (2024-09-09)
 ------------------
 
