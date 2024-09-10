@@ -104,7 +104,7 @@ def launch_setup(context, *args, **kwargs):
     autoware_launch_package             = LaunchConfiguration("autoware_launch_package",                default=default_autoware_launch_package_of(architecture_type.perform(context)))
     consider_acceleration_by_road_slope = LaunchConfiguration("consider_acceleration_by_road_slope",    default=False)
     consider_pose_by_road_slope         = LaunchConfiguration("consider_pose_by_road_slope",            default=True)
-    global_frame_rate                   = LaunchConfiguration("global_frame_rate",                      default=30.0)
+    global_frame_rate                   = LaunchConfiguration("global_frame_rate",                      default=20.0)
     global_real_time_factor             = LaunchConfiguration("global_real_time_factor",                default=1.0)
     global_timeout                      = LaunchConfiguration("global_timeout",                         default=180)
     initialize_duration                 = LaunchConfiguration("initialize_duration",                    default=300)
