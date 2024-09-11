@@ -375,10 +375,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::engageable() const -> bool
   return isWaitingForEngage();
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::engaged() const -> bool
-{
-  return isDriving();
-}
+auto FieldOperatorApplicationFor<AutowareUniverse>::engaged() const -> bool { return isDriving(); }
 
 auto FieldOperatorApplicationFor<AutowareUniverse>::getWaypoints() const
   -> traffic_simulator_msgs::msg::WaypointsArray
