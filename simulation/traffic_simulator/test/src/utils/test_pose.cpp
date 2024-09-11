@@ -313,7 +313,7 @@ TEST(pose, relativePose_poses_zero)
 }
 
 /**
- * @note ttest calculation correctness with a non trivial example.
+ * @note Test calculation correctness with a non trivial example.
  */
 TEST(pose, relativePose_poses_complex)
 {
@@ -620,7 +620,7 @@ TEST_F(PoseTest, isAtEndOfLanelets_singleFollowing_within)
 }
 
 /**
- * @note Test calculation correctness when there is a signle following lanelet and the pose lies after the end of the lanelet.
+ * @note Test calculation correctness when there is a single following lanelet and the pose lies after the end of the lanelet.
  */
 TEST_F(PoseTest, isAtEndOfLanelets_singleFollowing_outside)
 {
