@@ -19,7 +19,7 @@
 #include <simple_sensor_simulator/sensor_simulation/primitives/box.hpp>
 #include <vector>
 
-#include "../expect_eq_macros.hpp"
+#include "../../utils/expect_eq_macros.hpp"
 
 using namespace simple_sensor_simulator;
 using namespace simple_sensor_simulator::primitives;

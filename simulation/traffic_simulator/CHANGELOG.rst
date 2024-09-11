@@ -21,6 +21,111 @@ Changelog for package traffic_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+4.2.3 (2024-09-11)
+------------------
+
+4.2.2 (2024-09-10)
+------------------
+* Merge branch 'master' into RJD-1278/geometry-update
+* Merge branch 'master' into RJD-1278/geometry-update
+* Merge branch 'master' into RJD-1278/geometry-update
+* Merge branch 'master' into RJD-1278/geometry-update
+* Contributors: Masaya Kataoka, Michał Ciasnocha
+
+4.2.1 (2024-09-10)
+------------------
+* Merge pull request `#1367 <https://github.com/tier4/scenario_simulator_v2/issues/1367>`_ from tier4/RJD-1197/canonicalized_lanelet_pose
+  Rjd 1197/canonicalized lanelet pose
+* Spelling changes
+* Lint changes
+* Change assert check from bool to has_value
+* Change invalid test cases to more obvious values
+* Unit tests review changes
+* CanonicalizedLaneletPose unit tests
+* Contributors: Grzegorz Maj, Masaya Kataoka
+
+4.2.0 (2024-09-09)
+------------------
+* Merge pull request `#1362 <https://github.com/tier4/scenario_simulator_v2/issues/1362>`_ from tier4/feature/ros2-parameter-forwarding
+* Cleanup
+* Move parameter `use_sim_time` into function `make_parameters`
+* Remove data member `traffic_simulator::Configuration::rviz_config_path`
+* Add feature to forward parameters prefixed with `autoware.` to Autoware
+* Contributors: Kotaro Yoshimoto, yamacir-kit
+
+4.1.1 (2024-09-03)
+------------------
+* Merge pull request `#1207 <https://github.com/tier4/scenario_simulator_v2/issues/1207>`_ from tier4/fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* feat(use_sim_time): set default as false
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge remote-tracking branch 'origin/master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into doc/RJD-1273-add-realtime-factor-doc
+* use_sim_time used in concealer initialization
+* Contributors: Dawid Moszynski, Dawid Moszyński, Kotaro Yoshimoto, Paweł Lech
+
+4.1.0 (2024-09-03)
+------------------
+* Merge branch 'master' into RJD-1278/fix-line-segment
+* Merge branch 'master' into RJD-1278/fix-line-segment
+* Merge branch 'master' into RJD-1278/fix-line-segment
+* Merge branch 'master' into RJD-1278/fix-1344-getIntersection2DSValue
+* Merge branch 'master' into RJD-1278/fix-1343-isIntersect2D
+* Contributors: Michał Ciasnocha
+
+4.0.4 (2024-09-02)
+------------------
+* Merge branch 'master' into feature/simple_sensor_simulator_unit_tests_lidar
+* Merge branch 'master' into feature/simple_sensor_simulator_unit_tests_lidar
+* Merge branch 'master' into feature/simple_sensor_simulator_unit_tests_lidar
+* Contributors: Masaya Kataoka, SzymonParapura
+
+4.0.3 (2024-08-29)
+------------------
+* Merge pull request `#1358 <https://github.com/tier4/scenario_simulator_v2/issues/1358>`_ from tier4/RJD-1056-remove-npc-logic-started
+  Remove unused data members: npc_logic_started
+* feat(traffic_simulator): apply clang reforamt
+* Merge remote-tracking branch 'origin/master' into RJD-1056-remove-npc-logic-started
+* Merge branch 'RJD-1056-remove-current-time-step-time' into RJD-1057-base
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-npc-logic-started
+* Merge branch 'RJD-1056-remove-npc-logic-started' into RJD-1057-base
+* Merge branch 'RJD-1056-remove-current-time-step-time' into RJD-1057-base
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-npc-logic-started
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-npc-logic-started
+* Merge remote-tracking branch 'tier4/RJD-1056-remove-npc-logic-started' into RJD-1057-base
+* Merge remote-tracking branch 'tier4/RJD-1056-remove-current-time-step-time' into RJD-1057-base
+* fix(traffic_simulator): remove unnecessary misc_object tests
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-npc-logic-started
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-npc-logic-started
+* Merge remote-tracking branch 'origin/RJD-1056-remove-current-time-step-time' into RJD-1057-base
+* Merge remote-tracking branch 'origin/RJD-1056-remove-npc-logic-started' into RJD-1057-base
+* fix(ego_entity): fix autoware update when not npc_logic_started
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-npc-logic-started
+* Corrections for adapting removed npc logic started
+* Merge remote-tracking branch 'origin/ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-npc-logic-started
+* Merge remote-tracking branch 'origin/RJD-1056-remove-npc-logic-started' into RJD-1057-base
+* Correct EntityManager::getCurrentAction
+* Add else
+* Trailing return type
+* Use member instead of getter
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-npc-logic-started
+* Forward isNpcLogicStarted to API and restore TestExecutor
+* Add else
+* Move implementation to cpp file
+* Remove npc_logic_started from API
+* Update NPC logic only when it has been started
+* Correct style
+* Restore previous getCurrentAction behavior
+* Remove npc_logic_started from Entities
+* Contributors: DMoszynski, Dawid Moszynski, Masaya Kataoka, Mateusz Palczuk
+
 4.0.2 (2024-08-28)
 ------------------
 * Merge pull request `#1356 <https://github.com/tier4/scenario_simulator_v2/issues/1356>`_ from tier4/RJD-1056-remove-current-time-step-time

@@ -41,23 +41,26 @@ auto EgoEntity::makeFieldOperatorApplication(
   if (const auto architecture_type =
         getParameter<std::string>(node_parameters, "architecture_type", "awf/universe");
       architecture_type.find("awf/universe") != std::string::npos) {
-    std::string rviz_config = getParameter<std::string>(node_parameters, "rviz_config", "");
+    auto parameters = getParameter<std::vector<std::string>>(node_parameters, "autoware.", {});
+
+    // clang-format off
+    parameters.push_back("map_path:=" + configuration.map_path.string());
+    parameters.push_back("lanelet2_map_file:=" + configuration.getLanelet2MapFile());
+    parameters.push_back("pointcloud_map_file:=" + configuration.getPointCloudMapFile());
+    parameters.push_back("sensor_model:=" + getParameter<std::string>(node_parameters, "sensor_model"));
+    parameters.push_back("vehicle_model:=" + getParameter<std::string>(node_parameters, "vehicle_model"));
+    parameters.push_back("rviz_config:=" + getParameter<std::string>(node_parameters, "rviz_config"));
+    parameters.push_back("scenario_simulation:=true");
+    parameters.push_back("use_foa:=false");
+    parameters.push_back("perception/enable_traffic_light:=" + std::string(architecture_type >= "awf/universe/20230906" ? "true" : "false"));
+    parameters.push_back("use_sim_time:=" + std::string(getParameter<bool>(node_parameters, "use_sim_time", false) ? "true" : "false"));
+    // clang-format on
+
     return getParameter<bool>(node_parameters, "launch_autoware", true)
              ? std::make_unique<
                  concealer::FieldOperatorApplicationFor<concealer::AutowareUniverse>>(
                  getParameter<std::string>(node_parameters, "autoware_launch_package"),
-                 getParameter<std::string>(node_parameters, "autoware_launch_file"),
-                 "map_path:=" + configuration.map_path.string(),
-                 "lanelet2_map_file:=" + configuration.getLanelet2MapFile(),
-                 "pointcloud_map_file:=" + configuration.getPointCloudMapFile(),
-                 "sensor_model:=" + getParameter<std::string>(node_parameters, "sensor_model"),
-                 "vehicle_model:=" + getParameter<std::string>(node_parameters, "vehicle_model"),
-                 "rviz_config:=" + ((rviz_config == "")
-                                      ? configuration.rviz_config_path.string()
-                                      : Configuration::Pathname(rviz_config).string()),
-                 "scenario_simulation:=true", "use_foa:=false",
-                 "perception/enable_traffic_light:=" +
-                   std::string((architecture_type >= "awf/universe/20230906") ? "true" : "false"))
+                 getParameter<std::string>(node_parameters, "autoware_launch_file"), parameters)
              : std::make_unique<
                  concealer::FieldOperatorApplicationFor<concealer::AutowareUniverse>>();
   } else {
@@ -134,11 +137,17 @@ auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsAr
   return field_operator_application->getWaypoints();
 }
 
-auto EgoEntity::onUpdate(const double current_time, const double step_time) -> void
+void EgoEntity::updateFieldOperatorApplication() const
+{
+  field_operator_application->rethrow();
+  field_operator_application->spinSome();
+}
+
+void EgoEntity::onUpdate(double current_time, double step_time)
 {
   EntityBase::onUpdate(current_time, step_time);
 
-  if (is_controlled_by_simulator_ && npc_logic_started_) {
+  if (is_controlled_by_simulator_) {
     if (
       const auto non_canonicalized_updated_status =
         traffic_simulator::follow_trajectory::makeUpdatedStatus(
@@ -159,9 +168,7 @@ auto EgoEntity::onUpdate(const double current_time, const double step_time) -> v
 
   updateStandStillDuration(step_time);
   updateTraveledDistance(step_time);
-
-  field_operator_application->rethrow();
-  field_operator_application->spinSome();
+  updateFieldOperatorApplication();
 
   EntityBase::onPostUpdate(current_time, step_time);
 }
