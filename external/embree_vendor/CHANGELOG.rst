@@ -24,6 +24,9 @@ Changelog for package embree_vendor
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+4.2.3 (2024-09-11)
+------------------
+
 4.2.2 (2024-09-10)
 ------------------
 * Merge branch 'master' into RJD-1278/geometry-update
