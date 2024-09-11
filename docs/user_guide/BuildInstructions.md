@@ -2,8 +2,6 @@
 
 These setup instructions guide you through the process of building **Scenario Simulator v2**, which currently supports **ROS 2 Humble Hawksbill**.
 
----
-
 ## Setup ROS 2 environment
 
 1. **Configure the locale**  
@@ -64,7 +62,6 @@ These setup instructions guide you through the process of building **Scenario Si
    sudo apt install ros-dev-tools
    ```
 > **Reference:** [ROS 2 Humble Installation Guide](https://docs.ros.org/en/humble/Installation.html)
----
 
 ## Setup workspace
 
@@ -87,7 +84,6 @@ These setup instructions guide you through the process of building **Scenario Si
    ```bash
    vcs import external < dependency_humble.repos
    ```
----
 
 ## Install dependencies via rosdep
 
@@ -111,7 +107,6 @@ These setup instructions guide you through the process of building **Scenario Si
    ```bash
    rosdep install -iry --from-paths src/scenario_simulator_v2 --rosdistro humble
    ```
----
 
 ## Build scenario_simulator_v2
 To build **Scenario Simulator v2**, run this command:
