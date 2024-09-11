@@ -21,6 +21,18 @@ Changelog for package cpp_mock_scenarios
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+4.2.3 (2024-09-11)
+------------------
+* Merge pull request `#1368 <https://github.com/tier4/scenario_simulator_v2/issues/1368>`_ from tier4/fix/mock-test-launch-test
+  fix: mock test launch
+* fix: global frame rate 30.0 -> 20.0
+* fix: set default rviz config
+* fix: missing param
+* fix: use global timeout
+* fix: make it possible to change hard-coded parameters
+* fix: load necessary parameters
+* Contributors: Masaya Kataoka, satoshi-ota
+
 4.2.2 (2024-09-10)
 ------------------
 * Merge branch 'master' into RJD-1278/geometry-update
