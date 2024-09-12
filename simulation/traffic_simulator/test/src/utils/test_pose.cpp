@@ -289,7 +289,7 @@ TEST(pose, transformRelativePoseToGlobal)
 /**
  * @note Test calculation correctness when only one pose is zeroed, the goal is to obtain a pose equal to the second argument.
  */
-TEST(pose, relativePose_poses_zeros)
+TEST(pose, relativePose_poses_zero)
 {
   const auto from = makePose(makePoint(0.0, 0.0, 0.0));
   const auto to = makePose(makePoint(10.0, 51.0, 2.0));
@@ -302,7 +302,7 @@ TEST(pose, relativePose_poses_zeros)
 /**
  * @note Test calculation correctness when both poses are zeroed.
  */
-TEST(pose, relativePose_poses_zero)
+TEST(pose, relativePose_poses_zeros)
 {
   const auto from = makePose(makePoint(0.0, 0.0, 0.0));
   const auto to = makePose(makePoint(0.0, 0.0, 0.0));
@@ -330,7 +330,7 @@ TEST(pose, relativePose_poses_complex)
 /**
  * @note Test calculation correctness with the overload.
  */
-TEST_F(PoseTest, relativePose_first)
+TEST_F(PoseTest, relativePose_canonicalized_end_position)
 {
   const auto pose_relative = makePose(
     makePoint(9.9999, -0.0009, 0.0126),
@@ -350,7 +350,7 @@ TEST_F(PoseTest, relativePose_first)
 /**
  * @note Test calculation correctness with the overload.
  */
-TEST_F(PoseTest, relativePose_second)
+TEST_F(PoseTest, relativePose_canonicalized_start_position)
 {
   const auto pose_relative = makePose(
     makePoint(145244.7916, 786706.3326, 0.0127),
