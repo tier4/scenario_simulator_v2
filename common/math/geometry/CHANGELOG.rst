@@ -21,6 +21,58 @@ Changelog for package geometry
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+4.2.3 (2024-09-11)
+------------------
+
+4.2.2 (2024-09-10)
+------------------
+* Merge pull request `#1341 <https://github.com/tier4/scenario_simulator_v2/issues/1341>`_ from tier4/RJD-1278/geometry-update
+  Rjd 1278/geometry update
+* Merge branch 'master' into RJD-1278/geometry-update
+* updates after merge
+* update testcase
+* remove empty line
+* isIntersect2D_collinear
+* refactor toPolygon2D tests
+* add comments
+* bounding_box clean up
+* clean up vector3
+* rename tests in HermiteCurve
+* rename tests in CatmullRomSpline
+* quaternion operators
+* tune down numbers
+* sort tests, rm old duplicate
+* getIntersection2D function
+* getIntersection2DSValue and isIntersect2D functions
+* getPose, getPoint refactor
+* add a proper structure to the test files
+* Merge branch 'master' into RJD-1278/geometry-update
+* Merge branch 'master' into RJD-1278/geometry-update
+* update testcase
+* remove empty line
+* isIntersect2D_collinear
+* Merge branch 'master' into RJD-1278/geometry-update
+* refactor toPolygon2D tests
+* add comments
+* bounding_box clean up
+* clean up vector3
+* rename tests in HermiteCurve
+* rename tests in CatmullRomSpline
+* quaternion operators
+* tune down numbers
+* sort tests, rm old duplicate
+* getIntersection2D function
+* getIntersection2DSValue and isIntersect2D functions
+* getPose, getPoint refactor
+* add a proper structure to the test files
+* Contributors: Masaya Kataoka, Michał Ciasnocha, robomic
+
+4.2.1 (2024-09-10)
+------------------
+
+4.2.0 (2024-09-09)
+------------------
+
 4.1.1 (2024-09-03)
 ------------------
 * Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
