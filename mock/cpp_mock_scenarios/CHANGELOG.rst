@@ -21,6 +21,9 @@ Changelog for package cpp_mock_scenarios
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+4.2.4 (2024-09-12)
+------------------
+
 4.2.3 (2024-09-11)
 ------------------
 * Merge pull request `#1368 <https://github.com/tier4/scenario_simulator_v2/issues/1368>`_ from tier4/fix/mock-test-launch-test
