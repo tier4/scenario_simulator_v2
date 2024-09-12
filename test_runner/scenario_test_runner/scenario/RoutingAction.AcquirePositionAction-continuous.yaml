@@ -6,7 +6,10 @@ OpenSCENARIO:
     revMajor: 1
     revMinor: 0
   ParameterDeclarations:
-    ParameterDeclaration: []
+    ParameterDeclaration:
+      - name: laps
+        parameterType: unsignedInt
+        value: 3
   CatalogLocations:
     VehicleCatalog:
       Directory:
@@ -32,7 +35,7 @@ OpenSCENARIO:
           - entityRef: ego
             PrivateAction:
               - TeleportAction:
-                  Position:
+                  Position: &INITIAL_POSITION
                     LanePosition:
                       roadId: ''
                       laneId: '34513'
@@ -45,17 +48,17 @@ OpenSCENARIO:
                         r: 0
               - RoutingAction:
                   AcquirePositionAction:
-                    Position: &DESTINATION_1
+                    Position: &POSITION_A
                       LanePosition:
                         roadId: ''
-                        laneId: '34510'
+                        laneId: '34681'
                         s: 1
                         offset: 0
                         Orientation: *DEFAULT_ORIENTATION
     Story:
       - name: ''
         Act:
-          - name: ''
+          - name: loop
             ManeuverGroup:
               - maximumExecutionCount: 1
                 name: ''
@@ -65,24 +68,48 @@ OpenSCENARIO:
                     - entityRef: ego
                 Maneuver:
                   - name: ''
+                    ParameterDeclarations:
+                      ParameterDeclaration:
+                        - name: current_destination
+                          parameterType: string
+                          value: position_a
                     Event:
-                      - name: ''
+                      - maximumExecutionCount: $laps
+                        name: ''
                         priority: parallel
                         Action:
                           - name: ''
                             PrivateAction:
                               - RoutingAction:
                                   AcquirePositionAction:
-                                    Position: &DESTINATION_2
-                                      LanePosition:
-                                        roadId: ''
-                                        laneId: '34507'
-                                        s: 50
-                                        offset: 0
-                                        Orientation: *DEFAULT_ORIENTATION
+                                    Position: *POSITION_A
+                          - name: ''
+                            GlobalAction:
+                              ParameterAction:
+                                parameterRef: current_destination
+                                SetAction:
+                                  value: position_a
                         StartTrigger:
                           ConditionGroup:
                             - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      ReachPositionCondition:
+                                        Position: &POSITION_B
+                                          LanePosition:
+                                            roadId: ''
+                                            laneId: '34408'
+                                            s: 1
+                                            offset: 0
+                                            Orientation: *DEFAULT_ORIENTATION
+                                        tolerance: 1
                                 - name: ''
                                   delay: 0
                                   conditionEdge: none
@@ -103,21 +130,82 @@ OpenSCENARIO:
                                       name: ego.currentState
                                       rule: equalTo
                                       value: WAITING_FOR_ROUTE
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    ParameterCondition:
+                                      parameterRef: current_destination
+                                      rule: notEqualTo
+                                      value: position_a
+                      - maximumExecutionCount: $laps
+                        name: ''
+                        priority: parallel
+                        Action:
+                          - name: ''
+                            PrivateAction:
+                              - RoutingAction:
+                                  AcquirePositionAction:
+                                    Position: *POSITION_B
+                          - name: ''
+                            GlobalAction:
+                              ParameterAction:
+                                parameterRef: current_destination
+                                SetAction:
+                                  value: position_b
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      ReachPositionCondition:
+                                        Position: *POSITION_A
+                                        tolerance: 1
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      SpeedCondition:
+                                        rule: equalTo
+                                        value: 0
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    UserDefinedValueCondition:
+                                      name: ego.currentState
+                                      rule: equalTo
+                                      value: WAITING_FOR_ROUTE
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    ParameterCondition:
+                                      parameterRef: current_destination
+                                      rule: notEqualTo
+                                      value: position_b
             StartTrigger:
               ConditionGroup:
                 - Condition:
                     - name: ''
                       delay: 0
                       conditionEdge: none
-                      ByEntityCondition:
-                        TriggeringEntities:
-                          triggeringEntitiesRule: any
-                          EntityRef:
-                            - entityRef: ego
-                        EntityCondition:
-                          ReachPositionCondition:
-                            Position: *DESTINATION_1
-                            tolerance: 1
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
           - name: _EndCondition
             ManeuverGroup:
               - maximumExecutionCount: 1
@@ -137,6 +225,14 @@ OpenSCENARIO:
                                 - name: ''
                                   delay: 0
                                   conditionEdge: none
+                                  ByValueCondition:
+                                    StoryboardElementStateCondition:
+                                      storyboardElementRef: loop
+                                      storyboardElementType: act
+                                      state: completeState
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
                                   ByEntityCondition:
                                     TriggeringEntities:
                                       triggeringEntitiesRule: any
@@ -144,14 +240,16 @@ OpenSCENARIO:
                                         - entityRef: ego
                                     EntityCondition:
                                       ReachPositionCondition:
-                                        Position:
-                                          LanePosition:
-                                            roadId: ''
-                                            laneId: '34507'
-                                            s: 50
-                                            offset: 0
-                                            Orientation: *DEFAULT_ORIENTATION
-                                        tolerance: 0.5
+                                        Position: *POSITION_A
+                                        tolerance: 1
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: ${90 + $laps * 120}
+                                      rule: greaterThan
                         Action:
                           - name: ''
                             UserDefinedAction:
@@ -165,10 +263,14 @@ OpenSCENARIO:
                                 - name: ''
                                   delay: 0
                                   conditionEdge: none
-                                  ByValueCondition:
-                                    SimulationTimeCondition:
-                                      value: 180
-                                      rule: greaterThan
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      StandStillCondition:
+                                        duration: 10
                         Action:
                           - name: ''
                             UserDefinedAction:
