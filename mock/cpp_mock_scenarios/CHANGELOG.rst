@@ -21,6 +21,13 @@ Changelog for package cpp_mock_scenarios
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+4.2.5 (2024-09-12)
+------------------
+* Merge pull request `#1373 <https://github.com/tier4/scenario_simulator_v2/issues/1373>`_ from tier4/fix/colcon_build_error_furthermore
+  fix: install add_cpp_mock_scenario_test.cmake first, or colcon build won't pass
+* fix: install add_cpp_mock_scenario_test.cmake first, or build won't pass
+* Contributors: Masaya Kataoka, XiaoyuWang0601
+
 4.2.4 (2024-09-12)
 ------------------
 
