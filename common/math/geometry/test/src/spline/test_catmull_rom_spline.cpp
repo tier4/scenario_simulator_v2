@@ -18,8 +18,8 @@
 #include <geometry/spline/catmull_rom_spline.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 
-#include "expect_eq_macros.hpp"
-#include "test_utils.hpp"
+#include "../expect_eq_macros.hpp"
+#include "../test_utils.hpp"
 
 constexpr double EPS = 1e-6;
 
@@ -70,7 +70,7 @@ void addOffset(geometry_msgs::msg::Point & point, const double offset, const dou
 
 /// @brief Testing the `CatmullRomSpline::getCollisionPointIn2D` function works valid.
 /// In this test case, number of the control points of the catmull-rom spline (variable name `spline`) is 2, so the shape of the value `spline` is line segment.
-TEST(CatmullRomSpline, GetCollisionWith2ControlPoints)
+TEST(CatmullRomSpline, getCollisionPointIn2D_2ControlPoints)
 {
   /// @note The `spline` has control points p0 and p1. Control point p0 is point (x,y,z) = (0,0,0) and control point p1 is point (x,y,z) = (1,0,0) in the cartesian coordinate system.
   // [Snippet_construct_spline]
@@ -149,7 +149,7 @@ TEST(CatmullRomSpline, GetCollisionWith2ControlPoints)
 
 /// @brief Testing the `CatmullRomSpline::getCollisionPointIn2D` function works valid
 /// In this test case, number of the control points of the catmull-rom spline (variable name `spline`) is 1, so the shape of the value `spline` is single point.
-TEST(CatmullRomSpline, GetCollisionWith1ControlPoint)
+TEST(CatmullRomSpline, getCollisionPointIn2D_1ControlPoint)
 {
   /// @note The variable `spline` has control point with point (x,y,z) = (0,1,0) in the cartesian coordinate system. So, `spline` is same as point (x,y,z) = (0,1,0).
   auto spline = math::geometry::CatmullRomSpline(
