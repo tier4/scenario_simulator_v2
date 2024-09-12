@@ -65,7 +65,7 @@ This document contains step-by-step instruction on how to build and run [AWF Aut
 #### scenario_test_runner
    ```bash
    ros2 launch scenario_test_runner scenario_test_runner.launch.py \
-   architecture_type:=awf/universe \
+   architecture_type:=awf/universe/20230906 \
    record:=false \
    scenario:='$(find-pkg-share scenario_test_runner)/scenario/sample.yaml' \
    sensor_model:=sample_sensor_kit \
@@ -75,7 +75,7 @@ This document contains step-by-step instruction on how to build and run [AWF Aut
 #### random_test_runner
    ```bash
    ros2 launch random_test_runner random_test.launch.py \
-   architecture_type:=awf/universe \
+   architecture_type:=awf/universe/20230906 \
    sensor_model:=sample_sensor_kit \
    vehicle_model:=sample_vehicle
    ``` 
