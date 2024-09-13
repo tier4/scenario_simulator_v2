@@ -64,8 +64,9 @@ void CppScenarioNode::start()
 {
   onInitialize();
   api_.startNpcLogic();
-  using namespace std::chrono_literals;
-  update_timer_ = this->create_wall_timer(50ms, std::bind(&CppScenarioNode::update, this));
+  const auto rate =
+    std::chrono::duration<double>(1.0 / get_parameter("global_frame_rate").as_double());
+  update_timer_ = this->create_wall_timer(rate, std::bind(&CppScenarioNode::update, this));
 }
 
 void CppScenarioNode::stop(Result result, const std::string & description)
