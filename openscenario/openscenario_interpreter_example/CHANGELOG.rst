@@ -21,6 +21,11 @@ Changelog for package openscenario_interpreter_example
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+4.2.6 (2024-09-13)
+------------------
+* Merge branch 'master' into RJD-1197/pose_module
+* Contributors: Masaya Kataoka
+
 4.2.5 (2024-09-12)
 ------------------
 

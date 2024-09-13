@@ -21,6 +21,18 @@ Changelog for package traffic_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+4.2.6 (2024-09-13)
+------------------
+* Merge pull request `#1371 <https://github.com/tier4/scenario_simulator_v2/issues/1371>`_ from tier4/RJD-1197/pose_module
+  Rjd 1197/pose module
+* Change names of relativePose tests
+* Fix typos in comments
+* Merge branch 'master' into RJD-1197/pose_module
+* CR requested changes part 2
+* CR requested changes
+* Pose module unit tests
+* Contributors: Grzegorz Maj, Masaya Kataoka
+
 4.2.5 (2024-09-12)
 ------------------
 
