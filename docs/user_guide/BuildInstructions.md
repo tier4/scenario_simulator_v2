@@ -20,7 +20,7 @@ These setup instructions guide you through the process of building **Scenario Si
    ```
    <div style="text-align: center;">
       <img src="../image/locale_verification.png"/><br>
-      <em>The expected result after running the <code>locale</code> command should look like this, with <code>LANG</code> set to <code>en_US.UTF-8</code>.</em>
+      <em>The expected result after running the <code>locale</code> command should look like this, with <code>LANG</code> set to <code>en_US.UTF-8</code> by default.</em>
    </div>
 
 2. Enable the Ubuntu Universe repository.
@@ -95,5 +95,5 @@ colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
 ```
 <div style="text-align: center;">
    <img src="../image/ss2_build_result.png"/><br>
-   <em>After running <code>colcon build</code>, all packages should be built successfully.</em>
+   <em>As a result of running the <code>colcon build</code> command, all packages should be built successfully.</em>
 </div>
