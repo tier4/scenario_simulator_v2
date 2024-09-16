@@ -92,7 +92,7 @@ This guide provides step-by-step instructions for building and running **Scenari
    sensor_model:=sample_sensor_kit \
    vehicle_model:=sample_vehicle timeout:=120.0
    ``` 
-   > **Note:** To modify parameters of random testing and to obtain more details about the test results and the **result.junit.xml** file (which is saved by default in the **/tmp** directory),<br> please refer to the **random_test_runner** [documentation](random_test_runner/Usage.md).
+   > **Note:** To modify parameters of random testing and to obtain more details about the test results and the **result.junit.xml** file (which is saved by default in the **/tmp** directory), please refer to the **random_test_runner** [documentation](random_test_runner/Usage.md).
 
    <div style="text-align: center;">
       <img src="../image/random_test_runner_launch.gif"/><br>
