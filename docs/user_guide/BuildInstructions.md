@@ -50,7 +50,8 @@ These setup instructions guide you through the process of building **Scenario Si
    ```bash
    sudo apt install ros-dev-tools
    ```
-> **Reference:** [ROS 2 Humble Installation Guide](https://docs.ros.org/en/humble/Installation.html)
+!!! info
+    For more detailed information, refer to the [ROS 2 Humble Installation Guide](https://docs.ros.org/en/humble/Installation.html).
 
 ## Setup workspace
 

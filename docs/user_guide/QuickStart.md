@@ -32,7 +32,8 @@ This guide provides step-by-step instructions for building and running **Scenari
       ```bash
       ./setup-dev-env.sh
       ```
-      > **Note:** This step will install necessary dependencies, including ROS 2, if not already installed. <br> Make sure to confirm and agree with the licenses for NVIDIA libraries like [CUDA](https://docs.nvidia.com/cuda/eula/index.html), [cuDNN](https://docs.nvidia.com/deeplearning/cudnn/sla/index.html), and [TensorRT](https://docs.nvidia.com/deeplearning/tensorrt/sla/index.html).
+      !!! note 
+          This step will install necessary dependencies, including ROS 2, if not already installed. <br> Make sure to confirm and agree with the licenses for NVIDIA libraries like [CUDA](https://docs.nvidia.com/cuda/eula/index.html), [cuDNN](https://docs.nvidia.com/deeplearning/cudnn/sla/index.html), and [TensorRT](https://docs.nvidia.com/deeplearning/tensorrt/sla/index.html).
 
    5. Install dependent ROS packages.
       ```bash
@@ -44,12 +45,11 @@ This guide provides step-by-step instructions for building and running **Scenari
       ```bash
       colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
       ```
-      > **Note:** For detailed guidance on build issues and troubleshooting, please refer to the [Autoware Troubleshooting Guide](https://autowarefoundation.github.io/autoware-documentation/main/support/troubleshooting/#build-issues).
-      
-   <div style="text-align: center;">
-      <img src="../image/ss2_autoware_build_result.png" alt="Build success" /><br>
-      <em>As a result of running the <code>colcon build</code> command, all packages should be built successfully.</em>
-   </div>
+      !!! note 
+          For detailed guidance on build issues and troubleshooting, please refer to the [Autoware Troubleshooting Guide](https://autowarefoundation.github.io/autoware-documentation/main/support/troubleshooting/#build-issues).
+
+   ![Build success](../image/ss2_autoware_build_result.png)
+   *As a result of running the `colcon build` command, all packages should be built successfully.*
 
 ## How to run
 
@@ -75,15 +75,11 @@ This guide provides step-by-step instructions for building and running **Scenari
    sensor_model:=sample_sensor_kit \
    vehicle_model:=sample_vehicle
    ``` 
-   <div style="text-align: center;">
-      <img src="../image/scenario_test_runner_launch.gif"/><br>
-      <em>The process of launching the <code>scenario_test_runner</code> node.</em>
-   </div><br>
+   ![Launching scenario_test_runner](../image/scenario_test_runner_launch.gif)
+   *The process of launching the `scenario_test_runner` node.*
 
-   <div style="text-align: center;">
-      <img src="../image/scenario_test_runner_result.png"/><br>
-      <em>The expected outcome of running the <code>scenario_test_runner</code> node.</em>
-   </div>
+   ![Launching scenario_test_runner](../image/scenario_test_runner_result.png)
+   *The expected outcome of running the `scenario_test_runner` node.*
    
 #### random_test_runner
    ```bash
@@ -92,17 +88,14 @@ This guide provides step-by-step instructions for building and running **Scenari
    sensor_model:=sample_sensor_kit \
    vehicle_model:=sample_vehicle timeout:=120.0
    ``` 
-   > **Note:** To modify parameters of random testing and to obtain more details about the test results and the **result.junit.xml** file (which is saved by default in the **/tmp** directory), please refer to the **random_test_runner** [documentation](random_test_runner/Usage.md).
+   !!! note 
+      To modify parameters of random testing and to obtain more details about the test results and the **result.junit.xml** file (which is saved by default in the **/tmp** directory), please refer to the **random_test_runner** [documentation](random_test_runner/Usage.md).
 
-   <div style="text-align: center;">
-      <img src="../image/random_test_runner_launch.gif"/><br>
-      <em>The process of launching the <code>random_test_runner</code> node.</em>
-   </div><br>
+   ![Launching random_test_runner](../image/random_test_runner_launch.gif)
+   *The process of launching the `random_test_runner` node.*
 
-   <div style="text-align: center;">
-      <img src="../image/random_test_runner_result.png"/><br>
-      <em>The expected outcome of running the <code>random_test_runner</code> node.</em>
-   </div>
+   ![Result of random_test_runner](../image/random_test_runner_result.png)
+   *The expected outcome of running the `random_test_runner` node.*
  
 #### cpp scenario demo
    ```bash
@@ -110,14 +103,8 @@ This guide provides step-by-step instructions for building and running **Scenari
    scenario:=traffic_simulation_demo \
    launch_rviz:=true timeout:=120.0
    ```
-   > **Note:** This demo does not use Autoware. The ego vehicle is interpreted as an NPC.
+   ![Launching cpp_mock_scenarios](../image/cpp_scenario_launch.gif)
+   *The process of launching the `cpp_mock_scenarios` node.*
 
-   <div style="text-align: center;">
-      <img src="../image/cpp_scenario_launch.gif"/><br>
-      <em>The process of launching the <code>cpp_mock_scenarios</code> node.</em>
-   </div><br>
-
-   <div style="text-align: center;">
-      <img src="../image/cpp_scenario_result.png"/><br>
-      <em>The expected outcome of running the <code>cpp_mock_scenarios</code> node.</em>
-   </div>
+   ![Result of cpp_mock_scenarios](../image/cpp_scenario_result.png)
+   *The expected outcome of running the `cpp_mock_scenarios` node.*
