@@ -4,7 +4,7 @@ These setup instructions guide you through the process of building **Scenario Si
 
 ## Setup ROS 2 environment
 
-1. **Configure the locale**  
+1. Configure the locale.
    Ensure that your system is configured with a locale that supports UTF-8.
 
    ```bash
@@ -18,46 +18,35 @@ These setup instructions guide you through the process of building **Scenario Si
    ```bash
    locale
    ```
-   ![Verifying Locale](../image/locale_verification.png)  
-   *The expected result after running the `locale` command should look like this, with **LANG** set to **en_US.UTF-8**.*
+   <div style="text-align: center;">
+      <img src="../image/locale_verification.png"/><br>
+      <em>The expected result after running the <code>locale</code> command should look like this, with <code>LANG</code> set to <code>en_US.UTF-8.</code></em>
+   </div>
 
-2. **Enable the Ubuntu Universe repository**  
-   Run the following commands to enable the Universe repository:
-
+2. Enable the Ubuntu Universe repository.
    ```bash
    sudo apt install software-properties-common
    sudo add-apt-repository universe
    ```
 
-   ![Adding Universe Repository](../image/universe_repository_result.png)  
-   *The expected result after running `sudo add-apt-repository universe`.*
-
-3. **Add the ROS 2 GPG key**  
-   Install `curl` and add the ROS 2 GPG key to your system:
-
+3. Add the ROS 2 GPG key.
    ```bash
    sudo apt update && sudo apt install curl -y
    sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
    ```
 
-4. **Add the ROS 2 repository to the system's package sources list**  
-   This command adds the ROS 2 repository to the system’s package sources list, enabling access to ROS 2 packages:
-
+4. Add the ROS 2 repository to the system's package sources list.
    ```bash
    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null
    ```
 
-5. **Install ROS 2 Humble Desktop**  
-   Update the apt cache and install ROS 2 Humble with the following command:
-
+5. Install ROS 2 Humble Desktop.
    ```bash
    sudo apt update
    sudo apt install ros-humble-desktop
    ```
 
-6. **Install development tools**  
-   Install the development tools needed to build ROS packages:
-
+6. Install development tools.
    ```bash
    sudo apt install ros-dev-tools
    ```
@@ -65,45 +54,36 @@ These setup instructions guide you through the process of building **Scenario Si
 
 ## Setup workspace
 
-1. **Create the workspace directory**
-
+1. Create the workspace directory.
    ```bash
    mkdir -p ~/scenario_simulator_ws/src
    cd ~/scenario_simulator_ws/src
    ```
 
-2. **Clone the Scenario Simulator repository**
-
+2. Clone the Scenario Simulator repository.
    ```bash
    git clone https://github.com/tier4/scenario_simulator_v2.git
    cd scenario_simulator_v2
    ```
 
-3. **Import Autoware dependencies**
-
+3. Import Autoware dependencies.
    ```bash
    vcs import external < dependency_humble.repos
    ```
 
 ## Install dependencies via rosdep
 
-1. **Move to the workspace directory**  
-   Before installing dependencies, navigate to the workspace directory where **Scenario Simulator v2** is located:
-
+1. Move to the workspace directory.
    ```bash
    cd ~/scenario_simulator_ws
    ```
 
-2. **Source the ROS 2 environment**  
-   Make sure the ROS 2 environment is properly sourced by running:
-
+2. Source the ROS 2 environment.
    ```bash
    source /opt/ros/humble/setup.bash
    ```
 
-3. **Install all required dependencies**  
-   Use `rosdep` to install all dependencies required for **Scenario Simulator v2**:
-
+3. Install all required dependencies.
    ```bash
    rosdep install -iry --from-paths src/scenario_simulator_v2 --rosdistro humble
    ```
@@ -113,5 +93,7 @@ To build **Scenario Simulator v2**, run this command:
 ```bash
 colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
 ```
-![Build Success](../image/build_success2.png)  
-*The expected result after running `colcon build` should display a message confirming a successful build.*
+<div style="text-align: center;">
+   <img src="../image/ss2_build_result.png"/><br>
+   <em>After running <code>colcon build,</code> all packages should be built successfully.</em>
+</div>
