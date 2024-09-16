@@ -18,10 +18,8 @@ These setup instructions guide you through the process of building **Scenario Si
    ```bash
    locale
    ```
-   <div style="text-align: center;">
-      <img src="../image/locale_verification.png"/><br>
-      <em>The expected result after running the <code>locale</code> command should look like this, with <code>LANG</code> set to <code>en_US.UTF-8</code> by default.</em>
-   </div>
+   ![Locale Verification](../image/locale_verification.png)
+   *The expected result after running the `locale` command should look like this, with `LANG` set to `en_US.UTF-8` by default.*
 
 2. Enable the Ubuntu Universe repository.
    ```bash
@@ -94,7 +92,5 @@ To build **Scenario Simulator v2**, run this command:
 ```bash
 colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
 ```
-<div style="text-align: center;">
-   <img src="../image/ss2_build_result.png"/><br>
-   <em>As a result of running the <code>colcon build</code> command, all packages should be built successfully.</em>
-</div>
+![Build success](../image/ss2_build_result.png)
+*As a result of running the `colcon build` command, all packages should be built successfully.*
