@@ -77,12 +77,12 @@ This guide provides step-by-step instructions for building and running **Scenari
    ``` 
    <div style="text-align: center;">
       <img src="../image/scenario_test_runner_launch.gif"/><br>
-      <em>The process of launching the <code>scenario_test_runner.</code></em>
+      <em>The process of launching the <code>scenario_test_runner</code>.</em>
    </div><br>
 
    <div style="text-align: center;">
       <img src="../image/scenario_test_runner_result.png"/><br>
-      <em>The expected outcome of running the <code>scenario_test_runner.</code></em>
+      <em>The expected outcome of running the <code>scenario_test_runner</code>.</em>
    </div>
    
 #### random_test_runner
@@ -96,12 +96,12 @@ This guide provides step-by-step instructions for building and running **Scenari
 
    <div style="text-align: center;">
       <img src="../image/random_test_runner_launch.gif"/><br>
-      <em>The process of launching the <code>random_test_runner.</code></em>
+      <em>The process of launching the <code>random_test_runner</code>.</em>
    </div><br>
 
    <div style="text-align: center;">
       <img src="../image/random_test_runner_result.png"/><br>
-      <em>The expected outcome of running the <code>random_test_runner.</code></em>
+      <em>The expected outcome of running the <code>random_test_runner</code>.</em>
    </div>
  
 #### cpp scenario demo
@@ -114,10 +114,10 @@ This guide provides step-by-step instructions for building and running **Scenari
 
    <div style="text-align: center;">
       <img src="../image/cpp_scenario_launch.gif"/><br>
-      <em>The process of launching the <code>cpp_mock_scenarios.</code></em>
+      <em>The process of launching the <code>cpp_mock_scenarios</code>.</em>
    </div><br>
 
    <div style="text-align: center;">
       <img src="../image/cpp_scenario_result.png"/><br>
-      <em>The expected outcome of running the <code>cpp_mock_scenarios.</code></em>
+      <em>The expected outcome of running the <code>cpp_mock_scenarios</code>.</em>
    </div>
