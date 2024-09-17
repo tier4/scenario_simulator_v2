@@ -24,9 +24,10 @@ inline namespace syntax
 EnvironmentAction::EnvironmentAction(const pugi::xml_node & node, Scope & scope)
 // clang-format off
 : ComplexType(
-    choice(node,
-      std::make_pair("Environment",      [&](const auto & node) { return make<Environment>(node, scope);        }),
-      std::make_pair("CatalogReference", [&](const auto & node) { return CatalogReference(node, scope).make();  })))
+    choice(node, {
+      { "Environment",      [&](const auto & node) { return make<Environment>(node, scope);        } },
+      { "CatalogReference", [&](const auto & node) { return CatalogReference(node, scope).make();  } },
+    }))
 // clang-format on
 {
 }

@@ -24,11 +24,12 @@ inline namespace syntax
 OpenScenarioCategory::OpenScenarioCategory(const pugi::xml_node & tree, Scope & scope)
 : Group(
     // clang-format off
-    choice(tree,
-            std::make_pair("Storyboard",                [&](auto &&     ) { return make<ScenarioDefinition                  >(tree, scope);}),  // DIRTY HACK!!!
-            std::make_pair("Catalog",                   [&](auto &&     ) { return make<CatalogDefinition                   >(tree, scope);}),
-            std::make_pair("ParameterValueDistribution",[&](auto && node) { return make<ParameterValueDistributionDefinition>(node, scope);})))
-// clang-format on
+    choice(tree, {
+      { "Storyboard",                [&](auto &&     ) { return make<ScenarioDefinition                  >(tree, scope); } },  // DIRTY HACK!!!
+      { "Catalog",                   [&](auto &&     ) { return make<CatalogDefinition                   >(tree, scope); } },
+      { "ParameterValueDistribution",[&](auto && node) { return make<ParameterValueDistributionDefinition>(node, scope); } },
+    }))
+    // clang-format on
 {
 }
 }  // namespace syntax

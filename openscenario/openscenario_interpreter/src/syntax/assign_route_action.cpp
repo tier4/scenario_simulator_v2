@@ -28,9 +28,10 @@ AssignRouteAction::AssignRouteAction(const pugi::xml_node & node, Scope & scope)
 // clang-format off
 : Scope(scope),
   route(
-    choice(node,
-      std::make_pair("Route",            [&](auto && node) { return make<Route>     (node, local());        }),
-      std::make_pair("CatalogReference", [&](auto && node) { return CatalogReference(node, local()).make(); })))
+    choice(node, {
+      { "Route",            [&](auto && node) { return make<Route>     (node, local());        } },
+      { "CatalogReference", [&](auto && node) { return CatalogReference(node, local()).make(); } },
+    }))
 // clang-format on
 {
   // OpenSCENARIO 1.2 Table 11

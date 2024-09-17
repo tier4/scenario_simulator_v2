@@ -28,14 +28,15 @@ inline namespace syntax
 ByValueCondition::ByValueCondition(const pugi::xml_node & node, Scope & scope)
 // clang-format off
 : ComplexType(
-    choice(node,
-      std::make_pair(              "ParameterCondition", [&](const auto & node) { return make<              ParameterCondition>(node, scope); }),
-      std::make_pair(              "TimeOfDayCondition", [&](const auto & node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
-      std::make_pair(         "SimulationTimeCondition", [&](const auto & node) { return make<         SimulationTimeCondition>(node, scope); }),
-      std::make_pair( "StoryboardElementStateCondition", [&](const auto & node) { return make< StoryboardElementStateCondition>(node, scope); }),
-      std::make_pair(       "UserDefinedValueCondition", [&](const auto & node) { return make<       UserDefinedValueCondition>(node, scope); }),
-      std::make_pair(          "TrafficSignalCondition", [&](const auto & node) { return make<          TrafficSignalCondition>(node, scope); }),
-      std::make_pair("TrafficSignalControllerCondition", [&](const auto & node) { return make<TrafficSignalControllerCondition>(node, scope); })))
+    choice(node, {
+      {               "ParameterCondition", [&](const auto & node) { return make<              ParameterCondition>(node, scope);           } },
+      {               "TimeOfDayCondition", [&](const auto & node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; } },
+      {          "SimulationTimeCondition", [&](const auto & node) { return make<         SimulationTimeCondition>(node, scope);           } },
+      {  "StoryboardElementStateCondition", [&](const auto & node) { return make< StoryboardElementStateCondition>(node, scope);           } },
+      {        "UserDefinedValueCondition", [&](const auto & node) { return make<       UserDefinedValueCondition>(node, scope);           } },
+      {           "TrafficSignalCondition", [&](const auto & node) { return make<          TrafficSignalCondition>(node, scope);           } },
+      { "TrafficSignalControllerCondition", [&](const auto & node) { return make<TrafficSignalControllerCondition>(node, scope);           } },
+    }))
 // clang-format on
 {
 }
