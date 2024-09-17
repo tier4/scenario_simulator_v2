@@ -30,7 +30,7 @@ CanonicalizedLaneletPose::CanonicalizedLaneletPose(
 : lanelet_pose_(canonicalize(maybe_non_canonicalized_lanelet_pose, hdmap_utils)),
   lanelet_poses_(
     hdmap_utils->getAllCanonicalizedLaneletPoses(maybe_non_canonicalized_lanelet_pose)),
-  map_pose_(toMapPose(lanelet_pose_, hdmap_utils))
+  map_pose_(pose::toMapPose(lanelet_pose_, hdmap_utils))
 {
   adjustOrientationAndOzPosition(hdmap_utils);
 }
@@ -41,7 +41,7 @@ CanonicalizedLaneletPose::CanonicalizedLaneletPose(
 : lanelet_pose_(canonicalize(maybe_non_canonicalized_lanelet_pose, route_lanelets, hdmap_utils)),
   lanelet_poses_(
     hdmap_utils->getAllCanonicalizedLaneletPoses(maybe_non_canonicalized_lanelet_pose)),
-  map_pose_(toMapPose(lanelet_pose_, hdmap_utils))
+  map_pose_(pose::toMapPose(lanelet_pose_, hdmap_utils))
 {
   adjustOrientationAndOzPosition(hdmap_utils);
 }

@@ -64,6 +64,9 @@ endif()
 install(
   DIRECTORY launch rviz
   DESTINATION share/${PROJECT_NAME})
+install(
+  FILES cmake/add_cpp_mock_scenario_test.cmake
+  DESTINATION share/${PROJECT_NAME}/cmake)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

@@ -85,10 +85,6 @@ class EntityManager
 
   std::unordered_map<std::string, std::shared_ptr<traffic_simulator::entity::EntityBase>> entities_;
 
-  double step_time_;
-
-  double current_time_;
-
   bool npc_logic_started_;
 
   using EntityStatusWithTrajectoryArray =
@@ -158,7 +154,6 @@ public:
     broadcaster_(node),
     base_link_broadcaster_(node),
     clock_ptr_(node->get_clock()),
-    current_time_(std::numeric_limits<double>::quiet_NaN()),
     npc_logic_started_(false),
     entity_status_array_pub_ptr_(rclcpp::create_publisher<EntityStatusWithTrajectoryArray>(
       node, "entity/status", EntityMarkerQoS(),
@@ -263,33 +258,32 @@ public:
   static_assert(true, "")
   // clang-format on
 
+  FORWARD_TO_ENTITY(activateOutOfRangeJob, );
   FORWARD_TO_ENTITY(asFieldOperatorApplication, const);
+  FORWARD_TO_ENTITY(cancelRequest, );
   FORWARD_TO_ENTITY(get2DPolygon, const);
   FORWARD_TO_ENTITY(getBehaviorParameter, const);
   FORWARD_TO_ENTITY(getBoundingBox, const);
+  FORWARD_TO_ENTITY(getCanonicalizedStatusBeforeUpdate, const);
   FORWARD_TO_ENTITY(getCurrentAccel, const);
-  FORWARD_TO_ENTITY(getCurrentAction, const);
   FORWARD_TO_ENTITY(getCurrentTwist, const);
   FORWARD_TO_ENTITY(getDefaultMatchingDistanceForLaneletPoseCalculation, const);
-  FORWARD_TO_ENTITY(getEntityStatusBeforeUpdate, const);
   FORWARD_TO_ENTITY(getEntityType, const);
-  FORWARD_TO_ENTITY(reachPosition, const);
   FORWARD_TO_ENTITY(getEntityTypename, const);
   FORWARD_TO_ENTITY(getLinearJerk, const);
   FORWARD_TO_ENTITY(getRouteLanelets, const);
   FORWARD_TO_ENTITY(getStandStillDuration, const);
   FORWARD_TO_ENTITY(getTraveledDistance, const);
-  FORWARD_TO_ENTITY(laneMatchingSucceed, const);
-  FORWARD_TO_ENTITY(activateOutOfRangeJob, );
-  FORWARD_TO_ENTITY(cancelRequest, );
   FORWARD_TO_ENTITY(isControlledBySimulator, );
+  FORWARD_TO_ENTITY(laneMatchingSucceed, const);
+  FORWARD_TO_ENTITY(reachPosition, const);
   FORWARD_TO_ENTITY(requestAcquirePosition, );
   FORWARD_TO_ENTITY(requestAssignRoute, );
+  FORWARD_TO_ENTITY(requestClearRoute, );
   FORWARD_TO_ENTITY(requestFollowTrajectory, );
   FORWARD_TO_ENTITY(requestLaneChange, );
   FORWARD_TO_ENTITY(requestSynchronize, );
   FORWARD_TO_ENTITY(requestWalkStraight, );
-  FORWARD_TO_ENTITY(requestClearRoute, );
   FORWARD_TO_ENTITY(setAcceleration, );
   FORWARD_TO_ENTITY(setAccelerationLimit, );
   FORWARD_TO_ENTITY(setAccelerationRateLimit, );
@@ -302,29 +296,18 @@ public:
   FORWARD_TO_ENTITY(setMapPose, );
   FORWARD_TO_ENTITY(setTwist, );
   FORWARD_TO_ENTITY(setVelocityLimit, );
+  FORWARD_TO_ENTITY(requestSpeedChange, );
 
 #undef FORWARD_TO_ENTITY
+
+  auto getCurrentAction(const std::string & name) const -> std::string;
 
   visualization_msgs::msg::MarkerArray makeDebugMarker() const;
 
   bool trafficLightsChanged();
 
-  void requestSpeedChange(const std::string & name, double target_speed, bool continuous);
-
-  void requestSpeedChange(
-    const std::string & name, const double target_speed, const speed_change::Transition transition,
-    const speed_change::Constraint constraint, const bool continuous);
-
-  void requestSpeedChange(
-    const std::string & name, const speed_change::RelativeTargetSpeed & target_speed,
-    bool continuous);
-
-  void requestSpeedChange(
-    const std::string & name, const speed_change::RelativeTargetSpeed & target_speed,
-    const speed_change::Transition transition, const speed_change::Constraint constraint,
-    const bool continuous);
-
-  auto updateNpcLogic(const std::string & name) -> const CanonicalizedEntityStatus &;
+  auto updateNpcLogic(const std::string & name, const double current_time, const double step_time)
+    -> const CanonicalizedEntityStatus &;
 
   void broadcastEntityTransform();
 
@@ -338,14 +321,12 @@ public:
 
   bool entityExists(const std::string & name);
 
-  auto getCurrentTime() const noexcept -> double;
-
   auto getEntityNames() const -> const std::vector<std::string>;
 
   auto getEntity(const std::string & name) const
     -> std::shared_ptr<traffic_simulator::entity::EntityBase>;
 
-  auto getEntityStatus(const std::string & name) const -> CanonicalizedEntityStatus;
+  auto getEntityStatus(const std::string & name) const -> const CanonicalizedEntityStatus &;
 
   auto getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &;
 
@@ -356,8 +337,6 @@ public:
 
   auto getPedestrianParameters(const std::string & name) const
     -> const traffic_simulator_msgs::msg::PedestrianParameters &;
-
-  auto getStepTime() const noexcept -> double;
 
   auto getVehicleParameters(const std::string & name) const
     -> const traffic_simulator_msgs::msg::VehicleParameters &;
@@ -379,7 +358,7 @@ public:
       } else {
         std::vector<geometry_msgs::msg::Pose> poses;
         for (const auto & lanelet_pose : getGoalPoses<CanonicalizedLaneletPose>(name)) {
-          poses.push_back(toMapPose(lanelet_pose));
+          poses.push_back(pose::toMapPose(lanelet_pose));
         }
         return poses;
       }
@@ -413,13 +392,12 @@ public:
    */
   void resetBehaviorPlugin(const std::string & name, const std::string & behavior_plugin_name);
 
-  auto setEntityStatus(const std::string & name, const CanonicalizedEntityStatus & status) -> void;
-
   void setVerbose(const bool verbose);
 
   template <typename Entity, typename Pose, typename Parameters, typename... Ts>
   auto spawnEntity(
-    const std::string & name, const Pose & pose, const Parameters & parameters, Ts &&... xs)
+    const std::string & name, const Pose & pose, const Parameters & parameters,
+    const double current_time, Ts &&... xs)
   {
     static_assert(
       std::disjunction<
@@ -448,7 +426,7 @@ public:
       }
 
       entity_status.subtype = parameters.subtype;
-      entity_status.time = getCurrentTime();
+      entity_status.time = current_time;
       entity_status.name = name;
       entity_status.bounding_box = parameters.bounding_box;
       entity_status.action_status = traffic_simulator_msgs::msg::ActionStatus();
@@ -477,11 +455,11 @@ public:
           "LaneletPose is not supported type as pose argument. Only CanonicalizedLaneletPose and "
           "msg::Pose are supported as pose argument of EntityManager::spawnEntity().");
       } else if constexpr (std::is_same_v<std::decay_t<Pose>, CanonicalizedLaneletPose>) {
-        entity_status.pose = toMapPose(pose);
+        entity_status.pose = pose::toMapPose(pose);
         return CanonicalizedEntityStatus(entity_status, pose);
       } else if constexpr (std::is_same_v<std::decay_t<Pose>, geometry_msgs::msg::Pose>) {
         entity_status.pose = pose;
-        const auto canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
+        const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
           pose, parameters.bounding_box, include_crosswalk, matching_distance, hdmap_utils_ptr_);
         return CanonicalizedEntityStatus(entity_status, canonicalized_lanelet_pose);
       }
@@ -494,9 +472,6 @@ public:
         success) {
       // FIXME: this ignores V2I traffic lights
       iter->second->setTrafficLightManager(conventional_traffic_light_manager_ptr_);
-      if (npc_logic_started_ && not is<EgoEntity>(name)) {
-        iter->second->startNpcLogic(getCurrentTime());
-      }
       return success;
     } else {
       THROW_SEMANTIC_ERROR("Entity ", std::quoted(name), " is already exists.");
@@ -520,9 +495,9 @@ public:
 
   void updateHdmapMarker();
 
-  void startNpcLogic(const double current_time);
+  auto startNpcLogic(const double current_time) -> void;
 
-  auto isNpcLogicStarted() const { return npc_logic_started_; }
+  auto isNpcLogicStarted() const -> bool { return npc_logic_started_; }
 };
 }  // namespace entity
 }  // namespace traffic_simulator

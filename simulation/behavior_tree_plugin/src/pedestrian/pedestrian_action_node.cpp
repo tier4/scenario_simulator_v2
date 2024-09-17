@@ -42,31 +42,30 @@ void PedestrianActionNode::getBlackBoardValues()
 }
 
 auto PedestrianActionNode::calculateUpdatedEntityStatus(double target_speed) const
-  -> traffic_simulator::CanonicalizedEntityStatus
+  -> traffic_simulator::EntityStatus
 {
   return ActionNode::calculateUpdatedEntityStatus(
     target_speed, behavior_parameter.dynamic_constraints);
 }
 
 auto PedestrianActionNode::calculateUpdatedEntityStatusInWorldFrame(double target_speed) const
-  -> traffic_simulator::CanonicalizedEntityStatus
+  -> traffic_simulator::EntityStatus
 {
-  auto updated_status = static_cast<traffic_simulator::EntityStatus>(
-    ActionNode::calculateUpdatedEntityStatusInWorldFrame(
-      target_speed, behavior_parameter.dynamic_constraints));
-
+  auto entity_status_updated = ActionNode::calculateUpdatedEntityStatusInWorldFrame(
+    target_speed, behavior_parameter.dynamic_constraints);
   if (
     const auto canonicalized_lanelet_pose =
       traffic_simulator::pose::pedestrian::transformToCanonicalizedLaneletPose(
-        updated_status.pose, entity_status->getBoundingBox(), entity_status->getLaneletIds(), true,
+        entity_status_updated.pose, canonicalized_entity_status->getBoundingBox(),
+        canonicalized_entity_status->getLaneletIds(), true,
         default_matching_distance_for_lanelet_pose_calculation, hdmap_utils)) {
-    updated_status.lanelet_pose_valid = true;
-    updated_status.lanelet_pose =
+    entity_status_updated.lanelet_pose_valid = true;
+    entity_status_updated.lanelet_pose =
       static_cast<traffic_simulator::LaneletPose>(canonicalized_lanelet_pose.value());
   } else {
-    updated_status.lanelet_pose_valid = false;
-    updated_status.lanelet_pose = traffic_simulator::LaneletPose();
+    entity_status_updated.lanelet_pose_valid = false;
+    entity_status_updated.lanelet_pose = traffic_simulator::LaneletPose();
   }
-  return traffic_simulator::CanonicalizedEntityStatus(updated_status, hdmap_utils);
+  return entity_status_updated;
 }
 }  // namespace entity_behavior

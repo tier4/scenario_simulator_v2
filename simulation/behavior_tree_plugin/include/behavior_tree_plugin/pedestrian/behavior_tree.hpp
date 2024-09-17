@@ -39,7 +39,7 @@ class PedestrianBehaviorTree : public BehaviorPluginBase
 {
 public:
   void configure(const rclcpp::Logger & logger) override;
-  void update(double current_time, double step_time) override;
+  auto update(const double current_time, const double step_time) -> void override;
   const std::string & getCurrentAction() const override;
 
 #define DEFINE_GETTER_SETTER(NAME, TYPE)                                                    \
@@ -51,24 +51,23 @@ public:
 
   // clang-format off
   DEFINE_GETTER_SETTER(BehaviorParameter,                                traffic_simulator_msgs::msg::BehaviorParameter)
+  DEFINE_GETTER_SETTER(CanonicalizedEntityStatus,                        std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>)
   DEFINE_GETTER_SETTER(CurrentTime,                                      double)
   DEFINE_GETTER_SETTER(DebugMarker,                                      std::vector<visualization_msgs::msg::Marker>)
   DEFINE_GETTER_SETTER(DefaultMatchingDistanceForLaneletPoseCalculation, double)
   DEFINE_GETTER_SETTER(GoalPoses,                                        std::vector<geometry_msgs::msg::Pose>)
-  DEFINE_GETTER_SETTER(EntityStatus,                                     std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>)
-  DEFINE_GETTER_SETTER(PolylineTrajectory,                               std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory>)
   DEFINE_GETTER_SETTER(HdMapUtils,                                       std::shared_ptr<hdmap_utils::HdMapUtils>)
   DEFINE_GETTER_SETTER(LaneChangeParameters,                             traffic_simulator::lane_change::Parameter)
   DEFINE_GETTER_SETTER(Obstacle,                                         std::optional<traffic_simulator_msgs::msg::Obstacle>)
   DEFINE_GETTER_SETTER(OtherEntityStatus,                                EntityStatusDict)
   DEFINE_GETTER_SETTER(PedestrianParameters,                             traffic_simulator_msgs::msg::PedestrianParameters)
+  DEFINE_GETTER_SETTER(PolylineTrajectory,                               std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory>)
   DEFINE_GETTER_SETTER(ReferenceTrajectory,                              std::shared_ptr<math::geometry::CatmullRomSpline>)
   DEFINE_GETTER_SETTER(Request,                                          traffic_simulator::behavior::Request)
   DEFINE_GETTER_SETTER(RouteLanelets,                                    lanelet::Ids)
   DEFINE_GETTER_SETTER(StepTime,                                         double)
   DEFINE_GETTER_SETTER(TargetSpeed,                                      std::optional<double>)
   DEFINE_GETTER_SETTER(TrafficLightManager,                              std::shared_ptr<traffic_simulator::TrafficLightManager>)
-  DEFINE_GETTER_SETTER(UpdatedStatus,                                    std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>)
   DEFINE_GETTER_SETTER(VehicleParameters,                                traffic_simulator_msgs::msg::VehicleParameters)
   DEFINE_GETTER_SETTER(Waypoints,                                        traffic_simulator_msgs::msg::WaypointsArray)
   // clang-format on
@@ -76,7 +75,7 @@ public:
 #undef DEFINE_GETTER_SETTER
 
 private:
-  BT::NodeStatus tickOnce(double current_time, double step_time);
+  auto tickOnce(const double current_time, const double step_time) -> BT::NodeStatus;
   auto createBehaviorTree(const std::string & format_path) -> BT::Tree;
   BT::BehaviorTreeFactory factory_;
   BT::Tree tree_;

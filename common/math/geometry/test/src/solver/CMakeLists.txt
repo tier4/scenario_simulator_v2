@@ -1,0 +1,2 @@
+ament_add_gtest(test_polynomial_solver test_polynomial_solver.cpp)
+target_link_libraries(test_polynomial_solver geometry)

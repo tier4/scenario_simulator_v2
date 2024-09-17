@@ -13,6 +13,8 @@
 // limitations under the License.
 
 #include <do_nothing_plugin/plugin.hpp>
+#include <geometry/quaternion/get_rotation.hpp>
+#include <geometry/quaternion/quaternion_to_euler.hpp>
 #include <geometry/quaternion/slerp.hpp>
 #include <geometry/vector3/hypot.hpp>
 #include <geometry/vector3/operator.hpp>
@@ -98,23 +100,36 @@ auto interpolateEntityStatusFromPolylineTrajectory(
     const auto linear_jerk =
       (entity_status->getAccel().linear.x - linear_acceleration) / (v1.time - v0.time);
 
+    const double angular_velocity =
+      math::geometry::convertQuaternionToEulerAngle(
+        math::geometry::getRotation(v0.position.orientation, v1.position.orientation))
+        .z /
+      (v1.time - v0.time);
+    const auto angular_acceleration =
+      (entity_status->getTwist().angular.x - angular_velocity) / (v1.time - v0.time);
+
     interpolated_entity_status.action_status.twist =
       geometry_msgs::build<geometry_msgs::msg::Twist>()
         .linear(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(linear_velocity).y(0).z(0))
-        .angular(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0).y(0).z(0));
+        .angular(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0).y(0).z(angular_velocity));
     interpolated_entity_status.action_status.accel =
       geometry_msgs::build<geometry_msgs::msg::Accel>()
         .linear(
           geometry_msgs::build<geometry_msgs::msg::Vector3>().x(linear_acceleration).y(0).z(0))
-        .angular(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0).y(0).z(0));
+        .angular(
+          geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0).y(0).z(angular_acceleration));
     interpolated_entity_status.action_status.linear_jerk = linear_jerk;
     return interpolated_entity_status;
   };
 
-  if ((current_time + step_time) <= trajectory->shape.vertices.begin()->time) {
+  if (
+    (current_time + step_time) <=
+    (trajectory->base_time + trajectory->shape.vertices.begin()->time)) {
     return std::nullopt;
   }
-  if (trajectory->shape.vertices.back().time <= (current_time + step_time)) {
+  if (
+    (trajectory->base_time + trajectory->shape.vertices.back().time) <=
+    (current_time + step_time)) {
     return interpolate_entity_status(
       1, *std::prev(trajectory->shape.vertices.end(), 2),
       *std::prev(trajectory->shape.vertices.end(), 1));
@@ -149,24 +164,28 @@ void DoNothingBehavior::update(double current_time, double step_time)
     if (
       const auto interpolated_status =
         do_nothing_behavior::follow_trajectory::interpolateEntityStatusFromPolylineTrajectory(
-          getPolylineTrajectory(), getEntityStatus(), getCurrentTime(), getStepTime())) {
-      return std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(
-        traffic_simulator::CanonicalizedEntityStatus(interpolated_status.value(), getHdMapUtils()));
+          getPolylineTrajectory(), getCanonicalizedEntityStatus(), getCurrentTime(),
+          getStepTime())) {
+      return interpolated_status.value();
     } else {
-      return entity_status_;
+      return static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status_);
     }
   };
 
-  entity_status_->setTime(current_time);
+  canonicalized_entity_status_->setTime(current_time);
   if (getRequest() == traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY) {
-    setUpdatedStatus(interpolate_entity_status_on_polyline_trajectory());
+    canonicalized_entity_status_->set(
+      interpolate_entity_status_on_polyline_trajectory(),
+      getDefaultMatchingDistanceForLaneletPoseCalculation(), getHdMapUtils());
     if (
       getCurrentTime() + getStepTime() >=
       do_nothing_behavior::follow_trajectory::getLastVertexTimestamp(getPolylineTrajectory())) {
       setRequest(traffic_simulator::behavior::Request::NONE);
     }
   } else {
-    setUpdatedStatus(entity_status_);
+    canonicalized_entity_status_->set(
+      static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status_),
+      getDefaultMatchingDistanceForLaneletPoseCalculation(), getHdMapUtils());
   }
 }
 

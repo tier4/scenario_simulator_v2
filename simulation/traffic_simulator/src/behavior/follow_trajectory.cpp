@@ -47,9 +47,8 @@ auto makeUpdatedStatus(
   const traffic_simulator_msgs::msg::EntityStatus & entity_status,
   traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
   const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils, double step_time,
-  double matching_distance, std::optional<double> target_speed)
-  -> std::optional<traffic_simulator_msgs::msg::EntityStatus>
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils, const double step_time,
+  double matching_distance, std::optional<double> target_speed) -> std::optional<EntityStatus>
 {
   using math::arithmetic::isApproximatelyEqualTo;
   using math::arithmetic::isDefinitelyLessThan;
@@ -84,31 +83,6 @@ auto makeUpdatedStatus(
     }
     return hypot(from, to);
   };
-
-  auto fill_lanelet_data_and_adjust_orientation =
-    [&](traffic_simulator_msgs::msg::EntityStatus & status) {
-      if (const auto lanelet_pose =
-            hdmap_utils->toLaneletPose(status.pose, status.bounding_box, false, matching_distance);
-          lanelet_pose) {
-        status.lanelet_pose = lanelet_pose.value();
-        const CatmullRomSpline spline(hdmap_utils->getCenterPoints(status.lanelet_pose.lanelet_id));
-        const auto lanelet_quaternion = spline.getPose(status.lanelet_pose.s, true).orientation;
-        const auto lanelet_rpy = math::geometry::convertQuaternionToEulerAngle(lanelet_quaternion);
-        const auto entity_rpy =
-          math::geometry::convertQuaternionToEulerAngle(status.pose.orientation);
-        // adjust orientation in EntityStatus.pose (only pitch) and in EntityStatus.LaneletPose
-        status.pose.orientation = math::geometry::convertEulerAngleToQuaternion(
-          geometry_msgs::build<geometry_msgs::msg::Vector3>()
-            .x(entity_rpy.x)
-            .y(lanelet_rpy.y)
-            .z(entity_rpy.z));
-        status.lanelet_pose.rpy = math::geometry::convertQuaternionToEulerAngle(
-          math::geometry::getRotation(lanelet_quaternion, status.pose.orientation));
-        status.lanelet_pose_valid = true;
-      } else {
-        status.lanelet_pose_valid = false;
-      }
-    };
 
   auto discard_the_front_waypoint_and_recurse = [&]() {
     /*
@@ -595,13 +569,6 @@ auto makeUpdatedStatus(
       }
     }();
 
-    /*
-      After the step, i.e. movement in the direction of designed_velocity, it is necessary to adjust
-      the pose of the entity to the lane - if possible, the pitch orientation may be
-      changed as a result because the slope of the lane may be different
-    */
-    fill_lanelet_data_and_adjust_orientation(updated_status);
-
     updated_status.action_status.twist.linear.x = norm(desired_velocity);
 
     updated_status.action_status.twist.linear.y = 0;
@@ -622,6 +589,8 @@ auto makeUpdatedStatus(
       step_time;
 
     updated_status.time = entity_status.time + step_time;
+
+    updated_status.lanelet_pose_valid = false;
 
     return updated_status;
   }
