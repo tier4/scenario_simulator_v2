@@ -108,6 +108,7 @@ protected:
 
 public:
   SubscriberWrapper<autoware_auto_planning_msgs::msg::PathWithLaneId> getPathWithLaneId;
+  SubscriberWrapper<autoware_planning_msgs::msg::LaneletRoute> getAutowareMissionRoute;
 
 public:
   template <typename... Ts>
@@ -123,6 +124,7 @@ public:
 #endif
     getMrmState("/api/fail_safe/mrm_state", rclcpp::QoS(1), *this, [this](const auto & v) { receiveMrmState(v); }),
     getPathWithLaneId("/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", rclcpp::QoS(1), *this),
+    getAutowareMissionRoute("/planning/mission_planning/route", rclcpp::QoS(1), *this),
     getTrajectory("/api/iv_msgs/planning/scenario_planning/trajectory", rclcpp::QoS(1), *this),
     getTurnIndicatorsCommandImpl("/control/command/turn_indicators_cmd", rclcpp::QoS(1), *this),
     requestClearRoute("/api/routing/clear_route", *this),
