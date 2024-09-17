@@ -127,13 +127,6 @@ auto DistanceCondition::description() const -> std::string
 
 #define DISTANCE(...) distance<__VA_ARGS__>(triggering_entity)
 
-auto DistanceCondition::distance(const EntityRef & triggering_entity) const -> double
-{
-  SWITCH_COORDINATE_SYSTEM(
-    SWITCH_RELATIVE_DISTANCE_TYPE, SWITCH_ROUTING_ALGORITHM, SWITCH_FREESPACE, DISTANCE);
-  return Double::nan();
-}
-
 // @todo: after checking all the scenario work well with consider_z = true, remove this function and use std::hypot(x,y,z)
 static double hypot(const double x, const double y, const double z, const bool consider_z)
 {
@@ -742,6 +735,13 @@ auto DistanceCondition::distance<
         }
       }),
     position);
+}
+
+auto DistanceCondition::distance(const EntityRef & triggering_entity) const -> double
+{
+  SWITCH_COORDINATE_SYSTEM(
+    SWITCH_RELATIVE_DISTANCE_TYPE, SWITCH_ROUTING_ALGORITHM, SWITCH_FREESPACE, DISTANCE);
+  return Double::nan();
 }
 
 auto DistanceCondition::evaluate() -> Object
