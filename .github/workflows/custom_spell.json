@@ -6,6 +6,7 @@
     "Canonicalized",
     "canonicalizing",
     "classname",
+    "Cmyk",
     "Dawid",
     "DBOOST",
     "DBUILD",
@@ -40,6 +41,7 @@
     "TESTRANDOMIZER",
     "travelling",
     "Tschirnhaus",
+    "walltime",
     "xerces",
     "xercesc",
     "yamacir-kit"

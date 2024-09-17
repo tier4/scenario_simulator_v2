@@ -21,6 +21,248 @@ Changelog for package do_nothing_plugin
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+4.2.7 (2024-09-13)
+------------------
+
+4.2.6 (2024-09-13)
+------------------
+* Merge branch 'master' into RJD-1197/pose_module
+* Contributors: Masaya Kataoka
+
+4.2.5 (2024-09-12)
+------------------
+
+4.2.4 (2024-09-12)
+------------------
+
+4.2.3 (2024-09-11)
+------------------
+
+4.2.2 (2024-09-10)
+------------------
+* Merge branch 'master' into RJD-1278/geometry-update
+* Merge branch 'master' into RJD-1278/geometry-update
+* Merge branch 'master' into RJD-1278/geometry-update
+* Merge branch 'master' into RJD-1278/geometry-update
+* Contributors: Masaya Kataoka, Michał Ciasnocha
+
+4.2.1 (2024-09-10)
+------------------
+
+4.2.0 (2024-09-09)
+------------------
+
+4.1.1 (2024-09-03)
+------------------
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge remote-tracking branch 'origin/master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into doc/RJD-1273-add-realtime-factor-doc
+* Contributors: Dawid Moszynski, Dawid Moszyński, Kotaro Yoshimoto
+
+4.1.0 (2024-09-03)
+------------------
+* Merge branch 'master' into RJD-1278/fix-line-segment
+* Merge branch 'master' into RJD-1278/fix-line-segment
+* Merge branch 'master' into RJD-1278/fix-line-segment
+* Merge branch 'master' into RJD-1278/fix-1344-getIntersection2DSValue
+* Merge branch 'master' into RJD-1278/fix-1343-isIntersect2D
+* Contributors: Michał Ciasnocha
+
+4.0.4 (2024-09-02)
+------------------
+* Merge branch 'master' into feature/simple_sensor_simulator_unit_tests_lidar
+* Merge branch 'master' into feature/simple_sensor_simulator_unit_tests_lidar
+* Merge branch 'master' into feature/simple_sensor_simulator_unit_tests_lidar
+* Contributors: Masaya Kataoka, SzymonParapura
+
+4.0.3 (2024-08-29)
+------------------
+* Merge remote-tracking branch 'origin/master' into RJD-1056-remove-npc-logic-started
+* Merge branch 'RJD-1056-remove-current-time-step-time' into RJD-1057-base
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-npc-logic-started
+* Merge branch 'RJD-1056-remove-npc-logic-started' into RJD-1057-base
+* Merge branch 'RJD-1056-remove-current-time-step-time' into RJD-1057-base
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-npc-logic-started
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-npc-logic-started
+* Merge remote-tracking branch 'tier4/RJD-1056-remove-current-time-step-time' into RJD-1057-base
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-npc-logic-started
+* Merge remote-tracking branch 'origin/RJD-1056-remove-npc-logic-started' into RJD-1057-base
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-npc-logic-started
+* Merge remote-tracking branch 'origin/ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-npc-logic-started
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-npc-logic-started
+* Contributors: DMoszynski, Dawid Moszynski, Mateusz Palczuk
+
+4.0.2 (2024-08-28)
+------------------
+* Merge branch 'master' into RJD-1056-remove-current-time-step-time
+* Merge branch 'master' into RJD-1056-remove-current-time-step-time
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-current-time-step-time
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-current-time-step-time
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-current-time-step-time
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-current-time-step-time
+* Merge remote-tracking branch 'origin/ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-current-time-step-time
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-current-time-step-time
+* Contributors: DMoszynski, Dawid Moszynski, Dawid Moszyński, Mateusz Palczuk
+
+4.0.1 (2024-08-28)
+------------------
+* Merge pull request `#1354 <https://github.com/tier4/scenario_simulator_v2/issues/1354>`_ from tier4/fix/follow_trajectory
+  Fix follow trajectory action and timestamp in entity status
+* Merge branch 'master' into fix/follow_trajectory
+* Merge branch 'master' into fix/follow_trajectory
+* add angular velocity / acceleration as z axis value
+* enabel calculate angular accel and jerk
+* Merge remote-tracking branch 'origin' into fix/follow_trajectory
+* fix interpolate ration calculation
+* Contributors: Masaya Kataoka, Tatsuya Yamasaki
+
+4.0.0 (2024-08-27)
+------------------
+* Merge pull request `#1320 <https://github.com/tier4/scenario_simulator_v2/issues/1320>`_ from tier4/ref/RJD-1053-set-update-canonicalized-entity-status
+  ref(behavior_tree, traffic_simulator): move responsibility for canonicalization to traffic_simulator, simplify
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge remote-tracking branch 'origin/master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* ref(behavior_tree): use CanonicalizedEntityStatus as shared_ptr inside BT and use ::set
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge remote-tracking branch 'origin/ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' of https://github.com/tier4/scenario_simulator_v2 into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* ref(do_notching_plugin): remove unecessary comment
+* feat(behavior_tree_plugin, entity_base): move toCanonicalizedEntityPose to traffic_simulator, use EntityStatus as updated_state in BehaviorTree
+* feat(traffic_simulator): use CanonicalizedEntityStatus only with single constructor
+* Merge remote-tracking branch 'origin/ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* tmp
+* Contributors: DMoszynski, Dawid Moszynski, Dawid Moszyński, Masaya Kataoka, Mateusz Palczuk, Tatsuya Yamasaki
+
+3.5.5 (2024-08-27)
+------------------
+* Merge branch 'master' into fix/distance-with-lane-change
+* Merge branch 'master' into fix/distance-with-lane-change
+* Merge branch 'master' into fix/distance-with-lane-change
+* Merge branch 'master' into fix/distance-with-lane-change
+* Contributors: Kotaro Yoshimoto
+
+3.5.4 (2024-08-26)
+------------------
+* Merge branch 'master' into feature/use_workflow_dispatch_in_docker_build
+* Merge branch 'master' into feature/use_workflow_dispatch_in_docker_build
+* Merge remote-tracking branch 'origin/master' into feature/use_workflow_dispatch_in_docker_build
+* Merge remote-tracking branch 'origin/master' into feature/trigger_docker_build_by_tag
+* Contributors: Masaya Kataoka
+
+3.5.3 (2024-08-26)
+------------------
+* Merge branch 'master' into RJD-1278/traffic_simulator-update
+* Merge branch 'master' into RJD-1278/traffic_simulator-update
+* Merge branch 'master' into RJD-1278/traffic_simulator-update
+* Merge branch 'master' into RJD-1278/traffic_simulator-update
+* Contributors: Michał Ciasnocha
+
+3.5.2 (2024-08-23)
+------------------
+* Merge branch 'master' into fix/interpreter/user-defined-value-condition
+* Merge branch 'master' into fix/interpreter/user-defined-value-condition
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/user-defined-value-condition
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+3.5.1 (2024-08-22)
+------------------
+* Merge branch 'master' into feat/RJD-1283-add-traffic-controller-visualization
+* Merge branch 'master' into feat/RJD-1283-add-traffic-controller-visualization
+* Merge branch 'master' into feat/RJD-1283-add-traffic-controller-visualization
+* Merge branch 'master' into feat/RJD-1283-add-traffic-controller-visualization
+* Contributors: Dawid Moszyński, Tatsuya Yamasaki
+
+3.5.0 (2024-08-21)
+------------------
+* Merge branch 'master' into relative-clearance-condition
+* Merge branch 'master' into relative-clearance-condition
+* Merge branch 'master' into relative-clearance-condition
+* Merge branch 'master' into relative-clearance-condition
+* Merge remote-tracking branch 'origin/master' into relative-clearance-condition
+* Merge remote-tracking branch 'origin/master' into relative-clearance-condition
+* Merge remote-tracking branch 'origin/relative-clearance-condition' into relative-clearance-condition
+* Merge branch 'master' into relative-clearance-condition
+* Merge remote-tracking branch 'origin/master' into relative-clearance-condition
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
+3.4.4 (2024-08-20)
+------------------
+
+3.4.3 (2024-08-19)
+------------------
+
+3.4.2 (2024-08-05)
+------------------
+* Merge commit 'c1cab6eb1ece2df58982f50a78fef5a5ecaa7234' into doc/longitudinal-control
+* Merge branch 'master' into feat/RJD-1199-add-imu-sensor-to-simple-sensor-simulator
+* Merge branch 'master' into feat/RJD-1199-add-imu-sensor-to-simple-sensor-simulator
+* Merge branch 'master' into feat/RJD-1199-add-imu-sensor-to-simple-sensor-simulator
+* Merge branch 'master' into feat/RJD-1199-add-imu-sensor-to-simple-sensor-simulator
+* Merge branch 'master' into doc/longitudinal-control
+* Merge branch 'master' into doc/longitudinal-control
+* Merge branch 'master' into feat/RJD-1199-add-imu-sensor-to-simple-sensor-simulator
+* Merge branch 'master' into doc/longitudinal-control
+* Merge branch 'master' into feat/RJD-1199-add-imu-sensor-to-simple-sensor-simulator
+* Contributors: Masaya Kataoka, SzymonParapura, koki suzuki
+
+3.4.1 (2024-07-30)
+------------------
+* Merge branch 'master' into doc/open_scenario_support
+* Contributors: Tatsuya Yamasaki
+
+3.4.0 (2024-07-26)
+------------------
+
+3.3.0 (2024-07-23)
+------------------
+* Merge branch 'master' into feature/interpreter/entity_selection
+* Merge branch 'master' into feature/interpreter/entity_selection
+* Merge branch 'master' into feature/interpreter/entity_selection
+* Merge branch 'master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Merge branch 'feature/interpreter/entity_selection' into feature/interpreter/refactoring_entity
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/refactoring_entity
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Contributors: Shota Minami, Tatsuya Yamasaki
+
 3.2.0 (2024-07-18)
 ------------------
 * Merge remote-tracking branch 'origin/master' into fix/spawn_position_of_map_pose

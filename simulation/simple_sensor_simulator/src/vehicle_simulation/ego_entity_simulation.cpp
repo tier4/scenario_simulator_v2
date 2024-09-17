@@ -218,9 +218,9 @@ void EgoEntitySimulation::requestSpeedChange(double value)
   vehicle_model_ptr_->setState(v);
 }
 
-void EgoEntitySimulation::overwrite(
-  const traffic_simulator_msgs::msg::EntityStatus & status, double current_scenario_time,
-  double step_time, bool npc_logic_started)
+auto EgoEntitySimulation::overwrite(
+  const traffic_simulator_msgs::msg::EntityStatus & status, const double current_time,
+  const double step_time, const bool is_npc_logic_started) -> void
 {
   using math::geometry::convertQuaternionToEulerAngle;
   using math::geometry::getRotationMatrix;
@@ -238,7 +238,7 @@ void EgoEntitySimulation::overwrite(
                                status.pose.position.y - initial_pose_.position.y,
                                status.pose.position.z - initial_pose_.position.z);
 
-  if (npc_logic_started) {
+  if (is_npc_logic_started) {
     const auto yaw = [&]() {
       const auto q = Eigen::Quaterniond(
         getRotationMatrix(initial_pose_.orientation).transpose() *
@@ -280,12 +280,12 @@ void EgoEntitySimulation::overwrite(
           "Unsupported simulation model ", toString(vehicle_model_type_), " specified");
     }
   }
-  updateStatus(current_scenario_time, step_time);
+  updateStatus(current_time, step_time);
   updatePreviousValues();
 }
 
 void EgoEntitySimulation::update(
-  double current_scenario_time, double step_time, bool npc_logic_started)
+  const double current_time, const double step_time, const bool is_npc_logic_started)
 {
   using math::geometry::getRotationMatrix;
 
@@ -302,7 +302,7 @@ void EgoEntitySimulation::update(
                                status_.getMapPose().position.y - initial_pose_.position.y,
                                status_.getMapPose().position.z - initial_pose_.position.z);
 
-  if (npc_logic_started) {
+  if (is_npc_logic_started) {
     auto input = Eigen::VectorXd(vehicle_model_ptr_->getDimU());
 
     auto acceleration_by_slope = [this]() {
@@ -345,7 +345,7 @@ void EgoEntitySimulation::update(
   // only the position in the Oz axis is left unchanged, the rest is taken from SimModelInterface
   world_relative_position_.x() = vehicle_model_ptr_->getX();
   world_relative_position_.y() = vehicle_model_ptr_->getY();
-  updateStatus(current_scenario_time, step_time);
+  updateStatus(current_time, step_time);
   updatePreviousValues();
 }
 
@@ -464,6 +464,8 @@ auto EgoEntitySimulation::getStatus() const -> const traffic_simulator_msgs::msg
 auto EgoEntitySimulation::setStatus(const traffic_simulator_msgs::msg::EntityStatus & status)
   -> void
 {
+  /// @note The lanelet matching algorithm should be equivalent to the one used in
+  /// EgoEntity::setStatus
   const auto unique_route_lanelets =
     traffic_simulator::helper::getUniqueValues(autoware->getRouteLanelets());
   const auto matching_distance = std::max(
@@ -471,17 +473,20 @@ auto EgoEntitySimulation::setStatus(const traffic_simulator_msgs::msg::EntitySta
                                    vehicle_parameters.axles.rear_axle.track_width) *
                                    0.5 +
                                  1.0;
+  /// @note Ego uses the unique_route_lanelets get from Autoware, instead of the current lanelet_id
+  /// value from EntityStatus, therefore canonicalization has to be done in advance,
+  /// not inside CanonicalizedEntityStatus
   const auto canonicalized_lanelet_pose = traffic_simulator::pose::toCanonicalizedLaneletPose(
     status.pose, status.bounding_box, unique_route_lanelets, false, matching_distance,
     hdmap_utils_ptr_);
-  status_ = traffic_simulator::CanonicalizedEntityStatus(status, canonicalized_lanelet_pose);
+  status_.set(traffic_simulator::CanonicalizedEntityStatus(status, canonicalized_lanelet_pose));
   setAutowareStatus();
 }
 
-auto EgoEntitySimulation::updateStatus(double current_scenario_time, double step_time) -> void
+auto EgoEntitySimulation::updateStatus(const double current_time, const double step_time) -> void
 {
   auto status = static_cast<traffic_simulator_msgs::msg::EntityStatus>(status_);
-  status.time = std::isnan(current_scenario_time) ? 0 : current_scenario_time;
+  status.time = std::isnan(current_time) ? 0 : current_time;
   status.pose = getCurrentPose();
   status.action_status.twist = getCurrentTwist();
   status.action_status.accel = getCurrentAccel(step_time);

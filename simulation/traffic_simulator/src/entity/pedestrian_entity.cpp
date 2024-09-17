@@ -70,8 +70,8 @@ void PedestrianEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::
   std::vector<CanonicalizedLaneletPose> route;
   for (const auto & waypoint : waypoints) {
     if (
-      const auto canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
-        waypoint, status_.getBoundingBox(), true,
+      const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
+        waypoint, status_->getBoundingBox(), true,
         getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_)) {
       route.emplace_back(canonicalized_lanelet_pose.value());
     } else {
@@ -90,9 +90,6 @@ auto PedestrianEntity::requestFollowTrajectory(
 
 std::string PedestrianEntity::getCurrentAction() const
 {
-  if (!npc_logic_started_) {
-    return "waiting";
-  }
   return behavior_plugin_ptr_->getCurrentAction();
 }
 
@@ -109,7 +106,7 @@ auto PedestrianEntity::getDefaultDynamicConstraints() const
 
 auto PedestrianEntity::getRouteLanelets(double horizon) -> lanelet::Ids
 {
-  if (const auto canonicalized_lanelet_pose = status_.getCanonicalizedLaneletPose()) {
+  if (const auto canonicalized_lanelet_pose = status_->getCanonicalizedLaneletPose()) {
     return route_planner_.getRouteLanelets(canonicalized_lanelet_pose.value(), horizon);
   } else {
     return {};
@@ -139,7 +136,7 @@ void PedestrianEntity::requestWalkStraight()
 void PedestrianEntity::requestAcquirePosition(const CanonicalizedLaneletPose & lanelet_pose)
 {
   behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
-  if (status_.laneMatchingSucceed()) {
+  if (status_->laneMatchingSucceed()) {
     route_planner_.setWaypoints({lanelet_pose});
   }
   behavior_plugin_ptr_->setGoalPoses({static_cast<geometry_msgs::msg::Pose>(lanelet_pose)});
@@ -149,8 +146,8 @@ void PedestrianEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & m
 {
   behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
   if (
-    const auto canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
-      map_pose, status_.getBoundingBox(), true,
+    const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
+      map_pose, status_->getBoundingBox(), true,
       getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_)) {
     requestAcquirePosition(canonicalized_lanelet_pose.value());
   } else {
@@ -162,13 +159,6 @@ void PedestrianEntity::cancelRequest()
 {
   behavior_plugin_ptr_->setRequest(behavior::Request::NONE);
   route_planner_.cancelRoute();
-}
-
-auto PedestrianEntity::getEntityType() const -> const traffic_simulator_msgs::msg::EntityType &
-{
-  static traffic_simulator_msgs::msg::EntityType type;
-  type.type = traffic_simulator_msgs::msg::EntityType::PEDESTRIAN;
-  return type;
 }
 
 auto PedestrianEntity::getEntityTypename() const -> const std::string &
@@ -256,31 +246,26 @@ void PedestrianEntity::setDecelerationRateLimit(double deceleration_rate)
   setBehaviorParameter(behavior_parameter);
 }
 
-void PedestrianEntity::onUpdate(double current_time, double step_time)
+auto PedestrianEntity::onUpdate(const double current_time, const double step_time) -> void
 {
   EntityBase::onUpdate(current_time, step_time);
-  if (npc_logic_started_) {
-    behavior_plugin_ptr_->setOtherEntityStatus(other_status_);
-    behavior_plugin_ptr_->setEntityStatus(
-      std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(status_));
-    behavior_plugin_ptr_->setTargetSpeed(target_speed_);
-    behavior_plugin_ptr_->setRouteLanelets(getRouteLanelets());
-    behavior_plugin_ptr_->update(current_time, step_time);
-    auto status_updated = behavior_plugin_ptr_->getUpdatedStatus();
-    if (const auto canonicalized_lanelet_pose = status_updated->getCanonicalizedLaneletPose()) {
-      if (isAtEndOfLanelets(canonicalized_lanelet_pose.value(), hdmap_utils_ptr_)) {
-        stopAtCurrentPosition();
-        updateStandStillDuration(step_time);
-        updateTraveledDistance(step_time);
-        return;
-      }
+  behavior_plugin_ptr_->setOtherEntityStatus(other_status_);
+  behavior_plugin_ptr_->setCanonicalizedEntityStatus(status_);
+  behavior_plugin_ptr_->setTargetSpeed(target_speed_);
+  behavior_plugin_ptr_->setRouteLanelets(getRouteLanelets());
+  /// @note CanonicalizedEntityStatus is updated here, it is not skipped even if isAtEndOfLanelets return true
+  behavior_plugin_ptr_->update(current_time, step_time);
+  if (const auto canonicalized_lanelet_pose = status_->getCanonicalizedLaneletPose()) {
+    if (pose::isAtEndOfLanelets(canonicalized_lanelet_pose.value(), hdmap_utils_ptr_)) {
+      stopAtCurrentPosition();
+      updateStandStillDuration(step_time);
+      updateTraveledDistance(step_time);
+      return;
     }
-    setStatus(*status_updated);
-    updateStandStillDuration(step_time);
-    updateTraveledDistance(step_time);
-  } else {
-    updateEntityStatusTimestamp(current_time);
   }
+  updateStandStillDuration(step_time);
+  updateTraveledDistance(step_time);
+
   EntityBase::onPostUpdate(current_time, step_time);
 }
 }  // namespace entity

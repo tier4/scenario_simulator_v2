@@ -4,6 +4,8 @@ $(find-pkg-share scenario_test_runner)/scenario/ByEntityCondition.EntityConditio
 $(find-pkg-share scenario_test_runner)/scenario/ByEntityCondition.EntityCondition.DistanceCondition.yaml
 $(find-pkg-share scenario_test_runner)/scenario/ByEntityCondition.EntityCondition.DistanceCondition.Shortest.yaml
 $(find-pkg-share scenario_test_runner)/scenario/ByEntityCondition.EntityCondition.RelativeDistanceCondition.yaml
+$(find-pkg-share scenario_test_runner)/scenario/ByEntityCondition.EntityCondition.RelativeClearanceCondition.yaml
+$(find-pkg-share scenario_test_runner)/scenario/ByEntityCondition.EntityCondition.RelativeClearanceCondition-back.yaml
 $(find-pkg-share scenario_test_runner)/scenario/ControllerAction.AssignControllerAction.yaml
 $(find-pkg-share scenario_test_runner)/scenario/LongitudinalAction.SpeedAction.yaml
 $(find-pkg-share scenario_test_runner)/scenario/Property.isBlind.yaml
@@ -16,3 +18,8 @@ $(find-pkg-share scenario_test_runner)/scenario/all-in-one.yaml
 $(find-pkg-share scenario_test_runner)/scenario/minimal.yaml
 $(find-pkg-share scenario_test_runner)/scenario/prefixed-name-reference.yaml
 $(find-pkg-share scenario_test_runner)/scenario/stand-still.yaml
+$(find-pkg-share scenario_test_runner)/scenario/EntitySelection/DistanceCondition_RelativeDistanceCondition_ReachPositionCondition.yaml
+$(find-pkg-share scenario_test_runner)/scenario/EntitySelection/LaneChangeAction.yaml
+$(find-pkg-share scenario_test_runner)/scenario/EntitySelection/SpeedAction_SpeedCondition_AccelerationCondition.yaml
+$(find-pkg-share scenario_test_runner)/scenario/EntitySelection/TeleportAction_CollisionCondition_StandStillCondition.yaml
+$(find-pkg-share scenario_test_runner)/scenario/EntitySelection/TimeHeadwayCondition.yaml

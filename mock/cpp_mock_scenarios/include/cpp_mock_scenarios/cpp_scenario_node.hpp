@@ -52,6 +52,10 @@ public:
     const std::vector<traffic_simulator::CanonicalizedLaneletPose> & goal_lanelet_pose,
     const traffic_simulator_msgs::msg::VehicleParameters & parameters);
 
+  auto isVehicle(const std::string & name) const -> bool;
+
+  auto isPedestrian(const std::string & name) const -> bool;
+
 protected:
   traffic_simulator::API api_;
   common::junit::JUnit5 junit_;
@@ -64,7 +68,7 @@ private:
   virtual void onUpdate() = 0;
   virtual void onInitialize() = 0;
   rclcpp::TimerBase::SharedPtr update_timer_;
-  double timeout_;
+  int timeout_;
   auto configure(
     const std::string & map_path, const std::string & lanelet2_map_file,
     const std::string & scenario_filename, const bool verbose) -> traffic_simulator::Configuration

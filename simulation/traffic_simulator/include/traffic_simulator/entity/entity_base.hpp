@@ -71,17 +71,18 @@ public:
    */                                                         \
   /*   */ auto get##NAME() const noexcept->TYPE { return RETURN_VARIABLE; }
 
-  DEFINE_GETTER(BoundingBox,              traffic_simulator_msgs::msg::BoundingBox,        static_cast<EntityStatus>(getStatus()).bounding_box)
-  DEFINE_GETTER(CurrentAccel,             geometry_msgs::msg::Accel,                       static_cast<EntityStatus>(getStatus()).action_status.accel)
-  DEFINE_GETTER(CurrentTwist,             geometry_msgs::msg::Twist,                       static_cast<EntityStatus>(getStatus()).action_status.twist)
-  DEFINE_GETTER(DynamicConstraints,       traffic_simulator_msgs::msg::DynamicConstraints, getBehaviorParameter().dynamic_constraints)
-  DEFINE_GETTER(EntityStatusBeforeUpdate, const CanonicalizedEntityStatus &,               status_before_update_)
-  DEFINE_GETTER(EntitySubtype,            traffic_simulator_msgs::msg::EntitySubtype,      static_cast<EntityStatus>(getStatus()).subtype)
-  DEFINE_GETTER(LinearJerk,               double,                                          static_cast<EntityStatus>(getStatus()).action_status.linear_jerk)
-  DEFINE_GETTER(MapPose,                  geometry_msgs::msg::Pose,                        static_cast<EntityStatus>(getStatus()).pose)
-  DEFINE_GETTER(StandStillDuration,       double,                                          stand_still_duration_)
-  DEFINE_GETTER(Status,                   const CanonicalizedEntityStatus &,               status_)
-  DEFINE_GETTER(TraveledDistance,         double,                                          traveled_distance_)
+  DEFINE_GETTER(BoundingBox,                     const traffic_simulator_msgs::msg::BoundingBox &,   status_->getBoundingBox())
+  DEFINE_GETTER(CanonicalizedStatus,             const CanonicalizedEntityStatus &,                  *status_)
+  DEFINE_GETTER(CanonicalizedStatusBeforeUpdate, const CanonicalizedEntityStatus &,                  status_before_update_)
+  DEFINE_GETTER(CurrentAccel,                    const geometry_msgs::msg::Accel &,                  status_->getAccel())
+  DEFINE_GETTER(CurrentTwist,                    const geometry_msgs::msg::Twist &,                  status_->getTwist())
+  DEFINE_GETTER(DynamicConstraints,              traffic_simulator_msgs::msg::DynamicConstraints,    getBehaviorParameter().dynamic_constraints)
+  DEFINE_GETTER(EntitySubtype,                   const traffic_simulator_msgs::msg::EntitySubtype &, status_->getSubtype())
+  DEFINE_GETTER(EntityType,                      const traffic_simulator_msgs::msg::EntityType &,    status_->getType())
+  DEFINE_GETTER(LinearJerk,                      double,                                             status_->getLinearJerk())
+  DEFINE_GETTER(MapPose,                         const geometry_msgs::msg::Pose &,                   status_->getMapPose())
+  DEFINE_GETTER(StandStillDuration,              double,                                             stand_still_duration_)
+  DEFINE_GETTER(TraveledDistance,                double,                                             traveled_distance_)
   // clang-format on
 #undef DEFINE_GETTER
 
@@ -92,8 +93,7 @@ public:
    */                                                                  \
   /*   */ auto FUNCTION_NAME() const->bool { return BOOL_VARIABLE; }
 
-  DEFINE_CHECK_FUNCTION(isNpcLogicStarted,   npc_logic_started_)
-  DEFINE_CHECK_FUNCTION(laneMatchingSucceed, status_.laneMatchingSucceed())
+  DEFINE_CHECK_FUNCTION(laneMatchingSucceed, status_->laneMatchingSucceed())
   // clang-format on
 #undef DEFINE_CHECK_FUNCTION
 
@@ -106,8 +106,6 @@ public:
   virtual auto getDefaultDynamicConstraints() const
     -> const traffic_simulator_msgs::msg::DynamicConstraints & = 0;
 
-  virtual auto getEntityType() const -> const traffic_simulator_msgs::msg::EntityType & = 0;
-
   virtual auto getEntityTypename() const -> const std::string & = 0;
 
   virtual auto getGoalPoses() -> std::vector<CanonicalizedLaneletPose> = 0;
@@ -116,9 +114,6 @@ public:
 
   /*   */ auto getCanonicalizedLaneletPose(double matching_distance) const
     -> std::optional<CanonicalizedLaneletPose>;
-
-  /*   */ auto getMapPoseFromRelativePose(const geometry_msgs::msg::Pose &) const
-    -> geometry_msgs::msg::Pose;
 
   virtual auto getMaxAcceleration() const -> double = 0;
 
@@ -132,9 +127,9 @@ public:
 
   virtual auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray = 0;
 
-  virtual void onUpdate(double current_time, double step_time);
+  virtual auto onUpdate(const double current_time, const double step_time) -> void;
 
-  virtual void onPostUpdate(double current_time, double step_time);
+  virtual auto onPostUpdate(const double current_time, const double step_time) -> void;
 
   /*   */ void resetDynamicConstraints();
 
@@ -194,7 +189,11 @@ public:
 
   /*   */ void setOtherStatus(const std::unordered_map<std::string, CanonicalizedEntityStatus> &);
 
-  virtual auto setStatus(const CanonicalizedEntityStatus &) -> void;
+  virtual auto setStatus(const EntityStatus & status, const lanelet::Ids & lanelet_ids) -> void;
+
+  virtual auto setStatus(const EntityStatus & status) -> void;
+
+  /*   */ auto setCanonicalizedStatus(const CanonicalizedEntityStatus &) -> void;
 
   virtual auto setLinearAcceleration(const double linear_acceleration) -> void;
 
@@ -215,9 +214,9 @@ public:
 
   /*   */ auto setAcceleration(const geometry_msgs::msg::Accel & accel) -> void;
 
-  /*   */ auto setLinearJerk(const double liner_jerk) -> void;
+  /*   */ auto setAction(const std::string & action) -> void;
 
-  virtual void startNpcLogic(const double current_time);
+  /*   */ auto setLinearJerk(const double liner_jerk) -> void;
 
   /*   */ void stopAtCurrentPosition();
 
@@ -245,14 +244,13 @@ public:
   bool verbose;
 
 protected:
-  CanonicalizedEntityStatus status_;
+  std::shared_ptr<CanonicalizedEntityStatus> status_;
 
   CanonicalizedEntityStatus status_before_update_;
 
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
   std::shared_ptr<traffic_simulator::TrafficLightManager> traffic_light_manager_;
 
-  bool npc_logic_started_ = false;
   double stand_still_duration_ = 0.0;
   double traveled_distance_ = 0.0;
   double prev_job_duration_ = 0.0;

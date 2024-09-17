@@ -32,6 +32,446 @@ Changelog for package openscenario_interpreter
 * add publish_empty_context parameter
 * Contributors: Masaya Kataoka
 
+4.2.7 (2024-09-13)
+------------------
+
+4.2.6 (2024-09-13)
+------------------
+* Merge branch 'master' into RJD-1197/pose_module
+* Contributors: Masaya Kataoka
+
+4.2.5 (2024-09-12)
+------------------
+
+4.2.4 (2024-09-12)
+------------------
+
+4.2.3 (2024-09-11)
+------------------
+
+4.2.2 (2024-09-10)
+------------------
+* Merge branch 'master' into RJD-1278/geometry-update
+* Merge branch 'master' into RJD-1278/geometry-update
+* Merge branch 'master' into RJD-1278/geometry-update
+* Merge branch 'master' into RJD-1278/geometry-update
+* Contributors: Masaya Kataoka, Michał Ciasnocha
+
+4.2.1 (2024-09-10)
+------------------
+
+4.2.0 (2024-09-09)
+------------------
+
+4.1.1 (2024-09-03)
+------------------
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge remote-tracking branch 'origin/master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into doc/RJD-1273-add-realtime-factor-doc
+* Contributors: Dawid Moszynski, Dawid Moszyński, Kotaro Yoshimoto
+
+4.1.0 (2024-09-03)
+------------------
+* Merge branch 'master' into RJD-1278/fix-line-segment
+* Merge branch 'master' into RJD-1278/fix-line-segment
+* Merge branch 'master' into RJD-1278/fix-line-segment
+* Merge branch 'master' into RJD-1278/fix-1344-getIntersection2DSValue
+* Merge branch 'master' into RJD-1278/fix-1343-isIntersect2D
+* Contributors: Michał Ciasnocha
+
+4.0.4 (2024-09-02)
+------------------
+* Merge branch 'master' into feature/simple_sensor_simulator_unit_tests_lidar
+* Merge branch 'master' into feature/simple_sensor_simulator_unit_tests_lidar
+* Merge branch 'master' into feature/simple_sensor_simulator_unit_tests_lidar
+* Contributors: Masaya Kataoka, SzymonParapura
+
+4.0.3 (2024-08-29)
+------------------
+* Merge remote-tracking branch 'origin/master' into RJD-1056-remove-npc-logic-started
+* Merge branch 'RJD-1056-remove-current-time-step-time' into RJD-1057-base
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-npc-logic-started
+* Merge branch 'RJD-1056-remove-npc-logic-started' into RJD-1057-base
+* Merge branch 'RJD-1056-remove-current-time-step-time' into RJD-1057-base
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-npc-logic-started
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-npc-logic-started
+* Merge remote-tracking branch 'tier4/RJD-1056-remove-current-time-step-time' into RJD-1057-base
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-npc-logic-started
+* Merge remote-tracking branch 'origin/RJD-1056-remove-npc-logic-started' into RJD-1057-base
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-npc-logic-started
+* Merge remote-tracking branch 'origin/ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-npc-logic-started
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-npc-logic-started
+* Contributors: DMoszynski, Dawid Moszynski, Mateusz Palczuk
+
+4.0.2 (2024-08-28)
+------------------
+* Merge branch 'master' into RJD-1056-remove-current-time-step-time
+* Merge branch 'master' into RJD-1056-remove-current-time-step-time
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-current-time-step-time
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-current-time-step-time
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-current-time-step-time
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-current-time-step-time
+* Merge remote-tracking branch 'origin/ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-current-time-step-time
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-current-time-step-time
+* Contributors: DMoszynski, Dawid Moszynski, Dawid Moszyński, Mateusz Palczuk
+
+4.0.1 (2024-08-28)
+------------------
+* Merge branch 'master' into fix/follow_trajectory
+* Merge branch 'master' into fix/follow_trajectory
+* Merge remote-tracking branch 'origin' into fix/follow_trajectory
+* Contributors: Masaya Kataoka
+
+4.0.0 (2024-08-27)
+------------------
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge remote-tracking branch 'origin/master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge remote-tracking branch 'origin/ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' of https://github.com/tier4/scenario_simulator_v2 into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge remote-tracking branch 'origin/ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Contributors: DMoszynski, Dawid Moszynski, Dawid Moszyński, Mateusz Palczuk, Tatsuya Yamasaki
+
+3.5.5 (2024-08-27)
+------------------
+* Merge branch 'master' into fix/distance-with-lane-change
+* Merge branch 'master' into fix/distance-with-lane-change
+* Merge branch 'master' into fix/distance-with-lane-change
+* Merge branch 'master' into fix/distance-with-lane-change
+* Contributors: Kotaro Yoshimoto
+
+3.5.4 (2024-08-26)
+------------------
+* Merge branch 'master' into feature/use_workflow_dispatch_in_docker_build
+* Merge branch 'master' into feature/use_workflow_dispatch_in_docker_build
+* Merge remote-tracking branch 'origin/master' into feature/use_workflow_dispatch_in_docker_build
+* Merge remote-tracking branch 'origin/master' into feature/trigger_docker_build_by_tag
+* Contributors: Masaya Kataoka
+
+3.5.3 (2024-08-26)
+------------------
+* Merge branch 'master' into RJD-1278/traffic_simulator-update
+* Merge branch 'master' into RJD-1278/traffic_simulator-update
+* Merge branch 'master' into RJD-1278/traffic_simulator-update
+* Merge branch 'master' into RJD-1278/traffic_simulator-update
+* Contributors: Michał Ciasnocha
+
+3.5.2 (2024-08-23)
+------------------
+* Merge pull request `#1338 <https://github.com/tier4/scenario_simulator_v2/issues/1338>`_ from tier4/fix/interpreter/user-defined-value-condition
+  Fix/interpreter/user defined value condition
+* Merge branch 'master' into fix/interpreter/user-defined-value-condition
+* Merge branch 'master' into fix/interpreter/user-defined-value-condition
+* Update `MagicSubscription`'s QoS to best effort
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/user-defined-value-condition
+* Cleanup struct `MagicSubscription`
+* Update MagicSubscription to share resources between instances
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+3.5.1 (2024-08-22)
+------------------
+* Merge branch 'master' into feat/RJD-1283-add-traffic-controller-visualization
+* Merge branch 'master' into feat/RJD-1283-add-traffic-controller-visualization
+* Merge branch 'master' into feat/RJD-1283-add-traffic-controller-visualization
+* Merge branch 'master' into feat/RJD-1283-add-traffic-controller-visualization
+* Contributors: Dawid Moszyński, Tatsuya Yamasaki
+
+3.5.0 (2024-08-21)
+------------------
+* Merge pull request `#1316 <https://github.com/tier4/scenario_simulator_v2/issues/1316>`_ from tier4/relative-clearance-condition
+* Merge branch 'master' into relative-clearance-condition
+* Merge branch 'master' into relative-clearance-condition
+* fix: treat added entity only in RelativeClearanceCondition
+* refactor: delete RelativeClearanceCondition::getRelativeLanePosition
+* refactor: use exception when errors are occurred in SimulatorCore::evaluateLateralRelativeLanes
+* refactor: use std::optional for optional attribute in RelativeLaneRange
+* feat: support EntitySelection in RelativeClearanceCondition
+* refactor: use boost::math::constants::half_pi instead of 0.5 * boost::math::constants::pi
+* fix: update target entities of RelativeClearanceCondition in every frame
+* refactor: use boost::math::constants::pi<double>() instead of M_PI
+* fix: implement Integer::min/max instead of Integer::infinity
+* Merge branch 'master' into relative-clearance-condition
+* feat: improve description output of RelativeClearanceCondition
+* Merge branch 'master' into relative-clearance-condition
+* refactor: format comment-outs
+* Merge branch 'master' into relative-clearance-condition
+* refactor: clean up includes in relative_lane_range.hpp
+* Fix RelativeLaneRange to use default values in the specification
+* Add Integer::infinity function
+* apply linter
+* Fix copy bugs in RelativeClearanceCondition
+* Merge remote-tracking branch 'origin/master' into relative-clearance-condition
+* Implement switching by relative heading of triggering_entity in RelativeClearanceCondition
+* fix condition logic of RelativeClearanceCondition
+* Correct initialization of RelativeClearanceCondition::entity_refs along the standard
+* Merge remote-tracking branch 'origin/master' into relative-clearance-condition
+* Revert "Move entity existence check into `distance` from speceialized `distance`"
+  This reverts commit 727d57dc93f29badb41661fcb8543c9ce7840392.
+* Revert "Update `RelativeDistanceCondition::distance` to static member function"
+  This reverts commit 86f489f0
+* Add temporary implementation of  RelativeClearanceCondition::evaluate function
+* Implement RelativeClearanceCondition::getRelativeLanePosition function
+* Implement SimulatorCore::evaluateLateralRelativeLanes function
+* Merge remote-tracking branch 'origin/relative-clearance-condition' into relative-clearance-condition
+* refactor: import RelativeDistanceCondition updates from feature/time-to-collision-condition branch
+  Co-authored-by: yamacir-kit <httperror@404-notfound.jp>
+* Merge branch 'master' into relative-clearance-condition
+* Update `RelativeDistanceCondition::distance` to static member function
+* Move entity existence check into `distance` from speceialized `distance`
+* fix: replace freespace with freeSpace in RelativeClearanceCondition
+* chore: update OpenSCENARIO version of EntityCondition
+* Merge remote-tracking branch 'origin/master' into relative-clearance-condition
+* feat(openscenario_interpreter): add RelativeClearanceCondition(empty implementation)
+* feat(openscenario_interpreter): add RelativeLaneRange
+* Revert "fix(RelativeDistanceCondition): Fixed a bug where RelativeDistance showed negative values"
+  This reverts commit 84c8b0c101b8e680ad6029d8702387e5495e2646.
+* fix(RelativeDistanceCondition): Fixed a bug where RelativeDistance showed negative values
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki, yamacir-kit
+
+3.4.4 (2024-08-20)
+------------------
+
+3.4.3 (2024-08-19)
+------------------
+
+3.4.2 (2024-08-05)
+------------------
+* Merge branch 'master' into doc/longitudinal-control
+* Merge pull request `#1321 <https://github.com/tier4/scenario_simulator_v2/issues/1321>`_ from tier4/feat/RJD-1199-add-imu-sensor-to-simple-sensor-simulator
+* Merge commit 'c1cab6eb1ece2df58982f50a78fef5a5ecaa7234' into doc/longitudinal-control
+* Merge branch 'master' into feat/RJD-1199-add-imu-sensor-to-simple-sensor-simulator
+* feat: Enhance IMU sensor configuration and initialization
+  - Added frame_id to ImuSensorConfiguration
+  - Separated noise standard deviations for orientation, twist, and acceleration
+  - Updated ImuSensorBase and ImuSensor classes for new noise distributions
+* Merge branch 'master' into feat/RJD-1199-add-imu-sensor-to-simple-sensor-simulator
+* Merge branch 'master' into feat/RJD-1199-add-imu-sensor-to-simple-sensor-simulator
+* Merge branch 'master' into feat/RJD-1199-add-imu-sensor-to-simple-sensor-simulator
+* Merge branch 'master' into doc/longitudinal-control
+* Merge branch 'master' into doc/longitudinal-control
+* Merge branch 'master' into feat/RJD-1199-add-imu-sensor-to-simple-sensor-simulator
+* Merge branch 'master' into doc/longitudinal-control
+* Merge branch 'master' into feat/RJD-1199-add-imu-sensor-to-simple-sensor-simulator
+* feat(simple_sensor_simulator, imu): add gravity vector, tidy up
+* feat(simulator_core, api, zmq): add attachImuSensor, add update imu sensors
+* Contributors: Dawid Moszynski, Koki Suzuki, Kotaro Yoshimoto, Masaya Kataoka, SzymonParapura, koki suzuki
+
+3.4.1 (2024-07-30)
+------------------
+* Merge branch 'master' into doc/open_scenario_support
+* Contributors: Tatsuya Yamasaki
+
+3.4.0 (2024-07-26)
+------------------
+* Merge pull request `#1325 <https://github.com/tier4/scenario_simulator_v2/issues/1325>`_ from tier4/feature/interpreter/lidar-configuration
+  Feature/interpreter/lidar configuration
+* Add a test scenario for `ObjectController`'s pseudo LiDAR property
+* Update ControllerAction to support some new properties related to LiDAR
+* Contributors: Masaya Kataoka, yamacir-kit
+
+3.3.0 (2024-07-23)
+------------------
+* Merge pull request `#1059 <https://github.com/tier4/scenario_simulator_v2/issues/1059>`_ from tier4/feature/interpreter/entity_selection
+  Add `EntitySelection`
+* Merge branch 'master' into feature/interpreter/entity_selection
+* Merge branch 'master' into feature/interpreter/entity_selection
+* Merge branch 'master' into feature/interpreter/entity_selection
+* Merge branch 'master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Add operator overloading for ostream
+* Merge branch 'feature/interpreter/entity_selection' into feature/interpreter/refactoring_entity
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Rename
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/refactoring_entity
+* Remove implementation-defined types
+* Unite `GroupedEntity` and `SingleEntity` into `Entity`
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Fix wrong branch
+* Update entity lookup to consider empty name
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Format
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Fix constraint check
+* Update assign `this` after parsing ScenarioObject
+* Remove extra this
+* Update constructor to pass args by reference
+* Remove unneccessary type argument
+* Remove unneccessary argument name
+* Remove unneccessary argument name
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Add missing `return`
+* Simplify entity inspection
+* Simplify entity inspection
+* Simplify entity inspection
+* Simplify entity inspection
+* Simplify entity inspection
+* Update entity lookup
+* Use universal reference
+* Remove std::any_of
+* Simplify for loop
+* Rename
+* Simplify `AccelerationCondition::evaluate`
+* Format
+* Update comparators to handle `std::valarray`
+* Add `evaluate` to `GroupedEntity`
+* Rename variable
+* Use variadic function
+* Rename argument
+* Add this to lambda capture
+* Remove extra header
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Revert changes on Entities
+* Revert changes on Entities
+* Revert changes on Entities
+* Revert changes on Entities
+* Fix wrong cast
+* Format
+* Fix headers and declarations
+* Update entity implementation to distinguish plurality
+* Format
+* [WIP] Replace Entities::objects with Entity::objects
+* Remove extra
+* Make entity hashable
+* Remove extra include and declaration
+* Update entity exploration
+* Add static field of object type
+* Remove extra header
+* Rename
+* Implement `Entity`
+* Add const version of `apply`
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Remove
+* Remove unnecessary empty check
+* Format
+* Reorder header
+* Update parameter name
+* Rename HasIterator to Iterable
+* Update to use EntityRef instead of String
+* Use forward declration
+* Format
+* Remove extra header include
+* Replace String entity_ref to original EntityRef
+* Format
+* Update to use type trait
+* Add type trait for iterator detection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Remove unneccesary static_cast
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Fix wrong include guard
+* Fix typo
+* Remove wrong `return`
+* Refactor
+* Fix wrong argument order
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Use `Entities::isAdded`
+* Assign `this` first to avoid null dereference
+* Format
+* Add missing condition
+* Update to fill `results` with NaN by default
+* Update not to use temporal
+* Use `set` instead of `list` to deduplicate entity
+* Change to use inline variable instead of struct
+* Simplify
+* Fix wrong printing process
+* Refactor
+* Fix wrong condition
+* Update to check ExternalObjectReference
+* Refactor
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Update conditions to handle EntitySelection properly
+* Update `print_to` to print nested sequences
+* Remove redundant iteration
+* Simplify
+* Format
+* Update `Entities::isAdded` to handle `EntitySelection`
+* Mark constructor explicit
+* Implement constraints on entities of actions
+* Implement `objectTypes`
+* Update `ByType` to be like `EntityRef`
+* Reorder
+* Add simple impl of `ExternalObjectReference`
+* Remove redundant explicit
+* Make construcotors explicit
+* Make `entities` public
+* Rename header
+* Rename
+* Fix wrong message
+* Add constraints check for actions
+* Format
+* Use `is_also` instead of `is`
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Use switch for byType
+* Update `TeleportAction` to handle `EntitySelection`
+* Update `SpeedProfileAction` to handle `EntitySelection`
+* Update `SpeedAction` to handle `EntitySelection`
+* Use new enumeration in `SelectedEntities`
+* Update `LaneChangeAction` to handle `EntitySelection`
+* Update `EntityAction` to use new enumeration
+* Update `CustomCommandAction` to handle `EntitySelection`
+* Update `ControllerAction` to handle `EntitySelection`
+* Update `AssignRouteAction` to handle `EntitySelection`
+* Update `AcquirePositionAction` to handle `EntitySelection`
+* Update `Triggering_entities` to use new enumration
+* Update object enumeration
+* Add `EntitySelection` support for `TriggeringEntities`
+* Add support for `EntitySelection` in `EntityAction`
+* Improve entity enumeration
+* Add entity enumeration
+* Make `EntityRef` more specific to parsing
+* Add `readNameRef`
+* Remove unused functions
+* [WIP] implement tree flattening
+* Use class member instead of inheritance
+* Make reference to `EntitySelection` error by default
+* Ignore `EntitySelection` on engagement
+* Fix wrong parsing of `SelectedEntities`
+* Format include
+* `EntitySelection`の不完全な読み取り処理の追加
+* エンティティの列挙処理の追加
+* Make `EntityRef` more specific to parsing
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Add `readNameRef`
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Remove unused functions
+* [WIP] implement tree flattening
+* Use class member instead of inheritance
+* Make reference to `EntitySelection` error by default
+* Ignore `EntitySelection` on engagement
+* Fix wrong parsing of `SelectedEntities`
+* Format include
+* `EntitySelection`の不完全な読み取り処理の追加
+* Contributors: Shota Minami, Tatsuya Yamasaki
+
 3.2.0 (2024-07-18)
 ------------------
 * Merge remote-tracking branch 'origin/master' into fix/spawn_position_of_map_pose
