@@ -21,6 +21,7 @@
 #include <functional>
 #include <openscenario_interpreter/reader/evaluate.hpp>
 #include <openscenario_interpreter/syntax/parameter_type.hpp>
+#include <openscenario_interpreter/syntax/rule.hpp>
 #include <openscenario_interpreter/utility/highlighter.hpp>
 #include <optional>
 #include <pugixml.hpp>
@@ -31,6 +32,8 @@
 
 namespace openscenario_interpreter
 {
+struct Scope;
+
 inline namespace reader
 {
 template <typename Scope>
@@ -157,7 +160,7 @@ auto readAttribute(const std::string & name, const Node & node, const Scope & sc
 }
 
 template <typename T, typename Node, typename Scope>
-auto readAttribute(const std::string & name, const Node & node, const Scope & scope, T && value)
+auto readAttribute(const std::string & name, const Node & node, const Scope & scope, T && value) -> T
 {
   if (node.attribute(name.c_str())) {
     return readAttribute<T>(name, node, scope);
@@ -175,6 +178,12 @@ auto readAttribute(const std::string & name, const Node & node, const Scope & sc
     return std::optional<T>();
   }
 }
+
+extern template auto readAttribute<Boolean, pugi::xml_node, Scope>(const std::string &, const pugi::xml_node &, const Scope &) -> Boolean;
+extern template auto readAttribute<UnsignedInteger, pugi::xml_node, Scope>(const std::string &, const pugi::xml_node &, const Scope &) -> UnsignedInteger;
+extern template auto readAttribute<Double, pugi::xml_node, Scope>(const std::string &, const pugi::xml_node &, const Scope &) -> Double;
+extern template auto readAttribute<String, pugi::xml_node, Scope>(const std::string &, const pugi::xml_node &, const Scope &) -> String;
+extern template auto readAttribute<syntax::Rule, pugi::xml_node, Scope>(const std::string &, const pugi::xml_node &, const Scope &) -> syntax::Rule;
 }  // namespace reader
 }  // namespace openscenario_interpreter
 
