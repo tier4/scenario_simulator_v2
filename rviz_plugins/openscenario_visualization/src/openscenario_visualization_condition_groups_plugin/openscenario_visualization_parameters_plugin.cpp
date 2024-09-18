@@ -40,11 +40,12 @@ VisualizationParametersDisplay::VisualizationParametersDisplay()
   const float scale = static_cast<float>(screen_info->height) / hight_4k;
 
   /**
-   * @note The multiplication of 35.0 is used to determine the initial text size in the panel. 
+   * @note The multiplication of 35.0 is used to determine the initial text size in the panel.
    * This value is a base size that is then scaled according to the screen resolution.
-   * The 'Value Scale' property allows users to adjust the scaling factor of this text size later on, 
-   * but the initial value of 35.0 is set to ensure a default size that is likely suitable for most screens. 
-   * The scaling factor adjusts this size to ensure readability across various resolutions.
+   * The 'Value Scale' property allows users to adjust the scaling factor of this text size later
+   * on, but the initial value of 35.0 is set to ensure a default size that is likely suitable for
+   * most screens. The scaling factor adjusts this size to ensure readability across various
+   * resolutions.
    */
   const float text_size = scale * 35.0;
 
@@ -53,30 +54,32 @@ VisualizationParametersDisplay::VisualizationParametersDisplay()
 
   /**
    * @note Define initial value of top edge position of condition results panel
-   * The multiplication of 450 sets the initial top edge position of the condition results panel. 
-   * Like the width and length, this is a predefined base value, not necessarily linked to any value set from the Top property.
-   * The purpose of this calculation is to position the top edge of the panel at an appropriate place on the screen, 
-   * again scaling according to screen resolution to maintain a consistent look across different devices.
+   * The multiplication of 450 sets the initial top edge position of the condition results panel.
+   * Like the width and length, this is a predefined base value, not necessarily linked to any value
+   * set from the Top property. The purpose of this calculation is to position the top edge of the
+   * panel at an appropriate place on the screen, again scaling according to screen resolution to
+   * maintain a consistent look across different devices.
    */
   const int top = static_cast<int>(std::round(450 * scale));
 
   /**
    * @note Define initial value of horizontal length of condition results panel.
-   * The reason 2000 is hard-coded here is because that number displayed most beautifully when we tested the operation on a 4K/non 4K display.
-   * Also, this number can be set via the rviz GUI.
+   * The reason 2000 is hard-coded here is because that number displayed most beautifully when we
+   * tested the operation on a 4K/non 4K display. Also, this number can be set via the rviz GUI.
    */
   const int length = static_cast<int>(std::round(2000 * scale));
 
   /**
    * @note Define initial value of width of condition results panel.
-   * The reason 2000 is hard-coded here is because that number displayed most beautifully when we tested the operation on a 4K/non 4K display.
-   * Also, this number can be set via the rviz GUI.
+   * The reason 2000 is hard-coded here is because that number displayed most beautifully when we
+   * tested the operation on a 4K/non 4K display. Also, this number can be set via the rviz GUI.
    */
   const int width = static_cast<int>(std::round(2000 * scale));
 
   property_topic_name_ = new rviz_common::properties::StringProperty(
-    "Topic", "/simulation/test_iteration_parameters", "The topic on which to test iteration parameters are published.", this,
-    SLOT(updateTopic()), this);
+    "Topic", "/simulation/test_iteration_parameters",
+    "The topic on which to test iteration parameters are published.", this, SLOT(updateTopic()),
+    this);
   property_text_color_ = new rviz_common::properties::ColorProperty(
     "Text Color", QColor(255, 255, 255), "text color", this, SLOT(updateVisualization()), this);
   property_left_ = new rviz_common::properties::IntProperty(
@@ -156,7 +159,8 @@ void VisualizationParametersDisplay::subscribe()
 
 void VisualizationParametersDisplay::unsubscribe() { test_iteration_params_sub_.reset(); }
 
-void VisualizationParametersDisplay::processMessage(const std_msgs::msg::String::ConstSharedPtr msg_ptr)
+void VisualizationParametersDisplay::processMessage(
+  const std_msgs::msg::String::ConstSharedPtr msg_ptr)
 {
   if (!overlay_->isVisible()) return;
 

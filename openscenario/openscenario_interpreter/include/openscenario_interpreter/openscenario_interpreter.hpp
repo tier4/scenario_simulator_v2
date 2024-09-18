@@ -32,8 +32,8 @@
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <simple_junit/junit5.hpp>
-#include <utility>
 #include <std_msgs/msg/string.hpp>
+#include <utility>
 
 #define INTERPRETER_INFO_STREAM(...) \
   RCLCPP_INFO_STREAM(get_logger(), "\x1b[32m" << __VA_ARGS__ << "\x1b[0m")
@@ -50,7 +50,6 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode,
                     private SimulatorCore::NonStandardOperation
 {
   using Context = openscenario_interpreter_msgs::msg::Context;
-
 
   const rclcpp_lifecycle::LifecyclePublisher<Context>::SharedPtr publisher_of_context;
   const rclcpp_lifecycle::LifecyclePublisher<std_msgs::msg::String>::SharedPtr publisher_of_params;
@@ -82,7 +81,7 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode,
   using Result = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
 
   bool waiting_for_engagement_to_be_completed = false;  // NOTE: DIRTY HACK!!!
-  
+
   std_msgs::msg::String test_iteration_params_str = std_msgs::msg::String();
 
 public:

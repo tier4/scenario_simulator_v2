@@ -36,7 +36,8 @@ namespace openscenario_interpreter
 Interpreter::Interpreter(const rclcpp::NodeOptions & options)
 : rclcpp_lifecycle::LifecycleNode("openscenario_interpreter", options),
   publisher_of_context(create_publisher<Context>("context", rclcpp::QoS(1).transient_local())),
-  publisher_of_params(create_publisher<std_msgs::msg::String>("test_iteration_parameters", rclcpp::QoS(1).transient_local())),
+  publisher_of_params(create_publisher<std_msgs::msg::String>(
+    "test_iteration_parameters", rclcpp::QoS(1).transient_local())),
   local_frame_rate(30),
   local_real_time_factor(1.0),
   osc_path(""),
@@ -184,7 +185,6 @@ auto Interpreter::engaged() const -> bool
 
 auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 {
-  
   auto evaluate_storyboard = [this]() {
     withExceptionHandler(
       [this](auto &&...) {
@@ -250,7 +250,6 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 
         publisher_of_context->on_activate();
         publisher_of_params->on_activate();
-        
 
         assert(publisher_of_context->is_activated());
         assert(publisher_of_params->is_activated());
@@ -323,10 +322,9 @@ auto Interpreter::reset() -> void
     publisher_of_context->on_deactivate();
   }
 
-    if (publisher_of_params->is_activated()) {
+  if (publisher_of_params->is_activated()) {
     publisher_of_params->on_deactivate();
   }
-
 
   if (not has_parameter("initialize_duration")) {
     declare_parameter<int>("initialize_duration", 30);
