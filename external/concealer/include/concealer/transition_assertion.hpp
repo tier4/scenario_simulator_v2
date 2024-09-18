@@ -29,6 +29,8 @@ struct TransitionAssertion
 
   const std::chrono::seconds initialize_duration;
 
+  bool have_never_been_engaged = true;
+
   explicit TransitionAssertion()
   : start(std::chrono::steady_clock::now()), initialize_duration([]() {
       auto node = rclcpp::Node("get_parameter", "simulation");
@@ -47,45 +49,32 @@ struct TransitionAssertion
       (current_state.empty() ? "NOT PUBLISHED YET" : current_state), ".");
   }
 
-#define DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE_WITH_INITIALIZE_TIME_LIMIT(STATE)               \
-  template <typename Thunk = void (*)(), typename Interval = std::chrono::seconds>           \
-  auto waitForAutowareStateToBe##STATE(                                                      \
-    Thunk && thunk = [] {}, Interval interval = std::chrono::seconds(1))                     \
-  {                                                                                          \
-    for (thunk(); not static_cast<const Autoware &>(*this).isStopRequested() and             \
-                  not static_cast<const Autoware &>(*this).is##STATE();                      \
-         rclcpp::GenericRate<std::chrono::steady_clock>(interval).sleep()) {                 \
-      if (auto now = std::chrono::steady_clock::now(); start + initialize_duration <= now) { \
-        throw makeTransitionError(#STATE);                                                   \
-      } else {                                                                               \
-        thunk();                                                                             \
-      }                                                                                      \
-    }                                                                                        \
-  }                                                                                          \
+#define DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(STATE)                                \
+  template <typename Thunk = void (*)(), typename Interval = std::chrono::seconds> \
+  auto waitForAutowareStateToBe##STATE(                                            \
+    Thunk && thunk = [] {}, Interval interval = std::chrono::seconds(1))           \
+  {                                                                                \
+    for (thunk(); not static_cast<const Autoware &>(*this).isStopRequested() and   \
+                  not static_cast<const Autoware &>(*this).is##STATE();            \
+         rclcpp::GenericRate<std::chrono::steady_clock>(interval).sleep()) {       \
+      if (                                                                         \
+        have_never_been_engaged and                                                \
+        start + initialize_duration <= std::chrono::steady_clock::now()) {         \
+        throw makeTransitionError(#STATE);                                         \
+      } else {                                                                     \
+        thunk();                                                                   \
+      }                                                                            \
+    }                                                                              \
+    if constexpr (std::string_view(#STATE) == std::string_view("Driving")) {       \
+      have_never_been_engaged = false;                                             \
+    }                                                                              \
+  }                                                                                \
   static_assert(true)
 
-#define DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(STATE)                                  \
-  template <typename Thunk = void (*)()>                                             \
-  auto waitForAutowareStateToBe##STATE(                                              \
-    Thunk && thunk = [] {}, std::chrono::seconds interval = std::chrono::seconds(1)) \
-  {                                                                                  \
-    for (thunk(); not static_cast<const Autoware &>(*this).isStopRequested() and     \
-                  not static_cast<const Autoware &>(*this).is##STATE();              \
-         rclcpp::GenericRate<std::chrono::steady_clock>(interval).sleep()) {         \
-      thunk();                                                                       \
-    }                                                                                \
-  }                                                                                  \
-  static_assert(true)
-
-  /*
-     NOTE: The time limit must be ignored in waitForAutowareStateToBeDriving()
-     because the current implementation attempts to transition to Driving state
-     after initialize_duration seconds have elapsed.
-  */
-  DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE_WITH_INITIALIZE_TIME_LIMIT(Initializing);
-  DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE_WITH_INITIALIZE_TIME_LIMIT(WaitingForRoute);
-  DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE_WITH_INITIALIZE_TIME_LIMIT(Planning);
-  DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE_WITH_INITIALIZE_TIME_LIMIT(WaitingForEngage);
+  DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(Initializing);
+  DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(WaitingForRoute);
+  DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(Planning);
+  DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(WaitingForEngage);
   DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(Driving);
   DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(ArrivedGoal);
   DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(Finalizing);
