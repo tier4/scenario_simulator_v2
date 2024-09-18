@@ -84,8 +84,6 @@ public:
 
   auto getMaxDeceleration() const -> double override;
 
-  auto getEntityType() const -> const traffic_simulator_msgs::msg::EntityType & override;
-
   auto getEntityTypename() const -> const std::string & override;
 
   auto getGoalPoses() -> std::vector<CanonicalizedLaneletPose> override;
@@ -96,7 +94,7 @@ public:
 
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
 
-  void onUpdate(double current_time, double step_time) override;
+  auto onUpdate(const double current_time, const double step_time) -> void override;
 
   void requestAcquirePosition(const CanonicalizedLaneletPose &);
 

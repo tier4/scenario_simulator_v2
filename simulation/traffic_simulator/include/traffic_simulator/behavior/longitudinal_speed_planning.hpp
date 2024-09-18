@@ -26,7 +26,7 @@ namespace longitudinal_speed_planning
 class LongitudinalSpeedPlanner
 {
 public:
-  explicit LongitudinalSpeedPlanner(double step_time, const std::string & entity);
+  explicit LongitudinalSpeedPlanner(const double step_time, const std::string & entity);
   auto getDynamicStates(
     double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints &,
     const geometry_msgs::msg::Twist & current_twist,
