@@ -21,6 +21,18 @@ Changelog for package cpp_mock_scenarios
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+4.2.7 (2024-09-13)
+------------------
+* Merge pull request `#1379 <https://github.com/tier4/scenario_simulator_v2/issues/1379>`_ from tier4/fix/hard-coded-update-rate
+  fix(mock): hard-coded update rate
+* fix(mock): hard-coded update rate
+* Contributors: Masaya Kataoka, satoshi-ota
+
+4.2.6 (2024-09-13)
+------------------
+* Merge branch 'master' into RJD-1197/pose_module
+* Contributors: Masaya Kataoka
+
 4.2.5 (2024-09-12)
 ------------------
 * Merge pull request `#1373 <https://github.com/tier4/scenario_simulator_v2/issues/1373>`_ from tier4/fix/colcon_build_error_furthermore
