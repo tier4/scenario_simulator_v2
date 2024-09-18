@@ -359,7 +359,7 @@ public:
         core->attachImuSensor(entity_ref, [&]() {
           simulation_api_schema::ImuSensorConfiguration configuration;
           configuration.set_entity(entity_ref);
-          configuration.set_frame_id("tamagawa/imu_link");
+          configuration.set_frame_id("base_link");
           configuration.set_add_gravity(true);
           configuration.set_use_seed(true);
           configuration.set_seed(0);
