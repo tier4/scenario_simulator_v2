@@ -40,35 +40,30 @@ struct TransitionAssertion
   {
   }
 
-  auto makeTransitionError(const std::string & expected) const
-  {
-    const auto current_state = static_cast<const Autoware &>(*this).getAutowareStateName();
-    return common::AutowareError(
-      "Simulator waited for the Autoware state to transition to ", expected,
-      ", but time is up. The current Autoware state is ",
-      (current_state.empty() ? "NOT PUBLISHED YET" : current_state), ".");
-  }
-
-#define DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(STATE)                                \
-  template <typename Thunk = void (*)(), typename Interval = std::chrono::seconds> \
-  auto waitForAutowareStateToBe##STATE(                                            \
-    Thunk && thunk = [] {}, Interval interval = std::chrono::seconds(1))           \
-  {                                                                                \
-    for (thunk(); not static_cast<const Autoware &>(*this).isStopRequested() and   \
-                  not static_cast<const Autoware &>(*this).is##STATE();            \
-         rclcpp::GenericRate<std::chrono::steady_clock>(interval).sleep()) {       \
-      if (                                                                         \
-        have_never_been_engaged and                                                \
-        start + initialize_duration <= std::chrono::steady_clock::now()) {         \
-        throw makeTransitionError(#STATE);                                         \
-      } else {                                                                     \
-        thunk();                                                                   \
-      }                                                                            \
-    }                                                                              \
-    if constexpr (std::string_view(#STATE) == std::string_view("Driving")) {       \
-      have_never_been_engaged = false;                                             \
-    }                                                                              \
-  }                                                                                \
+#define DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(STATE)                                     \
+  template <typename Thunk = void (*)(), typename Interval = std::chrono::seconds>      \
+  auto waitForAutowareStateToBe##STATE(                                                 \
+    Thunk && thunk = [] {}, Interval interval = std::chrono::seconds(1))                \
+  {                                                                                     \
+    for (thunk(); not static_cast<const Autoware &>(*this).isStopRequested() and        \
+                  not static_cast<const Autoware &>(*this).is##STATE();                 \
+         rclcpp::GenericRate<std::chrono::steady_clock>(interval).sleep()) {            \
+      if (                                                                              \
+        have_never_been_engaged and                                                     \
+        start + initialize_duration <= std::chrono::steady_clock::now()) {              \
+        const auto state = static_cast<const Autoware &>(*this).getAutowareStateName(); \
+        throw common::AutowareError(                                                    \
+          "Simulator waited for the Autoware state to transition to " #STATE            \
+          ", but time is up. The current Autoware state is ",                           \
+          (state.empty() ? "not published yet" : state));                               \
+      } else {                                                                          \
+        thunk();                                                                        \
+      }                                                                                 \
+    }                                                                                   \
+    if constexpr (std::string_view(#STATE) == std::string_view("Driving")) {            \
+      have_never_been_engaged = false;                                                  \
+    }                                                                                   \
+  }                                                                                     \
   static_assert(true)
 
   DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(Initializing);
