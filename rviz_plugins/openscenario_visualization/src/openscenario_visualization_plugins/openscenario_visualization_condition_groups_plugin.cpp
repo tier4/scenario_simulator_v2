@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "openscenario_visualization_condition_groups_plugin/openscenario_visualization_condition_groups_plugin.hpp"
+#include "openscenario_visualization_plugins/openscenario_visualization_condition_groups_plugin.hpp"
 
 #include <OgreHardwarePixelBuffer.h>
 #include <X11/Xlib.h>
