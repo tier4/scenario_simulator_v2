@@ -32,6 +32,14 @@ Changelog for package openscenario_interpreter
 * add publish_empty_context parameter
 * Contributors: Masaya Kataoka
 
+4.2.9 (2024-09-19)
+------------------
+* Merge branch 'master' into RJD-1197/distance
+* Merge branch 'master' into RJD-1197/distance
+* resolve conflict
+* Merge branch 'master' into RJD-1197/distance
+* Contributors: Michał Ciasnocha, robomic
+
 4.2.8 (2024-09-18)
 ------------------
 
