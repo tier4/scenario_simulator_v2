@@ -38,6 +38,17 @@ EntityBase::EntityBase(
   status_before_update_(*status_),
   hdmap_utils_ptr_(hdmap_utils_ptr)
 {
+  job_list_.append(
+    [this](double delta_time) { 
+      traveled_distance_ += std::abs(getCurrentTwist().linear.x) * delta_time; 
+      return true;
+    },
+    [this]() { return false; },
+    job::Type::TRAVELED_DISTANCE,
+    true,
+    job::Event::POST_UPDATE
+  );
+
   if (name != static_cast<EntityStatus>(entity_status).name) {
     THROW_SIMULATION_ERROR(
       "The name of the entity does not match the name of the entity listed in entity_status.",
@@ -646,10 +657,10 @@ auto EntityBase::updateStandStillDuration(const double step_time) -> double
   }
 }
 
-auto EntityBase::updateTraveledDistance(const double step_time) -> double
-{
-  return traveled_distance_ += std::abs(getCurrentTwist().linear.x) * step_time;
-}
+// auto EntityBase::updateTraveledDistance(const double step_time) -> double
+// {
+//   return traveled_distance_ += std::abs(getCurrentTwist().linear.x) * step_time;
+// }
 
 bool EntityBase::reachPosition(const std::string & target_name, const double tolerance) const
 {
