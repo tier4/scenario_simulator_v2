@@ -52,13 +52,13 @@ jobs:
           git config --global user.name  "Release Bot"
           git config --global user.email "action@github.com"
           git config --global --add safe.directory /__w/scenario_simulator_v2/scenario_simulator_v2
-          git config --global credential.helper ${{ secrets.GITHUB_TOKEN }}
+          git config --global credential.helper ${{ secrets.BLOOM_GITHUB_TOKEN }}
           git config pull.rebase false
 
       - name: Copy branch to upstream
         if: github.event.pull_request.head.repo.full_name != github.repository
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.BLOOM_GITHUB_TOKEN }}
         run: |
           git remote add fork https://github.com/${{ github.event.pull_request.head.repo.full_name }}.git
           git fetch --all
