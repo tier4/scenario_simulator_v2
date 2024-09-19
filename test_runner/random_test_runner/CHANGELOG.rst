@@ -21,6 +21,16 @@ Changelog for package random_test_runner
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+4.3.0 (2024-09-19)
+------------------
+* Merge pull request `#1386 <https://github.com/tier4/scenario_simulator_v2/issues/1386>`_ from tier4/RJD-1201/documentation_update
+  [RJD-1201] Update Quick start / Build instructions
+* Merge branch 'master' into RJD-1201/documentation_update
+* Fix: Update supported architecture types for random_test_runner
+  - Updated launch script
+  - Updated Usage.md
+* Contributors: Masaya Kataoka, SzymonParapura
+
 4.2.9 (2024-09-19)
 ------------------
 * Merge branch 'master' into RJD-1197/distance

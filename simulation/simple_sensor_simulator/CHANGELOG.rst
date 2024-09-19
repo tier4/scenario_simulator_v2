@@ -21,6 +21,11 @@ Changelog for package simple_sensor_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+4.3.0 (2024-09-19)
+------------------
+* Merge branch 'master' into RJD-1201/documentation_update
+* Contributors: SzymonParapura
+
 4.2.9 (2024-09-19)
 ------------------
 * Merge branch 'master' into RJD-1197/distance
