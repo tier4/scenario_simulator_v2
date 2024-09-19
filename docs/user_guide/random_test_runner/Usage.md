@@ -73,7 +73,7 @@ and sensor model is used in the simulation
 
 | Parameter name      | Default value                 | Description                                                               |
 |---------------------|-------------------------------|---------------------------------------------------------------------------|
-| `architecture_type` | `"awf/universe"`              | Autoware architecture type. Currently the only supported value is: `awf/universe`. |
+| `architecture_type` | `"awf/universe/20230906"`              | Autoware architecture type. Currently supported values are: `awf/universe/20230906` and `awf/universe/20240605`. |
 | `sensor_model`      | `"sample_sensor_kit"`                   | Ego sensor model.                                                          |
 | `vehicle_model`     | `"sample_vehicle"`                     | Ego vehicle model.                                                         |
 
