@@ -21,6 +21,17 @@ Changelog for package simple_sensor_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+4.3.1 (2024-09-19)
+------------------
+* Merge pull request `#1324 <https://github.com/tier4/scenario_simulator_v2/issues/1324>`_ from tier4/fix/fix-eigen-variable-definition
+  Fix/fix eigen variable definition
+* Merge branch 'master' into fix/fix-eigen-variable-definition
+* Merge branch 'master' into fix/fix-eigen-variable-definition
+* Merge branch 'master' into fix/fix-eigen-variable-definition
+* Merge branch 'master' into fix/fix-eigen-variable-definition
+* fix(simple_sensor_simulator): fix eigen variable definition
+* Contributors: Masaya Kataoka, Mert Çolak
+
 4.3.0 (2024-09-19)
 ------------------
 * Merge branch 'master' into RJD-1201/documentation_update
