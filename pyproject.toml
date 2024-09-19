@@ -25,5 +25,5 @@ catkin-pkg = "^1.0.0"
 
 
 [build-system]
-requires = ["poetry-core", "setuptools"]
+requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
