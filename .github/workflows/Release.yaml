@@ -61,7 +61,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git remote add fork https://github.com/${{ github.event.pull_request.head.repo.full_name }}.git
-          git checkout fork ${{ github.event.pull_request.head.ref }}
+          git checkout fork/${{ github.event.pull_request.head.ref }}
+          git checkout -b ${{ github.event.pull_request.head.ref }}
           git push origin ${{ github.event.pull_request.head.ref }}
           git checkout origin master
 
