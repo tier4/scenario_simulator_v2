@@ -74,14 +74,15 @@ jobs:
       - name: Build packages
         run: |
           source /opt/ros/${{ matrix.rosdistro }}/setup.bash
-          colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release -DBUILD_CPP_MOCK_SCENARIOS=ON --packages-up-to ${{ steps.list_packages.outputs.package_list }}
+          colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release -DBUILD_CPP_MOCK_SCENARIOS=ON -DBUILD_TESTING=true -DCMAKE_CXX_FLAGS='-fprofile-arcs -ftest-coverage' -DCMAKE_C_FLAGS='-fprofile-arcs -ftest-coverage' --packages-up-to ${{ steps.list_packages.outputs.package_list }}
         shell: bash
 
       - name: Colcon test
         run: |
           source /opt/ros/${{ matrix.rosdistro }}/setup.bash
           source install/local_setup.bash
-          colcon test --packages-select ${{ steps.list_packages.outputs.package_list }}
+          colcon test --event-handlers console_cohesion+ --packages-select ${{ steps.list_packages.outputs.package_list }}
+          colcon lcov-result --packages-select cpp_mock_scenarios
         shell: bash
 
       - name: Show test result
