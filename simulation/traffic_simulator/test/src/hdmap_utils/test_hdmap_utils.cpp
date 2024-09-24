@@ -34,12 +34,13 @@ class HdMapUtilsTest_StandardMap : public testing::Test
 {
 protected:
   HdMapUtilsTest_StandardMap()
-  : hdmap_utils(hdmap_utils::HdMapUtils(
-      ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm",
+  : hdmap_utils(
+      ament_index_cpp::get_package_share_directory("traffic_simulator") +
+        "/map/standard_map/lanelet2_map.osm",
       geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
         .latitude(35.61836750154)
         .longitude(139.78066608243)
-        .altitude(0.0)))
+        .altitude(0.0))
   {
   }
 
@@ -49,13 +50,13 @@ class HdMapUtilsTest_WithRoadShoulderMap : public testing::Test
 {
 protected:
   HdMapUtilsTest_WithRoadShoulderMap()
-  : hdmap_utils(hdmap_utils::HdMapUtils(
+  : hdmap_utils(
       ament_index_cpp::get_package_share_directory("traffic_simulator") +
         "/map/with_road_shoulder/lanelet2_map.osm",
       geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
         .latitude(35.61836750154)
         .longitude(139.78066608243)
-        .altitude(0.0)))
+        .altitude(0.0))
   {
   }
 
@@ -65,13 +66,13 @@ class HdMapUtilsTest_EmptyMap : public testing::Test
 {
 protected:
   HdMapUtilsTest_EmptyMap()
-  : hdmap_utils(hdmap_utils::HdMapUtils(
+  : hdmap_utils(
       ament_index_cpp::get_package_share_directory("traffic_simulator") +
         "/map/empty/lanelet2_map.osm",
       geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
         .latitude(0.0)
         .longitude(0.0)
-        .altitude(0.0)))
+        .altitude(0.0))
   {
   }
 
@@ -81,13 +82,13 @@ class HdMapUtilsTest_FourTrackHighwayMap : public testing::Test
 {
 protected:
   HdMapUtilsTest_FourTrackHighwayMap()
-  : hdmap_utils(hdmap_utils::HdMapUtils(
+  : hdmap_utils(
       ament_index_cpp::get_package_share_directory("traffic_simulator") +
         "/map/four_track_highway/lanelet2_map.osm",
       geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
         .latitude(35.22312494055522)
         .longitude(138.8024583466017)
-        .altitude(0.0)))
+        .altitude(0.0))
   {
   }
 
@@ -97,13 +98,13 @@ class HdMapUtilsTest_CrossroadsWithStoplinesMap : public testing::Test
 {
 protected:
   HdMapUtilsTest_CrossroadsWithStoplinesMap()
-  : hdmap_utils(hdmap_utils::HdMapUtils(
+  : hdmap_utils(
       ament_index_cpp::get_package_share_directory("traffic_simulator") +
         "/map/crossroads_with_stoplines/lanelet2_map.osm",
       geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
         .latitude(35.23808753540768)
         .longitude(139.9009591876285)
-        .altitude(0.0)))
+        .altitude(0.0))
   {
   }
 
@@ -113,17 +114,18 @@ class HdMapUtilsTest_KashiwanohaMap : public testing::Test
 {
 protected:
   HdMapUtilsTest_KashiwanohaMap()
-  : hdmap_utils(hdmap_utils::HdMapUtils(
+  : hdmap_utils(
       ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map/lanelet2_map.osm",
       geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
         .latitude(0.0)
         .longitude(0.0)
-        .altitude(0.0)))
+        .altitude(0.0))
   {
   }
 
   hdmap_utils::HdMapUtils hdmap_utils;
 };
+
 /**
  * @note Test basic functionality.
  * Test initialization correctness with a correct path to a lanelet map.
@@ -132,7 +134,8 @@ TEST(HdMapUtils, Construct)
 {
   ASSERT_NO_THROW(
     auto hdmap_utils = hdmap_utils::HdMapUtils(
-      ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm",
+      ament_index_cpp::get_package_share_directory("traffic_simulator") +
+        "/map/standard_map/lanelet2_map.osm",
       geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
         .latitude(35.61836750154)
         .longitude(139.78066608243)
