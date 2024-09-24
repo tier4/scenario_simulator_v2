@@ -24,8 +24,8 @@ DeterministicParameterDistribution::DeterministicParameterDistribution(
 // clang-format off
 : Group(
     choice(node, {
-      { "DeterministicMultiParameterDistribution",  [&](auto && node) { return make<DeterministicMultiParameterDistribution >(node,scope); }},
-      { "DeterministicSingleParameterDistribution", [&](auto && node) { return make<DeterministicSingleParameterDistribution>(node,scope); }},
+      { "DeterministicMultiParameterDistribution",  [&](auto && node) { return make<DeterministicMultiParameterDistribution >(node,scope); } },
+      { "DeterministicSingleParameterDistribution", [&](auto && node) { return make<DeterministicSingleParameterDistribution>(node,scope); } },
     }))
 // clang-format on
 {
