@@ -27,8 +27,6 @@
 #include <chrono>
 #include <concealer/autoware_stream.hpp>
 #include <concealer/launch.hpp>
-#include <concealer/task_queue.hpp>
-#include <concealer/transition_assertion.hpp>
 #include <concealer/visibility.hpp>
 #include <exception>
 #include <geometry_msgs/msg/accel.hpp>
@@ -66,8 +64,6 @@ class FieldOperatorApplication : public rclcpp::Node
 
 protected:
   const pid_t process_id = 0;
-
-  TaskQueue task_queue;
 
   bool initialize_was_called = false;
 
@@ -149,11 +145,13 @@ public:
   virtual auto getTurnIndicatorsCommand() const
     -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand;
 
-  virtual auto rethrow() const noexcept(false) -> void;
-
   virtual auto sendCooperateCommand(const std::string &, const std::string &) -> void = 0;
 
   virtual auto setVelocityLimit(double) -> void = 0;
+
+  virtual auto enableAutowareControl() -> void = 0;
+
+  virtual auto disableAutowareControl() -> void = 0;
 };
 }  // namespace concealer
 

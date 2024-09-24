@@ -24,7 +24,6 @@ FieldOperatorApplicationFor<AutowareUniverse>::~FieldOperatorApplicationFor()
 {
   shutdownAutoware();
   // All tasks should be complete before the services used in them will be deinitialized.
-  task_queue.stopAndJoin();
 }
 
 template <auto N, typename Tuples>
@@ -264,7 +263,8 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::sendCooperateCommand(
     request->stamp = latest_cooperate_status_array.stamp;
     request->commands.push_back(cooperate_command);
 
-    task_queue.delay([this, request]() { requestCooperateCommands(request); });
+    autoware_state_dispatcher.registerTaskForCurrentState(
+      [this, request]() { requestCooperateCommands(request); });
 
     used_cooperate_statuses.push_back(*cooperate_status);
   }
@@ -273,34 +273,34 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::sendCooperateCommand(
 auto FieldOperatorApplicationFor<AutowareUniverse>::initialize(
   const geometry_msgs::msg::Pose & initial_pose) -> void
 {
-  if (not std::exchange(initialize_was_called, true)) {
-    task_queue.delay([this, initial_pose]() {
-      waitForAutowareStateToBeWaitingForRoute([&]() {
+  autoware_state_dispatcher.registerTask(
+    tier4_system_msgs::msg::AutowareState::INITIALIZING_VEHICLE,
+    [this, initial_pose]() {
+      initialize_was_called = true;
 
 #if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)
-        if (
-          getLocalizationState().state !=
-          autoware_adapi_v1_msgs::msg::LocalizationInitializationState::UNINITIALIZED) {
-          return;
-        }
+      if (
+        getLocalizationState().state !=
+        autoware_adapi_v1_msgs::msg::LocalizationInitializationState::UNINITIALIZED) {
+        return;
+      }
 #endif
-        geometry_msgs::msg::PoseWithCovarianceStamped initial_pose_msg;
-        initial_pose_msg.header.stamp = get_clock()->now();
-        initial_pose_msg.header.frame_id = "map";
-        initial_pose_msg.pose.pose = initial_pose;
+      geometry_msgs::msg::PoseWithCovarianceStamped initial_pose_msg;
+      initial_pose_msg.header.stamp = get_clock()->now();
+      initial_pose_msg.header.frame_id = "map";
+      initial_pose_msg.pose.pose = initial_pose;
 
-        auto request =
-          std::make_shared<autoware_adapi_v1_msgs::srv::InitializeLocalization::Request>();
-        request->pose.push_back(initial_pose_msg);
-        try {
-          return requestInitialPose(request);
-        } catch (const decltype(requestInitialPose)::TimeoutError &) {
-          // ignore timeout error because this service is validated by Autoware state transition.
-          return;
-        }
-      });
-    });
-  }
+      auto request =
+        std::make_shared<autoware_adapi_v1_msgs::srv::InitializeLocalization::Request>();
+      request->pose.push_back(initial_pose_msg);
+      try {
+        return requestInitialPose(request);
+      } catch (const decltype(requestInitialPose)::TimeoutError &) {
+        // ignore timeout error because this service is validated by Autoware state transition.
+        return;
+      }
+    },
+    rclcpp::Duration::from_seconds(1.0));
 }
 
 auto FieldOperatorApplicationFor<AutowareUniverse>::plan(
@@ -308,14 +308,14 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::plan(
 {
   assert(not route.empty());
 
-  task_queue.delay([this, route] {
-    waitForAutowareStateToBeWaitingForRoute();  // NOTE: This is assertion.
+  autoware_state_dispatcher.registerTask(
+    tier4_system_msgs::msg::AutowareState::WAITING_FOR_ROUTE,
+    [this, route]() {
+      auto request = std::make_shared<autoware_adapi_v1_msgs::srv::SetRoutePoints::Request>();
 
-    auto request = std::make_shared<autoware_adapi_v1_msgs::srv::SetRoutePoints::Request>();
+      request->header = route.back().header;
 
-    request->header = route.back().header;
-
-    /*
+      /*
        NOTE: The autoware_adapi_v1_msgs::srv::SetRoutePoints::Request type was
        created on 2022/09/05 [1], and the autoware_adapi_v1_msgs::msg::Option
        type data member was added to the
@@ -327,37 +327,37 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::plan(
        [1] https://github.com/autowarefoundation/autoware_adapi_msgs/commit/805f8ebd3ca24564844df9889feeaf183101fbef
        [2] https://github.com/autowarefoundation/autoware_adapi_msgs/commit/cf310bd038673b6cbef3ae3b61dfe607212de419
     */
-    if constexpr (
-      has_data_member_option_v<autoware_adapi_v1_msgs::srv::SetRoutePoints::Request> and
-      has_data_member_allow_goal_modification_v<
-        decltype(std::declval<autoware_adapi_v1_msgs::srv::SetRoutePoints::Request>().option)>) {
-      request->option.allow_goal_modification =
-        get_parameter("allow_goal_modification").get_value<bool>();
-    }
+      if constexpr (
+        has_data_member_option_v<autoware_adapi_v1_msgs::srv::SetRoutePoints::Request> and
+        has_data_member_allow_goal_modification_v<
+          decltype(std::declval<autoware_adapi_v1_msgs::srv::SetRoutePoints::Request>().option)>) {
+        request->option.allow_goal_modification =
+          get_parameter("allow_goal_modification").get_value<bool>();
+      }
 
-    request->goal = route.back().pose;
+      request->goal = route.back().pose;
 
-    for (const auto & each : route | boost::adaptors::sliced(0, route.size() - 1)) {
-      request->waypoints.push_back(each.pose);
-    }
+      for (const auto & each : route | boost::adaptors::sliced(0, route.size() - 1)) {
+        request->waypoints.push_back(each.pose);
+      }
 
-    requestSetRoutePoints(request);
-
-    waitForAutowareStateToBeWaitingForEngage();
-  });
+      requestSetRoutePoints(request);
+    },
+    rclcpp::Duration::from_seconds(10.0));
 }
 
 auto FieldOperatorApplicationFor<AutowareUniverse>::clearRoute() -> void
 {
-  task_queue.delay([this] {
+  autoware_state_dispatcher.registerTaskForCurrentState([this] {
     requestClearRoute(std::make_shared<autoware_adapi_v1_msgs::srv::ClearRoute::Request>());
   });
 }
 
 auto FieldOperatorApplicationFor<AutowareUniverse>::engage() -> void
 {
-  task_queue.delay([this]() {
-    waitForAutowareStateToBeDriving([this]() {
+  autoware_state_dispatcher.registerTask(
+    tier4_system_msgs::msg::AutowareState::WAITING_FOR_ENGAGE,
+    [this]() {
       auto request = std::make_shared<tier4_external_api_msgs::srv::Engage::Request>();
       request->engage = true;
       try {
@@ -366,21 +366,16 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::engage() -> void
         // ignore timeout error because this service is validated by Autoware state transition.
         return;
       }
-    });
-  });
+    },
+    rclcpp::Duration::from_seconds(1.0));
 }
 
 auto FieldOperatorApplicationFor<AutowareUniverse>::engageable() const -> bool
 {
-  rethrow();
-  return task_queue.exhausted() and isWaitingForEngage();
+  return isWaitingForEngage();
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::engaged() const -> bool
-{
-  rethrow();
-  return task_queue.exhausted() and isDriving();
-}
+auto FieldOperatorApplicationFor<AutowareUniverse>::engaged() const -> bool { return isDriving(); }
 
 auto FieldOperatorApplicationFor<AutowareUniverse>::getWaypoints() const
   -> traffic_simulator_msgs::msg::WaypointsArray
@@ -451,7 +446,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::sendSIGINT() -> void  //
 
 auto FieldOperatorApplicationFor<AutowareUniverse>::setVelocityLimit(double velocity_limit) -> void
 {
-  task_queue.delay([this, velocity_limit]() {
+  autoware_state_dispatcher.registerTaskForCurrentState([this, velocity_limit]() {
     auto request = std::make_shared<tier4_external_api_msgs::srv::SetVelocityLimit::Request>();
     request->velocity = velocity_limit;
     // We attempt to resend the service up to 30 times, but this number of times was determined by
@@ -466,7 +461,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::requestAutoModeForCooperatio
   // Note: The implementation of this function will not work properly
   //       if the `rtc_auto_mode_manager` package is present.
   if (not isPackageExists("rtc_auto_mode_manager")) {
-    task_queue.delay([this, module_name, enable]() {
+    autoware_state_dispatcher.registerTaskForCurrentState([this, module_name, enable]() {
       auto request = std::make_shared<tier4_rtc_msgs::srv::AutoModeWithModule::Request>();
       request->module.type = toModuleType<tier4_rtc_msgs::msg::Module>(module_name);
       request->enable = enable;
@@ -479,6 +474,22 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::requestAutoModeForCooperatio
       "FieldOperatorApplicationFor<AutowareUniverse>::requestAutoModeForCooperation is not "
       "supported in this environment, because rtc_auto_mode_manager is present.");
   }
+}
+
+auto FieldOperatorApplicationFor<AutowareUniverse>::enableAutowareControl() -> void
+{
+  autoware_state_dispatcher.registerTaskForCurrentState([this]() {
+    auto request = std::make_shared<autoware_adapi_v1_msgs::srv::ChangeOperationMode::Request>();
+    requestEnableAutowareControl(request);
+  });
+}
+
+auto FieldOperatorApplicationFor<AutowareUniverse>::disableAutowareControl() -> void
+{
+  autoware_state_dispatcher.registerTaskForCurrentState([this]() {
+    auto request = std::make_shared<autoware_adapi_v1_msgs::srv::ChangeOperationMode::Request>();
+    requestDisableAutowareControl(request);
+  });
 }
 
 auto FieldOperatorApplicationFor<AutowareUniverse>::receiveEmergencyState(

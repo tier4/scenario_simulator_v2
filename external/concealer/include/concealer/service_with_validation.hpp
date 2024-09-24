@@ -19,6 +19,7 @@
 #include <chrono>
 #include <concealer/field_operator_application.hpp>
 #include <rclcpp/rclcpp.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <tier4_external_api_msgs/msg/response_status.hpp>
 #include <tier4_rtc_msgs/srv/auto_mode_with_module.hpp>
@@ -116,11 +117,12 @@ public:
               return;
             } else {
               RCLCPP_ERROR_STREAM(
-                logger, service_name
-                          << " service request was accepted, but ResponseStatus::success is false "
-                          << (service_call_status.message.empty()
-                                ? ""
-                                : " (" + service_call_status.message + ")"));
+                logger, service_name << " service request was accepted, but "
+                                        "ResponseStatus::success is false with error code: "
+                                     << service_call_status.code << ", and message: "
+                                     << (service_call_status.message.empty()
+                                           ? ""
+                                           : " (" + service_call_status.message + ")"));
             }
           } else {
             RCLCPP_INFO_STREAM(logger, service_name << " service request has been accepted.");

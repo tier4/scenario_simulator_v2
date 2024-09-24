@@ -19,8 +19,7 @@ ament_auto_add_library(${PROJECT_NAME} SHARED
   src/execute.cpp
   src/field_operator_application.cpp
   src/field_operator_application_for_autoware_universe.cpp
-  src/is_package_exists.cpp
-  src/task_queue.cpp)
+  src/is_package_exists.cpp)
 
 target_link_libraries(${PROJECT_NAME}
   atomic)
