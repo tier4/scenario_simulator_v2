@@ -413,7 +413,7 @@ auto EgoEntitySimulation::getCurrentPose(const double pitch_angle = 0.) const
   -> geometry_msgs::msg::Pose
 {
   using math::geometry::operator*;
-  const auto relative_position =
+  const Eigen::Vector3d relative_position =
     math::geometry::getRotationMatrix(initial_pose_.orientation) * world_relative_position_;
   const auto relative_orientation = math::geometry::convertEulerAngleToQuaternion(
     geometry_msgs::build<geometry_msgs::msg::Vector3>()
