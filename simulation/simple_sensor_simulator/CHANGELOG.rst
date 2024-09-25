@@ -21,6 +21,12 @@ Changelog for package simple_sensor_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+4.3.2 (2024-09-24)
+------------------
+* Merge branch 'master' into fix/imu_frame
+* Merge branch 'master' into fix/imu_frame
+* Contributors: Kotaro Yoshimoto
+
 4.3.1 (2024-09-19)
 ------------------
 * Merge pull request `#1324 <https://github.com/tier4/scenario_simulator_v2/issues/1324>`_ from tier4/fix/fix-eigen-variable-definition
