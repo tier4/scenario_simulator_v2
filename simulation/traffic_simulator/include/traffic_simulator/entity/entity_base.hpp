@@ -141,7 +141,7 @@ public:
 
   virtual void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) = 0;
 
-  virtual void requestLaneChange(const lanelet::Id){};
+  virtual void requestLaneChange(const lanelet::Id) {}
 
   virtual void requestLaneChange(const traffic_simulator::lane_change::Parameter &){};
 
@@ -164,7 +164,7 @@ public:
 
   virtual void requestSpeedChange(const speed_change::RelativeTargetSpeed &, bool);
 
-  virtual void requestClearRoute();
+  virtual void requestClearRoute() {}
 
   virtual auto isControlledBySimulator() const -> bool;
 
