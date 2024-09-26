@@ -32,8 +32,8 @@ This guide provides step-by-step instructions for building and running **Scenari
       ```bash
       ./setup-dev-env.sh
       ```
-      !!! Note 
-          This step will install necessary dependencies, including ROS 2, if not already installed. <br> Make sure to confirm and agree with the licenses for NVIDIA libraries like [CUDA](https://docs.nvidia.com/cuda/eula/index.html), [cuDNN](https://docs.nvidia.com/deeplearning/cudnn/latest/reference/eula.html), and [TensorRT](https://docs.nvidia.com/deeplearning/tensorrt/sla/index.html).
+!!! Note 
+    This step will install necessary dependencies, including ROS 2, if not already installed. <br> Make sure to confirm and agree with the licenses for NVIDIA libraries like [CUDA](https://docs.nvidia.com/cuda/eula/index.html), [cuDNN](https://docs.nvidia.com/deeplearning/cudnn/latest/reference/eula.html), and [TensorRT](https://docs.nvidia.com/deeplearning/tensorrt/sla/index.html).
 
    5. Install dependent ROS packages.
       ```bash
@@ -45,8 +45,8 @@ This guide provides step-by-step instructions for building and running **Scenari
       ```bash
       colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
       ```
-      !!! Note 
-          For detailed guidance on build issues and troubleshooting, please refer to the [Autoware Troubleshooting Guide](https://autowarefoundation.github.io/autoware-documentation/main/support/troubleshooting/#build-issues).
+!!! Note 
+    For detailed guidance on build issues and troubleshooting, please refer to the [Autoware Troubleshooting Guide](https://autowarefoundation.github.io/autoware-documentation/main/support/troubleshooting/#build-issues).
 
    ![Build success](../image/ss2_autoware_build_result.png)
    *As a result of running the `colcon build` command, all packages should be built successfully.*
