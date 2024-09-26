@@ -70,12 +70,12 @@ auto operator<<(boost::json::object & json, const Maneuver & maneuver) -> boost:
 
   json["currentState"] = boost::lexical_cast<std::string>(maneuver.state());
 
-  json["Event"].emplace_array();
+  auto & events = json["Event"].emplace_array();
 
   for (const auto & event : maneuver.elements) {
     boost::json::object json_event;
     json_event << event.as<Event>();
-    json["Event"].as_array().push_back(json_event);
+    events.push_back(std::move(json_event));
   }
 
   return json;
