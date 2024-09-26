@@ -55,12 +55,12 @@ auto operator<<(boost::json::object & json, const Story & story) -> boost::json:
 
   json["currentState"] = boost::lexical_cast<std::string>(story.state());
 
-  auto & acts = json["Act"].emplace_array();
+  json["Act"].emplace_array();
 
   for (auto && act : story.elements) {
     boost::json::object json_act;
     json_act << act.as<Act>();
-    acts.push_back(std::move(json_act));
+    json["Act"].as_array().push_back(json_act);
   }
 
   return json;
