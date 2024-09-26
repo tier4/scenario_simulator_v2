@@ -72,7 +72,7 @@ auto operator<<(boost::json::object & json, const ManeuverGroup & maneuver_group
   auto & maneuvers = json["Maneuver"].emplace_array();
 
   for (auto && maneuver : maneuver_group.elements) {
-    boost::json::object json_maneuver;
+    boost::json::object json_maneuver(json.storage());
     json_maneuver << maneuver.as<Maneuver>();
     maneuvers.push_back(std::move(json_maneuver));
   }

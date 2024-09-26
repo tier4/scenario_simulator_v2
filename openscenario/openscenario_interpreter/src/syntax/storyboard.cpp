@@ -67,7 +67,7 @@ auto operator<<(boost::json::object & json, const Storyboard & datum) -> boost::
   auto & stories = json["Story"].emplace_array();
 
   for (const auto & story : datum.elements) {
-    boost::json::object each;
+    boost::json::object each(json.storage());
     if (story.is<InitActions>()) {
       continue;
     }

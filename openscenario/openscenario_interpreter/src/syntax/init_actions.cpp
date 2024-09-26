@@ -160,7 +160,7 @@ auto operator<<(boost::json::object & json, const InitActions & init_actions)
   auto & global_actions = json["GlobalAction"].emplace_array();
 
   for (const auto & init_action : init_actions.global_actions) {
-    boost::json::object action;
+    boost::json::object action(json.storage());
     action["type"] = makeTypename(init_action.as<GlobalAction>().type());
     global_actions.push_back(std::move(action));
   }
@@ -168,7 +168,7 @@ auto operator<<(boost::json::object & json, const InitActions & init_actions)
   auto & user_defined_actions = json["UserDefinedAction"].emplace_array();
 
   for (const auto & init_action : init_actions.user_defined_actions) {
-    boost::json::object action;
+    boost::json::object action(json.storage());
     action["type"] = makeTypename(init_action.as<UserDefinedAction>().type());
     user_defined_actions.push_back(std::move(action));
   }
@@ -176,7 +176,7 @@ auto operator<<(boost::json::object & json, const InitActions & init_actions)
   auto & privates = json["Private"].emplace_array();
 
   for (const auto & init_action : init_actions.privates) {
-    boost::json::object action;
+    boost::json::object action(json.storage());
     action << init_action.as<Private>();
     privates.push_back(std::move(action));
   }

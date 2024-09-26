@@ -42,7 +42,7 @@ auto operator<<(boost::json::object & json, const ConditionGroup & datum) -> boo
   auto & conditions = json["Condition"].emplace_array();
 
   for (const auto & each : datum) {
-    boost::json::object condition;
+    boost::json::object condition(json.storage());
     condition << each;
     conditions.push_back(std::move(condition));
   }

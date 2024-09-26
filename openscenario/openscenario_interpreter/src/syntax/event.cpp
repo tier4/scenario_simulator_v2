@@ -79,7 +79,7 @@ auto operator<<(boost::json::object & json, const Event & datum) -> boost::json:
   auto & actions = json["Action"].emplace_array();
 
   for (const auto & each : datum.elements) {
-    boost::json::object action;
+    boost::json::object action(json.storage());
     action << each.as<Action>();
     actions.push_back(std::move(action));
   }

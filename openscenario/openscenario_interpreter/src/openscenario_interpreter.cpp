@@ -288,8 +288,8 @@ auto Interpreter::publishCurrentContext() const -> void
 {
   Context context;
   {
-    nlohmann::json json;
-    boost::json::object json;
+    boost::json::monotonic_resource mr;
+    boost::json::object json(&mr);
     context.stamp = now();
     if (publish_empty_context) {
       context.data = "";

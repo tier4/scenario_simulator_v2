@@ -92,7 +92,7 @@ auto operator<<(boost::json::object & json, const Private & datum) -> boost::jso
   auto & private_actions = json["PrivateAction"].emplace_array();
 
   for (const auto & private_action : datum.private_actions) {
-    boost::json::object action;
+    boost::json::object action(json.storage());
     action["type"] = makeTypename(private_action.type());
     private_actions.push_back(std::move(action));
   }
