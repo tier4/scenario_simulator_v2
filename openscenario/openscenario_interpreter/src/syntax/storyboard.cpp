@@ -64,7 +64,7 @@ auto operator<<(boost::json::object & json, const Storyboard & datum) -> boost::
 
   json["Init"].emplace_object() << datum.init;
 
-  json["Story"].emplace_array();
+  auto & stories = json["Story"].emplace_array();
 
   for (const auto & story : datum.elements) {
     boost::json::object each;
@@ -72,7 +72,7 @@ auto operator<<(boost::json::object & json, const Storyboard & datum) -> boost::
       continue;
     }
     each << story.as<Story>();
-    json["Story"].as_array().push_back(each);
+    stories.push_back(std::move(each));
   }
 
   return json;

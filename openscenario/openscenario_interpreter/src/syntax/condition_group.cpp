@@ -39,12 +39,12 @@ auto operator<<(boost::json::object & json, const ConditionGroup & datum) -> boo
 {
   json["currentValue"] = boost::lexical_cast<std::string>(Boolean(datum.current_value));
 
-  json["Condition"].emplace_array();
+  auto & conditions = json["Condition"].emplace_array();
 
   for (const auto & each : datum) {
     boost::json::object condition;
     condition << each;
-    json["Condition"].as_array().push_back(condition);
+    conditions.push_back(std::move(condition));
   }
 
   return json;

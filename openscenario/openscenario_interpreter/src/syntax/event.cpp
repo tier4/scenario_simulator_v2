@@ -76,12 +76,12 @@ auto operator<<(boost::json::object & json, const Event & datum) -> boost::json:
   json["currentExecutionCount"] = datum.current_execution_count;
   json["maximumExecutionCount"] = datum.maximum_execution_count;
 
-  json["Action"].emplace_array();
+  auto & actions = json["Action"].emplace_array();
 
   for (const auto & each : datum.elements) {
     boost::json::object action;
     action << each.as<Action>();
-    json["Action"].as_array().push_back(action);
+    actions.push_back(std::move(action));
   }
 
   json["StartTrigger"].emplace_object() << datum.start_trigger;

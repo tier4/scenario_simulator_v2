@@ -89,12 +89,12 @@ auto operator<<(boost::json::object & json, const Private & datum) -> boost::jso
 {
   json["entityRef"] = datum.entity_ref.name();
 
-  json["PrivateAction"].emplace_array();
+  auto & private_actions = json["PrivateAction"].emplace_array();
 
   for (const auto & private_action : datum.private_actions) {
     boost::json::object action;
     action["type"] = makeTypename(private_action.type());
-    json["PrivateAction"].as_array().push_back(action);
+    private_actions.push_back(std::move(action));
   }
 
   return json;

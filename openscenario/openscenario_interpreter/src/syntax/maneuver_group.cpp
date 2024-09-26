@@ -69,12 +69,12 @@ auto operator<<(boost::json::object & json, const ManeuverGroup & maneuver_group
   json["currentExecutionCount"] = maneuver_group.current_execution_count;
   json["maximumExecutionCount"] = maneuver_group.maximum_execution_count;
 
-  json["Maneuver"].emplace_array();
+  auto & maneuvers = json["Maneuver"].emplace_array();
 
   for (auto && maneuver : maneuver_group.elements) {
     boost::json::object json_maneuver;
     json_maneuver << maneuver.as<Maneuver>();
-    json["Maneuver"].as_array().push_back(json_maneuver);
+    maneuvers.push_back(std::move(json_maneuver));
   }
 
   return json;
