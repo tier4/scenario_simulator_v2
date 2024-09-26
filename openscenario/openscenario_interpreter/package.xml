@@ -11,7 +11,6 @@
 
   <depend>concealer</depend>
   <depend>geometry_msgs</depend>
-  <depend>fmt</depend>
   <depend>libboost-dev</depend>
   <depend>libgoogle-glog-dev</depend>
   <depend>lifecycle_msgs</depend>

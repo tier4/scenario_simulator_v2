@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <fmt/format.h>
-
 #include <boost/lexical_cast.hpp>
 #include <iomanip>
 #include <limits>
@@ -99,7 +97,7 @@ auto operator>>(std::istream & is, Double & datum) -> std::istream &
 
 auto operator<<(std::ostream & os, const Double & datum) -> std::ostream &
 {
-  return os << fmt::format("{:.30f}", datum.data);
+  return os << std::fixed << std::setprecision(30) << datum.data;
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
