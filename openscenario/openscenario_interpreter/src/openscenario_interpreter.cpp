@@ -15,7 +15,8 @@
 #define OPENSCENARIO_INTERPRETER_NO_EXTENSION
 
 #include <algorithm>
-#include <nlohmann/json.hpp>
+#include <boost/json.hpp>
+#include <boost/json/src.hpp>
 #include <openscenario_interpreter/openscenario_interpreter.hpp>
 #include <openscenario_interpreter/record.hpp>
 #include <openscenario_interpreter/syntax/object_controller.hpp>
@@ -288,12 +289,13 @@ auto Interpreter::publishCurrentContext() const -> void
   Context context;
   {
     nlohmann::json json;
+    boost::json::object json;
     context.stamp = now();
     if (publish_empty_context) {
       context.data = "";
     } else {
-      context.data = (json << *script).dump();
-    }
+      context.data = boost::json::serialize(json << *script);
+          }
     context.time = evaluateSimulationTime();
   }
 

@@ -46,18 +46,18 @@ auto Act::run() -> void
   }
 }
 
-auto operator<<(nlohmann::json & json, const Act & datum) -> nlohmann::json &
+auto operator<<(boost::json::object & json, const Act & datum) -> boost::json::object &
 {
   json["name"] = datum.name;
 
   json["currentState"] = boost::lexical_cast<std::string>(datum.state());
 
-  json["ManeuverGroup"] = nlohmann::json::array();
+  json["ManeuverGroup"].emplace_array();
 
   for (auto && maneuver_group : datum.elements) {
-    nlohmann::json act;
+    boost::json::object act;
     act << maneuver_group.as<ManeuverGroup>();
-    json["ManeuverGroup"].push_back(act);
+    json["ManeuverGroup"].as_array().push_back(act);
   }
 
   return json;

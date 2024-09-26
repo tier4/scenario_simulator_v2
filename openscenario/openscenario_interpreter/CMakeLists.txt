@@ -15,9 +15,29 @@ find_package(ament_cmake_auto REQUIRED)
 ament_auto_find_build_dependencies()
 
 # ------------------------------------------------------------------------------
-#  libopenscenario_interpreter
+# Boost.JSON (from Git)
 # ------------------------------------------------------------------------------
+include(FetchContent)
 
+FetchContent_Declare(
+  boost_json
+  GIT_REPOSITORY https://github.com/boostorg/json.git
+  GIT_TAG boost-1.77.0)
+
+FetchContent_GetProperties(boost_json)
+
+set(BOOST_JSON_STANDALONE ON)
+set(BOOST_JSON_BUILD_TESTS OFF)
+set(BOOST_JSON_BUILD_EXAMPLES OFF)
+
+if(NOT boost_json_POPULATED)
+  FetchContent_Populate(boost_json)
+  add_subdirectory(${boost_json_SOURCE_DIR} ${boost_json_BINARY_DIR})
+endif()
+
+# ------------------------------------------------------------------------------
+# libopenscenario_interpreter
+# ------------------------------------------------------------------------------
 file(GLOB ${PROJECT_NAME}_POSIX_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/posix/*.cpp)
 file(GLOB ${PROJECT_NAME}_SYNTAX_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/syntax/*.cpp)
 file(GLOB ${PROJECT_NAME}_UTILITY_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/utility/*.cpp)
@@ -33,11 +53,11 @@ ament_auto_add_library(${PROJECT_NAME} SHARED
   src/scope.cpp)
 
 target_link_libraries(${PROJECT_NAME} Boost::filesystem glog pugixml)
+target_include_directories(${PROJECT_NAME} PUBLIC ${boost_json_SOURCE_DIR}/include)
 
 # ------------------------------------------------------------------------------
-#  openscenario_interpreter_node
+# openscenario_interpreter_node
 # ------------------------------------------------------------------------------
-
 ament_auto_add_executable(${PROJECT_NAME}_node src/${PROJECT_NAME}_node.cpp)
 
 target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME})
@@ -47,9 +67,8 @@ install(
   DESTINATION lib/${PROJECT_NAME})
 
 # ------------------------------------------------------------------------------
-#  test
+# test
 # ------------------------------------------------------------------------------
-
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()

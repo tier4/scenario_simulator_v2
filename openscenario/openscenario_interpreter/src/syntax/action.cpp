@@ -58,7 +58,7 @@ auto Action::stop() -> void
   }
 }
 
-auto operator<<(nlohmann::json & json, const Action & datum) -> nlohmann::json &
+auto operator<<(boost::json::object & json, const Action & datum) -> boost::json::object &
 {
   json["name"] = datum.name;
 

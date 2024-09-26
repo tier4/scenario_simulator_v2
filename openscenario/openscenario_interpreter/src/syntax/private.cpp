@@ -85,16 +85,16 @@ auto Private::startNonInstantaneousActions() -> void
   }
 }
 
-auto operator<<(nlohmann::json & json, const Private & datum) -> nlohmann::json &
+auto operator<<(boost::json::object & json, const Private & datum) -> boost::json::object &
 {
   json["entityRef"] = datum.entity_ref.name();
 
-  json["PrivateAction"] = nlohmann::json::array();
+  json["PrivateAction"].emplace_array();
 
   for (const auto & private_action : datum.private_actions) {
-    nlohmann::json action;
+    boost::json::object action;
     action["type"] = makeTypename(private_action.type());
-    json["PrivateAction"].push_back(action);
+    json["PrivateAction"].as_array().push_back(action);
   }
 
   return json;
