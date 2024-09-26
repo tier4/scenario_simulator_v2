@@ -796,18 +796,21 @@ auto HdMapUtils::getPreviousLanelets(const lanelet::Id lanelet_id, const double 
 {
   lanelet::Ids ret;
   double total_distance = 0.0;
-  ret.push_back(lanelet_id);
+  lanelet::Id current_lanelet_id = lanelet_id;
+  ret.push_back(current_lanelet_id);
   while (total_distance < distance) {
-    auto ids = getPreviousLaneletIds(lanelet_id, "straight");
+    auto ids = getPreviousLaneletIds(current_lanelet_id, "straight");
     if (ids.size() != 0) {
-      total_distance = total_distance + getLaneletLength(ids[0]);
-      ret.push_back(ids[0]);
+      current_lanelet_id = ids[0];
+      total_distance = total_distance + getLaneletLength(current_lanelet_id);
+      ret.push_back(current_lanelet_id);
       continue;
     } else {
-      auto else_ids = getPreviousLaneletIds(lanelet_id);
+      auto else_ids = getPreviousLaneletIds(current_lanelet_id);
       if (else_ids.size() != 0) {
-        total_distance = total_distance + getLaneletLength(else_ids[0]);
-        ret.push_back(else_ids[0]);
+        current_lanelet_id = else_ids[0];
+        total_distance = total_distance + getLaneletLength(current_lanelet_id);
+        ret.push_back(current_lanelet_id);
         continue;
       } else {
         break;

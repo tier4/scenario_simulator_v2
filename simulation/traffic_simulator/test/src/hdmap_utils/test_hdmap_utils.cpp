@@ -2616,3 +2616,15 @@ TEST_F(HdMapUtilsTest_CrossroadsWithStoplinesMap, getDistanceToStopLine_emptyVec
           makePoint(3807.63, 73715.99), makePoint(3785.76, 73707.70), makePoint(3773.19, 73723.27)})
       .has_value());
 }
+
+/**
+ * @note Test basic functionality.
+ */
+TEST_F(HdMapUtilsTest_StandardMap, getPreviousLanelets)
+{
+  const lanelet::Id id = 34600;
+  const auto result_previous = hdmap_utils.getPreviousLanelets(id, 100.0);
+  const lanelet::Ids actual_previous{id, 34783, 34606, 34795, 34507};
+
+  EXPECT_EQ(result_previous, actual_previous);
+}
