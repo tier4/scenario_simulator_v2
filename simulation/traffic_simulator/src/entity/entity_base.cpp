@@ -480,9 +480,9 @@ void EntityBase::requestSpeedChange(
           return true;
         }
         if (isTargetSpeedReached(target_speed)) {
-          target_speed_ = target_speed.getAbsoluteValue(getCanonicalizedStatus(), other_status_);
           return true;
         }
+        target_speed_ = target_speed.getAbsoluteValue(getCanonicalizedStatus(), other_status_);
         return false;
       },
       /**
