@@ -92,8 +92,8 @@ auto operator<<(rabbit::object & json, const Private & datum) -> rabbit::object 
   json.insert("PrivateAction", rabbit::array());
 
   for (const auto & private_action : datum.private_actions) {
-    rabbit::object action;
-    action["type"] = makeTypename(private_action.type());
+    rabbit::object action(json.get_allocator());
+    action["type"] = std::move(makeTypename(private_action.type()));
     json["PrivateAction"].push_back(std::move(action));
   }
 

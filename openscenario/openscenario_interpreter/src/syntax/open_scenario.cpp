@@ -63,7 +63,7 @@ auto operator<<(rabbit::object & json, const OpenScenario & datum) -> rabbit::ob
   if (datum.category.is<ScenarioDefinition>()) {
     rabbit::object scenario_definition;
     scenario_definition << datum.category.as<ScenarioDefinition>();
-    json["OpenSCENARIO"].swap(scenario_definition);
+    json.insert("OpenSCENARIO", scenario_definition);
   }
 
   return json;

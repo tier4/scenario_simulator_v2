@@ -70,11 +70,11 @@ auto Condition::evaluate() -> Object
 
 auto operator<<(rabbit::object & json, const Condition & datum) -> rabbit::object &
 {
-  // json["currentEvaluation"] = std::movedatum.description();
+  json["currentEvaluation"] = datum.description();
 
   json["currentValue"] = boost::lexical_cast<std::string>(Boolean(datum.current_value));
 
-  json["name"] = std::move(datum.name);
+  json["name"] = datum.name;
 
   // clang-format off
   static const std::unordered_map<

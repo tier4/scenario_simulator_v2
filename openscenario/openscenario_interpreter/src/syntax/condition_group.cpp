@@ -42,7 +42,7 @@ auto operator<<(rabbit::object & json, const ConditionGroup & datum) -> rabbit::
   json.insert("Condition", rabbit::array());
 
   for (const auto & each : datum) {
-    rabbit::object condition;
+    rabbit::object condition(json.get_allocator());
     condition << each;
     json["Condition"].push_back(std::move(condition));
   }

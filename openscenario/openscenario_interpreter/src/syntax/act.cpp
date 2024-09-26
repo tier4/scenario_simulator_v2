@@ -55,7 +55,7 @@ auto operator<<(rabbit::object & json, const Act & datum) -> rabbit::object &
   json.insert("ManeuverGroup", rabbit::array());
 
   for (auto && maneuver_group : datum.elements) {
-    rabbit::object act;
+    rabbit::object act(json.get_allocator());
     act << maneuver_group.as<ManeuverGroup>();
     json["ManeuverGroup"].push_back(std::move(act));
   }

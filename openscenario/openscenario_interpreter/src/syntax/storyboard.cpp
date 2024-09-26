@@ -62,9 +62,8 @@ auto operator<<(rabbit::object & json, const Storyboard & datum) -> rabbit::obje
 {
   json["currentState"].set(boost::lexical_cast<std::string>(datum.state()));
 
-  rabbit::object json_init;
+  rabbit::object json_init = json["Init"];
   json_init << datum.init;
-  json["Init"].swap(json_init);
 
   json.insert("Story", rabbit::array());
 

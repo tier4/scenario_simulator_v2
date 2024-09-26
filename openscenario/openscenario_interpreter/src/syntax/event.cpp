@@ -71,7 +71,7 @@ auto Event::evaluate() -> Object
 
 auto operator<<(rabbit::object & json, const Event & datum) -> rabbit::object &
 {
-  json["name"] = std::move(datum.name);
+  json["name"] = datum.name;
 
   json["currentState"] = boost::lexical_cast<std::string>(datum.state());
 
