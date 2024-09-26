@@ -2,7 +2,7 @@
 
 ### Scenario Simulator v2 with Autoware Universe
 
-This guide provides step-by-step instructions for building and running **Scenario Simulator v2** alongside [**Autoware Universe**](https://github.com/autowarefoundation/autoware).<br> It covers the required setup and prerequisites.
+This guide provides step-by-step instructions for building and running **Scenario Simulator v2** alongside [**Autoware Universe**](https://github.com/autowarefoundation/autoware). It covers the required setup and prerequisites.
 
 ## Prerequisites 
 
