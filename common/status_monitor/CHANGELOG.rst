@@ -21,6 +21,11 @@ Changelog for package status_monitor
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+4.3.4 (2024-09-27)
+------------------
+* Merge branch 'master' into RJD-1201/fix_quick_start
+* Contributors: SzymonParapura
+
 4.3.3 (2024-09-26)
 ------------------
 * Merge branch 'master' into fix/acquire-position-action

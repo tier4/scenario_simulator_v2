@@ -32,6 +32,12 @@ Changelog for package openscenario_interpreter
 * add publish_empty_context parameter
 * Contributors: Masaya Kataoka
 
+4.3.4 (2024-09-27)
+------------------
+* Merge branch 'master' into RJD-1201/fix_quick_start
+* Merge branch 'master' into RJD-1201/fix_quick_start
+* Contributors: SzymonParapura
+
 4.3.3 (2024-09-26)
 ------------------
 * Merge pull request `#1369 <https://github.com/tier4/scenario_simulator_v2/issues/1369>`_ from tier4/fix/acquire-position-action
