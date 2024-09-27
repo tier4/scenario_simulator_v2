@@ -111,6 +111,12 @@ jobs:
           path: lcov
           retention-days: 1
 
+      - name: Run SonarCloud scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
 #      - name: Basic test
 #        run: |
 #          source install/setup.bash
