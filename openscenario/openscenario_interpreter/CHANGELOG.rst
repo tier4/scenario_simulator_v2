@@ -32,6 +32,11 @@ Changelog for package openscenario_interpreter
 * add publish_empty_context parameter
 * Contributors: Masaya Kataoka
 
+4.3.5 (2024-09-27)
+------------------
+* Merge branch 'master' into feature/lcov
+* Contributors: Masaya Kataoka
+
 4.3.4 (2024-09-27)
 ------------------
 * Merge branch 'master' into RJD-1201/fix_quick_start

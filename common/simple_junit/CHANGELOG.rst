@@ -21,6 +21,11 @@ Changelog for package junit_exporter
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+4.3.5 (2024-09-27)
+------------------
+* Merge branch 'master' into feature/lcov
+* Contributors: Masaya Kataoka
+
 4.3.4 (2024-09-27)
 ------------------
 * Merge branch 'master' into RJD-1201/fix_quick_start
