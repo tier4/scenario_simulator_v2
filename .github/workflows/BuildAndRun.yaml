@@ -61,25 +61,28 @@ jobs:
         run: |
           vcs import src < src/scenario_simulator_v2/dependency_${{ matrix.rosdistro }}.repos
 
-      - name: Resolve rosdep
+      - name: Resolve rosdep and install colcon mixin
         run: |
           apt-get update
-          apt-get install -y python3-pip
+          apt-get install -y python3-pip python3-colcon-lcov-result lcov
           rosdep update --include-eol-distros
           rosdep install -iy --from-paths src --rosdistro ${{ matrix.rosdistro }}
+          colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml
+          colcon mixin update default
         shell: bash
 
       - name: Build packages
         run: |
           source /opt/ros/${{ matrix.rosdistro }}/setup.bash
-          colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release -DBUILD_CPP_MOCK_SCENARIOS=ON --packages-up-to ${{ steps.list_packages.outputs.package_list }}
+          colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release -DBUILD_CPP_MOCK_SCENARIOS=ON -DBUILD_TESTING=true -DCMAKE_CXX_FLAGS='-fprofile-arcs -ftest-coverage' -DCMAKE_C_FLAGS='-fprofile-arcs -ftest-coverage' --packages-up-to ${{ steps.list_packages.outputs.package_list }}
         shell: bash
 
       - name: Colcon test
         run: |
           source /opt/ros/${{ matrix.rosdistro }}/setup.bash
           source install/local_setup.bash
-          colcon test --packages-select ${{ steps.list_packages.outputs.package_list }}
+          colcon test --event-handlers console_cohesion+ --packages-select ${{ steps.list_packages.outputs.package_list }}
+          colcon lcov-result --packages-select cpp_mock_scenarios
         shell: bash
 
       - name: Show test result
@@ -96,6 +99,13 @@ jobs:
           source install/local_setup.bash
           ./src/scenario_simulator_v2/.github/workflows/workflow.sh ./src/scenario_simulator_v2/test_runner/scenario_test_runner/config/workflow.txt global_frame_rate:=20
         shell: bash
+
+      - name: Upload Lcov result
+        uses: actions/upload-artifact@v4
+        with:
+          name: lcov
+          path: lcov
+          retention-days: 1
 
 #      - name: Basic test
 #        run: |
