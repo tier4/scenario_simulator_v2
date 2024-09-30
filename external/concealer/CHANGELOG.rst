@@ -21,6 +21,72 @@ Changelog for package concealer
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+4.3.7 (2024-09-27)
+------------------
+* Merge branch 'master' into feature/sonar_cloud
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/sonar_cloud
+* Contributors: Masaya Kataoka
+
+4.3.6 (2024-09-27)
+------------------
+
+4.3.5 (2024-09-27)
+------------------
+* Merge branch 'master' into feature/lcov
+* Contributors: Masaya Kataoka
+
+4.3.4 (2024-09-27)
+------------------
+* Merge branch 'master' into RJD-1201/fix_quick_start
+* Merge branch 'master' into RJD-1201/fix_quick_start
+* Contributors: SzymonParapura
+
+4.3.3 (2024-09-26)
+------------------
+* Merge pull request `#1369 <https://github.com/tier4/scenario_simulator_v2/issues/1369>`_ from tier4/fix/acquire-position-action
+  Fix/acquire position action
+* Merge branch 'master' into fix/acquire-position-action
+* Merge branch 'master' into fix/acquire-position-action
+* Update the clear route service call to be attempted multiple times
+* Merge branch 'master' into fix/acquire-position-action
+* Merge remote-tracking branch 'origin/master' into fix/acquire-position-action
+* Remove member function `TransitionAssertion::makeTransitionError`
+* Update to check `initialize_duration` only if it has never been engaged
+* Cleanup struct `TransitionAssertion`
+* Merge remote-tracking branch 'origin/master' into fix/acquire-position-action
+* Merge remote-tracking branch 'origin/master' into fix/acquire-position-action
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+4.3.2 (2024-09-24)
+------------------
+* Merge branch 'master' into fix/imu_frame
+* Merge branch 'master' into fix/imu_frame
+* Contributors: Kotaro Yoshimoto
+
+4.3.1 (2024-09-19)
+------------------
+* Merge branch 'master' into fix/fix-eigen-variable-definition
+* Merge branch 'master' into fix/fix-eigen-variable-definition
+* Merge branch 'master' into fix/fix-eigen-variable-definition
+* Merge branch 'master' into fix/fix-eigen-variable-definition
+* Contributors: Masaya Kataoka
+
+4.3.0 (2024-09-19)
+------------------
+* Merge branch 'master' into RJD-1201/documentation_update
+* Contributors: SzymonParapura
+
+4.2.9 (2024-09-19)
+------------------
+* Merge branch 'master' into RJD-1197/distance
+* Merge branch 'master' into RJD-1197/distance
+* resolve conflict
+* Merge branch 'master' into RJD-1197/distance
+* Contributors: Michał Ciasnocha, robomic
+
+4.2.8 (2024-09-18)
+------------------
+
 4.2.7 (2024-09-13)
 ------------------
 
