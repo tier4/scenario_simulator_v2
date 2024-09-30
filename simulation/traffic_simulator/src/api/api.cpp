@@ -171,6 +171,7 @@ auto API::setEntityStatus(
     EntityStatus status = static_cast<EntityStatus>(entity->getCanonicalizedStatus());
     status.pose = map_pose;
     status.action_status = action_status;
+    status.lanelet_pose_valid = false;
     setEntityStatus(name, status);
   } else {
     THROW_SIMULATION_ERROR("Cannot set entity \"", name, "\" status - such entity does not exist.");
