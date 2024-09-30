@@ -284,9 +284,10 @@ public:
   {
   protected:
     template <typename... Ts>
-    static auto applyAcquirePositionAction(Ts &&... xs)
+    static auto applyAcquirePositionAction(const std::string & entity_ref, Ts &&... xs)
     {
-      return core->requestAcquirePosition(std::forward<decltype(xs)>(xs)...);
+      core->requestClearRoute(entity_ref);
+      return core->requestAcquirePosition(entity_ref, std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>
@@ -359,7 +360,7 @@ public:
         core->attachImuSensor(entity_ref, [&]() {
           simulation_api_schema::ImuSensorConfiguration configuration;
           configuration.set_entity(entity_ref);
-          configuration.set_frame_id("tamagawa/imu_link");
+          configuration.set_frame_id("base_link");
           configuration.set_add_gravity(true);
           configuration.set_use_seed(true);
           configuration.set_seed(0);
