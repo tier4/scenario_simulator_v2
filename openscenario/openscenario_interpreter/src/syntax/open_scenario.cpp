@@ -15,7 +15,10 @@
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/open_scenario.hpp>
 #include <openscenario_interpreter/syntax/open_scenario_category.hpp>
+
+#ifndef PARAMETER_VALUE_DISTRIBUTION_ONLY
 #include <openscenario_interpreter/syntax/scenario_definition.hpp>
+#endif  // PARAMETER_VALUE_DISTRIBUTION_ONLY
 
 namespace openscenario_interpreter
 {
@@ -48,6 +51,7 @@ auto operator<<(nlohmann::json & json, const OpenScenario & datum) -> nlohmann::
 {
   json["version"] = "1.0";
 
+#ifndef PARAMETER_VALUE_DISTRIBUTION_ONLY
   json["frame"] = datum.frame;
 
   // clang-format off
@@ -61,6 +65,7 @@ auto operator<<(nlohmann::json & json, const OpenScenario & datum) -> nlohmann::
   if (datum.category.is<ScenarioDefinition>()) {
     json["OpenSCENARIO"] << datum.category.as<ScenarioDefinition>();
   }
+#endif  // PARAMETER_VALUE_DISTRIBUTION_ONLY
 
   return json;
 }
