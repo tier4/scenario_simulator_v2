@@ -1531,11 +1531,6 @@ auto HdMapUtils::getLateralDistance(
   }
 }
 
-#include <geometry/vector3/normalize.hpp>
-#include <geometry/vector3/operator.hpp>
-using math::geometry::operator-;
-using math::geometry::operator*;
-
 auto HdMapUtils::getLongitudinalDistance(
   const traffic_simulator_msgs::msg::LaneletPose & from,
   const traffic_simulator_msgs::msg::LaneletPose & to, bool allow_lane_change) const
@@ -1552,7 +1547,7 @@ auto HdMapUtils::getLongitudinalDistance(
   if (route.empty()) {
     return std::nullopt;
   }
-  double distance = 0;
+  double distance = 0.0;
 
   auto with_lane_change = [this](
                             const bool allow_lane_change, const lanelet::Id current_lanelet,
@@ -1570,80 +1565,39 @@ auto HdMapUtils::getLongitudinalDistance(
 
   /// @note in this for loop, some cases are marked by @note command. each case is explained in the document.
   /// @sa https://tier4.github.io/scenario_simulator_v2-docs/developer_guide/DistanceCalculation/
-  for (unsigned int i = 0; i < route.size(); i++) {
-    if (i < route.size() - 1 && with_lane_change(allow_lane_change, route[i], route[i + 1])) {
+  for (std::size_t i = 0UL; i < route.size() - 1UL; ++i) {
+    if (with_lane_change(allow_lane_change, route[i], route[i + 1UL])) {
       /// @note "the lanelet before the lane change" case
-      auto curr_lanelet_spline_control_points = getCenterPointsSpline(route[i])->control_points;
-      auto next_lanelet_spline_control_points = getCenterPointsSpline(route[i + 1])->control_points;
-      math::geometry::operator+=(
-        curr_lanelet_spline_control_points[0],
-        math::geometry::normalize(
-          curr_lanelet_spline_control_points[0] - curr_lanelet_spline_control_points[1]) *
-          10.0);
-      math::geometry::operator+=(
-        next_lanelet_spline_control_points[0],
-        math::geometry::normalize(
-          next_lanelet_spline_control_points[0] - next_lanelet_spline_control_points[1]) *
-          10.0);
-      const auto next_lanelet_map_pose =
-        toMapPose(traffic_simulator_msgs::build<traffic_simulator_msgs::msg::LaneletPose>()
-                    .lanelet_id(route[i + 1])
-                    .s(0.0)
-                    .offset(0.0)
-                    .rpy(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0.0).y(0.0).z(0.0)))
-          .pose;
-      const auto curr_lanelet_map_pose =
-        toMapPose(traffic_simulator_msgs::build<traffic_simulator_msgs::msg::LaneletPose>()
-                    .lanelet_id(route[i])
-                    .s(0.0)
-                    .offset(0.0)
-                    .rpy(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0.0).y(0.0).z(0.0)))
-          .pose;
-      const auto curr_lanelet_spline_s =
-        getCenterPointsSpline(route[i])->getSValue(next_lanelet_map_pose, 10.0);
-      const auto next_lanelet_spline_s =
-        getCenterPointsSpline(route[i])->getSValue(curr_lanelet_map_pose, 10.0);
-      const auto curr_lanelet_spline_extended_s =
-        math::geometry::CatmullRomSpline(curr_lanelet_spline_control_points)
-          .getSValue(next_lanelet_map_pose, 10.0);
-      const auto next_lanelet_spline_extended_s =
-        math::geometry::CatmullRomSpline(next_lanelet_spline_control_points)
-          .getSValue(curr_lanelet_map_pose, 10.0);
+      const auto curr_lanelet_spline = getCenterPointsSpline(route[i]);
+      const auto next_lanelet_spline = getCenterPointsSpline(route[i + 1UL]);
+      const double mid_length =
+        std::min(curr_lanelet_spline->getLength(), next_lanelet_spline->getLength()) * 0.5;
 
-      if (curr_lanelet_spline_s.has_value()) {
-        distance += curr_lanelet_spline_s.value();
-      } else if (next_lanelet_spline_s.has_value()) {
-        distance -= next_lanelet_spline_s.value();
-      } else if (curr_lanelet_spline_extended_s.has_value()) {
-        distance += curr_lanelet_spline_extended_s.value() - 10.0;
-      } else if (next_lanelet_spline_extended_s.has_value()) {
-        distance -= next_lanelet_spline_extended_s.value() - 10.0;
+      const auto curr_start_matching_s =
+        curr_lanelet_spline->getSValue(next_lanelet_spline->getPose(0.0), 10.0);
+      const auto next_start_matching_s =
+        next_lanelet_spline->getSValue(curr_lanelet_spline->getPose(0.0), 10.0);
+      const auto curr_middle_matching_s =
+        curr_lanelet_spline->getSValue(next_lanelet_spline->getPose(mid_length), 10.0);
+      const auto next_middle_matching_s =
+        next_lanelet_spline->getSValue(curr_lanelet_spline->getPose(mid_length), 10.0);
+
+      if (curr_start_matching_s.has_value()) {
+        distance += curr_start_matching_s.value();
+      } else if (next_start_matching_s.has_value()) {
+        distance -= next_start_matching_s.value();
+      } else if (curr_middle_matching_s.has_value()) {
+        distance += curr_middle_matching_s.value() - mid_length;
+      } else if (next_middle_matching_s.has_value()) {
+        distance -= next_middle_matching_s.value() - mid_length;
       } else {
         return std::nullopt;
       }
-
-      /// @note "first lanelet before the lane change" case
-      if (route[i] == from.lanelet_id) {
-        distance -= from.s;
-        if (route[i + 1] == to.lanelet_id) {
-          distance += to.s;
-          return distance;
-        }
-      }
     } else {
-      if (route[i] == from.lanelet_id) {
-        /// @note "first lanelet" case
-        distance = getLaneletLength(from.lanelet_id) - from.s;
-      } else if (route[i] == to.lanelet_id) {
-        /// @note "last lanelet" case
-        distance += to.s;
-      } else {
-        ///@note "normal intermediate lanelet" case
-        distance += getLaneletLength(route[i]);
-      }
+      distance += getLaneletLength(route[i]);
     }
   }
-  return distance;
+  return distance - from.s + to.s;
 }
 
 auto HdMapUtils::toMapBin() const -> autoware_auto_mapping_msgs::msg::HADMapBin
