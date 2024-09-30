@@ -1531,6 +1531,11 @@ auto HdMapUtils::getLateralDistance(
   }
 }
 
+#include <geometry/vector3/normalize.hpp>
+#include <geometry/vector3/operator.hpp>
+using math::geometry::operator-;
+using math::geometry::operator*;
+
 auto HdMapUtils::getLongitudinalDistance(
   const traffic_simulator_msgs::msg::LaneletPose & from,
   const traffic_simulator_msgs::msg::LaneletPose & to, bool allow_lane_change) const
@@ -1568,25 +1573,53 @@ auto HdMapUtils::getLongitudinalDistance(
   for (unsigned int i = 0; i < route.size(); i++) {
     if (i < route.size() - 1 && with_lane_change(allow_lane_change, route[i], route[i + 1])) {
       /// @note "the lanelet before the lane change" case
-      traffic_simulator_msgs::msg::LaneletPose next_lanelet_pose;
-      next_lanelet_pose.lanelet_id = route[i + 1];
-      next_lanelet_pose.s = 0.0;
-      next_lanelet_pose.offset = 0.0;
+      auto curr_lanelet_spline_control_points = getCenterPointsSpline(route[i])->control_points;
+      auto next_lanelet_spline_control_points = getCenterPointsSpline(route[i + 1])->control_points;
+      math::geometry::operator+=(
+        curr_lanelet_spline_control_points[0],
+        math::geometry::normalize(
+          curr_lanelet_spline_control_points[0] - curr_lanelet_spline_control_points[1]) *
+          10.0);
+      math::geometry::operator+=(
+        next_lanelet_spline_control_points[0],
+        math::geometry::normalize(
+          next_lanelet_spline_control_points[0] - next_lanelet_spline_control_points[1]) *
+          10.0);
+      const auto next_lanelet_map_pose =
+        toMapPose(traffic_simulator_msgs::build<traffic_simulator_msgs::msg::LaneletPose>()
+                    .lanelet_id(route[i + 1])
+                    .s(0.0)
+                    .offset(0.0)
+                    .rpy(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0.0).y(0.0).z(0.0)))
+          .pose;
+      const auto curr_lanelet_map_pose =
+        toMapPose(traffic_simulator_msgs::build<traffic_simulator_msgs::msg::LaneletPose>()
+                    .lanelet_id(route[i])
+                    .s(0.0)
+                    .offset(0.0)
+                    .rpy(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0.0).y(0.0).z(0.0)))
+          .pose;
+      const auto curr_lanelet_spline_s =
+        getCenterPointsSpline(route[i])->getSValue(next_lanelet_map_pose, 10.0);
+      const auto next_lanelet_spline_s =
+        getCenterPointsSpline(route[i])->getSValue(curr_lanelet_map_pose, 10.0);
+      const auto curr_lanelet_spline_extended_s =
+        math::geometry::CatmullRomSpline(curr_lanelet_spline_control_points)
+          .getSValue(next_lanelet_map_pose, 10.0);
+      const auto next_lanelet_spline_extended_s =
+        math::geometry::CatmullRomSpline(next_lanelet_spline_control_points)
+          .getSValue(curr_lanelet_map_pose, 10.0);
 
-      if (
-        auto next_lanelet_origin_from_current_lanelet =
-          toLaneletPose(toMapPose(next_lanelet_pose).pose, route[i], 10.0)) {
-        distance += next_lanelet_origin_from_current_lanelet->s;
+      if (curr_lanelet_spline_s.has_value()) {
+        distance += curr_lanelet_spline_s.value();
+      } else if (next_lanelet_spline_s.has_value()) {
+        distance -= next_lanelet_spline_s.value();
+      } else if (curr_lanelet_spline_extended_s.has_value()) {
+        distance += curr_lanelet_spline_extended_s.value() - 10.0;
+      } else if (next_lanelet_spline_extended_s.has_value()) {
+        distance -= next_lanelet_spline_extended_s.value() - 10.0;
       } else {
-        traffic_simulator_msgs::msg::LaneletPose current_lanelet_pose = next_lanelet_pose;
-        current_lanelet_pose.lanelet_id = route[i];
-        if (
-          auto current_lanelet_origin_from_next_lanelet =
-            toLaneletPose(toMapPose(current_lanelet_pose).pose, route[i + 1], 10.0)) {
-          distance -= current_lanelet_origin_from_next_lanelet->s;
-        } else {
-          return std::nullopt;
-        }
+        return std::nullopt;
       }
 
       /// @note "first lanelet before the lane change" case
