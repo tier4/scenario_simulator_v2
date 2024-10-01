@@ -68,14 +68,19 @@ jobs:
       - name: Resolve rosdep and install colcon mixin
         run: |
           apt-get update
-          apt-get install -y python3-pip python3-colcon-lcov-result lcov
+          apt-get install -y python3-pip unzip
           rosdep update --include-eol-distros
           rosdep install -iy --from-paths src --rosdistro ${{ matrix.rosdistro }}
           colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml
           colcon mixin update default
         shell: bash
 
-      - name: Build packages
+      - name: Install sonar-scanner and build-wrapper
+        uses: sonarsource/sonarcloud-github-c-cpp@v3
+        env:
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }} 
+
+      - name: Build with SonarCloud Build Wrapper
         run: |
           source /opt/ros/${{ matrix.rosdistro }}/setup.bash
           colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=${{ matrix.cmake_build_type }} -DBUILD_CPP_MOCK_SCENARIOS=ON -DBUILD_TESTING=true -DCMAKE_CXX_FLAGS='-fprofile-arcs -ftest-coverage' -DCMAKE_C_FLAGS='-fprofile-arcs -ftest-coverage' --packages-up-to ${{ steps.list_packages.outputs.package_list }}
@@ -86,8 +91,16 @@ jobs:
           source /opt/ros/${{ matrix.rosdistro }}/setup.bash
           source install/local_setup.bash
           colcon test --event-handlers console_cohesion+ --packages-select ${{ steps.list_packages.outputs.package_list }}
-          colcon lcov-result --packages-select ${{ steps.list_packages.outputs.package_list }}
         shell: bash
+
+      - name: Collect and run gcov on coverage data
+        run: |
+          mkdir -p ./gcov && \
+          find ./build -name "*.gcda" -o -name "*.gcno" | \
+          while read -r line; do \
+            gcov -o $(dirname "$line") $(echo "$line" | sed 's/\.gcda$/.cpp/;s/\.gcno$/.cpp/;s/\.gcda$/.hpp/;s/\.gcno$/.hpp/'); \
+          done && mv *.gcov ./gcov/
+    
 
       - name: Show test result
         if: always()
@@ -114,12 +127,8 @@ jobs:
       - name: Run SonarCloud scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
-#      - name: Basic test
-#        run: |
-#          source install/setup.bash
-#          source install/local_setup.bash
-#          ./src/scenario_simulator_v2/.github/workflows/workflow.sh ./src/scenario_simulator_v2_scenarios/workflow/basic.txt
-#        shell: bash
+          SONAR_HOST_URL: https://sonarcloud.io/
+        working-directory: src/scenario_simulator_v2/
+        run: sonar-scanner --define sonar.cfamily.compile-commands="bw-output/compile_commands.json"
