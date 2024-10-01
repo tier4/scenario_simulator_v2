@@ -1562,26 +1562,29 @@ auto HdMapUtils::getLongitudinalDistance(
     if (with_lane_change(route[i], route[i + 1UL])) {
       const auto curr_lanelet_spline = getCenterPointsSpline(route[i]);
       const auto next_lanelet_spline = getCenterPointsSpline(route[i + 1UL]);
-      const double mid_length =
+
+      constexpr double lanelet_starting_s = 0.0;
+      const double lanelet_half_min_s =
         std::min(curr_lanelet_spline->getLength(), next_lanelet_spline->getLength()) * 0.5;
 
-      const auto curr_start_matching_s =
-        curr_lanelet_spline->getSValue(next_lanelet_spline->getPose(0.0), 10.0);
-      const auto next_start_matching_s =
-        next_lanelet_spline->getSValue(curr_lanelet_spline->getPose(0.0), 10.0);
-      const auto curr_middle_matching_s =
-        curr_lanelet_spline->getSValue(next_lanelet_spline->getPose(mid_length), 10.0);
-      const auto next_middle_matching_s =
-        next_lanelet_spline->getSValue(curr_lanelet_spline->getPose(mid_length), 10.0);
+      constexpr double matching_distance = 10.0;
+      const auto curr_start_matching_s = curr_lanelet_spline->getSValue(
+        next_lanelet_spline->getPose(lanelet_starting_s), matching_distance);
+      const auto next_start_matching_s = next_lanelet_spline->getSValue(
+        curr_lanelet_spline->getPose(lanelet_starting_s), matching_distance);
+      const auto curr_middle_matching_s = curr_lanelet_spline->getSValue(
+        next_lanelet_spline->getPose(lanelet_half_min_s), matching_distance);
+      const auto next_middle_matching_s = next_lanelet_spline->getSValue(
+        curr_lanelet_spline->getPose(lanelet_half_min_s), matching_distance);
 
       if (curr_start_matching_s.has_value()) {
         accumulated_distance += curr_start_matching_s.value();
       } else if (next_start_matching_s.has_value()) {
         accumulated_distance -= next_start_matching_s.value();
       } else if (curr_middle_matching_s.has_value()) {
-        accumulated_distance += curr_middle_matching_s.value() - mid_length;
+        accumulated_distance += curr_middle_matching_s.value() - lanelet_half_min_s;
       } else if (next_middle_matching_s.has_value()) {
-        accumulated_distance -= next_middle_matching_s.value() - mid_length;
+        accumulated_distance -= next_middle_matching_s.value() - lanelet_half_min_s;
       } else {
         return std::nullopt;
       }
