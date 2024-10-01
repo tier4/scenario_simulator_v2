@@ -1547,27 +1547,19 @@ auto HdMapUtils::getLongitudinalDistance(
   if (route.empty()) {
     return std::nullopt;
   }
-  double distance = 0.0;
 
-  auto with_lane_change = [this](
-                            const bool allow_lane_change, const lanelet::Id current_lanelet,
-                            const lanelet::Id next_lanelet) -> bool {
-    if (allow_lane_change) {
-      auto next_lanelet_ids = getNextLaneletIds(current_lanelet);
-      auto next_lanelet_itr = std::find_if(
-        next_lanelet_ids.begin(), next_lanelet_ids.end(),
-        [next_lanelet](const lanelet::Id & id) { return id == next_lanelet; });
-      return next_lanelet_itr == next_lanelet_ids.end();
-    } else {
-      return false;
-    }
+  const auto with_lane_change =
+    [this](const lanelet::Id current_lanelet, const lanelet::Id next_lanelet) -> bool {
+    const auto next_lanelet_ids = getNextLaneletIds(current_lanelet);
+    return std::none_of(
+      next_lanelet_ids.begin(), next_lanelet_ids.end(),
+      [next_lanelet](const lanelet::Id id) { return id == next_lanelet; });
   };
 
-  /// @note in this for loop, some cases are marked by @note command. each case is explained in the document.
   /// @sa https://tier4.github.io/scenario_simulator_v2-docs/developer_guide/DistanceCalculation/
+  double accumulated_distance = 0.0;
   for (std::size_t i = 0UL; i < route.size() - 1UL; ++i) {
-    if (with_lane_change(allow_lane_change, route[i], route[i + 1UL])) {
-      /// @note "the lanelet before the lane change" case
+    if (with_lane_change(route[i], route[i + 1UL])) {
       const auto curr_lanelet_spline = getCenterPointsSpline(route[i]);
       const auto next_lanelet_spline = getCenterPointsSpline(route[i + 1UL]);
       const double mid_length =
@@ -1583,21 +1575,21 @@ auto HdMapUtils::getLongitudinalDistance(
         next_lanelet_spline->getSValue(curr_lanelet_spline->getPose(mid_length), 10.0);
 
       if (curr_start_matching_s.has_value()) {
-        distance += curr_start_matching_s.value();
+        accumulated_distance += curr_start_matching_s.value();
       } else if (next_start_matching_s.has_value()) {
-        distance -= next_start_matching_s.value();
+        accumulated_distance -= next_start_matching_s.value();
       } else if (curr_middle_matching_s.has_value()) {
-        distance += curr_middle_matching_s.value() - mid_length;
+        accumulated_distance += curr_middle_matching_s.value() - mid_length;
       } else if (next_middle_matching_s.has_value()) {
-        distance -= next_middle_matching_s.value() - mid_length;
+        accumulated_distance -= next_middle_matching_s.value() - mid_length;
       } else {
         return std::nullopt;
       }
     } else {
-      distance += getLaneletLength(route[i]);
+      accumulated_distance += getLaneletLength(route[i]);
     }
   }
-  return distance - from.s + to.s;
+  return accumulated_distance - from.s + to.s;
 }
 
 auto HdMapUtils::toMapBin() const -> autoware_auto_mapping_msgs::msg::HADMapBin

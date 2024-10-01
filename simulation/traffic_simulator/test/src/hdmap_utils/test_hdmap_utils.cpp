@@ -125,6 +125,22 @@ protected:
 
   hdmap_utils::HdMapUtils hdmap_utils;
 };
+class HdMapUtilsTest_IntersectionMap : public testing::Test
+{
+protected:
+  HdMapUtilsTest_IntersectionMap()
+  : hdmap_utils(
+      ament_index_cpp::get_package_share_directory("traffic_simulator") +
+        "/map/intersection/lanelet2_map.osm",
+      geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
+        .latitude(35.64200728302)
+        .longitude(139.74821144562)
+        .altitude(0.0))
+  {
+  }
+
+  hdmap_utils::HdMapUtils hdmap_utils;
+};
 
 /**
  * @note Test basic functionality.
@@ -2053,6 +2069,48 @@ TEST_F(HdMapUtilsTest_KashiwanohaMap, getLongitudinalDistance_PullRequest1348)
   EXPECT_NO_THROW(EXPECT_DOUBLE_EQ(
     hdmap_utils.getLongitudinalDistance(pose_from, pose_to, true).value(),
     54.18867466433655977198213804513216018676757812500000));
+}
+
+/**
+ * @note Test for the corner case described in https://github.com/tier4/scenario_simulator_v2/issues/1364
+ */
+TEST_F(HdMapUtilsTest_IntersectionMap, getLongitudinalDistance_laneChange)
+{
+  {
+    const auto pose_from = traffic_simulator::helper::constructLaneletPose(563UL, 5.0);
+    const auto pose_to = traffic_simulator::helper::constructLaneletPose(659UL, 5.0);
+
+    const auto result = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, true);
+    EXPECT_NO_THROW(EXPECT_NEAR(result.value(), 157.0, 1.0));
+  }
+  {
+    const auto pose_from = traffic_simulator::helper::constructLaneletPose(563UL, 5.0);
+    const auto pose_to = traffic_simulator::helper::constructLaneletPose(658UL, 5.0);
+
+    const auto result = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, true);
+    EXPECT_NO_THROW(EXPECT_NEAR(result.value(), 161.0, 1.0));
+  }
+  {
+    const auto pose_from = traffic_simulator::helper::constructLaneletPose(563UL, 5.0);
+    const auto pose_to = traffic_simulator::helper::constructLaneletPose(657UL, 5.0);
+
+    const auto result = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, true);
+    EXPECT_NO_THROW(EXPECT_NEAR(result.value(), 161.0, 1.0));
+  }
+  {
+    const auto pose_from = traffic_simulator::helper::constructLaneletPose(643UL, 5.0);
+    const auto pose_to = traffic_simulator::helper::constructLaneletPose(666UL, 5.0);
+
+    const auto result = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, true);
+    EXPECT_NO_THROW(EXPECT_NEAR(result.value(), 250.0, 1.0));
+  }
+  {
+    const auto pose_from = traffic_simulator::helper::constructLaneletPose(643UL, 5.0);
+    const auto pose_to = traffic_simulator::helper::constructLaneletPose(665UL, 5.0);
+
+    const auto result = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, true);
+    EXPECT_NO_THROW(EXPECT_NEAR(result.value(), 253.0, 1.0));
+  }
 }
 
 /**
