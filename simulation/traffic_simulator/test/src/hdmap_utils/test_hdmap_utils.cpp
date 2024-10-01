@@ -2080,36 +2080,56 @@ TEST_F(HdMapUtilsTest_IntersectionMap, getLongitudinalDistance_laneChange)
     const auto pose_from = traffic_simulator::helper::constructLaneletPose(563UL, 5.0);
     const auto pose_to = traffic_simulator::helper::constructLaneletPose(659UL, 5.0);
 
-    const auto result = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, true);
-    EXPECT_NO_THROW(EXPECT_NEAR(result.value(), 157.0, 1.0));
+    const auto without_lane_change = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, false);
+    EXPECT_FALSE(without_lane_change.has_value());
+
+    const auto with_lane_change = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, true);
+    ASSERT_TRUE(with_lane_change.has_value());
+    EXPECT_NEAR(with_lane_change.value(), 157.0, 1.0);
   }
   {
     const auto pose_from = traffic_simulator::helper::constructLaneletPose(563UL, 5.0);
     const auto pose_to = traffic_simulator::helper::constructLaneletPose(658UL, 5.0);
 
-    const auto result = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, true);
-    EXPECT_NO_THROW(EXPECT_NEAR(result.value(), 161.0, 1.0));
+    const auto without_lane_change = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, false);
+    EXPECT_FALSE(without_lane_change.has_value());
+
+    const auto with_lane_change = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, true);
+    ASSERT_TRUE(with_lane_change.has_value());
+    EXPECT_NEAR(with_lane_change.value(), 161.0, 1.0);
   }
   {
     const auto pose_from = traffic_simulator::helper::constructLaneletPose(563UL, 5.0);
     const auto pose_to = traffic_simulator::helper::constructLaneletPose(657UL, 5.0);
 
-    const auto result = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, true);
-    EXPECT_NO_THROW(EXPECT_NEAR(result.value(), 161.0, 1.0));
+    const auto without_lane_change = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, false);
+    EXPECT_FALSE(without_lane_change.has_value());
+
+    const auto with_lane_change = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, true);
+    ASSERT_TRUE(with_lane_change.has_value());
+    EXPECT_NEAR(with_lane_change.value(), 161.0, 1.0);
   }
   {
     const auto pose_from = traffic_simulator::helper::constructLaneletPose(643UL, 5.0);
     const auto pose_to = traffic_simulator::helper::constructLaneletPose(666UL, 5.0);
 
-    const auto result = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, true);
-    EXPECT_NO_THROW(EXPECT_NEAR(result.value(), 250.0, 1.0));
+    const auto without_lane_change = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, false);
+    EXPECT_FALSE(without_lane_change.has_value());
+
+    const auto with_lane_change = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, true);
+    ASSERT_TRUE(with_lane_change.has_value());
+    EXPECT_NEAR(with_lane_change.value(), 250.0, 1.0);
   }
   {
     const auto pose_from = traffic_simulator::helper::constructLaneletPose(643UL, 5.0);
     const auto pose_to = traffic_simulator::helper::constructLaneletPose(665UL, 5.0);
 
-    const auto result = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, true);
-    EXPECT_NO_THROW(EXPECT_NEAR(result.value(), 253.0, 1.0));
+    const auto without_lane_change = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, false);
+    EXPECT_FALSE(without_lane_change.has_value());
+
+    const auto with_lane_change = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, true);
+    ASSERT_TRUE(with_lane_change.has_value());
+    EXPECT_NEAR(with_lane_change.value(), 253.0, 1.0);
   }
 }
 
