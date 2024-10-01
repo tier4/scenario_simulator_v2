@@ -47,7 +47,7 @@ EntityBase::EntityBase(
   }
 }
 
-void EntityBase::appendDebugMarker(visualization_msgs::msg::MarkerArray &) {}
+void EntityBase::appendDebugMarker(visualization_msgs::msg::MarkerArray & /*unused*/) {}
 
 auto EntityBase::asFieldOperatorApplication() const -> concealer::FieldOperatorApplication &
 {
@@ -69,7 +69,7 @@ auto EntityBase::getCanonicalizedLaneletPose() const -> std::optional<Canonicali
   return status_->getCanonicalizedLaneletPose();
 }
 
-auto EntityBase::getCanonicalizedLaneletPose(double matching_distance) const
+auto EntityBase::getCanonicalizedLaneletPose(const double matching_distance) const
   -> std::optional<CanonicalizedLaneletPose>
 {
   const auto include_crosswalk = [](const auto & entity_type) {
@@ -88,7 +88,7 @@ auto EntityBase::getDefaultMatchingDistanceForLaneletPoseCalculation() const -> 
   return getBoundingBox().dimensions.y * 0.5 + 1.0;
 }
 
-auto EntityBase::isTargetSpeedReached(double target_speed) const -> bool
+auto EntityBase::isTargetSpeedReached(const double target_speed) const -> bool
 {
   return speed_planner_->isTargetSpeedReached(target_speed, getCurrentTwist());
 }
@@ -133,7 +133,7 @@ void EntityBase::requestLaneChange(
   const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,
   const traffic_simulator::lane_change::Constraint & constraint)
 {
-  lanelet::Id reference_lanelet_id = 0;
+  lanelet::Id reference_lanelet_id = 0UL;
   if (target.entity_name == name) {
     if (not laneMatchingSucceed()) {
       THROW_SEMANTIC_ERROR(
@@ -168,10 +168,10 @@ void EntityBase::requestLaneChange(
 }
 
 void EntityBase::requestSpeedChangeWithConstantAcceleration(
-  const double target_speed, const speed_change::Transition transition, double acceleration,
+  const double target_speed, const speed_change::Transition transition, const double acceleration,
   const bool continuous)
 {
-  if (!continuous && isTargetSpeedReached(target_speed)) {
+  if (isTargetSpeedReached(target_speed) && !continuous) {
     return;
   }
   switch (transition) {
@@ -219,7 +219,8 @@ void EntityBase::requestSpeedChangeWithConstantAcceleration(
 }
 
 void EntityBase::requestSpeedChangeWithTimeConstraint(
-  const double target_speed, const speed_change::Transition transition, double acceleration_time)
+  const double target_speed, const speed_change::Transition transition,
+  const double acceleration_time)
 {
   if (isTargetSpeedReached(target_speed)) {
     return;
@@ -274,7 +275,7 @@ void EntityBase::requestSpeedChange(
   const double target_speed, const speed_change::Transition transition,
   const speed_change::Constraint constraint, const bool continuous)
 {
-  if (!continuous && isTargetSpeedReached(target_speed)) {
+  if (isTargetSpeedReached(target_speed) && !continuous) {
     return;
   }
   switch (constraint.type) {
@@ -293,9 +294,9 @@ void EntityBase::requestSpeedChange(
 
 void EntityBase::requestSpeedChangeWithConstantAcceleration(
   const speed_change::RelativeTargetSpeed & target_speed, const speed_change::Transition transition,
-  double acceleration, const bool continuous)
+  const double acceleration, const bool continuous)
 {
-  if (!continuous && isTargetSpeedReached(target_speed)) {
+  if (isTargetSpeedReached(target_speed) && !continuous) {
     return;
   }
   switch (transition) {
@@ -311,19 +312,20 @@ void EntityBase::requestSpeedChangeWithConstantAcceleration(
          * @brief Checking if the entity reaches target speed.
          */
         [this, target_speed, acceleration](double) {
-          double diff = target_speed.getAbsoluteValue(getCanonicalizedStatus(), other_status_) -
-                        getCurrentTwist().linear.x;
+          const double diff =
+            target_speed.getAbsoluteValue(getCanonicalizedStatus(), other_status_) -
+            getCurrentTwist().linear.x;
           /**
            * @brief Hard coded parameter, threshold for difference
            */
           if (std::abs(diff) <= 0.1) {
             return true;
           }
-          if (diff > 0) {
+          if (diff > 0.1) {
             setAccelerationLimit(std::abs(acceleration));
             return false;
           }
-          if (diff < 0) {
+          if (diff < 0.1) {
             setDecelerationLimit(std::abs(acceleration));
             return false;
           }
@@ -347,7 +349,7 @@ void EntityBase::requestSpeedChangeWithConstantAcceleration(
 
 void EntityBase::requestSpeedChangeWithTimeConstraint(
   const speed_change::RelativeTargetSpeed & target_speed, const speed_change::Transition transition,
-  double acceleration_time)
+  const double acceleration_time)
 {
   if (isTargetSpeedReached(target_speed)) {
     return;
@@ -384,7 +386,7 @@ void EntityBase::requestSpeedChange(
   const speed_change::RelativeTargetSpeed & target_speed, const speed_change::Transition transition,
   const speed_change::Constraint constraint, const bool continuous)
 {
-  if (!continuous && isTargetSpeedReached(target_speed)) {
+  if (isTargetSpeedReached(target_speed) && !continuous) {
     return;
   }
   switch (constraint.type) {
@@ -404,9 +406,9 @@ void EntityBase::requestSpeedChange(
   }
 }
 
-void EntityBase::requestSpeedChange(double target_speed, bool continuous)
+void EntityBase::requestSpeedChange(const double target_speed, const bool continuous)
 {
-  if (!continuous && isTargetSpeedReached(target_speed)) {
+  if (isTargetSpeedReached(target_speed) && !continuous) {
     return;
   }
   if (continuous) {
@@ -445,9 +447,9 @@ void EntityBase::requestSpeedChange(double target_speed, bool continuous)
 }
 
 void EntityBase::requestSpeedChange(
-  const speed_change::RelativeTargetSpeed & target_speed, bool continuous)
+  const speed_change::RelativeTargetSpeed & target_speed, const bool continuous)
 {
-  if (!continuous && isTargetSpeedReached(target_speed)) {
+  if (isTargetSpeedReached(target_speed) && !continuous) {
     return;
   }
   if (continuous) {
@@ -488,14 +490,14 @@ void EntityBase::requestSpeedChange(
 
 auto EntityBase::isControlledBySimulator() const -> bool { return true; }
 
-auto EntityBase::setControlledBySimulator(bool /*unused*/) -> void
+auto EntityBase::setControlledBySimulator(const bool /*unused*/) -> void
 {
   THROW_SEMANTIC_ERROR(
     getEntityTypename(), " type entities do not support setControlledBySimulator");
 }
 
 auto EntityBase::requestFollowTrajectory(
-  const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &) -> void
+  const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & /*unused*/) -> void
 {
   THROW_SEMANTIC_ERROR(
     getEntityTypename(), " type entities do not support follow trajectory action.");
@@ -570,15 +572,15 @@ auto EntityBase::setLinearJerk(const double linear_jerk) -> void
 
 auto EntityBase::setAction(const std::string & action) -> void { status_->setAction(action); }
 
-auto EntityBase::setMapPose(const geometry_msgs::msg::Pose &) -> void
+auto EntityBase::setMapPose(const geometry_msgs::msg::Pose & /*unused*/) -> void
 {
   THROW_SEMANTIC_ERROR(
     "You cannot set map pose to the vehicle other than ego named ", std::quoted(name), ".");
 }
 
 void EntityBase::activateOutOfRangeJob(
-  double min_velocity, double max_velocity, double min_acceleration, double max_acceleration,
-  double min_jerk, double max_jerk)
+  const double min_velocity, const double max_velocity, const double min_acceleration,
+  const double max_acceleration, const double min_jerk, const double max_jerk)
 {
   /**
    * @brief This value was determined heuristically rather than for
@@ -679,7 +681,7 @@ auto EntityBase::requestSynchronize(
     THROW_SYNTAX_ERROR("Request synchronize is only for non-ego entities.");
   }
 
-  if (tolerance == 0) {
+  if (tolerance == 0.0) {
     RCLCPP_WARN_ONCE(
       rclcpp::get_logger("traffic_simulator"),
       "The tolerance is set to 0.0. This may cause the entity to never reach the target lanelet.");
@@ -724,7 +726,7 @@ auto EntityBase::requestSynchronize(
       const auto target_entity_distance = longitudinalDistance(
         CanonicalizedLaneletPose(target_entity_lanelet_pose, hdmap_utils_ptr_), target_sync_pose,
         true, true, true, hdmap_utils_ptr_);
-      if (!target_entity_distance.has_value() || target_entity_distance.value() < 0) {
+      if (!target_entity_distance.has_value() || target_entity_distance.value() < 0.0) {
         RCLCPP_WARN_ONCE(
           rclcpp::get_logger("traffic_simulator"),
           "Failed to get distance between target entity and target lanelet pose. Check if target "
@@ -739,12 +741,12 @@ auto EntityBase::requestSynchronize(
       const auto target_entity_arrival_time =
         (std::abs(target_entity_velocity) > std::numeric_limits<double>::epsilon())
           ? target_entity_distance.value() / target_entity_velocity
-          : 0;
+          : 0.0;
 
       auto entity_velocity_to_synchronize = [this, entity_velocity, target_entity_arrival_time,
                                              entity_distance, target_speed]() {
         const auto border_distance =
-          (entity_velocity + target_speed) * target_entity_arrival_time / 2;
+          (entity_velocity + target_speed) * target_entity_arrival_time / 2.0;
         if (border_distance < entity_distance.value()) {
           ///@brief Making entity speed up.
           return entity_velocity + getMaxAcceleration() * step_time_;
