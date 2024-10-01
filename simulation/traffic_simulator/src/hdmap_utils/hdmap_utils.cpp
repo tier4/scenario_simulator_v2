@@ -831,32 +831,44 @@ auto HdMapUtils::getFollowingLanelets(
   const lanelet::Id lanelet_id, const lanelet::Ids & candidate_lanelet_ids, const double distance,
   const bool include_self) const -> lanelet::Ids
 {
-  if (candidate_lanelet_ids.empty()) {
-    return {};
-  }
   lanelet::Ids ids;
-  double total_distance = 0.0;
-  bool found = false;
-  for (const auto id : candidate_lanelet_ids) {
-    if (found) {
-      ids.emplace_back(id);
-      total_distance = total_distance + getLaneletLength(id);
-      if (total_distance > distance) {
-        return ids;
-      }
-    }
-    if (id == lanelet_id) {
-      found = true;
-      if (include_self) {
-        ids.push_back(id);
-      }
-    }
+  lanelet::Id previous_id;
+
+  if (candidate_lanelet_ids.empty()) {
+    return ids;
   }
-  if (!found) {
+
+  bool isNextLanelet{false};
+  double total_distance = 0.0;
+  auto lanelet = std::find_if(
+    candidate_lanelet_ids.begin(), candidate_lanelet_ids.end(),
+    [lanelet_id](const auto id) { return lanelet_id == id; });
+
+  if (lanelet == candidate_lanelet_ids.end()) {
     THROW_SEMANTIC_ERROR("lanelet id does not match");
   }
-  if (total_distance > distance) {
-    return ids;
+
+  previous_id = *lanelet;
+  if (include_self) {
+    ids.emplace_back(*lanelet);
+    ++lanelet;
+  }
+  for (; lanelet != candidate_lanelet_ids.end(); ++lanelet) {
+    if (const auto next_ids = getNextLaneletIds(previous_id); not next_ids.empty()) {
+      isNextLanelet = std::find_if(next_ids.begin(), next_ids.end(), [lanelet](const auto id) {
+                        return *lanelet == id;
+                      }) != next_ids.end();
+    }
+    if (not isNextLanelet) {
+      THROW_SEMANTIC_ERROR("lanelet id does not match");
+    }
+    ids.emplace_back(*lanelet);
+    previous_id = *lanelet;
+    total_distance += getLaneletLength(*lanelet);
+    isNextLanelet = false;
+    if (total_distance > distance) {
+      return ids;
+    }
   }
   // clang-format off
   return ids + getFollowingLanelets(

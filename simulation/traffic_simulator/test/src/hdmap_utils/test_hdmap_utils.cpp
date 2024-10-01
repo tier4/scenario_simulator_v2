@@ -1631,6 +1631,18 @@ TEST_F(HdMapUtilsTest_StandardMap, getFollowingLanelets_candidateTrajectoryEmpty
 }
 
 /**
+ * @note Test function behavior when called with a candidate trajectory
+ * that contains wrong candidates
+ */
+TEST_F(HdMapUtilsTest_StandardMap, getFollowingLanelets_candidatesDoNotMatchRealTrajectory)
+{
+  EXPECT_THROW(
+    hdmap_utils.getFollowingLanelets(
+      34564, lanelet::Ids{34564, 34495, 34507, 34399, 34399}, 100.0, true),
+    common::Error);
+}
+
+/**
  * @note Test basic functionality.
  * Test lane change possibility checking
  * correctness with lanelets that can be changed.
