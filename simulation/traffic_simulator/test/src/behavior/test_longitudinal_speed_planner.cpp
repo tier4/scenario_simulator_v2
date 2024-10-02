@@ -123,10 +123,10 @@ TEST_F(LongitudinalSpeedPlannerTest, getAccelerationDuration_acceleration)
 }
 /**
  * @note Test calculations correctness when difference between getVelocityWithConstantJerk 
- * and target_speed is more than 0.01
+ * and target_speed is more than 0.01, https://github.com/tier4/scenario_simulator_v2/issues/1395
  */
 
-TEST_F(LongitudinalSpeedPlannerTest, example)
+TEST_F(LongitudinalSpeedPlannerTest, getAccelerationDuration_targetSpeed_difference)
 {
   geometry_msgs::msg::Twist current_twist{};
   geometry_msgs::msg::Accel current_accel{};
@@ -141,26 +141,24 @@ TEST_F(LongitudinalSpeedPlannerTest, example)
       .max_deceleration_rate(1.0)
       .max_speed(10.0);
 
-  const double epsilon = 1e-5;
-  double target_speed, result_duration;
-
+  constexpr double epsilon = 1e-5;
   {
-    target_speed = current_twist.linear.x + epsilon;
-    result_duration =
+    const double target_speed = current_twist.linear.x + epsilon;
+    const double result_duration =
       planner.getAccelerationDuration(target_speed, constraints, current_twist, current_accel);
     EXPECT_GE(result_duration, 0.0);
     EXPECT_LE(result_duration, epsilon);
   }
   {
-    target_speed = current_twist.linear.x + 0.0100;
-    result_duration =
+    const double target_speed = current_twist.linear.x + 0.0100;
+    const double result_duration =
       planner.getAccelerationDuration(target_speed, constraints, current_twist, current_accel);
     EXPECT_GE(result_duration, 0.0);
     EXPECT_LE(result_duration, 0.0100 + epsilon);
   }
   {
-    target_speed = current_twist.linear.x + 0.0099;
-    result_duration =
+    const double target_speed = current_twist.linear.x + 0.0099;
+    const double result_duration =
       planner.getAccelerationDuration(target_speed, constraints, current_twist, current_accel);
     EXPECT_GE(result_duration, 0.0);
     EXPECT_LE(result_duration, 0.0099 + epsilon);
