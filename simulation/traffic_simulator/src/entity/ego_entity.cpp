@@ -108,10 +108,13 @@ auto EgoEntity::getGoalPoses() -> std::vector<CanonicalizedLaneletPose>
         dynamic_cast<concealer::FieldOperatorApplicationFor<concealer::AutowareUniverse> *>(
           field_operator_application.get());
       universe) {
-    lanelet_pose.push_back(traffic_simulator::pose::toCanonicalizedLaneletPose(
-                             universe->getAutowareMissionRoute().goal_pose, false, hdmap_utils_ptr_)
-                             .value());
+    if (const auto pose_opt = traffic_simulator::pose::toCanonicalizedLaneletPose(
+          universe->getAutowareMissionRoute().goal_pose, false, hdmap_utils_ptr_);
+        pose_opt.has_value()) {
+      lanelet_pose.push_back(pose_opt.value());
+    }
   }
+
   return lanelet_pose;
 }
 
