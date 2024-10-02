@@ -39,15 +39,11 @@ EntityBase::EntityBase(
   hdmap_utils_ptr_(hdmap_utils_ptr)
 {
   job_list_.append(
-    [this](double delta_time) { 
-      traveled_distance_ += std::abs(getCurrentTwist().linear.x) * delta_time; 
+    [this](double delta_time) {
+      traveled_distance_ += std::abs(getCurrentTwist().linear.x) * delta_time;
       return true;
     },
-    [this]() { return false; },
-    job::Type::TRAVELED_DISTANCE,
-    true,
-    job::Event::POST_UPDATE
-  );
+    [this]() { return false; }, job::Type::TRAVELED_DISTANCE, true, job::Event::POST_UPDATE);
 
   if (name != static_cast<EntityStatus>(entity_status).name) {
     THROW_SIMULATION_ERROR(
@@ -656,11 +652,6 @@ auto EntityBase::updateStandStillDuration(const double step_time) -> double
     return stand_still_duration_ = 0.0;
   }
 }
-
-// auto EntityBase::updateTraveledDistance(const double step_time) -> double
-// {
-//   return traveled_distance_ += std::abs(getCurrentTwist().linear.x) * step_time;
-// }
 
 bool EntityBase::reachPosition(const std::string & target_name, const double tolerance) const
 {
