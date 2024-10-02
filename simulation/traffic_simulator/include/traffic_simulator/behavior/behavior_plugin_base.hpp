@@ -55,10 +55,10 @@ public:
 
   // clang-format off
   DEFINE_GETTER_SETTER(BehaviorParameter,                                "behavior_parameter",                             traffic_simulator_msgs::msg::BehaviorParameter)
+  DEFINE_GETTER_SETTER(CanonicalizedEntityStatus,                        "canonicalized_entity_status",                    std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>)
   DEFINE_GETTER_SETTER(CurrentTime,                                      "current_time",                                   double)
   DEFINE_GETTER_SETTER(DebugMarker,                                      "debug_marker",                                   std::vector<visualization_msgs::msg::Marker>)
   DEFINE_GETTER_SETTER(DefaultMatchingDistanceForLaneletPoseCalculation, "matching_distance_for_lanelet_pose_calculation", double)
-  DEFINE_GETTER_SETTER(EntityStatus,                                     "entity_status",                                  std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>)
   DEFINE_GETTER_SETTER(GoalPoses,                                        "goal_poses",                                     std::vector<geometry_msgs::msg::Pose>)
   DEFINE_GETTER_SETTER(HdMapUtils,                                       "hdmap_utils",                                    std::shared_ptr<hdmap_utils::HdMapUtils>)
   DEFINE_GETTER_SETTER(LaneChangeParameters,                             "lane_change_parameters",                         traffic_simulator::lane_change::Parameter)
@@ -72,7 +72,6 @@ public:
   DEFINE_GETTER_SETTER(StepTime,                                         "step_time",                                      double)
   DEFINE_GETTER_SETTER(TargetSpeed,                                      "target_speed",                                   std::optional<double>)
   DEFINE_GETTER_SETTER(TrafficLights,                                    "traffic_lights",                                 std::shared_ptr<traffic_simulator::TrafficLightsBase>)
-  DEFINE_GETTER_SETTER(UpdatedStatus,                                    "non_canonicalized_updated_status",               std::shared_ptr<traffic_simulator::EntityStatus>)
   DEFINE_GETTER_SETTER(VehicleParameters,                                "vehicle_parameters",                             traffic_simulator_msgs::msg::VehicleParameters)
   DEFINE_GETTER_SETTER(Waypoints,                                        "waypoints",                                      traffic_simulator_msgs::msg::WaypointsArray)
   // clang-format on

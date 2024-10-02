@@ -44,7 +44,9 @@ public:
   auto set(
     const EntityStatus & status, const double matching_distance,
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> void;
+
   auto setAction(const std::string & action) -> void;
+  auto getActionStatus() const noexcept -> const traffic_simulator_msgs::msg::ActionStatus &;
 
   auto getTime() const noexcept -> double;
   auto setTime(double) -> void;

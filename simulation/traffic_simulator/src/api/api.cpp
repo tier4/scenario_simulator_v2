@@ -171,6 +171,7 @@ auto API::setEntityStatus(
     EntityStatus status = static_cast<EntityStatus>(entity->getCanonicalizedStatus());
     status.pose = map_pose;
     status.action_status = action_status;
+    status.lanelet_pose_valid = false;
     setEntityStatus(name, status);
   } else {
     THROW_SIMULATION_ERROR("Cannot set entity \"", name, "\" status - such entity does not exist.");
@@ -203,6 +204,14 @@ auto API::setEntityStatus(
       .position(relative_position)
       .orientation(math::geometry::convertEulerAngleToQuaternion(relative_rpy));
   setEntityStatus(name, reference_entity_name, relative_pose, action_status);
+}
+
+auto API::attachImuSensor(
+  const std::string &, const simulation_api_schema::ImuSensorConfiguration & configuration) -> bool
+{
+  simulation_api_schema::AttachImuSensorRequest req;
+  *req.mutable_configuration() = configuration;
+  return zeromq_client_.call(req).result().success();
 }
 
 bool API::attachPseudoTrafficLightDetector(
@@ -359,6 +368,7 @@ bool API::updateFrame()
   clock_.update();
   clock_pub_->publish(clock_.getCurrentRosTimeAsMsg());
   debug_marker_pub_->publish(entity_manager_ptr_->makeDebugMarker());
+  debug_marker_pub_->publish(traffic_controller_ptr_->makeDebugMarker());
   return true;
 }
 
