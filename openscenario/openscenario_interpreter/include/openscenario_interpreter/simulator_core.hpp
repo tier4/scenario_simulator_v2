@@ -284,9 +284,10 @@ public:
   {
   protected:
     template <typename... Ts>
-    static auto applyAcquirePositionAction(Ts &&... xs)
+    static auto applyAcquirePositionAction(const std::string & entity_ref, Ts &&... xs)
     {
-      return core->requestAcquirePosition(std::forward<decltype(xs)>(xs)...);
+      core->requestClearRoute(entity_ref);
+      return core->requestAcquirePosition(entity_ref, std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>

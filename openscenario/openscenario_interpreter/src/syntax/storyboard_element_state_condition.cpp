@@ -38,7 +38,7 @@ StoryboardElementStateCondition::StoryboardElementStateCondition(
      Note that there is no guarantee that the StoryboardElement will remain in
      the same state as when the notification is made until
      StoryboardElementStateCondition::evaluate is executed after the callback
-     is called. The In other words, the StoryboardElement may immediately
+     is called. In other words, the StoryboardElement may immediately
      transition to the next state after calling the callback function.
   */
 
