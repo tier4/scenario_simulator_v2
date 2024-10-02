@@ -71,16 +71,16 @@ public:
    */                                                         \
   /*   */ auto get##NAME() const noexcept->TYPE { return RETURN_VARIABLE; }
 
-  DEFINE_GETTER(BoundingBox,                     const traffic_simulator_msgs::msg::BoundingBox &,   status_.getBoundingBox())
-  DEFINE_GETTER(CanonicalizedStatus,             const CanonicalizedEntityStatus &,                  status_)
+  DEFINE_GETTER(BoundingBox,                     const traffic_simulator_msgs::msg::BoundingBox &,   status_->getBoundingBox())
+  DEFINE_GETTER(CanonicalizedStatus,             const CanonicalizedEntityStatus &,                  *status_)
   DEFINE_GETTER(CanonicalizedStatusBeforeUpdate, const CanonicalizedEntityStatus &,                  status_before_update_)
-  DEFINE_GETTER(CurrentAccel,                    const geometry_msgs::msg::Accel &,                  status_.getAccel())
-  DEFINE_GETTER(CurrentTwist,                    const geometry_msgs::msg::Twist &,                  status_.getTwist())
+  DEFINE_GETTER(CurrentAccel,                    const geometry_msgs::msg::Accel &,                  status_->getAccel())
+  DEFINE_GETTER(CurrentTwist,                    const geometry_msgs::msg::Twist &,                  status_->getTwist())
   DEFINE_GETTER(DynamicConstraints,              traffic_simulator_msgs::msg::DynamicConstraints,    getBehaviorParameter().dynamic_constraints)
-  DEFINE_GETTER(EntitySubtype,                   const traffic_simulator_msgs::msg::EntitySubtype &, status_.getSubtype())
-  DEFINE_GETTER(EntityType,                      const traffic_simulator_msgs::msg::EntityType &,    status_.getType())
-  DEFINE_GETTER(LinearJerk,                      double,                                             status_.getLinearJerk())
-  DEFINE_GETTER(MapPose,                         const geometry_msgs::msg::Pose &,                   status_.getMapPose())
+  DEFINE_GETTER(EntitySubtype,                   const traffic_simulator_msgs::msg::EntitySubtype &, status_->getSubtype())
+  DEFINE_GETTER(EntityType,                      const traffic_simulator_msgs::msg::EntityType &,    status_->getType())
+  DEFINE_GETTER(LinearJerk,                      double,                                             status_->getLinearJerk())
+  DEFINE_GETTER(MapPose,                         const geometry_msgs::msg::Pose &,                   status_->getMapPose())
   DEFINE_GETTER(StandStillDuration,              double,                                             stand_still_duration_)
   DEFINE_GETTER(TraveledDistance,                double,                                             traveled_distance_)
   // clang-format on
@@ -93,7 +93,7 @@ public:
    */                                                                  \
   /*   */ auto FUNCTION_NAME() const->bool { return BOOL_VARIABLE; }
 
-  DEFINE_CHECK_FUNCTION(laneMatchingSucceed, status_.laneMatchingSucceed())
+  DEFINE_CHECK_FUNCTION(laneMatchingSucceed, status_->laneMatchingSucceed())
   // clang-format on
 #undef DEFINE_CHECK_FUNCTION
 
@@ -141,7 +141,7 @@ public:
 
   virtual void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) = 0;
 
-  virtual void requestLaneChange(const lanelet::Id){};
+  virtual void requestLaneChange(const lanelet::Id) {}
 
   virtual void requestLaneChange(const traffic_simulator::lane_change::Parameter &){};
 
@@ -164,7 +164,7 @@ public:
 
   virtual void requestSpeedChange(const speed_change::RelativeTargetSpeed &, bool);
 
-  virtual void requestClearRoute();
+  virtual void requestClearRoute() {}
 
   virtual auto isControlledBySimulator() const -> bool;
 
@@ -243,7 +243,7 @@ public:
   bool verbose;
 
 protected:
-  CanonicalizedEntityStatus status_;
+  std::shared_ptr<CanonicalizedEntityStatus> status_;
 
   CanonicalizedEntityStatus status_before_update_;
 
