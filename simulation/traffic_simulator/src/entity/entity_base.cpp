@@ -41,9 +41,9 @@ EntityBase::EntityBase(
   job_list_.append(
     [this](double delta_time) {
       traveled_distance_ += std::abs(getCurrentTwist().linear.x) * delta_time;
-      return true;
+      return false;
     },
-    [this]() { return false; }, job::Type::TRAVELED_DISTANCE, true, job::Event::POST_UPDATE);
+    [this]() {}, job::Type::TRAVELED_DISTANCE, true, job::Event::POST_UPDATE);
 
   if (name != static_cast<EntityStatus>(entity_status).name) {
     THROW_SIMULATION_ERROR(
