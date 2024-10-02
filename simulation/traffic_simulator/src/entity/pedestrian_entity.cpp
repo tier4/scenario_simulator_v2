@@ -259,12 +259,10 @@ auto PedestrianEntity::onUpdate(const double current_time, const double step_tim
     if (pose::isAtEndOfLanelets(canonicalized_lanelet_pose.value(), hdmap_utils_ptr_)) {
       stopAtCurrentPosition();
       updateStandStillDuration(step_time);
-      // updateTraveledDistance(step_time);
       return;
     }
   }
   updateStandStillDuration(step_time);
-  // updateTraveledDistance(step_time);
 
   EntityBase::onPostUpdate(current_time, step_time);
 }
