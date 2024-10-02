@@ -26,13 +26,12 @@ MiscObjectEntity::MiscObjectEntity(
 {
 }
 
-auto MiscObjectEntity::onUpdate(const double /*current_time*/, const double step_time) -> void
+auto MiscObjectEntity::onUpdate(const double /*current_time*/, const double ) -> void
 {
   setTwist(geometry_msgs::msg::Twist());
   setAcceleration(geometry_msgs::msg::Accel());
   setLinearJerk(0.0);
   setAction("static");
-  updateStandStillDuration(step_time);
   status_before_update_.set(*status_);
 }
 

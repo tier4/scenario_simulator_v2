@@ -165,7 +165,6 @@ void EgoEntity::onUpdate(double current_time, double step_time)
     updateEntityStatusTimestamp(current_time + step_time);
   }
 
-  updateStandStillDuration(step_time);
   updateTraveledDistance(step_time);
   updateFieldOperatorApplication();
 
