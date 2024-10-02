@@ -3,7 +3,7 @@
 
 <package format="3">
   <name>openscenario_preprocessor</name>
-  <version>4.3.7</version>
+  <version>4.3.8</version>
   <description>Example package for TIER IV OpenSCENARIO Interpreter</description>
   <maintainer email="kotaro.yoshimoto@tier4.jp">Kotaro Yoshimoto</maintainer>
   <license>Apache License 2.0</license>

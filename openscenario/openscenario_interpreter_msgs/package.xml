@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>openscenario_interpreter_msgs</name>
-  <version>4.3.7</version>
+  <version>4.3.8</version>
   <description>ROS message types for package openscenario_interpreter</description>
   <maintainer email="tatsuya.yamasaki@tier4.jp">Yamasaki Tatsuya</maintainer>
   <license>Apache License 2.0</license>
