@@ -107,7 +107,7 @@ jobs:
       - name: Upload Lcov result
         uses: actions/upload-artifact@v4
         with:
-          name: lcov
+          name: lcov-${{ matrix.cmake_build_type }}
           path: lcov
           retention-days: 1
 
