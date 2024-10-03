@@ -246,6 +246,10 @@ public:
     const std::string & name, const geometry_msgs::msg::PoseWithCovarianceStamped & new_pose,
     const geometry_msgs::msg::PoseStamped & goal_pose) -> void;
 
+  auto attachImuSensor(
+    const std::string &, const simulation_api_schema::ImuSensorConfiguration & configuration)
+    -> bool;
+
   bool attachPseudoTrafficLightDetector(
     const simulation_api_schema::PseudoTrafficLightDetectorConfiguration &);
 
