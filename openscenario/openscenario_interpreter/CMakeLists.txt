@@ -29,6 +29,10 @@ FetchContent_GetProperties(boost_json)
 set(BOOST_JSON_STANDALONE ON)
 set(BOOST_JSON_BUILD_TESTS OFF)
 set(BOOST_JSON_BUILD_EXAMPLES OFF)
+set(BOOST_JSON_BUILD_FUZZERS OFF)
+set(BOOST_JSON_BUILD_BENCHMARKS OFF)
+
+add_compile_definitions(BOOST_JSON_STACK_BUFFER_SIZE=16384)
 
 if(NOT boost_json_POPULATED)
   FetchContent_Populate(boost_json)
@@ -54,6 +58,8 @@ ament_auto_add_library(${PROJECT_NAME} SHARED
 
 target_link_libraries(${PROJECT_NAME} Boost::filesystem glog pugixml)
 target_include_directories(${PROJECT_NAME} PUBLIC ${boost_json_SOURCE_DIR}/include)
+
+ament_export_include_directories(${boost_json_SOURCE_DIR}/include)
 
 # ------------------------------------------------------------------------------
 # openscenario_interpreter_node
