@@ -32,6 +32,14 @@ Changelog for package openscenario_interpreter
 * add publish_empty_context parameter
 * Contributors: Masaya Kataoka
 
+4.3.9 (2024-10-03)
+------------------
+* Merge pull request `#1405 <https://github.com/tier4/scenario_simulator_v2/issues/1405>`_ from tier4/test/cmake_flag_with_debug_and_relwithdebinfo
+  Test for cmake RelWithDebInfo build type
+* Merge branch 'master' into test/cmake_flag_with_debug_and_relwithdebinfo
+* fix: fix build errors in debug mode in RelativeClearanceCondition
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka
+
 4.3.8 (2024-10-02)
 ------------------
 * Merge branch 'master' into 1377/isInLanelet
