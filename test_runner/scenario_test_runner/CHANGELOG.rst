@@ -35,6 +35,9 @@ Changelog for package scenario_test_runner
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+4.3.10 (2024-10-03)
+-------------------
+
 4.3.9 (2024-10-03)
 ------------------
 * Merge branch 'master' into test/cmake_flag_with_debug_and_relwithdebinfo
