@@ -21,6 +21,20 @@ Changelog for package openscenario_msgs
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+4.3.10 (2024-10-03)
+-------------------
+
+4.3.9 (2024-10-03)
+------------------
+* Merge branch 'master' into test/cmake_flag_with_debug_and_relwithdebinfo
+* Contributors: Masaya Kataoka
+
+4.3.8 (2024-10-02)
+------------------
+* Merge branch 'master' into 1377/isInLanelet
+* Merge branch 'master' into 1377/isInLanelet
+* Contributors: Grzegorz Maj, Masaya Kataoka
+
 4.3.7 (2024-09-27)
 ------------------
 * Merge branch 'master' into feature/sonar_cloud
