@@ -178,6 +178,10 @@ public:
   }
 
   // sensors - attach
+  auto attachImuSensor(
+    const std::string &, const simulation_api_schema::ImuSensorConfiguration & configuration)
+    -> bool;
+
   auto attachPseudoTrafficLightDetector(
     const simulation_api_schema::PseudoTrafficLightDetectorConfiguration &) -> bool;
 

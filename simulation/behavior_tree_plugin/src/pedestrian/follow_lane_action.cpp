@@ -38,21 +38,16 @@ BT::NodeStatus FollowLaneAction::tick()
     request != traffic_simulator::behavior::Request::FOLLOW_LANE) {
     return BT::NodeStatus::FAILURE;
   }
-  if (!entity_status->isInLanelet()) {
+  if (!canonicalized_entity_status->isInLanelet()) {
     stopEntity();
-    setOutput(
-      "non_canonicalized_updated_status",
-      std::make_shared<traffic_simulator::EntityStatus>(
-        static_cast<traffic_simulator::EntityStatus>(*entity_status)));
     return BT::NodeStatus::RUNNING;
   }
-  auto following_lanelets = hdmap_utils->getFollowingLanelets(entity_status->getLaneletId());
+  auto following_lanelets =
+    hdmap_utils->getFollowingLanelets(canonicalized_entity_status->getLaneletId());
   if (!target_speed) {
     target_speed = hdmap_utils->getSpeedLimit(following_lanelets);
   }
-  setOutput(
-    "non_canonicalized_updated_status", std::make_shared<traffic_simulator::EntityStatus>(
-                                          calculateUpdatedEntityStatus(target_speed.value())));
+  setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(target_speed.value()));
   return BT::NodeStatus::RUNNING;
 }
 }  // namespace pedestrian

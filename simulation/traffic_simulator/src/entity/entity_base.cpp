@@ -35,8 +35,8 @@ EntityBase::EntityBase(
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
 : name(name),
   verbose(true),
-  status_(entity_status),
-  status_before_update_(status_),
+  status_(std::make_shared<CanonicalizedEntityStatus>(entity_status)),
+  status_before_update_(*status_),
   hdmap_utils_ptr_(hdmap_utils_ptr)
 {
   if (name != static_cast<EntityStatus>(entity_status).name) {
@@ -59,7 +59,7 @@ auto EntityBase::get2DPolygon() const -> std::vector<geometry_msgs::msg::Point>
 
 auto EntityBase::getCanonicalizedLaneletPose() const -> std::optional<CanonicalizedLaneletPose>
 {
-  return status_.getCanonicalizedLaneletPose();
+  return status_->getCanonicalizedLaneletPose();
 }
 
 auto EntityBase::getCanonicalizedLaneletPose(double matching_distance) const
@@ -72,7 +72,7 @@ auto EntityBase::getCanonicalizedLaneletPose(double matching_distance) const
 
   // prefer the current lanelet
   return pose::toCanonicalizedLaneletPose(
-    status_.getMapPose(), status_.getBoundingBox(), status_.getLaneletIds(), include_crosswalk,
+    status_->getMapPose(), status_->getBoundingBox(), status_->getLaneletIds(), include_crosswalk,
     matching_distance, hdmap_utils_ptr_);
 }
 
@@ -126,7 +126,7 @@ auto EntityBase::onUpdate(const double /*current_time*/, const double step_time)
 {
   job_list_.update(step_time, job::Event::PRE_UPDATE);
   step_time_ = step_time;
-  status_before_update_.set(status_);
+  status_before_update_.set(*status_);
   speed_planner_ =
     std::make_unique<traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner>(
       step_time, name);
@@ -173,7 +173,7 @@ void EntityBase::requestLaneChange(
         "Source entity does not assigned to lanelet. Please check source entity name : ", name,
         " exists on lane.");
     }
-    reference_lanelet_id = status_.getLaneletId();
+    reference_lanelet_id = status_->getLaneletId();
   } else {
     if (other_status_.find(target.entity_name) == other_status_.end()) {
       THROW_SEMANTIC_ERROR(
@@ -249,13 +249,6 @@ void EntityBase::requestSpeedChangeWithConstantAcceleration(
       break;
     }
   }
-}
-
-void EntityBase::requestClearRoute()
-{
-  THROW_SEMANTIC_ERROR(
-    "requestClearRoute is only supported for EgoEntity. The specified Entity is not an EgoEntity. "
-    "Please check the scenario carefully.");
 }
 
 void EntityBase::requestSpeedChangeWithTimeConstraint(
@@ -563,18 +556,18 @@ void EntityBase::setOtherStatus(
 
 auto EntityBase::setCanonicalizedStatus(const CanonicalizedEntityStatus & status) -> void
 {
-  status_.set(status);
+  status_->set(status);
 }
 
 auto EntityBase::setStatus(const EntityStatus & status, const lanelet::Ids & lanelet_ids) -> void
 {
-  status_.set(
+  status_->set(
     status, lanelet_ids, getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
 }
 
 auto EntityBase::setStatus(const EntityStatus & status) -> void
 {
-  status_.set(status, getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
+  status_->set(status, getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
 }
 
 auto EntityBase::setStatus(
@@ -634,12 +627,12 @@ auto EntityBase::setStatus(
 
 auto EntityBase::setLinearVelocity(const double linear_velocity) -> void
 {
-  status_.setLinearVelocity(linear_velocity);
+  status_->setLinearVelocity(linear_velocity);
 }
 
 auto EntityBase::setLinearAcceleration(const double linear_acceleration) -> void
 {
-  status_.setLinearAcceleration(linear_acceleration);
+  status_->setLinearAcceleration(linear_acceleration);
 }
 
 void EntityBase::setTrafficLights(
@@ -650,20 +643,20 @@ void EntityBase::setTrafficLights(
 
 auto EntityBase::setTwist(const geometry_msgs::msg::Twist & twist) -> void
 {
-  status_.setTwist(twist);
+  status_->setTwist(twist);
 }
 
 auto EntityBase::setAcceleration(const geometry_msgs::msg::Accel & accel) -> void
 {
-  status_.setAccel(accel);
+  status_->setAccel(accel);
 }
 
 auto EntityBase::setLinearJerk(const double linear_jerk) -> void
 {
-  status_.setLinearJerk(linear_jerk);
+  status_->setLinearJerk(linear_jerk);
 }
 
-auto EntityBase::setAction(const std::string & action) -> void { status_.setAction(action); }
+auto EntityBase::setAction(const std::string & action) -> void { status_->setAction(action); }
 
 auto EntityBase::setMapPose(const geometry_msgs::msg::Pose &) -> void
 {
@@ -715,14 +708,14 @@ void EntityBase::activateOutOfRangeJob(
 
 void EntityBase::stopAtCurrentPosition()
 {
-  status_.setTwist(geometry_msgs::msg::Twist());
-  status_.setAccel(geometry_msgs::msg::Accel());
-  status_.setLinearJerk(0.0);
+  status_->setTwist(geometry_msgs::msg::Twist());
+  status_->setAccel(geometry_msgs::msg::Accel());
+  status_->setLinearJerk(0.0);
 }
 
 void EntityBase::updateEntityStatusTimestamp(const double current_time)
 {
-  status_.setTime(current_time);
+  status_->setTime(current_time);
 }
 
 auto EntityBase::updateStandStillDuration(const double step_time) -> double

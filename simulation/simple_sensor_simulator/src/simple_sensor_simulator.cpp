@@ -38,6 +38,7 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
     [this](auto &&... xs) { return spawnMiscObjectEntity(std::forward<decltype(xs)>(xs)...); },
     [this](auto &&... xs) { return despawnEntity(std::forward<decltype(xs)>(xs)...); },
     [this](auto &&... xs) { return updateEntityStatus(std::forward<decltype(xs)>(xs)...); },
+    [this](auto &&... xs) { return attachImuSensor(std::forward<decltype(xs)>(xs)...); },
     [this](auto &&... xs) { return attachLidarSensor(std::forward<decltype(xs)>(xs)...); },
     [this](auto &&... xs) { return attachDetectionSensor(std::forward<decltype(xs)>(xs)...); },
     [this](auto &&... xs) { return attachOccupancyGridSensor(std::forward<decltype(xs)>(xs)...); },
@@ -295,6 +296,15 @@ auto ScenarioSimulator::despawnEntity(const simulation_api_schema::DespawnEntity
   }
   auto res = simulation_api_schema::DespawnEntityResponse();
   res.mutable_result()->set_success(any_entity_was_removed);
+  return res;
+}
+
+auto ScenarioSimulator::attachImuSensor(const simulation_api_schema::AttachImuSensorRequest & req)
+  -> simulation_api_schema::AttachImuSensorResponse
+{
+  sensor_sim_.attachImuSensor(current_simulation_time_, req.configuration(), *this);
+  auto res = simulation_api_schema::AttachImuSensorResponse();
+  res.mutable_result()->set_success(true);
   return res;
 }
 
