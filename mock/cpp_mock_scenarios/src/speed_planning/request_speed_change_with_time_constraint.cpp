@@ -39,13 +39,13 @@ public:
 private:
   void onUpdate() override
   {
-    if (api_.getCurrentTime() <= 3.9 && api_.getCurrentTwist("ego").linear.x > 10.0) {
+    if (api_.getCurrentTime() <= 3.9 && api_.getEntity("ego")->getCurrentTwist().linear.x > 10.0) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     if (api_.getCurrentTime() >= 3.999) {
       if (
-        api_.getCurrentTwist("ego").linear.x <= 10.0 &&
-        api_.getCurrentTwist("ego").linear.x >= 9.9) {
+        api_.getEntity("ego")->getCurrentTwist().linear.x <= 10.0 &&
+        api_.getEntity("ego")->getCurrentTwist().linear.x >= 9.9) {
         stop(cpp_mock_scenarios::Result::SUCCESS);
       } else {
         stop(cpp_mock_scenarios::Result::FAILURE);
@@ -60,9 +60,10 @@ private:
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
         34741, 0.0, 0.0, api_.getHdmapUtils()),
       getVehicleParameters());
-    api_.setLinearVelocity("ego", 0);
-    api_.requestSpeedChange(
-      "ego", 10.0, traffic_simulator::speed_change::Transition::AUTO,
+    auto ego_entity = api_.getEntity("ego");
+    ego_entity->setLinearVelocity(0);
+    ego_entity->requestSpeedChange(
+      10.0, traffic_simulator::speed_change::Transition::AUTO,
       traffic_simulator::speed_change::Constraint(
         traffic_simulator::speed_change::Constraint::Type::TIME, 4.0),
       false);
@@ -72,9 +73,10 @@ private:
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
         34741, 10.0, 0.0, api_.getHdmapUtils()),
       getVehicleParameters());
-    api_.setLinearVelocity("front", 10);
-    api_.requestSpeedChange(
-      "front", 10.0, traffic_simulator::speed_change::Transition::LINEAR,
+    auto front_entity = api_.getEntity("front");
+    front_entity->setLinearVelocity(10);
+    front_entity->requestSpeedChange(
+      10.0, traffic_simulator::speed_change::Transition::LINEAR,
       traffic_simulator::speed_change::Constraint(
         traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 4.0),
       true);

@@ -39,15 +39,15 @@ public:
 private:
   void onUpdate() override
   {
-    if (api_.getCurrentTwist("front").linear.x < 10.0) {
+    if (api_.getEntity("front")->getCurrentTwist().linear.x < 10.0) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
-    if (api_.getCurrentTime() <= 0.9 && api_.getCurrentTwist("ego").linear.x > 10.0) {
+    if (api_.getCurrentTime() <= 0.9 && api_.getEntity("ego")->getCurrentTwist().linear.x > 10.0) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     if (
-      api_.getCurrentTime() >= 1.0 && api_.getCurrentTwist("ego").linear.x <= 10.0 &&
-      api_.getCurrentTwist("ego").linear.x >= 9.9) {
+      api_.getCurrentTime() >= 1.0 && api_.getEntity("ego")->getCurrentTwist().linear.x <= 10.0 &&
+      api_.getEntity("ego")->getCurrentTwist().linear.x >= 9.9) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
   }
@@ -59,9 +59,10 @@ private:
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
         34741, 0.0, 0.0, api_.getHdmapUtils()),
       getVehicleParameters());
-    api_.setLinearVelocity("ego", 0);
-    api_.requestSpeedChange(
-      "ego", 10.0, traffic_simulator::speed_change::Transition::LINEAR,
+    auto ego_entity = api_.getEntity("ego");
+    ego_entity->setLinearVelocity(0);
+    ego_entity->requestSpeedChange(
+      10.0, traffic_simulator::speed_change::Transition::LINEAR,
       traffic_simulator::speed_change::Constraint(
         traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 10.0),
       true);
@@ -71,9 +72,10 @@ private:
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
         34741, 10.0, 0.0, api_.getHdmapUtils()),
       getVehicleParameters());
-    api_.setLinearVelocity("front", 0);
-    api_.requestSpeedChange(
-      "front", 10.0, traffic_simulator::speed_change::Transition::STEP,
+    auto front_entity = api_.getEntity("front");
+    front_entity->setLinearVelocity(0);
+    front_entity->requestSpeedChange(
+      10.0, traffic_simulator::speed_change::Transition::STEP,
       traffic_simulator::speed_change::Constraint(
         traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 10.0),
       true);
