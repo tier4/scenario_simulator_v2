@@ -57,6 +57,8 @@ struct Condition : public ComplexType, private SimulatorCore::ConditionEvaluatio
 
   bool current_value;
 
+  std::string type_name;
+
 private:
   struct History
   {

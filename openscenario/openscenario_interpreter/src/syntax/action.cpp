@@ -30,6 +30,7 @@ Action::Action(const pugi::xml_node & node, Scope & scope)
       std::make_pair(    "PrivateAction", [this](auto && node) { return make<    PrivateAction>(node, local()); })))
 // clang-format on
 {
+  type_name = apply<std::string>([](auto && action) { return makeTypename(action.type()); }, *this);
 }
 
 auto Action::accomplished() const -> bool { return ComplexType::accomplished(); }
@@ -64,8 +65,7 @@ auto operator<<(boost::json::object & json, const Action & datum) -> boost::json
 
   json["currentState"] = boost::lexical_cast<std::string>(datum.state());
 
-  json["type"] =
-    apply<std::string>([](auto && action) { return makeTypename(action.type()); }, datum);
+  json["type"] = datum.type_name;
 
   return json;
 }

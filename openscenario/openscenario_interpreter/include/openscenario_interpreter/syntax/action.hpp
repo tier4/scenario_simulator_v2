@@ -42,6 +42,8 @@ struct Action : public Scope, public ComplexType, public StoryboardElement
 {
   bool overridden = false;
 
+  std::string type_name;
+
   explicit Action(const pugi::xml_node &, Scope &);
 
   using StoryboardElement::evaluate;

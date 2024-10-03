@@ -43,6 +43,17 @@ Condition::Condition(const pugi::xml_node & node, Scope & scope)
   current_value(false)
 // clang-format on
 {
+  // clang-format off
+  static const std::unordered_map<
+    std::type_index,
+    std::function<std::string(const Condition &)>> table
+  {
+    { typeid(ByEntityCondition), [&](const Condition & condition) { return makeTypename(condition.as<ByEntityCondition>().type()); } },
+    { typeid( ByValueCondition), [&](const Condition & condition) { return makeTypename(condition.as< ByValueCondition>().type()); } },
+  };
+  // clang-format on
+
+  type_name = table.at(type())(*this);
 }
 
 auto Condition::evaluate() -> Object
@@ -76,17 +87,7 @@ auto operator<<(boost::json::object & json, const Condition & datum) -> boost::j
 
   json["name"] = datum.name;
 
-  // clang-format off
-  static const std::unordered_map<
-    std::type_index,
-    std::function<std::string(const Condition &)>> table
-  {
-    { typeid(ByEntityCondition), [&](const Condition & condition) { return makeTypename(condition.as<ByEntityCondition>().type()); } },
-    { typeid( ByValueCondition), [&](const Condition & condition) { return makeTypename(condition.as< ByValueCondition>().type()); } },
-  };
-  // clang-format on
-
-  json["type"] = table.at(datum.type())(datum);
+  json["type"] = datum.type_name;
 
   return json;
 }

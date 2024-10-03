@@ -65,7 +65,7 @@ auto Trigger::activeConditionGroupDescription() const
 
 auto operator<<(boost::json::object & json, const Trigger & datum) -> boost::json::object &
 {
-  json["currentValue"] = boost::lexical_cast<std::string>(Boolean(datum.current_value));
+  json.emplace("currentValue", boost::lexical_cast<std::string>(Boolean(datum.current_value)));
 
   auto & condition_groups = json["ConditionGroup"].emplace_array();
 

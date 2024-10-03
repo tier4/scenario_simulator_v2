@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#define FMT_HEADER_ONLY
+
+#include <fmt/format.h>
+
 #include <iomanip>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/syntax/simulation_time_condition.hpp>
@@ -24,16 +28,16 @@ SimulationTimeCondition::SimulationTimeCondition(const pugi::xml_node & node, Sc
 : value(readAttribute<Double>("value", node, scope)),
   compare(readAttribute<Rule>("rule", node, scope))
 {
+  std::stringstream os;
+  os << "is " << compare << " " << value << "?";
+  description_condition_part = os.str();
 }
 
 auto SimulationTimeCondition::description() const -> String
 {
-  std::stringstream description;
-
-  description << "Is the simulation time (= " << std::fixed << std::setprecision(6) << result
-              << ") is " << compare << " " << value << "?";
-
-  return description.str();
+  return fmt::format(
+    "Is the simulation time (= {:.30f}) {}", static_cast<double>(result),
+    description_condition_part);
 }
 
 auto SimulationTimeCondition::evaluate() -> Object

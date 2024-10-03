@@ -43,6 +43,8 @@ struct SimulationTimeCondition : private SimulatorCore::ConditionEvaluation
 
   Double result;
 
+  std::string description_condition_part;
+
   auto description() const -> String;
 
   auto evaluate() -> Object;

@@ -286,6 +286,7 @@ auto Interpreter::on_shutdown(const rclcpp_lifecycle::State &) -> Result
 auto Interpreter::publishCurrentContext() const -> void
 {
   auto start = std::chrono::steady_clock::now();
+  static size_t string_size = 0;
   Context context;
   {
     boost::json::monotonic_resource mr;
@@ -294,7 +295,15 @@ auto Interpreter::publishCurrentContext() const -> void
     if (publish_empty_context) {
       context.data = "";
     } else {
-      context.data = boost::json::serialize(json << *script);
+      json << *script;
+
+      std::ostringstream os(context.data);
+
+      os << json;
+      context.data = os.str();
+
+      string_size = context.data.size();
+
       auto end = std::chrono::steady_clock::now();
       RCLCPP_INFO_STREAM(
         get_logger(),
