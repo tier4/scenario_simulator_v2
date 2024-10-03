@@ -285,6 +285,7 @@ auto Interpreter::on_shutdown(const rclcpp_lifecycle::State &) -> Result
 
 auto Interpreter::publishCurrentContext() const -> void
 {
+  auto start = std::chrono::steady_clock::now();
   Context context;
   {
     boost::json::monotonic_resource mr;
@@ -294,11 +295,21 @@ auto Interpreter::publishCurrentContext() const -> void
       context.data = "";
     } else {
       context.data = boost::json::serialize(json << *script);
-          }
+      auto end = std::chrono::steady_clock::now();
+      RCLCPP_INFO_STREAM(
+        get_logger(),
+        "JSON serialization took "
+          << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() << " us");
+    }
     context.time = evaluateSimulationTime();
   }
 
   publisher_of_context->publish(context);
+  auto end = std::chrono::steady_clock::now();
+  RCLCPP_INFO_STREAM(
+    get_logger(), "publishCurrentContext serialization took "
+                    << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count()
+                    << " us");
 }
 
 auto Interpreter::reset() -> void
