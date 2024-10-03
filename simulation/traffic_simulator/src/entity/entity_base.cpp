@@ -47,9 +47,9 @@ EntityBase::EntityBase(
   }
 
   job_list_.append(
-    [this](double delta_time) {
+    [this](double) {
       if (std::abs(getCurrentTwist().linear.x) <= std::numeric_limits<double>::epsilon()) {
-        stand_still_duration_ += delta_time;
+        stand_still_duration_ += step_time_;
       } else {
         stand_still_duration_ = 0.0;
       }
