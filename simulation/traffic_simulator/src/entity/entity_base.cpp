@@ -39,8 +39,8 @@ EntityBase::EntityBase(
   hdmap_utils_ptr_(hdmap_utils_ptr)
 {
   job_list_.append(
-    [this](double delta_time) {
-      traveled_distance_ += std::abs(getCurrentTwist().linear.x) * delta_time;
+    [this](double) {
+      traveled_distance_ += std::abs(getCurrentTwist().linear.x) * step_time_;
       return false;
     },
     [this]() {}, job::Type::TRAVELED_DISTANCE, true, job::Event::POST_UPDATE);
