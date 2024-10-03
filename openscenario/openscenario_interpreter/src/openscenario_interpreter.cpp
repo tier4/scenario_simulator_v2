@@ -16,7 +16,6 @@
 
 #include <algorithm>
 #include <boost/json.hpp>
-#include <boost/json/src.hpp>
 #include <openscenario_interpreter/openscenario_interpreter.hpp>
 #include <openscenario_interpreter/record.hpp>
 #include <openscenario_interpreter/syntax/object_controller.hpp>
