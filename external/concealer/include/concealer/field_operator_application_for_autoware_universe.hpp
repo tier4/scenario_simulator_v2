@@ -88,7 +88,7 @@ class FieldOperatorApplicationFor<AutowareUniverse>
 
   tier4_rtc_msgs::msg::CooperateStatusArray latest_cooperate_status_array;
 
-  std::string autoware_state;
+  char const * autoware_state;
 
   std::string minimum_risk_maneuver_state;
 
@@ -119,7 +119,7 @@ class FieldOperatorApplicationFor<AutowareUniverse>
 
 protected:
   template <typename T>
-  auto getAutowareStateString(std::uint8_t state) const -> std::string
+  auto getAutowareStateString(std::uint8_t state) const -> char const *
   {
 #define CASE(IDENTIFIER) \
   case T::IDENTIFIER:    \
