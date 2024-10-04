@@ -820,7 +820,7 @@ auto HdMapUtils::getPreviousLanelets(const lanelet::Id lanelet_id, const double 
 
 auto HdMapUtils::isInRoute(const lanelet::Id lanelet_id, const lanelet::Ids & route) const -> bool
 {
-  return std::find(route.cbegin(), route.cend(), lanelet_id) != route.end();
+  return std::find(route.cbegin(), route.cend(), lanelet_id) != route.cend();
 }
 
 auto HdMapUtils::getFollowingLanelets(
@@ -835,7 +835,7 @@ auto HdMapUtils::getFollowingLanelets(
 
   auto lanelet_it =
     std::find(candidate_lanelet_ids.cbegin(), candidate_lanelet_ids.cend(), lanelet_id);
-  if (lanelet_it == candidate_lanelet_ids.end()) {
+  if (lanelet_it == candidate_lanelet_ids.cend()) {
     THROW_SEMANTIC_ERROR("lanelet id does not match");
   }
 
@@ -846,9 +846,9 @@ auto HdMapUtils::getFollowingLanelets(
 
   lanelet::Id previous_id{lanelet_id};
   double total_distance = 0.0;
-  for (; lanelet_it != candidate_lanelet_ids.end(); ++lanelet_it) {
+  for (; lanelet_it != candidate_lanelet_ids.cend(); ++lanelet_it) {
     if (const auto next_ids = getNextLaneletIds(previous_id);
-        std::find(next_ids.cbegin(), next_ids.cend(), *lanelet_it) == next_ids.end()) {
+        std::find(next_ids.cbegin(), next_ids.cend(), *lanelet_it) == next_ids.cend()) {
       THROW_SEMANTIC_ERROR("lanelet id does not match");
     }
     ids.emplace_back(*lanelet_it);
