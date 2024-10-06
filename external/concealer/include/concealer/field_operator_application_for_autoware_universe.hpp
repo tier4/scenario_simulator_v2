@@ -88,7 +88,7 @@ class FieldOperatorApplicationFor<AutowareUniverse>
 
   tier4_rtc_msgs::msg::CooperateStatusArray latest_cooperate_status_array;
 
-  char const * autoware_state;
+  std::string autoware_state;
 
   std::string minimum_risk_maneuver_state;
 
