@@ -258,12 +258,9 @@ auto PedestrianEntity::onUpdate(const double current_time, const double step_tim
   if (const auto canonicalized_lanelet_pose = status_->getCanonicalizedLaneletPose()) {
     if (pose::isAtEndOfLanelets(canonicalized_lanelet_pose.value(), hdmap_utils_ptr_)) {
       stopAtCurrentPosition();
-      updateTraveledDistance(step_time);
       return;
     }
   }
-  updateTraveledDistance(step_time);
-
   EntityBase::onPostUpdate(current_time, step_time);
 }
 }  // namespace entity
