@@ -138,8 +138,8 @@ public:
     const lanelet::Id traffic_light_id) const -> std::optional<double>;
 
   auto getFollowingLanelets(
-    const lanelet::Id lanelet_id, const lanelet::Ids & candidate_route, const double distance = 100,
-    const bool include_self = true) const -> lanelet::Ids;
+    const lanelet::Id current_lanelet_id, const lanelet::Ids & route, const double horizont = 100,
+    const bool include_current_lanelet_id = true) const -> lanelet::Ids;
 
   auto getFollowingLanelets(
     const lanelet::Id, const double distance = 100, const bool include_self = true) const

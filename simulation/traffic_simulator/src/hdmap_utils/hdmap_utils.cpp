@@ -791,31 +791,27 @@ auto HdMapUtils::getLaneChangeableLaneletId(
   return target;
 }
 
-auto HdMapUtils::getPreviousLanelets(const lanelet::Id lanelet_id, const double distance) const
-  -> lanelet::Ids
+auto HdMapUtils::getPreviousLanelets(
+  const lanelet::Id current_lanelet_id, const double distance) const -> lanelet::Ids
 {
-  lanelet::Ids ret;
+  lanelet::Ids previous_lanelets_ids;
   double total_distance = 0.0;
-  lanelet::Id current_lanelet_id = lanelet_id;
-  ret.push_back(current_lanelet_id);
+  previous_lanelets_ids.push_back(current_lanelet_id);
   while (total_distance < distance) {
-    const auto ids = getPreviousLaneletIds(current_lanelet_id, "straight");
-    if (ids.size() != 0) {
-      current_lanelet_id = ids[0];
-      total_distance = total_distance + getLaneletLength(current_lanelet_id);
-      ret.push_back(current_lanelet_id);
+    const auto & reference_lanelet_id = previous_lanelets_ids.back();
+    if (const auto straight_lanelet_ids = getPreviousLaneletIds(reference_lanelet_id, "straight");
+        not straight_lanelet_ids.empty()) {
+      total_distance = total_distance + getLaneletLength(straight_lanelet_ids[0]);
+      previous_lanelets_ids.push_back(straight_lanelet_ids[0]);
+    } else if (auto non_straight_lanelet_ids = getPreviousLaneletIds(reference_lanelet_id);
+               not non_straight_lanelet_ids.empty()) {
+      total_distance = total_distance + getLaneletLength(non_straight_lanelet_ids[0]);
+      previous_lanelets_ids.push_back(non_straight_lanelet_ids[0]);
     } else {
-      const auto else_ids = getPreviousLaneletIds(current_lanelet_id);
-      if (else_ids.size() != 0) {
-        current_lanelet_id = else_ids[0];
-        total_distance = total_distance + getLaneletLength(current_lanelet_id);
-        ret.push_back(current_lanelet_id);
-      } else {
-        break;
-      }
+      break;
     }
   }
-  return ret;
+  return previous_lanelets_ids;
 }
 
 auto HdMapUtils::isInRoute(const lanelet::Id lanelet_id, const lanelet::Ids & route) const -> bool
@@ -824,41 +820,40 @@ auto HdMapUtils::isInRoute(const lanelet::Id lanelet_id, const lanelet::Ids & ro
 }
 
 auto HdMapUtils::getFollowingLanelets(
-  const lanelet::Id lanelet_id, const lanelet::Ids & candidate_route, const double distance,
-  const bool include_self) const -> lanelet::Ids
+  const lanelet::Id current_lanelet_id, const lanelet::Ids & route, const double horizont,
+  const bool include_current_lanelet_id) const -> lanelet::Ids
 {
-  lanelet::Ids ids;
-
-  if (candidate_route.empty()) {
-    return ids;
-  }
-
-  auto lanelet_it = std::find(candidate_route.cbegin(), candidate_route.cend(), lanelet_id);
-  if (lanelet_it == candidate_route.cend()) {
-    THROW_SEMANTIC_ERROR("lanelet id does not match");
-  }
-
-  if (include_self) {
-    ids.emplace_back(*lanelet_it);
-    ++lanelet_it;
-  }
-
-  lanelet::Id previous_id{lanelet_id};
-  double total_distance = 0.0;
-  for (; lanelet_it != candidate_route.cend(); ++lanelet_it) {
-    if (const auto next_ids = getNextLaneletIds(previous_id);
-        std::find(next_ids.cbegin(), next_ids.cend(), *lanelet_it) == next_ids.cend()) {
+  lanelet::Ids following_lanelets_ids;
+  if (not route.empty()) {
+    double total_distance = 0.0;
+    for (const auto & candidate_lanelet_id : route) {
+      if (not following_lanelets_ids.empty()) {
+        if (const auto next_ids = getNextLaneletIds(following_lanelets_ids.back());
+            std::find(next_ids.cbegin(), next_ids.cend(), candidate_lanelet_id) ==
+            next_ids.cend()) {
+          THROW_SEMANTIC_ERROR("lanelet id does not match");
+        }
+        following_lanelets_ids.push_back(candidate_lanelet_id);
+        total_distance += getLaneletLength(candidate_lanelet_id);
+        if (total_distance > horizont) {
+          break;
+        }
+      } else if (candidate_lanelet_id == current_lanelet_id) {
+        if (include_current_lanelet_id) {
+          following_lanelets_ids.push_back(candidate_lanelet_id);
+        }
+      }
+    }
+    if (following_lanelets_ids.empty()) {
       THROW_SEMANTIC_ERROR("lanelet id does not match");
-    }
-    ids.emplace_back(*lanelet_it);
-    previous_id = *lanelet_it;
-    total_distance += getLaneletLength(*lanelet_it);
-    if (total_distance > distance) {
-      return ids;
+    } else if (total_distance < horizont) {
+      const auto remaining_lanelets =
+        getFollowingLanelets(route.back(), horizont - total_distance, false);
+      following_lanelets_ids.insert(
+        following_lanelets_ids.end(), remaining_lanelets.begin(), remaining_lanelets.end());
     }
   }
-  return ids + getFollowingLanelets(
-                 candidate_route[candidate_route.size() - 1], distance - total_distance, false);
+  return following_lanelets_ids;
 }
 
 auto HdMapUtils::getFollowingLanelets(
