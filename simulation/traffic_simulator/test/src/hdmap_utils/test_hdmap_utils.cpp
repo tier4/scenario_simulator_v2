@@ -2073,6 +2073,9 @@ TEST_F(HdMapUtilsTest_KashiwanohaMap, getLongitudinalDistance_PullRequest1348)
 
 /**
  * @note Test for the corner case described in https://github.com/tier4/scenario_simulator_v2/issues/1364
+ * Test in a scenario where lane change is necessary:
+ * if allow_lane_change = false, std::nullopt should be returned;
+ * if allow_lane_change = true, a value should be returned.
  */
 TEST_F(HdMapUtilsTest_IntersectionMap, getLongitudinalDistance_laneChange)
 {
