@@ -823,16 +823,16 @@ auto HdMapUtils::getFollowingLanelets(
   const lanelet::Id current_lanelet_id, const lanelet::Ids & route, const double horizon,
   const bool include_current_lanelet_id) const -> lanelet::Ids
 {
+  const auto is_following_lanelet =
+    [this](const auto & current_lanelet_id, const auto & candidate_lanelet_id) {
+      const auto next_ids = getNextLaneletIds(current_lanelet_id);
+      return std::find(next_ids.cbegin(), next_ids.cend(), candidate_lanelet_id) != next_ids.cend();
+    };
+
   lanelet::Ids following_lanelets_ids;
   if (not route.empty()) {
     double total_distance = 0.0;
     bool found_starting_lanelet = false;
-    const auto is_following_lanelet = [this](
-                                        const auto & current_lanelet_id,
-                                        const auto & candidate_lanelet_id) {
-      const auto next_ids = getNextLaneletIds(current_lanelet_id);
-      return std::find(next_ids.cbegin(), next_ids.cend(), candidate_lanelet_id) != next_ids.cend();
-    };
 
     for (const auto & candidate_lanelet_id : route) {
       if (found_starting_lanelet) {
