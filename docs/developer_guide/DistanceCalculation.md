@@ -32,7 +32,7 @@ For cases without any lane change it is enough to sum up every lanelets' length 
 #### With lane change
 For routes that include lane changes we do the exact same thing, except for the lanelet just before the lane change (lanelet including L3 segment):
 - its length is not added, because this part would be counted twice,
-- we calculate and add L3 (explained below).
+- we calculate and add L3 (explained in `Calculation of the lane_change distance`).
 
 #### Pseudocode
 ```
@@ -41,7 +41,7 @@ discard last element in route
 distance = 0
 for_each lanelet_id in route:
   if lanelet_id is a lanelet just before the lane change:
-    calculate lane_change distance
+    calculate lane_change distance 
     distance += lane_change distance
   else:
     distance += lanelet_id length
@@ -64,11 +64,18 @@ How lane change distance is calculated:
 if `Next_start` can be matched to the current lanelet:
   distance += distance from the `'start'` of the current lanelet to the matching position
 elif `Current_start` can be matched to the next lanelet:
-  distance += distance from the `'start'` of the next lanelet to the matching position
+  distance -= distance from the `'start'` of the next lanelet to the matching position
 if `Next_mid` can be matched to the current lanelet:
   distance += distance from the `'mid'` of the current lanelet to the matching position
 elif `Current_mid` can be matched to the next lanelet:
-  distance += distance from the `'mid'` of the next lanelet to the matching position
+  distance -= distance from the `'mid'` of the next lanelet to the matching position
 else:
   distance is undefined  
 ```
+
+#### Matching a position to a lanelet
+![](../image/lanelet_matching.png)
+1. From a position (which includes an oritentation) a horizontal bar is defined.
+2. Then target lanelet's centerline is checked for a collision with the horizontal bar.
+3. The collision point is defined as the matching position
+
