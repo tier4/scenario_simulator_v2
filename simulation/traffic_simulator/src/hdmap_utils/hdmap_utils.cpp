@@ -792,12 +792,12 @@ auto HdMapUtils::getLaneChangeableLaneletId(
 }
 
 auto HdMapUtils::getPreviousLanelets(
-  const lanelet::Id current_lanelet_id, const double distance) const -> lanelet::Ids
+  const lanelet::Id current_lanelet_id, const double backward_horizon) const -> lanelet::Ids
 {
   lanelet::Ids previous_lanelets_ids;
   double total_distance = 0.0;
   previous_lanelets_ids.push_back(current_lanelet_id);
-  while (total_distance < distance) {
+  while (total_distance < backward_horizon) {
     const auto & reference_lanelet_id = previous_lanelets_ids.back();
     if (const auto straight_lanelet_ids = getPreviousLaneletIds(reference_lanelet_id, "straight");
         not straight_lanelet_ids.empty()) {
@@ -820,25 +820,30 @@ auto HdMapUtils::isInRoute(const lanelet::Id lanelet_id, const lanelet::Ids & ro
 }
 
 auto HdMapUtils::getFollowingLanelets(
-  const lanelet::Id current_lanelet_id, const lanelet::Ids & route, const double horizont,
+  const lanelet::Id current_lanelet_id, const lanelet::Ids & route, const double horizon,
   const bool include_current_lanelet_id) const -> lanelet::Ids
 {
   lanelet::Ids following_lanelets_ids;
   if (not route.empty()) {
     double total_distance = 0.0;
+    bool found_starting_lanelet{false};
     for (const auto & candidate_lanelet_id : route) {
-      if (not following_lanelets_ids.empty()) {
-        if (const auto next_ids = getNextLaneletIds(following_lanelets_ids.back());
+      if (found_starting_lanelet) {
+        const auto previous_lanelet =
+          following_lanelets_ids.empty() ? current_lanelet_id : following_lanelets_ids.back();
+        if (const auto next_ids = getNextLaneletIds(previous_lanelet);
             std::find(next_ids.cbegin(), next_ids.cend(), candidate_lanelet_id) ==
             next_ids.cend()) {
-          THROW_SEMANTIC_ERROR("lanelet id does not match");
+          THROW_SEMANTIC_ERROR(
+            candidate_lanelet_id + " is not the follower of lanelet " + previous_lanelet);
         }
         following_lanelets_ids.push_back(candidate_lanelet_id);
         total_distance += getLaneletLength(candidate_lanelet_id);
-        if (total_distance > horizont) {
+        if (total_distance > horizon) {
           break;
         }
       } else if (candidate_lanelet_id == current_lanelet_id) {
+        found_starting_lanelet = true;
         if (include_current_lanelet_id) {
           following_lanelets_ids.push_back(candidate_lanelet_id);
         }
@@ -846,9 +851,9 @@ auto HdMapUtils::getFollowingLanelets(
     }
     if (following_lanelets_ids.empty()) {
       THROW_SEMANTIC_ERROR("lanelet id does not match");
-    } else if (total_distance < horizont) {
+    } else if (total_distance <= horizon) {
       const auto remaining_lanelets =
-        getFollowingLanelets(route.back(), horizont - total_distance, false);
+        getFollowingLanelets(route.back(), horizon - total_distance, false);
       following_lanelets_ids.insert(
         following_lanelets_ids.end(), remaining_lanelets.begin(), remaining_lanelets.end());
     }

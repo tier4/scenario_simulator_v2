@@ -1599,6 +1599,19 @@ TEST_F(HdMapUtilsTest_StandardMap, getFollowingLanelets_candidateTrajectory)
 
 /**
  * @note Test basic functionality.
+ * Test following lanelets obtaining
+ * with a candidate trajectory longer than the given distance without starting lanelet.
+ */
+TEST_F(HdMapUtilsTest_StandardMap, getFollowingLanelets_candidateTrajectoryFalse)
+{
+  const lanelet::Id id = 34564;
+  EXPECT_EQ(
+    hdmap_utils.getFollowingLanelets(id, lanelet::Ids{id, 34495, 34507, 34795, 34606}, 40.0, false),
+    (lanelet::Ids{34495, 34507}));
+}
+
+/**
+ * @note Test basic functionality.
  * Test following lanelets obtaining with
  * a candidate trajectory shorter than the given distance
  * - the goal is to test generating lacking part of the trajectory.
