@@ -826,14 +826,19 @@ auto HdMapUtils::getFollowingLanelets(
   lanelet::Ids following_lanelets_ids;
   if (not route.empty()) {
     double total_distance = 0.0;
-    bool found_starting_lanelet{false};
+    bool found_starting_lanelet = false;
+    const auto is_following_lanelet = [this](
+                                        const auto & current_lanelet_id,
+                                        const auto & candidate_lanelet_id) {
+      const auto next_ids = getNextLaneletIds(current_lanelet_id);
+      return std::find(next_ids.cbegin(), next_ids.cend(), candidate_lanelet_id) != next_ids.cend();
+    };
+
     for (const auto & candidate_lanelet_id : route) {
       if (found_starting_lanelet) {
         const auto previous_lanelet =
           following_lanelets_ids.empty() ? current_lanelet_id : following_lanelets_ids.back();
-        if (const auto next_ids = getNextLaneletIds(previous_lanelet);
-            std::find(next_ids.cbegin(), next_ids.cend(), candidate_lanelet_id) ==
-            next_ids.cend()) {
+        if (not is_following_lanelet(previous_lanelet, candidate_lanelet_id)) {
           THROW_SEMANTIC_ERROR(
             candidate_lanelet_id + " is not the follower of lanelet " + previous_lanelet);
         }
