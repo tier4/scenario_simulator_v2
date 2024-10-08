@@ -59,7 +59,7 @@ jobs:
       - name: Setup git credentials
         run: |
           git config --global credential.helper store
-          echo -e "protocol=https\nhost=github.com\nusername=Release Bot\npassword=$GITHUB_TOKEN" | git credential fill
+          echo -e "protocol=https\nhost=github.com\nusername=Release Bot\npassword=${{ secrets.BLOOM_GITHUB_TOKEN }}" | git credential approve
 
       - name: Copy branch to upstream
         if: github.event.pull_request.head.repo.full_name != github.repository
