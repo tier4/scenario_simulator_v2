@@ -75,7 +75,6 @@ else:
 
 #### Matching a position to a lanelet
 ![](../image/lanelet_matching.png)
-1. From a position (which includes an oritentation) a horizontal bar is defined.
+1. From a position (which includes an orientation) a horizontal bar is defined.
 2. Then target lanelet's centerline is checked for a collision with the horizontal bar.
 3. The collision point is defined as the matching position
-
