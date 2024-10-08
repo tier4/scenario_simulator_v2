@@ -26,13 +26,13 @@ The image below is a typical example of longitudinal distance measurement includ
 
 #### Without lane change
 For cases without any lane change it is enough to sum up every lanelets' length and then subtract:
-distance traveled on the first lanelet (start of the first lanelet to the red car),
-distance remaining on the last lanelet (blue car to the end of the last lanelet). This step is equvalent with discarding the last lanelet length and then adding distance traveled on the last lanelet (start of the last lanelet to the blue car),
+- distance traveled on the first lanelet (start of the first lanelet to the red car),
+- distance remaining on the last lanelet (blue car to the end of the last lanelet). This step is equvalent with discarding the last lanelet length and then adding distance traveled on the last lanelet (start of the last lanelet to the blue car),
 
 #### With lane change
 For routes that include lane changes we do the exact same thing, except for the lanelet just before the lane change (lanelet including L3 segment):
-its length is not added, because this part would be counted twice,
-we calculate and add L3 (explained below).
+- its length is not added, because this part would be counted twice,
+- we calculate and add L3 (explained below).
 
 #### Pseudocode
 ```
