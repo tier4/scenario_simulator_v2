@@ -140,7 +140,7 @@ void EntityBase::requestLaneChange(
   const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,
   const traffic_simulator::lane_change::Constraint & constraint)
 {
-  lanelet::Id reference_lanelet_id = 0UL;
+  lanelet::Id reference_lanelet_id = 0;
   if (target.entity_name == name) {
     if (not laneMatchingSucceed()) {
       THROW_SEMANTIC_ERROR(

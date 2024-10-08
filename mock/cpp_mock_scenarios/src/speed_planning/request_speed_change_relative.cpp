@@ -67,6 +67,7 @@ private:
         34741, 10.0, 0.0, api_.getHdmapUtils()),
       getVehicleParameters());
     api_.setLinearVelocity("front", 3);
+    api_.updateFrame();
     api_.requestSpeedChange(
       "front",
       traffic_simulator::speed_change::RelativeTargetSpeed(
