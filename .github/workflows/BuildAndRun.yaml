@@ -83,6 +83,7 @@ jobs:
       - name: Build with SonarCloud Build Wrapper
         run: |
           source /opt/ros/${{ matrix.rosdistro }}/setup.bash
+          build-wrapper-linux-x86-64 --out-dir src/scenario_simulator_v2/bw-output \
           colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=${{ matrix.cmake_build_type }} -DBUILD_CPP_MOCK_SCENARIOS=ON -DBUILD_TESTING=true -DCMAKE_CXX_FLAGS='-fprofile-arcs -ftest-coverage' -DCMAKE_C_FLAGS='-fprofile-arcs -ftest-coverage' --packages-up-to ${{ steps.list_packages.outputs.package_list }}
         shell: bash
 
@@ -117,15 +118,7 @@ jobs:
           ./src/scenario_simulator_v2/.github/workflows/workflow.sh ./src/scenario_simulator_v2/test_runner/scenario_test_runner/config/workflow.txt global_frame_rate:=20
         shell: bash
 
-      - name: Upload Lcov result
-        uses: actions/upload-artifact@v4
-        with:
-          name: lcov-${{ matrix.cmake_build_type }}
-          path: lcov
-          retention-days: 1
-
       - name: Run SonarCloud scan
-        uses: SonarSource/sonarcloud-github-action@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
