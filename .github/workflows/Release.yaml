@@ -46,13 +46,17 @@ jobs:
           ref: master
           fetch-depth: 0
           fetch-tags: true
+        
+      - name: Set up GITHUB_TOKEN
+        run: echo "GITHUB_TOKEN=${{ secrets.BLOOM_GITHUB_TOKEN }}" >> $GITHUB_ENV
 
       - name: Setup git
         run: |
           git config --global user.name  "Release Bot"
           git config --global user.email "action@github.com"
           git config --global --add safe.directory /__w/scenario_simulator_v2/scenario_simulator_v2
-          git config --global credential.helper ${{ secrets.BLOOM_GITHUB_TOKEN }}
+          git config --global credential.helper store
+          echo $GITHUB_TOKEN | git credential fill
           git config pull.rebase false
 
       - name: Copy branch to upstream
