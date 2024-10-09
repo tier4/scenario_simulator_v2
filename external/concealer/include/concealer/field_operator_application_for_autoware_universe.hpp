@@ -26,6 +26,7 @@
 #include <autoware_adapi_v1_msgs/srv/set_route_points.hpp>
 #include <autoware_control_msgs/msg/control.hpp>
 #include <autoware_perception_msgs/msg/traffic_signal_array.hpp>
+#include <autoware_system_msgs/msg/autoware_state.hpp>
 #include <autoware_vehicle_msgs/msg/gear_command.hpp>
 #include <concealer/autoware_universe.hpp>
 #include <concealer/field_operator_application.hpp>
@@ -42,7 +43,6 @@
 #include <tier4_rtc_msgs/msg/cooperate_status_array.hpp>
 #include <tier4_rtc_msgs/srv/auto_mode_with_module.hpp>
 #include <tier4_rtc_msgs/srv/cooperate_commands.hpp>
-#include <tier4_system_msgs/msg/autoware_state.hpp>
 
 namespace concealer
 {
@@ -54,8 +54,8 @@ class FieldOperatorApplicationFor<AutowareUniverse>
   friend class TransitionAssertion<FieldOperatorApplicationFor<AutowareUniverse>>;
 
   // clang-format off
-  SubscriberWrapper<autoware_control_msgs::msg::Control>     getCommand;
-  SubscriberWrapper<tier4_system_msgs::msg::AutowareState, ThreadSafety::safe>    getAutowareState;
+  SubscriberWrapper<autoware_control_msgs::msg::Control>                          getCommand;
+  SubscriberWrapper<autoware_system_msgs::msg::AutowareState, ThreadSafety::safe> getAutowareState;
   SubscriberWrapper<tier4_rtc_msgs::msg::CooperateStatusArray>                    getCooperateStatusArray;
   SubscriberWrapper<tier4_external_api_msgs::msg::Emergency>                      getEmergencyState;
 #if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)
@@ -63,7 +63,7 @@ class FieldOperatorApplicationFor<AutowareUniverse>
 #endif
   SubscriberWrapper<autoware_adapi_v1_msgs::msg::MrmState>                        getMrmState;
   SubscriberWrapper<tier4_planning_msgs::msg::Trajectory>                         getTrajectory;
-  SubscriberWrapper<autoware_vehicle_msgs::msg::TurnIndicatorsCommand>       getTurnIndicatorsCommandImpl;
+  SubscriberWrapper<autoware_vehicle_msgs::msg::TurnIndicatorsCommand>            getTurnIndicatorsCommandImpl;
 
   ServiceWithValidation<autoware_adapi_v1_msgs::srv::ClearRoute>                  requestClearRoute;
   ServiceWithValidation<tier4_rtc_msgs::srv::CooperateCommands>                   requestCooperateCommands;
@@ -78,6 +78,8 @@ class FieldOperatorApplicationFor<AutowareUniverse>
 
   tier4_rtc_msgs::msg::CooperateStatusArray latest_cooperate_status_array;
 
+  std::string autoware_state;
+
   std::string minimum_risk_maneuver_state;
 
   std::string minimum_risk_maneuver_behavior;
@@ -91,12 +93,8 @@ class FieldOperatorApplicationFor<AutowareUniverse>
      argument or template parameter. Otherwise, code using this class would
      need to have knowledge of the Autoware state type.
   */
-#define DEFINE_STATE_PREDICATE(NAME, VALUE)                  \
-  auto is##NAME() const noexcept                             \
-  {                                                          \
-    using tier4_system_msgs::msg::AutowareState;             \
-    return getAutowareState().state == AutowareState::VALUE; \
-  }                                                          \
+#define DEFINE_STATE_PREDICATE(NAME, VALUE)                           \
+  auto is##NAME() const noexcept { return autoware_state == #VALUE; } \
   static_assert(true, "")
 
   DEFINE_STATE_PREDICATE(Initializing, INITIALIZING_VEHICLE);
@@ -105,12 +103,33 @@ class FieldOperatorApplicationFor<AutowareUniverse>
   DEFINE_STATE_PREDICATE(WaitingForEngage, WAITING_FOR_ENGAGE);
   DEFINE_STATE_PREDICATE(Driving, DRIVING);
   DEFINE_STATE_PREDICATE(ArrivedGoal, ARRIVAL_GOAL);
-  DEFINE_STATE_PREDICATE(Emergency, EMERGENCY);
   DEFINE_STATE_PREDICATE(Finalizing, FINALIZING);
 
 #undef DEFINE_STATE_PREDICATE
 
 protected:
+  template <typename T>
+  auto getAutowareStateString(std::uint8_t state) const -> char const *
+  {
+#define CASE(IDENTIFIER) \
+  case T::IDENTIFIER:    \
+    return #IDENTIFIER
+
+    switch (state) {
+      CASE(INITIALIZING);
+      CASE(WAITING_FOR_ROUTE);
+      CASE(PLANNING);
+      CASE(WAITING_FOR_ENGAGE);
+      CASE(DRIVING);
+      CASE(ARRIVED_GOAL);
+      CASE(FINALIZING);
+
+      default:
+        return "";
+    }
+
+#undef CASE
+  }
   auto sendSIGINT() -> void override;
 
 public:
@@ -122,7 +141,8 @@ public:
   : FieldOperatorApplication(std::forward<decltype(xs)>(xs)...),
     // clang-format off
     getCommand("/control/command/control_cmd", rclcpp::QoS(1), *this),
-    getAutowareState("/api/iv_msgs/autoware/state", rclcpp::QoS(1), *this),
+    getAutowareState("/autoware/state", rclcpp::QoS(1), *this, [this](const auto & v) {
+       autoware_state = getAutowareStateString<autoware_system_msgs::msg::AutowareState>(v.state); }),
     getCooperateStatusArray("/api/external/get/rtc_status", rclcpp::QoS(1), *this, [this](const auto & v) { latest_cooperate_status_array = v; }),
     getEmergencyState("/api/external/get/emergency", rclcpp::QoS(1), *this, [this](const auto & v) { receiveEmergencyState(v); }),
 #if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)

@@ -16,6 +16,8 @@
     "DWITH_INTEGRATION_TEST",
     "engageable",
     "euclidian",
+    "gcda",
+    "gcno",
     "libunwind",
     "linelint",
     "Mersenne",
