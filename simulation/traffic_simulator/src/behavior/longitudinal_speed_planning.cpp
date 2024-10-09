@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <algorithm>
+#include <arithmetic/floating_point/comparison.hpp>
 #include <geometry/vector3/operator.hpp>
 #include <iostream>
 #include <rclcpp/rclcpp.hpp>
@@ -57,7 +58,7 @@ auto LongitudinalSpeedPlanner::planConstraintsFromJerkAndTimeConstraint(
   } else {
     if (isAccelerating(target_speed, current_twist)) {
       ret.max_acceleration = constraints.max_acceleration_rate * acceleration_duration -
-                             std::sqrt(
+                             math::arithmetic::safeSqrt(
                                (constraints.max_acceleration_rate * acceleration_duration *
                                 constraints.max_acceleration_rate * acceleration_duration) +
                                2 * constraints.max_acceleration_rate *
@@ -66,7 +67,7 @@ auto LongitudinalSpeedPlanner::planConstraintsFromJerkAndTimeConstraint(
                              current_accel.linear.x;
     } else {
       ret.max_deceleration = -constraints.max_deceleration_rate * acceleration_duration +
-                             std::sqrt(
+                             math::arithmetic::safeSqrt(
                                (constraints.max_deceleration_rate * acceleration_duration *
                                 constraints.max_deceleration_rate * acceleration_duration) -
                                2 * constraints.max_deceleration_rate *

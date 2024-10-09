@@ -16,12 +16,20 @@
 #define ARITHMETIC__FLOATING_POINT__COMPARISON_HPP_
 
 #include <algorithm>
+#include <cmath>
 #include <limits>
 
 namespace math
 {
 namespace arithmetic
 {
+
+template <typename T>
+auto safeSqrt(T a)
+{
+  return (a > 0.0) ? std::sqrt(a) : 0.0;
+}
+
 template <typename T>
 auto isApproximatelyEqualTo(T a, T b)
 {
