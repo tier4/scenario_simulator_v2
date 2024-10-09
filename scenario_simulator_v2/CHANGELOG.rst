@@ -21,6 +21,9 @@ Changelog for package scenario_simulator_v2
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+4.3.12 (2024-10-09)
+-------------------
+
 4.3.11 (2024-10-07)
 -------------------
 * Merge branch 'master' into feature/jpblist-update-traveled-distance
