@@ -32,6 +32,9 @@ Changelog for package openscenario_interpreter
 * add publish_empty_context parameter
 * Contributors: Masaya Kataoka
 
+4.3.12 (2024-10-09)
+-------------------
+
 4.3.11 (2024-10-07)
 -------------------
 * Merge branch 'master' into feature/jpblist-update-traveled-distance
