@@ -218,9 +218,9 @@ void EgoEntitySimulation::requestSpeedChange(double value)
   vehicle_model_ptr_->setState(v);
 }
 
-void EgoEntitySimulation::overwrite(
-  const traffic_simulator_msgs::msg::EntityStatus & status, double current_scenario_time,
-  double step_time, bool npc_logic_started)
+auto EgoEntitySimulation::overwrite(
+  const traffic_simulator_msgs::msg::EntityStatus & status, const double current_time,
+  const double step_time, const bool is_npc_logic_started) -> void
 {
   using math::geometry::convertQuaternionToEulerAngle;
   using math::geometry::getRotationMatrix;
@@ -238,7 +238,7 @@ void EgoEntitySimulation::overwrite(
                                status.pose.position.y - initial_pose_.position.y,
                                status.pose.position.z - initial_pose_.position.z);
 
-  if (npc_logic_started) {
+  if (is_npc_logic_started) {
     const auto yaw = [&]() {
       const auto q = Eigen::Quaterniond(
         getRotationMatrix(initial_pose_.orientation).transpose() *
@@ -280,12 +280,12 @@ void EgoEntitySimulation::overwrite(
           "Unsupported simulation model ", toString(vehicle_model_type_), " specified");
     }
   }
-  updateStatus(current_scenario_time, step_time);
+  updateStatus(current_time, step_time);
   updatePreviousValues();
 }
 
 void EgoEntitySimulation::update(
-  double current_scenario_time, double step_time, bool npc_logic_started)
+  const double current_time, const double step_time, const bool is_npc_logic_started)
 {
   using math::geometry::getRotationMatrix;
 
@@ -302,7 +302,7 @@ void EgoEntitySimulation::update(
                                status_.getMapPose().position.y - initial_pose_.position.y,
                                status_.getMapPose().position.z - initial_pose_.position.z);
 
-  if (npc_logic_started) {
+  if (is_npc_logic_started) {
     auto input = Eigen::VectorXd(vehicle_model_ptr_->getDimU());
 
     auto acceleration_by_slope = [this]() {
@@ -345,7 +345,7 @@ void EgoEntitySimulation::update(
   // only the position in the Oz axis is left unchanged, the rest is taken from SimModelInterface
   world_relative_position_.x() = vehicle_model_ptr_->getX();
   world_relative_position_.y() = vehicle_model_ptr_->getY();
-  updateStatus(current_scenario_time, step_time);
+  updateStatus(current_time, step_time);
   updatePreviousValues();
 }
 
@@ -413,7 +413,7 @@ auto EgoEntitySimulation::getCurrentPose(const double pitch_angle = 0.) const
   -> geometry_msgs::msg::Pose
 {
   using math::geometry::operator*;
-  const auto relative_position =
+  const Eigen::Vector3d relative_position =
     math::geometry::getRotationMatrix(initial_pose_.orientation) * world_relative_position_;
   const auto relative_orientation = math::geometry::convertEulerAngleToQuaternion(
     geometry_msgs::build<geometry_msgs::msg::Vector3>()
@@ -483,10 +483,10 @@ auto EgoEntitySimulation::setStatus(const traffic_simulator_msgs::msg::EntitySta
   setAutowareStatus();
 }
 
-auto EgoEntitySimulation::updateStatus(double current_scenario_time, double step_time) -> void
+auto EgoEntitySimulation::updateStatus(const double current_time, const double step_time) -> void
 {
   auto status = static_cast<traffic_simulator_msgs::msg::EntityStatus>(status_);
-  status.time = std::isnan(current_scenario_time) ? 0 : current_scenario_time;
+  status.time = std::isnan(current_time) ? 0 : current_time;
   status.pose = getCurrentPose();
   status.action_status.twist = getCurrentTwist();
   status.action_status.accel = getCurrentAccel(step_time);

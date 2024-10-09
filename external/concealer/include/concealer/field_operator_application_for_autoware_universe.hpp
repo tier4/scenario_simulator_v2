@@ -19,6 +19,14 @@
 #include <autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>
 #endif
 
+#if __has_include(<autoware_system_msgs/msg/autoware_state.hpp>)
+#include <autoware_system_msgs/msg/autoware_state.hpp>
+#endif
+
+#if __has_include(<autoware_auto_system_msgs/msg/autoware_state.hpp>)
+#include <autoware_auto_system_msgs/msg/autoware_state.hpp>
+#endif
+
 #include <autoware_adapi_v1_msgs/msg/mrm_state.hpp>
 #include <autoware_adapi_v1_msgs/srv/change_operation_mode.hpp>
 #include <autoware_adapi_v1_msgs/srv/clear_route.hpp>
@@ -43,7 +51,6 @@
 #include <tier4_rtc_msgs/msg/cooperate_status_array.hpp>
 #include <tier4_rtc_msgs/srv/auto_mode_with_module.hpp>
 #include <tier4_rtc_msgs/srv/cooperate_commands.hpp>
-#include <tier4_system_msgs/msg/autoware_state.hpp>
 
 namespace concealer
 {
@@ -56,7 +63,12 @@ class FieldOperatorApplicationFor<AutowareUniverse>
 
   // clang-format off
   SubscriberWrapper<autoware_auto_control_msgs::msg::AckermannControlCommand>     getAckermannControlCommand;
-  SubscriberWrapper<tier4_system_msgs::msg::AutowareState, ThreadSafety::safe>    getAutowareState;
+#if __has_include(<autoware_system_msgs/msg/autoware_state.hpp>)
+  SubscriberWrapper<autoware_system_msgs::msg::AutowareState, ThreadSafety::safe>    getAutowareState;
+#endif
+#if __has_include(<autoware_auto_system_msgs/msg/autoware_state.hpp>)
+  SubscriberWrapper<autoware_auto_system_msgs::msg::AutowareState, ThreadSafety::safe> getAutowareAutoState;
+#endif
   SubscriberWrapper<tier4_rtc_msgs::msg::CooperateStatusArray>                    getCooperateStatusArray;
   SubscriberWrapper<tier4_external_api_msgs::msg::Emergency>                      getEmergencyState;
 #if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)
@@ -79,6 +91,8 @@ class FieldOperatorApplicationFor<AutowareUniverse>
 
   tier4_rtc_msgs::msg::CooperateStatusArray latest_cooperate_status_array;
 
+  std::string autoware_state;
+
   std::string minimum_risk_maneuver_state;
 
   std::string minimum_risk_maneuver_behavior;
@@ -87,12 +101,13 @@ class FieldOperatorApplicationFor<AutowareUniverse>
 
   auto receiveEmergencyState(const tier4_external_api_msgs::msg::Emergency & msg) -> void;
 
-#define DEFINE_STATE_PREDICATE(NAME, VALUE)                  \
-  auto is##NAME() const noexcept                             \
-  {                                                          \
-    using tier4_system_msgs::msg::AutowareState;             \
-    return getAutowareState().state == AutowareState::VALUE; \
-  }                                                          \
+  /*
+     NOTE: This predicate should not take the state being compared as an
+     argument or template parameter. Otherwise, code using this class would
+     need to have knowledge of the Autoware state type.
+  */
+#define DEFINE_STATE_PREDICATE(NAME, VALUE)                           \
+  auto is##NAME() const noexcept { return autoware_state == #VALUE; } \
   static_assert(true, "")
 
   DEFINE_STATE_PREDICATE(Initializing, INITIALIZING_VEHICLE);
@@ -101,12 +116,33 @@ class FieldOperatorApplicationFor<AutowareUniverse>
   DEFINE_STATE_PREDICATE(WaitingForEngage, WAITING_FOR_ENGAGE);
   DEFINE_STATE_PREDICATE(Driving, DRIVING);
   DEFINE_STATE_PREDICATE(ArrivedGoal, ARRIVAL_GOAL);
-  DEFINE_STATE_PREDICATE(Emergency, EMERGENCY);
   DEFINE_STATE_PREDICATE(Finalizing, FINALIZING);
 
 #undef DEFINE_STATE_PREDICATE
 
 protected:
+  template <typename T>
+  auto getAutowareStateString(std::uint8_t state) const -> char const *
+  {
+#define CASE(IDENTIFIER) \
+  case T::IDENTIFIER:    \
+    return #IDENTIFIER
+
+    switch (state) {
+      CASE(INITIALIZING);
+      CASE(WAITING_FOR_ROUTE);
+      CASE(PLANNING);
+      CASE(WAITING_FOR_ENGAGE);
+      CASE(DRIVING);
+      CASE(ARRIVED_GOAL);
+      CASE(FINALIZING);
+
+      default:
+        return "";
+    }
+
+#undef CASE
+  }
   auto sendSIGINT() -> void override;
 
 public:
@@ -118,7 +154,27 @@ public:
   : FieldOperatorApplication(std::forward<decltype(xs)>(xs)...),
     // clang-format off
     getAckermannControlCommand("/control/command/control_cmd", rclcpp::QoS(1), *this),
-    getAutowareState("/api/iv_msgs/autoware/state", rclcpp::QoS(1), *this),
+#if __has_include(<autoware_system_msgs/msg/autoware_state.hpp>)
+    getAutowareState("/autoware/state", rclcpp::QoS(1), *this, [this](const auto & v) {
+      /*
+       There are multiple places that assignments to `autoware_state` in the callback for the /autoware/state topic to accommodate multiple messages.
+       But only one of them is used as long as correct configuration Autoware is.
+       Even if the topic comes in multiple types, as long as the content is the same,
+       there is basically no problem, but there is a possibility that potential problems may occur.
+      */
+       autoware_state = getAutowareStateString<autoware_system_msgs::msg::AutowareState>(v.state); }),
+#endif
+#if __has_include(<autoware_auto_system_msgs/msg/autoware_state.hpp>)
+    getAutowareAutoState("/autoware/state", rclcpp::QoS(1), *this, [this](const auto & v) {
+      /*
+       There are multiple places that assignments to `autoware_state` in the callback for the /autoware/state topic to accommodate multiple messages.
+       But only one of them is used as long as correct configuration Autoware is.
+       Even if the topic comes in multiple types, as long as the content is the same,
+       there is basically no problem, but there is a possibility that potential problems may occur.
+      */
+      autoware_state = getAutowareStateString<autoware_auto_system_msgs::msg::AutowareState>(v.state);
+    }),
+#endif
     getCooperateStatusArray("/api/external/get/rtc_status", rclcpp::QoS(1), *this, [this](const auto & v) { latest_cooperate_status_array = v; }),
     getEmergencyState("/api/external/get/emergency", rclcpp::QoS(1), *this, [this](const auto & v) { receiveEmergencyState(v); }),
 #if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)

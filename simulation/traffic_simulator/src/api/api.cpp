@@ -171,6 +171,7 @@ auto API::setEntityStatus(
     EntityStatus status = static_cast<EntityStatus>(entity->getCanonicalizedStatus());
     status.pose = map_pose;
     status.action_status = action_status;
+    status.lanelet_pose_valid = false;
     setEntityStatus(name, status);
   } else {
     THROW_SIMULATION_ERROR("Cannot set entity \"", name, "\" status - such entity does not exist.");
@@ -360,11 +361,12 @@ bool API::updateFrame()
 
 void API::startNpcLogic()
 {
-  if (isNpcLogicStarted()) {
+  if (entity_manager_ptr_->isNpcLogicStarted()) {
     THROW_SIMULATION_ERROR("NPC logics are already started.");
+  } else {
+    clock_.start();
+    entity_manager_ptr_->startNpcLogic(getCurrentTime());
   }
-  clock_.start();
-  entity_manager_ptr_->startNpcLogic(getCurrentTime());
 }
 
 void API::requestLaneChange(const std::string & name, const lanelet::Id & lanelet_id)

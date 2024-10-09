@@ -93,7 +93,6 @@ public:
    */                                                                  \
   /*   */ auto FUNCTION_NAME() const->bool { return BOOL_VARIABLE; }
 
-  DEFINE_CHECK_FUNCTION(isNpcLogicStarted,   npc_logic_started_)
   DEFINE_CHECK_FUNCTION(laneMatchingSucceed, status_->laneMatchingSucceed())
   // clang-format on
 #undef DEFINE_CHECK_FUNCTION
@@ -142,7 +141,7 @@ public:
 
   virtual void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) = 0;
 
-  virtual void requestLaneChange(const lanelet::Id){};
+  virtual void requestLaneChange(const lanelet::Id) {}
 
   virtual void requestLaneChange(const traffic_simulator::lane_change::Parameter &){};
 
@@ -165,7 +164,7 @@ public:
 
   virtual void requestSpeedChange(const speed_change::RelativeTargetSpeed &, bool);
 
-  virtual void requestClearRoute();
+  virtual void requestClearRoute() {}
 
   virtual auto isControlledBySimulator() const -> bool;
 
@@ -219,15 +218,11 @@ public:
 
   /*   */ auto setLinearJerk(const double liner_jerk) -> void;
 
-  virtual void startNpcLogic(const double current_time);
-
   /*   */ void stopAtCurrentPosition();
 
   /*   */ void updateEntityStatusTimestamp(const double current_time);
 
   /*   */ auto updateStandStillDuration(const double step_time) -> double;
-
-  /*   */ auto updateTraveledDistance(const double step_time) -> double;
 
   /*   */ bool reachPosition(
     const geometry_msgs::msg::Pose & target_pose, const double tolerance) const;
@@ -254,7 +249,6 @@ protected:
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
   std::shared_ptr<traffic_simulator::TrafficLightManager> traffic_light_manager_;
 
-  bool npc_logic_started_ = false;
   double stand_still_duration_ = 0.0;
   double traveled_distance_ = 0.0;
   double prev_job_duration_ = 0.0;
