@@ -152,10 +152,25 @@ public:
     // clang-format off
     getAckermannControlCommand("/control/command/control_cmd", rclcpp::QoS(1), *this),
 #if __has_include(<autoware_system_msgs/msg/autoware_state.hpp>)
-    getAutowareState("/autoware/state", rclcpp::QoS(1), *this, [this](const auto & v) { autoware_state = getAutowareStateString<autoware_system_msgs::msg::AutowareState>(v.state); }),
+    getAutowareState("/autoware/state", rclcpp::QoS(1), *this, [this](const auto & v) {
+      /*
+       There are multiple places that assignments to `autoware_state` in the callback for the /autoware/state topic to accommodate multiple messages.
+       But only one of them is used as long as correct configuration Autoware is.
+       Even if the topic comes in multiple types, as long as the content is the same,
+       there is basically no problem, but there is a possibility that potential problems may occur.
+      */
+       autoware_state = getAutowareStateString<autoware_system_msgs::msg::AutowareState>(v.state); }),
 #endif
 #if __has_include(<autoware_auto_system_msgs/msg/autoware_state.hpp>)
-    getAutowareAutoState("/autoware/state", rclcpp::QoS(1), *this, [this](const auto & v) { autoware_state = getAutowareStateString<autoware_auto_system_msgs::msg::AutowareState>(v.state); }),
+    getAutowareAutoState("/autoware/state", rclcpp::QoS(1), *this, [this](const auto & v) {
+      /*
+       There are multiple places that assignments to `autoware_state` in the callback for the /autoware/state topic to accommodate multiple messages.
+       But only one of them is used as long as correct configuration Autoware is.
+       Even if the topic comes in multiple types, as long as the content is the same,
+       there is basically no problem, but there is a possibility that potential problems may occur.
+      */
+      autoware_state = getAutowareStateString<autoware_auto_system_msgs::msg::AutowareState>(v.state);
+    }),
 #endif
     getCooperateStatusArray("/api/external/get/rtc_status", rclcpp::QoS(1), *this, [this](const auto & v) { latest_cooperate_status_array = v; }),
     getEmergencyState("/api/external/get/emergency", rclcpp::QoS(1), *this, [this](const auto & v) { receiveEmergencyState(v); }),
