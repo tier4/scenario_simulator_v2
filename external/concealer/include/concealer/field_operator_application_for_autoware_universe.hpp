@@ -84,6 +84,11 @@ class FieldOperatorApplicationFor<AutowareUniverse>
 
   auto receiveEmergencyState(const tier4_external_api_msgs::msg::Emergency & msg) -> void;
 
+  /*
+     NOTE: This predicate should not take the state being compared as an
+     argument or template parameter. Otherwise, code using this class would
+     need to have knowledge of the Autoware state type.
+  */
 #define DEFINE_STATE_PREDICATE(NAME, VALUE)                  \
   auto is##NAME() const noexcept                             \
   {                                                          \
