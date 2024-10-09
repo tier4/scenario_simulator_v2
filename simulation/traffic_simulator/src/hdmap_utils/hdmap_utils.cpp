@@ -1591,9 +1591,9 @@ auto HdMapUtils::getLongitudinalDistance(
 
       /// @note "first lanelet before the lane change" case
       if (route[i] == from.lanelet_id) {
-        distance += getLaneletLength(route[i + 1]) - from.s;
+        distance -= from.s;
         if (route[i + 1] == to.lanelet_id) {
-          distance -= getLaneletLength(route[i + 1]) - to.s;
+          distance += to.s;
           return distance;
         }
       }

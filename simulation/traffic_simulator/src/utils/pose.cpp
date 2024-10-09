@@ -242,7 +242,7 @@ auto isInLanelet(
           start_lanelet_pose, canonicalized_lanelet_pose, include_adjacent_lanelet,
           include_opposite_direction, allow_lane_change, hdmap_utils_ptr);
         distance_to_start_lanelet_pose and
-        std::abs(distance_to_start_lanelet_pose.value()) < tolerance) {
+        std::abs(distance_to_start_lanelet_pose.value()) <= tolerance) {
       return true;
     }
 
@@ -252,7 +252,7 @@ auto isInLanelet(
           canonicalized_lanelet_pose, end_lanelet_pose, include_adjacent_lanelet,
           include_opposite_direction, allow_lane_change, hdmap_utils_ptr);
         distance_to_end_lanelet_pose and
-        std::abs(distance_to_end_lanelet_pose.value()) < tolerance) {
+        std::abs(distance_to_end_lanelet_pose.value()) <= tolerance) {
       return true;
     }
   }

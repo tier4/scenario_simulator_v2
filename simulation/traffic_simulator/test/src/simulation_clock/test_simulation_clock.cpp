@@ -14,6 +14,7 @@
 
 #include <gtest/gtest.h>
 
+#include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/simulation_clock/simulation_clock.hpp>
 
 /**
@@ -21,7 +22,7 @@
  * Test initialization logic by calling update without initialized clock
  * - the goal is to verify that mandatory initialization works.
  */
-TEST(SimulationClock, Initialize)
+TEST(SimulationClock, SimulationClock)
 {
   auto simulation_clock = traffic_simulator::SimulationClock(true, 1.0, 10.0);
 
@@ -31,7 +32,7 @@ TEST(SimulationClock, Initialize)
 
   EXPECT_TRUE(simulation_clock.started());
   simulation_clock.update();
-  EXPECT_THROW(simulation_clock.start(), std::runtime_error);
+  EXPECT_THROW(simulation_clock.start(), common::SimulationError);
 }
 
 /**

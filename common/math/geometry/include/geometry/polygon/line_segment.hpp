@@ -29,6 +29,13 @@ namespace geometry
 class LineSegment
 {
 public:
+  const geometry_msgs::msg::Point start_point;
+  const geometry_msgs::msg::Point end_point;
+  const geometry_msgs::msg::Vector3 vector;
+  const geometry_msgs::msg::Vector3 vector_2d;
+  const double length;
+  const double length_2d;
+
   LineSegment(
     const geometry_msgs::msg::Point & start_point, const geometry_msgs::msg::Point & end_point);
   LineSegment(
@@ -36,36 +43,34 @@ public:
     double length);
   ~LineSegment();
   LineSegment & operator=(const LineSegment &);
-  const geometry_msgs::msg::Point start_point;
-  const geometry_msgs::msg::Point end_point;
+
+  auto isIntersect2D(const geometry_msgs::msg::Point & point) const -> bool;
+  auto isIntersect2D(const LineSegment & line) const -> bool;
+  auto isInBounds2D(const geometry_msgs::msg::Point & point) const -> bool;
+
   auto getPoint(const double s, const bool denormalize_s = false) const
     -> geometry_msgs::msg::Point;
   auto getPose(const double s, const bool denormalize_s = false, const bool fill_pitch = true) const
     -> geometry_msgs::msg::Pose;
-  auto isIntersect2D(const geometry_msgs::msg::Point & point) const -> bool;
-  auto isIntersect2D(const LineSegment & l0) const -> bool;
-  auto getIntersection2DSValue(
+  auto get2DIntersectionSValue(
     const geometry_msgs::msg::Point & point, const bool denormalize_s = false) const
     -> std::optional<double>;
-  auto getIntersection2DSValue(const LineSegment & line, const bool denormalize_s = false) const
+  auto get2DIntersectionSValue(const LineSegment & line, const bool denormalize_s = false) const
     -> std::optional<double>;
   auto getIntersection2D(const LineSegment & line) const
     -> std::optional<geometry_msgs::msg::Point>;
   auto getSValue(
     const geometry_msgs::msg::Pose & pose, double threshold_distance, bool denormalize_s) const
     -> std::optional<double>;
-  auto getVector() const -> geometry_msgs::msg::Vector3;
   auto getNormalVector() const -> geometry_msgs::msg::Vector3;
-  auto get2DVector() const -> geometry_msgs::msg::Vector3;
-  auto getLength() const -> double;
-  auto get2DLength() const -> double;
-  auto getSlope() const -> double;
+  auto get2DVectorSlope() const -> double;
   auto getSquaredDistanceIn2D(
     const geometry_msgs::msg::Point & point, const double s, const bool denormalize_s = false) const
     -> double;
   auto getSquaredDistanceVector(
     const geometry_msgs::msg::Point & point, const double s, const bool denormalize_s = false) const
     -> geometry_msgs::msg::Vector3;
+  auto relativePointPosition2D(const geometry_msgs::msg::Point & point) const -> int;
 
 private:
   auto denormalize(const std::optional<double> & s, const bool throw_error_on_out_of_range = true)

@@ -144,10 +144,10 @@ public:
       if (behavior == VehicleBehavior::autoware()) {
         return entity_manager_ptr_->entityExists(name) or
                entity_manager_ptr_->spawnEntity<entity::EgoEntity>(
-                 name, pose, parameters, configuration, node_parameters_);
+                 name, pose, parameters, getCurrentTime(), configuration, node_parameters_);
       } else {
         return entity_manager_ptr_->spawnEntity<entity::VehicleEntity>(
-          name, pose, parameters, behavior);
+          name, pose, parameters, getCurrentTime(), behavior);
       }
     };
 
@@ -182,7 +182,7 @@ public:
   {
     auto register_to_entity_manager = [&]() {
       return entity_manager_ptr_->spawnEntity<entity::PedestrianEntity>(
-        name, pose, parameters, behavior);
+        name, pose, parameters, getCurrentTime(), behavior);
     };
 
     auto register_to_environment_simulator = [&]() {
@@ -211,7 +211,8 @@ public:
     const std::string & model3d = "")
   {
     auto register_to_entity_manager = [&]() {
-      return entity_manager_ptr_->spawnEntity<entity::MiscObjectEntity>(name, pose, parameters);
+      return entity_manager_ptr_->spawnEntity<entity::MiscObjectEntity>(
+        name, pose, parameters, getCurrentTime());
     };
 
     auto register_to_environment_simulator = [&]() {
@@ -248,8 +249,7 @@ public:
     const std::string & name, const LaneletPose & lanelet_pose,
     const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void;
   auto setEntityStatus(
-    const std::string & name,
-    const std::optional<CanonicalizedLaneletPose> & canonicalized_lanelet_pose,
+    const std::string & name, const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
     const traffic_simulator_msgs::msg::ActionStatus & action_status =
       helper::constructActionStatus()) -> void;
   auto setEntityStatus(
@@ -333,6 +333,8 @@ public:
     const bool allow_spawn_outside_lane = false, const bool require_footprint_fitting = false,
     const bool random_orientation = false, std::optional<int> random_seed = std::nullopt) -> void;
 
+  auto getEntity(const std::string & name) const -> std::shared_ptr<entity::EntityBase>;
+
   // clang-format off
 #define FORWARD_TO_ENTITY_MANAGER(NAME)                                    \
   /*!                                                                      \
@@ -362,10 +364,9 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getCurrentAction);
   FORWARD_TO_ENTITY_MANAGER(getCurrentTwist);
   FORWARD_TO_ENTITY_MANAGER(getEgoName);
-  FORWARD_TO_ENTITY_MANAGER(getEntity);
   FORWARD_TO_ENTITY_MANAGER(getEntityNames);
   FORWARD_TO_ENTITY_MANAGER(getEntityStatus);
-  FORWARD_TO_ENTITY_MANAGER(getEntityStatusBeforeUpdate);
+  FORWARD_TO_ENTITY_MANAGER(getCanonicalizedStatusBeforeUpdate);
   FORWARD_TO_ENTITY_MANAGER(getHdmapUtils);
   FORWARD_TO_ENTITY_MANAGER(getLinearJerk);
   FORWARD_TO_ENTITY_MANAGER(getStandStillDuration);

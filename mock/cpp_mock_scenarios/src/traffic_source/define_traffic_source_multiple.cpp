@@ -53,37 +53,29 @@ private:
       }
       unsigned int vehicle_count = 0u, pedestrian_count = 0u;
       for (const auto & name : names) {
-        const traffic_simulator::CanonicalizedEntityStatus entity_status =
-          api_.getEntityStatus(name);
+        if (const auto entity = api_.getEntity(name)) {
+          const bool valid_vehicle_lanelet =
+            api_.isInLanelet(name, static_cast<lanelet::Id>(34705), 50.0) ||
+            api_.isInLanelet(name, static_cast<lanelet::Id>(34696), 50.0);
 
-        const bool is_vehicle =
-          static_cast<traffic_simulator_msgs::msg::EntityStatus>(entity_status).type.type ==
-          traffic_simulator_msgs::msg::EntityType::VEHICLE;
-        const bool is_pedestrian =
-          static_cast<traffic_simulator_msgs::msg::EntityStatus>(entity_status).type.type ==
-          traffic_simulator_msgs::msg::EntityType::PEDESTRIAN;
+          const bool valid_pedestrian_lanelet =
+            api_.isInLanelet(name, static_cast<lanelet::Id>(34385), 10.0);
 
-        const bool valid_vehicle_lanelet =
-          api_.isInLanelet(name, static_cast<lanelet::Id>(34705), 50.0) ||
-          api_.isInLanelet(name, static_cast<lanelet::Id>(34696), 50.0);
+          if (isVehicle(name)) {
+            ++vehicle_count;
+          } else if (isPedestrian(name)) {
+            ++pedestrian_count;
+          }
 
-        const bool valid_pedestrian_lanelet =
-          api_.isInLanelet(name, static_cast<lanelet::Id>(34385), 10.0);
-
-        if (is_vehicle) {
-          ++vehicle_count;
-        } else if (is_pedestrian) {
-          ++pedestrian_count;
-        }
-
-        if (
-          // clang-format off
-          !entity_status.laneMatchingSucceed() ||
-          (is_vehicle && !valid_vehicle_lanelet) ||
-          (is_pedestrian && !valid_pedestrian_lanelet))
-        // clang-format on
-        {
-          stop(cpp_mock_scenarios::Result::FAILURE);  // LCOV_EXCL_LINE
+          if (
+            // clang-format off
+          !entity->laneMatchingSucceed() ||
+          (isVehicle(name) && !valid_vehicle_lanelet) ||
+          (isPedestrian(name) && !valid_pedestrian_lanelet))
+          // clang-format on
+          {
+            stop(cpp_mock_scenarios::Result::FAILURE);  // LCOV_EXCL_LINE
+          }
         }
       }
       if (vehicle_count != 6u || pedestrian_count != 15u) {

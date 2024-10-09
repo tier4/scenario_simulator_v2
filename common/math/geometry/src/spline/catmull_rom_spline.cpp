@@ -139,7 +139,7 @@ CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> 
       break;
     /// @note In this case, spline is interpreted as line segment.
     case 2:
-      total_length_ = line_segments_[0].getLength();
+      total_length_ = line_segments_[0].length;
       break;
     /// @note In this case, spline is interpreted as curve.
     default:
@@ -316,7 +316,7 @@ auto CatmullRomSpline::getCollisionPointsIn2D(
           "This message is not originally intended to be displayed, if you see it, please "
           "contact the developer of traffic_simulator.");
       }
-      if (const auto s = line_segments_[0].getIntersection2DSValue(line, true)) {
+      if (const auto s = line_segments_[0].get2DIntersectionSValue(line, true)) {
         s_value_candidates.insert(s.value());
       }
     }
@@ -628,7 +628,7 @@ auto CatmullRomSpline::getTangentVector(const double s) const -> geometry_msgs::
           "contact the developer of traffic_simulator.");
       }
       if (0 <= s && s <= getLength()) {
-        return line_segments_[0].getVector();
+        return line_segments_[0].vector;
       }
       THROW_SIMULATION_ERROR(
         "Invalid S value is specified, while getting tangent vector.",

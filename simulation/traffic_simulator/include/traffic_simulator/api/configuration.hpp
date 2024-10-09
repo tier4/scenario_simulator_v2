@@ -16,7 +16,6 @@
 #define TRAFFIC_SIMULATOR__API__CONFIGURATION_HPP_
 
 #include <algorithm>
-#include <ament_index_cpp/get_package_share_directory.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/range/iterator_range.hpp>
@@ -64,10 +63,6 @@ struct Configuration
   Filename pointcloud_map_file;
 
   Pathname scenario_path = "";
-
-  Pathname rviz_config_path =  //
-    ament_index_cpp::get_package_share_directory("traffic_simulator") +
-    "/config/scenario_simulator_v2.rviz";
 
   explicit Configuration(const Pathname & map_path)  //
   : map_path(assertMapPath(map_path)),

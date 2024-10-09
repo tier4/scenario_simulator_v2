@@ -92,6 +92,17 @@ OpenSCENARIO:
                       offset: 0
                       Orientation: *DEFAULT_ORIENTATION
               - LongitudinalAction: *SPEED_ACTION_ZERO
+          - entityRef: car_4
+            PrivateAction:
+              - TeleportAction:
+                  Position: &POSITION_4
+                    LanePosition:
+                      roadId: ""
+                      laneId: 34795
+                      s: 5
+                      offset: 0
+                      Orientation: *DEFAULT_ORIENTATION
+              - LongitudinalAction: *SPEED_ACTION_ZERO
     Story:
       - name: story
         Act:
@@ -582,6 +593,24 @@ OpenSCENARIO:
                                         routingAlgorithm: shortest
                                         rule: notEqualTo
                                         value: 1.262040583529198123358128214022
+                            - Condition:
+                                - name: "corner case fixed in #1348"
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: all
+                                      EntityRef:
+                                        - entityRef: car_1
+                                    EntityCondition:
+                                      RelativeDistanceCondition:
+                                        coordinateSystem: lane
+                                        entityRef: car_4
+                                        freespace: false
+                                        relativeDistanceType: longitudinal
+                                        routingAlgorithm: shortest
+                                        rule: notEqualTo
+                                        value: 54.18867466433655977198213804513216018676757812500000
             StartTrigger:
               ConditionGroup:
                 - Condition:

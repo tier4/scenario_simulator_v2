@@ -33,8 +33,9 @@
 
 namespace concealer
 {
-template <typename... Ts>
-auto ros2_launch(const std::string & package, const std::string & file, Ts &&... xs)
+template <typename Parameters>
+auto ros2_launch(
+  const std::string & package, const std::string & file, const Parameters & parameters)
 {
 #ifdef CONCEALER_ISOLATE_STANDARD_OUTPUT
   const std::string log_filename = "/tmp/scenario_test_runner/autoware-output.txt";
@@ -44,17 +45,23 @@ auto ros2_launch(const std::string & package, const std::string & file, Ts &&...
   ::close(fd);
 #endif
 
-  const auto process_id = fork();
+  const auto argv = [&]() {
+    auto argv = std::vector<std::string>();
 
-  const std::vector<std::string> argv{
-    "python3",
-    boost::algorithm::replace_all_copy(dollar("which ros2"), "\n", ""),
-    "launch",  // NOTE: The command 'ros2' is a Python script.
-    package,
-    file,
-    std::forward<decltype(xs)>(xs)...};
+    argv.push_back("python3");
+    argv.push_back(boost::algorithm::replace_all_copy(dollar("which ros2"), "\n", ""));
+    argv.push_back("launch");
+    argv.push_back(package);
+    argv.push_back(file);
 
-  if (process_id < 0) {
+    for (const auto & parameter : parameters) {
+      argv.push_back(parameter);
+    }
+
+    return argv;
+  }();
+
+  if (const auto process_id = fork(); process_id < 0) {
     throw std::system_error(errno, std::system_category());
   } else if (process_id == 0 and execute(argv) < 0) {
     std::cout << std::system_error(errno, std::system_category()).what() << std::endl;
