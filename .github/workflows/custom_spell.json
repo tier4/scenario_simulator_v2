@@ -5,6 +5,7 @@
     "AUTORCC",
     "Canonicalized",
     "canonicalizing",
+    "cfamily",
     "classname",
     "Cmyk",
     "Dawid",
@@ -15,11 +16,10 @@
     "DWITH_INTEGRATION_TEST",
     "engageable",
     "euclidian",
-    "hakuturu",
-    "Kataoka",
+    "gcda",
+    "gcno",
     "libunwind",
     "linelint",
-    "Masaya",
     "Mersenne",
     "Monic",
     "Moszynski",
@@ -43,7 +43,6 @@
     "Tschirnhaus",
     "walltime",
     "xerces",
-    "xercesc",
-    "yamacir-kit"
+    "xercesc"
   ]
 }

@@ -38,6 +38,13 @@ EntityBase::EntityBase(
   status_before_update_(*status_),
   hdmap_utils_ptr_(hdmap_utils_ptr)
 {
+  job_list_.append(
+    [this](double) {
+      traveled_distance_ += std::abs(getCurrentTwist().linear.x) * step_time_;
+      return false;
+    },
+    [this]() {}, job::Type::TRAVELED_DISTANCE, true, job::Event::POST_UPDATE);
+
   if (name != static_cast<EntityStatus>(entity_status).name) {
     THROW_SIMULATION_ERROR(
       "The name of the entity does not match the name of the entity listed in entity_status.",
@@ -216,13 +223,6 @@ void EntityBase::requestSpeedChangeWithConstantAcceleration(
       break;
     }
   }
-}
-
-void EntityBase::requestClearRoute()
-{
-  THROW_SEMANTIC_ERROR(
-    "requestClearRoute is only supported for EgoEntity. The specified Entity is not an EgoEntity. "
-    "Please check the scenario carefully.");
 }
 
 void EntityBase::requestSpeedChangeWithTimeConstraint(
@@ -644,11 +644,6 @@ auto EntityBase::updateStandStillDuration(const double step_time) -> double
   } else {
     return stand_still_duration_ = 0.0;
   }
-}
-
-auto EntityBase::updateTraveledDistance(const double step_time) -> double
-{
-  return traveled_distance_ += std::abs(getCurrentTwist().linear.x) * step_time;
 }
 
 bool EntityBase::reachPosition(const std::string & target_name, const double tolerance) const

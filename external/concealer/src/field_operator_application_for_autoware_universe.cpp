@@ -350,7 +350,12 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::plan(
 auto FieldOperatorApplicationFor<AutowareUniverse>::clearRoute() -> void
 {
   task_queue.delay([this] {
-    requestClearRoute(std::make_shared<autoware_adapi_v1_msgs::srv::ClearRoute::Request>());
+    /*
+       Since this service tends to be available long after the launch of
+       Autoware, set the attempts_count to a high value. There is no technical
+       basis for the number 30.
+    */
+    requestClearRoute(std::make_shared<autoware_adapi_v1_msgs::srv::ClearRoute::Request>(), 30);
   });
 }
 
