@@ -113,7 +113,20 @@ UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node
   if (std::smatch result; std::regex_match(name, result, std::regex(R"(([^.]+)\.(.+))"))) {
     const std::unordered_map<std::string, std::function<Object()>> dispatch{
       std::make_pair(
-        "currentState", [result]() { return make<String>(evaluateCurrentState(result.str(1))); }),
+        "currentState",
+        [result, state_string = value]() {
+          if (state_string == "EMERGENCY") {
+            std::stringstream what;
+            what
+              << "Current version of scenario_simulator_v2 does not support the use of 'EMERGENCY' "
+                 "as a value for 'currentState' in UserDefinedValueCondition. Please use "
+                 "'currentEmergencyState' or `currentMinimumRiskManeuverState.state`(preferred) "
+                 "instead.";
+            throw common::Error(what.str());
+          } else {
+            return make<String>(evaluateCurrentState(result.str(1)));
+          }
+        }),
       std::make_pair(
         "currentMinimumRiskManeuverState.behavior",
         [result]() {
