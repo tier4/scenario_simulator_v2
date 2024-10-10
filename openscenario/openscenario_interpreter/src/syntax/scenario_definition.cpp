@@ -43,7 +43,7 @@ auto operator<<(std::ostream & os, const ScenarioDefinition & datum) -> std::ost
 {
   boost::json::object json;
 
-  return os << boost::json::serialize(json << datum);
+  return os << (json << datum);
 }
 
 auto operator<<(boost::json::object & json, const ScenarioDefinition & datum)
