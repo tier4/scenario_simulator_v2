@@ -32,9 +32,9 @@ class HermiteCurve
 {
 private:
   friend class HermiteCurveTest;
-  const double ax_, bx_, cx_, dx_;
-  const double ay_, by_, cy_, dy_;
-  const double az_, bz_, cz_, dz_;
+  double ax_, bx_, cx_, dx_;
+  double ay_, by_, cy_, dy_;
+  double az_, bz_, cz_, dz_;
   math::geometry::PolynomialSolver solver_;
 
 public:
@@ -78,7 +78,7 @@ public:
 
 private:
   std::pair<double, double> get2DMinMaxCurvatureValue() const;
-  const double length_;
+  double length_;
 };
 }  // namespace geometry
 }  // namespace math
