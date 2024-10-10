@@ -28,6 +28,9 @@ FetchContent_Declare(
 
 FetchContent_GetProperties(boost_json)
 
+# For static library inside shared library
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 # For faster build, we disable tests, examples, fuzzers, and benchmarks of Boost.JSON
 set(BOOST_JSON_STANDALONE ON)
 set(BOOST_JSON_BUILD_TESTS OFF CACHE INTERNAL OFF)
@@ -42,6 +45,8 @@ if(NOT boost_json_POPULATED)
   FetchContent_Populate(boost_json)
   add_subdirectory(${boost_json_SOURCE_DIR} ${boost_json_BINARY_DIR})
 endif()
+
+ament_export_include_directories(${boost_json_SOURCE_DIR}/include)
 
 # ------------------------------------------------------------------------------
 #  libopenscenario_interpreter
@@ -60,11 +65,7 @@ ament_auto_add_library(${PROJECT_NAME} SHARED
   src/record.cpp
   src/scope.cpp)
 
-target_link_libraries(${PROJECT_NAME} Boost::filesystem glog pugixml)
-
-# Boost.JSON (remove when OS includes libboost-json-dev)
-target_include_directories(${PROJECT_NAME} PUBLIC ${boost_json_SOURCE_DIR}/include)
-ament_export_include_directories(${boost_json_SOURCE_DIR}/include)
+target_link_libraries(${PROJECT_NAME} Boost::filesystem Boost::json glog pugixml)
 
 # ------------------------------------------------------------------------------
 #  openscenario_interpreter_node
