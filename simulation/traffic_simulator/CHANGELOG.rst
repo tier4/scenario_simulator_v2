@@ -21,6 +21,17 @@ Changelog for package traffic_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+4.3.14 (2024-10-10)
+-------------------
+* Merge pull request `#1409 <https://github.com/tier4/scenario_simulator_v2/issues/1409>`_ from tier4/feature/joblist-update-stand-still-duration
+  Register StandStillDuration to job list
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/joblist-update-stand-still-duration
+* Merge branch 'master' into feature/joblist-update-stand-still-duration
+* Revised the method for obtaining time.
+* fix format
+* Register StandStillDuration to job list
+* Contributors: Masaya Kataoka, Taiga Takano
+
 4.3.13 (2024-10-09)
 -------------------
 * Merge branch 'master' into feature/use-autoware-state
