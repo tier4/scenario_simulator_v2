@@ -141,7 +141,7 @@ public:
 
   virtual void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) = 0;
 
-  virtual void requestLaneChange(const lanelet::Id){};
+  virtual void requestLaneChange(const lanelet::Id) {}
 
   virtual void requestLaneChange(const traffic_simulator::lane_change::Parameter &){};
 
@@ -164,7 +164,7 @@ public:
 
   virtual void requestSpeedChange(const speed_change::RelativeTargetSpeed &, bool);
 
-  virtual void requestClearRoute();
+  virtual void requestClearRoute() {}
 
   virtual auto isControlledBySimulator() const -> bool;
 
@@ -221,10 +221,6 @@ public:
   /*   */ void stopAtCurrentPosition();
 
   /*   */ void updateEntityStatusTimestamp(const double current_time);
-
-  /*   */ auto updateStandStillDuration(const double step_time) -> double;
-
-  /*   */ auto updateTraveledDistance(const double step_time) -> double;
 
   /*   */ bool reachPosition(
     const geometry_msgs::msg::Pose & target_pose, const double tolerance) const;
