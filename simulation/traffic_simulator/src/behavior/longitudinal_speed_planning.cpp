@@ -183,7 +183,7 @@ auto LongitudinalSpeedPlanner::getQuadraticAccelerationDuration(
     double v = getVelocityWithConstantJerk(
       current_twist, current_accel, constraints.max_acceleration_rate, duration);
     // While quadratic acceleration, the entity does not reached the target speed.
-    if (std::abs(v - target_speed) >= 0.01) {
+    if (v < target_speed) {
       return duration;
     }
     // While quadratic acceleration, the entity reached the target speed.
@@ -197,7 +197,7 @@ auto LongitudinalSpeedPlanner::getQuadraticAccelerationDuration(
     double v = getVelocityWithConstantJerk(
       current_twist, current_accel, -constraints.max_deceleration_rate, duration);
     // While quadratic acceleration, the entity does not reached the target speed.
-    if (std::abs(v - target_speed) >= 0.01) {
+    if (v < target_speed) {
       return duration;
     }
     // While quadratic acceleration, the entity reached the target speed.
