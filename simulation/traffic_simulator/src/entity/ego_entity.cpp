@@ -100,6 +100,24 @@ auto EgoEntity::getBehaviorParameter() const -> traffic_simulator_msgs::msg::Beh
   return behavior_parameter_;
 }
 
+auto EgoEntity::getGoalPoses() -> std::vector<CanonicalizedLaneletPose>
+{
+  std::vector<CanonicalizedLaneletPose> lanelet_pose;
+
+  if (const auto universe =
+        dynamic_cast<concealer::FieldOperatorApplicationFor<concealer::AutowareUniverse> *>(
+          field_operator_application.get());
+      universe) {
+    if (const auto pose_opt = traffic_simulator::pose::toCanonicalizedLaneletPose(
+          universe->getAutowareMissionRoute().goal_pose, false, hdmap_utils_ptr_);
+        pose_opt.has_value()) {
+      lanelet_pose.push_back(pose_opt.value());
+    }
+  }
+
+  return lanelet_pose;
+}
+
 auto EgoEntity::getEntityTypename() const -> const std::string &
 {
   static const std::string result = "EgoEntity";
