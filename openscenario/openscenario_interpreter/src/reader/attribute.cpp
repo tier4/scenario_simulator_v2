@@ -4,18 +4,82 @@
 
 namespace openscenario_interpreter
 {
-template auto reader::substitute(std::string, const Scope &) -> String;
+inline namespace reader
+{
+auto substitute(std::string attribute, const Scope & scope) -> String
+{
+  auto dirname = [](auto &&, auto && scope) { return scope.dirname(); };
 
-template auto reader::readAttribute(const std::string &, const pugi::xml_node &, const Scope &)
-  -> Boolean;
-template auto reader::readAttribute(const std::string &, const pugi::xml_node &, const Scope &)
+  auto find_pkg_share = [](auto && package_name, const auto &) {
+    return ament_index_cpp::get_package_share_directory(package_name);
+  };
+
+  auto ros2 = [](auto && arguments, const auto &) {
+    auto remove_trailing_newline = [](auto && s) {
+      while (s.back() == '\n') {
+        s.pop_back();
+      }
+      return s;
+    };
+    if (auto && result = remove_trailing_newline(concealer::dollar("ros2 " + arguments));
+        result.find('\n') != std::string::npos) {
+      throw SyntaxError(
+        "The substitution result by `$(ros2 ...)` must not contain a newline character. "
+        "You gave `$(ros2 ",
+        arguments, ")` and the result was ",
+        std::quoted(boost::replace_all_copy(result, "\n", "\\n")),
+        ", which is unacceptable for the reasons stated above.");
+    } else {
+      return result;
+    }
+  };
+
+  auto var = [](auto && name, const auto & scope) {
+    // TODO: Return the value of the launch configuration variable instead of the OpenSCENARIO parameter.
+    if (const auto found = scope.ref(name); found) {
+      return boost::lexical_cast<String>(found);
+    } else {
+      return String();
+    }
+  };
+
+  // NOTE: https://design.ros2.org/articles/roslaunch_xml.html#dynamic-configuration
+  static const std::unordered_map<
+    std::string, std::function<std::string(const std::string &, const Scope &)> >
+    substitutions{
+      {"dirname", dirname},
+      // TODO {"env", env},
+      // TODO {"eval", eval},
+      // TODO {"exec-in-package", exec_in_package},
+      // TODO {"find-exec", find_exec},
+      // TODO {"find-pkg-prefix", find_pkg_prefix},
+      {"find-pkg-share", find_pkg_share},
+      {"ros2",
+       ros2},  // NOTE: TIER IV extension (Not included in the ROS 2 Launch XML Substitution)
+      {"var", var},
+    };
+
+  static const auto pattern = std::regex(R"((.*)\$\((([\w-]+)\s?([^\)]*))\)(.*))");
+
+  for (std::smatch result; std::regex_match(attribute, result, pattern);) {
+    if (const auto iter = substitutions.find(result.str(3)); iter != std::end(substitutions)) {
+      attribute = result.str(1) + std::get<1>(*iter)(result.str(4), scope) + result.str(5);
+    } else {
+      throw SyntaxError("Unknown substitution ", std::quoted(result.str(3)), " specified");
+    }
+  }
+
+  return attribute;
+}
+
+template auto readAttribute(const std::string &, const pugi::xml_node &, const Scope &) -> Boolean;
+template auto readAttribute(const std::string &, const pugi::xml_node &, const Scope &)
   -> UnsignedShort;
-template auto reader::readAttribute(const std::string &, const pugi::xml_node &, const Scope &)
+template auto readAttribute(const std::string &, const pugi::xml_node &, const Scope &)
   -> UnsignedInteger;
-template auto reader::readAttribute(const std::string &, const pugi::xml_node &, const Scope &)
-  -> Double;
-template auto reader::readAttribute(const std::string &, const pugi::xml_node &, const Scope &)
-  -> String;
-template auto reader::readAttribute(const std::string &, const pugi::xml_node &, const Scope &)
+template auto readAttribute(const std::string &, const pugi::xml_node &, const Scope &) -> Double;
+template auto readAttribute(const std::string &, const pugi::xml_node &, const Scope &) -> String;
+template auto readAttribute(const std::string &, const pugi::xml_node &, const Scope &)
   -> syntax::Rule;
+}  // namespace reader
 }  // namespace openscenario_interpreter

@@ -36,6 +36,17 @@
 
 namespace openscenario_interpreter
 {
+
+struct Scope;
+
+inline namespace syntax
+{
+struct Orientation;
+struct Position;
+struct Properties;
+struct Range;
+}  // namespace syntax
+
 inline namespace reader
 {
 using Cardinality =
@@ -88,6 +99,15 @@ auto readElement(const std::string & name, const pugi::xml_node & parent, Scope 
       parent.name(), " requires class ", name, " as element, but there is no declaration"));
   }
 }
+
+extern template auto readElement(const std::string &, const pugi::xml_node &, Scope &)
+  -> syntax::Orientation;
+extern template auto readElement(const std::string &, const pugi::xml_node &, Scope &)
+  -> syntax::Position;
+extern template auto readElement(const std::string &, const pugi::xml_node &, Scope &)
+  -> syntax::Properties;
+extern template auto readElement(const std::string &, const pugi::xml_node &, Scope &)
+  -> syntax::Range;
 
 template <typename T, typename U, typename Scope>
 auto readElement(const std::string & name, const pugi::xml_node & parent, Scope & scope, U && value)
@@ -157,25 +177,6 @@ auto choice(
   const pugi::xml_node & node,
   std::unordered_map<std::string, std::function<Object(const pugi::xml_node &)>> callees) -> Object;
 }  // namespace reader
-
-struct Scope;
-
-inline namespace syntax
-{
-struct Orientation;
-struct Position;
-struct Properties;
-struct Range;
-}  // namespace syntax
-
-extern template auto reader::readElement(const std::string &, const pugi::xml_node &, Scope &)
-  -> syntax::Orientation;
-extern template auto reader::readElement(const std::string &, const pugi::xml_node &, Scope &)
-  -> syntax::Position;
-extern template auto reader::readElement(const std::string &, const pugi::xml_node &, Scope &)
-  -> syntax::Properties;
-extern template auto reader::readElement(const std::string &, const pugi::xml_node &, Scope &)
-  -> syntax::Range;
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__READER__ELEMENT_HPP_

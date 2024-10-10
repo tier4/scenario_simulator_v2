@@ -7,16 +7,16 @@
 
 namespace openscenario_interpreter
 {
-template auto reader::readElement<syntax::Orientation, Scope>(
-  const std::string &, const pugi::xml_node &, Scope &) -> syntax::Orientation;
-template auto reader::readElement<syntax::Position, Scope>(
-  const std::string &, const pugi::xml_node &, Scope &) -> syntax::Position;
-template auto reader::readElement<syntax::Properties, Scope>(
-  const std::string &, const pugi::xml_node &, Scope &) -> syntax::Properties;
-template auto reader::readElement<syntax::Range, Scope>(
-  const std::string &, const pugi::xml_node &, Scope &) -> syntax::Range;
+inline namespace reader
+{
+template auto readElement(const std::string &, const pugi::xml_node &, Scope &)
+  -> syntax::Orientation;
+template auto readElement(const std::string &, const pugi::xml_node &, Scope &) -> syntax::Position;
+template auto readElement(const std::string &, const pugi::xml_node &, Scope &)
+  -> syntax::Properties;
+template auto readElement(const std::string &, const pugi::xml_node &, Scope &) -> syntax::Range;
 
-auto reader::choice(
+auto choice(
   const pugi::xml_node & node,
   std::unordered_map<std::string, std::function<Object(const pugi::xml_node &)>> callees) -> Object
 {
@@ -70,4 +70,5 @@ auto reader::choice(
     return callees.at(std::get<0>(*iter))(std::get<1>(*iter));
   }
 }
+}  // namespace reader
 }  // namespace openscenario_interpreter
