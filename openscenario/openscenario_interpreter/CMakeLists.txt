@@ -69,7 +69,7 @@ target_link_libraries(${PROJECT_NAME} Boost::filesystem Boost::json glog pugixml
 
 target_precompile_headers(${PROJECT_NAME}
   PUBLIC
-    "<nlohmann/json.hpp>"
+    "<boost/json.hpp>"
     "<openscenario_interpreter/expression.hpp>"
     "<openscenario_interpreter/object.hpp>"
     "<openscenario_interpreter/pointer.hpp>"
