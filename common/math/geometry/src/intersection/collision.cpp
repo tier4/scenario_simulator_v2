@@ -51,8 +51,8 @@ bool checkCollision2D(
 bool contains(
   const std::vector<geometry_msgs::msg::Point> & polygon, const geometry_msgs::msg::Point & point)
 {
-  typedef boost::geometry::model::d2::point_xy<double> boost_point;
-  typedef boost::geometry::model::polygon<boost_point> boost_polygon;
+  using boost_point = boost::geometry::model::d2::point_xy<double>;
+  using boost_polygon = boost::geometry::model::polygon<boost_point>;
   boost_polygon poly;
   for (const auto & p : polygon) {
     boost::geometry::exterior_ring(poly).push_back(boost_point(p.x, p.y));
