@@ -15,7 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__ACTION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ACTION_HPP_
 
-#include <nlohmann/json.hpp>
+#include <boost/json.hpp>
 #include <openscenario_interpreter/syntax/global_action.hpp>
 #include <openscenario_interpreter/syntax/private_action.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element.hpp>
@@ -56,7 +56,7 @@ struct Action : public Scope, public ComplexType, public StoryboardElement
 
   auto stop() -> void override;
 
-  friend auto operator<<(nlohmann::json &, const Action &) -> nlohmann::json &;
+  friend auto operator<<(boost::json::object &, const Action &) -> boost::json::object &;
 };
 
 DEFINE_LAZY_VISITOR(
