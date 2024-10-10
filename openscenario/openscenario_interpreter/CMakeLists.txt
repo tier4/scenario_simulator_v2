@@ -15,8 +15,10 @@ find_package(ament_cmake_auto REQUIRED)
 ament_auto_find_build_dependencies()
 
 # ------------------------------------------------------------------------------
-# Boost.JSON (from Git)
+#  Boost.JSON (from Git)
 # ------------------------------------------------------------------------------
+# - Ubuntu 22.04 does not include libboost-json-dev, we need to build it from source
+# - We also use older version due to compatibility of Boost by Ubuntu 22.04
 include(FetchContent)
 
 FetchContent_Declare(
@@ -26,12 +28,14 @@ FetchContent_Declare(
 
 FetchContent_GetProperties(boost_json)
 
+# For faster build, we disable tests, examples, fuzzers, and benchmarks of Boost.JSON
 set(BOOST_JSON_STANDALONE ON)
-set(BOOST_JSON_BUILD_TESTS OFF)
-set(BOOST_JSON_BUILD_EXAMPLES OFF)
-set(BOOST_JSON_BUILD_FUZZERS OFF)
-set(BOOST_JSON_BUILD_BENCHMARKS OFF)
+set(BOOST_JSON_BUILD_TESTS OFF CACHE INTERNAL OFF)
+set(BOOST_JSON_BUILD_EXAMPLES OFF CACHE INTERNAL OFF)
+set(BOOST_JSON_BUILD_FUZZERS OFF CACHE INTERNAL OFF)
+set(BOOST_JSON_BUILD_BENCHMARKS OFF CACHE INTERNAL OFF)
 
+# For faster serialization, we increase the internal buffer size
 add_compile_definitions(BOOST_JSON_STACK_BUFFER_SIZE=16384)
 
 if(NOT boost_json_POPULATED)
@@ -40,7 +44,7 @@ if(NOT boost_json_POPULATED)
 endif()
 
 # ------------------------------------------------------------------------------
-# libopenscenario_interpreter
+#  libopenscenario_interpreter
 # ------------------------------------------------------------------------------
 file(GLOB ${PROJECT_NAME}_POSIX_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/posix/*.cpp)
 file(GLOB ${PROJECT_NAME}_SYNTAX_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/syntax/*.cpp)
@@ -57,13 +61,15 @@ ament_auto_add_library(${PROJECT_NAME} SHARED
   src/scope.cpp)
 
 target_link_libraries(${PROJECT_NAME} Boost::filesystem glog pugixml)
-target_include_directories(${PROJECT_NAME} PUBLIC ${boost_json_SOURCE_DIR}/include)
 
+# Boost.JSON (remove when OS includes libboost-json-dev)
+target_include_directories(${PROJECT_NAME} PUBLIC ${boost_json_SOURCE_DIR}/include)
 ament_export_include_directories(${boost_json_SOURCE_DIR}/include)
 
 # ------------------------------------------------------------------------------
-# openscenario_interpreter_node
+#  openscenario_interpreter_node
 # ------------------------------------------------------------------------------
+
 ament_auto_add_executable(${PROJECT_NAME}_node src/${PROJECT_NAME}_node.cpp)
 
 target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME})
@@ -73,8 +79,9 @@ install(
   DESTINATION lib/${PROJECT_NAME})
 
 # ------------------------------------------------------------------------------
-# test
+#  test
 # ------------------------------------------------------------------------------
+
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
