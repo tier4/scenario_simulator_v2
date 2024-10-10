@@ -22,13 +22,24 @@ inline namespace syntax
 PoissonDistribution::PoissonDistribution(
   const pugi::xml_node & node, openscenario_interpreter::Scope & scope)
 : Scope(scope),
-  range(readElement<Range>("range", node, scope)),
+  range(readElement<Range>("Range", node, scope)),
   expected_value(readAttribute<Double>("expectedValue", node, scope)),
-  distribute(expected_value.data),
-  random_engine(scope.seed)
+  distribute(expected_value.data)
 {
 }
 
-auto PoissonDistribution::evaluate() -> Object { return make<Double>(distribute(random_engine)); }
+auto PoissonDistribution::derive() -> Object
+{
+  return make<Double>([&]() {
+    double value;
+    auto in_range = [this](double value) {
+      return range.lower_limit.data <= value and value <= range.upper_limit.data;
+    };
+    do {
+      value = distribute(random_engine);
+    } while (not in_range(value));
+    return value;
+  }());
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

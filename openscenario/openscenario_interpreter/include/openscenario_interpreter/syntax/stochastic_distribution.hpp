@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__STOCHASTIC_DISTRIBUTION_HPP_
-#define OPENSCENARIO_INTERPRETER__STOCHASTIC_DISTRIBUTION_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__STOCHASTIC_DISTRIBUTION_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__STOCHASTIC_DISTRIBUTION_HPP_
 
+#include <openscenario_interpreter/parameter_distribution.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/stochastic_distribution_type.hpp>
 #include <pugixml.hpp>
@@ -23,22 +24,27 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- StochasticDistribution 1.2 ---------------------------------------------
- *
- *  <xsd:complexType name="StochasticDistribution">
- *    <xsd:sequence>
- *      <xsd:group ref="StochasticDistributionType"/>
- *    </xsd:sequence>
- *    <xsd:attribute name="parameterName" type="String" use="required"/>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
-struct StochasticDistribution : public StochasticDistributionType
+/*
+   StochasticDistribution (OpenSCENARIO XML 1.3)
+
+   Container for a stochastic distribution which applies to a single parameter.
+
+   <xsd:complexType name="StochasticDistribution">
+     <xsd:sequence>
+       <xsd:group ref="StochasticDistributionType"/>
+     </xsd:sequence>
+     <xsd:attribute name="parameterName" type="String" use="required"/>
+   </xsd:complexType>
+*/
+struct StochasticDistribution : public StochasticDistributionType,
+                                public StochasticParameterDistributionBase
 {
   const String parameter_name;
 
   explicit StochasticDistribution(const pugi::xml_node &, Scope & scope);
+
+  auto derive() -> Object override;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
-#endif  // OPENSCENARIO_INTERPRETER__STOCHASTIC_DISTRIBUTION_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__STOCHASTIC_DISTRIBUTION_HPP_

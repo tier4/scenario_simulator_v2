@@ -20,15 +20,19 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 Histogram::Histogram(const pugi::xml_node & node, openscenario_interpreter::Scope & scope)
-: Scope(scope),
-  bins(readElements<HistogramBin, 1>("Bin", node, scope)),
-  bin_adaptor(bins),
-  distribute(
-    bin_adaptor.intervals.begin(), bin_adaptor.intervals.end(), bin_adaptor.densities.begin()),
-  random_engine(scope.seed)
+: Scope(scope), bins(readElements<HistogramBin, 1>("Bin", node, scope)), distribute([this]() {
+    std::vector<double> intervals, densities;
+    intervals.emplace_back(bins.front().range.lower_limit.data);
+    for (const auto & bin : bins) {
+      intervals.emplace_back(bin.range.upper_limit.data);
+      densities.emplace_back(bin.weight.data);
+    }
+    return std::piecewise_constant_distribution<Double::value_type>::param_type(
+      intervals.begin(), intervals.end(), densities.begin());
+  }())
 {
 }
 
-auto Histogram::evaluate() -> Object { return make<Double>(distribute(random_engine)); }
+auto Histogram::derive() -> Object { return make<Double>(distribute(random_engine)); }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
