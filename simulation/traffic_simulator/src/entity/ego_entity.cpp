@@ -165,8 +165,6 @@ void EgoEntity::onUpdate(double current_time, double step_time)
   if (not is_controlled_by_simulator_) {
     updateEntityStatusTimestamp(current_time + step_time);
   }
-
-  updateStandStillDuration(step_time);
   updateFieldOperatorApplication();
 
   EntityBase::onPostUpdate(current_time, step_time);
