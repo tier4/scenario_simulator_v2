@@ -221,10 +221,6 @@ public:
 
   /*   */ void updateEntityStatusTimestamp(const double current_time);
 
-  /*   */ auto updateStandStillDuration(const double step_time) -> double;
-
-  /*   */ auto updateTraveledDistance(const double step_time) -> double;
-
   /*   */ bool reachPosition(
     const geometry_msgs::msg::Pose & target_pose, const double tolerance) const;
 
