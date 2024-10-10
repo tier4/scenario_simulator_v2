@@ -22,8 +22,8 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 OpenScenarioCategory::OpenScenarioCategory(const pugi::xml_node & tree, Scope & scope)
-: Group(
 // clang-format off
+: Group(
     choice(tree, {
       { "Storyboard",                [&](auto &&     ) { return make<ScenarioDefinition                  >(tree, scope); } },  // DIRTY HACK!!!
       { "Catalog",                   [&](auto &&     ) { return make<CatalogDefinition                   >(tree, scope); } },
