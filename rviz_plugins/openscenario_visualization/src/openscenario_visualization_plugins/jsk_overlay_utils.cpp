@@ -45,7 +45,7 @@
 // POSSIBILITY OF SUCH DAMAGE.S SOFTWARE, EVEN IF ADVISED OF THE
 //  POSSIBILITY OF SUCH DAMAGE.
 
-#include "openscenario_visualization_condition_groups_plugin/jsk_overlay_utils.hpp"
+#include "openscenario_visualization_plugins/jsk_overlay_utils.hpp"
 
 #include <string>
 
