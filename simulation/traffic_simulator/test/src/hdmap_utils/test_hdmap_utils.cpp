@@ -125,6 +125,22 @@ protected:
 
   hdmap_utils::HdMapUtils hdmap_utils;
 };
+class HdMapUtilsTest_IntersectionMap : public testing::Test
+{
+protected:
+  HdMapUtilsTest_IntersectionMap()
+  : hdmap_utils(
+      ament_index_cpp::get_package_share_directory("traffic_simulator") +
+        "/map/intersection/lanelet2_map.osm",
+      geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
+        .latitude(35.64200728302)
+        .longitude(139.74821144562)
+        .altitude(0.0))
+  {
+  }
+
+  hdmap_utils::HdMapUtils hdmap_utils;
+};
 
 /**
  * @note Test basic functionality.
@@ -2053,6 +2069,71 @@ TEST_F(HdMapUtilsTest_KashiwanohaMap, getLongitudinalDistance_PullRequest1348)
   EXPECT_NO_THROW(EXPECT_DOUBLE_EQ(
     hdmap_utils.getLongitudinalDistance(pose_from, pose_to, true).value(),
     54.18867466433655977198213804513216018676757812500000));
+}
+
+/**
+ * @note Test for the corner case described in https://github.com/tier4/scenario_simulator_v2/issues/1364
+ * Test in a scenario where lane change is necessary:
+ * if allow_lane_change = false, std::nullopt should be returned;
+ * if allow_lane_change = true, a value should be returned.
+ */
+TEST_F(HdMapUtilsTest_IntersectionMap, getLongitudinalDistance_laneChange)
+{
+  {
+    const auto pose_from = traffic_simulator::helper::constructLaneletPose(563L, 5.0);
+    const auto pose_to = traffic_simulator::helper::constructLaneletPose(659L, 5.0);
+
+    const auto without_lane_change = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, false);
+    EXPECT_FALSE(without_lane_change.has_value());
+
+    const auto with_lane_change = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, true);
+    ASSERT_TRUE(with_lane_change.has_value());
+    EXPECT_NEAR(with_lane_change.value(), 157.0, 1.0);
+  }
+  {
+    const auto pose_from = traffic_simulator::helper::constructLaneletPose(563L, 5.0);
+    const auto pose_to = traffic_simulator::helper::constructLaneletPose(658L, 5.0);
+
+    const auto without_lane_change = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, false);
+    EXPECT_FALSE(without_lane_change.has_value());
+
+    const auto with_lane_change = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, true);
+    ASSERT_TRUE(with_lane_change.has_value());
+    EXPECT_NEAR(with_lane_change.value(), 161.0, 1.0);
+  }
+  {
+    const auto pose_from = traffic_simulator::helper::constructLaneletPose(563L, 5.0);
+    const auto pose_to = traffic_simulator::helper::constructLaneletPose(657L, 5.0);
+
+    const auto without_lane_change = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, false);
+    EXPECT_FALSE(without_lane_change.has_value());
+
+    const auto with_lane_change = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, true);
+    ASSERT_TRUE(with_lane_change.has_value());
+    EXPECT_NEAR(with_lane_change.value(), 161.0, 1.0);
+  }
+  {
+    const auto pose_from = traffic_simulator::helper::constructLaneletPose(643L, 5.0);
+    const auto pose_to = traffic_simulator::helper::constructLaneletPose(666L, 5.0);
+
+    const auto without_lane_change = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, false);
+    EXPECT_FALSE(without_lane_change.has_value());
+
+    const auto with_lane_change = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, true);
+    ASSERT_TRUE(with_lane_change.has_value());
+    EXPECT_NEAR(with_lane_change.value(), 250.0, 1.0);
+  }
+  {
+    const auto pose_from = traffic_simulator::helper::constructLaneletPose(643L, 5.0);
+    const auto pose_to = traffic_simulator::helper::constructLaneletPose(665L, 5.0);
+
+    const auto without_lane_change = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, false);
+    EXPECT_FALSE(without_lane_change.has_value());
+
+    const auto with_lane_change = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, true);
+    ASSERT_TRUE(with_lane_change.has_value());
+    EXPECT_NEAR(with_lane_change.value(), 253.0, 1.0);
+  }
 }
 
 /**
