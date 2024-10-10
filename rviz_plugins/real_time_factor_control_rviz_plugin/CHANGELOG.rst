@@ -21,6 +21,12 @@ Changelog for package real_time_factor_control_rviz_plugin
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+4.3.14 (2024-10-10)
+-------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/joblist-update-stand-still-duration
+* Merge branch 'master' into feature/joblist-update-stand-still-duration
+* Contributors: Masaya Kataoka
+
 4.3.13 (2024-10-09)
 -------------------
 * Merge branch 'master' into feature/use-autoware-state
