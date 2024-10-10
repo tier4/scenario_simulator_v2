@@ -23,13 +23,13 @@ inline namespace syntax
 {
 OpenScenarioCategory::OpenScenarioCategory(const pugi::xml_node & tree, Scope & scope)
 : Group(
-    // clang-format off
+// clang-format off
     choice(tree, {
       { "Storyboard",                [&](auto &&     ) { return make<ScenarioDefinition                  >(tree, scope); } },  // DIRTY HACK!!!
       { "Catalog",                   [&](auto &&     ) { return make<CatalogDefinition                   >(tree, scope); } },
       { "ParameterValueDistribution",[&](auto && node) { return make<ParameterValueDistributionDefinition>(node, scope); } },
     }))
-    // clang-format on
+// clang-format on
 {
 }
 }  // namespace syntax
