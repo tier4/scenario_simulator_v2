@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>concealer</name>
-  <version>4.3.1</version>
+  <version>4.3.13</version>
   <description>Provides a class 'Autoware' to conceal miscellaneous things to simplify Autoware management of the simulator.</description>
   <maintainer email="tatsuya.yamasaki@tier4.jp">Tatsuya Yamasaki</maintainer>
   <license>Apache License 2.0</license>
@@ -22,7 +22,6 @@
   <depend>tier4_external_api_msgs</depend>
   <depend>tier4_planning_msgs</depend>
   <depend>tier4_rtc_msgs</depend>
-  <depend>tier4_system_msgs</depend>
 
   <!-- Common -->
   <depend>ament_index_cpp</depend>
