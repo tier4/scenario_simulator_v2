@@ -438,20 +438,20 @@ TEST(Conversion, Clock)
   EXPECT_CLOCK_EQ(msg, proto);
 }
 
-TEST(Conversion, AckermannControlCommand)
+TEST(Conversion, Control)
 {
-  autoware_auto_control_msgs::AckermannControlCommand proto;
-  autoware_auto_control_msgs::msg::AckermannControlCommand msg;
+  autoware_control_msgs::Control proto;
+  autoware_control_msgs::msg::Control msg;
   msg.longitudinal.acceleration = 3;
   msg.lateral.steering_tire_angle = 1.4;
   msg.lateral.steering_tire_rotation_rate = 13.4;
-  msg.longitudinal.speed = 11.3;
+  msg.longitudinal.velocity = 11.3;
   simulation_interface::toProto(msg, proto);
   EXPECT_CONTROL_COMMAND_EQ(msg, proto);
   msg.longitudinal.acceleration = 0;
   msg.lateral.steering_tire_angle = 0;
   msg.lateral.steering_tire_rotation_rate = 0;
-  msg.longitudinal.speed = 0;
+  msg.longitudinal.velocity = 0;
   simulation_interface::toMsg(proto, msg);
   EXPECT_CONTROL_COMMAND_EQ(msg, proto);
 }

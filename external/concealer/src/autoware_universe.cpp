@@ -17,7 +17,7 @@
 namespace concealer
 {
 AutowareUniverse::AutowareUniverse()
-: getAckermannControlCommand("/control/command/control_cmd", rclcpp::QoS(1), *this),
+: getCommand("/control/command/control_cmd", rclcpp::QoS(1), *this),
   getGearCommandImpl("/control/command/gear_cmd", rclcpp::QoS(1), *this),
   getTurnIndicatorsCommand("/control/command/turn_indicators_cmd", rclcpp::QoS(1), *this),
   getPathWithLaneId(
@@ -66,17 +66,14 @@ auto AutowareUniverse::stopAndJoin() -> void
 
 auto AutowareUniverse::getAcceleration() const -> double
 {
-  return getAckermannControlCommand().longitudinal.acceleration;
+  return getCommand().longitudinal.acceleration;
 }
 
-auto AutowareUniverse::getVelocity() const -> double
-{
-  return getAckermannControlCommand().longitudinal.speed;
-}
+auto AutowareUniverse::getVelocity() const -> double { return getCommand().longitudinal.velocity; }
 
 auto AutowareUniverse::getSteeringAngle() const -> double
 {
-  return getAckermannControlCommand().lateral.steering_tire_angle;
+  return getCommand().lateral.steering_tire_angle;
 }
 
 auto AutowareUniverse::updateLocalization() -> void
@@ -111,20 +108,20 @@ auto AutowareUniverse::updateLocalization() -> void
 auto AutowareUniverse::updateVehicleState() -> void
 {
   setControlModeReport([this]() {
-    autoware_auto_vehicle_msgs::msg::ControlModeReport message;
-    message.mode = autoware_auto_vehicle_msgs::msg::ControlModeReport::AUTONOMOUS;
+    autoware_vehicle_msgs::msg::ControlModeReport message;
+    message.mode = current_control_mode.load();
     return message;
   }());
 
   setGearReport([this]() {
-    autoware_auto_vehicle_msgs::msg::GearReport message;
+    autoware_vehicle_msgs::msg::GearReport message;
     message.stamp = get_clock()->now();
     message.report = getGearCommand().command;
     return message;
   }());
 
   setSteeringReport([this]() {
-    autoware_auto_vehicle_msgs::msg::SteeringReport message;
+    autoware_vehicle_msgs::msg::SteeringReport message;
     message.stamp = get_clock()->now();
     message.steering_tire_angle = getSteeringAngle();
     return message;
@@ -132,7 +129,7 @@ auto AutowareUniverse::updateVehicleState() -> void
 
   setVelocityReport([this]() {
     const auto twist = current_twist.load();
-    autoware_auto_vehicle_msgs::msg::VelocityReport message;
+    autoware_vehicle_msgs::msg::VelocityReport message;
     message.header.stamp = get_clock()->now();
     message.header.frame_id = "base_link";
     message.longitudinal_velocity = twist.linear.x;
@@ -142,34 +139,33 @@ auto AutowareUniverse::updateVehicleState() -> void
   }());
 
   setTurnIndicatorsReport([this]() {
-    autoware_auto_vehicle_msgs::msg::TurnIndicatorsReport message;
+    autoware_vehicle_msgs::msg::TurnIndicatorsReport message;
     message.stamp = get_clock()->now();
     message.report = getTurnIndicatorsCommand().command;
     return message;
   }());
 }
 
-auto AutowareUniverse::getGearCommand() const -> autoware_auto_vehicle_msgs::msg::GearCommand
+auto AutowareUniverse::getGearCommand() const -> autoware_vehicle_msgs::msg::GearCommand
 {
   return getGearCommandImpl();
 }
 
 auto AutowareUniverse::getGearSign() const -> double
 {
-  using autoware_auto_vehicle_msgs::msg::GearCommand;
-  /// @todo Add support for GearCommand::NONE to return 0.0
-  /// @sa https://github.com/autowarefoundation/autoware.universe/blob/main/simulator/simple_planning_simulator/src/simple_planning_simulator/simple_planning_simulator_core.cpp#L475
+  using autoware_vehicle_msgs::msg::GearCommand;
+  // @todo Add support for GearCommand::NONE to return 0.0
+  // @sa https://github.com/autowarefoundation/autoware.universe/blob/main/simulator/simple_planning_simulator/src/simple_planning_simulator/simple_planning_simulator_core.cpp#L475
   return getGearCommand().command == GearCommand::REVERSE or
              getGearCommand().command == GearCommand::REVERSE_2
            ? -1.0
            : 1.0;
 }
 
-auto AutowareUniverse::getVehicleCommand() const -> std::tuple<
-  autoware_auto_control_msgs::msg::AckermannControlCommand,
-  autoware_auto_vehicle_msgs::msg::GearCommand>
+auto AutowareUniverse::getVehicleCommand() const
+  -> std::tuple<autoware_control_msgs::msg::Control, autoware_vehicle_msgs::msg::GearCommand>
 {
-  return std::make_tuple(getAckermannControlCommand(), getGearCommand());
+  return std::make_tuple(getCommand(), getGearCommand());
 }
 
 auto AutowareUniverse::getRouteLanelets() const -> std::vector<std::int64_t>
@@ -179,5 +175,15 @@ auto AutowareUniverse::getRouteLanelets() const -> std::vector<std::int64_t>
     std::copy(point.lane_ids.begin(), point.lane_ids.end(), std::back_inserter(ids));
   }
   return ids;
+}
+
+auto AutowareUniverse::setManualMode() -> void
+{
+  current_control_mode.store(autoware_vehicle_msgs::msg::ControlModeReport::MANUAL);
+}
+
+auto AutowareUniverse::setAutonomousMode() -> void
+{
+  current_control_mode.store(autoware_vehicle_msgs::msg::ControlModeReport::AUTONOMOUS);
 }
 }  // namespace concealer
