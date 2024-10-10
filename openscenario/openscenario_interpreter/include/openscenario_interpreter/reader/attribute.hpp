@@ -21,7 +21,6 @@
 #include <functional>
 #include <openscenario_interpreter/reader/evaluate.hpp>
 #include <openscenario_interpreter/syntax/parameter_type.hpp>
-#include <openscenario_interpreter/syntax/rule.hpp>
 #include <openscenario_interpreter/utility/highlighter.hpp>
 #include <optional>
 #include <pugixml.hpp>
@@ -32,20 +31,18 @@
 
 namespace openscenario_interpreter
 {
-struct Scope;
-
 inline namespace reader
 {
 template <typename Scope>
-auto substitute(std::string attribute, Scope & scope)
+auto substitute(std::string attribute, const Scope & scope) -> String
 {
   auto dirname = [](auto &&, auto && scope) { return scope.dirname(); };
 
-  auto find_pkg_share = [](auto && package_name, auto &&) {
+  auto find_pkg_share = [](auto && package_name, const auto &) {
     return ament_index_cpp::get_package_share_directory(package_name);
   };
 
-  auto ros2 = [](auto && arguments, auto &&) {
+  auto ros2 = [](auto && arguments, const auto &) {
     auto remove_trailing_newline = [](auto && s) {
       while (s.back() == '\n') {
         s.pop_back();
@@ -65,7 +62,7 @@ auto substitute(std::string attribute, Scope & scope)
     }
   };
 
-  auto var = [](auto && name, auto && scope) {
+  auto var = [](auto && name, const auto & scope) {
     // TODO: Return the value of the launch configuration variable instead of the OpenSCENARIO parameter.
     if (const auto found = scope.ref(name); found) {
       return boost::lexical_cast<String>(found);
@@ -76,7 +73,7 @@ auto substitute(std::string attribute, Scope & scope)
 
   // NOTE: https://design.ros2.org/articles/roslaunch_xml.html#dynamic-configuration
   static const std::unordered_map<
-    std::string, std::function<std::string(const std::string &, Scope &)> >
+    std::string, std::function<std::string(const std::string &, const Scope &)> >
     substitutions{
       {"dirname", dirname},
       // TODO {"env", env},
@@ -160,7 +157,8 @@ auto readAttribute(const std::string & name, const Node & node, const Scope & sc
 }
 
 template <typename T, typename Node, typename Scope>
-auto readAttribute(const std::string & name, const Node & node, const Scope & scope, T && value) -> T
+auto readAttribute(const std::string & name, const Node & node, const Scope & scope, T && value)
+  -> T
 {
   if (node.attribute(name.c_str())) {
     return readAttribute<T>(name, node, scope);
@@ -178,13 +176,29 @@ auto readAttribute(const std::string & name, const Node & node, const Scope & sc
     return std::optional<T>();
   }
 }
-
-extern template auto readAttribute<Boolean, pugi::xml_node, Scope>(const std::string &, const pugi::xml_node &, const Scope &) -> Boolean;
-extern template auto readAttribute<UnsignedInteger, pugi::xml_node, Scope>(const std::string &, const pugi::xml_node &, const Scope &) -> UnsignedInteger;
-extern template auto readAttribute<Double, pugi::xml_node, Scope>(const std::string &, const pugi::xml_node &, const Scope &) -> Double;
-extern template auto readAttribute<String, pugi::xml_node, Scope>(const std::string &, const pugi::xml_node &, const Scope &) -> String;
-extern template auto readAttribute<syntax::Rule, pugi::xml_node, Scope>(const std::string &, const pugi::xml_node &, const Scope &) -> syntax::Rule;
 }  // namespace reader
-}  // namespace openscenario_interpreter
 
+struct Scope;
+
+inline namespace syntax
+{
+struct Rule;
+}  // namespace syntax
+
+extern template auto substitute(std::string, const Scope &) -> String;
+
+extern template auto reader::readAttribute(
+  const std::string &, const pugi::xml_node &, const Scope &) -> Boolean;
+extern template auto reader::readAttribute(
+  const std::string &, const pugi::xml_node &, const Scope &) -> UnsignedShort;
+extern template auto reader::readAttribute(
+  const std::string &, const pugi::xml_node &, const Scope &) -> UnsignedInteger;
+extern template auto reader::readAttribute(
+  const std::string &, const pugi::xml_node &, const Scope &) -> Double;
+extern template auto reader::readAttribute(
+  const std::string &, const pugi::xml_node &, const Scope &) -> String;
+extern template auto reader::readAttribute(
+  const std::string &, const pugi::xml_node &, const Scope &) -> syntax::Rule;
+
+}  // namespace openscenario_interpreter
 #endif  // OPENSCENARIO_INTERPRETER__READER__ATTRIBUTE_HPP_

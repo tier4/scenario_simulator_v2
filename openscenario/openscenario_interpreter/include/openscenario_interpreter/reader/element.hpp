@@ -72,7 +72,7 @@ auto traverse(const pugi::xml_node & parent, const std::string & name, F && f) -
 }
 
 template <typename T, typename Scope>
-auto readElement(const std::string & name, const pugi::xml_node & parent, Scope & scope)
+auto readElement(const std::string & name, const pugi::xml_node & parent, Scope & scope) -> T
 {
   if (const auto child = parent.child(name.c_str())) {
     return T(child, scope);
@@ -153,8 +153,29 @@ auto readGroups(const pugi::xml_node & node, Ts &&... xs)
   return groups;
 }
 
-auto choice(const pugi::xml_node & node, std::unordered_map<std::string, std::function<Object(const pugi::xml_node &)>> callees) -> Object;
+auto choice(
+  const pugi::xml_node & node,
+  std::unordered_map<std::string, std::function<Object(const pugi::xml_node &)>> callees) -> Object;
 }  // namespace reader
+
+struct Scope;
+
+inline namespace syntax
+{
+struct Orientation;
+struct Position;
+struct Properties;
+struct Range;
+}  // namespace syntax
+
+extern template auto reader::readElement(const std::string &, const pugi::xml_node &, Scope &)
+  -> syntax::Orientation;
+extern template auto reader::readElement(const std::string &, const pugi::xml_node &, Scope &)
+  -> syntax::Position;
+extern template auto reader::readElement(const std::string &, const pugi::xml_node &, Scope &)
+  -> syntax::Properties;
+extern template auto reader::readElement(const std::string &, const pugi::xml_node &, Scope &)
+  -> syntax::Range;
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__READER__ELEMENT_HPP_

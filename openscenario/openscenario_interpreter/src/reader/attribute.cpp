@@ -1,13 +1,21 @@
 #include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/rule.hpp>
 
 namespace openscenario_interpreter
 {
-inline namespace reader
-{
-template auto readAttribute<Boolean, pugi::xml_node, Scope>(const std::string &, const pugi::xml_node &, const Scope &) -> Boolean;
-template auto readAttribute<UnsignedInteger, pugi::xml_node, Scope>(const std::string &, const pugi::xml_node &, const Scope &) -> UnsignedInteger;
-template auto readAttribute<Double, pugi::xml_node, Scope>(const std::string &, const pugi::xml_node &, const Scope &) -> Double;
-template auto readAttribute<String, pugi::xml_node, Scope>(const std::string &, const pugi::xml_node &, const Scope &) -> String;
-template auto readAttribute<syntax::Rule, pugi::xml_node, Scope>(const std::string &, const pugi::xml_node &, const Scope &) -> syntax::Rule;
-}
-}
+template auto reader::substitute(std::string, const Scope &) -> String;
+
+template auto reader::readAttribute(const std::string &, const pugi::xml_node &, const Scope &)
+  -> Boolean;
+template auto reader::readAttribute(const std::string &, const pugi::xml_node &, const Scope &)
+  -> UnsignedShort;
+template auto reader::readAttribute(const std::string &, const pugi::xml_node &, const Scope &)
+  -> UnsignedInteger;
+template auto reader::readAttribute(const std::string &, const pugi::xml_node &, const Scope &)
+  -> Double;
+template auto reader::readAttribute(const std::string &, const pugi::xml_node &, const Scope &)
+  -> String;
+template auto reader::readAttribute(const std::string &, const pugi::xml_node &, const Scope &)
+  -> syntax::Rule;
+}  // namespace openscenario_interpreter
