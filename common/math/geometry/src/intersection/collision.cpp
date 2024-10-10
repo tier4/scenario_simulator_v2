@@ -36,7 +36,7 @@ bool checkCollision2D(
     return false;
   }
   namespace bg = boost::geometry;
-  using bg_point = bg::model::d2::point_xy<double> bg_point;
+  using bg_point = bg::model::d2::point_xy<double>;
   const bg::model::polygon<bg_point> poly0 = math::geometry::toPolygon2D(pose0, bbox0);
   const bg::model::polygon<bg_point> poly1 = math::geometry::toPolygon2D(pose1, bbox1);
   if (bg::intersects(poly0, poly1)) {
