@@ -26,6 +26,9 @@ namespace math
 {
 namespace geometry
 {
+using boost_point = boost::geometry::model::d2::point_xy<double>;
+using boost_polygon = boost::geometry::model::polygon<boost_point>;
+
 bool checkCollision2D(
   geometry_msgs::msg::Pose pose0, traffic_simulator_msgs::msg::BoundingBox bbox0,
   geometry_msgs::msg::Pose pose1, traffic_simulator_msgs::msg::BoundingBox bbox1)
@@ -35,14 +38,12 @@ bool checkCollision2D(
     (std::abs(bbox0.dimensions.z + bbox1.dimensions.z) * 0.5)) {
     return false;
   }
-  namespace bg = boost::geometry;
-  using bg_point = bg::model::d2::point_xy<double>;
-  const bg::model::polygon<bg_point> poly0 = math::geometry::toPolygon2D(pose0, bbox0);
-  const bg::model::polygon<bg_point> poly1 = math::geometry::toPolygon2D(pose1, bbox1);
-  if (bg::intersects(poly0, poly1)) {
+  const boost_polygon poly0 = math::geometry::toPolygon2D(pose0, bbox0);
+  const boost_polygon poly1 = math::geometry::toPolygon2D(pose1, bbox1);
+  if (boost::geometry::intersects(poly0, poly1)) {
     return true;
   }
-  if (bg::disjoint(poly0, poly1)) {
+  if (boost::geometry::disjoint(poly0, poly1)) {
     return false;
   }
   return true;
@@ -51,8 +52,6 @@ bool checkCollision2D(
 bool contains(
   const std::vector<geometry_msgs::msg::Point> & polygon, const geometry_msgs::msg::Point & point)
 {
-  using boost_point = boost::geometry::model::d2::point_xy<double>;
-  using boost_polygon = boost::geometry::model::polygon<boost_point>;
   boost_polygon poly;
   for (const auto & p : polygon) {
     boost::geometry::exterior_ring(poly).push_back(boost_point(p.x, p.y));
