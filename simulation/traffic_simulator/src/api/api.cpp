@@ -455,6 +455,21 @@ auto API::relativePose(
   return pose::relativePose(from_map_pose, to_entity->getMapPose());
 }
 
+auto API::countLaneChanges(
+  const std::string & from_entity_name, const std::string & to_entity_name,
+  const bool allow_lane_change) const -> std::optional<std::pair<int, int>>
+{
+  if (from_entity_name != to_entity_name) {
+    const auto from_entity = getEntity(from_entity_name);
+    const auto to_entity = getEntity(to_entity_name);
+    return traffic_simulator::distance::countLaneChanges(
+      from_entity->getCanonicalizedLaneletPose().value(),
+      to_entity->getCanonicalizedLaneletPose().value(), allow_lane_change, getHdmapUtils());
+  } else {
+    return std::nullopt;
+  }
+}
+
 auto API::laneletDistance(
   const std::string & from_entity_name, const std::string & to_entity_name,
   const bool allow_lane_change) -> LaneletDistance

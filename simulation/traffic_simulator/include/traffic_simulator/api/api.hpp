@@ -256,6 +256,10 @@ public:
     const geometry_msgs::msg::Pose & from_map_pose, const std::string & to_entity_name)
     -> std::optional<geometry_msgs::msg::Pose>;
 
+  auto countLaneChanges(
+    const std::string & from_entity_name, const std::string & to_entity_name,
+    const bool allow_lane_change) const -> std::optional<std::pair<int, int>>;
+
   auto boundingBoxRelativePose(
     const std::string & from_entity_name, const geometry_msgs::msg::Pose & to_map_pose)
     -> std::optional<geometry_msgs::msg::Pose>;
