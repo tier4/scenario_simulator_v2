@@ -18,6 +18,9 @@ on:
   push:
     branches:
       - master
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   job1:
     name: BuildAndRun
@@ -31,6 +34,7 @@ jobs:
       matrix:
         rosdistro: [humble]
         runs_on: [ubuntu-22.04] # macos-14 is added for arm support. See also https://x.com/github/status/1752458943245189120?s=20
+        cmake_build_type: [RelWithDebInfo, Release] # Debug build type is currently unavailable. @TODO Fix problem and add Debug build.
     steps:
       - name: Suppress warnings
         run: git config --global --add safe.directory '*'
@@ -64,17 +68,23 @@ jobs:
       - name: Resolve rosdep and install colcon mixin
         run: |
           apt-get update
-          apt-get install -y python3-pip python3-colcon-lcov-result lcov
+          apt-get install -y python3-pip python3-colcon-lcov-result lcov unzip
           rosdep update --include-eol-distros
           rosdep install -iy --from-paths src --rosdistro ${{ matrix.rosdistro }}
           colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml
           colcon mixin update default
         shell: bash
 
-      - name: Build packages
+      - name: Install sonar-scanner and build-wrapper
+        uses: sonarsource/sonarcloud-github-c-cpp@v3
+        env:
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }} 
+
+      - name: Build with SonarCloud Build Wrapper
         run: |
           source /opt/ros/${{ matrix.rosdistro }}/setup.bash
-          colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release -DBUILD_CPP_MOCK_SCENARIOS=ON -DBUILD_TESTING=true -DCMAKE_CXX_FLAGS='-fprofile-arcs -ftest-coverage' -DCMAKE_C_FLAGS='-fprofile-arcs -ftest-coverage' --packages-up-to ${{ steps.list_packages.outputs.package_list }}
+          build-wrapper-linux-x86-64 --out-dir src/scenario_simulator_v2/bw-output \
+          colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=${{ matrix.cmake_build_type }} -DBUILD_CPP_MOCK_SCENARIOS=ON -DBUILD_TESTING=true -DCMAKE_CXX_FLAGS='-fprofile-arcs -ftest-coverage' -DCMAKE_C_FLAGS='-fprofile-arcs -ftest-coverage' --packages-up-to ${{ steps.list_packages.outputs.package_list }}
         shell: bash
 
       - name: Colcon test
@@ -84,6 +94,15 @@ jobs:
           colcon test --event-handlers console_cohesion+ --packages-select ${{ steps.list_packages.outputs.package_list }}
           colcon lcov-result --packages-select ${{ steps.list_packages.outputs.package_list }}
         shell: bash
+
+      - name: Collect and run gcov on coverage data
+        run: |
+          mkdir -p ./gcov && \
+          find ./build -name "*.gcda" -o -name "*.gcno" | \
+          while read -r line; do \
+            gcov -o $(dirname "$line") $(echo "$line" | sed 's/\.gcda$/.cpp/;s/\.gcno$/.cpp/;s/\.gcda$/.hpp/;s/\.gcno$/.hpp/'); \
+          done && mv *.gcov ./gcov/
+    
 
       - name: Show test result
         if: always()
@@ -103,9 +122,17 @@ jobs:
       - name: Upload Lcov result
         uses: actions/upload-artifact@v4
         with:
-          name: lcov
+          name: lcov-${{ matrix.cmake_build_type }}
           path: lcov
           retention-days: 1
+
+      - name: Run SonarCloud scan
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: https://sonarcloud.io/
+        working-directory: src/scenario_simulator_v2/
+        run: sonar-scanner --define sonar.cfamily.compile-commands="bw-output/compile_commands.json"
 
 #      - name: Basic test
 #        run: |

@@ -141,7 +141,7 @@ auto RelativeClearanceCondition::evaluate() -> Object
   };
 
   return asBoolean(triggering_entities.apply([&](const auto & triggering_scenario_object) {
-    assert(triggering_scenario_object.is<ScenarioObject>());
+    assert(triggering_scenario_object.template is<ScenarioObject>());
     if (not entity_refs.empty()) {
       return std::all_of(
         entity_refs.begin(), entity_refs.end(), [&](const auto & target_entity_ref) {
@@ -181,7 +181,7 @@ auto RelativeClearanceCondition::evaluate() -> Object
               bool is_included = false;
               triggering_entities.apply(
                 [target_candidate, &is_included](const auto & triggering_scenario_object) {
-                  assert(triggering_scenario_object.is<ScenarioObject>());
+                  assert(triggering_scenario_object.template is<ScenarioObject>());
                   if (triggering_scenario_object.name() == target_candidate.name) {
                     is_included = true;
                   }
