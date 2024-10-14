@@ -191,23 +191,31 @@ private:
     {
       const auto trigger_position = traffic_simulator::helper::constructCanonicalizedLaneletPose(
         34621, 10, 0.0, api_.getHdmapUtils());
+      const auto ego_goal_position = traffic_simulator::helper::constructCanonicalizedLaneletPose(
+        34606, 0.0, 0.0, api_.getHdmapUtils());
       const auto entity_name = "spawn_nearby_ego";
-      const auto ego = api_.getEntity("ego");
-      if (ego_entity->isInPosition(trigger_position, 20.0) && !api_.isEntitySpawned(entity_name)) {
-        api_.spawn(
-          entity_name,
-          traffic_simulator::pose::transformRelativePoseToGlobal(
-            ego->getMapPose(),
-            geometry_msgs::build<geometry_msgs::msg::Pose>()
-              .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(10).y(-5).z(0))
-              .orientation(geometry_msgs::msg::Quaternion())),
-          getVehicleParameters(),
-          traffic_simulator::entity::VehicleEntity::BuiltinBehavior::doNothing());
-      } else {
-        stop(cpp_mock_scenarios::Result::FAILURE);
+
+      if (const auto ego = api_.getEntity("ego")) {
+        if (api_.isInPosition("ego", trigger_position, 20.0) && !api_.isEntitySpawned(entity_name)) {
+          api_.spawn(
+            entity_name,
+            traffic_simulator::pose::transformRelativePoseToGlobal(
+              ego->getMapPose(),
+              geometry_msgs::build<geometry_msgs::msg::Pose>()
+                .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(10).y(-5).z(0))
+                .orientation(geometry_msgs::msg::Quaternion())),
+            getVehicleParameters(),
+            traffic_simulator::entity::VehicleEntity::BuiltinBehavior::doNothing());
+        }
+
+        if (!api_.isInPosition("ego", trigger_position, 20.0) && api_.isEntitySpawned(entity_name)) {
+          api_.despawn(entity_name);
+        }
       }
-      if (!ego_entity->isInPosition(trigger_position, 20.0) && api_.isEntitySpawned(entity_name)) {
-        api_.despawn(entity_name);
+
+      if (api_.isInPosition("ego", ego_goal_position, 1.0)) {
+        api_.despawn("ego");
+        stop(cpp_mock_scenarios::Result::SUCCESS);
       }
     }
   }
@@ -225,16 +233,20 @@ private:
       {traffic_simulator::helper::constructCanonicalizedLaneletPose(
         34606, 0.0, 0.0, api_.getHdmapUtils())},
       getVehicleParameters());
-    const auto ego_entity = api_.getEntity("ego");
-    api_.spawn(
-      "parking_outside",
-      traffic_simulator::pose::transformRelativePoseToGlobal(
-        ego_entity->getMapPose(),
-        geometry_msgs::build<geometry_msgs::msg::Pose>()
-          .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(10).y(15).z(0))
-          .orientation(geometry_msgs::msg::Quaternion())),
-      getVehicleParameters(),
-      traffic_simulator::entity::VehicleEntity::BuiltinBehavior::doNothing());
+    if (const auto ego = api_.getEntity("ego")) {
+      api_.spawn(
+        "parking_outside",
+        traffic_simulator::pose::transformRelativePoseToGlobal(
+          ego->getMapPose(),
+          geometry_msgs::build<geometry_msgs::msg::Pose>()
+            .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(10).y(15).z(0))
+            .orientation(geometry_msgs::msg::Quaternion())),
+        getVehicleParameters(),
+        traffic_simulator::entity::VehicleEntity::BuiltinBehavior::doNothing());
+    } else {
+      api_.despawn("ego");
+      stop(cpp_mock_scenarios::Result::FAILURE);
+    }
   }
 };
 

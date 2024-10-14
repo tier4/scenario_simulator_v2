@@ -84,12 +84,12 @@ private:
     const std::string & topic_name) -> std::unique_ptr<TrafficLightPublisherBase>
   {
     /*
-       Here autoware_perception_msgs is used for all awf/universe/....
-       Perhaps autoware_auto_perception_msgs should be used for >= "awf/universe/20230906"?
-       
-       PseudoTrafficLightsDetector in SimpleSensorSimulator publishes using topic
-       "/perception/traffic_light_recognition/traffic_signals" for >= "awf/universe/20230906"
-       otherwise uses "/perception/traffic_light_recognition/internal/traffic_signals".
+       V2ITrafficLights in TrafficSimulator publishes publishes using architecture-independent topics ("awf/universe..."): 
+       "/v2x/traffic_signals" and "/perception/traffic_light_recognition/external/traffic_signals"
+
+       TrafficLightsDetector in SimpleSensorSimulator publishes using architecture-dependent topics:
+       "/perception/traffic_light_recognition/internal/traffic_signals" for >= "awf/universe/20230906"
+       "/perception/traffic_light_recognition/traffic_signals" for "awf/universe"
     */
     if (architecture_type.find("awf/universe") != std::string::npos) {
       return std::make_unique<

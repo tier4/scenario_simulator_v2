@@ -150,14 +150,9 @@ auto VehicleEntity::onUpdate(const double current_time, const double step_time) 
   if (const auto canonicalized_lanelet_pose = status_->getCanonicalizedLaneletPose()) {
     if (pose::isAtEndOfLanelets(canonicalized_lanelet_pose.value(), hdmap_utils_ptr_)) {
       stopAtCurrentPosition();
-      updateStandStillDuration(step_time);
-      updateTraveledDistance(step_time);
       return;
     }
   }
-  updateStandStillDuration(step_time);
-  updateTraveledDistance(step_time);
-
   EntityBase::onPostUpdate(current_time, step_time);
 }
 

@@ -31,9 +31,9 @@
 namespace traffic_simulator
 {
 /*
-   TrafficLightsBase class is designed in such a way that while trying to perform an operation 
-   on a TrafficLight (add, set, etc.) that is not added to traffic_light_map_, 
-   it adds it first and then performs the operation, so that the methods 
+   TrafficLightsBase class is designed in such a way that while trying to perform an operation
+   on a TrafficLight (add, set, etc.) that is not added to traffic_light_map_,
+   it adds the traffic light first and then performs the operation, so that the methods
    here cannot be tagged with the "const" specifier
 */
 class TrafficLightsBase
