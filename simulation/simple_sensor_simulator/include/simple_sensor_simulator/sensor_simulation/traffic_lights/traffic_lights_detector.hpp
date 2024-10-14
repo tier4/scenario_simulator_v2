@@ -51,8 +51,12 @@ private:
     -> std::unique_ptr<TrafficLightsPublisherBase>
   {
     /*
-       V2ITrafficLights in TrafficSimulator publishes using topics "/v2x/traffic_signals" and
-       "/perception/traffic_light_recognition/external/traffic_signals" for all "awf/universe/..."
+       TrafficLightsDetector in SimpleSensorSimulator publishes using architecture-dependent topics:
+       "/perception/traffic_light_recognition/internal/traffic_signals" for >= "awf/universe/20230906"
+       "/perception/traffic_light_recognition/traffic_signals" for "awf/universe"
+
+       V2ITrafficLights in TrafficSimulator publishes publishes using architecture-independent topics ("awf/universe..."): 
+       "/v2x/traffic_signals" and "/perception/traffic_light_recognition/external/traffic_signals"
     */
     if (architecture_type == "awf/universe") {
       using Message = autoware_auto_perception_msgs::msg::TrafficSignalArray;
