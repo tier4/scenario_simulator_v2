@@ -37,20 +37,17 @@ public:
   }
 
 private:
-  const traffic_simulator::CanonicalizedLaneletPose ego_target =
-    traffic_simulator::helper::constructCanonicalizedLaneletPose(34585, 0, 0, api_.getHdmapUtils());
-  const traffic_simulator::CanonicalizedLaneletPose npc_target =
-    traffic_simulator::helper::constructCanonicalizedLaneletPose(34570, 0, 0, api_.getHdmapUtils());
-
   void onUpdate() override
   {
     auto ego_entity = api_.getEntity("ego");
     auto npc_entity = api_.getEntity("npc");
+    static const auto ego_target = traffic_simulator::helper::constructLaneletPose(34585, 0, 0);
+    static const auto npc_target = traffic_simulator::helper::constructLaneletPose(34570, 0, 0);
 
     // SUCCESS
     if (
       npc_entity->requestSynchronize("ego", ego_target, npc_target, 0, 0.5) &&
-      ego_entity->reachPosition(ego_target, 1.0) && npc_entity->reachPosition(npc_target, 1.0) &&
+      ego_entity->isInPosition(ego_target, 1.0) && npc_entity->isInPosition(npc_target, 1.0) &&
       npc_entity->getCurrentTwist().linear.x < 0.5) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
@@ -63,13 +60,11 @@ private:
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
   }
+
   void onInitialize() override
   {
     auto ego_entity = api_.spawn(
-      "ego",
-      traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34976, 20, 0, api_.getHdmapUtils()),
-      getVehicleParameters());
+      "ego", traffic_simulator::helper::constructLaneletPose(34976, 20, 0), getVehicleParameters());
 
     ego_entity->setLinearVelocity(3);
     ego_entity->requestSpeedChange(3, true);
@@ -80,22 +75,13 @@ private:
     ego_entity->requestAssignRoute(goal_poses);
 
     auto npc_entity = api_.spawn(
-      "npc",
-      traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34576, 0, 0, api_.getHdmapUtils()),
-      getVehicleParameters());
+      "npc", traffic_simulator::helper::constructLaneletPose(34576, 0, 0), getVehicleParameters());
 
     std::vector<geometry_msgs::msg::Pose> npc_goal_poses;
     npc_goal_poses.emplace_back(traffic_simulator::helper::constructCanonicalizedLaneletPose(
       34564, 20, 0, api_.getHdmapUtils()));
     npc_entity->requestAssignRoute(npc_goal_poses);
     npc_entity->setLinearVelocity(6);
-  }
-
-  auto getSampleLaneletPose(const traffic_simulator::LaneletPose & lanelet_pose)
-    -> std::optional<traffic_simulator::CanonicalizedLaneletPose>
-  {
-    return traffic_simulator::pose::canonicalize(lanelet_pose, api_.getHdmapUtils());
   }
 };
 }  // namespace cpp_mock_scenarios

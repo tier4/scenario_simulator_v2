@@ -38,7 +38,10 @@ std::ostream & operator<<(std::ostream & os, const geometry_msgs::msg::Quaternio
 std::ostream & operator<<(std::ostream & os, const geometry_msgs::msg::Pose & pose);
 
 std::ostream & operator<<(
-  std::ostream & os, const traffic_simulator_msgs::msg::LaneletPose & ll_pose);
+  std::ostream & os, const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose);
+
+std::ostream & operator<<(
+  std::ostream & os, const std::vector<traffic_simulator_msgs::msg::LaneletPose> & lanelet_pose);
 
 std::ostream & operator<<(
   std::ostream & os, const traffic_simulator_msgs::msg::EntitySubtype & subtype);

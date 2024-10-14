@@ -41,9 +41,7 @@ private:
   {
     const auto ego_entity = api_.getEntity("ego");
     if (ego_entity->isInPosition(
-          traffic_simulator::helper::constructCanonicalizedLaneletPose(
-            34513, 30, 0, api_.getHdmapUtils()),
-          3.0)) {
+          traffic_simulator::helper::constructLaneletPose(34513, 30, 0), 3.0)) {
       ego_entity->cancelRequest();
       canceled = true;
     }
@@ -54,9 +52,7 @@ private:
   void onInitialize() override
   {
     auto ego_entity = api_.spawn(
-      "ego",
-      traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34513, 0.0, 0.0, api_.getHdmapUtils()),
+      "ego", traffic_simulator::helper::constructLaneletPose(34513, 0.0, 0.0),
       getVehicleParameters());
     ego_entity->setLinearVelocity(7);
     ego_entity->requestSpeedChange(7, true);

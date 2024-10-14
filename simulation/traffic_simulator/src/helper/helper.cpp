@@ -54,17 +54,9 @@ auto constructCanonicalizedLaneletPose(
   lanelet::Id lanelet_id, double s, double offset, double roll, double pitch, double yaw,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> CanonicalizedLaneletPose
 {
-  if (
-    auto canonicalized_lanelet_pose = pose::canonicalize(
-      traffic_simulator::helper::constructLaneletPose(lanelet_id, s, offset, roll, pitch, yaw),
-      hdmap_utils_ptr)) {
-    return canonicalized_lanelet_pose.value();
-  } else {
-    THROW_SEMANTIC_ERROR(
-      "Lanelet pose (id=", lanelet_id, ",s=", s, ",offset=", offset, ",rpy.x=", roll,
-      ",rpy.y=", pitch, ",rpy.z=", yaw,
-      ") is invalid, please check lanelet length and connection.");
-  }
+  return pose::canonicalize(
+    traffic_simulator::helper::constructLaneletPose(lanelet_id, s, offset, roll, pitch, yaw),
+    hdmap_utils_ptr);
 }
 
 auto constructCanonicalizedLaneletPose(

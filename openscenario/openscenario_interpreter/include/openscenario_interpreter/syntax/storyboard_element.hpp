@@ -33,7 +33,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-class StoryboardElement : private SimulatorCore::ConditionEvaluation
+class StoryboardElement
 {
 protected:
   Trigger stop_trigger;
