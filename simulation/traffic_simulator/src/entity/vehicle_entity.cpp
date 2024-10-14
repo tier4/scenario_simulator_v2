@@ -105,7 +105,7 @@ auto VehicleEntity::getObstacle() -> std::optional<traffic_simulator_msgs::msg::
 
 auto VehicleEntity::getRouteLanelets(double horizon) -> lanelet::Ids
 {
-  if (const auto canonicalized_lanelet_pose = status_.getCanonicalizedLaneletPose()) {
+  if (const auto canonicalized_lanelet_pose = status_->getCanonicalizedLaneletPose()) {
     return route_planner_.getRouteLanelets(canonicalized_lanelet_pose.value(), horizon);
   } else {
     return {};
@@ -117,7 +117,7 @@ auto VehicleEntity::getWaypoints() -> const traffic_simulator_msgs::msg::Waypoin
   try {
     return behavior_plugin_ptr_->getWaypoints();
   } catch (const std::runtime_error & e) {
-    if (not status_.isInLanelet()) {
+    if (not status_->isInLanelet()) {
       THROW_SIMULATION_ERROR(
         "Failed to calculate waypoints in NPC logics, please check Entity : ", name,
         " is in a lane coordinate.");
@@ -132,7 +132,7 @@ auto VehicleEntity::onUpdate(const double current_time, const double step_time) 
   EntityBase::onUpdate(current_time, step_time);
 
   behavior_plugin_ptr_->setOtherEntityStatus(other_status_);
-  behavior_plugin_ptr_->setEntityStatus(std::make_unique<CanonicalizedEntityStatus>(status_));
+  behavior_plugin_ptr_->setCanonicalizedEntityStatus(status_);
   behavior_plugin_ptr_->setTargetSpeed(target_speed_);
   auto route_lanelets = getRouteLanelets();
   behavior_plugin_ptr_->setRouteLanelets(route_lanelets);
@@ -149,20 +149,14 @@ auto VehicleEntity::onUpdate(const double current_time, const double step_time) 
     }
   }
   behavior_plugin_ptr_->setReferenceTrajectory(spline_);
+  /// @note CanonicalizedEntityStatus is updated here, it is not skipped even if isAtEndOfLanelets return true
   behavior_plugin_ptr_->update(current_time, step_time);
-  setStatus(*behavior_plugin_ptr_->getUpdatedStatus());
-  /// @note setStatus() is not skipped even if isAtEndOfLanelets return true
-  if (const auto canonicalized_lanelet_pose = status_.getCanonicalizedLaneletPose()) {
+  if (const auto canonicalized_lanelet_pose = status_->getCanonicalizedLaneletPose()) {
     if (pose::isAtEndOfLanelets(canonicalized_lanelet_pose.value(), hdmap_utils_ptr_)) {
       stopAtCurrentPosition();
-      updateStandStillDuration(step_time);
-      updateTraveledDistance(step_time);
       return;
     }
   }
-  updateStandStillDuration(step_time);
-  updateTraveledDistance(step_time);
-
   EntityBase::onPostUpdate(current_time, step_time);
 }
 
@@ -170,7 +164,7 @@ void VehicleEntity::requestAcquirePosition(const LaneletPose & lanelet_pose)
 {
   const auto canonicalized_lanelet_pose = pose::canonicalize(lanelet_pose, hdmap_utils_ptr_);
   behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
-  if (status_.isInLanelet()) {
+  if (status_->isInLanelet()) {
     route_planner_.setWaypoints({canonicalized_lanelet_pose});
   }
   behavior_plugin_ptr_->setGoalPoses(
@@ -182,7 +176,7 @@ void VehicleEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_
   behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
   if (
     const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
-      map_pose, status_.getBoundingBox(), false,
+      map_pose, status_->getBoundingBox(), false,
       getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_)) {
     requestAcquirePosition(static_cast<LaneletPose>(canonicalized_lanelet_pose.value()));
   } else {
@@ -210,7 +204,7 @@ void VehicleEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pos
   for (const auto & waypoint : waypoints) {
     if (
       const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
-        waypoint, status_.getBoundingBox(), false,
+        waypoint, status_->getBoundingBox(), false,
         getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_)) {
       route.emplace_back(static_cast<LaneletPose>(canonicalized_lanelet_pose.value()));
     } else {
@@ -229,7 +223,7 @@ auto VehicleEntity::requestFollowTrajectory(
   for (const auto & vertex : parameter->shape.vertices) {
     if (
       const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
-        vertex.position, status_.getBoundingBox(), false,
+        vertex.position, status_->getBoundingBox(), false,
         getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_)) {
       waypoints.emplace_back(canonicalized_lanelet_pose.value());
     } else {

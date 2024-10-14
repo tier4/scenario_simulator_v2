@@ -46,10 +46,16 @@ auto lateralDistance(
   }
 }
 
-/*
-   See doc: 
-   https://github.com/tier4/scenario_simulator_v2/blob/729e4e6372cdba60e377ae097d032905b80763a9/docs/developer_guide/lane_pose_calculation/GetLongitudinalDistance.md
-*/
+auto countLaneChanges(
+  const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
+  bool allow_lane_change, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+  -> std::optional<std::pair<int, int>>
+{
+  return hdmap_utils_ptr->countLaneChanges(
+    static_cast<LaneletPose>(from), static_cast<LaneletPose>(to), allow_lane_change);
+}
+
+/// @sa https://github.com/tier4/scenario_simulator_v2/blob/729e4e6372cdba60e377ae097d032905b80763a9/docs/developer_guide/lane_pose_calculation/GetLongitudinalDistance.md
 auto longitudinalDistance(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
   bool include_adjacent_lanelet, bool include_opposite_direction, bool allow_lane_change,
@@ -259,6 +265,9 @@ auto distanceToLeftLaneBound(
   const traffic_simulator_msgs::msg::BoundingBox & bounding_box, const lanelet::Ids & lanelet_ids,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> double
 {
+  if (lanelet_ids.empty()) {
+    THROW_SEMANTIC_ERROR("Failing to calculate distanceToLeftLaneBound given an empty vector.");
+  }
   std::vector<double> distances;
   std::transform(
     lanelet_ids.begin(), lanelet_ids.end(), std::back_inserter(distances), [&](auto lanelet_id) {
@@ -290,10 +299,13 @@ auto distanceToRightLaneBound(
   const traffic_simulator_msgs::msg::BoundingBox & bounding_box, const lanelet::Ids & lanelet_ids,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> double
 {
+  if (lanelet_ids.empty()) {
+    THROW_SEMANTIC_ERROR("Failing to calculate distanceToRightLaneBound for given empty vector.");
+  }
   std::vector<double> distances;
   std::transform(
     lanelet_ids.begin(), lanelet_ids.end(), std::back_inserter(distances), [&](auto lanelet_id) {
-      return distanceToLeftLaneBound(map_pose, bounding_box, lanelet_id, hdmap_utils_ptr);
+      return distanceToRightLaneBound(map_pose, bounding_box, lanelet_id, hdmap_utils_ptr);
     });
   return *std::min_element(distances.begin(), distances.end());
 }

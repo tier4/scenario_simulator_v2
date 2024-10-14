@@ -34,6 +34,16 @@ Integer::Integer(const std::string & s)
   }
 }
 
+auto Integer::max() noexcept -> Integer
+{
+  return static_cast<Integer>(std::numeric_limits<value_type>::max());
+}
+
+auto Integer::min() noexcept -> Integer
+{
+  return static_cast<Integer>(std::numeric_limits<value_type>::min());
+}
+
 auto Integer::operator+=(const double & rhs) -> Integer &
 {
   data += rhs;

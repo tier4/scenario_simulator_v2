@@ -240,6 +240,24 @@ public:
 
     // Lane coordinate system distance
     template <typename FirstType, typename SecondType>
+    static auto lateralRelativeLanes(
+      const FirstType & from_pose_or_entity_name, const SecondType & to_pose_or_entity_name,
+      const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined) -> int
+    {
+      const bool allow_lane_change = (routing_algorithm == RoutingAlgorithm::value_type::shortest);
+      if (prerequisite(from_pose_or_entity_name, to_pose_or_entity_name)) {
+        if (
+          const auto lane_changes = core->countLaneChanges(
+            from_pose_or_entity_name, to_pose_or_entity_name, allow_lane_change)) {
+          return lane_changes.value().first - lane_changes.value().second;
+        }
+      }
+      throw common::Error(
+        "Failed to evaluate lateral relative lanes between ", from_pose_or_entity_name, " and ",
+        to_pose_or_entity_name);
+    }
+
+    template <typename FirstType, typename SecondType>
     static auto lateralLaneDistance(
       const FirstType & from_pose_or_entity_name, const SecondType & to_pose_or_entity_name,
       const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined) -> double
@@ -343,7 +361,8 @@ public:
         "maxSpeed", std::numeric_limits<Double::value_type>::max()));
 
       entity->setBehaviorParameter([&]() {
-        /// The default values written in https://github.com/tier4/scenario_simulator_v2/blob/master/simulation/traffic_simulator_msgs/msg/DynamicConstraints.msg
+        /// The default values written in
+        /// https://github.com/tier4/scenario_simulator_v2/blob/master/simulation/traffic_simulator_msgs/msg/DynamicConstraints.msg
         // clang-format off
         auto behavior_parameter = entity->getBehaviorParameter();
         behavior_parameter.see_around = not controller.properties.template get<Boolean>("isBlind");
@@ -357,8 +376,47 @@ public:
       }());
 
       if (controller.isAutoware()) {
-        core->attachLidarSensor(
-          entity_name, controller.properties.template get<Double>("pointcloudPublishingDelay"));
+        core->attachImuSensor(entity_name, [&]() {
+          simulation_api_schema::ImuSensorConfiguration configuration;
+          configuration.set_entity(entity_name);
+          configuration.set_frame_id("base_link");
+          configuration.set_add_gravity(true);
+          configuration.set_use_seed(true);
+          configuration.set_seed(0);
+          configuration.set_noise_standard_deviation_orientation(0.01);
+          configuration.set_noise_standard_deviation_twist(0.01);
+          configuration.set_noise_standard_deviation_acceleration(0.01);
+          return configuration;
+        }());
+
+        core->attachLidarSensor([&]() {
+          simulation_api_schema::LidarConfiguration configuration;
+
+          auto degree_to_radian = [](auto degree) {
+            return degree / 180.0 * boost::math::constants::pi<double>();
+          };
+
+          // clang-format off
+          configuration.set_architecture_type(core->getROS2Parameter<std::string>("architecture_type", "awf/universe"));
+          configuration.set_entity(entity_name);
+          configuration.set_horizontal_resolution(degree_to_radian(controller.properties.template get<Double>("pointcloudHorizontalResolution", 1.0)));
+          configuration.set_lidar_sensor_delay(controller.properties.template get<Double>("pointcloudPublishingDelay"));
+          configuration.set_scan_duration(0.1);
+          // clang-format on
+
+          const auto vertical_field_of_view = degree_to_radian(
+            controller.properties.template get<Double>("pointcloudVerticalFieldOfView", 30.0));
+
+          const auto channels =
+            controller.properties.template get<UnsignedInteger>("pointcloudChannels", 16);
+
+          for (std::size_t i = 0; i < channels; ++i) {
+            configuration.add_vertical_angles(
+              vertical_field_of_view / 2 - vertical_field_of_view / channels * i);
+          }
+
+          return configuration;
+        }());
 
         core->attachDetectionSensor([&]() {
           simulation_api_schema::DetectionSensorConfiguration configuration;
@@ -457,7 +515,9 @@ public:
     template <typename... Ts>
     static auto applyAcquirePositionAction(const std::string & entity_name, Ts &&... xs) -> void
     {
-      core->getEntity(entity_name)->requestAcquirePosition(std::forward<decltype(xs)>(xs)...);
+      auto entity = core->getEntity(entity_name);
+      entity->requestClearRoute();
+      return entity->requestAcquirePosition(std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>
@@ -581,7 +641,7 @@ public:
       return std::numeric_limits<double>::quiet_NaN();
     }
 
-    // Evaluate - user defined condition
+    // User defined conditions
     static auto evaluateCurrentState(const std::string & entity_name) -> const std::string
     {
       if (core->isEntitySpawned(entity_name)) {

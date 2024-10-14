@@ -256,64 +256,84 @@ struct TrafficLight
     template <
       typename MessageT,
       typename std::enable_if_t<
-        std::is_same_v<MessageT, autoware_auto_perception_msgs::msg::TrafficLight> ||
+        std::is_same_v<MessageT, autoware_auto_perception_msgs::msg::TrafficLight> or
           std::is_same_v<MessageT, traffic_simulator_msgs::msg::TrafficLightBulbV1>,
         int> = 0>
     explicit operator MessageT() const
     {
       const auto color = [this] {
+        auto color = MessageT::UNKNOWN;
         switch (std::get<Color>(value).value) {
           case Color::green:
-            return MessageT::GREEN;
+            color = MessageT::GREEN;
+            break;
           case Color::yellow:
-            return MessageT::AMBER;
+            color = MessageT::AMBER;
+            break;
           case Color::red:
-            return MessageT::RED;
+            color = MessageT::RED;
+            break;
           case Color::white:
-            return MessageT::WHITE;
-          default:
-            return MessageT::UNKNOWN;
+            color = MessageT::WHITE;
+            break;
         }
+        return color;
       };
 
       const auto status = [this] {
+        auto status = MessageT::UNKNOWN;
         switch (std::get<Status>(value).value) {
           case Status::solid_on:
-            return MessageT::SOLID_ON;
+            status = MessageT::SOLID_ON;
+            break;
           case Status::solid_off:
-            return MessageT::SOLID_OFF;
+            status = MessageT::SOLID_OFF;
+            break;
           case Status::flashing:
-            return MessageT::FLASHING;
-          default:
-            return MessageT::UNKNOWN;
+            status = MessageT::FLASHING;
+            break;
+          case Status::unknown:
+            status = MessageT::UNKNOWN;
+            break;
         }
+        return status;
       };
 
       const auto shape = [this] {
+        auto shape = MessageT::UNKNOWN;
         switch (std::get<Shape>(value).value) {
           case Shape::circle:
-            return MessageT::CIRCLE;
+            shape = MessageT::CIRCLE;
+            break;
           case Shape::cross:
-            return MessageT::CROSS;
+            shape = MessageT::CROSS;
+            break;
           case Shape::left:
-            return MessageT::LEFT_ARROW;
+            shape = MessageT::LEFT_ARROW;
+            break;
           case Shape::down:
-            return MessageT::DOWN_ARROW;
+            shape = MessageT::DOWN_ARROW;
+            break;
           case Shape::up:
-            return MessageT::UP_ARROW;
+            shape = MessageT::UP_ARROW;
+            break;
           case Shape::right:
-            return MessageT::RIGHT_ARROW;
+            shape = MessageT::RIGHT_ARROW;
+            break;
           case Shape::lower_left:
-            return MessageT::DOWN_LEFT_ARROW;
+            shape = MessageT::DOWN_LEFT_ARROW;
+            break;
           case Shape::lower_right:
-            return MessageT::DOWN_RIGHT_ARROW;
+            shape = MessageT::DOWN_RIGHT_ARROW;
+            break;
           case Shape::upper_left:
-            return MessageT::UP_LEFT_ARROW;
+            shape = MessageT::UP_LEFT_ARROW;
+            break;
           case Shape::upper_right:
-            return MessageT::UP_RIGHT_ARROW;
-          default:
-            return MessageT::UNKNOWN;
-        };
+            shape = MessageT::UP_RIGHT_ARROW;
+            break;
+        }
+        return shape;
       };
 
       MessageT msg;
@@ -329,62 +349,84 @@ struct TrafficLight
     // it will be removed when autoware_perception_msgs::msg::TrafficSignal is no longer supported
     explicit operator autoware_perception_msgs::msg::TrafficSignalElement() const
     {
+      using TrafficSignalElement = autoware_perception_msgs::msg::TrafficSignalElement;
+
       auto color = [this]() {
+        auto color = TrafficSignalElement::UNKNOWN;
         switch (std::get<Color>(value).value) {
           case Color::green:
-            return autoware_perception_msgs::msg::TrafficSignalElement::GREEN;
+            color = TrafficSignalElement::GREEN;
+            break;
           case Color::yellow:
-            return autoware_perception_msgs::msg::TrafficSignalElement::AMBER;
+            color = TrafficSignalElement::AMBER;
+            break;
           case Color::red:
-            return autoware_perception_msgs::msg::TrafficSignalElement::RED;
+            color = TrafficSignalElement::RED;
+            break;
           case Color::white:
-            return autoware_perception_msgs::msg::TrafficSignalElement::WHITE;
-          default:
-            throw common::SyntaxError(std::get<Color>(value), " is not supported color.");
+            color = TrafficSignalElement::WHITE;
+            break;
         }
+        return color;
       };
 
       auto status = [this]() {
+        auto status = TrafficSignalElement::UNKNOWN;
         switch (std::get<Status>(value).value) {
           case Status::solid_on:
-            return autoware_perception_msgs::msg::TrafficSignalElement::SOLID_ON;
+            status = TrafficSignalElement::SOLID_ON;
+            break;
           case Status::solid_off:
-            return autoware_perception_msgs::msg::TrafficSignalElement::SOLID_OFF;
+            status = TrafficSignalElement::SOLID_OFF;
+            break;
           case Status::flashing:
-            return autoware_perception_msgs::msg::TrafficSignalElement::FLASHING;
-          default:
-            throw common::SyntaxError(std::get<Status>(value), " is not supported color.");
+            status = TrafficSignalElement::FLASHING;
+            break;
+          case Status::unknown:
+            status = TrafficSignalElement::UNKNOWN;
+            break;
         }
+        return status;
       };
 
       auto shape = [this]() {
+        auto shape = TrafficSignalElement::UNKNOWN;
         switch (std::get<Shape>(value).value) {
           case Shape::circle:
-            return autoware_perception_msgs::msg::TrafficSignalElement::CIRCLE;
+            shape = TrafficSignalElement::CIRCLE;
+            break;
           case Shape::cross:
-            return autoware_perception_msgs::msg::TrafficSignalElement::CROSS;
+            shape = TrafficSignalElement::CROSS;
+            break;
           case Shape::left:
-            return autoware_perception_msgs::msg::TrafficSignalElement::LEFT_ARROW;
+            shape = TrafficSignalElement::LEFT_ARROW;
+            break;
           case Shape::down:
-            return autoware_perception_msgs::msg::TrafficSignalElement::DOWN_ARROW;
+            shape = TrafficSignalElement::DOWN_ARROW;
+            break;
           case Shape::up:
-            return autoware_perception_msgs::msg::TrafficSignalElement::UP_ARROW;
+            shape = TrafficSignalElement::UP_ARROW;
+            break;
           case Shape::right:
-            return autoware_perception_msgs::msg::TrafficSignalElement::RIGHT_ARROW;
+            shape = TrafficSignalElement::RIGHT_ARROW;
+            break;
           case Shape::lower_left:
-            return autoware_perception_msgs::msg::TrafficSignalElement::DOWN_LEFT_ARROW;
+            shape = TrafficSignalElement::DOWN_LEFT_ARROW;
+            break;
           case Shape::lower_right:
-            return autoware_perception_msgs::msg::TrafficSignalElement::DOWN_RIGHT_ARROW;
+            shape = TrafficSignalElement::DOWN_RIGHT_ARROW;
+            break;
           case Shape::upper_left:
-            return autoware_perception_msgs::msg::TrafficSignalElement::UP_LEFT_ARROW;
+            shape = TrafficSignalElement::UP_LEFT_ARROW;
+            break;
           case Shape::upper_right:
-            return autoware_perception_msgs::msg::TrafficSignalElement::UP_RIGHT_ARROW;
-          default:
-            throw common::SyntaxError(std::get<Shape>(value), " is not supported color.");
-        };
+            shape = TrafficSignalElement::UP_RIGHT_ARROW;
+            break;
+        }
+        return shape;
       };
 
-      autoware_perception_msgs::msg::TrafficSignalElement msg;
+      TrafficSignalElement msg;
       msg.color = color();
       msg.status = status();
       msg.shape = shape();

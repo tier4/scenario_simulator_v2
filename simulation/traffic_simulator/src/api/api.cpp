@@ -167,6 +167,14 @@ auto API::updateFrame() -> bool
 }
 
 // sensors - attach
+auto API::attachImuSensor(
+  const std::string &, const simulation_api_schema::ImuSensorConfiguration & configuration) -> bool
+{
+  simulation_api_schema::AttachImuSensorRequest req;
+  *req.mutable_configuration() = configuration;
+  return zeromq_client_.call(req).result().success();
+}
+
 auto API::attachPseudoTrafficLightDetector(
   const simulation_api_schema::PseudoTrafficLightDetectorConfiguration & configuration) -> bool
 {
