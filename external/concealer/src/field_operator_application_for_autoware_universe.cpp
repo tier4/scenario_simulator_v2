@@ -362,18 +362,20 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::clearRoute() -> void
 auto FieldOperatorApplicationFor<AutowareUniverse>::engage() -> void
 {
   task_queue.delay([this]() {
-    waitForAutowareStateToBeDriving([this]() {
-      auto request = std::make_shared<tier4_external_api_msgs::srv::Engage::Request>();
-      request->engage = true;
-      try {
-        return requestEngage(request);
-      } catch (const decltype(requestEngage)::TimeoutError &) {
-        // ignore timeout error because this service is validated by Autoware state transition.
-        return;
-      }
-    // There is no exact technical basis for the interval value equal to 100 ms, it is chosen by experiments and 
-    // should be sufficiently small to detect a single state change like WaitingForEngage->Driving->WaitingForEngage
-    }, std::chrono::milliseconds(100));
+    waitForAutowareStateToBeDriving(
+      [this]() {
+        auto request = std::make_shared<tier4_external_api_msgs::srv::Engage::Request>();
+        request->engage = true;
+        try {
+          return requestEngage(request);
+        } catch (const decltype(requestEngage)::TimeoutError &) {
+          // ignore timeout error because this service is validated by Autoware state transition.
+          return;
+        }
+        // There is no exact technical basis for the interval value equal to 100 ms, it is chosen by experiments and
+        // should be sufficiently small to detect a single state change like WaitingForEngage->Driving->WaitingForEngage
+      },
+      std::chrono::milliseconds(100));
   });
 }
 
