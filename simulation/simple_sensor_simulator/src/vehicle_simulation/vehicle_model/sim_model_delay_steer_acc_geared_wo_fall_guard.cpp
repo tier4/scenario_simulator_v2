@@ -12,11 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model_delay_steer_acc_geared_wo_fall_guard.hpp>
-
-#include <autoware_vehicle_msgs/msg/gear_command.hpp>
-
 #include <algorithm>
+#include <autoware_vehicle_msgs/msg/gear_command.hpp>
+#include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model_delay_steer_acc_geared_wo_fall_guard.hpp>
 
 SimModelDelaySteerAccGearedWoFallGuard::SimModelDelaySteerAccGearedWoFallGuard(
   double vx_lim, double steer_lim, double vx_rate_lim, double steer_rate_lim, double wheelbase,
@@ -41,39 +39,25 @@ SimModelDelaySteerAccGearedWoFallGuard::SimModelDelaySteerAccGearedWoFallGuard(
   initializeInputQueue(dt);
 }
 
-double SimModelDelaySteerAccGearedWoFallGuard::getX()
-{
-  return state_(IDX::X);
-}
-double SimModelDelaySteerAccGearedWoFallGuard::getY()
-{
-  return state_(IDX::Y);
-}
-double SimModelDelaySteerAccGearedWoFallGuard::getYaw()
-{
-  return state_(IDX::YAW);
-}
-double SimModelDelaySteerAccGearedWoFallGuard::getVx()
-{
-  return state_(IDX::VX);
-}
-double SimModelDelaySteerAccGearedWoFallGuard::getVy()
-{
-  return 0.0;
-}
-double SimModelDelaySteerAccGearedWoFallGuard::getAx()
-{
-  return state_(IDX::ACCX);
-}
+double SimModelDelaySteerAccGearedWoFallGuard::getX() { return state_(IDX::X); }
+
+double SimModelDelaySteerAccGearedWoFallGuard::getY() { return state_(IDX::Y); }
+
+double SimModelDelaySteerAccGearedWoFallGuard::getYaw() { return state_(IDX::YAW); }
+
+double SimModelDelaySteerAccGearedWoFallGuard::getVx() { return state_(IDX::VX); }
+
+double SimModelDelaySteerAccGearedWoFallGuard::getVy() { return 0.0; }
+
+double SimModelDelaySteerAccGearedWoFallGuard::getAx() { return state_(IDX::ACCX); }
+
 double SimModelDelaySteerAccGearedWoFallGuard::getWz()
 {
   return state_(IDX::VX) * std::tan(state_(IDX::STEER)) / wheelbase_;
-  ;
 }
-double SimModelDelaySteerAccGearedWoFallGuard::getSteer()
-{
-  return state_(IDX::STEER);
-}
+
+double SimModelDelaySteerAccGearedWoFallGuard::getSteer() { return state_(IDX::STEER); }
+
 void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
 {
   Eigen::VectorXd delayed_input = Eigen::VectorXd::Zero(dim_u_);
