@@ -51,16 +51,16 @@ private:
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
         34741, 10.0, 0.0, api_.getHdmapUtils()),
       getVehicleParameters());
-    auto entity = api_.getEntity("ego");
-    entity->setStatus(
+    auto ego_entity = api_.getEntity("ego");
+    ego_entity->setStatus(
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
         34513, 0.0, 0.0, api_.getHdmapUtils()),
       traffic_simulator::helper::constructActionStatus(10));
-    entity->requestSpeedChange(10, true);
+    ego_entity->requestSpeedChange(10, true);
     const geometry_msgs::msg::Pose goal_pose = traffic_simulator::pose::toMapPose(
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
         34408, 1.0, 0.0, api_.getHdmapUtils()));
-    entity->requestAcquirePosition(goal_pose);
+    ego_entity->requestAcquirePosition(goal_pose);
   }
 };
 }  // namespace cpp_mock_scenarios

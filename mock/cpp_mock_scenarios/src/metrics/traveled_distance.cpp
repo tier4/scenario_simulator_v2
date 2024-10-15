@@ -44,14 +44,11 @@ private:
   void onUpdate() override
   {
     // LCOV_EXCL_START
-    const auto entity = api_.getEntity("ego");
-    if (!entity) {
-      stop(cpp_mock_scenarios::Result::FAILURE);
-    } else if (const auto lanelet_pose = entity->getCanonicalizedLaneletPose(); not lanelet_pose) {
+    if (const auto ego_entity = api_.getEntity("ego"); !ego_entity->isInLanelet()) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     } else if (const auto difference = std::abs(
-                 static_cast<traffic_simulator::LaneletPose>(lanelet_pose.value()).s -
-                 entity->getTraveledDistance());
+                 ego_entity->getCanonicalizedStatus().getLaneletPose().s -
+                 ego_entity->getTraveledDistance());
                difference > std::numeric_limits<double>::epsilon()) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }  // LCOV_EXCL_STOP

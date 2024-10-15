@@ -736,23 +736,6 @@ void EntityBase::updateEntityStatusTimestamp(const double current_time)
   status_->setTime(current_time);
 }
 
-bool EntityBase::reachPosition(const std::string & target_name, const double tolerance) const
-{
-  return reachPosition(other_status_.find(target_name)->second.getMapPose(), tolerance);
-}
-
-bool EntityBase::reachPosition(
-  const geometry_msgs::msg::Pose & target_pose, const double tolerance) const
-{
-  return math::geometry::getDistance(getMapPose(), target_pose) < tolerance;
-}
-
-bool EntityBase::reachPosition(
-  const CanonicalizedLaneletPose & lanelet_pose, const double tolerance) const
-{
-  return reachPosition(static_cast<geometry_msgs::msg::Pose>(lanelet_pose), tolerance);
-}
-
 /***
  * @brief Request synchronize the entity with the target entity.
  * @param target_name The name of the target entity.
@@ -778,7 +761,7 @@ auto EntityBase::requestSynchronize(
   }
 
   ///@brief Check if the entity has already arrived to the target lanelet.
-  if (reachPosition(entity_target, tolerance)) {
+  if (isInPosition(entity_target, tolerance)) {
     if (getCurrentTwist().linear.x < target_speed + getMaxAcceleration() * step_time_) {
     } else {
       RCLCPP_WARN_ONCE(

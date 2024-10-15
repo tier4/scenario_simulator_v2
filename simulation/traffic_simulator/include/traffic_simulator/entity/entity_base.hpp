@@ -258,14 +258,6 @@ public:
 
   /*   */ void updateEntityStatusTimestamp(const double current_time);
 
-  /*   */ bool reachPosition(
-    const geometry_msgs::msg::Pose & target_pose, const double tolerance) const;
-
-  /*   */ bool reachPosition(
-    const CanonicalizedLaneletPose & lanelet_pose, const double tolerance) const;
-
-  /*   */ bool reachPosition(const std::string & target_name, const double tolerance) const;
-
   /*   */ auto requestSynchronize(
     const std::string & target_name, const CanonicalizedLaneletPose & target_sync_pose,
     const CanonicalizedLaneletPose & entity_target, const double target_speed,

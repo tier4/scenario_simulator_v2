@@ -39,13 +39,13 @@ public:
 private:
   void onUpdate() override
   {
-    double ego_accel = api_.getEntity("ego")->getCurrentAccel().linear.x;
-    double ego_twist = api_.getEntity("ego")->getCurrentTwist().linear.x;
-    // double npc_accel = static_cast<EntityStatus>(api_.getEntity("npc")->getStatus()).action_status.accel.linear.x;
-    double npc_twist = api_.getEntity("npc")->getCurrentTwist().linear.x;
-    ;
+    double ego_linear_acceleration = api_.getEntity("ego")->getCurrentAccel().linear.x;
+    double ego_linear_velocity = api_.getEntity("ego")->getCurrentTwist().linear.x;
+    // double npc_linear_acceleration =  api_.getEntity("npc")->getCurrentAccel().linear.x;
+    double npc_linear_velocity = api_.getEntity("npc")->getCurrentTwist().linear.x;
+
     // LCOV_EXCL_START
-    if (npc_twist > (ego_twist + 1) && ego_accel < 0) {
+    if (npc_linear_velocity > (ego_linear_velocity + 1) && ego_linear_acceleration < 0) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     if (api_.checkCollision("ego", "npc")) {

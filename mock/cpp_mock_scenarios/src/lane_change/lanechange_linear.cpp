@@ -40,11 +40,11 @@ private:
   bool lanechange_finished = false;
   void onUpdate() override
   {
-    const auto entity = api_.getEntity("ego");
-    if (entity->isInLanelet(34513, 0.1)) {
+    const auto ego_entity = api_.getEntity("ego");
+    if (ego_entity->isInLanelet(34513, 0.1)) {
       lanechange_finished = true;
     }
-    if (lanechange_finished && entity->isInLanelet(34510, 0.1)) {
+    if (lanechange_finished && ego_entity->isInLanelet(34510, 0.1)) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
     // LCOV_EXCL_START

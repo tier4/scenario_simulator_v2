@@ -53,12 +53,10 @@ private:
       }
       for (const auto & name : names) {
         const auto entity = api_.getEntity(name);
-        if (const auto lanelet_pose = entity->getCanonicalizedLaneletPose(); not lanelet_pose) {
+        if (!entity->isInLanelet()) {
           stop(cpp_mock_scenarios::Result::FAILURE);  // LCOV_EXCL_LINE
         } else {
-          const bool valid_pedestrian_lanelet = traffic_simulator::pose::isInLanelet(
-            lanelet_pose.value(), 34385, 10.0, api_.getHdmapUtils());
-
+          const bool valid_pedestrian_lanelet = entity->isInLanelet(34385, 10.0);
           if (!valid_pedestrian_lanelet || !isPedestrian(name)) {
             stop(cpp_mock_scenarios::Result::FAILURE);  // LCOV_EXCL_LINE
           }

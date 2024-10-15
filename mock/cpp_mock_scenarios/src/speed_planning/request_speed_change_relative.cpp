@@ -39,16 +39,15 @@ public:
 private:
   void onUpdate() override
   {
+    const auto entity_linear_velocity = api_.getEntity("front")->getCurrentTwist().linear.x;
     if (api_.getCurrentTime() <= 1.9) {
-      if (!equals(
-            api_.getCurrentTime() + 3.0, api_.getEntity("front")->getCurrentTwist().linear.x,
-            0.01)) {
+      if (!equals(api_.getCurrentTime() + 3.0, entity_linear_velocity, 0.01)) {
         stop(cpp_mock_scenarios::Result::FAILURE);
       }
     }
     if (
-      api_.getCurrentTime() >= 2.0 && api_.getEntity("front")->getCurrentTwist().linear.x <= 5.05 &&
-      api_.getEntity("front")->getCurrentTwist().linear.x >= 4.95) {
+      api_.getCurrentTime() >= 2.0 && entity_linear_velocity <= 5.05 &&
+      entity_linear_velocity >= 4.95) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
   }
