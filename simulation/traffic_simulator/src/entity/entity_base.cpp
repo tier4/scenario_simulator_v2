@@ -110,10 +110,9 @@ auto EntityBase::isInLanelet(const lanelet::Id lanelet_id, std::optional<double>
   -> bool
 {
   if (const auto lanelet_pose = getCanonicalizedLaneletPose()) {
-    const auto tolerance_ =
+    const auto tolerance_value =
       tolerance ? tolerance.value() : getDefaultMatchingDistanceForLaneletPoseCalculation();
-    return traffic_simulator::pose::isInLanelet(
-      lanelet_pose.value(), lanelet_id, tolerance_, hdmap_utils_ptr_);
+    return pose::isInLanelet(lanelet_pose.value(), lanelet_id, tolerance_value, hdmap_utils_ptr_);
   }
   return false;
 }
@@ -123,7 +122,7 @@ auto EntityBase::getDefaultMatchingDistanceForLaneletPoseCalculation() const -> 
   return getBoundingBox().dimensions.y * 0.5 + 1.0;
 }
 
-auto EntityBase::isStopping() const -> bool
+auto EntityBase::isStopped() const -> bool
 {
   return std::fabs(getCurrentTwist().linear.x) < std::numeric_limits<double>::epsilon();
 }
@@ -164,9 +163,9 @@ auto EntityBase::requestLaneChange(const lane_change::Direction & direction) -> 
 {
   if (isInLanelet()) {
     if (
-      const auto target = hdmap_utils_ptr_->getLaneChangeableLaneletId(
+      const auto target_lanelet_id = hdmap_utils_ptr_->getLaneChangeableLaneletId(
         getCanonicalizedStatus().getLaneletId(), direction)) {
-      requestLaneChange(target.value());
+      requestLaneChange(target_lanelet_id.value());
     }
   }
 }

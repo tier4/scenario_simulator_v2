@@ -35,7 +35,6 @@ public:
     const EntityStatus & may_non_canonicalized_entity_status,
     const std::optional<CanonicalizedLaneletPose> & canonicalized_lanelet_pose);
   CanonicalizedEntityStatus(const CanonicalizedEntityStatus & obj);
-  CanonicalizedEntityStatus(CanonicalizedEntityStatus && obj) noexcept;
   explicit operator EntityStatus() const noexcept { return entity_status_; }
 
   auto set(const CanonicalizedEntityStatus & status) -> void;

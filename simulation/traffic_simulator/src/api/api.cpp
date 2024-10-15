@@ -47,7 +47,7 @@ bool API::despawn(const std::string & name)
 
 bool API::despawnEntities()
 {
-  auto entities = entity_manager_ptr_->getEntityNames();
+  const auto entities = entity_manager_ptr_->getEntityNames();
   return std::all_of(
     entities.begin(), entities.end(), [&](const auto & entity) { return despawn(entity); });
 }
@@ -92,7 +92,7 @@ auto API::respawn(
       ego_entity->setMapPose(entity_status.pose);
       ego_entity->setTwist(entity_status.action_status.twist);
       ego_entity->setAcceleration(entity_status.action_status.accel);
-      ego_entity->replanRoute({goal_pose});
+      ego_entity->requestReplanRoute({goal_pose});
     }
   }
 }
@@ -101,12 +101,12 @@ bool API::checkCollision(
   const std::string & first_entity_name, const std::string & second_entity_name)
 {
   if (first_entity_name != second_entity_name) {
-    if (const auto first_entity = getEntityOrNullptr(first_entity_name)) {
-      if (const auto second_entity = getEntityOrNullptr(second_entity_name)) {
-        return math::geometry::checkCollision2D(
-          first_entity->getMapPose(), first_entity->getBoundingBox(), second_entity->getMapPose(),
-          second_entity->getBoundingBox());
-      }
+    const auto first_entity = getEntityOrNullptr(first_entity_name);
+    const auto second_entity = getEntityOrNullptr(second_entity_name);
+    if (first_entity && second_entity) {
+      return math::geometry::checkCollision2D(
+        first_entity->getMapPose(), first_entity->getBoundingBox(), second_entity->getMapPose(),
+        second_entity->getBoundingBox());
     }
   }
   return false;

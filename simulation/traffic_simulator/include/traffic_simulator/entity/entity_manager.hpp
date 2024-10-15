@@ -180,28 +180,10 @@ public:
   auto getEntity(const std::string & name) const
     -> std::shared_ptr<traffic_simulator::entity::EntityBase>;
 
-  auto getEgoEntity() const -> std::shared_ptr<traffic_simulator::entity::EgoEntity>
-  {
-    for (const auto & [name, entity] : entities_) {
-      if (entity->template is<EgoEntity>()) {
-        return std::dynamic_pointer_cast<EgoEntity>(entity);
-      }
-    }
-    THROW_SEMANTIC_ERROR("getEgoEntity function was called, but ego vehicle does not exist");
-  }
+  auto getEgoEntity() const -> std::shared_ptr<traffic_simulator::entity::EgoEntity>;
 
   auto getEgoEntity(const std::string & name) const
-    -> std::shared_ptr<traffic_simulator::entity::EgoEntity>
-  {
-    if (auto it = entities_.find(name); it == entities_.end()) {
-      THROW_SEMANTIC_ERROR("entity : ", name, "does not exist");
-    } else {
-      if (auto ego_entity = std::dynamic_pointer_cast<EgoEntity>(it->second); !ego_entity) {
-        THROW_SEMANTIC_ERROR("entity : ", name, " exists, but it is not ego");
-      } else
-        return ego_entity;
-    }
-  }
+    -> std::shared_ptr<traffic_simulator::entity::EgoEntity>;
 
   auto getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &;
 

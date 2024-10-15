@@ -104,7 +104,7 @@ public:
 
   virtual auto getGoalPoses() -> std::vector<CanonicalizedLaneletPose> = 0;
 
-  /*   */ auto isStopping() const -> bool;
+  /*   */ auto isStopped() const -> bool;
 
   /*   */ auto isInPosition(
     const geometry_msgs::msg::Pose & target_pose, const double tolerance) const -> bool;
@@ -173,8 +173,6 @@ public:
   virtual void requestSpeedChange(double, bool);
 
   virtual void requestSpeedChange(const speed_change::RelativeTargetSpeed &, bool);
-
-  virtual void requestClearRoute() {}
 
   virtual auto isControlledBySimulator() const -> bool;
 

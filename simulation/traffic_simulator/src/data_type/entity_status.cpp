@@ -52,12 +52,6 @@ CanonicalizedEntityStatus::CanonicalizedEntityStatus(const CanonicalizedEntitySt
 {
 }
 
-CanonicalizedEntityStatus::CanonicalizedEntityStatus(CanonicalizedEntityStatus && obj) noexcept
-: canonicalized_lanelet_pose_(std::move(obj.canonicalized_lanelet_pose_)),
-  entity_status_(std::move(obj.entity_status_))
-{
-}
-
 auto CanonicalizedEntityStatus::set(const CanonicalizedEntityStatus & status) -> void
 {
   assert(getType() == status.getType());
