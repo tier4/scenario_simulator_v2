@@ -29,7 +29,7 @@ ByObjectType::ByObjectType(const ObjectType & name, const Scope & scope)
 }
 
 ByObjectType::ByObjectType(const pugi::xml_node & node, const Scope & scope)
-: ByObjectType(readAttribute<ObjectType>("objectType", node, scope), scope)
+: ByObjectType(readAttribute<ObjectType>("type", node, scope), scope)
 {
 }
 
