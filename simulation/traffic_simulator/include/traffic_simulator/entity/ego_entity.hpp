@@ -161,7 +161,7 @@ public:
   auto getMinimumRiskManeuverBehaviorName() const -> std::string;
   auto getMinimumRiskManeuverStateName() const -> std::string;
   auto getEmergencyStateName() const -> std::string;
-  auto getTurnIndicatorsCommandName() const -> const std::string;
+  auto getTurnIndicatorsCommandName() const -> std::string;
 };
 }  // namespace entity
 }  // namespace traffic_simulator

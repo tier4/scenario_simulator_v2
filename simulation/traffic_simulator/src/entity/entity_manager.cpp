@@ -110,8 +110,8 @@ void EntityManager::broadcastTransform(
 visualization_msgs::msg::MarkerArray EntityManager::makeDebugMarker() const
 {
   visualization_msgs::msg::MarkerArray marker;
-  for (const auto & entity : entities_) {
-    entity.second->appendDebugMarker(marker);
+  for (const auto & [name, entity] : entities_) {
+    entity->appendDebugMarker(marker);
   }
   return marker;
 }
@@ -129,8 +129,8 @@ bool EntityManager::isEntitySpawned(const std::string & name)
 auto EntityManager::getEntityNames() const -> const std::vector<std::string>
 {
   std::vector<std::string> names{};
-  for (const auto & each : entities_) {
-    names.push_back(each.first);
+  for (const auto & [name, entity] : entities_) {
+    names.push_back(name);
   }
   return names;
 }
@@ -176,9 +176,9 @@ auto EntityManager::getNumberOfEgo() const -> std::size_t
 
 auto EntityManager::getEgoName() const -> const std::string &
 {
-  for (const auto & each : entities_) {
-    if (each.second->template is<EgoEntity>()) {
-      return each.second->getName();
+  for (const auto & [name, entity] : entities_) {
+    if (entity->template is<EgoEntity>()) {
+      return entity->getName();
     }
   }
   THROW_SEMANTIC_ERROR(
@@ -272,8 +272,8 @@ void EntityManager::resetBehaviorPlugin(
 void EntityManager::setVerbose(const bool verbose)
 {
   configuration.verbose = verbose;
-  for (auto & entity : entities_) {
-    entity.second->verbose = verbose;
+  for (const auto & [name, entity] : entities_) {
+    entity->verbose = verbose;
   }
 }
 

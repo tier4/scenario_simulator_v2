@@ -182,9 +182,9 @@ public:
 
   auto getEgoEntity() const -> std::shared_ptr<traffic_simulator::entity::EgoEntity>
   {
-    for (const auto & each : entities_) {
-      if (each.second->template is<EgoEntity>()) {
-        return std::dynamic_pointer_cast<EgoEntity>(each.second);
+    for (const auto & [name, entity] : entities_) {
+      if (entity->template is<EgoEntity>()) {
+        return std::dynamic_pointer_cast<EgoEntity>(entity);
       }
     }
     THROW_SEMANTIC_ERROR("getEgoEntity function was called, but ego vehicle does not exist");

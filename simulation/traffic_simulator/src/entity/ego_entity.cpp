@@ -116,7 +116,7 @@ auto EgoEntity::getEmergencyStateName() const -> std::string
 {
   return field_operator_application->getEmergencyStateName();
 }
-auto EgoEntity::getTurnIndicatorsCommandName() const -> const std::string
+auto EgoEntity::getTurnIndicatorsCommandName() const -> std::string
 {
   return boost::lexical_cast<std::string>(field_operator_application->getTurnIndicatorsCommand());
 }
