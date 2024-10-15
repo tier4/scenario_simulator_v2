@@ -138,7 +138,7 @@ public:
           if (const auto npc_start_canonicalized_lanelet_pose =
                 traffic_simulator::pose::canonicalize(
                   npc_descr.start_position, api_->getHdmapUtils());
-              not npc_start_canonicalized_lanelet_pose.has_value()) {
+              !npc_start_canonicalized_lanelet_pose.has_value()) {
             throw std::runtime_error(
               "Can not canonicalize npc start lanelet pose: id: " +
               std::to_string(npc_descr.start_position.lanelet_id) +
@@ -165,7 +165,7 @@ public:
   auto update() -> void
   {
     executeWithErrorHandling([this]() {
-      if (not api_->isNpcLogicStarted()) {
+      if (!api_->isNpcLogicStarted()) {
         if (api_->isAnyEgoSpawned()) {
           auto ego_entity = api_->getEgoEntity(api_->getEgoName());
           if (ego_entity->isEngageable()) {

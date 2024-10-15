@@ -294,8 +294,7 @@ auto ActionNode::getDistanceToTargetEntityPolygon(
   double width_extension_right, double width_extension_left, double length_extension_front,
   double length_extension_rear) const -> std::optional<double>
 {
-  const auto & status = getEntityStatus(target_name);
-  if (status.isInLanelet()) {
+  if (const auto & status = getEntityStatus(target_name); status.isInLanelet()) {
     return getDistanceToTargetEntityPolygon(
       spline, status, width_extension_right, width_extension_left, length_extension_front,
       length_extension_rear);

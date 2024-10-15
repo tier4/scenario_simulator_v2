@@ -186,7 +186,7 @@ void EntityBase::requestLaneChange(
 {
   lanelet::Id reference_lanelet_id = 0;
   if (target.entity_name == name) {
-    if (not isInLanelet()) {
+    if (!isInLanelet()) {
       THROW_SEMANTIC_ERROR(
         "Source entity does not assigned to lanelet. Please check source entity name : ", name,
         " exists on lane.");
@@ -592,7 +592,7 @@ auto EntityBase::setStatus(
   const geometry_msgs::msg::Pose & map_pose,
   const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
 {
-  EntityStatus status = static_cast<EntityStatus>(getCanonicalizedStatus());
+  auto status = static_cast<EntityStatus>(getCanonicalizedStatus());
   status.pose = map_pose;
   status.action_status = action_status;
   setStatus(status);

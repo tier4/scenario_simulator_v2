@@ -172,7 +172,7 @@ public:
 
   virtual void requestLaneChange(const lanelet::Id) {}
 
-  virtual void requestLaneChange(const lane_change::Parameter &){};
+  virtual void requestLaneChange(const lane_change::Parameter &) {}
 
   /*   */ auto requestLaneChange(const lane_change::Direction & direction) -> void;
 

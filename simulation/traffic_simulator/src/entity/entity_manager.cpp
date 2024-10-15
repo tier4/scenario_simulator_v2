@@ -31,8 +31,8 @@ auto EntityManager::setTrafficLights(const std::shared_ptr<TrafficLights> & traf
 auto EntityManager::setVerbose(const bool verbose) -> void
 {
   configuration.verbose = verbose;
-  for (auto & entity : entities_) {
-    entity.second->verbose = verbose;
+  for (const auto & [name, entity] : entities_) {
+    entity->verbose = verbose;
   }
 }
 
@@ -50,8 +50,8 @@ auto EntityManager::isNpcLogicStarted() const -> bool { return npc_logic_started
 auto EntityManager::makeDebugMarker() const -> visualization_msgs::msg::MarkerArray
 {
   visualization_msgs::msg::MarkerArray marker;
-  for (const auto & entity : entities_) {
-    entity.second->appendDebugMarker(marker);
+  for (const auto & [name, entity] : entities_) {
+    entity->appendDebugMarker(marker);
   }
   return marker;
 }
@@ -226,9 +226,9 @@ auto EntityManager::isAnyEgoSpawned() const -> bool
 
 auto EntityManager::getEgoName() const -> const std::string &
 {
-  for (const auto & each : entities_) {
-    if (each.second->template is<EgoEntity>()) {
-      return each.second->getName();
+  for (const auto & [name, entity] : entities_) {
+    if (entity->template is<EgoEntity>()) {
+      return entity->getName();
     }
   }
   THROW_SEMANTIC_ERROR(
@@ -238,9 +238,9 @@ auto EntityManager::getEgoName() const -> const std::string &
 
 auto EntityManager::getEgoEntity() const -> std::shared_ptr<entity::EgoEntity>
 {
-  for (const auto & each : entities_) {
-    if (each.second->template is<EgoEntity>()) {
-      return std::dynamic_pointer_cast<EgoEntity>(each.second);
+  for (const auto & [name, entity] : entities_) {
+    if (entity->template is<EgoEntity>()) {
+      return std::dynamic_pointer_cast<EgoEntity>(entity);
     }
   }
   THROW_SEMANTIC_ERROR(
@@ -269,8 +269,8 @@ bool EntityManager::isEntitySpawned(const std::string & name)
 auto EntityManager::getEntityNames() const -> const std::vector<std::string>
 {
   std::vector<std::string> names{};
-  for (const auto & each : entities_) {
-    names.push_back(each.first);
+  for (const auto & [name, entity] : entities_) {
+    names.push_back(name);
   }
   return names;
 }
