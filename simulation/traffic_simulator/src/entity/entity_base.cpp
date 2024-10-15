@@ -325,14 +325,15 @@ void EntityBase::requestSpeedChangeWithConstantAcceleration(
           /**
            * @brief Hard coded parameter, threshold for difference
            */
-          if (std::abs(diff) <= 0.1) {
+          static constexpr double difference_threshold = 0.1;
+          if (std::abs(diff) <= difference_threshold) {
             return true;
           }
-          if (diff > 0.1) {
+          if (diff > +difference_threshold) {
             setAccelerationLimit(std::abs(acceleration));
             return false;
           }
-          if (diff < 0.1) {
+          if (diff < -difference_threshold) {
             setDecelerationLimit(std::abs(acceleration));
             return false;
           }
