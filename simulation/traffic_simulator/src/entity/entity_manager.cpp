@@ -56,7 +56,7 @@ auto EntityManager::makeDebugMarker() const -> visualization_msgs::msg::MarkerAr
   return marker;
 }
 
-// update
+// updatee
 auto EntityManager::update(const double current_time, const double step_time) -> void
 {
   helper::StopWatch<std::chrono::milliseconds> stop_watch_update(
