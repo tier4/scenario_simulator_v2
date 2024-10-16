@@ -1,4 +1,4 @@
-name: Docker
+name: Docker Arm64
 on:
   pull_request:
     paths:
@@ -19,14 +19,13 @@ on:
 
 jobs:
   push_docker:
-    name: Push Docker Image
+    name: Push Docker Arm64 Image
     runs-on: ubuntu-22.04
     timeout-minutes: 720
     strategy:
       matrix:
         rosdistro: [humble]
         arch: [amd64]
-
     steps:
       - name: Free Disk Space (Ubuntu)
         uses: jlumbroso/free-disk-space@main
@@ -50,29 +49,10 @@ jobs:
 
       - name: Build (${{ matrix.arch }})
         if: github.event_name == 'pull_request'
-        uses: docker/bake-action@v3
-        with:
-          files: |
-            ./docker-bake.hcl
-          workdir: .
-          set: |
-            *.cache-to=type=gha,mode=max
-            *.cache-from=type=gha
-          push: false
-          targets: |
-            ${{ matrix.rosdistro }}_base_${{ matrix.arch }}
+        run: 
+          docker buildx build --platform linux/arm64/v8 -t ghcr.io/tier4/scenario_simulator_v2:humble --build-arg ROS_DISTRO=humble .
 
       - name: Build and push (${{ matrix.arch }})
         if: github.event_name == 'workflow_dispatch'
-        uses: docker/bake-action@v3
-        with:
-          files: |
-            ./docker-bake.hcl
-          workdir: .
-          set: |
-            *.cache-to=type=gha,mode=max
-            *.cache-from=type=gha
-            *.tags=ghcr.io/tier4/scenario_simulator_v2:humble-${{ github.event.inputs.version }}
-          push: true
-          targets: |
-            ${{ matrix.rosdistro }}_base_${{ matrix.arch }}
+        run:           
+          docker buildx build --platform linux/arm64/v8 -t ghcr.io/tier4/scenario_simulator_v2:humble --build-arg ROS_DISTRO=humble --push .
