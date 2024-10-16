@@ -32,6 +32,53 @@ Changelog for package openscenario_interpreter
 * add publish_empty_context parameter
 * Contributors: Masaya Kataoka
 
+4.3.16 (2024-10-15)
+-------------------
+
+4.3.15 (2024-10-10)
+-------------------
+* Merge pull request `#1370 <https://github.com/tier4/scenario_simulator_v2/issues/1370>`_ from tier4/feature/faster-compilation
+  Reducing build time of `openscenario_interpreter` by utilizing precompiled headers
+* Merge branch 'master' into feature/faster-compilation
+* Sort precompiled header list in lexicographic order
+* Merge remote-tracking branch 'origin/master' into feature/faster-compilation
+* Merge branch 'master' into fix/RJD-1296-fix-random001-ego-issue
+* Merge branch 'master' into fix/RJD-1296-fix-random001-ego-issue
+* Merge branch 'master' into fix/RJD-1296-fix-random001-ego-issue
+* Merge remote-tracking branch 'origin/master' into feature/faster-compilation
+* Merge branch 'master' into feature/faster-compilation
+* Merge branch 'master' into fix/RJD-1296-fix-random001-ego-issue
+* Merge branch 'master' into fix/RJD-1296-fix-random001-ego-issue
+* Merge remote-tracking branch 'origin/master' into feature/faster-compilation
+* Remove some headers from precompilation in order to avoid name confliction
+* Update CMakeLists.txt to make compilation faster
+* Update CMakeLists.txt to make compilation faster
+* Merge branch 'master' into fix/RJD-1296-fix-random001-ego-issue
+* Merge remote-tracking branch 'origin/master' into feature/faster-compilation
+* Merge remote-tracking branch 'origin/master' into feature/faster-compilation
+* Add precompile headers configuration
+* Contributors: Dawid Moszyński, Shota Minami, Tatsuya Yamasaki
+
+4.3.14 (2024-10-10)
+-------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/joblist-update-stand-still-duration
+* Merge branch 'master' into feature/joblist-update-stand-still-duration
+* Contributors: Masaya Kataoka
+
+4.3.13 (2024-10-09)
+-------------------
+* Merge pull request `#1378 <https://github.com/tier4/scenario_simulator_v2/issues/1378>`_ from tier4/feature/use-autoware-state
+* Merge branch 'master' into feature/use-autoware-state
+* feat: throw an exception when giving "EMERGENCY" to currentState in UserDefinedValueCondition
+* Merge branch 'master' into feature/use-autoware-state
+* fix: fix build errors in debug mode in RelativeClearanceCondition
+* Merge branch 'master' into feature/use-autoware-state
+* Merge branch 'master' into feature/use-autoware-state
+* Contributors: Kotaro Yoshimoto
+
+4.3.12 (2024-10-09)
+-------------------
+
 4.3.11 (2024-10-07)
 -------------------
 * Merge branch 'master' into feature/jpblist-update-traveled-distance

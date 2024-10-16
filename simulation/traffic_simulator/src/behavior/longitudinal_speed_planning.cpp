@@ -56,23 +56,34 @@ auto LongitudinalSpeedPlanner::planConstraintsFromJerkAndTimeConstraint(
       (acceleration_duration * acceleration_duration);
   } else {
     if (isAccelerating(target_speed, current_twist)) {
+      double discriminant =
+        (constraints.max_acceleration_rate * acceleration_duration *
+         constraints.max_acceleration_rate * acceleration_duration) +
+        2 * constraints.max_acceleration_rate *
+          (current_twist.linear.x + current_accel.linear.x * acceleration_duration - target_speed);
+
+      if (discriminant < 0) {
+        THROW_SEMANTIC_ERROR(
+          "Negative discriminant: the target speed is too high compared to the acceleration.");
+      }
+
       ret.max_acceleration = constraints.max_acceleration_rate * acceleration_duration -
-                             std::sqrt(
-                               (constraints.max_acceleration_rate * acceleration_duration *
-                                constraints.max_acceleration_rate * acceleration_duration) +
-                               2 * constraints.max_acceleration_rate *
-                                 (current_twist.linear.x +
-                                  current_accel.linear.x * acceleration_duration - target_speed)) +
-                             current_accel.linear.x;
+                             std::sqrt(discriminant) + current_accel.linear.x;
+
     } else {
+      double discriminant =
+        (constraints.max_deceleration_rate * acceleration_duration *
+         constraints.max_deceleration_rate * acceleration_duration) -
+        2 * constraints.max_deceleration_rate *
+          (current_twist.linear.x - current_accel.linear.x * acceleration_duration - target_speed);
+
+      if (discriminant < 0) {
+        THROW_SEMANTIC_ERROR(
+          "Negative discriminant: the target speed is too high compared to the deceleration.");
+      }
+
       ret.max_deceleration = -constraints.max_deceleration_rate * acceleration_duration +
-                             std::sqrt(
-                               (constraints.max_deceleration_rate * acceleration_duration *
-                                constraints.max_deceleration_rate * acceleration_duration) -
-                               2 * constraints.max_deceleration_rate *
-                                 (current_twist.linear.x -
-                                  current_accel.linear.x * acceleration_duration - target_speed)) +
-                             current_accel.linear.x;
+                             std::sqrt(discriminant) + current_accel.linear.x;
     }
   }
   return ret;
