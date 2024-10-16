@@ -126,7 +126,7 @@ public:
 
   virtual auto getGoalPoses() -> std::vector<geometry_msgs::msg::Pose> = 0;
 
-  /*   */ auto isStopping() const -> bool;
+  /*   */ auto isStopped() const -> bool;
 
   /*   */ auto isInPosition(
     const geometry_msgs::msg::Pose & target_pose, const double tolerance) const -> bool;
@@ -170,9 +170,9 @@ public:
 
   virtual void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) = 0;
 
-  virtual void requestLaneChange(const lanelet::Id) {}
+  virtual auto requestLaneChange(const lanelet::Id) -> void {}
 
-  virtual void requestLaneChange(const lane_change::Parameter &) {}
+  virtual auto requestLaneChange(const lane_change::Parameter &) -> void {}
 
   /*   */ auto requestLaneChange(const lane_change::Direction & direction) -> void;
 
@@ -195,8 +195,6 @@ public:
   virtual void requestSpeedChange(double, bool);
 
   virtual void requestSpeedChange(const speed_change::RelativeTargetSpeed &, bool);
-
-  virtual void requestClearRoute() {}
 
   virtual auto isControlledBySimulator() const -> bool;
 
@@ -279,14 +277,6 @@ public:
   /*   */ void stopAtCurrentPosition();
 
   /*   */ void updateEntityStatusTimestamp(const double current_time);
-
-  /*   */ bool reachPosition(
-    const geometry_msgs::msg::Pose & target_pose, const double tolerance) const;
-
-  /*   */ bool reachPosition(
-    const CanonicalizedLaneletPose & lanelet_pose, const double tolerance) const;
-
-  /*   */ bool reachPosition(const std::string & target_name, const double tolerance) const;
 
   /*   */ auto requestSynchronize(
     const std::string & target_name, const CanonicalizedLaneletPose & target_sync_pose,

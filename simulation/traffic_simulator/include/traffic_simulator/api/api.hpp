@@ -65,7 +65,8 @@ public:
       entity_manager_ptr_->getHdmapUtils(),
       [this]() { return entity_manager_ptr_->getEntityNames(); },
       [this](const auto & entity_name) { return getEntity(entity_name)->getMapPose(); },
-      [this](const auto & name) { return despawn(name); }, configuration.auto_sink)),
+      [this](const auto & entity_name) { return API::despawn(entity_name); },
+      configuration.auto_sink)),
     traffic_lights_ptr_(std::make_shared<TrafficLights>(
       node, entity_manager_ptr_->getHdmapUtils(),
       getParameter<std::string>(node_parameters_, "architecture_type", "awf/universe"))),

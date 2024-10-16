@@ -86,13 +86,6 @@ auto EgoEntity::isEngaged() const -> bool { return field_operator_application->e
 
 auto EgoEntity::isEngageable() const -> bool { return field_operator_application->engageable(); }
 
-auto EgoEntity::replanRoute(const std::vector<geometry_msgs::msg::PoseStamped> & route) -> void
-{
-  field_operator_application->clearRoute();
-  field_operator_application->plan(route);
-  field_operator_application->engage();
-}
-
 auto EgoEntity::sendCooperateCommand(const std::string & module_name, const std::string & command)
   -> void
 {
@@ -206,11 +199,13 @@ void EgoEntity::onUpdate(double current_time, double step_time)
 
 void EgoEntity::requestAcquirePosition(const CanonicalizedLaneletPose & lanelet_pose)
 {
+  requestClearRoute();
   requestAssignRoute({lanelet_pose});
 }
 
 void EgoEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose)
 {
+  requestClearRoute();
   requestAssignRoute({map_pose});
 }
 
@@ -259,7 +254,7 @@ auto EgoEntity::requestFollowTrajectory(
   is_controlled_by_simulator_ = true;
 }
 
-void EgoEntity::requestLaneChange(const lanelet::Id)
+auto EgoEntity::requestLaneChange(const lanelet::Id) -> void
 {
   THROW_SEMANTIC_ERROR(
     "From scenario, a lane change was requested to Ego type entity ", std::quoted(name),
@@ -291,7 +286,15 @@ auto EgoEntity::requestSpeedChange(
     "purposes only.");
 }
 
-void EgoEntity::requestClearRoute() { field_operator_application->clearRoute(); }
+auto EgoEntity::requestClearRoute() -> void { field_operator_application->clearRoute(); }
+
+auto EgoEntity::requestReplanRoute(const std::vector<geometry_msgs::msg::PoseStamped> & route)
+  -> void
+{
+  field_operator_application->clearRoute();
+  field_operator_application->plan(route);
+  field_operator_application->engage();
+}
 
 auto EgoEntity::getDefaultDynamicConstraints() const
   -> const traffic_simulator_msgs::msg::DynamicConstraints &

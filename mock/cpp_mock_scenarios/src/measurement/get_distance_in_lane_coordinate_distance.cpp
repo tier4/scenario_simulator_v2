@@ -58,9 +58,9 @@ private:
     const std::string & from_entity_name, const std::string & to_entity_name,
     const double matching_distance) -> std::optional<double>
   {
-    auto from_entity_lanelet_pose =
+    const auto from_entity_lanelet_pose =
       api_.getEntity(from_entity_name)->getCanonicalizedLaneletPose(matching_distance);
-    auto to_entity_lanelet_pose =
+    const auto to_entity_lanelet_pose =
       api_.getEntity(to_entity_name)->getCanonicalizedLaneletPose(matching_distance);
     if (from_entity_lanelet_pose && to_entity_lanelet_pose) {
       return traffic_simulator::distance::lateralDistance(

@@ -54,13 +54,14 @@ private:
         stop(cpp_mock_scenarios::Result::FAILURE);
       }
     }
+    const auto ego_linear_velocity = api_.getEntity("ego")->getCurrentTwist().linear.x;
     if (t >= 6.6) {
       if (7.5 >= t) {
-        if (std::fabs(0.1) <= api_.getEntity("ego")->getCurrentTwist().linear.x) {
+        if (std::fabs(0.1) <= ego_linear_velocity) {
           stop(cpp_mock_scenarios::Result::FAILURE);
         }
       } else {
-        if (0.1 >= api_.getEntity("ego")->getCurrentTwist().linear.x) {
+        if (0.1 >= ego_linear_velocity) {
           stop(cpp_mock_scenarios::Result::FAILURE);
         }
       }

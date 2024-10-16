@@ -42,8 +42,7 @@ private:
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
     // LCOV_EXCL_START
-    double ego_twist = api_.getEntity("ego")->getCurrentTwist().linear.x;
-    if (ego_twist >= -2.9) {
+    if (api_.getEntity("ego")->getCurrentTwist().linear.x >= -2.9) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     // LCOV_EXCL_STOP

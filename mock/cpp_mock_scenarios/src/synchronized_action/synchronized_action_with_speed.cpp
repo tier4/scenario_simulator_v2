@@ -50,7 +50,7 @@ private:
     // SUCCESS
     if (
       npc_entity->requestSynchronize("ego", ego_target, npc_target, 2, 0.5) &&
-      ego_entity->reachPosition(ego_target, 1.0) && npc_entity->reachPosition(npc_target, 1.0) &&
+      ego_entity->isInPosition(ego_target, 1.0) && npc_entity->isInPosition(npc_target, 1.0) &&
       npc_entity->getCurrentTwist().linear.x < 2.5) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }

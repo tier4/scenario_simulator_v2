@@ -167,7 +167,7 @@ public:
     executeWithErrorHandling([this]() {
       if (!api_->isNpcLogicStarted()) {
         if (api_->isAnyEgoSpawned()) {
-          auto ego_entity = api_->getEgoEntity(api_->getEgoName());
+          auto ego_entity = api_->getEgoEntity(ego_name_);
           if (ego_entity->isEngageable()) {
             api_->startNpcLogic();
           }

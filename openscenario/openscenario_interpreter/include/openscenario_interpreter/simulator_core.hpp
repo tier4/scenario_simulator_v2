@@ -286,9 +286,7 @@ public:
     template <typename... Ts>
     static auto applyAcquirePositionAction(const std::string & entity_ref, Ts &&... xs)
     {
-      auto entity = core->getEntity(entity_ref);
-      entity->requestClearRoute();
-      return entity->requestAcquirePosition(std::forward<decltype(xs)>(xs)...);
+      return core->getEntity(entity_ref)->requestAcquirePosition(std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>
@@ -302,7 +300,7 @@ public:
       const EntityRef & entity_ref, const DynamicConstraints & dynamic_constraints) -> void
     {
       auto entity = core->getEntity(entity_ref);
-      return entity->setBehaviorParameter([&]() {
+      entity->setBehaviorParameter([&]() {
         auto behavior_parameter = entity->getBehaviorParameter();
 
         if (not std::isinf(dynamic_constraints.max_speed)) {
@@ -359,8 +357,6 @@ public:
       }());
 
       if (controller.isAutoware()) {
-        auto ego_entity = core->getEgoEntity(entity_ref);
-
         core->attachImuSensor(entity_ref, [&]() {
           simulation_api_schema::ImuSensorConfiguration configuration;
           configuration.set_entity(entity_ref);
@@ -442,6 +438,8 @@ public:
           return configuration;
         }());
 
+        auto ego_entity = core->getEgoEntity(entity_ref);
+
         ego_entity->setParameter<bool>(
           "allow_goal_modification",
           controller.properties.template get<Boolean>("allowGoalModification"));
@@ -478,8 +476,7 @@ public:
     template <typename... Ts>
     static auto applyAssignRouteAction(const std::string & entity_ref, Ts &&... xs)
     {
-      auto entity = core->getEntity(entity_ref);
-      return entity->requestAssignRoute(std::forward<decltype(xs)>(xs)...);
+      return core->getEntity(entity_ref)->requestAssignRoute(std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>
@@ -491,22 +488,20 @@ public:
     template <typename... Ts>
     static auto applyFollowTrajectoryAction(const std::string & entity_ref, Ts &&... xs)
     {
-      auto entity = core->getEntity(entity_ref);
-      return entity->requestFollowTrajectory(std::forward<decltype(xs)>(xs)...);
+      return core->getEntity(entity_ref)
+        ->requestFollowTrajectory(std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>
     static auto applyLaneChangeAction(const std::string & entity_ref, Ts &&... xs)
     {
-      auto entity = core->getEntity(entity_ref);
-      return entity->requestLaneChange(std::forward<decltype(xs)>(xs)...);
+      return core->getEntity(entity_ref)->requestLaneChange(std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>
     static auto applySpeedAction(const std::string & entity_ref, Ts &&... xs)
     {
-      auto entity = core->getEntity(entity_ref);
-      return entity->requestSpeedChange(std::forward<decltype(xs)>(xs)...);
+      return core->getEntity(entity_ref)->requestSpeedChange(std::forward<decltype(xs)>(xs)...);
     }
 
     template <
@@ -524,19 +519,15 @@ public:
     static auto applyTeleportAction(
       const std::string & name, const std::string & reference_entity_name, Ts &&... xs)
     {
-      if (const auto reference_entity = core->getEntityOrNullptr(reference_entity_name)) {
-        return core->getEntity(name)->setStatus(
-          reference_entity->getMapPose(), std::forward<decltype(xs)>(xs)...);
-      } else {
-        throw Error("Reference entity \"", reference_entity_name, "\" does not exist");
-      }
+      const auto reference_entity = core->getEntity(reference_entity_name);
+      return core->getEntity(name)->setStatus(
+        reference_entity->getMapPose(), std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>
     static auto applyWalkStraightAction(const std::string & entity_ref, Ts &&... xs)
     {
-      auto entity = core->getEntity(entity_ref);
-      return entity->requestWalkStraight(std::forward<decltype(xs)>(xs)...);
+      return core->getEntity(entity_ref)->requestWalkStraight(std::forward<decltype(xs)>(xs)...);
     }
   };
 
@@ -595,9 +586,9 @@ public:
     static auto evaluateTimeHeadway(
       const std::string & from_entity_name, const std::string & to_entity_name)
     {
-      if (auto from_entity = core->getEntityOrNullptr(from_entity_name); from_entity) {
-        if (auto to_entity = core->getEntityOrNullptr(to_entity_name); to_entity) {
-          if (auto relative_pose = traffic_simulator::pose::relativePose(
+      if (const auto from_entity = core->getEntityOrNullptr(from_entity_name)) {
+        if (const auto to_entity = core->getEntityOrNullptr(to_entity_name)) {
+          if (const auto relative_pose = traffic_simulator::pose::relativePose(
                 from_entity->getMapPose(), to_entity->getMapPose());
               relative_pose && relative_pose->position.x <= 0) {
             const double time_headway =
@@ -667,7 +658,6 @@ public:
       return Double::nan();
     }
 
-    template <typename... Ts>
     static auto engage(const std::string & ego_ref) -> decltype(auto)
     {
       return core->getEgoEntity(ego_ref)->engage();

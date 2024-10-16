@@ -110,10 +110,9 @@ auto EntityBase::isInLanelet(const lanelet::Id lanelet_id, std::optional<double>
   -> bool
 {
   if (const auto lanelet_pose = getCanonicalizedLaneletPose()) {
-    const auto tolerance_ =
+    const auto tolerance_value =
       tolerance ? tolerance.value() : getDefaultMatchingDistanceForLaneletPoseCalculation();
-    return traffic_simulator::pose::isInLanelet(
-      lanelet_pose.value(), lanelet_id, tolerance_, hdmap_utils_ptr_);
+    return pose::isInLanelet(lanelet_pose.value(), lanelet_id, tolerance_value, hdmap_utils_ptr_);
   }
   return false;
 }
@@ -123,7 +122,7 @@ auto EntityBase::getDefaultMatchingDistanceForLaneletPoseCalculation() const -> 
   return getBoundingBox().dimensions.y * 0.5 + 1.0;
 }
 
-auto EntityBase::isStopping() const -> bool
+auto EntityBase::isStopped() const -> bool
 {
   return std::fabs(getCurrentTwist().linear.x) < std::numeric_limits<double>::epsilon();
 }
@@ -164,25 +163,25 @@ auto EntityBase::requestLaneChange(const lane_change::Direction & direction) -> 
 {
   if (isInLanelet()) {
     if (
-      const auto target = hdmap_utils_ptr_->getLaneChangeableLaneletId(
+      const auto target_lanelet_id = hdmap_utils_ptr_->getLaneChangeableLaneletId(
         getCanonicalizedStatus().getLaneletId(), direction)) {
-      requestLaneChange(target.value());
+      requestLaneChange(target_lanelet_id.value());
     }
   }
 }
 
-void EntityBase::requestLaneChange(
+auto EntityBase::requestLaneChange(
   const traffic_simulator::lane_change::AbsoluteTarget & target,
   const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,
-  const traffic_simulator::lane_change::Constraint & constraint)
+  const traffic_simulator::lane_change::Constraint & constraint) -> void
 {
   requestLaneChange(lane_change::Parameter(target, trajectory_shape, constraint));
 }
 
-void EntityBase::requestLaneChange(
+auto EntityBase::requestLaneChange(
   const traffic_simulator::lane_change::RelativeTarget & target,
   const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,
-  const traffic_simulator::lane_change::Constraint & constraint)
+  const traffic_simulator::lane_change::Constraint & constraint) -> void
 {
   lanelet::Id reference_lanelet_id = 0;
   if (target.entity_name == name) {
@@ -736,23 +735,6 @@ void EntityBase::updateEntityStatusTimestamp(const double current_time)
   status_->setTime(current_time);
 }
 
-bool EntityBase::reachPosition(const std::string & target_name, const double tolerance) const
-{
-  return reachPosition(other_status_.find(target_name)->second.getMapPose(), tolerance);
-}
-
-bool EntityBase::reachPosition(
-  const geometry_msgs::msg::Pose & target_pose, const double tolerance) const
-{
-  return math::geometry::getDistance(getMapPose(), target_pose) < tolerance;
-}
-
-bool EntityBase::reachPosition(
-  const CanonicalizedLaneletPose & lanelet_pose, const double tolerance) const
-{
-  return reachPosition(static_cast<geometry_msgs::msg::Pose>(lanelet_pose), tolerance);
-}
-
 /***
  * @brief Request synchronize the entity with the target entity.
  * @param target_name The name of the target entity.
@@ -778,7 +760,7 @@ auto EntityBase::requestSynchronize(
   }
 
   ///@brief Check if the entity has already arrived to the target lanelet.
-  if (reachPosition(entity_target, tolerance)) {
+  if (isInPosition(entity_target, tolerance)) {
     if (getCurrentTwist().linear.x < target_speed + getMaxAcceleration() * step_time_) {
     } else {
       RCLCPP_WARN_ONCE(

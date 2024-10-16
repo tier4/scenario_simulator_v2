@@ -233,7 +233,7 @@ auto VehicleEntity::requestFollowTrajectory(
   route_planner_.setWaypoints(waypoints);
 }
 
-void VehicleEntity::requestLaneChange(const lanelet::Id to_lanelet_id)
+auto VehicleEntity::requestLaneChange(const lanelet::Id to_lanelet_id) -> void
 {
   behavior_plugin_ptr_->setRequest(behavior::Request::LANE_CHANGE);
   const auto parameter = lane_change::Parameter(
@@ -242,7 +242,8 @@ void VehicleEntity::requestLaneChange(const lanelet::Id to_lanelet_id)
   behavior_plugin_ptr_->setLaneChangeParameters(parameter);
 }
 
-void VehicleEntity::requestLaneChange(const traffic_simulator::lane_change::Parameter & parameter)
+auto VehicleEntity::requestLaneChange(const traffic_simulator::lane_change::Parameter & parameter)
+  -> void
 {
   behavior_plugin_ptr_->setRequest(behavior::Request::LANE_CHANGE);
   behavior_plugin_ptr_->setLaneChangeParameters(parameter);

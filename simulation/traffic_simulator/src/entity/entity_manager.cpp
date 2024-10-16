@@ -155,6 +155,10 @@ auto EntityManager::broadcastEntityTransform() -> void
    * so we publish the average of the coordinates of all entities.
    */
   if (isAnyEgoSpawned()) {
+    if (!is_send) {
+      pose = getEgoEntity()->getMapPose();
+      is_send = true;
+    }
     broadcastTransform(
       geometry_msgs::build<geometry_msgs::msg::PoseStamped>()
         /**
@@ -163,9 +167,10 @@ auto EntityManager::broadcastEntityTransform() -> void
            * so the frame_id "ego" is issued regardless of the name of the ego entity.
            */
         .header(std_msgs::build<std_msgs::msg::Header>().stamp(clock_ptr_->now()).frame_id("ego"))
-        .pose(getEntity(getEgoName())->getMapPose()),
+        .pose(pose),
       true);
   }
+
   if (!names.empty()) {
     if (!is_send) {
       pose = geometry_msgs::build<geometry_msgs::msg::Pose>()
@@ -243,18 +248,17 @@ auto EntityManager::getEgoEntity() const -> std::shared_ptr<entity::EgoEntity>
       return std::dynamic_pointer_cast<EgoEntity>(entity);
     }
   }
-  THROW_SEMANTIC_ERROR(
-    "EntityManager::getEgoEntity function was called, but ego vehicle does not exist.");
+  THROW_SEMANTIC_ERROR("EgoEntity does not exist");
 }
 
 auto EntityManager::getEgoEntity(const std::string & name) const
   -> std::shared_ptr<entity::EgoEntity>
 {
   if (auto it = entities_.find(name); it == entities_.end()) {
-    THROW_SEMANTIC_ERROR("Entity : ", name, "does not exist.");
+    THROW_SEMANTIC_ERROR("Entity ", std::quoted(name), " does not exist.");
   } else {
     if (auto ego_entity = std::dynamic_pointer_cast<EgoEntity>(it->second); !ego_entity) {
-      THROW_SEMANTIC_ERROR("Entity : ", name, " exists, but it is not ego.");
+      THROW_SEMANTIC_ERROR("Entity : ", std::quoted(name), " exists, but it is not ego");
     } else
       return ego_entity;
   }
@@ -280,7 +284,7 @@ auto EntityManager::getEntity(const std::string & name) const -> std::shared_ptr
   if (const auto entity = getEntityOrNullptr(name)) {
     return entity;
   } else {
-    THROW_SEMANTIC_ERROR("entity : ", name, "does not exist");
+    THROW_SEMANTIC_ERROR("Entity ", std::quoted(name), " does not exist.");
   }
 }
 
@@ -306,7 +310,7 @@ auto EntityManager::resetBehaviorPlugin(
   const std::string & name, const std::string & behavior_plugin_name) -> void
 {
   const auto reference_entity = getEntity(name);
-  const CanonicalizedEntityStatus status = reference_entity->getCanonicalizedStatus();
+  const auto status = reference_entity->getCanonicalizedStatus();
   const auto behavior_parameter = reference_entity->getBehaviorParameter();
   if (reference_entity->is<EgoEntity>()) {
     THROW_SEMANTIC_ERROR(
