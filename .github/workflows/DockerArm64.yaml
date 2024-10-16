@@ -25,7 +25,7 @@ jobs:
     strategy:
       matrix:
         rosdistro: [humble]
-        arch: [amd64]
+        arch: [arm64]
     steps:
       - name: Free Disk Space (Ubuntu)
         uses: jlumbroso/free-disk-space@main
