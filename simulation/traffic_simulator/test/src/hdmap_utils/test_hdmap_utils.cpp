@@ -2008,15 +2008,17 @@ TEST_F(HdMapUtilsTest_StandardMap, getLongitudinalDistance_sameLanelet)
  */
 TEST_F(HdMapUtilsTest_StandardMap, getLongitudinalDistance_sameLaneletBehind)
 {
-  auto pose_to = hdmap_utils.toLaneletPose(
+  const auto pose_to = hdmap_utils.toLaneletPose(
     makePose(makePoint(3812.65, 73810.13, -2.80), makeQuaternionFromYaw(90.0)), lanelet::Id{34606});
-  auto pose_from = hdmap_utils.toLaneletPose(
+  const auto pose_from = hdmap_utils.toLaneletPose(
     makePose(makePoint(3825.10, 73786.34, -1.82), makeQuaternionFromYaw(90.0)), lanelet::Id{34606});
-  EXPECT_TRUE(pose_from.has_value());
-  EXPECT_TRUE(pose_to.has_value());
+  ASSERT_TRUE(pose_from.has_value());
+  ASSERT_TRUE(pose_to.has_value());
 
-  EXPECT_FALSE(
-    hdmap_utils.getLongitudinalDistance(pose_from.value(), pose_to.value(), false).has_value());
+  const auto longitudinal_distance =
+    hdmap_utils.getLongitudinalDistance(pose_from.value(), pose_to.value(), false);
+  ASSERT_TRUE(longitudinal_distance.has_value());
+  EXPECT_NEAR(longitudinal_distance.value(), -26.0, 1.0);
 }
 
 /**

@@ -1589,12 +1589,8 @@ auto HdMapUtils::getLongitudinalDistance(
     }
     // subtract the distance already traveled on the first lanelet: from_pose.s
     // and add the distance that needs to be traveled on the last: to_pose.s.
-    // in case of a negative distance, return std::nullopt.
-    if (const double distance = accumulated_distance - from_pose.s + to_pose.s; distance >= 0.0) {
-      return distance;
-    } else {
-      return std::nullopt;
-    }
+    // negative distance means that the target position has been passed (works only within a single lanlet)
+    return std::make_optional(accumulated_distance - from_pose.s + to_pose.s);
   } else {
     return std::nullopt;
   }
