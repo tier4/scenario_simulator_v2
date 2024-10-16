@@ -121,7 +121,7 @@ private:
 
     const auto spawn_and_change_lane = [&](const auto & entity_name, const auto spawn_s_value) {
       if (!api_.isEntitySpawned(entity_name)) {
-        api_.spawn(
+        auto entity = api_.spawn(
           entity_name,
           traffic_simulator::helper::constructCanonicalizedLaneletPose(
             34513, spawn_s_value, 0.0, api_.getHdmapUtils()),
@@ -130,7 +130,6 @@ private:
           params_.random_parameters.lane_following_vehicle.min_speed,
           params_.random_parameters.lane_following_vehicle.max_speed);
         const auto speed = speed_distribution(engine_);
-        auto entity = api_.getEntity(entity_name);
         entity->requestSpeedChange(speed, true);
         entity->setLinearVelocity(speed);
         std::uniform_real_distribution<> lane_change_position_distribution(
@@ -168,13 +167,12 @@ private:
         std::uniform_real_distribution<> speed_distribution(
           params_.random_parameters.crossing_pedestrian.min_speed,
           params_.random_parameters.crossing_pedestrian.max_speed);
-        api_.spawn(
+        auto entity = api_.spawn(
           entity_name,
           traffic_simulator::helper::constructCanonicalizedLaneletPose(
             lanelet_id, 0.0, offset_distribution(engine_), api_.getHdmapUtils()),
           getPedestrianParameters());
         const auto speed = speed_distribution(engine_);
-        auto entity = api_.getEntity(entity_name);
         entity->requestSpeedChange(speed, true);
         entity->setLinearVelocity(speed);
       }

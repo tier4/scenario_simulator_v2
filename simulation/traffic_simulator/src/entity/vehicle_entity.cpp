@@ -78,6 +78,11 @@ auto VehicleEntity::getDefaultMatchingDistanceForLaneletPoseCalculation() const 
          1.0;
 }
 
+auto VehicleEntity::getParameters() const -> const traffic_simulator_msgs::msg::VehicleParameters &
+{
+  return vehicle_parameters;
+}
+
 auto VehicleEntity::getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter
 {
   return behavior_plugin_ptr_->getBehaviorParameter();
@@ -89,9 +94,13 @@ auto VehicleEntity::getEntityTypename() const -> const std::string &
   return result;
 }
 
-auto VehicleEntity::getGoalPoses() -> std::vector<CanonicalizedLaneletPose>
+auto VehicleEntity::getGoalPoses() -> std::vector<geometry_msgs::msg::Pose>
 {
-  return route_planner_.getGoalPoses();
+  std::vector<geometry_msgs::msg::Pose> poses;
+  for (const auto & lanelet_pose : route_planner_.getGoalPoses()) {
+    poses.push_back(pose::toMapPose(lanelet_pose));
+  }
+  return poses;
 }
 
 auto VehicleEntity::getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle>
