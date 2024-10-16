@@ -52,6 +52,17 @@ EntityBase::EntityBase(
       " and the name of the entity listed in entity_status is ",
       static_cast<EntityStatus>(entity_status).name);
   }
+
+  job_list_.append(
+    [this](double) {
+      if (std::abs(getCurrentTwist().linear.x) <= std::numeric_limits<double>::epsilon()) {
+        stand_still_duration_ += step_time_;
+      } else {
+        stand_still_duration_ = 0.0;
+      }
+      return false;
+    },
+    [this]() {}, job::Type::STAND_STILL_DURATION, true, job::Event::POST_UPDATE);
 }
 
 void EntityBase::appendDebugMarker(visualization_msgs::msg::MarkerArray &) {}
@@ -635,15 +646,6 @@ void EntityBase::stopAtCurrentPosition()
 void EntityBase::updateEntityStatusTimestamp(const double current_time)
 {
   status_->setTime(current_time);
-}
-
-auto EntityBase::updateStandStillDuration(const double step_time) -> double
-{
-  if (std::abs(getCurrentTwist().linear.x) <= std::numeric_limits<double>::epsilon()) {
-    return stand_still_duration_ += step_time;
-  } else {
-    return stand_still_duration_ = 0.0;
-  }
 }
 
 bool EntityBase::reachPosition(const std::string & target_name, const double tolerance) const
