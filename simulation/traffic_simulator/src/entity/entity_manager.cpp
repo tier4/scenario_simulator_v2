@@ -54,7 +54,7 @@ auto EntityManager::broadcastEntityTransform() -> void
    */
   if (isAnyEgoSpawned()) {
     if (!is_send) {
-      pose = getEntity(getEgoName())->getMapPose();
+      pose = getEgoEntity()->getMapPose();
       is_send = true;
     }
     broadcastTransform(

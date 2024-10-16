@@ -148,9 +148,9 @@ public:
 
   virtual void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) = 0;
 
-  virtual void requestLaneChange(const lanelet::Id) {}
+  virtual auto requestLaneChange(const lanelet::Id) -> void {}
 
-  virtual void requestLaneChange(const lane_change::Parameter &) {}
+  virtual auto requestLaneChange(const lane_change::Parameter &) -> void {}
 
   /*   */ auto requestLaneChange(const lane_change::Direction & direction) -> void;
 

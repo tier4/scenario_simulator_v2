@@ -170,18 +170,18 @@ auto EntityBase::requestLaneChange(const lane_change::Direction & direction) -> 
   }
 }
 
-void EntityBase::requestLaneChange(
+auto EntityBase::requestLaneChange(
   const traffic_simulator::lane_change::AbsoluteTarget & target,
   const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,
-  const traffic_simulator::lane_change::Constraint & constraint)
+  const traffic_simulator::lane_change::Constraint & constraint) -> void
 {
   requestLaneChange(lane_change::Parameter(target, trajectory_shape, constraint));
 }
 
-void EntityBase::requestLaneChange(
+auto EntityBase::requestLaneChange(
   const traffic_simulator::lane_change::RelativeTarget & target,
   const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,
-  const traffic_simulator::lane_change::Constraint & constraint)
+  const traffic_simulator::lane_change::Constraint & constraint) -> void
 {
   lanelet::Id reference_lanelet_id = 0;
   if (target.entity_name == name) {

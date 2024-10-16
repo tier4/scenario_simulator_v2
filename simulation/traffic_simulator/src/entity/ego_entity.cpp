@@ -254,7 +254,7 @@ auto EgoEntity::requestFollowTrajectory(
   is_controlled_by_simulator_ = true;
 }
 
-void EgoEntity::requestLaneChange(const lanelet::Id)
+auto EgoEntity::requestLaneChange(const lanelet::Id) -> void
 {
   THROW_SEMANTIC_ERROR(
     "From scenario, a lane change was requested to Ego type entity ", std::quoted(name),

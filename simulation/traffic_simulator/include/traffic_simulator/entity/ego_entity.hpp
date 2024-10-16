@@ -99,9 +99,9 @@ public:
   auto requestFollowTrajectory(
     const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &) -> void override;
 
-  void requestLaneChange(const lanelet::Id) override;
+  auto requestLaneChange(const lanelet::Id) -> void override;
 
-  auto requestLaneChange(const traffic_simulator::lane_change::Parameter &) -> void override;
+  auto requestLaneChange(const lane_change::Parameter &) -> void override;
 
   auto requestSpeedChange(
     const double, const speed_change::Transition, const speed_change::Constraint,
