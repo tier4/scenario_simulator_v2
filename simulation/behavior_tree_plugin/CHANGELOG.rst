@@ -21,6 +21,9 @@ Changelog for package behavior_tree_plugin
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+4.3.16 (2024-10-15)
+-------------------
+
 4.3.15 (2024-10-10)
 -------------------
 * Merge branch 'master' into feature/faster-compilation
