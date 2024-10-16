@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// #include <tf2/LinearMath/Quaternion.h>
-
 #include <geometry/intersection/collision.hpp>
 #include <traffic_simulator/api/api.hpp>
 
@@ -129,7 +127,7 @@ auto API::updateTrafficLightsInSim() -> bool
         entity_manager_ptr_->getHdmapUtils()->getTrafficLightRegulatoryElementIDsFromTrafficLight(
           traffic_signal.id());
       for (const auto & relation_id : relation_ids) {
-        traffic_signal.add_relation_ids(relation_id);
+        traffic_signal.add_relation_ids(static_cast<google::protobuf::int32>(relation_id));
       }
     }
     return zeromq_client_.call(request).result().success();

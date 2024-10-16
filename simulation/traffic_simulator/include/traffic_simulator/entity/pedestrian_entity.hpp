@@ -112,10 +112,7 @@ public:
 
   auto getRouteLanelets(double horizon = 100) -> lanelet::Ids override;
 
-  auto getParameters() -> const traffic_simulator_msgs::msg::PedestrianParameters &
-  {
-    return pedestrian_parameters;
-  }
+  auto getParameters() const -> const traffic_simulator_msgs::msg::PedestrianParameters &;
 
   auto getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle> override;
 

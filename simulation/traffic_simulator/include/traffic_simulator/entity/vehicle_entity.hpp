@@ -88,10 +88,7 @@ public:
 
   auto getGoalPoses() -> std::vector<geometry_msgs::msg::Pose> override;
 
-  auto getParameters() -> const traffic_simulator_msgs::msg::VehicleParameters &
-  {
-    return vehicle_parameters;
-  }
+  auto getParameters() const -> const traffic_simulator_msgs::msg::VehicleParameters &;
 
   auto getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle> override;
 

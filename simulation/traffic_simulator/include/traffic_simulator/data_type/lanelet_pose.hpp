@@ -85,7 +85,7 @@ public:
     }
     os << "  map_pose_: " << obj.map_pose_ << "\n";
     os << "  consider_pose_by_road_slope_: "
-       << (obj.consider_pose_by_road_slope_ ? "true" : "false") << "\n";
+       << (CanonicalizedLaneletPose::consider_pose_by_road_slope_ ? "true" : "false") << "\n";
     os << ")";
     return os;
   }
