@@ -21,6 +21,29 @@ Changelog for package geometry
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+4.3.16 (2024-10-15)
+-------------------
+
+4.3.15 (2024-10-10)
+-------------------
+* Merge pull request `#1361 <https://github.com/tier4/scenario_simulator_v2/issues/1361>`_ from tier4/fix/RJD-1296-fix-random001-ego-issue
+  fix(cpp_mock_scenarios, ego_entity_simulation): fix ego issue in random001, fix getCurrentPose()
+* Merge branch 'master' into feature/faster-compilation
+* Merge remote-tracking branch 'origin/master' into feature/faster-compilation
+* Merge branch 'master' into fix/RJD-1296-fix-random001-ego-issue
+* Merge branch 'master' into fix/RJD-1296-fix-random001-ego-issue
+* Merge branch 'master' into fix/RJD-1296-fix-random001-ego-issue
+* Merge remote-tracking branch 'origin/master' into feature/faster-compilation
+* Merge branch 'master' into feature/faster-compilation
+* Merge branch 'master' into fix/RJD-1296-fix-random001-ego-issue
+* Merge branch 'master' into fix/RJD-1296-fix-random001-ego-issue
+* Merge remote-tracking branch 'origin/master' into feature/faster-compilation
+* Merge branch 'master' into fix/RJD-1296-fix-random001-ego-issue
+* fix(ego_entity_simulation): fix getCurrentPose, add const initial_rotation_matrix\_ attribute
+* Merge remote-tracking branch 'origin/master' into feature/faster-compilation
+* Merge remote-tracking branch 'origin/master' into feature/faster-compilation
+* Contributors: Dawid Moszynski, Dawid Moszyński, Masaya Kataoka, Shota Minami
+
 4.3.14 (2024-10-10)
 -------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/joblist-update-stand-still-duration
