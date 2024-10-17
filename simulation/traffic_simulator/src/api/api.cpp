@@ -291,9 +291,9 @@ bool API::updateTrafficLightsInSim()
 {
   if (traffic_lights_ptr_->isAnyTrafficLightChanged()) {
     simulation_api_schema::UpdateTrafficLightsRequest request;
-    const auto traffic_lights_msg =
+    const auto traffic_lights_message =
       traffic_lights_ptr_->getConventionalTrafficLights()->generateAutowareAutoPerceptionMsg();
-    simulation_interface::toProto(traffic_lights_msg, request);
+    simulation_interface::toProto(traffic_lights_message, request);
     // here is a lack of information in autoware_auto_perception_msgs::msg
     // to complete the relation_ids, so complete it manually here
     for (auto & traffic_signal : *request.mutable_states()) {
