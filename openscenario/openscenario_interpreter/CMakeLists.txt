@@ -21,11 +21,13 @@ ament_auto_find_build_dependencies()
 file(GLOB ${PROJECT_NAME}_POSIX_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/posix/*.cpp)
 file(GLOB ${PROJECT_NAME}_SYNTAX_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/syntax/*.cpp)
 file(GLOB ${PROJECT_NAME}_UTILITY_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/utility/*.cpp)
+file(GLOB ${PROJECT_NAME}_READER_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/reader/*.cpp)
 
 ament_auto_add_library(${PROJECT_NAME} SHARED
   ${${PROJECT_NAME}_POSIX_SOURCES}
   ${${PROJECT_NAME}_SYNTAX_SOURCES}
   ${${PROJECT_NAME}_UTILITY_SOURCES}
+  ${${PROJECT_NAME}_READER_SOURCES}
   src/object.cpp
   src/evaluate.cpp
   src/openscenario_interpreter.cpp

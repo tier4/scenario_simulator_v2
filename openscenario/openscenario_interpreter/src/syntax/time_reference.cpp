@@ -24,9 +24,10 @@ inline namespace syntax
 TimeReference::TimeReference(const pugi::xml_node & node, Scope & scope)
 // clang-format off
 : ComplexType(
-    choice(node,
-      std::make_pair(  "None", [&](const auto & node) { return make<  None>(node, scope); }),
-      std::make_pair("Timing", [&](const auto & node) { return make<Timing>(node, scope); })))
+    choice(node, {
+      {   "None", [&](const auto & node) { return make<  None>(node, scope); } },
+      { "Timing", [&](const auto & node) { return make<Timing>(node, scope); } },
+    }))
 // clang-format on
 {
 }
