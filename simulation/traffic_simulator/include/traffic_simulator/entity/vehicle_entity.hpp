@@ -123,8 +123,7 @@ public:
 
   void setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &) override;
 
-  void setTrafficLightManager(
-    const std::shared_ptr<traffic_simulator::TrafficLightManager> &) override;
+  void setTrafficLights(const std::shared_ptr<traffic_simulator::TrafficLightsBase> &) override;
 
   const traffic_simulator_msgs::msg::VehicleParameters vehicle_parameters;
 

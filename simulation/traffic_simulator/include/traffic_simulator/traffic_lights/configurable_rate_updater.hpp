@@ -22,28 +22,30 @@ namespace traffic_simulator
 {
 class ConfigurableRateUpdater
 {
-  rclcpp::TimerBase::SharedPtr timer_ = nullptr;
-  const rclcpp::node_interfaces::NodeBaseInterface::SharedPtr node_base_interface_;
-  const rclcpp::node_interfaces::NodeTimersInterface::SharedPtr node_timers_interface_;
-  double update_rate_ = 0.0;
-  const std::function<void()> thunk_;
-  const rclcpp::Clock::SharedPtr clock_ptr_;
-
 public:
   template <typename NodePointer>
   ConfigurableRateUpdater(const NodePointer & node, std::function<void()> thunk)
   : node_base_interface_(node->get_node_base_interface()),
     node_timers_interface_(node->get_node_timers_interface()),
-    thunk_(thunk),
-    clock_ptr_(node->get_clock())
+    clock_ptr_(node->get_clock()),
+    thunk_(std::move(thunk))
   {
   }
 
-  auto createTimer(double update_rate) -> void;
+  auto startTimer(const double update_rate) -> void;
 
-  auto resetUpdateRate(double update_rate) -> void;
+  auto resetTimer(const double update_rate) -> void;
 
   auto getUpdateRate() const -> double { return update_rate_; }
+
+private:
+  const rclcpp::node_interfaces::NodeBaseInterface::SharedPtr node_base_interface_;
+  const rclcpp::node_interfaces::NodeTimersInterface::SharedPtr node_timers_interface_;
+  const rclcpp::Clock::SharedPtr clock_ptr_;
+
+  rclcpp::TimerBase::SharedPtr timer_{nullptr};
+  const std::function<void()> thunk_;
+  double update_rate_ = 0.0;
 };
 }  // namespace traffic_simulator
 

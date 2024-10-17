@@ -15,35 +15,33 @@
 #ifndef TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MARKER_PUBLISHER_HPP
 #define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MARKER_PUBLISHER_HPP
 
-#include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
+#include <rclcpp/rclcpp.hpp>
+#include <traffic_simulator/traffic_lights/traffic_light.hpp>
 
 namespace traffic_simulator
 {
 class TrafficLightMarkerPublisher
 {
-  const rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
-  const std::string map_frame_;
-  const rclcpp::Clock::SharedPtr clock_ptr_;
-  const std::shared_ptr<TrafficLightManager> traffic_light_manager_;
-
-  auto deleteAllMarkers() const -> void;
-  auto drawMarkers() const -> void;
-
 public:
-  template <typename NodePointer>
+  template <typename NodeTypePointer>
   explicit TrafficLightMarkerPublisher(
-    const std::shared_ptr<TrafficLightManager> & traffic_light_manager, const NodePointer & node,
-    const std::string & map_frame = "map")
-  : marker_pub_(rclcpp::create_publisher<visualization_msgs::msg::MarkerArray>(
-      node, "traffic_light/marker", rclcpp::QoS(1).transient_local())),
-    map_frame_(map_frame),
-    clock_ptr_(node->get_clock()),
-    traffic_light_manager_(traffic_light_manager)
+    const NodeTypePointer & node_ptr, const std::string & frame = "map")
+  : frame_(frame),
+    clock_ptr_(node_ptr->get_clock()),
+    publisher_(rclcpp::create_publisher<visualization_msgs::msg::MarkerArray>(
+      node_ptr, "traffic_light/marker", rclcpp::QoS(1).transient_local()))
   {
   }
 
-  auto publish() -> void;
-};
+  auto deleteMarkers() const -> void;
 
+  auto drawMarkers(const std::unordered_map<lanelet::Id, TrafficLight> & traffic_lights_map) const
+    -> void;
+
+private:
+  const std::string frame_;
+  const rclcpp::Clock::SharedPtr clock_ptr_;
+  const rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr publisher_;
+};
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MARKER_PUBLISHER_HPP
