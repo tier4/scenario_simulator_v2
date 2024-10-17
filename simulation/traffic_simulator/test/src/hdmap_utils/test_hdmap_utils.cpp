@@ -1987,17 +1987,17 @@ TEST_F(HdMapUtilsTest_StandardMap, getTrafficLightIdsOnPath_empty)
  */
 TEST_F(HdMapUtilsTest_StandardMap, getLongitudinalDistance_sameLanelet)
 {
-  auto pose_from = hdmap_utils.toLaneletPose(
+  const auto pose_from = hdmap_utils.toLaneletPose(
     makePose(makePoint(3812.65, 73810.13, -2.80), makeQuaternionFromYaw(90.0)), lanelet::Id{34606});
-  auto pose_to = hdmap_utils.toLaneletPose(
+  const auto pose_to = hdmap_utils.toLaneletPose(
     makePose(makePoint(3825.10, 73786.34, -1.82), makeQuaternionFromYaw(90.0)), lanelet::Id{34606});
-  EXPECT_TRUE(pose_from.has_value());
-  EXPECT_TRUE(pose_to.has_value());
+  ASSERT_TRUE(pose_from.has_value());
+  ASSERT_TRUE(pose_to.has_value());
 
   const auto result_distance =
     hdmap_utils.getLongitudinalDistance(pose_from.value(), pose_to.value(), false);
 
-  EXPECT_TRUE(result_distance.has_value());
+  ASSERT_TRUE(result_distance.has_value());
   EXPECT_NEAR(result_distance.value(), 27.0, 1.0);
 }
 
@@ -2024,21 +2024,21 @@ TEST_F(HdMapUtilsTest_StandardMap, getLongitudinalDistance_sameLaneletBehind)
 /**
  * @note Test basic functionality.
  * Test longitudinal distance calculation correctness
- * with two poses on different lanelets  that are a few lanelets apart (e.g. 3).
+ * with two poses on different lanelets that are a few lanelets apart (e.g. 3).
  */
 TEST_F(HdMapUtilsTest_StandardMap, getLongitudinalDistance_differentLanelet)
 {
-  auto pose_from =
+  const auto pose_from =
     hdmap_utils.toLaneletPose(makePose(makePoint(3801.19, 73812.70, -2.86)), lanelet::Id{120660});
-  auto pose_to =
+  const auto pose_to =
     hdmap_utils.toLaneletPose(makePose(makePoint(3724.70, 73773.00, -1.20)), lanelet::Id{34462});
-  EXPECT_TRUE(pose_from.has_value());
-  EXPECT_TRUE(pose_to.has_value());
+  ASSERT_TRUE(pose_from.has_value());
+  ASSERT_TRUE(pose_to.has_value());
 
   const auto result_distance =
     hdmap_utils.getLongitudinalDistance(pose_from.value(), pose_to.value(), false);
 
-  EXPECT_TRUE(result_distance.has_value());
+  ASSERT_TRUE(result_distance.has_value());
   EXPECT_NEAR(result_distance.value(), 86.0, 1.0);
 }
 
@@ -2049,12 +2049,12 @@ TEST_F(HdMapUtilsTest_StandardMap, getLongitudinalDistance_differentLanelet)
  */
 TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLongitudinalDistance_differentLaneletNoRoute)
 {
-  auto pose_to = hdmap_utils.toLaneletPose(
+  const auto pose_to = hdmap_utils.toLaneletPose(
     makePose(makePoint(81590.79, 50067.66), makeQuaternionFromYaw(90.0)), lanelet::Id{3002185});
-  auto pose_from = hdmap_utils.toLaneletPose(
+  const auto pose_from = hdmap_utils.toLaneletPose(
     makePose(makePoint(81596.20, 50068.04), makeQuaternionFromYaw(90.0)), lanelet::Id{3002166});
-  EXPECT_TRUE(pose_from.has_value());
-  EXPECT_TRUE(pose_to.has_value());
+  ASSERT_TRUE(pose_from.has_value());
+  ASSERT_TRUE(pose_to.has_value());
 
   EXPECT_FALSE(
     hdmap_utils.getLongitudinalDistance(pose_from.value(), pose_to.value(), false).has_value());

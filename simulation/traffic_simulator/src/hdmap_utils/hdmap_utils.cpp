@@ -1533,9 +1533,13 @@ auto HdMapUtils::getLateralDistance(
 
 auto HdMapUtils::getLongitudinalDistance(
   const traffic_simulator_msgs::msg::LaneletPose & from_pose,
-  const traffic_simulator_msgs::msg::LaneletPose & to_pose, bool allow_lane_change) const
-  -> std::optional<double>
+  const traffic_simulator_msgs::msg::LaneletPose & to_pose,
+  const bool allow_lane_change /*= false*/) const -> std::optional<double>
 {
+  if (from_pose.lanelet_id == to_pose.lanelet_id) {
+    // negative distance means that the target position has been passed (works only within a single lanelet)
+    return std::make_optional(-from_pose.s + to_pose.s);
+  }
   const auto is_lane_change_required =
     [this](const lanelet::Id current_lanelet, const lanelet::Id next_lanelet) -> bool {
     const auto next_lanelet_ids = getNextLaneletIds(current_lanelet);
@@ -1589,7 +1593,6 @@ auto HdMapUtils::getLongitudinalDistance(
     }
     // subtract the distance already traveled on the first lanelet: from_pose.s
     // and add the distance that needs to be traveled on the last: to_pose.s.
-    // negative distance means that the target position has been passed (works only within a single lanlet)
     return std::make_optional(accumulated_distance - from_pose.s + to_pose.s);
   } else {
     return std::nullopt;
