@@ -1536,10 +1536,6 @@ auto HdMapUtils::getLongitudinalDistance(
   const traffic_simulator_msgs::msg::LaneletPose & to_pose,
   const bool allow_lane_change /*= false*/) const -> std::optional<double>
 {
-  if (from_pose.lanelet_id == to_pose.lanelet_id) {
-    // negative distance means that the target position has been passed (works only within a single lanelet)
-    return std::make_optional(-from_pose.s + to_pose.s);
-  }
   const auto is_lane_change_required =
     [this](const lanelet::Id current_lanelet, const lanelet::Id next_lanelet) -> bool {
     const auto next_lanelet_ids = getNextLaneletIds(current_lanelet);
@@ -1550,7 +1546,7 @@ auto HdMapUtils::getLongitudinalDistance(
 
   /// @sa https://tier4.github.io/scenario_simulator_v2-docs/developer_guide/DistanceCalculation/
   if (const auto route = getRoute(from_pose.lanelet_id, to_pose.lanelet_id, allow_lane_change);
-      not route.empty()) {
+      not route.empty() || from_pose.lanelet_id == to_pose.lanelet_id) {
     static constexpr double matching_distance = 10.0;
     double accumulated_distance = 0.0;
     // accumulate lanelet lengths alongside the route, considering possible lane changes
@@ -1593,7 +1589,11 @@ auto HdMapUtils::getLongitudinalDistance(
     }
     // subtract the distance already traveled on the first lanelet: from_pose.s
     // and add the distance that needs to be traveled on the last: to_pose.s.
-    return std::make_optional(accumulated_distance - from_pose.s + to_pose.s);
+    if (const double distance = accumulated_distance - from_pose.s + to_pose.s; distance >= 0.0) {
+      return std::make_optional(distance);
+    } else {
+      return std::nullopt;
+    }
   } else {
     return std::nullopt;
   }

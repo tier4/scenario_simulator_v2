@@ -2017,8 +2017,7 @@ TEST_F(HdMapUtilsTest_StandardMap, getLongitudinalDistance_sameLaneletBehind)
 
   const auto longitudinal_distance =
     hdmap_utils.getLongitudinalDistance(pose_from.value(), pose_to.value(), false);
-  ASSERT_TRUE(longitudinal_distance.has_value());
-  EXPECT_NEAR(longitudinal_distance.value(), -26.0, 1.0);
+  EXPECT_FALSE(longitudinal_distance.has_value());
 }
 
 /**
