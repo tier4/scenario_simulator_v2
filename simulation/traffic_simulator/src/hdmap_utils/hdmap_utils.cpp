@@ -1584,7 +1584,7 @@ auto HdMapUtils::getLongitudinalDistance(
           return std::nullopt;
         }
       } else {
-        accumulated_distance += getLaneletLength(route[i]);
+        accumulated_distance += getLaneletLength(route[i - 1UL]);
       }
     }
     // subtract the distance already traveled on the first lanelet: from_pose.s
