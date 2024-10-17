@@ -29,7 +29,7 @@ auto ConfigurableRateUpdater::startTimer(const double update_rate) -> void
 
 auto ConfigurableRateUpdater::resetTimer(const double update_rate) -> void
 {
-  if (timer_ && !timer_->is_canceled()) {
+  if (timer_ and not timer_->is_canceled()) {
     timer_->cancel();
     timer_.reset();
   }
