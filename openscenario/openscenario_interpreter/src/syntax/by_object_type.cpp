@@ -16,6 +16,7 @@
 #include <openscenario_interpreter/syntax/entities.hpp>
 #include <openscenario_interpreter/syntax/entity.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 
 namespace openscenario_interpreter
 {
@@ -31,6 +32,9 @@ ByObjectType::ByObjectType(const ObjectType & name, const Scope & scope)
 ByObjectType::ByObjectType(const pugi::xml_node & node, const Scope & scope)
 : ByObjectType(readAttribute<ObjectType>("type", node, scope), scope)
 {
+  if (this->value == ObjectType::external) {
+    THROW_SEMANTIC_ERROR("ObjectType::external does not support yet");
+  }
 }
 
 auto ByObjectType::objects() const -> std::set<Entity>
