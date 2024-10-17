@@ -33,8 +33,8 @@ namespace math
 namespace geometry
 {
 
-typedef boost::geometry::model::d2::point_xy<double> boost_point;
-typedef boost::geometry::model::polygon<boost_point> boost_polygon;
+using boost_point = boost::geometry::model::d2::point_xy<double>;
+using boost_polygon = boost::geometry::model::polygon<boost_point>;
 
 struct DistancesFromCenterToEdge
 {
