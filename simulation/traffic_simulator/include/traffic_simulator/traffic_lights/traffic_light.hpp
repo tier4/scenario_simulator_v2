@@ -262,78 +262,78 @@ struct TrafficLight
     explicit operator MessageT() const
     {
       const auto color = [this] {
-        auto color = MessageT::UNKNOWN;
+        auto color_message = MessageT::UNKNOWN;
         switch (std::get<Color>(value).value) {
           case Color::green:
-            color = MessageT::GREEN;
+            color_message = MessageT::GREEN;
             break;
           case Color::yellow:
-            color = MessageT::AMBER;
+            color_message = MessageT::AMBER;
             break;
           case Color::red:
-            color = MessageT::RED;
+            color_message = MessageT::RED;
             break;
           case Color::white:
-            color = MessageT::WHITE;
+            color_message = MessageT::WHITE;
             break;
         }
-        return color;
+        return color_message;
       };
 
       const auto status = [this] {
-        auto status = MessageT::UNKNOWN;
+        auto status_message = MessageT::UNKNOWN;
         switch (std::get<Status>(value).value) {
           case Status::solid_on:
-            status = MessageT::SOLID_ON;
+            status_message = MessageT::SOLID_ON;
             break;
           case Status::solid_off:
-            status = MessageT::SOLID_OFF;
+            status_message = MessageT::SOLID_OFF;
             break;
           case Status::flashing:
-            status = MessageT::FLASHING;
+            status_message = MessageT::FLASHING;
             break;
           case Status::unknown:
-            status = MessageT::UNKNOWN;
+            status_message = MessageT::UNKNOWN;
             break;
         }
-        return status;
+        return status_message;
       };
 
       const auto shape = [this] {
-        auto shape = MessageT::UNKNOWN;
+        auto shape_message = MessageT::UNKNOWN;
         switch (std::get<Shape>(value).value) {
           case Shape::circle:
-            shape = MessageT::CIRCLE;
+            shape_message = MessageT::CIRCLE;
             break;
           case Shape::cross:
-            shape = MessageT::CROSS;
+            shape_message = MessageT::CROSS;
             break;
           case Shape::left:
-            shape = MessageT::LEFT_ARROW;
+            shape_message = MessageT::LEFT_ARROW;
             break;
           case Shape::down:
-            shape = MessageT::DOWN_ARROW;
+            shape_message = MessageT::DOWN_ARROW;
             break;
           case Shape::up:
-            shape = MessageT::UP_ARROW;
+            shape_message = MessageT::UP_ARROW;
             break;
           case Shape::right:
-            shape = MessageT::RIGHT_ARROW;
+            shape_message = MessageT::RIGHT_ARROW;
             break;
           case Shape::lower_left:
-            shape = MessageT::DOWN_LEFT_ARROW;
+            shape_message = MessageT::DOWN_LEFT_ARROW;
             break;
           case Shape::lower_right:
-            shape = MessageT::DOWN_RIGHT_ARROW;
+            shape_message = MessageT::DOWN_RIGHT_ARROW;
             break;
           case Shape::upper_left:
-            shape = MessageT::UP_LEFT_ARROW;
+            shape_message = MessageT::UP_LEFT_ARROW;
             break;
           case Shape::upper_right:
-            shape = MessageT::UP_RIGHT_ARROW;
+            shape_message = MessageT::UP_RIGHT_ARROW;
             break;
         }
-        return shape;
+        return shape_message;
       };
 
       MessageT msg;
@@ -352,78 +352,78 @@ struct TrafficLight
       using TrafficSignalElement = autoware_perception_msgs::msg::TrafficSignalElement;
 
       auto color = [this]() {
-        auto color = TrafficSignalElement::UNKNOWN;
+        auto color_message = TrafficSignalElement::UNKNOWN;
         switch (std::get<Color>(value).value) {
           case Color::green:
-            color = TrafficSignalElement::GREEN;
+            color_message = TrafficSignalElement::GREEN;
             break;
           case Color::yellow:
-            color = TrafficSignalElement::AMBER;
+            color_message = TrafficSignalElement::AMBER;
             break;
           case Color::red:
-            color = TrafficSignalElement::RED;
+            color_message = TrafficSignalElement::RED;
             break;
           case Color::white:
-            color = TrafficSignalElement::WHITE;
+            color_message = TrafficSignalElement::WHITE;
             break;
         }
-        return color;
+        return color_message;
       };
 
       auto status = [this]() {
-        auto status = TrafficSignalElement::UNKNOWN;
+        auto status_message = TrafficSignalElement::UNKNOWN;
         switch (std::get<Status>(value).value) {
           case Status::solid_on:
-            status = TrafficSignalElement::SOLID_ON;
+            status_message = TrafficSignalElement::SOLID_ON;
             break;
           case Status::solid_off:
-            status = TrafficSignalElement::SOLID_OFF;
+            status_message = TrafficSignalElement::SOLID_OFF;
             break;
           case Status::flashing:
-            status = TrafficSignalElement::FLASHING;
+            status_message = TrafficSignalElement::FLASHING;
             break;
           case Status::unknown:
-            status = TrafficSignalElement::UNKNOWN;
+            status_message = TrafficSignalElement::UNKNOWN;
             break;
         }
-        return status;
+        return status_message;
       };
 
       auto shape = [this]() {
-        auto shape = TrafficSignalElement::UNKNOWN;
+        auto shape_message = TrafficSignalElement::UNKNOWN;
         switch (std::get<Shape>(value).value) {
           case Shape::circle:
-            shape = TrafficSignalElement::CIRCLE;
+            shape_message = TrafficSignalElement::CIRCLE;
             break;
           case Shape::cross:
-            shape = TrafficSignalElement::CROSS;
+            shape_message = TrafficSignalElement::CROSS;
             break;
           case Shape::left:
-            shape = TrafficSignalElement::LEFT_ARROW;
+            shape_message = TrafficSignalElement::LEFT_ARROW;
             break;
           case Shape::down:
-            shape = TrafficSignalElement::DOWN_ARROW;
+            shape_message = TrafficSignalElement::DOWN_ARROW;
             break;
           case Shape::up:
-            shape = TrafficSignalElement::UP_ARROW;
+            shape_message = TrafficSignalElement::UP_ARROW;
             break;
           case Shape::right:
-            shape = TrafficSignalElement::RIGHT_ARROW;
+            shape_message = TrafficSignalElement::RIGHT_ARROW;
             break;
           case Shape::lower_left:
-            shape = TrafficSignalElement::DOWN_LEFT_ARROW;
+            shape_message = TrafficSignalElement::DOWN_LEFT_ARROW;
             break;
           case Shape::lower_right:
-            shape = TrafficSignalElement::DOWN_RIGHT_ARROW;
+            shape_message = TrafficSignalElement::DOWN_RIGHT_ARROW;
             break;
           case Shape::upper_left:
-            shape = TrafficSignalElement::UP_LEFT_ARROW;
+            shape_message = TrafficSignalElement::UP_LEFT_ARROW;
             break;
           case Shape::upper_right:
-            shape = TrafficSignalElement::UP_RIGHT_ARROW;
+            shape_message = TrafficSignalElement::UP_RIGHT_ARROW;
             break;
         }
-        return shape;
+        return shape_message;
       };
 
       TrafficSignalElement msg;
