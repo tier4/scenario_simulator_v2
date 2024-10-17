@@ -26,7 +26,7 @@ class ConventionalTrafficLights : public TrafficLightsBase
 {
 public:
   template <typename NodeTypePointer>
-  ConventionalTrafficLights(
+  explicit ConventionalTrafficLights(
     const NodeTypePointer & node_ptr, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils)
   : TrafficLightsBase(node_ptr, hdmap_utils),
     backward_compatible_publisher_ptr_(
@@ -54,7 +54,7 @@ class V2ITrafficLights : public TrafficLightsBase
 {
 public:
   template <typename NodeTypePointer>
-  V2ITrafficLights(
+  explicit V2ITrafficLights(
     const NodeTypePointer & node_ptr, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
     const std::string & architecture_type)
   : TrafficLightsBase(node_ptr, hdmap_utils),
