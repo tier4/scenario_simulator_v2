@@ -16,10 +16,10 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CONDITION_HPP_
 
 #include <algorithm>
+#include <boost/json.hpp>
 #include <cstddef>
 #include <functional>
 #include <list>
-#include <nlohmann/json.hpp>
 #include <openscenario_interpreter/object.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
@@ -90,7 +90,7 @@ private:
   }
 };
 
-auto operator<<(nlohmann::json &, const Condition &) -> nlohmann::json &;
+auto operator<<(boost::json::object &, const Condition &) -> boost::json::object &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
