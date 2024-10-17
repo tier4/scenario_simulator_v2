@@ -164,12 +164,14 @@ auto ScenarioSimulator::updateEntityStatus(
       if (isEgo(status.name())) {
         assert(ego_entity_simulation_ && "Ego is spawned but ego_entity_simulation_ is nullptr!");
         if (req.overwrite_ego_status()) {
+          ego_entity_simulation_->autoware->setManualMode();
           traffic_simulator_msgs::msg::EntityStatus ego_status_msg;
           simulation_interface::toMsg(status, ego_status_msg);
           ego_entity_simulation_->overwrite(
             ego_status_msg, current_scenario_time_ + step_time_, step_time_,
             req.npc_logic_started());
         } else {
+          ego_entity_simulation_->autoware->setAutonomousMode();
           ego_entity_simulation_->update(
             current_scenario_time_ + step_time_, step_time_, req.npc_logic_started());
         }
