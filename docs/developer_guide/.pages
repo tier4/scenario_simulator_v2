@@ -18,3 +18,4 @@ nav:
     - CONTRIBUTING.md
     - Communication.md
     - ConfiguringPerceptionTopics.md
+    - ManualOverrideWithFollowTrajectoryAction.md
