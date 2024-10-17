@@ -1550,12 +1550,12 @@ auto HdMapUtils::getLongitudinalDistance(
     static constexpr double matching_distance = 10.0;
     double accumulated_distance = 0.0;
     // accumulate lanelet lengths alongside the route, considering possible lane changes
-    for (std::size_t i = 0UL; i < route.size() - 1UL; ++i) {
+    for (std::size_t i = 1UL; i < route.size(); ++i) {
       // if lane change is required, add the distance traveled during the lane change
       // if lane change is not required, add the current lanelet length
-      if (is_lane_change_required(route[i], route[i + 1UL])) {
-        const auto current_lanelet_spline = getCenterPointsSpline(route[i]);
-        const auto next_lanelet_spline = getCenterPointsSpline(route[i + 1UL]);
+      if (is_lane_change_required(route[i - 1UL], route[i])) {
+        const auto current_lanelet_spline = getCenterPointsSpline(route[i - 1UL]);
+        const auto next_lanelet_spline = getCenterPointsSpline(route[i]);
 
         // first, lanelets are matched at the start (s = 0.0) of each lanelet; only if this fails,
         // matching is performed at a larger s value, which should cover the rest of the cases.
