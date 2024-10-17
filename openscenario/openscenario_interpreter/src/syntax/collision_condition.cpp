@@ -71,7 +71,7 @@ auto CollisionCondition::evaluate() const -> Object
           another_given_entity.as<ByObjectType>().apply([&](const auto & another_entity) {
             return evaluateCollisionCondition(object, another_entity);
           });
-        return not evaluation.size() or evaluation.min();
+        return evaluation.size() and evaluation.max();
       });
       return not evaluation.size() or evaluation.min();
     }));
