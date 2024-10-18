@@ -33,7 +33,7 @@ from scenario_test_runner.shutdown_once import ShutdownOnce
 
 
 def architecture_types():
-    return ["awf/universe", "awf/universe/20230906"]
+    return ["awf/universe/20230906", "awf/universe/20240605"]
 
 
 def default_autoware_launch_package_of(architecture_type):
@@ -42,8 +42,8 @@ def default_autoware_launch_package_of(architecture_type):
             f"architecture_type := {architecture_type} is not supported. Choose one of {architecture_types()}."
         )
     return {
-        "awf/universe": "autoware_launch",
         "awf/universe/20230906": "autoware_launch",
+        "awf/universe/20240605": "autoware_launch",
     }[architecture_type]
 
 
@@ -53,8 +53,8 @@ def default_autoware_launch_file_of(architecture_type):
             f"architecture_type := {architecture_type} is not supported. Choose one of {architecture_types()}."
         )
     return {
-        "awf/universe": "planning_simulator.launch.xml",
         "awf/universe/20230906": "planning_simulator.launch.xml",
+        "awf/universe/20240605": "planning_simulator.launch.xml",
     }[architecture_type]
 
 
@@ -64,7 +64,7 @@ def default_rviz_config_file():
 
 def launch_setup(context, *args, **kwargs):
     # fmt: off
-    architecture_type                   = LaunchConfiguration("architecture_type",                      default="awf/universe/20230906")
+    architecture_type                   = LaunchConfiguration("architecture_type",                      default="awf/universe/20240605")
     autoware_launch_file                = LaunchConfiguration("autoware_launch_file",                   default=default_autoware_launch_file_of(architecture_type.perform(context)))
     autoware_launch_package             = LaunchConfiguration("autoware_launch_package",                default=default_autoware_launch_package_of(architecture_type.perform(context)))
     consider_acceleration_by_road_slope = LaunchConfiguration("consider_acceleration_by_road_slope",    default=False)

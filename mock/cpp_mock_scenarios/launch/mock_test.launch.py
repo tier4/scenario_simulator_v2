@@ -70,7 +70,7 @@ def on_stdout_output(event: launch.Event) -> None:
             print(Color.GREEN + "Scenario Succeed" + Color.END)
 
 def architecture_types():
-    return ["awf/universe", "awf/universe/20230906"]
+    return ["awf/universe", "awf/universe/20230906", "awf/universe/20240605"]
 
 
 def default_autoware_launch_package_of(architecture_type):
@@ -81,6 +81,7 @@ def default_autoware_launch_package_of(architecture_type):
     return {
         "awf/universe": "autoware_launch",
         "awf/universe/20230906": "autoware_launch",
+        "awf/universe/20240605": "autoware_launch",
     }[architecture_type]
 
 
@@ -92,6 +93,7 @@ def default_autoware_launch_file_of(architecture_type):
     return {
         "awf/universe": "planning_simulator.launch.xml",
         "awf/universe/20230906": "planning_simulator.launch.xml",
+        "awf/universe/20240605": "planning_simulator.launch.xml",
     }[architecture_type]
 
 def default_rviz_config_file():
@@ -99,7 +101,7 @@ def default_rviz_config_file():
 
 def launch_setup(context, *args, **kwargs):
     # fmt: off
-    architecture_type                   = LaunchConfiguration("architecture_type",                      default="awf/universe/20230906")
+    architecture_type                   = LaunchConfiguration("architecture_type",                      default="awf/universe/20240605")
     autoware_launch_file                = LaunchConfiguration("autoware_launch_file",                   default=default_autoware_launch_file_of(architecture_type.perform(context)))
     autoware_launch_package             = LaunchConfiguration("autoware_launch_package",                default=default_autoware_launch_package_of(architecture_type.perform(context)))
     consider_acceleration_by_road_slope = LaunchConfiguration("consider_acceleration_by_road_slope",    default=False)
@@ -117,10 +119,10 @@ def launch_setup(context, *args, **kwargs):
     record                              = LaunchConfiguration("record",                                 default=False)
     rviz_config                         = LaunchConfiguration("rviz_config",                            default=default_rviz_config_file())
     scenario                            = LaunchConfiguration("scenario",                               default=Path("/dev/null"))
-    sensor_model                        = LaunchConfiguration("sensor_model",                           default="")
+    sensor_model                        = LaunchConfiguration("sensor_model",                           default="sample_sensor_kit")
     sigterm_timeout                     = LaunchConfiguration("sigterm_timeout",                        default=8)
     use_sim_time                        = LaunchConfiguration("use_sim_time",                           default=False)
-    vehicle_model                       = LaunchConfiguration("vehicle_model",                          default="")
+    vehicle_model                       = LaunchConfiguration("vehicle_model",                          default="sample_vehicle")
     scenario_package                    = LaunchConfiguration("package",                                default="cpp_mock_scenarios")
     junit_path                          = LaunchConfiguration("junit_path",                             default="/tmp/output.xunit.xml")
     # fmt: on

@@ -16,9 +16,9 @@
 #define CONCEALER__AUTOWARE_HPP_
 
 #include <atomic>
-#include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
-#include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
-#include <autoware_auto_vehicle_msgs/msg/turn_indicators_command.hpp>
+#include <autoware_control_msgs/msg/control.hpp>
+#include <autoware_vehicle_msgs/msg/gear_command.hpp>
+#include <autoware_vehicle_msgs/msg/turn_indicators_command.hpp>
 #include <concealer/continuous_transform_broadcaster.hpp>
 #include <concealer/visibility.hpp>
 #include <geometry_msgs/msg/accel.hpp>
@@ -48,7 +48,7 @@ public:
 
   virtual auto getAcceleration() const -> double = 0;
 
-  virtual auto getGearCommand() const -> autoware_auto_vehicle_msgs::msg::GearCommand;
+  virtual auto getGearCommand() const -> autoware_vehicle_msgs::msg::GearCommand;
 
   virtual auto getSteeringAngle() const -> double = 0;
 
@@ -58,11 +58,10 @@ public:
   virtual auto getGearSign() const -> double = 0;
 
   virtual auto getTurnIndicatorsCommand() const
-    -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand;
+    -> autoware_vehicle_msgs::msg::TurnIndicatorsCommand;
 
-  virtual auto getVehicleCommand() const -> std::tuple<
-    autoware_auto_control_msgs::msg::AckermannControlCommand,
-    autoware_auto_vehicle_msgs::msg::GearCommand> = 0;
+  virtual auto getVehicleCommand() const
+    -> std::tuple<autoware_control_msgs::msg::Control, autoware_vehicle_msgs::msg::GearCommand> = 0;
 
   virtual auto getRouteLanelets() const -> std::vector<std::int64_t> = 0;
 
@@ -73,6 +72,10 @@ public:
   auto set(const geometry_msgs::msg::Pose &) -> void;
 
   virtual auto rethrow() -> void;
+
+  virtual auto setManualMode() -> void = 0;
+
+  virtual auto setAutonomousMode() -> void = 0;
 };
 }  // namespace concealer
 

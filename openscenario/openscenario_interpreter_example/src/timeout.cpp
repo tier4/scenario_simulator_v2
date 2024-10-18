@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <autoware_auto_system_msgs/msg/autoware_state.hpp>
+#include <autoware_system_msgs/msg/autoware_state.hpp>
 #include <boost/lexical_cast.hpp>
 #include <rclcpp/rclcpp.hpp>
 
@@ -85,13 +85,11 @@ int main(const int argc, char const * const * const argv)
   using tier4_simulation_msgs::msg::UserDefinedValue;
   using tier4_simulation_msgs::msg::UserDefinedValueType;
 
-  autoware_auto_system_msgs::msg::AutowareState status;
+  autoware_system_msgs::msg::AutowareState status;
 
-  auto subscription = node->create_subscription<autoware_auto_system_msgs::msg::AutowareState>(
+  auto subscription = node->create_subscription<autoware_system_msgs::msg::AutowareState>(
     "/autoware/state", rclcpp::QoS(1).reliable(),
-    [&](const autoware_auto_system_msgs::msg::AutowareState::SharedPtr message) {
-      status = *message;
-    });
+    [&](const autoware_system_msgs::msg::AutowareState::SharedPtr message) { status = *message; });
 
   auto publisher = node->create_publisher<UserDefinedValue>("/timeout", rclcpp::QoS(1).reliable());
 
@@ -99,7 +97,7 @@ int main(const int argc, char const * const * const argv)
   {
     static auto duration_since_autoware_engaged = std::chrono::high_resolution_clock::now();
 
-    if (status.state != autoware_auto_system_msgs::msg::AutowareState::DRIVING) {
+    if (status.state != autoware_system_msgs::msg::AutowareState::DRIVING) {
       duration_since_autoware_engaged = std::chrono::high_resolution_clock::now();
     }
 
