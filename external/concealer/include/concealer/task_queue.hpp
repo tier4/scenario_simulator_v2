@@ -40,6 +40,8 @@ class TaskQueue
 
   std::exception_ptr thrown;
 
+  std::atomic<bool> is_exhausted = true;
+
 public:
   explicit TaskQueue();
 
