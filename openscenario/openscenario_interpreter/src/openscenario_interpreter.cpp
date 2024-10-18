@@ -36,6 +36,8 @@ namespace openscenario_interpreter
 Interpreter::Interpreter(const rclcpp::NodeOptions & options)
 : rclcpp_lifecycle::LifecycleNode("openscenario_interpreter", options),
   publisher_of_context(create_publisher<Context>("context", rclcpp::QoS(1).transient_local())),
+  publisher_of_params(create_publisher<std_msgs::msg::String>(
+    "test_iteration_parameters", rclcpp::QoS(1).transient_local())),
   local_frame_rate(30),
   local_real_time_factor(1.0),
   osc_path(""),
@@ -122,6 +124,14 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
 
       if (script->category.is<ScenarioDefinition>()) {
         scenarios = {std::dynamic_pointer_cast<ScenarioDefinition>(script->category)};
+        // get and log parameters used in this test iteration
+        test_iteration_params_str.data.clear();
+        test_iteration_params_str.data = "Parameter declarations for this scenario iteration:\n";
+        for (const auto & pd : currentScenarioDefinition()->parameter_declarations) {
+          test_iteration_params_str.data.append(pd.name + " = " + pd.value + "\n");
+        }
+        RCLCPP_INFO_STREAM(get_logger(), test_iteration_params_str.data);
+
       } else if (script->category.is<ParameterValueDistribution>()) {
         throw Error(
           "ParameterValueDistribution cannot be processed by openscenario_interpreter alone. "
@@ -179,6 +189,7 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
     withExceptionHandler(
       [this](auto &&...) {
         publishCurrentContext();
+        publisher_of_params->publish(test_iteration_params_str);
         deactivate();
       },
       [this]() {
@@ -200,6 +211,7 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
           SimulatorCore::update();
 
           publishCurrentContext();
+          publisher_of_params->publish(test_iteration_params_str);
         });
       });
   };
@@ -237,8 +249,10 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
         execution_timer.clear();
 
         publisher_of_context->on_activate();
+        publisher_of_params->on_activate();
 
         assert(publisher_of_context->is_activated());
+        assert(publisher_of_params->is_activated());
 
         if (currentScenarioDefinition()) {
           currentScenarioDefinition()->storyboard.init.evaluateInstantaneousActions();
@@ -307,6 +321,10 @@ auto Interpreter::reset() -> void
 
   if (publisher_of_context->is_activated()) {
     publisher_of_context->on_deactivate();
+  }
+
+  if (publisher_of_params->is_activated()) {
+    publisher_of_params->on_deactivate();
   }
 
   if (not has_parameter("initialize_duration")) {
