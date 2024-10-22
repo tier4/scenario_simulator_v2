@@ -226,11 +226,6 @@ OpenSCENARIO:
                   EntityRef: []
                 Maneuver:
                   - name: "VehicleCollision"
-                    ParameterDeclarations:
-                      ParameterDeclaration:
-                        - name: "vehicle_collision"
-                          parameterType: boolean
-                          value: false
                     Event:
                       - name: "CollisionEvent"
                         priority: parallel
