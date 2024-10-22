@@ -111,7 +111,10 @@ void ContextPanel::updateTopicCandidates()
         }
       }
     }
-    std::unique(topics_.begin(), topics_.end());
+
+    std::sort(topics_.begin(), topics_.end());
+    topics_.erase(std::unique(topics_.begin(), topics_.end()), topics_.end());
+
     ui_->TopicSelect->clear();
     ui_->TopicSelect->addItem("simulation/context");
     for (const auto & topic : topics_) {
