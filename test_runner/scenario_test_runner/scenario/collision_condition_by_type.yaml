@@ -24,7 +24,7 @@ OpenSCENARIO:
         CatalogReference:
           catalogName: sample_vehicle
           entryName: sample_vehicle
-      - name: barricade
+      - name: Barricade
         MiscObject:
           mass: 1.0
           miscObjectCategory: obstacle
@@ -123,7 +123,7 @@ OpenSCENARIO:
                           h: 0
                           p: 0
                           r: 0
-          - entityRef: barricade
+          - entityRef: Barricade
             PrivateAction:
               - TeleportAction:
                   Position:
