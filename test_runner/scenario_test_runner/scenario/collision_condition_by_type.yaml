@@ -10,7 +10,7 @@ OpenSCENARIO:
   CatalogLocations:
     VehicleCatalog:
       Directory:
-        path: $(find-pkg-share scenario_test_runner)/scenario/catalog/vehicle
+        path: $(ros2 pkg prefix --share openscenario_experimental_catalog)/vehicle
   RoadNetwork:
     LogicFile:
       filepath: $(find-pkg-share kashiwanoha_map)/map
@@ -18,20 +18,12 @@ OpenSCENARIO:
     ScenarioObject:
       - name: "Vehicle0"
         CatalogReference:
-          catalogName: "all-in-one-vehicle"
-          entryName: "ego-vehicle"
-          ParameterAssignments:
-            ParameterAssignment:
-              - parameterRef: maxSpeed
-                value: 50
+          catalogName: sample_vehicle
+          entryName: sample_vehicle
       - name: "Vehicle1"
         CatalogReference:
-          catalogName: "all-in-one-vehicle"
-          entryName: "default-vehicle"
-          ParameterAssignments:
-            ParameterAssignment:
-              - parameterRef: maxSpeed
-                value: 50
+          catalogName: sample_vehicle
+          entryName: sample_vehicle
       - name: barricade
         MiscObject:
           mass: 1.0
