@@ -15,15 +15,14 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__BY_OBJECT_TYPE_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__BY_OBJECT_TYPE_HPP_
 
+#include <algorithm>
+#include <iterator>
 #include <openscenario_interpreter/object.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/object_type.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <pugixml.hpp>
 #include <scenario_simulator_exception/exception.hpp>
-
-#include <algorithm>
-#include <iterator>
 #include <set>
 #include <type_traits>
 #include <valarray>
