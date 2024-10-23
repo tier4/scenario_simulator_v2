@@ -316,7 +316,11 @@ std::pair<double, double> HermiteCurve::get2DMinMaxCurvatureValue() const
   /**
    * @brief 0.1 is a sampling resolution of the curvature
    */
-  for (double s = 0; s <= 1; s = s + 0.1) {
+  const int sample_count = 10;
+  const double resolution = 1.0 / sample_count;
+
+  for (int i = 0; i <= sample_count; ++i) {
+    double s = i * resolution;
     double curvature = get2DCurvature(s);
     curvatures.push_back(curvature);
   }
