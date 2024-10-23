@@ -64,8 +64,6 @@ LineSegment::LineSegment(
 {
 }
 
-LineSegment::~LineSegment() {}
-
 /**
  * @brief Get point on the line segment from s value.
  * @param s Normalized s value in coordinate along line segment.
@@ -300,8 +298,6 @@ auto LineSegment::denormalize(const double s) const -> double
       "contact the developer of traffic_simulator.");
   }
 }
-
-LineSegment & LineSegment::operator=(const LineSegment &) { return *this; }
 
 /**
  * @brief Get the line segments from points. 
