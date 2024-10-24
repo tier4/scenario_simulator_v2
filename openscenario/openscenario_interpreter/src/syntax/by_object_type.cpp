@@ -22,7 +22,6 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-
 ByObjectType::ByObjectType(const ObjectType & name, const Scope & scope)
 : Scope(scope), ObjectType(name)
 
@@ -47,6 +46,5 @@ auto ByObjectType::objects() const -> std::set<Entity>
   }
   return result;
 }
-
 }  // namespace syntax
 }  // namespace openscenario_interpreter
