@@ -47,7 +47,7 @@ auto CollisionCondition::description() const -> std::string
                 << "?";
   } else {
     description << "Is any of " << triggering_entities.description() << " colliding with another "
-                << another_given_entity.as<ByObjectType>() << " typed entities?";
+                << another_given_entity.as<ByObjectType>().type << " typed entities?";
   }
 
   return description.str();

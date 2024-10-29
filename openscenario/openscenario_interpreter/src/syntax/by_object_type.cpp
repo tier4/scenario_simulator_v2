@@ -22,16 +22,10 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-ByObjectType::ByObjectType(const ObjectType & name, const Scope & scope)
-: Scope(scope), ObjectType(name)
-
+ByObjectType::ByObjectType(const pugi::xml_node & node, Scope & scope)
+: Scope(scope), type(readAttribute<ObjectType>("type", node, scope))
 {
-}
-
-ByObjectType::ByObjectType(const pugi::xml_node & node, const Scope & scope)
-: ByObjectType(readAttribute<ObjectType>("type", node, scope), scope)
-{
-  if (this->value == ObjectType::external) {
+  if (type.value == ObjectType::external) {
     THROW_SEMANTIC_ERROR("ObjectType::external does not support yet");
   }
 }
@@ -40,7 +34,7 @@ auto ByObjectType::objects() const -> std::set<Entity>
 {
   std::set<Entity> result;
   for (const auto & [name, object] : *global().entities) {
-    if (object.is<ScenarioObject>() and object.as<ScenarioObject>().objectType() == *this) {
+    if (object.is<ScenarioObject>() and object.as<ScenarioObject>().objectType() == type) {
       result.emplace(name, *this);
     }
   }

@@ -32,18 +32,20 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- ByObjectType -----------------------------------------------------------------
- *
- *  <xsd:complexType name="ByObjectType">
- *    <xsd:attribute name="type" type="ObjectType" use="required"/>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
-struct ByObjectType : public Scope, public ComplexType, public ObjectType
-{
-  ByObjectType(const ObjectType &, const Scope &);
+/*
+   OpenSCENARIO XML 1.3 ByObjectType
 
-  ByObjectType(const pugi::xml_node &, const Scope &);
+   Defines an object type to select entities.
+
+   <xsd:complexType name="ByObjectType">
+     <xsd:attribute name="type" type="ObjectType" use="required"/>
+   </xsd:complexType>
+*/
+struct ByObjectType : public Scope
+{
+  ObjectType type;
+
+  explicit ByObjectType(const pugi::xml_node &, Scope &);
 
   auto objects() const -> std::set<Entity>;
 
