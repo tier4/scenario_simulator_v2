@@ -16,15 +16,15 @@ OpenSCENARIO:
       filepath: $(find-pkg-share kashiwanoha_map)/map
   Entities:
     ScenarioObject:
-      - name: "Vehicle0"
+      - name: vehicle0
         CatalogReference:
           catalogName: sample_vehicle
           entryName: sample_vehicle
-      - name: "Vehicle1"
+      - name: vehicle1
         CatalogReference:
           catalogName: sample_vehicle
           entryName: sample_vehicle
-      - name: Barricade
+      - name: barricade
         MiscObject:
           mass: 1.0
           miscObjectCategory: obstacle
@@ -40,7 +40,7 @@ OpenSCENARIO:
               height: 1
           Properties:
             Property: []
-      - name: Pedestrian0
+      - name: pedestrian0
         Pedestrian:
           name: Pedestrian
           mass: 60
@@ -57,7 +57,7 @@ OpenSCENARIO:
               height: 2
           Properties:
             Property: []
-      - name: Pedestrian1
+      - name: pedestrian1
         Pedestrian:
           name: Pedestrian
           mass: 60
@@ -74,7 +74,7 @@ OpenSCENARIO:
               height: 2
           Properties:
             Property: []
-      - name: Pedestrian2
+      - name: pedestrian2
         Pedestrian:
           name: Pedestrian
           mass: 60
@@ -95,7 +95,7 @@ OpenSCENARIO:
     Init:
       Actions:
         Private:
-          - entityRef: "Vehicle0"
+          - entityRef: vehicle0
             PrivateAction:
               TeleportAction:
                 Position:
@@ -109,7 +109,7 @@ OpenSCENARIO:
                         h: 0
                         p: 0
                         r: 0
-          - entityRef: "Vehicle1"
+          - entityRef: vehicle1
             PrivateAction:
               - TeleportAction:
                   Position:
@@ -123,7 +123,7 @@ OpenSCENARIO:
                           h: 0
                           p: 0
                           r: 0
-          - entityRef: Barricade
+          - entityRef: barricade
             PrivateAction:
               - TeleportAction:
                   Position:
@@ -137,7 +137,7 @@ OpenSCENARIO:
                         h: 0
                         p: 0
                         r: 0
-          - entityRef: "Pedestrian0"
+          - entityRef: pedestrian0
             PrivateAction:
               - TeleportAction:
                   Position:
@@ -160,7 +160,7 @@ OpenSCENARIO:
                     SpeedActionTarget:
                       AbsoluteTargetSpeed:
                         value: -1
-          - entityRef: "Pedestrian1"
+          - entityRef: pedestrian1
             PrivateAction:
               - TeleportAction:
                   Position:
@@ -183,7 +183,7 @@ OpenSCENARIO:
                     SpeedActionTarget:
                       AbsoluteTargetSpeed:
                         value: -1
-          - entityRef: "Pedestrian2"
+          - entityRef: pedestrian2
             PrivateAction:
               - TeleportAction:
                   Position:
@@ -207,26 +207,26 @@ OpenSCENARIO:
                       AbsoluteTargetSpeed:
                         value: -1
     Story:
-      - name: "CollisionStory"
+      - name: CollisionStory
         Act:
-          - name: "CollisionAct"
+          - name: CollisionAct
             ManeuverGroup:
               - maximumExecutionCount: 1
-                name: "CollisionManeuverGroup"
+                name: CollisionManeuverGroup
                 Actors:
                   selectTriggeringEntities: false
                   EntityRef: []
                 Maneuver:
-                  - name: "VehicleCollision"
+                  - name: check_if_vehicle0_collides_with_another_vehicle_type_entity
                     Event:
-                      - name: "CollisionEvent"
+                      - name: CollisionEvent
                         priority: parallel
                         maximumExecutionCount: 1
                         Action:
                           - name: ""
                             UserDefinedAction:
                               CustomCommandAction:
-                                type: 'echo collision with vehicle'
+                                type: 'echo vehicle0 collided with another vehicle type entity.'
                         StartTrigger:
                           ConditionGroup:
                             Condition:
@@ -236,20 +236,20 @@ OpenSCENARIO:
                                 ByEntityCondition:
                                   TriggeringEntities:
                                     triggeringEntitiesRule: any
-                                    EntityRef: [ entityRef: Vehicle0 ]
+                                    EntityRef: [ entityRef: vehicle0 ]
                                   EntityCondition:
                                     CollisionCondition:
                                       ByType: [ type: vehicle ]
-                  - name: "BarricadeCollision"
+                  - name: check_if_vehicle1_collides_with_another_miscellaneous_type_entity
                     Event:
-                      - name: "CollisionEvent"
+                      - name: CollisionEvent
                         priority: parallel
                         maximumExecutionCount: 1
                         Action:
                           - name: ""
                             UserDefinedAction:
                               CustomCommandAction:
-                                type: 'echo collision with barricade'
+                                type: 'echo vehicle1 collided with another miscellaneous type entity.'
                         StartTrigger:
                           ConditionGroup:
                             Condition:
@@ -259,20 +259,20 @@ OpenSCENARIO:
                                 ByEntityCondition:
                                   TriggeringEntities:
                                     triggeringEntitiesRule: any
-                                    EntityRef: [ entityRef: Vehicle1 ]
+                                    EntityRef: [ entityRef: vehicle1 ]
                                   EntityCondition:
                                     CollisionCondition:
                                       ByType: [ type: miscellaneous ]
-                  - name: "Pedestrian0Collision"
+                  - name: check_if_vehicle0_collides_with_pedestrian0
                     Event:
-                      - name: "CollisionEvent"
+                      - name: CollisionEvent
                         priority: parallel
                         maximumExecutionCount: 1
                         Action:
                           - name: ""
                             UserDefinedAction:
                               CustomCommandAction:
-                                type: 'echo collision with pedestrian0'
+                                type: 'echo vehicle0 collided with pedestrian0.'
                         StartTrigger:
                           ConditionGroup:
                             - Condition:
@@ -282,7 +282,7 @@ OpenSCENARIO:
                                 ByEntityCondition:
                                   TriggeringEntities:
                                     triggeringEntitiesRule: any
-                                    EntityRef: [ entityRef: Vehicle0 ]
+                                    EntityRef: [ entityRef: vehicle0 ]
                                   EntityCondition:
                                     CollisionCondition:
                                       ByType: [ type: pedestrian ]
@@ -292,21 +292,21 @@ OpenSCENARIO:
                                 ByEntityCondition:
                                   TriggeringEntities:
                                     triggeringEntitiesRule: any
-                                    EntityRef: [ entityRef: Vehicle0 ]
+                                    EntityRef: [ entityRef: vehicle0 ]
                                   EntityCondition:
                                     CollisionCondition:
                                       EntityRef:
-                                          entityRef: Pedestrian0
-                  - name: "Pedestrian1Collision"
+                                          entityRef: pedestrian0
+                  - name: check_if_vehicle0_collides_with_pedestrian1
                     Event:
-                      - name: "CollisionEvent"
+                      - name: CollisionEvent
                         priority: parallel
                         maximumExecutionCount: 1
                         Action:
                           - name: ""
                             UserDefinedAction:
                               CustomCommandAction:
-                                type: 'echo collision with pedestrian1'
+                                type: 'echo vehicle0 collided with pedestrian1.'
                         StartTrigger:
                           ConditionGroup:
                             - Condition:
@@ -316,7 +316,7 @@ OpenSCENARIO:
                                 ByEntityCondition:
                                   TriggeringEntities:
                                     triggeringEntitiesRule: any
-                                    EntityRef: [ entityRef: Vehicle0 ]
+                                    EntityRef: [ entityRef: vehicle0 ]
                                   EntityCondition:
                                     CollisionCondition:
                                       ByType: [ type: pedestrian ]
@@ -326,21 +326,21 @@ OpenSCENARIO:
                                 ByEntityCondition:
                                   TriggeringEntities:
                                     triggeringEntitiesRule: any
-                                    EntityRef: [ entityRef: Vehicle0 ]
+                                    EntityRef: [ entityRef: vehicle0 ]
                                   EntityCondition:
                                     CollisionCondition:
                                       EntityRef:
-                                          entityRef: Pedestrian1
-                  - name: "Pedestrian2Collision"
+                                          entityRef: pedestrian1
+                  - name: check_if_vehicle0_collides_with_pedestrian2
                     Event:
-                      - name: "CollisionEvent"
+                      - name: CollisionEvent
                         priority: parallel
                         maximumExecutionCount: 1
                         Action:
                           - name: ""
                             UserDefinedAction:
                               CustomCommandAction:
-                                type: 'echo collision with pedestrian2'
+                                type: 'echo vehicle0 collided with pedestrian2.'
                         StartTrigger:
                           ConditionGroup:
                             - Condition:
@@ -350,7 +350,7 @@ OpenSCENARIO:
                                 ByEntityCondition:
                                   TriggeringEntities:
                                     triggeringEntitiesRule: any
-                                    EntityRef: [ entityRef: Vehicle0 ]
+                                    EntityRef: [ entityRef: vehicle0 ]
                                   EntityCondition:
                                     CollisionCondition:
                                       ByType: [ type: pedestrian ]
@@ -360,11 +360,11 @@ OpenSCENARIO:
                                 ByEntityCondition:
                                   TriggeringEntities:
                                     triggeringEntitiesRule: any
-                                    EntityRef: [ entityRef: Vehicle0 ]
+                                    EntityRef: [ entityRef: vehicle0 ]
                                   EntityCondition:
                                     CollisionCondition:
                                       EntityRef:
-                                          entityRef: Pedestrian2
+                                          entityRef: pedestrian2
             StartTrigger:
               ConditionGroup:
                 Condition:
@@ -395,7 +395,7 @@ OpenSCENARIO:
                                   conditionEdge: none
                                   ByValueCondition:
                                     StoryboardElementStateCondition:
-                                      storyboardElementRef: "CollisionAct"
+                                      storyboardElementRef: CollisionAct
                                       storyboardElementType: act
                                       state: completeState
                         Action:
