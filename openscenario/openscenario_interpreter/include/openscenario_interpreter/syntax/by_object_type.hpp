@@ -30,7 +30,6 @@
 
 namespace openscenario_interpreter
 {
-
 inline namespace syntax
 {
 /* ---- ByObjectType -----------------------------------------------------------------
