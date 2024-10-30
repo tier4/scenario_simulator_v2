@@ -10,6 +10,9 @@ Changelog for package openscenario_validator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+4.3.19 (2024-10-30)
+-------------------
+
 4.3.18 (2024-10-18)
 -------------------
 * Merge branch 'master' into feature/json/boost-json
