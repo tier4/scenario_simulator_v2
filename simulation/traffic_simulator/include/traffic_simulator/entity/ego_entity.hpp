@@ -99,7 +99,7 @@ public:
 
   auto requestFollowTrajectory(
     const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &) -> void override;
-
+  using EntityBase::requestLaneChange;
   void requestLaneChange(const lanelet::Id) override;
 
   auto requestLaneChange(const traffic_simulator::lane_change::Parameter &) -> void override;
