@@ -31,7 +31,7 @@ VisualizationConditionGroupsDisplay::VisualizationConditionGroupsDisplay()
 : condition_groups_collection_ptr_(std::make_shared<std::vector<ConditionGroups>>())
 {
   /// @note Get screen info of default display
-  const Screen * screen_info = DefaultScreenOfDisplay(XOpenDisplay(NULL));
+  const Screen * screen_info = DefaultScreenOfDisplay(XOpenDisplay(nullptr));
 
   /// @note Fixed height for a 4k resolution screen
   /// @sa https://github.com/tier4/scenario_simulator_v2/pull/1033#discussion_r1412781103
