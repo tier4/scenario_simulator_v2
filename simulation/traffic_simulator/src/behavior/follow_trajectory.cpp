@@ -66,8 +66,9 @@ auto makeUpdatedStatus(
   using math::geometry::normalize;
   using math::geometry::truncate;
 
-  auto distance_along_lanelet =
-    [&](const geometry_msgs::msg::Point & from, const geometry_msgs::msg::Point & to) -> double {
+  auto distance_along_lanelet = [&hdmap_utils, &entity_status, matching_distance](
+                                  const geometry_msgs::msg::Point & from,
+                                  const geometry_msgs::msg::Point & to) -> double {
     if (const auto from_lanelet_pose =
           hdmap_utils->toLaneletPose(from, entity_status.bounding_box, false, matching_distance);
         from_lanelet_pose) {
@@ -84,7 +85,9 @@ auto makeUpdatedStatus(
     return hypot(from, to);
   };
 
-  auto discard_the_front_waypoint_and_recurse = [&]() {
+  auto discard_the_front_waypoint_and_recurse = [&polyline_trajectory, &entity_status,
+                                                 &behavior_parameter, &hdmap_utils, step_time,
+                                                 matching_distance, target_speed]() {
     /*
        The OpenSCENARIO standard does not define the behavior when the value of
        Timing.domainAbsoluteRelative is "relative". The standard only states
@@ -123,13 +126,14 @@ auto makeUpdatedStatus(
 
   auto is_infinity_or_nan = [](auto x) constexpr { return std::isinf(x) or std::isnan(x); };
 
-  auto first_waypoint_with_arrival_time_specified = [&]() {
+  auto first_waypoint_with_arrival_time_specified = [&polyline_trajectory]() {
     return std::find_if(
       polyline_trajectory.shape.vertices.begin(), polyline_trajectory.shape.vertices.end(),
       [](auto && vertex) { return not std::isnan(vertex.time); });
   };
 
-  auto is_breaking_waypoint = [&]() {
+  auto is_breaking_waypoint = [&first_waypoint_with_arrival_time_specified,
+                               &polyline_trajectory]() {
     return first_waypoint_with_arrival_time_specified() >=
            std::prev(polyline_trajectory.shape.vertices.end());
   };
@@ -181,14 +185,15 @@ auto makeUpdatedStatus(
     return discard_the_front_waypoint_and_recurse();
   } else if (
     const auto [distance, remaining_time] =
-      [&]() {
+      [&polyline_trajectory, &distance_along_lanelet, &first_waypoint_with_arrival_time_specified,
+       &entity_status, &distance_to_front_waypoint, step_time]() {
         /*
            Note for anyone working on adding support for followingMode follow
            to this function (FollowPolylineTrajectoryAction::tick) in the
            future: if followingMode is follow, this distance calculation may be
            inappropriate.
         */
-        auto total_distance_to = [&](auto last) {
+        auto total_distance_to = [&polyline_trajectory, &distance_along_lanelet](auto last) {
           auto total_distance = 0.0;
           for (auto iter = std::begin(polyline_trajectory.shape.vertices);
                0 < std::distance(iter, last); ++iter) {
@@ -322,7 +327,9 @@ auto makeUpdatedStatus(
        In addition, the controller ensures a smooth stop at the last waypoint of the trajectory,
        with linear speed equal to zero and acceleration equal to zero.
     */
-    const auto desired_acceleration = [&]() -> double {
+    const auto desired_acceleration = [&follow_waypoint_controller, &entity_status,
+                                       &polyline_trajectory, remaining_time, distance, acceleration,
+                                       speed]() -> double {
       try {
         return follow_waypoint_controller.getAcceleration(
           remaining_time, distance, acceleration, speed);
@@ -348,7 +355,8 @@ auto makeUpdatedStatus(
       std::quoted(entity_status.name), "'s desired speed value is NaN or infinity. The value is ",
       desired_speed, ". ");
   } else if (const auto desired_velocity =
-               [&]() {
+               [&polyline_trajectory, &entity_status, &target_position, &position,
+                desired_speed]() {
                  /*
                     Note: The followingMode in OpenSCENARIO is passed as
                     variable dynamic_constraints_ignorable. the value of the
@@ -390,7 +398,7 @@ auto makeUpdatedStatus(
       "'s desired velocity contains NaN or infinity. The value is [", desired_velocity.x, ", ",
       desired_velocity.y, ", ", desired_velocity.z, "].");
   } else if (const auto current_velocity =
-               [&]() {
+               [&entity_status, speed]() {
                  const auto pitch =
                    -math::geometry::convertQuaternionToEulerAngle(entity_status.pose.orientation).y;
                  const auto yaw =
@@ -554,7 +562,7 @@ auto makeUpdatedStatus(
 
     updated_status.pose.position += desired_velocity * step_time;
 
-    updated_status.pose.orientation = [&]() {
+    updated_status.pose.orientation = [&entity_status, &desired_velocity]() {
       if (desired_velocity.y == 0 && desired_velocity.x == 0 && desired_velocity.z == 0) {
         // do not change orientation if there is no designed_velocity vector
         return entity_status.pose.orientation;
