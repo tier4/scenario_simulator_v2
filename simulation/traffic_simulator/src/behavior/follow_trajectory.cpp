@@ -31,6 +31,95 @@ namespace traffic_simulator
 {
 namespace follow_trajectory
 {
+void print_debug_info(
+  const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter,
+  const double acceleration, const double min_acceleration, const double max_acceleration,
+  const double desired_acceleration, const double speed, const double desired_speed,
+  const double distance, const double distance_to_front_waypoint, const double remaining_time,
+  const double remaining_time_to_arrival_to_front_waypoint,
+  const double remaining_time_to_front_waypoint, const double step_time)
+{
+  using math::arithmetic::isDefinitelyLessThan;
+  // clang-format off
+  std::cout << std::fixed << std::boolalpha << std::string(80, '-') << std::endl;
+
+  std::cout << "acceleration "
+            << "== " << acceleration
+            << std::endl;
+
+  std::cout << "min_acceleration "
+            << "== std::max(acceleration - max_deceleration_rate * step_time, -max_deceleration) "
+            << "== std::max(" << acceleration << " - " << behavior_parameter.dynamic_constraints.max_deceleration_rate << " * " << step_time << ", " << -behavior_parameter.dynamic_constraints.max_deceleration << ") "
+            << "== std::max(" << acceleration << " - " << behavior_parameter.dynamic_constraints.max_deceleration_rate * step_time << ", " << -behavior_parameter.dynamic_constraints.max_deceleration << ") "
+            << "== std::max(" << (acceleration - behavior_parameter.dynamic_constraints.max_deceleration_rate * step_time) << ", " << -behavior_parameter.dynamic_constraints.max_deceleration << ") "
+            << "== " << min_acceleration
+            << std::endl;
+
+  std::cout << "max_acceleration "
+            << "== std::min(acceleration + max_acceleration_rate * step_time, +max_acceleration) "
+            << "== std::min(" << acceleration << " + " << behavior_parameter.dynamic_constraints.max_acceleration_rate << " * " << step_time << ", " << behavior_parameter.dynamic_constraints.max_acceleration << ") "
+            << "== std::min(" << acceleration << " + " << behavior_parameter.dynamic_constraints.max_acceleration_rate * step_time << ", " << behavior_parameter.dynamic_constraints.max_acceleration << ") "
+            << "== std::min(" << (acceleration + behavior_parameter.dynamic_constraints.max_acceleration_rate * step_time) << ", " << behavior_parameter.dynamic_constraints.max_acceleration << ") "
+            << "== " << max_acceleration
+            << std::endl;
+
+  std::cout << "min_acceleration < acceleration < max_acceleration "
+            << "== " << min_acceleration << " < " << acceleration << " < " << max_acceleration << std::endl;
+
+  std::cout << "desired_acceleration "
+            << "== 2 * distance / std::pow(remaining_time, 2) - 2 * speed / remaining_time "
+            << "== 2 * " << distance << " / " << std::pow(remaining_time, 2) << " - 2 * " << speed << " / " << remaining_time << " "
+            << "== " << (2 * distance / std::pow(remaining_time, 2)) << " - " << (2 * speed / remaining_time) << " "
+            << "== " << desired_acceleration << " "
+            << "(acceleration < desired_acceleration == " << (acceleration < desired_acceleration) << " == need to " <<(acceleration < desired_acceleration ? "accelerate" : "decelerate") << ")"
+            << std::endl;
+
+  std::cout << "desired_speed "
+            << "== speed + std::clamp(desired_acceleration, min_acceleration, max_acceleration) * step_time "
+            << "== " << speed << " + std::clamp(" << desired_acceleration << ", " << min_acceleration << ", " << max_acceleration << ") * " << step_time << " "
+            << "== " << speed << " + " << std::clamp(desired_acceleration, min_acceleration, max_acceleration) << " * " << step_time << " "
+            << "== " << speed << " + " << std::clamp(desired_acceleration, min_acceleration, max_acceleration) * step_time << " "
+            << "== " << desired_speed
+            << std::endl;
+
+  std::cout << "distance_to_front_waypoint "
+            << "== " << distance_to_front_waypoint
+            << std::endl;
+
+  std::cout << "remaining_time_to_arrival_to_front_waypoint "
+            << "== " << remaining_time_to_arrival_to_front_waypoint
+            << std::endl;
+
+  std::cout << "distance "
+            << "== " << distance
+            << std::endl;
+
+  std::cout << "remaining_time "
+            << "== " << remaining_time
+            << std::endl;
+
+  std::cout << "remaining_time_to_arrival_to_front_waypoint "
+            << "("
+            << "== distance_to_front_waypoint / desired_speed "
+            << "== " << distance_to_front_waypoint << " / " << desired_speed << " "
+            << "== " << remaining_time_to_arrival_to_front_waypoint
+            << ")"
+            << std::endl;
+
+  std::cout << "arrive during this frame? "
+            << "== remaining_time_to_arrival_to_front_waypoint < step_time "
+            << "== " << remaining_time_to_arrival_to_front_waypoint << " < " << step_time << " "
+            << "== " << isDefinitelyLessThan(remaining_time_to_arrival_to_front_waypoint, step_time)
+            << std::endl;
+
+  std::cout << "not too early? "
+            << "== std::isnan(remaining_time_to_front_waypoint) or remaining_time_to_front_waypoint < remaining_time_to_arrival_to_front_waypoint + step_time "
+            << "== std::isnan(" << remaining_time_to_front_waypoint << ") or " << remaining_time_to_front_waypoint << " < " << remaining_time_to_arrival_to_front_waypoint << " + " << step_time << " "
+            << "== " << std::isnan(remaining_time_to_front_waypoint) << " or " << isDefinitelyLessThan(remaining_time_to_front_waypoint, remaining_time_to_arrival_to_front_waypoint + step_time) << " "
+            << "== " << (std::isnan(remaining_time_to_front_waypoint) or isDefinitelyLessThan(remaining_time_to_front_waypoint, remaining_time_to_arrival_to_front_waypoint + step_time))
+            << std::endl;
+  // clang-format on
+}
 
 template <typename T>
 auto validate_vec3_like(const T & vec) -> bool
@@ -47,13 +136,13 @@ auto distance_along_lanelet(
 {
   if (const auto from_lanelet_pose =
         hdmap_utils->toLaneletPose(from, entity_status.bounding_box, false, matching_distance);
-      from_lanelet_pose) {
+      from_lanelet_pose.has_value()) {
     if (const auto to_lanelet_pose =
           hdmap_utils->toLaneletPose(to, entity_status.bounding_box, false, matching_distance);
-        to_lanelet_pose) {
+        to_lanelet_pose.has_value()) {
       if (const auto distance = hdmap_utils->getLongitudinalDistance(
             from_lanelet_pose.value(), to_lanelet_pose.value());
-          distance) {
+          distance.has_value()) {
         return distance.value();
       }
     }
@@ -105,6 +194,82 @@ auto discard_the_front_waypoint_and_recurse(
     matching_distance, target_speed);
 };
 
+auto first_waypoint_with_arrival_time_specified(
+  traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory) -> auto
+{
+  return std::find_if(
+    polyline_trajectory.shape.vertices.begin(), polyline_trajectory.shape.vertices.end(),
+    [](const auto & vertex) { return not std::isnan(vertex.time); });
+};
+
+auto make_updated_pose_orientation(
+  const traffic_simulator_msgs::msg::EntityStatus & entity_status,
+  const geometry_msgs::msg::Vector3 & desired_velocity)
+{
+  if (desired_velocity.y == 0.0 && desired_velocity.x == 0.0 && desired_velocity.z == 0.0) {
+    // do not change orientation if there is no designed_velocity vector
+    return entity_status.pose.orientation;
+  } else {
+    // if there is a designed_velocity vector, set the orientation in the direction of it
+    const geometry_msgs::msg::Vector3 direction =
+      geometry_msgs::build<geometry_msgs::msg::Vector3>()
+        .x(0.0)
+        .y(std::atan2(-desired_velocity.z, std::hypot(desired_velocity.x, desired_velocity.y)))
+        .z(std::atan2(desired_velocity.y, desired_velocity.x));
+    return math::geometry::convertEulerAngleToQuaternion(direction);
+  }
+}
+
+auto calculate_desired_velocity(
+  const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
+  const traffic_simulator_msgs::msg::EntityStatus & entity_status,
+  const geometry_msgs::msg::Point & target_position, const geometry_msgs::msg::Point & position,
+  const double desired_speed) -> geometry_msgs::msg::Vector3
+{
+  /*
+    Note: The followingMode in OpenSCENARIO is passed as
+    variable dynamic_constraints_ignorable. the value of the
+    variable is `followingMode == position`.
+  */
+  if (polyline_trajectory.dynamic_constraints_ignorable) {
+    const double dx = target_position.x - position.x;
+    const double dy = target_position.y - position.y;
+    // if entity is on lane use pitch from lanelet, otherwise use pitch on target
+    const double pitch =
+      entity_status.lanelet_pose_valid
+        ? -math::geometry::convertQuaternionToEulerAngle(entity_status.pose.orientation).y
+        : std::atan2(target_position.z - position.z, std::hypot(dy, dx));
+    const double yaw = std::atan2(dy, dx);  // Use yaw on target
+    return geometry_msgs::build<geometry_msgs::msg::Vector3>()
+      .x(std::cos(pitch) * std::cos(yaw) * desired_speed)
+      .y(std::cos(pitch) * std::sin(yaw) * desired_speed)
+      .z(std::sin(pitch) * desired_speed);
+  } else {
+    /*
+      Note: The vector returned if
+      dynamic_constraints_ignorable == true ignores parameters
+      such as the maximum rudder angle of the vehicle entry. In
+      this clause, such parameters must be respected and the
+      rotation angle difference of the z-axis center of the
+      vector must be kept below a certain value.
+    */
+    throw common::SimulationError("The followingMode is only supported for position.");
+  }
+}
+
+auto calculate_current_velocity(
+  const traffic_simulator_msgs::msg::EntityStatus & entity_status, const double speed)
+{
+  const double pitch =
+    -math::geometry::convertQuaternionToEulerAngle(entity_status.pose.orientation).y;
+  const double yaw =
+    math::geometry::convertQuaternionToEulerAngle(entity_status.pose.orientation).z;
+  return geometry_msgs::build<geometry_msgs::msg::Vector3>()
+    .x(std::cos(pitch) * std::cos(yaw) * speed)
+    .y(std::cos(pitch) * std::sin(yaw) * speed)
+    .z(std::sin(pitch) * speed);
+}
+
 auto makeUpdatedStatus(
   const traffic_simulator_msgs::msg::EntityStatus & entity_status,
   traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
@@ -128,16 +293,9 @@ auto makeUpdatedStatus(
   using math::geometry::normalize;
   using math::geometry::truncate;
 
-  auto first_waypoint_with_arrival_time_specified = [&polyline_trajectory]() {
-    return std::find_if(
-      polyline_trajectory.shape.vertices.begin(), polyline_trajectory.shape.vertices.end(),
-      [](auto && vertex) { return not std::isnan(vertex.time); });
-  };
-
-  auto is_breaking_waypoint = [&first_waypoint_with_arrival_time_specified,
-                               &polyline_trajectory]() {
-    return first_waypoint_with_arrival_time_specified() >=
-           std::prev(polyline_trajectory.shape.vertices.end());
+  const auto is_breaking_waypoint = [&polyline_trajectory]() {
+    return first_waypoint_with_arrival_time_specified(polyline_trajectory) >=
+           std::prev(polyline_trajectory.shape.vertices.cend());
   };
 
   /*
@@ -191,7 +349,7 @@ auto makeUpdatedStatus(
   } else if (
     const auto [distance, remaining_time] =
       [&hdmap_utils, &entity_status, &matching_distance, &polyline_trajectory,
-       &first_waypoint_with_arrival_time_specified, &distance_to_front_waypoint, step_time]() {
+       &distance_to_front_waypoint, step_time]() {
         /*
            Note for anyone working on adding support for followingMode follow
            to this function (FollowPolylineTrajectoryAction::tick) in the
@@ -211,12 +369,13 @@ auto makeUpdatedStatus(
         };
 
         if (
-          first_waypoint_with_arrival_time_specified() !=
-          std::end(polyline_trajectory.shape.vertices)) {
+          first_waypoint_with_arrival_time_specified(polyline_trajectory) !=
+          std::cend(polyline_trajectory.shape.vertices)) {
           if (const auto remaining_time =
                 (not std::isnan(polyline_trajectory.base_time) ? polyline_trajectory.base_time
                                                                : 0.0) +
-                first_waypoint_with_arrival_time_specified()->time - entity_status.time;
+                first_waypoint_with_arrival_time_specified(polyline_trajectory)->time -
+                entity_status.time;
               /*
                  The condition below should ideally be remaining_time < 0.
 
@@ -244,15 +403,15 @@ auto makeUpdatedStatus(
               "Vehicle ", std::quoted(entity_status.name),
               " failed to reach the trajectory waypoint at the specified time. The specified time "
               "is ",
-              first_waypoint_with_arrival_time_specified()->time, " (in ",
+              first_waypoint_with_arrival_time_specified(polyline_trajectory)->time, " (in ",
               (not std::isnan(polyline_trajectory.base_time) ? "absolute" : "relative"),
               " simulation time). This may be due to unrealistic conditions of arrival time "
               "specification compared to vehicle parameters and dynamic constraints.");
           } else {
             return std::make_tuple(
               distance_to_front_waypoint +
-                total_distance_to(first_waypoint_with_arrival_time_specified()),
-              remaining_time != 0 ? remaining_time : std::numeric_limits<double>::epsilon());
+                total_distance_to(first_waypoint_with_arrival_time_specified(polyline_trajectory)),
+              remaining_time != 0.0 ? remaining_time : std::numeric_limits<double>::epsilon());
           }
         } else {
           return std::make_tuple(
@@ -363,42 +522,8 @@ auto makeUpdatedStatus(
       "following information to the developer: Vehicle ",
       std::quoted(entity_status.name), "'s desired speed value is NaN or infinity. The value is ",
       desired_speed, ". ");
-  } else if (const auto desired_velocity =
-               [&polyline_trajectory, &entity_status, &target_position, &position,
-                desired_speed]() {
-                 /*
-                    Note: The followingMode in OpenSCENARIO is passed as
-                    variable dynamic_constraints_ignorable. the value of the
-                    variable is `followingMode == position`.
-                 */
-                 if (polyline_trajectory.dynamic_constraints_ignorable) {
-                   const auto dx = target_position.x - position.x;
-                   const auto dy = target_position.y - position.y;
-                   // if entity is on lane use pitch from lanelet, otherwise use pitch on target
-                   const auto pitch =
-                     entity_status.lanelet_pose_valid
-                       ? -math::geometry::convertQuaternionToEulerAngle(
-                            entity_status.pose.orientation)
-                            .y
-                       : std::atan2(target_position.z - position.z, std::hypot(dy, dx));
-                   const auto yaw = std::atan2(dy, dx);  // Use yaw on target
-                   return geometry_msgs::build<geometry_msgs::msg::Vector3>()
-                     .x(std::cos(pitch) * std::cos(yaw) * desired_speed)
-                     .y(std::cos(pitch) * std::sin(yaw) * desired_speed)
-                     .z(std::sin(pitch) * desired_speed);
-                 } else {
-                   /*
-                      Note: The vector returned if
-                      dynamic_constraints_ignorable == true ignores parameters
-                      such as the maximum rudder angle of the vehicle entry. In
-                      this clause, such parameters must be respected and the
-                      rotation angle difference of the z-axis center of the
-                      vector must be kept below a certain value.
-                   */
-                   throw common::SimulationError(
-                     "The followingMode is only supported for position.");
-                 }
-               }();
+  } else if (const auto desired_velocity = calculate_desired_velocity(
+               polyline_trajectory, entity_status, target_position, position, desired_speed);
              validate_vec3_like(desired_velocity)) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
@@ -406,24 +531,15 @@ auto makeUpdatedStatus(
       std::quoted(entity_status.name),
       "'s desired velocity contains NaN or infinity. The value is [", desired_velocity.x, ", ",
       desired_velocity.y, ", ", desired_velocity.z, "].");
-  } else if (const auto current_velocity =
-               [&entity_status, speed]() {
-                 const auto pitch =
-                   -math::geometry::convertQuaternionToEulerAngle(entity_status.pose.orientation).y;
-                 const auto yaw =
-                   math::geometry::convertQuaternionToEulerAngle(entity_status.pose.orientation).z;
-                 return geometry_msgs::build<geometry_msgs::msg::Vector3>()
-                   .x(std::cos(pitch) * std::cos(yaw) * speed)
-                   .y(std::cos(pitch) * std::sin(yaw) * speed)
-                   .z(std::sin(pitch) * speed);
-               }();
+  } else if (const auto current_velocity = calculate_current_velocity(entity_status, speed);
              (speed * step_time) > distance_to_front_waypoint &&
              innerProduct(desired_velocity, current_velocity) < 0.0) {
     return discard_the_front_waypoint_and_recurse(
       polyline_trajectory, entity_status, behavior_parameter, hdmap_utils, step_time,
       matching_distance, target_speed);
-  } else if (auto predicted_state_opt = follow_waypoint_controller.getPredictedWaypointArrivalState(
-               desired_acceleration, remaining_time, distance, acceleration, speed);
+  } else if (const auto predicted_state_opt =
+               follow_waypoint_controller.getPredictedWaypointArrivalState(
+                 desired_acceleration, remaining_time, distance, acceleration, speed);
              !std::isinf(remaining_time) && !predicted_state_opt.has_value()) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
@@ -434,87 +550,12 @@ auto makeUpdatedStatus(
       ", distance: ", distance, ", acceleration: ", acceleration, ", speed: ", speed, ". ",
       follow_waypoint_controller);
   } else {
-    auto remaining_time_to_arrival_to_front_waypoint = predicted_state_opt->travel_time;
     if constexpr (false) {
-      // clang-format off
-      std::cout << std::fixed << std::boolalpha << std::string(80, '-') << std::endl;
-
-      std::cout << "acceleration "
-                << "== " << acceleration
-                << std::endl;
-
-      std::cout << "min_acceleration "
-                << "== std::max(acceleration - max_deceleration_rate * step_time, -max_deceleration) "
-                << "== std::max(" << acceleration << " - " << behavior_parameter.dynamic_constraints.max_deceleration_rate << " * " << step_time << ", " << -behavior_parameter.dynamic_constraints.max_deceleration << ") "
-                << "== std::max(" << acceleration << " - " << behavior_parameter.dynamic_constraints.max_deceleration_rate * step_time << ", " << -behavior_parameter.dynamic_constraints.max_deceleration << ") "
-                << "== std::max(" << (acceleration - behavior_parameter.dynamic_constraints.max_deceleration_rate * step_time) << ", " << -behavior_parameter.dynamic_constraints.max_deceleration << ") "
-                << "== " << min_acceleration
-                << std::endl;
-
-      std::cout << "max_acceleration "
-                << "== std::min(acceleration + max_acceleration_rate * step_time, +max_acceleration) "
-                << "== std::min(" << acceleration << " + " << behavior_parameter.dynamic_constraints.max_acceleration_rate << " * " << step_time << ", " << behavior_parameter.dynamic_constraints.max_acceleration << ") "
-                << "== std::min(" << acceleration << " + " << behavior_parameter.dynamic_constraints.max_acceleration_rate * step_time << ", " << behavior_parameter.dynamic_constraints.max_acceleration << ") "
-                << "== std::min(" << (acceleration + behavior_parameter.dynamic_constraints.max_acceleration_rate * step_time) << ", " << behavior_parameter.dynamic_constraints.max_acceleration << ") "
-                << "== " << max_acceleration
-                << std::endl;
-
-      std::cout << "min_acceleration < acceleration < max_acceleration "
-                << "== " << min_acceleration << " < " << acceleration << " < " << max_acceleration << std::endl;
-
-      std::cout << "desired_acceleration "
-                << "== 2 * distance / std::pow(remaining_time, 2) - 2 * speed / remaining_time "
-                << "== 2 * " << distance << " / " << std::pow(remaining_time, 2) << " - 2 * " << speed << " / " << remaining_time << " "
-                << "== " << (2 * distance / std::pow(remaining_time, 2)) << " - " << (2 * speed / remaining_time) << " "
-                << "== " << desired_acceleration << " "
-                << "(acceleration < desired_acceleration == " << (acceleration < desired_acceleration) << " == need to " <<(acceleration < desired_acceleration ? "accelerate" : "decelerate") << ")"
-                << std::endl;
-
-      std::cout << "desired_speed "
-                << "== speed + std::clamp(desired_acceleration, min_acceleration, max_acceleration) * step_time "
-                << "== " << speed << " + std::clamp(" << desired_acceleration << ", " << min_acceleration << ", " << max_acceleration << ") * " << step_time << " "
-                << "== " << speed << " + " << std::clamp(desired_acceleration, min_acceleration, max_acceleration) << " * " << step_time << " "
-                << "== " << speed << " + " << std::clamp(desired_acceleration, min_acceleration, max_acceleration) * step_time << " "
-                << "== " << desired_speed
-                << std::endl;
-
-      std::cout << "distance_to_front_waypoint "
-                << "== " << distance_to_front_waypoint
-                << std::endl;
-
-      std::cout << "remaining_time_to_arrival_to_front_waypoint "
-                << "== " << remaining_time_to_arrival_to_front_waypoint
-                << std::endl;
-
-      std::cout << "distance "
-                << "== " << distance
-                << std::endl;
-
-      std::cout << "remaining_time "
-                << "== " << remaining_time
-                << std::endl;
-
-      std::cout << "remaining_time_to_arrival_to_front_waypoint "
-                << "("
-                << "== distance_to_front_waypoint / desired_speed "
-                << "== " << distance_to_front_waypoint << " / " << desired_speed << " "
-                << "== " << remaining_time_to_arrival_to_front_waypoint
-                << ")"
-                << std::endl;
-
-      std::cout << "arrive during this frame? "
-                << "== remaining_time_to_arrival_to_front_waypoint < step_time "
-                << "== " << remaining_time_to_arrival_to_front_waypoint << " < " << step_time << " "
-                << "== " << isDefinitelyLessThan(remaining_time_to_arrival_to_front_waypoint, step_time)
-                << std::endl;
-
-      std::cout << "not too early? "
-                << "== std::isnan(remaining_time_to_front_waypoint) or remaining_time_to_front_waypoint < remaining_time_to_arrival_to_front_waypoint + step_time "
-                << "== std::isnan(" << remaining_time_to_front_waypoint << ") or " << remaining_time_to_front_waypoint << " < " << remaining_time_to_arrival_to_front_waypoint << " + " << step_time << " "
-                << "== " << std::isnan(remaining_time_to_front_waypoint) << " or " << isDefinitelyLessThan(remaining_time_to_front_waypoint, remaining_time_to_arrival_to_front_waypoint + step_time) << " "
-                << "== " << (std::isnan(remaining_time_to_front_waypoint) or isDefinitelyLessThan(remaining_time_to_front_waypoint, remaining_time_to_arrival_to_front_waypoint + step_time))
-                << std::endl;
-      // clang-format on
+      const auto remaining_time_to_arrival_to_front_waypoint = predicted_state_opt->travel_time;
+      print_debug_info(
+        behavior_parameter, acceleration, min_acceleration, max_acceleration, desired_acceleration,
+        speed, desired_speed, distance, distance_to_front_waypoint, remaining_time,
+        remaining_time_to_arrival_to_front_waypoint, remaining_time_to_front_waypoint, step_time);
     }
 
     if (std::isnan(remaining_time_to_front_waypoint)) {
@@ -522,7 +563,7 @@ auto makeUpdatedStatus(
         If the nearest waypoint is arrived at in this step without a specific arrival time, it will
         be considered as achieved
       */
-      if (std::isinf(remaining_time) && polyline_trajectory.shape.vertices.size() == 1) {
+      if (std::isinf(remaining_time) && polyline_trajectory.shape.vertices.size() == 1UL) {
         /*
           If the trajectory has only waypoints with unspecified time, the last one is followed using
           maximum speed including braking - in this case accuracy of arrival is checked
@@ -538,7 +579,8 @@ auto makeUpdatedStatus(
           If it is an intermediate waypoint with an unspecified time, the accuracy of the arrival is
           irrelevant
         */
-        if (auto this_step_distance = (speed + desired_acceleration * step_time) * step_time;
+        if (const double this_step_distance =
+              (speed + desired_acceleration * step_time) * step_time;
             this_step_distance > distance_to_front_waypoint) {
           return discard_the_front_waypoint_and_recurse(
             polyline_trajectory, entity_status, behavior_parameter, hdmap_utils, step_time,
@@ -578,45 +620,23 @@ auto makeUpdatedStatus(
     auto updated_status = entity_status;
 
     updated_status.pose.position += desired_velocity * step_time;
-
-    updated_status.pose.orientation = [&entity_status, &desired_velocity]() {
-      if (desired_velocity.y == 0 && desired_velocity.x == 0 && desired_velocity.z == 0) {
-        // do not change orientation if there is no designed_velocity vector
-        return entity_status.pose.orientation;
-      } else {
-        // if there is a designed_velocity vector, set the orientation in the direction of it
-        const geometry_msgs::msg::Vector3 direction =
-          geometry_msgs::build<geometry_msgs::msg::Vector3>()
-            .x(0.0)
-            .y(std::atan2(-desired_velocity.z, std::hypot(desired_velocity.x, desired_velocity.y)))
-            .z(std::atan2(desired_velocity.y, desired_velocity.x));
-        return math::geometry::convertEulerAngleToQuaternion(direction);
-      }
-    }();
-
+    updated_status.pose.orientation =
+      make_updated_pose_orientation(entity_status, desired_velocity);
     updated_status.action_status.twist.linear.x = norm(desired_velocity);
-
-    updated_status.action_status.twist.linear.y = 0;
-
-    updated_status.action_status.twist.linear.z = 0;
-
+    updated_status.action_status.twist.linear.y = 0.0;
+    updated_status.action_status.twist.linear.z = 0.0;
     updated_status.action_status.twist.angular =
       math::geometry::convertQuaternionToEulerAngle(math::geometry::getRotation(
         entity_status.pose.orientation, updated_status.pose.orientation)) /
       step_time;
-
     updated_status.action_status.accel.linear =
       (updated_status.action_status.twist.linear - entity_status.action_status.twist.linear) /
       step_time;
-
     updated_status.action_status.accel.angular =
       (updated_status.action_status.twist.angular - entity_status.action_status.twist.angular) /
       step_time;
-
     updated_status.time = entity_status.time + step_time;
-
     updated_status.lanelet_pose_valid = false;
-
     return updated_status;
   }
 }
