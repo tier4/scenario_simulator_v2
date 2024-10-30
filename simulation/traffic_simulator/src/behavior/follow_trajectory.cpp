@@ -43,6 +43,71 @@ auto any(F f, T && x, Ts &&... xs)
   }
 }
 
+auto distance_along_lanelet(
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
+  const traffic_simulator_msgs::msg::EntityStatus & entity_status, const double matching_distance,
+  const geometry_msgs::msg::Point & from, const geometry_msgs::msg::Point & to) -> double
+{
+  if (const auto from_lanelet_pose =
+        hdmap_utils->toLaneletPose(from, entity_status.bounding_box, false, matching_distance);
+      from_lanelet_pose) {
+    if (const auto to_lanelet_pose =
+          hdmap_utils->toLaneletPose(to, entity_status.bounding_box, false, matching_distance);
+        to_lanelet_pose) {
+      if (const auto distance = hdmap_utils->getLongitudinalDistance(
+            from_lanelet_pose.value(), to_lanelet_pose.value());
+          distance) {
+        return distance.value();
+      }
+    }
+  }
+  return math::geometry::hypot(from, to);
+};
+
+auto discard_the_front_waypoint_and_recurse(
+  traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
+  const traffic_simulator_msgs::msg::EntityStatus & entity_status,
+  const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils, const double step_time,
+  const double matching_distance, const std::optional<double> target_speed)
+  -> std::optional<EntityStatus>
+{
+  /*
+      The OpenSCENARIO standard does not define the behavior when the value of
+      Timing.domainAbsoluteRelative is "relative". The standard only states
+      "Definition of time value context as either absolute or relative", and
+      it is completely unclear when the relative time starts.
+
+      This implementation has interpreted the specification as follows:
+      Relative time starts from the start of FollowTrajectoryAction or from
+      the time of reaching the previous "waypoint with arrival time".
+
+      Note: not std::isnan(polyline_trajectory.base_time) means
+      "Timing.domainAbsoluteRelative is relative".
+
+      Note: not std::isnan(polyline_trajectory.shape.vertices.front().time)
+      means "The waypoint about to be popped is the waypoint with the
+      specified arrival time".
+  */
+  if (
+    not std::isnan(polyline_trajectory.base_time) and
+    not std::isnan(polyline_trajectory.shape.vertices.front().time)) {
+    polyline_trajectory.base_time = entity_status.time;
+  }
+
+  if (std::rotate(
+        std::begin(polyline_trajectory.shape.vertices),
+        std::begin(polyline_trajectory.shape.vertices) + 1,
+        std::end(polyline_trajectory.shape.vertices));
+      not polyline_trajectory.closed) {
+    polyline_trajectory.shape.vertices.pop_back();
+  }
+
+  return makeUpdatedStatus(
+    entity_status, polyline_trajectory, behavior_parameter, hdmap_utils, step_time,
+    matching_distance, target_speed);
+};
+
 auto makeUpdatedStatus(
   const traffic_simulator_msgs::msg::EntityStatus & entity_status,
   traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
@@ -65,64 +130,6 @@ auto makeUpdatedStatus(
   using math::geometry::norm;
   using math::geometry::normalize;
   using math::geometry::truncate;
-
-  auto distance_along_lanelet = [&hdmap_utils, &entity_status, matching_distance](
-                                  const geometry_msgs::msg::Point & from,
-                                  const geometry_msgs::msg::Point & to) -> double {
-    if (const auto from_lanelet_pose =
-          hdmap_utils->toLaneletPose(from, entity_status.bounding_box, false, matching_distance);
-        from_lanelet_pose) {
-      if (const auto to_lanelet_pose =
-            hdmap_utils->toLaneletPose(to, entity_status.bounding_box, false, matching_distance);
-          to_lanelet_pose) {
-        if (const auto distance = hdmap_utils->getLongitudinalDistance(
-              from_lanelet_pose.value(), to_lanelet_pose.value());
-            distance) {
-          return distance.value();
-        }
-      }
-    }
-    return hypot(from, to);
-  };
-
-  auto discard_the_front_waypoint_and_recurse = [&polyline_trajectory, &entity_status,
-                                                 &behavior_parameter, &hdmap_utils, step_time,
-                                                 matching_distance, target_speed]() {
-    /*
-       The OpenSCENARIO standard does not define the behavior when the value of
-       Timing.domainAbsoluteRelative is "relative". The standard only states
-       "Definition of time value context as either absolute or relative", and
-       it is completely unclear when the relative time starts.
-
-       This implementation has interpreted the specification as follows:
-       Relative time starts from the start of FollowTrajectoryAction or from
-       the time of reaching the previous "waypoint with arrival time".
-
-       Note: not std::isnan(polyline_trajectory.base_time) means
-       "Timing.domainAbsoluteRelative is relative".
-
-       Note: not std::isnan(polyline_trajectory.shape.vertices.front().time)
-       means "The waypoint about to be popped is the waypoint with the
-       specified arrival time".
-    */
-    if (
-      not std::isnan(polyline_trajectory.base_time) and
-      not std::isnan(polyline_trajectory.shape.vertices.front().time)) {
-      polyline_trajectory.base_time = entity_status.time;
-    }
-
-    if (std::rotate(
-          std::begin(polyline_trajectory.shape.vertices),
-          std::begin(polyline_trajectory.shape.vertices) + 1,
-          std::end(polyline_trajectory.shape.vertices));
-        not polyline_trajectory.closed) {
-      polyline_trajectory.shape.vertices.pop_back();
-    }
-
-    return makeUpdatedStatus(
-      entity_status, polyline_trajectory, behavior_parameter, hdmap_utils, step_time,
-      matching_distance, target_speed);
-  };
 
   auto is_infinity_or_nan = [](auto x) constexpr { return std::isinf(x) or std::isnan(x); };
 
@@ -173,7 +180,8 @@ auto makeUpdatedStatus(
        problems.
     */
     const auto [distance_to_front_waypoint, remaining_time_to_front_waypoint] = std::make_tuple(
-      distance_along_lanelet(position, target_position),
+      distance_along_lanelet(
+        hdmap_utils, entity_status, matching_distance, position, target_position),
       (not std::isnan(polyline_trajectory.base_time) ? polyline_trajectory.base_time : 0.0) +
         polyline_trajectory.shape.vertices.front().time - entity_status.time);
     /*
@@ -182,23 +190,27 @@ auto makeUpdatedStatus(
        miraculously becomes zero.
     */
     isDefinitelyLessThan(distance_to_front_waypoint, std::numeric_limits<double>::epsilon())) {
-    return discard_the_front_waypoint_and_recurse();
+    return discard_the_front_waypoint_and_recurse(
+      polyline_trajectory, entity_status, behavior_parameter, hdmap_utils, step_time,
+      matching_distance, target_speed);
   } else if (
     const auto [distance, remaining_time] =
-      [&polyline_trajectory, &distance_along_lanelet, &first_waypoint_with_arrival_time_specified,
-       &entity_status, &distance_to_front_waypoint, step_time]() {
+      [&hdmap_utils, &entity_status, &matching_distance, &polyline_trajectory,
+       &first_waypoint_with_arrival_time_specified, &distance_to_front_waypoint, step_time]() {
         /*
            Note for anyone working on adding support for followingMode follow
            to this function (FollowPolylineTrajectoryAction::tick) in the
            future: if followingMode is follow, this distance calculation may be
            inappropriate.
         */
-        auto total_distance_to = [&polyline_trajectory, &distance_along_lanelet](auto last) {
+        auto total_distance_to = [&hdmap_utils, &entity_status, &matching_distance,
+                                  &polyline_trajectory](auto last) {
           auto total_distance = 0.0;
           for (auto iter = std::begin(polyline_trajectory.shape.vertices);
                0 < std::distance(iter, last); ++iter) {
-            total_distance +=
-              distance_along_lanelet(iter->position.position, std::next(iter)->position.position);
+            total_distance += distance_along_lanelet(
+              hdmap_utils, entity_status, matching_distance, iter->position.position,
+              std::next(iter)->position.position);
           }
           return total_distance;
         };
@@ -255,7 +267,9 @@ auto makeUpdatedStatus(
         }
       }();
     isDefinitelyLessThan(distance, std::numeric_limits<double>::epsilon())) {
-    return discard_the_front_waypoint_and_recurse();
+    return discard_the_front_waypoint_and_recurse(
+      polyline_trajectory, entity_status, behavior_parameter, hdmap_utils, step_time,
+      matching_distance, target_speed);
   } else if (const auto acceleration = entity_status.action_status.accel.linear.x;  // [m/s^2]
              std::isinf(acceleration) or std::isnan(acceleration)) {
     throw common::Error(
@@ -410,7 +424,9 @@ auto makeUpdatedStatus(
                }();
              (speed * step_time) > distance_to_front_waypoint &&
              innerProduct(desired_velocity, current_velocity) < 0.0) {
-    return discard_the_front_waypoint_and_recurse();
+    return discard_the_front_waypoint_and_recurse(
+      polyline_trajectory, entity_status, behavior_parameter, hdmap_utils, step_time,
+      matching_distance, target_speed);
   } else if (auto predicted_state_opt = follow_waypoint_controller.getPredictedWaypointArrivalState(
                desired_acceleration, remaining_time, distance, acceleration, speed);
              !std::isinf(remaining_time) && !predicted_state_opt.has_value()) {
@@ -518,7 +534,9 @@ auto makeUpdatedStatus(
         */
         if (follow_waypoint_controller.areConditionsOfArrivalMet(
               acceleration, speed, distance_to_front_waypoint)) {
-          return discard_the_front_waypoint_and_recurse();
+          return discard_the_front_waypoint_and_recurse(
+            polyline_trajectory, entity_status, behavior_parameter, hdmap_utils, step_time,
+            matching_distance, target_speed);
         }
       } else {
         /*
@@ -527,7 +545,9 @@ auto makeUpdatedStatus(
         */
         if (auto this_step_distance = (speed + desired_acceleration * step_time) * step_time;
             this_step_distance > distance_to_front_waypoint) {
-          return discard_the_front_waypoint_and_recurse();
+          return discard_the_front_waypoint_and_recurse(
+            polyline_trajectory, entity_status, behavior_parameter, hdmap_utils, step_time,
+            matching_distance, target_speed);
         }
       }
       /*
@@ -541,7 +561,9 @@ auto makeUpdatedStatus(
     } else if (isDefinitelyLessThan(remaining_time_to_front_waypoint, step_time / 2.0)) {
       if (follow_waypoint_controller.areConditionsOfArrivalMet(
             acceleration, speed, distance_to_front_waypoint)) {
-        return discard_the_front_waypoint_and_recurse();
+        return discard_the_front_waypoint_and_recurse(
+          polyline_trajectory, entity_status, behavior_parameter, hdmap_utils, step_time,
+          matching_distance, target_speed);
       } else {
         throw common::SimulationError(
           "Vehicle ", std::quoted(entity_status.name), " at time ", entity_status.time,
