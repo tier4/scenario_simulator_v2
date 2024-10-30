@@ -155,7 +155,14 @@ auto toPolygon2D(const traffic_simulator_msgs::msg::BoundingBox & bounding_box)
   -> std::vector<geometry_msgs::msg::Point>
 {
   std::vector<geometry_msgs::msg::Point> points_bounding_box;
-  geometry_msgs::msg::Point p0, p1, p2, p3, p4, p5, p6, p7;
+  geometry_msgs::msg::Point p0;
+  geometry_msgs::msg::Point p1;
+  geometry_msgs::msg::Point p2;
+  geometry_msgs::msg::Point p3;
+  geometry_msgs::msg::Point p4;
+  geometry_msgs::msg::Point p5;
+  geometry_msgs::msg::Point p6;
+  geometry_msgs::msg::Point p7;
 
   p0.x = bounding_box.center.x + bounding_box.dimensions.x * 0.5;
   p0.y = bounding_box.center.y + bounding_box.dimensions.y * 0.5;
