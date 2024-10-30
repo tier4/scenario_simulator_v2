@@ -31,16 +31,13 @@ namespace traffic_simulator
 {
 namespace follow_trajectory
 {
-template <typename F, typename T, typename... Ts>
-auto any(F f, T && x, Ts &&... xs)
+
+template <typename T>
+auto validate_vec3_like(const T & vec) -> bool
 {
-  if constexpr (math::geometry::IsLikeVector3<std::decay_t<decltype(x)>>::value) {
-    return any(f, x.x, x.y, x.z);
-  } else if constexpr (0 < sizeof...(xs)) {
-    return f(x) or any(f, std::forward<decltype(xs)>(xs)...);
-  } else {
-    return f(x);
-  }
+  static_assert(math::geometry::IsLikeVector3<std::decay_t<decltype(vec)>>::value);
+  return std::isinf(vec.x) or std::isnan(vec.x) or std::isinf(vec.y) or std::isnan(vec.y) or
+         std::isinf(vec.z) or std::isnan(vec.z);
 }
 
 auto distance_along_lanelet(
@@ -131,8 +128,6 @@ auto makeUpdatedStatus(
   using math::geometry::normalize;
   using math::geometry::truncate;
 
-  auto is_infinity_or_nan = [](auto x) constexpr { return std::isinf(x) or std::isnan(x); };
-
   auto first_waypoint_with_arrival_time_specified = [&polyline_trajectory]() {
     return std::find_if(
       polyline_trajectory.shape.vertices.begin(), polyline_trajectory.shape.vertices.end(),
@@ -154,7 +149,7 @@ auto makeUpdatedStatus(
   */
   if (polyline_trajectory.shape.vertices.empty()) {
     return std::nullopt;
-  } else if (const auto position = entity_status.pose.position; any(is_infinity_or_nan, position)) {
+  } else if (const auto position = entity_status.pose.position; validate_vec3_like(position)) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
@@ -167,7 +162,7 @@ auto makeUpdatedStatus(
        referenced only this once in this member function.
     */
     const auto target_position = polyline_trajectory.shape.vertices.front().position.position;
-    any(is_infinity_or_nan, target_position)) {
+    validate_vec3_like(target_position)) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
@@ -404,7 +399,7 @@ auto makeUpdatedStatus(
                      "The followingMode is only supported for position.");
                  }
                }();
-             any(is_infinity_or_nan, desired_velocity)) {
+             validate_vec3_like(desired_velocity)) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
