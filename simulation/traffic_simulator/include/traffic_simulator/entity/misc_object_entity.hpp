@@ -63,6 +63,7 @@ public:
     return traffic_simulator_msgs::msg::WaypointsArray();
   }
 
+  using EntityBase::requestSpeedChange;
   void requestSpeedChange(double, bool) override;
 
   void requestSpeedChange(const speed_change::RelativeTargetSpeed &, bool) override;
