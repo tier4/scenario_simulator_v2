@@ -130,7 +130,7 @@ auto toPolygon2D(
 }
 
 std::vector<geometry_msgs::msg::Point> getPointsFromBbox(
-  traffic_simulator_msgs::msg::BoundingBox bounding_box, double width_extension_right,
+  const traffic_simulator_msgs::msg::BoundingBox bounding_box, double width_extension_right,
   double width_extension_left, double length_extension_front, double length_extension_rear)
 {
   std::vector<geometry_msgs::msg::Point> points;
