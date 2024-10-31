@@ -32,6 +32,53 @@ Changelog for package openscenario_interpreter
 * add publish_empty_context parameter
 * Contributors: Masaya Kataoka
 
+4.3.21 (2024-10-31)
+-------------------
+* Merge branch 'master' into RJD-1337/getQuadraticAccelerationDuration
+* Merge branch 'master' into RJD-1337/getQuadraticAccelerationDuration
+* Merge branch 'master' into RJD-1337/getQuadraticAccelerationDuration
+* Merge branch 'master' into RJD-1337/getQuadraticAccelerationDuration
+* Contributors: Grzegorz Maj, Masaya Kataoka
+
+4.3.20 (2024-10-31)
+-------------------
+* Merge branch 'master' into RJD-1335/requestSpeedChange
+* Contributors: Grzegorz Maj
+
+4.3.19 (2024-10-30)
+-------------------
+
+4.3.18 (2024-10-18)
+-------------------
+* Merge pull request `#1418 <https://github.com/tier4/scenario_simulator_v2/issues/1418>`_ from tier4/feature/json/boost-json
+* Merge branch 'master' into feature/json/boost-json
+* Replace pre-compiled headers
+* Merge branch 'master' into feature/json/boost-json
+* Merge branch 'master' into feature/json/boost-json
+* Fix linelint error
+* Remove nlohmann-json-dev
+* Remove debug output
+* Remove library source
+* Fix stringify
+* Add some comments for CMakeLists
+* Fix build error due to include directory
+* Add serialization time measurement
+* Merge remote-tracking branch 'origin/master' into feature/json/boost-json
+* Move BoostJSON source into individual file
+* Merge remote-tracking branch 'origin/master' into feature/json/boost-json
+* Revert assert error
+* Use allocator from parent
+* Revert "Use fmt library in Double stringify"
+  This reverts commit 60172481e8c9c6e04ce0f2f93bd12298fe87e3db.
+* Revert "Revert "Use move semantics for some cases""
+  This reverts commit da9bb28a0fcdf641c92d3f8317906ece8e067b20.
+* Revert "Use move semantics for some cases"
+  This reverts commit a39319ae57f86434c582c857bb290c01834e3d31.
+* Use move semantics for some cases
+* Use Boost JSON
+* Use fmt library in Double stringify
+* Contributors: Kotaro Yoshimoto, f0reachARR, ぐるぐる
+
 4.3.17 (2024-10-17)
 -------------------
 * Merge branch 'master' into fix/remove_warnings_from_sonarcloud
