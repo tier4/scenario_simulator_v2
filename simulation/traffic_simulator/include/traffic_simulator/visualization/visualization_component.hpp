@@ -61,11 +61,13 @@ extern "C" {
 #endif
 
 #include <rclcpp/rclcpp.hpp>
-#include <string>
 #include <traffic_simulator/color_utils/color_utils.hpp>
+
 #include <traffic_simulator_msgs/msg/entity_status_with_trajectory_array.hpp>
-#include <unordered_map>
 #include <visualization_msgs/msg/marker_array.hpp>
+
+#include <string>
+#include <unordered_map>
 
 namespace traffic_simulator
 {
@@ -93,7 +95,8 @@ private:
   const visualization_msgs::msg::MarkerArray generateDeleteMarker(std::string ns);
   /**
    * @brief generate delete marker for all namespace.
-   * @return const visualization_msgs::msg::MarkerArray delete marker messages. (action is DELETE_ALL)
+   * @return const visualization_msgs::msg::MarkerArray delete marker messages. (action is
+   * DELETE_ALL)
    */
   const visualization_msgs::msg::MarkerArray generateDeleteMarker() const;
   /**
@@ -101,7 +104,8 @@ private:
    * @param status entity status message
    * @param waypoints waypoints message
    * @param obstacle obstacles in waypoint
-   * @return const visualization_msgs::msg::MarkerArray markers which describes entity bounding box and it's status.
+   * @return const visualization_msgs::msg::MarkerArray markers which describes entity bounding box
+   * and it's status.
    */
   int goal_pose_max_size = 0;
   const visualization_msgs::msg::MarkerArray generateMarker(
