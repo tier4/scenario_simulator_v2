@@ -171,7 +171,7 @@ CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> 
             bz = bz * 0.5;
             cz = cz * 0.5;
             dz = dz * 0.5;
-            curves_.emplace_back(HermiteCurve(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz));
+            curves_.emplace_back(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz);
           } else if (i == (n - 1)) {
             double ax = 0;
             double bx = control_points[i - 1].x - 2 * control_points[i].x + control_points[i + 1].x;
@@ -197,7 +197,7 @@ CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> 
             bz = bz * 0.5;
             cz = cz * 0.5;
             dz = dz * 0.5;
-            curves_.emplace_back(HermiteCurve(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz));
+            curves_.emplace_back(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz);
           } else {
             double ax = -1 * control_points[i - 1].x + 3 * control_points[i].x -
                         3 * control_points[i + 1].x + control_points[i + 2].x;
@@ -229,7 +229,7 @@ CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> 
             bz = bz * 0.5;
             cz = cz * 0.5;
             dz = dz * 0.5;
-            curves_.emplace_back(HermiteCurve(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz));
+            curves_.emplace_back(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz);
           }
         }
         for (const auto & curve : curves_) {
