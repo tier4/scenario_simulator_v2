@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="3">
   <name>simple_sensor_simulator</name>
-  <version>4.3.20</version>
+  <version>4.3.21</version>
   <description>simple_sensor_simulator package</description>
 
   <maintainer email="masaya.kataoka@tier4.jp">masaya kataoka</maintainer>
