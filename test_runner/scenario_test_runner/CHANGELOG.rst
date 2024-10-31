@@ -35,6 +35,11 @@ Changelog for package scenario_test_runner
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+4.3.22 (2024-10-31)
+-------------------
+* Merge branch 'master' into fix/improved-readability
+* Contributors: Masaya Kataoka
+
 4.3.21 (2024-10-31)
 -------------------
 * Merge branch 'master' into RJD-1337/getQuadraticAccelerationDuration
