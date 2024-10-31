@@ -124,7 +124,7 @@ boost_point pointToSegmentProjection(
 
 auto toPolygon2D(
   const geometry_msgs::msg::Pose & pose,
-  const traffic_simulator_msgs::msg::BoundingBox & bounding_box) -> const boost_polygon
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box) -> boost_polygon
 {
   return toBoostPolygon(transformPoints(pose, getPointsFromBbox(bounding_box)));
 }
