@@ -104,7 +104,8 @@ std::optional<std::pair<geometry_msgs::msg::Pose, geometry_msgs::msg::Pose>> get
 boost_point pointToSegmentProjection(
   const boost_point & p, const boost_point & p1, const boost_point & p2)
 {
-  boost_point v = p2, w = p;
+  auto v = p2;
+  auto w = p;
   boost::geometry::subtract_point(v, p1);
   boost::geometry::subtract_point(w, p1);
 
@@ -161,7 +162,14 @@ auto toPolygon2D(const traffic_simulator_msgs::msg::BoundingBox & bounding_box)
   -> std::vector<geometry_msgs::msg::Point>
 {
   std::vector<geometry_msgs::msg::Point> points_bounding_box;
-  geometry_msgs::msg::Point p0, p1, p2, p3, p4, p5, p6, p7;
+  geometry_msgs::msg::Point p0;
+  geometry_msgs::msg::Point p1;
+  geometry_msgs::msg::Point p2;
+  geometry_msgs::msg::Point p3;
+  geometry_msgs::msg::Point p4;
+  geometry_msgs::msg::Point p5;
+  geometry_msgs::msg::Point p6;
+  geometry_msgs::msg::Point p7;
 
   p0.x = bounding_box.center.x + bounding_box.dimensions.x * 0.5;
   p0.y = bounding_box.center.y + bounding_box.dimensions.y * 0.5;
