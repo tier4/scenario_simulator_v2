@@ -77,16 +77,22 @@ std::optional<std::pair<geometry_msgs::msg::Pose, geometry_msgs::msg::Pose>> get
       boost::geometry::segments_begin(poly0), boost::geometry::segments_end(poly0));
     auto points = boost::make_iterator_range(
       boost::geometry::points_begin(poly1), boost::geometry::points_end(poly1));
+
+    auto update_min_distance = [&](const auto & segment, const auto & point) {
+      auto nearest_point_from_segment =
+        pointToSegmentProjection(point, *segment.first, *segment.second);
+      auto distance = boost::geometry::distance(point, nearest_point_from_segment);
+      if (distance < min_distance) {
+        min_distance = distance;
+        point0 = point;
+        point1 = nearest_point_from_segment;
+      }
+    };
+
+    // メインループ
     for (auto && segment : segments) {
       for (auto && point : points) {
-        auto nearest_point_from_segment =
-          pointToSegmentProjection(point, *segment.first, *segment.second);
-        auto distance = boost::geometry::distance(point, nearest_point_from_segment);
-        if (distance < min_distance) {
-          min_distance = distance;
-          point0 = point;
-          point1 = nearest_point_from_segment;
-        }
+        update_min_distance(segment, point);
       }
     }
 
