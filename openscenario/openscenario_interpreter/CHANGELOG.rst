@@ -32,6 +32,9 @@ Changelog for package openscenario_interpreter
 * add publish_empty_context parameter
 * Contributors: Masaya Kataoka
 
+4.3.19 (2024-10-30)
+-------------------
+
 4.3.18 (2024-10-18)
 -------------------
 * Merge pull request `#1418 <https://github.com/tier4/scenario_simulator_v2/issues/1418>`_ from tier4/feature/json/boost-json
