@@ -21,6 +21,11 @@ Changelog for package geometry
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+4.3.20 (2024-10-31)
+-------------------
+* Merge branch 'master' into RJD-1335/requestSpeedChange
+* Contributors: Grzegorz Maj
+
 4.3.19 (2024-10-30)
 -------------------
 
