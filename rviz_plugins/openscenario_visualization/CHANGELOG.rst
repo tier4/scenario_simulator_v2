@@ -21,6 +21,16 @@ Changelog for package openscenario_visualization
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+4.3.24 (2024-11-01)
+-------------------
+* Merge pull request `#1426 <https://github.com/tier4/scenario_simulator_v2/issues/1426>`_ from tier4/fix/remove-topic-logic
+  Fixed logic to remove duplicate topics.
+* Merge branch 'master' into fix/remove-topic-logic
+* Merge branch 'master' into fix/remove-topic-logic
+* Changed to use std::set instead of std::unique.
+* Fixed logic to remove duplicate topics.
+* Contributors: Masaya Kataoka, Taiga Takano
+
 4.3.23 (2024-11-01)
 -------------------
 

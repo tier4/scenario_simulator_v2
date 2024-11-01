@@ -35,6 +35,12 @@ Changelog for package scenario_test_runner
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+4.3.24 (2024-11-01)
+-------------------
+* Merge branch 'master' into fix/remove-topic-logic
+* Merge branch 'master' into fix/remove-topic-logic
+* Contributors: Masaya Kataoka
+
 4.3.23 (2024-11-01)
 -------------------
 
