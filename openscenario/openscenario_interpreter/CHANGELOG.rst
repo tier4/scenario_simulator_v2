@@ -32,6 +32,9 @@ Changelog for package openscenario_interpreter
 * add publish_empty_context parameter
 * Contributors: Masaya Kataoka
 
+4.3.23 (2024-11-01)
+-------------------
+
 4.3.22 (2024-10-31)
 -------------------
 * Merge branch 'master' into fix/improved-readability
