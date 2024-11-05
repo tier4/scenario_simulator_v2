@@ -39,7 +39,7 @@ public:
     };
     BT::PortsList parent_ports = entity_behavior::ActionNode::providedPorts();
     for (const auto & parent_port : parent_ports) {
-      ports.emplace(parent_port.first, parent_port.second);
+      ports.try_emplace(parent_port.first, parent_port.second);
     }
     return ports;
   }

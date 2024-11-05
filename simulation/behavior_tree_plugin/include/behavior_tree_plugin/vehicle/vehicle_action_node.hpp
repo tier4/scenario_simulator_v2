@@ -37,7 +37,7 @@ class VehicleActionNode : public ActionNode
 public:
   VehicleActionNode(const std::string & name, const BT::NodeConfiguration & config);
   ~VehicleActionNode() override = default;
-  void getBlackBoardValues();
+  virtual void getBlackBoardValues();
   static BT::PortsList providedPorts()
   {
     BT::PortsList ports = {
@@ -49,7 +49,7 @@ public:
     };
     BT::PortsList parent_ports = entity_behavior::ActionNode::providedPorts();
     for (const auto & parent_port : parent_ports) {
-      ports.emplace(parent_port.first, parent_port.second);
+      ports.try_emplace(parent_port.first, parent_port.second);
     }
     return ports;
   }
