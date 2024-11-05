@@ -9,6 +9,9 @@ Changelog for package simple_cross_map
 * Merge branch 'master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+4.3.25 (2024-11-05)
+-------------------
+
 4.3.24 (2024-11-01)
 -------------------
 * Merge branch 'master' into fix/remove-topic-logic

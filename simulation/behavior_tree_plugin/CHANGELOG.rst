@@ -21,6 +21,13 @@ Changelog for package behavior_tree_plugin
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+4.3.25 (2024-11-05)
+-------------------
+* Merge pull request `#1433 <https://github.com/tier4/scenario_simulator_v2/issues/1433>`_ from tier4/fix/sonor-cloud-issue-3
+  fix/sonor-cloud-issue-3
+* Explicitly virtualized
+* Contributors: Masaya Kataoka, Taiga Takano
+
 4.3.24 (2024-11-01)
 -------------------
 * Merge branch 'master' into fix/remove-topic-logic
