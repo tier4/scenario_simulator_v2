@@ -38,6 +38,13 @@ EntityBase::EntityBase(
   status_before_update_(*status_),
   hdmap_utils_ptr_(hdmap_utils_ptr)
 {
+  job_list_.append(
+    [this](double) {
+      traveled_distance_ += std::abs(getCurrentTwist().linear.x) * step_time_;
+      return false;
+    },
+    [this]() {}, job::Type::TRAVELED_DISTANCE, true, job::Event::POST_UPDATE);
+
   if (name != static_cast<EntityStatus>(entity_status).name) {
     THROW_SIMULATION_ERROR(
       "The name of the entity does not match the name of the entity listed in entity_status.",
@@ -45,6 +52,17 @@ EntityBase::EntityBase(
       " and the name of the entity listed in entity_status is ",
       static_cast<EntityStatus>(entity_status).name);
   }
+
+  job_list_.append(
+    [this](double) {
+      if (std::abs(getCurrentTwist().linear.x) <= std::numeric_limits<double>::epsilon()) {
+        stand_still_duration_ += step_time_;
+      } else {
+        stand_still_duration_ = 0.0;
+      }
+      return false;
+    },
+    [this]() {}, job::Type::STAND_STILL_DURATION, true, job::Event::POST_UPDATE);
 }
 
 void EntityBase::appendDebugMarker(visualization_msgs::msg::MarkerArray &) {}
@@ -473,9 +491,9 @@ void EntityBase::requestSpeedChange(
           return true;
         }
         if (isTargetSpeedReached(target_speed)) {
-          target_speed_ = target_speed.getAbsoluteValue(getCanonicalizedStatus(), other_status_);
           return true;
         }
+        target_speed_ = target_speed.getAbsoluteValue(getCanonicalizedStatus(), other_status_);
         return false;
       },
       /**
@@ -628,20 +646,6 @@ void EntityBase::stopAtCurrentPosition()
 void EntityBase::updateEntityStatusTimestamp(const double current_time)
 {
   status_->setTime(current_time);
-}
-
-auto EntityBase::updateStandStillDuration(const double step_time) -> double
-{
-  if (std::abs(getCurrentTwist().linear.x) <= std::numeric_limits<double>::epsilon()) {
-    return stand_still_duration_ += step_time;
-  } else {
-    return stand_still_duration_ = 0.0;
-  }
-}
-
-auto EntityBase::updateTraveledDistance(const double step_time) -> double
-{
-  return traveled_distance_ += std::abs(getCurrentTwist().linear.x) * step_time;
 }
 
 bool EntityBase::reachPosition(const std::string & target_name, const double tolerance) const

@@ -21,6 +21,124 @@ Changelog for package geometry
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+4.3.24 (2024-11-01)
+-------------------
+* Merge branch 'master' into fix/remove-topic-logic
+* Merge branch 'master' into fix/remove-topic-logic
+* Contributors: Masaya Kataoka
+
+4.3.23 (2024-11-01)
+-------------------
+* Merge pull request `#1429 <https://github.com/tier4/scenario_simulator_v2/issues/1429>`_ from tier4/add-missing-include-2
+  Add missing include
+* Add missinginclude
+* Contributors: Masaya Kataoka, Taiga Takano
+
+4.3.22 (2024-10-31)
+-------------------
+* Merge pull request `#1427 <https://github.com/tier4/scenario_simulator_v2/issues/1427>`_ from tier4/fix/improved-readability
+  Improved readability.​
+* Merge branch 'master' into fix/improved-readability
+* Improved readability.​
+* Contributors: Masaya Kataoka, Taiga Takano
+
+4.3.21 (2024-10-31)
+-------------------
+* Merge branch 'master' into RJD-1337/getQuadraticAccelerationDuration
+* Merge branch 'master' into RJD-1337/getQuadraticAccelerationDuration
+* Merge branch 'master' into RJD-1337/getQuadraticAccelerationDuration
+* Merge branch 'master' into RJD-1337/getQuadraticAccelerationDuration
+* Contributors: Grzegorz Maj, Masaya Kataoka
+
+4.3.20 (2024-10-31)
+-------------------
+* Merge branch 'master' into RJD-1335/requestSpeedChange
+* Contributors: Grzegorz Maj
+
+4.3.19 (2024-10-30)
+-------------------
+
+4.3.18 (2024-10-18)
+-------------------
+* Merge branch 'master' into feature/json/boost-json
+* Merge branch 'master' into feature/json/boost-json
+* Merge remote-tracking branch 'origin/master' into feature/json/boost-json
+* Contributors: Kotaro Yoshimoto, f0reachARR, ぐるぐる
+
+4.3.17 (2024-10-17)
+-------------------
+* Merge pull request `#1417 <https://github.com/tier4/scenario_simulator_v2/issues/1417>`_ from tier4/fix/remove_warnings_from_sonarcloud
+  Fix/remove warnings from sonarcloud
+* Merge branch 'master' into fix/remove_warnings_from_sonarcloud
+* fix warning "There is a intentionality issues on this line, the code is not efficient"
+* fix some warnings
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/remove_warnings_from_sonarcloud
+* remove const
+* add const to the curve parameters and use const reference in constructor
+* remove typedef and remove variable which is used just once.
+* remove unused operator and typedef
+* Contributors: Masaya Kataoka, Tatsuya Yamasaki
+
+4.3.16 (2024-10-15)
+-------------------
+
+4.3.15 (2024-10-10)
+-------------------
+* Merge pull request `#1361 <https://github.com/tier4/scenario_simulator_v2/issues/1361>`_ from tier4/fix/RJD-1296-fix-random001-ego-issue
+  fix(cpp_mock_scenarios, ego_entity_simulation): fix ego issue in random001, fix getCurrentPose()
+* Merge branch 'master' into feature/faster-compilation
+* Merge remote-tracking branch 'origin/master' into feature/faster-compilation
+* Merge branch 'master' into fix/RJD-1296-fix-random001-ego-issue
+* Merge branch 'master' into fix/RJD-1296-fix-random001-ego-issue
+* Merge branch 'master' into fix/RJD-1296-fix-random001-ego-issue
+* Merge remote-tracking branch 'origin/master' into feature/faster-compilation
+* Merge branch 'master' into feature/faster-compilation
+* Merge branch 'master' into fix/RJD-1296-fix-random001-ego-issue
+* Merge branch 'master' into fix/RJD-1296-fix-random001-ego-issue
+* Merge remote-tracking branch 'origin/master' into feature/faster-compilation
+* Merge branch 'master' into fix/RJD-1296-fix-random001-ego-issue
+* fix(ego_entity_simulation): fix getCurrentPose, add const initial_rotation_matrix\_ attribute
+* Merge remote-tracking branch 'origin/master' into feature/faster-compilation
+* Merge remote-tracking branch 'origin/master' into feature/faster-compilation
+* Contributors: Dawid Moszynski, Dawid Moszyński, Masaya Kataoka, Shota Minami
+
+4.3.14 (2024-10-10)
+-------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/joblist-update-stand-still-duration
+* Merge branch 'master' into feature/joblist-update-stand-still-duration
+* Contributors: Masaya Kataoka
+
+4.3.13 (2024-10-09)
+-------------------
+* Merge branch 'master' into feature/use-autoware-state
+* Merge branch 'master' into feature/use-autoware-state
+* Merge branch 'master' into feature/use-autoware-state
+* Merge branch 'master' into feature/use-autoware-state
+* Contributors: Kotaro Yoshimoto
+
+4.3.12 (2024-10-09)
+-------------------
+
+4.3.11 (2024-10-07)
+-------------------
+* Merge branch 'master' into feature/jpblist-update-traveled-distance
+* Merge branch 'master' into feature/jpblist-update-traveled-distance
+* Contributors: Masaya Kataoka
+
+4.3.10 (2024-10-03)
+-------------------
+
+4.3.9 (2024-10-03)
+------------------
+* Merge branch 'master' into test/cmake_flag_with_debug_and_relwithdebinfo
+* Contributors: Masaya Kataoka
+
+4.3.8 (2024-10-02)
+------------------
+* Merge branch 'master' into 1377/isInLanelet
+* Merge branch 'master' into 1377/isInLanelet
+* Contributors: Grzegorz Maj, Masaya Kataoka
+
 4.3.7 (2024-09-27)
 ------------------
 * Merge branch 'master' into feature/sonar_cloud

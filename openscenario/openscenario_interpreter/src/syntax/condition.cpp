@@ -68,7 +68,7 @@ auto Condition::evaluate() -> Object
   }
 }
 
-auto operator<<(nlohmann::json & json, const Condition & datum) -> nlohmann::json &
+auto operator<<(boost::json::object & json, const Condition & datum) -> boost::json::object &
 {
   json["currentEvaluation"] = datum.description();
 
