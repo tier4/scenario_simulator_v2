@@ -24,6 +24,28 @@ Changelog for package openscenario_utility
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+4.3.24 (2024-11-01)
+-------------------
+* Merge branch 'master' into fix/remove-topic-logic
+* Merge branch 'master' into fix/remove-topic-logic
+* Contributors: Masaya Kataoka
+
+4.3.23 (2024-11-01)
+-------------------
+
+4.3.22 (2024-10-31)
+-------------------
+* Merge branch 'master' into fix/improved-readability
+* Contributors: Masaya Kataoka
+
+4.3.21 (2024-10-31)
+-------------------
+* Merge branch 'master' into RJD-1337/getQuadraticAccelerationDuration
+* Merge branch 'master' into RJD-1337/getQuadraticAccelerationDuration
+* Merge branch 'master' into RJD-1337/getQuadraticAccelerationDuration
+* Merge branch 'master' into RJD-1337/getQuadraticAccelerationDuration
+* Contributors: Grzegorz Maj, Masaya Kataoka
+
 4.3.20 (2024-10-31)
 -------------------
 * Merge branch 'master' into RJD-1335/requestSpeedChange

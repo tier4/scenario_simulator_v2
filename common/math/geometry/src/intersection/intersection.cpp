@@ -91,16 +91,22 @@ std::optional<geometry_msgs::msg::Point> getIntersection2D(
 std::vector<geometry_msgs::msg::Point> getIntersection2D(const std::vector<LineSegment> & lines)
 {
   std::vector<geometry_msgs::msg::Point> ret;
-  for (size_t i = 0; i < lines.size(); ++i) {
-    for (size_t m = 0; m < lines.size(); ++m) {
-      if (i != m) {
-        const auto point = getIntersection2D(lines[i], lines[m]);
-        if (point) {
-          ret.emplace_back(point.value());
-        }
+
+  auto addIntersectionIfExists = [&](size_t i, size_t m) {
+    if (i != m) {
+      const auto point = getIntersection2D(lines[i], lines[m]);
+      if (point) {
+        ret.emplace_back(point.value());
       }
     }
+  };
+
+  for (size_t i = 0; i < lines.size(); ++i) {
+    for (size_t m = 0; m < lines.size(); ++m) {
+      addIntersectionIfExists(i, m);
+    }
   }
+
   return ret;
 }
 }  // namespace geometry
