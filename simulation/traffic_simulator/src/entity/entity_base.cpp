@@ -103,7 +103,7 @@ auto EntityBase::getCanonicalizedLaneletPose(double matching_distance) const
 
 auto EntityBase::getDefaultMatchingDistanceForLaneletPoseCalculation() const -> double
 {
-  return getBoundingBox().dimensions.y * 0.5 + 1.0;
+  return getBoundingBox().dimensions.y * 0.5 + 2.0;
 }
 
 auto EntityBase::isTargetSpeedReached(double target_speed) const -> bool

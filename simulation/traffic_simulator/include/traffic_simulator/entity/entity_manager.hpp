@@ -440,13 +440,15 @@ public:
       const auto matching_distance = [](const auto & parameters) {
         if constexpr (std::is_same_v<
                         std::decay_t<Parameters>, traffic_simulator_msgs::msg::VehicleParameters>) {
+          /// @note The lanelet matching algorithm should be equivalent to the one used in
+          /// EgoEntity::setStatus
           return std::max(
                    parameters.axles.front_axle.track_width,
                    parameters.axles.rear_axle.track_width) *
                    0.5 +
-                 1.0;
+                 2.0;
         } else {
-          return parameters.bounding_box.dimensions.y * 0.5 + 1.0;
+          return parameters.bounding_box.dimensions.y * 0.5 + 2.0;
         }
       }(parameters);
 
