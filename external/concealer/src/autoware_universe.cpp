@@ -23,6 +23,7 @@ AutowareUniverse::AutowareUniverse()
   getPathWithLaneId(
     "/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", rclcpp::QoS(1),
     *this),
+  getAutowareMissionRoute("/planning/mission_planning/route", rclcpp::QoS(1), *this),
   setAcceleration("/localization/acceleration", *this),
   setOdometry("/localization/kinematic_state", *this),
   setSteeringReport("/vehicle/status/steering_status", *this),
