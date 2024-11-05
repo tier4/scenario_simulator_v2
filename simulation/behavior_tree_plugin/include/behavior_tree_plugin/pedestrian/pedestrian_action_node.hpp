@@ -31,17 +31,12 @@ public:
   virtual void getBlackBoardValues();
   static BT::PortsList providedPorts()
   {
-    BT::PortsList ports = {
-      // clang-format off
+    // clang-format off
+    return BT::PortsList({
       BT::InputPort<traffic_simulator_msgs::msg::BehaviorParameter>("behavior_parameter"),
       BT::InputPort<traffic_simulator_msgs::msg::PedestrianParameters>("pedestrian_parameters"),
-      // clang-format on
-    };
-    BT::PortsList parent_ports = entity_behavior::ActionNode::providedPorts();
-    for (const auto & parent_port : parent_ports) {
-      ports.try_emplace(parent_port.first, parent_port.second);
-    }
-    return ports;
+    }) + entity_behavior::ActionNode::providedPorts();
+    // clang-format on
   }
   traffic_simulator_msgs::msg::PedestrianParameters pedestrian_parameters;
   auto calculateUpdatedEntityStatusInWorldFrame(double target_speed) const

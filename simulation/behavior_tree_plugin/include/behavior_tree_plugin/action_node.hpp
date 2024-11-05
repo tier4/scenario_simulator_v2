@@ -37,6 +37,8 @@
 
 namespace entity_behavior
 {
+BT::PortsList operator+(const BT::PortsList & ports_0, const BT::PortsList & ports_1);
+
 class ActionNode : public BT::ActionNodeBase
 {
 public:
@@ -92,6 +94,7 @@ public:
       // clang-format on
     };
   }
+
   auto getBlackBoardValues() -> void;
   auto getEntityStatus(const std::string & target_name) const
     -> const traffic_simulator::CanonicalizedEntityStatus &;
