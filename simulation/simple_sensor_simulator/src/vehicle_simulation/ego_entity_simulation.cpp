@@ -267,19 +267,9 @@ auto EgoEntitySimulation::overwrite(
     }();
 
     switch (auto state = Eigen::VectorXd(vehicle_model_ptr_->getDimX()); vehicle_model_type_) {
-      case VehicleModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD:
-        // state{X, Y, YAW, VX, STEER, PEDAL_ACCX, ACCX}
-        state(0) = world_relative_position_.x();
-        state(1) = world_relative_position_.y();
-        state(2) = yaw;
-        state(3) = status.action_status.twist.linear.x;
-        state(4) = 0;
-        state(5) = 0;
-        state(6) = status.action_status.accel.linear.x;
-        vehicle_model_ptr_->setState(state);
-        break;
       case VehicleModelType::DELAY_STEER_ACC:
       case VehicleModelType::DELAY_STEER_ACC_GEARED:
+      case VehicleModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD:
       case VehicleModelType::DELAY_STEER_MAP_ACC_GEARED:
         state(5) = status.action_status.accel.linear.x;
         [[fallthrough]];
