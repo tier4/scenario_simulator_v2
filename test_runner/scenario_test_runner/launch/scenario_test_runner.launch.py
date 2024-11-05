@@ -33,6 +33,9 @@ from scenario_test_runner.shutdown_once import ShutdownOnce
 
 
 def architecture_types():
+    # awf/universe:          autoware_auto_perception_msgs/TrafficSignalArray for traffic lights
+    # awf/universe/20230906: autoware_perception_msgs/TrafficSignalArray for traffic lights
+    # awf/universe/20240605: autoware_perception_msgs/TrafficLightGroupArray for traffic lights
     return ["awf/universe", "awf/universe/20230906", "awf/universe/20240605"]
 
 
