@@ -121,8 +121,9 @@ auto EgoEntitySimulation::makeSimulationModel(
   const auto acceleration_map_path      = get_parameter("acceleration_map_path",       std::string(""));
   const auto debug_acc_scaling_factor   = get_parameter("debug_acc_scaling_factor",    1.0);
   const auto debug_steer_scaling_factor = get_parameter("debug_steer_scaling_factor",  1.0);
-  const auto steer_lim                  = get_parameter("steer_lim",                   parameters.axles.front_axle.max_steering);  // 1.0
+  const auto steer_bias                 = get_parameter("steer_bias",                  0.0);
   const auto steer_dead_band            = get_parameter("steer_dead_band",             0.0);
+  const auto steer_lim                  = get_parameter("steer_lim",                   parameters.axles.front_axle.max_steering);  // 1.0
   const auto steer_rate_lim             = get_parameter("steer_rate_lim",              5.0);
   const auto steer_time_constant        = get_parameter("steer_time_constant",         0.27);
   const auto steer_time_delay           = get_parameter("steer_time_delay",            0.24);
@@ -149,7 +150,7 @@ auto EgoEntitySimulation::makeSimulationModel(
     case VehicleModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD:
       return std::make_shared<SimModelDelaySteerAccGearedWoFallGuard>(
         vel_lim, steer_lim, vel_rate_lim, steer_rate_lim, wheel_base, step_time, acc_time_delay,
-        acc_time_constant, steer_time_delay, steer_time_constant, steer_dead_band,
+        acc_time_constant, steer_time_delay, steer_time_constant, steer_dead_band, steer_bias,
         debug_acc_scaling_factor, debug_steer_scaling_factor);
 
     case VehicleModelType::DELAY_STEER_MAP_ACC_GEARED:
