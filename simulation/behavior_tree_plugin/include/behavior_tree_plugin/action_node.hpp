@@ -95,7 +95,7 @@ public:
     };
   }
 
-  auto getBlackBoardValues() -> void;
+  virtual auto getBlackBoardValues() -> void;
   auto getEntityStatus(const std::string & target_name) const
     -> const traffic_simulator::CanonicalizedEntityStatus &;
   auto getDistanceToTargetEntityPolygon(
