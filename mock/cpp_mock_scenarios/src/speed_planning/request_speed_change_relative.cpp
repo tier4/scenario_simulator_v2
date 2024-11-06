@@ -31,23 +31,45 @@ public:
   : cpp_mock_scenarios::CppScenarioNode(
       "request_speed_change",
       ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
-      "private_road_and_walkway_ele_fix/lanelet2_map.osm", __FILE__, false, option)
+      "private_road_and_walkway_ele_fix/lanelet2_map.osm", __FILE__, false, option),
+    request_sent(false)
   {
     start();
   }
 
 private:
+  bool request_sent;
+
   void onUpdate() override
   {
-    if (api_.getCurrentTime() <= 1.9) {
-      if (!equals(api_.getCurrentTime() + 3.0, api_.getCurrentTwist("front").linear.x, 0.01)) {
+    api_.updateFrame();
+
+    const double current_time = api_.getCurrentTime();
+    const double current_speed = api_.getCurrentTwist("front").linear.x;
+
+    if (current_time >= 0.0 and not request_sent) {
+      request_sent = true;
+      api_.requestSpeedChange(
+        "front",
+        traffic_simulator::speed_change::RelativeTargetSpeed(
+          "ego", traffic_simulator::speed_change::RelativeTargetSpeed::Type::DELTA, 2.0),
+        traffic_simulator::speed_change::Transition::LINEAR,
+        traffic_simulator::speed_change::Constraint(
+          traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 1.0),
+        true);
+    }
+
+    static constexpr double speed_tolerance = 0.05;
+    if (current_time >= 0.0 and current_time < 2.0) {
+      if (not equals(current_time + 3.0, current_speed, speed_tolerance)) {
         stop(cpp_mock_scenarios::Result::FAILURE);
       }
-    }
-    if (
-      api_.getCurrentTime() >= 2.0 && api_.getCurrentTwist("front").linear.x <= 5.05 &&
-      api_.getCurrentTwist("front").linear.x >= 4.95) {
-      stop(cpp_mock_scenarios::Result::SUCCESS);
+    } else {
+      if (equals(current_speed, 5.0, speed_tolerance)) {
+        stop(cpp_mock_scenarios::Result::SUCCESS);
+      } else {
+        stop(cpp_mock_scenarios::Result::FAILURE);
+      }
     }
   }
 
@@ -67,15 +89,6 @@ private:
         34741, 10.0, 0.0, api_.getHdmapUtils()),
       getVehicleParameters());
     api_.setLinearVelocity("front", 3);
-    api_.updateFrame();
-    api_.requestSpeedChange(
-      "front",
-      traffic_simulator::speed_change::RelativeTargetSpeed(
-        "ego", traffic_simulator::speed_change::RelativeTargetSpeed::Type::DELTA, 2.0),
-      traffic_simulator::speed_change::Transition::LINEAR,
-      traffic_simulator::speed_change::Constraint(
-        traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 1.0),
-      true);
   }
 };
 }  // namespace cpp_mock_scenarios
