@@ -15,6 +15,8 @@
 #ifndef TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_PUBLISHER_HPP_
 #define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_PUBLISHER_HPP_
 
+#include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
+#include <autoware_perception_msgs/msg/traffic_signal_array.hpp>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <string>
@@ -29,6 +31,14 @@ class TrafficLightPublisherBase
 public:
   virtual auto publish(const TrafficLightsBase & traffic_lights) const -> void = 0;
   virtual ~TrafficLightPublisherBase() = default;
+
+  static auto generateAutowareAutoPerceptionMsg(
+    const rclcpp::Time & current_ros_time, const TrafficLightsBase & traffic_lights)
+    -> autoware_auto_perception_msgs::msg::TrafficSignalArray;
+
+  static auto generateAutowarePerceptionMsg(
+    const rclcpp::Time & current_ros_time, const TrafficLightsBase & traffic_lights)
+    -> autoware_perception_msgs::msg::TrafficSignalArray;
 };
 
 template <typename MessageType>

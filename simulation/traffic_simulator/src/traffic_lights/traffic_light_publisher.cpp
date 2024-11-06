@@ -12,22 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
-#include <autoware_perception_msgs/msg/traffic_signal_array.hpp>
 #include <simulation_interface/conversions.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_publisher.hpp>
 
 namespace traffic_simulator
 {
-template <>
-auto TrafficLightPublisher<autoware_auto_perception_msgs::msg::TrafficSignalArray>::publish(
-  const TrafficLightsBase & traffic_lights) const -> void
+auto TrafficLightPublisherBase::generateAutowareAutoPerceptionMsg(
+  const rclcpp::Time & current_ros_time, const TrafficLightsBase & traffic_lights)
+  -> autoware_auto_perception_msgs::msg::TrafficSignalArray
 {
   const auto states_as_proto_request = traffic_lights.generateUpdateTrafficLightsRequest();
   autoware_auto_perception_msgs::msg::TrafficSignalArray message;
 
   message.header.frame_id = "camera_link";  // DIRTY HACK!!!
-  message.header.stamp = clock_ptr_->now();
+  message.header.stamp = current_ros_time;
 
   using TrafficLightType = autoware_auto_perception_msgs::msg::TrafficSignal;
   using TrafficLightBulbType = TrafficLightType::_lights_type::value_type;
@@ -41,17 +39,17 @@ auto TrafficLightPublisher<autoware_auto_perception_msgs::msg::TrafficSignalArra
     }
     message.signals.push_back(traffic_light_message);
   }
-  traffic_light_state_array_publisher_->publish(message);
+  return message;
 }
 
-template <>
-auto TrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>::publish(
-  const TrafficLightsBase & traffic_lights) const -> void
+auto TrafficLightPublisherBase::generateAutowarePerceptionMsg(
+  const rclcpp::Time & current_ros_time, const TrafficLightsBase & traffic_lights)
+  -> autoware_perception_msgs::msg::TrafficSignalArray
 {
   const auto states_as_proto_request = traffic_lights.generateUpdateTrafficLightsRequest();
   autoware_perception_msgs::msg::TrafficSignalArray message;
 
-  message.stamp = clock_ptr_->now();
+  message.stamp = current_ros_time;
 
   using TrafficLightType = autoware_perception_msgs::msg::TrafficSignal;
   using TrafficLightBulbType =
@@ -71,7 +69,23 @@ auto TrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>::p
       }
     }
   }
-  traffic_light_state_array_publisher_->publish(message);
+  return message;
+}
+
+template <>
+auto TrafficLightPublisher<autoware_auto_perception_msgs::msg::TrafficSignalArray>::publish(
+  const TrafficLightsBase & traffic_lights) const -> void
+{
+  traffic_light_state_array_publisher_->publish(
+    generateAutowareAutoPerceptionMsg(clock_ptr_->now(), traffic_lights));
+}
+
+template <>
+auto TrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>::publish(
+  const TrafficLightsBase & traffic_lights) const -> void
+{
+  traffic_light_state_array_publisher_->publish(
+    generateAutowarePerceptionMsg(clock_ptr_->now(), traffic_lights));
 }
 
 template <>

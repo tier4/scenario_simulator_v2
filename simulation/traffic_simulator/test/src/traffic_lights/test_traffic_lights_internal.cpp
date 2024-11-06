@@ -17,6 +17,7 @@
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <std_msgs/msg/header.hpp>
+#include <traffic_simulator/traffic_lights/traffic_light_publisher.hpp>
 #include <traffic_simulator/traffic_lights/traffic_lights.hpp>
 #include <traffic_simulator/traffic_lights/traffic_lights_base.hpp>
 
@@ -422,7 +423,8 @@ TYPED_TEST(TrafficLightsInternalTest, generateAutowarePerceptionMsg)
   this->lights->setTrafficLightsState(this->id, "red solidOn circle, yellow flashing circle");
   this->lights->setTrafficLightsConfidence(this->id, 0.7);
 
-  const auto msg = this->lights->generateAutowarePerceptionMsg();
+  const auto msg = traffic_simulator::TrafficLightPublisherBase::generateAutowarePerceptionMsg(
+    this->node_ptr->get_clock()->now(), *this->lights);
 
   const double expected_time =
     static_cast<double>(getTime(this->node_ptr->get_clock()->now())) * 1e-9;
@@ -452,7 +454,8 @@ TYPED_TEST(TrafficLightsInternalTest, generateAutowareAutoPerceptionMsg)
   this->lights->setTrafficLightsState(this->id, "red solidOn circle, yellow flashing circle");
   this->lights->setTrafficLightsConfidence(this->id, 0.7);
 
-  const auto msg = this->lights->generateAutowareAutoPerceptionMsg();
+  const auto msg = traffic_simulator::TrafficLightPublisherBase::generateAutowareAutoPerceptionMsg(
+    this->node_ptr->get_clock()->now(), *this->lights);
 
   const double expected_time =
     static_cast<double>(getTime(this->node_ptr->get_clock()->now())) * 1e-9;
