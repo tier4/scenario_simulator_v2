@@ -472,7 +472,7 @@ auto EgoEntitySimulation::setStatus(const traffic_simulator_msgs::msg::EntitySta
                                    vehicle_parameters.axles.front_axle.track_width,
                                    vehicle_parameters.axles.rear_axle.track_width) *
                                    0.5 +
-                                 2.0;
+                                 1.5;
   /// @note Ego uses the unique_route_lanelets get from Autoware, instead of the current lanelet_id
   /// value from EntityStatus, therefore canonicalization has to be done in advance,
   /// not inside CanonicalizedEntityStatus

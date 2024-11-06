@@ -77,7 +77,7 @@ auto VehicleEntity::getDefaultMatchingDistanceForLaneletPoseCalculation() const 
            vehicle_parameters.axles.front_axle.track_width,
            vehicle_parameters.axles.rear_axle.track_width) *
            0.5 +
-         2.0;
+         1.5;
 }
 
 auto VehicleEntity::getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter
