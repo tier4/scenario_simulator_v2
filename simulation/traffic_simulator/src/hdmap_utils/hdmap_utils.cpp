@@ -1547,6 +1547,7 @@ auto HdMapUtils::getLongitudinalDistance(
   /// @sa https://tier4.github.io/scenario_simulator_v2-docs/developer_guide/DistanceCalculation/
   if (const auto route = getRoute(from_pose.lanelet_id, to_pose.lanelet_id, allow_lane_change);
       not route.empty() || from_pose.lanelet_id == to_pose.lanelet_id) {
+    /// @note horizontal bar must intersect with the lanelet spline, so the distance was set arbitrarily to 10 meters.
     static constexpr double matching_distance = 10.0;
     double accumulated_distance = 0.0;
     // accumulate lanelet lengths alongside the route, considering possible lane changes
