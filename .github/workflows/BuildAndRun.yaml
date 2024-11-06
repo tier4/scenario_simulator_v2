@@ -69,6 +69,7 @@ jobs:
         run: |
           apt-get update
           apt-get install -y python3-pip python3-colcon-lcov-result lcov unzip
+          rosdep fix-permissions
           rosdep update --include-eol-distros
           rosdep install -iy --from-paths src --rosdistro ${{ matrix.rosdistro }}
           colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml
