@@ -1,4 +1,4 @@
-// Copyright 2024 TIER IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
 
 #include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
 #include <autoware_perception_msgs/msg/traffic_signal_array.hpp>
+#include <simulation_interface/conversions.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_publisher.hpp>
 
 namespace traffic_simulator
@@ -22,14 +23,52 @@ template <>
 auto TrafficLightPublisher<autoware_auto_perception_msgs::msg::TrafficSignalArray>::publish(
   const TrafficLightsBase & traffic_lights) const -> void
 {
-  traffic_light_state_array_publisher_->publish(traffic_lights.generateAutowareAutoPerceptionMsg());
+  const auto request = traffic_lights.generateUpdateTrafficLightsRequest();
+  autoware_auto_perception_msgs::msg::TrafficSignalArray message;
+  using TrafficLightType = autoware_auto_perception_msgs::msg::TrafficSignal;
+  message.header.frame_id = "camera_link";  // DIRTY HACK!!!
+  message.header.stamp = clock_ptr_->now();
+  for (const auto & traffic_light : request.states()) {
+    TrafficLightType traffic_light_message;
+    traffic_light_message.map_primitive_id = traffic_light.id();
+    for (const auto & bulb_status : traffic_light.traffic_light_status()) {
+      using TrafficLightBulbType = TrafficLightType::_lights_type::value_type;
+      TrafficLightBulbType light_bulb_message;
+      simulation_interface::toMsg<TrafficLightBulbType>(bulb_status, light_bulb_message);
+      traffic_light_message.lights.push_back(light_bulb_message);
+    }
+    message.signals.push_back(traffic_light_message);
+  }
+  traffic_light_state_array_publisher_->publish(message);
 }
 
 template <>
 auto TrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>::publish(
   const TrafficLightsBase & traffic_lights) const -> void
 {
-  traffic_light_state_array_publisher_->publish(traffic_lights.generateAutowarePerceptionMsg());
+  const auto request = traffic_lights.generateUpdateTrafficLightsRequest();
+  autoware_perception_msgs::msg::TrafficSignalArray message;
+  message.stamp = clock_ptr_->now();
+  for (const auto & traffic_light : request.states()) {
+    for (const auto & relation_id : traffic_light.relation_ids()) {
+      // skip if the traffic light has no bulbs
+      if (not traffic_light.traffic_light_status().empty()) {
+        using TrafficLightType = autoware_perception_msgs::msg::TrafficSignal;
+        TrafficLightType traffic_light_message;
+        traffic_light_message.traffic_signal_id = relation_id;
+
+        for (const auto & bulb_status : traffic_light.traffic_light_status()) {
+          using TrafficLightBulbType =
+            autoware_perception_msgs::msg::TrafficSignal::_elements_type::value_type;
+          TrafficLightBulbType light_bulb_message;
+          simulation_interface::toMsg<TrafficLightBulbType>(bulb_status, light_bulb_message);
+          traffic_light_message.elements.push_back(light_bulb_message);
+        }
+        message.signals.push_back(traffic_light_message);
+      }
+    }
+  }
+  traffic_light_state_array_publisher_->publish(message);
 }
 
 template <>

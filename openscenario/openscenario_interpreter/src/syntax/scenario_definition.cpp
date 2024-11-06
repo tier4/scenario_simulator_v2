@@ -41,14 +41,15 @@ auto ScenarioDefinition::evaluate() -> Object
 
 auto operator<<(std::ostream & os, const ScenarioDefinition & datum) -> std::ostream &
 {
-  nlohmann::json json;
+  boost::json::object json;
 
-  return os << (json << datum).dump(2);
+  return os << (json << datum);
 }
 
-auto operator<<(nlohmann::json & json, const ScenarioDefinition & datum) -> nlohmann::json &
+auto operator<<(boost::json::object & json, const ScenarioDefinition & datum)
+  -> boost::json::object &
 {
-  json["Storyboard"] << datum.storyboard;
+  json["Storyboard"].emplace_object() << datum.storyboard;
 
   return json;
 }
