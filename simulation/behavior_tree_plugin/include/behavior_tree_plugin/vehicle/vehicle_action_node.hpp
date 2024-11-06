@@ -37,7 +37,7 @@ class VehicleActionNode : public ActionNode
 public:
   VehicleActionNode(const std::string & name, const BT::NodeConfiguration & config);
   ~VehicleActionNode() override = default;
-  virtual void getBlackBoardValues();
+  void getBlackBoardValues() override;
   static BT::PortsList providedPorts()
   {
     // clang-format off
