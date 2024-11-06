@@ -23,16 +23,18 @@ template <>
 auto TrafficLightPublisher<autoware_auto_perception_msgs::msg::TrafficSignalArray>::publish(
   const TrafficLightsBase & traffic_lights) const -> void
 {
-  const auto request = traffic_lights.generateUpdateTrafficLightsRequest();
+  const auto states_as_proto_request = traffic_lights.generateUpdateTrafficLightsRequest();
   autoware_auto_perception_msgs::msg::TrafficSignalArray message;
-  using TrafficLightType = autoware_auto_perception_msgs::msg::TrafficSignal;
+
   message.header.frame_id = "camera_link";  // DIRTY HACK!!!
   message.header.stamp = clock_ptr_->now();
-  for (const auto & traffic_light : request.states()) {
+
+  using TrafficLightType = autoware_auto_perception_msgs::msg::TrafficSignal;
+  using TrafficLightBulbType = TrafficLightType::_lights_type::value_type;
+  for (const auto & traffic_light : states_as_proto_request.states()) {
     TrafficLightType traffic_light_message;
     traffic_light_message.map_primitive_id = traffic_light.id();
     for (const auto & bulb_status : traffic_light.traffic_light_status()) {
-      using TrafficLightBulbType = TrafficLightType::_lights_type::value_type;
       TrafficLightBulbType light_bulb_message;
       simulation_interface::toMsg<TrafficLightBulbType>(bulb_status, light_bulb_message);
       traffic_light_message.lights.push_back(light_bulb_message);
@@ -46,20 +48,21 @@ template <>
 auto TrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>::publish(
   const TrafficLightsBase & traffic_lights) const -> void
 {
-  const auto request = traffic_lights.generateUpdateTrafficLightsRequest();
+  const auto states_as_proto_request = traffic_lights.generateUpdateTrafficLightsRequest();
   autoware_perception_msgs::msg::TrafficSignalArray message;
+
   message.stamp = clock_ptr_->now();
-  for (const auto & traffic_light : request.states()) {
+
+  using TrafficLightType = autoware_perception_msgs::msg::TrafficSignal;
+  using TrafficLightBulbType =
+    autoware_perception_msgs::msg::TrafficSignal::_elements_type::value_type;
+  for (const auto & traffic_light : states_as_proto_request.states()) {
     for (const auto & relation_id : traffic_light.relation_ids()) {
       // skip if the traffic light has no bulbs
       if (not traffic_light.traffic_light_status().empty()) {
-        using TrafficLightType = autoware_perception_msgs::msg::TrafficSignal;
         TrafficLightType traffic_light_message;
         traffic_light_message.traffic_signal_id = relation_id;
-
         for (const auto & bulb_status : traffic_light.traffic_light_status()) {
-          using TrafficLightBulbType =
-            autoware_perception_msgs::msg::TrafficSignal::_elements_type::value_type;
           TrafficLightBulbType light_bulb_message;
           simulation_interface::toMsg<TrafficLightBulbType>(bulb_status, light_bulb_message);
           traffic_light_message.elements.push_back(light_bulb_message);
