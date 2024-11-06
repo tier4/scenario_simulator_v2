@@ -141,7 +141,13 @@ public:
 
   virtual void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) = 0;
 
-  virtual void requestLaneChange(const lanelet::Id) {}
+  virtual void requestLaneChange(const lanelet::Id)
+  {
+    /**
+     * @note There are Entities such as MiscObjectEntity for which lane change is not possible, 
+     * and since it is necessary to implement appropriate overrides for each Entity, no operation is performed on the base type.
+     */
+  }
 
   virtual void requestLaneChange(const traffic_simulator::lane_change::Parameter &){};
 
