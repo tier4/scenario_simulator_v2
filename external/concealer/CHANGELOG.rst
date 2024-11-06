@@ -21,6 +21,15 @@ Changelog for package concealer
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+4.3.26 (2024-11-06)
+-------------------
+* Merge pull request `#1430 <https://github.com/tier4/scenario_simulator_v2/issues/1430>`_ from tier4/fix/refactor-code
+  Code Optimization and Refactoring
+* Standardizing declarations.
+* Added missing override qualifiers.
+* Removed unnecessary lambda captures.
+* Contributors: Masaya Kataoka, Taiga Takano
+
 4.3.25 (2024-11-05)
 -------------------
 

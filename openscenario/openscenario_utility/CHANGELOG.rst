@@ -24,6 +24,9 @@ Changelog for package openscenario_utility
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+4.3.26 (2024-11-06)
+-------------------
+
 4.3.25 (2024-11-05)
 -------------------
 
