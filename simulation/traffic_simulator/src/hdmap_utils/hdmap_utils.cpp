@@ -535,7 +535,6 @@ auto HdMapUtils::matchToLane(
   const bool include_crosswalk, const double matching_distance, const double reduction_ratio) const
   -> std::optional<lanelet::Id>
 {
-  std::optional<lanelet::Id> id;
   lanelet::matching::Object2d obj;
   obj.pose.translation() = toPoint2d(pose.position);
   obj.pose.linear() =

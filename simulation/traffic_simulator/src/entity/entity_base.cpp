@@ -43,7 +43,7 @@ EntityBase::EntityBase(
       traveled_distance_ += std::abs(getCurrentTwist().linear.x) * step_time_;
       return false;
     },
-    [this]() {}, job::Type::TRAVELED_DISTANCE, true, job::Event::POST_UPDATE);
+    []() {}, job::Type::TRAVELED_DISTANCE, true, job::Event::POST_UPDATE);
 
   if (name != static_cast<EntityStatus>(entity_status).name) {
     THROW_SIMULATION_ERROR(
@@ -62,7 +62,7 @@ EntityBase::EntityBase(
       }
       return false;
     },
-    [this]() {}, job::Type::STAND_STILL_DURATION, true, job::Event::POST_UPDATE);
+    []() {}, job::Type::STAND_STILL_DURATION, true, job::Event::POST_UPDATE);
 }
 
 void EntityBase::appendDebugMarker(visualization_msgs::msg::MarkerArray &) {}
@@ -440,7 +440,7 @@ void EntityBase::requestSpeedChange(double target_speed, bool continuous)
       /**
        * @brief Cancel speed change request.
        */
-      [this]() {}, job::Type::LINEAR_VELOCITY, true, job::Event::POST_UPDATE);
+      []() {}, job::Type::LINEAR_VELOCITY, true, job::Event::POST_UPDATE);
   } else {
     target_speed_ = target_speed;
     job_list_.append(
@@ -480,7 +480,7 @@ void EntityBase::requestSpeedChange(
         target_speed_ = target_speed.getAbsoluteValue(getCanonicalizedStatus(), other_status_);
         return false;
       },
-      [this]() {}, job::Type::LINEAR_VELOCITY, true, job::Event::POST_UPDATE);
+      []() {}, job::Type::LINEAR_VELOCITY, true, job::Event::POST_UPDATE);
   } else {
     job_list_.append(
       /**
@@ -608,7 +608,7 @@ void EntityBase::activateOutOfRangeJob(
      * @brief Checking if the values of velocity, acceleration and jerk are within the acceptable
      * range
      */
-    [this, tolerance, max_velocity, min_velocity, min_acceleration, max_acceleration, min_jerk,
+    [this, max_velocity, min_velocity, min_acceleration, max_acceleration, min_jerk,
      max_jerk](double) {
       const auto velocity = getCurrentTwist().linear.x;
       const auto accel = getCurrentAccel().linear.x;
@@ -633,7 +633,7 @@ void EntityBase::activateOutOfRangeJob(
     /**
      * @brief This job is always ACTIVE
      */
-    [this]() {}, job::Type::OUT_OF_RANGE, true, job::Event::POST_UPDATE);
+    []() {}, job::Type::OUT_OF_RANGE, true, job::Event::POST_UPDATE);
 }
 
 void EntityBase::stopAtCurrentPosition()
@@ -768,7 +768,7 @@ auto EntityBase::requestSynchronize(
       target_speed_ = entity_velocity_to_synchronize();
       return false;
     },
-    [this]() {}, job::Type::LINEAR_ACCELERATION, true, job::Event::POST_UPDATE);
+    []() {}, job::Type::LINEAR_ACCELERATION, true, job::Event::POST_UPDATE);
   return false;
 }
 

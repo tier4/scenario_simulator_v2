@@ -20,7 +20,7 @@
 
 namespace traffic_simulator
 {
-namespace pose
+inline namespace pose
 {
 auto quietNaNPose() -> geometry_msgs::msg::Pose
 {

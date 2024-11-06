@@ -90,7 +90,7 @@ public:
     autoware_auto_control_msgs::msg::AckermannControlCommand,
     autoware_auto_vehicle_msgs::msg::GearCommand> override;
 
-  auto getRouteLanelets() const -> std::vector<std::int64_t>;
+  auto getRouteLanelets() const -> std::vector<std::int64_t> override;
 };
 
 }  // namespace concealer
