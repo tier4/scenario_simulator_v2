@@ -34,7 +34,7 @@ class FollowLaneAction : public entity_behavior::PedestrianActionNode
 public:
   FollowLaneAction(const std::string & name, const BT::NodeConfiguration & config);
   BT::NodeStatus tick() override;
-  void getBlackBoardValues();
+  void getBlackBoardValues() override;
   static BT::PortsList providedPorts()
   {
     return entity_behavior::PedestrianActionNode::providedPorts();

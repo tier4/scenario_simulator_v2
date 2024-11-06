@@ -44,7 +44,7 @@ public:
   const traffic_simulator_msgs::msg::WaypointsArray calculateWaypoints() override;
   const std::optional<traffic_simulator_msgs::msg::Obstacle> calculateObstacle(
     const traffic_simulator_msgs::msg::WaypointsArray & waypoints) override;
-  void getBlackBoardValues();
+  void getBlackBoardValues() override;
 
 private:
   std::optional<math::geometry::HermiteCurve> curve_;
