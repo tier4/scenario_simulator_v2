@@ -17,7 +17,7 @@
 
 namespace traffic_simulator
 {
-namespace entity_status
+inline namespace entity_status
 {
 
 CanonicalizedEntityStatus::CanonicalizedEntityStatus(

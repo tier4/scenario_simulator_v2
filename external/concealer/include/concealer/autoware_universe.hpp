@@ -92,7 +92,7 @@ public:
   auto getVehicleCommand() const -> std::tuple<
     autoware_control_msgs::msg::Control, autoware_vehicle_msgs::msg::GearCommand> override;
 
-  auto getRouteLanelets() const -> std::vector<std::int64_t>;
+  auto getRouteLanelets() const -> std::vector<std::int64_t> override;
 
   auto setManualMode() -> void override;
 

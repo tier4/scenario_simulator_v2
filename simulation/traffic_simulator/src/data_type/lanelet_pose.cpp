@@ -22,7 +22,7 @@
 
 namespace traffic_simulator
 {
-namespace lanelet_pose
+inline namespace lanelet_pose
 {
 CanonicalizedLaneletPose::CanonicalizedLaneletPose(
   const LaneletPose & maybe_non_canonicalized_lanelet_pose,

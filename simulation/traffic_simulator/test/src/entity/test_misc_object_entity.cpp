@@ -439,17 +439,6 @@ TEST_F(MiscObjectEntityTest_FullObject, requestWalkStraight)
 }
 
 /**
- * @note test basic functionality; test updating stand still duration
- * when NPC logic is started and velocity is greater than 0.
- */
-TEST_F(MiscObjectEntityTest_FullObject, updateStandStillDuration_startedMoving)
-{
-  misc_object.setLinearVelocity(3.0);
-
-  EXPECT_EQ(0.0, misc_object.updateStandStillDuration(0.1));
-}
-
-/**
  * @note Test basic functionality; test stopping correctness - the goal
  * is to check whether the entity status is changed to stopped (no velocity etc.).
  */
