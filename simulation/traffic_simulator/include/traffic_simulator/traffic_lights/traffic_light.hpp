@@ -254,61 +254,79 @@ struct TrafficLight
 
     explicit operator simulation_api_schema::TrafficLight() const
     {
-      auto color = [this]() {
+      const auto color = [this]() {
+        auto color_message = simulation_api_schema::TrafficLight_Color_UNKNOWN_COLOR;
         switch (std::get<Color>(value).value) {
           case Color::green:
-            return simulation_api_schema::TrafficLight_Color_GREEN;
+            color_message = simulation_api_schema::TrafficLight_Color_GREEN;
+            break;
           case Color::yellow:
-            return simulation_api_schema::TrafficLight_Color_AMBER;
+            color_message = simulation_api_schema::TrafficLight_Color_AMBER;
+            break;
           case Color::red:
-            return simulation_api_schema::TrafficLight_Color_RED;
+            color_message = simulation_api_schema::TrafficLight_Color_RED;
+            break;
           case Color::white:
-            return simulation_api_schema::TrafficLight_Color_WHITE;
-          default:
-            throw common::SyntaxError(std::get<Color>(value), " is not supported color.");
+            color_message = simulation_api_schema::TrafficLight_Color_WHITE;
+            break;
         }
+        return color_message;
       };
 
-      auto status = [this]() {
+      const auto status = [this]() {
+        auto status_message = simulation_api_schema::TrafficLight_Status_UNKNOWN_STATUS;
         switch (std::get<Status>(value).value) {
           case Status::solid_on:
-            return simulation_api_schema::TrafficLight_Status_SOLID_ON;
+            status_message = simulation_api_schema::TrafficLight_Status_SOLID_ON;
+            break;
           case Status::solid_off:
-            return simulation_api_schema::TrafficLight_Status_SOLID_OFF;
+            status_message = simulation_api_schema::TrafficLight_Status_SOLID_OFF;
+            break;
           case Status::flashing:
-            return simulation_api_schema::TrafficLight_Status_FLASHING;
+            status_message = simulation_api_schema::TrafficLight_Status_FLASHING;
+            break;
           case Status::unknown:
-            return simulation_api_schema::TrafficLight_Status_UNKNOWN_STATUS;
-          default:
-            throw common::SyntaxError(std::get<Status>(value), " is not supported as a status.");
+            status_message = simulation_api_schema::TrafficLight_Status_UNKNOWN_STATUS;
+            break;
         }
+        return status_message;
       };
 
-      auto shape = [this]() {
+      const auto shape = [this]() {
+        auto shape_message = simulation_api_schema::TrafficLight_Shape_UNKNOWN_SHAPE;
         switch (std::get<Shape>(value).value) {
           case Shape::circle:
-            return simulation_api_schema::TrafficLight_Shape_CIRCLE;
+            shape_message = simulation_api_schema::TrafficLight_Shape_CIRCLE;
+            break;
           case Shape::cross:
-            return simulation_api_schema::TrafficLight_Shape_CROSS;
+            shape_message = simulation_api_schema::TrafficLight_Shape_CROSS;
+            break;
           case Shape::left:
-            return simulation_api_schema::TrafficLight_Shape_LEFT_ARROW;
+            shape_message = simulation_api_schema::TrafficLight_Shape_LEFT_ARROW;
+            break;
           case Shape::down:
-            return simulation_api_schema::TrafficLight_Shape_DOWN_ARROW;
+            shape_message = simulation_api_schema::TrafficLight_Shape_DOWN_ARROW;
+            break;
           case Shape::up:
-            return simulation_api_schema::TrafficLight_Shape_UP_ARROW;
+            shape_message = simulation_api_schema::TrafficLight_Shape_UP_ARROW;
+            break;
           case Shape::right:
-            return simulation_api_schema::TrafficLight_Shape_RIGHT_ARROW;
+            shape_message = simulation_api_schema::TrafficLight_Shape_RIGHT_ARROW;
+            break;
           case Shape::lower_left:
-            return simulation_api_schema::TrafficLight_Shape_DOWN_LEFT_ARROW;
+            shape_message = simulation_api_schema::TrafficLight_Shape_DOWN_LEFT_ARROW;
+            break;
           case Shape::lower_right:
-            return simulation_api_schema::TrafficLight_Shape_DOWN_RIGHT_ARROW;
+            shape_message = simulation_api_schema::TrafficLight_Shape_DOWN_RIGHT_ARROW;
+            break;
           case Shape::upper_left:
-            return simulation_api_schema::TrafficLight_Shape_UP_LEFT_ARROW;
+            shape_message = simulation_api_schema::TrafficLight_Shape_UP_LEFT_ARROW;
+            break;
           case Shape::upper_right:
-            return simulation_api_schema::TrafficLight_Shape_UP_RIGHT_ARROW;
-          default:
-            throw common::SyntaxError(std::get<Shape>(value), " is not supported as a shape.");
+            shape_message = simulation_api_schema::TrafficLight_Shape_UP_RIGHT_ARROW;
+            break;
         }
+        return shape_message;
       };
 
       simulation_api_schema::TrafficLight traffic_light_bulb_proto;
@@ -324,78 +342,78 @@ struct TrafficLight
     explicit operator traffic_simulator_msgs::msg::TrafficLightBulbV1() const
     {
       const auto color = [this] {
-        auto color = traffic_simulator_msgs::msg::TrafficLightBulbV1::UNKNOWN;
+        auto color_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::UNKNOWN;
         switch (std::get<Color>(value).value) {
           case Color::green:
-            color = traffic_simulator_msgs::msg::TrafficLightBulbV1::GREEN;
+            color_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::GREEN;
             break;
           case Color::yellow:
-            color = traffic_simulator_msgs::msg::TrafficLightBulbV1::AMBER;
+            color_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::AMBER;
             break;
           case Color::red:
-            color = traffic_simulator_msgs::msg::TrafficLightBulbV1::RED;
+            color_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::RED;
             break;
           case Color::white:
-            color = traffic_simulator_msgs::msg::TrafficLightBulbV1::WHITE;
+            color_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::WHITE;
             break;
         }
-        return color;
+        return color_message;
       };
 
       const auto status = [this] {
-        auto status = traffic_simulator_msgs::msg::TrafficLightBulbV1::UNKNOWN;
+        auto status_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::UNKNOWN;
         switch (std::get<Status>(value).value) {
           case Status::solid_on:
-            status = traffic_simulator_msgs::msg::TrafficLightBulbV1::SOLID_ON;
+            status_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::SOLID_ON;
             break;
           case Status::solid_off:
-            status = traffic_simulator_msgs::msg::TrafficLightBulbV1::SOLID_OFF;
+            status_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::SOLID_OFF;
             break;
           case Status::flashing:
-            status = traffic_simulator_msgs::msg::TrafficLightBulbV1::FLASHING;
+            status_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::FLASHING;
             break;
           case Status::unknown:
-            status = traffic_simulator_msgs::msg::TrafficLightBulbV1::UNKNOWN;
+            status_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::UNKNOWN;
             break;
         }
-        return status;
+        return status_message;
       };
 
       const auto shape = [this] {
-        auto shape = traffic_simulator_msgs::msg::TrafficLightBulbV1::UNKNOWN;
+        auto shape_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::UNKNOWN;
         switch (std::get<Shape>(value).value) {
           case Shape::circle:
-            shape = traffic_simulator_msgs::msg::TrafficLightBulbV1::CIRCLE;
+            shape_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::CIRCLE;
             break;
           case Shape::cross:
-            shape = traffic_simulator_msgs::msg::TrafficLightBulbV1::CROSS;
+            shape_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::CROSS;
             break;
           case Shape::left:
-            shape = traffic_simulator_msgs::msg::TrafficLightBulbV1::LEFT_ARROW;
+            shape_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::LEFT_ARROW;
             break;
           case Shape::down:
-            shape = traffic_simulator_msgs::msg::TrafficLightBulbV1::DOWN_ARROW;
+            shape_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::DOWN_ARROW;
             break;
           case Shape::up:
-            shape = traffic_simulator_msgs::msg::TrafficLightBulbV1::UP_ARROW;
+            shape_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::UP_ARROW;
             break;
           case Shape::right:
-            shape = traffic_simulator_msgs::msg::TrafficLightBulbV1::RIGHT_ARROW;
+            shape_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::RIGHT_ARROW;
             break;
           case Shape::lower_left:
-            shape = traffic_simulator_msgs::msg::TrafficLightBulbV1::DOWN_LEFT_ARROW;
+            shape_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::DOWN_LEFT_ARROW;
             break;
           case Shape::lower_right:
-            shape = traffic_simulator_msgs::msg::TrafficLightBulbV1::DOWN_RIGHT_ARROW;
+            shape_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::DOWN_RIGHT_ARROW;
             break;
           case Shape::upper_left:
-            shape = traffic_simulator_msgs::msg::TrafficLightBulbV1::UP_LEFT_ARROW;
+            shape_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::UP_LEFT_ARROW;
             break;
           case Shape::upper_right:
-            shape = traffic_simulator_msgs::msg::TrafficLightBulbV1::UP_RIGHT_ARROW;
+            shape_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::UP_RIGHT_ARROW;
             break;
         }
-        return shape;
+        return shape_message;
       };
 
       traffic_simulator_msgs::msg::TrafficLightBulbV1 msg;

@@ -20,7 +20,7 @@
 
 namespace traffic_simulator
 {
-namespace distance
+inline namespace distance
 {
 auto lateralDistance(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,

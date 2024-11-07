@@ -71,11 +71,14 @@ auto VehicleEntity::getDefaultDynamicConstraints() const
 
 auto VehicleEntity::getDefaultMatchingDistanceForLaneletPoseCalculation() const -> double
 {
+  /// @note The lanelet matching algorithm should be equivalent to the one used in
+  /// EgoEntitySimulation::setStatus
+  /// @note The offset value has been increased to 1.5 because a value of 1.0 was often insufficient when changing lanes. ( @Hans_Robo )
   return std::max(
            vehicle_parameters.axles.front_axle.track_width,
            vehicle_parameters.axles.rear_axle.track_width) *
            0.5 +
-         1.0;
+         1.5;
 }
 
 auto VehicleEntity::getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter
