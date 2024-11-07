@@ -27,11 +27,12 @@ namespace traffic_simulator
 namespace follow_trajectory
 {
 auto makeUpdatedStatus(
-  const traffic_simulator_msgs::msg::EntityStatus &,
-  const traffic_simulator_msgs::msg::PolylineTrajectory &,
-  const traffic_simulator_msgs::msg::BehaviorParameter &,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> &, double, double,
-  std::optional<double> target_speed = std::nullopt) -> std::optional<EntityStatus>;
+  const traffic_simulator_msgs::msg::EntityStatus & entity_status,
+  const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
+  const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils, const double step_time,
+  const double matching_distance, const std::optional<double> target_speed = std::nullopt)
+  -> std::optional<EntityStatus>;
 }  // namespace follow_trajectory
 }  // namespace traffic_simulator
 
