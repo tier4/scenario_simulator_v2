@@ -58,12 +58,14 @@ private:
 
   auto lateralDistance(
     const std::string & from_entity_name, const std::string & to_entity_name,
-    const double matching_distance) -> std::optional<double>
+    const double matching_distance, const double matching_altitude) -> std::optional<double>
   {
     if (const auto from_entity = api_.getEntity(from_entity_name)) {
       if (const auto to_entity = api_.getEntity(to_entity_name)) {
-        auto from_entity_lanelet_pose = from_entity->getCanonicalizedLaneletPose(matching_distance);
-        auto to_entity_lanelet_pose = to_entity->getCanonicalizedLaneletPose(matching_distance);
+        auto from_entity_lanelet_pose =
+          from_entity->getCanonicalizedLaneletPose(matching_distance, matching_altitude);
+        auto to_entity_lanelet_pose =
+          to_entity->getCanonicalizedLaneletPose(matching_distance, matching_altitude);
         if (from_entity_lanelet_pose && to_entity_lanelet_pose) {
           return traffic_simulator::distance::lateralDistance(
             from_entity_lanelet_pose.value(), to_entity_lanelet_pose.value(), false,

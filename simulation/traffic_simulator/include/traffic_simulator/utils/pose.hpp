@@ -46,14 +46,16 @@ auto toCanonicalizedLaneletPose(
 auto toCanonicalizedLaneletPose(
   const geometry_msgs::msg::Pose & map_pose,
   const traffic_simulator_msgs::msg::BoundingBox & bounding_box, const bool include_crosswalk,
-  const double matching_distance, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+  const double matching_distance, const double matching_altitude,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
   -> std::optional<CanonicalizedLaneletPose>;
 
 auto toCanonicalizedLaneletPose(
   const geometry_msgs::msg::Pose & map_pose,
   const traffic_simulator_msgs::msg::BoundingBox & bounding_box,
   const lanelet::Ids & unique_route_lanelets, const bool include_crosswalk,
-  const double matching_distance, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+  const double matching_distance, const double matching_altitude,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
   -> std::optional<CanonicalizedLaneletPose>;
 
 auto transformRelativePoseToGlobal(
@@ -110,7 +112,8 @@ auto transformToCanonicalizedLaneletPose(
   const geometry_msgs::msg::Pose & map_pose,
   const traffic_simulator_msgs::msg::BoundingBox & bounding_box,
   const lanelet::Ids & unique_route_lanelets, const bool include_crosswalk,
-  const double matching_distance, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+  const double matching_distance, const double matching_altitude,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
   -> std::optional<CanonicalizedLaneletPose>;
 }  // namespace pedestrian
 }  // namespace pose

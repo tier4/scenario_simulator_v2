@@ -404,6 +404,7 @@ public:
 
 private:
   FORWARD_TO_ENTITY_MANAGER(getDefaultMatchingDistanceForLaneletPoseCalculation);
+  FORWARD_TO_ENTITY_MANAGER(getDefaultMatchingAltitudeForLaneletPoseCalculation);
 
 public:
 #undef FORWARD_TO_ENTITY_MANAGER

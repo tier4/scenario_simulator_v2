@@ -87,8 +87,8 @@ auto EntityBase::getCanonicalizedLaneletPose() const -> std::optional<Canonicali
   return status_->getCanonicalizedLaneletPose();
 }
 
-auto EntityBase::getCanonicalizedLaneletPose(double matching_distance) const
-  -> std::optional<CanonicalizedLaneletPose>
+auto EntityBase::getCanonicalizedLaneletPose(double matching_distance, double matching_altitude)
+  const -> std::optional<CanonicalizedLaneletPose>
 {
   const auto include_crosswalk = [](const auto & entity_type) {
     return (traffic_simulator_msgs::msg::EntityType::PEDESTRIAN == entity_type.type) ||
@@ -98,12 +98,17 @@ auto EntityBase::getCanonicalizedLaneletPose(double matching_distance) const
   // prefer the current lanelet
   return pose::toCanonicalizedLaneletPose(
     status_->getMapPose(), status_->getBoundingBox(), status_->getLaneletIds(), include_crosswalk,
-    matching_distance, hdmap_utils_ptr_);
+    matching_distance, matching_altitude, hdmap_utils_ptr_);
 }
 
 auto EntityBase::getDefaultMatchingDistanceForLaneletPoseCalculation() const -> double
 {
   return getBoundingBox().dimensions.y * 0.5 + 1.0;
+}
+
+auto EntityBase::getDefaultMatchingAltitudeForLaneletPoseCalculation() const -> double
+{
+  return getBoundingBox().dimensions.z * 0.5 + 1.0;
 }
 
 auto EntityBase::isTargetSpeedReached(double target_speed) const -> bool
@@ -542,12 +547,15 @@ void EntityBase::setOtherStatus(
 auto EntityBase::setStatus(const EntityStatus & status, const lanelet::Ids & lanelet_ids) -> void
 {
   status_->set(
-    status, lanelet_ids, getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
+    status, lanelet_ids, getDefaultMatchingDistanceForLaneletPoseCalculation(),
+    getDefaultMatchingAltitudeForLaneletPoseCalculation(), hdmap_utils_ptr_);
 }
 
 auto EntityBase::setStatus(const EntityStatus & status) -> void
 {
-  status_->set(status, getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
+  status_->set(
+    status, getDefaultMatchingDistanceForLaneletPoseCalculation(),
+    getDefaultMatchingAltitudeForLaneletPoseCalculation(), hdmap_utils_ptr_);
 }
 
 auto EntityBase::setCanonicalizedStatus(const CanonicalizedEntityStatus & status) -> void

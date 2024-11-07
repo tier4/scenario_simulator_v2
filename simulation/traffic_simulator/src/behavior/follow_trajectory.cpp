@@ -48,7 +48,8 @@ auto makeUpdatedStatus(
   traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
   const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils, const double step_time,
-  double matching_distance, std::optional<double> target_speed) -> std::optional<EntityStatus>
+  const double matching_distance, const double matching_altitude,
+  std::optional<double> target_speed) -> std::optional<EntityStatus>
 {
   using math::arithmetic::isApproximatelyEqualTo;
   using math::arithmetic::isDefinitelyLessThan;
@@ -68,11 +69,11 @@ auto makeUpdatedStatus(
 
   auto distance_along_lanelet =
     [&](const geometry_msgs::msg::Point & from, const geometry_msgs::msg::Point & to) -> double {
-    if (const auto from_lanelet_pose =
-          hdmap_utils->toLaneletPose(from, entity_status.bounding_box, false, matching_distance);
+    if (const auto from_lanelet_pose = hdmap_utils->toLaneletPose(
+          from, entity_status.bounding_box, false, matching_distance, matching_altitude);
         from_lanelet_pose) {
-      if (const auto to_lanelet_pose =
-            hdmap_utils->toLaneletPose(to, entity_status.bounding_box, false, matching_distance);
+      if (const auto to_lanelet_pose = hdmap_utils->toLaneletPose(
+            to, entity_status.bounding_box, false, matching_distance, matching_altitude);
           to_lanelet_pose) {
         if (const auto distance = hdmap_utils->getLongitudinalDistance(
               from_lanelet_pose.value(), to_lanelet_pose.value());
@@ -118,7 +119,7 @@ auto makeUpdatedStatus(
 
     return makeUpdatedStatus(
       entity_status, polyline_trajectory, behavior_parameter, hdmap_utils, step_time,
-      matching_distance, target_speed);
+      matching_distance, matching_altitude, target_speed);
   };
 
   auto is_infinity_or_nan = [](auto x) constexpr { return std::isinf(x) or std::isnan(x); };

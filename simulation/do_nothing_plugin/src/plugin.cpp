@@ -176,7 +176,8 @@ void DoNothingBehavior::update(double current_time, double step_time)
   if (getRequest() == traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY) {
     canonicalized_entity_status_->set(
       interpolate_entity_status_on_polyline_trajectory(),
-      getDefaultMatchingDistanceForLaneletPoseCalculation(), getHdMapUtils());
+      getDefaultMatchingDistanceForLaneletPoseCalculation(),
+      getDefaultMatchingAltitudeForLaneletPoseCalculation(), getHdMapUtils());
     if (
       getCurrentTime() + getStepTime() >=
       do_nothing_behavior::follow_trajectory::getLastVertexTimestamp(getPolylineTrajectory())) {
@@ -185,7 +186,8 @@ void DoNothingBehavior::update(double current_time, double step_time)
   } else {
     canonicalized_entity_status_->set(
       static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status_),
-      getDefaultMatchingDistanceForLaneletPoseCalculation(), getHdMapUtils());
+      getDefaultMatchingDistanceForLaneletPoseCalculation(),
+      getDefaultMatchingAltitudeForLaneletPoseCalculation(), getHdMapUtils());
   }
 }
 

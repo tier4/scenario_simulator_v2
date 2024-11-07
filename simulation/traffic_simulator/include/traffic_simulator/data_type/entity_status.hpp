@@ -40,9 +40,10 @@ public:
   auto set(const CanonicalizedEntityStatus & status) -> void;
   auto set(
     const EntityStatus & status, const lanelet::Ids & lanelet_ids, const double matching_distance,
+    const double matching_altitude,
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> void;
   auto set(
-    const EntityStatus & status, const double matching_distance,
+    const EntityStatus & status, const double matching_distance, const double matching_altitude,
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> void;
 
   auto setAction(const std::string & action) -> void;

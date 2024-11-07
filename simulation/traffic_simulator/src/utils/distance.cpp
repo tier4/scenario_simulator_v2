@@ -94,15 +94,16 @@ auto longitudinalDistance(
      * so it is always 10m regardless of the entity type.
      */
     constexpr double matching_distance = 5.0;
+    constexpr double matching_altitude = 1.0;
 
     auto from_poses = hdmap_utils_ptr->toLaneletPoses(
       static_cast<geometry_msgs::msg::Pose>(from), static_cast<LaneletPose>(from).lanelet_id,
-      matching_distance, include_opposite_direction);
+      matching_distance, matching_altitude, include_opposite_direction);
     from_poses.emplace_back(from);
 
     auto to_poses = hdmap_utils_ptr->toLaneletPoses(
       static_cast<geometry_msgs::msg::Pose>(to), static_cast<LaneletPose>(to).lanelet_id,
-      matching_distance, include_opposite_direction);
+      matching_distance, matching_altitude, include_opposite_direction);
     to_poses.emplace_back(to);
 
     std::vector<double> distances = {};

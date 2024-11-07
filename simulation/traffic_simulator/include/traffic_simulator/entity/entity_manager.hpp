@@ -268,6 +268,7 @@ public:
   FORWARD_TO_ENTITY(getCurrentAccel, const);
   FORWARD_TO_ENTITY(getCurrentTwist, const);
   FORWARD_TO_ENTITY(getDefaultMatchingDistanceForLaneletPoseCalculation, const);
+  FORWARD_TO_ENTITY(getDefaultMatchingAltitudeForLaneletPoseCalculation, const);
   FORWARD_TO_ENTITY(getEntityType, const);
   FORWARD_TO_ENTITY(getEntityTypename, const);
   FORWARD_TO_ENTITY(getLinearJerk, const);
@@ -450,6 +451,8 @@ public:
         }
       }(parameters);
 
+      const double matching_altitude = 1.0;
+
       if constexpr (std::is_same_v<std::decay_t<Pose>, LaneletPose>) {
         THROW_SYNTAX_ERROR(
           "LaneletPose is not supported type as pose argument. Only CanonicalizedLaneletPose and "
@@ -460,7 +463,8 @@ public:
       } else if constexpr (std::is_same_v<std::decay_t<Pose>, geometry_msgs::msg::Pose>) {
         entity_status.pose = pose;
         const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
-          pose, parameters.bounding_box, include_crosswalk, matching_distance, hdmap_utils_ptr_);
+          pose, parameters.bounding_box, include_crosswalk, matching_distance, matching_altitude,
+          hdmap_utils_ptr_);
         return CanonicalizedEntityStatus(entity_status, canonicalized_lanelet_pose);
       }
     };

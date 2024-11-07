@@ -59,6 +59,7 @@ public:
   DEFINE_GETTER_SETTER(CurrentTime,                                      double)
   DEFINE_GETTER_SETTER(DebugMarker,                                      std::vector<visualization_msgs::msg::Marker>)
   DEFINE_GETTER_SETTER(DefaultMatchingDistanceForLaneletPoseCalculation, double)
+  DEFINE_GETTER_SETTER(DefaultMatchingAltitudeForLaneletPoseCalculation, double)
   DEFINE_GETTER_SETTER(GoalPoses,                                        std::vector<geometry_msgs::msg::Pose>)
   DEFINE_GETTER_SETTER(HdMapUtils,                                       std::shared_ptr<hdmap_utils::HdMapUtils>)
   DEFINE_GETTER_SETTER(LaneChangeParameters,                             traffic_simulator::lane_change::Parameter)

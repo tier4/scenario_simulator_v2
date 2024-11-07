@@ -78,6 +78,7 @@ public:
       // clang-format off
       BT::InputPort<double>("current_time"),
       BT::InputPort<double>("matching_distance_for_lanelet_pose_calculation"),
+      BT::InputPort<double>("matching_altitude_for_lanelet_pose_calculation"),
       BT::InputPort<double>("step_time"),
       BT::InputPort<EntityStatusDict>("other_entity_status"),
       BT::InputPort<lanelet::Ids>("route_lanelets"),
@@ -117,6 +118,7 @@ protected:
   double current_time;
   double step_time;
   double default_matching_distance_for_lanelet_pose_calculation;
+  double default_matching_altitude_for_lanelet_pose_calculation;
   std::optional<double> target_speed;
   EntityStatusDict other_entity_status;
   lanelet::Ids route_lanelets;

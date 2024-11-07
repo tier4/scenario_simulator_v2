@@ -86,12 +86,13 @@ auto toCanonicalizedLaneletPose(
 auto toCanonicalizedLaneletPose(
   const geometry_msgs::msg::Pose & map_pose,
   const traffic_simulator_msgs::msg::BoundingBox & bounding_box, const bool include_crosswalk,
-  const double matching_distance, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+  const double matching_distance, const double matching_altitude,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
   -> std::optional<CanonicalizedLaneletPose>
 {
   if (
     const auto pose = hdmap_utils_ptr->toLaneletPose(
-      map_pose, bounding_box, include_crosswalk, matching_distance)) {
+      map_pose, bounding_box, include_crosswalk, matching_distance, matching_altitude)) {
     return canonicalize(pose.value(), hdmap_utils_ptr);
   } else {
     return std::nullopt;
@@ -102,17 +103,18 @@ auto toCanonicalizedLaneletPose(
   const geometry_msgs::msg::Pose & map_pose,
   const traffic_simulator_msgs::msg::BoundingBox & bounding_box,
   const lanelet::Ids & unique_route_lanelets, const bool include_crosswalk,
-  const double matching_distance, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+  const double matching_distance, const double matching_altitude,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
   -> std::optional<CanonicalizedLaneletPose>
 {
   std::optional<LaneletPose> lanelet_pose;
   if (!unique_route_lanelets.empty()) {
-    lanelet_pose =
-      hdmap_utils_ptr->toLaneletPose(map_pose, unique_route_lanelets, matching_distance);
+    lanelet_pose = hdmap_utils_ptr->toLaneletPose(
+      map_pose, unique_route_lanelets, matching_distance, matching_altitude);
   }
   if (!lanelet_pose) {
-    lanelet_pose =
-      hdmap_utils_ptr->toLaneletPose(map_pose, bounding_box, include_crosswalk, matching_distance);
+    lanelet_pose = hdmap_utils_ptr->toLaneletPose(
+      map_pose, bounding_box, include_crosswalk, matching_distance, matching_altitude);
   }
   if (lanelet_pose) {
     return canonicalize(lanelet_pose.value(), hdmap_utils_ptr);
@@ -286,13 +288,14 @@ auto transformToCanonicalizedLaneletPose(
   const geometry_msgs::msg::Pose & map_pose,
   const traffic_simulator_msgs::msg::BoundingBox & bounding_box,
   const lanelet::Ids & unique_route_lanelets, const bool include_crosswalk,
-  const double matching_distance, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+  const double matching_distance, const double matching_altitude,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
   -> std::optional<CanonicalizedLaneletPose>
 {
   if (
     const auto canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
       map_pose, bounding_box, unique_route_lanelets, include_crosswalk, matching_distance,
-      hdmap_utils_ptr)) {
+      matching_altitude, hdmap_utils_ptr)) {
     return canonicalized_lanelet_pose;
   }
   /**

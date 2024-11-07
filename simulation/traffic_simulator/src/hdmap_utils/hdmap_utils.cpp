@@ -157,7 +157,8 @@ auto HdMapUtils::getAllCanonicalizedLaneletPoses(
 // If route is not specified, the lanelet_id with the lowest array index is used as a candidate for
 // canonicalize destination.
 auto HdMapUtils::canonicalizeLaneletPose(
-  const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) const
+  const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose,
+  const double matching_altitude) const
   -> std::tuple<std::optional<traffic_simulator_msgs::msg::LaneletPose>, std::optional<lanelet::Id>>
 {
   auto canonicalized = lanelet_pose;
@@ -165,7 +166,16 @@ auto HdMapUtils::canonicalizeLaneletPose(
     if (const auto ids = getPreviousLaneletIds(canonicalized.lanelet_id); ids.empty()) {
       return {std::nullopt, canonicalized.lanelet_id};
     } else {
-      canonicalized.s += getLaneletLength(ids[0]);
+      const auto previous_lanelet_length = getLaneletLength(ids[0]);
+      const auto previous_pose = traffic_simulator::helper::constructLaneletPose(
+        ids[0], previous_lanelet_length, canonicalized.offset);
+
+      if (!isAltitudeMatching(
+            getAltitude(previous_pose), getAltitude(canonicalized), matching_altitude)) {
+        return {std::nullopt, canonicalized.lanelet_id};
+      }
+
+      canonicalized.s += previous_lanelet_length;
       canonicalized.lanelet_id = ids[0];
     }
   }
@@ -173,6 +183,14 @@ auto HdMapUtils::canonicalizeLaneletPose(
     if (const auto ids = getNextLaneletIds(canonicalized.lanelet_id); ids.empty()) {
       return {std::nullopt, canonicalized.lanelet_id};
     } else {
+      const auto next_pose =
+        traffic_simulator::helper::constructLaneletPose(ids[0], 0.0, canonicalized.offset);
+
+      if (!isAltitudeMatching(
+            getAltitude(next_pose), getAltitude(canonicalized), matching_altitude)) {
+        return {std::nullopt, canonicalized.lanelet_id};
+      }
+
       canonicalized.s -= getLaneletLength(canonicalized.lanelet_id);
       canonicalized.lanelet_id = ids[0];
     }
@@ -182,7 +200,7 @@ auto HdMapUtils::canonicalizeLaneletPose(
 
 auto HdMapUtils::canonicalizeLaneletPose(
   const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose,
-  const lanelet::Ids & route_lanelets) const
+  const lanelet::Ids & route_lanelets, const double matching_altitude) const
   -> std::tuple<std::optional<traffic_simulator_msgs::msg::LaneletPose>, std::optional<lanelet::Id>>
 {
   auto canonicalized = lanelet_pose;
@@ -191,6 +209,14 @@ auto HdMapUtils::canonicalizeLaneletPose(
     if (const auto ids = getPreviousLaneletIds(canonicalized.lanelet_id); ids.empty()) {
       return {std::nullopt, canonicalized.lanelet_id};
     } else {
+      const auto previous_pose = traffic_simulator::helper::constructLaneletPose(
+        ids[0], getLaneletLength(ids[0]), canonicalized.offset);
+
+      if (!isAltitudeMatching(
+            getAltitude(previous_pose), getAltitude(canonicalized), matching_altitude)) {
+        return {std::nullopt, canonicalized.lanelet_id};
+      }
+
       canonicalized.s += getLaneletLength(ids[0]);
       canonicalized.lanelet_id = ids[0];
     }
@@ -199,12 +225,21 @@ auto HdMapUtils::canonicalizeLaneletPose(
     bool next_lanelet_found = false;
     // When canonicalizing to forward lanelet_id, consider route
     for (const auto id : getNextLaneletIds(canonicalized.lanelet_id)) {
-      if (std::any_of(route_lanelets.begin(), route_lanelets.end(), [id](auto id_on_route) {
-            return id == id_on_route;
+      if (std::any_of(route_lanelets.begin(), route_lanelets.end(), [id](const auto & id_on_route) {
+            return id_on_route == id;
           })) {
+        const auto next_pose =
+          traffic_simulator::helper::constructLaneletPose(id, 0.0, canonicalized.offset);
+
+        if (!isAltitudeMatching(
+              getAltitude(next_pose), getAltitude(canonicalized), matching_altitude)) {
+          continue;
+        }
+
         canonicalized.s -= getLaneletLength(canonicalized.lanelet_id);
         canonicalized.lanelet_id = id;
         next_lanelet_found = true;
+        break;
       }
     }
     if (!next_lanelet_found) {
@@ -212,6 +247,11 @@ auto HdMapUtils::canonicalizeLaneletPose(
     }
   }
   return {canonicalized, std::nullopt};
+}
+auto HdMapUtils::isAltitudeMatching(
+  const double altitude1, const double altitude2, const double threshold) const -> bool
+{
+  return std::abs(altitude1 - altitude2) <= threshold;
 }
 
 auto HdMapUtils::countLaneChanges(
@@ -343,7 +383,7 @@ auto HdMapUtils::getNearbyLaneletIds(
   return lanelet_ids;
 }
 
-auto HdMapUtils::getHeight(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) const
+auto HdMapUtils::getAltitude(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) const
   -> double
 {
   return toMapPose(lanelet_pose).pose.position.z;
@@ -532,8 +572,8 @@ auto HdMapUtils::toPoint2d(const geometry_msgs::msg::Point & point) const -> lan
 
 auto HdMapUtils::matchToLane(
   const geometry_msgs::msg::Pose & pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
-  const bool include_crosswalk, const double matching_distance, const double reduction_ratio) const
-  -> std::optional<lanelet::Id>
+  const bool include_crosswalk, const double matching_distance, const double matching_altitude,
+  const double reduction_ratio) const -> std::optional<lanelet::Id>
 {
   std::optional<lanelet::Id> id;
   lanelet::matching::Object2d obj;
@@ -560,7 +600,9 @@ auto HdMapUtils::matchToLane(
   }
   std::vector<std::pair<lanelet::Id, double>> id_and_distance;
   for (const auto & match : matches) {
-    if (const auto lanelet_pose = toLaneletPose(pose, match.lanelet.id(), matching_distance)) {
+    if (
+      const auto lanelet_pose =
+        toLaneletPose(pose, match.lanelet.id(), matching_distance, matching_altitude)) {
       id_and_distance.emplace_back(lanelet_pose->lanelet_id, lanelet_pose->offset);
     }
   }
@@ -575,15 +617,15 @@ auto HdMapUtils::matchToLane(
 
 auto HdMapUtils::toLaneletPose(
   const geometry_msgs::msg::Pose & pose, const bool include_crosswalk,
-  const double matching_distance) const -> std::optional<traffic_simulator_msgs::msg::LaneletPose>
+  const double matching_distance, const double matching_altitude) const
+  -> std::optional<traffic_simulator_msgs::msg::LaneletPose>
 {
   const auto lanelet_ids = getNearbyLaneletIds(pose.position, 0.1, include_crosswalk);
   if (lanelet_ids.empty()) {
     return std::nullopt;
   }
   for (const auto & id : lanelet_ids) {
-    const auto lanelet_pose = toLaneletPose(pose, id, matching_distance);
-    if (lanelet_pose) {
+    if (const auto lanelet_pose = toLaneletPose(pose, id, matching_distance, matching_altitude)) {
       return lanelet_pose;
     }
   }
@@ -592,13 +634,23 @@ auto HdMapUtils::toLaneletPose(
 
 auto HdMapUtils::toLaneletPose(
   const geometry_msgs::msg::Pose & pose, const lanelet::Id lanelet_id,
-  const double matching_distance) const -> std::optional<traffic_simulator_msgs::msg::LaneletPose>
+  const double matching_distance, const double matching_altitude) const
+  -> std::optional<traffic_simulator_msgs::msg::LaneletPose>
 {
   const auto spline = getCenterPointsSpline(lanelet_id);
   const auto s = spline->getSValue(pose, matching_distance);
   if (!s) {
     return std::nullopt;
   }
+
+  const double lanelet_altitude =
+    getAltitude(traffic_simulator::helper::constructLaneletPose(lanelet_id, s.value(), 0.0));
+  const double entity_altitude = pose.position.z;
+
+  if (!isAltitudeMatching(entity_altitude, lanelet_altitude, matching_altitude)) {
+    return std::nullopt;
+  }
+
   auto pose_on_centerline = spline->getPose(s.value());
   auto rpy = math::geometry::convertQuaternionToEulerAngle(
     math::geometry::getRotation(pose_on_centerline.orientation, pose.orientation));
@@ -625,10 +677,12 @@ auto HdMapUtils::toLaneletPose(
 
 auto HdMapUtils::toLaneletPose(
   const geometry_msgs::msg::Pose & pose, const lanelet::Ids & lanelet_ids,
-  const double matching_distance) const -> std::optional<traffic_simulator_msgs::msg::LaneletPose>
+  const double matching_distance, const double matching_altitude) const
+  -> std::optional<traffic_simulator_msgs::msg::LaneletPose>
 {
   for (const auto id : lanelet_ids) {
-    if (const auto lanelet_pose = toLaneletPose(pose, id, matching_distance); lanelet_pose) {
+    if (const auto lanelet_pose = toLaneletPose(pose, id, matching_distance, matching_altitude);
+        lanelet_pose) {
       return lanelet_pose.value();
     }
   }
@@ -637,48 +691,51 @@ auto HdMapUtils::toLaneletPose(
 
 auto HdMapUtils::toLaneletPose(
   const geometry_msgs::msg::Point & position, const traffic_simulator_msgs::msg::BoundingBox & bbox,
-  const bool include_crosswalk, const double matching_distance) const
-  -> std::optional<traffic_simulator_msgs::msg::LaneletPose>
+  const bool include_crosswalk, const double matching_distance,
+  const double matching_altitude) const -> std::optional<traffic_simulator_msgs::msg::LaneletPose>
 {
   return toLaneletPose(
     geometry_msgs::build<geometry_msgs::msg::Pose>().position(position).orientation(
       geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0).y(0).z(0).w(1)),
-    bbox, include_crosswalk, matching_distance);
+    bbox, include_crosswalk, matching_distance, matching_altitude);
 }
 
 auto HdMapUtils::toLaneletPose(
   const geometry_msgs::msg::Pose & pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
-  const bool include_crosswalk, const double matching_distance) const
-  -> std::optional<traffic_simulator_msgs::msg::LaneletPose>
+  const bool include_crosswalk, const double matching_distance,
+  const double matching_altitude) const -> std::optional<traffic_simulator_msgs::msg::LaneletPose>
 {
-  const auto lanelet_id = matchToLane(pose, bbox, include_crosswalk, matching_distance);
+  const auto lanelet_id =
+    matchToLane(pose, bbox, include_crosswalk, matching_distance, matching_altitude);
   if (!lanelet_id) {
-    return toLaneletPose(pose, include_crosswalk, matching_distance);
+    return toLaneletPose(pose, include_crosswalk, matching_distance, matching_altitude);
   }
-  const auto pose_in_target_lanelet = toLaneletPose(pose, lanelet_id.value(), matching_distance);
+  const auto pose_in_target_lanelet =
+    toLaneletPose(pose, lanelet_id.value(), matching_distance, matching_altitude);
   if (pose_in_target_lanelet) {
     return pose_in_target_lanelet;
   }
   const auto previous = getPreviousLaneletIds(lanelet_id.value());
   for (const auto id : previous) {
-    const auto pose_in_previous = toLaneletPose(pose, id, matching_distance);
+    const auto pose_in_previous = toLaneletPose(pose, id, matching_distance, matching_altitude);
     if (pose_in_previous) {
       return pose_in_previous;
     }
   }
   const auto next = getNextLaneletIds(lanelet_id.value());
   for (const auto id : previous) {
-    const auto pose_in_next = toLaneletPose(pose, id, matching_distance);
+    const auto pose_in_next = toLaneletPose(pose, id, matching_distance, matching_altitude);
     if (pose_in_next) {
       return pose_in_next;
     }
   }
-  return toLaneletPose(pose, include_crosswalk);
+  return toLaneletPose(pose, include_crosswalk, matching_distance, matching_altitude);
 }
 
 auto HdMapUtils::toLaneletPoses(
   const geometry_msgs::msg::Pose & pose, const lanelet::Id lanelet_id,
-  const double matching_distance, const bool include_opposite_direction) const
+  const double matching_distance, const double matching_altitude,
+  const bool include_opposite_direction) const
   -> std::vector<traffic_simulator_msgs::msg::LaneletPose>
 {
   std::vector<traffic_simulator_msgs::msg::LaneletPose> ret;
@@ -690,7 +747,7 @@ auto HdMapUtils::toLaneletPoses(
   lanelet_ids += getPreviousLaneletIds(lanelet_ids);
   lanelet_ids += getNextLaneletIds(lanelet_ids);
   for (const auto & id : sortAndUnique(lanelet_ids)) {
-    if (const auto & lanelet_pose = toLaneletPose(pose, id, matching_distance)) {
+    if (const auto & lanelet_pose = toLaneletPose(pose, id, matching_distance, matching_altitude)) {
       ret.emplace_back(lanelet_pose.value());
     }
   }

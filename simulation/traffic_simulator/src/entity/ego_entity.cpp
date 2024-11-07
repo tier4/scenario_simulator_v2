@@ -154,6 +154,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
           static_cast<traffic_simulator::EntityStatus>(*status_), *polyline_trajectory_,
           behavior_parameter_, hdmap_utils_ptr_, step_time,
           getDefaultMatchingDistanceForLaneletPoseCalculation(),
+          getDefaultMatchingAltitudeForLaneletPoseCalculation(),
           target_speed_ ? target_speed_.value() : status_->getTwist().linear.x)) {
       // prefer current lanelet on ss2 side
       setStatus(non_canonicalized_updated_status.value(), status_->getLaneletIds());
@@ -302,7 +303,8 @@ auto EgoEntity::setMapPose(const geometry_msgs::msg::Pose & map_pose) -> void
   // prefer current lanelet on Autoware side
   status_->set(
     entity_status, helper::getUniqueValues(getRouteLanelets()),
-    getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
+    getDefaultMatchingDistanceForLaneletPoseCalculation(),
+    getDefaultMatchingAltitudeForLaneletPoseCalculation(), hdmap_utils_ptr_);
 }
 }  // namespace entity
 }  // namespace traffic_simulator

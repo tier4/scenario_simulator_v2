@@ -65,12 +65,14 @@ public:
 
   auto canChangeLane(const lanelet::Id from, const lanelet::Id to) const -> bool;
 
-  auto canonicalizeLaneletPose(const traffic_simulator_msgs::msg::LaneletPose &) const
+  auto canonicalizeLaneletPose(
+    const traffic_simulator_msgs::msg::LaneletPose &, const double matching_altitude = 1.0) const
     -> std::tuple<
       std::optional<traffic_simulator_msgs::msg::LaneletPose>, std::optional<lanelet::Id>>;
 
   auto canonicalizeLaneletPose(
-    const traffic_simulator_msgs::msg::LaneletPose &, const lanelet::Ids & route_lanelets) const
+    const traffic_simulator_msgs::msg::LaneletPose &, const lanelet::Ids & route_lanelets,
+    const double matching_altitude = 1.0) const
     -> std::tuple<
       std::optional<traffic_simulator_msgs::msg::LaneletPose>, std::optional<lanelet::Id>>;
 
@@ -145,7 +147,10 @@ public:
     const lanelet::Id, const double distance = 100, const bool include_self = true) const
     -> lanelet::Ids;
 
-  auto getHeight(const traffic_simulator_msgs::msg::LaneletPose &) const -> double;
+  auto getAltitude(const traffic_simulator_msgs::msg::LaneletPose &) const -> double;
+
+  auto isAltitudeMatching(
+    const double altitude1, const double altitude2, const double threshold) const -> bool;
 
   auto getLaneChangeTrajectory(
     const geometry_msgs::msg::Pose & from,
@@ -277,35 +282,39 @@ public:
   auto matchToLane(
     const geometry_msgs::msg::Pose &, const traffic_simulator_msgs::msg::BoundingBox &,
     const bool include_crosswalk, const double matching_distance = 1.0,
-    const double reduction_ratio = 0.8) const -> std::optional<lanelet::Id>;
+    const double matching_altitude = 1.0, const double reduction_ratio = 0.8) const
+    -> std::optional<lanelet::Id>;
 
   auto toLaneletPose(
     const geometry_msgs::msg::Pose &, const bool include_crosswalk,
-    const double matching_distance = 1.0) const
+    const double matching_distance = 1.0, const double matching_altitude = 1.0) const
     -> std::optional<traffic_simulator_msgs::msg::LaneletPose>;
 
   auto toLaneletPose(
-    const geometry_msgs::msg::Pose &, const lanelet::Ids &,
-    const double matching_distance = 1.0) const
+    const geometry_msgs::msg::Pose &, const lanelet::Id, const double matching_distance = 1.0,
+    const double matching_altitude = 1.0) const
+    -> std::optional<traffic_simulator_msgs::msg::LaneletPose>;
+
+  auto toLaneletPose(
+    const geometry_msgs::msg::Pose &, const lanelet::Ids &, const double matching_distance = 1.0,
+    const double matching_altitude = 1.0) const
     -> std::optional<traffic_simulator_msgs::msg::LaneletPose>;
 
   auto toLaneletPose(
     const geometry_msgs::msg::Point &, const traffic_simulator_msgs::msg::BoundingBox &,
-    const bool include_crosswalk, const double matching_distance = 1.0) const
+    const bool include_crosswalk, const double matching_distance = 1.0,
+    const double matching_altitude = 1.0) const
     -> std::optional<traffic_simulator_msgs::msg::LaneletPose>;
 
   auto toLaneletPose(
     const geometry_msgs::msg::Pose &, const traffic_simulator_msgs::msg::BoundingBox &,
-    const bool include_crosswalk, const double matching_distance = 1.0) const
-    -> std::optional<traffic_simulator_msgs::msg::LaneletPose>;
-
-  auto toLaneletPose(
-    const geometry_msgs::msg::Pose &, const lanelet::Id, const double matching_distance = 1.0) const
+    const bool include_crosswalk, const double matching_distance = 1.0,
+    const double matching_altitude = 1.0) const
     -> std::optional<traffic_simulator_msgs::msg::LaneletPose>;
 
   auto toLaneletPoses(
     const geometry_msgs::msg::Pose &, const lanelet::Id, const double matching_distance = 5.0,
-    const bool include_opposite_direction = true) const
+    const double matching_altitude = 1.0, const bool include_opposite_direction = true) const
     -> std::vector<traffic_simulator_msgs::msg::LaneletPose>;
 
   auto toMapBin() const -> autoware_auto_mapping_msgs::msg::HADMapBin;

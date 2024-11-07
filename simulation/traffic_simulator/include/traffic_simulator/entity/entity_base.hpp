@@ -112,7 +112,7 @@ public:
 
   /*   */ auto getCanonicalizedLaneletPose() const -> std::optional<CanonicalizedLaneletPose>;
 
-  /*   */ auto getCanonicalizedLaneletPose(double matching_distance) const
+  /*   */ auto getCanonicalizedLaneletPose(double matching_distance, double matching_altitude) const
     -> std::optional<CanonicalizedLaneletPose>;
 
   virtual auto getMaxAcceleration() const -> double = 0;
@@ -120,6 +120,8 @@ public:
   virtual auto getMaxDeceleration() const -> double = 0;
 
   virtual auto getDefaultMatchingDistanceForLaneletPoseCalculation() const -> double;
+
+  virtual auto getDefaultMatchingAltitudeForLaneletPoseCalculation() const -> double;
 
   virtual auto getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle> = 0;
 

@@ -74,6 +74,13 @@ auto ActionNode::getBlackBoardValues() -> void
       "failed to get input matching_distance_for_lanelet_pose_calculation in ActionNode");
   }
 
+  if (!getInput<double>(
+        "matching_altitude_for_lanelet_pose_calculation",
+        default_matching_altitude_for_lanelet_pose_calculation)) {
+    THROW_SIMULATION_ERROR(
+      "failed to get input matching_altitude_for_lanelet_pose_calculation in ActionNode");
+  }
+
   if (!getInput<EntityStatusDict>("other_entity_status", other_entity_status)) {
     THROW_SIMULATION_ERROR("failed to get input other_entity_status in ActionNode");
   }
@@ -98,7 +105,8 @@ auto ActionNode::setCanonicalizedEntityStatus(const traffic_simulator::EntitySta
   -> void
 {
   canonicalized_entity_status->set(
-    entity_status, default_matching_distance_for_lanelet_pose_calculation, hdmap_utils);
+    entity_status, default_matching_distance_for_lanelet_pose_calculation,
+    default_matching_altitude_for_lanelet_pose_calculation, hdmap_utils);
 }
 
 auto ActionNode::getOtherEntityStatus(lanelet::Id lanelet_id) const

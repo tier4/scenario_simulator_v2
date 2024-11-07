@@ -43,6 +43,8 @@ VehicleEntity::VehicleEntity(
   behavior_plugin_ptr_->setHdMapUtils(hdmap_utils_ptr_);
   behavior_plugin_ptr_->setDefaultMatchingDistanceForLaneletPoseCalculation(
     getDefaultMatchingDistanceForLaneletPoseCalculation());
+  behavior_plugin_ptr_->setDefaultMatchingAltitudeForLaneletPoseCalculation(
+    getDefaultMatchingAltitudeForLaneletPoseCalculation());
 }
 
 void VehicleEntity::appendDebugMarker(visualization_msgs::msg::MarkerArray & marker_array)
@@ -171,7 +173,8 @@ void VehicleEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_
   if (
     const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
       map_pose, status_->getBoundingBox(), false,
-      getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_)) {
+      getDefaultMatchingDistanceForLaneletPoseCalculation(),
+      getDefaultMatchingAltitudeForLaneletPoseCalculation(), hdmap_utils_ptr_)) {
     requestAcquirePosition(canonicalized_lanelet_pose.value());
   } else {
     THROW_SEMANTIC_ERROR("Goal of the vehicle entity should be on lane.");
@@ -199,7 +202,8 @@ void VehicleEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pos
     if (
       const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
         waypoint, status_->getBoundingBox(), false,
-        getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_)) {
+        getDefaultMatchingDistanceForLaneletPoseCalculation(),
+        getDefaultMatchingAltitudeForLaneletPoseCalculation(), hdmap_utils_ptr_)) {
       route.emplace_back(canonicalized_lanelet_pose.value());
     } else {
       THROW_SEMANTIC_ERROR("Waypoint of vehicle entity should be on lane.");
@@ -218,7 +222,8 @@ auto VehicleEntity::requestFollowTrajectory(
     if (
       const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
         vertex.position, status_->getBoundingBox(), false,
-        getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_)) {
+        getDefaultMatchingDistanceForLaneletPoseCalculation(),
+        getDefaultMatchingAltitudeForLaneletPoseCalculation(), hdmap_utils_ptr_)) {
       waypoints.emplace_back(canonicalized_lanelet_pose.value());
     } else {
       /// @todo such a protection most likely makes sense, but test scenario
