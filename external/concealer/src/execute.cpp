@@ -17,6 +17,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+#include <array>
 #include <concealer/execute.hpp>
 #include <cstdio>
 #include <cstdlib>

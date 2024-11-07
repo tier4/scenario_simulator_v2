@@ -110,7 +110,7 @@ auto AutowareUniverse::updateLocalization() -> void
 
 auto AutowareUniverse::updateVehicleState() -> void
 {
-  setControlModeReport([this]() {
+  setControlModeReport([]() {
     autoware_auto_vehicle_msgs::msg::ControlModeReport message;
     message.mode = autoware_auto_vehicle_msgs::msg::ControlModeReport::AUTONOMOUS;
     return message;
