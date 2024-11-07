@@ -21,6 +21,57 @@ Changelog for package traffic_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+4.4.1 (2024-11-07)
+------------------
+* Merge pull request `#1404 <https://github.com/tier4/scenario_simulator_v2/issues/1404>`_ from tier4/RJD-1336/fix_request_speed_change
+  RJD-1336/fix_request_speed_change_throws
+* Merge branch 'master' into RJD-1336/fix_request_speed_change
+* Merge branch 'master' into RJD-1336/fix_request_speed_change
+* Merge branch 'RJD-1336/fix_request_speed_change' of github.com:tier4/scenario_simulator_v2 into RJD-1336/fix_request_speed_change
+* add constexpr
+* Merge branch 'master' into RJD-1336/fix_request_speed_change
+* add update frame to update other_statuses
+* Merge branch 'master' into RJD-1336/fix_request_speed_change
+* invert check, add const, add variable names
+* Contributors: Masaya Kataoka, Michał Ciasnocha, robomic
+
+4.4.0 (2024-11-07)
+------------------
+* Merge pull request `#1403 <https://github.com/tier4/scenario_simulator_v2/issues/1403>`_ from tier4/fix/longitudinal_distance
+  RJD-1334/fix_longitudinal_distance
+* add comment
+* Merge branch 'master' into fix/longitudinal_distance
+* Merge branch 'master' into fix/longitudinal_distance
+* Merge branch 'master' into fix/longitudinal_distance
+* typo
+* remove underflow
+* remove negative distance, unify logic
+* Merge branch 'master' into fix/longitudinal_distance
+* early return, update tests
+* Merge branch 'fix/longitudinal_distance' of github.com:tier4/scenario_simulator_v2 into fix/longitudinal_distance
+* consider negative longitudinal distance
+* Merge branch 'master' into fix/longitudinal_distance
+* remove no longer used pngs
+* Merge branch 'fix/longitudinal_distance' of github.com:tier4/scenario_simulator_v2 into fix/longitudinal_distance
+* Merge branch 'master' into fix/longitudinal_distance
+* getLongitudinalDistance refactor
+* name values explicitly
+* add negated tests
+* simplify lambda
+* additional lane change check, logic simplification
+* lanelet extension approach
+* Contributors: Masaya Kataoka, Michał Ciasnocha, robomic
+
+4.3.27 (2024-11-07)
+-------------------
+* Merge pull request `#1438 <https://github.com/tier4/scenario_simulator_v2/issues/1438>`_ from tier4/fix/add_comment_for_empty_function
+  Add comment for empty functions.
+* remove warnings about misc object entity
+* fix problem about https://sonarcloud.io/project/issues?open=AZJwAY5JlcZ2d3dSAT64&id=tier4_scenario_simulator_v2
+* fix problems about https://sonarcloud.io/project/issues?open=AZINWTDsjvEq9OQMnL7a&id=tier4_scenario_simulator_v2
+* fix warnings about https://sonarcloud.io/project/issues?open=AZJwAY5JlcZ2d3dSAT63&id=tier4_scenario_simulator_v2
+* Contributors: Masaya Kataoka
+
 4.3.26 (2024-11-06)
 -------------------
 * Merge pull request `#1430 <https://github.com/tier4/scenario_simulator_v2/issues/1430>`_ from tier4/fix/refactor-code

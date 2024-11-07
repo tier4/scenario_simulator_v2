@@ -187,9 +187,9 @@ public:
     const bool include_opposite_direction = true) const -> lanelet::Ids;
 
   auto getLongitudinalDistance(
-    const traffic_simulator_msgs::msg::LaneletPose & from,
-    const traffic_simulator_msgs::msg::LaneletPose & to, bool allow_lane_change = false) const
-    -> std::optional<double>;
+    const traffic_simulator_msgs::msg::LaneletPose & from_pose,
+    const traffic_simulator_msgs::msg::LaneletPose & to_pose,
+    const bool allow_lane_change = false) const -> std::optional<double>;
 
   auto getNearbyLaneletIds(
     const geometry_msgs::msg::Point &, const double distance_threshold,
