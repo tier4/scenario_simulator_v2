@@ -102,7 +102,8 @@ std::optional<std::pair<geometry_msgs::msg::Pose, geometry_msgs::msg::Pose>> get
 boost_point pointToSegmentProjection(
   const boost_point & p, const boost_point & p1, const boost_point & p2)
 {
-  boost_point v = p2, w = p;
+  auto v = p2;
+  auto w = p;
   boost::geometry::subtract_point(v, p1);
   boost::geometry::subtract_point(w, p1);
 
