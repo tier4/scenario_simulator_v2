@@ -94,13 +94,13 @@ std::set<double> HermiteCurve::getCollisionPointsIn2D(
   }
   std::set<double> s_values;
   for (size_t i = 0; i < (n - 1); i++) {
-    const auto p0 = polygon[i];
-    const auto p1 = polygon[i + 1];
+    const auto & p0 = polygon[i];
+    const auto & p1 = polygon[i + 1];
     s_values.merge(getCollisionPointsIn2D(p0, p1, search_backward, denormalize_s));
   }
   if (close_start_end) {
-    const auto p0 = polygon[n - 1];
-    const auto p1 = polygon[0];
+    const auto & p0 = polygon[n - 1];
+    const auto & p1 = polygon[0];
     s_values.merge(getCollisionPointsIn2D(p0, p1, search_backward, denormalize_s));
   }
   return s_values;
@@ -202,7 +202,8 @@ std::optional<double> HermiteCurve::getCollisionPointIn2D(
 std::optional<double> HermiteCurve::getSValue(
   const geometry_msgs::msg::Pose & pose, double threshold_distance, bool denormalize_s) const
 {
-  geometry_msgs::msg::Point p0, p1;
+  geometry_msgs::msg::Point p0;
+  geometry_msgs::msg::Point p1;
   p0.y = threshold_distance;
   p1.y = -threshold_distance;
   const auto line = math::geometry::transformPoints(pose, {p0, p1});
