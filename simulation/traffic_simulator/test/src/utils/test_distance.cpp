@@ -31,10 +31,10 @@ int main(int argc, char ** argv)
   return RUN_ALL_TESTS();
 }
 
-class distanceTest_FourTrackHighway : public testing::Test
+class distanceTest_FourTrackHighwayMap : public testing::Test
 {
 protected:
-  distanceTest_FourTrackHighway()
+  distanceTest_FourTrackHighwayMap()
   : hdmap_utils_ptr(std::make_shared<hdmap_utils::HdMapUtils>(
       ament_index_cpp::get_package_share_directory("traffic_simulator") +
         "/map/four_track_highway/lanelet2_map.osm",
@@ -63,10 +63,10 @@ protected:
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr;
 };
 
-class distanceTest_Intersection : public testing::Test
+class distanceTest_IntersectionMap : public testing::Test
 {
 protected:
-  distanceTest_Intersection()
+  distanceTest_IntersectionMap()
   : hdmap_utils_ptr(std::make_shared<hdmap_utils::HdMapUtils>(
       ament_index_cpp::get_package_share_directory("traffic_simulator") +
         "/map/intersection/lanelet2_map.osm",
@@ -84,7 +84,7 @@ protected:
  * in which it is impossible to calculate the distance, e.g. not connected lanelets
  * and with allow_lane_change = false.
  */
-TEST_F(distanceTest_FourTrackHighway, lateralDistance_impossible_noChange)
+TEST_F(distanceTest_FourTrackHighwayMap, lateralDistance_impossible_noChange)
 {
   const auto pose_from = traffic_simulator::helper::constructCanonicalizedLaneletPose(
     3002184L, 0.0, 0.0, hdmap_utils_ptr);
@@ -107,7 +107,7 @@ TEST_F(distanceTest_FourTrackHighway, lateralDistance_impossible_noChange)
  * in which it is possible to calculate the distance
  * and with allow_lane_change = false.
  */
-TEST_F(distanceTest_FourTrackHighway, lateralDistance_possible_noChange)
+TEST_F(distanceTest_FourTrackHighwayMap, lateralDistance_possible_noChange)
 {
   const auto pose_from = traffic_simulator::helper::constructCanonicalizedLaneletPose(
     3002184L, 0.0, 0.0, hdmap_utils_ptr);
@@ -132,7 +132,7 @@ TEST_F(distanceTest_FourTrackHighway, lateralDistance_possible_noChange)
  * in which it is impossible to calculate the distance, e.g. not connected lanelets
  * and with allow_lane_change = true.
  */
-TEST_F(distanceTest_FourTrackHighway, lateralDistance_impossible_change)
+TEST_F(distanceTest_FourTrackHighwayMap, lateralDistance_impossible_change)
 {
   const auto pose_from =
     traffic_simulator::helper::constructCanonicalizedLaneletPose(202L, 0.0, 0.0, hdmap_utils_ptr);
@@ -155,7 +155,7 @@ TEST_F(distanceTest_FourTrackHighway, lateralDistance_impossible_change)
  * in which it is possible to calculate the distance
  * and with allow_lane_change = true.
  */
-TEST_F(distanceTest_FourTrackHighway, lateralDistance_possible_change)
+TEST_F(distanceTest_FourTrackHighwayMap, lateralDistance_possible_change)
 {
   const auto pose_from = traffic_simulator::helper::constructCanonicalizedLaneletPose(
     3002184L, 0.0, 0.0, hdmap_utils_ptr);
@@ -181,7 +181,7 @@ TEST_F(distanceTest_FourTrackHighway, lateralDistance_possible_change)
  * @note Test if the function correctly uses getLateralDistance. Test with a scenario
  * in which it is possible to calculate the distance, but matching_distance is too small.
  */
-TEST_F(distanceTest_FourTrackHighway, lateralDistance_impossible_matching)
+TEST_F(distanceTest_FourTrackHighwayMap, lateralDistance_impossible_matching)
 {
   const auto pose_from =
     traffic_simulator::helper::constructCanonicalizedLaneletPose(202L, 0.0, 0.0, hdmap_utils_ptr);
@@ -198,7 +198,7 @@ TEST_F(distanceTest_FourTrackHighway, lateralDistance_impossible_matching)
  * @note Test if the function correctly uses getLateralDistance. Test with a scenario
  * in which it is possible to calculate the distance and matching_distance is large.
  */
-TEST_F(distanceTest_FourTrackHighway, lateralDistance_possible_matching)
+TEST_F(distanceTest_FourTrackHighwayMap, lateralDistance_possible_matching)
 {
   const auto pose_from = traffic_simulator::helper::constructCanonicalizedLaneletPose(
     3002184L, 0.0, 0.0, hdmap_utils_ptr);
@@ -218,7 +218,7 @@ TEST_F(distanceTest_FourTrackHighway, lateralDistance_possible_matching)
  * include_opposite_direction = false, allow_lane_change = false
  * in an impossible scenario, e.g. no path.
  */
-TEST_F(distanceTest_FourTrackHighway, longitudinalDistance_noAdjacent_noOpposite_noChange_false)
+TEST_F(distanceTest_FourTrackHighwayMap, longitudinalDistance_noAdjacent_noOpposite_noChange_false)
 {
   {
     const auto pose_from = traffic_simulator::toCanonicalizedLaneletPose(
@@ -261,7 +261,7 @@ TEST_F(distanceTest_StandardMap, longitudinalDistance_noAdjacent_noOpposite_noCh
  * include_opposite_direction = false, allow_lane_change = false
  * in an impossible scenario, e.g. no path.
  */
-TEST_F(distanceTest_FourTrackHighway, longitudinalDistance_adjacent_noOpposite_noChange_false)
+TEST_F(distanceTest_FourTrackHighwayMap, longitudinalDistance_adjacent_noOpposite_noChange_false)
 {
   {
     const auto pose_from = traffic_simulator::toCanonicalizedLaneletPose(
@@ -282,7 +282,7 @@ TEST_F(distanceTest_FourTrackHighway, longitudinalDistance_adjacent_noOpposite_n
  * include_opposite_direction = false, allow_lane_change = false
  * in a scenario that meets those criteria.
  */
-TEST_F(distanceTest_FourTrackHighway, longitudinalDistance_adjacent_noOpposite_noChange)
+TEST_F(distanceTest_FourTrackHighwayMap, longitudinalDistance_adjacent_noOpposite_noChange)
 {
   {
     const auto pose_from = traffic_simulator::toCanonicalizedLaneletPose(
@@ -304,7 +304,7 @@ TEST_F(distanceTest_FourTrackHighway, longitudinalDistance_adjacent_noOpposite_n
  * include_opposite_direction = false, allow_lane_change = true
  * in an impossible scenario, e.g. no path.
  */
-TEST_F(distanceTest_FourTrackHighway, longitudinalDistance_noAdjacent_noOpposite_change_false)
+TEST_F(distanceTest_FourTrackHighwayMap, longitudinalDistance_noAdjacent_noOpposite_change_false)
 {
   {
     const auto pose_from = traffic_simulator::toCanonicalizedLaneletPose(
@@ -337,7 +337,7 @@ TEST_F(distanceTest_FourTrackHighway, longitudinalDistance_noAdjacent_noOpposite
  * include_opposite_direction = false, allow_lane_change = true
  * in a scenario that meets those criteria.
  */
-TEST_F(distanceTest_FourTrackHighway, longitudinalDistance_noAdjacent_noOpposite_change)
+TEST_F(distanceTest_FourTrackHighwayMap, longitudinalDistance_noAdjacent_noOpposite_change_case0)
 {
   {
     const auto pose_from = traffic_simulator::toCanonicalizedLaneletPose(
@@ -368,11 +368,66 @@ TEST_F(distanceTest_FourTrackHighway, longitudinalDistance_noAdjacent_noOpposite
 }
 
 /**
+ * @note Test for the corner case described in https://github.com/tier4/scenario_simulator_v2/issues/1364
+ */
+TEST_F(distanceTest_IntersectionMap, longitudinalDistance_noAdjacent_noOpposite_change_case1)
+{
+  {
+    const auto pose_from = traffic_simulator::toCanonicalizedLaneletPose(
+      makePose(86627.71, 44972.06, 340.0), false, hdmap_utils_ptr);
+    ASSERT_TRUE(pose_from.has_value());
+    const auto pose_to = traffic_simulator::toCanonicalizedLaneletPose(
+      makePose(86647.23, 44882.51, 240.0), false, hdmap_utils_ptr);
+    ASSERT_TRUE(pose_from.has_value());
+
+    const auto result = traffic_simulator::distance::longitudinalDistance(
+      pose_from.value(), pose_to.value(), false, false, true, hdmap_utils_ptr);
+    EXPECT_NO_THROW(EXPECT_NEAR(result.value(), 118.0, 1.0));
+  }
+  {
+    const auto pose_from = traffic_simulator::toCanonicalizedLaneletPose(
+      makePose(86555.38, 45000.88, 340.0), false, hdmap_utils_ptr);
+    ASSERT_TRUE(pose_from.has_value());
+    const auto pose_to = traffic_simulator::toCanonicalizedLaneletPose(
+      makePose(86647.23, 44882.51, 240.0), false, hdmap_utils_ptr);
+    ASSERT_TRUE(pose_from.has_value());
+
+    const auto result = traffic_simulator::distance::longitudinalDistance(
+      pose_from.value(), pose_to.value(), false, false, true, hdmap_utils_ptr);
+    EXPECT_NO_THROW(EXPECT_NEAR(result.value(), 195.0, 1.0));
+  }
+  {
+    const auto pose_from = traffic_simulator::toCanonicalizedLaneletPose(
+      makePose(86788.82, 44993.77, 210.0), false, hdmap_utils_ptr);
+    ASSERT_TRUE(pose_from.has_value());
+    const auto pose_to = traffic_simulator::toCanonicalizedLaneletPose(
+      makePose(86553.48, 44990.56, 150.0), false, hdmap_utils_ptr);
+    ASSERT_TRUE(pose_from.has_value());
+
+    const auto result = traffic_simulator::distance::longitudinalDistance(
+      pose_from.value(), pose_to.value(), false, false, true, hdmap_utils_ptr);
+    EXPECT_NO_THROW(EXPECT_NEAR(result.value(), 257.0, 1.0));
+  }
+  {
+    const auto pose_from = traffic_simulator::toCanonicalizedLaneletPose(
+      makePose(86788.82, 44993.77, 210.0), false, hdmap_utils_ptr);
+    ASSERT_TRUE(pose_from.has_value());
+    const auto pose_to = traffic_simulator::toCanonicalizedLaneletPose(
+      makePose(86579.91, 44979.00, 150.0), false, hdmap_utils_ptr);
+    ASSERT_TRUE(pose_from.has_value());
+
+    const auto result = traffic_simulator::distance::longitudinalDistance(
+      pose_from.value(), pose_to.value(), false, false, true, hdmap_utils_ptr);
+    EXPECT_NO_THROW(EXPECT_NEAR(result.value(), 228.0, 1.0));
+  }
+}
+
+/**
  * @note Test calculation correctness with include_adjacent_lanelet = true,
  * include_opposite_direction = false, allow_lane_change = true
  * in an impossible scenario, e.g. no path.
  */
-TEST_F(distanceTest_Intersection, longitudinalDistance_adjacent_noOpposite_change_false)
+TEST_F(distanceTest_IntersectionMap, longitudinalDistance_adjacent_noOpposite_change_false)
 {
   {
     const auto pose_from = traffic_simulator::toCanonicalizedLaneletPose(
@@ -405,7 +460,7 @@ TEST_F(distanceTest_Intersection, longitudinalDistance_adjacent_noOpposite_chang
  * include_opposite_direction = false, allow_lane_change = true
  * in a scenario that meets those criteria.
  */
-TEST_F(distanceTest_Intersection, longitudinalDistance_adjacent_noOpposite_change)
+TEST_F(distanceTest_IntersectionMap, longitudinalDistance_adjacent_noOpposite_change)
 {
   {
     const auto pose_from = traffic_simulator::toCanonicalizedLaneletPose(
@@ -593,7 +648,7 @@ TEST_F(distanceTest_StandardMap, distanceToLeftLaneBound_emptyVector)
 /**
  * @note Test calculation correctness with lanelet::Id.
  */
-TEST_F(distanceTest_Intersection, distanceToRightLaneBound_single)
+TEST_F(distanceTest_IntersectionMap, distanceToRightLaneBound_single)
 {
   constexpr lanelet::Id lanelet_id = 660L;
   constexpr double tolerance = 0.1;
@@ -659,7 +714,7 @@ TEST_F(distanceTest_Intersection, distanceToRightLaneBound_single)
  * @note Test calculation correctness with a vector containing multiple lanelets.
  * Test equality with the minimum of distanceToRightLaneBound results (lanelet::Id overload).
  */
-TEST_F(distanceTest_Intersection, distanceToRightLaneBound_multipleVector)
+TEST_F(distanceTest_IntersectionMap, distanceToRightLaneBound_multipleVector)
 {
   const auto lanelet_ids = lanelet::Ids{660L, 663L, 684L, 654L, 686L};
   const auto pose = makePose(86642.05, 44902.61, 60.0);
@@ -681,7 +736,7 @@ TEST_F(distanceTest_Intersection, distanceToRightLaneBound_multipleVector)
  * @note Test calculation correctness with a vector containing a single lanelet.
  * Test equality with the distanceToRightLaneBound result (lanelet::Id overload).
  */
-TEST_F(distanceTest_Intersection, distanceToRightLaneBound_singleVector)
+TEST_F(distanceTest_IntersectionMap, distanceToRightLaneBound_singleVector)
 {
   constexpr lanelet::Id lanelet_id = 654L;
   const auto pose = makePose(86702.79, 44929.05, 150.0);
@@ -697,7 +752,7 @@ TEST_F(distanceTest_Intersection, distanceToRightLaneBound_singleVector)
 /**
  * @note Test function behavior with an empty vector.
  */
-TEST_F(distanceTest_Intersection, distanceToRightLaneBound_emptyVector)
+TEST_F(distanceTest_IntersectionMap, distanceToRightLaneBound_emptyVector)
 {
   const auto pose = makePose(3825.87, 73773.08, 135.0);
   const auto bounding_box = makeCustom2DBoundingBox(0.1, 0.1, 0.0, 0.0);
