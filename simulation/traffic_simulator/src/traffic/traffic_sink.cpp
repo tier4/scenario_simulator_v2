@@ -38,28 +38,28 @@ namespace traffic_simulator
 namespace traffic
 {
 TrafficSink::TrafficSink(
-  lanelet::Id lanelet_id, double radius, const geometry_msgs::msg::Point & position,
-  const std::function<std::vector<std::string>(void)> & get_entity_names_function,
-  const std::function<geometry_msgs::msg::Pose(const std::string &)> & get_entity_pose_function,
-  const std::function<void(std::string)> & despawn_function)
+  const lanelet::Id lanelet_id, const double radius, const geometry_msgs::msg::Point & position,
+  const std::function<std::vector<std::string>(void)> & get_entity_names,
+  const std::function<geometry_msgs::msg::Pose(const std::string &)> & get_entity_pose,
+  const std::function<void(std::string)> & despawn)
 : TrafficModuleBase(),
   lanelet_id(lanelet_id),
   radius(radius),
   position(position),
-  get_entity_names_function(get_entity_names_function),
-  get_entity_pose_function(get_entity_pose_function),
-  despawn_function(despawn_function)
+  get_entity_names(get_entity_names),
+  get_entity_pose(get_entity_pose),
+  despawn(despawn)
 {
 }
 
 void TrafficSink::execute(
   [[maybe_unused]] const double current_time, [[maybe_unused]] const double step_time)
 {
-  const auto names = get_entity_names_function();
+  const auto names = get_entity_names();
   for (const auto & name : names) {
-    const auto pose = get_entity_pose_function(name);
+    const auto pose = get_entity_pose(name);
     if (math::geometry::getDistance(position, pose) <= radius) {
-      despawn_function(name);
+      despawn(name);
     }
   }
 }
