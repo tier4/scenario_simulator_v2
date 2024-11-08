@@ -71,7 +71,9 @@ private:
   int timeout_;
   auto configure(
     const std::string & map_path, const std::string & lanelet2_map_file,
-    const std::string & scenario_filename, const bool verbose) -> traffic_simulator::Configuration
+    const std::string & scenario_filename, const bool verbose, const bool auto_sink = false,
+    const std::set<traffic_simulator::EntityType, traffic_simulator::EntityTypeComparator>
+      sinkable_entity_type = {}) -> traffic_simulator::Configuration
   {
     auto configuration = traffic_simulator::Configuration(map_path);
     {
@@ -79,6 +81,8 @@ private:
       // configuration.lanelet2_map_file = "lanelet2_map_with_private_road_and_walkway_ele_fix.osm";
       configuration.scenario_path = scenario_filename;
       configuration.verbose = verbose;
+      configuration.auto_sink = auto_sink;
+      configuration.sinkable_entity_type = sinkable_entity_type;
     }
     checkConfiguration(configuration);
     return configuration;
