@@ -42,10 +42,10 @@ class TrafficSink : public TrafficModuleBase
 {
 public:
   explicit TrafficSink(
-    lanelet::Id lanelet_id, double radius, const geometry_msgs::msg::Point & position,
-    const std::function<std::vector<std::string>(void)> & get_entity_names_function,
-    const std::function<geometry_msgs::msg::Pose(const std::string &)> & get_entity_pose_function,
-    const std::function<void(std::string)> & despawn_function);
+    const lanelet::Id lanelet_id, const double radius, const geometry_msgs::msg::Point & position,
+    const std::function<std::vector<std::string>(void)> & get_entity_names,
+    const std::function<geometry_msgs::msg::Pose(const std::string &)> & get_entity_pose,
+    const std::function<void(std::string)> & despawn);
   const lanelet::Id lanelet_id;
   const double radius;
   const geometry_msgs::msg::Point position;
@@ -54,9 +54,9 @@ public:
     -> void override;
 
 private:
-  const std::function<std::vector<std::string>(void)> get_entity_names_function;
-  const std::function<geometry_msgs::msg::Pose(const std::string &)> get_entity_pose_function;
-  const std::function<void(const std::string &)> despawn_function;
+  const std::function<std::vector<std::string>(void)> get_entity_names;
+  const std::function<geometry_msgs::msg::Pose(const std::string &)> get_entity_pose;
+  const std::function<void(const std::string &)> despawn;
 };
 }  // namespace traffic
 }  // namespace traffic_simulator
