@@ -645,40 +645,57 @@ public:
     }
 
     template <typename... Ts>
-    static auto getConventionalTrafficLights(Ts &&... xs) -> decltype(auto)
-    {
-      return core->getConventionalTrafficLights(std::forward<decltype(xs)>(xs)...);
-    }
-
-    template <typename... Ts>
-    static auto getV2ITrafficLights(Ts &&... xs) -> decltype(auto)
-    {
-      return core->getV2ITrafficLights(std::forward<decltype(xs)>(xs)...);
-    }
-
-    template <typename... Ts>
-    static auto resetConventionalTrafficLightPublishRate(Ts &&... xs) -> decltype(auto)
-    {
-      return core->resetConventionalTrafficLightPublishRate(std::forward<decltype(xs)>(xs)...);
-    }
-
-    template <typename... Ts>
-    static auto resetV2ITrafficLightPublishRate(Ts &&... xs) -> decltype(auto)
-    {
-      return core->resetV2ITrafficLightPublishRate(std::forward<decltype(xs)>(xs)...);
-    }
-
-    template <typename... Ts>
     static auto sendCooperateCommand(Ts &&... xs) -> decltype(auto)
     {
       return asFieldOperatorApplication(core->getEgoName())
         .sendCooperateCommand(std::forward<decltype(xs)>(xs)...);
     }
 
+    // TrafficLights - Conventional and V2I
+    template <typename... Ts>
+    static auto setConventionalTrafficLightsState(Ts &&... xs) -> decltype(auto)
+    {
+      return core->getConventionalTrafficLights()->setTrafficLightsState(
+        std::forward<decltype(xs)>(xs)...);
+    }
+
     template <typename... Ts>
     static auto setConventionalTrafficLightConfidence(Ts &&... xs) -> decltype(auto)
     {
-      return core->setConventionalTrafficLightConfidence(std::forward<decltype(xs)>(xs)...);
+      return core->getConventionalTrafficLights()->setTrafficLightsConfidence(
+        std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto getConventionalTrafficLightsComposedState(Ts &&... xs) -> decltype(auto)
+    {
+      return core->getConventionalTrafficLights()->getTrafficLightsComposedState(
+        std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto compareConventionalTrafficLightsState(Ts &&... xs) -> decltype(auto)
+    {
+      return core->getConventionalTrafficLights()->compareTrafficLightsState(
+        std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto resetConventionalTrafficLightPublishRate(Ts &&... xs) -> decltype(auto)
+    {
+      return core->getConventionalTrafficLights()->resetUpdate(std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto setV2ITrafficLightsState(Ts &&... xs) -> decltype(auto)
+    {
+      return core->getV2ITrafficLights()->setTrafficLightsState(std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto resetV2ITrafficLightPublishRate(Ts &&... xs) -> decltype(auto)
+    {
+      return core->getV2ITrafficLights()->resetUpdate(std::forward<decltype(xs)>(xs)...);
     }
   };
 };

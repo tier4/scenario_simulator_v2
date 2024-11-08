@@ -162,7 +162,8 @@ private:
       "obstacle", "ego", traffic_simulator::helper::constructPose(10, 5, 0, 0, 0, -1.57),
       traffic_simulator::helper::constructActionStatus());
 
-    api_.getConventionalTrafficLight(34802).emplace(traffic_simulator::TrafficLight::Color::green);
+    api_.getConventionalTrafficLights()->setTrafficLightsColor(
+      34802, traffic_simulator::TrafficLight::Color::green);
   }
 
 private:
