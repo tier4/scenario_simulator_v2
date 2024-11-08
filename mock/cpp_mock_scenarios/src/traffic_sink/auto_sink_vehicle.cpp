@@ -40,13 +40,12 @@ public:
 private:
   void onUpdate() override
   {
-    const auto map_pose = traffic_simulator::pose::toMapPose(
-      traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        120545, 0.0, 0.0, api_.getHdmapUtils()));
-    if (api_.reachPosition("ego", map_pose, 0.1)) {
-      stop(cpp_mock_scenarios::Result::SUCCESS);
-    } else {
-      stop(cpp_mock_scenarios::Result::FAILURE);
+    if (api_.getCurrentTime() >= 0.1) {
+      if (api_.entityExists("ego") && !api_.entityExists("ego")) {
+        stop(cpp_mock_scenarios::Result::FAILURE);
+      } else {
+        stop(cpp_mock_scenarios::Result::SUCCESS);
+      }
     }
   }
 
@@ -56,8 +55,14 @@ private:
       "ego",
       traffic_simulator::pose::toMapPose(
         traffic_simulator::helper::constructCanonicalizedLaneletPose(
-          120545, 0.0, 0.0, api_.getHdmapUtils())),
+          34774, 11.0, 0.0, api_.getHdmapUtils())),
       getVehicleParameters());
+    api_.spawn(
+      "bob",
+      traffic_simulator::pose::toMapPose(
+        traffic_simulator::helper::constructCanonicalizedLaneletPose(
+          34774, 11.0, 0.0, api_.getHdmapUtils())),
+      getPedestrianParameters());
   }
 };
 }  // namespace cpp_mock_scenarios
