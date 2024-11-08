@@ -50,7 +50,7 @@ public:
    * @param position Position of the traffic sink.
    * @param get_entity_names Function to get the name of entity
    * @param get_entity_type Function to get the type of entity
-   * @param sinkable_entity_type If this type is applicable, the entity is dewpanned only when it approaches radius [m] or less from the TrafficSink. If empty, all entity types are candidates for despawn.
+   * @param sinkable_entity_type If this type is applicable, the entity is despawned only when it approaches radius [m] or less from the TrafficSink. If empty, all entity types are candidates for despawn.
    * @param get_entity_pose Function to get the pose of entity.
    * @param despawn Function to despawn entity.
    */
