@@ -83,7 +83,7 @@ public:
           THROW_SEMANTIC_ERROR("Entity ", std::quoted(entity_name), " does not exists.");
         }
       },
-      std::set<traffic_simulator::EntityType>({}),
+      configuration.sinkable_entity_type,
       [this](const auto & entity_name) {
         if (const auto entity = getEntity(entity_name)) {
           return entity->getMapPose();
