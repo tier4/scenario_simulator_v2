@@ -43,9 +43,9 @@ class TrafficController
 public:
   explicit TrafficController(
     std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils,
-    const std::function<std::vector<std::string>(void)> & get_entity_names_function,
-    const std::function<geometry_msgs::msg::Pose(const std::string &)> & get_entity_pose_function,
-    const std::function<void(std::string)> & despawn_function, bool auto_sink = false);
+    const std::function<std::vector<std::string>(void)> & get_entity_names,
+    const std::function<geometry_msgs::msg::Pose(const std::string &)> & get_entity_pose,
+    const std::function<void(std::string)> & despawn, bool auto_sink = false);
 
   template <typename T, typename... Ts>
   void addModule(Ts &&... xs)
@@ -60,9 +60,9 @@ private:
   void autoSink();
   const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_;
   std::vector<std::shared_ptr<traffic_simulator::traffic::TrafficModuleBase>> modules_;
-  const std::function<std::vector<std::string>(void)> get_entity_names_function;
-  const std::function<geometry_msgs::msg::Pose(const std::string &)> get_entity_pose_function;
-  const std::function<void(const std::string &)> despawn_function;
+  const std::function<std::vector<std::string>(void)> get_entity_names;
+  const std::function<geometry_msgs::msg::Pose(const std::string &)> get_entity_pose;
+  const std::function<void(const std::string &)> despawn;
 
 public:
   const bool auto_sink;
