@@ -20,10 +20,14 @@ namespace cpp_mock_scenarios
 CppScenarioNode::CppScenarioNode(
   const std::string & node_name, const std::string & map_path,
   const std::string & lanelet2_map_file, const std::string & scenario_filename, const bool verbose,
-  const rclcpp::NodeOptions & option)
+  const rclcpp::NodeOptions & option, const bool auto_sink,
+  const std::set<traffic_simulator::EntityType, traffic_simulator::EntityTypeComparator>
+    sinkable_entity_type)
 : Node(node_name, option),
   api_(
-    this, configure(map_path, lanelet2_map_file, scenario_filename, verbose),
+    this,
+    configure(
+      map_path, lanelet2_map_file, scenario_filename, verbose, auto_sink, sinkable_entity_type),
     declare_parameter<double>("global_real_time_factor", 1.0),
     declare_parameter<double>("global_frame_rate", 20.0)),
   scenario_filename_(scenario_filename),
