@@ -95,15 +95,30 @@ public:
 
   void setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &) override;
 
-  void setVelocityLimit(double) override{};
+  void setVelocityLimit(double) override
+  {
+    /// @note Misc object entity does not move, so this function is no operation.
+  }
 
-  void setAccelerationLimit(double) override {}
+  void setAccelerationLimit(double) override
+  {
+    /// @note Misc object entity does not move, so this function is no operation.
+  }
 
-  void setAccelerationRateLimit(double) override {}
+  void setAccelerationRateLimit(double) override
+  {
+    /// @note Misc object entity does not move, so this function is no operation.
+  }
 
-  void setDecelerationLimit(double) override {}
+  void setDecelerationLimit(double) override
+  {
+    /// @note Misc object entity does not move, so this function is no operation.
+  }
 
-  void setDecelerationRateLimit(double) override {}
+  void setDecelerationRateLimit(double) override
+  {
+    /// @note Misc object entity does not move, so this function is no operation.
+  }
 
   auto getMaxAcceleration() const -> double override
   {

@@ -51,8 +51,8 @@ class EntityBase
 {
 public:
   explicit EntityBase(
-    const std::string & name, const CanonicalizedEntityStatus &,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> &);
+    const std::string & name, const CanonicalizedEntityStatus & entity_status,
+    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr);
 
   virtual ~EntityBase() = default;
 
@@ -62,7 +62,7 @@ public:
     return dynamic_cast<EntityType const *>(this) != nullptr;
   }
 
-  virtual void appendDebugMarker(visualization_msgs::msg::MarkerArray &);
+  virtual void appendDebugMarker(visualization_msgs::msg::MarkerArray & /*unused*/);
 
   virtual void cancelRequest();
 
@@ -119,7 +119,7 @@ public:
 
   /*   */ auto getCanonicalizedLaneletPose() const -> std::optional<CanonicalizedLaneletPose>;
 
-  /*   */ auto getCanonicalizedLaneletPose(double matching_distance) const
+  /*   */ auto getCanonicalizedLaneletPose(const double matching_distance) const
     -> std::optional<CanonicalizedLaneletPose>;
 
   virtual auto getMaxAcceleration() const -> double = 0;
@@ -130,7 +130,7 @@ public:
 
   virtual auto getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle> = 0;
 
-  virtual auto getRouteLanelets(double horizon = 100) -> lanelet::Ids = 0;
+  virtual auto getRouteLanelets(const double horizon = 100.0) -> lanelet::Ids = 0;
 
   virtual auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray = 0;
 
@@ -148,9 +148,21 @@ public:
 
   virtual void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) = 0;
 
-  virtual auto requestLaneChange(const lanelet::Id) -> void {}
+  virtual auto requestLaneChange(const lanelet::Id) -> void
+  {
+    /**
+     * @note There are Entities such as MiscObjectEntity for which lane change is not possible, 
+     * and since it is necessary to implement appropriate overrides for each Entity, no operation is performed on the base type.
+     */
+  }
 
-  virtual auto requestLaneChange(const lane_change::Parameter &) -> void {}
+  virtual auto requestLaneChange(const lane_change::Parameter &) -> void
+  {
+    /**
+     * @note There are Entities such as MiscObjectEntity for which lane change is not possible, 
+     * and since it is necessary to implement appropriate overrides for each Entity, no operation is performed on the base type.
+     */
+  }
 
   /*   */ auto requestLaneChange(const lane_change::Direction & direction) -> void;
 
@@ -163,41 +175,45 @@ public:
     const lane_change::Constraint & constraint) -> void;
 
   virtual auto requestSpeedChange(
-    const double, const speed_change::Transition, const speed_change::Constraint, const bool)
-    -> void;
+    const double target_speed, const speed_change::Transition,
+    const speed_change::Constraint constraint, const bool continuous) -> void;
 
   virtual void requestSpeedChange(
-    const speed_change::RelativeTargetSpeed &, const speed_change::Transition,
-    const speed_change::Constraint, const bool);
+    const speed_change::RelativeTargetSpeed & target_speed,
+    const speed_change::Transition transition, const speed_change::Constraint constraint,
+    const bool continuous);
 
-  virtual void requestSpeedChange(double, bool);
+  virtual void requestSpeedChange(const double target_speed, const bool continuous);
 
-  virtual void requestSpeedChange(const speed_change::RelativeTargetSpeed &, bool);
+  virtual void requestSpeedChange(
+    const speed_change::RelativeTargetSpeed & target_speed, const bool continuous);
 
   virtual auto isControlledBySimulator() const -> bool;
 
-  virtual auto setControlledBySimulator(bool) -> void;
+  virtual auto setControlledBySimulator(const bool /*unused*/) -> void;
 
   virtual auto requestFollowTrajectory(
-    const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &) -> void;
+    const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & /*unused*/) -> void;
 
   virtual void requestWalkStraight();
 
-  virtual void setAccelerationLimit(double acceleration) = 0;
+  virtual void setAccelerationLimit(const double acceleration) = 0;
 
-  virtual void setAccelerationRateLimit(double acceleration_rate) = 0;
+  virtual void setAccelerationRateLimit(const double acceleration_rate) = 0;
 
-  virtual void setDecelerationLimit(double deceleration) = 0;
+  virtual void setDecelerationLimit(const double deceleration) = 0;
 
-  virtual void setDecelerationRateLimit(double deceleration_rate) = 0;
+  virtual void setDecelerationRateLimit(const double deceleration_rate) = 0;
 
-  /*   */ void setDynamicConstraints(const traffic_simulator_msgs::msg::DynamicConstraints &);
+  /*   */ void setDynamicConstraints(
+    const traffic_simulator_msgs::msg::DynamicConstraints & constraints);
 
   virtual void setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &) = 0;
 
-  /*   */ void setOtherStatus(const std::unordered_map<std::string, CanonicalizedEntityStatus> &);
+  /*   */ void setOtherStatus(
+    const std::unordered_map<std::string, CanonicalizedEntityStatus> & status);
 
-  /*   */ auto setCanonicalizedStatus(const CanonicalizedEntityStatus &) -> void;
+  /*   */ auto setCanonicalizedStatus(const CanonicalizedEntityStatus & status) -> void;
 
   virtual auto setStatus(const EntityStatus & status) -> void;
 
@@ -234,13 +250,14 @@ public:
 
   virtual auto setLinearVelocity(const double linear_velocity) -> void;
 
-  virtual void setTrafficLights(const std::shared_ptr<traffic_simulator::TrafficLightsBase> &);
+  virtual void setTrafficLights(
+    const std::shared_ptr<traffic_simulator::TrafficLightsBase> & traffic_lights);
 
   virtual auto activateOutOfRangeJob(
-    double min_velocity, double max_velocity, double min_acceleration, double max_acceleration,
-    double min_jerk, double max_jerk) -> void;
+    const double min_velocity, const double max_velocity, const double min_acceleration,
+    const double max_acceleration, const double min_jerk, const double max_jerk) -> void;
 
-  virtual auto setVelocityLimit(double) -> void = 0;
+  virtual auto setVelocityLimit(const double) -> void = 0;
 
   virtual auto setMapPose(const geometry_msgs::msg::Pose & map_pose) -> void;
 
@@ -288,17 +305,19 @@ protected:
 
 private:
   virtual auto requestSpeedChangeWithConstantAcceleration(
-    const double target_speed, const speed_change::Transition, double acceleration,
+    const double target_speed, const speed_change::Transition, const double acceleration,
     const bool continuous) -> void;
   virtual auto requestSpeedChangeWithConstantAcceleration(
     const speed_change::RelativeTargetSpeed & target_speed,
-    const speed_change::Transition transition, double acceleration, const bool continuous) -> void;
+    const speed_change::Transition transition, const double acceleration, const bool continuous)
+    -> void;
   virtual auto requestSpeedChangeWithTimeConstraint(
-    const double target_speed, const speed_change::Transition, double acceleration_time) -> void;
+    const double target_speed, const speed_change::Transition, const double acceleration_time)
+    -> void;
   virtual auto requestSpeedChangeWithTimeConstraint(
     const speed_change::RelativeTargetSpeed & target_speed,
-    const speed_change::Transition transition, double time) -> void;
-  /*   */ auto isTargetSpeedReached(double target_speed) const -> bool;
+    const speed_change::Transition transition, const double time) -> void;
+  /*   */ auto isTargetSpeedReached(const double target_speed) const -> bool;
   /*   */ auto isTargetSpeedReached(const speed_change::RelativeTargetSpeed & target_speed) const
     -> bool;
 };

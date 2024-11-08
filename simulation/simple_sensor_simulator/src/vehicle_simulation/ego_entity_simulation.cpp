@@ -468,11 +468,12 @@ auto EgoEntitySimulation::setStatus(const traffic_simulator_msgs::msg::EntitySta
   /// EgoEntity::setStatus
   const auto unique_route_lanelets =
     traffic_simulator::helper::getUniqueValues(autoware->getRouteLanelets());
+  /// @note The offset value has been increased to 1.5 because a value of 1.0 was often insufficient when changing lanes. ( @Hans_Robo )
   const auto matching_distance = std::max(
                                    vehicle_parameters.axles.front_axle.track_width,
                                    vehicle_parameters.axles.rear_axle.track_width) *
                                    0.5 +
-                                 1.0;
+                                 1.5;
   /// @note Ego uses the unique_route_lanelets get from Autoware, instead of the current lanelet_id
   /// value from EntityStatus, therefore canonicalization has to be done in advance,
   /// not inside CanonicalizedEntityStatus

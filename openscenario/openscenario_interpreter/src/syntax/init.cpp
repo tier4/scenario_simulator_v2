@@ -42,9 +42,9 @@ auto Init::runNonInstantaneousActions() -> void { actions.runNonInstantaneousAct
 
 auto Init::startNonInstantaneousActions() -> void { actions.startNonInstantaneousActions(); }
 
-auto operator<<(nlohmann::json & json, const Init & datum) -> nlohmann::json &
+auto operator<<(boost::json::object & json, const Init & datum) -> boost::json::object &
 {
-  json["Actions"] << datum.actions;
+  json["Actions"].emplace_object() << datum.actions;
 
   return json;
 }
