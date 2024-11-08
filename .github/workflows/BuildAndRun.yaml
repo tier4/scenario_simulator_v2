@@ -18,6 +18,7 @@ on:
   push:
     branches:
       - master
+      - fix/sonar-cloud-coverage-chris
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -68,7 +69,7 @@ jobs:
       - name: Resolve rosdep and install colcon mixin
         run: |
           apt-get update
-          apt-get install -y python3-pip python3-colcon-lcov-result lcov unzip
+          apt-get install -y python3-pip python3-colcon-lcov-result lcov unzip gcovr
           rosdep update --include-eol-distros
           rosdep install -iy --from-paths src --rosdistro ${{ matrix.rosdistro }}
           colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml
@@ -84,7 +85,14 @@ jobs:
         run: |
           source /opt/ros/${{ matrix.rosdistro }}/setup.bash
           build-wrapper-linux-x86-64 --out-dir src/scenario_simulator_v2/bw-output \
-          colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=${{ matrix.cmake_build_type }} -DBUILD_CPP_MOCK_SCENARIOS=ON -DBUILD_TESTING=true -DCMAKE_CXX_FLAGS='-fprofile-arcs -ftest-coverage' -DCMAKE_C_FLAGS='-fprofile-arcs -ftest-coverage' --packages-up-to ${{ steps.list_packages.outputs.package_list }}
+          colcon build --symlink-install \
+          --cmake-args \
+            -DCMAKE_BUILD_TYPE=${{ matrix.cmake_build_type }} \
+            -DBUILD_CPP_MOCK_SCENARIOS=ON \
+            -DBUILD_TESTING=true \
+            -DCMAKE_CXX_FLAGS='-fprofile-arcs -ftest-coverage' \
+            -DCMAKE_C_FLAGS='-fprofile-arcs -ftest-coverage' \
+            --packages-up-to ${{ steps.list_packages.outputs.package_list }}
         shell: bash
 
       - name: Colcon test
@@ -95,14 +103,8 @@ jobs:
           colcon lcov-result --packages-select ${{ steps.list_packages.outputs.package_list }}
         shell: bash
 
-      - name: Collect and run gcov on coverage data
-        run: |
-          mkdir -p ./gcov && \
-          find ./build -name "*.gcda" -o -name "*.gcno" | \
-          while read -r line; do \
-            gcov -o $(dirname "$line") $(echo "$line" | sed 's/\.gcda$/.cpp/;s/\.gcno$/.cpp/;s/\.gcda$/.hpp/;s/\.gcno$/.hpp/'); \
-          done && mv *.gcov ./gcov/
-    
+      - name: generate gcov report for sonarcloud
+        run: gcovr -r src/scenario_simulator_v2 build --sonarqube coverage.xml
 
       - name: Show test result
         if: always()
@@ -125,6 +127,14 @@ jobs:
           name: lcov-${{ matrix.cmake_build_type }}
           path: lcov
           retention-days: 1
+
+      - name: Upload Gcov result
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage.xml
+          path: coverage.xml
+          retention-days: 1
+          
 
       - name: Run SonarCloud scan
         env:
