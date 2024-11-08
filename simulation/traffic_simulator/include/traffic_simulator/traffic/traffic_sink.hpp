@@ -46,11 +46,11 @@ public:
    * @brief Construct a new Traffic Sink object
    * @param lanelet_id Lanelet ID for visualization
    * @todo lanelet_id value is only used for visualization and its very confusing. So it should be refactor.
-   * @param radius Entity is despawned when the distance between the entity's coordinates in the Map coordinate system and the TrafficSink's coordinates is less than this value.
+   * @param radius The entity despawns when the distance between the entity's coordinates in the Map coordinate system and the TrafficSink's coordinates is less than this value.
    * @param position Position of the traffic sink.
    * @param get_entity_names Function to get the name of entity
    * @param get_entity_type Function to get the type of entity
-   * @param sinkable_entity_type If this type is applicable, the entity is despawned only when it approaches radius [m] or less from the TrafficSink. If empty, all entity types are candidates for despawn.
+   * @param sinkable_entity_type If this type is applicable, the entity despawn only when it approaches radius [m] or less from the TrafficSink. If empty, all entity types are candidates for despawn.
    * @param get_entity_pose Function to get the pose of entity.
    * @param despawn Function to despawn entity.
    */
