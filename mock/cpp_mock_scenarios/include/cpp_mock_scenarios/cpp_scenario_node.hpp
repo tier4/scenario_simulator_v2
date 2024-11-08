@@ -33,7 +33,9 @@ public:
   explicit CppScenarioNode(
     const std::string & node_name, const std::string & map_path,
     const std::string & lanelet2_map_file, const std::string & scenario_filename,
-    const bool verbose, const rclcpp::NodeOptions & option);
+    const bool verbose, const rclcpp::NodeOptions & option, const bool auto_sink = false,
+    const std::set<traffic_simulator::EntityType, traffic_simulator::EntityTypeComparator>
+      sinkable_entity_type = {});
   void start();
   void stop(Result result, const std::string & description = "");
   void expectThrow() { exception_expect_ = true; }
