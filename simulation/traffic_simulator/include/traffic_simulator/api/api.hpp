@@ -77,6 +77,13 @@ public:
       entity_manager_ptr_->getHdmapUtils(), [this]() { return API::getEntityNames(); },
       [this](const auto & entity_name) {
         if (const auto entity = getEntity(entity_name)) {
+          return entity->getEntityType();
+        } else {
+          THROW_SEMANTIC_ERROR("Entity ", std::quoted(entity_name), " does not exists.");
+        }
+      },
+      [this](const auto & entity_name) {
+        if (const auto entity = getEntity(entity_name)) {
           return entity->getMapPose();
         } else {
           THROW_SEMANTIC_ERROR("Entity ", std::quoted(entity_name), " does not exists.");
