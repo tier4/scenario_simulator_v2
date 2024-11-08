@@ -12,14 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <limits>
-#include <scenario_simulator_exception/exception.hpp>
-#include <string>
 #include <traffic_simulator/color_utils/color_utils.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light.hpp>
-#include <unordered_map>
-#include <utility>
-#include <vector>
 
 namespace traffic_simulator
 {
@@ -166,13 +160,14 @@ auto operator<<(std::ostream & os, const TrafficLight::Bulb & bulb) -> std::ostr
             << std::get<TrafficLight::Shape>(bulb.value);
 }
 
-TrafficLight::TrafficLight(const lanelet::Id lanelet_id, hdmap_utils::HdMapUtils & map_manager)
+TrafficLight::TrafficLight(
+  const lanelet::Id lanelet_id, const hdmap_utils::HdMapUtils & hdmap_utils)
 : way_id([&]() {
-    if (map_manager.isTrafficLight(lanelet_id)) {
+    if (hdmap_utils.isTrafficLight(lanelet_id)) {
       return lanelet_id;
     } else {
       // lanelet::RoleName::Refers
-      if (auto traffic_light_members = map_manager.getTrafficLightRegulatoryElement(lanelet_id)
+      if (auto traffic_light_members = hdmap_utils.getTrafficLightRegulatoryElement(lanelet_id)
                                          ->getParameters<lanelet::ConstLineString3d>("refers");
           traffic_light_members.size() > 0) {
         // Note: If `lanelet_id` is a relation id, it is okay to use only one of the referred way ids.
@@ -184,16 +179,17 @@ TrafficLight::TrafficLight(const lanelet::Id lanelet_id, hdmap_utils::HdMapUtils
       }
     }
   }()),
+  regulatory_elements_ids(hdmap_utils.getTrafficLightRegulatoryElementIDsFromTrafficLight(way_id)),
   positions{
     std::make_pair(
       Bulb(Color::green, Status::solid_on, Shape::circle).hash(),
-      map_manager.getTrafficLightBulbPosition(way_id, "green")),
+      hdmap_utils.getTrafficLightBulbPosition(way_id, "green")),
     std::make_pair(
       Bulb(Color::yellow, Status::solid_on, Shape::circle).hash(),
-      map_manager.getTrafficLightBulbPosition(way_id, "yellow")),
+      hdmap_utils.getTrafficLightBulbPosition(way_id, "yellow")),
     std::make_pair(
       Bulb(Color::red, Status::solid_on, Shape::circle).hash(),
-      map_manager.getTrafficLightBulbPosition(way_id, "red")),
+      hdmap_utils.getTrafficLightBulbPosition(way_id, "red")),
   }
 {
 }

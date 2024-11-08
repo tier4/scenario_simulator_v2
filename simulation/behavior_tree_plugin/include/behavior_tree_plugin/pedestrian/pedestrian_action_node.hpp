@@ -28,7 +28,7 @@ class PedestrianActionNode : public ActionNode
 {
 public:
   PedestrianActionNode(const std::string & name, const BT::NodeConfiguration & config);
-  void getBlackBoardValues();
+  virtual void getBlackBoardValues();
   static BT::PortsList providedPorts()
   {
     BT::PortsList ports = {
