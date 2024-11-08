@@ -62,6 +62,9 @@ void TrafficSink::execute(
 {
   const auto names = get_entity_names();
   for (const auto & name : names) {
+    const auto is_sinkable_entity = [](const auto) {
+
+    };
     const auto pose = get_entity_pose(name);
     if (math::geometry::getDistance(position, pose) <= radius) {
       despawn(name);
