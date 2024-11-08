@@ -50,8 +50,8 @@ public:
   auto isDecelerating(double target_speed, const geometry_msgs::msg::Twist & current_twist) const
     -> bool;
   auto isTargetSpeedReached(
-    double target_speed, const geometry_msgs::msg::Twist & current_twist,
-    double tolerance = 0.01) const noexcept -> bool;
+    const double target_speed, const geometry_msgs::msg::Twist & current_twist,
+    const double tolerance = 0.01) const noexcept -> bool;
   const double step_time;
   const std::string entity;
 
