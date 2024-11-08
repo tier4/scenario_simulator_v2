@@ -27,6 +27,7 @@
 #define TRAFFIC_SIMULATOR__TRAFFIC__TRAFFIC_CONTROLLER_HPP_
 
 #include <memory>
+#include <set>
 #include <string>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/traffic/traffic_module_base.hpp>
@@ -45,6 +46,7 @@ public:
     std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils,
     const std::function<std::vector<std::string>(void)> & get_entity_names,
     const std::function<traffic_simulator::EntityType(const std::string &)> & get_entity_type,
+    const std::set<traffic_simulator::EntityType> & sinkable_entity_type,
     const std::function<geometry_msgs::msg::Pose(const std::string &)> & get_entity_pose,
     const std::function<void(std::string)> & despawn, bool auto_sink = false);
 
@@ -63,6 +65,7 @@ private:
   std::vector<std::shared_ptr<traffic_simulator::traffic::TrafficModuleBase>> modules_;
   const std::function<std::vector<std::string>(void)> get_entity_names;
   const std::function<traffic_simulator::EntityType(const std::string &)> get_entity_type;
+  const std::set<traffic_simulator::EntityType> sinkable_entity_type;
   const std::function<geometry_msgs::msg::Pose(const std::string &)> get_entity_pose;
   const std::function<void(const std::string &)> despawn;
 

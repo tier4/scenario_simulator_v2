@@ -46,6 +46,7 @@ public:
     const lanelet::Id lanelet_id, const double radius, const geometry_msgs::msg::Point & position,
     const std::function<std::vector<std::string>(void)> & get_entity_names,
     const std::function<traffic_simulator::EntityType(const std::string &)> & get_entity_type,
+    const std::set<traffic_simulator::EntityType> & sinkable_entity_type,
     const std::function<geometry_msgs::msg::Pose(const std::string &)> & get_entity_pose,
     const std::function<void(std::string)> & despawn);
   const lanelet::Id lanelet_id;
@@ -58,6 +59,7 @@ public:
 private:
   const std::function<std::vector<std::string>(void)> get_entity_names;
   const std::function<traffic_simulator::EntityType(const std::string &)> get_entity_type;
+  const std::set<traffic_simulator::EntityType> sinkable_entity_type;
   const std::function<geometry_msgs::msg::Pose(const std::string &)> get_entity_pose;
   const std::function<void(const std::string &)> despawn;
 };

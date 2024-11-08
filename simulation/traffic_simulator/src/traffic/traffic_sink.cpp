@@ -29,6 +29,7 @@
 #include <geometry_msgs/msg/quaternion.hpp>
 #include <iostream>
 #include <memory>
+#include <set>
 #include <string>
 #include <traffic_simulator/traffic/traffic_sink.hpp>
 #include <vector>
@@ -41,6 +42,7 @@ TrafficSink::TrafficSink(
   const lanelet::Id lanelet_id, const double radius, const geometry_msgs::msg::Point & position,
   const std::function<std::vector<std::string>(void)> & get_entity_names,
   const std::function<traffic_simulator::EntityType(const std::string &)> & get_entity_type,
+  const std::set<traffic_simulator::EntityType> & sinkable_entity_type,
   const std::function<geometry_msgs::msg::Pose(const std::string &)> & get_entity_pose,
   const std::function<void(std::string)> & despawn)
 : TrafficModuleBase(),
@@ -49,6 +51,7 @@ TrafficSink::TrafficSink(
   position(position),
   get_entity_names(get_entity_names),
   get_entity_type(get_entity_type),
+  sinkable_entity_type(sinkable_entity_type),
   get_entity_pose(get_entity_pose),
   despawn(despawn)
 {
