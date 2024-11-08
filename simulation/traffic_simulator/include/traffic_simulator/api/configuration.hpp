@@ -35,7 +35,7 @@ struct Configuration
 
   bool auto_sink = true;
 
-  const std::set<traffic_simulator::EntityType> sinkable_entity_type = {};
+  const std::set<traffic_simulator::EntityType, EntityTypeComparator> sinkable_entity_type = {};
 
   bool verbose = false;
 
