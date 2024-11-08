@@ -25,6 +25,7 @@
 #include <optional>
 #include <rclcpp/rclcpp.hpp>
 #include <rosgraph_msgs/msg/clock.hpp>
+#include <set>
 #include <simulation_interface/conversions.hpp>
 #include <simulation_interface/zmq_multi_client.hpp>
 #include <std_msgs/msg/float64.hpp>
@@ -82,6 +83,7 @@ public:
           THROW_SEMANTIC_ERROR("Entity ", std::quoted(entity_name), " does not exists.");
         }
       },
+      std::set<traffic_simulator::EntityType>({}),
       [this](const auto & entity_name) {
         if (const auto entity = getEntity(entity_name)) {
           return entity->getMapPose();
