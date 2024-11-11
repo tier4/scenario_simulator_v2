@@ -19,12 +19,6 @@
 
 #include <autoware_auto_perception_msgs/msg/detected_objects.hpp>
 #include <autoware_auto_perception_msgs/msg/tracked_objects.hpp>
-#include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
-#include <autoware_perception_msgs/msg/traffic_signal_array.hpp>
-
-#if __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)
-#include <autoware_perception_msgs/msg/traffic_light_group_array.hpp>
-#endif
 
 #include <iomanip>
 #include <memory>

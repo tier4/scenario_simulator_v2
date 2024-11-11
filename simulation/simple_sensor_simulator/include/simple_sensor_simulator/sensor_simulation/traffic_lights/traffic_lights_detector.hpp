@@ -20,6 +20,13 @@
 #include <string>
 #include <traffic_simulator/traffic_lights/traffic_light_publisher.hpp>
 
+#include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
+#include <autoware_perception_msgs/msg/traffic_signal_array.hpp>
+
+#if __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)
+#include <autoware_perception_msgs/msg/traffic_light_group_array.hpp>
+#endif
+
 namespace simple_sensor_simulator
 {
 namespace traffic_lights

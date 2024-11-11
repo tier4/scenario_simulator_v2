@@ -19,12 +19,6 @@
 #include <tf2_ros/static_transform_broadcaster.h>
 #include <tf2_ros/transform_broadcaster.h>
 
-#include <autoware_perception_msgs/msg/traffic_signal_array.hpp>
-
-#if __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)
-#include <autoware_perception_msgs/msg/traffic_light_group_array.hpp>
-#endif
-
 #include <memory>
 #include <optional>
 #include <rclcpp/node_interfaces/get_node_topics_interface.hpp>
@@ -53,7 +47,6 @@
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/entity_status_with_trajectory_array.hpp>
-#include <traffic_simulator_msgs/msg/traffic_light_array_v1.hpp>
 #include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
 #include <type_traits>
 #include <unordered_map>
