@@ -32,6 +32,7 @@
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <simple_junit/junit5.hpp>
+#include <std_msgs/msg/string.hpp>
 #include <utility>
 
 #define INTERPRETER_INFO_STREAM(...) \
@@ -51,6 +52,7 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode,
   using Context = openscenario_interpreter_msgs::msg::Context;
 
   const rclcpp_lifecycle::LifecyclePublisher<Context>::SharedPtr publisher_of_context;
+  const rclcpp_lifecycle::LifecyclePublisher<std_msgs::msg::String>::SharedPtr publisher_of_params;
 
   double local_frame_rate;
 
@@ -79,6 +81,8 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode,
   using Result = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
 
   bool waiting_for_engagement_to_be_completed = false;  // NOTE: DIRTY HACK!!!
+
+  std_msgs::msg::String test_iteration_params_str = std_msgs::msg::String();
 
 public:
   OPENSCENARIO_INTERPRETER_PUBLIC
