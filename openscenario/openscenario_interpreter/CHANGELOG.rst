@@ -32,6 +32,9 @@ Changelog for package openscenario_interpreter
 * add publish_empty_context parameter
 * Contributors: Masaya Kataoka
 
+5.0.1 (2024-11-11)
+------------------
+
 5.0.0 (2024-11-08)
 ------------------
 * Merge pull request `#1406 <https://github.com/tier4/scenario_simulator_v2/issues/1406>`_ from tier4/RJD-1057-remove-traffic-lights-from-entity-manager
