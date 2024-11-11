@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
-
+#include <geometry/quaternion/euler_to_quaternion.hpp>
+#include <geometry/quaternion/quaternion_to_euler.hpp>
 #include <string>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/utils/pose.hpp>
@@ -50,8 +50,9 @@ traffic_simulator_msgs::msg::LaneletPose constructLaneletPose(
   return lanelet_pose;
 }
 
-traffic_simulator::lanelet_pose::CanonicalizedLaneletPose constructCanonicalizedLaneletPose(
+auto constructCanonicalizedLaneletPose(
   lanelet::Id lanelet_id, double s, double offset, double roll, double pitch, double yaw)
+  -> CanonicalizedLaneletPose
 {
   if (
     auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
@@ -65,8 +66,8 @@ traffic_simulator::lanelet_pose::CanonicalizedLaneletPose constructCanonicalized
   }
 }
 
-traffic_simulator::lanelet_pose::CanonicalizedLaneletPose constructCanonicalizedLaneletPose(
-  lanelet::Id lanelet_id, double s, double offset)
+auto constructCanonicalizedLaneletPose(lanelet::Id lanelet_id, double s, double offset)
+  -> CanonicalizedLaneletPose
 {
   return constructCanonicalizedLaneletPose(lanelet_id, s, offset, 0, 0, 0);
 }
@@ -82,7 +83,7 @@ geometry_msgs::msg::Vector3 constructRPY(double roll, double pitch, double yaw)
 
 geometry_msgs::msg::Vector3 constructRPYfromQuaternion(geometry_msgs::msg::Quaternion quaternion)
 {
-  return quaternion_operation::convertQuaternionToEulerAngle(quaternion);
+  return math::geometry::convertQuaternionToEulerAngle(quaternion);
 }
 
 geometry_msgs::msg::Pose constructPose(
@@ -92,8 +93,7 @@ geometry_msgs::msg::Pose constructPose(
   pose.position.x = x;
   pose.position.y = y;
   pose.position.z = z;
-  pose.orientation =
-    quaternion_operation::convertEulerAngleToQuaternion(constructRPY(roll, pitch, yaw));
+  pose.orientation = math::geometry::convertEulerAngleToQuaternion(constructRPY(roll, pitch, yaw));
   return pose;
 }
 

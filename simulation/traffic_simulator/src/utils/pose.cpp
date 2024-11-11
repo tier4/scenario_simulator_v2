@@ -1,4 +1,4 @@
-// Copyright 2024 TIER IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
 
 namespace traffic_simulator
 {
-namespace pose
+inline namespace pose
 {
 auto quietNaNPose() -> Pose
 {
@@ -64,7 +64,7 @@ auto isInLanelet(
           start_lanelet_pose, canonicalized_lanelet_pose, include_adjacent_lanelet,
           include_opposite_direction, allow_lane_change);
         distance_to_start_lanelet_pose and
-        std::abs(distance_to_start_lanelet_pose.value()) < tolerance) {
+        std::abs(distance_to_start_lanelet_pose.value()) <= tolerance) {
       return true;
     }
 
@@ -74,7 +74,7 @@ auto isInLanelet(
           canonicalized_lanelet_pose, end_lanelet_pose, include_adjacent_lanelet,
           include_opposite_direction, allow_lane_change);
         distance_to_end_lanelet_pose and
-        std::abs(distance_to_end_lanelet_pose.value()) < tolerance) {
+        std::abs(distance_to_end_lanelet_pose.value()) <= tolerance) {
       return true;
     }
   }

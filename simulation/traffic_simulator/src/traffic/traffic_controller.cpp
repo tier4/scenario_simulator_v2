@@ -52,10 +52,11 @@ TrafficController::TrafficController(
 
 void TrafficController::autoSink()
 {
-  const auto borderline_poses = lanelet_map::borderlinePoses();
-  for (const auto & pose : borderline_poses) {
+  constexpr double sink_radius{1.0};
+  for (const auto & [lanelet_id, pose] : lanelet_map::borderlinePoses()) {
     addModule<traffic_simulator::traffic::TrafficSink>(
-      1, pose.position, get_entity_names_function, get_entity_pose_function, despawn_function);
+      lanelet_id, sink_radius, pose.position, get_entity_names_function, get_entity_pose_function,
+      despawn_function);
   }
 }
 
@@ -64,6 +65,18 @@ void TrafficController::execute(const double current_time, const double step_tim
   for (const auto & module : modules_) {
     module->execute(current_time, step_time);
   }
+}
+
+auto TrafficController::makeDebugMarker() const -> const visualization_msgs::msg::MarkerArray
+{
+  static const auto marker_array = [&]() {
+    visualization_msgs::msg::MarkerArray marker_array;
+    for (size_t i = 0; i < modules_.size(); ++i) {
+      modules_[i]->appendDebugMarker(marker_array);
+    }
+    return marker_array;
+  }();
+  return marker_array;
 }
 }  // namespace traffic
 }  // namespace traffic_simulator

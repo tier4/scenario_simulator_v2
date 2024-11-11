@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
-
 #include <algorithm>
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <limits>
@@ -41,6 +39,7 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
     [this](auto &&... xs) { return spawnMiscObjectEntity(std::forward<decltype(xs)>(xs)...); },
     [this](auto &&... xs) { return despawnEntity(std::forward<decltype(xs)>(xs)...); },
     [this](auto &&... xs) { return updateEntityStatus(std::forward<decltype(xs)>(xs)...); },
+    [this](auto &&... xs) { return attachImuSensor(std::forward<decltype(xs)>(xs)...); },
     [this](auto &&... xs) { return attachLidarSensor(std::forward<decltype(xs)>(xs)...); },
     [this](auto &&... xs) { return attachDetectionSensor(std::forward<decltype(xs)>(xs)...); },
     [this](auto &&... xs) { return attachOccupancyGridSensor(std::forward<decltype(xs)>(xs)...); },
@@ -95,8 +94,6 @@ auto ScenarioSimulator::initialize(const simulation_api_schema::InitializeReques
     }
     return get_parameter("consider_pose_by_road_slope").as_bool();
   }();
-  traffic_simulator::lanelet_pose::CanonicalizedLaneletPose::setConsiderPoseByRoadSlope(
-    consider_pose_by_road_slope);
   auto res = simulation_api_schema::InitializeResponse();
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("succeed to initialize simulation");
@@ -300,6 +297,15 @@ auto ScenarioSimulator::despawnEntity(const simulation_api_schema::DespawnEntity
   }
   auto res = simulation_api_schema::DespawnEntityResponse();
   res.mutable_result()->set_success(any_entity_was_removed);
+  return res;
+}
+
+auto ScenarioSimulator::attachImuSensor(const simulation_api_schema::AttachImuSensorRequest & req)
+  -> simulation_api_schema::AttachImuSensorResponse
+{
+  sensor_sim_.attachImuSensor(current_simulation_time_, req.configuration(), *this);
+  auto res = simulation_api_schema::AttachImuSensorResponse();
+  res.mutable_result()->set_success(true);
   return res;
 }
 

@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <cmath>
 #include <geometry/bounding_box.hpp>
+#include <geometry/quaternion/euler_to_quaternion.hpp>
 #include <geometry/spline/hermite_curve.hpp>
 #include <iostream>
 #include <limits>
@@ -47,24 +48,22 @@ HermiteCurve::HermiteCurve(
 }
 
 HermiteCurve::HermiteCurve(
-  geometry_msgs::msg::Pose start_pose, geometry_msgs::msg::Pose goal_pose,
-  geometry_msgs::msg::Vector3 start_vec, geometry_msgs::msg::Vector3 goal_vec)
+  const geometry_msgs::msg::Pose & start_pose, const geometry_msgs::msg::Pose & goal_pose,
+  const geometry_msgs::msg::Vector3 & start_vec, const geometry_msgs::msg::Vector3 & goal_vec)
+: ax_(2 * start_pose.position.x - 2 * goal_pose.position.x + start_vec.x + goal_vec.x),
+  bx_(-3 * start_pose.position.x + 3 * goal_pose.position.x - 2 * start_vec.x - goal_vec.x),
+  cx_(start_vec.x),
+  dx_(start_pose.position.x),
+  ay_(2 * start_pose.position.y - 2 * goal_pose.position.y + start_vec.y + goal_vec.y),
+  by_(-3 * start_pose.position.y + 3 * goal_pose.position.y - 2 * start_vec.y - goal_vec.y),
+  cy_(start_vec.y),
+  dy_(start_pose.position.y),
+  az_(2 * start_pose.position.z - 2 * goal_pose.position.z + start_vec.z + goal_vec.z),
+  bz_(-3 * start_pose.position.z + 3 * goal_pose.position.z - 2 * start_vec.z - goal_vec.z),
+  cz_(start_vec.z),
+  dz_(start_pose.position.z),
+  length_(getLength(100))
 {
-  ax_ = 2 * start_pose.position.x - 2 * goal_pose.position.x + start_vec.x + goal_vec.x;
-  bx_ = -3 * start_pose.position.x + 3 * goal_pose.position.x - 2 * start_vec.x - goal_vec.x;
-  cx_ = start_vec.x;
-  dx_ = start_pose.position.x;
-
-  ay_ = 2 * start_pose.position.y - 2 * goal_pose.position.y + start_vec.y + goal_vec.y;
-  by_ = -3 * start_pose.position.y + 3 * goal_pose.position.y - 2 * start_vec.y - goal_vec.y;
-  cy_ = start_vec.y;
-  dy_ = start_pose.position.y;
-
-  az_ = 2 * start_pose.position.z - 2 * goal_pose.position.z + start_vec.z + goal_vec.z;
-  bz_ = -3 * start_pose.position.z + 3 * goal_pose.position.z - 2 * start_vec.z - goal_vec.z;
-  cz_ = start_vec.z;
-  dz_ = start_pose.position.z;
-  length_ = getLength(100);
 }
 
 double HermiteCurve::getSquaredDistanceIn2D(
@@ -292,7 +291,7 @@ const geometry_msgs::msg::Pose HermiteCurve::getPose(
   rpy.x = 0.0;
   rpy.y = fill_pitch ? std::atan2(-tangent_vec.z, std::hypot(tangent_vec.x, tangent_vec.y)) : 0.0;
   rpy.z = std::atan2(tangent_vec.y, tangent_vec.x);
-  pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(rpy);
+  pose.orientation = math::geometry::convertEulerAngleToQuaternion(rpy);
   pose.position = getPoint(s);
   return pose;
 }

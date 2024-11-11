@@ -33,14 +33,12 @@
 RandomTestRunner::RandomTestRunner(const rclcpp::NodeOptions & option)
 : Node("random_test_runner", option), error_reporter_(get_logger())
 {
-  const auto consider_pose_by_road_slope = [&]() {
-    if (!has_parameter("consider_pose_by_road_slope")) {
+  traffic_simulator::lanelet_pose::CanonicalizedLaneletPose::setConsiderPoseByRoadSlope([&]() {
+    if (not has_parameter("consider_pose_by_road_slope")) {
       declare_parameter("consider_pose_by_road_slope", false);
     }
     return get_parameter("consider_pose_by_road_slope").as_bool();
-  }();
-  traffic_simulator::lanelet_pose::CanonicalizedLaneletPose::setConsiderPoseByRoadSlope(
-    consider_pose_by_road_slope);
+  }());
   TestControlParameters test_control_parameters = collectAndValidateTestControlParameters();
   std::string message = fmt::format("test control parameters: {}", test_control_parameters);
   RCLCPP_INFO_STREAM(get_logger(), message);

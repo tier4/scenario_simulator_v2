@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
-
 #include <algorithm>
 #include <memory>
 #include <string>
@@ -71,7 +69,7 @@ void PedestrianEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::
   for (const auto & waypoint : waypoints) {
     if (
       const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
-        waypoint, status_.getBoundingBox(), true,
+        waypoint, status_->getBoundingBox(), true,
         getDefaultMatchingDistanceForLaneletPoseCalculation())) {
       route.emplace_back(canonicalized_lanelet_pose.value());
     } else {
@@ -90,9 +88,6 @@ auto PedestrianEntity::requestFollowTrajectory(
 
 std::string PedestrianEntity::getCurrentAction() const
 {
-  if (!npc_logic_started_) {
-    return "waiting";
-  }
   return behavior_plugin_ptr_->getCurrentAction();
 }
 
@@ -109,7 +104,7 @@ auto PedestrianEntity::getDefaultDynamicConstraints() const
 
 auto PedestrianEntity::getRouteLanelets(double horizon) -> lanelet::Ids
 {
-  if (const auto canonicalized_lanelet_pose = status_.getCanonicalizedLaneletPose()) {
+  if (const auto canonicalized_lanelet_pose = status_->getCanonicalizedLaneletPose()) {
     return route_planner_.getRouteLanelets(canonicalized_lanelet_pose.value(), horizon);
   } else {
     return {};
@@ -139,7 +134,7 @@ void PedestrianEntity::requestWalkStraight()
 void PedestrianEntity::requestAcquirePosition(const CanonicalizedLaneletPose & lanelet_pose)
 {
   behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
-  if (status_.laneMatchingSucceed()) {
+  if (status_->laneMatchingSucceed()) {
     route_planner_.setWaypoints({lanelet_pose});
   }
   behavior_plugin_ptr_->setGoalPoses({static_cast<geometry_msgs::msg::Pose>(lanelet_pose)});
@@ -150,7 +145,7 @@ void PedestrianEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & m
   behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
   if (
     const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
-      map_pose, status_.getBoundingBox(), true,
+      map_pose, status_->getBoundingBox(), true,
       getDefaultMatchingDistanceForLaneletPoseCalculation())) {
     requestAcquirePosition(canonicalized_lanelet_pose.value());
   } else {
@@ -164,24 +159,17 @@ void PedestrianEntity::cancelRequest()
   route_planner_.cancelRoute();
 }
 
-auto PedestrianEntity::getEntityType() const -> const traffic_simulator_msgs::msg::EntityType &
-{
-  static traffic_simulator_msgs::msg::EntityType type;
-  type.type = traffic_simulator_msgs::msg::EntityType::PEDESTRIAN;
-  return type;
-}
-
 auto PedestrianEntity::getEntityTypename() const -> const std::string &
 {
   static const std::string result = "PedestrianEntity";
   return result;
 }
 
-void PedestrianEntity::setTrafficLightManager(
-  const std::shared_ptr<traffic_simulator::TrafficLightManager> & ptr)
+void PedestrianEntity::setTrafficLights(
+  const std::shared_ptr<traffic_simulator::TrafficLightsBase> & ptr)
 {
-  EntityBase::setTrafficLightManager(ptr);
-  behavior_plugin_ptr_->setTrafficLightManager(traffic_light_manager_);
+  EntityBase::setTrafficLights(ptr);
+  behavior_plugin_ptr_->setTrafficLights(traffic_lights_);
 }
 
 auto PedestrianEntity::getBehaviorParameter() const
@@ -194,6 +182,16 @@ void PedestrianEntity::setBehaviorParameter(
   const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter)
 {
   behavior_plugin_ptr_->setBehaviorParameter(behavior_parameter);
+}
+
+auto PedestrianEntity::getMaxAcceleration() const -> double
+{
+  return getBehaviorParameter().dynamic_constraints.max_acceleration;
+}
+
+auto PedestrianEntity::getMaxDeceleration() const -> double
+{
+  return getBehaviorParameter().dynamic_constraints.max_deceleration;
 }
 
 void PedestrianEntity::setVelocityLimit(double linear_velocity)
@@ -246,30 +244,20 @@ void PedestrianEntity::setDecelerationRateLimit(double deceleration_rate)
   setBehaviorParameter(behavior_parameter);
 }
 
-void PedestrianEntity::onUpdate(double current_time, double step_time)
+auto PedestrianEntity::onUpdate(const double current_time, const double step_time) -> void
 {
   EntityBase::onUpdate(current_time, step_time);
-  if (npc_logic_started_) {
-    behavior_plugin_ptr_->setOtherEntityStatus(other_status_);
-    behavior_plugin_ptr_->setEntityStatus(
-      std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(status_));
-    behavior_plugin_ptr_->setTargetSpeed(target_speed_);
-    behavior_plugin_ptr_->setRouteLanelets(getRouteLanelets());
-    behavior_plugin_ptr_->update(current_time, step_time);
-    setStatus(*behavior_plugin_ptr_->getUpdatedStatus());
-    /// @note setStatus() is not skipped even if isAtEndOfLanelets return true
-    if (const auto canonicalized_lanelet_pose = status_.getCanonicalizedLaneletPose()) {
-      if (pose::isAtEndOfLanelets(canonicalized_lanelet_pose.value())) {
-        stopAtCurrentPosition();
-        updateStandStillDuration(step_time);
-        updateTraveledDistance(step_time);
-        return;
-      }
+  behavior_plugin_ptr_->setOtherEntityStatus(other_status_);
+  behavior_plugin_ptr_->setCanonicalizedEntityStatus(status_);
+  behavior_plugin_ptr_->setTargetSpeed(target_speed_);
+  behavior_plugin_ptr_->setRouteLanelets(getRouteLanelets());
+  /// @note CanonicalizedEntityStatus is updated here, it is not skipped even if isAtEndOfLanelets return true
+  behavior_plugin_ptr_->update(current_time, step_time);
+  if (const auto canonicalized_lanelet_pose = status_->getCanonicalizedLaneletPose()) {
+    if (pose::isAtEndOfLanelets(canonicalized_lanelet_pose.value())) {
+      stopAtCurrentPosition();
+      return;
     }
-    updateStandStillDuration(step_time);
-    updateTraveledDistance(step_time);
-  } else {
-    updateEntityStatusTimestamp(current_time);
   }
   EntityBase::onPostUpdate(current_time, step_time);
 }

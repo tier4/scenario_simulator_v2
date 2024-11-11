@@ -1,4 +1,4 @@
-// Copyright 2024 TIER IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@
 
 namespace traffic_simulator
 {
-namespace distance
+inline namespace distance
 {
 auto lateralDistance(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
@@ -48,10 +48,7 @@ auto lateralDistance(
   }
 }
 
-/*
-   See doc: 
-   https://github.com/tier4/scenario_simulator_v2/blob/729e4e6372cdba60e377ae097d032905b80763a9/docs/developer_guide/lane_pose_calculation/GetLongitudinalDistance.md
-*/
+/// @sa https://github.com/tier4/scenario_simulator_v2/blob/729e4e6372cdba60e377ae097d032905b80763a9/docs/developer_guide/lane_pose_calculation/GetLongitudinalDistance.md
 auto longitudinalDistance(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
   bool const include_adjacent_lanelet, bool const include_opposite_direction,
@@ -84,22 +81,19 @@ auto longitudinalDistance(
       return std::nullopt;
     }
   } else {
-    /// @todo here matching_distance should be passed
-    constexpr double matching_distance = 5.0;
     /**
-     * @brief hard coded parameter!! 5.0 is a matching distance of the toLaneletPoses function.
-     * A matching distance of about 1.5 lane widths is given as the matching distance to match the
+     * @brief A matching distance of about 1.5*lane widths is given as the matching distance to match the
      * Entity present on the adjacent Lanelet.
+     * The length of the horizontal bar must intersect with the adjacent lanelet, 
+     * so it is always 10m regardless of the entity type.
      */
+    constexpr double matching_distance = 5.0;
+
     auto from_poses = lanelet_wrapper::pose::toLaneletPoses(
       static_cast<Pose>(from), static_cast<LaneletPose>(from).lanelet_id, matching_distance,
       include_opposite_direction);
     from_poses.emplace_back(from);
-    /**
-     * @brief hard coded parameter!! 5.0 is a matching distance of the toLaneletPoses function.
-     * A matching distance of about 1.5 lane widths is given as the matching distance to match the
-     * Entity present on the adjacent Lanelet.
-     */
+
     auto to_poses = lanelet_wrapper::pose::toLaneletPoses(
       static_cast<Pose>(to), static_cast<LaneletPose>(to).lanelet_id, matching_distance,
       include_opposite_direction);
@@ -218,6 +212,9 @@ auto distanceToLeftLaneBound(
   const Pose & map_pose, const BoundingBox & bounding_box, const lanelet::Ids & lanelet_ids)
   -> double
 {
+  if (lanelet_ids.empty()) {
+    THROW_SEMANTIC_ERROR("Failing to calculate distanceToLeftLaneBound given an empty vector.");
+  }
   std::vector<double> distances;
   std::transform(
     lanelet_ids.begin(), lanelet_ids.end(), std::back_inserter(distances),
@@ -245,10 +242,13 @@ auto distanceToRightLaneBound(
   const Pose & map_pose, const BoundingBox & bounding_box, const lanelet::Ids & lanelet_ids)
   -> double
 {
+  if (lanelet_ids.empty()) {
+    THROW_SEMANTIC_ERROR("Failing to calculate distanceToRightLaneBound for given empty vector.");
+  }
   std::vector<double> distances;
   std::transform(
     lanelet_ids.begin(), lanelet_ids.end(), std::back_inserter(distances),
-    [&](auto lanelet_id) { return distanceToLeftLaneBound(map_pose, bounding_box, lanelet_id); });
+    [&](auto lanelet_id) { return distanceToRightLaneBound(map_pose, bounding_box, lanelet_id); });
   return *std::min_element(distances.begin(), distances.end());
 }
 

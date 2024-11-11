@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
-
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <cpp_mock_scenarios/catalogs.hpp>
 #include <cpp_mock_scenarios/cpp_scenario_node.hpp>
@@ -69,12 +67,12 @@ private:
         constexpr lanelet::Id spawn_lanelet_id = 34705;
         api_.spawn(
           entity_name,
-          traffic_simulator::helper::constructLaneletPose(
+          traffic_simulator::helper::constructCanonicalizedLaneletPose(
             spawn_lanelet_id,
             static_cast<double>(entity_index) / static_cast<double>(number_of_vehicles) *
                 traffic_simulator::lanelet_map::laneletLength(spawn_lanelet_id) +
               normal_dist(engine_),
-            offset, 0, 0),
+            offset),
           getVehicleParameters(
             get_entity_subtype(params_.random_parameters.road_parking_vehicle.entity_type)));
         api_.requestSpeedChange(entity_name, 0, true);
@@ -124,7 +122,7 @@ private:
       if (!api_.entityExists(entity_name)) {
         api_.spawn(
           entity_name,
-          traffic_simulator::helper::constructLaneletPose(34513, spawn_s_value, 0, 0, 0, 0),
+          traffic_simulator::helper::constructCanonicalizedLaneletPose(34513, spawn_s_value, 0.0),
           getVehicleParameters());
         std::uniform_real_distribution<> speed_distribution(
           params_.random_parameters.lane_following_vehicle.min_speed,
@@ -139,9 +137,8 @@ private:
       }
       /// Checking the ego entity overs the lane change position.
       if (const auto entity = api_.getEntity("ego"); entity->laneMatchingSucceed()) {
-        if (
-          entity->getStatus().getLaneletId() == 34684 &&
-          std::abs(entity->getStatus().getLaneletPose().s) >= lane_change_position) {
+        const auto lanelet_pose = entity->getCanonicalizedStatus().getLaneletPose();
+        if (lanelet_pose.lanelet_id == 34684 && std::abs(lanelet_pose.s) >= lane_change_position) {
           api_.requestLaneChange(entity_name, traffic_simulator::lane_change::Direction::RIGHT);
           lane_change_requested = true;
         }
@@ -168,7 +165,7 @@ private:
           params_.random_parameters.crossing_pedestrian.max_speed);
         api_.spawn(
           entity_name,
-          traffic_simulator::helper::constructLaneletPose(
+          traffic_simulator::helper::constructCanonicalizedLaneletPose(
             lanelet_id, 0.0, offset_distribution(engine_)),
           getPedestrianParameters());
         const auto speed = speed_distribution(engine_);
@@ -185,8 +182,11 @@ private:
 
     {
       const auto trigger_position =
-        traffic_simulator::helper::constructCanonicalizedLaneletPose(34621, 10, 0.0);
+        traffic_simulator::helper::constructCanonicalizedLaneletPose(34621, 10.0, 0.0);
+      const auto ego_goal_position =
+        traffic_simulator::helper::constructCanonicalizedLaneletPose(34606, 0.0, 0.0);
       const auto entity_name = "spawn_nearby_ego";
+
       if (const auto ego = api_.getEntity("ego")) {
         if (api_.reachPosition("ego", trigger_position, 20.0) && !api_.entityExists(entity_name)) {
           api_.spawn(
@@ -198,12 +198,16 @@ private:
                 .orientation(geometry_msgs::msg::Quaternion())),
             getVehicleParameters(),
             traffic_simulator::entity::VehicleEntity::BuiltinBehavior::doNothing());
-        } else {
-          stop(cpp_mock_scenarios::Result::FAILURE);
+        }
+
+        if (!api_.reachPosition("ego", trigger_position, 20.0) && api_.entityExists(entity_name)) {
+          api_.despawn(entity_name);
         }
       }
-      if (!api_.reachPosition("ego", trigger_position, 20.0) && api_.entityExists(entity_name)) {
-        api_.despawn(entity_name);
+
+      if (api_.reachPosition("ego", ego_goal_position, 1.0)) {
+        api_.despawn("ego");
+        stop(cpp_mock_scenarios::Result::SUCCESS);
       }
     }
   }
@@ -216,7 +220,7 @@ private:
     spawnRoadParkingVehicles();
 
     spawnEgoEntity(
-      traffic_simulator::helper::constructLaneletPose(34621, 10, 0, 0, 0, 0),
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(34621, 10.0, 0.0),
       {traffic_simulator::helper::constructCanonicalizedLaneletPose(34606, 0.0, 0.0)},
       getVehicleParameters());
     if (const auto ego = api_.getEntity("ego")) {
@@ -230,6 +234,7 @@ private:
         getVehicleParameters(),
         traffic_simulator::entity::VehicleEntity::BuiltinBehavior::doNothing());
     } else {
+      api_.despawn("ego");
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
   }

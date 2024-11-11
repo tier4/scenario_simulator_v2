@@ -40,6 +40,7 @@
 #include <traffic_simulator/simulation_clock/simulation_clock.hpp>
 #include <traffic_simulator/traffic/traffic_controller.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light.hpp>
+#include <traffic_simulator/traffic_lights/traffic_lights.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <utility>
 
@@ -64,14 +65,20 @@ public:
   template <typename NodeT, typename AllocatorT = std::allocator<void>, typename... Ts>
   explicit API(NodeT && node, const Configuration & configuration, Ts &&... xs)
   : configuration(configuration),
-    entity_manager_ptr_(std::make_shared<entity::EntityManager>(node, configuration)),
+    node_parameters_(
+      rclcpp::node_interfaces::get_node_parameters_interface(std::forward<NodeT>(node))),
+    entity_manager_ptr_(
+      std::make_shared<entity::EntityManager>(node, configuration, node_parameters_)),
+    traffic_lights_ptr_(std::make_shared<TrafficLights>(
+      node, getROS2Parameter<std::string>("architecture_type", "awf/universe"))),
     traffic_controller_ptr_(std::make_shared<traffic::TrafficController>(
       [this]() { return API::getEntityNames(); },
       [this](const auto & entity_name) {
         if (const auto entity = getEntity(entity_name)) {
           return entity->getMapPose();
+        } else {
+          THROW_SEMANTIC_ERROR("Entity ", std::quoted(entity_name), " does not exists.");
         }
-        THROW_SEMANTIC_ERROR("Entity ", std::quoted(entity_name), " does not exists.");
       },
       [this](const auto & name) { return API::despawn(name); }, configuration.auto_sink)),
     clock_pub_(rclcpp::create_publisher<rosgraph_msgs::msg::Clock>(
@@ -97,6 +104,7 @@ public:
     zeromq_client_(
       simulation_interface::protocol, configuration.simulator_host, getZMQSocketPort(*node))
   {
+    entity_manager_ptr_->setTrafficLights(traffic_lights_ptr_);
     setVerbose(configuration.verbose);
 
     if (not configuration.standalone_mode) {
@@ -111,6 +119,12 @@ public:
         throw common::SimulationError("Failed to initialize simulator by InitializeRequest");
       }
     }
+  }
+
+  template <typename ParameterT, typename... Ts>
+  auto getROS2Parameter(Ts &&... xs) const -> decltype(auto)
+  {
+    return getParameter<ParameterT>(node_parameters_, std::forward<Ts>(xs)...);
   }
 
   template <typename Node>
@@ -135,10 +149,10 @@ public:
       if (behavior == VehicleBehavior::autoware()) {
         return entity_manager_ptr_->entityExists(name) or
                entity_manager_ptr_->spawnEntity<entity::EgoEntity>(
-                 name, pose, parameters, configuration);
+                 name, pose, parameters, getCurrentTime(), configuration, node_parameters_);
       } else {
         return entity_manager_ptr_->spawnEntity<entity::VehicleEntity>(
-          name, pose, parameters, behavior);
+          name, pose, parameters, getCurrentTime(), behavior);
       }
     };
 
@@ -173,7 +187,7 @@ public:
   {
     auto register_to_entity_manager = [&]() {
       return entity_manager_ptr_->spawnEntity<entity::PedestrianEntity>(
-        name, pose, parameters, behavior);
+        name, pose, parameters, getCurrentTime(), behavior);
     };
 
     auto register_to_environment_simulator = [&]() {
@@ -202,7 +216,8 @@ public:
     const std::string & model3d = "")
   {
     auto register_to_entity_manager = [&]() {
-      return entity_manager_ptr_->spawnEntity<entity::MiscObjectEntity>(name, pose, parameters);
+      return entity_manager_ptr_->spawnEntity<entity::MiscObjectEntity>(
+        name, pose, parameters, getCurrentTime());
     };
 
     auto register_to_environment_simulator = [&]() {
@@ -239,8 +254,7 @@ public:
     const std::string & name, const LaneletPose & lanelet_pose,
     const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void;
   auto setEntityStatus(
-    const std::string & name,
-    const std::optional<CanonicalizedLaneletPose> & canonicalized_lanelet_pose,
+    const std::string & name, const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
     const traffic_simulator_msgs::msg::ActionStatus & action_status =
       helper::constructActionStatus()) -> void;
   auto setEntityStatus(
@@ -256,6 +270,10 @@ public:
       helper::constructActionStatus()) -> void;
 
   std::optional<double> getTimeHeadway(const std::string & from, const std::string & to);
+
+  auto attachImuSensor(
+    const std::string &, const simulation_api_schema::ImuSensorConfiguration & configuration)
+    -> bool;
 
   bool attachPseudoTrafficLightDetector(
     const simulation_api_schema::PseudoTrafficLightDetectorConfiguration &);
@@ -320,6 +338,15 @@ public:
     const bool allow_spawn_outside_lane = false, const bool require_footprint_fitting = false,
     const bool random_orientation = false, std::optional<int> random_seed = std::nullopt) -> void;
 
+  auto getV2ITrafficLights() { return traffic_lights_ptr_->getV2ITrafficLights(); }
+
+  auto getConventionalTrafficLights()
+  {
+    return traffic_lights_ptr_->getConventionalTrafficLights();
+  }
+
+  auto getEntity(const std::string & name) const -> std::shared_ptr<entity::EntityBase>;
+
   // clang-format off
 #define FORWARD_TO_ENTITY_MANAGER(NAME)                                    \
   /*!                                                                      \
@@ -343,21 +370,16 @@ public:
   FORWARD_TO_ENTITY_MANAGER(entityExists);
   FORWARD_TO_ENTITY_MANAGER(getBehaviorParameter);
   FORWARD_TO_ENTITY_MANAGER(getBoundingBox);
-  FORWARD_TO_ENTITY_MANAGER(getConventionalTrafficLight);
-  FORWARD_TO_ENTITY_MANAGER(getConventionalTrafficLights);
   FORWARD_TO_ENTITY_MANAGER(getCurrentAccel);
   FORWARD_TO_ENTITY_MANAGER(getCurrentAction);
   FORWARD_TO_ENTITY_MANAGER(getCurrentTwist);
   FORWARD_TO_ENTITY_MANAGER(getEgoName);
-  FORWARD_TO_ENTITY_MANAGER(getEntity);
   FORWARD_TO_ENTITY_MANAGER(getEntityNames);
   FORWARD_TO_ENTITY_MANAGER(getEntityStatus);
-  FORWARD_TO_ENTITY_MANAGER(getEntityStatusBeforeUpdate);
+  FORWARD_TO_ENTITY_MANAGER(getCanonicalizedStatusBeforeUpdate);
   FORWARD_TO_ENTITY_MANAGER(getLinearJerk);
   FORWARD_TO_ENTITY_MANAGER(getStandStillDuration);
   FORWARD_TO_ENTITY_MANAGER(getTraveledDistance);
-  FORWARD_TO_ENTITY_MANAGER(getV2ITrafficLight);
-  FORWARD_TO_ENTITY_MANAGER(getV2ITrafficLights);
   FORWARD_TO_ENTITY_MANAGER(isEgoSpawned);
   FORWARD_TO_ENTITY_MANAGER(isInLanelet);
   FORWARD_TO_ENTITY_MANAGER(isNpcLogicStarted);
@@ -367,15 +389,14 @@ public:
   FORWARD_TO_ENTITY_MANAGER(requestAssignRoute);
   FORWARD_TO_ENTITY_MANAGER(requestFollowTrajectory);
   FORWARD_TO_ENTITY_MANAGER(requestSpeedChange);
+  FORWARD_TO_ENTITY_MANAGER(requestSynchronize);
   FORWARD_TO_ENTITY_MANAGER(requestWalkStraight);
+  FORWARD_TO_ENTITY_MANAGER(requestClearRoute);
   FORWARD_TO_ENTITY_MANAGER(resetBehaviorPlugin);
-  FORWARD_TO_ENTITY_MANAGER(resetConventionalTrafficLightPublishRate);
-  FORWARD_TO_ENTITY_MANAGER(resetV2ITrafficLightPublishRate);
   FORWARD_TO_ENTITY_MANAGER(setAcceleration);
   FORWARD_TO_ENTITY_MANAGER(setAccelerationLimit);
   FORWARD_TO_ENTITY_MANAGER(setAccelerationRateLimit);
   FORWARD_TO_ENTITY_MANAGER(setBehaviorParameter);
-  FORWARD_TO_ENTITY_MANAGER(setConventionalTrafficLightConfidence);
   FORWARD_TO_ENTITY_MANAGER(setDecelerationLimit);
   FORWARD_TO_ENTITY_MANAGER(setDecelerationRateLimit);
   FORWARD_TO_ENTITY_MANAGER(setLinearVelocity);
@@ -398,7 +419,11 @@ private:
 
   const Configuration configuration;
 
+  const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr node_parameters_;
+
   const std::shared_ptr<entity::EntityManager> entity_manager_ptr_;
+
+  const std::shared_ptr<TrafficLights> traffic_lights_ptr_;
 
   const std::shared_ptr<traffic::TrafficController> traffic_controller_ptr_;
 

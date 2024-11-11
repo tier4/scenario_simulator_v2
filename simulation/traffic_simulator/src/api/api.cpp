@@ -14,6 +14,7 @@
 
 #include <tf2/LinearMath/Quaternion.h>
 
+#include <geometry/quaternion/euler_to_quaternion.hpp>
 #include <limits>
 #include <memory>
 #include <optional>
@@ -98,19 +99,21 @@ auto API::respawn(
   }
 }
 
+auto API::getEntity(const std::string & name) const -> std::shared_ptr<entity::EntityBase>
+{
+  return entity_manager_ptr_->getEntity(name);
+}
+
 auto API::setEntityStatus(
-  const std::string & name,
-  const std::optional<CanonicalizedLaneletPose> & canonicalized_lanelet_pose,
+  const std::string & name, const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
   const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
 {
   if (const auto entity = getEntity(name)) {
-    auto status = static_cast<EntityStatus>(entity->getStatus());
+    auto status = static_cast<EntityStatus>(entity->getCanonicalizedStatus());
     status.action_status = action_status;
-    if (canonicalized_lanelet_pose) {
-      status.pose = static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose.value());
-      status.lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose.value());
-      status.lanelet_pose_valid = true;
-    }
+    status.pose = static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose);
+    status.lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose);
+    status.lanelet_pose_valid = true;
     entity->setCanonicalizedStatus(CanonicalizedEntityStatus(status, canonicalized_lanelet_pose));
   } else {
     THROW_SIMULATION_ERROR("Cannot set entity \"", name, "\" status - such entity does not exist.");
@@ -148,7 +151,14 @@ auto API::setEntityStatus(
   const std::string & name, const LaneletPose & lanelet_pose,
   const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
 {
-  setEntityStatus(name, pose::toCanonicalizedLaneletPose(lanelet_pose), action_status);
+  if (const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(lanelet_pose)) {
+    setEntityStatus(name, canonicalized_lanelet_pose.value(), action_status);
+  } else {
+    std::stringstream ss;
+    ss << "Status can not be set. lanelet pose: " << lanelet_pose
+       << " cannot be canonicalized for ";
+    THROW_SEMANTIC_ERROR(ss.str(), " entity named: ", std::quoted(name), ".");
+  }
 }
 
 auto API::setEntityStatus(
@@ -156,9 +166,10 @@ auto API::setEntityStatus(
   const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
 {
   if (const auto entity = getEntity(name)) {
-    EntityStatus status = static_cast<EntityStatus>(entity->getStatus());
+    EntityStatus status = static_cast<EntityStatus>(entity->getCanonicalizedStatus());
     status.pose = map_pose;
     status.action_status = action_status;
+    status.lanelet_pose_valid = false;
     setEntityStatus(name, status);
   } else {
     THROW_SIMULATION_ERROR("Cannot set entity \"", name, "\" status - such entity does not exist.");
@@ -189,8 +200,16 @@ auto API::setEntityStatus(
   const auto relative_pose =
     geometry_msgs::build<geometry_msgs::msg::Pose>()
       .position(relative_position)
-      .orientation(quaternion_operation::convertEulerAngleToQuaternion(relative_rpy));
+      .orientation(math::geometry::convertEulerAngleToQuaternion(relative_rpy));
   setEntityStatus(name, reference_entity_name, relative_pose, action_status);
+}
+
+auto API::attachImuSensor(
+  const std::string &, const simulation_api_schema::ImuSensorConfiguration & configuration) -> bool
+{
+  simulation_api_schema::AttachImuSensorRequest req;
+  *req.mutable_configuration() = configuration;
+  return zeromq_client_.call(req).result().success();
 }
 
 bool API::attachPseudoTrafficLightDetector(
@@ -219,7 +238,7 @@ bool API::attachDetectionSensor(
   double object_recognition_delay)
 {
   return attachDetectionSensor(helper::constructDetectionSensorConfiguration(
-    entity_name, getParameter<std::string>("architecture_type", "awf/universe"), 0.1,
+    entity_name, getROS2Parameter<std::string>("architecture_type", "awf/universe"), 0.1,
     detection_sensor_range, detect_all_objects_in_range, pos_noise_stddev, random_seed,
     probability_of_lost, object_recognition_delay));
 }
@@ -252,7 +271,7 @@ bool API::attachLidarSensor(
   const helper::LidarType lidar_type)
 {
   return attachLidarSensor(helper::constructLidarConfiguration(
-    lidar_type, entity_name, getParameter<std::string>("architecture_type", "awf/universe"),
+    lidar_type, entity_name, getROS2Parameter<std::string>("architecture_type", "awf/universe"),
     lidar_sensor_delay));
 }
 
@@ -268,9 +287,10 @@ bool API::updateTimeInSim()
 
 bool API::updateTrafficLightsInSim()
 {
-  if (entity_manager_ptr_->trafficLightsChanged()) {
-    auto req = entity_manager_ptr_->generateUpdateRequestForConventionalTrafficLights();
-    return zeromq_client_.call(req).result().success();
+  if (traffic_lights_ptr_->isAnyTrafficLightChanged()) {
+    auto request =
+      traffic_lights_ptr_->getConventionalTrafficLights()->generateUpdateTrafficLightsRequest();
+    return zeromq_client_.call(request).result().success();
   }
   /// @todo handle response
   return simulation_api_schema::UpdateTrafficLightsResponse().result().success();
@@ -334,16 +354,18 @@ bool API::updateFrame()
   clock_.update();
   clock_pub_->publish(clock_.getCurrentRosTimeAsMsg());
   debug_marker_pub_->publish(entity_manager_ptr_->makeDebugMarker());
+  debug_marker_pub_->publish(traffic_controller_ptr_->makeDebugMarker());
   return true;
 }
 
 void API::startNpcLogic()
 {
-  if (isNpcLogicStarted()) {
+  if (entity_manager_ptr_->isNpcLogicStarted()) {
     THROW_SIMULATION_ERROR("NPC logics are already started.");
+  } else {
+    clock_.start();
+    entity_manager_ptr_->startNpcLogic(getCurrentTime());
   }
-  clock_.start();
-  entity_manager_ptr_->startNpcLogic(getCurrentTime());
 }
 
 void API::requestLaneChange(const std::string & name, const lanelet::Id lanelet_id)

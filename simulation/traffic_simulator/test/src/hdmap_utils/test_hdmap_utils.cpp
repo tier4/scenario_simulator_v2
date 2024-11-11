@@ -16,45 +16,13 @@
 #include <gtest/gtest.h>
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
+#include <geometry/quaternion/euler_to_quaternion.hpp>
 #include <string>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 
 #include "../expect_eq_macros.hpp"
-
-auto makePoint(const double x, const double y, const double z = 0.0) -> geometry_msgs::msg::Point
-{
-  return geometry_msgs::build<geometry_msgs::msg::Point>().x(x).y(y).z(z);
-}
-
-auto makeBoundingBox(const double center_y = 0.0) -> traffic_simulator_msgs::msg::BoundingBox
-{
-  return traffic_simulator_msgs::build<traffic_simulator_msgs::msg::BoundingBox>()
-    .center(makePoint(1.0, center_y))
-    .dimensions(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(4.0).y(2.0).z(1.5));
-}
-
-auto makePose(
-  geometry_msgs::msg::Point position,
-  geometry_msgs::msg::Quaternion orientation = geometry_msgs::msg::Quaternion())
-  -> geometry_msgs::msg::Pose
-{
-  return geometry_msgs::build<geometry_msgs::msg::Pose>().position(position).orientation(
-    orientation);
-}
-
-auto makeSmallBoundingBox(const double center_y = 0.0) -> traffic_simulator_msgs::msg::BoundingBox
-{
-  return traffic_simulator_msgs::build<traffic_simulator_msgs::msg::BoundingBox>()
-    .center(makePoint(0.0, center_y))
-    .dimensions(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(1.0).y(1.0).z(1.0));
-}
-
-auto makeQuaternionFromYaw(const double yaw) -> geometry_msgs::msg::Quaternion
-{
-  return quaternion_operation::convertEulerAngleToQuaternion(
-    geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0.0).y(0.0).z(yaw));
-}
+#include "../helper_functions.hpp"
 
 int main(int argc, char ** argv)
 {
@@ -66,12 +34,13 @@ class HdMapUtilsTest_StandardMap : public testing::Test
 {
 protected:
   HdMapUtilsTest_StandardMap()
-  : hdmap_utils(hdmap_utils::HdMapUtils(
-      ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm",
+  : hdmap_utils(
+      ament_index_cpp::get_package_share_directory("traffic_simulator") +
+        "/map/standard_map/lanelet2_map.osm",
       geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
         .latitude(35.61836750154)
         .longitude(139.78066608243)
-        .altitude(0.0)))
+        .altitude(0.0))
   {
   }
 
@@ -81,13 +50,13 @@ class HdMapUtilsTest_WithRoadShoulderMap : public testing::Test
 {
 protected:
   HdMapUtilsTest_WithRoadShoulderMap()
-  : hdmap_utils(hdmap_utils::HdMapUtils(
+  : hdmap_utils(
       ament_index_cpp::get_package_share_directory("traffic_simulator") +
         "/map/with_road_shoulder/lanelet2_map.osm",
       geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
         .latitude(35.61836750154)
         .longitude(139.78066608243)
-        .altitude(0.0)))
+        .altitude(0.0))
   {
   }
 
@@ -97,13 +66,13 @@ class HdMapUtilsTest_EmptyMap : public testing::Test
 {
 protected:
   HdMapUtilsTest_EmptyMap()
-  : hdmap_utils(hdmap_utils::HdMapUtils(
+  : hdmap_utils(
       ament_index_cpp::get_package_share_directory("traffic_simulator") +
         "/map/empty/lanelet2_map.osm",
       geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
         .latitude(0.0)
         .longitude(0.0)
-        .altitude(0.0)))
+        .altitude(0.0))
   {
   }
 
@@ -113,13 +82,13 @@ class HdMapUtilsTest_FourTrackHighwayMap : public testing::Test
 {
 protected:
   HdMapUtilsTest_FourTrackHighwayMap()
-  : hdmap_utils(hdmap_utils::HdMapUtils(
+  : hdmap_utils(
       ament_index_cpp::get_package_share_directory("traffic_simulator") +
         "/map/four_track_highway/lanelet2_map.osm",
       geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
         .latitude(35.22312494055522)
         .longitude(138.8024583466017)
-        .altitude(0.0)))
+        .altitude(0.0))
   {
   }
 
@@ -129,18 +98,50 @@ class HdMapUtilsTest_CrossroadsWithStoplinesMap : public testing::Test
 {
 protected:
   HdMapUtilsTest_CrossroadsWithStoplinesMap()
-  : hdmap_utils(hdmap_utils::HdMapUtils(
+  : hdmap_utils(
       ament_index_cpp::get_package_share_directory("traffic_simulator") +
         "/map/crossroads_with_stoplines/lanelet2_map.osm",
       geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
         .latitude(35.23808753540768)
         .longitude(139.9009591876285)
-        .altitude(0.0)))
+        .altitude(0.0))
   {
   }
 
   hdmap_utils::HdMapUtils hdmap_utils;
 };
+class HdMapUtilsTest_KashiwanohaMap : public testing::Test
+{
+protected:
+  HdMapUtilsTest_KashiwanohaMap()
+  : hdmap_utils(
+      ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map/lanelet2_map.osm",
+      geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
+        .latitude(0.0)
+        .longitude(0.0)
+        .altitude(0.0))
+  {
+  }
+
+  hdmap_utils::HdMapUtils hdmap_utils;
+};
+class HdMapUtilsTest_IntersectionMap : public testing::Test
+{
+protected:
+  HdMapUtilsTest_IntersectionMap()
+  : hdmap_utils(
+      ament_index_cpp::get_package_share_directory("traffic_simulator") +
+        "/map/intersection/lanelet2_map.osm",
+      geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
+        .latitude(35.64200728302)
+        .longitude(139.74821144562)
+        .altitude(0.0))
+  {
+  }
+
+  hdmap_utils::HdMapUtils hdmap_utils;
+};
+
 /**
  * @note Test basic functionality.
  * Test initialization correctness with a correct path to a lanelet map.
@@ -149,7 +150,8 @@ TEST(HdMapUtils, Construct)
 {
   ASSERT_NO_THROW(
     auto hdmap_utils = hdmap_utils::HdMapUtils(
-      ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm",
+      ament_index_cpp::get_package_share_directory("traffic_simulator") +
+        "/map/standard_map/lanelet2_map.osm",
       geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
         .latitude(35.61836750154)
         .longitude(139.78066608243)
@@ -477,6 +479,46 @@ TEST_F(HdMapUtilsTest_StandardMap, CanonicalizeAll)
   EXPECT_EQ(canonicalized_lanelet_poses.size(), static_cast<std::size_t>(1));
   EXPECT_EQ(canonicalized_lanelet_poses[0].lanelet_id, 34981);
   EXPECT_EQ(canonicalized_lanelet_poses[0].s, non_canonicalized_lanelet_s);
+}
+
+/**
+ * @note Testcase for countLaneChanges() function
+ */
+TEST_F(HdMapUtilsTest_FourTrackHighwayMap, CountLaneChangesAlongRoute)
+{
+  using traffic_simulator::helper::constructLaneletPose;
+  EXPECT_EQ(
+    hdmap_utils.countLaneChanges(
+      constructLaneletPose(3002176, 0), constructLaneletPose(3002175, 0), true),
+    std::make_pair(1, 0));
+  EXPECT_EQ(
+    hdmap_utils.countLaneChanges(
+      constructLaneletPose(3002176, 0), constructLaneletPose(3002182, 0), true),
+    std::make_pair(1, 0));
+  EXPECT_EQ(
+    hdmap_utils.countLaneChanges(
+      constructLaneletPose(3002176, 0), constructLaneletPose(199, 0), true),
+    std::make_pair(1, 0));
+  EXPECT_EQ(
+    hdmap_utils.countLaneChanges(
+      constructLaneletPose(3002176, 0), constructLaneletPose(3002176, 0), true),
+    std::make_pair(0, 0));
+  EXPECT_EQ(
+    hdmap_utils.countLaneChanges(
+      constructLaneletPose(3002176, 0), constructLaneletPose(200, 0), true),
+    std::make_pair(0, 0));
+  EXPECT_EQ(
+    hdmap_utils.countLaneChanges(
+      constructLaneletPose(3002176, 0), constructLaneletPose(201, 0), true),
+    std::make_pair(0, 1));
+  EXPECT_EQ(
+    hdmap_utils.countLaneChanges(
+      constructLaneletPose(3002176, 0), constructLaneletPose(202, 0), true),
+    std::make_pair(0, 2));
+  EXPECT_EQ(
+    hdmap_utils.countLaneChanges(
+      constructLaneletPose(3002176, 0), constructLaneletPose(206, 0), true),
+    std::make_pair(0, 2));
 }
 
 /**
@@ -1945,17 +1987,17 @@ TEST_F(HdMapUtilsTest_StandardMap, getTrafficLightIdsOnPath_empty)
  */
 TEST_F(HdMapUtilsTest_StandardMap, getLongitudinalDistance_sameLanelet)
 {
-  auto pose_from = hdmap_utils.toLaneletPose(
+  const auto pose_from = hdmap_utils.toLaneletPose(
     makePose(makePoint(3812.65, 73810.13, -2.80), makeQuaternionFromYaw(90.0)), lanelet::Id{34606});
-  auto pose_to = hdmap_utils.toLaneletPose(
+  const auto pose_to = hdmap_utils.toLaneletPose(
     makePose(makePoint(3825.10, 73786.34, -1.82), makeQuaternionFromYaw(90.0)), lanelet::Id{34606});
-  EXPECT_TRUE(pose_from.has_value());
-  EXPECT_TRUE(pose_to.has_value());
+  ASSERT_TRUE(pose_from.has_value());
+  ASSERT_TRUE(pose_to.has_value());
 
   const auto result_distance =
     hdmap_utils.getLongitudinalDistance(pose_from.value(), pose_to.value(), false);
 
-  EXPECT_TRUE(result_distance.has_value());
+  ASSERT_TRUE(result_distance.has_value());
   EXPECT_NEAR(result_distance.value(), 27.0, 1.0);
 }
 
@@ -1966,35 +2008,36 @@ TEST_F(HdMapUtilsTest_StandardMap, getLongitudinalDistance_sameLanelet)
  */
 TEST_F(HdMapUtilsTest_StandardMap, getLongitudinalDistance_sameLaneletBehind)
 {
-  auto pose_to = hdmap_utils.toLaneletPose(
+  const auto pose_to = hdmap_utils.toLaneletPose(
     makePose(makePoint(3812.65, 73810.13, -2.80), makeQuaternionFromYaw(90.0)), lanelet::Id{34606});
-  auto pose_from = hdmap_utils.toLaneletPose(
+  const auto pose_from = hdmap_utils.toLaneletPose(
     makePose(makePoint(3825.10, 73786.34, -1.82), makeQuaternionFromYaw(90.0)), lanelet::Id{34606});
-  EXPECT_TRUE(pose_from.has_value());
-  EXPECT_TRUE(pose_to.has_value());
+  ASSERT_TRUE(pose_from.has_value());
+  ASSERT_TRUE(pose_to.has_value());
 
-  EXPECT_FALSE(
-    hdmap_utils.getLongitudinalDistance(pose_from.value(), pose_to.value(), false).has_value());
+  const auto longitudinal_distance =
+    hdmap_utils.getLongitudinalDistance(pose_from.value(), pose_to.value(), false);
+  EXPECT_FALSE(longitudinal_distance.has_value());
 }
 
 /**
  * @note Test basic functionality.
  * Test longitudinal distance calculation correctness
- * with two poses on different lanelets  that are a few lanelets apart (e.g. 3).
+ * with two poses on different lanelets that are a few lanelets apart (e.g. 3).
  */
 TEST_F(HdMapUtilsTest_StandardMap, getLongitudinalDistance_differentLanelet)
 {
-  auto pose_from =
+  const auto pose_from =
     hdmap_utils.toLaneletPose(makePose(makePoint(3801.19, 73812.70, -2.86)), lanelet::Id{120660});
-  auto pose_to =
+  const auto pose_to =
     hdmap_utils.toLaneletPose(makePose(makePoint(3724.70, 73773.00, -1.20)), lanelet::Id{34462});
-  EXPECT_TRUE(pose_from.has_value());
-  EXPECT_TRUE(pose_to.has_value());
+  ASSERT_TRUE(pose_from.has_value());
+  ASSERT_TRUE(pose_to.has_value());
 
   const auto result_distance =
     hdmap_utils.getLongitudinalDistance(pose_from.value(), pose_to.value(), false);
 
-  EXPECT_TRUE(result_distance.has_value());
+  ASSERT_TRUE(result_distance.has_value());
   EXPECT_NEAR(result_distance.value(), 86.0, 1.0);
 }
 
@@ -2005,15 +2048,93 @@ TEST_F(HdMapUtilsTest_StandardMap, getLongitudinalDistance_differentLanelet)
  */
 TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLongitudinalDistance_differentLaneletNoRoute)
 {
-  auto pose_to = hdmap_utils.toLaneletPose(
+  const auto pose_to = hdmap_utils.toLaneletPose(
     makePose(makePoint(81590.79, 50067.66), makeQuaternionFromYaw(90.0)), lanelet::Id{3002185});
-  auto pose_from = hdmap_utils.toLaneletPose(
+  const auto pose_from = hdmap_utils.toLaneletPose(
     makePose(makePoint(81596.20, 50068.04), makeQuaternionFromYaw(90.0)), lanelet::Id{3002166});
-  EXPECT_TRUE(pose_from.has_value());
-  EXPECT_TRUE(pose_to.has_value());
+  ASSERT_TRUE(pose_from.has_value());
+  ASSERT_TRUE(pose_to.has_value());
 
   EXPECT_FALSE(
     hdmap_utils.getLongitudinalDistance(pose_from.value(), pose_to.value(), false).has_value());
+}
+
+/**
+ * @note Test for the corner-case fixed in https://github.com/tier4/scenario_simulator_v2/pull/1348.
+ */
+TEST_F(HdMapUtilsTest_KashiwanohaMap, getLongitudinalDistance_PullRequest1348)
+{
+  auto pose_from = traffic_simulator::helper::constructLaneletPose(34468, 10.0);
+  auto pose_to = traffic_simulator::helper::constructLaneletPose(34795, 5.0);
+
+  EXPECT_NO_THROW(EXPECT_DOUBLE_EQ(
+    hdmap_utils.getLongitudinalDistance(pose_from, pose_to, true).value(),
+    54.18867466433655977198213804513216018676757812500000));
+}
+
+/**
+ * @note Test for the corner case described in https://github.com/tier4/scenario_simulator_v2/issues/1364
+ * Test in a scenario where lane change is necessary:
+ * if allow_lane_change = false, std::nullopt should be returned;
+ * if allow_lane_change = true, a value should be returned.
+ */
+TEST_F(HdMapUtilsTest_IntersectionMap, getLongitudinalDistance_laneChange)
+{
+  {
+    const auto pose_from = traffic_simulator::helper::constructLaneletPose(563L, 5.0);
+    const auto pose_to = traffic_simulator::helper::constructLaneletPose(659L, 5.0);
+
+    const auto without_lane_change = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, false);
+    EXPECT_FALSE(without_lane_change.has_value());
+
+    const auto with_lane_change = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, true);
+    ASSERT_TRUE(with_lane_change.has_value());
+    EXPECT_NEAR(with_lane_change.value(), 157.0, 1.0);
+  }
+  {
+    const auto pose_from = traffic_simulator::helper::constructLaneletPose(563L, 5.0);
+    const auto pose_to = traffic_simulator::helper::constructLaneletPose(658L, 5.0);
+
+    const auto without_lane_change = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, false);
+    EXPECT_FALSE(without_lane_change.has_value());
+
+    const auto with_lane_change = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, true);
+    ASSERT_TRUE(with_lane_change.has_value());
+    EXPECT_NEAR(with_lane_change.value(), 161.0, 1.0);
+  }
+  {
+    const auto pose_from = traffic_simulator::helper::constructLaneletPose(563L, 5.0);
+    const auto pose_to = traffic_simulator::helper::constructLaneletPose(657L, 5.0);
+
+    const auto without_lane_change = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, false);
+    EXPECT_FALSE(without_lane_change.has_value());
+
+    const auto with_lane_change = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, true);
+    ASSERT_TRUE(with_lane_change.has_value());
+    EXPECT_NEAR(with_lane_change.value(), 161.0, 1.0);
+  }
+  {
+    const auto pose_from = traffic_simulator::helper::constructLaneletPose(643L, 5.0);
+    const auto pose_to = traffic_simulator::helper::constructLaneletPose(666L, 5.0);
+
+    const auto without_lane_change = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, false);
+    EXPECT_FALSE(without_lane_change.has_value());
+
+    const auto with_lane_change = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, true);
+    ASSERT_TRUE(with_lane_change.has_value());
+    EXPECT_NEAR(with_lane_change.value(), 250.0, 1.0);
+  }
+  {
+    const auto pose_from = traffic_simulator::helper::constructLaneletPose(643L, 5.0);
+    const auto pose_to = traffic_simulator::helper::constructLaneletPose(665L, 5.0);
+
+    const auto without_lane_change = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, false);
+    EXPECT_FALSE(without_lane_change.has_value());
+
+    const auto with_lane_change = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, true);
+    ASSERT_TRUE(with_lane_change.has_value());
+    EXPECT_NEAR(with_lane_change.value(), 253.0, 1.0);
+  }
 }
 
 /**

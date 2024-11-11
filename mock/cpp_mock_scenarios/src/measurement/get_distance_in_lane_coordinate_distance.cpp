@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
-
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <cpp_mock_scenarios/catalogs.hpp>
 #include <cpp_mock_scenarios/cpp_scenario_node.hpp>
@@ -143,19 +141,25 @@ private:
   void onInitialize() override
   {
     api_.spawn(
-      "ego", traffic_simulator::helper::constructLaneletPose(34513, 5, 0, 0, 0, 0),
+      "ego",
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(
+        34513, 5.0, 0.0, api_.getHdmapUtils()),
       getVehicleParameters());
     api_.setLinearVelocity("ego", 10);
     api_.requestSpeedChange("ego", 3, true);
 
     api_.spawn(
-      "front", traffic_simulator::helper::constructLaneletPose(34513, 10, 1, 0, 0, 0),
+      "front",
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(
+        34513, 10.0, 1.0, api_.getHdmapUtils()),
       getVehicleParameters());
     api_.setLinearVelocity("front", 10);
     api_.requestSpeedChange("front", 3, true);
 
     api_.spawn(
-      "behind", traffic_simulator::helper::constructLaneletPose(34513, 0, -1, 0, 0, 0),
+      "behind",
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(
+        34513, 0.0, -1.0, api_.getHdmapUtils()),
       getVehicleParameters());
     api_.setLinearVelocity("behind", 10);
     api_.requestSpeedChange("behind", 3, true);

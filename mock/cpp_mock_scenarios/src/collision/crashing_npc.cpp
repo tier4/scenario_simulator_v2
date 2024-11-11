@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
-
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <cpp_mock_scenarios/catalogs.hpp>
 #include <cpp_mock_scenarios/cpp_scenario_node.hpp>
@@ -54,7 +52,10 @@ private:
   void onInitialize() override
   {
     api_.spawn(
-      "ego", traffic_simulator::helper::constructLaneletPose(34741, 0, 0), getVehicleParameters());
+      "ego",
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(
+        34741, 0.0, 0.0, api_.getHdmapUtils()),
+      getVehicleParameters());
     api_.setLinearVelocity("ego", 0.0);
     api_.requestSpeedChange("ego", 15, true);
     traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter;
@@ -62,7 +63,10 @@ private:
     api_.setBehaviorParameter("ego", behavior_parameter);
 
     api_.spawn(
-      "npc", traffic_simulator::helper::constructLaneletPose(34741, 10, 0), getVehicleParameters());
+      "npc",
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(
+        34741, 10.0, 0.0, api_.getHdmapUtils()),
+      getVehicleParameters());
     api_.setLinearVelocity("npc", 0.0);
     api_.requestSpeedChange("npc", 5, true);
   }

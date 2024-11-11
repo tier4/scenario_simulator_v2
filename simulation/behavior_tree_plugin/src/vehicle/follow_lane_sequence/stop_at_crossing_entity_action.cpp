@@ -56,12 +56,12 @@ StopAtCrossingEntityAction::calculateObstacle(const traffic_simulator_msgs::msg:
 
 const traffic_simulator_msgs::msg::WaypointsArray StopAtCrossingEntityAction::calculateWaypoints()
 {
-  if (!entity_status->laneMatchingSucceed()) {
+  if (!canonicalized_entity_status->laneMatchingSucceed()) {
     THROW_SIMULATION_ERROR("failed to assign lane");
   }
-  if (entity_status->getTwist().linear.x >= 0) {
+  if (canonicalized_entity_status->getTwist().linear.x >= 0) {
     traffic_simulator_msgs::msg::WaypointsArray waypoints;
-    const auto lanelet_pose = entity_status->getLaneletPose();
+    const auto lanelet_pose = canonicalized_entity_status->getLaneletPose();
     waypoints.waypoints = reference_trajectory->getTrajectory(
       lanelet_pose.s, lanelet_pose.s + getHorizon(), 1.0, lanelet_pose.offset);
     trajectory = std::make_unique<math::geometry::CatmullRomSubspline>(
@@ -94,7 +94,7 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
     in_stop_sequence_ = false;
     return BT::NodeStatus::FAILURE;
   }
-  if (!entity_status->laneMatchingSucceed()) {
+  if (!canonicalized_entity_status->laneMatchingSucceed()) {
     in_stop_sequence_ = false;
     return BT::NodeStatus::FAILURE;
   }
@@ -136,14 +136,12 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
   }
   std::optional<double> target_linear_speed;
   if (distance_to_stop_target_) {
-    target_linear_speed = calculateTargetSpeed(entity_status->getTwist().linear.x);
+    target_linear_speed = calculateTargetSpeed(canonicalized_entity_status->getTwist().linear.x);
   } else {
     target_linear_speed = std::nullopt;
   }
   if (!distance_to_stop_target_) {
-    setOutput(
-      "non_canonicalized_updated_status",
-      std::make_shared<traffic_simulator::EntityStatus>(calculateUpdatedEntityStatus(0)));
+    setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(0));
     setOutput("waypoints", waypoints);
     setOutput("obstacle", calculateObstacle(waypoints));
     in_stop_sequence_ = false;
@@ -156,9 +154,7 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
   } else {
     target_speed = target_linear_speed.value();
   }
-  setOutput(
-    "non_canonicalized_updated_status", std::make_shared<traffic_simulator::EntityStatus>(
-                                          calculateUpdatedEntityStatus(target_speed.value())));
+  setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(target_speed.value()));
   setOutput("waypoints", waypoints);
   setOutput("obstacle", calculateObstacle(waypoints));
   in_stop_sequence_ = true;

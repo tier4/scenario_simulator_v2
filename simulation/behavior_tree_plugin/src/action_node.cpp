@@ -12,11 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
-
 #include <algorithm>
 #include <behavior_tree_plugin/action_node.hpp>
 #include <geometry/bounding_box.hpp>
+#include <geometry/quaternion/euler_to_quaternion.hpp>
+#include <geometry/quaternion/get_rotation.hpp>
+#include <geometry/quaternion/get_rotation_matrix.hpp>
+#include <geometry/quaternion/quaternion_to_euler.hpp>
 #include <memory>
 #include <optional>
 #include <rclcpp/rclcpp.hpp>
@@ -51,13 +53,13 @@ auto ActionNode::getBlackBoardValues() -> void
   if (!getInput<double>("current_time", current_time)) {
     THROW_SIMULATION_ERROR("failed to get input current_time in ActionNode");
   }
-  if (!getInput<std::shared_ptr<traffic_simulator::TrafficLightManager>>(
-        "traffic_light_manager", traffic_light_manager)) {
-    THROW_SIMULATION_ERROR("failed to get input traffic_light_manager in ActionNode");
+  if (!getInput<std::shared_ptr<traffic_simulator::TrafficLightsBase>>(
+        "traffic_lights", traffic_lights)) {
+    THROW_SIMULATION_ERROR("failed to get input traffic_lights in ActionNode");
   }
   if (!getInput<std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>>(
-        "entity_status", entity_status)) {
-    THROW_SIMULATION_ERROR("failed to get input entity_status in ActionNode");
+        "canonicalized_entity_status", canonicalized_entity_status)) {
+    THROW_SIMULATION_ERROR("failed to get input canonicalized_entity_status in ActionNode");
   }
 
   if (!getInput<std::optional<double>>("target_speed", target_speed)) {
@@ -105,14 +107,21 @@ auto ActionNode::getOtherEntities() const
 
 auto ActionNode::getHorizon() const -> double
 {
-  return std::clamp(entity_status->getTwist().linear.x * 5.0, 20.0, 50.0);
+  return std::clamp(canonicalized_entity_status->getTwist().linear.x * 5.0, 20.0, 50.0);
 }
 
 auto ActionNode::stopEntity() const -> void
 {
-  entity_status->setTwist(geometry_msgs::msg::Twist());
-  entity_status->setAccel(geometry_msgs::msg::Accel());
-  entity_status->setLinearJerk(0);
+  canonicalized_entity_status->setTwist(geometry_msgs::msg::Twist());
+  canonicalized_entity_status->setAccel(geometry_msgs::msg::Accel());
+  canonicalized_entity_status->setLinearJerk(0);
+}
+
+auto ActionNode::setCanonicalizedEntityStatus(const traffic_simulator::EntityStatus & entity_status)
+  -> void
+{
+  canonicalized_entity_status->set(
+    entity_status, default_matching_distance_for_lanelet_pose_calculation);
 }
 
 auto ActionNode::getOtherEntityStatus(lanelet::Id lanelet_id) const
@@ -133,7 +142,9 @@ auto ActionNode::getYieldStopDistance(const lanelet::Ids & following_lanelets) c
   -> std::optional<double>
 {
   if (const auto other_poses = getOtherEntitiesPoses(); !other_poses.empty()) {
-    if (auto const canonicalized_lanelet_pose = entity_status->getCanonicalizedLaneletPose())
+    if (
+      auto const canonicalized_lanelet_pose =
+        canonicalized_entity_status->getCanonicalizedLaneletPose())
       traffic_simulator::distance::distanceToYieldStop(
         canonicalized_lanelet_pose.value(), following_lanelets, other_poses);
   } else {
@@ -170,13 +181,14 @@ auto ActionNode::getFrontEntityName(const math::geometry::CatmullRomSplineInterf
     if (auto const canonicalized_lanelet_pose = each.second.getCanonicalizedLaneletPose()) {
       const auto distance = traffic_simulator::distance::splineDistanceToBoundingBox(
         spline, canonicalized_lanelet_pose.value(), each.second.getBoundingBox());
-      const auto quat = quaternion_operation::getRotation(
-        entity_status->getMapPose().orientation, each.second.getMapPose().orientation);
+      const auto quat = math::geometry::getRotation(
+        canonicalized_entity_status->getMapPose().orientation,
+        each.second.getMapPose().orientation);
       /**
      * @note hard-coded parameter, if the Yaw value of RPY is in ~1.5708 -> 1.5708, entity is a candidate of front entity.
      */
       if (
-        std::fabs(quaternion_operation::convertQuaternionToEulerAngle(quat).z) <=
+        std::fabs(math::geometry::convertQuaternionToEulerAngle(quat).z) <=
         boost::math::constants::half_pi<double>()) {
         if (distance && distance.value() < 40) {
           entities.emplace_back(each.first);
@@ -212,17 +224,21 @@ auto ActionNode::calculateUpdatedEntityStatus(
 {
   const auto speed_planner =
     traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner(
-      step_time, getEntityName());
+      step_time, canonicalized_entity_status->getName());
   const auto dynamics = speed_planner.getDynamicStates(
-    target_speed, constraints, entity_status->getTwist(), entity_status->getAccel());
+    target_speed, constraints, canonicalized_entity_status->getTwist(),
+    canonicalized_entity_status->getAccel());
 
   double linear_jerk_new = std::get<2>(dynamics);
   geometry_msgs::msg::Accel accel_new = std::get<1>(dynamics);
   geometry_msgs::msg::Twist twist_new = std::get<0>(dynamics);
-  if (const auto canonicalized_lanelet_pose = entity_status->getCanonicalizedLaneletPose()) {
-    auto entity_status_updated = static_cast<traffic_simulator::EntityStatus>(*entity_status);
+  if (
+    const auto canonicalized_lanelet_pose =
+      canonicalized_entity_status->getCanonicalizedLaneletPose()) {
+    auto entity_status_updated =
+      static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status);
     const auto distance =
-      (twist_new.linear.x + entity_status->getTwist().linear.x) / 2.0 * step_time;
+      (twist_new.linear.x + canonicalized_entity_status->getTwist().linear.x) / 2.0 * step_time;
     entity_status_updated.time = current_time + step_time;
     entity_status_updated.action_status.twist = twist_new;
     entity_status_updated.action_status.accel = accel_new;
@@ -242,11 +258,13 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
   double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints & constraints) const
   -> traffic_simulator::EntityStatus
 {
+  using math::geometry::operator*;
   const auto speed_planner =
     traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner(
-      step_time, getEntityName());
+      step_time, canonicalized_entity_status->getName());
   const auto dynamics = speed_planner.getDynamicStates(
-    target_speed, constraints, entity_status->getTwist(), entity_status->getAccel());
+    target_speed, constraints, canonicalized_entity_status->getTwist(),
+    canonicalized_entity_status->getAccel());
   double linear_jerk_new = std::get<2>(dynamics);
   geometry_msgs::msg::Accel accel_new = std::get<1>(dynamics);
   geometry_msgs::msg::Twist twist_new = std::get<0>(dynamics);
@@ -254,19 +272,19 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
   geometry_msgs::msg::Vector3 angular_trans_vec;
   angular_trans_vec.z = twist_new.angular.z * step_time;
   geometry_msgs::msg::Quaternion angular_trans_quat =
-    quaternion_operation::convertEulerAngleToQuaternion(angular_trans_vec);
-  pose_new.orientation =
-    quaternion_operation::rotation(entity_status->getMapPose().orientation, angular_trans_quat);
+    math::geometry::convertEulerAngleToQuaternion(angular_trans_vec);
+  pose_new.orientation = canonicalized_entity_status->getMapPose().orientation * angular_trans_quat;
   Eigen::Vector3d trans_vec;
   trans_vec(0) = twist_new.linear.x * step_time;
   trans_vec(1) = twist_new.linear.y * step_time;
   trans_vec(2) = 0;
-  Eigen::Matrix3d rotation_mat = quaternion_operation::getRotationMatrix(pose_new.orientation);
+  Eigen::Matrix3d rotation_mat = math::geometry::getRotationMatrix(pose_new.orientation);
   trans_vec = rotation_mat * trans_vec;
-  pose_new.position.x = trans_vec(0) + entity_status->getMapPose().position.x;
-  pose_new.position.y = trans_vec(1) + entity_status->getMapPose().position.y;
-  pose_new.position.z = trans_vec(2) + entity_status->getMapPose().position.z;
-  auto entity_status_updated = static_cast<traffic_simulator::EntityStatus>(*entity_status);
+  pose_new.position.x = trans_vec(0) + canonicalized_entity_status->getMapPose().position.x;
+  pose_new.position.y = trans_vec(1) + canonicalized_entity_status->getMapPose().position.y;
+  pose_new.position.z = trans_vec(2) + canonicalized_entity_status->getMapPose().position.z;
+  auto entity_status_updated =
+    static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status);
   entity_status_updated.time = current_time + step_time;
   entity_status_updated.lanelet_pose = traffic_simulator::LaneletPose();
   entity_status_updated.lanelet_pose_valid = false;
@@ -281,19 +299,9 @@ auto ActionNode::calculateStopDistance(
   const traffic_simulator_msgs::msg::DynamicConstraints & constraints) const -> double
 {
   return traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner(
-           step_time, getEntityName())
+           step_time, canonicalized_entity_status->getName())
     .getRunningDistance(
-      0, constraints, entity_status->getTwist(), entity_status->getAccel(),
-      entity_status->getLinearJerk());
-}
-
-auto ActionNode::getActionStatus() const noexcept -> traffic_simulator_msgs::msg::ActionStatus
-{
-  return static_cast<traffic_simulator::EntityStatus>(*entity_status).action_status;
-}
-
-auto ActionNode::getEntityName() const noexcept -> std::string
-{
-  return static_cast<traffic_simulator::EntityStatus>(*entity_status).name;
+      0, constraints, canonicalized_entity_status->getTwist(),
+      canonicalized_entity_status->getAccel(), canonicalized_entity_status->getLinearJerk());
 }
 }  // namespace entity_behavior

@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
-
 #include <algorithm>
 #include <behavior_tree_plugin/pedestrian/follow_lane_action.hpp>
 #include <iostream>
@@ -41,22 +39,16 @@ BT::NodeStatus FollowLaneAction::tick()
     request != traffic_simulator::behavior::Request::FOLLOW_LANE) {
     return BT::NodeStatus::FAILURE;
   }
-  if (!entity_status->laneMatchingSucceed()) {
+  if (!canonicalized_entity_status->laneMatchingSucceed()) {
     stopEntity();
-    setOutput(
-      "non_canonicalized_updated_status",
-      std::make_shared<traffic_simulator::EntityStatus>(
-        static_cast<traffic_simulator::EntityStatus>(*entity_status)));
     return BT::NodeStatus::RUNNING;
   }
   if (!target_speed) {
     const auto following_lanelets =
-      traffic_simulator::route::followingLanelets(entity_status->getLaneletId());
+      traffic_simulator::route::followingLanelets(canonicalized_entity_status->getLaneletId());
     target_speed = traffic_simulator::route::speedLimit(following_lanelets);
   }
-  setOutput(
-    "non_canonicalized_updated_status", std::make_shared<traffic_simulator::EntityStatus>(
-                                          calculateUpdatedEntityStatus(target_speed.value())));
+  setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(target_speed.value()));
   return BT::NodeStatus::RUNNING;
 }
 }  // namespace pedestrian

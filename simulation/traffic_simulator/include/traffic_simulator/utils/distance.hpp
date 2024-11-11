@@ -1,4 +1,4 @@
-// Copyright 2024 TIER IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -40,6 +40,12 @@ auto lateralDistance(
 auto lateralDistance(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
   const double matching_distance, const bool allow_lane_change) -> std::optional<double>;
+
+// Lateral (unit: lanes)
+auto countLaneChanges(
+  const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
+  bool allow_lane_change, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+  -> std::optional<std::pair<int, int>>;
 
 // Longitudinal
 auto longitudinalDistance(

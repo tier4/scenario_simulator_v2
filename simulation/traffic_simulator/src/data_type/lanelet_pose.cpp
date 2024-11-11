@@ -12,8 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
-
+#include <geometry/quaternion/euler_to_quaternion.hpp>
+#include <geometry/quaternion/get_rotation.hpp>
+#include <geometry/quaternion/quaternion_to_euler.hpp>
 #include <geometry/spline/catmull_rom_spline.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
@@ -22,7 +23,7 @@
 
 namespace traffic_simulator
 {
-namespace lanelet_pose
+inline namespace lanelet_pose
 {
 CanonicalizedLaneletPose::CanonicalizedLaneletPose(
   const LaneletPose & maybe_non_canonicalized_lanelet_pose)
@@ -56,8 +57,8 @@ CanonicalizedLaneletPose::CanonicalizedLaneletPose(CanonicalizedLaneletPose && o
 {
 }
 
-CanonicalizedLaneletPose & CanonicalizedLaneletPose::operator=(
-  const CanonicalizedLaneletPose & other)
+auto CanonicalizedLaneletPose::operator=(const CanonicalizedLaneletPose & other)
+  -> CanonicalizedLaneletPose &
 {
   this->lanelet_pose_ = other.lanelet_pose_;
   this->lanelet_poses_ = other.lanelet_poses_;
@@ -85,8 +86,8 @@ auto CanonicalizedLaneletPose::getAlternativeLaneletPoseBaseOnShortestRouteFrom(
 
 auto CanonicalizedLaneletPose::alignOrientationToLanelet() -> void
 {
-  using quaternion_operation::convertEulerAngleToQuaternion;
-  using quaternion_operation::convertQuaternionToEulerAngle;
+  using math::geometry::convertEulerAngleToQuaternion;
+  using math::geometry::convertQuaternionToEulerAngle;
   const auto spline = route::toSpline({lanelet_pose_.lanelet_id});
   const auto lanelet_quaternion = spline.getPose(lanelet_pose_.s, true).orientation;
   const auto lanelet_rpy = convertQuaternionToEulerAngle(lanelet_quaternion);
@@ -100,9 +101,9 @@ auto CanonicalizedLaneletPose::alignOrientationToLanelet() -> void
 
 auto CanonicalizedLaneletPose::adjustOrientationAndOzPosition() -> void
 {
-  using quaternion_operation::convertEulerAngleToQuaternion;
-  using quaternion_operation::convertQuaternionToEulerAngle;
-  using quaternion_operation::getRotation;
+  using math::geometry::convertEulerAngleToQuaternion;
+  using math::geometry::convertQuaternionToEulerAngle;
+  using math::geometry::getRotation;
   const auto spline = route::toSpline({lanelet_pose_.lanelet_id});
   // adjust Oz position
   if (const auto s_value = spline.getSValue(map_pose_)) {
@@ -125,7 +126,8 @@ auto CanonicalizedLaneletPose::adjustOrientationAndOzPosition() -> void
 
 }  // namespace lanelet_pose
 
-bool isSameLaneletId(const CanonicalizedLaneletPose & p0, const CanonicalizedLaneletPose & p1)
+auto isSameLaneletId(const CanonicalizedLaneletPose & p0, const CanonicalizedLaneletPose & p1)
+  -> bool
 {
   return static_cast<LaneletPose>(p0).lanelet_id == static_cast<LaneletPose>(p1).lanelet_id;
 }

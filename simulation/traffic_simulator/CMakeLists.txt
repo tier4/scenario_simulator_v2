@@ -20,7 +20,6 @@ find_package(traffic_simulator_msgs REQUIRED)
 find_package(Boost COMPONENTS filesystem)
 find_package(lanelet2_matching REQUIRED)
 find_package(tinyxml2_vendor REQUIRED)
-find_package(quaternion_operation REQUIRED)
 find_package(pluginlib REQUIRED)
 include(FindProtobuf REQUIRED)
 
@@ -60,9 +59,10 @@ ament_auto_add_library(traffic_simulator SHARED
   src/traffic/traffic_source.cpp
   src/traffic_lights/configurable_rate_updater.cpp
   src/traffic_lights/traffic_light.cpp
-  src/traffic_lights/traffic_light_manager.cpp
   src/traffic_lights/traffic_light_marker_publisher.cpp
   src/traffic_lights/traffic_light_publisher.cpp
+  src/traffic_lights/traffic_lights.cpp
+  src/traffic_lights/traffic_lights_base.cpp
   src/utils/distance.cpp
   src/utils/lanelet_map.cpp
   src/utils/pose.cpp

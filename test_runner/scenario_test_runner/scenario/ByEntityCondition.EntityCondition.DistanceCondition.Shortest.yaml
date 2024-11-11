@@ -92,6 +92,17 @@ OpenSCENARIO:
                       offset: 0
                       Orientation: *DEFAULT_ORIENTATION
               - LongitudinalAction: *SPEED_ACTION_ZERO
+          - entityRef: car_4
+            PrivateAction:
+              - TeleportAction:
+                  Position: &POSITION_4
+                    LanePosition:
+                      roadId: ""
+                      laneId: 34795
+                      s: 5
+                      offset: 0
+                      Orientation: *DEFAULT_ORIENTATION
+              - LongitudinalAction: *SPEED_ACTION_ZERO
     Story:
       - name: story
         Act:
@@ -453,8 +464,26 @@ OpenSCENARIO:
                                         freespace: false
                                         relativeDistanceType: longitudinal
                                         routingAlgorithm: shortest
-                                        rule: notEqualTo
-                                        value: 6.0951804081656817402290471363812
+                                        rule: lessThan
+                                        value: 6.09
+                                        Position: *POSITION_3
+                            - Condition:
+                                - name: "DistanceCondition, longitudinal, freespace=false, shortest, back"
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: all
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      DistanceCondition:
+                                        coordinateSystem: lane
+                                        freespace: false
+                                        relativeDistanceType: longitudinal
+                                        routingAlgorithm: shortest
+                                        rule: greaterThan
+                                        value: 6.10
                                         Position: *POSITION_3
                             - Condition:
                                 - name: "RelativeDistanceCondition, longitudinal, freespace=false, shortest, back"
@@ -472,8 +501,26 @@ OpenSCENARIO:
                                         freespace: false
                                         relativeDistanceType: longitudinal
                                         routingAlgorithm: shortest
-                                        rule: notEqualTo
-                                        value: 6.0951804081656817402290471363812
+                                        rule: lessThan
+                                        value: 6.09
+                            - Condition:
+                                - name: "RelativeDistanceCondition, longitudinal, freespace=false, shortest, back"
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: all
+                                      EntityRef:
+                                        - entityRef: car_3
+                                    EntityCondition:
+                                      RelativeDistanceCondition:
+                                        coordinateSystem: lane
+                                        entityRef: ego
+                                        freespace: false
+                                        relativeDistanceType: longitudinal
+                                        routingAlgorithm: shortest
+                                        rule: greaterThan
+                                        value: 6.10
                             - Condition:
                                 - name: "DistanceCondition, lateral, freespace=false, shortest, back"
                                   delay: 0
@@ -525,8 +572,26 @@ OpenSCENARIO:
                                         freespace: true
                                         relativeDistanceType: longitudinal
                                         routingAlgorithm: shortest
-                                        rule: notEqualTo
-                                        value: 5.065180408165682379717509320471
+                                        rule: lessThan
+                                        value: 5.06
+                                        Position: *POSITION_3
+                            - Condition:
+                                - name: "DistanceCondition, longitudinal, freespace=true, shortest, back"
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: all
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      DistanceCondition:
+                                        coordinateSystem: lane
+                                        freespace: true
+                                        relativeDistanceType: longitudinal
+                                        routingAlgorithm: shortest
+                                        rule: greaterThan
+                                        value: 5.07
                                         Position: *POSITION_3
                             - Condition:
                                 - name: "RelativeDistanceCondition, longitudinal, freespace=true, shortest, back"
@@ -544,8 +609,26 @@ OpenSCENARIO:
                                         freespace: true
                                         relativeDistanceType: longitudinal
                                         routingAlgorithm: shortest
-                                        rule: notEqualTo
-                                        value: 1.325180408165682166554688592441
+                                        rule: lessThan
+                                        value: 1.32
+                            - Condition:
+                                - name: "RelativeDistanceCondition, longitudinal, freespace=true, shortest, back"
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: all
+                                      EntityRef:
+                                        - entityRef: car_3
+                                    EntityCondition:
+                                      RelativeDistanceCondition:
+                                        coordinateSystem: lane
+                                        entityRef: ego
+                                        freespace: true
+                                        relativeDistanceType: longitudinal
+                                        routingAlgorithm: shortest
+                                        rule: greaterThan
+                                        value: 1.33
                             - Condition:
                                 - name: "DistanceCondition, lateral, freespace=true, shortest, back"
                                   delay: 0
@@ -582,6 +665,24 @@ OpenSCENARIO:
                                         routingAlgorithm: shortest
                                         rule: notEqualTo
                                         value: 1.262040583529198123358128214022
+                            - Condition:
+                                - name: "corner case fixed in #1348"
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: all
+                                      EntityRef:
+                                        - entityRef: car_1
+                                    EntityCondition:
+                                      RelativeDistanceCondition:
+                                        coordinateSystem: lane
+                                        entityRef: car_4
+                                        freespace: false
+                                        relativeDistanceType: longitudinal
+                                        routingAlgorithm: shortest
+                                        rule: notEqualTo
+                                        value: 54.18867466433655977198213804513216018676757812500000
             StartTrigger:
               ConditionGroup:
                 - Condition:

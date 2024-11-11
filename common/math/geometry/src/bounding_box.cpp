@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
-
 #include <geometry/bounding_box.hpp>
 #include <geometry/polygon/polygon.hpp>
 
@@ -79,7 +77,7 @@ std::optional<std::pair<geometry_msgs::msg::Pose, geometry_msgs::msg::Pose>> get
       boost::geometry::segments_begin(poly0), boost::geometry::segments_end(poly0));
     auto points = boost::make_iterator_range(
       boost::geometry::points_begin(poly1), boost::geometry::points_end(poly1));
-    for (auto && segment : segments) {
+    auto findNearestPointInSegment = [&](const auto & segment, const auto & points) {
       for (auto && point : points) {
         auto nearest_point_from_segment =
           pointToSegmentProjection(point, *segment.first, *segment.second);
@@ -90,6 +88,10 @@ std::optional<std::pair<geometry_msgs::msg::Pose, geometry_msgs::msg::Pose>> get
           point1 = nearest_point_from_segment;
         }
       }
+    };
+
+    for (auto && segment : segments) {
+      findNearestPointInSegment(segment, points);
     }
 
     return std::make_pair(toPose(point0), toPose(point1));

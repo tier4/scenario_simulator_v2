@@ -15,7 +15,7 @@
 #define OPENSCENARIO_INTERPRETER_NO_EXTENSION
 
 #include <algorithm>
-#include <nlohmann/json.hpp>
+#include <boost/json.hpp>
 #include <openscenario_interpreter/openscenario_interpreter.hpp>
 #include <openscenario_interpreter/record.hpp>
 #include <openscenario_interpreter/syntax/object_controller.hpp>
@@ -40,12 +40,14 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   local_real_time_factor(1.0),
   osc_path(""),
   output_directory("/tmp"),
+  publish_empty_context(false),
   record(false)
 {
   DECLARE_PARAMETER(local_frame_rate);
   DECLARE_PARAMETER(local_real_time_factor);
   DECLARE_PARAMETER(osc_path);
   DECLARE_PARAMETER(output_directory);
+  DECLARE_PARAMETER(publish_empty_context);
   DECLARE_PARAMETER(record);
 }
 
@@ -101,20 +103,19 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
       GET_PARAMETER(local_real_time_factor);
       GET_PARAMETER(osc_path);
       GET_PARAMETER(output_directory);
+      GET_PARAMETER(publish_empty_context);
       GET_PARAMETER(record);
 
       script = std::make_shared<OpenScenario>(osc_path);
 
       // CanonicalizedLaneletPose is also used on the OpenScenarioInterpreter side as NativeLanePose.
       // so canonicalization takes place here - it uses the value of the consider_pose_by_road_slope parameter
-      const auto consider_pose_by_road_slope = [&]() {
-        if (!has_parameter("consider_pose_by_road_slope")) {
+      traffic_simulator::lanelet_pose::CanonicalizedLaneletPose::setConsiderPoseByRoadSlope([&]() {
+        if (not has_parameter("consider_pose_by_road_slope")) {
           declare_parameter("consider_pose_by_road_slope", false);
         }
         return get_parameter("consider_pose_by_road_slope").as_bool();
-      }();
-      traffic_simulator::lanelet_pose::CanonicalizedLaneletPose::setConsiderPoseByRoadSlope(
-        consider_pose_by_road_slope);
+      }());
 
       if (script->category.is<ScenarioDefinition>()) {
         scenarios = {std::dynamic_pointer_cast<ScenarioDefinition>(script->category)};
@@ -135,6 +136,7 @@ auto Interpreter::engage() const -> void
 {
   for (const auto & [name, scenario_object] : currentScenarioDefinition()->entities) {
     if (
+      scenario_object.template is<ScenarioObject>() and
       scenario_object.template as<ScenarioObject>().is_added and
       scenario_object.template as<ScenarioObject>().object_controller.isAutoware()) {
       asFieldOperatorApplication(name).engage();
@@ -148,7 +150,8 @@ auto Interpreter::engageable() const -> bool
     std::cbegin(currentScenarioDefinition()->entities),
     std::cend(currentScenarioDefinition()->entities), [this](const auto & each) {
       const auto & [name, scenario_object] = each;
-      return not scenario_object.template as<ScenarioObject>().is_added or
+      return not scenario_object.template is<ScenarioObject>() or
+             not scenario_object.template as<ScenarioObject>().is_added or
              not scenario_object.template as<ScenarioObject>().object_controller.isAutoware() or
              asFieldOperatorApplication(name).engageable();
     });
@@ -160,7 +163,8 @@ auto Interpreter::engaged() const -> bool
     std::cbegin(currentScenarioDefinition()->entities),
     std::cend(currentScenarioDefinition()->entities), [this](const auto & each) {
       const auto & [name, scenario_object] = each;
-      return not scenario_object.template as<ScenarioObject>().is_added or
+      return not scenario_object.template is<ScenarioObject>() or
+             not scenario_object.template as<ScenarioObject>().is_added or
              not scenario_object.template as<ScenarioObject>().object_controller.isAutoware() or
              asFieldOperatorApplication(name).engaged();
     });
@@ -280,9 +284,14 @@ auto Interpreter::publishCurrentContext() const -> void
 {
   Context context;
   {
-    nlohmann::json json;
+    boost::json::monotonic_resource mr;
+    boost::json::object json(&mr);
     context.stamp = now();
-    context.data = (json << *script).dump();
+    if (publish_empty_context) {
+      context.data = "";
+    } else {
+      context.data = boost::json::serialize(json << *script);
+    }
     context.time = evaluateSimulationTime();
   }
 

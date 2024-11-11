@@ -68,8 +68,8 @@ traffic_simulator_msgs::msg::LaneletPose constructLaneletPose(
  * @param offset offset value in lane coordinate
  * @return LaneletPose
  */
-traffic_simulator::lanelet_pose::CanonicalizedLaneletPose constructCanonicalizedLaneletPose(
-  lanelet::Id lanelet_id, double s, double offset);
+auto constructCanonicalizedLaneletPose(lanelet::Id lanelet_id, double s, double offset)
+  -> CanonicalizedLaneletPose;
 
 /**
  * @brief helper function for constructing canonicalized lanelet pose
@@ -82,8 +82,9 @@ traffic_simulator::lanelet_pose::CanonicalizedLaneletPose constructCanonicalized
  * @param yaw yaw value in the lane coordinate
  * @return LaneletPose
  */
-traffic_simulator::lanelet_pose::CanonicalizedLaneletPose constructCanonicalizedLaneletPose(
-  lanelet::Id lanelet_id, double s, double offset, double roll, double pitch, double yaw);
+auto constructCanonicalizedLaneletPose(
+  lanelet::Id lanelet_id, double s, double offset, double roll, double pitch, double yaw)
+  -> CanonicalizedLaneletPose;
 
 /**
  * @brief helper function for constructing rpy

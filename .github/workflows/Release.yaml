@@ -29,12 +29,14 @@ jobs:
       statuses: write
     timeout-minutes: 10
     container: ros:humble
+    outputs:
+      new_version: ${{ steps.new_version.outputs.new_version }}
     steps:
       - name: Restore branch
         uses: levonet/action-restore-branch@master
 
       - name: Install bloom
-        run: apt update && apt install -y python3-bloom git
+        run: apt update && apt install -y python3-bloom git curl
 
       - name: Checkout
         uses: actions/checkout@v4
@@ -48,7 +50,7 @@ jobs:
           git config --global user.name  "Release Bot"
           git config --global user.email "action@github.com"
           git config --global --add safe.directory /__w/scenario_simulator_v2/scenario_simulator_v2
-          git config --global credential.helper ${{ secrets.GITHUB_TOKEN }}
+          git config --global credential.helper ${{ secrets.BLOOM_GITHUB_TOKEN }}
           git config pull.rebase false
 
       - name: Get old version
@@ -130,8 +132,24 @@ jobs:
           name: ${{ steps.new_version.outputs.new_version }}
           body: ${{ steps.get_release_description.outputs.stdout }}
 
-      - name: Delete branch
+      - name: Delete branch if merged
         if: github.event.pull_request.merged == true
-        uses: SvanBoxel/delete-merged-branch@main
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: actions/github-script@v5
+        with:
+          script: |
+            github.rest.git.deleteRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: `heads/${context.payload.pull_request.head.ref}`,
+            })
+
+      - name: Kick docker build action
+        if: github.event.pull_request.merged == true
+        run: |
+          curl -L \
+            -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: token ${{ secrets.BLOOM_GITHUB_TOKEN }}" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            https://api.github.com/repos/tier4/scenario_simulator_v2/actions/workflows/Docker.yaml/dispatches \
+            -d '{"ref":"master","inputs":{"version":"${{ steps.new_version.outputs.new_version }}"}}'

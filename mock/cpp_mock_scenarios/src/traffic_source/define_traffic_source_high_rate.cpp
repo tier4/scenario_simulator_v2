@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
-
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <cpp_mock_scenarios/catalogs.hpp>
 #include <cpp_mock_scenarios/cpp_scenario_node.hpp>
+#include <geometry/quaternion/euler_to_quaternion.hpp>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <string>
@@ -54,14 +53,11 @@ private:
       }
       for (const auto & name : names) {
         if (const auto entity = api_.getEntity(name)) {
-          const bool is_vehicle =
-            entity->getEntityType().type == traffic_simulator_msgs::msg::EntityType::VEHICLE;
-
           const bool valid_vehicle_lanelet =
             api_.isInLanelet(name, static_cast<lanelet::Id>(34705), 50.0) ||
             api_.isInLanelet(name, static_cast<lanelet::Id>(34696), 50.0);
 
-          if (!entity->laneMatchingSucceed() || !valid_vehicle_lanelet || !is_vehicle) {
+          if (!entity->laneMatchingSucceed() || !valid_vehicle_lanelet || !isVehicle(name)) {
             stop(cpp_mock_scenarios::Result::FAILURE);  // LCOV_EXCL_LINE
           }
         }
@@ -76,7 +72,7 @@ private:
       5.0, 50.0, 10.0,
       geometry_msgs::build<geometry_msgs::msg::Pose>()
         .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(3755.0).y(73692.5).z(0.0))
-        .orientation(quaternion_operation::convertEulerAngleToQuaternion(
+        .orientation(math::geometry::convertEulerAngleToQuaternion(
           geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0.0).y(0.0).z(0.321802))),
       // clang-format off
       {
@@ -86,7 +82,10 @@ private:
       false, true, true, 0);
 
     api_.spawn(
-      "ego", traffic_simulator::helper::constructLaneletPose(34570, 0, 0), getVehicleParameters());
+      "ego",
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(
+        34570, 0.0, 0.0, api_.getHdmapUtils()),
+      getVehicleParameters());
     api_.setLinearVelocity("ego", 0.0);
     api_.requestSpeedChange("ego", 0.0, true);
   }

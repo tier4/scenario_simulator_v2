@@ -17,6 +17,7 @@
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/absolute_target_lane.hpp>
 #include <openscenario_interpreter/syntax/lane_change_action.hpp>
+#include <openscenario_interpreter/syntax/object_type.hpp>
 #include <openscenario_interpreter/syntax/relative_target_lane.hpp>
 
 namespace openscenario_interpreter
@@ -30,13 +31,25 @@ LaneChangeAction::LaneChangeAction(const pugi::xml_node & node, Scope & scope)
     readElement<TransitionDynamics>("LaneChangeActionDynamics", node, local())),
   lane_change_target(readElement<LaneChangeTarget>("LaneChangeTarget", node, local()))
 {
+  // OpenSCENARIO 1.2 Table 11
+  for (const auto & actor : actors) {
+    for (const auto & object_type : actor.objectTypes()) {
+      if (object_type != ObjectType::vehicle and object_type != ObjectType::pedestrian) {
+        THROW_SEMANTIC_ERROR(
+          "Actors may be either of vehicle type or a pedestrian type;"
+          "See OpenSCENARIO 1.2 Table 11 for more details");
+      }
+    }
+  }
 }
 
 auto LaneChangeAction::accomplished() -> bool
 {
-  return std::all_of(std::begin(accomplishments), std::end(accomplishments), [](auto && each) {
-    const auto is_lane_changing = [](auto &&... xs) {
-      return evaluateCurrentState(std::forward<decltype(xs)>(xs)...) == "lane_change";
+  return std::all_of(std::begin(accomplishments), std::end(accomplishments), [&](auto & each) {
+    const auto is_lane_changing = [&](const auto & actor) {
+      auto evaluation = actor.apply(
+        [&](const auto & object) { return evaluateCurrentState(object) == "lane_change"; });
+      return not evaluation.size() or evaluation.min();
     };
     return each.second or (each.second = not is_lane_changing(each.first));
   });
@@ -56,17 +69,21 @@ auto LaneChangeAction::start() -> void
 
   for (const auto & accomplishment : accomplishments) {
     if (lane_change_target.is<AbsoluteTargetLane>()) {
-      return applyLaneChangeAction(
-        accomplishment.first, static_cast<traffic_simulator::lane_change::AbsoluteTarget>(*this),
-        static_cast<traffic_simulator::lane_change::TrajectoryShape>(
-          lane_change_action_dynamics.dynamics_shape),
-        static_cast<traffic_simulator::lane_change::Constraint>(lane_change_action_dynamics));
+      accomplishment.first.apply([&](const auto & object) {
+        applyLaneChangeAction(
+          object, static_cast<traffic_simulator::lane_change::AbsoluteTarget>(*this),
+          static_cast<traffic_simulator::lane_change::TrajectoryShape>(
+            lane_change_action_dynamics.dynamics_shape),
+          static_cast<traffic_simulator::lane_change::Constraint>(lane_change_action_dynamics));
+      });
     } else {
-      return applyLaneChangeAction(
-        accomplishment.first, static_cast<traffic_simulator::lane_change::RelativeTarget>(*this),
-        static_cast<traffic_simulator::lane_change::TrajectoryShape>(
-          lane_change_action_dynamics.dynamics_shape),
-        static_cast<traffic_simulator::lane_change::Constraint>(lane_change_action_dynamics));
+      accomplishment.first.apply([&](const auto & object) {
+        applyLaneChangeAction(
+          object, static_cast<traffic_simulator::lane_change::RelativeTarget>(*this),
+          static_cast<traffic_simulator::lane_change::TrajectoryShape>(
+            lane_change_action_dynamics.dynamics_shape),
+          static_cast<traffic_simulator::lane_change::Constraint>(lane_change_action_dynamics));
+      });
     }
   }
 }

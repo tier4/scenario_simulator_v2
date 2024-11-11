@@ -12,15 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <limits>
-#include <scenario_simulator_exception/exception.hpp>
-#include <string>
 #include <traffic_simulator/color_utils/color_utils.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light.hpp>
 #include <traffic_simulator/utils/traffic_lights.hpp>
-#include <unordered_map>
-#include <utility>
-#include <vector>
+// #include <unordered_map>
+// #include <utility>
+// #include <vector>
 
 namespace traffic_simulator
 {
@@ -169,6 +166,8 @@ auto operator<<(std::ostream & os, const TrafficLight::Bulb & bulb) -> std::ostr
 
 TrafficLight::TrafficLight(const lanelet::Id lanelet_id)
 : way_id(traffic_lights::wayId(lanelet_id)),
+  regulatory_elements_ids(
+    traffic_lights::trafficLightRegulatoryElementIdsFromTrafficLightId(way_id)),
   positions{
     std::make_pair(
       Bulb(Color::green, Status::solid_on, Shape::circle).hash(),

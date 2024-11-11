@@ -39,6 +39,7 @@ public:
   CanonicalizedLaneletPose & operator=(const CanonicalizedLaneletPose & obj);
   explicit operator LaneletPose() const noexcept { return lanelet_pose_; }
   explicit operator geometry_msgs::msg::Pose() const noexcept { return map_pose_; }
+  auto getLaneletPose() const -> const LaneletPose & { return lanelet_pose_; }
   auto hasAlternativeLaneletPose() const -> bool { return lanelet_poses_.size() > 1; }
   auto getAlternativeLaneletPoseBaseOnShortestRouteFrom(
     LaneletPose from, bool allow_lane_change = false) const -> std::optional<LaneletPose>;
@@ -81,8 +82,8 @@ private:
 };
 }  // namespace lanelet_pose
 
-bool isSameLaneletId(const CanonicalizedLaneletPose &, const CanonicalizedLaneletPose &);
-bool isSameLaneletId(const CanonicalizedLaneletPose &, const lanelet::Id lanelet_id);
+auto isSameLaneletId(const CanonicalizedLaneletPose &, const CanonicalizedLaneletPose &) -> bool;
+auto isSameLaneletId(const CanonicalizedLaneletPose &, const lanelet::Id lanelet_id) -> bool;
 }  // namespace traffic_simulator
 
 #endif  // TRAFFIC_SIMULATOR__DATA_TYPE__LANELET_POSE_HPP_

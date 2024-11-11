@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
-
 #include <arithmetic/floating_point/comparison.hpp>
-#include <geometry/spline/catmull_rom_spline.hpp>
+#include <geometry/quaternion/euler_to_quaternion.hpp>
+#include <geometry/quaternion/get_rotation.hpp>
+#include <geometry/quaternion/quaternion_to_euler.hpp>
 #include <geometry/vector3/hypot.hpp>
 #include <geometry/vector3/inner_product.hpp>
 #include <geometry/vector3/norm.hpp>
@@ -49,8 +49,8 @@ auto any(F f, T && x, Ts &&... xs)
 auto makeUpdatedStatus(
   const traffic_simulator_msgs::msg::EntityStatus & entity_status,
   traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
-  const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter, double step_time,
-  double matching_distance, std::optional<double> target_speed) -> std::optional<EntityStatus>
+  const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter, const double step_time,
+  const double matching_distance, std::optional<double> target_speed) -> std::optional<EntityStatus>
 {
   using math::arithmetic::isApproximatelyEqualTo;
   using math::arithmetic::isDefinitelyLessThan;
@@ -363,7 +363,7 @@ auto makeUpdatedStatus(
                    // if entity is on lane use pitch from lanelet, otherwise use pitch on target
                    const auto pitch =
                      entity_status.lanelet_pose_valid
-                       ? -quaternion_operation::convertQuaternionToEulerAngle(
+                       ? -math::geometry::convertQuaternionToEulerAngle(
                             entity_status.pose.orientation)
                             .y
                        : std::atan2(target_position.z - position.z, std::hypot(dy, dx));
@@ -394,12 +394,10 @@ auto makeUpdatedStatus(
       desired_velocity.y, ", ", desired_velocity.z, "].");
   } else if (const auto current_velocity =
                [&]() {
-                 const auto pitch = -quaternion_operation::convertQuaternionToEulerAngle(
-                                       entity_status.pose.orientation)
-                                       .y;
-                 const auto yaw = quaternion_operation::convertQuaternionToEulerAngle(
-                                    entity_status.pose.orientation)
-                                    .z;
+                 const auto pitch =
+                   -math::geometry::convertQuaternionToEulerAngle(entity_status.pose.orientation).y;
+                 const auto yaw =
+                   math::geometry::convertQuaternionToEulerAngle(entity_status.pose.orientation).z;
                  return geometry_msgs::build<geometry_msgs::msg::Vector3>()
                    .x(std::cos(pitch) * std::cos(yaw) * speed)
                    .y(std::cos(pitch) * std::sin(yaw) * speed)
@@ -570,7 +568,7 @@ auto makeUpdatedStatus(
             .x(0.0)
             .y(std::atan2(-desired_velocity.z, std::hypot(desired_velocity.x, desired_velocity.y)))
             .z(std::atan2(desired_velocity.y, desired_velocity.x));
-        return quaternion_operation::convertEulerAngleToQuaternion(direction);
+        return math::geometry::convertEulerAngleToQuaternion(direction);
       }
     }();
 
@@ -581,7 +579,7 @@ auto makeUpdatedStatus(
     updated_status.action_status.twist.linear.z = 0;
 
     updated_status.action_status.twist.angular =
-      quaternion_operation::convertQuaternionToEulerAngle(quaternion_operation::getRotation(
+      math::geometry::convertQuaternionToEulerAngle(math::geometry::getRotation(
         entity_status.pose.orientation, updated_status.pose.orientation)) /
       step_time;
 

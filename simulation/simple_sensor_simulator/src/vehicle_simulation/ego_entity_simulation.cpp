@@ -16,6 +16,10 @@
 
 #include <concealer/autoware_universe.hpp>
 #include <filesystem>
+#include <geometry/quaternion/euler_to_quaternion.hpp>
+#include <geometry/quaternion/get_rotation.hpp>
+#include <geometry/quaternion/get_rotation_matrix.hpp>
+#include <geometry/quaternion/quaternion_to_euler.hpp>
 #include <simple_sensor_simulator/vehicle_simulation/ego_entity_simulation.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/utils/lanelet_map.hpp>
@@ -44,11 +48,12 @@ EgoEntitySimulation::EgoEntitySimulation(
   vehicle_model_type_(getVehicleModelType()),
   vehicle_model_ptr_(makeSimulationModel(vehicle_model_type_, step_time, parameters)),
   status_(initial_status, std::nullopt),
+  initial_pose_(status_.getMapPose()),
+  initial_rotation_matrix_(math::geometry::getRotationMatrix(initial_pose_.orientation)),
   consider_acceleration_by_road_slope_(consider_acceleration_by_road_slope),
   vehicle_parameters(parameters)
 {
   setStatus(initial_status);
-  initial_pose_ = status_.getMapPose();
   autoware->set_parameter(use_sim_time);
 }
 
@@ -216,12 +221,12 @@ void EgoEntitySimulation::requestSpeedChange(double value)
   vehicle_model_ptr_->setState(v);
 }
 
-void EgoEntitySimulation::overwrite(
-  const traffic_simulator_msgs::msg::EntityStatus & status, double current_scenario_time,
-  double step_time, bool npc_logic_started)
+auto EgoEntitySimulation::overwrite(
+  const traffic_simulator_msgs::msg::EntityStatus & status, const double current_time,
+  const double step_time, const bool is_npc_logic_started) -> void
 {
-  using quaternion_operation::convertQuaternionToEulerAngle;
-  using quaternion_operation::getRotationMatrix;
+  using math::geometry::convertQuaternionToEulerAngle;
+  using math::geometry::getRotationMatrix;
 
   autoware->rethrow();
 
@@ -230,17 +235,16 @@ void EgoEntitySimulation::overwrite(
      considered unchangeable and stored in an additional variable
      world_relative_position_ that is used in calculations.
   */
-  world_relative_position_ = getRotationMatrix(initial_pose_.orientation).transpose() *
-                             Eigen::Vector3d(
-                               status.pose.position.x - initial_pose_.position.x,
-                               status.pose.position.y - initial_pose_.position.y,
-                               status.pose.position.z - initial_pose_.position.z);
+  world_relative_position_ =
+    initial_rotation_matrix_.transpose() * Eigen::Vector3d(
+                                             status.pose.position.x - initial_pose_.position.x,
+                                             status.pose.position.y - initial_pose_.position.y,
+                                             status.pose.position.z - initial_pose_.position.z);
 
-  if (npc_logic_started) {
+  if (is_npc_logic_started) {
     const auto yaw = [&]() {
       const auto q = Eigen::Quaterniond(
-        getRotationMatrix(initial_pose_.orientation).transpose() *
-        getRotationMatrix(status.pose.orientation));
+        initial_rotation_matrix_.transpose() * getRotationMatrix(status.pose.orientation));
       geometry_msgs::msg::Quaternion relative_orientation;
       relative_orientation.x = q.x();
       relative_orientation.y = q.y();
@@ -278,14 +282,14 @@ void EgoEntitySimulation::overwrite(
           "Unsupported simulation model ", toString(vehicle_model_type_), " specified");
     }
   }
-  updateStatus(current_scenario_time, step_time);
+  updateStatus(current_time, step_time);
   updatePreviousValues();
 }
 
 void EgoEntitySimulation::update(
-  double current_scenario_time, double step_time, bool npc_logic_started)
+  const double current_time, const double step_time, const bool is_npc_logic_started)
 {
-  using quaternion_operation::getRotationMatrix;
+  using math::geometry::getRotationMatrix;
 
   autoware->rethrow();
 
@@ -294,13 +298,13 @@ void EgoEntitySimulation::update(
      considered unchangeable and stored in an additional variable
      world_relative_position_ that is used in calculations.
   */
-  world_relative_position_ = getRotationMatrix(initial_pose_.orientation).transpose() *
+  world_relative_position_ = initial_rotation_matrix_.transpose() *
                              Eigen::Vector3d(
                                status_.getMapPose().position.x - initial_pose_.position.x,
                                status_.getMapPose().position.y - initial_pose_.position.y,
                                status_.getMapPose().position.z - initial_pose_.position.z);
 
-  if (npc_logic_started) {
+  if (is_npc_logic_started) {
     auto input = Eigen::VectorXd(vehicle_model_ptr_->getDimU());
 
     auto acceleration_by_slope = [this]() {
@@ -343,7 +347,7 @@ void EgoEntitySimulation::update(
   // only the position in the Oz axis is left unchanged, the rest is taken from SimModelInterface
   world_relative_position_.x() = vehicle_model_ptr_->getX();
   world_relative_position_.y() = vehicle_model_ptr_->getY();
-  updateStatus(current_scenario_time, step_time);
+  updateStatus(current_time, step_time);
   updatePreviousValues();
 }
 
@@ -382,9 +386,10 @@ auto EgoEntitySimulation::getCurrentTwist() const -> geometry_msgs::msg::Twist
 auto EgoEntitySimulation::getCurrentPose(const double pitch_angle = 0.) const
   -> geometry_msgs::msg::Pose
 {
+  using math::geometry::operator*;
   const auto relative_position =
-    quaternion_operation::getRotationMatrix(initial_pose_.orientation) * world_relative_position_;
-  const auto relative_orientation = quaternion_operation::convertEulerAngleToQuaternion(
+    Eigen::Vector3d(initial_rotation_matrix_ * world_relative_position_);
+  const auto relative_orientation = math::geometry::convertEulerAngleToQuaternion(
     geometry_msgs::build<geometry_msgs::msg::Vector3>()
       .x(0)
       .y(pitch_angle)
@@ -437,21 +442,25 @@ auto EgoEntitySimulation::setStatus(const traffic_simulator_msgs::msg::EntitySta
   /// EgoEntity::setStatus
   const auto unique_route_lanelets =
     traffic_simulator::helper::getUniqueValues(autoware->getRouteLanelets());
+  /// @note The offset value has been increased to 1.5 because a value of 1.0 was often insufficient when changing lanes. ( @Hans_Robo )
   const auto matching_distance = std::max(
                                    vehicle_parameters.axles.front_axle.track_width,
                                    vehicle_parameters.axles.rear_axle.track_width) *
                                    0.5 +
-                                 1.0;
+                                 1.5;
+  /// @note Ego uses the unique_route_lanelets get from Autoware, instead of the current lanelet_id
+  /// value from EntityStatus, therefore canonicalization has to be done in advance,
+  /// not inside CanonicalizedEntityStatus
   const auto canonicalized_lanelet_pose = traffic_simulator::pose::toCanonicalizedLaneletPose(
     status.pose, status.bounding_box, unique_route_lanelets, false, matching_distance);
   status_.set(traffic_simulator::CanonicalizedEntityStatus(status, canonicalized_lanelet_pose));
   setAutowareStatus();
 }
 
-auto EgoEntitySimulation::updateStatus(double current_scenario_time, double step_time) -> void
+auto EgoEntitySimulation::updateStatus(const double current_time, const double step_time) -> void
 {
   auto status = static_cast<traffic_simulator_msgs::msg::EntityStatus>(status_);
-  status.time = std::isnan(current_scenario_time) ? 0 : current_scenario_time;
+  status.time = std::isnan(current_time) ? 0 : current_time;
   status.pose = getCurrentPose();
   status.action_status.twist = getCurrentTwist();
   status.action_status.accel = getCurrentAccel(step_time);

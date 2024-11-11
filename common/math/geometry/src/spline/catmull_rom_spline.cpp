@@ -139,7 +139,7 @@ CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> 
       break;
     /// @note In this case, spline is interpreted as line segment.
     case 2:
-      total_length_ = line_segments_[0].getLength();
+      total_length_ = line_segments_[0].length;
       break;
     /// @note In this case, spline is interpreted as curve.
     default:
@@ -171,7 +171,7 @@ CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> 
             bz = bz * 0.5;
             cz = cz * 0.5;
             dz = dz * 0.5;
-            curves_.emplace_back(HermiteCurve(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz));
+            curves_.emplace_back(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz);
           } else if (i == (n - 1)) {
             double ax = 0;
             double bx = control_points[i - 1].x - 2 * control_points[i].x + control_points[i + 1].x;
@@ -197,7 +197,7 @@ CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> 
             bz = bz * 0.5;
             cz = cz * 0.5;
             dz = dz * 0.5;
-            curves_.emplace_back(HermiteCurve(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz));
+            curves_.emplace_back(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz);
           } else {
             double ax = -1 * control_points[i - 1].x + 3 * control_points[i].x -
                         3 * control_points[i + 1].x + control_points[i + 2].x;
@@ -229,7 +229,7 @@ CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> 
             bz = bz * 0.5;
             cz = cz * 0.5;
             dz = dz * 0.5;
-            curves_.emplace_back(HermiteCurve(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz));
+            curves_.emplace_back(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz);
           }
         }
         for (const auto & curve : curves_) {
@@ -316,7 +316,7 @@ auto CatmullRomSpline::getCollisionPointsIn2D(
           "This message is not originally intended to be displayed, if you see it, please "
           "contact the developer of traffic_simulator.");
       }
-      if (const auto s = line_segments_[0].getIntersection2DSValue(line, true)) {
+      if (const auto s = line_segments_[0].get2DIntersectionSValue(line, true)) {
         s_value_candidates.insert(s.value());
       }
     }
@@ -628,7 +628,7 @@ auto CatmullRomSpline::getTangentVector(const double s) const -> geometry_msgs::
           "contact the developer of traffic_simulator.");
       }
       if (0 <= s && s <= getLength()) {
-        return line_segments_[0].getVector();
+        return line_segments_[0].vector;
       }
       THROW_SIMULATION_ERROR(
         "Invalid S value is specified, while getting tangent vector.",
