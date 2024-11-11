@@ -106,7 +106,7 @@ auto TrafficLightPublisher<traffic_simulator_msgs::msg::TrafficLightArrayV1>::pu
 template <>
 auto TrafficLightPublisher<autoware_perception_msgs::msg::TrafficLightGroupArray>::publish(
   const rclcpp::Time & current_ros_time,
-  const simulation_api_schema::UpdateTrafficLightsRequest & request) -> void
+  const simulation_api_schema::UpdateTrafficLightsRequest & request) const -> void
 {
   autoware_perception_msgs::msg::TrafficLightGroupArray message;
 
