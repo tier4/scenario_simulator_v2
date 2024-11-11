@@ -81,28 +81,26 @@ auto ActionNode::getBlackBoardValues() -> void
   }
 }
 
-auto ActionNode::getOtherEntitiesPoses() const
+auto ActionNode::getOtherEntitiesCanonicalizedLaneletPoses() const
   -> std::vector<traffic_simulator::CanonicalizedLaneletPose>
 {
   std::vector<traffic_simulator::CanonicalizedLaneletPose> other_poses;
-  for (const auto & other_status_pair : other_entity_status) {
-    if (
-      auto const canonicalized_lanelet_pose =
-        other_status_pair.second.getCanonicalizedLaneletPose()) {
+  for (const auto & [entity_name, entity_status] : other_entity_status) {
+    if (auto const canonicalized_lanelet_pose = entity_status.getCanonicalizedLaneletPose()) {
       other_poses.push_back(canonicalized_lanelet_pose.value());
     }
   }
   return other_poses;
 }
 
-auto ActionNode::getOtherEntities() const
+auto ActionNode::getOtherEntitiesCanonicalizedEntityStatuses() const
   -> std::vector<traffic_simulator::CanonicalizedEntityStatus>
 {
-  std::vector<traffic_simulator::CanonicalizedEntityStatus> other_poses;
-  for (const auto & other_status_pair : other_entity_status) {
-    other_poses.push_back(other_status_pair.second);
+  std::vector<traffic_simulator::CanonicalizedEntityStatus> other_status;
+  for (const auto & [entity_name, entity_status] : other_entity_status) {
+    other_status.push_back(entity_status);
   }
-  return other_poses;
+  return other_status;
 }
 
 auto ActionNode::getHorizon() const -> double
@@ -141,7 +139,7 @@ auto ActionNode::getOtherEntityStatus(lanelet::Id lanelet_id) const
 auto ActionNode::getYieldStopDistance(const lanelet::Ids & following_lanelets) const
   -> std::optional<double>
 {
-  if (const auto other_poses = getOtherEntitiesPoses(); !other_poses.empty()) {
+  if (const auto other_poses = getOtherEntitiesCanonicalizedLaneletPoses(); !other_poses.empty()) {
     if (
       auto const canonicalized_lanelet_pose =
         canonicalized_entity_status->getCanonicalizedLaneletPose())

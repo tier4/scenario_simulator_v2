@@ -85,7 +85,8 @@ BT::NodeStatus FollowLaneAction::tick()
     return BT::NodeStatus::FAILURE;
   }
   if (behavior_parameter.see_around) {
-    if (traffic_simulator::route::isNeedToRightOfWay(route_lanelets, getOtherEntitiesPoses())) {
+    if (traffic_simulator::route::isNeedToRightOfWay(
+          route_lanelets, getOtherEntitiesCanonicalizedLaneletPoses())) {
       return BT::NodeStatus::FAILURE;
     }
     if (trajectory == nullptr) {
@@ -121,7 +122,7 @@ BT::NodeStatus FollowLaneAction::tick()
     if (
       const auto distance_to_conflicting_entity =
         traffic_simulator::distance::distanceToNearestConflictingPose(
-          route_lanelets, *trajectory, getOtherEntities())) {
+          route_lanelets, *trajectory, getOtherEntitiesCanonicalizedEntityStatuses())) {
       if (
         distance_to_conflicting_entity.value() <
         (vehicle_parameters.bounding_box.dimensions.x + 3 +

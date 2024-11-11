@@ -100,7 +100,8 @@ BT::NodeStatus StopAtStopLineAction::tick()
   if (!behavior_parameter.see_around) {
     return BT::NodeStatus::FAILURE;
   }
-  if (traffic_simulator::route::isNeedToRightOfWay(route_lanelets, getOtherEntitiesPoses())) {
+  if (traffic_simulator::route::isNeedToRightOfWay(
+        route_lanelets, getOtherEntitiesCanonicalizedLaneletPoses())) {
     return BT::NodeStatus::FAILURE;
   }
   const auto waypoints = calculateWaypoints();
@@ -126,7 +127,7 @@ BT::NodeStatus StopAtStopLineAction::tick()
   if (
     const auto distance_to_stop_target =
       traffic_simulator::distance::distanceToNearestConflictingPose(
-        route_lanelets, *trajectory, getOtherEntities())) {
+        route_lanelets, *trajectory, getOtherEntitiesCanonicalizedEntityStatuses())) {
     if (distance_to_stop_target.value() <= distance_to_stopline_.value()) {
       stopped_ = false;
       return BT::NodeStatus::FAILURE;

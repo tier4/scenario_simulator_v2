@@ -100,7 +100,8 @@ BT::NodeStatus StopAtTrafficLightAction::tick()
   if (!behavior_parameter.see_around) {
     return BT::NodeStatus::FAILURE;
   }
-  if (traffic_simulator::route::isNeedToRightOfWay(route_lanelets, getOtherEntitiesPoses())) {
+  if (traffic_simulator::route::isNeedToRightOfWay(
+        route_lanelets, getOtherEntitiesCanonicalizedLaneletPoses())) {
     return BT::NodeStatus::FAILURE;
   }
   const auto waypoints = calculateWaypoints();

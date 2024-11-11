@@ -101,7 +101,8 @@ BT::NodeStatus YieldAction::tick()
   if (!canonicalized_entity_status->laneMatchingSucceed()) {
     return BT::NodeStatus::FAILURE;
   }
-  if (!traffic_simulator::route::isNeedToRightOfWay(route_lanelets, getOtherEntitiesPoses())) {
+  if (!traffic_simulator::route::isNeedToRightOfWay(
+        route_lanelets, getOtherEntitiesCanonicalizedLaneletPoses())) {
     if (!target_speed) {
       target_speed = traffic_simulator::route::speedLimit(route_lanelets);
     }

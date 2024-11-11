@@ -79,7 +79,8 @@ BT::NodeStatus FollowFrontEntityAction::tick()
     request != traffic_simulator::behavior::Request::FOLLOW_LANE) {
     return BT::NodeStatus::FAILURE;
   }
-  if (traffic_simulator::route::isNeedToRightOfWay(route_lanelets, getOtherEntitiesPoses())) {
+  if (traffic_simulator::route::isNeedToRightOfWay(
+        route_lanelets, getOtherEntitiesCanonicalizedLaneletPoses())) {
     return BT::NodeStatus::FAILURE;
   }
   if (!behavior_parameter.see_around) {
@@ -96,7 +97,7 @@ BT::NodeStatus FollowFrontEntityAction::tick()
     traffic_simulator::distance::distanceToStopLine(route_lanelets, *trajectory);
   const auto distance_to_conflicting_entity =
     traffic_simulator::distance::distanceToNearestConflictingPose(
-      route_lanelets, *trajectory, getOtherEntities());
+      route_lanelets, *trajectory, getOtherEntitiesCanonicalizedEntityStatuses());
   const auto front_entity_name = getFrontEntityName(*trajectory);
   if (!front_entity_name) {
     return BT::NodeStatus::FAILURE;

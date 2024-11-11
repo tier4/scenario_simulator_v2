@@ -55,8 +55,10 @@ public:
     -> std::vector<traffic_simulator::CanonicalizedEntityStatus>;
   auto stopEntity() const -> void;
   auto getHorizon() const -> double;
-  auto getOtherEntitiesPoses() const -> std::vector<traffic_simulator::CanonicalizedLaneletPose>;
-  auto getOtherEntities() const -> std::vector<traffic_simulator::CanonicalizedEntityStatus>;
+  auto getOtherEntitiesCanonicalizedLaneletPoses() const
+    -> std::vector<traffic_simulator::CanonicalizedLaneletPose>;
+  auto getOtherEntitiesCanonicalizedEntityStatuses() const
+    -> std::vector<traffic_simulator::CanonicalizedEntityStatus>;
 
   /// throws if the derived class return RUNNING.
   auto executeTick() -> BT::NodeStatus override;
