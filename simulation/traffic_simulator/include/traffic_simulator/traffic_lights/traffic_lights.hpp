@@ -40,7 +40,8 @@ public:
 private:
   auto update() const -> void
   {
-    backward_compatible_publisher_ptr_->publish(*this);
+    backward_compatible_publisher_ptr_->publish(
+      clock_ptr_->now(), generateUpdateTrafficLightsRequest());
     if (isAnyTrafficLightChanged()) {
       marker_publisher_ptr_->deleteMarkers();
     }
@@ -70,8 +71,10 @@ public:
 private:
   auto update() const -> void override
   {
-    publisher_ptr_->publish(*this);
-    legacy_topic_publisher_ptr_->publish(*this);
+    const auto now = clock_ptr_->now();
+    const auto request = generateUpdateTrafficLightsRequest();
+    publisher_ptr_->publish(now, request);
+    legacy_topic_publisher_ptr_->publish(now, request);
     if (isAnyTrafficLightChanged()) {
       marker_publisher_ptr_->deleteMarkers();
     }
