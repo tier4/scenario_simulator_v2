@@ -37,15 +37,15 @@ auto nearbyLaneletIds(
     pose.position, distance_thresh, include_crosswalk, search_count);
 }
 
-auto borderlinePoses() -> std::vector<Pose>
+auto borderlinePoses() -> std::vector<std::pair<lanelet::Id, Pose>>
 {
-  std::vector<Pose> borderline_poses;
+  std::vector<std::pair<lanelet::Id, Pose>> borderline_poses;
   for (const auto & lanelet_id : lanelet_wrapper::lanelet_map::laneletIds()) {
     if (lanelet_wrapper::lanelet_map::nextLaneletIds(lanelet_id).empty()) {
       LaneletPose lanelet_pose;
       lanelet_pose.lanelet_id = lanelet_id;
       lanelet_pose.s = lanelet_map::laneletLength(lanelet_id);
-      borderline_poses.push_back(pose::toMapPose(lanelet_pose));
+      borderline_poses.push_back({lanelet_id, pose::toMapPose(lanelet_pose)});
     }
   }
   return borderline_poses;

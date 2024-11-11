@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <geometry/quaternion/quaternion_to_euler.hpp>
 #include <geometry/transform.hpp>
 #include <geometry/vector3/hypot.hpp>
 #include <traffic_simulator/helper/helper.hpp>
@@ -19,6 +20,7 @@
 #include <traffic_simulator/lanelet_wrapper/lanelet_map.hpp>
 #include <traffic_simulator/lanelet_wrapper/lanelet_wrapper.hpp>
 #include <traffic_simulator/lanelet_wrapper/pose.hpp>
+#include <traffic_simulator/lanelet_wrapper/route.hpp>
 
 namespace traffic_simulator
 {
@@ -68,6 +70,37 @@ auto laneChangeableLaneletId(
   }
 }
 
+auto countLaneChanges(
+  const lanelet::Id & from_lanelet_id, const lanelet::Id & to_lanelet_id, bool allow_lane_change)
+  -> std::optional<std::pair<int, int>>
+{
+  constexpr bool include_opposite_direction{true};
+  const auto traveled_route = route::route(from_lanelet_id, to_lanelet_id, allow_lane_change);
+  if (traveled_route.empty()) {
+    return std::nullopt;
+  } else {
+    std::pair<int, int> lane_changes{0, 0};
+    for (std::size_t i = 1; i < traveled_route.size(); ++i) {
+      const auto & previous = traveled_route[i - 1];
+      const auto & current = traveled_route[i];
+
+      if (auto followings = lanelet_map::nextLaneletIds(previous);
+          std::find(followings.begin(), followings.end(), current) == followings.end()) {
+        traffic_simulator_msgs::msg::EntityType type;
+        type.type = traffic_simulator_msgs::msg::EntityType::VEHICLE;
+        if (auto lefts = pose::leftLaneletIds(previous, type, include_opposite_direction);
+            std::find(lefts.begin(), lefts.end(), current) != lefts.end()) {
+          lane_changes.first++;
+        } else if (auto rights = pose::rightLaneletIds(previous, type, include_opposite_direction);
+                   std::find(rights.begin(), rights.end(), current) != rights.end()) {
+          lane_changes.second++;
+        }
+      }
+    }
+    return lane_changes;
+  }
+}
+
 // Trajectory
 auto laneChangeTrajectory(
   const Pose & from_pose, const LaneletPose & to_lanelet_pose,
@@ -76,7 +109,7 @@ auto laneChangeTrajectory(
   const auto to_pose = pose::toMapPose(to_lanelet_pose).pose;
 
   auto vectorFromPose = [](const Pose & pose, const double magnitude) -> Vector3 {
-    const auto direction = quaternion_operation::convertQuaternionToEulerAngle(pose.orientation);
+    const auto direction = math::geometry::convertQuaternionToEulerAngle(pose.orientation);
     return geometry_msgs::build<Vector3>()
       .x(magnitude * std::cos(direction.z))
       .y(magnitude * std::sin(direction.z))

@@ -15,8 +15,8 @@
 #include <lanelet2_core/geometry/Lanelet.h>
 #include <lanelet2_io/Io.h>
 
-#include <lanelet2_extension/projection/mgrs_projector.hpp>
-#include <lanelet2_extension/utility/query.hpp>
+#include <autoware_lanelet2_extension/projection/mgrs_projector.hpp>
+#include <autoware_lanelet2_extension/utility/query.hpp>
 #include <traffic_simulator/lanelet_wrapper/lanelet_wrapper.hpp>
 
 namespace traffic_simulator

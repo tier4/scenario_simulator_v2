@@ -15,8 +15,8 @@
 #ifndef TRAFFIC_SIMULATOR__UTILS__LANELET_MAP_HPP_
 #define TRAFFIC_SIMULATOR__UTILS__LANELET_MAP_HPP_
 
+#include <autoware_lanelet2_extension/visualization/visualization.hpp>
 #include <geometry_msgs/msg/point.hpp>
-#include <lanelet2_extension/visualization/visualization.hpp>
 #include <traffic_simulator/color_utils/color_utils.hpp>
 #include <traffic_simulator/lanelet_wrapper/lanelet_map.hpp>
 #include <traffic_simulator/lanelet_wrapper/lanelet_wrapper.hpp>
@@ -44,7 +44,7 @@ auto nearbyLaneletIds(
   const Pose & pose, const double distance_threshold, const bool include_crosswalk,
   const std::size_t search_count) -> lanelet::Ids;
 
-auto borderlinePoses() -> std::vector<Pose>;
+auto borderlinePoses() -> std::vector<std::pair<lanelet::Id, Pose>>;
 
 auto visualizationMarker() -> visualization_msgs::msg::MarkerArray;
 }  // namespace lanelet_map

@@ -113,19 +113,6 @@ public:
     return *field_operator_application_mock;
   }
 
-  /// Real member function required for the canonicalization of the lanelet pose in TestExecutor.InitializeWithNoNPCs test
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & getHdmapUtils()
-  {
-    static const std::string path =
-      ament_index_cpp::get_package_share_directory("random_test_runner") + "/map/lanelet2_map.osm";
-    static const auto origin = geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
-                                 .latitude(35.61836750154)
-                                 .longitude(139.78066608243)
-                                 .altitude(0.0);
-    static const auto hdmap_utils_ptr = std::make_shared<hdmap_utils::HdMapUtils>(path, origin);
-    return hdmap_utils_ptr;
-  }
-
   traffic_simulator::CanonicalizedEntityStatus getEntityStatus(const std::string & name)
   {
     getEntityStatusMock(name);

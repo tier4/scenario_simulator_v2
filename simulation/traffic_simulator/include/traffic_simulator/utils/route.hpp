@@ -95,6 +95,10 @@ auto laneChangeTrajectory(
 auto laneChangePoints(
   const Curve & curve, const double target_s, const double current_s, const double horizon,
   const lane_change::Parameter & parameter) -> std::vector<Point>;
+
+auto countLaneChanges(
+  const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
+  bool allow_lane_change) -> std::optional<std::pair<int, int>>;
 }  // namespace route
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__UTILS__ROUTE_HPP_

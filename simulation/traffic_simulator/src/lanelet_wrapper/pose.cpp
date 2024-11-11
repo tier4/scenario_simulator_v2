@@ -11,10 +11,11 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-#include <quaternion_operation/quaternion_operation.h>
-
+#include <geometry/quaternion/euler_to_quaternion.hpp>
+#include <geometry/quaternion/get_rotation.hpp>
 #include <geometry/quaternion/operator.hpp>
+#include <geometry/quaternion/quaternion_to_euler.hpp>
+#include <geometry/vector3/hypot.hpp>
 #include <geometry/vector3/inner_product.hpp>
 #include <geometry/vector3/normalize.hpp>
 #include <geometry/vector3/operator.hpp>
@@ -56,8 +57,8 @@ auto toMapPose(const LaneletPose & lanelet_pose, const bool fill_pitch) -> PoseS
                      : 0.0)
         .z(std::atan2(tangent_vector.y, tangent_vector.x));
     pose_stamped.pose.orientation =
-      quaternion_operation::convertEulerAngleToQuaternion(lanelet_rpy) *
-      quaternion_operation::convertEulerAngleToQuaternion(canonicalized_lanelet_pose->rpy);
+      math::geometry::convertEulerAngleToQuaternion(lanelet_rpy) *
+      math::geometry::convertEulerAngleToQuaternion(canonicalized_lanelet_pose->rpy);
     return pose_stamped;
   } else {
     THROW_SEMANTIC_ERROR(
@@ -78,8 +79,8 @@ auto toLaneletPose(
     return std::nullopt;
   } else {
     const auto lanelet_quaternion = lanelet_spline->getPose(lanelet_pose_s.value()).orientation;
-    if (const auto lanelet_pose_rpy = quaternion_operation::convertQuaternionToEulerAngle(
-          quaternion_operation::getRotation(lanelet_quaternion, map_pose.orientation));
+    if (const auto lanelet_pose_rpy = math::geometry::convertQuaternionToEulerAngle(
+          math::geometry::getRotation(lanelet_quaternion, map_pose.orientation));
         std::fabs(lanelet_pose_rpy.z) > M_PI * yaw_threshold &&
         std::fabs(lanelet_pose_rpy.z) < M_PI * (1 - yaw_threshold)) {
       return std::nullopt;
@@ -389,7 +390,7 @@ auto matchToLane(
     return absolute_hull_polygon;
   };
   // prepere object for matching
-  const auto yaw = quaternion_operation::convertQuaternionToEulerAngle(map_pose.orientation).z;
+  const auto yaw = math::geometry::convertQuaternionToEulerAngle(map_pose.orientation).z;
   lanelet::matching::Object2d bounding_box_object;
   bounding_box_object.pose.translation() =
     lanelet::BasicPoint2d(map_pose.position.x, map_pose.position.y);

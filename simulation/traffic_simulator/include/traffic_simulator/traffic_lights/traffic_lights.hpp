@@ -26,9 +26,8 @@ class ConventionalTrafficLights : public TrafficLightsBase
 {
 public:
   template <typename NodeTypePointer>
-  explicit ConventionalTrafficLights(
-    const NodeTypePointer & node_ptr, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils)
-  : TrafficLightsBase(node_ptr, hdmap_utils),
+  explicit ConventionalTrafficLights(const NodeTypePointer & node_ptr)
+  : TrafficLightsBase(node_ptr),
     backward_compatible_publisher_ptr_(
       std::make_unique<TrafficLightPublisher<traffic_simulator_msgs::msg::TrafficLightArrayV1>>(
         node_ptr, "/simulation/traffic_lights"))
@@ -54,10 +53,8 @@ class V2ITrafficLights : public TrafficLightsBase
 {
 public:
   template <typename NodeTypePointer>
-  explicit V2ITrafficLights(
-    const NodeTypePointer & node_ptr, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
-    const std::string & architecture_type)
-  : TrafficLightsBase(node_ptr, hdmap_utils),
+  explicit V2ITrafficLights(const NodeTypePointer & node_ptr, const std::string & architecture_type)
+  : TrafficLightsBase(node_ptr),
     publisher_ptr_(makePublisher(
       node_ptr, architecture_type,
       "/perception/traffic_light_recognition/external/traffic_signals")),
@@ -110,13 +107,9 @@ class TrafficLights
 {
 public:
   template <typename NodeTypePointer>
-  explicit TrafficLights(
-    const NodeTypePointer & node_ptr, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
-    const std::string & architecture_type)
-  : conventional_traffic_lights_(
-      std::make_shared<ConventionalTrafficLights>(node_ptr, hdmap_utils)),
-    v2i_traffic_lights_(
-      std::make_shared<V2ITrafficLights>(node_ptr, hdmap_utils, architecture_type))
+  explicit TrafficLights(const NodeTypePointer & node_ptr, const std::string & architecture_type)
+  : conventional_traffic_lights_(std::make_shared<ConventionalTrafficLights>(node_ptr)),
+    v2i_traffic_lights_(std::make_shared<V2ITrafficLights>(node_ptr, architecture_type))
   {
   }
 

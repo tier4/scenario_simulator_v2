@@ -18,11 +18,12 @@
 #include <lanelet2_core/utility/Units.h>
 #include <lanelet2_routing/RoutingGraphContainer.h>
 
-#include <lanelet2_extension/utility/utilities.hpp>
+#include <autoware_lanelet2_extension/utility/utilities.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/lanelet_wrapper/lanelet_map.hpp>
 #include <traffic_simulator/lanelet_wrapper/lanelet_wrapper.hpp>
 #include <traffic_simulator/lanelet_wrapper/route.hpp>
+#include <traffic_simulator_msgs/msg/entity_type.hpp>
 
 namespace traffic_simulator
 {

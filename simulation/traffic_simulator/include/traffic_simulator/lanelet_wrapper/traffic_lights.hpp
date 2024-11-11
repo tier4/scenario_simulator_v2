@@ -17,8 +17,8 @@
 #ifndef TRAFFIC_SIMULATOR__LANELET_WRAPPER_TRAFFIC_LIGHTS_HPP_
 #define TRAFFIC_SIMULATOR__LANELET_WRAPPER_TRAFFIC_LIGHTS_HPP_
 
+#include <autoware_lanelet2_extension/utility/query.hpp>
 #include <geometry_msgs/msg/point.hpp>
-#include <lanelet2_extension/utility/query.hpp>
 #include <optional>
 #include <traffic_simulator/lanelet_wrapper/lanelet_wrapper.hpp>
 

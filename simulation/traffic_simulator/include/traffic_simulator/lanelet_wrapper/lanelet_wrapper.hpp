@@ -19,10 +19,10 @@
 #include <lanelet2_routing/RoutingGraphContainer.h>
 #include <lanelet2_traffic_rules/TrafficRulesFactory.h>
 
+#include <autoware_lanelet2_extension/utility/utilities.hpp>
 #include <filesystem>
 #include <geometry/spline/catmull_rom_spline.hpp>
 #include <geometry_msgs/msg/point.hpp>
-#include <lanelet2_extension/utility/utilities.hpp>
 #include <mutex>
 #include <scenario_simulator_exception/exception.hpp>
 

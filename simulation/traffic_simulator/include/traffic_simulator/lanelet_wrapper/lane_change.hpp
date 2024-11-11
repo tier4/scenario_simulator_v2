@@ -45,6 +45,10 @@ auto laneChangeableLaneletId(
   const lanelet::Id lanelet_id, const Direction & direction, const std::uint8_t shift)
   -> std::optional<lanelet::Id>;
 
+auto countLaneChanges(
+  const lanelet::Id & from_lanelet_id, const lanelet::Id & to_lanelet_id, bool allow_lane_change)
+  -> std::optional<std::pair<int, int>>;
+
 // Trajectory
 auto laneChangeTrajectory(
   const Pose & from_pose, const LaneletPose & to_lanelet_pose,

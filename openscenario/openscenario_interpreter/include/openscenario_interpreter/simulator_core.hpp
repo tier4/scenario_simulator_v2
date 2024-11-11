@@ -25,6 +25,7 @@
 #include <traffic_simulator/api/api.hpp>
 #include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator/utils/pose.hpp>
+#include <traffic_simulator/utils/route.hpp>
 
 namespace openscenario_interpreter
 {
@@ -265,10 +266,9 @@ public:
           const bool allow_lane_change =
             (routing_algorithm == RoutingAlgorithm::value_type::shortest);
           if (
-            auto lane_changes = traffic_simulator::distance::countLaneChanges(
+            auto lane_changes = traffic_simulator::route::countLaneChanges(
               from_entity->getCanonicalizedLaneletPose().value(),
-              to_entity->getCanonicalizedLaneletPose().value(), allow_lane_change,
-              core->getHdmapUtils())) {
+              to_entity->getCanonicalizedLaneletPose().value(), allow_lane_change)) {
             return lane_changes.value().first - lane_changes.value().second;
           }
         }

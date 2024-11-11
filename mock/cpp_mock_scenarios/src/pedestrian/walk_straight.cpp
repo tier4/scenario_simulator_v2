@@ -70,9 +70,7 @@ private:
   void onInitialize() override
   {
     api_.spawn(
-      "ego",
-      traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        120545, 0.0, 0.0, api_.getHdmapUtils()),
+      "ego", traffic_simulator::helper::constructCanonicalizedLaneletPose(120545, 0.0, 0.0),
       getVehicleParameters());
     api_.setLinearVelocity("ego", 10);
     api_.requestSpeedChange("ego", 8, true);
@@ -81,9 +79,7 @@ private:
                traffic_simulator::helper::constructCanonicalizedLaneletPose(34675, 0.0, 0.0),
                traffic_simulator::helper::constructCanonicalizedLaneletPose(34690, 0.0, 0.0)});
     api_.spawn(
-      "bob",
-      traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34378, 0.0, 0.0, api_.getHdmapUtils()),
+      "bob", traffic_simulator::helper::constructCanonicalizedLaneletPose(34378, 0.0, 0.0),
       getPedestrianParameters());
     api_.setLinearVelocity("bob", 0);
     api_.requestWalkStraight("bob");

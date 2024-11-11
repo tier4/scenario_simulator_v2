@@ -61,62 +61,70 @@ auto lateralDistance(const LaneletPose & from, const LaneletPose & to, const boo
 }
 
 auto longitudinalDistance(
-  const LaneletPose & from, const LaneletPose & to, bool const allow_lane_change)
+  const LaneletPose & from_pose, const LaneletPose & to_pose, const bool allow_lane_change)
   -> std::optional<double>
 {
-  if (from.lanelet_id == to.lanelet_id) {
-    return from.s > to.s ? std::nullopt : std::make_optional(to.s - from.s);
-  } else if (const auto route = route::route(from.lanelet_id, to.lanelet_id, allow_lane_change);
-             route.empty()) {
-    return std::nullopt;
-  } else {
-    constexpr double matching_distance{10.0};
-    double longitudinal_distance{0.0};
-    /// @note in this for loop, some cases are marked by @note command. each case is explained in the document.
-    /// @sa https://tier4.github.io/scenario_simulator_v2-docs/developer_guide/DistanceCalculation/
-    for (std::size_t i = 0; i < route.size(); i++) {
-      // if there is a lane change and it is not last step in route
-      if (
-        allow_lane_change && i < route.size() - 1 &&
-        lane_change::canChangeLane(route[i], route[i + 1])) {
-        /// @note "the lanelet before the lane change" case
-        const auto next_lanelet_pose = helper::constructLaneletPose(route[i + 1], 0.0, 0.0);
-        const auto current_lanelet_pose = helper::constructLaneletPose(route[i], 0.0, 0.0);
-        if (
-          auto next_lanelet_origin_from_current_lanelet = pose::toLaneletPose(
-            pose::toMapPose(next_lanelet_pose).pose, route[i], matching_distance)) {
-          longitudinal_distance += next_lanelet_origin_from_current_lanelet->s;
-        } else if (
-          auto current_lanelet_origin_from_next_lanelet = pose::toLaneletPose(
-            pose::toMapPose(current_lanelet_pose).pose, route[i + 1], matching_distance)) {
-          longitudinal_distance -= current_lanelet_origin_from_next_lanelet->s;
+  const auto is_lane_change_required =
+    [](const lanelet::Id current_lanelet, const lanelet::Id next_lanelet) -> bool {
+    const auto next_lanelet_ids = lanelet_map::nextLaneletIds(current_lanelet);
+    return std::none_of(
+      next_lanelet_ids.cbegin(), next_lanelet_ids.cend(),
+      [next_lanelet](const lanelet::Id id) { return id == next_lanelet; });
+  };
+
+  /// @sa https://tier4.github.io/scenario_simulator_v2-docs/developer_guide/DistanceCalculation/
+  if (const auto route = route::route(from_pose.lanelet_id, to_pose.lanelet_id, allow_lane_change);
+      not route.empty() || from_pose.lanelet_id == to_pose.lanelet_id) {
+    /// @note horizontal bar must intersect with the lanelet spline, so the distance was set arbitrarily to 10 meters.
+    static constexpr double matching_distance = 10.0;
+    double accumulated_distance = 0.0;
+    // accumulate lanelet lengths alongside the route, considering possible lane changes
+    for (std::size_t i = 1UL; i < route.size(); ++i) {
+      // if lane change is required, add the distance traveled during the lane change
+      // if lane change is not required, add the current lanelet length
+      if (is_lane_change_required(route[i - 1UL], route[i])) {
+        const auto current_lanelet_spline = lanelet_map::centerPointsSpline(route[i - 1UL]);
+        const auto next_lanelet_spline = lanelet_map::centerPointsSpline(route[i]);
+
+        // first, lanelets are matched at the start (s = 0.0) of each lanelet; only if this fails,
+        // matching is performed at a larger s value, which should cover the rest of the cases.
+        static constexpr double lanelet_starting_s = 0.0;
+        const auto lanelet_min_middle_s =
+          std::min(current_lanelet_spline->getLength(), next_lanelet_spline->getLength()) * 0.5;
+
+        const auto current_start_matching_s = current_lanelet_spline->getSValue(
+          next_lanelet_spline->getPose(lanelet_starting_s), matching_distance);
+        const auto next_start_matching_s = next_lanelet_spline->getSValue(
+          current_lanelet_spline->getPose(lanelet_starting_s), matching_distance);
+        const auto current_middle_matching_s = current_lanelet_spline->getSValue(
+          next_lanelet_spline->getPose(lanelet_min_middle_s), matching_distance);
+        const auto next_middle_matching_s = next_lanelet_spline->getSValue(
+          current_lanelet_spline->getPose(lanelet_min_middle_s), matching_distance);
+
+        if (current_start_matching_s.has_value()) {
+          accumulated_distance += current_start_matching_s.value();
+        } else if (next_start_matching_s.has_value()) {
+          accumulated_distance -= next_start_matching_s.value();
+        } else if (current_middle_matching_s.has_value()) {
+          accumulated_distance += current_middle_matching_s.value() - lanelet_min_middle_s;
+        } else if (next_middle_matching_s.has_value()) {
+          accumulated_distance -= next_middle_matching_s.value() - lanelet_min_middle_s;
         } else {
-          /// @todo maybe an exception should be thrown here? since the route exists but is incorrect?
           return std::nullopt;
         }
-
-        /// @note "first lanelet before the lane change" case
-        if (route[i] == from.lanelet_id) {
-          longitudinal_distance += lanelet_map::laneletLength(route[i + 1]) - from.s;
-          if (route[i + 1] == to.lanelet_id) {
-            return longitudinal_distance -= lanelet_map::laneletLength(route[i + 1]) - to.s;
-          }
-        }
-
       } else {
-        if (route[i] == from.lanelet_id) {
-          /// @note "first lanelet" case
-          longitudinal_distance = lanelet_map::laneletLength(from.lanelet_id) - from.s;
-        } else if (route[i] == to.lanelet_id) {
-          /// @note "last lanelet" case
-          longitudinal_distance += to.s;
-        } else {
-          ///@note "normal intermediate lanelet" case
-          longitudinal_distance += lanelet_map::laneletLength(route[i]);
-        }
+        accumulated_distance += lanelet_map::laneletLength(route[i - 1UL]);
       }
     }
-    return longitudinal_distance;
+    // subtract the distance already traveled on the first lanelet: from_pose.s
+    // and add the distance that needs to be traveled on the last: to_pose.s.
+    if (const double distance = accumulated_distance - from_pose.s + to_pose.s; distance >= 0.0) {
+      return std::make_optional(distance);
+    } else {
+      return std::nullopt;
+    }
+  } else {
+    return std::nullopt;
   }
 }
 

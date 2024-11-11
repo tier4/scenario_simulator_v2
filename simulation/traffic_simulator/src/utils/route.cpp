@@ -185,5 +185,14 @@ auto laneChangePoints(
     return spline.getTrajectory(target_s, target_s + rest_s, 1.0);
   }
 }
+
+auto countLaneChanges(
+  const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
+  bool allow_lane_change) -> std::optional<std::pair<int, int>>
+{
+  return lanelet_wrapper::lane_change::countLaneChanges(
+    static_cast<LaneletPose>(from).lanelet_id, static_cast<LaneletPose>(to).lanelet_id,
+    allow_lane_change);
+}
 }  // namespace route
 }  // namespace traffic_simulator

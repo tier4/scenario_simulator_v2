@@ -101,7 +101,7 @@ BT::NodeStatus FollowLaneAction::tick()
       }
     }
     const auto distance_to_traffic_stop_line =
-      traffic_light_manager->getDistanceToActiveTrafficLightStopLine(route_lanelets, *trajectory);
+      traffic_lights->getDistanceToActiveTrafficLightStopLine(route_lanelets, *trajectory);
     if (distance_to_traffic_stop_line) {
       if (distance_to_traffic_stop_line.value() <= getHorizon()) {
         return BT::NodeStatus::FAILURE;
