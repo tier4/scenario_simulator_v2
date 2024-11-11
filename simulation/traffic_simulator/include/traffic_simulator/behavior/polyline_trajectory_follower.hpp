@@ -34,7 +34,7 @@ public:
     const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter,
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils);
 
-  auto makeUpdatedStatus(
+  auto makeUpdatedEntityStatus(
     const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
     const double step_time, const double matching_distance,
     const std::optional<double> target_speed /*= std::nullopt*/) const
@@ -49,6 +49,9 @@ private:
     const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
     const double step_time, const double matching_distance,
     const std::optional<double> target_speed) const -> std::optional<EntityStatus>;
+  auto buildUpdatedEntityStatus(
+    const geometry_msgs::msg::Vector3 & desired_velocity, const double step_time) const
+    -> EntityStatus;
   // PolylineTrajectoryFollower(const PolylineTrajectoryFollower & other);
   // PolylineTrajectoryFollower & operator=(const PolylineTrajectoryFollower & other);
   // PolylineTrajectoryFollower(PolylineTrajectoryFollower && other) noexcept;

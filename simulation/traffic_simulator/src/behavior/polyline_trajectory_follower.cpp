@@ -134,10 +134,10 @@ auto calculate_desired_velocity(
 auto calculate_current_velocity(
   const traffic_simulator_msgs::msg::EntityStatus & entity_status, const double speed)
 {
-  const double pitch =
-    -math::geometry::convertQuaternionToEulerAngle(entity_status.pose.orientation).y;
-  const double yaw =
-    math::geometry::convertQuaternionToEulerAngle(entity_status.pose.orientation).z;
+  const auto euler_angles =
+    math::geometry::convertQuaternionToEulerAngle(entity_status.pose.orientation);
+  const double pitch = -euler_angles.y;
+  const double yaw = euler_angles.z;
   return geometry_msgs::build<geometry_msgs::msg::Vector3>()
     .x(std::cos(pitch) * std::cos(yaw) * speed)
     .y(std::cos(pitch) * std::sin(yaw) * speed)
@@ -278,18 +278,75 @@ auto PolylineTrajectoryFollower::discard_the_front_waypoint_and_recurse(
     polyline_trajectory_copy.base_time = entity_status.time;
   }
 
-  if (std::rotate(
-        std::begin(polyline_trajectory_copy.shape.vertices),
-        std::begin(polyline_trajectory_copy.shape.vertices) + 1,
-        std::end(polyline_trajectory_copy.shape.vertices));
-      not polyline_trajectory_copy.closed) {
+  std::rotate(
+    std::begin(polyline_trajectory_copy.shape.vertices),
+    std::begin(polyline_trajectory_copy.shape.vertices) + 1,
+    std::end(polyline_trajectory_copy.shape.vertices));
+
+  if (not polyline_trajectory_copy.closed) {
     polyline_trajectory_copy.shape.vertices.pop_back();
   }
 
-  return makeUpdatedStatus(polyline_trajectory_copy, step_time, matching_distance, target_speed);
+  return makeUpdatedEntityStatus(
+    polyline_trajectory_copy, step_time, matching_distance, target_speed);
 };
 
-auto PolylineTrajectoryFollower::makeUpdatedStatus(
+auto PolylineTrajectoryFollower::buildUpdatedEntityStatus(
+  const geometry_msgs::msg::Vector3 & desired_velocity, const double step_time) const
+  -> EntityStatus
+{
+  using math::geometry::operator+;
+  using math::geometry::operator-;
+  using math::geometry::operator*;
+  using math::geometry::operator/;
+
+  const auto updated_pose_orientation =
+    make_updated_pose_orientation(entity_status, desired_velocity);
+  const auto updated_pose = geometry_msgs::build<geometry_msgs::msg::Pose>()
+                              .position(entity_status.pose.position + desired_velocity * step_time)
+                              .orientation(updated_pose_orientation);
+
+  const auto updated_action_status_twist_linear =
+    geometry_msgs::build<geometry_msgs::msg::Vector3>()
+      .x(math::geometry::norm(desired_velocity))
+      .y(0.0)
+      .z(0.0);
+  const auto updated_action_status_twist_angular =
+    math::geometry::convertQuaternionToEulerAngle(
+      math::geometry::getRotation(entity_status.pose.orientation, updated_pose_orientation)) /
+    step_time;
+  const auto updated_action_status_twist = geometry_msgs::build<geometry_msgs::msg::Twist>()
+                                             .linear(updated_action_status_twist_linear)
+                                             .angular(updated_action_status_twist_angular);
+  const auto updated_action_status_accel =
+    geometry_msgs::build<geometry_msgs::msg::Accel>()
+      .linear(
+        (updated_action_status_twist_linear - entity_status.action_status.twist.linear) / step_time)
+      .angular(
+        (updated_action_status_twist_angular - entity_status.action_status.twist.angular) /
+        step_time);
+  const auto updated_action_status =
+    traffic_simulator_msgs::build<traffic_simulator_msgs::msg::ActionStatus>()
+      .current_action(entity_status.action_status.current_action)
+      .twist(updated_action_status_twist)
+      .accel(updated_action_status_accel)
+      .linear_jerk(entity_status.action_status.linear_jerk);
+  const auto updated_time = entity_status.time + step_time;
+  const auto updated_lanelet_pose_valid = false;
+
+  return traffic_simulator_msgs::build<traffic_simulator_msgs::msg::EntityStatus>()
+    .type(entity_status.type)
+    .subtype(entity_status.subtype)
+    .time(updated_time)
+    .name(entity_status.name)
+    .bounding_box(entity_status.bounding_box)
+    .action_status(updated_action_status)
+    .pose(updated_pose)
+    .lanelet_pose(entity_status.lanelet_pose)
+    .lanelet_pose_valid(updated_lanelet_pose_valid);
+}
+
+auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
   const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
   const double step_time, const double matching_distance,
   const std::optional<double> target_speed /*= std::nullopt*/) const -> std::optional<EntityStatus>
@@ -301,7 +358,6 @@ auto PolylineTrajectoryFollower::makeUpdatedStatus(
 
     See https://www.researchgate.net/publication/2495826_Steering_Behaviors_For_Autonomous_Characters
   */
-  using math::arithmetic::isDefinitelyLessThan;
 
   using math::geometry::operator+;
   using math::geometry::operator-;
@@ -309,20 +365,13 @@ auto PolylineTrajectoryFollower::makeUpdatedStatus(
   using math::geometry::operator/;
   using math::geometry::operator+=;
 
-  using math::geometry::CatmullRomSpline;
-  using math::geometry::innerProduct;
-  using math::geometry::norm;
-
-  const auto is_breaking_waypoint = [&polyline_trajectory]() {
-    return first_waypoint_with_arrival_time_specified(polyline_trajectory) >=
-           std::prev(polyline_trajectory.shape.vertices.cend());
-  };
-
   if (polyline_trajectory.shape.vertices.empty()) {
     return std::nullopt;
   }
 
   const auto entity_position = entity_status.pose.position;
+  const auto target_position = polyline_trajectory.shape.vertices.front().position.position;
+
   if (is_infinite_vec3_like(entity_position)) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
@@ -336,7 +385,6 @@ auto PolylineTrajectoryFollower::makeUpdatedStatus(
     a reference to vertices.front() always succeeds. vertices.front() is
     referenced only this once in this member function.
   */
-  const auto target_position = polyline_trajectory.shape.vertices.front().position.position;
   if (is_infinite_vec3_like(target_position)) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
@@ -349,7 +397,7 @@ auto PolylineTrajectoryFollower::makeUpdatedStatus(
   const auto distance_to_front_waypoint = distance_along_lanelet(
     hdmap_utils, entity_status, matching_distance, entity_position, target_position);
   const auto remaining_time_to_front_waypoint =
-    (not std::isnan(polyline_trajectory.base_time) ? polyline_trajectory.base_time : 0.0) +
+    (std::isnan(polyline_trajectory.base_time) ? 0.0 : polyline_trajectory.base_time) +
     polyline_trajectory.shape.vertices.front().time - entity_status.time;
 
   /*
@@ -362,7 +410,8 @@ auto PolylineTrajectoryFollower::makeUpdatedStatus(
     distance_to_front_waypoint as the denominator if the distance
     miraculously becomes zero.
   */
-  if (isDefinitelyLessThan(distance_to_front_waypoint, std::numeric_limits<double>::epsilon())) {
+  if (math::arithmetic::isDefinitelyLessThan(
+        distance_to_front_waypoint, std::numeric_limits<double>::epsilon())) {
     return discard_the_front_waypoint_and_recurse(
       polyline_trajectory, step_time, matching_distance, target_speed);
   }
@@ -370,7 +419,7 @@ auto PolylineTrajectoryFollower::makeUpdatedStatus(
   const auto [distance, remaining_time] = calculate_distance_and_remaining_time(
     hdmap_utils, entity_status, matching_distance, polyline_trajectory, distance_to_front_waypoint,
     step_time);
-  if (isDefinitelyLessThan(distance, std::numeric_limits<double>::epsilon())) {
+  if (math::arithmetic::isDefinitelyLessThan(distance, std::numeric_limits<double>::epsilon())) {
     return discard_the_front_waypoint_and_recurse(
       polyline_trajectory, step_time, matching_distance, target_speed);
   }
@@ -436,8 +485,11 @@ auto PolylineTrajectoryFollower::makeUpdatedStatus(
     not set (it is std::nullopt), target_speed is assumed to be the same as max_speed from the
     behaviour_parameter.
   */
+  const bool is_breaking_waypoint =
+    first_waypoint_with_arrival_time_specified(polyline_trajectory) >=
+    std::prev(polyline_trajectory.shape.vertices.cend());
   const auto follow_waypoint_controller = FollowWaypointController(
-    behavior_parameter, step_time, is_breaking_waypoint(),
+    behavior_parameter, step_time, is_breaking_waypoint,
     std::isinf(remaining_time) ? target_speed : std::nullopt);
 
   /*
@@ -488,7 +540,7 @@ auto PolylineTrajectoryFollower::makeUpdatedStatus(
 
   if (
     entity_speed * step_time > distance_to_front_waypoint &&
-    innerProduct(desired_velocity, current_velocity) < 0.0) {
+    math::geometry::innerProduct(desired_velocity, current_velocity) < 0.0) {
     return discard_the_front_waypoint_and_recurse(
       polyline_trajectory, step_time, matching_distance, target_speed);
   }
@@ -520,6 +572,8 @@ auto PolylineTrajectoryFollower::makeUpdatedStatus(
             acceleration, entity_speed, distance_to_front_waypoint)) {
         return discard_the_front_waypoint_and_recurse(
           polyline_trajectory, step_time, matching_distance, target_speed);
+      } else {
+        return buildUpdatedEntityStatus(desired_velocity, step_time);
       }
     } else {
       /*
@@ -531,6 +585,8 @@ auto PolylineTrajectoryFollower::makeUpdatedStatus(
           this_step_distance > distance_to_front_waypoint) {
         return discard_the_front_waypoint_and_recurse(
           polyline_trajectory, step_time, matching_distance, target_speed);
+      } else {
+        return buildUpdatedEntityStatus(desired_velocity, step_time);
       }
     }
     /*
@@ -541,7 +597,8 @@ auto PolylineTrajectoryFollower::makeUpdatedStatus(
       here is either equal to 0 or step_time. Value step_time/2 allows to return true if no next
       step is possible (remaining_time_to_front_waypoint is almost zero).
     */
-  } else if (isDefinitelyLessThan(remaining_time_to_front_waypoint, step_time / 2.0)) {
+  } else if (math::arithmetic::isDefinitelyLessThan(
+               remaining_time_to_front_waypoint, step_time / 2.0)) {
     if (follow_waypoint_controller.areConditionsOfArrivalMet(
           acceleration, entity_speed, distance_to_front_waypoint)) {
       return discard_the_front_waypoint_and_recurse(
@@ -554,6 +611,8 @@ auto PolylineTrajectoryFollower::makeUpdatedStatus(
         polyline_trajectory.shape.vertices.front().time, "s at a distance equal to ", distance,
         " from that waypoint which is greater than the accepted accuracy.");
     }
+  } else {
+    return buildUpdatedEntityStatus(desired_velocity, step_time);
   }
 
   /*
@@ -561,47 +620,6 @@ auto PolylineTrajectoryFollower::makeUpdatedStatus(
     known by the name "collision avoidance" should be synthesized here into
     steering.
   */
-  const auto updated_pose_orientation =
-    make_updated_pose_orientation(entity_status, desired_velocity);
-  const auto updated_pose = geometry_msgs::build<geometry_msgs::msg::Pose>()
-                              .position(entity_status.pose.position + desired_velocity * step_time)
-                              .orientation(updated_pose_orientation);
-
-  const auto updated_action_status_twist_linear =
-    geometry_msgs::build<geometry_msgs::msg::Vector3>().x(norm(desired_velocity)).y(0.0).z(0.0);
-  const auto updated_action_status_twist_angular =
-    math::geometry::convertQuaternionToEulerAngle(
-      math::geometry::getRotation(entity_status.pose.orientation, updated_pose_orientation)) /
-    step_time;
-  const auto updated_action_status_twist = geometry_msgs::build<geometry_msgs::msg::Twist>()
-                                             .linear(updated_action_status_twist_linear)
-                                             .angular(updated_action_status_twist_angular);
-  const auto updated_action_status_accel =
-    geometry_msgs::build<geometry_msgs::msg::Accel>()
-      .linear(
-        (updated_action_status_twist_linear - entity_status.action_status.twist.linear) / step_time)
-      .angular(
-        (updated_action_status_twist_angular - entity_status.action_status.twist.angular) /
-        step_time);
-  const auto updated_action_status =
-    traffic_simulator_msgs::build<traffic_simulator_msgs::msg::ActionStatus>()
-      .current_action(entity_status.action_status.current_action)
-      .twist(updated_action_status_twist)
-      .accel(updated_action_status_accel)
-      .linear_jerk(entity_status.action_status.linear_jerk);
-  const auto updated_time = entity_status.time + step_time;
-  const auto updated_lanelet_pose_valid = false;
-
-  return traffic_simulator_msgs::build<traffic_simulator_msgs::msg::EntityStatus>()
-    .type(entity_status.type)
-    .subtype(entity_status.subtype)
-    .time(updated_time)
-    .name(entity_status.name)
-    .bounding_box(entity_status.bounding_box)
-    .action_status(updated_action_status)
-    .pose(updated_pose)
-    .lanelet_pose(entity_status.lanelet_pose)
-    .lanelet_pose_valid(updated_lanelet_pose_valid);
 }
 
 }  // namespace follow_trajectory

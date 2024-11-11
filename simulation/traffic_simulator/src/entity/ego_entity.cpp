@@ -151,7 +151,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
           traffic_simulator::follow_trajectory::PolylineTrajectoryFollower(
             static_cast<traffic_simulator::EntityStatus>(*status_), behavior_parameter_,
             hdmap_utils_ptr_)
-            .makeUpdatedStatus(
+            .makeUpdatedEntityStatus(
               *polyline_trajectory_, step_time,
               getDefaultMatchingDistanceForLaneletPoseCalculation(),
               target_speed_ ? target_speed_.value() : status_->getTwist().linear.x);
