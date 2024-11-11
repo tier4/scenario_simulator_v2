@@ -53,7 +53,7 @@ private:
     /*
        TrafficLightsDetector in SimpleSensorSimulator publishes using architecture-dependent topics:
        "/perception/traffic_light_recognition/internal/traffic_signals" for >= "awf/universe/20240605"
-       "/perception/traffic_light_recognition/internal/traffic_signals" for >= "awf/universe/20230906"
+       "/perception/traffic_light_recognition/internal/traffic_signals" for == "awf/universe/20230906"
        "/perception/traffic_light_recognition/traffic_signals" for "awf/universe"
 
        V2ITrafficLights in TrafficSimulator publishes publishes using architecture-independent topics ("awf/universe..."): 
@@ -63,7 +63,7 @@ private:
       using Message = autoware_auto_perception_msgs::msg::TrafficSignalArray;
       return std::make_unique<traffic_simulator::TrafficLightPublisher<Message>>(
         &node, "/perception/traffic_light_recognition/traffic_signals");
-    } else if (architecture_type >= "awf/universe/20230906") {
+    } else if (architecture_type == "awf/universe/20230906") {
       using Message = autoware_perception_msgs::msg::TrafficSignalArray;
       return std::make_unique<traffic_simulator::TrafficLightPublisher<Message>>(
         &node, "/perception/traffic_light_recognition/internal/traffic_signals");
