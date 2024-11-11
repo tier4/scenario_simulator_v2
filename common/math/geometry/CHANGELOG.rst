@@ -21,6 +21,47 @@ Changelog for package geometry
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+5.0.2 (2024-11-11)
+------------------
+* Merge pull request `#1431 <https://github.com/tier4/scenario_simulator_v2/issues/1431>`_ from tier4/fix/sonor-cloud-issue
+  fix/sonor-cloud-issue
+* Merge branch 'master' into fix/sonor-cloud-issue
+* Merge branch 'master' into fix/sonor-cloud-issue
+* adding const to objects.
+* Defined individually in each statement.
+* adding const to large objects.
+* Fix declaration mismatch.
+* Remove unnecessary const from the return value of the function.
+* Contributors: Masaya Kataoka, Taiga, Taiga Takano
+
+5.0.1 (2024-11-11)
+------------------
+* Merge pull request `#1428 <https://github.com/tier4/scenario_simulator_v2/issues/1428>`_ from tier4/fix/dont-float-loop
+  Refactor curvature sampling loop to avoid using float counter
+* add comment
+* Refactor curvature sampling loop to avoid using float counter
+* Contributors: Masaya Kataoka, Taiga Takano
+
+5.0.0 (2024-11-08)
+------------------
+* Merge remote-tracking branch 'tier4/master' into RJD-1057-remove-traffic-lights-from-entity-manager
+* Merge branch 'master' into RJD-1057-remove-traffic-lights-from-entity-manager
+* Merge branch 'master' into RJD-1057-remove-traffic-lights-from-entity-manager
+* Merge branch 'master' into RJD-1057-remove-traffic-lights-from-entity-manager
+* Merge branch 'master' into RJD-1057-remove-traffic-lights-from-entity-manager
+* Merge remote-tracking branch 'tier4/master' into RJD-1057-remove-traffic-lights-from-entity-manager
+* Merge branch 'RJD-1057-base' into RJD-1057-remove-traffic-lights-from-entity-manager
+* Merge branch 'RJD-1057-base' into RJD-1057-remove-traffic-lights-from-entity-manager
+* Merge branch 'RJD-1057-base' into RJD-1057-remove-traffic-lights-from-entity-manager
+* Merge branch 'RJD-1057-base' into RJD-1057-remove-traffic-lights-from-entity-manager
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Mateusz Palczuk
+
+4.5.0 (2024-11-07)
+------------------
+* Merge branch 'master' into chore/extend-npc-matching-distance
+* Merge branch 'master' into chore/extend-npc-matching-distance
+* Contributors: Kotaro Yoshimoto
+
 4.4.1 (2024-11-07)
 ------------------
 * Merge branch 'master' into RJD-1336/fix_request_speed_change

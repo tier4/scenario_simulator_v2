@@ -24,6 +24,35 @@ Changelog for package openscenario_utility
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+5.0.2 (2024-11-11)
+------------------
+* Merge branch 'master' into fix/sonor-cloud-issue
+* Merge branch 'master' into fix/sonor-cloud-issue
+* Contributors: Masaya Kataoka, Taiga
+
+5.0.1 (2024-11-11)
+------------------
+
+5.0.0 (2024-11-08)
+------------------
+* Merge remote-tracking branch 'tier4/master' into RJD-1057-remove-traffic-lights-from-entity-manager
+* Merge branch 'master' into RJD-1057-remove-traffic-lights-from-entity-manager
+* Merge branch 'master' into RJD-1057-remove-traffic-lights-from-entity-manager
+* Merge branch 'master' into RJD-1057-remove-traffic-lights-from-entity-manager
+* Merge branch 'master' into RJD-1057-remove-traffic-lights-from-entity-manager
+* Merge remote-tracking branch 'tier4/master' into RJD-1057-remove-traffic-lights-from-entity-manager
+* Merge branch 'RJD-1057-base' into RJD-1057-remove-traffic-lights-from-entity-manager
+* Merge branch 'RJD-1057-base' into RJD-1057-remove-traffic-lights-from-entity-manager
+* Merge branch 'RJD-1057-base' into RJD-1057-remove-traffic-lights-from-entity-manager
+* Merge branch 'RJD-1057-base' into RJD-1057-remove-traffic-lights-from-entity-manager
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Mateusz Palczuk
+
+4.5.0 (2024-11-07)
+------------------
+* Merge branch 'master' into chore/extend-npc-matching-distance
+* Merge branch 'master' into chore/extend-npc-matching-distance
+* Contributors: Kotaro Yoshimoto
+
 4.4.1 (2024-11-07)
 ------------------
 * Merge branch 'master' into RJD-1336/fix_request_speed_change

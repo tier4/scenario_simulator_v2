@@ -354,7 +354,7 @@ auto ScenarioSimulator::attachPseudoTrafficLightDetector(
 {
   auto response = simulation_api_schema::AttachPseudoTrafficLightDetectorResponse();
   sensor_sim_.attachPseudoTrafficLightsDetector(
-    current_simulation_time_, req.configuration(), *this, hdmap_utils_);
+    current_simulation_time_, req.configuration(), *this);
   response.mutable_result()->set_success(true);
   return response;
 }
