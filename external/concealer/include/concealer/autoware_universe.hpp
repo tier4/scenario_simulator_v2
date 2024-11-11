@@ -105,7 +105,7 @@ public:
 
   auto getVehicleCommand() const -> std::tuple<AckermannControlCommand, GearCommand> override;
 
-  auto getRouteLanelets() const -> std::vector<std::int64_t>;
+  auto getRouteLanelets() const -> std::vector<std::int64_t> override;
 
   auto getControlModeReport() const -> ControlModeReport override;
 

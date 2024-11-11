@@ -59,7 +59,7 @@ class FieldOperatorApplicationFor<AutowareUniverse>
 : public FieldOperatorApplication,
   public TransitionAssertion<FieldOperatorApplicationFor<AutowareUniverse>>
 {
-  friend class TransitionAssertion<FieldOperatorApplicationFor<AutowareUniverse>>;
+  friend struct TransitionAssertion<FieldOperatorApplicationFor<AutowareUniverse>>;
 
   // clang-format off
   SubscriberWrapper<autoware_auto_control_msgs::msg::AckermannControlCommand>     getAckermannControlCommand;
@@ -181,7 +181,6 @@ public:
     getLocalizationState("/api/localization/initialization_state", rclcpp::QoS(1).transient_local(), *this),
 #endif
     getMrmState("/api/fail_safe/mrm_state", rclcpp::QoS(1), *this, [this](const auto & v) { receiveMrmState(v); }),
-    getPathWithLaneId("/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", rclcpp::QoS(1), *this),
     getTrajectory("/api/iv_msgs/planning/scenario_planning/trajectory", rclcpp::QoS(1), *this),
     getTurnIndicatorsCommandImpl("/control/command/turn_indicators_cmd", rclcpp::QoS(1), *this),
     requestClearRoute("/api/routing/clear_route", *this),
@@ -193,7 +192,8 @@ public:
     requestSetRtcAutoMode("/api/external/set/rtc_auto_mode", *this),
     requestSetVelocityLimit("/api/autoware/set/velocity_limit", *this),
     requestEnableAutowareControl("/api/operation_mode/enable_autoware_control", *this),
-    requestDisableAutowareControl("/api/operation_mode/disable_autoware_control", *this)
+    requestDisableAutowareControl("/api/operation_mode/disable_autoware_control", *this),
+    getPathWithLaneId("/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", rclcpp::QoS(1), *this)
   // clang-format on
   {
   }

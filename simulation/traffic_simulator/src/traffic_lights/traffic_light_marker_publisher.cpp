@@ -17,38 +17,22 @@
 
 namespace traffic_simulator
 {
-auto TrafficLightMarkerPublisher::deleteAllMarkers() const -> void
-{
-  visualization_msgs::msg::MarkerArray message;
-  {
-    visualization_msgs::msg::Marker marker;
-    marker.action = marker.DELETEALL;
-    message.markers.push_back(marker);
-  }
-
-  marker_pub_->publish(message);
-}
-
-auto TrafficLightMarkerPublisher::drawMarkers() const -> void
+auto TrafficLightMarkerPublisher::deleteMarkers() const -> void
 {
   visualization_msgs::msg::MarkerArray marker_array;
-
-  const auto now = clock_ptr_->now();
-
-  for (const auto & [id, traffic_light] : traffic_light_manager_->getTrafficLights()) {
-    traffic_light.draw(marker_array.markers, now, map_frame_);
-  }
-
-  marker_pub_->publish(marker_array);
+  visualization_msgs::msg::Marker marker;
+  marker.action = visualization_msgs::msg::Marker::DELETEALL;
+  marker_array.markers.push_back(marker);
+  publisher_->publish(marker_array);
 }
 
-auto TrafficLightMarkerPublisher::publish() -> void
+auto TrafficLightMarkerPublisher::drawMarkers(
+  const std::unordered_map<lanelet::Id, TrafficLight> & traffic_lights_map) const -> void
 {
-  if (traffic_light_manager_->hasAnyLightChanged()) {
-    deleteAllMarkers();
+  visualization_msgs::msg::MarkerArray marker_array;
+  for (const auto & [id, traffic_light] : traffic_lights_map) {
+    traffic_light.draw(marker_array.markers, clock_ptr_->now(), frame_);
   }
-
-  drawMarkers();
+  publisher_->publish(marker_array);
 }
-
 }  // namespace traffic_simulator

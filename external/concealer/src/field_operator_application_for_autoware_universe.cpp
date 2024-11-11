@@ -226,7 +226,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::sendCooperateCommand(
    *       to avoid sending the same cooperate command when sending multiple commands between updates of cooperate statuses.
    */
   static std::vector<tier4_rtc_msgs::msg::CooperateStatus> used_cooperate_statuses;
-  auto is_used_cooperate_status = [this](const auto & cooperate_status) {
+  auto is_used_cooperate_status = [](const auto & cooperate_status) {
     return std::find_if(
              used_cooperate_statuses.begin(), used_cooperate_statuses.end(),
              [&cooperate_status](const auto & used_cooperate_status) {
