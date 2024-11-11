@@ -47,9 +47,6 @@ public:
     -> double;
   auto getDistanceToFrontEntity(const math::geometry::CatmullRomSplineInterface & spline) const
     -> std::optional<double>;
-  auto getDistanceToStopLine(
-    const lanelet::Ids & route_lanelets,
-    const std::vector<geometry_msgs::msg::Point> & waypoints) const -> std::optional<double>;
   auto getYieldStopDistance(const lanelet::Ids & following_lanelets) const -> std::optional<double>;
   auto getOtherEntityStatus(lanelet::Id lanelet_id) const
     -> std::vector<traffic_simulator::CanonicalizedEntityStatus>;
@@ -89,7 +86,7 @@ public:
     -> const traffic_simulator::CanonicalizedEntityStatus &;
   auto setCanonicalizedEntityStatus(const traffic_simulator::EntityStatus & entity_status) -> void;
   auto calculateUpdatedEntityStatus(
-    double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints &) const
+    const double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints &) const
     -> traffic_simulator::EntityStatus;
   auto calculateUpdatedEntityStatusInWorldFrame(
     double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints &) const

@@ -41,12 +41,12 @@ const traffic_simulator_msgs::msg::WaypointsArray MoveBackwardAction::calculateW
   } else if (
     const auto canonicalized_lanelet_pose =
       canonicalized_entity_status->getCanonicalizedLaneletPose()) {
-    traffic_simulator_msgs::msg::WaypointsArray waypoints;
-    waypoints.waypoints =
-      traffic_simulator::route::moveBackPoints(canonicalized_lanelet_pose.value());
-    return waypoints;
+    return traffic_simulator_msgs::build<traffic_simulator_msgs::msg::WaypointsArray>().waypoints(
+      traffic_simulator::route::moveBackPoints(canonicalized_lanelet_pose.value()));
   } else {
-    THROW_SIMULATION_ERROR("failed to assign lane");
+    THROW_SIMULATION_ERROR(
+      "Cannot move backward along lanelet - entity ",
+      std::quoted(canonicalized_entity_status->getName()), " has invalid lanelet pose.");
   }
 }
 
