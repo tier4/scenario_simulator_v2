@@ -19,7 +19,6 @@
 
 #include <autoware_auto_perception_msgs/msg/detected_objects.hpp>
 #include <autoware_auto_perception_msgs/msg/tracked_objects.hpp>
-
 #include <iomanip>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
