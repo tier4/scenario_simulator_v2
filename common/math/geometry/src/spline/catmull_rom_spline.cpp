@@ -61,7 +61,8 @@ auto CatmullRomSpline::getRightBounds(
     double s = step_size * static_cast<double>(i);
     points.emplace_back(
       [this](
-        const double local_width, const double local_s, const double local_z_offset) -> geometry_msgs::msg::Point {
+        const double local_width, const double local_s,
+        const double local_z_offset) -> geometry_msgs::msg::Point {
         geometry_msgs::msg::Vector3 vec = getNormalVector(local_s);
         double theta = std::atan2(vec.y, vec.x);
         geometry_msgs::msg::Point p = getPoint(local_s);
@@ -85,7 +86,8 @@ auto CatmullRomSpline::getLeftBounds(
     double s = step_size * static_cast<double>(i);
     points.emplace_back(
       [this](
-        const double local_width, const double local_s, const double local_z_offset) -> geometry_msgs::msg::Point {
+        const double local_width, const double local_s,
+        const double local_z_offset) -> geometry_msgs::msg::Point {
         geometry_msgs::msg::Vector3 vec = getNormalVector(local_s);
         double theta = std::atan2(vec.y, vec.x);
         geometry_msgs::msg::Point p = getPoint(local_s);
@@ -297,7 +299,8 @@ auto CatmullRomSpline::getCollisionPointsIn2D(
     std::set<double> s_value_candidates;
     for (size_t i = 0; i < curves_.size(); ++i) {
       /// @note The local_polygon is assumed to be closed
-      const auto s = curves_[i].getCollisionPointsIn2D(local_polygon, local_search_backward, true, true);
+      const auto s =
+        curves_[i].getCollisionPointsIn2D(local_polygon, local_search_backward, true, true);
       std::for_each(s.begin(), s.end(), [&s_value_candidates, i, this](const auto & s) {
         s_value_candidates.insert(getSInSplineCurve(i, s));
       });
@@ -305,7 +308,8 @@ auto CatmullRomSpline::getCollisionPointsIn2D(
     return s_value_candidates;
   };
   /// @note If the spline has two control points. (Same as single line segment.)
-  const auto get_collision_point_2d_with_line = [this](const auto & local_polygon) -> std::set<double> {
+  const auto get_collision_point_2d_with_line =
+    [this](const auto & local_polygon) -> std::set<double> {
     std::set<double> s_value_candidates;
     for (const auto & line : getLineSegments(local_polygon)) {
       if (static_cast<int>(line_segments_.size()) != 1) {
@@ -323,7 +327,8 @@ auto CatmullRomSpline::getCollisionPointsIn2D(
     return s_value_candidates;
   };
   /// @note If the spline has one control point. (Same as point.)
-  const auto get_collision_point_2d_with_point = [this](const auto & local_polygon) -> std::set<double> {
+  const auto get_collision_point_2d_with_point =
+    [this](const auto & local_polygon) -> std::set<double> {
     std::set<double> s_value_candidates;
     for (const auto & line : getLineSegments(local_polygon)) {
       if (line.isIntersect2D(control_points[0])) {

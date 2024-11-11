@@ -48,13 +48,15 @@ auto PolynomialSolver::solveLinearEquation(
   const double a, const double b, const double min_value, const double max_value) const
   -> std::vector<double>
 {
-  const auto solve_without_limit = [this](const double coef_a, const double coef_b) -> std::vector<double> {
+  const auto solve_without_limit =
+    [this](const double coef_a, const double coef_b) -> std::vector<double> {
     /// @note In this case, ax*b = 0 (a=0) can cause division by zero. So give special treatment to this case.
     if (isApproximatelyEqualTo(coef_a, 0)) {
       if (isApproximatelyEqualTo(coef_b, 0)) {
         THROW_SIMULATION_ERROR(
-          "Not computable x because of the linear equation ", coef_a, " x + ", coef_b, "=0, and a = ", coef_a,
-          ", b = ", coef_b, " is very close to zero ,so any value of x will be the solution.",
+          "Not computable x because of the linear equation ", coef_a, " x + ", coef_b,
+          "=0, and a = ", coef_a, ", b = ", coef_b,
+          " is very close to zero ,so any value of x will be the solution.",
           "There are no expected cases where this exception is thrown.",
           "Please contact the scenario_simulator_v2 developers, ",
           "especially Masaya Kataoka (@hakuturu583).");
@@ -76,12 +78,15 @@ auto PolynomialSolver::solveQuadraticEquation(
 {
   const auto solve_without_limit =
     [this](const double coef_a, const double coef_b, const double coef_c) -> std::vector<double> {
-    if (const double discriminant = coef_b * coef_b - 4 * coef_a * coef_c; isApproximatelyEqualTo(discriminant, 0)) {
+    if (const double discriminant = coef_b * coef_b - 4 * coef_a * coef_c;
+        isApproximatelyEqualTo(discriminant, 0)) {
       return {-coef_b / (2 * coef_a)};
     } else if (discriminant < 0) {
       return {};
     } else {
-      return {(-coef_b - std::sqrt(discriminant)) / (2 * coef_a), (-coef_b + std::sqrt(discriminant)) / (2 * coef_a)};
+      return {
+        (-coef_b - std::sqrt(discriminant)) / (2 * coef_a),
+        (-coef_b + std::sqrt(discriminant)) / (2 * coef_a)};
     }
   };
 
@@ -122,7 +127,8 @@ auto PolynomialSolver::solveCubicEquation(
         return real_values;
       };
       /// @note Finds the complex solution of the monic cubic equation and returns only those that are real numbers.
-      return get_real_values(solveMonicCubicEquationWithComplex(coef_b / coef_a, coef_c / coef_a, coef_d / coef_a));
+      return get_real_values(
+        solveMonicCubicEquationWithComplex(coef_b / coef_a, coef_c / coef_a, coef_d / coef_a));
     };
 
   /// @note Fallback to quadratic equation solver if a = 0
@@ -169,10 +175,13 @@ auto PolynomialSolver::solveMonicCubicEquationWithComplex(
    * @note Tschirnhaus transformation, transform into x^3 + 3q*x + 2r = 0
    * @sa https://oshima-gakushujuku.com/blog/math/formula-qubic-equation/
    */
-  const auto tschirnhaus_transformation = [](const auto coef_a, const auto coef_b, const auto coef_c) {
-    /// @note The first element of the return value is q, the second element is r
-    return std::tuple<double, double>((coef_a * coef_a - 3 * coef_b) / 9, (coef_a * (2 * coef_a * coef_a - 9 * coef_b) + 27 * coef_c) / 54);
-  };
+  const auto tschirnhaus_transformation =
+    [](const auto coef_a, const auto coef_b, const auto coef_c) {
+      /// @note The first element of the return value is q, the second element is r
+      return std::tuple<double, double>(
+        (coef_a * coef_a - 3 * coef_b) / 9,
+        (coef_a * (2 * coef_a * coef_a - 9 * coef_b) + 27 * coef_c) / 54);
+    };
 
   const auto solve_without_limit =
     // clang-format off
