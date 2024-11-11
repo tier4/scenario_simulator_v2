@@ -283,7 +283,10 @@ def launch_setup(context, *args, **kwargs):
             output={"stderr": "log", "stdout": "log"},
             condition=IfCondition(launch_rviz),
             arguments=["-d", str(default_rviz_config_file())],
-            remappings=[("/simulation/lanelet/marker", "/lanelet/marker")],
+            remappings=[
+                ("/simulation/lanelet/marker", "/lanelet/marker"),
+                ("/simulation/debug_marker", "/debug_marker"),
+            ],
         ),
         RegisterEventHandler(event_handler=io_handler),
         RegisterEventHandler(event_handler=shutdown_handler),
