@@ -30,7 +30,13 @@ from launch.conditions import IfCondition
 from launch.events import Shutdown
 from launch.event_handlers import OnProcessExit, OnProcessIO
 
-from launch.actions import EmitEvent, RegisterEventHandler, LogInfo, TimerAction, OpaqueFunction
+from launch.actions import (
+    EmitEvent,
+    RegisterEventHandler,
+    LogInfo,
+    TimerAction,
+    OpaqueFunction,
+)
 from launch.actions.declare_launch_argument import DeclareLaunchArgument
 from launch.substitutions.launch_configuration import LaunchConfiguration
 
@@ -39,6 +45,7 @@ from launch_ros.actions import Node
 from typing import cast
 
 from pathlib import Path
+
 
 class Color:
     BLACK = "\033[30m"
@@ -69,6 +76,7 @@ def on_stdout_output(event: launch.Event) -> None:
         if lines[0] == "cpp_scenario:success":
             print(Color.GREEN + "Scenario Succeed" + Color.END)
 
+
 def architecture_types():
     return ["awf/universe", "awf/universe/20230906"]
 
@@ -94,8 +102,13 @@ def default_autoware_launch_file_of(architecture_type):
         "awf/universe/20230906": "planning_simulator.launch.xml",
     }[architecture_type]
 
+
 def default_rviz_config_file():
-    return Path(get_package_share_directory("traffic_simulator")) / "config/scenario_simulator_v2.rviz"
+    return (
+        Path(get_package_share_directory("traffic_simulator"))
+        / "config/scenario_simulator_v2.rviz"
+    )
+
 
 def launch_setup(context, *args, **kwargs):
     # fmt: off
@@ -125,20 +138,38 @@ def launch_setup(context, *args, **kwargs):
     junit_path                          = LaunchConfiguration("junit_path",                             default="/tmp/output.xunit.xml")
     # fmt: on
 
-    print(f"architecture_type                   := {architecture_type.perform(context)}")
-    print(f"autoware_launch_file                := {autoware_launch_file.perform(context)}")
-    print(f"autoware_launch_package             := {autoware_launch_package.perform(context)}")
-    print(f"consider_acceleration_by_road_slope := {consider_acceleration_by_road_slope.perform(context)}")
-    print(f"consider_pose_by_road_slope         := {consider_pose_by_road_slope.perform(context)}")
-    print(f"global_frame_rate                   := {global_frame_rate.perform(context)}")
-    print(f"global_real_time_factor             := {global_real_time_factor.perform(context)}")
+    print(
+        f"architecture_type                   := {architecture_type.perform(context)}"
+    )
+    print(
+        f"autoware_launch_file                := {autoware_launch_file.perform(context)}"
+    )
+    print(
+        f"autoware_launch_package             := {autoware_launch_package.perform(context)}"
+    )
+    print(
+        f"consider_acceleration_by_road_slope := {consider_acceleration_by_road_slope.perform(context)}"
+    )
+    print(
+        f"consider_pose_by_road_slope         := {consider_pose_by_road_slope.perform(context)}"
+    )
+    print(
+        f"global_frame_rate                   := {global_frame_rate.perform(context)}"
+    )
+    print(
+        f"global_real_time_factor             := {global_real_time_factor.perform(context)}"
+    )
     print(f"global_timeout                      := {global_timeout.perform(context)}")
-    print(f"initialize_duration                 := {initialize_duration.perform(context)}")
+    print(
+        f"initialize_duration                 := {initialize_duration.perform(context)}"
+    )
     print(f"launch_autoware                     := {launch_autoware.perform(context)}")
     print(f"launch_rviz                         := {launch_rviz.perform(context)}")
     print(f"output_directory                    := {output_directory.perform(context)}")
     print(f"port                                := {port.perform(context)}")
-    print(f"publish_empty_context               := {publish_empty_context.perform(context)}")
+    print(
+        f"publish_empty_context               := {publish_empty_context.perform(context)}"
+    )
     print(f"record                              := {record.perform(context)}")
     print(f"rviz_config                         := {rviz_config.perform(context)}")
     print(f"scenario                            := {scenario.perform(context)}")
@@ -154,12 +185,14 @@ def launch_setup(context, *args, **kwargs):
             {"architecture_type": architecture_type},
             {"autoware_launch_file": autoware_launch_file},
             {"autoware_launch_package": autoware_launch_package},
-            {"consider_acceleration_by_road_slope": consider_acceleration_by_road_slope},
+            {
+                "consider_acceleration_by_road_slope": consider_acceleration_by_road_slope
+            },
             {"consider_pose_by_road_slope": consider_pose_by_road_slope},
             {"initialize_duration": initialize_duration},
             {"launch_autoware": launch_autoware},
             {"port": port},
-            {"publish_empty_context" : publish_empty_context},
+            {"publish_empty_context": publish_empty_context},
             {"record": record},
             {"rviz_config": rviz_config},
             {"sensor_model": sensor_model},
@@ -187,13 +220,13 @@ def launch_setup(context, *args, **kwargs):
         return parameters
 
     cpp_scenario_node = Node(
-            package=scenario_package,
-            executable=scenario,
-            name="scenario_node",
-            output="screen",
-            arguments=[("__log_level:=info")],
-            parameters=make_parameters() + [{"use_sim_time": use_sim_time}],
-            )
+        package=scenario_package,
+        executable=scenario,
+        name="scenario_node",
+        output="screen",
+        arguments=[("__log_level:=info")],
+        parameters=make_parameters() + [{"use_sim_time": use_sim_time}],
+    )
     io_handler = OnProcessIO(
         target_action=cpp_scenario_node,
         on_stderr=on_stderr_output,
@@ -241,6 +274,7 @@ def launch_setup(context, *args, **kwargs):
             namespace="simulation",
             name="visualizer",
             output="screen",
+            remappings=[("/simulation/entity/status", "/entity/status")],
         ),
         Node(
             package="rviz2",
@@ -249,10 +283,12 @@ def launch_setup(context, *args, **kwargs):
             output={"stderr": "log", "stdout": "log"},
             condition=IfCondition(launch_rviz),
             arguments=["-d", str(default_rviz_config_file())],
+            remappings=[("/simulation/lanelet/marker", "/lanelet/marker")],
         ),
         RegisterEventHandler(event_handler=io_handler),
         RegisterEventHandler(event_handler=shutdown_handler),
     ]
+
 
 def generate_launch_description():
     return LaunchDescription([OpaqueFunction(function=launch_setup)])
