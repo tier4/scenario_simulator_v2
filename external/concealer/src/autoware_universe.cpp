@@ -16,15 +16,25 @@
 
 namespace concealer
 {
-AutowareUniverse::AutowareUniverse()
+AutowareUniverse::AutowareUniverse(bool simulate_localization)
 : getCommand("/control/command/control_cmd", rclcpp::QoS(1), *this),
   getGearCommandImpl("/control/command/gear_cmd", rclcpp::QoS(1), *this),
   getTurnIndicatorsCommand("/control/command/turn_indicators_cmd", rclcpp::QoS(1), *this),
   getPathWithLaneId(
     "/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", rclcpp::QoS(1),
     *this),
-  setAcceleration("/localization/acceleration", *this),
-  setOdometry("/localization/kinematic_state", *this),
+  setAcceleration(
+    simulate_localization ? "/localization/acceleration"
+                          : "/simulation/debug/localization/acceleration",
+    *this),
+  setOdometry(
+    simulate_localization ? "/localization/kinematic_state"
+                          : "/simulation/debug/localization/kinematic_state",
+    *this),
+  setPose(
+    simulate_localization ? "/simulation/debug/localization/pose_estimator/pose_with_covariance"
+                          : "/localization/pose_estimator/pose_with_covariance",
+    *this),
   setSteeringReport("/vehicle/status/steering_status", *this),
   setGearReport("/vehicle/status/gear_status", *this),
   setControlModeReport("/vehicle/status/control_mode", *this),
@@ -99,6 +109,21 @@ auto AutowareUniverse::updateLocalization() -> void
     message.pose.pose = current_pose.load();
     message.pose.covariance = {};
     message.twist.twist = current_twist.load();
+    return message;
+  }());
+
+  setPose([this]() {
+    // See https://github.com/tier4/autoware.universe/blob/45ab20af979c5663e5a8d4dda787b1dea8d6e55b/simulator/simple_planning_simulator/src/simple_planning_simulator/simple_planning_simulator_core.cpp#L785-L803
+    geometry_msgs::msg::PoseWithCovarianceStamped message;
+    message.header.stamp = get_clock()->now();
+    message.header.frame_id = "map";
+    message.pose.pose = current_pose.load();
+    message.pose.covariance.at(6 * 0 + 0) = 0.0225;    // XYZRPY_COV_IDX::X_X
+    message.pose.covariance.at(6 * 1 + 1) = 0.0225;    // XYZRPY_COV_IDX::Y_Y
+    message.pose.covariance.at(6 * 2 + 2) = 0.0225;    // XYZRPY_COV_IDX::Z_Z
+    message.pose.covariance.at(6 * 3 + 3) = 0.000625;  // XYZRPY_COV_IDX::ROLL_ROLL
+    message.pose.covariance.at(6 * 4 + 4) = 0.000625;  // XYZRPY_COV_IDX::PITCH_PITCH
+    message.pose.covariance.at(6 * 5 + 5) = 0.000625;  // XYZRPY_COV_IDX::YAW_YAW
     return message;
   }());
 

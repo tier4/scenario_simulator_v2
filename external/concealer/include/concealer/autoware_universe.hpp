@@ -44,6 +44,7 @@ class AutowareUniverse : public Autoware
 
   PublisherWrapper<geometry_msgs::msg::AccelWithCovarianceStamped>        setAcceleration;
   PublisherWrapper<nav_msgs::msg::Odometry>                               setOdometry;
+  PublisherWrapper<geometry_msgs::msg::PoseWithCovarianceStamped>    setPose;
   PublisherWrapper<autoware_vehicle_msgs::msg::SteeringReport>       setSteeringReport;
   PublisherWrapper<autoware_vehicle_msgs::msg::GearReport>           setGearReport;
   PublisherWrapper<autoware_vehicle_msgs::msg::ControlModeReport>    setControlModeReport;
@@ -69,7 +70,7 @@ class AutowareUniverse : public Autoware
   auto stopAndJoin() -> void;
 
 public:
-  CONCEALER_PUBLIC explicit AutowareUniverse();
+  CONCEALER_PUBLIC explicit AutowareUniverse(bool);
 
   ~AutowareUniverse();
 
