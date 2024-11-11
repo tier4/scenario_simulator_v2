@@ -21,6 +21,19 @@ Changelog for package geometry
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+5.0.2 (2024-11-11)
+------------------
+* Merge pull request `#1431 <https://github.com/tier4/scenario_simulator_v2/issues/1431>`_ from tier4/fix/sonor-cloud-issue
+  fix/sonor-cloud-issue
+* Merge branch 'master' into fix/sonor-cloud-issue
+* Merge branch 'master' into fix/sonor-cloud-issue
+* adding const to objects.
+* Defined individually in each statement.
+* adding const to large objects.
+* Fix declaration mismatch.
+* Remove unnecessary const from the return value of the function.
+* Contributors: Masaya Kataoka, Taiga, Taiga Takano
+
 5.0.1 (2024-11-11)
 ------------------
 * Merge pull request `#1428 <https://github.com/tier4/scenario_simulator_v2/issues/1428>`_ from tier4/fix/dont-float-loop
