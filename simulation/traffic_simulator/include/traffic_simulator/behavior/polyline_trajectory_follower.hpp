@@ -51,12 +51,17 @@ private:
     const std::optional<double> target_speed) const -> std::optional<EntityStatus>;
   auto buildUpdatedEntityStatus(
     const geometry_msgs::msg::Vector3 & desired_velocity, const double step_time) const
-    -> EntityStatus;
-  // PolylineTrajectoryFollower(const PolylineTrajectoryFollower & other);
-  // PolylineTrajectoryFollower & operator=(const PolylineTrajectoryFollower & other);
-  // PolylineTrajectoryFollower(PolylineTrajectoryFollower && other) noexcept;
-  // PolylineTrajectoryFollower & operator=(PolylineTrajectoryFollower && other) noexcept;
-  // ~PolylineTrajectoryFollower();
+    noexcept(true) -> EntityStatus;
+  auto getValidatedEntityAcceleration() const noexcept(false) -> double;
+  auto getValidatedEntitySpeed() const noexcept(false) -> double;
+  auto getValidatedEntityMaxAcceleration(const double acceleration, const double step_time) const
+    noexcept(false) -> double;
+  auto getValidatedEntityMinAcceleration(const double acceleration, const double step_time) const
+    noexcept(false) -> double;
+  auto getValidatedEntityPosition() const noexcept(false) -> const geometry_msgs::msg::Point;
+  auto getValidatedEntityTargetPosition(
+    const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory) const
+    noexcept(false) -> const geometry_msgs::msg::Point;
 };
 }  // namespace follow_trajectory
 }  // namespace traffic_simulator
