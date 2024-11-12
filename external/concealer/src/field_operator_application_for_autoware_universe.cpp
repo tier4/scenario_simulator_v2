@@ -226,7 +226,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::sendCooperateCommand(
    *       to avoid sending the same cooperate command when sending multiple commands between updates of cooperate statuses.
    */
   static std::vector<tier4_rtc_msgs::msg::CooperateStatus> used_cooperate_statuses;
-  auto is_used_cooperate_status = [this](const auto & cooperate_status) {
+  auto is_used_cooperate_status = [](const auto & cooperate_status) {
     return std::find_if(
              used_cooperate_statuses.begin(), used_cooperate_statuses.end(),
              [&cooperate_status](const auto & used_cooperate_status) {
@@ -414,22 +414,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::restrictTargetSpeed(double v
 
 auto FieldOperatorApplicationFor<AutowareUniverse>::getAutowareStateName() const -> std::string
 {
-#define IF(IDENTIFIER, RETURN)                                                         \
-  if (getAutowareState().state == tier4_system_msgs::msg::AutowareState::IDENTIFIER) { \
-    return #RETURN;                                                                    \
-  }
-
-  IF(INITIALIZING_VEHICLE, INITIALIZING)
-  IF(WAITING_FOR_ROUTE, WAITING_FOR_ROUTE)
-  IF(PLANNING, PLANNING)
-  IF(WAITING_FOR_ENGAGE, WAITING_FOR_ENGAGE)
-  IF(DRIVING, DRIVING)
-  IF(ARRIVAL_GOAL, ARRIVED_GOAL)
-  IF(EMERGENCY, EMERGENCY)
-  IF(FINALIZING, FINALIZING)
-
-  return "";
-#undef IF
+  return autoware_state;
 }
 
 auto FieldOperatorApplicationFor<AutowareUniverse>::getEmergencyStateName() const -> std::string

@@ -20,6 +20,7 @@
 #include <QPainter>
 #include <algorithm>
 #include <iomanip>
+#include <memory>
 #include <rviz_common/display_context.hpp>
 #include <rviz_common/uniform_string_stream.hpp>
 #include <string>
@@ -31,7 +32,7 @@ VisualizationConditionGroupsDisplay::VisualizationConditionGroupsDisplay()
 : condition_groups_collection_ptr_(std::make_shared<std::vector<ConditionGroups>>())
 {
   /// @note Get screen info of default display
-  const Screen * screen_info = DefaultScreenOfDisplay(XOpenDisplay(NULL));
+  const Screen * screen_info = DefaultScreenOfDisplay(XOpenDisplay(nullptr));
 
   /// @note Fixed height for a 4k resolution screen
   /// @sa https://github.com/tier4/scenario_simulator_v2/pull/1033#discussion_r1412781103
@@ -75,25 +76,25 @@ VisualizationConditionGroupsDisplay::VisualizationConditionGroupsDisplay()
    */
   const int width = static_cast<int>(std::round(2000 * scale));
 
-  property_topic_name_ = new rviz_common::properties::StringProperty(
+  property_topic_name_ = std::make_unique<rviz_common::properties::StringProperty>(
     "Topic", "/simulation/context", "The topic on which to publish simulation context.", this,
     SLOT(updateTopic()), this);
-  property_text_color_ = new rviz_common::properties::ColorProperty(
+  property_text_color_ = std::make_unique<rviz_common::properties::ColorProperty>(
     "Text Color", QColor(255, 255, 255), "text color", this, SLOT(updateVisualization()), this);
-  property_left_ = new rviz_common::properties::IntProperty(
+  property_left_ = std::make_unique<rviz_common::properties::IntProperty>(
     "Left", left, "Left of the plotter window", this, SLOT(updateVisualization()), this);
   property_left_->setMin(0);
-  property_top_ = new rviz_common::properties::IntProperty(
+  property_top_ = std::make_unique<rviz_common::properties::IntProperty>(
     "Top", top, "Top of the plotter window", this, SLOT(updateVisualization()));
   property_top_->setMin(0);
 
-  property_length_ = new rviz_common::properties::IntProperty(
+  property_length_ = std::make_unique<rviz_common::properties::IntProperty>(
     "Length", length, "Length of the plotter window", this, SLOT(updateVisualization()), this);
   property_length_->setMin(10);
-  property_width_ = new rviz_common::properties::IntProperty(
+  property_width_ = std::make_unique<rviz_common::properties::IntProperty>(
     "Width", width, "Width of the plotter window", this, SLOT(updateVisualization()), this);
   property_width_->setMin(10);
-  property_value_scale_ = new rviz_common::properties::FloatProperty(
+  property_value_scale_ = std::make_unique<rviz_common::properties::FloatProperty>(
     "Value Scale", text_size,
     "This property controls the scaling factor for the text size on the panel. Setting a higher "
     "value results in larger text, making the displayed information easier to read.",

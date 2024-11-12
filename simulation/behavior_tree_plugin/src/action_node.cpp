@@ -54,9 +54,9 @@ auto ActionNode::getBlackBoardValues() -> void
   if (!getInput<std::shared_ptr<hdmap_utils::HdMapUtils>>("hdmap_utils", hdmap_utils)) {
     THROW_SIMULATION_ERROR("failed to get input hdmap_utils in ActionNode");
   }
-  if (!getInput<std::shared_ptr<traffic_simulator::TrafficLightManager>>(
-        "traffic_light_manager", traffic_light_manager)) {
-    THROW_SIMULATION_ERROR("failed to get input traffic_light_manager in ActionNode");
+  if (!getInput<std::shared_ptr<traffic_simulator::TrafficLightsBase>>(
+        "traffic_lights", traffic_lights)) {
+    THROW_SIMULATION_ERROR("failed to get input traffic_lights in ActionNode");
   }
   if (!getInput<std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>>(
         "canonicalized_entity_status", canonicalized_entity_status)) {
@@ -199,28 +199,23 @@ auto ActionNode::getDistanceToTrafficLightStopLine(
   const lanelet::Ids & route_lanelets,
   const math::geometry::CatmullRomSplineInterface & spline) const -> std::optional<double>
 {
-  const auto traffic_light_ids = hdmap_utils->getTrafficLightIdsOnPath(route_lanelets);
-  if (traffic_light_ids.empty()) {
-    return std::nullopt;
-  }
-  std::set<double> collision_points = {};
-  for (const auto id : traffic_light_ids) {
-    using Color = traffic_simulator::TrafficLight::Color;
-    using Status = traffic_simulator::TrafficLight::Status;
-    using Shape = traffic_simulator::TrafficLight::Shape;
-    if (auto && traffic_light = traffic_light_manager->getTrafficLight(id);
-        traffic_light.contains(Color::red, Status::solid_on, Shape::circle) or
-        traffic_light.contains(Color::yellow, Status::solid_on, Shape::circle)) {
-      const auto collision_point = hdmap_utils->getDistanceToTrafficLightStopLine(spline, id);
-      if (collision_point) {
-        collision_points.insert(collision_point.value());
+  if (const auto traffic_light_ids = hdmap_utils->getTrafficLightIdsOnPath(route_lanelets);
+      !traffic_light_ids.empty()) {
+    std::set<double> collision_points = {};
+    for (const auto traffic_light_id : traffic_light_ids) {
+      if (traffic_lights->isRequiredStopTrafficLightState(traffic_light_id)) {
+        if (
+          const auto collision_point =
+            hdmap_utils->getDistanceToTrafficLightStopLine(spline, traffic_light_id)) {
+          collision_points.insert(collision_point.value());
+        }
       }
     }
+    if (!collision_points.empty()) {
+      return *collision_points.begin();
+    }
   }
-  if (collision_points.empty()) {
-    return std::nullopt;
-  }
-  return *collision_points.begin();
+  return std::nullopt;
 }
 
 auto ActionNode::getDistanceToStopLine(

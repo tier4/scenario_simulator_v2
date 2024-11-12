@@ -51,7 +51,9 @@ private:
 
   traffic_simulator::CanonicalizedEntityStatus status_;
 
-  geometry_msgs::msg::Pose initial_pose_;
+  const geometry_msgs::msg::Pose initial_pose_;
+
+  const Eigen::Matrix3d initial_rotation_matrix_;
 
   static auto getVehicleModelType() -> VehicleModelType;
 

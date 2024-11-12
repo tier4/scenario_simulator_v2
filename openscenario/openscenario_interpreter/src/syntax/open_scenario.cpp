@@ -47,23 +47,25 @@ auto OpenScenario::load(const boost::filesystem::path & filepath) -> const pugi:
   }
 }
 
-auto operator<<(nlohmann::json & json, const OpenScenario & datum) -> nlohmann::json &
+auto operator<<(boost::json::object & json, const OpenScenario & datum) -> boost::json::object &
 {
   json["version"] = "1.0";
 
 #ifndef PARAMETER_VALUE_DISTRIBUTION_ONLY
   json["frame"] = datum.frame;
 
+  json["CurrentStates"].emplace_object();
+
   // clang-format off
-  json["CurrentStates"]["completeState"]   = openscenario_interpreter::complete_state  .use_count() - 1;
-  json["CurrentStates"]["runningState"]    = openscenario_interpreter::running_state   .use_count() - 1;
-  json["CurrentStates"]["standbyState"]    = openscenario_interpreter::standby_state   .use_count() - 1;
-  json["CurrentStates"]["startTransition"] = openscenario_interpreter::start_transition.use_count() - 1;
-  json["CurrentStates"]["stopTransition"]  = openscenario_interpreter::stop_transition .use_count() - 1;
+  json["CurrentStates"].as_object()["completeState"]   = openscenario_interpreter::complete_state  .use_count() - 1;
+  json["CurrentStates"].as_object()["runningState"]    = openscenario_interpreter::running_state   .use_count() - 1;
+  json["CurrentStates"].as_object()["standbyState"]    = openscenario_interpreter::standby_state   .use_count() - 1;
+  json["CurrentStates"].as_object()["startTransition"] = openscenario_interpreter::start_transition.use_count() - 1;
+  json["CurrentStates"].as_object()["stopTransition"]  = openscenario_interpreter::stop_transition .use_count() - 1;
   // clang-format on
 
   if (datum.category.is<ScenarioDefinition>()) {
-    json["OpenSCENARIO"] << datum.category.as<ScenarioDefinition>();
+    json["OpenSCENARIO"].emplace_object() << datum.category.as<ScenarioDefinition>();
   }
 #endif  // PARAMETER_VALUE_DISTRIBUTION_ONLY
 
