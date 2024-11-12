@@ -43,7 +43,6 @@ public:
     const std::string & frame = "camera_link")  // DIRTY HACK!!!
   : TrafficLightPublisherBase(),
     frame_(frame),
-    clock_ptr_(node_ptr->get_clock()),
     traffic_light_state_array_publisher_(rclcpp::create_publisher<MessageType>(
       node_ptr, topic_name, rclcpp::QoS(10).transient_local()))
   {
@@ -57,7 +56,7 @@ public:
 
 private:
   const std::string frame_;
-  const rclcpp::Clock::SharedPtr clock_ptr_;
+
   const typename rclcpp::Publisher<MessageType>::SharedPtr traffic_light_state_array_publisher_;
 };
 }  // namespace traffic_simulator
