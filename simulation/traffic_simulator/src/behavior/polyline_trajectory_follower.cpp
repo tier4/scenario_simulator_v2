@@ -215,7 +215,7 @@ auto calculate_distance_and_remaining_time(
     [&hdmap_utils, &entity_status, &matching_distance, &polyline_trajectory](
       const std::vector<traffic_simulator_msgs::msg::Vertex>::const_iterator last) {
       return std::accumulate(
-        std::begin(polyline_trajectory.shape.vertices), last, 0.0,
+        polyline_trajectory.shape.vertices.cbegin(), last, 0.0,
         [&hdmap_utils, &entity_status, &matching_distance](
           const double total_distance, const auto & vertex) {
           const auto next = std::next(&vertex);
