@@ -44,24 +44,24 @@ public:
   static auto generateTrafficSimulatorV1Msg(
     const rclcpp::Time & current_ros_time,
     const simulation_api_schema::UpdateTrafficLightsRequest & request)
-    -> traffic_simulator_msgs::msg::TrafficLightArrayV1;
+    -> traffic_simulator_msgs::msg::TrafficLightArrayV1::UniquePtr;
 
   static auto generateAutowareAutoPerceptionMsg(
     const rclcpp::Time & current_ros_time,
     const simulation_api_schema::UpdateTrafficLightsRequest & request, const std::string & frame)
-    -> autoware_auto_perception_msgs::msg::TrafficSignalArray;
+    -> autoware_auto_perception_msgs::msg::TrafficSignalArray::UniquePtr;
 
   static auto generateAutowarePerceptionTrafficSignalMsg(
     const rclcpp::Time & current_ros_time,
     const simulation_api_schema::UpdateTrafficLightsRequest & request)
-    -> autoware_perception_msgs::msg::TrafficSignalArray;
+    -> autoware_perception_msgs::msg::TrafficSignalArray::UniquePtr;
 
 #if __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)
 
   static auto generateAutowarePerceptionTrafficLightGroupMsg(
     const rclcpp::Time & current_ros_time,
     const simulation_api_schema::UpdateTrafficLightsRequest & request)
-    -> autoware_perception_msgs::msg::TrafficLightGroupArray;
+    -> autoware_perception_msgs::msg::TrafficLightGroupArray::UniquePtr;
 
 #endif  // __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)
 };
