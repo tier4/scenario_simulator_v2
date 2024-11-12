@@ -418,36 +418,30 @@ TYPED_TEST(TrafficLightsInternalTest, resetUpdate_publishMarkers)
   }
 }
 
-TYPED_TEST(TrafficLightsInternalTest, generateAutowarePerceptionTrafficSignalMsg)
+TYPED_TEST(TrafficLightsInternalTest, generateTrafficSimulatorV1Msg)
 {
   this->lights->setTrafficLightsState(this->id, "red solidOn circle, yellow flashing circle");
   this->lights->setTrafficLightsConfidence(this->id, 0.7);
 
-  const auto msg =
-    *traffic_simulator::TrafficLightPublisherBase::generateAutowarePerceptionTrafficSignalMsg(
-      this->node_ptr->get_clock()->now(), this->lights->generateUpdateTrafficLightsRequest());
+  const auto msg = *traffic_simulator::TrafficLightPublisherBase::generateTrafficSimulatorV1Msg(
+    this->node_ptr->get_clock()->now(), this->lights->generateUpdateTrafficLightsRequest());
 
-  const double expected_time =
-    static_cast<double>(getTime(this->node_ptr->get_clock()->now())) * 1e-9;
-  const double actual_time = static_cast<double>(getTime(msg.stamp)) * 1e-9;
-  EXPECT_NEAR(actual_time, expected_time, timing_eps);
+  EXPECT_EQ(msg.traffic_lights.size(), static_cast<std::size_t>(1));
+  EXPECT_EQ(msg.traffic_lights.front().traffic_light_bulbs.size(), static_cast<std::size_t>(2));
 
-  EXPECT_EQ(msg.signals.size(), static_cast<std::size_t>(1));
-  EXPECT_EQ(msg.signals.front().elements.size(), static_cast<std::size_t>(2));
+  EXPECT_EQ(msg.traffic_lights[0].lanelet_way_id, this->id);
 
-  EXPECT_EQ(msg.signals[0].traffic_signal_id, this->signal_id);
-
-  using TrafficSignalElement = autoware_perception_msgs::msg::TrafficSignalElement;
+  using TrafficLightBulbV1 = traffic_simulator_msgs::msg::TrafficLightBulbV1;
   // signals are parsed in reverse order
-  EXPECT_EQ(msg.signals[0].elements[0].color, TrafficSignalElement::AMBER);
-  EXPECT_EQ(msg.signals[0].elements[0].status, TrafficSignalElement::FLASHING);
-  EXPECT_EQ(msg.signals[0].elements[0].shape, TrafficSignalElement::CIRCLE);
-  EXPECT_NEAR(msg.signals[0].elements[0].confidence, 0.7, 1e-6);
+  EXPECT_EQ(msg.traffic_lights[0].traffic_light_bulbs[0].color, TrafficLightBulbV1::AMBER);
+  EXPECT_EQ(msg.traffic_lights[0].traffic_light_bulbs[0].status, TrafficLightBulbV1::FLASHING);
+  EXPECT_EQ(msg.traffic_lights[0].traffic_light_bulbs[0].shape, TrafficLightBulbV1::CIRCLE);
+  EXPECT_NEAR(msg.traffic_lights[0].traffic_light_bulbs[0].confidence, 0.7, 1e-6);
 
-  EXPECT_EQ(msg.signals[0].elements[1].color, TrafficSignalElement::RED);
-  EXPECT_EQ(msg.signals[0].elements[1].status, TrafficSignalElement::SOLID_ON);
-  EXPECT_EQ(msg.signals[0].elements[1].shape, TrafficSignalElement::CIRCLE);
-  EXPECT_NEAR(msg.signals[0].elements[1].confidence, 0.7, 1e-6);
+  EXPECT_EQ(msg.traffic_lights[0].traffic_light_bulbs[1].color, TrafficLightBulbV1::RED);
+  EXPECT_EQ(msg.traffic_lights[0].traffic_light_bulbs[1].status, TrafficLightBulbV1::SOLID_ON);
+  EXPECT_EQ(msg.traffic_lights[0].traffic_light_bulbs[1].shape, TrafficLightBulbV1::CIRCLE);
+  EXPECT_NEAR(msg.traffic_lights[0].traffic_light_bulbs[1].confidence, 0.7, 1e-6);
 }
 
 TYPED_TEST(TrafficLightsInternalTest, generateAutowareAutoPerceptionMsg)
@@ -483,6 +477,74 @@ TYPED_TEST(TrafficLightsInternalTest, generateAutowareAutoPerceptionMsg)
   EXPECT_EQ(msg.signals[0].lights[1].shape, TrafficLight::CIRCLE);
   EXPECT_NEAR(msg.signals[0].lights[1].confidence, 0.7, 1e-6);
 }
+
+TYPED_TEST(TrafficLightsInternalTest, generateAutowarePerceptionTrafficSignalMsg)
+{
+  this->lights->setTrafficLightsState(this->id, "red solidOn circle, yellow flashing circle");
+  this->lights->setTrafficLightsConfidence(this->id, 0.7);
+
+  const auto msg =
+    *traffic_simulator::TrafficLightPublisherBase::generateAutowarePerceptionTrafficSignalMsg(
+      this->node_ptr->get_clock()->now(), this->lights->generateUpdateTrafficLightsRequest());
+
+  const double expected_time =
+    static_cast<double>(getTime(this->node_ptr->get_clock()->now())) * 1e-9;
+  const double actual_time = static_cast<double>(getTime(msg.stamp)) * 1e-9;
+  EXPECT_NEAR(actual_time, expected_time, timing_eps);
+
+  EXPECT_EQ(msg.signals.size(), static_cast<std::size_t>(1));
+  EXPECT_EQ(msg.signals.front().elements.size(), static_cast<std::size_t>(2));
+
+  EXPECT_EQ(msg.signals[0].traffic_signal_id, this->signal_id);
+
+  using TrafficSignalElement = autoware_perception_msgs::msg::TrafficSignalElement;
+  // signals are parsed in reverse order
+  EXPECT_EQ(msg.signals[0].elements[0].color, TrafficSignalElement::AMBER);
+  EXPECT_EQ(msg.signals[0].elements[0].status, TrafficSignalElement::FLASHING);
+  EXPECT_EQ(msg.signals[0].elements[0].shape, TrafficSignalElement::CIRCLE);
+  EXPECT_NEAR(msg.signals[0].elements[0].confidence, 0.7, 1e-6);
+
+  EXPECT_EQ(msg.signals[0].elements[1].color, TrafficSignalElement::RED);
+  EXPECT_EQ(msg.signals[0].elements[1].status, TrafficSignalElement::SOLID_ON);
+  EXPECT_EQ(msg.signals[0].elements[1].shape, TrafficSignalElement::CIRCLE);
+  EXPECT_NEAR(msg.signals[0].elements[1].confidence, 0.7, 1e-6);
+}
+
+#if __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)
+
+TYPED_TEST(TrafficLightsInternalTest, generateAutowarePerceptionTrafficLightGroupMsg)
+{
+  this->lights->setTrafficLightsState(this->id, "red solidOn circle, yellow flashing circle");
+  this->lights->setTrafficLightsConfidence(this->id, 0.7);
+
+  const auto msg =
+    *traffic_simulator::TrafficLightPublisherBase::generateAutowarePerceptionTrafficLightGroupMsg(
+      this->node_ptr->get_clock()->now(), this->lights->generateUpdateTrafficLightsRequest());
+
+  const double expected_time =
+    static_cast<double>(getTime(this->node_ptr->get_clock()->now())) * 1e-9;
+  const double actual_time = static_cast<double>(getTime(msg.stamp)) * 1e-9;
+  EXPECT_NEAR(actual_time, expected_time, timing_eps);
+
+  EXPECT_EQ(msg.traffic_light_groups.size(), static_cast<std::size_t>(1));
+  EXPECT_EQ(msg.traffic_light_groups.front().elements.size(), static_cast<std::size_t>(2));
+
+  EXPECT_EQ(msg.traffic_light_groups[0].traffic_light_group_id, this->signal_id);
+
+  using TrafficLightElement = autoware_perception_msgs::msg::TrafficLightElement;
+  // traffic_light_groups are parsed in reverse order
+  EXPECT_EQ(msg.traffic_light_groups[0].elements[0].color, TrafficLightElement::AMBER);
+  EXPECT_EQ(msg.traffic_light_groups[0].elements[0].status, TrafficLightElement::FLASHING);
+  EXPECT_EQ(msg.traffic_light_groups[0].elements[0].shape, TrafficLightElement::CIRCLE);
+  EXPECT_NEAR(msg.traffic_light_groups[0].elements[0].confidence, 0.7, 1e-6);
+
+  EXPECT_EQ(msg.traffic_light_groups[0].elements[1].color, TrafficLightElement::RED);
+  EXPECT_EQ(msg.traffic_light_groups[0].elements[1].status, TrafficLightElement::SOLID_ON);
+  EXPECT_EQ(msg.traffic_light_groups[0].elements[1].shape, TrafficLightElement::CIRCLE);
+  EXPECT_NEAR(msg.traffic_light_groups[0].elements[1].confidence, 0.7, 1e-6);
+}
+
+#endif  // __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)
 
 TEST_F(V2ITrafficLightsTest, startUpdate_publishSignals)
 {
