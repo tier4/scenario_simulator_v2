@@ -313,13 +313,19 @@ std::pair<double, double> HermiteCurve::get2DMinMaxCurvatureValue() const
 {
   std::pair<double, double> ret;
   std::vector<double> curvatures;
-  /**
-   * @brief 0.1 is a sampling resolution of the curvature
-   */
-  for (double s = 0; s <= 1; s = s + 0.1) {
+
+  /// @note Specifies the number of samples. The curve is divided into 10 segments for calculation.
+  constexpr int sample_count = 10;
+
+  /// @note Sampling resolution. Calculated as 1.0 divided by sample_count.
+  constexpr double resolution = 1.0 / sample_count;
+
+  for (int i = 0; i <= sample_count; ++i) {
+    double s = i * resolution;
     double curvature = get2DCurvature(s);
     curvatures.push_back(curvature);
   }
+
   ret.first = *std::min_element(curvatures.begin(), curvatures.end());
   ret.second = *std::max_element(curvatures.begin(), curvatures.end());
   return ret;
