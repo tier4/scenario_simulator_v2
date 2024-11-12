@@ -48,24 +48,22 @@ HermiteCurve::HermiteCurve(
 }
 
 HermiteCurve::HermiteCurve(
-  geometry_msgs::msg::Pose start_pose, geometry_msgs::msg::Pose goal_pose,
-  geometry_msgs::msg::Vector3 start_vec, geometry_msgs::msg::Vector3 goal_vec)
+  const geometry_msgs::msg::Pose & start_pose, const geometry_msgs::msg::Pose & goal_pose,
+  const geometry_msgs::msg::Vector3 & start_vec, const geometry_msgs::msg::Vector3 & goal_vec)
+: ax_(2 * start_pose.position.x - 2 * goal_pose.position.x + start_vec.x + goal_vec.x),
+  bx_(-3 * start_pose.position.x + 3 * goal_pose.position.x - 2 * start_vec.x - goal_vec.x),
+  cx_(start_vec.x),
+  dx_(start_pose.position.x),
+  ay_(2 * start_pose.position.y - 2 * goal_pose.position.y + start_vec.y + goal_vec.y),
+  by_(-3 * start_pose.position.y + 3 * goal_pose.position.y - 2 * start_vec.y - goal_vec.y),
+  cy_(start_vec.y),
+  dy_(start_pose.position.y),
+  az_(2 * start_pose.position.z - 2 * goal_pose.position.z + start_vec.z + goal_vec.z),
+  bz_(-3 * start_pose.position.z + 3 * goal_pose.position.z - 2 * start_vec.z - goal_vec.z),
+  cz_(start_vec.z),
+  dz_(start_pose.position.z),
+  length_(getLength(100))
 {
-  ax_ = 2 * start_pose.position.x - 2 * goal_pose.position.x + start_vec.x + goal_vec.x;
-  bx_ = -3 * start_pose.position.x + 3 * goal_pose.position.x - 2 * start_vec.x - goal_vec.x;
-  cx_ = start_vec.x;
-  dx_ = start_pose.position.x;
-
-  ay_ = 2 * start_pose.position.y - 2 * goal_pose.position.y + start_vec.y + goal_vec.y;
-  by_ = -3 * start_pose.position.y + 3 * goal_pose.position.y - 2 * start_vec.y - goal_vec.y;
-  cy_ = start_vec.y;
-  dy_ = start_pose.position.y;
-
-  az_ = 2 * start_pose.position.z - 2 * goal_pose.position.z + start_vec.z + goal_vec.z;
-  bz_ = -3 * start_pose.position.z + 3 * goal_pose.position.z - 2 * start_vec.z - goal_vec.z;
-  cz_ = start_vec.z;
-  dz_ = start_pose.position.z;
-  length_ = getLength(100);
 }
 
 double HermiteCurve::getSquaredDistanceIn2D(
@@ -315,13 +313,19 @@ std::pair<double, double> HermiteCurve::get2DMinMaxCurvatureValue() const
 {
   std::pair<double, double> ret;
   std::vector<double> curvatures;
-  /**
-   * @brief 0.1 is a sampling resolution of the curvature
-   */
-  for (double s = 0; s <= 1; s = s + 0.1) {
+
+  /// @note Specifies the number of samples. The curve is divided into 10 segments for calculation.
+  constexpr int sample_count = 10;
+
+  /// @note Sampling resolution. Calculated as 1.0 divided by sample_count.
+  constexpr double resolution = 1.0 / sample_count;
+
+  for (int i = 0; i <= sample_count; ++i) {
+    double s = i * resolution;
     double curvature = get2DCurvature(s);
     curvatures.push_back(curvature);
   }
+
   ret.first = *std::min_element(curvatures.begin(), curvatures.end());
   ret.second = *std::max_element(curvatures.begin(), curvatures.end());
   return ret;

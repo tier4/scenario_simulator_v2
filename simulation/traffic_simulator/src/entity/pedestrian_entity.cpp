@@ -167,11 +167,11 @@ auto PedestrianEntity::getEntityTypename() const -> const std::string &
   return result;
 }
 
-void PedestrianEntity::setTrafficLightManager(
-  const std::shared_ptr<traffic_simulator::TrafficLightManager> & ptr)
+void PedestrianEntity::setTrafficLights(
+  const std::shared_ptr<traffic_simulator::TrafficLightsBase> & ptr)
 {
-  EntityBase::setTrafficLightManager(ptr);
-  behavior_plugin_ptr_->setTrafficLightManager(traffic_light_manager_);
+  EntityBase::setTrafficLights(ptr);
+  behavior_plugin_ptr_->setTrafficLights(traffic_lights_);
 }
 
 auto PedestrianEntity::getBehaviorParameter() const
@@ -258,14 +258,9 @@ auto PedestrianEntity::onUpdate(const double current_time, const double step_tim
   if (const auto canonicalized_lanelet_pose = status_->getCanonicalizedLaneletPose()) {
     if (pose::isAtEndOfLanelets(canonicalized_lanelet_pose.value(), hdmap_utils_ptr_)) {
       stopAtCurrentPosition();
-      updateStandStillDuration(step_time);
-      updateTraveledDistance(step_time);
       return;
     }
   }
-  updateStandStillDuration(step_time);
-  updateTraveledDistance(step_time);
-
   EntityBase::onPostUpdate(current_time, step_time);
 }
 }  // namespace entity
