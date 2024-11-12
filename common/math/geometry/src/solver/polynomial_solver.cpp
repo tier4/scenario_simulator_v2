@@ -100,32 +100,34 @@ auto PolynomialSolver::solveCubicEquation(
   const double a, const double b, const double c, const double d, const double min_value,
   const double max_value) const -> std::vector<double>
 {
+  const auto get_real_values =
+    [](const std::vector<std::complex<double>> & complex_values) -> std::vector<double> {
+    /**
+       * @note Function that takes a complex number as input and returns the real part if it is a real number (imaginary part is 0) 
+       * or std::nullopt if it is an imaginary or complex number.
+       */
+    const auto is_real_value = [](const std::complex<double> & complex_value) {
+      constexpr double epsilon = std::numeric_limits<double>::epsilon();
+      return (std::abs(complex_value.imag()) <= epsilon)
+               ? std::optional<double>(complex_value.real())
+               : std::nullopt;
+    };
+    /// @note Iterate all complex values and check the value is real value or not.
+    std::vector<double> real_values = {};
+    std::for_each(
+      complex_values.begin(), complex_values.end(),
+      [&real_values, is_real_value](const auto & complex_value) mutable {
+        if (const auto real_value = is_real_value(complex_value)) {
+          real_values.push_back(real_value.value());
+        }
+      });
+    return real_values;
+  };
+
   const auto solve_without_limit =
-    [this](const double coef_a, const double coef_b, const double coef_c, const double coef_d) {
+    [=](const double coef_a, const double coef_b, const double coef_c, const double coef_d) {
       /// @note Function that takes a std::vector of complex numbers and selects only real numbers from it and returns them
-      const auto get_real_values =
-        [](const std::vector<std::complex<double>> & complex_values) -> std::vector<double> {
-        /**
-         * @note Function that takes a complex number as input and returns the real part if it is a real number (imaginary part is 0) 
-         * or std::nullopt if it is an imaginary or complex number.
-         */
-        const auto is_real_value = [](const std::complex<double> & complex_value) {
-          constexpr double epsilon = std::numeric_limits<double>::epsilon();
-          return (std::abs(complex_value.imag()) <= epsilon)
-                   ? std::optional<double>(complex_value.real())
-                   : std::nullopt;
-        };
-        /// @note Iterate all complex values and check the value is real value or not.
-        std::vector<double> real_values = {};
-        std::for_each(
-          complex_values.begin(), complex_values.end(),
-          [&real_values, is_real_value](const auto & complex_value) mutable {
-            if (const auto real_value = is_real_value(complex_value)) {
-              real_values.push_back(real_value.value());
-            }
-          });
-        return real_values;
-      };
+
       /// @note Finds the complex solution of the monic cubic equation and returns only those that are real numbers.
       return get_real_values(
         solveMonicCubicEquationWithComplex(coef_b / coef_a, coef_c / coef_a, coef_d / coef_a));
