@@ -21,6 +21,22 @@ Changelog for package openscenario_msgs
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+5.1.0 (2024-11-12)
+------------------
+* Merge branch 'master' into feature/traffic_light_group
+* Merge remote-tracking branch 'origin/master' into feature/traffic_light_group
+  # Conflicts:
+  #	simulation/simple_sensor_simulator/include/simple_sensor_simulator/sensor_simulation/sensor_simulation.hpp
+  #	simulation/traffic_simulator/include/traffic_simulator/entity/entity_manager.hpp
+  #	simulation/traffic_simulator/src/traffic_lights/traffic_light_publisher.cpp
+* Merge branch 'master' into feature/traffic_light_group
+* Merge branch 'master' into feature/traffic_light_group
+* Merge branch 'master' into feature/traffic_light_group
+* Merge branch 'master' into feature/traffic_light_group
+* Merge branch 'master' into feature/traffic_light_group
+* Merge branch 'master' into feature/traffic_light_group
+* Contributors: Kotaro Yoshimoto
+
 5.0.2 (2024-11-11)
 ------------------
 * Merge branch 'master' into fix/sonor-cloud-issue
