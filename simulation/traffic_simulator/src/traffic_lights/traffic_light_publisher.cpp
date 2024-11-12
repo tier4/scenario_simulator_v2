@@ -13,16 +13,33 @@
 // limitations under the License.
 
 #include <simulation_interface/conversions.hpp>
-#include <traffic_simulator_msgs/msg/traffic_light_array_v1.hpp>
-
-#if __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)
-#include <autoware_perception_msgs/msg/traffic_light_group_array.hpp>
-#endif
-
 #include <traffic_simulator/traffic_lights/traffic_light_publisher.hpp>
 
 namespace traffic_simulator
 {
+
+auto TrafficLightPublisherBase::generateTrafficSimulatorV1Msg(
+  [[maybe_unused]] const rclcpp::Time & current_ros_time,
+  const simulation_api_schema::UpdateTrafficLightsRequest & request)
+  -> traffic_simulator_msgs::msg::TrafficLightArrayV1
+{
+  traffic_simulator_msgs::msg::TrafficLightArrayV1 message;
+
+  using TrafficLightType = traffic_simulator_msgs::msg::TrafficLightV1;
+  using TrafficLightBulbType = traffic_simulator_msgs::msg::TrafficLightBulbV1;
+  for (const auto & traffic_light : request.states()) {
+    TrafficLightType traffic_light_message;
+    traffic_light_message.lanelet_way_id = traffic_light.id();
+    for (const auto & bulb_status : traffic_light.traffic_light_status()) {
+      TrafficLightBulbType light_bulb_message;
+      simulation_interface::toMsg<TrafficLightBulbType>(bulb_status, light_bulb_message);
+      traffic_light_message.traffic_light_bulbs.push_back(light_bulb_message);
+    }
+    message.traffic_lights.push_back(traffic_light_message);
+  }
+  return message;
+}
+
 auto TrafficLightPublisherBase::generateAutowareAutoPerceptionMsg(
   const rclcpp::Time & current_ros_time,
   const simulation_api_schema::UpdateTrafficLightsRequest & request, const std::string & frame)
@@ -48,7 +65,7 @@ auto TrafficLightPublisherBase::generateAutowareAutoPerceptionMsg(
   return message;
 }
 
-auto TrafficLightPublisherBase::generateAutowarePerceptionMsg(
+auto TrafficLightPublisherBase::generateAutowarePerceptionTrafficSignalMsg(
   const rclcpp::Time & current_ros_time,
   const simulation_api_schema::UpdateTrafficLightsRequest & request)
   -> autoware_perception_msgs::msg::TrafficSignalArray
@@ -78,51 +95,12 @@ auto TrafficLightPublisherBase::generateAutowarePerceptionMsg(
   return message;
 }
 
-template <>
-auto TrafficLightPublisher<autoware_auto_perception_msgs::msg::TrafficSignalArray>::publish(
-  const rclcpp::Time & current_ros_time,
-  const simulation_api_schema::UpdateTrafficLightsRequest & request) const -> void
-{
-  traffic_light_state_array_publisher_->publish(
-    generateAutowareAutoPerceptionMsg(current_ros_time, request, frame_));
-}
-
-template <>
-auto TrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>::publish(
-  const rclcpp::Time & current_ros_time,
-  const simulation_api_schema::UpdateTrafficLightsRequest & request) const -> void
-{
-  traffic_light_state_array_publisher_->publish(
-    generateAutowarePerceptionMsg(current_ros_time, request));
-}
-
-template <>
-auto TrafficLightPublisher<traffic_simulator_msgs::msg::TrafficLightArrayV1>::publish(
-  [[maybe_unused]] const rclcpp::Time & current_ros_time,
-  const simulation_api_schema::UpdateTrafficLightsRequest & request) const -> void
-{
-  traffic_simulator_msgs::msg::TrafficLightArrayV1 message;
-
-  using TrafficLightType = traffic_simulator_msgs::msg::TrafficLightV1;
-  using TrafficLightBulbType = traffic_simulator_msgs::msg::TrafficLightBulbV1;
-  for (const auto & traffic_light : request.states()) {
-    TrafficLightType traffic_light_message;
-    traffic_light_message.lanelet_way_id = traffic_light.id();
-    for (const auto & bulb_status : traffic_light.traffic_light_status()) {
-      TrafficLightBulbType light_bulb_message;
-      simulation_interface::toMsg<TrafficLightBulbType>(bulb_status, light_bulb_message);
-      traffic_light_message.traffic_light_bulbs.push_back(light_bulb_message);
-    }
-    message.traffic_lights.push_back(traffic_light_message);
-  }
-  traffic_light_state_array_publisher_->publish(message);
-}
-
 #if __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)
-template <>
-auto TrafficLightPublisher<autoware_perception_msgs::msg::TrafficLightGroupArray>::publish(
+
+auto TrafficLightPublisherBase::generateAutowarePerceptionTrafficLightGroupMsg(
   const rclcpp::Time & current_ros_time,
-  const simulation_api_schema::UpdateTrafficLightsRequest & request) const -> void
+  const simulation_api_schema::UpdateTrafficLightsRequest & request)
+  -> autoware_perception_msgs::msg::TrafficLightGroupArray
 {
   autoware_perception_msgs::msg::TrafficLightGroupArray message;
 
@@ -145,7 +123,49 @@ auto TrafficLightPublisher<autoware_perception_msgs::msg::TrafficLightGroupArray
       }
     }
   }
-  traffic_light_state_array_publisher_->publish(message);
+  return message;
 }
-#endif
+
+#endif  // __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)
+
+template <>
+auto TrafficLightPublisher<traffic_simulator_msgs::msg::TrafficLightArrayV1>::publish(
+  [[maybe_unused]] const rclcpp::Time & current_ros_time,
+  const simulation_api_schema::UpdateTrafficLightsRequest & request) const -> void
+{
+  traffic_light_state_array_publisher_->publish(
+    generateTrafficSimulatorV1Msg(current_ros_time, request));
+}
+
+template <>
+auto TrafficLightPublisher<autoware_auto_perception_msgs::msg::TrafficSignalArray>::publish(
+  const rclcpp::Time & current_ros_time,
+  const simulation_api_schema::UpdateTrafficLightsRequest & request) const -> void
+{
+  traffic_light_state_array_publisher_->publish(
+    generateAutowareAutoPerceptionMsg(current_ros_time, request, frame_));
+}
+
+template <>
+auto TrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>::publish(
+  const rclcpp::Time & current_ros_time,
+  const simulation_api_schema::UpdateTrafficLightsRequest & request) const -> void
+{
+  traffic_light_state_array_publisher_->publish(
+    generateAutowarePerceptionTrafficSignalMsg(current_ros_time, request));
+}
+
+#if __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)
+
+template <>
+auto TrafficLightPublisher<autoware_perception_msgs::msg::TrafficLightGroupArray>::publish(
+  const rclcpp::Time & current_ros_time,
+  const simulation_api_schema::UpdateTrafficLightsRequest & request) const -> void
+{
+  traffic_light_state_array_publisher_->publish(
+    generateAutowarePerceptionTrafficLightGroupMsg(current_ros_time, request));
+}
+
+#endif  // __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)
+
 }  // namespace traffic_simulator

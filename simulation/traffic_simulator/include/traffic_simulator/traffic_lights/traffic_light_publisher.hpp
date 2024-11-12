@@ -23,6 +23,13 @@
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light.hpp>
 #include <traffic_simulator/traffic_lights/traffic_lights_base.hpp>
+#include <traffic_simulator_msgs/msg/traffic_light_array_v1.hpp>
+
+#if __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)
+
+#include <autoware_perception_msgs/msg/traffic_light_group_array.hpp>
+
+#endif  // __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)
 
 namespace traffic_simulator
 {
@@ -34,15 +41,29 @@ public:
     const simulation_api_schema::UpdateTrafficLightsRequest & request) const -> void = 0;
   virtual ~TrafficLightPublisherBase() = default;
 
+  static auto generateTrafficSimulatorV1Msg(
+    const rclcpp::Time & current_ros_time,
+    const simulation_api_schema::UpdateTrafficLightsRequest & request)
+    -> traffic_simulator_msgs::msg::TrafficLightArrayV1;
+
   static auto generateAutowareAutoPerceptionMsg(
     const rclcpp::Time & current_ros_time,
     const simulation_api_schema::UpdateTrafficLightsRequest & request, const std::string & frame)
     -> autoware_auto_perception_msgs::msg::TrafficSignalArray;
 
-  static auto generateAutowarePerceptionMsg(
+  static auto generateAutowarePerceptionTrafficSignalMsg(
     const rclcpp::Time & current_ros_time,
     const simulation_api_schema::UpdateTrafficLightsRequest & request)
     -> autoware_perception_msgs::msg::TrafficSignalArray;
+
+#if __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)
+
+  static auto generateAutowarePerceptionTrafficLightGroupMsg(
+    const rclcpp::Time & current_ros_time,
+    const simulation_api_schema::UpdateTrafficLightsRequest & request)
+    -> autoware_perception_msgs::msg::TrafficLightGroupArray;
+
+#endif  // __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)
 };
 
 template <typename MessageType>

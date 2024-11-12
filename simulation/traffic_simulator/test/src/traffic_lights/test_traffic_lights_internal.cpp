@@ -418,13 +418,14 @@ TYPED_TEST(TrafficLightsInternalTest, resetUpdate_publishMarkers)
   }
 }
 
-TYPED_TEST(TrafficLightsInternalTest, generateAutowarePerceptionMsg)
+TYPED_TEST(TrafficLightsInternalTest, generateAutowarePerceptionTrafficSignalMsg)
 {
   this->lights->setTrafficLightsState(this->id, "red solidOn circle, yellow flashing circle");
   this->lights->setTrafficLightsConfidence(this->id, 0.7);
 
-  const auto msg = traffic_simulator::TrafficLightPublisherBase::generateAutowarePerceptionMsg(
-    this->node_ptr->get_clock()->now(), this->lights->generateUpdateTrafficLightsRequest());
+  const auto msg =
+    traffic_simulator::TrafficLightPublisherBase::generateAutowarePerceptionTrafficSignalMsg(
+      this->node_ptr->get_clock()->now(), this->lights->generateUpdateTrafficLightsRequest());
 
   const double expected_time =
     static_cast<double>(getTime(this->node_ptr->get_clock()->now())) * 1e-9;
