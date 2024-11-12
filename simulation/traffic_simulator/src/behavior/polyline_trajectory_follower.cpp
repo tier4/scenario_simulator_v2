@@ -223,14 +223,6 @@ auto calculate_distance_and_remaining_time(
                                     hdmap_utils, entity_status, matching_distance,
                                     vertex.position.position, next->position.position);
         });
-      double total_distance = 0.0;
-      for (auto iter = std::begin(polyline_trajectory.shape.vertices);
-           0 < std::distance(iter, last); ++iter) {
-        total_distance += distance_along_lanelet(
-          hdmap_utils, entity_status, matching_distance, iter->position.position,
-          std::next(iter)->position.position);
-      }
-      return total_distance;
     };
 
   const auto waypoint_ptr = first_waypoint_with_arrival_time_specified(polyline_trajectory);
