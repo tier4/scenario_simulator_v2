@@ -18,6 +18,8 @@
 #include <geometry/quaternion/slerp.hpp>
 #include <geometry/vector3/hypot.hpp>
 #include <geometry/vector3/operator.hpp>
+#include <geometry_msgs/msg/accel.hpp>
+#include <geometry_msgs/msg/twist.hpp>
 
 namespace entity_behavior
 {
