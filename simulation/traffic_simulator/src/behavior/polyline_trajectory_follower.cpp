@@ -657,7 +657,16 @@ auto PolylineTrajectoryFollower::getValidatedEntityTargetPosition(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "attempted to dereference an element of an empty PolylineTrajectory");
   }
-  return polyline_trajectory.shape.vertices.front().position.position;
+  const auto target_position = polyline_trajectory.shape.vertices.front().position.position;
+  if (is_infinite_vec3_like(target_position)) {
+    throw common::Error(
+      "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
+      "following information to the developer: Vehicle ",
+      std::quoted(entity_status.name),
+      "'s target position coordinate value contains NaN or infinity. The value is [",
+      target_position.x, ", ", target_position.y, ", ", target_position.z, "].");
+  }
+  return target_position;
 }
 auto PolylineTrajectoryFollower::getValidatedEntityDesiredSpeed(
   const double entity_speed, const double desired_acceleration) const noexcept(false) -> double
