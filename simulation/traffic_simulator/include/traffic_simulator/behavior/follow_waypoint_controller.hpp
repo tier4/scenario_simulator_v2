@@ -30,11 +30,11 @@ namespace traffic_simulator
 {
 namespace follow_trajectory
 {
-struct ControllerError : public common::Error
+struct ControllerError : public common::SimulationError
 {
   template <typename... Ts>
   explicit ControllerError(Ts &&... xs)
-  : common::Error(common::concatenate(
+  : common::SimulationError(common::concatenate(
       "An error occurred in the internal controller operation in the FollowTrajectoryAction. ",
       "Please report the following information to the developer: ",
       std::forward<decltype(xs)>(xs)...))

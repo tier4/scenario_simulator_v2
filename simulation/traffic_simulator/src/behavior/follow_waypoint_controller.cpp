@@ -65,7 +65,7 @@ auto FollowWaypointController::getAnalyticalAccelerationForLastSteps(
 auto FollowWaypointController::roundTimeToFullStepsWithTolerance(
   const double remaining_time_source, const double time_tolerance) const -> double
 {
-  if (std::isnan(remaining_time_source) || std::isinf(remaining_time_source)) {
+  if (not std::isfinite(remaining_time_source)) {
     throw ControllerError(
       "Value remaining_time_source (", remaining_time_source,
       ") is NaN or inf - it cannot be rounded.");

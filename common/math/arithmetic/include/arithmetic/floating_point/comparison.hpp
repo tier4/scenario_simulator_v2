@@ -36,18 +36,10 @@ auto isEssentiallyEqualTo(T a, T b)
          (std::numeric_limits<T>::epsilon() * std::min(std::abs(a), std::abs(b)));
 }
 
-template <typename T, typename... Ts>
-auto isDefinitelyLessThan(T a, T b, Ts... xs)
+template <typename T>
+auto isDefinitelyLessThan(T a, T b)
 {
-  auto compare = [](T a, T b) {
-    return (b - a) > (std::numeric_limits<T>::epsilon() * std::max(std::abs(a), std::abs(b)));
-  };
-
-  if constexpr (0 < sizeof...(Ts)) {
-    return compare(a, b) and compare(b, xs...);
-  } else {
-    return compare(a, b);
-  }
+  return (b - a) > (std::numeric_limits<T>::epsilon() * std::max(std::abs(a), std::abs(b)));
 }
 
 template <typename T>

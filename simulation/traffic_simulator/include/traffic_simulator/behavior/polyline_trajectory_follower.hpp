@@ -16,6 +16,7 @@
 #define TRAFFIC_SIMULATOR__BEHAVIOR__POLYLINE_TRAJECTORY_FOLLOWER_HPP_
 
 #include <optional>
+#include <traffic_simulator/behavior/follow_waypoint_controller.hpp>
 #include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
@@ -32,11 +33,11 @@ public:
   explicit PolylineTrajectoryFollower(
     const traffic_simulator_msgs::msg::EntityStatus & entity_status,
     const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils);
+    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils, const double step_time);
 
   auto makeUpdatedEntityStatus(
     const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
-    const double step_time, const double matching_distance,
+    const double matching_distance,
     const std::optional<double> target_speed /*= std::nullopt*/) const
     -> std::optional<EntityStatus>;
 
@@ -44,24 +45,34 @@ private:
   const traffic_simulator_msgs::msg::EntityStatus entity_status;
   const traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter;
   const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils;
+  const double step_time;
 
-  auto discard_the_front_waypoint_and_recurse(
+  auto discardTheFrontWaypointAndRecurse(
     const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
-    const double step_time, const double matching_distance,
-    const std::optional<double> target_speed) const -> std::optional<EntityStatus>;
-  auto buildUpdatedEntityStatus(
-    const geometry_msgs::msg::Vector3 & desired_velocity, const double step_time) const
+    const double matching_distance, const std::optional<double> target_speed) const
+    -> std::optional<EntityStatus>;
+  auto buildUpdatedEntityStatus(const geometry_msgs::msg::Vector3 & desired_velocity) const
     noexcept(true) -> EntityStatus;
   auto getValidatedEntityAcceleration() const noexcept(false) -> double;
   auto getValidatedEntitySpeed() const noexcept(false) -> double;
-  auto getValidatedEntityMaxAcceleration(const double acceleration, const double step_time) const
-    noexcept(false) -> double;
-  auto getValidatedEntityMinAcceleration(const double acceleration, const double step_time) const
-    noexcept(false) -> double;
-  auto getValidatedEntityPosition() const noexcept(false) -> const geometry_msgs::msg::Point;
+  auto getValidatedEntityMaxAcceleration(const double acceleration) const noexcept(false) -> double;
+  auto getValidatedEntityMinAcceleration(const double acceleration) const noexcept(false) -> double;
+  auto getValidatedEntityPosition() const noexcept(false) -> geometry_msgs::msg::Point;
   auto getValidatedEntityTargetPosition(
     const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory) const
-    noexcept(false) -> const geometry_msgs::msg::Point;
+    noexcept(false) -> geometry_msgs::msg::Point;
+  auto getValidatedEntityDesiredAcceleration(
+    const traffic_simulator::follow_trajectory::FollowWaypointController &
+      follow_waypoint_controller,
+    const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
+    const double remaining_time, const double distance, const double acceleration,
+    const double speed) const noexcept(false) -> double;
+  auto getValidatedEntityDesiredVelocity(
+    const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
+    const geometry_msgs::msg::Point & target_position, const geometry_msgs::msg::Point & position,
+    const double desired_speed) const noexcept(false) -> geometry_msgs::msg::Vector3;
+  auto getValidatedEntityDesiredSpeed(
+    const double entity_speed, const double desired_acceleration) const noexcept(false) -> double;
 };
 }  // namespace follow_trajectory
 }  // namespace traffic_simulator
