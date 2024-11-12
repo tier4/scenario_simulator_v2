@@ -26,14 +26,6 @@ using EntityStatus = traffic_simulator_msgs::msg::EntityStatus;
 using EntityType = traffic_simulator_msgs::msg::EntityType;
 using EntitySubtype = traffic_simulator_msgs::msg::EntitySubtype;
 
-struct EntityTypeComparator
-{
-  bool operator()(const EntityType & lhs, const EntityType & rhs) const
-  {
-    return lhs.type < rhs.type;
-  }
-};
-
 inline namespace entity_status
 {
 class CanonicalizedEntityStatus

@@ -34,8 +34,7 @@ public:
     const std::string & node_name, const std::string & map_path,
     const std::string & lanelet2_map_file, const std::string & scenario_filename,
     const bool verbose, const rclcpp::NodeOptions & option, const bool auto_sink = false,
-    const std::set<traffic_simulator::EntityType, traffic_simulator::EntityTypeComparator>
-      sinkable_entity_type = {});
+    const std::set<std::uint8_t> sinkable_entity_type = {});
   void start();
   void stop(Result result, const std::string & description = "");
   void expectThrow() { exception_expect_ = true; }
@@ -74,8 +73,7 @@ private:
   auto configure(
     const std::string & map_path, const std::string & lanelet2_map_file,
     const std::string & scenario_filename, const bool verbose, const bool auto_sink = false,
-    const std::set<traffic_simulator::EntityType, traffic_simulator::EntityTypeComparator>
-      sinkable_entity_type = {}) -> traffic_simulator::Configuration
+    const std::set<std::uint8_t> sinkable_entity_type = {}) -> traffic_simulator::Configuration
   {
     auto configuration = traffic_simulator::Configuration(map_path);
     {

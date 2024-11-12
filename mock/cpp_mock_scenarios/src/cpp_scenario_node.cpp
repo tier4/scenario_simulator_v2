@@ -21,8 +21,7 @@ CppScenarioNode::CppScenarioNode(
   const std::string & node_name, const std::string & map_path,
   const std::string & lanelet2_map_file, const std::string & scenario_filename, const bool verbose,
   const rclcpp::NodeOptions & option, const bool auto_sink,
-  const std::set<traffic_simulator::EntityType, traffic_simulator::EntityTypeComparator>
-    sinkable_entity_type)
+  const std::set<std::uint8_t> sinkable_entity_type)
 : Node(node_name, option),
   api_(
     this,

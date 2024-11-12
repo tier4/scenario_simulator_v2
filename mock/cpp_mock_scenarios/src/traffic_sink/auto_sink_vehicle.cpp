@@ -30,9 +30,7 @@ public:
   explicit AutoSinkVehicleScenario(const rclcpp::NodeOptions & option)
   : cpp_mock_scenarios::CppScenarioNode(
       "auto_sink_vehicle", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
-      "lanelet2_map.osm", __FILE__, false, option, true,
-      {traffic_simulator_msgs::build<traffic_simulator_msgs::msg::EntityType>().type(
-        traffic_simulator::EntityType::VEHICLE)})
+      "lanelet2_map.osm", __FILE__, false, option, true, {traffic_simulator::EntityType::VEHICLE})
   {
     start();
   }
