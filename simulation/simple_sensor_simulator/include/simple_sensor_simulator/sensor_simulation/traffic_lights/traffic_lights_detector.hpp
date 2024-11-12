@@ -65,11 +65,7 @@ private:
        V2ITrafficLights in TrafficSimulator publishes publishes using architecture-independent topics ("awf/universe..."): 
        "/v2x/traffic_signals" and "/perception/traffic_light_recognition/external/traffic_signals"
     */
-    if (architecture_type == "awf/universe") {
-      using Message = autoware_auto_perception_msgs::msg::TrafficSignalArray;
-      return std::make_unique<traffic_simulator::TrafficLightPublisher<Message>>(
-        &node, "/perception/traffic_light_recognition/traffic_signals");
-    } else if (architecture_type == "awf/universe/20230906") {
+    if (architecture_type == "awf/universe/20230906") {
       using Message = autoware_perception_msgs::msg::TrafficSignalArray;
       return std::make_unique<traffic_simulator::TrafficLightPublisher<Message>>(
         &node, "/perception/traffic_light_recognition/internal/traffic_signals");
