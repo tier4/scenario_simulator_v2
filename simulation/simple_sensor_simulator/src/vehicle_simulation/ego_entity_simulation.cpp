@@ -46,12 +46,13 @@ EgoEntitySimulation::EgoEntitySimulation(
   vehicle_model_type_(getVehicleModelType()),
   vehicle_model_ptr_(makeSimulationModel(vehicle_model_type_, step_time, parameters)),
   status_(initial_status, std::nullopt),
+  initial_pose_(status_.getMapPose()),
+  initial_rotation_matrix_(math::geometry::getRotationMatrix(initial_pose_.orientation)),
   consider_acceleration_by_road_slope_(consider_acceleration_by_road_slope),
   hdmap_utils_ptr_(hdmap_utils),
   vehicle_parameters(parameters)
 {
   setStatus(initial_status);
-  initial_pose_ = status_.getMapPose();
   autoware->set_parameter(use_sim_time);
 }
 
@@ -233,17 +234,16 @@ auto EgoEntitySimulation::overwrite(
      considered unchangeable and stored in an additional variable
      world_relative_position_ that is used in calculations.
   */
-  world_relative_position_ = getRotationMatrix(initial_pose_.orientation).transpose() *
-                             Eigen::Vector3d(
-                               status.pose.position.x - initial_pose_.position.x,
-                               status.pose.position.y - initial_pose_.position.y,
-                               status.pose.position.z - initial_pose_.position.z);
+  world_relative_position_ =
+    initial_rotation_matrix_.transpose() * Eigen::Vector3d(
+                                             status.pose.position.x - initial_pose_.position.x,
+                                             status.pose.position.y - initial_pose_.position.y,
+                                             status.pose.position.z - initial_pose_.position.z);
 
   if (is_npc_logic_started) {
     const auto yaw = [&]() {
       const auto q = Eigen::Quaterniond(
-        getRotationMatrix(initial_pose_.orientation).transpose() *
-        getRotationMatrix(status.pose.orientation));
+        initial_rotation_matrix_.transpose() * getRotationMatrix(status.pose.orientation));
       geometry_msgs::msg::Quaternion relative_orientation;
       relative_orientation.x = q.x();
       relative_orientation.y = q.y();
@@ -297,7 +297,7 @@ void EgoEntitySimulation::update(
      considered unchangeable and stored in an additional variable
      world_relative_position_ that is used in calculations.
   */
-  world_relative_position_ = getRotationMatrix(initial_pose_.orientation).transpose() *
+  world_relative_position_ = initial_rotation_matrix_.transpose() *
                              Eigen::Vector3d(
                                status_.getMapPose().position.x - initial_pose_.position.x,
                                status_.getMapPose().position.y - initial_pose_.position.y,
@@ -414,8 +414,8 @@ auto EgoEntitySimulation::getCurrentPose(const double pitch_angle = 0.) const
   -> geometry_msgs::msg::Pose
 {
   using math::geometry::operator*;
-  const Eigen::Vector3d relative_position =
-    math::geometry::getRotationMatrix(initial_pose_.orientation) * world_relative_position_;
+  const auto relative_position =
+    Eigen::Vector3d(initial_rotation_matrix_ * world_relative_position_);
   const auto relative_orientation = math::geometry::convertEulerAngleToQuaternion(
     geometry_msgs::build<geometry_msgs::msg::Vector3>()
       .x(0)
@@ -469,11 +469,12 @@ auto EgoEntitySimulation::setStatus(const traffic_simulator_msgs::msg::EntitySta
   /// EgoEntity::setStatus
   const auto unique_route_lanelets =
     traffic_simulator::helper::getUniqueValues(autoware->getRouteLanelets());
+  /// @note The offset value has been increased to 1.5 because a value of 1.0 was often insufficient when changing lanes. ( @Hans_Robo )
   const auto matching_distance = std::max(
                                    vehicle_parameters.axles.front_axle.track_width,
                                    vehicle_parameters.axles.rear_axle.track_width) *
                                    0.5 +
-                                 1.0;
+                                 1.5;
   /// @note Ego uses the unique_route_lanelets get from Autoware, instead of the current lanelet_id
   /// value from EntityStatus, therefore canonicalization has to be done in advance,
   /// not inside CanonicalizedEntityStatus

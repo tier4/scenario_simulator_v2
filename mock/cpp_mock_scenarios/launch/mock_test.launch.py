@@ -119,10 +119,10 @@ def launch_setup(context, *args, **kwargs):
     record                              = LaunchConfiguration("record",                                 default=False)
     rviz_config                         = LaunchConfiguration("rviz_config",                            default=default_rviz_config_file())
     scenario                            = LaunchConfiguration("scenario",                               default=Path("/dev/null"))
-    sensor_model                        = LaunchConfiguration("sensor_model",                           default="sample_sensor_kit")
+    sensor_model                        = LaunchConfiguration("sensor_model",                           default="")
     sigterm_timeout                     = LaunchConfiguration("sigterm_timeout",                        default=8)
     use_sim_time                        = LaunchConfiguration("use_sim_time",                           default=False)
-    vehicle_model                       = LaunchConfiguration("vehicle_model",                          default="sample_vehicle")
+    vehicle_model                       = LaunchConfiguration("vehicle_model",                          default="")
     scenario_package                    = LaunchConfiguration("package",                                default="cpp_mock_scenarios")
     junit_path                          = LaunchConfiguration("junit_path",                             default="/tmp/output.xunit.xml")
     # fmt: on
