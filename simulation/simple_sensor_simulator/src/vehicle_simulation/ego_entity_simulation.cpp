@@ -358,31 +358,32 @@ auto EgoEntitySimulation::calculateEgoPitch() const -> double
 
   /// @note Copied from motion_util::findNearestSegmentIndex
   auto centerline_points = hdmap_utils_ptr_->getCenterPoints(status_.getLaneletId());
-  auto find_nearest_segment_index =
-    [](const std::vector<geometry_msgs::msg::Point> & points, const Eigen::Vector3d & point) {
-      assert(not points.empty());
+  auto find_nearest_segment_index = [](
+                                      const std::vector<geometry_msgs::msg::Point> & points,
+                                      const geometry_msgs::msg::Point & point) {
+    assert(not points.empty());
 
-      double min_dist = std::numeric_limits<double>::max();
-      size_t min_idx = 0;
+    double min_dist = std::numeric_limits<double>::max();
+    size_t min_idx = 0;
 
-      for (size_t i = 0; i < points.size(); ++i) {
-        const auto dist =
-          [](const geometry_msgs::msg::Point & point1, const Eigen::Vector3d & point2) {
-            const auto dx = point1.x - point2.x();
-            const auto dy = point1.y - point2.y();
-            return dx * dx + dy * dy;
-          }(points.at(i), point);
+    for (size_t i = 0; i < points.size(); ++i) {
+      const auto dist =
+        [](const geometry_msgs::msg::Point & point1, const geometry_msgs::msg::Point & point2) {
+          const auto dx = point1.x - point2.x;
+          const auto dy = point1.y - point2.y;
+          return dx * dx + dy * dy;
+        }(points.at(i), point);
 
-        if (dist < min_dist) {
-          min_dist = dist;
-          min_idx = i;
-        }
+      if (dist < min_dist) {
+        min_dist = dist;
+        min_idx = i;
       }
-      return min_idx;
-    };
+    }
+    return min_idx;
+  };
 
   const size_t ego_seg_idx =
-    find_nearest_segment_index(centerline_points, world_relative_position_);
+    find_nearest_segment_index(centerline_points, this->getCurrentPose().position);
 
   const auto & prev_point = centerline_points.at(ego_seg_idx);
   const auto & next_point = centerline_points.at(ego_seg_idx + 1);
@@ -409,8 +410,7 @@ auto EgoEntitySimulation::getCurrentTwist() const -> geometry_msgs::msg::Twist
   return current_twist;
 }
 
-auto EgoEntitySimulation::getCurrentPose(const double pitch_angle = 0.) const
-  -> geometry_msgs::msg::Pose
+auto EgoEntitySimulation::getCurrentPose(const double pitch_angle) const -> geometry_msgs::msg::Pose
 {
   using math::geometry::operator*;
   const auto relative_position =

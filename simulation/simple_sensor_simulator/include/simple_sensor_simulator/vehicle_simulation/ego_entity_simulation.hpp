@@ -74,7 +74,7 @@ public:
 private:
   auto calculateEgoPitch() const -> double;
 
-  auto getCurrentPose(const double pitch_angle) const -> geometry_msgs::msg::Pose;
+  auto getCurrentPose(const double pitch_angle = 0.) const -> geometry_msgs::msg::Pose;
 
   auto getCurrentTwist() const -> geometry_msgs::msg::Twist;
 
