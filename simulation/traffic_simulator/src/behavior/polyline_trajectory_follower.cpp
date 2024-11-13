@@ -33,10 +33,10 @@ namespace follow_trajectory
 PolylineTrajectoryFollower::PolylineTrajectoryFollower(
   const traffic_simulator_msgs::msg::EntityStatus & entity_status,
   const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils, const double step_time)
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr, const double step_time)
 : entity_status(entity_status),
   behavior_parameter(behavior_parameter),
-  hdmap_utils(hdmap_utils),
+  hdmap_utils_ptr(hdmap_utils_ptr),
   step_time(step_time)
 {
 }
@@ -49,17 +49,17 @@ auto isfinite_vec3(const T & vec) -> bool
 }
 
 auto distance_along_lanelet(
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
   const traffic_simulator_msgs::msg::EntityStatus & entity_status, const double matching_distance,
   const geometry_msgs::msg::Point & from, const geometry_msgs::msg::Point & to) -> double
 {
   if (const auto from_lanelet_pose =
-        hdmap_utils->toLaneletPose(from, entity_status.bounding_box, false, matching_distance);
+        hdmap_utils_ptr->toLaneletPose(from, entity_status.bounding_box, false, matching_distance);
       from_lanelet_pose.has_value()) {
     if (const auto to_lanelet_pose =
-          hdmap_utils->toLaneletPose(to, entity_status.bounding_box, false, matching_distance);
+          hdmap_utils_ptr->toLaneletPose(to, entity_status.bounding_box, false, matching_distance);
         to_lanelet_pose.has_value()) {
-      if (const auto distance = hdmap_utils->getLongitudinalDistance(
+      if (const auto distance = hdmap_utils_ptr->getLongitudinalDistance(
             from_lanelet_pose.value(), to_lanelet_pose.value());
           distance.has_value()) {
         return distance.value();
@@ -98,6 +98,7 @@ auto make_updated_pose_orientation(
 
 auto calculate_current_velocity(
   const traffic_simulator_msgs::msg::EntityStatus & entity_status, const double speed)
+  -> geometry_msgs::msg::Vector3
 {
   const auto euler_angles =
     math::geometry::convertQuaternionToEulerAngle(entity_status.pose.orientation);
@@ -107,6 +108,83 @@ auto calculate_current_velocity(
     .x(std::cos(pitch) * std::cos(yaw) * speed)
     .y(std::cos(pitch) * std::sin(yaw) * speed)
     .z(std::sin(pitch) * speed);
+}
+
+auto calculate_distance_and_remaining_time(
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
+  const traffic_simulator_msgs::msg::EntityStatus & entity_status, const double matching_distance,
+  const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
+  const double distance_to_front_waypoint, const double step_time) -> std::tuple<double, double>
+{
+  /*
+    Note for anyone working on adding support for followingMode follow
+    to this function (FollowPolylineTrajectoryAction::tick) in the
+    future: if followingMode is follow, this distance calculation may be
+    inappropriate.
+  */
+  const auto total_distance_to =
+    [&hdmap_utils_ptr, &entity_status, &matching_distance, &polyline_trajectory](
+      const std::vector<traffic_simulator_msgs::msg::Vertex>::const_iterator last) {
+      return std::accumulate(
+        polyline_trajectory.shape.vertices.cbegin(), last, 0.0,
+        [&hdmap_utils_ptr, &entity_status, &matching_distance](
+          const double total_distance, const auto & vertex) {
+          const auto next = std::next(&vertex);
+          return total_distance + distance_along_lanelet(
+                                    hdmap_utils_ptr, entity_status, matching_distance,
+                                    vertex.position.position, next->position.position);
+        });
+    };
+
+  const auto waypoint_ptr = first_waypoint_with_arrival_time_specified(polyline_trajectory);
+  if (waypoint_ptr == std::cend(polyline_trajectory.shape.vertices)) {
+    return std::make_tuple(
+      distance_to_front_waypoint +
+        total_distance_to(std::cend(polyline_trajectory.shape.vertices) - 1),
+      std::numeric_limits<double>::infinity());
+  }
+
+  const auto remaining_time =
+    (not std::isnan(polyline_trajectory.base_time) ? polyline_trajectory.base_time : 0.0) +
+    waypoint_ptr->time - entity_status.time;
+
+  /*
+    The condition below should ideally be remaining_time < 0.
+
+    The simulator runs at a constant frame rate, so the step time is
+    1/FPS. If the simulation time is an accumulation of step times
+    expressed as rational numbers, times that are integer multiples
+    of the frame rate will always be exact integer seconds.
+    Therefore, the timing of remaining_time == 0 always exists, and
+    the velocity planning of this member function (tick) aims to
+    reach the waypoint exactly at that timing. So the ideal timeout
+    condition is remaining_time < 0.
+
+    But actually the step time is expressed as a float and the
+    simulation time is its accumulation. As a result, it is not
+    guaranteed that there will be times when the simulation time is
+    exactly zero. For example, remaining_time == -0.00006 and it was
+    judged to be out of time.
+
+    For the above reasons, the condition is remaining_time <
+    -step_time. In other words, the conditions are such that a delay
+    of 1 step time is allowed.
+  */
+  if (remaining_time < -step_time) {
+    throw common::Error(
+      "Vehicle ", std::quoted(entity_status.name),
+      " failed to reach the trajectory waypoint at the specified time. The specified time "
+      "is ",
+      waypoint_ptr->time, " (in ",
+      (not std::isnan(polyline_trajectory.base_time) ? "absolute" : "relative"),
+      " simulation time). This may be due to unrealistic conditions of arrival time "
+      "specification compared to vehicle parameters and dynamic constraints.");
+
+  } else {
+    return std::make_tuple(
+      distance_to_front_waypoint + total_distance_to(waypoint_ptr),
+      remaining_time == 0.0 ? std::numeric_limits<double>::epsilon() : remaining_time);
+  }
 }
 
 auto PolylineTrajectoryFollower::getValidatedEntityDesiredVelocity(
@@ -196,83 +274,6 @@ auto PolylineTrajectoryFollower::getValidatedEntityDesiredAcceleration(
     throw common::Error(
       "Vehicle ", std::quoted(entity_status.name), " - controller operation problem encountered. ",
       follow_waypoint_controller.getFollowedWaypointDetails(polyline_trajectory), e.what());
-  }
-}
-
-auto calculate_distance_and_remaining_time(
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
-  const traffic_simulator_msgs::msg::EntityStatus & entity_status, double matching_distance,
-  const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
-  const double distance_to_front_waypoint, const double step_time) -> std::tuple<double, double>
-{
-  /*
-    Note for anyone working on adding support for followingMode follow
-    to this function (FollowPolylineTrajectoryAction::tick) in the
-    future: if followingMode is follow, this distance calculation may be
-    inappropriate.
-  */
-  const auto total_distance_to =
-    [&hdmap_utils, &entity_status, &matching_distance, &polyline_trajectory](
-      const std::vector<traffic_simulator_msgs::msg::Vertex>::const_iterator last) {
-      return std::accumulate(
-        polyline_trajectory.shape.vertices.cbegin(), last, 0.0,
-        [&hdmap_utils, &entity_status, &matching_distance](
-          const double total_distance, const auto & vertex) {
-          const auto next = std::next(&vertex);
-          return total_distance + distance_along_lanelet(
-                                    hdmap_utils, entity_status, matching_distance,
-                                    vertex.position.position, next->position.position);
-        });
-    };
-
-  const auto waypoint_ptr = first_waypoint_with_arrival_time_specified(polyline_trajectory);
-  if (waypoint_ptr == std::cend(polyline_trajectory.shape.vertices)) {
-    return std::make_tuple(
-      distance_to_front_waypoint +
-        total_distance_to(std::cend(polyline_trajectory.shape.vertices) - 1),
-      std::numeric_limits<double>::infinity());
-  }
-
-  const auto remaining_time =
-    (not std::isnan(polyline_trajectory.base_time) ? polyline_trajectory.base_time : 0.0) +
-    waypoint_ptr->time - entity_status.time;
-
-  /*
-    The condition below should ideally be remaining_time < 0.
-
-    The simulator runs at a constant frame rate, so the step time is
-    1/FPS. If the simulation time is an accumulation of step times
-    expressed as rational numbers, times that are integer multiples
-    of the frame rate will always be exact integer seconds.
-    Therefore, the timing of remaining_time == 0 always exists, and
-    the velocity planning of this member function (tick) aims to
-    reach the waypoint exactly at that timing. So the ideal timeout
-    condition is remaining_time < 0.
-
-    But actually the step time is expressed as a float and the
-    simulation time is its accumulation. As a result, it is not
-    guaranteed that there will be times when the simulation time is
-    exactly zero. For example, remaining_time == -0.00006 and it was
-    judged to be out of time.
-
-    For the above reasons, the condition is remaining_time <
-    -step_time. In other words, the conditions are such that a delay
-    of 1 step time is allowed.
-  */
-  if (remaining_time < -step_time) {
-    throw common::Error(
-      "Vehicle ", std::quoted(entity_status.name),
-      " failed to reach the trajectory waypoint at the specified time. The specified time "
-      "is ",
-      waypoint_ptr->time, " (in ",
-      (not std::isnan(polyline_trajectory.base_time) ? "absolute" : "relative"),
-      " simulation time). This may be due to unrealistic conditions of arrival time "
-      "specification compared to vehicle parameters and dynamic constraints.");
-
-  } else {
-    return std::make_tuple(
-      distance_to_front_waypoint + total_distance_to(waypoint_ptr),
-      remaining_time == 0.0 ? std::numeric_limits<double>::epsilon() : remaining_time);
   }
 }
 
@@ -415,14 +416,14 @@ auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
   const auto target_position = getValidatedEntityTargetPosition(polyline_trajectory);
 
   const double distance_to_front_waypoint = distance_along_lanelet(
-    hdmap_utils, entity_status, matching_distance, entity_position, target_position);
+    hdmap_utils_ptr, entity_status, matching_distance, entity_position, target_position);
   const double remaining_time_to_front_waypoint =
     (std::isnan(polyline_trajectory.base_time) ? 0.0 : polyline_trajectory.base_time) +
     polyline_trajectory.shape.vertices.front().time - entity_status.time;
 
   const auto [distance, remaining_time] = calculate_distance_and_remaining_time(
-    hdmap_utils, entity_status, matching_distance, polyline_trajectory, distance_to_front_waypoint,
-    step_time);
+    hdmap_utils_ptr, entity_status, matching_distance, polyline_trajectory,
+    distance_to_front_waypoint, step_time);
 
   /*
     The controller provides the ability to calculate acceleration using constraints from the

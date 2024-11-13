@@ -33,7 +33,7 @@ public:
   explicit PolylineTrajectoryFollower(
     const traffic_simulator_msgs::msg::EntityStatus & entity_status,
     const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils, const double step_time);
+    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr, const double step_time);
 
   auto makeUpdatedEntityStatus(
     const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
@@ -44,7 +44,7 @@ public:
 private:
   const traffic_simulator_msgs::msg::EntityStatus entity_status;
   const traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter;
-  const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils;
+  const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr;
   const double step_time;
 
   auto discardTheFrontWaypointAndRecurse(
