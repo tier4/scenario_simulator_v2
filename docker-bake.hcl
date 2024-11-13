@@ -27,6 +27,6 @@ target "humble" {
   args = {"ROS_DISTRO" : "humble"}
   group = ["humble"]
   matrix = {
-    base = ["base_amd64", "base_arm64"]
+    base = ["base_amd64", "base_arm64", "base_traffic_simulator"]
   }
 }
