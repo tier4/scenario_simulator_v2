@@ -1,0 +1,85 @@
+// Copyright 2015 TIER IV, Inc. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#include <gtest/gtest.h>
+
+#include <ament_index_cpp/get_package_share_directory.hpp>
+#include <traffic_simulator/traffic_lights/traffic_lights.hpp>
+
+constexpr char architecture_old[] = "awf/universe";
+constexpr char architecture_new[] = "awf/universe/20240605";
+
+template <typename TrafficLightsT, const char * Architecture>
+class TrafficLightsInternalTestArchitectureDependent : public testing::Test
+{
+public:
+  const lanelet::Id id = 34836;
+  const lanelet::Id signal_id = 34806;
+
+  const rclcpp::Node::SharedPtr node_ptr = rclcpp::Node::make_shared("TrafficLightsInternalTest");
+
+  const std::string path = ament_index_cpp::get_package_share_directory("traffic_simulator") +
+                           "/map/standard_map/lanelet2_map.osm";
+
+  const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr =
+    std::make_shared<hdmap_utils::HdMapUtils>(
+      path, geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
+              .latitude(35.61836750154)
+              .longitude(139.78066608243)
+              .altitude(0.0));
+
+  std::unique_ptr<TrafficLightsT> lights;
+
+  TrafficLightsInternalTestArchitectureDependent()
+  : lights([this] {
+      if constexpr (std::is_same_v<TrafficLightsT, traffic_simulator::ConventionalTrafficLights>)
+        return std::make_unique<TrafficLightsT>(node_ptr, hdmap_utils_ptr);
+      else if constexpr (std::is_same_v<TrafficLightsT, traffic_simulator::V2ITrafficLights>)
+        return std::make_unique<TrafficLightsT>(node_ptr, hdmap_utils_ptr, Architecture);
+      else
+        throw std::runtime_error("Given TrafficLights type is not supported");
+    }())
+  {
+  }
+};
+
+template <typename TrafficLightsT>
+class TrafficLightsInternalTest
+: public TrafficLightsInternalTestArchitectureDependent<TrafficLightsT, architecture_old>
+{
+};
+
+template <typename TrafficLightsT>
+class TrafficLightsInternalTestNewArchitecture
+: public TrafficLightsInternalTestArchitectureDependent<TrafficLightsT, architecture_new>
+{
+};
+
+// Alias for declaring types in typed tests
+using TrafficLightsTypes =
+  testing::Types<traffic_simulator::ConventionalTrafficLights, traffic_simulator::V2ITrafficLights>;
+
+// Test name generator
+class TrafficLightsNameGenerator
+{
+public:
+  template <typename TrafficLightsT>
+  static std::string GetName(int)
+  {
+    if constexpr (std::is_same_v<TrafficLightsT, traffic_simulator::ConventionalTrafficLights>)
+      return "ConventionalTrafficLights";
+    if constexpr (std::is_same_v<TrafficLightsT, traffic_simulator::V2ITrafficLights>)
+      return "V2ITrafficLights";
+  }
+};
