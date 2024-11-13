@@ -154,9 +154,11 @@ add_definitions("-DBOOST_ALLOW_DEPRECATED_HEADERS")
 # cspell: ignore DPARAMETER
 target_compile_definitions(parameter_value_distribution_without_ros PUBLIC -DPARAMETER_VALUE_DISTRIBUTION_ONLY)
 target_include_directories(parameter_value_distribution_without_ros PUBLIC include)
+target_include_directories(parameter_value_distribution_without_ros PUBLIC ${boost_json_SOURCE_DIR}/include)
 target_include_directories(parameter_value_distribution_without_ros PUBLIC ${scenario_simulator_exception_INCLUDE_DIRS})
 target_link_libraries(parameter_value_distribution_without_ros
   Boost::filesystem
+  Boost::json
   pugixml)
 
 install(
