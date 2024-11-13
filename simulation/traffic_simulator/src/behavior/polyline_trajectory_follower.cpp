@@ -286,7 +286,7 @@ auto PolylineTrajectoryFollower::discardTheFrontWaypointAndRecurse(
     throw common::SimulationError(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: ",
-      "Attmpted to access an element of an empty vector");
+      "Attempted to access an element of an empty vector");
   }
   /*
       The OpenSCENARIO standard does not define the behavior when the value of
