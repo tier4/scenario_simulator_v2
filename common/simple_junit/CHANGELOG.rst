@@ -21,6 +21,13 @@ Changelog for package junit_exporter
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+5.1.1 (2024-11-13)
+------------------
+* Merge branch 'master' into fix/sonor-cloud-issue-5
+* Merge branch 'master' into fix/sonor-cloud-issue-5
+* Merge branch 'master' into fix/sonor-cloud-issue-5
+* Contributors: Masaya Kataoka, Taiga
+
 5.1.0 (2024-11-12)
 ------------------
 * Merge branch 'master' into feature/traffic_light_group

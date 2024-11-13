@@ -21,6 +21,13 @@ Changelog for package traffic_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+5.1.1 (2024-11-13)
+------------------
+* Merge branch 'master' into fix/sonor-cloud-issue-5
+* Merge branch 'master' into fix/sonor-cloud-issue-5
+* Merge branch 'master' into fix/sonor-cloud-issue-5
+* Contributors: Masaya Kataoka, Taiga
+
 5.1.0 (2024-11-12)
 ------------------
 * Merge pull request `#1357 <https://github.com/tier4/scenario_simulator_v2/issues/1357>`_ from tier4/feature/traffic_light_group
