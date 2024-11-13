@@ -23,27 +23,27 @@ namespace math
 namespace arithmetic
 {
 template <typename T>
-auto isApproximatelyEqualTo(T a, T b)
+constexpr auto isApproximatelyEqualTo(T a, T b) -> bool
 {
   return std::abs(a - b) <=
          (std::numeric_limits<T>::epsilon() * std::max(std::abs(a), std::abs(b)));
 }
 
 template <typename T>
-auto isEssentiallyEqualTo(T a, T b)
+constexpr auto isEssentiallyEqualTo(T a, T b) -> bool
 {
   return std::abs(a - b) <=
          (std::numeric_limits<T>::epsilon() * std::min(std::abs(a), std::abs(b)));
 }
 
 template <typename T>
-auto isDefinitelyLessThan(T a, T b)
+constexpr auto isDefinitelyLessThan(T a, T b) -> bool
 {
   return (b - a) > (std::numeric_limits<T>::epsilon() * std::max(std::abs(a), std::abs(b)));
 }
 
 template <typename T>
-auto isDefinitelyGreaterThan(T a, T b)
+constexpr auto isDefinitelyGreaterThan(T a, T b) -> bool
 {
   return (a - b) > (std::numeric_limits<T>::epsilon() * std::max(std::abs(a), std::abs(b)));
 }
