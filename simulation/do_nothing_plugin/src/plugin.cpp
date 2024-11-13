@@ -18,6 +18,8 @@
 #include <geometry/quaternion/slerp.hpp>
 #include <geometry/vector3/hypot.hpp>
 #include <geometry/vector3/operator.hpp>
+#include <geometry_msgs/msg/accel.hpp>
+#include <geometry_msgs/msg/twist.hpp>
 
 namespace entity_behavior
 {
@@ -152,7 +154,10 @@ auto interpolateEntityStatusFromPolylineTrajectory(
 }  // namespace follow_trajectory
 }  // namespace do_nothing_behavior
 
-void DoNothingBehavior::configure(const rclcpp::Logger &) {}
+void DoNothingBehavior::configure(const rclcpp::Logger &)
+{
+  /// @note The do nothing plugin currently does not use rclcpp::Logger and the configure function is no operation.
+}
 
 void DoNothingBehavior::update(double current_time, double step_time)
 {
