@@ -23,8 +23,10 @@ namespace geometry
 {
 bool isIntersect2D(const LineSegment & line0, const LineSegment & line1)
 {
-  const auto &p0 = line0.start_point, &q0 = line0.end_point;
-  const auto &p1 = line1.start_point, &q1 = line1.end_point;
+  const auto & p0 = line0.start_point;
+  const auto & q0 = line0.end_point;
+  const auto & p1 = line1.start_point;
+  const auto & q1 = line1.end_point;
 
   const int relative_position_p0 = line1.relativePointPosition2D(p0);
   const int relative_position_q0 = line1.relativePointPosition2D(q0);
