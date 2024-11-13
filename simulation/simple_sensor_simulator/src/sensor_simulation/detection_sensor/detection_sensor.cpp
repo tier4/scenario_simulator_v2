@@ -31,6 +31,13 @@
 
 namespace simple_sensor_simulator
 {
+
+auto altitudeDifference(const geometry_msgs::Pose & pose1, const geometry_msgs::Pose & pose2)
+  -> double
+{
+  return std::abs(pose1.position().z() - pose2.position().z());
+}
+
 auto distance(const geometry_msgs::Pose & pose1, const geometry_msgs::Pose & pose2)
 {
   return std::hypot(
@@ -322,6 +329,7 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
     auto is_in_range = [&](const auto & status) {
       return not isEgoEntityStatusToWhichThisSensorIsAttached(status) and
              distance(status.pose(), ego_entity_status->pose()) <= configuration_.range() and
+             altitudeDifference(status.pose(), ego_entity_status->pose()) < 5.0 and
              (configuration_.detect_all_objects_in_range() or
               std::find(
                 lidar_detected_entities.begin(), lidar_detected_entities.end(), status.name()) !=

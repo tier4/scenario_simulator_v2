@@ -322,7 +322,7 @@ auto ActionNode::getDistanceToTargetEntityPolygon(
   double width_extension_left, double length_extension_front, double length_extension_rear) const
   -> std::optional<double>
 {
-  if (status.laneMatchingSucceed()) {
+  if (status.laneMatchingSucceed() && isAltitudeCompatible(status)) {
     const auto polygon = math::geometry::transformPoints(
       status.getMapPose(), math::geometry::getPointsFromBbox(
                              status.getBoundingBox(), width_extension_right, width_extension_left,
@@ -330,6 +330,15 @@ auto ActionNode::getDistanceToTargetEntityPolygon(
     return spline.getCollisionPointIn2D(polygon, false);
   }
   return std::nullopt;
+}
+
+auto ActionNode::isAltitudeCompatible(
+  const traffic_simulator::CanonicalizedEntityStatus & status) const -> bool
+{
+  return hdmap_utils->isAltitudeMatching(
+    hdmap_utils->getAltitude(canonicalized_entity_status->getLaneletPose()),
+    hdmap_utils->getAltitude(status.getLaneletPose()),
+    default_matching_altitude_for_lanelet_pose_calculation);
 }
 
 auto ActionNode::getDistanceToConflictingEntity(
@@ -381,7 +390,7 @@ auto ActionNode::getConflictingEntityStatusOnLane(const lanelet::Ids & route_lan
   auto conflicting_lanes = hdmap_utils->getConflictingLaneIds(route_lanelets);
   for (const auto & status : other_entity_status) {
     if (
-      status.second.laneMatchingSucceed() &&
+      status.second.laneMatchingSucceed() && isAltitudeCompatible(status.second) &&
       std::count(
         conflicting_lanes.begin(), conflicting_lanes.end(), status.second.getLaneletId()) >= 1) {
       conflicting_entity_status.emplace_back(status.second);
