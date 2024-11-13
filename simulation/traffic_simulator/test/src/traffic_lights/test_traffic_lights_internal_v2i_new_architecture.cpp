@@ -12,6 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#if __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)
+
+/**
+ * These tests are almost identical to tests in `test_traffic_lights_internal_v2i.cpp` but they use
+ * autoware_perception_msgs::msg::TrafficLightGroupArray instead of
+ * autoware_perception_msgs::msg::TrafficSignalArray
+ */
+
 #include <gtest/gtest.h>
 
 #include "../expect_eq_macros.hpp"
@@ -22,21 +30,22 @@ constexpr double timing_eps = 1e-3;
 constexpr double frequency_eps = 0.5;
 
 // Define V2I type for use in tests with V2I traffic lights only
-using V2ITrafficLightsTest = TrafficLightsInternalTest<traffic_simulator::V2ITrafficLights>;
+using V2ITrafficLightsTestNewArchitecture =
+  TrafficLightsInternalTestNewArchitecture<traffic_simulator::V2ITrafficLights>;
 
-TEST_F(V2ITrafficLightsTest, startUpdate_publishSignals)
+TEST_F(V2ITrafficLightsTestNewArchitecture, startUpdate_publishSignals)
 {
   using namespace autoware_perception_msgs::msg;
 
   this->lights->setTrafficLightsState(this->id, "red solidOn circle, yellow flashing circle");
   this->lights->setTrafficLightsConfidence(this->id, 0.7);
 
-  std::vector<TrafficSignalArray> signals;
+  std::vector<TrafficLightGroupArray> signals;
 
-  rclcpp::Subscription<TrafficSignalArray>::SharedPtr subscriber =
-    this->node_ptr->create_subscription<TrafficSignalArray>(
+  rclcpp::Subscription<TrafficLightGroupArray>::SharedPtr subscriber =
+    this->node_ptr->create_subscription<TrafficLightGroupArray>(
       "/perception/traffic_light_recognition/external/traffic_signals", 10,
-      [&signals](const TrafficSignalArray::SharedPtr msg_in) { signals.push_back(*msg_in); });
+      [&signals](const TrafficLightGroupArray::SharedPtr msg_in) { signals.push_back(*msg_in); });
 
   this->lights->startUpdate(20.0);
 
@@ -51,11 +60,11 @@ TEST_F(V2ITrafficLightsTest, startUpdate_publishSignals)
   for (std::size_t i = 0; i < signals.size(); ++i) {
     stamps.push_back(signals[i].stamp);
 
-    const auto & one_message = signals[i].signals;
+    const auto & one_message = signals[i].traffic_light_groups;
     std::string info = "signals message number " + std::to_string(i);
 
     EXPECT_EQ(one_message.size(), static_cast<std::size_t>(1)) << info;
-    EXPECT_EQ(one_message[0].traffic_signal_id, signal_id) << info;
+    EXPECT_EQ(one_message[0].traffic_light_group_id, signal_id) << info;
 
     EXPECT_EQ(one_message[0].elements.size(), static_cast<std::size_t>(2)) << info;
 
@@ -79,19 +88,19 @@ TEST_F(V2ITrafficLightsTest, startUpdate_publishSignals)
   EXPECT_NEAR(actual_frequency, expected_frequency, frequency_eps);
 }
 
-TEST_F(V2ITrafficLightsTest, startUpdate_publishSignalsLegacy)
+TEST_F(V2ITrafficLightsTestNewArchitecture, startUpdate_publishSignalsLegacy)
 {
   using namespace autoware_perception_msgs::msg;
 
   this->lights->setTrafficLightsState(this->id, "red solidOn circle, yellow flashing circle");
   this->lights->setTrafficLightsConfidence(this->id, 0.7);
 
-  std::vector<TrafficSignalArray> signals;
+  std::vector<TrafficLightGroupArray> signals;
 
-  rclcpp::Subscription<TrafficSignalArray>::SharedPtr subscriber =
-    this->node_ptr->create_subscription<TrafficSignalArray>(
+  rclcpp::Subscription<TrafficLightGroupArray>::SharedPtr subscriber =
+    this->node_ptr->create_subscription<TrafficLightGroupArray>(
       "/v2x/traffic_signals", 10,
-      [&signals](const TrafficSignalArray::SharedPtr msg_in) { signals.push_back(*msg_in); });
+      [&signals](const TrafficLightGroupArray::SharedPtr msg_in) { signals.push_back(*msg_in); });
 
   this->lights->startUpdate(20.0);
 
@@ -106,11 +115,11 @@ TEST_F(V2ITrafficLightsTest, startUpdate_publishSignalsLegacy)
   for (std::size_t i = 0; i < signals.size(); ++i) {
     stamps.push_back(signals[i].stamp);
 
-    const auto & one_message = signals[i].signals;
+    const auto & one_message = signals[i].traffic_light_groups;
     std::string info = "signals message number " + std::to_string(i);
 
     EXPECT_EQ(one_message.size(), static_cast<std::size_t>(1)) << info;
-    EXPECT_EQ(one_message[0].traffic_signal_id, signal_id) << info;
+    EXPECT_EQ(one_message[0].traffic_light_group_id, signal_id) << info;
 
     EXPECT_EQ(one_message[0].elements.size(), static_cast<std::size_t>(2)) << info;
 
@@ -133,19 +142,19 @@ TEST_F(V2ITrafficLightsTest, startUpdate_publishSignalsLegacy)
   EXPECT_NEAR(actual_frequency, expected_frequency, frequency_eps);
 }
 
-TEST_F(V2ITrafficLightsTest, resetUpdate_publishSignals)
+TEST_F(V2ITrafficLightsTestNewArchitecture, resetUpdate_publishSignals)
 {
   using namespace autoware_perception_msgs::msg;
 
   this->lights->setTrafficLightsState(this->id, "red solidOn circle, yellow flashing circle");
   this->lights->setTrafficLightsConfidence(this->id, 0.7);
 
-  std::vector<TrafficSignalArray> signals, signals_reset;
+  std::vector<TrafficLightGroupArray> signals, signals_reset;
 
-  rclcpp::Subscription<TrafficSignalArray>::SharedPtr subscriber =
-    this->node_ptr->create_subscription<TrafficSignalArray>(
+  rclcpp::Subscription<TrafficLightGroupArray>::SharedPtr subscriber =
+    this->node_ptr->create_subscription<TrafficLightGroupArray>(
       "/perception/traffic_light_recognition/external/traffic_signals", 10,
-      [&signals](const TrafficSignalArray::SharedPtr msg_in) { signals.push_back(*msg_in); });
+      [&signals](const TrafficLightGroupArray::SharedPtr msg_in) { signals.push_back(*msg_in); });
 
   this->lights->startUpdate(20.0);
 
@@ -155,9 +164,9 @@ TEST_F(V2ITrafficLightsTest, resetUpdate_publishSignals)
     rclcpp::spin_some(this->node_ptr);
   }
 
-  subscriber = this->node_ptr->create_subscription<TrafficSignalArray>(
+  subscriber = this->node_ptr->create_subscription<TrafficLightGroupArray>(
     "/perception/traffic_light_recognition/external/traffic_signals", 10,
-    [&signals_reset](const TrafficSignalArray::SharedPtr msg_in) {
+    [&signals_reset](const TrafficLightGroupArray::SharedPtr msg_in) {
       signals_reset.push_back(*msg_in);
     });
 
@@ -172,11 +181,11 @@ TEST_F(V2ITrafficLightsTest, resetUpdate_publishSignals)
   for (std::size_t i = 0; i < signals.size(); ++i) {
     stamps.push_back(signals[i].stamp);
 
-    const auto & one_message = signals[i].signals;
+    const auto & one_message = signals[i].traffic_light_groups;
     std::string info = "signals message number " + std::to_string(i);
 
     EXPECT_EQ(one_message.size(), static_cast<std::size_t>(1)) << info;
-    EXPECT_EQ(one_message[0].traffic_signal_id, signal_id) << info;
+    EXPECT_EQ(one_message[0].traffic_light_group_id, signal_id) << info;
 
     EXPECT_EQ(one_message[0].elements.size(), static_cast<std::size_t>(2)) << info;
 
@@ -194,11 +203,11 @@ TEST_F(V2ITrafficLightsTest, resetUpdate_publishSignals)
   for (std::size_t i = 0; i < signals_reset.size(); ++i) {
     stamps_reset.push_back(signals_reset[i].stamp);
 
-    const auto & one_message = signals_reset[i].signals;
+    const auto & one_message = signals_reset[i].traffic_light_groups;
     std::string info = "signals message number " + std::to_string(i);
 
     EXPECT_EQ(one_message.size(), static_cast<std::size_t>(1)) << info;
-    EXPECT_EQ(one_message[0].traffic_signal_id, signal_id) << info;
+    EXPECT_EQ(one_message[0].traffic_light_group_id, signal_id) << info;
 
     EXPECT_EQ(one_message[0].elements.size(), static_cast<std::size_t>(2)) << info;
 
@@ -230,19 +239,19 @@ TEST_F(V2ITrafficLightsTest, resetUpdate_publishSignals)
   }
 }
 
-TEST_F(V2ITrafficLightsTest, resetUpdate_publishSignalsLegacy)
+TEST_F(V2ITrafficLightsTestNewArchitecture, resetUpdate_publishSignalsLegacy)
 {
   using namespace autoware_perception_msgs::msg;
 
   this->lights->setTrafficLightsState(this->id, "red solidOn circle, yellow flashing circle");
   this->lights->setTrafficLightsConfidence(this->id, 0.7);
 
-  std::vector<TrafficSignalArray> signals, signals_reset;
+  std::vector<TrafficLightGroupArray> signals, signals_reset;
 
-  rclcpp::Subscription<TrafficSignalArray>::SharedPtr subscriber =
-    this->node_ptr->create_subscription<TrafficSignalArray>(
+  rclcpp::Subscription<TrafficLightGroupArray>::SharedPtr subscriber =
+    this->node_ptr->create_subscription<TrafficLightGroupArray>(
       "/v2x/traffic_signals", 10,
-      [&signals](const TrafficSignalArray::SharedPtr msg_in) { signals.push_back(*msg_in); });
+      [&signals](const TrafficLightGroupArray::SharedPtr msg_in) { signals.push_back(*msg_in); });
 
   this->lights->startUpdate(20.0);
 
@@ -252,8 +261,8 @@ TEST_F(V2ITrafficLightsTest, resetUpdate_publishSignalsLegacy)
     rclcpp::spin_some(this->node_ptr);
   }
 
-  subscriber = this->node_ptr->create_subscription<TrafficSignalArray>(
-    "/v2x/traffic_signals", 10, [&signals_reset](const TrafficSignalArray::SharedPtr msg_in) {
+  subscriber = this->node_ptr->create_subscription<TrafficLightGroupArray>(
+    "/v2x/traffic_signals", 10, [&signals_reset](const TrafficLightGroupArray::SharedPtr msg_in) {
       signals_reset.push_back(*msg_in);
     });
 
@@ -268,11 +277,11 @@ TEST_F(V2ITrafficLightsTest, resetUpdate_publishSignalsLegacy)
   for (std::size_t i = 0; i < signals.size(); ++i) {
     stamps.push_back(signals[i].stamp);
 
-    const auto & one_message = signals[i].signals;
+    const auto & one_message = signals[i].traffic_light_groups;
     std::string info = "signals message number " + std::to_string(i);
 
     EXPECT_EQ(one_message.size(), static_cast<std::size_t>(1)) << info;
-    EXPECT_EQ(one_message[0].traffic_signal_id, signal_id) << info;
+    EXPECT_EQ(one_message[0].traffic_light_group_id, signal_id) << info;
 
     EXPECT_EQ(one_message[0].elements.size(), static_cast<std::size_t>(2)) << info;
 
@@ -290,11 +299,11 @@ TEST_F(V2ITrafficLightsTest, resetUpdate_publishSignalsLegacy)
   for (std::size_t i = 0; i < signals_reset.size(); ++i) {
     stamps_reset.push_back(signals_reset[i].stamp);
 
-    const auto & one_message = signals_reset[i].signals;
+    const auto & one_message = signals_reset[i].traffic_light_groups;
     std::string info = "signals message number " + std::to_string(i);
 
     EXPECT_EQ(one_message.size(), static_cast<std::size_t>(1)) << info;
-    EXPECT_EQ(one_message[0].traffic_signal_id, signal_id) << info;
+    EXPECT_EQ(one_message[0].traffic_light_group_id, signal_id) << info;
 
     EXPECT_EQ(one_message[0].elements.size(), static_cast<std::size_t>(2)) << info;
 
@@ -325,3 +334,5 @@ TEST_F(V2ITrafficLightsTest, resetUpdate_publishSignalsLegacy)
     EXPECT_NEAR(actual_frequency, expected_frequency, frequency_eps);
   }
 }
+
+#endif  // __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)
