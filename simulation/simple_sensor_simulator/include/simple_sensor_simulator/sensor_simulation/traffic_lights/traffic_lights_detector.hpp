@@ -15,7 +15,6 @@
 #ifndef SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__TRAFFIC_LIGHTS__TRAFFIC_LIGHTS_DETECTOR_HPP_
 #define SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__TRAFFIC_LIGHTS__TRAFFIC_LIGHTS_DETECTOR_HPP_
 
-#include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
 #include <autoware_perception_msgs/msg/traffic_signal_array.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <simulation_interface/conversions.hpp>
