@@ -110,7 +110,7 @@ OverlayObject::OverlayObject(
 
 OverlayObject::~OverlayObject()
 {
-  hide();
+  this->hide();
   panel_material_->unload();
   Ogre::MaterialManager::getSingleton().remove(panel_material_->getName());
 }

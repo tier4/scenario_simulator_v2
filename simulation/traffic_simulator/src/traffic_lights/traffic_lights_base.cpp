@@ -107,17 +107,6 @@ auto TrafficLightsBase::generateUpdateTrafficLightsRequest() const
   return update_traffic_lights_request;
 }
 
-auto TrafficLightsBase::generateTrafficSimulatorV1Msg() const
-  -> traffic_simulator_msgs::msg::TrafficLightArrayV1
-{
-  traffic_simulator_msgs::msg::TrafficLightArrayV1 traffic_lights_message;
-  for (const auto & [id, traffic_light] : traffic_lights_map_) {
-    traffic_lights_message.traffic_lights.push_back(
-      static_cast<traffic_simulator_msgs::msg::TrafficLightV1>(traffic_light));
-  }
-  return traffic_lights_message;
-}
-
 // private
 auto TrafficLightsBase::isTrafficLightAdded(const lanelet::Id traffic_light_id) const -> bool
 {
