@@ -3,6 +3,7 @@ target_link_libraries(test_traffic_light traffic_simulator)
 
 ament_add_gtest(test_traffic_lights
   test_traffic_lights_internal.cpp
+  test_traffic_lights_internal_v2i.cpp
   test_traffic_lights.cpp
 )
 target_link_libraries(test_traffic_lights traffic_simulator)
