@@ -42,10 +42,10 @@ PolylineTrajectoryFollower::PolylineTrajectoryFollower(
 }
 
 template <typename T>
-auto is_infinite_vec3_like(const T & vec) -> bool
+auto isfinite_vec3(const T & vec) -> bool
 {
   static_assert(math::geometry::IsLikeVector3<std::decay_t<decltype(vec)>>::value);
-  return not std::isfinite(vec.x) or not std::isfinite(vec.y) or not std::isfinite(vec.z);
+  return std::isfinite(vec.x) and std::isfinite(vec.y) and std::isfinite(vec.z);
 }
 
 auto distance_along_lanelet(
@@ -149,7 +149,7 @@ auto PolylineTrajectoryFollower::getValidatedEntityDesiredVelocity(
                                   .x(std::cos(pitch) * std::cos(yaw) * desired_speed)
                                   .y(std::cos(pitch) * std::sin(yaw) * desired_speed)
                                   .z(std::sin(pitch) * desired_speed);
-  if (is_infinite_vec3_like(desired_velocity)) {
+  if (not isfinite_vec3(desired_velocity)) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
@@ -631,7 +631,7 @@ auto PolylineTrajectoryFollower::getValidatedEntityPosition() const noexcept(fal
   -> geometry_msgs::msg::Point
 {
   const auto entity_position = entity_status.pose.position;
-  if (is_infinite_vec3_like(entity_position)) {
+  if (not isfinite_vec3(entity_position)) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
@@ -650,7 +650,7 @@ auto PolylineTrajectoryFollower::getValidatedEntityTargetPosition(
       "attempted to dereference an element of an empty PolylineTrajectory");
   }
   const auto target_position = polyline_trajectory.shape.vertices.front().position.position;
-  if (is_infinite_vec3_like(target_position)) {
+  if (not isfinite_vec3(target_position)) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
