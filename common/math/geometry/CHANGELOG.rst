@@ -21,6 +21,18 @@ Changelog for package geometry
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+5.1.1 (2024-11-13)
+------------------
+* Merge pull request `#1439 <https://github.com/tier4/scenario_simulator_v2/issues/1439>`_ from tier4/fix/sonor-cloud-issue-5
+  fix sonor cloud issue
+* Refactor: Replace 'virtual' with 'override' in destructor for clarity
+* Merge branch 'master' into fix/sonor-cloud-issue-5
+* fix sonor cloud issue
+* Merge branch 'master' into fix/sonor-cloud-issue-5
+* Merge branch 'master' into fix/sonor-cloud-issue-5
+* fix sonor cloud issue
+* Contributors: Masaya Kataoka, Taiga, Taiga Takano
+
 5.1.0 (2024-11-12)
 ------------------
 * Merge branch 'master' into feature/traffic_light_group
