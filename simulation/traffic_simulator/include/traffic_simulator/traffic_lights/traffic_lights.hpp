@@ -17,6 +17,11 @@
 
 #include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
 #include <autoware_perception_msgs/msg/traffic_signal_array.hpp>
+
+#if __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)
+#include <autoware_perception_msgs/msg/traffic_light_group_array.hpp>
+#endif
+
 #include <traffic_simulator/traffic_lights/traffic_light_publisher.hpp>
 #include <traffic_simulator/traffic_lights/traffic_lights_base.hpp>
 
@@ -40,7 +45,8 @@ public:
 private:
   auto update() const -> void
   {
-    backward_compatible_publisher_ptr_->publish(*this);
+    backward_compatible_publisher_ptr_->publish(
+      clock_ptr_->now(), generateUpdateTrafficLightsRequest());
     if (isAnyTrafficLightChanged()) {
       marker_publisher_ptr_->deleteMarkers();
     }
@@ -70,8 +76,10 @@ public:
 private:
   auto update() const -> void override
   {
-    publisher_ptr_->publish(*this);
-    legacy_topic_publisher_ptr_->publish(*this);
+    const auto now = clock_ptr_->now();
+    const auto request = generateUpdateTrafficLightsRequest();
+    publisher_ptr_->publish(now, request);
+    legacy_topic_publisher_ptr_->publish(now, request);
     if (isAnyTrafficLightChanged()) {
       marker_publisher_ptr_->deleteMarkers();
     }
@@ -91,10 +99,16 @@ private:
        "/perception/traffic_light_recognition/internal/traffic_signals" for >= "awf/universe/20230906"
        "/perception/traffic_light_recognition/traffic_signals" for "awf/universe"
     */
-    if (architecture_type.find("awf/universe") != std::string::npos) {
+    if (architecture_type <= "awf/universe/20230906") {
       return std::make_unique<
         TrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>>(
         node_ptr, topic_name);
+#if __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)
+    } else if (architecture_type >= "awf/universe/20240605") {
+      return std::make_unique<
+        TrafficLightPublisher<autoware_perception_msgs::msg::TrafficLightGroupArray>>(
+        node_ptr, topic_name);
+#endif
     } else {
       throw common::SemanticError(
         "Unexpected architecture_type ", std::quoted(architecture_type),

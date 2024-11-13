@@ -23,22 +23,47 @@
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light.hpp>
 #include <traffic_simulator/traffic_lights/traffic_lights_base.hpp>
+#include <traffic_simulator_msgs/msg/traffic_light_array_v1.hpp>
+
+#if __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)
+
+#include <autoware_perception_msgs/msg/traffic_light_group_array.hpp>
+
+#endif  // __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)
 
 namespace traffic_simulator
 {
 class TrafficLightPublisherBase
 {
 public:
-  virtual auto publish(const TrafficLightsBase & traffic_lights) const -> void = 0;
+  virtual auto publish(
+    const rclcpp::Time & current_ros_time,
+    const simulation_api_schema::UpdateTrafficLightsRequest & request) const -> void = 0;
   virtual ~TrafficLightPublisherBase() = default;
 
-  static auto generateAutowareAutoPerceptionMsg(
-    const rclcpp::Time & current_ros_time, const TrafficLightsBase & traffic_lights)
-    -> autoware_auto_perception_msgs::msg::TrafficSignalArray;
+  static auto generateTrafficSimulatorV1Msg(
+    const rclcpp::Time & current_ros_time,
+    const simulation_api_schema::UpdateTrafficLightsRequest & request)
+    -> traffic_simulator_msgs::msg::TrafficLightArrayV1::UniquePtr;
 
-  static auto generateAutowarePerceptionMsg(
-    const rclcpp::Time & current_ros_time, const TrafficLightsBase & traffic_lights)
-    -> autoware_perception_msgs::msg::TrafficSignalArray;
+  static auto generateAutowareAutoPerceptionMsg(
+    const rclcpp::Time & current_ros_time,
+    const simulation_api_schema::UpdateTrafficLightsRequest & request, const std::string & frame)
+    -> autoware_auto_perception_msgs::msg::TrafficSignalArray::UniquePtr;
+
+  static auto generateAutowarePerceptionTrafficSignalMsg(
+    const rclcpp::Time & current_ros_time,
+    const simulation_api_schema::UpdateTrafficLightsRequest & request)
+    -> autoware_perception_msgs::msg::TrafficSignalArray::UniquePtr;
+
+#if __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)
+
+  static auto generateAutowarePerceptionTrafficLightGroupMsg(
+    const rclcpp::Time & current_ros_time,
+    const simulation_api_schema::UpdateTrafficLightsRequest & request)
+    -> autoware_perception_msgs::msg::TrafficLightGroupArray::UniquePtr;
+
+#endif  // __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)
 };
 
 template <typename MessageType>
@@ -48,10 +73,9 @@ public:
   template <typename NodeTypePointer>
   explicit TrafficLightPublisher(
     const NodeTypePointer & node_ptr, const std::string & topic_name,
-    const std::string & frame = "camera_link")
+    const std::string & frame = "camera_link")  // DIRTY HACK!!!
   : TrafficLightPublisherBase(),
     frame_(frame),
-    clock_ptr_(node_ptr->get_clock()),
     traffic_light_state_array_publisher_(rclcpp::create_publisher<MessageType>(
       node_ptr, topic_name, rclcpp::QoS(10).transient_local()))
   {
@@ -59,11 +83,13 @@ public:
 
   ~TrafficLightPublisher() override = default;
 
-  auto publish(const TrafficLightsBase & traffic_lights) const -> void override;
+  auto publish(
+    const rclcpp::Time & current_ros_time,
+    const simulation_api_schema::UpdateTrafficLightsRequest & request) const -> void override;
 
 private:
   const std::string frame_;
-  const rclcpp::Clock::SharedPtr clock_ptr_;
+
   const typename rclcpp::Publisher<MessageType>::SharedPtr traffic_light_state_array_publisher_;
 };
 }  // namespace traffic_simulator
