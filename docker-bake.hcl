@@ -14,6 +14,12 @@ target "base_arm64" {
   platforms = ["linux/arm64/v8"]
 }
 
+target "base_traffic_simulator" {
+  target = "build-stage"
+  dockerfile = "Dockerfile.traffic_simulator"
+  platforms = ["linux/amd64"]
+}
+
 target "humble" {
   inherits = [base]
   name = "humble_${base}"
