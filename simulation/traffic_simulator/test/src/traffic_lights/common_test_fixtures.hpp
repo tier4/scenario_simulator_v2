@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifndef TRAFFIC_SIMULATOR__TEST__TRAFFIC_LIGHTS__COMMON_TEST_FIXTURES_HPP_
+#define TRAFFIC_SIMULATOR__TEST__TRAFFIC_LIGHTS__COMMON_TEST_FIXTURES_HPP_
+
 #include <gtest/gtest.h>
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
@@ -83,3 +86,5 @@ public:
       return "V2ITrafficLights";
   }
 };
+
+#endif  // TRAFFIC_SIMULATOR__TEST__TRAFFIC_LIGHTS__COMMON_TEST_FIXTURES_HPP_
