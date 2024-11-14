@@ -18,6 +18,7 @@
 #include <openscenario_interpreter/syntax/reach_position_condition.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
 #include <openscenario_interpreter/utility/print.hpp>
+#include <openscenario_interpreter/visualization_buffer.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 
@@ -53,10 +54,65 @@ auto ReachPositionCondition::description() const -> String
   return description.str();
 }
 
-// @todo: after checking all the scenario work well with consider_z = true, remove this function and use std::hypot(x,y,z)
+// @todo: after checking all the scenario work well with consider_z = true, remove this function and
+// use std::hypot(x,y,z)
 static double hypot(const double x, const double y, const double z, const bool consider_z)
 {
   return consider_z ? std::hypot(x, y, z) : std::hypot(x, y);
+}
+
+auto ReachPositionCondition::visualize() const -> void
+{
+  const auto center = static_cast<geometry_msgs::msg::Pose>(position);
+  const auto radius = tolerance;
+
+  const auto make_radius_marker = [&](auto && triggering_entity) {
+    visualization_msgs::msg::Marker marker;
+    marker.header.frame_id = "map";
+    marker.header.stamp = rclcpp::Clock().now();
+    marker.ns = "reach_position_condition/" + triggering_entity.name();
+    marker.id = 1;
+    marker.type = visualization_msgs::msg::Marker::SPHERE;
+    marker.action = visualization_msgs::msg::Marker::ADD;
+    marker.pose = center;
+    marker.scale.x = radius;
+    marker.scale.y = radius;
+    marker.scale.z = radius;
+    marker.color.a = 0.3;
+    marker.color.r = 0.0;
+    marker.color.g = 1.0;
+    marker.color.b = 0.0;
+    return marker;
+  };
+
+  const auto make_label_marker = [&](auto && triggering_entity) {
+    visualization_msgs::msg::Marker marker;
+    marker.header.frame_id = "map";
+    marker.header.stamp = rclcpp::Clock().now();
+    marker.ns = "reach_position_condition/" + triggering_entity.name();
+    marker.id = 2;
+    marker.type = visualization_msgs::msg::Marker::TEXT_VIEW_FACING;
+    marker.action = visualization_msgs::msg::Marker::ADD;
+    marker.pose = center;
+    marker.pose.position.z += radius;
+    marker.text = "ReachPositionCondition\n" + triggering_entity.name() +
+                  "\ntolerance = " + std::to_string(tolerance);
+    marker.scale.z = 0.3;
+    marker.color.a = 0.8;
+    marker.color.r = 1.0;
+    marker.color.g = 1.0;
+    marker.color.b = 1.0;
+    return marker;
+  };
+
+  std::for_each(
+    triggering_entities.entity_refs.begin(), triggering_entities.entity_refs.end(),
+    [&](auto && triggering_entity) {
+      triggering_entity.apply([&](auto && object) {
+        add(make_radius_marker(object));
+        add(make_label_marker(object));
+      });
+    });
 }
 
 auto ReachPositionCondition::evaluate() -> Object
@@ -83,6 +139,8 @@ auto ReachPositionCondition::evaluate() -> Object
         triggering_entity, static_cast<geometry_msgs::msg::Pose>(position));
       return hypot(pose.position.x, pose.position.y, pose.position.z, consider_z);
     });
+
+  visualize();
 
   results.clear();
 
