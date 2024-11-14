@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <geometry/transform.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
@@ -63,7 +64,8 @@ static double hypot(const double x, const double y, const double z, const bool c
 
 auto ReachPositionCondition::visualize() const -> void
 {
-  const auto center = static_cast<geometry_msgs::msg::Pose>(position);
+  auto center = static_cast<geometry_msgs::msg::Pose>(position);
+  center.orientation.w = 0;
   const auto radius = tolerance;
 
   const auto make_radius_marker = [&](auto && triggering_entity) {
@@ -105,12 +107,36 @@ auto ReachPositionCondition::visualize() const -> void
     return marker;
   };
 
+  const auto make_distance_marker = [&](auto && triggering_entity) {
+    visualization_msgs::msg::Marker marker;
+    marker.header.frame_id = "map";
+    marker.header.stamp = rclcpp::Clock().now();
+    marker.ns = "reach_position_condition/" + triggering_entity.name();
+    marker.id = 3;
+    marker.type = visualization_msgs::msg::Marker::LINE_STRIP;
+    marker.action = visualization_msgs::msg::Marker::ADD;
+    auto relative_pose = makeNativeRelativeWorldPosition(center, triggering_entity.name());
+    marker.points.push_back(center.position);
+    auto entity_position = center.position;
+    entity_position.x -= relative_pose.position.x;
+    entity_position.y -= relative_pose.position.y;
+    entity_position.z -= relative_pose.position.z;
+    marker.points.push_back(entity_position);
+    marker.scale.x = 0.1;
+    marker.color.a = 0.8;
+    marker.color.r = 1.0;
+    marker.color.g = 0.0;
+    marker.color.b = 0.0;
+    return marker;
+  };
+
   std::for_each(
     triggering_entities.entity_refs.begin(), triggering_entities.entity_refs.end(),
     [&](auto && triggering_entity) {
       triggering_entity.apply([&](auto && object) {
         add(make_radius_marker(object));
         add(make_label_marker(object));
+        add(make_distance_marker(object));
       });
     });
 }
