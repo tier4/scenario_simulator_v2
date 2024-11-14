@@ -39,7 +39,7 @@ private:
   void onUpdate() override
   {
     if (api_.getCurrentTime() >= 0.1) {
-      if (api_.entityExists("ego") && !api_.entityExists("ego")) {
+      if (api_.entityExists("bob") && !api_.entityExists("ego")) {
         stop(cpp_mock_scenarios::Result::FAILURE);
       } else {
         stop(cpp_mock_scenarios::Result::SUCCESS);
