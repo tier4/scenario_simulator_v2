@@ -978,6 +978,7 @@ auto HdMapUtils::getPreviousRoadShoulderLanelet(const lanelet::Id lanelet_id) co
   return ids;
 }
 
+/// @todo add RoutingGraphType argument after supporting a routing graph with road shoulder lanelets
 auto HdMapUtils::getPreviousLaneletIds(const lanelet::Id lanelet_id) const -> lanelet::Ids
 {
   lanelet::Ids ids;
@@ -992,6 +993,7 @@ auto HdMapUtils::getPreviousLaneletIds(const lanelet::Id lanelet_id) const -> la
   return ids;
 }
 
+/// @todo add RoutingGraphType argument after fixing the bug to get next lanelet instead of previous one
 auto HdMapUtils::getPreviousLaneletIds(const lanelet::Ids & lanelet_ids) const -> lanelet::Ids
 {
   lanelet::Ids ids;
@@ -1002,12 +1004,12 @@ auto HdMapUtils::getPreviousLaneletIds(const lanelet::Ids & lanelet_ids) const -
 }
 
 auto HdMapUtils::getPreviousLaneletIds(
-  const lanelet::Id lanelet_id, const std::string & turn_direction) const -> lanelet::Ids
+  const lanelet::Id lanelet_id, const std::string & turn_direction,
+  const traffic_simulator::RoutingGraphType type) const -> lanelet::Ids
 {
   lanelet::Ids ids;
   const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
-  for (const auto & llt :
-       routing_graphs_->get(traffic_simulator::RoutingGraphType::VEHICLE)->previous(lanelet)) {
+  for (const auto & llt : routing_graphs_->get(type)->previous(lanelet)) {
     if (llt.attributeOr("turn_direction", "else") == turn_direction) {
       ids.push_back(llt.id());
     }
@@ -1016,11 +1018,12 @@ auto HdMapUtils::getPreviousLaneletIds(
 }
 
 auto HdMapUtils::getPreviousLaneletIds(
-  const lanelet::Ids & lanelet_ids, const std::string & turn_direction) const -> lanelet::Ids
+  const lanelet::Ids & lanelet_ids, const std::string & turn_direction,
+  const traffic_simulator::RoutingGraphType type) const -> lanelet::Ids
 {
   lanelet::Ids ids;
   for (const auto & id : lanelet_ids) {
-    ids += getPreviousLaneletIds(id, turn_direction);
+    ids += getPreviousLaneletIds(id, turn_direction, type);
   }
   return sortAndUnique(ids);
 }
@@ -1037,6 +1040,7 @@ auto HdMapUtils::getNextRoadShoulderLanelet(const lanelet::Id lanelet_id) const 
   return ids;
 }
 
+/// @todo add RoutingGraphType argument after supporting a routing graph with road shoulder lanelets
 auto HdMapUtils::getNextLaneletIds(const lanelet::Id lanelet_id) const -> lanelet::Ids
 {
   lanelet::Ids ids;
@@ -1051,6 +1055,7 @@ auto HdMapUtils::getNextLaneletIds(const lanelet::Id lanelet_id) const -> lanele
   return ids;
 }
 
+/// @todo add RoutingGraphType argument after supporting a routing graph with road shoulder lanelets
 auto HdMapUtils::getNextLaneletIds(const lanelet::Ids & lanelet_ids) const -> lanelet::Ids
 {
   lanelet::Ids ids;
@@ -1061,12 +1066,12 @@ auto HdMapUtils::getNextLaneletIds(const lanelet::Ids & lanelet_ids) const -> la
 }
 
 auto HdMapUtils::getNextLaneletIds(
-  const lanelet::Id lanelet_id, const std::string & turn_direction) const -> lanelet::Ids
+  const lanelet::Id lanelet_id, const std::string & turn_direction,
+  const traffic_simulator::RoutingGraphType type) const -> lanelet::Ids
 {
   lanelet::Ids ids;
   const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
-  for (const auto & llt :
-       routing_graphs_->get(traffic_simulator::RoutingGraphType::VEHICLE)->following(lanelet)) {
+  for (const auto & llt : routing_graphs_->get(type)->following(lanelet)) {
     if (llt.attributeOr("turn_direction", "else") == turn_direction) {
       ids.push_back(llt.id());
     }
@@ -1075,11 +1080,12 @@ auto HdMapUtils::getNextLaneletIds(
 }
 
 auto HdMapUtils::getNextLaneletIds(
-  const lanelet::Ids & lanelet_ids, const std::string & turn_direction) const -> lanelet::Ids
+  const lanelet::Ids & lanelet_ids, const std::string & turn_direction,
+  const traffic_simulator::RoutingGraphType type) const -> lanelet::Ids
 {
   lanelet::Ids ids;
   for (const auto & id : lanelet_ids) {
-    ids += getNextLaneletIds(id, turn_direction);
+    ids += getNextLaneletIds(id, turn_direction, type);
   }
   return sortAndUnique(ids);
 }

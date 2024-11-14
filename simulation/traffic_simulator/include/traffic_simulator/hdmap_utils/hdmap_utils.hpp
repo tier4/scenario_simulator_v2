@@ -202,23 +202,31 @@ public:
 
   auto getNextLaneletIds(const lanelet::Ids &) const -> lanelet::Ids;
 
-  auto getNextLaneletIds(const lanelet::Ids &, const std::string & turn_direction) const
-    -> lanelet::Ids;
+  auto getNextLaneletIds(
+    const lanelet::Ids &, const std::string & turn_direction,
+    const traffic_simulator::RoutingGraphType type =
+      traffic_simulator::RoutingGraphType::VEHICLE) const -> lanelet::Ids;
 
   auto getNextLaneletIds(const lanelet::Id) const -> lanelet::Ids;
 
-  auto getNextLaneletIds(const lanelet::Id, const std::string & turn_direction) const
-    -> lanelet::Ids;
+  auto getNextLaneletIds(
+    const lanelet::Id, const std::string & turn_direction,
+    const traffic_simulator::RoutingGraphType type =
+      traffic_simulator::RoutingGraphType::VEHICLE) const -> lanelet::Ids;
 
   auto getPreviousLaneletIds(const lanelet::Ids &) const -> lanelet::Ids;
 
-  auto getPreviousLaneletIds(const lanelet::Ids &, const std::string & turn_direction) const
-    -> lanelet::Ids;
+  auto getPreviousLaneletIds(
+    const lanelet::Ids &, const std::string & turn_direction,
+    const traffic_simulator::RoutingGraphType type =
+      traffic_simulator::RoutingGraphType::VEHICLE) const -> lanelet::Ids;
 
   auto getPreviousLaneletIds(const lanelet::Id) const -> lanelet::Ids;
 
-  auto getPreviousLaneletIds(const lanelet::Id, const std::string & turn_direction) const
-    -> lanelet::Ids;
+  auto getPreviousLaneletIds(
+    const lanelet::Id, const std::string & turn_direction,
+    const traffic_simulator::RoutingGraphType type =
+      traffic_simulator::RoutingGraphType::VEHICLE) const -> lanelet::Ids;
 
   auto getPreviousLanelets(const lanelet::Id, const double distance = 100) const -> lanelet::Ids;
 
