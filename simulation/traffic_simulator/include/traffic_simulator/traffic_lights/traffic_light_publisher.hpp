@@ -27,7 +27,9 @@ namespace traffic_simulator
 class TrafficLightPublisherBase
 {
 public:
-  virtual auto publish(const TrafficLightsBase & traffic_lights) const -> void = 0;
+  virtual auto publish(
+    const rclcpp::Time & current_ros_time,
+    const simulation_api_schema::UpdateTrafficLightsRequest & request) const -> void = 0;
   virtual ~TrafficLightPublisherBase() = default;
 };
 
@@ -38,10 +40,9 @@ public:
   template <typename NodeTypePointer>
   explicit TrafficLightPublisher(
     const NodeTypePointer & node_ptr, const std::string & topic_name,
-    const std::string & frame = "camera_link")
+    const std::string & frame = "camera_link")  // DIRTY HACK!!!
   : TrafficLightPublisherBase(),
     frame_(frame),
-    clock_ptr_(node_ptr->get_clock()),
     traffic_light_state_array_publisher_(rclcpp::create_publisher<MessageType>(
       node_ptr, topic_name, rclcpp::QoS(10).transient_local()))
   {
@@ -49,11 +50,13 @@ public:
 
   ~TrafficLightPublisher() override = default;
 
-  auto publish(const TrafficLightsBase & traffic_lights) const -> void override;
+  auto publish(
+    const rclcpp::Time & current_ros_time,
+    const simulation_api_schema::UpdateTrafficLightsRequest & request) const -> void override;
 
 private:
   const std::string frame_;
-  const rclcpp::Clock::SharedPtr clock_ptr_;
+
   const typename rclcpp::Publisher<MessageType>::SharedPtr traffic_light_state_array_publisher_;
 };
 }  // namespace traffic_simulator

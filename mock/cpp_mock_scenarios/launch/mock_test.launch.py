@@ -78,7 +78,7 @@ def on_stdout_output(event: launch.Event) -> None:
 
 
 def architecture_types():
-    return ["awf/universe", "awf/universe/20230906"]
+    return ["awf/universe", "awf/universe/20230906", "awf/universe/20240605"]
 
 
 def default_autoware_launch_package_of(architecture_type):
@@ -89,6 +89,7 @@ def default_autoware_launch_package_of(architecture_type):
     return {
         "awf/universe": "autoware_launch",
         "awf/universe/20230906": "autoware_launch",
+        "awf/universe/20240605": "autoware_launch",
     }[architecture_type]
 
 
@@ -100,6 +101,7 @@ def default_autoware_launch_file_of(architecture_type):
     return {
         "awf/universe": "planning_simulator.launch.xml",
         "awf/universe/20230906": "planning_simulator.launch.xml",
+        "awf/universe/20240605": "planning_simulator.launch.xml",
     }[architecture_type]
 
 
