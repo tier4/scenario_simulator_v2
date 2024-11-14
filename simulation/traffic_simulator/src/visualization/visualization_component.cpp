@@ -198,7 +198,7 @@ const visualization_msgs::msg::MarkerArray VisualizationComponent::generateMarke
     goal_pose_marker.ns = status.name;
     ret.markers.emplace_back(goal_pose_marker);
     visualization_msgs::msg::Marker goal_pose_text_marker;
-    goal_pose_text_marker.action = = visualization_msgs::msg::Marker::DELETE;
+    goal_pose_text_marker.action = visualization_msgs::msg::Marker::DELETE;
     goal_pose_text_marker.id = 100 + int(goal_pose_max_size - 1);
     goal_pose_text_marker.ns = status.name;
     ret.markers.emplace_back(goal_pose_text_marker);
@@ -407,7 +407,7 @@ const visualization_msgs::msg::MarkerArray VisualizationComponent::generateMarke
     waypoints_marker.header.stamp = stamp;
     waypoints_marker.ns = status.name;
     waypoints_marker.id = 4;
-    waypoints_marker.action = wvisualization_msgs::msg::Marker::ADD;
+    waypoints_marker.action = visualization_msgs::msg::Marker::ADD;
     waypoints_marker.type = visualization_msgs::msg::Marker::TRIANGLE_LIST;
     size_t num_points = 20;
     waypoints_marker.points = spline.getPolygon(status.bounding_box.dimensions.y, num_points);
