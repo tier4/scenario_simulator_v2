@@ -891,30 +891,9 @@ auto HdMapUtils::getRoute(
   const lanelet::Id from_lanelet_id, const lanelet::Id to_lanelet_id, bool allow_lane_change) const
   -> lanelet::Ids
 {
-  auto & route_cache = routing_graphs_->getRouteCache(traffic_simulator::RoutingGraphType::VEHICLE);
-  if (route_cache.exists(from_lanelet_id, to_lanelet_id, allow_lane_change)) {
-    return route_cache.getRoute(from_lanelet_id, to_lanelet_id, allow_lane_change);
-  }
-  lanelet::Ids ids;
-  const auto lanelet = lanelet_map_ptr_->laneletLayer.get(from_lanelet_id);
-  const auto to_lanelet = lanelet_map_ptr_->laneletLayer.get(to_lanelet_id);
-  lanelet::Optional<lanelet::routing::Route> route =
-    routing_graphs_->get(traffic_simulator::RoutingGraphType::VEHICLE)
-      ->getRoute(lanelet, to_lanelet, 0, allow_lane_change);
-  if (!route) {
-    route_cache.appendData(from_lanelet_id, to_lanelet_id, allow_lane_change, ids);
-    return ids;
-  }
-  lanelet::routing::LaneletPath shortest_path = route->shortestPath();
-  if (shortest_path.empty()) {
-    route_cache.appendData(from_lanelet_id, to_lanelet_id, allow_lane_change, ids);
-    return ids;
-  }
-  for (auto lane_itr = shortest_path.begin(); lane_itr != shortest_path.end(); lane_itr++) {
-    ids.push_back(lane_itr->id());
-  }
-  route_cache.appendData(from_lanelet_id, to_lanelet_id, allow_lane_change, ids);
-  return ids;
+  return routing_graphs_->getRoute(
+    from_lanelet_id, to_lanelet_id, lanelet_map_ptr_, allow_lane_change,
+    traffic_simulator::RoutingGraphType::VEHICLE);
 }
 
 auto HdMapUtils::getCenterPointsSpline(const lanelet::Id lanelet_id) const
@@ -2239,6 +2218,36 @@ RouteCache & HdMapUtils::RoutingGraphs::getRouteCache(
     default:
       throw std::runtime_error("Invalid routing graph type");
   }
+}
+
+auto HdMapUtils::RoutingGraphs::getRoute(
+  const lanelet::Id from_lanelet_id, const lanelet::Id to_lanelet_id,
+  lanelet::LaneletMapPtr lanelet_map_ptr, bool allow_lane_change,
+  const traffic_simulator::RoutingGraphType type) -> lanelet::Ids
+{
+  auto & route_cache = getRouteCache(type);
+  if (route_cache.exists(from_lanelet_id, to_lanelet_id, allow_lane_change)) {
+    return route_cache.getRoute(from_lanelet_id, to_lanelet_id, allow_lane_change);
+  }
+  lanelet::Ids ids;
+  const auto lanelet = lanelet_map_ptr->laneletLayer.get(from_lanelet_id);
+  const auto to_lanelet = lanelet_map_ptr->laneletLayer.get(to_lanelet_id);
+  lanelet::Optional<lanelet::routing::Route> route =
+    get(type)->getRoute(lanelet, to_lanelet, 0, allow_lane_change);
+  if (!route) {
+    route_cache.appendData(from_lanelet_id, to_lanelet_id, allow_lane_change, ids);
+    return ids;
+  }
+  lanelet::routing::LaneletPath shortest_path = route->shortestPath();
+  if (shortest_path.empty()) {
+    route_cache.appendData(from_lanelet_id, to_lanelet_id, allow_lane_change, ids);
+    return ids;
+  }
+  for (auto lane_itr = shortest_path.begin(); lane_itr != shortest_path.end(); lane_itr++) {
+    ids.push_back(lane_itr->id());
+  }
+  route_cache.appendData(from_lanelet_id, to_lanelet_id, allow_lane_change, ids);
+  return ids;
 }
 
 }  // namespace hdmap_utils

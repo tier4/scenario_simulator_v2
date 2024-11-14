@@ -348,10 +348,16 @@ private:
     [[nodiscard]] lanelet::traffic_rules::TrafficRulesPtr getRules(
       const traffic_simulator::RoutingGraphType type) const;
 
-    [[nodiscard]] RouteCache & getRouteCache(const traffic_simulator::RoutingGraphType type);
+    [[nodiscard]] auto getRoute(
+      const lanelet::Id from_lanelet_id, const lanelet::Id to_lanelet_id,
+      lanelet::LaneletMapPtr lanelet_map_ptr, const bool allow_lane_change,
+      const traffic_simulator::RoutingGraphType type) -> lanelet::Ids;
 
   private:
+    [[nodiscard]] RouteCache & getRouteCache(const traffic_simulator::RoutingGraphType type);
+
     RuleWithGraph vehicle;
+
     RuleWithGraph pedestrian;
   };
 
