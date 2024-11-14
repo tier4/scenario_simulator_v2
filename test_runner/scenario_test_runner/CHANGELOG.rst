@@ -35,6 +35,24 @@ Changelog for package scenario_test_runner
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+5.2.0 (2024-11-14)
+------------------
+* Merge pull request `#1423 <https://github.com/tier4/scenario_simulator_v2/issues/1423>`_ from tier4/feature/by_object_type
+  Support `ByType` element in `CollisionCondition`
+* Merge branch 'master' into feature/by_object_type
+* Merge branch 'master' into feature/by_object_type
+* Merge branch 'master' into feature/by_object_type
+* Use lower_snake_case identifier name
+  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
+* Merge branch 'master' into feature/by_object_type
+* Add collision condition scenario
+* Use upper camel case
+* Use sample_vehicle
+* Remove unused parameter
+* Apply formatter
+* Add "by object type" test scenario
+* Contributors: Tatsuya Yamasaki, abco20
+
 5.1.1 (2024-11-13)
 ------------------
 * Merge branch 'master' into fix/sonor-cloud-issue-5
