@@ -351,10 +351,10 @@ private:
       RouteCache route_cache;
     };
 
-    [[nodiscard]] lanelet::routing::RoutingGraphPtr get(
+    [[nodiscard]] lanelet::routing::RoutingGraphPtr routing_graph(
       const traffic_simulator::RoutingGraphType type) const;
 
-    [[nodiscard]] lanelet::traffic_rules::TrafficRulesPtr getRules(
+    [[nodiscard]] lanelet::traffic_rules::TrafficRulesPtr traffic_rule(
       const traffic_simulator::RoutingGraphType type) const;
 
     [[nodiscard]] auto getRoute(
@@ -363,7 +363,7 @@ private:
       const traffic_simulator::RoutingGraphType type) -> lanelet::Ids;
 
   private:
-    [[nodiscard]] RouteCache & getRouteCache(const traffic_simulator::RoutingGraphType type);
+    [[nodiscard]] RouteCache & route_cache(const traffic_simulator::RoutingGraphType type);
 
     RuleWithGraph vehicle;
 
