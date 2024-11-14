@@ -12,19 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__DATA_TYPE__ROUTING_GRAPH_TYPE_HPP_
-#define TRAFFIC_SIMULATOR__DATA_TYPE__ROUTING_GRAPH_TYPE_HPP_
-
-#include <iostream>
+#include <traffic_simulator/data_type/routing_graph_type.hpp>
 
 namespace traffic_simulator
 {
-inline namespace routing_graph_type
+namespace routing_graph_type
 {
-enum class RoutingGraphType : std::uint8_t { VEHICLE, PEDESTRIAN };
-
-char const * to_string(const RoutingGraphType &);
+char const * to_string(const RoutingGraphType & type)
+{
+  switch (type) {
+    case RoutingGraphType::VEHICLE:
+      return "VEHICLE";
+    case RoutingGraphType::PEDESTRIAN:
+      return "PEDESTRIAN";
+    default:
+      return "UNKNOWN";
+  }
+}
 }  // namespace routing_graph_type
 }  // namespace traffic_simulator
-
-#endif  // TRAFFIC_SIMULATOR__DATA_TYPE__ROUTING_GRAPH_TYPE_HPP_
