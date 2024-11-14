@@ -21,6 +21,55 @@ Changelog for package geometry
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+5.1.1 (2024-11-13)
+------------------
+* Merge pull request `#1439 <https://github.com/tier4/scenario_simulator_v2/issues/1439>`_ from tier4/fix/sonor-cloud-issue-5
+  fix sonor cloud issue
+* Refactor: Replace 'virtual' with 'override' in destructor for clarity
+* Merge branch 'master' into fix/sonor-cloud-issue-5
+* fix sonor cloud issue
+* Merge branch 'master' into fix/sonor-cloud-issue-5
+* Merge branch 'master' into fix/sonor-cloud-issue-5
+* fix sonor cloud issue
+* Contributors: Masaya Kataoka, Taiga, Taiga Takano
+
+5.1.0 (2024-11-12)
+------------------
+* Merge branch 'master' into feature/traffic_light_group
+* Merge remote-tracking branch 'origin/master' into feature/traffic_light_group
+  # Conflicts:
+  #	simulation/simple_sensor_simulator/include/simple_sensor_simulator/sensor_simulation/sensor_simulation.hpp
+  #	simulation/traffic_simulator/include/traffic_simulator/entity/entity_manager.hpp
+  #	simulation/traffic_simulator/src/traffic_lights/traffic_light_publisher.cpp
+* Merge branch 'master' into feature/traffic_light_group
+* Merge branch 'master' into feature/traffic_light_group
+* Merge branch 'master' into feature/traffic_light_group
+* Merge branch 'master' into feature/traffic_light_group
+* Merge branch 'master' into feature/traffic_light_group
+* Merge branch 'master' into feature/traffic_light_group
+* Contributors: Kotaro Yoshimoto
+
+5.0.2 (2024-11-11)
+------------------
+* Merge pull request `#1431 <https://github.com/tier4/scenario_simulator_v2/issues/1431>`_ from tier4/fix/sonor-cloud-issue
+  fix/sonor-cloud-issue
+* Merge branch 'master' into fix/sonor-cloud-issue
+* Merge branch 'master' into fix/sonor-cloud-issue
+* adding const to objects.
+* Defined individually in each statement.
+* adding const to large objects.
+* Fix declaration mismatch.
+* Remove unnecessary const from the return value of the function.
+* Contributors: Masaya Kataoka, Taiga, Taiga Takano
+
+5.0.1 (2024-11-11)
+------------------
+* Merge pull request `#1428 <https://github.com/tier4/scenario_simulator_v2/issues/1428>`_ from tier4/fix/dont-float-loop
+  Refactor curvature sampling loop to avoid using float counter
+* add comment
+* Refactor curvature sampling loop to avoid using float counter
+* Contributors: Masaya Kataoka, Taiga Takano
+
 5.0.0 (2024-11-08)
 ------------------
 * Merge remote-tracking branch 'tier4/master' into RJD-1057-remove-traffic-lights-from-entity-manager

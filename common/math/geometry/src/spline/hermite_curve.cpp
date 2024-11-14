@@ -94,13 +94,13 @@ std::set<double> HermiteCurve::getCollisionPointsIn2D(
   }
   std::set<double> s_values;
   for (size_t i = 0; i < (n - 1); i++) {
-    const auto p0 = polygon[i];
-    const auto p1 = polygon[i + 1];
+    const auto & p0 = polygon[i];
+    const auto & p1 = polygon[i + 1];
     s_values.merge(getCollisionPointsIn2D(p0, p1, search_backward, denormalize_s));
   }
   if (close_start_end) {
-    const auto p0 = polygon[n - 1];
-    const auto p1 = polygon[0];
+    const auto & p0 = polygon[n - 1];
+    const auto & p1 = polygon[0];
     s_values.merge(getCollisionPointsIn2D(p0, p1, search_backward, denormalize_s));
   }
   return s_values;
@@ -202,7 +202,8 @@ std::optional<double> HermiteCurve::getCollisionPointIn2D(
 std::optional<double> HermiteCurve::getSValue(
   const geometry_msgs::msg::Pose & pose, double threshold_distance, bool denormalize_s) const
 {
-  geometry_msgs::msg::Point p0, p1;
+  geometry_msgs::msg::Point p0;
+  geometry_msgs::msg::Point p1;
   p0.y = threshold_distance;
   p1.y = -threshold_distance;
   const auto line = math::geometry::transformPoints(pose, {p0, p1});
@@ -313,13 +314,19 @@ std::pair<double, double> HermiteCurve::get2DMinMaxCurvatureValue() const
 {
   std::pair<double, double> ret;
   std::vector<double> curvatures;
-  /**
-   * @brief 0.1 is a sampling resolution of the curvature
-   */
-  for (double s = 0; s <= 1; s = s + 0.1) {
+
+  /// @note Specifies the number of samples. The curve is divided into 10 segments for calculation.
+  constexpr int sample_count = 10;
+
+  /// @note Sampling resolution. Calculated as 1.0 divided by sample_count.
+  constexpr double resolution = 1.0 / sample_count;
+
+  for (int i = 0; i <= sample_count; ++i) {
+    double s = i * resolution;
     double curvature = get2DCurvature(s);
     curvatures.push_back(curvature);
   }
+
   ret.first = *std::min_element(curvatures.begin(), curvatures.end());
   ret.second = *std::max_element(curvatures.begin(), curvatures.end());
   return ret;

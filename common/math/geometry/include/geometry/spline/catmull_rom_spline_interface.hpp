@@ -29,6 +29,7 @@ namespace geometry
 class CatmullRomSplineInterface
 {
 public:
+  virtual ~CatmullRomSplineInterface() = default;
   virtual double getLength() const = 0;
   virtual std::optional<double> getCollisionPointIn2D(
     const std::vector<geometry_msgs::msg::Point> & polygon,
