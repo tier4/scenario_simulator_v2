@@ -139,8 +139,8 @@ public:
     const lanelet::Id traffic_light_id) const -> std::optional<double>;
 
   auto getFollowingLanelets(
-    const lanelet::Id lanelet_id, const lanelet::Ids & candidate_lanelet_ids,
-    const double distance = 100, const bool include_self = true) const -> lanelet::Ids;
+    const lanelet::Id current_lanelet_id, const lanelet::Ids & route, const double horizon = 100,
+    const bool include_current_lanelet_id = true) const -> lanelet::Ids;
 
   auto getFollowingLanelets(
     const lanelet::Id, const double distance = 100, const bool include_self = true) const
@@ -228,7 +228,8 @@ public:
     const traffic_simulator::RoutingGraphType type =
       traffic_simulator::RoutingGraphType::VEHICLE) const -> lanelet::Ids;
 
-  auto getPreviousLanelets(const lanelet::Id, const double distance = 100) const -> lanelet::Ids;
+  auto getPreviousLanelets(const lanelet::Id, const double backward_horizon = 100) const
+    -> lanelet::Ids;
 
   auto getRightBound(const lanelet::Id) const -> std::vector<geometry_msgs::msg::Point>;
 
