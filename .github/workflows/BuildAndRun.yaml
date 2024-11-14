@@ -18,7 +18,6 @@ on:
   push:
     branches:
       - master
-      - fix/sonar-cloud-coverage-chris
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -131,10 +130,9 @@ jobs:
       - name: Upload Gcov result
         uses: actions/upload-artifact@v4
         with:
-          name: coverage.xml
+          name: coverage${{ matrix.cmake_build_type }}.xml
           path: coverage.xml
           retention-days: 1
-          
 
       - name: Run SonarCloud scan
         env:
@@ -143,6 +141,10 @@ jobs:
           SONAR_HOST_URL: https://sonarcloud.io/
         working-directory: src/scenario_simulator_v2/
         run: sonar-scanner --define sonar.cfamily.compile-commands="bw-output/compile_commands.json"
+
+      - name: Debug
+        if: ${{ always() }}
+        uses: mxschmitt/action-tmate@v3
 
 #      - name: Basic test
 #        run: |
