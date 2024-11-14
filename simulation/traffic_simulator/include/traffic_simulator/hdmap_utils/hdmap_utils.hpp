@@ -45,6 +45,7 @@
 #include <string>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 #include <traffic_simulator/data_type/lane_change.hpp>
+#include <traffic_simulator/data_type/routing_graph_type.hpp>
 #include <traffic_simulator/hdmap_utils/cache.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
@@ -321,17 +322,40 @@ private:
    *  Declared mutable for caching
    */
   // @{
-  mutable RouteCache route_cache_;
   mutable CenterPointsCache center_points_cache_;
   mutable LaneletLengthCache lanelet_length_cache_;
   // @}
 
   lanelet::LaneletMapPtr lanelet_map_ptr_;
-  lanelet::routing::RoutingGraphConstPtr vehicle_routing_graph_ptr_;
-  lanelet::traffic_rules::TrafficRulesPtr traffic_rules_vehicle_ptr_;
-  lanelet::routing::RoutingGraphConstPtr pedestrian_routing_graph_ptr_;
-  lanelet::traffic_rules::TrafficRulesPtr traffic_rules_pedestrian_ptr_;
+
   lanelet::ConstLanelets shoulder_lanelets_;
+
+  class RoutingGraphs
+  {
+  public:
+    explicit RoutingGraphs(const lanelet::LaneletMapPtr & lanelet_map);
+
+    struct RuleWithGraph
+    {
+      lanelet::traffic_rules::TrafficRulesPtr rules;
+      lanelet::routing::RoutingGraphPtr graph;
+      RouteCache route_cache;
+    };
+
+    [[nodiscard]] lanelet::routing::RoutingGraphPtr get(
+      const traffic_simulator::RoutingGraphType type) const;
+
+    [[nodiscard]] lanelet::traffic_rules::TrafficRulesPtr getRules(
+      const traffic_simulator::RoutingGraphType type) const;
+
+    [[nodiscard]] RouteCache & getRouteCache(const traffic_simulator::RoutingGraphType type);
+
+  private:
+    RuleWithGraph vehicle;
+    RuleWithGraph pedestrian;
+  };
+
+  std::unique_ptr<RoutingGraphs> routing_graphs_;
 
   template <typename Lanelet>
   auto getLaneletIds(const std::vector<Lanelet> & lanelets) const -> lanelet::Ids
