@@ -202,7 +202,7 @@ auto PolylineTrajectoryFollower::getValidatedEntityDesiredVelocity(
     variable dynamic_constraints_ignorable. the value of the
     variable is `followingMode == position`.
   */
-  if (polyline_trajectory.dynamic_constraints_ignorable) {
+  if (not polyline_trajectory.dynamic_constraints_ignorable) {
     /*
       Note: The vector returned if
       dynamic_constraints_ignorable == true ignores parameters

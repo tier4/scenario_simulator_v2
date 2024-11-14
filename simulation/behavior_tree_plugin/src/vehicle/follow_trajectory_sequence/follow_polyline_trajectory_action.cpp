@@ -56,7 +56,7 @@ auto FollowPolylineTrajectoryAction::providedPorts() -> BT::PortsList
 
 auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
 {
-  auto getTargetSpeed = [&]() -> double {
+  const auto getTargetSpeed = [this]() -> double {
     if (target_speed.has_value()) {
       return target_speed.value();
     } else {
