@@ -59,7 +59,6 @@ private:
        TrafficLightsDetector in SimpleSensorSimulator publishes using architecture-dependent topics:
        "/perception/traffic_light_recognition/internal/traffic_signals" for >= "awf/universe/20240605"
        "/perception/traffic_light_recognition/internal/traffic_signals" for == "awf/universe/20230906"
-       "/perception/traffic_light_recognition/traffic_signals" for "awf/universe"
 
        V2ITrafficLights in TrafficSimulator publishes publishes using architecture-independent topics ("awf/universe..."): 
        "/v2x/traffic_signals" and "/perception/traffic_light_recognition/external/traffic_signals"
