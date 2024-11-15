@@ -21,6 +21,11 @@ Changelog for package openscenario_interpreter_example
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+5.2.2 (2024-11-15)
+------------------
+* Merge branch 'master' into fix/sonor-cloud-issue-6
+* Contributors: Taiga
+
 5.2.1 (2024-11-14)
 ------------------
 * Merge branch 'master' into RJD-1333/previous_following_lanelets

@@ -48,13 +48,15 @@ auto PolynomialSolver::solveLinearEquation(
   const double a, const double b, const double min_value, const double max_value) const
   -> std::vector<double>
 {
-  const auto solve_without_limit = [this](const double a, const double b) -> std::vector<double> {
+  const auto solve_without_limit =
+    [this](const double coef_a, const double coef_b) -> std::vector<double> {
     /// @note In this case, ax*b = 0 (a=0) can cause division by zero. So give special treatment to this case.
-    if (isApproximatelyEqualTo(a, 0)) {
-      if (isApproximatelyEqualTo(b, 0)) {
+    if (isApproximatelyEqualTo(coef_a, 0)) {
+      if (isApproximatelyEqualTo(coef_b, 0)) {
         THROW_SIMULATION_ERROR(
-          "Not computable x because of the linear equation ", a, " x + ", b, "=0, and a = ", a,
-          ", b = ", b, " is very close to zero ,so any value of x will be the solution.",
+          "Not computable x because of the linear equation ", coef_a, " x + ", coef_b,
+          "=0, and a = ", coef_a, ", b = ", coef_b,
+          " is very close to zero ,so any value of x will be the solution.",
           "There are no expected cases where this exception is thrown.",
           "Please contact the scenario_simulator_v2 developers, ",
           "especially Masaya Kataoka (@hakuturu583).");
@@ -63,7 +65,7 @@ auto PolynomialSolver::solveLinearEquation(
       return {};
     }
     /// @note In this case, ax*b = 0 (a!=0, b!=0) so x = -b/a is a only solution.
-    return {-b / a};
+    return {-coef_b / coef_a};
   };
 
   /// @note No fallback because of the order cannot be lowered any further.
@@ -75,13 +77,16 @@ auto PolynomialSolver::solveQuadraticEquation(
   const double max_value) const -> std::vector<double>
 {
   const auto solve_without_limit =
-    [this](const double a, const double b, const double c) -> std::vector<double> {
-    if (const double discriminant = b * b - 4 * a * c; isApproximatelyEqualTo(discriminant, 0)) {
-      return {-b / (2 * a)};
+    [this](const double coef_a, const double coef_b, const double coef_c) -> std::vector<double> {
+    if (const double discriminant = coef_b * coef_b - 4 * coef_a * coef_c;
+        isApproximatelyEqualTo(discriminant, 0)) {
+      return {-coef_b / (2 * coef_a)};
     } else if (discriminant < 0) {
       return {};
     } else {
-      return {(-b - std::sqrt(discriminant)) / (2 * a), (-b + std::sqrt(discriminant)) / (2 * a)};
+      return {
+        (-coef_b - std::sqrt(discriminant)) / (2 * coef_a),
+        (-coef_b + std::sqrt(discriminant)) / (2 * coef_a)};
     }
   };
 
@@ -95,34 +100,37 @@ auto PolynomialSolver::solveCubicEquation(
   const double a, const double b, const double c, const double d, const double min_value,
   const double max_value) const -> std::vector<double>
 {
+  const auto get_real_values =
+    [](const std::vector<std::complex<double>> & complex_values) -> std::vector<double> {
+    /**
+       * @note Function that takes a complex number as input and returns the real part if it is a real number (imaginary part is 0) 
+       * or std::nullopt if it is an imaginary or complex number.
+       */
+    const auto is_real_value = [](const std::complex<double> & complex_value) {
+      constexpr double epsilon = std::numeric_limits<double>::epsilon();
+      return (std::abs(complex_value.imag()) <= epsilon)
+               ? std::optional<double>(complex_value.real())
+               : std::nullopt;
+    };
+    /// @note Iterate all complex values and check the value is real value or not.
+    std::vector<double> real_values = {};
+    std::for_each(
+      complex_values.begin(), complex_values.end(),
+      [&real_values, is_real_value](const auto & complex_value) mutable {
+        if (const auto real_value = is_real_value(complex_value)) {
+          real_values.push_back(real_value.value());
+        }
+      });
+    return real_values;
+  };
+
   const auto solve_without_limit =
-    [this](const double a, const double b, const double c, const double d) {
+    [=](const double coef_a, const double coef_b, const double coef_c, const double coef_d) {
       /// @note Function that takes a std::vector of complex numbers and selects only real numbers from it and returns them
-      const auto get_real_values =
-        [](const std::vector<std::complex<double>> & complex_values) -> std::vector<double> {
-        /**
-         * @note Function that takes a complex number as input and returns the real part if it is a real number (imaginary part is 0) 
-         * or std::nullopt if it is an imaginary or complex number.
-         */
-        const auto is_real_value = [](const std::complex<double> & complex_value) {
-          constexpr double epsilon = std::numeric_limits<double>::epsilon();
-          return (std::abs(complex_value.imag()) <= epsilon)
-                   ? std::optional<double>(complex_value.real())
-                   : std::nullopt;
-        };
-        /// @note Iterate all complex values and check the value is real value or not.
-        std::vector<double> real_values = {};
-        std::for_each(
-          complex_values.begin(), complex_values.end(),
-          [&real_values, is_real_value](const auto & complex_value) mutable {
-            if (const auto real_value = is_real_value(complex_value)) {
-              real_values.push_back(real_value.value());
-            }
-          });
-        return real_values;
-      };
+
       /// @note Finds the complex solution of the monic cubic equation and returns only those that are real numbers.
-      return get_real_values(solveMonicCubicEquationWithComplex(b / a, c / a, d / a));
+      return get_real_values(
+        solveMonicCubicEquationWithComplex(coef_b / coef_a, coef_c / coef_a, coef_d / coef_a));
     };
 
   /// @note Fallback to quadratic equation solver if a = 0
@@ -139,13 +147,13 @@ auto PolynomialSolver::filterByRange(
    * @note Function to check if value exists between [min_value,max_value] considering the tolerance,
    * returning std::nullopt if not present. If not, return std::nullopt, otherwise return value.
    */
-  const auto is_in_range = [](const double value, const double min_value, const double max_value) {
-    if (min_value <= value && value <= max_value) {
+  const auto is_in_range = [](const double value, const double min, const double max) {
+    if (min <= value && value <= max) {
       return std::optional(value);
-    } else if (std::abs(value - max_value) <= tolerance) {
-      return std::optional(max_value);
-    } else if (std::abs(value - min_value) <= tolerance) {
-      return std::optional(min_value);
+    } else if (std::abs(value - max) <= tolerance) {
+      return std::optional(max);
+    } else if (std::abs(value - min) <= tolerance) {
+      return std::optional(min);
     }
     return std::optional<double>();
   };
@@ -169,10 +177,13 @@ auto PolynomialSolver::solveMonicCubicEquationWithComplex(
    * @note Tschirnhaus transformation, transform into x^3 + 3q*x + 2r = 0
    * @sa https://oshima-gakushujuku.com/blog/math/formula-qubic-equation/
    */
-  const auto tschirnhaus_transformation = [](const auto a, const auto b, const auto c) {
-    /// @note The first element of the return value is q, the second element is r
-    return std::tuple<double, double>((a * a - 3 * b) / 9, (a * (2 * a * a - 9 * b) + 27 * c) / 54);
-  };
+  const auto tschirnhaus_transformation =
+    [](const auto coef_a, const auto coef_b, const auto coef_c) {
+      /// @note The first element of the return value is q, the second element is r
+      return std::tuple<double, double>(
+        (coef_a * coef_a - 3 * coef_b) / 9,
+        (coef_a * (2 * coef_a * coef_a - 9 * coef_b) + 27 * coef_c) / 54);
+    };
 
   const auto solve_without_limit =
     // clang-format off
