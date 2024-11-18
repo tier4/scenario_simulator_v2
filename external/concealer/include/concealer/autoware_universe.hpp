@@ -109,8 +109,6 @@ public:
 
   auto getControlModeReport() const -> ControlModeReport override;
 
-  auto setAutonomousMode() -> void override;
-
   auto setManualMode() -> void override;
 };
 

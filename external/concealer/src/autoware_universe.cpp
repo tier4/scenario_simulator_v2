@@ -197,11 +197,6 @@ auto AutowareUniverse::getControlModeReport() const -> ControlModeReport
   return message;
 }
 
-auto AutowareUniverse::setAutonomousMode() -> void
-{
-  current_control_mode.store(ControlModeReport::AUTONOMOUS);
-}
-
 auto AutowareUniverse::setManualMode() -> void
 {
   current_control_mode.store(ControlModeReport::MANUAL);

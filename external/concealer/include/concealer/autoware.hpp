@@ -76,8 +76,6 @@ public:
 
   auto set(const geometry_msgs::msg::Pose &) -> void;
 
-  virtual auto setAutonomousMode() -> void = 0;
-
   virtual auto setManualMode() -> void = 0;
 
   virtual auto rethrow() -> void;

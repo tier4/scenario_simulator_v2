@@ -86,7 +86,6 @@ class FieldOperatorApplicationFor<AutowareUniverse>
   ServiceWithValidation<tier4_rtc_msgs::srv::AutoModeWithModule>                  requestSetRtcAutoMode;
   ServiceWithValidation<tier4_external_api_msgs::srv::SetVelocityLimit>           requestSetVelocityLimit;
   ServiceWithValidation<autoware_adapi_v1_msgs::srv::ChangeOperationMode>         requestEnableAutowareControl;
-  ServiceWithValidation<autoware_adapi_v1_msgs::srv::ChangeOperationMode>         requestDisableAutowareControl;
   // clang-format on
 
   tier4_rtc_msgs::msg::CooperateStatusArray latest_cooperate_status_array;
@@ -192,7 +191,6 @@ public:
     requestSetRtcAutoMode("/api/external/set/rtc_auto_mode", *this),
     requestSetVelocityLimit("/api/autoware/set/velocity_limit", *this),
     requestEnableAutowareControl("/api/operation_mode/enable_autoware_control", *this),
-    requestDisableAutowareControl("/api/operation_mode/disable_autoware_control", *this),
     getPathWithLaneId("/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", rclcpp::QoS(1), *this)
   // clang-format on
   {
@@ -234,8 +232,6 @@ public:
   auto setVelocityLimit(double) -> void override;
 
   auto enableAutowareControl() -> void override;
-
-  auto disableAutowareControl() -> void override;
 };
 }  // namespace concealer
 
