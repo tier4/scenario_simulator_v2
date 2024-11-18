@@ -35,6 +35,15 @@ Changelog for package scenario_test_runner
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+5.3.2 (2024-11-18)
+------------------
+* Merge pull request `#1453 <https://github.com/tier4/scenario_simulator_v2/issues/1453>`_ from tier4/fix/interpreter/assign-route-action
+  Fix/interpreter/assign route action
+* Merge branch 'master' into fix/interpreter/assign-route-action
+* Merge branch 'master' into fix/interpreter/assign-route-action
+* Add new test scenario `RoutingAction.AssignRouteAction.yaml`
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
 5.3.1 (2024-11-18)
 ------------------
 * Merge branch 'master' into refactor/routing_graph
