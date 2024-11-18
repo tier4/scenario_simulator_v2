@@ -65,6 +65,8 @@ HdMapUtils::HdMapUtils(
 
   lanelet_map_ptr_ = lanelet::load(lanelet2_map_path.string(), projector, &errors);
 
+  routing_graphs_ = std::make_unique<RoutingGraphs>(lanelet_map_ptr_);
+
   if (not errors.empty()) {
     std::stringstream ss;
     const auto * separator = "";
@@ -75,17 +77,11 @@ HdMapUtils::HdMapUtils(
     THROW_SIMULATION_ERROR("Failed to load lanelet map (", ss.str(), ")");
   }
   overwriteLaneletsCenterline();
-  traffic_rules_vehicle_ptr_ = lanelet::traffic_rules::TrafficRulesFactory::create(
-    lanelet::Locations::Germany, lanelet::Participants::Vehicle);
-  vehicle_routing_graph_ptr_ =
-    lanelet::routing::RoutingGraph::build(*lanelet_map_ptr_, *traffic_rules_vehicle_ptr_);
-  traffic_rules_pedestrian_ptr_ = lanelet::traffic_rules::TrafficRulesFactory::create(
-    lanelet::Locations::Germany, lanelet::Participants::Pedestrian);
-  pedestrian_routing_graph_ptr_ =
-    lanelet::routing::RoutingGraph::build(*lanelet_map_ptr_, *traffic_rules_pedestrian_ptr_);
   std::vector<lanelet::routing::RoutingGraphConstPtr> all_graphs;
-  all_graphs.push_back(vehicle_routing_graph_ptr_);
-  all_graphs.push_back(pedestrian_routing_graph_ptr_);
+  all_graphs.push_back(
+    routing_graphs_->routing_graph(traffic_simulator::RoutingGraphType::VEHICLE));
+  all_graphs.push_back(
+    routing_graphs_->routing_graph(traffic_simulator::RoutingGraphType::PEDESTRIAN));
   shoulder_lanelets_ =
     lanelet::utils::query::shoulderLanelets(lanelet::utils::query::laneletLayer(lanelet_map_ptr_));
 }
@@ -230,12 +226,11 @@ auto HdMapUtils::countLaneChanges(
 
       if (auto followings = getNextLaneletIds(previous);
           std::find(followings.begin(), followings.end(), current) == followings.end()) {
-        traffic_simulator_msgs::msg::EntityType type;
-        type.type = traffic_simulator_msgs::msg::EntityType::VEHICLE;
-        if (auto lefts = getLeftLaneletIds(previous, type);
+        if (auto lefts = getLeftLaneletIds(previous, traffic_simulator::RoutingGraphType::VEHICLE);
             std::find(lefts.begin(), lefts.end(), current) != lefts.end()) {
           lane_changes.first++;
-        } else if (auto rights = getRightLaneletIds(previous, type);
+        } else if (auto rights =
+                     getRightLaneletIds(previous, traffic_simulator::RoutingGraphType::VEHICLE);
                    std::find(rights.begin(), rights.end(), current) != rights.end()) {
           lane_changes.second++;
         }
@@ -403,8 +398,8 @@ auto HdMapUtils::getConflictingLaneIds(const lanelet::Ids & lanelet_ids) const -
   lanelet::Ids ids;
   for (const auto & lanelet_id : lanelet_ids) {
     const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
-    const auto conflicting_lanelets =
-      lanelet::utils::getConflictingLanelets(vehicle_routing_graph_ptr_, lanelet);
+    const auto conflicting_lanelets = lanelet::utils::getConflictingLanelets(
+      routing_graphs_->routing_graph(traffic_simulator::RoutingGraphType::VEHICLE), lanelet);
     for (const auto & conflicting_lanelet : conflicting_lanelets) {
       ids.emplace_back(conflicting_lanelet.id());
     }
@@ -416,8 +411,9 @@ auto HdMapUtils::getConflictingCrosswalkIds(const lanelet::Ids & lanelet_ids) co
 {
   lanelet::Ids ids;
   std::vector<lanelet::routing::RoutingGraphConstPtr> graphs;
-  graphs.emplace_back(vehicle_routing_graph_ptr_);
-  graphs.emplace_back(pedestrian_routing_graph_ptr_);
+  graphs.emplace_back(routing_graphs_->routing_graph(traffic_simulator::RoutingGraphType::VEHICLE));
+  graphs.emplace_back(
+    routing_graphs_->routing_graph(traffic_simulator::RoutingGraphType::PEDESTRIAN));
   lanelet::routing::RoutingGraphContainer container(graphs);
   for (const auto & lanelet_id : lanelet_ids) {
     const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
@@ -552,7 +548,8 @@ auto HdMapUtils::matchToLane(
   auto matches =
     lanelet::matching::getDeterministicMatches(*lanelet_map_ptr_, obj, matching_distance);
   if (!include_crosswalk) {
-    matches = lanelet::matching::removeNonRuleCompliantMatches(matches, traffic_rules_vehicle_ptr_);
+    matches = lanelet::matching::removeNonRuleCompliantMatches(
+      matches, routing_graphs_->traffic_rule(traffic_simulator::RoutingGraphType::VEHICLE));
   }
   if (matches.empty()) {
     return std::nullopt;
@@ -681,11 +678,11 @@ auto HdMapUtils::toLaneletPoses(
   -> std::vector<traffic_simulator_msgs::msg::LaneletPose>
 {
   std::vector<traffic_simulator_msgs::msg::LaneletPose> ret;
-  traffic_simulator_msgs::msg::EntityType type;
-  type.type = traffic_simulator_msgs::msg::EntityType::VEHICLE;
   std::vector lanelet_ids = {lanelet_id};
-  lanelet_ids += getLeftLaneletIds(lanelet_id, type, include_opposite_direction);
-  lanelet_ids += getRightLaneletIds(lanelet_id, type, include_opposite_direction);
+  lanelet_ids += getLeftLaneletIds(
+    lanelet_id, traffic_simulator::RoutingGraphType::VEHICLE, include_opposite_direction);
+  lanelet_ids += getRightLaneletIds(
+    lanelet_id, traffic_simulator::RoutingGraphType::VEHICLE, include_opposite_direction);
   lanelet_ids += getPreviousLaneletIds(lanelet_ids);
   lanelet_ids += getNextLaneletIds(lanelet_ids);
   for (const auto & id : sortAndUnique(lanelet_ids)) {
@@ -736,7 +733,8 @@ auto HdMapUtils::getSpeedLimit(const lanelet::Ids & lanelet_ids) const -> double
   }
   for (auto itr = lanelet_ids.begin(); itr != lanelet_ids.end(); itr++) {
     const auto lanelet = lanelet_map_ptr_->laneletLayer.get(*itr);
-    const auto limit = traffic_rules_vehicle_ptr_->speedLimit(lanelet);
+    const auto limit = routing_graphs_->traffic_rule(traffic_simulator::RoutingGraphType::VEHICLE)
+                         ->speedLimit(lanelet);
     limits.push_back(lanelet::units::KmHQuantity(limit.speedLimit).value() / 3.6);
   }
   return *std::min_element(limits.begin(), limits.end());
@@ -777,13 +775,19 @@ auto HdMapUtils::getLaneChangeableLaneletId(
       target = lanelet.id();
       break;
     case traffic_simulator::lane_change::Direction::LEFT:
-      if (vehicle_routing_graph_ptr_->left(lanelet)) {
-        target = vehicle_routing_graph_ptr_->left(lanelet)->id();
+      if (routing_graphs_->routing_graph(traffic_simulator::RoutingGraphType::VEHICLE)
+            ->left(lanelet)) {
+        target = routing_graphs_->routing_graph(traffic_simulator::RoutingGraphType::VEHICLE)
+                   ->left(lanelet)
+                   ->id();
       }
       break;
     case traffic_simulator::lane_change::Direction::RIGHT:
-      if (vehicle_routing_graph_ptr_->right(lanelet)) {
-        target = vehicle_routing_graph_ptr_->right(lanelet)->id();
+      if (routing_graphs_->routing_graph(traffic_simulator::RoutingGraphType::VEHICLE)
+            ->right(lanelet)) {
+        target = routing_graphs_->routing_graph(traffic_simulator::RoutingGraphType::VEHICLE)
+                   ->right(lanelet)
+                   ->id();
       }
       break;
   }
@@ -902,28 +906,9 @@ auto HdMapUtils::getRoute(
   const lanelet::Id from_lanelet_id, const lanelet::Id to_lanelet_id, bool allow_lane_change) const
   -> lanelet::Ids
 {
-  if (route_cache_.exists(from_lanelet_id, to_lanelet_id, allow_lane_change)) {
-    return route_cache_.getRoute(from_lanelet_id, to_lanelet_id, allow_lane_change);
-  }
-  lanelet::Ids ids;
-  const auto lanelet = lanelet_map_ptr_->laneletLayer.get(from_lanelet_id);
-  const auto to_lanelet = lanelet_map_ptr_->laneletLayer.get(to_lanelet_id);
-  lanelet::Optional<lanelet::routing::Route> route =
-    vehicle_routing_graph_ptr_->getRoute(lanelet, to_lanelet, 0, allow_lane_change);
-  if (!route) {
-    route_cache_.appendData(from_lanelet_id, to_lanelet_id, allow_lane_change, ids);
-    return ids;
-  }
-  lanelet::routing::LaneletPath shortest_path = route->shortestPath();
-  if (shortest_path.empty()) {
-    route_cache_.appendData(from_lanelet_id, to_lanelet_id, allow_lane_change, ids);
-    return ids;
-  }
-  for (auto lane_itr = shortest_path.begin(); lane_itr != shortest_path.end(); lane_itr++) {
-    ids.push_back(lane_itr->id());
-  }
-  route_cache_.appendData(from_lanelet_id, to_lanelet_id, allow_lane_change, ids);
-  return ids;
+  return routing_graphs_->getRoute(
+    from_lanelet_id, to_lanelet_id, lanelet_map_ptr_, allow_lane_change,
+    traffic_simulator::RoutingGraphType::VEHICLE);
 }
 
 auto HdMapUtils::getCenterPointsSpline(const lanelet::Id lanelet_id) const
@@ -1008,11 +993,14 @@ auto HdMapUtils::getPreviousRoadShoulderLanelet(const lanelet::Id lanelet_id) co
   return ids;
 }
 
+/// @todo add RoutingGraphType argument after supporting a routing graph with road shoulder lanelets
 auto HdMapUtils::getPreviousLaneletIds(const lanelet::Id lanelet_id) const -> lanelet::Ids
 {
   lanelet::Ids ids;
   const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
-  for (const auto & llt : vehicle_routing_graph_ptr_->previous(lanelet)) {
+  for (const auto & llt :
+       routing_graphs_->routing_graph(traffic_simulator::RoutingGraphType::VEHICLE)
+         ->previous(lanelet)) {
     ids.push_back(llt.id());
   }
   for (const auto & id : getPreviousRoadShoulderLanelet(lanelet_id)) {
@@ -1021,6 +1009,7 @@ auto HdMapUtils::getPreviousLaneletIds(const lanelet::Id lanelet_id) const -> la
   return ids;
 }
 
+/// @todo add RoutingGraphType argument after fixing the bug to get next lanelet instead of previous one
 auto HdMapUtils::getPreviousLaneletIds(const lanelet::Ids & lanelet_ids) const -> lanelet::Ids
 {
   lanelet::Ids ids;
@@ -1031,11 +1020,12 @@ auto HdMapUtils::getPreviousLaneletIds(const lanelet::Ids & lanelet_ids) const -
 }
 
 auto HdMapUtils::getPreviousLaneletIds(
-  const lanelet::Id lanelet_id, const std::string & turn_direction) const -> lanelet::Ids
+  const lanelet::Id lanelet_id, const std::string & turn_direction,
+  const traffic_simulator::RoutingGraphType type) const -> lanelet::Ids
 {
   lanelet::Ids ids;
   const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
-  for (const auto & llt : vehicle_routing_graph_ptr_->previous(lanelet)) {
+  for (const auto & llt : routing_graphs_->routing_graph(type)->previous(lanelet)) {
     if (llt.attributeOr("turn_direction", "else") == turn_direction) {
       ids.push_back(llt.id());
     }
@@ -1044,11 +1034,12 @@ auto HdMapUtils::getPreviousLaneletIds(
 }
 
 auto HdMapUtils::getPreviousLaneletIds(
-  const lanelet::Ids & lanelet_ids, const std::string & turn_direction) const -> lanelet::Ids
+  const lanelet::Ids & lanelet_ids, const std::string & turn_direction,
+  const traffic_simulator::RoutingGraphType type) const -> lanelet::Ids
 {
   lanelet::Ids ids;
   for (const auto & id : lanelet_ids) {
-    ids += getPreviousLaneletIds(id, turn_direction);
+    ids += getPreviousLaneletIds(id, turn_direction, type);
   }
   return sortAndUnique(ids);
 }
@@ -1065,11 +1056,14 @@ auto HdMapUtils::getNextRoadShoulderLanelet(const lanelet::Id lanelet_id) const 
   return ids;
 }
 
+/// @todo add RoutingGraphType argument after supporting a routing graph with road shoulder lanelets
 auto HdMapUtils::getNextLaneletIds(const lanelet::Id lanelet_id) const -> lanelet::Ids
 {
   lanelet::Ids ids;
   const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
-  for (const auto & llt : vehicle_routing_graph_ptr_->following(lanelet)) {
+  for (const auto & llt :
+       routing_graphs_->routing_graph(traffic_simulator::RoutingGraphType::VEHICLE)
+         ->following(lanelet)) {
     ids.push_back(llt.id());
   }
   for (const auto & id : getNextRoadShoulderLanelet(lanelet_id)) {
@@ -1078,6 +1072,7 @@ auto HdMapUtils::getNextLaneletIds(const lanelet::Id lanelet_id) const -> lanele
   return ids;
 }
 
+/// @todo add RoutingGraphType argument after supporting a routing graph with road shoulder lanelets
 auto HdMapUtils::getNextLaneletIds(const lanelet::Ids & lanelet_ids) const -> lanelet::Ids
 {
   lanelet::Ids ids;
@@ -1088,11 +1083,12 @@ auto HdMapUtils::getNextLaneletIds(const lanelet::Ids & lanelet_ids) const -> la
 }
 
 auto HdMapUtils::getNextLaneletIds(
-  const lanelet::Id lanelet_id, const std::string & turn_direction) const -> lanelet::Ids
+  const lanelet::Id lanelet_id, const std::string & turn_direction,
+  const traffic_simulator::RoutingGraphType type) const -> lanelet::Ids
 {
   lanelet::Ids ids;
   const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
-  for (const auto & llt : vehicle_routing_graph_ptr_->following(lanelet)) {
+  for (const auto & llt : routing_graphs_->routing_graph(type)->following(lanelet)) {
     if (llt.attributeOr("turn_direction", "else") == turn_direction) {
       ids.push_back(llt.id());
     }
@@ -1101,11 +1097,12 @@ auto HdMapUtils::getNextLaneletIds(
 }
 
 auto HdMapUtils::getNextLaneletIds(
-  const lanelet::Ids & lanelet_ids, const std::string & turn_direction) const -> lanelet::Ids
+  const lanelet::Ids & lanelet_ids, const std::string & turn_direction,
+  const traffic_simulator::RoutingGraphType type) const -> lanelet::Ids
 {
   lanelet::Ids ids;
   for (const auto & id : lanelet_ids) {
-    ids += getNextLaneletIds(id, turn_direction);
+    ids += getNextLaneletIds(id, turn_direction, type);
   }
   return sortAndUnique(ids);
 }
@@ -1216,72 +1213,28 @@ auto HdMapUtils::getRightBound(const lanelet::Id lanelet_id) const
 }
 
 auto HdMapUtils::getLeftLaneletIds(
-  const lanelet::Id lanelet_id, const traffic_simulator_msgs::msg::EntityType & type,
+  const lanelet::Id lanelet_id, const traffic_simulator::RoutingGraphType type,
   const bool include_opposite_direction) const -> lanelet::Ids
 {
-  switch (type.type) {
-    case traffic_simulator_msgs::msg::EntityType::EGO:
-      if (include_opposite_direction) {
-        return getLaneletIds(
-          vehicle_routing_graph_ptr_->lefts(lanelet_map_ptr_->laneletLayer.get(lanelet_id)));
-      } else {
-        return getLaneletIds(vehicle_routing_graph_ptr_->adjacentLefts(
-          lanelet_map_ptr_->laneletLayer.get(lanelet_id)));
-      }
-    case traffic_simulator_msgs::msg::EntityType::VEHICLE:
-      if (include_opposite_direction) {
-        return getLaneletIds(
-          vehicle_routing_graph_ptr_->lefts(lanelet_map_ptr_->laneletLayer.get(lanelet_id)));
-      } else {
-        return getLaneletIds(vehicle_routing_graph_ptr_->adjacentLefts(
-          lanelet_map_ptr_->laneletLayer.get(lanelet_id)));
-      }
-    case traffic_simulator_msgs::msg::EntityType::PEDESTRIAN:
-      if (include_opposite_direction) {
-        return getLaneletIds(
-          pedestrian_routing_graph_ptr_->lefts(lanelet_map_ptr_->laneletLayer.get(lanelet_id)));
-      } else {
-        return getLaneletIds(pedestrian_routing_graph_ptr_->adjacentLefts(
-          lanelet_map_ptr_->laneletLayer.get(lanelet_id)));
-      }
-    default:
-    case traffic_simulator_msgs::msg::EntityType::MISC_OBJECT:
-      return {};
+  if (include_opposite_direction) {
+    return getLaneletIds(
+      routing_graphs_->routing_graph(type)->lefts(lanelet_map_ptr_->laneletLayer.get(lanelet_id)));
+  } else {
+    return getLaneletIds(routing_graphs_->routing_graph(type)->adjacentLefts(
+      lanelet_map_ptr_->laneletLayer.get(lanelet_id)));
   }
 }
 
 auto HdMapUtils::getRightLaneletIds(
-  lanelet::Id lanelet_id, traffic_simulator_msgs::msg::EntityType type,
-  bool include_opposite_direction) const -> lanelet::Ids
+  const lanelet::Id lanelet_id, const traffic_simulator::RoutingGraphType type,
+  const bool include_opposite_direction) const -> lanelet::Ids
 {
-  switch (type.type) {
-    case traffic_simulator_msgs::msg::EntityType::EGO:
-      if (include_opposite_direction) {
-        return getLaneletIds(
-          vehicle_routing_graph_ptr_->rights(lanelet_map_ptr_->laneletLayer.get(lanelet_id)));
-      } else {
-        return getLaneletIds(vehicle_routing_graph_ptr_->adjacentRights(
-          lanelet_map_ptr_->laneletLayer.get(lanelet_id)));
-      }
-    case traffic_simulator_msgs::msg::EntityType::VEHICLE:
-      if (include_opposite_direction) {
-        return getLaneletIds(
-          vehicle_routing_graph_ptr_->rights(lanelet_map_ptr_->laneletLayer.get(lanelet_id)));
-      } else {
-        return getLaneletIds(vehicle_routing_graph_ptr_->adjacentRights(
-          lanelet_map_ptr_->laneletLayer.get(lanelet_id)));
-      }
-    case traffic_simulator_msgs::msg::EntityType::PEDESTRIAN:
-      if (include_opposite_direction) {
-        return getLaneletIds(
-          pedestrian_routing_graph_ptr_->rights(lanelet_map_ptr_->laneletLayer.get(lanelet_id)));
-      } else {
-        return getLaneletIds(pedestrian_routing_graph_ptr_->adjacentRights(
-          lanelet_map_ptr_->laneletLayer.get(lanelet_id)));
-      }
-    default:
-    case traffic_simulator_msgs::msg::EntityType::MISC_OBJECT:
-      return {};
+  if (include_opposite_direction) {
+    return getLaneletIds(
+      routing_graphs_->routing_graph(type)->rights(lanelet_map_ptr_->laneletLayer.get(lanelet_id)));
+  } else {
+    return getLaneletIds(routing_graphs_->routing_graph(type)->adjacentRights(
+      lanelet_map_ptr_->laneletLayer.get(lanelet_id)));
   }
 }
 
@@ -1490,7 +1443,8 @@ auto HdMapUtils::canChangeLane(
 {
   const auto from_lanelet = lanelet_map_ptr_->laneletLayer.get(from_lanelet_id);
   const auto to_lanelet = lanelet_map_ptr_->laneletLayer.get(to_lanelet_id);
-  return traffic_rules_vehicle_ptr_->canChangeLane(from_lanelet, to_lanelet);
+  return routing_graphs_->traffic_rule(traffic_simulator::RoutingGraphType::VEHICLE)
+    ->canChangeLane(from_lanelet, to_lanelet);
 }
 
 auto HdMapUtils::getLateralDistance(
@@ -2239,4 +2193,89 @@ auto HdMapUtils::toPolygon(const lanelet::ConstLineString3d & line_string) const
   }
   return ret;
 }
+
+HdMapUtils::RoutingGraphs::RoutingGraphs(const lanelet::LaneletMapPtr & lanelet_map)
+{
+  vehicle.rules = lanelet::traffic_rules::TrafficRulesFactory::create(
+    lanelet::Locations::Germany, lanelet::Participants::Vehicle);
+  vehicle.graph = lanelet::routing::RoutingGraph::build(*lanelet_map, *vehicle.rules);
+  pedestrian.rules = lanelet::traffic_rules::TrafficRulesFactory::create(
+    lanelet::Locations::Germany, lanelet::Participants::Pedestrian);
+  pedestrian.graph = lanelet::routing::RoutingGraph::build(*lanelet_map, *pedestrian.rules);
+}
+
+lanelet::routing::RoutingGraphPtr HdMapUtils::RoutingGraphs::routing_graph(
+  const traffic_simulator::RoutingGraphType type) const
+{
+  switch (type) {
+    case traffic_simulator::RoutingGraphType::VEHICLE:
+      return vehicle.graph;
+    case traffic_simulator::RoutingGraphType::PEDESTRIAN:
+      return pedestrian.graph;
+    default:
+      std::stringstream what;
+      what << "Invalid routing graph type: " << static_cast<int>(type);
+      throw common::Error(what.str());
+  }
+}
+
+lanelet::traffic_rules::TrafficRulesPtr HdMapUtils::RoutingGraphs::traffic_rule(
+  const traffic_simulator::RoutingGraphType type) const
+{
+  switch (type) {
+    case traffic_simulator::RoutingGraphType::VEHICLE:
+      return vehicle.rules;
+    case traffic_simulator::RoutingGraphType::PEDESTRIAN:
+      return pedestrian.rules;
+    default:
+      std::stringstream what;
+      what << "Invalid routing graph type: " << static_cast<int>(type);
+      throw common::Error(what.str());
+  }
+}
+
+RouteCache & HdMapUtils::RoutingGraphs::route_cache(const traffic_simulator::RoutingGraphType type)
+{
+  switch (type) {
+    case traffic_simulator::RoutingGraphType::VEHICLE:
+      return vehicle.route_cache;
+    case traffic_simulator::RoutingGraphType::PEDESTRIAN:
+      return pedestrian.route_cache;
+    default:
+      std::stringstream what;
+      what << "Invalid routing graph type: " << static_cast<int>(type);
+      throw common::Error(what.str());
+  }
+}
+
+auto HdMapUtils::RoutingGraphs::getRoute(
+  const lanelet::Id from_lanelet_id, const lanelet::Id to_lanelet_id,
+  lanelet::LaneletMapPtr lanelet_map_ptr, bool allow_lane_change,
+  const traffic_simulator::RoutingGraphType type) -> lanelet::Ids
+{
+  auto & cache = route_cache(type);
+  if (cache.exists(from_lanelet_id, to_lanelet_id, allow_lane_change)) {
+    return cache.getRoute(from_lanelet_id, to_lanelet_id, allow_lane_change);
+  }
+  lanelet::Ids ids;
+  const auto lanelet = lanelet_map_ptr->laneletLayer.get(from_lanelet_id);
+  const auto to_lanelet = lanelet_map_ptr->laneletLayer.get(to_lanelet_id);
+  lanelet::Optional<lanelet::routing::Route> route =
+    routing_graph(type)->getRoute(lanelet, to_lanelet, 0, allow_lane_change);
+  if (!route) {
+    cache.appendData(from_lanelet_id, to_lanelet_id, allow_lane_change, ids);
+    return ids;
+  }
+  lanelet::routing::LaneletPath shortest_path = route->shortestPath();
+  if (shortest_path.empty()) {
+    cache.appendData(from_lanelet_id, to_lanelet_id, allow_lane_change, ids);
+    return ids;
+  }
+  for (auto lane_itr = shortest_path.begin(); lane_itr != shortest_path.end(); lane_itr++) {
+    ids.push_back(lane_itr->id());
+  }
+  cache.appendData(from_lanelet_id, to_lanelet_id, allow_lane_change, ids);
+  return ids;
+}
+
 }  // namespace hdmap_utils
