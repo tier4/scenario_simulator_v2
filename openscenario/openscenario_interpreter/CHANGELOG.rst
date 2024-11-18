@@ -32,6 +32,49 @@ Changelog for package openscenario_interpreter
 * add publish_empty_context parameter
 * Contributors: Masaya Kataoka
 
+5.2.3 (2024-11-18)
+------------------
+
+5.2.2 (2024-11-15)
+------------------
+* Merge branch 'master' into fix/sonor-cloud-issue-6
+* Contributors: Taiga
+
+5.2.1 (2024-11-14)
+------------------
+* Merge branch 'master' into RJD-1333/previous_following_lanelets
+* Merge branch 'master' into RJD-1333/previous_following_lanelets
+* Merge branch 'master' into RJD-1333/previous_following_lanelets
+* Contributors: Grzegorz Maj
+
+5.2.0 (2024-11-14)
+------------------
+* Merge pull request `#1423 <https://github.com/tier4/scenario_simulator_v2/issues/1423>`_ from tier4/feature/by_object_type
+  Support `ByType` element in `CollisionCondition`
+* Merge branch 'master' into feature/by_object_type
+* Merge branch 'master' into feature/by_object_type
+* Merge branch 'master' into feature/by_object_type
+* Fix undesirable inheritance
+  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
+* Remove blank line
+  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
+* Merge branch 'master' into feature/by_object_type
+* Fix format
+* Apply formatter
+* Add error message for unsupported ObjectType::external
+* Fix collision condition evaluation logic
+* Fix attribute name
+* Support ByType in CollisionCondition
+* Add ByObjectType
+* Contributors: Tatsuya Yamasaki, abco20
+
+5.1.1 (2024-11-13)
+------------------
+* Merge branch 'master' into fix/sonor-cloud-issue-5
+* Merge branch 'master' into fix/sonor-cloud-issue-5
+* Merge branch 'master' into fix/sonor-cloud-issue-5
+* Contributors: Masaya Kataoka, Taiga
+
 5.1.0 (2024-11-12)
 ------------------
 * Merge branch 'master' into feature/traffic_light_group
