@@ -21,6 +21,43 @@ Changelog for package concealer
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+5.3.0 (2024-11-18)
+------------------
+* Merge pull request `#1421 <https://github.com/tier4/scenario_simulator_v2/issues/1421>`_ from tier4/feature/manual_on_follow_trajectory_with_new_state
+* Merge branch 'master' into feature/manual_on_follow_trajectory_with_new_state
+* refactor: delete unused code
+* Merge branch 'master' into feature/manual_on_follow_trajectory_with_new_state
+* Merge branch 'master' into feature/manual_on_follow_trajectory_with_new_state
+* Merge branch 'master' into feature/manual_on_follow_trajectory_with_new_state
+* Merge remote-tracking branch 'origin/master' into feature/manual_on_follow_trajectory_with_new_state
+* Merge remote-tracking branch 'origin/master' into feature/manual_on_follow_trajectory_with_new_state
+* Merge branch 'master' into feature/manual_on_follow_trajectory
+* refactor: use aliases for message types in AutowareUniverse class
+* refactor: use std::uint8_t instead of uint8_t
+* fix: TaskQueue::exhausted returns true during last task is executing
+* Merge remote-tracking branch 'origin/master' into feature/manual_on_follow_trajectory
+* Merge branch 'master' into feature/manual_on_follow_trajectory
+* Merge branch 'master' into feature/manual_on_follow_trajectory
+* Merge branch 'master' into feature/manual_on_follow_trajectory
+* Merge branch 'master' into feature/manual_on_follow_trajectory
+* refactor: change some variable name and comment
+* Merge remote-tracking branch 'origin/feature/manual_on_follow_trajectory' into feature/manual_on_follow_trajectory
+* Merge branch 'master' into feature/manual_on_follow_trajectory
+* fix(concealer): delete MANUAL control trigger via API
+* feat(concealer): add way to set autoware control mode in Autoware class
+* refactor(concealer): add service server for /control/control_mode_request
+* Merge branch 'master' into feature/manual_on_follow_trajectory
+* chore(concealer): use ADAPI to change Autoware control
+* feat: enrich error message of ServiceWithValidation for ResponseStatus of ADAPI
+* feat: use ADAPI for change autoware control
+* Merge branch 'master' into feature/manual_on_follow_trajectory
+* Merge branch 'master' into feature/manual_on_follow_trajectory
+* fix: build errors
+* Merge remote-tracking branch 'origin/master' into feature/manual_on_follow_trajectory
+* feat: add requestAutowareControl to FieldOperatorApplicationFor class
+* feat: add control mode setting APIs to Autoware class
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
 5.2.3 (2024-11-18)
 ------------------
 
