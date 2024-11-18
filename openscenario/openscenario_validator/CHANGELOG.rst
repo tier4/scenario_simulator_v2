@@ -10,6 +10,12 @@ Changelog for package openscenario_validator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+5.3.1 (2024-11-18)
+------------------
+* Merge branch 'master' into refactor/routing_graph
+* Merge branch 'master' into refactor/routing_graph
+* Contributors: Kotaro Yoshimoto
+
 5.3.0 (2024-11-18)
 ------------------
 * Merge branch 'master' into feature/manual_on_follow_trajectory_with_new_state
