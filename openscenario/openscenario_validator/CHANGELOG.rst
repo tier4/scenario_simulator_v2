@@ -10,6 +10,9 @@ Changelog for package openscenario_validator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+5.2.3 (2024-11-18)
+------------------
+
 5.2.2 (2024-11-15)
 ------------------
 * Merge branch 'master' into fix/sonor-cloud-issue-6
