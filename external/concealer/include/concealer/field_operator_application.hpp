@@ -154,8 +154,6 @@ public:
   virtual auto setVelocityLimit(double) -> void = 0;
 
   virtual auto enableAutowareControl() -> void = 0;
-
-  virtual auto disableAutowareControl() -> void = 0;
 };
 }  // namespace concealer
 

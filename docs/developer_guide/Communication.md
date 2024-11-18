@@ -50,14 +50,19 @@
 
 ### Service Clients
 
-| service name                       | type                                                                                                                                                                | note |
-|------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|------|
-| `/api/autoware/set/velocity_limit` | [`tier4_external_api_msgs/srv/SetVelocityLimit`](https://github.com/tier4/tier4_autoware_msgs/blob/tier4/universe/tier4_external_api_msgs/srv/SetVelocityLimit.srv) |      |
-| `/api/external/set/engage`         | [`tier4_external_api_msgs/srv/Engage`](https://github.com/tier4/tier4_autoware_msgs/blob/tier4/universe/tier4_external_api_msgs/srv/Engage.srv)                     |      |
-| `/api/external/set/rtc_commands`   | [`tier4_rtc_msgs/srv/CooperateCommands`](https://github.com/tier4/tier4_autoware_msgs/blob/tier4/universe/tier4_rtc_msgs/srv/CooperateCommands.srv)                 |      |
-| `/api/external/set/rtc_auto_mode`  | [`tier4_rtc_msgs/srv/AutoModeWithModule`](https://github.com/tier4/tier4_autoware_msgs/blob/tier4/universe/tier4_rtc_msgs/srv/AutoModeWithModule.srv)               |      |
+| service name                                  | type                                                                                                                                                                                      | note |
+|-----------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------|
+| `/api/autoware/set/velocity_limit`            | [`tier4_external_api_msgs/srv/SetVelocityLimit`](https://github.com/tier4/tier4_autoware_msgs/blob/tier4/universe/tier4_external_api_msgs/srv/SetVelocityLimit.srv)                       |      |
+| `/api/external/set/engage`                    | [`tier4_external_api_msgs/srv/Engage`](https://github.com/tier4/tier4_autoware_msgs/blob/tier4/universe/tier4_external_api_msgs/srv/Engage.srv)                                           |      |
+| `/api/external/set/rtc_commands`              | [`tier4_rtc_msgs/srv/CooperateCommands`](https://github.com/tier4/tier4_autoware_msgs/blob/tier4/universe/tier4_rtc_msgs/srv/CooperateCommands.srv)                                       |      |
+| `/api/external/set/rtc_auto_mode`             | [`tier4_rtc_msgs/srv/AutoModeWithModule`](https://github.com/tier4/tier4_autoware_msgs/blob/tier4/universe/tier4_rtc_msgs/srv/AutoModeWithModule.srv)                                     |      |
+| `/api/operation_mode/enable_autoware_control` | [`autoware_adapi_v1_msgs/srv/ChangeOperationMode`](https://github.com/autowarefoundation/autoware_adapi_msgs/blob/main/autoware_adapi_v1_msgs/operation_mode/srv/ChangeOperationMode.srv) |      |
 
+### Service Servers
 
+| service name                    | type                                                                                                                                                                     | note                                                         |
+|---------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------|
+| `/control/control_mode_request` | [`autoware_auto_vehicle_msgs/srv/ControlModeCommand`](https://github.com/tier4/autoware_auto_msgs/blob/tier4/main/autoware_auto_vehicle_msgs/srv/ControlModeCommand.srv) | Simulated by `simple_sensor_simulator` for a manual override |
 
 [//]: # (/simulation/openscenario_visualizer)
 
