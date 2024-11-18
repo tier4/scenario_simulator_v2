@@ -1615,6 +1615,19 @@ TEST_F(HdMapUtilsTest_StandardMap, getFollowingLanelets_candidateTrajectory)
 
 /**
  * @note Test basic functionality.
+ * Test following lanelets obtaining
+ * with a candidate trajectory longer than the given distance without starting lanelet.
+ */
+TEST_F(HdMapUtilsTest_StandardMap, getFollowingLanelets_candidateTrajectoryFalse)
+{
+  const lanelet::Id id = 34564;
+  EXPECT_EQ(
+    hdmap_utils.getFollowingLanelets(id, lanelet::Ids{id, 34495, 34507, 34795, 34606}, 40.0, false),
+    (lanelet::Ids{34495, 34507}));
+}
+
+/**
+ * @note Test basic functionality.
  * Test following lanelets obtaining with
  * a candidate trajectory shorter than the given distance
  * - the goal is to test generating lacking part of the trajectory.
@@ -1644,6 +1657,18 @@ TEST_F(HdMapUtilsTest_StandardMap, getFollowingLanelets_candidateTrajectoryEmpty
 {
   EXPECT_EQ(
     hdmap_utils.getFollowingLanelets(120660, {}, 1.0e3, true).size(), static_cast<std::size_t>(0));
+}
+
+/**
+ * @note Test function behavior when called with a candidate trajectory
+ * that contains wrong candidates
+ */
+TEST_F(HdMapUtilsTest_StandardMap, getFollowingLanelets_candidatesDoNotMatchRealTrajectory)
+{
+  EXPECT_THROW(
+    hdmap_utils.getFollowingLanelets(
+      34564, lanelet::Ids{34564, 34495, 34507, 34399, 34399}, 100.0, true),
+    common::Error);
 }
 
 /**
@@ -2697,4 +2722,16 @@ TEST_F(HdMapUtilsTest_CrossroadsWithStoplinesMap, getDistanceToStopLine_emptyVec
         std::vector<geometry_msgs::msg::Point>{
           makePoint(3807.63, 73715.99), makePoint(3785.76, 73707.70), makePoint(3773.19, 73723.27)})
       .has_value());
+}
+
+/**
+ * @note Test basic functionality.
+ */
+TEST_F(HdMapUtilsTest_StandardMap, getPreviousLanelets)
+{
+  const lanelet::Id id = 34600;
+  const auto result_previous = hdmap_utils.getPreviousLanelets(id, 100.0);
+  const lanelet::Ids actual_previous{id, 34783, 34606, 34795, 34507};
+
+  EXPECT_EQ(result_previous, actual_previous);
 }
