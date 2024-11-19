@@ -174,7 +174,7 @@ void VisualizationConditionGroupsDisplay::processMessage(const Context::ConstSha
   // QColor text_color = property_text_color_->getColor();
   QColor text_color(property_text_color_->getColor());
   text_color.setAlpha(255);
-  painter.setPen(QPen(text_color, static_cast<int>(2), Qt::SolidLine));
+  painter.setPen(QPen(text_color, 2, Qt::SolidLine));
   QFont font = painter.font();
   font.setPixelSize(std::max(static_cast<int>(property_value_scale_->getFloat()), 1));
   font.setBold(true);
