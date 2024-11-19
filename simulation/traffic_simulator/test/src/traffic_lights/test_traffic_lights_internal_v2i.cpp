@@ -21,6 +21,8 @@
 constexpr double timing_eps = 1e-3;
 constexpr double frequency_eps = 0.5;
 
+using namespace std::chrono_literals;
+
 using V2ITrafficLightsTest = TrafficLightsInternalTest<traffic_simulator::V2ITrafficLights>;
 
 TEST_F(V2ITrafficLightsTest, startUpdate_publishSignals)
@@ -39,7 +41,7 @@ TEST_F(V2ITrafficLightsTest, startUpdate_publishSignals)
 
   this->lights->startUpdate(20.0);
 
-  auto end = std::chrono::system_clock::now() + std::chrono::milliseconds(1005);
+  auto end = std::chrono::system_clock::now() + 1s;
   while (std::chrono::system_clock::now() < end) {
     rclcpp::spin_some(this->node_ptr);
   }
@@ -92,7 +94,7 @@ TEST_F(V2ITrafficLightsTest, startUpdate_publishSignalsLegacy)
 
   this->lights->startUpdate(20.0);
 
-  const auto end = std::chrono::system_clock::now() + std::chrono::milliseconds(1005);
+  const auto end = std::chrono::system_clock::now() + 1s;
   while (std::chrono::system_clock::now() < end) {
     rclcpp::spin_some(this->node_ptr);
   }
@@ -144,7 +146,7 @@ TEST_F(V2ITrafficLightsTest, resetUpdate_publishSignals)
 
   this->lights->startUpdate(20.0);
 
-  auto end = std::chrono::system_clock::now() + std::chrono::milliseconds(505);
+  auto end = std::chrono::system_clock::now() + 0.5s;
   while (std::chrono::system_clock::now() < end) {
     rclcpp::spin_some(this->node_ptr);
   }
@@ -156,7 +158,7 @@ TEST_F(V2ITrafficLightsTest, resetUpdate_publishSignals)
     });
 
   this->lights->resetUpdate(10.0);
-  end = std::chrono::system_clock::now() + std::chrono::milliseconds(505);
+  end = std::chrono::system_clock::now() + 0.5s;
   while (std::chrono::system_clock::now() < end) {
     rclcpp::spin_some(this->node_ptr);
   }
@@ -239,7 +241,7 @@ TEST_F(V2ITrafficLightsTest, resetUpdate_publishSignalsLegacy)
 
   this->lights->startUpdate(20.0);
 
-  auto end = std::chrono::system_clock::now() + std::chrono::milliseconds(505);
+  auto end = std::chrono::system_clock::now() + 0.5s;
   while (std::chrono::system_clock::now() < end) {
     rclcpp::spin_some(this->node_ptr);
   }
@@ -250,7 +252,7 @@ TEST_F(V2ITrafficLightsTest, resetUpdate_publishSignalsLegacy)
     });
 
   this->lights->resetUpdate(10.0);
-  end = std::chrono::system_clock::now() + std::chrono::milliseconds(505);
+  end = std::chrono::system_clock::now() + 0.5s;
   while (std::chrono::system_clock::now() < end) {
     rclcpp::spin_some(this->node_ptr);
   }

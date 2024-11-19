@@ -26,6 +26,8 @@
 constexpr double timing_eps = 1e-3;
 constexpr double frequency_eps = 0.5;
 
+using namespace std::chrono_literals;
+
 class TrafficLightsTest : public testing::Test
 {
 public:
@@ -113,10 +115,7 @@ TEST_F(TrafficLightsTest, startTrafficLightsUpdate)
 
   this->lights->startTrafficLightsUpdate(20.0, 10.0);
 
-  // start time is required to be measured here and not from first message, because there are two publishers publishing to this topic at the same time
-  const auto start_time = node_ptr->now();
-
-  const auto end = std::chrono::system_clock::now() + std::chrono::milliseconds(1020);
+  const auto end = std::chrono::system_clock::now() + 1s;
   while (std::chrono::system_clock::now() < end) {
     rclcpp::spin_some(this->node_ptr);
   }
@@ -135,8 +134,8 @@ TEST_F(TrafficLightsTest, startTrafficLightsUpdate)
 
   const double expected_frequency = 30.0;
   const double actual_frequency =
-    static_cast<double>(headers.size()) /
-    static_cast<double>(getTime(headers.back()) - getTime(start_time)) * 1e+9;
+    static_cast<double>(headers.size() - 1) /
+    static_cast<double>(getTime(headers.back()) - getTime(headers.front())) * 1e+9;
   EXPECT_NEAR(actual_frequency, expected_frequency, frequency_eps);
 }
 

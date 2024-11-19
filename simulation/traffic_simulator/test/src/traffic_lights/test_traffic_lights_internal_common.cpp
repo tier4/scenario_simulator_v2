@@ -21,6 +21,8 @@
 constexpr double timing_eps = 1e-3;
 constexpr double frequency_eps = 0.5;
 
+using namespace std::chrono_literals;
+
 TYPED_TEST_SUITE(TrafficLightsInternalTest, TrafficLightsTypes, TrafficLightsNameGenerator);
 
 TYPED_TEST(TrafficLightsInternalTest, setTrafficLightsColor)
@@ -179,7 +181,7 @@ TYPED_TEST(TrafficLightsInternalTest, startUpdate_publishMarkers)
 
   this->lights->startUpdate(20.0);
 
-  const auto end = std::chrono::system_clock::now() + std::chrono::milliseconds(1005);
+  const auto end = std::chrono::system_clock::now() + 1s;
   while (std::chrono::system_clock::now() < end) {
     rclcpp::spin_some(this->node_ptr);
   }
@@ -249,7 +251,7 @@ TYPED_TEST(TrafficLightsInternalTest, resetUpdate_publishMarkers)
 
   this->lights->startUpdate(20.0);
 
-  auto end = std::chrono::system_clock::now() + std::chrono::milliseconds(505);
+  auto end = std::chrono::system_clock::now() + 0.5s;
   while (std::chrono::system_clock::now() < end) {
     rclcpp::spin_some(this->node_ptr);
   }
@@ -261,7 +263,7 @@ TYPED_TEST(TrafficLightsInternalTest, resetUpdate_publishMarkers)
     });
 
   this->lights->resetUpdate(10.0);
-  end = std::chrono::system_clock::now() + std::chrono::milliseconds(505);
+  end = std::chrono::system_clock::now() + 0.5s;
   while (std::chrono::system_clock::now() < end) {
     rclcpp::spin_some(this->node_ptr);
   }
