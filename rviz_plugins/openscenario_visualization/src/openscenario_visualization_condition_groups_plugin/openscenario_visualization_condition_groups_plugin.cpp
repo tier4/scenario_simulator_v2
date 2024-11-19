@@ -262,7 +262,7 @@ void VisualizationConditionGroupsDisplay::processEvent(const YAML::Node & event_
   std::string event_name;
   try {
     event_name = event_node["name"].as<std::string>();
-  } catch (const YAML::BadConversion & e) {
+  } catch (const YAML::BadConversion & ) {
     event_name = "";
   }
   if (event_name.empty()) {
