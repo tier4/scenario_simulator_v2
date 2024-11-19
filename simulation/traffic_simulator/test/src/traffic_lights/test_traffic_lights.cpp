@@ -116,7 +116,6 @@ TEST_F(TrafficLightsTest, startTrafficLightsUpdate)
   // start time is required to be measured here and not from first message, because there are two publishers publishing to this topic at the same time
   const auto start_time = node_ptr->now();
 
-  // spin for 1 second
   const auto end = std::chrono::system_clock::now() + std::chrono::milliseconds(1020);
   while (std::chrono::system_clock::now() < end) {
     rclcpp::spin_some(this->node_ptr);
@@ -124,7 +123,6 @@ TEST_F(TrafficLightsTest, startTrafficLightsUpdate)
 
   std::vector<std_msgs::msg::Header> headers;
 
-  // verify
   for (std::size_t i = 0; i < markers.size(); ++i) {
     const auto & one_marker = markers[i].markers;
     EXPECT_EQ(one_marker.size(), static_cast<std::size_t>(1));
@@ -135,7 +133,6 @@ TEST_F(TrafficLightsTest, startTrafficLightsUpdate)
     }
   }
 
-  // verify message timing
   const double expected_frequency = 30.0;
   const double actual_frequency =
     static_cast<double>(headers.size()) /

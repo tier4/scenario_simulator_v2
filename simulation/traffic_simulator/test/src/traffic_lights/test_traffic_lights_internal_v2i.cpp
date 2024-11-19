@@ -21,7 +21,6 @@
 constexpr double timing_eps = 1e-3;
 constexpr double frequency_eps = 0.5;
 
-// Define V2I type for use in tests with V2I traffic lights only
 using V2ITrafficLightsTest = TrafficLightsInternalTest<traffic_simulator::V2ITrafficLights>;
 
 TEST_F(V2ITrafficLightsTest, startUpdate_publishSignals)
@@ -40,7 +39,6 @@ TEST_F(V2ITrafficLightsTest, startUpdate_publishSignals)
 
   this->lights->startUpdate(20.0);
 
-  // spin for 1 second
   auto end = std::chrono::system_clock::now() + std::chrono::milliseconds(1005);
   while (std::chrono::system_clock::now() < end) {
     rclcpp::spin_some(this->node_ptr);
@@ -70,7 +68,6 @@ TEST_F(V2ITrafficLightsTest, startUpdate_publishSignals)
     EXPECT_NEAR(one_message[0].elements[1].confidence, 0.7, 1e-6);
   }
 
-  // verify message timing
   const double expected_frequency = 20.0;
   const double actual_frequency =
     static_cast<double>(stamps.size() - 1) /
@@ -95,7 +92,6 @@ TEST_F(V2ITrafficLightsTest, startUpdate_publishSignalsLegacy)
 
   this->lights->startUpdate(20.0);
 
-  // spin for 1 second
   const auto end = std::chrono::system_clock::now() + std::chrono::milliseconds(1005);
   while (std::chrono::system_clock::now() < end) {
     rclcpp::spin_some(this->node_ptr);
@@ -125,7 +121,6 @@ TEST_F(V2ITrafficLightsTest, startUpdate_publishSignalsLegacy)
     EXPECT_NEAR(one_message[0].elements[1].confidence, 0.7, 1e-6);
   }
 
-  // verify message timing
   const double expected_frequency = 20.0;
   const double actual_frequency =
     static_cast<double>(stamps.size() - 1) /
@@ -149,7 +144,6 @@ TEST_F(V2ITrafficLightsTest, resetUpdate_publishSignals)
 
   this->lights->startUpdate(20.0);
 
-  // spin for 1 second
   auto end = std::chrono::system_clock::now() + std::chrono::milliseconds(505);
   while (std::chrono::system_clock::now() < end) {
     rclcpp::spin_some(this->node_ptr);
@@ -213,7 +207,6 @@ TEST_F(V2ITrafficLightsTest, resetUpdate_publishSignals)
     EXPECT_NEAR(one_message[0].elements[1].confidence, 0.7, 1e-6);
   }
 
-  // verify message timing
   {
     const double expected_frequency = 20.0;
     const double actual_frequency =
@@ -246,7 +239,6 @@ TEST_F(V2ITrafficLightsTest, resetUpdate_publishSignalsLegacy)
 
   this->lights->startUpdate(20.0);
 
-  // spin for 1 second
   auto end = std::chrono::system_clock::now() + std::chrono::milliseconds(505);
   while (std::chrono::system_clock::now() < end) {
     rclcpp::spin_some(this->node_ptr);
@@ -309,7 +301,6 @@ TEST_F(V2ITrafficLightsTest, resetUpdate_publishSignalsLegacy)
     EXPECT_NEAR(one_message[0].elements[1].confidence, 0.7, 1e-6);
   }
 
-  // verify message timing
   {
     const double expected_frequency = 20.0;
     const double actual_frequency =

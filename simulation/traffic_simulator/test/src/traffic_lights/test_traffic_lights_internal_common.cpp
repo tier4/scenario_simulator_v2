@@ -179,13 +179,11 @@ TYPED_TEST(TrafficLightsInternalTest, startUpdate_publishMarkers)
 
   this->lights->startUpdate(20.0);
 
-  // spin for 1 second
   const auto end = std::chrono::system_clock::now() + std::chrono::milliseconds(1005);
   while (std::chrono::system_clock::now() < end) {
     rclcpp::spin_some(this->node_ptr);
   }
 
-  // verify lambdas
   const auto verify_delete_marker =
     [](const visualization_msgs::msg::Marker & marker, const auto & info = "") {
       EXPECT_EQ(marker.action, visualization_msgs::msg::Marker::DELETEALL) << info;
@@ -214,7 +212,6 @@ TYPED_TEST(TrafficLightsInternalTest, startUpdate_publishMarkers)
 
   std::vector<std_msgs::msg::Header> headers;
 
-  // verify
   for (std::size_t i = 0; i < markers.size(); i += 2) {
     {
       const auto & one_marker = markers[i].markers;
@@ -230,7 +227,6 @@ TYPED_TEST(TrafficLightsInternalTest, startUpdate_publishMarkers)
     }
   }
 
-  // verify message timing
   const double expected_frequency = 20.0;
   const double actual_frequency =
     static_cast<double>(headers.size() - 1) /
@@ -253,7 +249,6 @@ TYPED_TEST(TrafficLightsInternalTest, resetUpdate_publishMarkers)
 
   this->lights->startUpdate(20.0);
 
-  // spin for 1 second
   auto end = std::chrono::system_clock::now() + std::chrono::milliseconds(505);
   while (std::chrono::system_clock::now() < end) {
     rclcpp::spin_some(this->node_ptr);
@@ -271,7 +266,6 @@ TYPED_TEST(TrafficLightsInternalTest, resetUpdate_publishMarkers)
     rclcpp::spin_some(this->node_ptr);
   }
 
-  // verify lambdas
   const auto verify_delete_marker =
     [](const visualization_msgs::msg::Marker & marker, const auto & info = "") {
       EXPECT_EQ(marker.action, visualization_msgs::msg::Marker::DELETEALL) << info;
@@ -301,7 +295,6 @@ TYPED_TEST(TrafficLightsInternalTest, resetUpdate_publishMarkers)
 
   std::vector<std_msgs::msg::Header> headers, headers_reset;
 
-  // verify
   for (std::size_t i = 0; i < markers.size(); i += 2) {
     {
       const auto & one_marker = markers[i].markers;
@@ -331,7 +324,6 @@ TYPED_TEST(TrafficLightsInternalTest, resetUpdate_publishMarkers)
     }
   }
 
-  // verify message timing
   {
     const double expected_frequency = 20.0;
     const double actual_frequency =
@@ -364,7 +356,7 @@ TYPED_TEST(TrafficLightsInternalTest, generateTrafficSimulatorV1Msg)
   EXPECT_EQ(msg.traffic_lights[0].lanelet_way_id, this->id);
 
   using TrafficLightBulbV1 = traffic_simulator_msgs::msg::TrafficLightBulbV1;
-  // signals are parsed in reverse order
+  // we use this order, because signals are parsed in reverse
   EXPECT_EQ(msg.traffic_lights[0].traffic_light_bulbs[0].color, TrafficLightBulbV1::AMBER);
   EXPECT_EQ(msg.traffic_lights[0].traffic_light_bulbs[0].status, TrafficLightBulbV1::FLASHING);
   EXPECT_EQ(msg.traffic_lights[0].traffic_light_bulbs[0].shape, TrafficLightBulbV1::CIRCLE);
@@ -401,7 +393,7 @@ TYPED_TEST(TrafficLightsInternalTest, generateAutowareAutoPerceptionMsg)
   EXPECT_EQ(msg.signals[0].map_primitive_id, this->id);
 
   using TrafficLight = autoware_auto_perception_msgs::msg::TrafficLight;
-  // signals are parsed in reverse order
+  // we use this order, because signals are parsed in reverse
   EXPECT_EQ(msg.signals[0].lights[0].color, TrafficLight::AMBER);
   EXPECT_EQ(msg.signals[0].lights[0].status, TrafficLight::FLASHING);
   EXPECT_EQ(msg.signals[0].lights[0].shape, TrafficLight::CIRCLE);
@@ -434,7 +426,7 @@ TYPED_TEST(TrafficLightsInternalTest, generateAutowarePerceptionTrafficSignalMsg
   EXPECT_EQ(msg.signals[0].traffic_signal_id, this->signal_id);
 
   using TrafficSignalElement = autoware_perception_msgs::msg::TrafficSignalElement;
-  // signals are parsed in reverse order
+  // we use this order, because signals are parsed in reverse
   EXPECT_EQ(msg.signals[0].elements[0].color, TrafficSignalElement::AMBER);
   EXPECT_EQ(msg.signals[0].elements[0].status, TrafficSignalElement::FLASHING);
   EXPECT_EQ(msg.signals[0].elements[0].shape, TrafficSignalElement::CIRCLE);
@@ -468,7 +460,7 @@ TYPED_TEST(TrafficLightsInternalTest, generateAutowarePerceptionTrafficLightGrou
   EXPECT_EQ(msg.traffic_light_groups[0].traffic_light_group_id, this->signal_id);
 
   using TrafficLightElement = autoware_perception_msgs::msg::TrafficLightElement;
-  // traffic_light_groups are parsed in reverse order
+  // we use this order, because signals are parsed in reverse
   EXPECT_EQ(msg.traffic_light_groups[0].elements[0].color, TrafficLightElement::AMBER);
   EXPECT_EQ(msg.traffic_light_groups[0].elements[0].status, TrafficLightElement::FLASHING);
   EXPECT_EQ(msg.traffic_light_groups[0].elements[0].shape, TrafficLightElement::CIRCLE);
