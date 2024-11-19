@@ -20,7 +20,7 @@
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <traffic_simulator/traffic_lights/traffic_lights.hpp>
 
-constexpr char architecture_old[] = "awf/universe";
+constexpr char architecture_old[] = "awf/universe/20230906";
 constexpr char architecture_new[] = "awf/universe/20240605";
 
 template <typename TrafficLightsT, const char * Architecture>
