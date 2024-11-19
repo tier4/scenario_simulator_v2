@@ -74,8 +74,6 @@ public:
   auto calculateAccelerationBySlope() const -> double;
 
 private:
-  auto calculateEgoPitch() const -> double;
-
   auto getCurrentPose(const double pitch_angle) const -> geometry_msgs::msg::Pose;
 
   auto getCurrentTwist() const -> geometry_msgs::msg::Twist;
