@@ -51,11 +51,13 @@ public:
         return std::make_unique<TrafficLightsT>(node_ptr, hdmap_utils_ptr);
       } else if constexpr (std::is_same_v<TrafficLightsT, traffic_simulator::V2ITrafficLights>) {
         return std::make_unique<TrafficLightsT>(node_ptr, hdmap_utils_ptr, Architecture);
-      } else {
-        throw std::runtime_error("Given TrafficLights type is not supported");
       }
     }())
   {
+    static_assert(
+      std::is_same_v<TrafficLightsT, traffic_simulator::ConventionalTrafficLights> or
+        std::is_same_v<TrafficLightsT, traffic_simulator::V2ITrafficLights>,
+      "Given TrafficLights type is not supported");
   }
 };
 
