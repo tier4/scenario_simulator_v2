@@ -468,7 +468,7 @@ TEST(Shape, make)
 }
 
 /**
- * @note Test basic functionality. Test function behavior when called with invalid name. 
+ * @note Test basic functionality. Test function behavior when called with invalid name.
  */
 TEST(Shape, make_wrong)
 {

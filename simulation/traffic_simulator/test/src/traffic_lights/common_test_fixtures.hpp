@@ -28,6 +28,7 @@ class TrafficLightsInternalTestArchitectureDependent : public testing::Test
 {
 public:
   const lanelet::Id id = 34836;
+
   const lanelet::Id signal_id = 34806;
 
   const rclcpp::Node::SharedPtr node_ptr = rclcpp::Node::make_shared("TrafficLightsInternalTest");
@@ -44,14 +45,15 @@ public:
 
   std::unique_ptr<TrafficLightsT> lights;
 
-  TrafficLightsInternalTestArchitectureDependent()
+  explicit TrafficLightsInternalTestArchitectureDependent()
   : lights([this] {
-      if constexpr (std::is_same_v<TrafficLightsT, traffic_simulator::ConventionalTrafficLights>)
+      if constexpr (std::is_same_v<TrafficLightsT, traffic_simulator::ConventionalTrafficLights>) {
         return std::make_unique<TrafficLightsT>(node_ptr, hdmap_utils_ptr);
-      else if constexpr (std::is_same_v<TrafficLightsT, traffic_simulator::V2ITrafficLights>)
+      } else if constexpr (std::is_same_v<TrafficLightsT, traffic_simulator::V2ITrafficLights>) {
         return std::make_unique<TrafficLightsT>(node_ptr, hdmap_utils_ptr, Architecture);
-      else
+      } else {
         throw std::runtime_error("Given TrafficLights type is not supported");
+      }
     }())
   {
   }
@@ -69,21 +71,19 @@ class TrafficLightsInternalTestNewArchitecture
 {
 };
 
-// Alias for declaring types in typed tests
 using TrafficLightsTypes =
   testing::Types<traffic_simulator::ConventionalTrafficLights, traffic_simulator::V2ITrafficLights>;
 
-// Test name generator
-class TrafficLightsNameGenerator
+struct TrafficLightsNameGenerator
 {
-public:
-  template <typename TrafficLightsT>
-  static std::string GetName(int)
+  template <typename T>
+  static auto GetName(int) -> std::string
   {
-    if constexpr (std::is_same_v<TrafficLightsT, traffic_simulator::ConventionalTrafficLights>)
+    if constexpr (std::is_same_v<T, traffic_simulator::ConventionalTrafficLights>) {
       return "ConventionalTrafficLights";
-    if constexpr (std::is_same_v<TrafficLightsT, traffic_simulator::V2ITrafficLights>)
+    } else if constexpr (std::is_same_v<T, traffic_simulator::V2ITrafficLights>) {
       return "V2ITrafficLights";
+    }
   }
 };
 

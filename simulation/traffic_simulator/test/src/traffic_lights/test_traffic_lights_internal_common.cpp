@@ -21,7 +21,6 @@
 constexpr double timing_eps = 1e-3;
 constexpr double frequency_eps = 0.5;
 
-// Declare typed test suite
 TYPED_TEST_SUITE(TrafficLightsInternalTest, TrafficLightsTypes, TrafficLightsNameGenerator);
 
 TYPED_TEST(TrafficLightsInternalTest, setTrafficLightsColor)
@@ -47,21 +46,18 @@ TYPED_TEST(TrafficLightsInternalTest, setTrafficLightsColor)
 
 TYPED_TEST(TrafficLightsInternalTest, setTrafficLightsState_color)
 {
-  // green
   this->lights->setTrafficLightsState(this->id, stateFromColor("green"));
   EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromColor("green"));
 
   this->lights->setTrafficLightsState(this->id, stateFromColor("Green"));
   EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromColor("green"));
 
-  // red
   this->lights->setTrafficLightsState(this->id, stateFromColor("red"));
   EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromColor("red"));
 
   this->lights->setTrafficLightsState(this->id, stateFromColor("Red"));
   EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromColor("red"));
 
-  // yellow
   this->lights->setTrafficLightsState(this->id, stateFromColor("yellow"));
   EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromColor("yellow"));
 
@@ -71,18 +67,15 @@ TYPED_TEST(TrafficLightsInternalTest, setTrafficLightsState_color)
   this->lights->setTrafficLightsState(this->id, stateFromColor("amber"));
   EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromColor("yellow"));
 
-  // white
   this->lights->setTrafficLightsState(this->id, stateFromColor("white"));
   EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromColor("white"));
 }
 
 TYPED_TEST(TrafficLightsInternalTest, setTrafficLightsState_status)
 {
-  // solid on
   this->lights->setTrafficLightsState(this->id, stateFromStatus("solidOn"));
   EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromStatus("solidOn"));
 
-  // solid off
   this->lights->setTrafficLightsState(this->id, stateFromStatus("solidOff"));
   EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromStatus("solidOff"));
 
@@ -92,11 +85,9 @@ TYPED_TEST(TrafficLightsInternalTest, setTrafficLightsState_status)
   this->lights->setTrafficLightsState(this->id, stateFromStatus("none"));
   EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromStatus("solidOff"));
 
-  // flashing
   this->lights->setTrafficLightsState(this->id, stateFromStatus("flashing"));
   EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromStatus("flashing"));
 
-  // unknown
   this->lights->setTrafficLightsState(this->id, stateFromStatus("unknown"));
   EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromStatus("unknown"));
 }
@@ -362,8 +353,10 @@ TYPED_TEST(TrafficLightsInternalTest, generateTrafficSimulatorV1Msg)
   this->lights->setTrafficLightsState(this->id, "red solidOn circle, yellow flashing circle");
   this->lights->setTrafficLightsConfidence(this->id, 0.7);
 
-  const auto msg = *traffic_simulator::TrafficLightPublisherBase::generateTrafficSimulatorV1Msg(
-    this->node_ptr->get_clock()->now(), this->lights->generateUpdateTrafficLightsRequest());
+  const auto msg =
+    *traffic_simulator::TrafficLightPublisher<traffic_simulator_msgs::msg::TrafficLightArrayV1>::
+      generateMessage(
+        this->node_ptr->get_clock()->now(), this->lights->generateUpdateTrafficLightsRequest());
 
   EXPECT_EQ(msg.traffic_lights.size(), static_cast<std::size_t>(1));
   EXPECT_EQ(msg.traffic_lights.front().traffic_light_bulbs.size(), static_cast<std::size_t>(2));
@@ -390,8 +383,11 @@ TYPED_TEST(TrafficLightsInternalTest, generateAutowareAutoPerceptionMsg)
   this->lights->setTrafficLightsState(this->id, "red solidOn circle, yellow flashing circle");
   this->lights->setTrafficLightsConfidence(this->id, 0.7);
 
-  const auto msg = *traffic_simulator::TrafficLightPublisherBase::generateAutowareAutoPerceptionMsg(
-    this->node_ptr->get_clock()->now(), this->lights->generateUpdateTrafficLightsRequest(), frame);
+  const auto msg = *traffic_simulator::TrafficLightPublisher<
+    autoware_auto_perception_msgs::msg::TrafficSignalArray>::
+                     generateMessage(
+                       this->node_ptr->get_clock()->now(),
+                       this->lights->generateUpdateTrafficLightsRequest(), frame);
 
   const double expected_time =
     static_cast<double>(getTime(this->node_ptr->get_clock()->now())) * 1e-9;
@@ -423,8 +419,9 @@ TYPED_TEST(TrafficLightsInternalTest, generateAutowarePerceptionTrafficSignalMsg
   this->lights->setTrafficLightsConfidence(this->id, 0.7);
 
   const auto msg =
-    *traffic_simulator::TrafficLightPublisherBase::generateAutowarePerceptionTrafficSignalMsg(
-      this->node_ptr->get_clock()->now(), this->lights->generateUpdateTrafficLightsRequest());
+    *traffic_simulator::TrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>::
+      generateMessage(
+        this->node_ptr->get_clock()->now(), this->lights->generateUpdateTrafficLightsRequest());
 
   const double expected_time =
     static_cast<double>(getTime(this->node_ptr->get_clock()->now())) * 1e-9;
@@ -450,15 +447,15 @@ TYPED_TEST(TrafficLightsInternalTest, generateAutowarePerceptionTrafficSignalMsg
 }
 
 #if __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)
-
 TYPED_TEST(TrafficLightsInternalTest, generateAutowarePerceptionTrafficLightGroupMsg)
 {
   this->lights->setTrafficLightsState(this->id, "red solidOn circle, yellow flashing circle");
   this->lights->setTrafficLightsConfidence(this->id, 0.7);
 
   const auto msg =
-    *traffic_simulator::TrafficLightPublisherBase::generateAutowarePerceptionTrafficLightGroupMsg(
-      this->node_ptr->get_clock()->now(), this->lights->generateUpdateTrafficLightsRequest());
+    *traffic_simulator::
+      TrafficLightPublisher<autoware_perception_msgs::msg::TrafficLightGroupArray>::generateMessage(
+        this->node_ptr->get_clock()->now(), this->lights->generateUpdateTrafficLightsRequest());
 
   const double expected_time =
     static_cast<double>(getTime(this->node_ptr->get_clock()->now())) * 1e-9;
@@ -482,5 +479,4 @@ TYPED_TEST(TrafficLightsInternalTest, generateAutowarePerceptionTrafficLightGrou
   EXPECT_EQ(msg.traffic_light_groups[0].elements[1].shape, TrafficLightElement::CIRCLE);
   EXPECT_NEAR(msg.traffic_light_groups[0].elements[1].confidence, 0.7, 1e-6);
 }
-
 #endif  // __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)
