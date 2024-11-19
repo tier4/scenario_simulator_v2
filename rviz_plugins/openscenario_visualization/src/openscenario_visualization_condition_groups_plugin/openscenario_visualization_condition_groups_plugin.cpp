@@ -48,7 +48,7 @@ VisualizationConditionGroupsDisplay::VisualizationConditionGroupsDisplay()
    * but the initial value of 35.0 is set to ensure a default size that is likely suitable for most screens. 
    * The scaling factor adjusts this size to ensure readability across various resolutions.
    */
-  const float text_size = scale * 35.0;
+  const float text_size = scale * 35.0f;
 
   /// @note Define initial value of left edge position of condition results panel
   const int left = 0;
@@ -99,7 +99,7 @@ VisualizationConditionGroupsDisplay::VisualizationConditionGroupsDisplay()
     "This property controls the scaling factor for the text size on the panel. Setting a higher "
     "value results in larger text, making the displayed information easier to read.",
     this, SLOT(updateVisualization()), this);
-  property_value_scale_->setMin(0.01);
+  property_value_scale_->setMin(0.01f);
 }
 
 VisualizationConditionGroupsDisplay::~VisualizationConditionGroupsDisplay()
