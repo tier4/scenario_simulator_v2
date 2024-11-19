@@ -21,6 +21,27 @@ Changelog for package traffic_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+5.3.2 (2024-11-18)
+------------------
+* Merge branch 'master' into fix/interpreter/assign-route-action
+* Merge branch 'master' into fix/interpreter/assign-route-action
+* Contributors: Tatsuya Yamasaki
+
+5.3.1 (2024-11-18)
+------------------
+* Merge pull request `#1450 <https://github.com/tier4/scenario_simulator_v2/issues/1450>`_ from tier4/refactor/routing_graph
+  refactor HDMapUtils class about routing graph
+* Merge branch 'master' into refactor/routing_graph
+* refactor: modify member function name of RoutingGraphs class
+* Merge branch 'master' into refactor/routing_graph
+* refactor: add RoutingGraphType argument to get{Next|Previous}LaneletIds
+* refactor: move implementation of getRoute into RoutingGraphs class
+* refactor: use RoutingGraphType instead of EntityType for an argument in get{Right|Left}LaneletIds
+* refactor: add HdMapUtils::RoutingGraphs class to manage routing graphs
+* refactor: delete operator<< and add to_string for RoutingGraphType
+* feat: add routing_graph_type.hpp
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka
+
 5.3.0 (2024-11-18)
 ------------------
 * Merge pull request `#1421 <https://github.com/tier4/scenario_simulator_v2/issues/1421>`_ from tier4/feature/manual_on_follow_trajectory_with_new_state

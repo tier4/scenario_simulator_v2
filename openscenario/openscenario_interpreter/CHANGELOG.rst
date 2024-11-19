@@ -32,6 +32,21 @@ Changelog for package openscenario_interpreter
 * add publish_empty_context parameter
 * Contributors: Masaya Kataoka
 
+5.3.2 (2024-11-18)
+------------------
+* Merge pull request `#1453 <https://github.com/tier4/scenario_simulator_v2/issues/1453>`_ from tier4/fix/interpreter/assign-route-action
+  Fix/interpreter/assign route action
+* Merge branch 'master' into fix/interpreter/assign-route-action
+* Merge branch 'master' into fix/interpreter/assign-route-action
+* Fix AssignRouteAction to clear route before requesting a new route
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+5.3.1 (2024-11-18)
+------------------
+* Merge branch 'master' into refactor/routing_graph
+* Merge branch 'master' into refactor/routing_graph
+* Contributors: Kotaro Yoshimoto
+
 5.3.0 (2024-11-18)
 ------------------
 * Merge branch 'master' into feature/manual_on_follow_trajectory_with_new_state
