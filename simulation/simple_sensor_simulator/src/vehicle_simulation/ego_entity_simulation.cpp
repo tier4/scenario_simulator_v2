@@ -305,17 +305,7 @@ void EgoEntitySimulation::update(
   if (is_npc_logic_started) {
     auto input = Eigen::VectorXd(vehicle_model_ptr_->getDimU());
 
-    auto acceleration_by_slope = [this]() {
-      if (consider_acceleration_by_road_slope_) {
-        // calculate longitudinal acceleration by slope
-        constexpr double gravity_acceleration = -9.81;
-        const double ego_pitch_angle = calculateEgoPitch();
-        const double slope_angle = -ego_pitch_angle;
-        return gravity_acceleration * std::sin(slope_angle);
-      } else {
-        return 0.0;
-      }
-    }();
+    auto acceleration_by_slope = calculateAccelerationBySlope();
 
     switch (vehicle_model_type_) {
       case VehicleModelType::DELAY_STEER_ACC:
@@ -347,6 +337,18 @@ void EgoEntitySimulation::update(
   world_relative_position_.y() = vehicle_model_ptr_->getY();
   updateStatus(current_time, step_time);
   updatePreviousValues();
+}
+
+auto EgoEntitySimulation::calculateAccelerationBySlope() -> double
+{
+  if (consider_acceleration_by_road_slope_) {
+    constexpr double gravity_acceleration = -9.81;
+    const double ego_pitch_angle = calculateEgoPitch();
+    const double slope_angle = -ego_pitch_angle;
+    return gravity_acceleration * std::sin(slope_angle);
+  } else {
+    return 0.0;
+  }
 }
 
 auto EgoEntitySimulation::calculateEgoPitch() const -> double
