@@ -18,7 +18,8 @@
 #include "common_test_fixtures.hpp"
 #include "helper.hpp"
 
-constexpr double timing_eps = 1e-3;
+constexpr double eps = 1e-6;
+// Frequency can fluctuate a bit due to timing, especially when the machine is under heavy load, so higher tolerance is needed
 constexpr double frequency_eps = 0.5;
 
 using namespace std::chrono_literals;
@@ -62,12 +63,12 @@ TEST_F(V2ITrafficLightsTest, startUpdate_publishSignals)
     EXPECT_EQ(one_message[0].elements[0].color, TrafficSignalElement::AMBER) << info;
     EXPECT_EQ(one_message[0].elements[0].shape, TrafficSignalElement::CIRCLE) << info;
     EXPECT_EQ(one_message[0].elements[0].status, TrafficSignalElement::FLASHING) << info;
-    EXPECT_NEAR(one_message[0].elements[0].confidence, 0.7, 1e-6);
+    EXPECT_NEAR(one_message[0].elements[0].confidence, 0.7, eps);
 
     EXPECT_EQ(one_message[0].elements[1].color, TrafficSignalElement::RED) << info;
     EXPECT_EQ(one_message[0].elements[1].shape, TrafficSignalElement::CIRCLE) << info;
     EXPECT_EQ(one_message[0].elements[1].status, TrafficSignalElement::SOLID_ON) << info;
-    EXPECT_NEAR(one_message[0].elements[1].confidence, 0.7, 1e-6);
+    EXPECT_NEAR(one_message[0].elements[1].confidence, 0.7, eps);
   }
 
   const double expected_frequency = 20.0;
@@ -115,12 +116,12 @@ TEST_F(V2ITrafficLightsTest, startUpdate_publishSignalsLegacy)
     EXPECT_EQ(one_message[0].elements[0].color, TrafficSignalElement::AMBER) << info;
     EXPECT_EQ(one_message[0].elements[0].shape, TrafficSignalElement::CIRCLE) << info;
     EXPECT_EQ(one_message[0].elements[0].status, TrafficSignalElement::FLASHING) << info;
-    EXPECT_NEAR(one_message[0].elements[0].confidence, 0.7, 1e-6);
+    EXPECT_NEAR(one_message[0].elements[0].confidence, 0.7, eps);
 
     EXPECT_EQ(one_message[0].elements[1].color, TrafficSignalElement::RED) << info;
     EXPECT_EQ(one_message[0].elements[1].shape, TrafficSignalElement::CIRCLE) << info;
     EXPECT_EQ(one_message[0].elements[1].status, TrafficSignalElement::SOLID_ON) << info;
-    EXPECT_NEAR(one_message[0].elements[1].confidence, 0.7, 1e-6);
+    EXPECT_NEAR(one_message[0].elements[1].confidence, 0.7, eps);
   }
 
   const double expected_frequency = 20.0;
@@ -179,12 +180,12 @@ TEST_F(V2ITrafficLightsTest, resetUpdate_publishSignals)
     EXPECT_EQ(one_message[0].elements[0].color, TrafficSignalElement::AMBER) << info;
     EXPECT_EQ(one_message[0].elements[0].shape, TrafficSignalElement::CIRCLE) << info;
     EXPECT_EQ(one_message[0].elements[0].status, TrafficSignalElement::FLASHING) << info;
-    EXPECT_NEAR(one_message[0].elements[0].confidence, 0.7, 1e-6);
+    EXPECT_NEAR(one_message[0].elements[0].confidence, 0.7, eps);
 
     EXPECT_EQ(one_message[0].elements[1].color, TrafficSignalElement::RED) << info;
     EXPECT_EQ(one_message[0].elements[1].shape, TrafficSignalElement::CIRCLE) << info;
     EXPECT_EQ(one_message[0].elements[1].status, TrafficSignalElement::SOLID_ON) << info;
-    EXPECT_NEAR(one_message[0].elements[1].confidence, 0.7, 1e-6);
+    EXPECT_NEAR(one_message[0].elements[1].confidence, 0.7, eps);
   }
 
   for (std::size_t i = 0; i < signals_reset.size(); ++i) {
@@ -201,12 +202,12 @@ TEST_F(V2ITrafficLightsTest, resetUpdate_publishSignals)
     EXPECT_EQ(one_message[0].elements[0].color, TrafficSignalElement::AMBER) << info;
     EXPECT_EQ(one_message[0].elements[0].shape, TrafficSignalElement::CIRCLE) << info;
     EXPECT_EQ(one_message[0].elements[0].status, TrafficSignalElement::FLASHING) << info;
-    EXPECT_NEAR(one_message[0].elements[0].confidence, 0.7, 1e-6);
+    EXPECT_NEAR(one_message[0].elements[0].confidence, 0.7, eps);
 
     EXPECT_EQ(one_message[0].elements[1].color, TrafficSignalElement::RED) << info;
     EXPECT_EQ(one_message[0].elements[1].shape, TrafficSignalElement::CIRCLE) << info;
     EXPECT_EQ(one_message[0].elements[1].status, TrafficSignalElement::SOLID_ON) << info;
-    EXPECT_NEAR(one_message[0].elements[1].confidence, 0.7, 1e-6);
+    EXPECT_NEAR(one_message[0].elements[1].confidence, 0.7, eps);
   }
 
   {
@@ -273,12 +274,12 @@ TEST_F(V2ITrafficLightsTest, resetUpdate_publishSignalsLegacy)
     EXPECT_EQ(one_message[0].elements[0].color, TrafficSignalElement::AMBER) << info;
     EXPECT_EQ(one_message[0].elements[0].shape, TrafficSignalElement::CIRCLE) << info;
     EXPECT_EQ(one_message[0].elements[0].status, TrafficSignalElement::FLASHING) << info;
-    EXPECT_NEAR(one_message[0].elements[0].confidence, 0.7, 1e-6);
+    EXPECT_NEAR(one_message[0].elements[0].confidence, 0.7, eps);
 
     EXPECT_EQ(one_message[0].elements[1].color, TrafficSignalElement::RED) << info;
     EXPECT_EQ(one_message[0].elements[1].shape, TrafficSignalElement::CIRCLE) << info;
     EXPECT_EQ(one_message[0].elements[1].status, TrafficSignalElement::SOLID_ON) << info;
-    EXPECT_NEAR(one_message[0].elements[1].confidence, 0.7, 1e-6);
+    EXPECT_NEAR(one_message[0].elements[1].confidence, 0.7, eps);
   }
 
   for (std::size_t i = 0; i < signals_reset.size(); ++i) {
@@ -295,12 +296,12 @@ TEST_F(V2ITrafficLightsTest, resetUpdate_publishSignalsLegacy)
     EXPECT_EQ(one_message[0].elements[0].color, TrafficSignalElement::AMBER) << info;
     EXPECT_EQ(one_message[0].elements[0].shape, TrafficSignalElement::CIRCLE) << info;
     EXPECT_EQ(one_message[0].elements[0].status, TrafficSignalElement::FLASHING) << info;
-    EXPECT_NEAR(one_message[0].elements[0].confidence, 0.7, 1e-6);
+    EXPECT_NEAR(one_message[0].elements[0].confidence, 0.7, eps);
 
     EXPECT_EQ(one_message[0].elements[1].color, TrafficSignalElement::RED) << info;
     EXPECT_EQ(one_message[0].elements[1].shape, TrafficSignalElement::CIRCLE) << info;
     EXPECT_EQ(one_message[0].elements[1].status, TrafficSignalElement::SOLID_ON) << info;
-    EXPECT_NEAR(one_message[0].elements[1].confidence, 0.7, 1e-6);
+    EXPECT_NEAR(one_message[0].elements[1].confidence, 0.7, eps);
   }
 
   {

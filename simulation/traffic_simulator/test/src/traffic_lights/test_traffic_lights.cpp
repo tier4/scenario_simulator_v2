@@ -23,7 +23,7 @@
 #include "../expect_eq_macros.hpp"
 #include "helper.hpp"
 
-constexpr double timing_eps = 1e-3;
+// Frequency can fluctuate a bit due to timing, especially when the machine is under heavy load, so higher tolerance is needed
 constexpr double frequency_eps = 0.5;
 
 using namespace std::chrono_literals;

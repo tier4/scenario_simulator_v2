@@ -14,12 +14,18 @@
 
 #include <gtest/gtest.h>
 
+#include <color_names/color_names.hpp>
+
 #include "../expect_eq_macros.hpp"
 #include "common_test_fixtures.hpp"
 #include "helper.hpp"
 
+constexpr double eps = 1e-6;
 constexpr double timing_eps = 1e-3;
+// Frequency can fluctuate a bit due to timing, especially when the machine is under heavy load, so higher tolerance is needed
 constexpr double frequency_eps = 0.5;
+// Position in tests is defined with precision of 1cm so such tolerance is needed
+constexpr double position_eps = 0.01;
 
 using namespace std::chrono_literals;
 
@@ -168,7 +174,9 @@ TYPED_TEST(TrafficLightsInternalTest, compareTrafficLightsState)
 
 TYPED_TEST(TrafficLightsInternalTest, startUpdate_publishMarkers)
 {
-  this->lights->setTrafficLightsState(this->id, stateFromColor("red"));
+  const std::string color_name = "red";
+
+  this->lights->setTrafficLightsState(this->id, stateFromColor(color_name));
 
   std::vector<visualization_msgs::msg::MarkerArray> markers;
 
@@ -191,7 +199,7 @@ TYPED_TEST(TrafficLightsInternalTest, startUpdate_publishMarkers)
       EXPECT_EQ(marker.action, visualization_msgs::msg::Marker::DELETEALL) << info;
     };
 
-  const auto verify_add_marker = [](
+  const auto verify_add_marker = [&color_name](
                                    const visualization_msgs::msg::Marker & marker,
                                    const auto info = "") {
     EXPECT_EQ(marker.ns, "bulb") << info;
@@ -201,15 +209,15 @@ TYPED_TEST(TrafficLightsInternalTest, startUpdate_publishMarkers)
 
     EXPECT_POINT_NEAR_STREAM(
       marker.pose.position,
-      geometry_msgs::build<geometry_msgs::msg::Point>().x(3770.02).y(73738.34).z(5.80), 0.01, info);
+      geometry_msgs::build<geometry_msgs::msg::Point>().x(3770.02).y(73738.34).z(5.80),
+      position_eps, info);
 
     EXPECT_QUATERNION_EQ_STREAM(marker.pose.orientation, geometry_msgs::msg::Quaternion(), info);
 
     EXPECT_POINT_EQ_STREAM(
       marker.scale, geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0.3).y(0.3).z(0.3), info);
 
-    EXPECT_COLOR_RGBA_EQ_STREAM(
-      marker.color, std_msgs::build<std_msgs::msg::ColorRGBA>().r(1.0).g(0.0).b(0.0).a(1.0), info);
+    EXPECT_COLOR_RGBA_NEAR_STREAM(marker.color, color_names::makeColorMsg(color_name), eps, info);
   };
 
   std::vector<std_msgs::msg::Header> headers;
@@ -238,7 +246,8 @@ TYPED_TEST(TrafficLightsInternalTest, startUpdate_publishMarkers)
 
 TYPED_TEST(TrafficLightsInternalTest, resetUpdate_publishMarkers)
 {
-  this->lights->setTrafficLightsState(this->id, stateFromColor("green"));
+  const std::string color_name = "green";
+  this->lights->setTrafficLightsState(this->id, stateFromColor(color_name));
 
   std::vector<visualization_msgs::msg::MarkerArray> markers, markers_reset;
 
@@ -273,7 +282,7 @@ TYPED_TEST(TrafficLightsInternalTest, resetUpdate_publishMarkers)
       EXPECT_EQ(marker.action, visualization_msgs::msg::Marker::DELETEALL) << info;
     };
 
-  const auto verify_add_marker = [](
+  const auto verify_add_marker = [&color_name](
                                    const visualization_msgs::msg::Marker & marker,
                                    const auto info = "") {
     EXPECT_EQ(marker.ns, "bulb") << info;
@@ -283,16 +292,15 @@ TYPED_TEST(TrafficLightsInternalTest, resetUpdate_publishMarkers)
 
     EXPECT_POINT_NEAR_STREAM(
       marker.pose.position,
-      geometry_msgs::build<geometry_msgs::msg::Point>().x(3770.02).y(73738.34).z(5.80), 0.01, info);
+      geometry_msgs::build<geometry_msgs::msg::Point>().x(3770.02).y(73738.34).z(5.80),
+      position_eps, info);
 
     EXPECT_QUATERNION_EQ_STREAM(marker.pose.orientation, geometry_msgs::msg::Quaternion(), info);
 
     EXPECT_POINT_EQ_STREAM(
       marker.scale, geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0.3).y(0.3).z(0.3), info);
 
-    EXPECT_COLOR_RGBA_NEAR_STREAM(
-      marker.color, std_msgs::build<std_msgs::msg::ColorRGBA>().r(0.0).g(0.5).b(0.0).a(1.0), 0.01,
-      info);
+    EXPECT_COLOR_RGBA_NEAR_STREAM(marker.color, color_names::makeColorMsg(color_name), eps, info);
   };
 
   std::vector<std_msgs::msg::Header> headers, headers_reset;
@@ -362,12 +370,12 @@ TYPED_TEST(TrafficLightsInternalTest, generateTrafficSimulatorV1Msg)
   EXPECT_EQ(msg.traffic_lights[0].traffic_light_bulbs[0].color, TrafficLightBulbV1::AMBER);
   EXPECT_EQ(msg.traffic_lights[0].traffic_light_bulbs[0].status, TrafficLightBulbV1::FLASHING);
   EXPECT_EQ(msg.traffic_lights[0].traffic_light_bulbs[0].shape, TrafficLightBulbV1::CIRCLE);
-  EXPECT_NEAR(msg.traffic_lights[0].traffic_light_bulbs[0].confidence, 0.7, 1e-6);
+  EXPECT_NEAR(msg.traffic_lights[0].traffic_light_bulbs[0].confidence, 0.7, eps);
 
   EXPECT_EQ(msg.traffic_lights[0].traffic_light_bulbs[1].color, TrafficLightBulbV1::RED);
   EXPECT_EQ(msg.traffic_lights[0].traffic_light_bulbs[1].status, TrafficLightBulbV1::SOLID_ON);
   EXPECT_EQ(msg.traffic_lights[0].traffic_light_bulbs[1].shape, TrafficLightBulbV1::CIRCLE);
-  EXPECT_NEAR(msg.traffic_lights[0].traffic_light_bulbs[1].confidence, 0.7, 1e-6);
+  EXPECT_NEAR(msg.traffic_lights[0].traffic_light_bulbs[1].confidence, 0.7, eps);
 }
 
 TYPED_TEST(TrafficLightsInternalTest, generateAutowareAutoPerceptionMsg)
@@ -399,12 +407,12 @@ TYPED_TEST(TrafficLightsInternalTest, generateAutowareAutoPerceptionMsg)
   EXPECT_EQ(msg.signals[0].lights[0].color, TrafficLight::AMBER);
   EXPECT_EQ(msg.signals[0].lights[0].status, TrafficLight::FLASHING);
   EXPECT_EQ(msg.signals[0].lights[0].shape, TrafficLight::CIRCLE);
-  EXPECT_NEAR(msg.signals[0].lights[0].confidence, 0.7, 1e-6);
+  EXPECT_NEAR(msg.signals[0].lights[0].confidence, 0.7, eps);
 
   EXPECT_EQ(msg.signals[0].lights[1].color, TrafficLight::RED);
   EXPECT_EQ(msg.signals[0].lights[1].status, TrafficLight::SOLID_ON);
   EXPECT_EQ(msg.signals[0].lights[1].shape, TrafficLight::CIRCLE);
-  EXPECT_NEAR(msg.signals[0].lights[1].confidence, 0.7, 1e-6);
+  EXPECT_NEAR(msg.signals[0].lights[1].confidence, 0.7, eps);
 }
 
 TYPED_TEST(TrafficLightsInternalTest, generateAutowarePerceptionTrafficSignalMsg)
@@ -432,12 +440,12 @@ TYPED_TEST(TrafficLightsInternalTest, generateAutowarePerceptionTrafficSignalMsg
   EXPECT_EQ(msg.signals[0].elements[0].color, TrafficSignalElement::AMBER);
   EXPECT_EQ(msg.signals[0].elements[0].status, TrafficSignalElement::FLASHING);
   EXPECT_EQ(msg.signals[0].elements[0].shape, TrafficSignalElement::CIRCLE);
-  EXPECT_NEAR(msg.signals[0].elements[0].confidence, 0.7, 1e-6);
+  EXPECT_NEAR(msg.signals[0].elements[0].confidence, 0.7, eps);
 
   EXPECT_EQ(msg.signals[0].elements[1].color, TrafficSignalElement::RED);
   EXPECT_EQ(msg.signals[0].elements[1].status, TrafficSignalElement::SOLID_ON);
   EXPECT_EQ(msg.signals[0].elements[1].shape, TrafficSignalElement::CIRCLE);
-  EXPECT_NEAR(msg.signals[0].elements[1].confidence, 0.7, 1e-6);
+  EXPECT_NEAR(msg.signals[0].elements[1].confidence, 0.7, eps);
 }
 
 #if __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)
@@ -466,11 +474,11 @@ TYPED_TEST(TrafficLightsInternalTest, generateAutowarePerceptionTrafficLightGrou
   EXPECT_EQ(msg.traffic_light_groups[0].elements[0].color, TrafficLightElement::AMBER);
   EXPECT_EQ(msg.traffic_light_groups[0].elements[0].status, TrafficLightElement::FLASHING);
   EXPECT_EQ(msg.traffic_light_groups[0].elements[0].shape, TrafficLightElement::CIRCLE);
-  EXPECT_NEAR(msg.traffic_light_groups[0].elements[0].confidence, 0.7, 1e-6);
+  EXPECT_NEAR(msg.traffic_light_groups[0].elements[0].confidence, 0.7, eps);
 
   EXPECT_EQ(msg.traffic_light_groups[0].elements[1].color, TrafficLightElement::RED);
   EXPECT_EQ(msg.traffic_light_groups[0].elements[1].status, TrafficLightElement::SOLID_ON);
   EXPECT_EQ(msg.traffic_light_groups[0].elements[1].shape, TrafficLightElement::CIRCLE);
-  EXPECT_NEAR(msg.traffic_light_groups[0].elements[1].confidence, 0.7, 1e-6);
+  EXPECT_NEAR(msg.traffic_light_groups[0].elements[1].confidence, 0.7, eps);
 }
 #endif  // __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)
