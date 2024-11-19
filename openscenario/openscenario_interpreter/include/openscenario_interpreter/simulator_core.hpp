@@ -475,9 +475,10 @@ public:
     }
 
     template <typename... Ts>
-    static auto applyAssignRouteAction(Ts &&... xs)
+    static auto applyAssignRouteAction(const std::string & entity_ref, Ts &&... xs)
     {
-      return core->requestAssignRoute(std::forward<decltype(xs)>(xs)...);
+      core->requestClearRoute(entity_ref);
+      return core->requestAssignRoute(entity_ref, std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>
