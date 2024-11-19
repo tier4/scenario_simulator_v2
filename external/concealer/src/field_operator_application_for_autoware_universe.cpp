@@ -479,14 +479,6 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::enableAutowareControl() -> v
   });
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::disableAutowareControl() -> void
-{
-  task_queue.delay([this]() {
-    auto request = std::make_shared<autoware_adapi_v1_msgs::srv::ChangeOperationMode::Request>();
-    requestDisableAutowareControl(request);
-  });
-}
-
 auto FieldOperatorApplicationFor<AutowareUniverse>::receiveEmergencyState(
   const tier4_external_api_msgs::msg::Emergency & message) -> void
 {

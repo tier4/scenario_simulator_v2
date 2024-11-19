@@ -40,6 +40,25 @@ AutowareUniverse::AutowareUniverse(bool simulate_localization)
   setControlModeReport("/vehicle/status/control_mode", *this),
   setVelocityReport("/vehicle/status/velocity_status", *this),
   setTurnIndicatorsReport("/vehicle/status/turn_indicators_status", *this),
+  control_mode_request_server(create_service<ControlModeCommand>(
+    "/control/control_mode_request",
+    [this](
+      const ControlModeCommand::Request::SharedPtr request,
+      ControlModeCommand::Response::SharedPtr response) {
+      if (request->mode == ControlModeCommand::Request::AUTONOMOUS) {
+        current_control_mode.store(ControlModeReport::AUTONOMOUS);
+        response->success = true;
+      } else if (request->mode == ControlModeCommand::Request::MANUAL) {
+        /*
+          NOTE:
+            MANUAL request will come when a remote override is triggered.
+            But scenario_simulator_v2 don't support a remote override for now.
+        */
+        response->success = false;
+      } else {
+        response->success = false;
+      }
+    })),
   // Autoware.Universe requires localization topics to send data at 50Hz
   localization_update_timer(rclcpp::create_timer(
     this, get_clock(), std::chrono::milliseconds(20), [this]() { updateLocalization(); })),
@@ -89,7 +108,7 @@ auto AutowareUniverse::getSteeringAngle() const -> double
 auto AutowareUniverse::updateLocalization() -> void
 {
   setAcceleration([this]() {
-    geometry_msgs::msg::AccelWithCovarianceStamped message;
+    AccelWithCovarianceStamped message;
     message.header.stamp = get_clock()->now();
     message.header.frame_id = "/base_link";
     message.accel.accel = current_acceleration.load();
@@ -132,21 +151,17 @@ auto AutowareUniverse::updateLocalization() -> void
 
 auto AutowareUniverse::updateVehicleState() -> void
 {
-  setControlModeReport([this]() {
-    autoware_vehicle_msgs::msg::ControlModeReport message;
-    message.mode = current_control_mode.load();
-    return message;
-  }());
+  setControlModeReport(getControlModeReport());
 
   setGearReport([this]() {
-    autoware_vehicle_msgs::msg::GearReport message;
+    GearReport message;
     message.stamp = get_clock()->now();
     message.report = getGearCommand().command;
     return message;
   }());
 
   setSteeringReport([this]() {
-    autoware_vehicle_msgs::msg::SteeringReport message;
+    SteeringReport message;
     message.stamp = get_clock()->now();
     message.steering_tire_angle = getSteeringAngle();
     return message;
@@ -154,7 +169,7 @@ auto AutowareUniverse::updateVehicleState() -> void
 
   setVelocityReport([this]() {
     const auto twist = current_twist.load();
-    autoware_vehicle_msgs::msg::VelocityReport message;
+    VelocityReport message;
     message.header.stamp = get_clock()->now();
     message.header.frame_id = "base_link";
     message.longitudinal_velocity = twist.linear.x;
@@ -164,31 +179,26 @@ auto AutowareUniverse::updateVehicleState() -> void
   }());
 
   setTurnIndicatorsReport([this]() {
-    autoware_vehicle_msgs::msg::TurnIndicatorsReport message;
+    TurnIndicatorsReport message;
     message.stamp = get_clock()->now();
     message.report = getTurnIndicatorsCommand().command;
     return message;
   }());
 }
 
-auto AutowareUniverse::getGearCommand() const -> autoware_vehicle_msgs::msg::GearCommand
-{
-  return getGearCommandImpl();
-}
+auto AutowareUniverse::getGearCommand() const -> GearCommand { return getGearCommandImpl(); }
 
 auto AutowareUniverse::getGearSign() const -> double
 {
-  using autoware_vehicle_msgs::msg::GearCommand;
-  // @todo Add support for GearCommand::NONE to return 0.0
-  // @sa https://github.com/autowarefoundation/autoware.universe/blob/main/simulator/simple_planning_simulator/src/simple_planning_simulator/simple_planning_simulator_core.cpp#L475
+  /// @todo Add support for GearCommand::NONE to return 0.0
+  /// @sa https://github.com/autowarefoundation/autoware.universe/blob/main/simulator/simple_planning_simulator/src/simple_planning_simulator/simple_planning_simulator_core.cpp#L475
   return getGearCommand().command == GearCommand::REVERSE or
              getGearCommand().command == GearCommand::REVERSE_2
            ? -1.0
            : 1.0;
 }
 
-auto AutowareUniverse::getVehicleCommand() const
-  -> std::tuple<autoware_control_msgs::msg::Control, autoware_vehicle_msgs::msg::GearCommand>
+auto AutowareUniverse::getVehicleCommand() const -> std::tuple<Control, GearCommand>
 {
   return std::make_tuple(getCommand(), getGearCommand());
 }
@@ -202,13 +212,15 @@ auto AutowareUniverse::getRouteLanelets() const -> std::vector<std::int64_t>
   return ids;
 }
 
-auto AutowareUniverse::setManualMode() -> void
+auto AutowareUniverse::getControlModeReport() const -> ControlModeReport
 {
-  current_control_mode.store(autoware_vehicle_msgs::msg::ControlModeReport::MANUAL);
+  ControlModeReport message;
+  message.mode = current_control_mode.load();
+  return message;
 }
 
-auto AutowareUniverse::setAutonomousMode() -> void
+auto AutowareUniverse::setManualMode() -> void
 {
-  current_control_mode.store(autoware_vehicle_msgs::msg::ControlModeReport::AUTONOMOUS);
+  current_control_mode.store(ControlModeReport::MANUAL);
 }
 }  // namespace concealer
