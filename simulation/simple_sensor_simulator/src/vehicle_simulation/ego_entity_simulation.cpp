@@ -383,8 +383,10 @@ auto EgoEntitySimulation::calculateEgoPitch() const -> double
       return min_idx;
     };
 
-  const size_t ego_seg_idx =
-    find_nearest_segment_index(centerline_points, world_relative_position_);
+  Eigen::Vector3d position;
+  position << status_.getMapPose().position.x, status_.getMapPose().position.y,
+    status_.getMapPose().position.z;
+  const size_t ego_seg_idx = find_nearest_segment_index(centerline_points, position);
 
   const auto & prev_point = centerline_points.at(ego_seg_idx);
   const auto & next_point = centerline_points.at(ego_seg_idx + 1);
