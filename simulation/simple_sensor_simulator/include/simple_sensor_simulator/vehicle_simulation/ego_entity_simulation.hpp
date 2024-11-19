@@ -71,7 +71,7 @@ public:
 
   const traffic_simulator_msgs::msg::VehicleParameters vehicle_parameters;
 
-  auto calculateAccelerationBySlope() -> double;
+  auto calculateAccelerationBySlope() const -> double;
 
 private:
   auto calculateEgoPitch() const -> double;

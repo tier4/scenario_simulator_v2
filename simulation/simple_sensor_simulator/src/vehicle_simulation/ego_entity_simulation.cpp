@@ -339,7 +339,7 @@ void EgoEntitySimulation::update(
   updatePreviousValues();
 }
 
-auto EgoEntitySimulation::calculateAccelerationBySlope() -> double
+auto EgoEntitySimulation::calculateAccelerationBySlope() const -> double
 {
   if (consider_acceleration_by_road_slope_) {
     constexpr double gravity_acceleration = -9.81;
