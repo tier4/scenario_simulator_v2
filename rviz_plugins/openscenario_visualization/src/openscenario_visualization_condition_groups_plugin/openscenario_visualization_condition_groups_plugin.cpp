@@ -60,21 +60,21 @@ VisualizationConditionGroupsDisplay::VisualizationConditionGroupsDisplay()
    * The purpose of this calculation is to position the top edge of the panel at an appropriate place on the screen, 
    * again scaling according to screen resolution to maintain a consistent look across different devices.
    */
-  const int top = static_cast<int>(std::round(450 * scale));
+  const auto top = static_cast<int>(std::round(450 * scale));
 
   /**
    * @note Define initial value of horizontal length of condition results panel.
    * The reason 2000 is hard-coded here is because that number displayed most beautifully when we tested the operation on a 4K/non 4K display.
    * Also, this number can be set via the rviz GUI.
    */
-  const int length = static_cast<int>(std::round(2000 * scale));
+  const auto length = static_cast<int>(std::round(2000 * scale));
 
   /**
    * @note Define initial value of width of condition results panel.
    * The reason 2000 is hard-coded here is because that number displayed most beautifully when we tested the operation on a 4K/non 4K display.
    * Also, this number can be set via the rviz GUI.
    */
-  const int width = static_cast<int>(std::round(2000 * scale));
+  const auto width = static_cast<int>(std::round(2000 * scale));
 
   property_topic_name_ = std::make_unique<rviz_common::properties::StringProperty>(
     "Topic", "/simulation/context", "The topic on which to publish simulation context.", this,
