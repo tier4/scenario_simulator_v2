@@ -408,22 +408,33 @@ auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
     return std::nullopt;
   }
 
-  const double entity_speed = getValidatedEntitySpeed();
-  const double acceleration = getValidatedEntityAcceleration();
-  [[maybe_unused]] const double max_acceleration = getValidatedEntityMaxAcceleration(acceleration);
-  [[maybe_unused]] const double min_acceleration = getValidatedEntityMinAcceleration(acceleration);
   const auto entity_position = getValidatedEntityPosition();
   const auto target_position = getValidatedEntityTargetPosition(polyline_trajectory);
 
   const double distance_to_front_waypoint = distance_along_lanelet(
     hdmap_utils_ptr, entity_status, matching_distance, entity_position, target_position);
-  const double remaining_time_to_front_waypoint =
-    (std::isnan(polyline_trajectory.base_time) ? 0.0 : polyline_trajectory.base_time) +
-    polyline_trajectory.shape.vertices.front().time - entity_status.time;
 
+  /*
+    This clause is to avoid division-by-zero errors in later clauses with
+    distance_to_front_waypoint as the denominator if the distance
+    miraculously becomes zero.
+  */
+  if (math::arithmetic::isDefinitelyLessThan(
+        distance_to_front_waypoint, std::numeric_limits<double>::epsilon())) {
+    return discardTheFrontWaypointAndRecurse(polyline_trajectory, matching_distance, target_speed);
+  }
   const auto [distance, remaining_time] = calculate_distance_and_remaining_time(
     hdmap_utils_ptr, entity_status, matching_distance, polyline_trajectory,
     distance_to_front_waypoint, step_time);
+
+  if (math::arithmetic::isDefinitelyLessThan(distance, std::numeric_limits<double>::epsilon())) {
+    return discardTheFrontWaypointAndRecurse(polyline_trajectory, matching_distance, target_speed);
+  }
+
+  const double acceleration = getValidatedEntityAcceleration();
+  [[maybe_unused]] const double max_acceleration = getValidatedEntityMaxAcceleration(acceleration);
+  [[maybe_unused]] const double min_acceleration = getValidatedEntityMinAcceleration(acceleration);
+  const double entity_speed = getValidatedEntitySpeed();
 
   /*
     The controller provides the ability to calculate acceleration using constraints from the
@@ -450,20 +461,6 @@ auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
     std::isinf(remaining_time) ? target_speed : std::nullopt);
 
   /*
-    This clause is to avoid division-by-zero errors in later clauses with
-    distance_to_front_waypoint as the denominator if the distance
-    miraculously becomes zero.
-  */
-  if (math::arithmetic::isDefinitelyLessThan(
-        distance_to_front_waypoint, std::numeric_limits<double>::epsilon())) {
-    return discardTheFrontWaypointAndRecurse(polyline_trajectory, matching_distance, target_speed);
-  }
-
-  if (math::arithmetic::isDefinitelyLessThan(distance, std::numeric_limits<double>::epsilon())) {
-    return discardTheFrontWaypointAndRecurse(polyline_trajectory, matching_distance, target_speed);
-  }
-
-  /*
     The desired acceleration is the acceleration at which the destination
     can be reached exactly at the specified time (= time remaining at zero).
 
@@ -482,14 +479,18 @@ auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
   const auto desired_velocity = getValidatedEntityDesiredVelocity(
     polyline_trajectory, target_position, entity_position, desired_speed);
   const auto current_velocity = calculate_current_velocity(entity_status, entity_speed);
-  const auto predicted_state_opt = follow_waypoint_controller.getPredictedWaypointArrivalState(
-    desired_acceleration, remaining_time, distance, acceleration, entity_speed);
 
   if (
     entity_speed * step_time > distance_to_front_waypoint &&
     math::geometry::innerProduct(desired_velocity, current_velocity) < 0.0) {
     return discardTheFrontWaypointAndRecurse(polyline_trajectory, matching_distance, target_speed);
   }
+
+  const auto predicted_state_opt = follow_waypoint_controller.getPredictedWaypointArrivalState(
+    desired_acceleration, remaining_time, distance, acceleration, entity_speed);
+  const double remaining_time_to_front_waypoint =
+    (std::isnan(polyline_trajectory.base_time) ? 0.0 : polyline_trajectory.base_time) +
+    polyline_trajectory.shape.vertices.front().time - entity_status.time;
 
   if (not std::isinf(remaining_time) and not predicted_state_opt.has_value()) {
     throw common::Error(
