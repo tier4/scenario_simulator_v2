@@ -45,7 +45,7 @@ class AutowareUniverse : public Autoware
   using GearCommand                 = autoware_vehicle_msgs::msg::GearCommand;
   using GearReport                  = autoware_vehicle_msgs::msg::GearReport;
   using PathWithLaneId              = tier4_planning_msgs::msg::PathWithLaneId;
-  using PoseWithCovarianceStamped   = geometry_msgs::msg::PoseWithCovarianceStamped
+  using PoseWithCovarianceStamped   = geometry_msgs::msg::PoseWithCovarianceStamped;
   using SteeringReport              = autoware_vehicle_msgs::msg::SteeringReport;
   using TurnIndicatorsCommand       = autoware_vehicle_msgs::msg::TurnIndicatorsCommand;
   using TurnIndicatorsReport        = autoware_vehicle_msgs::msg::TurnIndicatorsReport;
