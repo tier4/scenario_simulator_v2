@@ -143,7 +143,8 @@ auto calculate_distance_and_remaining_time(
         total_distance_to(std::cend(polyline_trajectory.shape.vertices) - 1),
       std::numeric_limits<double>::infinity());
   }
-
+  std::cout << "  waypoint_ptr->time " << waypoint_ptr->time << " " << polyline_trajectory.base_time
+            << std::endl;
   const auto remaining_time =
     (not std::isnan(polyline_trajectory.base_time) ? polyline_trajectory.base_time : 0.0) +
     waypoint_ptr->time - entity_status.time;
@@ -405,6 +406,7 @@ auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
   }
 
   if (polyline_trajectory.shape.vertices.empty()) {
+    std::cout << __LINE__ << "empty" << std::endl;
     return std::nullopt;
   }
 
@@ -424,6 +426,7 @@ auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
   */
   if (math::arithmetic::isDefinitelyLessThan(
         distance_to_front_waypoint, std::numeric_limits<double>::epsilon())) {
+    std::cout << __LINE__ << "recursion" << std::endl;
     return discardTheFrontWaypointAndRecurse(polyline_trajectory, matching_distance, target_speed);
   }
   const auto [distance, remaining_time] = calculate_distance_and_remaining_time(
@@ -431,6 +434,7 @@ auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
     distance_to_front_waypoint, step_time);
 
   if (math::arithmetic::isDefinitelyLessThan(distance, std::numeric_limits<double>::epsilon())) {
+    std::cout << __LINE__ << "recursion" << std::endl;
     return discardTheFrontWaypointAndRecurse(polyline_trajectory, matching_distance, target_speed);
   }
 
@@ -486,6 +490,12 @@ auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
   if (
     entity_speed * step_time > distance_to_front_waypoint &&
     math::geometry::innerProduct(desired_velocity, current_velocity) < 0.0) {
+    std::cout << entity_speed << " " << step_time << " " << distance_to_front_waypoint << std::endl;
+    std::cout << desired_velocity.x << " " << desired_velocity.y << " " << desired_velocity.z << " "
+              << std::endl;
+    std::cout << current_velocity.x << " " << current_velocity.y << " " << current_velocity.z << " "
+              << std::endl;
+    std::cout << __LINE__ << "recursion" << std::endl;
     return discardTheFrontWaypointAndRecurse(polyline_trajectory, matching_distance, target_speed);
   }
 
@@ -495,7 +505,7 @@ auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
     auto remaining_time_to_arrival_to_front_waypoint = predicted_state_opt->travel_time;
     // clang-format off
       std::cout << std::fixed << std::boolalpha << std::string(80, '-') << std::endl;
-
+      std::cout << "entity time == " << entity_status.time << std::endl;
       std::cout << "acceleration "
                 << "== " << acceleration
                 << std::endl;
@@ -596,9 +606,11 @@ auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
       */
       if (follow_waypoint_controller.areConditionsOfArrivalMet(
             acceleration, entity_speed, distance_to_front_waypoint)) {
+        std::cout << __LINE__ << "recursion" << std::endl;
         return discardTheFrontWaypointAndRecurse(
           polyline_trajectory, matching_distance, target_speed);
       } else {
+        std::cout << __LINE__ << "finish" << std::endl;
         return buildUpdatedEntityStatus(desired_velocity);
       }
     } else {
@@ -609,9 +621,11 @@ auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
       if (const double this_step_distance =
             (entity_speed + desired_acceleration * step_time) * step_time;
           this_step_distance > distance_to_front_waypoint) {
+        std::cout << __LINE__ << "recursion" << std::endl;
         return discardTheFrontWaypointAndRecurse(
           polyline_trajectory, matching_distance, target_speed);
       } else {
+        std::cout << __LINE__ << "finish" << std::endl;
         return buildUpdatedEntityStatus(desired_velocity);
       }
     }
@@ -627,6 +641,7 @@ auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
                remaining_time_to_front_waypoint, step_time / 2.0)) {
     if (follow_waypoint_controller.areConditionsOfArrivalMet(
           acceleration, entity_speed, distance_to_front_waypoint)) {
+      std::cout << __LINE__ << "recursion" << std::endl;
       return discardTheFrontWaypointAndRecurse(
         polyline_trajectory, matching_distance, target_speed);
     } else {
@@ -638,6 +653,7 @@ auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
         " from that waypoint which is greater than the accepted accuracy.");
     }
   } else {
+    std::cout << __LINE__ << "finish" << std::endl;
     return buildUpdatedEntityStatus(desired_velocity);
   }
 
