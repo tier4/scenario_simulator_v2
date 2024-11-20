@@ -35,8 +35,9 @@ public:
     const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter,
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr, const double step_time);
 
+  // side effects on polyline_trajectory
   auto makeUpdatedEntityStatus(
-    const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
+    traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
     const double matching_distance,
     const std::optional<double> target_speed /*= std::nullopt*/) const
     -> std::optional<EntityStatus>;
@@ -47,8 +48,9 @@ private:
   const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr;
   const double step_time;
 
+  // side effects on polyline_trajectory
   auto discardTheFrontWaypointAndRecurse(
-    const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
+    traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
     const double matching_distance, const std::optional<double> target_speed) const
     -> std::optional<EntityStatus>;
   auto buildUpdatedEntityStatus(const geometry_msgs::msg::Vector3 & desired_velocity) const

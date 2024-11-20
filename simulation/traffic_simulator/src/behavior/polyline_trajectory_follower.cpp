@@ -143,8 +143,6 @@ auto calculate_distance_and_remaining_time(
         total_distance_to(std::cend(polyline_trajectory.shape.vertices) - 1),
       std::numeric_limits<double>::infinity());
   }
-  std::cout << "  waypoint_ptr->time " << waypoint_ptr->time << " " << polyline_trajectory.base_time
-            << std::endl;
   const auto remaining_time =
     (not std::isnan(polyline_trajectory.base_time) ? polyline_trajectory.base_time : 0.0) +
     waypoint_ptr->time - entity_status.time;
@@ -279,7 +277,7 @@ auto PolylineTrajectoryFollower::getValidatedEntityDesiredAcceleration(
 }
 
 auto PolylineTrajectoryFollower::discardTheFrontWaypointAndRecurse(
-  const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
+  traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
   const double matching_distance, const std::optional<double> target_speed) const
   -> std::optional<EntityStatus>
 {
@@ -306,23 +304,22 @@ auto PolylineTrajectoryFollower::discardTheFrontWaypointAndRecurse(
       means "The waypoint about to be popped is the waypoint with the
       specified arrival time".
   */
-  auto polyline_trajectory_copy = polyline_trajectory;
   if (
-    not std::isnan(polyline_trajectory_copy.base_time) and
-    not std::isnan(polyline_trajectory_copy.shape.vertices.front().time)) {
-    polyline_trajectory_copy.base_time = entity_status.time;
+    not std::isnan(polyline_trajectory.base_time) and
+    not std::isnan(polyline_trajectory.shape.vertices.front().time)) {
+    polyline_trajectory.base_time = entity_status.time;
   }
 
   std::rotate(
-    std::begin(polyline_trajectory_copy.shape.vertices),
-    std::begin(polyline_trajectory_copy.shape.vertices) + 1,
-    std::end(polyline_trajectory_copy.shape.vertices));
+    std::begin(polyline_trajectory.shape.vertices),
+    std::begin(polyline_trajectory.shape.vertices) + 1,
+    std::end(polyline_trajectory.shape.vertices));
 
-  if (not polyline_trajectory_copy.closed) {
-    polyline_trajectory_copy.shape.vertices.pop_back();
+  if (not polyline_trajectory.closed) {
+    polyline_trajectory.shape.vertices.pop_back();
   }
 
-  return makeUpdatedEntityStatus(polyline_trajectory_copy, matching_distance, target_speed);
+  return makeUpdatedEntityStatus(polyline_trajectory, matching_distance, target_speed);
 };
 
 auto PolylineTrajectoryFollower::buildUpdatedEntityStatus(
@@ -380,7 +377,7 @@ auto PolylineTrajectoryFollower::buildUpdatedEntityStatus(
 }
 
 auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
-  const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
+  traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
   const double matching_distance, const std::optional<double> target_speed /*= std::nullopt*/) const
   -> std::optional<EntityStatus>
 {
@@ -406,7 +403,6 @@ auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
   }
 
   if (polyline_trajectory.shape.vertices.empty()) {
-    std::cout << __LINE__ << "empty" << std::endl;
     return std::nullopt;
   }
 
@@ -426,7 +422,6 @@ auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
   */
   if (math::arithmetic::isDefinitelyLessThan(
         distance_to_front_waypoint, std::numeric_limits<double>::epsilon())) {
-    std::cout << __LINE__ << "recursion" << std::endl;
     return discardTheFrontWaypointAndRecurse(polyline_trajectory, matching_distance, target_speed);
   }
   const auto [distance, remaining_time] = calculate_distance_and_remaining_time(
@@ -434,7 +429,6 @@ auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
     distance_to_front_waypoint, step_time);
 
   if (math::arithmetic::isDefinitelyLessThan(distance, std::numeric_limits<double>::epsilon())) {
-    std::cout << __LINE__ << "recursion" << std::endl;
     return discardTheFrontWaypointAndRecurse(polyline_trajectory, matching_distance, target_speed);
   }
 
@@ -490,99 +484,12 @@ auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
   if (
     entity_speed * step_time > distance_to_front_waypoint &&
     math::geometry::innerProduct(desired_velocity, current_velocity) < 0.0) {
-    std::cout << entity_speed << " " << step_time << " " << distance_to_front_waypoint << std::endl;
-    std::cout << desired_velocity.x << " " << desired_velocity.y << " " << desired_velocity.z << " "
-              << std::endl;
-    std::cout << current_velocity.x << " " << current_velocity.y << " " << current_velocity.z << " "
-              << std::endl;
-    std::cout << __LINE__ << "recursion" << std::endl;
     return discardTheFrontWaypointAndRecurse(polyline_trajectory, matching_distance, target_speed);
   }
 
   const auto predicted_state_opt = follow_waypoint_controller.getPredictedWaypointArrivalState(
     desired_acceleration, remaining_time, distance, acceleration, entity_speed);
-  if constexpr (true) {
-    auto remaining_time_to_arrival_to_front_waypoint = predicted_state_opt->travel_time;
-    // clang-format off
-      std::cout << std::fixed << std::boolalpha << std::string(80, '-') << std::endl;
-      std::cout << "entity time == " << entity_status.time << std::endl;
-      std::cout << "acceleration "
-                << "== " << acceleration
-                << std::endl;
 
-      std::cout << "min_acceleration "
-                << "== std::max(acceleration - max_deceleration_rate * step_time, -max_deceleration) "
-                << "== std::max(" << acceleration << " - " << behavior_parameter.dynamic_constraints.max_deceleration_rate << " * " << step_time << ", " << -behavior_parameter.dynamic_constraints.max_deceleration << ") "
-                << "== std::max(" << acceleration << " - " << behavior_parameter.dynamic_constraints.max_deceleration_rate * step_time << ", " << -behavior_parameter.dynamic_constraints.max_deceleration << ") "
-                << "== std::max(" << (acceleration - behavior_parameter.dynamic_constraints.max_deceleration_rate * step_time) << ", " << -behavior_parameter.dynamic_constraints.max_deceleration << ") "
-                << "== " << min_acceleration
-                << std::endl;
-
-      std::cout << "max_acceleration "
-                << "== std::min(acceleration + max_acceleration_rate * step_time, +max_acceleration) "
-                << "== std::min(" << acceleration << " + " << behavior_parameter.dynamic_constraints.max_acceleration_rate << " * " << step_time << ", " << behavior_parameter.dynamic_constraints.max_acceleration << ") "
-                << "== std::min(" << acceleration << " + " << behavior_parameter.dynamic_constraints.max_acceleration_rate * step_time << ", " << behavior_parameter.dynamic_constraints.max_acceleration << ") "
-                << "== std::min(" << (acceleration + behavior_parameter.dynamic_constraints.max_acceleration_rate * step_time) << ", " << behavior_parameter.dynamic_constraints.max_acceleration << ") "
-                << "== " << max_acceleration
-                << std::endl;
-
-      std::cout << "min_acceleration < acceleration < max_acceleration "
-                << "== " << min_acceleration << " < " << acceleration << " < " << max_acceleration << std::endl;
-
-      std::cout << "desired_acceleration "
-                << "== 2 * distance / std::pow(remaining_time, 2) - 2 * speed / remaining_time "
-                << "== 2 * " << distance << " / " << std::pow(remaining_time, 2) << " - 2 * " << entity_speed << " / " << remaining_time << " "
-                << "== " << (2 * distance / std::pow(remaining_time, 2)) << " - " << (2 * entity_speed / remaining_time) << " "
-                << "== " << desired_acceleration << " "
-                << "(acceleration < desired_acceleration == " << (acceleration < desired_acceleration) << " == need to " <<(acceleration < desired_acceleration ? "accelerate" : "decelerate") << ")"
-                << std::endl;
-
-      std::cout << "desired_speed "
-                << "== speed + std::clamp(desired_acceleration, min_acceleration, max_acceleration) * step_time "
-                << "== " << entity_speed << " + std::clamp(" << desired_acceleration << ", " << min_acceleration << ", " << max_acceleration << ") * " << step_time << " "
-                << "== " << entity_speed << " + " << std::clamp(desired_acceleration, min_acceleration, max_acceleration) << " * " << step_time << " "
-                << "== " << entity_speed << " + " << std::clamp(desired_acceleration, min_acceleration, max_acceleration) * step_time << " "
-                << "== " << desired_speed
-                << std::endl;
-
-      std::cout << "distance_to_front_waypoint "
-                << "== " << distance_to_front_waypoint
-                << std::endl;
-
-      std::cout << "remaining_time_to_arrival_to_front_waypoint "
-                << "== " << remaining_time_to_arrival_to_front_waypoint
-                << std::endl;
-
-      std::cout << "distance "
-                << "== " << distance
-                << std::endl;
-
-      std::cout << "remaining_time "
-                << "== " << remaining_time
-                << std::endl;
-
-      std::cout << "remaining_time_to_arrival_to_front_waypoint "
-                << "("
-                << "== distance_to_front_waypoint / desired_speed "
-                << "== " << distance_to_front_waypoint << " / " << desired_speed << " "
-                << "== " << remaining_time_to_arrival_to_front_waypoint
-                << ")"
-                << std::endl;
-
-      std::cout << "arrive during this frame? "
-                << "== remaining_time_to_arrival_to_front_waypoint < step_time "
-                << "== " << remaining_time_to_arrival_to_front_waypoint << " < " << step_time << " "
-                << "== " << math::arithmetic::isDefinitelyLessThan(remaining_time_to_arrival_to_front_waypoint, step_time)
-                << std::endl;
-
-      std::cout << "not too early? "
-                << "== std::isnan(remaining_time_to_front_waypoint) or remaining_time_to_front_waypoint < remaining_time_to_arrival_to_front_waypoint + step_time "
-                << "== std::isnan(" << remaining_time_to_front_waypoint << ") or " << remaining_time_to_front_waypoint << " < " << remaining_time_to_arrival_to_front_waypoint << " + " << step_time << " "
-                << "== " << std::isnan(remaining_time_to_front_waypoint) << " or " << math::arithmetic::isDefinitelyLessThan(remaining_time_to_front_waypoint, remaining_time_to_arrival_to_front_waypoint + step_time) << " "
-                << "== " << (std::isnan(remaining_time_to_front_waypoint) or math::arithmetic::isDefinitelyLessThan(remaining_time_to_front_waypoint, remaining_time_to_arrival_to_front_waypoint + step_time))
-                << std::endl;
-    // clang-format on
-  }
   if (not std::isinf(remaining_time) and not predicted_state_opt.has_value()) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
@@ -606,11 +513,9 @@ auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
       */
       if (follow_waypoint_controller.areConditionsOfArrivalMet(
             acceleration, entity_speed, distance_to_front_waypoint)) {
-        std::cout << __LINE__ << "recursion" << std::endl;
         return discardTheFrontWaypointAndRecurse(
           polyline_trajectory, matching_distance, target_speed);
       } else {
-        std::cout << __LINE__ << "finish" << std::endl;
         return buildUpdatedEntityStatus(desired_velocity);
       }
     } else {
@@ -621,11 +526,9 @@ auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
       if (const double this_step_distance =
             (entity_speed + desired_acceleration * step_time) * step_time;
           this_step_distance > distance_to_front_waypoint) {
-        std::cout << __LINE__ << "recursion" << std::endl;
         return discardTheFrontWaypointAndRecurse(
           polyline_trajectory, matching_distance, target_speed);
       } else {
-        std::cout << __LINE__ << "finish" << std::endl;
         return buildUpdatedEntityStatus(desired_velocity);
       }
     }
@@ -641,7 +544,6 @@ auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
                remaining_time_to_front_waypoint, step_time / 2.0)) {
     if (follow_waypoint_controller.areConditionsOfArrivalMet(
           acceleration, entity_speed, distance_to_front_waypoint)) {
-      std::cout << __LINE__ << "recursion" << std::endl;
       return discardTheFrontWaypointAndRecurse(
         polyline_trajectory, matching_distance, target_speed);
     } else {
@@ -653,7 +555,6 @@ auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
         " from that waypoint which is greater than the accepted accuracy.");
     }
   } else {
-    std::cout << __LINE__ << "finish" << std::endl;
     return buildUpdatedEntityStatus(desired_velocity);
   }
 
