@@ -413,6 +413,9 @@ auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
 
   const double distance_to_front_waypoint = distance_along_lanelet(
     hdmap_utils_ptr, entity_status, matching_distance, entity_position, target_position);
+  const double remaining_time_to_front_waypoint =
+    (std::isnan(polyline_trajectory.base_time) ? 0.0 : polyline_trajectory.base_time) +
+    polyline_trajectory.shape.vertices.front().time - entity_status.time;
 
   /*
     This clause is to avoid division-by-zero errors in later clauses with
@@ -488,10 +491,88 @@ auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
 
   const auto predicted_state_opt = follow_waypoint_controller.getPredictedWaypointArrivalState(
     desired_acceleration, remaining_time, distance, acceleration, entity_speed);
-  const double remaining_time_to_front_waypoint =
-    (std::isnan(polyline_trajectory.base_time) ? 0.0 : polyline_trajectory.base_time) +
-    polyline_trajectory.shape.vertices.front().time - entity_status.time;
+  if constexpr (true) {
+    auto remaining_time_to_arrival_to_front_waypoint = predicted_state_opt->travel_time;
+    // clang-format off
+      std::cout << std::fixed << std::boolalpha << std::string(80, '-') << std::endl;
 
+      std::cout << "acceleration "
+                << "== " << acceleration
+                << std::endl;
+
+      std::cout << "min_acceleration "
+                << "== std::max(acceleration - max_deceleration_rate * step_time, -max_deceleration) "
+                << "== std::max(" << acceleration << " - " << behavior_parameter.dynamic_constraints.max_deceleration_rate << " * " << step_time << ", " << -behavior_parameter.dynamic_constraints.max_deceleration << ") "
+                << "== std::max(" << acceleration << " - " << behavior_parameter.dynamic_constraints.max_deceleration_rate * step_time << ", " << -behavior_parameter.dynamic_constraints.max_deceleration << ") "
+                << "== std::max(" << (acceleration - behavior_parameter.dynamic_constraints.max_deceleration_rate * step_time) << ", " << -behavior_parameter.dynamic_constraints.max_deceleration << ") "
+                << "== " << min_acceleration
+                << std::endl;
+
+      std::cout << "max_acceleration "
+                << "== std::min(acceleration + max_acceleration_rate * step_time, +max_acceleration) "
+                << "== std::min(" << acceleration << " + " << behavior_parameter.dynamic_constraints.max_acceleration_rate << " * " << step_time << ", " << behavior_parameter.dynamic_constraints.max_acceleration << ") "
+                << "== std::min(" << acceleration << " + " << behavior_parameter.dynamic_constraints.max_acceleration_rate * step_time << ", " << behavior_parameter.dynamic_constraints.max_acceleration << ") "
+                << "== std::min(" << (acceleration + behavior_parameter.dynamic_constraints.max_acceleration_rate * step_time) << ", " << behavior_parameter.dynamic_constraints.max_acceleration << ") "
+                << "== " << max_acceleration
+                << std::endl;
+
+      std::cout << "min_acceleration < acceleration < max_acceleration "
+                << "== " << min_acceleration << " < " << acceleration << " < " << max_acceleration << std::endl;
+
+      std::cout << "desired_acceleration "
+                << "== 2 * distance / std::pow(remaining_time, 2) - 2 * speed / remaining_time "
+                << "== 2 * " << distance << " / " << std::pow(remaining_time, 2) << " - 2 * " << entity_speed << " / " << remaining_time << " "
+                << "== " << (2 * distance / std::pow(remaining_time, 2)) << " - " << (2 * entity_speed / remaining_time) << " "
+                << "== " << desired_acceleration << " "
+                << "(acceleration < desired_acceleration == " << (acceleration < desired_acceleration) << " == need to " <<(acceleration < desired_acceleration ? "accelerate" : "decelerate") << ")"
+                << std::endl;
+
+      std::cout << "desired_speed "
+                << "== speed + std::clamp(desired_acceleration, min_acceleration, max_acceleration) * step_time "
+                << "== " << entity_speed << " + std::clamp(" << desired_acceleration << ", " << min_acceleration << ", " << max_acceleration << ") * " << step_time << " "
+                << "== " << entity_speed << " + " << std::clamp(desired_acceleration, min_acceleration, max_acceleration) << " * " << step_time << " "
+                << "== " << entity_speed << " + " << std::clamp(desired_acceleration, min_acceleration, max_acceleration) * step_time << " "
+                << "== " << desired_speed
+                << std::endl;
+
+      std::cout << "distance_to_front_waypoint "
+                << "== " << distance_to_front_waypoint
+                << std::endl;
+
+      std::cout << "remaining_time_to_arrival_to_front_waypoint "
+                << "== " << remaining_time_to_arrival_to_front_waypoint
+                << std::endl;
+
+      std::cout << "distance "
+                << "== " << distance
+                << std::endl;
+
+      std::cout << "remaining_time "
+                << "== " << remaining_time
+                << std::endl;
+
+      std::cout << "remaining_time_to_arrival_to_front_waypoint "
+                << "("
+                << "== distance_to_front_waypoint / desired_speed "
+                << "== " << distance_to_front_waypoint << " / " << desired_speed << " "
+                << "== " << remaining_time_to_arrival_to_front_waypoint
+                << ")"
+                << std::endl;
+
+      std::cout << "arrive during this frame? "
+                << "== remaining_time_to_arrival_to_front_waypoint < step_time "
+                << "== " << remaining_time_to_arrival_to_front_waypoint << " < " << step_time << " "
+                << "== " << math::arithmetic::isDefinitelyLessThan(remaining_time_to_arrival_to_front_waypoint, step_time)
+                << std::endl;
+
+      std::cout << "not too early? "
+                << "== std::isnan(remaining_time_to_front_waypoint) or remaining_time_to_front_waypoint < remaining_time_to_arrival_to_front_waypoint + step_time "
+                << "== std::isnan(" << remaining_time_to_front_waypoint << ") or " << remaining_time_to_front_waypoint << " < " << remaining_time_to_arrival_to_front_waypoint << " + " << step_time << " "
+                << "== " << std::isnan(remaining_time_to_front_waypoint) << " or " << math::arithmetic::isDefinitelyLessThan(remaining_time_to_front_waypoint, remaining_time_to_arrival_to_front_waypoint + step_time) << " "
+                << "== " << (std::isnan(remaining_time_to_front_waypoint) or math::arithmetic::isDefinitelyLessThan(remaining_time_to_front_waypoint, remaining_time_to_arrival_to_front_waypoint + step_time))
+                << std::endl;
+    // clang-format on
+  }
   if (not std::isinf(remaining_time) and not predicted_state_opt.has_value()) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
