@@ -36,6 +36,7 @@ ament_auto_add_library(traffic_simulator SHARED
   src/data_type/entity_status.cpp
   src/data_type/lane_change.cpp
   src/data_type/lanelet_pose.cpp
+  src/data_type/routing_graph_type.cpp
   src/data_type/speed_change.cpp
   src/entity/ego_entity.cpp
   src/entity/entity_base.cpp
