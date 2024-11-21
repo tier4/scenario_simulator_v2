@@ -2876,6 +2876,18 @@ Visualization Manager:
             Reliability Policy: Reliable
             Value: /simulation/debug_marker
           Value: true
+        - Class: rviz_default_plugins/MarkerArray
+          Enabled: true
+          Name: Interpreter Marker
+          Namespaces:
+            {}
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /simulation/interpreter/markers
+          Value: true
         - Class: rviz_common/Group
           Displays:
             - Alpha: 0.9990000128746033
@@ -2984,19 +2996,7 @@ Visualization Manager:
           Name: Simple Sensor Simulator
       Enabled: true
       Name: Simulation
-    - Class: rviz_default_plugins/MarkerArray
       Enabled: true
-      Name: MarkerArray
-      Namespaces:
-        reach_position_condition/ego: true
-      Topic:
-        Depth: 5
-        Durability Policy: Volatile
-        History Policy: Keep Last
-        Reliability Policy: Reliable
-        Value: /simulation/interpreter/markers
-      Value: true
-  Enabled: true
   Global Options:
     Background Color: 10; 10; 10
     Fixed Frame: map
