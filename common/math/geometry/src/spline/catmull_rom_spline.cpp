@@ -36,7 +36,7 @@ auto CatmullRomSpline::getPolygon(
   std::vector<geometry_msgs::msg::Point> points;
   std::vector<geometry_msgs::msg::Point> left_bounds = getLeftBounds(width, num_points, z_offset);
   std::vector<geometry_msgs::msg::Point> right_bounds = getRightBounds(width, num_points, z_offset);
-  for (size_t i = 0; i < static_cast<size_t>(left_bounds.size() - 1); i++) {
+  for (size_t i = 0; i < left_bounds.size() - 1; i++) {
     geometry_msgs::msg::Point pr_0 = right_bounds[i];
     geometry_msgs::msg::Point pl_0 = left_bounds[i];
     geometry_msgs::msg::Point pr_1 = right_bounds[i + 1];
@@ -57,7 +57,7 @@ auto CatmullRomSpline::getRightBounds(
 {
   std::vector<geometry_msgs::msg::Point> points;
   double step_size = getLength() / static_cast<double>(num_points);
-  for (size_t i = 0; i < static_cast<size_t>(num_points + 1); i++) {
+  for (size_t i = 0; i < num_points + 1; i++) {
     double s = step_size * static_cast<double>(i);
     points.emplace_back(
       [this](const double local_width, const double local_s, const double local_z_offset) {
@@ -80,7 +80,7 @@ auto CatmullRomSpline::getLeftBounds(
 {
   std::vector<geometry_msgs::msg::Point> points;
   double step_size = getLength() / static_cast<double>(num_points);
-  for (size_t i = 0; i < static_cast<size_t>(num_points + 1); i++) {
+  for (size_t i = 0; i < num_points + 1; i++) {
     double s = step_size * static_cast<double>(i);
     points.emplace_back(
       [this](const double local_width, const double local_s, const double local_z_offset) {
