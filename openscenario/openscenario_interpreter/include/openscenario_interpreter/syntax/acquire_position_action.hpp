@@ -24,15 +24,17 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- AcquirePositionAction --------------------------------------------------
- *
- *  <xsd:complexType name="AcquirePositionAction">
- *    <xsd:all>
- *      <xsd:element name="Position" type="Position"/>
- *    </xsd:all>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
+/*
+  AcquirePositionAction (OpenSCENARIO XML 1.3.0)
+
+  Controls the entity to acquire a target position.
+
+  <xsd:complexType name="AcquirePositionAction">
+    <xsd:all>
+      <xsd:element name="Position" type="Position"/>
+    </xsd:all>
+  </xsd:complexType>
+*/
 struct AcquirePositionAction : private Scope, private SimulatorCore::ActionApplication
 {
   const Position position;
