@@ -21,6 +21,23 @@ Changelog for package traffic_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+5.3.4 (2024-11-21)
+------------------
+* Merge pull request `#1447 <https://github.com/tier4/scenario_simulator_v2/issues/1447>`_ from tier4/fix/find_nearest_segment_index
+  fix pitch and slope acceleration calculation for ego vehicle
+* Merge branch 'master' into fix/find_nearest_segment_index
+* feat: add tests for EgoEntitySimulation::calculateAccelerationBySlope
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka
+
+5.3.3 (2024-11-21)
+------------------
+* Merge pull request `#1451 <https://github.com/tier4/scenario_simulator_v2/issues/1451>`_ from tier4/fix/sonor-cloud-issue-7
+  Fix/sonor cloud issue 7
+* Merge branch 'master' into fix/sonor-cloud-issue-7
+* fix typo
+* Replace "." with "::" for access
+* Contributors: Masaya Kataoka, Taiga Takano
+
 5.3.2 (2024-11-18)
 ------------------
 * Merge branch 'master' into fix/interpreter/assign-route-action
