@@ -47,6 +47,7 @@
 #include <traffic_simulator/data_type/lane_change.hpp>
 #include <traffic_simulator/data_type/routing_graph_type.hpp>
 #include <traffic_simulator/hdmap_utils/cache.hpp>
+#include <traffic_simulator/hdmap_utils/traffic_rules.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
 #include <tuple>
@@ -366,6 +367,8 @@ private:
     [[nodiscard]] RouteCache & route_cache(const traffic_simulator::RoutingGraphType type);
 
     RuleWithGraph vehicle;
+
+    RuleWithGraph vehicle_with_road_shoulder;
 
     RuleWithGraph pedestrian;
   };

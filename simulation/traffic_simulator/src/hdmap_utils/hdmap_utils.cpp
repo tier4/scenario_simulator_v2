@@ -2199,6 +2199,10 @@ HdMapUtils::RoutingGraphs::RoutingGraphs(const lanelet::LaneletMapPtr & lanelet_
   vehicle.rules = lanelet::traffic_rules::TrafficRulesFactory::create(
     lanelet::Locations::Germany, lanelet::Participants::Vehicle);
   vehicle.graph = lanelet::routing::RoutingGraph::build(*lanelet_map, *vehicle.rules);
+  vehicle_with_road_shoulder.rules = lanelet::traffic_rules::TrafficRulesFactory::create(
+    Locations::RoadShoulderPassableGermany, lanelet::Participants::Vehicle);
+  vehicle_with_road_shoulder.graph =
+    lanelet::routing::RoutingGraph::build(*lanelet_map, *vehicle_with_road_shoulder.rules);
   pedestrian.rules = lanelet::traffic_rules::TrafficRulesFactory::create(
     lanelet::Locations::Germany, lanelet::Participants::Pedestrian);
   pedestrian.graph = lanelet::routing::RoutingGraph::build(*lanelet_map, *pedestrian.rules);
@@ -2210,6 +2214,8 @@ lanelet::routing::RoutingGraphPtr HdMapUtils::RoutingGraphs::routing_graph(
   switch (type) {
     case traffic_simulator::RoutingGraphType::VEHICLE:
       return vehicle.graph;
+    case traffic_simulator::RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER:
+      return vehicle_with_road_shoulder.graph;
     case traffic_simulator::RoutingGraphType::PEDESTRIAN:
       return pedestrian.graph;
     default:
@@ -2225,6 +2231,8 @@ lanelet::traffic_rules::TrafficRulesPtr HdMapUtils::RoutingGraphs::traffic_rule(
   switch (type) {
     case traffic_simulator::RoutingGraphType::VEHICLE:
       return vehicle.rules;
+    case traffic_simulator::RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER:
+      return vehicle_with_road_shoulder.rules;
     case traffic_simulator::RoutingGraphType::PEDESTRIAN:
       return pedestrian.rules;
     default:
@@ -2239,6 +2247,8 @@ RouteCache & HdMapUtils::RoutingGraphs::route_cache(const traffic_simulator::Rou
   switch (type) {
     case traffic_simulator::RoutingGraphType::VEHICLE:
       return vehicle.route_cache;
+    case traffic_simulator::RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER:
+      return vehicle_with_road_shoulder.route_cache;
     case traffic_simulator::RoutingGraphType::PEDESTRIAN:
       return pedestrian.route_cache;
     default:

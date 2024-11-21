@@ -21,7 +21,7 @@ namespace traffic_simulator
 {
 inline namespace routing_graph_type
 {
-enum class RoutingGraphType : std::uint8_t { VEHICLE, PEDESTRIAN };
+enum class RoutingGraphType : std::uint8_t { VEHICLE, PEDESTRIAN, VEHICLE_WITH_ROAD_SHOULDER };
 
 char const * to_string(const RoutingGraphType &);
 }  // namespace routing_graph_type
