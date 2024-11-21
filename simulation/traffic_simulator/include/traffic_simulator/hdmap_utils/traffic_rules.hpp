@@ -59,6 +59,7 @@ protected:
       return {};
     }
 
+    // cspell: ignore startswith
     auto startswith = [](const std::string & str, const std::string & substr) {
       return str.compare(0, substr.size(), substr) == 0;
     };
