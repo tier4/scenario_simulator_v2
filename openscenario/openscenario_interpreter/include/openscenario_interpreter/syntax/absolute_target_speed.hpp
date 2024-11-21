@@ -24,13 +24,15 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- AbsoluteTargetSpeed ----------------------------------------------------
- *
- *  <xsd:complexType name="AbsoluteTargetSpeed">
- *    <xsd:attribute name="value" type="Double" use="required"/>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
+/*
+  AbsoluteTargetSpeed (OpenSCENARIO XML 1.3.0)
+
+  Absolute speed defined as a target for a SpeedAction.
+
+  <xsd:complexType name="AbsoluteTargetSpeed">
+    <xsd:attribute name="value" type="Double" use="required"/>
+  </xsd:complexType>
+*/
 struct AbsoluteTargetSpeed
 {
   const Double value;
