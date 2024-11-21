@@ -14,6 +14,8 @@
 
 #define OPENSCENARIO_INTERPRETER_NO_EXTENSION
 
+#include <algorithm>
+#include <boost/json.hpp>
 #include <openscenario_interpreter/openscenario_interpreter.hpp>
 #include <openscenario_interpreter/record.hpp>
 #include <openscenario_interpreter/syntax/object_controller.hpp>
@@ -24,10 +26,6 @@
 #include <openscenario_interpreter/visualization_buffer.hpp>
 #include <status_monitor/status_monitor.hpp>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
-
-#include <boost/json.hpp>
-
-#include <algorithm>
 
 #define DECLARE_PARAMETER(IDENTIFIER) \
   declare_parameter<decltype(IDENTIFIER)>(#IDENTIFIER, IDENTIFIER)
@@ -56,9 +54,7 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   DECLARE_PARAMETER(publish_visualization);
 }
 
-Interpreter::~Interpreter()
-{
-}
+Interpreter::~Interpreter() {}
 
 auto Interpreter::currentLocalFrameRate() const -> std::chrono::milliseconds
 {

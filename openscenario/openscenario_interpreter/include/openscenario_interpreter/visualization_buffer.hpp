@@ -15,9 +15,8 @@
 #ifndef OPENSCENARIO_INTERPRETER__VISUALIZATION_BUFFER_HPP_
 #define OPENSCENARIO_INTERPRETER__VISUALIZATION_BUFFER_HPP_
 
-#include <rclcpp/rclcpp.hpp>
-
 #include <memory>
+#include <rclcpp/rclcpp.hpp>
 
 namespace openscenario_interpreter
 {
