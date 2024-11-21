@@ -166,7 +166,7 @@ auto ReachPositionCondition::evaluate() -> Object
       return hypot(pose.position.x, pose.position.y, pose.position.z, consider_z);
     });
 
-  visualize();
+  call_visualize([this]() { visualize(); });
 
   results.clear();
 

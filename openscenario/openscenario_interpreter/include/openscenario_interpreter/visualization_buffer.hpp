@@ -15,8 +15,9 @@
 #ifndef OPENSCENARIO_INTERPRETER__VISUALIZATION_BUFFER_HPP_
 #define OPENSCENARIO_INTERPRETER__VISUALIZATION_BUFFER_HPP_
 
-#include <memory>
 #include <rclcpp/rclcpp.hpp>
+
+#include <memory>
 
 namespace openscenario_interpreter
 {
@@ -71,6 +72,14 @@ public:
     {
       if (active()) {
         buffer->markers.push_back(marker);
+      }
+    }
+
+    template <typename F>
+    void call_visualize(F && function) const
+    {
+      if (active()) {
+        function();
       }
     }
   };
