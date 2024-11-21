@@ -27,7 +27,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- AccelerationCondition --------------------------------------------------
+/* ---- AccelerationCondition (OpenSCENARIO 1.1)--------------------------------\
  *
  *  <xsd:complexType name="AccelerationCondition">
  *    <xsd:attribute name="value" type="Double" use="required"/>

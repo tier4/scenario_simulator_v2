@@ -229,7 +229,7 @@ Currently, the only way to know the result of the simulation is by viewing the s
 | AbsoluteTargetLane                           | 1.3               |                                            |
 | AbsoluteTargetLaneOffset                     | unimplemented     |                                            |
 | AbsoluteTargetSpeed                          | 1.3               |                                            |
-| AccelerationCondition                        | 1.3               |                                            |
+| AccelerationCondition                        | 1.1               |                                            |
 | AcquirePositionAction                        | 1.3 (partial)     | [detail](#AcquirePositionAction)           |
 | Act                                          | 1.3               |                                            |
 | Action                                       | 1.3               |                                            |
