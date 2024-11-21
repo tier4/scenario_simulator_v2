@@ -35,10 +35,10 @@ protected:
   lanelet::Optional<bool> canPass(
     const std::string & type, const std::string & /*location*/) const override
   {
-    using ParticantsMap = std::map<std::string, std::vector<std::string>>;
+    using ParticipantsMap = std::map<std::string, std::vector<std::string>>;
     using Value = lanelet::AttributeValueString;
     using Participants = lanelet::Participants;
-    const static ParticantsMap ParticipantMap{
+    const static ParticipantsMap ParticipantMap{
       // clang-format off
       {"",                    {Participants::Vehicle}},
       {Value::Road,           {Participants::Vehicle, Participants::Bicycle}},
