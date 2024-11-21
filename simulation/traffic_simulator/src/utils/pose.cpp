@@ -48,64 +48,7 @@ auto quietNaNLaneletPose() -> LaneletPose
            .z(std::numeric_limits<double>::quiet_NaN()));
 }
 
-auto isInLanelet(
-  const CanonicalizedLaneletPose & canonicalized_lanelet_pose, const lanelet::Id lanelet_id,
-  const double tolerance) -> bool
-{
-  constexpr bool include_adjacent_lanelet{false};
-  constexpr bool include_opposite_direction{false};
-  constexpr bool allow_lane_change{false};
-
-  if (isSameLaneletId(canonicalized_lanelet_pose, lanelet_id)) {
-    return true;
-  } else {
-    const auto start_lanelet_pose = helper::constructCanonicalizedLaneletPose(lanelet_id, 0.0, 0.0);
-    if (const auto distance_to_start_lanelet_pose = distance::longitudinalDistance(
-          start_lanelet_pose, canonicalized_lanelet_pose, include_adjacent_lanelet,
-          include_opposite_direction, allow_lane_change);
-        distance_to_start_lanelet_pose and
-        std::abs(distance_to_start_lanelet_pose.value()) <= tolerance) {
-      return true;
-    }
-
-    const auto end_lanelet_pose = helper::constructCanonicalizedLaneletPose(
-      lanelet_id, lanelet_wrapper::lanelet_map::laneletLength(lanelet_id), 0.0);
-    if (const auto distance_to_end_lanelet_pose = distance::longitudinalDistance(
-          canonicalized_lanelet_pose, end_lanelet_pose, include_adjacent_lanelet,
-          include_opposite_direction, allow_lane_change);
-        distance_to_end_lanelet_pose and
-        std::abs(distance_to_end_lanelet_pose.value()) <= tolerance) {
-      return true;
-    }
-  }
-  return false;
-}
-
-auto isInLanelet(const Point & point, const lanelet::Id lanelet_id) -> bool
-{
-  return lanelet_wrapper::lanelet_map::isInLanelet(lanelet_id, point);
-}
-
-auto isAtEndOfLanelets(const CanonicalizedLaneletPose & canonicalized_lanelet_pose) -> bool
-{
-  const auto lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose);
-  return lanelet_wrapper::route::followingLanelets(lanelet_pose.lanelet_id).size() == 1 &&
-         lanelet_wrapper::lanelet_map::laneletLength(lanelet_pose.lanelet_id) <= lanelet_pose.s;
-}
-
 // Conversions
-auto toMapPose(const CanonicalizedLaneletPose & lanelet_pose) -> Pose
-{
-  return static_cast<Pose>(lanelet_pose);
-}
-
-auto toMapPose(const LaneletPose & lanelet_pose) -> Pose
-{
-  return lanelet_wrapper::pose::toMapPose(
-           lanelet_pose, CanonicalizedLaneletPose::getConsiderPoseByRoadSlope())
-    .pose;
-}
-
 auto canonicalize(const LaneletPose & lanelet_pose) -> LaneletPose
 {
   if (
@@ -134,6 +77,18 @@ auto canonicalize(const LaneletPose & lanelet_pose, const lanelet::Ids & route_l
       ",rpy.z=", lanelet_pose.rpy.z,
       ") is invalid, please check lanelet length, connection and entity route.");
   }
+}
+
+auto toMapPose(const CanonicalizedLaneletPose & lanelet_pose) -> Pose
+{
+  return static_cast<Pose>(lanelet_pose);
+}
+
+auto toMapPose(const LaneletPose & lanelet_pose) -> Pose
+{
+  return lanelet_wrapper::pose::toMapPose(
+           lanelet_pose, CanonicalizedLaneletPose::getConsiderPoseByRoadSlope())
+    .pose;
 }
 
 auto alternativeLaneletPoses(const LaneletPose & lanelet_pose) -> std::vector<LaneletPose>
@@ -301,6 +256,51 @@ auto boundingBoxRelativeLaneletPose(
     position.offset = lateral_bounding_box_distance.value();
   }
   return position;
+}
+
+auto isInLanelet(
+  const CanonicalizedLaneletPose & canonicalized_lanelet_pose, const lanelet::Id lanelet_id,
+  const double tolerance) -> bool
+{
+  constexpr bool include_adjacent_lanelet{false};
+  constexpr bool include_opposite_direction{false};
+  constexpr bool allow_lane_change{false};
+
+  if (isSameLaneletId(canonicalized_lanelet_pose, lanelet_id)) {
+    return true;
+  } else {
+    const auto start_lanelet_pose = helper::constructCanonicalizedLaneletPose(lanelet_id, 0.0, 0.0);
+    if (const auto distance_to_start_lanelet_pose = distance::longitudinalDistance(
+          start_lanelet_pose, canonicalized_lanelet_pose, include_adjacent_lanelet,
+          include_opposite_direction, allow_lane_change);
+        distance_to_start_lanelet_pose and
+        std::abs(distance_to_start_lanelet_pose.value()) <= tolerance) {
+      return true;
+    }
+
+    const auto end_lanelet_pose = helper::constructCanonicalizedLaneletPose(
+      lanelet_id, lanelet_wrapper::lanelet_map::laneletLength(lanelet_id), 0.0);
+    if (const auto distance_to_end_lanelet_pose = distance::longitudinalDistance(
+          canonicalized_lanelet_pose, end_lanelet_pose, include_adjacent_lanelet,
+          include_opposite_direction, allow_lane_change);
+        distance_to_end_lanelet_pose and
+        std::abs(distance_to_end_lanelet_pose.value()) <= tolerance) {
+      return true;
+    }
+  }
+  return false;
+}
+
+auto isInLanelet(const Point & point, const lanelet::Id lanelet_id) -> bool
+{
+  return lanelet_wrapper::lanelet_map::isInLanelet(lanelet_id, point);
+}
+
+auto isAtEndOfLanelets(const CanonicalizedLaneletPose & canonicalized_lanelet_pose) -> bool
+{
+  const auto lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose);
+  return lanelet_wrapper::route::followingLanelets(lanelet_pose.lanelet_id).size() == 1 &&
+         lanelet_wrapper::lanelet_map::laneletLength(lanelet_pose.lanelet_id) <= lanelet_pose.s;
 }
 
 namespace pedestrian

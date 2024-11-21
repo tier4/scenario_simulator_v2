@@ -31,23 +31,15 @@ auto quietNaNPose() -> Pose;
 
 auto quietNaNLaneletPose() -> LaneletPose;
 
-auto isInLanelet(
-  const CanonicalizedLaneletPose & canonicalized_lanelet_pose, const lanelet::Id lanelet_id,
-  const double tolerance) -> bool;
-
-auto isInLanelet(const Point & point, const lanelet::Id lanelet_id) -> bool;
-
-auto isAtEndOfLanelets(const CanonicalizedLaneletPose & canonicalized_lanelet_pose) -> bool;
-
 // Conversions
-auto toMapPose(const CanonicalizedLaneletPose & lanelet_pose) -> Pose;
-
-auto toMapPose(const LaneletPose & lanelet_pose) -> Pose;
-
 auto canonicalize(const LaneletPose & lanelet_pose) -> LaneletPose;
 
 auto canonicalize(const LaneletPose & lanelet_pose, const lanelet::Ids & route_lanelets)
   -> LaneletPose;
+
+auto toMapPose(const CanonicalizedLaneletPose & lanelet_pose) -> Pose;
+
+auto toMapPose(const LaneletPose & lanelet_pose) -> Pose;
 
 auto alternativeLaneletPoses(const LaneletPose & lanelet_pose) -> std::vector<LaneletPose>;
 
@@ -94,6 +86,14 @@ auto boundingBoxRelativeLaneletPose(
   const bool allow_lane_change) -> LaneletPose;
 
 // Others
+auto isInLanelet(
+  const CanonicalizedLaneletPose & canonicalized_lanelet_pose, const lanelet::Id lanelet_id,
+  const double tolerance) -> bool;
+
+auto isInLanelet(const Point & point, const lanelet::Id lanelet_id) -> bool;
+
+auto isAtEndOfLanelets(const CanonicalizedLaneletPose & canonicalized_lanelet_pose) -> bool;
+
 namespace pedestrian
 {
 auto transformToCanonicalizedLaneletPose(
