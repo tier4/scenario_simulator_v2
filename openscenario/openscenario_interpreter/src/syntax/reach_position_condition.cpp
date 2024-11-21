@@ -130,6 +130,28 @@ auto ReachPositionCondition::visualize() const -> void
     return marker;
   };
 
+  const auto make_distance_label_marker = [&](auto && triggering_entity) {
+    visualization_msgs::msg::Marker marker;
+    marker.header.frame_id = "map";
+    marker.header.stamp = rclcpp::Clock().now();
+    marker.ns = "reach_position_condition/" + triggering_entity.name();
+    marker.id = 4;
+    marker.type = visualization_msgs::msg::Marker::TEXT_VIEW_FACING;
+    marker.action = visualization_msgs::msg::Marker::ADD;
+    auto relative_pose = makeNativeRelativeWorldPosition(center, triggering_entity.name());
+    marker.pose.position.x = center.position.x - relative_pose.position.x / 2;
+    marker.pose.position.y = center.position.y - relative_pose.position.y / 2;
+    marker.pose.position.z = center.position.z - relative_pose.position.z / 2;
+    marker.text = std::to_string(hypot(
+      relative_pose.position.x, relative_pose.position.y, relative_pose.position.z, consider_z));
+    marker.scale.z = 0.3;
+    marker.color.a = 0.8;
+    marker.color.r = 1.0;
+    marker.color.g = 0.0;
+    marker.color.b = 0.0;
+    return marker;
+  };
+
   std::for_each(
     triggering_entities.entity_refs.begin(), triggering_entities.entity_refs.end(),
     [&](auto && triggering_entity) {
@@ -137,6 +159,7 @@ auto ReachPositionCondition::visualize() const -> void
         add(make_radius_marker(object));
         add(make_label_marker(object));
         add(make_distance_marker(object));
+        add(make_distance_label_marker(object));
       });
     });
 }
