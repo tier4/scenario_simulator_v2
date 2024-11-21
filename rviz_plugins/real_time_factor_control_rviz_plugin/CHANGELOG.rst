@@ -21,6 +21,11 @@ Changelog for package real_time_factor_control_rviz_plugin
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+5.3.4 (2024-11-21)
+------------------
+* Merge branch 'master' into fix/find_nearest_segment_index
+* Contributors: Kotaro Yoshimoto
+
 5.3.3 (2024-11-21)
 ------------------
 * Merge branch 'master' into fix/sonor-cloud-issue-7
