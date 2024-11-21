@@ -171,7 +171,6 @@ void VisualizationConditionGroupsDisplay::processMessage(const Context::ConstSha
 
   QPainter painter(&hud);
   painter.setRenderHint(QPainter::Antialiasing, true);
-  // QColor text_color = property_text_color_->getColor();
   QColor text_color(property_text_color_->getColor());
   text_color.setAlpha(255);
   painter.setPen(QPen(text_color, 2, Qt::SolidLine));
@@ -262,7 +261,7 @@ void VisualizationConditionGroupsDisplay::processEvent(const YAML::Node & event_
   std::string event_name;
   try {
     event_name = event_node["name"].as<std::string>();
-  } catch (const YAML::BadConversion & ) {
+  } catch (const YAML::BadConversion &) {
     event_name = "";
   }
   if (event_name.empty()) {
