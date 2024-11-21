@@ -22,13 +22,15 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- AbsoluteTargetLane -----------------------------------------------------
- *
- *  <xsd:complexType name="AbsoluteTargetLane">
- *    <xsd:attribute name="value" type="String" use="required"/>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
+/*
+  AbsoluteTargetLane (OpenSCENARIO XML 1.3.0)
+
+  Defines the number (ID) of the target lane.
+
+  <xsd:complexType name="AbsoluteTargetLane">
+    <xsd:attribute name="value" type="String" use="required"/>
+  </xsd:complexType>
+*/
 struct AbsoluteTargetLane
 {
   const String value;
