@@ -21,6 +21,14 @@ Changelog for package openscenario_visualization
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+5.3.3 (2024-11-21)
+------------------
+* Merge pull request `#1451 <https://github.com/tier4/scenario_simulator_v2/issues/1451>`_ from tier4/fix/sonor-cloud-issue-7
+  Fix/sonor cloud issue 7
+* Merge branch 'master' into fix/sonor-cloud-issue-7
+* Remove this redundant cast.
+* Contributors: Masaya Kataoka, Taiga Takano
+
 5.3.2 (2024-11-18)
 ------------------
 * Merge branch 'master' into fix/interpreter/assign-route-action

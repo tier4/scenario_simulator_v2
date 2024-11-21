@@ -21,6 +21,11 @@ Changelog for package openscenario_experimental_catalog
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+5.3.3 (2024-11-21)
+------------------
+* Merge branch 'master' into fix/sonor-cloud-issue-7
+* Contributors: Masaya Kataoka
+
 5.3.2 (2024-11-18)
 ------------------
 * Merge branch 'master' into fix/interpreter/assign-route-action
