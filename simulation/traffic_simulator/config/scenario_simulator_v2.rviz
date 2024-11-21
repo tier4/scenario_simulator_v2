@@ -2984,6 +2984,18 @@ Visualization Manager:
           Name: Simple Sensor Simulator
       Enabled: true
       Name: Simulation
+    - Class: rviz_default_plugins/MarkerArray
+      Enabled: true
+      Name: MarkerArray
+      Namespaces:
+        reach_position_condition/ego: true
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /simulation/interpreter/markers
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 10; 10; 10
