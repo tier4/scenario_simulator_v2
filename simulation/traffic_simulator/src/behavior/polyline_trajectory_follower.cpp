@@ -186,7 +186,7 @@ auto calculate_distance_and_remaining_time(
   }
 }
 
-auto PolylineTrajectoryFollower::getValidatedEntityDesiredVelocity(
+auto PolylineTrajectoryFollower::validatedEntityDesiredVelocity(
   const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
   const geometry_msgs::msg::Point & target_position, const geometry_msgs::msg::Point & position,
   const double desired_speed) const noexcept(false) -> geometry_msgs::msg::Vector3
@@ -237,7 +237,7 @@ auto PolylineTrajectoryFollower::getValidatedEntityDesiredVelocity(
   return desired_velocity;
 }
 
-auto PolylineTrajectoryFollower::getValidatedEntityDesiredAcceleration(
+auto PolylineTrajectoryFollower::validatedEntityDesiredAcceleration(
   const traffic_simulator::follow_trajectory::FollowWaypointController & follow_waypoint_controller,
   const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
   const double remaining_time, const double distance, const double acceleration,
@@ -406,8 +406,8 @@ auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
     return std::nullopt;
   }
 
-  const auto entity_position = getValidatedEntityPosition();
-  const auto target_position = getValidatedEntityTargetPosition(polyline_trajectory);
+  const auto entity_position = validatedEntityPosition();
+  const auto target_position = validatedEntityTargetPosition(polyline_trajectory);
 
   const double distance_to_front_waypoint = distance_along_lanelet(
     hdmap_utils_ptr, entity_status, matching_distance, entity_position, target_position);
@@ -432,10 +432,8 @@ auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
     return discardTheFrontWaypointAndRecurse(polyline_trajectory, matching_distance, target_speed);
   }
 
-  const double acceleration = getValidatedEntityAcceleration();
-  [[maybe_unused]] const double max_acceleration = getValidatedEntityMaxAcceleration(acceleration);
-  [[maybe_unused]] const double min_acceleration = getValidatedEntityMinAcceleration(acceleration);
-  const double entity_speed = getValidatedEntitySpeed();
+  const double acceleration = validatedEntityAcceleration();
+  const double entity_speed = validatedEntitySpeed();
 
   /*
     The controller provides the ability to calculate acceleration using constraints from the
@@ -473,11 +471,11 @@ auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
     In addition, the controller ensures a smooth stop at the last waypoint of the trajectory,
     with linear speed equal to zero and acceleration equal to zero.
   */
-  const double desired_acceleration = getValidatedEntityDesiredAcceleration(
+  const double desired_acceleration = validatedEntityDesiredAcceleration(
     follow_waypoint_controller, polyline_trajectory, remaining_time, distance, acceleration,
     entity_speed);
-  const double desired_speed = getValidatedEntityDesiredSpeed(entity_speed, desired_acceleration);
-  const auto desired_velocity = getValidatedEntityDesiredVelocity(
+  const double desired_speed = validatedEntityDesiredSpeed(entity_speed, desired_acceleration);
+  const auto desired_velocity = validatedEntityDesiredVelocity(
     polyline_trajectory, target_position, entity_position, desired_speed);
   const auto current_velocity = calculate_current_velocity(entity_status, entity_speed);
 
@@ -565,7 +563,7 @@ auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
   */
 }
 
-auto PolylineTrajectoryFollower::getValidatedEntityAcceleration() const noexcept(false) -> double
+auto PolylineTrajectoryFollower::validatedEntityAcceleration() const noexcept(false) -> double
 {
   const double acceleration = entity_status.action_status.accel.linear.x;
   if (not std::isfinite(acceleration)) {
@@ -575,25 +573,6 @@ auto PolylineTrajectoryFollower::getValidatedEntityAcceleration() const noexcept
       std::quoted(entity_status.name), "'s acceleration value is NaN or infinity. The value is ",
       acceleration, ". ");
   }
-  return acceleration;
-}
-
-auto PolylineTrajectoryFollower::getValidatedEntitySpeed() const noexcept(false) -> double
-{
-  const double entity_speed = entity_status.action_status.twist.linear.x;  // [m/s]
-
-  if (not std::isfinite(entity_speed)) {
-    throw common::Error(
-      "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
-      "following information to the developer: Vehicle ",
-      std::quoted(entity_status.name), "'s speed value is NaN or infinity. The value is ",
-      entity_speed, ". ");
-  }
-  return entity_speed;
-}
-auto PolylineTrajectoryFollower::getValidatedEntityMaxAcceleration(const double acceleration) const
-  noexcept(false) -> double
-{
   const double max_acceleration = std::min(
     acceleration /* [m/s^2] */ +
       behavior_parameter.dynamic_constraints.max_acceleration_rate /* [m/s^3] */ *
@@ -607,11 +586,6 @@ auto PolylineTrajectoryFollower::getValidatedEntityMaxAcceleration(const double 
       std::quoted(entity_status.name),
       "'s maximum acceleration value is NaN or infinity. The value is ", max_acceleration, ". ");
   }
-  return max_acceleration;
-}
-auto PolylineTrajectoryFollower::getValidatedEntityMinAcceleration(const double acceleration) const
-  noexcept(false) -> double
-{
   const double min_acceleration = std::max(
     acceleration /* [m/s^2] */ -
       behavior_parameter.dynamic_constraints.max_deceleration_rate /* [m/s^3] */ *
@@ -625,9 +599,24 @@ auto PolylineTrajectoryFollower::getValidatedEntityMinAcceleration(const double 
       std::quoted(entity_status.name),
       "'s minimum acceleration value is NaN or infinity. The value is ", min_acceleration, ". ");
   }
-  return min_acceleration;
+  return acceleration;
 }
-auto PolylineTrajectoryFollower::getValidatedEntityPosition() const noexcept(false)
+
+auto PolylineTrajectoryFollower::validatedEntitySpeed() const noexcept(false) -> double
+{
+  const double entity_speed = entity_status.action_status.twist.linear.x;  // [m/s]
+
+  if (not std::isfinite(entity_speed)) {
+    throw common::Error(
+      "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
+      "following information to the developer: Vehicle ",
+      std::quoted(entity_status.name), "'s speed value is NaN or infinity. The value is ",
+      entity_speed, ". ");
+  }
+  return entity_speed;
+}
+
+auto PolylineTrajectoryFollower::validatedEntityPosition() const noexcept(false)
   -> geometry_msgs::msg::Point
 {
   const auto entity_position = entity_status.pose.position;
@@ -640,7 +629,7 @@ auto PolylineTrajectoryFollower::getValidatedEntityPosition() const noexcept(fal
   }
   return entity_position;
 }
-auto PolylineTrajectoryFollower::getValidatedEntityTargetPosition(
+auto PolylineTrajectoryFollower::validatedEntityTargetPosition(
   const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory) const noexcept(false)
   -> geometry_msgs::msg::Point
 {
@@ -660,7 +649,7 @@ auto PolylineTrajectoryFollower::getValidatedEntityTargetPosition(
   }
   return target_position;
 }
-auto PolylineTrajectoryFollower::getValidatedEntityDesiredSpeed(
+auto PolylineTrajectoryFollower::validatedEntityDesiredSpeed(
   const double entity_speed, const double desired_acceleration) const noexcept(false) -> double
 {
   const double desired_speed = entity_speed + desired_acceleration * step_time;

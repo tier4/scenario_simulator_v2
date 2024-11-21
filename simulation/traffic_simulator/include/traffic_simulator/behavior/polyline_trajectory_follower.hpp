@@ -55,25 +55,23 @@ private:
     -> std::optional<EntityStatus>;
   auto buildUpdatedEntityStatus(const geometry_msgs::msg::Vector3 & desired_velocity) const
     noexcept(true) -> EntityStatus;
-  auto getValidatedEntityAcceleration() const noexcept(false) -> double;
-  auto getValidatedEntitySpeed() const noexcept(false) -> double;
-  auto getValidatedEntityMaxAcceleration(const double acceleration) const noexcept(false) -> double;
-  auto getValidatedEntityMinAcceleration(const double acceleration) const noexcept(false) -> double;
-  auto getValidatedEntityPosition() const noexcept(false) -> geometry_msgs::msg::Point;
-  auto getValidatedEntityTargetPosition(
+  auto validatedEntityAcceleration() const noexcept(false) -> double;
+  auto validatedEntitySpeed() const noexcept(false) -> double;
+  auto validatedEntityPosition() const noexcept(false) -> geometry_msgs::msg::Point;
+  auto validatedEntityTargetPosition(
     const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory) const
     noexcept(false) -> geometry_msgs::msg::Point;
-  auto getValidatedEntityDesiredAcceleration(
+  auto validatedEntityDesiredAcceleration(
     const traffic_simulator::follow_trajectory::FollowWaypointController &
       follow_waypoint_controller,
     const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
     const double remaining_time, const double distance, const double acceleration,
     const double speed) const noexcept(false) -> double;
-  auto getValidatedEntityDesiredVelocity(
+  auto validatedEntityDesiredVelocity(
     const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
     const geometry_msgs::msg::Point & target_position, const geometry_msgs::msg::Point & position,
     const double desired_speed) const noexcept(false) -> geometry_msgs::msg::Vector3;
-  auto getValidatedEntityDesiredSpeed(
+  auto validatedEntityDesiredSpeed(
     const double entity_speed, const double desired_acceleration) const noexcept(false) -> double;
 };
 }  // namespace follow_trajectory
