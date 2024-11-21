@@ -744,15 +744,102 @@ auto DistanceCondition::distance<
     position);
 }
 
+void DistanceCondition::visualize() const
+{
+  if (relative_distance_type != RelativeDistanceType::euclidianDistance) {
+    /// @todo implement visualization for other distance types
+    return;
+  }
+  auto center = static_cast<geometry_msgs::msg::Pose>(position);
+  center.orientation.w = 0;
+
+  const auto make_label_marker = [&](auto && triggering_entity) {
+    visualization_msgs::msg::Marker marker;
+    marker.header.frame_id = "map";
+    marker.header.stamp = rclcpp::Clock().now();
+    marker.ns = "distance_condition/" + triggering_entity.name();
+    marker.id = 2;
+    marker.type = visualization_msgs::msg::Marker::TEXT_VIEW_FACING;
+    marker.action = visualization_msgs::msg::Marker::ADD;
+    marker.pose = center;
+    marker.pose.position.z += 0.3;
+    marker.text = description();
+    marker.scale.z = 0.3;
+    marker.color.a = 0.8;
+    marker.color.r = 1.0;
+    marker.color.g = 1.0;
+    marker.color.b = 1.0;
+    return marker;
+  };
+
+  const auto make_distance_marker = [&](auto && triggering_entity) {
+    visualization_msgs::msg::Marker marker;
+    marker.header.frame_id = "map";
+    marker.header.stamp = rclcpp::Clock().now();
+    marker.ns = "distance_condition/" + triggering_entity.name();
+    marker.id = 3;
+    marker.type = visualization_msgs::msg::Marker::LINE_STRIP;
+    marker.action = visualization_msgs::msg::Marker::ADD;
+    auto relative_pose = makeNativeRelativeWorldPosition(center, triggering_entity.name());
+    marker.points.push_back(center.position);
+    auto entity_position = center.position;
+    entity_position.x -= relative_pose.position.x;
+    entity_position.y -= relative_pose.position.y;
+    entity_position.z -= relative_pose.position.z;
+    marker.points.push_back(entity_position);
+    marker.scale.x = 0.1;
+    marker.color.a = 0.8;
+    marker.color.r = 1.0;
+    marker.color.g = 0.0;
+    marker.color.b = 0.0;
+    return marker;
+  };
+
+  const auto make_distance_label_marker = [&](auto && triggering_entity) {
+    visualization_msgs::msg::Marker marker;
+    marker.header.frame_id = "map";
+    marker.header.stamp = rclcpp::Clock().now();
+    marker.ns = "distance_condition/" + triggering_entity.name();
+    marker.id = 4;
+    marker.type = visualization_msgs::msg::Marker::TEXT_VIEW_FACING;
+    marker.action = visualization_msgs::msg::Marker::ADD;
+    auto relative_pose = makeNativeRelativeWorldPosition(center, triggering_entity.name());
+    marker.pose.position.x = center.position.x - relative_pose.position.x / 2;
+    marker.pose.position.y = center.position.y - relative_pose.position.y / 2;
+    marker.pose.position.z = center.position.z - relative_pose.position.z / 2;
+    marker.text = std::to_string(distance(triggering_entity));
+    marker.scale.z = 0.3;
+    marker.color.a = 0.8;
+    marker.color.r = 1.0;
+    marker.color.g = 0.0;
+    marker.color.b = 0.0;
+    return marker;
+  };
+
+  std::for_each(
+    triggering_entities.entity_refs.begin(), triggering_entities.entity_refs.end(),
+    [&](auto && triggering_entity) {
+      triggering_entity.apply([&](auto && object) {
+        add(make_label_marker(object));
+        add(make_distance_marker(object));
+        add(make_distance_label_marker(object));
+      });
+    });
+}
+
 auto DistanceCondition::evaluate() -> Object
 {
   results.clear();
 
-  return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
+  const auto result = asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
     results.push_back(
       triggering_entity.apply([&](const auto & object) { return distance(object); }));
     return not results.back().size() or rule(results.back(), value).min();
   }));
+
+  visualize();
+
+  return result;
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
