@@ -311,9 +311,9 @@ auto PolylineTrajectoryFollower::discardTheFrontWaypointAndRecurse(
   }
 
   std::rotate(
-    std::cbegin(polyline_trajectory.shape.vertices),
-    std::cbegin(polyline_trajectory.shape.vertices) + 1UL,
-    std::cend(polyline_trajectory.shape.vertices));
+    std::begin(polyline_trajectory.shape.vertices),
+    std::begin(polyline_trajectory.shape.vertices) + 1,
+    std::end(polyline_trajectory.shape.vertices));
 
   if (not polyline_trajectory.closed) {
     polyline_trajectory.shape.vertices.pop_back();
@@ -410,9 +410,6 @@ auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
 
   const double distance_to_front_waypoint = distanceAlongLanelet(
     hdmap_utils_ptr, entity_status, matching_distance, entity_position, target_position);
-  const double remaining_time_to_front_waypoint =
-    (std::isnan(polyline_trajectory.base_time) ? 0.0 : polyline_trajectory.base_time) +
-    polyline_trajectory.shape.vertices.front().time - entity_status.time;
 
   /*
     This clause is to avoid division-by-zero errors in later clauses with
@@ -438,8 +435,7 @@ auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
     The controller provides the ability to calculate acceleration using constraints from the
     behavior_parameter. The value is_breaking_waypoint() determines whether the calculated
     acceleration takes braking into account - it is true if the nearest waypoint with the
-    specified time is the last waypoint or the nearest waypoint without the specified time is the
-    last waypoint.
+    specified time is the last waypoint or there is no waypoint with a specified time.
 
     If an arrival time was specified for any of the remaining waypoints, priority is given to
     meeting the arrival time, and the vehicle is driven at a speed at which the arrival time can
@@ -482,6 +478,10 @@ auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
     math::geometry::innerProduct(desired_velocity, current_velocity) < 0.0) {
     return discardTheFrontWaypointAndRecurse(polyline_trajectory, matching_distance, target_speed);
   }
+
+  const double remaining_time_to_front_waypoint =
+    (std::isnan(polyline_trajectory.base_time) ? 0.0 : polyline_trajectory.base_time) +
+    polyline_trajectory.shape.vertices.front().time - entity_status.time;
 
   const auto predicted_state_opt = follow_waypoint_controller.getPredictedWaypointArrivalState(
     desired_acceleration, remaining_time, distance, acceleration, entity_speed);
