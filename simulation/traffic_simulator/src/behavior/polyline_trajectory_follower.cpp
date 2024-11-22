@@ -311,9 +311,9 @@ auto PolylineTrajectoryFollower::discardTheFrontWaypointAndRecurse(
   }
 
   std::rotate(
-    std::begin(polyline_trajectory.shape.vertices),
-    std::begin(polyline_trajectory.shape.vertices) + 1,
-    std::end(polyline_trajectory.shape.vertices));
+    std::cbegin(polyline_trajectory.shape.vertices),
+    std::cbegin(polyline_trajectory.shape.vertices) + 1UL,
+    std::cend(polyline_trajectory.shape.vertices));
 
   if (not polyline_trajectory.closed) {
     polyline_trajectory.shape.vertices.pop_back();
@@ -423,7 +423,7 @@ auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
         distance_to_front_waypoint, std::numeric_limits<double>::epsilon())) {
     return discardTheFrontWaypointAndRecurse(polyline_trajectory, matching_distance, target_speed);
   }
-  const auto [distance, remaining_time] = calculateDistanceAndRemainingTime(
+  const auto && [distance, remaining_time] = calculateDistanceAndRemainingTime(
     hdmap_utils_ptr, entity_status, matching_distance, polyline_trajectory,
     distance_to_front_waypoint, step_time);
 
@@ -478,7 +478,7 @@ auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
   const auto current_velocity = calculateCurrentVelocity(entity_status, entity_speed);
 
   if (
-    entity_speed * step_time > distance_to_front_waypoint &&
+    entity_speed * step_time > distance_to_front_waypoint and
     math::geometry::innerProduct(desired_velocity, current_velocity) < 0.0) {
     return discardTheFrontWaypointAndRecurse(polyline_trajectory, matching_distance, target_speed);
   }
@@ -502,7 +502,7 @@ auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
       If the nearest waypoint is arrived at in this step without a specific arrival time, it will
       be considered as achieved
     */
-    if (std::isinf(remaining_time) && polyline_trajectory.shape.vertices.size() == 1UL) {
+    if (std::isinf(remaining_time) and polyline_trajectory.shape.vertices.size() == 1UL) {
       /*
         If the trajectory has only waypoints with unspecified time, the last one is followed using
         maximum speed including braking - in this case accuracy of arrival is checked
