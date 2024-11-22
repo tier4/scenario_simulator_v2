@@ -121,14 +121,15 @@ auto SpeedProfileAction::run() -> void
 {
   for (auto && [actor, iter] : accomplishments) {
     auto accomplished = [this](const auto & actor, const auto & speed_profile_entry) {
-      auto speeds = actor.apply(
-        [&](const auto & object) { return SpeedCondition::evaluate(global().entities, object); });
+      auto speeds = actor.apply([&](const auto & object) {
+        return SpeedCondition::evaluate(global().entities, object, std::nullopt);
+      });
       if (not speeds.size()) {
         return true;
       } else if (entity_ref) {
         return equal_to<std::valarray<double>>()(
                  speeds, speed_profile_entry.speed +
-                           SpeedCondition::evaluate(global().entities, entity_ref))
+                           SpeedCondition::evaluate(global().entities, entity_ref, std::nullopt))
           .min();
       } else {
         return equal_to<std::valarray<double>>()(speeds, speed_profile_entry.speed).min();

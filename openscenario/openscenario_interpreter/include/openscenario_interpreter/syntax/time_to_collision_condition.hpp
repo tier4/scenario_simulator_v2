@@ -123,40 +123,40 @@ struct TimeToCollisionCondition : private Scope, private SimulatorCore::Conditio
     CoordinateSystem coordinate_system, RelativeDistanceType relative_distance_type,
     RoutingAlgorithm routing_algorithm, Boolean freespace)
   {
-    if (time_to_collision_condition_target.is<Entity>()) {
-      const auto relative_distance = RelativeDistanceCondition::evaluate(
-        entities,                                         //
-        triggering_entity,                                //
-        time_to_collision_condition_target.as<Entity>(),  //
-        coordinate_system,                                //
-        relative_distance_type,                           //
-        routing_algorithm,                                //
-        freespace);
+    auto distance = [&]() {
+      if (time_to_collision_condition_target.is<Entity>()) {
+        return RelativeDistanceCondition::evaluate(
+          entities, triggering_entity, time_to_collision_condition_target.as<Entity>(),
+          coordinate_system, relative_distance_type, routing_algorithm, freespace);
+      } else {
+        return DistanceCondition::evaluate(
+          entities, triggering_entity, time_to_collision_condition_target.as<Position>(),
+          coordinate_system, relative_distance_type, routing_algorithm, freespace);
+      }
+    };
 
-      const auto relative_speed = RelativeSpeedCondition::evaluate(
-        entities,           //
-        triggering_entity,  //
-        time_to_collision_condition_target.as<Entity>());
+    auto speed = [&](auto &&... xs) {
+      if (time_to_collision_condition_target.is<Entity>()) {
+        return RelativeSpeedCondition::evaluate(
+          entities,           //
+          triggering_entity,  //
+          time_to_collision_condition_target.as<Entity>(), std::forward<decltype(xs)>(xs)...);
+      } else {
+        return SpeedCondition::evaluate(
+          entities, triggering_entity, std::forward<decltype(xs)>(xs)...);
+      }
+    };
 
-      // std::cerr << "RELATIVE DISTANCE = " << relative_distance
-      //           << ", RELATIVE SPEED = " << relative_speed << std::endl;
+    switch (relative_distance_type) {
+      case RelativeDistanceType::longitudinal:
+        return distance() / speed(DirectionalDimension::longitudinal);
 
-      return relative_distance / relative_speed;
-    } else {
-      const auto distance = DistanceCondition::evaluate(
-        entities,                                           //
-        triggering_entity,                                  //
-        time_to_collision_condition_target.as<Position>(),  //
-        coordinate_system,                                  //
-        relative_distance_type,                             //
-        routing_algorithm,                                  //
-        freespace);
+      case RelativeDistanceType::lateral:
+        return distance() / speed(DirectionalDimension::lateral);
 
-      const auto speed = SpeedCondition::evaluate(entities, triggering_entity);
-
-      // std::cerr << "DISTANCE = " << distance << ", RELATIVE SPEED = " << speed << std::endl;
-
-      return distance / speed;
+      default:
+      case RelativeDistanceType::euclidianDistance:
+        return distance() / speed(std::nullopt);
     }
   }
 

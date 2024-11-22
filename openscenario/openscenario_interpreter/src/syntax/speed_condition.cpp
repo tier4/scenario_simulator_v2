@@ -49,27 +49,35 @@ auto SpeedCondition::description() const -> String
   return description.str();
 }
 
+auto SpeedCondition::evaluate(const Entities * entities, const Entity & triggering_entity)
+  -> geometry_msgs::msg::Vector3
+{
+  if (entities->isAdded(triggering_entity)) {
+    return evaluateSpeed(triggering_entity);
+  } else {
+    return geometry_msgs::build<geometry_msgs::msg::Vector3>()
+      .x(Double::nan())
+      .y(Double::nan())
+      .z(Double::nan());
+  }
+}
+
 auto SpeedCondition::evaluate(
   const Entities * entities, const Entity & triggering_entity,
   const std::optional<DirectionalDimension> & direction) -> double
 {
-  if (entities->isAdded(triggering_entity)) {
-    if (const auto v = evaluateSpeed(triggering_entity); direction) {
-      switch (*direction) {
-        case DirectionalDimension::longitudinal:
-          return v.x;
-        case DirectionalDimension::lateral:
-          return v.y;
-        case DirectionalDimension::vertical:
-          return v.z;
-        default:
-          return math::geometry::norm(v);
-      }
-    } else {
-      return math::geometry::norm(v);
+  if (const auto v = evaluate(entities, triggering_entity); direction) {
+    switch (*direction) {
+      default:
+      case DirectionalDimension::longitudinal:
+        return v.x;
+      case DirectionalDimension::lateral:
+        return v.y;
+      case DirectionalDimension::vertical:
+        return v.z;
     }
   } else {
-    return Double::nan();
+    return math::geometry::norm(v);
   }
 }
 
@@ -79,7 +87,7 @@ auto SpeedCondition::evaluate() -> Object
 
   return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
     results.push_back(triggering_entity.apply([&](const auto & triggering_entity) {
-      return evaluate(global().entities, triggering_entity);
+      return evaluate(global().entities, triggering_entity, direction);
     }));
     return not results.back().size() or std::invoke(rule, results.back(), value).min();
   }));

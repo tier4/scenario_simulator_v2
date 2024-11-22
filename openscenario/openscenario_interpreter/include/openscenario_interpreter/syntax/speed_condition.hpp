@@ -68,9 +68,10 @@ struct SpeedCondition : private Scope, private SimulatorCore::ConditionEvaluatio
 
   auto description() const -> String;
 
+  static auto evaluate(const Entities *, const Entity &) -> geometry_msgs::msg::Vector3;
+
   static auto evaluate(
-    const Entities *, const Entity &, const std::optional<DirectionalDimension> & = std::nullopt)
-    -> double;
+    const Entities *, const Entity &, const std::optional<DirectionalDimension> &) -> double;
 
   auto evaluate() -> Object;
 };

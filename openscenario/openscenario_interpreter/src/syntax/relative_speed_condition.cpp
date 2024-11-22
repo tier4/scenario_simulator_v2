@@ -58,28 +58,37 @@ auto RelativeSpeedCondition::description() const -> String
 }
 
 auto RelativeSpeedCondition::evaluate(
-  const Entities * entities, const Entity & triggering_entity, const Entity & entity_ref,
-  const std::optional<DirectionalDimension> & direction) -> double
+  const Entities * entities, const Entity & triggering_entity, const Entity & entity_ref)
+  -> geometry_msgs::msg::Vector3
 {
   if (
     triggering_entity.apply([&](const auto & each) { return entities->isAdded(each); }).min() and
     entities->isAdded(entity_ref)) {
-    if (const auto v = evaluateRelativeSpeed(triggering_entity, entity_ref); direction) {
-      switch (*direction) {
-        case DirectionalDimension::longitudinal:
-          return v.x;
-        case DirectionalDimension::lateral:
-          return v.y;
-        case DirectionalDimension::vertical:
-          return v.z;
-        default:
-          return math::geometry::norm(v);
-      }
-    } else {
-      return math::geometry::norm(v);
+    return evaluateRelativeSpeed(triggering_entity, entity_ref);
+  } else {
+    return geometry_msgs::build<geometry_msgs::msg::Vector3>()
+      .x(Double::nan())
+      .y(Double::nan())
+      .z(Double::nan());
+  }
+}
+
+auto RelativeSpeedCondition::evaluate(
+  const Entities * entities, const Entity & triggering_entity, const Entity & entity_ref,
+  const std::optional<DirectionalDimension> & direction) -> double
+{
+  if (const auto v = evaluate(entities, triggering_entity, entity_ref); direction) {
+    switch (*direction) {
+      default:
+      case DirectionalDimension::longitudinal:
+        return v.x;
+      case DirectionalDimension::lateral:
+        return v.y;
+      case DirectionalDimension::vertical:
+        return v.z;
     }
   } else {
-    return Double::nan();
+    return math::geometry::norm(v);
   }
 }
 

@@ -56,8 +56,9 @@ auto SpeedAction::accomplished() -> bool
   };
 
   auto check = [this](auto && actor) {
-    auto evaluation = actor.apply(
-      [this](const auto & actor) { return SpeedCondition::evaluate(global().entities, actor); });
+    auto evaluation = actor.apply([this](const auto & actor) {
+      return SpeedCondition::evaluate(global().entities, actor, std::nullopt);
+    });
     if (speed_action_target.is<AbsoluteTargetSpeed>()) {
       return not evaluation.size() or
              equal_to<std::valarray<double>>()(
@@ -69,7 +70,8 @@ auto SpeedAction::accomplished() -> bool
           return not evaluation.size() or
                  equal_to<std::valarray<double>>()(
                    SpeedCondition::evaluate(
-                     global().entities, speed_action_target.as<RelativeTargetSpeed>().entity_ref) +
+                     global().entities, speed_action_target.as<RelativeTargetSpeed>().entity_ref,
+                     std::nullopt) +
                      speed_action_target.as<RelativeTargetSpeed>().value,
                    evaluation)
                    .min();
@@ -77,7 +79,8 @@ auto SpeedAction::accomplished() -> bool
           return not evaluation.size() or
                  equal_to<std::valarray<double>>()(
                    SpeedCondition::evaluate(
-                     global().entities, speed_action_target.as<RelativeTargetSpeed>().entity_ref) *
+                     global().entities, speed_action_target.as<RelativeTargetSpeed>().entity_ref,
+                     std::nullopt) *
                      speed_action_target.as<RelativeTargetSpeed>().value,
                    evaluation)
                    .min();
