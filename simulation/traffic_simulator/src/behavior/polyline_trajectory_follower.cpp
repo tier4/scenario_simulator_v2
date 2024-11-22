@@ -143,8 +143,8 @@ auto calculateDistanceAndRemainingTime(
         total_distance_to(std::cend(polyline_trajectory.shape.vertices) - 1),
       std::numeric_limits<double>::infinity());
   }
-  const auto remaining_time =
-    (not std::isnan(polyline_trajectory.base_time) ? polyline_trajectory.base_time : 0.0) +
+  const double remaining_time =
+    (std::isnan(polyline_trajectory.base_time) ? 0.0 : polyline_trajectory.base_time) +
     waypoint_ptr->time - entity_status.time;
 
   /*

@@ -178,7 +178,7 @@ auto FollowWaypointController::clampAcceleration(
   const double candidate_acceleration, const double acceleration, const double speed) const
   -> double
 {
-  const auto [local_min_acceleration, local_max_acceleration] =
+  const auto && [local_min_acceleration, local_max_acceleration] =
     getAccelerationLimits(acceleration, speed);
   return std::clamp(candidate_acceleration, local_min_acceleration, local_max_acceleration);
 }
@@ -336,7 +336,7 @@ auto FollowWaypointController::getAcceleration(
   const double remaining_time_source, const double remaining_distance, const double acceleration,
   const double speed) const -> double
 {
-  const auto [local_min_acceleration, local_max_acceleration] =
+  const auto && [local_min_acceleration, local_max_acceleration] =
     getAccelerationLimits(acceleration, speed);
 
   if ((speed + local_min_acceleration * step_time) * step_time > remaining_distance) {
@@ -408,7 +408,7 @@ auto FollowWaypointController::getAcceleration(
 
     // Consider the borderline values and precise value of 0
     considerCandidate(local_min_acceleration);
-    if (local_min_acceleration < 0.0 && local_max_acceleration > 0.0) {
+    if (local_min_acceleration < 0.0 and local_max_acceleration > 0.0) {
       considerCandidate(0.0);
     }
     considerCandidate(local_max_acceleration);
