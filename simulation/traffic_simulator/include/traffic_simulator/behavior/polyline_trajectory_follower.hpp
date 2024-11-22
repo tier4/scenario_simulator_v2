@@ -38,8 +38,7 @@ public:
   // side effects on polyline_trajectory
   auto makeUpdatedEntityStatus(
     traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
-    const double matching_distance,
-    const std::optional<double> target_speed /*= std::nullopt*/) const
+    const double matching_distance, const std::optional<double> target_speed) const
     -> std::optional<EntityStatus>;
 
 private:

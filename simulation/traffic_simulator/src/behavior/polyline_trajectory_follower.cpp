@@ -170,7 +170,7 @@ auto calculate_distance_and_remaining_time(
     of 1 step time is allowed.
   */
   if (remaining_time < -step_time) {
-    throw common::Error(
+    THROW_SIMULATION_ERROR(
       "Vehicle ", std::quoted(entity_status.name),
       " failed to reach the trajectory waypoint at the specified time. The specified time "
       "is ",
@@ -210,7 +210,7 @@ auto PolylineTrajectoryFollower::validatedEntityDesiredVelocity(
       rotation angle difference of the z-axis center of the
       vector must be kept below a certain value.
     */
-    throw common::SimulationError("The followingMode is only supported for position.");
+    THROW_SIMULATION_ERROR("The followingMode is only supported for position.");
   }
 
   const double dx = target_position.x - position.x;
@@ -227,7 +227,7 @@ auto PolylineTrajectoryFollower::validatedEntityDesiredVelocity(
                                   .y(std::cos(pitch) * std::sin(yaw) * desired_speed)
                                   .z(std::sin(pitch) * desired_speed);
   if (not isfinite_vec3(desired_velocity)) {
-    throw common::Error(
+    THROW_SIMULATION_ERROR(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
       std::quoted(entity_status.name),
@@ -261,7 +261,7 @@ auto PolylineTrajectoryFollower::validatedEntityDesiredAcceleration(
       follow_waypoint_controller.getAcceleration(remaining_time, distance, acceleration, speed);
 
     if (not std::isfinite(desired_acceleration)) {
-      throw common::Error(
+      THROW_SIMULATION_ERROR(
         "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
         "following information to the developer: Vehicle ",
         std::quoted(entity_status.name),
@@ -270,7 +270,7 @@ auto PolylineTrajectoryFollower::validatedEntityDesiredAcceleration(
     }
     return desired_acceleration;
   } catch (const ControllerError & e) {
-    throw common::Error(
+    THROW_SIMULATION_ERROR(
       "Vehicle ", std::quoted(entity_status.name), " - controller operation problem encountered. ",
       follow_waypoint_controller.getFollowedWaypointDetails(polyline_trajectory), e.what());
   }
@@ -282,7 +282,7 @@ auto PolylineTrajectoryFollower::discardTheFrontWaypointAndRecurse(
   -> std::optional<EntityStatus>
 {
   if (polyline_trajectory.shape.vertices.empty()) {
-    throw common::SimulationError(
+    THROW_SIMULATION_ERROR(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: ",
       "Attempted to access an element of an empty vector");
@@ -378,7 +378,7 @@ auto PolylineTrajectoryFollower::buildUpdatedEntityStatus(
 
 auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
   traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
-  const double matching_distance, const std::optional<double> target_speed /*= std::nullopt*/) const
+  const double matching_distance, const std::optional<double> target_speed) const
   -> std::optional<EntityStatus>
 {
   /*
@@ -396,7 +396,7 @@ auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
   using math::geometry::operator+=;
 
   if (step_time <= 0.0) {
-    throw common::SimulationError(
+    THROW_SIMULATION_ERROR(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: ",
       "non-positive step time provided");
@@ -489,7 +489,7 @@ auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
     desired_acceleration, remaining_time, distance, acceleration, entity_speed);
 
   if (not std::isinf(remaining_time) and not predicted_state_opt.has_value()) {
-    throw common::Error(
+    THROW_SIMULATION_ERROR(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: FollowWaypointController for vehicle ",
       std::quoted(entity_status.name),
@@ -545,7 +545,7 @@ auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
       return discardTheFrontWaypointAndRecurse(
         polyline_trajectory, matching_distance, target_speed);
     } else {
-      throw common::SimulationError(
+      THROW_SIMULATION_ERROR(
         "Vehicle ", std::quoted(entity_status.name), " at time ", entity_status.time,
         "s (remaining time is ", remaining_time_to_front_waypoint,
         "s), has completed a trajectory to the nearest waypoint with", " specified time equal to ",
@@ -567,7 +567,7 @@ auto PolylineTrajectoryFollower::validatedEntityAcceleration() const noexcept(fa
 {
   const double acceleration = entity_status.action_status.accel.linear.x;
   if (not std::isfinite(acceleration)) {
-    throw common::Error(
+    THROW_SIMULATION_ERROR(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
       std::quoted(entity_status.name), "'s acceleration value is NaN or infinity. The value is ",
@@ -580,7 +580,7 @@ auto PolylineTrajectoryFollower::validatedEntityAcceleration() const noexcept(fa
     +behavior_parameter.dynamic_constraints.max_acceleration /* [m/s^2] */);
 
   if (not std::isfinite(max_acceleration)) {
-    throw common::Error(
+    THROW_SIMULATION_ERROR(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
       std::quoted(entity_status.name),
@@ -593,7 +593,7 @@ auto PolylineTrajectoryFollower::validatedEntityAcceleration() const noexcept(fa
     -behavior_parameter.dynamic_constraints.max_deceleration /* [m/s^2] */);
 
   if (not std::isfinite(min_acceleration)) {
-    throw common::Error(
+    THROW_SIMULATION_ERROR(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
       std::quoted(entity_status.name),
@@ -607,7 +607,7 @@ auto PolylineTrajectoryFollower::validatedEntitySpeed() const noexcept(false) ->
   const double entity_speed = entity_status.action_status.twist.linear.x;  // [m/s]
 
   if (not std::isfinite(entity_speed)) {
-    throw common::Error(
+    THROW_SIMULATION_ERROR(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
       std::quoted(entity_status.name), "'s speed value is NaN or infinity. The value is ",
@@ -621,7 +621,7 @@ auto PolylineTrajectoryFollower::validatedEntityPosition() const noexcept(false)
 {
   const auto entity_position = entity_status.pose.position;
   if (not isfinite_vec3(entity_position)) {
-    throw common::Error(
+    THROW_SIMULATION_ERROR(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
       std::quoted(entity_status.name), " coordinate value contains NaN or infinity. The value is [",
@@ -634,13 +634,13 @@ auto PolylineTrajectoryFollower::validatedEntityTargetPosition(
   -> geometry_msgs::msg::Point
 {
   if (polyline_trajectory.shape.vertices.empty()) {
-    throw common::Error(
+    THROW_SIMULATION_ERROR(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "attempted to dereference an element of an empty PolylineTrajectory");
   }
   const auto target_position = polyline_trajectory.shape.vertices.front().position.position;
   if (not isfinite_vec3(target_position)) {
-    throw common::Error(
+    THROW_SIMULATION_ERROR(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
       std::quoted(entity_status.name),
@@ -655,7 +655,7 @@ auto PolylineTrajectoryFollower::validatedEntityDesiredSpeed(
   const double desired_speed = entity_speed + desired_acceleration * step_time;
 
   if (not std::isfinite(desired_speed)) {
-    throw common::Error(
+    THROW_SIMULATION_ERROR(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
       std::quoted(entity_status.name), "'s desired speed value is NaN or infinity. The value is ",
