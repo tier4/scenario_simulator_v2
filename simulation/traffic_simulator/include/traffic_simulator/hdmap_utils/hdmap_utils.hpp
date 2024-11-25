@@ -320,8 +320,9 @@ public:
 
   auto toLaneletPose(
     const geometry_msgs::msg::Pose &, const bool include_crosswalk,
-    const double matching_distance = 1.0) const
-    -> std::optional<traffic_simulator_msgs::msg::LaneletPose>;
+    const double matching_distance = 1.0,
+    const traffic_simulator::RoutingGraphType type = traffic_simulator::RoutingGraphType::VEHICLE)
+    const -> std::optional<traffic_simulator_msgs::msg::LaneletPose>;
 
   auto toLaneletPose(
     const geometry_msgs::msg::Pose &, const lanelet::Ids &,
@@ -330,13 +331,15 @@ public:
 
   auto toLaneletPose(
     const geometry_msgs::msg::Point &, const traffic_simulator_msgs::msg::BoundingBox &,
-    const bool include_crosswalk, const double matching_distance = 1.0) const
-    -> std::optional<traffic_simulator_msgs::msg::LaneletPose>;
+    const bool include_crosswalk, const double matching_distance = 1.0,
+    const traffic_simulator::RoutingGraphType type = traffic_simulator::RoutingGraphType::VEHICLE)
+    const -> std::optional<traffic_simulator_msgs::msg::LaneletPose>;
 
   auto toLaneletPose(
     const geometry_msgs::msg::Pose &, const traffic_simulator_msgs::msg::BoundingBox &,
-    const bool include_crosswalk, const double matching_distance = 1.0) const
-    -> std::optional<traffic_simulator_msgs::msg::LaneletPose>;
+    const bool include_crosswalk, const double matching_distance = 1.0,
+    const traffic_simulator::RoutingGraphType type = traffic_simulator::RoutingGraphType::VEHICLE)
+    const -> std::optional<traffic_simulator_msgs::msg::LaneletPose>;
 
   auto toLaneletPose(
     const geometry_msgs::msg::Pose &, const lanelet::Id, const double matching_distance = 1.0) const
@@ -344,8 +347,9 @@ public:
 
   auto toLaneletPoses(
     const geometry_msgs::msg::Pose &, const lanelet::Id, const double matching_distance = 5.0,
-    const bool include_opposite_direction = true) const
-    -> std::vector<traffic_simulator_msgs::msg::LaneletPose>;
+    const bool include_opposite_direction = true,
+    const traffic_simulator::RoutingGraphType type = traffic_simulator::RoutingGraphType::VEHICLE)
+    const -> std::vector<traffic_simulator_msgs::msg::LaneletPose>;
 
   auto toMapBin() const -> autoware_auto_mapping_msgs::msg::HADMapBin;
 

@@ -565,14 +565,15 @@ auto HdMapUtils::matchToLane(
 
 auto HdMapUtils::toLaneletPose(
   const geometry_msgs::msg::Pose & pose, const bool include_crosswalk,
-  const double matching_distance) const -> std::optional<traffic_simulator_msgs::msg::LaneletPose>
+  const double matching_distance, const traffic_simulator::RoutingGraphType type) const
+  -> std::optional<traffic_simulator_msgs::msg::LaneletPose>
 {
   const auto lanelet_ids = getNearbyLaneletIds(pose.position, 0.1, include_crosswalk);
   if (lanelet_ids.empty()) {
     return std::nullopt;
   }
   for (const auto & id : lanelet_ids) {
-    const auto lanelet_pose = toLaneletPose(pose, id, matching_distance);
+    const auto lanelet_pose = toLaneletPose(pose, id, matching_distance, type);
     if (lanelet_pose) {
       return lanelet_pose;
     }
@@ -627,58 +628,60 @@ auto HdMapUtils::toLaneletPose(
 
 auto HdMapUtils::toLaneletPose(
   const geometry_msgs::msg::Point & position, const traffic_simulator_msgs::msg::BoundingBox & bbox,
-  const bool include_crosswalk, const double matching_distance) const
+  const bool include_crosswalk, const double matching_distance,
+  const traffic_simulator::RoutingGraphType type) const
   -> std::optional<traffic_simulator_msgs::msg::LaneletPose>
 {
   return toLaneletPose(
     geometry_msgs::build<geometry_msgs::msg::Pose>().position(position).orientation(
       geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0).y(0).z(0).w(1)),
-    bbox, include_crosswalk, matching_distance);
+    bbox, include_crosswalk, matching_distance, type);
 }
 
 auto HdMapUtils::toLaneletPose(
   const geometry_msgs::msg::Pose & pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
-  const bool include_crosswalk, const double matching_distance) const
+  const bool include_crosswalk, const double matching_distance,
+  const traffic_simulator::RoutingGraphType type) const
   -> std::optional<traffic_simulator_msgs::msg::LaneletPose>
 {
-  const auto lanelet_id = matchToLane(pose, bbox, include_crosswalk, matching_distance);
+  const auto lanelet_id = matchToLane(
+    pose, bbox, include_crosswalk, matching_distance, DEFAULT_MATCH_TO_LANE_REDUCTION_RATIO, type);
   if (!lanelet_id) {
-    return toLaneletPose(pose, include_crosswalk, matching_distance);
+    return toLaneletPose(pose, include_crosswalk, matching_distance, type);
   }
   const auto pose_in_target_lanelet = toLaneletPose(pose, lanelet_id.value(), matching_distance);
   if (pose_in_target_lanelet) {
     return pose_in_target_lanelet;
   }
-  const auto previous = getPreviousLaneletIds(lanelet_id.value());
+  const auto previous = getPreviousLaneletIds(lanelet_id.value(), type);
   for (const auto id : previous) {
     const auto pose_in_previous = toLaneletPose(pose, id, matching_distance);
     if (pose_in_previous) {
       return pose_in_previous;
     }
   }
-  const auto next = getNextLaneletIds(lanelet_id.value());
+  const auto next = getNextLaneletIds(lanelet_id.value(), type);
   for (const auto id : previous) {
     const auto pose_in_next = toLaneletPose(pose, id, matching_distance);
     if (pose_in_next) {
       return pose_in_next;
     }
   }
-  return toLaneletPose(pose, include_crosswalk);
+  return toLaneletPose(pose, include_crosswalk, matching_distance, type);
 }
 
 auto HdMapUtils::toLaneletPoses(
   const geometry_msgs::msg::Pose & pose, const lanelet::Id lanelet_id,
-  const double matching_distance, const bool include_opposite_direction) const
+  const double matching_distance, const bool include_opposite_direction,
+  const traffic_simulator::RoutingGraphType type) const
   -> std::vector<traffic_simulator_msgs::msg::LaneletPose>
 {
   std::vector<traffic_simulator_msgs::msg::LaneletPose> ret;
   std::vector lanelet_ids = {lanelet_id};
-  lanelet_ids += getLeftLaneletIds(
-    lanelet_id, traffic_simulator::RoutingGraphType::VEHICLE, include_opposite_direction);
-  lanelet_ids += getRightLaneletIds(
-    lanelet_id, traffic_simulator::RoutingGraphType::VEHICLE, include_opposite_direction);
-  lanelet_ids += getPreviousLaneletIds(lanelet_ids);
-  lanelet_ids += getNextLaneletIds(lanelet_ids);
+  lanelet_ids += getLeftLaneletIds(lanelet_id, type, include_opposite_direction);
+  lanelet_ids += getRightLaneletIds(lanelet_id, type, include_opposite_direction);
+  lanelet_ids += getPreviousLaneletIds(lanelet_ids, type);
+  lanelet_ids += getNextLaneletIds(lanelet_ids, type);
   for (const auto & id : sortAndUnique(lanelet_ids)) {
     if (const auto & lanelet_pose = toLaneletPose(pose, id, matching_distance)) {
       ret.emplace_back(lanelet_pose.value());
