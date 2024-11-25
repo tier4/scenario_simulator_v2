@@ -268,7 +268,9 @@ public:
     const traffic_simulator::RoutingGraphType type =
       traffic_simulator::RoutingGraphType::VEHICLE) const -> lanelet::Ids;
 
-  auto getSpeedLimit(const lanelet::Ids &) const -> double;
+  auto getSpeedLimit(
+    const lanelet::Ids &, const traffic_simulator::RoutingGraphType type =
+                            traffic_simulator::RoutingGraphType::VEHICLE) const -> double;
 
   auto getStopLineIds() const -> lanelet::Ids;
 

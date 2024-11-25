@@ -722,7 +722,8 @@ auto HdMapUtils::getClosestLaneletId(
   }
 }
 
-auto HdMapUtils::getSpeedLimit(const lanelet::Ids & lanelet_ids) const -> double
+auto HdMapUtils::getSpeedLimit(
+  const lanelet::Ids & lanelet_ids, const traffic_simulator::RoutingGraphType type) const -> double
 {
   std::vector<double> limits;
   if (lanelet_ids.empty()) {
@@ -730,8 +731,7 @@ auto HdMapUtils::getSpeedLimit(const lanelet::Ids & lanelet_ids) const -> double
   }
   for (auto itr = lanelet_ids.begin(); itr != lanelet_ids.end(); itr++) {
     const auto lanelet = lanelet_map_ptr_->laneletLayer.get(*itr);
-    const auto limit = routing_graphs_->traffic_rule(traffic_simulator::RoutingGraphType::VEHICLE)
-                         ->speedLimit(lanelet);
+    const auto limit = routing_graphs_->traffic_rule(type)->speedLimit(lanelet);
     limits.push_back(lanelet::units::KmHQuantity(limit.speedLimit).value() / 3.6);
   }
   return *std::min_element(limits.begin(), limits.end());
