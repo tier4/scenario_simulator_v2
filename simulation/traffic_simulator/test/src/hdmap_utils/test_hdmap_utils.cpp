@@ -2735,3 +2735,18 @@ TEST_F(HdMapUtilsTest_StandardMap, getPreviousLanelets)
 
   EXPECT_EQ(result_previous, actual_previous);
 }
+
+TEST_F(HdMapUtilsTest_WithRoadShoulderMap, routingWithRoadShoulder)
+{
+  // default: traffic_simulator::RoutingGraphType::VEHICLE
+  const auto default_route = hdmap_utils.getRoute(34693, 34615, false);
+  EXPECT_EQ(default_route.size(), 0);
+
+  const auto route_with_road_shoulder = hdmap_utils.getRoute(
+    34693, 34615, false, traffic_simulator::RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER);
+  EXPECT_EQ(route_with_road_shoulder.size(), 4);
+  EXPECT_EQ(route_with_road_shoulder[0], 34693);
+  EXPECT_EQ(route_with_road_shoulder[1], 34696);  // road shoulder
+  EXPECT_EQ(route_with_road_shoulder[2], 34768);  // road shoulder
+  EXPECT_EQ(route_with_road_shoulder[3], 34615);
+}
