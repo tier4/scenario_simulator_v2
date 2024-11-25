@@ -46,7 +46,7 @@ TEST_F(V2ITrafficLightsTestNewArchitecture, startUpdate_publishSignals)
   this->lights->setTrafficLightsConfidence(this->id, expected_confidence);
 
   std::vector<TrafficLightGroupArray> signals;
-  auto subscriber = this->node_ptr->create_subscription<TrafficLightGroupArray>(
+  const auto subscriber = this->node_ptr->create_subscription<TrafficLightGroupArray>(
     "/perception/traffic_light_recognition/external/traffic_signals", 10,
     [&signals](const TrafficLightGroupArray::SharedPtr msg_in) { signals.push_back(*msg_in); });
 
@@ -56,7 +56,6 @@ TEST_F(V2ITrafficLightsTestNewArchitecture, startUpdate_publishSignals)
   while (std::chrono::system_clock::now() < end) {
     rclcpp::spin_some(this->node_ptr);
   }
-  subscriber.reset();
 
   // verify contents of messages
   std::vector<builtin_interfaces::msg::Time> stamps;
@@ -99,7 +98,7 @@ TEST_F(V2ITrafficLightsTestNewArchitecture, startUpdate_publishSignalsLegacy)
   this->lights->setTrafficLightsConfidence(this->id, expected_confidence);
 
   std::vector<TrafficLightGroupArray> signals;
-  auto subscriber = this->node_ptr->create_subscription<TrafficLightGroupArray>(
+  const auto subscriber = this->node_ptr->create_subscription<TrafficLightGroupArray>(
     "/v2x/traffic_signals", 10,
     [&signals](const TrafficLightGroupArray::SharedPtr msg_in) { signals.push_back(*msg_in); });
 
@@ -109,7 +108,6 @@ TEST_F(V2ITrafficLightsTestNewArchitecture, startUpdate_publishSignalsLegacy)
   while (std::chrono::system_clock::now() < end) {
     rclcpp::spin_some(this->node_ptr);
   }
-  subscriber.reset();
 
   // verify contents of messages
   std::vector<builtin_interfaces::msg::Time> stamps;
@@ -152,32 +150,34 @@ TEST_F(V2ITrafficLightsTestNewArchitecture, resetUpdate_publishSignals)
   this->lights->setTrafficLightsConfidence(this->id, expected_confidence);
 
   std::vector<TrafficLightGroupArray> signals;
-  auto subscriber = this->node_ptr->create_subscription<TrafficLightGroupArray>(
-    "/perception/traffic_light_recognition/external/traffic_signals", 10,
-    [&signals](const TrafficLightGroupArray::SharedPtr msg_in) { signals.push_back(*msg_in); });
+  {
+    const auto subscriber = this->node_ptr->create_subscription<TrafficLightGroupArray>(
+      "/perception/traffic_light_recognition/external/traffic_signals", 10,
+      [&signals](const TrafficLightGroupArray::SharedPtr msg_in) { signals.push_back(*msg_in); });
 
-  // start update with 20Hz frequency and subscribe for 0.5 second
-  this->lights->startUpdate(20.0);
-  const auto end = std::chrono::system_clock::now() + 0.5s;
-  while (std::chrono::system_clock::now() < end) {
-    rclcpp::spin_some(this->node_ptr);
+    // start update with 20Hz frequency and subscribe for 0.5 second
+    this->lights->startUpdate(20.0);
+    const auto end = std::chrono::system_clock::now() + 0.5s;
+    while (std::chrono::system_clock::now() < end) {
+      rclcpp::spin_some(this->node_ptr);
+    }
   }
-  subscriber.reset();
 
   std::vector<TrafficLightGroupArray> signals_reset;
-  auto subscriber_reset = this->node_ptr->create_subscription<TrafficLightGroupArray>(
-    "/perception/traffic_light_recognition/external/traffic_signals", 10,
-    [&signals_reset](const TrafficLightGroupArray::SharedPtr msg_in) {
-      signals_reset.push_back(*msg_in);
-    });
+  {
+    const auto subscriber = this->node_ptr->create_subscription<TrafficLightGroupArray>(
+      "/perception/traffic_light_recognition/external/traffic_signals", 10,
+      [&signals_reset](const TrafficLightGroupArray::SharedPtr msg_in) {
+        signals_reset.push_back(*msg_in);
+      });
 
-  // reset update to 10Hz frequency and subscribe for 0.5 second
-  this->lights->resetUpdate(10.0);
-  const auto end_reset = std::chrono::system_clock::now() + 0.5s;
-  while (std::chrono::system_clock::now() < end_reset) {
-    rclcpp::spin_some(this->node_ptr);
+    // reset update to 10Hz frequency and subscribe for 0.5 second
+    this->lights->resetUpdate(10.0);
+    const auto end_reset = std::chrono::system_clock::now() + 0.5s;
+    while (std::chrono::system_clock::now() < end_reset) {
+      rclcpp::spin_some(this->node_ptr);
+    }
   }
-  subscriber_reset.reset();
 
   // verify contents of messages - before reset
   std::vector<builtin_interfaces::msg::Time> stamps;
@@ -253,31 +253,33 @@ TEST_F(V2ITrafficLightsTestNewArchitecture, resetUpdate_publishSignalsLegacy)
   this->lights->setTrafficLightsConfidence(this->id, expected_confidence);
 
   std::vector<TrafficLightGroupArray> signals;
-  auto subscriber = this->node_ptr->create_subscription<TrafficLightGroupArray>(
-    "/v2x/traffic_signals", 10,
-    [&signals](const TrafficLightGroupArray::SharedPtr msg_in) { signals.push_back(*msg_in); });
+  {
+    const auto subscriber = this->node_ptr->create_subscription<TrafficLightGroupArray>(
+      "/v2x/traffic_signals", 10,
+      [&signals](const TrafficLightGroupArray::SharedPtr msg_in) { signals.push_back(*msg_in); });
 
-  // start update with 20Hz frequency and subscribe for 0.5 second
-  this->lights->startUpdate(20.0);
-  const auto end = std::chrono::system_clock::now() + 0.5s;
-  while (std::chrono::system_clock::now() < end) {
-    rclcpp::spin_some(this->node_ptr);
+    // start update with 20Hz frequency and subscribe for 0.5 second
+    this->lights->startUpdate(20.0);
+    const auto end = std::chrono::system_clock::now() + 0.5s;
+    while (std::chrono::system_clock::now() < end) {
+      rclcpp::spin_some(this->node_ptr);
+    }
   }
-  subscriber.reset();
 
   std::vector<TrafficLightGroupArray> signals_reset;
-  auto subscriber_reset = this->node_ptr->create_subscription<TrafficLightGroupArray>(
-    "/v2x/traffic_signals", 10, [&signals_reset](const TrafficLightGroupArray::SharedPtr msg_in) {
-      signals_reset.push_back(*msg_in);
-    });
+  {
+    const auto subscriber = this->node_ptr->create_subscription<TrafficLightGroupArray>(
+      "/v2x/traffic_signals", 10, [&signals_reset](const TrafficLightGroupArray::SharedPtr msg_in) {
+        signals_reset.push_back(*msg_in);
+      });
 
-  // reset update to 10Hz frequency and subscribe for 0.5 second
-  this->lights->resetUpdate(10.0);
-  auto end_reset = std::chrono::system_clock::now() + 0.5s;
-  while (std::chrono::system_clock::now() < end_reset) {
-    rclcpp::spin_some(this->node_ptr);
+    // reset update to 10Hz frequency and subscribe for 0.5 second
+    this->lights->resetUpdate(10.0);
+    auto end_reset = std::chrono::system_clock::now() + 0.5s;
+    while (std::chrono::system_clock::now() < end_reset) {
+      rclcpp::spin_some(this->node_ptr);
+    }
   }
-  subscriber_reset.reset();
 
   // verify contents of messages - before reset
   std::vector<builtin_interfaces::msg::Time> stamps;

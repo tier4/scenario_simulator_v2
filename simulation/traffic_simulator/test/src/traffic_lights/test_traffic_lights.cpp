@@ -101,7 +101,7 @@ TEST_F(TrafficLightsTest, startTrafficLightsUpdate)
   this->lights->getV2ITrafficLights()->setTrafficLightsState(this->id, this->red_state);
 
   std::vector<visualization_msgs::msg::MarkerArray> markers;
-  auto subscriber =
+  const auto subscriber =
     this->node_ptr->template create_subscription<visualization_msgs::msg::MarkerArray>(
       "traffic_light/marker", 10,
       [&markers](const visualization_msgs::msg::MarkerArray::SharedPtr msg_in) {
@@ -115,7 +115,6 @@ TEST_F(TrafficLightsTest, startTrafficLightsUpdate)
   while (std::chrono::system_clock::now() < end) {
     rclcpp::spin_some(this->node_ptr);
   }
-  subscriber.reset();
 
   // verify contents of messages
   std::vector<std_msgs::msg::Header> headers;

@@ -186,7 +186,7 @@ TYPED_TEST(TrafficLightsInternalTest, startUpdate_publishMarkers)
   this->lights->setTrafficLightsState(this->id, stateFromColor(color_name));
 
   std::vector<visualization_msgs::msg::MarkerArray> markers;
-  auto subscriber =
+  const auto subscriber =
     this->node_ptr->template create_subscription<visualization_msgs::msg::MarkerArray>(
       "traffic_light/marker", 10,
       [&markers](const visualization_msgs::msg::MarkerArray::SharedPtr msg_in) {
@@ -199,7 +199,6 @@ TYPED_TEST(TrafficLightsInternalTest, startUpdate_publishMarkers)
   while (std::chrono::system_clock::now() < end) {
     rclcpp::spin_some(this->node_ptr);
   }
-  subscriber.reset();
 
   const auto verify_delete_marker =
     [](const visualization_msgs::msg::Marker & marker, const auto & info = "") {
@@ -260,36 +259,38 @@ TYPED_TEST(TrafficLightsInternalTest, resetUpdate_publishMarkers)
   this->lights->setTrafficLightsState(this->id, stateFromColor(color_name));
 
   std::vector<visualization_msgs::msg::MarkerArray> markers;
-  auto subscriber =
-    this->node_ptr->template create_subscription<visualization_msgs::msg::MarkerArray>(
-      "traffic_light/marker", 10,
-      [&markers](const visualization_msgs::msg::MarkerArray::SharedPtr msg_in) {
-        markers.push_back(*msg_in);
-      });
+  {
+    const auto subscriber =
+      this->node_ptr->template create_subscription<visualization_msgs::msg::MarkerArray>(
+        "traffic_light/marker", 10,
+        [&markers](const visualization_msgs::msg::MarkerArray::SharedPtr msg_in) {
+          markers.push_back(*msg_in);
+        });
 
-  // start update with 20Hz frequency and subscribe for 0.5 second
-  this->lights->startUpdate(20.0);
-  const auto first_end = std::chrono::system_clock::now() + 0.5s;
-  while (std::chrono::system_clock::now() < first_end) {
-    rclcpp::spin_some(this->node_ptr);
+    // start update with 20Hz frequency and subscribe for 0.5 second
+    this->lights->startUpdate(20.0);
+    const auto first_end = std::chrono::system_clock::now() + 0.5s;
+    while (std::chrono::system_clock::now() < first_end) {
+      rclcpp::spin_some(this->node_ptr);
+    }
   }
-  subscriber.reset();
 
   std::vector<visualization_msgs::msg::MarkerArray> markers_reset;
-  auto subscriber_reset =
-    this->node_ptr->template create_subscription<visualization_msgs::msg::MarkerArray>(
-      "traffic_light/marker", 10,
-      [&markers_reset](const visualization_msgs::msg::MarkerArray::SharedPtr msg_in) {
-        markers_reset.push_back(*msg_in);
-      });
+  {
+    const auto subscriber =
+      this->node_ptr->template create_subscription<visualization_msgs::msg::MarkerArray>(
+        "traffic_light/marker", 10,
+        [&markers_reset](const visualization_msgs::msg::MarkerArray::SharedPtr msg_in) {
+          markers_reset.push_back(*msg_in);
+        });
 
-  // reset update to 10Hz frequency and subscribe for 0.5 second
-  this->lights->resetUpdate(10.0);
-  const auto second_end = std::chrono::system_clock::now() + 0.5s;
-  while (std::chrono::system_clock::now() < second_end) {
-    rclcpp::spin_some(this->node_ptr);
+    // reset update to 10Hz frequency and subscribe for 0.5 second
+    this->lights->resetUpdate(10.0);
+    const auto second_end = std::chrono::system_clock::now() + 0.5s;
+    while (std::chrono::system_clock::now() < second_end) {
+      rclcpp::spin_some(this->node_ptr);
+    }
   }
-  subscriber_reset.reset();
 
   const auto verify_delete_marker =
     [](const visualization_msgs::msg::Marker & marker, const auto & info = "") {
