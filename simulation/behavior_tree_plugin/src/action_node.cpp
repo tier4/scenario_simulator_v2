@@ -33,15 +33,10 @@
 
 namespace entity_behavior
 {
-BT::PortsList operator+(const BT::PortsList & ports_0, const BT::PortsList & ports_1)
+BT::PortsList operator+(const BT::PortsList & ports_1, const BT::PortsList & ports_2)
 {
-  BT::PortsList ports;
-  for (const auto & [name, port_info] : ports_0) {
-    ports.try_emplace(name, port_info);
-  }
-  for (const auto & [name, port_info] : ports_1) {
-    ports.try_emplace(name, port_info);
-  }
+  BT::PortsList ports = ports_1;
+  ports.insert(ports_2.begin(), ports_2.end());
   return ports;
 }
 
