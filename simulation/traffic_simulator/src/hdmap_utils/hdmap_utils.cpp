@@ -82,8 +82,6 @@ HdMapUtils::HdMapUtils(
     routing_graphs_->routing_graph(traffic_simulator::RoutingGraphType::VEHICLE));
   all_graphs.push_back(
     routing_graphs_->routing_graph(traffic_simulator::RoutingGraphType::PEDESTRIAN));
-  shoulder_lanelets_ =
-    lanelet::utils::query::shoulderLanelets(lanelet::utils::query::laneletLayer(lanelet_map_ptr_));
 }
 
 auto HdMapUtils::getAllCanonicalizedLaneletPoses(
@@ -981,18 +979,6 @@ auto HdMapUtils::getLaneletLength(const lanelet::Id lanelet_id) const -> double
   return ret;
 }
 
-auto HdMapUtils::getPreviousRoadShoulderLanelet(const lanelet::Id lanelet_id) const -> lanelet::Ids
-{
-  lanelet::Ids ids;
-  const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
-  for (const auto & shoulder_lanelet : shoulder_lanelets_) {
-    if (lanelet::geometry::follows(shoulder_lanelet, lanelet)) {
-      ids.push_back(shoulder_lanelet.id());
-    }
-  }
-  return ids;
-}
-
 auto HdMapUtils::getPreviousLaneletIds(
   const lanelet::Id lanelet_id, const traffic_simulator::RoutingGraphType type) const
   -> lanelet::Ids
@@ -1038,18 +1024,6 @@ auto HdMapUtils::getPreviousLaneletIds(
     ids += getPreviousLaneletIds(id, turn_direction, type);
   }
   return sortAndUnique(ids);
-}
-
-auto HdMapUtils::getNextRoadShoulderLanelet(const lanelet::Id lanelet_id) const -> lanelet::Ids
-{
-  lanelet::Ids ids;
-  const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
-  for (const auto & shoulder_lanelet : shoulder_lanelets_) {
-    if (lanelet::geometry::follows(lanelet, shoulder_lanelet)) {
-      ids.push_back(shoulder_lanelet.id());
-    }
-  }
-  return ids;
 }
 
 auto HdMapUtils::getNextLaneletIds(

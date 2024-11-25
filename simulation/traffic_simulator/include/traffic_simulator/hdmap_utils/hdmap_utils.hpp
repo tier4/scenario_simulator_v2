@@ -201,7 +201,8 @@ public:
     const geometry_msgs::msg::Point &, const double distance_threshold,
     const std::size_t search_count = 5) const -> lanelet::Ids;
 
-  auto getNextLaneletIds(const lanelet::Ids &) const -> lanelet::Ids;
+  auto getNextLaneletIds(const lanelet::Ids &, const traffic_simulator::RoutingGraphType type =
+                                                 traffic_simulator::RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER) const -> lanelet::Ids;
 
   auto getNextLaneletIds(
     const lanelet::Ids &, const std::string & turn_direction,
@@ -218,7 +219,8 @@ public:
     const traffic_simulator::RoutingGraphType type =
       traffic_simulator::RoutingGraphType::VEHICLE) const -> lanelet::Ids;
 
-  auto getPreviousLaneletIds(const lanelet::Ids &) const -> lanelet::Ids;
+  auto getPreviousLaneletIds(const lanelet::Ids &, const traffic_simulator::RoutingGraphType type =
+                                                     traffic_simulator::RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER) const -> lanelet::Ids;
 
   auto getPreviousLaneletIds(
     const lanelet::Ids &, const std::string & turn_direction,
@@ -344,8 +346,6 @@ private:
 
   lanelet::LaneletMapPtr lanelet_map_ptr_;
 
-  lanelet::ConstLanelets shoulder_lanelets_;
-
   class RoutingGraphs
   {
   public:
@@ -420,10 +420,6 @@ private:
     const geometry_msgs::msg::Pose & from, const traffic_simulator_msgs::msg::LaneletPose & to,
     const traffic_simulator::lane_change::TrajectoryShape,
     const double tangent_vector_size = 100) const -> math::geometry::HermiteCurve;
-
-  auto getNextRoadShoulderLanelet(const lanelet::Id) const -> lanelet::Ids;
-
-  auto getPreviousRoadShoulderLanelet(const lanelet::Id) const -> lanelet::Ids;
 
   auto getStopLines() const -> lanelet::ConstLineStrings3d;
 
