@@ -117,7 +117,9 @@ public:
 
   auto getConflictingCrosswalkIds(const lanelet::Ids &) const -> lanelet::Ids;
 
-  auto getConflictingLaneIds(const lanelet::Ids &) const -> lanelet::Ids;
+  auto getConflictingLaneIds(
+    const lanelet::Ids &, const traffic_simulator::RoutingGraphType type =
+                            traffic_simulator::RoutingGraphType::VEHICLE) const -> lanelet::Ids;
 
   auto getDistanceToStopLine(
     const lanelet::Ids & route_lanelets,
