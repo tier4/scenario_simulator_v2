@@ -21,13 +21,20 @@
 #include "helper.hpp"
 
 constexpr double eps = 1e-6;
+
 constexpr double timing_eps = 1e-3;
-// Frequency can fluctuate a bit due to timing, especially when the machine is under heavy load, so higher tolerance is needed
+
+// Frequency can fluctuate a bit due to timing, especially when the machine is under heavy load
+// so higher tolerance is needed
 constexpr double frequency_eps = 0.5;
+
 // Position in tests is defined with precision of 1cm so such tolerance is needed
 constexpr double position_eps = 0.01;
 
 using namespace std::chrono_literals;
+
+using TrafficLightsTypes =
+  testing::Types<traffic_simulator::ConventionalTrafficLights, traffic_simulator::V2ITrafficLights>;
 
 TYPED_TEST_SUITE(TrafficLightsInternalTest, TrafficLightsTypes, TrafficLightsNameGenerator);
 
@@ -174,21 +181,20 @@ TYPED_TEST(TrafficLightsInternalTest, compareTrafficLightsState)
 
 TYPED_TEST(TrafficLightsInternalTest, startUpdate_publishMarkers)
 {
-  const std::string color_name = "red";
-
+  const auto marker_id = this->id;
+  constexpr const char * color_name = "red";
   this->lights->setTrafficLightsState(this->id, stateFromColor(color_name));
 
   std::vector<visualization_msgs::msg::MarkerArray> markers;
-
-  rclcpp::Subscription<visualization_msgs::msg::MarkerArray>::SharedPtr subscriber =
+  const auto subscriber =
     this->node_ptr->template create_subscription<visualization_msgs::msg::MarkerArray>(
       "traffic_light/marker", 10,
       [&markers](const visualization_msgs::msg::MarkerArray::SharedPtr msg_in) {
         markers.push_back(*msg_in);
       });
 
+  // start update with 20Hz frequency and subscribe for 1 second
   this->lights->startUpdate(20.0);
-
   const auto end = std::chrono::system_clock::now() + 1s;
   while (std::chrono::system_clock::now() < end) {
     rclcpp::spin_some(this->node_ptr);
@@ -199,11 +205,11 @@ TYPED_TEST(TrafficLightsInternalTest, startUpdate_publishMarkers)
       EXPECT_EQ(marker.action, visualization_msgs::msg::Marker::DELETEALL) << info;
     };
 
-  const auto verify_add_marker = [&color_name](
+  const auto verify_add_marker = [&color_name, &marker_id](
                                    const visualization_msgs::msg::Marker & marker,
                                    const auto info = "") {
     EXPECT_EQ(marker.ns, "bulb") << info;
-    EXPECT_EQ(marker.id, 34836) << info;
+    EXPECT_EQ(marker.id, marker_id) << info;
     EXPECT_EQ(marker.type, visualization_msgs::msg::Marker::SPHERE) << info;
     EXPECT_EQ(marker.action, visualization_msgs::msg::Marker::ADD) << info;
 
@@ -220,9 +226,10 @@ TYPED_TEST(TrafficLightsInternalTest, startUpdate_publishMarkers)
     EXPECT_COLOR_RGBA_NEAR_STREAM(marker.color, color_names::makeColorMsg(color_name), eps, info);
   };
 
+  // verify contents of messages
   std::vector<std_msgs::msg::Header> headers;
-
   for (std::size_t i = 0; i < markers.size(); i += 2) {
+    // every marker with an even index (i=0,2,4...) is of type ::DELETEALL, others are ::ADD
     {
       const auto & one_marker = markers[i].markers;
       EXPECT_EQ(one_marker.size(), static_cast<std::size_t>(1));
@@ -237,6 +244,7 @@ TYPED_TEST(TrafficLightsInternalTest, startUpdate_publishMarkers)
     }
   }
 
+  // verify 20Hz frequency of ::ADD markers
   const double expected_frequency = 20.0;
   const double actual_frequency =
     static_cast<double>(headers.size() - 1) /
@@ -246,34 +254,37 @@ TYPED_TEST(TrafficLightsInternalTest, startUpdate_publishMarkers)
 
 TYPED_TEST(TrafficLightsInternalTest, resetUpdate_publishMarkers)
 {
-  const std::string color_name = "green";
+  const auto marker_id = this->id;
+  constexpr const char * color_name = "green";
   this->lights->setTrafficLightsState(this->id, stateFromColor(color_name));
 
-  std::vector<visualization_msgs::msg::MarkerArray> markers, markers_reset;
-
-  rclcpp::Subscription<visualization_msgs::msg::MarkerArray>::SharedPtr subscriber =
+  std::vector<visualization_msgs::msg::MarkerArray> markers;
+  const auto subscriber =
     this->node_ptr->template create_subscription<visualization_msgs::msg::MarkerArray>(
       "traffic_light/marker", 10,
       [&markers](const visualization_msgs::msg::MarkerArray::SharedPtr msg_in) {
         markers.push_back(*msg_in);
       });
 
+  // start update with 20Hz frequency and subscribe for 0.5 second
   this->lights->startUpdate(20.0);
-
-  auto end = std::chrono::system_clock::now() + 0.5s;
-  while (std::chrono::system_clock::now() < end) {
+  const auto first_end = std::chrono::system_clock::now() + 0.5s;
+  while (std::chrono::system_clock::now() < first_end) {
     rclcpp::spin_some(this->node_ptr);
   }
 
-  subscriber = this->node_ptr->template create_subscription<visualization_msgs::msg::MarkerArray>(
-    "traffic_light/marker", 10,
-    [&markers_reset](const visualization_msgs::msg::MarkerArray::SharedPtr msg_in) {
-      markers_reset.push_back(*msg_in);
-    });
+  std::vector<visualization_msgs::msg::MarkerArray> markers_reset;
+  const auto subscriber_reset =
+    this->node_ptr->template create_subscription<visualization_msgs::msg::MarkerArray>(
+      "traffic_light/marker", 10,
+      [&markers_reset](const visualization_msgs::msg::MarkerArray::SharedPtr msg_in) {
+        markers_reset.push_back(*msg_in);
+      });
 
+  // reset update to 10Hz frequency and subscribe for 0.5 second
   this->lights->resetUpdate(10.0);
-  end = std::chrono::system_clock::now() + 0.5s;
-  while (std::chrono::system_clock::now() < end) {
+  const auto second_end = std::chrono::system_clock::now() + 0.5s;
+  while (std::chrono::system_clock::now() < second_end) {
     rclcpp::spin_some(this->node_ptr);
   }
 
@@ -282,11 +293,11 @@ TYPED_TEST(TrafficLightsInternalTest, resetUpdate_publishMarkers)
       EXPECT_EQ(marker.action, visualization_msgs::msg::Marker::DELETEALL) << info;
     };
 
-  const auto verify_add_marker = [&color_name](
+  const auto verify_add_marker = [&color_name, &marker_id](
                                    const visualization_msgs::msg::Marker & marker,
                                    const auto info = "") {
     EXPECT_EQ(marker.ns, "bulb") << info;
-    EXPECT_EQ(marker.id, 34836) << info;
+    EXPECT_EQ(marker.id, marker_id) << info;
     EXPECT_EQ(marker.type, visualization_msgs::msg::Marker::SPHERE) << info;
     EXPECT_EQ(marker.action, visualization_msgs::msg::Marker::ADD) << info;
 
@@ -303,9 +314,10 @@ TYPED_TEST(TrafficLightsInternalTest, resetUpdate_publishMarkers)
     EXPECT_COLOR_RGBA_NEAR_STREAM(marker.color, color_names::makeColorMsg(color_name), eps, info);
   };
 
-  std::vector<std_msgs::msg::Header> headers, headers_reset;
-
+  // verify contents of messages - before reset
+  std::vector<std_msgs::msg::Header> headers;
   for (std::size_t i = 0; i < markers.size(); i += 2) {
+    // every marker with an even index (i=0,2,4...) is of type ::DELETEALL, others are ::ADD
     {
       const auto & one_marker = markers[i].markers;
       EXPECT_EQ(one_marker.size(), static_cast<std::size_t>(1));
@@ -319,7 +331,19 @@ TYPED_TEST(TrafficLightsInternalTest, resetUpdate_publishMarkers)
       headers.push_back(one_marker[0].header);
     }
   }
+  // verify 20Hz frequency of ::ADD markers - before reset
+  {
+    const double expected_frequency = 20.0;
+    const double actual_frequency =
+      static_cast<double>(headers.size() - 1) /
+      static_cast<double>(getTime(headers.back()) - getTime(headers.front())) * 1e+9;
+    EXPECT_NEAR(actual_frequency, expected_frequency, frequency_eps);
+  }
+
+  // verify contents of messages - after reset
+  std::vector<std_msgs::msg::Header> headers_reset;
   for (std::size_t i = 0; i < markers_reset.size(); i += 2) {
+    // every marker with an even index (i=0,2,4...) is of type ::DELETEALL, others are ::ADD
     {
       const auto & one_marker = markers_reset[i].markers;
       EXPECT_EQ(one_marker.size(), static_cast<std::size_t>(1));
@@ -333,14 +357,7 @@ TYPED_TEST(TrafficLightsInternalTest, resetUpdate_publishMarkers)
       headers_reset.push_back(one_marker[0].header);
     }
   }
-
-  {
-    const double expected_frequency = 20.0;
-    const double actual_frequency =
-      static_cast<double>(headers.size() - 1) /
-      static_cast<double>(getTime(headers.back()) - getTime(headers.front())) * 1e+9;
-    EXPECT_NEAR(actual_frequency, expected_frequency, frequency_eps);
-  }
+  // verify 10Hz frequency of ::ADD markers - after reset
   {
     const double expected_frequency = 10.0;
     const double actual_frequency =
@@ -352,8 +369,9 @@ TYPED_TEST(TrafficLightsInternalTest, resetUpdate_publishMarkers)
 
 TYPED_TEST(TrafficLightsInternalTest, generateTrafficSimulatorV1Msg)
 {
+  constexpr double expected_confidence{0.7};
   this->lights->setTrafficLightsState(this->id, "red solidOn circle, yellow flashing circle");
-  this->lights->setTrafficLightsConfidence(this->id, 0.7);
+  this->lights->setTrafficLightsConfidence(this->id, expected_confidence);
 
   const auto msg =
     *traffic_simulator::TrafficLightPublisher<traffic_simulator_msgs::msg::TrafficLightArrayV1>::
@@ -362,28 +380,28 @@ TYPED_TEST(TrafficLightsInternalTest, generateTrafficSimulatorV1Msg)
 
   EXPECT_EQ(msg.traffic_lights.size(), static_cast<std::size_t>(1));
   EXPECT_EQ(msg.traffic_lights.front().traffic_light_bulbs.size(), static_cast<std::size_t>(2));
-
   EXPECT_EQ(msg.traffic_lights[0].lanelet_way_id, this->id);
 
   using TrafficLightBulbV1 = traffic_simulator_msgs::msg::TrafficLightBulbV1;
-  // we use this order, because signals are parsed in reverse
+  // we use this order, because signals are parsed in reverse (note: AMBER is equal to yellow)
   EXPECT_EQ(msg.traffic_lights[0].traffic_light_bulbs[0].color, TrafficLightBulbV1::AMBER);
   EXPECT_EQ(msg.traffic_lights[0].traffic_light_bulbs[0].status, TrafficLightBulbV1::FLASHING);
   EXPECT_EQ(msg.traffic_lights[0].traffic_light_bulbs[0].shape, TrafficLightBulbV1::CIRCLE);
-  EXPECT_NEAR(msg.traffic_lights[0].traffic_light_bulbs[0].confidence, 0.7, eps);
+  EXPECT_NEAR(msg.traffic_lights[0].traffic_light_bulbs[0].confidence, expected_confidence, eps);
 
   EXPECT_EQ(msg.traffic_lights[0].traffic_light_bulbs[1].color, TrafficLightBulbV1::RED);
   EXPECT_EQ(msg.traffic_lights[0].traffic_light_bulbs[1].status, TrafficLightBulbV1::SOLID_ON);
   EXPECT_EQ(msg.traffic_lights[0].traffic_light_bulbs[1].shape, TrafficLightBulbV1::CIRCLE);
-  EXPECT_NEAR(msg.traffic_lights[0].traffic_light_bulbs[1].confidence, 0.7, eps);
+  EXPECT_NEAR(msg.traffic_lights[0].traffic_light_bulbs[1].confidence, expected_confidence, eps);
 }
 
 TYPED_TEST(TrafficLightsInternalTest, generateAutowareAutoPerceptionMsg)
 {
+  constexpr double expected_confidence{0.7};
   constexpr const char * frame = "camera_link";
 
   this->lights->setTrafficLightsState(this->id, "red solidOn circle, yellow flashing circle");
-  this->lights->setTrafficLightsConfidence(this->id, 0.7);
+  this->lights->setTrafficLightsConfidence(this->id, expected_confidence);
 
   const auto msg = *traffic_simulator::TrafficLightPublisher<
     autoware_auto_perception_msgs::msg::TrafficSignalArray>::
@@ -399,7 +417,7 @@ TYPED_TEST(TrafficLightsInternalTest, generateAutowareAutoPerceptionMsg)
   EXPECT_EQ(msg.signals.size(), static_cast<std::size_t>(1));
   EXPECT_EQ(msg.signals.front().lights.size(), static_cast<std::size_t>(2));
 
-  EXPECT_EQ(msg.header.frame_id, "camera_link");
+  EXPECT_EQ(msg.header.frame_id, frame);
   EXPECT_EQ(msg.signals[0].map_primitive_id, this->id);
 
   using TrafficLight = autoware_auto_perception_msgs::msg::TrafficLight;
@@ -407,18 +425,19 @@ TYPED_TEST(TrafficLightsInternalTest, generateAutowareAutoPerceptionMsg)
   EXPECT_EQ(msg.signals[0].lights[0].color, TrafficLight::AMBER);
   EXPECT_EQ(msg.signals[0].lights[0].status, TrafficLight::FLASHING);
   EXPECT_EQ(msg.signals[0].lights[0].shape, TrafficLight::CIRCLE);
-  EXPECT_NEAR(msg.signals[0].lights[0].confidence, 0.7, eps);
+  EXPECT_NEAR(msg.signals[0].lights[0].confidence, expected_confidence, eps);
 
   EXPECT_EQ(msg.signals[0].lights[1].color, TrafficLight::RED);
   EXPECT_EQ(msg.signals[0].lights[1].status, TrafficLight::SOLID_ON);
   EXPECT_EQ(msg.signals[0].lights[1].shape, TrafficLight::CIRCLE);
-  EXPECT_NEAR(msg.signals[0].lights[1].confidence, 0.7, eps);
+  EXPECT_NEAR(msg.signals[0].lights[1].confidence, expected_confidence, eps);
 }
 
 TYPED_TEST(TrafficLightsInternalTest, generateAutowarePerceptionTrafficSignalMsg)
 {
+  constexpr double expected_confidence{0.7};
   this->lights->setTrafficLightsState(this->id, "red solidOn circle, yellow flashing circle");
-  this->lights->setTrafficLightsConfidence(this->id, 0.7);
+  this->lights->setTrafficLightsConfidence(this->id, expected_confidence);
 
   const auto msg =
     *traffic_simulator::TrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>::
@@ -440,19 +459,20 @@ TYPED_TEST(TrafficLightsInternalTest, generateAutowarePerceptionTrafficSignalMsg
   EXPECT_EQ(msg.signals[0].elements[0].color, TrafficSignalElement::AMBER);
   EXPECT_EQ(msg.signals[0].elements[0].status, TrafficSignalElement::FLASHING);
   EXPECT_EQ(msg.signals[0].elements[0].shape, TrafficSignalElement::CIRCLE);
-  EXPECT_NEAR(msg.signals[0].elements[0].confidence, 0.7, eps);
+  EXPECT_NEAR(msg.signals[0].elements[0].confidence, expected_confidence, eps);
 
   EXPECT_EQ(msg.signals[0].elements[1].color, TrafficSignalElement::RED);
   EXPECT_EQ(msg.signals[0].elements[1].status, TrafficSignalElement::SOLID_ON);
   EXPECT_EQ(msg.signals[0].elements[1].shape, TrafficSignalElement::CIRCLE);
-  EXPECT_NEAR(msg.signals[0].elements[1].confidence, 0.7, eps);
+  EXPECT_NEAR(msg.signals[0].elements[1].confidence, expected_confidence, eps);
 }
 
 #if __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)
 TYPED_TEST(TrafficLightsInternalTest, generateAutowarePerceptionTrafficLightGroupMsg)
 {
+  constexpr double expected_confidence{0.7};
   this->lights->setTrafficLightsState(this->id, "red solidOn circle, yellow flashing circle");
-  this->lights->setTrafficLightsConfidence(this->id, 0.7);
+  this->lights->setTrafficLightsConfidence(this->id, expected_confidence);
 
   const auto msg =
     *traffic_simulator::
@@ -474,11 +494,11 @@ TYPED_TEST(TrafficLightsInternalTest, generateAutowarePerceptionTrafficLightGrou
   EXPECT_EQ(msg.traffic_light_groups[0].elements[0].color, TrafficLightElement::AMBER);
   EXPECT_EQ(msg.traffic_light_groups[0].elements[0].status, TrafficLightElement::FLASHING);
   EXPECT_EQ(msg.traffic_light_groups[0].elements[0].shape, TrafficLightElement::CIRCLE);
-  EXPECT_NEAR(msg.traffic_light_groups[0].elements[0].confidence, 0.7, eps);
+  EXPECT_NEAR(msg.traffic_light_groups[0].elements[0].confidence, expected_confidence, eps);
 
   EXPECT_EQ(msg.traffic_light_groups[0].elements[1].color, TrafficLightElement::RED);
   EXPECT_EQ(msg.traffic_light_groups[0].elements[1].status, TrafficLightElement::SOLID_ON);
   EXPECT_EQ(msg.traffic_light_groups[0].elements[1].shape, TrafficLightElement::CIRCLE);
-  EXPECT_NEAR(msg.traffic_light_groups[0].elements[1].confidence, 0.7, eps);
+  EXPECT_NEAR(msg.traffic_light_groups[0].elements[1].confidence, expected_confidence, eps);
 }
 #endif  // __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)

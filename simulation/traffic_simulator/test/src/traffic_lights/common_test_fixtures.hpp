@@ -27,24 +27,6 @@ template <typename TrafficLightsT, const char * Architecture>
 class TrafficLightsInternalTestArchitectureDependent : public testing::Test
 {
 public:
-  const lanelet::Id id = 34836;
-
-  const lanelet::Id signal_id = 34806;
-
-  const rclcpp::Node::SharedPtr node_ptr = rclcpp::Node::make_shared("TrafficLightsInternalTest");
-
-  const std::string path = ament_index_cpp::get_package_share_directory("traffic_simulator") +
-                           "/map/standard_map/lanelet2_map.osm";
-
-  const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr =
-    std::make_shared<hdmap_utils::HdMapUtils>(
-      path, geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
-              .latitude(35.61836750154)
-              .longitude(139.78066608243)
-              .altitude(0.0));
-
-  std::unique_ptr<TrafficLightsT> lights;
-
   explicit TrafficLightsInternalTestArchitectureDependent()
   : lights([this] {
       if constexpr (std::is_same_v<TrafficLightsT, traffic_simulator::ConventionalTrafficLights>) {
@@ -59,6 +41,24 @@ public:
         std::is_same_v<TrafficLightsT, traffic_simulator::V2ITrafficLights>,
       "Given TrafficLights type is not supported");
   }
+
+  const lanelet::Id id{34836};
+
+  const lanelet::Id signal_id{34806};
+
+  const rclcpp::Node::SharedPtr node_ptr = rclcpp::Node::make_shared("TrafficLightsInternalTest");
+
+  const std::string path = ament_index_cpp::get_package_share_directory("traffic_simulator") +
+                           "/map/standard_map/lanelet2_map.osm";
+
+  const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr =
+    std::make_shared<hdmap_utils::HdMapUtils>(
+      path, geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
+              .latitude(35.61836750154)
+              .longitude(139.78066608243)
+              .altitude(0.0));
+
+  std::unique_ptr<TrafficLightsT> lights;
 };
 
 template <typename TrafficLightsT>
@@ -73,20 +73,16 @@ class TrafficLightsInternalTestNewArchitecture
 {
 };
 
-using TrafficLightsTypes =
-  testing::Types<traffic_simulator::ConventionalTrafficLights, traffic_simulator::V2ITrafficLights>;
-
 struct TrafficLightsNameGenerator
 {
-  template <typename T>
+  template <typename TrafficLightsT>
   static auto GetName(int) -> std::string
   {
-    if constexpr (std::is_same_v<T, traffic_simulator::ConventionalTrafficLights>) {
+    if constexpr (std::is_same_v<TrafficLightsT, traffic_simulator::ConventionalTrafficLights>) {
       return "ConventionalTrafficLights";
-    } else if constexpr (std::is_same_v<T, traffic_simulator::V2ITrafficLights>) {
+    } else if constexpr (std::is_same_v<TrafficLightsT, traffic_simulator::V2ITrafficLights>) {
       return "V2ITrafficLights";
     }
   }
 };
-
 #endif  // TRAFFIC_SIMULATOR__TEST__TRAFFIC_LIGHTS__COMMON_TEST_FIXTURES_HPP_
