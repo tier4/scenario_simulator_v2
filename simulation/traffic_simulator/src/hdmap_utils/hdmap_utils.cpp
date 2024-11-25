@@ -788,18 +788,20 @@ auto HdMapUtils::getLaneChangeableLaneletId(
 }
 
 auto HdMapUtils::getPreviousLanelets(
-  const lanelet::Id current_lanelet_id, const double backward_horizon) const -> lanelet::Ids
+  const lanelet::Id current_lanelet_id, const double backward_horizon,
+  const traffic_simulator::RoutingGraphType type) const -> lanelet::Ids
 {
   lanelet::Ids previous_lanelets_ids;
   double total_distance = 0.0;
   previous_lanelets_ids.push_back(current_lanelet_id);
   while (total_distance < backward_horizon) {
     const auto & reference_lanelet_id = previous_lanelets_ids.back();
-    if (const auto straight_lanelet_ids = getPreviousLaneletIds(reference_lanelet_id, "straight");
+    if (const auto straight_lanelet_ids =
+          getPreviousLaneletIds(reference_lanelet_id, "straight", type);
         not straight_lanelet_ids.empty()) {
       total_distance = total_distance + getLaneletLength(straight_lanelet_ids[0]);
       previous_lanelets_ids.push_back(straight_lanelet_ids[0]);
-    } else if (auto non_straight_lanelet_ids = getPreviousLaneletIds(reference_lanelet_id);
+    } else if (auto non_straight_lanelet_ids = getPreviousLaneletIds(reference_lanelet_id, type);
                not non_straight_lanelet_ids.empty()) {
       total_distance = total_distance + getLaneletLength(non_straight_lanelet_ids[0]);
       previous_lanelets_ids.push_back(non_straight_lanelet_ids[0]);

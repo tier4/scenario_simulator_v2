@@ -241,8 +241,10 @@ public:
     const traffic_simulator::RoutingGraphType type =
       traffic_simulator::RoutingGraphType::VEHICLE) const -> lanelet::Ids;
 
-  auto getPreviousLanelets(const lanelet::Id, const double backward_horizon = 100) const
-    -> lanelet::Ids;
+  auto getPreviousLanelets(
+    const lanelet::Id, const double backward_horizon = 100,
+    const traffic_simulator::RoutingGraphType type =
+      traffic_simulator::RoutingGraphType::VEHICLE) const -> lanelet::Ids;
 
   auto getRightBound(const lanelet::Id) const -> std::vector<geometry_msgs::msg::Point>;
 
