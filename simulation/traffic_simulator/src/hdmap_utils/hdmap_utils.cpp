@@ -991,12 +991,13 @@ auto HdMapUtils::getPreviousLaneletIds(
   return ids;
 }
 
-/// @todo add RoutingGraphType argument after fixing the bug to get next lanelet instead of previous one
-auto HdMapUtils::getPreviousLaneletIds(const lanelet::Ids & lanelet_ids) const -> lanelet::Ids
+auto HdMapUtils::getPreviousLaneletIds(
+  const lanelet::Ids & lanelet_ids, const traffic_simulator::RoutingGraphType type) const
+  -> lanelet::Ids
 {
   lanelet::Ids ids;
   for (const auto & id : lanelet_ids) {
-    ids += getNextLaneletIds(id);
+    ids += getNextLaneletIds(id, type);
   }
   return sortAndUnique(ids);
 }
@@ -1038,12 +1039,13 @@ auto HdMapUtils::getNextLaneletIds(
   return ids;
 }
 
-/// @todo add RoutingGraphType argument after supporting a routing graph with road shoulder lanelets
-auto HdMapUtils::getNextLaneletIds(const lanelet::Ids & lanelet_ids) const -> lanelet::Ids
+auto HdMapUtils::getNextLaneletIds(
+  const lanelet::Ids & lanelet_ids, const traffic_simulator::RoutingGraphType type) const
+  -> lanelet::Ids
 {
   lanelet::Ids ids;
   for (const auto & id : lanelet_ids) {
-    ids += getNextLaneletIds(id);
+    ids += getNextLaneletIds(id, type);
   }
   return sortAndUnique(ids);
 }

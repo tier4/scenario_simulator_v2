@@ -201,8 +201,10 @@ public:
     const geometry_msgs::msg::Point &, const double distance_threshold,
     const std::size_t search_count = 5) const -> lanelet::Ids;
 
-  auto getNextLaneletIds(const lanelet::Ids &, const traffic_simulator::RoutingGraphType type =
-                                                 traffic_simulator::RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER) const -> lanelet::Ids;
+  auto getNextLaneletIds(
+    const lanelet::Ids &, const traffic_simulator::RoutingGraphType type =
+                            traffic_simulator::RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER) const
+    -> lanelet::Ids;
 
   auto getNextLaneletIds(
     const lanelet::Ids &, const std::string & turn_direction,
@@ -219,8 +221,10 @@ public:
     const traffic_simulator::RoutingGraphType type =
       traffic_simulator::RoutingGraphType::VEHICLE) const -> lanelet::Ids;
 
-  auto getPreviousLaneletIds(const lanelet::Ids &, const traffic_simulator::RoutingGraphType type =
-                                                     traffic_simulator::RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER) const -> lanelet::Ids;
+  auto getPreviousLaneletIds(
+    const lanelet::Ids &, const traffic_simulator::RoutingGraphType type =
+                            traffic_simulator::RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER) const
+    -> lanelet::Ids;
 
   auto getPreviousLaneletIds(
     const lanelet::Ids &, const std::string & turn_direction,
