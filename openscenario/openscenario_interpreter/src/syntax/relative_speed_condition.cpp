@@ -64,7 +64,13 @@ auto RelativeSpeedCondition::evaluate(
   if (
     triggering_entity.apply([&](const auto & each) { return entities->isAdded(each); }).min() and
     entities->isAdded(entity_ref)) {
-    return evaluateRelativeSpeed(triggering_entity, entity_ref);
+    /*
+       Relative speed is defined as speed_rel = speed(triggering entity) -
+       speed(reference entity)
+
+       See: https://publications.pages.asam.net/standards/ASAM_OpenSCENARIO/ASAM_OpenSCENARIO_XML/latest/generated/content/RelativeSpeedCondition.html
+    */
+    return evaluateRelativeSpeed(entity_ref, triggering_entity);
   } else {
     return geometry_msgs::build<geometry_msgs::msg::Vector3>()
       .x(Double::nan())

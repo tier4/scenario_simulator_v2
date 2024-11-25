@@ -15,11 +15,14 @@
 #ifndef OPENSCENARIO_INTERPRETER__SIMULATOR_CORE_HPP_
 #define OPENSCENARIO_INTERPRETER__SIMULATOR_CORE_HPP_
 
+#include <geometry/quaternion/get_rotation_matrix.hpp>
 #include <geometry/quaternion/quaternion_to_euler.hpp>
+#include <geometry/vector3/norm.hpp>
 #include <geometry/vector3/operator.hpp>
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/syntax/boolean.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
+#include <openscenario_interpreter/syntax/entity.hpp>
 #include <openscenario_interpreter/syntax/routing_algorithm.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <openscenario_interpreter/syntax/unsigned_integer.hpp>
@@ -528,6 +531,90 @@ public:
       return core->getCurrentAccel(std::forward<decltype(xs)>(xs)...).linear.x;
     }
 
+    static auto evaluateCartesianTimeToCollisionCondition(const Entity & from, const Entity & to)
+    {
+      if (const auto entity_a = core->getEntity(from.name())) {
+        if (const auto entity_b = core->getEntity(to.name())) {
+          struct OrientedBoundingBox
+          {
+            Eigen::Vector3d position;
+
+            Eigen::Matrix3d rotation;
+
+            Eigen::Vector3d size;  // [width, height, depth]
+
+            explicit OrientedBoundingBox(
+              const geometry_msgs::msg::Pose & pose,
+              const traffic_simulator_msgs::msg::BoundingBox & box)
+            : position(
+                pose.position.x + box.center.x, pose.position.y + box.center.y,
+                pose.position.z + box.center.z),
+              rotation(math::geometry::getRotationMatrix(pose.orientation)),
+              size(box.dimensions.y / 2, box.dimensions.z / 2, box.dimensions.x / 2)
+            {
+            }
+
+            auto axis(std::size_t index) const -> Eigen::Vector3d { return rotation.col(index); }
+          };
+
+          const Eigen::Vector3d v = [&]() {
+            const auto v = evaluateRelativeSpeed(from, to);
+            return Eigen::Vector3d(v.x, v.y, v.z);
+          }();
+
+          const auto a = OrientedBoundingBox(entity_a->getMapPose(), entity_a->getBoundingBox());
+          const auto b = OrientedBoundingBox(entity_b->getMapPose(), entity_b->getBoundingBox());
+
+          const auto axes = std::array<Eigen::Vector3d, 15>{
+            a.axis(0),
+            b.axis(0),
+
+            a.axis(1),
+            b.axis(1),
+
+            a.axis(2),
+            b.axis(2),
+
+            a.axis(0).cross(b.axis(0)),
+            a.axis(0).cross(b.axis(1)),
+            a.axis(0).cross(b.axis(2)),
+
+            a.axis(1).cross(b.axis(0)),
+            a.axis(1).cross(b.axis(1)),
+            a.axis(1).cross(b.axis(2)),
+
+            a.axis(2).cross(b.axis(0)),
+            a.axis(2).cross(b.axis(1)),
+            a.axis(2).cross(b.axis(2)),
+          };
+
+          auto t_min = std::numeric_limits<double>::infinity();
+
+          Eigen::Vector3d d = b.position - a.position;
+
+          for (const auto & axis : axes) {
+            auto project = [&](const auto & obb) {
+              return std::abs(axis.dot(obb.axis(0)) * obb.size(0)) +
+                     std::abs(axis.dot(obb.axis(1)) * obb.size(1)) +
+                     std::abs(axis.dot(obb.axis(2)) * obb.size(2));
+            };
+
+            if (const auto relative_speed = v.dot(axis); relative_speed < 0) {
+              const auto separation = std::abs(d.dot(axis)) - project(a) - project(b);
+
+              if (const auto t = separation / -relative_speed; 0 < t) {
+                t_min = std::min(t_min, t);
+              }
+            }
+          }
+
+          return t_min;
+        }
+      }
+
+      return std::numeric_limits<double>::quiet_NaN();
+    }
+
     template <typename... Ts>
     static auto evaluateCollisionCondition(Ts &&... xs) -> bool
     {
@@ -551,11 +638,41 @@ public:
       return std::numeric_limits<double>::quiet_NaN();
     }
 
-    template <typename T, typename U>
-    static auto evaluateRelativeSpeed(const T & x, const U & y)
+    static auto evaluateRelativeSpeed(const Entity & from, const Entity & to)
+      -> geometry_msgs::msg::Vector3
     {
-      using math::geometry::operator-;
-      return core->getCurrentTwist(x).linear - core->getCurrentTwist(y).linear;
+      auto direction = [](auto orientation) {
+        const auto euler_angle = math::geometry::convertQuaternionToEulerAngle(orientation);
+
+        // clang-format off
+        const auto roll  = euler_angle.x;
+        const auto pitch = euler_angle.y;
+        const auto yaw   = euler_angle.z;
+        // clang-format on
+
+        auto v = decltype(euler_angle)();
+
+        v.x = std::cos(yaw) * std::cos(pitch);
+        v.y = std::sin(yaw) * std::cos(pitch);
+        v.z = std::sin(pitch);
+
+        return v;
+      };
+
+      if (const auto a = core->getEntity(from.name())) {
+        if (const auto b = core->getEntity(to.name())) {
+          using math::geometry::operator*;
+          using math::geometry::operator-;
+
+          return direction(b->getMapPose().orientation) * b->getCurrentTwist().linear.x -
+                 direction(a->getMapPose().orientation) * a->getCurrentTwist().linear.x;
+        }
+      }
+
+      return geometry_msgs::build<geometry_msgs::msg::Vector3>()
+        .x(Double::nan())
+        .y(Double::nan())
+        .z(Double::nan());
     }
 
     template <typename... Ts>

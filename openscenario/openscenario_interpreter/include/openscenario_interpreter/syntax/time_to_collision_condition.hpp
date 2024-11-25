@@ -149,14 +149,41 @@ struct TimeToCollisionCondition : private Scope, private SimulatorCore::Conditio
 
     switch (relative_distance_type) {
       case RelativeDistanceType::longitudinal:
+        /*
+           There is no need to treat the cases where the speed is zero, NaN, or
+           infinity specially. When zero, NaN, or infinity appear in the
+           denominator, the Time-To-Collision will be infinity, NaN, or zero,
+           respectively, which are the desired return values to distinguish
+           between "no collision after infinite time", "undefined", and
+           "already a collision".
+        */
         return distance() / speed(DirectionalDimension::longitudinal);
 
       case RelativeDistanceType::lateral:
+        /*
+           There is no need to treat the cases where the speed is zero, NaN, or
+           infinity specially. When zero, NaN, or infinity appear in the
+           denominator, the Time-To-Collision will be infinity, NaN, or zero,
+           respectively, which are the desired return values to distinguish
+           between "no collision after infinite time", "undefined", and
+           "already a collision".
+        */
         return distance() / speed(DirectionalDimension::lateral);
 
       default:
       case RelativeDistanceType::euclidianDistance:
-        return distance() / speed(std::nullopt);
+        if (time_to_collision_condition_target.is<Entity>()) {
+          if (freespace) {
+            return evaluateCartesianTimeToCollisionCondition(
+              triggering_entity, time_to_collision_condition_target.as<Entity>());
+          } else {
+            // TODO
+            return std::numeric_limits<double>::quiet_NaN();
+          }
+        } else {
+          // TODO
+          return distance() / speed(std::nullopt);
+        }
     }
   }
 
