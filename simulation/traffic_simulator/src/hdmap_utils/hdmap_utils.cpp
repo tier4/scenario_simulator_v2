@@ -77,11 +77,6 @@ HdMapUtils::HdMapUtils(
     THROW_SIMULATION_ERROR("Failed to load lanelet map (", ss.str(), ")");
   }
   overwriteLaneletsCenterline();
-  std::vector<lanelet::routing::RoutingGraphConstPtr> all_graphs;
-  all_graphs.push_back(
-    routing_graphs_->routing_graph(traffic_simulator::RoutingGraphType::VEHICLE));
-  all_graphs.push_back(
-    routing_graphs_->routing_graph(traffic_simulator::RoutingGraphType::PEDESTRIAN));
 }
 
 auto HdMapUtils::getAllCanonicalizedLaneletPoses(
