@@ -307,10 +307,16 @@ public:
 
   auto isTrafficLightRegulatoryElement(const lanelet::Id) const -> bool;
 
+private:
+  constexpr static double DEFAULT_MATCH_TO_LANE_REDUCTION_RATIO = 0.8;
+
+public:
   auto matchToLane(
     const geometry_msgs::msg::Pose &, const traffic_simulator_msgs::msg::BoundingBox &,
     const bool include_crosswalk, const double matching_distance = 1.0,
-    const double reduction_ratio = 0.8) const -> std::optional<lanelet::Id>;
+    const double reduction_ratio = DEFAULT_MATCH_TO_LANE_REDUCTION_RATIO,
+    const traffic_simulator::RoutingGraphType type =
+      traffic_simulator::RoutingGraphType::VEHICLE) const -> std::optional<lanelet::Id>;
 
   auto toLaneletPose(
     const geometry_msgs::msg::Pose &, const bool include_crosswalk,

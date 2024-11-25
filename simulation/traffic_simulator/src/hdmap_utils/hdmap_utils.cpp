@@ -522,8 +522,8 @@ auto HdMapUtils::toPoint2d(const geometry_msgs::msg::Point & point) const -> lan
 
 auto HdMapUtils::matchToLane(
   const geometry_msgs::msg::Pose & pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
-  const bool include_crosswalk, const double matching_distance, const double reduction_ratio) const
-  -> std::optional<lanelet::Id>
+  const bool include_crosswalk, const double matching_distance, const double reduction_ratio,
+  const traffic_simulator::RoutingGraphType type) const -> std::optional<lanelet::Id>
 {
   lanelet::matching::Object2d obj;
   obj.pose.translation() = toPoint2d(pose.position);
@@ -543,7 +543,7 @@ auto HdMapUtils::matchToLane(
     lanelet::matching::getDeterministicMatches(*lanelet_map_ptr_, obj, matching_distance);
   if (!include_crosswalk) {
     matches = lanelet::matching::removeNonRuleCompliantMatches(
-      matches, routing_graphs_->traffic_rule(traffic_simulator::RoutingGraphType::VEHICLE));
+      matches, routing_graphs_->traffic_rule(type));
   }
   if (matches.empty()) {
     return std::nullopt;
