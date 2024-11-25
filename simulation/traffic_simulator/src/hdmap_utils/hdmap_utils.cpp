@@ -993,18 +993,14 @@ auto HdMapUtils::getPreviousRoadShoulderLanelet(const lanelet::Id lanelet_id) co
   return ids;
 }
 
-/// @todo add RoutingGraphType argument after supporting a routing graph with road shoulder lanelets
-auto HdMapUtils::getPreviousLaneletIds(const lanelet::Id lanelet_id) const -> lanelet::Ids
+auto HdMapUtils::getPreviousLaneletIds(
+  const lanelet::Id lanelet_id, const traffic_simulator::RoutingGraphType type) const
+  -> lanelet::Ids
 {
   lanelet::Ids ids;
   const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
-  for (const auto & llt :
-       routing_graphs_->routing_graph(traffic_simulator::RoutingGraphType::VEHICLE)
-         ->previous(lanelet)) {
+  for (const auto & llt : routing_graphs_->routing_graph(type)->previous(lanelet)) {
     ids.push_back(llt.id());
-  }
-  for (const auto & id : getPreviousRoadShoulderLanelet(lanelet_id)) {
-    ids.push_back(id);
   }
   return ids;
 }
@@ -1056,18 +1052,14 @@ auto HdMapUtils::getNextRoadShoulderLanelet(const lanelet::Id lanelet_id) const 
   return ids;
 }
 
-/// @todo add RoutingGraphType argument after supporting a routing graph with road shoulder lanelets
-auto HdMapUtils::getNextLaneletIds(const lanelet::Id lanelet_id) const -> lanelet::Ids
+auto HdMapUtils::getNextLaneletIds(
+  const lanelet::Id lanelet_id, const traffic_simulator::RoutingGraphType type) const
+  -> lanelet::Ids
 {
   lanelet::Ids ids;
   const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
-  for (const auto & llt :
-       routing_graphs_->routing_graph(traffic_simulator::RoutingGraphType::VEHICLE)
-         ->following(lanelet)) {
+  for (const auto & llt : routing_graphs_->routing_graph(type)->following(lanelet)) {
     ids.push_back(llt.id());
-  }
-  for (const auto & id : getNextRoadShoulderLanelet(lanelet_id)) {
-    ids.push_back(id);
   }
   return ids;
 }

@@ -208,7 +208,10 @@ public:
     const traffic_simulator::RoutingGraphType type =
       traffic_simulator::RoutingGraphType::VEHICLE) const -> lanelet::Ids;
 
-  auto getNextLaneletIds(const lanelet::Id) const -> lanelet::Ids;
+  auto getNextLaneletIds(
+    const lanelet::Id, const traffic_simulator::RoutingGraphType type =
+                         traffic_simulator::RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER) const
+    -> lanelet::Ids;
 
   auto getNextLaneletIds(
     const lanelet::Id, const std::string & turn_direction,
@@ -222,7 +225,10 @@ public:
     const traffic_simulator::RoutingGraphType type =
       traffic_simulator::RoutingGraphType::VEHICLE) const -> lanelet::Ids;
 
-  auto getPreviousLaneletIds(const lanelet::Id) const -> lanelet::Ids;
+  auto getPreviousLaneletIds(
+    const lanelet::Id, const traffic_simulator::RoutingGraphType type =
+                         traffic_simulator::RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER) const
+    -> lanelet::Ids;
 
   auto getPreviousLaneletIds(
     const lanelet::Id, const std::string & turn_direction,
