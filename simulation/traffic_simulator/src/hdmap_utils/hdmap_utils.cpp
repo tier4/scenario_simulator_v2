@@ -205,10 +205,10 @@ auto HdMapUtils::canonicalizeLaneletPose(
 
 auto HdMapUtils::countLaneChanges(
   const traffic_simulator_msgs::msg::LaneletPose & from,
-  const traffic_simulator_msgs::msg::LaneletPose & to, bool allow_lane_change) const
-  -> std::optional<std::pair<int, int>>
+  const traffic_simulator_msgs::msg::LaneletPose & to, bool allow_lane_change,
+  const traffic_simulator::RoutingGraphType type) const -> std::optional<std::pair<int, int>>
 {
-  const auto route = getRoute(from.lanelet_id, to.lanelet_id, allow_lane_change);
+  const auto route = getRoute(from.lanelet_id, to.lanelet_id, allow_lane_change, type);
   if (route.empty()) {
     return std::nullopt;
   } else {
@@ -217,13 +217,12 @@ auto HdMapUtils::countLaneChanges(
       const auto & previous = route[i - 1];
       const auto & current = route[i];
 
-      if (auto followings = getNextLaneletIds(previous);
+      if (auto followings = getNextLaneletIds(previous, type);
           std::find(followings.begin(), followings.end(), current) == followings.end()) {
-        if (auto lefts = getLeftLaneletIds(previous, traffic_simulator::RoutingGraphType::VEHICLE);
+        if (auto lefts = getLeftLaneletIds(previous, type);
             std::find(lefts.begin(), lefts.end(), current) != lefts.end()) {
           lane_changes.first++;
-        } else if (auto rights =
-                     getRightLaneletIds(previous, traffic_simulator::RoutingGraphType::VEHICLE);
+        } else if (auto rights = getRightLaneletIds(previous, type);
                    std::find(rights.begin(), rights.end(), current) != rights.end()) {
           lane_changes.second++;
         }
