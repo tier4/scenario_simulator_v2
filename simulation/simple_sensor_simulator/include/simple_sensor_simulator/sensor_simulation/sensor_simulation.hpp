@@ -19,8 +19,6 @@
 
 #include <autoware_auto_perception_msgs/msg/detected_objects.hpp>
 #include <autoware_auto_perception_msgs/msg/tracked_objects.hpp>
-#include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
-#include <autoware_perception_msgs/msg/traffic_signal_array.hpp>
 #include <iomanip>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
@@ -95,24 +93,10 @@ public:
   auto attachPseudoTrafficLightsDetector(
     const double /*current_simulation_time*/,
     const simulation_api_schema::PseudoTrafficLightDetectorConfiguration & configuration,
-    rclcpp::Node & node, std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils) -> void
+    rclcpp::Node & node) -> void
   {
-    if (configuration.architecture_type() == "awf/universe") {
-      using Message = autoware_auto_perception_msgs::msg::TrafficSignalArray;
-      traffic_lights_detectors_.push_back(std::make_unique<traffic_lights::TrafficLightsDetector>(
-        std::make_shared<traffic_simulator::TrafficLightPublisher<Message>>(
-          "/perception/traffic_light_recognition/traffic_signals", &node, hdmap_utils)));
-    } else if (configuration.architecture_type() >= "awf/universe/20230906") {
-      using Message = autoware_perception_msgs::msg::TrafficSignalArray;
-      traffic_lights_detectors_.push_back(std::make_unique<traffic_lights::TrafficLightsDetector>(
-        std::make_shared<traffic_simulator::TrafficLightPublisher<Message>>(
-          "/perception/traffic_light_recognition/internal/traffic_signals", &node, hdmap_utils)));
-    } else {
-      std::stringstream ss;
-      ss << "Unexpected architecture_type " << std::quoted(configuration.architecture_type())
-         << " given.";
-      throw std::runtime_error(ss.str());
-    }
+    traffic_lights_detectors_.push_back(std::make_unique<traffic_lights::TrafficLightsDetector>(
+      node, configuration.architecture_type()));
   }
 
   auto attachImuSensor(
