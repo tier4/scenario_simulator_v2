@@ -168,8 +168,9 @@ public:
     -> std::optional<std::pair<math::geometry::HermiteCurve, double>>;
 
   auto getLaneChangeableLaneletId(
-    const lanelet::Id, const traffic_simulator::lane_change::Direction) const
-    -> std::optional<lanelet::Id>;
+    const lanelet::Id, const traffic_simulator::lane_change::Direction,
+    const traffic_simulator::RoutingGraphType type =
+      traffic_simulator::RoutingGraphType::VEHICLE) const -> std::optional<lanelet::Id>;
 
   auto getLaneChangeableLaneletId(
     const lanelet::Id, const traffic_simulator::lane_change::Direction,

@@ -762,8 +762,8 @@ auto HdMapUtils::getLaneChangeableLaneletId(
 }
 
 auto HdMapUtils::getLaneChangeableLaneletId(
-  const lanelet::Id lanelet_id, const traffic_simulator::lane_change::Direction direction) const
-  -> std::optional<lanelet::Id>
+  const lanelet::Id lanelet_id, const traffic_simulator::lane_change::Direction direction,
+  const traffic_simulator::RoutingGraphType type) const -> std::optional<lanelet::Id>
 {
   const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
   std::optional<lanelet::Id> target = std::nullopt;
@@ -772,19 +772,13 @@ auto HdMapUtils::getLaneChangeableLaneletId(
       target = lanelet.id();
       break;
     case traffic_simulator::lane_change::Direction::LEFT:
-      if (routing_graphs_->routing_graph(traffic_simulator::RoutingGraphType::VEHICLE)
-            ->left(lanelet)) {
-        target = routing_graphs_->routing_graph(traffic_simulator::RoutingGraphType::VEHICLE)
-                   ->left(lanelet)
-                   ->id();
+      if (routing_graphs_->routing_graph(type)->left(lanelet)) {
+        target = routing_graphs_->routing_graph(type)->left(lanelet)->id();
       }
       break;
     case traffic_simulator::lane_change::Direction::RIGHT:
-      if (routing_graphs_->routing_graph(traffic_simulator::RoutingGraphType::VEHICLE)
-            ->right(lanelet)) {
-        target = routing_graphs_->routing_graph(traffic_simulator::RoutingGraphType::VEHICLE)
-                   ->right(lanelet)
-                   ->id();
+      if (routing_graphs_->routing_graph(type)->right(lanelet)) {
+        target = routing_graphs_->routing_graph(type)->right(lanelet)->id();
       }
       break;
   }
