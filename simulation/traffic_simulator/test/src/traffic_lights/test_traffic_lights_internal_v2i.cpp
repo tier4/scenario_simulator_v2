@@ -19,6 +19,7 @@
 #include "helper.hpp"
 
 constexpr double eps = 1e-6;
+
 // Frequency can fluctuate a bit due to timing, especially when the machine is under heavy load, so higher tolerance is needed
 constexpr double frequency_eps = 0.5;
 
