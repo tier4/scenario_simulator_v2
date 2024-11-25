@@ -901,12 +901,11 @@ auto HdMapUtils::getFollowingLanelets(
 }
 
 auto HdMapUtils::getRoute(
-  const lanelet::Id from_lanelet_id, const lanelet::Id to_lanelet_id, bool allow_lane_change) const
-  -> lanelet::Ids
+  const lanelet::Id from_lanelet_id, const lanelet::Id to_lanelet_id, bool allow_lane_change,
+  const traffic_simulator::RoutingGraphType type) const -> lanelet::Ids
 {
   return routing_graphs_->getRoute(
-    from_lanelet_id, to_lanelet_id, lanelet_map_ptr_, allow_lane_change,
-    traffic_simulator::RoutingGraphType::VEHICLE);
+    from_lanelet_id, to_lanelet_id, lanelet_map_ptr_, allow_lane_change, type);
 }
 
 auto HdMapUtils::getCenterPointsSpline(const lanelet::Id lanelet_id) const

@@ -255,8 +255,10 @@ public:
 
   auto getRightOfWayLaneletIds(const lanelet::Id) const -> lanelet::Ids;
 
-  auto getRoute(const lanelet::Id from, const lanelet::Id to, bool allow_lane_change = false) const
-    -> lanelet::Ids;
+  auto getRoute(
+    const lanelet::Id from, const lanelet::Id to, bool allow_lane_change = false,
+    const traffic_simulator::RoutingGraphType type =
+      traffic_simulator::RoutingGraphType::VEHICLE) const -> lanelet::Ids;
 
   auto getSpeedLimit(const lanelet::Ids &) const -> double;
 
