@@ -32,39 +32,38 @@ public:
   using lanelet::traffic_rules::GermanVehicle::GermanVehicle;
 
 protected:
+  /// @note this function overrides and adds road shoulder handling to GenericTrafficRules::canPass
   lanelet::Optional<bool> canPass(
     const std::string & type, const std::string & /*location*/) const override
   {
-    using ParticipantsMap = std::map<std::string, std::vector<std::string>>;
-    using Value = lanelet::AttributeValueString;
-    using Participants = lanelet::Participants;
-    const static ParticipantsMap ParticipantMap{
+    using lanelet::AttributeValueString;
+    using lanelet::Participants;
+    const static std::map<std::string, std::vector<std::string>> participants_map{
       // clang-format off
-      {"",                    {Participants::Vehicle}},
-      {Value::Road,           {Participants::Vehicle, Participants::Bicycle}},
-      {"road_shoulder",       {Participants::Vehicle, Participants::Bicycle}},  // add road_shoulder
-      {Value::Highway,        {Participants::Vehicle}},
-      {Value::BicycleLane,    {Participants::Bicycle}},
-      {Value::PlayStreet,     {Participants::Pedestrian, Participants::Bicycle, Participants::Vehicle}},
-      {Value::EmergencyLane,  {Participants::VehicleEmergency}},
-      {Value::Exit,           {Participants::Pedestrian, Participants::Bicycle, Participants::Vehicle}},
-      {Value::Walkway,        {Participants::Pedestrian}},
-      {Value::Crosswalk,      {Participants::Pedestrian}},
-      {Value::Stairs,         {Participants::Pedestrian}},
-      {Value::SharedWalkway,  {Participants::Pedestrian, Participants::Bicycle}}
+      {"",                                  {Participants::Vehicle}},
+      {AttributeValueString::Road,          {Participants::Vehicle, Participants::Bicycle}},
+      {"road_shoulder",                     {Participants::Vehicle, Participants::Bicycle}},  // add road_shoulder
+      {AttributeValueString::Highway,       {Participants::Vehicle}},
+      {AttributeValueString::BicycleLane,   {Participants::Bicycle}},
+      {AttributeValueString::PlayStreet,    {Participants::Pedestrian, Participants::Bicycle, Participants::Vehicle}},
+      {AttributeValueString::EmergencyLane, {Participants::VehicleEmergency}},
+      {AttributeValueString::Exit,          {Participants::Pedestrian, Participants::Bicycle, Participants::Vehicle}},
+      {AttributeValueString::Walkway,       {Participants::Pedestrian}},
+      {AttributeValueString::Crosswalk,     {Participants::Pedestrian}},
+      {AttributeValueString::Stairs,        {Participants::Pedestrian}},
+      {AttributeValueString::SharedWalkway, {Participants::Pedestrian, Participants::Bicycle}}
       // clang-format on
     };
-    auto participants = ParticipantMap.find(type);
-    if (participants == ParticipantMap.end()) {
+    auto participants = participants_map.find(type);
+    if (participants == participants_map.end()) {
       return {};
     }
 
-    // cspell: ignore startswith
-    auto startswith = [](const std::string & str, const std::string & substr) {
+    auto startsWith = [](const std::string & str, const std::string & substr) {
       return str.compare(0, substr.size(), substr) == 0;
     };
-    return lanelet::utils::anyOf(participants->second, [this, startswith](auto & participant) {
-      return startswith(this->participant(), participant);
+    return lanelet::utils::anyOf(participants->second, [this, startsWith](auto & participant) {
+      return startsWith(this->participant(), participant);
     });
   }
 };
