@@ -65,7 +65,10 @@ class HdMapUtils
 public:
   explicit HdMapUtils(const boost::filesystem::path &, const geographic_msgs::msg::GeoPoint &);
 
-  auto canChangeLane(const lanelet::Id from, const lanelet::Id to) const -> bool;
+  auto canChangeLane(
+    const lanelet::Id from, const lanelet::Id to,
+    const traffic_simulator::RoutingGraphType type =
+      traffic_simulator::RoutingGraphType::VEHICLE) const -> bool;
 
   auto canonicalizeLaneletPose(const traffic_simulator_msgs::msg::LaneletPose &) const
     -> std::tuple<

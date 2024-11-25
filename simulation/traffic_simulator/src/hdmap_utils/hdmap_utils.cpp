@@ -1403,12 +1403,12 @@ auto HdMapUtils::getTangentVector(const lanelet::Id lanelet_id, const double s) 
 }
 
 auto HdMapUtils::canChangeLane(
-  const lanelet::Id from_lanelet_id, const lanelet::Id to_lanelet_id) const -> bool
+  const lanelet::Id from_lanelet_id, const lanelet::Id to_lanelet_id,
+  const traffic_simulator::RoutingGraphType type) const -> bool
 {
   const auto from_lanelet = lanelet_map_ptr_->laneletLayer.get(from_lanelet_id);
   const auto to_lanelet = lanelet_map_ptr_->laneletLayer.get(to_lanelet_id);
-  return routing_graphs_->traffic_rule(traffic_simulator::RoutingGraphType::VEHICLE)
-    ->canChangeLane(from_lanelet, to_lanelet);
+  return routing_graphs_->traffic_rule(type)->canChangeLane(from_lanelet, to_lanelet);
 }
 
 auto HdMapUtils::getLateralDistance(
