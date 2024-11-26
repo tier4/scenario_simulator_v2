@@ -64,7 +64,7 @@ OpenSCENARIO:
                       Properties:
                         Property:
                           - name: maxSpeed
-                            value: '1'
+                            value: '0.5'
     Story:
       - name: ''
         Act:

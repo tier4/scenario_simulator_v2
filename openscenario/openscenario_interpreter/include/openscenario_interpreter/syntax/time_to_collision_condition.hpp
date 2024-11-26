@@ -164,15 +164,7 @@ struct TimeToCollisionCondition : private Scope, private SimulatorCore::Conditio
       return evaluateTimeToCollisionCondition(
         triggering_entity, time_to_collision_condition_target.as<Entity>());
     } else {
-      /*
-         There is no need to treat the cases where the speed is zero, NaN, or
-         infinity specially. When zero, NaN, or infinity appear in the
-         denominator, the Time-To-Collision will be infinity, NaN, or zero,
-         respectively, which are the desired return values to distinguish
-         between "no collision after infinite time", "undefined", and "already
-         a collision".
-      */
-      return distance() / speed();
+      return distance() / std::max(speed(), 0.0);
     }
   }
 
