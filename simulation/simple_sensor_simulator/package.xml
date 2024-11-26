@@ -40,7 +40,7 @@
   <depend>boost</depend>
   <depend>eigen</depend>
   <depend>embree_vendor</depend>
-  <depend>glog_vendor</depend>
+  <depend>glog</depend>
   <depend>libpcl-all-dev</depend>
   <depend>nav_msgs</depend>
   <depend>pcl_conversions</depend>
