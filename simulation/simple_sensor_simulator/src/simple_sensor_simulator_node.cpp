@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <glog/logging.h>
+
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <simple_sensor_simulator/simple_sensor_simulator.hpp>
@@ -19,6 +21,9 @@
 
 int main(int argc, char * argv[])
 {
+  google::InitGoogleLogging(argv[0]);
+  google::InstallFailureSignalHandler();
+
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
   auto component = std::make_shared<simple_sensor_simulator::ScenarioSimulator>(options);

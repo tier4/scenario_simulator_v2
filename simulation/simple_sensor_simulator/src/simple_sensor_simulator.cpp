@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <glog/logging.h>
-
 #include <algorithm>
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <limits>
@@ -50,10 +48,6 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
     },
     [this](auto &&... xs) { return updateStepTime(std::forward<decltype(xs)>(xs)...); })
 {
-  if (!google::IsGoogleLoggingInitialized()) {
-    google::InitGoogleLogging("simple_sensor_simulator");
-    google::InstallFailureSignalHandler();
-  }
 }
 
 geographic_msgs::msg::GeoPoint ScenarioSimulator::getOrigin()
