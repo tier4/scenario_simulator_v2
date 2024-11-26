@@ -565,15 +565,14 @@ auto HdMapUtils::matchToLane(
 
 auto HdMapUtils::toLaneletPose(
   const geometry_msgs::msg::Pose & pose, const bool include_crosswalk,
-  const double matching_distance, const traffic_simulator::RoutingGraphType type) const
-  -> std::optional<traffic_simulator_msgs::msg::LaneletPose>
+  const double matching_distance) const -> std::optional<traffic_simulator_msgs::msg::LaneletPose>
 {
   const auto lanelet_ids = getNearbyLaneletIds(pose.position, 0.1, include_crosswalk);
   if (lanelet_ids.empty()) {
     return std::nullopt;
   }
   for (const auto & id : lanelet_ids) {
-    const auto lanelet_pose = toLaneletPose(pose, id, matching_distance, type);
+    const auto lanelet_pose = toLaneletPose(pose, id, matching_distance);
     if (lanelet_pose) {
       return lanelet_pose;
     }
@@ -647,7 +646,7 @@ auto HdMapUtils::toLaneletPose(
   const auto lanelet_id = matchToLane(
     pose, bbox, include_crosswalk, matching_distance, DEFAULT_MATCH_TO_LANE_REDUCTION_RATIO, type);
   if (!lanelet_id) {
-    return toLaneletPose(pose, include_crosswalk, matching_distance, type);
+    return toLaneletPose(pose, include_crosswalk, matching_distance);
   }
   const auto pose_in_target_lanelet = toLaneletPose(pose, lanelet_id.value(), matching_distance);
   if (pose_in_target_lanelet) {
@@ -667,7 +666,7 @@ auto HdMapUtils::toLaneletPose(
       return pose_in_next;
     }
   }
-  return toLaneletPose(pose, include_crosswalk, matching_distance, type);
+  return toLaneletPose(pose, include_crosswalk, matching_distance);
 }
 
 auto HdMapUtils::toLaneletPoses(

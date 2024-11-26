@@ -323,9 +323,8 @@ public:
 
   auto toLaneletPose(
     const geometry_msgs::msg::Pose &, const bool include_crosswalk,
-    const double matching_distance = 1.0,
-    const traffic_simulator::RoutingGraphType type = traffic_simulator::RoutingGraphType::VEHICLE)
-    const -> std::optional<traffic_simulator_msgs::msg::LaneletPose>;
+    const double matching_distance = 1.0) const
+    -> std::optional<traffic_simulator_msgs::msg::LaneletPose>;
 
   auto toLaneletPose(
     const geometry_msgs::msg::Pose &, const lanelet::Ids &,
