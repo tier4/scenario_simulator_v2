@@ -20,7 +20,7 @@ endif()
 add_definitions("-DBOOST_ALLOW_DEPRECATED_HEADERS")
 
 find_package(ament_cmake_auto REQUIRED)
-find_package(glog REQUIRED)
+find_package(glog_vendor REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(PCL REQUIRED)
 
@@ -57,12 +57,12 @@ ament_auto_add_library(simple_sensor_simulator_component SHARED
   src/vehicle_simulation/vehicle_model/sim_model_interface.cpp
 )
 target_link_libraries(simple_sensor_simulator_component
-  glog::glog
   pthread
   sodium
   zmq
 )
 ament_target_dependencies(simple_sensor_simulator_component
+  glog_vendor
   simulation_interface
 )
 rclcpp_components_register_nodes(simple_sensor_simulator_component
