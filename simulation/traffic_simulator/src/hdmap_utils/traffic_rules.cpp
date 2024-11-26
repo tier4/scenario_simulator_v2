@@ -12,19 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__DATA_TYPE__ROUTING_GRAPH_TYPE_HPP_
-#define TRAFFIC_SIMULATOR__DATA_TYPE__ROUTING_GRAPH_TYPE_HPP_
+#include <lanelet2_traffic_rules/TrafficRulesFactory.h>
 
-#include <iostream>
+#include <traffic_simulator/hdmap_utils/traffic_rules.hpp>
 
-namespace traffic_simulator
-{
-inline namespace routing_graph_type
-{
-enum class RoutingGraphType : std::uint8_t { VEHICLE, PEDESTRIAN, VEHICLE_WITH_ROAD_SHOULDER };
-
-char const * to_string(const RoutingGraphType &);
-}  // namespace routing_graph_type
-}  // namespace traffic_simulator
-
-#endif  // TRAFFIC_SIMULATOR__DATA_TYPE__ROUTING_GRAPH_TYPE_HPP_
+lanelet::traffic_rules::RegisterTrafficRules<hdmap_utils::GermanRoadShoulderPassableVehicle>
+  germanRoadShoulderPassableVehicleRules(
+    hdmap_utils::Locations::RoadShoulderPassableGermany, lanelet::Participants::Vehicle);
