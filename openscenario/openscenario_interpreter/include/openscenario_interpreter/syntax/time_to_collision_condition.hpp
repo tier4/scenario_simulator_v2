@@ -135,55 +135,44 @@ struct TimeToCollisionCondition : private Scope, private SimulatorCore::Conditio
       }
     };
 
-    auto speed = [&](auto &&... xs) {
+    auto directional_dimension = [&]() {
+      switch (relative_distance_type) {
+        case RelativeDistanceType::longitudinal:
+          return std::optional<DirectionalDimension>(DirectionalDimension::longitudinal);
+        case RelativeDistanceType::lateral:
+          return std::optional<DirectionalDimension>(DirectionalDimension::lateral);
+        default:
+        case RelativeDistanceType::euclidianDistance:
+          return std::optional<DirectionalDimension>(std::nullopt);
+      };
+    };
+
+    auto speed = [&]() {
       if (time_to_collision_condition_target.is<Entity>()) {
         return RelativeSpeedCondition::evaluate(
-          entities,           //
-          triggering_entity,  //
-          time_to_collision_condition_target.as<Entity>(), std::forward<decltype(xs)>(xs)...);
+          entities, triggering_entity, time_to_collision_condition_target.as<Entity>(),
+          directional_dimension());
       } else {
-        return SpeedCondition::evaluate(
-          entities, triggering_entity, std::forward<decltype(xs)>(xs)...);
+        return SpeedCondition::evaluate(entities, triggering_entity, directional_dimension());
       }
     };
 
-    switch (relative_distance_type) {
-      case RelativeDistanceType::longitudinal:
-        /*
-           There is no need to treat the cases where the speed is zero, NaN, or
-           infinity specially. When zero, NaN, or infinity appear in the
-           denominator, the Time-To-Collision will be infinity, NaN, or zero,
-           respectively, which are the desired return values to distinguish
-           between "no collision after infinite time", "undefined", and
-           "already a collision".
-        */
-        return distance() / speed(DirectionalDimension::longitudinal);
-
-      case RelativeDistanceType::lateral:
-        /*
-           There is no need to treat the cases where the speed is zero, NaN, or
-           infinity specially. When zero, NaN, or infinity appear in the
-           denominator, the Time-To-Collision will be infinity, NaN, or zero,
-           respectively, which are the desired return values to distinguish
-           between "no collision after infinite time", "undefined", and
-           "already a collision".
-        */
-        return distance() / speed(DirectionalDimension::lateral);
-
-      default:
-      case RelativeDistanceType::euclidianDistance:
-        if (time_to_collision_condition_target.is<Entity>()) {
-          if (freespace) {
-            return evaluateCartesianTimeToCollisionCondition(
-              triggering_entity, time_to_collision_condition_target.as<Entity>());
-          } else {
-            // TODO
-            return std::numeric_limits<double>::quiet_NaN();
-          }
-        } else {
-          // TODO
-          return distance() / speed(std::nullopt);
-        }
+    if (
+      time_to_collision_condition_target.is<Entity>() and
+      coordinate_system == CoordinateSystem::entity and
+      relative_distance_type == RelativeDistanceType::euclidianDistance and freespace) {
+      return evaluateTimeToCollisionCondition(
+        triggering_entity, time_to_collision_condition_target.as<Entity>());
+    } else {
+      /*
+         There is no need to treat the cases where the speed is zero, NaN, or
+         infinity specially. When zero, NaN, or infinity appear in the
+         denominator, the Time-To-Collision will be infinity, NaN, or zero,
+         respectively, which are the desired return values to distinguish
+         between "no collision after infinite time", "undefined", and "already
+         a collision".
+      */
+      return distance() / speed();
     }
   }
 

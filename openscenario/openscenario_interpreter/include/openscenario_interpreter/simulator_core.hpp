@@ -531,7 +531,99 @@ public:
       return core->getCurrentAccel(std::forward<decltype(xs)>(xs)...).linear.x;
     }
 
-    static auto evaluateCartesianTimeToCollisionCondition(const Entity & from, const Entity & to)
+    template <typename... Ts>
+    static auto evaluateCollisionCondition(Ts &&... xs) -> bool
+    {
+      return core->checkCollision(std::forward<decltype(xs)>(xs)...);
+    }
+
+    static auto evaluateBoundingBoxEuclideanDistance(
+      const std::string & from_entity_name,
+      const std::string & to_entity_name)  // for RelativeDistanceCondition
+    {
+      if (const auto from_entity = core->getEntity(from_entity_name)) {
+        if (const auto to_entity = core->getEntity(to_entity_name)) {
+          if (
+            const auto distance = traffic_simulator::distance::boundingBoxDistance(
+              from_entity->getMapPose(), from_entity->getBoundingBox(), to_entity->getMapPose(),
+              to_entity->getBoundingBox())) {
+            return distance.value();
+          }
+        }
+      }
+      return std::numeric_limits<double>::quiet_NaN();
+    }
+
+    static auto evaluateRelativeSpeed(const Entity & from, const Entity & to)
+    {
+      auto direction = [](auto orientation) {
+        const auto euler_angle = math::geometry::convertQuaternionToEulerAngle(orientation);
+
+        // clang-format off
+        const auto roll  = euler_angle.x;
+        const auto pitch = euler_angle.y;
+        const auto yaw   = euler_angle.z;
+        // clang-format on
+
+        auto v = decltype(euler_angle)();
+
+        v.x = std::cos(yaw) * std::cos(pitch);
+        v.y = std::sin(yaw) * std::cos(pitch);
+        v.z = std::sin(pitch);
+
+        return v;
+      };
+
+      if (const auto a = core->getEntity(from.name())) {
+        if (const auto b = core->getEntity(to.name())) {
+          using math::geometry::operator*;
+          using math::geometry::operator-;
+
+          return direction(b->getMapPose().orientation) * b->getCurrentTwist().linear.x -
+                 direction(a->getMapPose().orientation) * a->getCurrentTwist().linear.x;
+        }
+      }
+
+      return geometry_msgs::build<geometry_msgs::msg::Vector3>()
+        .x(Double::nan())
+        .y(Double::nan())
+        .z(Double::nan());
+    }
+
+    template <typename... Ts>
+    static auto evaluateSimulationTime(Ts &&... xs) -> double
+    {
+      if (SimulatorCore::active()) {
+        return core->getCurrentTime(std::forward<decltype(xs)>(xs)...);
+      } else {
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+    }
+
+    template <typename... Ts>
+    static auto evaluateSpeed(Ts &&... xs)
+    {
+      return core->getCurrentTwist(std::forward<decltype(xs)>(xs)...).linear;
+    }
+
+    template <typename... Ts>
+    static auto evaluateStandStill(Ts &&... xs)
+    {
+      return core->getStandStillDuration(std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto evaluateTimeHeadway(Ts &&... xs)
+    {
+      if (const auto result = core->getTimeHeadway(std::forward<decltype(xs)>(xs)...); result) {
+        return result.value();
+      } else {
+        using value_type = typename std::decay<decltype(result)>::type::value_type;
+        return std::numeric_limits<value_type>::quiet_NaN();
+      }
+    }
+
+    static auto evaluateTimeToCollisionCondition(const Entity & from, const Entity & to)
     {
       if (const auto entity_a = core->getEntity(from.name())) {
         if (const auto entity_b = core->getEntity(to.name())) {
@@ -613,99 +705,6 @@ public:
       }
 
       return std::numeric_limits<double>::quiet_NaN();
-    }
-
-    template <typename... Ts>
-    static auto evaluateCollisionCondition(Ts &&... xs) -> bool
-    {
-      return core->checkCollision(std::forward<decltype(xs)>(xs)...);
-    }
-
-    static auto evaluateBoundingBoxEuclideanDistance(
-      const std::string & from_entity_name,
-      const std::string & to_entity_name)  // for RelativeDistanceCondition
-    {
-      if (const auto from_entity = core->getEntity(from_entity_name)) {
-        if (const auto to_entity = core->getEntity(to_entity_name)) {
-          if (
-            const auto distance = traffic_simulator::distance::boundingBoxDistance(
-              from_entity->getMapPose(), from_entity->getBoundingBox(), to_entity->getMapPose(),
-              to_entity->getBoundingBox())) {
-            return distance.value();
-          }
-        }
-      }
-      return std::numeric_limits<double>::quiet_NaN();
-    }
-
-    static auto evaluateRelativeSpeed(const Entity & from, const Entity & to)
-      -> geometry_msgs::msg::Vector3
-    {
-      auto direction = [](auto orientation) {
-        const auto euler_angle = math::geometry::convertQuaternionToEulerAngle(orientation);
-
-        // clang-format off
-        const auto roll  = euler_angle.x;
-        const auto pitch = euler_angle.y;
-        const auto yaw   = euler_angle.z;
-        // clang-format on
-
-        auto v = decltype(euler_angle)();
-
-        v.x = std::cos(yaw) * std::cos(pitch);
-        v.y = std::sin(yaw) * std::cos(pitch);
-        v.z = std::sin(pitch);
-
-        return v;
-      };
-
-      if (const auto a = core->getEntity(from.name())) {
-        if (const auto b = core->getEntity(to.name())) {
-          using math::geometry::operator*;
-          using math::geometry::operator-;
-
-          return direction(b->getMapPose().orientation) * b->getCurrentTwist().linear.x -
-                 direction(a->getMapPose().orientation) * a->getCurrentTwist().linear.x;
-        }
-      }
-
-      return geometry_msgs::build<geometry_msgs::msg::Vector3>()
-        .x(Double::nan())
-        .y(Double::nan())
-        .z(Double::nan());
-    }
-
-    template <typename... Ts>
-    static auto evaluateSimulationTime(Ts &&... xs) -> double
-    {
-      if (SimulatorCore::active()) {
-        return core->getCurrentTime(std::forward<decltype(xs)>(xs)...);
-      } else {
-        return std::numeric_limits<double>::quiet_NaN();
-      }
-    }
-
-    template <typename... Ts>
-    static auto evaluateSpeed(Ts &&... xs)
-    {
-      return core->getCurrentTwist(std::forward<decltype(xs)>(xs)...).linear;
-    }
-
-    template <typename... Ts>
-    static auto evaluateStandStill(Ts &&... xs)
-    {
-      return core->getStandStillDuration(std::forward<decltype(xs)>(xs)...);
-    }
-
-    template <typename... Ts>
-    static auto evaluateTimeHeadway(Ts &&... xs)
-    {
-      if (const auto result = core->getTimeHeadway(std::forward<decltype(xs)>(xs)...); result) {
-        return result.value();
-      } else {
-        using value_type = typename std::decay<decltype(result)>::type::value_type;
-        return std::numeric_limits<value_type>::quiet_NaN();
-      }
     }
   };
 
