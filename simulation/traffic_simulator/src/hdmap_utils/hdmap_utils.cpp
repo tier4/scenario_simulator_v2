@@ -1124,16 +1124,16 @@ auto HdMapUtils::getTrafficLightBulbPosition(
 }
 
 auto HdMapUtils::getAlongLaneletPose(
-  const traffic_simulator_msgs::msg::LaneletPose & from_pose, const double along) const
-  -> traffic_simulator_msgs::msg::LaneletPose
+  const traffic_simulator_msgs::msg::LaneletPose & from_pose, const double along,
+  const traffic_simulator::RoutingGraphType type) const -> traffic_simulator_msgs::msg::LaneletPose
 {
   traffic_simulator_msgs::msg::LaneletPose along_pose = from_pose;
   along_pose.s = along_pose.s + along;
   if (along_pose.s >= 0) {
     while (along_pose.s >= getLaneletLength(along_pose.lanelet_id)) {
-      auto next_ids = getNextLaneletIds(along_pose.lanelet_id, "straight");
+      auto next_ids = getNextLaneletIds(along_pose.lanelet_id, "straight", type);
       if (next_ids.empty()) {
-        next_ids = getNextLaneletIds(along_pose.lanelet_id);
+        next_ids = getNextLaneletIds(along_pose.lanelet_id, type);
         if (next_ids.empty()) {
           THROW_SEMANTIC_ERROR(
             "failed to calculate along pose (id,s) = (", from_pose.lanelet_id, ",",
@@ -1145,9 +1145,9 @@ auto HdMapUtils::getAlongLaneletPose(
     }
   } else {
     while (along_pose.s < 0) {
-      auto previous_ids = getPreviousLaneletIds(along_pose.lanelet_id, "straight");
+      auto previous_ids = getPreviousLaneletIds(along_pose.lanelet_id, "straight", type);
       if (previous_ids.empty()) {
-        previous_ids = getPreviousLaneletIds(along_pose.lanelet_id);
+        previous_ids = getPreviousLaneletIds(along_pose.lanelet_id, type);
         if (previous_ids.empty()) {
           THROW_SEMANTIC_ERROR(
             "failed to calculate along pose (id,s) = (", from_pose.lanelet_id, ",",

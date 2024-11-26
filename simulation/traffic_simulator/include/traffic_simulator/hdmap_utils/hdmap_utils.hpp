@@ -97,8 +97,9 @@ public:
     -> std::vector<traffic_simulator_msgs::msg::LaneletPose>;
 
   auto getAlongLaneletPose(
-    const traffic_simulator_msgs::msg::LaneletPose & from, const double along) const
-    -> traffic_simulator_msgs::msg::LaneletPose;
+    const traffic_simulator_msgs::msg::LaneletPose & from, const double along,
+    const traffic_simulator::RoutingGraphType type = traffic_simulator::RoutingGraphType::VEHICLE)
+    const -> traffic_simulator_msgs::msg::LaneletPose;
 
   auto getCenterPoints(const lanelet::Ids &) const -> std::vector<geometry_msgs::msg::Point>;
 
