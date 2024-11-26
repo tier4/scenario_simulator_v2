@@ -1410,17 +1410,17 @@ auto HdMapUtils::canChangeLane(
 
 auto HdMapUtils::getLateralDistance(
   const traffic_simulator_msgs::msg::LaneletPose & from,
-  const traffic_simulator_msgs::msg::LaneletPose & to, bool allow_lane_change) const
-  -> std::optional<double>
+  const traffic_simulator_msgs::msg::LaneletPose & to, bool allow_lane_change,
+  const traffic_simulator::RoutingGraphType type) const -> std::optional<double>
 {
-  const auto route = getRoute(from.lanelet_id, to.lanelet_id, allow_lane_change);
+  const auto route = getRoute(from.lanelet_id, to.lanelet_id, allow_lane_change, type);
   if (route.empty()) {
     return std::nullopt;
   }
   if (allow_lane_change) {
     double lateral_distance_by_lane_change = 0.0;
     for (unsigned int i = 0; i < route.size() - 1; i++) {
-      auto next_lanelet_ids = getNextLaneletIds(route[i]);
+      auto next_lanelet_ids = getNextLaneletIds(route[i], type);
       if (auto next_lanelet = std::find_if(
             next_lanelet_ids.begin(), next_lanelet_ids.end(),
             [&route, i](const lanelet::Id & id) { return id == route[i + 1]; });
