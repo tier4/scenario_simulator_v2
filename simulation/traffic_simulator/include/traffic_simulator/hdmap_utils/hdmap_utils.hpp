@@ -45,6 +45,7 @@
 #include <string>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 #include <traffic_simulator/data_type/lane_change.hpp>
+#include <traffic_simulator/data_type/routing_configuration.hpp>
 #include <traffic_simulator/data_type/routing_graph_type.hpp>
 #include <traffic_simulator/hdmap_utils/cache.hpp>
 #include <traffic_simulator/hdmap_utils/traffic_rules.hpp>
@@ -85,9 +86,9 @@ public:
 
   auto countLaneChanges(
     const traffic_simulator_msgs::msg::LaneletPose & from,
-    const traffic_simulator_msgs::msg::LaneletPose & to, bool allow_lane_change,
-    const traffic_simulator::RoutingGraphType type =
-      traffic_simulator::RoutingGraphType::VEHICLE) const -> std::optional<std::pair<int, int>>;
+    const traffic_simulator_msgs::msg::LaneletPose & to,
+    const traffic_simulator::RoutingConfiguration & routing_configuration =
+      traffic_simulator::RoutingConfiguration()) const -> std::optional<std::pair<int, int>>;
 
   auto filterLaneletIds(const lanelet::Ids &, const char subtype[]) const -> lanelet::Ids;
 
@@ -177,8 +178,9 @@ public:
       traffic_simulator::RoutingGraphType::VEHICLE) const -> std::optional<lanelet::Id>;
 
   auto getLaneChangeableLaneletId(
-    const lanelet::Id, const traffic_simulator::lane_change::Direction,
-    const std::uint8_t shift) const -> std::optional<lanelet::Id>;
+    const lanelet::Id, const traffic_simulator::lane_change::Direction, const std::uint8_t shift,
+    const traffic_simulator::RoutingGraphType type =
+      traffic_simulator::RoutingGraphType::VEHICLE) const -> std::optional<lanelet::Id>;
 
   auto getLaneletIds() const -> lanelet::Ids;
 
@@ -190,9 +192,9 @@ public:
 
   auto getLateralDistance(
     const traffic_simulator_msgs::msg::LaneletPose & from,
-    const traffic_simulator_msgs::msg::LaneletPose & to, bool allow_lane_change = false,
-    const traffic_simulator::RoutingGraphType type =
-      traffic_simulator::RoutingGraphType::VEHICLE) const -> std::optional<double>;
+    const traffic_simulator_msgs::msg::LaneletPose & to,
+    const traffic_simulator::RoutingConfiguration & routing_configuration =
+      traffic_simulator::RoutingConfiguration()) const -> std::optional<double>;
 
   auto getLeftBound(const lanelet::Id) const -> std::vector<geometry_msgs::msg::Point>;
 
@@ -202,9 +204,9 @@ public:
 
   auto getLongitudinalDistance(
     const traffic_simulator_msgs::msg::LaneletPose & from_pose,
-    const traffic_simulator_msgs::msg::LaneletPose & to_pose, const bool allow_lane_change = false,
-    const traffic_simulator::RoutingGraphType type =
-      traffic_simulator::RoutingGraphType::VEHICLE) const -> std::optional<double>;
+    const traffic_simulator_msgs::msg::LaneletPose & to_pose,
+    const traffic_simulator::RoutingConfiguration & routing_configuration =
+      traffic_simulator::RoutingConfiguration()) const -> std::optional<double>;
 
   auto getNearbyLaneletIds(
     const geometry_msgs::msg::Point &, const double distance_threshold,
@@ -271,9 +273,9 @@ public:
   auto getRightOfWayLaneletIds(const lanelet::Id) const -> lanelet::Ids;
 
   auto getRoute(
-    const lanelet::Id from, const lanelet::Id to, bool allow_lane_change = false,
-    const traffic_simulator::RoutingGraphType type =
-      traffic_simulator::RoutingGraphType::VEHICLE) const -> lanelet::Ids;
+    const lanelet::Id from, const lanelet::Id to,
+    const traffic_simulator::RoutingConfiguration & routing_configuration =
+      traffic_simulator::RoutingConfiguration()) const -> lanelet::Ids;
 
   auto getSpeedLimit(
     const lanelet::Ids &, const traffic_simulator::RoutingGraphType type =
@@ -398,8 +400,9 @@ private:
 
     [[nodiscard]] auto getRoute(
       const lanelet::Id from_lanelet_id, const lanelet::Id to_lanelet_id,
-      lanelet::LaneletMapPtr lanelet_map_ptr, const bool allow_lane_change,
-      const traffic_simulator::RoutingGraphType type) -> lanelet::Ids;
+      lanelet::LaneletMapPtr lanelet_map_ptr,
+      const traffic_simulator::RoutingConfiguration & routing_configuration =
+        traffic_simulator::RoutingConfiguration()) -> lanelet::Ids;
 
   private:
     [[nodiscard]] RouteCache & route_cache(const traffic_simulator::RoutingGraphType type);
