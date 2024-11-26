@@ -198,8 +198,9 @@ public:
 
   auto getLongitudinalDistance(
     const traffic_simulator_msgs::msg::LaneletPose & from_pose,
-    const traffic_simulator_msgs::msg::LaneletPose & to_pose,
-    const bool allow_lane_change = false) const -> std::optional<double>;
+    const traffic_simulator_msgs::msg::LaneletPose & to_pose, const bool allow_lane_change = false,
+    const traffic_simulator::RoutingGraphType type =
+      traffic_simulator::RoutingGraphType::VEHICLE) const -> std::optional<double>;
 
   auto getNearbyLaneletIds(
     const geometry_msgs::msg::Point &, const double distance_threshold,
