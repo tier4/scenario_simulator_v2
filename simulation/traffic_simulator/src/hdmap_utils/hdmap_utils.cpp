@@ -816,11 +816,12 @@ auto HdMapUtils::isInRoute(const lanelet::Id lanelet_id, const lanelet::Ids & ro
 
 auto HdMapUtils::getFollowingLanelets(
   const lanelet::Id current_lanelet_id, const lanelet::Ids & route, const double horizon,
-  const bool include_current_lanelet_id) const -> lanelet::Ids
+  const bool include_current_lanelet_id, const traffic_simulator::RoutingGraphType type) const
+  -> lanelet::Ids
 {
   const auto is_following_lanelet =
-    [this](const auto & current_lanelet, const auto & candidate_lanelet) {
-      const auto next_ids = getNextLaneletIds(current_lanelet);
+    [this, type](const auto & current_lanelet, const auto & candidate_lanelet) {
+      const auto next_ids = getNextLaneletIds(current_lanelet, type);
       return std::find(next_ids.cbegin(), next_ids.cend(), candidate_lanelet) != next_ids.cend();
     };
 
@@ -857,7 +858,7 @@ auto HdMapUtils::getFollowingLanelets(
     THROW_SEMANTIC_ERROR("lanelet id does not match");
   } else if (total_distance <= horizon) {
     const auto remaining_lanelets =
-      getFollowingLanelets(route.back(), horizon - total_distance, false);
+      getFollowingLanelets(route.back(), horizon - total_distance, false, type);
     following_lanelets_ids.insert(
       following_lanelets_ids.end(), remaining_lanelets.begin(), remaining_lanelets.end());
   }
@@ -866,8 +867,8 @@ auto HdMapUtils::getFollowingLanelets(
 }
 
 auto HdMapUtils::getFollowingLanelets(
-  const lanelet::Id lanelet_id, const double distance, const bool include_self) const
-  -> lanelet::Ids
+  const lanelet::Id lanelet_id, const double distance, const bool include_self,
+  const traffic_simulator::RoutingGraphType type) const -> lanelet::Ids
 {
   lanelet::Ids ret;
   double total_distance = 0.0;
@@ -876,13 +877,13 @@ auto HdMapUtils::getFollowingLanelets(
   }
   lanelet::Id end_lanelet_id = lanelet_id;
   while (total_distance < distance) {
-    if (const auto straight_ids = getNextLaneletIds(end_lanelet_id, "straight");
+    if (const auto straight_ids = getNextLaneletIds(end_lanelet_id, "straight", type);
         !straight_ids.empty()) {
       total_distance = total_distance + getLaneletLength(straight_ids[0]);
       ret.push_back(straight_ids[0]);
       end_lanelet_id = straight_ids[0];
       continue;
-    } else if (const auto ids = getNextLaneletIds(end_lanelet_id); ids.size() != 0) {
+    } else if (const auto ids = getNextLaneletIds(end_lanelet_id, type); ids.size() != 0) {
       total_distance = total_distance + getLaneletLength(ids[0]);
       ret.push_back(ids[0]);
       end_lanelet_id = ids[0];

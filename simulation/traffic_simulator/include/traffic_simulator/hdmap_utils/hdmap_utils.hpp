@@ -148,11 +148,14 @@ public:
 
   auto getFollowingLanelets(
     const lanelet::Id current_lanelet_id, const lanelet::Ids & route, const double horizon = 100,
-    const bool include_current_lanelet_id = true) const -> lanelet::Ids;
+    const bool include_current_lanelet_id = true,
+    const traffic_simulator::RoutingGraphType type =
+      traffic_simulator::RoutingGraphType::VEHICLE) const -> lanelet::Ids;
 
   auto getFollowingLanelets(
-    const lanelet::Id, const double distance = 100, const bool include_self = true) const
-    -> lanelet::Ids;
+    const lanelet::Id, const double distance = 100, const bool include_self = true,
+    const traffic_simulator::RoutingGraphType type =
+      traffic_simulator::RoutingGraphType::VEHICLE) const -> lanelet::Ids;
 
   auto getHeight(const traffic_simulator_msgs::msg::LaneletPose &) const -> double;
 
