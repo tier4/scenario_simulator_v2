@@ -18,11 +18,13 @@
 #include <geometry/quaternion/quaternion_to_euler.hpp>
 #include <geometry/vector3/hypot.hpp>
 #include <geometry/vector3/inner_product.hpp>
+#include <geometry/vector3/is_finite.hpp>
 #include <geometry/vector3/norm.hpp>
 #include <geometry/vector3/operator.hpp>
 #include <geometry_msgs/msg/accel.hpp>
 #include <geometry_msgs/msg/twist.hpp>
 #include <traffic_simulator/behavior/polyline_trajectory_follower.hpp>
+#include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator_msgs/msg/action_status.hpp>
 
 namespace traffic_simulator
@@ -41,46 +43,9 @@ PolylineTrajectoryFollower::PolylineTrajectoryFollower(
 {
 }
 
-template <typename T>
-auto isFiniteVector3(const T & vec) -> bool
-{
-  static_assert(math::geometry::IsLikeVector3<std::decay_t<decltype(vec)>>::value);
-  return std::isfinite(vec.x) and std::isfinite(vec.y) and std::isfinite(vec.z);
-}
-
-auto distanceAlongLanelet(
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
-  const traffic_simulator_msgs::msg::EntityStatus & entity_status, const double matching_distance,
-  const geometry_msgs::msg::Point & from, const geometry_msgs::msg::Point & to) -> double
-{
-  if (const auto from_lanelet_pose =
-        hdmap_utils_ptr->toLaneletPose(from, entity_status.bounding_box, false, matching_distance);
-      from_lanelet_pose.has_value()) {
-    if (const auto to_lanelet_pose =
-          hdmap_utils_ptr->toLaneletPose(to, entity_status.bounding_box, false, matching_distance);
-        to_lanelet_pose.has_value()) {
-      if (const auto distance = hdmap_utils_ptr->getLongitudinalDistance(
-            from_lanelet_pose.value(), to_lanelet_pose.value());
-          distance.has_value()) {
-        return distance.value();
-      }
-    }
-  }
-  return math::geometry::hypot(from, to);
-};
-
-auto firstWaypointWithArrivalTimeSpecified(
-  const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory)
-  -> std::vector<traffic_simulator_msgs::msg::Vertex>::const_iterator
-{
-  return std::find_if(
-    polyline_trajectory.shape.vertices.cbegin(), polyline_trajectory.shape.vertices.cend(),
-    [](const auto & vertex) { return not std::isnan(vertex.time); });
-}
-
-auto makeUpdatedPoseOrientation(
-  const traffic_simulator_msgs::msg::EntityStatus & entity_status,
-  const geometry_msgs::msg::Vector3 & desired_velocity) -> geometry_msgs::msg::Quaternion
+auto PolylineTrajectoryFollower::buildUpdatedPoseOrientation(
+  const geometry_msgs::msg::Vector3 & desired_velocity) const noexcept(true)
+  -> geometry_msgs::msg::Quaternion
 {
   if (desired_velocity.y == 0.0 && desired_velocity.x == 0.0 && desired_velocity.z == 0.0) {
     // do not change orientation if there is no designed_velocity vector
@@ -96,8 +61,7 @@ auto makeUpdatedPoseOrientation(
   }
 }
 
-auto calculateCurrentVelocity(
-  const traffic_simulator_msgs::msg::EntityStatus & entity_status, const double speed)
+auto PolylineTrajectoryFollower::calculateCurrentVelocity(const double speed) const
   -> geometry_msgs::msg::Vector3
 {
   const auto euler_angles =
@@ -110,11 +74,10 @@ auto calculateCurrentVelocity(
     .z(std::sin(pitch) * speed);
 }
 
-auto calculateDistanceAndRemainingTime(
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
-  const traffic_simulator_msgs::msg::EntityStatus & entity_status, const double matching_distance,
+auto PolylineTrajectoryFollower::calculateDistanceAndRemainingTime(
   const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
-  const double distance_to_front_waypoint, const double step_time) -> std::tuple<double, double>
+  const double matching_distance, const double distance_to_front_waypoint,
+  const double step_time) const -> std::tuple<double, double>
 {
   /*
     Note for anyone working on adding support for followingMode follow
@@ -123,20 +86,21 @@ auto calculateDistanceAndRemainingTime(
     inappropriate.
   */
   const auto total_distance_to =
-    [&hdmap_utils_ptr, &entity_status, &matching_distance, &polyline_trajectory](
+    [this, matching_distance, &polyline_trajectory](
       const std::vector<traffic_simulator_msgs::msg::Vertex>::const_iterator last) {
       return std::accumulate(
         polyline_trajectory.shape.vertices.cbegin(), last, 0.0,
-        [&hdmap_utils_ptr, &entity_status, &matching_distance](
-          const double total_distance, const auto & vertex) {
+        [this, matching_distance](const double total_distance, const auto & vertex) {
           const auto next = std::next(&vertex);
           return total_distance + distanceAlongLanelet(
-                                    hdmap_utils_ptr, entity_status, matching_distance,
+                                    hdmap_utils_ptr, entity_status.bounding_box, matching_distance,
                                     vertex.position.position, next->position.position);
         });
     };
 
-  const auto waypoint_ptr = firstWaypointWithArrivalTimeSpecified(polyline_trajectory);
+  const auto waypoint_ptr = std::find_if(
+    polyline_trajectory.shape.vertices.cbegin(), polyline_trajectory.shape.vertices.cend(),
+    [](const auto & vertex) { return std::isfinite(vertex.time); });
   if (waypoint_ptr == std::cend(polyline_trajectory.shape.vertices)) {
     return std::make_tuple(
       distance_to_front_waypoint +
@@ -144,7 +108,7 @@ auto calculateDistanceAndRemainingTime(
       std::numeric_limits<double>::infinity());
   }
   const double remaining_time =
-    (std::isnan(polyline_trajectory.base_time) ? 0.0 : polyline_trajectory.base_time) +
+    (std::isfinite(polyline_trajectory.base_time) ? polyline_trajectory.base_time : 0.0) +
     waypoint_ptr->time - entity_status.time;
 
   /*
@@ -175,14 +139,13 @@ auto calculateDistanceAndRemainingTime(
       " failed to reach the trajectory waypoint at the specified time. The specified time "
       "is ",
       waypoint_ptr->time, " (in ",
-      (not std::isnan(polyline_trajectory.base_time) ? "absolute" : "relative"),
+      (std::isfinite(polyline_trajectory.base_time) ? "absolute" : "relative"),
       " simulation time). This may be due to unrealistic conditions of arrival time "
       "specification compared to vehicle parameters and dynamic constraints.");
 
   } else {
     return std::make_tuple(
-      distance_to_front_waypoint + total_distance_to(waypoint_ptr),
-      remaining_time == 0.0 ? std::numeric_limits<double>::epsilon() : remaining_time);
+      distance_to_front_waypoint + total_distance_to(waypoint_ptr), remaining_time);
   }
 }
 
@@ -226,7 +189,7 @@ auto PolylineTrajectoryFollower::validatedEntityDesiredVelocity(
                                   .x(std::cos(pitch) * std::cos(yaw) * desired_speed)
                                   .y(std::cos(pitch) * std::sin(yaw) * desired_speed)
                                   .z(std::sin(pitch) * desired_speed);
-  if (not isFiniteVector3(desired_velocity)) {
+  if (not math::geometry::isFinite(desired_velocity)) {
     THROW_SIMULATION_ERROR(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
@@ -297,16 +260,16 @@ auto PolylineTrajectoryFollower::discardTheFrontWaypointAndRecurse(
       Relative time starts from the start of FollowTrajectoryAction or from
       the time of reaching the previous "waypoint with arrival time".
 
-      Note: not std::isnan(polyline_trajectory.base_time) means
+      Note: std::isfinite(polyline_trajectory.base_time) means
       "Timing.domainAbsoluteRelative is relative".
 
-      Note: not std::isnan(polyline_trajectory.shape.vertices.front().time)
+      Note: std::isfinite(polyline_trajectory.shape.vertices.front().time)
       means "The waypoint about to be popped is the waypoint with the
       specified arrival time".
   */
   if (
-    not std::isnan(polyline_trajectory.base_time) and
-    not std::isnan(polyline_trajectory.shape.vertices.front().time)) {
+    std::isfinite(polyline_trajectory.base_time) and
+    std::isfinite(polyline_trajectory.shape.vertices.front().time)) {
     polyline_trajectory.base_time = entity_status.time;
   }
 
@@ -330,7 +293,7 @@ auto PolylineTrajectoryFollower::buildUpdatedEntityStatus(
   using math::geometry::operator*;
   using math::geometry::operator/;
 
-  const auto updated_pose_orientation = makeUpdatedPoseOrientation(entity_status, desired_velocity);
+  const auto updated_pose_orientation = buildUpdatedPoseOrientation(desired_velocity);
   const auto updated_pose = geometry_msgs::build<geometry_msgs::msg::Pose>()
                               .position(entity_status.pose.position + desired_velocity * step_time)
                               .orientation(updated_pose_orientation);
@@ -361,7 +324,7 @@ auto PolylineTrajectoryFollower::buildUpdatedEntityStatus(
       .accel(updated_action_status_accel)
       .linear_jerk(entity_status.action_status.linear_jerk);
   const auto updated_time = entity_status.time + step_time;
-  const auto updated_lanelet_pose_valid = false;
+  constexpr bool updated_lanelet_pose_valid = false;
 
   return traffic_simulator_msgs::build<traffic_simulator_msgs::msg::EntityStatus>()
     .type(entity_status.type)
@@ -408,23 +371,22 @@ auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
   const auto entity_position = validatedEntityPosition();
   const auto target_position = validatedEntityTargetPosition(polyline_trajectory);
 
-  const double distance_to_front_waypoint = distanceAlongLanelet(
-    hdmap_utils_ptr, entity_status, matching_distance, entity_position, target_position);
+  const double distance_to_front_waypoint = traffic_simulator::distance::distanceAlongLanelet(
+    hdmap_utils_ptr, entity_status.bounding_box, matching_distance, entity_position,
+    target_position);
 
   /*
     This clause is to avoid division-by-zero errors in later clauses with
     distance_to_front_waypoint as the denominator if the distance
     miraculously becomes zero.
   */
-  if (math::arithmetic::isDefinitelyLessThan(
-        distance_to_front_waypoint, std::numeric_limits<double>::epsilon())) {
+  if (distance_to_front_waypoint <= 0.0) {
     return discardTheFrontWaypointAndRecurse(polyline_trajectory, matching_distance, target_speed);
   }
   const auto && [distance, remaining_time] = calculateDistanceAndRemainingTime(
-    hdmap_utils_ptr, entity_status, matching_distance, polyline_trajectory,
-    distance_to_front_waypoint, step_time);
+    polyline_trajectory, matching_distance, distance_to_front_waypoint, step_time);
 
-  if (math::arithmetic::isDefinitelyLessThan(distance, std::numeric_limits<double>::epsilon())) {
+  if (distance <= 0) {
     return discardTheFrontWaypointAndRecurse(polyline_trajectory, matching_distance, target_speed);
   }
 
@@ -447,11 +409,14 @@ auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
     not set (it is std::nullopt), target_speed is assumed to be the same as max_speed from the
     behaviour_parameter.
   */
-  const bool is_breaking_waypoint = firstWaypointWithArrivalTimeSpecified(polyline_trajectory) >=
-                                    std::prev(polyline_trajectory.shape.vertices.cend());
+  const bool is_breaking_waypoint =
+    std::find_if(
+      polyline_trajectory.shape.vertices.cbegin(), polyline_trajectory.shape.vertices.cend(),
+      [](const auto & vertex) { return std::isfinite(vertex.time); }) >=
+    std::prev(polyline_trajectory.shape.vertices.cend());
   const auto follow_waypoint_controller = FollowWaypointController(
     behavior_parameter, step_time, is_breaking_waypoint,
-    std::isinf(remaining_time) ? target_speed : std::nullopt);
+    std::isfinite(remaining_time) ? std::nullopt : target_speed);
 
   /*
     The desired acceleration is the acceleration at which the destination
@@ -471,22 +436,24 @@ auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
   const double desired_speed = validatedEntityDesiredSpeed(entity_speed, desired_acceleration);
   const auto desired_velocity = validatedEntityDesiredVelocity(
     polyline_trajectory, target_position, entity_position, desired_speed);
-  const auto current_velocity = calculateCurrentVelocity(entity_status, entity_speed);
 
-  if (
-    entity_speed * step_time > distance_to_front_waypoint and
-    math::geometry::innerProduct(desired_velocity, current_velocity) < 0.0) {
+  const auto current_velocity = calculateCurrentVelocity(entity_speed);
+
+  if (const bool target_passed =
+        entity_speed * step_time > distance_to_front_waypoint and
+        math::geometry::innerProduct(desired_velocity, current_velocity) < 0.0;
+      target_passed) {
     return discardTheFrontWaypointAndRecurse(polyline_trajectory, matching_distance, target_speed);
   }
 
   const double remaining_time_to_front_waypoint =
-    (std::isnan(polyline_trajectory.base_time) ? 0.0 : polyline_trajectory.base_time) +
+    (std::isfinite(polyline_trajectory.base_time) ? polyline_trajectory.base_time : 0.0) +
     polyline_trajectory.shape.vertices.front().time - entity_status.time;
 
   const auto predicted_state_opt = follow_waypoint_controller.getPredictedWaypointArrivalState(
     desired_acceleration, remaining_time, distance, acceleration, entity_speed);
 
-  if (not std::isinf(remaining_time) and not predicted_state_opt.has_value()) {
+  if (std::isfinite(remaining_time) and not predicted_state_opt.has_value()) {
     THROW_SIMULATION_ERROR(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: FollowWaypointController for vehicle ",
@@ -497,12 +464,12 @@ auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
       follow_waypoint_controller);
   }
 
-  if (std::isnan(remaining_time_to_front_waypoint)) {
+  if (not std::isfinite(remaining_time_to_front_waypoint)) {
     /*
       If the nearest waypoint is arrived at in this step without a specific arrival time, it will
       be considered as achieved
     */
-    if (std::isinf(remaining_time) and polyline_trajectory.shape.vertices.size() == 1UL) {
+    if (not std::isfinite(remaining_time) and polyline_trajectory.shape.vertices.size() == 1UL) {
       /*
         If the trajectory has only waypoints with unspecified time, the last one is followed using
         maximum speed including braking - in this case accuracy of arrival is checked
@@ -618,7 +585,7 @@ auto PolylineTrajectoryFollower::validatedEntityPosition() const noexcept(false)
   -> geometry_msgs::msg::Point
 {
   const auto entity_position = entity_status.pose.position;
-  if (not isFiniteVector3(entity_position)) {
+  if (not math::geometry::isFinite(entity_position)) {
     THROW_SIMULATION_ERROR(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
@@ -637,7 +604,7 @@ auto PolylineTrajectoryFollower::validatedEntityTargetPosition(
       "attempted to dereference an element of an empty PolylineTrajectory");
   }
   const auto target_position = polyline_trajectory.shape.vertices.front().position.position;
-  if (not isFiniteVector3(target_position)) {
+  if (not math::geometry::isFinite(target_position)) {
     THROW_SIMULATION_ERROR(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",

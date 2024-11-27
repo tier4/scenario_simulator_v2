@@ -52,6 +52,13 @@ private:
     traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
     const double matching_distance, const std::optional<double> target_speed) const
     -> std::optional<EntityStatus>;
+  auto calculateCurrentVelocity(const double speed) const -> geometry_msgs::msg::Vector3;
+  auto calculateDistanceAndRemainingTime(
+    const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
+    const double matching_distance, const double distance_to_front_waypoint,
+    const double step_time) const -> std::tuple<double, double>;
+  auto buildUpdatedPoseOrientation(const geometry_msgs::msg::Vector3 & desired_velocity) const
+    noexcept(true) -> geometry_msgs::msg::Quaternion;
   auto buildUpdatedEntityStatus(const geometry_msgs::msg::Vector3 & desired_velocity) const
     noexcept(true) -> EntityStatus;
   auto validatedEntityAcceleration() const noexcept(false) -> double;
