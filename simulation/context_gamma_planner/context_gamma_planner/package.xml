@@ -14,7 +14,6 @@
   <depend>pluginlib</depend>
   <depend>traffic_simulator</depend>
   <depend>behaviortree_cpp_v3</depend>
-  <depend>cpp_mock_scenarios</depend>
   <depend>customized_rvo2</depend>
   <depend>geometry</depend>
   <depend>libgoogle-glog-dev</depend>
