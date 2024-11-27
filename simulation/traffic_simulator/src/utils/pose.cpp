@@ -94,18 +94,6 @@ auto isAtEndOfLanelets(const CanonicalizedLaneletPose & canonicalized_lanelet_po
 }
 
 // Conversions
-auto toMapPose(const CanonicalizedLaneletPose & lanelet_pose) -> Pose
-{
-  return static_cast<Pose>(lanelet_pose);
-}
-
-auto toMapPose(const LaneletPose & lanelet_pose) -> Pose
-{
-  return lanelet_wrapper::pose::toMapPose(
-           lanelet_pose, CanonicalizedLaneletPose::getConsiderPoseByRoadSlope())
-    .pose;
-}
-
 auto canonicalize(const LaneletPose & lanelet_pose) -> LaneletPose
 {
   if (
@@ -134,6 +122,18 @@ auto canonicalize(const LaneletPose & lanelet_pose, const lanelet::Ids & route_l
       ",rpy.z=", lanelet_pose.rpy.z,
       ") is invalid, please check lanelet length, connection and entity route.");
   }
+}
+
+auto toMapPose(const CanonicalizedLaneletPose & lanelet_pose) -> Pose
+{
+  return static_cast<Pose>(lanelet_pose);
+}
+
+auto toMapPose(const LaneletPose & lanelet_pose) -> Pose
+{
+  return lanelet_wrapper::pose::toMapPose(
+           lanelet_pose, CanonicalizedLaneletPose::getConsiderPoseByRoadSlope())
+    .pose;
 }
 
 auto alternativeLaneletPoses(const LaneletPose & lanelet_pose) -> std::vector<LaneletPose>
