@@ -470,7 +470,7 @@ auto CatmullRomSpline::getSquaredDistanceIn2D(
       }
       return line_segments_[0].getSquaredDistanceIn2D(point, s, true);
     default:
-      const auto [index, sValue] = getCurveIndexAndS(s);
+      const auto [index, s_value] = getCurveIndexAndS(s);
       return curves_[index].getSquaredDistanceIn2D(point, sValue, true);
   }
 }
@@ -508,7 +508,7 @@ auto CatmullRomSpline::getSquaredDistanceVector(
       }
       return line_segments_[0].getSquaredDistanceVector(point, s, true);
     default:
-      const auto [index, sValue] = getCurveIndexAndS(s);
+      const auto [index, s_value] = getCurveIndexAndS(s);
       return curves_[index].getSquaredDistanceVector(point, sValue, true);
   }
 }
@@ -542,7 +542,7 @@ auto CatmullRomSpline::getPoint(const double s) const -> geometry_msgs::msg::Poi
       }
       return line_segments_[0].getPoint(s, true);
     default:
-      const auto [index, sValue] = getCurveIndexAndS(s);
+      const auto [index, s_value] = getCurveIndexAndS(s);
       return curves_[index].getPoint(sValue, true);
   }
 }
@@ -597,7 +597,7 @@ auto CatmullRomSpline::getNormalVector(const double s) const -> geometry_msgs::m
         "This message is not originally intended to be displayed, if you see it, please "
         "contact the developer of traffic_simulator.");
     default:
-      const auto [index, sValue] = getCurveIndexAndS(s);
+      const auto [index, s_value] = getCurveIndexAndS(s);
       return curves_[index].getNormalVector(sValue, true);
   }
 }
@@ -634,7 +634,7 @@ auto CatmullRomSpline::getTangentVector(const double s) const -> geometry_msgs::
         "This message is not originally intended to be displayed, if you see it, please "
         "contact the developer of traffic_simulator.");
     default:
-      const auto [index, sValue] = getCurveIndexAndS(s);
+      const auto [index, s_value] = getCurveIndexAndS(s);
       return curves_[index].getTangentVector(sValue, true);
   }
 }
@@ -665,7 +665,7 @@ auto CatmullRomSpline::getPose(const double s, const bool fill_pitch) const
       }
       return line_segments_[0].getPose(s, true, fill_pitch);
     default:
-      const auto [index, sValue] = getCurveIndexAndS(s);
+      const auto [index, s_value] = getCurveIndexAndS(s);
       return curves_[index].getPose(sValue, true, fill_pitch);
   }
 }
