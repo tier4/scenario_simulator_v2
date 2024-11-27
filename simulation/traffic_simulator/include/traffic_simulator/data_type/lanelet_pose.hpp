@@ -20,6 +20,8 @@
 #include <geometry_msgs/msg/pose.hpp>
 #include <optional>
 #include <scenario_simulator_exception/exception.hpp>
+#include <traffic_simulator/data_type/routing_configuration.hpp>
+#include <traffic_simulator/data_type/routing_graph_type.hpp>
 #include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
 
 namespace traffic_simulator
@@ -42,7 +44,9 @@ public:
   auto getLaneletPose() const -> const LaneletPose & { return lanelet_pose_; }
   auto hasAlternativeLaneletPose() const -> bool { return lanelet_poses_.size() > 1; }
   auto getAlternativeLaneletPoseBaseOnShortestRouteFrom(
-    LaneletPose from, bool allow_lane_change = false) const -> std::optional<LaneletPose>;
+    LaneletPose from,
+    const RoutingConfiguration & routing_configuration = RoutingConfiguration()) const
+    -> std::optional<LaneletPose>;
   static auto setConsiderPoseByRoadSlope(bool consider_pose_by_road_slope) -> void
   {
     consider_pose_by_road_slope_ = consider_pose_by_road_slope;

@@ -36,6 +36,7 @@ ament_auto_add_library(traffic_simulator SHARED
   src/data_type/entity_status.cpp
   src/data_type/lane_change.cpp
   src/data_type/lanelet_pose.cpp
+  src/data_type/routing_graph_type.cpp
   src/data_type/speed_change.cpp
   src/entity/ego_entity.cpp
   src/entity/entity_base.cpp
@@ -53,6 +54,7 @@ ament_auto_add_library(traffic_simulator SHARED
   src/lanelet_wrapper/pose.cpp
   src/lanelet_wrapper/route.cpp
   src/lanelet_wrapper/traffic_lights.cpp
+  src/lanelet_wrapper/traffic_rules.cpp
   src/simulation_clock/simulation_clock.cpp
   src/traffic/traffic_controller.cpp
   src/traffic/traffic_sink.cpp

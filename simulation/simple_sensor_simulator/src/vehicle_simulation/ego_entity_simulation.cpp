@@ -305,17 +305,7 @@ void EgoEntitySimulation::update(
   if (is_npc_logic_started) {
     auto input = Eigen::VectorXd(vehicle_model_ptr_->getDimU());
 
-    auto acceleration_by_slope = [this]() {
-      if (consider_acceleration_by_road_slope_) {
-        // calculate longitudinal acceleration by slope
-        constexpr double gravity_acceleration = -9.81;
-        const double ego_pitch_angle = calculateEgoPitch();
-        const double slope_angle = -ego_pitch_angle;
-        return gravity_acceleration * std::sin(slope_angle);
-      } else {
-        return 0.0;
-      }
-    }();
+    auto acceleration_by_slope = calculateAccelerationBySlope();
 
     switch (vehicle_model_type_) {
       case VehicleModelType::DELAY_STEER_ACC:
@@ -349,28 +339,16 @@ void EgoEntitySimulation::update(
   updatePreviousValues();
 }
 
-auto EgoEntitySimulation::calculateEgoPitch() const -> double
+auto EgoEntitySimulation::calculateAccelerationBySlope() const -> double
 {
-  // calculate prev/next point of lanelet centerline nearest to ego pose.
-  if (!status_.laneMatchingSucceed()) {
+  if (consider_acceleration_by_road_slope_) {
+    constexpr double gravity_acceleration = -9.81;
+    const double ego_pitch_angle =
+      math::geometry::convertQuaternionToEulerAngle(status_.getMapPose().orientation).y;
+    return gravity_acceleration * std::sin(ego_pitch_angle);
+  } else {
     return 0.0;
   }
-  geometry_msgs::msg::Point ego_point;
-  ego_point.x = world_relative_position_.x();
-  ego_point.y = world_relative_position_.y();
-  ego_point.z = world_relative_position_.z();
-  auto [lanelet_yaw, prev_point, next_point] =
-    traffic_simulator::lanelet_map::laneletYaw(ego_point, status_.getLaneletId());
-  const double ego_yaw_against_lanelet = vehicle_model_ptr_->getYaw() - lanelet_yaw;
-
-  /// @note calculate ego pitch angle considering ego yaw.
-  const double diff_z = next_point.z - prev_point.z;
-  const double diff_xy = std::hypot(next_point.x - prev_point.x, next_point.y - prev_point.y) /
-                         std::cos(ego_yaw_against_lanelet);
-  const bool reverse_sign = std::cos(ego_yaw_against_lanelet) < 0.0;
-  const double ego_pitch_angle =
-    reverse_sign ? -std::atan2(-diff_z, -diff_xy) : -std::atan2(diff_z, diff_xy);
-  return ego_pitch_angle;
 }
 
 auto EgoEntitySimulation::getCurrentTwist() const -> geometry_msgs::msg::Twist

@@ -67,15 +67,18 @@ auto CanonicalizedLaneletPose::operator=(const CanonicalizedLaneletPose & other)
 }
 
 auto CanonicalizedLaneletPose::getAlternativeLaneletPoseBaseOnShortestRouteFrom(
-  LaneletPose from, bool allow_lane_change) const -> std::optional<LaneletPose>
+  LaneletPose from, const RoutingConfiguration & routing_configuration) const
+  -> std::optional<LaneletPose>
 {
   if (lanelet_poses_.empty()) {
     return std::nullopt;
   }
-  auto shortest_route = route::getRoute(from.lanelet_id, lanelet_poses_[0].lanelet_id);
+  auto shortest_route =
+    route::getRoute(from.lanelet_id, lanelet_poses_[0].lanelet_id, routing_configuration);
   LaneletPose alternative_lanelet_pose = lanelet_poses_[0];
   for (const auto & laneletPose : lanelet_poses_) {
-    const auto route = route::getRoute(from.lanelet_id, laneletPose.lanelet_id, allow_lane_change);
+    const auto route =
+      route::getRoute(from.lanelet_id, laneletPose.lanelet_id, routing_configuration);
     if (shortest_route.size() > route.size()) {
       shortest_route = route;
       alternative_lanelet_pose = laneletPose;

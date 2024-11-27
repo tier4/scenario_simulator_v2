@@ -35,17 +35,18 @@ using SplineInterface = math::geometry::CatmullRomSplineInterface;
 // Lateral
 auto lateralDistance(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
-  const bool allow_lane_change) -> std::optional<double>;
+  const RoutingConfiguration & routing_configuration) -> std::optional<double>;
 
 auto lateralDistance(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
-  const double matching_distance, const bool allow_lane_change) -> std::optional<double>;
+  const double matching_distance, const RoutingConfiguration & routing_configuration)
+  -> std::optional<double>;
 
 // Longitudinal
 auto longitudinalDistance(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
   const bool include_adjacent_lanelet, const bool include_opposite_direction,
-  const bool allow_lane_change) -> std::optional<double>;
+  const RoutingConfiguration & routing_configuration) -> std::optional<double>;
 
 // BoundingBox
 auto boundingBoxDistance(
@@ -55,13 +56,13 @@ auto boundingBoxDistance(
 auto boundingBoxLaneLateralDistance(
   const CanonicalizedLaneletPose & from, const BoundingBox & from_bounding_box,
   const CanonicalizedLaneletPose & to, const BoundingBox & to_bounding_box,
-  const bool allow_lane_change) -> std::optional<double>;
+  const RoutingConfiguration & routing_configuration) -> std::optional<double>;
 
 auto boundingBoxLaneLongitudinalDistance(
   const CanonicalizedLaneletPose & from, const BoundingBox & from_bounding_box,
   const CanonicalizedLaneletPose & to, const BoundingBox & to_bounding_box,
   const bool include_adjacent_lanelet, const bool include_opposite_direction,
-  const bool allow_lane_change) -> std::optional<double>;
+  const RoutingConfiguration & routing_configuration) -> std::optional<double>;
 
 auto splineDistanceToBoundingBox(
   const SplineInterface & spline, const CanonicalizedLaneletPose & pose,

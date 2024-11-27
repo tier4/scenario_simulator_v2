@@ -54,7 +54,7 @@ auto isInLanelet(
 {
   constexpr bool include_adjacent_lanelet{false};
   constexpr bool include_opposite_direction{false};
-  constexpr bool allow_lane_change{false};
+  constexpr RoutingConfiguration routing_configuration;
 
   if (isSameLaneletId(canonicalized_lanelet_pose, lanelet_id)) {
     return true;
@@ -62,7 +62,7 @@ auto isInLanelet(
     const auto start_lanelet_pose = helper::constructCanonicalizedLaneletPose(lanelet_id, 0.0, 0.0);
     if (const auto distance_to_start_lanelet_pose = distance::longitudinalDistance(
           start_lanelet_pose, canonicalized_lanelet_pose, include_adjacent_lanelet,
-          include_opposite_direction, allow_lane_change);
+          include_opposite_direction, routing_configuration);
         distance_to_start_lanelet_pose and
         std::abs(distance_to_start_lanelet_pose.value()) <= tolerance) {
       return true;
@@ -72,7 +72,7 @@ auto isInLanelet(
       lanelet_id, lanelet_wrapper::lanelet_map::laneletLength(lanelet_id), 0.0);
     if (const auto distance_to_end_lanelet_pose = distance::longitudinalDistance(
           canonicalized_lanelet_pose, end_lanelet_pose, include_adjacent_lanelet,
-          include_opposite_direction, allow_lane_change);
+          include_opposite_direction, routing_configuration);
         distance_to_end_lanelet_pose and
         std::abs(distance_to_end_lanelet_pose.value()) <= tolerance) {
       return true;
@@ -259,7 +259,7 @@ auto boundingBoxRelativePose(
 // Relative LaneletPose
 auto relativeLaneletPose(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
-  const bool allow_lane_change) -> LaneletPose
+  const RoutingConfiguration & routing_configuration) -> LaneletPose
 {
   constexpr bool include_adjacent_lanelet{false};
   constexpr bool include_opposite_direction{true};
@@ -269,10 +269,10 @@ auto relativeLaneletPose(
   // it is not possible to calculate one of them - it happens that one is sufficient
   if (
     const auto longitudinal_distance = distance::longitudinalDistance(
-      from, to, include_adjacent_lanelet, include_opposite_direction, allow_lane_change)) {
+      from, to, include_adjacent_lanelet, include_opposite_direction, routing_configuration)) {
     position.s = longitudinal_distance.value();
   }
-  if (const auto lateral_distance = distance::lateralDistance(from, to, allow_lane_change)) {
+  if (const auto lateral_distance = distance::lateralDistance(from, to, routing_configuration)) {
     position.offset = lateral_distance.value();
   }
   return position;
@@ -281,7 +281,7 @@ auto relativeLaneletPose(
 auto boundingBoxRelativeLaneletPose(
   const CanonicalizedLaneletPose & from, const BoundingBox & from_bounding_box,
   const CanonicalizedLaneletPose & to, const BoundingBox & to_bounding_box,
-  const bool allow_lane_change) -> LaneletPose
+  const RoutingConfiguration & routing_configuration) -> LaneletPose
 {
   constexpr bool include_adjacent_lanelet{false};
   constexpr bool include_opposite_direction{true};
@@ -292,12 +292,12 @@ auto boundingBoxRelativeLaneletPose(
   if (
     const auto longitudinal_bounding_box_distance = distance::boundingBoxLaneLongitudinalDistance(
       from, from_bounding_box, to, to_bounding_box, include_adjacent_lanelet,
-      include_opposite_direction, allow_lane_change)) {
+      include_opposite_direction, routing_configuration)) {
     position.s = longitudinal_bounding_box_distance.value();
   }
   if (
     const auto lateral_bounding_box_distance = distance::boundingBoxLaneLateralDistance(
-      from, from_bounding_box, to, to_bounding_box, allow_lane_change)) {
+      from, from_bounding_box, to, to_bounding_box, routing_configuration)) {
     position.offset = lateral_bounding_box_distance.value();
   }
   return position;

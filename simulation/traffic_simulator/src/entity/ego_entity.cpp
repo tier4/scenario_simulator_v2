@@ -156,6 +156,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
       // prefer current lanelet on ss2 side
       setStatus(non_canonicalized_updated_status.value(), status_->getLaneletIds());
     } else {
+      field_operator_application->enableAutowareControl();
       is_controlled_by_simulator_ = false;
     }
   }

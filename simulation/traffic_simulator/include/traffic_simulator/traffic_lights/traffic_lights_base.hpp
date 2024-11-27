@@ -24,7 +24,6 @@
 #include <traffic_simulator/traffic_lights/configurable_rate_updater.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_marker_publisher.hpp>
-#include <traffic_simulator_msgs/msg/traffic_light_array_v1.hpp>
 #include <unordered_map>
 #include <vector>
 
@@ -70,14 +69,12 @@ public:
 
   auto getTrafficLightsComposedState(const lanelet::Id lanelet_id) -> std::string;
 
-  auto generateUpdateTrafficLightsRequest() const
-    -> simulation_api_schema::UpdateTrafficLightsRequest;
-
-  auto generateTrafficSimulatorV1Msg() const -> traffic_simulator_msgs::msg::TrafficLightArrayV1;
-
   auto getDistanceToActiveTrafficLightStopLine(
     const lanelet::Ids & route_lanelets, const math::geometry::CatmullRomSplineInterface & spline)
     -> std::optional<double>;
+
+  auto generateUpdateTrafficLightsRequest() const
+    -> simulation_api_schema::UpdateTrafficLightsRequest;
 
 protected:
   virtual auto update() const -> void = 0;

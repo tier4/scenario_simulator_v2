@@ -32,6 +32,7 @@ namespace geometry
 class CatmullRomSubspline : public CatmullRomSplineInterface
 {
 public:
+  ~CatmullRomSubspline() override = default;
   explicit CatmullRomSubspline(
     std::shared_ptr<math::geometry::CatmullRomSpline> spline, const double start_s,
     const double end_s)

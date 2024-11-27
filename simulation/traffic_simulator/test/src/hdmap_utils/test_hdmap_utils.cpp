@@ -30,10 +30,10 @@
 //   return RUN_ALL_TESTS();
 // }
 
-// class LaneletWapperTest_StandardMap : public testing::Test
+// class HdMapUtilsTest_StandardMap : public testing::Test
 // {
 // protected:
-//   LaneletWapperTest_StandardMap()
+//   HdMapUtilsTest_StandardMap()
 //   : hdmap_utils(
 //       ament_index_cpp::get_package_share_directory("traffic_simulator") +
 //         "/map/standard_map/lanelet2_map.osm",
@@ -46,10 +46,10 @@
 
 //   hdmap_utils::HdMapUtils hdmap_utils;
 // };
-// class LaneletWapperTest_WithRoadShoulderMap : public testing::Test
+// class HdMapUtilsTest_WithRoadShoulderMap : public testing::Test
 // {
 // protected:
-//   LaneletWapperTest_WithRoadShoulderMap()
+//   HdMapUtilsTest_WithRoadShoulderMap()
 //   : hdmap_utils(
 //       ament_index_cpp::get_package_share_directory("traffic_simulator") +
 //         "/map/with_road_shoulder/lanelet2_map.osm",
@@ -62,10 +62,10 @@
 
 //   hdmap_utils::HdMapUtils hdmap_utils;
 // };
-// class LaneletWapperTest_EmptyMap : public testing::Test
+// class HdMapUtilsTest_EmptyMap : public testing::Test
 // {
 // protected:
-//   LaneletWapperTest_EmptyMap()
+//   HdMapUtilsTest_EmptyMap()
 //   : hdmap_utils(
 //       ament_index_cpp::get_package_share_directory("traffic_simulator") +
 //         "/map/empty/lanelet2_map.osm",
@@ -78,10 +78,10 @@
 
 //   hdmap_utils::HdMapUtils hdmap_utils;
 // };
-// class LaneletWapperTest_FourTrackHighwayMap : public testing::Test
+// class HdMapUtilsTest_FourTrackHighwayMap : public testing::Test
 // {
 // protected:
-//   LaneletWapperTest_FourTrackHighwayMap()
+//   HdMapUtilsTest_FourTrackHighwayMap()
 //   : hdmap_utils(
 //       ament_index_cpp::get_package_share_directory("traffic_simulator") +
 //         "/map/four_track_highway/lanelet2_map.osm",
@@ -94,10 +94,10 @@
 
 //   hdmap_utils::HdMapUtils hdmap_utils;
 // };
-// class LaneletWapperTest_CrossroadsWithStoplinesMap : public testing::Test
+// class HdMapUtilsTest_CrossroadsWithStoplinesMap : public testing::Test
 // {
 // protected:
-//   LaneletWapperTest_CrossroadsWithStoplinesMap()
+//   HdMapUtilsTest_CrossroadsWithStoplinesMap()
 //   : hdmap_utils(
 //       ament_index_cpp::get_package_share_directory("traffic_simulator") +
 //         "/map/crossroads_with_stoplines/lanelet2_map.osm",
@@ -110,10 +110,10 @@
 
 //   hdmap_utils::HdMapUtils hdmap_utils;
 // };
-// class LaneletWapperTest_KashiwanohaMap : public testing::Test
+// class HdMapUtilsTest_KashiwanohaMap : public testing::Test
 // {
 // protected:
-//   LaneletWapperTest_KashiwanohaMap()
+//   HdMapUtilsTest_KashiwanohaMap()
 //   : hdmap_utils(
 //       ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map/lanelet2_map.osm",
 //       geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
@@ -125,10 +125,10 @@
 
 //   hdmap_utils::HdMapUtils hdmap_utils;
 // };
-// class LaneletWapperTest_IntersectionMap : public testing::Test
+// class HdMapUtilsTest_IntersectionMap : public testing::Test
 // {
 // protected:
-//   LaneletWapperTest_IntersectionMap()
+//   HdMapUtilsTest_IntersectionMap()
 //   : hdmap_utils(
 //       ament_index_cpp::get_package_share_directory("traffic_simulator") +
 //         "/map/intersection/lanelet2_map.osm",
@@ -178,14 +178,14 @@
 //  * @note Test basic functionality.
 //  * Test map conversion to binary message correctness with a sample map.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, toMapBin) { ASSERT_NO_THROW(hdmap_utils.toMapBin()); }
+// TEST_F(HdMapUtilsTest_StandardMap, toMapBin) { ASSERT_NO_THROW(hdmap_utils.toMapBin()); }
 
 // /**
 //  * @note Test basic functionality.
 //  * Test lanelet matching correctness with a small bounding box (1, 1)
 //  * and a pose on a lanelet and without including the crosswalk.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, matchToLane)
+// TEST_F(HdMapUtilsTest_StandardMap, matchToLane)
 // {
 //   const auto bbox = makeSmallBoundingBox();
 //   {
@@ -209,7 +209,7 @@
 //  * Test lanelet matching correctness with a small bounding box (1, 1)
 //  * and a pose on a crosswalk lanelet and including the crosswalk.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, matchToLane_includeCrosswalk)
+// TEST_F(HdMapUtilsTest_StandardMap, matchToLane_includeCrosswalk)
 // {
 //   auto bbox = makeSmallBoundingBox();
 //   {
@@ -236,7 +236,7 @@
 //  * - the goal is to test the branch where getDeterministicMatches returns nullopt and thus
 //  * this function returns nullopt as well.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, matchToLane_noMatch)
+// TEST_F(HdMapUtilsTest_StandardMap, matchToLane_noMatch)
 // {
 //   auto bbox = makeSmallBoundingBox();
 //   {
@@ -258,7 +258,7 @@
 //  * Test along lanelet pose obtaining with a distance
 //  * along the lanelet less than the lanelet length - so the along pose is still the same lanelet.
 // */
-// TEST_F(LaneletWapperTest_StandardMap, AlongLaneletPose_insideDistance)
+// TEST_F(HdMapUtilsTest_StandardMap, AlongLaneletPose_insideDistance)
 // {
 //   EXPECT_DOUBLE_EQ(
 //     hdmap_utils.getAlongLaneletPose(traffic_simulator::helper::constructLaneletPose(34513, 0), 30.0)
@@ -276,7 +276,7 @@
 //  * along the lanelet more than the lanelet length - the goal is
 //  * to test the situation when the next lanelet is returned.
 // */
-// TEST_F(LaneletWapperTest_StandardMap, AlongLaneletPose_outsideDistance)
+// TEST_F(HdMapUtilsTest_StandardMap, AlongLaneletPose_outsideDistance)
 // {
 //   EXPECT_EQ(
 //     hdmap_utils.getAlongLaneletPose(traffic_simulator::helper::constructLaneletPose(34513, 0), 30)
@@ -297,7 +297,7 @@
 //  * along the lanelet and start from the beginning of one lanelet - the goal is to test
 //  * the situation when the previous lanelet is returned.
 // */
-// TEST_F(LaneletWapperTest_StandardMap, AlongLaneletPose_negativeDistance)
+// TEST_F(HdMapUtilsTest_StandardMap, AlongLaneletPose_negativeDistance)
 // {
 //   EXPECT_EQ(
 //     hdmap_utils
@@ -316,7 +316,7 @@
 //  * and the last lanelet on the map as start - the goal is to test the situation
 //  * when desired pose is outside the lanelet map.
 //  */
-// TEST_F(LaneletWapperTest_FourTrackHighwayMap, AlongLaneletPose_afterLast)
+// TEST_F(HdMapUtilsTest_FourTrackHighwayMap, AlongLaneletPose_afterLast)
 // {
 //   EXPECT_THROW(
 //     hdmap_utils.getAlongLaneletPose(
@@ -329,7 +329,7 @@
 //  * lanelet on the map as start - the goal is to test the situation
 //  * when desired pose is outside the lanelet map.
 //  */
-// TEST_F(LaneletWapperTest_FourTrackHighwayMap, AlongLaneletPose_beforeFirst)
+// TEST_F(HdMapUtilsTest_FourTrackHighwayMap, AlongLaneletPose_beforeFirst)
 // {
 //   EXPECT_THROW(
 //     hdmap_utils.getAlongLaneletPose(
@@ -344,7 +344,7 @@
 //  * Canonicalized lanelet pose of (id=34564, s=-22) is suppose to be
 //  *                               (id=34576, s=-22 + length of 34570 + length of 34576)
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, CanonicalizeNegative)
+// TEST_F(HdMapUtilsTest_StandardMap, CanonicalizeNegative)
 // {
 //   double non_canonicalized_lanelet_s = -22.0;
 //   const auto canonicalized_lanelet_pose =
@@ -365,7 +365,7 @@
 //  * Canonicalized lanelet pose of (id=34981, s=30) is suppose to be
 //  *                               (id=34579, s=30 - length of 34585 - length of 34981)
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, CanonicalizePositive)
+// TEST_F(HdMapUtilsTest_StandardMap, CanonicalizePositive)
 // {
 //   double non_canonicalized_lanelet_s = 30.0;
 //   const auto canonicalized_lanelet_pose =
@@ -384,7 +384,7 @@
 //  * range [0,length_of_the_lanelet]
 //  * Canonicalized lanelet pose of (id=34981, s=2) is suppose to be the same.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, Canonicalize)
+// TEST_F(HdMapUtilsTest_StandardMap, Canonicalize)
 // {
 //   const double non_canonicalized_lanelet_s = 2.0;
 //   const auto canonicalized_lanelet_pose =
@@ -406,7 +406,7 @@
 //  *                               (id=34981, s=-22 + length of 34636 + length of 34981)
 //  *                               (id=34600, s=-22 + length of 34648 + length of 34600)
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, CanonicalizeAllNegative)
+// TEST_F(HdMapUtilsTest_StandardMap, CanonicalizeAllNegative)
 // {
 //   const double non_canonicalized_lanelet_s = -22.0;
 //   const auto canonicalized_lanelet_poses = hdmap_utils.getAllCanonicalizedLaneletPoses(
@@ -441,7 +441,7 @@
 //  *                               (id=34564, s=30 - length of 34636 - length of 34981)
 //  *                               (id=34630, s=30 - length of 34651 - length of 34981)
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, CanonicalizeAllPositive)
+// TEST_F(HdMapUtilsTest_StandardMap, CanonicalizeAllPositive)
 // {
 //   const double non_canonicalized_lanelet_s = 30.0;
 //   const auto canonicalized_lanelet_poses = hdmap_utils.getAllCanonicalizedLaneletPoses(
@@ -470,7 +470,7 @@
 //  * range [0,length_of_the_lanelet]
 //  * Canonicalized lanelet pose of (id=34981, s=2) is supposed to be the same.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, CanonicalizeAll)
+// TEST_F(HdMapUtilsTest_StandardMap, CanonicalizeAll)
 // {
 //   const double non_canonicalized_lanelet_s = 2.0;
 //   const auto canonicalized_lanelet_poses = hdmap_utils.getAllCanonicalizedLaneletPoses(
@@ -484,40 +484,50 @@
 // /**
 //  * @note Testcase for countLaneChanges() function
 //  */
-// TEST_F(LaneletWapperTest_FourTrackHighwayMap, CountLaneChangesAlongRoute)
+// TEST_F(HdMapUtilsTest_FourTrackHighwayMap, CountLaneChangesAlongRoute)
 // {
 //   using traffic_simulator::helper::constructLaneletPose;
+//   traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
+//   lane_changeable_routing_configuration.allow_lane_change = true;
 //   EXPECT_EQ(
 //     hdmap_utils.countLaneChanges(
-//       constructLaneletPose(3002176, 0), constructLaneletPose(3002175, 0), true),
+//       constructLaneletPose(3002176, 0), constructLaneletPose(3002175, 0),
+//       lane_changeable_routing_configuration),
 //     std::make_pair(1, 0));
 //   EXPECT_EQ(
 //     hdmap_utils.countLaneChanges(
-//       constructLaneletPose(3002176, 0), constructLaneletPose(3002182, 0), true),
+//       constructLaneletPose(3002176, 0), constructLaneletPose(3002182, 0),
+//       lane_changeable_routing_configuration),
 //     std::make_pair(1, 0));
 //   EXPECT_EQ(
 //     hdmap_utils.countLaneChanges(
-//       constructLaneletPose(3002176, 0), constructLaneletPose(199, 0), true),
+//       constructLaneletPose(3002176, 0), constructLaneletPose(199, 0),
+//       lane_changeable_routing_configuration),
 //     std::make_pair(1, 0));
 //   EXPECT_EQ(
 //     hdmap_utils.countLaneChanges(
-//       constructLaneletPose(3002176, 0), constructLaneletPose(3002176, 0), true),
+//       constructLaneletPose(3002176, 0), constructLaneletPose(3002176, 0),
+//       lane_changeable_routing_configuration),
 //     std::make_pair(0, 0));
 //   EXPECT_EQ(
 //     hdmap_utils.countLaneChanges(
-//       constructLaneletPose(3002176, 0), constructLaneletPose(200, 0), true),
+//       constructLaneletPose(3002176, 0), constructLaneletPose(200, 0),
+//       lane_changeable_routing_configuration),
 //     std::make_pair(0, 0));
 //   EXPECT_EQ(
 //     hdmap_utils.countLaneChanges(
-//       constructLaneletPose(3002176, 0), constructLaneletPose(201, 0), true),
+//       constructLaneletPose(3002176, 0), constructLaneletPose(201, 0),
+//       lane_changeable_routing_configuration),
 //     std::make_pair(0, 1));
 //   EXPECT_EQ(
 //     hdmap_utils.countLaneChanges(
-//       constructLaneletPose(3002176, 0), constructLaneletPose(202, 0), true),
+//       constructLaneletPose(3002176, 0), constructLaneletPose(202, 0),
+//       lane_changeable_routing_configuration),
 //     std::make_pair(0, 2));
 //   EXPECT_EQ(
 //     hdmap_utils.countLaneChanges(
-//       constructLaneletPose(3002176, 0), constructLaneletPose(206, 0), true),
+//       constructLaneletPose(3002176, 0), constructLaneletPose(206, 0),
+//       lane_changeable_routing_configuration),
 //     std::make_pair(0, 2));
 // }
 
@@ -525,7 +535,7 @@
 //  * @note Test basic functionality.
 //  * Test filtering correctness with some lanelet ids and a valid subtype name.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, filterLaneletIds_correct)
+// TEST_F(HdMapUtilsTest_StandardMap, filterLaneletIds_correct)
 // {
 //   const lanelet::Id id_crosswalk_0 = 34399;
 //   const lanelet::Id id_crosswalk_1 = 34385;
@@ -541,7 +551,7 @@
 // /**
 //  * @note Test function behavior when passed an empty lanelet ids vector.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, filterLaneletIds_emptyIds)
+// TEST_F(HdMapUtilsTest_StandardMap, filterLaneletIds_emptyIds)
 // {
 //   EXPECT_TRUE(hdmap_utils.filterLaneletIds({}, "crosswalk").empty());
 // }
@@ -549,7 +559,7 @@
 // /**
 //  * @note Test function behavior when passed an invalid subtype name.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, filterLaneletIds_invalidSubtype)
+// TEST_F(HdMapUtilsTest_StandardMap, filterLaneletIds_invalidSubtype)
 // {
 //   EXPECT_TRUE(
 //     hdmap_utils.filterLaneletIds({34399, 34385, 34600, 34675}, "invalid_subtype").empty());
@@ -558,7 +568,7 @@
 // /**
 //  * @note Test function behavior when passed a vector of invalid lanelet ids.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, filterLaneletIds_invalidIds)
+// TEST_F(HdMapUtilsTest_StandardMap, filterLaneletIds_invalidIds)
 // {
 //   EXPECT_THROW(
 //     auto filtered = hdmap_utils.filterLaneletIds({10000000, 10000001, 10000002}, "crosswalk"),
@@ -571,7 +581,7 @@
 //  * with a position in the middle of the lane and relatively big distance threshold
 //  * - the goal is to test successful scenario when there should be lanelets returned.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getNearbyLaneletIds)
+// TEST_F(HdMapUtilsTest_StandardMap, getNearbyLaneletIds)
 // {
 //   EXPECT_EQ(
 //     hdmap_utils.getNearbyLaneletIds(
@@ -585,7 +595,7 @@
 //  * with a position on the side of the map and with fairly small distance threshold
 //  * - the goal is to test unsuccessful scenario when there should be no lanelets returned.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getNearbyLaneletIds_unsuccessful)
+// TEST_F(HdMapUtilsTest_StandardMap, getNearbyLaneletIds_unsuccessful)
 // {
 //   EXPECT_TRUE(
 //     hdmap_utils
@@ -599,7 +609,7 @@
 //  * (with a crosswalk) with a position on the side of the map and with fairly small distance threshold
 //  * - the goal is to test unsuccessful scenario when there should be no lanelets returned.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getNearbyLaneletIds_crosswalkUnsuccessful)
+// TEST_F(HdMapUtilsTest_StandardMap, getNearbyLaneletIds_crosswalkUnsuccessful)
 // {
 //   EXPECT_TRUE(
 //     hdmap_utils
@@ -612,7 +622,7 @@
 //  * Test collision point calculations
 //  * correctness with ids of a road and a crosswalk that do intersect.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getCollisionPointInLaneCoordinate_intersects)
+// TEST_F(HdMapUtilsTest_StandardMap, getCollisionPointInLaneCoordinate_intersects)
 // {
 //   auto distance = hdmap_utils.getCollisionPointInLaneCoordinate(34633, 34399);
 
@@ -625,7 +635,7 @@
 //  * Test collision point calculations
 //  * correctness with ids of a road and a crosswalk that do not intersect.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getCollisionPointInLaneCoordinate_disjoint)
+// TEST_F(HdMapUtilsTest_StandardMap, getCollisionPointInLaneCoordinate_disjoint)
 // {
 //   EXPECT_FALSE(hdmap_utils.getCollisionPointInLaneCoordinate(34579, 34399).has_value());
 // }
@@ -633,7 +643,7 @@
 // /**
 //  * @note Test function behavior when called with an id of non existing lanelet.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getCollisionPointInLaneCoordinate_invalidLanelet)
+// TEST_F(HdMapUtilsTest_StandardMap, getCollisionPointInLaneCoordinate_invalidLanelet)
 // {
 //   EXPECT_THROW(hdmap_utils.getCollisionPointInLaneCoordinate(1000000, 34399), std::runtime_error);
 // }
@@ -641,7 +651,7 @@
 // /**
 //  * @note Test function behavior when called with an id of non existing crosswalk lanelet.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getCollisionPointInLaneCoordinate_invalidCrosswalkLanelet)
+// TEST_F(HdMapUtilsTest_StandardMap, getCollisionPointInLaneCoordinate_invalidCrosswalkLanelet)
 // {
 //   EXPECT_THROW(hdmap_utils.getCollisionPointInLaneCoordinate(34600, 1000000), std::runtime_error);
 // }
@@ -652,7 +662,7 @@
 //  * positioned on a given lanelet with the given matching distance
 //  * - the goal is to test a regular usecase of correct conversion.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, toLaneletPose_correct)
+// TEST_F(HdMapUtilsTest_StandardMap, toLaneletPose_correct)
 // {
 //   const auto lanelet_pose = hdmap_utils.toLaneletPose(
 //     makePose(makePoint(3790.0, 73757.0), makeQuaternionFromYaw(M_PI + M_PI_2 / 3.0)),
@@ -679,7 +689,7 @@
 //  * - the normal vector to the nearest point on the spline
 //  * is negative - meaning the offset should be calculated negative
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, toLaneletPose_negativeOffset)
+// TEST_F(HdMapUtilsTest_StandardMap, toLaneletPose_negativeOffset)
 // {
 //   const double yaw = M_PI + M_PI_2 / 3.0;  // angle to make pose aligned with the lanelet
 
@@ -711,7 +721,7 @@
 //  * - the goal is to test the branch of execution where alignment with the lanelet
 //  * is checked and if pose is nor oriented in similar direction the result is decided incorrect.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, toLaneletPose_reverse)
+// TEST_F(HdMapUtilsTest_StandardMap, toLaneletPose_reverse)
 // {
 //   EXPECT_FALSE(
 //     hdmap_utils
@@ -724,7 +734,7 @@
 //  * @note Test function behavior when passed a pose that is away
 //  * from the given lanelet (over the matching distance).
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, toLaneletPose_notOnLanelet)
+// TEST_F(HdMapUtilsTest_StandardMap, toLaneletPose_notOnLanelet)
 // {
 //   EXPECT_FALSE(
 //     hdmap_utils
@@ -739,7 +749,7 @@
 //  * @note test function behavior when passed an empty vector
 //  * of lanelet ids (for the vector specialization).
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, toLaneletPose_empty)
+// TEST_F(HdMapUtilsTest_StandardMap, toLaneletPose_empty)
 // {
 //   EXPECT_FALSE(hdmap_utils
 //                  .toLaneletPose(
@@ -758,7 +768,7 @@
 //  * the matching_distance. In this situation the previous lanelet has to be matched
 //  * - so the loop over previous lanelets is executed.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, toLaneletPose_boundingBoxMatchPrevious)
+// TEST_F(HdMapUtilsTest_StandardMap, toLaneletPose_boundingBoxMatchPrevious)
 // {
 //   EXPECT_LANELET_POSE_NEAR(
 //     hdmap_utils
@@ -782,7 +792,7 @@
 //  * Test speed limit obtaining correctness
 //  * with ids of lanelets that have different speed limits.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getSpeedLimit_correct)
+// TEST_F(HdMapUtilsTest_StandardMap, getSpeedLimit_correct)
 // {
 //   EXPECT_NEAR(hdmap_utils.getSpeedLimit(lanelet::Ids{34600, 34675}), 50.0 / 3.6, 0.01);
 // }
@@ -790,7 +800,7 @@
 // /**
 //  * @note Test function behavior when crosswalk lanelet id is included in the vector.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getSpeedLimit_crosswalk)
+// TEST_F(HdMapUtilsTest_StandardMap, getSpeedLimit_crosswalk)
 // {
 //   EXPECT_NEAR(hdmap_utils.getSpeedLimit(lanelet::Ids{34399, 34385, 34600, 34675}), 0.0 / 3.6, 0.01);
 // }
@@ -798,7 +808,7 @@
 // /**
 //  * @note Test function behavior when an empty vector is passed.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getSpeedLimit_empty)
+// TEST_F(HdMapUtilsTest_StandardMap, getSpeedLimit_empty)
 // {
 //   EXPECT_THROW(hdmap_utils.getSpeedLimit(lanelet::Ids{}), std::runtime_error);
 // }
@@ -808,7 +818,7 @@
 //  * Test obtaining closest lanelet id with a pose near
 //  * the road lanelet (closer than the distance_threshold).
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getClosestLaneletId_near)
+// TEST_F(HdMapUtilsTest_StandardMap, getClosestLaneletId_near)
 // {
 //   const auto result =
 //     hdmap_utils.getClosestLaneletId(makePose(makePoint(3818.91, 73787.95)), 1.0, false);
@@ -822,7 +832,7 @@
 //  * Test obtaining closest lanelet id with a pose far
 //  * from the road lanelet (further than the distance_threshold).
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getClosestLaneletId_away)
+// TEST_F(HdMapUtilsTest_StandardMap, getClosestLaneletId_away)
 // {
 //   EXPECT_FALSE(hdmap_utils.getClosestLaneletId(makePose(makePoint(3775.82, 73743.29)), 1.0, false)
 //                  .has_value());
@@ -836,7 +846,7 @@
 //  * - the goal is to test whether the function returns road lanelet,
 //  * when the crosswalk is closer, but should not be included.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getClosestLaneletId_crosswalkCloserButExcluded)
+// TEST_F(HdMapUtilsTest_StandardMap, getClosestLaneletId_crosswalkCloserButExcluded)
 // {
 //   const auto result =
 //     hdmap_utils.getClosestLaneletId(makePose(makePoint(3774.73, 73744.38)), 5.0, false);
@@ -854,7 +864,7 @@
 //  * - the goal is to test scenario when the only lanelet in the
 //  * considered distance is crosswalk, but should not be included.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getClosestLaneletId_onlyCrosswalkNearButExcluded)
+// TEST_F(HdMapUtilsTest_StandardMap, getClosestLaneletId_onlyCrosswalkNearButExcluded)
 // {
 //   const auto pose = makePose(makePoint(3774.73, 73744.38));
 //   const double distance_threshold = 2.0;
@@ -880,7 +890,7 @@
 //  * @note Test function behavior when the map contains no lanelets - the goal is to test
 //  * the branch when findNearest does not find anything and returns an empty vector.
 //  */
-// TEST_F(LaneletWapperTest_EmptyMap, getClosestLaneletId_emptyMap)
+// TEST_F(HdMapUtilsTest_EmptyMap, getClosestLaneletId_emptyMap)
 // {
 //   EXPECT_FALSE(
 //     hdmap_utils.getClosestLaneletId(makePose(makePoint(3.0, 5.0)), 7.0, false).has_value());
@@ -891,7 +901,7 @@
 //  * Test previous lanelets id obtaining correctness
 //  * with a lanelet that has a lanelet preceding it.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getPreviousLaneletIds)
+// TEST_F(HdMapUtilsTest_StandardMap, getPreviousLaneletIds)
 // {
 //   const auto result_ids = hdmap_utils.getPreviousLaneletIds(34468);
 //   EXPECT_EQ(result_ids.size(), static_cast<std::size_t>(1));
@@ -905,7 +915,7 @@
 //  * Test previous lanelets id obtaining correctness
 //  * with a lanelet that has a lanelet preceding it and is a shoulder lane.
 //  */
-// TEST_F(LaneletWapperTest_WithRoadShoulderMap, getPreviousLaneletIds_RoadShoulder)
+// TEST_F(HdMapUtilsTest_WithRoadShoulderMap, getPreviousLaneletIds_RoadShoulder)
 // {
 //   const auto result_ids = hdmap_utils.getPreviousLaneletIds(34768);
 //   EXPECT_EQ(result_ids.size(), static_cast<std::size_t>(1));
@@ -919,7 +929,7 @@
 //  * Test previous lanelets id obtaining correctness
 //  * with a lanelet that has several lanelets preceding it.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getPreviousLaneletIds_multiplePrevious)
+// TEST_F(HdMapUtilsTest_StandardMap, getPreviousLaneletIds_multiplePrevious)
 // {
 //   lanelet::Ids prev_lanelets = {34411, 34465};
 //   auto result_ids = hdmap_utils.getPreviousLaneletIds(34462);
@@ -937,7 +947,7 @@
 //  * - the goal is to test the function specialization that takes a direction as an argument
 //  * and returns only the previous lanelets that have this turn direction.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getPreviousLaneletIds_direction)
+// TEST_F(HdMapUtilsTest_StandardMap, getPreviousLaneletIds_direction)
 // {
 //   const lanelet::Id curr_lanelet = 34462;
 //   const lanelet::Id prev_lanelet_left = 34411;
@@ -964,7 +974,7 @@
 //  * Test next lanelets id obtaining correctness
 //  * with a lanelet that has a lanelet following it.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getNextLaneletIds)
+// TEST_F(HdMapUtilsTest_StandardMap, getNextLaneletIds)
 // {
 //   const auto result_ids = hdmap_utils.getNextLaneletIds(120660);
 //   EXPECT_EQ(result_ids.size(), static_cast<std::size_t>(1));
@@ -978,7 +988,7 @@
 //  * Test next lanelets id obtaining correctness
 //  * with a lanelet that has a lanelet following it and is a shoulder lane.
 //  */
-// TEST_F(LaneletWapperTest_WithRoadShoulderMap, getNextLaneletIds_RoadShoulder)
+// TEST_F(HdMapUtilsTest_WithRoadShoulderMap, getNextLaneletIds_RoadShoulder)
 // {
 //   const auto result_ids = hdmap_utils.getNextLaneletIds(34696);
 //   EXPECT_EQ(result_ids.size(), static_cast<std::size_t>(1));
@@ -992,7 +1002,7 @@
 //  * Test next lanelets id obtaining correctness
 //  * with a lanelet that has several lanelets following it.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getNextLaneletIds_multipleNext)
+// TEST_F(HdMapUtilsTest_StandardMap, getNextLaneletIds_multipleNext)
 // {
 //   lanelet::Ids next_lanelets = {34438, 34465};
 //   auto result_ids = hdmap_utils.getNextLaneletIds(34468);
@@ -1010,7 +1020,7 @@
 //  * - the goal is to test the function specialization that takes a direction as an argument
 //  * and returns only the next lanelets that have this turn direction.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getNextLaneletIds_direction)
+// TEST_F(HdMapUtilsTest_StandardMap, getNextLaneletIds_direction)
 // {
 //   const lanelet::Id curr_lanelet = 34468;
 
@@ -1035,7 +1045,7 @@
 //  * Test on route checking correctness
 //  * with a route and a lanelet that is on the route.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, isInRoute_onRoute)
+// TEST_F(HdMapUtilsTest_StandardMap, isInRoute_onRoute)
 // {
 //   EXPECT_TRUE(hdmap_utils.isInRoute(34850, lanelet::Ids{34741, 34850, 34603, 34777}));
 // }
@@ -1045,7 +1055,7 @@
 //  * Test on route checking correctness
 //  * with a route and a lanelet that is not on the route.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, isInRoute_notOnRoute)
+// TEST_F(HdMapUtilsTest_StandardMap, isInRoute_notOnRoute)
 // {
 //   EXPECT_FALSE(hdmap_utils.isInRoute(34468, lanelet::Ids{34741, 34850, 34603, 34777}));
 // }
@@ -1053,7 +1063,7 @@
 // /**
 //  * @note Test function behavior when an empty vector is passed.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, isInRoute_empty)
+// TEST_F(HdMapUtilsTest_StandardMap, isInRoute_empty)
 // {
 //   EXPECT_FALSE(hdmap_utils.isInRoute(34468, lanelet::Ids{}));
 // }
@@ -1063,7 +1073,7 @@
 //  * Test in lanelet presence correctness
 //  * with a position that is in the given lanelet.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, isInLanelet_correct)
+// TEST_F(HdMapUtilsTest_StandardMap, isInLanelet_correct)
 // {
 //   EXPECT_TRUE(hdmap_utils.isInLanelet(34696, 10.0));
 // }
@@ -1073,7 +1083,7 @@
 //  * Test in lanelet presence correctness
 //  * with a position that is after the given lanelet.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, isInLanelet_after)
+// TEST_F(HdMapUtilsTest_StandardMap, isInLanelet_after)
 // {
 //   const lanelet::Id lanelet_id = 34696;
 //   EXPECT_FALSE(hdmap_utils.isInLanelet(lanelet_id, hdmap_utils.getLaneletLength(lanelet_id) + 5.0));
@@ -1084,7 +1094,7 @@
 //  * Test in lanelet presence correctness
 //  * with a position that is before the given lanelet.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, isInLanelet_before)
+// TEST_F(HdMapUtilsTest_StandardMap, isInLanelet_before)
 // {
 //   EXPECT_FALSE(hdmap_utils.isInLanelet(34696, -5.0));
 // }
@@ -1094,7 +1104,7 @@
 //  * Test lanelet to map point transform correctness
 //  * with a vector of several s larger than 0 but smaller than the lanelet length.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, toMapPoints_correctPoints)
+// TEST_F(HdMapUtilsTest_StandardMap, toMapPoints_correctPoints)
 // {
 //   const auto points = hdmap_utils.toMapPoints(34696, std::vector<double>{10.0, 20.0, 30.0});
 
@@ -1107,7 +1117,7 @@
 // /**
 //  * @note Test function behavior when called with a negative s.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, toMapPoints_negativeS)
+// TEST_F(HdMapUtilsTest_StandardMap, toMapPoints_negativeS)
 // {
 //   const auto points = hdmap_utils.toMapPoints(34696, std::vector<double>{-10.0, -20.0, -30.0});
 
@@ -1121,7 +1131,7 @@
 // /**
 //  * @note Test function behavior when called with a value of s larger than the lanelet length.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, toMapPoints_sLargerThanLaneletLength)
+// TEST_F(HdMapUtilsTest_StandardMap, toMapPoints_sLargerThanLaneletLength)
 // {
 //   const lanelet::Id lanelet_id = 34696;
 
@@ -1139,7 +1149,7 @@
 // /**
 //  * @note Test function behavior when called with an empty vector.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, toMapPoints_empty)
+// TEST_F(HdMapUtilsTest_StandardMap, toMapPoints_empty)
 // {
 //   std::vector<geometry_msgs::msg::Point> points;
 
@@ -1154,7 +1164,7 @@
 //  * with a position on the lanelet and a small offset (e.g. 0.5) - test the specialization
 //  * taking a lanelet id, s and an offset as parameters.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, toMapPose_onlyOffset)
+// TEST_F(HdMapUtilsTest_StandardMap, toMapPose_onlyOffset)
 // {
 //   const auto map_pose =
 //     hdmap_utils.toMapPose(traffic_simulator::helper::constructLaneletPose(34696, 10.0, 0.5));
@@ -1170,7 +1180,7 @@
 //  * on the lanelet and additional rotation of 90 degrees
 //  * - test the specialization taking a lanelet pose object as a parameter.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, toMapPose_additionalRotation)
+// TEST_F(HdMapUtilsTest_StandardMap, toMapPose_additionalRotation)
 // {
 //   const auto map_pose = hdmap_utils.toMapPose(
 //     traffic_simulator::helper::constructLaneletPose(34696, 10.0, 0.0, 0.0, 0.0, M_PI_4));
@@ -1184,7 +1194,7 @@
 // /**
 //  * @note Test function behavior when called with a negative s.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, toMapPose_negativeS)
+// TEST_F(HdMapUtilsTest_StandardMap, toMapPose_negativeS)
 // {
 //   geometry_msgs::msg::PoseStamped map_pose;
 //   EXPECT_NO_THROW(
@@ -1199,7 +1209,7 @@
 // /**
 //  * @note Test function behavior when called with a value of s larger than the lanelet length.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, toMapPose_sLargerThanLaneletLength)
+// TEST_F(HdMapUtilsTest_StandardMap, toMapPose_sLargerThanLaneletLength)
 // {
 //   const lanelet::Id lanelet_id = 34696;
 
@@ -1218,7 +1228,7 @@
 //  * Test changeable lanelets id obtaining with a lanelet
 //  * that has no changeable lanelets and direction = STRAIGHT.
 //  */
-// TEST_F(LaneletWapperTest_FourTrackHighwayMap, getLaneChangeableLaneletId_straight)
+// TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLaneChangeableLaneletId_straight)
 // {
 //   const lanelet::Id start_and_end_lanelet = 199;
 //   const auto result_lanelet = hdmap_utils.getLaneChangeableLaneletId(
@@ -1233,7 +1243,7 @@
 //  * Test changeable lanelets id obtaining
 //  * with a lanelet that has no changeable lanelets and direction = LEFT.
 //  */
-// TEST_F(LaneletWapperTest_FourTrackHighwayMap, getLaneChangeableLaneletId_leftNoChangeable)
+// TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLaneChangeableLaneletId_leftNoChangeable)
 // {
 //   EXPECT_FALSE(
 //     hdmap_utils.getLaneChangeableLaneletId(199, traffic_simulator::lane_change::Direction::LEFT)
@@ -1245,7 +1255,7 @@
 //  * Test changeable lanelets id obtaining with
 //  * a lanelet that has changeable lanelets (left direction) and direction = LEFT.
 //  */
-// TEST_F(LaneletWapperTest_FourTrackHighwayMap, getLaneChangeableLaneletId_leftChangeable)
+// TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLaneChangeableLaneletId_leftChangeable)
 // {
 //   const auto result_lanelet =
 //     hdmap_utils.getLaneChangeableLaneletId(200, traffic_simulator::lane_change::Direction::LEFT);
@@ -1259,7 +1269,7 @@
 //  * Test changeable lanelets id obtaining
 //  * with a lanelet that has no changeable lanelets and direction = RIGHT.
 //  */
-// TEST_F(LaneletWapperTest_FourTrackHighwayMap, getLaneChangeableLaneletId_rightNoChangeable)
+// TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLaneChangeableLaneletId_rightNoChangeable)
 // {
 //   EXPECT_FALSE(
 //     hdmap_utils.getLaneChangeableLaneletId(202, traffic_simulator::lane_change::Direction::RIGHT)
@@ -1271,7 +1281,7 @@
 //  * Test changeable lanelets id obtaining with
 //  * a lanelet that has changeable lanelets (right direction) and direction = RIGHT.
 //  */
-// TEST_F(LaneletWapperTest_FourTrackHighwayMap, getLaneChangeableLaneletId_rightChangeable)
+// TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLaneChangeableLaneletId_rightChangeable)
 // {
 //   const auto result_lanelet =
 //     hdmap_utils.getLaneChangeableLaneletId(200, traffic_simulator::lane_change::Direction::RIGHT);
@@ -1286,7 +1296,7 @@
 //  * with a lanelet that has at least two changeable lanes to the left,
 //  * direction = LEFT and shift = 2.
 //  */
-// TEST_F(LaneletWapperTest_FourTrackHighwayMap, getLaneChangeableLaneletId_shift2LeftPossible)
+// TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLaneChangeableLaneletId_shift2LeftPossible)
 // {
 //   const auto result_lanelet =
 //     hdmap_utils.getLaneChangeableLaneletId(201, traffic_simulator::lane_change::Direction::LEFT, 2);
@@ -1302,7 +1312,7 @@
 //  * - the goal is to test the branch where we expect lanelet id
 //  * for shifting 2 times left, but shifting 2 lanes is not possible.
 //  */
-// TEST_F(LaneletWapperTest_FourTrackHighwayMap, getLaneChangeableLaneletId_shift2LeftNotPossible)
+// TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLaneChangeableLaneletId_shift2LeftNotPossible)
 // {
 //   EXPECT_FALSE(
 //     hdmap_utils.getLaneChangeableLaneletId(200, traffic_simulator::lane_change::Direction::LEFT, 2)
@@ -1315,7 +1325,7 @@
 //  * with a lanelet that has at least two changeable lanes to the right,
 //  * direction = RIGHT and shift = 2.
 //  */
-// TEST_F(LaneletWapperTest_FourTrackHighwayMap, getLaneChangeableLaneletId_shift2RightPossible)
+// TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLaneChangeableLaneletId_shift2RightPossible)
 // {
 //   const auto result_lanelet = hdmap_utils.getLaneChangeableLaneletId(
 //     200, traffic_simulator::lane_change::Direction::RIGHT, 2);
@@ -1331,7 +1341,7 @@
 //  * direction = RIGHT and shift = 2 - the goal is to test the branch where
 //  * we expect lanelet id for shifting 2 times right, but shifting 2 lanes is not possible.
 //  */
-// TEST_F(LaneletWapperTest_FourTrackHighwayMap, getLaneChangeableLaneletId_shift2RightNotPossible)
+// TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLaneChangeableLaneletId_shift2RightNotPossible)
 // {
 //   EXPECT_FALSE(
 //     hdmap_utils.getLaneChangeableLaneletId(201, traffic_simulator::lane_change::Direction::RIGHT, 2)
@@ -1341,7 +1351,7 @@
 // /**
 //  * @note Test function behavior when called with a direction = RIGHT and shift = 0.
 //  */
-// TEST_F(LaneletWapperTest_FourTrackHighwayMap, getLaneChangeableLaneletId_shift0)
+// TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLaneChangeableLaneletId_shift0)
 // {
 //   const lanelet::Id start_and_end_lanelet = 201;
 //   const auto result_lanelet = hdmap_utils.getLaneChangeableLaneletId(
@@ -1355,7 +1365,7 @@
 //  * @note Test basic functionality.
 //  * Test traffic lights id obtaining correctness.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getTrafficLightIds_correct)
+// TEST_F(HdMapUtilsTest_StandardMap, getTrafficLightIds_correct)
 // {
 //   auto result_traffic_lights = hdmap_utils.getTrafficLightIds();
 
@@ -1366,7 +1376,7 @@
 // /**
 //  * @note Test function behavior when there are no traffic lights on the map.
 //  */
-// TEST_F(LaneletWapperTest_FourTrackHighwayMap, getTrafficLightIds_noTrafficLight)
+// TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getTrafficLightIds_noTrafficLight)
 // {
 //   EXPECT_EQ(hdmap_utils.getTrafficLightIds().size(), static_cast<size_t>(0));
 // }
@@ -1376,7 +1386,7 @@
 //  * Test traffic light position obtaining
 //  * with a traffic light and bulb color specified.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getTrafficLightBulbPosition_correct)
+// TEST_F(HdMapUtilsTest_StandardMap, getTrafficLightBulbPosition_correct)
 // {
 //   const lanelet::Id light_id = 34802;
 //   const double epsilon = 0.1;
@@ -1413,7 +1423,7 @@
 //  * with an id of a traffic light that does not exist
 //  * - the goal is to test the branch when no traffic light is selected.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getTrafficLightBulbPosition_invalidTrafficLight)
+// TEST_F(HdMapUtilsTest_StandardMap, getTrafficLightBulbPosition_invalidTrafficLight)
 // {
 //   EXPECT_FALSE(hdmap_utils.getTrafficLightBulbPosition(1000003, "red").has_value());
 // }
@@ -1423,7 +1433,7 @@
 //  * Test obtaining conflicting lanelets correctness
 //  * with lanelets that do conflict with other lanelets.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getConflictingLaneIds_conflicting)
+// TEST_F(HdMapUtilsTest_StandardMap, getConflictingLaneIds_conflicting)
 // {
 //   lanelet::Ids actual_ids = {34495, 34498};
 //   auto result_ids = hdmap_utils.getConflictingLaneIds({34510});
@@ -1438,7 +1448,7 @@
 //  * Test obtaining conflicting lanelets correctness
 //  * with lanelets that do not conflict with any other lanelets.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getConflictingLaneIds_notConflicting)
+// TEST_F(HdMapUtilsTest_StandardMap, getConflictingLaneIds_notConflicting)
 // {
 //   EXPECT_EQ(hdmap_utils.getConflictingLaneIds({34513}).size(), static_cast<std::size_t>(0));
 // }
@@ -1446,7 +1456,7 @@
 // /**
 //  * @note Test function behavior when called with an empty vector.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getConflictingLaneIds_empty)
+// TEST_F(HdMapUtilsTest_StandardMap, getConflictingLaneIds_empty)
 // {
 //   EXPECT_EQ(hdmap_utils.getConflictingLaneIds({}).size(), static_cast<std::size_t>(0));
 // }
@@ -1456,7 +1466,7 @@
 //  * Test obtaining conflicting crosswalk lanelets
 //  * correctness with lanelets that do conflict with crosswalk lanelets.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getConflictingCrosswalkIds_conflicting)
+// TEST_F(HdMapUtilsTest_StandardMap, getConflictingCrosswalkIds_conflicting)
 // {
 //   lanelet::Ids actual_ids = {34399, 34385};
 //   auto result_ids = hdmap_utils.getConflictingCrosswalkIds({34633});
@@ -1472,7 +1482,7 @@
 //  * correctness with lanelets that do not conflict with any crosswalk lanelets,
 //  * but do conflict with vehicle lanelets.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getConflictingCrosswalkIds_notConflictingWithCrosswalk)
+// TEST_F(HdMapUtilsTest_StandardMap, getConflictingCrosswalkIds_notConflictingWithCrosswalk)
 // {
 //   EXPECT_EQ(hdmap_utils.getConflictingCrosswalkIds({34510}).size(), static_cast<std::size_t>(0));
 // }
@@ -1482,7 +1492,7 @@
 //  * Test obtaining conflicting crosswalk lanelets
 //  * correctness with lanelets that do not conflict with any other lanelets.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getConflictingCrosswalkIds_notConflicting)
+// TEST_F(HdMapUtilsTest_StandardMap, getConflictingCrosswalkIds_notConflicting)
 // {
 //   EXPECT_EQ(hdmap_utils.getConflictingCrosswalkIds({34513}).size(), static_cast<std::size_t>(0));
 // }
@@ -1490,7 +1500,7 @@
 // /**
 //  * @note Test function behavior when called with an empty vector.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getConflictingCrosswalkIds_empty)
+// TEST_F(HdMapUtilsTest_StandardMap, getConflictingCrosswalkIds_empty)
 // {
 //   EXPECT_EQ(hdmap_utils.getConflictingCrosswalkIds({}).size(), static_cast<std::size_t>(0));
 // }
@@ -1501,7 +1511,7 @@
 //  * with a correct vector of lanelets and the reference lanelet
 //  * also correct and reasonable forward distance.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, clipTrajectoryFromLaneletIds_correct)
+// TEST_F(HdMapUtilsTest_StandardMap, clipTrajectoryFromLaneletIds_correct)
 // {
 //   const lanelet::Id start_id = 34600;
 //   const auto result_trajectory = hdmap_utils.clipTrajectoryFromLaneletIds(
@@ -1527,7 +1537,7 @@
 //  * with a correct vector of lanelets and the reference
 //  * lanelet not on the trajectory and reasonable forward distance.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, clipTrajectoryFromLaneletIds_startNotOnTrajectory)
+// TEST_F(HdMapUtilsTest_StandardMap, clipTrajectoryFromLaneletIds_startNotOnTrajectory)
 // {
 //   EXPECT_EQ(
 //     hdmap_utils.clipTrajectoryFromLaneletIds(34606, 40.0, lanelet::Ids{34600, 34594, 34621}, 10.0)
@@ -1538,7 +1548,7 @@
 // /**
 //  * @note Test function behavior when passed an empty trajectory vector.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, clipTrajectoryFromLaneletIds_emptyTrajectory)
+// TEST_F(HdMapUtilsTest_StandardMap, clipTrajectoryFromLaneletIds_emptyTrajectory)
 // {
 //   EXPECT_EQ(
 //     hdmap_utils.clipTrajectoryFromLaneletIds(34600, 40.0, lanelet::Ids{}, 10.0).size(),
@@ -1551,7 +1561,7 @@
 //  * with a correct vector of lanelets, and the reference lanelet
 //  * also correct and forward distance fairly small (e.g. 2).
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, clipTrajectoryFromLaneletIds_smallForwardDistance)
+// TEST_F(HdMapUtilsTest_StandardMap, clipTrajectoryFromLaneletIds_smallForwardDistance)
 // {
 //   const lanelet::Id start_id = 34600;
 
@@ -1570,7 +1580,7 @@
 //  * Test following lanelets obtaining with
 //  * a lanelet that has lanelets after it longer than parameter distance.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getFollowingLanelets_straightAfter)
+// TEST_F(HdMapUtilsTest_StandardMap, getFollowingLanelets_straightAfter)
 // {
 //   const lanelet::Id id = 120660;
 //   EXPECT_EQ(hdmap_utils.getFollowingLanelets(id, 1.0, true), (lanelet::Ids{id, 34468}));
@@ -1582,7 +1592,7 @@
 //  * that has lanelets after it longer than parameter distance, but the following lanelets
 //  * go through a curve (e.g there was an order to go right earlier on the lane).
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getFollowingLanelets_curveAfter)
+// TEST_F(HdMapUtilsTest_StandardMap, getFollowingLanelets_curveAfter)
 // {
 //   const lanelet::Id id = 34564;
 //   EXPECT_EQ(hdmap_utils.getFollowingLanelets(id, 40.0, true), (lanelet::Ids{id, 34411, 34462}));
@@ -1594,7 +1604,7 @@
 //  * that has lanelets after it for less than specified in the distance parameter
 //  * - the goal is for the function to return trajectory shorter than distance specified.
 //  */
-// TEST_F(LaneletWapperTest_FourTrackHighwayMap, getFollowingLanelets_notEnoughLaneletsAfter)
+// TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getFollowingLanelets_notEnoughLaneletsAfter)
 // {
 //   const lanelet::Id id = 199;
 //   EXPECT_EQ(hdmap_utils.getFollowingLanelets(id, 1.0e3, true), (lanelet::Ids{id, 203}));
@@ -1605,7 +1615,7 @@
 //  * Test following lanelets obtaining
 //  * with a candidate trajectory longer than the given distance.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getFollowingLanelets_candidateTrajectory)
+// TEST_F(HdMapUtilsTest_StandardMap, getFollowingLanelets_candidateTrajectory)
 // {
 //   const lanelet::Id id = 34564;
 //   EXPECT_EQ(
@@ -1615,11 +1625,24 @@
 
 // /**
 //  * @note Test basic functionality.
+//  * Test following lanelets obtaining
+//  * with a candidate trajectory longer than the given distance without starting lanelet.
+//  */
+// TEST_F(HdMapUtilsTest_StandardMap, getFollowingLanelets_candidateTrajectoryFalse)
+// {
+//   const lanelet::Id id = 34564;
+//   EXPECT_EQ(
+//     hdmap_utils.getFollowingLanelets(id, lanelet::Ids{id, 34495, 34507, 34795, 34606}, 40.0, false),
+//     (lanelet::Ids{34495, 34507}));
+// }
+
+// /**
+//  * @note Test basic functionality.
 //  * Test following lanelets obtaining with
 //  * a candidate trajectory shorter than the given distance
 //  * - the goal is to test generating lacking part of the trajectory.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getFollowingLanelets_candidateTrajectoryNotEnough)
+// TEST_F(HdMapUtilsTest_StandardMap, getFollowingLanelets_candidateTrajectoryNotEnough)
 // {
 //   const lanelet::Id id = 34564;
 //   EXPECT_EQ(
@@ -1631,7 +1654,7 @@
 //  * @note Test function behavior when called with a candidate trajectory
 //  * that does not contain the starting lanelet.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getFollowingLanelets_candidatesDoNotMatch)
+// TEST_F(HdMapUtilsTest_StandardMap, getFollowingLanelets_candidatesDoNotMatch)
 // {
 //   EXPECT_THROW(
 //     hdmap_utils.getFollowingLanelets(120660, lanelet::Ids{34981}, 1.0e3, true), common::Error);
@@ -1640,10 +1663,22 @@
 // /**
 //  * @note Test function behavior when an empty vector is passed.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getFollowingLanelets_candidateTrajectoryEmpty)
+// TEST_F(HdMapUtilsTest_StandardMap, getFollowingLanelets_candidateTrajectoryEmpty)
 // {
 //   EXPECT_EQ(
 //     hdmap_utils.getFollowingLanelets(120660, {}, 1.0e3, true).size(), static_cast<std::size_t>(0));
+// }
+
+// /**
+//  * @note Test function behavior when called with a candidate trajectory
+//  * that contains wrong candidates
+//  */
+// TEST_F(HdMapUtilsTest_StandardMap, getFollowingLanelets_candidatesDoNotMatchRealTrajectory)
+// {
+//   EXPECT_THROW(
+//     hdmap_utils.getFollowingLanelets(
+//       34564, lanelet::Ids{34564, 34495, 34507, 34399, 34399}, 100.0, true),
+//     common::Error);
 // }
 
 // /**
@@ -1651,7 +1686,7 @@
 //  * Test lane change possibility checking
 //  * correctness with lanelets that can be changed.
 //  */
-// TEST_F(LaneletWapperTest_FourTrackHighwayMap, canChangeLane_canChange)
+// TEST_F(HdMapUtilsTest_FourTrackHighwayMap, canChangeLane_canChange)
 // {
 //   EXPECT_TRUE(hdmap_utils.canChangeLane(199, 200));
 // }
@@ -1661,7 +1696,7 @@
 //  * Test lane change possibility checking correctness with lanelets
 //  * that can not be changed (e.g. goal lanelet is behind the start lanelet).
 //  */
-// TEST_F(LaneletWapperTest_FourTrackHighwayMap, canChangeLane_canNotChange)
+// TEST_F(HdMapUtilsTest_FourTrackHighwayMap, canChangeLane_canNotChange)
 // {
 //   EXPECT_FALSE(hdmap_utils.canChangeLane(199, 201));
 // }
@@ -1669,7 +1704,7 @@
 // /**
 //  * @note Test function behavior when either of the lanelet ids is invalid.
 //  */
-// TEST_F(LaneletWapperTest_FourTrackHighwayMap, canChangeLane_invalidLaneletId)
+// TEST_F(HdMapUtilsTest_FourTrackHighwayMap, canChangeLane_invalidLaneletId)
 // {
 //   EXPECT_THROW(hdmap_utils.canChangeLane(1000003, 1000033), std::runtime_error);
 // }
@@ -1679,7 +1714,7 @@
 //  * Test lateral distance calculation correctness
 //  * with two lanelet poses on the same lanelet but with different offsets.
 //  */
-// TEST_F(LaneletWapperTest_FourTrackHighwayMap, getLateralDistance_sameLane)
+// TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLateralDistance_sameLane)
 // {
 //   const auto from = traffic_simulator::helper::constructLaneletPose(3002185, 0.0, 0.5);
 //   const auto to = traffic_simulator::helper::constructLaneletPose(3002185, 10.0, 0.2);
@@ -1694,12 +1729,12 @@
 //  * Test lateral distance calculation correctness
 //  * with two lanelet poses on parallel lanes with no possibility of changing the lane.
 //  */
-// TEST_F(LaneletWapperTest_FourTrackHighwayMap, getLateralDistance_parallelLanesCanNotChange)
+// TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLateralDistance_parallelLanesCanNotChange)
 // {
 //   EXPECT_FALSE(hdmap_utils
 //                  .getLateralDistance(
 //                    traffic_simulator::helper::constructLaneletPose(3002185, 0.0, 0.5),
-//                    traffic_simulator::helper::constructLaneletPose(3002184, 10.0, 0.2), false)
+//                    traffic_simulator::helper::constructLaneletPose(3002184, 10.0, 0.2))
 //                  .has_value());
 // }
 
@@ -1708,12 +1743,15 @@
 //  * Test lateral distance calculation correctness
 //  * with two lanelet poses on parallel lanes with a possibility of changing the lane.
 //  */
-// TEST_F(LaneletWapperTest_FourTrackHighwayMap, getLateralDistance_parallelLanesCanChange)
+// TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLateralDistance_parallelLanesCanChange)
 // {
 //   const auto from = traffic_simulator::helper::constructLaneletPose(3002185, 0.0, 0.5);
 //   const auto to = traffic_simulator::helper::constructLaneletPose(3002184, 10.0, 0.2);
 
-//   const auto result = hdmap_utils.getLateralDistance(from, to, true);
+//   traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
+//   lane_changeable_routing_configuration.allow_lane_change = true;
+//   const auto result =
+//     hdmap_utils.getLateralDistance(from, to, lane_changeable_routing_configuration);
 
 //   EXPECT_TRUE(result.has_value());
 //   EXPECT_NEAR(result.value(), 2.80373 / 2.0 + 3.03463 / 2.0 + to.offset - from.offset, 1e-3);
@@ -1726,12 +1764,15 @@
 //  * the scenario when the distance cannot be calculated because two positions
 //  * will never be able to come in contact.
 //  */
-// TEST_F(LaneletWapperTest_FourTrackHighwayMap, getLateralDistance_notConnected)
+// TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLateralDistance_notConnected)
 // {
+//   traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
+//   lane_changeable_routing_configuration.allow_lane_change = true;
 //   EXPECT_FALSE(hdmap_utils
 //                  .getLateralDistance(
 //                    traffic_simulator::helper::constructLaneletPose(3002185, 0.0, 0.5),
-//                    traffic_simulator::helper::constructLaneletPose(3002166, 10.0, 0.2), true)
+//                    traffic_simulator::helper::constructLaneletPose(3002166, 10.0, 0.2),
+//                    lane_changeable_routing_configuration)
 //                  .has_value());
 // }
 
@@ -1739,10 +1780,12 @@
 //  * @note Test basic functionality.
 //  * Test route obtaining correctness with a feasible route.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getRoute_correct)
+// TEST_F(HdMapUtilsTest_StandardMap, getRoute_correct)
 // {
+//   traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
+//   lane_changeable_routing_configuration.allow_lane_change = true;
 //   EXPECT_EQ(
-//     hdmap_utils.getRoute(34579, 34630, true),
+//     hdmap_utils.getRoute(34579, 34630, lane_changeable_routing_configuration),
 //     (lanelet::Ids{34579, 34774, 120659, 120660, 34468, 34438, 34408, 34624, 34630}));
 // }
 
@@ -1751,15 +1794,16 @@
 //  * Test route obtaining correctness with a feasible route and obtain it two times
 //  * - the goal is to test whether the route cache works correctly.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getRoute_correctCache)
+// TEST_F(HdMapUtilsTest_StandardMap, getRoute_correctCache)
 // {
 //   const lanelet::Id from_id = 34579;
 //   const lanelet::Id to_id = 34630;
-//   const bool allow_lane_change = true;
+//   traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
+//   lane_changeable_routing_configuration.allow_lane_change = true;
 
 //   EXPECT_EQ(
-//     hdmap_utils.getRoute(from_id, to_id, allow_lane_change),
-//     hdmap_utils.getRoute(from_id, to_id, allow_lane_change));
+//     hdmap_utils.getRoute(from_id, to_id, lane_changeable_routing_configuration),
+//     hdmap_utils.getRoute(from_id, to_id, lane_changeable_routing_configuration));
 // }
 
 // /**
@@ -1767,9 +1811,13 @@
 //  * Test route obtaining correctness with the beginning
 //  * and ending that are impossible to route between.
 //  */
-// TEST_F(LaneletWapperTest_FourTrackHighwayMap, getRoute_impossibleRouting)
+// TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getRoute_impossibleRouting)
 // {
-//   EXPECT_EQ(hdmap_utils.getRoute(199, 196, true).size(), static_cast<std::size_t>(0));
+//   traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
+//   lane_changeable_routing_configuration.allow_lane_change = true;
+//   EXPECT_EQ(
+//     hdmap_utils.getRoute(199, 196, lane_changeable_routing_configuration).size(),
+//     static_cast<std::size_t>(0));
 // }
 
 // /**
@@ -1777,18 +1825,19 @@
 //  * Test route obtaining correctness with beginning
 //  * and ending of the route set to the same lanelet id.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getRoute_circular)
+// TEST_F(HdMapUtilsTest_StandardMap, getRoute_circular)
 // {
 //   const lanelet::Id from_and_to_id = 120659;
 
 //   EXPECT_EQ(
-//     hdmap_utils.getRoute(from_and_to_id, from_and_to_id, false), lanelet::Ids{from_and_to_id});
+//     hdmap_utils.getRoute(from_and_to_id, from_and_to_id, traffic_simulator::RoutingConfiguration()),
+//     lanelet::Ids{from_and_to_id});
 // }
 
 // /**
 //  * @note Test basic functionality with a lanelet that has a centerline with 3 or more points.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getCenterPoints_correct)
+// TEST_F(HdMapUtilsTest_StandardMap, getCenterPoints_correct)
 // {
 //   const std::vector<geometry_msgs::msg::Point> actual_center_points{
 //     makePoint(3774.1, 73748.8, -0.3), makePoint(3772.5, 73748.0, -0.2),
@@ -1812,7 +1861,7 @@
 //  * and call the function 2 times
 //  * - the goal is to test whether the centerline cache works correctly.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getCenterPoints_correctCache)
+// TEST_F(HdMapUtilsTest_StandardMap, getCenterPoints_correctCache)
 // {
 //   const lanelet::Id id = 34594;
 
@@ -1829,7 +1878,7 @@
 // /**
 //  * @note Test basic functionality with a vector containing valid lanelets.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getCenterPoints_correctVector)
+// TEST_F(HdMapUtilsTest_StandardMap, getCenterPoints_correctVector)
 // {
 //   const std::vector<geometry_msgs::msg::Point> actual_center_points{
 //     makePoint(3774.1, 73748.8, -0.3), makePoint(3772.4, 73748.0, -0.2),
@@ -1864,7 +1913,7 @@
 // /**
 //  * @note Test basic functionality with an empty lanelet vector.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getCenterPoints_empty)
+// TEST_F(HdMapUtilsTest_StandardMap, getCenterPoints_empty)
 // {
 //   EXPECT_EQ(hdmap_utils.getCenterPoints(lanelet::Ids{}).size(), static_cast<std::size_t>(0));
 // }
@@ -1873,7 +1922,7 @@
 //  * @note Test basic functionality.
 //  * Test traffic light checking correctness with an id of a traffic light.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, isTrafficLight_trafficLight)
+// TEST_F(HdMapUtilsTest_StandardMap, isTrafficLight_trafficLight)
 // {
 //   EXPECT_TRUE(hdmap_utils.isTrafficLight(34836));
 // }
@@ -1882,7 +1931,7 @@
 //  * @note Test basic functionality.
 //  * Test traffic light checking correctness with an id of not a traffic light.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, isTrafficLight_notTrafficLight)
+// TEST_F(HdMapUtilsTest_StandardMap, isTrafficLight_notTrafficLight)
 // {
 //   EXPECT_FALSE(hdmap_utils.isTrafficLight(120659));
 // }
@@ -1890,7 +1939,7 @@
 // /**
 //  * @note Test function behavior when called with an invalid lanelet id.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, isTrafficLight_invalidId)
+// TEST_F(HdMapUtilsTest_StandardMap, isTrafficLight_invalidId)
 // {
 //   EXPECT_FALSE(hdmap_utils.isTrafficLight(1000003));
 // }
@@ -1900,7 +1949,7 @@
 //  * Test traffic light relation checking correctness
 //  * with an id of a lanelet that has a relation with a traffic light.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, isTrafficLightRegulatoryElement_trafficLightRegulatoryElement)
+// TEST_F(HdMapUtilsTest_StandardMap, isTrafficLightRegulatoryElement_trafficLightRegulatoryElement)
 // {
 //   EXPECT_TRUE(hdmap_utils.isTrafficLightRegulatoryElement(34806));
 // }
@@ -1910,7 +1959,7 @@
 //  * Test traffic light relation checking correctness
 //  * with an id of a lanelet that does not have a relation with a traffic light.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, isTrafficLightRegulatoryElement_noTrafficLightRegulatoryElement)
+// TEST_F(HdMapUtilsTest_StandardMap, isTrafficLightRegulatoryElement_noTrafficLightRegulatoryElement)
 // {
 //   EXPECT_FALSE(hdmap_utils.isTrafficLightRegulatoryElement(120659));
 // }
@@ -1918,7 +1967,7 @@
 // /**
 //  * @note Test function behavior when called with an invalid lanelet id.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, isTrafficLightRegulatoryElement_invalidId)
+// TEST_F(HdMapUtilsTest_StandardMap, isTrafficLightRegulatoryElement_invalidId)
 // {
 //   EXPECT_FALSE(hdmap_utils.isTrafficLightRegulatoryElement(1000003));
 // }
@@ -1926,7 +1975,7 @@
 // /**
 //  * @note Test basic functionality. Test lanelet length obtaining with some lanelet id.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getLaneletLength_simple)
+// TEST_F(HdMapUtilsTest_StandardMap, getLaneletLength_simple)
 // {
 //   EXPECT_NEAR(hdmap_utils.getLaneletLength(34468), 55.5, 1.0);
 // }
@@ -1936,7 +1985,7 @@
 //  * Test lanelet length obtaining with some lanelet id two times
 //  * (the same lanelet id) - the goal is to test lanelet length caching correctness.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getLaneletLength_cache)
+// TEST_F(HdMapUtilsTest_StandardMap, getLaneletLength_cache)
 // {
 //   const lanelet::Id id = 34468;
 
@@ -1948,7 +1997,7 @@
 //  * Test traffic light ids obtaining correctness
 //  * with a route that does not have any traffic lights.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getTrafficLightIdsOnPath_noTrafficLights)
+// TEST_F(HdMapUtilsTest_StandardMap, getTrafficLightIdsOnPath_noTrafficLights)
 // {
 //   EXPECT_EQ(
 //     hdmap_utils.getTrafficLightIdsOnPath(lanelet::Ids{34579, 34774, 120659, 120660, 34468, 34438})
@@ -1960,7 +2009,7 @@
 //  * @note Test basic functionality.
 //  * Test traffic light ids obtaining correctness with a route that has some traffic lights.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getTrafficLightIdsOnPath_trafficLights)
+// TEST_F(HdMapUtilsTest_StandardMap, getTrafficLightIdsOnPath_trafficLights)
 // {
 //   auto result_traffic_light_ids = hdmap_utils.getTrafficLightIdsOnPath(
 //     {34579, 34774, 120659, 120660, 34468, 34438, 34408, 34624, 34630});
@@ -1975,7 +2024,7 @@
 // /**
 //  * @note Test function behavior when passed an empty vector of lanelet ids.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getTrafficLightIdsOnPath_empty)
+// TEST_F(HdMapUtilsTest_StandardMap, getTrafficLightIdsOnPath_empty)
 // {
 //   EXPECT_EQ(hdmap_utils.getTrafficLightIdsOnPath({}).size(), static_cast<size_t>(0));
 // }
@@ -1985,7 +2034,7 @@
 //  * Test longitudinal distance calculation correctness
 //  * with two poses on the same lanelet, where the goal pose is positioned in front of the start pose.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getLongitudinalDistance_sameLanelet)
+// TEST_F(HdMapUtilsTest_StandardMap, getLongitudinalDistance_sameLanelet)
 // {
 //   const auto pose_from = hdmap_utils.toLaneletPose(
 //     makePose(makePoint(3812.65, 73810.13, -2.80), makeQuaternionFromYaw(90.0)), lanelet::Id{34606});
@@ -1994,8 +2043,8 @@
 //   ASSERT_TRUE(pose_from.has_value());
 //   ASSERT_TRUE(pose_to.has_value());
 
-//   const auto result_distance =
-//     hdmap_utils.getLongitudinalDistance(pose_from.value(), pose_to.value(), false);
+//   const auto result_distance = hdmap_utils.getLongitudinalDistance(
+//     pose_from.value(), pose_to.value(), traffic_simulator::RoutingConfiguration());
 
 //   ASSERT_TRUE(result_distance.has_value());
 //   EXPECT_NEAR(result_distance.value(), 27.0, 1.0);
@@ -2006,7 +2055,7 @@
 //  * Test longitudinal distance calculation correctness
 //  * with two poses on the same lanelet, where the goal pose is positioned behind the start pose.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getLongitudinalDistance_sameLaneletBehind)
+// TEST_F(HdMapUtilsTest_StandardMap, getLongitudinalDistance_sameLaneletBehind)
 // {
 //   const auto pose_to = hdmap_utils.toLaneletPose(
 //     makePose(makePoint(3812.65, 73810.13, -2.80), makeQuaternionFromYaw(90.0)), lanelet::Id{34606});
@@ -2015,8 +2064,8 @@
 //   ASSERT_TRUE(pose_from.has_value());
 //   ASSERT_TRUE(pose_to.has_value());
 
-//   const auto longitudinal_distance =
-//     hdmap_utils.getLongitudinalDistance(pose_from.value(), pose_to.value(), false);
+//   const auto longitudinal_distance = hdmap_utils.getLongitudinalDistance(
+//     pose_from.value(), pose_to.value(), traffic_simulator::RoutingConfiguration());
 //   EXPECT_FALSE(longitudinal_distance.has_value());
 // }
 
@@ -2025,7 +2074,7 @@
 //  * Test longitudinal distance calculation correctness
 //  * with two poses on different lanelets that are a few lanelets apart (e.g. 3).
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getLongitudinalDistance_differentLanelet)
+// TEST_F(HdMapUtilsTest_StandardMap, getLongitudinalDistance_differentLanelet)
 // {
 //   const auto pose_from =
 //     hdmap_utils.toLaneletPose(makePose(makePoint(3801.19, 73812.70, -2.86)), lanelet::Id{120660});
@@ -2034,8 +2083,8 @@
 //   ASSERT_TRUE(pose_from.has_value());
 //   ASSERT_TRUE(pose_to.has_value());
 
-//   const auto result_distance =
-//     hdmap_utils.getLongitudinalDistance(pose_from.value(), pose_to.value(), false);
+//   const auto result_distance = hdmap_utils.getLongitudinalDistance(
+//     pose_from.value(), pose_to.value(), traffic_simulator::RoutingConfiguration());
 
 //   ASSERT_TRUE(result_distance.has_value());
 //   EXPECT_NEAR(result_distance.value(), 86.0, 1.0);
@@ -2046,7 +2095,7 @@
 //  * with two poses on different lanelets where the goal pose is on lanelet unreachable
 //  * from the start pose lanelet - the goal is to test the branch of execution where no route is found.
 //  */
-// TEST_F(LaneletWapperTest_FourTrackHighwayMap, getLongitudinalDistance_differentLaneletNoRoute)
+// TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLongitudinalDistance_differentLaneletNoRoute)
 // {
 //   const auto pose_to = hdmap_utils.toLaneletPose(
 //     makePose(makePoint(81590.79, 50067.66), makeQuaternionFromYaw(90.0)), lanelet::Id{3002185});
@@ -2055,20 +2104,25 @@
 //   ASSERT_TRUE(pose_from.has_value());
 //   ASSERT_TRUE(pose_to.has_value());
 
-//   EXPECT_FALSE(
-//     hdmap_utils.getLongitudinalDistance(pose_from.value(), pose_to.value(), false).has_value());
+//   EXPECT_FALSE(hdmap_utils
+//                  .getLongitudinalDistance(
+//                    pose_from.value(), pose_to.value(), traffic_simulator::RoutingConfiguration())
+//                  .has_value());
 // }
 
 // /**
 //  * @note Test for the corner-case fixed in https://github.com/tier4/scenario_simulator_v2/pull/1348.
 //  */
-// TEST_F(LaneletWapperTest_KashiwanohaMap, getLongitudinalDistance_PullRequest1348)
+// TEST_F(HdMapUtilsTest_KashiwanohaMap, getLongitudinalDistance_PullRequest1348)
 // {
 //   auto pose_from = traffic_simulator::helper::constructLaneletPose(34468, 10.0);
 //   auto pose_to = traffic_simulator::helper::constructLaneletPose(34795, 5.0);
 
+//   traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
+//   lane_changeable_routing_configuration.allow_lane_change = true;
 //   EXPECT_NO_THROW(EXPECT_DOUBLE_EQ(
-//     hdmap_utils.getLongitudinalDistance(pose_from, pose_to, true).value(),
+//     hdmap_utils.getLongitudinalDistance(pose_from, pose_to, lane_changeable_routing_configuration)
+//       .value(),
 //     54.18867466433655977198213804513216018676757812500000));
 // }
 
@@ -2078,16 +2132,21 @@
 //  * if allow_lane_change = false, std::nullopt should be returned;
 //  * if allow_lane_change = true, a value should be returned.
 //  */
-// TEST_F(LaneletWapperTest_IntersectionMap, getLongitudinalDistance_laneChange)
+// TEST_F(HdMapUtilsTest_IntersectionMap, getLongitudinalDistance_laneChange)
 // {
+//   traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
+//   lane_changeable_routing_configuration.allow_lane_change = true;
+//   traffic_simulator::RoutingConfiguration default_routing_configuration;
 //   {
 //     const auto pose_from = traffic_simulator::helper::constructLaneletPose(563L, 5.0);
 //     const auto pose_to = traffic_simulator::helper::constructLaneletPose(659L, 5.0);
 
-//     const auto without_lane_change = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, false);
+//     const auto without_lane_change =
+//       hdmap_utils.getLongitudinalDistance(pose_from, pose_to, default_routing_configuration);
 //     EXPECT_FALSE(without_lane_change.has_value());
 
-//     const auto with_lane_change = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, true);
+//     const auto with_lane_change = hdmap_utils.getLongitudinalDistance(
+//       pose_from, pose_to, lane_changeable_routing_configuration);
 //     ASSERT_TRUE(with_lane_change.has_value());
 //     EXPECT_NEAR(with_lane_change.value(), 157.0, 1.0);
 //   }
@@ -2095,10 +2154,12 @@
 //     const auto pose_from = traffic_simulator::helper::constructLaneletPose(563L, 5.0);
 //     const auto pose_to = traffic_simulator::helper::constructLaneletPose(658L, 5.0);
 
-//     const auto without_lane_change = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, false);
+//     const auto without_lane_change =
+//       hdmap_utils.getLongitudinalDistance(pose_from, pose_to, default_routing_configuration);
 //     EXPECT_FALSE(without_lane_change.has_value());
 
-//     const auto with_lane_change = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, true);
+//     const auto with_lane_change = hdmap_utils.getLongitudinalDistance(
+//       pose_from, pose_to, lane_changeable_routing_configuration);
 //     ASSERT_TRUE(with_lane_change.has_value());
 //     EXPECT_NEAR(with_lane_change.value(), 161.0, 1.0);
 //   }
@@ -2106,10 +2167,12 @@
 //     const auto pose_from = traffic_simulator::helper::constructLaneletPose(563L, 5.0);
 //     const auto pose_to = traffic_simulator::helper::constructLaneletPose(657L, 5.0);
 
-//     const auto without_lane_change = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, false);
+//     const auto without_lane_change =
+//       hdmap_utils.getLongitudinalDistance(pose_from, pose_to, default_routing_configuration);
 //     EXPECT_FALSE(without_lane_change.has_value());
 
-//     const auto with_lane_change = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, true);
+//     const auto with_lane_change = hdmap_utils.getLongitudinalDistance(
+//       pose_from, pose_to, lane_changeable_routing_configuration);
 //     ASSERT_TRUE(with_lane_change.has_value());
 //     EXPECT_NEAR(with_lane_change.value(), 161.0, 1.0);
 //   }
@@ -2117,10 +2180,12 @@
 //     const auto pose_from = traffic_simulator::helper::constructLaneletPose(643L, 5.0);
 //     const auto pose_to = traffic_simulator::helper::constructLaneletPose(666L, 5.0);
 
-//     const auto without_lane_change = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, false);
+//     const auto without_lane_change =
+//       hdmap_utils.getLongitudinalDistance(pose_from, pose_to, default_routing_configuration);
 //     EXPECT_FALSE(without_lane_change.has_value());
 
-//     const auto with_lane_change = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, true);
+//     const auto with_lane_change = hdmap_utils.getLongitudinalDistance(
+//       pose_from, pose_to, lane_changeable_routing_configuration);
 //     ASSERT_TRUE(with_lane_change.has_value());
 //     EXPECT_NEAR(with_lane_change.value(), 250.0, 1.0);
 //   }
@@ -2128,10 +2193,12 @@
 //     const auto pose_from = traffic_simulator::helper::constructLaneletPose(643L, 5.0);
 //     const auto pose_to = traffic_simulator::helper::constructLaneletPose(665L, 5.0);
 
-//     const auto without_lane_change = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, false);
+//     const auto without_lane_change =
+//       hdmap_utils.getLongitudinalDistance(pose_from, pose_to, default_routing_configuration);
 //     EXPECT_FALSE(without_lane_change.has_value());
 
-//     const auto with_lane_change = hdmap_utils.getLongitudinalDistance(pose_from, pose_to, true);
+//     const auto with_lane_change = hdmap_utils.getLongitudinalDistance(
+//       pose_from, pose_to, lane_changeable_routing_configuration);
 //     ASSERT_TRUE(with_lane_change.has_value());
 //     EXPECT_NEAR(with_lane_change.value(), 253.0, 1.0);
 //   }
@@ -2141,7 +2208,7 @@
 //  * @note Test basic functionality.
 //  * Test obtaining stop line ids correctness with a route that has no stop lines.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getStopLineIdsOnPath_noStopLines)
+// TEST_F(HdMapUtilsTest_StandardMap, getStopLineIdsOnPath_noStopLines)
 // {
 //   EXPECT_EQ(
 //     hdmap_utils.getStopLineIdsOnPath({34507, 34795, 34606, 34672}).size(), static_cast<size_t>(0));
@@ -2151,7 +2218,7 @@
 //  * @note Test basic functionality.
 //  * Test obtaining stop line ids correctness with a route that has a stop line.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getStopLineIdsOnPath_someStopLines)
+// TEST_F(HdMapUtilsTest_StandardMap, getStopLineIdsOnPath_someStopLines)
 // {
 //   EXPECT_EQ(
 //     hdmap_utils.getStopLineIdsOnPath({34408, 34633, 34579, 34780, 34675, 34744, 34690}),
@@ -2161,7 +2228,7 @@
 // /**
 //  * @note Test function behavior when passed an empty vector of lanelet ids.
 //  */
-// TEST_F(LaneletWapperTest_StandardMap, getStopLineIdsOnPath_empty)
+// TEST_F(HdMapUtilsTest_StandardMap, getStopLineIdsOnPath_empty)
 // {
 //   EXPECT_EQ(hdmap_utils.getStopLineIdsOnPath(lanelet::Ids{}).size(), static_cast<size_t>(0));
 // }
@@ -2171,7 +2238,7 @@
 //  * Test obtaining traffic light stop line ids
 //  * correctness with a traffic light that has one stop line.
 //  */
-// TEST_F(LaneletWapperTest_CrossroadsWithStoplinesMap, getTrafficLightStopLineIds_stopLine)
+// TEST_F(HdMapUtilsTest_CrossroadsWithStoplinesMap, getTrafficLightStopLineIds_stopLine)
 // {
 //   EXPECT_EQ(hdmap_utils.getTrafficLightStopLineIds(34802), (lanelet::Ids{34805}));
 // }
@@ -2183,7 +2250,7 @@
 //  * - the goal is to test the scenario where one traffic light has multiple stop lines
 //  * (e.g. on a road with two parallel lanes with the same direction).
 //  */
-// TEST_F(LaneletWapperTest_CrossroadsWithStoplinesMap, getTrafficLightStopLineIds_severalStopLines)
+// TEST_F(HdMapUtilsTest_CrossroadsWithStoplinesMap, getTrafficLightStopLineIds_severalStopLines)
 // {
 //   auto result_stoplines = hdmap_utils.getTrafficLightStopLineIds(34836);
 //   auto actual_stoplines = lanelet::Ids{120663, 34805};
@@ -2197,7 +2264,7 @@
 // /**
 //  * @note Test function behavior when passed an invalid traffic light id.
 //  */
-// TEST_F(LaneletWapperTest_CrossroadsWithStoplinesMap, getTrafficLightStopLineIds_invalidTrafficLightId)
+// TEST_F(HdMapUtilsTest_CrossroadsWithStoplinesMap, getTrafficLightStopLineIds_invalidTrafficLightId)
 // {
 //   EXPECT_THROW(hdmap_utils.getTrafficLightStopLineIds(1000039), std::runtime_error);
 // }
@@ -2243,7 +2310,7 @@
 //  * Test obtaining traffic light stop line points correctness
 //  * with a traffic light id that has only one traffic light stop line.
 //  */
-// TEST_F(LaneletWapperTest_CrossroadsWithStoplinesMap, getTrafficLightStopLinesPoints_stopLine)
+// TEST_F(HdMapUtilsTest_CrossroadsWithStoplinesMap, getTrafficLightStopLinesPoints_stopLine)
 // {
 //   auto result_stoplines_points = hdmap_utils.getTrafficLightStopLinesPoints(34802);
 //   auto actual_stoplines_points = std::vector<std::vector<geometry_msgs::msg::Point>>{
@@ -2262,7 +2329,7 @@
 //  * Test obtaining traffic light stop line points correctness
 //  * with a traffic light id that has multiple traffic light stop lines.
 //  */
-// TEST_F(LaneletWapperTest_CrossroadsWithStoplinesMap, getTrafficLightStopLinesPoints_severalStopLines)
+// TEST_F(HdMapUtilsTest_CrossroadsWithStoplinesMap, getTrafficLightStopLinesPoints_severalStopLines)
 // {
 //   auto result_stoplines_points = hdmap_utils.getTrafficLightStopLinesPoints(34836);
 //   auto actual_stoplines_points = std::vector<std::vector<geometry_msgs::msg::Point>>{
@@ -2281,7 +2348,7 @@
 //  * @note Test function behavior when passed an invalid traffic light id.
 //  */
 // TEST_F(
-//   LaneletWapperTest_CrossroadsWithStoplinesMap, getTrafficLightStopLinesPoints_invalidTrafficLightId)
+//   HdMapUtilsTest_CrossroadsWithStoplinesMap, getTrafficLightStopLinesPoints_invalidTrafficLightId)
 // {
 //   EXPECT_THROW(hdmap_utils.getTrafficLightStopLinesPoints(1000039), std::runtime_error);
 // }
@@ -2290,7 +2357,7 @@
 //  * @note Test basic functionality.
 //  * Test stop line polygon obtaining correctness with a lanelet that has a stop line.
 //  */
-// TEST_F(LaneletWapperTest_CrossroadsWithStoplinesMap, getStopLinePolygon_stopLine)
+// TEST_F(HdMapUtilsTest_CrossroadsWithStoplinesMap, getStopLinePolygon_stopLine)
 // {
 //   const auto result_stoplines_points = hdmap_utils.getStopLinePolygon(lanelet::Id{120663});
 //   const auto actual_stoplines_points = std::vector<geometry_msgs::msg::Point>{
@@ -2305,7 +2372,7 @@
 // /**
 //  * @note Test function behavior with an invalid lanelet id.
 //  */
-// TEST_F(LaneletWapperTest_CrossroadsWithStoplinesMap, getStopLinePolygon_invalidLaneletId)
+// TEST_F(HdMapUtilsTest_CrossroadsWithStoplinesMap, getStopLinePolygon_invalidLaneletId)
 // {
 //   EXPECT_THROW(hdmap_utils.getStopLinePolygon(1000039), std::runtime_error);
 // }
@@ -2316,7 +2383,7 @@
 //  * correctness with a spline and a traffic light id that has a stop line on the spline.
 //  */
 // TEST_F(
-//   LaneletWapperTest_CrossroadsWithStoplinesMap, getDistanceToTrafficLightStopLine_trafficLightOnSpline)
+//   HdMapUtilsTest_CrossroadsWithStoplinesMap, getDistanceToTrafficLightStopLine_trafficLightOnSpline)
 // {
 //   const auto start_waypoint = makePoint(3771.06, 73728.35);
 //   const auto result_distance = hdmap_utils.getDistanceToTrafficLightStopLine(
@@ -2338,7 +2405,7 @@
 //  * with a spline and a traffic light id that does not have a stop line on the spline.
 //  */
 // TEST_F(
-//   LaneletWapperTest_CrossroadsWithStoplinesMap,
+//   HdMapUtilsTest_CrossroadsWithStoplinesMap,
 //   getDistanceToTrafficLightStopLine_noTrafficLightOnSpline)
 // {
 //   EXPECT_FALSE(hdmap_utils
@@ -2356,7 +2423,7 @@
 //  * with a road (waypoints) and a traffic light id has a stop line on the road.
 //  */
 // TEST_F(
-//   LaneletWapperTest_CrossroadsWithStoplinesMap,
+//   HdMapUtilsTest_CrossroadsWithStoplinesMap,
 //   getDistanceToTrafficLightStopLine_trafficLightOnWaypoints)
 // {
 //   const auto start_waypoint = makePoint(3771.06, 73728.35);
@@ -2379,7 +2446,7 @@
 //  * with a road (waypoints) and a traffic light id that does not have a stop line on the road.
 //  */
 // TEST_F(
-//   LaneletWapperTest_CrossroadsWithStoplinesMap,
+//   HdMapUtilsTest_CrossroadsWithStoplinesMap,
 //   getDistanceToTrafficLightStopLine_noTrafficLightOnWaypoints)
 // {
 //   EXPECT_FALSE(
@@ -2395,7 +2462,7 @@
 //  * @note Test function behavior when an empty vector is passed.
 //  */
 // TEST_F(
-//   LaneletWapperTest_CrossroadsWithStoplinesMap,
+//   HdMapUtilsTest_CrossroadsWithStoplinesMap,
 //   getDistanceToTrafficLightStopLine_emptyVector_waypoints)
 // {
 //   EXPECT_FALSE(hdmap_utils
@@ -2410,7 +2477,7 @@
 //  * with a spline and a route that is coherent with the spline and has a traffic light on it.
 //  */
 // TEST_F(
-//   LaneletWapperTest_CrossroadsWithStoplinesMap,
+//   HdMapUtilsTest_CrossroadsWithStoplinesMap,
 //   getDistanceToTrafficLightStopLine_routeWithTrafficLightsOnSpline)
 // {
 //   const auto start_waypoint = makePoint(3771.06, 73728.35);
@@ -2434,7 +2501,7 @@
 //  * with a spline and a route that is coherent with the spline and does not have a traffic light on it.
 //  */
 // TEST_F(
-//   LaneletWapperTest_CrossroadsWithStoplinesMap,
+//   HdMapUtilsTest_CrossroadsWithStoplinesMap,
 //   getDistanceToTrafficLightStopLine_routeWithNoTrafficLightsOnSplineCongruent)
 // {
 //   EXPECT_FALSE(hdmap_utils
@@ -2454,7 +2521,7 @@
 //  * against a spline that does not overlay with them.
 //  */
 // TEST_F(
-//   LaneletWapperTest_CrossroadsWithStoplinesMap,
+//   HdMapUtilsTest_CrossroadsWithStoplinesMap,
 //   getDistanceToTrafficLightStopLine_routeWithTrafficLightsNotOnSplineIncongruent)
 // {
 //   EXPECT_FALSE(hdmap_utils
@@ -2470,7 +2537,7 @@
 //  * @note Test function behavior when an empty vector is passed.
 //  */
 // TEST_F(
-//   LaneletWapperTest_CrossroadsWithStoplinesMap,
+//   HdMapUtilsTest_CrossroadsWithStoplinesMap,
 //   getDistanceToTrafficLightStopLine_emptyVector_splineRoute)
 // {
 //   EXPECT_FALSE(
@@ -2488,7 +2555,7 @@
 //  * with a road (waypoints) and a route that is coherent with the road and has a traffic light on it.
 //  */
 // TEST_F(
-//   LaneletWapperTest_CrossroadsWithStoplinesMap,
+//   HdMapUtilsTest_CrossroadsWithStoplinesMap,
 //   getDistanceToTrafficLightStopLine_routeWithTrafficLightsOnWaypoints)
 // {
 //   const auto start_waypoint = makePoint(3771.06, 73728.35);
@@ -2514,7 +2581,7 @@
 //  * the traffic light and its stop line are checked against a road that does not overlay with them.
 //  */
 // TEST_F(
-//   LaneletWapperTest_CrossroadsWithStoplinesMap,
+//   HdMapUtilsTest_CrossroadsWithStoplinesMap,
 //   getDistanceToTrafficLightStopLine_routeWithNoTrafficLightsOnWaypointsIncongruent)
 // {
 //   EXPECT_FALSE(
@@ -2532,7 +2599,7 @@
 //  * and a route that is coherent with the road and does not have a traffic light on it.
 //  */
 // TEST_F(
-//   LaneletWapperTest_CrossroadsWithStoplinesMap,
+//   HdMapUtilsTest_CrossroadsWithStoplinesMap,
 //   getDistanceToTrafficLightStopLine_routeWithTrafficLightsNotOnWaypointsCongruent)
 // {
 //   EXPECT_FALSE(
@@ -2548,7 +2615,7 @@
 //  * @note Test function behavior when an empty vector is passed.
 //  */
 // TEST_F(
-//   LaneletWapperTest_CrossroadsWithStoplinesMap,
+//   HdMapUtilsTest_CrossroadsWithStoplinesMap,
 //   getDistanceToTrafficLightStopLine_emptyVector_waypointsRoute)
 // {
 //   EXPECT_FALSE(
@@ -2565,7 +2632,7 @@
 //  * Test distance to stop line calculation correctness
 //  * with a spline and a route that is coherent with the spline and has a stop line on it.
 //  */
-// TEST_F(LaneletWapperTest_CrossroadsWithStoplinesMap, getDistanceToStopLine_stopLineOnSpline)
+// TEST_F(HdMapUtilsTest_CrossroadsWithStoplinesMap, getDistanceToStopLine_stopLineOnSpline)
 // {
 //   const auto start_waypoint = makePoint(3821.86, 73777.20);
 //   const auto result_distance = hdmap_utils.getDistanceToStopLine(
@@ -2585,7 +2652,7 @@
 //  * Test distance to stop line calculation correctness
 //  * with a spline and a route that is coherent with the spline and does not have a stop line on it.
 //  */
-// TEST_F(LaneletWapperTest_CrossroadsWithStoplinesMap, getDistanceToStopLine_noStopLineOnSplineCongruent)
+// TEST_F(HdMapUtilsTest_CrossroadsWithStoplinesMap, getDistanceToStopLine_noStopLineOnSplineCongruent)
 // {
 //   EXPECT_FALSE(hdmap_utils
 //                  .getDistanceToStopLine(
@@ -2604,7 +2671,7 @@
 //  * against a spline that does not overlay with it.
 //  */
 // TEST_F(
-//   LaneletWapperTest_CrossroadsWithStoplinesMap, getDistanceToStopLine_noStopLineOnSplineIncongruent)
+//   HdMapUtilsTest_CrossroadsWithStoplinesMap, getDistanceToStopLine_noStopLineOnSplineIncongruent)
 // {
 //   EXPECT_FALSE(hdmap_utils
 //                  .getDistanceToStopLine(
@@ -2618,7 +2685,7 @@
 // /**
 //  * @note Test function behavior when an empty vector is passed.
 //  */
-// TEST_F(LaneletWapperTest_CrossroadsWithStoplinesMap, getDistanceToStopLine_emptyVector_spline)
+// TEST_F(HdMapUtilsTest_CrossroadsWithStoplinesMap, getDistanceToStopLine_emptyVector_spline)
 // {
 //   EXPECT_FALSE(
 //     hdmap_utils
@@ -2634,7 +2701,7 @@
 //  * Test distance to stop line calculation correctness
 //  * with a road (waypoints) and a route that is coherent with the road and has a stop line on it.
 //  */
-// TEST_F(LaneletWapperTest_CrossroadsWithStoplinesMap, getDistanceToStopLine_stopLineOnWaypoints)
+// TEST_F(HdMapUtilsTest_CrossroadsWithStoplinesMap, getDistanceToStopLine_stopLineOnWaypoints)
 // {
 //   const auto start_waypoint = makePoint(3821.86, 73777.20);
 //   const auto result_distance = hdmap_utils.getDistanceToStopLine(
@@ -2655,7 +2722,7 @@
 //  * and a route that is coherent with the road and does not have a stop line on it.
 //  */
 // TEST_F(
-//   LaneletWapperTest_CrossroadsWithStoplinesMap, getDistanceToStopLine_noStopLineOnWaypointsCongruent)
+//   HdMapUtilsTest_CrossroadsWithStoplinesMap, getDistanceToStopLine_noStopLineOnWaypointsCongruent)
 // {
 //   EXPECT_FALSE(
 //     hdmap_utils
@@ -2674,7 +2741,7 @@
 //  * is checked against a road that does not overlay with it.
 //  */
 // TEST_F(
-//   LaneletWapperTest_CrossroadsWithStoplinesMap, getDistanceToStopLine_noStopLineOnWaypointsIncongruent)
+//   HdMapUtilsTest_CrossroadsWithStoplinesMap, getDistanceToStopLine_noStopLineOnWaypointsIncongruent)
 // {
 //   EXPECT_FALSE(
 //     hdmap_utils
@@ -2688,7 +2755,7 @@
 // /**
 //  * @note Test function behavior when an empty vector is passed.
 //  */
-// TEST_F(LaneletWapperTest_CrossroadsWithStoplinesMap, getDistanceToStopLine_emptyVector_waypoints)
+// TEST_F(HdMapUtilsTest_CrossroadsWithStoplinesMap, getDistanceToStopLine_emptyVector_waypoints)
 // {
 //   EXPECT_FALSE(
 //     hdmap_utils
@@ -2697,4 +2764,36 @@
 //         std::vector<geometry_msgs::msg::Point>{
 //           makePoint(3807.63, 73715.99), makePoint(3785.76, 73707.70), makePoint(3773.19, 73723.27)})
 //       .has_value());
+// }
+
+// /**
+//  * @note Test basic functionality.
+//  */
+// TEST_F(HdMapUtilsTest_StandardMap, getPreviousLanelets)
+// {
+//   const lanelet::Id id = 34600;
+//   const auto result_previous = hdmap_utils.getPreviousLanelets(id, 100.0);
+//   const lanelet::Ids actual_previous{id, 34783, 34606, 34795, 34507};
+
+//   EXPECT_EQ(result_previous, actual_previous);
+// }
+
+// TEST_F(HdMapUtilsTest_WithRoadShoulderMap, routingWithRoadShoulder)
+// {
+//   // default: traffic_simulator::RoutingGraphType::VEHICLE
+//   const auto default_route =
+//     hdmap_utils.getRoute(34693, 34615, traffic_simulator::RoutingConfiguration());
+//   EXPECT_EQ(default_route.size(), 0);
+
+//   traffic_simulator::RoutingConfiguration routing_configuration_with_road_shoulder;
+//   routing_configuration_with_road_shoulder.routing_graph_type =
+//     traffic_simulator::RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER;
+//   traffic_simulator::RoutingConfiguration default_routing_configuration;
+//   const auto route_with_road_shoulder =
+//     hdmap_utils.getRoute(34693, 34615, routing_configuration_with_road_shoulder);
+//   EXPECT_EQ(route_with_road_shoulder.size(), 4);
+//   EXPECT_EQ(route_with_road_shoulder[0], 34693);
+//   EXPECT_EQ(route_with_road_shoulder[1], 34696);  // road shoulder
+//   EXPECT_EQ(route_with_road_shoulder[2], 34768);  // road shoulder
+//   EXPECT_EQ(route_with_road_shoulder[3], 34615);
 // }

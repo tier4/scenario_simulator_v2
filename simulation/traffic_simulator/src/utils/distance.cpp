@@ -29,20 +29,21 @@ inline namespace distance
 {
 auto lateralDistance(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
-  const bool allow_lane_change) -> std::optional<double>
+  const RoutingConfiguration & routing_configuration) -> std::optional<double>
 {
   return lanelet_wrapper::distance::lateralDistance(
-    static_cast<LaneletPose>(from), static_cast<LaneletPose>(to), allow_lane_change);
+    static_cast<LaneletPose>(from), static_cast<LaneletPose>(to), routing_configuration);
 }
 
 auto lateralDistance(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
-  const double matching_distance, const bool allow_lane_change) -> std::optional<double>
+  double matching_distance, const RoutingConfiguration & routing_configuration)
+  -> std::optional<double>
 {
   if (
     std::abs(static_cast<LaneletPose>(from).offset) <= matching_distance &&
     std::abs(static_cast<LaneletPose>(to).offset) <= matching_distance) {
-    return lateralDistance(from, to, allow_lane_change);
+    return lateralDistance(from, to, routing_configuration);
   } else {
     return std::nullopt;
   }
@@ -52,23 +53,23 @@ auto lateralDistance(
 auto longitudinalDistance(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
   bool const include_adjacent_lanelet, bool const include_opposite_direction,
-  const bool allow_lane_change) -> std::optional<double>
+  const RoutingConfiguration & routing_configuration) -> std::optional<double>
 {
   if (!include_adjacent_lanelet) {
     auto to_canonicalized = static_cast<LaneletPose>(to);
     if (to.hasAlternativeLaneletPose()) {
       if (
         const auto to_canonicalized_opt = to.getAlternativeLaneletPoseBaseOnShortestRouteFrom(
-          static_cast<LaneletPose>(from), allow_lane_change)) {
+          static_cast<LaneletPose>(from), routing_configuration)) {
         to_canonicalized = to_canonicalized_opt.value();
       }
     }
 
     const auto forward_distance = lanelet_wrapper::distance::longitudinalDistance(
-      static_cast<LaneletPose>(from), to_canonicalized, allow_lane_change);
+      static_cast<LaneletPose>(from), to_canonicalized, routing_configuration);
 
     const auto backward_distance = lanelet_wrapper::distance::longitudinalDistance(
-      to_canonicalized, static_cast<LaneletPose>(from), allow_lane_change);
+      to_canonicalized, static_cast<LaneletPose>(from), routing_configuration);
 
     if (forward_distance && backward_distance) {
       return forward_distance.value() > backward_distance.value() ? -backward_distance.value()
@@ -91,12 +92,12 @@ auto longitudinalDistance(
 
     auto from_poses = lanelet_wrapper::pose::toLaneletPoses(
       static_cast<Pose>(from), static_cast<LaneletPose>(from).lanelet_id, matching_distance,
-      include_opposite_direction);
+      include_opposite_direction, routing_configuration.routing_graph_type);
     from_poses.emplace_back(from);
 
     auto to_poses = lanelet_wrapper::pose::toLaneletPoses(
       static_cast<Pose>(to), static_cast<LaneletPose>(to).lanelet_id, matching_distance,
-      include_opposite_direction);
+      include_opposite_direction, routing_configuration.routing_graph_type);
     to_poses.emplace_back(to);
 
     std::vector<double> distances = {};
@@ -105,7 +106,7 @@ auto longitudinalDistance(
         if (
           const auto distance = distance::longitudinalDistance(
             CanonicalizedLaneletPose(from_pose), CanonicalizedLaneletPose(to_pose), false,
-            include_opposite_direction, allow_lane_change)) {
+            include_opposite_direction, routing_configuration)) {
           distances.emplace_back(distance.value());
         }
       }
@@ -132,9 +133,9 @@ auto boundingBoxDistance(
 auto boundingBoxLaneLateralDistance(
   const CanonicalizedLaneletPose & from, const BoundingBox & from_bounding_box,
   const CanonicalizedLaneletPose & to, const BoundingBox & to_bounding_box,
-  const bool allow_lane_change) -> std::optional<double>
+  const RoutingConfiguration & routing_configuration) -> std::optional<double>
 {
-  if (const auto lateral_distance = lateralDistance(from, to, allow_lane_change);
+  if (const auto lateral_distance = lateralDistance(from, to, routing_configuration);
       lateral_distance) {
     const auto from_bounding_box_distances =
       math::geometry::getDistancesFromCenterToEdge(from_bounding_box);
@@ -157,10 +158,10 @@ auto boundingBoxLaneLongitudinalDistance(
   const CanonicalizedLaneletPose & from, const BoundingBox & from_bounding_box,
   const CanonicalizedLaneletPose & to, const BoundingBox & to_bounding_box,
   const bool include_adjacent_lanelet, const bool include_opposite_direction,
-  const bool allow_lane_change) -> std::optional<double>
+  const RoutingConfiguration & routing_configuration) -> std::optional<double>
 {
   if (const auto longitudinal_distance = distance::longitudinalDistance(
-        from, to, include_adjacent_lanelet, include_opposite_direction, allow_lane_change);
+        from, to, include_adjacent_lanelet, include_opposite_direction, routing_configuration);
       longitudinal_distance) {
     const auto from_bounding_box_distances =
       math::geometry::getDistancesFromCenterToEdge(from_bounding_box);
@@ -293,10 +294,10 @@ auto distanceToYieldStop(
       if (!other_poses.empty()) {
         const auto distance_forward = lanelet_wrapper::distance::longitudinalDistance(
           static_cast<LaneletPose>(reference_pose),
-          helper::constructLaneletPose(lanelet_id, 0.0, 0.0), allow_lane_change);
+          helper::constructLaneletPose(lanelet_id, 0.0, 0.0), RoutingConfiguration());
         const auto distance_backward = lanelet_wrapper::distance::longitudinalDistance(
           helper::constructLaneletPose(lanelet_id, 0.0, 0.0),
-          static_cast<LaneletPose>(reference_pose), allow_lane_change);
+          static_cast<LaneletPose>(reference_pose), RoutingConfiguration());
         if (distance_forward) {
           distances.insert(distance_forward.value());
         } else if (distance_backward) {

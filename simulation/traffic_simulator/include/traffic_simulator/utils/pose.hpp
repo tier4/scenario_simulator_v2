@@ -86,12 +86,14 @@ auto boundingBoxRelativePose(
 // Relative LaneletPose
 auto relativeLaneletPose(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
-  const bool allow_lane_change) -> LaneletPose;
+  const RoutingConfiguration & routing_configuration) -> LaneletPose;
 
 auto boundingBoxRelativeLaneletPose(
-  const CanonicalizedLaneletPose & from, const BoundingBox & from_bounding_box,
-  const CanonicalizedLaneletPose & to, const BoundingBox & to_bounding_box,
-  const bool allow_lane_change) -> LaneletPose;
+  const CanonicalizedLaneletPose & from,
+  const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
+  const CanonicalizedLaneletPose & to,
+  const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box,
+  const RoutingConfiguration & routing_configuration) -> LaneletPose;
 
 // Others
 namespace pedestrian

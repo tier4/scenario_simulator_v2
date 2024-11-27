@@ -19,8 +19,6 @@
 #include <tf2_ros/static_transform_broadcaster.h>
 #include <tf2_ros/transform_broadcaster.h>
 
-#include <autoware_perception_msgs/msg/traffic_signal_array.hpp>
-#include <geographic_msgs/msg/geo_point.hpp>
 #include <memory>
 #include <optional>
 #include <rclcpp/node_interfaces/get_node_topics_interface.hpp>
@@ -48,7 +46,6 @@
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/entity_status_with_trajectory_array.hpp>
-#include <traffic_simulator_msgs/msg/traffic_light_array_v1.hpp>
 #include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
 #include <type_traits>
 #include <unordered_map>
@@ -109,24 +106,6 @@ public:
     const std::shared_ptr<traffic_simulator::TrafficLights> & traffic_lights_ptr) -> void
   {
     traffic_lights_ptr_ = traffic_lights_ptr;
-  }
-
-  template <typename Node>
-  auto getOrigin(Node & node) const
-  {
-    geographic_msgs::msg::GeoPoint origin;
-    {
-      if (!node.has_parameter("origin_latitude")) {
-        node.declare_parameter("origin_latitude", 0.0);
-      }
-      if (!node.has_parameter("origin_longitude")) {
-        node.declare_parameter("origin_longitude", 0.0);
-      }
-      node.get_parameter("origin_latitude", origin.latitude);
-      node.get_parameter("origin_longitude", origin.longitude);
-    }
-
-    return origin;
   }
 
   template <class NodeT, class AllocatorT = std::allocator<void>>
@@ -346,16 +325,16 @@ public:
                (traffic_simulator_msgs::msg::EntityType::MISC_OBJECT == entity_type.type);
       }(entity_status.type);
 
-      const auto matching_distance = [](const auto & parameters) {
+      const auto matching_distance = [](const auto & local_parameters) {
         if constexpr (std::is_same_v<
                         std::decay_t<Parameters>, traffic_simulator_msgs::msg::VehicleParameters>) {
           return std::max(
-                   parameters.axles.front_axle.track_width,
-                   parameters.axles.rear_axle.track_width) *
+                   local_parameters.axles.front_axle.track_width,
+                   local_parameters.axles.rear_axle.track_width) *
                    0.5 +
                  1.0;
         } else {
-          return parameters.bounding_box.dimensions.y * 0.5 + 1.0;
+          return local_parameters.bounding_box.dimensions.y * 0.5 + 1.0;
         }
       }(parameters);
 
