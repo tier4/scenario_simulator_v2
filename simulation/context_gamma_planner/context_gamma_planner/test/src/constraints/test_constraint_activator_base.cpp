@@ -27,9 +27,8 @@ protected:
   static void TearDownTestCase() { rclcpp::shutdown(); }
   virtual void SetUp()
   {
-    std::string path = ament_index_cpp::get_package_share_directory("context_gamma_planner") +
-                       "/maps/lanelet2_map.osm";
-    geographic_msgs::msg::GeoPoint origin;
+    std::string path = ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
+                "lanelet2_map.osm", geographic_msgs::msg::GeoPoint origin;
     origin.latitude = 35.61836750154;
     origin.longitude = 139.78066608243;
     hdmap_utils_ptr = std::make_shared<hdmap_utils::HdMapUtils>(path, origin);
