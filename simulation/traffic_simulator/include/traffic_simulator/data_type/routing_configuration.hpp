@@ -14,6 +14,7 @@
 
 #ifndef TRAFFIC_SIMULATOR__DATA_TYPE__ROUTING_CONFIGURATIONS_HPP_
 #define TRAFFIC_SIMULATOR__DATA_TYPE__ROUTING_CONFIGURATIONS_HPP_
+
 #include <iostream>
 #include <traffic_simulator/data_type/routing_graph_type.hpp>
 
@@ -39,19 +40,5 @@ struct RoutingConfiguration
   }
 };
 }  // namespace traffic_simulator
-
-namespace std
-{
-template <>
-struct hash<traffic_simulator::RoutingConfiguration>
-{
-  std::size_t operator()(const traffic_simulator::RoutingConfiguration & config) const
-  {
-    auto h1 = std::hash<bool>{}(config.allow_lane_change);
-    auto h2 = std::hash<std::uint8_t>{}(static_cast<std::uint8_t>(config.routing_graph_type));
-    return h1 ^ (h2 << 1);
-  }
-};
-}  // namespace std
 
 #endif  // TRAFFIC_SIMULATOR__DATA_TYPE__ROUTING_CONFIGURATIONS_HPP_
