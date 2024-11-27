@@ -32,6 +32,9 @@ Changelog for package openscenario_interpreter
 * add publish_empty_context parameter
 * Contributors: Masaya Kataoka
 
+5.5.0 (2024-11-27)
+------------------
+
 5.4.0 (2024-11-26)
 ------------------
 * Merge branch 'master' into feature/shoulder_routing_graph
