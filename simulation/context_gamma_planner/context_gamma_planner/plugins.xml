@@ -1,0 +1,17 @@
+
+<library path="context_gamma_planner">
+  <class name="context_gamma_planner/PedestrianPlugin"
+         type="context_gamma_planner::PedestrianPlugin"
+         base_class_type="entity_behavior::BehaviorPluginBase">
+    <description>
+      A context-gamma planner plugin for pedestrian NPC.
+    </description>
+  </class>
+  <class name="context_gamma_planner/VehiclePlugin"
+         type="context_gamma_planner::VehiclePlugin"
+         base_class_type="entity_behavior::BehaviorPluginBase">
+    <description>
+      A context-gamma planner plugin for vehicle NPC.
+    </description>
+  </class>
+</library>

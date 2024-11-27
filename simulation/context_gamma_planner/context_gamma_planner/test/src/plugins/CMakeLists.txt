@@ -1,0 +1,2 @@
+ament_add_gtest(test_pedestrian_plugin test_pedestrian_plugin.cpp)
+target_link_libraries(test_pedestrian_plugin context_gamma_planner)
