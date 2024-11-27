@@ -319,6 +319,8 @@ public:
   auto isTrafficLightRegulatoryElement(const lanelet::Id) const -> bool;
 
 private:
+  /// @note This value was determined experimentally by @hakuturu583 and not theoretically.
+  /// @sa https://github.com/tier4/scenario_simulator_v2/commit/4c8e9f496b061b00bec799159d59c33f2ba46b3a
   constexpr static double DEFAULT_MATCH_TO_LANE_REDUCTION_RATIO = 0.8;
 
 public:
