@@ -45,6 +45,7 @@ ament_auto_add_library(traffic_simulator SHARED
   src/entity/pedestrian_entity.cpp
   src/entity/vehicle_entity.cpp
   src/hdmap_utils/hdmap_utils.cpp
+  src/hdmap_utils/traffic_rules.cpp
   src/helper/helper.cpp
   src/job/job_list.cpp
   src/job/job.cpp

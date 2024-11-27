@@ -21,6 +21,23 @@ Changelog for package arithmetic
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+6.0.1 (2024-11-27)
+------------------
+
+6.0.0 (2024-11-27)
+------------------
+* Merge branch 'master' into refactor/add_routing_graph_argument
+* Merge branch 'master' into refactor/add_routing_graph_argument
+* Contributors: Kotaro Yoshimoto
+
+5.5.0 (2024-11-27)
+------------------
+
+5.4.0 (2024-11-26)
+------------------
+* Merge branch 'master' into feature/shoulder_routing_graph
+* Contributors: Kotaro Yoshimoto
+
 5.3.4 (2024-11-21)
 ------------------
 * Merge branch 'master' into fix/find_nearest_segment_index
