@@ -16,9 +16,11 @@
 #define OPENSCENARIO_INTERPRETER__SIMULATOR_CORE_HPP_
 
 #include <geometry/quaternion/quaternion_to_euler.hpp>
+#include <geometry/vector3/operator.hpp>
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/syntax/boolean.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
+#include <openscenario_interpreter/syntax/entity.hpp>
 #include <openscenario_interpreter/syntax/routing_algorithm.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <openscenario_interpreter/syntax/unsigned_integer.hpp>
@@ -533,7 +535,6 @@ public:
       return core->checkCollision(std::forward<decltype(xs)>(xs)...);
     }
 
-    template <typename... Ts>
     static auto evaluateBoundingBoxEuclideanDistance(
       const std::string & from_entity_name,
       const std::string & to_entity_name)  // for RelativeDistanceCondition
@@ -549,6 +550,42 @@ public:
         }
       }
       return std::numeric_limits<double>::quiet_NaN();
+    }
+
+    static auto evaluateRelativeSpeed(const Entity & from, const Entity & to)
+    {
+      auto direction = [](auto orientation) {
+        const auto euler_angle = math::geometry::convertQuaternionToEulerAngle(orientation);
+
+        // clang-format off
+        const auto roll  = euler_angle.x;
+        const auto pitch = euler_angle.y;
+        const auto yaw   = euler_angle.z;
+        // clang-format on
+
+        auto v = decltype(euler_angle)();
+
+        v.x = std::cos(yaw) * std::cos(pitch);
+        v.y = std::sin(yaw) * std::cos(pitch);
+        v.z = std::sin(pitch);
+
+        return v;
+      };
+
+      if (const auto a = core->getEntity(from.name())) {
+        if (const auto b = core->getEntity(to.name())) {
+          using math::geometry::operator*;
+          using math::geometry::operator-;
+
+          return direction(b->getMapPose().orientation) * b->getCurrentTwist().linear.x -
+                 direction(a->getMapPose().orientation) * a->getCurrentTwist().linear.x;
+        }
+      }
+
+      return geometry_msgs::build<geometry_msgs::msg::Vector3>()
+        .x(Double::nan())
+        .y(Double::nan())
+        .z(Double::nan());
     }
 
     template <typename... Ts>
