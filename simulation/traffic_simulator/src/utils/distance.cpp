@@ -275,7 +275,6 @@ auto distanceToYieldStop(
   const CanonicalizedLaneletPose & reference_pose, const lanelet::Ids & following_lanelets,
   const std::vector<CanonicalizedLaneletPose> & other_poses) -> std::optional<double>
 {
-  constexpr bool allow_lane_change{false};
   auto getPosesOnLanelet = [&other_poses](const auto & lanelet_id) {
     std::vector<CanonicalizedLaneletPose> ret;
     for (const auto & pose : other_poses) {

@@ -243,7 +243,7 @@ public:
 struct TrafficRulesWithRoutingGraph
 {
   lanelet::traffic_rules::TrafficRulesPtr rules;
-  lanelet::routing::RoutingGraphPtr graph;
+  lanelet::routing::RoutingGraphConstPtr graph;
   mutable RouteCache route_cache;
 };
 
@@ -252,18 +252,18 @@ class LaneletWrapper
 public:
   static auto activate(const std::string & lanelet_map_path) -> void;
 
-  [[nodiscard]] static auto map() -> const lanelet::LaneletMapPtr &;
+  [[nodiscard]] static auto map() -> const lanelet::LaneletMapPtr;
   [[nodiscard]] static auto routingGraph(const RoutingGraphType type)
-    -> const lanelet::routing::RoutingGraphConstPtr &;
+    -> const lanelet::routing::RoutingGraphConstPtr;
   [[nodiscard]] static auto trafficRules(const RoutingGraphType type)
-    -> const lanelet::traffic_rules::TrafficRulesPtr &;
+    -> const lanelet::traffic_rules::TrafficRulesPtr;
 
   [[nodiscard]] static auto routeCache(const RoutingGraphType type) -> RouteCache &;
   [[nodiscard]] static auto centerPointsCache() -> CenterPointsCache &;
   [[nodiscard]] static auto laneletLengthCache() -> LaneletLengthCache &;
 
 private:
-  LaneletWrapper(const std::filesystem::path & lanelet2_map_path);
+  LaneletWrapper(const std::filesystem::path & lanelet_map_path);
   static LaneletWrapper & getInstance();
 
   auto calculateAccumulatedLengths(const lanelet::ConstLineString3d & line_string)

@@ -170,8 +170,6 @@ auto toLaneletPoses(
   auto insertIds = [&](const auto & new_ids) {
     lanelet_ids_set.insert(new_ids.begin(), new_ids.end());
   };
-  /// @todo here entity_type is hardcoded as VEHICLE
-  const auto entity_type = traffic_simulator_msgs::build<EntityType>().type(EntityType::VEHICLE);
   insertIds(leftLaneletIds(lanelet_id, type, include_opposite_direction));
   insertIds(rightLaneletIds(lanelet_id, type, include_opposite_direction));
   insertIds(lanelet_map::previousLaneletIds({lanelet_id}, type));

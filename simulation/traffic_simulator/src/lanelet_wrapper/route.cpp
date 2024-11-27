@@ -64,6 +64,49 @@ auto route(
       LaneletWrapper::routingGraph(routing_configuration.routing_graph_type));
 }
 
+// auto route(
+//   const lanelet::Id from_lanelet_id, const lanelet::Id to_lanelet_id,
+//   const RoutingConfiguration & routing_configuration) -> lanelet::Ids
+// {
+//   auto & cache = LaneletWrapper::routeCache(routing_configuration.routing_graph_type);
+//   std::cout << " ########## A ##########" << std::endl;
+//   if (cache.exists(from_lanelet_id, to_lanelet_id, routing_configuration.allow_lane_change)) {
+//     return cache.getRoute(from_lanelet_id, to_lanelet_id, routing_configuration.allow_lane_change);
+//   }
+//   std::cout << " ########## B ##########" << std::endl;
+
+//   lanelet::Ids ids;
+//   const auto lanelet = LaneletWrapper::map()->laneletLayer.get(from_lanelet_id);
+//   const auto to_lanelet = LaneletWrapper::map()->laneletLayer.get(to_lanelet_id);
+//   std::cout << " ########## B + ##########" << std::endl;
+//   const auto graph = LaneletWrapper::routingGraph(routing_configuration.routing_graph_type);
+//   std::cout << " ########## B ++ ##########" << std::endl;
+//   lanelet::Optional<lanelet::routing::Route> route =
+//     graph->getRoute(lanelet, to_lanelet, 0, routing_configuration.allow_lane_change);
+//   std::cout << " ########## C ##########" << std::endl;
+
+//   if (!route) {
+//     cache.appendData(from_lanelet_id, to_lanelet_id, routing_configuration.allow_lane_change, ids);
+//     return ids;
+//   }
+//   lanelet::routing::LaneletPath shortest_path = route->shortestPath();
+//   std::cout << " ########## D ##########" << std::endl;
+
+//   if (shortest_path.empty()) {
+//     cache.appendData(from_lanelet_id, to_lanelet_id, routing_configuration.allow_lane_change, ids);
+//     return ids;
+//   }
+//   std::cout << " ########## E ##########" << std::endl;
+
+//   for (auto lane_itr = shortest_path.begin(); lane_itr != shortest_path.end(); lane_itr++) {
+//     ids.push_back(lane_itr->id());
+//   }
+//   cache.appendData(from_lanelet_id, to_lanelet_id, routing_configuration.allow_lane_change, ids);
+//   std::cout << " ########## G ##########" << std::endl;
+
+//   return ids;
+// }
+
 auto followingLanelets(
   const lanelet::Id current_lanelet_id, const lanelet::Ids & route, const double horizon,
   const bool include_current_lanelet_id, const RoutingGraphType type) -> lanelet::Ids

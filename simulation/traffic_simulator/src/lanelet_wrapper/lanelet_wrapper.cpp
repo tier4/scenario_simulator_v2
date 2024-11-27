@@ -46,13 +46,13 @@ LaneletWrapper & LaneletWrapper::getInstance()
   return *instance;
 }
 
-auto LaneletWrapper::map() -> const lanelet::LaneletMapPtr &
+auto LaneletWrapper::map() -> const lanelet::LaneletMapPtr
 {
   return getInstance().lanelet_map_ptr_;
 }
 
 auto LaneletWrapper::routingGraph(const RoutingGraphType type)
-  -> const lanelet::routing::RoutingGraphConstPtr &
+  -> const lanelet::routing::RoutingGraphConstPtr
 {
   switch (type) {
     case RoutingGraphType::VEHICLE:
@@ -69,7 +69,7 @@ auto LaneletWrapper::routingGraph(const RoutingGraphType type)
 }
 
 auto LaneletWrapper::trafficRules(const RoutingGraphType type)
-  -> const lanelet::traffic_rules::TrafficRulesPtr &
+  -> const lanelet::traffic_rules::TrafficRulesPtr
 {
   switch (type) {
     case RoutingGraphType::VEHICLE:
