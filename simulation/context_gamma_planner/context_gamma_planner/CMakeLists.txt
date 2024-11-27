@@ -47,9 +47,6 @@ target_link_libraries(${PROJECT_NAME}
   glog
 )
 
-
-add_subdirectory(src/mock)
-
 pluginlib_export_plugin_description_file(traffic_simulator plugins.xml)
 
 if(${tf2_geometry_msgs_VERSION} VERSION_LESS 0.18.0)
