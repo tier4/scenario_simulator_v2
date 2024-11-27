@@ -188,11 +188,11 @@ auto laneChangePoints(
 
 auto countLaneChanges(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
-  bool allow_lane_change) -> std::optional<std::pair<int, int>>
+  const RoutingConfiguration & routing_configuration) -> std::optional<std::pair<int, int>>
 {
   return lanelet_wrapper::lane_change::countLaneChanges(
     static_cast<LaneletPose>(from).lanelet_id, static_cast<LaneletPose>(to).lanelet_id,
-    allow_lane_change);
+    routing_configuration);
 }
 }  // namespace route
 }  // namespace traffic_simulator

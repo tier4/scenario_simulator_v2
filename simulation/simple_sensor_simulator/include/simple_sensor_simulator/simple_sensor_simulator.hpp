@@ -153,7 +153,6 @@ private:
   simulation_api_schema::UpdateTrafficLightsRequest traffic_signals_states_;
   traffic_simulator_msgs::BoundingBox getBoundingBox(const std::string & name);
   zeromq::MultiServer server_;
-  geographic_msgs::msg::GeoPoint getOrigin();
   std::shared_ptr<vehicle_simulation::EgoEntitySimulation> ego_entity_simulation_;
 
   bool isEgo(const std::string & name);

@@ -29,7 +29,7 @@ int main(int argc, char ** argv)
 class RoutePlannerTest : public testing::Test
 {
 protected:
-  RoutePlannerTest() { activateLaneletWrapper(); }
+  RoutePlannerTest() { activateLaneletWrapper("standard_map"); }
 
   traffic_simulator::RoutePlanner planner;
 };

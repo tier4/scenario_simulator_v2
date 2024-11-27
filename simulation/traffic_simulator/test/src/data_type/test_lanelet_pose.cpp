@@ -28,7 +28,7 @@ int main(int argc, char ** argv)
 class CanonicalizedLaneletPoseTest : public testing::Test
 {
 protected:
-  CanonicalizedLaneletPoseTest() { activateLaneletWrapper(); }
+  CanonicalizedLaneletPoseTest() { activateLaneletWrapper("standard_map"); }
 };
 
 /**

@@ -715,8 +715,8 @@ class TrafficLightTest : public testing::Test
 protected:
   TrafficLightTest()
   {
-    const auto lanelet_path =
-      ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm";
+    const auto lanelet_path = ament_index_cpp::get_package_share_directory("traffic_simulator") +
+                              "/map/standard_map/lanelet2_map.osm";
     traffic_simulator::lanelet_map::activate(lanelet_path);
   }
 };

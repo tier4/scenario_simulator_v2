@@ -39,6 +39,10 @@ using BoundingBox = traffic_simulator_msgs::msg::BoundingBox;
 using LaneletPose = traffic_simulator_msgs::msg::LaneletPose;
 using EntityType = traffic_simulator_msgs::msg::EntityType;
 
+/// @note This value was determined experimentally by @hakuturu583 and not theoretically.
+/// @sa https://github.com/tier4/scenario_simulator_v2/commit/4c8e9f496b061b00bec799159d59c33f2ba46b3a
+constexpr static double DEFAULT_MATCH_TO_LANE_REDUCTION_RATIO = 0.8;
+
 auto toMapPose(const LaneletPose & lanelet_pose, const bool fill_pitch = true) -> PoseStamped;
 
 auto toLaneletPose(
@@ -55,11 +59,13 @@ auto toLaneletPose(
 
 auto toLaneletPose(
   const Pose & map_pose, const BoundingBox & bounding_box, const bool include_crosswalk,
-  const double matching_distance) -> std::optional<LaneletPose>;
+  const double matching_distance, const RoutingGraphType type = RoutingGraphType::VEHICLE)
+  -> std::optional<LaneletPose>;
 
 auto toLaneletPoses(
   const Pose & map_pose, const lanelet::Id lanelet_id, const double matching_distance,
-  const bool include_opposite_direction) -> std::vector<LaneletPose>;
+  const bool include_opposite_direction, const RoutingGraphType type = RoutingGraphType::VEHICLE)
+  -> std::vector<LaneletPose>;
 
 auto alternativeLaneletPoses(const LaneletPose & lanelet_pose) -> std::vector<LaneletPose>;
 
@@ -67,7 +73,9 @@ auto alongLaneletPose(
   const LaneletPose & from_pose, const lanelet::Ids & route_lanelets, const double distance)
   -> LaneletPose;
 
-auto alongLaneletPose(const LaneletPose & from_pose, const double distance) -> LaneletPose;
+auto alongLaneletPose(
+  const LaneletPose & from_pose, const double distance,
+  const RoutingGraphType type = RoutingGraphType::VEHICLE) -> LaneletPose;
 
 auto canonicalizeLaneletPose(const LaneletPose & lanelet_pose)
   -> std::tuple<std::optional<LaneletPose>, std::optional<lanelet::Id>>;
@@ -78,15 +86,17 @@ auto canonicalizeLaneletPose(const LaneletPose & lanelet_pose, const lanelet::Id
 // used only by this namespace
 auto matchToLane(
   const Pose & map_pose, const BoundingBox & bounding_box, const bool include_crosswalk,
-  const double matching_distance, const double reduction_ratio) -> std::optional<lanelet::Id>;
+  const double matching_distance,
+  const double reduction_ratio = DEFAULT_MATCH_TO_LANE_REDUCTION_RATIO,
+  const RoutingGraphType type = RoutingGraphType::VEHICLE) -> std::optional<lanelet::Id>;
 
 auto leftLaneletIds(
-  const lanelet::Id lanelet_id, const EntityType & entity_type,
-  const bool include_opposite_direction) -> lanelet::Ids;
+  const lanelet::Id lanelet_id, const RoutingGraphType type, const bool include_opposite_direction)
+  -> lanelet::Ids;
 
 auto rightLaneletIds(
-  const lanelet::Id lanelet_id, const EntityType & entity_type,
-  const bool include_opposite_direction) -> lanelet::Ids;
+  const lanelet::Id lanelet_id, const RoutingGraphType type, const bool include_opposite_direction)
+  -> lanelet::Ids;
 }  // namespace pose
 }  // namespace lanelet_wrapper
 }  // namespace traffic_simulator

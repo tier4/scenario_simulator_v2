@@ -78,7 +78,7 @@ auto makeUpdatedStatus(
           to_canonicalized_lanelet_pose) {
         if (const auto distance = distance::longitudinalDistance(
               from_canonicalized_lanelet_pose.value(), to_canonicalized_lanelet_pose.value(), false,
-              false, false);
+              false, RoutingConfiguration());
             distance) {
           return distance.value();
         }

@@ -14,8 +14,14 @@
 
 #include <lanelet2_traffic_rules/TrafficRulesFactory.h>
 
-#include <traffic_simulator/hdmap_utils/traffic_rules.hpp>
+#include <traffic_simulator/lanelet_wrapper/traffic_rules.hpp>
 
-lanelet::traffic_rules::RegisterTrafficRules<hdmap_utils::GermanRoadShoulderPassableVehicle>
+namespace traffic_simulator
+{
+namespace lanelet_wrapper
+{
+lanelet::traffic_rules::RegisterTrafficRules<GermanRoadShoulderPassableVehicle>
   germanRoadShoulderPassableVehicleRules(
-    hdmap_utils::Locations::RoadShoulderPassableGermany, lanelet::Participants::Vehicle);
+    Locations::RoadShoulderPassableGermany, lanelet::Participants::Vehicle);
+}
+}  // namespace traffic_simulator

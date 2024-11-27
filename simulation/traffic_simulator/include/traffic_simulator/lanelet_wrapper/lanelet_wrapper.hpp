@@ -15,16 +15,20 @@
 #ifndef TRAFFIC_SIMULATOR__LANELET_WRAPPER_HPP_
 #define TRAFFIC_SIMULATOR__LANELET_WRAPPER_HPP_
 
+#include <lanelet2_io/Io.h>
 #include <lanelet2_routing/RoutingGraph.h>
 #include <lanelet2_routing/RoutingGraphContainer.h>
 #include <lanelet2_traffic_rules/TrafficRulesFactory.h>
 
+#include <autoware_lanelet2_extension/projection/mgrs_projector.hpp>
 #include <autoware_lanelet2_extension/utility/utilities.hpp>
 #include <filesystem>
 #include <geometry/spline/catmull_rom_spline.hpp>
 #include <geometry_msgs/msg/point.hpp>
 #include <mutex>
 #include <scenario_simulator_exception/exception.hpp>
+#include <traffic_simulator/data_type/routing_configuration.hpp>
+#include <traffic_simulator/data_type/routing_graph_type.hpp>
 
 namespace std
 {
@@ -57,27 +61,31 @@ class RouteCache
 public:
   auto getRoute(
     const lanelet::Id from_lanelet_id, const lanelet::Id to_lanelet_id,
-    const bool allow_lane_change, const lanelet::LaneletMapPtr & lanelet_map,
+    const lanelet::LaneletMapPtr & lanelet_map,
+    const traffic_simulator::RoutingConfiguration & routing_configuration,
     const lanelet::routing::RoutingGraphConstPtr & routing_graph) -> lanelet::Ids
   {
-    if (!exists(from_lanelet_id, to_lanelet_id, allow_lane_change)) {
+    if (!exists(from_lanelet_id, to_lanelet_id, routing_configuration.allow_lane_change)) {
       constexpr int routing_cost_id = 0;
       const auto & from_lanelet = lanelet_map->laneletLayer.get(from_lanelet_id);
       const auto & to_lanelet = lanelet_map->laneletLayer.get(to_lanelet_id);
-      if (const auto route =
-            routing_graph->getRoute(from_lanelet, to_lanelet, routing_cost_id, allow_lane_change);
+      if (const auto route = routing_graph->getRoute(
+            from_lanelet, to_lanelet, routing_cost_id, routing_configuration.allow_lane_change);
           !route || route->shortestPath().empty()) {
-        appendData(from_lanelet_id, to_lanelet_id, allow_lane_change, lanelet::Ids());
+        appendData(
+          from_lanelet_id, to_lanelet_id, routing_configuration.allow_lane_change, lanelet::Ids());
       } else {
         lanelet::Ids shortest_path_ids;
         for (const auto & lanelet : route->shortestPath()) {
           shortest_path_ids.push_back(lanelet.id());
         }
-        appendData(from_lanelet_id, to_lanelet_id, allow_lane_change, shortest_path_ids);
+        appendData(
+          from_lanelet_id, to_lanelet_id, routing_configuration.allow_lane_change,
+          shortest_path_ids);
       }
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    return data_.at({from_lanelet_id, to_lanelet_id, allow_lane_change});
+    return data_.at({from_lanelet_id, to_lanelet_id, routing_configuration.allow_lane_change});
   }
 
   auto getRoute(const lanelet::Id from, const lanelet::Id to, const bool allow_lane_change)
@@ -232,20 +240,27 @@ public:
   }
 };
 
+struct TrafficRulesWithRoutingGraph
+{
+  lanelet::traffic_rules::TrafficRulesPtr rules;
+  lanelet::routing::RoutingGraphPtr graph;
+  mutable RouteCache route_cache;
+};
+
 class LaneletWrapper
 {
 public:
-  static auto routeCache() -> RouteCache &;
-  static auto centerPointsCache() -> CenterPointsCache &;
-  static auto laneletLengthCache() -> LaneletLengthCache &;
-
   static auto activate(const std::string & lanelet_map_path) -> void;
-  static auto map() -> const lanelet::LaneletMapPtr &;
-  static auto shoulderLanelets() -> const lanelet::ConstLanelets &;
-  static auto vehicleRoutingGraph() -> const lanelet::routing::RoutingGraphConstPtr &;
-  static auto pedestrianRoutingGraph() -> const lanelet::routing::RoutingGraphConstPtr &;
-  static auto trafficRulesVehicle() -> const lanelet::traffic_rules::TrafficRulesPtr &;
-  static auto trafficRulesPedestrian() -> const lanelet::traffic_rules::TrafficRulesPtr &;
+
+  [[nodiscard]] static auto map() -> const lanelet::LaneletMapPtr &;
+  [[nodiscard]] static auto routingGraph(const RoutingGraphType type)
+    -> const lanelet::routing::RoutingGraphConstPtr &;
+  [[nodiscard]] static auto trafficRules(const RoutingGraphType type)
+    -> const lanelet::traffic_rules::TrafficRulesPtr &;
+
+  [[nodiscard]] static auto routeCache(const RoutingGraphType type) -> RouteCache &;
+  [[nodiscard]] static auto centerPointsCache() -> CenterPointsCache &;
+  [[nodiscard]] static auto laneletLengthCache() -> LaneletLengthCache &;
 
 private:
   LaneletWrapper(const std::filesystem::path & lanelet2_map_path);
@@ -264,16 +279,17 @@ private:
   inline static std::string lanelet_map_path_{""};
   inline static std::mutex mutex_;
 
-  mutable RouteCache route_cache_;
+  lanelet::projection::MGRSProjector mgrs_projector_;
+  lanelet::ErrorMessages lanelet_errors_;
+
+  const lanelet::LaneletMapPtr lanelet_map_ptr_;
+  /// @todo It is worth trying to add const to each attribute of type TrafficRulesWithRoutingGraph
+  TrafficRulesWithRoutingGraph vehicle_;
+  TrafficRulesWithRoutingGraph vehicle_with_road_shoulder_;
+  TrafficRulesWithRoutingGraph pedestrian_;
+
   mutable CenterPointsCache center_points_cache_;
   mutable LaneletLengthCache lanelet_length_cache_;
-
-  lanelet::LaneletMapPtr lanelet_map_ptr_;
-  lanelet::ConstLanelets shoulder_lanelets_;
-  lanelet::routing::RoutingGraphConstPtr vehicle_routing_graph_ptr_;
-  lanelet::routing::RoutingGraphConstPtr pedestrian_routing_graph_ptr_;
-  lanelet::traffic_rules::TrafficRulesPtr traffic_rules_vehicle_ptr_;
-  lanelet::traffic_rules::TrafficRulesPtr traffic_rules_pedestrian_ptr_;
 };
 }  // namespace lanelet_wrapper
 }  // namespace traffic_simulator

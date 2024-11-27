@@ -20,6 +20,7 @@
 
 #include <geometry/spline/catmull_rom_spline.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
+#include <traffic_simulator/lanelet_wrapper/lanelet_wrapper.hpp>
 #include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
 
 namespace traffic_simulator
@@ -40,6 +41,16 @@ auto laneletLength(const lanelet::Id lanelet_id) -> double;
 auto laneletYaw(const lanelet::Id lanelet_id, const Point & point)
   -> std::tuple<double, Point, Point>;
 
+template <typename Lanelet>
+auto laneletIds(const std::vector<Lanelet> & lanelets) -> lanelet::Ids
+{
+  lanelet::Ids ids;
+  std::transform(
+    lanelets.begin(), lanelets.end(), std::back_inserter(ids),
+    [](const auto & lanelet) { return lanelet.id(); });
+  return ids;
+}
+
 auto laneletIds() -> lanelet::Ids;
 
 auto nearbyLaneletIds(
@@ -54,28 +65,40 @@ auto centerPoints(const lanelet::Id lanelet_id) -> std::vector<Point>;
 auto centerPointsSpline(const lanelet::Id lanelet_id) -> std::shared_ptr<Spline>;
 
 // Next lanelet
-auto nextLaneletIds(const lanelet::Id lanelet_id) -> lanelet::Ids;
+auto nextLaneletIds(
+  const lanelet::Id lanelet_id,
+  const RoutingGraphType type = RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER) -> lanelet::Ids;
 
-auto nextLaneletIds(const lanelet::Ids & lanelet_ids) -> lanelet::Ids;
+auto nextLaneletIds(
+  const lanelet::Ids & lanelet_ids,
+  const RoutingGraphType type = RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER) -> lanelet::Ids;
 
-auto nextLaneletIds(const lanelet::Id lanelet_id, const std::string & turn_direction)
-  -> lanelet::Ids;
+auto nextLaneletIds(
+  const lanelet::Id lanelet_id, const std::string & turn_direction,
+  const RoutingGraphType type = RoutingGraphType::VEHICLE) -> lanelet::Ids;
 
-auto nextLaneletIds(const lanelet::Ids & lanelet_ids, const std::string & turn_direction)
-  -> lanelet::Ids;
+auto nextLaneletIds(
+  const lanelet::Ids & lanelet_ids, const std::string & turn_direction,
+  const RoutingGraphType type = RoutingGraphType::VEHICLE) -> lanelet::Ids;
 
-//Previous lanelet
-auto previousLaneletIds(const lanelet::Id lanelet_id) -> lanelet::Ids;
+// Previous lanelet
+auto previousLaneletIds(
+  const lanelet::Id lanelet_id,
+  const RoutingGraphType type = RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER) -> lanelet::Ids;
 
-auto previousLaneletIds(const lanelet::Ids & lanelet_ids) -> lanelet::Ids;
+auto previousLaneletIds(
+  const lanelet::Ids & lanelet_ids,
+  const RoutingGraphType type = RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER) -> lanelet::Ids;
 
-auto previousLaneletIds(const lanelet::Id lanelet_id, const std::string & turn_direction)
-  -> lanelet::Ids;
+auto previousLaneletIds(
+  const lanelet::Id lanelet_id, const std::string & turn_direction,
+  const RoutingGraphType type = RoutingGraphType::VEHICLE) -> lanelet::Ids;
 
-auto previousLaneletIds(const lanelet::Ids & lanelet_ids, const std::string & turn_direction)
-  -> lanelet::Ids;
+auto previousLaneletIds(
+  const lanelet::Ids & lanelet_ids, const std::string & turn_direction,
+  const RoutingGraphType type = RoutingGraphType::VEHICLE) -> lanelet::Ids;
 
-//Bounds
+// Bounds
 auto leftBound(const lanelet::Id lanelet_id) -> std::vector<Point>;
 
 auto rightBound(const lanelet::Id lanelet_id) -> std::vector<Point>;
@@ -95,7 +118,9 @@ auto rightOfWayLaneletIds(const lanelet::Id lanelet_id) -> lanelet::Ids;
 
 auto conflictingCrosswalkIds(const lanelet::Ids & lanelet_ids) -> lanelet::Ids;
 
-auto conflictingLaneIds(const lanelet::Ids & lanelet_ids) -> lanelet::Ids;
+auto conflictingLaneIds(
+  const lanelet::Ids & lanelet_ids, const RoutingGraphType type = RoutingGraphType::VEHICLE)
+  -> lanelet::Ids;
 }  // namespace lanelet_map
 }  // namespace lanelet_wrapper
 }  // namespace traffic_simulator

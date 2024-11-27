@@ -13,11 +13,11 @@
 // limitations under the License.
 
 #include <lanelet2_core/geometry/Lanelet.h>
-#include <lanelet2_io/Io.h>
 
 #include <autoware_lanelet2_extension/projection/mgrs_projector.hpp>
 #include <autoware_lanelet2_extension/utility/query.hpp>
 #include <traffic_simulator/lanelet_wrapper/lanelet_wrapper.hpp>
+#include <traffic_simulator/lanelet_wrapper/traffic_rules.hpp>
 
 namespace traffic_simulator
 {
@@ -46,7 +46,60 @@ LaneletWrapper & LaneletWrapper::getInstance()
   return *instance;
 }
 
-auto LaneletWrapper::routeCache() -> RouteCache & { return getInstance().route_cache_; }
+auto LaneletWrapper::map() -> const lanelet::LaneletMapPtr &
+{
+  return getInstance().lanelet_map_ptr_;
+}
+
+auto LaneletWrapper::routingGraph(const RoutingGraphType type)
+  -> const lanelet::routing::RoutingGraphConstPtr &
+{
+  switch (type) {
+    case RoutingGraphType::VEHICLE:
+      return getInstance().vehicle_.graph;
+    case RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER:
+      return getInstance().vehicle_with_road_shoulder_.graph;
+    case RoutingGraphType::PEDESTRIAN:
+      return getInstance().pedestrian_.graph;
+    default:
+      std::stringstream what;
+      what << "Invalid routing graph type: " << static_cast<int>(type);
+      throw common::Error(what.str());
+  }
+}
+
+auto LaneletWrapper::trafficRules(const RoutingGraphType type)
+  -> const lanelet::traffic_rules::TrafficRulesPtr &
+{
+  switch (type) {
+    case RoutingGraphType::VEHICLE:
+      return getInstance().vehicle_.rules;
+    case RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER:
+      return getInstance().vehicle_with_road_shoulder_.rules;
+    case RoutingGraphType::PEDESTRIAN:
+      return getInstance().pedestrian_.rules;
+    default:
+      std::stringstream what;
+      what << "Invalid routing graph type: " << static_cast<int>(type);
+      throw common::Error(what.str());
+  }
+}
+
+auto LaneletWrapper::routeCache(const RoutingGraphType type) -> RouteCache &
+{
+  switch (type) {
+    case RoutingGraphType::VEHICLE:
+      return getInstance().vehicle_.route_cache;
+    case RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER:
+      return getInstance().vehicle_with_road_shoulder_.route_cache;
+    case RoutingGraphType::PEDESTRIAN:
+      return getInstance().pedestrian_.route_cache;
+    default:
+      std::stringstream what;
+      what << "Invalid routing graph type: " << static_cast<int>(type);
+      throw common::Error(what.str());
+  }
+}
 
 auto LaneletWrapper::centerPointsCache() -> CenterPointsCache &
 {
@@ -58,41 +111,13 @@ auto LaneletWrapper::laneletLengthCache() -> LaneletLengthCache &
   return getInstance().lanelet_length_cache_;
 }
 
-auto LaneletWrapper::map() -> const lanelet::LaneletMapPtr &
-{
-  return getInstance().lanelet_map_ptr_;
-}
-
-auto LaneletWrapper::shoulderLanelets() -> const lanelet::ConstLanelets &
-{
-  return getInstance().shoulder_lanelets_;
-}
-auto LaneletWrapper::vehicleRoutingGraph() -> const lanelet::routing::RoutingGraphConstPtr &
-{
-  return getInstance().vehicle_routing_graph_ptr_;
-}
-auto LaneletWrapper::pedestrianRoutingGraph() -> const lanelet::routing::RoutingGraphConstPtr &
-{
-  return getInstance().pedestrian_routing_graph_ptr_;
-}
-auto LaneletWrapper::trafficRulesVehicle() -> const lanelet::traffic_rules::TrafficRulesPtr &
-{
-  return getInstance().traffic_rules_vehicle_ptr_;
-}
-auto LaneletWrapper::trafficRulesPedestrian() -> const lanelet::traffic_rules::TrafficRulesPtr &
-{
-  return getInstance().traffic_rules_pedestrian_ptr_;
-}
-
 LaneletWrapper::LaneletWrapper(const std::filesystem::path & lanelet_map_path)
+: lanelet_map_ptr_(lanelet::load(lanelet_map_path.string(), mgrs_projector_, &lanelet_errors_))
 {
-  lanelet::projection::MGRSProjector mgrs_projector;
-  lanelet::ErrorMessages lanelet_errors;
-  lanelet_map_ptr_ = lanelet::load(lanelet_map_path.string(), mgrs_projector, &lanelet_errors);
-  if (!lanelet_errors.empty()) {
+  if (!lanelet_errors_.empty()) {
     std::stringstream ss;
     ss << "Failed to load lanelet map, errors:\n";
-    for (const auto & error : lanelet_errors) {
+    for (const auto & error : lanelet_errors_) {
       ss << " - " << error << "\n";
     }
     THROW_SIMULATION_ERROR(ss.str());
@@ -103,18 +128,18 @@ LaneletWrapper::LaneletWrapper(const std::filesystem::path & lanelet_map_path)
   }
 
   overwriteLaneletsCenterline();
-  shoulder_lanelets_ =
-    lanelet::utils::query::shoulderLanelets(lanelet::utils::query::laneletLayer(lanelet_map_ptr_));
-  // Vehicle
-  traffic_rules_vehicle_ptr_ = lanelet::traffic_rules::TrafficRulesFactory::create(
+  vehicle_.rules = lanelet::traffic_rules::TrafficRulesFactory::create(
     lanelet::Locations::Germany, lanelet::Participants::Vehicle);
-  vehicle_routing_graph_ptr_ =
-    lanelet::routing::RoutingGraph::build(*lanelet_map_ptr_, *traffic_rules_vehicle_ptr_);
-  // Pedestrian
-  traffic_rules_pedestrian_ptr_ = lanelet::traffic_rules::TrafficRulesFactory::create(
+  vehicle_.graph = lanelet::routing::RoutingGraph::build(*lanelet_map_ptr_, *vehicle_.rules);
+
+  vehicle_with_road_shoulder_.rules = lanelet::traffic_rules::TrafficRulesFactory::create(
+    Locations::RoadShoulderPassableGermany, lanelet::Participants::Vehicle);
+  vehicle_with_road_shoulder_.graph =
+    lanelet::routing::RoutingGraph::build(*lanelet_map_ptr_, *vehicle_with_road_shoulder_.rules);
+
+  pedestrian_.rules = lanelet::traffic_rules::TrafficRulesFactory::create(
     lanelet::Locations::Germany, lanelet::Participants::Pedestrian);
-  pedestrian_routing_graph_ptr_ =
-    lanelet::routing::RoutingGraph::build(*lanelet_map_ptr_, *traffic_rules_pedestrian_ptr_);
+  pedestrian_.graph = lanelet::routing::RoutingGraph::build(*lanelet_map_ptr_, *pedestrian_.rules);
 }
 
 auto LaneletWrapper::calculateAccumulatedLengths(const lanelet::ConstLineString3d & line_string)

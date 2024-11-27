@@ -35,7 +35,7 @@ class MiscObjectEntityTest_LaneletWapper : public testing::Test
 protected:
   MiscObjectEntityTest_LaneletWapper() : entity_name("misc_object_entity")
   {
-    activateLaneletWrapper();
+    activateLaneletWrapper("standard_map");
   }
   const std::string entity_name;
 };

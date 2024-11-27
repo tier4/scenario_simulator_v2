@@ -98,7 +98,7 @@ auto laneChangePoints(
 
 auto countLaneChanges(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
-  bool allow_lane_change) -> std::optional<std::pair<int, int>>;
+  const RoutingConfiguration & routing_configuration) -> std::optional<std::pair<int, int>>;
 }  // namespace route
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__UTILS__ROUTE_HPP_

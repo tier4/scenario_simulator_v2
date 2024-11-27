@@ -85,10 +85,10 @@ auto makePose(
     orientation);
 }
 
-auto activateLaneletWrapper() -> void
+auto activateLaneletWrapper(const std::string map_name) -> void
 {
-  const auto lanelet_path =
-    ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm";
+  const auto lanelet_path = ament_index_cpp::get_package_share_directory("traffic_simulator") +
+                            "/map/" + map_name + "/lanelet2_map.osm";
   traffic_simulator::lanelet_map::activate(lanelet_path);
 }
 

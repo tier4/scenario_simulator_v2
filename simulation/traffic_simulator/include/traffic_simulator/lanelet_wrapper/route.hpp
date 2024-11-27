@@ -27,21 +27,26 @@ namespace route
 {
 auto isInRoute(const lanelet::Id lanelet_id, const lanelet::Ids & route_lanelets_ids) -> bool;
 
-auto speedLimit(const lanelet::Ids & lanelet_ids) -> double;
+auto speedLimit(
+  const lanelet::Ids & lanelet_ids, const RoutingGraphType type = RoutingGraphType::VEHICLE)
+  -> double;
 
 auto route(
   const lanelet::Id from_lanelet_id, const lanelet::Id to_lanelet_id,
-  const bool allow_lane_change = false) -> lanelet::Ids;
+  const RoutingConfiguration & routing_configuration = RoutingConfiguration()) -> lanelet::Ids;
 
 auto followingLanelets(
   const lanelet::Id lanelet_id, const lanelet::Ids & candidate_lanelet_ids,
-  const double distance = 100, const bool include_self = true) -> lanelet::Ids;
+  const double distance = 100, const bool include_self = true,
+  const RoutingGraphType type = RoutingGraphType::VEHICLE) -> lanelet::Ids;
 
 auto followingLanelets(
-  const lanelet::Id lanelet_id, const double distance = 100, const bool include_self = true)
-  -> lanelet::Ids;
+  const lanelet::Id lanelet_id, const double distance = 100, const bool include_self = true,
+  const RoutingGraphType type = RoutingGraphType::VEHICLE) -> lanelet::Ids;
 
-auto previousLanelets(const lanelet::Id lanelet_id, const double distance = 100) -> lanelet::Ids;
+auto previousLanelets(
+  const lanelet::Id current_lanelet_id, const double backward_horizon = 100,
+  const RoutingGraphType type = RoutingGraphType::VEHICLE) -> lanelet::Ids;
 }  // namespace route
 }  // namespace lanelet_wrapper
 }  // namespace traffic_simulator

@@ -36,17 +36,21 @@ using Direction = traffic_simulator::lane_change::Direction;
 using Constraint = traffic_simulator::lane_change::Constraint;
 using TrajectoryShape = traffic_simulator::lane_change::TrajectoryShape;
 
-auto canChangeLane(const lanelet::Id from_lanelet_id, const lanelet::Id to_lanelet_id) -> bool;
-
-auto laneChangeableLaneletId(const lanelet::Id lanelet_id, const Direction & direction)
-  -> std::optional<lanelet::Id>;
+auto canChangeLane(
+  const lanelet::Id from_lanelet_id, const lanelet::Id to_lanelet_id,
+  const RoutingGraphType type = RoutingGraphType::VEHICLE) -> bool;
 
 auto laneChangeableLaneletId(
-  const lanelet::Id lanelet_id, const Direction & direction, const std::uint8_t shift)
-  -> std::optional<lanelet::Id>;
+  const lanelet::Id lanelet_id, const Direction & direction,
+  const RoutingGraphType type = RoutingGraphType::VEHICLE) -> std::optional<lanelet::Id>;
+
+auto laneChangeableLaneletId(
+  const lanelet::Id lanelet_id, const Direction & direction, const std::uint8_t shift,
+  const RoutingGraphType type = RoutingGraphType::VEHICLE) -> std::optional<lanelet::Id>;
 
 auto countLaneChanges(
-  const lanelet::Id & from_lanelet_id, const lanelet::Id & to_lanelet_id, bool allow_lane_change)
+  const lanelet::Id & from_lanelet_id, const lanelet::Id & to_lanelet_id,
+  const RoutingConfiguration & routing_configuration = RoutingConfiguration())
   -> std::optional<std::pair<int, int>>;
 
 // Trajectory

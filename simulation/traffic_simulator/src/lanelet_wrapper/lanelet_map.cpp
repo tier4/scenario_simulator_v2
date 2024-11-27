@@ -20,7 +20,6 @@
 #include <geometry/vector3/normalize.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/lanelet_wrapper/lanelet_map.hpp>
-#include <traffic_simulator/lanelet_wrapper/lanelet_wrapper.hpp>
 #include <traffic_simulator/lanelet_wrapper/pose.hpp>
 
 namespace traffic_simulator
@@ -150,47 +149,34 @@ auto centerPointsSpline(const lanelet::Id lanelet_id) -> std::shared_ptr<Spline>
 }
 
 // Next lanelet
-auto nextLaneletIds(const lanelet::Id lanelet_id) -> lanelet::Ids
+auto nextLaneletIds(const lanelet::Id lanelet_id, const RoutingGraphType type) -> lanelet::Ids
 {
-  auto nextRoadShoulderLaneletIds = [](const lanelet::Id reference_lanelet_id) -> lanelet::Ids {
-    lanelet::Ids shoulder_lanelet_ids;
-    const auto & reference_lanelet = LaneletWrapper::map()->laneletLayer.get(reference_lanelet_id);
-    for (const auto & shoulder_lanelet : LaneletWrapper::shoulderLanelets()) {
-      if (lanelet::geometry::follows(reference_lanelet, shoulder_lanelet)) {
-        shoulder_lanelet_ids.push_back(shoulder_lanelet.id());
-      }
-    }
-    return shoulder_lanelet_ids;
-  };
-
   lanelet::Ids next_lanelet_ids;
-  const auto & lanelet = LaneletWrapper::map()->laneletLayer.get(lanelet_id);
-  for (const auto & following_lanelet : LaneletWrapper::vehicleRoutingGraph()->following(lanelet)) {
+  const auto lanelet = LaneletWrapper::map()->laneletLayer.get(lanelet_id);
+  for (const auto & following_lanelet : LaneletWrapper::routingGraph(type)->following(lanelet)) {
     next_lanelet_ids.push_back(following_lanelet.id());
-  }
-  for (const auto & shoulder_lanelet_id : nextRoadShoulderLaneletIds(lanelet_id)) {
-    next_lanelet_ids.push_back(shoulder_lanelet_id);
   }
   return next_lanelet_ids;
 }
 
-auto nextLaneletIds(const lanelet::Ids & lanelet_ids) -> lanelet::Ids
+auto nextLaneletIds(const lanelet::Ids & lanelet_ids, const RoutingGraphType type) -> lanelet::Ids
 {
   std::set<lanelet::Id> next_lanelet_ids_set;
   for (const auto & lanelet_id : lanelet_ids) {
-    auto next_lanelet_ids = nextLaneletIds(lanelet_id);
+    auto next_lanelet_ids = nextLaneletIds(lanelet_id, type);
     next_lanelet_ids_set.insert(next_lanelet_ids.begin(), next_lanelet_ids.end());
   }
   return lanelet::Ids(next_lanelet_ids_set.begin(), next_lanelet_ids_set.end());
 }
 
-auto nextLaneletIds(const lanelet::Id lanelet_id, const std::string & turn_direction)
+auto nextLaneletIds(
+  const lanelet::Id lanelet_id, const std::string & turn_direction, const RoutingGraphType type)
   -> lanelet::Ids
 {
   lanelet::Ids next_lanelet_ids;
   const auto & reference_lanelet = LaneletWrapper::map()->laneletLayer.get(lanelet_id);
   for (const auto & following_lanelet :
-       LaneletWrapper::vehicleRoutingGraph()->following(reference_lanelet)) {
+       LaneletWrapper::routingGraph(type)->following(reference_lanelet)) {
     if (following_lanelet.attributeOr("turn_direction", "else") == turn_direction) {
       next_lanelet_ids.push_back(following_lanelet.id());
     }
@@ -198,59 +184,48 @@ auto nextLaneletIds(const lanelet::Id lanelet_id, const std::string & turn_direc
   return next_lanelet_ids;
 }
 
-auto nextLaneletIds(const lanelet::Ids & lanelet_ids, const std::string & turn_direction)
+auto nextLaneletIds(
+  const lanelet::Ids & lanelet_ids, const std::string & turn_direction, const RoutingGraphType type)
   -> lanelet::Ids
 {
   std::set<lanelet::Id> next_lanelet_ids_set;
   for (const auto & lanelet_id : lanelet_ids) {
-    auto next_lanelet_ids = nextLaneletIds(lanelet_id, turn_direction);
+    auto next_lanelet_ids = nextLaneletIds(lanelet_id, turn_direction, type);
     next_lanelet_ids_set.insert(next_lanelet_ids.begin(), next_lanelet_ids.end());
   }
   return lanelet::Ids(next_lanelet_ids_set.begin(), next_lanelet_ids_set.end());
 }
 
-//Previus lanelet
-auto previousLaneletIds(const lanelet::Id lanelet_id) -> lanelet::Ids
+// Previus lanelet
+auto previousLaneletIds(const lanelet::Id lanelet_id, const RoutingGraphType type) -> lanelet::Ids
 {
-  auto previousRoadShoulderLanelet = [](const lanelet::Id reference_lanelet_id) -> lanelet::Ids {
-    lanelet::Ids shoulder_lanelet_ids;
-    const auto & reference_lanelet = LaneletWrapper::map()->laneletLayer.get(reference_lanelet_id);
-    for (const auto & shoulder_lanelet : LaneletWrapper::shoulderLanelets()) {
-      if (lanelet::geometry::follows(shoulder_lanelet, reference_lanelet)) {
-        shoulder_lanelet_ids.push_back(shoulder_lanelet.id());
-      }
-    }
-    return shoulder_lanelet_ids;
-  };
-
   lanelet::Ids previous_lanelet_ids;
-  const auto & lanelet = LaneletWrapper::map()->laneletLayer.get(lanelet_id);
-  for (const auto & previous_lanelet : LaneletWrapper::vehicleRoutingGraph()->previous(lanelet)) {
+  const auto lanelet = LaneletWrapper::map()->laneletLayer.get(lanelet_id);
+  for (const auto & previous_lanelet : LaneletWrapper::routingGraph(type)->previous(lanelet)) {
     previous_lanelet_ids.push_back(previous_lanelet.id());
-  }
-  for (const auto & shoulder_lanelet_id : previousRoadShoulderLanelet(lanelet_id)) {
-    previous_lanelet_ids.push_back(shoulder_lanelet_id);
   }
   return previous_lanelet_ids;
 }
 
-auto previousLaneletIds(const lanelet::Ids & lanelet_ids) -> lanelet::Ids
+auto previousLaneletIds(const lanelet::Ids & lanelet_ids, const RoutingGraphType type)
+  -> lanelet::Ids
 {
   std::set<lanelet::Id> previous_lanelet_ids_set;
   for (const auto & lanelet_id : lanelet_ids) {
-    auto previous_lanelet_ids = previousLaneletIds(lanelet_id);
+    auto previous_lanelet_ids = previousLaneletIds(lanelet_id, type);
     previous_lanelet_ids_set.insert(previous_lanelet_ids.begin(), previous_lanelet_ids.end());
   }
   return lanelet::Ids(previous_lanelet_ids_set.begin(), previous_lanelet_ids_set.end());
 }
 
-auto previousLaneletIds(const lanelet::Id lanelet_id, const std::string & turn_direction)
+auto previousLaneletIds(
+  const lanelet::Id lanelet_id, const std::string & turn_direction, const RoutingGraphType type)
   -> lanelet::Ids
 {
   lanelet::Ids previous_lanelet_ids;
   const auto reference_lanelet = LaneletWrapper::map()->laneletLayer.get(lanelet_id);
   for (const auto & previous_lanelet :
-       LaneletWrapper::vehicleRoutingGraph()->previous(reference_lanelet)) {
+       LaneletWrapper::routingGraph(type)->previous(reference_lanelet)) {
     if (previous_lanelet.attributeOr("turn_direction", "else") == turn_direction) {
       previous_lanelet_ids.push_back(previous_lanelet.id());
     }
@@ -258,12 +233,13 @@ auto previousLaneletIds(const lanelet::Id lanelet_id, const std::string & turn_d
   return previous_lanelet_ids;
 }
 
-auto previousLaneletIds(const lanelet::Ids & lanelet_ids, const std::string & turn_direction)
+auto previousLaneletIds(
+  const lanelet::Ids & lanelet_ids, const std::string & turn_direction, const RoutingGraphType type)
   -> lanelet::Ids
 {
   std::set<lanelet::Id> previous_lanelet_ids_set;
   for (const auto & lanelet_id : lanelet_ids) {
-    auto previous_lanelet_ids = previousLaneletIds(lanelet_id, turn_direction);
+    auto previous_lanelet_ids = previousLaneletIds(lanelet_id, turn_direction, type);
     previous_lanelet_ids_set.insert(previous_lanelet_ids.begin(), previous_lanelet_ids.end());
   }
   return lanelet::Ids(previous_lanelet_ids_set.begin(), previous_lanelet_ids_set.end());
@@ -339,7 +315,8 @@ auto conflictingCrosswalkIds(const lanelet::Ids & lanelet_ids) -> lanelet::Ids
   /// @note it is not clear if the distinction for crosswalks only is implemented here
   lanelet::Ids conflicting_crosswalk_ids;
   lanelet::routing::RoutingGraphContainer graphs_container(
-    {LaneletWrapper::vehicleRoutingGraph(), LaneletWrapper::pedestrianRoutingGraph()});
+    {LaneletWrapper::routingGraph(RoutingGraphType::VEHICLE),
+     LaneletWrapper::routingGraph(RoutingGraphType::PEDESTRIAN)});
   for (const auto & lanelet_id : lanelet_ids) {
     const auto & conflicting_crosswalks = graphs_container.conflictingInGraph(
       LaneletWrapper::map()->laneletLayer.get(lanelet_id), routing_graph_id, height_clearance);
@@ -350,12 +327,13 @@ auto conflictingCrosswalkIds(const lanelet::Ids & lanelet_ids) -> lanelet::Ids
   return conflicting_crosswalk_ids;
 }
 
-auto conflictingLaneIds(const lanelet::Ids & lanelet_ids) -> lanelet::Ids
+auto conflictingLaneIds(const lanelet::Ids & lanelet_ids, const RoutingGraphType type)
+  -> lanelet::Ids
 {
   lanelet::Ids conflicting_lanes_ids;
   for (const auto & lanelet_id : lanelet_ids) {
     const auto & conflicting_lanelets = lanelet::utils::getConflictingLanelets(
-      LaneletWrapper::vehicleRoutingGraph(), LaneletWrapper::map()->laneletLayer.get(lanelet_id));
+      LaneletWrapper::routingGraph(type), LaneletWrapper::map()->laneletLayer.get(lanelet_id));
     for (const auto & conflicting_lanelet : conflicting_lanelets) {
       conflicting_lanes_ids.emplace_back(conflicting_lanelet.id());
     }

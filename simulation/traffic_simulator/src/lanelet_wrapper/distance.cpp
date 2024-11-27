@@ -25,55 +25,105 @@ namespace lanelet_wrapper
 {
 namespace distance
 {
-auto lateralDistance(const LaneletPose & from, const LaneletPose & to, const bool allow_lane_change)
-  -> std::optional<double>
+auto lateralDistance(
+  const LaneletPose & from, const LaneletPose & to,
+  const RoutingConfiguration & routing_configuration) -> std::optional<double>
 {
-  // route must exist for lateral distance to be calculated at all
-  if (const auto route = route::route(from.lanelet_id, to.lanelet_id, allow_lane_change);
-      route.empty()) {
+  const auto route = route::route(from.lanelet_id, to.lanelet_id, routing_configuration);
+  if (route.empty()) {
     return std::nullopt;
-  } else if (not allow_lane_change) {
-    return to.offset - from.offset;
-  } else {
-    constexpr double matching_distance{10.0};
-    double lateral_distance_by_lane_change{0.0};
-    for (std::size_t i = 0; i < route.size() - 1; ++i) {
-      // if there is a lane change
-      if (lane_change::canChangeLane(route[i], route[i + 1])) {
-        const auto current_lanelet_pose = helper::constructLaneletPose(route[i], 0.0, 0.0);
-        const auto next_lanelet_pose = helper::constructLaneletPose(route[i + 1], 0.0, 0.0);
+  }
+  if (routing_configuration.allow_lane_change) {
+    double lateral_distance_by_lane_change = 0.0;
+    for (unsigned int i = 0; i < route.size() - 1; i++) {
+      auto next_lanelet_ids =
+        lanelet_map::nextLaneletIds(route[i], routing_configuration.routing_graph_type);
+      if (auto next_lanelet = std::find_if(
+            next_lanelet_ids.begin(), next_lanelet_ids.end(),
+            [&route, i](const lanelet::Id & id) { return id == route[i + 1]; });
+          next_lanelet == next_lanelet_ids.end()) {
+        traffic_simulator_msgs::msg::LaneletPose next_lanelet_pose;
+        next_lanelet_pose.lanelet_id = route[i + 1];
+        next_lanelet_pose.s = 0.0;
+        next_lanelet_pose.offset = 0.0;
+
         if (
-          const auto next_lanelet_origin_from_current_lanelet = pose::toLaneletPose(
-            pose::toMapPose(next_lanelet_pose).pose, route[i], matching_distance)) {
+          auto next_lanelet_origin_from_current_lanelet =
+            pose::toLaneletPose(pose::toMapPose(next_lanelet_pose).pose, route[i], 10.0)) {
           lateral_distance_by_lane_change += next_lanelet_origin_from_current_lanelet->offset;
-        } else if (
-          const auto current_lanelet_origin_from_next_lanelet = pose::toLaneletPose(
-            pose::toMapPose(current_lanelet_pose).pose, route[i + 1], matching_distance)) {
-          lateral_distance_by_lane_change -= current_lanelet_origin_from_next_lanelet->offset;
         } else {
-          /// @todo maybe an exception should be thrown here? since the route exists but is incorrect?
-          return std::nullopt;
+          traffic_simulator_msgs::msg::LaneletPose current_lanelet_pose = next_lanelet_pose;
+          current_lanelet_pose.lanelet_id = route[i];
+          if (
+            auto current_lanelet_origin_from_next_lanelet =
+              pose::toLaneletPose(pose::toMapPose(current_lanelet_pose).pose, route[i + 1], 10.0)) {
+            lateral_distance_by_lane_change -= current_lanelet_origin_from_next_lanelet->offset;
+          } else {
+            return std::nullopt;
+          }
         }
       }
     }
     return to.offset - from.offset + lateral_distance_by_lane_change;
+  } else {
+    return to.offset - from.offset;
   }
 }
 
+// auto lateralDistance(
+//   const LaneletPose & from, const LaneletPose & to,
+//   const RoutingConfiguration & routing_configuration) -> std::optional<double>
+// {
+//   // route must exist for lateral distance to be calculated at all
+//   if (const auto route = route::route(from.lanelet_id, to.lanelet_id, routing_configuration);
+//       route.empty()) {
+//     return std::nullopt;
+//   } else if (not routing_configuration.allow_lane_change) {
+//     return to.offset - from.offset;
+//   } else {
+//     constexpr double matching_distance{10.0};
+//     double lateral_distance_by_lane_change{0.0};
+//     for (std::size_t i = 0; i < route.size() - 1; ++i) {
+//       // if there is a lane change
+//       if (lane_change::canChangeLane(route[i], route[i + 1])) {
+//         const auto current_lanelet_pose = helper::constructLaneletPose(route[i], 0.0, 0.0);
+//         const auto next_lanelet_pose = helper::constructLaneletPose(route[i + 1], 0.0, 0.0);
+//         if (
+//           const auto next_lanelet_origin_from_current_lanelet = pose::toLaneletPose(
+//             pose::toMapPose(next_lanelet_pose).pose, route[i], matching_distance)) {
+//           lateral_distance_by_lane_change += next_lanelet_origin_from_current_lanelet->offset;
+//         } else if (
+//           const auto current_lanelet_origin_from_next_lanelet = pose::toLaneletPose(
+//             pose::toMapPose(current_lanelet_pose).pose, route[i + 1], matching_distance)) {
+//           lateral_distance_by_lane_change -= current_lanelet_origin_from_next_lanelet->offset;
+//         } else {
+//           /// @todo maybe an exception should be thrown here? since the route exists but is
+//           /// incorrect?
+//           return std::nullopt;
+//         }
+//       }
+//     }
+//     return to.offset - from.offset + lateral_distance_by_lane_change;
+//   }
+// }
+
 auto longitudinalDistance(
-  const LaneletPose & from_pose, const LaneletPose & to_pose, const bool allow_lane_change)
-  -> std::optional<double>
+  const LaneletPose & from_pose, const LaneletPose & to_pose,
+  const RoutingConfiguration & routing_configuration) -> std::optional<double>
 {
-  const auto is_lane_change_required =
-    [](const lanelet::Id current_lanelet, const lanelet::Id next_lanelet) -> bool {
-    const auto next_lanelet_ids = lanelet_map::nextLaneletIds(current_lanelet);
+  const auto is_lane_change_required = [&routing_configuration](
+                                         const lanelet::Id current_lanelet,
+                                         const lanelet::Id next_lanelet) -> bool {
+    const auto next_lanelet_ids =
+      lanelet_map::nextLaneletIds(current_lanelet, routing_configuration.routing_graph_type);
     return std::none_of(
       next_lanelet_ids.cbegin(), next_lanelet_ids.cend(),
       [next_lanelet](const lanelet::Id id) { return id == next_lanelet; });
   };
 
   /// @sa https://tier4.github.io/scenario_simulator_v2-docs/developer_guide/DistanceCalculation/
-  if (const auto route = route::route(from_pose.lanelet_id, to_pose.lanelet_id, allow_lane_change);
+  if (const auto route =
+        route::route(from_pose.lanelet_id, to_pose.lanelet_id, routing_configuration);
       not route.empty() || from_pose.lanelet_id == to_pose.lanelet_id) {
     /// @note horizontal bar must intersect with the lanelet spline, so the distance was set arbitrarily to 10 meters.
     static constexpr double matching_distance = 10.0;

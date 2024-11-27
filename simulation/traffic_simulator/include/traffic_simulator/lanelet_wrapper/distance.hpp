@@ -34,11 +34,14 @@ using Spline = math::geometry::CatmullRomSpline;
 using SplineInterface = math::geometry::CatmullRomSplineInterface;
 using LaneletPose = traffic_simulator_msgs::msg::LaneletPose;
 
-auto lateralDistance(const LaneletPose & from, const LaneletPose & to, const bool allow_lane_change)
+auto lateralDistance(
+  const LaneletPose & from, const LaneletPose & to,
+  const RoutingConfiguration & routing_configuration = RoutingConfiguration())
   -> std::optional<double>;
 
 auto longitudinalDistance(
-  const LaneletPose & from, const LaneletPose & to, const bool allow_lane_change)
+  const LaneletPose & from, const LaneletPose & to,
+  const RoutingConfiguration & routing_configuration = RoutingConfiguration())
   -> std::optional<double>;
 
 // StopLine
