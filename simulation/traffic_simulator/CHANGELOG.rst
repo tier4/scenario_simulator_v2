@@ -21,6 +21,39 @@ Changelog for package traffic_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+6.0.1 (2024-11-27)
+------------------
+
+6.0.0 (2024-11-27)
+------------------
+* Merge pull request `#1458 <https://github.com/tier4/scenario_simulator_v2/issues/1458>`_ from tier4/refactor/add_routing_graph_argument
+* docs: add comment for HdMapUtils::DEFAULT_MATCH_TO_LANE_REDUCTION_RATIO
+* refactor: delete unused hash function
+* Merge branch 'master' into refactor/add_routing_graph_argument
+* chore: fix spell miss
+* chore: fix build error
+* chore: fix linelint error
+* feat: introduce RoutingConfiguration to traffic_simulator::pose
+* feat: introduce RoutingConfiguration to traffic_simulator::distance
+* feat: introduce RoutingConfiguration to CanonicalizedLaneletPose
+* feat: introduce RoutingConfiguration to HDMapUtils
+* feat: add RoutingConfiguration
+* refactor: add routing graph argument to HdMapUtils::getFollowingLanelets
+* refactor: add routing graph argument to HdMapUtils::getAlongLaneletPose
+* refactor: add routing graph argument to HdMapUtils::getLongitudinalDistance
+* refactor: add routing graph argument to HdMapUtils::getLateralDistance
+* fix: correct wrong usage of toLaneletPose
+* Merge branch 'master' into refactor/add_routing_graph_argument
+* refactor: add routing graph argument to HdMapUtils::getLaneChangeableLaneletId
+* refactor: add routing graph argument to HdMapUtils::getSpeedLimit
+* refactor: add routing graph argument to HdMapUtils::toLaneletPose(s)
+* refactor: add routing graph argument to HdMapUtils::matchToLane
+* refactor: add routing graph argument to HdMapUtils::getConflictingLaneIds
+* refactor: add routing graph argument to HdMapUtils::countLaneChanges
+* refactor: add routing graph argument to HdMapUtils::canChangeLane
+* refactor: add routing graph argument to HdMapUtils::getPreviousLanelets
+* Contributors: Kotaro Yoshimoto
+
 5.5.0 (2024-11-27)
 ------------------
 
