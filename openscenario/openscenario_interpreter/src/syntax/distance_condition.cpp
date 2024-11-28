@@ -765,7 +765,7 @@ void DistanceCondition::visualize() const
     marker.pose.position.z += 0.3;
     marker.text = description();
     marker.scale.z = 0.3;
-    marker.color.a = 0.8;
+    marker.color.a = 0.8f;
     marker.color.r = 1.0;
     marker.color.g = 1.0;
     marker.color.b = 1.0;
@@ -788,7 +788,7 @@ void DistanceCondition::visualize() const
     entity_position.z -= relative_pose.position.z;
     marker.points.push_back(entity_position);
     marker.scale.x = 0.1;
-    marker.color.a = 0.8;
+    marker.color.a = 0.8f;
     marker.color.r = 1.0;
     marker.color.g = 0.0;
     marker.color.b = 0.0;
@@ -809,7 +809,7 @@ void DistanceCondition::visualize() const
     marker.pose.position.z = center.position.z - relative_pose.position.z / 2;
     marker.text = std::to_string(distance(triggering_entity));
     marker.scale.z = 0.3;
-    marker.color.a = 0.8;
+    marker.color.a = 0.8f;
     marker.color.r = 1.0;
     marker.color.g = 0.0;
     marker.color.b = 0.0;

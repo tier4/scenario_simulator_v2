@@ -80,7 +80,7 @@ auto ReachPositionCondition::visualize() const -> void
     marker.scale.x = radius;
     marker.scale.y = radius;
     marker.scale.z = radius;
-    marker.color.a = 0.3;
+    marker.color.a = 0.3f;
     marker.color.r = 0.0;
     marker.color.g = 1.0;
     marker.color.b = 0.0;
@@ -100,7 +100,7 @@ auto ReachPositionCondition::visualize() const -> void
     marker.text = "ReachPositionCondition\n" + triggering_entity.name() +
                   "\ntolerance = " + std::to_string(tolerance);
     marker.scale.z = 0.3;
-    marker.color.a = 0.8;
+    marker.color.a = 0.8f;
     marker.color.r = 1.0;
     marker.color.g = 1.0;
     marker.color.b = 1.0;
@@ -123,7 +123,7 @@ auto ReachPositionCondition::visualize() const -> void
     entity_position.z -= relative_pose.position.z;
     marker.points.push_back(entity_position);
     marker.scale.x = 0.1;
-    marker.color.a = 0.8;
+    marker.color.a = 0.8f;
     marker.color.r = 1.0;
     marker.color.g = 0.0;
     marker.color.b = 0.0;
@@ -145,7 +145,7 @@ auto ReachPositionCondition::visualize() const -> void
     marker.text = std::to_string(hypot(
       relative_pose.position.x, relative_pose.position.y, relative_pose.position.z, consider_z));
     marker.scale.z = 0.3;
-    marker.color.a = 0.8;
+    marker.color.a = 0.8f;
     marker.color.r = 1.0;
     marker.color.g = 0.0;
     marker.color.b = 0.0;
