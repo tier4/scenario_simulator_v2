@@ -21,6 +21,27 @@ Changelog for package simple_sensor_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+6.0.1 (2024-11-27)
+------------------
+* Merge pull request `#1442 <https://github.com/tier4/scenario_simulator_v2/issues/1442>`_ from tier4/feat/add-glog-simple-sensor-simulator
+  Feat/add glog simple sensor simulator
+* fix: update cmake
+* fix: implementation
+* Revert "fix: use glog_vendor"
+  This reverts commit 96f6c540fad3faa43c6a8eb82c48c467e746675f.
+* fix: use glog_vendor
+* feat(simple_sensor_simulator): add glog
+* Contributors: Masaya Kataoka, satoshi-ota
+
+6.0.0 (2024-11-27)
+------------------
+* Merge branch 'master' into refactor/add_routing_graph_argument
+* Merge branch 'master' into refactor/add_routing_graph_argument
+* Contributors: Kotaro Yoshimoto
+
+5.5.0 (2024-11-27)
+------------------
+
 5.4.0 (2024-11-26)
 ------------------
 * Merge branch 'master' into feature/shoulder_routing_graph
