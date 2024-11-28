@@ -72,8 +72,7 @@ struct RelativeSpeedCondition : private Scope, private SimulatorCore::ConditionE
 
   auto description() const -> String;
 
-  static auto evaluate(const Entities *, const Entity &, const Entity &)
-    -> geometry_msgs::msg::Vector3;
+  static auto evaluate(const Entities *, const Entity &, const Entity &) -> Eigen::Vector3d;
 
   static auto evaluate(
     const Entities *, const Entity &, const Entity &, const std::optional<DirectionalDimension> &)

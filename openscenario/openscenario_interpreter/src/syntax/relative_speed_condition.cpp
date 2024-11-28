@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <geometry/vector3/norm.hpp>
 #include <openscenario_interpreter/syntax/entities.hpp>
 #include <openscenario_interpreter/syntax/entity_selection.hpp>
 #include <openscenario_interpreter/syntax/relative_speed_condition.hpp>
@@ -59,23 +58,21 @@ auto RelativeSpeedCondition::description() const -> String
 
 auto RelativeSpeedCondition::evaluate(
   const Entities * entities, const Entity & triggering_entity, const Entity & entity_ref)
-  -> geometry_msgs::msg::Vector3
+  -> Eigen::Vector3d
 {
   if (
     triggering_entity.apply([&](const auto & each) { return entities->isAdded(each); }).min() and
     entities->isAdded(entity_ref)) {
     /*
        Relative speed is defined as speed_rel = speed(triggering entity) -
-       speed(reference entity)
+       speed(reference entity). In other words, entity_ref is the observer and
+       triggering_entity is the observed.
 
        See: https://publications.pages.asam.net/standards/ASAM_OpenSCENARIO/ASAM_OpenSCENARIO_XML/latest/generated/content/RelativeSpeedCondition.html
     */
     return evaluateRelativeSpeed(entity_ref, triggering_entity);
   } else {
-    return geometry_msgs::build<geometry_msgs::msg::Vector3>()
-      .x(Double::nan())
-      .y(Double::nan())
-      .z(Double::nan());
+    return Eigen::Vector3d(Double::nan(), Double::nan(), Double::nan());
   }
 }
 
@@ -83,18 +80,18 @@ auto RelativeSpeedCondition::evaluate(
   const Entities * entities, const Entity & triggering_entity, const Entity & entity_ref,
   const std::optional<DirectionalDimension> & direction) -> double
 {
-  if (const auto v = evaluate(entities, triggering_entity, entity_ref); direction) {
+  if (const Eigen::Vector3d v = evaluate(entities, triggering_entity, entity_ref); direction) {
     switch (*direction) {
       default:
       case DirectionalDimension::longitudinal:
-        return v.x;
+        return v.x();
       case DirectionalDimension::lateral:
-        return v.y;
+        return v.y();
       case DirectionalDimension::vertical:
-        return v.z;
+        return v.z();
     }
   } else {
-    return math::geometry::norm(v);
+    return v.norm();
   }
 }
 

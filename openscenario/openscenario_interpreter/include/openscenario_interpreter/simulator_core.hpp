@@ -15,8 +15,8 @@
 #ifndef OPENSCENARIO_INTERPRETER__SIMULATOR_CORE_HPP_
 #define OPENSCENARIO_INTERPRETER__SIMULATOR_CORE_HPP_
 
+#include <geometry/quaternion/get_rotation_matrix.hpp>
 #include <geometry/quaternion/quaternion_to_euler.hpp>
-#include <geometry/vector3/operator.hpp>
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/syntax/boolean.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
@@ -552,40 +552,32 @@ public:
       return std::numeric_limits<double>::quiet_NaN();
     }
 
-    static auto evaluateRelativeSpeed(const Entity & from, const Entity & to)
+    static auto evaluateRelativeSpeed(const Entity & from, const Entity & to) -> Eigen::Vector3d
     {
-      auto direction = [](auto orientation) {
-        const auto euler_angle = math::geometry::convertQuaternionToEulerAngle(orientation);
+      if (const auto observer = core->getEntity(from.name())) {
+        if (const auto observed = core->getEntity(to.name())) {
+          auto velocity = [](const auto & entity) {
+            auto direction = [](auto orientation) {
+              const auto euler_angle = math::geometry::convertQuaternionToEulerAngle(orientation);
+              const auto r = euler_angle.x;
+              const auto p = euler_angle.y;
+              const auto y = euler_angle.z;
+              return Eigen::Vector3d(
+                std::cos(y) * std::cos(p), std::sin(y) * std::cos(p), std::sin(p));
+            };
 
-        // clang-format off
-        const auto roll  = euler_angle.x;
-        const auto pitch = euler_angle.y;
-        const auto yaw   = euler_angle.z;
-        // clang-format on
+            return direction(entity->getMapPose().orientation) * entity->getCurrentTwist().linear.x;
+          };
 
-        auto v = decltype(euler_angle)();
+          const Eigen::Matrix3d rotation =
+            math::geometry::getRotationMatrix(observer->getMapPose().orientation);
 
-        v.x = std::cos(yaw) * std::cos(pitch);
-        v.y = std::sin(yaw) * std::cos(pitch);
-        v.z = std::sin(pitch);
-
-        return v;
-      };
-
-      if (const auto a = core->getEntity(from.name())) {
-        if (const auto b = core->getEntity(to.name())) {
-          using math::geometry::operator*;
-          using math::geometry::operator-;
-
-          return direction(b->getMapPose().orientation) * b->getCurrentTwist().linear.x -
-                 direction(a->getMapPose().orientation) * a->getCurrentTwist().linear.x;
+          return rotation.transpose() * velocity(observed) -
+                 rotation.transpose() * velocity(observer);
         }
       }
 
-      return geometry_msgs::build<geometry_msgs::msg::Vector3>()
-        .x(Double::nan())
-        .y(Double::nan())
-        .z(Double::nan());
+      return Eigen::Vector3d(Double::nan(), Double::nan(), Double::nan());
     }
 
     template <typename... Ts>
