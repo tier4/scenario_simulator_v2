@@ -24,6 +24,8 @@ Trigger::Trigger(const pugi::xml_node & node, Scope & scope)
   traverse<0, unbounded>(node, "ConditionGroup", [&](auto && node) { emplace_back(node, scope); });
 }
 
+const Trigger Trigger::always_true = Trigger{{ConditionGroup()}};
+
 auto Trigger::evaluate() -> Object
 {
   /* -------------------------------------------------------------------------

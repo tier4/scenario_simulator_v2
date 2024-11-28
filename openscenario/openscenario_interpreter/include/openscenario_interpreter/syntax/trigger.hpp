@@ -52,6 +52,9 @@ struct Trigger : public std::list<ConditionGroup>
   auto activeConditionGroupDescription() const -> std::vector<std::pair<std::string, std::string>>;
 
   auto evaluate() -> Object;
+
+  // Utility variables for some default triggers that are always evaluated to be true
+  static const Trigger always_true;
 };
 
 auto operator<<(boost::json::object &, const Trigger &) -> boost::json::object &;
