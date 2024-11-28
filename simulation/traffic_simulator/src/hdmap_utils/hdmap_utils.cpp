@@ -407,7 +407,8 @@ auto HdMapUtils::getConflictingCrosswalkIds(const lanelet::Ids & lanelet_ids) co
 {
   lanelet::Ids ids;
   std::vector<lanelet::routing::RoutingGraphConstPtr> graphs;
-  graphs.emplace_back(routing_graphs_->routing_graph(traffic_simulator::RoutingGraphType::VEHICLE));
+  graphs.emplace_back(routing_graphs_->routing_graph(
+    traffic_simulator::RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER));
   graphs.emplace_back(
     routing_graphs_->routing_graph(traffic_simulator::RoutingGraphType::PEDESTRIAN));
   lanelet::routing::RoutingGraphContainer container(graphs);
