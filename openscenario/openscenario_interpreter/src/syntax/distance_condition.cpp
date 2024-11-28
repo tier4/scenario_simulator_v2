@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <cmath>
+#include <openscenario_interpreter/cmath/hypot.hpp>
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
@@ -46,12 +46,7 @@ DistanceCondition::DistanceCondition(
   value(readAttribute<Double>("value", node, scope)),
   position(readElement<Position>("Position", node, scope)),
   triggering_entities(triggering_entities),
-  results(triggering_entities.entity_refs.size(), {Double::nan()}),
-  consider_z([]() {
-    rclcpp::Node node{"get_parameter", "simulation"};
-    node.declare_parameter("consider_pose_by_road_slope", false);
-    return node.get_parameter("consider_pose_by_road_slope").as_bool();
-  }())
+  results(triggering_entities.entity_refs.size(), {Double::nan()})
 {
   std::set<RoutingAlgorithm::value_type> supported = {
     RoutingAlgorithm::value_type::shortest, RoutingAlgorithm::value_type::undefined};
@@ -134,12 +129,6 @@ auto DistanceCondition::distance(const EntityRef & triggering_entity) const -> d
   return Double::nan();
 }
 
-// @todo: after checking all the scenario work well with consider_z = true, remove this function and use std::hypot(x,y,z)
-static double hypot(const double x, const double y, const double z, const bool consider_z)
-{
-  return consider_z ? std::hypot(x, y, z) : std::hypot(x, y);
-}
-
 template <>
 auto DistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, RoutingAlgorithm::undefined,
@@ -151,29 +140,25 @@ auto DistanceCondition::distance<
         const auto relative_world = makeNativeRelativeWorldPosition(
           triggering_entity, static_cast<NativeWorldPosition>(position));
         return hypot(
-          relative_world.position.x, relative_world.position.y, relative_world.position.z,
-          consider_z);
+          relative_world.position.x, relative_world.position.y, relative_world.position.z);
       },
       [&](const RelativeWorldPosition & position) {
         const auto relative_world = makeNativeRelativeWorldPosition(
           triggering_entity, static_cast<NativeWorldPosition>(position));
         return hypot(
-          relative_world.position.x, relative_world.position.y, relative_world.position.z,
-          consider_z);
+          relative_world.position.x, relative_world.position.y, relative_world.position.z);
       },
       [&](const RelativeObjectPosition & position) {
         const auto relative_world = makeNativeRelativeWorldPosition(
           triggering_entity, static_cast<NativeWorldPosition>(position));
         return hypot(
-          relative_world.position.x, relative_world.position.y, relative_world.position.z,
-          consider_z);
+          relative_world.position.x, relative_world.position.y, relative_world.position.z);
       },
       [&](const LanePosition & position) {
         const auto relative_world = makeNativeRelativeWorldPosition(
           triggering_entity, static_cast<NativeWorldPosition>(position));
         return hypot(
-          relative_world.position.x, relative_world.position.y, relative_world.position.z,
-          consider_z);
+          relative_world.position.x, relative_world.position.y, relative_world.position.z);
       }),
     position);
 }
@@ -189,29 +174,25 @@ auto DistanceCondition::distance<
         const auto relative_world = makeNativeBoundingBoxRelativeWorldPosition(
           triggering_entity, static_cast<NativeWorldPosition>(position));
         return hypot(
-          relative_world.position.x, relative_world.position.y, relative_world.position.z,
-          consider_z);
+          relative_world.position.x, relative_world.position.y, relative_world.position.z);
       },
       [&](const RelativeWorldPosition & position) {
         const auto relative_world = makeNativeBoundingBoxRelativeWorldPosition(
           triggering_entity, static_cast<NativeWorldPosition>(position));
         return hypot(
-          relative_world.position.x, relative_world.position.y, relative_world.position.z,
-          consider_z);
+          relative_world.position.x, relative_world.position.y, relative_world.position.z);
       },
       [&](const RelativeObjectPosition & position) {
         const auto relative_world = makeNativeBoundingBoxRelativeWorldPosition(
           triggering_entity, static_cast<NativeWorldPosition>(position));
         return hypot(
-          relative_world.position.x, relative_world.position.y, relative_world.position.z,
-          consider_z);
+          relative_world.position.x, relative_world.position.y, relative_world.position.z);
       },
       [&](const LanePosition & position) {
         const auto relative_world = makeNativeBoundingBoxRelativeWorldPosition(
           triggering_entity, static_cast<NativeWorldPosition>(position));
         return hypot(
-          relative_world.position.x, relative_world.position.y, relative_world.position.z,
-          consider_z);
+          relative_world.position.x, relative_world.position.y, relative_world.position.z);
       }),
     position);
 }
