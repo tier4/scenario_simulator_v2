@@ -471,7 +471,7 @@ auto CatmullRomSpline::getSquaredDistanceIn2D(
       return line_segments_[0].getSquaredDistanceIn2D(point, s, true);
     default:
       const auto [index, s_value] = getCurveIndexAndS(s);
-      return curves_[index].getSquaredDistanceIn2D(point, sValue, true);
+      return curves_[index].getSquaredDistanceIn2D(point, s_value, true);
   }
 }
 
@@ -509,7 +509,7 @@ auto CatmullRomSpline::getSquaredDistanceVector(
       return line_segments_[0].getSquaredDistanceVector(point, s, true);
     default:
       const auto [index, s_value] = getCurveIndexAndS(s);
-      return curves_[index].getSquaredDistanceVector(point, sValue, true);
+      return curves_[index].getSquaredDistanceVector(point, s_value, true);
   }
 }
 
@@ -543,7 +543,7 @@ auto CatmullRomSpline::getPoint(const double s) const -> geometry_msgs::msg::Poi
       return line_segments_[0].getPoint(s, true);
     default:
       const auto [index, s_value] = getCurveIndexAndS(s);
-      return curves_[index].getPoint(sValue, true);
+      return curves_[index].getPoint(s_value, true);
   }
 }
 
@@ -598,7 +598,7 @@ auto CatmullRomSpline::getNormalVector(const double s) const -> geometry_msgs::m
         "contact the developer of traffic_simulator.");
     default:
       const auto [index, s_value] = getCurveIndexAndS(s);
-      return curves_[index].getNormalVector(sValue, true);
+      return curves_[index].getNormalVector(s_value, true);
   }
 }
 
@@ -635,7 +635,7 @@ auto CatmullRomSpline::getTangentVector(const double s) const -> geometry_msgs::
         "contact the developer of traffic_simulator.");
     default:
       const auto [index, s_value] = getCurveIndexAndS(s);
-      return curves_[index].getTangentVector(sValue, true);
+      return curves_[index].getTangentVector(s_value, true);
   }
 }
 
@@ -666,7 +666,7 @@ auto CatmullRomSpline::getPose(const double s, const bool fill_pitch) const
       return line_segments_[0].getPose(s, true, fill_pitch);
     default:
       const auto [index, s_value] = getCurveIndexAndS(s);
-      return curves_[index].getPose(sValue, true, fill_pitch);
+      return curves_[index].getPose(s_value, true, fill_pitch);
   }
 }
 
