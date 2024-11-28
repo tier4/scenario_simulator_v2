@@ -91,7 +91,7 @@ private:
     const std::string & topic_name) -> std::unique_ptr<TrafficLightPublisherBase>
   {
     /*
-       V2ITrafficLights in TrafficSimulator publishes publishes using architecture-independent topics ("awf/universe..."): 
+       V2ITrafficLights in TrafficSimulator publishes using architecture-independent topics ("awf/universe..."):
        "/v2x/traffic_signals" and "/perception/traffic_light_recognition/external/traffic_signals"
 
        TrafficLightsDetector in SimpleSensorSimulator publishes using architecture-dependent topics:

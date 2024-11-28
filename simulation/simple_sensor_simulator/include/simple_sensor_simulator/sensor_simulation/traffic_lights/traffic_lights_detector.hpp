@@ -60,7 +60,7 @@ private:
        "/perception/traffic_light_recognition/internal/traffic_signals" for >= "awf/universe/20240605"
        "/perception/traffic_light_recognition/internal/traffic_signals" for == "awf/universe/20230906"
 
-       V2ITrafficLights in TrafficSimulator publishes publishes using architecture-independent topics ("awf/universe..."): 
+       V2ITrafficLights in TrafficSimulator publishes using architecture-independent topics ("awf/universe..."):
        "/v2x/traffic_signals" and "/perception/traffic_light_recognition/external/traffic_signals"
     */
     if (architecture_type == "awf/universe/20230906") {
