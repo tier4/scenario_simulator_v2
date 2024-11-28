@@ -33,6 +33,7 @@
 #if __has_include(<autoware_perception_msgs/msg/traffic_signal_array.hpp>)
 #include <autoware_perception_msgs/msg/traffic_signal_array.hpp>
 #endif
+
 #if __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)
 #include <autoware_perception_msgs/msg/traffic_light_group_array.hpp>
 #endif

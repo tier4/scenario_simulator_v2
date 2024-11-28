@@ -15,7 +15,10 @@
 #ifndef TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHTS_HPP_
 #define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHTS_HPP_
 
+// This message will be deleted in the future
+#if __has_include(<autoware_perception_msgs/msg/traffic_signal_array.hpp>)
 #include <autoware_perception_msgs/msg/traffic_signal_array.hpp>
+#endif
 
 #if __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)
 #include <autoware_perception_msgs/msg/traffic_light_group_array.hpp>
@@ -98,10 +101,16 @@ private:
        "/perception/traffic_light_recognition/internal/traffic_signals" for >= "awf/universe/20230906"
        "/perception/traffic_light_recognition/traffic_signals" for "awf/universe"
     */
-    if (architecture_type <= "awf/universe/20230906") {
+    if (architecture_type == "awf/universe") {
+      throw common::SemanticError(
+        "This version of scenario_simulator_v2 does not support ", std::quoted(architecture_type),
+        " as ", std::quoted("architecture_type"), ". Please use older version.");
+#if __has_include(<autoware_perception_msgs/msg/traffic_signal_array.hpp>)
+    } else if (architecture_type <= "awf/universe/20230906") {
       return std::make_unique<
         TrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>>(
         node_ptr, topic_name);
+#endif
 #if __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)
     } else if (architecture_type >= "awf/universe/20240605") {
       return std::make_unique<
