@@ -29,6 +29,7 @@
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
 #include <traffic_simulator/traffic/traffic_controller.hpp>
 #include <traffic_simulator/traffic/traffic_sink.hpp>
+#include <traffic_simulator/traffic/traffic_source.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 #include <utility>
 #include <vector>
@@ -38,18 +39,10 @@ namespace traffic_simulator
 namespace traffic
 {
 TrafficController::TrafficController(
-  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils,
-  const std::function<std::vector<std::string>(void)> & get_entity_names,
-  const std::function<traffic_simulator::EntityType(const std::string &)> & get_entity_type,
-  const std::set<std::uint8_t> & sinkable_entity_type,
-  const std::function<geometry_msgs::msg::Pose(const std::string &)> & get_entity_pose,
-  const std::function<void(std::string)> & despawn, bool auto_sink)
-: hdmap_utils_(hdmap_utils),
-  get_entity_names(get_entity_names),
-  get_entity_type(get_entity_type),
+  const std::shared_ptr<traffic_simulator::entity::EntityManager> entity_manager_ptr,
+  const std::set<std::uint8_t> & sinkable_entity_type, bool auto_sink)
+: entity_manager_ptr(entity_manager_ptr),
   sinkable_entity_type(sinkable_entity_type),
-  get_entity_pose(get_entity_pose),
-  despawn(despawn),
   auto_sink(auto_sink)
 {
   if (auto_sink) {
@@ -59,15 +52,15 @@ TrafficController::TrafficController(
 
 void TrafficController::autoSink()
 {
-  for (const auto & lanelet_id : hdmap_utils_->getLaneletIds()) {
-    if (hdmap_utils_->getNextLaneletIds(lanelet_id).empty()) {
+  const auto hdmap_utils_ptr = entity_manager_ptr->getHdmapUtils();
+  for (const auto & lanelet_id : hdmap_utils_ptr->getLaneletIds()) {
+    if (hdmap_utils_ptr->getNextLaneletIds(lanelet_id).empty()) {
       LaneletPose lanelet_pose;
       lanelet_pose.lanelet_id = lanelet_id;
-      lanelet_pose.s = pose::laneletLength(lanelet_id, hdmap_utils_);
-      const auto pose = pose::toMapPose(lanelet_pose, hdmap_utils_);
+      lanelet_pose.s = pose::laneletLength(lanelet_id, hdmap_utils_ptr);
+      const auto pose = pose::toMapPose(lanelet_pose, hdmap_utils_ptr);
       addModule<traffic_simulator::traffic::TrafficSink>(
-        lanelet_id, 1, pose.position, get_entity_names, get_entity_type, sinkable_entity_type,
-        get_entity_pose, despawn);
+        entity_manager_ptr, lanelet_id, 1, pose.position, sinkable_entity_type);
     }
   }
 }

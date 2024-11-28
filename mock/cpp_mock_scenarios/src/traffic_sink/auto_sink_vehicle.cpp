@@ -30,7 +30,8 @@ public:
   explicit AutoSinkVehicleScenario(const rclcpp::NodeOptions & option)
   : cpp_mock_scenarios::CppScenarioNode(
       "auto_sink_vehicle", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
-      "lanelet2_map.osm", __FILE__, false, option, true, {traffic_simulator::EntityType::VEHICLE})
+      "lanelet2_map.osm", __FILE__, false, option, true,
+      {traffic_simulator::EntityType::PEDESTRIAN})
   {
     start();
   }
@@ -39,10 +40,10 @@ private:
   void onUpdate() override
   {
     if (api_.getCurrentTime() >= 0.1) {
-      if (api_.entityExists("bob") && !api_.entityExists("ego")) {
-        stop(cpp_mock_scenarios::Result::FAILURE);
-      } else {
+      if (api_.entityExists("ego") and not api_.entityExists("bob")) {
         stop(cpp_mock_scenarios::Result::SUCCESS);
+      } else {
+        stop(cpp_mock_scenarios::Result::FAILURE);
       }
     }
   }

@@ -26,6 +26,7 @@
 #include <color_names/color_names.hpp>
 #include <functional>
 #include <geometry/distance.hpp>
+#include <geometry/vector3/hypot.hpp>
 #include <geometry_msgs/msg/quaternion.hpp>
 #include <iostream>
 #include <memory>
@@ -39,36 +40,30 @@ namespace traffic_simulator
 namespace traffic
 {
 TrafficSink::TrafficSink(
+  const std::shared_ptr<traffic_simulator::entity::EntityManager> entity_manager_ptr,
   const lanelet::Id lanelet_id, const double radius, const geometry_msgs::msg::Point & position,
-  const std::function<std::vector<std::string>(void)> & get_entity_names,
-  const std::function<traffic_simulator::EntityType(const std::string &)> & get_entity_type,
-  const std::set<std::uint8_t> & sinkable_entity_type,
-  const std::function<geometry_msgs::msg::Pose(const std::string &)> & get_entity_pose,
-  const std::function<void(std::string)> & despawn)
+  const std::set<std::uint8_t> & sinkable_entity_type)
 : TrafficModuleBase(),
+  entity_manager_ptr(entity_manager_ptr),
   lanelet_id(lanelet_id),
   radius(radius),
   position(position),
-  get_entity_names(get_entity_names),
-  get_entity_type(get_entity_type),
-  sinkable_entity_type(sinkable_entity_type),
-  get_entity_pose(get_entity_pose),
-  despawn(despawn)
+  sinkable_entity_type(sinkable_entity_type)
 {
 }
 
 void TrafficSink::execute(
   [[maybe_unused]] const double current_time, [[maybe_unused]] const double step_time)
 {
-  const auto names = get_entity_names();
+  const auto names = getEntityNames();
   for (const auto & name : names) {
     const auto is_sinkable_entity = [this](const auto & entity_name) {
       return sinkable_entity_type.empty()
                ? true
-               : sinkable_entity_type.find(get_entity_type(entity_name).type) !=
+               : sinkable_entity_type.find(getEntityType(entity_name).type) !=
                    sinkable_entity_type.end();
     };
-    const auto pose = get_entity_pose(name);
+    const auto pose = getEntityPose(name);
     if (is_sinkable_entity(name) and math::geometry::getDistance(position, pose) <= radius) {
       despawn(name);
     }
@@ -102,6 +97,43 @@ auto TrafficSink::appendDebugMarker(visualization_msgs::msg::MarkerArray & marke
   text_marker.color = color_names::makeColorMsg("white", 0.99);
   text_marker.scale.z = 0.6;
   marker_array.markers.emplace_back(text_marker);
+}
+
+auto TrafficSink::getEntityNames() const -> std::vector<std::string>
+{
+  return entity_manager_ptr->getEntityNames();
+}
+
+auto TrafficSink::getEntityType(const std::string & entity_name) const noexcept(false)
+  -> traffic_simulator::EntityType
+{
+  if (const auto entity = entity_manager_ptr->getEntity(entity_name)) {
+    return entity->getEntityType();
+  } else {
+    THROW_SEMANTIC_ERROR("Entity ", std::quoted(entity_name), " does not exists.");
+  }
+}
+auto TrafficSink::getEntityPose(const std::string & entity_name) const noexcept(false)
+  -> geometry_msgs::msg::Pose
+{
+  if (const auto entity = entity_manager_ptr->getEntity(entity_name)) {
+    return entity->getMapPose();
+  } else {
+    THROW_SEMANTIC_ERROR("Entity ", std::quoted(entity_name), " does not exists.");
+  }
+}
+auto TrafficSink::despawn(const std::string & entity_name) const -> void
+{
+  const auto entity_position = getEntityPose(entity_name).position;
+  const bool in_despawn_proximity = math::geometry::hypot(entity_position, position) <= radius;
+
+  const std::uint8_t entity_type = getEntityType(entity_name).type;
+  const bool is_despawn_candidate =
+    sinkable_entity_type.empty() or
+    sinkable_entity_type.find(entity_type) != sinkable_entity_type.cend();
+  if (is_despawn_candidate and in_despawn_proximity) {
+    entity_manager_ptr->despawnEntity(entity_name);
+  }
 }
 }  // namespace traffic
 }  // namespace traffic_simulator
