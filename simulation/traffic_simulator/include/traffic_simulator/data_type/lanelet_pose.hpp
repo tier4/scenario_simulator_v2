@@ -41,7 +41,8 @@ public:
   auto hasAlternativeLaneletPose() const -> bool { return lanelet_poses_.size() > 1; }
   auto getAlternativeLaneletPoseBaseOnShortestRouteFrom(
     LaneletPose from, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
-    bool allow_lane_change = false) const -> std::optional<LaneletPose>;
+    const traffic_simulator::RoutingConfiguration & routing_configuration =
+      traffic_simulator::RoutingConfiguration()) const -> std::optional<LaneletPose>;
   static auto setConsiderPoseByRoadSlope(bool consider_pose_by_road_slope) -> void
   {
     consider_pose_by_road_slope_ = consider_pose_by_road_slope;

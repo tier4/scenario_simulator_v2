@@ -163,7 +163,11 @@ auto ScenarioSimulator::updateEntityStatus(
     try {
       if (isEgo(status.name())) {
         assert(ego_entity_simulation_ && "Ego is spawned but ego_entity_simulation_ is nullptr!");
-        if (req.overwrite_ego_status()) {
+        if (
+          req.overwrite_ego_status() or
+          ego_entity_simulation_->autoware->getControlModeReport().mode ==
+            autoware_auto_vehicle_msgs::msg::ControlModeReport::MANUAL) {
+          ego_entity_simulation_->autoware->setManualMode();
           traffic_simulator_msgs::msg::EntityStatus ego_status_msg;
           simulation_interface::toMsg(status, ego_status_msg);
           ego_entity_simulation_->overwrite(
@@ -354,7 +358,7 @@ auto ScenarioSimulator::attachPseudoTrafficLightDetector(
 {
   auto response = simulation_api_schema::AttachPseudoTrafficLightDetectorResponse();
   sensor_sim_.attachPseudoTrafficLightsDetector(
-    current_simulation_time_, req.configuration(), *this, hdmap_utils_);
+    current_simulation_time_, req.configuration(), *this);
   response.mutable_result()->set_success(true);
   return response;
 }

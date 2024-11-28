@@ -85,8 +85,8 @@ auto FieldOperatorApplication::shutdownAutoware() -> void
       }
     }();
 
-    const auto timeout = [this]() {
-      auto sigterm_timeout = [this](auto value) {
+    const auto timeout = []() {
+      auto sigterm_timeout = [](auto value) {
         auto node = rclcpp::Node("get_parameter_sigterm_timeout", "simulation");
         node.declare_parameter<int>("sigterm_timeout", value);
         node.get_parameter<int>("sigterm_timeout", value);

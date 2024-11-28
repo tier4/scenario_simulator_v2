@@ -28,6 +28,7 @@
 #endif
 
 #include <autoware_adapi_v1_msgs/msg/mrm_state.hpp>
+#include <autoware_adapi_v1_msgs/srv/change_operation_mode.hpp>
 #include <autoware_adapi_v1_msgs/srv/clear_route.hpp>
 #include <autoware_adapi_v1_msgs/srv/initialize_localization.hpp>
 #include <autoware_adapi_v1_msgs/srv/set_route_points.hpp>
@@ -58,7 +59,7 @@ class FieldOperatorApplicationFor<AutowareUniverse>
 : public FieldOperatorApplication,
   public TransitionAssertion<FieldOperatorApplicationFor<AutowareUniverse>>
 {
-  friend class TransitionAssertion<FieldOperatorApplicationFor<AutowareUniverse>>;
+  friend struct TransitionAssertion<FieldOperatorApplicationFor<AutowareUniverse>>;
 
   // clang-format off
   SubscriberWrapper<autoware_auto_control_msgs::msg::AckermannControlCommand>     getAckermannControlCommand;
@@ -84,6 +85,7 @@ class FieldOperatorApplicationFor<AutowareUniverse>
   ServiceWithValidation<autoware_adapi_v1_msgs::srv::SetRoutePoints>              requestSetRoutePoints;
   ServiceWithValidation<tier4_rtc_msgs::srv::AutoModeWithModule>                  requestSetRtcAutoMode;
   ServiceWithValidation<tier4_external_api_msgs::srv::SetVelocityLimit>           requestSetVelocityLimit;
+  ServiceWithValidation<autoware_adapi_v1_msgs::srv::ChangeOperationMode>         requestEnableAutowareControl;
   // clang-format on
 
   tier4_rtc_msgs::msg::CooperateStatusArray latest_cooperate_status_array;
@@ -178,7 +180,6 @@ public:
     getLocalizationState("/api/localization/initialization_state", rclcpp::QoS(1).transient_local(), *this),
 #endif
     getMrmState("/api/fail_safe/mrm_state", rclcpp::QoS(1), *this, [this](const auto & v) { receiveMrmState(v); }),
-    getPathWithLaneId("/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", rclcpp::QoS(1), *this),
     getTrajectory("/api/iv_msgs/planning/scenario_planning/trajectory", rclcpp::QoS(1), *this),
     getTurnIndicatorsCommandImpl("/control/command/turn_indicators_cmd", rclcpp::QoS(1), *this),
     requestClearRoute("/api/routing/clear_route", *this),
@@ -188,7 +189,9 @@ public:
     // NOTE: /api/routing/set_route_points takes a long time to return. But the specified duration is not decided by any technical reasons.
     requestSetRoutePoints("/api/routing/set_route_points", *this, std::chrono::seconds(10)),
     requestSetRtcAutoMode("/api/external/set/rtc_auto_mode", *this),
-    requestSetVelocityLimit("/api/autoware/set/velocity_limit", *this)
+    requestSetVelocityLimit("/api/autoware/set/velocity_limit", *this),
+    requestEnableAutowareControl("/api/operation_mode/enable_autoware_control", *this),
+    getPathWithLaneId("/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", rclcpp::QoS(1), *this)
   // clang-format on
   {
   }
@@ -227,6 +230,8 @@ public:
   auto sendCooperateCommand(const std::string &, const std::string &) -> void override;
 
   auto setVelocityLimit(double) -> void override;
+
+  auto enableAutowareControl() -> void override;
 };
 }  // namespace concealer
 

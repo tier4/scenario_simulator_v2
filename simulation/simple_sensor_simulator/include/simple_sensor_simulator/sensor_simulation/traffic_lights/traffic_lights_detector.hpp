@@ -15,11 +15,16 @@
 #ifndef SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__TRAFFIC_LIGHTS__TRAFFIC_LIGHTS_DETECTOR_HPP_
 #define SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__TRAFFIC_LIGHTS__TRAFFIC_LIGHTS_DETECTOR_HPP_
 
+#include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
+#include <autoware_perception_msgs/msg/traffic_signal_array.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <simulation_interface/conversions.hpp>
 #include <string>
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_publisher.hpp>
+
+#if __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)
+#include <autoware_perception_msgs/msg/traffic_light_group_array.hpp>
+#endif
 
 namespace simple_sensor_simulator
 {
@@ -32,12 +37,10 @@ namespace traffic_lights
  */
 class TrafficLightsDetector
 {
-  const std::shared_ptr<traffic_simulator::TrafficLightPublisherBase> publisher_;
-
 public:
-  explicit TrafficLightsDetector(
-    const std::shared_ptr<traffic_simulator::TrafficLightPublisherBase> & publisher)
-  : publisher_(publisher)
+  template <typename NodeType>
+  explicit TrafficLightsDetector(NodeType & node, const std::string & architecture_type)
+  : publisher_ptr_(makePublisher(node, architecture_type))
   {
   }
 
@@ -45,8 +48,46 @@ public:
     const rclcpp::Time & current_ros_time,
     const simulation_api_schema::UpdateTrafficLightsRequest & request) -> void
   {
-    publisher_->publish(current_ros_time, request);
+    publisher_ptr_->publish(current_ros_time, request);
   }
+
+private:
+  template <typename NodeType>
+  auto makePublisher(NodeType & node, const std::string & architecture_type)
+    -> std::unique_ptr<traffic_simulator::TrafficLightPublisherBase>
+  {
+    /*
+       TrafficLightsDetector in SimpleSensorSimulator publishes using architecture-dependent topics:
+       "/perception/traffic_light_recognition/internal/traffic_signals" for >= "awf/universe/20240605"
+       "/perception/traffic_light_recognition/internal/traffic_signals" for == "awf/universe/20230906"
+       "/perception/traffic_light_recognition/traffic_signals" for "awf/universe"
+
+       V2ITrafficLights in TrafficSimulator publishes publishes using architecture-independent topics ("awf/universe..."): 
+       "/v2x/traffic_signals" and "/perception/traffic_light_recognition/external/traffic_signals"
+    */
+    if (architecture_type == "awf/universe") {
+      using Message = autoware_auto_perception_msgs::msg::TrafficSignalArray;
+      return std::make_unique<traffic_simulator::TrafficLightPublisher<Message>>(
+        &node, "/perception/traffic_light_recognition/traffic_signals");
+    } else if (architecture_type == "awf/universe/20230906") {
+      using Message = autoware_perception_msgs::msg::TrafficSignalArray;
+      return std::make_unique<traffic_simulator::TrafficLightPublisher<Message>>(
+        &node, "/perception/traffic_light_recognition/internal/traffic_signals");
+#if __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)
+    } else if (architecture_type >= "awf/universe/20240605") {
+      using Message = autoware_perception_msgs::msg::TrafficLightGroupArray;
+      return std::make_unique<traffic_simulator::TrafficLightPublisher<Message>>(
+        &node, "/perception/traffic_light_recognition/internal/traffic_signals");
+#endif
+    } else {
+      std::stringstream ss;
+      ss << "Unexpected architecture_type " << std::quoted(architecture_type)
+         << " given for traffic light.";
+      throw std::invalid_argument(ss.str());
+    }
+  }
+
+  const std::unique_ptr<traffic_simulator::TrafficLightPublisherBase> publisher_ptr_;
 };
 }  // namespace traffic_lights
 }  // namespace simple_sensor_simulator

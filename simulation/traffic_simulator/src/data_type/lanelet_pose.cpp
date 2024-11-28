@@ -22,7 +22,7 @@
 
 namespace traffic_simulator
 {
-namespace lanelet_pose
+inline namespace lanelet_pose
 {
 CanonicalizedLaneletPose::CanonicalizedLaneletPose(
   const LaneletPose & maybe_non_canonicalized_lanelet_pose,
@@ -111,17 +111,18 @@ auto CanonicalizedLaneletPose::canonicalize(
 
 auto CanonicalizedLaneletPose::getAlternativeLaneletPoseBaseOnShortestRouteFrom(
   LaneletPose from, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
-  bool allow_lane_change) const -> std::optional<LaneletPose>
+  const traffic_simulator::RoutingConfiguration & routing_configuration) const
+  -> std::optional<LaneletPose>
 {
   if (lanelet_poses_.empty()) {
     return std::nullopt;
   }
   lanelet::Ids shortest_route =
-    hdmap_utils->getRoute(from.lanelet_id, lanelet_poses_[0].lanelet_id);
+    hdmap_utils->getRoute(from.lanelet_id, lanelet_poses_[0].lanelet_id, routing_configuration);
   LaneletPose alternative_lanelet_pose = lanelet_poses_[0];
   for (const auto & laneletPose : lanelet_poses_) {
     const auto route =
-      hdmap_utils->getRoute(from.lanelet_id, laneletPose.lanelet_id, allow_lane_change);
+      hdmap_utils->getRoute(from.lanelet_id, laneletPose.lanelet_id, routing_configuration);
     if (shortest_route.size() > route.size()) {
       shortest_route = route;
       alternative_lanelet_pose = laneletPose;

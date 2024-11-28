@@ -22,8 +22,6 @@
 #include "../expect_eq_macros.hpp"
 #include "../test_utils.hpp"
 
-constexpr double EPS = 1e-6;
-
 TEST(Vector3, truncate_msgVectorBelowMax)
 {
   geometry_msgs::msg::Vector3 vec0 = makeVector(4.0, 4.0, 4.0);

@@ -305,17 +305,7 @@ void EgoEntitySimulation::update(
   if (is_npc_logic_started) {
     auto input = Eigen::VectorXd(vehicle_model_ptr_->getDimU());
 
-    auto acceleration_by_slope = [this]() {
-      if (consider_acceleration_by_road_slope_) {
-        // calculate longitudinal acceleration by slope
-        constexpr double gravity_acceleration = -9.81;
-        const double ego_pitch_angle = calculateEgoPitch();
-        const double slope_angle = -ego_pitch_angle;
-        return gravity_acceleration * std::sin(slope_angle);
-      } else {
-        return 0.0;
-      }
-    }();
+    auto acceleration_by_slope = calculateAccelerationBySlope();
 
     switch (vehicle_model_type_) {
       case VehicleModelType::DELAY_STEER_ACC:
@@ -349,56 +339,16 @@ void EgoEntitySimulation::update(
   updatePreviousValues();
 }
 
-auto EgoEntitySimulation::calculateEgoPitch() const -> double
+auto EgoEntitySimulation::calculateAccelerationBySlope() const -> double
 {
-  // calculate prev/next point of lanelet centerline nearest to ego pose.
-  if (!status_.laneMatchingSucceed()) {
+  if (consider_acceleration_by_road_slope_) {
+    constexpr double gravity_acceleration = -9.81;
+    const double ego_pitch_angle =
+      math::geometry::convertQuaternionToEulerAngle(status_.getMapPose().orientation).y;
+    return gravity_acceleration * std::sin(ego_pitch_angle);
+  } else {
     return 0.0;
   }
-
-  /// @note Copied from motion_util::findNearestSegmentIndex
-  auto centerline_points = hdmap_utils_ptr_->getCenterPoints(status_.getLaneletId());
-  auto find_nearest_segment_index =
-    [](const std::vector<geometry_msgs::msg::Point> & points, const Eigen::Vector3d & point) {
-      assert(not points.empty());
-
-      double min_dist = std::numeric_limits<double>::max();
-      size_t min_idx = 0;
-
-      for (size_t i = 0; i < points.size(); ++i) {
-        const auto dist =
-          [](const geometry_msgs::msg::Point & point1, const Eigen::Vector3d & point2) {
-            const auto dx = point1.x - point2.x();
-            const auto dy = point1.y - point2.y();
-            return dx * dx + dy * dy;
-          }(points.at(i), point);
-
-        if (dist < min_dist) {
-          min_dist = dist;
-          min_idx = i;
-        }
-      }
-      return min_idx;
-    };
-
-  const size_t ego_seg_idx =
-    find_nearest_segment_index(centerline_points, world_relative_position_);
-
-  const auto & prev_point = centerline_points.at(ego_seg_idx);
-  const auto & next_point = centerline_points.at(ego_seg_idx + 1);
-
-  /// @note Calculate ego yaw angle on lanelet coordinates
-  const double lanelet_yaw = std::atan2(next_point.y - prev_point.y, next_point.x - prev_point.x);
-  const double ego_yaw_against_lanelet = vehicle_model_ptr_->getYaw() - lanelet_yaw;
-
-  /// @note calculate ego pitch angle considering ego yaw.
-  const double diff_z = next_point.z - prev_point.z;
-  const double diff_xy = std::hypot(next_point.x - prev_point.x, next_point.y - prev_point.y) /
-                         std::cos(ego_yaw_against_lanelet);
-  const bool reverse_sign = std::cos(ego_yaw_against_lanelet) < 0.0;
-  const double ego_pitch_angle =
-    reverse_sign ? -std::atan2(-diff_z, -diff_xy) : -std::atan2(diff_z, diff_xy);
-  return ego_pitch_angle;
 }
 
 auto EgoEntitySimulation::getCurrentTwist() const -> geometry_msgs::msg::Twist
@@ -468,11 +418,12 @@ auto EgoEntitySimulation::setStatus(const traffic_simulator_msgs::msg::EntitySta
   /// EgoEntity::setStatus
   const auto unique_route_lanelets =
     traffic_simulator::helper::getUniqueValues(autoware->getRouteLanelets());
+  /// @note The offset value has been increased to 1.5 because a value of 1.0 was often insufficient when changing lanes. ( @Hans_Robo )
   const auto matching_distance = std::max(
                                    vehicle_parameters.axles.front_axle.track_width,
                                    vehicle_parameters.axles.rear_axle.track_width) *
                                    0.5 +
-                                 1.0;
+                                 1.5;
   /// @note Ego uses the unique_route_lanelets get from Autoware, instead of the current lanelet_id
   /// value from EntityStatus, therefore canonicalization has to be done in advance,
   /// not inside CanonicalizedEntityStatus
