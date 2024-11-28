@@ -25,7 +25,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- Act --------------------------------------------------------------------
+/* ---- Act 1.2 -------------------------------------------------------------
  *
  *  <xsd:complexType name="Act">
  *    <xsd:sequence>
