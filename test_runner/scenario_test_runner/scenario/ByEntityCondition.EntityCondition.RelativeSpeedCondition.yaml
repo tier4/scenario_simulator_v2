@@ -168,7 +168,7 @@ OpenSCENARIO:
                                   conditionEdge: none
                                   ByValueCondition:
                                     SimulationTimeCondition:
-                                      value: 10
+                                      value: 5
                                       rule: greaterThan
                                 - name: ''
                                   delay: 0
@@ -297,7 +297,7 @@ OpenSCENARIO:
                                   conditionEdge: none
                                   ByValueCondition:
                                     SimulationTimeCondition:
-                                      value: 20
+                                      value: 10
                                       rule: greaterThan
                         Action:
                           - name: ''
