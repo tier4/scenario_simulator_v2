@@ -75,7 +75,7 @@ private:
   auto getEntityPose(const std::string & entity_name) const noexcept(false)
     -> geometry_msgs::msg::Pose;
   /** 
-   *  @note Despawns the entity only when both:
+   *  @note Despawn the entity only when both:
    *  1. Its distance from the TrafficSink is <= radius [m].
    *  2. Its EntityType is in sinkable_entity_type or sinkable_entity_type is empty.
    */
