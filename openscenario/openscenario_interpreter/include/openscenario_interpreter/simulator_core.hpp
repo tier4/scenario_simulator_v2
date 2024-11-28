@@ -176,9 +176,11 @@ public:
       const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined)
       -> traffic_simulator::LaneletPose
     {
-      const bool allow_lane_change = (routing_algorithm == RoutingAlgorithm::value_type::shortest);
+      traffic_simulator::RoutingConfiguration routing_configuration;
+      routing_configuration.allow_lane_change =
+        (routing_algorithm == RoutingAlgorithm::value_type::shortest);
       return traffic_simulator::pose::relativeLaneletPose(
-        from_lanelet_pose, to_lanelet_pose, allow_lane_change, core->getHdmapUtils());
+        from_lanelet_pose, to_lanelet_pose, routing_configuration, core->getHdmapUtils());
     }
 
     static auto makeNativeBoundingBoxRelativeLanePosition(
@@ -221,10 +223,12 @@ public:
       const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined)
       -> traffic_simulator::LaneletPose
     {
-      const bool allow_lane_change = (routing_algorithm == RoutingAlgorithm::value_type::shortest);
+      traffic_simulator::RoutingConfiguration routing_configuration;
+      routing_configuration.allow_lane_change =
+        (routing_algorithm == RoutingAlgorithm::value_type::shortest);
       return traffic_simulator::pose::boundingBoxRelativeLaneletPose(
-        from_lanelet_pose, from_bounding_box, to_lanelet_pose, to_bounding_box, allow_lane_change,
-        core->getHdmapUtils());
+        from_lanelet_pose, from_bounding_box, to_lanelet_pose, to_bounding_box,
+        routing_configuration, core->getHdmapUtils());
     }
 
     static auto makeNativeBoundingBoxRelativeWorldPosition(
@@ -261,14 +265,15 @@ public:
       const std::string & from_entity_name, const std::string & to_entity_name,
       const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined) -> int
     {
+      traffic_simulator::RoutingConfiguration routing_configuration;
+      routing_configuration.allow_lane_change =
+        (routing_algorithm == RoutingAlgorithm::value_type::shortest);
       if (const auto from_entity = core->getEntity(from_entity_name)) {
         if (const auto to_entity = core->getEntity(to_entity_name)) {
-          const bool allow_lane_change =
-            (routing_algorithm == RoutingAlgorithm::value_type::shortest);
           if (
             auto lane_changes = traffic_simulator::distance::countLaneChanges(
               from_entity->getCanonicalizedLaneletPose().value(),
-              to_entity->getCanonicalizedLaneletPose().value(), allow_lane_change,
+              to_entity->getCanonicalizedLaneletPose().value(), routing_configuration,
               core->getHdmapUtils())) {
             return lane_changes.value().first - lane_changes.value().second;
           }
@@ -474,9 +479,10 @@ public:
     }
 
     template <typename... Ts>
-    static auto applyAssignRouteAction(Ts &&... xs)
+    static auto applyAssignRouteAction(const std::string & entity_ref, Ts &&... xs)
     {
-      return core->requestAssignRoute(std::forward<decltype(xs)>(xs)...);
+      core->requestClearRoute(entity_ref);
+      return core->requestAssignRoute(entity_ref, std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>
