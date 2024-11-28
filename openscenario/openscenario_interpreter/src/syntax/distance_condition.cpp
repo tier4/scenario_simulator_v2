@@ -837,7 +837,7 @@ auto DistanceCondition::evaluate() -> Object
     return not results.back().size() or rule(results.back(), value).min();
   }));
 
-  visualize();
+  call_visualize([this]() { visualize(); });
 
   return result;
 }
