@@ -53,8 +53,8 @@ struct Trigger : public std::list<ConditionGroup>
 
   auto evaluate() -> Object;
 
-  // Utility variables for some default triggers that are always evaluated to be true
-  static const Trigger always_true;
+  // Utility function for some default triggers that are always evaluated to be true
+  static auto truthy() noexcept -> Trigger;
 };
 
 auto operator<<(boost::json::object &, const Trigger &) -> boost::json::object &;
