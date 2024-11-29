@@ -108,8 +108,6 @@ struct DistanceCondition : private Scope, private SimulatorCore::ConditionEvalua
 
   std::vector<std::valarray<double>> results;  // for description
 
-  const bool consider_z;
-
   explicit DistanceCondition(const pugi::xml_node &, Scope &, const TriggeringEntities &);
 
   auto description() const -> std::string;
