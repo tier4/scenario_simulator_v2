@@ -561,8 +561,8 @@ public:
     {
       if (const auto observer = core->getEntity(from.name())) {
         if (const auto observed = core->getEntity(to.name())) {
-          auto velocity = [](const auto & entity) {
-            auto direction = [](auto orientation) {
+          auto velocity = [](const auto & entity) -> Eigen::Vector3d {
+            auto direction = [](auto orientation) -> Eigen::Vector3d {
               const auto euler_angle = math::geometry::convertQuaternionToEulerAngle(orientation);
               const auto r = euler_angle.x;
               const auto p = euler_angle.y;
