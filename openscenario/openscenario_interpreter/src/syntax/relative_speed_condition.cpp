@@ -101,9 +101,7 @@ auto RelativeSpeedCondition::evaluate() -> Object
 
   return asBoolean(triggering_entities.apply([this](const auto & triggering_entity) {
     evaluations.push_back(triggering_entity.apply([this](const auto & triggering_entity) {
-      const auto value = evaluate(global().entities, triggering_entity, entity_ref, direction);
-      std::cerr << "[" << triggering_entity.name() << "] " << value << std::endl;
-      return value;
+      return evaluate(global().entities, triggering_entity, entity_ref, direction);
     }));
     return not evaluations.back().size() or std::invoke(rule, evaluations.back(), value).min();
   }));
