@@ -25,6 +25,7 @@
 #include <openscenario_interpreter/syntax/routing_algorithm.hpp>
 #include <openscenario_interpreter/syntax/rule.hpp>
 #include <openscenario_interpreter/syntax/triggering_entities.hpp>
+#include <openscenario_interpreter/visualization_buffer.hpp>
 #include <pugixml.hpp>
 #include <valarray>
 
@@ -60,7 +61,9 @@ inline namespace syntax
      <xsd:attribute name="routingAlgorithm" type="RoutingAlgorithm"/>
    </xsd:complexType>
 */
-struct DistanceCondition : private Scope, private SimulatorCore::ConditionEvaluation
+struct DistanceCondition : private Scope,
+                           private SimulatorCore::ConditionEvaluation,
+                           private VisualizationBuffer::Target
 {
   /*
      Definition of the coordinate system to be used for calculations. If not
@@ -123,6 +126,8 @@ struct DistanceCondition : private Scope, private SimulatorCore::ConditionEvalua
   {
     throw SyntaxError(__FILE__, ":", __LINE__);
   }
+
+  void visualize() const;
 
   auto evaluate() -> Object;
 };

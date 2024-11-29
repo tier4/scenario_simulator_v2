@@ -23,6 +23,7 @@
 #include <openscenario_interpreter/syntax/scenario_definition.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
+#include <openscenario_interpreter/visualization_buffer.hpp>
 #include <status_monitor/status_monitor.hpp>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
 
@@ -41,7 +42,8 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   osc_path(""),
   output_directory("/tmp"),
   publish_empty_context(false),
-  record(false)
+  record(false),
+  publish_visualization(false)
 {
   DECLARE_PARAMETER(local_frame_rate);
   DECLARE_PARAMETER(local_real_time_factor);
@@ -49,6 +51,7 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   DECLARE_PARAMETER(output_directory);
   DECLARE_PARAMETER(publish_empty_context);
   DECLARE_PARAMETER(record);
+  DECLARE_PARAMETER(publish_visualization);
 }
 
 Interpreter::~Interpreter() {}
@@ -108,11 +111,13 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
       GET_PARAMETER(output_directory);
       GET_PARAMETER(publish_empty_context);
       GET_PARAMETER(record);
+      GET_PARAMETER(publish_visualization);
 
       script = std::make_shared<OpenScenario>(osc_path);
 
-      // CanonicalizedLaneletPose is also used on the OpenScenarioInterpreter side as NativeLanePose.
-      // so canonicalization takes place here - it uses the value of the consider_pose_by_road_slope parameter
+      // CanonicalizedLaneletPose is also used on the OpenScenarioInterpreter side as
+      // NativeLanePose. so canonicalization takes place here - it uses the value of the
+      // consider_pose_by_road_slope parameter
       traffic_simulator::lanelet_pose::CanonicalizedLaneletPose::setConsiderPoseByRoadSlope([&]() {
         if (not has_parameter("consider_pose_by_road_slope")) {
           declare_parameter("consider_pose_by_road_slope", false);
@@ -179,6 +184,8 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
     withExceptionHandler(
       [this](auto &&...) {
         publishCurrentContext();
+        VisualizationBuffer::flush();
+        VisualizationBuffer::deactivate();
         deactivate();
       },
       [this]() {
@@ -200,6 +207,7 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
           SimulatorCore::update();
 
           publishCurrentContext();
+          VisualizationBuffer::flush();
         });
       });
   };
@@ -221,6 +229,10 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 
         SimulatorCore::activate(
           shared_from_this(), makeCurrentConfiguration(), local_real_time_factor, local_frame_rate);
+
+        if (publish_visualization) {
+          VisualizationBuffer::activate(shared_from_this());
+        }
 
         /*
            DIRTY HACK!
