@@ -25,7 +25,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 /*
-   Entities (OpenSCENARIO XML 1.3)
+   Entities (OpenSCENARIO XML 1.3.1)
 
    Definition of entities (scenario objects or entity selections) in
    a scenario.
@@ -39,6 +39,7 @@ inline namespace syntax
 */
 struct Entities : private std::unordered_map<std::string, Object>
 {
+  using std::unordered_map<std::string, Object>::at;
   using std::unordered_map<std::string, Object>::begin;
   using std::unordered_map<std::string, Object>::end;
 

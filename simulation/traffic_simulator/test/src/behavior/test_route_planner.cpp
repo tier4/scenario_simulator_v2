@@ -29,7 +29,11 @@ int main(int argc, char ** argv)
 class RoutePlannerTest : public testing::Test
 {
 protected:
-  RoutePlannerTest() : hdmap_utils_ptr(makeHdMapUtilsSharedPointer()), planner(hdmap_utils_ptr) {}
+  RoutePlannerTest()
+  : hdmap_utils_ptr(makeHdMapUtilsSharedPointer()),
+    planner(traffic_simulator::RoutingConfiguration().routing_graph_type, hdmap_utils_ptr)
+  {
+  }
 
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr;
   traffic_simulator::RoutePlanner planner;
