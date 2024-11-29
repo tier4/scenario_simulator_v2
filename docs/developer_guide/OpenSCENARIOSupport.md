@@ -308,7 +308,7 @@ Currently, the only way to know the result of the simulation is by viewing the s
 | DynamicsDimension                            | 1.3               |                                            |
 | DynamicsShape                                | 1.3 (partial)     | [detail](#DynamicsShape)                   |
 | EndOfRoadCondition                           | unimplemented     |                                            |
-| Entities                                     | 1.3 (partial)     | [detail](#Entities)                        |
+| Entities                                     | 1.3.1             |                                            |
 | EntityAction                                 | 1.3               |                                            |
 | EntityCondition                              | 1.3 (partial)     | [detail](#EntityCondition)                 |
 | EntityDistribution                           | unimplemented     |                                            |
@@ -636,10 +636,6 @@ Currently, the only way to know the result of the simulation is by viewing the s
 #### DynamicsShape
 
 - Enumeration literal `sinusoidal` is **not** supported.
-
-#### Entities
-
-- Property `EntitySelection` is **not** supported.
 
 #### EntityCondition
 
