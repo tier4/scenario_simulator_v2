@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/cmath/hypot.hpp>
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/syntax/entities.hpp>  // TEMPORARY (TODO REMOVE THIS LINE)
@@ -39,12 +40,7 @@ RelativeDistanceCondition::RelativeDistanceCondition(
   rule(readAttribute<Rule>("rule", node, scope)),
   value(readAttribute<Double>("value", node, scope)),
   triggering_entities(triggering_entities),
-  results(triggering_entities.entity_refs.size(), {Double::nan()}),
-  consider_z([]() {
-    rclcpp::Node node{"get_parameter", "simulation"};
-    node.declare_parameter("consider_pose_by_road_slope", false);
-    return node.get_parameter("consider_pose_by_road_slope").as_bool();
-  }())
+  results(triggering_entities.entity_refs.size(), {Double::nan()})
 {
   std::set<RoutingAlgorithm::value_type> supported = {
     RoutingAlgorithm::value_type::shortest, RoutingAlgorithm::value_type::undefined};
@@ -132,12 +128,6 @@ auto RelativeDistanceCondition::distance<
   }
 }
 
-// @todo: after checking all the scenario work well with consider_z = true, remove this function and use std::hypot(x,y,z)
-static double hypot(const double x, const double y, const double z, const bool consider_z)
-{
-  return consider_z ? std::hypot(x, y, z) : std::hypot(x, y);
-}
-
 template <>
 auto RelativeDistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, RoutingAlgorithm::undefined,
@@ -149,8 +139,7 @@ auto RelativeDistanceCondition::distance<
     return hypot(
       makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref).position.x,
       makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref).position.y,
-      makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref).position.z,
-      consider_z);
+      makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref).position.z);
   } else {
     return Double::nan();
   }
@@ -167,7 +156,7 @@ auto RelativeDistanceCondition::distance<
     return hypot(
       makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.x,
       makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.y,
-      makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.z, consider_z);
+      makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.z);
   } else {
     return Double::nan();
   }

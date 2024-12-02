@@ -2780,17 +2780,16 @@ TEST_F(HdMapUtilsTest_StandardMap, getPreviousLanelets)
 
 TEST_F(HdMapUtilsTest_WithRoadShoulderMap, routingWithRoadShoulder)
 {
-  // default: traffic_simulator::RoutingGraphType::VEHICLE
-  const auto default_route =
-    hdmap_utils.getRoute(34693, 34615, traffic_simulator::RoutingConfiguration());
-  EXPECT_EQ(default_route.size(), 0);
+  traffic_simulator::RoutingConfiguration routing_configuration_without_road_shoulder;
+  routing_configuration_without_road_shoulder.routing_graph_type =
+    traffic_simulator::RoutingGraphType::VEHICLE;
+  const auto route_without_road_shoulder =
+    hdmap_utils.getRoute(34693, 34615, routing_configuration_without_road_shoulder);
+  EXPECT_EQ(route_without_road_shoulder.size(), 0);
 
-  traffic_simulator::RoutingConfiguration routing_configuration_with_road_shoulder;
-  routing_configuration_with_road_shoulder.routing_graph_type =
-    traffic_simulator::RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER;
-  traffic_simulator::RoutingConfiguration default_routing_configuration;
+  // default: traffic_simulator::RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER
   const auto route_with_road_shoulder =
-    hdmap_utils.getRoute(34693, 34615, routing_configuration_with_road_shoulder);
+    hdmap_utils.getRoute(34693, 34615, traffic_simulator::RoutingConfiguration());
   EXPECT_EQ(route_with_road_shoulder.size(), 4);
   EXPECT_EQ(route_with_road_shoulder[0], 34693);
   EXPECT_EQ(route_with_road_shoulder[1], 34696);  // road shoulder

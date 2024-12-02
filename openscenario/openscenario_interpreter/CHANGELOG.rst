@@ -32,6 +32,50 @@ Changelog for package openscenario_interpreter
 * add publish_empty_context parameter
 * Contributors: Masaya Kataoka
 
+6.1.3 (2024-11-29)
+------------------
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge remote-tracking branch 'tier4/RJD-1057-traffic-lights-tests' into RJD-1057-traffic-lights-tests
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge remote-tracking branch 'tier4/master' into RJD-1057-traffic-lights-tests
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge remote-tracking branch 'tier4/RJD-1057-remove-traffic-lights-from-entity-manager' into RJD-1057-traffic-lights-tests
+* Merge branch 'RJD-1057-remove-traffic-lights-from-entity-manager' into RJD-1057-traffic-lights-tests
+* Merge branch 'RJD-1057-remove-traffic-lights-from-entity-manager' into RJD-1057-traffic-lights-tests
+* Merge branch 'RJD-1057-remove-traffic-lights-from-entity-manager' into RJD-1057-traffic-lights-tests
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Mateusz Palczuk, Tatsuya Yamasaki
+
+6.1.2 (2024-11-29)
+------------------
+* Merge pull request `#1463 <https://github.com/tier4/scenario_simulator_v2/issues/1463>`_ from tier4/refactor/interpreter
+  Refactor/interpreter
+* Merge branch 'master' into refactor/interpreter
+* Cleanup struct `Entities`
+* Update `ReachPositionCondition` to use `cmath::hypot`
+* Update `DistanceCondition` to use `cmath::hypot`
+* Update `RelativeDistanceCondition` to use `cmath::hypot`
+* Add new free function `openscenario_interpreter::cmath::hypot`
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+6.1.1 (2024-11-29)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/sonarcloud_warning
+* Merge branch 'master' into fix/sonarcloud_warning
+* Merge branch 'master' into fix/sonarcloud_warning
+* Contributors: Masaya Kataoka
+
+6.1.0 (2024-11-29)
+------------------
+
+6.0.1 (2024-11-27)
+------------------
+
 6.0.0 (2024-11-27)
 ------------------
 * Merge pull request `#1458 <https://github.com/tier4/scenario_simulator_v2/issues/1458>`_ from tier4/refactor/add_routing_graph_argument
