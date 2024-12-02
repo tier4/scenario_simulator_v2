@@ -65,14 +65,12 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
   };
 
   const auto makeUpdatedEntityStatus = [this, &getTargetSpeed]() -> auto {
-    const auto vehicle_state = traffic_simulator::follow_trajectory::VehicleState(
+    const auto validated_status = traffic_simulator::follow_trajectory::ValidatedEntityStatus(
       static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status),
       behavior_parameter, step_time);
-    auto polyline_trajectory_follower =
-      traffic_simulator::follow_trajectory::PolylineTrajectoryFollower(
-        vehicle_state, *polyline_trajectory, default_matching_distance_for_lanelet_pose_calculation,
-        getTargetSpeed(), step_time, hdmap_utils);
-    return polyline_trajectory_follower.updatedEntityStatus();
+    return traffic_simulator::follow_trajectory::PolylineTrajectoryFollower::updatedEntityStatus(
+      validated_status, *polyline_trajectory, getTargetSpeed(), step_time,
+      default_matching_distance_for_lanelet_pose_calculation, hdmap_utils);
   };
 
   if (getBlackBoardValues();

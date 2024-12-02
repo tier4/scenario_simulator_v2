@@ -147,15 +147,13 @@ void EgoEntity::onUpdate(double current_time, double step_time)
 {
   EntityBase::onUpdate(current_time, step_time);
   if (is_controlled_by_simulator_) {
-    const auto vehicle_state = traffic_simulator::follow_trajectory::VehicleState(
+    const auto validated_status = traffic_simulator::follow_trajectory::ValidatedEntityStatus(
       static_cast<traffic_simulator::EntityStatus>(*status_), behavior_parameter_, step_time);
-    auto polyline_trajectory_follower =
-      traffic_simulator::follow_trajectory::PolylineTrajectoryFollower(
-        vehicle_state, *polyline_trajectory_, getDefaultMatchingDistanceForLaneletPoseCalculation(),
-        target_speed_ ? target_speed_.value() : status_->getTwist().linear.x, step_time,
-        hdmap_utils_ptr_);
     if (const auto non_canonicalized_updated_status =
-          polyline_trajectory_follower.updatedEntityStatus();
+          traffic_simulator::follow_trajectory::PolylineTrajectoryFollower::updatedEntityStatus(
+            validated_status, *polyline_trajectory_,
+            target_speed_ ? target_speed_.value() : status_->getTwist().linear.x, step_time,
+            getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
         non_canonicalized_updated_status.has_value()) {
       // prefer current lanelet on ss2 side
       setStatus(non_canonicalized_updated_status.value(), status_->getLaneletIds());
