@@ -69,7 +69,7 @@ public:
   auto canChangeLane(
     const lanelet::Id from, const lanelet::Id to,
     const traffic_simulator::RoutingGraphType type =
-      traffic_simulator::RoutingGraphType::VEHICLE) const -> bool;
+      traffic_simulator::RoutingConfiguration().routing_graph_type) const -> bool;
 
   auto canonicalizeLaneletPose(const traffic_simulator_msgs::msg::LaneletPose &) const
     -> std::tuple<
@@ -99,8 +99,9 @@ public:
 
   auto getAlongLaneletPose(
     const traffic_simulator_msgs::msg::LaneletPose & from, const double along,
-    const traffic_simulator::RoutingGraphType type = traffic_simulator::RoutingGraphType::VEHICLE)
-    const -> traffic_simulator_msgs::msg::LaneletPose;
+    const traffic_simulator::RoutingGraphType type =
+      traffic_simulator::RoutingConfiguration().routing_graph_type) const
+    -> traffic_simulator_msgs::msg::LaneletPose;
 
   auto getCenterPoints(const lanelet::Ids &) const -> std::vector<geometry_msgs::msg::Point>;
 
@@ -121,7 +122,8 @@ public:
 
   auto getConflictingLaneIds(
     const lanelet::Ids &, const traffic_simulator::RoutingGraphType type =
-                            traffic_simulator::RoutingGraphType::VEHICLE) const -> lanelet::Ids;
+                            traffic_simulator::RoutingConfiguration().routing_graph_type) const
+    -> lanelet::Ids;
 
   auto getDistanceToStopLine(
     const lanelet::Ids & route_lanelets,
@@ -151,12 +153,12 @@ public:
     const lanelet::Id current_lanelet_id, const lanelet::Ids & route, const double horizon = 100,
     const bool include_current_lanelet_id = true,
     const traffic_simulator::RoutingGraphType type =
-      traffic_simulator::RoutingGraphType::VEHICLE) const -> lanelet::Ids;
+      traffic_simulator::RoutingConfiguration().routing_graph_type) const -> lanelet::Ids;
 
   auto getFollowingLanelets(
     const lanelet::Id, const double distance = 100, const bool include_self = true,
     const traffic_simulator::RoutingGraphType type =
-      traffic_simulator::RoutingGraphType::VEHICLE) const -> lanelet::Ids;
+      traffic_simulator::RoutingConfiguration().routing_graph_type) const -> lanelet::Ids;
 
   auto getHeight(const traffic_simulator_msgs::msg::LaneletPose &) const -> double;
 
@@ -175,12 +177,14 @@ public:
   auto getLaneChangeableLaneletId(
     const lanelet::Id, const traffic_simulator::lane_change::Direction,
     const traffic_simulator::RoutingGraphType type =
-      traffic_simulator::RoutingGraphType::VEHICLE) const -> std::optional<lanelet::Id>;
+      traffic_simulator::RoutingConfiguration().routing_graph_type) const
+    -> std::optional<lanelet::Id>;
 
   auto getLaneChangeableLaneletId(
     const lanelet::Id, const traffic_simulator::lane_change::Direction, const std::uint8_t shift,
     const traffic_simulator::RoutingGraphType type =
-      traffic_simulator::RoutingGraphType::VEHICLE) const -> std::optional<lanelet::Id>;
+      traffic_simulator::RoutingConfiguration().routing_graph_type) const
+    -> std::optional<lanelet::Id>;
 
   auto getLaneletIds() const -> lanelet::Ids;
 
@@ -218,48 +222,48 @@ public:
 
   auto getNextLaneletIds(
     const lanelet::Ids &, const traffic_simulator::RoutingGraphType type =
-                            traffic_simulator::RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER) const
+                            traffic_simulator::RoutingConfiguration().routing_graph_type) const
     -> lanelet::Ids;
 
   auto getNextLaneletIds(
     const lanelet::Ids &, const std::string & turn_direction,
     const traffic_simulator::RoutingGraphType type =
-      traffic_simulator::RoutingGraphType::VEHICLE) const -> lanelet::Ids;
+      traffic_simulator::RoutingConfiguration().routing_graph_type) const -> lanelet::Ids;
 
   auto getNextLaneletIds(
     const lanelet::Id, const traffic_simulator::RoutingGraphType type =
-                         traffic_simulator::RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER) const
+                         traffic_simulator::RoutingConfiguration().routing_graph_type) const
     -> lanelet::Ids;
 
   auto getNextLaneletIds(
     const lanelet::Id, const std::string & turn_direction,
     const traffic_simulator::RoutingGraphType type =
-      traffic_simulator::RoutingGraphType::VEHICLE) const -> lanelet::Ids;
+      traffic_simulator::RoutingConfiguration().routing_graph_type) const -> lanelet::Ids;
 
   auto getPreviousLaneletIds(
     const lanelet::Ids &, const traffic_simulator::RoutingGraphType type =
-                            traffic_simulator::RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER) const
+                            traffic_simulator::RoutingConfiguration().routing_graph_type) const
     -> lanelet::Ids;
 
   auto getPreviousLaneletIds(
     const lanelet::Ids &, const std::string & turn_direction,
     const traffic_simulator::RoutingGraphType type =
-      traffic_simulator::RoutingGraphType::VEHICLE) const -> lanelet::Ids;
+      traffic_simulator::RoutingConfiguration().routing_graph_type) const -> lanelet::Ids;
 
   auto getPreviousLaneletIds(
     const lanelet::Id, const traffic_simulator::RoutingGraphType type =
-                         traffic_simulator::RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER) const
+                         traffic_simulator::RoutingConfiguration().routing_graph_type) const
     -> lanelet::Ids;
 
   auto getPreviousLaneletIds(
     const lanelet::Id, const std::string & turn_direction,
     const traffic_simulator::RoutingGraphType type =
-      traffic_simulator::RoutingGraphType::VEHICLE) const -> lanelet::Ids;
+      traffic_simulator::RoutingConfiguration().routing_graph_type) const -> lanelet::Ids;
 
   auto getPreviousLanelets(
     const lanelet::Id, const double backward_horizon = 100,
     const traffic_simulator::RoutingGraphType type =
-      traffic_simulator::RoutingGraphType::VEHICLE) const -> lanelet::Ids;
+      traffic_simulator::RoutingConfiguration().routing_graph_type) const -> lanelet::Ids;
 
   auto getRightBound(const lanelet::Id) const -> std::vector<geometry_msgs::msg::Point>;
 
@@ -279,7 +283,8 @@ public:
 
   auto getSpeedLimit(
     const lanelet::Ids &, const traffic_simulator::RoutingGraphType type =
-                            traffic_simulator::RoutingGraphType::VEHICLE) const -> double;
+                            traffic_simulator::RoutingConfiguration().routing_graph_type) const
+    -> double;
 
   auto getStopLineIds() const -> lanelet::Ids;
 
@@ -329,7 +334,8 @@ public:
     const bool include_crosswalk, const double matching_distance = 1.0,
     const double reduction_ratio = DEFAULT_MATCH_TO_LANE_REDUCTION_RATIO,
     const traffic_simulator::RoutingGraphType type =
-      traffic_simulator::RoutingGraphType::VEHICLE) const -> std::optional<lanelet::Id>;
+      traffic_simulator::RoutingConfiguration().routing_graph_type) const
+    -> std::optional<lanelet::Id>;
 
   auto toLaneletPose(
     const geometry_msgs::msg::Pose &, const bool include_crosswalk,
@@ -344,14 +350,16 @@ public:
   auto toLaneletPose(
     const geometry_msgs::msg::Point &, const traffic_simulator_msgs::msg::BoundingBox &,
     const bool include_crosswalk, const double matching_distance = 1.0,
-    const traffic_simulator::RoutingGraphType type = traffic_simulator::RoutingGraphType::VEHICLE)
-    const -> std::optional<traffic_simulator_msgs::msg::LaneletPose>;
+    const traffic_simulator::RoutingGraphType type =
+      traffic_simulator::RoutingConfiguration().routing_graph_type) const
+    -> std::optional<traffic_simulator_msgs::msg::LaneletPose>;
 
   auto toLaneletPose(
     const geometry_msgs::msg::Pose &, const traffic_simulator_msgs::msg::BoundingBox &,
     const bool include_crosswalk, const double matching_distance = 1.0,
-    const traffic_simulator::RoutingGraphType type = traffic_simulator::RoutingGraphType::VEHICLE)
-    const -> std::optional<traffic_simulator_msgs::msg::LaneletPose>;
+    const traffic_simulator::RoutingGraphType type =
+      traffic_simulator::RoutingConfiguration().routing_graph_type) const
+    -> std::optional<traffic_simulator_msgs::msg::LaneletPose>;
 
   auto toLaneletPose(
     const geometry_msgs::msg::Pose &, const lanelet::Id, const double matching_distance = 1.0) const
@@ -360,8 +368,9 @@ public:
   auto toLaneletPoses(
     const geometry_msgs::msg::Pose &, const lanelet::Id, const double matching_distance = 5.0,
     const bool include_opposite_direction = true,
-    const traffic_simulator::RoutingGraphType type = traffic_simulator::RoutingGraphType::VEHICLE)
-    const -> std::vector<traffic_simulator_msgs::msg::LaneletPose>;
+    const traffic_simulator::RoutingGraphType type =
+      traffic_simulator::RoutingConfiguration().routing_graph_type) const
+    -> std::vector<traffic_simulator_msgs::msg::LaneletPose>;
 
   auto toMapBin() const -> autoware_map_msgs::msg::LaneletMapBin;
 
