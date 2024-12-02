@@ -69,52 +69,58 @@ auto DistanceCondition::description() const -> std::string
   return description.str();
 }
 
-#define SWITCH_COORDINATE_SYSTEM(FUNCTION, ...)            \
-  switch (coordinate_system) {                             \
-    case CoordinateSystem::entity:                         \
-      FUNCTION(__VA_ARGS__, CoordinateSystem::entity);     \
-      break;                                               \
-    case CoordinateSystem::lane:                           \
-      FUNCTION(__VA_ARGS__, CoordinateSystem::lane);       \
-      break;                                               \
-    case CoordinateSystem::road:                           \
-      FUNCTION(__VA_ARGS__, CoordinateSystem::road);       \
-      break;                                               \
-    case CoordinateSystem::trajectory:                     \
-      FUNCTION(__VA_ARGS__, CoordinateSystem::trajectory); \
-      break;                                               \
+#define SWITCH_COORDINATE_SYSTEM(FUNCTION, ...)                                         \
+  switch (coordinate_system) {                                                          \
+    case CoordinateSystem::entity:                                                      \
+      FUNCTION(__VA_ARGS__, CoordinateSystem::entity);                                  \
+      break;                                                                            \
+    case CoordinateSystem::lane:                                                        \
+      FUNCTION(__VA_ARGS__, CoordinateSystem::lane);                                    \
+      break;                                                                            \
+    case CoordinateSystem::road:                                                        \
+      FUNCTION(__VA_ARGS__, CoordinateSystem::road);                                    \
+      break;                                                                            \
+    case CoordinateSystem::trajectory:                                                  \
+      FUNCTION(__VA_ARGS__, CoordinateSystem::trajectory);                              \
+      break;                                                                            \
+    default:                                                                            \
+      throw UNEXPECTED_ENUMERATION_VALUE_ASSIGNED(CoordinateSystem, coordinate_system); \
   }
 
-#define SWITCH_RELATIVE_DISTANCE_TYPE(FUNCTION, ...)                  \
-  switch (relative_distance_type) {                                   \
-    case RelativeDistanceType::longitudinal:                          \
-      FUNCTION(__VA_ARGS__, RelativeDistanceType::longitudinal);      \
-      break;                                                          \
-    case RelativeDistanceType::lateral:                               \
-      FUNCTION(__VA_ARGS__, RelativeDistanceType::lateral);           \
-      break;                                                          \
-    case RelativeDistanceType::euclidianDistance:                     \
-      FUNCTION(__VA_ARGS__, RelativeDistanceType::euclidianDistance); \
-      break;                                                          \
+#define SWITCH_RELATIVE_DISTANCE_TYPE(FUNCTION, ...)                                             \
+  switch (relative_distance_type) {                                                              \
+    case RelativeDistanceType::longitudinal:                                                     \
+      FUNCTION(__VA_ARGS__, RelativeDistanceType::longitudinal);                                 \
+      break;                                                                                     \
+    case RelativeDistanceType::lateral:                                                          \
+      FUNCTION(__VA_ARGS__, RelativeDistanceType::lateral);                                      \
+      break;                                                                                     \
+    case RelativeDistanceType::euclidianDistance:                                                \
+      FUNCTION(__VA_ARGS__, RelativeDistanceType::euclidianDistance);                            \
+      break;                                                                                     \
+    default:                                                                                     \
+      throw UNEXPECTED_ENUMERATION_VALUE_ASSIGNED(RelativeDistanceType, relative_distance_type); \
   }
 
-#define SWITCH_ROUTING_ALGORITHM(FUNCTION, ...)                     \
-  switch (routing_algorithm) {                                      \
-    case RoutingAlgorithm::assigned_route:                          \
-      FUNCTION(__VA_ARGS__, RoutingAlgorithm::assigned_route);      \
-      break;                                                        \
-    case RoutingAlgorithm::fastest:                                 \
-      FUNCTION(__VA_ARGS__, RoutingAlgorithm::fastest);             \
-      break;                                                        \
-    case RoutingAlgorithm::least_intersections:                     \
-      FUNCTION(__VA_ARGS__, RoutingAlgorithm::least_intersections); \
-      break;                                                        \
-    case RoutingAlgorithm::shortest:                                \
-      FUNCTION(__VA_ARGS__, RoutingAlgorithm::shortest);            \
-      break;                                                        \
-    case RoutingAlgorithm::undefined:                               \
-      FUNCTION(__VA_ARGS__, RoutingAlgorithm::undefined);           \
-      break;                                                        \
+#define SWITCH_ROUTING_ALGORITHM(FUNCTION, ...)                                         \
+  switch (routing_algorithm) {                                                          \
+    case RoutingAlgorithm::assigned_route:                                              \
+      FUNCTION(__VA_ARGS__, RoutingAlgorithm::assigned_route);                          \
+      break;                                                                            \
+    case RoutingAlgorithm::fastest:                                                     \
+      FUNCTION(__VA_ARGS__, RoutingAlgorithm::fastest);                                 \
+      break;                                                                            \
+    case RoutingAlgorithm::least_intersections:                                         \
+      FUNCTION(__VA_ARGS__, RoutingAlgorithm::least_intersections);                     \
+      break;                                                                            \
+    case RoutingAlgorithm::shortest:                                                    \
+      FUNCTION(__VA_ARGS__, RoutingAlgorithm::shortest);                                \
+      break;                                                                            \
+    case RoutingAlgorithm::undefined:                                                   \
+      FUNCTION(__VA_ARGS__, RoutingAlgorithm::undefined);                               \
+      break;                                                                            \
+    default:                                                                            \
+      throw UNEXPECTED_ENUMERATION_VALUE_ASSIGNED(RoutingAlgorithm, routing_algorithm); \
   }
 
 #define SWITCH_FREESPACE(FUNCTION, ...) \
