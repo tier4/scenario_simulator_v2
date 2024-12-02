@@ -78,9 +78,6 @@ auto RelativeDistanceCondition::distance<
   }
 }
 
-/**
- * @note This implementation differs from the OpenSCENARIO standard. See the section "6.4. Distances" in the OpenSCENARIO User Guide.
- */
 template <>
 auto RelativeDistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::longitudinal, RoutingAlgorithm::undefined, true>(
@@ -89,6 +86,10 @@ auto RelativeDistanceCondition::distance<
   if (
     global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
     global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
+    /**
+       @note This implementation differs from the OpenSCENARIO standard. See
+       the section "5.4. Distances" in the OpenSCENARIO User Guide.
+    */
     return std::abs(
       makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref).position.x);
   } else {
@@ -395,7 +396,7 @@ auto RelativeDistanceCondition::distance<
 
 #define DISTANCE(...) distance<__VA_ARGS__>(triggering_entity)
 
-auto RelativeDistanceCondition::distance(const EntityRef & triggering_entity) -> double
+auto RelativeDistanceCondition::evaluate(const EntityRef & triggering_entity) -> double
 {
   SWITCH_COORDINATE_SYSTEM(
     SWITCH_RELATIVE_DISTANCE_TYPE, SWITCH_ROUTING_ALGORITHM, SWITCH_FREESPACE, DISTANCE);
@@ -408,7 +409,7 @@ auto RelativeDistanceCondition::evaluate() -> Object
 
   return asBoolean(triggering_entities.apply([&](const auto & triggering_entity) {
     results.push_back(
-      triggering_entity.apply([&](const auto & object) { return distance(object); }));
+      triggering_entity.apply([&](const auto & object) { return evaluate(object); }));
     return not results.back().size() or rule(results.back(), value).min();
   }));
 }
