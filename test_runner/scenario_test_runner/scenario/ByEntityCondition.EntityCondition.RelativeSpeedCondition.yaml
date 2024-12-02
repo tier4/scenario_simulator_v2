@@ -1,0 +1,318 @@
+ScenarioModifiers:
+  ScenarioModifier: []
+OpenSCENARIO:
+  FileHeader: { revMajor: 1, revMinor: 1, date: '2024-11-27T05:59:29.868Z', description: '', author: Tatsuya Yamasaki }
+  ParameterDeclarations:
+    ParameterDeclaration: []
+  CatalogLocations:
+    VehicleCatalog:
+      Directory: { path: $(ros2 pkg prefix --share openscenario_experimental_catalog)/vehicle }
+  RoadNetwork:
+    LogicFile: { filepath: $(ros2 pkg prefix --share kashiwanoha_map)/map }
+  Entities:
+    ScenarioObject:
+      - name: vehicle_00
+        CatalogReference: { catalogName: sample_vehicle, entryName: sample_vehicle }
+        ObjectController: &OBJECT_CONTROLLER
+          Controller:
+            name: ''
+            Properties:
+              Property: []
+      - name: vehicle_01
+        CatalogReference: { catalogName: sample_vehicle, entryName: sample_vehicle }
+        ObjectController: *OBJECT_CONTROLLER
+      - name: vehicle_02
+        CatalogReference: { catalogName: sample_vehicle, entryName: sample_vehicle }
+        ObjectController: *OBJECT_CONTROLLER
+      - name: vehicle_03
+        CatalogReference: { catalogName: sample_vehicle, entryName: sample_vehicle }
+        ObjectController: *OBJECT_CONTROLLER
+      - name: vehicle_04
+        CatalogReference: { catalogName: sample_vehicle, entryName: sample_vehicle }
+        ObjectController: *OBJECT_CONTROLLER
+  Storyboard:
+    Init:
+      Actions:
+        Private:
+          - entityRef: vehicle_00
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '34976'
+                      s: 10
+                      offset: 0
+                      Orientation:
+                        type: relative
+                        h: 0
+                        p: 0
+                        r: 0
+              - ControllerAction:
+                  AssignControllerAction:
+                    Controller:
+                      name: ''
+                      Properties:
+                        Property:
+                          - name: maxSpeed
+                            value: '2'
+          - entityRef: vehicle_01
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '34579'
+                      s: 0
+                      offset: 0
+                      Orientation:
+                        type: relative
+                        h: 0
+                        p: 0
+                        r: 0
+              - ControllerAction:
+                  AssignControllerAction:
+                    Controller:
+                      name: ''
+                      Properties:
+                        Property:
+                          - name: maxSpeed
+                            value: '2'
+          - entityRef: vehicle_02
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '34600'
+                      s: 0
+                      offset: 0
+                      Orientation:
+                        type: relative
+                        h: 0
+                        p: 0
+                        r: 0
+              - ControllerAction:
+                  AssignControllerAction:
+                    Controller:
+                      name: ''
+                      Properties:
+                        Property:
+                          - name: maxSpeed
+                            value: '2'
+          - entityRef: vehicle_03
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '34564'
+                      s: 0
+                      offset: 0
+                      Orientation:
+                        type: relative
+                        h: 0
+                        p: 0
+                        r: 0
+              - ControllerAction:
+                  AssignControllerAction:
+                    Controller:
+                      name: ''
+                      Properties:
+                        Property:
+                          - name: maxSpeed
+                            value: '2'
+          - entityRef: vehicle_04
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '34630'
+                      s: 0
+                      offset: 0
+                      Orientation:
+                        type: relative
+                        h: 0
+                        p: 0
+                        r: 0
+              - ControllerAction:
+                  AssignControllerAction:
+                    Controller:
+                      name: ''
+                      Properties:
+                        Property:
+                          - name: maxSpeed
+                            value: '2'
+    Story:
+      - name: ''
+        Act:
+          - name: _EndCondition
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ''
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef:
+                    - entityRef: vehicle_00
+                Maneuver:
+                  - name: ''
+                    Event:
+                      - name: ''
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 5
+                                      rule: greaterThan
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: vehicle_01
+                                    EntityCondition:
+                                      RelativeSpeedCondition:
+                                        direction: longitudinal
+                                        entityRef: vehicle_00
+                                        rule: lessThan
+                                        value: 0.1
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: vehicle_01
+                                    EntityCondition:
+                                      RelativeSpeedCondition:
+                                        direction: longitudinal
+                                        entityRef: vehicle_00
+                                        rule: greaterThan
+                                        value: -0.1
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: vehicle_02
+                                    EntityCondition:
+                                      RelativeSpeedCondition:
+                                        direction: longitudinal
+                                        entityRef: vehicle_00
+                                        rule: lessThan
+                                        value: -3.9
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: vehicle_02
+                                    EntityCondition:
+                                      RelativeSpeedCondition:
+                                        direction: longitudinal
+                                        entityRef: vehicle_00
+                                        rule: greaterThan
+                                        value: -4.1
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: vehicle_03
+                                    EntityCondition:
+                                      RelativeSpeedCondition:
+                                        direction: lateral
+                                        entityRef: vehicle_00
+                                        rule: lessThan
+                                        value: 2.1
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: vehicle_03
+                                    EntityCondition:
+                                      RelativeSpeedCondition:
+                                        direction: lateral
+                                        entityRef: vehicle_00
+                                        rule: greaterThan
+                                        value: 1.9
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: vehicle_04
+                                    EntityCondition:
+                                      RelativeSpeedCondition:
+                                        direction: lateral
+                                        entityRef: vehicle_00
+                                        rule: lessThan
+                                        value: -1.9
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: vehicle_04
+                                    EntityCondition:
+                                      RelativeSpeedCondition:
+                                        direction: lateral
+                                        entityRef: vehicle_00
+                                        rule: greaterThan
+                                        value: -2.1
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitSuccess
+                      - name: ''
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 10
+                                      rule: greaterThan
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitFailure
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ''
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
+    StopTrigger:
+      ConditionGroup: []
