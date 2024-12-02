@@ -69,13 +69,7 @@ auto RelativeDistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::longitudinal, RoutingAlgorithm::undefined, false>(
   const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
 {
-  if (
-    global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
-    global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
-    return std::abs(makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.x);
-  } else {
-    return Double::nan();
-  }
+  return std::abs(makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.x);
 }
 
 template <>
@@ -83,18 +77,12 @@ auto RelativeDistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::longitudinal, RoutingAlgorithm::undefined, true>(
   const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
 {
-  if (
-    global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
-    global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
-    /**
-       @note This implementation differs from the OpenSCENARIO standard. See
-       the section "5.4. Distances" in the OpenSCENARIO User Guide.
-    */
-    return std::abs(
-      makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref).position.x);
-  } else {
-    return Double::nan();
-  }
+  /**
+     @note This implementation differs from the OpenSCENARIO standard. See the
+     section "6.4. Distances" in the OpenSCENARIO User Guide.
+  */
+  return std::abs(
+    makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref).position.x);
 }
 
 template <>
@@ -102,31 +90,20 @@ auto RelativeDistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::lateral, RoutingAlgorithm::undefined, false>(
   const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
 {
-  if (
-    global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
-    global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
-    return std::abs(makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.y);
-  } else {
-    return Double::nan();
-  }
+  return std::abs(makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.y);
 }
 
-/**
- * @note This implementation differs from the OpenSCENARIO standard. See the section "6.4. Distances" in the OpenSCENARIO User Guide.
- */
 template <>
 auto RelativeDistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::lateral, RoutingAlgorithm::undefined, true>(
   const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
 {
-  if (
-    global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
-    global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
-    return std::abs(
-      makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref).position.y);
-  } else {
-    return Double::nan();
-  }
+  /**
+     @note This implementation differs from the OpenSCENARIO standard. See the
+     section "6.4. Distances" in the OpenSCENARIO User Guide.
+  */
+  return std::abs(
+    makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref).position.y);
 }
 
 template <>
@@ -134,16 +111,9 @@ auto RelativeDistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, RoutingAlgorithm::undefined,
   true>(const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
 {
-  if (
-    global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
-    global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
-    return hypot(
-      makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref).position.x,
-      makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref).position.y,
-      makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref).position.z);
-  } else {
-    return Double::nan();
-  }
+  const auto relative_world =
+    makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref);
+  return hypot(relative_world.position.x, relative_world.position.y, relative_world.position.z);
 }
 
 template <>
@@ -151,16 +121,8 @@ auto RelativeDistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, RoutingAlgorithm::undefined,
   false>(const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
 {
-  if (
-    global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
-    global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
-    return hypot(
-      makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.x,
-      makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.y,
-      makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.z);
-  } else {
-    return Double::nan();
-  }
+  const auto relative_world = makeNativeRelativeWorldPosition(triggering_entity, entity_ref);
+  return hypot(relative_world.position.x, relative_world.position.y, relative_world.position.z);
 }
 
 template <>
@@ -168,27 +130,21 @@ auto RelativeDistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::lateral, RoutingAlgorithm::undefined, false>(
   const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
 {
-  if (
-    global().entities->at(entity_ref).as<ScenarioObject>().is_added and
-    global().entities->at(triggering_entity).as<ScenarioObject>().is_added) {
-    /*
-       For historical reasons, signed distances are returned when
-       coordinateSystem == lane and relativeDistanceType ==
-       longitudinal/lateral. The sign has been mainly used to determine the
-       front/back and left/right positional relationship (a negative value is
-       returned if the target entity is behind or to the right).
+  /*
+     For historical reasons, signed distances are returned when
+     coordinateSystem == lane and relativeDistanceType == longitudinal/lateral.
+     The sign has been mainly used to determine the front/back and left/right
+     positional relationship (a negative value is returned if the target entity
+     is behind or to the right).
 
-       This behavior violates the OpenSCENARIO standard. In the future, after
-       DistanceCondition and RelativeDistanceCondition of TIER IV's
-       OpenSCENARIO Interpreter support OpenSCENARIO 1.2 RoutingAlgorithm, this
-       behavior will be enabled only when routingAlgorithm == undefined.
-    */
-    return static_cast<traffic_simulator::LaneletPose>(
-             makeNativeRelativeLanePosition(triggering_entity, entity_ref))
-      .offset;
-  } else {
-    return Double::nan();
-  }
+     This behavior violates the OpenSCENARIO standard. In the future, after
+     DistanceCondition and RelativeDistanceCondition of TIER IV's OpenSCENARIO
+     Interpreter support OpenSCENARIO 1.2 RoutingAlgorithm, this behavior will
+     be enabled only when routingAlgorithm == undefined.
+  */
+  return static_cast<traffic_simulator::LaneletPose>(
+           makeNativeRelativeLanePosition(triggering_entity, entity_ref))
+    .offset;
 }
 
 template <>
@@ -196,27 +152,21 @@ auto RelativeDistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::lateral, RoutingAlgorithm::undefined, true>(
   const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
 {
-  if (
-    global().entities->at(entity_ref).as<ScenarioObject>().is_added and
-    global().entities->at(triggering_entity).as<ScenarioObject>().is_added) {
-    /*
-       For historical reasons, signed distances are returned when
-       coordinateSystem == lane and relativeDistanceType ==
-       longitudinal/lateral. The sign has been mainly used to determine the
-       front/back and left/right positional relationship (a negative value is
-       returned if the target entity is behind or to the right).
+  /*
+     For historical reasons, signed distances are returned when
+     coordinateSystem == lane and relativeDistanceType == longitudinal/lateral.
+     The sign has been mainly used to determine the front/back and left/right
+     positional relationship (a negative value is returned if the target entity
+     is behind or to the right).
 
-       This behavior violates the OpenSCENARIO standard. In the future, after
-       DistanceCondition and RelativeDistanceCondition of TIER IV's
-       OpenSCENARIO Interpreter support OpenSCENARIO 1.2 RoutingAlgorithm, this
-       behavior will be enabled only when routingAlgorithm == undefined.
-    */
-    return static_cast<traffic_simulator::LaneletPose>(
-             makeNativeBoundingBoxRelativeLanePosition(triggering_entity, entity_ref))
-      .offset;
-  } else {
-    return Double::nan();
-  }
+     This behavior violates the OpenSCENARIO standard. In the future, after
+     DistanceCondition and RelativeDistanceCondition of TIER IV's OpenSCENARIO
+     Interpreter support OpenSCENARIO 1.2 RoutingAlgorithm, this behavior will
+     be enabled only when routingAlgorithm == undefined.
+  */
+  return static_cast<traffic_simulator::LaneletPose>(
+           makeNativeBoundingBoxRelativeLanePosition(triggering_entity, entity_ref))
+    .offset;
 }
 
 template <>
@@ -224,27 +174,21 @@ auto RelativeDistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::longitudinal, RoutingAlgorithm::undefined, false>(
   const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
 {
-  if (
-    global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
-    global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
-    /*
-       For historical reasons, signed distances are returned when
-       coordinateSystem == lane and relativeDistanceType ==
-       longitudinal/lateral. The sign has been mainly used to determine the
-       front/back and left/right positional relationship (a negative value is
-       returned if the target entity is behind or to the right).
+  /*
+     For historical reasons, signed distances are returned when
+     coordinateSystem == lane and relativeDistanceType == longitudinal/lateral.
+     The sign has been mainly used to determine the front/back and left/right
+     positional relationship (a negative value is returned if the target entity
+     is behind or to the right).
 
-       This behavior violates the OpenSCENARIO standard. In the future, after
-       DistanceCondition and RelativeDistanceCondition of TIER IV's
-       OpenSCENARIO Interpreter support OpenSCENARIO 1.2 RoutingAlgorithm, this
-       behavior will be enabled only when routingAlgorithm == undefined.
-    */
-    return static_cast<traffic_simulator::LaneletPose>(
-             makeNativeRelativeLanePosition(triggering_entity, entity_ref))
-      .s;
-  } else {
-    return Double::nan();
-  }
+     This behavior violates the OpenSCENARIO standard. In the future, after
+     DistanceCondition and RelativeDistanceCondition of TIER IV's OpenSCENARIO
+     Interpreter support OpenSCENARIO 1.2 RoutingAlgorithm, this behavior will
+     be enabled only when routingAlgorithm == undefined.
+  */
+  return static_cast<traffic_simulator::LaneletPose>(
+           makeNativeRelativeLanePosition(triggering_entity, entity_ref))
+    .s;
 }
 
 template <>
@@ -252,27 +196,21 @@ auto RelativeDistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::longitudinal, RoutingAlgorithm::undefined, true>(
   const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
 {
-  if (
-    global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
-    global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
-    /*
-       For historical reasons, signed distances are returned when
-       coordinateSystem == lane and relativeDistanceType ==
-       longitudinal/lateral. The sign has been mainly used to determine the
-       front/back and left/right positional relationship (a negative value is
-       returned if the target entity is behind or to the right).
+  /*
+     For historical reasons, signed distances are returned when
+     coordinateSystem == lane and relativeDistanceType == longitudinal/lateral.
+     The sign has been mainly used to determine the front/back and left/right
+     positional relationship (a negative value is returned if the target entity
+     is behind or to the right).
 
-       This behavior violates the OpenSCENARIO standard. In the future, after
-       DistanceCondition and RelativeDistanceCondition of TIER IV's
-       OpenSCENARIO Interpreter support OpenSCENARIO 1.2 RoutingAlgorithm, this
-       behavior will be enabled only when routingAlgorithm == undefined.
-    */
-    return static_cast<traffic_simulator::LaneletPose>(
-             makeNativeBoundingBoxRelativeLanePosition(triggering_entity, entity_ref))
-      .s;
-  } else {
-    return Double::nan();
-  }
+     This behavior violates the OpenSCENARIO standard. In the future, after
+     DistanceCondition and RelativeDistanceCondition of TIER IV's OpenSCENARIO
+     Interpreter support OpenSCENARIO 1.2 RoutingAlgorithm, this behavior will
+     be enabled only when routingAlgorithm == undefined.
+  */
+  return static_cast<traffic_simulator::LaneletPose>(
+           makeNativeBoundingBoxRelativeLanePosition(triggering_entity, entity_ref))
+    .s;
 }
 
 template <>
@@ -280,16 +218,10 @@ auto RelativeDistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::lateral, RoutingAlgorithm::shortest, true>(
   const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
 {
-  if (
-    global().entities->at(entity_ref).as<ScenarioObject>().is_added and
-    global().entities->at(triggering_entity).as<ScenarioObject>().is_added) {
-    return std::abs(static_cast<traffic_simulator::LaneletPose>(
-                      makeNativeBoundingBoxRelativeLanePosition(
-                        triggering_entity, entity_ref, RoutingAlgorithm::shortest))
-                      .offset);
-  } else {
-    return Double::nan();
-  }
+  return std::abs(static_cast<traffic_simulator::LaneletPose>(
+                    makeNativeBoundingBoxRelativeLanePosition(
+                      triggering_entity, entity_ref, RoutingAlgorithm::shortest))
+                    .offset);
 }
 
 template <>
@@ -297,16 +229,10 @@ auto RelativeDistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::lateral, RoutingAlgorithm::shortest, false>(
   const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
 {
-  if (
-    global().entities->at(entity_ref).as<ScenarioObject>().is_added and
-    global().entities->at(triggering_entity).as<ScenarioObject>().is_added) {
-    return std::abs(
-      static_cast<traffic_simulator::LaneletPose>(
-        makeNativeRelativeLanePosition(triggering_entity, entity_ref, RoutingAlgorithm::shortest))
-        .offset);
-  } else {
-    return Double::nan();
-  }
+  return std::abs(
+    static_cast<traffic_simulator::LaneletPose>(
+      makeNativeRelativeLanePosition(triggering_entity, entity_ref, RoutingAlgorithm::shortest))
+      .offset);
 }
 
 template <>
@@ -314,16 +240,10 @@ auto RelativeDistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::longitudinal, RoutingAlgorithm::shortest, true>(
   const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
 {
-  if (
-    global().entities->at(entity_ref).as<ScenarioObject>().is_added and
-    global().entities->at(triggering_entity).as<ScenarioObject>().is_added) {
-    return std::abs(static_cast<traffic_simulator::LaneletPose>(
-                      makeNativeBoundingBoxRelativeLanePosition(
-                        triggering_entity, entity_ref, RoutingAlgorithm::shortest))
-                      .s);
-  } else {
-    return Double::nan();
-  }
+  return std::abs(static_cast<traffic_simulator::LaneletPose>(
+                    makeNativeBoundingBoxRelativeLanePosition(
+                      triggering_entity, entity_ref, RoutingAlgorithm::shortest))
+                    .s);
 }
 
 template <>
@@ -331,16 +251,10 @@ auto RelativeDistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::longitudinal, RoutingAlgorithm::shortest, false>(
   const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
 {
-  if (
-    global().entities->at(entity_ref).as<ScenarioObject>().is_added and
-    global().entities->at(triggering_entity).as<ScenarioObject>().is_added) {
-    return std::abs(
-      static_cast<traffic_simulator::LaneletPose>(
-        makeNativeRelativeLanePosition(triggering_entity, entity_ref, RoutingAlgorithm::shortest))
-        .s);
-  } else {
-    return Double::nan();
-  }
+  return std::abs(
+    static_cast<traffic_simulator::LaneletPose>(
+      makeNativeRelativeLanePosition(triggering_entity, entity_ref, RoutingAlgorithm::shortest))
+      .s);
 }
 
 #define SWITCH_COORDINATE_SYSTEM(FUNCTION, ...)                                         \
