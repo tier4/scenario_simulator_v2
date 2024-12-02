@@ -432,7 +432,7 @@ Currently, the only way to know the result of the simulation is by viewing the s
 | RelativeLaneRange                            | 1.3               |                                            |
 | RelativeObjectPosition                       | 1.3               |                                            |
 | RelativeRoadPosition                         | unimplemented     |                                            |
-| RelativeSpeedCondition                       | unimplemented     |                                            |
+| RelativeSpeedCondition                       | 1.3.1             |                                            |
 | RelativeSpeedToMaster                        | unimplemented     |                                            |
 | RelativeTargetLane                           | 1.3               |                                            |
 | RelativeTargetLaneOffset                     | unimplemented     |                                            |
