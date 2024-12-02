@@ -67,7 +67,7 @@ auto RelativeDistanceCondition::description() const -> String
 template <>
 auto RelativeDistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::longitudinal, RoutingAlgorithm::undefined, false>(
-  const EntityRef & triggering_entity) -> double
+  const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
 {
   if (
     global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
@@ -81,7 +81,7 @@ auto RelativeDistanceCondition::distance<
 template <>
 auto RelativeDistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::longitudinal, RoutingAlgorithm::undefined, true>(
-  const EntityRef & triggering_entity) -> double
+  const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
 {
   if (
     global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
@@ -100,7 +100,7 @@ auto RelativeDistanceCondition::distance<
 template <>
 auto RelativeDistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::lateral, RoutingAlgorithm::undefined, false>(
-  const EntityRef & triggering_entity) -> double
+  const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
 {
   if (
     global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
@@ -117,7 +117,7 @@ auto RelativeDistanceCondition::distance<
 template <>
 auto RelativeDistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::lateral, RoutingAlgorithm::undefined, true>(
-  const EntityRef & triggering_entity) -> double
+  const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
 {
   if (
     global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
@@ -132,7 +132,7 @@ auto RelativeDistanceCondition::distance<
 template <>
 auto RelativeDistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, RoutingAlgorithm::undefined,
-  true>(const EntityRef & triggering_entity) -> double
+  true>(const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
 {
   if (
     global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
@@ -149,7 +149,7 @@ auto RelativeDistanceCondition::distance<
 template <>
 auto RelativeDistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, RoutingAlgorithm::undefined,
-  false>(const EntityRef & triggering_entity) -> double
+  false>(const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
 {
   if (
     global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
@@ -166,7 +166,7 @@ auto RelativeDistanceCondition::distance<
 template <>
 auto RelativeDistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::lateral, RoutingAlgorithm::undefined, false>(
-  const EntityRef & triggering_entity) -> double
+  const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
 {
   if (
     global().entities->at(entity_ref).as<ScenarioObject>().is_added and
@@ -194,7 +194,7 @@ auto RelativeDistanceCondition::distance<
 template <>
 auto RelativeDistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::lateral, RoutingAlgorithm::undefined, true>(
-  const EntityRef & triggering_entity) -> double
+  const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
 {
   if (
     global().entities->at(entity_ref).as<ScenarioObject>().is_added and
@@ -222,7 +222,7 @@ auto RelativeDistanceCondition::distance<
 template <>
 auto RelativeDistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::longitudinal, RoutingAlgorithm::undefined, false>(
-  const EntityRef & triggering_entity) -> double
+  const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
 {
   if (
     global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
@@ -250,7 +250,7 @@ auto RelativeDistanceCondition::distance<
 template <>
 auto RelativeDistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::longitudinal, RoutingAlgorithm::undefined, true>(
-  const EntityRef & triggering_entity) -> double
+  const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
 {
   if (
     global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
@@ -278,7 +278,7 @@ auto RelativeDistanceCondition::distance<
 template <>
 auto RelativeDistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::lateral, RoutingAlgorithm::shortest, true>(
-  const EntityRef & triggering_entity) -> double
+  const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
 {
   if (
     global().entities->at(entity_ref).as<ScenarioObject>().is_added and
@@ -295,7 +295,7 @@ auto RelativeDistanceCondition::distance<
 template <>
 auto RelativeDistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::lateral, RoutingAlgorithm::shortest, false>(
-  const EntityRef & triggering_entity) -> double
+  const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
 {
   if (
     global().entities->at(entity_ref).as<ScenarioObject>().is_added and
@@ -312,7 +312,7 @@ auto RelativeDistanceCondition::distance<
 template <>
 auto RelativeDistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::longitudinal, RoutingAlgorithm::shortest, true>(
-  const EntityRef & triggering_entity) -> double
+  const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
 {
   if (
     global().entities->at(entity_ref).as<ScenarioObject>().is_added and
@@ -329,7 +329,7 @@ auto RelativeDistanceCondition::distance<
 template <>
 auto RelativeDistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::longitudinal, RoutingAlgorithm::shortest, false>(
-  const EntityRef & triggering_entity) -> double
+  const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
 {
   if (
     global().entities->at(entity_ref).as<ScenarioObject>().is_added and
@@ -394,9 +394,10 @@ auto RelativeDistanceCondition::distance<
 #define SWITCH_FREESPACE(FUNCTION, ...) \
   return freespace ? FUNCTION(__VA_ARGS__, true) : FUNCTION(__VA_ARGS__, false)
 
-#define DISTANCE(...) distance<__VA_ARGS__>(triggering_entity)
+#define DISTANCE(...) distance<__VA_ARGS__>(triggering_entity, entity_ref)
 
-auto RelativeDistanceCondition::evaluate(const EntityRef & triggering_entity) -> double
+auto RelativeDistanceCondition::evaluate(
+  const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
 {
   SWITCH_COORDINATE_SYSTEM(
     SWITCH_RELATIVE_DISTANCE_TYPE, SWITCH_ROUTING_ALGORITHM, SWITCH_FREESPACE, DISTANCE);
@@ -408,8 +409,8 @@ auto RelativeDistanceCondition::evaluate() -> Object
   results.clear();
 
   return asBoolean(triggering_entities.apply([&](const auto & triggering_entity) {
-    results.push_back(
-      triggering_entity.apply([&](const auto & object) { return evaluate(object); }));
+    results.push_back(triggering_entity.apply(
+      [&](const auto & triggering_entity) { return evaluate(triggering_entity, entity_ref); }));
     return not results.back().size() or rule(results.back(), value).min();
   }));
 }
