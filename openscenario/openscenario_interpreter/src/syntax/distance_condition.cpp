@@ -120,9 +120,10 @@ auto DistanceCondition::description() const -> std::string
 #define SWITCH_FREESPACE(FUNCTION, ...) \
   return freespace ? FUNCTION(__VA_ARGS__, true) : FUNCTION(__VA_ARGS__, false)
 
-#define DISTANCE(...) distance<__VA_ARGS__>(triggering_entity)
+#define DISTANCE(...) distance<__VA_ARGS__>(triggering_entity, position)
 
-auto DistanceCondition::evaluate(const EntityRef & triggering_entity) const -> double
+auto DistanceCondition::evaluate(
+  const EntityRef & triggering_entity, const Position & position) const -> double
 {
   SWITCH_COORDINATE_SYSTEM(
     SWITCH_RELATIVE_DISTANCE_TYPE, SWITCH_ROUTING_ALGORITHM, SWITCH_FREESPACE, DISTANCE);
@@ -132,7 +133,7 @@ auto DistanceCondition::evaluate(const EntityRef & triggering_entity) const -> d
 template <>
 auto DistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, RoutingAlgorithm::undefined,
-  false>(const EntityRef & triggering_entity) const -> double
+  false>(const EntityRef & triggering_entity, const Position & position) const -> double
 {
   return apply<double>(
     overload(
@@ -166,7 +167,7 @@ auto DistanceCondition::distance<
 template <>
 auto DistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, RoutingAlgorithm::undefined,
-  true>(const EntityRef & triggering_entity) const -> double
+  true>(const EntityRef & triggering_entity, const Position & position) const -> double
 {
   return apply<double>(
     overload(
@@ -200,7 +201,7 @@ auto DistanceCondition::distance<
 template <>
 auto DistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::lateral, RoutingAlgorithm::undefined, false>(
-  const EntityRef & triggering_entity) const -> double
+  const EntityRef & triggering_entity, const Position & position) const -> double
 {
   return apply<double>(
     overload(
@@ -230,7 +231,7 @@ auto DistanceCondition::distance<
 template <>
 auto DistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::lateral, RoutingAlgorithm::undefined, true>(
-  const EntityRef & triggering_entity) const -> double
+  const EntityRef & triggering_entity, const Position & position) const -> double
 {
   return apply<double>(
     overload(
@@ -260,7 +261,7 @@ auto DistanceCondition::distance<
 template <>
 auto DistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::longitudinal, RoutingAlgorithm::undefined, false>(
-  const EntityRef & triggering_entity) const -> double
+  const EntityRef & triggering_entity, const Position & position) const -> double
 {
   return apply<double>(
     overload(
@@ -290,7 +291,7 @@ auto DistanceCondition::distance<
 template <>
 auto DistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::longitudinal, RoutingAlgorithm::undefined, true>(
-  const EntityRef & triggering_entity) const -> double
+  const EntityRef & triggering_entity, const Position & position) const -> double
 {
   return apply<double>(
     overload(
@@ -320,7 +321,7 @@ auto DistanceCondition::distance<
 template <>
 auto DistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::lateral, RoutingAlgorithm::undefined, false>(
-  const EntityRef & triggering_entity) const -> double
+  const EntityRef & triggering_entity, const Position & position) const -> double
 {
   return apply<double>(
     overload(
@@ -369,7 +370,7 @@ auto DistanceCondition::distance<
 template <>
 auto DistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::lateral, RoutingAlgorithm::undefined, true>(
-  const EntityRef & triggering_entity) const -> double
+  const EntityRef & triggering_entity, const Position & position) const -> double
 {
   return apply<double>(
     overload(
@@ -418,7 +419,7 @@ auto DistanceCondition::distance<
 template <>
 auto DistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::longitudinal, RoutingAlgorithm::undefined, false>(
-  const EntityRef & triggering_entity) const -> double
+  const EntityRef & triggering_entity, const Position & position) const -> double
 {
   return apply<double>(
     overload(
@@ -467,7 +468,7 @@ auto DistanceCondition::distance<
 template <>
 auto DistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::longitudinal, RoutingAlgorithm::undefined, true>(
-  const EntityRef & triggering_entity) const -> double
+  const EntityRef & triggering_entity, const Position & position) const -> double
 {
   return apply<double>(
     overload(
@@ -516,7 +517,7 @@ auto DistanceCondition::distance<
 template <>
 auto DistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::lateral, RoutingAlgorithm::shortest, false>(
-  const EntityRef & triggering_entity) const -> double
+  const EntityRef & triggering_entity, const Position & position) const -> double
 {
   return apply<double>(
     overload(
@@ -569,7 +570,7 @@ auto DistanceCondition::distance<
 template <>
 auto DistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::lateral, RoutingAlgorithm::shortest, true>(
-  const EntityRef & triggering_entity) const -> double
+  const EntityRef & triggering_entity, const Position & position) const -> double
 {
   return apply<double>(
     overload(
@@ -622,7 +623,7 @@ auto DistanceCondition::distance<
 template <>
 auto DistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::longitudinal, RoutingAlgorithm::shortest, false>(
-  const EntityRef & triggering_entity) const -> double
+  const EntityRef & triggering_entity, const Position & position) const -> double
 {
   return apply<double>(
     overload(
@@ -675,7 +676,7 @@ auto DistanceCondition::distance<
 template <>
 auto DistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::longitudinal, RoutingAlgorithm::shortest, true>(
-  const EntityRef & triggering_entity) const -> double
+  const EntityRef & triggering_entity, const Position & position) const -> double
 {
   return apply<double>(
     overload(
@@ -730,8 +731,8 @@ auto DistanceCondition::evaluate() -> Object
   results.clear();
 
   return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
-    results.push_back(
-      triggering_entity.apply([&](const auto & object) { return evaluate(object); }));
+    results.push_back(triggering_entity.apply(
+      [&](const auto & triggering_entity) { return evaluate(triggering_entity, position); }));
     return not results.back().size() or rule(results.back(), value).min();
   }));
 }
