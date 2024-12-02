@@ -99,12 +99,14 @@ struct RelativeDistanceCondition : private Scope, private SimulatorCore::Conditi
   template <
     CoordinateSystem::value_type, RelativeDistanceType::value_type, RoutingAlgorithm::value_type,
     Boolean::value_type>
-  auto distance(const EntityRef &, const EntityRef &) -> double
+  static auto distance(const EntityRef &, const EntityRef &) -> double
   {
     throw SyntaxError(__FILE__, ":", __LINE__);
   }
 
-  auto evaluate(const Entity &, const Entity &) -> double;
+  static auto evaluate(
+    const Entities *, const Entity &, const Entity &, CoordinateSystem, RelativeDistanceType,
+    RoutingAlgorithm, Boolean) -> double;
 
   auto evaluate() -> Object;
 };

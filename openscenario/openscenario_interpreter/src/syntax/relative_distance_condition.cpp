@@ -317,9 +317,11 @@ auto RelativeDistanceCondition::distance<
 #define DISTANCE(...) distance<__VA_ARGS__>(triggering_entity, entity_ref)
 
 auto RelativeDistanceCondition::evaluate(
-  const Entity & triggering_entity, const Entity & entity_ref) -> double
+  const Entities * entities, const Entity & triggering_entity, const Entity & entity_ref,
+  CoordinateSystem coordinate_system, RelativeDistanceType relative_distance_type,
+  RoutingAlgorithm routing_algorithm, Boolean freespace) -> double
 {
-  if (global().entities->isAdded(triggering_entity) and global().entities->isAdded(entity_ref)) {
+  if (entities->isAdded(triggering_entity) and entities->isAdded(entity_ref)) {
     SWITCH_COORDINATE_SYSTEM(
       SWITCH_RELATIVE_DISTANCE_TYPE, SWITCH_ROUTING_ALGORITHM, SWITCH_FREESPACE, DISTANCE);
   } else {
@@ -332,8 +334,11 @@ auto RelativeDistanceCondition::evaluate() -> Object
   results.clear();
 
   return asBoolean(triggering_entities.apply([&](const auto & triggering_entity) {
-    results.push_back(triggering_entity.apply(
-      [&](const auto & triggering_entity) { return evaluate(triggering_entity, entity_ref); }));
+    results.push_back(triggering_entity.apply([&](const auto & triggering_entity) {
+      return evaluate(
+        global().entities, triggering_entity, entity_ref, coordinate_system, relative_distance_type,
+        routing_algorithm, freespace);
+    }));
     return not results.back().size() or rule(results.back(), value).min();
   }));
 }
