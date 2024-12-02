@@ -64,6 +64,17 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
     }
   };
 
+  const auto makeUpdatedEntityStatus = [this, &getTargetSpeed]() -> auto {
+    const auto vehicle_state = traffic_simulator::follow_trajectory::VehicleState(
+      static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status),
+      behavior_parameter, step_time);
+    auto polyline_trajectory_follower =
+      traffic_simulator::follow_trajectory::PolylineTrajectoryFollower(
+        vehicle_state, *polyline_trajectory, default_matching_distance_for_lanelet_pose_calculation,
+        getTargetSpeed(), step_time, hdmap_utils);
+    return polyline_trajectory_follower.updatedEntityStatus();
+  };
+
   if (getBlackBoardValues();
       request != traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY or
       not getInput<decltype(polyline_trajectory)>("polyline_trajectory", polyline_trajectory) or
@@ -74,15 +85,9 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
     THROW_SIMULATION_ERROR(
       "Time in canonicalized_entity_status is NaN - FollowTrajectoryAction does not support such "
       "case.");
-  } else if (const auto entity_status_updated =
-               traffic_simulator::follow_trajectory::PolylineTrajectoryFollower(
-                 static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status),
-                 behavior_parameter, hdmap_utils, step_time)
-                 .makeUpdatedEntityStatus(
-                   *polyline_trajectory, default_matching_distance_for_lanelet_pose_calculation,
-                   getTargetSpeed());
-             entity_status_updated.has_value()) {
-    setCanonicalizedEntityStatus(entity_status_updated.value());
+  } else if (const auto non_canonicalized_updated_status = makeUpdatedEntityStatus();
+             non_canonicalized_updated_status.has_value()) {
+    setCanonicalizedEntityStatus(non_canonicalized_updated_status.value());
     setOutput("waypoints", calculateWaypoints());
     setOutput("obstacle", calculateObstacle(calculateWaypoints()));
     return BT::NodeStatus::RUNNING;
