@@ -120,7 +120,7 @@ struct DistanceCondition : private Scope, private SimulatorCore::ConditionEvalua
     throw SyntaxError(__FILE__, ":", __LINE__);
   }
 
-  auto evaluate(const EntityRef &, const Position &) const -> double;
+  auto evaluate(const Entity &, const Position &) const -> double;
 
   auto evaluate() -> Object;
 };

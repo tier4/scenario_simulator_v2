@@ -128,12 +128,15 @@ auto DistanceCondition::description() const -> std::string
 
 #define DISTANCE(...) distance<__VA_ARGS__>(triggering_entity, position)
 
-auto DistanceCondition::evaluate(
-  const EntityRef & triggering_entity, const Position & position) const -> double
+auto DistanceCondition::evaluate(const Entity & triggering_entity, const Position & position) const
+  -> double
 {
-  SWITCH_COORDINATE_SYSTEM(
-    SWITCH_RELATIVE_DISTANCE_TYPE, SWITCH_ROUTING_ALGORITHM, SWITCH_FREESPACE, DISTANCE);
-  return Double::nan();
+  if (global().entities->isAdded(triggering_entity)) {
+    SWITCH_COORDINATE_SYSTEM(
+      SWITCH_RELATIVE_DISTANCE_TYPE, SWITCH_ROUTING_ALGORITHM, SWITCH_FREESPACE, DISTANCE);
+  } else {
+    return Double::nan();
+  }
 }
 
 template <>
@@ -736,7 +739,7 @@ auto DistanceCondition::evaluate() -> Object
 {
   results.clear();
 
-  return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
+  return asBoolean(triggering_entities.apply([&](const auto & triggering_entity) {
     results.push_back(triggering_entity.apply(
       [&](const auto & triggering_entity) { return evaluate(triggering_entity, position); }));
     return not results.back().size() or rule(results.back(), value).min();
