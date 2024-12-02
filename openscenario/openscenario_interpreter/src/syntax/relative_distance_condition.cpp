@@ -403,11 +403,14 @@ auto RelativeDistanceCondition::distance<
 #define DISTANCE(...) distance<__VA_ARGS__>(triggering_entity, entity_ref)
 
 auto RelativeDistanceCondition::evaluate(
-  const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
+  const Entity & triggering_entity, const Entity & entity_ref) -> double
 {
-  SWITCH_COORDINATE_SYSTEM(
-    SWITCH_RELATIVE_DISTANCE_TYPE, SWITCH_ROUTING_ALGORITHM, SWITCH_FREESPACE, DISTANCE);
-  return Double::nan();
+  if (global().entities->isAdded(triggering_entity) and global().entities->isAdded(entity_ref)) {
+    SWITCH_COORDINATE_SYSTEM(
+      SWITCH_RELATIVE_DISTANCE_TYPE, SWITCH_ROUTING_ALGORITHM, SWITCH_FREESPACE, DISTANCE);
+  } else {
+    return Double::nan();
+  }
 }
 
 auto RelativeDistanceCondition::evaluate() -> Object
