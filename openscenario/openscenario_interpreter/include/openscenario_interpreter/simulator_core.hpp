@@ -559,40 +559,32 @@ public:
       return std::numeric_limits<double>::quiet_NaN();
     }
 
-    static auto evaluateRelativeSpeed(const Entity & from, const Entity & to)
+    static auto evaluateRelativeSpeed(const Entity & from, const Entity & to) -> Eigen::Vector3d
     {
-      auto direction = [](auto orientation) {
-        const auto euler_angle = math::geometry::convertQuaternionToEulerAngle(orientation);
+      if (const auto observer = core->getEntity(from.name())) {
+        if (const auto observed = core->getEntity(to.name())) {
+          auto velocity = [](const auto & entity) -> Eigen::Vector3d {
+            auto direction = [](auto orientation) -> Eigen::Vector3d {
+              const auto euler_angle = math::geometry::convertQuaternionToEulerAngle(orientation);
+              const auto r = euler_angle.x;
+              const auto p = euler_angle.y;
+              const auto y = euler_angle.z;
+              return Eigen::Vector3d(
+                std::cos(y) * std::cos(p), std::sin(y) * std::cos(p), std::sin(p));
+            };
 
-        // clang-format off
-        const auto roll  = euler_angle.x;
-        const auto pitch = euler_angle.y;
-        const auto yaw   = euler_angle.z;
-        // clang-format on
+            return direction(entity->getMapPose().orientation) * entity->getCurrentTwist().linear.x;
+          };
 
-        auto v = decltype(euler_angle)();
+          const Eigen::Matrix3d rotation =
+            math::geometry::getRotationMatrix(observer->getMapPose().orientation);
 
-        v.x = std::cos(yaw) * std::cos(pitch);
-        v.y = std::sin(yaw) * std::cos(pitch);
-        v.z = std::sin(pitch);
-
-        return v;
-      };
-
-      if (const auto a = core->getEntity(from.name())) {
-        if (const auto b = core->getEntity(to.name())) {
-          using math::geometry::operator*;
-          using math::geometry::operator-;
-
-          return direction(b->getMapPose().orientation) * b->getCurrentTwist().linear.x -
-                 direction(a->getMapPose().orientation) * a->getCurrentTwist().linear.x;
+          return rotation.transpose() * velocity(observed) -
+                 rotation.transpose() * velocity(observer);
         }
       }
 
-      return geometry_msgs::build<geometry_msgs::msg::Vector3>()
-        .x(Double::nan())
-        .y(Double::nan())
-        .z(Double::nan());
+      return Eigen::Vector3d(Double::nan(), Double::nan(), Double::nan());
     }
 
     template <typename... Ts>
@@ -667,10 +659,7 @@ public:
             auto axis(std::size_t index) const -> Eigen::Vector3d { return rotation.col(index); }
           };
 
-          const Eigen::Vector3d v = [&]() {
-            const auto v = evaluateRelativeSpeed(from, to);
-            return Eigen::Vector3d(v.x, v.y, v.z);
-          }();
+          const Eigen::Vector3d v = evaluateRelativeSpeed(from, to);
 
           const auto a = OrientedBoundingBox(entity_a->getMapPose(), entity_a->getBoundingBox());
           const auto b = OrientedBoundingBox(entity_b->getMapPose(), entity_b->getBoundingBox());

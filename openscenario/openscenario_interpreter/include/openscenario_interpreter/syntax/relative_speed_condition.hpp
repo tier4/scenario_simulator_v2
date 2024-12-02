@@ -26,7 +26,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 /*
-   RelativeSpeedCondition 1.3
+   RelativeSpeedCondition (OpenSCENARIO XML 1.3.1)
 
    The current relative speed of a triggering entity/entities to a reference
    entity is compared to a given value. The logical operator used for the
@@ -72,8 +72,7 @@ struct RelativeSpeedCondition : private Scope, private SimulatorCore::ConditionE
 
   auto description() const -> String;
 
-  static auto evaluate(const Entities *, const Entity &, const Entity &)
-    -> geometry_msgs::msg::Vector3;
+  static auto evaluate(const Entities *, const Entity &, const Entity &) -> Eigen::Vector3d;
 
   static auto evaluate(
     const Entities *, const Entity &, const Entity &, const std::optional<DirectionalDimension> &)
