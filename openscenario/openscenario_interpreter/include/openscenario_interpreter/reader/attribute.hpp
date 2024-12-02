@@ -15,9 +15,12 @@
 #ifndef OPENSCENARIO_INTERPRETER__READER__ATTRIBUTE_HPP_
 #define OPENSCENARIO_INTERPRETER__READER__ATTRIBUTE_HPP_
 
+#ifndef PARAMETER_VALUE_DISTRIBUTION_ONLY
 #include <ament_index_cpp/get_package_share_directory.hpp>
-#include <boost/algorithm/string/replace.hpp>
 #include <concealer/execute.hpp>
+#endif  // PARAMETER_VALUE_DISTRIBUTION_ONLY
+
+#include <boost/algorithm/string/replace.hpp>
 #include <functional>
 #include <openscenario_interpreter/reader/evaluate.hpp>
 #include <openscenario_interpreter/syntax/parameter_type.hpp>
@@ -38,6 +41,7 @@ auto substitute(std::string attribute, Scope & scope)
 {
   auto dirname = [](auto &&, auto && scope) { return scope.dirname(); };
 
+#ifndef PARAMETER_VALUE_DISTRIBUTION_ONLY
   auto find_pkg_share = [](auto && package_name, auto &&) {
     return ament_index_cpp::get_package_share_directory(package_name);
   };
@@ -61,9 +65,11 @@ auto substitute(std::string attribute, Scope & scope)
       return result;
     }
   };
+#endif  // PARAMETER_VALUE_DISTRIBUTION_ONLY
 
   auto var = [](auto && name, auto && scope) {
-    // TODO: Return the value of the launch configuration variable instead of the OpenSCENARIO parameter.
+    // TODO: Return the value of the launch configuration variable instead of the OpenSCENARIO
+    // parameter.
     if (const auto found = scope.ref(name); found) {
       return boost::lexical_cast<String>(found);
     } else {
@@ -76,14 +82,16 @@ auto substitute(std::string attribute, Scope & scope)
     std::string, std::function<std::string(const std::string &, Scope &)> >
     substitutions{
       {"dirname", dirname},
-      // TODO {"env", env},
-      // TODO {"eval", eval},
-      // TODO {"exec-in-package", exec_in_package},
-      // TODO {"find-exec", find_exec},
-      // TODO {"find-pkg-prefix", find_pkg_prefix},
+  // TODO {"env", env},
+  // TODO {"eval", eval},
+  // TODO {"exec-in-package", exec_in_package},
+  // TODO {"find-exec", find_exec},
+  // TODO {"find-pkg-prefix", find_pkg_prefix},
+#ifndef PARAMETER_VALUE_DISTRIBUTION_ONLY
       {"find-pkg-share", find_pkg_share},
       {"ros2",
        ros2},  // NOTE: TIER IV extension (Not included in the ROS 2 Launch XML Substitution)
+#endif         // PARAMETER_VALUE_DISTRIBUTION_ONLY
       {"var", var},
     };
 
@@ -136,7 +144,8 @@ auto readAttribute(const std::string & name, const Node & node, const Scope & sc
     }
   };
 
-  // NOTE: https://www.asam.net/index.php?eID=dumpFile&t=f&f=4092&token=d3b6a55e911b22179e3c0895fe2caae8f5492467#_parameters
+  // NOTE:
+  // https://www.asam.net/index.php?eID=dumpFile&t=f&f=4092&token=d3b6a55e911b22179e3c0895fe2caae8f5492467#_parameters
 
   if (const auto & attribute = node.attribute(name.c_str())) {
     // NOTE: `substitute` is TIER IV extension (Non-OpenSCENARIO standard)
