@@ -21,6 +21,15 @@ Changelog for package traffic_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+6.2.0 (2024-12-02)
+------------------
+* Merge branch 'master' into feature/relative-speed-condition
+* Merge remote-tracking branch 'origin/master' into feature/relative-speed-condition
+* Merge remote-tracking branch 'origin/master' into feature/relative-speed-condition
+* Merge remote-tracking branch 'origin/master' into feature/relative-speed-condition
+* Merge remote-tracking branch 'origin/master' into feature/relative-speed-condition
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
 6.1.3 (2024-11-29)
 ------------------
 * Merge pull request `#1444 <https://github.com/tier4/scenario_simulator_v2/issues/1444>`_ from tier4/RJD-1057-traffic-lights-tests
