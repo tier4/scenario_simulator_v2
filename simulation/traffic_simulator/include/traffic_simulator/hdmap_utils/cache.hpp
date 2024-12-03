@@ -20,27 +20,9 @@
 #include <mutex>
 #include <optional>
 #include <scenario_simulator_exception/exception.hpp>
+#include <traffic_simulator/lanelet_wrapper/lanelet_wrapper.hpp>
 #include <unordered_map>
 #include <vector>
-
-namespace std
-{
-template <>
-struct hash<std::tuple<lanelet::Id, lanelet::Id, bool>>
-{
-public:
-  size_t operator()(const std::tuple<lanelet::Id, lanelet::Id, bool> & data) const
-  {
-    std::hash<lanelet::Id> lanelet_id_hash;
-    size_t seed = 0;
-    // hash combine like boost library
-    seed ^= lanelet_id_hash(std::get<0>(data)) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-    seed ^= lanelet_id_hash(std::get<1>(data)) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-    seed ^= std::hash<bool>{}(std::get<2>(data)) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-    return seed;
-  }
-};
-}  // namespace std
 
 namespace hdmap_utils
 {

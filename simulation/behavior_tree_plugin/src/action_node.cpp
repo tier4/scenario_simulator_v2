@@ -105,7 +105,7 @@ auto ActionNode::setCanonicalizedEntityStatus(const traffic_simulator::EntitySta
   -> void
 {
   canonicalized_entity_status->set(
-    entity_status, default_matching_distance_for_lanelet_pose_calculation, hdmap_utils);
+    entity_status, default_matching_distance_for_lanelet_pose_calculation);
 }
 
 auto ActionNode::getOtherEntityStatus(lanelet::Id lanelet_id) const

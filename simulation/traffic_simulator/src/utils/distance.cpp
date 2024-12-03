@@ -112,9 +112,8 @@ auto longitudinalDistance(
       for (const auto & to_pose : to_poses) {
         if (
           const auto distance = longitudinalDistance(
-            CanonicalizedLaneletPose(from_pose, hdmap_utils_ptr),
-            CanonicalizedLaneletPose(to_pose, hdmap_utils_ptr), false, include_opposite_direction,
-            routing_configuration, hdmap_utils_ptr)) {
+            CanonicalizedLaneletPose(from_pose), CanonicalizedLaneletPose(to_pose), false,
+            include_opposite_direction, routing_configuration, hdmap_utils_ptr)) {
           distances.emplace_back(distance.value());
         }
       }

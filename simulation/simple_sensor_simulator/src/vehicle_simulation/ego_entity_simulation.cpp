@@ -428,8 +428,7 @@ auto EgoEntitySimulation::setStatus(const traffic_simulator_msgs::msg::EntitySta
   /// value from EntityStatus, therefore canonicalization has to be done in advance,
   /// not inside CanonicalizedEntityStatus
   const auto canonicalized_lanelet_pose = traffic_simulator::pose::toCanonicalizedLaneletPose(
-    status.pose, status.bounding_box, unique_route_lanelets, false, matching_distance,
-    hdmap_utils_ptr_);
+    status.pose, status.bounding_box, unique_route_lanelets, false, matching_distance);
   status_.set(traffic_simulator::CanonicalizedEntityStatus(status, canonicalized_lanelet_pose));
   setAutowareStatus();
 }

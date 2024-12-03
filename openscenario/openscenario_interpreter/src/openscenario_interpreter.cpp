@@ -65,21 +65,18 @@ auto Interpreter::currentScenarioDefinition() const -> const std::shared_ptr<Sce
 
 auto Interpreter::makeCurrentConfiguration() const -> traffic_simulator::Configuration
 {
+  constexpr bool auto_sink{false};
   const auto logic_file = currentScenarioDefinition()->road_network.logic_file;
-
-  auto configuration = traffic_simulator::Configuration(
-    logic_file.isDirectory() ? logic_file : logic_file.filepath.parent_path());
-  {
-    configuration.auto_sink = false;
-    configuration.scenario_path = osc_path;
-
-    // XXX DIRTY HACK!!!
-    if (not logic_file.isDirectory() and logic_file.filepath.extension() == ".osm") {
-      configuration.lanelet2_map_file = logic_file.filepath.filename().string();
-    }
+  // XXX DIRTY HACK!!!
+  if (not logic_file.isDirectory() and logic_file.filepath.extension() == ".osm") {
+    return traffic_simulator::Configuration(
+      logic_file.isDirectory() ? logic_file : logic_file.filepath.parent_path(),
+      logic_file.filepath.filename().string(), osc_path, auto_sink);
+  } else {
+    return traffic_simulator::Configuration(
+      logic_file.isDirectory() ? logic_file : logic_file.filepath.parent_path(), osc_path,
+      auto_sink);
   }
-
-  return configuration;
 }
 
 auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result

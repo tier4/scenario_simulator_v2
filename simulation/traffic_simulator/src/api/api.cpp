@@ -151,9 +151,7 @@ auto API::setEntityStatus(
   const std::string & name, const LaneletPose & lanelet_pose,
   const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
 {
-  if (
-    const auto canonicalized_lanelet_pose =
-      pose::canonicalize(lanelet_pose, entity_manager_ptr_->getHdmapUtils())) {
+  if (const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(lanelet_pose)) {
     setEntityStatus(name, canonicalized_lanelet_pose.value(), action_status);
   } else {
     std::stringstream ss;
