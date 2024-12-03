@@ -27,6 +27,7 @@
 #include <geometry/vector3/operator.hpp>
 #include <optional>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
+#include <traffic_simulator/utils/lanelet_map.hpp>
 
 LaneletUtils::LaneletUtils(const boost::filesystem::path & filename)
 {
@@ -45,6 +46,7 @@ LaneletUtils::LaneletUtils(const boost::filesystem::path & filename)
 
   hdmap_utils_ptr_ =
     std::make_shared<hdmap_utils::HdMapUtils>(filename, geographic_msgs::msg::GeoPoint());
+  traffic_simulator::lanelet_map::activate(filename.string());
 }
 
 std::vector<int64_t> LaneletUtils::getLaneletIds() { return hdmap_utils_ptr_->getLaneletIds(); }

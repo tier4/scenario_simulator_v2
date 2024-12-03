@@ -17,6 +17,7 @@
 #include <gmock/gmock.h>
 
 #include <random_test_runner/test_executor.hpp>
+#include <traffic_simulator/utils/lanelet_map.hpp>
 
 class MockFieldOperatorApplication
 {
@@ -66,6 +67,13 @@ auto getTestDescription() -> TestDescription
 class MockTrafficSimulatorAPI
 {
 public:
+  MockTrafficSimulatorAPI()
+  {
+    const std::string path =
+      ament_index_cpp::get_package_share_directory("random_test_runner") + "/map/lanelet2_map.osm";
+    traffic_simulator::lanelet_map::activate(path);
+  }
+
   traffic_simulator::EntityStatus entity_status_;
   std::shared_ptr<::testing::StrictMock<MockFieldOperatorApplication>>
     field_operator_application_mock =

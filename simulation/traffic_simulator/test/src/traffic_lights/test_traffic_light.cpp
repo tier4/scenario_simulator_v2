@@ -19,6 +19,7 @@
 #include <regex>
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light.hpp>
+#include <traffic_simulator/utils/lanelet_map.hpp>
 
 using TrafficLight = traffic_simulator::TrafficLight;
 using Color = TrafficLight::Color;
@@ -724,6 +725,9 @@ protected:
         .longitude(139.78066608243)
         .altitude(0.0))
   {
+    const auto lanelet_path = ament_index_cpp::get_package_share_directory("traffic_simulator") +
+                              "/map/standard_map/lanelet2_map.osm";
+    traffic_simulator::lanelet_map::activate(lanelet_path);
   }
   hdmap_utils::HdMapUtils map_manager;
 };
