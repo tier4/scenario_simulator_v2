@@ -17,6 +17,7 @@
 
 #include <optional>
 #include <traffic_simulator/behavior/follow_waypoint_controller.hpp>
+#include <traffic_simulator/behavior/validated_entity_status.hpp>
 #include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
@@ -27,6 +28,7 @@ namespace traffic_simulator
 {
 namespace follow_trajectory
 {
+
 struct PolylineTrajectoryFollower
 {
 public:
@@ -57,13 +59,6 @@ private:
     const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
     const double matching_distance, const double distance_to_front_waypoint,
     const double step_time) const -> std::tuple<double, double>;
-  auto buildUpdatedPoseOrientation(const geometry_msgs::msg::Vector3 & desired_velocity) const
-    noexcept(true) -> geometry_msgs::msg::Quaternion;
-  auto buildUpdatedEntityStatus(const geometry_msgs::msg::Vector3 & desired_velocity) const
-    noexcept(true) -> EntityStatus;
-  auto validatedEntityAcceleration() const noexcept(false) -> double;
-  auto validatedEntitySpeed() const noexcept(false) -> double;
-  auto validatedEntityPosition() const noexcept(false) -> geometry_msgs::msg::Point;
   auto validatedEntityTargetPosition(
     const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory) const
     noexcept(false) -> geometry_msgs::msg::Point;

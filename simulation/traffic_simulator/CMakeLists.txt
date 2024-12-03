@@ -31,6 +31,7 @@ ament_auto_add_library(traffic_simulator SHARED
   src/behavior/follow_waypoint_controller.cpp
   src/behavior/longitudinal_speed_planning.cpp
   src/behavior/route_planner.cpp
+  src/behavior/validated_entity_status.cpp
   src/color_utils/color_utils.cpp
   src/data_type/behavior.cpp
   src/data_type/entity_status.cpp
