@@ -27,6 +27,7 @@
 #include <string>
 #include <traffic_simulator/behavior/longitudinal_speed_planning.hpp>
 #include <traffic_simulator/helper/helper.hpp>
+#include <traffic_simulator/lanelet_wrapper/pose.hpp>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -407,7 +408,8 @@ auto ActionNode::foundConflictingEntity(const lanelet::Ids & following_lanelets)
 }
 
 auto ActionNode::calculateUpdatedEntityStatus(
-  double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints & constraints) const
+  const double target_speed,
+  const traffic_simulator_msgs::msg::DynamicConstraints & constraints) const
   -> traffic_simulator::EntityStatus
 {
   const auto speed_planner =
@@ -420,82 +422,29 @@ auto ActionNode::calculateUpdatedEntityStatus(
   const double linear_jerk_new = std::get<2>(dynamics);
   const geometry_msgs::msg::Accel accel_new = std::get<1>(dynamics);
   const geometry_msgs::msg::Twist twist_new = std::get<0>(dynamics);
-
-  if (!canonicalized_entity_status->laneMatchingSucceed()) {
-    THROW_SIMULATION_ERROR(
-      "Entity ", canonicalized_entity_status->getName(), " is not matched to the lanelet.");
-  } else {
-    auto lanelet_pose = canonicalized_entity_status->getLaneletPose();
-    lanelet_pose.s =
-      lanelet_pose.s +
+  if (
+    const auto canonicalized_lanelet_pose =
+      canonicalized_entity_status->getCanonicalizedLaneletPose()) {
+    const auto distance =
       (twist_new.linear.x + canonicalized_entity_status->getTwist().linear.x) / 2.0 * step_time;
-    const auto canonicalized = hdmap_utils->canonicalizeLaneletPose(lanelet_pose, route_lanelets);
-    if (
-      const auto canonicalized_lanelet_pose =
-        std::get<std::optional<traffic_simulator::LaneletPose>>(canonicalized)) {
-      // If canonicalize succeed, set canonicalized pose and set other values.
-      auto entity_status_updated =
-        static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status);
-      {
-        entity_status_updated.time = current_time + step_time;
-        entity_status_updated.lanelet_pose = canonicalized_lanelet_pose.value();
-        entity_status_updated.lanelet_pose_valid = true;
-        entity_status_updated.action_status.twist = twist_new;
-        entity_status_updated.action_status.accel = accel_new;
-        entity_status_updated.action_status.linear_jerk = linear_jerk_new;
-        entity_status_updated.pose =
-          hdmap_utils->toMapPose(canonicalized_lanelet_pose.value()).pose;
-      }
-      return entity_status_updated;
-    } else {
-      // If canonicalize failed, set end of road lanelet pose.
-      if (const auto end_of_road_lanelet_id = std::get<std::optional<lanelet::Id>>(canonicalized)) {
-        if (lanelet_pose.s < 0) {
-          traffic_simulator::LaneletPose end_of_road_lanelet_pose;
-          {
-            end_of_road_lanelet_pose.lanelet_id = end_of_road_lanelet_id.value();
-            end_of_road_lanelet_pose.s = 0;
-            end_of_road_lanelet_pose.offset = lanelet_pose.offset;
-            end_of_road_lanelet_pose.rpy = lanelet_pose.rpy;
-          }
-          auto entity_status_updated =
-            static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status);
-          {
-            entity_status_updated.time = current_time + step_time;
-            entity_status_updated.lanelet_pose = end_of_road_lanelet_pose;
-            entity_status_updated.lanelet_pose_valid = true;
-            entity_status_updated.action_status.twist = twist_new;
-            entity_status_updated.action_status.accel = accel_new;
-            entity_status_updated.action_status.linear_jerk = linear_jerk_new;
-            entity_status_updated.pose = hdmap_utils->toMapPose(end_of_road_lanelet_pose).pose;
-          }
-          return entity_status_updated;
-        } else {
-          traffic_simulator::LaneletPose end_of_road_lanelet_pose;
-          {
-            end_of_road_lanelet_pose.lanelet_id = end_of_road_lanelet_id.value();
-            end_of_road_lanelet_pose.s =
-              hdmap_utils->getLaneletLength(end_of_road_lanelet_id.value());
-            end_of_road_lanelet_pose.offset = lanelet_pose.offset;
-            end_of_road_lanelet_pose.rpy = lanelet_pose.rpy;
-          }
-          auto entity_status_updated =
-            static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status);
-          {
-            entity_status_updated.time = current_time + step_time;
-            entity_status_updated.lanelet_pose = end_of_road_lanelet_pose;
-            entity_status_updated.lanelet_pose_valid = true;
-            entity_status_updated.action_status.twist = twist_new;
-            entity_status_updated.action_status.accel = accel_new;
-            entity_status_updated.action_status.linear_jerk = linear_jerk_new;
-            entity_status_updated.pose = hdmap_utils->toMapPose(end_of_road_lanelet_pose).pose;
-          }
-          return entity_status_updated;
-        }
-      } else {
-        THROW_SIMULATION_ERROR("Failed to find trailing lanelet_id.");
-      }
-    }
+    auto entity_status_updated =
+      static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status);
+    entity_status_updated.time = current_time + step_time;
+    entity_status_updated.action_status.twist = twist_new;
+    entity_status_updated.action_status.accel = accel_new;
+    entity_status_updated.action_status.linear_jerk = linear_jerk_new;
+    /// @todo it will be moved to route::moveAlongLaneletPose(...)
+    entity_status_updated.lanelet_pose = traffic_simulator::lanelet_wrapper::pose::alongLaneletPose(
+      static_cast<traffic_simulator::LaneletPose>(canonicalized_lanelet_pose.value()),
+      route_lanelets, distance);
+    entity_status_updated.lanelet_pose_valid = true;
+    entity_status_updated.pose =
+      traffic_simulator::pose::toMapPose(entity_status_updated.lanelet_pose);
+    return entity_status_updated;
+  } else {
+    THROW_SIMULATION_ERROR(
+      "Cannot move along lanelet - entity ", std::quoted(canonicalized_entity_status->getName()),
+      " has invalid lanelet pose.");
   }
 }
 

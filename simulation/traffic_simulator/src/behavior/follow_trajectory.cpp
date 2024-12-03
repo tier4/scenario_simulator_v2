@@ -68,14 +68,15 @@ auto makeUpdatedStatus(
 
   auto distance_along_lanelet =
     [&](const geometry_msgs::msg::Point & from, const geometry_msgs::msg::Point & to) -> double {
-    if (const auto from_lanelet_pose =
-          hdmap_utils->toLaneletPose(from, entity_status.bounding_box, false, matching_distance);
+    if (const auto from_lanelet_pose = pose::toCanonicalizedLaneletPose(
+          from, entity_status.bounding_box, false, matching_distance);
         from_lanelet_pose) {
-      if (const auto to_lanelet_pose =
-            hdmap_utils->toLaneletPose(to, entity_status.bounding_box, false, matching_distance);
+      if (const auto to_lanelet_pose = pose::toCanonicalizedLaneletPose(
+            to, entity_status.bounding_box, false, matching_distance);
           to_lanelet_pose) {
         if (const auto distance = hdmap_utils->getLongitudinalDistance(
-              from_lanelet_pose.value(), to_lanelet_pose.value());
+              static_cast<LaneletPose>(from_lanelet_pose.value()),
+              static_cast<LaneletPose>(to_lanelet_pose.value()));
             distance) {
           return distance.value();
         }
