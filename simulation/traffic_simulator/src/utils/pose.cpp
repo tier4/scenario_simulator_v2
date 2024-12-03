@@ -17,7 +17,6 @@
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/lanelet_wrapper/lanelet_map.hpp>
 #include <traffic_simulator/lanelet_wrapper/pose.hpp>
-#include <traffic_simulator/lanelet_wrapper/route.hpp>
 #include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
@@ -224,6 +223,7 @@ auto boundingBoxRelativePose(
 }
 
 // Relative LaneletPose
+/// @todo HdMapUtils will be removed when lanelet_wrapper::distance is added
 auto relativeLaneletPose(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
   const traffic_simulator::RoutingConfiguration & routing_configuration,
@@ -249,27 +249,7 @@ auto relativeLaneletPose(
   return position;
 }
 
-// auto relativeLaneletPose(
-//   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
-//   const RoutingConfiguration & routing_configuration) -> LaneletPose
-// {
-//   constexpr bool include_adjacent_lanelet{false};
-//   constexpr bool include_opposite_direction{true};
-
-//   LaneletPose position = quietNaNLaneletPose();
-//   // here the s and offset are intentionally assigned independently, even if
-//   // it is not possible to calculate one of them - it happens that one is sufficient
-//   if (
-//     const auto longitudinal_distance = distance::longitudinalDistance(
-//       from, to, include_adjacent_lanelet, include_opposite_direction, routing_configuration)) {
-//     position.s = longitudinal_distance.value();
-//   }
-//   if (const auto lateral_distance = distance::lateralDistance(from, to, routing_configuration)) {
-//     position.offset = lateral_distance.value();
-//   }
-//   return position;
-// }
-
+/// @todo HdMapUtils will be removed when lanelet_wrapper::distance is added
 auto boundingBoxRelativeLaneletPose(
   const CanonicalizedLaneletPose & from,
   const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
@@ -298,33 +278,7 @@ auto boundingBoxRelativeLaneletPose(
   return position;
 }
 
-// auto boundingBoxRelativeLaneletPose(
-//   const CanonicalizedLaneletPose & from,
-//   const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
-//   const CanonicalizedLaneletPose & to,
-//   const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box,
-//   const RoutingConfiguration & routing_configuration) -> LaneletPose
-// {
-//   constexpr bool include_adjacent_lanelet{false};
-//   constexpr bool include_opposite_direction{true};
-
-//   LaneletPose position = quietNaNLaneletPose();
-//   // here the s and offset are intentionally assigned independently, even if
-//   // it is not possible to calculate one of them - it happens that one is sufficient
-//   if (
-//     const auto longitudinal_bounding_box_distance = distance::boundingBoxLaneLongitudinalDistance(
-//       from, from_bounding_box, to, to_bounding_box, include_adjacent_lanelet,
-//       include_opposite_direction, routing_configuration)) {
-//     position.s = longitudinal_bounding_box_distance.value();
-//   }
-//   if (
-//     const auto lateral_bounding_box_distance = distance::boundingBoxLaneLateralDistance(
-//       from, from_bounding_box, to, to_bounding_box, routing_configuration)) {
-//     position.offset = lateral_bounding_box_distance.value();
-//   }
-//   return position;
-// }
-
+/// @todo HdMapUtils will be removed when lanelet_wrapper::distance is added
 auto isInLanelet(
   const CanonicalizedLaneletPose & canonicalized_lanelet_pose, const lanelet::Id lanelet_id,
   const double tolerance, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> bool
@@ -358,44 +312,12 @@ auto isInLanelet(
   return false;
 }
 
-// auto isInLanelet(
-//   const CanonicalizedLaneletPose & canonicalized_lanelet_pose, const lanelet::Id lanelet_id,
-//   const double tolerance) -> bool
-// {
-//   constexpr bool include_adjacent_lanelet{false};
-//   constexpr bool include_opposite_direction{false};
-//   constexpr RoutingConfiguration routing_configuration;
-
-//   if (isSameLaneletId(canonicalized_lanelet_pose, lanelet_id)) {
-//     return true;
-//   } else {
-//     const auto start_lanelet_pose = helper::constructCanonicalizedLaneletPose(lanelet_id, 0.0, 0.0);
-//     if (const auto distance_to_start_lanelet_pose = distance::longitudinalDistance(
-//           start_lanelet_pose, canonicalized_lanelet_pose, include_adjacent_lanelet,
-//           include_opposite_direction, routing_configuration);
-//         distance_to_start_lanelet_pose and
-//         std::abs(distance_to_start_lanelet_pose.value()) <= tolerance) {
-//       return true;
-//     }
-
-//     const auto end_lanelet_pose = helper::constructCanonicalizedLaneletPose(
-//       lanelet_id, lanelet_wrapper::lanelet_map::laneletLength(lanelet_id), 0.0);
-//     if (const auto distance_to_end_lanelet_pose = distance::longitudinalDistance(
-//           canonicalized_lanelet_pose, end_lanelet_pose, include_adjacent_lanelet,
-//           include_opposite_direction, routing_configuration);
-//         distance_to_end_lanelet_pose and
-//         std::abs(distance_to_end_lanelet_pose.value()) <= tolerance) {
-//       return true;
-//     }
-//   }
-//   return false;
-// }
-
 auto isInLanelet(const geometry_msgs::msg::Point & point, const lanelet::Id lanelet_id) -> bool
 {
   return lanelet_wrapper::lanelet_map::isInLanelet(lanelet_id, point);
 }
 
+/// @todo HdMapUtils will be removed when lanelet_wrapper::distance is added
 auto isAtEndOfLanelets(
   const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> bool
@@ -404,13 +326,6 @@ auto isAtEndOfLanelets(
   return hdmap_utils_ptr->getFollowingLanelets(lanelet_pose.lanelet_id).size() == 1 &&
          lanelet_wrapper::lanelet_map::laneletLength(lanelet_pose.lanelet_id) <= lanelet_pose.s;
 }
-
-// auto isAtEndOfLanelets(const CanonicalizedLaneletPose & canonicalized_lanelet_pose) -> bool
-// {
-//   const auto lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose);
-//   return lanelet_wrapper::route::followingLanelets(lanelet_pose.lanelet_id).size() == 1 &&
-//          lanelet_wrapper::lanelet_map::laneletLength(lanelet_pose.lanelet_id) <= lanelet_pose.s;
-// }
 
 namespace pedestrian
 {
