@@ -79,9 +79,10 @@ auto SpeedCondition::evaluate() -> Object
 {
   results.clear();
 
-  return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
-    results.push_back(
-      triggering_entity.apply([&](const auto & object) { return evaluateSpeed(object).norm(); }));
+  return asBoolean(triggering_entities.apply([&](const auto & triggering_entity) {
+    results.push_back(triggering_entity.apply([&](const auto & triggering_entity) {
+      return evaluate(global().entities, triggering_entity, direction);
+    }));
     return not results.back().size() or std::invoke(rule, results.back(), value).min();
   }));
 }
