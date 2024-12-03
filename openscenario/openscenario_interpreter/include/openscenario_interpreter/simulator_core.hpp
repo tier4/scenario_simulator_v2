@@ -15,10 +15,12 @@
 #ifndef OPENSCENARIO_INTERPRETER__SIMULATOR_CORE_HPP_
 #define OPENSCENARIO_INTERPRETER__SIMULATOR_CORE_HPP_
 
+#include <geometry/quaternion/get_rotation_matrix.hpp>
 #include <geometry/quaternion/quaternion_to_euler.hpp>
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/syntax/boolean.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
+#include <openscenario_interpreter/syntax/entity.hpp>
 #include <openscenario_interpreter/syntax/routing_algorithm.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <openscenario_interpreter/syntax/unsigned_integer.hpp>
@@ -538,7 +540,6 @@ public:
       return core->checkCollision(std::forward<decltype(xs)>(xs)...);
     }
 
-    template <typename... Ts>
     static auto evaluateBoundingBoxEuclideanDistance(
       const std::string & from_entity_name,
       const std::string & to_entity_name)  // for RelativeDistanceCondition
@@ -554,6 +555,34 @@ public:
         }
       }
       return std::numeric_limits<double>::quiet_NaN();
+    }
+
+    static auto evaluateRelativeSpeed(const Entity & from, const Entity & to) -> Eigen::Vector3d
+    {
+      if (const auto observer = core->getEntity(from.name())) {
+        if (const auto observed = core->getEntity(to.name())) {
+          auto velocity = [](const auto & entity) -> Eigen::Vector3d {
+            auto direction = [](auto orientation) -> Eigen::Vector3d {
+              const auto euler_angle = math::geometry::convertQuaternionToEulerAngle(orientation);
+              const auto r = euler_angle.x;
+              const auto p = euler_angle.y;
+              const auto y = euler_angle.z;
+              return Eigen::Vector3d(
+                std::cos(y) * std::cos(p), std::sin(y) * std::cos(p), std::sin(p));
+            };
+
+            return direction(entity->getMapPose().orientation) * entity->getCurrentTwist().linear.x;
+          };
+
+          const Eigen::Matrix3d rotation =
+            math::geometry::getRotationMatrix(observer->getMapPose().orientation);
+
+          return rotation.transpose() * velocity(observed) -
+                 rotation.transpose() * velocity(observer);
+        }
+      }
+
+      return Eigen::Vector3d(Double::nan(), Double::nan(), Double::nan());
     }
 
     template <typename... Ts>

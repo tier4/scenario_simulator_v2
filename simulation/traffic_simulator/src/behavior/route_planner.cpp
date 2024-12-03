@@ -17,7 +17,10 @@
 
 namespace traffic_simulator
 {
-RoutePlanner::RoutePlanner() {}
+RoutePlanner::RoutePlanner(const traffic_simulator::RoutingGraphType & routing_graph_type)
+: routing_graph_type_(routing_graph_type)
+{
+}
 
 auto RoutePlanner::setWaypoints(const std::vector<CanonicalizedLaneletPose> & waypoints) -> void
 {
@@ -40,14 +43,17 @@ auto RoutePlanner::getRouteLanelets(
   // If the route from the entity_lanelet_pose to waypoint_queue_.front() was failed to calculate in updateRoute function,
   // use following lanelet as route.
   if (!route_) {
-    return route::followingLanelets(lanelet_pose.lanelet_id, horizon, include_current_lanelet);
+    return route::followingLanelets(
+      lanelet_pose.lanelet_id, horizon, include_current_lanelet, routing_graph_type_);
   }
   if (route_ && route::isInRoute(lanelet_pose.lanelet_id, route_.value())) {
-    return route::followingLanelets(lanelet_pose.lanelet_id, route_.value(), horizon, true);
+    return route::followingLanelets(
+      lanelet_pose.lanelet_id, route_.value(), horizon, true, routing_graph_type_);
   }
   // If the entity_lanelet_pose is in the lanelet id of the waypoint queue, cancel the target waypoint.
   cancelWaypoint(entity_lanelet_pose);
-  return route::followingLanelets(lanelet_pose.lanelet_id, horizon, include_current_lanelet);
+  return route::followingLanelets(
+    lanelet_pose.lanelet_id, horizon, include_current_lanelet, routing_graph_type_);
 }
 
 void RoutePlanner::cancelRoute()
@@ -100,16 +106,24 @@ auto RoutePlanner::updateRoute(const CanonicalizedLaneletPose & entity_lanelet_p
     }
   }
   const auto lanelet_pose = static_cast<LaneletPose>(entity_lanelet_pose);
+  static auto routing_configuration = [this]() {
+    RoutingConfiguration config;
+    config.routing_graph_type = routing_graph_type_;
+    config.allow_lane_change = false;
+    return config;
+  }();
   if (!route_) {
     route_ = route::getRoute(
-      lanelet_pose.lanelet_id, static_cast<LaneletPose>(waypoint_queue_.front()).lanelet_id);
+      lanelet_pose.lanelet_id, static_cast<LaneletPose>(waypoint_queue_.front()).lanelet_id,
+      routing_configuration);
     return;
   }
   if (route::isInRoute(lanelet_pose.lanelet_id, route_.value())) {
     return;
   } else {
     route_ = route::getRoute(
-      lanelet_pose.lanelet_id, static_cast<LaneletPose>(waypoint_queue_.front()).lanelet_id);
+      lanelet_pose.lanelet_id, static_cast<LaneletPose>(waypoint_queue_.front()).lanelet_id,
+      routing_configuration);
     return;
   }
 }

@@ -29,7 +29,10 @@ int main(int argc, char ** argv)
 class RoutePlannerTest : public testing::Test
 {
 protected:
-  RoutePlannerTest() { activateLaneletWrapper("standard_map"); }
+  RoutePlannerTest() : planner(traffic_simulator::RoutingConfiguration().routing_graph_type)
+  {
+    activateLaneletWrapper("standard_map");
+  }
 
   traffic_simulator::RoutePlanner planner;
 };

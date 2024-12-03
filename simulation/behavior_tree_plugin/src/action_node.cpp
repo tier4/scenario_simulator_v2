@@ -35,6 +35,13 @@
 
 namespace entity_behavior
 {
+BT::PortsList operator+(const BT::PortsList & ports_1, const BT::PortsList & ports_2)
+{
+  BT::PortsList ports = ports_1;
+  ports.insert(ports_2.begin(), ports_2.end());
+  return ports;
+}
+
 ActionNode::ActionNode(const std::string & name, const BT::NodeConfiguration & config)
 : BT::ActionNodeBase(name, config)
 {
