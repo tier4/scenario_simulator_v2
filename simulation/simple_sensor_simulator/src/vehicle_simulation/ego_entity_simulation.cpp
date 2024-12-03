@@ -64,6 +64,7 @@ auto toString(const VehicleModelType datum) -> std::string
   switch (datum) {
     BOILERPLATE(DELAY_STEER_ACC);
     BOILERPLATE(DELAY_STEER_ACC_GEARED);
+    BOILERPLATE(DELAY_STEER_ACC_GEARED_WO_FALL_GUARD);
     BOILERPLATE(DELAY_STEER_MAP_ACC_GEARED);
     BOILERPLATE(DELAY_STEER_VEL);
     BOILERPLATE(IDEAL_STEER_ACC);
@@ -84,6 +85,8 @@ auto EgoEntitySimulation::getVehicleModelType() -> VehicleModelType
   static const std::unordered_map<std::string, VehicleModelType> table{
     {"DELAY_STEER_ACC", VehicleModelType::DELAY_STEER_ACC},
     {"DELAY_STEER_ACC_GEARED", VehicleModelType::DELAY_STEER_ACC_GEARED},
+    {"DELAY_STEER_ACC_GEARED_WO_FALL_GUARD",
+     VehicleModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD},
     {"DELAY_STEER_MAP_ACC_GEARED", VehicleModelType::DELAY_STEER_MAP_ACC_GEARED},
     {"DELAY_STEER_VEL", VehicleModelType::DELAY_STEER_VEL},
     {"IDEAL_STEER_ACC", VehicleModelType::IDEAL_STEER_ACC},
@@ -118,8 +121,9 @@ auto EgoEntitySimulation::makeSimulationModel(
   const auto acceleration_map_path      = get_parameter("acceleration_map_path",       std::string(""));
   const auto debug_acc_scaling_factor   = get_parameter("debug_acc_scaling_factor",    1.0);
   const auto debug_steer_scaling_factor = get_parameter("debug_steer_scaling_factor",  1.0);
-  const auto steer_lim                  = get_parameter("steer_lim",                   parameters.axles.front_axle.max_steering);  // 1.0
+  const auto steer_bias                 = get_parameter("steer_bias",                  0.0);
   const auto steer_dead_band            = get_parameter("steer_dead_band",             0.0);
+  const auto steer_lim                  = get_parameter("steer_lim",                   parameters.axles.front_axle.max_steering);  // 1.0
   const auto steer_rate_lim             = get_parameter("steer_rate_lim",              5.0);
   const auto steer_time_constant        = get_parameter("steer_time_constant",         0.27);
   const auto steer_time_delay           = get_parameter("steer_time_delay",            0.24);
@@ -141,6 +145,12 @@ auto EgoEntitySimulation::makeSimulationModel(
       return std::make_shared<SimModelDelaySteerAccGeared>(
         vel_lim, steer_lim, vel_rate_lim, steer_rate_lim, wheel_base, step_time, acc_time_delay,
         acc_time_constant, steer_time_delay, steer_time_constant, steer_dead_band,
+        debug_acc_scaling_factor, debug_steer_scaling_factor);
+
+    case VehicleModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD:
+      return std::make_shared<SimModelDelaySteerAccGearedWoFallGuard>(
+        vel_lim, steer_lim, vel_rate_lim, steer_rate_lim, wheel_base, step_time, acc_time_delay,
+        acc_time_constant, steer_time_delay, steer_time_constant, steer_dead_band, steer_bias,
         debug_acc_scaling_factor, debug_steer_scaling_factor);
 
     case VehicleModelType::DELAY_STEER_MAP_ACC_GEARED:
@@ -196,6 +206,10 @@ void EgoEntitySimulation::requestSpeedChange(double value)
     case VehicleModelType::DELAY_STEER_ACC_GEARED:
     case VehicleModelType::DELAY_STEER_MAP_ACC_GEARED:
       v << 0, 0, 0, value, 0, 0;
+      break;
+
+    case VehicleModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD:
+      v << 0, 0, 0, value, 0, 0, 0;
       break;
 
     case VehicleModelType::IDEAL_STEER_ACC:
@@ -255,6 +269,7 @@ auto EgoEntitySimulation::overwrite(
     switch (auto state = Eigen::VectorXd(vehicle_model_ptr_->getDimX()); vehicle_model_type_) {
       case VehicleModelType::DELAY_STEER_ACC:
       case VehicleModelType::DELAY_STEER_ACC_GEARED:
+      case VehicleModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD:
       case VehicleModelType::DELAY_STEER_MAP_ACC_GEARED:
         state(5) = status.action_status.accel.linear.x;
         [[fallthrough]];
@@ -315,6 +330,13 @@ void EgoEntitySimulation::update(
       case VehicleModelType::IDEAL_STEER_ACC_GEARED:
         input(0) = autoware->getGearSign() * (autoware->getAcceleration() + acceleration_by_slope);
         input(1) = autoware->getSteeringAngle();
+        break;
+
+      case VehicleModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD:
+        input(0) = autoware->getAcceleration();
+        input(1) = autoware->getGearCommand().command;
+        input(2) = acceleration_by_slope;
+        input(3) = autoware->getSteeringAngle();
         break;
 
       case VehicleModelType::DELAY_STEER_VEL:
