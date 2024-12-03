@@ -39,8 +39,7 @@ private:
   void onUpdate() override
   {
     const auto map_pose = traffic_simulator::pose::toMapPose(
-      traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        120545, 0.0, 0.0, api_.getHdmapUtils()));
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(120545, 0.0, 0.0));
     if (api_.reachPosition("ego", map_pose, 0.1)) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     } else {
@@ -53,8 +52,7 @@ private:
     api_.spawn(
       "ego",
       traffic_simulator::pose::toMapPose(
-        traffic_simulator::helper::constructCanonicalizedLaneletPose(
-          120545, 0.0, 0.0, api_.getHdmapUtils())),
+        traffic_simulator::helper::constructCanonicalizedLaneletPose(120545, 0.0, 0.0)),
       getVehicleParameters());
   }
 };

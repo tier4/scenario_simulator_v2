@@ -21,6 +21,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <string>
 #include <traffic_simulator/api/api.hpp>
+#include <traffic_simulator/utils/lanelet_map.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <vector>
 
@@ -70,9 +71,9 @@ private:
           traffic_simulator::helper::constructCanonicalizedLaneletPose(
             spawn_lanelet_id,
             static_cast<double>(entity_index) / static_cast<double>(number_of_vehicles) *
-                traffic_simulator::pose::laneletLength(spawn_lanelet_id, api_.getHdmapUtils()) +
+                traffic_simulator::lanelet_map::laneletLength(spawn_lanelet_id) +
               normal_dist(engine_),
-            offset, api_.getHdmapUtils()),
+            offset),
           getVehicleParameters(
             get_entity_subtype(params_.random_parameters.road_parking_vehicle.entity_type)));
         api_.requestSpeedChange(entity_name, 0, true);
@@ -122,8 +123,7 @@ private:
       if (!api_.entityExists(entity_name)) {
         api_.spawn(
           entity_name,
-          traffic_simulator::helper::constructCanonicalizedLaneletPose(
-            34513, spawn_s_value, 0.0, api_.getHdmapUtils()),
+          traffic_simulator::helper::constructCanonicalizedLaneletPose(34513, spawn_s_value, 0.0),
           getVehicleParameters());
         std::uniform_real_distribution<> speed_distribution(
           params_.random_parameters.lane_following_vehicle.min_speed,
@@ -132,7 +132,7 @@ private:
         api_.requestSpeedChange(entity_name, speed, true);
         api_.setLinearVelocity(entity_name, speed);
         std::uniform_real_distribution<> lane_change_position_distribution(
-          0.0, traffic_simulator::pose::laneletLength(34684, api_.getHdmapUtils()));
+          0.0, traffic_simulator::lanelet_map::laneletLength(34684));
         lane_change_position = lane_change_position_distribution(engine_);
         lane_change_requested = false;
       }
@@ -157,9 +157,7 @@ private:
       if (
         !api_.entityExists(entity_name) &&
         !api_.reachPosition(
-          "ego",
-          traffic_simulator::helper::constructCanonicalizedLaneletPose(
-            34576, 25.0, 0.0, api_.getHdmapUtils()),
+          "ego", traffic_simulator::helper::constructCanonicalizedLaneletPose(34576, 25.0, 0.0),
           5.0)) {
         std::normal_distribution<> offset_distribution(
           0.0, params_.random_parameters.crossing_pedestrian.offset_variance);
@@ -169,7 +167,7 @@ private:
         api_.spawn(
           entity_name,
           traffic_simulator::helper::constructCanonicalizedLaneletPose(
-            lanelet_id, 0.0, offset_distribution(engine_), api_.getHdmapUtils()),
+            lanelet_id, 0.0, offset_distribution(engine_)),
           getPedestrianParameters());
         const auto speed = speed_distribution(engine_);
         api_.requestSpeedChange(entity_name, speed, true);
@@ -184,10 +182,10 @@ private:
     }
 
     {
-      const auto trigger_position = traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34621, 10, 0.0, api_.getHdmapUtils());
-      const auto ego_goal_position = traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34606, 0.0, 0.0, api_.getHdmapUtils());
+      const auto trigger_position =
+        traffic_simulator::helper::constructCanonicalizedLaneletPose(34621, 10, 0.0);
+      const auto ego_goal_position =
+        traffic_simulator::helper::constructCanonicalizedLaneletPose(34606, 0.0, 0.0);
       const auto entity_name = "spawn_nearby_ego";
 
       if (const auto ego = api_.getEntity("ego")) {
@@ -223,10 +221,8 @@ private:
     spawnRoadParkingVehicles();
 
     spawnEgoEntity(
-      traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34621, 10.0, 0.0, api_.getHdmapUtils()),
-      {traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34606, 0.0, 0.0, api_.getHdmapUtils())},
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(34621, 10.0, 0.0),
+      {traffic_simulator::helper::constructCanonicalizedLaneletPose(34606, 0.0, 0.0)},
       getVehicleParameters());
     if (const auto ego = api_.getEntity("ego")) {
       api_.spawn(
