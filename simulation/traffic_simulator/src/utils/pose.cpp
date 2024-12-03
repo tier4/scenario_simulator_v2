@@ -26,10 +26,10 @@ namespace traffic_simulator
 {
 inline namespace pose
 {
-auto quietNaNPose() -> Pose
+auto quietNaNPose() -> geometry_msgs::msg::Pose
 {
-  return geometry_msgs::build<Pose>()
-    .position(geometry_msgs::build<Point>()
+  return geometry_msgs::build<geometry_msgs::msg::Pose>()
+    .position(geometry_msgs::build<geometry_msgs::msg::Point>()
                 .x(std::numeric_limits<double>::quiet_NaN())
                 .y(std::numeric_limits<double>::quiet_NaN())
                 .z(std::numeric_limits<double>::quiet_NaN()))
@@ -42,55 +42,10 @@ auto quietNaNLaneletPose() -> LaneletPose
     .lanelet_id(std::numeric_limits<std::int64_t>::max())
     .s(std::numeric_limits<double>::quiet_NaN())
     .offset(std::numeric_limits<double>::quiet_NaN())
-    .rpy(geometry_msgs::build<Vector3>()
+    .rpy(geometry_msgs::build<geometry_msgs::msg::Vector3>()
            .x(std::numeric_limits<double>::quiet_NaN())
            .y(std::numeric_limits<double>::quiet_NaN())
            .z(std::numeric_limits<double>::quiet_NaN()));
-}
-
-auto isInLanelet(
-  const CanonicalizedLaneletPose & canonicalized_lanelet_pose, const lanelet::Id lanelet_id,
-  const double tolerance) -> bool
-{
-  constexpr bool include_adjacent_lanelet{false};
-  constexpr bool include_opposite_direction{false};
-  constexpr RoutingConfiguration routing_configuration;
-
-  if (isSameLaneletId(canonicalized_lanelet_pose, lanelet_id)) {
-    return true;
-  } else {
-    const auto start_lanelet_pose = helper::constructCanonicalizedLaneletPose(lanelet_id, 0.0, 0.0);
-    if (const auto distance_to_start_lanelet_pose = distance::longitudinalDistance(
-          start_lanelet_pose, canonicalized_lanelet_pose, include_adjacent_lanelet,
-          include_opposite_direction, routing_configuration);
-        distance_to_start_lanelet_pose and
-        std::abs(distance_to_start_lanelet_pose.value()) <= tolerance) {
-      return true;
-    }
-
-    const auto end_lanelet_pose = helper::constructCanonicalizedLaneletPose(
-      lanelet_id, lanelet_wrapper::lanelet_map::laneletLength(lanelet_id), 0.0);
-    if (const auto distance_to_end_lanelet_pose = distance::longitudinalDistance(
-          canonicalized_lanelet_pose, end_lanelet_pose, include_adjacent_lanelet,
-          include_opposite_direction, routing_configuration);
-        distance_to_end_lanelet_pose and
-        std::abs(distance_to_end_lanelet_pose.value()) <= tolerance) {
-      return true;
-    }
-  }
-  return false;
-}
-
-auto isInLanelet(const Point & point, const lanelet::Id lanelet_id) -> bool
-{
-  return lanelet_wrapper::lanelet_map::isInLanelet(lanelet_id, point);
-}
-
-auto isAtEndOfLanelets(const CanonicalizedLaneletPose & canonicalized_lanelet_pose) -> bool
-{
-  const auto lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose);
-  return lanelet_wrapper::route::followingLanelets(lanelet_pose.lanelet_id).size() == 1 &&
-         lanelet_wrapper::lanelet_map::laneletLength(lanelet_pose.lanelet_id) <= lanelet_pose.s;
 }
 
 // Conversions
@@ -124,12 +79,12 @@ auto canonicalize(const LaneletPose & lanelet_pose, const lanelet::Ids & route_l
   }
 }
 
-auto toMapPose(const CanonicalizedLaneletPose & lanelet_pose) -> Pose
+auto toMapPose(const CanonicalizedLaneletPose & lanelet_pose) -> geometry_msgs::msg::Pose
 {
-  return static_cast<Pose>(lanelet_pose);
+  return static_cast<geometry_msgs::msg::Pose>(lanelet_pose);
 }
 
-auto toMapPose(const LaneletPose & lanelet_pose) -> Pose
+auto toMapPose(const LaneletPose & lanelet_pose) -> geometry_msgs::msg::Pose
 {
   return lanelet_wrapper::pose::toMapPose(
            lanelet_pose, CanonicalizedLaneletPose::getConsiderPoseByRoadSlope())
@@ -151,7 +106,8 @@ auto toCanonicalizedLaneletPose(const LaneletPose & lanelet_pose)
   }
 }
 
-auto toCanonicalizedLaneletPose(const Pose & map_pose, const bool include_crosswalk)
+auto toCanonicalizedLaneletPose(
+  const geometry_msgs::msg::Pose & map_pose, const bool include_crosswalk)
   -> std::optional<CanonicalizedLaneletPose>
 {
   /// @todo here matching_distance should be passed
@@ -166,7 +122,8 @@ auto toCanonicalizedLaneletPose(const Pose & map_pose, const bool include_crossw
 }
 
 auto toCanonicalizedLaneletPose(
-  const Pose & map_pose, const BoundingBox & bounding_box, const bool include_crosswalk,
+  const geometry_msgs::msg::Pose & map_pose,
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, const bool include_crosswalk,
   const double matching_distance) -> std::optional<CanonicalizedLaneletPose>
 {
   if (
@@ -179,7 +136,8 @@ auto toCanonicalizedLaneletPose(
 }
 
 auto toCanonicalizedLaneletPose(
-  const Point & map_point, const BoundingBox & bounding_box, const bool include_crosswalk,
+  const geometry_msgs::msg::Point & map_point,
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, const bool include_crosswalk,
   const double matching_distance) -> std::optional<CanonicalizedLaneletPose>
 {
   return toCanonicalizedLaneletPose(
@@ -189,7 +147,8 @@ auto toCanonicalizedLaneletPose(
 }
 
 auto toCanonicalizedLaneletPose(
-  const Pose & map_pose, const BoundingBox & bounding_box,
+  const geometry_msgs::msg::Pose & map_pose,
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box,
   const lanelet::Ids & unique_route_lanelets, const bool include_crosswalk,
   const double matching_distance) -> std::optional<CanonicalizedLaneletPose>
 {
@@ -209,18 +168,21 @@ auto toCanonicalizedLaneletPose(
   }
 }
 
-auto transformRelativePoseToGlobal(const Pose & global_pose, const Pose & relative_pose) -> Pose
+auto transformRelativePoseToGlobal(
+  const geometry_msgs::msg::Pose & global_pose, const geometry_msgs::msg::Pose & relative_pose)
+  -> geometry_msgs::msg::Pose
 {
   tf2::Transform ref_transform, relative_transform;
   tf2::fromMsg(global_pose, ref_transform);
   tf2::fromMsg(relative_pose, relative_transform);
-  Pose ret;
+  geometry_msgs::msg::Pose ret;
   tf2::toMsg(ref_transform * relative_transform, ret);
   return ret;
 }
 
 // Relative msg::Pose
-auto relativePose(const Pose & from, const Pose & to) -> std::optional<Pose>
+auto relativePose(const geometry_msgs::msg::Pose & from, const geometry_msgs::msg::Pose & to)
+  -> std::optional<geometry_msgs::msg::Pose>
 {
   try {
     return math::geometry::getRelativePose(from, to);
@@ -229,19 +191,24 @@ auto relativePose(const Pose & from, const Pose & to) -> std::optional<Pose>
   }
 }
 
-auto relativePose(const Pose & from, const CanonicalizedLaneletPose & to) -> std::optional<Pose>
+auto relativePose(const geometry_msgs::msg::Pose & from, const CanonicalizedLaneletPose & to)
+  -> std::optional<geometry_msgs::msg::Pose>
 {
-  return relativePose(from, static_cast<Pose>(to));
+  return relativePose(from, static_cast<geometry_msgs::msg::Pose>(to));
 }
 
-auto relativePose(const CanonicalizedLaneletPose & from, const Pose & to) -> std::optional<Pose>
+auto relativePose(const CanonicalizedLaneletPose & from, const geometry_msgs::msg::Pose & to)
+  -> std::optional<geometry_msgs::msg::Pose>
 {
-  return relativePose(static_cast<Pose>(from), to);
+  return relativePose(static_cast<geometry_msgs::msg::Pose>(from), to);
 }
 
 auto boundingBoxRelativePose(
-  const Pose & from, const BoundingBox & from_bounding_box, const Pose & to,
-  const BoundingBox & to_bounding_box) -> std::optional<Pose>
+  const geometry_msgs::msg::Pose & from,
+  const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
+  const geometry_msgs::msg::Pose & to,
+  const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box)
+  -> std::optional<geometry_msgs::msg::Pose>
 {
   if (const auto closest_points =
         math::geometry::getClosestPoses(from, from_bounding_box, to, to_bounding_box);
@@ -279,8 +246,10 @@ auto relativeLaneletPose(
 }
 
 auto boundingBoxRelativeLaneletPose(
-  const CanonicalizedLaneletPose & from, const BoundingBox & from_bounding_box,
-  const CanonicalizedLaneletPose & to, const BoundingBox & to_bounding_box,
+  const CanonicalizedLaneletPose & from,
+  const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
+  const CanonicalizedLaneletPose & to,
+  const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box,
   const RoutingConfiguration & routing_configuration) -> LaneletPose
 {
   constexpr bool include_adjacent_lanelet{false};
@@ -301,6 +270,51 @@ auto boundingBoxRelativeLaneletPose(
     position.offset = lateral_bounding_box_distance.value();
   }
   return position;
+}
+
+auto isInLanelet(
+  const CanonicalizedLaneletPose & canonicalized_lanelet_pose, const lanelet::Id lanelet_id,
+  const double tolerance) -> bool
+{
+  constexpr bool include_adjacent_lanelet{false};
+  constexpr bool include_opposite_direction{false};
+  constexpr RoutingConfiguration routing_configuration;
+
+  if (isSameLaneletId(canonicalized_lanelet_pose, lanelet_id)) {
+    return true;
+  } else {
+    const auto start_lanelet_pose = helper::constructCanonicalizedLaneletPose(lanelet_id, 0.0, 0.0);
+    if (const auto distance_to_start_lanelet_pose = distance::longitudinalDistance(
+          start_lanelet_pose, canonicalized_lanelet_pose, include_adjacent_lanelet,
+          include_opposite_direction, routing_configuration);
+        distance_to_start_lanelet_pose and
+        std::abs(distance_to_start_lanelet_pose.value()) <= tolerance) {
+      return true;
+    }
+
+    const auto end_lanelet_pose = helper::constructCanonicalizedLaneletPose(
+      lanelet_id, lanelet_wrapper::lanelet_map::laneletLength(lanelet_id), 0.0);
+    if (const auto distance_to_end_lanelet_pose = distance::longitudinalDistance(
+          canonicalized_lanelet_pose, end_lanelet_pose, include_adjacent_lanelet,
+          include_opposite_direction, routing_configuration);
+        distance_to_end_lanelet_pose and
+        std::abs(distance_to_end_lanelet_pose.value()) <= tolerance) {
+      return true;
+    }
+  }
+  return false;
+}
+
+auto isInLanelet(const geometry_msgs::msg::Point & point, const lanelet::Id lanelet_id) -> bool
+{
+  return lanelet_wrapper::lanelet_map::isInLanelet(lanelet_id, point);
+}
+
+auto isAtEndOfLanelets(const CanonicalizedLaneletPose & canonicalized_lanelet_pose) -> bool
+{
+  const auto lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose);
+  return lanelet_wrapper::route::followingLanelets(lanelet_pose.lanelet_id).size() == 1 &&
+         lanelet_wrapper::lanelet_map::laneletLength(lanelet_pose.lanelet_id) <= lanelet_pose.s;
 }
 
 namespace pedestrian
