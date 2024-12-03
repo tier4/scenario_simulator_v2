@@ -598,7 +598,8 @@ public:
     template <typename... Ts>
     static auto evaluateSpeed(Ts &&... xs)
     {
-      return core->getCurrentTwist(std::forward<decltype(xs)>(xs)...).linear.x;
+      const auto linear = core->getCurrentTwist(std::forward<decltype(xs)>(xs)...).linear;
+      return Eigen::Vector3d(linear.x, linear.y, linear.z);
     }
 
     template <typename... Ts>

@@ -49,7 +49,7 @@ auto SpeedCondition::evaluate() -> Object
 
   return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
     results.push_back(
-      triggering_entity.apply([&](const auto & object) { return evaluateSpeed(object); }));
+      triggering_entity.apply([&](const auto & object) { return evaluateSpeed(object).norm(); }));
     return not results.back().size() or compare(results.back(), value).min();
   }));
 }

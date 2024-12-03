@@ -55,7 +55,7 @@ auto SpeedAction::accomplished() -> bool
   };
 
   auto check = [this](auto && actor) {
-    auto evaluation = actor.apply([](const auto & object) { return evaluateSpeed(object); });
+    auto evaluation = actor.apply([](const auto & actor) { return evaluateSpeed(actor).norm(); });
     if (speed_action_target.is<AbsoluteTargetSpeed>()) {
       return not evaluation.size() or
              equal_to<std::valarray<double>>()(
@@ -66,14 +66,14 @@ auto SpeedAction::accomplished() -> bool
         case SpeedTargetValueType::delta:
           return not evaluation.size() or
                  equal_to<std::valarray<double>>()(
-                   evaluateSpeed(speed_action_target.as<RelativeTargetSpeed>().entity_ref) +
+                   evaluateSpeed(speed_action_target.as<RelativeTargetSpeed>().entity_ref).norm() +
                      speed_action_target.as<RelativeTargetSpeed>().value,
                    evaluation)
                    .min();
         case SpeedTargetValueType::factor:
           return not evaluation.size() or
                  equal_to<std::valarray<double>>()(
-                   evaluateSpeed(speed_action_target.as<RelativeTargetSpeed>().entity_ref) *
+                   evaluateSpeed(speed_action_target.as<RelativeTargetSpeed>().entity_ref).norm() *
                      speed_action_target.as<RelativeTargetSpeed>().value,
                    evaluation)
                    .min();

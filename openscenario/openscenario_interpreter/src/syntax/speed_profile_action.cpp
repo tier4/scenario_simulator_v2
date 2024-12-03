@@ -120,12 +120,12 @@ auto SpeedProfileAction::run() -> void
 {
   for (auto && [actor, iter] : accomplishments) {
     auto accomplished = [this](const auto & actor, const auto & speed_profile_entry) {
-      auto speeds = actor.apply([&](const auto & object) { return evaluateSpeed(object); });
+      auto speeds = actor.apply([&](const auto & actor) { return evaluateSpeed(actor).norm(); });
       if (not speeds.size()) {
         return true;
       } else if (entity_ref) {
         return equal_to<std::valarray<double>>()(
-                 speeds, speed_profile_entry.speed + evaluateSpeed(entity_ref))
+                 speeds, speed_profile_entry.speed + evaluateSpeed(entity_ref).norm())
           .min();
       } else {
         return equal_to<std::valarray<double>>()(speeds, speed_profile_entry.speed).min();
