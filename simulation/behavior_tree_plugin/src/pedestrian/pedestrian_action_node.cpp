@@ -18,7 +18,6 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <traffic_simulator/helper/helper.hpp>
-#include <traffic_simulator/utils/pose.hpp>
 
 namespace entity_behavior
 {

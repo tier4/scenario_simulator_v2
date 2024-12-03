@@ -55,16 +55,11 @@ TrafficController::TrafficController(
 
 void TrafficController::autoSink()
 {
-  for (const auto & lanelet_id : hdmap_utils_->getLaneletIds()) {
-    if (hdmap_utils_->getNextLaneletIds(lanelet_id).empty()) {
-      LaneletPose lanelet_pose;
-      lanelet_pose.lanelet_id = lanelet_id;
-      lanelet_pose.s = lanelet_map::laneletLength(lanelet_id);
-      const auto pose = pose::toMapPose(lanelet_pose);
-      addModule<traffic_simulator::traffic::TrafficSink>(
-        lanelet_id, 1, pose.position, get_entity_names_function, get_entity_pose_function,
-        despawn_function);
-    }
+  constexpr double sink_radius{1.0};
+  for (const auto & [lanelet_id, pose] : lanelet_map::borderlinePoses()) {
+    addModule<traffic_simulator::traffic::TrafficSink>(
+      lanelet_id, sink_radius, pose.position, get_entity_names_function, get_entity_pose_function,
+      despawn_function);
   }
 }
 

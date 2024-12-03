@@ -36,6 +36,8 @@ inline auto activate(Ts &&... xs)
 }
 
 auto laneletLength(const lanelet::Id lanelet_id) -> double;
+
+auto borderlinePoses() -> std::vector<std::pair<lanelet::Id, Pose>>;
 }  // namespace lanelet_map
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__UTILS__LANELET_MAP_HPP_

@@ -22,5 +22,19 @@ auto laneletLength(const lanelet::Id lanelet_id) -> double
 {
   return lanelet_wrapper::lanelet_map::laneletLength(lanelet_id);
 }
+
+auto borderlinePoses() -> std::vector<std::pair<lanelet::Id, Pose>>
+{
+  std::vector<std::pair<lanelet::Id, Pose>> borderline_poses;
+  for (const auto & lanelet_id : lanelet_wrapper::lanelet_map::laneletIds()) {
+    if (lanelet_wrapper::lanelet_map::nextLaneletIds(lanelet_id).empty()) {
+      LaneletPose lanelet_pose;
+      lanelet_pose.lanelet_id = lanelet_id;
+      lanelet_pose.s = lanelet_map::laneletLength(lanelet_id);
+      borderline_poses.push_back({lanelet_id, pose::toMapPose(lanelet_pose)});
+    }
+  }
+  return borderline_poses;
+}
 }  // namespace lanelet_map
 }  // namespace traffic_simulator
