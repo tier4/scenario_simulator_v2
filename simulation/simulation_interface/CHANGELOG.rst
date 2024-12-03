@@ -21,6 +21,11 @@ Changelog for package simulation_interface
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+6.2.1 (2024-12-03)
+------------------
+* Merge branch 'master' into refactor/distance-condition-and-relative-distance-condition
+* Contributors: Tatsuya Yamasaki
+
 6.2.0 (2024-12-02)
 ------------------
 * Merge branch 'master' into feature/relative-speed-condition
