@@ -170,8 +170,6 @@ public:
 
   auto getLaneletIds() const -> lanelet::Ids;
 
-  auto getLaneletLength(const lanelet::Id) const -> double;
-
   auto getLaneletPolygon(const lanelet::Id) const -> std::vector<geometry_msgs::msg::Point>;
 
   auto getLanelets(const lanelet::Ids &) const -> lanelet::Lanelets;
@@ -197,46 +195,6 @@ public:
   auto getNearbyLaneletIds(
     const geometry_msgs::msg::Point &, const double distance_threshold,
     const std::size_t search_count = 5) const -> lanelet::Ids;
-
-  auto getNextLaneletIds(
-    const lanelet::Ids &, const traffic_simulator::RoutingGraphType type =
-                            traffic_simulator::RoutingConfiguration().routing_graph_type) const
-    -> lanelet::Ids;
-
-  auto getNextLaneletIds(
-    const lanelet::Ids &, const std::string & turn_direction,
-    const traffic_simulator::RoutingGraphType type =
-      traffic_simulator::RoutingConfiguration().routing_graph_type) const -> lanelet::Ids;
-
-  auto getNextLaneletIds(
-    const lanelet::Id, const traffic_simulator::RoutingGraphType type =
-                         traffic_simulator::RoutingConfiguration().routing_graph_type) const
-    -> lanelet::Ids;
-
-  auto getNextLaneletIds(
-    const lanelet::Id, const std::string & turn_direction,
-    const traffic_simulator::RoutingGraphType type =
-      traffic_simulator::RoutingConfiguration().routing_graph_type) const -> lanelet::Ids;
-
-  auto getPreviousLaneletIds(
-    const lanelet::Ids &, const traffic_simulator::RoutingGraphType type =
-                            traffic_simulator::RoutingConfiguration().routing_graph_type) const
-    -> lanelet::Ids;
-
-  auto getPreviousLaneletIds(
-    const lanelet::Ids &, const std::string & turn_direction,
-    const traffic_simulator::RoutingGraphType type =
-      traffic_simulator::RoutingConfiguration().routing_graph_type) const -> lanelet::Ids;
-
-  auto getPreviousLaneletIds(
-    const lanelet::Id, const traffic_simulator::RoutingGraphType type =
-                         traffic_simulator::RoutingConfiguration().routing_graph_type) const
-    -> lanelet::Ids;
-
-  auto getPreviousLaneletIds(
-    const lanelet::Id, const std::string & turn_direction,
-    const traffic_simulator::RoutingGraphType type =
-      traffic_simulator::RoutingConfiguration().routing_graph_type) const -> lanelet::Ids;
 
   auto getPreviousLanelets(
     const lanelet::Id, const double backward_horizon = 100,

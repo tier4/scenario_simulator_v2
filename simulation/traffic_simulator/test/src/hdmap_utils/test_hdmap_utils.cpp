@@ -20,6 +20,7 @@
 #include <string>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/helper/helper.hpp>
+#include <traffic_simulator/lanelet_wrapper/lanelet_map.hpp>
 #include <traffic_simulator/lanelet_wrapper/pose.hpp>
 
 #include "../expect_eq_macros.hpp"
@@ -923,7 +924,8 @@ TEST_F(HdMapUtilsTest_EmptyMap, getClosestLaneletId_emptyMap)
  */
 TEST_F(HdMapUtilsTest_StandardMap, getPreviousLaneletIds)
 {
-  const auto result_ids = hdmap_utils.getPreviousLaneletIds(34468);
+  const auto result_ids =
+    traffic_simulator::lanelet_wrapper::lanelet_map::previousLaneletIds(34468);
   EXPECT_EQ(result_ids.size(), static_cast<std::size_t>(1));
   if (result_ids.size() == 1) {
     EXPECT_EQ(result_ids[0], static_cast<lanelet::Id>(120660));
@@ -937,7 +939,8 @@ TEST_F(HdMapUtilsTest_StandardMap, getPreviousLaneletIds)
  */
 TEST_F(HdMapUtilsTest_WithRoadShoulderMap, getPreviousLaneletIds_RoadShoulder)
 {
-  const auto result_ids = hdmap_utils.getPreviousLaneletIds(34768);
+  const auto result_ids =
+    traffic_simulator::lanelet_wrapper::lanelet_map::previousLaneletIds(34768);
   EXPECT_EQ(result_ids.size(), static_cast<std::size_t>(1));
   if (result_ids.size() == 1) {
     EXPECT_EQ(result_ids[0], static_cast<lanelet::Id>(34696));
@@ -952,7 +955,7 @@ TEST_F(HdMapUtilsTest_WithRoadShoulderMap, getPreviousLaneletIds_RoadShoulder)
 TEST_F(HdMapUtilsTest_StandardMap, getPreviousLaneletIds_multiplePrevious)
 {
   lanelet::Ids prev_lanelets = {34411, 34465};
-  auto result_ids = hdmap_utils.getPreviousLaneletIds(34462);
+  auto result_ids = traffic_simulator::lanelet_wrapper::lanelet_map::previousLaneletIds(34462);
 
   std::sort(prev_lanelets.begin(), prev_lanelets.end());
   std::sort(result_ids.begin(), result_ids.end());
@@ -974,14 +977,16 @@ TEST_F(HdMapUtilsTest_StandardMap, getPreviousLaneletIds_direction)
   const lanelet::Id prev_lanelet_straight = 34465;
 
   {
-    const auto result_ids = hdmap_utils.getPreviousLaneletIds(curr_lanelet, "left");
+    const auto result_ids =
+      traffic_simulator::lanelet_wrapper::lanelet_map::previousLaneletIds(curr_lanelet, "left");
     EXPECT_EQ(result_ids.size(), static_cast<std::size_t>(1));
     if (result_ids.size() == 1) {
       EXPECT_EQ(result_ids[0], static_cast<lanelet::Id>(prev_lanelet_left));
     }
   }
   {
-    const auto result_ids = hdmap_utils.getPreviousLaneletIds(curr_lanelet, "straight");
+    const auto result_ids =
+      traffic_simulator::lanelet_wrapper::lanelet_map::previousLaneletIds(curr_lanelet, "straight");
     EXPECT_EQ(result_ids.size(), static_cast<std::size_t>(1));
     if (result_ids.size() == 1) {
       EXPECT_EQ(result_ids[0], static_cast<lanelet::Id>(prev_lanelet_straight));
@@ -994,9 +999,9 @@ TEST_F(HdMapUtilsTest_StandardMap, getPreviousLaneletIds_direction)
  * Test next lanelets id obtaining correctness
  * with a lanelet that has a lanelet following it.
  */
-TEST_F(HdMapUtilsTest_StandardMap, getNextLaneletIds)
+TEST_F(HdMapUtilsTest_StandardMap, nextLaneletIds)
 {
-  const auto result_ids = hdmap_utils.getNextLaneletIds(120660);
+  const auto result_ids = traffic_simulator::lanelet_wrapper::lanelet_map::nextLaneletIds(120660);
   EXPECT_EQ(result_ids.size(), static_cast<std::size_t>(1));
   if (result_ids.size() == 1) {
     EXPECT_EQ(result_ids[0], static_cast<lanelet::Id>(34468));
@@ -1008,9 +1013,9 @@ TEST_F(HdMapUtilsTest_StandardMap, getNextLaneletIds)
  * Test next lanelets id obtaining correctness
  * with a lanelet that has a lanelet following it and is a shoulder lane.
  */
-TEST_F(HdMapUtilsTest_WithRoadShoulderMap, getNextLaneletIds_RoadShoulder)
+TEST_F(HdMapUtilsTest_WithRoadShoulderMap, nextLaneletIds_RoadShoulder)
 {
-  const auto result_ids = hdmap_utils.getNextLaneletIds(34696);
+  const auto result_ids = traffic_simulator::lanelet_wrapper::lanelet_map::nextLaneletIds(34696);
   EXPECT_EQ(result_ids.size(), static_cast<std::size_t>(1));
   if (result_ids.size() == 1) {
     EXPECT_EQ(result_ids[0], static_cast<lanelet::Id>(34768));
@@ -1022,10 +1027,10 @@ TEST_F(HdMapUtilsTest_WithRoadShoulderMap, getNextLaneletIds_RoadShoulder)
  * Test next lanelets id obtaining correctness
  * with a lanelet that has several lanelets following it.
  */
-TEST_F(HdMapUtilsTest_StandardMap, getNextLaneletIds_multipleNext)
+TEST_F(HdMapUtilsTest_StandardMap, nextLaneletIds_multipleNext)
 {
   lanelet::Ids next_lanelets = {34438, 34465};
-  auto result_ids = hdmap_utils.getNextLaneletIds(34468);
+  auto result_ids = traffic_simulator::lanelet_wrapper::lanelet_map::nextLaneletIds(34468);
 
   std::sort(next_lanelets.begin(), next_lanelets.end());
   std::sort(result_ids.begin(), result_ids.end());
@@ -1040,19 +1045,21 @@ TEST_F(HdMapUtilsTest_StandardMap, getNextLaneletIds_multipleNext)
  * - the goal is to test the function specialization that takes a direction as an argument
  * and returns only the next lanelets that have this turn direction.
  */
-TEST_F(HdMapUtilsTest_StandardMap, getNextLaneletIds_direction)
+TEST_F(HdMapUtilsTest_StandardMap, nextLaneletIds_direction)
 {
   const lanelet::Id curr_lanelet = 34468;
 
   {
-    const auto result_ids = hdmap_utils.getNextLaneletIds(curr_lanelet, "left");
+    const auto result_ids =
+      traffic_simulator::lanelet_wrapper::lanelet_map::nextLaneletIds(curr_lanelet, "left");
     EXPECT_EQ(result_ids.size(), static_cast<std::size_t>(1));
     if (result_ids.size() == 1) {
       EXPECT_EQ(result_ids[0], static_cast<lanelet::Id>(34438));
     }
   }
   {
-    const auto result_ids = hdmap_utils.getNextLaneletIds(curr_lanelet, "straight");
+    const auto result_ids =
+      traffic_simulator::lanelet_wrapper::lanelet_map::nextLaneletIds(curr_lanelet, "straight");
     EXPECT_EQ(result_ids.size(), static_cast<std::size_t>(1));
     if (result_ids.size() == 1) {
       EXPECT_EQ(result_ids[0], static_cast<lanelet::Id>(34465));
