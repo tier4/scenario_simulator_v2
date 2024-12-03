@@ -44,10 +44,10 @@ TrafficSink::TrafficSink(
   const lanelet::Id lanelet_id, const double radius, const geometry_msgs::msg::Point & position,
   const std::set<std::uint8_t> & sinkable_entity_type)
 : TrafficModuleBase(),
-  entity_manager_ptr(entity_manager_ptr),
   lanelet_id(lanelet_id),
   radius(radius),
   position(position),
+  entity_manager_ptr(entity_manager_ptr),
   sinkable_entity_type(sinkable_entity_type)
 {
 }
