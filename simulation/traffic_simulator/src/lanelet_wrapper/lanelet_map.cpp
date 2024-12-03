@@ -315,7 +315,7 @@ auto conflictingCrosswalkIds(const lanelet::Ids & lanelet_ids) -> lanelet::Ids
   /// @note it is not clear if the distinction for crosswalks only is implemented here
   lanelet::Ids conflicting_crosswalk_ids;
   lanelet::routing::RoutingGraphContainer graphs_container(
-    {LaneletWrapper::routingGraph(RoutingGraphType::VEHICLE),
+    {LaneletWrapper::routingGraph(RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER),
      LaneletWrapper::routingGraph(RoutingGraphType::PEDESTRIAN)});
   for (const auto & lanelet_id : lanelet_ids) {
     const auto & conflicting_crosswalks = graphs_container.conflictingInGraph(

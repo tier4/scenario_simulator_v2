@@ -19,6 +19,7 @@
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <traffic_simulator/traffic_lights/traffic_lights.hpp>
+#include <traffic_simulator/utils/lanelet_map.hpp>
 
 constexpr char architecture_old[] = "awf/universe/20230906";
 constexpr char architecture_new[] = "awf/universe/20240605";
@@ -30,9 +31,9 @@ public:
   explicit TrafficLightsInternalTestArchitectureDependent()
   : lights([this] {
       if constexpr (std::is_same_v<TrafficLightsT, traffic_simulator::ConventionalTrafficLights>) {
-        return std::make_unique<TrafficLightsT>(node_ptr, hdmap_utils_ptr);
+        return std::make_unique<TrafficLightsT>(node_ptr);
       } else if constexpr (std::is_same_v<TrafficLightsT, traffic_simulator::V2ITrafficLights>) {
-        return std::make_unique<TrafficLightsT>(node_ptr, hdmap_utils_ptr, Architecture);
+        return std::make_unique<TrafficLightsT>(node_ptr, Architecture);
       }
     }())
   {
@@ -40,6 +41,10 @@ public:
       std::is_same_v<TrafficLightsT, traffic_simulator::ConventionalTrafficLights> or
         std::is_same_v<TrafficLightsT, traffic_simulator::V2ITrafficLights>,
       "Given TrafficLights type is not supported");
+
+    const auto lanelet_path = ament_index_cpp::get_package_share_directory("traffic_simulator") +
+                              "/map/standard_map/lanelet2_map.osm";
+    traffic_simulator::lanelet_map::activate(lanelet_path);
   }
 
   const lanelet::Id id{34836};
@@ -47,16 +52,6 @@ public:
   const lanelet::Id signal_id{34806};
 
   const rclcpp::Node::SharedPtr node_ptr = rclcpp::Node::make_shared("TrafficLightsInternalTest");
-
-  const std::string path = ament_index_cpp::get_package_share_directory("traffic_simulator") +
-                           "/map/standard_map/lanelet2_map.osm";
-
-  const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr =
-    std::make_shared<hdmap_utils::HdMapUtils>(
-      path, geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
-              .latitude(35.61836750154)
-              .longitude(139.78066608243)
-              .altitude(0.0));
 
   std::unique_ptr<TrafficLightsT> lights;
 };

@@ -28,8 +28,8 @@ namespace route
 auto isInRoute(const lanelet::Id lanelet_id, const lanelet::Ids & route_lanelets_ids) -> bool;
 
 auto speedLimit(
-  const lanelet::Ids & lanelet_ids, const RoutingGraphType type = RoutingGraphType::VEHICLE)
-  -> double;
+  const lanelet::Ids & lanelet_ids,
+  const RoutingGraphType type = RoutingConfiguration().routing_graph_type) -> double;
 
 auto route(
   const lanelet::Id from_lanelet_id, const lanelet::Id to_lanelet_id,
@@ -38,15 +38,15 @@ auto route(
 auto followingLanelets(
   const lanelet::Id lanelet_id, const lanelet::Ids & candidate_lanelet_ids,
   const double distance = 100, const bool include_self = true,
-  const RoutingGraphType type = RoutingGraphType::VEHICLE) -> lanelet::Ids;
+  const RoutingGraphType type = RoutingConfiguration().routing_graph_type) -> lanelet::Ids;
 
 auto followingLanelets(
   const lanelet::Id lanelet_id, const double distance = 100, const bool include_self = true,
-  const RoutingGraphType type = RoutingGraphType::VEHICLE) -> lanelet::Ids;
+  const RoutingGraphType type = RoutingConfiguration().routing_graph_type) -> lanelet::Ids;
 
 auto previousLanelets(
   const lanelet::Id current_lanelet_id, const double backward_horizon = 100,
-  const RoutingGraphType type = RoutingGraphType::VEHICLE) -> lanelet::Ids;
+  const RoutingGraphType type = RoutingConfiguration().routing_graph_type) -> lanelet::Ids;
 }  // namespace route
 }  // namespace lanelet_wrapper
 }  // namespace traffic_simulator

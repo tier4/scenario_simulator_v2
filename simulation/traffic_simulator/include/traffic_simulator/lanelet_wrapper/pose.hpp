@@ -59,12 +59,14 @@ auto toLaneletPose(
 
 auto toLaneletPose(
   const Pose & map_pose, const BoundingBox & bounding_box, const bool include_crosswalk,
-  const double matching_distance, const RoutingGraphType type = RoutingGraphType::VEHICLE)
+  const double matching_distance,
+  const RoutingGraphType type = RoutingConfiguration().routing_graph_type)
   -> std::optional<LaneletPose>;
 
 auto toLaneletPoses(
   const Pose & map_pose, const lanelet::Id lanelet_id, const double matching_distance,
-  const bool include_opposite_direction, const RoutingGraphType type = RoutingGraphType::VEHICLE)
+  const bool include_opposite_direction,
+  const RoutingGraphType type = RoutingConfiguration().routing_graph_type)
   -> std::vector<LaneletPose>;
 
 auto alternativeLaneletPoses(const LaneletPose & lanelet_pose) -> std::vector<LaneletPose>;
@@ -75,7 +77,7 @@ auto alongLaneletPose(
 
 auto alongLaneletPose(
   const LaneletPose & from_pose, const double distance,
-  const RoutingGraphType type = RoutingGraphType::VEHICLE) -> LaneletPose;
+  const RoutingGraphType type = RoutingConfiguration().routing_graph_type) -> LaneletPose;
 
 auto canonicalizeLaneletPose(const LaneletPose & lanelet_pose)
   -> std::tuple<std::optional<LaneletPose>, std::optional<lanelet::Id>>;
@@ -88,7 +90,8 @@ auto matchToLane(
   const Pose & map_pose, const BoundingBox & bounding_box, const bool include_crosswalk,
   const double matching_distance,
   const double reduction_ratio = DEFAULT_MATCH_TO_LANE_REDUCTION_RATIO,
-  const RoutingGraphType type = RoutingGraphType::VEHICLE) -> std::optional<lanelet::Id>;
+  const RoutingGraphType type = RoutingConfiguration().routing_graph_type)
+  -> std::optional<lanelet::Id>;
 
 auto leftLaneletIds(
   const lanelet::Id lanelet_id, const RoutingGraphType type, const bool include_opposite_direction)
