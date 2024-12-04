@@ -44,6 +44,7 @@ protected:
         .longitude(139.78066608243)
         .altitude(0.0))
   {
+    activateLaneletWrapper("standard_map");
   }
 
   hdmap_utils::HdMapUtils hdmap_utils;
@@ -60,6 +61,7 @@ protected:
         .longitude(139.78066608243)
         .altitude(0.0))
   {
+    activateLaneletWrapper("with_road_shoulder");
   }
 
   hdmap_utils::HdMapUtils hdmap_utils;
@@ -76,6 +78,7 @@ protected:
         .longitude(0.0)
         .altitude(0.0))
   {
+    activateLaneletWrapper("empty");
   }
 
   hdmap_utils::HdMapUtils hdmap_utils;
@@ -92,6 +95,7 @@ protected:
         .longitude(138.8024583466017)
         .altitude(0.0))
   {
+    activateLaneletWrapper("four_track_highway");
   }
 
   hdmap_utils::HdMapUtils hdmap_utils;
@@ -108,6 +112,7 @@ protected:
         .longitude(139.9009591876285)
         .altitude(0.0))
   {
+    activateLaneletWrapper("crossroads_with_stoplines");
   }
 
   hdmap_utils::HdMapUtils hdmap_utils;
@@ -123,6 +128,9 @@ protected:
         .longitude(0.0)
         .altitude(0.0))
   {
+    const auto lanelet_path =
+      ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map/lanelet2_map.osm";
+    traffic_simulator::lanelet_map::activate(lanelet_path);
   }
 
   hdmap_utils::HdMapUtils hdmap_utils;
@@ -139,6 +147,7 @@ protected:
         .longitude(139.74821144562)
         .altitude(0.0))
   {
+    activateLaneletWrapper("intersection");
   }
 
   hdmap_utils::HdMapUtils hdmap_utils;
