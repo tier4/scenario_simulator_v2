@@ -23,14 +23,23 @@
 #include "../expect_eq_macros.hpp"
 #include "helper.hpp"
 
-constexpr double timing_eps = 1e-3;
+// Frequency can fluctuate a bit due to timing, especially when the machine is under heavy load, so higher tolerance is needed
 constexpr double frequency_eps = 0.5;
+
+using namespace std::chrono_literals;
 
 class TrafficLightsTest : public testing::Test
 {
 public:
-  const lanelet::Id id = 34836;
-  const lanelet::Id signal_id = 34806;
+  TrafficLightsTest() = default;
+
+  const lanelet::Id id{34836};
+
+  const lanelet::Id signal_id{34806};
+
+  const std::string red_state{stateFromColor("red")};
+
+  const std::string yellow_state{"yellow flashing circle"};
 
   const rclcpp::Node::SharedPtr node_ptr = rclcpp::Node::make_shared("TrafficLightsTest");
 
@@ -43,9 +52,6 @@ public:
               .latitude(35.61836750154)
               .longitude(139.78066608243)
               .altitude(0.0));
-
-  const std::string red_state = stateFromColor("red");
-  const std::string yellow_state = "yellow flashing circle";
 
   std::unique_ptr<traffic_simulator::TrafficLights> lights =
     std::make_unique<traffic_simulator::TrafficLights>(node_ptr, hdmap_utils_ptr, "awf/universe");
@@ -60,19 +66,15 @@ TEST_F(TrafficLightsTest, getConventionalTrafficLights)
 {
   {
     this->lights->getConventionalTrafficLights()->setTrafficLightsState(this->id, this->red_state);
-
     const auto actual_state =
       this->lights->getConventionalTrafficLights()->getTrafficLightsComposedState(this->id);
-
     EXPECT_EQ(actual_state, this->red_state);
   }
   {
     this->lights->getConventionalTrafficLights()->setTrafficLightsState(
       this->id, this->yellow_state);
-
     const auto actual_state =
       this->lights->getConventionalTrafficLights()->getTrafficLightsComposedState(this->id);
-
     EXPECT_EQ(actual_state, this->yellow_state);
   }
 }
@@ -81,18 +83,14 @@ TEST_F(TrafficLightsTest, getV2ITrafficLights)
 {
   {
     this->lights->getV2ITrafficLights()->setTrafficLightsState(this->id, this->red_state);
-
     const auto actual_state =
       this->lights->getV2ITrafficLights()->getTrafficLightsComposedState(this->id);
-
     EXPECT_EQ(actual_state, this->red_state);
   }
   {
     this->lights->getV2ITrafficLights()->setTrafficLightsState(this->id, this->yellow_state);
-
     const auto actual_state =
       this->lights->getV2ITrafficLights()->getTrafficLightsComposedState(this->id);
-
     EXPECT_EQ(actual_state, this->yellow_state);
   }
 }
@@ -103,43 +101,37 @@ TEST_F(TrafficLightsTest, startTrafficLightsUpdate)
   this->lights->getV2ITrafficLights()->setTrafficLightsState(this->id, this->red_state);
 
   std::vector<visualization_msgs::msg::MarkerArray> markers;
-
-  rclcpp::Subscription<visualization_msgs::msg::MarkerArray>::SharedPtr subscriber =
+  const auto subscriber =
     this->node_ptr->template create_subscription<visualization_msgs::msg::MarkerArray>(
       "traffic_light/marker", 10,
       [&markers](const visualization_msgs::msg::MarkerArray::SharedPtr msg_in) {
         markers.push_back(*msg_in);
       });
 
+  // start update the Conventional with 20Hz frequency
+  // as well as V2I with 10Hz frequency and subscribe for 1 second
   this->lights->startTrafficLightsUpdate(20.0, 10.0);
-
-  // start time is required to be measured here and not from first message, because there are two publishers publishing to this topic at the same time
-  const auto start_time = node_ptr->now();
-
-  // spin for 1 second
-  const auto end = std::chrono::system_clock::now() + std::chrono::milliseconds(1020);
+  const auto end = std::chrono::system_clock::now() + 1s;
   while (std::chrono::system_clock::now() < end) {
     rclcpp::spin_some(this->node_ptr);
   }
 
+  // verify contents of messages
   std::vector<std_msgs::msg::Header> headers;
-
-  // verify
   for (std::size_t i = 0; i < markers.size(); ++i) {
     const auto & one_marker = markers[i].markers;
     EXPECT_EQ(one_marker.size(), static_cast<std::size_t>(1));
-
     if (
       one_marker.front().header.stamp.sec != 0 and one_marker.front().header.stamp.nanosec != 0u) {
       headers.push_back(one_marker.front().header);
     }
   }
 
-  // verify message timing
+  // verify 30Hz frequency (conventional and v2i publish markers on the same topic)
   const double expected_frequency = 30.0;
   const double actual_frequency =
-    static_cast<double>(headers.size()) /
-    static_cast<double>(getTime(headers.back()) - getTime(start_time)) * 1e+9;
+    static_cast<double>(headers.size() - 1) /
+    static_cast<double>(getTime(headers.back()) - getTime(headers.front())) * 1e+9;
   EXPECT_NEAR(actual_frequency, expected_frequency, frequency_eps);
 }
 

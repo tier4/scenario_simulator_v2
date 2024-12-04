@@ -20,6 +20,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
+#include <traffic_simulator/data_type/routing_configuration.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator/utils/pose.hpp>
@@ -784,8 +785,12 @@ auto EntityBase::requestSynchronize(
           "If so please contact the developer since there might be an undiscovered bug.");
       }
 
+      RoutingConfiguration lane_changeable_routing_configuration;
+      lane_changeable_routing_configuration.allow_lane_change = true;
+
       const auto entity_distance = longitudinalDistance(
-        entity_lanelet_pose.value(), entity_target, true, true, true, hdmap_utils_ptr_);
+        entity_lanelet_pose.value(), entity_target, true, true,
+        lane_changeable_routing_configuration, hdmap_utils_ptr_);
       if (!entity_distance.has_value()) {
         THROW_SEMANTIC_ERROR(
           "Failed to get distance between entity and target lanelet pose. Check if the entity has "
@@ -800,7 +805,7 @@ auto EntityBase::requestSynchronize(
 
       const auto target_entity_distance = longitudinalDistance(
         CanonicalizedLaneletPose(target_entity_lanelet_pose, hdmap_utils_ptr_), target_sync_pose,
-        true, true, true, hdmap_utils_ptr_);
+        true, true, lane_changeable_routing_configuration, hdmap_utils_ptr_);
       if (!target_entity_distance.has_value() || target_entity_distance.value() < 0.0) {
         RCLCPP_WARN_ONCE(
           rclcpp::get_logger("traffic_simulator"),

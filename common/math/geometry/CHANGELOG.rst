@@ -21,6 +21,203 @@ Changelog for package geometry
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+6.2.2 (2024-12-04)
+------------------
+* Merge branch 'master' into refactor/distance-condition
+* Merge remote-tracking branch 'origin/master' into refactor/distance-condition
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+6.2.1 (2024-12-03)
+------------------
+* Merge branch 'master' into refactor/distance-condition-and-relative-distance-condition
+* Contributors: Tatsuya Yamasaki
+
+6.2.0 (2024-12-02)
+------------------
+* Merge branch 'master' into feature/relative-speed-condition
+* Merge remote-tracking branch 'origin/master' into feature/relative-speed-condition
+* Merge remote-tracking branch 'origin/master' into feature/relative-speed-condition
+* Merge remote-tracking branch 'origin/master' into feature/relative-speed-condition
+* Merge remote-tracking branch 'origin/master' into feature/relative-speed-condition
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+6.1.3 (2024-11-29)
+------------------
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge remote-tracking branch 'tier4/RJD-1057-traffic-lights-tests' into RJD-1057-traffic-lights-tests
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge remote-tracking branch 'tier4/master' into RJD-1057-traffic-lights-tests
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge remote-tracking branch 'tier4/RJD-1057-remove-traffic-lights-from-entity-manager' into RJD-1057-traffic-lights-tests
+* Merge branch 'RJD-1057-remove-traffic-lights-from-entity-manager' into RJD-1057-traffic-lights-tests
+* Merge branch 'RJD-1057-remove-traffic-lights-from-entity-manager' into RJD-1057-traffic-lights-tests
+* Merge branch 'RJD-1057-remove-traffic-lights-from-entity-manager' into RJD-1057-traffic-lights-tests
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Mateusz Palczuk, Tatsuya Yamasaki
+
+6.1.2 (2024-11-29)
+------------------
+* Merge branch 'master' into refactor/interpreter
+* Contributors: Tatsuya Yamasaki
+
+6.1.1 (2024-11-29)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/sonarcloud_warning
+* Merge branch 'master' into fix/sonarcloud_warning
+* Merge branch 'master' into fix/sonarcloud_warning
+* Contributors: Masaya Kataoka
+
+6.1.0 (2024-11-29)
+------------------
+
+6.0.1 (2024-11-27)
+------------------
+
+6.0.0 (2024-11-27)
+------------------
+* Merge branch 'master' into refactor/add_routing_graph_argument
+* Merge branch 'master' into refactor/add_routing_graph_argument
+* Contributors: Kotaro Yoshimoto
+
+5.5.0 (2024-11-27)
+------------------
+
+5.4.0 (2024-11-26)
+------------------
+* Merge branch 'master' into feature/shoulder_routing_graph
+* Contributors: Kotaro Yoshimoto
+
+5.3.4 (2024-11-21)
+------------------
+* Merge branch 'master' into fix/find_nearest_segment_index
+* Contributors: Kotaro Yoshimoto
+
+5.3.3 (2024-11-21)
+------------------
+* Merge pull request `#1451 <https://github.com/tier4/scenario_simulator_v2/issues/1451>`_ from tier4/fix/sonor-cloud-issue-7
+  Fix/sonor cloud issue 7
+* Merge branch 'master' into fix/sonor-cloud-issue-7
+* Remove this redundant cast.
+* Directly pass the arguments for object creation to this function.
+* Added const and & to function parameters
+* Contributors: Masaya Kataoka, Taiga Takano
+
+5.3.2 (2024-11-18)
+------------------
+* Merge branch 'master' into fix/interpreter/assign-route-action
+* Merge branch 'master' into fix/interpreter/assign-route-action
+* Contributors: Tatsuya Yamasaki
+
+5.3.1 (2024-11-18)
+------------------
+* Merge branch 'master' into refactor/routing_graph
+* Merge branch 'master' into refactor/routing_graph
+* Contributors: Kotaro Yoshimoto
+
+5.3.0 (2024-11-18)
+------------------
+* Merge branch 'master' into feature/manual_on_follow_trajectory_with_new_state
+* Merge branch 'master' into feature/manual_on_follow_trajectory_with_new_state
+* Merge branch 'master' into feature/manual_on_follow_trajectory_with_new_state
+* Merge branch 'master' into feature/manual_on_follow_trajectory_with_new_state
+* Merge remote-tracking branch 'origin/master' into feature/manual_on_follow_trajectory_with_new_state
+* Merge remote-tracking branch 'origin/master' into feature/manual_on_follow_trajectory_with_new_state
+* Merge branch 'master' into feature/manual_on_follow_trajectory
+* Merge remote-tracking branch 'origin/master' into feature/manual_on_follow_trajectory
+* Merge branch 'master' into feature/manual_on_follow_trajectory
+* Merge branch 'master' into feature/manual_on_follow_trajectory
+* Merge branch 'master' into feature/manual_on_follow_trajectory
+* Merge branch 'master' into feature/manual_on_follow_trajectory
+* Merge remote-tracking branch 'origin/feature/manual_on_follow_trajectory' into feature/manual_on_follow_trajectory
+* Merge branch 'master' into feature/manual_on_follow_trajectory
+* Merge branch 'master' into feature/manual_on_follow_trajectory
+* Merge branch 'master' into feature/manual_on_follow_trajectory
+* Merge branch 'master' into feature/manual_on_follow_trajectory
+* Merge remote-tracking branch 'origin/master' into feature/manual_on_follow_trajectory
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
+5.2.3 (2024-11-18)
+------------------
+
+5.2.2 (2024-11-15)
+------------------
+* Merge pull request `#1445 <https://github.com/tier4/scenario_simulator_v2/issues/1445>`_ from tier4/fix/sonor-cloud-issue-6
+  Renamed lambda parameters to avoid variable shadowing.
+* Merge branch 'master' into fix/sonor-cloud-issue-6
+* fix sonor cloud issue
+* fix format
+* Renamed lambda parameters to avoid variable shadowing.
+* Contributors: Masaya Kataoka, Taiga, Taiga Takano
+
+5.2.1 (2024-11-14)
+------------------
+* Merge branch 'master' into RJD-1333/previous_following_lanelets
+* Merge branch 'master' into RJD-1333/previous_following_lanelets
+* Merge branch 'master' into RJD-1333/previous_following_lanelets
+* Contributors: Grzegorz Maj
+
+5.2.0 (2024-11-14)
+------------------
+* Merge branch 'master' into feature/by_object_type
+* Merge branch 'master' into feature/by_object_type
+* Merge branch 'master' into feature/by_object_type
+* Merge branch 'master' into feature/by_object_type
+* Contributors: Tatsuya Yamasaki
+
+5.1.1 (2024-11-13)
+------------------
+* Merge pull request `#1439 <https://github.com/tier4/scenario_simulator_v2/issues/1439>`_ from tier4/fix/sonor-cloud-issue-5
+  fix sonor cloud issue
+* Refactor: Replace 'virtual' with 'override' in destructor for clarity
+* Merge branch 'master' into fix/sonor-cloud-issue-5
+* fix sonor cloud issue
+* Merge branch 'master' into fix/sonor-cloud-issue-5
+* Merge branch 'master' into fix/sonor-cloud-issue-5
+* fix sonor cloud issue
+* Contributors: Masaya Kataoka, Taiga, Taiga Takano
+
+5.1.0 (2024-11-12)
+------------------
+* Merge branch 'master' into feature/traffic_light_group
+* Merge remote-tracking branch 'origin/master' into feature/traffic_light_group
+  # Conflicts:
+  #	simulation/simple_sensor_simulator/include/simple_sensor_simulator/sensor_simulation/sensor_simulation.hpp
+  #	simulation/traffic_simulator/include/traffic_simulator/entity/entity_manager.hpp
+  #	simulation/traffic_simulator/src/traffic_lights/traffic_light_publisher.cpp
+* Merge branch 'master' into feature/traffic_light_group
+* Merge branch 'master' into feature/traffic_light_group
+* Merge branch 'master' into feature/traffic_light_group
+* Merge branch 'master' into feature/traffic_light_group
+* Merge branch 'master' into feature/traffic_light_group
+* Merge branch 'master' into feature/traffic_light_group
+* Contributors: Kotaro Yoshimoto
+
+5.0.2 (2024-11-11)
+------------------
+* Merge pull request `#1431 <https://github.com/tier4/scenario_simulator_v2/issues/1431>`_ from tier4/fix/sonor-cloud-issue
+  fix/sonor-cloud-issue
+* Merge branch 'master' into fix/sonor-cloud-issue
+* Merge branch 'master' into fix/sonor-cloud-issue
+* adding const to objects.
+* Defined individually in each statement.
+* adding const to large objects.
+* Fix declaration mismatch.
+* Remove unnecessary const from the return value of the function.
+* Contributors: Masaya Kataoka, Taiga, Taiga Takano
+
+5.0.1 (2024-11-11)
+------------------
+* Merge pull request `#1428 <https://github.com/tier4/scenario_simulator_v2/issues/1428>`_ from tier4/fix/dont-float-loop
+  Refactor curvature sampling loop to avoid using float counter
+* add comment
+* Refactor curvature sampling loop to avoid using float counter
+* Contributors: Masaya Kataoka, Taiga Takano
+
 5.0.0 (2024-11-08)
 ------------------
 * Merge remote-tracking branch 'tier4/master' into RJD-1057-remove-traffic-lights-from-entity-manager

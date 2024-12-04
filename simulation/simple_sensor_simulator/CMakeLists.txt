@@ -44,7 +44,6 @@ ament_auto_add_library(simple_sensor_simulator_component SHARED
   src/sensor_simulation/primitives/primitive.cpp
   src/sensor_simulation/primitives/primitive.cpp
   src/sensor_simulation/sensor_simulation.cpp
-  src/sensor_simulation/traffic_lights/traffic_lights_publisher.cpp
   src/simple_sensor_simulator.cpp
   src/vehicle_simulation/ego_entity_simulation.cpp
   src/vehicle_simulation/vehicle_model/sim_model_delay_steer_acc.cpp
@@ -57,6 +56,7 @@ ament_auto_add_library(simple_sensor_simulator_component SHARED
   src/vehicle_simulation/vehicle_model/sim_model_interface.cpp
 )
 target_link_libraries(simple_sensor_simulator_component
+  glog
   pthread
   sodium
   zmq
