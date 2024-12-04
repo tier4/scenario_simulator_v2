@@ -106,8 +106,8 @@ public:
 
   /*   */ auto isStopped() const -> bool;
 
-  /*   */ auto isInPosition(
-    const geometry_msgs::msg::Pose & target_pose, const double tolerance) const -> bool;
+  /*   */ auto isInPosition(const geometry_msgs::msg::Pose & pose, const double tolerance) const
+    -> bool;
 
   /*   */ auto isInPosition(
     const CanonicalizedLaneletPose & lanelet_pose, const double tolerance) const -> bool;

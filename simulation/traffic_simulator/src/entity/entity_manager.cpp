@@ -126,7 +126,7 @@ bool EntityManager::despawnEntity(const std::string & name)
   return isEntitySpawned(name) && entities_.erase(name);
 }
 
-bool EntityManager::isEntitySpawned(const std::string & name)
+auto EntityManager::isEntitySpawned(const std::string & name) const -> bool
 {
   return entities_.find(name) != std::end(entities_);
 }

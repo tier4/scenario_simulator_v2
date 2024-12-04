@@ -168,7 +168,7 @@ public:
 
   bool despawnEntity(const std::string & name);
 
-  bool isEntitySpawned(const std::string & name);
+  auto isEntitySpawned(const std::string & name) const -> bool;
 
   auto getEntityNames() const -> const std::vector<std::string>;
 

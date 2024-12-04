@@ -95,10 +95,10 @@ auto EntityBase::getCanonicalizedLaneletPose(const double matching_distance) con
     matching_distance, hdmap_utils_ptr_);
 }
 
-auto EntityBase::isInPosition(
-  const geometry_msgs::msg::Pose & target_pose, const double tolerance) const -> bool
+auto EntityBase::isInPosition(const geometry_msgs::msg::Pose & pose, const double tolerance) const
+  -> bool
 {
-  return math::geometry::getDistance(getMapPose(), target_pose) < tolerance;
+  return math::geometry::getDistance(getMapPose(), pose) < tolerance;
 }
 
 auto EntityBase::isInPosition(
@@ -641,7 +641,8 @@ auto EntityBase::setStatus(
     setStatus(canonicalized_lanelet_pose.value(), action_status);
   } else {
     std::stringstream ss;
-    ss << "Status can not be set. lanelet pose: " << lanelet_pose << " is not canonicalizable for ";
+    ss << "Status can not be set. lanelet pose: " << lanelet_pose
+       << " is cannot be canonicalized for ";
     THROW_SEMANTIC_ERROR(ss.str(), " entity named: ", std::quoted(name), ".");
   }
 }
