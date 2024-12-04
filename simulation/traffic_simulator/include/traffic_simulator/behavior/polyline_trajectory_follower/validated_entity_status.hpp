@@ -15,6 +15,7 @@
 #ifndef TRAFFIC_SIMULATOR__BEHAVIOR__POLYLINE_TRAJECTORY_FOLLOWER__VALIDATED_ENTITY_STATUS_HPP_
 #define TRAFFIC_SIMULATOR__BEHAVIOR__POLYLINE_TRAJECTORY_FOLLOWER__VALIDATED_ENTITY_STATUS_HPP_
 
+#include <geometry/vector3/is_like_vector3.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
 #include <traffic_simulator_msgs/msg/polyline_trajectory.hpp>
@@ -41,6 +42,7 @@ public:
   const double linear_speed;
   const double linear_acceleration;
   const bool lanelet_pose_valid;
+  const geometry_msgs::msg::Vector3 current_velocity;
   const traffic_simulator_msgs::msg::BoundingBox & bounding_box;
   const traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter;
   const traffic_simulator_msgs::msg::EntityStatus entity_status;
@@ -54,7 +56,31 @@ private:
 
   auto buildUpdatedPoseOrientation(const geometry_msgs::msg::Vector3 & desired_velocity) const
     noexcept(true) -> geometry_msgs::msg::Quaternion;
+
+  auto buildValidatedCurrentVelocity(const double speed) const -> geometry_msgs::msg::Vector3;
+
+  template <
+    typename T, std::enable_if_t<math::geometry::IsLikeVector3<T>::value, std::nullptr_t> = nullptr>
+  auto throwDetailedError(const std::string & variable_name, const T variable) const noexcept(false)
+    -> void
+  {
+    THROW_SIMULATION_ERROR(
+      "Error in ValidatedEntityStatus. Entity name: ", std::quoted(entity_status.name),
+      ", Variable: ", std::quoted(variable_name), ", variable contains NaN or inf value, ",
+      "Values: [", variable.x, ", ", variable.y, ", ", variable.z, "].");
+  }
+
+  template <typename T, std::enable_if_t<std::is_arithmetic_v<T>, std::nullptr_t> = nullptr>
+  auto throwDetailedError(const std::string & variable_name, const T variable) const noexcept(false)
+    -> void
+  {
+    THROW_SIMULATION_ERROR(
+      "Error in ValidatedEntityStatus. Entity name: ", std::quoted(entity_status.name),
+      ", Variable: ", std::quoted(variable_name), ", variable contains NaN or inf value, ",
+      "Value: ", variable);
+  }
 };
+
 }  // namespace follow_trajectory
 }  // namespace traffic_simulator
 

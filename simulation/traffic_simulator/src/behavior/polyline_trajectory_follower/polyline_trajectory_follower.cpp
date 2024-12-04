@@ -40,6 +40,7 @@ auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
   const double matching_distance, const std::optional<double> target_speed, const double step_time)
   -> std::optional<EntityStatus>
 {
+  assert(step_time > 0.0);
   while (not polyline_trajectory.shape.vertices.empty()) {
     const auto updated_entity_opt =
       PolylineTrajectoryPositioner(

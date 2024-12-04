@@ -49,7 +49,6 @@ private:
   const traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter;
   const double step_time;
 
-  auto calculateCurrentVelocity(const double speed) const -> geometry_msgs::msg::Vector3;
   auto calculateDistanceAndRemainingTime(
     const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
     const double matching_distance, const double distance_to_front_waypoint,

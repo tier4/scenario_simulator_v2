@@ -41,6 +41,7 @@ ValidatedEntityStatus::ValidatedEntityStatus(
   linear_speed(validatedLinearSpeed()),
   linear_acceleration(validatedLinearAcceleration(step_time)),
   lanelet_pose_valid(entity_status.lanelet_pose_valid),
+  current_velocity(buildValidatedCurrentVelocity(linear_speed)),
   bounding_box(entity_status.bounding_box),
   behavior_parameter(behavior_parameter),
   entity_status(entity_status)
@@ -74,11 +75,8 @@ auto ValidatedEntityStatus::buildUpdatedEntityStatus(
   using math::geometry::operator*;
   using math::geometry::operator/;
 
+  const auto updated_time = entity_status.time + step_time;
   const auto updated_pose_orientation = buildUpdatedPoseOrientation(desired_velocity);
-  const auto updated_pose = geometry_msgs::build<geometry_msgs::msg::Pose>()
-                              .position(entity_status.pose.position + desired_velocity * step_time)
-                              .orientation(updated_pose_orientation);
-
   const auto updated_action_status_twist_linear =
     geometry_msgs::build<geometry_msgs::msg::Vector3>()
       .x(math::geometry::norm(desired_velocity))
@@ -104,7 +102,10 @@ auto ValidatedEntityStatus::buildUpdatedEntityStatus(
       .twist(updated_action_status_twist)
       .accel(updated_action_status_accel)
       .linear_jerk(entity_status.action_status.linear_jerk);
-  const auto updated_time = entity_status.time + step_time;
+  const auto updated_pose = geometry_msgs::build<geometry_msgs::msg::Pose>()
+                              .position(entity_status.pose.position + desired_velocity * step_time)
+                              .orientation(updated_pose_orientation);
+
   constexpr bool updated_lanelet_pose_valid = false;
 
   return traffic_simulator_msgs::build<traffic_simulator_msgs::msg::EntityStatus>()
@@ -123,11 +124,7 @@ auto ValidatedEntityStatus::validatedPosition() const noexcept(false) -> geometr
 {
   const auto entity_position = entity_status.pose.position;
   if (not math::geometry::isFinite(entity_position)) {
-    THROW_SIMULATION_ERROR(
-      "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
-      "following information to the developer: Vehicle ",
-      std::quoted(entity_status.name), " coordinate value contains NaN or infinity. The value is [",
-      entity_position.x, ", ", entity_position.y, ", ", entity_position.z, "].");
+    throwDetailedError("entity_position", entity_position);
   }
   return entity_position;
 }
@@ -137,28 +134,14 @@ auto ValidatedEntityStatus::validatedLinearSpeed() const noexcept(false) -> doub
   const double entity_speed = entity_status.action_status.twist.linear.x;
 
   if (not std::isfinite(entity_speed)) {
-    THROW_SIMULATION_ERROR(
-      "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
-      "following information to the developer: Vehicle ",
-      std::quoted(entity_status.name), "'s speed value is NaN or infinity. The value is ",
-      entity_speed, ". ");
-  } else {
-    return entity_speed;
+    throwDetailedError("entity_speed", entity_speed);
   }
+  return entity_speed;
 }
 
 auto ValidatedEntityStatus::validatedLinearAcceleration(const double step_time) const
   noexcept(false) -> double
 {
-  const auto throwDetailedException = [this](const std::string & text, const double value) {
-    std::stringstream ss;
-    ss << "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
-          "following information to the developer: Entity "
-       << std::quoted(name) << "'s";
-    ss << text << " value is NaN or infinity. The value is " << value << ".";
-    THROW_SIMULATION_ERROR(ss.str());
-  };
-
   const double acceleration = entity_status.action_status.accel.linear.x;
   const double max_acceleration = std::min(
     acceleration + behavior_parameter.dynamic_constraints.max_acceleration_rate * step_time,
@@ -167,13 +150,30 @@ auto ValidatedEntityStatus::validatedLinearAcceleration(const double step_time) 
     acceleration - behavior_parameter.dynamic_constraints.max_deceleration_rate * step_time,
     -behavior_parameter.dynamic_constraints.max_deceleration);
   if (not std::isfinite(acceleration)) {
-    throwDetailedException("acceleration", acceleration);
+    throwDetailedError("acceleration", acceleration);
   } else if (not std::isfinite(max_acceleration)) {
-    throwDetailedException("maximum acceleration", max_acceleration);
+    throwDetailedError("maximum acceleration", max_acceleration);
   } else if (not std::isfinite(min_acceleration)) {
-    throwDetailedException("minimum acceleration", min_acceleration);
+    throwDetailedError("minimum acceleration", min_acceleration);
   }
   return acceleration;
+}
+
+auto ValidatedEntityStatus::buildValidatedCurrentVelocity(const double speed) const
+  -> geometry_msgs::msg::Vector3
+{
+  const auto euler_angles =
+    math::geometry::convertQuaternionToEulerAngle(entity_status.pose.orientation);
+  const double pitch = -euler_angles.y;
+  const double yaw = euler_angles.z;
+  const auto entity_velocity = geometry_msgs::build<geometry_msgs::msg::Vector3>()
+                                 .x(std::cos(pitch) * std::cos(yaw) * speed)
+                                 .y(std::cos(pitch) * std::sin(yaw) * speed)
+                                 .z(std::sin(pitch) * speed);
+  if (not math::geometry::isFinite(entity_velocity)) {
+    throwDetailedError("entity_velocity", entity_velocity);
+  }
+  return entity_velocity;
 }
 
 }  // namespace follow_trajectory

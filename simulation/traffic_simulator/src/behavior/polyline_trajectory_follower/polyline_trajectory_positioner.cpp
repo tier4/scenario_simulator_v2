@@ -43,19 +43,6 @@ PolylineTrajectoryPositioner::PolylineTrajectoryPositioner(
 {
 }
 
-auto PolylineTrajectoryPositioner::calculateCurrentVelocity(const double speed) const
-  -> geometry_msgs::msg::Vector3
-{
-  const auto euler_angles = math::geometry::convertQuaternionToEulerAngle(
-    validated_entity_status.entity_status.pose.orientation);
-  const double pitch = -euler_angles.y;
-  const double yaw = euler_angles.z;
-  return geometry_msgs::build<geometry_msgs::msg::Vector3>()
-    .x(std::cos(pitch) * std::cos(yaw) * speed)
-    .y(std::cos(pitch) * std::sin(yaw) * speed)
-    .z(std::sin(pitch) * speed);
-}
-
 auto PolylineTrajectoryPositioner::calculateDistanceAndRemainingTime(
   const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
   const double matching_distance, const double distance_to_front_waypoint,
@@ -309,11 +296,10 @@ auto PolylineTrajectoryPositioner::makeUpdatedEntityStatus(
   const auto desired_velocity = validatedEntityDesiredVelocity(
     polyline_trajectory, target_position, validated_entity_status.position, desired_speed);
 
-  const auto current_velocity = calculateCurrentVelocity(validated_entity_status.linear_speed);
-
   if (const bool target_passed =
         validated_entity_status.linear_speed * step_time > distance_to_front_waypoint and
-        math::geometry::innerProduct(desired_velocity, current_velocity) < 0.0;
+        math::geometry::innerProduct(desired_velocity, validated_entity_status.current_velocity) <
+          0.0;
       target_passed) {
     return std::nullopt;
   }
