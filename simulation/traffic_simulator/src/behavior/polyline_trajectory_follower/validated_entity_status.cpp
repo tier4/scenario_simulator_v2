@@ -35,16 +35,16 @@ namespace follow_trajectory
 ValidatedEntityStatus::ValidatedEntityStatus(
   const traffic_simulator_msgs::msg::EntityStatus & entity_status,
   const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter, const double step_time)
-: name(entity_status.name),
-  time(entity_status.time),
+: entity_status_(entity_status),
+  name(entity_status_.name),
+  time(entity_status_.time),
   position(validatedPosition()),
   linear_speed(validatedLinearSpeed()),
   linear_acceleration(validatedLinearAcceleration(step_time)),
-  lanelet_pose_valid(entity_status.lanelet_pose_valid),
+  lanelet_pose_valid(entity_status_.lanelet_pose_valid),
   current_velocity(buildValidatedCurrentVelocity(linear_speed)),
-  bounding_box(entity_status.bounding_box),
-  behavior_parameter(behavior_parameter),
-  entity_status(entity_status)
+  bounding_box(entity_status_.bounding_box),
+  behavior_parameter(behavior_parameter)
 {
 }
 
@@ -54,7 +54,7 @@ auto ValidatedEntityStatus::buildUpdatedPoseOrientation(
 {
   if (desired_velocity.y == 0.0 && desired_velocity.x == 0.0 && desired_velocity.z == 0.0) {
     // do not change orientation if there is no designed_velocity vector
-    return entity_status.pose.orientation;
+    return entity_status_.pose.orientation;
   } else {
     // if there is a designed_velocity vector, set the orientation in the direction of it
     const geometry_msgs::msg::Vector3 direction =
@@ -75,7 +75,7 @@ auto ValidatedEntityStatus::buildUpdatedEntityStatus(
   using math::geometry::operator*;
   using math::geometry::operator/;
 
-  const auto updated_time = entity_status.time + step_time;
+  const auto updated_time = entity_status_.time + step_time;
   const auto updated_pose_orientation = buildUpdatedPoseOrientation(desired_velocity);
   const auto updated_action_status_twist_linear =
     geometry_msgs::build<geometry_msgs::msg::Vector3>()
@@ -84,7 +84,7 @@ auto ValidatedEntityStatus::buildUpdatedEntityStatus(
       .z(0.0);
   const auto updated_action_status_twist_angular =
     math::geometry::convertQuaternionToEulerAngle(
-      math::geometry::getRotation(entity_status.pose.orientation, updated_pose_orientation)) /
+      math::geometry::getRotation(entity_status_.pose.orientation, updated_pose_orientation)) /
     step_time;
   const auto updated_action_status_twist = geometry_msgs::build<geometry_msgs::msg::Twist>()
                                              .linear(updated_action_status_twist_linear)
@@ -92,37 +92,38 @@ auto ValidatedEntityStatus::buildUpdatedEntityStatus(
   const auto updated_action_status_accel =
     geometry_msgs::build<geometry_msgs::msg::Accel>()
       .linear(
-        (updated_action_status_twist_linear - entity_status.action_status.twist.linear) / step_time)
+        (updated_action_status_twist_linear - entity_status_.action_status.twist.linear) /
+        step_time)
       .angular(
-        (updated_action_status_twist_angular - entity_status.action_status.twist.angular) /
+        (updated_action_status_twist_angular - entity_status_.action_status.twist.angular) /
         step_time);
   const auto updated_action_status =
     traffic_simulator_msgs::build<traffic_simulator_msgs::msg::ActionStatus>()
-      .current_action(entity_status.action_status.current_action)
+      .current_action(entity_status_.action_status.current_action)
       .twist(updated_action_status_twist)
       .accel(updated_action_status_accel)
-      .linear_jerk(entity_status.action_status.linear_jerk);
+      .linear_jerk(entity_status_.action_status.linear_jerk);
   const auto updated_pose = geometry_msgs::build<geometry_msgs::msg::Pose>()
-                              .position(entity_status.pose.position + desired_velocity * step_time)
+                              .position(entity_status_.pose.position + desired_velocity * step_time)
                               .orientation(updated_pose_orientation);
 
   constexpr bool updated_lanelet_pose_valid = false;
 
   return traffic_simulator_msgs::build<traffic_simulator_msgs::msg::EntityStatus>()
-    .type(entity_status.type)
-    .subtype(entity_status.subtype)
+    .type(entity_status_.type)
+    .subtype(entity_status_.subtype)
     .time(updated_time)
-    .name(entity_status.name)
-    .bounding_box(entity_status.bounding_box)
+    .name(entity_status_.name)
+    .bounding_box(entity_status_.bounding_box)
     .action_status(updated_action_status)
     .pose(updated_pose)
-    .lanelet_pose(entity_status.lanelet_pose)
+    .lanelet_pose(entity_status_.lanelet_pose)
     .lanelet_pose_valid(updated_lanelet_pose_valid);
 }
 
 auto ValidatedEntityStatus::validatedPosition() const noexcept(false) -> geometry_msgs::msg::Point
 {
-  const auto entity_position = entity_status.pose.position;
+  const auto entity_position = entity_status_.pose.position;
   if (not math::geometry::isFinite(entity_position)) {
     throwDetailedError("entity_position", entity_position);
   }
@@ -131,7 +132,7 @@ auto ValidatedEntityStatus::validatedPosition() const noexcept(false) -> geometr
 
 auto ValidatedEntityStatus::validatedLinearSpeed() const noexcept(false) -> double
 {
-  const double entity_speed = entity_status.action_status.twist.linear.x;
+  const double entity_speed = entity_status_.action_status.twist.linear.x;
 
   if (not std::isfinite(entity_speed)) {
     throwDetailedError("entity_speed", entity_speed);
@@ -142,7 +143,7 @@ auto ValidatedEntityStatus::validatedLinearSpeed() const noexcept(false) -> doub
 auto ValidatedEntityStatus::validatedLinearAcceleration(const double step_time) const
   noexcept(false) -> double
 {
-  const double acceleration = entity_status.action_status.accel.linear.x;
+  const double acceleration = entity_status_.action_status.accel.linear.x;
   const double max_acceleration = std::min(
     acceleration + behavior_parameter.dynamic_constraints.max_acceleration_rate * step_time,
     +behavior_parameter.dynamic_constraints.max_acceleration);
@@ -163,7 +164,7 @@ auto ValidatedEntityStatus::buildValidatedCurrentVelocity(const double speed) co
   -> geometry_msgs::msg::Vector3
 {
   const auto euler_angles =
-    math::geometry::convertQuaternionToEulerAngle(entity_status.pose.orientation);
+    math::geometry::convertQuaternionToEulerAngle(entity_status_.pose.orientation);
   const double pitch = -euler_angles.y;
   const double yaw = euler_angles.z;
   const auto entity_velocity = geometry_msgs::build<geometry_msgs::msg::Vector3>()

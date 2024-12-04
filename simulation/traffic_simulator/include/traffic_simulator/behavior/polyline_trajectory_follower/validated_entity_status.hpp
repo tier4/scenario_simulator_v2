@@ -36,7 +36,8 @@ public:
     const geometry_msgs::msg::Vector3 & desired_velocity, const double step_time) const
     -> traffic_simulator_msgs::msg::EntityStatus;
 
-  const std::string name;
+  const traffic_simulator_msgs::msg::EntityStatus entity_status_;
+  const std::string & name;
   const double time;
   const geometry_msgs::msg::Point position;
   const double linear_speed;
@@ -44,8 +45,7 @@ public:
   const bool lanelet_pose_valid;
   const geometry_msgs::msg::Vector3 current_velocity;
   const traffic_simulator_msgs::msg::BoundingBox & bounding_box;
-  const traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter;
-  const traffic_simulator_msgs::msg::EntityStatus entity_status;
+  const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter;
 
 private:
   auto validatedPosition() const noexcept(false) -> geometry_msgs::msg::Point;
@@ -65,7 +65,7 @@ private:
     -> void
   {
     THROW_SIMULATION_ERROR(
-      "Error in ValidatedEntityStatus. Entity name: ", std::quoted(entity_status.name),
+      "Error in ValidatedEntityStatus. Entity name: ", std::quoted(entity_status_.name),
       ", Variable: ", std::quoted(variable_name), ", variable contains NaN or inf value, ",
       "Values: [", variable.x, ", ", variable.y, ", ", variable.z, "].");
   }
@@ -75,7 +75,7 @@ private:
     -> void
   {
     THROW_SIMULATION_ERROR(
-      "Error in ValidatedEntityStatus. Entity name: ", std::quoted(entity_status.name),
+      "Error in ValidatedEntityStatus. Entity name: ", std::quoted(entity_status_.name),
       ", Variable: ", std::quoted(variable_name), ", variable contains NaN or inf value, ",
       "Value: ", variable);
   }
