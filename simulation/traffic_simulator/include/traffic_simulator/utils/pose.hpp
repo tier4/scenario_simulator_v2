@@ -85,7 +85,7 @@ auto boundingBoxRelativePose(
 // Relative LaneletPose
 auto relativeLaneletPose(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
-  const traffic_simulator::RoutingConfiguration & routing_configuration,
+  const RoutingConfiguration & routing_configuration,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> LaneletPose;
 
 auto boundingBoxRelativeLaneletPose(
@@ -93,7 +93,7 @@ auto boundingBoxRelativeLaneletPose(
   const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
   const CanonicalizedLaneletPose & to,
   const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box,
-  const traffic_simulator::RoutingConfiguration & routing_configuration,
+  const RoutingConfiguration & routing_configuration,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> LaneletPose;
 
 // Others
@@ -106,8 +106,6 @@ auto isInLanelet(const geometry_msgs::msg::Point & point, const lanelet::Id lane
 auto isAtEndOfLanelets(
   const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> bool;
-
-// auto isAtEndOfLanelets(const CanonicalizedLaneletPose & canonicalized_lanelet_pose) -> bool;
 
 namespace pedestrian
 {

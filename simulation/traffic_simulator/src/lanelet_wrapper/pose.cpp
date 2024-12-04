@@ -1,4 +1,4 @@
-// Copyright 2024 TIER IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -162,8 +162,7 @@ auto toLaneletPose(
 
 auto toLaneletPoses(
   const Pose & map_pose, const lanelet::Id lanelet_id, const double matching_distance,
-  const bool include_opposite_direction, const traffic_simulator::RoutingGraphType type)
-  -> std::vector<LaneletPose>
+  const bool include_opposite_direction, const RoutingGraphType type) -> std::vector<LaneletPose>
 {
   std::vector<LaneletPose> lanelet_poses;
   std::set<lanelet::Id> lanelet_ids_set{lanelet_id};
@@ -424,8 +423,8 @@ auto matchToLane(
 }
 
 auto leftLaneletIds(
-  const lanelet::Id lanelet_id, const traffic_simulator::RoutingGraphType type,
-  const bool include_opposite_direction) -> lanelet::Ids
+  const lanelet::Id lanelet_id, const RoutingGraphType type, const bool include_opposite_direction)
+  -> lanelet::Ids
 {
   if (include_opposite_direction) {
     return lanelet_map::laneletIds(LaneletWrapper::routingGraph(type)->lefts(

@@ -73,8 +73,9 @@ private:
     const std::string & map_path, const std::string & lanelet2_map_file,
     const std::string & scenario_filename, const bool verbose) -> traffic_simulator::Configuration
   {
+    constexpr bool auto_sink{true};
     auto configuration =
-      traffic_simulator::Configuration(map_path, lanelet2_map_file, scenario_filename);
+      traffic_simulator::Configuration(map_path, lanelet2_map_file, scenario_filename, true);
     configuration.verbose = verbose;
     checkConfiguration(configuration);
     return configuration;

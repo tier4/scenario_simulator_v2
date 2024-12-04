@@ -1,4 +1,4 @@
-// Copyright 2024 TIER IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -97,7 +97,6 @@ auto nearbyLaneletIds(
   }
 }
 
-// Center points
 auto centerPoints(const lanelet::Ids & lanelet_ids) -> std::vector<Point>
 {
   if (lanelet_ids.empty()) {
@@ -125,7 +124,6 @@ auto centerPointsSpline(const lanelet::Id lanelet_id) -> std::shared_ptr<Spline>
     lanelet_id, LaneletWrapper::map());
 }
 
-// Next lanelet
 auto nextLaneletIds(const lanelet::Id lanelet_id, const RoutingGraphType type) -> lanelet::Ids
 {
   lanelet::Ids next_lanelet_ids;
@@ -173,7 +171,6 @@ auto nextLaneletIds(
   return lanelet::Ids(next_lanelet_ids_set.begin(), next_lanelet_ids_set.end());
 }
 
-// Previous lanelet
 auto previousLaneletIds(const lanelet::Id lanelet_id, const RoutingGraphType type) -> lanelet::Ids
 {
   lanelet::Ids previous_lanelet_ids;

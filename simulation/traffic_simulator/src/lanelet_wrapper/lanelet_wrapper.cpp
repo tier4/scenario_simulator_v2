@@ -1,4 +1,4 @@
-// Copyright 2024 TIER IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -142,26 +142,43 @@ LaneletWrapper::LaneletWrapper(const std::filesystem::path & lanelet_map_path)
   pedestrian_.graph = lanelet::routing::RoutingGraph::build(*lanelet_map_ptr_, *pedestrian_.rules);
 }
 
-auto LaneletWrapper::calculateAccumulatedLengths(const lanelet::ConstLineString3d & line_string)
-  -> std::vector<double>
+auto LaneletWrapper::overwriteLaneletsCenterline() -> void
 {
-  auto calculateSegmentDistances =
-    [](const lanelet::ConstLineString3d & line_string) -> std::vector<double> {
-    std::vector<double> segment_distances;
-    segment_distances.reserve(line_string.size() - 1);
-    for (size_t i = 1; i < line_string.size(); ++i) {
-      segment_distances.push_back(lanelet::geometry::distance(line_string[i], line_string[i - 1]));
+  constexpr double resolution{2.0};
+
+  auto generateFineCenterline =
+    [&](const lanelet::ConstLanelet & lanelet_obj) -> lanelet::LineString3d {
+    // Get length of longer border
+    const double left_length =
+      static_cast<double>(lanelet::geometry::length(lanelet_obj.leftBound()));
+    const double right_length =
+      static_cast<double>(lanelet::geometry::length(lanelet_obj.rightBound()));
+    const double longer_distance = (left_length > right_length) ? left_length : right_length;
+    const int32_t num_segments =
+      std::max(static_cast<int32_t>(ceil(longer_distance / resolution)), 1);
+
+    // Resample points
+    const auto left_points = resamplePoints(lanelet_obj.leftBound(), num_segments);
+    const auto right_points = resamplePoints(lanelet_obj.rightBound(), num_segments);
+
+    // Create centerline
+    lanelet::LineString3d centerline(lanelet::utils::getId());
+    for (size_t i = 0; i < static_cast<size_t>(num_segments + 1); i++) {
+      // Add ID for the average point of left and right
+      const auto center_basic_point = (right_points.at(i) + left_points.at(i)) / 2.0;
+      const lanelet::Point3d center_point(
+        lanelet::utils::getId(), center_basic_point.x(), center_basic_point.y(),
+        center_basic_point.z());
+      centerline.push_back(center_point);
     }
-    return segment_distances;
+    return centerline;
   };
 
-  const auto segment_distances = calculateSegmentDistances(line_string);
-  std::vector<double> accumulated_lengths{0};
-  accumulated_lengths.reserve(segment_distances.size() + 1);
-  std::partial_sum(
-    std::begin(segment_distances), std::end(segment_distances),
-    std::back_inserter(accumulated_lengths));
-  return accumulated_lengths;
+  for (auto & lanelet_obj : lanelet_map_ptr_->laneletLayer) {
+    if (!lanelet_obj.hasCustomCenterline()) {
+      lanelet_obj.setCenterline(generateFineCenterline(lanelet_obj));
+    }
+  }
 }
 
 auto LaneletWrapper::resamplePoints(
@@ -215,43 +232,26 @@ auto LaneletWrapper::resamplePoints(
   return resampled_points;
 }
 
-auto LaneletWrapper::overwriteLaneletsCenterline() -> void
+auto LaneletWrapper::calculateAccumulatedLengths(const lanelet::ConstLineString3d & line_string)
+  -> std::vector<double>
 {
-  constexpr double resolution{2.0};
-
-  auto generateFineCenterline =
-    [&](const lanelet::ConstLanelet & lanelet_obj) -> lanelet::LineString3d {
-    // Get length of longer border
-    const double left_length =
-      static_cast<double>(lanelet::geometry::length(lanelet_obj.leftBound()));
-    const double right_length =
-      static_cast<double>(lanelet::geometry::length(lanelet_obj.rightBound()));
-    const double longer_distance = (left_length > right_length) ? left_length : right_length;
-    const int32_t num_segments =
-      std::max(static_cast<int32_t>(ceil(longer_distance / resolution)), 1);
-
-    // Resample points
-    const auto left_points = resamplePoints(lanelet_obj.leftBound(), num_segments);
-    const auto right_points = resamplePoints(lanelet_obj.rightBound(), num_segments);
-
-    // Create centerline
-    lanelet::LineString3d centerline(lanelet::utils::getId());
-    for (size_t i = 0; i < static_cast<size_t>(num_segments + 1); i++) {
-      // Add ID for the average point of left and right
-      const auto center_basic_point = (right_points.at(i) + left_points.at(i)) / 2.0;
-      const lanelet::Point3d center_point(
-        lanelet::utils::getId(), center_basic_point.x(), center_basic_point.y(),
-        center_basic_point.z());
-      centerline.push_back(center_point);
+  auto calculateSegmentDistances =
+    [](const lanelet::ConstLineString3d & line_string) -> std::vector<double> {
+    std::vector<double> segment_distances;
+    segment_distances.reserve(line_string.size() - 1);
+    for (size_t i = 1; i < line_string.size(); ++i) {
+      segment_distances.push_back(lanelet::geometry::distance(line_string[i], line_string[i - 1]));
     }
-    return centerline;
+    return segment_distances;
   };
 
-  for (auto & lanelet_obj : lanelet_map_ptr_->laneletLayer) {
-    if (!lanelet_obj.hasCustomCenterline()) {
-      lanelet_obj.setCenterline(generateFineCenterline(lanelet_obj));
-    }
-  }
+  const auto segment_distances = calculateSegmentDistances(line_string);
+  std::vector<double> accumulated_lengths{0};
+  accumulated_lengths.reserve(segment_distances.size() + 1);
+  std::partial_sum(
+    std::begin(segment_distances), std::end(segment_distances),
+    std::back_inserter(accumulated_lengths));
+  return accumulated_lengths;
 }
 }  // namespace lanelet_wrapper
 }  // namespace traffic_simulator

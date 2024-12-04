@@ -1,4 +1,4 @@
-// Copyright 2024 TIER IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,14 +17,7 @@
 
 #include <lanelet2_matching/LaneletMatching.h>
 
-#include <geometry_msgs/msg/point.hpp>
-#include <geometry_msgs/msg/pose.hpp>
-#include <geometry_msgs/msg/pose_stamped.hpp>
-#include <geometry_msgs/msg/vector3.hpp>
 #include <traffic_simulator/lanelet_wrapper/lanelet_wrapper.hpp>
-#include <traffic_simulator_msgs/msg/bounding_box.hpp>
-#include <traffic_simulator_msgs/msg/entity_type.hpp>
-#include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
 
 namespace traffic_simulator
 {
@@ -32,14 +25,6 @@ namespace lanelet_wrapper
 {
 namespace pose
 {
-using Point = geometry_msgs::msg::Point;
-using Vector3 = geometry_msgs::msg::Vector3;
-using Pose = geometry_msgs::msg::Pose;
-using PoseStamped = geometry_msgs::msg::PoseStamped;
-using BoundingBox = traffic_simulator_msgs::msg::BoundingBox;
-using LaneletPose = traffic_simulator_msgs::msg::LaneletPose;
-using EntityType = traffic_simulator_msgs::msg::EntityType;
-
 /// @note This value was determined experimentally by @hakuturu583 and not theoretically.
 /// @sa https://github.com/tier4/scenario_simulator_v2/commit/4c8e9f496b061b00bec799159d59c33f2ba46b3a
 constexpr static double DEFAULT_MATCH_TO_LANE_REDUCTION_RATIO = 0.8;

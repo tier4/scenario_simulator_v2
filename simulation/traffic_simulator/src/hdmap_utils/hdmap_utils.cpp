@@ -52,6 +52,7 @@
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/lanelet_wrapper/lanelet_map.hpp>
 #include <traffic_simulator/lanelet_wrapper/pose.hpp>
+#include <traffic_simulator/lanelet_wrapper/traffic_rules.hpp>
 #include <unordered_map>
 #include <utility>
 #include <vector>

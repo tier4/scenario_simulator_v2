@@ -1,4 +1,4 @@
-// Copyright 2024 TIER IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,10 +18,7 @@
 #include <lanelet2_core/geometry/Lanelet.h>
 #include <lanelet2_core/primitives/LaneletSequence.h>
 
-#include <geometry/spline/catmull_rom_spline.hpp>
-#include <geometry_msgs/msg/pose_stamped.hpp>
 #include <traffic_simulator/lanelet_wrapper/lanelet_wrapper.hpp>
-#include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
 
 namespace traffic_simulator
 {
@@ -29,9 +26,6 @@ namespace lanelet_wrapper
 {
 namespace lanelet_map
 {
-using Point = geometry_msgs::msg::Point;
-using Spline = math::geometry::CatmullRomSpline;
-
 auto isInLanelet(const lanelet::Id lanelet_id, const double lanelet_pose_s) -> bool;
 
 auto isInLanelet(const lanelet::Id lanelet_id, const Point point) -> bool;
@@ -54,14 +48,12 @@ auto nearbyLaneletIds(
   const Point & point, const double distance_threshold, const bool include_crosswalk,
   const std::size_t search_count) -> lanelet::Ids;
 
-// Center points
 auto centerPoints(const lanelet::Ids & lanelet_ids) -> std::vector<Point>;
 
 auto centerPoints(const lanelet::Id lanelet_id) -> std::vector<Point>;
 
 auto centerPointsSpline(const lanelet::Id lanelet_id) -> std::shared_ptr<Spline>;
 
-// Next lanelet
 auto nextLaneletIds(
   const lanelet::Id lanelet_id,
   const RoutingGraphType type = RoutingConfiguration().routing_graph_type) -> lanelet::Ids;
@@ -78,7 +70,6 @@ auto nextLaneletIds(
   const lanelet::Ids & lanelet_ids, const std::string & turn_direction,
   const RoutingGraphType type = RoutingConfiguration().routing_graph_type) -> lanelet::Ids;
 
-// Previous lanelet
 auto previousLaneletIds(
   const lanelet::Id lanelet_id,
   const RoutingGraphType type = RoutingConfiguration().routing_graph_type) -> lanelet::Ids;

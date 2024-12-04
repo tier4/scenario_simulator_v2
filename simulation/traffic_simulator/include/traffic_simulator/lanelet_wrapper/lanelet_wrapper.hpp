@@ -1,4 +1,4 @@
-// Copyright 2024 TIER IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,10 +25,17 @@
 #include <filesystem>
 #include <geometry/spline/catmull_rom_spline.hpp>
 #include <geometry_msgs/msg/point.hpp>
+#include <geometry_msgs/msg/pose.hpp>
+#include <geometry_msgs/msg/pose_stamped.hpp>
+#include <geometry_msgs/msg/vector3.hpp>
 #include <mutex>
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/data_type/routing_configuration.hpp>
 #include <traffic_simulator/data_type/routing_graph_type.hpp>
+#include <traffic_simulator/lanelet_wrapper/lanelet_wrapper.hpp>
+#include <traffic_simulator_msgs/msg/bounding_box.hpp>
+#include <traffic_simulator_msgs/msg/entity_type.hpp>
+#include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
 
 namespace std
 {
@@ -53,16 +60,21 @@ namespace traffic_simulator
 {
 namespace lanelet_wrapper
 {
+using BoundingBox = traffic_simulator_msgs::msg::BoundingBox;
+using EntityType = traffic_simulator_msgs::msg::EntityType;
+using LaneletPose = traffic_simulator_msgs::msg::LaneletPose;
 using Point = geometry_msgs::msg::Point;
+using Pose = geometry_msgs::msg::Pose;
+using PoseStamped = geometry_msgs::msg::PoseStamped;
 using Spline = math::geometry::CatmullRomSpline;
+using Vector3 = geometry_msgs::msg::Vector3;
 
 class RouteCache
 {
 public:
   auto getRoute(
     const lanelet::Id from_lanelet_id, const lanelet::Id to_lanelet_id,
-    const lanelet::LaneletMapPtr & lanelet_map,
-    const traffic_simulator::RoutingConfiguration & routing_configuration,
+    const lanelet::LaneletMapPtr & lanelet_map, const RoutingConfiguration & routing_configuration,
     const lanelet::routing::RoutingGraphConstPtr & routing_graph) -> lanelet::Ids
   {
     if (!exists(from_lanelet_id, to_lanelet_id, routing_configuration.allow_lane_change)) {
@@ -138,7 +150,7 @@ public:
       THROW_SIMULATION_ERROR("center point of : ", lanelet_id, " does not exists on route cache.");
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    return splines_[lanelet_id];
+    return splines_.at(lanelet_id);
   }
 
   auto getCenterPoints(const lanelet::Id lanelet_id, const lanelet::LaneletMapPtr & lanelet_map)
@@ -159,7 +171,7 @@ public:
       appendData(lanelet_id, centerPoints(lanelet_id, lanelet_map));
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    return splines_[lanelet_id];
+    return splines_.at(lanelet_id);
   }
 
   std::unordered_map<lanelet::Id, std::vector<Point>> data_;
@@ -211,7 +223,7 @@ public:
       THROW_SIMULATION_ERROR("length of : ", lanelet_id, " does not exists on route cache.");
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    return data_[lanelet_id];
+    return data_.at(lanelet_id);
   }
 
   auto getLength(const lanelet::Id lanelet_id, const lanelet::LaneletMapPtr & lanelet_map) -> double
@@ -221,7 +233,7 @@ public:
         lanelet_id, lanelet::utils::getLaneletLength2d(lanelet_map->laneletLayer.get(lanelet_id)));
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    return data_[lanelet_id];
+    return data_.at(lanelet_id);
   }
 
   std::unordered_map<lanelet::Id, double> data_;
@@ -266,23 +278,23 @@ private:
   LaneletWrapper(const std::filesystem::path & lanelet_map_path);
   static LaneletWrapper & getInstance();
 
-  auto calculateAccumulatedLengths(const lanelet::ConstLineString3d & line_string)
-    -> std::vector<double>;
+  auto overwriteLaneletsCenterline() -> void;
 
   auto resamplePoints(
     const lanelet::ConstLineString3d & line_string, const std::int32_t num_segments)
     -> lanelet::BasicPoints3d;
 
-  auto overwriteLaneletsCenterline() -> void;
+  auto calculateAccumulatedLengths(const lanelet::ConstLineString3d & line_string)
+    -> std::vector<double>;
 
   inline static std::unique_ptr<LaneletWrapper> instance{nullptr};
   inline static std::string lanelet_map_path_{""};
   inline static std::mutex mutex_;
 
-  lanelet::projection::MGRSProjector mgrs_projector_;
+  const lanelet::LaneletMapPtr lanelet_map_ptr_;
+  const lanelet::projection::MGRSProjector mgrs_projector_;
   lanelet::ErrorMessages lanelet_errors_;
 
-  const lanelet::LaneletMapPtr lanelet_map_ptr_;
   /// @todo It is worth trying to add const to each attribute of type TrafficRulesWithRoutingGraph
   TrafficRulesWithRoutingGraph vehicle_;
   TrafficRulesWithRoutingGraph vehicle_with_road_shoulder_;

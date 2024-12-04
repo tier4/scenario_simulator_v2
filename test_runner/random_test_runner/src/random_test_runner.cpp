@@ -70,7 +70,7 @@ RandomTestRunner::RandomTestRunner(const rclcpp::NodeOptions & option)
   message = fmt::format("Map path found: {}", map_path);
   RCLCPP_INFO_STREAM(get_logger(), message);
 
-  traffic_simulator::Configuration configuration(map_path);
+  traffic_simulator::Configuration configuration(map_path, "", true);
   configuration.simulator_host = test_control_parameters.simulator_host;
   auto lanelet_utils = std::make_shared<LaneletUtils>(configuration.lanelet2_map_path());
 

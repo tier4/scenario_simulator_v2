@@ -67,15 +67,17 @@ auto Interpreter::makeCurrentConfiguration() const -> traffic_simulator::Configu
 {
   constexpr bool auto_sink{false};
   const auto logic_file = currentScenarioDefinition()->road_network.logic_file;
+  const auto is_directly_lanelet2_map_file =
+    not logic_file.isDirectory() and logic_file.filepath.extension() == ".osm";
+  const auto map_files_path =
+    is_directly_lanelet2_map_file ? logic_file.filepath.parent_path() : logic_file;
+
   // XXX DIRTY HACK!!!
-  if (not logic_file.isDirectory() and logic_file.filepath.extension() == ".osm") {
+  if (is_directly_lanelet2_map_file) {
     return traffic_simulator::Configuration(
-      logic_file.isDirectory() ? logic_file : logic_file.filepath.parent_path(),
-      logic_file.filepath.filename().string(), osc_path, auto_sink);
+      map_files_path, logic_file.filepath.filename().string(), osc_path, auto_sink);
   } else {
-    return traffic_simulator::Configuration(
-      logic_file.isDirectory() ? logic_file : logic_file.filepath.parent_path(), osc_path,
-      auto_sink);
+    return traffic_simulator::Configuration(map_files_path, osc_path, auto_sink);
   }
 }
 
