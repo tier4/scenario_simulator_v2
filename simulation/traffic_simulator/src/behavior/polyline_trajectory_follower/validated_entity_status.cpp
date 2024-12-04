@@ -38,13 +38,19 @@ ValidatedEntityStatus::ValidatedEntityStatus(
 : entity_status_(entity_status),
   name(entity_status_.name),
   time(entity_status_.time),
+  step_time(step_time),
   position(validatedPosition()),
   linear_speed(validatedLinearSpeed()),
-  linear_acceleration(validatedLinearAcceleration(step_time)),
+  linear_acceleration(validatedLinearAcceleration()),
   lanelet_pose_valid(entity_status_.lanelet_pose_valid),
   current_velocity(buildValidatedCurrentVelocity(linear_speed)),
   bounding_box(entity_status_.bounding_box),
   behavior_parameter(behavior_parameter)
+{
+}
+
+ValidatedEntityStatus::ValidatedEntityStatus(const ValidatedEntityStatus & other)
+: ValidatedEntityStatus(other.entity_status_, other.behavior_parameter, other.step_time)
 {
 }
 
@@ -67,7 +73,7 @@ auto ValidatedEntityStatus::buildUpdatedPoseOrientation(
 }
 
 auto ValidatedEntityStatus::buildUpdatedEntityStatus(
-  const geometry_msgs::msg::Vector3 & desired_velocity, const double step_time) const
+  const geometry_msgs::msg::Vector3 & desired_velocity) const
   -> traffic_simulator_msgs::msg::EntityStatus
 {
   using math::geometry::operator+;
@@ -140,8 +146,7 @@ auto ValidatedEntityStatus::validatedLinearSpeed() const noexcept(false) -> doub
   return entity_speed;
 }
 
-auto ValidatedEntityStatus::validatedLinearAcceleration(const double step_time) const
-  noexcept(false) -> double
+auto ValidatedEntityStatus::validatedLinearAcceleration() const noexcept(false) -> double
 {
   const double acceleration = entity_status_.action_status.accel.linear.x;
   const double max_acceleration = std::min(

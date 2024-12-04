@@ -27,32 +27,39 @@ namespace follow_trajectory
 struct ValidatedEntityStatus
 {
 public:
-  ValidatedEntityStatus(
+  explicit ValidatedEntityStatus(
     const traffic_simulator_msgs::msg::EntityStatus & entity_status,
     const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter,
     const double step_time);
 
-  auto buildUpdatedEntityStatus(
-    const geometry_msgs::msg::Vector3 & desired_velocity, const double step_time) const
+  auto buildUpdatedEntityStatus(const geometry_msgs::msg::Vector3 & desired_velocity) const
     -> traffic_simulator_msgs::msg::EntityStatus;
 
   const traffic_simulator_msgs::msg::EntityStatus entity_status_;
   const std::string & name;
   const double time;
+  const double step_time;
   const geometry_msgs::msg::Point position;
   const double linear_speed;
   const double linear_acceleration;
   const bool lanelet_pose_valid;
   const geometry_msgs::msg::Vector3 current_velocity;
   const traffic_simulator_msgs::msg::BoundingBox & bounding_box;
-  const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter;
+  const traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter;
+
+  ValidatedEntityStatus() = delete;
+  ValidatedEntityStatus(const ValidatedEntityStatus & other);
+  ValidatedEntityStatus & operator=(const ValidatedEntityStatus & other) = delete;
+  ValidatedEntityStatus(ValidatedEntityStatus && other) noexcept(true) = delete;
+  ValidatedEntityStatus & operator=(ValidatedEntityStatus && other) noexcept(true) = delete;
+  ~ValidatedEntityStatus() = default;
 
 private:
   auto validatedPosition() const noexcept(false) -> geometry_msgs::msg::Point;
 
   auto validatedLinearSpeed() const noexcept(false) -> double;
 
-  auto validatedLinearAcceleration(const double step_time) const noexcept(false) -> double;
+  auto validatedLinearAcceleration() const noexcept(false) -> double;
 
   auto buildUpdatedPoseOrientation(const geometry_msgs::msg::Vector3 & desired_velocity) const
     noexcept(true) -> geometry_msgs::msg::Quaternion;

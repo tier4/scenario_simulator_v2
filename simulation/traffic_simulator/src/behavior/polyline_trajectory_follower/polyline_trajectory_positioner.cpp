@@ -338,7 +338,7 @@ auto PolylineTrajectoryPositioner::makeUpdatedEntityStatus(
             distance_to_front_waypoint)) {
         return std::nullopt;
       } else {
-        return validated_entity_status.buildUpdatedEntityStatus(desired_velocity, step_time);
+        return validated_entity_status.buildUpdatedEntityStatus(desired_velocity);
       }
     } else {
       /*
@@ -350,7 +350,7 @@ auto PolylineTrajectoryPositioner::makeUpdatedEntityStatus(
           this_step_distance > distance_to_front_waypoint) {
         return std::nullopt;
       } else {
-        return validated_entity_status.buildUpdatedEntityStatus(desired_velocity, step_time);
+        return validated_entity_status.buildUpdatedEntityStatus(desired_velocity);
       }
     }
     /*
@@ -376,7 +376,7 @@ auto PolylineTrajectoryPositioner::makeUpdatedEntityStatus(
         " from that waypoint which is greater than the accepted accuracy.");
     }
   } else {
-    return validated_entity_status.buildUpdatedEntityStatus(desired_velocity, step_time);
+    return validated_entity_status.buildUpdatedEntityStatus(desired_velocity);
   }
 
   /*
