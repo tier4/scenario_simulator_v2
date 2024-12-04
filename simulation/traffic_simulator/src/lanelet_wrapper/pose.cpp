@@ -193,14 +193,14 @@ auto alternativeLaneletPoses(const LaneletPose & lanelet_pose) -> std::vector<La
         const auto lanelet_pose_in_previous_lanelet = helper::constructLaneletPose(
           previous_lanelet_id, lanelet_pose.s + lanelet_map::laneletLength(previous_lanelet_id),
           lanelet_pose.offset);
-        if (const auto recurency_alternative_poses =
+        if (const auto recursive_alternative_poses =
               alternativeLaneletPoses(lanelet_pose_in_previous_lanelet);
-            recurency_alternative_poses.empty()) {
+            recursive_alternative_poses.empty()) {
           lanelet_poses_in_previous_lanelet.emplace_back(lanelet_pose_in_previous_lanelet);
         } else {
           lanelet_poses_in_previous_lanelet.insert(
-            lanelet_poses_in_previous_lanelet.end(), recurency_alternative_poses.begin(),
-            recurency_alternative_poses.end());
+            lanelet_poses_in_previous_lanelet.end(), recursive_alternative_poses.begin(),
+            recursive_alternative_poses.end());
         }
       }
     }
@@ -215,14 +215,14 @@ auto alternativeLaneletPoses(const LaneletPose & lanelet_pose) -> std::vector<La
         const auto lanelet_pose_in_next_lanelet = helper::constructLaneletPose(
           next_lanelet_id, lanelet_pose.s - lanelet_map::laneletLength(lanelet_pose.lanelet_id),
           lanelet_pose.offset);
-        if (const auto recurency_alternative_poses =
+        if (const auto recursive_alternative_poses =
               alternativeLaneletPoses(lanelet_pose_in_next_lanelet);
-            recurency_alternative_poses.empty()) {
+            recursive_alternative_poses.empty()) {
           lanelet_poses_in_next_lanelet.emplace_back(lanelet_pose_in_next_lanelet);
         } else {
           lanelet_poses_in_next_lanelet.insert(
-            lanelet_poses_in_next_lanelet.end(), recurency_alternative_poses.begin(),
-            recurency_alternative_poses.end());
+            lanelet_poses_in_next_lanelet.end(), recursive_alternative_poses.begin(),
+            recursive_alternative_poses.end());
         }
       }
     }
@@ -391,7 +391,7 @@ auto matchToLane(
     }
     return absolute_hull_polygon;
   };
-  // prepere object for matching
+  // prepare object for matching
   const auto yaw = math::geometry::convertQuaternionToEulerAngle(map_pose.orientation).z;
   lanelet::matching::Object2d bounding_box_object;
   bounding_box_object.pose.translation() =
@@ -405,7 +405,7 @@ auto matchToLane(
     matches =
       lanelet::matching::removeNonRuleCompliantMatches(matches, LaneletWrapper::trafficRules(type));
   }
-  // find best match (minimalize offset)
+  // find best match (minimize offset)
   if (matches.empty()) {
     return std::nullopt;
   } else {

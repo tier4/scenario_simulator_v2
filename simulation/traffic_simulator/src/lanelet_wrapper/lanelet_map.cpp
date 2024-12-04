@@ -173,7 +173,7 @@ auto nextLaneletIds(
   return lanelet::Ids(next_lanelet_ids_set.begin(), next_lanelet_ids_set.end());
 }
 
-// Previus lanelet
+// Previous lanelet
 auto previousLaneletIds(const lanelet::Id lanelet_id, const RoutingGraphType type) -> lanelet::Ids
 {
   lanelet::Ids previous_lanelet_ids;
