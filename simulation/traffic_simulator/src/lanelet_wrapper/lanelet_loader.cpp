@@ -54,13 +54,12 @@ auto LaneletLoader::overwriteLaneletsCenterline(lanelet::LaneletMapPtr lanelet_m
   auto generateFineCenterline =
     [&](const lanelet::ConstLanelet & lanelet_obj) -> lanelet::LineString3d {
     // Get length of longer border
-    const double left_length =
+    const auto left_length =
       static_cast<double>(lanelet::geometry::length(lanelet_obj.leftBound()));
-    const double right_length =
+    const auto right_length =
       static_cast<double>(lanelet::geometry::length(lanelet_obj.rightBound()));
-    const double longer_distance = (left_length > right_length) ? left_length : right_length;
-    const int32_t num_segments =
-      std::max(static_cast<int32_t>(ceil(longer_distance / resolution)), 1);
+    const auto longer_distance = (left_length > right_length) ? left_length : right_length;
+    const auto num_segments = std::max(static_cast<int32_t>(ceil(longer_distance / resolution)), 1);
 
     // Resample points
     const auto left_points = resamplePoints(lanelet_obj.leftBound(), num_segments);
@@ -118,21 +117,21 @@ auto LaneletLoader::resamplePoints(
     // Find two nearest points
     const double target_length = (static_cast<double>(i) / num_segments) *
                                  static_cast<double>(lanelet::geometry::length(line_string));
-    const auto index_pair = findNearestIndexPair(target_length);
+    const auto [first_index, second_index] = findNearestIndexPair(target_length);
 
     // Apply linear interpolation
-    const lanelet::BasicPoint3d back_point = line_string[index_pair.first];
-    const lanelet::BasicPoint3d front_point = line_string[index_pair.second];
+    const lanelet::BasicPoint3d back_point = line_string[first_index];
+    const lanelet::BasicPoint3d front_point = line_string[second_index];
     const auto direction_vector = (front_point - back_point);
 
-    const auto back_length = accumulated_lengths.at(index_pair.first);
-    const auto front_length = accumulated_lengths.at(index_pair.second);
+    const auto back_length = accumulated_lengths.at(first_index);
+    const auto front_length = accumulated_lengths.at(second_index);
     const auto segment_length = front_length - back_length;
     const auto target_point =
       back_point + (direction_vector * (target_length - back_length) / segment_length);
 
     // Add to list
-    resampled_points.push_back(target_point);
+    resampled_points.emplace_back(target_point);
   }
   return resampled_points;
 }
@@ -141,11 +140,11 @@ auto LaneletLoader::calculateAccumulatedLengths(const lanelet::ConstLineString3d
   -> std::vector<double>
 {
   auto calculateSegmentDistances =
-    [](const lanelet::ConstLineString3d & line_string) -> std::vector<double> {
+    [](const lanelet::ConstLineString3d & line) -> std::vector<double> {
     std::vector<double> segment_distances;
-    segment_distances.reserve(line_string.size() - 1);
-    for (size_t i = 1; i < line_string.size(); ++i) {
-      segment_distances.push_back(lanelet::geometry::distance(line_string[i], line_string[i - 1]));
+    segment_distances.reserve(line.size() - 1);
+    for (size_t i = 1; i < line.size(); ++i) {
+      segment_distances.push_back(lanelet::geometry::distance(line[i], line[i - 1]));
     }
     return segment_distances;
   };

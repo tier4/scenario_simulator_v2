@@ -408,7 +408,7 @@ auto ActionNode::foundConflictingEntity(const lanelet::Ids & following_lanelets)
 }
 
 auto ActionNode::calculateUpdatedEntityStatus(
-  const double target_speed,
+  const double local_target_speed,
   const traffic_simulator_msgs::msg::DynamicConstraints & constraints) const
   -> traffic_simulator::EntityStatus
 {
@@ -416,7 +416,7 @@ auto ActionNode::calculateUpdatedEntityStatus(
     traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner(
       step_time, canonicalized_entity_status->getName());
   const auto dynamics = speed_planner.getDynamicStates(
-    target_speed, constraints, canonicalized_entity_status->getTwist(),
+    local_target_speed, constraints, canonicalized_entity_status->getTwist(),
     canonicalized_entity_status->getAccel());
 
   const double linear_jerk_new = std::get<2>(dynamics);
@@ -449,7 +449,8 @@ auto ActionNode::calculateUpdatedEntityStatus(
 }
 
 auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
-  double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints & constraints) const
+  const double local_target_speed,
+  const traffic_simulator_msgs::msg::DynamicConstraints & constraints) const
   -> traffic_simulator::EntityStatus
 {
   using math::geometry::operator*;
@@ -457,7 +458,7 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
     traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner(
       step_time, canonicalized_entity_status->getName());
   const auto dynamics = speed_planner.getDynamicStates(
-    target_speed, constraints, canonicalized_entity_status->getTwist(),
+    local_target_speed, constraints, canonicalized_entity_status->getTwist(),
     canonicalized_entity_status->getAccel());
   double linear_jerk_new = std::get<2>(dynamics);
   geometry_msgs::msg::Accel accel_new = std::get<1>(dynamics);

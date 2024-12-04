@@ -63,10 +63,10 @@ auto nearbyLaneletIds(
       const char subtype[]) -> std::vector<std::pair<double, lanelet::Lanelet>> {
     std::vector<std::pair<double, lanelet::Lanelet>> filtered_lanelets;
     for (const auto & pair : pair_distance_lanelet) {
-      if (pair.second.hasAttribute(lanelet::AttributeName::Subtype)) {
-        if (pair.second.attribute(lanelet::AttributeName::Subtype).value() != subtype) {
-          filtered_lanelets.push_back(pair);
-        }
+      if (
+        pair.second.hasAttribute(lanelet::AttributeName::Subtype) &&
+        pair.second.attribute(lanelet::AttributeName::Subtype).value() != subtype) {
+        filtered_lanelets.push_back(pair);
       }
     }
     return filtered_lanelets;
@@ -88,9 +88,9 @@ auto nearbyLaneletIds(
     return {};
   } else {
     lanelet::Ids target_lanelet_ids;
-    for (const auto & lanelet : nearest_lanelets) {
-      if (lanelet.first <= distance_thresh) {
-        target_lanelet_ids.emplace_back(lanelet.second.id());
+    for (const auto & [distance, lanelet] : nearest_lanelets) {
+      if (distance <= distance_thresh) {
+        target_lanelet_ids.emplace_back(lanelet.id());
       }
     }
     return target_lanelet_ids;

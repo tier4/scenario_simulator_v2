@@ -20,7 +20,7 @@ namespace traffic_simulator
 {
 namespace lanelet_wrapper
 {
-lanelet::traffic_rules::RegisterTrafficRules<GermanRoadShoulderPassableVehicle>
+const lanelet::traffic_rules::RegisterTrafficRules<GermanRoadShoulderPassableVehicle>
   germanRoadShoulderPassableVehicleRules(
     Locations::RoadShoulderPassableGermany, lanelet::Participants::Vehicle);
 }

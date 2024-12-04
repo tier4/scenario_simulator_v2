@@ -189,7 +189,7 @@ public:
     splines_[lanelet_id] = std::make_shared<Spline>(route);
   }
 
-  auto centerPoints(const lanelet::Id lanelet_id, const lanelet::LaneletMapPtr & lanelet_map)
+  auto centerPoints(const lanelet::Id lanelet_id, const lanelet::LaneletMapPtr & lanelet_map) const
     -> std::vector<Point>
   {
     std::vector<Point> center_points;
@@ -281,7 +281,7 @@ public:
   [[nodiscard]] static auto laneletLengthCache() -> LaneletLengthCache &;
 
 private:
-  LaneletWrapper(const std::filesystem::path & lanelet_map_path);
+  explicit LaneletWrapper(const std::filesystem::path & lanelet_map_path);
   static LaneletWrapper & getInstance();
 
   inline static std::unique_ptr<LaneletWrapper> instance{nullptr};

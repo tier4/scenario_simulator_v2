@@ -65,7 +65,7 @@ auto transformRelativePoseToGlobal(
   const geometry_msgs::msg::Pose & global_pose, const geometry_msgs::msg::Pose & relative_pose)
   -> geometry_msgs::msg::Pose;
 
-// Relative msg::geometry_msgs::msg::Pose
+// Relative msg::Pose
 auto relativePose(const geometry_msgs::msg::Pose & from, const geometry_msgs::msg::Pose & to)
   -> std::optional<geometry_msgs::msg::Pose>;
 
