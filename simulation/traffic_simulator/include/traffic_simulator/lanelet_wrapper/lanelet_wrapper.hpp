@@ -15,12 +15,10 @@
 #ifndef TRAFFIC_SIMULATOR__LANELET_WRAPPER_HPP_
 #define TRAFFIC_SIMULATOR__LANELET_WRAPPER_HPP_
 
-#include <lanelet2_io/Io.h>
 #include <lanelet2_routing/RoutingGraph.h>
 #include <lanelet2_routing/RoutingGraphContainer.h>
 #include <lanelet2_traffic_rules/TrafficRulesFactory.h>
 
-#include <autoware_lanelet2_extension/projection/mgrs_projector.hpp>
 #include <autoware_lanelet2_extension/utility/utilities.hpp>
 #include <filesystem>
 #include <geometry/spline/catmull_rom_spline.hpp>
@@ -257,6 +255,14 @@ struct TrafficRulesWithRoutingGraph
   lanelet::traffic_rules::TrafficRulesPtr rules;
   lanelet::routing::RoutingGraphConstPtr graph;
   mutable RouteCache route_cache;
+
+  TrafficRulesWithRoutingGraph(
+    const lanelet::LaneletMapPtr lanelet_map_ptr, const std::string & locations,
+    const std::string & participants)
+  {
+    rules = lanelet::traffic_rules::TrafficRulesFactory::create(locations, participants);
+    graph = lanelet::routing::RoutingGraph::build(*lanelet_map_ptr, *rules);
+  }
 };
 
 class LaneletWrapper
@@ -278,27 +284,15 @@ private:
   LaneletWrapper(const std::filesystem::path & lanelet_map_path);
   static LaneletWrapper & getInstance();
 
-  auto overwriteLaneletsCenterline() -> void;
-
-  auto resamplePoints(
-    const lanelet::ConstLineString3d & line_string, const std::int32_t num_segments)
-    -> lanelet::BasicPoints3d;
-
-  auto calculateAccumulatedLengths(const lanelet::ConstLineString3d & line_string)
-    -> std::vector<double>;
-
   inline static std::unique_ptr<LaneletWrapper> instance{nullptr};
   inline static std::string lanelet_map_path_{""};
   inline static std::mutex mutex_;
 
   const lanelet::LaneletMapPtr lanelet_map_ptr_;
-  const lanelet::projection::MGRSProjector mgrs_projector_;
-  lanelet::ErrorMessages lanelet_errors_;
 
-  /// @todo It is worth trying to add const to each attribute of type TrafficRulesWithRoutingGraph
-  TrafficRulesWithRoutingGraph vehicle_;
-  TrafficRulesWithRoutingGraph vehicle_with_road_shoulder_;
-  TrafficRulesWithRoutingGraph pedestrian_;
+  const TrafficRulesWithRoutingGraph vehicle_;
+  const TrafficRulesWithRoutingGraph vehicle_with_road_shoulder_;
+  const TrafficRulesWithRoutingGraph pedestrian_;
 
   mutable CenterPointsCache center_points_cache_;
   mutable LaneletLengthCache lanelet_length_cache_;
