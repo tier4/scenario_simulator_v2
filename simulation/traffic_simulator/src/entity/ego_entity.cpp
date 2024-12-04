@@ -200,41 +200,36 @@ void EgoEntity::onUpdate(double current_time, double step_time)
 
 void EgoEntity::requestAcquirePosition(const CanonicalizedLaneletPose & lanelet_pose)
 {
-  requestClearRoute();
   requestAssignRoute({lanelet_pose});
 }
 
 void EgoEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose)
 {
-  requestClearRoute();
   requestAssignRoute({map_pose});
 }
 
 void EgoEntity::requestAssignRoute(const std::vector<CanonicalizedLaneletPose> & waypoints)
 {
   std::vector<geometry_msgs::msg::Pose> route;
-
   for (const auto & waypoint : waypoints) {
     route.push_back(static_cast<geometry_msgs::msg::Pose>(waypoint));
   }
-
   requestAssignRoute(route);
 }
 
 void EgoEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> & waypoints)
 {
   std::vector<geometry_msgs::msg::PoseStamped> route;
-
   for (const auto & waypoint : waypoints) {
     geometry_msgs::msg::PoseStamped pose_stamped;
     {
       pose_stamped.header.frame_id = "map";
       pose_stamped.pose = waypoint;
     }
-
     route.push_back(pose_stamped);
   }
 
+  requestClearRoute();
   if (not field_operator_application->initialized()) {
     field_operator_application->initialize(getMapPose());
     field_operator_application->plan(route);
