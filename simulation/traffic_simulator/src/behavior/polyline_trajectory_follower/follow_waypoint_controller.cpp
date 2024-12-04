@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <traffic_simulator/behavior/follow_waypoint_controller.hpp>
+#include <traffic_simulator/behavior/polyline_trajectory_follower/follow_waypoint_controller.hpp>
 
 namespace traffic_simulator
 {

@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__BEHAVIOR__FOLLOW_WAYPOINT_CONTROLLER_HPP_
-#define TRAFFIC_SIMULATOR__BEHAVIOR__FOLLOW_WAYPOINT_CONTROLLER_HPP_
+#ifndef TRAFFIC_SIMULATOR__BEHAVIOR__POLYLINE_TRAJECTORY_FOLLOWER__FOLLOW_WAYPOINT_CONTROLLER_HPP_
+#define TRAFFIC_SIMULATOR__BEHAVIOR__POLYLINE_TRAJECTORY_FOLLOWER__FOLLOW_WAYPOINT_CONTROLLER_HPP_
 
 #include <algorithm>
 #include <cmath>
@@ -287,7 +287,7 @@ public:
     const double speed) const -> double;
 
   auto areConditionsOfArrivalMet(
-    const double acceleration, const double speed, const double distance) const -> double
+    const double acceleration, const double speed, const double distance) const -> bool
   {
     return (not with_breaking or std::abs(speed) < local_epsilon) and
            std::abs(acceleration) < local_epsilon and distance < finish_distance_tolerance;
@@ -296,4 +296,4 @@ public:
 }  // namespace follow_trajectory
 }  // namespace traffic_simulator
 
-#endif  // TRAFFIC_SIMULATOR__BEHAVIOR__FOLLOW_WAYPOINT_CONTROLLER_HPP_
+#endif  // TRAFFIC_SIMULATOR__BEHAVIOR__POLYLINE_TRAJECTORY_FOLLOWER__FOLLOW_WAYPOINT_CONTROLLER_HPP_

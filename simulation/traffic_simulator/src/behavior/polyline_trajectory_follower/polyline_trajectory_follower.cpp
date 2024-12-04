@@ -23,7 +23,7 @@
 #include <geometry/vector3/operator.hpp>
 #include <geometry_msgs/msg/accel.hpp>
 #include <geometry_msgs/msg/twist.hpp>
-#include <traffic_simulator/behavior/polyline_trajectory_follower.hpp>
+#include <traffic_simulator/behavior/polyline_trajectory_follower/polyline_trajectory_follower.hpp>
 #include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator_msgs/msg/action_status.hpp>
 
@@ -42,7 +42,7 @@ auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
 {
   while (not polyline_trajectory.shape.vertices.empty()) {
     const auto updated_entity_opt =
-      PolylineTrajectoryFollowerStep(
+      PolylineTrajectoryPositioner(
         validated_entity_status, hdmap_utils_ptr, behavior_parameter, step_time)
         .makeUpdatedEntityStatus(polyline_trajectory, matching_distance, target_speed);
     if (updated_entity_opt.has_value()) {

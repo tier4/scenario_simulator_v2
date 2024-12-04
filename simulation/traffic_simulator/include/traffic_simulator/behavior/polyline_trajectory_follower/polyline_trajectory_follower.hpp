@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__BEHAVIOR__POLYLINE_TRAJECTORY_FOLLOWER_HPP_
-#define TRAFFIC_SIMULATOR__BEHAVIOR__POLYLINE_TRAJECTORY_FOLLOWER_HPP_
+#ifndef TRAFFIC_SIMULATOR__BEHAVIOR__POLYLINE_TRAJECTORY_FOLLOWER__POLYLINE_TRAJECTORY_FOLLOWER_HPP_
+#define TRAFFIC_SIMULATOR__BEHAVIOR__POLYLINE_TRAJECTORY_FOLLOWER__POLYLINE_TRAJECTORY_FOLLOWER_HPP_
 
 #include <optional>
-#include <traffic_simulator/behavior/follow_waypoint_controller.hpp>
-#include <traffic_simulator/behavior/polyline_trajectory_follower_step.hpp>
-#include <traffic_simulator/behavior/validated_entity_status.hpp>
+#include <traffic_simulator/behavior/polyline_trajectory_follower/follow_waypoint_controller.hpp>
+#include <traffic_simulator/behavior/polyline_trajectory_follower/polyline_trajectory_positioner.hpp>
+#include <traffic_simulator/behavior/polyline_trajectory_follower/validated_entity_status.hpp>
 #include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
@@ -51,4 +51,4 @@ private:
 }  // namespace follow_trajectory
 }  // namespace traffic_simulator
 
-#endif  // TRAFFIC_SIMULATOR__BEHAVIOR__POLYLINE_TRAJECTORY_FOLLOWER_HPP_
+#endif  // TRAFFIC_SIMULATOR__BEHAVIOR__POLYLINE_TRAJECTORY_FOLLOWER__POLYLINE_TRAJECTORY_FOLLOWER_HPP_

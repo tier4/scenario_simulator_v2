@@ -23,7 +23,7 @@
 #include <geometry/vector3/operator.hpp>
 #include <geometry_msgs/msg/accel.hpp>
 #include <geometry_msgs/msg/twist.hpp>
-#include <traffic_simulator/behavior/polyline_trajectory_follower_step.hpp>
+#include <traffic_simulator/behavior/polyline_trajectory_follower/polyline_trajectory_positioner.hpp>
 #include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator_msgs/msg/action_status.hpp>
 
@@ -32,7 +32,7 @@ namespace traffic_simulator
 namespace follow_trajectory
 {
 
-PolylineTrajectoryFollowerStep::PolylineTrajectoryFollowerStep(
+PolylineTrajectoryPositioner::PolylineTrajectoryPositioner(
   const ValidatedEntityStatus & validated_entity_status,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
   const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter, const double step_time)
@@ -43,7 +43,7 @@ PolylineTrajectoryFollowerStep::PolylineTrajectoryFollowerStep(
 {
 }
 
-auto PolylineTrajectoryFollowerStep::calculateCurrentVelocity(const double speed) const
+auto PolylineTrajectoryPositioner::calculateCurrentVelocity(const double speed) const
   -> geometry_msgs::msg::Vector3
 {
   const auto euler_angles = math::geometry::convertQuaternionToEulerAngle(
@@ -56,7 +56,7 @@ auto PolylineTrajectoryFollowerStep::calculateCurrentVelocity(const double speed
     .z(std::sin(pitch) * speed);
 }
 
-auto PolylineTrajectoryFollowerStep::calculateDistanceAndRemainingTime(
+auto PolylineTrajectoryPositioner::calculateDistanceAndRemainingTime(
   const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
   const double matching_distance, const double distance_to_front_waypoint,
   const double step_time) const -> std::tuple<double, double>
@@ -132,7 +132,7 @@ auto PolylineTrajectoryFollowerStep::calculateDistanceAndRemainingTime(
   }
 }
 
-auto PolylineTrajectoryFollowerStep::validatedEntityDesiredVelocity(
+auto PolylineTrajectoryPositioner::validatedEntityDesiredVelocity(
   const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
   const geometry_msgs::msg::Point & target_position, const geometry_msgs::msg::Point & position,
   const double desired_speed) const noexcept(false) -> geometry_msgs::msg::Vector3
@@ -184,7 +184,7 @@ auto PolylineTrajectoryFollowerStep::validatedEntityDesiredVelocity(
   return desired_velocity;
 }
 
-auto PolylineTrajectoryFollowerStep::validatedEntityDesiredAcceleration(
+auto PolylineTrajectoryPositioner::validatedEntityDesiredAcceleration(
   const traffic_simulator::follow_trajectory::FollowWaypointController & follow_waypoint_controller,
   const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
   const double remaining_time, const double distance, const double acceleration,
@@ -224,7 +224,7 @@ auto PolylineTrajectoryFollowerStep::validatedEntityDesiredAcceleration(
   }
 }
 
-auto PolylineTrajectoryFollowerStep::makeUpdatedEntityStatus(
+auto PolylineTrajectoryPositioner::makeUpdatedEntityStatus(
   const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
   const double matching_distance, const std::optional<double> target_speed) const
   -> std::optional<EntityStatus>
@@ -400,7 +400,7 @@ auto PolylineTrajectoryFollowerStep::makeUpdatedEntityStatus(
   */
 }
 
-auto PolylineTrajectoryFollowerStep::validatedEntityTargetPosition(
+auto PolylineTrajectoryPositioner::validatedEntityTargetPosition(
   const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory) const noexcept(false)
   -> geometry_msgs::msg::Point
 {
@@ -420,7 +420,7 @@ auto PolylineTrajectoryFollowerStep::validatedEntityTargetPosition(
   }
   return target_position;
 }
-auto PolylineTrajectoryFollowerStep::validatedEntityDesiredSpeed(
+auto PolylineTrajectoryPositioner::validatedEntityDesiredSpeed(
   const double entity_speed, const double desired_acceleration) const noexcept(false) -> double
 {
   const double desired_speed = entity_speed + desired_acceleration * step_time;
