@@ -1,0 +1,439 @@
+// Copyright 2015 TIER IV, Inc. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#include <arithmetic/floating_point/comparison.hpp>
+#include <geometry/quaternion/euler_to_quaternion.hpp>
+#include <geometry/quaternion/get_rotation.hpp>
+#include <geometry/quaternion/quaternion_to_euler.hpp>
+#include <geometry/vector3/hypot.hpp>
+#include <geometry/vector3/inner_product.hpp>
+#include <geometry/vector3/is_finite.hpp>
+#include <geometry/vector3/norm.hpp>
+#include <geometry/vector3/operator.hpp>
+#include <geometry_msgs/msg/accel.hpp>
+#include <geometry_msgs/msg/twist.hpp>
+#include <traffic_simulator/behavior/polyline_trajectory_follower_step.hpp>
+#include <traffic_simulator/utils/distance.hpp>
+#include <traffic_simulator_msgs/msg/action_status.hpp>
+
+namespace traffic_simulator
+{
+namespace follow_trajectory
+{
+
+PolylineTrajectoryFollowerStep::PolylineTrajectoryFollowerStep(
+  const ValidatedEntityStatus & validated_entity_status,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
+  const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter, const double step_time)
+: validated_entity_status(validated_entity_status),
+  hdmap_utils_ptr(hdmap_utils_ptr),
+  behavior_parameter(behavior_parameter),
+  step_time(step_time)
+{
+}
+
+auto PolylineTrajectoryFollowerStep::calculateCurrentVelocity(const double speed) const
+  -> geometry_msgs::msg::Vector3
+{
+  const auto euler_angles = math::geometry::convertQuaternionToEulerAngle(
+    validated_entity_status.entity_status.pose.orientation);
+  const double pitch = -euler_angles.y;
+  const double yaw = euler_angles.z;
+  return geometry_msgs::build<geometry_msgs::msg::Vector3>()
+    .x(std::cos(pitch) * std::cos(yaw) * speed)
+    .y(std::cos(pitch) * std::sin(yaw) * speed)
+    .z(std::sin(pitch) * speed);
+}
+
+auto PolylineTrajectoryFollowerStep::calculateDistanceAndRemainingTime(
+  const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
+  const double matching_distance, const double distance_to_front_waypoint,
+  const double step_time) const -> std::tuple<double, double>
+{
+  /*
+    Note for anyone working on adding support for followingMode follow
+    to this function (FollowPolylineTrajectoryAction::tick) in the
+    future: if followingMode is follow, this distance calculation may be
+    inappropriate.
+  */
+  const auto total_distance_to =
+    [this, matching_distance, &polyline_trajectory](
+      const std::vector<traffic_simulator_msgs::msg::Vertex>::const_iterator last) {
+      return std::accumulate(
+        polyline_trajectory.shape.vertices.cbegin(), last, 0.0,
+        [this, matching_distance](const double total_distance, const auto & vertex) {
+          const auto next = std::next(&vertex);
+          return total_distance + distanceAlongLanelet(
+                                    hdmap_utils_ptr, validated_entity_status.bounding_box,
+                                    matching_distance, vertex.position.position,
+                                    next->position.position);
+        });
+    };
+
+  const auto waypoint_ptr = std::find_if(
+    polyline_trajectory.shape.vertices.cbegin(), polyline_trajectory.shape.vertices.cend(),
+    [](const auto & vertex) { return std::isfinite(vertex.time); });
+  if (waypoint_ptr == std::cend(polyline_trajectory.shape.vertices)) {
+    return std::make_tuple(
+      distance_to_front_waypoint +
+        total_distance_to(std::cend(polyline_trajectory.shape.vertices) - 1),
+      std::numeric_limits<double>::infinity());
+  }
+  const double remaining_time =
+    (std::isfinite(polyline_trajectory.base_time) ? polyline_trajectory.base_time : 0.0) +
+    waypoint_ptr->time - validated_entity_status.time;
+
+  /*
+    The condition below should ideally be remaining_time < 0.
+
+    The simulator runs at a constant frame rate, so the step time is
+    1/FPS. If the simulation time is an accumulation of step times
+    expressed as rational numbers, times that are integer multiples
+    of the frame rate will always be exact integer seconds.
+    Therefore, the timing of remaining_time == 0 always exists, and
+    the velocity planning of this member function (tick) aims to
+    reach the waypoint exactly at that timing. So the ideal timeout
+    condition is remaining_time < 0.
+
+    But actually the step time is expressed as a float and the
+    simulation time is its accumulation. As a result, it is not
+    guaranteed that there will be times when the simulation time is
+    exactly zero. For example, remaining_time == -0.00006 and it was
+    judged to be out of time.
+
+    For the above reasons, the condition is remaining_time <
+    -step_time. In other words, the conditions are such that a delay
+    of 1 step time is allowed.
+  */
+  if (remaining_time < -step_time) {
+    THROW_SIMULATION_ERROR(
+      "Vehicle ", std::quoted(validated_entity_status.name),
+      " failed to reach the trajectory waypoint at the specified time. The specified time "
+      "is ",
+      waypoint_ptr->time, " (in ",
+      (std::isfinite(polyline_trajectory.base_time) ? "absolute" : "relative"),
+      " simulation time). This may be due to unrealistic conditions of arrival time "
+      "specification compared to vehicle parameters and dynamic constraints.");
+
+  } else {
+    return std::make_tuple(
+      distance_to_front_waypoint + total_distance_to(waypoint_ptr), remaining_time);
+  }
+}
+
+auto PolylineTrajectoryFollowerStep::validatedEntityDesiredVelocity(
+  const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
+  const geometry_msgs::msg::Point & target_position, const geometry_msgs::msg::Point & position,
+  const double desired_speed) const noexcept(false) -> geometry_msgs::msg::Vector3
+{
+  /*
+    If not dynamic_constraints_ignorable, the linear distance should cause
+    problems.
+  */
+
+  /*
+    Note: The followingMode in OpenSCENARIO is passed as
+    variable dynamic_constraints_ignorable. the value of the
+    variable is `followingMode == position`.
+  */
+  if (not polyline_trajectory.dynamic_constraints_ignorable) {
+    /*
+      Note: The vector returned if
+      dynamic_constraints_ignorable == true ignores parameters
+      such as the maximum rudder angle of the vehicle entry. In
+      this clause, such parameters must be respected and the
+      rotation angle difference of the z-axis center of the
+      vector must be kept below a certain value.
+    */
+    THROW_SIMULATION_ERROR("The followingMode is only supported for position.");
+  }
+
+  const double dx = target_position.x - position.x;
+  const double dy = target_position.y - position.y;
+  // if entity is on lane use pitch from lanelet, otherwise use pitch on target
+  const double pitch = validated_entity_status.lanelet_pose_valid
+                         ? -math::geometry::convertQuaternionToEulerAngle(
+                              validated_entity_status.entity_status.pose.orientation)
+                              .y
+                         : std::atan2(target_position.z - position.z, std::hypot(dy, dx));
+  const double yaw = std::atan2(dy, dx);  // Use yaw on target
+
+  const auto desired_velocity = geometry_msgs::build<geometry_msgs::msg::Vector3>()
+                                  .x(std::cos(pitch) * std::cos(yaw) * desired_speed)
+                                  .y(std::cos(pitch) * std::sin(yaw) * desired_speed)
+                                  .z(std::sin(pitch) * desired_speed);
+  if (not math::geometry::isFinite(desired_velocity)) {
+    THROW_SIMULATION_ERROR(
+      "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
+      "following information to the developer: Vehicle ",
+      std::quoted(validated_entity_status.name),
+      "'s desired velocity contains NaN or infinity. The value is [", desired_velocity.x, ", ",
+      desired_velocity.y, ", ", desired_velocity.z, "].");
+  }
+  return desired_velocity;
+}
+
+auto PolylineTrajectoryFollowerStep::validatedEntityDesiredAcceleration(
+  const traffic_simulator::follow_trajectory::FollowWaypointController & follow_waypoint_controller,
+  const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
+  const double remaining_time, const double distance, const double acceleration,
+  const double speed) const noexcept(false) -> double
+{
+  /*
+    The desired acceleration is the acceleration at which the destination
+    can be reached exactly at the specified time (= time remaining at zero).
+
+    The desired acceleration is calculated to the nearest waypoint with a specified arrival time.
+    It is calculated in such a way as to reach a constant linear speed as quickly as possible,
+    ensuring arrival at a waypoint at the precise time and with the shortest possible distance.
+    More precisely, the controller selects acceleration to minimize the distance to the waypoint
+    that will be reached in a time step defined as the expected arrival time.
+    In addition, the controller ensures a smooth stop at the last waypoint of the trajectory,
+    with linear speed equal to zero and acceleration equal to zero.
+  */
+
+  try {
+    const double desired_acceleration =
+      follow_waypoint_controller.getAcceleration(remaining_time, distance, acceleration, speed);
+
+    if (not std::isfinite(desired_acceleration)) {
+      THROW_SIMULATION_ERROR(
+        "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
+        "following information to the developer: Vehicle ",
+        std::quoted(validated_entity_status.name),
+        "'s desired acceleration value contains NaN or infinity. The value is ",
+        desired_acceleration, ". ");
+    }
+    return desired_acceleration;
+  } catch (const ControllerError & e) {
+    THROW_SIMULATION_ERROR(
+      "Vehicle ", std::quoted(validated_entity_status.name),
+      " - controller operation problem encountered. ",
+      follow_waypoint_controller.getFollowedWaypointDetails(polyline_trajectory), e.what());
+  }
+}
+
+auto PolylineTrajectoryFollowerStep::makeUpdatedEntityStatus(
+  const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
+  const double matching_distance, const std::optional<double> target_speed) const
+  -> std::optional<EntityStatus>
+{
+  /*
+    The following code implements the steering behavior known as "seek". See
+    "Steering Behaviors For Autonomous Characters" by Craig Reynolds for more
+    information.
+
+    See https://www.researchgate.net/publication/2495826_Steering_Behaviors_For_Autonomous_Characters
+  */
+
+  using math::geometry::operator+;
+  using math::geometry::operator-;
+  using math::geometry::operator*;
+  using math::geometry::operator/;
+  using math::geometry::operator+=;
+
+  const auto target_position = validatedEntityTargetPosition(polyline_trajectory);
+
+  const double distance_to_front_waypoint = traffic_simulator::distance::distanceAlongLanelet(
+    hdmap_utils_ptr, validated_entity_status.bounding_box, matching_distance,
+    validated_entity_status.position, target_position);
+
+  /*
+    This clause is to avoid division-by-zero errors in later clauses with
+    distance_to_front_waypoint as the denominator if the distance
+    miraculously becomes zero.
+  */
+  if (distance_to_front_waypoint <= 0.0) {
+    return std::nullopt;
+  }
+  const auto && [distance, remaining_time] = calculateDistanceAndRemainingTime(
+    polyline_trajectory, matching_distance, distance_to_front_waypoint, step_time);
+
+  if (distance <= 0) {
+    return std::nullopt;
+  }
+
+  /*
+    The controller provides the ability to calculate acceleration using constraints from the
+    behavior_parameter. The value is_breaking_waypoint() determines whether the calculated
+    acceleration takes braking into account - it is true if the nearest waypoint with the
+    specified time is the last waypoint or there is no waypoint with a specified time.
+
+    If an arrival time was specified for any of the remaining waypoints, priority is given to
+    meeting the arrival time, and the vehicle is driven at a speed at which the arrival time can
+    be met.
+
+    However, the controller allows passing target_speed as a speed which is followed by the
+    controller. target_speed is passed only if no arrival time was specified for any of the
+    remaining waypoints. If despite no arrival time in the remaining waypoints, target_speed is
+    not set (it is std::nullopt), target_speed is assumed to be the same as max_speed from the
+    behaviour_parameter.
+  */
+  const bool is_breaking_waypoint =
+    std::find_if(
+      polyline_trajectory.shape.vertices.cbegin(), polyline_trajectory.shape.vertices.cend(),
+      [](const auto & vertex) { return std::isfinite(vertex.time); }) >=
+    std::prev(polyline_trajectory.shape.vertices.cend());
+  const auto follow_waypoint_controller = FollowWaypointController(
+    behavior_parameter, step_time, is_breaking_waypoint,
+    std::isfinite(remaining_time) ? std::nullopt : target_speed);
+
+  /*
+    The desired acceleration is the acceleration at which the destination
+    can be reached exactly at the specified time (= time remaining at zero).
+
+    The desired acceleration is calculated to the nearest waypoint with a specified arrival time.
+    It is calculated in such a way as to reach a constant linear speed as quickly as possible,
+    ensuring arrival at a waypoint at the precise time and with the shortest possible distance.
+    More precisely, the controller selects acceleration to minimize the distance to the waypoint
+    that will be reached in a time step defined as the expected arrival time.
+    In addition, the controller ensures a smooth stop at the last waypoint of the trajectory,
+    with linear speed equal to zero and acceleration equal to zero.
+  */
+  const double desired_acceleration = validatedEntityDesiredAcceleration(
+    follow_waypoint_controller, polyline_trajectory, remaining_time, distance,
+    validated_entity_status.linear_acceleration, validated_entity_status.linear_speed);
+  const double desired_speed =
+    validatedEntityDesiredSpeed(validated_entity_status.linear_speed, desired_acceleration);
+  const auto desired_velocity = validatedEntityDesiredVelocity(
+    polyline_trajectory, target_position, validated_entity_status.position, desired_speed);
+
+  const auto current_velocity = calculateCurrentVelocity(validated_entity_status.linear_speed);
+
+  if (const bool target_passed =
+        validated_entity_status.linear_speed * step_time > distance_to_front_waypoint and
+        math::geometry::innerProduct(desired_velocity, current_velocity) < 0.0;
+      target_passed) {
+    return std::nullopt;
+  }
+
+  const double remaining_time_to_front_waypoint =
+    (std::isfinite(polyline_trajectory.base_time) ? polyline_trajectory.base_time : 0.0) +
+    polyline_trajectory.shape.vertices.front().time - validated_entity_status.time;
+
+  const auto predicted_state_opt = follow_waypoint_controller.getPredictedWaypointArrivalState(
+    desired_acceleration, remaining_time, distance, validated_entity_status.linear_acceleration,
+    validated_entity_status.linear_speed);
+
+  if (std::isfinite(remaining_time) and not predicted_state_opt.has_value()) {
+    THROW_SIMULATION_ERROR(
+      "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
+      "following information to the developer: FollowWaypointController for vehicle ",
+      std::quoted(validated_entity_status.name),
+      " calculated invalid acceleration:", " desired_acceleration: ", desired_acceleration,
+      ", remaining_time_to_front_waypoint: ", remaining_time_to_front_waypoint,
+      ", distance: ", distance, ", acceleration: ", validated_entity_status.linear_acceleration,
+      ", speed: ", validated_entity_status.linear_speed, ". ", follow_waypoint_controller);
+  }
+
+  if (not std::isfinite(remaining_time_to_front_waypoint)) {
+    /*
+      If the nearest waypoint is arrived at in this step without a specific arrival time, it will
+      be considered as achieved
+    */
+    if (not std::isfinite(remaining_time) and polyline_trajectory.shape.vertices.size() == 1UL) {
+      /*
+        If the trajectory has only waypoints with unspecified time, the last one is followed using
+        maximum speed including braking - in this case accuracy of arrival is checked
+      */
+      if (follow_waypoint_controller.areConditionsOfArrivalMet(
+            validated_entity_status.linear_acceleration, validated_entity_status.linear_speed,
+            distance_to_front_waypoint)) {
+        return std::nullopt;
+      } else {
+        return validated_entity_status.buildUpdatedEntityStatus(desired_velocity, step_time);
+      }
+    } else {
+      /*
+        If it is an intermediate waypoint with an unspecified time, the accuracy of the arrival is
+        irrelevant
+      */
+      if (const double this_step_distance =
+            (validated_entity_status.linear_speed + desired_acceleration * step_time) * step_time;
+          this_step_distance > distance_to_front_waypoint) {
+        return std::nullopt;
+      } else {
+        return validated_entity_status.buildUpdatedEntityStatus(desired_velocity, step_time);
+      }
+    }
+    /*
+      If there is insufficient time left for the next calculation step.
+      The value of step_time/2 is compared, as the remaining time is affected by floating point
+      inaccuracy, sometimes it reaches values of 1e-7 (almost zero, but not zero) or (step_time -
+      1e-7) (almost step_time). Because the step is fixed, it should be assumed that the value
+      here is either equal to 0 or step_time. Value step_time/2 allows to return true if no next
+      step is possible (remaining_time_to_front_waypoint is almost zero).
+    */
+  } else if (math::arithmetic::isDefinitelyLessThan(
+               remaining_time_to_front_waypoint, step_time / 2.0)) {
+    if (follow_waypoint_controller.areConditionsOfArrivalMet(
+          validated_entity_status.linear_acceleration, validated_entity_status.linear_speed,
+          distance_to_front_waypoint)) {
+      return std::nullopt;
+    } else {
+      THROW_SIMULATION_ERROR(
+        "Vehicle ", std::quoted(validated_entity_status.name), " at time ",
+        validated_entity_status.time, "s (remaining time is ", remaining_time_to_front_waypoint,
+        "s), has completed a trajectory to the nearest waypoint with", " specified time equal to ",
+        polyline_trajectory.shape.vertices.front().time, "s at a distance equal to ", distance,
+        " from that waypoint which is greater than the accepted accuracy.");
+    }
+  } else {
+    return validated_entity_status.buildUpdatedEntityStatus(desired_velocity, step_time);
+  }
+
+  /*
+    Note: If obstacle avoidance is to be implemented, the steering behavior
+    known by the name "collision avoidance" should be synthesized here into
+    steering.
+  */
+}
+
+auto PolylineTrajectoryFollowerStep::validatedEntityTargetPosition(
+  const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory) const noexcept(false)
+  -> geometry_msgs::msg::Point
+{
+  if (polyline_trajectory.shape.vertices.empty()) {
+    THROW_SIMULATION_ERROR(
+      "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
+      "attempted to dereference an element of an empty PolylineTrajectory");
+  }
+  const auto target_position = polyline_trajectory.shape.vertices.front().position.position;
+  if (not math::geometry::isFinite(target_position)) {
+    THROW_SIMULATION_ERROR(
+      "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
+      "following information to the developer: Vehicle ",
+      std::quoted(validated_entity_status.name),
+      "'s target position coordinate value contains NaN or infinity. The value is [",
+      target_position.x, ", ", target_position.y, ", ", target_position.z, "].");
+  }
+  return target_position;
+}
+auto PolylineTrajectoryFollowerStep::validatedEntityDesiredSpeed(
+  const double entity_speed, const double desired_acceleration) const noexcept(false) -> double
+{
+  const double desired_speed = entity_speed + desired_acceleration * step_time;
+
+  if (not std::isfinite(desired_speed)) {
+    THROW_SIMULATION_ERROR(
+      "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
+      "following information to the developer: Vehicle ",
+      std::quoted(validated_entity_status.name),
+      "'s desired speed value is NaN or infinity. The value is ", desired_speed, ". ");
+  }
+  return desired_speed;
+}
+
+}  // namespace follow_trajectory
+}  // namespace traffic_simulator

@@ -43,6 +43,7 @@ public:
   const bool lanelet_pose_valid;
   const traffic_simulator_msgs::msg::BoundingBox & bounding_box;
   const traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter;
+  const traffic_simulator_msgs::msg::EntityStatus entity_status;
 
 private:
   auto validatedPosition() const noexcept(false) -> geometry_msgs::msg::Point;
@@ -53,8 +54,6 @@ private:
 
   auto buildUpdatedPoseOrientation(const geometry_msgs::msg::Vector3 & desired_velocity) const
     noexcept(true) -> geometry_msgs::msg::Quaternion;
-
-  const traffic_simulator_msgs::msg::EntityStatus entity_status;
 };
 }  // namespace follow_trajectory
 }  // namespace traffic_simulator
