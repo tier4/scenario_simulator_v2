@@ -49,10 +49,9 @@ TEST(EgoEntitySimulation, calculateAccelerationBySlope)
     [&](const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose, bool consider_slope) {
       traffic_simulator_msgs::msg::EntityStatus initial_status;
       initial_status.name = "ego";
-      initial_status.lanelet_pose_valid = true;
-      initial_status.lanelet_pose = lanelet_pose;
-      initial_status.pose =
-        traffic_simulator::pose::toMapPose(initial_status.lanelet_pose, hdmap_utils);
+      // use pitch-filled map pose
+      initial_status.lanelet_pose_valid = false;
+      initial_status.pose = hdmap_utils->toMapPose(lanelet_pose, true).pose;
 
       EgoEntitySimulation ego_entity_simulation(
         initial_status, traffic_simulator_msgs::msg::VehicleParameters(), 1.f / 30.f, hdmap_utils,
