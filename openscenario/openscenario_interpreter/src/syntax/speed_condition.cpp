@@ -12,8 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <geometry/vector3/norm.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
+#include <openscenario_interpreter/syntax/entities.hpp>
+#include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <openscenario_interpreter/syntax/speed_condition.hpp>
 #include <openscenario_interpreter/utility/print.hpp>
 
@@ -23,8 +27,10 @@ inline namespace syntax
 {
 SpeedCondition::SpeedCondition(
   const pugi::xml_node & node, Scope & scope, const TriggeringEntities & triggering_entities)
-: value(readAttribute<Double>("value", node, scope)),
-  compare(readAttribute<Rule>("rule", node, scope)),
+: Scope(scope),
+  rule(readAttribute<Rule>("rule", node, scope)),
+  value(readAttribute<Double>("value", node, scope)),
+  direction(readAttribute<DirectionalDimension>("direction", node, scope, std::nullopt)),
   triggering_entities(triggering_entities),
   results(triggering_entities.entity_refs.size(), {Double::nan()})
 {
@@ -38,9 +44,41 @@ auto SpeedCondition::description() const -> String
 
   print_to(description, results);
 
-  description << " " << compare << " " << value << "?";
+  description << " " << rule << " " << value << "?";
 
   return description.str();
+}
+
+auto SpeedCondition::evaluate(const Entities * entities, const Entity & triggering_entity)
+  -> geometry_msgs::msg::Vector3
+{
+  if (entities->isAdded(triggering_entity)) {
+    return evaluateSpeed(triggering_entity);
+  } else {
+    return geometry_msgs::build<geometry_msgs::msg::Vector3>()
+      .x(Double::nan())
+      .y(Double::nan())
+      .z(Double::nan());
+  }
+}
+
+auto SpeedCondition::evaluate(
+  const Entities * entities, const Entity & triggering_entity,
+  const std::optional<DirectionalDimension> & direction) -> double
+{
+  if (const auto v = evaluate(entities, triggering_entity); direction) {
+    switch (*direction) {
+      default:
+      case DirectionalDimension::longitudinal:
+        return v.x;
+      case DirectionalDimension::lateral:
+        return v.y;
+      case DirectionalDimension::vertical:
+        return v.z;
+    }
+  } else {
+    return math::geometry::norm(v);
+  }
 }
 
 auto SpeedCondition::evaluate() -> Object
@@ -48,9 +86,10 @@ auto SpeedCondition::evaluate() -> Object
   results.clear();
 
   return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
-    results.push_back(
-      triggering_entity.apply([&](const auto & object) { return evaluateSpeed(object); }));
-    return not results.back().size() or compare(results.back(), value).min();
+    results.push_back(triggering_entity.apply([&](const auto & triggering_entity) {
+      return evaluate(global().entities, triggering_entity, direction);
+    }));
+    return not results.back().size() or std::invoke(rule, results.back(), value).min();
   }));
 }
 }  // namespace syntax
