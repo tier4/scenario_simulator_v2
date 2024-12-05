@@ -21,6 +21,11 @@ Changelog for package do_nothing_plugin
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+6.2.3 (2024-12-05)
+------------------
+* Merge branch 'master' into fix/sonor-cloud-issue-8-2
+* Contributors: Masaya Kataoka
+
 6.2.2 (2024-12-04)
 ------------------
 * Merge branch 'master' into refactor/distance-condition
