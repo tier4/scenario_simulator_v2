@@ -137,7 +137,7 @@ TEST(BoundingBox, getPolygonDistanceWithoutCollision)
   EXPECT_DOUBLE_EQ(ans.value(), 3.0);
 }
 
-TEST(BoudingBox, getClosestPoses)
+TEST(BoundingBox, getClosestPoses)
 {
   traffic_simulator_msgs::msg::BoundingBox bbox = makeBbox(1.0, 1.0, 1.0);
   geometry_msgs::msg::Pose pose0;
@@ -164,7 +164,7 @@ TEST(BoudingBox, getClosestPoses)
   }
 }
 
-TEST(BoudingBox, getClosestPosesWithAlmostTouch)
+TEST(BoundingBox, getClosestPosesWithAlmostTouch)
 {
   traffic_simulator_msgs::msg::BoundingBox bbox0 = makeBbox(1.0, 1.0, 1.0);
   geometry_msgs::msg::Pose pose0;
@@ -186,7 +186,7 @@ TEST(BoudingBox, getClosestPosesWithAlmostTouch)
   }
 }
 
-TEST(BoudingBox, getClosestPosesWithIntersection)
+TEST(BoundingBox, getClosestPosesWithIntersection)
 {
   traffic_simulator_msgs::msg::BoundingBox bbox = makeBbox(1.0, 1.0, 1.0);
   geometry_msgs::msg::Pose pose0;
