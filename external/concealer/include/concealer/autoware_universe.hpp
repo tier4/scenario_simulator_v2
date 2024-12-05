@@ -54,12 +54,12 @@ class AutowareUniverse : public rclcpp::Node,
   using AckermannControlCommand     = autoware_auto_control_msgs::msg::AckermannControlCommand;
   using AccelWithCovarianceStamped  = geometry_msgs::msg::AccelWithCovarianceStamped;
 
-  SubscriberWrapper<AckermannControlCommand, ThreadSafety::safe> getAckermannControlCommand;
+  SubscriberWrapper<AckermannControlCommand> getAckermannControlCommand;
 public:
-  SubscriberWrapper<GearCommand,             ThreadSafety::safe> getGearCommand;
+  SubscriberWrapper<GearCommand>             getGearCommand;
 private:
-  SubscriberWrapper<TurnIndicatorsCommand,   ThreadSafety::safe> getTurnIndicatorsCommand;
-  SubscriberWrapper<PathWithLaneId,          ThreadSafety::safe> getPathWithLaneId;
+  SubscriberWrapper<TurnIndicatorsCommand>   getTurnIndicatorsCommand;
+  SubscriberWrapper<PathWithLaneId>          getPathWithLaneId;
 
   PublisherWrapper<AccelWithCovarianceStamped>  setAcceleration;
   PublisherWrapper<nav_msgs::msg::Odometry>     setOdometry;

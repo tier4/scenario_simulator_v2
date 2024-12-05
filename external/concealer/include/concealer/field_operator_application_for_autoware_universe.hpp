@@ -64,10 +64,10 @@ class FieldOperatorApplicationFor<AutowareUniverse>
   // clang-format off
   SubscriberWrapper<autoware_auto_control_msgs::msg::AckermannControlCommand>     getAckermannControlCommand;
 #if __has_include(<autoware_system_msgs/msg/autoware_state.hpp>)
-  SubscriberWrapper<autoware_system_msgs::msg::AutowareState, ThreadSafety::safe>    getAutowareState;
+  SubscriberWrapper<autoware_system_msgs::msg::AutowareState>                     getAutowareState;
 #endif
 #if __has_include(<autoware_auto_system_msgs/msg/autoware_state.hpp>)
-  SubscriberWrapper<autoware_auto_system_msgs::msg::AutowareState, ThreadSafety::safe> getAutowareAutoState;
+  SubscriberWrapper<autoware_auto_system_msgs::msg::AutowareState>                getAutowareAutoState;
 #endif
   SubscriberWrapper<tier4_rtc_msgs::msg::CooperateStatusArray>                    getCooperateStatusArray;
   SubscriberWrapper<tier4_external_api_msgs::msg::Emergency>                      getEmergencyState;
