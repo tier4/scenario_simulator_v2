@@ -32,6 +32,25 @@ Changelog for package openscenario_interpreter
 * add publish_empty_context parameter
 * Contributors: Masaya Kataoka
 
+6.2.3 (2024-12-05)
+------------------
+* Merge branch 'master' into fix/sonor-cloud-issue-8-2
+* Contributors: Masaya Kataoka
+
+6.2.2 (2024-12-04)
+------------------
+* Merge pull request `#1467 <https://github.com/tier4/scenario_simulator_v2/issues/1467>`_ from tier4/refactor/distance-condition
+  Refactor/distance condition
+* Merge branch 'master' into refactor/distance-condition
+* Update member function `DistanceCondition::evaluate` to be static
+* Remove duplicate entity existence check in `DistanceCondition`
+* Update `DistanceCondition::evaluate` to check if the given entity exists
+* Add default clause to switch to suppress warnings
+* Merge remote-tracking branch 'origin/master' into refactor/distance-condition
+* Update `RelativeDistanceCondition::evaluate` to receive `Position`
+* Rename `DistanceCondition::distance` to `evaluate`
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
 6.2.1 (2024-12-03)
 ------------------
 * Merge pull request `#1466 <https://github.com/tier4/scenario_simulator_v2/issues/1466>`_ from tier4/refactor/distance-condition-and-relative-distance-condition

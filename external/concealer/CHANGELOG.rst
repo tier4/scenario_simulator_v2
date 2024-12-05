@@ -21,6 +21,17 @@ Changelog for package concealer
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+6.2.3 (2024-12-05)
+------------------
+* Merge branch 'master' into fix/sonor-cloud-issue-8-2
+* Contributors: Masaya Kataoka
+
+6.2.2 (2024-12-04)
+------------------
+* Merge branch 'master' into refactor/distance-condition
+* Merge remote-tracking branch 'origin/master' into refactor/distance-condition
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
 6.2.1 (2024-12-03)
 ------------------
 * Merge branch 'master' into refactor/distance-condition-and-relative-distance-condition
