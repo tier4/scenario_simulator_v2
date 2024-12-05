@@ -34,7 +34,8 @@ namespace follow_trajectory
 
 ValidatedEntityStatus::ValidatedEntityStatus(
   const traffic_simulator_msgs::msg::EntityStatus & entity_status,
-  const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter, const double step_time)
+  const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter,
+  const double step_time) noexcept(false)
 : entity_status_(entity_status),
   name(entity_status_.name),
   time(entity_status_.time),
@@ -47,6 +48,10 @@ ValidatedEntityStatus::ValidatedEntityStatus(
   bounding_box(entity_status_.bounding_box),
   behavior_parameter(behavior_parameter)
 {
+  assert(std::isfinite(behavior_parameter.dynamic_constraints.max_acceleration_rate));
+  assert(std::isfinite(behavior_parameter.dynamic_constraints.max_deceleration_rate));
+  assert(std::isfinite(behavior_parameter.dynamic_constraints.max_acceleration));
+  assert(std::isfinite(behavior_parameter.dynamic_constraints.max_deceleration));
 }
 
 ValidatedEntityStatus::ValidatedEntityStatus(const ValidatedEntityStatus & other)
@@ -58,7 +63,7 @@ auto ValidatedEntityStatus::buildUpdatedPoseOrientation(
   const geometry_msgs::msg::Vector3 & desired_velocity) const noexcept(true)
   -> geometry_msgs::msg::Quaternion
 {
-  if (desired_velocity.y == 0.0 && desired_velocity.x == 0.0 && desired_velocity.z == 0.0) {
+  if (desired_velocity.x == 0.0 and desired_velocity.y == 0.0 and desired_velocity.z == 0.0) {
     // do not change orientation if there is no designed_velocity vector
     return entity_status_.pose.orientation;
   } else {
@@ -112,7 +117,6 @@ auto ValidatedEntityStatus::buildUpdatedEntityStatus(
   const auto updated_pose = geometry_msgs::build<geometry_msgs::msg::Pose>()
                               .position(entity_status_.pose.position + desired_velocity * step_time)
                               .orientation(updated_pose_orientation);
-
   constexpr bool updated_lanelet_pose_valid = false;
 
   return traffic_simulator_msgs::build<traffic_simulator_msgs::msg::EntityStatus>()

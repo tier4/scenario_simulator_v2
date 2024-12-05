@@ -30,7 +30,7 @@ public:
   explicit ValidatedEntityStatus(
     const traffic_simulator_msgs::msg::EntityStatus & entity_status,
     const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter,
-    const double step_time);
+    const double step_time) noexcept(false);
 
   auto buildUpdatedEntityStatus(const geometry_msgs::msg::Vector3 & desired_velocity) const
     -> traffic_simulator_msgs::msg::EntityStatus;
