@@ -1,0 +1,8 @@
+<root>
+    <BehaviorTree>
+        <Fallback name="root">
+            <FollowLane name="follow_lane"/>
+            <FollowPolylineTrajectory name="follow_polyline_trajectory"/>
+        </Fallback>
+    </BehaviorTree>
+</root>
