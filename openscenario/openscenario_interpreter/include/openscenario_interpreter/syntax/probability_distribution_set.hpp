@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__PROBABILITY_DISTRIBUTION_SET_HPP_
-#define OPENSCENARIO_INTERPRETER__PROBABILITY_DISTRIBUTION_SET_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__PROBABILITY_DISTRIBUTION_SET_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__PROBABILITY_DISTRIBUTION_SET_HPP_
 
+#include <openscenario_interpreter/parameter_distribution.hpp>
 #include <openscenario_interpreter/syntax/probability_distribution_set_element.hpp>
 #include <random>
 
@@ -22,42 +23,31 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- ProbabilityDistributionSet 1.2 -----------------------------------------
- *
- *  <xsd:complexType name="ProbabilityDistributionSet">
- *    <xsd:sequence>
- *      <xsd:element name="Element" type="ProbabilityDistributionSetElement" maxOccurs="unbounded"/>
- *    </xsd:sequence>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   ProbabilityDistributionSet (OpenSCENARIO XML 1.3)
 
-struct ProbabilityDistributionSet : public ComplexType, private Scope
+   Container for a set of single values with a defined probability.
+
+   <xsd:complexType name="ProbabilityDistributionSet">
+     <xsd:sequence>
+       <xsd:element name="Element" type="ProbabilityDistributionSetElement" maxOccurs="unbounded"/>
+     </xsd:sequence>
+   </xsd:complexType>
+*/
+
+struct ProbabilityDistributionSet : public ComplexType,
+                                    private Scope,
+                                    public StochasticParameterDistributionBase
 {
+  // NOTE: use std::vector instead of std::list due to random access in `derive()`
   const std::vector<ProbabilityDistributionSetElement> elements;
-
-  struct ProbabilityDistributionSetAdaptor
-  {
-    explicit ProbabilityDistributionSetAdaptor(
-      const std::vector<ProbabilityDistributionSetElement> & elements)
-    {
-      for (const auto & element : elements) {
-        probabilities.emplace_back(element.weight);
-        values.emplace_back(element.value);
-      }
-    }
-    std::vector<double> probabilities;
-    std::vector<String> values;
-  } adaptor;
 
   std::discrete_distribution<std::size_t> distribute;
 
-  std::mt19937 random_engine;
-
   explicit ProbabilityDistributionSet(const pugi::xml_node &, Scope & scope);
 
-  auto evaluate() -> Object;
+  auto derive() -> Object override;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
-#endif  // OPENSCENARIO_INTERPRETER__PROBABILITY_DISTRIBUTION_SET_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__PROBABILITY_DISTRIBUTION_SET_HPP_
