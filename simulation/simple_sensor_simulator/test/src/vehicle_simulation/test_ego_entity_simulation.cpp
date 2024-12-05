@@ -40,10 +40,12 @@ TEST(EgoEntitySimulation, calculateAccelerationBySlope)
   // expected value in the lanelet(id:7)
   // first 25m: 1m up
   constexpr double expected_slope_acceleration_first_25m =
-    std::sin(-std::atan(1. / 25.)) * gravity_acceleration;
+    -std::sin(-std::atan(1. / 25.)) * gravity_acceleration;
+  EXPECT_LE(expected_slope_acceleration_first_25m, 0.0);  // up -> negative slope acceleration
   // last 25m:  4m up
   constexpr double expected_slope_acceleration_last_25m =
-    std::sin(-std::atan(4. / 25.)) * gravity_acceleration;
+    -std::sin(-std::atan(4. / 25.)) * gravity_acceleration;
+  EXPECT_LE(expected_slope_acceleration_last_25m, 0.0);  // up -> negative slope acceleration
 
   auto get_slope_acceleration_at =
     [&](const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose, bool consider_slope) {
