@@ -15,19 +15,26 @@
 #ifndef CONCEALER__AUTOWARE_UNIVERSE_HPP_
 #define CONCEALER__AUTOWARE_UNIVERSE_HPP_
 
+#include <atomic>
 #include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
 #include <autoware_auto_planning_msgs/msg/path_with_lane_id.hpp>
 #include <autoware_auto_vehicle_msgs/msg/control_mode_report.hpp>
+#include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
 #include <autoware_auto_vehicle_msgs/msg/gear_report.hpp>
 #include <autoware_auto_vehicle_msgs/msg/steering_report.hpp>
+#include <autoware_auto_vehicle_msgs/msg/turn_indicators_command.hpp>
 #include <autoware_auto_vehicle_msgs/msg/turn_indicators_report.hpp>
 #include <autoware_auto_vehicle_msgs/msg/velocity_report.hpp>
 #include <autoware_auto_vehicle_msgs/srv/control_mode_command.hpp>
-#include <concealer/autoware.hpp>
+#include <concealer/continuous_transform_broadcaster.hpp>
 #include <concealer/publisher_wrapper.hpp>
 #include <concealer/subscriber_wrapper.hpp>
+#include <concealer/visibility.hpp>
 #include <geometry_msgs/msg/accel_with_covariance_stamped.hpp>
+#include <geometry_msgs/msg/pose.hpp>
+#include <geometry_msgs/msg/twist_stamped.hpp>
 #include <nav_msgs/msg/odometry.hpp>
+#include <rclcpp/rclcpp.hpp>
 
 namespace concealer
 {
@@ -35,7 +42,8 @@ namespace concealer
  * Implements Autoware interface for Autoware Universe
  * NOTE: This class is intended to be move to simple_sensor_simulator
  */
-class AutowareUniverse : public Autoware
+class AutowareUniverse : public rclcpp::Node,
+                         public ContinuousTransformBroadcaster<AutowareUniverse>
 {
   // clang-format off
   using ControlModeCommand          = autoware_auto_vehicle_msgs::srv::ControlModeCommand;
@@ -82,34 +90,49 @@ class AutowareUniverse : public Autoware
 
   auto stopAndJoin() -> void;
 
+  std::atomic<geometry_msgs::msg::Accel> current_acceleration;
+
+  std::atomic<geometry_msgs::msg::Twist> current_twist;
+
+  std::atomic<geometry_msgs::msg::Pose> current_pose;
+
 public:
   CONCEALER_PUBLIC explicit AutowareUniverse();
 
   ~AutowareUniverse();
 
-  auto rethrow() -> void override;
+  auto rethrow() -> void;
 
-  auto getAcceleration() const -> double override;
+  auto getAcceleration() const -> double;
 
-  auto getSteeringAngle() const -> double override;
+  auto getSteeringAngle() const -> double;
 
-  auto getVelocity() const -> double override;
+  auto getVelocity() const -> double;
 
   auto updateLocalization() -> void;
 
   auto updateVehicleState() -> void;
 
-  auto getGearCommand() const -> GearCommand override;
+  auto getGearCommand() const -> GearCommand;
 
-  auto getGearSign() const -> double override;
+  auto getGearSign() const -> double;
 
-  auto getVehicleCommand() const -> std::tuple<AckermannControlCommand, GearCommand> override;
+  auto getVehicleCommand() const -> std::tuple<AckermannControlCommand, GearCommand>;
 
-  auto getRouteLanelets() const -> std::vector<std::int64_t> override;
+  auto getRouteLanelets() const -> std::vector<std::int64_t>;
 
-  auto getControlModeReport() const -> ControlModeReport override;
+  auto getControlModeReport() const -> ControlModeReport;
 
-  auto setManualMode() -> void override;
+  auto set(const geometry_msgs::msg::Accel & acceleration) -> void
+  {
+    current_acceleration.store(acceleration);
+  }
+
+  auto set(const geometry_msgs::msg::Twist & twist) -> void { current_twist.store(twist); }
+
+  auto set(const geometry_msgs::msg::Pose & pose) -> void { current_pose.store(pose); }
+
+  auto setManualMode() -> void;
 };
 
 }  // namespace concealer

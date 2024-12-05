@@ -17,7 +17,8 @@
 namespace concealer
 {
 AutowareUniverse::AutowareUniverse()
-: getAckermannControlCommand("/control/command/control_cmd", rclcpp::QoS(1), *this),
+: rclcpp::Node("concealer", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),
+  getAckermannControlCommand("/control/command/control_cmd", rclcpp::QoS(1), *this),
   getGearCommandImpl("/control/command/gear_cmd", rclcpp::QoS(1), *this),
   getTurnIndicatorsCommand("/control/command/turn_indicators_cmd", rclcpp::QoS(1), *this),
   getPathWithLaneId(

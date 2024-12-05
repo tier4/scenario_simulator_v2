@@ -41,7 +41,7 @@ EgoEntitySimulation::EgoEntitySimulation(
   const traffic_simulator_msgs::msg::VehicleParameters & parameters, double step_time,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
   const rclcpp::Parameter & use_sim_time, const bool consider_acceleration_by_road_slope)
-: autoware(std::make_unique<concealer::AutowareUniverse>()),
+: autoware(),
   vehicle_model_type_(getVehicleModelType()),
   vehicle_model_ptr_(makeSimulationModel(vehicle_model_type_, step_time, parameters)),
   status_(initial_status, std::nullopt),
@@ -52,7 +52,7 @@ EgoEntitySimulation::EgoEntitySimulation(
   vehicle_parameters(parameters)
 {
   setStatus(initial_status);
-  autoware->set_parameter(use_sim_time);
+  autoware.set_parameter(use_sim_time);
 }
 
 auto toString(const VehicleModelType datum) -> std::string
@@ -176,15 +176,15 @@ auto EgoEntitySimulation::makeSimulationModel(
 
 auto EgoEntitySimulation::setAutowareStatus() -> void
 {
-  autoware->set([this]() {
+  autoware.set([this]() {
     geometry_msgs::msg::Accel message;
     message.linear.x = vehicle_model_ptr_->getAx();
     return message;
   }());
 
-  autoware->set(status_.getMapPose());
+  autoware.set(status_.getMapPose());
 
-  autoware->set(getCurrentTwist());
+  autoware.set(getCurrentTwist());
 }
 
 void EgoEntitySimulation::requestSpeedChange(double value)
@@ -226,7 +226,7 @@ auto EgoEntitySimulation::overwrite(
   using math::geometry::convertQuaternionToEulerAngle;
   using math::geometry::getRotationMatrix;
 
-  autoware->rethrow();
+  autoware.rethrow();
 
   /*
      SimModelInterface only supports 2D, therefore the position in Oz is
@@ -289,7 +289,7 @@ void EgoEntitySimulation::update(
 {
   using math::geometry::getRotationMatrix;
 
-  autoware->rethrow();
+  autoware.rethrow();
 
   /*
      SimModelInterface only supports 2D, therefore the position in Oz is
@@ -313,14 +313,14 @@ void EgoEntitySimulation::update(
       case VehicleModelType::DELAY_STEER_MAP_ACC_GEARED:
       case VehicleModelType::IDEAL_STEER_ACC:
       case VehicleModelType::IDEAL_STEER_ACC_GEARED:
-        input(0) = autoware->getGearSign() * (autoware->getAcceleration() + acceleration_by_slope);
-        input(1) = autoware->getSteeringAngle();
+        input(0) = autoware.getGearSign() * (autoware.getAcceleration() + acceleration_by_slope);
+        input(1) = autoware.getSteeringAngle();
         break;
 
       case VehicleModelType::DELAY_STEER_VEL:
       case VehicleModelType::IDEAL_STEER_VEL:
-        input(0) = autoware->getVelocity();
-        input(1) = autoware->getSteeringAngle();
+        input(0) = autoware.getVelocity();
+        input(1) = autoware.getSteeringAngle();
         break;
 
       default:
@@ -328,7 +328,7 @@ void EgoEntitySimulation::update(
           "Unsupported vehicle_model_type ", toString(vehicle_model_type_), "specified");
     }
 
-    vehicle_model_ptr_->setGear(autoware->getGearCommand().command);
+    vehicle_model_ptr_->setGear(autoware.getGearCommand().command);
     vehicle_model_ptr_->setInput(input);
     vehicle_model_ptr_->update(step_time);
   }
@@ -417,7 +417,7 @@ auto EgoEntitySimulation::setStatus(const traffic_simulator_msgs::msg::EntitySta
   /// @note The lanelet matching algorithm should be equivalent to the one used in
   /// EgoEntity::setStatus
   const auto unique_route_lanelets =
-    traffic_simulator::helper::getUniqueValues(autoware->getRouteLanelets());
+    traffic_simulator::helper::getUniqueValues(autoware.getRouteLanelets());
   /// @note The offset value has been increased to 1.5 because a value of 1.0 was often insufficient when changing lanes. ( @Hans_Robo )
   const auto matching_distance = std::max(
                                    vehicle_parameters.axles.front_axle.track_width,
