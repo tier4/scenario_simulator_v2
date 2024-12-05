@@ -54,8 +54,31 @@ auto laneletIds() -> lanelet::Ids
   return ids;
 }
 
+auto filterLaneletIds(const lanelet::Ids & lanelet_ids, const char subtype[]) -> lanelet::Ids
+{
+  const auto convertToLanelets = [](const lanelet::Ids & lanelet_ids) -> lanelet::Lanelets {
+    lanelet::Lanelets lanelets;
+    for (const auto & id : lanelet_ids) {
+      lanelets.emplace_back(LaneletWrapper::map()->laneletLayer.get(id));
+    }
+    return lanelets;
+  };
+
+  const auto lanelets = convertToLanelets(lanelet_ids);
+  lanelet::Lanelets filtered_lanelets;
+  for (const auto & lanelet : lanelets) {
+    if (lanelet.hasAttribute(lanelet::AttributeName::Subtype)) {
+      lanelet::Attribute attr = lanelet.attribute(lanelet::AttributeName::Subtype);
+      if (attr.value() == subtype) {
+        filtered_lanelets.emplace_back(lanelet);
+      }
+    }
+  }
+  return laneletIds(filtered_lanelets);
+}
+
 auto nearbyLaneletIds(
-  const Point & point, const double distance_thresh, const bool include_crosswalk,
+  const Point & point, const double distance_threshold, const bool include_crosswalk,
   const std::size_t search_count) -> lanelet::Ids
 {
   auto excludeSubtypeLanelets =
@@ -77,7 +100,7 @@ auto nearbyLaneletIds(
     LaneletWrapper::map()->laneletLayer, lanelet::BasicPoint2d(point.x, point.y), search_count);
 
   // check for current content, if not empty then optionally apply filter
-  if (nearest_lanelets.empty() || nearest_lanelets.front().first > distance_thresh) {
+  if (nearest_lanelets.empty() || nearest_lanelets.front().first > distance_threshold) {
     return {};
   } else if (!include_crosswalk) {
     nearest_lanelets =
@@ -85,12 +108,12 @@ auto nearbyLaneletIds(
   }
 
   // check again
-  if (nearest_lanelets.empty() || nearest_lanelets.front().first > distance_thresh) {
+  if (nearest_lanelets.empty() || nearest_lanelets.front().first > distance_threshold) {
     return {};
   } else {
     lanelet::Ids target_lanelet_ids;
     for (const auto & [distance, lanelet] : nearest_lanelets) {
-      if (distance <= distance_thresh) {
+      if (distance <= distance_threshold) {
         target_lanelet_ids.emplace_back(lanelet.id());
       }
     }
@@ -284,6 +307,39 @@ auto rightOfWayLaneletIds(const lanelet::Ids & lanelet_ids)
     right_of_way_lanelets_ids.emplace(lanelet_id, rightOfWayLaneletIds(lanelet_id));
   }
   return right_of_way_lanelets_ids;
+}
+
+auto conflictingCrosswalkIds(const lanelet::Ids & lanelet_ids) -> lanelet::Ids
+{
+  constexpr size_t routing_graph_id{1};
+  constexpr double height_clearance{4};
+  /// @note it is not clear if the distinction for crosswalks only is implemented here
+  lanelet::Ids conflicting_crosswalk_ids;
+  lanelet::routing::RoutingGraphContainer graphs_container(
+    {LaneletWrapper::routingGraph(RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER),
+     LaneletWrapper::routingGraph(RoutingGraphType::PEDESTRIAN)});
+  for (const auto & lanelet_id : lanelet_ids) {
+    const auto & conflicting_crosswalks = graphs_container.conflictingInGraph(
+      LaneletWrapper::map()->laneletLayer.get(lanelet_id), routing_graph_id, height_clearance);
+    for (const auto & conflicting_crosswalk : conflicting_crosswalks) {
+      conflicting_crosswalk_ids.emplace_back(conflicting_crosswalk.id());
+    }
+  }
+  return conflicting_crosswalk_ids;
+}
+
+auto conflictingLaneIds(const lanelet::Ids & lanelet_ids, const RoutingGraphType type)
+  -> lanelet::Ids
+{
+  lanelet::Ids conflicting_lanes_ids;
+  for (const auto & lanelet_id : lanelet_ids) {
+    const auto & conflicting_lanelets = lanelet::utils::getConflictingLanelets(
+      LaneletWrapper::routingGraph(type), LaneletWrapper::map()->laneletLayer.get(lanelet_id));
+    for (const auto & conflicting_lanelet : conflicting_lanelets) {
+      conflicting_lanes_ids.emplace_back(conflicting_lanelet.id());
+    }
+  }
+  return conflicting_lanes_ids;
 }
 
 // Objects on path

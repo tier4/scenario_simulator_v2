@@ -45,6 +45,8 @@ auto laneletIds(const std::vector<Lanelet> & lanelets) -> lanelet::Ids
 
 auto laneletIds() -> lanelet::Ids;
 
+auto filterLaneletIds(const lanelet::Ids & lanelet_ids, const char subtype[]) -> lanelet::Ids;
+
 auto nearbyLaneletIds(
   const Point & point, const double distance_threshold, const bool include_crosswalk,
   const std::size_t search_count) -> lanelet::Ids;
@@ -107,6 +109,12 @@ auto rightOfWayLaneletIds(const lanelet::Ids & lanelet_ids)
   -> std::unordered_map<lanelet::Id, lanelet::Ids>;
 
 auto rightOfWayLaneletIds(const lanelet::Id lanelet_id) -> lanelet::Ids;
+
+auto conflictingCrosswalkIds(const lanelet::Ids & lanelet_ids) -> lanelet::Ids;
+
+auto conflictingLaneIds(
+  const lanelet::Ids & lanelet_ids,
+  const RoutingGraphType type = RoutingConfiguration().routing_graph_type) -> lanelet::Ids;
 
 // Objects on path
 auto trafficSignsOnPath(const lanelet::Ids & lanelet_ids)

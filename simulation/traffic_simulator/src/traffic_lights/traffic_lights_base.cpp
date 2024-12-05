@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <traffic_simulator/lanelet_wrapper/traffic_lights.hpp>
 #include <traffic_simulator/traffic_lights/traffic_lights_base.hpp>
+#include <traffic_simulator/utils/distance.hpp>
 
 namespace traffic_simulator
 {
@@ -145,5 +147,36 @@ auto TrafficLightsBase::getTrafficLights(const lanelet::Id lanelet_id)
       "Given lanelet ID ", lanelet_id, " is neither a traffic light ID not a traffic relation ID.");
   }
   return traffic_lights;
+}
+
+auto TrafficLightsBase::getDistanceToActiveTrafficLightStopLine(
+  const lanelet::Ids & route_lanelets, const math::geometry::CatmullRomSplineInterface & spline)
+  -> std::optional<double>
+{
+  /// @todo this will be changed when traffic_lights is added to utils
+  const auto traffic_light_ids =
+    lanelet_wrapper::traffic_lights::trafficLightIdsOnPath(route_lanelets);
+  if (traffic_light_ids.empty()) {
+    return std::nullopt;
+  }
+  std::set<double> collision_points = {};
+  for (const auto id : traffic_light_ids) {
+    using Color = traffic_simulator::TrafficLight::Color;
+    using Status = traffic_simulator::TrafficLight::Status;
+    using Shape = traffic_simulator::TrafficLight::Shape;
+    if (auto && traffic_light = getTrafficLight(id);
+        traffic_light.contains(Color::red, Status::solid_on, Shape::circle) or
+        traffic_light.contains(Color::yellow, Status::solid_on, Shape::circle)) {
+      const auto collision_point =
+        traffic_simulator::distance::distanceToTrafficLightStopLine(spline, id);
+      if (collision_point) {
+        collision_points.insert(collision_point.value());
+      }
+    }
+  }
+  if (collision_points.empty()) {
+    return std::nullopt;
+  }
+  return *collision_points.begin();
 }
 }  // namespace traffic_simulator

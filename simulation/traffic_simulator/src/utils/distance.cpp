@@ -18,7 +18,9 @@
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/lanelet_wrapper/distance.hpp>
 #include <traffic_simulator/lanelet_wrapper/lanelet_map.hpp>
+#include <traffic_simulator/lanelet_wrapper/lanelet_wrapper.hpp>
 #include <traffic_simulator/lanelet_wrapper/pose.hpp>
+#include <traffic_simulator/lanelet_wrapper/route.hpp>
 #include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 
@@ -48,6 +50,7 @@ auto lateralDistance(
   }
 }
 
+/// @todo HdMapUtils will be removed when lanelet_wrapper:lane_change is added
 auto countLaneChanges(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
   const traffic_simulator::RoutingConfiguration & routing_configuration,
@@ -195,6 +198,20 @@ auto boundingBoxLaneLongitudinalDistance(
   return std::nullopt;
 }
 
+auto splineDistanceToBoundingBox(
+  const math::geometry::CatmullRomSplineInterface & spline, const CanonicalizedLaneletPose & pose,
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, const double width_extension_right,
+  const double width_extension_left, const double length_extension_front,
+  const double length_extension_rear) -> std::optional<double>
+{
+  const auto polygon = math::geometry::transformPoints(
+    static_cast<geometry_msgs::msg::Pose>(pose),
+    math::geometry::getPointsFromBbox(
+      bounding_box, width_extension_right, width_extension_left, length_extension_front,
+      length_extension_rear));
+  return spline.getCollisionPointIn2D(polygon, false);
+}
+
 // Bounds
 auto distanceToLeftLaneBound(
   const geometry_msgs::msg::Pose & map_pose,
@@ -320,6 +337,70 @@ auto distanceToYieldStop(
     }
   }
   return std::nullopt;
+}
+
+auto distanceToNearestConflictingPose(
+  const lanelet::Ids & following_lanelets, const math::geometry::CatmullRomSplineInterface & spline,
+  const std::vector<CanonicalizedEntityStatus> & other_statuses) -> std::optional<double>
+{
+  const auto conflicting_entities_on_crosswalk =
+    [&other_statuses](
+      const lanelet::Ids & following_lanelets) -> std::vector<CanonicalizedEntityStatus> {
+    std::vector<CanonicalizedEntityStatus> conflicting_entity_status;
+    const auto conflicting_crosswalks =
+      lanelet_wrapper::lanelet_map::conflictingCrosswalkIds(following_lanelets);
+    for (const auto & status : other_statuses) {
+      if (
+        status.laneMatchingSucceed() &&
+        std::count(
+          conflicting_crosswalks.begin(), conflicting_crosswalks.end(), status.getLaneletId()) >=
+          1) {
+        conflicting_entity_status.emplace_back(status);
+      }
+    }
+    return conflicting_entity_status;
+  }(following_lanelets);
+
+  const auto conflicting_entities_on_lane =
+    [&other_statuses](
+      const lanelet::Ids & following_lanelets) -> std::vector<CanonicalizedEntityStatus> {
+    std::vector<CanonicalizedEntityStatus> conflicting_entity_status;
+    const auto conflicting_lanes =
+      lanelet_wrapper::lanelet_map::conflictingLaneIds(following_lanelets);
+    for (const auto & status : other_statuses) {
+      if (
+        status.laneMatchingSucceed() &&
+        std::count(conflicting_lanes.begin(), conflicting_lanes.end(), status.getLaneletId()) >=
+          1) {
+        conflicting_entity_status.emplace_back(status);
+      }
+    }
+    return conflicting_entity_status;
+  }(following_lanelets);
+
+  std::set<double> distances;
+  for (const auto & status : conflicting_entities_on_crosswalk) {
+    if (const auto pose = status.getCanonicalizedLaneletPose()) {
+      if (const auto s = distanceToCrosswalk(spline, pose->getLaneletId())) {
+        distances.insert(s.value());
+      }
+    }
+  }
+  for (const auto & status : conflicting_entities_on_lane) {
+    if (const auto pose = status.getCanonicalizedLaneletPose()) {
+      if (
+        const auto s = splineDistanceToBoundingBox(
+          spline, pose.value(), status.getBoundingBox(), 0.0, 0.0, 0.0, 1.0)) {
+        distances.insert(s.value());
+      }
+    }
+  }
+
+  if (distances.empty()) {
+    return std::nullopt;
+  } else {
+    return *distances.begin();
+  }
 }
 }  // namespace distance
 }  // namespace traffic_simulator
