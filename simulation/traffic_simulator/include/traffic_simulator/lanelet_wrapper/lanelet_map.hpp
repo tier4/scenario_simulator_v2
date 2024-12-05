@@ -26,6 +26,7 @@ namespace lanelet_wrapper
 {
 namespace lanelet_map
 {
+// Basics
 auto isInLanelet(const lanelet::Id lanelet_id, const double lanelet_pose_s) -> bool;
 
 auto isInLanelet(const lanelet::Id lanelet_id, const Point point) -> bool;
@@ -48,12 +49,14 @@ auto nearbyLaneletIds(
   const Point & point, const double distance_threshold, const bool include_crosswalk,
   const std::size_t search_count) -> lanelet::Ids;
 
+// Center points
 auto centerPoints(const lanelet::Ids & lanelet_ids) -> std::vector<Point>;
 
 auto centerPoints(const lanelet::Id lanelet_id) -> std::vector<Point>;
 
 auto centerPointsSpline(const lanelet::Id lanelet_id) -> std::shared_ptr<Spline>;
 
+// Next lanelet
 auto nextLaneletIds(
   const lanelet::Id lanelet_id,
   const RoutingGraphType type = RoutingConfiguration().routing_graph_type) -> lanelet::Ids;
@@ -70,6 +73,7 @@ auto nextLaneletIds(
   const lanelet::Ids & lanelet_ids, const std::string & turn_direction,
   const RoutingGraphType type = RoutingConfiguration().routing_graph_type) -> lanelet::Ids;
 
+// Previous lanelet
 auto previousLaneletIds(
   const lanelet::Id lanelet_id,
   const RoutingGraphType type = RoutingConfiguration().routing_graph_type) -> lanelet::Ids;
@@ -85,6 +89,32 @@ auto previousLaneletIds(
 auto previousLaneletIds(
   const lanelet::Ids & lanelet_ids, const std::string & turn_direction,
   const RoutingGraphType type = RoutingConfiguration().routing_graph_type) -> lanelet::Ids;
+
+// Bounds
+auto leftBound(const lanelet::Id lanelet_id) -> std::vector<Point>;
+
+auto rightBound(const lanelet::Id lanelet_id) -> std::vector<Point>;
+
+// Polygons
+auto laneletPolygon(const lanelet::Id lanelet_id) -> std::vector<Point>;
+
+auto stopLinePolygon(const lanelet::Id lanelet_id) -> std::vector<Point>;
+
+auto toPolygon(const lanelet::ConstLineString3d & line_string) -> std::vector<Point>;
+
+// Relations
+auto rightOfWayLaneletIds(const lanelet::Ids & lanelet_ids)
+  -> std::unordered_map<lanelet::Id, lanelet::Ids>;
+
+auto rightOfWayLaneletIds(const lanelet::Id lanelet_id) -> lanelet::Ids;
+
+// Objects on path
+auto trafficSignsOnPath(const lanelet::Ids & lanelet_ids)
+  -> std::vector<std::shared_ptr<const lanelet::TrafficSign>>;
+
+auto stopLinesOnPath(const lanelet::Ids & lanelet_ids) -> lanelet::ConstLineStrings3d;
+
+auto stopLineIdsOnPath(const lanelet::Ids & lanelet_ids) -> lanelet::Ids;
 }  // namespace lanelet_map
 }  // namespace lanelet_wrapper
 }  // namespace traffic_simulator
