@@ -28,6 +28,7 @@ namespace lanelet_wrapper
 {
 namespace lanelet_map
 {
+// Basics
 auto isInLanelet(const lanelet::Id lanelet_id, const double lanelet_pose_s) -> bool
 {
   return 0 <= lanelet_pose_s and lanelet_pose_s <= laneletLength(lanelet_id);
@@ -97,6 +98,7 @@ auto nearbyLaneletIds(
   }
 }
 
+// Center points
 auto centerPoints(const lanelet::Ids & lanelet_ids) -> std::vector<Point>
 {
   if (lanelet_ids.empty()) {
@@ -124,6 +126,7 @@ auto centerPointsSpline(const lanelet::Id lanelet_id) -> std::shared_ptr<Spline>
     lanelet_id, LaneletWrapper::map());
 }
 
+// Next lanelet
 auto nextLaneletIds(const lanelet::Id lanelet_id, const RoutingGraphType type) -> lanelet::Ids
 {
   lanelet::Ids next_lanelet_ids;
@@ -171,6 +174,7 @@ auto nextLaneletIds(
   return lanelet::Ids(next_lanelet_ids_set.begin(), next_lanelet_ids_set.end());
 }
 
+// Previous lanelet
 auto previousLaneletIds(const lanelet::Id lanelet_id, const RoutingGraphType type) -> lanelet::Ids
 {
   lanelet::Ids previous_lanelet_ids;
@@ -217,6 +221,105 @@ auto previousLaneletIds(
     previous_lanelet_ids_set.insert(previous_lanelet_ids.begin(), previous_lanelet_ids.end());
   }
   return lanelet::Ids(previous_lanelet_ids_set.begin(), previous_lanelet_ids_set.end());
+}
+
+// Bounds
+auto leftBound(const lanelet::Id lanelet_id) -> std::vector<Point>
+{
+  return toPolygon(LaneletWrapper::map()->laneletLayer.get(lanelet_id).leftBound());
+}
+
+auto rightBound(const lanelet::Id lanelet_id) -> std::vector<Point>
+{
+  return toPolygon(LaneletWrapper::map()->laneletLayer.get(lanelet_id).rightBound());
+}
+
+// Polygons
+auto laneletPolygon(const lanelet::Id lanelet_id) -> std::vector<Point>
+{
+  std::vector<Point> points;
+  const auto & lanelet_polygon = LaneletWrapper::map()->laneletLayer.get(lanelet_id).polygon3d();
+  for (const auto & point : lanelet_polygon) {
+    points.emplace_back(geometry_msgs::build<Point>().x(point.x()).y(point.y()).z(point.z()));
+  }
+  return points;
+}
+
+auto stopLinePolygon(const lanelet::Id lanelet_id) -> std::vector<Point>
+{
+  /// @todo here you should probably add a verify if the passed lanelet_id is indeed a stop_line
+  return toPolygon(LaneletWrapper::map()->lineStringLayer.get(lanelet_id));
+}
+
+auto toPolygon(const lanelet::ConstLineString3d & line_string) -> std::vector<Point>
+{
+  std::vector<Point> points;
+  for (const auto & point : line_string) {
+    points.emplace_back(geometry_msgs::build<Point>().x(point.x()).y(point.y()).z(point.z()));
+  }
+  return points;
+}
+
+// Relations
+auto rightOfWayLaneletIds(const lanelet::Id lanelet_id) -> lanelet::Ids
+{
+  lanelet::Ids right_of_way_lanelets_ids;
+  const auto & right_of_ways =
+    LaneletWrapper::map()->laneletLayer.get(lanelet_id).regulatoryElementsAs<lanelet::RightOfWay>();
+  for (const auto & right_of_way : right_of_ways) {
+    for (const auto & right_of_way_lanelet : right_of_way->rightOfWayLanelets()) {
+      if (right_of_way_lanelet.id() != lanelet_id) {
+        right_of_way_lanelets_ids.push_back(right_of_way_lanelet.id());
+      }
+    }
+  }
+  return right_of_way_lanelets_ids;
+}
+
+auto rightOfWayLaneletIds(const lanelet::Ids & lanelet_ids)
+  -> std::unordered_map<lanelet::Id, lanelet::Ids>
+{
+  std::unordered_map<lanelet::Id, lanelet::Ids> right_of_way_lanelets_ids;
+  for (const auto & lanelet_id : lanelet_ids) {
+    right_of_way_lanelets_ids.emplace(lanelet_id, rightOfWayLaneletIds(lanelet_id));
+  }
+  return right_of_way_lanelets_ids;
+}
+
+// Objects on path
+auto trafficSignsOnPath(const lanelet::Ids & lanelet_ids)
+  -> std::vector<std::shared_ptr<const lanelet::TrafficSign>>
+{
+  std::vector<std::shared_ptr<const lanelet::TrafficSign>> ret;
+  for (const auto & lanelet_id : lanelet_ids) {
+    const auto lanelet = LaneletWrapper::map()->laneletLayer.get(lanelet_id);
+    const auto traffic_signs = lanelet.regulatoryElementsAs<const lanelet::TrafficSign>();
+    for (const auto & traffic_sign : traffic_signs) {
+      ret.emplace_back(traffic_sign);
+    }
+  }
+  return ret;
+}
+
+auto stopLinesOnPath(const lanelet::Ids & lanelet_ids) -> lanelet::ConstLineStrings3d
+{
+  lanelet::ConstLineStrings3d stop_lines;
+  for (const auto & traffic_sign : lanelet_wrapper::lanelet_map::trafficSignsOnPath(lanelet_ids)) {
+    if (traffic_sign->type() == "stop_sign") {
+      const auto & ref_lines = traffic_sign->refLines();
+      stop_lines.insert(stop_lines.end(), ref_lines.begin(), ref_lines.end());
+    }
+  }
+  return stop_lines;
+}
+
+auto stopLineIdsOnPath(const lanelet::Ids & lanelet_ids) -> lanelet::Ids
+{
+  lanelet::Ids stop_line_ids;
+  for (const auto & ret : stopLinesOnPath(lanelet_ids)) {
+    stop_line_ids.push_back(ret.id());
+  }
+  return stop_line_ids;
 }
 }  // namespace lanelet_map
 }  // namespace lanelet_wrapper
