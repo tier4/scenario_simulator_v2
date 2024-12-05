@@ -13,9 +13,10 @@
 // limitations under the License.
 
 #include <lanelet2_core/geometry/Lanelet.h>
-
+#include <lanelet2_io/io_handlers/Serialize.h>
 #include <autoware_lanelet2_extension/projection/mgrs_projector.hpp>
 #include <autoware_lanelet2_extension/utility/query.hpp>
+#include <boost/archive/binary_oarchive.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/lanelet_wrapper/lanelet_loader.hpp>
 
@@ -45,6 +46,23 @@ auto LaneletLoader::load(const std::filesystem::path & lanelet_map_path) -> lane
 
   overwriteLaneletsCenterline(lanelet_map_ptr);
   return lanelet_map_ptr;
+}
+
+auto LaneletLoader::convertMapToBin(const lanelet::LaneletMapPtr lanelet_map_ptr)
+  -> autoware_auto_mapping_msgs::msg::HADMapBin
+{
+  std::stringstream ss;
+  boost::archive::binary_oarchive oa(ss);
+  oa << *lanelet_map_ptr;
+  auto id_counter = lanelet::utils::getId();
+  oa << id_counter;
+  std::string tmp_str = ss.str();
+  autoware_auto_mapping_msgs::msg::HADMapBin msg;
+  msg.data.clear();
+  msg.data.resize(tmp_str.size());
+  msg.data.assign(tmp_str.begin(), tmp_str.end());
+  msg.header.frame_id = "map";
+  return msg;
 }
 
 auto LaneletLoader::overwriteLaneletsCenterline(lanelet::LaneletMapPtr lanelet_map_ptr) -> void

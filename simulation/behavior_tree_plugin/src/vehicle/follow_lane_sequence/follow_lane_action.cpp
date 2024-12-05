@@ -83,7 +83,7 @@ BT::NodeStatus FollowLaneAction::tick()
     return BT::NodeStatus::FAILURE;
   }
   if (behavior_parameter.see_around) {
-    if (getRightOfWayEntities(route_lanelets).size() != 0) {
+    if (isNeedToRightOfWay(route_lanelets)) {
       return BT::NodeStatus::FAILURE;
     }
     if (trajectory == nullptr) {
@@ -99,17 +99,16 @@ BT::NodeStatus FollowLaneAction::tick()
       }
     }
     const auto distance_to_traffic_stop_line =
-      getDistanceToTrafficLightStopLine(route_lanelets, *trajectory);
+      traffic_lights->getDistanceToActiveTrafficLightStopLine(route_lanelets, *trajectory);
     if (distance_to_traffic_stop_line) {
       if (distance_to_traffic_stop_line.value() <= getHorizon()) {
         return BT::NodeStatus::FAILURE;
       }
     }
-    auto distance_to_stopline =
-      traffic_simulator::distance::distanceToStopLine(route_lanelets, *trajectory);
-    auto distance_to_conflicting_entity =
-      getDistanceToConflictingEntity(route_lanelets, *trajectory);
-    if (distance_to_stopline) {
+
+    if (
+      const auto distance_to_stopline =
+        traffic_simulator::distance::distanceToStopLine(route_lanelets, *trajectory)) {
       if (
         distance_to_stopline.value() <=
         calculateStopDistance(behavior_parameter.dynamic_constraints) +
@@ -117,7 +116,10 @@ BT::NodeStatus FollowLaneAction::tick()
         return BT::NodeStatus::FAILURE;
       }
     }
-    if (distance_to_conflicting_entity) {
+    if (
+      const auto distance_to_conflicting_entity =
+        traffic_simulator::distance::distanceToNearestConflictingPose(
+          route_lanelets, *trajectory, getOtherEntitiesCanonicalizedEntityStatuses())) {
       if (
         distance_to_conflicting_entity.value() <
         (vehicle_parameters.bounding_box.dimensions.x + 3 +
