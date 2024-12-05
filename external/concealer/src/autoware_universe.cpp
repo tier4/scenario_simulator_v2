@@ -19,7 +19,7 @@ namespace concealer
 AutowareUniverse::AutowareUniverse()
 : rclcpp::Node("concealer", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),
   getAckermannControlCommand("/control/command/control_cmd", rclcpp::QoS(1), *this),
-  getGearCommandImpl("/control/command/gear_cmd", rclcpp::QoS(1), *this),
+  getGearCommand("/control/command/gear_cmd", rclcpp::QoS(1), *this),
   getTurnIndicatorsCommand("/control/command/turn_indicators_cmd", rclcpp::QoS(1), *this),
   getPathWithLaneId(
     "/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", rclcpp::QoS(1),
@@ -164,8 +164,6 @@ auto AutowareUniverse::updateVehicleState() -> void
     return message;
   }());
 }
-
-auto AutowareUniverse::getGearCommand() const -> GearCommand { return getGearCommandImpl(); }
 
 auto AutowareUniverse::getGearSign() const -> double
 {

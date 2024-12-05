@@ -59,7 +59,9 @@ class AutowareUniverse : public rclcpp::Node,
   using AccelWithCovarianceStamped  = geometry_msgs::msg::AccelWithCovarianceStamped;
 
   SubscriberWrapper<AckermannControlCommand, ThreadSafety::safe> getAckermannControlCommand;
-  SubscriberWrapper<GearCommand,             ThreadSafety::safe> getGearCommandImpl;
+public:
+  SubscriberWrapper<GearCommand,             ThreadSafety::safe> getGearCommand;
+private:
   SubscriberWrapper<TurnIndicatorsCommand,   ThreadSafety::safe> getTurnIndicatorsCommand;
   SubscriberWrapper<PathWithLaneId,          ThreadSafety::safe> getPathWithLaneId;
 
@@ -112,8 +114,6 @@ public:
   auto updateLocalization() -> void;
 
   auto updateVehicleState() -> void;
-
-  auto getGearCommand() const -> GearCommand;
 
   auto getGearSign() const -> double;
 
