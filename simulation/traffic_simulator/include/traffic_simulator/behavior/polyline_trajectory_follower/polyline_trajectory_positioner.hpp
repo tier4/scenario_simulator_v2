@@ -33,41 +33,47 @@ struct PolylineTrajectoryPositioner
 {
 public:
   explicit PolylineTrajectoryPositioner(
-    const ValidatedEntityStatus & validated_entity_status,
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
+    const ValidatedEntityStatus & validated_entity_status,
+    const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
     const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter,
+    const std::optional<double> target_speed, const double matching_distance,
     const double step_time);
 
-  auto makeUpdatedEntityStatus(
-    const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
-    const double matching_distance, const std::optional<double> target_speed) const
-    -> std::optional<EntityStatus>;
+  auto makeUpdatedEntityStatus() const -> std::optional<EntityStatus>;
 
 private:
-  const ValidatedEntityStatus validated_entity_status;
   const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr;
+  const ValidatedEntityStatus validated_entity_status;
   const traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter;
+  const traffic_simulator_msgs::msg::PolylineTrajectory polyline_trajectory;
   const double step_time;
+  const double matching_distance;
 
-  auto calculateDistanceAndRemainingTime(
-    const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
-    const double matching_distance, const double distance_to_front_waypoint,
-    const double step_time) const -> std::tuple<double, double>;
-  auto validatedEntityTargetPosition(
-    const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory) const
-    noexcept(false) -> geometry_msgs::msg::Point;
-  auto validatedEntityDesiredAcceleration(
-    const traffic_simulator::follow_trajectory::FollowWaypointController &
-      follow_waypoint_controller,
-    const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
-    const double remaining_time, const double distance, const double acceleration,
-    const double speed) const noexcept(false) -> double;
-  auto validatedEntityDesiredVelocity(
-    const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
-    const geometry_msgs::msg::Point & target_position, const geometry_msgs::msg::Point & position,
-    const double desired_speed) const noexcept(false) -> geometry_msgs::msg::Vector3;
-  auto validatedEntityDesiredSpeed(
-    const double entity_speed, const double desired_acceleration) const noexcept(false) -> double;
+  const std::vector<traffic_simulator_msgs::msg::Vertex>::const_iterator
+    nearest_waypoint_with_specified_time_it;
+  const geometry_msgs::msg::Point nearest_waypoint_position;
+  const double distance_to_nearest_waypoint;
+  const double total_remining_distance;
+  const double time_to_nearest_waypoint;
+  const double total_remaining_time;
+
+  const FollowWaypointController follow_waypoint_controller;
+
+  auto totalRemainingDistance(
+    const double matching_distance,
+    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) const -> double;
+  auto totalRemainingTime() const noexcept(false) -> double;
+  auto isNearestWaypointWithSpecifiedTimeSameAsLastWaypoint() const -> bool;
+  auto nearestWaypointWithSpecifiedTimeIterator() const
+    -> std::vector<traffic_simulator_msgs::msg::Vertex>::const_iterator;
+  auto validatedEntityTargetPosition() const noexcept(false) -> geometry_msgs::msg::Point;
+  auto validatedEntityDesiredAcceleration() const noexcept(false) -> double;
+  auto validatedEntityDesiredVelocity(const double desired_speed) const noexcept(false)
+    -> geometry_msgs::msg::Vector3;
+  auto validatedEntityDesiredSpeed(const double desired_acceleration) const noexcept(false)
+    -> double;
+  auto validatePredictedState(const double desired_acceleration) const noexcept(false) -> void;
 };
 }  // namespace follow_trajectory
 }  // namespace traffic_simulator

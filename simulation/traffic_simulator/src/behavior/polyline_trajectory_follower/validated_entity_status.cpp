@@ -46,12 +46,8 @@ ValidatedEntityStatus::ValidatedEntityStatus(
   lanelet_pose_valid(entity_status_.lanelet_pose_valid),
   current_velocity(buildValidatedCurrentVelocity(linear_speed)),
   bounding_box(entity_status_.bounding_box),
-  behavior_parameter(behavior_parameter)
+  behavior_parameter(validatedBehaviorParameter(behavior_parameter))
 {
-  assert(std::isfinite(behavior_parameter.dynamic_constraints.max_acceleration_rate));
-  assert(std::isfinite(behavior_parameter.dynamic_constraints.max_deceleration_rate));
-  assert(std::isfinite(behavior_parameter.dynamic_constraints.max_acceleration));
-  assert(std::isfinite(behavior_parameter.dynamic_constraints.max_deceleration));
 }
 
 ValidatedEntityStatus::ValidatedEntityStatus(const ValidatedEntityStatus & other)
@@ -135,7 +131,7 @@ auto ValidatedEntityStatus::validatedPosition() const noexcept(false) -> geometr
 {
   const auto entity_position = entity_status_.pose.position;
   if (not math::geometry::isFinite(entity_position)) {
-    throwDetailedError("entity_position", entity_position);
+    throwDetailedValidationError("entity_position", entity_position);
   }
   return entity_position;
 }
@@ -145,7 +141,7 @@ auto ValidatedEntityStatus::validatedLinearSpeed() const noexcept(false) -> doub
   const double entity_speed = entity_status_.action_status.twist.linear.x;
 
   if (not std::isfinite(entity_speed)) {
-    throwDetailedError("entity_speed", entity_speed);
+    throwDetailedValidationError("entity_speed", entity_speed);
   }
   return entity_speed;
 }
@@ -160,16 +156,16 @@ auto ValidatedEntityStatus::validatedLinearAcceleration() const noexcept(false) 
     acceleration - behavior_parameter.dynamic_constraints.max_deceleration_rate * step_time,
     -behavior_parameter.dynamic_constraints.max_deceleration);
   if (not std::isfinite(acceleration)) {
-    throwDetailedError("acceleration", acceleration);
+    throwDetailedValidationError("acceleration", acceleration);
   } else if (not std::isfinite(max_acceleration)) {
-    throwDetailedError("maximum acceleration", max_acceleration);
+    throwDetailedValidationError("maximum acceleration", max_acceleration);
   } else if (not std::isfinite(min_acceleration)) {
-    throwDetailedError("minimum acceleration", min_acceleration);
+    throwDetailedValidationError("minimum acceleration", min_acceleration);
   }
   return acceleration;
 }
 
-auto ValidatedEntityStatus::buildValidatedCurrentVelocity(const double speed) const
+auto ValidatedEntityStatus::buildValidatedCurrentVelocity(const double speed) const noexcept(false)
   -> geometry_msgs::msg::Vector3
 {
   const auto euler_angles =
@@ -181,10 +177,36 @@ auto ValidatedEntityStatus::buildValidatedCurrentVelocity(const double speed) co
                                  .y(std::cos(pitch) * std::sin(yaw) * speed)
                                  .z(std::sin(pitch) * speed);
   if (not math::geometry::isFinite(entity_velocity)) {
-    throwDetailedError("entity_velocity", entity_velocity);
+    throwDetailedValidationError("entity_velocity", entity_velocity);
   }
   return entity_velocity;
 }
 
+auto ValidatedEntityStatus::validatedBehaviorParameter(
+  const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter) const noexcept(false)
+  -> traffic_simulator_msgs::msg::BehaviorParameter
+{
+  if (not std::isfinite(behavior_parameter.dynamic_constraints.max_acceleration_rate)) {
+    throwDetailedValidationError(
+      "behavior_parameter.dynamic_constraints.max_acceleration_rate",
+      behavior_parameter.dynamic_constraints.max_acceleration_rate);
+  }
+  if (not std::isfinite(behavior_parameter.dynamic_constraints.max_deceleration_rate)) {
+    throwDetailedValidationError(
+      "behavior_parameter.dynamic_constraints.max_acceleration_rate",
+      behavior_parameter.dynamic_constraints.max_acceleration_rate);
+  }
+  if (not std::isfinite(behavior_parameter.dynamic_constraints.max_acceleration)) {
+    throwDetailedValidationError(
+      "behavior_parameter.dynamic_constraints.max_acceleration_rate",
+      behavior_parameter.dynamic_constraints.max_acceleration_rate);
+  }
+  if (not std::isfinite(behavior_parameter.dynamic_constraints.max_deceleration)) {
+    throwDetailedValidationError(
+      "behavior_parameter.dynamic_constraints.max_acceleration_rate",
+      behavior_parameter.dynamic_constraints.max_acceleration_rate);
+  }
+  return behavior_parameter;
+}
 }  // namespace follow_trajectory
 }  // namespace traffic_simulator

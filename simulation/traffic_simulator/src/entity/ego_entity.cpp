@@ -145,6 +145,13 @@ void EgoEntity::updateFieldOperatorApplication() const
 
 void EgoEntity::onUpdate(double current_time, double step_time)
 {
+  const auto getTargetSpeed = [this]() -> double {
+    if (target_speed_.has_value()) {
+      return target_speed_.value();
+    } else {
+      return status_->getTwist().linear.x;
+    }
+  };
   EntityBase::onUpdate(current_time, step_time);
   if (is_controlled_by_simulator_) {
     if (const auto non_canonicalized_updated_status =
@@ -153,9 +160,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
               static_cast<traffic_simulator::EntityStatus>(*status_), behavior_parameter_,
               step_time),
             hdmap_utils_ptr_, behavior_parameter_, *polyline_trajectory_,
-            getDefaultMatchingDistanceForLaneletPoseCalculation(),
-            target_speed_.has_value() ? target_speed_.value() : status_->getTwist().linear.x,
-            step_time);
+            getDefaultMatchingDistanceForLaneletPoseCalculation(), getTargetSpeed(), step_time);
         non_canonicalized_updated_status.has_value()) {
       // prefer current lanelet on ss2 side
       setStatus(non_canonicalized_updated_status.value(), status_->getLaneletIds());

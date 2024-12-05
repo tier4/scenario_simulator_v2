@@ -44,8 +44,9 @@ auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
   while (not polyline_trajectory.shape.vertices.empty()) {
     const auto updated_entity_opt =
       PolylineTrajectoryPositioner(
-        validated_entity_status, hdmap_utils_ptr, behavior_parameter, step_time)
-        .makeUpdatedEntityStatus(polyline_trajectory, matching_distance, target_speed);
+        hdmap_utils_ptr, validated_entity_status, polyline_trajectory, behavior_parameter,
+        target_speed, matching_distance, step_time)
+        .makeUpdatedEntityStatus();
     if (updated_entity_opt.has_value()) {
       return updated_entity_opt;
     } else {

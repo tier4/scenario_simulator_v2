@@ -61,15 +61,20 @@ private:
 
   auto validatedLinearAcceleration() const noexcept(false) -> double;
 
+  auto validatedBehaviorParameter(
+    const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter) const noexcept(false)
+    -> traffic_simulator_msgs::msg::BehaviorParameter;
+
   auto buildUpdatedPoseOrientation(const geometry_msgs::msg::Vector3 & desired_velocity) const
     noexcept(true) -> geometry_msgs::msg::Quaternion;
 
-  auto buildValidatedCurrentVelocity(const double speed) const -> geometry_msgs::msg::Vector3;
+  auto buildValidatedCurrentVelocity(const double speed) const noexcept(false)
+    -> geometry_msgs::msg::Vector3;
 
   template <
     typename T, std::enable_if_t<math::geometry::IsLikeVector3<T>::value, std::nullptr_t> = nullptr>
-  auto throwDetailedError(const std::string & variable_name, const T variable) const noexcept(false)
-    -> void
+  auto throwDetailedValidationError(const std::string & variable_name, const T variable) const
+    noexcept(false) -> void
   {
     THROW_SIMULATION_ERROR(
       "Error in ValidatedEntityStatus. Entity name: ", std::quoted(entity_status_.name),
@@ -78,8 +83,8 @@ private:
   }
 
   template <typename T, std::enable_if_t<std::is_arithmetic_v<T>, std::nullptr_t> = nullptr>
-  auto throwDetailedError(const std::string & variable_name, const T variable) const noexcept(false)
-    -> void
+  auto throwDetailedValidationError(const std::string & variable_name, const T variable) const
+    noexcept(false) -> void
   {
     THROW_SIMULATION_ERROR(
       "Error in ValidatedEntityStatus. Entity name: ", std::quoted(entity_status_.name),
