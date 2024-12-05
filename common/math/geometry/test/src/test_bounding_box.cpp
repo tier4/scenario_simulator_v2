@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "expect_eq_macros.hpp"
-#include "geometry/distance.hpp"
-#include "test_utils.hpp"
+#include <gtest/gtest.h>
 
 #include <geometry/bounding_box.hpp>
 #include <geometry/quaternion/euler_to_quaternion.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 
-#include <gtest/gtest.h>
+#include "expect_eq_macros.hpp"
+#include "geometry/distance.hpp"
+#include "test_utils.hpp"
 
 TEST(BoundingBox, getPointsFromBboxDefault)
 {
