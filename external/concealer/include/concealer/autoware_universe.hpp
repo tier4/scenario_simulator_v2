@@ -90,8 +90,6 @@ private:
 
   std::exception_ptr thrown;
 
-  auto stopAndJoin() -> void;
-
   std::atomic<geometry_msgs::msg::Accel> current_acceleration;
 
   std::atomic<geometry_msgs::msg::Twist> current_twist;

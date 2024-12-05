@@ -69,19 +69,17 @@ AutowareUniverse::AutowareUniverse()
 {
 }
 
-AutowareUniverse::~AutowareUniverse() { stopAndJoin(); }
+AutowareUniverse::~AutowareUniverse()
+{
+  is_stop_requested.store(true);
+  localization_and_vehicle_state_update_thread.join();
+}
 
 auto AutowareUniverse::rethrow() -> void
 {
   if (is_thrown.load()) {
     throw thrown;
   }
-}
-
-auto AutowareUniverse::stopAndJoin() -> void
-{
-  is_stop_requested.store(true);
-  localization_and_vehicle_state_update_thread.join();
 }
 
 auto AutowareUniverse::getAcceleration() const -> double
