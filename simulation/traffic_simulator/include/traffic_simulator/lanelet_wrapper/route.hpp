@@ -17,7 +17,7 @@
 
 #include <lanelet2_core/geometry/Lanelet.h>
 
-#include <geometry_msgs/msg/point.hpp>
+#include <traffic_simulator/lanelet_wrapper/lanelet_wrapper.hpp>
 
 namespace traffic_simulator
 {

@@ -55,8 +55,7 @@ auto lateralDistance(
             pose::toMapPose(current_lanelet_pose).pose, route[i + 1], matching_distance)) {
           lateral_distance_by_lane_change -= current_lanelet_origin_from_next_lanelet->offset;
         } else {
-          /// @todo maybe an exception should be thrown here? since the route exists but is
-          /// incorrect?
+          /// @todo maybe an exception should be thrown here? since the route exists but is incorrect?
           return std::nullopt;
         }
       }
@@ -242,7 +241,7 @@ auto distanceToTrafficLightStopLine(
   return distanceToTrafficLightStopLine(route_lanelets, Spline{route_waypoints});
 }
 
-// crosswalk
+// Crosswalk
 auto distanceToCrosswalk(const std::vector<Point> & route_waypoints, const lanelet::Id crosswalk_id)
   -> std::optional<double>
 {

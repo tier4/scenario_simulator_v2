@@ -22,6 +22,7 @@
 #include <autoware_lanelet2_extension/utility/utilities.hpp>
 #include <filesystem>
 #include <geometry/spline/catmull_rom_spline.hpp>
+#include <geometry/spline/catmull_rom_spline_interface.hpp>
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
@@ -65,6 +66,7 @@ using Point = geometry_msgs::msg::Point;
 using Pose = geometry_msgs::msg::Pose;
 using PoseStamped = geometry_msgs::msg::PoseStamped;
 using Spline = math::geometry::CatmullRomSpline;
+using SplineInterface = math::geometry::CatmullRomSplineInterface;
 using Vector3 = geometry_msgs::msg::Vector3;
 
 class RouteCache

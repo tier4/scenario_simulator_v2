@@ -18,9 +18,7 @@
 
 #include <lanelet2_core/geometry/Lanelet.h>
 
-#include <geometry/spline/catmull_rom_spline.hpp>
-#include <geometry/spline/catmull_rom_spline_interface.hpp>
-#include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
+#include <traffic_simulator/lanelet_wrapper/lanelet_wrapper.hpp>
 
 namespace traffic_simulator
 {
@@ -28,11 +26,6 @@ namespace lanelet_wrapper
 {
 namespace distance
 {
-using Point = geometry_msgs::msg::Point;
-using Spline = math::geometry::CatmullRomSpline;
-using SplineInterface = math::geometry::CatmullRomSplineInterface;
-using LaneletPose = traffic_simulator_msgs::msg::LaneletPose;
-
 auto lateralDistance(
   const LaneletPose & from, const LaneletPose & to,
   const RoutingConfiguration & routing_configuration = RoutingConfiguration())

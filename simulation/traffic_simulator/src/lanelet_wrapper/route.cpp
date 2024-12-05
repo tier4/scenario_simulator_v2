@@ -23,7 +23,6 @@
 #include <traffic_simulator/lanelet_wrapper/lanelet_map.hpp>
 #include <traffic_simulator/lanelet_wrapper/lanelet_wrapper.hpp>
 #include <traffic_simulator/lanelet_wrapper/route.hpp>
-#include <traffic_simulator_msgs/msg/entity_type.hpp>
 
 namespace traffic_simulator
 {

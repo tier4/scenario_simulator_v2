@@ -93,13 +93,13 @@ auto ActionNode::getBlackBoardValues() -> void
 auto ActionNode::getOtherEntitiesCanonicalizedLaneletPoses() const
   -> std::vector<traffic_simulator::CanonicalizedLaneletPose>
 {
-  std::vector<traffic_simulator::CanonicalizedLaneletPose> other_poses;
-  for (const auto & [entity_name, entity_status] : other_entity_status) {
-    if (auto const canonicalized_lanelet_pose = entity_status.getCanonicalizedLaneletPose()) {
-      other_poses.push_back(canonicalized_lanelet_pose.value());
+  std::vector<traffic_simulator::CanonicalizedLaneletPose> other_canonicalized_lanelet_poses;
+  for (const auto & [name, status] : other_entity_status) {
+    if (auto const canonicalized_lanelet_pose = status.getCanonicalizedLaneletPose()) {
+      other_canonicalized_lanelet_poses.push_back(canonicalized_lanelet_pose.value());
     }
   }
-  return other_poses;
+  return other_canonicalized_lanelet_poses;
 }
 
 auto ActionNode::getHorizon() const -> double
@@ -127,10 +127,10 @@ auto ActionNode::getYieldStopDistance(const lanelet::Ids & following_lanelets) c
   if (
     const auto canonicalized_lanelet_pose =
       canonicalized_entity_status->getCanonicalizedLaneletPose()) {
-    if (const auto other_poses = getOtherEntitiesCanonicalizedLaneletPoses();
-        !other_poses.empty()) {
+    if (const auto other_canonicalized_lanelet_poses = getOtherEntitiesCanonicalizedLaneletPoses();
+        !other_canonicalized_lanelet_poses.empty()) {
       traffic_simulator::distance::distanceToYieldStop(
-        canonicalized_lanelet_pose.value(), following_lanelets, other_poses);
+        canonicalized_lanelet_pose.value(), following_lanelets, other_canonicalized_lanelet_poses);
     }
   }
   return std::nullopt;

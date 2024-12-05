@@ -74,7 +74,8 @@ auto boundingBoxLaneLongitudinalDistance(
 // Bounds
 auto distanceToLaneBound(
   const geometry_msgs::msg::Pose & map_pose,
-  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, lanelet::Id lanelet_id) -> double;
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, const lanelet::Id lanelet_id)
+  -> double;
 
 auto distanceToLaneBound(
   const geometry_msgs::msg::Pose & map_pose,
