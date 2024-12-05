@@ -25,6 +25,7 @@
 #include <optional>
 #include <rclcpp/rclcpp.hpp>
 #include <rosgraph_msgs/msg/clock.hpp>
+#include <set>
 #include <simulation_interface/conversions.hpp>
 #include <simulation_interface/zmq_multi_client.hpp>
 #include <std_msgs/msg/float64.hpp>
@@ -75,6 +76,14 @@ public:
       getROS2Parameter<std::string>("architecture_type", "awf/universe"))),
     traffic_controller_ptr_(std::make_shared<traffic::TrafficController>(
       entity_manager_ptr_->getHdmapUtils(), [this]() { return API::getEntityNames(); },
+      [this](const auto & entity_name) {
+        if (const auto entity = getEntity(entity_name)) {
+          return entity->getEntityType();
+        } else {
+          THROW_SEMANTIC_ERROR("Entity ", std::quoted(entity_name), " does not exists.");
+        }
+      },
+      configuration.sinkable_entity_type,
       [this](const auto & entity_name) {
         if (const auto entity = getEntity(entity_name)) {
           return entity->getMapPose();
