@@ -1183,11 +1183,11 @@ auto HdMapUtils::getLeftLaneletIds(
   const bool include_opposite_direction) const -> lanelet::Ids
 {
   if (include_opposite_direction) {
+    throw common::Error(
+      "HdMapUtils::getLeftLaneletIds with include_opposite_direction=true is not implemented yet.");
+  } else {
     return getLaneletIds(
       routing_graphs_->routing_graph(type)->lefts(lanelet_map_ptr_->laneletLayer.get(lanelet_id)));
-  } else {
-    return getLaneletIds(routing_graphs_->routing_graph(type)->adjacentLefts(
-      lanelet_map_ptr_->laneletLayer.get(lanelet_id)));
   }
 }
 
@@ -1196,11 +1196,12 @@ auto HdMapUtils::getRightLaneletIds(
   const bool include_opposite_direction) const -> lanelet::Ids
 {
   if (include_opposite_direction) {
+    throw common::Error(
+      "HdMapUtils::getRightLaneletIds with include_opposite_direction=true is not implemented "
+      "yet.");
+  } else {
     return getLaneletIds(
       routing_graphs_->routing_graph(type)->rights(lanelet_map_ptr_->laneletLayer.get(lanelet_id)));
-  } else {
-    return getLaneletIds(routing_graphs_->routing_graph(type)->adjacentRights(
-      lanelet_map_ptr_->laneletLayer.get(lanelet_id)));
   }
 }
 

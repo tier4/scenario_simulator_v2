@@ -85,7 +85,7 @@ private:
           to_entity && to_entity->laneMatchingSucceed()) {
         return traffic_simulator::distance::longitudinalDistance(
           from_entity->getCanonicalizedLaneletPose().value(),
-          to_entity->getCanonicalizedLaneletPose().value(), false, true,
+          to_entity->getCanonicalizedLaneletPose().value(), false, false,
           traffic_simulator::RoutingConfiguration(), api_.getHdmapUtils());
       }
     }

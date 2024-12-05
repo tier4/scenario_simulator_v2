@@ -19,3 +19,11 @@
 lanelet::traffic_rules::RegisterTrafficRules<hdmap_utils::GermanRoadShoulderPassableVehicle>
   germanRoadShoulderPassableVehicleRules(
     hdmap_utils::Locations::RoadShoulderPassableGermany, lanelet::Participants::Vehicle);
+
+lanelet::traffic_rules::LaneChangeType
+hdmap_utils::GermanRoadShoulderPassableVehicle::laneChangeType(
+  const lanelet::ConstLineString3d &, bool) const
+{
+  /// @note allow lane-changes everywhere even if prohibited by lanelet2 map, because lane-change settings are not for entities but only for Autoware.
+  return lanelet::traffic_rules::LaneChangeType::Both;
+}

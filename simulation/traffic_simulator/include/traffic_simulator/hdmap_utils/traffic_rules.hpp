@@ -66,6 +66,9 @@ protected:
       return startsWith(this->participant(), participant);
     });
   }
+
+  lanelet::traffic_rules::LaneChangeType laneChangeType(
+    const lanelet::ConstLineString3d &, bool) const override;
 };
 }  // namespace hdmap_utils
 #endif  // TRAFFIC_SIMULATOR__HDMAP_UTILS__TRAFFIC_RULES_HPP_

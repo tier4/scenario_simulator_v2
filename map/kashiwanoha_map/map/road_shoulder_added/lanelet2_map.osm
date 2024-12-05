@@ -3477,7 +3477,7 @@
     <nd ref="30442"/>
     <nd ref="14512"/>
     <tag k="type" v="line_thin"/>
-    <tag k="subtype" v="dashed"/>
+    <tag k="subtype" v="solid"/>
   </way>
   <way id="34506">
     <nd ref="30444"/>
@@ -3489,7 +3489,7 @@
     <nd ref="13864"/>
     <nd ref="30442"/>
     <tag k="type" v="line_thin"/>
-    <tag k="subtype" v="dashed"/>
+    <tag k="subtype" v="solid"/>
   </way>
   <way id="34509">
     <nd ref="13866"/>
@@ -3501,7 +3501,7 @@
     <nd ref="13369"/>
     <nd ref="13864"/>
     <tag k="type" v="line_thin"/>
-    <tag k="subtype" v="dashed"/>
+    <tag k="subtype" v="solid"/>
   </way>
   <way id="34512">
     <nd ref="13371"/>
