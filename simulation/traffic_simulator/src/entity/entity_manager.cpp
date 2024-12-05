@@ -266,8 +266,7 @@ bool EntityManager::isInLanelet(
 {
   if (const auto entity = getEntity(name)) {
     if (const auto canonicalized_lanelet_pose = entity->getCanonicalizedLaneletPose()) {
-      return pose::isInLanelet(
-        canonicalized_lanelet_pose.value(), lanelet_id, tolerance, hdmap_utils_ptr_);
+      return pose::isInLanelet(canonicalized_lanelet_pose.value(), lanelet_id, tolerance);
     }
   }
   return false;

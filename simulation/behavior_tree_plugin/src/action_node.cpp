@@ -90,6 +90,18 @@ auto ActionNode::getBlackBoardValues() -> void
   }
 }
 
+auto ActionNode::getOtherEntitiesCanonicalizedLaneletPoses() const
+  -> std::vector<traffic_simulator::CanonicalizedLaneletPose>
+{
+  std::vector<traffic_simulator::CanonicalizedLaneletPose> other_poses;
+  for (const auto & [entity_name, entity_status] : other_entity_status) {
+    if (auto const canonicalized_lanelet_pose = entity_status.getCanonicalizedLaneletPose()) {
+      other_poses.push_back(canonicalized_lanelet_pose.value());
+    }
+  }
+  return other_poses;
+}
+
 auto ActionNode::getHorizon() const -> double
 {
   return std::clamp(canonicalized_entity_status->getTwist().linear.x * 5.0, 20.0, 50.0);
@@ -109,43 +121,16 @@ auto ActionNode::setCanonicalizedEntityStatus(const traffic_simulator::EntitySta
     entity_status, default_matching_distance_for_lanelet_pose_calculation);
 }
 
-auto ActionNode::getOtherEntityStatus(lanelet::Id lanelet_id) const
-  -> std::vector<traffic_simulator::CanonicalizedEntityStatus>
-{
-  std::vector<traffic_simulator::CanonicalizedEntityStatus> ret;
-  for (const auto & status : other_entity_status) {
-    if (
-      status.second.laneMatchingSucceed() &&
-      traffic_simulator::isSameLaneletId(status.second, lanelet_id)) {
-      ret.emplace_back(status.second);
-    }
-  }
-  return ret;
-}
-
 auto ActionNode::getYieldStopDistance(const lanelet::Ids & following_lanelets) const
   -> std::optional<double>
 {
-  std::set<double> distances;
-  for (const auto & lanelet : following_lanelets) {
-    const auto right_of_way_ids = hdmap_utils->getRightOfWayLaneletIds(lanelet);
-    for (const auto right_of_way_id : right_of_way_ids) {
-      const auto other_status = getOtherEntityStatus(right_of_way_id);
-      if (!other_status.empty() && canonicalized_entity_status->laneMatchingSucceed()) {
-        const auto lanelet_pose = canonicalized_entity_status->getLaneletPose();
-        const auto distance_forward = hdmap_utils->getLongitudinalDistance(
-          lanelet_pose, traffic_simulator::helper::constructLaneletPose(lanelet, 0));
-        const auto distance_backward = hdmap_utils->getLongitudinalDistance(
-          traffic_simulator::helper::constructLaneletPose(lanelet, 0), lanelet_pose);
-        if (distance_forward) {
-          distances.insert(distance_forward.value());
-        } else if (distance_backward) {
-          distances.insert(-distance_backward.value());
-        }
-      }
-    }
-    if (distances.size() != 0) {
-      return *distances.begin();
+  if (
+    const auto canonicalized_lanelet_pose =
+      canonicalized_entity_status->getCanonicalizedLaneletPose()) {
+    if (const auto other_poses = getOtherEntitiesCanonicalizedLaneletPoses();
+        !other_poses.empty()) {
+      traffic_simulator::distance::distanceToYieldStop(
+        canonicalized_lanelet_pose.value(), following_lanelets, other_poses);
     }
   }
   return std::nullopt;
@@ -214,7 +199,7 @@ auto ActionNode::getDistanceToTrafficLightStopLine(
       if (traffic_lights->isRequiredStopTrafficLightState(traffic_light_id)) {
         if (
           const auto collision_point =
-            hdmap_utils->getDistanceToTrafficLightStopLine(spline, traffic_light_id)) {
+            traffic_simulator::distance::distanceToTrafficLightStopLine(spline, traffic_light_id)) {
           collision_points.insert(collision_point.value());
         }
       }
@@ -224,13 +209,6 @@ auto ActionNode::getDistanceToTrafficLightStopLine(
     }
   }
   return std::nullopt;
-}
-
-auto ActionNode::getDistanceToStopLine(
-  const lanelet::Ids & route_lanelets,
-  const std::vector<geometry_msgs::msg::Point> & waypoints) const -> std::optional<double>
-{
-  return hdmap_utils->getDistanceToStopLine(route_lanelets, waypoints);
 }
 
 auto ActionNode::getDistanceToFrontEntity(
