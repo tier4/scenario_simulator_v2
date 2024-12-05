@@ -37,7 +37,6 @@
 #include <traffic_simulator/entity/pedestrian_entity.hpp>
 #include <traffic_simulator/entity/vehicle_entity.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
-#include <traffic_simulator/traffic/traffic_sink.hpp>
 #include <traffic_simulator/traffic_lights/configurable_rate_updater.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_marker_publisher.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_publisher.hpp>
