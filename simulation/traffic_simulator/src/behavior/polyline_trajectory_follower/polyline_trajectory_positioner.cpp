@@ -49,7 +49,7 @@ PolylineTrajectoryPositioner::PolylineTrajectoryPositioner(
   distance_to_nearest_waypoint(distanceAlongLanelet(
     hdmap_utils_ptr, validated_entity_status.bounding_box, matching_distance,
     validated_entity_status.entity_status_.pose.position, nearest_waypoint_position)),
-  total_remining_distance(totalRemainingDistance(matching_distance, hdmap_utils_ptr)),
+  total_remaining_distance(totalRemainingDistance(matching_distance, hdmap_utils_ptr)),
   time_to_nearest_waypoint(
     (std::isnan(polyline_trajectory.base_time) ? 0.0 : polyline_trajectory.base_time) +
     polyline_trajectory.shape.vertices.front().time - validated_entity_status.time),
@@ -243,7 +243,7 @@ auto PolylineTrajectoryPositioner::validatedEntityDesiredAcceleration() const no
 
   try {
     const double desired_acceleration = follow_waypoint_controller.getAcceleration(
-      total_remaining_time, total_remining_distance, validated_entity_status.linear_acceleration,
+      total_remaining_time, total_remaining_distance, validated_entity_status.linear_acceleration,
       validated_entity_status.linear_speed);
 
     if (not std::isfinite(desired_acceleration)) {
@@ -288,7 +288,7 @@ auto PolylineTrajectoryPositioner::makeUpdatedEntityStatus() const -> std::optio
     return std::nullopt;
   }
 
-  if (total_remining_distance <= 0) {
+  if (total_remaining_distance <= 0) {
     return std::nullopt;
   }
 
@@ -421,7 +421,7 @@ auto PolylineTrajectoryPositioner::validatePredictedState(const double desired_a
   noexcept(false) -> void
 {
   const auto predicted_state_opt = follow_waypoint_controller.getPredictedWaypointArrivalState(
-    desired_acceleration, total_remaining_time, total_remining_distance,
+    desired_acceleration, total_remaining_time, total_remaining_distance,
     validated_entity_status.linear_acceleration, validated_entity_status.linear_speed);
   if (not std::isinf(total_remaining_time) and not predicted_state_opt.has_value()) {
     THROW_SIMULATION_ERROR(
@@ -430,7 +430,7 @@ auto PolylineTrajectoryPositioner::validatePredictedState(const double desired_a
       std::quoted(validated_entity_status.name),
       " calculated invalid acceleration:", " desired_acceleration: ", desired_acceleration,
       ", total_remaining_time: ", total_remaining_time,
-      ", total_remining_distance: ", total_remining_distance,
+      ", total_remaining_distance: ", total_remaining_distance,
       ", acceleration: ", validated_entity_status.linear_acceleration,
       ", speed: ", validated_entity_status.linear_speed, ". ", follow_waypoint_controller);
   }

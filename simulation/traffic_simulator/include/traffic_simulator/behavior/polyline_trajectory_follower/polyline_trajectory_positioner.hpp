@@ -54,7 +54,7 @@ private:
     nearest_waypoint_with_specified_time_it;
   const geometry_msgs::msg::Point nearest_waypoint_position;
   const double distance_to_nearest_waypoint;
-  const double total_remining_distance;
+  const double total_remaining_distance;
   const double time_to_nearest_waypoint;
   const double total_remaining_time;
 
