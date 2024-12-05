@@ -38,10 +38,6 @@
 
 namespace concealer
 {
-/*
- * Implements Autoware interface for Autoware Universe
- * NOTE: This class is intended to be move to simple_sensor_simulator
- */
 class AutowareUniverse : public rclcpp::Node,
                          public ContinuousTransformBroadcaster<AutowareUniverse>
 {

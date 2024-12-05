@@ -165,12 +165,15 @@ auto AutowareUniverse::updateVehicleState() -> void
 
 auto AutowareUniverse::getGearSign() const -> double
 {
-  /// @todo Add support for GearCommand::NONE to return 0.0
-  /// @sa https://github.com/autowarefoundation/autoware.universe/blob/main/simulator/simple_planning_simulator/src/simple_planning_simulator/simple_planning_simulator_core.cpp#L475
-  return getGearCommand().command == GearCommand::REVERSE or
-             getGearCommand().command == GearCommand::REVERSE_2
-           ? -1.0
-           : 1.0;
+  switch (getGearCommand().command) {
+    case GearCommand::NONE:
+      return 0.0;
+    case GearCommand::REVERSE:
+    case GearCommand::REVERSE_2:
+      return -1.0;
+    default:
+      return 1.0;
+  }
 }
 
 auto AutowareUniverse::getVehicleCommand() const -> std::tuple<AckermannControlCommand, GearCommand>
