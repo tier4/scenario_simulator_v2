@@ -10,6 +10,60 @@ Changelog for package openscenario_validator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+6.2.2 (2024-12-04)
+------------------
+* Merge branch 'master' into refactor/distance-condition
+* Merge remote-tracking branch 'origin/master' into refactor/distance-condition
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+6.2.1 (2024-12-03)
+------------------
+* Merge branch 'master' into refactor/distance-condition-and-relative-distance-condition
+* Contributors: Tatsuya Yamasaki
+
+6.2.0 (2024-12-02)
+------------------
+* Merge branch 'master' into feature/relative-speed-condition
+* Merge remote-tracking branch 'origin/master' into feature/relative-speed-condition
+* Merge remote-tracking branch 'origin/master' into feature/relative-speed-condition
+* Merge remote-tracking branch 'origin/master' into feature/relative-speed-condition
+* Merge remote-tracking branch 'origin/master' into feature/relative-speed-condition
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+6.1.3 (2024-11-29)
+------------------
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge remote-tracking branch 'tier4/RJD-1057-traffic-lights-tests' into RJD-1057-traffic-lights-tests
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge remote-tracking branch 'tier4/master' into RJD-1057-traffic-lights-tests
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge remote-tracking branch 'tier4/RJD-1057-remove-traffic-lights-from-entity-manager' into RJD-1057-traffic-lights-tests
+* Merge branch 'RJD-1057-remove-traffic-lights-from-entity-manager' into RJD-1057-traffic-lights-tests
+* Merge branch 'RJD-1057-remove-traffic-lights-from-entity-manager' into RJD-1057-traffic-lights-tests
+* Merge branch 'RJD-1057-remove-traffic-lights-from-entity-manager' into RJD-1057-traffic-lights-tests
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Mateusz Palczuk, Tatsuya Yamasaki
+
+6.1.2 (2024-11-29)
+------------------
+* Merge branch 'master' into refactor/interpreter
+* Contributors: Tatsuya Yamasaki
+
+6.1.1 (2024-11-29)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/sonarcloud_warning
+* Merge branch 'master' into fix/sonarcloud_warning
+* Merge branch 'master' into fix/sonarcloud_warning
+* Contributors: Masaya Kataoka
+
+6.1.0 (2024-11-29)
+------------------
+
 6.0.1 (2024-11-27)
 ------------------
 
