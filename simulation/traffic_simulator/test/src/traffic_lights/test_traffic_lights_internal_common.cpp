@@ -399,44 +399,6 @@ TYPED_TEST(TrafficLightsInternalTest, generateTrafficSimulatorV1Msg)
   EXPECT_NEAR(msg.traffic_lights[0].traffic_light_bulbs[1].confidence, expected_confidence, eps);
 }
 
-TYPED_TEST(TrafficLightsInternalTest, generateAutowareAutoPerceptionMsg)
-{
-  constexpr double expected_confidence{0.7};
-  constexpr const char * frame = "camera_link";
-
-  this->lights->setTrafficLightsState(this->id, "red solidOn circle, yellow flashing circle");
-  this->lights->setTrafficLightsConfidence(this->id, expected_confidence);
-
-  const auto msg = *traffic_simulator::TrafficLightPublisher<
-    autoware_auto_perception_msgs::msg::TrafficSignalArray>::
-                     generateMessage(
-                       this->node_ptr->get_clock()->now(),
-                       this->lights->generateUpdateTrafficLightsRequest(), frame);
-
-  const double expected_time =
-    static_cast<double>(getTime(this->node_ptr->get_clock()->now())) * 1e-9;
-  const double actual_time = static_cast<double>(getTime(msg.header)) * 1e-9;
-  EXPECT_NEAR(actual_time, expected_time, timing_eps);
-
-  EXPECT_EQ(msg.signals.size(), static_cast<std::size_t>(1));
-  EXPECT_EQ(msg.signals.front().lights.size(), static_cast<std::size_t>(2));
-
-  EXPECT_EQ(msg.header.frame_id, frame);
-  EXPECT_EQ(msg.signals[0].map_primitive_id, this->id);
-
-  using TrafficLight = autoware_auto_perception_msgs::msg::TrafficLight;
-  // we use this order, because signals are parsed in reverse
-  EXPECT_EQ(msg.signals[0].lights[0].color, TrafficLight::AMBER);
-  EXPECT_EQ(msg.signals[0].lights[0].status, TrafficLight::FLASHING);
-  EXPECT_EQ(msg.signals[0].lights[0].shape, TrafficLight::CIRCLE);
-  EXPECT_NEAR(msg.signals[0].lights[0].confidence, expected_confidence, eps);
-
-  EXPECT_EQ(msg.signals[0].lights[1].color, TrafficLight::RED);
-  EXPECT_EQ(msg.signals[0].lights[1].status, TrafficLight::SOLID_ON);
-  EXPECT_EQ(msg.signals[0].lights[1].shape, TrafficLight::CIRCLE);
-  EXPECT_NEAR(msg.signals[0].lights[1].confidence, expected_confidence, eps);
-}
-
 TYPED_TEST(TrafficLightsInternalTest, generateAutowarePerceptionTrafficSignalMsg)
 {
   constexpr double expected_confidence{0.7};

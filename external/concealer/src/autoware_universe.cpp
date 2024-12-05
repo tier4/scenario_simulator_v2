@@ -17,7 +17,7 @@
 namespace concealer
 {
 AutowareUniverse::AutowareUniverse()
-: getAckermannControlCommand("/control/command/control_cmd", rclcpp::QoS(1), *this),
+: getCommand("/control/command/control_cmd", rclcpp::QoS(1), *this),
   getGearCommandImpl("/control/command/gear_cmd", rclcpp::QoS(1), *this),
   getTurnIndicatorsCommand("/control/command/turn_indicators_cmd", rclcpp::QoS(1), *this),
   getPathWithLaneId(
@@ -85,17 +85,14 @@ auto AutowareUniverse::stopAndJoin() -> void
 
 auto AutowareUniverse::getAcceleration() const -> double
 {
-  return getAckermannControlCommand().longitudinal.acceleration;
+  return getCommand().longitudinal.acceleration;
 }
 
-auto AutowareUniverse::getVelocity() const -> double
-{
-  return getAckermannControlCommand().longitudinal.speed;
-}
+auto AutowareUniverse::getVelocity() const -> double { return getCommand().longitudinal.velocity; }
 
 auto AutowareUniverse::getSteeringAngle() const -> double
 {
-  return getAckermannControlCommand().lateral.steering_tire_angle;
+  return getCommand().lateral.steering_tire_angle;
 }
 
 auto AutowareUniverse::updateLocalization() -> void
@@ -176,9 +173,9 @@ auto AutowareUniverse::getGearSign() const -> double
            : 1.0;
 }
 
-auto AutowareUniverse::getVehicleCommand() const -> std::tuple<AckermannControlCommand, GearCommand>
+auto AutowareUniverse::getVehicleCommand() const -> std::tuple<Control, GearCommand>
 {
-  return std::make_tuple(getAckermannControlCommand(), getGearCommand());
+  return std::make_tuple(getCommand(), getGearCommand());
 }
 
 auto AutowareUniverse::getRouteLanelets() const -> std::vector<std::int64_t>

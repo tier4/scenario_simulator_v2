@@ -60,7 +60,7 @@ TEST(DataTypes, architectureTypeFromString_incorrect)
 TEST(DataTypes, stringFromArchitectureType_correct)
 {
   EXPECT_EQ(stringFromArchitectureType(ArchitectureType::AWF_AUTO), "awf/auto");
-  EXPECT_EQ(stringFromArchitectureType(ArchitectureType::AWF_UNIVERSE), "awf/universe");
+  EXPECT_EQ(stringFromArchitectureType(ArchitectureType::AWF_UNIVERSE), "awf/universe/20240605");
   EXPECT_EQ(stringFromArchitectureType(ArchitectureType::TIER4_PROPOSAL), "tier4/proposal");
 }
 

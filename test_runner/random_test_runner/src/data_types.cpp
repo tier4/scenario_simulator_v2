@@ -46,7 +46,7 @@ std::string stringFromArchitectureType(const ArchitectureType architecture_type)
     case ArchitectureType::AWF_AUTO:
       return "awf/auto";
     case ArchitectureType::AWF_UNIVERSE:
-      return "awf/universe";
+      return "awf/universe/20240605";
     case ArchitectureType::TIER4_PROPOSAL:
       return "tier4/proposal";
     default:

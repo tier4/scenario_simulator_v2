@@ -112,7 +112,7 @@ void CppScenarioNode::spawnEgoEntity(
   api_.attachOccupancyGridSensor([this] {
     simulation_api_schema::OccupancyGridSensorConfiguration configuration;
     // clang-format off
-      configuration.set_architecture_type(api_.getROS2Parameter<std::string>("architecture_type", "awf/universe"));
+      configuration.set_architecture_type(api_.getROS2Parameter<std::string>("architecture_type", "awf/universe/20240605"));
       configuration.set_entity("ego");
       configuration.set_filter_by_range(true);
       configuration.set_height(200);
