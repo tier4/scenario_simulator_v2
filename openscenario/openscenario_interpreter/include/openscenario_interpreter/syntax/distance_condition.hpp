@@ -121,7 +121,7 @@ struct DistanceCondition : private Scope, private SimulatorCore::ConditionEvalua
   }
 
   static auto evaluate(
-    const Entities *, const EntityRef &, const Position &, CoordinateSystem, RelativeDistanceType,
+    const Entities *, const Entity &, const Position &, CoordinateSystem, RelativeDistanceType,
     RoutingAlgorithm, Boolean) -> double;
 
   auto evaluate() -> Object;
