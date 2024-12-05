@@ -17,7 +17,9 @@
 
 #include <lanelet2_traffic_rules/GermanTrafficRules.h>
 
-namespace hdmap_utils
+namespace traffic_simulator
+{
+namespace lanelet_wrapper
 {
 struct Locations
 {
@@ -67,5 +69,6 @@ protected:
     });
   }
 };
-}  // namespace hdmap_utils
+}  // namespace lanelet_wrapper
+}  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__HDMAP_UTILS__TRAFFIC_RULES_HPP_

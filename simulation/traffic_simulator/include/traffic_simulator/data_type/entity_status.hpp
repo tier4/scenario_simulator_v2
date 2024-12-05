@@ -39,11 +39,9 @@ public:
 
   auto set(const CanonicalizedEntityStatus & status) -> void;
   auto set(
-    const EntityStatus & status, const lanelet::Ids & lanelet_ids, const double matching_distance,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> void;
-  auto set(
-    const EntityStatus & status, const double matching_distance,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> void;
+    const EntityStatus & status, const lanelet::Ids & lanelet_ids, const double matching_distance)
+    -> void;
+  auto set(const EntityStatus & status, const double matching_distance) -> void;
 
   auto setAction(const std::string & action) -> void;
   auto getActionStatus() const noexcept -> const traffic_simulator_msgs::msg::ActionStatus &;
