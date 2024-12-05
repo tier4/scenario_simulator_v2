@@ -69,45 +69,61 @@ TEST(EgoEntitySimulation, calculateAccelerationBySlope)
   // it will not exactly match the ideal value, so we manually selected the smallest possible value specifically for this test.
   constexpr double compare_epsilon = 1e-7;
 
-  // first 25m, up, with considering slope
-  lanelet_pose.s = 12.5;
-  lanelet_pose.rpy.z = 0.0;
-  EXPECT_NEAR(
-    expected_slope_acceleration_first_25m, get_slope_acceleration_at(lanelet_pose, true),
-    compare_epsilon);
+  // first 25m, up
+  {
+    lanelet_pose.s = 12.5;
+    lanelet_pose.rpy.z = 0.0;
 
-  // first 25m, up, without considering slope
-  EXPECT_DOUBLE_EQ(0.0, get_slope_acceleration_at(lanelet_pose, false));
+    // with considering slope
+    EXPECT_NEAR(
+      expected_slope_acceleration_first_25m, get_slope_acceleration_at(lanelet_pose, true),
+      compare_epsilon);
+
+    // without considering slope
+    EXPECT_DOUBLE_EQ(0.0, get_slope_acceleration_at(lanelet_pose, false));
+  }
 
   // last 25m, up
-  lanelet_pose.s = 37.5;
-  lanelet_pose.rpy.z = 0.0;
-  EXPECT_NEAR(
-    expected_slope_acceleration_last_25m, get_slope_acceleration_at(lanelet_pose, true),
-    compare_epsilon);
+  {
+    lanelet_pose.s = 37.5;
+    lanelet_pose.rpy.z = 0.0;
 
-  // last 25m, up, without considering slope
-  EXPECT_DOUBLE_EQ(0.0, get_slope_acceleration_at(lanelet_pose, false));
+    // with considering slope
+    EXPECT_NEAR(
+      expected_slope_acceleration_last_25m, get_slope_acceleration_at(lanelet_pose, true),
+      compare_epsilon);
+
+    // without considering slope
+    EXPECT_DOUBLE_EQ(0.0, get_slope_acceleration_at(lanelet_pose, false));
+  }
 
   // first 25m, down
-  lanelet_pose.s = 12.5;
-  lanelet_pose.rpy.z = M_PI;
-  EXPECT_NEAR(
-    -expected_slope_acceleration_first_25m, get_slope_acceleration_at(lanelet_pose, true),
-    compare_epsilon);
+  {
+    lanelet_pose.s = 12.5;
+    lanelet_pose.rpy.z = M_PI;
 
-  // first 25m, down, without considering slope
-  EXPECT_DOUBLE_EQ(0.0, get_slope_acceleration_at(lanelet_pose, false));
+    // with considering slope
+    EXPECT_NEAR(
+      -expected_slope_acceleration_first_25m, get_slope_acceleration_at(lanelet_pose, true),
+      compare_epsilon);
+
+    // without considering slope
+    EXPECT_DOUBLE_EQ(0.0, get_slope_acceleration_at(lanelet_pose, false));
+  }
 
   // last 25m, down
-  lanelet_pose.s = 37.5;
-  lanelet_pose.rpy.z = M_PI;
-  EXPECT_NEAR(
-    -expected_slope_acceleration_last_25m, get_slope_acceleration_at(lanelet_pose, true),
-    compare_epsilon);
+  {
+    lanelet_pose.s = 37.5;
+    lanelet_pose.rpy.z = M_PI;
 
-  // last 25m, down, without considering slope
-  EXPECT_DOUBLE_EQ(0.0, get_slope_acceleration_at(lanelet_pose, false));
+    // with considering slope
+    EXPECT_NEAR(
+      -expected_slope_acceleration_last_25m, get_slope_acceleration_at(lanelet_pose, true),
+      compare_epsilon);
+
+    // without considering slope
+    EXPECT_DOUBLE_EQ(0.0, get_slope_acceleration_at(lanelet_pose, false));
+  }
 
   rclcpp::shutdown();
 
