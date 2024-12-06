@@ -23,9 +23,28 @@ namespace lanelet_wrapper
 {
 namespace route
 {
-auto route(
+auto isInRoute(const lanelet::Id lanelet_id, const lanelet::Ids & route_lanelets_ids) -> bool;
+
+auto speedLimit(
+  const lanelet::Ids & lanelet_ids,
+  const RoutingGraphType type = RoutingConfiguration().routing_graph_type) -> double;
+
+auto routeFromGraph(
   const lanelet::Id from_lanelet_id, const lanelet::Id to_lanelet_id,
   const RoutingConfiguration & routing_configuration = RoutingConfiguration()) -> lanelet::Ids;
+
+auto followingLanelets(
+  const lanelet::Id lanelet_id, const lanelet::Ids & candidate_lanelet_ids,
+  const double distance = 100, const bool include_self = true,
+  const RoutingGraphType type = RoutingConfiguration().routing_graph_type) -> lanelet::Ids;
+
+auto followingLanelets(
+  const lanelet::Id lanelet_id, const double distance = 100, const bool include_self = true,
+  const RoutingGraphType type = RoutingConfiguration().routing_graph_type) -> lanelet::Ids;
+
+auto previousLanelets(
+  const lanelet::Id current_lanelet_id, const double backward_horizon = 100,
+  const RoutingGraphType type = RoutingConfiguration().routing_graph_type) -> lanelet::Ids;
 }  // namespace route
 }  // namespace lanelet_wrapper
 }  // namespace traffic_simulator
