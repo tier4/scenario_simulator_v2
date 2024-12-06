@@ -344,8 +344,10 @@ auto EgoEntitySimulation::calculateAccelerationBySlope() const -> double
   if (consider_acceleration_by_road_slope_) {
     constexpr double gravity_acceleration = -9.81;
     const double ego_pitch_angle =
-      math::geometry::convertQuaternionToEulerAngle(status_.getMapPose().orientation).y;
-    return gravity_acceleration * std::sin(ego_pitch_angle);
+      math::geometry::convertQuaternionToEulerAngle(
+        hdmap_utils_ptr_->toMapPose(status_.getLaneletPose(), true).pose.orientation)
+        .y;
+    return -std::sin(ego_pitch_angle) * gravity_acceleration;
   } else {
     return 0.0;
   }
