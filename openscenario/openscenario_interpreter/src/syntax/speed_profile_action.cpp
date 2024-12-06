@@ -17,6 +17,7 @@
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/entity.hpp>
 #include <openscenario_interpreter/syntax/object_type.hpp>
+#include <openscenario_interpreter/syntax/speed_condition.hpp>
 #include <openscenario_interpreter/syntax/speed_profile_action.hpp>
 #include <valarray>
 
@@ -120,12 +121,15 @@ auto SpeedProfileAction::run() -> void
 {
   for (auto && [actor, iter] : accomplishments) {
     auto accomplished = [this](const auto & actor, const auto & speed_profile_entry) {
-      auto speeds = actor.apply([&](const auto & object) { return evaluateSpeed(object); });
+      auto speeds = actor.apply([&](const auto & actor) {
+        return SpeedCondition::evaluate(global().entities, actor, std::nullopt);
+      });
       if (not speeds.size()) {
         return true;
       } else if (entity_ref) {
         return equal_to<std::valarray<double>>()(
-                 speeds, speed_profile_entry.speed + evaluateSpeed(entity_ref))
+                 speeds, speed_profile_entry.speed +
+                           SpeedCondition::evaluate(global().entities, entity_ref, std::nullopt))
           .min();
       } else {
         return equal_to<std::valarray<double>>()(speeds, speed_profile_entry.speed).min();
