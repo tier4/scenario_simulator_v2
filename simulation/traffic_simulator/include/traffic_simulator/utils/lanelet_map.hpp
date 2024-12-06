@@ -37,6 +37,10 @@ inline auto activate(Ts &&... xs)
 
 auto laneletLength(const lanelet::Id lanelet_id) -> double;
 
+auto nearbyLaneletIds(
+  const Pose & pose, const double distance_threshold, const bool include_crosswalk,
+  const std::size_t search_count) -> lanelet::Ids;
+
 auto borderlinePoses() -> std::vector<std::pair<lanelet::Id, Pose>>;
 }  // namespace lanelet_map
 }  // namespace traffic_simulator

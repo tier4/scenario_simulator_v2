@@ -29,7 +29,6 @@
 #include <traffic_simulator/traffic/traffic_controller.hpp>
 #include <traffic_simulator/traffic/traffic_sink.hpp>
 #include <traffic_simulator/utils/lanelet_map.hpp>
-#include <traffic_simulator/utils/pose.hpp>
 #include <utility>
 #include <vector>
 
@@ -38,12 +37,10 @@ namespace traffic_simulator
 namespace traffic
 {
 TrafficController::TrafficController(
-  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils,
   const std::function<std::vector<std::string>(void)> & get_entity_names_function,
   const std::function<geometry_msgs::msg::Pose(const std::string &)> & get_entity_pose_function,
   const std::function<void(std::string)> & despawn_function, bool auto_sink)
-: hdmap_utils_(hdmap_utils),
-  get_entity_names_function(get_entity_names_function),
+: get_entity_names_function(get_entity_names_function),
   get_entity_pose_function(get_entity_pose_function),
   despawn_function(despawn_function),
   auto_sink(auto_sink)
