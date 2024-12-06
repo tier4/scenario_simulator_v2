@@ -29,9 +29,7 @@ int main(int argc, char ** argv)
 class RoutePlannerTest : public testing::Test
 {
 protected:
-  RoutePlannerTest()
-  : planner(
-      traffic_simulator::RoutingConfiguration().routing_graph_type, makeHdMapUtilsSharedPointer())
+  RoutePlannerTest() : planner(traffic_simulator::RoutingConfiguration().routing_graph_type)
   {
     activateLaneletWrapper("standard_map");
   }

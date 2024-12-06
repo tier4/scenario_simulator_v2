@@ -19,6 +19,7 @@
 #include <traffic_simulator/lanelet_wrapper/pose.hpp>
 #include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator/utils/pose.hpp>
+#include <traffic_simulator/utils/route.hpp>
 #include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
 
 namespace traffic_simulator
@@ -309,13 +310,10 @@ auto isInLanelet(const geometry_msgs::msg::Point & point, const lanelet::Id lane
   return lanelet_wrapper::lanelet_map::isInLanelet(lanelet_id, point);
 }
 
-/// @todo passing HdMapUtils will be removed when lanelet_wrapper::route::followingLanelets is added
-auto isAtEndOfLanelets(
-  const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> bool
+auto isAtEndOfLanelets(const CanonicalizedLaneletPose & canonicalized_lanelet_pose) -> bool
 {
   const auto lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose);
-  return hdmap_utils_ptr->getFollowingLanelets(lanelet_pose.lanelet_id).size() == 1 &&
+  return lanelet_wrapper::route::followingLanelets(lanelet_pose.lanelet_id).size() == 1 &&
          lanelet_wrapper::lanelet_map::laneletLength(lanelet_pose.lanelet_id) <= lanelet_pose.s;
 }
 

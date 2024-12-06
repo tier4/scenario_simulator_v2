@@ -23,6 +23,7 @@
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator/utils/pose.hpp>
+#include <traffic_simulator/utils/route.hpp>
 #include <unordered_map>
 #include <vector>
 
@@ -175,8 +176,8 @@ void EntityBase::requestLaneChange(
   }
 
   if (
-    const auto lane_change_target_id = hdmap_utils_ptr_->getLaneChangeableLaneletId(
-      reference_lanelet_id, target.direction, target.shift)) {
+    const auto lane_change_target_id =
+      route::laneChangeableLaneletId(reference_lanelet_id, target.direction, target.shift)) {
     requestLaneChange(
       traffic_simulator::lane_change::AbsoluteTarget(lane_change_target_id.value(), target.offset),
       trajectory_shape, constraint);
