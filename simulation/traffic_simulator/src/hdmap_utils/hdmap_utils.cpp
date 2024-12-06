@@ -332,7 +332,7 @@ auto HdMapUtils::getNearbyLaneletIds(
   return lanelet_ids;
 }
 
-auto HdMapUtils::getHeight(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) const
+auto HdMapUtils::getAltitude(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) const
   -> double
 {
   return toMapPose(lanelet_pose).pose.position.z;
@@ -593,6 +593,11 @@ auto HdMapUtils::toLaneletPose(
     return std::nullopt;
   }
   auto pose_on_centerline = spline->getPose(s.value());
+
+  if (!isAltitudeMatching(pose.position.z, pose_on_centerline.position.z)) {
+    return std::nullopt;
+  }
+
   auto rpy = math::geometry::convertQuaternionToEulerAngle(
     math::geometry::getRotation(pose_on_centerline.orientation, pose.orientation));
   double offset = std::sqrt(spline->getSquaredDistanceIn2D(pose.position, s.value()));
@@ -614,6 +619,12 @@ auto HdMapUtils::toLaneletPose(
   lanelet_pose.offset = offset;
   lanelet_pose.rpy = rpy;
   return lanelet_pose;
+}
+
+auto HdMapUtils::isAltitudeMatching(
+  const double current_altitude, const double target_altitude) const -> bool
+{
+  return std::abs(current_altitude - target_altitude) <= altitude_threshold_;
 }
 
 auto HdMapUtils::toLaneletPose(

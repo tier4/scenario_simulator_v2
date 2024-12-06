@@ -160,7 +160,7 @@ public:
     const traffic_simulator::RoutingGraphType type =
       traffic_simulator::RoutingConfiguration().routing_graph_type) const -> lanelet::Ids;
 
-  auto getHeight(const traffic_simulator_msgs::msg::LaneletPose &) const -> double;
+  auto getAltitude(const traffic_simulator_msgs::msg::LaneletPose &) const -> double;
 
   auto getLaneChangeTrajectory(
     const geometry_msgs::msg::Pose & from,
@@ -380,7 +380,24 @@ public:
   auto toMapPose(const traffic_simulator_msgs::msg::LaneletPose &, const bool fill_pitch = true)
     const -> geometry_msgs::msg::PoseStamped;
 
+  auto isAltitudeMatching(const double current_altitude, const double target_altitude) const
+    -> bool;
+
 private:
+  /*
+     Using a fixed `altitude_threshold` value of 1.0 [m] is justified because the
+     entity's Z-position is always relative to its base. This eliminates the
+     need to dynamically adjust the threshold based on the entity's dimensions,
+     ensuring consistent altitude matching regardless of the entity type.
+
+     The position of the entity is defined relative to its base, typically
+     the center of the rear axle projected onto the ground in the case of vehicles.
+
+     There is no technical basis for this value; it was determined based on
+     experiments conducted by Szymon Parapura.
+  */
+  static constexpr double altitude_threshold_ = 1.0;
+
   /** @defgroup cache
    *  Declared mutable for caching
    */
