@@ -23,6 +23,14 @@ auto laneletLength(const lanelet::Id lanelet_id) -> double
   return lanelet_wrapper::lanelet_map::laneletLength(lanelet_id);
 }
 
+auto nearbyLaneletIds(
+  const Pose & pose, const double distance_thresh, const bool include_crosswalk,
+  const std::size_t search_count) -> lanelet::Ids
+{
+  return lanelet_wrapper::lanelet_map::nearbyLaneletIds(
+    pose.position, distance_thresh, include_crosswalk, search_count);
+}
+
 auto borderlinePoses() -> std::vector<std::pair<lanelet::Id, Pose>>
 {
   std::vector<std::pair<lanelet::Id, Pose>> borderline_poses;

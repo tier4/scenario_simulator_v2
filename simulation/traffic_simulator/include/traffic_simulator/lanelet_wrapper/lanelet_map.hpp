@@ -15,9 +15,6 @@
 #ifndef TRAFFIC_SIMULATOR__LANELET_WRAPPER_LANELET_MAP_HPP_
 #define TRAFFIC_SIMULATOR__LANELET_WRAPPER_LANELET_MAP_HPP_
 
-#include <lanelet2_core/geometry/Lanelet.h>
-#include <lanelet2_core/primitives/LaneletSequence.h>
-
 #include <traffic_simulator/lanelet_wrapper/lanelet_wrapper.hpp>
 
 namespace traffic_simulator
@@ -44,6 +41,8 @@ auto laneletIds(const std::vector<Lanelet> & lanelets) -> lanelet::Ids
 }
 
 auto laneletIds() -> lanelet::Ids;
+
+auto filterLaneletIds(const lanelet::Ids & lanelet_ids, const char subtype[]) -> lanelet::Ids;
 
 auto nearbyLaneletIds(
   const Point & point, const double distance_threshold, const bool include_crosswalk,
@@ -107,6 +106,12 @@ auto rightOfWayLaneletIds(const lanelet::Ids & lanelet_ids)
   -> std::unordered_map<lanelet::Id, lanelet::Ids>;
 
 auto rightOfWayLaneletIds(const lanelet::Id lanelet_id) -> lanelet::Ids;
+
+auto conflictingCrosswalkIds(const lanelet::Ids & lanelet_ids) -> lanelet::Ids;
+
+auto conflictingLaneIds(
+  const lanelet::Ids & lanelet_ids,
+  const RoutingGraphType type = RoutingConfiguration().routing_graph_type) -> lanelet::Ids;
 
 // Objects on path
 auto trafficSignsOnPath(const lanelet::Ids & lanelet_ids)
