@@ -54,7 +54,8 @@ public:
               .altitude(0.0));
 
   std::unique_ptr<traffic_simulator::TrafficLights> lights =
-    std::make_unique<traffic_simulator::TrafficLights>(node_ptr, hdmap_utils_ptr, "awf/universe/20240605");
+    std::make_unique<traffic_simulator::TrafficLights>(
+      node_ptr, hdmap_utils_ptr, "awf/universe/20240605");
 };
 
 TEST_F(TrafficLightsTest, isAnyTrafficLightChanged)

@@ -32,6 +32,39 @@ Changelog for package openscenario_interpreter
 * add publish_empty_context parameter
 * Contributors: Masaya Kataoka
 
+6.2.1 (2024-12-03)
+------------------
+* Merge pull request `#1466 <https://github.com/tier4/scenario_simulator_v2/issues/1466>`_ from tier4/refactor/distance-condition-and-relative-distance-condition
+  Refactor/relative distance condition
+* Merge branch 'master' into refactor/distance-condition-and-relative-distance-condition
+* Merge branch 'master' into refactor/distance-condition-and-relative-distance-condition
+* Update member function `RelativeDistanceCondition::evaluate` to be static
+* Remove duplicate entity existence check in `RelativeDistanceCondition`
+* Update `RelativeDistanceCondition::evaluate()` to check if the given entities exists
+* Add default clause to switch to suppress warnings
+* Update `RelativeDistanceCondition::evaluate` to receive 1 more EntityRef
+* Rename `RelativeDistanceCondition::distance` to `evaluate`
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+6.2.0 (2024-12-02)
+------------------
+* Merge pull request `#1459 <https://github.com/tier4/scenario_simulator_v2/issues/1459>`_ from tier4/feature/relative-speed-condition
+  Feature/relative speed condition
+* Merge branch 'master' into feature/relative-speed-condition
+* Merge remote-tracking branch 'origin/master' into feature/relative-speed-condition
+* Merge remote-tracking branch 'origin/master' into feature/relative-speed-condition
+* Remove the code for debugging purposes
+* Update lambda return type to be explicit when it is an `Eigen::*` type
+* Make temporary changes to analyze scenario failures that only occur on GitHub Actions
+* Update `OpenSCENARIOSupport.md`
+* Merge remote-tracking branch 'origin/master' into feature/relative-speed-condition
+* Fix `evaluateRelativeSpeed` to return velocity in observer's local coordinates
+* Merge remote-tracking branch 'origin/master' into feature/relative-speed-condition
+* Add new struct `RelativeSpeedCondition`
+* Add new static member function `evaluateRelativeSpeed`
+* Add new struct `DirectionalDimension`
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
 6.1.3 (2024-11-29)
 ------------------
 * Merge branch 'master' into RJD-1057-traffic-lights-tests

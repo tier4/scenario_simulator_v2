@@ -35,6 +35,25 @@ Changelog for package scenario_test_runner
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+6.2.1 (2024-12-03)
+------------------
+* Merge branch 'master' into refactor/distance-condition-and-relative-distance-condition
+* Merge branch 'master' into refactor/distance-condition-and-relative-distance-condition
+* Contributors: Tatsuya Yamasaki
+
+6.2.0 (2024-12-02)
+------------------
+* Merge pull request `#1459 <https://github.com/tier4/scenario_simulator_v2/issues/1459>`_ from tier4/feature/relative-speed-condition
+  Feature/relative speed condition
+* Merge branch 'master' into feature/relative-speed-condition
+* Merge remote-tracking branch 'origin/master' into feature/relative-speed-condition
+* Merge remote-tracking branch 'origin/master' into feature/relative-speed-condition
+* Update test scenario `...RelativeSpeedCondition.yaml` to finish earlier
+* Merge remote-tracking branch 'origin/master' into feature/relative-speed-condition
+* Add new test scenario `...RelativeSpeedCondition.yaml`
+* Merge remote-tracking branch 'origin/master' into feature/relative-speed-condition
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
 6.1.3 (2024-11-29)
 ------------------
 * Merge branch 'master' into RJD-1057-traffic-lights-tests
