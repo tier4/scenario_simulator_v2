@@ -231,7 +231,7 @@ auto ActionNode::getEntityStatus(const std::string & target_name) const
   if (auto it = other_entity_status.find(target_name); it != other_entity_status.end()) {
     return it->second;
   } else {
-    THROW_SEMANTIC_ERROR("other entity : ", target_name, " does not exist.");
+    THROW_SEMANTIC_ERROR("Other entity ", std::quoted(target_name), " does not exist.");
   }
 }
 

@@ -21,7 +21,6 @@
 #include <rclcpp/rclcpp.hpp>
 #include <string>
 #include <traffic_simulator/api/api.hpp>
-#include <traffic_simulator/utils/lanelet_map.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <vector>
 
@@ -183,7 +182,7 @@ private:
 
     {
       const auto trigger_position =
-        traffic_simulator::helper::constructCanonicalizedLaneletPose(34621, 10, 0.0);
+        traffic_simulator::helper::constructCanonicalizedLaneletPose(34621, 10.0, 0.0);
       const auto ego_goal_position =
         traffic_simulator::helper::constructCanonicalizedLaneletPose(34606, 0.0, 0.0);
       const auto entity_name = "spawn_nearby_ego";

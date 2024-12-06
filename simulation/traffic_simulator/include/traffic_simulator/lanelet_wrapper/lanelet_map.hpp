@@ -15,9 +15,6 @@
 #ifndef TRAFFIC_SIMULATOR__LANELET_WRAPPER_LANELET_MAP_HPP_
 #define TRAFFIC_SIMULATOR__LANELET_WRAPPER_LANELET_MAP_HPP_
 
-#include <lanelet2_core/geometry/Lanelet.h>
-#include <lanelet2_core/primitives/LaneletSequence.h>
-
 #include <traffic_simulator/lanelet_wrapper/lanelet_wrapper.hpp>
 
 namespace traffic_simulator
