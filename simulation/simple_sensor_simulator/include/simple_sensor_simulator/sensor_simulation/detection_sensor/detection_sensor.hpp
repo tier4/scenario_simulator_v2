@@ -17,7 +17,10 @@
 
 #include <simulation_api_schema.pb.h>
 
+#include <geometry/plane.hpp>
+#include <geometry_msgs/msg/pose.hpp>
 #include <memory>
+#include <optional>
 #include <queue>
 #include <random>
 #include <rclcpp/rclcpp.hpp>
@@ -37,7 +40,11 @@ protected:
   explicit DetectionSensorBase(
     const double current_simulation_time,
     const simulation_api_schema::DetectionSensorConfiguration & configuration)
-  : previous_simulation_time_(current_simulation_time), configuration_(configuration)
+  : previous_simulation_time_(current_simulation_time),
+    configuration_(configuration),
+    ego_pose_(),
+    previous_ego_pose_(std::nullopt),
+    ego_plane_(std::nullopt)
   {
   }
 
@@ -48,6 +55,9 @@ protected:
     const std::vector<traffic_simulator_msgs::EntityStatus> &) const
     -> std::vector<traffic_simulator_msgs::EntityStatus>::const_iterator;
 
+  auto isOnOrAboveEgoPlane(
+    const geometry_msgs::Pose & npc_pose, const geometry_msgs::Pose & ego_pose) -> bool;
+
 public:
   virtual ~DetectionSensorBase() = default;
 
@@ -55,6 +65,36 @@ public:
     const double current_simulation_time, const std::vector<traffic_simulator_msgs::EntityStatus> &,
     const rclcpp::Time & current_ros_time,
     const std::vector<std::string> & lidar_detected_entities) = 0;
+
+private:
+  /*
+      The threshold for detecting significant changes in ego vehicle's orientation (unit: radian).
+      The value determines the minimum angular difference required to consider the ego orientation
+      as "changed".
+
+      There is no technical basis for this value, it was determined based on Szymon Parapura
+      experiments.
+  */
+  constexpr static double rotation_threshold_ = 0.04;
+
+  /*
+      Maximum downward offset in Z-axis relative to the ego position (unit: meter).
+      If the NPC is lower than this offset relative to the ego position,
+      the NPC will be excluded from detection
+
+      There is no technical basis for this value, it was determined based on Szymon Parapura
+      experiments.
+  */
+  constexpr static double max_downward_z_offset_ = 1.0;
+
+  geometry_msgs::msg::Pose ego_pose_;
+  std::optional<geometry_msgs::msg::Pose> previous_ego_pose_;
+  std::optional<math::geometry::Plane> ego_plane_;
+
+  auto isAltitudeDifferenceWithinThreshold(const geometry_msgs::msg::Pose & entity_pose) const
+    -> bool;
+  auto needToUpdateEgoPlane() const -> bool;
+  auto hasEgoOrientationChanged() const -> bool;
 };
 
 template <typename T, typename U = autoware_auto_perception_msgs::msg::TrackedObjects>

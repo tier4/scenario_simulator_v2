@@ -19,6 +19,8 @@
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
+#include <geometry/quaternion/get_angle_difference.hpp>
+#include <geometry/quaternion/get_normal_vector.hpp>
 #include <geometry/quaternion/get_rotation_matrix.hpp>
 #include <geometry/vector3/hypot.hpp>
 #include <memory>
@@ -60,6 +62,55 @@ auto DetectionSensorBase::findEgoEntityStatusToWhichThisSensorIsAttached(
   } else {
     throw SimulationRuntimeError("Detection sensor can be attached only ego entity.");
   }
+}
+
+auto DetectionSensorBase::isOnOrAboveEgoPlane(
+  const geometry_msgs::Pose & npc_pose, const geometry_msgs::Pose & ego_pose) -> bool
+{
+  using math::geometry::getNormalVector;
+  using math::geometry::makePlane;
+
+  geometry_msgs::msg::Pose entity_pose;
+  simulation_interface::toMsg(ego_pose, ego_pose_);
+  simulation_interface::toMsg(npc_pose, entity_pose);
+
+  if (isAltitudeDifferenceWithinThreshold(entity_pose)) {
+    return true;
+  }
+
+  if (needToUpdateEgoPlane()) {
+    ego_plane_ = makePlane(ego_pose_.position, getNormalVector(ego_pose_.orientation));
+    if (ego_plane_) {
+      previous_ego_pose_ = ego_pose_;
+    } else {
+      return false;
+    }
+  }
+
+  return ego_plane_.value().calculateOffset(entity_pose.position) >= 0.0;
+}
+
+auto DetectionSensorBase::isAltitudeDifferenceWithinThreshold(
+  const geometry_msgs::msg::Pose & entity_pose) const -> bool
+{
+  return entity_pose.position.z >= (ego_pose_.position.z - max_downward_z_offset_);
+}
+
+auto DetectionSensorBase::needToUpdateEgoPlane() const -> bool
+{
+  return !ego_plane_ || hasEgoOrientationChanged();
+}
+
+auto DetectionSensorBase::hasEgoOrientationChanged() const -> bool
+{
+  using math::geometry::getAngleDifference;
+
+  if (!previous_ego_pose_) {
+    return true;
+  }
+
+  return getAngleDifference(ego_pose_.orientation, previous_ego_pose_.value().orientation) >
+         rotation_threshold_;
 }
 
 template <typename To, typename... From>
@@ -322,6 +373,7 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
     auto is_in_range = [&](const auto & status) {
       return not isEgoEntityStatusToWhichThisSensorIsAttached(status) and
              distance(status.pose(), ego_entity_status->pose()) <= configuration_.range() and
+             isOnOrAboveEgoPlane(status.pose(), ego_entity_status->pose()) and
              (configuration_.detect_all_objects_in_range() or
               std::find(
                 lidar_detected_entities.begin(), lidar_detected_entities.end(), status.name()) !=
