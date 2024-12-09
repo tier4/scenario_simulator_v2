@@ -183,64 +183,50 @@ auto toLaneletPoses(
   return lanelet_poses;
 }
 
-auto alternativeLaneletPoses(const LaneletPose & lanelet_pose) -> std::vector<LaneletPose>
+auto alternativeLaneletPoses(const LaneletPose & reference_lanelet_pose) -> std::vector<LaneletPose>
 {
-  const auto alternativesInPreviousLanelet =
-    [](const auto & lanelet_pose) -> std::vector<LaneletPose> {
-    std::vector<LaneletPose> lanelet_poses_in_previous_lanelet;
-    if (const auto previous_lanelet_ids = lanelet_map::previousLaneletIds(lanelet_pose.lanelet_id);
-        !previous_lanelet_ids.empty()) {
-      for (const auto & previous_lanelet_id : previous_lanelet_ids) {
-        const auto lanelet_pose_in_previous_lanelet = helper::constructLaneletPose(
-          previous_lanelet_id, lanelet_pose.s + lanelet_map::laneletLength(previous_lanelet_id),
-          lanelet_pose.offset);
-        if (const auto recursive_alternative_poses =
-              alternativeLaneletPoses(lanelet_pose_in_previous_lanelet);
-            recursive_alternative_poses.empty()) {
-          lanelet_poses_in_previous_lanelet.emplace_back(lanelet_pose_in_previous_lanelet);
+  // Helper function to process previous or next lanelets
+  const auto constructAlternativePoses =
+    [&](const auto & alternativeLaneletIdsFunc, const auto & constructLaneletPoseFunc) {
+      std::vector<LaneletPose> alternative_lanelet_poses;
+      for (const auto & lanelet_id : alternativeLaneletIdsFunc(reference_lanelet_pose.lanelet_id)) {
+        const auto lanelet_pose = constructLaneletPoseFunc(lanelet_id);
+        // Recursively collect alternative poses
+        if (const auto recursive_poses = alternativeLaneletPoses(lanelet_pose);
+            recursive_poses.empty()) {
+          alternative_lanelet_poses.push_back(lanelet_pose);
         } else {
-          lanelet_poses_in_previous_lanelet.insert(
-            lanelet_poses_in_previous_lanelet.end(), recursive_alternative_poses.begin(),
-            recursive_alternative_poses.end());
+          alternative_lanelet_poses.insert(
+            alternative_lanelet_poses.end(), recursive_poses.begin(), recursive_poses.end());
         }
       }
-    }
-    return lanelet_poses_in_previous_lanelet;
-  };
+      return alternative_lanelet_poses;
+    };
 
-  const auto alternativesInNextLanelet = [](const auto & lanelet_pose) -> std::vector<LaneletPose> {
-    std::vector<LaneletPose> lanelet_poses_in_next_lanelet;
-    if (const auto next_lanelet_ids = lanelet_map::nextLaneletIds(lanelet_pose.lanelet_id);
-        !next_lanelet_ids.empty()) {
-      for (const auto & next_lanelet_id : next_lanelet_ids) {
-        const auto lanelet_pose_in_next_lanelet = helper::constructLaneletPose(
-          next_lanelet_id, lanelet_pose.s - lanelet_map::laneletLength(lanelet_pose.lanelet_id),
-          lanelet_pose.offset);
-        if (const auto recursive_alternative_poses =
-              alternativeLaneletPoses(lanelet_pose_in_next_lanelet);
-            recursive_alternative_poses.empty()) {
-          lanelet_poses_in_next_lanelet.emplace_back(lanelet_pose_in_next_lanelet);
-        } else {
-          lanelet_poses_in_next_lanelet.insert(
-            lanelet_poses_in_next_lanelet.end(), recursive_alternative_poses.begin(),
-            recursive_alternative_poses.end());
-        }
-      }
-    }
-    return lanelet_poses_in_next_lanelet;
-  };
-
-  /// @note If s value under 0, it means this pose is on the previous lanelet.
-  if (lanelet_pose.s < 0) {
-    return alternativesInPreviousLanelet(lanelet_pose);
+  /// If s value under 0, it means this pose is on the previous lanelet.
+  if (reference_lanelet_pose.s < 0) {
+    return constructAlternativePoses(
+      [](const auto & lanelet_id) { return lanelet_map::previousLaneletIds(lanelet_id); },
+      [&reference_lanelet_pose](const auto & lanelet_id) {
+        return helper::constructLaneletPose(
+          lanelet_id, reference_lanelet_pose.s + lanelet_map::laneletLength(lanelet_id),
+          reference_lanelet_pose.offset);
+      });
   }
-  /// @note If s value overs it's lanelet length, it means this pose is on the next lanelet.
-  else if (lanelet_pose.s > (lanelet_map::laneletLength(lanelet_pose.lanelet_id))) {
-    return alternativesInNextLanelet(lanelet_pose);
+  /// If s value overs it's lanelet length, it means this pose is on the next lanelet.
+  else if (
+    reference_lanelet_pose.s > lanelet_map::laneletLength(reference_lanelet_pose.lanelet_id)) {
+    return constructAlternativePoses(
+      [](const auto & lanelet_id) { return lanelet_map::nextLaneletIds(lanelet_id); },
+      [&reference_lanelet_pose](const auto & lanelet_id) {
+        return helper::constructLaneletPose(
+          lanelet_id, reference_lanelet_pose.s - lanelet_map::laneletLength(lanelet_id),
+          reference_lanelet_pose.offset);
+      });
   }
-  /// @note If s value is in range [0,length_of_the_lanelet], return lanelet_pose.
+  /// If s value is in range [0, length_of_the_lanelet], return lanelet_pose.
   else {
-    return {lanelet_pose};
+    return {reference_lanelet_pose};
   }
 }
 
@@ -377,8 +363,8 @@ auto matchToLane(
   const double matching_distance, const double reduction_ratio, const RoutingGraphType type)
   -> std::optional<lanelet::Id>
 {
-  const auto absoluteHullPolygon =
-    [&reduction_ratio](const auto & bounding_box, const auto & pose) -> lanelet::BasicPolygon2d {
+  const auto absoluteHullPolygon = [&reduction_ratio,
+                                    &bounding_box](const auto & pose) -> lanelet::BasicPolygon2d {
     auto relative_hull = lanelet::matching::Hull2d{
       lanelet::BasicPoint2d{
         bounding_box.center.x + bounding_box.dimensions.x * 0.5 * reduction_ratio,
@@ -399,7 +385,7 @@ auto matchToLane(
   bounding_box_object.pose.translation() =
     lanelet::BasicPoint2d(map_pose.position.x, map_pose.position.y);
   bounding_box_object.pose.linear() = Eigen::Rotation2D<double>(yaw).matrix();
-  bounding_box_object.absoluteHull = absoluteHullPolygon(bounding_box, bounding_box_object.pose);
+  bounding_box_object.absoluteHull = absoluteHullPolygon(bounding_box_object.pose);
   // find matches and optionally filter
   auto matches = lanelet::matching::getDeterministicMatches(
     *LaneletWrapper::map(), bounding_box_object, matching_distance);
