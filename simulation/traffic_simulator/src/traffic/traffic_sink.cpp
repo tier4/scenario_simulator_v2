@@ -40,9 +40,8 @@ namespace traffic_simulator
 namespace traffic
 {
 TrafficSink::TrafficSink(
-  const std::shared_ptr<traffic_simulator::entity::EntityManager> entity_manager_ptr,
-  const double radius, const geometry_msgs::msg::Point & position,
-  const std::set<std::uint8_t> & sinkable_entity_type)
+  const std::shared_ptr<entity::EntityManager> entity_manager_ptr, const double radius,
+  const geometry_msgs::msg::Point & position, const std::set<std::uint8_t> & sinkable_entity_type)
 : TrafficModuleBase(),
   unique_id(unique_id_counter++),
   radius(radius),
@@ -104,8 +103,7 @@ auto TrafficSink::getEntityNames() const -> std::vector<std::string>
   return entity_manager_ptr->getEntityNames();
 }
 
-auto TrafficSink::getEntityType(const std::string & entity_name) const noexcept(false)
-  -> traffic_simulator::EntityType
+auto TrafficSink::getEntityType(const std::string & entity_name) const noexcept(false) -> EntityType
 {
   if (const auto entity = entity_manager_ptr->getEntity(entity_name)) {
     return entity->getEntityType();

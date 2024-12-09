@@ -46,14 +46,13 @@ public:
   /**
    * @brief Construct a new Traffic Sink object
    * @param entity_manager_ptr Shared pointer, refers to the EntityManager
-   * @param radius The entity despawn when the distance between the entity's coordinates in the Map coordinate system and the TrafficSink's coordinates is less than this value.
+   * @param radius Radius of the sink
    * @param position Position of the traffic sink.
-   * @param sinkable_entity_type If this type is applicable, the entity despawn only when it approaches
-   *  radius [m] or less from the TrafficSink. If empty, all entity types are candidates for despawn.
+   * @param sinkable_entity_type Candidates for despawn. If empty, all entities are sinkable
    */
   explicit TrafficSink(
-    const std::shared_ptr<traffic_simulator::entity::EntityManager> entity_manager_ptr,
-    const double radius, const geometry_msgs::msg::Point & position,
+    const std::shared_ptr<entity::EntityManager> entity_manager_ptr, const double radius,
+    const geometry_msgs::msg::Point & position,
     const std::set<std::uint8_t> & sinkable_entity_type);
   void execute(const double current_time, const double step_time) override;
   auto appendDebugMarker(visualization_msgs::msg::MarkerArray & marker_array) const
@@ -65,8 +64,7 @@ public:
 
 private:
   auto getEntityNames() const -> std::vector<std::string>;
-  auto getEntityType(const std::string & entity_name) const noexcept(false)
-    -> traffic_simulator::EntityType;
+  auto getEntityType(const std::string & entity_name) const noexcept(false) -> EntityType;
   auto getEntityPose(const std::string & entity_name) const noexcept(false)
     -> geometry_msgs::msg::Pose;
   /** 
@@ -76,7 +74,7 @@ private:
    */
   auto despawn(const std::string & entity_name) const -> void;
 
-  const std::shared_ptr<traffic_simulator::entity::EntityManager> entity_manager_ptr;
+  const std::shared_ptr<entity::EntityManager> entity_manager_ptr;
   const std::set<std::uint8_t> sinkable_entity_type;
   inline static std::size_t unique_id_counter = 0UL;
 };

@@ -39,7 +39,7 @@ namespace traffic_simulator
 namespace traffic
 {
 TrafficController::TrafficController(
-  const std::shared_ptr<traffic_simulator::entity::EntityManager> entity_manager_ptr,
+  const std::shared_ptr<entity::EntityManager> entity_manager_ptr,
   const std::set<std::uint8_t> & sinkable_entity_type, bool auto_sink)
 : entity_manager_ptr(entity_manager_ptr),
   sinkable_entity_type(sinkable_entity_type),
@@ -59,8 +59,7 @@ void TrafficController::autoSink()
       lanelet_pose.lanelet_id = lanelet_id;
       lanelet_pose.s = pose::laneletLength(lanelet_id, hdmap_utils_ptr);
       const auto pose = pose::toMapPose(lanelet_pose, hdmap_utils_ptr);
-      addModule<traffic_simulator::traffic::TrafficSink>(
-        entity_manager_ptr, 1, pose.position, sinkable_entity_type);
+      addModule<TrafficSink>(entity_manager_ptr, 1, pose.position, sinkable_entity_type);
     }
   }
 }

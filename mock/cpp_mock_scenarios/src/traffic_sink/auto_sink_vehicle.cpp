@@ -50,17 +50,14 @@ private:
 
   void onInitialize() override
   {
+    const auto canonicalized_lanelet_pose =
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(
+        34774, 11.0, 0.0, api_.getHdmapUtils());
     api_.spawn(
-      "ego",
-      traffic_simulator::pose::toMapPose(
-        traffic_simulator::helper::constructCanonicalizedLaneletPose(
-          34774, 11.0, 0.0, api_.getHdmapUtils())),
+      "ego", traffic_simulator::pose::toMapPose(canonicalized_lanelet_pose),
       getVehicleParameters());
     api_.spawn(
-      "bob",
-      traffic_simulator::pose::toMapPose(
-        traffic_simulator::helper::constructCanonicalizedLaneletPose(
-          34774, 11.0, 0.0, api_.getHdmapUtils())),
+      "bob", traffic_simulator::pose::toMapPose(canonicalized_lanelet_pose),
       getPedestrianParameters());
   }
 };

@@ -43,7 +43,7 @@ class TrafficController
 {
 public:
   explicit TrafficController(
-    const std::shared_ptr<traffic_simulator::entity::EntityManager> entity_manager_ptr,
+    const std::shared_ptr<entity::EntityManager> entity_manager_ptr,
     const std::set<std::uint8_t> & sinkable_entity_type, bool auto_sink = false);
 
   template <typename T, typename... Ts>
@@ -57,8 +57,8 @@ public:
 
 private:
   void autoSink();
-  const std::shared_ptr<traffic_simulator::entity::EntityManager> entity_manager_ptr;
-  std::vector<std::shared_ptr<traffic_simulator::traffic::TrafficModuleBase>> modules_;
+  const std::shared_ptr<entity::EntityManager> entity_manager_ptr;
+  std::vector<std::shared_ptr<TrafficModuleBase>> modules_;
   const std::set<std::uint8_t> sinkable_entity_type;
 
 public:
