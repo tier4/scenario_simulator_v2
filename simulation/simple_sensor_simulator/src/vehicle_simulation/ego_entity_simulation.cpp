@@ -177,15 +177,15 @@ auto EgoEntitySimulation::makeSimulationModel(
 
 auto EgoEntitySimulation::setAutowareStatus() -> void
 {
-  autoware->set([this]() {
+  autoware->current_acceleration.store([this]() {
     geometry_msgs::msg::Accel message;
     message.linear.x = vehicle_model_ptr_->getAx();
     return message;
   }());
 
-  autoware->set(status_.getMapPose());
+  autoware->current_pose.store(status_.getMapPose());
 
-  autoware->set(getCurrentTwist());
+  autoware->current_twist.store(getCurrentTwist());
 }
 
 void EgoEntitySimulation::requestSpeedChange(double value)

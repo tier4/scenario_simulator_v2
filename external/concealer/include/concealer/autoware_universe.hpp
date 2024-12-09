@@ -69,6 +69,10 @@ public:
   PublisherWrapper<ControlModeReport>          setControlModeReport;
   PublisherWrapper<VelocityReport>             setVelocityReport;
   PublisherWrapper<TurnIndicatorsReport>       setTurnIndicatorsReport;
+
+  std::atomic<geometry_msgs::msg::Accel> current_acceleration;
+  std::atomic<geometry_msgs::msg::Pose>  current_pose;
+  std::atomic<geometry_msgs::msg::Twist> current_twist;
   // clang-format on
 
 private:
@@ -87,12 +91,6 @@ private:
   std::atomic<bool> is_thrown = false;
 
   std::exception_ptr thrown;
-
-  std::atomic<geometry_msgs::msg::Accel> current_acceleration;
-
-  std::atomic<geometry_msgs::msg::Twist> current_twist;
-
-  std::atomic<geometry_msgs::msg::Pose> current_pose;
 
 public:
   CONCEALER_PUBLIC explicit AutowareUniverse(bool);
@@ -120,15 +118,6 @@ public:
   auto getControlModeReport() const -> ControlModeReport;
 
   auto setManualMode() -> void;
-
-  auto set(const geometry_msgs::msg::Accel & acceleration) -> void
-  {
-    current_acceleration.store(acceleration);
-  }
-
-  auto set(const geometry_msgs::msg::Twist & twist) -> void { current_twist.store(twist); }
-
-  auto set(const geometry_msgs::msg::Pose & pose) -> void { current_pose.store(pose); }
 };
 }  // namespace concealer
 
