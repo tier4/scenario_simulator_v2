@@ -32,6 +32,25 @@ Changelog for package openscenario_interpreter
 * add publish_empty_context parameter
 * Contributors: Masaya Kataoka
 
+6.2.5 (2024-12-09)
+------------------
+* Merge branch 'master' into fix/acc_by_slope
+* Contributors: Kotaro Yoshimoto
+
+6.2.4 (2024-12-09)
+------------------
+* Merge pull request `#1469 <https://github.com/tier4/scenario_simulator_v2/issues/1469>`_ from tier4/refactor/speed-condition
+  Refactor/speed condition
+* Add comment about element that may confuse readers
+* Merge branch 'master' into refactor/speed-condition
+* Merge branch 'master' into refactor/speed-condition
+* Update `SpeedCondition` to use `SpeedCondition::evaluate` instead of `evaluateSpeed`
+* Update `SpeedProfileAction` to use `SpeedCondition::evaluate` instead of `evaluateSpeed`
+* Update `SpeedAction` to use `SpeedCondition::evaluate` instead of `evaluateSpeed`
+* Update `SpeedCondition` to support `DirectionalDimension`
+* Update `evaluateSpeed` to return `Eigen::Vector3d` instead of `double`
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
 6.2.3 (2024-12-05)
 ------------------
 * Merge branch 'master' into fix/sonor-cloud-issue-8-2
