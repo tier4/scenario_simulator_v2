@@ -192,8 +192,6 @@ public:
 
   auto requestAutoModeForCooperation(const std::string &, bool) -> void override;
 
-  auto restrictTargetSpeed(double) const -> double override;
-
   auto sendCooperateCommand(const std::string &, const std::string &) -> void override;
 
   auto setVelocityLimit(double) -> void override;

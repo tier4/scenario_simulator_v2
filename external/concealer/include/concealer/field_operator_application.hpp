@@ -141,9 +141,6 @@ public:
 
   virtual auto requestAutoModeForCooperation(const std::string &, bool) -> void = 0;
 
-  // different autowares accept different initial target speed
-  virtual auto restrictTargetSpeed(double) const -> double = 0;
-
   virtual auto getTurnIndicatorsCommand() const
     -> autoware_vehicle_msgs::msg::TurnIndicatorsCommand = 0;
 

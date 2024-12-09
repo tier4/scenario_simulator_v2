@@ -405,13 +405,6 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::getTurnIndicatorsCommand() c
   return getTurnIndicatorsCommandImpl();
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::restrictTargetSpeed(double value) const
-  -> double
-{
-  // no restrictions here
-  return value;
-}
-
 auto FieldOperatorApplicationFor<AutowareUniverse>::getAutowareStateName() const -> std::string
 {
   return autoware_state;

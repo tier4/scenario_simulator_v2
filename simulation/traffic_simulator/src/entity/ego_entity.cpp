@@ -278,7 +278,6 @@ auto EgoEntity::requestSpeedChange(double value, bool /* continuous */) -> void
     THROW_SEMANTIC_ERROR("You cannot set target speed to the ego vehicle after starting scenario.");
   } else {
     target_speed_ = value;
-    field_operator_application->restrictTargetSpeed(value);
   }
 }
 
