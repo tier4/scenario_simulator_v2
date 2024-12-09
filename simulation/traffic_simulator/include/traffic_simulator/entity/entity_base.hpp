@@ -27,7 +27,6 @@
 #include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator/data_type/lane_change.hpp>
 #include <traffic_simulator/data_type/speed_change.hpp>
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/job/job_list.hpp>
 #include <traffic_simulator/traffic_lights/traffic_lights.hpp>
@@ -50,9 +49,7 @@ namespace entity
 class EntityBase
 {
 public:
-  explicit EntityBase(
-    const std::string & name, const CanonicalizedEntityStatus & entity_status,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr);
+  explicit EntityBase(const std::string & name, const CanonicalizedEntityStatus & entity_status);
 
   virtual ~EntityBase() = default;
 
@@ -267,7 +264,6 @@ protected:
 
   CanonicalizedEntityStatus status_before_update_;
 
-  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
   std::shared_ptr<traffic_simulator::TrafficLightsBase> traffic_lights_;
 
   double stand_still_duration_ = 0.0;
