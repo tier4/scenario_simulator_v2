@@ -14,7 +14,6 @@
 
 #include <openscenario_interpreter/functional/equal_to.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
-#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/object_type.hpp>
 #include <openscenario_interpreter/syntax/speed_action.hpp>
 #include <openscenario_interpreter/syntax/speed_condition.hpp>
@@ -56,7 +55,7 @@ auto SpeedAction::accomplished() -> bool
   };
 
   auto check = [this](auto && actor) {
-    auto evaluation = actor.apply([this](const auto & actor) {
+    const auto evaluation = actor.apply([this](const auto & actor) {
       return SpeedCondition::evaluate(global().entities, actor, std::nullopt);
     });
     if (speed_action_target.is<AbsoluteTargetSpeed>()) {

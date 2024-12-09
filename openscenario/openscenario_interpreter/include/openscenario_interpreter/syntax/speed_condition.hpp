@@ -29,12 +29,12 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 /*
-   SpeedCondition (OpenSCENARIO XML 1.3)
+   SpeedCondition (OpenSCENARIO XML 1.3.1)
 
-   Compares a triggering entity's/entities' speed to a target speed.
-   The logical operator for the comparison is given by the rule
-   attribute. If direction is used, only the projection to that
-   direction is used in the comparison.
+   Compares a triggering entity's/entities' speed to a target speed. The
+   logical operator for the comparison is given by the rule attribute. If
+   direction is used, only the projection to that direction is used in the
+   comparison.
 
    <xsd:complexType name="SpeedCondition">
      <xsd:attribute name="rule" type="Rule" use="required"/>
@@ -55,8 +55,7 @@ struct SpeedCondition : private Scope, private SimulatorCore::ConditionEvaluatio
   const Double value;
 
   /*
-     Direction of the speed (if not given, the total speed is
-     considered).
+     Direction of the speed (if not given, the total speed is considered).
   */
   const std::optional<DirectionalDimension> direction;
 
@@ -68,7 +67,7 @@ struct SpeedCondition : private Scope, private SimulatorCore::ConditionEvaluatio
 
   auto description() const -> String;
 
-  static auto evaluate(const Entities *, const Entity &) -> geometry_msgs::msg::Vector3;
+  static auto evaluate(const Entities *, const Entity &) -> Eigen::Vector3d;
 
   static auto evaluate(
     const Entities *, const Entity &, const std::optional<DirectionalDimension> &) -> double;

@@ -21,6 +21,17 @@ Changelog for package scenario_simulator_exception
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+6.2.4 (2024-12-09)
+------------------
+* Merge branch 'master' into refactor/speed-condition
+* Merge branch 'master' into refactor/speed-condition
+* Contributors: Tatsuya Yamasaki
+
+6.2.3 (2024-12-05)
+------------------
+* Merge branch 'master' into fix/sonor-cloud-issue-8-2
+* Contributors: Masaya Kataoka
+
 6.2.2 (2024-12-04)
 ------------------
 * Merge branch 'master' into refactor/distance-condition

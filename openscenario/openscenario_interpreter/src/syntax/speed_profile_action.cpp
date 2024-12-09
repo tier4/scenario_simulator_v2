@@ -121,8 +121,8 @@ auto SpeedProfileAction::run() -> void
 {
   for (auto && [actor, iter] : accomplishments) {
     auto accomplished = [this](const auto & actor, const auto & speed_profile_entry) {
-      auto speeds = actor.apply([&](const auto & object) {
-        return SpeedCondition::evaluate(global().entities, object, std::nullopt);
+      auto speeds = actor.apply([&](const auto & actor) {
+        return SpeedCondition::evaluate(global().entities, actor, std::nullopt);
       });
       if (not speeds.size()) {
         return true;

@@ -17,7 +17,6 @@
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/entities.hpp>
-#include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <openscenario_interpreter/syntax/speed_condition.hpp>
 #include <openscenario_interpreter/utility/print.hpp>
 
@@ -50,15 +49,12 @@ auto SpeedCondition::description() const -> String
 }
 
 auto SpeedCondition::evaluate(const Entities * entities, const Entity & triggering_entity)
-  -> geometry_msgs::msg::Vector3
+  -> Eigen::Vector3d
 {
   if (entities->isAdded(triggering_entity)) {
     return evaluateSpeed(triggering_entity);
   } else {
-    return geometry_msgs::build<geometry_msgs::msg::Vector3>()
-      .x(Double::nan())
-      .y(Double::nan())
-      .z(Double::nan());
+    return Eigen::Vector3d(Double::nan(), Double::nan(), Double::nan());
   }
 }
 
@@ -66,18 +62,18 @@ auto SpeedCondition::evaluate(
   const Entities * entities, const Entity & triggering_entity,
   const std::optional<DirectionalDimension> & direction) -> double
 {
-  if (const auto v = evaluate(entities, triggering_entity); direction) {
+  if (const Eigen::Vector3d v = evaluate(entities, triggering_entity); direction) {
     switch (*direction) {
       default:
       case DirectionalDimension::longitudinal:
-        return v.x;
+        return v.x();
       case DirectionalDimension::lateral:
-        return v.y;
+        return v.y();
       case DirectionalDimension::vertical:
-        return v.z;
+        return v.z();
     }
   } else {
-    return math::geometry::norm(v);
+    return v.norm();
   }
 }
 
@@ -85,7 +81,7 @@ auto SpeedCondition::evaluate() -> Object
 {
   results.clear();
 
-  return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
+  return asBoolean(triggering_entities.apply([&](const auto & triggering_entity) {
     results.push_back(triggering_entity.apply([&](const auto & triggering_entity) {
       return evaluate(global().entities, triggering_entity, direction);
     }));
