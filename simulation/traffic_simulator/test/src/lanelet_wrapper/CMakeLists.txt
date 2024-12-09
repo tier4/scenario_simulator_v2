@@ -15,4 +15,3 @@ target_link_libraries(test_lanelet_wrapper_lane_change traffic_simulator)
 
 ament_add_gtest(test_lanelet_wrapper_traffic_lights test_traffic_lights.cpp)
 target_link_libraries(test_lanelet_wrapper_traffic_lights traffic_simulator)
-
