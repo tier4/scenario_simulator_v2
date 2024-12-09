@@ -21,6 +21,28 @@ Changelog for package openscenario_visualization
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+6.2.5 (2024-12-09)
+------------------
+* Merge branch 'master' into fix/acc_by_slope
+* Contributors: Kotaro Yoshimoto
+
+6.2.4 (2024-12-09)
+------------------
+* Merge branch 'master' into refactor/speed-condition
+* Merge branch 'master' into refactor/speed-condition
+* Contributors: Tatsuya Yamasaki
+
+6.2.3 (2024-12-05)
+------------------
+* Merge pull request `#1471 <https://github.com/tier4/scenario_simulator_v2/issues/1471>`_ from tier4/fix/sonor-cloud-issue-8-2
+  Fix/sonor cloud issue 8-2
+* Merge branch 'master' into fix/sonor-cloud-issue-8-2
+* Replace the redundant type with "auto".
+  Remove this redundant cast.
+  Remove unused exception parameter 'e'
+  implicit conversion loses floating-point precision: 'double' to 'const float'
+* Contributors: Masaya Kataoka, Taiga Takano
+
 6.2.2 (2024-12-04)
 ------------------
 * Merge branch 'master' into refactor/distance-condition
