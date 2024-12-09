@@ -67,10 +67,10 @@ public:
   : configuration(configuration),
     node_parameters_(
       rclcpp::node_interfaces::get_node_parameters_interface(std::forward<NodeT>(node))),
+    entity_manager_ptr_(
+      std::make_shared<entity::EntityManager>(node, configuration, node_parameters_)),
     traffic_lights_ptr_(std::make_shared<TrafficLights>(
       node, getROS2Parameter<std::string>("architecture_type", "awf/universe"))),
-    entity_manager_ptr_(std::make_shared<entity::EntityManager>(
-      node, configuration, node_parameters_, traffic_lights_ptr_)),
     traffic_controller_ptr_(std::make_shared<traffic::TrafficController>(
       [this]() { return API::getEntityNames(); },
       [this](const auto & entity_name) {
@@ -104,6 +104,7 @@ public:
     zeromq_client_(
       simulation_interface::protocol, configuration.simulator_host, getZMQSocketPort(*node))
   {
+    entity_manager_ptr_->setTrafficLights(traffic_lights_ptr_);
     setVerbose(configuration.verbose);
 
     if (not configuration.standalone_mode) {

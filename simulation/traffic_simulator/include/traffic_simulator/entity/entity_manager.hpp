@@ -97,15 +97,24 @@ class EntityManager
   std::shared_ptr<traffic_simulator::TrafficLights> traffic_lights_ptr_;
 
 public:
+  /**
+   * This function is necessary because the TrafficLights object is created after the EntityManager,
+   * so it cannot be assigned during the call of the EntityManager constructor.
+   * TrafficLights cannot be created before the EntityManager due to the dependency on HdMapUtils.
+   */
+  auto setTrafficLights(
+    const std::shared_ptr<traffic_simulator::TrafficLights> & traffic_lights_ptr) -> void
+  {
+    traffic_lights_ptr_ = traffic_lights_ptr;
+  }
+
   template <class NodeT, class AllocatorT = std::allocator<void>>
   explicit EntityManager(
     NodeT && node, const Configuration & configuration,
-    const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node_parameters,
-    const std::shared_ptr<traffic_simulator::TrafficLights> & traffic_lights_ptr)
+    const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node_parameters)
   : configuration(configuration),
     node_topics_interface(rclcpp::node_interfaces::get_node_topics_interface(node)),
     node_parameters_(node_parameters),
-    traffic_lights_ptr_(traffic_lights_ptr),
     broadcaster_(node),
     base_link_broadcaster_(node),
     clock_ptr_(node->get_clock()),
