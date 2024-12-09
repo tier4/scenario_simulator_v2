@@ -31,8 +31,7 @@ public:
   explicit AutoSinkVehicleScenario(const rclcpp::NodeOptions & option)
   : cpp_mock_scenarios::CppScenarioNode(
       "auto_sink_vehicle", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
-      "lanelet2_map.osm", __FILE__, false, option,
-      traffic_simulator::traffic::AutoSinkConfig{true, {traffic_simulator::EntityType::PEDESTRIAN}})
+      "lanelet2_map.osm", __FILE__, false, option, {traffic_simulator::EntityType::PEDESTRIAN})
   {
     start();
   }
@@ -41,7 +40,7 @@ private:
   void onUpdate() override
   {
     if (api_.getCurrentTime() >= 0.1) {
-      if (api_.entityExists("ego") and not api_.entityExists("bob")) {
+      if (api_.entityExists("car") and not api_.entityExists("bob")) {
         stop(cpp_mock_scenarios::Result::SUCCESS);
       } else {
         stop(cpp_mock_scenarios::Result::FAILURE);
@@ -55,7 +54,7 @@ private:
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
         34774, 11.0, 0.0, api_.getHdmapUtils());
     api_.spawn(
-      "ego", traffic_simulator::pose::toMapPose(canonicalized_lanelet_pose),
+      "car", traffic_simulator::pose::toMapPose(canonicalized_lanelet_pose),
       getVehicleParameters());
     api_.spawn(
       "bob", traffic_simulator::pose::toMapPose(canonicalized_lanelet_pose),

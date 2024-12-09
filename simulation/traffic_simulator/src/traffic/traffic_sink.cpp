@@ -48,18 +48,15 @@ TrafficSink::TrafficSink(
 void TrafficSink::execute(
   [[maybe_unused]] const double current_time, [[maybe_unused]] const double step_time)
 {
-  const auto names = getEntityNames();
-  for (const auto & name : names) {
-    const auto is_sinkable_entity = [this](const auto & entity_name) {
-      return config.sinkable_entity_type.empty() or
-             config.sinkable_entity_type.find(getEntityType(entity_name).type) !=
-               config.sinkable_entity_type.end();
-    };
-    const auto pose = getEntityPose(name);
-    if (
-      is_sinkable_entity(name) and
-      math::geometry::getDistance(config.position, pose) <= config.radius) {
-      despawn(name);
+  const auto entity_names = getEntityNames();
+  for (const auto & entity_name : entity_names) {
+    const bool is_in_sinkable_radius =
+      math::geometry::getDistance(config.position, getEntityPose(entity_name)) <= config.radius;
+    const bool has_sinkable_entity_type =
+      config.sinkable_entity_types.find(getEntityType(entity_name).type) !=
+      config.sinkable_entity_types.end();
+    if (has_sinkable_entity_type and is_in_sinkable_radius) {
+      entity_manager_ptr->despawnEntity(entity_name);
     }
   }
 }
@@ -113,20 +110,6 @@ auto TrafficSink::getEntityPose(const std::string & entity_name) const noexcept(
     return entity->getMapPose();
   } else {
     THROW_SEMANTIC_ERROR("Entity ", std::quoted(entity_name), " does not exists.");
-  }
-}
-auto TrafficSink::despawn(const std::string & entity_name) const -> void
-{
-  const auto entity_position = getEntityPose(entity_name).position;
-  const bool in_despawn_proximity =
-    math::geometry::hypot(entity_position, config.position) <= config.radius;
-
-  const std::uint8_t entity_type = getEntityType(entity_name).type;
-  const bool is_despawn_candidate =
-    config.sinkable_entity_type.empty() or
-    config.sinkable_entity_type.find(entity_type) != config.sinkable_entity_type.cend();
-  if (is_despawn_candidate and in_despawn_proximity) {
-    entity_manager_ptr->despawnEntity(entity_name);
   }
 }
 }  // namespace traffic

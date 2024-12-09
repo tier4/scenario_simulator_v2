@@ -70,7 +70,6 @@ auto Interpreter::makeCurrentConfiguration() const -> traffic_simulator::Configu
   auto configuration = traffic_simulator::Configuration(
     logic_file.isDirectory() ? logic_file : logic_file.filepath.parent_path());
   {
-    configuration.generate_auto_sink = false;
     configuration.scenario_path = osc_path;
 
     // XXX DIRTY HACK!!!

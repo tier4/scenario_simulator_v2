@@ -34,7 +34,7 @@ public:
     const std::string & node_name, const std::string & map_path,
     const std::string & lanelet2_map_file, const std::string & scenario_filename,
     const bool verbose, const rclcpp::NodeOptions & option,
-    const traffic_simulator::traffic::AutoSinkConfig & auto_sink_config = {false, {}});
+    const std::set<std::uint8_t> & auto_sink_entity_types = {});
   void start();
   void stop(Result result, const std::string & description = "");
   void expectThrow() { exception_expect_ = true; }
@@ -73,8 +73,7 @@ private:
   auto configure(
     const std::string & map_path, const std::string & lanelet2_map_file,
     const std::string & scenario_filename, const bool verbose,
-    const traffic_simulator::traffic::AutoSinkConfig & auto_sink_config = {false, {}})
-    -> traffic_simulator::Configuration
+    const std::set<std::uint8_t> & auto_sink_entity_types = {}) -> traffic_simulator::Configuration
   {
     auto configuration = traffic_simulator::Configuration(map_path);
     {
@@ -82,8 +81,7 @@ private:
       // configuration.lanelet2_map_file = "lanelet2_map_with_private_road_and_walkway_ele_fix.osm";
       configuration.scenario_path = scenario_filename;
       configuration.verbose = verbose;
-      configuration.generate_auto_sink = auto_sink_config.generate_auto_sink;
-      configuration.default_sinkable_entity_type = auto_sink_config.default_sinkable_entity_type;
+      configuration.auto_sink_entity_types = auto_sink_entity_types;
     }
     checkConfiguration(configuration);
     return configuration;

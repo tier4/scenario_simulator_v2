@@ -46,16 +46,16 @@ struct TrafficSinkConfig
    * @brief Construct a new TrafficSinkConfig object
    * @param radius Radius of the traffic sink
    * @param position Position of the traffic sink
-   * @param sinkable_entity_type Candidates for despawn. If empty, all entities are sinkable
+   * @param sinkable_entity_types Candidates for despawn.
    */
   explicit TrafficSinkConfig(
     const double radius, const geometry_msgs::msg::Point & position,
-    const std::set<std::uint8_t> & sinkable_entity_type,
+    const std::set<std::uint8_t> & sinkable_entity_types,
     const std::optional<lanelet::Id> lanelet_id_opt)
   : radius(radius),
     position(position),
-    sinkable_entity_type(sinkable_entity_type),
-    description([](std::optional<lanelet::Id> lanelet_id_opt) -> std::string {
+    sinkable_entity_types(sinkable_entity_types),
+    description([](const std::optional<lanelet::Id> lanelet_id_opt) -> std::string {
       static long unique_id = 0L;
       if (lanelet_id_opt.has_value()) {
         return std::string("auto_") + std::to_string(lanelet_id_opt.value());
@@ -68,7 +68,7 @@ struct TrafficSinkConfig
 
   const double radius;
   const geometry_msgs::msg::Point position;
-  const std::set<std::uint8_t> sinkable_entity_type;
+  const std::set<std::uint8_t> sinkable_entity_types;
   const std::string description;
 };
 
@@ -83,6 +83,11 @@ public:
   explicit TrafficSink(
     const std::shared_ptr<entity::EntityManager> entity_manager_ptr,
     const TrafficSinkConfig & config);
+  /** 
+   *  @note execute calls despawn on each entity only when both:
+   *  1. Its distance from the TrafficSink is <= config.radius [m].
+   *  2. Its EntityType is in config.sinkable_entity_types.
+   */
   void execute(const double current_time, const double step_time) override;
   auto appendDebugMarker(visualization_msgs::msg::MarkerArray & marker_array) const
     -> void override;
@@ -94,12 +99,6 @@ private:
   auto getEntityType(const std::string & entity_name) const noexcept(false) -> EntityType;
   auto getEntityPose(const std::string & entity_name) const noexcept(false)
     -> geometry_msgs::msg::Pose;
-  /** 
-   *  @note Despawn the entity only when both:
-   *  1. Its distance from the TrafficSink is <= radius [m].
-   *  2. Its EntityType is in sinkable_entity_type or sinkable_entity_type is empty.
-   */
-  auto despawn(const std::string & entity_name) const -> void;
 
   const std::shared_ptr<entity::EntityManager> entity_manager_ptr;
 };
