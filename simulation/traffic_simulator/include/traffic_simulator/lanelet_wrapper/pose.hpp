@@ -55,7 +55,8 @@ auto toLaneletPoses(
   const RoutingGraphType type = RoutingConfiguration().routing_graph_type)
   -> std::vector<LaneletPose>;
 
-auto alternativeLaneletPoses(const LaneletPose & lanelet_pose) -> std::vector<LaneletPose>;
+auto alternativeLaneletPoses(const LaneletPose & reference_lanelet_pose)
+  -> std::vector<LaneletPose>;
 
 auto alongLaneletPose(
   const LaneletPose & from_pose, const lanelet::Ids & route_lanelets, const double distance)
