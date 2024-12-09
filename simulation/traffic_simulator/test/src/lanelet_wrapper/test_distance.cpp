@@ -20,6 +20,8 @@ int main(int argc, char ** argv)
   return RUN_ALL_TESTS();
 }
 
+namespace traffic_simulator::lanelet_wrapper::tests
+{
 /**
  * @note Test basic functionality.
  * Test lateral distance calculation correctness
@@ -27,9 +29,9 @@ int main(int argc, char ** argv)
  */
 TEST_F(LaneletWrapperTest_FourTrackHighwayMap, getLateralDistance_sameLane)
 {
-  const auto from = traffic_simulator::helper::constructLaneletPose(3002185, 0.0, 0.5);
-  const auto to = traffic_simulator::helper::constructLaneletPose(3002185, 10.0, 0.2);
-  const auto result = traffic_simulator::lanelet_wrapper::distance::lateralDistance(from, to);
+  const auto from = helper::constructLaneletPose(3002185, 0.0, 0.5);
+  const auto to = helper::constructLaneletPose(3002185, 10.0, 0.2);
+  const auto result = distance::lateralDistance(from, to);
 
   EXPECT_TRUE(result.has_value());
   EXPECT_NEAR(result.value(), to.offset - from.offset, 1e-3);
@@ -42,9 +44,9 @@ TEST_F(LaneletWrapperTest_FourTrackHighwayMap, getLateralDistance_sameLane)
  */
 TEST_F(LaneletWrapperTest_FourTrackHighwayMap, getLateralDistance_parallelLanesCanNotChange)
 {
-  EXPECT_FALSE(traffic_simulator::lanelet_wrapper::distance::lateralDistance(
-                 traffic_simulator::helper::constructLaneletPose(3002185, 0.0, 0.5),
-                 traffic_simulator::helper::constructLaneletPose(3002184, 10.0, 0.2))
+  EXPECT_FALSE(distance::lateralDistance(
+                 helper::constructLaneletPose(3002185, 0.0, 0.5),
+                 helper::constructLaneletPose(3002184, 10.0, 0.2))
                  .has_value());
 }
 
@@ -55,13 +57,12 @@ TEST_F(LaneletWrapperTest_FourTrackHighwayMap, getLateralDistance_parallelLanesC
  */
 TEST_F(LaneletWrapperTest_FourTrackHighwayMap, getLateralDistance_parallelLanesCanChange)
 {
-  const auto from = traffic_simulator::helper::constructLaneletPose(3002185, 0.0, 0.5);
-  const auto to = traffic_simulator::helper::constructLaneletPose(3002184, 10.0, 0.2);
+  const auto from = helper::constructLaneletPose(3002185, 0.0, 0.5);
+  const auto to = helper::constructLaneletPose(3002184, 10.0, 0.2);
 
-  traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
+  RoutingConfiguration lane_changeable_routing_configuration;
   lane_changeable_routing_configuration.allow_lane_change = true;
-  const auto result = traffic_simulator::lanelet_wrapper::distance::lateralDistance(
-    from, to, lane_changeable_routing_configuration);
+  const auto result = distance::lateralDistance(from, to, lane_changeable_routing_configuration);
 
   EXPECT_TRUE(result.has_value());
   EXPECT_NEAR(result.value(), 2.80373 / 2.0 + 3.03463 / 2.0 + to.offset - from.offset, 1e-3);
@@ -76,11 +77,11 @@ TEST_F(LaneletWrapperTest_FourTrackHighwayMap, getLateralDistance_parallelLanesC
  */
 TEST_F(LaneletWrapperTest_FourTrackHighwayMap, getLateralDistance_notConnected)
 {
-  traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
+  RoutingConfiguration lane_changeable_routing_configuration;
   lane_changeable_routing_configuration.allow_lane_change = true;
-  EXPECT_FALSE(traffic_simulator::lanelet_wrapper::distance::lateralDistance(
-                 traffic_simulator::helper::constructLaneletPose(3002185, 0.0, 0.5),
-                 traffic_simulator::helper::constructLaneletPose(3002166, 10.0, 0.2),
+  EXPECT_FALSE(distance::lateralDistance(
+                 helper::constructLaneletPose(3002185, 0.0, 0.5),
+                 helper::constructLaneletPose(3002166, 10.0, 0.2),
                  lane_changeable_routing_configuration)
                  .has_value());
 }
@@ -92,15 +93,15 @@ TEST_F(LaneletWrapperTest_FourTrackHighwayMap, getLateralDistance_notConnected)
  */
 TEST_F(LaneletWrapperTest_StandardMap, getLongitudinalDistance_sameLanelet)
 {
-  const auto pose_from = traffic_simulator::lanelet_wrapper::pose::toLaneletPose(
+  const auto pose_from = pose::toLaneletPose(
     makePose(makePoint(3812.65, 73810.13, -2.80), makeQuaternionFromYaw(90.0)), lanelet::Id{34606});
-  const auto pose_to = traffic_simulator::lanelet_wrapper::pose::toLaneletPose(
+  const auto pose_to = pose::toLaneletPose(
     makePose(makePoint(3825.10, 73786.34, -1.82), makeQuaternionFromYaw(90.0)), lanelet::Id{34606});
   ASSERT_TRUE(pose_from.has_value());
   ASSERT_TRUE(pose_to.has_value());
 
-  const auto result_distance = traffic_simulator::lanelet_wrapper::distance::longitudinalDistance(
-    pose_from.value(), pose_to.value(), traffic_simulator::RoutingConfiguration());
+  const auto result_distance =
+    distance::longitudinalDistance(pose_from.value(), pose_to.value(), RoutingConfiguration());
 
   ASSERT_TRUE(result_distance.has_value());
   EXPECT_NEAR(result_distance.value(), 27.0, 1.0);
@@ -113,16 +114,15 @@ TEST_F(LaneletWrapperTest_StandardMap, getLongitudinalDistance_sameLanelet)
  */
 TEST_F(LaneletWrapperTest_StandardMap, getLongitudinalDistance_sameLaneletBehind)
 {
-  const auto pose_to = traffic_simulator::lanelet_wrapper::pose::toLaneletPose(
+  const auto pose_to = pose::toLaneletPose(
     makePose(makePoint(3812.65, 73810.13, -2.80), makeQuaternionFromYaw(90.0)), lanelet::Id{34606});
-  const auto pose_from = traffic_simulator::lanelet_wrapper::pose::toLaneletPose(
+  const auto pose_from = pose::toLaneletPose(
     makePose(makePoint(3825.10, 73786.34, -1.82), makeQuaternionFromYaw(90.0)), lanelet::Id{34606});
   ASSERT_TRUE(pose_from.has_value());
   ASSERT_TRUE(pose_to.has_value());
 
   const auto longitudinal_distance =
-    traffic_simulator::lanelet_wrapper::distance::longitudinalDistance(
-      pose_from.value(), pose_to.value(), traffic_simulator::RoutingConfiguration());
+    distance::longitudinalDistance(pose_from.value(), pose_to.value(), RoutingConfiguration());
   EXPECT_FALSE(longitudinal_distance.has_value());
 }
 
@@ -133,15 +133,15 @@ TEST_F(LaneletWrapperTest_StandardMap, getLongitudinalDistance_sameLaneletBehind
  */
 TEST_F(LaneletWrapperTest_StandardMap, getLongitudinalDistance_differentLanelet)
 {
-  const auto pose_from = traffic_simulator::lanelet_wrapper::pose::toLaneletPose(
-    makePose(makePoint(3801.19, 73812.70, -2.86)), lanelet::Id{120660});
-  const auto pose_to = traffic_simulator::lanelet_wrapper::pose::toLaneletPose(
-    makePose(makePoint(3724.70, 73773.00, -1.20)), lanelet::Id{34462});
+  const auto pose_from =
+    pose::toLaneletPose(makePose(makePoint(3801.19, 73812.70, -2.86)), lanelet::Id{120660});
+  const auto pose_to =
+    pose::toLaneletPose(makePose(makePoint(3724.70, 73773.00, -1.20)), lanelet::Id{34462});
   ASSERT_TRUE(pose_from.has_value());
   ASSERT_TRUE(pose_to.has_value());
 
-  const auto result_distance = traffic_simulator::lanelet_wrapper::distance::longitudinalDistance(
-    pose_from.value(), pose_to.value(), traffic_simulator::RoutingConfiguration());
+  const auto result_distance =
+    distance::longitudinalDistance(pose_from.value(), pose_to.value(), RoutingConfiguration());
 
   ASSERT_TRUE(result_distance.has_value());
   EXPECT_NEAR(result_distance.value(), 86.0, 1.0);
@@ -154,16 +154,16 @@ TEST_F(LaneletWrapperTest_StandardMap, getLongitudinalDistance_differentLanelet)
  */
 TEST_F(LaneletWrapperTest_FourTrackHighwayMap, getLongitudinalDistance_differentLaneletNoRoute)
 {
-  const auto pose_to = traffic_simulator::lanelet_wrapper::pose::toLaneletPose(
+  const auto pose_to = pose::toLaneletPose(
     makePose(makePoint(81590.79, 50067.66), makeQuaternionFromYaw(90.0)), lanelet::Id{3002185});
-  const auto pose_from = traffic_simulator::lanelet_wrapper::pose::toLaneletPose(
+  const auto pose_from = pose::toLaneletPose(
     makePose(makePoint(81596.20, 50068.04), makeQuaternionFromYaw(90.0)), lanelet::Id{3002166});
   ASSERT_TRUE(pose_from.has_value());
   ASSERT_TRUE(pose_to.has_value());
 
-  EXPECT_FALSE(traffic_simulator::lanelet_wrapper::distance::longitudinalDistance(
-                 pose_from.value(), pose_to.value(), traffic_simulator::RoutingConfiguration())
-                 .has_value());
+  EXPECT_FALSE(
+    distance::longitudinalDistance(pose_from.value(), pose_to.value(), RoutingConfiguration())
+      .has_value());
 }
 
 /**
@@ -171,14 +171,13 @@ TEST_F(LaneletWrapperTest_FourTrackHighwayMap, getLongitudinalDistance_different
  */
 TEST_F(LaneletWrapperTest_KashiwanohaMap, getLongitudinalDistance_PullRequest1348)
 {
-  auto pose_from = traffic_simulator::helper::constructLaneletPose(34468, 10.0);
-  auto pose_to = traffic_simulator::helper::constructLaneletPose(34795, 5.0);
+  auto pose_from = helper::constructLaneletPose(34468, 10.0);
+  auto pose_to = helper::constructLaneletPose(34795, 5.0);
 
-  traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
+  RoutingConfiguration lane_changeable_routing_configuration;
   lane_changeable_routing_configuration.allow_lane_change = true;
   EXPECT_NO_THROW(EXPECT_DOUBLE_EQ(
-    traffic_simulator::lanelet_wrapper::distance::longitudinalDistance(
-      pose_from, pose_to, lane_changeable_routing_configuration)
+    distance::longitudinalDistance(pose_from, pose_to, lane_changeable_routing_configuration)
       .value(),
     54.18867466433655977198213804513216018676757812500000));
 }
@@ -191,81 +190,71 @@ TEST_F(LaneletWrapperTest_KashiwanohaMap, getLongitudinalDistance_PullRequest134
  */
 TEST_F(LaneletWrapperTest_IntersectionMap, getLongitudinalDistance_laneChange)
 {
-  traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
+  RoutingConfiguration lane_changeable_routing_configuration;
   lane_changeable_routing_configuration.allow_lane_change = true;
-  traffic_simulator::RoutingConfiguration default_routing_configuration;
+  RoutingConfiguration default_routing_configuration;
   {
-    const auto pose_from = traffic_simulator::helper::constructLaneletPose(563L, 5.0);
-    const auto pose_to = traffic_simulator::helper::constructLaneletPose(659L, 5.0);
+    const auto pose_from = helper::constructLaneletPose(563L, 5.0);
+    const auto pose_to = helper::constructLaneletPose(659L, 5.0);
 
     const auto without_lane_change =
-      traffic_simulator::lanelet_wrapper::distance::longitudinalDistance(
-        pose_from, pose_to, default_routing_configuration);
+      distance::longitudinalDistance(pose_from, pose_to, default_routing_configuration);
     EXPECT_FALSE(without_lane_change.has_value());
 
     const auto with_lane_change =
-      traffic_simulator::lanelet_wrapper::distance::longitudinalDistance(
-        pose_from, pose_to, lane_changeable_routing_configuration);
+      distance::longitudinalDistance(pose_from, pose_to, lane_changeable_routing_configuration);
     ASSERT_TRUE(with_lane_change.has_value());
     EXPECT_NEAR(with_lane_change.value(), 157.0, 1.0);
   }
   {
-    const auto pose_from = traffic_simulator::helper::constructLaneletPose(563L, 5.0);
-    const auto pose_to = traffic_simulator::helper::constructLaneletPose(658L, 5.0);
+    const auto pose_from = helper::constructLaneletPose(563L, 5.0);
+    const auto pose_to = helper::constructLaneletPose(658L, 5.0);
 
     const auto without_lane_change =
-      traffic_simulator::lanelet_wrapper::distance::longitudinalDistance(
-        pose_from, pose_to, default_routing_configuration);
+      distance::longitudinalDistance(pose_from, pose_to, default_routing_configuration);
     EXPECT_FALSE(without_lane_change.has_value());
 
     const auto with_lane_change =
-      traffic_simulator::lanelet_wrapper::distance::longitudinalDistance(
-        pose_from, pose_to, lane_changeable_routing_configuration);
+      distance::longitudinalDistance(pose_from, pose_to, lane_changeable_routing_configuration);
     ASSERT_TRUE(with_lane_change.has_value());
     EXPECT_NEAR(with_lane_change.value(), 161.0, 1.0);
   }
   {
-    const auto pose_from = traffic_simulator::helper::constructLaneletPose(563L, 5.0);
-    const auto pose_to = traffic_simulator::helper::constructLaneletPose(657L, 5.0);
+    const auto pose_from = helper::constructLaneletPose(563L, 5.0);
+    const auto pose_to = helper::constructLaneletPose(657L, 5.0);
 
     const auto without_lane_change =
-      traffic_simulator::lanelet_wrapper::distance::longitudinalDistance(
-        pose_from, pose_to, default_routing_configuration);
+      distance::longitudinalDistance(pose_from, pose_to, default_routing_configuration);
     EXPECT_FALSE(without_lane_change.has_value());
 
     const auto with_lane_change =
-      traffic_simulator::lanelet_wrapper::distance::longitudinalDistance(
-        pose_from, pose_to, lane_changeable_routing_configuration);
+      distance::longitudinalDistance(pose_from, pose_to, lane_changeable_routing_configuration);
     ASSERT_TRUE(with_lane_change.has_value());
     EXPECT_NEAR(with_lane_change.value(), 161.0, 1.0);
   }
   {
-    const auto pose_from = traffic_simulator::helper::constructLaneletPose(643L, 5.0);
-    const auto pose_to = traffic_simulator::helper::constructLaneletPose(666L, 5.0);
+    const auto pose_from = helper::constructLaneletPose(643L, 5.0);
+    const auto pose_to = helper::constructLaneletPose(666L, 5.0);
 
     const auto without_lane_change =
-      traffic_simulator::lanelet_wrapper::distance::longitudinalDistance(
-        pose_from, pose_to, default_routing_configuration);
+      distance::longitudinalDistance(pose_from, pose_to, default_routing_configuration);
     EXPECT_FALSE(without_lane_change.has_value());
 
     const auto with_lane_change =
-      traffic_simulator::lanelet_wrapper::distance::longitudinalDistance(
-        pose_from, pose_to, lane_changeable_routing_configuration);
+      distance::longitudinalDistance(pose_from, pose_to, lane_changeable_routing_configuration);
     ASSERT_TRUE(with_lane_change.has_value());
     EXPECT_NEAR(with_lane_change.value(), 250.0, 1.0);
   }
   {
-    const auto pose_from = traffic_simulator::helper::constructLaneletPose(643L, 5.0);
-    const auto pose_to = traffic_simulator::helper::constructLaneletPose(665L, 5.0);
+    const auto pose_from = helper::constructLaneletPose(643L, 5.0);
+    const auto pose_to = helper::constructLaneletPose(665L, 5.0);
 
     const auto without_lane_change =
-      traffic_simulator::lanelet_wrapper::distance::longitudinalDistance(
-        pose_from, pose_to, default_routing_configuration);
+      distance::longitudinalDistance(pose_from, pose_to, default_routing_configuration);
     EXPECT_FALSE(without_lane_change.has_value());
 
     const auto with_lane_change =
-      traffic_simulator::lanelet_wrapper::distance::longitudinalDistance(
-        pose_from, pose_to, lane_changeable_routing_configuration);
+      distance::longitudinalDistance(pose_from, pose_to, lane_changeable_routing_configuration);
     ASSERT_TRUE(with_lane_change.has_value());
     EXPECT_NEAR(with_lane_change.value(), 253.0, 1.0);
   }
@@ -281,11 +270,10 @@ TEST_F(
   getDistanceToTrafficLightStopLine_trafficLightOnSpline)
 {
   const auto start_waypoint = makePoint(3771.06, 73728.35);
-  const auto result_distance =
-    traffic_simulator::lanelet_wrapper::distance::distanceToTrafficLightStopLine(
-      math::geometry::CatmullRomSpline(std::vector<geometry_msgs::msg::Point>{
-        start_waypoint, makePoint(3756.30, 73755.87), makePoint(3746.90, 73774.44)}),
-      lanelet::Id{34836});
+  const auto result_distance = distance::distanceToTrafficLightStopLine(
+    math::geometry::CatmullRomSpline(std::vector<geometry_msgs::msg::Point>{
+      start_waypoint, makePoint(3756.30, 73755.87), makePoint(3746.90, 73774.44)}),
+    lanelet::Id{34836});
   EXPECT_TRUE(result_distance.has_value());
 
   const auto stopline_midpoint = makePoint(3767.00, 73736.47);
@@ -305,7 +293,7 @@ TEST_F(
   getDistanceToTrafficLightStopLine_noTrafficLightOnSpline)
 {
   EXPECT_FALSE(
-    traffic_simulator::lanelet_wrapper::distance::distanceToTrafficLightStopLine(
+    distance::distanceToTrafficLightStopLine(
       math::geometry::CatmullRomSpline(std::vector<geometry_msgs::msg::Point>{
         makePoint(3807.63, 73715.99), makePoint(3785.76, 73707.70), makePoint(3773.19, 73723.27)}),
       lanelet::Id{34836})
@@ -322,11 +310,10 @@ TEST_F(
   getDistanceToTrafficLightStopLine_trafficLightOnWaypoints)
 {
   const auto start_waypoint = makePoint(3771.06, 73728.35);
-  const auto result_distance =
-    traffic_simulator::lanelet_wrapper::distance::distanceToTrafficLightStopLine(
-      std::vector<geometry_msgs::msg::Point>{
-        start_waypoint, makePoint(3756.30, 73755.87), makePoint(3746.90, 73774.44)},
-      lanelet::Id{34836});
+  const auto result_distance = distance::distanceToTrafficLightStopLine(
+    std::vector<geometry_msgs::msg::Point>{
+      start_waypoint, makePoint(3756.30, 73755.87), makePoint(3746.90, 73774.44)},
+    lanelet::Id{34836});
   EXPECT_TRUE(result_distance.has_value());
 
   const auto stopline_midpoint = makePoint(3767.00, 73736.47);
@@ -347,7 +334,7 @@ TEST_F(
 {
   EXPECT_FALSE(
 
-    traffic_simulator::lanelet_wrapper::distance::distanceToTrafficLightStopLine(
+    distance::distanceToTrafficLightStopLine(
       std::vector<geometry_msgs::msg::Point>{
         makePoint(3807.63, 73715.99), makePoint(3785.76, 73707.70), makePoint(3773.19, 73723.27)},
       lanelet::Id{34836})
@@ -361,7 +348,7 @@ TEST_F(
   LaneletWrapperTest_CrossroadsWithStoplinesMap,
   getDistanceToTrafficLightStopLine_emptyVector_waypoints)
 {
-  EXPECT_FALSE(traffic_simulator::lanelet_wrapper::distance::distanceToTrafficLightStopLine(
+  EXPECT_FALSE(distance::distanceToTrafficLightStopLine(
                  std::vector<geometry_msgs::msg::Point>{}, lanelet::Id{34836})
                  .has_value());
 }
@@ -377,11 +364,10 @@ TEST_F(
 {
   const auto start_waypoint = makePoint(3771.06, 73728.35);
 
-  const auto result_distance =
-    traffic_simulator::lanelet_wrapper::distance::distanceToTrafficLightStopLine(
-      lanelet::Ids{34576, 34570, 34564},
-      math::geometry::CatmullRomSpline(std::vector<geometry_msgs::msg::Point>{
-        start_waypoint, makePoint(3756.30, 73755.87), makePoint(3746.90, 73774.44)}));
+  const auto result_distance = distance::distanceToTrafficLightStopLine(
+    lanelet::Ids{34576, 34570, 34564},
+    math::geometry::CatmullRomSpline(std::vector<geometry_msgs::msg::Point>{
+      start_waypoint, makePoint(3756.30, 73755.87), makePoint(3746.90, 73774.44)}));
   EXPECT_TRUE(result_distance.has_value());
 
   const auto stopline_midpoint = makePoint(3767.00, 73736.47);
@@ -401,7 +387,7 @@ TEST_F(
   getDistanceToTrafficLightStopLine_routeWithNoTrafficLightsOnSplineCongruent)
 {
   EXPECT_FALSE(
-    traffic_simulator::lanelet_wrapper::distance::distanceToTrafficLightStopLine(
+    distance::distanceToTrafficLightStopLine(
       lanelet::Ids{34690, 34759, 34576},
       math::geometry::CatmullRomSpline(std::vector<geometry_msgs::msg::Point>{
         makePoint(3807.63, 73715.99), makePoint(3785.76, 73707.70), makePoint(3773.19, 73723.27)}))
@@ -420,7 +406,7 @@ TEST_F(
   getDistanceToTrafficLightStopLine_routeWithTrafficLightsNotOnSplineIncongruent)
 {
   EXPECT_FALSE(
-    traffic_simulator::lanelet_wrapper::distance::distanceToTrafficLightStopLine(
+    distance::distanceToTrafficLightStopLine(
       lanelet::Ids{34576, 34570, 34564},
       math::geometry::CatmullRomSpline(std::vector<geometry_msgs::msg::Point>{
         makePoint(3807.63, 73715.99), makePoint(3785.76, 73707.70), makePoint(3773.19, 73723.27)}))
@@ -435,7 +421,7 @@ TEST_F(
   getDistanceToTrafficLightStopLine_emptyVector_splineRoute)
 {
   EXPECT_FALSE(
-    traffic_simulator::lanelet_wrapper::distance::distanceToTrafficLightStopLine(
+    distance::distanceToTrafficLightStopLine(
       lanelet::Ids{},
       math::geometry::CatmullRomSpline(std::vector<geometry_msgs::msg::Point>{
         makePoint(3807.63, 73715.99), makePoint(3785.76, 73707.70), makePoint(3773.19, 73723.27)}))
@@ -453,11 +439,10 @@ TEST_F(
 {
   const auto start_waypoint = makePoint(3771.06, 73728.35);
 
-  const auto result_distance =
-    traffic_simulator::lanelet_wrapper::distance::distanceToTrafficLightStopLine(
-      lanelet::Ids{34576, 34570, 34564},
-      std::vector<geometry_msgs::msg::Point>{
-        start_waypoint, makePoint(3756.30, 73755.87), makePoint(3746.90, 73774.44)});
+  const auto result_distance = distance::distanceToTrafficLightStopLine(
+    lanelet::Ids{34576, 34570, 34564},
+    std::vector<geometry_msgs::msg::Point>{
+      start_waypoint, makePoint(3756.30, 73755.87), makePoint(3746.90, 73774.44)});
   EXPECT_TRUE(result_distance.has_value());
 
   const auto stopline_midpoint = makePoint(3767.00, 73736.47);
@@ -480,7 +465,7 @@ TEST_F(
 {
   EXPECT_FALSE(
 
-    traffic_simulator::lanelet_wrapper::distance::distanceToTrafficLightStopLine(
+    distance::distanceToTrafficLightStopLine(
       lanelet::Ids{34690, 34759, 34576},
       std::vector<geometry_msgs::msg::Point>{
         makePoint(3807.63, 73715.99), makePoint(3785.76, 73707.70), makePoint(3773.19, 73723.27)})
@@ -498,7 +483,7 @@ TEST_F(
 {
   EXPECT_FALSE(
 
-    traffic_simulator::lanelet_wrapper::distance::distanceToTrafficLightStopLine(
+    distance::distanceToTrafficLightStopLine(
       lanelet::Ids{34576, 34570, 34564},
       std::vector<geometry_msgs::msg::Point>{
         makePoint(3807.63, 73715.99), makePoint(3785.76, 73707.70), makePoint(3773.19, 73723.27)})
@@ -514,7 +499,7 @@ TEST_F(
 {
   EXPECT_FALSE(
 
-    traffic_simulator::lanelet_wrapper::distance::distanceToTrafficLightStopLine(
+    distance::distanceToTrafficLightStopLine(
       lanelet::Ids{},
       std::vector<geometry_msgs::msg::Point>{
         makePoint(3807.63, 73715.99), makePoint(3785.76, 73707.70), makePoint(3773.19, 73723.27)})
@@ -529,7 +514,7 @@ TEST_F(
 TEST_F(LaneletWrapperTest_CrossroadsWithStoplinesMap, getDistanceToStopLine_stopLineOnSpline)
 {
   const auto start_waypoint = makePoint(3821.86, 73777.20);
-  const auto result_distance = traffic_simulator::lanelet_wrapper::distance::distanceToStopLine(
+  const auto result_distance = distance::distanceToStopLine(
     lanelet::Ids{34780, 34675, 34744},
     math::geometry::CatmullRomSpline(std::vector<geometry_msgs::msg::Point>{
       start_waypoint, makePoint(3837.28, 73762.67), makePoint(3846.10, 73741.38)}));
@@ -550,7 +535,7 @@ TEST_F(
   LaneletWrapperTest_CrossroadsWithStoplinesMap, getDistanceToStopLine_noStopLineOnSplineCongruent)
 {
   EXPECT_FALSE(
-    traffic_simulator::lanelet_wrapper::distance::distanceToStopLine(
+    distance::distanceToStopLine(
       lanelet::Ids{34690, 34759, 34576},
       math::geometry::CatmullRomSpline(std::vector<geometry_msgs::msg::Point>{
         makePoint(3807.63, 73715.99), makePoint(3785.76, 73707.70), makePoint(3773.19, 73723.27)}))
@@ -569,7 +554,7 @@ TEST_F(
   getDistanceToStopLine_noStopLineOnSplineIncongruent)
 {
   EXPECT_FALSE(
-    traffic_simulator::lanelet_wrapper::distance::distanceToStopLine(
+    distance::distanceToStopLine(
       lanelet::Ids{34576, 34570, 34564},
       math::geometry::CatmullRomSpline(std::vector<geometry_msgs::msg::Point>{
         makePoint(3821.86, 73777.20), makePoint(3837.28, 73762.67), makePoint(3846.10, 73741.38)}))
@@ -582,7 +567,7 @@ TEST_F(
 TEST_F(LaneletWrapperTest_CrossroadsWithStoplinesMap, getDistanceToStopLine_emptyVector_spline)
 {
   EXPECT_FALSE(
-    traffic_simulator::lanelet_wrapper::distance::distanceToStopLine(
+    distance::distanceToStopLine(
       lanelet::Ids{},
       math::geometry::CatmullRomSpline(std::vector<geometry_msgs::msg::Point>{
         makePoint(3807.63, 73715.99), makePoint(3785.76, 73707.70), makePoint(3773.19, 73723.27)}))
@@ -597,7 +582,7 @@ TEST_F(LaneletWrapperTest_CrossroadsWithStoplinesMap, getDistanceToStopLine_empt
 TEST_F(LaneletWrapperTest_CrossroadsWithStoplinesMap, getDistanceToStopLine_stopLineOnWaypoints)
 {
   const auto start_waypoint = makePoint(3821.86, 73777.20);
-  const auto result_distance = traffic_simulator::lanelet_wrapper::distance::distanceToStopLine(
+  const auto result_distance = distance::distanceToStopLine(
     lanelet::Ids{34780, 34675, 34744},
     std::vector<geometry_msgs::msg::Point>{
       start_waypoint, makePoint(3837.28, 73762.67), makePoint(3846.10, 73741.38)});
@@ -619,7 +604,7 @@ TEST_F(
   getDistanceToStopLine_noStopLineOnWaypointsCongruent)
 {
   EXPECT_FALSE(
-    traffic_simulator::lanelet_wrapper::distance::distanceToStopLine(
+    distance::distanceToStopLine(
       lanelet::Ids{34690, 34759, 34576},
       std::vector<geometry_msgs::msg::Point>{
         makePoint(3807.63, 73715.99), makePoint(3785.76, 73707.70), makePoint(3773.19, 73723.27)})
@@ -638,7 +623,7 @@ TEST_F(
   getDistanceToStopLine_noStopLineOnWaypointsIncongruent)
 {
   EXPECT_FALSE(
-    traffic_simulator::lanelet_wrapper::distance::distanceToStopLine(
+    distance::distanceToStopLine(
       lanelet::Ids{34576, 34570, 34564},
       std::vector<geometry_msgs::msg::Point>{
         makePoint(3821.86, 73777.20), makePoint(3837.28, 73762.67), makePoint(3846.10, 73741.38)})
@@ -651,9 +636,10 @@ TEST_F(
 TEST_F(LaneletWrapperTest_CrossroadsWithStoplinesMap, getDistanceToStopLine_emptyVector_waypoints)
 {
   EXPECT_FALSE(
-    traffic_simulator::lanelet_wrapper::distance::distanceToStopLine(
+    distance::distanceToStopLine(
       lanelet::Ids{},
       std::vector<geometry_msgs::msg::Point>{
         makePoint(3807.63, 73715.99), makePoint(3785.76, 73707.70), makePoint(3773.19, 73723.27)})
       .has_value());
 }
+}  // namespace traffic_simulator::lanelet_wrapper::tests

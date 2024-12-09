@@ -20,13 +20,15 @@ int main(int argc, char ** argv)
   return RUN_ALL_TESTS();
 }
 
+namespace traffic_simulator::lanelet_wrapper::tests
+{
 /**
  * @note Test basic functionality.
  * Test traffic light checking correctness with an id of a traffic light.
  */
 TEST_F(LaneletWrapperTest_StandardMap, isTrafficLight_trafficLight)
 {
-  EXPECT_TRUE(traffic_simulator::lanelet_wrapper::traffic_lights::isTrafficLight(34836));
+  EXPECT_TRUE(traffic_lights::isTrafficLight(34836));
 }
 
 /**
@@ -35,7 +37,7 @@ TEST_F(LaneletWrapperTest_StandardMap, isTrafficLight_trafficLight)
  */
 TEST_F(LaneletWrapperTest_StandardMap, isTrafficLight_notTrafficLight)
 {
-  EXPECT_FALSE(traffic_simulator::lanelet_wrapper::traffic_lights::isTrafficLight(120659));
+  EXPECT_FALSE(traffic_lights::isTrafficLight(120659));
 }
 
 /**
@@ -43,7 +45,7 @@ TEST_F(LaneletWrapperTest_StandardMap, isTrafficLight_notTrafficLight)
  */
 TEST_F(LaneletWrapperTest_StandardMap, isTrafficLight_invalidId)
 {
-  EXPECT_FALSE(traffic_simulator::lanelet_wrapper::traffic_lights::isTrafficLight(1000003));
+  EXPECT_FALSE(traffic_lights::isTrafficLight(1000003));
 }
 
 /**
@@ -54,8 +56,7 @@ TEST_F(LaneletWrapperTest_StandardMap, isTrafficLight_invalidId)
 TEST_F(
   LaneletWrapperTest_StandardMap, isTrafficLightRegulatoryElement_trafficLightRegulatoryElement)
 {
-  EXPECT_TRUE(
-    traffic_simulator::lanelet_wrapper::traffic_lights::isTrafficLightRegulatoryElement(34806));
+  EXPECT_TRUE(traffic_lights::isTrafficLightRegulatoryElement(34806));
 }
 
 /**
@@ -66,8 +67,7 @@ TEST_F(
 TEST_F(
   LaneletWrapperTest_StandardMap, isTrafficLightRegulatoryElement_noTrafficLightRegulatoryElement)
 {
-  EXPECT_FALSE(
-    traffic_simulator::lanelet_wrapper::traffic_lights::isTrafficLightRegulatoryElement(120659));
+  EXPECT_FALSE(traffic_lights::isTrafficLightRegulatoryElement(120659));
 }
 
 /**
@@ -75,8 +75,7 @@ TEST_F(
  */
 TEST_F(LaneletWrapperTest_StandardMap, isTrafficLightRegulatoryElement_invalidId)
 {
-  EXPECT_FALSE(
-    traffic_simulator::lanelet_wrapper::traffic_lights::isTrafficLightRegulatoryElement(1000003));
+  EXPECT_FALSE(traffic_lights::isTrafficLightRegulatoryElement(1000003));
 }
 /**
  * @note Test basic functionality.
@@ -84,8 +83,7 @@ TEST_F(LaneletWrapperTest_StandardMap, isTrafficLightRegulatoryElement_invalidId
  */
 TEST_F(LaneletWrapperTest_StandardMap, getTrafficLightIds_correct)
 {
-  auto result_traffic_lights =
-    traffic_simulator::lanelet_wrapper::traffic_lights::trafficLightIds();
+  auto result_traffic_lights = traffic_lights::trafficLightIds();
 
   std::sort(result_traffic_lights.begin(), result_traffic_lights.end());
   EXPECT_EQ(result_traffic_lights, (lanelet::Ids{34802, 34836}));
@@ -96,9 +94,7 @@ TEST_F(LaneletWrapperTest_StandardMap, getTrafficLightIds_correct)
  */
 TEST_F(LaneletWrapperTest_FourTrackHighwayMap, getTrafficLightIds_noTrafficLight)
 {
-  EXPECT_EQ(
-    traffic_simulator::lanelet_wrapper::traffic_lights::trafficLightIds().size(),
-    static_cast<size_t>(0));
+  EXPECT_EQ(traffic_lights::trafficLightIds().size(), static_cast<size_t>(0));
 }
 
 /**
@@ -112,35 +108,28 @@ TEST_F(LaneletWrapperTest_StandardMap, getTrafficLightBulbPosition_correct)
   const double epsilon = 0.1;
 
   {
-    const auto return_bulb_position =
-      traffic_simulator::lanelet_wrapper::traffic_lights::trafficLightBulbPosition(
-        light_id, "green");
+    const auto return_bulb_position = traffic_lights::trafficLightBulbPosition(light_id, "green");
 
     EXPECT_TRUE(return_bulb_position.has_value());
     EXPECT_POINT_NEAR(return_bulb_position.value(), makePoint(3761.05, 73755.30, 5.35), epsilon);
   }
 
   {
-    const auto return_bulb_position =
-      traffic_simulator::lanelet_wrapper::traffic_lights::trafficLightBulbPosition(
-        light_id, "yellow");
+    const auto return_bulb_position = traffic_lights::trafficLightBulbPosition(light_id, "yellow");
 
     EXPECT_TRUE(return_bulb_position.has_value());
     EXPECT_POINT_NEAR(return_bulb_position.value(), makePoint(3760.60, 73755.07, 5.35), epsilon);
   }
 
   {
-    const auto return_bulb_position =
-      traffic_simulator::lanelet_wrapper::traffic_lights::trafficLightBulbPosition(light_id, "red");
+    const auto return_bulb_position = traffic_lights::trafficLightBulbPosition(light_id, "red");
 
     EXPECT_TRUE(return_bulb_position.has_value());
     EXPECT_POINT_NEAR(return_bulb_position.value(), makePoint(3760.16, 73754.87, 5.35), epsilon);
   }
 
   {
-    EXPECT_FALSE(
-      traffic_simulator::lanelet_wrapper::traffic_lights::trafficLightBulbPosition(light_id, "pink")
-        .has_value());
+    EXPECT_FALSE(traffic_lights::trafficLightBulbPosition(light_id, "pink").has_value());
   }
 }
 
@@ -152,9 +141,7 @@ TEST_F(LaneletWrapperTest_StandardMap, getTrafficLightBulbPosition_correct)
  */
 TEST_F(LaneletWrapperTest_StandardMap, getTrafficLightBulbPosition_invalidTrafficLight)
 {
-  EXPECT_FALSE(
-    traffic_simulator::lanelet_wrapper::traffic_lights::trafficLightBulbPosition(1000003, "red")
-      .has_value());
+  EXPECT_FALSE(traffic_lights::trafficLightBulbPosition(1000003, "red").has_value());
 }
 /**
  * @note Test basic functionality.
@@ -164,8 +151,7 @@ TEST_F(LaneletWrapperTest_StandardMap, getTrafficLightBulbPosition_invalidTraffi
 TEST_F(LaneletWrapperTest_StandardMap, getTrafficLightIdsOnPath_noTrafficLights)
 {
   EXPECT_EQ(
-    traffic_simulator::lanelet_wrapper::traffic_lights::trafficLightIdsOnPath(
-      lanelet::Ids{34579, 34774, 120659, 120660, 34468, 34438})
+    traffic_lights::trafficLightIdsOnPath(lanelet::Ids{34579, 34774, 120659, 120660, 34468, 34438})
       .size(),
     static_cast<size_t>(0));
 }
@@ -176,9 +162,8 @@ TEST_F(LaneletWrapperTest_StandardMap, getTrafficLightIdsOnPath_noTrafficLights)
  */
 TEST_F(LaneletWrapperTest_StandardMap, getTrafficLightIdsOnPath_trafficLights)
 {
-  auto result_traffic_light_ids =
-    traffic_simulator::lanelet_wrapper::traffic_lights::trafficLightIdsOnPath(
-      {34579, 34774, 120659, 120660, 34468, 34438, 34408, 34624, 34630});
+  auto result_traffic_light_ids = traffic_lights::trafficLightIdsOnPath(
+    {34579, 34774, 120659, 120660, 34468, 34438, 34408, 34624, 34630});
   auto actual_traffic_light_ids = lanelet::Ids{34802, 34836};
 
   std::sort(result_traffic_light_ids.begin(), result_traffic_light_ids.end());
@@ -192,9 +177,7 @@ TEST_F(LaneletWrapperTest_StandardMap, getTrafficLightIdsOnPath_trafficLights)
  */
 TEST_F(LaneletWrapperTest_StandardMap, getTrafficLightIdsOnPath_empty)
 {
-  EXPECT_EQ(
-    traffic_simulator::lanelet_wrapper::traffic_lights::trafficLightIdsOnPath({}).size(),
-    static_cast<size_t>(0));
+  EXPECT_EQ(traffic_lights::trafficLightIdsOnPath({}).size(), static_cast<size_t>(0));
 }
 
 /**
@@ -204,9 +187,7 @@ TEST_F(LaneletWrapperTest_StandardMap, getTrafficLightIdsOnPath_empty)
  */
 TEST_F(LaneletWrapperTest_CrossroadsWithStoplinesMap, getTrafficLightStopLineIds_stopLine)
 {
-  EXPECT_EQ(
-    traffic_simulator::lanelet_wrapper::traffic_lights::trafficLightStopLineIds(34802),
-    (lanelet::Ids{34805}));
+  EXPECT_EQ(traffic_lights::trafficLightStopLineIds(34802), (lanelet::Ids{34805}));
 }
 
 /**
@@ -218,8 +199,7 @@ TEST_F(LaneletWrapperTest_CrossroadsWithStoplinesMap, getTrafficLightStopLineIds
  */
 TEST_F(LaneletWrapperTest_CrossroadsWithStoplinesMap, getTrafficLightStopLineIds_severalStopLines)
 {
-  auto result_stoplines =
-    traffic_simulator::lanelet_wrapper::traffic_lights::trafficLightStopLineIds(34836);
+  auto result_stoplines = traffic_lights::trafficLightStopLineIds(34836);
   auto actual_stoplines = lanelet::Ids{120663, 34805};
 
   std::sort(result_stoplines.begin(), result_stoplines.end());
@@ -234,7 +214,6 @@ TEST_F(LaneletWrapperTest_CrossroadsWithStoplinesMap, getTrafficLightStopLineIds
 TEST_F(
   LaneletWrapperTest_CrossroadsWithStoplinesMap, getTrafficLightStopLineIds_invalidTrafficLightId)
 {
-  EXPECT_THROW(
-    traffic_simulator::lanelet_wrapper::traffic_lights::trafficLightStopLineIds(1000039),
-    std::runtime_error);
+  EXPECT_THROW(traffic_lights::trafficLightStopLineIds(1000039), std::runtime_error);
 }
+}  // namespace traffic_simulator::lanelet_wrapper::tests

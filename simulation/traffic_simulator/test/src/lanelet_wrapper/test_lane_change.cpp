@@ -20,45 +20,39 @@ int main(int argc, char ** argv)
   return RUN_ALL_TESTS();
 }
 
+namespace traffic_simulator::lanelet_wrapper::tests
+{
 /**
  * @note Testcase for countLaneChanges() function
  */
 TEST_F(LaneletWrapperTest_FourTrackHighwayMap, CountLaneChangesAlongRoute)
 {
-  using traffic_simulator::helper::constructLaneletPose;
-  traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
+  using helper::constructLaneletPose;
+  RoutingConfiguration lane_changeable_routing_configuration;
   lane_changeable_routing_configuration.allow_lane_change = true;
   EXPECT_EQ(
-    traffic_simulator::lanelet_wrapper::lane_change::countLaneChanges(
-      3002176, 3002175, lane_changeable_routing_configuration),
+    lane_change::countLaneChanges(3002176, 3002175, lane_changeable_routing_configuration),
     std::make_pair(1, 0));
   EXPECT_EQ(
-    traffic_simulator::lanelet_wrapper::lane_change::countLaneChanges(
-      3002176, 3002182, lane_changeable_routing_configuration),
+    lane_change::countLaneChanges(3002176, 3002182, lane_changeable_routing_configuration),
     std::make_pair(1, 0));
   EXPECT_EQ(
-    traffic_simulator::lanelet_wrapper::lane_change::countLaneChanges(
-      3002176, 199, lane_changeable_routing_configuration),
+    lane_change::countLaneChanges(3002176, 199, lane_changeable_routing_configuration),
     std::make_pair(1, 0));
   EXPECT_EQ(
-    traffic_simulator::lanelet_wrapper::lane_change::countLaneChanges(
-      3002176, 3002176, lane_changeable_routing_configuration),
+    lane_change::countLaneChanges(3002176, 3002176, lane_changeable_routing_configuration),
     std::make_pair(0, 0));
   EXPECT_EQ(
-    traffic_simulator::lanelet_wrapper::lane_change::countLaneChanges(
-      3002176, 200, lane_changeable_routing_configuration),
+    lane_change::countLaneChanges(3002176, 200, lane_changeable_routing_configuration),
     std::make_pair(0, 0));
   EXPECT_EQ(
-    traffic_simulator::lanelet_wrapper::lane_change::countLaneChanges(
-      3002176, 201, lane_changeable_routing_configuration),
+    lane_change::countLaneChanges(3002176, 201, lane_changeable_routing_configuration),
     std::make_pair(0, 1));
   EXPECT_EQ(
-    traffic_simulator::lanelet_wrapper::lane_change::countLaneChanges(
-      3002176, 202, lane_changeable_routing_configuration),
+    lane_change::countLaneChanges(3002176, 202, lane_changeable_routing_configuration),
     std::make_pair(0, 2));
   EXPECT_EQ(
-    traffic_simulator::lanelet_wrapper::lane_change::countLaneChanges(
-      3002176, 206, lane_changeable_routing_configuration),
+    lane_change::countLaneChanges(3002176, 206, lane_changeable_routing_configuration),
     std::make_pair(0, 2));
 }
 
@@ -71,8 +65,7 @@ TEST_F(LaneletWrapperTest_FourTrackHighwayMap, getLaneChangeableLaneletId_straig
 {
   const lanelet::Id start_and_end_lanelet = 199;
   const auto result_lanelet =
-    traffic_simulator::lanelet_wrapper::lane_change::laneChangeableLaneletId(
-      start_and_end_lanelet, traffic_simulator::lane_change::Direction::STRAIGHT);
+    lane_change::laneChangeableLaneletId(start_and_end_lanelet, lane_change::Direction::STRAIGHT);
 
   EXPECT_TRUE(result_lanelet.has_value());
   EXPECT_EQ(start_and_end_lanelet, result_lanelet);
@@ -85,9 +78,7 @@ TEST_F(LaneletWrapperTest_FourTrackHighwayMap, getLaneChangeableLaneletId_straig
  */
 TEST_F(LaneletWrapperTest_FourTrackHighwayMap, getLaneChangeableLaneletId_leftNoChangeable)
 {
-  EXPECT_FALSE(traffic_simulator::lanelet_wrapper::lane_change::laneChangeableLaneletId(
-                 199, traffic_simulator::lane_change::Direction::LEFT)
-                 .has_value());
+  EXPECT_FALSE(lane_change::laneChangeableLaneletId(199, lane_change::Direction::LEFT).has_value());
 }
 
 /**
@@ -98,8 +89,7 @@ TEST_F(LaneletWrapperTest_FourTrackHighwayMap, getLaneChangeableLaneletId_leftNo
 TEST_F(LaneletWrapperTest_FourTrackHighwayMap, getLaneChangeableLaneletId_leftChangeable)
 {
   const auto result_lanelet =
-    traffic_simulator::lanelet_wrapper::lane_change::laneChangeableLaneletId(
-      200, traffic_simulator::lane_change::Direction::LEFT);
+    lane_change::laneChangeableLaneletId(200, lane_change::Direction::LEFT);
 
   EXPECT_TRUE(result_lanelet.has_value());
   EXPECT_EQ(result_lanelet.value(), 199);
@@ -112,9 +102,8 @@ TEST_F(LaneletWrapperTest_FourTrackHighwayMap, getLaneChangeableLaneletId_leftCh
  */
 TEST_F(LaneletWrapperTest_FourTrackHighwayMap, getLaneChangeableLaneletId_rightNoChangeable)
 {
-  EXPECT_FALSE(traffic_simulator::lanelet_wrapper::lane_change::laneChangeableLaneletId(
-                 202, traffic_simulator::lane_change::Direction::RIGHT)
-                 .has_value());
+  EXPECT_FALSE(
+    lane_change::laneChangeableLaneletId(202, lane_change::Direction::RIGHT).has_value());
 }
 
 /**
@@ -125,8 +114,7 @@ TEST_F(LaneletWrapperTest_FourTrackHighwayMap, getLaneChangeableLaneletId_rightN
 TEST_F(LaneletWrapperTest_FourTrackHighwayMap, getLaneChangeableLaneletId_rightChangeable)
 {
   const auto result_lanelet =
-    traffic_simulator::lanelet_wrapper::lane_change::laneChangeableLaneletId(
-      200, traffic_simulator::lane_change::Direction::RIGHT);
+    lane_change::laneChangeableLaneletId(200, lane_change::Direction::RIGHT);
 
   EXPECT_TRUE(result_lanelet.has_value());
   EXPECT_EQ(result_lanelet.value(), 201);
@@ -141,8 +129,7 @@ TEST_F(LaneletWrapperTest_FourTrackHighwayMap, getLaneChangeableLaneletId_rightC
 TEST_F(LaneletWrapperTest_FourTrackHighwayMap, getLaneChangeableLaneletId_shift2LeftPossible)
 {
   const auto result_lanelet =
-    traffic_simulator::lanelet_wrapper::lane_change::laneChangeableLaneletId(
-      201, traffic_simulator::lane_change::Direction::LEFT, 2);
+    lane_change::laneChangeableLaneletId(201, lane_change::Direction::LEFT, 2);
 
   EXPECT_TRUE(result_lanelet.has_value());
   EXPECT_EQ(result_lanelet.value(), 199);
@@ -157,9 +144,8 @@ TEST_F(LaneletWrapperTest_FourTrackHighwayMap, getLaneChangeableLaneletId_shift2
  */
 TEST_F(LaneletWrapperTest_FourTrackHighwayMap, getLaneChangeableLaneletId_shift2LeftNotPossible)
 {
-  EXPECT_FALSE(traffic_simulator::lanelet_wrapper::lane_change::laneChangeableLaneletId(
-                 200, traffic_simulator::lane_change::Direction::LEFT, 2)
-                 .has_value());
+  EXPECT_FALSE(
+    lane_change::laneChangeableLaneletId(200, lane_change::Direction::LEFT, 2).has_value());
 }
 
 /**
@@ -171,8 +157,7 @@ TEST_F(LaneletWrapperTest_FourTrackHighwayMap, getLaneChangeableLaneletId_shift2
 TEST_F(LaneletWrapperTest_FourTrackHighwayMap, getLaneChangeableLaneletId_shift2RightPossible)
 {
   const auto result_lanelet =
-    traffic_simulator::lanelet_wrapper::lane_change::laneChangeableLaneletId(
-      200, traffic_simulator::lane_change::Direction::RIGHT, 2);
+    lane_change::laneChangeableLaneletId(200, lane_change::Direction::RIGHT, 2);
 
   EXPECT_TRUE(result_lanelet.has_value());
   EXPECT_EQ(result_lanelet.value(), 202);
@@ -187,9 +172,8 @@ TEST_F(LaneletWrapperTest_FourTrackHighwayMap, getLaneChangeableLaneletId_shift2
  */
 TEST_F(LaneletWrapperTest_FourTrackHighwayMap, getLaneChangeableLaneletId_shift2RightNotPossible)
 {
-  EXPECT_FALSE(traffic_simulator::lanelet_wrapper::lane_change::laneChangeableLaneletId(
-                 201, traffic_simulator::lane_change::Direction::RIGHT, 2)
-                 .has_value());
+  EXPECT_FALSE(
+    lane_change::laneChangeableLaneletId(201, lane_change::Direction::RIGHT, 2).has_value());
 }
 
 /**
@@ -199,8 +183,7 @@ TEST_F(LaneletWrapperTest_FourTrackHighwayMap, getLaneChangeableLaneletId_shift0
 {
   const lanelet::Id start_and_end_lanelet = 201;
   const auto result_lanelet =
-    traffic_simulator::lanelet_wrapper::lane_change::laneChangeableLaneletId(
-      start_and_end_lanelet, traffic_simulator::lane_change::Direction::RIGHT, 0);
+    lane_change::laneChangeableLaneletId(start_and_end_lanelet, lane_change::Direction::RIGHT, 0);
 
   EXPECT_TRUE(result_lanelet.has_value());
   EXPECT_EQ(result_lanelet.value(), start_and_end_lanelet);
@@ -213,7 +196,7 @@ TEST_F(LaneletWrapperTest_FourTrackHighwayMap, getLaneChangeableLaneletId_shift0
  */
 TEST_F(LaneletWrapperTest_FourTrackHighwayMap, canChangeLane_canChange)
 {
-  EXPECT_TRUE(traffic_simulator::lanelet_wrapper::lane_change::canChangeLane(199, 200));
+  EXPECT_TRUE(lane_change::canChangeLane(199, 200));
 }
 
 /**
@@ -223,7 +206,7 @@ TEST_F(LaneletWrapperTest_FourTrackHighwayMap, canChangeLane_canChange)
  */
 TEST_F(LaneletWrapperTest_FourTrackHighwayMap, canChangeLane_canNotChange)
 {
-  EXPECT_FALSE(traffic_simulator::lanelet_wrapper::lane_change::canChangeLane(199, 201));
+  EXPECT_FALSE(lane_change::canChangeLane(199, 201));
 }
 
 /**
@@ -231,7 +214,6 @@ TEST_F(LaneletWrapperTest_FourTrackHighwayMap, canChangeLane_canNotChange)
  */
 TEST_F(LaneletWrapperTest_FourTrackHighwayMap, canChangeLane_invalidLaneletId)
 {
-  EXPECT_THROW(
-    traffic_simulator::lanelet_wrapper::lane_change::canChangeLane(1000003, 1000033),
-    std::runtime_error);
+  EXPECT_THROW(lane_change::canChangeLane(1000003, 1000033), std::runtime_error);
 }
+}  // namespace traffic_simulator::lanelet_wrapper::tests

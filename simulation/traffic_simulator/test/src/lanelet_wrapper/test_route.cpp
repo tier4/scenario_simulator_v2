@@ -20,6 +20,8 @@ int main(int argc, char ** argv)
   return RUN_ALL_TESTS();
 }
 
+namespace traffic_simulator::lanelet_wrapper::tests
+{
 /**
  * @note Test basic functionality.
  * Test following lanelets obtaining with
@@ -28,9 +30,7 @@ int main(int argc, char ** argv)
 TEST_F(LaneletWrapperTest_StandardMap, getFollowingLanelets_straightAfter)
 {
   const lanelet::Id id = 120660;
-  EXPECT_EQ(
-    traffic_simulator::lanelet_wrapper::route::followingLanelets(id, 1.0, true),
-    (lanelet::Ids{id, 34468}));
+  EXPECT_EQ(route::followingLanelets(id, 1.0, true), (lanelet::Ids{id, 34468}));
 }
 
 /**
@@ -42,9 +42,7 @@ TEST_F(LaneletWrapperTest_StandardMap, getFollowingLanelets_straightAfter)
 TEST_F(LaneletWrapperTest_StandardMap, getFollowingLanelets_curveAfter)
 {
   const lanelet::Id id = 34564;
-  EXPECT_EQ(
-    traffic_simulator::lanelet_wrapper::route::followingLanelets(id, 40.0, true),
-    (lanelet::Ids{id, 34411, 34462}));
+  EXPECT_EQ(route::followingLanelets(id, 40.0, true), (lanelet::Ids{id, 34411, 34462}));
 }
 
 /**
@@ -56,9 +54,7 @@ TEST_F(LaneletWrapperTest_StandardMap, getFollowingLanelets_curveAfter)
 TEST_F(LaneletWrapperTest_FourTrackHighwayMap, getFollowingLanelets_notEnoughLaneletsAfter)
 {
   const lanelet::Id id = 199;
-  EXPECT_EQ(
-    traffic_simulator::lanelet_wrapper::route::followingLanelets(id, 1.0e3, true),
-    (lanelet::Ids{id, 203}));
+  EXPECT_EQ(route::followingLanelets(id, 1.0e3, true), (lanelet::Ids{id, 203}));
 }
 
 /**
@@ -70,8 +66,7 @@ TEST_F(LaneletWrapperTest_StandardMap, getFollowingLanelets_candidateTrajectory)
 {
   const lanelet::Id id = 34564;
   EXPECT_EQ(
-    traffic_simulator::lanelet_wrapper::route::followingLanelets(
-      id, lanelet::Ids{id, 34495, 34507, 34795, 34606}, 40.0, true),
+    route::followingLanelets(id, lanelet::Ids{id, 34495, 34507, 34795, 34606}, 40.0, true),
     (lanelet::Ids{id, 34495, 34507}));
 }
 
@@ -84,8 +79,7 @@ TEST_F(LaneletWrapperTest_StandardMap, getFollowingLanelets_candidateTrajectoryF
 {
   const lanelet::Id id = 34564;
   EXPECT_EQ(
-    traffic_simulator::lanelet_wrapper::route::followingLanelets(
-      id, lanelet::Ids{id, 34495, 34507, 34795, 34606}, 40.0, false),
+    route::followingLanelets(id, lanelet::Ids{id, 34495, 34507, 34795, 34606}, 40.0, false),
     (lanelet::Ids{34495, 34507}));
 }
 
@@ -99,8 +93,7 @@ TEST_F(LaneletWrapperTest_StandardMap, getFollowingLanelets_candidateTrajectoryN
 {
   const lanelet::Id id = 34564;
   EXPECT_EQ(
-    traffic_simulator::lanelet_wrapper::route::followingLanelets(
-      id, lanelet::Ids{id, 34495, 34507}, 100.0, true),
+    route::followingLanelets(id, lanelet::Ids{id, 34495, 34507}, 100.0, true),
     (lanelet::Ids{id, 34495, 34507, 34795, 34606}));
 }
 
@@ -110,10 +103,7 @@ TEST_F(LaneletWrapperTest_StandardMap, getFollowingLanelets_candidateTrajectoryN
  */
 TEST_F(LaneletWrapperTest_StandardMap, getFollowingLanelets_candidatesDoNotMatch)
 {
-  EXPECT_THROW(
-    traffic_simulator::lanelet_wrapper::route::followingLanelets(
-      120660, lanelet::Ids{34981}, 1.0e3, true),
-    common::Error);
+  EXPECT_THROW(route::followingLanelets(120660, lanelet::Ids{34981}, 1.0e3, true), common::Error);
 }
 
 /**
@@ -121,9 +111,7 @@ TEST_F(LaneletWrapperTest_StandardMap, getFollowingLanelets_candidatesDoNotMatch
  */
 TEST_F(LaneletWrapperTest_StandardMap, getFollowingLanelets_candidateTrajectoryEmpty)
 {
-  EXPECT_EQ(
-    traffic_simulator::lanelet_wrapper::route::followingLanelets(120660, {}, 1.0e3, true).size(),
-    static_cast<std::size_t>(0));
+  EXPECT_EQ(route::followingLanelets(120660, {}, 1.0e3, true).size(), static_cast<std::size_t>(0));
 }
 
 /**
@@ -133,8 +121,7 @@ TEST_F(LaneletWrapperTest_StandardMap, getFollowingLanelets_candidateTrajectoryE
 TEST_F(LaneletWrapperTest_StandardMap, getFollowingLanelets_candidatesDoNotMatchRealTrajectory)
 {
   EXPECT_THROW(
-    traffic_simulator::lanelet_wrapper::route::followingLanelets(
-      34564, lanelet::Ids{34564, 34495, 34507, 34399, 34399}, 100.0, true),
+    route::followingLanelets(34564, lanelet::Ids{34564, 34495, 34507, 34399, 34399}, 100.0, true),
     common::Error);
 }
 
@@ -144,11 +131,10 @@ TEST_F(LaneletWrapperTest_StandardMap, getFollowingLanelets_candidatesDoNotMatch
  */
 TEST_F(LaneletWrapperTest_StandardMap, getRoute_correct)
 {
-  traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
+  RoutingConfiguration lane_changeable_routing_configuration;
   lane_changeable_routing_configuration.allow_lane_change = true;
   EXPECT_EQ(
-    traffic_simulator::lanelet_wrapper::route::routeFromGraph(
-      34579, 34630, lane_changeable_routing_configuration),
+    route::routeFromGraph(34579, 34630, lane_changeable_routing_configuration),
     (lanelet::Ids{34579, 34774, 120659, 120660, 34468, 34438, 34408, 34624, 34630}));
 }
 
@@ -161,14 +147,12 @@ TEST_F(LaneletWrapperTest_StandardMap, getRoute_correctCache)
 {
   const lanelet::Id from_id = 34579;
   const lanelet::Id to_id = 34630;
-  traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
+  RoutingConfiguration lane_changeable_routing_configuration;
   lane_changeable_routing_configuration.allow_lane_change = true;
 
   EXPECT_EQ(
-    traffic_simulator::lanelet_wrapper::route::routeFromGraph(
-      from_id, to_id, lane_changeable_routing_configuration),
-    traffic_simulator::lanelet_wrapper::route::routeFromGraph(
-      from_id, to_id, lane_changeable_routing_configuration));
+    route::routeFromGraph(from_id, to_id, lane_changeable_routing_configuration),
+    route::routeFromGraph(from_id, to_id, lane_changeable_routing_configuration));
 }
 
 /**
@@ -178,12 +162,10 @@ TEST_F(LaneletWrapperTest_StandardMap, getRoute_correctCache)
  */
 TEST_F(LaneletWrapperTest_FourTrackHighwayMap, getRoute_impossibleRouting)
 {
-  traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
+  RoutingConfiguration lane_changeable_routing_configuration;
   lane_changeable_routing_configuration.allow_lane_change = true;
   EXPECT_EQ(
-    traffic_simulator::lanelet_wrapper::route::routeFromGraph(
-      199, 196, lane_changeable_routing_configuration)
-      .size(),
+    route::routeFromGraph(199, 196, lane_changeable_routing_configuration).size(),
     static_cast<std::size_t>(0));
 }
 
@@ -197,8 +179,7 @@ TEST_F(LaneletWrapperTest_StandardMap, getRoute_circular)
   const lanelet::Id from_and_to_id = 120659;
 
   EXPECT_EQ(
-    traffic_simulator::lanelet_wrapper::route::routeFromGraph(
-      from_and_to_id, from_and_to_id, traffic_simulator::RoutingConfiguration()),
+    route::routeFromGraph(from_and_to_id, from_and_to_id, RoutingConfiguration()),
     lanelet::Ids{from_and_to_id});
 }
 
@@ -209,9 +190,7 @@ TEST_F(LaneletWrapperTest_StandardMap, getRoute_circular)
  */
 TEST_F(LaneletWrapperTest_StandardMap, getSpeedLimit_correct)
 {
-  EXPECT_NEAR(
-    traffic_simulator::lanelet_wrapper::route::speedLimit(lanelet::Ids{34600, 34675}), 50.0 / 3.6,
-    0.01);
+  EXPECT_NEAR(route::speedLimit(lanelet::Ids{34600, 34675}), 50.0 / 3.6, 0.01);
 }
 
 /**
@@ -219,9 +198,7 @@ TEST_F(LaneletWrapperTest_StandardMap, getSpeedLimit_correct)
  */
 TEST_F(LaneletWrapperTest_StandardMap, getSpeedLimit_crosswalk)
 {
-  EXPECT_NEAR(
-    traffic_simulator::lanelet_wrapper::route::speedLimit(lanelet::Ids{34399, 34385, 34600, 34675}),
-    0.0 / 3.6, 0.01);
+  EXPECT_NEAR(route::speedLimit(lanelet::Ids{34399, 34385, 34600, 34675}), 0.0 / 3.6, 0.01);
 }
 
 /**
@@ -229,8 +206,7 @@ TEST_F(LaneletWrapperTest_StandardMap, getSpeedLimit_crosswalk)
  */
 TEST_F(LaneletWrapperTest_StandardMap, getSpeedLimit_empty)
 {
-  EXPECT_THROW(
-    traffic_simulator::lanelet_wrapper::route::speedLimit(lanelet::Ids{}), std::runtime_error);
+  EXPECT_THROW(route::speedLimit(lanelet::Ids{}), std::runtime_error);
 }
 
 /**
@@ -240,8 +216,7 @@ TEST_F(LaneletWrapperTest_StandardMap, getSpeedLimit_empty)
  */
 TEST_F(LaneletWrapperTest_StandardMap, isInRoute_onRoute)
 {
-  EXPECT_TRUE(traffic_simulator::lanelet_wrapper::route::isInRoute(
-    34850, lanelet::Ids{34741, 34850, 34603, 34777}));
+  EXPECT_TRUE(route::isInRoute(34850, lanelet::Ids{34741, 34850, 34603, 34777}));
 }
 
 /**
@@ -251,8 +226,7 @@ TEST_F(LaneletWrapperTest_StandardMap, isInRoute_onRoute)
  */
 TEST_F(LaneletWrapperTest_StandardMap, isInRoute_notOnRoute)
 {
-  EXPECT_FALSE(traffic_simulator::lanelet_wrapper::route::isInRoute(
-    34468, lanelet::Ids{34741, 34850, 34603, 34777}));
+  EXPECT_FALSE(route::isInRoute(34468, lanelet::Ids{34741, 34850, 34603, 34777}));
 }
 
 /**
@@ -260,7 +234,7 @@ TEST_F(LaneletWrapperTest_StandardMap, isInRoute_notOnRoute)
  */
 TEST_F(LaneletWrapperTest_StandardMap, isInRoute_empty)
 {
-  EXPECT_FALSE(traffic_simulator::lanelet_wrapper::route::isInRoute(34468, lanelet::Ids{}));
+  EXPECT_FALSE(route::isInRoute(34468, lanelet::Ids{}));
 }
 
 /**
@@ -269,8 +243,7 @@ TEST_F(LaneletWrapperTest_StandardMap, isInRoute_empty)
 TEST_F(LaneletWrapperTest_StandardMap, getPreviousLanelets)
 {
   const lanelet::Id id = 34600;
-  const auto result_previous =
-    traffic_simulator::lanelet_wrapper::route::previousLanelets(id, 100.0);
+  const auto result_previous = route::previousLanelets(id, 100.0);
   const lanelet::Ids actual_previous{id, 34783, 34606, 34795, 34507};
 
   EXPECT_EQ(result_previous, actual_previous);
@@ -278,20 +251,18 @@ TEST_F(LaneletWrapperTest_StandardMap, getPreviousLanelets)
 
 TEST_F(LaneletWrapperTest_WithRoadShoulderMap, routingWithRoadShoulder)
 {
-  traffic_simulator::RoutingConfiguration routing_configuration_without_road_shoulder;
-  routing_configuration_without_road_shoulder.routing_graph_type =
-    traffic_simulator::RoutingGraphType::VEHICLE;
+  RoutingConfiguration routing_configuration_without_road_shoulder;
+  routing_configuration_without_road_shoulder.routing_graph_type = RoutingGraphType::VEHICLE;
   const auto route_without_road_shoulder =
-    traffic_simulator::lanelet_wrapper::route::routeFromGraph(
-      34693, 34615, routing_configuration_without_road_shoulder);
+    route::routeFromGraph(34693, 34615, routing_configuration_without_road_shoulder);
   EXPECT_EQ(route_without_road_shoulder.size(), 0);
 
-  // default: traffic_simulator::RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER
-  const auto route_with_road_shoulder = traffic_simulator::lanelet_wrapper::route::routeFromGraph(
-    34693, 34615, traffic_simulator::RoutingConfiguration());
+  // default: RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER
+  const auto route_with_road_shoulder = route::routeFromGraph(34693, 34615, RoutingConfiguration());
   EXPECT_EQ(route_with_road_shoulder.size(), 4);
   EXPECT_EQ(route_with_road_shoulder[0], 34693);
   EXPECT_EQ(route_with_road_shoulder[1], 34696);  // road shoulder
   EXPECT_EQ(route_with_road_shoulder[2], 34768);  // road shoulder
   EXPECT_EQ(route_with_road_shoulder[3], 34615);
 }
+}  // namespace traffic_simulator::lanelet_wrapper::tests
