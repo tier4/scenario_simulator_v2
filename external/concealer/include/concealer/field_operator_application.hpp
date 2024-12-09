@@ -60,8 +60,6 @@ class FieldOperatorApplication : public rclcpp::Node
 
   bool is_autoware_exited = false;
 
-  auto checkAutowareProcess() -> void;
-
 protected:
   const pid_t process_id = 0;
 

@@ -36,36 +36,31 @@ auto FieldOperatorApplication::isStopRequested() const noexcept -> bool
 auto FieldOperatorApplication::spinSome() -> void
 {
   if (rclcpp::ok() and not isStopRequested()) {
-    checkAutowareProcess();
-    rclcpp::spin_some(get_node_base_interface());
-  }
-}
+    if (process_id != 0) {
+      int wstatus = 0;
+      int ret = waitpid(process_id, &wstatus, WNOHANG);
+      if (ret == 0) {
+        return;
+      } else if (ret < 0) {
+        if (errno == ECHILD) {
+          is_autoware_exited = true;
+          throw common::AutowareError("Autoware process is already terminated");
+        } else {
+          AUTOWARE_SYSTEM_ERROR("waitpid");
+          std::exit(EXIT_FAILURE);
+        }
+      }
 
-auto FieldOperatorApplication::checkAutowareProcess() -> void
-{
-  if (process_id != 0) {
-    int wstatus = 0;
-    int ret = waitpid(process_id, &wstatus, WNOHANG);
-    if (ret == 0) {
-      return;
-    } else if (ret < 0) {
-      if (errno == ECHILD) {
+      if (WIFEXITED(wstatus)) {
         is_autoware_exited = true;
-        throw common::AutowareError("Autoware process is already terminated");
-      } else {
-        AUTOWARE_SYSTEM_ERROR("waitpid");
-        std::exit(EXIT_FAILURE);
+        throw common::AutowareError(
+          "Autoware process is unintentionally exited. exit code: ", WEXITSTATUS(wstatus));
+      } else if (WIFSIGNALED(wstatus)) {
+        is_autoware_exited = true;
+        throw common::AutowareError("Autoware process is killed. signal is ", WTERMSIG(wstatus));
       }
     }
-
-    if (WIFEXITED(wstatus)) {
-      is_autoware_exited = true;
-      throw common::AutowareError(
-        "Autoware process is unintentionally exited. exit code: ", WEXITSTATUS(wstatus));
-    } else if (WIFSIGNALED(wstatus)) {
-      is_autoware_exited = true;
-      throw common::AutowareError("Autoware process is killed. signal is ", WTERMSIG(wstatus));
-    }
+    rclcpp::spin_some(get_node_base_interface());
   }
 }
 
