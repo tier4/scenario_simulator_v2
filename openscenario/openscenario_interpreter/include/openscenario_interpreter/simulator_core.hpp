@@ -27,6 +27,7 @@
 #include <traffic_simulator/api/api.hpp>
 #include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator/utils/pose.hpp>
+#include <traffic_simulator/utils/route.hpp>
 
 namespace openscenario_interpreter
 {
@@ -273,10 +274,9 @@ public:
       if (const auto from_entity = core->getEntity(from_entity_name)) {
         if (const auto to_entity = core->getEntity(to_entity_name)) {
           if (
-            auto lane_changes = traffic_simulator::distance::countLaneChanges(
+            auto lane_changes = traffic_simulator::route::countLaneChanges(
               from_entity->getCanonicalizedLaneletPose().value(),
-              to_entity->getCanonicalizedLaneletPose().value(), routing_configuration,
-              core->getHdmapUtils())) {
+              to_entity->getCanonicalizedLaneletPose().value(), routing_configuration)) {
             return lane_changes.value().first - lane_changes.value().second;
           }
         }

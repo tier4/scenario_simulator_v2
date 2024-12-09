@@ -50,17 +50,6 @@ auto lateralDistance(
   }
 }
 
-/// @todo HdMapUtils will be removed when lanelet_wrapper:lane_change is added
-auto countLaneChanges(
-  const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
-  const traffic_simulator::RoutingConfiguration & routing_configuration,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
-  -> std::optional<std::pair<int, int>>
-{
-  return hdmap_utils_ptr->countLaneChanges(
-    static_cast<LaneletPose>(from), static_cast<LaneletPose>(to), routing_configuration);
-}
-
 /// @sa https://github.com/tier4/scenario_simulator_v2/blob/729e4e6372cdba60e377ae097d032905b80763a9/docs/developer_guide/lane_pose_calculation/GetLongitudinalDistance.md
 auto longitudinalDistance(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,

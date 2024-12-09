@@ -18,6 +18,7 @@
 #include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
+#include <traffic_simulator/utils/route.hpp>
 #include <vector>
 
 namespace entity_behavior
@@ -77,7 +78,8 @@ BT::NodeStatus FollowFrontEntityAction::tick()
     request != traffic_simulator::behavior::Request::FOLLOW_LANE) {
     return BT::NodeStatus::FAILURE;
   }
-  if (isNeedToRightOfWay(route_lanelets)) {
+  if (traffic_simulator::route::isNeedToRightOfWay(
+        route_lanelets, getOtherEntitiesCanonicalizedLaneletPoses())) {
     return BT::NodeStatus::FAILURE;
   }
   if (!behavior_parameter.see_around) {
@@ -117,7 +119,7 @@ BT::NodeStatus FollowFrontEntityAction::tick()
     }
   }
   if (!target_speed) {
-    target_speed = hdmap_utils->getSpeedLimit(route_lanelets);
+    target_speed = traffic_simulator::route::speedLimit(route_lanelets);
   }
   const double front_entity_linear_velocity = front_entity_status.getTwist().linear.x;
   if (target_speed.value() <= front_entity_linear_velocity) {

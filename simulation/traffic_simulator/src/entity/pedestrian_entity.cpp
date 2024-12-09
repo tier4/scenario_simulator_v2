@@ -34,7 +34,7 @@ PedestrianEntity::PedestrianEntity(
   loader_(pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase>(
     "traffic_simulator", "entity_behavior::BehaviorPluginBase")),
   behavior_plugin_ptr_(loader_.createSharedInstance(plugin_name)),
-  route_planner_(traffic_simulator::RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER, hdmap_utils_ptr_)
+  route_planner_(traffic_simulator::RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER)
 {
   behavior_plugin_ptr_->configure(rclcpp::get_logger(name));
   behavior_plugin_ptr_->setPedestrianParameters(parameters);
@@ -256,7 +256,7 @@ auto PedestrianEntity::onUpdate(const double current_time, const double step_tim
   /// @note CanonicalizedEntityStatus is updated here, it is not skipped even if isAtEndOfLanelets return true
   behavior_plugin_ptr_->update(current_time, step_time);
   if (const auto canonicalized_lanelet_pose = status_->getCanonicalizedLaneletPose()) {
-    if (pose::isAtEndOfLanelets(canonicalized_lanelet_pose.value(), hdmap_utils_ptr_)) {
+    if (pose::isAtEndOfLanelets(canonicalized_lanelet_pose.value())) {
       stopAtCurrentPosition();
       return;
     }
