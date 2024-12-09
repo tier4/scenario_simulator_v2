@@ -610,7 +610,16 @@ public:
 
     static auto evaluateSpeed(const std::string & name)
     {
-      return core->getEntity(name)->getCurrentTwist().linear.x;
+      /*
+         The function name "evaluateSpeed" stands for "evaluate SpeedCondition"
+         and is a part used to implement `SpeedCondition::evaluate`.
+         SpeedCondition can be evaluated in three directions: longitudinal,
+         lateral, and vertical, based on the attribute direction. Therefore,
+         please note that this function returns velocity, that is, a vector,
+         rather than speed, contrary to the name "evaluateSpeed".
+      */
+      const auto linear = core->getEntity(name)->getCurrentTwist().linear;
+      return Eigen::Vector3d(linear.x, linear.y, linear.z);
     }
 
     static auto evaluateStandStill(const std::string & name)
