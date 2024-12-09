@@ -145,7 +145,7 @@ public:
   virtual auto restrictTargetSpeed(double) const -> double = 0;
 
   virtual auto getTurnIndicatorsCommand() const
-    -> autoware_vehicle_msgs::msg::TurnIndicatorsCommand;
+    -> autoware_vehicle_msgs::msg::TurnIndicatorsCommand = 0;
 
   virtual auto rethrow() const noexcept(false) -> void;
 

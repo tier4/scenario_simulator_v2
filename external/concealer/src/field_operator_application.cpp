@@ -146,18 +146,6 @@ auto FieldOperatorApplication::shutdownAutoware() -> void
   }
 }
 
-auto FieldOperatorApplication::getTurnIndicatorsCommand() const
-  -> autoware_vehicle_msgs::msg::TurnIndicatorsCommand
-{
-  static auto turn_indicators_command = []() {
-    autoware_vehicle_msgs::msg::TurnIndicatorsCommand turn_indicators_command;
-    turn_indicators_command.command = autoware_vehicle_msgs::msg::TurnIndicatorsCommand::NO_COMMAND;
-    return turn_indicators_command;
-  }();
-  turn_indicators_command.stamp = now();
-  return turn_indicators_command;
-}
-
 auto FieldOperatorApplication::rethrow() const -> void { task_queue.rethrow(); }
 }  // namespace concealer
 
