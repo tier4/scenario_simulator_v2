@@ -30,6 +30,9 @@ auto isInLanelet(const lanelet::Id lanelet_id, const Point point) -> bool;
 
 auto laneletLength(const lanelet::Id lanelet_id) -> double;
 
+auto laneletYaw(const lanelet::Id lanelet_id, const Point & point)
+  -> std::tuple<double, Point, Point>;
+
 template <typename Lanelet>
 auto laneletIds(const std::vector<Lanelet> & lanelets) -> lanelet::Ids
 {
