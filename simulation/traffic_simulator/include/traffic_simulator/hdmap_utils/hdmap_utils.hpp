@@ -383,6 +383,10 @@ public:
   auto isAltitudeMatching(const double current_altitude, const double target_altitude) const
     -> bool;
 
+  auto getLaneletAltitude(
+    const lanelet::Id & lanelet_id, const geometry_msgs::msg::Pose & pose,
+    const double matching_distance = 1.0) const -> std::optional<double>;
+
 private:
   /*
      Using a fixed `altitude_threshold` value of 1.0 [m] is justified because the

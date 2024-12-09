@@ -2175,6 +2175,18 @@ auto HdMapUtils::toPolygon(const lanelet::ConstLineString3d & line_string) const
   return ret;
 }
 
+auto HdMapUtils::getLaneletAltitude(
+  const lanelet::Id & lanelet_id, const geometry_msgs::msg::Pose & pose,
+  const double matching_distance) const -> std::optional<double>
+{
+  if (const auto spline = getCenterPointsSpline(lanelet_id)) {
+    if (const auto s = spline->getSValue(pose, matching_distance)) {
+      return spline->getPoint(s.value()).z;
+    }
+  }
+  return std::nullopt;
+}
+
 HdMapUtils::RoutingGraphs::RoutingGraphs(const lanelet::LaneletMapPtr & lanelet_map)
 {
   vehicle.rules = lanelet::traffic_rules::TrafficRulesFactory::create(
