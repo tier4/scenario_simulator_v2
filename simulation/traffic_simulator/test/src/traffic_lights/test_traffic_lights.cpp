@@ -1,4 +1,4 @@
-// Copyright 2024 TIER IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #include <std_msgs/msg/header.hpp>
 #include <traffic_simulator/traffic_lights/traffic_lights.hpp>
 #include <traffic_simulator/traffic_lights/traffic_lights_base.hpp>
+#include <traffic_simulator/utils/lanelet_map.hpp>
 
 #include "../expect_eq_macros.hpp"
 #include "helper.hpp"
@@ -31,7 +32,12 @@ using namespace std::chrono_literals;
 class TrafficLightsTest : public testing::Test
 {
 public:
-  TrafficLightsTest() = default;
+  TrafficLightsTest()
+  {
+    const auto lanelet_path = ament_index_cpp::get_package_share_directory("traffic_simulator") +
+                              "/map/standard_map/lanelet2_map.osm";
+    traffic_simulator::lanelet_map::activate(lanelet_path);
+  }
 
   const lanelet::Id id{34836};
 

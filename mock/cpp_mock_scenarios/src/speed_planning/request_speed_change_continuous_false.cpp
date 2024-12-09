@@ -62,9 +62,7 @@ private:
   {
     speed_reached = false;
     api_.spawn(
-      "ego",
-      traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34741, 0.0, 0.0, api_.getHdmapUtils()),
+      "ego", traffic_simulator::helper::constructCanonicalizedLaneletPose(34741, 0.0, 0.0),
       getVehicleParameters());
     api_.setLinearVelocity("ego", 0);
     api_.requestSpeedChange(
