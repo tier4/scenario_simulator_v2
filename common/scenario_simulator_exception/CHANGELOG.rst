@@ -21,6 +21,11 @@ Changelog for package scenario_simulator_exception
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+6.2.5 (2024-12-09)
+------------------
+* Merge branch 'master' into fix/acc_by_slope
+* Contributors: Kotaro Yoshimoto
+
 6.2.4 (2024-12-09)
 ------------------
 * Merge branch 'master' into refactor/speed-condition
