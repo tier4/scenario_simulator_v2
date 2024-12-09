@@ -157,11 +157,4 @@ public:
 };
 }  // namespace concealer
 
-namespace autoware_vehicle_msgs::msg
-{
-auto operator<<(std::ostream &, const TurnIndicatorsCommand &) -> std::ostream &;
-
-auto operator>>(std::istream &, TurnIndicatorsCommand &) -> std::istream &;
-}  // namespace autoware_vehicle_msgs::msg
-
 #endif  // CONCEALER__AUTOWARE_USER_HPP_
