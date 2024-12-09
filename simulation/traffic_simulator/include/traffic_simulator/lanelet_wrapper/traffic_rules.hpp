@@ -35,8 +35,8 @@ public:
 
 protected:
   /// @note this function overrides and adds road shoulder handling to GenericTrafficRules::canPass
-  lanelet::Optional<bool> canPass(
-    const std::string & type, const std::string & /*location*/) const override
+  auto canPass(const std::string & type, const std::string & /*location*/) const
+    -> lanelet::Optional<bool> override
   {
     using lanelet::AttributeValueString;
     using lanelet::Participants;
