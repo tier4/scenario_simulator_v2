@@ -19,6 +19,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <simple_sensor_simulator/vehicle_simulation/ego_entity_simulation.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
+#include <traffic_simulator/lanelet_wrapper/pose.hpp>
 #include <traffic_simulator/utils/lanelet_map.hpp>
 #include <vector>
 
@@ -58,7 +59,8 @@ TEST(EgoEntitySimulation, calculateAccelerationBySlope)
       initial_status.name = "ego";
       // use pitch-filled map pose
       initial_status.lanelet_pose_valid = false;
-      initial_status.pose = traffic_simulator::pose::toMapPose(lanelet_pose, true).pose;
+      initial_status.pose =
+        traffic_simulator::lanelet_wrapper::pose::toMapPose(lanelet_pose, true).pose;
 
       EgoEntitySimulation ego_entity_simulation(
         initial_status, traffic_simulator_msgs::msg::VehicleParameters(), 1.f / 30.f, hdmap_utils,
