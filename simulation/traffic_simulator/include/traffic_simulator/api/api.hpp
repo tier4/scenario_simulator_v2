@@ -36,7 +36,6 @@
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/entity/entity_manager.hpp>
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/simulation_clock/simulation_clock.hpp>
 #include <traffic_simulator/traffic/traffic_controller.hpp>
@@ -71,8 +70,7 @@ public:
     entity_manager_ptr_(
       std::make_shared<entity::EntityManager>(node, configuration, node_parameters_)),
     traffic_lights_ptr_(std::make_shared<TrafficLights>(
-      node, entity_manager_ptr_->getHdmapUtils(),
-      getROS2Parameter<std::string>("architecture_type", "awf/universe"))),
+      node, getROS2Parameter<std::string>("architecture_type", "awf/universe"))),
     traffic_controller_ptr_(std::make_shared<traffic::TrafficController>(
       [this]() { return API::getEntityNames(); },
       [this](const auto & entity_name) {
@@ -379,7 +377,6 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getEntityNames);
   FORWARD_TO_ENTITY_MANAGER(getEntityStatus);
   FORWARD_TO_ENTITY_MANAGER(getCanonicalizedStatusBeforeUpdate);
-  FORWARD_TO_ENTITY_MANAGER(getHdmapUtils);
   FORWARD_TO_ENTITY_MANAGER(getLinearJerk);
   FORWARD_TO_ENTITY_MANAGER(getStandStillDuration);
   FORWARD_TO_ENTITY_MANAGER(getTraveledDistance);

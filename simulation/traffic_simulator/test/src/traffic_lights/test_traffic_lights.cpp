@@ -49,18 +49,8 @@ public:
 
   const rclcpp::Node::SharedPtr node_ptr = rclcpp::Node::make_shared("TrafficLightsTest");
 
-  const std::string path = ament_index_cpp::get_package_share_directory("traffic_simulator") +
-                           "/map/standard_map/lanelet2_map.osm";
-
-  const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr =
-    std::make_shared<hdmap_utils::HdMapUtils>(
-      path, geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
-              .latitude(35.61836750154)
-              .longitude(139.78066608243)
-              .altitude(0.0));
-
   std::unique_ptr<traffic_simulator::TrafficLights> lights =
-    std::make_unique<traffic_simulator::TrafficLights>(node_ptr, hdmap_utils_ptr, "awf/universe");
+    std::make_unique<traffic_simulator::TrafficLights>(node_ptr, "awf/universe");
 };
 
 TEST_F(TrafficLightsTest, isAnyTrafficLightChanged)
