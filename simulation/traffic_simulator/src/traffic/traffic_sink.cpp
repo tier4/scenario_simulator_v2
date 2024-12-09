@@ -40,23 +40,8 @@ namespace traffic_simulator
 namespace traffic
 {
 TrafficSink::TrafficSink(
-  const std::shared_ptr<entity::EntityManager> entity_manager_ptr, const double radius,
-  const geometry_msgs::msg::Point & position,
-  const std::unordered_set<std::uint8_t> & sinkable_entity_type,
-  const std::optional<lanelet::Id> lanelet_id_opt /*= std::nullopt*/)
-: TrafficModuleBase(),
-  description([](std::optional<lanelet::Id> lanelet_id_opt) -> std::string {
-    static long unique_id = 0L;
-    if (lanelet_id_opt.has_value()) {
-      return std::string("auto_") + std::to_string(lanelet_id_opt.value());
-    } else {
-      return std::string("custom_") + std::to_string(unique_id++);
-    }
-  }(lanelet_id_opt)),
-  radius(radius),
-  position(position),
-  entity_manager_ptr(entity_manager_ptr),
-  sinkable_entity_type(sinkable_entity_type)
+  const std::shared_ptr<entity::EntityManager> entity_manager_ptr, const TrafficSinkConfig & config)
+: TrafficModuleBase(), config(config), entity_manager_ptr(entity_manager_ptr)
 {
 }
 
@@ -66,13 +51,14 @@ void TrafficSink::execute(
   const auto names = getEntityNames();
   for (const auto & name : names) {
     const auto is_sinkable_entity = [this](const auto & entity_name) {
-      return sinkable_entity_type.empty()
-               ? true
-               : sinkable_entity_type.find(getEntityType(entity_name).type) !=
-                   sinkable_entity_type.end();
+      return config.sinkable_entity_type.empty() or
+             config.sinkable_entity_type.find(getEntityType(entity_name).type) !=
+               config.sinkable_entity_type.end();
     };
     const auto pose = getEntityPose(name);
-    if (is_sinkable_entity(name) and math::geometry::getDistance(position, pose) <= radius) {
+    if (
+      is_sinkable_entity(name) and
+      math::geometry::getDistance(config.position, pose) <= config.radius) {
       despawn(name);
     }
   }
@@ -83,16 +69,17 @@ auto TrafficSink::appendDebugMarker(visualization_msgs::msg::MarkerArray & marke
 {
   visualization_msgs::msg::Marker traffic_sink_marker;
   traffic_sink_marker.header.frame_id = "map";
-  traffic_sink_marker.ns = "traffic_controller/traffic_sink/" + description;
+  traffic_sink_marker.ns = "traffic_controller/traffic_sink/" + config.description;
   traffic_sink_marker.id = 0;
   traffic_sink_marker.action = traffic_sink_marker.ADD;
   traffic_sink_marker.type = 3;  // cylinder
   traffic_sink_marker.pose =
-    geometry_msgs::build<geometry_msgs::msg::Pose>().position(position).orientation(
-      geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0).y(0).z(0).w(1));
+    geometry_msgs::build<geometry_msgs::msg::Pose>()
+      .position(config.position)
+      .orientation(geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0).y(0).z(0).w(1));
   traffic_sink_marker.color = color_names::makeColorMsg("firebrick", 0.99);
-  traffic_sink_marker.scale.x = radius * 2;
-  traffic_sink_marker.scale.y = radius * 2;
+  traffic_sink_marker.scale.x = config.radius * 2.0;
+  traffic_sink_marker.scale.y = config.radius * 2.0;
   traffic_sink_marker.scale.z = 1.0;
   marker_array.markers.emplace_back(traffic_sink_marker);
 
@@ -100,7 +87,7 @@ auto TrafficSink::appendDebugMarker(visualization_msgs::msg::MarkerArray & marke
   text_marker = traffic_sink_marker;
   text_marker.id = 1;
   text_marker.type = 9;  //text
-  text_marker.text = description;
+  text_marker.text = config.description;
   text_marker.color = color_names::makeColorMsg("white", 0.99);
   text_marker.scale.z = 0.6;
   marker_array.markers.emplace_back(text_marker);
@@ -131,12 +118,13 @@ auto TrafficSink::getEntityPose(const std::string & entity_name) const noexcept(
 auto TrafficSink::despawn(const std::string & entity_name) const -> void
 {
   const auto entity_position = getEntityPose(entity_name).position;
-  const bool in_despawn_proximity = math::geometry::hypot(entity_position, position) <= radius;
+  const bool in_despawn_proximity =
+    math::geometry::hypot(entity_position, config.position) <= config.radius;
 
   const std::uint8_t entity_type = getEntityType(entity_name).type;
   const bool is_despawn_candidate =
-    sinkable_entity_type.empty() or
-    sinkable_entity_type.find(entity_type) != sinkable_entity_type.cend();
+    config.sinkable_entity_type.empty() or
+    config.sinkable_entity_type.find(entity_type) != config.sinkable_entity_type.cend();
   if (is_despawn_candidate and in_despawn_proximity) {
     entity_manager_ptr->despawnEntity(entity_name);
   }

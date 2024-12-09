@@ -41,8 +41,8 @@ namespace traffic
 {
 struct AutoSinkConfig
 {
-  bool generate_auto_sink = true;
-  std::unordered_set<std::uint8_t> default_sinkable_entity_type = {};
+  const bool generate_auto_sink = true;
+  const std::set<std::uint8_t> default_sinkable_entity_type = {};
   static constexpr double radius = 1.0;
 };
 class TrafficController

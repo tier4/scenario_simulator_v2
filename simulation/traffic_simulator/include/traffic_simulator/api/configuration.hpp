@@ -35,7 +35,7 @@ struct Configuration
 
   bool generate_auto_sink = true;
 
-  std::unordered_set<std::uint8_t> default_sinkable_entity_type = {};
+  std::set<std::uint8_t> default_sinkable_entity_type = {};
 
   bool verbose = false;
 

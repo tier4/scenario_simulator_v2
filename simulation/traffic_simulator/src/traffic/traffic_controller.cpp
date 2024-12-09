@@ -41,7 +41,7 @@ namespace traffic
 TrafficController::TrafficController(
   const std::shared_ptr<entity::EntityManager> entity_manager_ptr,
   const AutoSinkConfig & auto_sink_config /* = {false, {}}*/)
-: entity_manager_ptr(entity_manager_ptr), auto_sink_config(auto_sink_config)
+: entity_manager_ptr(entity_manager_ptr), modules_(), auto_sink_config(auto_sink_config)
 {
   if (auto_sink_config.generate_auto_sink) {
     autoSink();
@@ -57,9 +57,10 @@ void TrafficController::autoSink()
       lanelet_pose.lanelet_id = lanelet_id;
       lanelet_pose.s = pose::laneletLength(lanelet_id, hdmap_utils_ptr);
       const auto pose = pose::toMapPose(lanelet_pose, hdmap_utils_ptr);
-      addModule<TrafficSink>(
-        entity_manager_ptr, auto_sink_config.radius, pose.position,
-        auto_sink_config.default_sinkable_entity_type, std::make_optional(lanelet_id));
+      const auto traffic_sink_config = TrafficSinkConfig(
+        auto_sink_config.radius, pose.position, auto_sink_config.default_sinkable_entity_type,
+        std::make_optional(lanelet_id));
+      addModule<TrafficSink>(entity_manager_ptr, traffic_sink_config);
     }
   }
 }
