@@ -394,7 +394,7 @@ private:
      the center of the rear axle projected onto the ground in the case of vehicles.
 
      There is no technical basis for this value; it was determined based on
-     experiments conducted by Szymon Parapura.
+     experiments.
   */
   static constexpr double altitude_threshold_ = 1.0;
 

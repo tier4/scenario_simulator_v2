@@ -72,8 +72,7 @@ private:
       The value determines the minimum angular difference required to consider the ego orientation
       as "changed".
 
-      There is no technical basis for this value, it was determined based on Szymon Parapura
-      experiments.
+      There is no technical basis for this value, it was determined based on experiments.
   */
   constexpr static double rotation_threshold_ = 0.04;
 
@@ -82,8 +81,7 @@ private:
       If the NPC is lower than this offset relative to the ego position,
       the NPC will be excluded from detection
 
-      There is no technical basis for this value, it was determined based on Szymon Parapura
-      experiments.
+      There is no technical basis for this value, it was determined based on experiments.
   */
   constexpr static double max_downward_z_offset_ = 1.0;
 
