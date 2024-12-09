@@ -32,6 +32,11 @@ Changelog for package openscenario_interpreter
 * add publish_empty_context parameter
 * Contributors: Masaya Kataoka
 
+6.2.5 (2024-12-09)
+------------------
+* Merge branch 'master' into fix/acc_by_slope
+* Contributors: Kotaro Yoshimoto
+
 6.2.4 (2024-12-09)
 ------------------
 * Merge pull request `#1469 <https://github.com/tier4/scenario_simulator_v2/issues/1469>`_ from tier4/refactor/speed-condition
