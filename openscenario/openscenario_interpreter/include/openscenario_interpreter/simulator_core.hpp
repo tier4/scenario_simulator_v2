@@ -15,10 +15,12 @@
 #ifndef OPENSCENARIO_INTERPRETER__SIMULATOR_CORE_HPP_
 #define OPENSCENARIO_INTERPRETER__SIMULATOR_CORE_HPP_
 
+#include <geometry/quaternion/get_rotation_matrix.hpp>
 #include <geometry/quaternion/quaternion_to_euler.hpp>
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/syntax/boolean.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
+#include <openscenario_interpreter/syntax/entity.hpp>
 #include <openscenario_interpreter/syntax/routing_algorithm.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <openscenario_interpreter/syntax/unsigned_integer.hpp>
@@ -176,9 +178,11 @@ public:
       const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined)
       -> traffic_simulator::LaneletPose
     {
-      const bool allow_lane_change = (routing_algorithm == RoutingAlgorithm::value_type::shortest);
+      traffic_simulator::RoutingConfiguration routing_configuration;
+      routing_configuration.allow_lane_change =
+        (routing_algorithm == RoutingAlgorithm::value_type::shortest);
       return traffic_simulator::pose::relativeLaneletPose(
-        from_lanelet_pose, to_lanelet_pose, allow_lane_change, core->getHdmapUtils());
+        from_lanelet_pose, to_lanelet_pose, routing_configuration, core->getHdmapUtils());
     }
 
     static auto makeNativeBoundingBoxRelativeLanePosition(
@@ -221,10 +225,12 @@ public:
       const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined)
       -> traffic_simulator::LaneletPose
     {
-      const bool allow_lane_change = (routing_algorithm == RoutingAlgorithm::value_type::shortest);
+      traffic_simulator::RoutingConfiguration routing_configuration;
+      routing_configuration.allow_lane_change =
+        (routing_algorithm == RoutingAlgorithm::value_type::shortest);
       return traffic_simulator::pose::boundingBoxRelativeLaneletPose(
-        from_lanelet_pose, from_bounding_box, to_lanelet_pose, to_bounding_box, allow_lane_change,
-        core->getHdmapUtils());
+        from_lanelet_pose, from_bounding_box, to_lanelet_pose, to_bounding_box,
+        routing_configuration, core->getHdmapUtils());
     }
 
     static auto makeNativeBoundingBoxRelativeWorldPosition(
@@ -261,14 +267,15 @@ public:
       const std::string & from_entity_name, const std::string & to_entity_name,
       const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined) -> int
     {
+      traffic_simulator::RoutingConfiguration routing_configuration;
+      routing_configuration.allow_lane_change =
+        (routing_algorithm == RoutingAlgorithm::value_type::shortest);
       if (const auto from_entity = core->getEntity(from_entity_name)) {
         if (const auto to_entity = core->getEntity(to_entity_name)) {
-          const bool allow_lane_change =
-            (routing_algorithm == RoutingAlgorithm::value_type::shortest);
           if (
             auto lane_changes = traffic_simulator::distance::countLaneChanges(
               from_entity->getCanonicalizedLaneletPose().value(),
-              to_entity->getCanonicalizedLaneletPose().value(), allow_lane_change,
+              to_entity->getCanonicalizedLaneletPose().value(), routing_configuration,
               core->getHdmapUtils())) {
             return lane_changes.value().first - lane_changes.value().second;
           }
@@ -474,9 +481,10 @@ public:
     }
 
     template <typename... Ts>
-    static auto applyAssignRouteAction(Ts &&... xs)
+    static auto applyAssignRouteAction(const std::string & entity_ref, Ts &&... xs)
     {
-      return core->requestAssignRoute(std::forward<decltype(xs)>(xs)...);
+      core->requestClearRoute(entity_ref);
+      return core->requestAssignRoute(entity_ref, std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>
@@ -532,7 +540,6 @@ public:
       return core->checkCollision(std::forward<decltype(xs)>(xs)...);
     }
 
-    template <typename... Ts>
     static auto evaluateBoundingBoxEuclideanDistance(
       const std::string & from_entity_name,
       const std::string & to_entity_name)  // for RelativeDistanceCondition
@@ -550,6 +557,34 @@ public:
       return std::numeric_limits<double>::quiet_NaN();
     }
 
+    static auto evaluateRelativeSpeed(const Entity & from, const Entity & to) -> Eigen::Vector3d
+    {
+      if (const auto observer = core->getEntity(from.name())) {
+        if (const auto observed = core->getEntity(to.name())) {
+          auto velocity = [](const auto & entity) -> Eigen::Vector3d {
+            auto direction = [](auto orientation) -> Eigen::Vector3d {
+              const auto euler_angle = math::geometry::convertQuaternionToEulerAngle(orientation);
+              const auto r = euler_angle.x;
+              const auto p = euler_angle.y;
+              const auto y = euler_angle.z;
+              return Eigen::Vector3d(
+                std::cos(y) * std::cos(p), std::sin(y) * std::cos(p), std::sin(p));
+            };
+
+            return direction(entity->getMapPose().orientation) * entity->getCurrentTwist().linear.x;
+          };
+
+          const Eigen::Matrix3d rotation =
+            math::geometry::getRotationMatrix(observer->getMapPose().orientation);
+
+          return rotation.transpose() * velocity(observed) -
+                 rotation.transpose() * velocity(observer);
+        }
+      }
+
+      return Eigen::Vector3d(Double::nan(), Double::nan(), Double::nan());
+    }
+
     template <typename... Ts>
     static auto evaluateSimulationTime(Ts &&... xs) -> double
     {
@@ -563,7 +598,16 @@ public:
     template <typename... Ts>
     static auto evaluateSpeed(Ts &&... xs)
     {
-      return core->getCurrentTwist(std::forward<decltype(xs)>(xs)...).linear.x;
+      /*
+         The function name "evaluateSpeed" stands for "evaluate SpeedCondition"
+         and is a part used to implement `SpeedCondition::evaluate`.
+         SpeedCondition can be evaluated in three directions: longitudinal,
+         lateral, and vertical, based on the attribute direction. Therefore,
+         please note that this function returns velocity, that is, a vector,
+         rather than speed, contrary to the name "evaluateSpeed".
+      */
+      const auto linear = core->getCurrentTwist(std::forward<decltype(xs)>(xs)...).linear;
+      return Eigen::Vector3d(linear.x, linear.y, linear.z);
     }
 
     template <typename... Ts>

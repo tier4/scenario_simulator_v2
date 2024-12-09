@@ -30,8 +30,8 @@ using boost_point = boost::geometry::model::d2::point_xy<double>;
 using boost_polygon = boost::geometry::model::polygon<boost_point>;
 
 bool checkCollision2D(
-  geometry_msgs::msg::Pose pose0, traffic_simulator_msgs::msg::BoundingBox bbox0,
-  geometry_msgs::msg::Pose pose1, traffic_simulator_msgs::msg::BoundingBox bbox1)
+  const geometry_msgs::msg::Pose & pose0, const traffic_simulator_msgs::msg::BoundingBox & bbox0,
+  const geometry_msgs::msg::Pose & pose1, const traffic_simulator_msgs::msg::BoundingBox & bbox1)
 {
   if (
     std::abs((pose0.position.z + bbox0.center.z) - (pose1.position.z + bbox1.center.z)) >
