@@ -53,12 +53,13 @@ public:
   explicit TrafficSink(
     const std::shared_ptr<entity::EntityManager> entity_manager_ptr, const double radius,
     const geometry_msgs::msg::Point & position,
-    const std::set<std::uint8_t> & sinkable_entity_type);
+    const std::unordered_set<std::uint8_t> & sinkable_entity_type,
+    const std::optional<lanelet::Id> lanelet_id_opt = std::nullopt);
   void execute(const double current_time, const double step_time) override;
   auto appendDebugMarker(visualization_msgs::msg::MarkerArray & marker_array) const
     -> void override;
 
-  const std::size_t unique_id;
+  const std::string description;
   const double radius;
   const geometry_msgs::msg::Point position;
 
@@ -75,8 +76,7 @@ private:
   auto despawn(const std::string & entity_name) const -> void;
 
   const std::shared_ptr<entity::EntityManager> entity_manager_ptr;
-  const std::set<std::uint8_t> sinkable_entity_type;
-  inline static std::size_t unique_id_counter = 0UL;
+  const std::unordered_set<std::uint8_t> sinkable_entity_type;
 };
 }  // namespace traffic
 }  // namespace traffic_simulator

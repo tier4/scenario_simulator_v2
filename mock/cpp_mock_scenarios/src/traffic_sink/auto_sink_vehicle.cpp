@@ -19,6 +19,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <string>
 #include <traffic_simulator/api/api.hpp>
+#include <traffic_simulator/traffic/traffic_controller.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <vector>
 
@@ -30,8 +31,8 @@ public:
   explicit AutoSinkVehicleScenario(const rclcpp::NodeOptions & option)
   : cpp_mock_scenarios::CppScenarioNode(
       "auto_sink_vehicle", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
-      "lanelet2_map.osm", __FILE__, false, option, true,
-      {traffic_simulator::EntityType::PEDESTRIAN})
+      "lanelet2_map.osm", __FILE__, false, option,
+      traffic_simulator::traffic::AutoSinkConfig{true, {traffic_simulator::EntityType::PEDESTRIAN}})
   {
     start();
   }
@@ -39,7 +40,7 @@ public:
 private:
   void onUpdate() override
   {
-    if (api_.getCurrentTime() >= 0.1) {
+    if (api_.getCurrentTime() >= 10.1) {
       if (api_.entityExists("ego") and not api_.entityExists("bob")) {
         stop(cpp_mock_scenarios::Result::SUCCESS);
       } else {

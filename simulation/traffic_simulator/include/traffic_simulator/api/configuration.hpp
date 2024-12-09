@@ -33,9 +33,9 @@ struct Configuration
 
   using Pathname = boost::filesystem::path;
 
-  bool auto_sink = true;
+  bool generate_auto_sink = true;
 
-  std::set<std::uint8_t> sinkable_entity_type = {};
+  std::unordered_set<std::uint8_t> default_sinkable_entity_type = {};
 
   bool verbose = false;
 

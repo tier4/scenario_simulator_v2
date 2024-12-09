@@ -39,12 +39,18 @@ namespace traffic_simulator
 {
 namespace traffic
 {
+struct AutoSinkConfig
+{
+  bool generate_auto_sink = true;
+  std::unordered_set<std::uint8_t> default_sinkable_entity_type = {};
+  static constexpr double radius = 1.0;
+};
 class TrafficController
 {
 public:
   explicit TrafficController(
     const std::shared_ptr<entity::EntityManager> entity_manager_ptr,
-    const std::set<std::uint8_t> & sinkable_entity_type, bool auto_sink = false);
+    const AutoSinkConfig & auto_sink_config = {false, {}});
 
   template <typename T, typename... Ts>
   void addModule(Ts &&... xs)
@@ -59,10 +65,9 @@ private:
   void autoSink();
   const std::shared_ptr<entity::EntityManager> entity_manager_ptr;
   std::vector<std::shared_ptr<TrafficModuleBase>> modules_;
-  const std::set<std::uint8_t> sinkable_entity_type;
 
 public:
-  const bool auto_sink;
+  const AutoSinkConfig auto_sink_config;
 };
 }  // namespace traffic
 }  // namespace traffic_simulator

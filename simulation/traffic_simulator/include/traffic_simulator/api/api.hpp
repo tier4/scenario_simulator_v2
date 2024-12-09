@@ -76,7 +76,9 @@ public:
       node, entity_manager_ptr_->getHdmapUtils(),
       getROS2Parameter<std::string>("architecture_type", "awf/universe"))),
     traffic_controller_ptr_(std::make_shared<traffic::TrafficController>(
-      entity_manager_ptr_, configuration.sinkable_entity_type, configuration.auto_sink)),
+      entity_manager_ptr_,
+      traffic_simulator::traffic::AutoSinkConfig{
+        configuration.generate_auto_sink, configuration.default_sinkable_entity_type})),
     clock_pub_(rclcpp::create_publisher<rosgraph_msgs::msg::Clock>(
       node, "/clock", rclcpp::QoS(rclcpp::KeepLast(1)).best_effort(),
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),

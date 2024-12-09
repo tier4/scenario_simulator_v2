@@ -41,9 +41,18 @@ namespace traffic
 {
 TrafficSink::TrafficSink(
   const std::shared_ptr<entity::EntityManager> entity_manager_ptr, const double radius,
-  const geometry_msgs::msg::Point & position, const std::set<std::uint8_t> & sinkable_entity_type)
+  const geometry_msgs::msg::Point & position,
+  const std::unordered_set<std::uint8_t> & sinkable_entity_type,
+  const std::optional<lanelet::Id> lanelet_id_opt /*= std::nullopt*/)
 : TrafficModuleBase(),
-  unique_id(unique_id_counter++),
+  description([](std::optional<lanelet::Id> lanelet_id_opt) -> std::string {
+    static long unique_id = 0L;
+    if (lanelet_id_opt.has_value()) {
+      return std::string("auto_") + std::to_string(lanelet_id_opt.value());
+    } else {
+      return std::string("custom_") + std::to_string(unique_id++);
+    }
+  }(lanelet_id_opt)),
   radius(radius),
   position(position),
   entity_manager_ptr(entity_manager_ptr),
@@ -72,10 +81,9 @@ void TrafficSink::execute(
 auto TrafficSink::appendDebugMarker(visualization_msgs::msg::MarkerArray & marker_array) const
   -> void
 {
-  const auto lanelet_text = std::string("sink_") + std::to_string(unique_id);
   visualization_msgs::msg::Marker traffic_sink_marker;
   traffic_sink_marker.header.frame_id = "map";
-  traffic_sink_marker.ns = "traffic_controller/traffic_sink/" + lanelet_text;
+  traffic_sink_marker.ns = "traffic_controller/traffic_sink/" + description;
   traffic_sink_marker.id = 0;
   traffic_sink_marker.action = traffic_sink_marker.ADD;
   traffic_sink_marker.type = 3;  // cylinder
@@ -92,7 +100,7 @@ auto TrafficSink::appendDebugMarker(visualization_msgs::msg::MarkerArray & marke
   text_marker = traffic_sink_marker;
   text_marker.id = 1;
   text_marker.type = 9;  //text
-  text_marker.text = lanelet_text;
+  text_marker.text = description;
   text_marker.color = color_names::makeColorMsg("white", 0.99);
   text_marker.scale.z = 0.6;
   marker_array.markers.emplace_back(text_marker);

@@ -40,12 +40,10 @@ namespace traffic
 {
 TrafficController::TrafficController(
   const std::shared_ptr<entity::EntityManager> entity_manager_ptr,
-  const std::set<std::uint8_t> & sinkable_entity_type, bool auto_sink)
-: entity_manager_ptr(entity_manager_ptr),
-  sinkable_entity_type(sinkable_entity_type),
-  auto_sink(auto_sink)
+  const AutoSinkConfig & auto_sink_config /* = {false, {}}*/)
+: entity_manager_ptr(entity_manager_ptr), auto_sink_config(auto_sink_config)
 {
-  if (auto_sink) {
+  if (auto_sink_config.generate_auto_sink) {
     autoSink();
   }
 }
@@ -59,7 +57,9 @@ void TrafficController::autoSink()
       lanelet_pose.lanelet_id = lanelet_id;
       lanelet_pose.s = pose::laneletLength(lanelet_id, hdmap_utils_ptr);
       const auto pose = pose::toMapPose(lanelet_pose, hdmap_utils_ptr);
-      addModule<TrafficSink>(entity_manager_ptr, 1, pose.position, sinkable_entity_type);
+      addModule<TrafficSink>(
+        entity_manager_ptr, auto_sink_config.radius, pose.position,
+        auto_sink_config.default_sinkable_entity_type, std::make_optional(lanelet_id));
     }
   }
 }
@@ -75,7 +75,7 @@ auto TrafficController::makeDebugMarker() const -> const visualization_msgs::msg
 {
   static const auto marker_array = [&]() {
     visualization_msgs::msg::MarkerArray marker_array;
-    for (size_t i = 0; i < modules_.size(); ++i) {
+    for (size_t i = 0UL; i < modules_.size(); ++i) {
       modules_[i]->appendDebugMarker(marker_array);
     }
     return marker_array;
