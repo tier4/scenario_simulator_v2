@@ -1,0 +1,2 @@
+ament_add_gtest(test_lanelet_wrapper test_lanelet_wrapper.cpp)
+target_link_libraries(test_lanelet_wrapper traffic_simulator)
