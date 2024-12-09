@@ -23,7 +23,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 /*
-   TimeToCollisionConditionTarget 1.3
+   TimeToCollisionConditionTarget (OpenSCENARIO XML 1.3.1)
 
    Target position used in the TimeToCollisionCondition. Can be defined as
    either an explicit position, or the position of a reference entity.
