@@ -60,7 +60,7 @@ void TrafficController::autoSink()
       lanelet_pose.s = pose::laneletLength(lanelet_id, hdmap_utils_ptr);
       const auto pose = pose::toMapPose(lanelet_pose, hdmap_utils_ptr);
       addModule<traffic_simulator::traffic::TrafficSink>(
-        entity_manager_ptr, lanelet_id, 1, pose.position, sinkable_entity_type);
+        entity_manager_ptr, 1, pose.position, sinkable_entity_type);
     }
   }
 }

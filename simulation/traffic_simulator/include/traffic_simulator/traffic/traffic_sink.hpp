@@ -45,26 +45,21 @@ class TrafficSink : public TrafficModuleBase
 public:
   /**
    * @brief Construct a new Traffic Sink object
-   * @param lanelet_id Lanelet ID for visualization
-   * @todo lanelet_id value is only used for visualization and its very confusing. So it should be refactor.
+   * @param entity_manager_ptr Shared pointer, refers to the EntityManager
    * @param radius The entity despawn when the distance between the entity's coordinates in the Map coordinate system and the TrafficSink's coordinates is less than this value.
    * @param position Position of the traffic sink.
-   * @param get_entity_names Function to get the name of entity
-   * @param get_entity_type Function to get the type of entity
    * @param sinkable_entity_type If this type is applicable, the entity despawn only when it approaches
    *  radius [m] or less from the TrafficSink. If empty, all entity types are candidates for despawn.
-   * @param get_entity_pose Function to get the pose of entity.
-   * @param despawn Function to despawn entity.
    */
   explicit TrafficSink(
     const std::shared_ptr<traffic_simulator::entity::EntityManager> entity_manager_ptr,
-    const lanelet::Id lanelet_id, const double radius, const geometry_msgs::msg::Point & position,
+    const double radius, const geometry_msgs::msg::Point & position,
     const std::set<std::uint8_t> & sinkable_entity_type);
   void execute(const double current_time, const double step_time) override;
   auto appendDebugMarker(visualization_msgs::msg::MarkerArray & marker_array) const
     -> void override;
 
-  const lanelet::Id lanelet_id;
+  const std::size_t unique_id;
   const double radius;
   const geometry_msgs::msg::Point position;
 
@@ -83,6 +78,7 @@ private:
 
   const std::shared_ptr<traffic_simulator::entity::EntityManager> entity_manager_ptr;
   const std::set<std::uint8_t> sinkable_entity_type;
+  inline static std::size_t unique_id_counter = 0UL;
 };
 }  // namespace traffic
 }  // namespace traffic_simulator

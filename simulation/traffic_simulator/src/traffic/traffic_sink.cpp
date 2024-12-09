@@ -41,10 +41,10 @@ namespace traffic
 {
 TrafficSink::TrafficSink(
   const std::shared_ptr<traffic_simulator::entity::EntityManager> entity_manager_ptr,
-  const lanelet::Id lanelet_id, const double radius, const geometry_msgs::msg::Point & position,
+  const double radius, const geometry_msgs::msg::Point & position,
   const std::set<std::uint8_t> & sinkable_entity_type)
 : TrafficModuleBase(),
-  lanelet_id(lanelet_id),
+  unique_id(unique_id_counter++),
   radius(radius),
   position(position),
   entity_manager_ptr(entity_manager_ptr),
@@ -73,7 +73,7 @@ void TrafficSink::execute(
 auto TrafficSink::appendDebugMarker(visualization_msgs::msg::MarkerArray & marker_array) const
   -> void
 {
-  const auto lanelet_text = std::to_string(lanelet_id);
+  const auto lanelet_text = std::string("sink_") + std::to_string(unique_id);
   visualization_msgs::msg::Marker traffic_sink_marker;
   traffic_sink_marker.header.frame_id = "map";
   traffic_sink_marker.ns = "traffic_controller/traffic_sink/" + lanelet_text;
