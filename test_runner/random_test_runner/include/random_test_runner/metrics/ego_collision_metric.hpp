@@ -24,8 +24,8 @@ public:
   {
     timeoutCollisions(current_time);
 
-    auto npc_insertion_data = npc_last_collision_type_map_.emplace(npc_name, current_time);
-    if (npc_insertion_data.second) {
+    auto [_, was_inserted] = npc_last_collision_type_map_.emplace(npc_name, current_time);
+    if (was_inserted) {
       return true;
     }
     npc_last_collision_type_map_[npc_name] = current_time;
