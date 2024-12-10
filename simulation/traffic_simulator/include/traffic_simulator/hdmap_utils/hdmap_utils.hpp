@@ -28,10 +28,10 @@
 #include <lanelet2_traffic_rules/TrafficRulesFactory.h>
 #include <tf2/LinearMath/Matrix3x3.h>
 
-#include <autoware_auto_mapping_msgs/msg/had_map_bin.hpp>
 #include <autoware_lanelet2_extension/utility/message_conversion.hpp>
 #include <autoware_lanelet2_extension/utility/query.hpp>
 #include <autoware_lanelet2_extension/utility/utilities.hpp>
+#include <autoware_map_msgs/msg/lanelet_map_bin.hpp>
 #include <boost/filesystem.hpp>
 #include <geographic_msgs/msg/geo_point.hpp>
 #include <geometry/spline/catmull_rom_spline.hpp>
@@ -372,7 +372,7 @@ public:
       traffic_simulator::RoutingConfiguration().routing_graph_type) const
     -> std::vector<traffic_simulator_msgs::msg::LaneletPose>;
 
-  auto toMapBin() const -> autoware_auto_mapping_msgs::msg::HADMapBin;
+  auto toMapBin() const -> autoware_map_msgs::msg::LaneletMapBin;
 
   auto toMapPoints(const lanelet::Id, const std::vector<double> & s) const
     -> std::vector<geometry_msgs::msg::Point>;
@@ -486,7 +486,7 @@ private:
   auto getVectorFromPose(const geometry_msgs::msg::Pose &, const double magnitude) const
     -> geometry_msgs::msg::Vector3;
 
-  auto mapCallback(const autoware_auto_mapping_msgs::msg::HADMapBin &) const -> void;
+  auto mapCallback(const autoware_map_msgs::msg::LaneletMapBin &) const -> void;
 
   auto overwriteLaneletsCenterline() -> void;
 
