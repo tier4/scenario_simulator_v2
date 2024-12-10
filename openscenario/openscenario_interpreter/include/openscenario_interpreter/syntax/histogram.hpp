@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__HISTOGRAM_HPP_
-#define OPENSCENARIO_INTERPRETER__HISTOGRAM_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__HISTOGRAM_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__HISTOGRAM_HPP_
 
+#include <openscenario_interpreter/parameter_distribution.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/histogram_bin.hpp>
 #include <random>
@@ -23,45 +24,32 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- Histogram 1.2 ----------------------------------------------------------
- *
- *  <xsd:complexType name="Histogram">
- *    <xsd:sequence>
- *      <xsd:element name="Bin" type="HistogramBin" maxOccurs="unbounded"/>
- *    </xsd:sequence>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   Histogram (OpenSCENARIO XML 1.3)
 
-struct Histogram : public ComplexType, private Scope
+   Histogram which can be applied to a single parameter.
+
+   <xsd:complexType name="Histogram">
+     <xsd:sequence>
+       <xsd:element name="Bin" type="HistogramBin" maxOccurs="unbounded"/>
+     </xsd:sequence>
+   </xsd:complexType>
+*/
+
+struct Histogram : public ComplexType, private Scope, public StochasticParameterDistributionBase
 {
   /**
-   * Note: HistogramBin must be stored in continuous range and ascending order, to `bins`
+   * Note: HistogramBin must be stored in continuous range and ascending order to `bins`
+   *       due to restriction of `BinAdapter`
    */
   const std::list<HistogramBin> bins;
 
-  struct BinAdaptor
-  {
-    explicit BinAdaptor(const std::list<HistogramBin> & bins)
-    {
-      intervals.emplace_back(bins.front().range.lower_limit.data);
-      for (const auto & bin : bins) {
-        intervals.emplace_back(bin.range.lower_limit.data);
-        densities.emplace_back(bin.weight.data);
-      }
-      intervals.emplace_back(bins.back().range.upper_limit.data);
-    }
-    std::vector<double> intervals, densities;
-  } bin_adaptor;
-
   std::piecewise_constant_distribution<Double::value_type> distribute;
-
-  std::mt19937 random_engine;
 
   explicit Histogram(const pugi::xml_node &, Scope & scope);
 
-  auto evaluate() -> Object;
+  auto derive() -> Object override;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
-#endif  // OPENSCENARIO_INTERPRETER__HISTOGRAM_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__HISTOGRAM_HPP_

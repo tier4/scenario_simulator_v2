@@ -24,5 +24,17 @@ Deterministic::Deterministic(const pugi::xml_node & node, Scope & scope)
     readGroups<DeterministicParameterDistribution, 0>(node, scope))
 {
 }
+
+auto Deterministic::derive() -> ParameterDistribution
+{
+  ParameterDistribution distribution;
+  for (auto additional_distribution : deterministic_parameter_distributions) {
+    distribution = mergeParameterDistribution(
+      distribution,
+      apply<ParameterDistribution>(
+        [](auto & distribution) { return distribution.derive(); }, additional_distribution));
+  }
+  return distribution;
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter
