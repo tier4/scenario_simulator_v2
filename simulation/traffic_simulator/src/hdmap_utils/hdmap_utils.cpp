@@ -220,11 +220,12 @@ auto HdMapUtils::countLaneChanges(
 
       if (auto followings = getNextLaneletIds(previous, routing_configuration.routing_graph_type);
           std::find(followings.begin(), followings.end(), current) == followings.end()) {
-        if (auto lefts = getLeftLaneletIds(previous, routing_configuration.routing_graph_type);
+        if (auto lefts =
+              getLeftLaneletIds(previous, routing_configuration.routing_graph_type, false);
             std::find(lefts.begin(), lefts.end(), current) != lefts.end()) {
           lane_changes.first++;
         } else if (auto rights =
-                     getRightLaneletIds(previous, routing_configuration.routing_graph_type);
+                     getRightLaneletIds(previous, routing_configuration.routing_graph_type, false);
                    std::find(rights.begin(), rights.end(), current) != rights.end()) {
           lane_changes.second++;
         }
@@ -1183,11 +1184,11 @@ auto HdMapUtils::getLeftLaneletIds(
   const bool include_opposite_direction) const -> lanelet::Ids
 {
   if (include_opposite_direction) {
+    throw common::Error(
+      "HdMapUtils::getLeftLaneletIds with include_opposite_direction=true is not implemented yet.");
+  } else {
     return getLaneletIds(
       routing_graphs_->routing_graph(type)->lefts(lanelet_map_ptr_->laneletLayer.get(lanelet_id)));
-  } else {
-    return getLaneletIds(routing_graphs_->routing_graph(type)->adjacentLefts(
-      lanelet_map_ptr_->laneletLayer.get(lanelet_id)));
   }
 }
 
@@ -1196,11 +1197,12 @@ auto HdMapUtils::getRightLaneletIds(
   const bool include_opposite_direction) const -> lanelet::Ids
 {
   if (include_opposite_direction) {
+    throw common::Error(
+      "HdMapUtils::getRightLaneletIds with include_opposite_direction=true is not implemented "
+      "yet.");
+  } else {
     return getLaneletIds(
       routing_graphs_->routing_graph(type)->rights(lanelet_map_ptr_->laneletLayer.get(lanelet_id)));
-  } else {
-    return getLaneletIds(routing_graphs_->routing_graph(type)->adjacentRights(
-      lanelet_map_ptr_->laneletLayer.get(lanelet_id)));
   }
 }
 
