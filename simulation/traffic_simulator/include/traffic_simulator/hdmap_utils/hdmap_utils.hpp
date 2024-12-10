@@ -204,7 +204,7 @@ public:
 
   auto getLeftLaneletIds(
     const lanelet::Id, const traffic_simulator::RoutingGraphType,
-    const bool include_opposite_direction = true) const -> lanelet::Ids;
+    const bool include_opposite_direction) const -> lanelet::Ids;
 
   auto getLongitudinalDistance(
     const traffic_simulator_msgs::msg::LaneletPose & from_pose,
@@ -269,7 +269,7 @@ public:
 
   auto getRightLaneletIds(
     const lanelet::Id, const traffic_simulator::RoutingGraphType,
-    const bool include_opposite_direction = true) const -> lanelet::Ids;
+    const bool include_opposite_direction) const -> lanelet::Ids;
 
   auto getRightOfWayLaneletIds(const lanelet::Ids &) const
     -> std::unordered_map<lanelet::Id, lanelet::Ids>;
@@ -367,7 +367,7 @@ public:
 
   auto toLaneletPoses(
     const geometry_msgs::msg::Pose &, const lanelet::Id, const double matching_distance = 5.0,
-    const bool include_opposite_direction = true,
+    const bool include_opposite_direction = false,
     const traffic_simulator::RoutingGraphType type =
       traffic_simulator::RoutingConfiguration().routing_graph_type) const
     -> std::vector<traffic_simulator_msgs::msg::LaneletPose>;

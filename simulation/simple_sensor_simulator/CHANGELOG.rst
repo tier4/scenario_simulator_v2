@@ -21,6 +21,31 @@ Changelog for package simple_sensor_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+6.3.0 (2024-12-10)
+------------------
+* Merge branch 'master' into feature/lane-change-everywhere
+* Merge remote-tracking branch 'origin/master' into feature/lane-change-everywhere
+* Merge remote-tracking branch 'origin/master' into feature/lane-change-everywhere
+* Contributors: Kotaro Yoshimoto
+
+6.2.5 (2024-12-09)
+------------------
+* Merge pull request `#1477 <https://github.com/tier4/scenario_simulator_v2/issues/1477>`_ from tier4/fix/acc_by_slope
+* refactor: use std::atan2 instead of std::atan
+* Merge branch 'master' into fix/acc_by_slope
+* fix: EgoEntitySimulation::calculateAccelerationBySlope()
+* refactor: EgoEntitySimulation::calculateAccelerationBySlope unit test
+* chore: add test for calculated expected value in  EgoEntitySimulation::calculateAccelerationBySlope unit test
+* fix: use pitch-filled map pose in EgoEntitySimulation::calculateAccelerationBySlope test
+* fix: fix pitch angle sign in ego entity simulation test
+* Contributors: Kotaro Yoshimoto
+
+6.2.4 (2024-12-09)
+------------------
+* Merge branch 'master' into refactor/speed-condition
+* Merge branch 'master' into refactor/speed-condition
+* Contributors: Tatsuya Yamasaki
+
 6.2.3 (2024-12-05)
 ------------------
 * Merge branch 'master' into fix/sonor-cloud-issue-8-2
