@@ -97,7 +97,7 @@ auto DetectionSensorBase::isOnOrAboveEgoPlane(
     // update ego plane if needed
     geometry_msgs::msg::Pose ego_pose_ros;
     simulation_interface::toMsg(ego_pose, ego_pose_ros);
-    if (!ego_plane_opt_ || ego_plane_pose_opt_ || hasEgoOrientationChanged(ego_pose_ros)) {
+    if (!ego_plane_opt_ || !ego_plane_pose_opt_ || hasEgoOrientationChanged(ego_pose_ros)) {
       ego_plane_opt_.emplace(
         ego_pose_ros.position, math::geometry::getNormalVector(ego_pose_ros.orientation));
       ego_plane_pose_opt_ = ego_pose_ros;

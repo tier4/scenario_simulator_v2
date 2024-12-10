@@ -40,10 +40,7 @@ protected:
   explicit DetectionSensorBase(
     const double current_simulation_time,
     const simulation_api_schema::DetectionSensorConfiguration & configuration)
-  : previous_simulation_time_(current_simulation_time),
-    configuration_(configuration),
-    ego_plane_opt_(std::nullopt),
-    ego_plane_pose_opt_(std::nullopt)
+  : previous_simulation_time_(current_simulation_time), configuration_(configuration)
   {
   }
 
@@ -66,8 +63,8 @@ public:
     const std::vector<std::string> & lidar_detected_entities) = 0;
 
 private:
-  std::optional<math::geometry::Plane> ego_plane_opt_;
-  std::optional<geometry_msgs::msg::Pose> ego_plane_pose_opt_;
+  std::optional<math::geometry::Plane> ego_plane_opt_{std::nullopt};
+  std::optional<geometry_msgs::msg::Pose> ego_plane_pose_opt_{std::nullopt};
 };
 
 template <typename T, typename U = autoware_perception_msgs::msg::TrackedObjects>
