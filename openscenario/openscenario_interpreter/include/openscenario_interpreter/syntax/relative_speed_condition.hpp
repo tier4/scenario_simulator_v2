@@ -12,45 +12,50 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__SPEED_CONDITION_HPP_
-#define OPENSCENARIO_INTERPRETER__SYNTAX__SPEED_CONDITION_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_SPEED_CONDITION_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_SPEED_CONDITION_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/directional_dimension.hpp>
-#include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/rule.hpp>
 #include <openscenario_interpreter/syntax/triggering_entities.hpp>
-#include <pugixml.hpp>
-#include <valarray>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
 /*
-   SpeedCondition (OpenSCENARIO XML 1.3.1)
+   RelativeSpeedCondition 1.3.1
 
-   Compares a triggering entity's/entities' speed to a target speed. The
-   logical operator for the comparison is given by the rule attribute. If
-   direction is used, only the projection to that direction is used in the
-   comparison.
+   The current relative speed of a triggering entity/entities to a reference
+   entity is compared to a given value. The logical operator used for the
+   evaluation is defined by the rule attribute. If direction is used, only the
+   projection to that direction is used in the comparison, with the triggering
+   entity/entities as the reference.
 
-   <xsd:complexType name="SpeedCondition">
+   <xsd:complexType name="RelativeSpeedCondition">
+     <xsd:attribute name="entityRef" type="String" use="required"/>
      <xsd:attribute name="rule" type="Rule" use="required"/>
      <xsd:attribute name="value" type="Double" use="required"/>
      <xsd:attribute name="direction" type="DirectionalDimension"/>
    </xsd:complexType>
 */
-struct SpeedCondition : private Scope, private SimulatorCore::ConditionEvaluation
+struct RelativeSpeedCondition : private Scope, private SimulatorCore::ConditionEvaluation
 {
+  /*
+     Reference entity.
+  */
+  const Entity entity_ref;
+
   /*
      The operator (less, greater, equal).
   */
   const Rule rule;
 
   /*
-     Speed value of the speed condition. Unit: [m/s].
+     Relative speed value. Unit: [m/s]. Range: ]-inf..inf[. Relative speed is
+     defined as speed_rel = speed(triggering entity) - speed(reference entity)
   */
   const Double value;
 
@@ -61,20 +66,21 @@ struct SpeedCondition : private Scope, private SimulatorCore::ConditionEvaluatio
 
   const TriggeringEntities triggering_entities;
 
-  std::vector<std::valarray<double>> results;  // for description
+  std::vector<std::valarray<double>> evaluations;
 
-  explicit SpeedCondition(const pugi::xml_node &, Scope &, const TriggeringEntities &);
+  explicit RelativeSpeedCondition(const pugi::xml_node &, Scope &, const TriggeringEntities &);
 
   auto description() const -> String;
 
-  static auto evaluate(const Entities *, const Entity &) -> Eigen::Vector3d;
+  static auto evaluate(const Entities *, const Entity &, const Entity &) -> Eigen::Vector3d;
 
   static auto evaluate(
-    const Entities *, const Entity &, const std::optional<DirectionalDimension> &) -> double;
+    const Entities *, const Entity &, const Entity &, const std::optional<DirectionalDimension> &)
+    -> double;
 
   auto evaluate() -> Object;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
-#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__SPEED_CONDITION_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_SPEED_CONDITION_HPP_
