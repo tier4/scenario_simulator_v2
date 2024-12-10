@@ -147,12 +147,11 @@ auto FieldOperatorApplication::shutdownAutoware() -> void
 }
 
 auto FieldOperatorApplication::getTurnIndicatorsCommand() const
-  -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand
+  -> autoware_vehicle_msgs::msg::TurnIndicatorsCommand
 {
   static auto turn_indicators_command = []() {
-    autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand turn_indicators_command;
-    turn_indicators_command.command =
-      autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand::NO_COMMAND;
+    autoware_vehicle_msgs::msg::TurnIndicatorsCommand turn_indicators_command;
+    turn_indicators_command.command = autoware_vehicle_msgs::msg::TurnIndicatorsCommand::NO_COMMAND;
     return turn_indicators_command;
   }();
   turn_indicators_command.stamp = now();
@@ -162,15 +161,15 @@ auto FieldOperatorApplication::getTurnIndicatorsCommand() const
 auto FieldOperatorApplication::rethrow() const -> void { task_queue.rethrow(); }
 }  // namespace concealer
 
-namespace autoware_auto_vehicle_msgs::msg
+namespace autoware_vehicle_msgs::msg
 {
 auto operator<<(
-  std::ostream & out, const autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand & message)
+  std::ostream & out, const autoware_vehicle_msgs::msg::TurnIndicatorsCommand & message)
   -> std::ostream &
 {
-#define CASE(IDENTIFIER)                                                   \
-  case autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand::IDENTIFIER: \
-    out << #IDENTIFIER;                                                    \
+#define CASE(IDENTIFIER)                                              \
+  case autoware_vehicle_msgs::msg::TurnIndicatorsCommand::IDENTIFIER: \
+    out << #IDENTIFIER;                                               \
     break
 
   switch (message.command) {
@@ -189,11 +188,11 @@ auto operator<<(
   return out;
 }
 
-auto operator>>(std::istream & is, autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand & message)
+auto operator>>(std::istream & is, autoware_vehicle_msgs::msg::TurnIndicatorsCommand & message)
   -> std::istream &
 {
 #define STATE(IDENTIFIER) \
-  {#IDENTIFIER, autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand::IDENTIFIER}
+  {#IDENTIFIER, autoware_vehicle_msgs::msg::TurnIndicatorsCommand::IDENTIFIER}
 
   std::unordered_map<std::string, std::uint8_t> state_dictionary{
     STATE(DISABLE),
@@ -215,4 +214,4 @@ auto operator>>(std::istream & is, autoware_auto_vehicle_msgs::msg::TurnIndicato
 
   return is;
 }
-}  // namespace autoware_auto_vehicle_msgs::msg
+}  // namespace autoware_vehicle_msgs::msg

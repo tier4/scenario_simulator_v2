@@ -719,7 +719,7 @@ auto EntityBase::requestSynchronize(
       lane_changeable_routing_configuration.allow_lane_change = true;
 
       const auto entity_distance = longitudinalDistance(
-        entity_lanelet_pose.value(), entity_target, true, true,
+        entity_lanelet_pose.value(), entity_target, true, false,
         lane_changeable_routing_configuration, hdmap_utils_ptr_);
       if (!entity_distance.has_value()) {
         THROW_SEMANTIC_ERROR(
@@ -735,7 +735,7 @@ auto EntityBase::requestSynchronize(
 
       const auto target_entity_distance = longitudinalDistance(
         CanonicalizedLaneletPose(target_entity_lanelet_pose, hdmap_utils_ptr_), target_sync_pose,
-        true, true, lane_changeable_routing_configuration, hdmap_utils_ptr_);
+        true, false, lane_changeable_routing_configuration, hdmap_utils_ptr_);
       if (!target_entity_distance.has_value() || target_entity_distance.value() < 0.0) {
         RCLCPP_WARN_ONCE(
           rclcpp::get_logger("traffic_simulator"),
