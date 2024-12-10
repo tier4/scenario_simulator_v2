@@ -100,7 +100,7 @@ private:
   auto getEntityPose(const std::string & entity_name) const noexcept(false)
     -> geometry_msgs::msg::Pose;
 
-  const std::shared_ptr<entity::EntityManager> entity_manager_ptr;
+  const std::shared_ptr<entity::EntityManager> entity_manager_ptr_;
 };
 }  // namespace traffic
 }  // namespace traffic_simulator

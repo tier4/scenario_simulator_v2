@@ -41,7 +41,7 @@ namespace traffic
 {
 TrafficSink::TrafficSink(
   const std::shared_ptr<entity::EntityManager> entity_manager_ptr, const TrafficSinkConfig & config)
-: TrafficModuleBase(), config(config), entity_manager_ptr(entity_manager_ptr)
+: TrafficModuleBase(), config(config), entity_manager_ptr_(entity_manager_ptr)
 {
 }
 
@@ -56,7 +56,7 @@ void TrafficSink::execute(
       config.sinkable_entity_types.find(getEntityType(entity_name).type) !=
       config.sinkable_entity_types.end();
     if (has_sinkable_entity_type and is_in_sinkable_radius) {
-      entity_manager_ptr->despawnEntity(entity_name);
+      entity_manager_ptr_->despawnEntity(entity_name);
     }
   }
 }
@@ -92,12 +92,12 @@ auto TrafficSink::appendDebugMarker(visualization_msgs::msg::MarkerArray & marke
 
 auto TrafficSink::getEntityNames() const -> std::vector<std::string>
 {
-  return entity_manager_ptr->getEntityNames();
+  return entity_manager_ptr_->getEntityNames();
 }
 
 auto TrafficSink::getEntityType(const std::string & entity_name) const noexcept(false) -> EntityType
 {
-  if (const auto entity = entity_manager_ptr->getEntity(entity_name)) {
+  if (const auto entity = entity_manager_ptr_->getEntity(entity_name)) {
     return entity->getEntityType();
   } else {
     THROW_SEMANTIC_ERROR("Entity ", std::quoted(entity_name), " does not exists.");
@@ -106,7 +106,7 @@ auto TrafficSink::getEntityType(const std::string & entity_name) const noexcept(
 auto TrafficSink::getEntityPose(const std::string & entity_name) const noexcept(false)
   -> geometry_msgs::msg::Pose
 {
-  if (const auto entity = entity_manager_ptr->getEntity(entity_name)) {
+  if (const auto entity = entity_manager_ptr_->getEntity(entity_name)) {
     return entity->getMapPose();
   } else {
     THROW_SEMANTIC_ERROR("Entity ", std::quoted(entity_name), " does not exists.");
