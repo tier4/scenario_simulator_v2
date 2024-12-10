@@ -93,6 +93,7 @@ auto HdMapUtils::countLaneChanges(
   const traffic_simulator::RoutingConfiguration & routing_configuration) const
   -> std::optional<std::pair<int, int>>
 {
+  constexpr bool include_opposite_direction{false};
   const auto route = getRoute(from.lanelet_id, to.lanelet_id, routing_configuration);
   if (route.empty()) {
     return std::nullopt;
@@ -105,11 +106,13 @@ auto HdMapUtils::countLaneChanges(
       if (auto followings =
             lanelet_map::nextLaneletIds(previous, routing_configuration.routing_graph_type);
           std::find(followings.begin(), followings.end(), current) == followings.end()) {
-        if (auto lefts = pose::leftLaneletIds(previous, routing_configuration.routing_graph_type);
+        if (auto lefts = pose::leftLaneletIds(
+              previous, routing_configuration.routing_graph_type, include_opposite_direction);
             std::find(lefts.begin(), lefts.end(), current) != lefts.end()) {
           lane_changes.first++;
-        } else if (auto rights =
-                     pose::rightLaneletIds(previous, routing_configuration.routing_graph_type);
+        } else if (auto rights = pose::rightLaneletIds(
+                     previous, routing_configuration.routing_graph_type,
+                     include_opposite_direction);
                    std::find(rights.begin(), rights.end(), current) != rights.end()) {
           lane_changes.second++;
         }
@@ -1048,7 +1051,7 @@ auto HdMapUtils::getLongitudinalDistance(
   }
 }
 
-auto HdMapUtils::toMapBin() const -> autoware_auto_mapping_msgs::msg::HADMapBin
+auto HdMapUtils::toMapBin() const -> autoware_map_msgs::msg::LaneletMapBin
 {
   std::stringstream ss;
   boost::archive::binary_oarchive oa(ss);
@@ -1056,7 +1059,7 @@ auto HdMapUtils::toMapBin() const -> autoware_auto_mapping_msgs::msg::HADMapBin
   auto id_counter = lanelet::utils::getId();
   oa << id_counter;
   std::string tmp_str = ss.str();
-  autoware_auto_mapping_msgs::msg::HADMapBin msg;
+  autoware_map_msgs::msg::LaneletMapBin msg;
   msg.data.clear();
   msg.data.resize(tmp_str.size());
   msg.data.assign(tmp_str.begin(), tmp_str.end());

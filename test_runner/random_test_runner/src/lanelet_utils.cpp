@@ -50,10 +50,13 @@ LaneletUtils::LaneletUtils(const boost::filesystem::path & filename)
   traffic_simulator::lanelet_map::activate(filename.string());
 }
 
-std::vector<int64_t> LaneletUtils::getLaneletIds() { return hdmap_utils_ptr_->getLaneletIds(); }
+std::vector<int64_t> LaneletUtils::getLaneletIds() const
+{
+  return hdmap_utils_ptr_->getLaneletIds();
+}
 
 geometry_msgs::msg::PoseStamped LaneletUtils::toMapPose(
-  const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose, const bool fill_pitch)
+  const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose, const bool fill_pitch) const
 {
   return traffic_simulator::lanelet_wrapper::pose::toMapPose(lanelet_pose, fill_pitch);
 }
@@ -63,14 +66,14 @@ std::vector<int64_t> LaneletUtils::getRoute(int64_t from_lanelet_id, int64_t to_
   return hdmap_utils_ptr_->getRoute(from_lanelet_id, to_lanelet_id);
 }
 
-double LaneletUtils::getLaneletLength(int64_t lanelet_id)
+double LaneletUtils::getLaneletLength(int64_t lanelet_id) const
 {
   return traffic_simulator::lanelet_wrapper::lanelet_map::laneletLength(lanelet_id);
 }
 
 double LaneletUtils::computeDistance(
   const traffic_simulator_msgs::msg::LaneletPose & p1,
-  const traffic_simulator_msgs::msg::LaneletPose & p2)
+  const traffic_simulator_msgs::msg::LaneletPose & p2) const
 {
   auto p1_g = traffic_simulator::lanelet_wrapper::pose::toMapPose(p1).pose.position;
   auto p2_g = traffic_simulator::lanelet_wrapper::pose::toMapPose(p2).pose.position;
@@ -81,7 +84,7 @@ double LaneletUtils::computeDistance(
   return std::sqrt(d.x * d.x + d.y * d.y + d.z * d.z);
 }
 
-bool LaneletUtils::isInLanelet(int64_t lanelet_id, double s)
+bool LaneletUtils::isInLanelet(int64_t lanelet_id, double s) const
 {
   return hdmap_utils_ptr_->isInLanelet(lanelet_id, s);
 }
