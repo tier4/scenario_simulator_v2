@@ -57,7 +57,7 @@ public:
     const std::vector<std::string> & lidar_detected_entities) = 0;
 };
 
-template <typename T, typename U = autoware_auto_perception_msgs::msg::TrackedObjects>
+template <typename T, typename U = autoware_perception_msgs::msg::TrackedObjects>
 class DetectionSensor : public DetectionSensorBase
 {
   const typename rclcpp::Publisher<T>::SharedPtr detected_objects_publisher;
@@ -66,10 +66,10 @@ class DetectionSensor : public DetectionSensorBase
 
   std::default_random_engine random_engine_;
 
-  std::queue<std::pair<autoware_auto_perception_msgs::msg::DetectedObjects, double>>
+  std::queue<std::pair<autoware_perception_msgs::msg::DetectedObjects, double>>
     detected_objects_queue;
 
-  std::queue<std::pair<autoware_auto_perception_msgs::msg::TrackedObjects, double>>
+  std::queue<std::pair<autoware_perception_msgs::msg::TrackedObjects, double>>
     ground_truth_objects_queue;
 
 public:

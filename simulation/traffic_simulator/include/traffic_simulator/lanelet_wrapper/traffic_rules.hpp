@@ -68,6 +68,9 @@ protected:
       return startsWith(this->participant(), participant);
     });
   }
+
+  lanelet::traffic_rules::LaneChangeType laneChangeType(
+    const lanelet::ConstLineString3d &, bool) const override;
 };
 }  // namespace lanelet_wrapper
 }  // namespace traffic_simulator
