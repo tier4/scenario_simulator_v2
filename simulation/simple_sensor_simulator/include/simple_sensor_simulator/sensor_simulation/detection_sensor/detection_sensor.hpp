@@ -68,7 +68,6 @@ public:
 private:
   std::optional<math::geometry::Plane> ego_plane_opt_;
   std::optional<geometry_msgs::msg::Pose> ego_plane_pose_opt_;
-  auto hasEgoOrientationChanged() const -> bool;
 };
 
 template <typename T, typename U = autoware_perception_msgs::msg::TrackedObjects>

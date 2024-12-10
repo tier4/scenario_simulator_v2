@@ -89,7 +89,7 @@ auto DetectionSensorBase::isOnOrAboveEgoPlane(
              ego_pose_ros.orientation, ego_plane_pose_opt_->orientation) > rotation_threshold_;
   };
 
-  // if other entity is just above ego return true
+  // if other entity is at the same altitude as Ego or within max_downward_z_offset_ below Ego
   if (entity_pose.position().z() >= (ego_pose.position().z() - max_downward_z_offset_)) {
     return true;
     // otherwise check if other entity is above ego plane
