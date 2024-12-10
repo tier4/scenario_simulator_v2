@@ -86,13 +86,13 @@ HdMapUtils::HdMapUtils(
 
 // If route is not specified, the lanelet_id with the lowest array index is used as a candidate for
 // canonicalize destination.
-
 auto HdMapUtils::countLaneChanges(
   const traffic_simulator_msgs::msg::LaneletPose & from,
   const traffic_simulator_msgs::msg::LaneletPose & to,
   const traffic_simulator::RoutingConfiguration & routing_configuration) const
   -> std::optional<std::pair<int, int>>
 {
+  constexpr bool include_opposite_direction{false};
   const auto route = getRoute(from.lanelet_id, to.lanelet_id, routing_configuration);
   if (route.empty()) {
     return std::nullopt;
@@ -101,18 +101,18 @@ auto HdMapUtils::countLaneChanges(
     for (std::size_t i = 1; i < route.size(); ++i) {
       const auto & previous = route[i - 1];
       const auto & current = route[i];
-
-      if (auto followings =
-            lanelet_map::nextLaneletIds(previous, routing_configuration.routing_graph_type);
-          std::find(followings.begin(), followings.end(), current) == followings.end()) {
-        if (auto lefts = pose::leftLaneletIds(previous, routing_configuration.routing_graph_type);
-            std::find(lefts.begin(), lefts.end(), current) != lefts.end()) {
-          lane_changes.first++;
-        } else if (auto rights =
-                     pose::rightLaneletIds(previous, routing_configuration.routing_graph_type);
-                   std::find(rights.begin(), rights.end(), current) != rights.end()) {
-          lane_changes.second++;
-        }
+      if (const auto followings = lanelet_map::nextLaneletIds(
+            previous, routing_configuration.routing_graph_type, include_opposite_direction);
+          std::find(followings.begin(), followings.end(), current) != followings.end()) {
+        continue;
+      } else if (const auto lefts = pose::leftLaneletIds(
+                   previous, routing_configuration.routing_graph_type, include_opposite_direction);
+                 std::find(lefts.begin(), lefts.end(), current) != lefts.end()) {
+        lane_changes.first++;
+      } else if (const auto rights = pose::rightLaneletIds(
+                   previous, routing_configuration.routing_graph_type, include_opposite_direction);
+                 std::find(rights.begin(), rights.end(), current) != rights.end()) {
+        lane_changes.second++;
       }
     }
     return lane_changes;
@@ -917,7 +917,7 @@ auto HdMapUtils::canChangeLane(
   return routing_graphs_->traffic_rule(type)->canChangeLane(from_lanelet, to_lanelet);
 }
 
-auto HdMapUtils::toMapBin() const -> autoware_auto_mapping_msgs::msg::HADMapBin
+auto HdMapUtils::toMapBin() const -> autoware_map_msgs::msg::LaneletMapBin
 {
   std::stringstream ss;
   boost::archive::binary_oarchive oa(ss);
@@ -925,7 +925,7 @@ auto HdMapUtils::toMapBin() const -> autoware_auto_mapping_msgs::msg::HADMapBin
   auto id_counter = lanelet::utils::getId();
   oa << id_counter;
   std::string tmp_str = ss.str();
-  autoware_auto_mapping_msgs::msg::HADMapBin msg;
+  autoware_map_msgs::msg::LaneletMapBin msg;
   msg.data.clear();
   msg.data.resize(tmp_str.size());
   msg.data.assign(tmp_str.begin(), tmp_str.end());

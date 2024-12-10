@@ -168,7 +168,7 @@ auto ScenarioSimulator::updateEntityStatus(
         if (
           req.overwrite_ego_status() or
           ego_entity_simulation_->autoware->getControlModeReport().mode ==
-            autoware_auto_vehicle_msgs::msg::ControlModeReport::MANUAL) {
+            autoware_vehicle_msgs::msg::ControlModeReport::MANUAL) {
           ego_entity_simulation_->autoware->setManualMode();
           traffic_simulator_msgs::msg::EntityStatus ego_status_msg;
           simulation_interface::toMsg(status, ego_status_msg);

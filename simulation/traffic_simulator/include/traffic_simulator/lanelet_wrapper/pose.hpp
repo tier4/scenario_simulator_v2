@@ -81,12 +81,12 @@ auto matchToLane(
   -> std::optional<lanelet::Id>;
 
 auto leftLaneletIds(
-  const lanelet::Id lanelet_id, const RoutingGraphType type,
-  const bool include_opposite_direction = true) -> lanelet::Ids;
+  const lanelet::Id lanelet_id, const RoutingGraphType type, const bool include_opposite_direction)
+  -> lanelet::Ids;
 
 auto rightLaneletIds(
-  const lanelet::Id lanelet_id, const RoutingGraphType type,
-  const bool include_opposite_direction = true) -> lanelet::Ids;
+  const lanelet::Id lanelet_id, const RoutingGraphType type, const bool include_opposite_direction)
+  -> lanelet::Ids;
 }  // namespace pose
 }  // namespace lanelet_wrapper
 }  // namespace traffic_simulator
