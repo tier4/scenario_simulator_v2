@@ -25,11 +25,9 @@
 
 #include <memory>
 #include <string>
-#include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
 #include <traffic_simulator/traffic/traffic_controller.hpp>
 #include <traffic_simulator/traffic/traffic_sink.hpp>
-#include <traffic_simulator/traffic/traffic_source.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 #include <utility>
 #include <vector>

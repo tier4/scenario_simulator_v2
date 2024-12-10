@@ -17,7 +17,6 @@
 
 namespace traffic_simulator
 {
-
 inline namespace entity_status
 {
 

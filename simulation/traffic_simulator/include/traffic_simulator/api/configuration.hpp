@@ -23,7 +23,6 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <set>
 #include <string>
-#include <traffic_simulator/data_type/entity_status.hpp>
 
 namespace traffic_simulator
 {
