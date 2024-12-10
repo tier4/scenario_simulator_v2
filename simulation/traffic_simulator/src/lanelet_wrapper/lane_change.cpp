@@ -77,18 +77,16 @@ auto countLaneChanges(
   const RoutingConfiguration & routing_configuration) -> std::optional<std::pair<int, int>>
 {
   constexpr bool include_opposite_direction{true};
-  const auto traveled_route =
-    route::routeFromGraph(from_lanelet_id, to_lanelet_id, routing_configuration);
-  if (traveled_route.empty()) {
+  const auto route = route::routeFromGraph(from_lanelet_id, to_lanelet_id, routing_configuration);
+  if (route.empty()) {
     return std::nullopt;
   } else {
     std::pair<int, int> lane_changes{0, 0};
-    for (std::size_t i = 1; i < traveled_route.size(); ++i) {
-      const auto & previous = traveled_route[i - 1];
-      const auto & current = traveled_route[i];
-
-      if (const auto followings = lanelet_map::nextLaneletIds(
-            previous, routing_configuration.routing_graph_type, include_opposite_direction);
+    for (std::size_t i = 1; i < route.size(); ++i) {
+      const auto & previous = route[i - 1];
+      const auto & current = route[i];
+      if (const auto followings =
+            lanelet_map::nextLaneletIds(previous, routing_configuration.routing_graph_type);
           std::find(followings.begin(), followings.end(), current) != followings.end()) {
         continue;
       } else if (const auto lefts = pose::leftLaneletIds(
