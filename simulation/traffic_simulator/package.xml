@@ -36,8 +36,8 @@
   <depend>tf2_geometry_msgs</depend>
   <depend>tf2_ros</depend>
   <depend>tier4_debug_msgs</depend>
-  <depend>autoware_auto_perception_msgs</depend>
   <depend>autoware_perception_msgs</depend>
+  <depend>autoware_map_msgs</depend>
   <depend>tinyxml2_vendor</depend>
   <depend>pluginlib</depend>
   <depend>traffic_simulator_msgs</depend>
