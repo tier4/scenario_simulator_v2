@@ -29,7 +29,7 @@ auto getAngleDifference(const T & quat1, const T & quat2) -> double
   const Eigen::Quaterniond q1(quat1.w, quat1.x, quat1.y, quat1.z);
   const Eigen::Quaterniond q2(quat2.w, quat2.x, quat2.y, quat2.z);
 
-  Eigen::AngleAxisd delta(q1.inverse() * q2);
+  const Eigen::AngleAxisd delta(q1.inverse() * q2);
 
   return std::abs(delta.angle());  // [rad]
 }

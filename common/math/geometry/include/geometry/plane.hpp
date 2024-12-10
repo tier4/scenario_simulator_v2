@@ -15,7 +15,6 @@
 #ifndef GEOMETRY__PLANE_HPP_
 #define GEOMETRY__PLANE_HPP_
 
-#include <geometry/quaternion/operator.hpp>
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
 #include <optional>
@@ -24,19 +23,23 @@ namespace math
 {
 namespace geometry
 {
+
+/// @class Plane
+/// @brief Represents a plane in 3D space, defined by a normal vector and a point on the plane.
+///
+/// The plane is described using the equation:
+///     Ax + By + Cz + D = 0
+/// where:
+/// - A, B, C are the components of the normal vector (normal_ attribute).
+/// - D is the offset from the origin, calculated using the point and normal vector (d_ attribute).
 struct Plane
 {
-  geometry_msgs::msg::Vector3 normal_;
-  double d_;
-
   Plane(const geometry_msgs::msg::Point & point, const geometry_msgs::msg::Vector3 & normal);
-  auto calculateOffset(const geometry_msgs::msg::Point & point) -> double;
+  auto offset(const geometry_msgs::msg::Point & point) const -> double;
+
+  const geometry_msgs::msg::Vector3 normal_;
+  const double d_;
 };
-
-auto makePlane(const geometry_msgs::msg::Point & point, const geometry_msgs::msg::Vector3 & normal)
-  -> std::optional<Plane>;
-
 }  // namespace geometry
 }  // namespace math
-
 #endif  // GEOMETRY__PLANE_HPP_

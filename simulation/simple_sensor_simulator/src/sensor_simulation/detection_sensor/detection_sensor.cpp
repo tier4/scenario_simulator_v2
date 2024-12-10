@@ -65,52 +65,53 @@ auto DetectionSensorBase::findEgoEntityStatusToWhichThisSensorIsAttached(
 }
 
 auto DetectionSensorBase::isOnOrAboveEgoPlane(
-  const geometry_msgs::Pose & npc_pose, const geometry_msgs::Pose & ego_pose) -> bool
+  const geometry_msgs::Pose & entity_pose, const geometry_msgs::Pose & ego_pose) -> bool
 {
-  using math::geometry::getNormalVector;
-  using math::geometry::makePlane;
+  /*
+      The threshold for detecting significant changes in ego vehicle's orientation (unit: radian).
+      The value determines the minimum angular difference required to consider the ego orientation
+      as "changed".
 
-  geometry_msgs::msg::Pose entity_pose;
-  simulation_interface::toMsg(ego_pose, ego_pose_);
-  simulation_interface::toMsg(npc_pose, entity_pose);
+      There is no technical basis for this value, it was determined based on experiments.
+  */
+  constexpr static double rotation_threshold_ = 0.04;
+  /*
+      Maximum downward offset in Z-axis relative to the ego position (unit: meter).
+      If the NPC is lower than this offset relative to the ego position,
+      the NPC will be excluded from detection
 
-  if (isAltitudeDifferenceWithinThreshold(entity_pose)) {
-    return true;
-  }
+      There is no technical basis for this value, it was determined based on experiments.
+  */
+  constexpr static double max_downward_z_offset_ = 1.0;
 
-  if (needToUpdateEgoPlane()) {
-    ego_plane_ = makePlane(ego_pose_.position, getNormalVector(ego_pose_.orientation));
-    if (ego_plane_) {
-      previous_ego_pose_ = ego_pose_;
+  geometry_msgs::msg::Pose ego_pose_ros, entity_pose_ros;
+  simulation_interface::toMsg(entity_pose, entity_pose_ros);
+  simulation_interface::toMsg(ego_pose, ego_pose_ros);
+
+  const auto hasEgoOrientationChanged = [this, &entity_pose_ros]() {
+    if (previous_ego_pose_opt_) {
+      return true;
     } else {
-      return false;
+      return math::geometry::getAngleDifference(
+               entity_pose_ros.orientation, previous_ego_pose_opt_->orientation) >
+             rotation_threshold_;
     }
+  };
+
+  // update ego plane if needed
+  if (!ego_plane_opt_ || hasEgoOrientationChanged()) {
+    ego_plane_opt_.emplace(
+      entity_pose_ros.position, math::geometry::getNormalVector(entity_pose_ros.orientation));
   }
+  previous_ego_pose_opt_ = entity_pose_ros;
 
-  return ego_plane_.value().calculateOffset(entity_pose.position) >= 0.0;
-}
-
-auto DetectionSensorBase::isAltitudeDifferenceWithinThreshold(
-  const geometry_msgs::msg::Pose & entity_pose) const -> bool
-{
-  return entity_pose.position.z >= (ego_pose_.position.z - max_downward_z_offset_);
-}
-
-auto DetectionSensorBase::needToUpdateEgoPlane() const -> bool
-{
-  return !ego_plane_ || hasEgoOrientationChanged();
-}
-
-auto DetectionSensorBase::hasEgoOrientationChanged() const -> bool
-{
-  using math::geometry::getAngleDifference;
-
-  if (!previous_ego_pose_) {
+  // if other entity is just above ego return true
+  if (entity_pose_ros.position.z >= (ego_pose_ros.position.z - max_downward_z_offset_)) {
     return true;
+    // otherwise check if other entity is above ego plane
+  } else {
+    return ego_plane_opt_->offset(entity_pose_ros.position) >= 0.0;
   }
-
-  return getAngleDifference(ego_pose_.orientation, previous_ego_pose_.value().orientation) >
-         rotation_threshold_;
 }
 
 template <typename To, typename... From>

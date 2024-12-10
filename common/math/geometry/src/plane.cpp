@@ -14,35 +14,26 @@
 
 #include <cmath>
 #include <geometry/plane.hpp>
+#include <geometry/quaternion/operator.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 
 namespace math
 {
 namespace geometry
 {
-
 Plane::Plane(const geometry_msgs::msg::Point & point, const geometry_msgs::msg::Vector3 & normal)
 : normal_(normal), d_(-(normal.x * point.x + normal.y * point.y + normal.z * point.z))
 {
+  if (normal.x == 0.0 && normal.y == 0.0 && normal.z == 0.0) {
+    THROW_SIMULATION_ERROR("Plane cannot be created using zero normal vector.");
+  } else if (std::isnan(point.x) || std::isnan(point.y) || std::isnan(point.z)) {
+    THROW_SIMULATION_ERROR("Plane cannot be created using point with NaN value.");
+  }
 }
 
-auto Plane::calculateOffset(const geometry_msgs::msg::Point & point) -> double
+auto Plane::offset(const geometry_msgs::msg::Point & point) const -> double
 {
   return normal_.x * point.x + normal_.y * point.y + normal_.z * point.z + d_;
 }
-
-auto makePlane(const geometry_msgs::msg::Point & point, const geometry_msgs::msg::Vector3 & normal)
-  -> std::optional<Plane>
-{
-  if (normal.x == 0.0 && normal.y == 0.0 && normal.z == 0.0) {
-    return std::nullopt;
-  }
-
-  if (std::isnan(point.x) || std::isnan(point.y) || std::isnan(point.z)) {
-    return std::nullopt;
-  }
-
-  return Plane(point, normal);
-}
-
 }  // namespace geometry
 }  // namespace math
