@@ -32,6 +32,13 @@ Changelog for package openscenario_interpreter
 * add publish_empty_context parameter
 * Contributors: Masaya Kataoka
 
+6.3.0 (2024-12-10)
+------------------
+* Merge branch 'master' into feature/lane-change-everywhere
+* Merge remote-tracking branch 'origin/master' into feature/lane-change-everywhere
+* Merge remote-tracking branch 'origin/master' into feature/lane-change-everywhere
+* Contributors: Kotaro Yoshimoto
+
 6.2.5 (2024-12-09)
 ------------------
 * Merge branch 'master' into fix/acc_by_slope
