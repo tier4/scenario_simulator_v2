@@ -16,7 +16,7 @@
 
 #include <lanelet2_io/Io.h>
 
-#include <autoware_auto_mapping_msgs/msg/had_map_bin.hpp>
+#include <autoware_map_msgs/msg/lanelet_map_bin.hpp>
 #include <filesystem>
 
 namespace traffic_simulator
@@ -28,7 +28,7 @@ class LaneletLoader
 public:
   static auto load(const std::filesystem::path & lanelet_map_path) -> lanelet::LaneletMapPtr;
   static auto convertMapToBin(const lanelet::LaneletMapPtr lanelet_map_ptr)
-    -> autoware_auto_mapping_msgs::msg::HADMapBin;
+    -> autoware_map_msgs::msg::LaneletMapBin;
 
 private:
   static auto overwriteLaneletsCenterline(lanelet::LaneletMapPtr) -> void;
