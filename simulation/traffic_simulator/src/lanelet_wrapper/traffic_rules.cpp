@@ -23,5 +23,12 @@ namespace lanelet_wrapper
 const lanelet::traffic_rules::RegisterTrafficRules<GermanRoadShoulderPassableVehicle>
   germanRoadShoulderPassableVehicleRules(
     Locations::RoadShoulderPassableGermany, lanelet::Participants::Vehicle);
+
+lanelet::traffic_rules::LaneChangeType GermanRoadShoulderPassableVehicle::laneChangeType(
+  const lanelet::ConstLineString3d &, bool) const
+{
+  /// @note allow lane-changes everywhere even if prohibited by lanelet2 map, because lane-change settings are not for entities but only for Autoware.
+  return lanelet::traffic_rules::LaneChangeType::Both;
 }
+}  // namespace lanelet_wrapper
 }  // namespace traffic_simulator

@@ -424,10 +424,11 @@ auto leftLaneletIds(
   -> lanelet::Ids
 {
   if (include_opposite_direction) {
-    return lanelet_map::laneletIds(LaneletWrapper::routingGraph(type)->lefts(
-      LaneletWrapper::map()->laneletLayer.get(lanelet_id)));
+    throw common::Error(
+      "lanelet_wrapper::pose::leftLaneletIds with include_opposite_direction=true is not "
+      "implemented yet.");
   } else {
-    return lanelet_map::laneletIds(LaneletWrapper::routingGraph(type)->adjacentLefts(
+    return lanelet_map::laneletIds(LaneletWrapper::routingGraph(type)->lefts(
       LaneletWrapper::map()->laneletLayer.get(lanelet_id)));
   }
 }
@@ -437,10 +438,12 @@ auto rightLaneletIds(
   -> lanelet::Ids
 {
   if (include_opposite_direction) {
-    return lanelet_map::laneletIds(LaneletWrapper::routingGraph(type)->rights(
-      LaneletWrapper::map()->laneletLayer.get(lanelet_id)));
+    throw common::Error(
+      "lanelet_wrapper::pose::rightLaneletIds with include_opposite_direction=true is not "
+      "implemented "
+      "yet.");
   } else {
-    return lanelet_map::laneletIds(LaneletWrapper::routingGraph(type)->adjacentRights(
+    return lanelet_map::laneletIds(LaneletWrapper::routingGraph(type)->rights(
       LaneletWrapper::map()->laneletLayer.get(lanelet_id)));
   }
 }
