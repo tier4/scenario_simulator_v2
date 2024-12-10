@@ -140,7 +140,7 @@ private:
   auto getConflictingEntityStatusOnLane(const lanelet::Ids & route_lanelets) const
     -> std::vector<traffic_simulator::CanonicalizedEntityStatus>;
   auto isOtherEntityAtConsideredAltitude(
-    const traffic_simulator::CanonicalizedEntityStatus & other_entity_status) const -> bool;
+    const traffic_simulator::CanonicalizedEntityStatus & entity_status) const -> bool;
 };
 }  // namespace entity_behavior
 

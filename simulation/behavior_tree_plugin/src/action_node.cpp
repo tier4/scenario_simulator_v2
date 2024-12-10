@@ -327,10 +327,10 @@ auto ActionNode::getDistanceToTargetEntityPolygon(
 }
 
 auto ActionNode::isOtherEntityAtConsideredAltitude(
-  const traffic_simulator::CanonicalizedEntityStatus & other_entity_status) const -> bool
+  const traffic_simulator::CanonicalizedEntityStatus & entity_status) const -> bool
 {
   return hdmap_utils->isAltitudeMatching(
-    canonicalized_entity_status->getAltitude(), other_entity_status.getAltitude());
+    canonicalized_entity_status->getAltitude(), entity_status.getAltitude());
 }
 
 auto ActionNode::getDistanceToConflictingEntity(
