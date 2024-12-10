@@ -17,9 +17,10 @@
 
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
-#include <simulation_interface/conversions.hpp>
 #include <string>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
+#include <traffic_simulator/traffic_lights/traffic_light.hpp>
+#include <traffic_simulator/traffic_lights/traffic_lights_base.hpp>
 
 namespace traffic_simulator
 {
@@ -28,31 +29,44 @@ class TrafficLightPublisherBase
 public:
   virtual auto publish(
     const rclcpp::Time & current_ros_time,
-    const simulation_api_schema::UpdateTrafficLightsRequest & request) -> void = 0;
+    const simulation_api_schema::UpdateTrafficLightsRequest & request) const -> void = 0;
+
+  virtual ~TrafficLightPublisherBase() = default;
 };
 
-template <typename Message>
+template <typename MessageType>
 class TrafficLightPublisher : public TrafficLightPublisherBase
 {
-  const typename rclcpp::Publisher<Message>::SharedPtr traffic_light_state_array_publisher_;
-
-  const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_;
-
 public:
-  template <typename NodePointer>
+  template <typename NodeTypePointer>
   explicit TrafficLightPublisher(
-    const std::string & topic_name, const NodePointer & node,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils = nullptr)
+    const NodeTypePointer & node_ptr, const std::string & topic_name,
+    const std::string & frame = "camera_link")  // DIRTY HACK!!!
   : TrafficLightPublisherBase(),
-    traffic_light_state_array_publisher_(
-      rclcpp::create_publisher<Message>(node, topic_name, rclcpp::QoS(10).transient_local())),
-    hdmap_utils_(hdmap_utils)
+    frame_(frame),
+    traffic_light_state_array_publisher_(rclcpp::create_publisher<MessageType>(
+      node_ptr, topic_name, rclcpp::QoS(10).transient_local()))
   {
   }
 
+  ~TrafficLightPublisher() override = default;
+
+  static auto generateMessage(
+    const rclcpp::Time &, const simulation_api_schema::UpdateTrafficLightsRequest & request,
+    const std::string & frame = "") -> std::unique_ptr<MessageType>;
+
   auto publish(
     const rclcpp::Time & current_ros_time,
-    const simulation_api_schema::UpdateTrafficLightsRequest & request) -> void override;
+    const simulation_api_schema::UpdateTrafficLightsRequest & request) const -> void override
+  {
+    traffic_light_state_array_publisher_->publish(
+      generateMessage(current_ros_time, request, frame_));
+  }
+
+private:
+  const std::string frame_;
+
+  const typename rclcpp::Publisher<MessageType>::SharedPtr traffic_light_state_array_publisher_;
 };
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_PUBLISHER_HPP_

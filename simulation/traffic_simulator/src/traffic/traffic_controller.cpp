@@ -28,6 +28,7 @@
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
 #include <traffic_simulator/traffic/traffic_controller.hpp>
 #include <traffic_simulator/traffic/traffic_sink.hpp>
+#include <traffic_simulator/utils/pose.hpp>
 #include <utility>
 #include <vector>
 
@@ -57,10 +58,10 @@ void TrafficController::autoSink()
     if (hdmap_utils_->getNextLaneletIds(lanelet_id).empty()) {
       LaneletPose lanelet_pose;
       lanelet_pose.lanelet_id = lanelet_id;
-      lanelet_pose.s = hdmap_utils_->getLaneletLength(lanelet_id);
-      const auto pose = hdmap_utils_->toMapPose(lanelet_pose);
+      lanelet_pose.s = pose::laneletLength(lanelet_id, hdmap_utils_);
+      const auto pose = pose::toMapPose(lanelet_pose, hdmap_utils_);
       addModule<traffic_simulator::traffic::TrafficSink>(
-        1, pose.pose.position, get_entity_names_function, get_entity_pose_function,
+        lanelet_id, 1, pose.position, get_entity_names_function, get_entity_pose_function,
         despawn_function);
     }
   }
@@ -71,6 +72,18 @@ void TrafficController::execute(const double current_time, const double step_tim
   for (const auto & module : modules_) {
     module->execute(current_time, step_time);
   }
+}
+
+auto TrafficController::makeDebugMarker() const -> const visualization_msgs::msg::MarkerArray
+{
+  static const auto marker_array = [&]() {
+    visualization_msgs::msg::MarkerArray marker_array;
+    for (size_t i = 0; i < modules_.size(); ++i) {
+      modules_[i]->appendDebugMarker(marker_array);
+    }
+    return marker_array;
+  }();
+  return marker_array;
 }
 }  // namespace traffic
 }  // namespace traffic_simulator

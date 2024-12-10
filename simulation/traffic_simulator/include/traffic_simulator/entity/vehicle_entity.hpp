@@ -80,7 +80,9 @@ public:
 
   auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter override;
 
-  auto getEntityType() const -> const traffic_simulator_msgs::msg::EntityType & override;
+  auto getMaxAcceleration() const -> double override;
+
+  auto getMaxDeceleration() const -> double override;
 
   auto getEntityTypename() const -> const std::string & override;
 
@@ -92,7 +94,7 @@ public:
 
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
 
-  void onUpdate(double current_time, double step_time) override;
+  auto onUpdate(const double current_time, const double step_time) -> void override;
 
   void requestAcquirePosition(const CanonicalizedLaneletPose &);
 
@@ -121,10 +123,7 @@ public:
 
   void setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &) override;
 
-  void setTrafficLightManager(
-    const std::shared_ptr<traffic_simulator::TrafficLightManager> &) override;
-
-  auto fillLaneletPose(CanonicalizedEntityStatus & status) -> void override;
+  void setTrafficLights(const std::shared_ptr<traffic_simulator::TrafficLightsBase> &) override;
 
   const traffic_simulator_msgs::msg::VehicleParameters vehicle_parameters;
 

@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
-
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <cpp_mock_scenarios/catalogs.hpp>
 #include <cpp_mock_scenarios/cpp_scenario_node.hpp>
+#include <geometry/quaternion/euler_to_quaternion.hpp>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <string>
@@ -54,37 +53,29 @@ private:
       }
       unsigned int vehicle_count = 0u, pedestrian_count = 0u;
       for (const auto & name : names) {
-        const traffic_simulator::CanonicalizedEntityStatus entity_status =
-          api_.getEntityStatus(name);
+        if (const auto entity = api_.getEntity(name)) {
+          const bool valid_vehicle_lanelet =
+            api_.isInLanelet(name, static_cast<lanelet::Id>(34705), 50.0) ||
+            api_.isInLanelet(name, static_cast<lanelet::Id>(34696), 50.0);
 
-        const bool is_vehicle =
-          static_cast<traffic_simulator_msgs::msg::EntityStatus>(entity_status).type.type ==
-          traffic_simulator_msgs::msg::EntityType::VEHICLE;
-        const bool is_pedestrian =
-          static_cast<traffic_simulator_msgs::msg::EntityStatus>(entity_status).type.type ==
-          traffic_simulator_msgs::msg::EntityType::PEDESTRIAN;
+          const bool valid_pedestrian_lanelet =
+            api_.isInLanelet(name, static_cast<lanelet::Id>(34385), 10.0);
 
-        const bool valid_vehicle_lanelet =
-          api_.isInLanelet(name, static_cast<lanelet::Id>(34705), 50.0) ||
-          api_.isInLanelet(name, static_cast<lanelet::Id>(34696), 50.0);
+          if (isVehicle(name)) {
+            ++vehicle_count;
+          } else if (isPedestrian(name)) {
+            ++pedestrian_count;
+          }
 
-        const bool valid_pedestrian_lanelet =
-          api_.isInLanelet(name, static_cast<lanelet::Id>(34385), 10.0);
-
-        if (is_vehicle) {
-          ++vehicle_count;
-        } else if (is_pedestrian) {
-          ++pedestrian_count;
-        }
-
-        if (
-          // clang-format off
-          !entity_status.laneMatchingSucceed() ||
-          (is_vehicle && !valid_vehicle_lanelet) ||
-          (is_pedestrian && !valid_pedestrian_lanelet))
-        // clang-format on
-        {
-          stop(cpp_mock_scenarios::Result::FAILURE);  // LCOV_EXCL_LINE
+          if (
+            // clang-format off
+          !entity->laneMatchingSucceed() ||
+          (isVehicle(name) && !valid_vehicle_lanelet) ||
+          (isPedestrian(name) && !valid_pedestrian_lanelet))
+          // clang-format on
+          {
+            stop(cpp_mock_scenarios::Result::FAILURE);  // LCOV_EXCL_LINE
+          }
         }
       }
       if (vehicle_count != 6u || pedestrian_count != 15u) {
@@ -100,7 +91,7 @@ private:
       5.0, 2.0, 10.0,
       geometry_msgs::build<geometry_msgs::msg::Pose>()
         .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(3755.0).y(73692.5).z(0.0))
-        .orientation(quaternion_operation::convertEulerAngleToQuaternion(
+        .orientation(math::geometry::convertEulerAngleToQuaternion(
           geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0.0).y(0.0).z(0.321802))),
       // clang-format off
       {
@@ -113,7 +104,7 @@ private:
       1.0, 5.0, 3.0,
       geometry_msgs::build<geometry_msgs::msg::Pose>()
         .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(3757.0).y(73750.3).z(0.0))
-        .orientation(quaternion_operation::convertEulerAngleToQuaternion(
+        .orientation(math::geometry::convertEulerAngleToQuaternion(
           geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0.0).y(0.0).z(0.321802))),
 
       // clang-format off
@@ -124,7 +115,9 @@ private:
       false, true, true, 0);
 
     api_.spawn(
-      "ego", api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34570, 0, 0)),
+      "ego",
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(
+        34570, 0.0, 0.0, api_.getHdmapUtils()),
       getVehicleParameters());
     api_.setLinearVelocity("ego", 0.0);
     api_.requestSpeedChange("ego", 0.0, true);

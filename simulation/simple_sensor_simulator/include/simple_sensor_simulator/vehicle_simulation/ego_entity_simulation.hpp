@@ -18,6 +18,8 @@
 #include <concealer/autoware.hpp>
 #include <memory>
 #include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model.hpp>
+#include <traffic_simulator/data_type/entity_status.hpp>
+#include <traffic_simulator/data_type/lanelet_pose.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
 #include <traffic_simulator_msgs/msg/polyline_trajectory.hpp>
@@ -47,7 +49,11 @@ private:
 
   std::optional<double> previous_linear_velocity_, previous_angular_velocity_;
 
-  geometry_msgs::msg::Pose initial_pose_;
+  traffic_simulator::CanonicalizedEntityStatus status_;
+
+  const geometry_msgs::msg::Pose initial_pose_;
+
+  const Eigen::Matrix3d initial_rotation_matrix_;
 
   static auto getVehicleModelType() -> VehicleModelType;
 
@@ -56,20 +62,18 @@ private:
     const traffic_simulator_msgs::msg::VehicleParameters &)
     -> const std::shared_ptr<SimModelInterface>;
 
-  traffic_simulator_msgs::msg::EntityStatus status_;
-
   const bool consider_acceleration_by_road_slope_;
 
-  const bool consider_pose_by_road_slope_;
+  Eigen::Vector3d world_relative_position_;
 
 public:
   const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
 
   const traffic_simulator_msgs::msg::VehicleParameters vehicle_parameters;
 
-private:
-  auto calculateEgoPitch() const -> double;
+  auto calculateAccelerationBySlope() const -> double;
 
+private:
   auto getCurrentPose(const double pitch_angle) const -> geometry_msgs::msg::Pose;
 
   auto getCurrentTwist() const -> geometry_msgs::msg::Twist;
@@ -78,37 +82,31 @@ private:
 
   auto getLinearJerk(double step_time) -> double;
 
-  auto getMatchedLaneletPoseFromEntityStatus(
-    const traffic_simulator_msgs::msg::EntityStatus & status, const double entity_width) const
-    -> std::optional<traffic_simulator_msgs::msg::LaneletPose>;
-
   auto updatePreviousValues() -> void;
 
 public:
   auto setAutowareStatus() -> void;
 
   explicit EgoEntitySimulation(
+    const traffic_simulator_msgs::msg::EntityStatus &,
     const traffic_simulator_msgs::msg::VehicleParameters &, double,
     const std::shared_ptr<hdmap_utils::HdMapUtils> &, const rclcpp::Parameter & use_sim_time,
-    const bool consider_acceleration_by_road_slope, const bool consider_pose_by_road_slope);
+    const bool consider_acceleration_by_road_slope);
 
   auto overwrite(
-    const traffic_simulator_msgs::msg::EntityStatus & status, double current_scenario_time,
-    double step_time, bool npc_logic_started) -> void;
+    const traffic_simulator_msgs::msg::EntityStatus & status, const double current_time,
+    const double step_time, bool is_npc_logic_started) -> void;
 
-  auto update(double time, double step_time, bool npc_logic_started) -> void;
+  auto update(const double current_time, const double step_time, const bool is_npc_logic_started)
+    -> void;
 
   auto requestSpeedChange(double value) -> void;
 
-  auto getStatus() const -> const traffic_simulator_msgs::msg::EntityStatus &;
-
-  auto setInitialStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> void;
+  auto getStatus() const -> const traffic_simulator_msgs::msg::EntityStatus;
 
   auto setStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> void;
 
-  auto updateStatus(double time, double step_time) -> void;
-
-  auto fillLaneletDataAndSnapZToLanelet(traffic_simulator_msgs::msg::EntityStatus & status) -> void;
+  auto updateStatus(const double current_time, const double step_time) -> void;
 };
 }  // namespace vehicle_simulation
 

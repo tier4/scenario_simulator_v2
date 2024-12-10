@@ -12,10 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
-
+#include <geometry/quaternion/euler_to_quaternion.hpp>
+#include <geometry/quaternion/quaternion_to_euler.hpp>
 #include <string>
 #include <traffic_simulator/helper/helper.hpp>
+#include <traffic_simulator/utils/pose.hpp>
 
 namespace traffic_simulator
 {
@@ -49,6 +50,30 @@ LaneletPose constructLaneletPose(
   return lanelet_pose;
 }
 
+auto constructCanonicalizedLaneletPose(
+  lanelet::Id lanelet_id, double s, double offset, double roll, double pitch, double yaw,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> CanonicalizedLaneletPose
+{
+  if (
+    auto canonicalized_lanelet_pose = pose::canonicalize(
+      traffic_simulator::helper::constructLaneletPose(lanelet_id, s, offset, roll, pitch, yaw),
+      hdmap_utils_ptr)) {
+    return canonicalized_lanelet_pose.value();
+  } else {
+    THROW_SEMANTIC_ERROR(
+      "Lanelet pose (id=", lanelet_id, ",s=", s, ",offset=", offset, ",rpy.x=", roll,
+      ",rpy.y=", pitch, ",rpy.z=", yaw,
+      ") is invalid, please check lanelet length and connection.");
+  }
+}
+
+auto constructCanonicalizedLaneletPose(
+  lanelet::Id lanelet_id, double s, double offset,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> CanonicalizedLaneletPose
+{
+  return constructCanonicalizedLaneletPose(lanelet_id, s, offset, 0, 0, 0, hdmap_utils_ptr);
+}
+
 geometry_msgs::msg::Vector3 constructRPY(double roll, double pitch, double yaw)
 {
   geometry_msgs::msg::Vector3 rpy;
@@ -60,7 +85,7 @@ geometry_msgs::msg::Vector3 constructRPY(double roll, double pitch, double yaw)
 
 geometry_msgs::msg::Vector3 constructRPYfromQuaternion(geometry_msgs::msg::Quaternion quaternion)
 {
-  return quaternion_operation::convertQuaternionToEulerAngle(quaternion);
+  return math::geometry::convertQuaternionToEulerAngle(quaternion);
 }
 
 geometry_msgs::msg::Pose constructPose(
@@ -70,8 +95,7 @@ geometry_msgs::msg::Pose constructPose(
   pose.position.x = x;
   pose.position.y = y;
   pose.position.z = z;
-  pose.orientation =
-    quaternion_operation::convertEulerAngleToQuaternion(constructRPY(roll, pitch, yaw));
+  pose.orientation = math::geometry::convertEulerAngleToQuaternion(constructRPY(roll, pitch, yaw));
   return pose;
 }
 

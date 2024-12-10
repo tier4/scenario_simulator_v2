@@ -21,9 +21,10 @@
 #include <lanelet2_routing/RoutingCost.h>
 #include <lanelet2_traffic_rules/TrafficRulesFactory.h>
 
+#include <autoware_lanelet2_extension/projection/mgrs_projector.hpp>
 #include <geographic_msgs/msg/geo_point.hpp>
-#include <geometry/linear_algebra.hpp>
-#include <lanelet2_extension/projection/mgrs_projector.hpp>
+#include <geometry/vector3/normalize.hpp>
+#include <geometry/vector3/operator.hpp>
 #include <optional>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 
@@ -46,10 +47,13 @@ LaneletUtils::LaneletUtils(const boost::filesystem::path & filename)
     std::make_shared<hdmap_utils::HdMapUtils>(filename, geographic_msgs::msg::GeoPoint());
 }
 
-std::vector<int64_t> LaneletUtils::getLaneletIds() { return hdmap_utils_ptr_->getLaneletIds(); }
+std::vector<int64_t> LaneletUtils::getLaneletIds() const
+{
+  return hdmap_utils_ptr_->getLaneletIds();
+}
 
 geometry_msgs::msg::PoseStamped LaneletUtils::toMapPose(
-  const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose, const bool fill_pitch)
+  const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose, const bool fill_pitch) const
 {
   return hdmap_utils_ptr_->toMapPose(lanelet_pose, fill_pitch);
 }
@@ -59,14 +63,14 @@ std::vector<int64_t> LaneletUtils::getRoute(int64_t from_lanelet_id, int64_t to_
   return hdmap_utils_ptr_->getRoute(from_lanelet_id, to_lanelet_id);
 }
 
-double LaneletUtils::getLaneletLength(int64_t lanelet_id)
+double LaneletUtils::getLaneletLength(int64_t lanelet_id) const
 {
   return hdmap_utils_ptr_->getLaneletLength(lanelet_id);
 }
 
 double LaneletUtils::computeDistance(
   const traffic_simulator_msgs::msg::LaneletPose & p1,
-  const traffic_simulator_msgs::msg::LaneletPose & p2)
+  const traffic_simulator_msgs::msg::LaneletPose & p2) const
 {
   auto p1_g = hdmap_utils_ptr_->toMapPose(p1).pose.position;
   auto p2_g = hdmap_utils_ptr_->toMapPose(p2).pose.position;
@@ -77,7 +81,7 @@ double LaneletUtils::computeDistance(
   return std::sqrt(d.x * d.x + d.y * d.y + d.z * d.z);
 }
 
-bool LaneletUtils::isInLanelet(int64_t lanelet_id, double s)
+bool LaneletUtils::isInLanelet(int64_t lanelet_id, double s) const
 {
   return hdmap_utils_ptr_->isInLanelet(lanelet_id, s);
 }
@@ -92,6 +96,9 @@ std::optional<traffic_simulator_msgs::msg::LaneletPose> LaneletUtils::getOpposit
 
   // TODO: Multiple same-direction lane support
   // TODO: Find lane width for current s value
+
+  using math::geometry::operator*;
+  using math::geometry::operator+;
 
   if (!lanelet_map_ptr_->laneletLayer.exists(pose.lanelet_id)) {
     return {};

@@ -15,8 +15,9 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__PRIVATE_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__PRIVATE_HPP_
 
-#include <nlohmann/json.hpp>
+#include <boost/json.hpp>
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/entity.hpp>
 #include <openscenario_interpreter/syntax/private_action.hpp>
 #include <pugixml.hpp>
 
@@ -36,7 +37,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct Private : public Scope
 {
-  const String entity_ref;
+  const Entity entity_ref;
 
   std::list<PrivateAction> private_actions;
 
@@ -59,7 +60,7 @@ struct Private : public Scope
   auto startNonInstantaneousActions() -> void;
 };
 
-auto operator<<(nlohmann::json &, const Private &) -> nlohmann::json &;
+auto operator<<(boost::json::object &, const Private &) -> boost::json::object &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

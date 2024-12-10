@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
-
 #include <boost/geometry.hpp>
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
@@ -28,8 +26,8 @@ namespace geometry
 std::vector<geometry_msgs::msg::Point> get2DConvexHull(
   const std::vector<geometry_msgs::msg::Point> & points)
 {
-  typedef boost::geometry::model::d2::point_xy<double> boost_point;
-  typedef boost::geometry::model::polygon<boost_point> boost_polygon;
+  using boost_point = boost::geometry::model::d2::point_xy<double>;
+  using boost_polygon = boost::geometry::model::polygon<boost_point>;
   boost_polygon poly;
   for (const auto & p : points) {
     boost::geometry::exterior_ring(poly).push_back(boost_point(p.x, p.y));

@@ -16,7 +16,6 @@
 #define TRAFFIC_SIMULATOR__ENTITY__EGO_ENTITY_HPP_
 
 #include <algorithm>
-#include <autoware_auto_system_msgs/msg/emergency_state.hpp>
 #include <boost/filesystem.hpp>
 #include <concealer/autoware.hpp>
 #include <concealer/field_operator_application.hpp>
@@ -25,6 +24,7 @@
 #include <string>
 #include <traffic_simulator/api/configuration.hpp>
 #include <traffic_simulator/entity/vehicle_entity.hpp>
+#include <traffic_simulator/utils/node_parameters.hpp>
 #include <traffic_simulator_msgs/msg/entity_type.hpp>
 #include <vector>
 
@@ -36,7 +36,8 @@ class EgoEntity : public VehicleEntity
 {
   const std::unique_ptr<concealer::FieldOperatorApplication> field_operator_application;
 
-  static auto makeFieldOperatorApplication(const Configuration &)
+  static auto makeFieldOperatorApplication(
+    const Configuration &, const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr &)
     -> std::unique_ptr<concealer::FieldOperatorApplication>;
 
   bool is_controlled_by_simulator_{false};
@@ -50,7 +51,8 @@ public:
   explicit EgoEntity(
     const std::string & name, const CanonicalizedEntityStatus &,
     const std::shared_ptr<hdmap_utils::HdMapUtils> &,
-    const traffic_simulator_msgs::msg::VehicleParameters &, const Configuration &);
+    const traffic_simulator_msgs::msg::VehicleParameters &, const Configuration &,
+    const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr &);
 
   explicit EgoEntity(EgoEntity &&) = delete;
 
@@ -66,7 +68,7 @@ public:
 
   auto getCurrentAction() const -> std::string override;
 
-  auto getCurrentPose() const -> geometry_msgs::msg::Pose;
+  auto getCurrentPose() const -> const geometry_msgs::msg::Pose &;
 
   auto getDefaultDynamicConstraints() const
     -> const traffic_simulator_msgs::msg::DynamicConstraints & override;
@@ -75,8 +77,6 @@ public:
 
   auto getEntityStatus(const double, const double) const -> const CanonicalizedEntityStatus;
 
-  auto getEntityType() const -> const traffic_simulator_msgs::msg::EntityType & override;
-
   auto getEntityTypename() const -> const std::string & override;
 
   auto getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle> override;
@@ -84,6 +84,8 @@ public:
   auto getRouteLanelets(double horizon = 100) -> lanelet::Ids override;
 
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
+
+  auto updateFieldOperatorApplication() const -> void;
 
   void onUpdate(double current_time, double step_time) override;
 
@@ -110,6 +112,8 @@ public:
     const speed_change::RelativeTargetSpeed &, const speed_change::Transition,
     const speed_change::Constraint, const bool continuous) -> void override;
 
+  void requestClearRoute() override;
+
   auto isControlledBySimulator() const -> bool override;
 
   auto setControlledBySimulator(bool state) -> void override
@@ -129,7 +133,17 @@ public:
 
   auto setMapPose(const geometry_msgs::msg::Pose & map_pose) -> void override;
 
-  auto fillLaneletPose(CanonicalizedEntityStatus & status) -> void override;
+  template <typename... Ts>
+  auto setStatus(Ts &&... xs)
+  {
+    if (status_->getTime() > 0 && not isControlledBySimulator()) {
+      THROW_SEMANTIC_ERROR(
+        "You cannot set entity status to the ego vehicle named ", std::quoted(status_->getName()),
+        " after starting scenario.");
+    } else {
+      EntityBase::setStatus(std::forward<decltype(xs)>(xs)...);
+    }
+  }
 };
 }  // namespace entity
 }  // namespace traffic_simulator

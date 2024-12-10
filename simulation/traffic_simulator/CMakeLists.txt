@@ -20,7 +20,6 @@ find_package(traffic_simulator_msgs REQUIRED)
 find_package(Boost COMPONENTS filesystem)
 find_package(lanelet2_matching REQUIRED)
 find_package(tinyxml2_vendor REQUIRED)
-find_package(quaternion_operation REQUIRED)
 find_package(pluginlib REQUIRED)
 include(FindProtobuf REQUIRED)
 
@@ -37,6 +36,7 @@ ament_auto_add_library(traffic_simulator SHARED
   src/data_type/entity_status.cpp
   src/data_type/lane_change.cpp
   src/data_type/lanelet_pose.cpp
+  src/data_type/routing_graph_type.cpp
   src/data_type/speed_change.cpp
   src/entity/ego_entity.cpp
   src/entity/entity_base.cpp
@@ -45,18 +45,20 @@ ament_auto_add_library(traffic_simulator SHARED
   src/entity/pedestrian_entity.cpp
   src/entity/vehicle_entity.cpp
   src/hdmap_utils/hdmap_utils.cpp
+  src/hdmap_utils/traffic_rules.cpp
   src/helper/helper.cpp
-  src/job/job.cpp
   src/job/job_list.cpp
+  src/job/job.cpp
   src/simulation_clock/simulation_clock.cpp
+  src/traffic_lights/configurable_rate_updater.cpp
+  src/traffic_lights/traffic_light_marker_publisher.cpp
+  src/traffic_lights/traffic_light_publisher.cpp
+  src/traffic_lights/traffic_light.cpp
+  src/traffic_lights/traffic_lights_base.cpp
+  src/traffic_lights/traffic_lights.cpp
   src/traffic/traffic_controller.cpp
   src/traffic/traffic_sink.cpp
   src/traffic/traffic_source.cpp
-  src/traffic_lights/configurable_rate_updater.cpp
-  src/traffic_lights/traffic_light.cpp
-  src/traffic_lights/traffic_light_manager.cpp
-  src/traffic_lights/traffic_light_marker_publisher.cpp
-  src/traffic_lights/traffic_light_publisher.cpp
   src/utils/distance.cpp
   src/utils/pose.cpp
 )

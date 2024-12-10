@@ -67,7 +67,7 @@ auto Event::evaluate() -> Object
   }
 }
 
-auto operator<<(nlohmann::json & json, const Event & datum) -> nlohmann::json &
+auto operator<<(boost::json::object & json, const Event & datum) -> boost::json::object &
 {
   json["name"] = datum.name;
 
@@ -76,15 +76,15 @@ auto operator<<(nlohmann::json & json, const Event & datum) -> nlohmann::json &
   json["currentExecutionCount"] = datum.current_execution_count;
   json["maximumExecutionCount"] = datum.maximum_execution_count;
 
-  json["Action"] = nlohmann::json::array();
+  auto & actions = json["Action"].emplace_array();
 
   for (const auto & each : datum.elements) {
-    nlohmann::json action;
+    boost::json::object action(json.storage());
     action << each.as<Action>();
-    json["Action"].push_back(action);
+    actions.push_back(std::move(action));
   }
 
-  json["StartTrigger"] << datum.start_trigger;
+  json["StartTrigger"].emplace_object() << datum.start_trigger;
 
   return json;
 }

@@ -15,9 +15,12 @@
 #ifndef OPENSCENARIO_INTERPRETER__SIMULATOR_CORE_HPP_
 #define OPENSCENARIO_INTERPRETER__SIMULATOR_CORE_HPP_
 
+#include <geometry/quaternion/get_rotation_matrix.hpp>
+#include <geometry/quaternion/quaternion_to_euler.hpp>
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/syntax/boolean.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
+#include <openscenario_interpreter/syntax/entity.hpp>
 #include <openscenario_interpreter/syntax/routing_algorithm.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <openscenario_interpreter/syntax/unsigned_integer.hpp>
@@ -71,15 +74,16 @@ public:
     static auto canonicalize(const traffic_simulator::LaneletPose & non_canonicalized)
       -> NativeLanePosition
     {
-      return traffic_simulator::pose::canonicalize(non_canonicalized, core->getHdmapUtils());
+      return NativeLanePosition(non_canonicalized, core->getHdmapUtils());
     }
 
     template <typename T, typename std::enable_if_t<std::is_same_v<T, NativeLanePosition>, int> = 0>
     static auto convert(const NativeWorldPosition & pose) -> NativeLanePosition
     {
+      constexpr bool include_crosswalk{false};
       if (
-        const auto result =
-          traffic_simulator::pose::toLaneletPose(pose, false, core->getHdmapUtils())) {
+        const auto result = traffic_simulator::pose::toCanonicalizedLaneletPose(
+          pose, include_crosswalk, core->getHdmapUtils())) {
         return result.value();
       } else {
         throw Error(
@@ -147,7 +151,7 @@ public:
       -> traffic_simulator::LaneletPose
     {
       if (const auto to_entity = core->getEntity(to_entity_name)) {
-        if (const auto to_lanelet_pose = to_entity->getLaneletPose()) {
+        if (const auto to_lanelet_pose = to_entity->getCanonicalizedLaneletPose()) {
           return makeNativeRelativeLanePosition(
             from_entity_name, to_lanelet_pose.value(), routing_algorithm);
         }
@@ -161,7 +165,7 @@ public:
       -> traffic_simulator::LaneletPose
     {
       if (const auto from_entity = core->getEntity(from_entity_name)) {
-        if (const auto from_lanelet_pose = from_entity->getLaneletPose()) {
+        if (const auto from_lanelet_pose = from_entity->getCanonicalizedLaneletPose()) {
           return makeNativeRelativeLanePosition(
             from_lanelet_pose.value(), to_lanelet_pose, routing_algorithm);
         }
@@ -174,9 +178,11 @@ public:
       const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined)
       -> traffic_simulator::LaneletPose
     {
-      const bool allow_lane_change = (routing_algorithm == RoutingAlgorithm::value_type::shortest);
+      traffic_simulator::RoutingConfiguration routing_configuration;
+      routing_configuration.allow_lane_change =
+        (routing_algorithm == RoutingAlgorithm::value_type::shortest);
       return traffic_simulator::pose::relativeLaneletPose(
-        from_lanelet_pose, to_lanelet_pose, allow_lane_change, core->getHdmapUtils());
+        from_lanelet_pose, to_lanelet_pose, routing_configuration, core->getHdmapUtils());
     }
 
     static auto makeNativeBoundingBoxRelativeLanePosition(
@@ -185,8 +191,8 @@ public:
     {
       if (const auto from_entity = core->getEntity(from_entity_name)) {
         if (const auto to_entity = core->getEntity(to_entity_name)) {
-          if (const auto from_lanelet_pose = from_entity->getLaneletPose()) {
-            if (const auto to_lanelet_pose = to_entity->getLaneletPose()) {
+          if (const auto from_lanelet_pose = from_entity->getCanonicalizedLaneletPose()) {
+            if (const auto to_lanelet_pose = to_entity->getCanonicalizedLaneletPose()) {
               return makeNativeBoundingBoxRelativeLanePosition(
                 from_lanelet_pose.value(), from_entity->getBoundingBox(), to_lanelet_pose.value(),
                 to_entity->getBoundingBox(), routing_algorithm);
@@ -202,7 +208,7 @@ public:
       const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined)
     {
       if (const auto from_entity = core->getEntity(from_entity_name)) {
-        if (const auto from_lanelet_pose = from_entity->getLaneletPose()) {
+        if (const auto from_lanelet_pose = from_entity->getCanonicalizedLaneletPose()) {
           return makeNativeBoundingBoxRelativeLanePosition(
             from_lanelet_pose.value(), from_entity->getBoundingBox(), to_lanelet_pose,
             traffic_simulator_msgs::msg::BoundingBox(), routing_algorithm);
@@ -219,10 +225,12 @@ public:
       const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined)
       -> traffic_simulator::LaneletPose
     {
-      const bool allow_lane_change = (routing_algorithm == RoutingAlgorithm::value_type::shortest);
+      traffic_simulator::RoutingConfiguration routing_configuration;
+      routing_configuration.allow_lane_change =
+        (routing_algorithm == RoutingAlgorithm::value_type::shortest);
       return traffic_simulator::pose::boundingBoxRelativeLaneletPose(
-        from_lanelet_pose, from_bounding_box, to_lanelet_pose, to_bounding_box, allow_lane_change,
-        core->getHdmapUtils());
+        from_lanelet_pose, from_bounding_box, to_lanelet_pose, to_bounding_box,
+        routing_configuration, core->getHdmapUtils());
     }
 
     static auto makeNativeBoundingBoxRelativeWorldPosition(
@@ -254,15 +262,39 @@ public:
       }
       return traffic_simulator::pose::quietNaNPose();
     }
+
+    static auto evaluateLateralRelativeLanes(
+      const std::string & from_entity_name, const std::string & to_entity_name,
+      const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined) -> int
+    {
+      traffic_simulator::RoutingConfiguration routing_configuration;
+      routing_configuration.allow_lane_change =
+        (routing_algorithm == RoutingAlgorithm::value_type::shortest);
+      if (const auto from_entity = core->getEntity(from_entity_name)) {
+        if (const auto to_entity = core->getEntity(to_entity_name)) {
+          if (
+            auto lane_changes = traffic_simulator::distance::countLaneChanges(
+              from_entity->getCanonicalizedLaneletPose().value(),
+              to_entity->getCanonicalizedLaneletPose().value(), routing_configuration,
+              core->getHdmapUtils())) {
+            return lane_changes.value().first - lane_changes.value().second;
+          }
+        }
+      }
+      throw common::Error(
+        "Failed to evaluate lateral relative lanes between ", from_entity_name, " and ",
+        to_entity_name);
+    }
   };
 
   class ActionApplication  // OpenSCENARIO 1.1.1 Section 3.1.5
   {
   protected:
     template <typename... Ts>
-    static auto applyAcquirePositionAction(Ts &&... xs)
+    static auto applyAcquirePositionAction(const std::string & entity_ref, Ts &&... xs)
     {
-      return core->requestAcquirePosition(std::forward<decltype(xs)>(xs)...);
+      core->requestClearRoute(entity_ref);
+      return core->requestAcquirePosition(entity_ref, std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>
@@ -332,13 +364,52 @@ public:
       }());
 
       if (controller.isAutoware()) {
-        core->attachLidarSensor(
-          entity_ref, controller.properties.template get<Double>("pointcloudPublishingDelay"));
+        core->attachImuSensor(entity_ref, [&]() {
+          simulation_api_schema::ImuSensorConfiguration configuration;
+          configuration.set_entity(entity_ref);
+          configuration.set_frame_id("base_link");
+          configuration.set_add_gravity(true);
+          configuration.set_use_seed(true);
+          configuration.set_seed(0);
+          configuration.set_noise_standard_deviation_orientation(0.01);
+          configuration.set_noise_standard_deviation_twist(0.01);
+          configuration.set_noise_standard_deviation_acceleration(0.01);
+          return configuration;
+        }());
+
+        core->attachLidarSensor([&]() {
+          simulation_api_schema::LidarConfiguration configuration;
+
+          auto degree_to_radian = [](auto degree) {
+            return degree / 180.0 * boost::math::constants::pi<double>();
+          };
+
+          // clang-format off
+          configuration.set_architecture_type(core->getROS2Parameter<std::string>("architecture_type", "awf/universe/20240605"));
+          configuration.set_entity(entity_ref);
+          configuration.set_horizontal_resolution(degree_to_radian(controller.properties.template get<Double>("pointcloudHorizontalResolution", 1.0)));
+          configuration.set_lidar_sensor_delay(controller.properties.template get<Double>("pointcloudPublishingDelay"));
+          configuration.set_scan_duration(0.1);
+          // clang-format on
+
+          const auto vertical_field_of_view = degree_to_radian(
+            controller.properties.template get<Double>("pointcloudVerticalFieldOfView", 30.0));
+
+          const auto channels =
+            controller.properties.template get<UnsignedInteger>("pointcloudChannels", 16);
+
+          for (std::size_t i = 0; i < channels; ++i) {
+            configuration.add_vertical_angles(
+              vertical_field_of_view / 2 - vertical_field_of_view / channels * i);
+          }
+
+          return configuration;
+        }());
 
         core->attachDetectionSensor([&]() {
           simulation_api_schema::DetectionSensorConfiguration configuration;
           // clang-format off
-          configuration.set_architecture_type(getParameter<std::string>("architecture_type", "awf/universe"));
+          configuration.set_architecture_type(core->getROS2Parameter<std::string>("architecture_type", "awf/universe/20240605"));
           configuration.set_entity(entity_ref);
           configuration.set_detect_all_objects_in_range(controller.properties.template get<Boolean>("isClairvoyant"));
           configuration.set_object_recognition_delay(controller.properties.template get<Double>("detectedObjectPublishingDelay"));
@@ -355,7 +426,7 @@ public:
         core->attachOccupancyGridSensor([&]() {
           simulation_api_schema::OccupancyGridSensorConfiguration configuration;
           // clang-format off
-          configuration.set_architecture_type(getParameter<std::string>("architecture_type", "awf/universe"));
+          configuration.set_architecture_type(core->getROS2Parameter<std::string>("architecture_type", "awf/universe/20240605"));
           configuration.set_entity(entity_ref);
           configuration.set_filter_by_range(controller.properties.template get<Boolean>("isClairvoyant"));
           configuration.set_height(200);
@@ -370,7 +441,7 @@ public:
         core->attachPseudoTrafficLightDetector([&]() {
           simulation_api_schema::PseudoTrafficLightDetectorConfiguration configuration;
           configuration.set_architecture_type(
-            getParameter<std::string>("architecture_type", "awf/universe"));
+            core->getROS2Parameter<std::string>("architecture_type", "awf/universe/20240605"));
           return configuration;
         }());
 
@@ -410,9 +481,10 @@ public:
     }
 
     template <typename... Ts>
-    static auto applyAssignRouteAction(Ts &&... xs)
+    static auto applyAssignRouteAction(const std::string & entity_ref, Ts &&... xs)
     {
-      return core->requestAssignRoute(std::forward<decltype(xs)>(xs)...);
+      core->requestClearRoute(entity_ref);
+      return core->requestAssignRoute(entity_ref, std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>
@@ -468,7 +540,6 @@ public:
       return core->checkCollision(std::forward<decltype(xs)>(xs)...);
     }
 
-    template <typename... Ts>
     static auto evaluateBoundingBoxEuclideanDistance(
       const std::string & from_entity_name,
       const std::string & to_entity_name)  // for RelativeDistanceCondition
@@ -486,6 +557,34 @@ public:
       return std::numeric_limits<double>::quiet_NaN();
     }
 
+    static auto evaluateRelativeSpeed(const Entity & from, const Entity & to) -> Eigen::Vector3d
+    {
+      if (const auto observer = core->getEntity(from.name())) {
+        if (const auto observed = core->getEntity(to.name())) {
+          auto velocity = [](const auto & entity) -> Eigen::Vector3d {
+            auto direction = [](auto orientation) -> Eigen::Vector3d {
+              const auto euler_angle = math::geometry::convertQuaternionToEulerAngle(orientation);
+              const auto r = euler_angle.x;
+              const auto p = euler_angle.y;
+              const auto y = euler_angle.z;
+              return Eigen::Vector3d(
+                std::cos(y) * std::cos(p), std::sin(y) * std::cos(p), std::sin(p));
+            };
+
+            return direction(entity->getMapPose().orientation) * entity->getCurrentTwist().linear.x;
+          };
+
+          const Eigen::Matrix3d rotation =
+            math::geometry::getRotationMatrix(observer->getMapPose().orientation);
+
+          return rotation.transpose() * velocity(observed) -
+                 rotation.transpose() * velocity(observer);
+        }
+      }
+
+      return Eigen::Vector3d(Double::nan(), Double::nan(), Double::nan());
+    }
+
     template <typename... Ts>
     static auto evaluateSimulationTime(Ts &&... xs) -> double
     {
@@ -499,7 +598,16 @@ public:
     template <typename... Ts>
     static auto evaluateSpeed(Ts &&... xs)
     {
-      return core->getCurrentTwist(std::forward<decltype(xs)>(xs)...).linear.x;
+      /*
+         The function name "evaluateSpeed" stands for "evaluate SpeedCondition"
+         and is a part used to implement `SpeedCondition::evaluate`.
+         SpeedCondition can be evaluated in three directions: longitudinal,
+         lateral, and vertical, based on the attribute direction. Therefore,
+         please note that this function returns velocity, that is, a vector,
+         rather than speed, contrary to the name "evaluateSpeed".
+      */
+      const auto linear = core->getCurrentTwist(std::forward<decltype(xs)>(xs)...).linear;
+      return Eigen::Vector3d(linear.x, linear.y, linear.z);
     }
 
     template <typename... Ts>
@@ -562,8 +670,7 @@ public:
           const auto relative_pose =
             traffic_simulator::pose::relativePose(from_map_pose, to_map_pose)) {
           return static_cast<Double>(std::abs(
-            quaternion_operation::convertQuaternionToEulerAngle(relative_pose.value().orientation)
-              .z));
+            math::geometry::convertQuaternionToEulerAngle(relative_pose.value().orientation).z));
         }
       }
       return Double::nan();
@@ -572,36 +679,13 @@ public:
     template <typename EntityRef>
     static auto evaluateRelativeHeading(const EntityRef & entity_ref)
     {
-      if (auto lanelet_pose = core->getLaneletPose(entity_ref)) {
-        return static_cast<Double>(
-          std::abs(static_cast<traffic_simulator::LaneletPose>(lanelet_pose.value()).rpy.z));
-      } else {
-        return Double::nan();
+      if (const auto entity = core->getEntity(entity_ref)) {
+        if (const auto canonicalized_lanelet_pose = entity->getCanonicalizedLaneletPose()) {
+          return static_cast<Double>(std::abs(
+            static_cast<traffic_simulator::LaneletPose>(canonicalized_lanelet_pose.value()).rpy.z));
+        }
       }
-    }
-
-    template <typename... Ts>
-    static auto getConventionalTrafficLights(Ts &&... xs) -> decltype(auto)
-    {
-      return core->getConventionalTrafficLights(std::forward<decltype(xs)>(xs)...);
-    }
-
-    template <typename... Ts>
-    static auto getV2ITrafficLights(Ts &&... xs) -> decltype(auto)
-    {
-      return core->getV2ITrafficLights(std::forward<decltype(xs)>(xs)...);
-    }
-
-    template <typename... Ts>
-    static auto resetConventionalTrafficLightPublishRate(Ts &&... xs) -> decltype(auto)
-    {
-      return core->resetConventionalTrafficLightPublishRate(std::forward<decltype(xs)>(xs)...);
-    }
-
-    template <typename... Ts>
-    static auto resetV2ITrafficLightPublishRate(Ts &&... xs) -> decltype(auto)
-    {
-      return core->resetV2ITrafficLightPublishRate(std::forward<decltype(xs)>(xs)...);
+      return Double::nan();
     }
 
     template <typename... Ts>
@@ -611,10 +695,51 @@ public:
         .sendCooperateCommand(std::forward<decltype(xs)>(xs)...);
     }
 
+    // TrafficLights - Conventional and V2I
+    template <typename... Ts>
+    static auto setConventionalTrafficLightsState(Ts &&... xs) -> decltype(auto)
+    {
+      return core->getConventionalTrafficLights()->setTrafficLightsState(
+        std::forward<decltype(xs)>(xs)...);
+    }
+
     template <typename... Ts>
     static auto setConventionalTrafficLightConfidence(Ts &&... xs) -> decltype(auto)
     {
-      return core->setConventionalTrafficLightConfidence(std::forward<decltype(xs)>(xs)...);
+      return core->getConventionalTrafficLights()->setTrafficLightsConfidence(
+        std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto getConventionalTrafficLightsComposedState(Ts &&... xs) -> decltype(auto)
+    {
+      return core->getConventionalTrafficLights()->getTrafficLightsComposedState(
+        std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto compareConventionalTrafficLightsState(Ts &&... xs) -> decltype(auto)
+    {
+      return core->getConventionalTrafficLights()->compareTrafficLightsState(
+        std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto resetConventionalTrafficLightPublishRate(Ts &&... xs) -> decltype(auto)
+    {
+      return core->getConventionalTrafficLights()->resetUpdate(std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto setV2ITrafficLightsState(Ts &&... xs) -> decltype(auto)
+    {
+      return core->getV2ITrafficLights()->setTrafficLightsState(std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto resetV2ITrafficLightPublishRate(Ts &&... xs) -> decltype(auto)
+    {
+      return core->getV2ITrafficLights()->resetUpdate(std::forward<decltype(xs)>(xs)...);
     }
   };
 };
