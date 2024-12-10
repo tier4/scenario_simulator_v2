@@ -48,12 +48,10 @@ public:
   auto getDistanceToConflictingEntity(
     const lanelet::Ids & route_lanelets,
     const math::geometry::CatmullRomSplineInterface & spline) const -> std::optional<double>;
-  auto getFrontEntityName(const math::geometry::CatmullRomSplineInterface & spline) const
-    -> std::optional<std::string>;
+  auto getFrontEntityName() const -> std::optional<std::string>;
   auto calculateStopDistance(const traffic_simulator_msgs::msg::DynamicConstraints &) const
     -> double;
-  auto getDistanceToFrontEntity(const math::geometry::CatmullRomSplineInterface & spline) const
-    -> std::optional<double>;
+  auto getDistanceToFrontEntity() const -> std::optional<double>;
   auto getDistanceToStopLine(
     const lanelet::Ids & route_lanelets,
     const std::vector<geometry_msgs::msg::Point> & waypoints) const -> std::optional<double>;
@@ -98,10 +96,7 @@ public:
   virtual auto getBlackBoardValues() -> void;
   auto getEntityStatus(const std::string & target_name) const
     -> const traffic_simulator::CanonicalizedEntityStatus &;
-  auto getDistanceToTargetEntityPolygon(
-    const math::geometry::CatmullRomSplineInterface & spline, const std::string target_name,
-    double width_extension_right = 0.0, double width_extension_left = 0.0,
-    double length_extension_front = 0.0, double length_extension_rear = 0.0) const
+  auto getDistanceToTargetEntityPolygon(const std::string target_name) const
     -> std::optional<double>;
 
   auto setCanonicalizedEntityStatus(const traffic_simulator::EntityStatus & entity_status) -> void;
@@ -129,10 +124,7 @@ private:
     const math::geometry::CatmullRomSplineInterface & spline,
     const traffic_simulator::CanonicalizedEntityStatus & status) const -> std::optional<double>;
   auto getDistanceToTargetEntityPolygon(
-    const math::geometry::CatmullRomSplineInterface & spline,
-    const traffic_simulator::CanonicalizedEntityStatus & status, double width_extension_right = 0.0,
-    double width_extension_left = 0.0, double length_extension_front = 0.0,
-    double length_extension_rear = 0.0) const -> std::optional<double>;
+    const traffic_simulator::CanonicalizedEntityStatus & status) const -> std::optional<double>;
   auto getConflictingEntityStatus(const lanelet::Ids & following_lanelets) const
     -> std::optional<traffic_simulator::CanonicalizedEntityStatus>;
   auto getConflictingEntityStatusOnCrossWalk(const lanelet::Ids & route_lanelets) const

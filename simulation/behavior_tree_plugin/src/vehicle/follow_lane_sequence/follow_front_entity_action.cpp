@@ -92,12 +92,11 @@ BT::NodeStatus FollowFrontEntityAction::tick()
   }
   auto distance_to_stopline = hdmap_utils->getDistanceToStopLine(route_lanelets, *trajectory);
   auto distance_to_conflicting_entity = getDistanceToConflictingEntity(route_lanelets, *trajectory);
-  const auto front_entity_name = getFrontEntityName(*trajectory);
+  const auto front_entity_name = getFrontEntityName();
   if (!front_entity_name) {
     return BT::NodeStatus::FAILURE;
   }
-  distance_to_front_entity_ =
-    getDistanceToTargetEntityPolygon(*trajectory, front_entity_name.value());
+  distance_to_front_entity_ = getDistanceToTargetEntityPolygon(front_entity_name.value());
   if (!distance_to_front_entity_) {
     return BT::NodeStatus::FAILURE;
   }
