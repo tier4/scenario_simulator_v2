@@ -25,6 +25,7 @@
 #include <optional>
 #include <rclcpp/rclcpp.hpp>
 #include <rosgraph_msgs/msg/clock.hpp>
+#include <set>
 #include <simulation_interface/conversions.hpp>
 #include <simulation_interface/zmq_multi_client.hpp>
 #include <std_msgs/msg/float64.hpp>
@@ -40,6 +41,7 @@
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/simulation_clock/simulation_clock.hpp>
 #include <traffic_simulator/traffic/traffic_controller.hpp>
+#include <traffic_simulator/traffic/traffic_source.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light.hpp>
 #include <traffic_simulator/traffic_lights/traffic_lights.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
@@ -74,15 +76,7 @@ public:
       node, entity_manager_ptr_->getHdmapUtils(),
       getROS2Parameter<std::string>("architecture_type", "awf/universe"))),
     traffic_controller_ptr_(std::make_shared<traffic::TrafficController>(
-      entity_manager_ptr_->getHdmapUtils(), [this]() { return API::getEntityNames(); },
-      [this](const auto & entity_name) {
-        if (const auto entity = getEntity(entity_name)) {
-          return entity->getMapPose();
-        } else {
-          THROW_SEMANTIC_ERROR("Entity ", std::quoted(entity_name), " does not exists.");
-        }
-      },
-      [this](const auto & name) { return API::despawn(name); }, configuration.auto_sink)),
+      entity_manager_ptr_, configuration.auto_sink_entity_types)),
     clock_pub_(rclcpp::create_publisher<rosgraph_msgs::msg::Clock>(
       node, "/clock", rclcpp::QoS(rclcpp::KeepLast(1)).best_effort(),
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),

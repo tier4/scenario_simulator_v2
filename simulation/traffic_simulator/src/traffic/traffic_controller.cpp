@@ -25,9 +25,11 @@
 
 #include <memory>
 #include <string>
+#include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
 #include <traffic_simulator/traffic/traffic_controller.hpp>
 #include <traffic_simulator/traffic/traffic_sink.hpp>
+#include <traffic_simulator/traffic/traffic_source.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 #include <utility>
 #include <vector>
@@ -37,32 +39,28 @@ namespace traffic_simulator
 namespace traffic
 {
 TrafficController::TrafficController(
-  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils,
-  const std::function<std::vector<std::string>(void)> & get_entity_names_function,
-  const std::function<geometry_msgs::msg::Pose(const std::string &)> & get_entity_pose_function,
-  const std::function<void(std::string)> & despawn_function, bool auto_sink)
-: hdmap_utils_(hdmap_utils),
-  get_entity_names_function(get_entity_names_function),
-  get_entity_pose_function(get_entity_pose_function),
-  despawn_function(despawn_function),
-  auto_sink(auto_sink)
+  const std::shared_ptr<entity::EntityManager> entity_manager_ptr,
+  const std::set<std::uint8_t> auto_sink_entity_types)
+: entity_manager_ptr(entity_manager_ptr), modules_()
 {
-  if (auto_sink) {
-    autoSink();
+  if (not auto_sink_entity_types.empty()) {
+    generateAutoSinks(auto_sink_entity_types);
   }
 }
 
-void TrafficController::autoSink()
+void TrafficController::generateAutoSinks(const std::set<std::uint8_t> & auto_sink_entity_types)
 {
-  for (const auto & lanelet_id : hdmap_utils_->getLaneletIds()) {
-    if (hdmap_utils_->getNextLaneletIds(lanelet_id).empty()) {
+  const auto hdmap_utils_ptr = entity_manager_ptr->getHdmapUtils();
+  for (const auto & lanelet_id : hdmap_utils_ptr->getLaneletIds()) {
+    if (hdmap_utils_ptr->getNextLaneletIds(lanelet_id).empty()) {
       LaneletPose lanelet_pose;
       lanelet_pose.lanelet_id = lanelet_id;
-      lanelet_pose.s = pose::laneletLength(lanelet_id, hdmap_utils_);
-      const auto pose = pose::toMapPose(lanelet_pose, hdmap_utils_);
-      addModule<traffic_simulator::traffic::TrafficSink>(
-        lanelet_id, 1, pose.position, get_entity_names_function, get_entity_pose_function,
-        despawn_function);
+      lanelet_pose.s = pose::laneletLength(lanelet_id, hdmap_utils_ptr);
+      const auto pose = pose::toMapPose(lanelet_pose, hdmap_utils_ptr);
+      static constexpr double sink_radius = 1.0;
+      const auto traffic_sink_config = TrafficSinkConfig(
+        sink_radius, pose.position, auto_sink_entity_types, std::make_optional(lanelet_id));
+      addModule<TrafficSink>(entity_manager_ptr, traffic_sink_config);
     }
   }
 }
@@ -78,7 +76,7 @@ auto TrafficController::makeDebugMarker() const -> const visualization_msgs::msg
 {
   static const auto marker_array = [&]() {
     visualization_msgs::msg::MarkerArray marker_array;
-    for (size_t i = 0; i < modules_.size(); ++i) {
+    for (size_t i = 0UL; i < modules_.size(); ++i) {
       modules_[i]->appendDebugMarker(marker_array);
     }
     return marker_array;

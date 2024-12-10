@@ -30,7 +30,7 @@ public:
   explicit StopAtCrosswalkScenario(const rclcpp::NodeOptions & option)
   : cpp_mock_scenarios::CppScenarioNode(
       "stop_at_crosswalk", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
-      "lanelet2_map.osm", __FILE__, false, option)
+      "lanelet2_map.osm", __FILE__, false, option, {traffic_simulator::EntityType::PEDESTRIAN})
   {
     start();
   }

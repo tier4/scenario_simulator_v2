@@ -27,10 +27,11 @@
 #define TRAFFIC_SIMULATOR__TRAFFIC__TRAFFIC_CONTROLLER_HPP_
 
 #include <memory>
+#include <set>
 #include <string>
+#include <traffic_simulator/entity/entity_manager.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/traffic/traffic_module_base.hpp>
-#include <traffic_simulator/traffic/traffic_source.hpp>
 #include <utility>
 #include <vector>
 
@@ -42,10 +43,8 @@ class TrafficController
 {
 public:
   explicit TrafficController(
-    std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils,
-    const std::function<std::vector<std::string>(void)> & get_entity_names_function,
-    const std::function<geometry_msgs::msg::Pose(const std::string &)> & get_entity_pose_function,
-    const std::function<void(std::string)> & despawn_function, bool auto_sink = false);
+    const std::shared_ptr<entity::EntityManager> entity_manager_ptr,
+    const std::set<std::uint8_t> auto_sink_entity_types /*= {}*/);
 
   template <typename T, typename... Ts>
   void addModule(Ts &&... xs)
@@ -57,15 +56,9 @@ public:
   auto makeDebugMarker() const -> const visualization_msgs::msg::MarkerArray;
 
 private:
-  void autoSink();
-  const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_;
-  std::vector<std::shared_ptr<traffic_simulator::traffic::TrafficModuleBase>> modules_;
-  const std::function<std::vector<std::string>(void)> get_entity_names_function;
-  const std::function<geometry_msgs::msg::Pose(const std::string &)> get_entity_pose_function;
-  const std::function<void(const std::string &)> despawn_function;
-
-public:
-  const bool auto_sink;
+  void generateAutoSinks(const std::set<std::uint8_t> & auto_sink_entity_types);
+  const std::shared_ptr<entity::EntityManager> entity_manager_ptr;
+  std::vector<std::shared_ptr<TrafficModuleBase>> modules_;
 };
 }  // namespace traffic
 }  // namespace traffic_simulator

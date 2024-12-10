@@ -26,9 +26,11 @@
 #include <color_names/color_names.hpp>
 #include <functional>
 #include <geometry/distance.hpp>
+#include <geometry/vector3/hypot.hpp>
 #include <geometry_msgs/msg/quaternion.hpp>
 #include <iostream>
 #include <memory>
+#include <set>
 #include <string>
 #include <traffic_simulator/traffic/traffic_sink.hpp>
 #include <vector>
@@ -38,28 +40,23 @@ namespace traffic_simulator
 namespace traffic
 {
 TrafficSink::TrafficSink(
-  lanelet::Id lanelet_id, double radius, const geometry_msgs::msg::Point & position,
-  const std::function<std::vector<std::string>(void)> & get_entity_names_function,
-  const std::function<geometry_msgs::msg::Pose(const std::string &)> & get_entity_pose_function,
-  const std::function<void(std::string)> & despawn_function)
-: TrafficModuleBase(),
-  lanelet_id(lanelet_id),
-  radius(radius),
-  position(position),
-  get_entity_names_function(get_entity_names_function),
-  get_entity_pose_function(get_entity_pose_function),
-  despawn_function(despawn_function)
+  const std::shared_ptr<entity::EntityManager> entity_manager_ptr, const TrafficSinkConfig & config)
+: TrafficModuleBase(), config(config), entity_manager_ptr(entity_manager_ptr)
 {
 }
 
 void TrafficSink::execute(
   [[maybe_unused]] const double current_time, [[maybe_unused]] const double step_time)
 {
-  const auto names = get_entity_names_function();
-  for (const auto & name : names) {
-    const auto pose = get_entity_pose_function(name);
-    if (math::geometry::getDistance(position, pose) <= radius) {
-      despawn_function(name);
+  const auto entity_names = getEntityNames();
+  for (const auto & entity_name : entity_names) {
+    const bool is_in_sinkable_radius =
+      math::geometry::getDistance(config.position, getEntityPose(entity_name)) <= config.radius;
+    const bool has_sinkable_entity_type =
+      config.sinkable_entity_types.find(getEntityType(entity_name).type) !=
+      config.sinkable_entity_types.end();
+    if (has_sinkable_entity_type and is_in_sinkable_radius) {
+      entity_manager_ptr->despawnEntity(entity_name);
     }
   }
 }
@@ -67,19 +64,19 @@ void TrafficSink::execute(
 auto TrafficSink::appendDebugMarker(visualization_msgs::msg::MarkerArray & marker_array) const
   -> void
 {
-  const auto lanelet_text = std::to_string(lanelet_id);
   visualization_msgs::msg::Marker traffic_sink_marker;
   traffic_sink_marker.header.frame_id = "map";
-  traffic_sink_marker.ns = "traffic_controller/traffic_sink/" + lanelet_text;
+  traffic_sink_marker.ns = "traffic_controller/traffic_sink/" + config.description;
   traffic_sink_marker.id = 0;
   traffic_sink_marker.action = traffic_sink_marker.ADD;
   traffic_sink_marker.type = 3;  // cylinder
   traffic_sink_marker.pose =
-    geometry_msgs::build<geometry_msgs::msg::Pose>().position(position).orientation(
-      geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0).y(0).z(0).w(1));
+    geometry_msgs::build<geometry_msgs::msg::Pose>()
+      .position(config.position)
+      .orientation(geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0).y(0).z(0).w(1));
   traffic_sink_marker.color = color_names::makeColorMsg("firebrick", 0.99);
-  traffic_sink_marker.scale.x = radius * 2;
-  traffic_sink_marker.scale.y = radius * 2;
+  traffic_sink_marker.scale.x = config.radius * 2.0;
+  traffic_sink_marker.scale.y = config.radius * 2.0;
   traffic_sink_marker.scale.z = 1.0;
   marker_array.markers.emplace_back(traffic_sink_marker);
 
@@ -87,10 +84,33 @@ auto TrafficSink::appendDebugMarker(visualization_msgs::msg::MarkerArray & marke
   text_marker = traffic_sink_marker;
   text_marker.id = 1;
   text_marker.type = 9;  //text
-  text_marker.text = lanelet_text;
+  text_marker.text = config.description;
   text_marker.color = color_names::makeColorMsg("white", 0.99);
   text_marker.scale.z = 0.6;
   marker_array.markers.emplace_back(text_marker);
+}
+
+auto TrafficSink::getEntityNames() const -> std::vector<std::string>
+{
+  return entity_manager_ptr->getEntityNames();
+}
+
+auto TrafficSink::getEntityType(const std::string & entity_name) const noexcept(false) -> EntityType
+{
+  if (const auto entity = entity_manager_ptr->getEntity(entity_name)) {
+    return entity->getEntityType();
+  } else {
+    THROW_SEMANTIC_ERROR("Entity ", std::quoted(entity_name), " does not exists.");
+  }
+}
+auto TrafficSink::getEntityPose(const std::string & entity_name) const noexcept(false)
+  -> geometry_msgs::msg::Pose
+{
+  if (const auto entity = entity_manager_ptr->getEntity(entity_name)) {
+    return entity->getMapPose();
+  } else {
+    THROW_SEMANTIC_ERROR("Entity ", std::quoted(entity_name), " does not exists.");
+  }
 }
 }  // namespace traffic
 }  // namespace traffic_simulator
