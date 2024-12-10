@@ -25,7 +25,7 @@ Plane::Plane(const geometry_msgs::msg::Point & point, const geometry_msgs::msg::
 {
 }
 
-auto Plane::calculateOffset(const geometry_msgs::msg::Point & point) -> double
+auto Plane::calculateOffset(const geometry_msgs::msg::Point & point) const -> double
 {
   return normal_.x * point.x + normal_.y * point.y + normal_.z * point.z + d_;
 }

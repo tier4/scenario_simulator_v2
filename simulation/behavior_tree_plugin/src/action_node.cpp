@@ -327,11 +327,11 @@ auto ActionNode::getDistanceToTargetEntityPolygon(
 }
 
 auto ActionNode::isEntityAltitudeCompatible(
-  const traffic_simulator::CanonicalizedEntityStatus & other_entity_status) const -> bool
+  const traffic_simulator::CanonicalizedEntityStatus & entity_status) const -> bool
 {
   return hdmap_utils->isAltitudeMatching(
     hdmap_utils->getAltitude(canonicalized_entity_status->getLaneletPose()),
-    hdmap_utils->getAltitude(other_entity_status.getLaneletPose()));
+    hdmap_utils->getAltitude(entity_status.getLaneletPose()));
 }
 
 auto ActionNode::getDistanceToConflictingEntity(

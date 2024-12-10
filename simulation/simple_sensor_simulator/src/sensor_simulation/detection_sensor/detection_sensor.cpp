@@ -74,7 +74,7 @@ auto DetectionSensorBase::isOnOrAboveEgoPlane(
   simulation_interface::toMsg(ego_pose, ego_pose_);
   simulation_interface::toMsg(npc_pose, entity_pose);
 
-  if (isAltitudeDifferenceWithinThreshold(entity_pose)) {
+  if (isEntityAltitudeAcceptable(entity_pose)) {
     return true;
   }
 
@@ -90,7 +90,7 @@ auto DetectionSensorBase::isOnOrAboveEgoPlane(
   return ego_plane_.value().calculateOffset(entity_pose.position) >= 0.0;
 }
 
-auto DetectionSensorBase::isAltitudeDifferenceWithinThreshold(
+auto DetectionSensorBase::isEntityAltitudeAcceptable(
   const geometry_msgs::msg::Pose & entity_pose) const -> bool
 {
   return entity_pose.position.z >= (ego_pose_.position.z - max_downward_z_offset_);

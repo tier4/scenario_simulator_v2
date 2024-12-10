@@ -40,11 +40,7 @@ protected:
   explicit DetectionSensorBase(
     const double current_simulation_time,
     const simulation_api_schema::DetectionSensorConfiguration & configuration)
-  : previous_simulation_time_(current_simulation_time),
-    configuration_(configuration),
-    ego_pose_(),
-    previous_ego_pose_(std::nullopt),
-    ego_plane_(std::nullopt)
+  : previous_simulation_time_(current_simulation_time), configuration_(configuration)
   {
   }
 
@@ -86,11 +82,10 @@ private:
   constexpr static double max_downward_z_offset_ = 1.0;
 
   geometry_msgs::msg::Pose ego_pose_;
-  std::optional<geometry_msgs::msg::Pose> previous_ego_pose_;
-  std::optional<math::geometry::Plane> ego_plane_;
+  std::optional<geometry_msgs::msg::Pose> previous_ego_pose_{std::nullopt};
+  std::optional<math::geometry::Plane> ego_plane_{std::nullopt};
 
-  auto isAltitudeDifferenceWithinThreshold(const geometry_msgs::msg::Pose & entity_pose) const
-    -> bool;
+  auto isEntityAltitudeAcceptable(const geometry_msgs::msg::Pose & entity_pose) const -> bool;
   auto needToUpdateEgoPlane() const -> bool;
   auto hasEgoOrientationChanged() const -> bool;
 };

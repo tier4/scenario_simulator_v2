@@ -30,7 +30,7 @@ struct Plane
   double d_;
 
   Plane(const geometry_msgs::msg::Point & point, const geometry_msgs::msg::Vector3 & normal);
-  auto calculateOffset(const geometry_msgs::msg::Point & point) -> double;
+  auto calculateOffset(const geometry_msgs::msg::Point & point) const -> double;
 };
 
 auto makePlane(const geometry_msgs::msg::Point & point, const geometry_msgs::msg::Vector3 & normal)
