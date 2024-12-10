@@ -76,7 +76,7 @@ auto countLaneChanges(
   const lanelet::Id & from_lanelet_id, const lanelet::Id & to_lanelet_id,
   const RoutingConfiguration & routing_configuration) -> std::optional<std::pair<int, int>>
 {
-  constexpr bool include_opposite_direction{true};
+  constexpr bool include_opposite_direction{false};
   const auto route = route::routeFromGraph(from_lanelet_id, to_lanelet_id, routing_configuration);
   if (route.empty()) {
     return std::nullopt;
