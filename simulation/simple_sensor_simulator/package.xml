@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="3">
   <name>simple_sensor_simulator</name>
-  <version>6.2.2</version>
+  <version>7.0.0</version>
   <description>simple_sensor_simulator package</description>
 
   <maintainer email="masaya.kataoka@tier4.jp">masaya kataoka</maintainer>
@@ -35,7 +35,6 @@
   <exec_depend>tf2_ros</exec_depend>
   <exec_depend>tf2</exec_depend>
 
-  <depend>autoware_auto_perception_msgs</depend>
   <depend>autoware_perception_msgs</depend>
   <depend>boost</depend>
   <depend>eigen</depend>
