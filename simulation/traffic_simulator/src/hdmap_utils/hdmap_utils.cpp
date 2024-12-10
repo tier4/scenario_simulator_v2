@@ -101,8 +101,8 @@ auto HdMapUtils::countLaneChanges(
     for (std::size_t i = 1; i < route.size(); ++i) {
       const auto & previous = route[i - 1];
       const auto & current = route[i];
-      if (const auto followings = lanelet_map::nextLaneletIds(
-            previous, routing_configuration.routing_graph_type, include_opposite_direction);
+      if (const auto followings =
+            lanelet_map::nextLaneletIds(previous, routing_configuration.routing_graph_type);
           std::find(followings.begin(), followings.end(), current) != followings.end()) {
         continue;
       } else if (const auto lefts = pose::leftLaneletIds(
