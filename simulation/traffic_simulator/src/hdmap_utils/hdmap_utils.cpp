@@ -220,11 +220,12 @@ auto HdMapUtils::countLaneChanges(
 
       if (auto followings = getNextLaneletIds(previous, routing_configuration.routing_graph_type);
           std::find(followings.begin(), followings.end(), current) == followings.end()) {
-        if (auto lefts = getLeftLaneletIds(previous, routing_configuration.routing_graph_type);
+        if (auto lefts =
+              getLeftLaneletIds(previous, routing_configuration.routing_graph_type, false);
             std::find(lefts.begin(), lefts.end(), current) != lefts.end()) {
           lane_changes.first++;
         } else if (auto rights =
-                     getRightLaneletIds(previous, routing_configuration.routing_graph_type);
+                     getRightLaneletIds(previous, routing_configuration.routing_graph_type, false);
                    std::find(rights.begin(), rights.end(), current) != rights.end()) {
           lane_changes.second++;
         }
