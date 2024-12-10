@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <geometry/transform.hpp>
+#include <openscenario_interpreter/cmath/hypot.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
@@ -33,12 +34,7 @@ ReachPositionCondition::ReachPositionCondition(
   position(readElement<Position>("Position", node, scope)),
   compare(Rule::lessThan),
   triggering_entities(triggering_entities),
-  results(triggering_entities.entity_refs.size(), {Double::nan()}),
-  consider_z([]() {
-    rclcpp::Node node{"get_parameter", "simulation"};
-    node.declare_parameter("consider_pose_by_road_slope", false);
-    return node.get_parameter("consider_pose_by_road_slope").as_bool();
-  }())
+  results(triggering_entities.entity_refs.size(), {Double::nan()})
 {
 }
 
@@ -53,13 +49,6 @@ auto ReachPositionCondition::description() const -> String
   description << " " << compare << " " << tolerance << "?";
 
   return description.str();
-}
-
-// @todo: after checking all the scenario work well with consider_z = true, remove this function and
-// use std::hypot(x,y,z)
-static double hypot(const double x, const double y, const double z, const bool consider_z)
-{
-  return consider_z ? std::hypot(x, y, z) : std::hypot(x, y);
 }
 
 auto ReachPositionCondition::visualize() const -> void
@@ -143,7 +132,7 @@ auto ReachPositionCondition::visualize() const -> void
     marker.pose.position.y = center.position.y - relative_pose.position.y / 2;
     marker.pose.position.z = center.position.z - relative_pose.position.z / 2;
     marker.text = std::to_string(hypot(
-      relative_pose.position.x, relative_pose.position.y, relative_pose.position.z, consider_z));
+      relative_pose.position.x, relative_pose.position.y, relative_pose.position.z));
     marker.scale.z = 0.3;
     marker.color.a = 0.8f;
     marker.color.r = 1.0;
@@ -171,22 +160,22 @@ auto ReachPositionCondition::evaluate() -> Object
     [&](const WorldPosition & position, auto && triggering_entity) {
       const auto pose = makeNativeRelativeWorldPosition(
         triggering_entity, static_cast<geometry_msgs::msg::Pose>(position));
-      return hypot(pose.position.x, pose.position.y, pose.position.z, consider_z);
+      return hypot(pose.position.x, pose.position.y, pose.position.z);
     },
     [&](const RelativeWorldPosition & position, auto && triggering_entity) {
       const auto pose = makeNativeRelativeWorldPosition(
         triggering_entity, static_cast<geometry_msgs::msg::Pose>(position));
-      return hypot(pose.position.x, pose.position.y, pose.position.z, consider_z);
+      return hypot(pose.position.x, pose.position.y, pose.position.z);
     },
     [&](const RelativeObjectPosition & position, auto && triggering_entity) {
       const auto pose = makeNativeRelativeWorldPosition(
         triggering_entity, static_cast<geometry_msgs::msg::Pose>(position));
-      return hypot(pose.position.x, pose.position.y, pose.position.z, consider_z);
+      return hypot(pose.position.x, pose.position.y, pose.position.z);
     },
     [&](const LanePosition & position, auto && triggering_entity) {
       const auto pose = makeNativeRelativeWorldPosition(
         triggering_entity, static_cast<geometry_msgs::msg::Pose>(position));
-      return hypot(pose.position.x, pose.position.y, pose.position.z, consider_z);
+      return hypot(pose.position.x, pose.position.y, pose.position.z);
     });
 
   call_visualize([this]() { visualize(); });
