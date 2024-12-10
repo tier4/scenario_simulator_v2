@@ -316,7 +316,7 @@ auto ActionNode::getDistanceToTargetEntityPolygon(
   double width_extension_left, double length_extension_front, double length_extension_rear) const
   -> std::optional<double>
 {
-  if (status.laneMatchingSucceed()) {
+  if (status.laneMatchingSucceed() && isEntityAltitudeCompatible(status)) {
     const auto polygon = math::geometry::transformPoints(
       status.getMapPose(), math::geometry::getPointsFromBbox(
                              status.getBoundingBox(), width_extension_right, width_extension_left,
@@ -324,6 +324,14 @@ auto ActionNode::getDistanceToTargetEntityPolygon(
     return spline.getCollisionPointIn2D(polygon, false);
   }
   return std::nullopt;
+}
+
+auto ActionNode::isEntityAltitudeCompatible(
+  const traffic_simulator::CanonicalizedEntityStatus & other_entity_status) const -> bool
+{
+  return hdmap_utils->isAltitudeMatching(
+    hdmap_utils->getAltitude(canonicalized_entity_status->getLaneletPose()),
+    hdmap_utils->getAltitude(other_entity_status.getLaneletPose()));
 }
 
 auto ActionNode::getDistanceToConflictingEntity(
