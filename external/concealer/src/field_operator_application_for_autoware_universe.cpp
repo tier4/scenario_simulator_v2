@@ -475,7 +475,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::enableAutowareControl() -> v
 {
   task_queue.delay([this]() {
     auto request = std::make_shared<autoware_adapi_v1_msgs::srv::ChangeOperationMode::Request>();
-    requestEnableAutowareControl(request);
+    requestEnableAutowareControl(request, 30);
   });
 }
 
