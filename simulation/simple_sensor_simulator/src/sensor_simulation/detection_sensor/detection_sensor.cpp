@@ -88,13 +88,12 @@ auto DetectionSensorBase::isOnOrAboveEgoPlane(
   simulation_interface::toMsg(entity_pose, entity_pose_ros);
   simulation_interface::toMsg(ego_pose, ego_pose_ros);
 
-  const auto hasEgoOrientationChanged = [this, &entity_pose_ros]() {
+  const auto hasEgoOrientationChanged = [this, &ego_pose_ros]() {
     if (previous_ego_pose_opt_) {
       return true;
     } else {
       return math::geometry::getAngleDifference(
-               entity_pose_ros.orientation, previous_ego_pose_opt_->orientation) >
-             rotation_threshold_;
+               ego_pose_ros.orientation, previous_ego_pose_opt_->orientation) > rotation_threshold_;
     }
   };
 
@@ -103,7 +102,7 @@ auto DetectionSensorBase::isOnOrAboveEgoPlane(
     ego_plane_opt_.emplace(
       entity_pose_ros.position, math::geometry::getNormalVector(entity_pose_ros.orientation));
   }
-  previous_ego_pose_opt_ = entity_pose_ros;
+  previous_ego_pose_opt_ = ego_pose_ros;
 
   // if other entity is just above ego return true
   if (entity_pose_ros.position.z >= (ego_pose_ros.position.z - max_downward_z_offset_)) {
