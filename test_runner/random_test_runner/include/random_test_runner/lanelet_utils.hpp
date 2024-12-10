@@ -51,19 +51,19 @@ public:
 
   double computeDistance(
     const traffic_simulator_msgs::msg::LaneletPose & p1,
-    const traffic_simulator_msgs::msg::LaneletPose & p2);
+    const traffic_simulator_msgs::msg::LaneletPose & p2) const;
   std::optional<traffic_simulator_msgs::msg::LaneletPose> getOppositeLaneLet(
     const traffic_simulator_msgs::msg::LaneletPose & pose);
   std::vector<LaneletPart> getLanesWithinDistance(
     const traffic_simulator_msgs::msg::LaneletPose & pose, double min_distance,
     double max_distance);
 
-  std::vector<int64_t> getLaneletIds();
+  std::vector<int64_t> getLaneletIds() const;
   geometry_msgs::msg::PoseStamped toMapPose(
-    const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose, const bool fill_pitch);
+    const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose, const bool fill_pitch) const;
   std::vector<int64_t> getRoute(int64_t from_lanelet_id, int64_t to_lanelet_id);
-  double getLaneletLength(int64_t lanelet_id);
-  bool isInLanelet(int64_t lanelet_id, double s);
+  double getLaneletLength(int64_t lanelet_id) const;
+  bool isInLanelet(int64_t lanelet_id, double s) const;
 
 private:
   lanelet::LaneletMapPtr lanelet_map_ptr_;
