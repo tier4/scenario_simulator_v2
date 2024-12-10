@@ -634,8 +634,16 @@ auto CatmullRomSpline::getTangentVector(const double s) const -> geometry_msgs::
         "This message is not originally intended to be displayed, if you see it, please "
         "contact the developer of traffic_simulator.");
     default:
-      const auto [index, s_value] = getCurveIndexAndS(s);
-      return curves_[index].getNormalVector(s_value, true);
+      /**
+       * @note The current implementation uses `index_and_s` instead of structured binding
+       * (`const auto [index, s_value] = getCurveIndexAndS(s)`) because some tests fail
+       * when using structured binding. The root cause of these test failures is under investigation.
+       */
+      // const auto [index, s_value] = getCurveIndexAndS(s);
+      // return curves_[index].getTangentVector(s_value, true);
+
+      const auto index_and_s = getCurveIndexAndS(s);
+      return curves_[index_and_s.first].getTangentVector(index_and_s.second, true);
   }
 }
 
