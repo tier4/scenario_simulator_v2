@@ -32,6 +32,191 @@ Changelog for package openscenario_interpreter
 * add publish_empty_context parameter
 * Contributors: Masaya Kataoka
 
+7.0.0 (2024-12-10)
+------------------
+* Merge pull request `#1454 <https://github.com/tier4/scenario_simulator_v2/issues/1454>`_ from tier4/RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge branch 'master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* fix: replace "awf/universe" with "awf/universe/20240605" for architecture_type
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+  # Conflicts:
+  #	simulation/traffic_simulator/src/traffic_lights/traffic_light_publisher.cpp
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+  # Conflicts:
+  #	external/concealer/include/concealer/autoware.hpp
+  #	external/concealer/include/concealer/autoware_universe.hpp
+  #	external/concealer/include/concealer/field_operator_application_for_autoware_universe.hpp
+  #	external/concealer/src/autoware_universe.cpp
+  #	external/concealer/src/field_operator_application_for_autoware_universe.cpp
+* Merge branch 'master' into RJD-736/autoware_msgs_support
+* Merge branch 'master' into RJD-736/autoware_msgs_support
+* Merge branch 'master' into RJD-736/autoware_msgs_support
+* Merge branch 'master' into RJD-736/autoware_msgs_support
+* Merge branch 'master' into RJD-736/autoware_msgs_support
+* Merge branch 'master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge branch 'master' into RJD-736/autoware_msgs_support
+* Merge branch 'master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/feature/manual_on_follow_trajectory' into feature/manual_on_follow_trajectory_not_auto
+  # Conflicts:
+  #	simulation/traffic_simulator/include/traffic_simulator/entity/entity_manager.hpp
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, Michał Kiełczykowski
+
+6.3.1 (2024-12-10)
+------------------
+* Merge branch 'master' into fix/sonor-cloud-issue-8-3
+* Merge branch 'master' into fix/sonor-cloud-issue-8-3
+* Contributors: Masaya Kataoka
+
+6.3.0 (2024-12-10)
+------------------
+* Merge branch 'master' into feature/lane-change-everywhere
+* Merge remote-tracking branch 'origin/master' into feature/lane-change-everywhere
+* Merge remote-tracking branch 'origin/master' into feature/lane-change-everywhere
+* Contributors: Kotaro Yoshimoto
+
+6.2.5 (2024-12-09)
+------------------
+* Merge branch 'master' into fix/acc_by_slope
+* Contributors: Kotaro Yoshimoto
+
+6.2.4 (2024-12-09)
+------------------
+* Merge pull request `#1469 <https://github.com/tier4/scenario_simulator_v2/issues/1469>`_ from tier4/refactor/speed-condition
+  Refactor/speed condition
+* Add comment about element that may confuse readers
+* Merge branch 'master' into refactor/speed-condition
+* Merge branch 'master' into refactor/speed-condition
+* Update `SpeedCondition` to use `SpeedCondition::evaluate` instead of `evaluateSpeed`
+* Update `SpeedProfileAction` to use `SpeedCondition::evaluate` instead of `evaluateSpeed`
+* Update `SpeedAction` to use `SpeedCondition::evaluate` instead of `evaluateSpeed`
+* Update `SpeedCondition` to support `DirectionalDimension`
+* Update `evaluateSpeed` to return `Eigen::Vector3d` instead of `double`
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+6.2.3 (2024-12-05)
+------------------
+* Merge branch 'master' into fix/sonor-cloud-issue-8-2
+* Contributors: Masaya Kataoka
+
+6.2.2 (2024-12-04)
+------------------
+* Merge pull request `#1467 <https://github.com/tier4/scenario_simulator_v2/issues/1467>`_ from tier4/refactor/distance-condition
+  Refactor/distance condition
+* Merge branch 'master' into refactor/distance-condition
+* Update member function `DistanceCondition::evaluate` to be static
+* Remove duplicate entity existence check in `DistanceCondition`
+* Update `DistanceCondition::evaluate` to check if the given entity exists
+* Add default clause to switch to suppress warnings
+* Merge remote-tracking branch 'origin/master' into refactor/distance-condition
+* Update `RelativeDistanceCondition::evaluate` to receive `Position`
+* Rename `DistanceCondition::distance` to `evaluate`
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+6.2.1 (2024-12-03)
+------------------
+* Merge pull request `#1466 <https://github.com/tier4/scenario_simulator_v2/issues/1466>`_ from tier4/refactor/distance-condition-and-relative-distance-condition
+  Refactor/relative distance condition
+* Merge branch 'master' into refactor/distance-condition-and-relative-distance-condition
+* Merge branch 'master' into refactor/distance-condition-and-relative-distance-condition
+* Update member function `RelativeDistanceCondition::evaluate` to be static
+* Remove duplicate entity existence check in `RelativeDistanceCondition`
+* Update `RelativeDistanceCondition::evaluate()` to check if the given entities exists
+* Add default clause to switch to suppress warnings
+* Update `RelativeDistanceCondition::evaluate` to receive 1 more EntityRef
+* Rename `RelativeDistanceCondition::distance` to `evaluate`
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+6.2.0 (2024-12-02)
+------------------
+* Merge pull request `#1459 <https://github.com/tier4/scenario_simulator_v2/issues/1459>`_ from tier4/feature/relative-speed-condition
+  Feature/relative speed condition
+* Merge branch 'master' into feature/relative-speed-condition
+* Merge remote-tracking branch 'origin/master' into feature/relative-speed-condition
+* Merge remote-tracking branch 'origin/master' into feature/relative-speed-condition
+* Remove the code for debugging purposes
+* Update lambda return type to be explicit when it is an `Eigen::*` type
+* Make temporary changes to analyze scenario failures that only occur on GitHub Actions
+* Update `OpenSCENARIOSupport.md`
+* Merge remote-tracking branch 'origin/master' into feature/relative-speed-condition
+* Fix `evaluateRelativeSpeed` to return velocity in observer's local coordinates
+* Merge remote-tracking branch 'origin/master' into feature/relative-speed-condition
+* Add new struct `RelativeSpeedCondition`
+* Add new static member function `evaluateRelativeSpeed`
+* Add new struct `DirectionalDimension`
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+6.1.3 (2024-11-29)
+------------------
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge remote-tracking branch 'tier4/RJD-1057-traffic-lights-tests' into RJD-1057-traffic-lights-tests
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge remote-tracking branch 'tier4/master' into RJD-1057-traffic-lights-tests
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge remote-tracking branch 'tier4/RJD-1057-remove-traffic-lights-from-entity-manager' into RJD-1057-traffic-lights-tests
+* Merge branch 'RJD-1057-remove-traffic-lights-from-entity-manager' into RJD-1057-traffic-lights-tests
+* Merge branch 'RJD-1057-remove-traffic-lights-from-entity-manager' into RJD-1057-traffic-lights-tests
+* Merge branch 'RJD-1057-remove-traffic-lights-from-entity-manager' into RJD-1057-traffic-lights-tests
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Mateusz Palczuk, Tatsuya Yamasaki
+
+6.1.2 (2024-11-29)
+------------------
+* Merge pull request `#1463 <https://github.com/tier4/scenario_simulator_v2/issues/1463>`_ from tier4/refactor/interpreter
+  Refactor/interpreter
+* Merge branch 'master' into refactor/interpreter
+* Cleanup struct `Entities`
+* Update `ReachPositionCondition` to use `cmath::hypot`
+* Update `DistanceCondition` to use `cmath::hypot`
+* Update `RelativeDistanceCondition` to use `cmath::hypot`
+* Add new free function `openscenario_interpreter::cmath::hypot`
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+6.1.1 (2024-11-29)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/sonarcloud_warning
+* Merge branch 'master' into fix/sonarcloud_warning
+* Merge branch 'master' into fix/sonarcloud_warning
+* Contributors: Masaya Kataoka
+
+6.1.0 (2024-11-29)
+------------------
+
+6.0.1 (2024-11-27)
+------------------
+
 6.0.0 (2024-11-27)
 ------------------
 * Merge pull request `#1458 <https://github.com/tier4/scenario_simulator_v2/issues/1458>`_ from tier4/refactor/add_routing_graph_argument
