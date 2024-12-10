@@ -52,12 +52,12 @@ public:
     auto module_ptr = std::make_shared<T>(std::forward<Ts>(xs)...);
     modules_.emplace_back(module_ptr);
   }
-  void execute(const double current_time, const double step_time);
-  auto makeDebugMarker() const -> const visualization_msgs::msg::MarkerArray;
+  auto execute(const double current_time, const double step_time) -> void;
+  auto makeDebugMarker() const -> visualization_msgs::msg::MarkerArray;
 
 private:
-  void generateAutoSinks(const std::set<std::uint8_t> & auto_sink_entity_types);
-  const std::shared_ptr<entity::EntityManager> entity_manager_ptr;
+  auto appendAutoSinks(const std::set<std::uint8_t> & auto_sink_entity_types) -> void;
+  const std::shared_ptr<entity::EntityManager> entity_manager_ptr_;
   std::vector<std::shared_ptr<TrafficModuleBase>> modules_;
 };
 }  // namespace traffic

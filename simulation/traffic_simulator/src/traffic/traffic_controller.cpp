@@ -41,42 +41,43 @@ namespace traffic
 TrafficController::TrafficController(
   const std::shared_ptr<entity::EntityManager> entity_manager_ptr,
   const std::set<std::uint8_t> auto_sink_entity_types)
-: entity_manager_ptr(entity_manager_ptr), modules_()
+: entity_manager_ptr_(entity_manager_ptr), modules_()
 {
   if (not auto_sink_entity_types.empty()) {
-    generateAutoSinks(auto_sink_entity_types);
+    appendAutoSinks(auto_sink_entity_types);
   }
 }
 
-void TrafficController::generateAutoSinks(const std::set<std::uint8_t> & auto_sink_entity_types)
+auto TrafficController::appendAutoSinks(const std::set<std::uint8_t> & auto_sink_entity_types)
+  -> void
 {
-  const auto hdmap_utils_ptr = entity_manager_ptr->getHdmapUtils();
+  static constexpr double sink_radius = 1.0;
+  const auto hdmap_utils_ptr = entity_manager_ptr_->getHdmapUtils();
   for (const auto & lanelet_id : hdmap_utils_ptr->getLaneletIds()) {
     if (hdmap_utils_ptr->getNextLaneletIds(lanelet_id).empty()) {
       LaneletPose lanelet_pose;
       lanelet_pose.lanelet_id = lanelet_id;
       lanelet_pose.s = pose::laneletLength(lanelet_id, hdmap_utils_ptr);
       const auto pose = pose::toMapPose(lanelet_pose, hdmap_utils_ptr);
-      static constexpr double sink_radius = 1.0;
       const auto traffic_sink_config = TrafficSinkConfig(
         sink_radius, pose.position, auto_sink_entity_types, std::make_optional(lanelet_id));
-      addModule<TrafficSink>(entity_manager_ptr, traffic_sink_config);
+      addModule<TrafficSink>(entity_manager_ptr_, traffic_sink_config);
     }
   }
 }
 
-void TrafficController::execute(const double current_time, const double step_time)
+auto TrafficController::execute(const double current_time, const double step_time) -> void
 {
   for (const auto & module : modules_) {
     module->execute(current_time, step_time);
   }
 }
 
-auto TrafficController::makeDebugMarker() const -> const visualization_msgs::msg::MarkerArray
+auto TrafficController::makeDebugMarker() const -> visualization_msgs::msg::MarkerArray
 {
-  static const auto marker_array = [&]() {
+  static const auto marker_array = [this]() {
     visualization_msgs::msg::MarkerArray marker_array;
-    for (size_t i = 0UL; i < modules_.size(); ++i) {
+    for (std::size_t i = 0UL; i < modules_.size(); ++i) {
       modules_[i]->appendDebugMarker(marker_array);
     }
     return marker_array;
