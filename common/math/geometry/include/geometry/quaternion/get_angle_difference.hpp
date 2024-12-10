@@ -15,7 +15,7 @@
 #ifndef GEOMETRY__QUATERNION__GET_ANGLE_DIFFERENCE_HPP_
 #define GEOMETRY__QUATERNION__GET_ANGLE_DIFFERENCE_HPP_
 
-#include <Eigen/Geometry>  // Załaduj biblioteki Eigen
+#include <Eigen/Geometry>
 #include <geometry/quaternion/is_like_quaternion.hpp>
 
 namespace math
