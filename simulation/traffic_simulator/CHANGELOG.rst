@@ -21,6 +21,26 @@ Changelog for package traffic_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+6.3.1 (2024-12-10)
+------------------
+* Merge branch 'master' into fix/sonor-cloud-issue-8-3
+* Merge branch 'master' into fix/sonor-cloud-issue-8-3
+* Contributors: Masaya Kataoka
+
+6.3.0 (2024-12-10)
+------------------
+* Merge pull request `#1468 <https://github.com/tier4/scenario_simulator_v2/issues/1468>`_ from tier4/feature/lane-change-everywhere
+* fix:　disable default argument value for include_oppsite_direction in  HdMapUtils::getLeftLaneletIds/getRightLaneletIds
+* Merge branch 'master' into feature/lane-change-everywhere
+* fix: fit test constants to latest algorithm
+* Merge remote-tracking branch 'origin/master' into feature/lane-change-everywhere
+* replace true with false for include_opposite_direction option
+* fix:　use lanelet2 functions correctly in HdMapUtils::getLeftLaneletIds/getRightLaneletIds
+* chore: fix linelint error
+* Merge remote-tracking branch 'origin/master' into feature/lane-change-everywhere
+* feat: allow lane-change everywhere in `VEHICLE_WITH_ROAD_SHOULDER` routing graph
+* Contributors: Kotaro Yoshimoto
+
 6.2.5 (2024-12-09)
 ------------------
 * Merge branch 'master' into fix/acc_by_slope
