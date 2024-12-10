@@ -88,18 +88,14 @@ public:
    *  1. Its distance from the TrafficSink is <= config.radius [m].
    *  2. Its EntityType is in config.sinkable_entity_types.
    */
-  void execute(const double current_time, const double step_time) override;
+  auto execute(const double current_time, const double step_time) -> void override;
   auto appendDebugMarker(visualization_msgs::msg::MarkerArray & marker_array) const
     -> void override;
 
-  const TrafficSinkConfig config;
-
 private:
-  auto getEntityNames() const -> std::vector<std::string>;
-  auto getEntityType(const std::string & entity_name) const noexcept(false) -> EntityType;
-  auto getEntityPose(const std::string & entity_name) const noexcept(false)
-    -> geometry_msgs::msg::Pose;
+  auto isEntitySinkable(const std::string & entity_name) const noexcept(false) -> bool;
 
+  const TrafficSinkConfig config_;
   const std::shared_ptr<entity::EntityManager> entity_manager_ptr_;
 };
 }  // namespace traffic
