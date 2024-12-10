@@ -43,7 +43,7 @@ protected:
   : previous_simulation_time_(current_simulation_time),
     configuration_(configuration),
     ego_plane_opt_(std::nullopt),
-    previous_ego_pose_opt_(std::nullopt)
+    ego_plane_pose_opt_(std::nullopt)
   {
   }
 
@@ -67,7 +67,7 @@ public:
 
 private:
   std::optional<math::geometry::Plane> ego_plane_opt_;
-  std::optional<geometry_msgs::msg::Pose> previous_ego_pose_opt_;
+  std::optional<geometry_msgs::msg::Pose> ego_plane_pose_opt_;
   auto hasEgoOrientationChanged() const -> bool;
 };
 

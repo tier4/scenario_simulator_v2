@@ -84,31 +84,27 @@ auto DetectionSensorBase::isOnOrAboveEgoPlane(
   */
   constexpr static double max_downward_z_offset_ = 1.0;
 
-  geometry_msgs::msg::Pose ego_pose_ros, entity_pose_ros;
-  simulation_interface::toMsg(entity_pose, entity_pose_ros);
-  simulation_interface::toMsg(ego_pose, ego_pose_ros);
-
-  const auto hasEgoOrientationChanged = [this, &ego_pose_ros]() {
-    if (previous_ego_pose_opt_) {
-      return true;
-    } else {
-      return math::geometry::getAngleDifference(
-               ego_pose_ros.orientation, previous_ego_pose_opt_->orientation) > rotation_threshold_;
-    }
+  const auto hasEgoOrientationChanged = [this](const geometry_msgs::msg::Pose & ego_pose_ros) {
+    return math::geometry::getAngleDifference(
+             ego_pose_ros.orientation, ego_plane_pose_opt_->orientation) > rotation_threshold_;
   };
 
-  // update ego plane if needed
-  if (!ego_plane_opt_ || hasEgoOrientationChanged()) {
-    ego_plane_opt_.emplace(
-      entity_pose_ros.position, math::geometry::getNormalVector(entity_pose_ros.orientation));
-  }
-  previous_ego_pose_opt_ = ego_pose_ros;
-
   // if other entity is just above ego return true
-  if (entity_pose_ros.position.z >= (ego_pose_ros.position.z - max_downward_z_offset_)) {
+  if (entity_pose.position().z() >= (ego_pose.position().z() - max_downward_z_offset_)) {
     return true;
     // otherwise check if other entity is above ego plane
   } else {
+    // update ego plane if needed
+    geometry_msgs::msg::Pose ego_pose_ros;
+    simulation_interface::toMsg(ego_pose, ego_pose_ros);
+    if (!ego_plane_opt_ || ego_plane_pose_opt_ || hasEgoOrientationChanged(ego_pose_ros)) {
+      ego_plane_opt_.emplace(
+        ego_pose_ros.position, math::geometry::getNormalVector(ego_pose_ros.orientation));
+      ego_plane_pose_opt_ = ego_pose_ros;
+    }
+
+    geometry_msgs::msg::Pose entity_pose_ros;
+    simulation_interface::toMsg(entity_pose, entity_pose_ros);
     return ego_plane_opt_->offset(entity_pose_ros.position) >= 0.0;
   }
 }
