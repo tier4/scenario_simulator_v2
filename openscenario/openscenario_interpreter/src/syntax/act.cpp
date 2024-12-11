@@ -24,8 +24,8 @@ inline namespace syntax
 Act::Act(const pugi::xml_node & node, Scope & scope)
 : Scope(readAttribute<String>("name", node, scope), scope),
   StoryboardElement(
-    readElement<Trigger>("StartTrigger", node, local()),
-    readElement<Trigger>("StopTrigger", node, local()))  // NOTE: Optional element
+    readElement<Trigger>("StartTrigger", node, local(), Trigger::truthy()),
+    readElement<Trigger>("StopTrigger", node, local()))
 {
   traverse<1, unbounded>(node, "ManeuverGroup", [&](auto && node) {
     return elements.push_back(readStoryboardElement<ManeuverGroup>(node, local()));
