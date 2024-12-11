@@ -31,7 +31,6 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
-// #include <traffic_simulator/data_type/lanelet_pose.hpp>
 
 namespace entity_behavior
 {
