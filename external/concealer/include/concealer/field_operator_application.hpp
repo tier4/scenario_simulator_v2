@@ -17,19 +17,15 @@
 
 #include <sys/wait.h>
 
-#include <autoware_adapi_v1_msgs/msg/mrm_state.hpp>
 #include <autoware_control_msgs/msg/control.hpp>
 #include <autoware_vehicle_msgs/msg/turn_indicators_command.hpp>
-#include <chrono>
 #include <concealer/autoware_stream.hpp>
 #include <concealer/launch.hpp>
 #include <concealer/task_queue.hpp>
 #include <concealer/transition_assertion.hpp>
 #include <concealer/visibility.hpp>
-#include <exception>
 #include <geometry_msgs/msg/accel.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
-#include <limits>
 #include <rclcpp/rclcpp.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 #include <utility>
@@ -64,10 +60,6 @@ struct FieldOperatorApplication : public rclcpp::Node
 
   bool initialize_was_called = false;
 
-  // method called in destructor of a derived class
-  // because it is difficult to differentiate shutting down behavior in destructor of a base class
-  auto shutdownAutoware() -> void;
-
   CONCEALER_PUBLIC explicit FieldOperatorApplication(const pid_t = 0);
 
   template <typename... Ts>
@@ -80,35 +72,16 @@ struct FieldOperatorApplication : public rclcpp::Node
 
   auto spinSome() -> void;
 
-  /* ---- NOTE -------------------------------------------------------------------
-   *
-   *  Send an engagement request to Autoware. If Autoware does not have an
-   *  engagement equivalent, this operation can be nop (No operation).
-   *
-   * -------------------------------------------------------------------------- */
+  auto shutdownAutoware() -> void;
+
   virtual auto engage() -> void = 0;
 
   virtual auto engageable() const -> bool = 0;
 
   virtual auto engaged() const -> bool = 0;
 
-  /* ---- NOTE -------------------------------------------------------------------
-   *
-   *  Send initial_pose to Autoware.
-   *
-   * -------------------------------------------------------------------------- */
   virtual auto initialize(const geometry_msgs::msg::Pose &) -> void = 0;
 
-  /* ---- NOTE -------------------------------------------------------------------
-   *
-   *  Send the destination and route constraint points to Autoware. The argument
-   *  route is guaranteed to be size 1 or greater, and its last element is the
-   *  destination. When the size of a route is 2 or greater, the non-last element
-   *  is the route constraint. That is, Autoware must go through the element
-   *  points on the given'route' starting at index 0 and stop at index
-   *  route.size() - 1.
-   *
-   * -------------------------------------------------------------------------- */
   virtual auto plan(const std::vector<geometry_msgs::msg::PoseStamped> &) -> void = 0;
 
   virtual auto clearRoute() -> void = 0;

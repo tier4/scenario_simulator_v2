@@ -46,12 +46,10 @@
 namespace concealer
 {
 template <>
-class FieldOperatorApplicationFor<AutowareUniverse>
+struct FieldOperatorApplicationFor<AutowareUniverse>
 : public FieldOperatorApplication,
   public TransitionAssertion<FieldOperatorApplicationFor<AutowareUniverse>>
 {
-  friend struct TransitionAssertion<FieldOperatorApplicationFor<AutowareUniverse>>;
-
   // clang-format off
   SubscriberWrapper<autoware_control_msgs::msg::Control>                          getCommand;
   SubscriberWrapper<autoware_system_msgs::msg::AutowareState, ThreadSafety::safe> getAutowareState;
@@ -61,6 +59,7 @@ class FieldOperatorApplicationFor<AutowareUniverse>
   SubscriberWrapper<autoware_adapi_v1_msgs::msg::LocalizationInitializationState> getLocalizationState;
 #endif
   SubscriberWrapper<autoware_adapi_v1_msgs::msg::MrmState>                        getMrmState;
+  SubscriberWrapper<tier4_planning_msgs::msg::PathWithLaneId>                     getPathWithLaneId;
   SubscriberWrapper<tier4_planning_msgs::msg::Trajectory>                         getTrajectory;
   SubscriberWrapper<autoware_vehicle_msgs::msg::TurnIndicatorsCommand>            getTurnIndicatorsCommandImpl;
 
@@ -105,7 +104,6 @@ class FieldOperatorApplicationFor<AutowareUniverse>
 
 #undef DEFINE_STATE_PREDICATE
 
-protected:
   template <typename T>
   auto getAutowareStateString(std::uint8_t state) const -> char const *
   {
@@ -129,10 +127,6 @@ protected:
 #undef CASE
   }
 
-public:
-  SubscriberWrapper<tier4_planning_msgs::msg::PathWithLaneId> getPathWithLaneId;
-
-public:
   template <typename... Ts>
   CONCEALER_PUBLIC explicit FieldOperatorApplicationFor(Ts &&... xs)
   : FieldOperatorApplication(std::forward<decltype(xs)>(xs)...),
@@ -146,6 +140,7 @@ public:
     getLocalizationState("/api/localization/initialization_state", rclcpp::QoS(1).transient_local(), *this),
 #endif
     getMrmState("/api/fail_safe/mrm_state", rclcpp::QoS(1), *this, [this](const auto & v) { receiveMrmState(v); }),
+    getPathWithLaneId("/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", rclcpp::QoS(1), *this),
     getTrajectory("/api/iv_msgs/planning/scenario_planning/trajectory", rclcpp::QoS(1), *this),
     getTurnIndicatorsCommandImpl("/control/command/turn_indicators_cmd", rclcpp::QoS(1), *this),
     requestClearRoute("/api/routing/clear_route", *this),
@@ -156,8 +151,7 @@ public:
     requestSetRoutePoints("/api/routing/set_route_points", *this, std::chrono::seconds(10)),
     requestSetRtcAutoMode("/api/external/set/rtc_auto_mode", *this),
     requestSetVelocityLimit("/api/autoware/set/velocity_limit", *this),
-    requestEnableAutowareControl("/api/operation_mode/enable_autoware_control", *this),
-    getPathWithLaneId("/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", rclcpp::QoS(1), *this)
+    requestEnableAutowareControl("/api/operation_mode/enable_autoware_control", *this)
   // clang-format on
   {
   }
