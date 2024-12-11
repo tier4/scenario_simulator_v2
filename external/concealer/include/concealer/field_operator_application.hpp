@@ -18,9 +18,11 @@
 #include <sys/wait.h>
 
 #include <autoware_control_msgs/msg/control.hpp>
+#include <autoware_system_msgs/msg/autoware_state.hpp>
 #include <autoware_vehicle_msgs/msg/turn_indicators_command.hpp>
 #include <concealer/autoware_stream.hpp>
 #include <concealer/launch.hpp>
+#include <concealer/subscriber_wrapper.hpp>
 #include <concealer/task_queue.hpp>
 #include <concealer/transition_assertion.hpp>
 #include <concealer/visibility.hpp>
@@ -60,6 +62,10 @@ struct FieldOperatorApplication : public rclcpp::Node
 
   bool initialize_was_called = false;
 
+  std::string autoware_state;
+
+  SubscriberWrapper<autoware_system_msgs::msg::AutowareState, ThreadSafety::safe> getAutowareState;
+
   CONCEALER_PUBLIC explicit FieldOperatorApplication(const pid_t = 0);
 
   template <typename... Ts>
@@ -69,6 +75,25 @@ struct FieldOperatorApplication : public rclcpp::Node
   }
 
   ~FieldOperatorApplication();
+
+  /*
+     NOTE: This predicate should not take the state being compared as an
+     argument or template parameter. Otherwise, code using this class would
+     need to have knowledge of the Autoware state type.
+  */
+#define DEFINE_STATE_PREDICATE(NAME, VALUE)                           \
+  auto is##NAME() const noexcept { return autoware_state == #VALUE; } \
+  static_assert(true, "")
+
+  DEFINE_STATE_PREDICATE(Initializing, INITIALIZING_VEHICLE);
+  DEFINE_STATE_PREDICATE(WaitingForRoute, WAITING_FOR_ROUTE);
+  DEFINE_STATE_PREDICATE(Planning, PLANNING);
+  DEFINE_STATE_PREDICATE(WaitingForEngage, WAITING_FOR_ENGAGE);
+  DEFINE_STATE_PREDICATE(Driving, DRIVING);
+  DEFINE_STATE_PREDICATE(ArrivedGoal, ARRIVAL_GOAL);
+  DEFINE_STATE_PREDICATE(Finalizing, FINALIZING);
+
+#undef DEFINE_STATE_PREDICATE
 
   auto spinSome() -> void;
 

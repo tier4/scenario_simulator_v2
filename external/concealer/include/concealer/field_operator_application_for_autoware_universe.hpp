@@ -25,13 +25,11 @@
 #include <autoware_adapi_v1_msgs/srv/initialize_localization.hpp>
 #include <autoware_adapi_v1_msgs/srv/set_route_points.hpp>
 #include <autoware_control_msgs/msg/control.hpp>
-#include <autoware_system_msgs/msg/autoware_state.hpp>
 #include <autoware_vehicle_msgs/msg/gear_command.hpp>
 #include <concealer/autoware_universe.hpp>
 #include <concealer/field_operator_application.hpp>
 #include <concealer/publisher_wrapper.hpp>
 #include <concealer/service_with_validation.hpp>
-#include <concealer/subscriber_wrapper.hpp>
 #include <concealer/task_queue.hpp>
 #include <geometry_msgs/msg/pose_with_covariance_stamped.hpp>
 #include <tier4_external_api_msgs/msg/emergency.hpp>
@@ -52,7 +50,6 @@ struct FieldOperatorApplicationFor<AutowareUniverse>
 {
   // clang-format off
   SubscriberWrapper<autoware_control_msgs::msg::Control>                          getCommand;
-  SubscriberWrapper<autoware_system_msgs::msg::AutowareState, ThreadSafety::safe> getAutowareState;
   SubscriberWrapper<tier4_rtc_msgs::msg::CooperateStatusArray>                    getCooperateStatusArray;
   SubscriberWrapper<tier4_external_api_msgs::msg::Emergency>                      getEmergencyState;
 #if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)
@@ -75,8 +72,6 @@ struct FieldOperatorApplicationFor<AutowareUniverse>
 
   tier4_rtc_msgs::msg::CooperateStatusArray latest_cooperate_status_array;
 
-  std::string autoware_state;
-
   std::string minimum_risk_maneuver_state;
 
   std::string minimum_risk_maneuver_behavior;
@@ -85,55 +80,11 @@ struct FieldOperatorApplicationFor<AutowareUniverse>
 
   auto receiveEmergencyState(const tier4_external_api_msgs::msg::Emergency & msg) -> void;
 
-  /*
-     NOTE: This predicate should not take the state being compared as an
-     argument or template parameter. Otherwise, code using this class would
-     need to have knowledge of the Autoware state type.
-  */
-#define DEFINE_STATE_PREDICATE(NAME, VALUE)                           \
-  auto is##NAME() const noexcept { return autoware_state == #VALUE; } \
-  static_assert(true, "")
-
-  DEFINE_STATE_PREDICATE(Initializing, INITIALIZING_VEHICLE);
-  DEFINE_STATE_PREDICATE(WaitingForRoute, WAITING_FOR_ROUTE);
-  DEFINE_STATE_PREDICATE(Planning, PLANNING);
-  DEFINE_STATE_PREDICATE(WaitingForEngage, WAITING_FOR_ENGAGE);
-  DEFINE_STATE_PREDICATE(Driving, DRIVING);
-  DEFINE_STATE_PREDICATE(ArrivedGoal, ARRIVAL_GOAL);
-  DEFINE_STATE_PREDICATE(Finalizing, FINALIZING);
-
-#undef DEFINE_STATE_PREDICATE
-
-  template <typename T>
-  auto getAutowareStateString(std::uint8_t state) const -> char const *
-  {
-#define CASE(IDENTIFIER) \
-  case T::IDENTIFIER:    \
-    return #IDENTIFIER
-
-    switch (state) {
-      CASE(INITIALIZING);
-      CASE(WAITING_FOR_ROUTE);
-      CASE(PLANNING);
-      CASE(WAITING_FOR_ENGAGE);
-      CASE(DRIVING);
-      CASE(ARRIVED_GOAL);
-      CASE(FINALIZING);
-
-      default:
-        return "";
-    }
-
-#undef CASE
-  }
-
   template <typename... Ts>
   CONCEALER_PUBLIC explicit FieldOperatorApplicationFor(Ts &&... xs)
   : FieldOperatorApplication(std::forward<decltype(xs)>(xs)...),
     // clang-format off
     getCommand("/control/command/control_cmd", rclcpp::QoS(1), *this),
-    getAutowareState("/autoware/state", rclcpp::QoS(1), *this, [this](const auto & v) {
-       autoware_state = getAutowareStateString<autoware_system_msgs::msg::AutowareState>(v.state); }),
     getCooperateStatusArray("/api/external/get/rtc_status", rclcpp::QoS(1), *this, [this](const auto & v) { latest_cooperate_status_array = v; }),
     getEmergencyState("/api/external/get/emergency", rclcpp::QoS(1), *this, [this](const auto & v) { receiveEmergencyState(v); }),
 #if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)

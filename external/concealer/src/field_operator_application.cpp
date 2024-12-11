@@ -20,9 +20,35 @@
 
 namespace concealer
 {
+template <typename T>
+auto toAutowareStateString(std::uint8_t state) -> char const *
+{
+#define CASE(IDENTIFIER) \
+  case T::IDENTIFIER:    \
+    return #IDENTIFIER
+
+  switch (state) {
+    CASE(INITIALIZING);
+    CASE(WAITING_FOR_ROUTE);
+    CASE(PLANNING);
+    CASE(WAITING_FOR_ENGAGE);
+    CASE(DRIVING);
+    CASE(ARRIVED_GOAL);
+    CASE(FINALIZING);
+
+    default:
+      return "";
+  }
+
+#undef CASE
+}
+
 FieldOperatorApplication::FieldOperatorApplication(const pid_t pid)
 : rclcpp::Node("concealer_user", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),
-  process_id(pid)
+  process_id(pid),
+  getAutowareState("/autoware/state", rclcpp::QoS(1), *this, [this](const auto & v) {
+    autoware_state = toAutowareStateString<autoware_system_msgs::msg::AutowareState>(v.state);
+  })
 {
 }
 
@@ -64,7 +90,8 @@ auto FieldOperatorApplication::spinSome() -> void
 
 auto FieldOperatorApplication::shutdownAutoware() -> void
 {
-  if (is_stop_requested.store(true); process_id != 0 && not std::exchange(is_autoware_exited, true)) {
+  if (is_stop_requested.store(true);
+      process_id != 0 && not std::exchange(is_autoware_exited, true)) {
     const auto sigset = [this]() {
       if (auto signal_set = sigset_t();
           sigemptyset(&signal_set) or sigaddset(&signal_set, SIGCHLD)) {
