@@ -78,7 +78,7 @@ struct FieldOperatorApplication : public rclcpp::Node
   {
   }
 
-  ~FieldOperatorApplication() override = default;
+  ~FieldOperatorApplication();
 
   auto spinSome() -> void;
 

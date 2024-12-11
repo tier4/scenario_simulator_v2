@@ -26,6 +26,13 @@ FieldOperatorApplication::FieldOperatorApplication(const pid_t pid)
 {
 }
 
+FieldOperatorApplication::~FieldOperatorApplication()
+{
+  shutdownAutoware();
+  // All tasks should be complete before the services used in them will be deinitialized.
+  task_queue.stopAndJoin();
+}
+
 auto FieldOperatorApplication::spinSome() -> void
 {
   if (rclcpp::ok() and not is_stop_requested.load()) {

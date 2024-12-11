@@ -20,13 +20,6 @@
 
 namespace concealer
 {
-FieldOperatorApplicationFor<AutowareUniverse>::~FieldOperatorApplicationFor()
-{
-  shutdownAutoware();
-  // All tasks should be complete before the services used in them will be deinitialized.
-  task_queue.stopAndJoin();
-}
-
 template <auto N, typename Tuples>
 struct lister
 {

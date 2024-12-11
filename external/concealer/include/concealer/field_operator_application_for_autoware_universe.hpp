@@ -162,8 +162,6 @@ public:
   {
   }
 
-  ~FieldOperatorApplicationFor() override;
-
   auto engage() -> void override;
 
   auto engageable() const -> bool override;
