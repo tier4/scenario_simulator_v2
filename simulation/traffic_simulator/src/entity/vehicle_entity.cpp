@@ -17,6 +17,7 @@
 #include <string>
 #include <traffic_simulator/entity/vehicle_entity.hpp>
 #include <traffic_simulator/utils/pose.hpp>
+#include <traffic_simulator/utils/route.hpp>
 #include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
 #include <vector>
 
@@ -34,7 +35,7 @@ VehicleEntity::VehicleEntity(
   loader_(pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase>(
     "traffic_simulator", "entity_behavior::BehaviorPluginBase")),
   behavior_plugin_ptr_(loader_.createSharedInstance(plugin_name)),
-  route_planner_(traffic_simulator::RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER, hdmap_utils_ptr_)
+  route_planner_(traffic_simulator::RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER)
 {
   behavior_plugin_ptr_->configure(rclcpp::get_logger(name));
   behavior_plugin_ptr_->setVehicleParameters(parameters);
@@ -140,8 +141,7 @@ auto VehicleEntity::onUpdate(const double current_time, const double step_time) 
   if (previous_route_lanelets_ != route_lanelets) {
     previous_route_lanelets_ = route_lanelets;
     try {
-      spline_ = std::make_shared<math::geometry::CatmullRomSpline>(
-        hdmap_utils_ptr_->getCenterPoints(route_lanelets));
+      spline_ = std::make_shared<math::geometry::CatmullRomSpline>(route::toSpline(route_lanelets));
     } catch (const common::scenario_simulator_exception::SemanticError & error) {
       // reset the ptr when spline cannot be calculated
       spline_.reset();
@@ -151,7 +151,7 @@ auto VehicleEntity::onUpdate(const double current_time, const double step_time) 
   /// @note CanonicalizedEntityStatus is updated here, it is not skipped even if isAtEndOfLanelets return true
   behavior_plugin_ptr_->update(current_time, step_time);
   if (const auto canonicalized_lanelet_pose = status_->getCanonicalizedLaneletPose()) {
-    if (pose::isAtEndOfLanelets(canonicalized_lanelet_pose.value(), hdmap_utils_ptr_)) {
+    if (pose::isAtEndOfLanelets(canonicalized_lanelet_pose.value())) {
       stopAtCurrentPosition();
       return;
     }
