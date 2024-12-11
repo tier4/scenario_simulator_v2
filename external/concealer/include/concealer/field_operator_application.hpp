@@ -15,8 +15,6 @@
 #ifndef CONCEALER__AUTOWARE_USER_HPP_
 #define CONCEALER__AUTOWARE_USER_HPP_
 
-// #define CONCEALER_ISOLATE_STANDARD_OUTPUT
-
 #include <sys/wait.h>
 
 #include <autoware_adapi_v1_msgs/msg/mrm_state.hpp>
