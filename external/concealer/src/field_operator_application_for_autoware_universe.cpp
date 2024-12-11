@@ -427,11 +427,6 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::getMinimumRiskManeuverStateN
   return minimum_risk_maneuver_state;
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::sendSIGINT() -> void  //
-{
-  ::kill(process_id, SIGINT);
-}
-
 auto FieldOperatorApplicationFor<AutowareUniverse>::setVelocityLimit(double velocity_limit) -> void
 {
   task_queue.delay([this, velocity_limit]() {

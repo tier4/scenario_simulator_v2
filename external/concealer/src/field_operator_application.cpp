@@ -91,7 +91,7 @@ auto FieldOperatorApplication::shutdownAutoware() -> void
       return timeout;
     }();
 
-    if (sendSIGINT(); sigtimedwait(&sigset, nullptr, &timeout) < 0) {
+    if (::kill(process_id, SIGINT); sigtimedwait(&sigset, nullptr, &timeout) < 0) {
       switch (errno) {
         case EINTR:
           /*

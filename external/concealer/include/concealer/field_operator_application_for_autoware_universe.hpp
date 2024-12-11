@@ -128,7 +128,6 @@ protected:
 
 #undef CASE
   }
-  auto sendSIGINT() -> void override;
 
 public:
   SubscriberWrapper<tier4_planning_msgs::msg::PathWithLaneId> getPathWithLaneId;

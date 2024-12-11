@@ -71,10 +71,6 @@ protected:
 
   auto isStopRequested() const noexcept -> bool;
 
-  // this method is purely virtual because different Autoware types are killed differently
-  // currently, we are not sure why this is the case so detailed investigation is needed
-  virtual auto sendSIGINT() -> void = 0;
-
   // method called in destructor of a derived class
   // because it is difficult to differentiate shutting down behavior in destructor of a base class
   auto shutdownAutoware() -> void;
