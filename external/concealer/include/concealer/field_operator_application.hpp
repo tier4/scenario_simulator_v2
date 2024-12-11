@@ -54,28 +54,22 @@ class FieldOperatorApplicationFor;
  *        initialize, plan, and engage.
  *
  * -------------------------------------------------------------------------- */
-class FieldOperatorApplication : public rclcpp::Node
+struct FieldOperatorApplication : public rclcpp::Node
 {
   std::atomic<bool> is_stop_requested = false;
 
   bool is_autoware_exited = false;
 
-protected:
   const pid_t process_id = 0;
 
   TaskQueue task_queue;
 
   bool initialize_was_called = false;
 
-  auto stopRequest() noexcept -> void;
-
-  auto isStopRequested() const noexcept -> bool;
-
   // method called in destructor of a derived class
   // because it is difficult to differentiate shutting down behavior in destructor of a base class
   auto shutdownAutoware() -> void;
 
-public:
   CONCEALER_PUBLIC explicit FieldOperatorApplication(const pid_t = 0);
 
   template <typename... Ts>

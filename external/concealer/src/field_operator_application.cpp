@@ -26,16 +26,9 @@ FieldOperatorApplication::FieldOperatorApplication(const pid_t pid)
 {
 }
 
-auto FieldOperatorApplication::stopRequest() noexcept -> void { is_stop_requested.store(true); }
-
-auto FieldOperatorApplication::isStopRequested() const noexcept -> bool
-{
-  return is_stop_requested.load();
-}
-
 auto FieldOperatorApplication::spinSome() -> void
 {
-  if (rclcpp::ok() and not isStopRequested()) {
+  if (rclcpp::ok() and not is_stop_requested.load()) {
     if (process_id != 0) {
       auto status = 0;
       if (const auto id = waitpid(process_id, &status, WNOHANG); id < 0) {
@@ -64,7 +57,7 @@ auto FieldOperatorApplication::spinSome() -> void
 
 auto FieldOperatorApplication::shutdownAutoware() -> void
 {
-  if (stopRequest(); process_id != 0 && not std::exchange(is_autoware_exited, true)) {
+  if (is_stop_requested.store(true); process_id != 0 && not std::exchange(is_autoware_exited, true)) {
     const auto sigset = [this]() {
       if (auto signal_set = sigset_t();
           sigemptyset(&signal_set) or sigaddset(&signal_set, SIGCHLD)) {

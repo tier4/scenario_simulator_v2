@@ -45,7 +45,7 @@ struct TransitionAssertion
   auto waitForAutowareStateToBe##STATE(                                                 \
     Thunk && thunk = [] {}, Interval interval = std::chrono::seconds(1))                \
   {                                                                                     \
-    for (thunk(); not static_cast<const Autoware &>(*this).isStopRequested() and        \
+    for (thunk(); not static_cast<const Autoware &>(*this).is_stop_requested.load() and \
                   not static_cast<const Autoware &>(*this).is##STATE();                 \
          rclcpp::GenericRate<std::chrono::steady_clock>(interval).sleep()) {            \
       if (                                                                              \
