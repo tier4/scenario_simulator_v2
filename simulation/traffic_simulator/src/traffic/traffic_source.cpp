@@ -17,7 +17,7 @@
 #include <geometry/vector3/hypot.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/traffic/traffic_source.hpp>
-#include <traffic_simulator/utils/pose.hpp>
+#include <traffic_simulator/utils/lanelet_map.hpp>
 #include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
 
 namespace traffic_simulator
@@ -25,25 +25,14 @@ namespace traffic_simulator
 namespace traffic
 {
 TrafficSource::Validator::Validator(
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
   const geometry_msgs::msg::Pose & pose, const double radius, const bool include_crosswalk)
-: ids(hdmap_utils->getNearbyLaneletIds(
-    pose.position, radius, include_crosswalk, spawning_lanes_limit)),
-  lanelets(hdmap_utils->getLanelets(ids))
+: ids(lanelet_map::nearbyLaneletIds(pose, radius, include_crosswalk, spawning_lanes_limit))
 {
 }
 
 auto TrafficSource::Validator::operator()(
-  const std::vector<geometry_msgs::msg::Point> & points, lanelet::Id id) const -> bool
+  const std::vector<geometry_msgs::msg::Point> & points, const lanelet::Id id) const -> bool
 {
-  const auto points2d = [&]() {
-    auto points2d = lanelet::Points2d();
-    for (const auto point : points) {
-      points2d.emplace_back(lanelet::utils::getId(), point.x, point.y);
-    }
-    return points2d;
-  }();
-
   /**
    * @note Possibly undesirable behavior
    * This implementation will consider cases like intersections as one big spawning area.
@@ -66,9 +55,9 @@ auto TrafficSource::Validator::operator()(
    *   . |____|  .
    */
   return std::find(ids.begin(), ids.end(), id) != ids.end() and
-         std::all_of(points2d.begin(), points2d.end(), [&](const auto & point) {
-           return std::any_of(lanelets.begin(), lanelets.end(), [&](const auto & lane) {
-             return lanelet::geometry::inside(lane, point);
+         std::all_of(points.begin(), points.end(), [&](const auto & point) {
+           return std::any_of(ids.begin(), ids.end(), [&](const auto & lanelet_id) {
+             return pose::isInLanelet(point, lanelet_id);
            });
          });
 }

@@ -72,7 +72,7 @@ public:
       node, entity_manager_ptr_->getHdmapUtils(),
       getROS2Parameter<std::string>("architecture_type", "awf/universe/20240605"))),
     traffic_controller_ptr_(std::make_shared<traffic::TrafficController>(
-      entity_manager_ptr_->getHdmapUtils(), [this]() { return API::getEntityNames(); },
+      [this]() { return API::getEntityNames(); },
       [this](const auto & entity_name) {
         if (const auto entity = getEntity(entity_name)) {
           return entity->getMapPose();
