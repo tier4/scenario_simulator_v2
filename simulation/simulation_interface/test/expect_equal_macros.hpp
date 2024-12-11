@@ -156,14 +156,14 @@
  * @brief Expect equal macros for autoware related messages.
  */
 #define EXPECT_CONTROL_COMMAND_EQ(MSG, PROTO)                                               \
-  EXPECT_DOUBLE_EQ(MSG.longitudinal.speed, PROTO.longitudinal().speed());                   \
+  EXPECT_DOUBLE_EQ(MSG.longitudinal.velocity, PROTO.longitudinal().velocity());             \
   EXPECT_DOUBLE_EQ(MSG.longitudinal.acceleration, PROTO.longitudinal().acceleration());     \
   EXPECT_DOUBLE_EQ(MSG.lateral.steering_tire_angle, PROTO.lateral().steering_tire_angle()); \
   EXPECT_DOUBLE_EQ(                                                                         \
     MSG.lateral.steering_tire_rotation_rate, PROTO.lateral().steering_tire_rotation_rate());
 
 #define EXPECT_VEHICLE_COMMAND_EQ(CONTROL_MSG, GEAR_MSG, EMERGENCY_MSG, PROTO) \
-  EXPECT_CONTROL_COMMAND_EQ(CONTROL_MSG, PROTO.ackermann_control_command());   \
+  EXPECT_CONTROL_COMMAND_EQ(CONTROL_MSG, PROTO.control());                     \
   EXPECT_DOUBLE_EQ(GEAR_MSG.command, PROTO.gear_command().data());             \
   EXPECT_DOUBLE_EQ(EMERGENCY_MSG.emergency, PROTO.vehicle_emergency_stamped().emergency());
 

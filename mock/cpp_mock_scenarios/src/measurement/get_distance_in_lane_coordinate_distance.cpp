@@ -80,7 +80,7 @@ private:
     if (from_entity->isInLanelet() && to_entity->isInLanelet()) {
       return traffic_simulator::distance::longitudinalDistance(
         from_entity->getCanonicalizedLaneletPose().value(),
-        to_entity->getCanonicalizedLaneletPose().value(), false, true,
+        to_entity->getCanonicalizedLaneletPose().value(), false, false,
         traffic_simulator::RoutingConfiguration(), api_.getHdmapUtils());
     }
     return std::nullopt;

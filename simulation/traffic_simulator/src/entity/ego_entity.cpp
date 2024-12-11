@@ -39,7 +39,7 @@ auto EgoEntity::makeFieldOperatorApplication(
   -> std::unique_ptr<concealer::FieldOperatorApplication>
 {
   if (const auto architecture_type =
-        getParameter<std::string>(node_parameters, "architecture_type", "awf/universe");
+        getParameter<std::string>(node_parameters, "architecture_type", "awf/universe/20240605");
       architecture_type.find("awf/universe") != std::string::npos) {
     auto parameters = getParameter<std::vector<std::string>>(node_parameters, "autoware.", {});
 
