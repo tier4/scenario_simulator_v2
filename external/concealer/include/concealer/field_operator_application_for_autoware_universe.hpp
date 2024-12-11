@@ -76,15 +76,17 @@ struct FieldOperatorApplicationFor<AutowareUniverse> : public FieldOperatorAppli
 
   auto receiveMrmState(const autoware_adapi_v1_msgs::msg::MrmState & msg) -> void;
 
-  auto receiveEmergencyState(const tier4_external_api_msgs::msg::Emergency & msg) -> void;
-
   template <typename... Ts>
   CONCEALER_PUBLIC explicit FieldOperatorApplicationFor(Ts &&... xs)
   : FieldOperatorApplication(std::forward<decltype(xs)>(xs)...),
     // clang-format off
     getCommand("/control/command/control_cmd", rclcpp::QoS(1), *this),
     getCooperateStatusArray("/api/external/get/rtc_status", rclcpp::QoS(1), *this, [this](const auto & v) { latest_cooperate_status_array = v; }),
-    getEmergencyState("/api/external/get/emergency", rclcpp::QoS(1), *this, [this](const auto & v) { receiveEmergencyState(v); }),
+    getEmergencyState("/api/external/get/emergency", rclcpp::QoS(1), *this, [this](const auto & message) {
+      if (message.emergency) {
+        throw common::Error("Emergency state received");
+      }
+    }),
 #if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)
     getLocalizationState("/api/localization/initialization_state", rclcpp::QoS(1).transient_local(), *this),
 #endif

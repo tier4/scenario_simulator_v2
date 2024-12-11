@@ -460,14 +460,6 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::enableAutowareControl() -> v
   });
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::receiveEmergencyState(
-  const tier4_external_api_msgs::msg::Emergency & message) -> void
-{
-  if (message.emergency) {
-    throw common::Error("Emergency state received");
-  }
-}
-
 template <typename T>
 auto toMinimumRiskManeuverBehaviorString(const std::uint8_t & behavior_number) -> std::string
 {

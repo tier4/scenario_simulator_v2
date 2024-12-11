@@ -65,7 +65,9 @@ struct FieldOperatorApplication : public rclcpp::Node,
 
   std::string autoware_state;
 
+  // clang-format off
   SubscriberWrapper<autoware_system_msgs::msg::AutowareState, ThreadSafety::safe> getAutowareState;
+  // clang-format on
 
   CONCEALER_PUBLIC explicit FieldOperatorApplication(const pid_t = 0);
 
