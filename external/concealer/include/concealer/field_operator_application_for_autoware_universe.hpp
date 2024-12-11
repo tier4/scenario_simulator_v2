@@ -44,9 +44,7 @@
 namespace concealer
 {
 template <>
-struct FieldOperatorApplicationFor<AutowareUniverse>
-: public FieldOperatorApplication,
-  public TransitionAssertion<FieldOperatorApplicationFor<AutowareUniverse>>
+struct FieldOperatorApplicationFor<AutowareUniverse> : public FieldOperatorApplication
 {
   // clang-format off
   SubscriberWrapper<autoware_control_msgs::msg::Control>                          getCommand;

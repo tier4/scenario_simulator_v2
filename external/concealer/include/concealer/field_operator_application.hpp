@@ -50,7 +50,8 @@ class FieldOperatorApplicationFor;
  *        initialize, plan, and engage.
  *
  * -------------------------------------------------------------------------- */
-struct FieldOperatorApplication : public rclcpp::Node
+struct FieldOperatorApplication : public rclcpp::Node,
+                                  public TransitionAssertion<FieldOperatorApplication>
 {
   std::atomic<bool> is_stop_requested = false;
 
