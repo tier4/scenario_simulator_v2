@@ -56,48 +56,6 @@ auto listup(const Tuples & tuples) -> lister<N, Tuples>
   return lister<N, Tuples>(tuples);
 }
 
-#define DEFINE_STATIC_DATA_MEMBER_DETECTOR(NAME)                                    \
-  template <typename T, typename = void>                                            \
-  struct HasStatic##NAME : public std::false_type                                   \
-  {                                                                                 \
-  };                                                                                \
-                                                                                    \
-  template <typename T>                                                             \
-  struct HasStatic##NAME<T, std::void_t<decltype(T::NAME)>> : public std::true_type \
-  {                                                                                 \
-  }
-
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(NONE);
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(LANE_CHANGE_LEFT);
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(LANE_CHANGE_RIGHT);
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(AVOIDANCE_LEFT);
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(AVOIDANCE_RIGHT);
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(GOAL_PLANNER);
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(START_PLANNER);
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(PULL_OUT);
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(TRAFFIC_LIGHT);
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(INTERSECTION);
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(INTERSECTION_OCCLUSION);
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(CROSSWALK);
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(BLIND_SPOT);
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(DETECTION_AREA);
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(NO_STOPPING_AREA);
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(OCCLUSION_SPOT);
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(EXT_REQUEST_LANE_CHANGE_LEFT);
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(EXT_REQUEST_LANE_CHANGE_RIGHT);
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(AVOIDANCE_BY_LC_LEFT);
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(AVOIDANCE_BY_LC_RIGHT);
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(NO_DRIVABLE_LANE);
-
-// For MrmState::behavior
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(COMFORTABLE_STOP);
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(EMERGENCY_STOP);
-// DEFINE_STATIC_DATA_MEMBER_DETECTOR(NONE); // NOTE: This is defined above.
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(UNKNOWN);
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(PULL_OVER);
-
-#undef DEFINE_STATIC_DATA_MEMBER_DETECTOR
-
 /**
  * NOTE: for changes from `distance` to start/finish distance
  * see https://github.com/tier4/tier4_autoware_msgs/commit/8b85e6e43aa48cf4a439c77bf4bf6aee2e70c3ef
@@ -458,63 +416,5 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::enableAutowareControl() -> v
     auto request = std::make_shared<autoware_adapi_v1_msgs::srv::ChangeOperationMode::Request>();
     requestEnableAutowareControl(request);
   });
-}
-
-template <typename T>
-auto toMinimumRiskManeuverBehaviorString(const std::uint8_t & behavior_number) -> std::string
-{
-  static const std::unordered_map<std::uint8_t, std::string> behavior_string_map = [&]() {
-    std::unordered_map<std::uint8_t, std::string> behavior_string_map;
-
-#define EMPLACE(IDENTIFIER)                                  \
-  if constexpr (HasStatic##IDENTIFIER<T>::value) {           \
-    behavior_string_map.emplace(T::IDENTIFIER, #IDENTIFIER); \
-  }                                                          \
-  static_assert(true)
-
-    EMPLACE(COMFORTABLE_STOP);
-    EMPLACE(EMERGENCY_STOP);
-    EMPLACE(NONE);
-    EMPLACE(UNKNOWN);
-    EMPLACE(PULL_OVER);
-
-#undef EMPLACE
-    return behavior_string_map;
-  }();
-
-  if (const auto behavior = behavior_string_map.find(behavior_number);
-      behavior == behavior_string_map.end()) {
-    throw common::Error(
-      "Unexpected autoware_adapi_v1_msgs::msg::MrmState::behavior, number: ", behavior_number);
-  } else {
-    return behavior->second;
-  }
-}
-
-auto toMinimumRiskManeuverStateString(const std::uint8_t & state_number) -> std::string
-{
-  static const std::unordered_map<std::uint8_t, std::string> state_string_map = {
-    {autoware_adapi_v1_msgs::msg::MrmState::MRM_FAILED, "MRM_FAILED"},
-    {autoware_adapi_v1_msgs::msg::MrmState::MRM_OPERATING, "MRM_OPERATING"},
-    {autoware_adapi_v1_msgs::msg::MrmState::MRM_SUCCEEDED, "MRM_SUCCEEDED"},
-    {autoware_adapi_v1_msgs::msg::MrmState::NORMAL, "NORMAL"},
-    {autoware_adapi_v1_msgs::msg::MrmState::UNKNOWN, "UNKNOWN"},
-  };
-
-  if (const auto state = state_string_map.find(state_number); state == state_string_map.end()) {
-    throw common::Error(
-      "Unexpected autoware_adapi_v1_msgs::msg::MrmState::state, number: ", state_number);
-  } else {
-    return state->second;
-  }
-}
-
-auto FieldOperatorApplicationFor<AutowareUniverse>::receiveMrmState(
-  const autoware_adapi_v1_msgs::msg::MrmState & message) -> void
-{
-  minimum_risk_maneuver_state = toMinimumRiskManeuverStateString(message.state);
-
-  minimum_risk_maneuver_behavior =
-    toMinimumRiskManeuverBehaviorString<autoware_adapi_v1_msgs::msg::MrmState>(message.behavior);
 }
 }  // namespace concealer

@@ -43,6 +43,48 @@
 
 namespace concealer
 {
+#define DEFINE_STATIC_DATA_MEMBER_DETECTOR(NAME)                                    \
+  template <typename T, typename = void>                                            \
+  struct HasStatic##NAME : public std::false_type                                   \
+  {                                                                                 \
+  };                                                                                \
+                                                                                    \
+  template <typename T>                                                             \
+  struct HasStatic##NAME<T, std::void_t<decltype(T::NAME)>> : public std::true_type \
+  {                                                                                 \
+  }
+
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(NONE);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(LANE_CHANGE_LEFT);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(LANE_CHANGE_RIGHT);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(AVOIDANCE_LEFT);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(AVOIDANCE_RIGHT);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(GOAL_PLANNER);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(START_PLANNER);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(PULL_OUT);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(TRAFFIC_LIGHT);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(INTERSECTION);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(INTERSECTION_OCCLUSION);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(CROSSWALK);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(BLIND_SPOT);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(DETECTION_AREA);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(NO_STOPPING_AREA);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(OCCLUSION_SPOT);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(EXT_REQUEST_LANE_CHANGE_LEFT);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(EXT_REQUEST_LANE_CHANGE_RIGHT);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(AVOIDANCE_BY_LC_LEFT);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(AVOIDANCE_BY_LC_RIGHT);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(NO_DRIVABLE_LANE);
+
+// For MrmState::behavior
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(COMFORTABLE_STOP);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(EMERGENCY_STOP);
+// DEFINE_STATIC_DATA_MEMBER_DETECTOR(NONE); // NOTE: This is defined above.
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(UNKNOWN);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(PULL_OVER);
+
+#undef DEFINE_STATIC_DATA_MEMBER_DETECTOR
+
 template <>
 struct FieldOperatorApplicationFor<AutowareUniverse> : public FieldOperatorApplication
 {
@@ -74,8 +116,6 @@ struct FieldOperatorApplicationFor<AutowareUniverse> : public FieldOperatorAppli
 
   std::string minimum_risk_maneuver_behavior;
 
-  auto receiveMrmState(const autoware_adapi_v1_msgs::msg::MrmState & msg) -> void;
-
   template <typename... Ts>
   CONCEALER_PUBLIC explicit FieldOperatorApplicationFor(Ts &&... xs)
   : FieldOperatorApplication(std::forward<decltype(xs)>(xs)...),
@@ -90,7 +130,58 @@ struct FieldOperatorApplicationFor<AutowareUniverse> : public FieldOperatorAppli
 #if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)
     getLocalizationState("/api/localization/initialization_state", rclcpp::QoS(1).transient_local(), *this),
 #endif
-    getMrmState("/api/fail_safe/mrm_state", rclcpp::QoS(1), *this, [this](const auto & v) { receiveMrmState(v); }),
+    getMrmState("/api/fail_safe/mrm_state", rclcpp::QoS(1), *this, [this](const auto & message) {
+      auto state_name_of = [](auto state) constexpr {
+        switch (state) {
+          case autoware_adapi_v1_msgs::msg::MrmState::MRM_FAILED:
+            return "MRM_FAILED";
+          case autoware_adapi_v1_msgs::msg::MrmState::MRM_OPERATING:
+            return "MRM_OPERATING";
+          case autoware_adapi_v1_msgs::msg::MrmState::MRM_SUCCEEDED:
+            return "MRM_SUCCEEDED";
+          case autoware_adapi_v1_msgs::msg::MrmState::NORMAL:
+            return "NORMAL";
+          case autoware_adapi_v1_msgs::msg::MrmState::UNKNOWN:
+            return "UNKNOWN";
+          default:
+            throw common::Error(
+              "Unexpected autoware_adapi_v1_msgs::msg::MrmState::state, number: ", state);
+        }
+      };
+
+      auto behavior_name_of = [](auto behavior) constexpr {
+        if constexpr (HasStaticCOMFORTABLE_STOP<autoware_adapi_v1_msgs::msg::MrmState>::value) {
+          if (behavior == autoware_adapi_v1_msgs::msg::MrmState::COMFORTABLE_STOP) {
+            return "COMFORTABLE_STOP";
+          }
+        }
+        if constexpr (HasStaticEMERGENCY_STOP<autoware_adapi_v1_msgs::msg::MrmState>::value) {
+          if (behavior == autoware_adapi_v1_msgs::msg::MrmState::EMERGENCY_STOP) {
+            return "EMERGENCY_STOP";
+          }
+        }
+        if constexpr (HasStaticNONE<autoware_adapi_v1_msgs::msg::MrmState>::value) {
+          if (behavior == autoware_adapi_v1_msgs::msg::MrmState::NONE) {
+            return "NONE";
+          }
+        }
+        if constexpr (HasStaticUNKNOWN<autoware_adapi_v1_msgs::msg::MrmState>::value) {
+          if (behavior == autoware_adapi_v1_msgs::msg::MrmState::UNKNOWN) {
+            return "UNKNOWN";
+          }
+        }
+        if constexpr (HasStaticPULL_OVER<autoware_adapi_v1_msgs::msg::MrmState>::value) {
+          if (behavior == autoware_adapi_v1_msgs::msg::MrmState::PULL_OVER) {
+            return "PULL_OVER";
+          }
+        }
+        throw common::Error(
+          "Unexpected autoware_adapi_v1_msgs::msg::MrmState::behavior, number: ", behavior);
+      };
+
+      minimum_risk_maneuver_state = state_name_of(message.state);
+      minimum_risk_maneuver_behavior = behavior_name_of(message.behavior);
+    }),
     getPathWithLaneId("/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", rclcpp::QoS(1), *this),
     getTrajectory("/api/iv_msgs/planning/scenario_planning/trajectory", rclcpp::QoS(1), *this),
     getTurnIndicatorsCommandImpl("/control/command/turn_indicators_cmd", rclcpp::QoS(1), *this),
