@@ -634,8 +634,8 @@ auto CatmullRomSpline::getTangentVector(const double s) const -> geometry_msgs::
         "This message is not originally intended to be displayed, if you see it, please "
         "contact the developer of traffic_simulator.");
     default:
-      const auto index_and_s = getCurveIndexAndS(s);
-      return curves_[index_and_s.first].getTangentVector(index_and_s.second, true);
+      const auto [index, s_value] = getCurveIndexAndS(s);
+      return curves_[index].getTangentVector(s_value, true);
   }
 }
 
