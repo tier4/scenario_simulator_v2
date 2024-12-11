@@ -71,11 +71,10 @@ auto EgoEntity::makeFieldOperatorApplication(
 
 EgoEntity::EgoEntity(
   const std::string & name, const CanonicalizedEntityStatus & entity_status,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
   const traffic_simulator_msgs::msg::VehicleParameters & parameters,
   const Configuration & configuration,
   const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node_parameters)
-: VehicleEntity(name, entity_status, hdmap_utils_ptr, parameters),
+: VehicleEntity(name, entity_status, parameters),
   field_operator_application(makeFieldOperatorApplication(configuration, node_parameters))
 {
 }

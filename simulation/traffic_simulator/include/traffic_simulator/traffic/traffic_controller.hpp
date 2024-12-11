@@ -28,7 +28,6 @@
 
 #include <memory>
 #include <string>
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/traffic/traffic_module_base.hpp>
 #include <traffic_simulator/traffic/traffic_source.hpp>
 #include <utility>

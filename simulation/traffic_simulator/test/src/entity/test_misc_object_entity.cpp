@@ -30,19 +30,17 @@ int main(int argc, char ** argv)
   return RUN_ALL_TESTS();
 }
 
-class MiscObjectEntityTest_HdMapUtils : public testing::Test
+class MiscObjectEntityTest_LaneletWrapper : public testing::Test
 {
 protected:
-  MiscObjectEntityTest_HdMapUtils()
-  : hdmap_utils_ptr(makeHdMapUtilsSharedPointer()), entity_name("misc_object_entity")
+  MiscObjectEntityTest_LaneletWrapper() : entity_name("misc_object_entity")
   {
     activateLaneletWrapper("standard_map");
   }
-  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr;
   const std::string entity_name;
 };
 
-class MiscObjectEntityTest_FullObject : public MiscObjectEntityTest_HdMapUtils
+class MiscObjectEntityTest_FullObject : public MiscObjectEntityTest_LaneletWrapper
 {
 protected:
   MiscObjectEntityTest_FullObject()
@@ -50,8 +48,7 @@ protected:
     pose(makeCanonicalizedLaneletPose(id)),
     bbox(makeBoundingBox()),
     status(makeCanonicalizedEntityStatus(pose, bbox, 0.0, entity_name)),
-    misc_object(
-      entity_name, status, hdmap_utils_ptr, traffic_simulator_msgs::msg::MiscObjectParameters{}),
+    misc_object(entity_name, status, traffic_simulator_msgs::msg::MiscObjectParameters{}),
     entity_base(&misc_object)
   {
   }
@@ -67,7 +64,7 @@ protected:
 /**
  * @note Test basic functionality. Test current action obtaining when NPC logic is not started.
  */
-TEST_F(MiscObjectEntityTest_HdMapUtils, getCurrentAction_npcNotStarted)
+TEST_F(MiscObjectEntityTest_LaneletWrapper, getCurrentAction_npcNotStarted)
 {
   auto non_canonicalized_status = makeEntityStatus(
     makeCanonicalizedLaneletPose(120659), makeBoundingBox(), 0.0, entity_name,
@@ -78,7 +75,7 @@ TEST_F(MiscObjectEntityTest_HdMapUtils, getCurrentAction_npcNotStarted)
     entity_name,
     traffic_simulator::entity_status::CanonicalizedEntityStatus(
       non_canonicalized_status, makeCanonicalizedLaneletPose(120659)),
-    hdmap_utils_ptr, traffic_simulator_msgs::msg::MiscObjectParameters{});
+    traffic_simulator_msgs::msg::MiscObjectParameters{});
 
   EXPECT_EQ(blob.getCurrentAction(), "current_action_name");
 }
@@ -87,7 +84,7 @@ TEST_F(MiscObjectEntityTest_HdMapUtils, getCurrentAction_npcNotStarted)
  * @note Test function behavior when absolute speed change is requested - the goal is to test
  * throwing error.
  */
-TEST_F(MiscObjectEntityTest_HdMapUtils, requestSpeedChange_absolute)
+TEST_F(MiscObjectEntityTest_LaneletWrapper, requestSpeedChange_absolute)
 {
   EXPECT_THROW(
     traffic_simulator::entity::MiscObjectEntity(
@@ -95,7 +92,7 @@ TEST_F(MiscObjectEntityTest_HdMapUtils, requestSpeedChange_absolute)
       makeCanonicalizedEntityStatus(
         makeCanonicalizedLaneletPose(120659), makeBoundingBox(), 0.0, entity_name,
         traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
-      hdmap_utils_ptr, traffic_simulator_msgs::msg::MiscObjectParameters{})
+      traffic_simulator_msgs::msg::MiscObjectParameters{})
       .requestSpeedChange(10.0, false),
     common::SemanticError);
 }
@@ -104,7 +101,7 @@ TEST_F(MiscObjectEntityTest_HdMapUtils, requestSpeedChange_absolute)
  * @note Test function behavior when relative speed change is requested - the goal is to test
  * throwing error.
  */
-TEST_F(MiscObjectEntityTest_HdMapUtils, requestSpeedChange_relative)
+TEST_F(MiscObjectEntityTest_LaneletWrapper, requestSpeedChange_relative)
 {
   auto pose = makeCanonicalizedLaneletPose(120659);
   auto bbox = makeBoundingBox();
@@ -113,7 +110,7 @@ TEST_F(MiscObjectEntityTest_HdMapUtils, requestSpeedChange_relative)
     entity_name,
     makeCanonicalizedEntityStatus(
       pose, bbox, 0.0, entity_name, traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
-    hdmap_utils_ptr, traffic_simulator_msgs::msg::MiscObjectParameters{});
+    traffic_simulator_msgs::msg::MiscObjectParameters{});
 
   std::unordered_map<std::string, traffic_simulator::entity_status::CanonicalizedEntityStatus>
     others;
@@ -135,7 +132,7 @@ TEST_F(MiscObjectEntityTest_HdMapUtils, requestSpeedChange_relative)
  * @note Test function behavior when relative speed change with transition type is requested
  * - the goal is to test throwing error.
  */
-TEST_F(MiscObjectEntityTest_HdMapUtils, requestSpeedChange_absoluteTransition)
+TEST_F(MiscObjectEntityTest_LaneletWrapper, requestSpeedChange_absoluteTransition)
 {
   EXPECT_THROW(
     traffic_simulator::entity::MiscObjectEntity(
@@ -143,7 +140,7 @@ TEST_F(MiscObjectEntityTest_HdMapUtils, requestSpeedChange_absoluteTransition)
       makeCanonicalizedEntityStatus(
         makeCanonicalizedLaneletPose(120659), makeBoundingBox(), 0.0, entity_name,
         traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
-      hdmap_utils_ptr, traffic_simulator_msgs::msg::MiscObjectParameters{})
+      traffic_simulator_msgs::msg::MiscObjectParameters{})
       .requestSpeedChange(
         10.0, traffic_simulator::speed_change::Transition::AUTO,
         traffic_simulator::speed_change::Constraint(
@@ -156,7 +153,7 @@ TEST_F(MiscObjectEntityTest_HdMapUtils, requestSpeedChange_absoluteTransition)
  * @note Test function behavior when route assigning is requested with lanelet pose
  * - the goal is to test throwing error.
  */
-TEST_F(MiscObjectEntityTest_HdMapUtils, requestAssignRoute_laneletPose)
+TEST_F(MiscObjectEntityTest_LaneletWrapper, requestAssignRoute_laneletPose)
 {
   EXPECT_THROW(
     traffic_simulator::entity::MiscObjectEntity(
@@ -164,7 +161,7 @@ TEST_F(MiscObjectEntityTest_HdMapUtils, requestAssignRoute_laneletPose)
       makeCanonicalizedEntityStatus(
         makeCanonicalizedLaneletPose(120659), makeBoundingBox(), 0.0, entity_name,
         traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
-      hdmap_utils_ptr, traffic_simulator_msgs::msg::MiscObjectParameters{})
+      traffic_simulator_msgs::msg::MiscObjectParameters{})
       .requestAssignRoute(std::vector<traffic_simulator::lanelet_pose::CanonicalizedLaneletPose>{
         makeCanonicalizedLaneletPose(120660)}),
     common::SemanticError);
@@ -174,7 +171,7 @@ TEST_F(MiscObjectEntityTest_HdMapUtils, requestAssignRoute_laneletPose)
  * @note Test function behavior when route assigning is requested with pose
  * - the goal is to test throwing error.
  */
-TEST_F(MiscObjectEntityTest_HdMapUtils, requestAssignRoute_pose)
+TEST_F(MiscObjectEntityTest_LaneletWrapper, requestAssignRoute_pose)
 {
   EXPECT_THROW(
     traffic_simulator::entity::MiscObjectEntity(
@@ -182,7 +179,7 @@ TEST_F(MiscObjectEntityTest_HdMapUtils, requestAssignRoute_pose)
       makeCanonicalizedEntityStatus(
         makeCanonicalizedLaneletPose(120659), makeBoundingBox(), 0.0, entity_name,
         traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
-      hdmap_utils_ptr, traffic_simulator_msgs::msg::MiscObjectParameters{})
+      traffic_simulator_msgs::msg::MiscObjectParameters{})
       .requestAssignRoute(
         std::vector<geometry_msgs::msg::Pose>{makePose(makePoint(3759.34, 73791.38))}),
     common::SemanticError);
@@ -192,7 +189,7 @@ TEST_F(MiscObjectEntityTest_HdMapUtils, requestAssignRoute_pose)
  * @note Test function behavior when position acquiring is requested with lanelet pose
  * - the goal is to test throwing error.
  */
-TEST_F(MiscObjectEntityTest_HdMapUtils, requestAcquirePosition_laneletPose)
+TEST_F(MiscObjectEntityTest_LaneletWrapper, requestAcquirePosition_laneletPose)
 {
   EXPECT_THROW(
     traffic_simulator::entity::MiscObjectEntity(
@@ -200,7 +197,7 @@ TEST_F(MiscObjectEntityTest_HdMapUtils, requestAcquirePosition_laneletPose)
       makeCanonicalizedEntityStatus(
         makeCanonicalizedLaneletPose(120659), makeBoundingBox(), 0.0, entity_name,
         traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
-      hdmap_utils_ptr, traffic_simulator_msgs::msg::MiscObjectParameters{})
+      traffic_simulator_msgs::msg::MiscObjectParameters{})
       .requestAcquirePosition(makeCanonicalizedLaneletPose(120660)),
     common::SemanticError);
 }
@@ -209,7 +206,7 @@ TEST_F(MiscObjectEntityTest_HdMapUtils, requestAcquirePosition_laneletPose)
  * @note Test function behavior when position acquiring is requested with pose
  * - the goal is to test throwing error.
  */
-TEST_F(MiscObjectEntityTest_HdMapUtils, requestAcquirePosition_pose)
+TEST_F(MiscObjectEntityTest_LaneletWrapper, requestAcquirePosition_pose)
 {
   EXPECT_THROW(
     traffic_simulator::entity::MiscObjectEntity(
@@ -217,7 +214,7 @@ TEST_F(MiscObjectEntityTest_HdMapUtils, requestAcquirePosition_pose)
       makeCanonicalizedEntityStatus(
         makeCanonicalizedLaneletPose(120659), makeBoundingBox(), 0.0, entity_name,
         traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
-      hdmap_utils_ptr, traffic_simulator_msgs::msg::MiscObjectParameters{})
+      traffic_simulator_msgs::msg::MiscObjectParameters{})
       .requestAcquirePosition(makePose(makePoint(3759.34, 73791.38))),
     common::SemanticError);
 }
@@ -225,7 +222,7 @@ TEST_F(MiscObjectEntityTest_HdMapUtils, requestAcquirePosition_pose)
 /**
  * @note Test function behavior when called with any argument - the goal is to test error throwing.
  */
-TEST_F(MiscObjectEntityTest_HdMapUtils, getRouteLanelets)
+TEST_F(MiscObjectEntityTest_LaneletWrapper, getRouteLanelets)
 {
   EXPECT_THROW(
     traffic_simulator::entity::MiscObjectEntity(
@@ -233,7 +230,7 @@ TEST_F(MiscObjectEntityTest_HdMapUtils, getRouteLanelets)
       makeCanonicalizedEntityStatus(
         makeCanonicalizedLaneletPose(120659), makeBoundingBox(), 0.0, entity_name,
         traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
-      hdmap_utils_ptr, traffic_simulator_msgs::msg::MiscObjectParameters{})
+      traffic_simulator_msgs::msg::MiscObjectParameters{})
       .getRouteLanelets(100.0),
     common::SemanticError);
 }
@@ -454,14 +451,15 @@ TEST_F(MiscObjectEntityTest_FullObject, stopAtCurrentPosition)
  * (both crosswalk and road) and status_.type.type != PEDESTRIAN.
  */
 TEST_F(
-  MiscObjectEntityTest_HdMapUtils, getCanonicalizedLaneletPose_notOnRoadAndCrosswalkNotPedestrian)
+  MiscObjectEntityTest_LaneletWrapper,
+  getCanonicalizedLaneletPose_notOnRoadAndCrosswalkNotPedestrian)
 {
   EXPECT_FALSE(traffic_simulator::entity::MiscObjectEntity(
                  entity_name,
                  makeCanonicalizedEntityStatus(
                    makePose(makePoint(3810.0, 73745.0)), makeBoundingBox(), 1.0, 0.0, entity_name,
                    traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
-                 hdmap_utils_ptr, traffic_simulator_msgs::msg::MiscObjectParameters{})
+                 traffic_simulator_msgs::msg::MiscObjectParameters{})
                  .getCanonicalizedLaneletPose(5.0)
                  .has_value());
 }
@@ -471,7 +469,8 @@ TEST_F(
  * with a matching distance greater than a distance from an entity to the lanelet
  * (both crosswalk and road) and status_.type.type != PEDESTRIAN.
  */
-TEST_F(MiscObjectEntityTest_HdMapUtils, getCanonicalizedLaneletPose_onRoadAndCrosswalkNotPedestrian)
+TEST_F(
+  MiscObjectEntityTest_LaneletWrapper, getCanonicalizedLaneletPose_onRoadAndCrosswalkNotPedestrian)
 {
   EXPECT_TRUE(
     traffic_simulator::entity::MiscObjectEntity(
@@ -480,7 +479,7 @@ TEST_F(MiscObjectEntityTest_HdMapUtils, getCanonicalizedLaneletPose_onRoadAndCro
         makePose(makePoint(3766.1, 73738.2), makeQuaternionFromYaw((120.0) * M_PI / 180.0)),
         makeBoundingBox(), 1.0, 0.0, entity_name,
         traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
-      hdmap_utils_ptr, traffic_simulator_msgs::msg::MiscObjectParameters{})
+      traffic_simulator_msgs::msg::MiscObjectParameters{})
       .getCanonicalizedLaneletPose(1.0)
       .has_value());
 }
@@ -491,7 +490,8 @@ TEST_F(MiscObjectEntityTest_HdMapUtils, getCanonicalizedLaneletPose_onRoadAndCro
  * but smaller than to the road lanelet and status_.type.type != PEDESTRIAN.
  */
 TEST_F(
-  MiscObjectEntityTest_HdMapUtils, getCanonicalizedLaneletPose_onCrosswalkNotOnRoadNotPedestrian)
+  MiscObjectEntityTest_LaneletWrapper,
+  getCanonicalizedLaneletPose_onCrosswalkNotOnRoadNotPedestrian)
 {
   EXPECT_FALSE(
     traffic_simulator::entity::MiscObjectEntity(
@@ -500,7 +500,7 @@ TEST_F(
         makePose(makePoint(3764.5, 73737.5), makeQuaternionFromYaw((120.0) * M_PI / 180.0)),
         makeBoundingBox(), 1.0, 0.0, entity_name,
         traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
-      hdmap_utils_ptr, traffic_simulator_msgs::msg::MiscObjectParameters{})
+      traffic_simulator_msgs::msg::MiscObjectParameters{})
       .getCanonicalizedLaneletPose(1.0)
       .has_value());
 }
