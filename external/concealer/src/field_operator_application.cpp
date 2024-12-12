@@ -48,7 +48,81 @@ FieldOperatorApplication::FieldOperatorApplication(const pid_t pid)
   process_id(pid),
   getAutowareState("/autoware/state", rclcpp::QoS(1), *this, [this](const auto & v) {
     autoware_state = toAutowareStateString<autoware_system_msgs::msg::AutowareState>(v.state);
-  })
+  }),
+  getCommand("/control/command/control_cmd", rclcpp::QoS(1), *this),
+  getCooperateStatusArray("/api/external/get/rtc_status", rclcpp::QoS(1), *this, [this](const auto & v) { latest_cooperate_status_array = v; }),
+  getEmergencyState("/api/external/get/emergency", rclcpp::QoS(1), *this, [this](const auto & message) {
+    if (message.emergency) {
+      throw common::Error("Emergency state received");
+    }
+  }),
+#if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)
+  getLocalizationState("/api/localization/initialization_state", rclcpp::QoS(1).transient_local(), *this),
+#endif
+  getMrmState("/api/fail_safe/mrm_state", rclcpp::QoS(1), *this, [this](const auto & message) {
+    auto state_name_of = [](auto state) constexpr {
+      switch (state) {
+        case autoware_adapi_v1_msgs::msg::MrmState::MRM_FAILED:
+          return "MRM_FAILED";
+        case autoware_adapi_v1_msgs::msg::MrmState::MRM_OPERATING:
+          return "MRM_OPERATING";
+        case autoware_adapi_v1_msgs::msg::MrmState::MRM_SUCCEEDED:
+          return "MRM_SUCCEEDED";
+        case autoware_adapi_v1_msgs::msg::MrmState::NORMAL:
+          return "NORMAL";
+        case autoware_adapi_v1_msgs::msg::MrmState::UNKNOWN:
+          return "UNKNOWN";
+        default:
+          throw common::Error(
+            "Unexpected autoware_adapi_v1_msgs::msg::MrmState::state, number: ", state);
+      }
+    };
+
+    auto behavior_name_of = [](auto behavior) constexpr {
+      if constexpr (HasStaticCOMFORTABLE_STOP<autoware_adapi_v1_msgs::msg::MrmState>::value) {
+        if (behavior == autoware_adapi_v1_msgs::msg::MrmState::COMFORTABLE_STOP) {
+          return "COMFORTABLE_STOP";
+        }
+      }
+      if constexpr (HasStaticEMERGENCY_STOP<autoware_adapi_v1_msgs::msg::MrmState>::value) {
+        if (behavior == autoware_adapi_v1_msgs::msg::MrmState::EMERGENCY_STOP) {
+          return "EMERGENCY_STOP";
+        }
+      }
+      if constexpr (HasStaticNONE<autoware_adapi_v1_msgs::msg::MrmState>::value) {
+        if (behavior == autoware_adapi_v1_msgs::msg::MrmState::NONE) {
+          return "NONE";
+        }
+      }
+      if constexpr (HasStaticUNKNOWN<autoware_adapi_v1_msgs::msg::MrmState>::value) {
+        if (behavior == autoware_adapi_v1_msgs::msg::MrmState::UNKNOWN) {
+          return "UNKNOWN";
+        }
+      }
+      if constexpr (HasStaticPULL_OVER<autoware_adapi_v1_msgs::msg::MrmState>::value) {
+        if (behavior == autoware_adapi_v1_msgs::msg::MrmState::PULL_OVER) {
+          return "PULL_OVER";
+        }
+      }
+      throw common::Error(
+        "Unexpected autoware_adapi_v1_msgs::msg::MrmState::behavior, number: ", behavior);
+    };
+
+    minimum_risk_maneuver_state = state_name_of(message.state);
+    minimum_risk_maneuver_behavior = behavior_name_of(message.behavior);
+  }),
+  getPathWithLaneId("/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", rclcpp::QoS(1), *this),
+  getTrajectory("/api/iv_msgs/planning/scenario_planning/trajectory", rclcpp::QoS(1), *this),
+  getTurnIndicatorsCommandImpl("/control/command/turn_indicators_cmd", rclcpp::QoS(1), *this),
+  requestClearRoute("/api/routing/clear_route", *this),
+  requestCooperateCommands("/api/external/set/rtc_commands", *this),
+  requestEngage("/api/external/set/engage", *this),
+  requestInitialPose("/api/localization/initialize", *this),
+  // NOTE: /api/routing/set_route_points takes a long time to return. But the specified duration is not decided by any technical reasons.
+  requestSetRoutePoints("/api/routing/set_route_points", *this, std::chrono::seconds(10)),
+  requestSetRtcAutoMode("/api/external/set/rtc_auto_mode", *this),
+  requestSetVelocityLimit("/api/autoware/set/velocity_limit", *this),
+  requestEnableAutowareControl("/api/operation_mode/enable_autoware_control", *this)
 {
 }
 

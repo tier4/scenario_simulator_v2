@@ -17,8 +17,8 @@
 
 #include <autoware_adapi_v1_msgs/msg/response_status.hpp>
 #include <chrono>
-#include <concealer/field_operator_application.hpp>
 #include <rclcpp/rclcpp.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <tier4_external_api_msgs/msg/response_status.hpp>
 #include <tier4_rtc_msgs/srv/auto_mode_with_module.hpp>
@@ -58,21 +58,22 @@ template <typename T>
 class ServiceWithValidation
 {
 public:
+  template <typename FieldOperatorApplication>
   explicit ServiceWithValidation(
     const std::string & service_name, FieldOperatorApplication & autoware,
     const std::chrono::nanoseconds validation_interval = std::chrono::seconds(1))
   : service_name(service_name),
     logger(autoware.get_logger()),
-    client(autoware.create_client<T>(service_name, rmw_qos_profile_default)),
+    client(autoware.template create_client<T>(service_name, rmw_qos_profile_default)),
     validation_rate(validation_interval)
   {
   }
 
-  class TimeoutError : public common::Error
+  class TimeoutError : public common::scenario_simulator_exception::Error
   {
   public:
     template <typename... Ts>
-    explicit TimeoutError(Ts &&... xs) : common::Error(std::forward<decltype(xs)>(xs)...)
+    explicit TimeoutError(Ts &&... xs) : common::scenario_simulator_exception::Error(std::forward<decltype(xs)>(xs)...)
     {
     }
   };
