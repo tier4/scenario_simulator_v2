@@ -54,6 +54,7 @@ auto EgoEntity::makeFieldOperatorApplication(
     parameters.push_back("use_foa:=false");
     parameters.push_back("perception/enable_traffic_light:=" + std::string(architecture_type >= "awf/universe/20230906" ? "true" : "false"));
     parameters.push_back("use_sim_time:=" + std::string(getParameter<bool>(node_parameters, "use_sim_time", false) ? "true" : "false"));
+    parameters.push_back("localization_sim_mode:=" + std::string(getParameter<bool>(node_parameters, "simulate_localization") ? "api" : "pose_twist_estimator"));
     // clang-format on
 
     return getParameter<bool>(node_parameters, "launch_autoware", true)
