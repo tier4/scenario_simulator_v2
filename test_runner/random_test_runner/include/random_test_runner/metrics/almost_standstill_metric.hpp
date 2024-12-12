@@ -28,7 +28,7 @@ public:
   bool isAlmostStandingStill(const traffic_simulator::CanonicalizedEntityStatus & status)
   {
     if (!last_status_) {
-      last_status_ = status;
+      last_status_.emplace(status);
       return false;
     }
 
@@ -43,7 +43,7 @@ public:
       almost_standstill_time_ = 0.0;
     }
 
-    last_status_ = status;
+    last_status_->set(status);
 
     if (almost_standstill_time_ > almost_standstill_timeout_) {
       return true;
