@@ -141,19 +141,18 @@ struct TimeToCollisionCondition : private Scope, private SimulatorCore::Conditio
       }
     };
 
-    auto directional_dimension = [&]() {
-      switch (relative_distance_type) {
-        case RelativeDistanceType::longitudinal:
-          return std::optional<DirectionalDimension>(DirectionalDimension::longitudinal);
-        case RelativeDistanceType::lateral:
-          return std::optional<DirectionalDimension>(DirectionalDimension::lateral);
-        default:
-        case RelativeDistanceType::euclidianDistance:
-          return std::optional<DirectionalDimension>(std::nullopt);
-      };
-    };
-
     auto speed = [&]() {
+      auto directional_dimension = [&]() {
+        switch (relative_distance_type) {
+          case RelativeDistanceType::longitudinal:
+            return std::optional<DirectionalDimension>(DirectionalDimension::longitudinal);
+          case RelativeDistanceType::lateral:
+            return std::optional<DirectionalDimension>(DirectionalDimension::lateral);
+          default:
+          case RelativeDistanceType::euclidianDistance:
+            return std::optional<DirectionalDimension>(std::nullopt);
+        };
+      };
       if (time_to_collision_condition_target.is<Entity>()) {
         return RelativeSpeedCondition::evaluate(
           entities, triggering_entity, time_to_collision_condition_target.as<Entity>(),
@@ -163,15 +162,7 @@ struct TimeToCollisionCondition : private Scope, private SimulatorCore::Conditio
       }
     };
 
-    if (
-      time_to_collision_condition_target.is<Entity>() and
-      coordinate_system == CoordinateSystem::entity and
-      relative_distance_type == RelativeDistanceType::euclidianDistance and freespace) {
-      return evaluateTimeToCollisionCondition(
-        triggering_entity, time_to_collision_condition_target.as<Entity>());
-    } else {
-      return distance() / std::max(speed(), 0.0);
-    }
+    return distance() / std::max(speed(), 0.0);
   }
 
   auto evaluate()
