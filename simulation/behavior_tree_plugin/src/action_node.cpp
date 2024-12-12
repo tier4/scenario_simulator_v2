@@ -247,7 +247,7 @@ auto ActionNode::getFrontEntityName() const -> std::optional<std::string>
   std::vector<double> distances;
   std::vector<std::string> entities;
   for (const auto & each : other_entity_status) {
-    const auto distance = getDistanceToTargetEntityPolygon(getEntityStatus(each.first));
+    const auto distance = getDistanceToTargetEntityPolygon(each.second);
     const auto quat = math::geometry::getRotation(
       canonicalized_entity_status->getMapPose().orientation,
       other_entity_status.at(each.first).getMapPose().orientation);
@@ -299,8 +299,9 @@ auto ActionNode::getDistanceToTargetEntityPolygon(
   const traffic_simulator::CanonicalizedEntityStatus & status) const -> std::optional<double>
 {
   if (status.laneMatchingSucceed() and canonicalized_entity_status->laneMatchingSucceed()) {
-    /* boundingBoxRelativeLaneletPose requires routing_configuration, 
-     * allow_lane_change = true gives shortes route possible
+    /* 
+     * boundingBoxRelativeLaneletPose requires routing_configuration, 
+     * 'allow_lane_change = true' is needed to check distances to entities on neighbour lanelets
      */
 
     traffic_simulator::RoutingConfiguration routing_configuration;
