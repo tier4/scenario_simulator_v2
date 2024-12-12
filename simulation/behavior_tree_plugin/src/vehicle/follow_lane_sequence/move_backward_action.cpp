@@ -51,7 +51,7 @@ const traffic_simulator_msgs::msg::WaypointsArray MoveBackwardAction::calculateW
       s_in_spline = s_in_spline + lanelet_pose.s;
       break;
     } else {
-      s_in_spline = hdmap_utils->getLaneletLength(id) + s_in_spline;
+      s_in_spline = traffic_simulator::lanelet_map::laneletLength(id) + s_in_spline;
     }
   }
   traffic_simulator_msgs::msg::WaypointsArray waypoints;

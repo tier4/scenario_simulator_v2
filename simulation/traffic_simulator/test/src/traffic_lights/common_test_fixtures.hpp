@@ -19,6 +19,7 @@
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <traffic_simulator/traffic_lights/traffic_lights.hpp>
+#include <traffic_simulator/utils/lanelet_map.hpp>
 
 constexpr char architecture_old[] = "awf/universe/20230906";
 constexpr char architecture_new[] = "awf/universe/20240605";
@@ -40,6 +41,10 @@ public:
       std::is_same_v<TrafficLightsT, traffic_simulator::ConventionalTrafficLights> or
         std::is_same_v<TrafficLightsT, traffic_simulator::V2ITrafficLights>,
       "Given TrafficLights type is not supported");
+
+    const auto lanelet_path = ament_index_cpp::get_package_share_directory("traffic_simulator") +
+                              "/map/standard_map/lanelet2_map.osm";
+    traffic_simulator::lanelet_map::activate(lanelet_path);
   }
 
   const lanelet::Id id{34836};
