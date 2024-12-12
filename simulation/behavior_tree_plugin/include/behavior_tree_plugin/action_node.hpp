@@ -96,8 +96,6 @@ public:
   virtual auto getBlackBoardValues() -> void;
   auto getEntityStatus(const std::string & target_name) const
     -> const traffic_simulator::CanonicalizedEntityStatus &;
-  auto getDistanceToTargetEntityPolygon(const std::string target_name) const
-    -> std::optional<double>;
 
   auto setCanonicalizedEntityStatus(const traffic_simulator::EntityStatus & entity_status) -> void;
   auto calculateUpdatedEntityStatus(
@@ -119,11 +117,12 @@ protected:
   EntityStatusDict other_entity_status;
   lanelet::Ids route_lanelets;
 
+  auto getDistanceToTargetEntityPolygon(
+    const traffic_simulator::CanonicalizedEntityStatus & status) const -> std::optional<double>;
+
 private:
   auto getDistanceToTargetEntityOnCrosswalk(
     const math::geometry::CatmullRomSplineInterface & spline,
-    const traffic_simulator::CanonicalizedEntityStatus & status) const -> std::optional<double>;
-  auto getDistanceToTargetEntityPolygon(
     const traffic_simulator::CanonicalizedEntityStatus & status) const -> std::optional<double>;
   auto getConflictingEntityStatus(const lanelet::Ids & following_lanelets) const
     -> std::optional<traffic_simulator::CanonicalizedEntityStatus>;

@@ -235,11 +235,11 @@ auto ActionNode::getDistanceToStopLine(
 
 auto ActionNode::getDistanceToFrontEntity() const -> std::optional<double>
 {
-  auto name = getFrontEntityName();
-  if (!name) {
+  if (const auto entity_name_opt = getFrontEntityName()) {
+    return getDistanceToTargetEntityPolygon(getEntityStatus(entity_name_opt.value()));
+  } else {
     return std::nullopt;
   }
-  return getDistanceToTargetEntityPolygon(name.value());
 }
 
 auto ActionNode::getFrontEntityName() const -> std::optional<std::string>
@@ -247,7 +247,7 @@ auto ActionNode::getFrontEntityName() const -> std::optional<std::string>
   std::vector<double> distances;
   std::vector<std::string> entities;
   for (const auto & each : other_entity_status) {
-    const auto distance = getDistanceToTargetEntityPolygon(each.first);
+    const auto distance = getDistanceToTargetEntityPolygon(getEntityStatus(each.first));
     const auto quat = math::geometry::getRotation(
       canonicalized_entity_status->getMapPose().orientation,
       other_entity_status.at(each.first).getMapPose().orientation);
@@ -295,38 +295,27 @@ auto ActionNode::getEntityStatus(const std::string & target_name) const
   }
 }
 
-auto ActionNode::getDistanceToTargetEntityPolygon(const std::string target_name) const
-  -> std::optional<double>
-{
-  const auto & status = getEntityStatus(target_name);
-  if (status.laneMatchingSucceed()) {
-    return getDistanceToTargetEntityPolygon(status);
-  }
-  return std::nullopt;
-}
-
 auto ActionNode::getDistanceToTargetEntityPolygon(
   const traffic_simulator::CanonicalizedEntityStatus & status) const -> std::optional<double>
 {
-  if (
-    status.laneMatchingSucceed() and canonicalized_entity_status->getCanonicalizedLaneletPose() and
-    status.getCanonicalizedLaneletPose()) {
+  if (status.laneMatchingSucceed() and canonicalized_entity_status->laneMatchingSucceed()) {
+    /* boundingBoxRelativeLaneletPose requires routing_configuration, 
+     * allow_lane_change = true gives shortes route possible
+     */
+
     traffic_simulator::RoutingConfiguration routing_configuration;
     routing_configuration.allow_lane_change = true;
 
-    const auto relative_pose = traffic_simulator::pose::boundingBoxRelativeLaneletPose(
-      canonicalized_entity_status->getCanonicalizedLaneletPose().value(),
-      canonicalized_entity_status->getBoundingBox(), status.getCanonicalizedLaneletPose().value(),
-      status.getBoundingBox(), routing_configuration, hdmap_utils);
+    const auto & bounding_box = canonicalized_entity_status->getBoundingBox();
+    const auto relative_lanelet_pose = traffic_simulator::pose::boundingBoxRelativeLaneletPose(
+      canonicalized_entity_status->getCanonicalizedLaneletPose().value(), bounding_box,
+      status.getCanonicalizedLaneletPose().value(), status.getBoundingBox(), routing_configuration,
+      hdmap_utils);
 
-    auto distance_from_center =
-      relative_pose.s + (canonicalized_entity_status->getBoundingBox().dimensions.x / 2);
-
-    if (
-      (std::abs(relative_pose.offset) <=
-       (canonicalized_entity_status->getBoundingBox().dimensions.y / 2)) and
-      (relative_pose.s >= 0)) {
-      return distance_from_center;
+    const auto half_width = bounding_box.dimensions.y / 2;
+    // is in front and is within considered width (lateral distance)
+    if (relative_lanelet_pose.s >= 0 and std::abs(relative_lanelet_pose.offset) <= half_width) {
+      return relative_lanelet_pose.s + bounding_box.dimensions.x / 2;
     }
   }
   return std::nullopt;
@@ -346,9 +335,8 @@ auto ActionNode::getDistanceToConflictingEntity(
     }
   }
   for (const auto & status : lane_entity_status) {
-    const auto s = getDistanceToTargetEntityPolygon(status);
-    if (s) {
-      distances.insert(s.value());
+    if (const auto distance_to_entity = getDistanceToTargetEntityPolygon(status)) {
+      distances.insert(distance_to_entity.value());
     }
   }
   if (distances.empty()) {
