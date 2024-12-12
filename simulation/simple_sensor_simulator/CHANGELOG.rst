@@ -21,6 +21,137 @@ Changelog for package simple_sensor_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+7.0.2 (2024-12-12)
+------------------
+* Merge branch 'master' into fix/snor-cloud-issue-8-1
+* Merge branch 'master' into fix/snor-cloud-issue-8-1
+* Merge branch 'master' into fix/snor-cloud-issue-8-1
+* Merge branch 'master' into fix/snor-cloud-issue-8-1
+* Contributors: Masaya Kataoka, Taiga
+
+7.0.1 (2024-12-11)
+------------------
+* Merge branch 'master' into feature/act-starttrigger-optional
+* Merge branch 'master' into feature/act-starttrigger-optional
+* Contributors: Kotaro Yoshimoto, ぐるぐる
+
+7.0.0 (2024-12-10)
+------------------
+* Merge pull request `#1454 <https://github.com/tier4/scenario_simulator_v2/issues/1454>`_ from tier4/RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge branch 'master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* chore: apply linter
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* fix: replace "awf/universe" with "awf/universe/20240605" for architecture_type
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+  # Conflicts:
+  #	simulation/traffic_simulator/src/traffic_lights/traffic_light_publisher.cpp
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* refactor: added handling when autoware_perception_msgs/msg/traffic_signal_array.hpp is not present
+* chore: delete wrongly doubled word
+* docs: update comment
+* docs: update comment
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+  # Conflicts:
+  #	external/concealer/include/concealer/autoware.hpp
+  #	external/concealer/include/concealer/autoware_universe.hpp
+  #	external/concealer/include/concealer/field_operator_application_for_autoware_universe.hpp
+  #	external/concealer/src/autoware_universe.cpp
+  #	external/concealer/src/field_operator_application_for_autoware_universe.cpp
+* Merge branch 'master' into RJD-736/autoware_msgs_support
+* docs: delete comment for unsupported "awf/universe"
+* fix: delete autoware_auto_xx_msgs from include
+* fix: delete unsupported architecture_type "awf/universe"
+* Merge branch 'master' into RJD-736/autoware_msgs_support
+* Merge branch 'master' into RJD-736/autoware_msgs_support
+* Merge branch 'master' into RJD-736/autoware_msgs_support
+* Merge branch 'master' into RJD-736/autoware_msgs_support
+* Merge branch 'master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge branch 'master' into RJD-736/autoware_msgs_support
+* Merge branch 'master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Apply clang format
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/feature/manual_on_follow_trajectory' into feature/manual_on_follow_trajectory_not_auto
+  # Conflicts:
+  #	simulation/traffic_simulator/include/traffic_simulator/entity/entity_manager.hpp
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge pull request `#1277 <https://github.com/tier4/scenario_simulator_v2/issues/1277>`_ from tier4/RJD-736/autoware_msgs_support_new_traffic_light_group
+  Rjd 736/autoware msgs support new traffic light group
+* Merge remote-tracking branch 'origin/RJD-736/autoware_msgs_support_new_traffic_light_group' into feature/manual_on_follow_trajectory_not_auto
+  # Conflicts:
+  #	external/concealer/src/autoware_universe.cpp
+* feat(traffic_simulator): support TrafficLightGroupArray in SimpleSensorSimulator
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Port DetectedObjects and TrackedObjects
+* Port TrafficSignalArray from autoware_auto_perception_msgs to autoware_perception_msgs
+* Port GearCommand
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, Michał Kiełczykowski
+
+6.3.1 (2024-12-10)
+------------------
+* Merge branch 'master' into fix/sonor-cloud-issue-8-3
+* Merge branch 'master' into fix/sonor-cloud-issue-8-3
+* Contributors: Masaya Kataoka
+
+6.3.0 (2024-12-10)
+------------------
+* Merge branch 'master' into feature/lane-change-everywhere
+* Merge remote-tracking branch 'origin/master' into feature/lane-change-everywhere
+* Merge remote-tracking branch 'origin/master' into feature/lane-change-everywhere
+* Contributors: Kotaro Yoshimoto
+
+6.2.5 (2024-12-09)
+------------------
+* Merge pull request `#1477 <https://github.com/tier4/scenario_simulator_v2/issues/1477>`_ from tier4/fix/acc_by_slope
+* refactor: use std::atan2 instead of std::atan
+* Merge branch 'master' into fix/acc_by_slope
+* fix: EgoEntitySimulation::calculateAccelerationBySlope()
+* refactor: EgoEntitySimulation::calculateAccelerationBySlope unit test
+* chore: add test for calculated expected value in  EgoEntitySimulation::calculateAccelerationBySlope unit test
+* fix: use pitch-filled map pose in EgoEntitySimulation::calculateAccelerationBySlope test
+* fix: fix pitch angle sign in ego entity simulation test
+* Contributors: Kotaro Yoshimoto
+
+6.2.4 (2024-12-09)
+------------------
+* Merge branch 'master' into refactor/speed-condition
+* Merge branch 'master' into refactor/speed-condition
+* Contributors: Tatsuya Yamasaki
+
+6.2.3 (2024-12-05)
+------------------
+* Merge branch 'master' into fix/sonor-cloud-issue-8-2
+* Contributors: Masaya Kataoka
+
+6.2.2 (2024-12-04)
+------------------
+* Merge branch 'master' into refactor/distance-condition
+* Merge remote-tracking branch 'origin/master' into refactor/distance-condition
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
 6.2.1 (2024-12-03)
 ------------------
 * Merge branch 'master' into refactor/distance-condition-and-relative-distance-condition

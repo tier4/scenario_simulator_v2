@@ -48,7 +48,7 @@ VisualizationConditionGroupsDisplay::VisualizationConditionGroupsDisplay()
    * but the initial value of 35.0 is set to ensure a default size that is likely suitable for most screens. 
    * The scaling factor adjusts this size to ensure readability across various resolutions.
    */
-  const float text_size = scale * 35.0;
+  const float text_size = scale * 35.0f;
 
   /// @note Define initial value of left edge position of condition results panel
   const int left = 0;
@@ -60,21 +60,21 @@ VisualizationConditionGroupsDisplay::VisualizationConditionGroupsDisplay()
    * The purpose of this calculation is to position the top edge of the panel at an appropriate place on the screen, 
    * again scaling according to screen resolution to maintain a consistent look across different devices.
    */
-  const int top = static_cast<int>(std::round(450 * scale));
+  const auto top = static_cast<int>(std::round(450 * scale));
 
   /**
    * @note Define initial value of horizontal length of condition results panel.
    * The reason 2000 is hard-coded here is because that number displayed most beautifully when we tested the operation on a 4K/non 4K display.
    * Also, this number can be set via the rviz GUI.
    */
-  const int length = static_cast<int>(std::round(2000 * scale));
+  const auto length = static_cast<int>(std::round(2000 * scale));
 
   /**
    * @note Define initial value of width of condition results panel.
    * The reason 2000 is hard-coded here is because that number displayed most beautifully when we tested the operation on a 4K/non 4K display.
    * Also, this number can be set via the rviz GUI.
    */
-  const int width = static_cast<int>(std::round(2000 * scale));
+  const auto width = static_cast<int>(std::round(2000 * scale));
 
   property_topic_name_ = std::make_unique<rviz_common::properties::StringProperty>(
     "Topic", "/simulation/context", "The topic on which to publish simulation context.", this,
@@ -99,7 +99,7 @@ VisualizationConditionGroupsDisplay::VisualizationConditionGroupsDisplay()
     "This property controls the scaling factor for the text size on the panel. Setting a higher "
     "value results in larger text, making the displayed information easier to read.",
     this, SLOT(updateVisualization()), this);
-  property_value_scale_->setMin(0.01);
+  property_value_scale_->setMin(0.01f);
 }
 
 VisualizationConditionGroupsDisplay::~VisualizationConditionGroupsDisplay()
@@ -171,10 +171,9 @@ void VisualizationConditionGroupsDisplay::processMessage(const Context::ConstSha
 
   QPainter painter(&hud);
   painter.setRenderHint(QPainter::Antialiasing, true);
-  // QColor text_color = property_text_color_->getColor();
   QColor text_color(property_text_color_->getColor());
   text_color.setAlpha(255);
-  painter.setPen(QPen(text_color, static_cast<int>(2), Qt::SolidLine));
+  painter.setPen(QPen(text_color, 2, Qt::SolidLine));
   QFont font = painter.font();
   font.setPixelSize(std::max(static_cast<int>(property_value_scale_->getFloat()), 1));
   font.setBold(true);
@@ -262,7 +261,7 @@ void VisualizationConditionGroupsDisplay::processEvent(const YAML::Node & event_
   std::string event_name;
   try {
     event_name = event_node["name"].as<std::string>();
-  } catch (const YAML::BadConversion & e) {
+  } catch (const YAML::BadConversion &) {
     event_name = "";
   }
   if (event_name.empty()) {

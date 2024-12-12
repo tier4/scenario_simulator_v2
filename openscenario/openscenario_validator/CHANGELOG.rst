@@ -10,6 +10,110 @@ Changelog for package openscenario_validator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+7.0.2 (2024-12-12)
+------------------
+* Merge branch 'master' into fix/snor-cloud-issue-8-1
+* Merge branch 'master' into fix/snor-cloud-issue-8-1
+* Merge branch 'master' into fix/snor-cloud-issue-8-1
+* Merge branch 'master' into fix/snor-cloud-issue-8-1
+* Contributors: Masaya Kataoka, Taiga
+
+7.0.1 (2024-12-11)
+------------------
+* Merge branch 'master' into feature/act-starttrigger-optional
+* Merge branch 'master' into feature/act-starttrigger-optional
+* Contributors: Kotaro Yoshimoto, ぐるぐる
+
+7.0.0 (2024-12-10)
+------------------
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge branch 'master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+  # Conflicts:
+  #	simulation/traffic_simulator/src/traffic_lights/traffic_light_publisher.cpp
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+  # Conflicts:
+  #	external/concealer/include/concealer/autoware.hpp
+  #	external/concealer/include/concealer/autoware_universe.hpp
+  #	external/concealer/include/concealer/field_operator_application_for_autoware_universe.hpp
+  #	external/concealer/src/autoware_universe.cpp
+  #	external/concealer/src/field_operator_application_for_autoware_universe.cpp
+* Merge branch 'master' into RJD-736/autoware_msgs_support
+* Merge branch 'master' into RJD-736/autoware_msgs_support
+* Merge branch 'master' into RJD-736/autoware_msgs_support
+* Merge branch 'master' into RJD-736/autoware_msgs_support
+* Merge branch 'master' into RJD-736/autoware_msgs_support
+* Merge branch 'master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge branch 'master' into RJD-736/autoware_msgs_support
+* Merge branch 'master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/feature/manual_on_follow_trajectory' into feature/manual_on_follow_trajectory_not_auto
+  # Conflicts:
+  #	simulation/traffic_simulator/include/traffic_simulator/entity/entity_manager.hpp
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, Michał Kiełczykowski
+
+6.3.1 (2024-12-10)
+------------------
+* Merge branch 'master' into fix/sonor-cloud-issue-8-3
+* Merge branch 'master' into fix/sonor-cloud-issue-8-3
+* Contributors: Masaya Kataoka
+
+6.3.0 (2024-12-10)
+------------------
+* Merge branch 'master' into feature/lane-change-everywhere
+* Merge remote-tracking branch 'origin/master' into feature/lane-change-everywhere
+* Merge remote-tracking branch 'origin/master' into feature/lane-change-everywhere
+* Contributors: Kotaro Yoshimoto
+
+6.2.5 (2024-12-09)
+------------------
+* Merge branch 'master' into fix/acc_by_slope
+* Contributors: Kotaro Yoshimoto
+
+6.2.4 (2024-12-09)
+------------------
+* Merge branch 'master' into refactor/speed-condition
+* Merge branch 'master' into refactor/speed-condition
+* Contributors: Tatsuya Yamasaki
+
+6.2.3 (2024-12-05)
+------------------
+* Merge branch 'master' into fix/sonor-cloud-issue-8-2
+* Contributors: Masaya Kataoka
+
+6.2.2 (2024-12-04)
+------------------
+* Merge branch 'master' into refactor/distance-condition
+* Merge remote-tracking branch 'origin/master' into refactor/distance-condition
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
 6.2.1 (2024-12-03)
 ------------------
 * Merge branch 'master' into refactor/distance-condition-and-relative-distance-condition
