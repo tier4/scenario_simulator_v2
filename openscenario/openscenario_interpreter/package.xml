@@ -25,6 +25,7 @@
   <depend>tier4_simulation_msgs</depend>
   <depend>traffic_simulator</depend>
   <depend>traffic_simulator_msgs</depend>
+  <depend>visualization_msgs</depend>
 
   <test_depend>ament_cmake_clang_format</test_depend>
   <test_depend>ament_cmake_copyright</test_depend>
