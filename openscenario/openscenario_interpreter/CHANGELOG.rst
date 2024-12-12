@@ -32,6 +32,14 @@ Changelog for package openscenario_interpreter
 * add publish_empty_context parameter
 * Contributors: Masaya Kataoka
 
+7.0.2 (2024-12-12)
+------------------
+* Merge branch 'master' into fix/snor-cloud-issue-8-1
+* Merge branch 'master' into fix/snor-cloud-issue-8-1
+* Merge branch 'master' into fix/snor-cloud-issue-8-1
+* Merge branch 'master' into fix/snor-cloud-issue-8-1
+* Contributors: Masaya Kataoka, Taiga
+
 7.0.1 (2024-12-11)
 ------------------
 * Merge pull request `#1462 <https://github.com/tier4/scenario_simulator_v2/issues/1462>`_ from tier4/feature/act-starttrigger-optional
