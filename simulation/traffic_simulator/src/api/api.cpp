@@ -255,9 +255,9 @@ auto API::getEgoEntity(const std::string & name) const -> std::shared_ptr<entity
 }
 
 // entities - checks, getters
-auto API::isEntitySpawned(const std::string & name) const -> bool
+auto API::isEntityExist(const std::string & name) const -> bool
 {
-  return entity_manager_ptr_->isEntitySpawned(name);
+  return entity_manager_ptr_->isEntityExist(name);
 }
 
 auto API::getEntityNames() const -> std::vector<std::string>

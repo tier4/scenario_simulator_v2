@@ -130,7 +130,7 @@ public:
   MOCK_METHOD(void, getEntityMock, (const std::string &), (const));
   MOCK_METHOD(void, getEgoEntityMock, (const std::string &), (const));
   MOCK_METHOD(void, getHdmapUtilsMock, (), ());
-  MOCK_METHOD(bool, isEntitySpawned, (const std::string &), ());
+  MOCK_METHOD(bool, isEntityExist, (const std::string &), ());
   MOCK_METHOD(bool, checkCollision, (const std::string &, const std::string &), ());
 
   auto getEntity(const std::string & name) const

@@ -104,7 +104,7 @@ public:
       const geometry_msgs::msg::Pose & from_map_pose, const std::string & to_entity_name)
       -> const geometry_msgs::msg::Pose
     {
-      if (!core->isEntitySpawned(to_entity_name)) {
+      if (!core->isEntityExist(to_entity_name)) {
         throw Error("Reference entity ", std::quoted(to_entity_name), " not exist.");
       } else if (const auto relative_pose = core->relativePose(from_map_pose, to_entity_name);
                  !relative_pose) {
@@ -128,12 +128,12 @@ public:
       const FirstType & from_pose_or_entity_name, const SecondType & to_pose_or_entity_name) -> bool
     {
       if constexpr (std::is_same_v<FirstType, std::string>) {
-        if (!core->isEntitySpawned(from_pose_or_entity_name)) {
+        if (!core->isEntityExist(from_pose_or_entity_name)) {
           return false;
         }
       }
       if constexpr (std::is_same_v<SecondType, std::string>) {
-        if (!core->isEntitySpawned(to_pose_or_entity_name)) {
+        if (!core->isEntityExist(to_pose_or_entity_name)) {
           return false;
         }
       }
@@ -595,7 +595,7 @@ public:
 
     static auto evaluateStandStill(const std::string & entity_name) -> double
     {
-      if (core->isEntitySpawned(entity_name)) {
+      if (core->isEntityExist(entity_name)) {
         return core->getEntity(entity_name)->getStandStillDuration();
       } else {
         return std::numeric_limits<double>::quiet_NaN();
@@ -604,7 +604,7 @@ public:
 
     static auto evaluateSpeed(const std::string & entity_name) -> double
     {
-      if (core->isEntitySpawned(entity_name)) {
+      if (core->isEntityExist(entity_name)) {
         return core->getEntity(entity_name)->getCurrentTwist().linear.x;
       } else {
         return std::numeric_limits<double>::quiet_NaN();
@@ -613,7 +613,7 @@ public:
 
     static auto evaluateAcceleration(const std::string & entity_name) -> double
     {
-      if (core->isEntitySpawned(entity_name)) {
+      if (core->isEntityExist(entity_name)) {
         return core->getEntity(entity_name)->getCurrentAccel().linear.x;
       } else {
         return std::numeric_limits<double>::quiet_NaN();
@@ -623,7 +623,7 @@ public:
     static auto evaluateCollisionCondition(
       const std::string & first_entity_name, const std::string & second_entity_name) -> bool
     {
-      if (core->isEntitySpawned(first_entity_name) && core->isEntitySpawned(second_entity_name)) {
+      if (core->isEntityExist(first_entity_name) && core->isEntityExist(second_entity_name)) {
         return core->checkCollision(first_entity_name, second_entity_name);
       } else {
         return false;
@@ -633,7 +633,7 @@ public:
     static auto evaluateTimeHeadway(
       const std::string & from_entity_name, const std::string & to_entity_name) -> double
     {
-      if (core->isEntitySpawned(from_entity_name) && core->isEntitySpawned(to_entity_name)) {
+      if (core->isEntityExist(from_entity_name) && core->isEntityExist(to_entity_name)) {
         if (const auto time_headway = core->timeHeadway(from_entity_name, to_entity_name)) {
           return time_headway.value();
         }
@@ -644,7 +644,7 @@ public:
     // User defined conditions
     static auto evaluateCurrentState(const std::string & entity_name) -> const std::string
     {
-      if (core->isEntitySpawned(entity_name)) {
+      if (core->isEntityExist(entity_name)) {
         return core->getEntity(entity_name)->getCurrentAction();
       } else {
         return "not spawned";
@@ -655,7 +655,7 @@ public:
       const std::string & entity_name, const traffic_simulator::LaneletPose & lanelet_pose)
       -> double
     {
-      if (core->isEntitySpawned(entity_name)) {
+      if (core->isEntityExist(entity_name)) {
         if (const auto relative_yaw = core->laneletRelativeYaw(entity_name, lanelet_pose)) {
           return std::abs(relative_yaw.value());
         }
@@ -665,7 +665,7 @@ public:
 
     static auto evaluateRelativeHeading(const std::string & entity_name) -> double
     {
-      if (core->isEntitySpawned(entity_name)) {
+      if (core->isEntityExist(entity_name)) {
         if (const auto relative_yaw = core->getEntity(entity_name)->getLaneletRelativeYaw()) {
           return std::abs(relative_yaw.value());
         }

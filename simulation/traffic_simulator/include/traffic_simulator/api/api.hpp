@@ -214,7 +214,7 @@ public:
   auto getEgoEntity(const std::string & name) const -> std::shared_ptr<entity::EgoEntity>;
 
   // entities - checks, getters
-  auto isEntitySpawned(const std::string & name) const -> bool;
+  auto isEntityExist(const std::string & name) const -> bool;
 
   auto getEntityNames() const -> std::vector<std::string>;
 
