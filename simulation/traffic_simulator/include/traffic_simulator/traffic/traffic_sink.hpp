@@ -31,6 +31,7 @@
 #include <functional>
 #include <geometry_msgs/msg/pose.hpp>
 #include <string>
+#include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator/traffic/traffic_module_base.hpp>
 #include <vector>
 
@@ -41,11 +42,25 @@ namespace traffic
 class TrafficSink : public TrafficModuleBase
 {
 public:
+  /**
+   * @brief Construct a new Traffic Sink object
+   * @param lanelet_id Lanelet ID for visualization
+   * @todo lanelet_id value is only used for visualization and its very confusing. So it should be refactor.
+   * @param radius The entity despawn when the distance between the entity's coordinates in the Map coordinate system and the TrafficSink's coordinates is less than this value.
+   * @param position Position of the traffic sink.
+   * @param get_entity_names Function to get the name of entity
+   * @param get_entity_type Function to get the type of entity
+   * @param sinkable_entity_type If this type is applicable, the entity despawn only when it approaches radius [m] or less from the TrafficSink. If empty, all entity types are candidates for despawn.
+   * @param get_entity_pose Function to get the pose of entity.
+   * @param despawn Function to despawn entity.
+   */
   explicit TrafficSink(
-    lanelet::Id lanelet_id, double radius, const geometry_msgs::msg::Point & position,
-    const std::function<std::vector<std::string>(void)> & get_entity_names_function,
-    const std::function<geometry_msgs::msg::Pose(const std::string &)> & get_entity_pose_function,
-    const std::function<void(std::string)> & despawn_function);
+    const lanelet::Id lanelet_id, const double radius, const geometry_msgs::msg::Point & position,
+    const std::function<std::vector<std::string>(void)> & get_entity_names,
+    const std::function<traffic_simulator::EntityType(const std::string &)> & get_entity_type,
+    const std::set<std::uint8_t> & sinkable_entity_type,
+    const std::function<geometry_msgs::msg::Pose(const std::string &)> & get_entity_pose,
+    const std::function<void(std::string)> & despawn);
   const lanelet::Id lanelet_id;
   const double radius;
   const geometry_msgs::msg::Point position;
@@ -54,9 +69,11 @@ public:
     -> void override;
 
 private:
-  const std::function<std::vector<std::string>(void)> get_entity_names_function;
-  const std::function<geometry_msgs::msg::Pose(const std::string &)> get_entity_pose_function;
-  const std::function<void(const std::string &)> despawn_function;
+  const std::function<std::vector<std::string>(void)> get_entity_names;
+  const std::function<traffic_simulator::EntityType(const std::string &)> get_entity_type;
+  const std::set<std::uint8_t> sinkable_entity_type;
+  const std::function<geometry_msgs::msg::Pose(const std::string &)> get_entity_pose;
+  const std::function<void(const std::string &)> despawn;
 };
 }  // namespace traffic
 }  // namespace traffic_simulator
