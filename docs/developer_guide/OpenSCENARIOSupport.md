@@ -486,8 +486,8 @@ Currently, the only way to know the result of the simulation is by viewing the s
 | TimeOfDay                                    | 1.3               |                                            |
 | TimeOfDayCondition                           | unimplemented     |                                            |
 | TimeReference                                | 1.3               |                                            |
-| TimeToCollisionCondition                     | unimplemented     |                                            |
-| TimeToCollisionConditionTarget               | unimplemented     |                                            |
+| TimeToCollisionCondition                     | 1.3.1 (partial)   | [detail](#TimeToCollisionCondition)        |
+| TimeToCollisionConditionTarget               | 1.3.1             |                                            |
 | Timing                                       | 1.3               |                                            |
 | TrafficAction                                | unimplemented     |                                            |
 | TrafficArea                                  | unimplemented     |                                            |
@@ -847,6 +847,13 @@ Currently, the only way to know the result of the simulation is by viewing the s
 - Property `alongRoute` deprecated in version 1.1 is ignored.
 - Property `freespace` is ignored.
   - The simulator behaves as if `freespace` is `false`.
+
+#### TimeToCollisionCondition
+
+- Since `TimeToCollisionCondition` is implemented using `DistanceCondition`,
+  `RelativeDistanceCondition`, `SpeedCondition`, and `RelativeSpeedCondition`,
+  if a combination of properties that is not supported by those Conditions is
+  given to `TimeToCollisionCondition`, an error will be thrown.
 
 #### TransitionDynamics
 
