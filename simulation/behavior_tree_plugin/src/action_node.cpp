@@ -298,7 +298,7 @@ auto ActionNode::getEntityStatus(const std::string & target_name) const
 auto ActionNode::getDistanceToTargetEntityPolygon(
   const traffic_simulator::CanonicalizedEntityStatus & status) const -> std::optional<double>
 {
-  if (status.laneMatchingSucceed() and canonicalized_entity_status->laneMatchingSucceed()) {
+  if (status.laneMatchingSucceed() && canonicalized_entity_status->laneMatchingSucceed()) {
     /* 
      * boundingBoxRelativeLaneletPose requires routing_configuration, 
      * 'allow_lane_change = true' is needed to check distances to entities on neighbour lanelets
@@ -315,7 +315,7 @@ auto ActionNode::getDistanceToTargetEntityPolygon(
 
     const auto half_width = bounding_box.dimensions.y / 2;
     // is in front and is within considered width (lateral distance)
-    if (relative_lanelet_pose.s >= 0 and std::abs(relative_lanelet_pose.offset) <= half_width) {
+    if (relative_lanelet_pose.s >= 0 && std::abs(relative_lanelet_pose.offset) <= half_width) {
       return relative_lanelet_pose.s + bounding_box.dimensions.x / 2;
     }
   }
