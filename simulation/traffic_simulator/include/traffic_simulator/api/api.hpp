@@ -143,7 +143,7 @@ public:
   {
     auto register_to_entity_manager = [&]() {
       if (behavior == VehicleBehavior::autoware()) {
-        return entity_manager_ptr_->isEntitySpawned(name) or
+        return entity_manager_ptr_->isEntityExist(name) or
                entity_manager_ptr_->spawnEntity<entity::EgoEntity>(
                  name, pose, parameters, getCurrentTime(), configuration, node_parameters_);
       } else {
@@ -321,7 +321,7 @@ public:
   static_assert(true, "")
   // clang-format on
 
-  FORWARD_TO_ENTITY_MANAGER(isEntitySpawned);
+  FORWARD_TO_ENTITY_MANAGER(isEntityExist);
   FORWARD_TO_ENTITY_MANAGER(getEgoEntity);
   FORWARD_TO_ENTITY_MANAGER(getEntityNames);
   FORWARD_TO_ENTITY_MANAGER(getEntityOrNullptr);

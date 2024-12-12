@@ -123,10 +123,10 @@ visualization_msgs::msg::MarkerArray EntityManager::makeDebugMarker() const
 
 bool EntityManager::despawnEntity(const std::string & name)
 {
-  return isEntitySpawned(name) && entities_.erase(name);
+  return isEntityExist(name) && entities_.erase(name);
 }
 
-auto EntityManager::isEntitySpawned(const std::string & name) const -> bool
+auto EntityManager::isEntityExist(const std::string & name) const -> bool
 {
   return entities_.find(name) != std::end(entities_);
 }
