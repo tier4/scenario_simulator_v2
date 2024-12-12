@@ -74,14 +74,14 @@ void VisualizationComponent::entityStatusCallback(
     entity_name_lists.emplace_back(data.status.name);
   }
   std::vector<std::string> erase_names;
-  for (const auto & marker : markers_) {
-    auto itr = std::find(entity_name_lists.begin(), entity_name_lists.end(), marker.first);
+  for (const auto & [key, _] : markers_) {
+    auto itr = std::find(entity_name_lists.begin(), entity_name_lists.end(), key);
     if (itr == entity_name_lists.end()) {
-      auto delete_marker = generateDeleteMarker(marker.first);
+      auto delete_marker = generateDeleteMarker(key);
       std::copy(
         delete_marker.markers.begin(), delete_marker.markers.end(),
         std::back_inserter(current_marker.markers));
-      erase_names.emplace_back(marker.first);
+      erase_names.emplace_back(key);
     }
   }
   for (const auto & name : erase_names) {
@@ -336,7 +336,6 @@ const visualization_msgs::msg::MarkerArray VisualizationComponent::generateMarke
   arrow.id = 2;
   arrow.action = visualization_msgs::msg::Marker::ADD;
 
-  // constexpr double arrow_size = 0.3;
   double arrow_size = 0.4 * status.bounding_box.dimensions.y;
   constexpr double arrow_ratio = 1.0;
   geometry_msgs::msg::Point pf, pl, pr;
