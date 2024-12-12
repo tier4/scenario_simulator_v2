@@ -15,6 +15,7 @@
 #include <geometry/bounding_box.hpp>
 #include <geometry/distance.hpp>
 #include <geometry/transform.hpp>
+#include <geometry/vector3/hypot.hpp>
 #include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 
@@ -310,6 +311,27 @@ auto distanceToStopLine(
     const auto polygon = hdmap_utils_ptr->getStopLinePolygon(target_stop_line_id);
     return spline.getCollisionPointIn2D(polygon);
   }
+}
+
+auto distanceAlongLanelet(
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, const double matching_distance,
+  const geometry_msgs::msg::Point & from, const geometry_msgs::msg::Point & to) -> double
+{
+  if (const auto from_lanelet_pose =
+        hdmap_utils_ptr->toLaneletPose(from, bounding_box, false, matching_distance);
+      from_lanelet_pose.has_value()) {
+    if (const auto to_lanelet_pose =
+          hdmap_utils_ptr->toLaneletPose(to, bounding_box, false, matching_distance);
+        to_lanelet_pose.has_value()) {
+      if (const auto distance = hdmap_utils_ptr->getLongitudinalDistance(
+            from_lanelet_pose.value(), to_lanelet_pose.value());
+          distance.has_value()) {
+        return distance.value();
+      }
+    }
+  }
+  return math::geometry::hypot(from, to);
 }
 }  // namespace distance
 }  // namespace traffic_simulator
