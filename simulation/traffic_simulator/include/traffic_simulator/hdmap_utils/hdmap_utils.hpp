@@ -160,7 +160,7 @@ public:
     const traffic_simulator::RoutingGraphType type =
       traffic_simulator::RoutingConfiguration().routing_graph_type) const -> lanelet::Ids;
 
-  auto getHeight(const traffic_simulator_msgs::msg::LaneletPose &) const -> double;
+  auto getAltitude(const traffic_simulator_msgs::msg::LaneletPose &) const -> double;
 
   auto getLaneChangeTrajectory(
     const geometry_msgs::msg::Pose & from,
@@ -379,6 +379,13 @@ public:
 
   auto toMapPose(const traffic_simulator_msgs::msg::LaneletPose &, const bool fill_pitch = true)
     const -> geometry_msgs::msg::PoseStamped;
+
+  auto isAltitudeMatching(const double current_altitude, const double target_altitude) const
+    -> bool;
+
+  auto getLaneletAltitude(
+    const lanelet::Id & lanelet_id, const geometry_msgs::msg::Pose & pose,
+    const double matching_distance = 1.0) const -> std::optional<double>;
 
 private:
   /** @defgroup cache

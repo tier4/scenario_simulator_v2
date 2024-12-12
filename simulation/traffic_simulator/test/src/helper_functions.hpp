@@ -63,13 +63,14 @@ auto makeQuaternionFromYaw(const double yaw) -> geometry_msgs::msg::Quaternion
     geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0.0).y(0.0).z(yaw));
 }
 
-auto makePose(const double x, const double y, const double yaw_deg) -> geometry_msgs::msg::Pose
+auto makePose(const double x, const double y, const double z, const double yaw_deg)
+  -> geometry_msgs::msg::Pose
 {
   /**
    * @note +x axis is  0 degrees; +y axis is 90 degrees
    */
   return geometry_msgs::build<geometry_msgs::msg::Pose>()
-    .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(x).y(y).z(0.0))
+    .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(x).y(y).z(z))
     .orientation(math::geometry::convertEulerAngleToQuaternion(
       geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0.0).y(0.0).z(
         convertDegToRad(yaw_deg))));

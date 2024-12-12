@@ -117,7 +117,8 @@ public:
   const std::size_t id;
 
 private:
-  auto makeRandomPose(const bool random_orientation = false) -> geometry_msgs::msg::Pose;
+  auto makeRandomPose(const bool random_orientation, const VehicleOrPedestrianParameter & parameter)
+    -> geometry_msgs::msg::Pose;
 
   auto isPoseValid(const VehicleOrPedestrianParameter &, const geometry_msgs::msg::Pose &)
     -> std::pair<bool, std::optional<CanonicalizedLaneletPose>>;
