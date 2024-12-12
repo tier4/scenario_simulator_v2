@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__SPEED_CONDITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__SPEED_CONDITION_HPP_
 
+#include <openscenario_interpreter/compatibility.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/directional_dimension.hpp>
@@ -63,6 +64,8 @@ struct SpeedCondition : private Scope, private SimulatorCore::ConditionEvaluatio
 
   std::vector<std::valarray<double>> results;  // for description
 
+  static inline auto compatibility = Compatibility::legacy;
+
   explicit SpeedCondition(const pugi::xml_node &, Scope &, const TriggeringEntities &);
 
   auto description() const -> String;
@@ -70,7 +73,8 @@ struct SpeedCondition : private Scope, private SimulatorCore::ConditionEvaluatio
   static auto evaluate(const Entities *, const Entity &) -> Eigen::Vector3d;
 
   static auto evaluate(
-    const Entities *, const Entity &, const std::optional<DirectionalDimension> &) -> double;
+    const Entities *, const Entity &, const std::optional<DirectionalDimension> &,
+    const Compatibility = Compatibility::legacy) -> double;
 
   auto evaluate() -> Object;
 };

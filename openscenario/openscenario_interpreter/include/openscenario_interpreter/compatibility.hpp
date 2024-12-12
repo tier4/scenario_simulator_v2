@@ -12,24 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SCENARIO_SIMULATOR_EXCEPTION__CONCATENATE_HPP_
-#define SCENARIO_SIMULATOR_EXCEPTION__CONCATENATE_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__COMPATIBILITY_HPP_
+#define OPENSCENARIO_INTERPRETER__COMPATIBILITY_HPP_
 
-#include <scenario_simulator_exception/fold.hpp>
-#include <sstream>
-#include <string>
-#include <utility>
+#include <iostream>
 
-namespace common
+namespace openscenario_interpreter
 {
-inline namespace scenario_simulator_exception
-{
-inline auto concatenate = [](auto &&... xs) {
-  std::stringstream result;
-  (result << ... << std::forward<decltype(xs)>(xs));
-  return result.str();
+enum class Compatibility {
+  legacy,
+  standard,
 };
-}  // namespace scenario_simulator_exception
-}  // namespace common
 
-#endif  // OPENSCENARIO_INTERPRETER__CONCATENATE_HPP_
+auto operator>>(std::istream &, Compatibility &) -> std::istream &;
+}  // namespace openscenario_interpreter
+
+#endif  // OPENSCENARIO_INTERPRETER__COMPATIBILITY_HPP_
