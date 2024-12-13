@@ -94,6 +94,7 @@ auto API::respawn(
 
       entity_manager_ptr_->asFieldOperatorApplication(name).clearRoute();
       entity_manager_ptr_->asFieldOperatorApplication(name).plan({goal_pose});
+      entity_manager_ptr_->asFieldOperatorApplication(name).enableAutowareControl();
       entity_manager_ptr_->asFieldOperatorApplication(name).engage();
     }
   }
