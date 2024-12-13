@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #include <boost/range/adaptor/sliced.hpp>
-#include <concealer/field_operator_application_for_autoware_universe.hpp>
+#include <concealer/field_operator_application.hpp>
 #include <concealer/has_data_member_allow_goal_modification.hpp>
 #include <concealer/has_data_member_option.hpp>
 #include <concealer/is_package_exists.hpp>
@@ -375,8 +375,8 @@ auto FieldOperatorApplication::requestAutoModeForCooperation(
     });
   } else {
     throw common::Error(
-      "FieldOperatorApplicationFor<AutowareUniverse>::requestAutoModeForCooperation is not "
-      "supported in this environment, because rtc_auto_mode_manager is present.");
+      "FieldOperatorApplication::requestAutoModeForCooperation is not supported in this "
+      "environment, because rtc_auto_mode_manager is present.");
   }
 }
 

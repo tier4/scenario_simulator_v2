@@ -56,9 +56,6 @@
 
 namespace concealer
 {
-template <typename T>
-class FieldOperatorApplicationFor;
-
 #define DEFINE_STATIC_DATA_MEMBER_DETECTOR(NAME)                                    \
   template <typename T, typename = void>                                            \
   struct HasStatic##NAME : public std::false_type                                   \

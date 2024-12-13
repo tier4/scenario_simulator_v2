@@ -13,8 +13,7 @@
 // limitations under the License.
 
 #include <boost/lexical_cast.hpp>
-#include <concealer/autoware_universe.hpp>
-#include <concealer/field_operator_application_for_autoware_universe.hpp>
+#include <concealer/field_operator_application.hpp>
 #include <functional>
 #include <memory>
 #include <optional>
@@ -58,12 +57,10 @@ auto EgoEntity::makeFieldOperatorApplication(
     // clang-format on
 
     return getParameter<bool>(node_parameters, "launch_autoware", true)
-             ? std::make_unique<
-                 concealer::FieldOperatorApplicationFor<concealer::AutowareUniverse>>(
+             ? std::make_unique<concealer::FieldOperatorApplication>(
                  getParameter<std::string>(node_parameters, "autoware_launch_package"),
                  getParameter<std::string>(node_parameters, "autoware_launch_file"), parameters)
-             : std::make_unique<
-                 concealer::FieldOperatorApplicationFor<concealer::AutowareUniverse>>();
+             : std::make_unique<concealer::FieldOperatorApplication>();
   } else {
     throw common::SemanticError(
       "Unexpected architecture_type ", std::quoted(architecture_type), " was given.");
@@ -117,8 +114,7 @@ auto EgoEntity::getRouteLanelets(double /*unused horizon*/) -> lanelet::Ids
   lanelet::Ids ids{};
 
   if (const auto universe =
-        dynamic_cast<concealer::FieldOperatorApplicationFor<concealer::AutowareUniverse> *>(
-          field_operator_application.get());
+        dynamic_cast<concealer::FieldOperatorApplication *>(field_operator_application.get());
       universe) {
     for (const auto & point : universe->getPathWithLaneId().points) {
       ids += point.lane_ids;
