@@ -470,8 +470,8 @@ auto CatmullRomSpline::getSquaredDistanceIn2D(
       }
       return line_segments_[0].getSquaredDistanceIn2D(point, s, true);
     default:
-      const auto index_and_s = getCurveIndexAndS(s);
-      return curves_[index_and_s.first].getSquaredDistanceIn2D(point, index_and_s.second, true);
+      const auto [index, s_value] = getCurveIndexAndS(s);
+      return curves_[index].getSquaredDistanceIn2D(point, s_value, true);
   }
 }
 
@@ -508,8 +508,8 @@ auto CatmullRomSpline::getSquaredDistanceVector(
       }
       return line_segments_[0].getSquaredDistanceVector(point, s, true);
     default:
-      const auto index_and_s = getCurveIndexAndS(s);
-      return curves_[index_and_s.first].getSquaredDistanceVector(point, index_and_s.second, true);
+      const auto [index, s_value] = getCurveIndexAndS(s);
+      return curves_[index].getSquaredDistanceVector(point, s_value, true);
   }
 }
 
@@ -542,8 +542,8 @@ auto CatmullRomSpline::getPoint(const double s) const -> geometry_msgs::msg::Poi
       }
       return line_segments_[0].getPoint(s, true);
     default:
-      const auto index_and_s = getCurveIndexAndS(s);
-      return curves_[index_and_s.first].getPoint(index_and_s.second, true);
+      const auto [index, s_value] = getCurveIndexAndS(s);
+      return curves_[index].getPoint(s_value, true);
   }
 }
 
@@ -597,8 +597,8 @@ auto CatmullRomSpline::getNormalVector(const double s) const -> geometry_msgs::m
         "This message is not originally intended to be displayed, if you see it, please "
         "contact the developer of traffic_simulator.");
     default:
-      const auto index_and_s = getCurveIndexAndS(s);
-      return curves_[index_and_s.first].getNormalVector(index_and_s.second, true);
+      const auto [index, s_value] = getCurveIndexAndS(s);
+      return curves_[index].getNormalVector(s_value, true);
   }
 }
 
@@ -634,6 +634,14 @@ auto CatmullRomSpline::getTangentVector(const double s) const -> geometry_msgs::
         "This message is not originally intended to be displayed, if you see it, please "
         "contact the developer of traffic_simulator.");
     default:
+      /**
+       * @note The current implementation uses `index_and_s` instead of structured binding
+       * (`const auto [index, s_value] = getCurveIndexAndS(s)`) because some tests fail
+       * when using structured binding. The root cause of these test failures is under investigation.
+       */
+      // const auto [index, s_value] = getCurveIndexAndS(s);
+      // return curves_[index].getTangentVector(s_value, true);
+
       const auto index_and_s = getCurveIndexAndS(s);
       return curves_[index_and_s.first].getTangentVector(index_and_s.second, true);
   }
@@ -665,8 +673,8 @@ auto CatmullRomSpline::getPose(const double s, const bool fill_pitch) const
       }
       return line_segments_[0].getPose(s, true, fill_pitch);
     default:
-      const auto index_and_s = getCurveIndexAndS(s);
-      return curves_[index_and_s.first].getPose(index_and_s.second, true, fill_pitch);
+      const auto [index, s_value] = getCurveIndexAndS(s);
+      return curves_[index].getPose(s_value, true, fill_pitch);
   }
 }
 
