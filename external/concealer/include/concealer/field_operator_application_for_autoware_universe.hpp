@@ -22,11 +22,7 @@ namespace concealer
 template <>
 struct FieldOperatorApplicationFor<AutowareUniverse> : public FieldOperatorApplication
 {
-  template <typename... Ts>
-  CONCEALER_PUBLIC explicit FieldOperatorApplicationFor(Ts &&... xs)
-  : FieldOperatorApplication(std::forward<decltype(xs)>(xs)...)
-  {
-  }
+  using FieldOperatorApplication::FieldOperatorApplication;
 
   auto engage() -> void override;
 
@@ -34,18 +30,7 @@ struct FieldOperatorApplicationFor<AutowareUniverse> : public FieldOperatorAppli
 
   auto engaged() const -> bool override;
 
-  auto getAutowareStateName() const -> std::string override;
-
   auto getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray override;
-
-  auto getTurnIndicatorsCommand() const
-    -> autoware_vehicle_msgs::msg::TurnIndicatorsCommand override;
-
-  auto getEmergencyStateName() const -> std::string override;
-
-  auto getMinimumRiskManeuverBehaviorName() const -> std::string override;
-
-  auto getMinimumRiskManeuverStateName() const -> std::string override;
 
   auto initialize(const geometry_msgs::msg::Pose &) -> void override;
 

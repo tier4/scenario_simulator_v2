@@ -350,34 +350,6 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::getWaypoints() const
   return waypoints;
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::getTurnIndicatorsCommand() const
-  -> autoware_vehicle_msgs::msg::TurnIndicatorsCommand
-{
-  return getTurnIndicatorsCommandImpl();
-}
-
-auto FieldOperatorApplicationFor<AutowareUniverse>::getAutowareStateName() const -> std::string
-{
-  return autoware_state;
-}
-
-auto FieldOperatorApplicationFor<AutowareUniverse>::getEmergencyStateName() const -> std::string
-{
-  return minimum_risk_maneuver_state;
-}
-
-auto FieldOperatorApplicationFor<AutowareUniverse>::getMinimumRiskManeuverBehaviorName() const
-  -> std::string
-{
-  return minimum_risk_maneuver_behavior;
-}
-
-auto FieldOperatorApplicationFor<AutowareUniverse>::getMinimumRiskManeuverStateName() const
-  -> std::string
-{
-  return minimum_risk_maneuver_state;
-}
-
 auto FieldOperatorApplicationFor<AutowareUniverse>::setVelocityLimit(double velocity_limit) -> void
 {
   task_queue.delay([this, velocity_limit]() {

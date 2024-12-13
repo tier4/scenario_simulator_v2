@@ -73,7 +73,8 @@ public:
   {
   public:
     template <typename... Ts>
-    explicit TimeoutError(Ts &&... xs) : common::scenario_simulator_exception::Error(std::forward<decltype(xs)>(xs)...)
+    explicit TimeoutError(Ts &&... xs)
+    : common::scenario_simulator_exception::Error(std::forward<decltype(xs)>(xs)...)
     {
     }
   };

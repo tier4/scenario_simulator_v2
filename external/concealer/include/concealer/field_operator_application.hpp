@@ -145,7 +145,7 @@ struct FieldOperatorApplication : public rclcpp::Node,
   SubscriberWrapper<autoware_adapi_v1_msgs::msg::MrmState>                        getMrmState;
   SubscriberWrapper<tier4_planning_msgs::msg::PathWithLaneId>                     getPathWithLaneId;
   SubscriberWrapper<tier4_planning_msgs::msg::Trajectory>                         getTrajectory;
-  SubscriberWrapper<autoware_vehicle_msgs::msg::TurnIndicatorsCommand>            getTurnIndicatorsCommandImpl;
+  SubscriberWrapper<autoware_vehicle_msgs::msg::TurnIndicatorsCommand>            getTurnIndicatorsCommand;
 
   ServiceWithValidation<autoware_adapi_v1_msgs::srv::ClearRoute>                  requestClearRoute;
   ServiceWithValidation<tier4_rtc_msgs::srv::CooperateCommands>                   requestCooperateCommands;
@@ -202,22 +202,19 @@ struct FieldOperatorApplication : public rclcpp::Node,
 
   virtual auto clearRoute() -> void = 0;
 
-  virtual auto getAutowareStateName() const -> std::string = 0;
+  auto getAutowareStateName() const { return autoware_state; }
 
-  virtual auto getMinimumRiskManeuverBehaviorName() const -> std::string = 0;
+  auto getMinimumRiskManeuverBehaviorName() const { return minimum_risk_maneuver_behavior; }
 
-  virtual auto getMinimumRiskManeuverStateName() const -> std::string = 0;
+  auto getMinimumRiskManeuverStateName() const { return minimum_risk_maneuver_state; }
 
-  virtual auto getEmergencyStateName() const -> std::string = 0;
+  auto getEmergencyStateName() const { return minimum_risk_maneuver_state; }
 
   virtual auto getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray = 0;
 
   /*   */ auto initialized() const noexcept { return initialize_was_called; }
 
   virtual auto requestAutoModeForCooperation(const std::string &, bool) -> void = 0;
-
-  virtual auto getTurnIndicatorsCommand() const
-    -> autoware_vehicle_msgs::msg::TurnIndicatorsCommand = 0;
 
   virtual auto rethrow() const noexcept(false) -> void;
 

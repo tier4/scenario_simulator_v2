@@ -43,6 +43,7 @@ auto toAutowareStateString(std::uint8_t state) -> char const *
 #undef CASE
 }
 
+// clang-format off
 FieldOperatorApplication::FieldOperatorApplication(const pid_t pid)
 : rclcpp::Node("concealer_user", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),
   process_id(pid),
@@ -113,7 +114,7 @@ FieldOperatorApplication::FieldOperatorApplication(const pid_t pid)
   }),
   getPathWithLaneId("/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", rclcpp::QoS(1), *this),
   getTrajectory("/api/iv_msgs/planning/scenario_planning/trajectory", rclcpp::QoS(1), *this),
-  getTurnIndicatorsCommandImpl("/control/command/turn_indicators_cmd", rclcpp::QoS(1), *this),
+  getTurnIndicatorsCommand("/control/command/turn_indicators_cmd", rclcpp::QoS(1), *this),
   requestClearRoute("/api/routing/clear_route", *this),
   requestCooperateCommands("/api/external/set/rtc_commands", *this),
   requestEngage("/api/external/set/engage", *this),
@@ -125,6 +126,7 @@ FieldOperatorApplication::FieldOperatorApplication(const pid_t pid)
   requestEnableAutowareControl("/api/operation_mode/enable_autoware_control", *this)
 {
 }
+// clang-format on
 
 FieldOperatorApplication::~FieldOperatorApplication()
 {
