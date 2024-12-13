@@ -158,7 +158,8 @@ struct TimeToCollisionCondition : private Scope, private SimulatorCore::Conditio
           entities, triggering_entity, time_to_collision_condition_target.as<Entity>(),
           directional_dimension());
       } else {
-        return SpeedCondition::evaluate(entities, triggering_entity, directional_dimension());
+        return SpeedCondition::evaluate(
+          entities, triggering_entity, directional_dimension(), Compatibility::standard);
       }
     };
 
