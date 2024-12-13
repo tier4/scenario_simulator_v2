@@ -152,7 +152,7 @@ bool isValidCooperateStatus(
   }
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::sendCooperateCommand(
+auto FieldOperatorApplication::sendCooperateCommand(
   const std::string & module_name, const std::string & command) -> void
 {
   auto to_command_type = [](const auto & command) {
@@ -221,8 +221,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::sendCooperateCommand(
   }
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::initialize(
-  const geometry_msgs::msg::Pose & initial_pose) -> void
+auto FieldOperatorApplication::initialize(const geometry_msgs::msg::Pose & initial_pose) -> void
 {
   if (not std::exchange(initialize_was_called, true)) {
     task_queue.delay([this, initial_pose]() {
@@ -254,8 +253,8 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::initialize(
   }
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::plan(
-  const std::vector<geometry_msgs::msg::PoseStamped> & route) -> void
+auto FieldOperatorApplication::plan(const std::vector<geometry_msgs::msg::PoseStamped> & route)
+  -> void
 {
   assert(not route.empty());
 
@@ -298,7 +297,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::plan(
   });
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::clearRoute() -> void
+auto FieldOperatorApplication::clearRoute() -> void
 {
   task_queue.delay([this] {
     /*
@@ -310,7 +309,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::clearRoute() -> void
   });
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::engage() -> void
+auto FieldOperatorApplication::engage() -> void
 {
   task_queue.delay([this]() {
     waitForAutowareStateToBeDriving([this]() {
@@ -326,20 +325,19 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::engage() -> void
   });
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::engageable() const -> bool
+auto FieldOperatorApplication::engageable() const -> bool
 {
   rethrow();
   return task_queue.exhausted() and isWaitingForEngage();
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::engaged() const -> bool
+auto FieldOperatorApplication::engaged() const -> bool
 {
   rethrow();
   return task_queue.exhausted() and isDriving();
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::getWaypoints() const
-  -> traffic_simulator_msgs::msg::WaypointsArray
+auto FieldOperatorApplication::getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray
 {
   traffic_simulator_msgs::msg::WaypointsArray waypoints;
 
@@ -350,7 +348,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::getWaypoints() const
   return waypoints;
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::setVelocityLimit(double velocity_limit) -> void
+auto FieldOperatorApplication::setVelocityLimit(double velocity_limit) -> void
 {
   task_queue.delay([this, velocity_limit]() {
     auto request = std::make_shared<tier4_external_api_msgs::srv::SetVelocityLimit::Request>();
@@ -361,7 +359,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::setVelocityLimit(double velo
   });
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::requestAutoModeForCooperation(
+auto FieldOperatorApplication::requestAutoModeForCooperation(
   const std::string & module_name, bool enable) -> void
 {
   // Note: The implementation of this function will not work properly
@@ -382,7 +380,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::requestAutoModeForCooperatio
   }
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::enableAutowareControl() -> void
+auto FieldOperatorApplication::enableAutowareControl() -> void
 {
   task_queue.delay([this]() {
     auto request = std::make_shared<autoware_adapi_v1_msgs::srv::ChangeOperationMode::Request>();

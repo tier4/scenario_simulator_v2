@@ -190,17 +190,17 @@ struct FieldOperatorApplication : public rclcpp::Node,
 
   auto shutdownAutoware() -> void;
 
-  virtual auto engage() -> void = 0;
+  auto engage() -> void;
 
-  virtual auto engageable() const -> bool = 0;
+  auto engageable() const -> bool;
 
-  virtual auto engaged() const -> bool = 0;
+  auto engaged() const -> bool;
 
-  virtual auto initialize(const geometry_msgs::msg::Pose &) -> void = 0;
+  auto initialize(const geometry_msgs::msg::Pose &) -> void;
 
-  virtual auto plan(const std::vector<geometry_msgs::msg::PoseStamped> &) -> void = 0;
+  auto plan(const std::vector<geometry_msgs::msg::PoseStamped> &) -> void;
 
-  virtual auto clearRoute() -> void = 0;
+  auto clearRoute() -> void;
 
   auto getAutowareStateName() const { return autoware_state; }
 
@@ -210,19 +210,19 @@ struct FieldOperatorApplication : public rclcpp::Node,
 
   auto getEmergencyStateName() const { return minimum_risk_maneuver_state; }
 
-  virtual auto getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray = 0;
+  auto getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray;
 
-  /*   */ auto initialized() const noexcept { return initialize_was_called; }
+  auto initialized() const noexcept { return initialize_was_called; }
 
-  virtual auto requestAutoModeForCooperation(const std::string &, bool) -> void = 0;
+  auto requestAutoModeForCooperation(const std::string &, bool) -> void;
 
-  virtual auto rethrow() const noexcept(false) -> void;
+  auto rethrow() const { task_queue.rethrow(); }
 
-  virtual auto sendCooperateCommand(const std::string &, const std::string &) -> void = 0;
+  auto sendCooperateCommand(const std::string &, const std::string &) -> void;
 
-  virtual auto setVelocityLimit(double) -> void = 0;
+  auto setVelocityLimit(double) -> void;
 
-  virtual auto enableAutowareControl() -> void = 0;
+  auto enableAutowareControl() -> void;
 };
 }  // namespace concealer
 

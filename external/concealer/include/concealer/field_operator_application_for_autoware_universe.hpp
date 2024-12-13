@@ -23,28 +23,6 @@ template <>
 struct FieldOperatorApplicationFor<AutowareUniverse> : public FieldOperatorApplication
 {
   using FieldOperatorApplication::FieldOperatorApplication;
-
-  auto engage() -> void override;
-
-  auto engageable() const -> bool override;
-
-  auto engaged() const -> bool override;
-
-  auto getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray override;
-
-  auto initialize(const geometry_msgs::msg::Pose &) -> void override;
-
-  auto plan(const std::vector<geometry_msgs::msg::PoseStamped> &) -> void override;
-
-  auto clearRoute() -> void override;
-
-  auto requestAutoModeForCooperation(const std::string &, bool) -> void override;
-
-  auto sendCooperateCommand(const std::string &, const std::string &) -> void override;
-
-  auto setVelocityLimit(double) -> void override;
-
-  auto enableAutowareControl() -> void override;
 };
 }  // namespace concealer
 

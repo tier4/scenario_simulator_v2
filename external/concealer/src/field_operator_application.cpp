@@ -241,6 +241,4 @@ auto FieldOperatorApplication::shutdownAutoware() -> void
     }
   }
 }
-
-auto FieldOperatorApplication::rethrow() const -> void { task_queue.rethrow(); }
 }  // namespace concealer
