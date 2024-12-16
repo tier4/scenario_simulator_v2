@@ -1,4 +1,4 @@
-// Copyright 2024 TIER IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -441,6 +441,23 @@ auto API::relativePose(
 {
   const auto to_entity = getEntity(to_entity_name);
   return pose::relativePose(from_map_pose, to_entity->getMapPose());
+}
+
+auto API::relativeSpeed(const std::string & from_entity_name, const std::string & to_entity_name)
+  -> Eigen::Vector3d
+{
+  auto velocity = [](const auto & entity) -> Eigen::Vector3d {
+    auto direction = [](const auto & q) -> Eigen::Vector3d {
+      return Eigen::Quaternion(q.w, q.x, q.y, q.z) * Eigen::Vector3d::UnitX();
+    };
+    return direction(entity->getMapPose().orientation) * entity->getCurrentTwist().linear.x;
+  };
+
+  const auto observer = getEntity(from_entity_name);
+  const auto observed = getEntity(to_entity_name);
+  const Eigen::Matrix3d rotation =
+    math::geometry::getRotationMatrix(observer->getMapPose().orientation);
+  return rotation.transpose() * velocity(observed) - rotation.transpose() * velocity(observer);
 }
 
 auto API::countLaneChanges(

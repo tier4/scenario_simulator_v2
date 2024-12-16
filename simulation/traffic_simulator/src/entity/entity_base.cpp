@@ -765,7 +765,6 @@ auto EntityBase::requestSynchronize(
      target_speed](double) {
       constexpr bool include_adjacent_lanelet{true};
       constexpr bool include_opposite_direction{false};
-      constexpr bool allow_lane_change{true};
 
       RoutingConfiguration lane_changeable_routing_configuration;
       lane_changeable_routing_configuration.allow_lane_change = true;

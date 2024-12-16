@@ -53,8 +53,8 @@ void PedestrianEntity::appendDebugMarker(visualization_msgs::msg::MarkerArray & 
 
 void PedestrianEntity::requestAssignRoute(const std::vector<LaneletPose> & waypoints)
 {
-  const auto canonicalized_waypoints = pose::canonicalize(waypoints, hdmap_utils_ptr_);
   if (isInLanelet()) {
+    const auto canonicalized_waypoints = pose::canonicalize(waypoints, hdmap_utils_ptr_);
     behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
     route_planner_.setWaypoints(canonicalized_waypoints);
     std::vector<geometry_msgs::msg::Pose> goal_poses;

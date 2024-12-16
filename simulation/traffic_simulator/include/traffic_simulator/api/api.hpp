@@ -1,4 +1,4 @@
-// Copyright 2024 TIER IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 
 #include <simulation_api_schema.pb.h>
 
+#include <geometry/quaternion/get_rotation_matrix.hpp>
 #include <simulation_interface/conversions.hpp>
 #include <simulation_interface/zmq_multi_client.hpp>
 #include <std_msgs/msg/float64.hpp>
@@ -256,6 +257,9 @@ public:
   auto relativePose(
     const geometry_msgs::msg::Pose & from_map_pose, const std::string & to_entity_name)
     -> std::optional<geometry_msgs::msg::Pose>;
+
+  auto relativeSpeed(const std::string & from_entity_name, const std::string & to_entity_name)
+    -> Eigen::Vector3d;
 
   auto countLaneChanges(
     const std::string & from_entity_name, const std::string & to_entity_name,

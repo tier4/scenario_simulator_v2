@@ -1,4 +1,4 @@
-// Copyright 2024 TIER IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
 #ifndef OPENSCENARIO_INTERPRETER__SIMULATOR_CORE_HPP_
 #define OPENSCENARIO_INTERPRETER__SIMULATOR_CORE_HPP_
 
-#include <geometry/quaternion/get_rotation_matrix.hpp>
 #include <openscenario_interpreter/cmath/hypot.hpp>
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/syntax/boolean.hpp>
@@ -621,24 +620,11 @@ public:
     static auto evaluateRelativeSpeed(
       const std::string & from_entity_name, const std::string & to_entity_name) -> Eigen::Vector3d
     {
-      if (const auto observer = core->getEntity(from_entity_name)) {
-        if (const auto observed = core->getEntity(to_entity_name)) {
-          auto velocity = [](const auto & entity) -> Eigen::Vector3d {
-            auto direction = [](const auto & q) -> Eigen::Vector3d {
-              return Eigen::Quaternion(q.w, q.x, q.y, q.z) * Eigen::Vector3d::UnitX();
-            };
-            return direction(entity->getMapPose().orientation) * entity->getCurrentTwist().linear.x;
-          };
-
-          const Eigen::Matrix3d rotation =
-            math::geometry::getRotationMatrix(observer->getMapPose().orientation);
-
-          return rotation.transpose() * velocity(observed) -
-                 rotation.transpose() * velocity(observer);
-        }
+      if (core->isEntityExist(from_entity_name) && core->isEntityExist(to_entity_name)) {
+        return core->relativeSpeed(from_entity_name, to_entity_name);
+      } else {
+        return Eigen::Vector3d::Constant(std::numeric_limits<double>::quiet_NaN());
       }
-      const auto nan = std::numeric_limits<double>::quiet_NaN();
-      return Eigen::Vector3d(nan, nan, nan);
     }
 
     static auto evaluateAcceleration(const std::string & entity_name) -> double
