@@ -55,7 +55,7 @@ The OpenSCENARIO XML standard [does not define](https://releases.asam.net/OpenSC
 
 ### Command
 
-OpenSCENARIO XML standard states that `CustomCommandAction` can be used to either issue a command to the simulation environment or start an external script. 
+OpenSCENARIO XML standard states that `CustomCommandAction` can be used to either issue a command to the simulation environment or start an external script.
 
 For OpenSCENARIO interpreters implemented in scripting languages such as Python, this action is often implemented as a call to an external script file written in the same language as the host language. However, `scenario_simulator_v2` is implemented in C++ and we cannot simply implement such a feature. Therefore, `scenario_simulator_v2` treats the string given in `CustomCommandAction.type` as a command and executes it on a subprocess, as `sh` does.
 
@@ -308,7 +308,7 @@ Currently, the only way to know the result of the simulation is by viewing the s
 | DynamicsDimension                            | 1.3               |                                            |
 | DynamicsShape                                | 1.3 (partial)     | [detail](#DynamicsShape)                   |
 | EndOfRoadCondition                           | unimplemented     |                                            |
-| Entities                                     | 1.3 (partial)     | [detail](#Entities)                        |
+| Entities                                     | 1.3.1             |                                            |
 | EntityAction                                 | 1.3               |                                            |
 | EntityCondition                              | 1.3 (partial)     | [detail](#EntityCondition)                 |
 | EntityDistribution                           | unimplemented     |                                            |
@@ -432,7 +432,7 @@ Currently, the only way to know the result of the simulation is by viewing the s
 | RelativeLaneRange                            | 1.3               |                                            |
 | RelativeObjectPosition                       | 1.3               |                                            |
 | RelativeRoadPosition                         | unimplemented     |                                            |
-| RelativeSpeedCondition                       | unimplemented     |                                            |
+| RelativeSpeedCondition                       | 1.3.1             |                                            |
 | RelativeSpeedToMaster                        | unimplemented     |                                            |
 | RelativeTargetLane                           | 1.3               |                                            |
 | RelativeTargetLaneOffset                     | unimplemented     |                                            |
@@ -486,8 +486,8 @@ Currently, the only way to know the result of the simulation is by viewing the s
 | TimeOfDay                                    | 1.3               |                                            |
 | TimeOfDayCondition                           | unimplemented     |                                            |
 | TimeReference                                | 1.3               |                                            |
-| TimeToCollisionCondition                     | unimplemented     |                                            |
-| TimeToCollisionConditionTarget               | unimplemented     |                                            |
+| TimeToCollisionCondition                     | 1.3.1 (partial)   | [detail](#TimeToCollisionCondition)        |
+| TimeToCollisionConditionTarget               | 1.3.1             |                                            |
 | Timing                                       | 1.3               |                                            |
 | TrafficAction                                | unimplemented     |                                            |
 | TrafficArea                                  | unimplemented     |                                            |
@@ -636,10 +636,6 @@ Currently, the only way to know the result of the simulation is by viewing the s
 #### DynamicsShape
 
 - Enumeration literal `sinusoidal` is **not** supported.
-
-#### Entities
-
-- Property `EntitySelection` is **not** supported.
 
 #### EntityCondition
 
@@ -851,6 +847,13 @@ Currently, the only way to know the result of the simulation is by viewing the s
 - Property `alongRoute` deprecated in version 1.1 is ignored.
 - Property `freespace` is ignored.
   - The simulator behaves as if `freespace` is `false`.
+
+#### TimeToCollisionCondition
+
+- Since `TimeToCollisionCondition` is implemented using `DistanceCondition`,
+  `RelativeDistanceCondition`, `SpeedCondition`, and `RelativeSpeedCondition`,
+  if a combination of properties that is not supported by those Conditions is
+  given to `TimeToCollisionCondition`, an error will be thrown.
 
 #### TransitionDynamics
 

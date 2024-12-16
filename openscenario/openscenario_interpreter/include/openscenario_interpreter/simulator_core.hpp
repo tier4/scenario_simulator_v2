@@ -15,9 +15,12 @@
 #ifndef OPENSCENARIO_INTERPRETER__SIMULATOR_CORE_HPP_
 #define OPENSCENARIO_INTERPRETER__SIMULATOR_CORE_HPP_
 
+#include <geometry/quaternion/get_rotation_matrix.hpp>
+#include <openscenario_interpreter/cmath/hypot.hpp>
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/syntax/boolean.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
+#include <openscenario_interpreter/syntax/entity.hpp>
 #include <openscenario_interpreter/syntax/routing_algorithm.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <openscenario_interpreter/syntax/unsigned_integer.hpp>
@@ -144,13 +147,9 @@ public:
     // Euclidean distance
     template <typename FirstType, typename SecondType>
     static auto euclideanDistance(
-      const FirstType & from_pose_or_entity_name, const SecondType & to_pose_or_entity_name,
-      const bool consider_z) -> double
+      const FirstType & from_pose_or_entity_name, const SecondType & to_pose_or_entity_name)
+      -> double
     {
-      const auto hypot = [&](const double x, const double y, const double z) {
-        return consider_z ? std::hypot(x, y, z) : std::hypot(x, y);
-      };
-
       if (prerequisite(from_pose_or_entity_name, to_pose_or_entity_name)) {
         if (
           const auto pose = core->relativePose(from_pose_or_entity_name, to_pose_or_entity_name)) {
@@ -162,13 +161,9 @@ public:
 
     template <typename FirstType, typename SecondType>
     static auto euclideanBoundingBoxDistance(
-      const FirstType & from_pose_or_entity_name, const SecondType & to_pose_or_entity_name,
-      const bool consider_z) -> double
+      const FirstType & from_pose_or_entity_name, const SecondType & to_pose_or_entity_name)
+      -> double
     {
-      const auto hypot = [&](const double x, const double y, const double z) {
-        return consider_z ? std::hypot(x, y, z) : std::hypot(x, y);
-      };
-
       if (prerequisite(from_pose_or_entity_name, to_pose_or_entity_name)) {
         if (
           const auto pose =
@@ -244,11 +239,13 @@ public:
       const FirstType & from_pose_or_entity_name, const SecondType & to_pose_or_entity_name,
       const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined) -> int
     {
-      const bool allow_lane_change = (routing_algorithm == RoutingAlgorithm::value_type::shortest);
+      traffic_simulator::RoutingConfiguration routing_configuration;
+      routing_configuration.allow_lane_change =
+        (routing_algorithm == RoutingAlgorithm::value_type::shortest);
       if (prerequisite(from_pose_or_entity_name, to_pose_or_entity_name)) {
         if (
           const auto lane_changes = core->countLaneChanges(
-            from_pose_or_entity_name, to_pose_or_entity_name, allow_lane_change)) {
+            from_pose_or_entity_name, to_pose_or_entity_name, routing_configuration)) {
           return lane_changes.value().first - lane_changes.value().second;
         }
       }
@@ -262,10 +259,12 @@ public:
       const FirstType & from_pose_or_entity_name, const SecondType & to_pose_or_entity_name,
       const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined) -> double
     {
-      const bool allow_lane_change = (routing_algorithm == RoutingAlgorithm::value_type::shortest);
+      traffic_simulator::RoutingConfiguration routing_configuration;
+      routing_configuration.allow_lane_change =
+        (routing_algorithm == RoutingAlgorithm::value_type::shortest);
       if (prerequisite(from_pose_or_entity_name, to_pose_or_entity_name)) {
         if (const auto lanelet_distance = core->laneletDistance(
-              from_pose_or_entity_name, to_pose_or_entity_name, allow_lane_change);
+              from_pose_or_entity_name, to_pose_or_entity_name, routing_configuration);
             lanelet_distance.lateral) {
           return lanelet_distance.lateral.value();
         }
@@ -278,10 +277,12 @@ public:
       const FirstType & from_pose_or_entity_name, const SecondType & to_pose_or_entity_name,
       const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined) -> double
     {
-      const bool allow_lane_change = (routing_algorithm == RoutingAlgorithm::value_type::shortest);
+      traffic_simulator::RoutingConfiguration routing_configuration;
+      routing_configuration.allow_lane_change =
+        (routing_algorithm == RoutingAlgorithm::value_type::shortest);
       if (prerequisite(from_pose_or_entity_name, to_pose_or_entity_name)) {
         if (const auto lanelet_distance = core->laneletDistance(
-              from_pose_or_entity_name, to_pose_or_entity_name, allow_lane_change);
+              from_pose_or_entity_name, to_pose_or_entity_name, routing_configuration);
             lanelet_distance.longitudinal) {
           return lanelet_distance.longitudinal.value();
         }
@@ -294,10 +295,12 @@ public:
       const FirstType & from_pose_or_entity_name, const SecondType & to_pose_or_entity_name,
       const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined) -> double
     {
-      const bool allow_lane_change = (routing_algorithm == RoutingAlgorithm::value_type::shortest);
+      traffic_simulator::RoutingConfiguration routing_configuration;
+      routing_configuration.allow_lane_change =
+        (routing_algorithm == RoutingAlgorithm::value_type::shortest);
       if (prerequisite(from_pose_or_entity_name, to_pose_or_entity_name)) {
         if (const auto lanelet_distance = core->boundingBoxLaneletDistance(
-              from_pose_or_entity_name, to_pose_or_entity_name, allow_lane_change);
+              from_pose_or_entity_name, to_pose_or_entity_name, routing_configuration);
             lanelet_distance.lateral) {
           return lanelet_distance.lateral.value();
         }
@@ -310,10 +313,12 @@ public:
       const FirstType & from_pose_or_entity_name, const SecondType & to_pose_or_entity_name,
       const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined) -> double
     {
-      const bool allow_lane_change = (routing_algorithm == RoutingAlgorithm::value_type::shortest);
+      traffic_simulator::RoutingConfiguration routing_configuration;
+      routing_configuration.allow_lane_change =
+        (routing_algorithm == RoutingAlgorithm::value_type::shortest);
       if (prerequisite(from_pose_or_entity_name, to_pose_or_entity_name)) {
         if (const auto lanelet_distance = core->boundingBoxLaneletDistance(
-              from_pose_or_entity_name, to_pose_or_entity_name, allow_lane_change);
+              from_pose_or_entity_name, to_pose_or_entity_name, routing_configuration);
             lanelet_distance.longitudinal) {
           return lanelet_distance.longitudinal.value();
         }
@@ -397,7 +402,7 @@ public:
           };
 
           // clang-format off
-          configuration.set_architecture_type(core->getROS2Parameter<std::string>("architecture_type", "awf/universe"));
+          configuration.set_architecture_type(core->getROS2Parameter<std::string>("architecture_type", "awf/universe/20240605"));
           configuration.set_entity(entity_name);
           configuration.set_horizontal_resolution(degree_to_radian(controller.properties.template get<Double>("pointcloudHorizontalResolution", 1.0)));
           configuration.set_lidar_sensor_delay(controller.properties.template get<Double>("pointcloudPublishingDelay"));
@@ -421,7 +426,7 @@ public:
         core->attachDetectionSensor([&]() {
           simulation_api_schema::DetectionSensorConfiguration configuration;
           // clang-format off
-          configuration.set_architecture_type(core->getROS2Parameter<std::string>("architecture_type", "awf/universe"));
+          configuration.set_architecture_type(core->getROS2Parameter<std::string>("architecture_type", "awf/universe/20240605"));
           configuration.set_entity(entity_name);
           configuration.set_detect_all_objects_in_range(controller.properties.template get<Boolean>("isClairvoyant"));
           configuration.set_object_recognition_delay(controller.properties.template get<Double>("detectedObjectPublishingDelay"));
@@ -438,7 +443,7 @@ public:
         core->attachOccupancyGridSensor([&]() {
           simulation_api_schema::OccupancyGridSensorConfiguration configuration;
           // clang-format off
-          configuration.set_architecture_type(core->getROS2Parameter<std::string>("architecture_type", "awf/universe"));
+          configuration.set_architecture_type(core->getROS2Parameter<std::string>("architecture_type", "awf/universe/20240605"));
           configuration.set_entity(entity_name);
           configuration.set_filter_by_range(controller.properties.template get<Boolean>("isClairvoyant"));
           configuration.set_height(200);
@@ -453,7 +458,7 @@ public:
         core->attachPseudoTrafficLightDetector([&]() {
           simulation_api_schema::PseudoTrafficLightDetectorConfiguration configuration;
           configuration.set_architecture_type(
-            core->getROS2Parameter<std::string>("architecture_type", "awf/universe"));
+            core->getROS2Parameter<std::string>("architecture_type", "awf/universe/20240605"));
           return configuration;
         }());
 
@@ -497,7 +502,7 @@ public:
       typename = std::enable_if_t<
         std::is_same_v<std::decay_t<PoseType>, geometry_msgs::msg::Pose> ||
         std::is_same_v<std::decay_t<PoseType>, traffic_simulator::LaneletPose> ||
-        std::is_same_v<std::decay_t<PoseType>, traffic_simulator::CanonicalizedLaneletPose>>>
+        std::is_same_v<std::decay_t<PoseType>, traffic_simulator::CanonicalizedLaneletPose> > >
     static auto applyTeleportAction(const std::string & name, const PoseType & pose, Ts &&... xs)
       -> void
     {
@@ -602,13 +607,38 @@ public:
       }
     }
 
-    static auto evaluateSpeed(const std::string & entity_name) -> double
+    static auto evaluateSpeed(const std::string & entity_name) -> Eigen::Vector3d
     {
       if (core->isEntityExist(entity_name)) {
-        return core->getEntity(entity_name)->getCurrentTwist().linear.x;
+        const auto linear = core->getEntity(entity_name)->getCurrentTwist().linear;
+        return Eigen::Vector3d(linear.x, linear.y, linear.z);
       } else {
-        return std::numeric_limits<double>::quiet_NaN();
+        const auto nan = std::numeric_limits<double>::quiet_NaN();
+        return Eigen::Vector3d(nan, nan, nan);
       }
+    }
+
+    static auto evaluateRelativeSpeed(
+      const std::string & from_entity_name, const std::string & to_entity_name) -> Eigen::Vector3d
+    {
+      if (const auto observer = core->getEntity(from_entity_name)) {
+        if (const auto observed = core->getEntity(to_entity_name)) {
+          auto velocity = [](const auto & entity) -> Eigen::Vector3d {
+            auto direction = [](const auto & q) -> Eigen::Vector3d {
+              return Eigen::Quaternion(q.w, q.x, q.y, q.z) * Eigen::Vector3d::UnitX();
+            };
+            return direction(entity->getMapPose().orientation) * entity->getCurrentTwist().linear.x;
+          };
+
+          const Eigen::Matrix3d rotation =
+            math::geometry::getRotationMatrix(observer->getMapPose().orientation);
+
+          return rotation.transpose() * velocity(observed) -
+                 rotation.transpose() * velocity(observer);
+        }
+      }
+      const auto nan = std::numeric_limits<double>::quiet_NaN();
+      return Eigen::Vector3d(nan, nan, nan);
     }
 
     static auto evaluateAcceleration(const std::string & entity_name) -> double

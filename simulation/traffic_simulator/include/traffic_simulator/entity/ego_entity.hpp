@@ -16,7 +16,6 @@
 #define TRAFFIC_SIMULATOR__ENTITY__EGO_ENTITY_HPP_
 
 #include <algorithm>
-#include <autoware_auto_system_msgs/msg/emergency_state.hpp>
 #include <boost/filesystem.hpp>
 #include <concealer/autoware.hpp>
 #include <concealer/field_operator_application.hpp>
@@ -99,9 +98,9 @@ public:
   auto requestFollowTrajectory(
     const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &) -> void override;
 
-  void requestLaneChange(const lanelet::Id) override;
+  auto requestLaneChange(const lanelet::Id) -> void override;
 
-  auto requestLaneChange(const traffic_simulator::lane_change::Parameter &) -> void override;
+  auto requestLaneChange(const lane_change::Parameter &) -> void override;
 
   auto requestSpeedChange(
     const double, const speed_change::Transition, const speed_change::Constraint,
@@ -111,11 +110,15 @@ public:
     const speed_change::RelativeTargetSpeed &, const speed_change::Transition,
     const speed_change::Constraint, const bool continuous) -> void override;
 
-  virtual auto requestSynchronize(
+  auto requestSynchronize(
     const std::string & target_name, const LaneletPose & target_sync_pose,
     const LaneletPose & entity_target, const double target_speed, const double tolerance) -> bool;
 
   void requestClearRoute() override;
+
+  auto requestReplanRoute(const std::vector<geometry_msgs::msg::PoseStamped> & route) -> void;
+
+  auto requestAutoModeForCooperation(const std::string & module_name, bool enable) -> void;
 
   auto isControlledBySimulator() const -> bool override;
 
@@ -159,13 +162,11 @@ public:
   auto engage() -> void;
   auto isEngaged() const -> bool;
   auto isEngageable() const -> bool;
-  auto replanRoute(const std::vector<geometry_msgs::msg::PoseStamped> & route) -> void;
   auto sendCooperateCommand(const std::string & module_name, const std::string & command) -> void;
-  auto requestAutoModeForCooperation(const std::string & module_name, bool enable) -> void;
   auto getMinimumRiskManeuverBehaviorName() const -> std::string;
   auto getMinimumRiskManeuverStateName() const -> std::string;
   auto getEmergencyStateName() const -> std::string;
-  auto getTurnIndicatorsCommandName() const -> const std::string;
+  auto getTurnIndicatorsCommandName() const -> std::string;
 };
 }  // namespace entity
 }  // namespace traffic_simulator

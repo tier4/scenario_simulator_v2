@@ -468,7 +468,7 @@ TEST(Shape, make)
 }
 
 /**
- * @note Test basic functionality. Test function behavior when called with invalid name. 
+ * @note Test basic functionality. Test function behavior when called with invalid name.
  */
 TEST(Shape, make_wrong)
 {
@@ -481,6 +481,9 @@ TEST(Shape, make_wrong)
 TEST(Bulb, hash)
 {
   // clang-format off
+  //byte1:   Color,  e.g. 00000000 green,           00000001 yellow,         00000010 red
+  //byte2:   Status, e.g. 00000000 solid on,        00000001 solid off,      00000010 flashing
+  //byte3&4: Shape,  e.g. 00000000 00000000 circle, 00000000 00000001 cross, 00001000 00000010 left
   static_assert(Bulb(Color::green,  Status::solid_on,  Shape::circle     ).hash() == 0b0000'0000'0000'0000'0000'0000'0000'0000);
   static_assert(Bulb(Color::yellow, Status::solid_on,  Shape::circle     ).hash() == 0b0000'0001'0000'0000'0000'0000'0000'0000);
   static_assert(Bulb(Color::red,    Status::solid_on,  Shape::circle     ).hash() == 0b0000'0010'0000'0000'0000'0000'0000'0000);
@@ -727,7 +730,7 @@ protected:
 
 /**
  * @note test if function correctly determines if a given bulb
- * is in the bulbs vector given a Color, Status, Shape triple.
+ * is in the bulbs vector, passing the Color, Status, Shape triple.
  */
 TEST_F(TrafficLightTest, contains_colorStatusShape)
 {

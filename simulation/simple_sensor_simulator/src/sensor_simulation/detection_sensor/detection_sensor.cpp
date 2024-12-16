@@ -13,12 +13,14 @@
 // limitations under the License.
 
 #include <algorithm>
-#include <autoware_auto_perception_msgs/msg/detected_objects.hpp>
-#include <autoware_auto_perception_msgs/msg/tracked_objects.hpp>
+#include <autoware_perception_msgs/msg/detected_objects.hpp>
+#include <autoware_perception_msgs/msg/tracked_objects.hpp>
 #include <boost/uuid/string_generator.hpp>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
+#include <geometry/quaternion/get_angle_difference.hpp>
+#include <geometry/quaternion/get_normal_vector.hpp>
 #include <geometry/quaternion/get_rotation_matrix.hpp>
 #include <geometry/vector3/hypot.hpp>
 #include <memory>
@@ -62,6 +64,51 @@ auto DetectionSensorBase::findEgoEntityStatusToWhichThisSensorIsAttached(
   }
 }
 
+auto DetectionSensorBase::isOnOrAboveEgoPlane(
+  const geometry_msgs::Pose & entity_pose, const geometry_msgs::Pose & ego_pose) -> bool
+{
+  /*
+      The threshold for detecting significant changes in ego vehicle's orientation (unit: radian).
+      The value determines the minimum angular difference required to consider the ego orientation
+      as "changed".
+
+      There is no technical basis for this value, it was determined based on experiments.
+  */
+  constexpr static double rotation_threshold_ = 0.04;
+  /*
+      Maximum downward offset in Z-axis relative to the ego position (unit: meter).
+      If the NPC is lower than this offset relative to the ego position,
+      the NPC will be excluded from detection
+
+      There is no technical basis for this value, it was determined based on experiments.
+  */
+  constexpr static double max_downward_z_offset_ = 1.0;
+
+  const auto hasEgoOrientationChanged = [this](const geometry_msgs::msg::Pose & ego_pose_ros) {
+    return math::geometry::getAngleDifference(
+             ego_pose_ros.orientation, ego_plane_pose_opt_->orientation) > rotation_threshold_;
+  };
+
+  // if other entity is at the same altitude as Ego or within max_downward_z_offset_ below Ego
+  if (entity_pose.position().z() >= (ego_pose.position().z() - max_downward_z_offset_)) {
+    return true;
+    // otherwise check if other entity is above ego plane
+  } else {
+    // update ego plane if needed
+    geometry_msgs::msg::Pose ego_pose_ros;
+    simulation_interface::toMsg(ego_pose, ego_pose_ros);
+    if (!ego_plane_opt_ || !ego_plane_pose_opt_ || hasEgoOrientationChanged(ego_pose_ros)) {
+      ego_plane_opt_.emplace(
+        ego_pose_ros.position, math::geometry::getNormalVector(ego_pose_ros.orientation));
+      ego_plane_pose_opt_ = ego_pose_ros;
+    }
+
+    geometry_msgs::msg::Pose entity_pose_ros;
+    simulation_interface::toMsg(entity_pose, entity_pose_ros);
+    return ego_plane_opt_->offset(entity_pose_ros.position) >= 0.0;
+  }
+}
+
 template <typename To, typename... From>
 auto make(From &&...) -> To;
 
@@ -77,28 +124,28 @@ auto make(const traffic_simulator_msgs::EntityStatus & status) -> unique_identif
 
 template <>
 auto make(const traffic_simulator_msgs::EntityStatus & status)
-  -> autoware_auto_perception_msgs::msg::ObjectClassification
+  -> autoware_perception_msgs::msg::ObjectClassification
 {
-  auto object_classification = autoware_auto_perception_msgs::msg::ObjectClassification();
+  auto object_classification = autoware_perception_msgs::msg::ObjectClassification();
 
   object_classification.label = [&]() {
     switch (status.subtype().value()) {
       case traffic_simulator_msgs::EntitySubtype::CAR:
-        return autoware_auto_perception_msgs::msg::ObjectClassification::CAR;
+        return autoware_perception_msgs::msg::ObjectClassification::CAR;
       case traffic_simulator_msgs::EntitySubtype::TRUCK:
-        return autoware_auto_perception_msgs::msg::ObjectClassification::TRUCK;
+        return autoware_perception_msgs::msg::ObjectClassification::TRUCK;
       case traffic_simulator_msgs::EntitySubtype::BUS:
-        return autoware_auto_perception_msgs::msg::ObjectClassification::BUS;
+        return autoware_perception_msgs::msg::ObjectClassification::BUS;
       case traffic_simulator_msgs::EntitySubtype::TRAILER:
-        return autoware_auto_perception_msgs::msg::ObjectClassification::TRAILER;
+        return autoware_perception_msgs::msg::ObjectClassification::TRAILER;
       case traffic_simulator_msgs::EntitySubtype::MOTORCYCLE:
-        return autoware_auto_perception_msgs::msg::ObjectClassification::MOTORCYCLE;
+        return autoware_perception_msgs::msg::ObjectClassification::MOTORCYCLE;
       case traffic_simulator_msgs::EntitySubtype::BICYCLE:
-        return autoware_auto_perception_msgs::msg::ObjectClassification::BICYCLE;
+        return autoware_perception_msgs::msg::ObjectClassification::BICYCLE;
       case traffic_simulator_msgs::EntitySubtype::PEDESTRIAN:
-        return autoware_auto_perception_msgs::msg::ObjectClassification::PEDESTRIAN;
+        return autoware_perception_msgs::msg::ObjectClassification::PEDESTRIAN;
       default:
-        return autoware_auto_perception_msgs::msg::ObjectClassification::UNKNOWN;
+        return autoware_perception_msgs::msg::ObjectClassification::UNKNOWN;
     }
   }();
 
@@ -136,9 +183,9 @@ auto make(const traffic_simulator_msgs::EntityStatus & status) -> geometry_msgs:
 
 template <>
 auto make(const traffic_simulator_msgs::EntityStatus & status)
-  -> autoware_auto_perception_msgs::msg::DetectedObjectKinematics
+  -> autoware_perception_msgs::msg::DetectedObjectKinematics
 {
-  auto kinematics = autoware_auto_perception_msgs::msg::DetectedObjectKinematics();
+  auto kinematics = autoware_perception_msgs::msg::DetectedObjectKinematics();
 
   kinematics.pose_with_covariance.pose = make<geometry_msgs::msg::Pose>(status);
 
@@ -165,9 +212,9 @@ auto make(const traffic_simulator_msgs::EntityStatus & status)
     switch (status.subtype().value()) {
       case traffic_simulator_msgs::EntitySubtype::BICYCLE:
       case traffic_simulator_msgs::EntitySubtype::MOTORCYCLE:
-        return autoware_auto_perception_msgs::msg::DetectedObjectKinematics::SIGN_UNKNOWN;
+        return autoware_perception_msgs::msg::DetectedObjectKinematics::SIGN_UNKNOWN;
       default:
-        return autoware_auto_perception_msgs::msg::DetectedObjectKinematics::UNAVAILABLE;
+        return autoware_perception_msgs::msg::DetectedObjectKinematics::UNAVAILABLE;
     }
   }();
 
@@ -176,35 +223,35 @@ auto make(const traffic_simulator_msgs::EntityStatus & status)
 
 template <>
 auto make(const traffic_simulator_msgs::EntityStatus & status)
-  -> autoware_auto_perception_msgs::msg::Shape
+  -> autoware_perception_msgs::msg::Shape
 {
-  auto shape = autoware_auto_perception_msgs::msg::Shape();
+  auto shape = autoware_perception_msgs::msg::Shape();
   simulation_interface::toMsg(status.bounding_box().dimensions(), shape.dimensions);
-  shape.type = autoware_auto_perception_msgs::msg::Shape::BOUNDING_BOX;
+  shape.type = autoware_perception_msgs::msg::Shape::BOUNDING_BOX;
   return shape;
 }
 
 template <>
 auto make(const traffic_simulator_msgs::EntityStatus & status)
-  -> autoware_auto_perception_msgs::msg::DetectedObject
+  -> autoware_perception_msgs::msg::DetectedObject
 {
-  auto detected_object = autoware_auto_perception_msgs::msg::DetectedObject();
+  auto detected_object = autoware_perception_msgs::msg::DetectedObject();
   detected_object.classification.push_back(
-    make<autoware_auto_perception_msgs::msg::ObjectClassification>(status));
+    make<autoware_perception_msgs::msg::ObjectClassification>(status));
   detected_object.kinematics =
-    make<autoware_auto_perception_msgs::msg::DetectedObjectKinematics>(status);
-  detected_object.shape = make<autoware_auto_perception_msgs::msg::Shape>(status);
+    make<autoware_perception_msgs::msg::DetectedObjectKinematics>(status);
+  detected_object.shape = make<autoware_perception_msgs::msg::Shape>(status);
   return detected_object;
 }
 
 template <>
 auto make(
   const traffic_simulator_msgs::EntityStatus & status,
-  const autoware_auto_perception_msgs::msg::DetectedObject & detected_object)
-  -> autoware_auto_perception_msgs::msg::TrackedObject
+  const autoware_perception_msgs::msg::DetectedObject & detected_object)
+  -> autoware_perception_msgs::msg::TrackedObject
 {
   // ref: https://github.com/autowarefoundation/autoware.universe/blob/main/common/perception_utils/src/conversion.cpp
-  auto tracked_object = autoware_auto_perception_msgs::msg::TrackedObject();
+  auto tracked_object = autoware_perception_msgs::msg::TrackedObject();
   // clang-format off
   tracked_object.object_id                           = make<unique_identifier_msgs::msg::UUID>(status);
   tracked_object.existence_probability               = detected_object.existence_probability;
@@ -250,8 +297,7 @@ struct DefaultNoiseApplicator
 
   auto operator=(DefaultNoiseApplicator &&) = delete;
 
-  auto operator()(autoware_auto_perception_msgs::msg::DetectedObjects detected_objects)
-    -> decltype(auto)
+  auto operator()(autoware_perception_msgs::msg::DetectedObjects detected_objects) -> decltype(auto)
   {
     auto position_noise_distribution =
       std::normal_distribution<>(0.0, detection_sensor_configuration.pos_noise_stddev());
@@ -291,7 +337,7 @@ struct CustomNoiseApplicator : public DefaultNoiseApplicator
      This class inherits from DefaultNoiseApplicator, so you can use its data
      members, or you can explicitly call DefaultNoiseApplicator::operator().
   */
-  // auto operator()(autoware_auto_perception_msgs::msg::DetectedObjects detected_objects)
+  // auto operator()(autoware_perception_msgs::msg::DetectedObjects detected_objects)
   //   -> decltype(auto)
   // {
   //   return detected_objects;
@@ -299,7 +345,7 @@ struct CustomNoiseApplicator : public DefaultNoiseApplicator
 };
 
 template <>
-auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::update(
+auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
   const double current_simulation_time,
   const std::vector<traffic_simulator_msgs::EntityStatus> & statuses,
   const rclcpp::Time & current_ros_time, const std::vector<std::string> & lidar_detected_entities)
@@ -310,11 +356,11 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
     -0.002) {
     previous_simulation_time_ = current_simulation_time;
 
-    autoware_auto_perception_msgs::msg::DetectedObjects detected_objects;
+    autoware_perception_msgs::msg::DetectedObjects detected_objects;
     detected_objects.header.stamp = current_ros_time;
     detected_objects.header.frame_id = "map";
 
-    autoware_auto_perception_msgs::msg::TrackedObjects ground_truth_objects;
+    autoware_perception_msgs::msg::TrackedObjects ground_truth_objects;
     ground_truth_objects.header = detected_objects.header;
 
     const auto ego_entity_status = findEgoEntityStatusToWhichThisSensorIsAttached(statuses);
@@ -322,6 +368,7 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
     auto is_in_range = [&](const auto & status) {
       return not isEgoEntityStatusToWhichThisSensorIsAttached(status) and
              distance(status.pose(), ego_entity_status->pose()) <= configuration_.range() and
+             isOnOrAboveEgoPlane(status.pose(), ego_entity_status->pose()) and
              (configuration_.detect_all_objects_in_range() or
               std::find(
                 lidar_detected_entities.begin(), lidar_detected_entities.end(), status.name()) !=
@@ -330,11 +377,10 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
 
     for (const auto & status : statuses) {
       if (is_in_range(status)) {
-        const auto detected_object =
-          make<autoware_auto_perception_msgs::msg::DetectedObject>(status);
+        const auto detected_object = make<autoware_perception_msgs::msg::DetectedObject>(status);
         detected_objects.objects.push_back(detected_object);
         ground_truth_objects.objects.push_back(
-          make<autoware_auto_perception_msgs::msg::TrackedObject>(status, detected_object));
+          make<autoware_perception_msgs::msg::TrackedObject>(status, detected_object));
       }
     }
 

@@ -1,4 +1,4 @@
-// Copyright 2024 TIER IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 
 namespace traffic_simulator
 {
-namespace pose
+inline namespace pose
 {
 auto quietNaNPose() -> geometry_msgs::msg::Pose
 {
@@ -218,7 +218,7 @@ auto isInLanelet(
 {
   constexpr bool include_adjacent_lanelet{false};
   constexpr bool include_opposite_direction{false};
-  constexpr bool allow_lane_change{false};
+  constexpr RoutingConfiguration routing_configuration;
 
   if (isSameLaneletId(canonicalized_lanelet_pose, lanelet_id)) {
     return true;
@@ -227,7 +227,7 @@ auto isInLanelet(
       helper::constructCanonicalizedLaneletPose(lanelet_id, 0.0, 0.0, hdmap_utils_ptr);
     if (const auto distance_to_start_lanelet_pose = longitudinalDistance(
           start_lanelet_pose, canonicalized_lanelet_pose, include_adjacent_lanelet,
-          include_opposite_direction, allow_lane_change, hdmap_utils_ptr);
+          include_opposite_direction, routing_configuration, hdmap_utils_ptr);
         distance_to_start_lanelet_pose and
         std::abs(distance_to_start_lanelet_pose.value()) <= tolerance) {
       return true;
@@ -237,7 +237,7 @@ auto isInLanelet(
       lanelet_id, hdmap_utils_ptr->getLaneletLength(lanelet_id), 0.0, hdmap_utils_ptr);
     if (const auto distance_to_end_lanelet_pose = longitudinalDistance(
           canonicalized_lanelet_pose, end_lanelet_pose, include_adjacent_lanelet,
-          include_opposite_direction, allow_lane_change, hdmap_utils_ptr);
+          include_opposite_direction, routing_configuration, hdmap_utils_ptr);
         distance_to_end_lanelet_pose and
         std::abs(distance_to_end_lanelet_pose.value()) <= tolerance) {
       return true;

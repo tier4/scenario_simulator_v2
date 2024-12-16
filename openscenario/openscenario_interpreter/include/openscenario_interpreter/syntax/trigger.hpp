@@ -15,7 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__TRIGGER_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__TRIGGER_HPP_
 
-#include <nlohmann/json.hpp>
+#include <boost/json.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/condition_group.hpp>
 #include <pugixml.hpp>
@@ -52,9 +52,12 @@ struct Trigger : public std::list<ConditionGroup>
   auto activeConditionGroupDescription() const -> std::vector<std::pair<std::string, std::string>>;
 
   auto evaluate() -> Object;
+
+  // Utility function for some default triggers that are always evaluated to be true
+  static auto truthy() noexcept -> Trigger;
 };
 
-auto operator<<(nlohmann::json &, const Trigger &) -> nlohmann::json &;
+auto operator<<(boost::json::object &, const Trigger &) -> boost::json::object &;
 
 static_assert(std::is_default_constructible<Trigger>::value);
 

@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <cmath>
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
@@ -46,12 +45,7 @@ DistanceCondition::DistanceCondition(
   value(readAttribute<Double>("value", node, scope)),
   position(readElement<Position>("Position", node, scope)),
   triggering_entities(triggering_entities),
-  results(triggering_entities.entity_refs.size(), {Double::nan()}),
-  consider_z([]() {
-    rclcpp::Node node{"get_parameter", "simulation"};
-    node.declare_parameter("consider_pose_by_road_slope", false);
-    return node.get_parameter("consider_pose_by_road_slope").as_bool();
-  }())
+  results(triggering_entities.entity_refs.size(), {Double::nan()})
 {
   std::set<RoutingAlgorithm::value_type> supported = {
     RoutingAlgorithm::value_type::shortest, RoutingAlgorithm::value_type::undefined};
@@ -74,258 +68,209 @@ auto DistanceCondition::description() const -> std::string
   return description.str();
 }
 
-#define SWITCH_COORDINATE_SYSTEM(FUNCTION, ...)            \
-  switch (coordinate_system) {                             \
-    case CoordinateSystem::entity:                         \
-      FUNCTION(__VA_ARGS__, CoordinateSystem::entity);     \
-      break;                                               \
-    case CoordinateSystem::lane:                           \
-      FUNCTION(__VA_ARGS__, CoordinateSystem::lane);       \
-      break;                                               \
-    case CoordinateSystem::road:                           \
-      FUNCTION(__VA_ARGS__, CoordinateSystem::road);       \
-      break;                                               \
-    case CoordinateSystem::trajectory:                     \
-      FUNCTION(__VA_ARGS__, CoordinateSystem::trajectory); \
-      break;                                               \
+#define SWITCH_COORDINATE_SYSTEM(FUNCTION, ...)                                         \
+  switch (coordinate_system) {                                                          \
+    case CoordinateSystem::entity:                                                      \
+      FUNCTION(__VA_ARGS__, CoordinateSystem::entity);                                  \
+      break;                                                                            \
+    case CoordinateSystem::lane:                                                        \
+      FUNCTION(__VA_ARGS__, CoordinateSystem::lane);                                    \
+      break;                                                                            \
+    case CoordinateSystem::road:                                                        \
+      FUNCTION(__VA_ARGS__, CoordinateSystem::road);                                    \
+      break;                                                                            \
+    case CoordinateSystem::trajectory:                                                  \
+      FUNCTION(__VA_ARGS__, CoordinateSystem::trajectory);                              \
+      break;                                                                            \
+    default:                                                                            \
+      throw UNEXPECTED_ENUMERATION_VALUE_ASSIGNED(CoordinateSystem, coordinate_system); \
   }
 
-#define SWITCH_RELATIVE_DISTANCE_TYPE(FUNCTION, ...)                  \
-  switch (relative_distance_type) {                                   \
-    case RelativeDistanceType::longitudinal:                          \
-      FUNCTION(__VA_ARGS__, RelativeDistanceType::longitudinal);      \
-      break;                                                          \
-    case RelativeDistanceType::lateral:                               \
-      FUNCTION(__VA_ARGS__, RelativeDistanceType::lateral);           \
-      break;                                                          \
-    case RelativeDistanceType::euclidianDistance:                     \
-      FUNCTION(__VA_ARGS__, RelativeDistanceType::euclidianDistance); \
-      break;                                                          \
+#define SWITCH_RELATIVE_DISTANCE_TYPE(FUNCTION, ...)                                             \
+  switch (relative_distance_type) {                                                              \
+    case RelativeDistanceType::longitudinal:                                                     \
+      FUNCTION(__VA_ARGS__, RelativeDistanceType::longitudinal);                                 \
+      break;                                                                                     \
+    case RelativeDistanceType::lateral:                                                          \
+      FUNCTION(__VA_ARGS__, RelativeDistanceType::lateral);                                      \
+      break;                                                                                     \
+    case RelativeDistanceType::euclidianDistance:                                                \
+      FUNCTION(__VA_ARGS__, RelativeDistanceType::euclidianDistance);                            \
+      break;                                                                                     \
+    default:                                                                                     \
+      throw UNEXPECTED_ENUMERATION_VALUE_ASSIGNED(RelativeDistanceType, relative_distance_type); \
   }
 
-#define SWITCH_ROUTING_ALGORITHM(FUNCTION, ...)                     \
-  switch (routing_algorithm) {                                      \
-    case RoutingAlgorithm::assigned_route:                          \
-      FUNCTION(__VA_ARGS__, RoutingAlgorithm::assigned_route);      \
-      break;                                                        \
-    case RoutingAlgorithm::fastest:                                 \
-      FUNCTION(__VA_ARGS__, RoutingAlgorithm::fastest);             \
-      break;                                                        \
-    case RoutingAlgorithm::least_intersections:                     \
-      FUNCTION(__VA_ARGS__, RoutingAlgorithm::least_intersections); \
-      break;                                                        \
-    case RoutingAlgorithm::shortest:                                \
-      FUNCTION(__VA_ARGS__, RoutingAlgorithm::shortest);            \
-      break;                                                        \
-    case RoutingAlgorithm::undefined:                               \
-      FUNCTION(__VA_ARGS__, RoutingAlgorithm::undefined);           \
-      break;                                                        \
+#define SWITCH_ROUTING_ALGORITHM(FUNCTION, ...)                                         \
+  switch (routing_algorithm) {                                                          \
+    case RoutingAlgorithm::assigned_route:                                              \
+      FUNCTION(__VA_ARGS__, RoutingAlgorithm::assigned_route);                          \
+      break;                                                                            \
+    case RoutingAlgorithm::fastest:                                                     \
+      FUNCTION(__VA_ARGS__, RoutingAlgorithm::fastest);                                 \
+      break;                                                                            \
+    case RoutingAlgorithm::least_intersections:                                         \
+      FUNCTION(__VA_ARGS__, RoutingAlgorithm::least_intersections);                     \
+      break;                                                                            \
+    case RoutingAlgorithm::shortest:                                                    \
+      FUNCTION(__VA_ARGS__, RoutingAlgorithm::shortest);                                \
+      break;                                                                            \
+    case RoutingAlgorithm::undefined:                                                   \
+      FUNCTION(__VA_ARGS__, RoutingAlgorithm::undefined);                               \
+      break;                                                                            \
+    default:                                                                            \
+      throw UNEXPECTED_ENUMERATION_VALUE_ASSIGNED(RoutingAlgorithm, routing_algorithm); \
   }
 
 #define SWITCH_FREESPACE(FUNCTION, ...) \
   return freespace ? FUNCTION(__VA_ARGS__, true) : FUNCTION(__VA_ARGS__, false)
 
-#define DISTANCE(...) distance<__VA_ARGS__>(triggering_entity)
+#define DISTANCE(...) distance<__VA_ARGS__>(triggering_entity, position)
 
-auto DistanceCondition::distance(const EntityRef & triggering_entity) const -> double
+auto DistanceCondition::evaluate(
+  const Entities * entities, const Entity & triggering_entity, const Position & position,
+  CoordinateSystem coordinate_system, RelativeDistanceType relative_distance_type,
+  RoutingAlgorithm routing_algorithm, Boolean freespace) -> double
 {
-  SWITCH_COORDINATE_SYSTEM(
-    SWITCH_RELATIVE_DISTANCE_TYPE, SWITCH_ROUTING_ALGORITHM, SWITCH_FREESPACE, DISTANCE);
-  return Double::nan();
-}
-
-// @todo: after checking all the scenario work well with consider_z = true, remove this function and use std::hypot(x,y,z)
-static double hypot(const double x, const double y, const double z, const bool consider_z)
-{
-  return consider_z ? std::hypot(x, y, z) : std::hypot(x, y);
-}
-
-template <>
-auto DistanceCondition::distance<
-  CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, RoutingAlgorithm::undefined,
-  false>(const EntityRef & triggering_entity) const -> double
-{
-  if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
-    return euclideanDistance(
-      triggering_entity, static_cast<NativeWorldPosition>(position), consider_z);
+  if (entities->isAdded(triggering_entity)) {
+    SWITCH_COORDINATE_SYSTEM(
+      SWITCH_RELATIVE_DISTANCE_TYPE, SWITCH_ROUTING_ALGORITHM, SWITCH_FREESPACE, DISTANCE);
   } else {
-    return std::numeric_limits<double>::quiet_NaN();
+    return Double::nan();
   }
 }
 
 template <>
 auto DistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, RoutingAlgorithm::undefined,
-  true>(const EntityRef & triggering_entity) const -> double
+  false>(const EntityRef & triggering_entity, const Position & position) -> double
 {
-  if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
-    return euclideanBoundingBoxDistance(
-      triggering_entity, static_cast<NativeWorldPosition>(position), consider_z);
-  } else {
-    return std::numeric_limits<double>::quiet_NaN();
-  }
+  return euclideanDistance(triggering_entity, static_cast<NativeWorldPosition>(position));
+}
+
+template <>
+auto DistanceCondition::distance<
+  CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, RoutingAlgorithm::undefined,
+  true>(const EntityRef & triggering_entity, const Position & position) -> double
+{
+  return euclideanBoundingBoxDistance(
+    triggering_entity, static_cast<NativeWorldPosition>(position));
 }
 
 template <>
 auto DistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::lateral, RoutingAlgorithm::undefined, false>(
-  const EntityRef & triggering_entity) const -> double
+  const EntityRef & triggering_entity, const Position & position) -> double
 {
-  if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
-    return lateralEntityDistance(triggering_entity, static_cast<NativeWorldPosition>(position));
-  } else {
-    return std::numeric_limits<double>::quiet_NaN();
-  }
+  return lateralEntityDistance(triggering_entity, static_cast<NativeWorldPosition>(position));
 }
 
 template <>
 auto DistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::lateral, RoutingAlgorithm::undefined, true>(
-  const EntityRef & triggering_entity) const -> double
+  const EntityRef & triggering_entity, const Position & position) -> double
 {
-  if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
-    return lateralEntityBoundingBoxDistance(
-      triggering_entity, static_cast<NativeWorldPosition>(position));
-  } else {
-    return std::numeric_limits<double>::quiet_NaN();
-  }
+  return lateralEntityBoundingBoxDistance(
+    triggering_entity, static_cast<NativeWorldPosition>(position));
 }
 
 template <>
 auto DistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::longitudinal, RoutingAlgorithm::undefined, false>(
-  const EntityRef & triggering_entity) const -> double
+  const EntityRef & triggering_entity, const Position & position) -> double
 {
-  if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
-    return longitudinalEntityDistance(
-      triggering_entity, static_cast<NativeWorldPosition>(position));
-  } else {
-    return std::numeric_limits<double>::quiet_NaN();
-  }
+  return longitudinalEntityDistance(triggering_entity, static_cast<NativeWorldPosition>(position));
 }
 
 template <>
 auto DistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::longitudinal, RoutingAlgorithm::undefined, true>(
-  const EntityRef & triggering_entity) const -> double
+  const EntityRef & triggering_entity, const Position & position) -> double
 {
-  if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
-    return longitudinalEntityBoundingBoxDistance(
-      triggering_entity, static_cast<NativeWorldPosition>(position));
-  } else {
-    return std::numeric_limits<double>::quiet_NaN();
-  }
+  return longitudinalEntityBoundingBoxDistance(
+    triggering_entity, static_cast<NativeWorldPosition>(position));
 }
 
 template <>
 auto DistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::lateral, RoutingAlgorithm::undefined, false>(
-  const EntityRef & triggering_entity) const -> double
+  const EntityRef & triggering_entity, const Position & position) -> double
 {
-  if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
-    return lateralLaneDistance(triggering_entity, static_cast<NativeLanePosition>(position));
-  } else {
-    return std::numeric_limits<double>::quiet_NaN();
-  }
+  return lateralLaneDistance(triggering_entity, static_cast<NativeLanePosition>(position));
 }
 
 template <>
 auto DistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::lateral, RoutingAlgorithm::undefined, true>(
-  const EntityRef & triggering_entity) const -> double
+  const EntityRef & triggering_entity, const Position & position) -> double
 {
-  if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
-    return lateralLaneBoundingBoxDistance(
-      triggering_entity, static_cast<NativeLanePosition>(position));
-  } else {
-    return std::numeric_limits<double>::quiet_NaN();
-  }
+  return lateralLaneBoundingBoxDistance(
+    triggering_entity, static_cast<NativeLanePosition>(position));
 }
 
 template <>
 auto DistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::longitudinal, RoutingAlgorithm::undefined, false>(
-  const EntityRef & triggering_entity) const -> double
+  const EntityRef & triggering_entity, const Position & position) -> double
 {
-  if (global().entities->ref(triggering_entity).template as<ScenarioObject>().is_added) {
-    return longitudinalLaneDistance(triggering_entity, static_cast<NativeLanePosition>(position));
-  } else {
-    return std::numeric_limits<double>::quiet_NaN();
-  }
+  return longitudinalLaneDistance(triggering_entity, static_cast<NativeLanePosition>(position));
 }
 
 template <>
 auto DistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::longitudinal, RoutingAlgorithm::undefined, true>(
-  const EntityRef & triggering_entity) const -> double
+  const EntityRef & triggering_entity, const Position & position) -> double
 {
-  if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
-    return longitudinalLaneBoundingBoxDistance(
-      triggering_entity, static_cast<NativeLanePosition>(position));
-  } else {
-    return std::numeric_limits<double>::quiet_NaN();
-  }
+  return longitudinalLaneBoundingBoxDistance(
+    triggering_entity, static_cast<NativeLanePosition>(position));
 }
 
 template <>
 auto DistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::lateral, RoutingAlgorithm::shortest, false>(
-  const EntityRef & triggering_entity) const -> double
+  const EntityRef & triggering_entity, const Position & position) -> double
 {
-  if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
-    return std::abs(lateralLaneDistance(
-      triggering_entity, static_cast<NativeLanePosition>(position), RoutingAlgorithm::shortest));
-  } else {
-    return std::numeric_limits<double>::quiet_NaN();
-  }
+  return std::abs(lateralLaneDistance(
+    triggering_entity, static_cast<NativeLanePosition>(position), RoutingAlgorithm::shortest));
 }
 
 template <>
 auto DistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::lateral, RoutingAlgorithm::shortest, true>(
-  const EntityRef & triggering_entity) const -> double
+  const EntityRef & triggering_entity, const Position & position) -> double
 {
-  if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
-    return std::abs(lateralLaneBoundingBoxDistance(
-      triggering_entity, static_cast<NativeLanePosition>(position), RoutingAlgorithm::shortest));
-  } else {
-    return std::numeric_limits<double>::quiet_NaN();
-  }
+  return std::abs(lateralLaneBoundingBoxDistance(
+    triggering_entity, static_cast<NativeLanePosition>(position), RoutingAlgorithm::shortest));
 }
 
 template <>
 auto DistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::longitudinal, RoutingAlgorithm::shortest, false>(
-  const EntityRef & triggering_entity) const -> double
+  const EntityRef & triggering_entity, const Position & position) -> double
 {
-  if (global().entities->ref(triggering_entity).template as<ScenarioObject>().is_added) {
-    return std::abs(longitudinalLaneDistance(
-      triggering_entity, static_cast<NativeLanePosition>(position), RoutingAlgorithm::shortest));
-  } else {
-    return std::numeric_limits<double>::quiet_NaN();
-  }
+  return std::abs(longitudinalLaneDistance(
+    triggering_entity, static_cast<NativeLanePosition>(position), RoutingAlgorithm::shortest));
 }
 
 template <>
 auto DistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::longitudinal, RoutingAlgorithm::shortest, true>(
-  const EntityRef & triggering_entity) const -> double
+  const EntityRef & triggering_entity, const Position & position) -> double
 {
-  if (global().entities->ref(triggering_entity).template as<ScenarioObject>().is_added) {
-    return std::abs(longitudinalLaneBoundingBoxDistance(
-      triggering_entity, static_cast<NativeLanePosition>(position), RoutingAlgorithm::shortest));
-  } else {
-    return std::numeric_limits<double>::quiet_NaN();
-  }
+  return std::abs(longitudinalLaneBoundingBoxDistance(
+    triggering_entity, static_cast<NativeLanePosition>(position), RoutingAlgorithm::shortest));
 }
 
 auto DistanceCondition::evaluate() -> Object
 {
   results.clear();
 
-  return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
-    results.push_back(
-      triggering_entity.apply([&](const auto & object) { return distance(object); }));
+  return asBoolean(triggering_entities.apply([&](const auto & triggering_entity) {
+    results.push_back(triggering_entity.apply([&](const auto & triggering_entity) {
+      return evaluate(
+        global().entities, triggering_entity, position, coordinate_system, relative_distance_type,
+        routing_algorithm, freespace);
+    }));
     return not results.back().size() or rule(results.back(), value).min();
   }));
 }

@@ -15,7 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__ACT_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ACT_HPP_
 
-#include <nlohmann/json.hpp>
+#include <boost/json.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element.hpp>
 #include <openscenario_interpreter/syntax/trigger.hpp>
@@ -25,25 +25,25 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- Act --------------------------------------------------------------------
- *
- *  <xsd:complexType name="Act">
- *    <xsd:sequence>
- *      <xsd:element name="ManeuverGroup" maxOccurs="unbounded" type="ManeuverGroup"/>
- *      <xsd:element name="StartTrigger" type="Trigger"/>
- *      <xsd:element name="StopTrigger" minOccurs="0" type="Trigger"/>
- *    </xsd:sequence>
- *    <xsd:attribute name="name" type="String" use="required"/>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   Act(OpenSCENARIO XML 1.3)
+
+   <xsd:complexType name="Act">
+     <xsd:sequence>
+       <xsd:element name="ManeuverGroup" maxOccurs="unbounded" type="ManeuverGroup"/>
+       <xsd:element name="StartTrigger" minOccurs="0" type="Trigger"/>
+       <xsd:element name="StopTrigger" minOccurs="0" type="Trigger"/>
+     </xsd:sequence>
+     <xsd:attribute name="name" type="String" use="required"/>
+   </xsd:complexType>
+*/
 struct Act : public Scope, public StoryboardElement
 {
   explicit Act(const pugi::xml_node &, Scope &);
 
   auto run() -> void override;
 
-  friend auto operator<<(nlohmann::json &, const Act &) -> nlohmann::json &;
+  friend auto operator<<(boost::json::object &, const Act &) -> boost::json::object &;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

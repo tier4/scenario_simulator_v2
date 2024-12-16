@@ -31,8 +31,8 @@ auto EntityManager::setTrafficLights(const std::shared_ptr<TrafficLights> & traf
 auto EntityManager::setVerbose(const bool verbose) -> void
 {
   configuration.verbose = verbose;
-  for (auto & entity : entities_) {
-    entity.second->verbose = verbose;
+  for (const auto & [name, entity] : entities_) {
+    entity->verbose = verbose;
   }
 }
 
@@ -50,13 +50,13 @@ auto EntityManager::isNpcLogicStarted() const -> bool { return npc_logic_started
 auto EntityManager::makeDebugMarker() const -> visualization_msgs::msg::MarkerArray
 {
   visualization_msgs::msg::MarkerArray marker;
-  for (const auto & entity : entities_) {
-    entity.second->appendDebugMarker(marker);
+  for (const auto & [name, entity] : entities_) {
+    entity->appendDebugMarker(marker);
   }
   return marker;
 }
 
-// update
+// updatee
 auto EntityManager::update(const double current_time, const double step_time) -> void
 {
   helper::StopWatch<std::chrono::milliseconds> stop_watch_update(
@@ -127,7 +127,7 @@ auto EntityManager::updateNpcLogic(
   return entity->getCanonicalizedStatus();
 }
 
-auto EntityManager::updateHdmapMarker() -> void
+auto EntityManager::updateHdmapMarker() const -> void
 {
   MarkerArray markers;
   const auto stamp = clock_ptr_->now();
@@ -155,6 +155,10 @@ auto EntityManager::broadcastEntityTransform() -> void
    * so we publish the average of the coordinates of all entities.
    */
   if (isAnyEgoSpawned()) {
+    if (!is_send) {
+      pose = getEgoEntity()->getMapPose();
+      is_send = true;
+    }
     broadcastTransform(
       geometry_msgs::build<geometry_msgs::msg::PoseStamped>()
         /**
@@ -163,9 +167,10 @@ auto EntityManager::broadcastEntityTransform() -> void
            * so the frame_id "ego" is issued regardless of the name of the ego entity.
            */
         .header(std_msgs::build<std_msgs::msg::Header>().stamp(clock_ptr_->now()).frame_id("ego"))
-        .pose(getEntity(getEgoName())->getMapPose()),
+        .pose(pose),
       true);
   }
+
   if (!names.empty()) {
     if (!is_send) {
       pose = geometry_msgs::build<geometry_msgs::msg::Pose>()
@@ -226,9 +231,9 @@ auto EntityManager::isAnyEgoSpawned() const -> bool
 
 auto EntityManager::getEgoName() const -> const std::string &
 {
-  for (const auto & each : entities_) {
-    if (each.second->template is<EgoEntity>()) {
-      return each.second->getName();
+  for (const auto & [name, entity] : entities_) {
+    if (entity->template is<EgoEntity>()) {
+      return entity->getName();
     }
   }
   THROW_SEMANTIC_ERROR(
@@ -238,30 +243,29 @@ auto EntityManager::getEgoName() const -> const std::string &
 
 auto EntityManager::getEgoEntity() const -> std::shared_ptr<entity::EgoEntity>
 {
-  for (const auto & each : entities_) {
-    if (each.second->template is<EgoEntity>()) {
-      return std::dynamic_pointer_cast<EgoEntity>(each.second);
+  for (const auto & [name, entity] : entities_) {
+    if (entity->template is<EgoEntity>()) {
+      return std::dynamic_pointer_cast<EgoEntity>(entity);
     }
   }
-  THROW_SEMANTIC_ERROR(
-    "EntityManager::getEgoEntity function was called, but ego vehicle does not exist.");
+  THROW_SEMANTIC_ERROR("EgoEntity does not exist");
 }
 
 auto EntityManager::getEgoEntity(const std::string & name) const
   -> std::shared_ptr<entity::EgoEntity>
 {
   if (auto it = entities_.find(name); it == entities_.end()) {
-    THROW_SEMANTIC_ERROR("Entity : ", name, "does not exist.");
+    THROW_SEMANTIC_ERROR("Entity ", std::quoted(name), " does not exist.");
   } else {
     if (auto ego_entity = std::dynamic_pointer_cast<EgoEntity>(it->second); !ego_entity) {
-      THROW_SEMANTIC_ERROR("Entity : ", name, " exists, but it is not ego.");
+      THROW_SEMANTIC_ERROR("Entity : ", std::quoted(name), " exists, but it is not ego");
     } else
       return ego_entity;
   }
 }
 
 // entities - checks, getters
-bool EntityManager::isEntityExist(const std::string & name)
+auto EntityManager::isEntityExist(const std::string & name) const -> bool
 {
   return entities_.find(name) != std::end(entities_);
 }
@@ -269,8 +273,8 @@ bool EntityManager::isEntityExist(const std::string & name)
 auto EntityManager::getEntityNames() const -> const std::vector<std::string>
 {
   std::vector<std::string> names{};
-  for (const auto & each : entities_) {
-    names.push_back(each.first);
+  for (const auto & [name, entity] : entities_) {
+    names.push_back(name);
   }
   return names;
 }
@@ -289,7 +293,7 @@ auto EntityManager::resetBehaviorPlugin(
   const std::string & name, const std::string & behavior_plugin_name) -> void
 {
   const auto reference_entity = getEntity(name);
-  const CanonicalizedEntityStatus status = reference_entity->getCanonicalizedStatus();
+  const auto status = reference_entity->getCanonicalizedStatus();
   const auto behavior_parameter = reference_entity->getBehaviorParameter();
   if (reference_entity->is<EgoEntity>()) {
     THROW_SEMANTIC_ERROR(

@@ -34,7 +34,7 @@ PedestrianEntity::PedestrianEntity(
   loader_(pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase>(
     "traffic_simulator", "entity_behavior::BehaviorPluginBase")),
   behavior_plugin_ptr_(loader_.createSharedInstance(plugin_name)),
-  route_planner_(hdmap_utils_ptr_)
+  route_planner_(traffic_simulator::RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER, hdmap_utils_ptr_)
 {
   behavior_plugin_ptr_->configure(rclcpp::get_logger(name));
   behavior_plugin_ptr_->setPedestrianParameters(parameters);
@@ -178,6 +178,12 @@ void PedestrianEntity::setTrafficLights(
 {
   EntityBase::setTrafficLights(ptr);
   behavior_plugin_ptr_->setTrafficLights(traffic_lights_);
+}
+
+auto PedestrianEntity::getParameters() const
+  -> const traffic_simulator_msgs::msg::PedestrianParameters &
+{
+  return pedestrian_parameters;
 }
 
 auto PedestrianEntity::getBehaviorParameter() const

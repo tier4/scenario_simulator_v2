@@ -68,10 +68,11 @@ public:
       entity_manager_ptr_->getHdmapUtils(),
       [this]() { return entity_manager_ptr_->getEntityNames(); },
       [this](const auto & entity_name) { return getEntity(entity_name)->getMapPose(); },
-      [this](const auto & name) { return despawn(name); }, configuration.auto_sink)),
+      [this](const auto & entity_name) { return API::despawn(entity_name); },
+      configuration.auto_sink)),
     traffic_lights_ptr_(std::make_shared<TrafficLights>(
       node, entity_manager_ptr_->getHdmapUtils(),
-      getParameter<std::string>(node_parameters_, "architecture_type", "awf/universe"))),
+      getParameter<std::string>(node_parameters_, "architecture_type", "awf/universe/20240605"))),
     real_time_factor_subscriber_(rclcpp::create_subscription<std_msgs::msg::Float64>(
       node, "/real_time_factor", rclcpp::QoS(rclcpp::KeepLast(1)).best_effort(),
       [this](const std_msgs::msg::Float64 & message) {

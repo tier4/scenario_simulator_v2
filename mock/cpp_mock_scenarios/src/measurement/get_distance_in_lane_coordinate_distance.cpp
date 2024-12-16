@@ -49,7 +49,8 @@ private:
     if (from_entity->isInLanelet() && to_entity->isInLanelet()) {
       return traffic_simulator::distance::lateralDistance(
         from_entity->getCanonicalizedLaneletPose().value(),
-        to_entity->getCanonicalizedLaneletPose().value(), false, api_.getHdmapUtils());
+        to_entity->getCanonicalizedLaneletPose().value(), traffic_simulator::RoutingConfiguration(),
+        api_.getHdmapUtils());
     }
     return std::nullopt;
   };
@@ -58,14 +59,14 @@ private:
     const std::string & from_entity_name, const std::string & to_entity_name,
     const double matching_distance) -> std::optional<double>
   {
-    auto from_entity_lanelet_pose =
+    const auto from_entity_lanelet_pose =
       api_.getEntity(from_entity_name)->getCanonicalizedLaneletPose(matching_distance);
-    auto to_entity_lanelet_pose =
+    const auto to_entity_lanelet_pose =
       api_.getEntity(to_entity_name)->getCanonicalizedLaneletPose(matching_distance);
     if (from_entity_lanelet_pose && to_entity_lanelet_pose) {
       return traffic_simulator::distance::lateralDistance(
-        from_entity_lanelet_pose.value(), to_entity_lanelet_pose.value(), false,
-        api_.getHdmapUtils());
+        from_entity_lanelet_pose.value(), to_entity_lanelet_pose.value(),
+        traffic_simulator::RoutingConfiguration(), api_.getHdmapUtils());
     }
     return std::nullopt;
   };
@@ -79,7 +80,8 @@ private:
     if (from_entity->isInLanelet() && to_entity->isInLanelet()) {
       return traffic_simulator::distance::longitudinalDistance(
         from_entity->getCanonicalizedLaneletPose().value(),
-        to_entity->getCanonicalizedLaneletPose().value(), false, true, false, api_.getHdmapUtils());
+        to_entity->getCanonicalizedLaneletPose().value(), false, false,
+        traffic_simulator::RoutingConfiguration(), api_.getHdmapUtils());
     }
     return std::nullopt;
   }

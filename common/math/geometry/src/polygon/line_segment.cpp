@@ -64,8 +64,6 @@ LineSegment::LineSegment(
 {
 }
 
-LineSegment::~LineSegment() {}
-
 /**
  * @brief Get point on the line segment from s value.
  * @param s Normalized s value in coordinate along line segment.
@@ -301,8 +299,6 @@ auto LineSegment::denormalize(const double s) const -> double
   }
 }
 
-LineSegment & LineSegment::operator=(const LineSegment &) { return *this; }
-
 /**
  * @brief Get the line segments from points. 
  * @param points Points you want to build line segments.
@@ -318,11 +314,11 @@ auto getLineSegments(
   } else {
     std::vector<LineSegment> seg;
     for (size_t i = 0; i < points.size() - 1; i++) {
-      seg.emplace_back(LineSegment(points[i], points[i + 1]));
+      seg.emplace_back(points[i], points[i + 1]);
     }
     /// @note If true, the end point(points[points.size() - 1]) and start point(points[0]) was connected.
     if (close_start_end) {
-      seg.emplace_back(LineSegment(points[points.size() - 1], points[0]));
+      seg.emplace_back(points[points.size() - 1], points[0]);
     }
     return seg;
   }

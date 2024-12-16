@@ -39,7 +39,7 @@ auto EgoEntity::makeFieldOperatorApplication(
   -> std::unique_ptr<concealer::FieldOperatorApplication>
 {
   if (const auto architecture_type =
-        getParameter<std::string>(node_parameters, "architecture_type", "awf/universe");
+        getParameter<std::string>(node_parameters, "architecture_type", "awf/universe/20240605");
       architecture_type.find("awf/universe") != std::string::npos) {
     auto parameters = getParameter<std::vector<std::string>>(node_parameters, "autoware.", {});
 
@@ -54,6 +54,7 @@ auto EgoEntity::makeFieldOperatorApplication(
     parameters.push_back("use_foa:=false");
     parameters.push_back("perception/enable_traffic_light:=" + std::string(architecture_type >= "awf/universe/20230906" ? "true" : "false"));
     parameters.push_back("use_sim_time:=" + std::string(getParameter<bool>(node_parameters, "use_sim_time", false) ? "true" : "false"));
+    parameters.push_back("localization_sim_mode:=" + std::string(getParameter<bool>(node_parameters, "simulate_localization") ? "api" : "pose_twist_estimator"));
     // clang-format on
 
     return getParameter<bool>(node_parameters, "launch_autoware", true)
@@ -86,13 +87,6 @@ auto EgoEntity::isEngaged() const -> bool { return field_operator_application->e
 
 auto EgoEntity::isEngageable() const -> bool { return field_operator_application->engageable(); }
 
-auto EgoEntity::replanRoute(const std::vector<geometry_msgs::msg::PoseStamped> & route) -> void
-{
-  field_operator_application->clearRoute();
-  field_operator_application->plan(route);
-  field_operator_application->engage();
-}
-
 auto EgoEntity::sendCooperateCommand(const std::string & module_name, const std::string & command)
   -> void
 {
@@ -116,7 +110,7 @@ auto EgoEntity::getEmergencyStateName() const -> std::string
 {
   return field_operator_application->getEmergencyStateName();
 }
-auto EgoEntity::getTurnIndicatorsCommandName() const -> const std::string
+auto EgoEntity::getTurnIndicatorsCommandName() const -> std::string
 {
   return boost::lexical_cast<std::string>(field_operator_application->getTurnIndicatorsCommand());
 }
@@ -193,6 +187,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
       // prefer current lanelet on ss2 side
       setStatus(non_canonicalized_updated_status.value(), status_->getLaneletIds());
     } else {
+      field_operator_application->enableAutowareControl();
       is_controlled_by_simulator_ = false;
     }
   }
@@ -217,30 +212,26 @@ void EgoEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose
 
 void EgoEntity::requestAssignRoute(const std::vector<LaneletPose> & waypoints)
 {
-  const auto canonicalized_waypoints = pose::canonicalize(waypoints, hdmap_utils_ptr_);
-  if (isInLanelet()) {
-    std::vector<geometry_msgs::msg::Pose> route;
-    for (const auto & waypoint : canonicalized_waypoints) {
-      route.push_back(static_cast<geometry_msgs::msg::Pose>(waypoint));
-    }
-    requestAssignRoute(route);
+  std::vector<geometry_msgs::msg::Pose> route;
+  for (const auto & waypoint : pose::canonicalize(waypoints, hdmap_utils_ptr_)) {
+    route.push_back(static_cast<geometry_msgs::msg::Pose>(waypoint));
   }
+  requestAssignRoute(route);
 }
 
 void EgoEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> & waypoints)
 {
   std::vector<geometry_msgs::msg::PoseStamped> route;
-
   for (const auto & waypoint : waypoints) {
     geometry_msgs::msg::PoseStamped pose_stamped;
     {
       pose_stamped.header.frame_id = "map";
       pose_stamped.pose = waypoint;
     }
-
     route.push_back(pose_stamped);
   }
 
+  requestClearRoute();
   if (not field_operator_application->initialized()) {
     field_operator_application->initialize(getMapPose());
     field_operator_application->plan(route);
@@ -261,7 +252,7 @@ auto EgoEntity::requestFollowTrajectory(
   is_controlled_by_simulator_ = true;
 }
 
-void EgoEntity::requestLaneChange(const lanelet::Id)
+auto EgoEntity::requestLaneChange(const lanelet::Id) -> void
 {
   THROW_SEMANTIC_ERROR(
     "From scenario, a lane change was requested to Ego type entity ", std::quoted(name),
@@ -299,7 +290,16 @@ auto EgoEntity::requestSynchronize(
   THROW_SYNTAX_ERROR("Request synchronize is only for non-ego entities.");
 }
 
-void EgoEntity::requestClearRoute() { field_operator_application->clearRoute(); }
+auto EgoEntity::requestClearRoute() -> void { field_operator_application->clearRoute(); }
+
+auto EgoEntity::requestReplanRoute(const std::vector<geometry_msgs::msg::PoseStamped> & route)
+  -> void
+{
+  field_operator_application->clearRoute();
+  field_operator_application->plan(route);
+  field_operator_application->enableAutowareControl();
+  field_operator_application->engage();
+}
 
 auto EgoEntity::getDefaultDynamicConstraints() const
   -> const traffic_simulator_msgs::msg::DynamicConstraints &

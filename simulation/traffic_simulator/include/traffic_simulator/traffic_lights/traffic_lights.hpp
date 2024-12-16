@@ -1,4 +1,4 @@
-// Copyright 2024 TIER IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,8 +15,15 @@
 #ifndef TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHTS_HPP_
 #define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHTS_HPP_
 
-#include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
+// This message will be deleted in the future
+#if __has_include(<autoware_perception_msgs/msg/traffic_signal_array.hpp>)
 #include <autoware_perception_msgs/msg/traffic_signal_array.hpp>
+#endif
+
+#if __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)
+#include <autoware_perception_msgs/msg/traffic_light_group_array.hpp>
+#endif
+
 #include <traffic_simulator/traffic_lights/traffic_light_publisher.hpp>
 #include <traffic_simulator/traffic_lights/traffic_lights_base.hpp>
 
@@ -26,7 +33,7 @@ class ConventionalTrafficLights : public TrafficLightsBase
 {
 public:
   template <typename NodeTypePointer>
-  ConventionalTrafficLights(
+  explicit ConventionalTrafficLights(
     const NodeTypePointer & node_ptr, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils)
   : TrafficLightsBase(node_ptr, hdmap_utils),
     backward_compatible_publisher_ptr_(
@@ -40,7 +47,8 @@ public:
 private:
   auto update() const -> void
   {
-    backward_compatible_publisher_ptr_->publish(*this);
+    backward_compatible_publisher_ptr_->publish(
+      clock_ptr_->now(), generateUpdateTrafficLightsRequest());
     if (isAnyTrafficLightChanged()) {
       marker_publisher_ptr_->deleteMarkers();
     }
@@ -54,7 +62,7 @@ class V2ITrafficLights : public TrafficLightsBase
 {
 public:
   template <typename NodeTypePointer>
-  V2ITrafficLights(
+  explicit V2ITrafficLights(
     const NodeTypePointer & node_ptr, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
     const std::string & architecture_type)
   : TrafficLightsBase(node_ptr, hdmap_utils),
@@ -70,8 +78,10 @@ public:
 private:
   auto update() const -> void override
   {
-    publisher_ptr_->publish(*this);
-    legacy_topic_publisher_ptr_->publish(*this);
+    const auto now = clock_ptr_->now();
+    const auto request = generateUpdateTrafficLightsRequest();
+    publisher_ptr_->publish(now, request);
+    legacy_topic_publisher_ptr_->publish(now, request);
     if (isAnyTrafficLightChanged()) {
       marker_publisher_ptr_->deleteMarkers();
     }
@@ -84,17 +94,29 @@ private:
     const std::string & topic_name) -> std::unique_ptr<TrafficLightPublisherBase>
   {
     /*
-       V2ITrafficLights in TrafficSimulator publishes publishes using architecture-independent topics ("awf/universe..."): 
+       V2ITrafficLights in TrafficSimulator publishes using architecture-independent topics ("awf/universe..."):
        "/v2x/traffic_signals" and "/perception/traffic_light_recognition/external/traffic_signals"
 
        TrafficLightsDetector in SimpleSensorSimulator publishes using architecture-dependent topics:
        "/perception/traffic_light_recognition/internal/traffic_signals" for >= "awf/universe/20230906"
        "/perception/traffic_light_recognition/traffic_signals" for "awf/universe"
     */
-    if (architecture_type.find("awf/universe") != std::string::npos) {
+    if (architecture_type == "awf/universe") {
+      throw common::SemanticError(
+        "This version of scenario_simulator_v2 does not support ", std::quoted(architecture_type),
+        " as ", std::quoted("architecture_type"), ". Please use older version.");
+#if __has_include(<autoware_perception_msgs/msg/traffic_signal_array.hpp>)
+    } else if (architecture_type <= "awf/universe/20230906") {
       return std::make_unique<
         TrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>>(
         node_ptr, topic_name);
+#endif
+#if __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)
+    } else if (architecture_type >= "awf/universe/20240605") {
+      return std::make_unique<
+        TrafficLightPublisher<autoware_perception_msgs::msg::TrafficLightGroupArray>>(
+        node_ptr, topic_name);
+#endif
     } else {
       throw common::SemanticError(
         "Unexpected architecture_type ", std::quoted(architecture_type),

@@ -60,7 +60,6 @@ private:
           const bool valid_vehicle_lanelet =
             entity->isInLanelet(34705, 50.0) || entity->isInLanelet(34696, 50.0);
           const bool valid_pedestrian_lanelet = entity->isInLanelet(34385, 10.0);
-
           if (isVehicle(name)) {
             ++vehicle_count;
           } else if (isPedestrian(name)) {

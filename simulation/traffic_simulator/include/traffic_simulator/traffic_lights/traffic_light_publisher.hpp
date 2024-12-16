@@ -1,4 +1,4 @@
-// Copyright 2024 TIER IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,7 +27,10 @@ namespace traffic_simulator
 class TrafficLightPublisherBase
 {
 public:
-  virtual auto publish(const TrafficLightsBase & traffic_lights) const -> void = 0;
+  virtual auto publish(
+    const rclcpp::Time & current_ros_time,
+    const simulation_api_schema::UpdateTrafficLightsRequest & request) const -> void = 0;
+
   virtual ~TrafficLightPublisherBase() = default;
 };
 
@@ -38,10 +41,9 @@ public:
   template <typename NodeTypePointer>
   explicit TrafficLightPublisher(
     const NodeTypePointer & node_ptr, const std::string & topic_name,
-    const std::string & frame = "camera_link")
+    const std::string & frame = "camera_link")  // DIRTY HACK!!!
   : TrafficLightPublisherBase(),
     frame_(frame),
-    clock_ptr_(node_ptr->get_clock()),
     traffic_light_state_array_publisher_(rclcpp::create_publisher<MessageType>(
       node_ptr, topic_name, rclcpp::QoS(10).transient_local()))
   {
@@ -49,11 +51,21 @@ public:
 
   ~TrafficLightPublisher() override = default;
 
-  auto publish(const TrafficLightsBase & traffic_lights) const -> void override;
+  static auto generateMessage(
+    const rclcpp::Time &, const simulation_api_schema::UpdateTrafficLightsRequest & request,
+    const std::string & frame = "") -> std::unique_ptr<MessageType>;
+
+  auto publish(
+    const rclcpp::Time & current_ros_time,
+    const simulation_api_schema::UpdateTrafficLightsRequest & request) const -> void override
+  {
+    traffic_light_state_array_publisher_->publish(
+      generateMessage(current_ros_time, request, frame_));
+  }
 
 private:
   const std::string frame_;
-  const rclcpp::Clock::SharedPtr clock_ptr_;
+
   const typename rclcpp::Publisher<MessageType>::SharedPtr traffic_light_state_array_publisher_;
 };
 }  // namespace traffic_simulator

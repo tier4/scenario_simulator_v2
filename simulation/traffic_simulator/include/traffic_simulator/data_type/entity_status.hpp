@@ -35,7 +35,6 @@ public:
     const EntityStatus & may_non_canonicalized_entity_status,
     const std::optional<CanonicalizedLaneletPose> & canonicalized_lanelet_pose);
   CanonicalizedEntityStatus(const CanonicalizedEntityStatus & obj);
-  CanonicalizedEntityStatus(CanonicalizedEntityStatus && obj) noexcept;
   explicit operator EntityStatus() const noexcept { return entity_status_; }
 
   auto set(const CanonicalizedEntityStatus & status) -> void;
@@ -56,6 +55,7 @@ public:
   auto setMapPose(const geometry_msgs::msg::Pose & pose) -> void;
 
   auto getLaneletRelativeYaw() const -> std::optional<double>;
+  auto getAltitude() const -> double;
 
   auto getTwist() const noexcept -> const geometry_msgs::msg::Twist &;
   auto setTwist(const geometry_msgs::msg::Twist & twist) -> void;

@@ -24,6 +24,8 @@ Trigger::Trigger(const pugi::xml_node & node, Scope & scope)
   traverse<0, unbounded>(node, "ConditionGroup", [&](auto && node) { emplace_back(node, scope); });
 }
 
+auto Trigger::truthy() noexcept -> Trigger { return Trigger{{ConditionGroup()}}; }
+
 auto Trigger::evaluate() -> Object
 {
   /* -------------------------------------------------------------------------
@@ -63,16 +65,16 @@ auto Trigger::activeConditionGroupDescription() const
   return name_description_vec;
 }
 
-auto operator<<(nlohmann::json & json, const Trigger & datum) -> nlohmann::json &
+auto operator<<(boost::json::object & json, const Trigger & datum) -> boost::json::object &
 {
   json["currentValue"] = boost::lexical_cast<std::string>(Boolean(datum.current_value));
 
-  json["ConditionGroup"] = nlohmann::json::array();
+  auto & condition_groups = json["ConditionGroup"].emplace_array();
 
   for (const auto & each : datum) {
-    nlohmann::json condition_group;
+    boost::json::object condition_group(json.storage());
     condition_group << each;
-    json["ConditionGroup"].push_back(condition_group);
+    condition_groups.push_back(std::move(condition_group));
   }
 
   return json;

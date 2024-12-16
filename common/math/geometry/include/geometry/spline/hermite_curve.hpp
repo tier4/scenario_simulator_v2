@@ -32,15 +32,26 @@ class HermiteCurve
 {
 private:
   friend class HermiteCurveTest;
-  double ax_, bx_, cx_, dx_;
-  double ay_, by_, cy_, dy_;
-  double az_, bz_, cz_, dz_;
+  double ax_;
+  double bx_;
+  double cx_;
+  double dx_;
+
+  double ay_;
+  double by_;
+  double cy_;
+  double dy_;
+
+  double az_;
+  double bz_;
+  double cz_;
+  double dz_;
   math::geometry::PolynomialSolver solver_;
 
 public:
   HermiteCurve(
-    geometry_msgs::msg::Pose start_pose, geometry_msgs::msg::Pose goal_pose,
-    geometry_msgs::msg::Vector3 start_vec, geometry_msgs::msg::Vector3 goal_vec);
+    const geometry_msgs::msg::Pose & start_pose, const geometry_msgs::msg::Pose & goal_pose,
+    const geometry_msgs::msg::Vector3 & start_vec, const geometry_msgs::msg::Vector3 & goal_vec);
   HermiteCurve(
     double ax, double bx, double cx, double dx, double ay, double by, double cy, double dy,
     double az, double bz, double cz, double dz);

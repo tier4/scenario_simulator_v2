@@ -17,7 +17,7 @@
 
 namespace traffic_simulator
 {
-namespace entity_status
+inline namespace entity_status
 {
 CanonicalizedEntityStatus::CanonicalizedEntityStatus(
   const EntityStatus & may_non_canonicalized_entity_status,
@@ -49,12 +49,6 @@ CanonicalizedEntityStatus::CanonicalizedEntityStatus(
 CanonicalizedEntityStatus::CanonicalizedEntityStatus(const CanonicalizedEntityStatus & obj)
 : canonicalized_lanelet_pose_(obj.canonicalized_lanelet_pose_),
   entity_status_(static_cast<EntityStatus>(obj))
-{
-}
-
-CanonicalizedEntityStatus::CanonicalizedEntityStatus(CanonicalizedEntityStatus && obj) noexcept
-: canonicalized_lanelet_pose_(std::move(obj.canonicalized_lanelet_pose_)),
-  entity_status_(std::move(obj.entity_status_))
 {
 }
 
@@ -130,6 +124,11 @@ auto CanonicalizedEntityStatus::getMapPose() const noexcept -> const geometry_ms
 auto CanonicalizedEntityStatus::getLaneletRelativeYaw() const -> std::optional<double>
 {
   return isInLanelet() ? std::make_optional<double>(getLaneletPose().rpy.z) : (std::nullopt);
+}
+
+auto CanonicalizedEntityStatus::getAltitude() const -> double
+{
+  return entity_status_.pose.position.z;
 }
 
 auto CanonicalizedEntityStatus::getLaneletPose() const noexcept -> const LaneletPose &

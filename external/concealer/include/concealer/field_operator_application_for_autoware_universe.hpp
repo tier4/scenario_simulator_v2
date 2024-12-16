@@ -19,23 +19,14 @@
 #include <autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>
 #endif
 
-#if __has_include(<autoware_system_msgs/msg/autoware_state.hpp>)
-#include <autoware_system_msgs/msg/autoware_state.hpp>
-#endif
-
-#if __has_include(<autoware_auto_system_msgs/msg/autoware_state.hpp>)
-#include <autoware_auto_system_msgs/msg/autoware_state.hpp>
-#endif
-
 #include <autoware_adapi_v1_msgs/msg/mrm_state.hpp>
+#include <autoware_adapi_v1_msgs/srv/change_operation_mode.hpp>
 #include <autoware_adapi_v1_msgs/srv/clear_route.hpp>
 #include <autoware_adapi_v1_msgs/srv/initialize_localization.hpp>
 #include <autoware_adapi_v1_msgs/srv/set_route_points.hpp>
-#include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
-#include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
-#include <autoware_auto_planning_msgs/msg/path_with_lane_id.hpp>
-#include <autoware_auto_system_msgs/msg/emergency_state.hpp>
-#include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
+#include <autoware_control_msgs/msg/control.hpp>
+#include <autoware_system_msgs/msg/autoware_state.hpp>
+#include <autoware_vehicle_msgs/msg/gear_command.hpp>
 #include <concealer/autoware_universe.hpp>
 #include <concealer/field_operator_application.hpp>
 #include <concealer/publisher_wrapper.hpp>
@@ -46,6 +37,7 @@
 #include <tier4_external_api_msgs/msg/emergency.hpp>
 #include <tier4_external_api_msgs/srv/engage.hpp>
 #include <tier4_external_api_msgs/srv/set_velocity_limit.hpp>
+#include <tier4_planning_msgs/msg/path_with_lane_id.hpp>
 #include <tier4_planning_msgs/msg/trajectory.hpp>
 #include <tier4_rtc_msgs/msg/cooperate_status_array.hpp>
 #include <tier4_rtc_msgs/srv/auto_mode_with_module.hpp>
@@ -58,16 +50,11 @@ class FieldOperatorApplicationFor<AutowareUniverse>
 : public FieldOperatorApplication,
   public TransitionAssertion<FieldOperatorApplicationFor<AutowareUniverse>>
 {
-  friend class TransitionAssertion<FieldOperatorApplicationFor<AutowareUniverse>>;
+  friend struct TransitionAssertion<FieldOperatorApplicationFor<AutowareUniverse>>;
 
   // clang-format off
-  SubscriberWrapper<autoware_auto_control_msgs::msg::AckermannControlCommand>     getAckermannControlCommand;
-#if __has_include(<autoware_system_msgs/msg/autoware_state.hpp>)
-  SubscriberWrapper<autoware_system_msgs::msg::AutowareState, ThreadSafety::safe>    getAutowareState;
-#endif
-#if __has_include(<autoware_auto_system_msgs/msg/autoware_state.hpp>)
-  SubscriberWrapper<autoware_auto_system_msgs::msg::AutowareState, ThreadSafety::safe> getAutowareAutoState;
-#endif
+  SubscriberWrapper<autoware_control_msgs::msg::Control>                          getCommand;
+  SubscriberWrapper<autoware_system_msgs::msg::AutowareState, ThreadSafety::safe> getAutowareState;
   SubscriberWrapper<tier4_rtc_msgs::msg::CooperateStatusArray>                    getCooperateStatusArray;
   SubscriberWrapper<tier4_external_api_msgs::msg::Emergency>                      getEmergencyState;
 #if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)
@@ -75,7 +62,7 @@ class FieldOperatorApplicationFor<AutowareUniverse>
 #endif
   SubscriberWrapper<autoware_adapi_v1_msgs::msg::MrmState>                        getMrmState;
   SubscriberWrapper<tier4_planning_msgs::msg::Trajectory>                         getTrajectory;
-  SubscriberWrapper<autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand>       getTurnIndicatorsCommandImpl;
+  SubscriberWrapper<autoware_vehicle_msgs::msg::TurnIndicatorsCommand>            getTurnIndicatorsCommandImpl;
 
   ServiceWithValidation<autoware_adapi_v1_msgs::srv::ClearRoute>                  requestClearRoute;
   ServiceWithValidation<tier4_rtc_msgs::srv::CooperateCommands>                   requestCooperateCommands;
@@ -84,6 +71,7 @@ class FieldOperatorApplicationFor<AutowareUniverse>
   ServiceWithValidation<autoware_adapi_v1_msgs::srv::SetRoutePoints>              requestSetRoutePoints;
   ServiceWithValidation<tier4_rtc_msgs::srv::AutoModeWithModule>                  requestSetRtcAutoMode;
   ServiceWithValidation<tier4_external_api_msgs::srv::SetVelocityLimit>           requestSetVelocityLimit;
+  ServiceWithValidation<autoware_adapi_v1_msgs::srv::ChangeOperationMode>         requestEnableAutowareControl;
   // clang-format on
 
   tier4_rtc_msgs::msg::CooperateStatusArray latest_cooperate_status_array;
@@ -143,42 +131,22 @@ protected:
   auto sendSIGINT() -> void override;
 
 public:
-  SubscriberWrapper<autoware_auto_planning_msgs::msg::PathWithLaneId> getPathWithLaneId;
+  SubscriberWrapper<tier4_planning_msgs::msg::PathWithLaneId> getPathWithLaneId;
 
 public:
   template <typename... Ts>
   CONCEALER_PUBLIC explicit FieldOperatorApplicationFor(Ts &&... xs)
   : FieldOperatorApplication(std::forward<decltype(xs)>(xs)...),
     // clang-format off
-    getAckermannControlCommand("/control/command/control_cmd", rclcpp::QoS(1), *this),
-#if __has_include(<autoware_system_msgs/msg/autoware_state.hpp>)
+    getCommand("/control/command/control_cmd", rclcpp::QoS(1), *this),
     getAutowareState("/autoware/state", rclcpp::QoS(1), *this, [this](const auto & v) {
-      /*
-       There are multiple places that assignments to `autoware_state` in the callback for the /autoware/state topic to accommodate multiple messages.
-       But only one of them is used as long as correct configuration Autoware is.
-       Even if the topic comes in multiple types, as long as the content is the same,
-       there is basically no problem, but there is a possibility that potential problems may occur.
-      */
        autoware_state = getAutowareStateString<autoware_system_msgs::msg::AutowareState>(v.state); }),
-#endif
-#if __has_include(<autoware_auto_system_msgs/msg/autoware_state.hpp>)
-    getAutowareAutoState("/autoware/state", rclcpp::QoS(1), *this, [this](const auto & v) {
-      /*
-       There are multiple places that assignments to `autoware_state` in the callback for the /autoware/state topic to accommodate multiple messages.
-       But only one of them is used as long as correct configuration Autoware is.
-       Even if the topic comes in multiple types, as long as the content is the same,
-       there is basically no problem, but there is a possibility that potential problems may occur.
-      */
-      autoware_state = getAutowareStateString<autoware_auto_system_msgs::msg::AutowareState>(v.state);
-    }),
-#endif
     getCooperateStatusArray("/api/external/get/rtc_status", rclcpp::QoS(1), *this, [this](const auto & v) { latest_cooperate_status_array = v; }),
     getEmergencyState("/api/external/get/emergency", rclcpp::QoS(1), *this, [this](const auto & v) { receiveEmergencyState(v); }),
 #if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)
     getLocalizationState("/api/localization/initialization_state", rclcpp::QoS(1).transient_local(), *this),
 #endif
     getMrmState("/api/fail_safe/mrm_state", rclcpp::QoS(1), *this, [this](const auto & v) { receiveMrmState(v); }),
-    getPathWithLaneId("/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", rclcpp::QoS(1), *this),
     getTrajectory("/api/iv_msgs/planning/scenario_planning/trajectory", rclcpp::QoS(1), *this),
     getTurnIndicatorsCommandImpl("/control/command/turn_indicators_cmd", rclcpp::QoS(1), *this),
     requestClearRoute("/api/routing/clear_route", *this),
@@ -188,7 +156,9 @@ public:
     // NOTE: /api/routing/set_route_points takes a long time to return. But the specified duration is not decided by any technical reasons.
     requestSetRoutePoints("/api/routing/set_route_points", *this, std::chrono::seconds(10)),
     requestSetRtcAutoMode("/api/external/set/rtc_auto_mode", *this),
-    requestSetVelocityLimit("/api/autoware/set/velocity_limit", *this)
+    requestSetVelocityLimit("/api/autoware/set/velocity_limit", *this),
+    requestEnableAutowareControl("/api/operation_mode/enable_autoware_control", *this),
+    getPathWithLaneId("/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", rclcpp::QoS(1), *this)
   // clang-format on
   {
   }
@@ -206,7 +176,7 @@ public:
   auto getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray override;
 
   auto getTurnIndicatorsCommand() const
-    -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand override;
+    -> autoware_vehicle_msgs::msg::TurnIndicatorsCommand override;
 
   auto getEmergencyStateName() const -> std::string override;
 
@@ -227,6 +197,8 @@ public:
   auto sendCooperateCommand(const std::string &, const std::string &) -> void override;
 
   auto setVelocityLimit(double) -> void override;
+
+  auto enableAutowareControl() -> void override;
 };
 }  // namespace concealer
 

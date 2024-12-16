@@ -1,4 +1,4 @@
-// Copyright 2024 TIER IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -93,49 +93,18 @@ auto TrafficLightsBase::getTrafficLightsComposedState(const lanelet::Id lanelet_
   return ss.str();
 }
 
-auto TrafficLightsBase::generateAutowarePerceptionMsg() const
-  -> autoware_perception_msgs::msg::TrafficSignalArray
+auto TrafficLightsBase::generateUpdateTrafficLightsRequest() const
+  -> simulation_api_schema::UpdateTrafficLightsRequest
 {
-  autoware_perception_msgs::msg::TrafficSignalArray traffic_lights_message;
-  traffic_lights_message.stamp = clock_ptr_->now();
-
-  size_t total_number_of_signals{0};
-  for (const auto & [id, traffic_light] : traffic_lights_map_) {
-    total_number_of_signals += traffic_light.regulatory_elements_ids.size();
+  simulation_api_schema::UpdateTrafficLightsRequest update_traffic_lights_request;
+  for (auto && [lanelet_id, traffic_light] : traffic_lights_map_) {
+    auto traffic_signal = static_cast<simulation_api_schema::TrafficSignal>(traffic_light);
+    for (const auto & relation_id : traffic_light.regulatory_elements_ids) {
+      traffic_signal.add_relation_ids(relation_id);
+    }
+    *update_traffic_lights_request.add_states() = traffic_signal;
   }
-  traffic_lights_message.signals.reserve(total_number_of_signals);
-
-  for (const auto & [id, traffic_light] : traffic_lights_map_) {
-    const auto traffic_signals =
-      static_cast<std::vector<autoware_perception_msgs::msg::TrafficSignal>>(traffic_light);
-    traffic_lights_message.signals.insert(
-      traffic_lights_message.signals.end(), traffic_signals.begin(), traffic_signals.end());
-  }
-  return traffic_lights_message;
-}
-
-auto TrafficLightsBase::generateAutowareAutoPerceptionMsg() const
-  -> autoware_auto_perception_msgs::msg::TrafficSignalArray
-{
-  autoware_auto_perception_msgs::msg::TrafficSignalArray traffic_lights_message;
-  traffic_lights_message.header.frame_id = "camera_link";  /// DIRTY HACK!
-  traffic_lights_message.header.stamp = clock_ptr_->now();
-  for (const auto & [id, traffic_light] : traffic_lights_map_) {
-    traffic_lights_message.signals.push_back(
-      static_cast<autoware_auto_perception_msgs::msg::TrafficSignal>(traffic_light));
-  }
-  return traffic_lights_message;
-}
-
-auto TrafficLightsBase::generateTrafficSimulatorV1Msg() const
-  -> traffic_simulator_msgs::msg::TrafficLightArrayV1
-{
-  traffic_simulator_msgs::msg::TrafficLightArrayV1 traffic_lights_message;
-  for (const auto & [id, traffic_light] : traffic_lights_map_) {
-    traffic_lights_message.traffic_lights.push_back(
-      static_cast<traffic_simulator_msgs::msg::TrafficLightV1>(traffic_light));
-  }
-  return traffic_lights_message;
+  return update_traffic_lights_request;
 }
 
 // private

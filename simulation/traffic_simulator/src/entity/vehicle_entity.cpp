@@ -34,7 +34,7 @@ VehicleEntity::VehicleEntity(
   loader_(pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase>(
     "traffic_simulator", "entity_behavior::BehaviorPluginBase")),
   behavior_plugin_ptr_(loader_.createSharedInstance(plugin_name)),
-  route_planner_(hdmap_utils_ptr_)
+  route_planner_(traffic_simulator::RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER, hdmap_utils_ptr_)
 {
   behavior_plugin_ptr_->configure(rclcpp::get_logger(name));
   behavior_plugin_ptr_->setVehicleParameters(parameters);
@@ -71,11 +71,19 @@ auto VehicleEntity::getDefaultDynamicConstraints() const
 
 auto VehicleEntity::getDefaultMatchingDistanceForLaneletPoseCalculation() const -> double
 {
+  /// @note The lanelet matching algorithm should be equivalent to the one used in
+  /// EgoEntitySimulation::setStatus
+  /// @note The offset value has been increased to 1.5 because a value of 1.0 was often insufficient when changing lanes. ( @Hans_Robo )
   return std::max(
            vehicle_parameters.axles.front_axle.track_width,
            vehicle_parameters.axles.rear_axle.track_width) *
            0.5 +
-         1.0;
+         1.5;
+}
+
+auto VehicleEntity::getParameters() const -> const traffic_simulator_msgs::msg::VehicleParameters &
+{
+  return vehicle_parameters;
 }
 
 auto VehicleEntity::getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter
@@ -235,7 +243,7 @@ auto VehicleEntity::requestFollowTrajectory(
   route_planner_.setWaypoints(waypoints);
 }
 
-void VehicleEntity::requestLaneChange(const lanelet::Id to_lanelet_id)
+auto VehicleEntity::requestLaneChange(const lanelet::Id to_lanelet_id) -> void
 {
   behavior_plugin_ptr_->setRequest(behavior::Request::LANE_CHANGE);
   const auto parameter = lane_change::Parameter(
@@ -244,7 +252,8 @@ void VehicleEntity::requestLaneChange(const lanelet::Id to_lanelet_id)
   behavior_plugin_ptr_->setLaneChangeParameters(parameter);
 }
 
-void VehicleEntity::requestLaneChange(const traffic_simulator::lane_change::Parameter & parameter)
+auto VehicleEntity::requestLaneChange(const traffic_simulator::lane_change::Parameter & parameter)
+  -> void
 {
   behavior_plugin_ptr_->setRequest(behavior::Request::LANE_CHANGE);
   behavior_plugin_ptr_->setLaneChangeParameters(parameter);

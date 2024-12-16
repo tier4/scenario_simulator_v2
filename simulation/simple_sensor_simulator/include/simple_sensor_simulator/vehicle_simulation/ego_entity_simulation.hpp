@@ -71,9 +71,9 @@ public:
 
   const traffic_simulator_msgs::msg::VehicleParameters vehicle_parameters;
 
-private:
-  auto calculateEgoPitch() const -> double;
+  auto calculateAccelerationBySlope() const -> double;
 
+private:
   auto getCurrentPose(const double pitch_angle) const -> geometry_msgs::msg::Pose;
 
   auto getCurrentTwist() const -> geometry_msgs::msg::Twist;

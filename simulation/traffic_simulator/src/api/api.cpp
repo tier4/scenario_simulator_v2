@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// #include <tf2/LinearMath/Quaternion.h>
-
 #include <geometry/intersection/collision.hpp>
 #include <geometry/quaternion/quaternion_to_euler.hpp>
 #include <traffic_simulator/api/api.hpp>
@@ -120,20 +118,8 @@ auto API::updateEntitiesStatusInSim() -> bool
 auto API::updateTrafficLightsInSim() -> bool
 {
   if (traffic_lights_ptr_->isAnyTrafficLightChanged()) {
-    simulation_api_schema::UpdateTrafficLightsRequest request;
-    const auto traffic_lights_msg =
-      traffic_lights_ptr_->getConventionalTrafficLights()->generateAutowareAutoPerceptionMsg();
-    simulation_interface::toProto(traffic_lights_msg, request);
-    // here is a lack of information in autoware_auto_perception_msgs::msg
-    // to complete the relation_ids, so complete it manually here
-    for (auto & traffic_signal : *request.mutable_states()) {
-      const auto relation_ids =
-        entity_manager_ptr_->getHdmapUtils()->getTrafficLightRegulatoryElementIDsFromTrafficLight(
-          traffic_signal.id());
-      for (const auto & relation_id : relation_ids) {
-        traffic_signal.add_relation_ids(relation_id);
-      }
-    }
+    auto request =
+      traffic_lights_ptr_->getConventionalTrafficLights()->generateUpdateTrafficLightsRequest();
     return zeromq_client_.call(request).result().success();
   }
   /// @todo handle response
@@ -163,6 +149,7 @@ auto API::updateFrame() -> bool
   clock_.update();
   clock_pub_->publish(clock_.getCurrentRosTimeAsMsg());
   debug_marker_pub_->publish(entity_manager_ptr_->makeDebugMarker());
+  debug_marker_pub_->publish(traffic_controller_ptr_->makeDebugMarker());
   return true;
 }
 
@@ -200,7 +187,8 @@ auto API::attachLidarSensor(
   const helper::LidarType lidar_type) -> bool
 {
   return attachLidarSensor(helper::constructLidarConfiguration(
-    lidar_type, entity_name, getROS2Parameter<std::string>("architecture_type", "awf/universe"),
+    lidar_type, entity_name,
+    getROS2Parameter<std::string>("architecture_type", "awf/universe/20240605"),
     lidar_sensor_delay));
 }
 
@@ -317,7 +305,7 @@ auto API::respawn(
       ego_entity->setMapPose(entity_status.pose);
       ego_entity->setTwist(entity_status.action_status.twist);
       ego_entity->setAcceleration(entity_status.action_status.accel);
-      ego_entity->replanRoute({goal_pose});
+      ego_entity->requestReplanRoute({goal_pose});
     }
   }
 }
@@ -338,7 +326,7 @@ auto API::despawn(const std::string & name) -> bool
 
 auto API::despawnEntities() -> bool
 {
-  auto entities = entity_manager_ptr_->getEntityNames();
+  const auto entities = entity_manager_ptr_->getEntityNames();
   return std::all_of(
     entities.begin(), entities.end(), [&](const auto & entity) { return despawn(entity); });
 }
@@ -457,14 +445,15 @@ auto API::relativePose(
 
 auto API::countLaneChanges(
   const std::string & from_entity_name, const std::string & to_entity_name,
-  const bool allow_lane_change) const -> std::optional<std::pair<int, int>>
+  const traffic_simulator::RoutingConfiguration & routing_configuration) const
+  -> std::optional<std::pair<int, int>>
 {
   if (from_entity_name != to_entity_name) {
     const auto from_entity = getEntity(from_entity_name);
     const auto to_entity = getEntity(to_entity_name);
     return traffic_simulator::distance::countLaneChanges(
       from_entity->getCanonicalizedLaneletPose().value(),
-      to_entity->getCanonicalizedLaneletPose().value(), allow_lane_change, getHdmapUtils());
+      to_entity->getCanonicalizedLaneletPose().value(), routing_configuration, getHdmapUtils());
   } else {
     return std::nullopt;
   }
@@ -472,7 +461,7 @@ auto API::countLaneChanges(
 
 auto API::laneletDistance(
   const std::string & from_entity_name, const std::string & to_entity_name,
-  const bool allow_lane_change) -> LaneletDistance
+  const traffic_simulator::RoutingConfiguration & routing_configuration) -> LaneletDistance
 {
   const auto from_entity = getEntity(from_entity_name);
   const auto to_entity = getEntity(to_entity_name);
@@ -480,7 +469,7 @@ auto API::laneletDistance(
     if (from_entity->isInLanelet() && to_entity->isInLanelet()) {
       return distance::laneletDistance(
         from_entity->getCanonicalizedLaneletPose().value(),
-        to_entity->getCanonicalizedLaneletPose().value(), allow_lane_change, getHdmapUtils());
+        to_entity->getCanonicalizedLaneletPose().value(), routing_configuration, getHdmapUtils());
     }
   }
   return LaneletDistance();
@@ -488,14 +477,14 @@ auto API::laneletDistance(
 
 auto API::laneletDistance(
   const std::string & from_entity_name, const LaneletPose & to_lanelet_pose,
-  const bool allow_lane_change) -> LaneletDistance
+  const traffic_simulator::RoutingConfiguration & routing_configuration) -> LaneletDistance
 {
   const auto canonicalized_lanelet_pose = pose::canonicalize(to_lanelet_pose, getHdmapUtils());
   const auto from_entity = getEntity(from_entity_name);
   if (from_entity->isInLanelet()) {
     return distance::laneletDistance(
       from_entity->getCanonicalizedLaneletPose().value(), canonicalized_lanelet_pose,
-      allow_lane_change, getHdmapUtils());
+      routing_configuration, getHdmapUtils());
   } else {
     return LaneletDistance();
   }
@@ -503,14 +492,14 @@ auto API::laneletDistance(
 
 auto API::laneletDistance(
   const LaneletPose & from_lanelet_pose, const std::string & to_entity_name,
-  const bool allow_lane_change) -> LaneletDistance
+  const traffic_simulator::RoutingConfiguration & routing_configuration) -> LaneletDistance
 {
   const auto canonicalized_lanelet_pose = pose::canonicalize(from_lanelet_pose, getHdmapUtils());
   const auto to_entity = getEntity(to_entity_name);
   if (to_entity->isInLanelet()) {
     return distance::laneletDistance(
       canonicalized_lanelet_pose, to_entity->getCanonicalizedLaneletPose().value(),
-      allow_lane_change, getHdmapUtils());
+      routing_configuration, getHdmapUtils());
   } else {
     return LaneletDistance();
   }
@@ -518,7 +507,7 @@ auto API::laneletDistance(
 
 auto API::boundingBoxLaneletDistance(
   const std::string & from_entity_name, const std::string & to_entity_name,
-  const bool allow_lane_change) -> LaneletDistance
+  const traffic_simulator::RoutingConfiguration & routing_configuration) -> LaneletDistance
 {
   const auto from_entity = getEntity(from_entity_name);
   const auto to_entity = getEntity(to_entity_name);
@@ -527,7 +516,7 @@ auto API::boundingBoxLaneletDistance(
       return distance::boundingBoxLaneletDistance(
         from_entity->getCanonicalizedLaneletPose().value(), from_entity->getBoundingBox(),
         to_entity->getCanonicalizedLaneletPose().value(), to_entity->getBoundingBox(),
-        allow_lane_change, getHdmapUtils());
+        routing_configuration, getHdmapUtils());
     }
   }
   return LaneletDistance();
@@ -535,14 +524,14 @@ auto API::boundingBoxLaneletDistance(
 
 auto API::boundingBoxLaneletDistance(
   const std::string & from_entity_name, const LaneletPose & to_lanelet_pose,
-  const bool allow_lane_change) -> LaneletDistance
+  const traffic_simulator::RoutingConfiguration & routing_configuration) -> LaneletDistance
 {
   const auto canonicalized_lanelet_pose = pose::canonicalize(to_lanelet_pose, getHdmapUtils());
   const auto from_entity = getEntity(from_entity_name);
   if (from_entity->isInLanelet()) {
     return distance::boundingBoxLaneletDistance(
       from_entity->getCanonicalizedLaneletPose().value(), from_entity->getBoundingBox(),
-      canonicalized_lanelet_pose, traffic_simulator_msgs::msg::BoundingBox(), allow_lane_change,
+      canonicalized_lanelet_pose, traffic_simulator_msgs::msg::BoundingBox(), routing_configuration,
       getHdmapUtils());
   } else {
     return LaneletDistance();

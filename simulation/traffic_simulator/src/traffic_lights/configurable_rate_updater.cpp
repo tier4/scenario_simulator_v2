@@ -1,4 +1,4 @@
-// Copyright 2024 TIER IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ auto ConfigurableRateUpdater::startTimer(const double update_rate) -> void
 
 auto ConfigurableRateUpdater::resetTimer(const double update_rate) -> void
 {
-  if (timer_ && !timer_->is_canceled()) {
+  if (timer_ and not timer_->is_canceled()) {
     timer_->cancel();
     timer_.reset();
   }
