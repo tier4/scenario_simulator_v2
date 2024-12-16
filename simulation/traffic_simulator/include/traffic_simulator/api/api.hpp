@@ -259,7 +259,7 @@ public:
 
   auto countLaneChanges(
     const std::string & from_entity_name, const std::string & to_entity_name,
-    const bool allow_lane_change) const -> std::optional<std::pair<int, int>>;
+    const RoutingConfiguration & routing_configuration) const -> std::optional<std::pair<int, int>>;
 
   auto boundingBoxRelativePose(
     const std::string & from_entity_name, const geometry_msgs::msg::Pose & to_map_pose)
@@ -271,23 +271,23 @@ public:
 
   auto laneletDistance(
     const std::string & from_entity_name, const std::string & to_entity_name,
-    const bool allow_lane_change) -> LaneletDistance;
+    const RoutingConfiguration & routing_configuration) -> LaneletDistance;
 
   auto laneletDistance(
     const std::string & from_entity_name, const LaneletPose & to_lanelet_pose,
-    const bool allow_lane_change) -> LaneletDistance;
+    const RoutingConfiguration & routing_configuration) -> LaneletDistance;
 
   auto laneletDistance(
     const LaneletPose & from_lanelet_pose, const std::string & to_entity_name,
-    const bool allow_lane_change) -> LaneletDistance;
+    const RoutingConfiguration & routing_configuration) -> LaneletDistance;
 
   auto boundingBoxLaneletDistance(
     const std::string & from_entity_name, const std::string & to_entity_name,
-    const bool allow_lane_change) -> LaneletDistance;
+    const RoutingConfiguration & routing_configuration) -> LaneletDistance;
 
   auto boundingBoxLaneletDistance(
     const std::string & from_entity_name, const LaneletPose & to_lanelet_pose,
-    const bool allow_lane_change) -> LaneletDistance;
+    const RoutingConfiguration & routing_configuration) -> LaneletDistance;
 
   // traffics, lanelet
   auto getHdmapUtils() const -> const std::shared_ptr<hdmap_utils::HdMapUtils> &;

@@ -445,8 +445,7 @@ auto API::relativePose(
 
 auto API::countLaneChanges(
   const std::string & from_entity_name, const std::string & to_entity_name,
-  const traffic_simulator::RoutingConfiguration & routing_configuration) const
-  -> std::optional<std::pair<int, int>>
+  const RoutingConfiguration & routing_configuration) const -> std::optional<std::pair<int, int>>
 {
   if (from_entity_name != to_entity_name) {
     const auto from_entity = getEntity(from_entity_name);
@@ -461,7 +460,7 @@ auto API::countLaneChanges(
 
 auto API::laneletDistance(
   const std::string & from_entity_name, const std::string & to_entity_name,
-  const traffic_simulator::RoutingConfiguration & routing_configuration) -> LaneletDistance
+  const RoutingConfiguration & routing_configuration) -> LaneletDistance
 {
   const auto from_entity = getEntity(from_entity_name);
   const auto to_entity = getEntity(to_entity_name);
@@ -477,7 +476,7 @@ auto API::laneletDistance(
 
 auto API::laneletDistance(
   const std::string & from_entity_name, const LaneletPose & to_lanelet_pose,
-  const traffic_simulator::RoutingConfiguration & routing_configuration) -> LaneletDistance
+  const RoutingConfiguration & routing_configuration) -> LaneletDistance
 {
   const auto canonicalized_lanelet_pose = pose::canonicalize(to_lanelet_pose, getHdmapUtils());
   const auto from_entity = getEntity(from_entity_name);
@@ -492,7 +491,7 @@ auto API::laneletDistance(
 
 auto API::laneletDistance(
   const LaneletPose & from_lanelet_pose, const std::string & to_entity_name,
-  const traffic_simulator::RoutingConfiguration & routing_configuration) -> LaneletDistance
+  const RoutingConfiguration & routing_configuration) -> LaneletDistance
 {
   const auto canonicalized_lanelet_pose = pose::canonicalize(from_lanelet_pose, getHdmapUtils());
   const auto to_entity = getEntity(to_entity_name);
@@ -507,7 +506,7 @@ auto API::laneletDistance(
 
 auto API::boundingBoxLaneletDistance(
   const std::string & from_entity_name, const std::string & to_entity_name,
-  const traffic_simulator::RoutingConfiguration & routing_configuration) -> LaneletDistance
+  const RoutingConfiguration & routing_configuration) -> LaneletDistance
 {
   const auto from_entity = getEntity(from_entity_name);
   const auto to_entity = getEntity(to_entity_name);
@@ -524,7 +523,7 @@ auto API::boundingBoxLaneletDistance(
 
 auto API::boundingBoxLaneletDistance(
   const std::string & from_entity_name, const LaneletPose & to_lanelet_pose,
-  const traffic_simulator::RoutingConfiguration & routing_configuration) -> LaneletDistance
+  const RoutingConfiguration & routing_configuration) -> LaneletDistance
 {
   const auto canonicalized_lanelet_pose = pose::canonicalize(to_lanelet_pose, getHdmapUtils());
   const auto from_entity = getEntity(from_entity_name);

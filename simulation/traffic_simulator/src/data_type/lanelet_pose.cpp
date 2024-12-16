@@ -103,8 +103,7 @@ auto CanonicalizedLaneletPose::canonicalize(
 
 auto CanonicalizedLaneletPose::getAlternativeLaneletPoseBaseOnShortestRouteFrom(
   LaneletPose from, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
-  const traffic_simulator::RoutingConfiguration & routing_configuration) const
-  -> std::optional<LaneletPose>
+  const RoutingConfiguration & routing_configuration) const -> std::optional<LaneletPose>
 {
   if (lanelet_poses_.empty()) {
     return std::nullopt;
