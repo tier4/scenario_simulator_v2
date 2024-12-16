@@ -483,7 +483,8 @@ auto FieldOperatorApplication::spinSome() -> void
             is_autoware_exited = true;
             throw common::AutowareError("Autoware process is already terminated");
           default:
-            AUTOWARE_SYSTEM_ERROR("waitpid");
+            RCLCPP_ERROR_STREAM(
+              get_logger(), std::system_error(errno, std::system_category()).what());
             std::exit(EXIT_FAILURE);
         }
       } else if (0 < id) {

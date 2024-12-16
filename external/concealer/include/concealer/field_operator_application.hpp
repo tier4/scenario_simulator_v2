@@ -30,7 +30,6 @@
 #include <autoware_system_msgs/msg/autoware_state.hpp>
 #include <autoware_vehicle_msgs/msg/gear_command.hpp>
 #include <autoware_vehicle_msgs/msg/turn_indicators_command.hpp>
-#include <concealer/autoware_stream.hpp>
 #include <concealer/autoware_universe.hpp>
 #include <concealer/launch.hpp>
 #include <concealer/publisher_wrapper.hpp>
