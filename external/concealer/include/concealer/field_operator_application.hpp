@@ -162,8 +162,6 @@ struct FieldOperatorApplication : public rclcpp::Node,
 
   auto spinSome() -> void;
 
-  auto shutdownAutoware() -> void;
-
   auto engage() -> void;
 
   auto engageable() const -> bool;
