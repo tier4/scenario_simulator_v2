@@ -24,6 +24,7 @@
 #include <openscenario_interpreter/syntax/speed_condition.hpp>
 #include <openscenario_interpreter/syntax/stand_still_condition.hpp>
 #include <openscenario_interpreter/syntax/time_headway_condition.hpp>
+#include <openscenario_interpreter/syntax/time_to_collision_condition.hpp>
 
 namespace openscenario_interpreter
 {
@@ -38,7 +39,7 @@ EntityCondition::EntityCondition(
       std::make_pair(        "CollisionCondition", [&](const auto & node) { return make<        CollisionCondition>(node, scope, triggering_entities); }),
       std::make_pair(          "OffroadCondition", [&](const auto & node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
       std::make_pair(      "TimeHeadwayCondition", [&](const auto & node) { return make<      TimeHeadwayCondition>(node, scope, triggering_entities); }),
-      std::make_pair(  "TimeToCollisionCondition", [&](const auto & node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
+      std::make_pair(  "TimeToCollisionCondition", [&](const auto & node) { return make<  TimeToCollisionCondition>(node, scope, triggering_entities); }),
       std::make_pair(     "AccelerationCondition", [&](const auto & node) { return make<     AccelerationCondition>(node, scope, triggering_entities); }),
       std::make_pair(       "StandStillCondition", [&](const auto & node) { return make<       StandStillCondition>(node, scope, triggering_entities); }),
       std::make_pair(            "SpeedCondition", [&](const auto & node) { return make<            SpeedCondition>(node, scope, triggering_entities); }),
