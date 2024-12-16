@@ -23,8 +23,8 @@ include(FindProtobuf REQUIRED)
 ament_auto_find_build_dependencies()
 
 set(PROTO_FILES
-  "proto/autoware_auto_control_msgs.proto"
-  "proto/autoware_auto_vehicle_msgs.proto"
+  "proto/autoware_control_msgs.proto"
+  "proto/autoware_vehicle_msgs.proto"
   "proto/builtin_interfaces.proto"
   "proto/geometry_msgs.proto"
   "proto/rosgraph_msgs.proto"

@@ -42,17 +42,17 @@ private:
     if (api_.getCurrentTime() >= 60) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
-    if (api_.getCurrentTime() >= 4 && api_.isEntitySpawned("tom")) {
+    if (api_.getCurrentTime() >= 4 && api_.isEntityExist("tom")) {
       api_.despawn("tom");
     }
-    if (api_.getCurrentTime() >= 4 && api_.isEntitySpawned("obstacle")) {
+    if (api_.getCurrentTime() >= 4 && api_.isEntityExist("obstacle")) {
       api_.getEntity("obstacle")
         ->setStatus(
           traffic_simulator::helper::constructCanonicalizedLaneletPose(
             120545, 0.0, 0.0, api_.getHdmapUtils()),
           traffic_simulator::helper::constructActionStatus(10));
     }
-    if (api_.getCurrentTime() >= 6 && api_.isEntitySpawned("obstacle")) {
+    if (api_.getCurrentTime() >= 6 && api_.isEntityExist("obstacle")) {
       api_.despawn("obstacle");
     }
     const auto ego_entity = api_.getEntity("ego");
@@ -64,7 +64,7 @@ private:
       ego_entity->requestAcquirePosition(
         traffic_simulator::helper::constructCanonicalizedLaneletPose(
           35026, 0.0, 0.0, api_.getHdmapUtils()));
-      if (api_.isEntitySpawned("npc2")) {
+      if (api_.isEntityExist("npc2")) {
         npc2_entity->requestSpeedChange(13, true);
       }
     }
@@ -75,7 +75,7 @@ private:
       ego_entity->requestAcquirePosition(
         traffic_simulator::helper::constructCanonicalizedLaneletPose(
           34675, 0.0, 0.0, api_.getHdmapUtils()));
-      if (api_.isEntitySpawned("npc2")) {
+      if (api_.isEntityExist("npc2")) {
         npc2_entity->requestSpeedChange(3, true);
       }
     }
@@ -88,7 +88,7 @@ private:
           34630, 0.0, 0.0, api_.getHdmapUtils()));
       npc2_entity->requestSpeedChange(13, true);
     }
-    if (api_.getCurrentTime() > 10.0 && api_.isEntitySpawned("bob")) {
+    if (api_.getCurrentTime() > 10.0 && api_.isEntityExist("bob")) {
       api_.despawn("bob");
     }
   }

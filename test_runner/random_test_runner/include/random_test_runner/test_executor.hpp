@@ -197,7 +197,7 @@ public:
       }
 
       for (const auto & npc : test_description_.npcs_descriptions) {
-        if (api_->isEntitySpawned(npc.name) && api_->checkCollision(ego_name_, npc.name)) {
+        if (api_->isEntityExist(npc.name) && api_->checkCollision(ego_name_, npc.name)) {
           if (ego_collision_metric_.isThereEgosCollisionWith(npc.name, current_time)) {
             std::string message =
               fmt::format("New collision occurred between ego and {}", npc.name);

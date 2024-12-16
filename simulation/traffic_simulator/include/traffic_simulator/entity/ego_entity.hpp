@@ -16,7 +16,6 @@
 #define TRAFFIC_SIMULATOR__ENTITY__EGO_ENTITY_HPP_
 
 #include <algorithm>
-#include <autoware_auto_system_msgs/msg/emergency_state.hpp>
 #include <boost/filesystem.hpp>
 #include <concealer/autoware.hpp>
 #include <concealer/field_operator_application.hpp>

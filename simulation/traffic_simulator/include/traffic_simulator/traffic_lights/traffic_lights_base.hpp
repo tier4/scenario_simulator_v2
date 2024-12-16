@@ -1,4 +1,4 @@
-// Copyright 2024 TIER IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
 #ifndef TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHTS_BASE_HPP_
 #define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHTS_BASE_HPP_
 
-#include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
-#include <autoware_perception_msgs/msg/traffic_signal_array.hpp>
+#include <simulation_api_schema.pb.h>
+
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <string>
@@ -24,7 +24,6 @@
 #include <traffic_simulator/traffic_lights/configurable_rate_updater.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_marker_publisher.hpp>
-#include <traffic_simulator_msgs/msg/traffic_light_array_v1.hpp>
 #include <unordered_map>
 #include <vector>
 
@@ -72,12 +71,8 @@ public:
 
   auto getTrafficLightsComposedState(const lanelet::Id lanelet_id) -> std::string;
 
-  auto generateAutowarePerceptionMsg() const -> autoware_perception_msgs::msg::TrafficSignalArray;
-
-  auto generateAutowareAutoPerceptionMsg() const
-    -> autoware_auto_perception_msgs::msg::TrafficSignalArray;
-
-  auto generateTrafficSimulatorV1Msg() const -> traffic_simulator_msgs::msg::TrafficLightArrayV1;
+  auto generateUpdateTrafficLightsRequest() const
+    -> simulation_api_schema::UpdateTrafficLightsRequest;
 
 protected:
   virtual auto update() const -> void = 0;

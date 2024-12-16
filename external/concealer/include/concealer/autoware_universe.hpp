@@ -15,18 +15,19 @@
 #ifndef CONCEALER__AUTOWARE_UNIVERSE_HPP_
 #define CONCEALER__AUTOWARE_UNIVERSE_HPP_
 
-#include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
-#include <autoware_auto_planning_msgs/msg/path_with_lane_id.hpp>
-#include <autoware_auto_vehicle_msgs/msg/control_mode_report.hpp>
-#include <autoware_auto_vehicle_msgs/msg/gear_report.hpp>
-#include <autoware_auto_vehicle_msgs/msg/steering_report.hpp>
-#include <autoware_auto_vehicle_msgs/msg/turn_indicators_report.hpp>
-#include <autoware_auto_vehicle_msgs/msg/velocity_report.hpp>
+#include <autoware_control_msgs/msg/control.hpp>
+#include <autoware_vehicle_msgs/msg/control_mode_report.hpp>
+#include <autoware_vehicle_msgs/msg/gear_report.hpp>
+#include <autoware_vehicle_msgs/msg/steering_report.hpp>
+#include <autoware_vehicle_msgs/msg/turn_indicators_report.hpp>
+#include <autoware_vehicle_msgs/msg/velocity_report.hpp>
+#include <autoware_vehicle_msgs/srv/control_mode_command.hpp>
 #include <concealer/autoware.hpp>
 #include <concealer/publisher_wrapper.hpp>
 #include <concealer/subscriber_wrapper.hpp>
 #include <geometry_msgs/msg/accel_with_covariance_stamped.hpp>
 #include <nav_msgs/msg/odometry.hpp>
+#include <tier4_planning_msgs/msg/path_with_lane_id.hpp>
 
 namespace concealer
 {
@@ -37,19 +38,35 @@ namespace concealer
 class AutowareUniverse : public Autoware
 {
   // clang-format off
-  SubscriberWrapper<autoware_auto_control_msgs::msg::AckermannControlCommand, ThreadSafety::safe> getAckermannControlCommand;
-  SubscriberWrapper<autoware_auto_vehicle_msgs::msg::GearCommand,             ThreadSafety::safe> getGearCommandImpl;
-  SubscriberWrapper<autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand,   ThreadSafety::safe> getTurnIndicatorsCommand;
-  SubscriberWrapper<autoware_auto_planning_msgs::msg::PathWithLaneId,         ThreadSafety::safe> getPathWithLaneId;
+  using AccelWithCovarianceStamped  = geometry_msgs::msg::AccelWithCovarianceStamped;
+  using Control                     = autoware_control_msgs::msg::Control;
+  using ControlModeCommand          = autoware_vehicle_msgs::srv::ControlModeCommand;
+  using ControlModeReport           = autoware_vehicle_msgs::msg::ControlModeReport;
+  using GearCommand                 = autoware_vehicle_msgs::msg::GearCommand;
+  using GearReport                  = autoware_vehicle_msgs::msg::GearReport;
+  using PathWithLaneId              = tier4_planning_msgs::msg::PathWithLaneId;
+  using PoseWithCovarianceStamped   = geometry_msgs::msg::PoseWithCovarianceStamped;
+  using SteeringReport              = autoware_vehicle_msgs::msg::SteeringReport;
+  using TurnIndicatorsCommand       = autoware_vehicle_msgs::msg::TurnIndicatorsCommand;
+  using TurnIndicatorsReport        = autoware_vehicle_msgs::msg::TurnIndicatorsReport;
+  using VelocityReport              = autoware_vehicle_msgs::msg::VelocityReport;
 
-  PublisherWrapper<geometry_msgs::msg::AccelWithCovarianceStamped>        setAcceleration;
-  PublisherWrapper<nav_msgs::msg::Odometry>                               setOdometry;
-  PublisherWrapper<autoware_auto_vehicle_msgs::msg::SteeringReport>       setSteeringReport;
-  PublisherWrapper<autoware_auto_vehicle_msgs::msg::GearReport>           setGearReport;
-  PublisherWrapper<autoware_auto_vehicle_msgs::msg::ControlModeReport>    setControlModeReport;
-  PublisherWrapper<autoware_auto_vehicle_msgs::msg::VelocityReport>       setVelocityReport;
-  PublisherWrapper<autoware_auto_vehicle_msgs::msg::TurnIndicatorsReport> setTurnIndicatorsReport;
+  SubscriberWrapper<Control,                ThreadSafety::safe> getCommand;
+  SubscriberWrapper<GearCommand,            ThreadSafety::safe> getGearCommandImpl;
+  SubscriberWrapper<TurnIndicatorsCommand,  ThreadSafety::safe> getTurnIndicatorsCommand;
+  SubscriberWrapper<PathWithLaneId,         ThreadSafety::safe> getPathWithLaneId;
+
+  PublisherWrapper<AccelWithCovarianceStamped> setAcceleration;
+  PublisherWrapper<nav_msgs::msg::Odometry>    setOdometry;
+  PublisherWrapper<PoseWithCovarianceStamped>  setPose;
+  PublisherWrapper<SteeringReport>             setSteeringReport;
+  PublisherWrapper<GearReport>                 setGearReport;
+  PublisherWrapper<ControlModeReport>          setControlModeReport;
+  PublisherWrapper<VelocityReport>             setVelocityReport;
+  PublisherWrapper<TurnIndicatorsReport>       setTurnIndicatorsReport;
   // clang-format on
+
+  rclcpp::Service<ControlModeCommand>::SharedPtr control_mode_request_server;
 
   const rclcpp::TimerBase::SharedPtr localization_update_timer;
 
@@ -59,6 +76,8 @@ class AutowareUniverse : public Autoware
 
   std::atomic<bool> is_stop_requested = false;
 
+  std::atomic<std::uint8_t> current_control_mode = ControlModeReport::AUTONOMOUS;
+
   std::atomic<bool> is_thrown = false;
 
   std::exception_ptr thrown;
@@ -66,7 +85,7 @@ class AutowareUniverse : public Autoware
   auto stopAndJoin() -> void;
 
 public:
-  CONCEALER_PUBLIC explicit AutowareUniverse();
+  CONCEALER_PUBLIC explicit AutowareUniverse(bool);
 
   ~AutowareUniverse();
 
@@ -82,15 +101,17 @@ public:
 
   auto updateVehicleState() -> void;
 
-  auto getGearCommand() const -> autoware_auto_vehicle_msgs::msg::GearCommand override;
+  auto getGearCommand() const -> GearCommand override;
 
   auto getGearSign() const -> double override;
 
-  auto getVehicleCommand() const -> std::tuple<
-    autoware_auto_control_msgs::msg::AckermannControlCommand,
-    autoware_auto_vehicle_msgs::msg::GearCommand> override;
+  auto getVehicleCommand() const -> std::tuple<Control, GearCommand> override;
 
-  auto getRouteLanelets() const -> std::vector<std::int64_t>;
+  auto getRouteLanelets() const -> std::vector<std::int64_t> override;
+
+  auto getControlModeReport() const -> ControlModeReport override;
+
+  auto setManualMode() -> void override;
 };
 
 }  // namespace concealer

@@ -33,6 +33,13 @@
 
 namespace entity_behavior
 {
+BT::PortsList operator+(const BT::PortsList & ports_1, const BT::PortsList & ports_2)
+{
+  BT::PortsList ports = ports_1;
+  ports.insert(ports_2.begin(), ports_2.end());
+  return ports;
+}
+
 ActionNode::ActionNode(const std::string & name, const BT::NodeConfiguration & config)
 : BT::ActionNodeBase(name, config)
 {
@@ -303,7 +310,7 @@ auto ActionNode::getDistanceToTargetEntityPolygon(
   double width_extension_left, double length_extension_front, double length_extension_rear) const
   -> std::optional<double>
 {
-  if (status.isInLanelet()) {
+  if (status.isInLanelet() && isOtherEntityAtConsideredAltitude(status)) {
     const auto polygon = math::geometry::transformPoints(
       status.getMapPose(), math::geometry::getPointsFromBbox(
                              status.getBoundingBox(), width_extension_right, width_extension_left,
@@ -311,6 +318,13 @@ auto ActionNode::getDistanceToTargetEntityPolygon(
     return spline.getCollisionPointIn2D(polygon, false);
   }
   return std::nullopt;
+}
+
+auto ActionNode::isOtherEntityAtConsideredAltitude(
+  const traffic_simulator::CanonicalizedEntityStatus & entity_status) const -> bool
+{
+  return hdmap_utils->isAltitudeMatching(
+    canonicalized_entity_status->getAltitude(), entity_status.getAltitude());
 }
 
 auto ActionNode::getDistanceToConflictingEntity(

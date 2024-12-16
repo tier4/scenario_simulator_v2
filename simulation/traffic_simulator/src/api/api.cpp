@@ -116,20 +116,8 @@ auto API::updateEntitiesStatusInSim() -> bool
 auto API::updateTrafficLightsInSim() -> bool
 {
   if (traffic_lights_ptr_->isAnyTrafficLightChanged()) {
-    simulation_api_schema::UpdateTrafficLightsRequest request;
-    const auto traffic_lights_msg =
-      traffic_lights_ptr_->getConventionalTrafficLights()->generateAutowareAutoPerceptionMsg();
-    simulation_interface::toProto(traffic_lights_msg, request);
-    // here is a lack of information in autoware_auto_perception_msgs::msg
-    // to complete the relation_ids, so complete it manually here
-    for (auto & traffic_signal : *request.mutable_states()) {
-      const auto relation_ids =
-        entity_manager_ptr_->getHdmapUtils()->getTrafficLightRegulatoryElementIDsFromTrafficLight(
-          traffic_signal.id());
-      for (const auto & relation_id : relation_ids) {
-        traffic_signal.add_relation_ids(static_cast<google::protobuf::int32>(relation_id));
-      }
-    }
+    auto request =
+      traffic_lights_ptr_->getConventionalTrafficLights()->generateUpdateTrafficLightsRequest();
     return zeromq_client_.call(request).result().success();
   }
   /// @todo handle response
@@ -159,6 +147,7 @@ auto API::updateFrame() -> bool
   clock_.update();
   clock_pub_->publish(clock_.getCurrentRosTimeAsMsg());
   debug_marker_pub_->publish(entity_manager_ptr_->makeDebugMarker());
+  debug_marker_pub_->publish(traffic_controller_ptr_->makeDebugMarker());
   return true;
 }
 
@@ -196,7 +185,8 @@ auto API::attachLidarSensor(
   const helper::LidarType lidar_type) -> bool
 {
   return attachLidarSensor(helper::constructLidarConfiguration(
-    lidar_type, entity_name, getROS2Parameter<std::string>("architecture_type", "awf/universe"),
+    lidar_type, entity_name,
+    getROS2Parameter<std::string>("architecture_type", "awf/universe/20240605"),
     lidar_sensor_delay));
 }
 
@@ -251,9 +241,9 @@ auto API::getEgoEntity(const std::string & name) const -> std::shared_ptr<entity
 }
 
 // entities - checks, getters
-auto API::isEntitySpawned(const std::string & name) const -> bool
+auto API::isEntityExist(const std::string & name) const -> bool
 {
-  return entity_manager_ptr_->isEntitySpawned(name);
+  return entity_manager_ptr_->isEntityExist(name);
 }
 
 auto API::getEntityNames() const -> std::vector<std::string>

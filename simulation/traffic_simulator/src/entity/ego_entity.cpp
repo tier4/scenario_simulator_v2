@@ -39,7 +39,7 @@ auto EgoEntity::makeFieldOperatorApplication(
   -> std::unique_ptr<concealer::FieldOperatorApplication>
 {
   if (const auto architecture_type =
-        getParameter<std::string>(node_parameters, "architecture_type", "awf/universe");
+        getParameter<std::string>(node_parameters, "architecture_type", "awf/universe/20240605");
       architecture_type.find("awf/universe") != std::string::npos) {
     auto parameters = getParameter<std::vector<std::string>>(node_parameters, "autoware.", {});
 
@@ -54,6 +54,7 @@ auto EgoEntity::makeFieldOperatorApplication(
     parameters.push_back("use_foa:=false");
     parameters.push_back("perception/enable_traffic_light:=" + std::string(architecture_type >= "awf/universe/20230906" ? "true" : "false"));
     parameters.push_back("use_sim_time:=" + std::string(getParameter<bool>(node_parameters, "use_sim_time", false) ? "true" : "false"));
+    parameters.push_back("localization_sim_mode:=" + std::string(getParameter<bool>(node_parameters, "simulate_localization") ? "api" : "pose_twist_estimator"));
     // clang-format on
 
     return getParameter<bool>(node_parameters, "launch_autoware", true)
@@ -186,6 +187,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
       // prefer current lanelet on ss2 side
       setStatus(non_canonicalized_updated_status.value(), status_->getLaneletIds());
     } else {
+      field_operator_application->enableAutowareControl();
       is_controlled_by_simulator_ = false;
     }
   }
@@ -199,41 +201,36 @@ void EgoEntity::onUpdate(double current_time, double step_time)
 
 void EgoEntity::requestAcquirePosition(const CanonicalizedLaneletPose & lanelet_pose)
 {
-  requestClearRoute();
   requestAssignRoute({lanelet_pose});
 }
 
 void EgoEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose)
 {
-  requestClearRoute();
   requestAssignRoute({map_pose});
 }
 
 void EgoEntity::requestAssignRoute(const std::vector<CanonicalizedLaneletPose> & waypoints)
 {
   std::vector<geometry_msgs::msg::Pose> route;
-
   for (const auto & waypoint : waypoints) {
     route.push_back(static_cast<geometry_msgs::msg::Pose>(waypoint));
   }
-
   requestAssignRoute(route);
 }
 
 void EgoEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> & waypoints)
 {
   std::vector<geometry_msgs::msg::PoseStamped> route;
-
   for (const auto & waypoint : waypoints) {
     geometry_msgs::msg::PoseStamped pose_stamped;
     {
       pose_stamped.header.frame_id = "map";
       pose_stamped.pose = waypoint;
     }
-
     route.push_back(pose_stamped);
   }
 
+  requestClearRoute();
   if (not field_operator_application->initialized()) {
     field_operator_application->initialize(getMapPose());
     field_operator_application->plan(route);
@@ -293,6 +290,7 @@ auto EgoEntity::requestReplanRoute(const std::vector<geometry_msgs::msg::PoseSta
 {
   field_operator_application->clearRoute();
   field_operator_application->plan(route);
+  field_operator_application->enableAutowareControl();
   field_operator_application->engage();
 }
 

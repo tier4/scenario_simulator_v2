@@ -265,7 +265,7 @@ auto EntityManager::getEgoEntity(const std::string & name) const
 }
 
 // entities - checks, getters
-bool EntityManager::isEntitySpawned(const std::string & name)
+auto EntityManager::isEntityExist(const std::string & name) const -> bool
 {
   return entities_.find(name) != std::end(entities_);
 }
@@ -342,7 +342,7 @@ auto EntityManager::resetBehaviorPlugin(
 
 auto EntityManager::despawnEntity(const std::string & name) -> bool
 {
-  return isEntitySpawned(name) && entities_.erase(name);
+  return isEntityExist(name) && entities_.erase(name);
 }
 
 // traffics, lanelet

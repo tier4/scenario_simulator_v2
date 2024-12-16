@@ -69,7 +69,7 @@ public:
       configuration.auto_sink)),
     traffic_lights_ptr_(std::make_shared<TrafficLights>(
       node, entity_manager_ptr_->getHdmapUtils(),
-      getParameter<std::string>(node_parameters_, "architecture_type", "awf/universe"))),
+      getParameter<std::string>(node_parameters_, "architecture_type", "awf/universe/20240605"))),
     real_time_factor_subscriber_(rclcpp::create_subscription<std_msgs::msg::Float64>(
       node, "/real_time_factor", rclcpp::QoS(rclcpp::KeepLast(1)).best_effort(),
       [this](const std_msgs::msg::Float64 & message) {
@@ -212,7 +212,7 @@ public:
   auto getEgoEntity(const std::string & name) const -> std::shared_ptr<entity::EgoEntity>;
 
   // entities - checks, getters
-  auto isEntitySpawned(const std::string & name) const -> bool;
+  auto isEntityExist(const std::string & name) const -> bool;
 
   auto getEntityNames() const -> std::vector<std::string>;
 

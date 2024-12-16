@@ -490,8 +490,7 @@ void toMsg(const std_msgs::Header & proto, std_msgs::msg::Header & header)
 }
 
 void toProto(
-  const autoware_auto_control_msgs::msg::AckermannLateralCommand & message,
-  autoware_auto_control_msgs::AckermannLateralCommand & proto)
+  const autoware_control_msgs::msg::Lateral & message, autoware_control_msgs::Lateral & proto)
 {
   toProto(message.stamp, *proto.mutable_stamp());
   proto.set_steering_tire_angle(message.steering_tire_angle);
@@ -499,8 +498,7 @@ void toProto(
 }
 
 void toMsg(
-  const autoware_auto_control_msgs::AckermannLateralCommand & proto,
-  autoware_auto_control_msgs::msg::AckermannLateralCommand & message)
+  const autoware_control_msgs::Lateral & proto, autoware_control_msgs::msg::Lateral & message)
 {
   toMsg(proto.stamp(), message.stamp);
   message.steering_tire_angle = proto.steering_tire_angle();
@@ -508,28 +506,27 @@ void toMsg(
 }
 
 void toProto(
-  const autoware_auto_control_msgs::msg::LongitudinalCommand & message,
-  autoware_auto_control_msgs::LongitudinalCommand & proto)
+  const autoware_control_msgs::msg::Longitudinal & message,
+  autoware_control_msgs::Longitudinal & proto)
 {
   toProto(message.stamp, *proto.mutable_stamp());
-  proto.set_speed(message.speed);
+  proto.set_velocity(message.velocity);
   proto.set_acceleration(message.acceleration);
   proto.set_jerk(message.jerk);
 }
 
 void toMsg(
-  const autoware_auto_control_msgs::LongitudinalCommand & proto,
-  autoware_auto_control_msgs::msg::LongitudinalCommand & message)
+  const autoware_control_msgs::Longitudinal & proto,
+  autoware_control_msgs::msg::Longitudinal & message)
 {
   toMsg(proto.stamp(), message.stamp);
-  message.speed = proto.speed();
+  message.velocity = proto.velocity();
   message.acceleration = proto.acceleration();
   message.jerk = proto.jerk();
 }
 
 void toProto(
-  const autoware_auto_control_msgs::msg::AckermannControlCommand & message,
-  autoware_auto_control_msgs::AckermannControlCommand & proto)
+  const autoware_control_msgs::msg::Control & message, autoware_control_msgs::Control & proto)
 {
   toProto(message.stamp, *proto.mutable_stamp());
   toProto(message.lateral, *proto.mutable_lateral());
@@ -537,8 +534,7 @@ void toProto(
 }
 
 void toMsg(
-  const autoware_auto_control_msgs::AckermannControlCommand & proto,
-  autoware_auto_control_msgs::msg::AckermannControlCommand & message)
+  const autoware_control_msgs::Control & proto, autoware_control_msgs::msg::Control & message)
 {
   toMsg(proto.stamp(), message.stamp);
   toMsg(proto.lateral(), message.lateral);
@@ -546,14 +542,14 @@ void toMsg(
 }
 
 auto toProto(
-  const autoware_auto_vehicle_msgs::msg::GearCommand & message,
-  autoware_auto_vehicle_msgs::GearCommand & proto) -> void
+  const autoware_vehicle_msgs::msg::GearCommand & message,
+  autoware_vehicle_msgs::GearCommand & proto) -> void
 {
   toProto(message.stamp, *proto.mutable_stamp());
 
-#define CASE(NAME)                                                              \
-  case autoware_auto_vehicle_msgs::msg::GearCommand::NAME:                      \
-    proto.set_command(autoware_auto_vehicle_msgs::GearCommand_Constants::NAME); \
+#define CASE(NAME)                                                         \
+  case autoware_vehicle_msgs::msg::GearCommand::NAME:                      \
+    proto.set_command(autoware_vehicle_msgs::GearCommand_Constants::NAME); \
     break
 
   switch (message.command) {
@@ -586,111 +582,20 @@ auto toProto(
 }
 
 auto toMsg(
-  const autoware_auto_vehicle_msgs::GearCommand & proto,
-  autoware_auto_vehicle_msgs::msg::GearCommand & message) -> void
+  const autoware_vehicle_msgs::GearCommand & proto,
+  autoware_vehicle_msgs::msg::GearCommand & message) -> void
 {
   toMsg(proto.stamp(), message.stamp);
   message.command = proto.command();
 }
 
 auto toProto(
-  const std::tuple<
-    autoware_auto_control_msgs::msg::AckermannControlCommand,
-    autoware_auto_vehicle_msgs::msg::GearCommand> & message,
+  const std::tuple<autoware_control_msgs::msg::Control, autoware_vehicle_msgs::msg::GearCommand> &
+    message,
   traffic_simulator_msgs::VehicleCommand & proto) -> void
 {
-  toProto(std::get<0>(message), *proto.mutable_ackermann_control_command());
+  toProto(std::get<0>(message), *proto.mutable_control());
   toProto(std::get<1>(message), *proto.mutable_gear_command());
-}
-
-auto toProto(
-  const autoware_auto_perception_msgs::msg::TrafficLight & message,
-  simulation_api_schema::TrafficLight & proto) -> void
-{
-  auto color = [&]() {
-    switch (message.color) {
-      case autoware_auto_perception_msgs::msg::TrafficLight::GREEN:
-        return simulation_api_schema::TrafficLight_Color_GREEN;
-      case autoware_auto_perception_msgs::msg::TrafficLight::AMBER:
-        return simulation_api_schema::TrafficLight_Color_AMBER;
-      case autoware_auto_perception_msgs::msg::TrafficLight::RED:
-        return simulation_api_schema::TrafficLight_Color_RED;
-      case autoware_auto_perception_msgs::msg::TrafficLight::WHITE:
-        return simulation_api_schema::TrafficLight_Color_WHITE;
-      default:
-        return simulation_api_schema::TrafficLight_Color_UNKNOWN_COLOR;
-    }
-  };
-
-  auto status = [&]() {
-    switch (message.status) {
-      case autoware_auto_perception_msgs::msg::TrafficLight::SOLID_ON:
-        return simulation_api_schema::TrafficLight_Status_SOLID_ON;
-      case autoware_auto_perception_msgs::msg::TrafficLight::SOLID_OFF:
-        return simulation_api_schema::TrafficLight_Status_SOLID_OFF;
-      case autoware_auto_perception_msgs::msg::TrafficLight::FLASHING:
-        return simulation_api_schema::TrafficLight_Status_FLASHING;
-      default:
-        return simulation_api_schema::TrafficLight_Status_UNKNOWN_STATUS;
-    }
-  };
-
-  auto shape = [&]() {
-    switch (message.shape) {
-      case autoware_auto_perception_msgs::msg::TrafficLight::CIRCLE:
-        return simulation_api_schema::TrafficLight_Shape_CIRCLE;
-      case autoware_auto_perception_msgs::msg::TrafficLight::CROSS:
-        return simulation_api_schema::TrafficLight_Shape_CROSS;
-      case autoware_auto_perception_msgs::msg::TrafficLight::LEFT_ARROW:
-        return simulation_api_schema::TrafficLight_Shape_LEFT_ARROW;
-      case autoware_auto_perception_msgs::msg::TrafficLight::DOWN_ARROW:
-        return simulation_api_schema::TrafficLight_Shape_DOWN_ARROW;
-      case autoware_auto_perception_msgs::msg::TrafficLight::UP_ARROW:
-        return simulation_api_schema::TrafficLight_Shape_UP_ARROW;
-      case autoware_auto_perception_msgs::msg::TrafficLight::RIGHT_ARROW:
-        return simulation_api_schema::TrafficLight_Shape_RIGHT_ARROW;
-      case autoware_auto_perception_msgs::msg::TrafficLight::DOWN_LEFT_ARROW:
-        return simulation_api_schema::TrafficLight_Shape_DOWN_LEFT_ARROW;
-      case autoware_auto_perception_msgs::msg::TrafficLight::DOWN_RIGHT_ARROW:
-        return simulation_api_schema::TrafficLight_Shape_DOWN_RIGHT_ARROW;
-      case autoware_auto_perception_msgs::msg::TrafficLight::UP_LEFT_ARROW:
-        return simulation_api_schema::TrafficLight_Shape_UP_LEFT_ARROW;
-      case autoware_auto_perception_msgs::msg::TrafficLight::UP_RIGHT_ARROW:
-        return simulation_api_schema::TrafficLight_Shape_UP_RIGHT_ARROW;
-      default:
-        return simulation_api_schema::TrafficLight_Shape_UNKNOWN_SHAPE;
-    }
-  };
-
-  proto.set_status(status());
-  proto.set_shape(shape());
-  proto.set_color(color());
-  proto.set_confidence(message.confidence);
-}
-
-auto toProto(
-  const autoware_auto_perception_msgs::msg::TrafficSignal & message,
-  simulation_api_schema::TrafficSignal & proto) -> void
-{
-  // here is a lack of information in autoware_auto_perception_msgs::msg
-  // to complete relation_ids in simulation_api_schema::TrafficSignal
-  proto.set_id(message.map_primitive_id);
-  for (const auto & traffic_light : message.lights) {
-    simulation_api_schema::TrafficLight traffic_light_proto;
-    toProto(traffic_light, traffic_light_proto);
-    *proto.add_traffic_light_status() = traffic_light_proto;
-  }
-}
-
-auto toProto(
-  const autoware_auto_perception_msgs::msg::TrafficSignalArray & message,
-  simulation_api_schema::UpdateTrafficLightsRequest & proto) -> void
-{
-  for (const auto & traffic_signal : message.signals) {
-    simulation_api_schema::TrafficSignal traffic_signal_proto;
-    toProto(traffic_signal, traffic_signal_proto);
-    *proto.add_states() = traffic_signal_proto;
-  }
 }
 
 auto toProtobufMessage(const traffic_simulator_msgs::msg::Vertex & message)

@@ -21,6 +21,538 @@ Changelog for package simple_sensor_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+7.3.0 (2024-12-16)
+------------------
+* Merge pull request `#1481 <https://github.com/tier4/scenario_simulator_v2/issues/1481>`_ from tier4/feature/multi-level-lanelet-support
+  Feature/multi level lanelet support
+* Merge branch 'master' into feature/multi-level-lanelet-support
+* Merge branch 'master' into feature/multi-level-lanelet-support
+* Merge branch 'master' into feature/multi-level-lanelet-support
+* fix(simple_sensor_simulator): Fix if condition by adding negation to ensure proper logic
+* Remove unused function and update comment
+* fix(simple_senor_simulator): fix after Szymon discussion
+* fix(simple_sensor_simulator): fix after detection_sensor refactor
+* ref(traffic_simulator, simple_sensor_simulator): refactor altitude checks
+* Refactor code to improve readability based on SonarQube findings
+* Merge branch 'master' into feature/multi-level-lanelet-support
+* Merge branch 'master' into feature/multi-level-lanelet-support
+* Removed unrecognized words because spell-check flagged them as invalid
+* [RJD-1369] Improve Collision Solving for Multi-Level Support
+  - Enhanced BehaviorTree to consider altitude when detecting potential obstacles,
+  allowing to ignore objects located at different altitudes.
+  - Modified the detection sensor by introducing Ego plane determination to exclude objects below the Ego plane,
+  preventing unnecessary slowing or stopping caused by incorrect detections.
+* Contributors: Dawid Moszynski, Kotaro Yoshimoto, SzymonParapura
+
+7.2.0 (2024-12-16)
+------------------
+* Merge pull request `#1484 <https://github.com/tier4/scenario_simulator_v2/issues/1484>`_ from tier4/RJD-736/autoware_msgs_support_and_localization_sim_mode_support
+  Rjd 736/autoware msgs support and localization sim mode support
+* Merge branch 'master' into RJD-736/autoware_msgs_support_and_localization_sim_mode_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support_and_localization_sim_mode_support
+* Merge branch 'master' into RJD-736/autoware_msgs_support_and_localization_sim_mode_support
+* Merge branch 'master' into RJD-736/autoware_msgs_support_and_localization_sim_mode_support
+* Merge branch 'master' into RJD-736/autoware_msgs_support_and_localization_sim_mode_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support_and_localization_sim_mode_support
+* Merge remote-tracking branch 'origin/RJD-736/autoware_msgs_support' into RJD-736/autoware_msgs_support_and_localization_sim_mode_support
+* Merge remote-tracking branch 'origin/RJD-736/autoware_msgs_support' into RJD-736/autoware_msgs_support_and_localization_sim_mode_support
+* Merge remote-tracking branch 'origin/RJD-736/autoware_msgs_support' into RJD-736/autoware_msgs_support_and_localization_sim_mode_support
+* Merge remote-tracking branch 'origin/RJD-736/autoware_msgs_support' into RJD-736/autoware_msgs_support_and_localization_sim_mode_support
+* Merge remote-tracking branch 'origin/RJD-736/autoware_msgs_support' into RJD-736/autoware_msgs_support_and_localization_sim_mode_support
+* Add launch argument `simulate_localization` to `scenario_test_runner`
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+7.1.0 (2024-12-16)
+------------------
+* Merge remote-tracking branch 'origin/master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge remote-tracking branch 'origin/master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge remote-tracking branch 'origin/master' into feature/time-to-collision-condition
+* Merge remote-tracking branch 'origin/master' into feature/time-to-collision-condition
+* Merge remote-tracking branch 'origin/master' into feature/time-to-collision-condition
+* Merge remote-tracking branch 'origin/master' into feature/time-to-collision-condition
+* Merge remote-tracking branch 'origin/master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge remote-tracking branch 'origin/master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge remote-tracking branch 'origin/master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge remote-tracking branch 'origin/master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge remote-tracking branch 'origin/master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge remote-tracking branch 'origin/master' into feature/time-to-collision-condition
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+7.0.4 (2024-12-13)
+------------------
+* Merge branch 'master' into fix/speed-condition/backward-compatibility
+* Merge remote-tracking branch 'origin/master' into fix/speed-condition/backward-compatibility
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+7.0.3 (2024-12-13)
+------------------
+* Merge branch 'master' into fix/request-enable-autoware-control
+* Merge branch 'master' into fix/request-enable-autoware-control
+* Merge branch 'master' into fix/request-enable-autoware-control
+* Merge branch 'master' into fix/request-enable-autoware-control
+* Contributors: Kotaro Yoshimoto
+
+7.0.2 (2024-12-12)
+------------------
+* Merge branch 'master' into fix/snor-cloud-issue-8-1
+* Merge branch 'master' into fix/snor-cloud-issue-8-1
+* Merge branch 'master' into fix/snor-cloud-issue-8-1
+* Merge branch 'master' into fix/snor-cloud-issue-8-1
+* Contributors: Masaya Kataoka, Taiga
+
+7.0.1 (2024-12-11)
+------------------
+* Merge branch 'master' into feature/act-starttrigger-optional
+* Merge branch 'master' into feature/act-starttrigger-optional
+* Contributors: Kotaro Yoshimoto, ぐるぐる
+
+7.0.0 (2024-12-10)
+------------------
+* Merge pull request `#1454 <https://github.com/tier4/scenario_simulator_v2/issues/1454>`_ from tier4/RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge branch 'master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* chore: apply linter
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* fix: replace "awf/universe" with "awf/universe/20240605" for architecture_type
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+  # Conflicts:
+  #	simulation/traffic_simulator/src/traffic_lights/traffic_light_publisher.cpp
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* refactor: added handling when autoware_perception_msgs/msg/traffic_signal_array.hpp is not present
+* chore: delete wrongly doubled word
+* docs: update comment
+* docs: update comment
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+  # Conflicts:
+  #	external/concealer/include/concealer/autoware.hpp
+  #	external/concealer/include/concealer/autoware_universe.hpp
+  #	external/concealer/include/concealer/field_operator_application_for_autoware_universe.hpp
+  #	external/concealer/src/autoware_universe.cpp
+  #	external/concealer/src/field_operator_application_for_autoware_universe.cpp
+* Merge branch 'master' into RJD-736/autoware_msgs_support
+* docs: delete comment for unsupported "awf/universe"
+* fix: delete autoware_auto_xx_msgs from include
+* fix: delete unsupported architecture_type "awf/universe"
+* Merge branch 'master' into RJD-736/autoware_msgs_support
+* Merge branch 'master' into RJD-736/autoware_msgs_support
+* Merge branch 'master' into RJD-736/autoware_msgs_support
+* Merge branch 'master' into RJD-736/autoware_msgs_support
+* Merge branch 'master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge branch 'master' into RJD-736/autoware_msgs_support
+* Merge branch 'master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Apply clang format
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/feature/manual_on_follow_trajectory' into feature/manual_on_follow_trajectory_not_auto
+  # Conflicts:
+  #	simulation/traffic_simulator/include/traffic_simulator/entity/entity_manager.hpp
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge pull request `#1277 <https://github.com/tier4/scenario_simulator_v2/issues/1277>`_ from tier4/RJD-736/autoware_msgs_support_new_traffic_light_group
+  Rjd 736/autoware msgs support new traffic light group
+* Merge remote-tracking branch 'origin/RJD-736/autoware_msgs_support_new_traffic_light_group' into feature/manual_on_follow_trajectory_not_auto
+  # Conflicts:
+  #	external/concealer/src/autoware_universe.cpp
+* feat(traffic_simulator): support TrafficLightGroupArray in SimpleSensorSimulator
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Port DetectedObjects and TrackedObjects
+* Port TrafficSignalArray from autoware_auto_perception_msgs to autoware_perception_msgs
+* Port GearCommand
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, Michał Kiełczykowski
+
+6.3.1 (2024-12-10)
+------------------
+* Merge branch 'master' into fix/sonor-cloud-issue-8-3
+* Merge branch 'master' into fix/sonor-cloud-issue-8-3
+* Contributors: Masaya Kataoka
+
+6.3.0 (2024-12-10)
+------------------
+* Merge branch 'master' into feature/lane-change-everywhere
+* Merge remote-tracking branch 'origin/master' into feature/lane-change-everywhere
+* Merge remote-tracking branch 'origin/master' into feature/lane-change-everywhere
+* Contributors: Kotaro Yoshimoto
+
+6.2.5 (2024-12-09)
+------------------
+* Merge pull request `#1477 <https://github.com/tier4/scenario_simulator_v2/issues/1477>`_ from tier4/fix/acc_by_slope
+* refactor: use std::atan2 instead of std::atan
+* Merge branch 'master' into fix/acc_by_slope
+* fix: EgoEntitySimulation::calculateAccelerationBySlope()
+* refactor: EgoEntitySimulation::calculateAccelerationBySlope unit test
+* chore: add test for calculated expected value in  EgoEntitySimulation::calculateAccelerationBySlope unit test
+* fix: use pitch-filled map pose in EgoEntitySimulation::calculateAccelerationBySlope test
+* fix: fix pitch angle sign in ego entity simulation test
+* Contributors: Kotaro Yoshimoto
+
+6.2.4 (2024-12-09)
+------------------
+* Merge branch 'master' into refactor/speed-condition
+* Merge branch 'master' into refactor/speed-condition
+* Contributors: Tatsuya Yamasaki
+
+6.2.3 (2024-12-05)
+------------------
+* Merge branch 'master' into fix/sonor-cloud-issue-8-2
+* Contributors: Masaya Kataoka
+
+6.2.2 (2024-12-04)
+------------------
+* Merge branch 'master' into refactor/distance-condition
+* Merge remote-tracking branch 'origin/master' into refactor/distance-condition
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+6.2.1 (2024-12-03)
+------------------
+* Merge branch 'master' into refactor/distance-condition-and-relative-distance-condition
+* Contributors: Tatsuya Yamasaki
+
+6.2.0 (2024-12-02)
+------------------
+* Merge branch 'master' into feature/relative-speed-condition
+* Merge remote-tracking branch 'origin/master' into feature/relative-speed-condition
+* Merge remote-tracking branch 'origin/master' into feature/relative-speed-condition
+* Merge remote-tracking branch 'origin/master' into feature/relative-speed-condition
+* Merge remote-tracking branch 'origin/master' into feature/relative-speed-condition
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+6.1.3 (2024-11-29)
+------------------
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge remote-tracking branch 'tier4/RJD-1057-traffic-lights-tests' into RJD-1057-traffic-lights-tests
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge remote-tracking branch 'tier4/master' into RJD-1057-traffic-lights-tests
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge remote-tracking branch 'tier4/RJD-1057-remove-traffic-lights-from-entity-manager' into RJD-1057-traffic-lights-tests
+* Merge branch 'RJD-1057-remove-traffic-lights-from-entity-manager' into RJD-1057-traffic-lights-tests
+* Merge branch 'RJD-1057-remove-traffic-lights-from-entity-manager' into RJD-1057-traffic-lights-tests
+* Merge branch 'RJD-1057-remove-traffic-lights-from-entity-manager' into RJD-1057-traffic-lights-tests
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Mateusz Palczuk, Tatsuya Yamasaki
+
+6.1.2 (2024-11-29)
+------------------
+* Merge branch 'master' into refactor/interpreter
+* Contributors: Tatsuya Yamasaki
+
+6.1.1 (2024-11-29)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/sonarcloud_warning
+* Merge branch 'master' into fix/sonarcloud_warning
+* Merge branch 'master' into fix/sonarcloud_warning
+* Contributors: Masaya Kataoka
+
+6.1.0 (2024-11-29)
+------------------
+
+6.0.1 (2024-11-27)
+------------------
+* Merge pull request `#1442 <https://github.com/tier4/scenario_simulator_v2/issues/1442>`_ from tier4/feat/add-glog-simple-sensor-simulator
+  Feat/add glog simple sensor simulator
+* fix: update cmake
+* fix: implementation
+* Revert "fix: use glog_vendor"
+  This reverts commit 96f6c540fad3faa43c6a8eb82c48c467e746675f.
+* fix: use glog_vendor
+* feat(simple_sensor_simulator): add glog
+* Contributors: Masaya Kataoka, satoshi-ota
+
+6.0.0 (2024-11-27)
+------------------
+* Merge branch 'master' into refactor/add_routing_graph_argument
+* Merge branch 'master' into refactor/add_routing_graph_argument
+* Contributors: Kotaro Yoshimoto
+
+5.5.0 (2024-11-27)
+------------------
+
+5.4.0 (2024-11-26)
+------------------
+* Merge branch 'master' into feature/shoulder_routing_graph
+* Contributors: Kotaro Yoshimoto
+
+5.3.4 (2024-11-21)
+------------------
+* Merge pull request `#1447 <https://github.com/tier4/scenario_simulator_v2/issues/1447>`_ from tier4/fix/find_nearest_segment_index
+  fix pitch and slope acceleration calculation for ego vehicle
+* Merge branch 'master' into fix/find_nearest_segment_index
+* fix: delete EgoEntitySimulation::calculateEgoPitch and replace it with pitch from ego status
+* refactor: mark as EgoEntitySimulation::calculateAccelerationBySlope const
+* fix: use world position for calculating nearest center line point
+* feat: add tests for EgoEntitySimulation::calculateAccelerationBySlope
+* refactor: extract some process to EgoEntitySimulation::calculateAccelerationBySlope
+* Revert "fix: use map based pose for pitch angle calculation"
+  This reverts commit c957a325c4d39e148a69c2c5f5a25db8989a1faf.
+* fix: use map based pose for pitch angle calculation
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka
+
+5.3.3 (2024-11-21)
+------------------
+* Merge branch 'master' into fix/sonor-cloud-issue-7
+* Contributors: Masaya Kataoka
+
+5.3.2 (2024-11-18)
+------------------
+* Merge branch 'master' into fix/interpreter/assign-route-action
+* Merge branch 'master' into fix/interpreter/assign-route-action
+* Contributors: Tatsuya Yamasaki
+
+5.3.1 (2024-11-18)
+------------------
+* Merge branch 'master' into refactor/routing_graph
+* Merge branch 'master' into refactor/routing_graph
+* Contributors: Kotaro Yoshimoto
+
+5.3.0 (2024-11-18)
+------------------
+* Merge pull request `#1421 <https://github.com/tier4/scenario_simulator_v2/issues/1421>`_ from tier4/feature/manual_on_follow_trajectory_with_new_state
+* Merge branch 'master' into feature/manual_on_follow_trajectory_with_new_state
+* Merge branch 'master' into feature/manual_on_follow_trajectory_with_new_state
+* Merge branch 'master' into feature/manual_on_follow_trajectory_with_new_state
+* Merge branch 'master' into feature/manual_on_follow_trajectory_with_new_state
+* Merge remote-tracking branch 'origin/master' into feature/manual_on_follow_trajectory_with_new_state
+* Merge remote-tracking branch 'origin/master' into feature/manual_on_follow_trajectory_with_new_state
+* Merge branch 'master' into feature/manual_on_follow_trajectory
+* Merge remote-tracking branch 'origin/master' into feature/manual_on_follow_trajectory
+* Merge branch 'master' into feature/manual_on_follow_trajectory
+* Merge branch 'master' into feature/manual_on_follow_trajectory
+* Merge branch 'master' into feature/manual_on_follow_trajectory
+* Merge branch 'master' into feature/manual_on_follow_trajectory
+* refactor: change some variable name and comment
+* Merge remote-tracking branch 'origin/feature/manual_on_follow_trajectory' into feature/manual_on_follow_trajectory
+* Merge branch 'master' into feature/manual_on_follow_trajectory
+* fix: avoid finishing the override during control mode is MANUAL
+* fix(concealer): simulate hardware override
+* refactor(concealer): switch ego overriding by vehicle status
+* Merge branch 'master' into feature/manual_on_follow_trajectory
+* Merge branch 'master' into feature/manual_on_follow_trajectory
+* Merge branch 'master' into feature/manual_on_follow_trajectory
+* Merge remote-tracking branch 'origin/fix/RJD-955-fix-followtrajectoryaction-nan-time' into feature/manual_on_follow_trajectory
+* Merge remote-tracking branch 'origin/master' into feature/manual_on_follow_trajectory
+* feat: use manual mode when follow trajectory action is enabled
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
+5.2.3 (2024-11-18)
+------------------
+
+5.2.2 (2024-11-15)
+------------------
+* Merge branch 'master' into fix/sonor-cloud-issue-6
+* Contributors: Taiga
+
+5.2.1 (2024-11-14)
+------------------
+* Merge branch 'master' into RJD-1333/previous_following_lanelets
+* Merge branch 'master' into RJD-1333/previous_following_lanelets
+* Merge branch 'master' into RJD-1333/previous_following_lanelets
+* Contributors: Grzegorz Maj
+
+5.2.0 (2024-11-14)
+------------------
+* Merge branch 'master' into feature/by_object_type
+* Merge branch 'master' into feature/by_object_type
+* Merge branch 'master' into feature/by_object_type
+* Merge branch 'master' into feature/by_object_type
+* Contributors: Tatsuya Yamasaki
+
+5.1.1 (2024-11-13)
+------------------
+* Merge branch 'master' into fix/sonor-cloud-issue-5
+* Merge branch 'master' into fix/sonor-cloud-issue-5
+* Merge branch 'master' into fix/sonor-cloud-issue-5
+* Contributors: Masaya Kataoka, Taiga
+
+5.1.0 (2024-11-12)
+------------------
+* Merge pull request `#1357 <https://github.com/tier4/scenario_simulator_v2/issues/1357>`_ from tier4/feature/traffic_light_group
+* apply linter
+* Merge branch 'master' into feature/traffic_light_group
+* refactor: adjust include
+* fix: remove deleted cpp file in CMakeLists.txt
+* feat: support awf/universe/20240605 as architecture_type for V2I traffic light
+* refactor: use traffic light publisher from traffic_simulator in simple_sensor_simulator
+* Merge remote-tracking branch 'origin/master' into feature/traffic_light_group
+  # Conflicts:
+  #	simulation/simple_sensor_simulator/include/simple_sensor_simulator/sensor_simulation/sensor_simulation.hpp
+  #	simulation/traffic_simulator/include/traffic_simulator/entity/entity_manager.hpp
+  #	simulation/traffic_simulator/src/traffic_lights/traffic_light_publisher.cpp
+* Merge branch 'master' into feature/traffic_light_group
+* Merge branch 'master' into feature/traffic_light_group
+* Merge branch 'master' into feature/traffic_light_group
+* Merge branch 'master' into feature/traffic_light_group
+* Merge branch 'master' into feature/traffic_light_group
+* Merge branch 'master' into feature/traffic_light_group
+* chore: apply formatter
+* feat(traffic_simulator): support TrafficLightGroupArray in SimpleSensorSimulator
+* Contributors: Kotaro Yoshimoto
+
+5.0.2 (2024-11-11)
+------------------
+* Merge branch 'master' into fix/sonor-cloud-issue
+* Merge branch 'master' into fix/sonor-cloud-issue
+* Contributors: Masaya Kataoka, Taiga
+
+5.0.1 (2024-11-11)
+------------------
+
+5.0.0 (2024-11-08)
+------------------
+* Merge pull request `#1406 <https://github.com/tier4/scenario_simulator_v2/issues/1406>`_ from tier4/RJD-1057-remove-traffic-lights-from-entity-manager
+  RJD-1057 (1/5): Remove non-API member functions: EntityManager’s TrafficLight related member functions
+* Merge remote-tracking branch 'tier4/master' into RJD-1057-remove-traffic-lights-from-entity-manager
+* Merge branch 'master' into RJD-1057-remove-traffic-lights-from-entity-manager
+* Merge branch 'master' into RJD-1057-remove-traffic-lights-from-entity-manager
+* Fix copyright notice date
+* Merge branch 'master' into RJD-1057-remove-traffic-lights-from-entity-manager
+* fix(traffic_lights): improve the meaning of comments
+* Merge branch 'master' into RJD-1057-remove-traffic-lights-from-entity-manager
+* Fix spelling
+* Merge remote-tracking branch 'tier4/master' into RJD-1057-remove-traffic-lights-from-entity-manager
+* Merge branch 'RJD-1057-base' into RJD-1057-remove-traffic-lights-from-entity-manager
+* Merge branch 'RJD-1057-base' into RJD-1057-remove-traffic-lights-from-entity-manager
+* Merge branch 'RJD-1057-base' into RJD-1057-remove-traffic-lights-from-entity-manager
+* feat(traffic_lights): develop individual traffic_lights_publisher for simple_sensor_simulator
+* feat(scenario_sensor_simulator/traffic_lights_detector): remove dependencies on hdmap_utils, improve creation
+* Merge branch 'RJD-1057-base' into RJD-1057-remove-traffic-lights-from-entity-manager
+* Contributors: Dawid Moszynski, Dawid Moszyński, Kotaro Yoshimoto, Mateusz Palczuk, Tatsuya Yamasaki
+
+4.5.0 (2024-11-07)
+------------------
+* Merge pull request `#1437 <https://github.com/tier4/scenario_simulator_v2/issues/1437>`_ from tier4/chore/extend-npc-matching-distance
+* docs: add memos for default lanelet matching distance
+* Merge branch 'master' into chore/extend-npc-matching-distance
+* use 1.5 for default lanelet matching distance for vehicle NPCs
+* Merge branch 'master' into chore/extend-npc-matching-distance
+* extend for default lanelet matching distance for NPCs
+* Contributors: Kotaro Yoshimoto
+
+4.4.1 (2024-11-07)
+------------------
+* Merge branch 'master' into RJD-1336/fix_request_speed_change
+* Merge branch 'master' into RJD-1336/fix_request_speed_change
+* Merge branch 'RJD-1336/fix_request_speed_change' of github.com:tier4/scenario_simulator_v2 into RJD-1336/fix_request_speed_change
+* Merge branch 'master' into RJD-1336/fix_request_speed_change
+* Merge branch 'master' into RJD-1336/fix_request_speed_change
+* Contributors: Michał Ciasnocha, robomic
+
+4.4.0 (2024-11-07)
+------------------
+* Merge branch 'master' into fix/longitudinal_distance
+* Merge branch 'master' into fix/longitudinal_distance
+* Merge branch 'master' into fix/longitudinal_distance
+* Merge branch 'master' into fix/longitudinal_distance
+* Merge branch 'fix/longitudinal_distance' of github.com:tier4/scenario_simulator_v2 into fix/longitudinal_distance
+* Merge branch 'master' into fix/longitudinal_distance
+* Merge branch 'fix/longitudinal_distance' of github.com:tier4/scenario_simulator_v2 into fix/longitudinal_distance
+* Merge branch 'master' into fix/longitudinal_distance
+* Contributors: Masaya Kataoka, Michał Ciasnocha, robomic
+
+4.3.27 (2024-11-07)
+-------------------
+
+4.3.26 (2024-11-06)
+-------------------
+
+4.3.25 (2024-11-05)
+-------------------
+
+4.3.24 (2024-11-01)
+-------------------
+* Merge branch 'master' into fix/remove-topic-logic
+* Merge branch 'master' into fix/remove-topic-logic
+* Contributors: Masaya Kataoka
+
+4.3.23 (2024-11-01)
+-------------------
+
+4.3.22 (2024-10-31)
+-------------------
+* Merge branch 'master' into fix/improved-readability
+* Contributors: Masaya Kataoka
+
+4.3.21 (2024-10-31)
+-------------------
+* Merge branch 'master' into RJD-1337/getQuadraticAccelerationDuration
+* Merge branch 'master' into RJD-1337/getQuadraticAccelerationDuration
+* Merge branch 'master' into RJD-1337/getQuadraticAccelerationDuration
+* Merge branch 'master' into RJD-1337/getQuadraticAccelerationDuration
+* Contributors: Grzegorz Maj, Masaya Kataoka
+
+4.3.20 (2024-10-31)
+-------------------
+* Merge branch 'master' into RJD-1335/requestSpeedChange
+* Contributors: Grzegorz Maj
+
+4.3.19 (2024-10-30)
+-------------------
+
+4.3.18 (2024-10-18)
+-------------------
+* Merge branch 'master' into feature/json/boost-json
+* Merge branch 'master' into feature/json/boost-json
+* Merge remote-tracking branch 'origin/master' into feature/json/boost-json
+* Contributors: Kotaro Yoshimoto, f0reachARR, ぐるぐる
+
+4.3.17 (2024-10-17)
+-------------------
+* Merge branch 'master' into fix/remove_warnings_from_sonarcloud
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/remove_warnings_from_sonarcloud
+* Contributors: Masaya Kataoka
+
+4.3.16 (2024-10-15)
+-------------------
+
 4.3.15 (2024-10-10)
 -------------------
 * Merge pull request `#1361 <https://github.com/tier4/scenario_simulator_v2/issues/1361>`_ from tier4/fix/RJD-1296-fix-random001-ego-issue

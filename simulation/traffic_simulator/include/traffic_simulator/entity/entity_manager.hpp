@@ -146,17 +146,17 @@ public:
                (traffic_simulator_msgs::msg::EntityType::MISC_OBJECT == entity_type.type);
       }(entity_status.type);
 
-      const auto matching_distance = [](const auto & parameters) {
+      const auto matching_distance = [](const auto & local_parameters) {
         if constexpr (std::is_same_v<
                         std::decay_t<ParametersType>,
                         traffic_simulator_msgs::msg::VehicleParameters>) {
           return std::max(
-                   parameters.axles.front_axle.track_width,
-                   parameters.axles.rear_axle.track_width) *
+                   local_parameters.axles.front_axle.track_width,
+                   local_parameters.axles.rear_axle.track_width) *
                    0.5 +
                  1.0;
         } else {
-          return parameters.bounding_box.dimensions.y * 0.5 + 1.0;
+          return local_parameters.bounding_box.dimensions.y * 0.5 + 1.0;
         }
       }(parameters);
 
@@ -200,7 +200,7 @@ public:
   auto getEgoEntity(const std::string & name) const -> std::shared_ptr<entity::EgoEntity>;
 
   // entities - checks, getters
-  auto isEntitySpawned(const std::string & name) -> bool;
+  auto isEntityExist(const std::string & name) const -> bool;
 
   auto getEntityNames() const -> const std::vector<std::string>;
 

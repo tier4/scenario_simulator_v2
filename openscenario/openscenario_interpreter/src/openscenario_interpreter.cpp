@@ -15,13 +15,14 @@
 #define OPENSCENARIO_INTERPRETER_NO_EXTENSION
 
 #include <algorithm>
-#include <nlohmann/json.hpp>
+#include <boost/json.hpp>
 #include <openscenario_interpreter/openscenario_interpreter.hpp>
 #include <openscenario_interpreter/record.hpp>
 #include <openscenario_interpreter/syntax/object_controller.hpp>
 #include <openscenario_interpreter/syntax/parameter_value_distribution.hpp>
 #include <openscenario_interpreter/syntax/scenario_definition.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
+#include <openscenario_interpreter/syntax/speed_condition.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
 #include <status_monitor/status_monitor.hpp>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
@@ -49,6 +50,10 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   DECLARE_PARAMETER(output_directory);
   DECLARE_PARAMETER(publish_empty_context);
   DECLARE_PARAMETER(record);
+
+  declare_parameter<std::string>("speed_condition", "legacy");
+  SpeedCondition::compatibility =
+    boost::lexical_cast<Compatibility>(get_parameter("speed_condition").as_string());
 }
 
 Interpreter::~Interpreter() {}
@@ -287,12 +292,13 @@ auto Interpreter::publishCurrentContext() const -> void
 {
   Context context;
   {
-    nlohmann::json json;
+    boost::json::monotonic_resource mr;
+    boost::json::object json(&mr);
     context.stamp = now();
     if (publish_empty_context) {
       context.data = "";
     } else {
-      context.data = (json << *script).dump();
+      context.data = boost::json::serialize(json << *script);
     }
     context.time = evaluateSimulationTime();
   }
