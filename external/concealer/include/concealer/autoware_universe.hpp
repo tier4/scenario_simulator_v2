@@ -49,6 +49,7 @@ public:
   using ControlModeReport           = autoware_vehicle_msgs::msg::ControlModeReport;
   using GearCommand                 = autoware_vehicle_msgs::msg::GearCommand;
   using GearReport                  = autoware_vehicle_msgs::msg::GearReport;
+  using Odometry                    = nav_msgs::msg::Odometry;
   using PathWithLaneId              = tier4_planning_msgs::msg::PathWithLaneId;
   using PoseWithCovarianceStamped   = geometry_msgs::msg::PoseWithCovarianceStamped;
   using SteeringReport              = autoware_vehicle_msgs::msg::SteeringReport;
@@ -62,7 +63,7 @@ public:
   SubscriberWrapper<PathWithLaneId>        getPathWithLaneId;
 
   PublisherWrapper<AccelWithCovarianceStamped> setAcceleration;
-  PublisherWrapper<nav_msgs::msg::Odometry>    setOdometry;
+  PublisherWrapper<Odometry>                   setOdometry;
   PublisherWrapper<PoseWithCovarianceStamped>  setPose;
   PublisherWrapper<SteeringReport>             setSteeringReport;
   PublisherWrapper<GearReport>                 setGearReport;

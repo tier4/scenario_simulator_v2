@@ -90,26 +90,45 @@ struct FieldOperatorApplication : public rclcpp::Node,
   std::string minimum_risk_maneuver_behavior;
 
   // clang-format off
-  SubscriberWrapper<autoware_system_msgs::msg::AutowareState>                     getAutowareState;
-  SubscriberWrapper<autoware_control_msgs::msg::Control>                          getCommand;
-  SubscriberWrapper<tier4_rtc_msgs::msg::CooperateStatusArray>                    getCooperateStatusArray;
-  SubscriberWrapper<tier4_external_api_msgs::msg::Emergency>                      getEmergencyState;
-#if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)
-  SubscriberWrapper<autoware_adapi_v1_msgs::msg::LocalizationInitializationState> getLocalizationState;
-#endif
-  SubscriberWrapper<autoware_adapi_v1_msgs::msg::MrmState>                        getMrmState;
-  SubscriberWrapper<tier4_planning_msgs::msg::PathWithLaneId>                     getPathWithLaneId;
-  SubscriberWrapper<tier4_planning_msgs::msg::Trajectory>                         getTrajectory;
-  SubscriberWrapper<autoware_vehicle_msgs::msg::TurnIndicatorsCommand>            getTurnIndicatorsCommand;
+  using AutowareState                   = autoware_system_msgs::msg::AutowareState;
+  using Control                         = autoware_control_msgs::msg::Control;
+  using CooperateStatusArray            = tier4_rtc_msgs::msg::CooperateStatusArray;
+  using Emergency                       = tier4_external_api_msgs::msg::Emergency;
+  using LocalizationInitializationState = autoware_adapi_v1_msgs::msg::LocalizationInitializationState;
+  using MrmState                        = autoware_adapi_v1_msgs::msg::MrmState;
+  using PathWithLaneId                  = tier4_planning_msgs::msg::PathWithLaneId;
+  using Trajectory                      = tier4_planning_msgs::msg::Trajectory;
+  using TurnIndicatorsCommand           = autoware_vehicle_msgs::msg::TurnIndicatorsCommand;
 
-  ServiceWithValidation<autoware_adapi_v1_msgs::srv::ClearRoute>                  requestClearRoute;
-  ServiceWithValidation<tier4_rtc_msgs::srv::CooperateCommands>                   requestCooperateCommands;
-  ServiceWithValidation<tier4_external_api_msgs::srv::Engage>                     requestEngage;
-  ServiceWithValidation<autoware_adapi_v1_msgs::srv::InitializeLocalization>      requestInitialPose;
-  ServiceWithValidation<autoware_adapi_v1_msgs::srv::SetRoutePoints>              requestSetRoutePoints;
-  ServiceWithValidation<tier4_rtc_msgs::srv::AutoModeWithModule>                  requestSetRtcAutoMode;
-  ServiceWithValidation<tier4_external_api_msgs::srv::SetVelocityLimit>           requestSetVelocityLimit;
-  ServiceWithValidation<autoware_adapi_v1_msgs::srv::ChangeOperationMode>         requestEnableAutowareControl;
+  using ClearRoute                      = autoware_adapi_v1_msgs::srv::ClearRoute;
+  using CooperateCommands               = tier4_rtc_msgs::srv::CooperateCommands;
+  using Engage                          = tier4_external_api_msgs::srv::Engage;
+  using InitializeLocalization          = autoware_adapi_v1_msgs::srv::InitializeLocalization;
+  using SetRoutePoints                  = autoware_adapi_v1_msgs::srv::SetRoutePoints;
+  using AutoModeWithModule              = tier4_rtc_msgs::srv::AutoModeWithModule;
+  using SetVelocityLimit                = tier4_external_api_msgs::srv::SetVelocityLimit;
+  using ChangeOperationMode             = autoware_adapi_v1_msgs::srv::ChangeOperationMode;
+
+  SubscriberWrapper<AutowareState>                   getAutowareState;
+  SubscriberWrapper<Control>                         getCommand;
+  SubscriberWrapper<CooperateStatusArray>            getCooperateStatusArray;
+  SubscriberWrapper<Emergency>                       getEmergencyState;
+#if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)
+  SubscriberWrapper<LocalizationInitializationState> getLocalizationState;
+#endif
+  SubscriberWrapper<MrmState>                        getMrmState;
+  SubscriberWrapper<PathWithLaneId>                  getPathWithLaneId;
+  SubscriberWrapper<Trajectory>                      getTrajectory;
+  SubscriberWrapper<TurnIndicatorsCommand>           getTurnIndicatorsCommand;
+
+  ServiceWithValidation<ClearRoute>                  requestClearRoute;
+  ServiceWithValidation<CooperateCommands>           requestCooperateCommands;
+  ServiceWithValidation<Engage>                      requestEngage;
+  ServiceWithValidation<InitializeLocalization>      requestInitialPose;
+  ServiceWithValidation<SetRoutePoints>              requestSetRoutePoints;
+  ServiceWithValidation<AutoModeWithModule>          requestSetRtcAutoMode;
+  ServiceWithValidation<SetVelocityLimit>            requestSetVelocityLimit;
+  ServiceWithValidation<ChangeOperationMode>         requestEnableAutowareControl;
   // clang-format on
 
   CONCEALER_PUBLIC explicit FieldOperatorApplication(const pid_t = 0);

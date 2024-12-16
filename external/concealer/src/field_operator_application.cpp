@@ -111,19 +111,19 @@ FieldOperatorApplication::FieldOperatorApplication(const pid_t pid)
   getAutowareState("/autoware/state", rclcpp::QoS(1), *this, [this](const auto & message) {
     auto state_name_of = [](auto state) constexpr {
       switch (state) {
-        case autoware_system_msgs::msg::AutowareState::INITIALIZING:
+        case AutowareState::INITIALIZING:
           return "INITIALIZING";
-        case autoware_system_msgs::msg::AutowareState::WAITING_FOR_ROUTE:
+        case AutowareState::WAITING_FOR_ROUTE:
           return "WAITING_FOR_ROUTE";
-        case autoware_system_msgs::msg::AutowareState::PLANNING:
+        case AutowareState::PLANNING:
           return "PLANNING";
-        case autoware_system_msgs::msg::AutowareState::WAITING_FOR_ENGAGE:
+        case AutowareState::WAITING_FOR_ENGAGE:
           return "WAITING_FOR_ENGAGE";
-        case autoware_system_msgs::msg::AutowareState::DRIVING:
+        case AutowareState::DRIVING:
           return "DRIVING";
-        case autoware_system_msgs::msg::AutowareState::ARRIVED_GOAL:
+        case AutowareState::ARRIVED_GOAL:
           return "ARRIVED_GOAL";
-        case autoware_system_msgs::msg::AutowareState::FINALIZING:
+        case AutowareState::FINALIZING:
           return "FINALIZING";
         default:
           return "";
@@ -145,15 +145,15 @@ FieldOperatorApplication::FieldOperatorApplication(const pid_t pid)
   getMrmState("/api/fail_safe/mrm_state", rclcpp::QoS(1), *this, [this](const auto & message) {
     auto state_name_of = [](auto state) constexpr {
       switch (state) {
-        case autoware_adapi_v1_msgs::msg::MrmState::MRM_FAILED:
+        case MrmState::MRM_FAILED:
           return "MRM_FAILED";
-        case autoware_adapi_v1_msgs::msg::MrmState::MRM_OPERATING:
+        case MrmState::MRM_OPERATING:
           return "MRM_OPERATING";
-        case autoware_adapi_v1_msgs::msg::MrmState::MRM_SUCCEEDED:
+        case MrmState::MRM_SUCCEEDED:
           return "MRM_SUCCEEDED";
-        case autoware_adapi_v1_msgs::msg::MrmState::NORMAL:
+        case MrmState::NORMAL:
           return "NORMAL";
-        case autoware_adapi_v1_msgs::msg::MrmState::UNKNOWN:
+        case MrmState::UNKNOWN:
           return "UNKNOWN";
         default:
           throw common::Error(
@@ -162,28 +162,28 @@ FieldOperatorApplication::FieldOperatorApplication(const pid_t pid)
     };
 
     auto behavior_name_of = [](auto behavior) constexpr {
-      if constexpr (DetectStaticMember_COMFORTABLE_STOP<autoware_adapi_v1_msgs::msg::MrmState>::value) {
-        if (behavior == autoware_adapi_v1_msgs::msg::MrmState::COMFORTABLE_STOP) {
+      if constexpr (DetectStaticMember_COMFORTABLE_STOP<MrmState>::value) {
+        if (behavior == MrmState::COMFORTABLE_STOP) {
           return "COMFORTABLE_STOP";
         }
       }
-      if constexpr (DetectStaticMember_EMERGENCY_STOP<autoware_adapi_v1_msgs::msg::MrmState>::value) {
-        if (behavior == autoware_adapi_v1_msgs::msg::MrmState::EMERGENCY_STOP) {
+      if constexpr (DetectStaticMember_EMERGENCY_STOP<MrmState>::value) {
+        if (behavior == MrmState::EMERGENCY_STOP) {
           return "EMERGENCY_STOP";
         }
       }
-      if constexpr (DetectStaticMember_NONE<autoware_adapi_v1_msgs::msg::MrmState>::value) {
-        if (behavior == autoware_adapi_v1_msgs::msg::MrmState::NONE) {
+      if constexpr (DetectStaticMember_NONE<MrmState>::value) {
+        if (behavior == MrmState::NONE) {
           return "NONE";
         }
       }
-      if constexpr (DetectStaticMember_UNKNOWN<autoware_adapi_v1_msgs::msg::MrmState>::value) {
-        if (behavior == autoware_adapi_v1_msgs::msg::MrmState::UNKNOWN) {
+      if constexpr (DetectStaticMember_UNKNOWN<MrmState>::value) {
+        if (behavior == MrmState::UNKNOWN) {
           return "UNKNOWN";
         }
       }
-      if constexpr (DetectStaticMember_PULL_OVER<autoware_adapi_v1_msgs::msg::MrmState>::value) {
-        if (behavior == autoware_adapi_v1_msgs::msg::MrmState::PULL_OVER) {
+      if constexpr (DetectStaticMember_PULL_OVER<MrmState>::value) {
+        if (behavior == MrmState::PULL_OVER) {
           return "PULL_OVER";
         }
       }
@@ -225,14 +225,14 @@ auto FieldOperatorApplication::clearRoute() -> void
        Autoware, set the attempts_count to a high value. There is no technical
        basis for the number 30.
     */
-    requestClearRoute(std::make_shared<autoware_adapi_v1_msgs::srv::ClearRoute::Request>(), 30);
+    requestClearRoute(std::make_shared<ClearRoute::Request>(), 30);
   });
 }
 
 auto FieldOperatorApplication::enableAutowareControl() -> void
 {
   task_queue.delay([this]() {
-    auto request = std::make_shared<autoware_adapi_v1_msgs::srv::ChangeOperationMode::Request>();
+    auto request = std::make_shared<ChangeOperationMode::Request>();
     requestEnableAutowareControl(request, 30);
   });
 }
@@ -241,7 +241,7 @@ auto FieldOperatorApplication::engage() -> void
 {
   task_queue.delay([this]() {
     waitForAutowareStateToBeDriving([this]() {
-      auto request = std::make_shared<tier4_external_api_msgs::srv::Engage::Request>();
+      auto request = std::make_shared<Engage::Request>();
       request->engage = true;
       try {
         return requestEngage(request);
@@ -282,9 +282,7 @@ auto FieldOperatorApplication::initialize(const geometry_msgs::msg::Pose & initi
     task_queue.delay([this, initial_pose]() {
       waitForAutowareStateToBeWaitingForRoute([&]() {
 #if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)
-        if (
-          getLocalizationState().state !=
-          autoware_adapi_v1_msgs::msg::LocalizationInitializationState::UNINITIALIZED) {
+        if (getLocalizationState().state != LocalizationInitializationState::UNINITIALIZED) {
           return;
         }
 #endif
@@ -315,7 +313,7 @@ auto FieldOperatorApplication::plan(const std::vector<geometry_msgs::msg::PoseSt
   task_queue.delay([this, route] {
     waitForAutowareStateToBeWaitingForRoute();  // NOTE: This is assertion.
 
-    auto request = std::make_shared<autoware_adapi_v1_msgs::srv::SetRoutePoints::Request>();
+    auto request = std::make_shared<SetRoutePoints::Request>();
 
     request->header = route.back().header;
 
@@ -332,10 +330,9 @@ auto FieldOperatorApplication::plan(const std::vector<geometry_msgs::msg::PoseSt
        [2] https://github.com/autowarefoundation/autoware_adapi_msgs/commit/cf310bd038673b6cbef3ae3b61dfe607212de419
     */
     if constexpr (
-      DetectMember_option<autoware_adapi_v1_msgs::srv::SetRoutePoints::Request>::value and
+      DetectMember_option<SetRoutePoints::Request>::value and
       DetectMember_allow_goal_modification<
-        decltype(std::declval<autoware_adapi_v1_msgs::srv::SetRoutePoints::Request>()
-                   .option)>::value) {
+        decltype(std::declval<SetRoutePoints::Request>().option)>::value) {
       request->option.allow_goal_modification =
         get_parameter("allow_goal_modification").get_value<bool>();
     }
@@ -361,7 +358,7 @@ auto FieldOperatorApplication::requestAutoModeForCooperation(
   */
   if (not isPackageExists("rtc_auto_mode_manager")) {
     task_queue.delay([this, module_name, enable]() {
-      auto request = std::make_shared<tier4_rtc_msgs::srv::AutoModeWithModule::Request>();
+      auto request = std::make_shared<AutoModeWithModule::Request>();
       request->module.type = toModuleType<tier4_rtc_msgs::msg::Module>(module_name);
       request->enable = enable;
       /*
@@ -450,7 +447,7 @@ auto FieldOperatorApplication::sendCooperateCommand(
 auto FieldOperatorApplication::setVelocityLimit(double velocity_limit) -> void
 {
   task_queue.delay([this, velocity_limit]() {
-    auto request = std::make_shared<tier4_external_api_msgs::srv::SetVelocityLimit::Request>();
+    auto request = std::make_shared<SetVelocityLimit::Request>();
     request->velocity = velocity_limit;
     // We attempt to resend the service up to 30 times, but this number of times was determined by
     // heuristics, not for any technical reason

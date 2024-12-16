@@ -121,7 +121,7 @@ auto AutowareUniverse::updateLocalization() -> void
   }());
 
   setOdometry([this]() {
-    nav_msgs::msg::Odometry message;
+    Odometry message;
     message.header.stamp = get_clock()->now();
     message.header.frame_id = "map";
     message.pose.pose = current_pose.load();
@@ -132,7 +132,7 @@ auto AutowareUniverse::updateLocalization() -> void
 
   setPose([this]() {
     // See https://github.com/tier4/autoware.universe/blob/45ab20af979c5663e5a8d4dda787b1dea8d6e55b/simulator/simple_planning_simulator/src/simple_planning_simulator/simple_planning_simulator_core.cpp#L785-L803
-    geometry_msgs::msg::PoseWithCovarianceStamped message;
+    PoseWithCovarianceStamped message;
     message.header.stamp = get_clock()->now();
     message.header.frame_id = "map";
     message.pose.pose = current_pose.load();
