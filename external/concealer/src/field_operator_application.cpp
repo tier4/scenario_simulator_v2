@@ -20,35 +20,33 @@
 
 namespace concealer
 {
-template <typename T>
-auto toAutowareStateString(std::uint8_t state) -> char const *
-{
-#define CASE(IDENTIFIER) \
-  case T::IDENTIFIER:    \
-    return #IDENTIFIER
-
-  switch (state) {
-    CASE(INITIALIZING);
-    CASE(WAITING_FOR_ROUTE);
-    CASE(PLANNING);
-    CASE(WAITING_FOR_ENGAGE);
-    CASE(DRIVING);
-    CASE(ARRIVED_GOAL);
-    CASE(FINALIZING);
-
-    default:
-      return "";
-  }
-
-#undef CASE
-}
-
 // clang-format off
 FieldOperatorApplication::FieldOperatorApplication(const pid_t pid)
 : rclcpp::Node("concealer_user", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),
   process_id(pid),
-  getAutowareState("/autoware/state", rclcpp::QoS(1), *this, [this](const auto & v) {
-    autoware_state = toAutowareStateString<autoware_system_msgs::msg::AutowareState>(v.state);
+  getAutowareState("/autoware/state", rclcpp::QoS(1), *this, [this](const auto & message) {
+    auto state_name_of = [](auto state) constexpr {
+      switch (state) {
+        case autoware_system_msgs::msg::AutowareState::INITIALIZING:
+          return "INITIALIZING";
+        case autoware_system_msgs::msg::AutowareState::WAITING_FOR_ROUTE:
+          return "WAITING_FOR_ROUTE";
+        case autoware_system_msgs::msg::AutowareState::PLANNING:
+          return "PLANNING";
+        case autoware_system_msgs::msg::AutowareState::WAITING_FOR_ENGAGE:
+          return "WAITING_FOR_ENGAGE";
+        case autoware_system_msgs::msg::AutowareState::DRIVING:
+          return "DRIVING";
+        case autoware_system_msgs::msg::AutowareState::ARRIVED_GOAL:
+          return "ARRIVED_GOAL";
+        case autoware_system_msgs::msg::AutowareState::FINALIZING:
+          return "FINALIZING";
+        default:
+          return "";
+      }
+    };
+
+    autoware_state = state_name_of(message.state);
   }),
   getCommand("/control/command/control_cmd", rclcpp::QoS(1), *this),
   getCooperateStatusArray("/api/external/get/rtc_status", rclcpp::QoS(1), *this, [this](const auto & v) { latest_cooperate_status_array = v; }),
