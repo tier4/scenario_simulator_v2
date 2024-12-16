@@ -20,46 +20,10 @@
 
 namespace concealer
 {
-template <auto N, typename Tuples>
-struct lister
-{
-  std::reference_wrapper<const Tuples> tuples;
-
-  explicit lister(const Tuples & tuples) : tuples(std::cref(tuples)) {}
-};
-
-template <auto N, typename Tuples>
-auto operator<<(std::ostream & ostream, const lister<N, Tuples> & lister) -> std::ostream &
-{
-  for (auto iterator = std::begin(lister.tuples.get()); iterator != std::end(lister.tuples.get());
-       ++iterator) {
-    switch (std::distance(iterator, std::end(lister.tuples.get()))) {
-      case 1:
-        return ostream << std::get<N>(*iterator);
-
-      case 2:
-        ostream << std::get<N>(*iterator) << " and ";
-        break;
-
-      default:
-        ostream << std::get<N>(*iterator) << ", ";
-        break;
-    }
-  }
-
-  return ostream;
-}
-
-template <auto N, typename Tuples>
-auto listup(const Tuples & tuples) -> lister<N, Tuples>
-{
-  return lister<N, Tuples>(tuples);
-}
-
 /**
- * NOTE: for changes from `distance` to start/finish distance
- * see https://github.com/tier4/tier4_autoware_msgs/commit/8b85e6e43aa48cf4a439c77bf4bf6aee2e70c3ef
- */
+   NOTE: For changes from `distance` to start/finish distance. See
+   https://github.com/tier4/tier4_autoware_msgs/commit/8b85e6e43aa48cf4a439c77bf4bf6aee2e70c3ef
+*/
 template <typename T, typename = void>
 struct HasDistance : public std::false_type
 {
@@ -117,8 +81,7 @@ auto toModuleType(const std::string & module_name)
   if (const auto module_type = module_type_map.find(module_name);
       module_type == module_type_map.end()) {
     throw common::Error(
-      "Unexpected module name for tier4_rtc_msgs::msg::Module: ", module_name,
-      ". One of the following module names is expected: ", listup<0>(module_type_map), ".");
+      "Unexpected module name for tier4_rtc_msgs::msg::Module: ", module_name, ".");
   } else {
     return module_type->second;
   }
@@ -162,20 +125,20 @@ auto FieldOperatorApplication::sendCooperateCommand(
     };
     if (const auto command_type = command_type_map.find(command);
         command_type == command_type_map.end()) {
-      throw common::Error(
-        "Unexpected command for tier4_rtc_msgs::msg::Command: ", command,
-        ", One of the following commands is expected: ", listup<0>(command_type_map), ".");
+      throw common::Error("Unexpected command for tier4_rtc_msgs::msg::Command: ", command, ".");
     } else {
       return command_type->second;
     }
   };
 
-  /**
-   * NOTE: Used cooperate statuses will be deleted correctly in Autoware side and provided via topic update.
-   *       But, their update rate (typ. 10Hz) is lower than the one of scenario_simulator_v2.
-   *       So, we need to check cooperate statuses if they are used or not in scenario_simulator_v2 side
-   *       to avoid sending the same cooperate command when sending multiple commands between updates of cooperate statuses.
-   */
+  /*
+     NOTE: Used cooperate statuses will be deleted correctly in Autoware side
+     and provided via topic update. But, their update rate (typ. 10Hz) is lower
+     than the one of scenario_simulator_v2. So, we need to check cooperate
+     statuses if they are used or not in scenario_simulator_v2 side to avoid
+     sending the same cooperate command when sending multiple commands between
+     updates of cooperate statuses.
+  */
   static std::vector<tier4_rtc_msgs::msg::CooperateStatus> used_cooperate_statuses;
   auto is_used_cooperate_status = [](const auto & cooperate_status) {
     return std::find_if(
@@ -202,7 +165,7 @@ auto FieldOperatorApplication::sendCooperateCommand(
     std::stringstream what;
     what
       << "Failed to send a cooperate command: Cannot find a valid request to cooperate for module "
-      << std::quoted(module_name) << " and command " << std::quoted(command) << "."
+      << std::quoted(module_name) << " and command " << std::quoted(command) << ". "
       << "Please check if the situation is such that the request occurs when sending.";
     throw common::Error(what.str());
   } else {
