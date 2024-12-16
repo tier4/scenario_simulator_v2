@@ -131,7 +131,7 @@ struct FieldOperatorApplication : public rclcpp::Node,
   std::string minimum_risk_maneuver_behavior;
 
   // clang-format off
-  SubscriberWrapper<autoware_system_msgs::msg::AutowareState, ThreadSafety::safe> getAutowareState;
+  SubscriberWrapper<autoware_system_msgs::msg::AutowareState>                     getAutowareState;
   SubscriberWrapper<autoware_control_msgs::msg::Control>                          getCommand;
   SubscriberWrapper<tier4_rtc_msgs::msg::CooperateStatusArray>                    getCooperateStatusArray;
   SubscriberWrapper<tier4_external_api_msgs::msg::Emergency>                      getEmergencyState;

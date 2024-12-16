@@ -56,10 +56,10 @@ public:
   using TurnIndicatorsReport        = autoware_vehicle_msgs::msg::TurnIndicatorsReport;
   using VelocityReport              = autoware_vehicle_msgs::msg::VelocityReport;
 
-  SubscriberWrapper<Control,                ThreadSafety::safe> getCommand;
-  SubscriberWrapper<GearCommand,            ThreadSafety::safe> getGearCommand;
-  SubscriberWrapper<TurnIndicatorsCommand,  ThreadSafety::safe> getTurnIndicatorsCommand;
-  SubscriberWrapper<PathWithLaneId,         ThreadSafety::safe> getPathWithLaneId;
+  SubscriberWrapper<Control>               getCommand;
+  SubscriberWrapper<GearCommand>           getGearCommand;
+  SubscriberWrapper<TurnIndicatorsCommand> getTurnIndicatorsCommand;
+  SubscriberWrapper<PathWithLaneId>        getPathWithLaneId;
 
   PublisherWrapper<AccelWithCovarianceStamped> setAcceleration;
   PublisherWrapper<nav_msgs::msg::Odometry>    setOdometry;
