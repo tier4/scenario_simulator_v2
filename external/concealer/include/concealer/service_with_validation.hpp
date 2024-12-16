@@ -17,40 +17,13 @@
 
 #include <autoware_adapi_v1_msgs/msg/response_status.hpp>
 #include <chrono>
+#include <concealer/member_detector.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <tier4_external_api_msgs/msg/response_status.hpp>
 #include <tier4_rtc_msgs/srv/auto_mode_with_module.hpp>
 #include <type_traits>
-
-template <typename T, typename = void>
-struct has_data_member_status : public std::false_type
-{
-};
-
-template <typename T>
-struct has_data_member_status<T, std::void_t<decltype(std::declval<T>().status)>>
-: public std::true_type
-{
-};
-
-template <typename T>
-constexpr auto has_data_member_status_v = has_data_member_status<T>::value;
-
-template <typename T, typename = void>
-struct has_data_member_success : public std::false_type
-{
-};
-
-template <typename T>
-struct has_data_member_success<T, std::void_t<decltype(std::declval<T>().success)>>
-: public std::true_type
-{
-};
-
-template <typename T>
-constexpr auto has_data_member_success_v = has_data_member_success<T>::value;
 
 namespace concealer
 {
@@ -85,7 +58,7 @@ public:
     validateAvailability();
     for (std::size_t attempt = 0; attempt < attempts_count; ++attempt, validation_rate.sleep()) {
       if (const auto & service_call_result = callWithTimeoutValidation(request)) {
-        if constexpr (has_data_member_status_v<typename T::Response>) {
+        if constexpr (DetectMember_status<typename T::Response>::value) {
           if constexpr (std::is_same_v<
                           tier4_external_api_msgs::msg::ResponseStatus,
                           decltype(T::Response::status)>) {
@@ -129,7 +102,7 @@ public:
             RCLCPP_INFO_STREAM(logger, service_name << " service request has been accepted.");
             return;
           }
-        } else if constexpr (has_data_member_success_v<typename T::Response>) {
+        } else if constexpr (DetectMember_success<typename T::Response>::value) {
           if constexpr (std::is_same_v<bool, decltype(T::Response::success)>) {
             if (service_call_result->get()->success) {
               RCLCPP_INFO_STREAM(logger, service_name << " service request has been accepted.");

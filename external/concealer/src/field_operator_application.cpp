@@ -14,9 +14,8 @@
 
 #include <boost/range/adaptor/sliced.hpp>
 #include <concealer/field_operator_application.hpp>
-#include <concealer/has_data_member_allow_goal_modification.hpp>
-#include <concealer/has_data_member_option.hpp>
 #include <concealer/is_package_exists.hpp>
+#include <concealer/member_detector.hpp>
 #include <cstdlib>
 #include <exception>
 #include <scenario_simulator_exception/exception.hpp>
@@ -24,30 +23,16 @@
 
 namespace concealer
 {
-/**
-   NOTE: For changes from `distance` to start/finish distance. See
-   https://github.com/tier4/tier4_autoware_msgs/commit/8b85e6e43aa48cf4a439c77bf4bf6aee2e70c3ef
-*/
-template <typename T, typename = void>
-struct HasDistance : public std::false_type
-{
-};
-
-template <typename T>
-struct HasDistance<T, std::void_t<decltype(std::declval<T>().distance)>> : public std::true_type
-{
-};
-
 template <typename T>
 auto toModuleType(const std::string & module_name)
 {
   static const std::unordered_map<std::string, std::uint8_t> module_type_map = [&]() {
     std::unordered_map<std::string, std::uint8_t> module_type_map;
 
-#define EMPLACE(IDENTIFIER)                              \
-  if constexpr (HasStatic##IDENTIFIER<T>::value) {       \
-    module_type_map.emplace(#IDENTIFIER, T::IDENTIFIER); \
-  }                                                      \
+#define EMPLACE(IDENTIFIER)                                  \
+  if constexpr (DetectStaticMember_##IDENTIFIER<T>::value) { \
+    module_type_map.emplace(#IDENTIFIER, T::IDENTIFIER);     \
+  }                                                          \
   static_assert(true)
 
     /*
@@ -108,7 +93,7 @@ bool isValidCooperateStatus(
    * This was also decided after consulting with a member of TIER IV planning and control team.
    * ref: https://github.com/tier4/tier4_autoware_msgs/commit/8b85e6e43aa48cf4a439c77bf4bf6aee2e70c3ef
    */
-  if constexpr (HasDistance<CooperateStatusType>::value) {
+  if constexpr (DetectMember_distance<CooperateStatusType>::value) {
     return cooperate_status.module.type == module_type &&
            command_type != cooperate_status.command_status.type &&
            cooperate_status.distance >= -20.0;
@@ -177,27 +162,27 @@ FieldOperatorApplication::FieldOperatorApplication(const pid_t pid)
     };
 
     auto behavior_name_of = [](auto behavior) constexpr {
-      if constexpr (HasStaticCOMFORTABLE_STOP<autoware_adapi_v1_msgs::msg::MrmState>::value) {
+      if constexpr (DetectStaticMember_COMFORTABLE_STOP<autoware_adapi_v1_msgs::msg::MrmState>::value) {
         if (behavior == autoware_adapi_v1_msgs::msg::MrmState::COMFORTABLE_STOP) {
           return "COMFORTABLE_STOP";
         }
       }
-      if constexpr (HasStaticEMERGENCY_STOP<autoware_adapi_v1_msgs::msg::MrmState>::value) {
+      if constexpr (DetectStaticMember_EMERGENCY_STOP<autoware_adapi_v1_msgs::msg::MrmState>::value) {
         if (behavior == autoware_adapi_v1_msgs::msg::MrmState::EMERGENCY_STOP) {
           return "EMERGENCY_STOP";
         }
       }
-      if constexpr (HasStaticNONE<autoware_adapi_v1_msgs::msg::MrmState>::value) {
+      if constexpr (DetectStaticMember_NONE<autoware_adapi_v1_msgs::msg::MrmState>::value) {
         if (behavior == autoware_adapi_v1_msgs::msg::MrmState::NONE) {
           return "NONE";
         }
       }
-      if constexpr (HasStaticUNKNOWN<autoware_adapi_v1_msgs::msg::MrmState>::value) {
+      if constexpr (DetectStaticMember_UNKNOWN<autoware_adapi_v1_msgs::msg::MrmState>::value) {
         if (behavior == autoware_adapi_v1_msgs::msg::MrmState::UNKNOWN) {
           return "UNKNOWN";
         }
       }
-      if constexpr (HasStaticPULL_OVER<autoware_adapi_v1_msgs::msg::MrmState>::value) {
+      if constexpr (DetectStaticMember_PULL_OVER<autoware_adapi_v1_msgs::msg::MrmState>::value) {
         if (behavior == autoware_adapi_v1_msgs::msg::MrmState::PULL_OVER) {
           return "PULL_OVER";
         }
@@ -347,9 +332,10 @@ auto FieldOperatorApplication::plan(const std::vector<geometry_msgs::msg::PoseSt
        [2] https://github.com/autowarefoundation/autoware_adapi_msgs/commit/cf310bd038673b6cbef3ae3b61dfe607212de419
     */
     if constexpr (
-      has_data_member_option_v<autoware_adapi_v1_msgs::srv::SetRoutePoints::Request> and
-      has_data_member_allow_goal_modification_v<
-        decltype(std::declval<autoware_adapi_v1_msgs::srv::SetRoutePoints::Request>().option)>) {
+      DetectMember_option<autoware_adapi_v1_msgs::srv::SetRoutePoints::Request>::value and
+      DetectMember_allow_goal_modification<
+        decltype(std::declval<autoware_adapi_v1_msgs::srv::SetRoutePoints::Request>()
+                   .option)>::value) {
       request->option.allow_goal_modification =
         get_parameter("allow_goal_modification").get_value<bool>();
     }

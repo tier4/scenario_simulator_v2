@@ -55,47 +55,6 @@
 
 namespace concealer
 {
-#define DEFINE_STATIC_DATA_MEMBER_DETECTOR(NAME)                                    \
-  template <typename T, typename = void>                                            \
-  struct HasStatic##NAME : public std::false_type                                   \
-  {                                                                                 \
-  };                                                                                \
-                                                                                    \
-  template <typename T>                                                             \
-  struct HasStatic##NAME<T, std::void_t<decltype(T::NAME)>> : public std::true_type \
-  {                                                                                 \
-  }
-
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(NONE);
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(LANE_CHANGE_LEFT);
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(LANE_CHANGE_RIGHT);
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(AVOIDANCE_LEFT);
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(AVOIDANCE_RIGHT);
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(GOAL_PLANNER);
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(START_PLANNER);
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(PULL_OUT);
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(TRAFFIC_LIGHT);
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(INTERSECTION);
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(INTERSECTION_OCCLUSION);
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(CROSSWALK);
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(BLIND_SPOT);
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(DETECTION_AREA);
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(NO_STOPPING_AREA);
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(OCCLUSION_SPOT);
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(EXT_REQUEST_LANE_CHANGE_LEFT);
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(EXT_REQUEST_LANE_CHANGE_RIGHT);
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(AVOIDANCE_BY_LC_LEFT);
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(AVOIDANCE_BY_LC_RIGHT);
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(NO_DRIVABLE_LANE);
-
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(COMFORTABLE_STOP);
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(EMERGENCY_STOP);
-// DEFINE_STATIC_DATA_MEMBER_DETECTOR(NONE); // NOTE: This is defined above.
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(UNKNOWN);
-DEFINE_STATIC_DATA_MEMBER_DETECTOR(PULL_OVER);
-
-#undef DEFINE_STATIC_DATA_MEMBER_DETECTOR
-
 /* ---- NOTE -------------------------------------------------------------------
  *
  *  The magic class 'FieldOperatorApplication' is a class that makes it easy to work with
