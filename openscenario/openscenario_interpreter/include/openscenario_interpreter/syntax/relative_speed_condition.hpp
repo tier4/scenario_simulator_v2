@@ -26,7 +26,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 /*
-   RelativeSpeedCondition 1.3.1
+   RelativeSpeedCondition (OpenSCENARIO XML 1.3.1)
 
    The current relative speed of a triggering entity/entities to a reference
    entity is compared to a given value. The logical operator used for the
