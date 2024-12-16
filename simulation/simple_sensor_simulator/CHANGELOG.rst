@@ -21,6 +21,29 @@ Changelog for package simple_sensor_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+7.3.0 (2024-12-16)
+------------------
+* Merge pull request `#1481 <https://github.com/tier4/scenario_simulator_v2/issues/1481>`_ from tier4/feature/multi-level-lanelet-support
+  Feature/multi level lanelet support
+* Merge branch 'master' into feature/multi-level-lanelet-support
+* Merge branch 'master' into feature/multi-level-lanelet-support
+* Merge branch 'master' into feature/multi-level-lanelet-support
+* fix(simple_sensor_simulator): Fix if condition by adding negation to ensure proper logic
+* Remove unused function and update comment
+* fix(simple_senor_simulator): fix after Szymon discussion
+* fix(simple_sensor_simulator): fix after detection_sensor refactor
+* ref(traffic_simulator, simple_sensor_simulator): refactor altitude checks
+* Refactor code to improve readability based on SonarQube findings
+* Merge branch 'master' into feature/multi-level-lanelet-support
+* Merge branch 'master' into feature/multi-level-lanelet-support
+* Removed unrecognized words because spell-check flagged them as invalid
+* [RJD-1369] Improve Collision Solving for Multi-Level Support
+  - Enhanced BehaviorTree to consider altitude when detecting potential obstacles,
+  allowing to ignore objects located at different altitudes.
+  - Modified the detection sensor by introducing Ego plane determination to exclude objects below the Ego plane,
+  preventing unnecessary slowing or stopping caused by incorrect detections.
+* Contributors: Dawid Moszynski, Kotaro Yoshimoto, SzymonParapura
+
 7.2.0 (2024-12-16)
 ------------------
 * Merge pull request `#1484 <https://github.com/tier4/scenario_simulator_v2/issues/1484>`_ from tier4/RJD-736/autoware_msgs_support_and_localization_sim_mode_support
