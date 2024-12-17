@@ -303,7 +303,6 @@ auto ActionNode::getDistanceToTargetEntityPolygon(
      * boundingBoxRelativeLaneletPose requires routing_configuration, 
      * 'allow_lane_change = true' is needed to check distances to entities on neighbour lanelets
      */
-
     traffic_simulator::RoutingConfiguration routing_configuration;
     routing_configuration.allow_lane_change = true;
     constexpr bool include_adjacent_lanelet{false};
@@ -343,6 +342,13 @@ auto ActionNode::getDistanceToTargetEntityPolygon(
     }
   }
   return std::nullopt;
+}
+
+auto ActionNode::isOtherEntityAtConsideredAltitude(
+  const traffic_simulator::CanonicalizedEntityStatus & entity_status) const -> bool
+{
+  return hdmap_utils->isAltitudeMatching(
+    canonicalized_entity_status->getAltitude(), entity_status.getAltitude());
 }
 
 auto ActionNode::getDistanceToConflictingEntity(
