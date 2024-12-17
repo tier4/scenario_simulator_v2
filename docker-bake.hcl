@@ -14,6 +14,12 @@ target "base_arm64" {
   platforms = ["linux/arm64/v8"]
 }
 
+target "base_traffic_simulator" {
+  target = "build-stage"
+  dockerfile = "Dockerfile.traffic_simulator"
+  platforms = ["linux/amd64"]
+}
+
 target "humble" {
   inherits = [base]
   name = "humble_${base}"
@@ -21,6 +27,6 @@ target "humble" {
   args = {"ROS_DISTRO" : "humble"}
   group = ["humble"]
   matrix = {
-    base = ["base_amd64", "base_arm64"]
+    base = ["base_amd64", "base_arm64", "base_traffic_simulator"]
   }
 }
