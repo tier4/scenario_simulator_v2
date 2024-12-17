@@ -311,12 +311,12 @@ auto FieldOperatorApplication::enableAutowareControl() -> void
 auto FieldOperatorApplication::engage() -> void
 {
   task_queue.delay([this]() {
-    waitForAutowareStateToBeDriving([this]() {
+    waitForAutowareStateToBe_DRIVING([this]() {
       auto request = std::make_shared<Engage::Request>();
       request->engage = true;
       try {
         return requestEngage(request, 1);
-      } catch (const common::Error &) {
+      } catch (const common::AutowareError &) {
         return;  // Ignore error because this service is validated by Autoware state transition.
       }
     });
@@ -326,13 +326,13 @@ auto FieldOperatorApplication::engage() -> void
 auto FieldOperatorApplication::engageable() const -> bool
 {
   rethrow();
-  return task_queue.exhausted() and isWaitingForEngage();
+  return task_queue.exhausted() and autoware_state == "WAITING_FOR_ENGAGE";
 }
 
 auto FieldOperatorApplication::engaged() const -> bool
 {
   rethrow();
-  return task_queue.exhausted() and isDriving();
+  return task_queue.exhausted() and autoware_state == "DRIVING";
 }
 
 auto FieldOperatorApplication::getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray
@@ -350,7 +350,7 @@ auto FieldOperatorApplication::initialize(const geometry_msgs::msg::Pose & initi
 {
   if (not std::exchange(initialize_was_called, true)) {
     task_queue.delay([this, initial_pose]() {
-      waitForAutowareStateToBeWaitingForRoute([&]() {
+      waitForAutowareStateToBe_WAITING_FOR_ROUTE([&]() {
 #if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)
         if (getLocalizationState().state != LocalizationInitializationState::UNINITIALIZED) {
           return;
@@ -366,7 +366,7 @@ auto FieldOperatorApplication::initialize(const geometry_msgs::msg::Pose & initi
         request->pose.push_back(initial_pose_msg);
         try {
           return requestInitialPose(request, 1);
-        } catch (const common::Error &) {
+        } catch (const common::AutowareError &) {
           return;  // Ignore error because this service is validated by Autoware state transition.
         }
       });
@@ -380,7 +380,7 @@ auto FieldOperatorApplication::plan(const std::vector<geometry_msgs::msg::PoseSt
   assert(not route.empty());
 
   task_queue.delay([this, route] {
-    waitForAutowareStateToBeWaitingForRoute();  // NOTE: This is assertion.
+    waitForAutowareStateToBe_WAITING_FOR_ROUTE();  // NOTE: This is assertion.
 
     auto request = std::make_shared<SetRoutePoints::Request>();
 
@@ -414,7 +414,7 @@ auto FieldOperatorApplication::plan(const std::vector<geometry_msgs::msg::PoseSt
 
     requestSetRoutePoints(request, 1);
 
-    waitForAutowareStateToBeWaitingForEngage();
+    waitForAutowareStateToBe_WAITING_FOR_ENGAGE();
   });
 }
 

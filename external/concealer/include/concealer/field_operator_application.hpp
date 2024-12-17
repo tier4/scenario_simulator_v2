@@ -146,25 +146,6 @@ struct FieldOperatorApplication : public rclcpp::Node,
 
   ~FieldOperatorApplication();
 
-  /*
-     NOTE: This predicate should not take the state being compared as an
-     argument or template parameter. Otherwise, code using this class would
-     need to have knowledge of the Autoware state type.
-  */
-#define DEFINE_STATE_PREDICATE(NAME, VALUE)                           \
-  auto is##NAME() const noexcept { return autoware_state == #VALUE; } \
-  static_assert(true, "")
-
-  DEFINE_STATE_PREDICATE(Initializing, INITIALIZING_VEHICLE);
-  DEFINE_STATE_PREDICATE(WaitingForRoute, WAITING_FOR_ROUTE);
-  DEFINE_STATE_PREDICATE(Planning, PLANNING);
-  DEFINE_STATE_PREDICATE(WaitingForEngage, WAITING_FOR_ENGAGE);
-  DEFINE_STATE_PREDICATE(Driving, DRIVING);
-  DEFINE_STATE_PREDICATE(ArrivedGoal, ARRIVAL_GOAL);
-  DEFINE_STATE_PREDICATE(Finalizing, FINALIZING);
-
-#undef DEFINE_STATE_PREDICATE
-
   auto spinSome() -> void;
 
   auto engage() -> void;

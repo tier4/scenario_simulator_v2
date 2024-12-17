@@ -135,7 +135,7 @@ public:
       }
     }
 
-    throw common::scenario_simulator_exception::Error(
+    throw common::scenario_simulator_exception::AutowareError(
       "Requested the service ", std::quoted(service_name), " ", attempts_count,
       " times, but was not successful.");
   }
