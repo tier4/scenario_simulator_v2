@@ -551,8 +551,45 @@ auto makeUpdatedStatus(
        steering.
     */
     auto updated_status = entity_status;
+    const auto displacement = desired_velocity * step_time;
 
-    updated_status.pose.position += desired_velocity * step_time;
+    auto adjustPositionAtLaneletBoundary =
+      [&](double remaining_lanelet_length, const std::optional<lanelet::Id> & next_lanelet_id) {
+        const auto excess_displacement =
+          displacement - normalize(desired_velocity) * remaining_lanelet_length;
+
+        // Update position to the next lanelet if available, otherwise apply full displacement.
+        updated_status.pose.position =
+          next_lanelet_id
+            ? hdmap_utils->toMapPosition(next_lanelet_id.value(), norm(excess_displacement))
+            : updated_status.pose.position + displacement;
+
+        // Apply lateral offset if transitioning to the next lanelet
+        if (next_lanelet_id) {
+          updated_status.pose.position.y += updated_status.lanelet_pose.offset;
+        }
+      };
+
+    if (!updated_status.lanelet_pose_valid) {
+      updated_status.pose.position += displacement;
+    } else {
+      const double remaining_lanelet_length =
+        hdmap_utils->getLaneletLength(updated_status.lanelet_pose.lanelet_id) -
+        updated_status.lanelet_pose.s;
+
+      // Adjust position if displacement exceeds the current lanelet length.
+      if (norm(displacement) > remaining_lanelet_length) {
+        const auto target_lanelet_pose = hdmap_utils->toLaneletPose(
+          target_position, updated_status.bounding_box, false, matching_distance);
+        adjustPositionAtLaneletBoundary(
+          remaining_lanelet_length, target_lanelet_pose ? hdmap_utils->getNextLaneletOnRoute(
+                                                            updated_status.lanelet_pose.lanelet_id,
+                                                            target_lanelet_pose->lanelet_id)
+                                                        : std::nullopt);
+      } else {
+        updated_status.pose.position += displacement;
+      }
+    }
 
     updated_status.pose.orientation = [&]() {
       if (desired_velocity.y == 0 && desired_velocity.x == 0 && desired_velocity.z == 0) {
