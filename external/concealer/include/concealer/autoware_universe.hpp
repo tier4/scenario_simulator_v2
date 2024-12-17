@@ -100,19 +100,11 @@ public:
 
   auto rethrow() -> void;
 
-  auto getAcceleration() const -> double;
-
-  auto getSteeringAngle() const -> double;
-
-  auto getVelocity() const -> double;
-
   auto updateLocalization() -> void;
 
   auto updateVehicleState() -> void;
 
-  auto getGearSign() const -> double;
-
-  auto getVehicleCommand() const -> std::tuple<Control, GearCommand>;
+  auto getVehicleCommand() const -> std::tuple<double, double, double, double, int>;
 
   auto getRouteLanelets() const -> std::vector<std::int64_t>;
 

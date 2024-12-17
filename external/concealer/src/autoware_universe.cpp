@@ -51,21 +51,20 @@ AutowareUniverse::AutowareUniverse(bool simulate_localization)
         response->success = true;
       } else if (request->mode == ControlModeCommand::Request::MANUAL) {
         /*
-          NOTE:
-            MANUAL request will come when a remote override is triggered.
-            But scenario_simulator_v2 don't support a remote override for now.
+          NOTE: MANUAL request will come when a remote override is triggered.
+          But scenario_simulator_v2 don't support a remote override for now.
         */
         response->success = false;
       } else {
         response->success = false;
       }
     })),
-  // Autoware.Universe requires localization topics to send data at 50Hz
-  localization_update_timer(rclcpp::create_timer(
-    this, get_clock(), std::chrono::milliseconds(20), [this]() { updateLocalization(); })),
-  // Autoware.Universe requires vehicle state topics to send data at 30Hz
-  vehicle_state_update_timer(rclcpp::create_timer(
-    this, get_clock(), std::chrono::milliseconds(33), [this]() { updateVehicleState(); })),
+  localization_update_timer(
+    rclcpp::create_timer(  // Autoware.Universe requires localization topics to send data at 50Hz
+      this, get_clock(), std::chrono::milliseconds(20), [this]() { updateLocalization(); })),
+  vehicle_state_update_timer(
+    rclcpp::create_timer(  // Autoware.Universe requires vehicle state topics to send data at 30Hz
+      this, get_clock(), std::chrono::milliseconds(33), [this]() { updateVehicleState(); })),
   localization_and_vehicle_state_update_thread(std::thread([this]() {
     try {
       while (rclcpp::ok() and not is_stop_requested.load()) {
@@ -90,18 +89,6 @@ auto AutowareUniverse::rethrow() -> void
   if (is_thrown.load()) {
     throw thrown;
   }
-}
-
-auto AutowareUniverse::getAcceleration() const -> double
-{
-  return getCommand().longitudinal.acceleration;
-}
-
-auto AutowareUniverse::getVelocity() const -> double { return getCommand().longitudinal.velocity; }
-
-auto AutowareUniverse::getSteeringAngle() const -> double
-{
-  return getCommand().lateral.steering_tire_angle;
 }
 
 auto AutowareUniverse::updateLocalization() -> void
@@ -162,7 +149,7 @@ auto AutowareUniverse::updateVehicleState() -> void
   setSteeringReport([this]() {
     SteeringReport message;
     message.stamp = get_clock()->now();
-    message.steering_tire_angle = getSteeringAngle();
+    message.steering_tire_angle = getCommand().lateral.steering_tire_angle;
     return message;
   }());
 
@@ -185,19 +172,40 @@ auto AutowareUniverse::updateVehicleState() -> void
   }());
 }
 
-auto AutowareUniverse::getGearSign() const -> double
+auto AutowareUniverse::getVehicleCommand() const -> std::tuple<double, double, double, double, int>
 {
-  /// @todo Add support for GearCommand::NONE to return 0.0
-  /// @sa https://github.com/autowarefoundation/autoware.universe/blob/main/simulator/simple_planning_simulator/src/simple_planning_simulator/simple_planning_simulator_core.cpp#L475
-  return getGearCommand().command == GearCommand::REVERSE or
-             getGearCommand().command == GearCommand::REVERSE_2
-           ? -1.0
-           : 1.0;
-}
+  const auto control_command = getCommand();
 
-auto AutowareUniverse::getVehicleCommand() const -> std::tuple<Control, GearCommand>
-{
-  return std::make_tuple(getCommand(), getGearCommand());
+  const auto gear_command = getGearCommand();
+
+  auto sign_of = [](auto command) constexpr {
+    switch (command) {
+      case GearCommand::REVERSE:
+      case GearCommand::REVERSE_2:
+        return -1.0;
+      case GearCommand::NONE:
+        return 0.0;
+      default:
+        return 1.0;
+    }
+  };
+
+  /*
+     TODO Currently, acceleration is returned as an unsigned value
+     (`control_command.longitudinal.acceleration`) and a signed value
+     (`sign_of(gear_command.command)`), but this is for historical reasons and
+     there is no longer any reason to do so.
+
+     return std::make_tuple(
+       control_command.longitudinal.velocity,
+       sign_of(gear_command.command) * control_command.longitudinal.acceleration,
+       control_command.lateral.steering_tire_angle,
+       gear_command.command);
+  */
+  return std::make_tuple(
+    control_command.longitudinal.velocity, control_command.longitudinal.acceleration,
+    control_command.lateral.steering_tire_angle, sign_of(gear_command.command),
+    gear_command.command);
 }
 
 auto AutowareUniverse::getRouteLanelets() const -> std::vector<std::int64_t>
