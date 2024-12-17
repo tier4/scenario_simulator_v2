@@ -286,9 +286,6 @@ FieldOperatorApplication::~FieldOperatorApplication()
       }
     }
   }
-
-  // All tasks should be complete before the services used in them will be deinitialized.
-  task_queue.stopAndJoin();
 }
 
 auto FieldOperatorApplication::clearRoute() -> void

@@ -77,8 +77,6 @@ struct FieldOperatorApplication : public rclcpp::Node,
 
   const pid_t process_id = 0;
 
-  TaskQueue task_queue;
-
   bool initialize_was_called = false;
 
   std::string autoware_state;
@@ -130,6 +128,13 @@ struct FieldOperatorApplication : public rclcpp::Node,
   ServiceWithValidation<SetVelocityLimit>            requestSetVelocityLimit;
   ServiceWithValidation<ChangeOperationMode>         requestEnableAutowareControl;
   // clang-format on
+
+  /*
+     The task queue must be deconstructed before any services, so it must be
+     the last class data member. (Class data members are constructed in
+     declaration order and deconstructed in reverse order.)
+  */
+  TaskQueue task_queue;
 
   CONCEALER_PUBLIC explicit FieldOperatorApplication(const pid_t = 0);
 
