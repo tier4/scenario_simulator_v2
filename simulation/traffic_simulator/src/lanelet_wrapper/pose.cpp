@@ -68,6 +68,24 @@ auto toMapPose(const LaneletPose & lanelet_pose, const bool fill_pitch) -> PoseS
   }
 }
 
+auto isAltitudeMatching(const double current_altitude, const double target_altitude) -> bool
+{
+  /*
+     Using a fixed `altitude_threshold` value of 1.0 [m] is justified because the
+     entity's Z-position is always relative to its base. This eliminates the
+     need to dynamically adjust the threshold based on the entity's dimensions,
+     ensuring consistent altitude matching regardless of the entity type.
+
+     The position of the entity is defined relative to its base, typically
+     the center of the rear axle projected onto the ground in the case of vehicles.
+
+     There is no technical basis for this value; it was determined based on
+     experiments.
+  */
+  static constexpr double altitude_threshold = 1.0;
+  return std::abs(current_altitude - target_altitude) <= altitude_threshold;
+}
+
 auto toLaneletPose(
   const Pose & map_pose, const lanelet::Id lanelet_id, const double matching_distance)
   -> std::optional<LaneletPose>
@@ -77,10 +95,12 @@ auto toLaneletPose(
   if (const auto lanelet_pose_s = lanelet_spline->getSValue(map_pose, matching_distance);
       !lanelet_pose_s) {
     return std::nullopt;
+  } else if (const auto pose_on_centerline = lanelet_spline->getPose(lanelet_pose_s.value());
+             !isAltitudeMatching(map_pose.position.z, pose_on_centerline.position.z)) {
+    return std::nullopt;
   } else {
-    const auto lanelet_quaternion = lanelet_spline->getPose(lanelet_pose_s.value()).orientation;
     if (const auto lanelet_pose_rpy = math::geometry::convertQuaternionToEulerAngle(
-          math::geometry::getRotation(lanelet_quaternion, map_pose.orientation));
+          math::geometry::getRotation(pose_on_centerline.orientation, map_pose.orientation));
         std::fabs(lanelet_pose_rpy.z) > M_PI * yaw_threshold &&
         std::fabs(lanelet_pose_rpy.z) < M_PI * (1 - yaw_threshold)) {
       return std::nullopt;

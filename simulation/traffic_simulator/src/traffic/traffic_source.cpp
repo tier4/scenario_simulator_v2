@@ -17,6 +17,7 @@
 #include <geometry/vector3/hypot.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/traffic/traffic_source.hpp>
+#include <traffic_simulator/utils/lanelet_map.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
 
@@ -91,8 +92,8 @@ auto TrafficSource::makeRandomPose(
       !nearby_lanelets.empty()) {
     // Get the altitude of the first nearby lanelet
     if (
-      const auto altitude =
-        hdmap_utils_->getLaneletAltitude(nearby_lanelets.front(), random_pose, radius)) {
+      const auto altitude = traffic_simulator::lanelet_map::laneletAltitude(
+        nearby_lanelets.front(), random_pose, radius)) {
       random_pose.position.z = altitude.value();
     }
   }

@@ -44,6 +44,7 @@ public:
   explicit operator geometry_msgs::msg::Pose() const noexcept { return map_pose_; }
 
   auto getLaneletPose() const -> const LaneletPose & { return lanelet_pose_; }
+  auto getAltitude() const -> double { return map_pose_.position.z; }
   auto getLaneletId() const noexcept -> lanelet::Id { return lanelet_pose_.lanelet_id; }
   auto alignOrientationToLanelet() -> void;
   auto hasAlternativeLaneletPose() const -> bool { return lanelet_poses_.size() > 1; }

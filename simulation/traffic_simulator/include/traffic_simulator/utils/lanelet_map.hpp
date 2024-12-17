@@ -37,6 +37,12 @@ inline auto activate(Ts &&... xs)
 
 auto laneletLength(const lanelet::Id lanelet_id) -> double;
 
+template <typename... Ts>
+inline auto laneletAltitude(Ts &&... xs)
+{
+  return lanelet_wrapper::lanelet_map::laneletAltitude(std::forward<decltype(xs)>(xs)...);
+}
+
 auto borderlinePoses() -> std::vector<std::pair<lanelet::Id, Pose>>;
 }  // namespace lanelet_map
 }  // namespace traffic_simulator

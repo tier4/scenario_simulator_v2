@@ -78,6 +78,10 @@ auto boundingBoxRelativePose(
   -> std::optional<geometry_msgs::msg::Pose>;
 
 // Relative LaneletPose
+auto isAltitudeMatching(
+  const CanonicalizedLaneletPose & lanelet_pose,
+  const CanonicalizedLaneletPose & target_lanelet_pose) -> bool;
+
 auto relativeLaneletPose(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
   const RoutingConfiguration & routing_configuration,

@@ -122,7 +122,8 @@ auto CanonicalizedEntityStatus::getMapPose() const noexcept -> const geometry_ms
 
 auto CanonicalizedEntityStatus::getAltitude() const -> double
 {
-  return entity_status_.pose.position.z;
+  return canonicalized_lanelet_pose_ ? canonicalized_lanelet_pose_->getAltitude()
+                                     : entity_status_.pose.position.z;
 }
 
 auto CanonicalizedEntityStatus::getLaneletPose() const noexcept -> const LaneletPose &
