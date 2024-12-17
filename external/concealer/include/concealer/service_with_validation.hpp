@@ -30,6 +30,14 @@ namespace concealer
 template <typename T>
 class ServiceWithValidation
 {
+  const std::string service_name;
+
+  rclcpp::Logger logger;
+
+  typename rclcpp::Client<T>::SharedPtr client;
+
+  rclcpp::WallRate validation_rate;
+
 public:
   template <typename FieldOperatorApplication>
   explicit ServiceWithValidation(
@@ -45,9 +53,23 @@ public:
   auto operator()(const typename T::Request::SharedPtr & request, std::size_t attempts_count)
     -> void
   {
-    validateAvailability();
+    while (!client->service_is_ready()) {
+      RCLCPP_INFO_STREAM(logger, service_name << " service is not ready.");
+      validation_rate.sleep();
+    }
+
+    auto send = [this](const auto & request) {
+      if (auto future = client->async_send_request(request);
+          future.wait_for(validation_rate.period()) == std::future_status::ready) {
+        return std::optional<typename rclcpp::Client<T>::SharedFuture>(future);
+      } else {
+        RCLCPP_ERROR_STREAM(logger, service_name << " service request has timed out.");
+        return std::optional<typename rclcpp::Client<T>::SharedFuture>();
+      }
+    };
+
     for (std::size_t attempt = 0; attempt < attempts_count; ++attempt, validation_rate.sleep()) {
-      if (const auto & service_call_result = callWithTimeoutValidation(request)) {
+      if (const auto & service_call_result = send(request)) {
         if constexpr (DetectMember_status<typename T::Response>::value) {
           if constexpr (std::is_same_v<
                           tier4_external_api_msgs::msg::ResponseStatus,
@@ -112,39 +134,11 @@ public:
         }
       }
     }
+
     throw common::scenario_simulator_exception::Error(
       "Requested the service ", std::quoted(service_name), " ", attempts_count,
       " times, but was not successful.");
   }
-
-private:
-  auto validateAvailability() -> void
-  {
-    while (!client->service_is_ready()) {
-      RCLCPP_INFO_STREAM(logger, service_name << " service is not ready.");
-      validation_rate.sleep();
-    }
-  }
-
-  auto callWithTimeoutValidation(const typename T::Request::SharedPtr & request)
-    -> std::optional<typename rclcpp::Client<T>::SharedFuture>
-  {
-    if (auto future = client->async_send_request(request);
-        future.wait_for(validation_rate.period()) == std::future_status::ready) {
-      return future;
-    } else {
-      RCLCPP_ERROR_STREAM(logger, service_name << " service request has timed out.");
-      return std::nullopt;
-    }
-  }
-
-  const std::string service_name;
-
-  rclcpp::Logger logger;
-
-  typename rclcpp::Client<T>::SharedPtr client;
-
-  rclcpp::WallRate validation_rate;
 };
 }  // namespace concealer
 
