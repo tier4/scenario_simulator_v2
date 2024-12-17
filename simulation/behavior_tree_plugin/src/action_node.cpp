@@ -306,17 +306,40 @@ auto ActionNode::getDistanceToTargetEntityPolygon(
 
     traffic_simulator::RoutingConfiguration routing_configuration;
     routing_configuration.allow_lane_change = true;
+    constexpr bool include_adjacent_lanelet{false};
+    constexpr bool include_opposite_direction{true};
 
-    const auto & bounding_box = canonicalized_entity_status->getBoundingBox();
-    const auto relative_lanelet_pose = traffic_simulator::pose::boundingBoxRelativeLaneletPose(
-      canonicalized_entity_status->getCanonicalizedLaneletPose().value(), bounding_box,
-      status.getCanonicalizedLaneletPose().value(), status.getBoundingBox(), routing_configuration,
-      hdmap_utils);
+    const auto & from = canonicalized_entity_status->getCanonicalizedLaneletPose().value();
+    const auto & from_bounding_box = canonicalized_entity_status->getBoundingBox();
 
-    const auto half_width = bounding_box.dimensions.y / 2;
-    // is in front and is within considered width (lateral distance)
-    if (relative_lanelet_pose.s >= 0 && std::abs(relative_lanelet_pose.offset) <= half_width) {
-      return relative_lanelet_pose.s + bounding_box.dimensions.x / 2;
+    const auto & to = status.getCanonicalizedLaneletPose().value();
+    const auto & to_bounding_box = status.getBoundingBox();
+
+    const auto longitudinalDistance =
+      traffic_simulator::distance::boundingBoxLaneLongitudinalDistance(
+        from, from_bounding_box, to, to_bounding_box, include_adjacent_lanelet,
+        include_opposite_direction, routing_configuration, hdmap_utils);
+
+    if (const auto lateral_distance = lateralDistance(from, to, routing_configuration, hdmap_utils);
+        lateral_distance && longitudinalDistance) {
+      const auto from_bounding_box_distances =
+        math::geometry::getDistancesFromCenterToEdge(from_bounding_box);
+      const auto to_bounding_box_distances =
+        math::geometry::getDistancesFromCenterToEdge(to_bounding_box);
+      auto bounding_box_distance = 0.0;
+      if (lateral_distance.value() > 0.0) {
+        bounding_box_distance =
+          std::abs(from_bounding_box_distances.right) + std::abs(to_bounding_box_distances.left);
+      } else if (lateral_distance.value() < 0.0) {
+        bounding_box_distance =
+          std::abs(from_bounding_box_distances.left) + std::abs(to_bounding_box_distances.right);
+      }
+      // is in front and is within considered width (lateral distance)
+      if (
+        longitudinalDistance.value() >= 0 &&
+        std::abs(lateral_distance.value()) <= bounding_box_distance) {
+        return longitudinalDistance.value() + from_bounding_box.dimensions.x / 2;
+      }
     }
   }
   return std::nullopt;
