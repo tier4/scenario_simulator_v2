@@ -42,17 +42,7 @@ public:
   {
   }
 
-  class TimeoutError : public common::scenario_simulator_exception::Error
-  {
-  public:
-    template <typename... Ts>
-    explicit TimeoutError(Ts &&... xs)
-    : common::scenario_simulator_exception::Error(std::forward<decltype(xs)>(xs)...)
-    {
-    }
-  };
-
-  auto operator()(const typename T::Request::SharedPtr & request, std::size_t attempts_count = 1)
+  auto operator()(const typename T::Request::SharedPtr & request, std::size_t attempts_count)
     -> void
   {
     validateAvailability();
@@ -122,7 +112,7 @@ public:
         }
       }
     }
-    throw TimeoutError(
+    throw common::scenario_simulator_exception::Error(
       "Requested the service ", std::quoted(service_name), " ", attempts_count,
       " times, but was not successful.");
   }
