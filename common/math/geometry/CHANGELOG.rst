@@ -21,6 +21,41 @@ Changelog for package geometry
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+7.3.1 (2024-12-17)
+------------------
+* Merge pull request `#1475 <https://github.com/tier4/scenario_simulator_v2/issues/1475>`_ from tier4/fix/math-closest-point
+  Fix bug in `math::geometry::getClosestPoses`
+* Merge branch 'master' into fix/math-closest-point
+* Merge branch 'master' into fix/math-closest-point
+* Merge branch 'master' into fix/math-closest-point
+* Merge branch 'master' into fix/math-closest-point
+* Merge branch 'master' into fix/math-closest-point
+* Fix spell mistake
+* Fix getClosestPoses with naive algorithm
+* Apply clang-format
+* Add some test cases for getClosestPoses
+* Contributors: Kotaro Yoshimoto, f0reachARR
+
+7.3.0 (2024-12-16)
+------------------
+* Merge pull request `#1481 <https://github.com/tier4/scenario_simulator_v2/issues/1481>`_ from tier4/feature/multi-level-lanelet-support
+  Feature/multi level lanelet support
+* Merge branch 'master' into feature/multi-level-lanelet-support
+* Merge branch 'master' into feature/multi-level-lanelet-support
+* Merge branch 'master' into feature/multi-level-lanelet-support
+* ref(traffic_simulator, simple_sensor_simulator): refactor altitude checks
+* Refactor code to improve readability based on SonarQube findings
+* Merge branch 'master' into feature/multi-level-lanelet-support
+* Remove comment
+* Merge branch 'master' into feature/multi-level-lanelet-support
+* Fix missing newline at end of file
+* [RJD-1369] Improve Collision Solving for Multi-Level Support
+  - Enhanced BehaviorTree to consider altitude when detecting potential obstacles,
+  allowing to ignore objects located at different altitudes.
+  - Modified the detection sensor by introducing Ego plane determination to exclude objects below the Ego plane,
+  preventing unnecessary slowing or stopping caused by incorrect detections.
+* Contributors: Dawid Moszynski, Kotaro Yoshimoto, SzymonParapura
+
 7.2.0 (2024-12-16)
 ------------------
 * Merge branch 'master' into RJD-736/autoware_msgs_support_and_localization_sim_mode_support
