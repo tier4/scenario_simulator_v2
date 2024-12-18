@@ -31,6 +31,8 @@ constexpr static double DEFAULT_MATCH_TO_LANE_REDUCTION_RATIO = 0.8;
 
 auto toMapPose(const LaneletPose & lanelet_pose, const bool fill_pitch = true) -> PoseStamped;
 
+auto isAltitudeMatching(const double current_altitude, const double target_altitude) -> bool;
+
 auto toLaneletPose(
   const Pose & map_pose, const lanelet::Id lanelet_id, const double matching_distance = 1.0)
   -> std::optional<LaneletPose>;

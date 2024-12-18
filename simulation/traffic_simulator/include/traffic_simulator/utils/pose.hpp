@@ -47,11 +47,6 @@ auto toCanonicalizedLaneletPose(
   -> std::optional<CanonicalizedLaneletPose>;
 
 auto toCanonicalizedLaneletPose(
-  const geometry_msgs::msg::Point & map_point,
-  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, const bool include_crosswalk,
-  const double matching_distance) -> std::optional<CanonicalizedLaneletPose>;
-
-auto toCanonicalizedLaneletPose(
   const geometry_msgs::msg::Pose & map_pose,
   const traffic_simulator_msgs::msg::BoundingBox & bounding_box, const bool include_crosswalk,
   const double matching_distance) -> std::optional<CanonicalizedLaneletPose>;
@@ -84,6 +79,10 @@ auto boundingBoxRelativePose(
   -> std::optional<geometry_msgs::msg::Pose>;
 
 // Relative LaneletPose
+auto isAltitudeMatching(
+  const CanonicalizedLaneletPose & lanelet_pose,
+  const CanonicalizedLaneletPose & target_lanelet_pose) -> bool;
+
 auto relativeLaneletPose(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
   const RoutingConfiguration & routing_configuration) -> LaneletPose;

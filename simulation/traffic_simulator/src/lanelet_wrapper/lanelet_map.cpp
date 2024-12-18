@@ -40,6 +40,18 @@ auto laneletLength(const lanelet::Id lanelet_id) -> double
   return LaneletWrapper::laneletLengthCache().getLength(lanelet_id, LaneletWrapper::map());
 }
 
+auto laneletAltitude(
+  const lanelet::Id & lanelet_id, const geometry_msgs::msg::Pose & pose,
+  const double matching_distance) -> std::optional<double>
+{
+  if (const auto spline = centerPointsSpline(lanelet_id)) {
+    if (const auto s = spline->getSValue(pose, matching_distance)) {
+      return spline->getPoint(s.value()).z;
+    }
+  }
+  return std::nullopt;
+}
+
 auto laneletIds() -> lanelet::Ids
 {
   lanelet::Ids ids;
