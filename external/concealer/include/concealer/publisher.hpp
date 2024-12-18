@@ -20,23 +20,22 @@
 
 namespace concealer
 {
-template <typename MessageType>
+template <typename Message>
 class Publisher
 {
-private:
-  typename rclcpp::Publisher<MessageType>::SharedPtr publisher;
+  typename rclcpp::Publisher<Message>::SharedPtr publisher;
 
 public:
-  auto operator()(const MessageType & message) const -> decltype(auto)
+  template <typename Node>
+  explicit Publisher(const std::string & topic, Node & node)
+  : publisher(node.template create_publisher<Message>(topic, rclcpp::QoS(1).reliable()))
   {
-    return publisher->publish(message);
   }
 
-  template <typename NodeInterface>
-  explicit Publisher(std::string topic, NodeInterface & autoware_interface)
-  : publisher(
-      autoware_interface.template create_publisher<MessageType>(topic, rclcpp::QoS(1).reliable()))
+  template <typename... Ts>
+  auto operator()(Ts &&... xs) const -> decltype(auto)
   {
+    return publisher->publish(std::forward<decltype(xs)>(xs)...);
   }
 };
 }  // namespace concealer
