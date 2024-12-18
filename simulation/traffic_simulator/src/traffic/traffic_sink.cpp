@@ -48,8 +48,7 @@ TrafficSink::TrafficSink(
 auto TrafficSink::execute(
   [[maybe_unused]] const double current_time, [[maybe_unused]] const double step_time) -> void
 {
-  const auto entity_names = entity_manager_ptr_->getEntityNames();
-  for (const auto & entity_name : entity_names) {
+  for (const auto & entity_name : entity_manager_ptr_->getEntityNames()) {
     if (isEntitySinkable(entity_name)) {
       entity_manager_ptr_->despawnEntity(entity_name);
     }
