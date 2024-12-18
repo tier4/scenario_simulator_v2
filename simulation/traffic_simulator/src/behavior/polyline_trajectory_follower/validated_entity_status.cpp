@@ -41,6 +41,7 @@ ValidatedEntityStatus::ValidatedEntityStatus(
   behavior_parameter(validatedBehaviorParameter(behavior_parameter)),
   current_velocity(buildValidatedCurrentVelocity(linearSpeed(), entity_status_.pose.orientation))
 {
+  validatePosition(position());
   validateLinearSpeed(linearSpeed());
   validateLinearAcceleration(linearAcceleration(), behavior_parameter, step_time_);
 }
@@ -123,13 +124,12 @@ auto ValidatedEntityStatus::buildUpdatedEntityStatus(
     .lanelet_pose_valid(updated_lanelet_pose_valid);
 }
 
-auto ValidatedEntityStatus::validatedPosition(const geometry_msgs::msg::Point & entity_position)
-  const noexcept(false) -> geometry_msgs::msg::Point
+auto ValidatedEntityStatus::validatePosition(
+  const geometry_msgs::msg::Point & entity_position) const noexcept(false) -> void
 {
   if (not math::geometry::isFinite(entity_position)) {
     throwDetailedValidationError("entity_position", entity_position);
   }
-  return entity_position;
 }
 
 auto ValidatedEntityStatus::validateLinearSpeed(const double entity_speed) const noexcept(false)

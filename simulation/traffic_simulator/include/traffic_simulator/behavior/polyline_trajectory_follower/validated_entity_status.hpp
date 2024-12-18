@@ -72,8 +72,8 @@ public:
   }
 
 private:
-  auto validatedPosition(const geometry_msgs::msg::Point & entity_position) const noexcept(false)
-    -> geometry_msgs::msg::Point;
+  auto validatePosition(const geometry_msgs::msg::Point & entity_position) const noexcept(false)
+    -> void;
 
   auto validateLinearSpeed(const double entity_speed) const noexcept(false) -> void;
 
