@@ -36,17 +36,17 @@ ValidatedEntityStatus::ValidatedEntityStatus(
   const traffic_simulator_msgs::msg::EntityStatus & entity_status,
   const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter,
   const double step_time) noexcept(false)
-: entity_status_(entity_status),
+: step_time(step_time),
+  entity_status_(entity_status),
   name(entity_status_.name),
   time(entity_status_.time),
-  step_time(step_time),
+  bounding_box(entity_status_.bounding_box),
+  lanelet_pose_valid(entity_status_.lanelet_pose_valid),
   position(validatedPosition()),
+  behavior_parameter(validatedBehaviorParameter(behavior_parameter)),
   linear_speed(validatedLinearSpeed()),
   linear_acceleration(validatedLinearAcceleration()),
-  lanelet_pose_valid(entity_status_.lanelet_pose_valid),
-  current_velocity(buildValidatedCurrentVelocity(linear_speed)),
-  bounding_box(entity_status_.bounding_box),
-  behavior_parameter(validatedBehaviorParameter(behavior_parameter))
+  current_velocity(buildValidatedCurrentVelocity(linear_speed))
 {
 }
 

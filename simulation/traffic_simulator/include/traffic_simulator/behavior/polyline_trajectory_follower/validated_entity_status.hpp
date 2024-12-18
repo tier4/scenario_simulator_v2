@@ -35,17 +35,17 @@ public:
   auto buildUpdatedEntityStatus(const geometry_msgs::msg::Vector3 & desired_velocity) const
     -> traffic_simulator_msgs::msg::EntityStatus;
 
+  const double step_time;
   const traffic_simulator_msgs::msg::EntityStatus entity_status_;
   const std::string & name;
   const double time;
-  const double step_time;
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box;
+  const bool lanelet_pose_valid;
   const geometry_msgs::msg::Point position;
+  const traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter;
   const double linear_speed;
   const double linear_acceleration;
-  const bool lanelet_pose_valid;
   const geometry_msgs::msg::Vector3 current_velocity;
-  const traffic_simulator_msgs::msg::BoundingBox & bounding_box;
-  const traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter;
 
   ValidatedEntityStatus() = delete;
   ValidatedEntityStatus(const ValidatedEntityStatus & other);
