@@ -135,7 +135,7 @@ void PedestrianPlugin::tryInitializeConstraintActivator()
   if (activator_ptr_ == nullptr) {
     activator_ptr_ =
       std::make_shared<context_gamma_planner::pedestrian::constraints::ConstraintActivator>(
-        getHdMapUtils(), getTrafficLightManager());
+        getHdMapUtils(), getTrafficLights());
     setConstraintActivator(activator_ptr_);
   }
 }

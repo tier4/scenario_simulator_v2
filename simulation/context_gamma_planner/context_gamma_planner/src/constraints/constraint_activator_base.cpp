@@ -21,9 +21,9 @@ namespace constraints
 {
 ConstraintActivatorBase::ConstraintActivatorBase(
   const std::shared_ptr<hdmap_utils::HdMapUtils> hd_map_utils_ptr,
-  const std::shared_ptr<traffic_simulator::TrafficLightManager> traffic_light_manager_ptr)
+  const std::shared_ptr<traffic_simulator::TrafficLights> traffic_lights_ptr)
 : hd_map_utils_ptr_(hd_map_utils_ptr),
-  traffic_light_manager_ptr_(traffic_light_manager_ptr),
+  traffic_lights_ptr_(traffic_lights_ptr),
   is_stoped_(false)
 {
   for (const auto & id : hd_map_utils_ptr_->getLaneletIds()) {

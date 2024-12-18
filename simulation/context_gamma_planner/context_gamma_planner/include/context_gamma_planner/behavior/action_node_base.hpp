@@ -30,7 +30,7 @@
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/helper/stop_watch.hpp>
-#include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
+#include <traffic_simulator/traffic_lights/traffic_lights.hpp>
 #include <traffic_simulator_msgs/msg/obstacle.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 #include <unordered_map>
@@ -56,7 +56,8 @@ public:
    */
   static BT::PortsList providedPorts()
   {
-    return {// clang-format off
+    return {
+      // clang-format off
       BT::InputPort<std::shared_ptr<constraints::ConstraintActivatorBase>>("activator"),
       BT::InputPort<traffic_simulator::behavior::Request>("request"),
       BT::InputPort<std::shared_ptr<hdmap_utils::HdMapUtils>>("hdmap_utils"),
@@ -73,7 +74,7 @@ public:
       BT::OutputPort<traffic_simulator::behavior::Request>("request"),
       BT::InputPort<entity_behavior::EntityStatusDict>("other_entity_status"),
       BT::InputPort<std::vector<lanelet::Id>>("route_lanelets"),
-      BT::InputPort<std::shared_ptr<traffic_simulator::TrafficLightManager>>("traffic_light_manager"),
+      BT::InputPort<std::shared_ptr<traffic_simulator::TrafficLights>>("traffic_lights"),
       BT::OutputPort<std::shared_ptr<hdmap_utils::HdMapUtils>>("hdmap_utils"),
       BT::OutputPort<std::optional<traffic_simulator_msgs::msg::Obstacle>>("obstacle"),
       BT::OutputPort<traffic_simulator_msgs::msg::WaypointsArray>("waypoints")};
@@ -89,7 +90,7 @@ protected:
   std::shared_ptr<constraints::ConstraintActivatorBase> activator;
   traffic_simulator::behavior::Request request;
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils;
-  std::shared_ptr<traffic_simulator::TrafficLightManager> traffic_light_manager;
+  std::shared_ptr<traffic_simulator::TrafficLights> traffic_lights;
   std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus> entity_status;
   double current_time;
   double step_time;

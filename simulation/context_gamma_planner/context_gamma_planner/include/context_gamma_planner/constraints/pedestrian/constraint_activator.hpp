@@ -21,7 +21,7 @@
 #include <geometry/spline/catmull_rom_subspline.hpp>
 #include <memory>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
-#include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
+#include <traffic_simulator/traffic_lights/traffic_lights.hpp>
 
 namespace context_gamma_planner
 {
@@ -34,7 +34,7 @@ class ConstraintActivator : public context_gamma_planner::constraints::Constrain
 public:
   ConstraintActivator(
     const std::shared_ptr<hdmap_utils::HdMapUtils> hd_map_utils_ptr,
-    const std::shared_ptr<traffic_simulator::TrafficLightManager> traffic_light_manager_ptr);
+    const std::shared_ptr<traffic_simulator::TrafficLights> traffic_lights_ptr);
 };
 }  // namespace constraints
 }  // namespace pedestrian

@@ -26,9 +26,9 @@ using Side = context_gamma_planner::constraints::RoadEdgeConstraint::Side;
 
 ConstraintActivator::ConstraintActivator(
   const std::shared_ptr<hdmap_utils::HdMapUtils> hd_map_utils_ptr,
-  const std::shared_ptr<traffic_simulator::TrafficLightManager> traffic_light_manager_ptr)
+  const std::shared_ptr<traffic_simulator::TrafficLights> traffic_lights_ptr)
 : context_gamma_planner::constraints::ConstraintActivatorBase(
-    hd_map_utils_ptr, traffic_light_manager_ptr)
+    hd_map_utils_ptr, traffic_lights_ptr)
 {
   for (const auto & id : hd_map_utils_ptr_->getTrafficLightIds()) {
     const auto stop_line_ids = hd_map_utils_ptr_->getTrafficLightStopLineIds(id);
@@ -80,7 +80,7 @@ void ConstraintActivator::appendStopLineConstraint(
 void ConstraintActivator::appendTrafficLightConstraint(const lanelet::Ids & route_ids)
 {
   for (const auto & traffic_light_id : hd_map_utils_ptr_->getTrafficLightIdsOnPath(route_ids)) {
-    if (traffic_light_manager_ptr_->getTrafficLight(traffic_light_id)
+    if (traffic_lights_ptr_->getTrafficLight(traffic_light_id)
           .contains(
             traffic_simulator::TrafficLight::Color::green,
             traffic_simulator::TrafficLight::Status::solid_on,

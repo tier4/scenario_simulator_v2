@@ -75,7 +75,7 @@ if(BUILD_TESTING)
 endif()
 
 install(
-  DIRECTORY config launch
+  DIRECTORY launch
   DESTINATION share/${PROJECT_NAME})
 
 ament_auto_package()

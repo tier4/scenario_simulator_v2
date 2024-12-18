@@ -25,9 +25,9 @@ using State = context_gamma_planner::constraints::State;
 
 ConstraintActivator::ConstraintActivator(
   const std::shared_ptr<hdmap_utils::HdMapUtils> hd_map_utils_ptr,
-  const std::shared_ptr<traffic_simulator::TrafficLightManager> traffic_light_manager_ptr)
+  const std::shared_ptr<traffic_simulator::TrafficLights> traffic_lights_ptr)
 : context_gamma_planner::constraints::ConstraintActivatorBase(
-    hd_map_utils_ptr, traffic_light_manager_ptr)
+    hd_map_utils_ptr, traffic_lights_ptr)
 {
 }
 

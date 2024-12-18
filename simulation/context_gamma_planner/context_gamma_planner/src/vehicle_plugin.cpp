@@ -138,7 +138,7 @@ void VehiclePlugin::tryInitializeConstraintActivator()
   if (activator_ptr_ == nullptr) {
     activator_ptr_ =
       std::make_shared<context_gamma_planner::vehicle::constraints::ConstraintActivator>(
-        getHdMapUtils(), getTrafficLightManager());
+        getHdMapUtils(), getTrafficLights());
     setConstraintActivator(activator_ptr_);
   }
 }
