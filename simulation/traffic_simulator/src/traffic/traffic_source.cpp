@@ -17,6 +17,7 @@
 #include <geometry/vector3/hypot.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/traffic/traffic_source.hpp>
+#include <traffic_simulator/utils/lanelet_map.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
 
@@ -73,7 +74,9 @@ auto TrafficSource::Validator::operator()(
          });
 }
 
-auto TrafficSource::makeRandomPose(const bool random_orientation) -> geometry_msgs::msg::Pose
+auto TrafficSource::makeRandomPose(
+  const bool random_orientation, const VehicleOrPedestrianParameter & parameter)
+  -> geometry_msgs::msg::Pose
 {
   const double angle = angle_distribution_(engine_);
 
@@ -83,6 +86,17 @@ auto TrafficSource::makeRandomPose(const bool random_orientation) -> geometry_ms
 
   random_pose.position.x += radius * std::cos(angle);
   random_pose.position.y += radius * std::sin(angle);
+
+  if (const auto nearby_lanelets = hdmap_utils_->getNearbyLaneletIds(
+        random_pose.position, radius, std::holds_alternative<PedestrianParameter>(parameter));
+      !nearby_lanelets.empty()) {
+    // Get the altitude of the first nearby lanelet
+    if (
+      const auto altitude = traffic_simulator::lanelet_map::laneletAltitude(
+        nearby_lanelets.front(), random_pose, radius)) {
+      random_pose.position.z = altitude.value();
+    }
+  }
 
   if (random_orientation) {
     random_pose.orientation = math::geometry::convertEulerAngleToQuaternion(
@@ -107,7 +121,7 @@ void TrafficSource::execute(
       static constexpr auto max_randomization_attempts = 10000;
 
       for (auto tries = 0; tries < max_randomization_attempts; ++tries) {
-        auto candidate_pose = makeRandomPose(configuration_.use_random_orientation);
+        auto candidate_pose = makeRandomPose(configuration_.use_random_orientation, parameter);
         if (auto [valid, lanelet_pose] = isPoseValid(parameter, candidate_pose); valid) {
           return std::make_pair(candidate_pose, lanelet_pose);
         }

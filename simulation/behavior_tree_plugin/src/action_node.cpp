@@ -280,13 +280,9 @@ auto ActionNode::getDistanceToTargetEntityPolygon(
   double width_extension_right, double width_extension_left, double length_extension_front,
   double length_extension_rear) const -> std::optional<double>
 {
-  const auto & status = getEntityStatus(target_name);
-  if (status.laneMatchingSucceed()) {
-    return getDistanceToTargetEntityPolygon(
-      spline, status, width_extension_right, width_extension_left, length_extension_front,
-      length_extension_rear);
-  }
-  return std::nullopt;
+  return getDistanceToTargetEntityPolygon(
+    spline, getEntityStatus(target_name), width_extension_right, width_extension_left,
+    length_extension_front, length_extension_rear);
 }
 
 auto ActionNode::getDistanceToTargetEntityPolygon(
@@ -295,14 +291,27 @@ auto ActionNode::getDistanceToTargetEntityPolygon(
   double width_extension_left, double length_extension_front, double length_extension_rear) const
   -> std::optional<double>
 {
-  if (status.laneMatchingSucceed()) {
+  if (isOtherEntityAtConsideredAltitude(status)) {
     const auto polygon = math::geometry::transformPoints(
       status.getMapPose(), math::geometry::getPointsFromBbox(
                              status.getBoundingBox(), width_extension_right, width_extension_left,
                              length_extension_front, length_extension_rear));
     return spline.getCollisionPointIn2D(polygon, false);
+  } else {
+    return std::nullopt;
   }
-  return std::nullopt;
+}
+
+auto ActionNode::isOtherEntityAtConsideredAltitude(
+  const traffic_simulator::CanonicalizedEntityStatus & entity_status) const -> bool
+{
+  if (canonicalized_entity_status->laneMatchingSucceed() && entity_status.laneMatchingSucceed()) {
+    return traffic_simulator::pose::isAltitudeMatching(
+      canonicalized_entity_status->getCanonicalizedLaneletPose().value(),
+      entity_status.getCanonicalizedLaneletPose().value());
+  } else {
+    return false;
+  }
 }
 
 auto ActionNode::getDistanceToConflictingEntity(

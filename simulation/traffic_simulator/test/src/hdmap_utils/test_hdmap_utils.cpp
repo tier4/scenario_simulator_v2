@@ -2140,9 +2140,11 @@ TEST_F(HdMapUtilsTest_StandardMap, getLongitudinalDistance_differentLanelet)
 TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLongitudinalDistance_differentLaneletNoRoute)
 {
   const auto pose_to = traffic_simulator::lanelet_wrapper::pose::toLaneletPose(
-    makePose(makePoint(81590.79, 50067.66), makeQuaternionFromYaw(90.0)), lanelet::Id{3002185});
+    makePose(makePoint(81590.79, 50067.66, 35.0), makeQuaternionFromYaw(90.0)),
+    lanelet::Id{3002185});
   const auto pose_from = traffic_simulator::lanelet_wrapper::pose::toLaneletPose(
-    makePose(makePoint(81596.20, 50068.04), makeQuaternionFromYaw(90.0)), lanelet::Id{3002166});
+    makePose(makePoint(81596.20, 50068.04, 35.0), makeQuaternionFromYaw(90.0)),
+    lanelet::Id{3002166});
   ASSERT_TRUE(pose_from.has_value());
   ASSERT_TRUE(pose_to.has_value());
 

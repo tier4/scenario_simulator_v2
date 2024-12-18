@@ -33,6 +33,10 @@ auto isInLanelet(const lanelet::Id lanelet_id, const Point point) -> bool;
 
 auto laneletLength(const lanelet::Id lanelet_id) -> double;
 
+auto laneletAltitude(
+  const lanelet::Id & lanelet_id, const geometry_msgs::msg::Pose & pose,
+  const double matching_distance) -> std::optional<double>;
+
 template <typename Lanelet>
 auto laneletIds(const std::vector<Lanelet> & lanelets) -> lanelet::Ids
 {

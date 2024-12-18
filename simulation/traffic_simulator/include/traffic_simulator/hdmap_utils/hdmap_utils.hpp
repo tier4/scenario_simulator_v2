@@ -117,7 +117,7 @@ public:
     const traffic_simulator::RoutingGraphType type =
       traffic_simulator::RoutingConfiguration().routing_graph_type) const -> lanelet::Ids;
 
-  auto getHeight(const traffic_simulator_msgs::msg::LaneletPose &) const -> double;
+  auto getAltitude(const traffic_simulator_msgs::msg::LaneletPose &) const -> double;
 
   auto getLaneChangeTrajectory(
     const geometry_msgs::msg::Pose & from,

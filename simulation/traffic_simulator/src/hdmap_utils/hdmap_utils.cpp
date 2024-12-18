@@ -217,7 +217,7 @@ auto HdMapUtils::getNearbyLaneletIds(
   return lanelet_ids;
 }
 
-auto HdMapUtils::getHeight(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) const
+auto HdMapUtils::getAltitude(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) const
   -> double
 {
   return pose::toMapPose(lanelet_pose).pose.position.z;
