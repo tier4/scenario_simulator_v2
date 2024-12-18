@@ -26,7 +26,7 @@ Event::Event(const pugi::xml_node & node, Scope & scope, Maneuver & maneuver)
   StoryboardElement(
     readAttribute<UnsignedInt>("maximumExecutionCount", node, local(), UnsignedInt(1)),
     // If there is no "StartTrigger" in the "Event", the default StartTrigger that always returns true is used.
-    readElement<Trigger>("StartTrigger", node, local(), Trigger({ConditionGroup()}))),
+    readElement<Trigger>("StartTrigger", node, local(), Trigger::truthy())),
   priority(readAttribute<Priority>("priority", node, local())),
   parent_maneuver(maneuver)
 {
