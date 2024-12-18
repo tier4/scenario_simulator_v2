@@ -40,7 +40,7 @@ static auto getParameter(const std::string & name, T value = {})
 EgoEntitySimulation::EgoEntitySimulation(
   const traffic_simulator_msgs::msg::EntityStatus & initial_status,
   const traffic_simulator_msgs::msg::VehicleParameters & parameters, double step_time,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
+
   const rclcpp::Parameter & use_sim_time, const bool consider_acceleration_by_road_slope)
 : autoware(
     std::make_unique<concealer::AutowareUniverse>(getParameter<bool>("simulate_localization"))),
@@ -50,7 +50,6 @@ EgoEntitySimulation::EgoEntitySimulation(
   initial_pose_(status_.getMapPose()),
   initial_rotation_matrix_(math::geometry::getRotationMatrix(initial_pose_.orientation)),
   consider_acceleration_by_road_slope_(consider_acceleration_by_road_slope),
-  hdmap_utils_ptr_(hdmap_utils),
   vehicle_parameters(parameters)
 {
   setStatus(initial_status);
