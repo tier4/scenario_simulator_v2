@@ -178,7 +178,7 @@ auto AutowareUniverse::getVehicleCommand() const -> std::tuple<double, double, d
 
   const auto gear_command = getGearCommand();
 
-  auto sign_of = [](auto command) constexpr {
+  auto sign_of = [](auto command) {
     switch (command) {
       case GearCommand::REVERSE:
       case GearCommand::REVERSE_2:
