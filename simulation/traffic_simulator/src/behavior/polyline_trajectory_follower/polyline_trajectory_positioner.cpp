@@ -47,7 +47,7 @@ PolylineTrajectoryPositioner::PolylineTrajectoryPositioner(
   nearest_waypoint_with_specified_time_it(nearestWaypointWithSpecifiedTimeIterator()),
   nearest_waypoint_position(validatedEntityTargetPosition()),
   distance_to_nearest_waypoint(distanceAlongLanelet(
-    hdmap_utils_ptr, validated_entity_status.bounding_box, matching_distance,
+    hdmap_utils_ptr, validated_entity_status.boundingBox(), matching_distance,
     validated_entity_status.entity_status_.pose.position, nearest_waypoint_position)),
   total_remaining_distance(totalRemainingDistance(matching_distance, hdmap_utils_ptr)),
   time_to_nearest_waypoint(
@@ -112,7 +112,7 @@ auto PolylineTrajectoryPositioner::totalRemainingDistance(
           const double total_distance, const auto & vertex) {
           const auto next = std::next(&vertex);
           return total_distance + distanceAlongLanelet(
-                                    hdmap_utils_ptr, validated_entity_status.bounding_box,
+                                    hdmap_utils_ptr, validated_entity_status.boundingBox(),
                                     matching_distance, vertex.position.position,
                                     next->position.position);
         });

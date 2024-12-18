@@ -37,7 +37,6 @@ public:
 
   const double step_time_;
   const traffic_simulator_msgs::msg::EntityStatus entity_status_;
-  const traffic_simulator_msgs::msg::BoundingBox & bounding_box;
   const bool lanelet_pose_valid;
   const geometry_msgs::msg::Point position;
   const traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter;
@@ -54,6 +53,10 @@ public:
 
   auto name() const noexcept(true) -> const std::string & { return entity_status_.name; }
   auto time() const noexcept(true) -> double { return entity_status_.time; }
+  auto boundingBox() const noexcept(true) -> const traffic_simulator_msgs::msg::BoundingBox &
+  {
+    return entity_status_.bounding_box;
+  }
 
 private:
   auto validatedPosition(const geometry_msgs::msg::Point & entity_position) const noexcept(false)
