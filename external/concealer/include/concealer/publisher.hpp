@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CONCEALER__PUBLISHER_WRAPPER_HPP_
-#define CONCEALER__PUBLISHER_WRAPPER_HPP_
+#ifndef CONCEALER__PUBLISHER_HPP_
+#define CONCEALER__PUBLISHER_HPP_
 
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
@@ -21,7 +21,7 @@
 namespace concealer
 {
 template <typename MessageType>
-class PublisherWrapper
+class Publisher
 {
 private:
   typename rclcpp::Publisher<MessageType>::SharedPtr publisher;
@@ -33,7 +33,7 @@ public:
   }
 
   template <typename NodeInterface>
-  explicit PublisherWrapper(std::string topic, NodeInterface & autoware_interface)
+  explicit Publisher(std::string topic, NodeInterface & autoware_interface)
   : publisher(
       autoware_interface.template create_publisher<MessageType>(topic, rclcpp::QoS(1).reliable()))
   {
@@ -41,4 +41,4 @@ public:
 };
 }  // namespace concealer
 
-#endif  // CONCEALER__PUBLISHER_WRAPPER_HPP_
+#endif  // CONCEALER__PUBLISHER_HPP_

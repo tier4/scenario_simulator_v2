@@ -26,7 +26,7 @@
 #include <autoware_vehicle_msgs/msg/velocity_report.hpp>
 #include <autoware_vehicle_msgs/srv/control_mode_command.hpp>
 #include <concealer/continuous_transform_broadcaster.hpp>
-#include <concealer/publisher_wrapper.hpp>
+#include <concealer/publisher.hpp>
 #include <concealer/subscriber_wrapper.hpp>
 #include <concealer/visibility.hpp>
 #include <geometry_msgs/msg/accel_with_covariance_stamped.hpp>
@@ -62,14 +62,14 @@ public:
   SubscriberWrapper<TurnIndicatorsCommand> getTurnIndicatorsCommand;
   SubscriberWrapper<PathWithLaneId>        getPathWithLaneId;
 
-  PublisherWrapper<AccelWithCovarianceStamped> setAcceleration;
-  PublisherWrapper<Odometry>                   setOdometry;
-  PublisherWrapper<PoseWithCovarianceStamped>  setPose;
-  PublisherWrapper<SteeringReport>             setSteeringReport;
-  PublisherWrapper<GearReport>                 setGearReport;
-  PublisherWrapper<ControlModeReport>          setControlModeReport;
-  PublisherWrapper<VelocityReport>             setVelocityReport;
-  PublisherWrapper<TurnIndicatorsReport>       setTurnIndicatorsReport;
+  Publisher<AccelWithCovarianceStamped> setAcceleration;
+  Publisher<Odometry>                   setOdometry;
+  Publisher<PoseWithCovarianceStamped>  setPose;
+  Publisher<SteeringReport>             setSteeringReport;
+  Publisher<GearReport>                 setGearReport;
+  Publisher<ControlModeReport>          setControlModeReport;
+  Publisher<VelocityReport>             setVelocityReport;
+  Publisher<TurnIndicatorsReport>       setTurnIndicatorsReport;
 
   std::atomic<geometry_msgs::msg::Accel> current_acceleration;
   std::atomic<geometry_msgs::msg::Pose>  current_pose;

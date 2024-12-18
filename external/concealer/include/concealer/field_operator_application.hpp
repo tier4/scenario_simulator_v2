@@ -32,7 +32,7 @@
 #include <autoware_vehicle_msgs/msg/turn_indicators_command.hpp>
 #include <concealer/autoware_universe.hpp>
 #include <concealer/launch.hpp>
-#include <concealer/publisher_wrapper.hpp>
+#include <concealer/publisher.hpp>
 #include <concealer/service_with_validation.hpp>
 #include <concealer/subscriber_wrapper.hpp>
 #include <concealer/task_queue.hpp>
