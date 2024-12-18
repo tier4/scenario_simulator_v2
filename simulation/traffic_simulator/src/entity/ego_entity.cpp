@@ -286,7 +286,7 @@ auto EgoEntity::requestSpeedChange(
 
 auto EgoEntity::requestSynchronize(
   const std::string & /*target_name*/, const LaneletPose & /*target_sync_pose*/,
-  const LaneletPose & /*entity_targe*/ t, const double /*target_speed*/, const double /*tolerance*/)
+  const LaneletPose & /*entity_target*/, const double /*target_speed*/, const double /*tolerance*/)
   -> bool
 {
   THROW_SYNTAX_ERROR("Request synchronize is only for non-ego entities.");
