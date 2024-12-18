@@ -25,12 +25,30 @@ inline namespace syntax
    the OpenSCENARIO standard, so it may change in the future.
  */
 Stochastic::Stochastic(const pugi::xml_node & node, Scope & scope)
-: number_of_test_runs(readAttribute<UnsignedInt>("numberOfTestRuns", node, scope)),
-  random_seed(
-    scope.seed = static_cast<double>(readAttribute<Double>("randomSeed", node, scope, 0))),
-  stochastic_distribution(
-    readElement<StochasticDistribution>("StochasticDistribution", node, scope))
+: Scope(scope),
+  number_of_test_runs(readAttribute<UnsignedInt>("numberOfTestRuns", node, scope)),
+  random_seed([&] {
+    auto seed = static_cast<double>(readAttribute<Double>("randomSeed", node, scope, 0));
+    scope.random_engine.seed(seed);
+    return seed;
+  }()),
+  stochastic_distributions(
+    readElements<StochasticDistribution, 1>("StochasticDistribution", node, scope))
 {
+}
+
+auto Stochastic::derive() -> ParameterDistribution
+{
+  ParameterDistribution distribution;
+  for (std::size_t i = 0; i < number_of_test_runs; i++) {
+    ParameterSetSharedPtr parameter_set = std::make_shared<ParameterSet>();
+    for (auto & stochastic_distribution : stochastic_distributions) {
+      auto derived = stochastic_distribution.derive();
+      parameter_set->emplace(stochastic_distribution.parameter_name, derived);
+    }
+    distribution.emplace_back(parameter_set);
+  }
+  return distribution;
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

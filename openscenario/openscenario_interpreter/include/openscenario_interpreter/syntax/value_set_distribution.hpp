@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__VALUE_SET_DISTRIBUTION_HPP_
-#define OPENSCENARIO_INTERPRETER__VALUE_SET_DISTRIBUTION_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__VALUE_SET_DISTRIBUTION_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__VALUE_SET_DISTRIBUTION_HPP_
 
+#include <openscenario_interpreter/parameter_distribution.hpp>
 #include <openscenario_interpreter/syntax/file.hpp>
 #include <openscenario_interpreter/syntax/parameter_value_set.hpp>
 
@@ -22,23 +23,25 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- ValueSetDistribution 1.2 -----------------------------------------------
- *
- *  <xsd:complexType name="ValueSetDistribution">
- *    <xsd:sequence>
- *      <xsd:element name="ParameterValueSet" type="ParameterValueSet" maxOccurs="unbounded"/>
- *    </xsd:sequence>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
-struct ValueSetDistribution : public Scope
+/*
+   ValueSetDistribution (OpenSCENARIO XML 1.3)
+
+   Deterministic multi-parameter distribution, where one or multiple sets of parameter values can be defined.
+
+   <xsd:complexType name="ValueSetDistribution">
+     <xsd:sequence>
+       <xsd:element name="ParameterValueSet" type="ParameterValueSet" maxOccurs="unbounded"/>
+     </xsd:sequence>
+   </xsd:complexType>
+*/
+struct ValueSetDistribution : public Scope, public MultiParameterDistributionBase
 {
   const std::list<ParameterValueSet> parameter_value_sets;
 
   explicit ValueSetDistribution(const pugi::xml_node &, Scope & scope);
 
-  // TODO: implement evaluate()
+  auto derive() -> ParameterDistribution override;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
-#endif  // OPENSCENARIO_INTERPRETER__VALUE_SET_DISTRIBUTION_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__VALUE_SET_DISTRIBUTION_HPP_
