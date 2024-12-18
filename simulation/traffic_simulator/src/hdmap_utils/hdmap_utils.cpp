@@ -333,7 +333,7 @@ auto HdMapUtils::getNearbyLaneletIds(
   return lanelet_ids;
 }
 
-auto HdMapUtils::getHeight(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) const
+auto HdMapUtils::getAltitude(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) const
   -> double
 {
   return toMapPose(lanelet_pose).pose.position.z;
@@ -594,6 +594,11 @@ auto HdMapUtils::toLaneletPose(
     return std::nullopt;
   }
   auto pose_on_centerline = spline->getPose(s.value());
+
+  if (!isAltitudeMatching(pose.position.z, pose_on_centerline.position.z)) {
+    return std::nullopt;
+  }
+
   auto rpy = math::geometry::convertQuaternionToEulerAngle(
     math::geometry::getRotation(pose_on_centerline.orientation, pose.orientation));
   double offset = std::sqrt(spline->getSquaredDistanceIn2D(pose.position, s.value()));
@@ -615,6 +620,25 @@ auto HdMapUtils::toLaneletPose(
   lanelet_pose.offset = offset;
   lanelet_pose.rpy = rpy;
   return lanelet_pose;
+}
+
+auto HdMapUtils::isAltitudeMatching(
+  const double current_altitude, const double target_altitude) const -> bool
+{
+  /*
+     Using a fixed `altitude_threshold` value of 1.0 [m] is justified because the
+     entity's Z-position is always relative to its base. This eliminates the
+     need to dynamically adjust the threshold based on the entity's dimensions,
+     ensuring consistent altitude matching regardless of the entity type.
+
+     The position of the entity is defined relative to its base, typically
+     the center of the rear axle projected onto the ground in the case of vehicles.
+
+     There is no technical basis for this value; it was determined based on
+     experiments.
+  */
+  static constexpr double altitude_threshold = 1.0;
+  return std::abs(current_altitude - target_altitude) <= altitude_threshold;
 }
 
 auto HdMapUtils::toLaneletPose(
@@ -2164,6 +2188,18 @@ auto HdMapUtils::toPolygon(const lanelet::ConstLineString3d & line_string) const
     ret.emplace_back(point);
   }
   return ret;
+}
+
+auto HdMapUtils::getLaneletAltitude(
+  const lanelet::Id & lanelet_id, const geometry_msgs::msg::Pose & pose,
+  const double matching_distance) const -> std::optional<double>
+{
+  if (const auto spline = getCenterPointsSpline(lanelet_id)) {
+    if (const auto s = spline->getSValue(pose, matching_distance)) {
+      return spline->getPoint(s.value()).z;
+    }
+  }
+  return std::nullopt;
 }
 
 HdMapUtils::RoutingGraphs::RoutingGraphs(const lanelet::LaneletMapPtr & lanelet_map)
