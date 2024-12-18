@@ -169,8 +169,8 @@ public:
   auto toMapPosition(const lanelet::Id lanelet_id, const double s) const
     -> geometry_msgs::msg::Point;
 
-  auto toMapOrientation(const lanelet::Id lanelet_id, const double s) const
-    -> geometry_msgs::msg::Quaternion;
+  auto toMapOrientation(const lanelet::Id lanelet_id, const double s, const bool fill_pitch = true)
+    const -> geometry_msgs::msg::Quaternion;
 
   auto getLaneChangeTrajectory(
     const geometry_msgs::msg::Pose & from,
