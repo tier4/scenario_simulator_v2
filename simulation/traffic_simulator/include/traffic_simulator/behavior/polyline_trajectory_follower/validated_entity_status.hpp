@@ -37,7 +37,6 @@ public:
 
   const double step_time_;
   const traffic_simulator_msgs::msg::EntityStatus entity_status_;
-  const geometry_msgs::msg::Point position;
   const traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter;
   const double linear_speed;
   const double linear_acceleration;
@@ -57,6 +56,10 @@ public:
     return entity_status_.bounding_box;
   }
   auto laneletPoseValid() const noexcept(true) -> bool { return entity_status_.lanelet_pose_valid; }
+  auto position() const noexcept(true) -> const geometry_msgs::msg::Point &
+  {
+    return entity_status_.pose.position;
+  }
 
 private:
   auto validatedPosition(const geometry_msgs::msg::Point & entity_position) const noexcept(false)

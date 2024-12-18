@@ -198,8 +198,8 @@ auto PolylineTrajectoryPositioner::validatedEntityDesiredVelocity(const double d
     THROW_SIMULATION_ERROR("The followingMode is only supported for position.");
   }
 
-  const double dx = nearest_waypoint_position.x - validated_entity_status.position.x;
-  const double dy = nearest_waypoint_position.y - validated_entity_status.position.y;
+  const double dx = nearest_waypoint_position.x - validated_entity_status.position().x;
+  const double dy = nearest_waypoint_position.y - validated_entity_status.position().y;
   // if entity is on lane use pitch from lanelet, otherwise use pitch on target
   const double pitch =
     validated_entity_status.laneletPoseValid()
@@ -207,7 +207,7 @@ auto PolylineTrajectoryPositioner::validatedEntityDesiredVelocity(const double d
            validated_entity_status.entity_status_.pose.orientation)
            .y
       : std::atan2(
-          nearest_waypoint_position.z - validated_entity_status.position.z, std::hypot(dy, dx));
+          nearest_waypoint_position.z - validated_entity_status.position().z, std::hypot(dy, dx));
   const double yaw = std::atan2(dy, dx);  // Use yaw on target
 
   const auto desired_velocity = geometry_msgs::build<geometry_msgs::msg::Vector3>()

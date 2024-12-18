@@ -38,7 +38,6 @@ ValidatedEntityStatus::ValidatedEntityStatus(
   const double step_time) noexcept(false)
 : step_time_(step_time),
   entity_status_(entity_status),
-  position(validatedPosition(entity_status_.pose.position)),
   behavior_parameter(validatedBehaviorParameter(behavior_parameter)),
   linear_speed(validatedLinearSpeed(entity_status_.action_status.twist.linear.x)),
   linear_acceleration(validatedLinearAcceleration(
