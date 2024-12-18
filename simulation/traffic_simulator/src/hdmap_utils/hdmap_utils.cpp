@@ -1118,10 +1118,11 @@ auto HdMapUtils::toMapPosition(const lanelet::Id lanelet_id, const double s) con
   return getCenterPointsSpline(lanelet_id)->getPoint(s);
 }
 
-auto HdMapUtils::toMapOrientation(const lanelet::Id lanelet_id, const double s) const
+auto HdMapUtils::toMapOrientation(
+  const lanelet::Id lanelet_id, const double s, const bool fill_pitch) const
   -> geometry_msgs::msg::Quaternion
 {
-  return getCenterPointsSpline(lanelet_id)->getPose(s, true).orientation;
+  return getCenterPointsSpline(lanelet_id)->getPose(s, fill_pitch).orientation;
 }
 
 auto HdMapUtils::getTrafficLightIds() const -> lanelet::Ids
