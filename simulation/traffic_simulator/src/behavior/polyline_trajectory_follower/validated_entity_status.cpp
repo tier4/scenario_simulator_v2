@@ -42,11 +42,12 @@ ValidatedEntityStatus::ValidatedEntityStatus(
   time(entity_status_.time),
   bounding_box(entity_status_.bounding_box),
   lanelet_pose_valid(entity_status_.lanelet_pose_valid),
-  position(validatedPosition()),
+  position(validatedPosition(entity_status_.pose.position)),
   behavior_parameter(validatedBehaviorParameter(behavior_parameter)),
-  linear_speed(validatedLinearSpeed()),
-  linear_acceleration(validatedLinearAcceleration()),
-  current_velocity(buildValidatedCurrentVelocity(linear_speed))
+  linear_speed(validatedLinearSpeed(entity_status_.action_status.twist.linear.x)),
+  linear_acceleration(validatedLinearAcceleration(
+    entity_status_.action_status.accel.linear.x, behavior_parameter, step_time)),
+  current_velocity(buildValidatedCurrentVelocity(linear_speed, entity_status_.pose.orientation))
 {
 }
 
@@ -127,28 +128,29 @@ auto ValidatedEntityStatus::buildUpdatedEntityStatus(
     .lanelet_pose_valid(updated_lanelet_pose_valid);
 }
 
-auto ValidatedEntityStatus::validatedPosition() const noexcept(false) -> geometry_msgs::msg::Point
+auto ValidatedEntityStatus::validatedPosition(const geometry_msgs::msg::Point & entity_position)
+  const noexcept(false) -> geometry_msgs::msg::Point
 {
-  const auto entity_position = entity_status_.pose.position;
   if (not math::geometry::isFinite(entity_position)) {
     throwDetailedValidationError("entity_position", entity_position);
   }
   return entity_position;
 }
 
-auto ValidatedEntityStatus::validatedLinearSpeed() const noexcept(false) -> double
+auto ValidatedEntityStatus::validatedLinearSpeed(const double entity_speed) const noexcept(false)
+  -> double
 {
-  const double entity_speed = entity_status_.action_status.twist.linear.x;
-
   if (not std::isfinite(entity_speed)) {
     throwDetailedValidationError("entity_speed", entity_speed);
   }
   return entity_speed;
 }
 
-auto ValidatedEntityStatus::validatedLinearAcceleration() const noexcept(false) -> double
+auto ValidatedEntityStatus::validatedLinearAcceleration(
+  const double acceleration,
+  const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter,
+  const double step_time) const noexcept(false) -> double
 {
-  const double acceleration = entity_status_.action_status.accel.linear.x;
   const double max_acceleration = std::min(
     acceleration + behavior_parameter.dynamic_constraints.max_acceleration_rate * step_time,
     +behavior_parameter.dynamic_constraints.max_acceleration);
@@ -165,11 +167,11 @@ auto ValidatedEntityStatus::validatedLinearAcceleration() const noexcept(false) 
   return acceleration;
 }
 
-auto ValidatedEntityStatus::buildValidatedCurrentVelocity(const double speed) const noexcept(false)
-  -> geometry_msgs::msg::Vector3
+auto ValidatedEntityStatus::buildValidatedCurrentVelocity(
+  const double speed, const geometry_msgs::msg::Quaternion & entity_orientation) const
+  noexcept(false) -> geometry_msgs::msg::Vector3
 {
-  const auto euler_angles =
-    math::geometry::convertQuaternionToEulerAngle(entity_status_.pose.orientation);
+  const auto euler_angles = math::geometry::convertQuaternionToEulerAngle(entity_orientation);
   const double pitch = -euler_angles.y;
   const double yaw = euler_angles.z;
   const auto entity_velocity = geometry_msgs::build<geometry_msgs::msg::Vector3>()

@@ -55,11 +55,15 @@ public:
   ~ValidatedEntityStatus() = default;
 
 private:
-  auto validatedPosition() const noexcept(false) -> geometry_msgs::msg::Point;
+  auto validatedPosition(const geometry_msgs::msg::Point & entity_position) const noexcept(false)
+    -> geometry_msgs::msg::Point;
 
-  auto validatedLinearSpeed() const noexcept(false) -> double;
+  auto validatedLinearSpeed(const double entity_speed) const noexcept(false) -> double;
 
-  auto validatedLinearAcceleration() const noexcept(false) -> double;
+  auto validatedLinearAcceleration(
+    const double acceleration,
+    const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter,
+    const double step_time) const noexcept(false) -> double;
 
   auto validatedBehaviorParameter(
     const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter) const noexcept(false)
@@ -68,8 +72,9 @@ private:
   auto buildUpdatedPoseOrientation(const geometry_msgs::msg::Vector3 & desired_velocity) const
     noexcept(true) -> geometry_msgs::msg::Quaternion;
 
-  auto buildValidatedCurrentVelocity(const double speed) const noexcept(false)
-    -> geometry_msgs::msg::Vector3;
+  auto buildValidatedCurrentVelocity(
+    const double speed, const geometry_msgs::msg::Quaternion & entity_orientation) const
+    noexcept(false) -> geometry_msgs::msg::Vector3;
 
   template <
     typename T, std::enable_if_t<math::geometry::IsLikeVector3<T>::value, std::nullptr_t> = nullptr>
