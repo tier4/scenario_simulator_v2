@@ -75,21 +75,20 @@ private:
 
   void onInitialize() override
   {
-    api_.spawn(
+    auto ego_entity = api_.spawn(
       "ego",
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
         34741, 0.0, 0.0, api_.getHdmapUtils()),
       getVehicleParameters());
-    auto ego_entity = api_.getEntity("ego");
     ego_entity->setLinearVelocity(3);
     ego_entity->requestSpeedChange(3.0, true);
 
-    api_.spawn(
+    auto front_entity = api_.spawn(
       "front",
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
         34741, 10.0, 0.0, api_.getHdmapUtils()),
       getVehicleParameters());
-    api_.getEntity("front")->setLinearVelocity(3);
+    front_entity->setLinearVelocity(3);
   }
 };
 }  // namespace cpp_mock_scenarios

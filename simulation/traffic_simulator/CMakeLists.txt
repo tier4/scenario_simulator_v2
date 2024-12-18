@@ -47,19 +47,21 @@ ament_auto_add_library(traffic_simulator SHARED
   src/hdmap_utils/hdmap_utils.cpp
   src/hdmap_utils/traffic_rules.cpp
   src/helper/helper.cpp
-  src/job/job_list.cpp
+  src/helper/ostream_helpers.cpp
   src/job/job.cpp
+  src/job/job_list.cpp
   src/simulation_clock/simulation_clock.cpp
-  src/traffic_lights/configurable_rate_updater.cpp
-  src/traffic_lights/traffic_light_marker_publisher.cpp
-  src/traffic_lights/traffic_light_publisher.cpp
-  src/traffic_lights/traffic_light.cpp
-  src/traffic_lights/traffic_lights_base.cpp
-  src/traffic_lights/traffic_lights.cpp
   src/traffic/traffic_controller.cpp
   src/traffic/traffic_sink.cpp
   src/traffic/traffic_source.cpp
+  src/traffic_lights/configurable_rate_updater.cpp
+  src/traffic_lights/traffic_light.cpp
+  src/traffic_lights/traffic_lights.cpp
+  src/traffic_lights/traffic_lights_base.cpp
+  src/traffic_lights/traffic_light_marker_publisher.cpp
+  src/traffic_lights/traffic_light_publisher.cpp
   src/utils/distance.cpp
+  src/utils/node_parameters.cpp
   src/utils/pose.cpp
 )
 
