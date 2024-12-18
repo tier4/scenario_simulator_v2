@@ -38,7 +38,6 @@ public:
   const double step_time_;
   const traffic_simulator_msgs::msg::EntityStatus entity_status_;
   const traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter;
-  const double linear_speed;
   const double linear_acceleration;
   const geometry_msgs::msg::Vector3 current_velocity;
 
@@ -60,12 +59,16 @@ public:
   {
     return entity_status_.pose.position;
   }
+  auto linearSpeed() const noexcept(true) -> double
+  {
+    return entity_status_.action_status.twist.linear.x;
+  }
 
 private:
   auto validatedPosition(const geometry_msgs::msg::Point & entity_position) const noexcept(false)
     -> geometry_msgs::msg::Point;
 
-  auto validatedLinearSpeed(const double entity_speed) const noexcept(false) -> double;
+  auto validateLinearSpeed(const double entity_speed) const noexcept(false) -> void;
 
   auto validatedLinearAcceleration(
     const double acceleration,

@@ -39,11 +39,11 @@ ValidatedEntityStatus::ValidatedEntityStatus(
 : step_time_(step_time),
   entity_status_(entity_status),
   behavior_parameter(validatedBehaviorParameter(behavior_parameter)),
-  linear_speed(validatedLinearSpeed(entity_status_.action_status.twist.linear.x)),
   linear_acceleration(validatedLinearAcceleration(
     entity_status_.action_status.accel.linear.x, behavior_parameter, step_time_)),
-  current_velocity(buildValidatedCurrentVelocity(linear_speed, entity_status_.pose.orientation))
+  current_velocity(buildValidatedCurrentVelocity(linearSpeed(), entity_status_.pose.orientation))
 {
+  validateLinearSpeed(linearSpeed());
 }
 
 ValidatedEntityStatus::ValidatedEntityStatus(const ValidatedEntityStatus & other)
@@ -133,13 +133,12 @@ auto ValidatedEntityStatus::validatedPosition(const geometry_msgs::msg::Point & 
   return entity_position;
 }
 
-auto ValidatedEntityStatus::validatedLinearSpeed(const double entity_speed) const noexcept(false)
-  -> double
+auto ValidatedEntityStatus::validateLinearSpeed(const double entity_speed) const noexcept(false)
+  -> void
 {
   if (not std::isfinite(entity_speed)) {
     throwDetailedValidationError("entity_speed", entity_speed);
   }
-  return entity_speed;
 }
 
 auto ValidatedEntityStatus::validatedLinearAcceleration(
