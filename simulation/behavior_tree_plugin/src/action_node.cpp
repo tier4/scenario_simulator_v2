@@ -18,6 +18,7 @@
 #include <geometry/quaternion/euler_to_quaternion.hpp>
 #include <geometry/quaternion/get_rotation.hpp>
 #include <geometry/quaternion/get_rotation_matrix.hpp>
+#include <geometry/quaternion/normalize.hpp>
 #include <geometry/quaternion/quaternion_to_euler.hpp>
 #include <geometry/vector3/normalize.hpp>
 #include <memory>
@@ -544,13 +545,13 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
   geometry_msgs::msg::Accel accel_new = std::get<1>(dynamics);
   geometry_msgs::msg::Twist twist_new = std::get<0>(dynamics);
   geometry_msgs::msg::Pose pose_new = canonicalized_entity_status->getMapPose();
-  const auto current_lanelet_Id = canonicalized_entity_status->getLaneletId();
 
   const auto desired_velocity = geometry_msgs::build<geometry_msgs::msg::Vector3>()
                                   .x(twist_new.linear.x)
                                   .y(twist_new.linear.y)
                                   .z(twist_new.linear.z);
   auto displacement = desired_velocity * step_time;
+  displacement = math::geometry::normalize(pose_new.orientation) * displacement;
 
   auto adjustPositionAtLaneletBoundary =
     [&](double remaining_lanelet_length, const std::optional<lanelet::Id> & next_lanelet_id) {
@@ -572,6 +573,7 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
   if (!canonicalized_entity_status->laneMatchingSucceed()) {
     pose_new.position += displacement;
   } else {
+    const auto current_lanelet_Id = canonicalized_entity_status->getLaneletId();
     const auto lanelet_pose = canonicalized_entity_status->getLaneletPose().s;
     applyPitchToDisplacement(displacement, getLaneletPitch(current_lanelet_Id, lanelet_pose));
     const double remaining_lanelet_length =

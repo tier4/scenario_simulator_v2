@@ -16,6 +16,7 @@
 #define GEOMETRY__QUATERNION__OPERATOR_HPP_
 
 #include <geometry/quaternion/is_like_quaternion.hpp>
+#include <geometry/vector3/vector3.hpp>
 #include <geometry_msgs/msg/quaternion.hpp>
 
 namespace math
@@ -62,6 +63,34 @@ auto operator*(const T & a, const U & b)
   v.z = -a.y * b.x + a.x * b.y + a.w * b.z + a.z * b.w;
   v.w = -a.x * b.x - a.y * b.y - a.z * b.z + a.w * b.w;
   return v;
+}
+
+template <
+  typename T, typename U,
+  std::enable_if_t<std::conjunction_v<IsLikeQuaternion<T>, IsLikeVector3<U>>, std::nullptr_t> =
+    nullptr>
+auto operator*(const T & a, const U & b)
+{
+  T b_quat;
+  b_quat.x = b.x;
+  b_quat.y = b.y;
+  b_quat.z = b.z;
+  b_quat.w = 0.0;
+
+  T a_inv = a;
+  a_inv.x = -a.x;
+  a_inv.y = -a.y;
+  a_inv.z = -a.z;
+  a_inv.w = a.w;
+
+  T result_quat = a * b_quat * a_inv;
+
+  U rotated_vector;
+  rotated_vector.x = result_quat.x;
+  rotated_vector.y = result_quat.y;
+  rotated_vector.z = result_quat.z;
+
+  return rotated_vector;
 }
 
 template <
