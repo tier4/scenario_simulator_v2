@@ -39,7 +39,7 @@ ValidatedEntityStatus::ValidatedEntityStatus(
 : step_time_(step_time),
   entity_status_(entity_status),
   behavior_parameter(validatedBehaviorParameter(behavior_parameter)),
-  current_velocity(buildValidatedCurrentVelocity(linearSpeed(), entity_status_.pose.orientation))
+  current_velocity(buildValidatedCurrentVelocity(linearSpeed(), orientation()))
 {
   validatePosition(position());
   validateLinearSpeed(linearSpeed());
@@ -57,7 +57,7 @@ auto ValidatedEntityStatus::buildUpdatedPoseOrientation(
 {
   if (desired_velocity.x == 0.0 and desired_velocity.y == 0.0 and desired_velocity.z == 0.0) {
     // do not change orientation if there is no designed_velocity vector
-    return entity_status_.pose.orientation;
+    return orientation();
   } else {
     // if there is a designed_velocity vector, set the orientation in the direction of it
     const geometry_msgs::msg::Vector3 direction =
@@ -87,7 +87,7 @@ auto ValidatedEntityStatus::buildUpdatedEntityStatus(
       .z(0.0);
   const auto updated_action_status_twist_angular =
     math::geometry::convertQuaternionToEulerAngle(
-      math::geometry::getRotation(entity_status_.pose.orientation, updated_pose_orientation)) /
+      math::geometry::getRotation(orientation(), updated_pose_orientation)) /
     step_time_;
   const auto updated_action_status_twist = geometry_msgs::build<geometry_msgs::msg::Twist>()
                                              .linear(updated_action_status_twist_linear)
@@ -106,10 +106,9 @@ auto ValidatedEntityStatus::buildUpdatedEntityStatus(
       .twist(updated_action_status_twist)
       .accel(updated_action_status_accel)
       .linear_jerk(entity_status_.action_status.linear_jerk);
-  const auto updated_pose =
-    geometry_msgs::build<geometry_msgs::msg::Pose>()
-      .position(entity_status_.pose.position + desired_velocity * step_time_)
-      .orientation(updated_pose_orientation);
+  const auto updated_pose = geometry_msgs::build<geometry_msgs::msg::Pose>()
+                              .position(position() + desired_velocity * step_time_)
+                              .orientation(updated_pose_orientation);
   constexpr bool updated_lanelet_pose_valid = false;
 
   return traffic_simulator_msgs::build<traffic_simulator_msgs::msg::EntityStatus>()
