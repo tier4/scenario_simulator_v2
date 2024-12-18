@@ -243,7 +243,7 @@ auto PolylineTrajectoryPositioner::validatedEntityDesiredAcceleration() const no
 
   try {
     const double desired_acceleration = follow_waypoint_controller.getAcceleration(
-      total_remaining_time, total_remaining_distance, validated_entity_status.linear_acceleration,
+      total_remaining_time, total_remaining_distance, validated_entity_status.linearAcceleration(),
       validated_entity_status.linearSpeed());
 
     if (not std::isfinite(desired_acceleration)) {
@@ -330,7 +330,7 @@ auto PolylineTrajectoryPositioner::makeUpdatedEntityStatus() const -> std::optio
         maximum speed including braking - in this case accuracy of arrival is checked
       */
       if (follow_waypoint_controller.areConditionsOfArrivalMet(
-            validated_entity_status.linear_acceleration, validated_entity_status.linearSpeed(),
+            validated_entity_status.linearAcceleration(), validated_entity_status.linearSpeed(),
             distance_to_nearest_waypoint)) {
         return std::nullopt;
       } else {
@@ -359,7 +359,7 @@ auto PolylineTrajectoryPositioner::makeUpdatedEntityStatus() const -> std::optio
     */
   } else if (math::arithmetic::isDefinitelyLessThan(time_to_nearest_waypoint, step_time / 2.0)) {
     if (follow_waypoint_controller.areConditionsOfArrivalMet(
-          validated_entity_status.linear_acceleration, validated_entity_status.linearSpeed(),
+          validated_entity_status.linearAcceleration(), validated_entity_status.linearSpeed(),
           distance_to_nearest_waypoint)) {
       return std::nullopt;
     } else {
@@ -422,7 +422,7 @@ auto PolylineTrajectoryPositioner::validatePredictedState(const double desired_a
 {
   const auto predicted_state_opt = follow_waypoint_controller.getPredictedWaypointArrivalState(
     desired_acceleration, total_remaining_time, total_remaining_distance,
-    validated_entity_status.linear_acceleration, validated_entity_status.linearSpeed());
+    validated_entity_status.linearAcceleration(), validated_entity_status.linearSpeed());
   if (not std::isinf(total_remaining_time) and not predicted_state_opt.has_value()) {
     THROW_SIMULATION_ERROR(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
@@ -431,7 +431,7 @@ auto PolylineTrajectoryPositioner::validatePredictedState(const double desired_a
       " calculated invalid acceleration:", " desired_acceleration: ", desired_acceleration,
       ", total_remaining_time: ", total_remaining_time,
       ", total_remaining_distance: ", total_remaining_distance,
-      ", acceleration: ", validated_entity_status.linear_acceleration,
+      ", acceleration: ", validated_entity_status.linearAcceleration(),
       ", speed: ", validated_entity_status.linearSpeed(), ". ", follow_waypoint_controller);
   }
 }

@@ -39,11 +39,10 @@ ValidatedEntityStatus::ValidatedEntityStatus(
 : step_time_(step_time),
   entity_status_(entity_status),
   behavior_parameter(validatedBehaviorParameter(behavior_parameter)),
-  linear_acceleration(validatedLinearAcceleration(
-    entity_status_.action_status.accel.linear.x, behavior_parameter, step_time_)),
   current_velocity(buildValidatedCurrentVelocity(linearSpeed(), entity_status_.pose.orientation))
 {
   validateLinearSpeed(linearSpeed());
+  validateLinearAcceleration(linearAcceleration(), behavior_parameter, step_time_);
 }
 
 ValidatedEntityStatus::ValidatedEntityStatus(const ValidatedEntityStatus & other)
@@ -141,10 +140,10 @@ auto ValidatedEntityStatus::validateLinearSpeed(const double entity_speed) const
   }
 }
 
-auto ValidatedEntityStatus::validatedLinearAcceleration(
+auto ValidatedEntityStatus::validateLinearAcceleration(
   const double acceleration,
   const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter,
-  const double step_time) const noexcept(false) -> double
+  const double step_time) const noexcept(false) -> void
 {
   const double max_acceleration = std::min(
     acceleration + behavior_parameter.dynamic_constraints.max_acceleration_rate * step_time,
@@ -159,7 +158,6 @@ auto ValidatedEntityStatus::validatedLinearAcceleration(
   } else if (not std::isfinite(min_acceleration)) {
     throwDetailedValidationError("minimum acceleration", min_acceleration);
   }
-  return acceleration;
 }
 
 auto ValidatedEntityStatus::buildValidatedCurrentVelocity(
