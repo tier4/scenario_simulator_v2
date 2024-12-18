@@ -38,7 +38,6 @@ ValidatedEntityStatus::ValidatedEntityStatus(
   const double step_time) noexcept(false)
 : step_time_(step_time),
   entity_status_(entity_status),
-  time(entity_status_.time),
   bounding_box(entity_status_.bounding_box),
   lanelet_pose_valid(entity_status_.lanelet_pose_valid),
   position(validatedPosition(entity_status_.pose.position)),

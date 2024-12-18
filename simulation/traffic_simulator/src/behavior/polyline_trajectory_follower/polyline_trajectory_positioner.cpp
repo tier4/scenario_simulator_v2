@@ -52,7 +52,7 @@ PolylineTrajectoryPositioner::PolylineTrajectoryPositioner(
   total_remaining_distance(totalRemainingDistance(matching_distance, hdmap_utils_ptr)),
   time_to_nearest_waypoint(
     (std::isnan(polyline_trajectory.base_time) ? 0.0 : polyline_trajectory.base_time) +
-    polyline_trajectory.shape.vertices.front().time - validated_entity_status.time),
+    polyline_trajectory.shape.vertices.front().time - validated_entity_status.time()),
   total_remaining_time(totalRemainingTime()),
   follow_waypoint_controller(FollowWaypointController(
     validated_entity_status.behavior_parameter, step_time,
@@ -134,7 +134,7 @@ auto PolylineTrajectoryPositioner::totalRemainingTime() const noexcept(false) ->
   } else {
     const double remaining_time =
       (std::isnan(polyline_trajectory.base_time) ? 0.0 : polyline_trajectory.base_time) +
-      nearest_waypoint_with_specified_time_it->time - validated_entity_status.time;
+      nearest_waypoint_with_specified_time_it->time - validated_entity_status.time();
 
     /*
       The condition below should ideally be remaining_time < 0.
@@ -365,7 +365,7 @@ auto PolylineTrajectoryPositioner::makeUpdatedEntityStatus() const -> std::optio
     } else {
       THROW_SIMULATION_ERROR(
         "Vehicle ", std::quoted(validated_entity_status.name()), " at time ",
-        validated_entity_status.time, "s (remaining time is ", time_to_nearest_waypoint,
+        validated_entity_status.time(), "s (remaining time is ", time_to_nearest_waypoint,
         "s), has completed a trajectory to the nearest waypoint with", " specified time equal to ",
         polyline_trajectory.shape.vertices.front().time, "s at a distance equal to ",
         distance_to_nearest_waypoint,
