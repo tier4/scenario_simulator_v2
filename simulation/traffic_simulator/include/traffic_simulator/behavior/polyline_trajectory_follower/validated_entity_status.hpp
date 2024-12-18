@@ -47,38 +47,18 @@ public:
   ValidatedEntityStatus & operator=(ValidatedEntityStatus && other) noexcept(true) = delete;
   ~ValidatedEntityStatus() = default;
 
-  auto name() const noexcept(true) -> const std::string & { return entity_status_.name; }
-  auto time() const noexcept(true) -> double { return entity_status_.time; }
-  auto boundingBox() const noexcept(true) -> const traffic_simulator_msgs::msg::BoundingBox &
-  {
-    return entity_status_.bounding_box;
-  }
-  auto laneletPoseValid() const noexcept(true) -> bool { return entity_status_.lanelet_pose_valid; }
-  auto position() const noexcept(true) -> const geometry_msgs::msg::Point &
-  {
-    return entity_status_.pose.position;
-  }
-  auto orientation() const noexcept(true) -> const geometry_msgs::msg::Quaternion &
-  {
-    return entity_status_.pose.orientation;
-  }
-  auto linearSpeed() const noexcept(true) -> double
-  {
-    return entity_status_.action_status.twist.linear.x;
-  }
-  auto linearAcceleration() const noexcept(true) -> double
-  {
-    return entity_status_.action_status.accel.linear.x;
-  }
-  auto behaviorParameter() const noexcept(true)
-    -> const traffic_simulator_msgs::msg::BehaviorParameter &
-  {
-    return behavior_parameter_;
-  }
-  auto currentVelocity() const noexcept(true) -> const geometry_msgs::msg::Vector3 &
-  {
-    return current_velocity_;
-  }
+  // clang-format off
+  auto name()               const noexcept(true) -> const std::string &                                    { return entity_status_.name;                         }
+  auto time()               const noexcept(true) -> double                                                 { return entity_status_.time;                         }
+  auto boundingBox()        const noexcept(true) -> const traffic_simulator_msgs::msg::BoundingBox &       { return entity_status_.bounding_box;                 }
+  auto laneletPoseValid()   const noexcept(true) -> bool                                                   { return entity_status_.lanelet_pose_valid;           }
+  auto position()           const noexcept(true) -> const geometry_msgs::msg::Point &                      { return entity_status_.pose.position;                }
+  auto orientation()        const noexcept(true) -> const geometry_msgs::msg::Quaternion &                 { return entity_status_.pose.orientation;             }
+  auto linearSpeed()        const noexcept(true) -> double                                                 { return entity_status_.action_status.twist.linear.x; }
+  auto linearAcceleration() const noexcept(true) -> double                                                 { return entity_status_.action_status.accel.linear.x; }
+  auto behaviorParameter()  const noexcept(true) -> const traffic_simulator_msgs::msg::BehaviorParameter & { return behavior_parameter_;                         }
+  auto currentVelocity()    const noexcept(true) -> const geometry_msgs::msg::Vector3 &                    { return current_velocity_;                           }
+  // clang-format on
 
 private:
   auto validatePosition(const geometry_msgs::msg::Point & entity_position) const noexcept(false)
