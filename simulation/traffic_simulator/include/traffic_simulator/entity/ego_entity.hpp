@@ -17,7 +17,6 @@
 
 #include <algorithm>
 #include <boost/filesystem.hpp>
-#include <concealer/autoware.hpp>
 #include <concealer/field_operator_application.hpp>
 #include <memory>
 #include <optional>

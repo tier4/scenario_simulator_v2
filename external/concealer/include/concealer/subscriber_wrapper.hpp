@@ -20,43 +20,36 @@
 
 namespace concealer
 {
-enum class ThreadSafety : bool { unsafe, safe };
-
-template <typename MessageType, ThreadSafety thread_safety = ThreadSafety::unsafe>
+template <typename Message>
 class SubscriberWrapper
 {
-  typename MessageType::ConstSharedPtr current_value = std::make_shared<const MessageType>();
+  typename Message::ConstSharedPtr current_value = std::make_shared<const Message>();
 
-  typename rclcpp::Subscription<MessageType>::SharedPtr subscription;
+  typename rclcpp::Subscription<Message>::SharedPtr subscription;
 
 public:
-  auto operator()() const -> decltype(auto)
+  auto operator()() const -> const auto & { return *std::atomic_load(&current_value); }
+
+  template <typename Autoware, typename Callback>
+  explicit SubscriberWrapper(
+    const std::string & topic, const rclcpp::QoS & quality_of_service, Autoware & autoware,
+    const Callback & callback)
+  : subscription(autoware.template create_subscription<Message>(
+      topic, quality_of_service,
+      [this, callback](const typename Message::ConstSharedPtr & message) {
+        if (std::atomic_store(&current_value, message); current_value) {
+          callback(*std::atomic_load(&current_value));
+        }
+      }))
   {
-    if constexpr (thread_safety == ThreadSafety::unsafe) {
-      return *current_value;
-    } else {
-      return *std::atomic_load(&current_value);
-    }
   }
 
-  template <typename NodeInterface>
-  SubscriberWrapper(
-    const std::string & topic, const rclcpp::QoS & quality_of_service,
-    NodeInterface & autoware_interface,
-    const std::function<void(const MessageType &)> & callback = {})
-  : subscription(autoware_interface.template create_subscription<MessageType>(
-      topic, quality_of_service,
-      [this, callback](const typename MessageType::ConstSharedPtr message) {
-        if constexpr (thread_safety == ThreadSafety::safe) {
-          std::atomic_store(&current_value, message);
-          if (current_value and callback) {
-            callback(*std::atomic_load(&current_value));
-          }
-        } else {
-          if (current_value = message; current_value and callback) {
-            callback(*current_value);
-          }
-        }
+  template <typename Autoware>
+  explicit SubscriberWrapper(
+    const std::string & topic, const rclcpp::QoS & quality_of_service, Autoware & autoware)
+  : subscription(autoware.template create_subscription<Message>(
+      topic, quality_of_service, [this](const typename Message::ConstSharedPtr & message) {
+        std::atomic_store(&current_value, message);
       }))
   {
   }

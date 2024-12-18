@@ -15,13 +15,6 @@
 #ifndef CONCEALER__LAUNCH_HPP_
 #define CONCEALER__LAUNCH_HPP_
 
-#ifdef CONCEALER_ISOLATE_STANDARD_OUTPUT
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <unistd.h>
-#endif
-
 #include <boost/algorithm/string.hpp>
 #include <concealer/execute.hpp>
 #include <cstdlib>
@@ -37,14 +30,6 @@ template <typename Parameters>
 auto ros2_launch(
   const std::string & package, const std::string & file, const Parameters & parameters)
 {
-#ifdef CONCEALER_ISOLATE_STANDARD_OUTPUT
-  const std::string log_filename = "/tmp/scenario_test_runner/autoware-output.txt";
-  const auto fd = ::open(log_filename.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
-  ::dup2(fd, STDOUT_FILENO);
-  ::dup2(fd, STDERR_FILENO);
-  ::close(fd);
-#endif
-
   const auto argv = [&]() {
     auto argv = std::vector<std::string>();
 

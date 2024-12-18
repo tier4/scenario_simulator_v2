@@ -177,15 +177,15 @@ auto EgoEntitySimulation::makeSimulationModel(
 
 auto EgoEntitySimulation::setAutowareStatus() -> void
 {
-  autoware->set([this]() {
+  autoware->current_acceleration.store([this]() {
     geometry_msgs::msg::Accel message;
     message.linear.x = vehicle_model_ptr_->getAx();
     return message;
   }());
 
-  autoware->set(status_.getMapPose());
+  autoware->current_pose.store(status_.getMapPose());
 
-  autoware->set(getCurrentTwist());
+  autoware->current_twist.store(getCurrentTwist());
 }
 
 void EgoEntitySimulation::requestSpeedChange(double value)
@@ -308,20 +308,42 @@ void EgoEntitySimulation::update(
 
     auto acceleration_by_slope = calculateAccelerationBySlope();
 
+    const auto [speed, acceleration, tire_angle, gear_sign, gear_command] =
+      autoware->getVehicleCommand();
+
     switch (vehicle_model_type_) {
       case VehicleModelType::DELAY_STEER_ACC:
       case VehicleModelType::DELAY_STEER_ACC_GEARED:
       case VehicleModelType::DELAY_STEER_MAP_ACC_GEARED:
       case VehicleModelType::IDEAL_STEER_ACC:
       case VehicleModelType::IDEAL_STEER_ACC_GEARED:
-        input(0) = autoware->getGearSign() * (autoware->getAcceleration() + acceleration_by_slope);
-        input(1) = autoware->getSteeringAngle();
+        /*
+           TODO FIX THIS!!!
+
+           THIS IS MAYBE INCORRECT.
+
+           SHOULD BE
+               gear_sign * acceleration + acceleration_by_slope
+           OR
+               signed_acceleration + acceleration_by_slope
+
+           Currently, acceleration is obtained as an unsigned value
+           (`acceleration`) and a signed value (`gear_sign`), but this is for
+           historical reasons and there is no longer any reason to do so.
+
+           Therefore, when resolving this TODO comment, the assignee should
+           remove `gear_sign` from the tuple returned by
+           `AutowareUniverse::getVehicleCommand`, and at the same time change
+           `acceleration` to a signed value.
+        */
+        input(0) = gear_sign * (acceleration + acceleration_by_slope);
+        input(1) = tire_angle;
         break;
 
       case VehicleModelType::DELAY_STEER_VEL:
       case VehicleModelType::IDEAL_STEER_VEL:
-        input(0) = autoware->getVelocity();
-        input(1) = autoware->getSteeringAngle();
+        input(0) = speed;
+        input(1) = tire_angle;
         break;
 
       default:
@@ -329,7 +351,7 @@ void EgoEntitySimulation::update(
           "Unsupported vehicle_model_type ", toString(vehicle_model_type_), "specified");
     }
 
-    vehicle_model_ptr_->setGear(autoware->getGearCommand().command);
+    vehicle_model_ptr_->setGear(gear_command);
     vehicle_model_ptr_->setInput(input);
     vehicle_model_ptr_->update(step_time);
   }
