@@ -160,7 +160,7 @@ auto PolylineTrajectoryPositioner::totalRemainingTime() const noexcept(false) ->
     */
     if (remaining_time < -step_time) {
       THROW_SIMULATION_ERROR(
-        "Vehicle ", std::quoted(validated_entity_status.name),
+        "Vehicle ", std::quoted(validated_entity_status.name()),
         " failed to reach the trajectory waypoint at the specified time. The specified time "
         "is ",
         nearest_waypoint_with_specified_time_it->time, " (in ",
@@ -218,7 +218,7 @@ auto PolylineTrajectoryPositioner::validatedEntityDesiredVelocity(const double d
     THROW_SIMULATION_ERROR(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
-      std::quoted(validated_entity_status.name),
+      std::quoted(validated_entity_status.name()),
       "'s desired velocity contains NaN or infinity. The value is [", desired_velocity.x, ", ",
       desired_velocity.y, ", ", desired_velocity.z, "].");
   }
@@ -250,14 +250,14 @@ auto PolylineTrajectoryPositioner::validatedEntityDesiredAcceleration() const no
       THROW_SIMULATION_ERROR(
         "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
         "following information to the developer: Vehicle ",
-        std::quoted(validated_entity_status.name),
+        std::quoted(validated_entity_status.name()),
         "'s desired acceleration value contains NaN or infinity. The value is ",
         desired_acceleration, ". ");
     }
     return desired_acceleration;
   } catch (const ControllerError & e) {
     THROW_SIMULATION_ERROR(
-      "Vehicle ", std::quoted(validated_entity_status.name),
+      "Vehicle ", std::quoted(validated_entity_status.name()),
       " - controller operation problem encountered. ",
       follow_waypoint_controller.getFollowedWaypointDetails(polyline_trajectory), e.what());
   }
@@ -364,7 +364,7 @@ auto PolylineTrajectoryPositioner::makeUpdatedEntityStatus() const -> std::optio
       return std::nullopt;
     } else {
       THROW_SIMULATION_ERROR(
-        "Vehicle ", std::quoted(validated_entity_status.name), " at time ",
+        "Vehicle ", std::quoted(validated_entity_status.name()), " at time ",
         validated_entity_status.time, "s (remaining time is ", time_to_nearest_waypoint,
         "s), has completed a trajectory to the nearest waypoint with", " specified time equal to ",
         polyline_trajectory.shape.vertices.front().time, "s at a distance equal to ",
@@ -395,7 +395,7 @@ auto PolylineTrajectoryPositioner::validatedEntityTargetPosition() const noexcep
     THROW_SIMULATION_ERROR(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
-      std::quoted(validated_entity_status.name),
+      std::quoted(validated_entity_status.name()),
       "'s target position coordinate value contains NaN or infinity. The value is [",
       target_position.x, ", ", target_position.y, ", ", target_position.z, "].");
   }
@@ -411,7 +411,7 @@ auto PolylineTrajectoryPositioner::validatedEntityDesiredSpeed(
     THROW_SIMULATION_ERROR(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
-      std::quoted(validated_entity_status.name),
+      std::quoted(validated_entity_status.name()),
       "'s desired speed value is NaN or infinity. The value is ", desired_speed, ". ");
   }
   return desired_speed;
@@ -427,7 +427,7 @@ auto PolylineTrajectoryPositioner::validatePredictedState(const double desired_a
     THROW_SIMULATION_ERROR(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: FollowWaypointController for vehicle ",
-      std::quoted(validated_entity_status.name),
+      std::quoted(validated_entity_status.name()),
       " calculated invalid acceleration:", " desired_acceleration: ", desired_acceleration,
       ", total_remaining_time: ", total_remaining_time,
       ", total_remaining_distance: ", total_remaining_distance,

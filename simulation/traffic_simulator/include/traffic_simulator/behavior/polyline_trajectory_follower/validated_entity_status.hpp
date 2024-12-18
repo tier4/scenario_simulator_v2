@@ -37,7 +37,6 @@ public:
 
   const double step_time_;
   const traffic_simulator_msgs::msg::EntityStatus entity_status_;
-  const std::string & name;
   const double time;
   const traffic_simulator_msgs::msg::BoundingBox & bounding_box;
   const bool lanelet_pose_valid;
@@ -53,6 +52,8 @@ public:
   ValidatedEntityStatus(ValidatedEntityStatus && other) noexcept(true) = delete;
   ValidatedEntityStatus & operator=(ValidatedEntityStatus && other) noexcept(true) = delete;
   ~ValidatedEntityStatus() = default;
+
+  auto name() const noexcept(true) -> const std::string & { return entity_status_.name; }
 
 private:
   auto validatedPosition(const geometry_msgs::msg::Point & entity_position) const noexcept(false)
