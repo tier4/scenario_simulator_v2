@@ -58,6 +58,10 @@ public:
   {
     return entity_status_.pose.position;
   }
+  auto orientation() const noexcept(true) -> const geometry_msgs::msg::Quaternion &
+  {
+    return entity_status_.pose.orientation;
+  }
   auto linearSpeed() const noexcept(true) -> double
   {
     return entity_status_.action_status.twist.linear.x;

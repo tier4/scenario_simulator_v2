@@ -203,9 +203,7 @@ auto PolylineTrajectoryPositioner::validatedEntityDesiredVelocity(const double d
   // if entity is on lane use pitch from lanelet, otherwise use pitch on target
   const double pitch =
     validated_entity_status.laneletPoseValid()
-      ? -math::geometry::convertQuaternionToEulerAngle(
-           validated_entity_status.entity_status_.pose.orientation)
-           .y
+      ? -math::geometry::convertQuaternionToEulerAngle(validated_entity_status.orientation()).y
       : std::atan2(
           nearest_waypoint_position.z - validated_entity_status.position().z, std::hypot(dy, dx));
   const double yaw = std::atan2(dy, dx);  // Use yaw on target
