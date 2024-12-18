@@ -9,6 +9,9 @@ Changelog for package simple_cross_map
 * Merge branch 'master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+7.3.2 (2024-12-18)
+------------------
+
 7.3.1 (2024-12-17)
 ------------------
 * Merge branch 'master' into fix/math-closest-point
