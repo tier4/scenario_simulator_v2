@@ -308,7 +308,7 @@ auto PolylineTrajectoryPositioner::makeUpdatedEntityStatus() const -> std::optio
 
   if (const bool target_passed =
         validated_entity_status.linearSpeed() * step_time > distance_to_nearest_waypoint and
-        math::geometry::innerProduct(desired_velocity, validated_entity_status.current_velocity) <
+        math::geometry::innerProduct(desired_velocity, validated_entity_status.currentVelocity()) <
           0.0;
       target_passed) {
     return std::nullopt;

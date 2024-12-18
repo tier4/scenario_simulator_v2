@@ -38,7 +38,7 @@ public:
   const double step_time_;
   const traffic_simulator_msgs::msg::EntityStatus entity_status_;
   const traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter_;
-  const geometry_msgs::msg::Vector3 current_velocity;
+  const geometry_msgs::msg::Vector3 current_velocity_;
 
   ValidatedEntityStatus() = delete;
   ValidatedEntityStatus(const ValidatedEntityStatus & other);
@@ -74,6 +74,10 @@ public:
     -> const traffic_simulator_msgs::msg::BehaviorParameter &
   {
     return behavior_parameter_;
+  }
+  auto currentVelocity() const noexcept(true) -> const geometry_msgs::msg::Vector3 &
+  {
+    return current_velocity_;
   }
 
 private:

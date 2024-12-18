@@ -39,7 +39,7 @@ ValidatedEntityStatus::ValidatedEntityStatus(
 : step_time_(step_time),
   entity_status_(entity_status),
   behavior_parameter_(behavior_parameter),
-  current_velocity(buildValidatedCurrentVelocity(linearSpeed(), orientation()))
+  current_velocity_(buildValidatedCurrentVelocity(linearSpeed(), orientation()))
 {
   validateBehaviorParameter(behaviorParameter());
   validatePosition(position());
