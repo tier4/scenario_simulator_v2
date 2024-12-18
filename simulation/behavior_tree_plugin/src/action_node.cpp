@@ -19,6 +19,7 @@
 #include <geometry/quaternion/get_rotation.hpp>
 #include <geometry/quaternion/get_rotation_matrix.hpp>
 #include <geometry/quaternion/quaternion_to_euler.hpp>
+#include <geometry/vector3/normalize.hpp>
 #include <memory>
 #include <optional>
 #include <rclcpp/rclcpp.hpp>
@@ -511,6 +512,30 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
   -> traffic_simulator::EntityStatus
 {
   using math::geometry::operator*;
+  using math::geometry::operator+;
+  using math::geometry::operator-;
+  using math::geometry::operator+=;
+
+  const auto getLaneletPitch = [&](const lanelet::Id lanelet_id, const double s) {
+    const auto lanelet_orientation = hdmap_utils->toMapOrientation(lanelet_id, s);
+    const auto lanelet_rpy = math::geometry::convertQuaternionToEulerAngle(lanelet_orientation);
+
+    return lanelet_rpy.y;
+  };
+
+  auto applyPitchToDisplacement = [&](
+                                    const geometry_msgs::msg::Vector3 & displacement,
+                                    const double pitch) -> geometry_msgs::msg::Vector3 {
+    const Eigen::Quaterniond pitch_rotation(Eigen::AngleAxisd(pitch, Eigen::Vector3d::UnitY()));
+    const Eigen::Vector3d rotated_displacement =
+      pitch_rotation * Eigen::Vector3d(displacement.x, displacement.y, displacement.z);
+
+    return geometry_msgs::build<geometry_msgs::msg::Vector3>()
+      .x(rotated_displacement.x())
+      .y(rotated_displacement.y())
+      .z(rotated_displacement.z());
+  };
+
   const auto speed_planner =
     traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner(
       step_time, canonicalized_entity_status->getName());
@@ -520,21 +545,52 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
   double linear_jerk_new = std::get<2>(dynamics);
   geometry_msgs::msg::Accel accel_new = std::get<1>(dynamics);
   geometry_msgs::msg::Twist twist_new = std::get<0>(dynamics);
-  geometry_msgs::msg::Pose pose_new;
-  geometry_msgs::msg::Vector3 angular_trans_vec;
-  angular_trans_vec.z = twist_new.angular.z * step_time;
-  geometry_msgs::msg::Quaternion angular_trans_quat =
-    math::geometry::convertEulerAngleToQuaternion(angular_trans_vec);
-  pose_new.orientation = canonicalized_entity_status->getMapPose().orientation * angular_trans_quat;
-  Eigen::Vector3d trans_vec;
-  trans_vec(0) = twist_new.linear.x * step_time;
-  trans_vec(1) = twist_new.linear.y * step_time;
-  trans_vec(2) = 0;
-  Eigen::Matrix3d rotation_mat = math::geometry::getRotationMatrix(pose_new.orientation);
-  trans_vec = rotation_mat * trans_vec;
-  pose_new.position.x = trans_vec(0) + canonicalized_entity_status->getMapPose().position.x;
-  pose_new.position.y = trans_vec(1) + canonicalized_entity_status->getMapPose().position.y;
-  pose_new.position.z = trans_vec(2) + canonicalized_entity_status->getMapPose().position.z;
+  geometry_msgs::msg::Pose pose_new = canonicalized_entity_status->getMapPose();
+  const lanelet::Id current_lanelet_Id = canonicalized_entity_status->getLaneletId();
+
+  const auto desired_velocity = geometry_msgs::build<geometry_msgs::msg::Vector3>()
+                                  .x(twist_new.linear.x)
+                                  .y(twist_new.linear.y)
+                                  .z(twist_new.linear.z);
+
+  const auto displacement = applyPitchToDisplacement(
+    desired_velocity * step_time,
+    getLaneletPitch(current_lanelet_Id, canonicalized_entity_status->getLaneletPose().s));
+
+  auto adjustPositionAtLaneletBoundary =
+    [&](double remaining_lanelet_length, const std::optional<lanelet::Id> & next_lanelet_id) {
+      const auto excess_displacement =
+        displacement - math::geometry::normalize(desired_velocity) * remaining_lanelet_length;
+
+      // Update position to the next lanelet if available, otherwise apply full displacement.
+      pose_new.position = next_lanelet_id
+                            ? hdmap_utils->toMapPosition(
+                                next_lanelet_id.value(), math::geometry::norm(excess_displacement))
+                            : pose_new.position + displacement;
+
+      // Apply lateral offset if transitioning to the next lanelet
+      if (next_lanelet_id) {
+        pose_new.position.y += canonicalized_entity_status->getLaneletPose().offset;
+      }
+    };
+
+  if (!canonicalized_entity_status->laneMatchingSucceed()) {
+    pose_new.position += displacement;
+  } else {
+    const double remaining_lanelet_length = hdmap_utils->getLaneletLength(current_lanelet_Id) -
+                                            canonicalized_entity_status->getLaneletPose().s;
+
+    // Adjust position if displacement exceeds the current lanelet length.
+    if (math::geometry::norm(displacement) > remaining_lanelet_length) {
+      const auto next_lanelet_ids = hdmap_utils->getNextLaneletIds(current_lanelet_Id);
+      adjustPositionAtLaneletBoundary(
+        remaining_lanelet_length,
+        next_lanelet_ids.empty() ? std::nullopt : std::make_optional(next_lanelet_ids[0]));
+    } else {
+      pose_new.position += displacement;
+    }
+  }
+
   auto entity_status_updated =
     static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status);
   entity_status_updated.time = current_time + step_time;
