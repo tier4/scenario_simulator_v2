@@ -523,18 +523,16 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
     return lanelet_rpy.y;
   };
 
-  auto applyPitchToDisplacement = [&](
-                                    const geometry_msgs::msg::Vector3 & displacement,
-                                    const double pitch) -> geometry_msgs::msg::Vector3 {
-    const Eigen::Quaterniond pitch_rotation(Eigen::AngleAxisd(pitch, Eigen::Vector3d::UnitY()));
-    const Eigen::Vector3d rotated_displacement =
-      pitch_rotation * Eigen::Vector3d(displacement.x, displacement.y, displacement.z);
+  auto applyPitchToDisplacement =
+    [&](geometry_msgs::msg::Vector3 & displacement, const double pitch) {
+      const Eigen::Quaterniond pitch_rotation(Eigen::AngleAxisd(pitch, Eigen::Vector3d::UnitY()));
+      const Eigen::Vector3d rotated_displacement =
+        pitch_rotation * Eigen::Vector3d(displacement.x, displacement.y, displacement.z);
 
-    return geometry_msgs::build<geometry_msgs::msg::Vector3>()
-      .x(rotated_displacement.x())
-      .y(rotated_displacement.y())
-      .z(rotated_displacement.z());
-  };
+      displacement.x = rotated_displacement.x();
+      displacement.y = rotated_displacement.y();
+      displacement.z = rotated_displacement.z();
+    };
 
   const auto speed_planner =
     traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner(
@@ -546,16 +544,13 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
   geometry_msgs::msg::Accel accel_new = std::get<1>(dynamics);
   geometry_msgs::msg::Twist twist_new = std::get<0>(dynamics);
   geometry_msgs::msg::Pose pose_new = canonicalized_entity_status->getMapPose();
-  const lanelet::Id current_lanelet_Id = canonicalized_entity_status->getLaneletId();
+  const auto current_lanelet_Id = canonicalized_entity_status->getLaneletId();
 
   const auto desired_velocity = geometry_msgs::build<geometry_msgs::msg::Vector3>()
                                   .x(twist_new.linear.x)
                                   .y(twist_new.linear.y)
                                   .z(twist_new.linear.z);
-
-  const auto displacement = applyPitchToDisplacement(
-    desired_velocity * step_time,
-    getLaneletPitch(current_lanelet_Id, canonicalized_entity_status->getLaneletPose().s));
+  auto displacement = desired_velocity * step_time;
 
   auto adjustPositionAtLaneletBoundary =
     [&](double remaining_lanelet_length, const std::optional<lanelet::Id> & next_lanelet_id) {
@@ -577,8 +572,10 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
   if (!canonicalized_entity_status->laneMatchingSucceed()) {
     pose_new.position += displacement;
   } else {
-    const double remaining_lanelet_length = hdmap_utils->getLaneletLength(current_lanelet_Id) -
-                                            canonicalized_entity_status->getLaneletPose().s;
+    const auto lanelet_pose = canonicalized_entity_status->getLaneletPose().s;
+    applyPitchToDisplacement(displacement, getLaneletPitch(current_lanelet_Id, lanelet_pose));
+    const double remaining_lanelet_length =
+      hdmap_utils->getLaneletLength(current_lanelet_Id) - lanelet_pose;
 
     // Adjust position if displacement exceeds the current lanelet length.
     if (math::geometry::norm(displacement) > remaining_lanelet_length) {
