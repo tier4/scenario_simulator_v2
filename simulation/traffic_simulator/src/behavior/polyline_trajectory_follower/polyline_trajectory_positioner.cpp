@@ -55,7 +55,7 @@ PolylineTrajectoryPositioner::PolylineTrajectoryPositioner(
     polyline_trajectory.shape.vertices.front().time - validated_entity_status.time()),
   total_remaining_time(totalRemainingTime()),
   follow_waypoint_controller(FollowWaypointController(
-    validated_entity_status.behavior_parameter, step_time,
+    validated_entity_status.behaviorParameter(), step_time,
     isNearestWaypointWithSpecifiedTimeSameAsLastWaypoint(),
     std::isinf(total_remaining_time) ? target_speed : std::nullopt))
 {

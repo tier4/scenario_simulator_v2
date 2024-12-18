@@ -37,7 +37,7 @@ public:
 
   const double step_time_;
   const traffic_simulator_msgs::msg::EntityStatus entity_status_;
-  const traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter;
+  const traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter_;
   const geometry_msgs::msg::Vector3 current_velocity;
 
   ValidatedEntityStatus() = delete;
@@ -70,6 +70,11 @@ public:
   {
     return entity_status_.action_status.accel.linear.x;
   }
+  auto behaviorParameter() const noexcept(true)
+    -> const traffic_simulator_msgs::msg::BehaviorParameter &
+  {
+    return behavior_parameter_;
+  }
 
 private:
   auto validatePosition(const geometry_msgs::msg::Point & entity_position) const noexcept(false)
@@ -82,9 +87,9 @@ private:
     const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter,
     const double step_time) const noexcept(false) -> void;
 
-  auto validatedBehaviorParameter(
+  auto validateBehaviorParameter(
     const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter) const noexcept(false)
-    -> traffic_simulator_msgs::msg::BehaviorParameter;
+    -> void;
 
   auto buildUpdatedPoseOrientation(const geometry_msgs::msg::Vector3 & desired_velocity) const
     noexcept(true) -> geometry_msgs::msg::Quaternion;

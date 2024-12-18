@@ -38,16 +38,17 @@ ValidatedEntityStatus::ValidatedEntityStatus(
   const double step_time) noexcept(false)
 : step_time_(step_time),
   entity_status_(entity_status),
-  behavior_parameter(validatedBehaviorParameter(behavior_parameter)),
+  behavior_parameter_(behavior_parameter),
   current_velocity(buildValidatedCurrentVelocity(linearSpeed(), orientation()))
 {
+  validateBehaviorParameter(behaviorParameter());
   validatePosition(position());
   validateLinearSpeed(linearSpeed());
-  validateLinearAcceleration(linearAcceleration(), behavior_parameter, step_time_);
+  validateLinearAcceleration(linearAcceleration(), behaviorParameter(), step_time_);
 }
 
 ValidatedEntityStatus::ValidatedEntityStatus(const ValidatedEntityStatus & other)
-: ValidatedEntityStatus(other.entity_status_, other.behavior_parameter, other.step_time_)
+: ValidatedEntityStatus(other.entity_status_, other.behavior_parameter_, other.step_time_)
 {
 }
 
@@ -176,9 +177,9 @@ auto ValidatedEntityStatus::buildValidatedCurrentVelocity(
   return entity_velocity;
 }
 
-auto ValidatedEntityStatus::validatedBehaviorParameter(
+auto ValidatedEntityStatus::validateBehaviorParameter(
   const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter) const noexcept(false)
-  -> traffic_simulator_msgs::msg::BehaviorParameter
+  -> void
 {
   if (not std::isfinite(behavior_parameter.dynamic_constraints.max_acceleration_rate)) {
     throwDetailedValidationError(
@@ -200,7 +201,6 @@ auto ValidatedEntityStatus::validatedBehaviorParameter(
       "behavior_parameter.dynamic_constraints.max_acceleration_rate",
       behavior_parameter.dynamic_constraints.max_acceleration_rate);
   }
-  return behavior_parameter;
 }
 }  // namespace follow_trajectory
 }  // namespace traffic_simulator
