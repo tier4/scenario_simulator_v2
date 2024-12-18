@@ -21,6 +21,21 @@ Changelog for package geometry
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+7.3.1 (2024-12-17)
+------------------
+* Merge pull request `#1475 <https://github.com/tier4/scenario_simulator_v2/issues/1475>`_ from tier4/fix/math-closest-point
+  Fix bug in `math::geometry::getClosestPoses`
+* Merge branch 'master' into fix/math-closest-point
+* Merge branch 'master' into fix/math-closest-point
+* Merge branch 'master' into fix/math-closest-point
+* Merge branch 'master' into fix/math-closest-point
+* Merge branch 'master' into fix/math-closest-point
+* Fix spell mistake
+* Fix getClosestPoses with naive algorithm
+* Apply clang-format
+* Add some test cases for getClosestPoses
+* Contributors: Kotaro Yoshimoto, f0reachARR
+
 7.3.0 (2024-12-16)
 ------------------
 * Merge pull request `#1481 <https://github.com/tier4/scenario_simulator_v2/issues/1481>`_ from tier4/feature/multi-level-lanelet-support
