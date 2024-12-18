@@ -36,7 +36,7 @@ ValidatedEntityStatus::ValidatedEntityStatus(
   const traffic_simulator_msgs::msg::EntityStatus & entity_status,
   const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter,
   const double step_time) noexcept(false)
-: step_time(step_time),
+: step_time_(step_time),
   entity_status_(entity_status),
   name(entity_status_.name),
   time(entity_status_.time),
@@ -46,13 +46,13 @@ ValidatedEntityStatus::ValidatedEntityStatus(
   behavior_parameter(validatedBehaviorParameter(behavior_parameter)),
   linear_speed(validatedLinearSpeed(entity_status_.action_status.twist.linear.x)),
   linear_acceleration(validatedLinearAcceleration(
-    entity_status_.action_status.accel.linear.x, behavior_parameter, step_time)),
+    entity_status_.action_status.accel.linear.x, behavior_parameter, step_time_)),
   current_velocity(buildValidatedCurrentVelocity(linear_speed, entity_status_.pose.orientation))
 {
 }
 
 ValidatedEntityStatus::ValidatedEntityStatus(const ValidatedEntityStatus & other)
-: ValidatedEntityStatus(other.entity_status_, other.behavior_parameter, other.step_time)
+: ValidatedEntityStatus(other.entity_status_, other.behavior_parameter, other.step_time_)
 {
 }
 
@@ -83,7 +83,7 @@ auto ValidatedEntityStatus::buildUpdatedEntityStatus(
   using math::geometry::operator*;
   using math::geometry::operator/;
 
-  const auto updated_time = entity_status_.time + step_time;
+  const auto updated_time = entity_status_.time + step_time_;
   const auto updated_pose_orientation = buildUpdatedPoseOrientation(desired_velocity);
   const auto updated_action_status_twist_linear =
     geometry_msgs::build<geometry_msgs::msg::Vector3>()
@@ -93,7 +93,7 @@ auto ValidatedEntityStatus::buildUpdatedEntityStatus(
   const auto updated_action_status_twist_angular =
     math::geometry::convertQuaternionToEulerAngle(
       math::geometry::getRotation(entity_status_.pose.orientation, updated_pose_orientation)) /
-    step_time;
+    step_time_;
   const auto updated_action_status_twist = geometry_msgs::build<geometry_msgs::msg::Twist>()
                                              .linear(updated_action_status_twist_linear)
                                              .angular(updated_action_status_twist_angular);
@@ -101,19 +101,20 @@ auto ValidatedEntityStatus::buildUpdatedEntityStatus(
     geometry_msgs::build<geometry_msgs::msg::Accel>()
       .linear(
         (updated_action_status_twist_linear - entity_status_.action_status.twist.linear) /
-        step_time)
+        step_time_)
       .angular(
         (updated_action_status_twist_angular - entity_status_.action_status.twist.angular) /
-        step_time);
+        step_time_);
   const auto updated_action_status =
     traffic_simulator_msgs::build<traffic_simulator_msgs::msg::ActionStatus>()
       .current_action(entity_status_.action_status.current_action)
       .twist(updated_action_status_twist)
       .accel(updated_action_status_accel)
       .linear_jerk(entity_status_.action_status.linear_jerk);
-  const auto updated_pose = geometry_msgs::build<geometry_msgs::msg::Pose>()
-                              .position(entity_status_.pose.position + desired_velocity * step_time)
-                              .orientation(updated_pose_orientation);
+  const auto updated_pose =
+    geometry_msgs::build<geometry_msgs::msg::Pose>()
+      .position(entity_status_.pose.position + desired_velocity * step_time_)
+      .orientation(updated_pose_orientation);
   constexpr bool updated_lanelet_pose_valid = false;
 
   return traffic_simulator_msgs::build<traffic_simulator_msgs::msg::EntityStatus>()

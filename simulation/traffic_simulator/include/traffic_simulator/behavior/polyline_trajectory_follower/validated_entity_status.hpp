@@ -35,7 +35,7 @@ public:
   auto buildUpdatedEntityStatus(const geometry_msgs::msg::Vector3 & desired_velocity) const
     -> traffic_simulator_msgs::msg::EntityStatus;
 
-  const double step_time;
+  const double step_time_;
   const traffic_simulator_msgs::msg::EntityStatus entity_status_;
   const std::string & name;
   const double time;
