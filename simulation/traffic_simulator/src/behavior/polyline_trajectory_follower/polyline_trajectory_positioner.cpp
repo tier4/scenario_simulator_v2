@@ -202,7 +202,7 @@ auto PolylineTrajectoryPositioner::validatedEntityDesiredVelocity(const double d
   const double dy = nearest_waypoint_position.y - validated_entity_status.position.y;
   // if entity is on lane use pitch from lanelet, otherwise use pitch on target
   const double pitch =
-    validated_entity_status.lanelet_pose_valid
+    validated_entity_status.laneletPoseValid()
       ? -math::geometry::convertQuaternionToEulerAngle(
            validated_entity_status.entity_status_.pose.orientation)
            .y
