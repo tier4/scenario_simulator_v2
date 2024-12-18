@@ -48,7 +48,7 @@ PolylineTrajectoryPositioner::PolylineTrajectoryPositioner(
   nearest_waypoint_position(validatedEntityTargetPosition()),
   distance_to_nearest_waypoint(distanceAlongLanelet(
     hdmap_utils_ptr, validated_entity_status.boundingBox(), matching_distance,
-    validated_entity_status.entity_status_.pose.position, nearest_waypoint_position)),
+    validated_entity_status.position(), nearest_waypoint_position)),
   total_remaining_distance(totalRemainingDistance(matching_distance, hdmap_utils_ptr)),
   time_to_nearest_waypoint(
     (std::isnan(polyline_trajectory.base_time) ? 0.0 : polyline_trajectory.base_time) +
