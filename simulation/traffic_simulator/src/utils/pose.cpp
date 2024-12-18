@@ -225,7 +225,7 @@ auto relativeLaneletPose(
   const RoutingConfiguration & routing_configuration) -> LaneletPose
 {
   constexpr bool include_adjacent_lanelet{false};
-  constexpr bool include_opposite_direction{true};
+  constexpr bool include_opposite_direction{false};
 
   LaneletPose position = quietNaNLaneletPose();
   // here the s and offset are intentionally assigned independently, even if
