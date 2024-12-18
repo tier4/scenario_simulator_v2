@@ -21,6 +21,7 @@
 #include <geometry/quaternion/normalize.hpp>
 #include <geometry/quaternion/quaternion_to_euler.hpp>
 #include <geometry/vector3/normalize.hpp>
+#include <geometry/vector3/rotate.hpp>
 #include <memory>
 #include <optional>
 #include <rclcpp/rclcpp.hpp>
@@ -516,27 +517,26 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
   using math::geometry::operator+;
   using math::geometry::operator-;
   using math::geometry::operator+=;
+  static bool is_yaw_applied = false;
 
-  const auto getEntityYaw = [&](const geometry_msgs::msg::Quaternion & orientation) {
-    return math::geometry::convertQuaternionToEulerAngle(orientation).z;
+  // Apply pitch rotation based on the lanelet's pitch angle
+  auto applyPitchRotation = [&](auto & disp, const double lanelet_pose_s) {
+    const auto current_lanelet_Id = canonicalized_entity_status->getLaneletId();
+    const auto lanelet_pitch = math::geometry::convertQuaternionToEulerAngle(
+                                 hdmap_utils->toMapOrientation(current_lanelet_Id, lanelet_pose_s))
+                                 .y;
+    math::geometry::rotate(disp, lanelet_pitch, math::geometry::Axis::Y);
   };
 
-  const auto getLaneletPitch = [&](const lanelet::Id lanelet_id, const double s) {
-    return math::geometry::convertQuaternionToEulerAngle(
-             hdmap_utils->toMapOrientation(lanelet_id, s))
-      .y;
-  };
-
-  auto applyRotationToDisplacement = [&](
-                                       geometry_msgs::msg::Vector3 & displacement,
-                                       const double angle, const Eigen::Vector3d & axis) {
-    const Eigen::Quaterniond rotation(Eigen::AngleAxisd(angle, axis));
-    const Eigen::Vector3d rotated_displacement =
-      rotation * Eigen::Vector3d(displacement.x, displacement.y, displacement.z);
-
-    displacement.x = rotated_displacement.x();
-    displacement.y = rotated_displacement.y();
-    displacement.z = rotated_displacement.z();
+  // Apply yaw rotation once to avoid cumulative lateral offset errors
+  auto applyYawRotation = [&](auto & disp) {
+    if (!is_yaw_applied) {
+      const auto yaw = math::geometry::convertQuaternionToEulerAngle(
+                         canonicalized_entity_status->getMapPose().orientation)
+                         .z;
+      math::geometry::rotate(disp, yaw, math::geometry::Axis::Z);
+      is_yaw_applied = true;
+    }
   };
 
   const auto speed_planner =
@@ -549,20 +549,19 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
   geometry_msgs::msg::Accel accel_new = std::get<1>(dynamics);
   geometry_msgs::msg::Twist twist_new = std::get<0>(dynamics);
   geometry_msgs::msg::Pose pose_new = canonicalized_entity_status->getMapPose();
-  static bool is_yaw_applied = false;
-
   const auto desired_velocity = geometry_msgs::build<geometry_msgs::msg::Vector3>()
                                   .x(twist_new.linear.x)
                                   .y(twist_new.linear.y)
                                   .z(twist_new.linear.z);
   auto displacement = desired_velocity * step_time;
 
+  // Adjust the entity's position when approaching the end of the current lanelet
   auto adjustPositionAtLaneletBoundary =
     [&](double remaining_lanelet_length, const std::optional<lanelet::Id> & next_lanelet_id) {
       const auto excess_displacement =
         displacement - math::geometry::normalize(desired_velocity) * remaining_lanelet_length;
 
-      // Update position to the next lanelet if available, otherwise apply full displacement.
+      // If a next lanelet is available, transition to it; otherwise, apply displacement
       pose_new.position = next_lanelet_id
                             ? hdmap_utils->toMapPosition(
                                 next_lanelet_id.value(), math::geometry::norm(excess_displacement))
@@ -577,22 +576,16 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
   if (!canonicalized_entity_status->laneMatchingSucceed()) {
     displacement = math::geometry::normalize(pose_new.orientation) * displacement;
     pose_new.position += displacement;
-
   } else {
     const auto current_lanelet_Id = canonicalized_entity_status->getLaneletId();
-    const auto lanelet_pose = canonicalized_entity_status->getLaneletPose().s;
-    applyRotationToDisplacement(
-      displacement, getLaneletPitch(current_lanelet_Id, lanelet_pose), Eigen::Vector3d::UnitY());
-    const double remaining_lanelet_length =
-      hdmap_utils->getLaneletLength(current_lanelet_Id) - lanelet_pose;
+    const auto lanelet_pose_s = canonicalized_entity_status->getLaneletPose().s;
+    const auto remaining_lanelet_length =
+      hdmap_utils->getLaneletLength(current_lanelet_Id) - lanelet_pose_s;
 
-    if (!is_yaw_applied) {
-      const double yaw = getEntityYaw(canonicalized_entity_status->getMapPose().orientation);
-      applyRotationToDisplacement(displacement, yaw, Eigen::Vector3d::UnitZ());
-      is_yaw_applied = true;
-    }
+    applyPitchRotation(displacement, lanelet_pose_s);
+    applyYawRotation(displacement);
 
-    // Adjust position if displacement exceeds the current lanelet length.
+    // Check if the displacement exceeds the remaining lanelet length
     if (math::geometry::norm(displacement) > remaining_lanelet_length) {
       const auto next_lanelet_ids = hdmap_utils->getNextLaneletIds(current_lanelet_Id);
       adjustPositionAtLaneletBoundary(
