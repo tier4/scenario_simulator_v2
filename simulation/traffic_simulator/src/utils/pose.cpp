@@ -156,6 +156,7 @@ auto moveAlongLanelet(
   auto pose_new = static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose);
   auto displacement = desired_velocity * step_time;
 
+  /// @todo from this - these lines are just weird
   // Apply pitch rotation based on the lanelet's pitch angle
   const auto lanelet_pitch =
     math::geometry::convertQuaternionToEulerAngle(
@@ -168,6 +169,7 @@ auto moveAlongLanelet(
     const auto yaw = math::geometry::convertQuaternionToEulerAngle(pose_new.orientation).z;
     math::geometry::rotate(displacement, yaw, math::geometry::Axis::Z);
   }
+  /// @todo to this - these lines are just weird
 
   // Check if the displacement exceeds the remaining lanelet length
   if (math::geometry::norm(displacement) > remaining_lanelet_length) {
@@ -191,12 +193,12 @@ auto moveAlongLanelet(
   return pose_new;
 }
 
-/// @todo merge moveAlongLanelet and moveToTargetPosition or separate the common part
-auto moveToTargetPosition(
+/// @todo merge moveAlongLanelet and moveToTargetLaneletPose or separate the common part
+auto moveToTargetLaneletPose(
   const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
-  const geometry_msgs::msg::Point & target_position,
-  const geometry_msgs::msg::Vector3 & desired_velocity, const auto step_time, const bool adjust_yaw,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> geometry_msgs::msg::Pose
+  const LaneletPose & target_lanelet_pose, const geometry_msgs::msg::Vector3 & desired_velocity,
+  const double step_time, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+  -> geometry_msgs::msg::Pose
 {
   using math::geometry::operator*;
   using math::geometry::operator+;
@@ -214,13 +216,9 @@ auto moveToTargetPosition(
   if (math::geometry::norm(displacement) > remaining_lanelet_length) {
     const auto excess_displacement =
       displacement - math::geometry::normalize(desired_velocity) * remaining_lanelet_length;
-    /// @todo it can throw an exception... quite offten
-    // so using just target_position and toLaneletPose is a bad idea, you need to figure out another one
-    const auto target_lanelet_pose = hdmap_utils_ptr->toLaneletPose(
-      target_position, updated_status.bounding_box, false, matching_distance);
     if (
       const auto next_lanelet_id = hdmap_utils_ptr->getNextLaneletOnRoute(
-        lanelet_pose.lanelet_id, target_lanelet_pose->lanelet_id)) {
+        lanelet_pose.lanelet_id, target_lanelet_pose.lanelet_id)) {
       // update position to the next lanelet
       const auto s = math::geometry::norm(excess_displacement);
       pose_new.position = hdmap_utils_ptr->toMapPosition(next_lanelet_id.value(), s);
@@ -228,7 +226,7 @@ auto moveToTargetPosition(
       pose_new.position.y += lanelet_pose.offset;
     } else {
       // apply full displacement
-      pose_new.position = updated_status.pose.position + displacement;
+      pose_new.position = pose_new.position + displacement;
     }
   } else {
     pose_new.position += displacement;

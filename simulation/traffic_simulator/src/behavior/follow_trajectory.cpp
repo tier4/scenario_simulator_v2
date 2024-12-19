@@ -26,6 +26,7 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/behavior/follow_trajectory.hpp>
 #include <traffic_simulator/behavior/follow_waypoint_controller.hpp>
+#include <traffic_simulator/utils/pose.hpp>
 
 namespace traffic_simulator
 {
@@ -65,6 +66,8 @@ auto makeUpdatedStatus(
   using math::geometry::norm;
   using math::geometry::normalize;
   using math::geometry::truncate;
+
+  constexpr bool include_crosswalk{false};
 
   auto distance_along_lanelet =
     [&](const geometry_msgs::msg::Point & from, const geometry_msgs::msg::Point & to) -> double {
@@ -551,21 +554,24 @@ auto makeUpdatedStatus(
        steering.
     */
     auto updated_status = entity_status;
+    updated_status.pose.position += desired_velocity * step_time;
 
-    constexpr bool adjust_yaw{false};
-    constexpr bool include_crosswalk{false};
-    if (!entity_status.lanelet_pose_valid) {
-      updated_status.pose.position += desired_velocity * step_time;
-    } else if (
+    // optionally overwrite pose
+    /// @todo is the orientation changed in moveToTargetLaneletPose?
+    /// @todo target_lanelet_pose can be optional... quite offten so using just target_position and toLaneletPose is a bad idea, you need to figure out another idea (not so far target but the intermediate point)
+    if (entity_status.lanelet_pose_valid) {
       const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
         entity_status.pose, entity_status.bounding_box, {entity_status.lanelet_pose.lanelet_id},
-        include_crosswalk, matching_distance, hdmap_utils)) {
-      updated_status.pose = pose::moveToTargetPosition(
-        canonicalized_lanelet_pose.value(), target_position, desired_velocity, step_time,
-        adjust_yaw, hdmap_utils);
-      /// @todo is the orientation changed in moveToTargetPosition?
-    } else {
-      updated_status.pose.position += desired_velocity * step_time;
+        include_crosswalk, matching_distance, hdmap_utils);
+
+      const auto target_lanelet_pose = hdmap_utils->toLaneletPose(
+        target_position, updated_status.bounding_box, include_crosswalk, matching_distance);
+
+      if (canonicalized_lanelet_pose && target_lanelet_pose) {
+        updated_status.pose = pose::moveToTargetLaneletPose(
+          canonicalized_lanelet_pose.value(), target_lanelet_pose.value(), desired_velocity,
+          step_time, hdmap_utils);
+      }
     }
 
     updated_status.pose.orientation = [&]() {
