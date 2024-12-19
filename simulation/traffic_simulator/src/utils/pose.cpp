@@ -191,6 +191,52 @@ auto moveAlongLanelet(
   return pose_new;
 }
 
+/// @todo merge moveAlongLanelet and moveToTargetPosition or separate the common part
+auto moveToTargetPosition(
+  const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
+  const geometry_msgs::msg::Point & target_position,
+  const geometry_msgs::msg::Vector3 & desired_velocity, const auto step_time, const bool adjust_yaw,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> geometry_msgs::msg::Pose
+{
+  using math::geometry::operator*;
+  using math::geometry::operator+;
+  using math::geometry::operator-;
+  using math::geometry::operator+=;
+
+  const auto lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose);
+  const auto remaining_lanelet_length =
+    hdmap_utils_ptr->getLaneletLength(lanelet_pose.lanelet_id) - lanelet_pose.s;
+
+  auto pose_new = static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose);
+  const auto displacement = desired_velocity * step_time;
+
+  // Adjust position if displacement exceeds the current lanelet length.
+  if (math::geometry::norm(displacement) > remaining_lanelet_length) {
+    const auto excess_displacement =
+      displacement - math::geometry::normalize(desired_velocity) * remaining_lanelet_length;
+    /// @todo it can throw an exception... quite offten
+    // so using just target_position and toLaneletPose is a bad idea, you need to figure out another one
+    const auto target_lanelet_pose = hdmap_utils_ptr->toLaneletPose(
+      target_position, updated_status.bounding_box, false, matching_distance);
+    if (
+      const auto next_lanelet_id = hdmap_utils_ptr->getNextLaneletOnRoute(
+        lanelet_pose.lanelet_id, target_lanelet_pose->lanelet_id)) {
+      // update position to the next lanelet
+      const auto s = math::geometry::norm(excess_displacement);
+      pose_new.position = hdmap_utils_ptr->toMapPosition(next_lanelet_id.value(), s);
+      // apply lateral offset if transitioning to the next lanelet
+      pose_new.position.y += lanelet_pose.offset;
+    } else {
+      // apply full displacement
+      pose_new.position = updated_status.pose.position + displacement;
+    }
+  } else {
+    pose_new.position += displacement;
+  }
+  /// @todo orientation?
+  return pose_new;
+}
+
 auto relativePose(const geometry_msgs::msg::Pose & from, const geometry_msgs::msg::Pose & to)
   -> std::optional<geometry_msgs::msg::Pose>
 {
