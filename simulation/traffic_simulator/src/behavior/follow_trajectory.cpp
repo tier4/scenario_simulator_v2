@@ -575,20 +575,25 @@ auto makeUpdatedStatus(
       }
     }();
 
-    // optionally overwrite pose
-    /// @todo is the orientation changed in moveToLaneletPose?
+    // if the transition between lanelet pose: optionally overwrite position
     if (entity_status.lanelet_pose_valid) {
       const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
         entity_status.pose, entity_status.bounding_box, {entity_status.lanelet_pose.lanelet_id},
         include_crosswalk, matching_distance, hdmap_utils);
 
-      const auto next_lanelet_pose = hdmap_utils->toLaneletPose(
+      const auto estimated_next_lanelet_pose = hdmap_utils->toLaneletPose(
         updated_status.pose, entity_status.bounding_box, include_crosswalk, matching_distance);
 
-      if (canonicalized_lanelet_pose && next_lanelet_pose) {
-        updated_status.pose = pose::moveToLaneletPose(
-          canonicalized_lanelet_pose.value(), next_lanelet_pose.value(), desired_velocity,
+      if (canonicalized_lanelet_pose && estimated_next_lanelet_pose) {
+        const auto next_lanelet_pose = pose::moveTowardsLaneletPose(
+          canonicalized_lanelet_pose.value(), estimated_next_lanelet_pose.value(), desired_velocity,
           step_time, hdmap_utils);
+        const auto was_position = updated_status.pose.position;
+        updated_status.pose.position = pose::toMapPose(next_lanelet_pose, hdmap_utils).position;
+        // if (hypot(was_position, updated_status.pose.position) > 0.1) {
+        //   THROW_SIMULATION_ERROR(
+        //     "Position override bug by method pose::moveTowardsLaneletPose() - too much change.");
+        // }
       }
     }
 

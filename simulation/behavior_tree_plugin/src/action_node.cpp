@@ -19,6 +19,7 @@
 #include <geometry/quaternion/get_rotation.hpp>
 #include <geometry/quaternion/get_rotation_matrix.hpp>
 #include <geometry/quaternion/quaternion_to_euler.hpp>
+#include <geometry/vector3/hypot.hpp>
 #include <geometry/vector3/normalize.hpp>
 #include <memory>
 #include <optional>
@@ -541,25 +542,29 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
   const Eigen::Matrix3d rotation_matrix = math::geometry::getRotationMatrix(pose_new.orientation);
   const Eigen::Vector3d translation =
     Eigen::Vector3d(twist_new.linear.x * step_time, twist_new.linear.y * step_time, 0.0);
-  const Eigen::Vector3d delta_position_eigen = rotation_matrix * translation;
-  /// @todo allow: canonicalized_entity_status->getMapPose().position + delta_position_eigen
-  geometry_msgs::msg::Vector3 delta_position;
-  delta_position.x = delta_position_eigen.x();
-  delta_position.y = delta_position_eigen.y();
-  delta_position.z = delta_position_eigen.z();
+  const Eigen::Vector3d delta_position = rotation_matrix * translation;
   pose_new.position = canonicalized_entity_status->getMapPose().position + delta_position;
 
+  // if the transition between lanelet pose: optionally overwrite position
   if (
     const auto canonicalized_lanelet_pose =
       canonicalized_entity_status->getCanonicalizedLaneletPose()) {
-    const auto next_lanelet_pose = hdmap_utils->toLaneletPose(
+    const auto estimated_next_lanelet_pose = hdmap_utils->toLaneletPose(
       pose_new, canonicalized_entity_status->getBoundingBox(), include_crosswalk,
       default_matching_distance_for_lanelet_pose_calculation);
 
-    if (next_lanelet_pose) {
-      pose_new = traffic_simulator::pose::moveToLaneletPose(
-        canonicalized_lanelet_pose.value(), next_lanelet_pose.value(), twist_new.linear, step_time,
-        hdmap_utils);
+    // if the next position is on any lanelet, ensure that the traveled distance (linear_velocity*dt) is the same
+    if (estimated_next_lanelet_pose) {
+      const auto next_lanelet_pose = traffic_simulator::pose::moveTowardsLaneletPose(
+        canonicalized_lanelet_pose.value(), estimated_next_lanelet_pose.value(), twist_new.linear,
+        step_time, hdmap_utils);
+      const auto was_position = pose_new.position;
+      pose_new.position =
+        traffic_simulator::pose::toMapPose(next_lanelet_pose, hdmap_utils).position;
+      // if (hypot(was_position, pose_new.position) > 0.1) {
+      //   THROW_SIMULATION_ERROR(
+      //     "Position override bug by method pose::moveTowardsLaneletPose() - too much change.");
+      // }
     }
   }
 

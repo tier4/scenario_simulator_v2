@@ -136,12 +136,13 @@ auto transformRelativePoseToGlobal(
   return ret;
 }
 
-/// @todo merge moveAlongLanelet and moveToLaneletPose or separate the common part
-auto moveToLaneletPose(
+/// @note this function does not modify the orientation of LaneletPose
+// the orientation remains the same as in next_lanelet_pose
+auto moveTowardsLaneletPose(
   const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
   const LaneletPose & next_lanelet_pose, const geometry_msgs::msg::Vector3 & desired_velocity,
   const double step_time, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
-  -> geometry_msgs::msg::Pose
+  -> LaneletPose
 {
   using math::geometry::operator*;
   using math::geometry::operator+;
@@ -149,27 +150,32 @@ auto moveToLaneletPose(
   using math::geometry::operator+=;
 
   const auto lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose);
+  const auto yaw_relative_to_lanelet = lanelet_pose.rpy.z;
+  const auto longitudinal_d = (desired_velocity.x * cos(yaw_relative_to_lanelet) -
+                               desired_velocity.y * sin(yaw_relative_to_lanelet)) *
+                              step_time;
+  const auto lateral_d = (desired_velocity.x * sin(yaw_relative_to_lanelet) +
+                          desired_velocity.y * cos(yaw_relative_to_lanelet)) *
+                         step_time;
+
+  LaneletPose result_lanelet_pose;
   const auto remaining_lanelet_length =
     hdmap_utils_ptr->getLaneletLength(lanelet_pose.lanelet_id) - lanelet_pose.s;
-
-  auto pose_new = static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose);
-  const auto displacement = desired_velocity * step_time;
-
-  // adjust position if displacement exceeds the current lanelet length
-  if (math::geometry::norm(displacement) > remaining_lanelet_length) {
-    const auto next_lanelet_displacement =
-      displacement - math::geometry::normalize(desired_velocity) * remaining_lanelet_length;
-    const auto next_lanelet_s = math::geometry::norm(next_lanelet_displacement);
-    pose_new.position =
-      hdmap_utils_ptr->toMapPosition(next_lanelet_pose.lanelet_id, next_lanelet_s);
-    // apply lateral offset if transitioning to the next lanelet
-    /// @todo offset is not the same as y...
-    pose_new.position.y += lanelet_pose.offset;
+  const auto next_lanelet_longitudinal_d = longitudinal_d - remaining_lanelet_length;
+  if (longitudinal_d < remaining_lanelet_length) {
+    result_lanelet_pose.lanelet_id = lanelet_pose.lanelet_id;
+    result_lanelet_pose.s = lanelet_pose.s + longitudinal_d;
+    result_lanelet_pose.offset = lanelet_pose.offset + lateral_d;
+  } else if (  // if longitudinal displacement exceeds the current lanelet length, use next lanelet if possible
+    next_lanelet_longitudinal_d < hdmap_utils_ptr->getLaneletLength(next_lanelet_pose.lanelet_id)) {
+    result_lanelet_pose.lanelet_id = next_lanelet_pose.lanelet_id;
+    result_lanelet_pose.s = next_lanelet_longitudinal_d;
+    result_lanelet_pose.offset = lanelet_pose.offset + lateral_d;
   } else {
-    pose_new.position += displacement;
+    THROW_SIMULATION_ERROR("Next lanelet is too short.");
   }
-  /// @todo orientation?
-  return pose_new;
+  result_lanelet_pose.rpy = lanelet_pose.rpy;
+  return result_lanelet_pose;
 }
 
 auto relativePose(const geometry_msgs::msg::Pose & from, const geometry_msgs::msg::Pose & to)
