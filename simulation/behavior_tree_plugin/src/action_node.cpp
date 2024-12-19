@@ -19,8 +19,7 @@
 #include <geometry/quaternion/get_rotation.hpp>
 #include <geometry/quaternion/get_rotation_matrix.hpp>
 #include <geometry/quaternion/quaternion_to_euler.hpp>
-#include <geometry/vector3/hypot.hpp>
-#include <geometry/vector3/normalize.hpp>
+#include <geometry/vector3/operator.hpp>
 #include <memory>
 #include <optional>
 #include <rclcpp/rclcpp.hpp>
@@ -547,7 +546,7 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
     const Eigen::Vector3d delta_position = rotation_matrix * translation;
     updated_pose.position = status->getMapPose().position + delta_position;
 
-    // if it is the transition between lanelet pose: optionally overwrite position to improve precision
+    // if it is the transition between lanelet pose: overwrite position to improve precision
     if (const auto canonicalized_lanelet_pose = status->getCanonicalizedLaneletPose()) {
       const auto estimated_next_lanelet_pose = hdmap_utils_ptr->toLaneletPose(
         updated_pose, status->getBoundingBox(), include_crosswalk, matching_distance);
