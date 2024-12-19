@@ -16,7 +16,6 @@
 #define GEOMETRY__QUATERNION__OPERATOR_HPP_
 
 #include <geometry/quaternion/is_like_quaternion.hpp>
-#include <geometry/vector3/vector3.hpp>
 #include <geometry_msgs/msg/quaternion.hpp>
 
 namespace math
