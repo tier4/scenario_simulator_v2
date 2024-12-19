@@ -20,7 +20,6 @@
 #include <traffic_simulator/behavior/polyline_trajectory_follower/validated_entity_status.hpp>
 #include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
-#include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
 #include <traffic_simulator_msgs/msg/polyline_trajectory.hpp>
 
@@ -36,7 +35,6 @@ public:
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
     const ValidatedEntityStatus & validated_entity_status,
     const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
-    const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter,
     const std::optional<double> target_speed, const double matching_distance,
     const double step_time);
 
@@ -45,7 +43,6 @@ public:
 private:
   const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr;
   const ValidatedEntityStatus validated_entity_status;
-  const traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter;
   const traffic_simulator_msgs::msg::PolylineTrajectory polyline_trajectory;
   const double step_time;
   const double matching_distance;

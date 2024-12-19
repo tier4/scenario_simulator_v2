@@ -36,11 +36,9 @@ PolylineTrajectoryPositioner::PolylineTrajectoryPositioner(
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
   const ValidatedEntityStatus & validated_entity_status,
   const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
-  const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter,
   const std::optional<double> target_speed, const double matching_distance, const double step_time)
 : hdmap_utils_ptr(hdmap_utils_ptr),
   validated_entity_status(validated_entity_status),
-  behavior_parameter(behavior_parameter),
   polyline_trajectory(polyline_trajectory),
   step_time(step_time),
   matching_distance(matching_distance),
