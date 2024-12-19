@@ -108,17 +108,18 @@ auto PolylineTrajectoryPositioner::totalRemainingDistance() const -> double
       return std::accumulate(
         polyline_trajectory_.shape.vertices.cbegin(), last, 0.0,
         [this](const double total_distance, const auto & vertex) {
-          const auto next = std::next(&vertex);
+          const auto next_vertex = std::next(&vertex);
           return total_distance + distanceAlongLanelet(
                                     hdmap_utils_ptr_, vertex.position.position,
-                                    validated_entity_status_.boundingBox(), next->position.position,
+                                    validated_entity_status_.boundingBox(),
+                                    next_vertex->position.position,
                                     validated_entity_status_.boundingBox(), matching_distance_);
         });
     };
 
-  if (nearest_waypoint_with_specified_time_it_ == std::cend(polyline_trajectory_.shape.vertices)) {
+  if (nearest_waypoint_with_specified_time_it_ == polyline_trajectory_.shape.vertices.cend()) {
     return distance_to_nearest_waypoint_ +
-           total_distance_to(std::cend(polyline_trajectory_.shape.vertices) - 1);
+           total_distance_to(std::prev(polyline_trajectory_.shape.vertices.cend()));
   } else {
     return distance_to_nearest_waypoint_ +
            total_distance_to(nearest_waypoint_with_specified_time_it_);
@@ -127,7 +128,7 @@ auto PolylineTrajectoryPositioner::totalRemainingDistance() const -> double
 
 auto PolylineTrajectoryPositioner::totalRemainingTime() const noexcept(false) -> double
 {
-  if (nearest_waypoint_with_specified_time_it_ == std::cend(polyline_trajectory_.shape.vertices)) {
+  if (nearest_waypoint_with_specified_time_it_ == polyline_trajectory_.shape.vertices.cend()) {
     return std::numeric_limits<double>::infinity();
   } else {
     const double remaining_time =
@@ -385,7 +386,8 @@ auto PolylineTrajectoryPositioner::validatedEntityTargetPosition() const noexcep
   if (polyline_trajectory_.shape.vertices.empty()) {
     THROW_SIMULATION_ERROR(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
-      "attempted to dereference an element of an empty PolylineTrajectory");
+      "attempted to dereference an element of an empty PolylineTrajectory for vehicle ",
+      std::quoted(validated_entity_status_.name()));
   }
   const auto & target_position = polyline_trajectory_.shape.vertices.front().position.position;
   if (not math::geometry::isFinite(target_position)) {
