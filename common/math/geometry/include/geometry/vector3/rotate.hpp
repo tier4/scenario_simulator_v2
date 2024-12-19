@@ -15,7 +15,6 @@
 #ifndef GEOMETRY__VECTOR3__ROTATE_HPP_
 #define GEOMETRY__VECTOR3__ROTATE_HPP_
 
-#include <geometry/axis/axis.hpp>
 #include <geometry/vector3/is_like_vector3.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 
@@ -23,6 +22,20 @@ namespace math
 {
 namespace geometry
 {
+inline Eigen::Vector3d axisToEigenAxis(Axis axis)
+{
+  switch (axis) {
+    case Axis::X:
+      return Eigen::Vector3d::UnitX();
+    case Axis::Y:
+      return Eigen::Vector3d::UnitY();
+    case Axis::Z:
+      return Eigen::Vector3d::UnitZ();
+    default:
+      THROW_SIMULATION_ERROR("Invalid axis specified.");
+  }
+}
+
 // Rotate a vector by a given angle around a specified axis
 template <
   typename T, std::enable_if_t<std::conjunction_v<IsLikeVector3<T>>, std::nullptr_t> = nullptr>
@@ -30,15 +43,15 @@ auto rotate(T & v, const double angle, const Axis axis)
 {
   if (!std::isfinite(angle)) {
     THROW_SIMULATION_ERROR("The provided angle for rotation is not finite.");
-  } else {
-    const Eigen::Quaterniond rotation(Eigen::AngleAxisd(angle, axisToEigenAxis(axis)));
-    const Eigen::Vector3d eigen_vector(v.x, v.y, v.z);
-    const Eigen::Vector3d rotated_vector = rotation * eigen_vector;
-
-    v.x = rotated_vector.x();
-    v.y = rotated_vector.y();
-    v.z = rotated_vector.z();
   }
+
+  const Eigen::Quaterniond rotation(Eigen::AngleAxisd(angle, axisToEigenAxis(axis)));
+  const Eigen::Vector3d eigen_vector(v.x, v.y, v.z);
+  const Eigen::Vector3d rotated_vector = rotation * eigen_vector;
+
+  v.x = rotated_vector.x();
+  v.y = rotated_vector.y();
+  v.z = rotated_vector.z();
 }
 }  // namespace geometry
 }  // namespace math
