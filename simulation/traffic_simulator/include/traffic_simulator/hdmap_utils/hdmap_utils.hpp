@@ -162,9 +162,6 @@ public:
 
   auto getAltitude(const traffic_simulator_msgs::msg::LaneletPose &) const -> double;
 
-  auto toMapPosition(const lanelet::Id lanelet_id, const double s) const
-    -> geometry_msgs::msg::Point;
-
   auto getLaneChangeTrajectory(
     const geometry_msgs::msg::Pose & from,
     const traffic_simulator::lane_change::Parameter & lane_change_parameter,

@@ -1098,12 +1098,6 @@ auto HdMapUtils::getNextLaneletIds(
   return sortAndUnique(ids);
 }
 
-auto HdMapUtils::toMapPosition(const lanelet::Id lanelet_id, const double s) const
-  -> geometry_msgs::msg::Point
-{
-  return getCenterPointsSpline(lanelet_id)->getPoint(s);
-}
-
 auto HdMapUtils::getTrafficLightIds() const -> lanelet::Ids
 {
   using namespace lanelet::utils::query;
