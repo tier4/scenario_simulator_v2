@@ -14,6 +14,7 @@
 
 #include <gtest/gtest.h>
 
+#include <geometry/axis/axis.hpp>
 #include <geometry/polygon/polygon.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 
@@ -41,6 +42,7 @@ TEST(Polygon, filterByAxis)
   EXPECT_DOUBLE_EQ(values_z[2], -3.0);
 }
 
+/// @todo refactor test to throw exception
 TEST(Polygon, filterByAxisEmptyVector)
 {
   std::vector<geometry_msgs::msg::Point> points;

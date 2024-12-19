@@ -18,6 +18,7 @@
 #include <embree4/rtcore.h>
 
 #include <algorithm>
+#include <geometry/axis/axis.hpp>
 #include <geometry/polygon/polygon.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 #include <optional>

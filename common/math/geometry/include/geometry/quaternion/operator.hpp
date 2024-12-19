@@ -69,26 +69,26 @@ template <
   typename T, typename U,
   std::enable_if_t<std::conjunction_v<IsLikeQuaternion<T>, IsLikeVector3<U>>, std::nullptr_t> =
     nullptr>
-auto operator*(const T & a, const U & b)
+auto operator*(const T & rotation, const U & vector)
 {
-  T b_quat;
-  b_quat.x = b.x;
-  b_quat.y = b.y;
-  b_quat.z = b.z;
-  b_quat.w = 0.0;
+  T vector_as_quaternion;
+  vector_as_quaternion.x = vector.x;
+  vector_as_quaternion.y = vector.y;
+  vector_as_quaternion.z = vector.z;
+  vector_as_quaternion.w = 0.0;
 
-  T a_inv = a;
-  a_inv.x = -a.x;
-  a_inv.y = -a.y;
-  a_inv.z = -a.z;
-  a_inv.w = a.w;
+  T inverse_rotation = rotation;
+  inverse_rotation.x = -rotation.x;
+  inverse_rotation.y = -rotation.y;
+  inverse_rotation.z = -rotation.z;
+  inverse_rotation.w = rotation.w;
 
-  T result_quat = a * b_quat * a_inv;
+  T rotated_quaternion = rotation * vector_as_quaternion * inverse_rotation;
 
   U rotated_vector;
-  rotated_vector.x = result_quat.x;
-  rotated_vector.y = result_quat.y;
-  rotated_vector.z = result_quat.z;
+  rotated_vector.x = vector_as_quaternion.x;
+  rotated_vector.y = vector_as_quaternion.y;
+  rotated_vector.z = vector_as_quaternion.z;
 
   return rotated_vector;
 }

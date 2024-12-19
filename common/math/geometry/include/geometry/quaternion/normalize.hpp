@@ -27,15 +27,18 @@ namespace geometry
 template <typename T, std::enable_if_t<IsLikeQuaternion<T>::value, std::nullptr_t> = nullptr>
 auto normalize(const T & q)
 {
-  const auto n = norm(q);
-  if (std::fabs(n) <= std::numeric_limits<double>::epsilon()) {
+  if (const auto n = norm(q); std::fabs(n) <= std::numeric_limits<double>::epsilon()) {
     THROW_SIMULATION_ERROR(
-      "Norm of quaternion (", q.w, ",", q.x, ",", q.y, ",", q.z, ") is ", n,
+      "Norm of Quaternion(", q.w, ",", q.x, ",", q.y, ",", q.z, ") is ", n,
       ". The norm of the quaternion you want to normalize should be greater than ",
       std::numeric_limits<double>::epsilon());
+  } else {
+    return geometry_msgs::build<geometry_msgs::msg::Quaternion>()
+      .x(q.x / n)
+      .y(q.y / n)
+      .z(q.z / n)
+      .w(q.w / n);
   }
-  return geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(q.x / n).y(q.y / n).z(q.z / n).w(
-    q.w / n);
 }
 }  // namespace geometry
 }  // namespace math
