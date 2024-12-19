@@ -31,7 +31,6 @@
 #include <autoware_vehicle_msgs/msg/gear_command.hpp>
 #include <autoware_vehicle_msgs/msg/turn_indicators_command.hpp>
 #include <concealer/autoware_universe.hpp>
-#include <concealer/launch.hpp>
 #include <concealer/publisher.hpp>
 #include <concealer/service.hpp>
 #include <concealer/subscriber.hpp>
@@ -136,13 +135,7 @@ struct FieldOperatorApplication : public rclcpp::Node,
   */
   TaskQueue task_queue;
 
-  CONCEALER_PUBLIC explicit FieldOperatorApplication(const pid_t = 0);
-
-  template <typename... Ts>
-  CONCEALER_PUBLIC explicit FieldOperatorApplication(Ts &&... xs)
-  : FieldOperatorApplication(ros2_launch(std::forward<decltype(xs)>(xs)...))
-  {
-  }
+  CONCEALER_PUBLIC explicit FieldOperatorApplication(const pid_t);
 
   ~FieldOperatorApplication();
 

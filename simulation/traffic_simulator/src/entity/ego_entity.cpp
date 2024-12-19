@@ -14,6 +14,7 @@
 
 #include <boost/lexical_cast.hpp>
 #include <concealer/field_operator_application.hpp>
+#include <concealer/launch.hpp>
 #include <functional>
 #include <memory>
 #include <optional>
@@ -32,7 +33,7 @@ namespace traffic_simulator
 {
 namespace entity
 {
-auto EgoEntity::makeFieldOperatorApplication(
+auto makeFieldOperatorApplication(
   const Configuration & configuration,
   const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node_parameters)
   -> std::unique_ptr<concealer::FieldOperatorApplication>
@@ -56,11 +57,12 @@ auto EgoEntity::makeFieldOperatorApplication(
     parameters.push_back("localization_sim_mode:=" + std::string(getParameter<bool>(node_parameters, "simulate_localization") ? "api" : "pose_twist_estimator"));
     // clang-format on
 
-    return getParameter<bool>(node_parameters, "launch_autoware", true)
-             ? std::make_unique<concealer::FieldOperatorApplication>(
-                 getParameter<std::string>(node_parameters, "autoware_launch_package"),
-                 getParameter<std::string>(node_parameters, "autoware_launch_file"), parameters)
-             : std::make_unique<concealer::FieldOperatorApplication>();
+    return std::make_unique<concealer::FieldOperatorApplication>(
+      getParameter<bool>(node_parameters, "launch_autoware", true)
+        ? concealer::ros2_launch(
+            getParameter<std::string>(node_parameters, "autoware_launch_package"),
+            getParameter<std::string>(node_parameters, "autoware_launch_file"), parameters)
+        : 0);
   } else {
     throw common::SemanticError(
       "Unexpected architecture_type ", std::quoted(architecture_type), " was given.");
@@ -113,9 +115,7 @@ auto EgoEntity::getRouteLanelets(double /*unused horizon*/) -> lanelet::Ids
 {
   lanelet::Ids ids{};
 
-  if (const auto universe =
-        dynamic_cast<concealer::FieldOperatorApplication *>(field_operator_application.get());
-      universe) {
+  if (const auto universe = field_operator_application.get(); universe) {
     for (const auto & point : universe->getPathWithLaneId().points) {
       ids += point.lane_ids;
     }
