@@ -34,7 +34,7 @@
 #include <concealer/launch.hpp>
 #include <concealer/publisher.hpp>
 #include <concealer/service_with_validation.hpp>
-#include <concealer/subscriber_wrapper.hpp>
+#include <concealer/subscriber.hpp>
 #include <concealer/task_queue.hpp>
 #include <concealer/transition_assertion.hpp>
 #include <concealer/visibility.hpp>
@@ -107,17 +107,17 @@ struct FieldOperatorApplication : public rclcpp::Node,
   using SetVelocityLimit                = tier4_external_api_msgs::srv::SetVelocityLimit;
   using ChangeOperationMode             = autoware_adapi_v1_msgs::srv::ChangeOperationMode;
 
-  SubscriberWrapper<AutowareState>                   getAutowareState;
-  SubscriberWrapper<Control>                         getCommand;
-  SubscriberWrapper<CooperateStatusArray>            getCooperateStatusArray;
-  SubscriberWrapper<Emergency>                       getEmergencyState;
+  Subscriber<AutowareState>                   getAutowareState;
+  Subscriber<Control>                         getCommand;
+  Subscriber<CooperateStatusArray>            getCooperateStatusArray;
+  Subscriber<Emergency>                       getEmergencyState;
 #if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)
-  SubscriberWrapper<LocalizationInitializationState> getLocalizationState;
+  Subscriber<LocalizationInitializationState> getLocalizationState;
 #endif
-  SubscriberWrapper<MrmState>                        getMrmState;
-  SubscriberWrapper<PathWithLaneId>                  getPathWithLaneId;
-  SubscriberWrapper<Trajectory>                      getTrajectory;
-  SubscriberWrapper<TurnIndicatorsCommand>           getTurnIndicatorsCommand;
+  Subscriber<MrmState>                        getMrmState;
+  Subscriber<PathWithLaneId>                  getPathWithLaneId;
+  Subscriber<Trajectory>                      getTrajectory;
+  Subscriber<TurnIndicatorsCommand>           getTurnIndicatorsCommand;
 
   ServiceWithValidation<ClearRoute>                  requestClearRoute;
   ServiceWithValidation<CooperateCommands>           requestCooperateCommands;

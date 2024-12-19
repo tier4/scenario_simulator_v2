@@ -27,7 +27,7 @@
 #include <autoware_vehicle_msgs/srv/control_mode_command.hpp>
 #include <concealer/continuous_transform_broadcaster.hpp>
 #include <concealer/publisher.hpp>
-#include <concealer/subscriber_wrapper.hpp>
+#include <concealer/subscriber.hpp>
 #include <concealer/visibility.hpp>
 #include <geometry_msgs/msg/accel_with_covariance_stamped.hpp>
 #include <geometry_msgs/msg/pose.hpp>
@@ -57,10 +57,10 @@ public:
   using TurnIndicatorsReport        = autoware_vehicle_msgs::msg::TurnIndicatorsReport;
   using VelocityReport              = autoware_vehicle_msgs::msg::VelocityReport;
 
-  SubscriberWrapper<Control>               getCommand;
-  SubscriberWrapper<GearCommand>           getGearCommand;
-  SubscriberWrapper<TurnIndicatorsCommand> getTurnIndicatorsCommand;
-  SubscriberWrapper<PathWithLaneId>        getPathWithLaneId;
+  Subscriber<Control>               getCommand;
+  Subscriber<GearCommand>           getGearCommand;
+  Subscriber<TurnIndicatorsCommand> getTurnIndicatorsCommand;
+  Subscriber<PathWithLaneId>        getPathWithLaneId;
 
   Publisher<AccelWithCovarianceStamped> setAcceleration;
   Publisher<Odometry>                   setOdometry;
