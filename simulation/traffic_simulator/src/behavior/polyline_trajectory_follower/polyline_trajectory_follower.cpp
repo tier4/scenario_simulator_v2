@@ -32,7 +32,12 @@ namespace traffic_simulator
 namespace follow_trajectory
 {
 
-auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
+/// @note side effects on polyline_trajectory
+auto discardTheFrontWaypoint(
+  traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory, const double current_time)
+  -> void;
+
+auto makeUpdatedEntityStatus(
   const ValidatedEntityStatus & validated_entity_status,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
   traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
@@ -54,7 +59,7 @@ auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
   return std::nullopt;
 }
 
-auto PolylineTrajectoryFollower::discardTheFrontWaypoint(
+auto discardTheFrontWaypoint(
   traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory, const double current_time)
   -> void
 {

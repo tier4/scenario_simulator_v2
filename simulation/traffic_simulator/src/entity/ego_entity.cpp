@@ -155,7 +155,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
   EntityBase::onUpdate(current_time, step_time);
   if (is_controlled_by_simulator_) {
     if (const auto non_canonicalized_updated_status =
-          traffic_simulator::follow_trajectory::PolylineTrajectoryFollower::makeUpdatedEntityStatus(
+          traffic_simulator::follow_trajectory::makeUpdatedEntityStatus(
             traffic_simulator::follow_trajectory::ValidatedEntityStatus(
               static_cast<traffic_simulator::EntityStatus>(*status_), behavior_parameter_,
               step_time),
