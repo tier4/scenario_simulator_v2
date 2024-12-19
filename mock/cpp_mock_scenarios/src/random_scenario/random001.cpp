@@ -67,12 +67,12 @@ private:
         constexpr lanelet::Id spawn_lanelet_id = 34705;
         api_.spawn(
           entity_name,
-          traffic_simulator::helper::constructCanonicalizedLaneletPose(
+          traffic_simulator::helper::constructLaneletPose(
             spawn_lanelet_id,
             static_cast<double>(entity_index) / static_cast<double>(number_of_vehicles) *
                 traffic_simulator::pose::laneletLength(spawn_lanelet_id, api_.getHdmapUtils()) +
               normal_dist(engine_),
-            offset, api_.getHdmapUtils()),
+            offset),
           getVehicleParameters(
             get_entity_subtype(params_.random_parameters.road_parking_vehicle.entity_type)));
         api_.getEntity(entity_name)->requestSpeedChange(0, true);
@@ -122,9 +122,7 @@ private:
     const auto spawn_and_change_lane = [&](const auto & entity_name, const auto spawn_s_value) {
       if (!api_.isEntityExist(entity_name)) {
         auto entity = api_.spawn(
-          entity_name,
-          traffic_simulator::helper::constructCanonicalizedLaneletPose(
-            34513, spawn_s_value, 0.0, api_.getHdmapUtils()),
+          entity_name, traffic_simulator::helper::constructLaneletPose(34513, spawn_s_value, 0.0),
           getVehicleParameters());
         std::uniform_real_distribution<> speed_distribution(
           params_.random_parameters.lane_following_vehicle.min_speed,
@@ -159,9 +157,7 @@ private:
       if (
         !api_.isEntityExist(entity_name) &&
         !ego_entity->isInPosition(
-          traffic_simulator::helper::constructCanonicalizedLaneletPose(
-            34576, 25.0, 0.0, api_.getHdmapUtils()),
-          5.0)) {
+          traffic_simulator::helper::constructLaneletPose(34576, 25.0, 0.0), 5.0)) {
         std::normal_distribution<> offset_distribution(
           0.0, params_.random_parameters.crossing_pedestrian.offset_variance);
         std::uniform_real_distribution<> speed_distribution(
@@ -169,8 +165,8 @@ private:
           params_.random_parameters.crossing_pedestrian.max_speed);
         auto entity = api_.spawn(
           entity_name,
-          traffic_simulator::helper::constructCanonicalizedLaneletPose(
-            lanelet_id, 0.0, offset_distribution(engine_), api_.getHdmapUtils()),
+          traffic_simulator::helper::constructLaneletPose(
+            lanelet_id, 0.0, offset_distribution(engine_)),
           getPedestrianParameters());
         const auto speed = speed_distribution(engine_);
         entity->requestSpeedChange(speed, true);
@@ -186,8 +182,7 @@ private:
       spawn_and_cross_pedestrian(i);
     }
 
-    const auto trigger_position = traffic_simulator::helper::constructCanonicalizedLaneletPose(
-      34621, 10, 0.0, api_.getHdmapUtils());
+    const auto trigger_position = traffic_simulator::helper::constructLaneletPose(34621, 10, 0.0);
     constexpr auto entity_name = "spawn_nearby_ego";
     if (ego_entity->isInPosition(trigger_position, 20.0) && !api_.isEntityExist(entity_name)) {
       api_.spawn(
@@ -205,8 +200,7 @@ private:
       api_.despawn(entity_name);
     }
 
-    const auto ego_goal_position = traffic_simulator::helper::constructCanonicalizedLaneletPose(
-      34606, 0.0, 0.0, api_.getHdmapUtils());
+    const auto ego_goal_position = traffic_simulator::helper::constructLaneletPose(34606, 0.0, 0.0);
     if (ego_entity->isInPosition(ego_goal_position, 1.0)) {
       api_.despawn("ego");
       stop(cpp_mock_scenarios::Result::SUCCESS);
@@ -222,11 +216,8 @@ private:
     spawnRoadParkingVehicles();
 
     spawnEgoEntity(
-      traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34621, 10.0, 0.0, api_.getHdmapUtils()),
-      {traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34606, 0.0, 0.0, api_.getHdmapUtils())},
-      getVehicleParameters());
+      traffic_simulator::helper::constructLaneletPose(34621, 10.0, 0.0),
+      {traffic_simulator::helper::constructLaneletPose(34606, 0.0, 0.0)}, getVehicleParameters());
     if (const auto ego = api_.getEntity("ego")) {
       api_.spawn(
         "parking_outside",

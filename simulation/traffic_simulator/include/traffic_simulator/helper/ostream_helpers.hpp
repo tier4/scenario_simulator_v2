@@ -1,4 +1,4 @@
-// Copyright 2024 TIER IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -38,7 +38,10 @@ std::ostream & operator<<(std::ostream & os, const geometry_msgs::msg::Quaternio
 std::ostream & operator<<(std::ostream & os, const geometry_msgs::msg::Pose & pose);
 
 std::ostream & operator<<(
-  std::ostream & os, const traffic_simulator_msgs::msg::LaneletPose & ll_pose);
+  std::ostream & os, const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose);
+
+std::ostream & operator<<(
+  std::ostream & os, const std::vector<traffic_simulator_msgs::msg::LaneletPose> & lanelet_pose);
 
 std::ostream & operator<<(
   std::ostream & os, const traffic_simulator_msgs::msg::EntitySubtype & subtype);

@@ -1,4 +1,4 @@
-// Copyright 2024 TIER IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -281,29 +281,12 @@ auto EntityManager::getEntityNames() const -> const std::vector<std::string>
 
 auto EntityManager::getEntity(const std::string & name) const -> std::shared_ptr<entity::EntityBase>
 {
-  if (const auto entity = getEntityOrNullptr(name)) {
-    return entity;
+  if (auto it = entities_.find(name); it != entities_.end()) {
+    return it->second;
   } else {
     THROW_SEMANTIC_ERROR("Entity ", std::quoted(name), " does not exist.");
   }
 }
-
-auto EntityManager::getEntityOrNullptr(const std::string & name) const
-  -> std::shared_ptr<entity::EntityBase>
-{
-  if (auto it = entities_.find(name); it != entities_.end()) {
-    return it->second;
-  } else {
-    /*
-      This method returns nullptr, due to the fact that the interpretation of the scenario operates in
-      such a way that checking a condition, e.g. DistanceCondition, is called also for Entities that
-      have not yet been spawned. For example, if for DistanceCondition any getEntity() returns
-      nullptr, the condition returns a distance equal to NaN. For this reason, using getEntity() with
-      throwing an exception is not recommended.
-    */
-    return nullptr;
-  }
-};
 
 // entities - respawn, despawn, reset
 auto EntityManager::resetBehaviorPlugin(

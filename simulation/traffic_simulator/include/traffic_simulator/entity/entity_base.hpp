@@ -108,6 +108,7 @@ public:
   DEFINE_GETTER(LinearJerk,                      double,                                             status_->getLinearJerk())
   DEFINE_GETTER(MapPose,                         const geometry_msgs::msg::Pose &,                   status_->getMapPose())
   DEFINE_GETTER(StandStillDuration,              double,                                             stand_still_duration_)
+  DEFINE_GETTER(LaneletRelativeYaw,              std::optional<double>,                              status_->getLaneletRelativeYaw()) 
   DEFINE_GETTER(TraveledDistance,                double,                                             traveled_distance_)
   DEFINE_GETTER(Name,                            const std::string &,                                status_->getName())
   // clang-format on
@@ -131,8 +132,7 @@ public:
   /*   */ auto isInPosition(const geometry_msgs::msg::Pose & pose, const double tolerance) const
     -> bool;
 
-  /*   */ auto isInPosition(
-    const CanonicalizedLaneletPose & lanelet_pose, const double tolerance) const -> bool;
+  /*   */ auto isInPosition(const LaneletPose & lanelet_pose, const double tolerance) const -> bool;
 
   /*   */ auto isInLanelet() const -> bool { return status_->isInLanelet(); };
 
@@ -162,11 +162,11 @@ public:
 
   /*   */ void resetDynamicConstraints();
 
-  virtual void requestAcquirePosition(const CanonicalizedLaneletPose &) = 0;
+  virtual void requestAcquirePosition(const LaneletPose &) = 0;
 
   virtual void requestAcquirePosition(const geometry_msgs::msg::Pose &) = 0;
 
-  virtual void requestAssignRoute(const std::vector<CanonicalizedLaneletPose> &) = 0;
+  virtual void requestAssignRoute(const std::vector<LaneletPose> &) = 0;
 
   virtual void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) = 0;
 
@@ -207,8 +207,13 @@ public:
 
   virtual void requestSpeedChange(const double target_speed, const bool continuous);
 
-  virtual void requestSpeedChange(
-    const speed_change::RelativeTargetSpeed & target_speed, const bool continuous);
+  virtual void requestSpeedChange(const speed_change::RelativeTargetSpeed &, bool);
+
+  virtual auto requestSynchronize(
+    const std::string & target_name, const LaneletPose & target_sync_pose,
+    const LaneletPose & entity_target, const double target_speed, const double tolerance) -> bool;
+
+  virtual void requestClearRoute() {}
 
   virtual auto isControlledBySimulator() const -> bool;
 
@@ -235,8 +240,6 @@ public:
   /*   */ void setOtherStatus(
     const std::unordered_map<std::string, CanonicalizedEntityStatus> & status);
 
-  /*   */ auto setCanonicalizedStatus(const CanonicalizedEntityStatus & status) -> void;
-
   virtual auto setStatus(const EntityStatus & status) -> void;
 
   virtual auto setStatus(const EntityStatus & status, const lanelet::Ids & lanelet_ids) -> void;
@@ -255,11 +258,6 @@ public:
     const geometry_msgs::msg::Pose & reference_pose,
     const geometry_msgs::msg::Point & relative_position,
     const geometry_msgs::msg::Vector3 & relative_rpy,
-    const traffic_simulator_msgs::msg::ActionStatus & action_status =
-      helper::constructActionStatus()) -> void;
-
-  virtual auto setStatus(
-    const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
     const traffic_simulator_msgs::msg::ActionStatus & action_status =
       helper::constructActionStatus()) -> void;
 
@@ -295,10 +293,9 @@ public:
 
   /*   */ void updateEntityStatusTimestamp(const double current_time);
 
-  /*   */ auto requestSynchronize(
-    const std::string & target_name, const CanonicalizedLaneletPose & target_sync_pose,
-    const CanonicalizedLaneletPose & entity_target, const double target_speed,
-    const double tolerance) -> bool;
+  /*   */ auto updateStandStillDuration(const double step_time) -> double;
+
+  /*   */ auto updateTraveledDistance(const double step_time) -> double;
 
   const std::string name;
 

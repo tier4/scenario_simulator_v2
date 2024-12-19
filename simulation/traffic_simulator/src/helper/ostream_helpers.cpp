@@ -1,4 +1,4 @@
-// Copyright 2024 TIER IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -48,6 +48,15 @@ std::ostream & operator<<(
 {
   os << "LaneletPose(lanelet_id: " << lanelet_pose.lanelet_id << ", s: " << lanelet_pose.s
      << ", offset: " << lanelet_pose.offset << ", rpy: " << lanelet_pose.rpy << ")";
+  return os;
+}
+
+std::ostream & operator<<(
+  std::ostream & os, const std::vector<traffic_simulator_msgs::msg::LaneletPose> & lanelet_poses)
+{
+  for (size_t i = 0; i < lanelet_poses.size(); ++i) {
+    os << "[" << i << "] " << lanelet_poses[i] << std::endl;
+  }
   return os;
 }
 

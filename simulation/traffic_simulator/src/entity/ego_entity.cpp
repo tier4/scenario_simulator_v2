@@ -199,9 +199,10 @@ void EgoEntity::onUpdate(double current_time, double step_time)
   EntityBase::onPostUpdate(current_time, step_time);
 }
 
-void EgoEntity::requestAcquirePosition(const CanonicalizedLaneletPose & lanelet_pose)
+void EgoEntity::requestAcquirePosition(const LaneletPose & lanelet_pose)
 {
-  requestAssignRoute({lanelet_pose});
+  const auto canonicalized_lanelet_pose = pose::canonicalize(lanelet_pose, hdmap_utils_ptr_);
+  requestAssignRoute({static_cast<LaneletPose>(canonicalized_lanelet_pose)});
 }
 
 void EgoEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose)
@@ -209,10 +210,10 @@ void EgoEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose
   requestAssignRoute({map_pose});
 }
 
-void EgoEntity::requestAssignRoute(const std::vector<CanonicalizedLaneletPose> & waypoints)
+void EgoEntity::requestAssignRoute(const std::vector<LaneletPose> & waypoints)
 {
   std::vector<geometry_msgs::msg::Pose> route;
-  for (const auto & waypoint : waypoints) {
+  for (const auto & waypoint : pose::canonicalize(waypoints, hdmap_utils_ptr_)) {
     route.push_back(static_cast<geometry_msgs::msg::Pose>(waypoint));
   }
   requestAssignRoute(route);
@@ -281,6 +282,14 @@ auto EgoEntity::requestSpeedChange(
   THROW_SEMANTIC_ERROR(
     "The traffic_simulator's request to set speed to the Ego type entity is for initialization "
     "purposes only.");
+}
+
+auto EgoEntity::requestSynchronize(
+  const std::string & /*target_name*/, const LaneletPose & /*target_sync_pose*/,
+  const LaneletPose & /*entity_target*/, const double /*target_speed*/, const double /*tolerance*/)
+  -> bool
+{
+  THROW_SYNTAX_ERROR("Request synchronize is only for non-ego entities.");
 }
 
 auto EgoEntity::requestClearRoute() -> void { field_operator_application->clearRoute(); }
