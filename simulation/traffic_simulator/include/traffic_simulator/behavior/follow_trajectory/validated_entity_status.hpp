@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__BEHAVIOR__POLYLINE_TRAJECTORY_FOLLOWER__VALIDATED_ENTITY_STATUS_HPP_
-#define TRAFFIC_SIMULATOR__BEHAVIOR__POLYLINE_TRAJECTORY_FOLLOWER__VALIDATED_ENTITY_STATUS_HPP_
+#ifndef TRAFFIC_SIMULATOR__BEHAVIOR__FOLLOW_TRAJECTORY__VALIDATED_ENTITY_STATUS_HPP_
+#define TRAFFIC_SIMULATOR__BEHAVIOR__FOLLOW_TRAJECTORY__VALIDATED_ENTITY_STATUS_HPP_
 
 #include <geometry/vector3/is_like_vector3.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
@@ -107,4 +107,4 @@ private:
 }  // namespace follow_trajectory
 }  // namespace traffic_simulator
 
-#endif  // TRAFFIC_SIMULATOR__BEHAVIOR__POLYLINE_TRAJECTORY_FOLLOWER__VALIDATED_ENTITY_STATUS_HPP_
+#endif  // TRAFFIC_SIMULATOR__BEHAVIOR__FOLLOW_TRAJECTORY__VALIDATED_ENTITY_STATUS_HPP_

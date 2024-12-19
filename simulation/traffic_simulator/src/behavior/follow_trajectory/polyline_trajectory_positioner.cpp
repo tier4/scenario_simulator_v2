@@ -23,7 +23,7 @@
 #include <geometry/vector3/operator.hpp>
 #include <geometry_msgs/msg/accel.hpp>
 #include <geometry_msgs/msg/twist.hpp>
-#include <traffic_simulator/behavior/polyline_trajectory_follower/polyline_trajectory_positioner.hpp>
+#include <traffic_simulator/behavior/follow_trajectory/polyline_trajectory_positioner.hpp>
 #include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator_msgs/msg/action_status.hpp>
 

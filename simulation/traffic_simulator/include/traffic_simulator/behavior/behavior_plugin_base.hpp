@@ -17,7 +17,7 @@
 
 #include <optional>
 #include <string>
-#include <traffic_simulator/behavior/polyline_trajectory_follower/polyline_trajectory_follower.hpp>
+#include <traffic_simulator/behavior/follow_trajectory/follow_trajectory.hpp>
 #include <traffic_simulator/data_type/behavior.hpp>
 #include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
@@ -44,13 +44,13 @@ public:
   virtual auto update(const double current_time, const double step_time) -> void = 0;
   virtual const std::string & getCurrentAction() const = 0;
 
-#define DEFINE_GETTER_SETTER(NAME, KEY, TYPE)      \
-  virtual TYPE get##NAME() = 0;                    \
-  virtual void set##NAME(const TYPE & value) = 0;  \
-  auto get##NAME##Key() const->const std::string & \
-  {                                                \
-    static const std::string key = KEY;            \
-    return key;                                    \
+#define DEFINE_GETTER_SETTER(NAME, KEY, TYPE)        \
+  virtual TYPE get##NAME() = 0;                      \
+  virtual void set##NAME(const TYPE & value) = 0;    \
+  auto get##NAME##Key() const -> const std::string & \
+  {                                                  \
+    static const std::string key = KEY;              \
+    return key;                                      \
   }
 
   // clang-format off

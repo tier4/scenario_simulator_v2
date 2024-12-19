@@ -24,7 +24,7 @@
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/twist.hpp>
 #include <scenario_simulator_exception/exception.hpp>
-#include <traffic_simulator/behavior/polyline_trajectory_follower/validated_entity_status.hpp>
+#include <traffic_simulator/behavior/follow_trajectory/validated_entity_status.hpp>
 #include <traffic_simulator_msgs/msg/action_status.hpp>
 
 namespace traffic_simulator
