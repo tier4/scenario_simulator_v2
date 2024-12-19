@@ -50,7 +50,7 @@ auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
     if (updated_entity_opt.has_value()) {
       return updated_entity_opt;
     } else {
-      discardTheFrontWaypoint(polyline_trajectory, validated_entity_status.entity_status_.time);
+      discardTheFrontWaypoint(polyline_trajectory, validated_entity_status.time());
     }
   }
   return std::nullopt;

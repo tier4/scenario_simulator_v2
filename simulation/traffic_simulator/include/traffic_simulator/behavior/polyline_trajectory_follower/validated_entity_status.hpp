@@ -35,11 +35,6 @@ public:
   auto buildUpdatedEntityStatus(const geometry_msgs::msg::Vector3 & desired_velocity) const
     -> traffic_simulator_msgs::msg::EntityStatus;
 
-  const double step_time_;
-  const traffic_simulator_msgs::msg::EntityStatus entity_status_;
-  const traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter_;
-  const geometry_msgs::msg::Vector3 current_velocity_;
-
   ValidatedEntityStatus() = delete;
   ValidatedEntityStatus(const ValidatedEntityStatus & other);
   ValidatedEntityStatus & operator=(const ValidatedEntityStatus & other) = delete;
@@ -102,6 +97,11 @@ private:
       ", Variable: ", std::quoted(variable_name), ", variable contains NaN or inf value, ",
       "Value: ", variable);
   }
+
+  const double step_time_;
+  const traffic_simulator_msgs::msg::EntityStatus entity_status_;
+  const traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter_;
+  const geometry_msgs::msg::Vector3 current_velocity_;
 };
 
 }  // namespace follow_trajectory
