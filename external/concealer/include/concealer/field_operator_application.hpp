@@ -33,7 +33,7 @@
 #include <concealer/autoware_universe.hpp>
 #include <concealer/launch.hpp>
 #include <concealer/publisher.hpp>
-#include <concealer/service_with_validation.hpp>
+#include <concealer/service.hpp>
 #include <concealer/subscriber.hpp>
 #include <concealer/task_queue.hpp>
 #include <concealer/transition_assertion.hpp>
@@ -119,14 +119,14 @@ struct FieldOperatorApplication : public rclcpp::Node,
   Subscriber<Trajectory>                      getTrajectory;
   Subscriber<TurnIndicatorsCommand>           getTurnIndicatorsCommand;
 
-  ServiceWithValidation<ClearRoute>                  requestClearRoute;
-  ServiceWithValidation<CooperateCommands>           requestCooperateCommands;
-  ServiceWithValidation<Engage>                      requestEngage;
-  ServiceWithValidation<InitializeLocalization>      requestInitialPose;
-  ServiceWithValidation<SetRoutePoints>              requestSetRoutePoints;
-  ServiceWithValidation<AutoModeWithModule>          requestSetRtcAutoMode;
-  ServiceWithValidation<SetVelocityLimit>            requestSetVelocityLimit;
-  ServiceWithValidation<ChangeOperationMode>         requestEnableAutowareControl;
+  Service<ClearRoute>             requestClearRoute;
+  Service<CooperateCommands>      requestCooperateCommands;
+  Service<Engage>                 requestEngage;
+  Service<InitializeLocalization> requestInitialPose;
+  Service<SetRoutePoints>         requestSetRoutePoints;
+  Service<AutoModeWithModule>     requestSetRtcAutoMode;
+  Service<SetVelocityLimit>       requestSetVelocityLimit;
+  Service<ChangeOperationMode>    requestEnableAutowareControl;
   // clang-format on
 
   /*
