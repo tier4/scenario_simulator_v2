@@ -315,6 +315,8 @@ public:
     visualization_msgs::msg::MarkerArray &, const visualization_msgs::msg::MarkerArray &) const
     -> void;
 
+  auto isInIntersection(const lanelet::Id) const -> bool;
+
   auto isInLanelet(const lanelet::Id, const double s) const -> bool;
 
   auto isInRoute(const lanelet::Id, const lanelet::Ids & route) const -> bool;
