@@ -23,7 +23,7 @@
 #include <geometry/vector3/operator.hpp>
 #include <geometry_msgs/msg/accel.hpp>
 #include <geometry_msgs/msg/twist.hpp>
-#include <traffic_simulator/behavior/polyline_trajectory_follower/polyline_trajectory_follower.hpp>
+#include <traffic_simulator/behavior/follow_trajectory/follow_trajectory.hpp>
 #include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator_msgs/msg/action_status.hpp>
 
@@ -32,31 +32,34 @@ namespace traffic_simulator
 namespace follow_trajectory
 {
 
-auto PolylineTrajectoryFollower::makeUpdatedEntityStatus(
+/// @note side effects on polyline_trajectory
+auto discardTheFrontWaypoint(
+  traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory, const double current_time)
+  -> void;
+
+auto makeUpdatedEntityStatus(
   const ValidatedEntityStatus & validated_entity_status,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
-  const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter,
   traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
   const double matching_distance, const std::optional<double> target_speed, const double step_time)
   -> std::optional<EntityStatus>
 {
   assert(step_time > 0.0);
   while (not polyline_trajectory.shape.vertices.empty()) {
-    const auto updated_entity_opt =
-      PolylineTrajectoryPositioner(
-        hdmap_utils_ptr, validated_entity_status, polyline_trajectory, behavior_parameter,
-        target_speed, matching_distance, step_time)
-        .makeUpdatedEntityStatus();
+    const auto updated_entity_opt = PolylineTrajectoryPositioner(
+                                      hdmap_utils_ptr, validated_entity_status, polyline_trajectory,
+                                      target_speed, matching_distance, step_time)
+                                      .makeUpdatedEntityStatus();
     if (updated_entity_opt.has_value()) {
       return updated_entity_opt;
     } else {
-      discardTheFrontWaypoint(polyline_trajectory, validated_entity_status.entity_status_.time);
+      discardTheFrontWaypoint(polyline_trajectory, validated_entity_status.time());
     }
   }
   return std::nullopt;
 }
 
-auto PolylineTrajectoryFollower::discardTheFrontWaypoint(
+auto discardTheFrontWaypoint(
   traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory, const double current_time)
   -> void
 {
