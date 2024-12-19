@@ -150,13 +150,19 @@ auto moveTowardsLaneletPose(
   using math::geometry::operator+=;
 
   const auto lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose);
-  const auto yaw_relative_to_lanelet = lanelet_pose.rpy.z;
-  const auto longitudinal_d = (desired_velocity.x * cos(yaw_relative_to_lanelet) -
-                               desired_velocity.y * sin(yaw_relative_to_lanelet)) *
-                              step_time;
-  const auto lateral_d = (desired_velocity.x * sin(yaw_relative_to_lanelet) +
-                          desired_velocity.y * cos(yaw_relative_to_lanelet)) *
-                         step_time;
+
+  // transform desired (global) velocity to local velocity
+  const auto orientation =
+    static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose).orientation;
+  const Eigen::Vector3d global_velocity(desired_velocity.x, desired_velocity.y, desired_velocity.z);
+  const Eigen::Quaterniond quaternion(orientation.w, orientation.x, orientation.y, orientation.z);
+  const Eigen::Vector3d local_velocity = quaternion.inverse() * global_velocity;
+  // determine the displacement in the 2D lanelet coordinate system
+  const Eigen::Vector2d displacement = Eigen::Rotation2Dd(lanelet_pose.rpy.z) *
+                                       Eigen::Vector2d(local_velocity.x(), local_velocity.y()) *
+                                       step_time;
+  const auto longitudinal_d = displacement.x();
+  const auto lateral_d = displacement.y();
 
   LaneletPose result_lanelet_pose;
   const auto remaining_lanelet_length =
@@ -165,15 +171,14 @@ auto moveTowardsLaneletPose(
   if (longitudinal_d < remaining_lanelet_length) {
     result_lanelet_pose.lanelet_id = lanelet_pose.lanelet_id;
     result_lanelet_pose.s = lanelet_pose.s + longitudinal_d;
-    result_lanelet_pose.offset = lanelet_pose.offset + lateral_d;
   } else if (  // if longitudinal displacement exceeds the current lanelet length, use next lanelet if possible
     next_lanelet_longitudinal_d < hdmap_utils_ptr->getLaneletLength(next_lanelet_pose.lanelet_id)) {
     result_lanelet_pose.lanelet_id = next_lanelet_pose.lanelet_id;
     result_lanelet_pose.s = next_lanelet_longitudinal_d;
-    result_lanelet_pose.offset = lanelet_pose.offset + lateral_d;
   } else {
     THROW_SIMULATION_ERROR("Next lanelet is too short.");
   }
+  result_lanelet_pose.offset = lanelet_pose.offset + lateral_d;
   result_lanelet_pose.rpy = lanelet_pose.rpy;
   return result_lanelet_pose;
 }

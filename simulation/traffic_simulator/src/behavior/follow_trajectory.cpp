@@ -590,10 +590,10 @@ auto makeUpdatedStatus(
           step_time, hdmap_utils);
         const auto was_position = updated_status.pose.position;
         updated_status.pose.position = pose::toMapPose(next_lanelet_pose, hdmap_utils).position;
-        // if (hypot(was_position, updated_status.pose.position) > 0.1) {
-        //   THROW_SIMULATION_ERROR(
-        //     "Position override bug by method pose::moveTowardsLaneletPose() - too much change.");
-        // }
+        if (hypot(was_position, updated_status.pose.position) > 0.1) {
+          THROW_SIMULATION_ERROR(
+            "Position override bug by method pose::moveTowardsLaneletPose() - too much change.");
+        }
       }
     }
 

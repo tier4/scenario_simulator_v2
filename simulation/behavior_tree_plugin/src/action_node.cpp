@@ -561,10 +561,10 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
       const auto was_position = pose_new.position;
       pose_new.position =
         traffic_simulator::pose::toMapPose(next_lanelet_pose, hdmap_utils).position;
-      // if (hypot(was_position, pose_new.position) > 0.1) {
-      //   THROW_SIMULATION_ERROR(
-      //     "Position override bug by method pose::moveTowardsLaneletPose() - too much change.");
-      // }
+      if (math::geometry::hypot(was_position, pose_new.position) > 0.1) {
+        THROW_SIMULATION_ERROR(
+          "Position override bug by method pose::moveTowardsLaneletPose() - too much change.");
+      }
     }
   }
 
