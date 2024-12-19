@@ -519,26 +519,6 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
   using math::geometry::operator+=;
   static bool is_yaw_applied = false;
 
-  // Apply pitch rotation based on the lanelet's pitch angle
-  auto applyPitchRotation = [&](auto & disp, const double lanelet_pose_s) {
-    const auto current_lanelet_Id = canonicalized_entity_status->getLaneletId();
-    const auto lanelet_pitch = math::geometry::convertQuaternionToEulerAngle(
-                                 hdmap_utils->toMapOrientation(current_lanelet_Id, lanelet_pose_s))
-                                 .y;
-    math::geometry::rotate(disp, lanelet_pitch, math::geometry::Axis::Y);
-  };
-
-  // Apply yaw rotation once to avoid cumulative lateral offset errors
-  auto applyYawRotation = [&](auto & disp) {
-    if (!is_yaw_applied) {
-      const auto yaw = math::geometry::convertQuaternionToEulerAngle(
-                         canonicalized_entity_status->getMapPose().orientation)
-                         .z;
-      math::geometry::rotate(disp, yaw, math::geometry::Axis::Z);
-      is_yaw_applied = true;
-    }
-  };
-
   const auto speed_planner =
     traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner(
       step_time, canonicalized_entity_status->getName());
@@ -548,52 +528,24 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
   double linear_jerk_new = std::get<2>(dynamics);
   geometry_msgs::msg::Accel accel_new = std::get<1>(dynamics);
   geometry_msgs::msg::Twist twist_new = std::get<0>(dynamics);
-  geometry_msgs::msg::Pose pose_new = canonicalized_entity_status->getMapPose();
   const auto desired_velocity = geometry_msgs::build<geometry_msgs::msg::Vector3>()
                                   .x(twist_new.linear.x)
                                   .y(twist_new.linear.y)
                                   .z(twist_new.linear.z);
-  auto displacement = desired_velocity * step_time;
 
-  // Adjust the entity's position when approaching the end of the current lanelet
-  auto adjustPositionAtLaneletBoundary =
-    [&](double remaining_lanelet_length, const std::optional<lanelet::Id> & next_lanelet_id) {
-      const auto excess_displacement =
-        displacement - math::geometry::normalize(desired_velocity) * remaining_lanelet_length;
-
-      // If a next lanelet is available, transition to it; otherwise, apply displacement
-      pose_new.position = next_lanelet_id
-                            ? hdmap_utils->toMapPosition(
-                                next_lanelet_id.value(), math::geometry::norm(excess_displacement))
-                            : pose_new.position + displacement;
-
-      // Apply lateral offset if transitioning to the next lanelet
-      if (next_lanelet_id) {
-        pose_new.position.y += canonicalized_entity_status->getLaneletPose().offset;
-      }
-    };
-
-  if (!canonicalized_entity_status->laneMatchingSucceed()) {
-    displacement = math::geometry::normalize(pose_new.orientation) * displacement;
-    pose_new.position += displacement;
+  geometry_msgs::msg::Pose pose_new;
+  if (
+    const auto canonicalized_lanelet_pose =
+      canonicalized_entity_status->getCanonicalizedLaneletPose()) {
+    pose_new = traffic_simulator::pose::moveAlongLanelet(
+      canonicalized_lanelet_pose.value(), desired_velocity, step_time, !is_yaw_applied,
+      hdmap_utils);
+    is_yaw_applied = true;
   } else {
-    const auto current_lanelet_Id = canonicalized_entity_status->getLaneletId();
-    const auto lanelet_pose_s = canonicalized_entity_status->getLaneletPose().s;
-    const auto remaining_lanelet_length =
-      hdmap_utils->getLaneletLength(current_lanelet_Id) - lanelet_pose_s;
-
-    applyPitchRotation(displacement, lanelet_pose_s);
-    applyYawRotation(displacement);
-
-    // Check if the displacement exceeds the remaining lanelet length
-    if (math::geometry::norm(displacement) > remaining_lanelet_length) {
-      const auto next_lanelet_ids = hdmap_utils->getNextLaneletIds(current_lanelet_Id);
-      adjustPositionAtLaneletBoundary(
-        remaining_lanelet_length,
-        next_lanelet_ids.empty() ? std::nullopt : std::make_optional(next_lanelet_ids[0]));
-    } else {
-      pose_new.position += displacement;
-    }
+    pose_new = canonicalized_entity_status->getMapPose();
+    pose_new.position +=
+      math::geometry::normalize(pose_new.orientation) * desired_velocity * step_time;
+    /// @todo orientation does not change?
   }
 
   auto entity_status_updated =

@@ -13,6 +13,11 @@
 // limitations under the License.
 
 #include <geometry/bounding_box.hpp>
+#include <geometry/quaternion/normalize.hpp>
+#include <geometry/quaternion/quaternion_to_euler.hpp>
+#include <geometry/vector3/normalize.hpp>
+#include <geometry/vector3/operator.hpp>
+#include <geometry/vector3/rotate.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator/utils/pose.hpp>
@@ -131,6 +136,59 @@ auto transformRelativePoseToGlobal(
   geometry_msgs::msg::Pose ret;
   tf2::toMsg(ref_transform * relative_transform, ret);
   return ret;
+}
+
+/// @todo remove adjust yaw... figure out a better solution, adjust_yaw is local..
+auto moveAlongLanelet(
+  const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
+  const geometry_msgs::msg::Vector3 & desired_velocity, const auto step_time, const bool adjust_yaw,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> geometry_msgs::msg::Pose
+{
+  using math::geometry::operator*;
+  using math::geometry::operator+;
+  using math::geometry::operator-;
+  using math::geometry::operator+=;
+
+  const auto lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose);
+  const auto remaining_lanelet_length =
+    hdmap_utils_ptr->getLaneletLength(lanelet_pose.lanelet_id) - lanelet_pose.s;
+
+  auto pose_new = static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose);
+  auto displacement = desired_velocity * step_time;
+
+  // Apply pitch rotation based on the lanelet's pitch angle
+  const auto lanelet_pitch =
+    math::geometry::convertQuaternionToEulerAngle(
+      hdmap_utils_ptr->toMapOrientation(lanelet_pose.lanelet_id, lanelet_pose.s))
+      .y;
+  math::geometry::rotate(displacement, lanelet_pitch, math::geometry::Axis::Y);
+
+  // Apply yaw rotation once to avoid cumulative lateral offset errors
+  if (adjust_yaw) {
+    const auto yaw = math::geometry::convertQuaternionToEulerAngle(pose_new.orientation).z;
+    math::geometry::rotate(displacement, yaw, math::geometry::Axis::Z);
+  }
+
+  // Check if the displacement exceeds the remaining lanelet length
+  if (math::geometry::norm(displacement) > remaining_lanelet_length) {
+    const auto excess_displacement =
+      displacement - math::geometry::normalize(desired_velocity) * remaining_lanelet_length;
+    /// @todo why always first next_lanelet? (route?)
+    if (const auto next_lanelet_ids = hdmap_utils_ptr->getNextLaneletIds(lanelet_pose.lanelet_id);
+        !next_lanelet_ids.empty()) {
+      // transition to next lanelet
+      const auto s = math::geometry::norm(excess_displacement);
+      pose_new.position = hdmap_utils_ptr->toMapPosition(next_lanelet_ids[0], lanelet_pose.s);
+      // Apply lateral offset if transitioning to the next lanelet
+      pose_new.position.y += canonicalized_lanelet_pose.getLaneletPose().offset;
+    } else {
+      pose_new.position += displacement;
+    }
+  } else {
+    pose_new.position += displacement;
+  }
+  /// @todo orientation?
+  return pose_new;
 }
 
 auto relativePose(const geometry_msgs::msg::Pose & from, const geometry_msgs::msg::Pose & to)
