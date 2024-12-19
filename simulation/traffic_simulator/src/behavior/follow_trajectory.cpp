@@ -26,6 +26,7 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/behavior/follow_trajectory.hpp>
 #include <traffic_simulator/behavior/follow_waypoint_controller.hpp>
+#include <traffic_simulator/utils/pose.hpp>
 
 namespace traffic_simulator
 {
@@ -65,6 +66,11 @@ auto makeUpdatedStatus(
   using math::geometry::norm;
   using math::geometry::normalize;
   using math::geometry::truncate;
+
+  const auto include_crosswalk = [](const auto & entity_type) {
+    return (traffic_simulator_msgs::msg::EntityType::PEDESTRIAN == entity_type.type) ||
+           (traffic_simulator_msgs::msg::EntityType::MISC_OBJECT == entity_type.type);
+  }(entity_status.type);
 
   auto distance_along_lanelet =
     [&](const geometry_msgs::msg::Point & from, const geometry_msgs::msg::Point & to) -> double {
@@ -568,6 +574,23 @@ auto makeUpdatedStatus(
         return math::geometry::convertEulerAngleToQuaternion(direction);
       }
     }();
+
+    // optionally overwrite pose
+    /// @todo is the orientation changed in moveToLaneletPose?
+    if (entity_status.lanelet_pose_valid) {
+      const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
+        entity_status.pose, entity_status.bounding_box, {entity_status.lanelet_pose.lanelet_id},
+        include_crosswalk, matching_distance, hdmap_utils);
+
+      const auto next_lanelet_pose = hdmap_utils->toLaneletPose(
+        updated_status.pose, entity_status.bounding_box, include_crosswalk, matching_distance);
+
+      if (canonicalized_lanelet_pose && next_lanelet_pose) {
+        updated_status.pose = pose::moveToLaneletPose(
+          canonicalized_lanelet_pose.value(), next_lanelet_pose.value(), desired_velocity,
+          step_time, hdmap_utils);
+      }
+    }
 
     updated_status.action_status.twist.linear.x = norm(desired_velocity);
 

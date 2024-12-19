@@ -18,7 +18,10 @@
 #include <geometry/quaternion/euler_to_quaternion.hpp>
 #include <geometry/quaternion/get_rotation.hpp>
 #include <geometry/quaternion/get_rotation_matrix.hpp>
+#include <geometry/quaternion/normalize.hpp>
 #include <geometry/quaternion/quaternion_to_euler.hpp>
+#include <geometry/vector3/normalize.hpp>
+#include <geometry/vector3/rotate.hpp>
 #include <memory>
 #include <optional>
 #include <rclcpp/rclcpp.hpp>
@@ -511,6 +514,15 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
   -> traffic_simulator::EntityStatus
 {
   using math::geometry::operator*;
+  using math::geometry::operator+;
+  using math::geometry::operator-;
+  using math::geometry::operator+=;
+
+  const auto include_crosswalk = [](const auto & entity_type) {
+    return (traffic_simulator_msgs::msg::EntityType::PEDESTRIAN == entity_type.type) ||
+           (traffic_simulator_msgs::msg::EntityType::MISC_OBJECT == entity_type.type);
+  }(canonicalized_entity_status->getType());
+
   const auto speed_planner =
     traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner(
       step_time, canonicalized_entity_status->getName());
@@ -520,21 +532,39 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
   double linear_jerk_new = std::get<2>(dynamics);
   geometry_msgs::msg::Accel accel_new = std::get<1>(dynamics);
   geometry_msgs::msg::Twist twist_new = std::get<0>(dynamics);
+
   geometry_msgs::msg::Pose pose_new;
-  geometry_msgs::msg::Vector3 angular_trans_vec;
-  angular_trans_vec.z = twist_new.angular.z * step_time;
-  geometry_msgs::msg::Quaternion angular_trans_quat =
-    math::geometry::convertEulerAngleToQuaternion(angular_trans_vec);
-  pose_new.orientation = canonicalized_entity_status->getMapPose().orientation * angular_trans_quat;
-  Eigen::Vector3d trans_vec;
-  trans_vec(0) = twist_new.linear.x * step_time;
-  trans_vec(1) = twist_new.linear.y * step_time;
-  trans_vec(2) = 0;
-  Eigen::Matrix3d rotation_mat = math::geometry::getRotationMatrix(pose_new.orientation);
-  trans_vec = rotation_mat * trans_vec;
-  pose_new.position.x = trans_vec(0) + canonicalized_entity_status->getMapPose().position.x;
-  pose_new.position.y = trans_vec(1) + canonicalized_entity_status->getMapPose().position.y;
-  pose_new.position.z = trans_vec(2) + canonicalized_entity_status->getMapPose().position.z;
+  // apply yaw change (delta rotation) in radians: yaw_angular_speed (rad/s) * step_time (s)
+  geometry_msgs::msg::Vector3 delta_rotation;
+  delta_rotation.z = twist_new.angular.z * step_time;
+  const auto delta_quaternion = math::geometry::convertEulerAngleToQuaternion(delta_rotation);
+  pose_new.orientation = canonicalized_entity_status->getMapPose().orientation * delta_quaternion;
+  // apply position change
+  const Eigen::Matrix3d rotation_matix = math::geometry::getRotationMatrix(pose_new.orientation);
+  const Eigen::Vector3d translation =
+    Eigen::Vector3d(twist_new.linear.x * step_time, twist_new.linear.y * step_time, 0.0);
+  const Eigen::Vector3d delta_position_eigen = rotation_matix * translation;
+  /// @todo allow: canonicalized_entity_status->getMapPose().position + delta_position_eigen
+  geometry_msgs::msg::Vector3 delta_position;
+  delta_position.x = delta_position_eigen.x();
+  delta_position.y = delta_position_eigen.y();
+  delta_position.z = delta_position_eigen.z();
+  pose_new.position = canonicalized_entity_status->getMapPose().position + delta_position;
+
+  if (
+    const auto canonicalized_lanelet_pose =
+      canonicalized_entity_status->getCanonicalizedLaneletPose()) {
+    const auto next_lanelet_pose = hdmap_utils->toLaneletPose(
+      pose_new, canonicalized_entity_status->getBoundingBox(), include_crosswalk,
+      default_matching_distance_for_lanelet_pose_calculation);
+
+    if (next_lanelet_pose) {
+      pose_new = traffic_simulator::pose::moveToLaneletPose(
+        canonicalized_lanelet_pose.value(), next_lanelet_pose.value(), twist_new.linear, step_time,
+        hdmap_utils);
+    }
+  }
+
   auto entity_status_updated =
     static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status);
   entity_status_updated.time = current_time + step_time;
