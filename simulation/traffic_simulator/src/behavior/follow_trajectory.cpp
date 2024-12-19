@@ -67,7 +67,10 @@ auto makeUpdatedStatus(
   using math::geometry::normalize;
   using math::geometry::truncate;
 
-  constexpr bool include_crosswalk{false};
+  const auto include_crosswalk = [](const auto & entity_type) {
+    return (traffic_simulator_msgs::msg::EntityType::PEDESTRIAN == entity_type.type) ||
+           (traffic_simulator_msgs::msg::EntityType::MISC_OBJECT == entity_type.type);
+  }(entity_status.type);
 
   auto distance_along_lanelet =
     [&](const geometry_msgs::msg::Point & from, const geometry_msgs::msg::Point & to) -> double {

@@ -517,7 +517,11 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
   using math::geometry::operator+;
   using math::geometry::operator-;
   using math::geometry::operator+=;
-  static bool is_yaw_applied = false;
+
+  const auto include_crosswalk = [](const auto & entity_type) {
+    return (traffic_simulator_msgs::msg::EntityType::PEDESTRIAN == entity_type.type) ||
+           (traffic_simulator_msgs::msg::EntityType::MISC_OBJECT == entity_type.type);
+  }(canonicalized_entity_status->getType());
 
   const auto speed_planner =
     traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner(
@@ -528,24 +532,37 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
   double linear_jerk_new = std::get<2>(dynamics);
   geometry_msgs::msg::Accel accel_new = std::get<1>(dynamics);
   geometry_msgs::msg::Twist twist_new = std::get<0>(dynamics);
-  const auto desired_velocity = geometry_msgs::build<geometry_msgs::msg::Vector3>()
-                                  .x(twist_new.linear.x)
-                                  .y(twist_new.linear.y)
-                                  .z(twist_new.linear.z);
 
   geometry_msgs::msg::Pose pose_new;
+  // apply yaw change (delta rotation) in radians: yaw_angular_speed (rad/s) * step_time (s)
+  geometry_msgs::msg::Vector3 delta_rotation;
+  delta_rotation.z = twist_new.angular.z * step_time;
+  const auto delta_quaternion = math::geometry::convertEulerAngleToQuaternion(delta_rotation);
+  pose_new.orientation = canonicalized_entity_status->getMapPose().orientation * delta_quaternion;
+  // apply position change
+  const Eigen::Matrix3d rotation_matix = math::geometry::getRotationMatrix(pose_new.orientation);
+  const Eigen::Vector3d translation =
+    Eigen::Vector3d(twist_new.linear.x * step_time, twist_new.linear.y * step_time, 0.0);
+  const Eigen::Vector3d delta_position_eigen = rotation_matix * translation;
+  /// @todo allow: canonicalized_entity_status->getMapPose().position + delta_position_eigen
+  geometry_msgs::msg::Vector3 delta_position;
+  delta_position.x = delta_position_eigen.x();
+  delta_position.y = delta_position_eigen.y();
+  delta_position.z = delta_position_eigen.z();
+  pose_new.position = canonicalized_entity_status->getMapPose().position + delta_position;
+
   if (
     const auto canonicalized_lanelet_pose =
       canonicalized_entity_status->getCanonicalizedLaneletPose()) {
-    pose_new = traffic_simulator::pose::moveAlongLanelet(
-      canonicalized_lanelet_pose.value(), desired_velocity, step_time, !is_yaw_applied,
-      hdmap_utils);
-    is_yaw_applied = true;
-  } else {
-    pose_new = canonicalized_entity_status->getMapPose();
-    pose_new.position +=
-      math::geometry::normalize(pose_new.orientation) * desired_velocity * step_time;
-    /// @todo orientation does not change?
+    const auto next_lanelet_pose = hdmap_utils->toLaneletPose(
+      pose_new, canonicalized_entity_status->getBoundingBox(), include_crosswalk,
+      default_matching_distance_for_lanelet_pose_calculation);
+
+    if (next_lanelet_pose) {
+      pose_new = traffic_simulator::pose::moveToLaneletPose(
+        canonicalized_lanelet_pose.value(), next_lanelet_pose.value(), twist_new.linear, step_time,
+        hdmap_utils);
+    }
   }
 
   auto entity_status_updated =
