@@ -17,6 +17,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <traffic_simulator/utils/route.hpp>
 #include <vector>
 
 namespace entity_behavior
@@ -42,10 +43,10 @@ BT::NodeStatus FollowLaneAction::tick()
     stopEntity();
     return BT::NodeStatus::RUNNING;
   }
-  auto following_lanelets =
-    hdmap_utils->getFollowingLanelets(canonicalized_entity_status->getLaneletId());
   if (!target_speed) {
-    target_speed = hdmap_utils->getSpeedLimit(following_lanelets);
+    const auto following_lanelets =
+      traffic_simulator::route::followingLanelets(canonicalized_entity_status->getLaneletId());
+    target_speed = traffic_simulator::route::speedLimit(following_lanelets);
   }
   setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(target_speed.value()));
   return BT::NodeStatus::RUNNING;

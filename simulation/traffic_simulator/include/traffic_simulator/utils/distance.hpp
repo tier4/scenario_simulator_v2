@@ -36,13 +36,6 @@ auto lateralDistance(
   const double matching_distance, const RoutingConfiguration & routing_configuration)
   -> std::optional<double>;
 
-// Lateral (unit: lanes)
-auto countLaneChanges(
-  const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
-  const traffic_simulator::RoutingConfiguration & routing_configuration,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
-  -> std::optional<std::pair<int, int>>;
-
 // Longitudinal
 auto longitudinalDistance(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,

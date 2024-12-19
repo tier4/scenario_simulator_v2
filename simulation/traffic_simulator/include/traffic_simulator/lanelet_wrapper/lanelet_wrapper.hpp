@@ -63,6 +63,7 @@ namespace traffic_simulator
 namespace lanelet_wrapper
 {
 using BoundingBox = traffic_simulator_msgs::msg::BoundingBox;
+using Curve = math::geometry::HermiteCurve;
 using EntityType = traffic_simulator_msgs::msg::EntityType;
 using LaneletPose = traffic_simulator_msgs::msg::LaneletPose;
 using Point = geometry_msgs::msg::Point;
