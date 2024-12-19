@@ -31,10 +31,8 @@ namespace traffic_simulator
 {
 namespace entity
 {
-class EgoEntity : public VehicleEntity
+class EgoEntity : public VehicleEntity, public concealer::FieldOperatorApplication
 {
-  concealer::FieldOperatorApplication field_operator_application;
-
   bool is_controlled_by_simulator_{false};
   std::optional<double> target_speed_;
   traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter_;

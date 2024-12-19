@@ -39,8 +39,7 @@ EgoEntity::EgoEntity(
   const traffic_simulator_msgs::msg::VehicleParameters & parameters,
   const Configuration & configuration,
   const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node_parameters)
-: VehicleEntity(name, entity_status, hdmap_utils_ptr, parameters),
-  field_operator_application([&]() {
+: VehicleEntity(name, entity_status, hdmap_utils_ptr, parameters), FieldOperatorApplication([&]() {
     if (const auto architecture_type =
           getParameter<std::string>(node_parameters, "architecture_type", "awf/universe/20240605");
         architecture_type.find("awf/universe") != std::string::npos) {
@@ -75,12 +74,12 @@ EgoEntity::EgoEntity(
 
 auto EgoEntity::asFieldOperatorApplication() -> concealer::FieldOperatorApplication &
 {
-  return field_operator_application;
+  return *this;
 }
 
 auto EgoEntity::getCurrentAction() const -> std::string
 {
-  const auto state = field_operator_application.getAutowareStateName();
+  const auto state = getAutowareStateName();
   return state.empty() ? "Launching" : state;
 }
 
@@ -107,7 +106,7 @@ auto EgoEntity::getRouteLanelets(double /*unused horizon*/) -> lanelet::Ids
 {
   lanelet::Ids ids{};
 
-  for (const auto & point : field_operator_application.getPathWithLaneId().points) {
+  for (const auto & point : getPathWithLaneId().points) {
     ids += point.lane_ids;
   }
 
@@ -121,13 +120,13 @@ auto EgoEntity::getCurrentPose() const -> const geometry_msgs::msg::Pose &
 
 auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray
 {
-  return field_operator_application.getWaypoints();
+  return FieldOperatorApplication::getWaypoints();
 }
 
 void EgoEntity::updateFieldOperatorApplication()
 {
-  field_operator_application.rethrow();
-  field_operator_application.spinSome();
+  rethrow();
+  spinSome();
 }
 
 void EgoEntity::onUpdate(double current_time, double step_time)
@@ -145,7 +144,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
       // prefer current lanelet on ss2 side
       setStatus(non_canonicalized_updated_status.value(), status_->getLaneletIds());
     } else {
-      field_operator_application.enableAutowareControl();
+      enableAutowareControl();
       is_controlled_by_simulator_ = false;
     }
   }
@@ -192,13 +191,13 @@ void EgoEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &
     route.push_back(pose_stamped);
   }
 
-  if (not field_operator_application.initialized()) {
-    field_operator_application.initialize(getMapPose());
-    field_operator_application.plan(route);
+  if (not initialized()) {
+    initialize(getMapPose());
+    plan(route);
     // NOTE: engage() will be executed at simulation-time 0.
   } else {
-    field_operator_application.plan(route);
-    field_operator_application.engage();
+    plan(route);
+    engage();
   }
 }
 
@@ -244,7 +243,7 @@ auto EgoEntity::requestSpeedChange(
     "purposes only.");
 }
 
-void EgoEntity::requestClearRoute() { field_operator_application.clearRoute(); }
+void EgoEntity::requestClearRoute() { clearRoute(); }
 
 auto EgoEntity::getDefaultDynamicConstraints() const
   -> const traffic_simulator_msgs::msg::DynamicConstraints &
@@ -278,7 +277,7 @@ auto EgoEntity::requestSpeedChange(
 auto EgoEntity::setVelocityLimit(double value) -> void  //
 {
   behavior_parameter_.dynamic_constraints.max_speed = value;
-  field_operator_application.setVelocityLimit(value);
+  FieldOperatorApplication::setVelocityLimit(value);
 }
 
 auto EgoEntity::setMapPose(const geometry_msgs::msg::Pose & map_pose) -> void
