@@ -93,7 +93,7 @@ auto longitudinalDistance(
     /**
      * @brief A matching distance of about 1.5*lane widths is given as the matching distance to match the
      * Entity present on the adjacent Lanelet.
-     * The length of the horizontal bar must intersect with the adjacent lanelet, 
+     * The length of the horizontal bar must intersect with the adjacent lanelet,
      * so it is always 10m regardless of the entity type.
      */
     constexpr double matching_distance = 5.0;
@@ -315,14 +315,17 @@ auto distanceToStopLine(
 
 auto distanceAlongLanelet(
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
-  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, const double matching_distance,
-  const geometry_msgs::msg::Point & from, const geometry_msgs::msg::Point & to) -> double
+  const geometry_msgs::msg::Point & from_position,
+  const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
+  const geometry_msgs::msg::Point & to_position,
+  const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box, const double matching_distance)
+  -> double
 {
   if (const auto from_lanelet_pose =
-        hdmap_utils_ptr->toLaneletPose(from, bounding_box, false, matching_distance);
+        hdmap_utils_ptr->toLaneletPose(from_position, from_bounding_box, false, matching_distance);
       from_lanelet_pose.has_value()) {
     if (const auto to_lanelet_pose =
-          hdmap_utils_ptr->toLaneletPose(to, bounding_box, false, matching_distance);
+          hdmap_utils_ptr->toLaneletPose(to_position, to_bounding_box, false, matching_distance);
         to_lanelet_pose.has_value()) {
       if (const auto distance = hdmap_utils_ptr->getLongitudinalDistance(
             from_lanelet_pose.value(), to_lanelet_pose.value());
@@ -331,7 +334,7 @@ auto distanceAlongLanelet(
       }
     }
   }
-  return math::geometry::hypot(from, to);
+  return math::geometry::hypot(from_position, to_position);
 }
 }  // namespace distance
 }  // namespace traffic_simulator
