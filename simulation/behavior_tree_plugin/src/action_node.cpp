@@ -548,13 +548,15 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
 
     // if it is the transition between lanelet pose: overwrite position to improve precision
     if (const auto canonicalized_lanelet_pose = status->getCanonicalizedLaneletPose()) {
-      const auto estimated_next_lanelet_pose = hdmap_utils_ptr->toLaneletPose(
-        updated_pose, status->getBoundingBox(), include_crosswalk, matching_distance);
+      const auto estimated_next_canonicalized_lanelet_pose =
+        traffic_simulator::pose::toCanonicalizedLaneletPose(
+          updated_pose, status->getBoundingBox(), include_crosswalk, matching_distance,
+          hdmap_utils_ptr);
 
       // if the next position is on any lanelet, ensure that the traveled distance (linear_velocity*dt) is the same
-      if (estimated_next_lanelet_pose) {
+      if (estimated_next_canonicalized_lanelet_pose) {
         const auto next_lanelet_pose = traffic_simulator::pose::moveTowardsLaneletPose(
-          canonicalized_lanelet_pose.value(), estimated_next_lanelet_pose.value(),
+          canonicalized_lanelet_pose.value(), estimated_next_canonicalized_lanelet_pose.value(),
           desired_twist.linear, step_time, hdmap_utils_ptr);
         updated_pose.position =
           traffic_simulator::pose::toMapPose(next_lanelet_pose, hdmap_utils_ptr).position;

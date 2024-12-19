@@ -558,6 +558,8 @@ auto makeUpdatedStatus(
     */
     auto updated_status = entity_status;
 
+    updated_status.lanelet_pose_valid = false;
+
     updated_status.pose.position += desired_velocity * step_time;
 
     updated_status.pose.orientation = [&]() {
@@ -581,14 +583,19 @@ auto makeUpdatedStatus(
         entity_status.pose, entity_status.bounding_box, {entity_status.lanelet_pose.lanelet_id},
         include_crosswalk, matching_distance, hdmap_utils);
 
-      const auto estimated_next_lanelet_pose = hdmap_utils->toLaneletPose(
-        updated_status.pose, entity_status.bounding_box, include_crosswalk, matching_distance);
+      const auto estimated_next_canonicalized_lanelet_pose =
+        traffic_simulator::pose::toCanonicalizedLaneletPose(
+          updated_status.pose, entity_status.bounding_box, include_crosswalk, matching_distance,
+          hdmap_utils);
 
-      if (canonicalized_lanelet_pose && estimated_next_lanelet_pose) {
+      if (canonicalized_lanelet_pose && estimated_next_canonicalized_lanelet_pose) {
         const auto next_lanelet_pose = pose::moveTowardsLaneletPose(
-          canonicalized_lanelet_pose.value(), estimated_next_lanelet_pose.value(), desired_velocity,
-          step_time, hdmap_utils);
+          canonicalized_lanelet_pose.value(), estimated_next_canonicalized_lanelet_pose.value(),
+          desired_velocity, step_time, hdmap_utils);
         updated_status.pose.position = pose::toMapPose(next_lanelet_pose, hdmap_utils).position;
+        /// @todo uncomment to test it!
+        // updated_status.lanelet_pose = next_lanelet_pose
+        // updated_status.lanelet_pose_valid = true;
       }
     }
 
@@ -612,8 +619,6 @@ auto makeUpdatedStatus(
       step_time;
 
     updated_status.time = entity_status.time + step_time;
-
-    updated_status.lanelet_pose_valid = false;
 
     return updated_status;
   }
