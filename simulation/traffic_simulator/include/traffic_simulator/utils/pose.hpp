@@ -65,7 +65,7 @@ auto moveAlongLanelet(
   const geometry_msgs::msg::Vector3 & desired_velocity, const auto step_time, const bool adjust_yaw,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> geometry_msgs::msg::Pose;
 
-auto moveToTargetLaneletPose(
+auto moveToLaneletPose(
   const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
   const LaneletPose & target_lanelet_pose, const geometry_msgs::msg::Vector3 & desired_velocity,
   const double step_time, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)

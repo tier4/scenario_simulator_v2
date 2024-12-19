@@ -182,6 +182,7 @@ auto moveAlongLanelet(
       const auto s = math::geometry::norm(excess_displacement);
       pose_new.position = hdmap_utils_ptr->toMapPosition(next_lanelet_ids[0], lanelet_pose.s);
       // Apply lateral offset if transitioning to the next lanelet
+      /// @todo offset is not the same as y...
       pose_new.position.y += canonicalized_lanelet_pose.getLaneletPose().offset;
     } else {
       pose_new.position += displacement;
@@ -193,10 +194,10 @@ auto moveAlongLanelet(
   return pose_new;
 }
 
-/// @todo merge moveAlongLanelet and moveToTargetLaneletPose or separate the common part
-auto moveToTargetLaneletPose(
+/// @todo merge moveAlongLanelet and moveToLaneletPose or separate the common part
+auto moveToLaneletPose(
   const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
-  const LaneletPose & target_lanelet_pose, const geometry_msgs::msg::Vector3 & desired_velocity,
+  const LaneletPose & next_lanelet_pose, const geometry_msgs::msg::Vector3 & desired_velocity,
   const double step_time, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
   -> geometry_msgs::msg::Pose
 {
@@ -216,18 +217,11 @@ auto moveToTargetLaneletPose(
   if (math::geometry::norm(displacement) > remaining_lanelet_length) {
     const auto excess_displacement =
       displacement - math::geometry::normalize(desired_velocity) * remaining_lanelet_length;
-    if (
-      const auto next_lanelet_id = hdmap_utils_ptr->getNextLaneletOnRoute(
-        lanelet_pose.lanelet_id, target_lanelet_pose.lanelet_id)) {
-      // update position to the next lanelet
-      const auto s = math::geometry::norm(excess_displacement);
-      pose_new.position = hdmap_utils_ptr->toMapPosition(next_lanelet_id.value(), s);
-      // apply lateral offset if transitioning to the next lanelet
-      pose_new.position.y += lanelet_pose.offset;
-    } else {
-      // apply full displacement
-      pose_new.position = pose_new.position + displacement;
-    }
+    const auto s = math::geometry::norm(excess_displacement);
+    pose_new.position = hdmap_utils_ptr->toMapPosition(next_lanelet_pose.lanelet_id, s);
+    // apply lateral offset if transitioning to the next lanelet
+    /// @todo offset is not the same as y...
+    pose_new.position.y += lanelet_pose.offset;
   } else {
     pose_new.position += displacement;
   }
