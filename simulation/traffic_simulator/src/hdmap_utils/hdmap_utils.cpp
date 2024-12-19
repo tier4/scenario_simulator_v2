@@ -1098,31 +1098,10 @@ auto HdMapUtils::getNextLaneletIds(
   return sortAndUnique(ids);
 }
 
-auto HdMapUtils::getNextLaneletOnRoute(
-  const lanelet::Id current_lanelet_id, const lanelet::Id destination_lanelet_id) const
-  -> std::optional<lanelet::Id>
-{
-  const auto route = getRoute(current_lanelet_id, destination_lanelet_id);
-
-  if (const auto it = std::find(route.begin(), route.end(), current_lanelet_id);
-      it != route.end() && std::next(it) != route.end()) {
-    return *std::next(it);
-  }
-
-  return std::nullopt;
-}
-
 auto HdMapUtils::toMapPosition(const lanelet::Id lanelet_id, const double s) const
   -> geometry_msgs::msg::Point
 {
   return getCenterPointsSpline(lanelet_id)->getPoint(s);
-}
-
-auto HdMapUtils::toMapOrientation(
-  const lanelet::Id lanelet_id, const double s, const bool fill_pitch) const
-  -> geometry_msgs::msg::Quaternion
-{
-  return getCenterPointsSpline(lanelet_id)->getPose(s, fill_pitch).orientation;
 }
 
 auto HdMapUtils::getTrafficLightIds() const -> lanelet::Ids

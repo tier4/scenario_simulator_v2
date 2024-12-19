@@ -18,10 +18,8 @@
 #include <geometry/quaternion/euler_to_quaternion.hpp>
 #include <geometry/quaternion/get_rotation.hpp>
 #include <geometry/quaternion/get_rotation_matrix.hpp>
-#include <geometry/quaternion/normalize.hpp>
 #include <geometry/quaternion/quaternion_to_euler.hpp>
 #include <geometry/vector3/normalize.hpp>
-#include <geometry/vector3/rotate.hpp>
 #include <memory>
 #include <optional>
 #include <rclcpp/rclcpp.hpp>
@@ -540,10 +538,10 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
   const auto delta_quaternion = math::geometry::convertEulerAngleToQuaternion(delta_rotation);
   pose_new.orientation = canonicalized_entity_status->getMapPose().orientation * delta_quaternion;
   // apply position change
-  const Eigen::Matrix3d rotation_matix = math::geometry::getRotationMatrix(pose_new.orientation);
+  const Eigen::Matrix3d rotation_matrix = math::geometry::getRotationMatrix(pose_new.orientation);
   const Eigen::Vector3d translation =
     Eigen::Vector3d(twist_new.linear.x * step_time, twist_new.linear.y * step_time, 0.0);
-  const Eigen::Vector3d delta_position_eigen = rotation_matix * translation;
+  const Eigen::Vector3d delta_position_eigen = rotation_matrix * translation;
   /// @todo allow: canonicalized_entity_status->getMapPose().position + delta_position_eigen
   geometry_msgs::msg::Vector3 delta_position;
   delta_position.x = delta_position_eigen.x();

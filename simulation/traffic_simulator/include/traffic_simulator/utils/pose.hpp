@@ -60,11 +60,6 @@ auto transformRelativePoseToGlobal(
   const geometry_msgs::msg::Pose & global_pose, const geometry_msgs::msg::Pose & relative_pose)
   -> geometry_msgs::msg::Pose;
 
-auto moveAlongLanelet(
-  const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
-  const geometry_msgs::msg::Vector3 & desired_velocity, const auto step_time, const bool adjust_yaw,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> geometry_msgs::msg::Pose;
-
 auto moveToLaneletPose(
   const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
   const LaneletPose & target_lanelet_pose, const geometry_msgs::msg::Vector3 & desired_velocity,

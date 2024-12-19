@@ -13,11 +13,9 @@
 // limitations under the License.
 
 #include <geometry/bounding_box.hpp>
-#include <geometry/quaternion/normalize.hpp>
-#include <geometry/quaternion/quaternion_to_euler.hpp>
+#include <geometry/vector3/norm.hpp>
 #include <geometry/vector3/normalize.hpp>
 #include <geometry/vector3/operator.hpp>
-#include <geometry/vector3/rotate.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator/utils/pose.hpp>
@@ -138,62 +136,6 @@ auto transformRelativePoseToGlobal(
   return ret;
 }
 
-/// @todo remove adjust yaw... figure out a better solution, adjust_yaw is local..
-auto moveAlongLanelet(
-  const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
-  const geometry_msgs::msg::Vector3 & desired_velocity, const auto step_time, const bool adjust_yaw,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> geometry_msgs::msg::Pose
-{
-  using math::geometry::operator*;
-  using math::geometry::operator+;
-  using math::geometry::operator-;
-  using math::geometry::operator+=;
-
-  const auto lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose);
-  const auto remaining_lanelet_length =
-    hdmap_utils_ptr->getLaneletLength(lanelet_pose.lanelet_id) - lanelet_pose.s;
-
-  auto pose_new = static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose);
-  auto displacement = desired_velocity * step_time;
-
-  /// @todo from this - these lines are just weird
-  // Apply pitch rotation based on the lanelet's pitch angle
-  const auto lanelet_pitch =
-    math::geometry::convertQuaternionToEulerAngle(
-      hdmap_utils_ptr->toMapOrientation(lanelet_pose.lanelet_id, lanelet_pose.s))
-      .y;
-  math::geometry::rotate(displacement, lanelet_pitch, math::geometry::Axis::Y);
-
-  // Apply yaw rotation once to avoid cumulative lateral offset errors
-  if (adjust_yaw) {
-    const auto yaw = math::geometry::convertQuaternionToEulerAngle(pose_new.orientation).z;
-    math::geometry::rotate(displacement, yaw, math::geometry::Axis::Z);
-  }
-  /// @todo to this - these lines are just weird
-
-  // Check if the displacement exceeds the remaining lanelet length
-  if (math::geometry::norm(displacement) > remaining_lanelet_length) {
-    const auto excess_displacement =
-      displacement - math::geometry::normalize(desired_velocity) * remaining_lanelet_length;
-    /// @todo why always first next_lanelet? (route?)
-    if (const auto next_lanelet_ids = hdmap_utils_ptr->getNextLaneletIds(lanelet_pose.lanelet_id);
-        !next_lanelet_ids.empty()) {
-      // transition to next lanelet
-      const auto s = math::geometry::norm(excess_displacement);
-      pose_new.position = hdmap_utils_ptr->toMapPosition(next_lanelet_ids[0], lanelet_pose.s);
-      // Apply lateral offset if transitioning to the next lanelet
-      /// @todo offset is not the same as y...
-      pose_new.position.y += canonicalized_lanelet_pose.getLaneletPose().offset;
-    } else {
-      pose_new.position += displacement;
-    }
-  } else {
-    pose_new.position += displacement;
-  }
-  /// @todo orientation?
-  return pose_new;
-}
-
 /// @todo merge moveAlongLanelet and moveToLaneletPose or separate the common part
 auto moveToLaneletPose(
   const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
@@ -213,12 +155,13 @@ auto moveToLaneletPose(
   auto pose_new = static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose);
   const auto displacement = desired_velocity * step_time;
 
-  // Adjust position if displacement exceeds the current lanelet length.
+  // adjust position if displacement exceeds the current lanelet length
   if (math::geometry::norm(displacement) > remaining_lanelet_length) {
-    const auto excess_displacement =
+    const auto next_lanelet_displacement =
       displacement - math::geometry::normalize(desired_velocity) * remaining_lanelet_length;
-    const auto s = math::geometry::norm(excess_displacement);
-    pose_new.position = hdmap_utils_ptr->toMapPosition(next_lanelet_pose.lanelet_id, s);
+    const auto next_lanelet_s = math::geometry::norm(next_lanelet_displacement);
+    pose_new.position =
+      hdmap_utils_ptr->toMapPosition(next_lanelet_pose.lanelet_id, next_lanelet_s);
     // apply lateral offset if transitioning to the next lanelet
     /// @todo offset is not the same as y...
     pose_new.position.y += lanelet_pose.offset;
