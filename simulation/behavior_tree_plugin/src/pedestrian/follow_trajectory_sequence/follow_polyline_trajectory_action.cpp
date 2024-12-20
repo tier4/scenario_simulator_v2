@@ -63,7 +63,6 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
       return canonicalized_entity_status->getTwist().linear.x;
     }
   };
-
   if (getBlackBoardValues();
       request != traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY or
       not getInput<decltype(polyline_trajectory)>("polyline_trajectory", polyline_trajectory) or
