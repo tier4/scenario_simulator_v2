@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__BEHAVIOR__POLYLINE_TRAJECTORY_FOLLOWER__POLYLINE_TRAJECTORY_POSITIONER_HPP_
-#define TRAFFIC_SIMULATOR__BEHAVIOR__POLYLINE_TRAJECTORY_FOLLOWER__POLYLINE_TRAJECTORY_POSITIONER_HPP_
+#ifndef TRAFFIC_SIMULATOR__BEHAVIOR__FOLLOW_TRAJECTORY__POLYLINE_TRAJECTORY_POSITIONER_HPP_
+#define TRAFFIC_SIMULATOR__BEHAVIOR__FOLLOW_TRAJECTORY__POLYLINE_TRAJECTORY_POSITIONER_HPP_
 
 #include <optional>
-#include <traffic_simulator/behavior/polyline_trajectory_follower/follow_waypoint_controller.hpp>
-#include <traffic_simulator/behavior/polyline_trajectory_follower/validated_entity_status.hpp>
+#include <traffic_simulator/behavior/follow_trajectory/follow_waypoint_controller.hpp>
+#include <traffic_simulator/behavior/follow_trajectory/validated_entity_status.hpp>
 #include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
@@ -41,25 +41,23 @@ public:
   auto makeUpdatedEntityStatus() const -> std::optional<EntityStatus>;
 
 private:
-  const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr;
-  const ValidatedEntityStatus validated_entity_status;
-  const traffic_simulator_msgs::msg::PolylineTrajectory polyline_trajectory;
-  const double step_time;
-  const double matching_distance;
+  const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
+  const ValidatedEntityStatus validated_entity_status_;
+  const traffic_simulator_msgs::msg::PolylineTrajectory polyline_trajectory_;
+  const double step_time_;
+  const double matching_distance_;
 
   const std::vector<traffic_simulator_msgs::msg::Vertex>::const_iterator
-    nearest_waypoint_with_specified_time_it;
-  const geometry_msgs::msg::Point nearest_waypoint_position;
-  const double distance_to_nearest_waypoint;
-  const double total_remaining_distance;
-  const double time_to_nearest_waypoint;
-  const double total_remaining_time;
+    nearest_waypoint_with_specified_time_it_;
+  const geometry_msgs::msg::Point nearest_waypoint_position_;
+  const double distance_to_nearest_waypoint_;
+  const double total_remaining_distance_;
+  const double time_to_nearest_waypoint_;
+  const double total_remaining_time_;
 
-  const FollowWaypointController follow_waypoint_controller;
+  const FollowWaypointController follow_waypoint_controller_;
 
-  auto totalRemainingDistance(
-    const double matching_distance,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) const -> double;
+  auto totalRemainingDistance() const -> double;
   auto totalRemainingTime() const noexcept(false) -> double;
   auto isNearestWaypointWithSpecifiedTimeSameAsLastWaypoint() const -> bool;
   auto nearestWaypointWithSpecifiedTimeIterator() const
@@ -75,4 +73,4 @@ private:
 }  // namespace follow_trajectory
 }  // namespace traffic_simulator
 
-#endif  // TRAFFIC_SIMULATOR__BEHAVIOR__POLYLINE_TRAJECTORY_FOLLOWER__POLYLINE_TRAJECTORY_POSITIONER_HPP_
+#endif  // TRAFFIC_SIMULATOR__BEHAVIOR__FOLLOW_TRAJECTORY__POLYLINE_TRAJECTORY_POSITIONER_HPP_

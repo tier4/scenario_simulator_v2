@@ -74,8 +74,8 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
     THROW_SIMULATION_ERROR(
       "Time in canonicalized_entity_status is NaN - FollowTrajectoryAction does not support such "
       "case.");
-  } else if (const auto entity_status_updated = traffic_simulator::follow_trajectory::
-               PolylineTrajectoryFollower::makeUpdatedEntityStatus(
+  } else if (const auto entity_status_updated =
+               traffic_simulator::follow_trajectory::makeUpdatedEntityStatus(
                  traffic_simulator::follow_trajectory::ValidatedEntityStatus(
                    static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status),
                    behavior_parameter, step_time),
