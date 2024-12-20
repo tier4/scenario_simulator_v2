@@ -530,7 +530,6 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
       const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
     -> geometry_msgs::msg::Pose {
     geometry_msgs::msg::Pose updated_pose;
-
     // apply yaw change (delta rotation) in radians: yaw_angular_speed (rad/s) * step_time (s)
     geometry_msgs::msg::Vector3 delta_rotation;
     delta_rotation.z = desired_twist.angular.z * step_time;
@@ -538,6 +537,8 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
     updated_pose.orientation = status->getMapPose().orientation * delta_quaternion;
 
     // apply position change
+    /// @todo first determine global desired_velocity, calculate position change using it
+    // then pass the same global desired_velocity to moveTowardsLaneletPose()
     const Eigen::Matrix3d rotation_matrix =
       math::geometry::getRotationMatrix(updated_pose.orientation);
     const Eigen::Vector3d translation = Eigen::Vector3d(
@@ -546,22 +547,39 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
     const Eigen::Vector3d delta_position = rotation_matrix * translation;
     updated_pose.position = status->getMapPose().position + delta_position;
 
+    std::cout << " 1 " << std::endl;
     // if it is the transition between lanelet pose: overwrite position to improve precision
     if (const auto canonicalized_lanelet_pose = status->getCanonicalizedLaneletPose()) {
       const auto estimated_next_canonicalized_lanelet_pose =
         traffic_simulator::pose::toCanonicalizedLaneletPose(
           updated_pose, status->getBoundingBox(), include_crosswalk, matching_distance,
           hdmap_utils_ptr);
-
+      const auto lanelet_pose =
+        static_cast<traffic_simulator::LaneletPose>(canonicalized_lanelet_pose.value());
+      const auto pose = static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose.value());
+      std::cout << " 2 " << std::endl;
+      std::cout << " -- lanelet pose: id:" << lanelet_pose.lanelet_id << " s:" << lanelet_pose.s
+                << " offset:" << lanelet_pose.offset << " yaw: " << lanelet_pose.rpy.z << std::endl;
+      std::cout << " -- orientation: "
+                << math::geometry::convertQuaternionToEulerAngle(pose.orientation).z << std::endl;
+      std::cout << " -- d_velocity: x:" << desired_twist.linear.x << " y:" << desired_twist.linear.y
+                << " z:" << desired_twist.linear.z << std::endl;
       // if the next position is on any lanelet, ensure that the traveled distance (linear_velocity*dt) is the same
       if (estimated_next_canonicalized_lanelet_pose) {
         const auto next_lanelet_pose = traffic_simulator::pose::moveTowardsLaneletPose(
           canonicalized_lanelet_pose.value(), estimated_next_canonicalized_lanelet_pose.value(),
-          desired_twist.linear, step_time, hdmap_utils_ptr);
-        updated_pose.position =
-          traffic_simulator::pose::toMapPose(next_lanelet_pose, hdmap_utils_ptr).position;
+          desired_twist.linear, false, step_time, hdmap_utils_ptr);
+        std::cout << " 3 " << std::endl;
+        if (
+          const auto next_canonicalized_lanelet_pose =
+            traffic_simulator::pose::canonicalize(next_lanelet_pose, hdmap_utils_ptr)) {
+          std::cout << " 4 " << std::endl;
+          updated_pose.position =
+            static_cast<geometry_msgs::msg::Pose>(next_canonicalized_lanelet_pose.value()).position;
+        }
       }
     }
+    std::cout << " ~~~~~ " << std::endl;
     return updated_pose;
   };
 

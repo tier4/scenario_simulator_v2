@@ -63,12 +63,13 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
       return canonicalized_entity_status->getTwist().linear.x;
     }
   };
-
+  std::cout << "FollowPolylineTrajectoryAction" << std::endl;
   if (getBlackBoardValues();
       request != traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY or
       not getInput<decltype(polyline_trajectory)>("polyline_trajectory", polyline_trajectory) or
       not getInput<decltype(target_speed)>("target_speed", target_speed) or
       not polyline_trajectory) {
+    std::cout << "~~FollowPolylineTrajectoryAction" << std::endl;
     return BT::NodeStatus::FAILURE;
   } else if (std::isnan(canonicalized_entity_status->getTime())) {
     THROW_SIMULATION_ERROR(
@@ -82,8 +83,10 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
     setCanonicalizedEntityStatus(entity_status_updated.value());
     setOutput("waypoints", calculateWaypoints());
     setOutput("obstacle", calculateObstacle(calculateWaypoints()));
+    std::cout << "~~FollowPolylineTrajectoryAction" << std::endl;
     return BT::NodeStatus::RUNNING;
   } else {
+    std::cout << "~~FollowPolylineTrajectoryAction" << std::endl;
     return BT::NodeStatus::SUCCESS;
   }
 }

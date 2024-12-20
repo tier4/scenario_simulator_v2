@@ -591,8 +591,13 @@ auto makeUpdatedStatus(
       if (canonicalized_lanelet_pose && estimated_next_canonicalized_lanelet_pose) {
         const auto next_lanelet_pose = pose::moveTowardsLaneletPose(
           canonicalized_lanelet_pose.value(), estimated_next_canonicalized_lanelet_pose.value(),
-          desired_velocity, step_time, hdmap_utils);
-        updated_status.pose.position = pose::toMapPose(next_lanelet_pose, hdmap_utils).position;
+          desired_velocity, true, step_time, hdmap_utils);
+        if (
+          const auto next_canonicalized_lanelet_pose =
+            pose::canonicalize(next_lanelet_pose, hdmap_utils)) {
+          updated_status.pose.position =
+            static_cast<geometry_msgs::msg::Pose>(next_canonicalized_lanelet_pose.value()).position;
+        }
       }
     }
 

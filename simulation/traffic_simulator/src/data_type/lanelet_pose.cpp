@@ -154,7 +154,7 @@ auto CanonicalizedLaneletPose::adjustOrientationAndOzPosition(
                                       .y(lanelet_rpy.y)
                                       .z(entity_rpy.z));
     lanelet_pose_.rpy =
-      convertQuaternionToEulerAngle(getRotation(lanelet_quaternion, map_pose_.orientation));
+      convertQuaternionToEulerAngle(getRotation(map_pose_.orientation, lanelet_quaternion));
   }
 }
 
