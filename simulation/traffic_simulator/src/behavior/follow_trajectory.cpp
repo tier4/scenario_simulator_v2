@@ -593,9 +593,6 @@ auto makeUpdatedStatus(
           canonicalized_lanelet_pose.value(), estimated_next_canonicalized_lanelet_pose.value(),
           desired_velocity, step_time, hdmap_utils);
         updated_status.pose.position = pose::toMapPose(next_lanelet_pose, hdmap_utils).position;
-        /// @todo uncomment to test it!
-        // updated_status.lanelet_pose = next_lanelet_pose
-        // updated_status.lanelet_pose_valid = true;
       }
     }
 

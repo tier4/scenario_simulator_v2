@@ -13,6 +13,8 @@
 // limitations under the License.
 
 #include <geometry/bounding_box.hpp>
+#include <geometry/quaternion/euler_to_quaternion.hpp>
+#include <geometry/quaternion/quaternion_to_euler.hpp>
 #include <geometry/vector3/norm.hpp>
 #include <geometry/vector3/normalize.hpp>
 #include <geometry/vector3/operator.hpp>
@@ -152,14 +154,39 @@ auto moveTowardsLaneletPose(
   const auto lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose);
   const auto next_lanelet_pose = static_cast<LaneletPose>(next_canonicalized_lanelet_pose);
 
-  // transform desired (global) velocity to local velocity
+  /*
+   * When the yaw of the lanelet is outside the range -90° to +90°, 
+   * transforming the global velocity using this orientation results 
+   * in a negative X component of the local velocity. This causes a 
+   * negative longitudinal displacement, making the vehicle appear 
+   * to move backward even when the intended motion is forward.
+   * 
+   * To address this issue, we adjust the yaw of the lanelet by ±180° 
+   * if it falls outside the range -90° to +90°. This correction ensures 
+   * that the local velocity's X component remains positive, resulting 
+   * in the vehicle moving forward as intended.
+   */
   const auto orientation =
     static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose).orientation;
+  auto orientation_rpy = math::geometry::convertQuaternionToEulerAngle(orientation);
+
+  if (std::abs(orientation_rpy.z) > M_PI / 2) {
+    if (orientation_rpy.z > 0) {
+      orientation_rpy.z -= M_PI;
+    } else {
+      orientation_rpy.z += M_PI;
+    }
+  }
+
+  // transform desired (global) velocity to local velocity
+  const auto corrected_orientation = math::geometry::convertEulerAngleToQuaternion(orientation_rpy);
   const Eigen::Vector3d global_velocity(desired_velocity.x, desired_velocity.y, desired_velocity.z);
-  const Eigen::Quaterniond quaternion(orientation.w, orientation.x, orientation.y, orientation.z);
+  const Eigen::Quaterniond quaternion(
+    corrected_orientation.w, corrected_orientation.x, corrected_orientation.y,
+    corrected_orientation.z);
   const Eigen::Vector3d local_velocity = quaternion.inverse() * global_velocity;
   // determine the displacement in the 2D lanelet coordinate system
-  const Eigen::Vector2d displacement = Eigen::Rotation2Dd(lanelet_pose.rpy.z) *
+  const Eigen::Vector2d displacement = Eigen::Rotation2Dd(orientation_rpy.z) *
                                        Eigen::Vector2d(local_velocity.x(), local_velocity.y()) *
                                        step_time;
   const auto longitudinal_d = displacement.x();
