@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__PARAMETER_VALUE_DISTRIBUTION_HPP_
-#define OPENSCENARIO_INTERPRETER__PARAMETER_VALUE_DISTRIBUTION_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_VALUE_DISTRIBUTION_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_VALUE_DISTRIBUTION_HPP_
 
 #include <openscenario_interpreter/syntax/distribution_definition.hpp>
 #include <openscenario_interpreter/syntax/file.hpp>
@@ -22,22 +22,28 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- ParameterValueDistribution 1.2 -----------------------------------------
- *
- *  <xsd:complexType name="ParameterValueDistribution">
- *    <xsd:sequence>
- *      <xsd:element name="ScenarioFile" type="File"/>
- *      <xsd:group ref="DistributionDefinition"/>
- *    </xsd:sequence>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
-struct ParameterValueDistribution : public DistributionDefinition
+/*
+   ParameterValueDistribution (OpenSCENARIO XML 1.3)
+
+   The ParameterValueDistribution represents
+   the top level container of a parameter distribution file.
+
+   <xsd:complexType name="ParameterValueDistribution">
+     <xsd:sequence>
+       <xsd:element name="ScenarioFile" type="File"/>
+       <xsd:group ref="DistributionDefinition"/>
+     </xsd:sequence>
+   </xsd:complexType>
+*/
+struct ParameterValueDistribution : public DistributionDefinition,
+                                    public ParameterDistributionContainer
 {
   const File scenario_file;
 
   explicit ParameterValueDistribution(const pugi::xml_node &, Scope & scope);
+
+  auto derive() -> ParameterDistribution override;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
-#endif  // OPENSCENARIO_INTERPRETER__PARAMETER_VALUE_DISTRIBUTION_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_VALUE_DISTRIBUTION_HPP_
