@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <lanelet2_core/primitives/Primitive.h>
 #include <lanelet2_core/utility/Units.h>
 #include <lanelet2_io/Io.h>
 #include <lanelet2_io/io_handlers/Serialize.h>
@@ -1374,6 +1375,11 @@ auto HdMapUtils::getVectorFromPose(const geometry_msgs::msg::Pose & pose, const 
   vector.y = magnitude * std::sin(dir.z);
   vector.z = 0;
   return vector;
+}
+
+auto HdMapUtils::isInIntersection(const lanelet::Id lanelet_id) const -> bool
+{
+  return lanelet_map_ptr_->laneletLayer.get(lanelet_id).hasAttribute("turn_direction");
 }
 
 auto HdMapUtils::isInLanelet(const lanelet::Id lanelet_id, const double s) const -> bool

@@ -21,6 +21,63 @@ Changelog for package concealer
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+7.3.5 (2024-12-20)
+------------------
+* Merge pull request `#1488 <https://github.com/tier4/scenario_simulator_v2/issues/1488>`_ from tier4/refactor/concealer-1
+  Refactor/concealer 1
+* Merge branch 'master' into refactor/concealer-1
+* Merge branch 'master' into refactor/concealer-1
+* Merge branch 'master' into refactor/concealer-1
+* Reformat
+* Remove `getAcceleration`, `getSteeringAngle`, `getVelocity` and `getGearSign`
+* Remove macro `DEFINE_STATE_PREDICATE`
+* Remove member function `TaskQueue::stopAndJoin`
+* Remove free function `sudokill`
+* Remove member function `validateAvailability` and `callWithTimeoutValidation`
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-1
+* Remove class `ServceWithValidation::TimeoutError`
+* Remove member function `FieldOperatorApplication::shutdownAutoware`
+* Add using declarations for subscribers and publishers
+* Add new header file `concealer/member_detector.hpp`
+* Cleanup class template `SubscriberWrapper`
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-1
+* Remove header file `autoware_stream.hpp`
+* Move member function implementations into `field_operator_application.cpp`
+* Remove function template `listup`
+* Remove function template `toAutowareStateString`
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-1
+* Remove class template `FieldOperatorApplicationFor<T>`
+* Update all member function of `FieldOperatorApplication` to be non-virtual
+* Update some member functions of `FieldOperatorApplication` to be non-virtual
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-1
+* Move data members into base class `FieldOperatorApplication`
+* Remove member function `receiveMrmState`
+* Remove member function `receiveEmergencyState`
+* Move base class `TransitionAssertion<T>` to `FieldOperatorApplication`
+* Move `getAutowareState` into `FieldOperatorApplication`
+* Update all members of `FieldOperatorApplicationFor<...>` to be public
+* Remove macro `CONCEALER_ISOLATE_STANDARD_OUTPUT`
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-1
+* Update `~FieldOperatorApplication()` to be non-virtual
+* Remove member function `isStopRequested` and `stopRequest`
+* Remove virtual function `sendSIGINT`
+* Cleanup `FieldOperatorApplication::spinSome`
+* Remove member function `FieldOperatorApplication::checkAutowareProcess`
+* Remove member function `FieldOperatorApplication::restrictTargetSpeed`
+* Remove stream input/output operator for `TurnIndicatorsCommand`
+* Update `FieldOperatorApplication::getTurnIndicatorsCommand` to pure virtual
+* Remove member function `AutowareUniverse::set`
+* Remove member function `AutowareUniverse::stopAndJoin`
+* Remove class `concealer::Autoware`
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+7.3.4 (2024-12-20)
+------------------
+* Merge branch 'master' into feature/is_in_intersection
+* Merge remote-tracking branch 'origin/master' into feature/is_in_intersection
+* Merge remote-tracking branch 'origin/master' into feature/is_in_intersection
+* Contributors: Masaya Kataoka
+
 7.3.3 (2024-12-18)
 ------------------
 
