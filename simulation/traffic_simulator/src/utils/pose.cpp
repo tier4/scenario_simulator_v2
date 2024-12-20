@@ -155,17 +155,11 @@ auto moveTowardsLaneletPose(
   const auto lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose);
   const auto next_lanelet_pose = static_cast<LaneletPose>(next_canonicalized_lanelet_pose);
 
-  // transform desired (global) velocity to local velocity
-  const auto orientation =
-    static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose).orientation;
-
-  // const auto fi = lanelet_pose.rpy.z;
-  // const auto orientation_rpy = math::geometry::convertQuaternionToEulerAngle(orientation);
-  // std::cout << "-- lanelet_pose.rpy.z: " << lanelet_pose.rpy.z
-  //           << " | orientation_rpy.z: " << orientation_rpy.z << " | fi: " << fi << std::endl;
-
   Eigen::Vector2d displacement;
   if (desired_velocity_is_global) {
+    // transform desired (global) velocity to local velocity
+    const auto orientation =
+      static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose).orientation;
     const Eigen::Vector3d global_velocity(
       desired_velocity.x, desired_velocity.y, desired_velocity.z);
     const Eigen::Quaterniond quaternion(orientation.w, orientation.x, orientation.y, orientation.z);
@@ -187,17 +181,16 @@ auto moveTowardsLaneletPose(
   if (longitudinal_d <= remaining_lanelet_length) {
     result_lanelet_pose.lanelet_id = lanelet_pose.lanelet_id;
     result_lanelet_pose.s = lanelet_pose.s + longitudinal_d;
-    result_lanelet_pose.offset = lanelet_pose.offset;  // + lateral_d;
   } else if (  // if longitudinal displacement exceeds the current lanelet length, use next lanelet if possible
     next_lanelet_longitudinal_d < hdmap_utils_ptr->getLaneletLength(next_lanelet_pose.lanelet_id)) {
     result_lanelet_pose.lanelet_id = next_lanelet_pose.lanelet_id;
     result_lanelet_pose.s = next_lanelet_longitudinal_d;
-    result_lanelet_pose.offset = lanelet_pose.offset;  // + lateral_d;
   } else {
     THROW_SIMULATION_ERROR(
       "Next lanelet is too short: lanelet_id==", next_lanelet_pose.lanelet_id, " is shorter than ",
       next_lanelet_longitudinal_d);
   }
+  result_lanelet_pose.offset = lanelet_pose.offset + lateral_d;
   result_lanelet_pose.rpy = lanelet_pose.rpy;
   return result_lanelet_pose;
 }

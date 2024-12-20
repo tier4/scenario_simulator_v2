@@ -579,6 +579,8 @@ auto makeUpdatedStatus(
 
     // if it is the transition between lanelet pose: overwrite position to improve precision
     if (entity_status.lanelet_pose_valid) {
+      constexpr bool desired_velocity_is_global{true};
+
       const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
         entity_status.pose, entity_status.bounding_box, {entity_status.lanelet_pose.lanelet_id},
         include_crosswalk, matching_distance, hdmap_utils);
@@ -591,13 +593,8 @@ auto makeUpdatedStatus(
       if (canonicalized_lanelet_pose && estimated_next_canonicalized_lanelet_pose) {
         const auto next_lanelet_pose = pose::moveTowardsLaneletPose(
           canonicalized_lanelet_pose.value(), estimated_next_canonicalized_lanelet_pose.value(),
-          desired_velocity, true, step_time, hdmap_utils);
-        if (
-          const auto next_canonicalized_lanelet_pose =
-            pose::canonicalize(next_lanelet_pose, hdmap_utils)) {
-          updated_status.pose.position =
-            static_cast<geometry_msgs::msg::Pose>(next_canonicalized_lanelet_pose.value()).position;
-        }
+          desired_velocity, desired_velocity_is_global, step_time, hdmap_utils);
+        updated_status.pose.position = pose::toMapPose(next_lanelet_pose, hdmap_utils).position;
       }
     }
 
