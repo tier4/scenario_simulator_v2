@@ -67,27 +67,21 @@ private:
   void onInitialize() override
   {
     api_.spawn(
-      "ego",
-      traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34741, 0.0, 0.0, api_.getHdmapUtils()),
+      "ego", traffic_simulator::helper::constructCanonicalizedLaneletPose(34741, 0.0, 0.0),
       getVehicleParameters(),
       traffic_simulator::entity::VehicleEntity::BuiltinBehavior::doNothing());
     api_.spawn(
-      "pedestrian",
-      traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34741, 3.0, 0.0, api_.getHdmapUtils()),
+      "pedestrian", traffic_simulator::helper::constructCanonicalizedLaneletPose(34741, 3.0, 0.0),
       getPedestrianParameters(),
       traffic_simulator::entity::PedestrianEntity::BuiltinBehavior::doNothing());
     api_.spawn(
       "vehicle_spawn_with_behavior_tree",
-      traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34741, 2.0, 0.0, api_.getHdmapUtils()),
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(34741, 2.0, 0.0),
       getVehicleParameters(),
       traffic_simulator::entity::VehicleEntity::BuiltinBehavior::behaviorTree());
     api_.spawn(
       "pedestrian_spawn_with_behavior_tree",
-      traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34741, 3.0, 0.0, api_.getHdmapUtils()),
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(34741, 3.0, 0.0),
       getPedestrianParameters(),
       traffic_simulator::entity::PedestrianEntity::BuiltinBehavior::behaviorTree());
   }

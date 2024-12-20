@@ -74,7 +74,7 @@ public:
     static auto canonicalize(const traffic_simulator::LaneletPose & non_canonicalized)
       -> NativeLanePosition
     {
-      return NativeLanePosition(non_canonicalized, core->getHdmapUtils());
+      return NativeLanePosition(non_canonicalized);
     }
 
     template <typename T, typename std::enable_if_t<std::is_same_v<T, NativeLanePosition>, int> = 0>
@@ -82,8 +82,8 @@ public:
     {
       constexpr bool include_crosswalk{false};
       if (
-        const auto result = traffic_simulator::pose::toCanonicalizedLaneletPose(
-          pose, include_crosswalk, core->getHdmapUtils())) {
+        const auto result =
+          traffic_simulator::pose::toCanonicalizedLaneletPose(pose, include_crosswalk)) {
         return result.value();
       } else {
         throw Error(
