@@ -155,6 +155,7 @@ auto moveTowardsLaneletPose(
   const auto lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose);
   const auto next_lanelet_pose = static_cast<LaneletPose>(next_canonicalized_lanelet_pose);
 
+  // determine the displacement in the 2D lanelet coordinate system
   Eigen::Vector2d displacement;
   if (desired_velocity_is_global) {
     // transform desired (global) velocity to local velocity
@@ -164,7 +165,6 @@ auto moveTowardsLaneletPose(
       desired_velocity.x, desired_velocity.y, desired_velocity.z);
     const Eigen::Quaterniond quaternion(orientation.w, orientation.x, orientation.y, orientation.z);
     const Eigen::Vector3d local_velocity = quaternion.inverse() * global_velocity;
-    // determine the displacement in the 2D lanelet coordinate system
     displacement = Eigen::Rotation2Dd(lanelet_pose.rpy.z) *
                    Eigen::Vector2d(local_velocity.x(), local_velocity.y()) * step_time;
   } else {

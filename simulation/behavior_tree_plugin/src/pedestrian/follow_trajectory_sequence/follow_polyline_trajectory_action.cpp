@@ -68,7 +68,6 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
       not getInput<decltype(polyline_trajectory)>("polyline_trajectory", polyline_trajectory) or
       not getInput<decltype(target_speed)>("target_speed", target_speed) or
       not polyline_trajectory) {
-    std::cout << "~~FollowPolylineTrajectoryAction" << std::endl;
     return BT::NodeStatus::FAILURE;
   } else if (std::isnan(canonicalized_entity_status->getTime())) {
     THROW_SIMULATION_ERROR(

@@ -558,8 +558,6 @@ auto makeUpdatedStatus(
     */
     auto updated_status = entity_status;
 
-    updated_status.lanelet_pose_valid = false;
-
     updated_status.pose.position += desired_velocity * step_time;
 
     updated_status.pose.orientation = [&]() {
@@ -618,6 +616,8 @@ auto makeUpdatedStatus(
       step_time;
 
     updated_status.time = entity_status.time + step_time;
+
+    updated_status.lanelet_pose_valid = false;
 
     return updated_status;
   }
