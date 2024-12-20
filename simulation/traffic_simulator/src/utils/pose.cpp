@@ -207,7 +207,7 @@ auto moveTowardsLaneletPose(
     result_lanelet_pose.offset = next_lanelet_pose.offset + lateral_d;
   } else {
     THROW_SIMULATION_ERROR(
-      "Next lanelet is too short: lanelet_id==", next_lanelet_pose.lanelet_id, " is shroter than ",
+      "Next lanelet is too short: lanelet_id==", next_lanelet_pose.lanelet_id, " is shorter than ",
       next_lanelet_longitudinal_d);
   }
   result_lanelet_pose.rpy = lanelet_pose.rpy;
