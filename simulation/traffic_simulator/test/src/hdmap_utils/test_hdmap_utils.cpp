@@ -2207,6 +2207,16 @@ TEST_F(HdMapUtilsTest_IntersectionMap, getLongitudinalDistance_laneChange)
 }
 
 /**
+ * @note Test for isInIntersection function
+ * 
+ */
+TEST_F(HdMapUtilsTest_IntersectionMap, isInIntersection)
+{
+  EXPECT_TRUE(hdmap_utils.isInIntersection(662));
+  EXPECT_FALSE(hdmap_utils.isInIntersection(574));
+}
+
+/**
  * @note Test basic functionality.
  * Test obtaining stop line ids correctness with a route that has no stop lines.
  */
