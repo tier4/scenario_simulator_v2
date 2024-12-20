@@ -35,18 +35,6 @@ public:
   auto buildUpdatedEntityStatus(const geometry_msgs::msg::Vector3 & desired_velocity) const
     -> traffic_simulator_msgs::msg::EntityStatus;
 
-  const traffic_simulator_msgs::msg::EntityStatus entity_status_;
-  const std::string & name;
-  const double time;
-  const double step_time;
-  const geometry_msgs::msg::Point position;
-  const double linear_speed;
-  const double linear_acceleration;
-  const bool lanelet_pose_valid;
-  const geometry_msgs::msg::Vector3 current_velocity;
-  const traffic_simulator_msgs::msg::BoundingBox & bounding_box;
-  const traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter;
-
   ValidatedEntityStatus() = delete;
   ValidatedEntityStatus(const ValidatedEntityStatus & other);
   ValidatedEntityStatus & operator=(const ValidatedEntityStatus & other) = delete;
@@ -54,22 +42,40 @@ public:
   ValidatedEntityStatus & operator=(ValidatedEntityStatus && other) noexcept(true) = delete;
   ~ValidatedEntityStatus() = default;
 
+  // clang-format off
+  auto name()               const noexcept(true) -> const std::string &                                    { return entity_status_.name;                         }
+  auto time()               const noexcept(true) -> double                                                 { return entity_status_.time;                         }
+  auto boundingBox()        const noexcept(true) -> const traffic_simulator_msgs::msg::BoundingBox &       { return entity_status_.bounding_box;                 }
+  auto laneletPoseValid()   const noexcept(true) -> bool                                                   { return entity_status_.lanelet_pose_valid;           }
+  auto position()           const noexcept(true) -> const geometry_msgs::msg::Point &                      { return entity_status_.pose.position;                }
+  auto orientation()        const noexcept(true) -> const geometry_msgs::msg::Quaternion &                 { return entity_status_.pose.orientation;             }
+  auto linearSpeed()        const noexcept(true) -> double                                                 { return entity_status_.action_status.twist.linear.x; }
+  auto linearAcceleration() const noexcept(true) -> double                                                 { return entity_status_.action_status.accel.linear.x; }
+  auto behaviorParameter()  const noexcept(true) -> const traffic_simulator_msgs::msg::BehaviorParameter & { return behavior_parameter_;                         }
+  auto currentVelocity()    const noexcept(true) -> const geometry_msgs::msg::Vector3 &                    { return current_velocity_;                           }
+  // clang-format on
+
 private:
-  auto validatedPosition() const noexcept(false) -> geometry_msgs::msg::Point;
+  auto validatePosition(const geometry_msgs::msg::Point & entity_position) const noexcept(false)
+    -> void;
 
-  auto validatedLinearSpeed() const noexcept(false) -> double;
+  auto validateLinearSpeed(const double entity_speed) const noexcept(false) -> void;
 
-  auto validatedLinearAcceleration() const noexcept(false) -> double;
+  auto validateLinearAcceleration(
+    const double acceleration,
+    const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter,
+    const double step_time) const noexcept(false) -> void;
 
-  auto validatedBehaviorParameter(
+  auto validateBehaviorParameter(
     const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter) const noexcept(false)
-    -> traffic_simulator_msgs::msg::BehaviorParameter;
+    -> void;
 
   auto buildUpdatedPoseOrientation(const geometry_msgs::msg::Vector3 & desired_velocity) const
     noexcept(true) -> geometry_msgs::msg::Quaternion;
 
-  auto buildValidatedCurrentVelocity(const double speed) const noexcept(false)
-    -> geometry_msgs::msg::Vector3;
+  auto buildValidatedCurrentVelocity(
+    const double speed, const geometry_msgs::msg::Quaternion & entity_orientation) const
+    noexcept(false) -> geometry_msgs::msg::Vector3;
 
   template <
     typename T, std::enable_if_t<math::geometry::IsLikeVector3<T>::value, std::nullptr_t> = nullptr>
@@ -91,6 +97,11 @@ private:
       ", Variable: ", std::quoted(variable_name), ", variable contains NaN or inf value, ",
       "Value: ", variable);
   }
+
+  const double step_time_;
+  const traffic_simulator_msgs::msg::EntityStatus entity_status_;
+  const traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter_;
+  const geometry_msgs::msg::Vector3 current_velocity_;
 };
 
 }  // namespace follow_trajectory

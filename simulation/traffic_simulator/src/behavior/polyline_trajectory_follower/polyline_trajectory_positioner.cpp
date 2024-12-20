@@ -36,26 +36,24 @@ PolylineTrajectoryPositioner::PolylineTrajectoryPositioner(
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
   const ValidatedEntityStatus & validated_entity_status,
   const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
-  const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter,
   const std::optional<double> target_speed, const double matching_distance, const double step_time)
 : hdmap_utils_ptr(hdmap_utils_ptr),
   validated_entity_status(validated_entity_status),
-  behavior_parameter(behavior_parameter),
   polyline_trajectory(polyline_trajectory),
   step_time(step_time),
   matching_distance(matching_distance),
   nearest_waypoint_with_specified_time_it(nearestWaypointWithSpecifiedTimeIterator()),
   nearest_waypoint_position(validatedEntityTargetPosition()),
   distance_to_nearest_waypoint(distanceAlongLanelet(
-    hdmap_utils_ptr, validated_entity_status.bounding_box, matching_distance,
-    validated_entity_status.entity_status_.pose.position, nearest_waypoint_position)),
+    hdmap_utils_ptr, validated_entity_status.boundingBox(), matching_distance,
+    validated_entity_status.position(), nearest_waypoint_position)),
   total_remaining_distance(totalRemainingDistance(matching_distance, hdmap_utils_ptr)),
   time_to_nearest_waypoint(
     (std::isnan(polyline_trajectory.base_time) ? 0.0 : polyline_trajectory.base_time) +
-    polyline_trajectory.shape.vertices.front().time - validated_entity_status.time),
+    polyline_trajectory.shape.vertices.front().time - validated_entity_status.time()),
   total_remaining_time(totalRemainingTime()),
   follow_waypoint_controller(FollowWaypointController(
-    validated_entity_status.behavior_parameter, step_time,
+    validated_entity_status.behaviorParameter(), step_time,
     isNearestWaypointWithSpecifiedTimeSameAsLastWaypoint(),
     std::isinf(total_remaining_time) ? target_speed : std::nullopt))
 {
@@ -112,7 +110,7 @@ auto PolylineTrajectoryPositioner::totalRemainingDistance(
           const double total_distance, const auto & vertex) {
           const auto next = std::next(&vertex);
           return total_distance + distanceAlongLanelet(
-                                    hdmap_utils_ptr, validated_entity_status.bounding_box,
+                                    hdmap_utils_ptr, validated_entity_status.boundingBox(),
                                     matching_distance, vertex.position.position,
                                     next->position.position);
         });
@@ -134,7 +132,7 @@ auto PolylineTrajectoryPositioner::totalRemainingTime() const noexcept(false) ->
   } else {
     const double remaining_time =
       (std::isnan(polyline_trajectory.base_time) ? 0.0 : polyline_trajectory.base_time) +
-      nearest_waypoint_with_specified_time_it->time - validated_entity_status.time;
+      nearest_waypoint_with_specified_time_it->time - validated_entity_status.time();
 
     /*
       The condition below should ideally be remaining_time < 0.
@@ -160,7 +158,7 @@ auto PolylineTrajectoryPositioner::totalRemainingTime() const noexcept(false) ->
     */
     if (remaining_time < -step_time) {
       THROW_SIMULATION_ERROR(
-        "Vehicle ", std::quoted(validated_entity_status.name),
+        "Vehicle ", std::quoted(validated_entity_status.name()),
         " failed to reach the trajectory waypoint at the specified time. The specified time "
         "is ",
         nearest_waypoint_with_specified_time_it->time, " (in ",
@@ -198,16 +196,14 @@ auto PolylineTrajectoryPositioner::validatedEntityDesiredVelocity(const double d
     THROW_SIMULATION_ERROR("The followingMode is only supported for position.");
   }
 
-  const double dx = nearest_waypoint_position.x - validated_entity_status.position.x;
-  const double dy = nearest_waypoint_position.y - validated_entity_status.position.y;
+  const double dx = nearest_waypoint_position.x - validated_entity_status.position().x;
+  const double dy = nearest_waypoint_position.y - validated_entity_status.position().y;
   // if entity is on lane use pitch from lanelet, otherwise use pitch on target
   const double pitch =
-    validated_entity_status.lanelet_pose_valid
-      ? -math::geometry::convertQuaternionToEulerAngle(
-           validated_entity_status.entity_status_.pose.orientation)
-           .y
+    validated_entity_status.laneletPoseValid()
+      ? -math::geometry::convertQuaternionToEulerAngle(validated_entity_status.orientation()).y
       : std::atan2(
-          nearest_waypoint_position.z - validated_entity_status.position.z, std::hypot(dy, dx));
+          nearest_waypoint_position.z - validated_entity_status.position().z, std::hypot(dy, dx));
   const double yaw = std::atan2(dy, dx);  // Use yaw on target
 
   const auto desired_velocity = geometry_msgs::build<geometry_msgs::msg::Vector3>()
@@ -218,7 +214,7 @@ auto PolylineTrajectoryPositioner::validatedEntityDesiredVelocity(const double d
     THROW_SIMULATION_ERROR(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
-      std::quoted(validated_entity_status.name),
+      std::quoted(validated_entity_status.name()),
       "'s desired velocity contains NaN or infinity. The value is [", desired_velocity.x, ", ",
       desired_velocity.y, ", ", desired_velocity.z, "].");
   }
@@ -243,21 +239,21 @@ auto PolylineTrajectoryPositioner::validatedEntityDesiredAcceleration() const no
 
   try {
     const double desired_acceleration = follow_waypoint_controller.getAcceleration(
-      total_remaining_time, total_remaining_distance, validated_entity_status.linear_acceleration,
-      validated_entity_status.linear_speed);
+      total_remaining_time, total_remaining_distance, validated_entity_status.linearAcceleration(),
+      validated_entity_status.linearSpeed());
 
     if (not std::isfinite(desired_acceleration)) {
       THROW_SIMULATION_ERROR(
         "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
         "following information to the developer: Vehicle ",
-        std::quoted(validated_entity_status.name),
+        std::quoted(validated_entity_status.name()),
         "'s desired acceleration value contains NaN or infinity. The value is ",
         desired_acceleration, ". ");
     }
     return desired_acceleration;
   } catch (const ControllerError & e) {
     THROW_SIMULATION_ERROR(
-      "Vehicle ", std::quoted(validated_entity_status.name),
+      "Vehicle ", std::quoted(validated_entity_status.name()),
       " - controller operation problem encountered. ",
       follow_waypoint_controller.getFollowedWaypointDetails(polyline_trajectory), e.what());
   }
@@ -309,8 +305,8 @@ auto PolylineTrajectoryPositioner::makeUpdatedEntityStatus() const -> std::optio
   const auto desired_velocity = validatedEntityDesiredVelocity(desired_speed);
 
   if (const bool target_passed =
-        validated_entity_status.linear_speed * step_time > distance_to_nearest_waypoint and
-        math::geometry::innerProduct(desired_velocity, validated_entity_status.current_velocity) <
+        validated_entity_status.linearSpeed() * step_time > distance_to_nearest_waypoint and
+        math::geometry::innerProduct(desired_velocity, validated_entity_status.currentVelocity()) <
           0.0;
       target_passed) {
     return std::nullopt;
@@ -330,7 +326,7 @@ auto PolylineTrajectoryPositioner::makeUpdatedEntityStatus() const -> std::optio
         maximum speed including braking - in this case accuracy of arrival is checked
       */
       if (follow_waypoint_controller.areConditionsOfArrivalMet(
-            validated_entity_status.linear_acceleration, validated_entity_status.linear_speed,
+            validated_entity_status.linearAcceleration(), validated_entity_status.linearSpeed(),
             distance_to_nearest_waypoint)) {
         return std::nullopt;
       } else {
@@ -342,7 +338,7 @@ auto PolylineTrajectoryPositioner::makeUpdatedEntityStatus() const -> std::optio
         irrelevant
       */
       if (const double this_step_distance =
-            (validated_entity_status.linear_speed + desired_acceleration * step_time) * step_time;
+            (validated_entity_status.linearSpeed() + desired_acceleration * step_time) * step_time;
           this_step_distance > distance_to_nearest_waypoint) {
         return std::nullopt;
       } else {
@@ -359,13 +355,13 @@ auto PolylineTrajectoryPositioner::makeUpdatedEntityStatus() const -> std::optio
     */
   } else if (math::arithmetic::isDefinitelyLessThan(time_to_nearest_waypoint, step_time / 2.0)) {
     if (follow_waypoint_controller.areConditionsOfArrivalMet(
-          validated_entity_status.linear_acceleration, validated_entity_status.linear_speed,
+          validated_entity_status.linearAcceleration(), validated_entity_status.linearSpeed(),
           distance_to_nearest_waypoint)) {
       return std::nullopt;
     } else {
       THROW_SIMULATION_ERROR(
-        "Vehicle ", std::quoted(validated_entity_status.name), " at time ",
-        validated_entity_status.time, "s (remaining time is ", time_to_nearest_waypoint,
+        "Vehicle ", std::quoted(validated_entity_status.name()), " at time ",
+        validated_entity_status.time(), "s (remaining time is ", time_to_nearest_waypoint,
         "s), has completed a trajectory to the nearest waypoint with", " specified time equal to ",
         polyline_trajectory.shape.vertices.front().time, "s at a distance equal to ",
         distance_to_nearest_waypoint,
@@ -395,7 +391,7 @@ auto PolylineTrajectoryPositioner::validatedEntityTargetPosition() const noexcep
     THROW_SIMULATION_ERROR(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
-      std::quoted(validated_entity_status.name),
+      std::quoted(validated_entity_status.name()),
       "'s target position coordinate value contains NaN or infinity. The value is [",
       target_position.x, ", ", target_position.y, ", ", target_position.z, "].");
   }
@@ -405,13 +401,13 @@ auto PolylineTrajectoryPositioner::validatedEntityDesiredSpeed(
   const double desired_acceleration) const noexcept(false) -> double
 {
   const double desired_speed =
-    validated_entity_status.linear_speed + desired_acceleration * step_time;
+    validated_entity_status.linearSpeed() + desired_acceleration * step_time;
 
   if (not std::isfinite(desired_speed)) {
     THROW_SIMULATION_ERROR(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
-      std::quoted(validated_entity_status.name),
+      std::quoted(validated_entity_status.name()),
       "'s desired speed value is NaN or infinity. The value is ", desired_speed, ". ");
   }
   return desired_speed;
@@ -422,17 +418,17 @@ auto PolylineTrajectoryPositioner::validatePredictedState(const double desired_a
 {
   const auto predicted_state_opt = follow_waypoint_controller.getPredictedWaypointArrivalState(
     desired_acceleration, total_remaining_time, total_remaining_distance,
-    validated_entity_status.linear_acceleration, validated_entity_status.linear_speed);
+    validated_entity_status.linearAcceleration(), validated_entity_status.linearSpeed());
   if (not std::isinf(total_remaining_time) and not predicted_state_opt.has_value()) {
     THROW_SIMULATION_ERROR(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: FollowWaypointController for vehicle ",
-      std::quoted(validated_entity_status.name),
+      std::quoted(validated_entity_status.name()),
       " calculated invalid acceleration:", " desired_acceleration: ", desired_acceleration,
       ", total_remaining_time: ", total_remaining_time,
       ", total_remaining_distance: ", total_remaining_distance,
-      ", acceleration: ", validated_entity_status.linear_acceleration,
-      ", speed: ", validated_entity_status.linear_speed, ". ", follow_waypoint_controller);
+      ", acceleration: ", validated_entity_status.linearAcceleration(),
+      ", speed: ", validated_entity_status.linearSpeed(), ". ", follow_waypoint_controller);
   }
 }
 
