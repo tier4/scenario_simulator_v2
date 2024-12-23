@@ -21,6 +21,7 @@
 #include <boost/range/iterator_range.hpp>
 #include <iomanip>
 #include <scenario_simulator_exception/exception.hpp>
+#include <set>
 #include <string>
 
 namespace traffic_simulator
@@ -31,7 +32,7 @@ struct Configuration
 
   using Pathname = boost::filesystem::path;
 
-  bool auto_sink = true;
+  std::set<std::uint8_t> auto_sink_entity_types = {};
 
   bool verbose = false;
 
