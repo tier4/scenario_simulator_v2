@@ -21,6 +21,51 @@ Changelog for package traffic_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+7.4.0 (2024-12-23)
+------------------
+* Merge pull request `#1464 <https://github.com/tier4/scenario_simulator_v2/issues/1464>`_ from tier4/RJD-1457/traffic_sink_refactor
+  RJD-1457/traffic_sink_refactor
+* Merge branch 'master' into RJD-1457/traffic_sink_refactor
+* style fix
+* Merge branch 'master' into RJD-1457/traffic_sink_refactor
+* Merge branch 'master' into RJD-1457/traffic_sink_refactor
+* Merge branch 'master' into RJD-1457/traffic_sink_refactor
+* remove unnecessary include directives
+* remove unnecessary funcs
+* code style
+* code style
+* Merge branch 'master' into RJD-1457/traffic_sink_refactor
+* simplify auto_sink logic
+* TrafficSinkConfig
+* AutoSinkConfig
+* review suggestions
+* remove lanelet_id from the constructor
+* Merge branch 'master' into RJD-1457/traffic_sink_refactor
+* Merge branch 'master' into RJD-1457/traffic_sink_refactor
+* reorder fix
+* Merge branch 'master' into RJD-1457/traffic_sink_refactor
+* spell-check happy
+* TrafficSink refactor with despawn functionality
+* Merge tag '6.0.1' into RJD-1457/traffic_sink_refactor
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/enable_specify_entity_type_in_autosink
+* Merge branch 'master' into feature/enable_specify_entity_type_in_autosink
+* remove warning
+* remove sonarcloud warning
+* apply reformat
+* use uint8_t instead of traffic_simulator_msgs::msg::EntityType
+* fix typo
+* fix typo
+* fix typo
+* enable set traffic sink in cpp scenario
+* enable compare entity type
+* add doxygen comment
+* add sinkable_entity_type to the configuration class
+* add sinkable_entity_type variable
+* add get_entity_type function
+* rename variable in TrafficController class
+* rename argument and member variables
+* Contributors: Masaya Kataoka, Michał Ciasnocha, robomic
+
 7.3.5 (2024-12-20)
 ------------------
 * Merge pull request `#1488 <https://github.com/tier4/scenario_simulator_v2/issues/1488>`_ from tier4/refactor/concealer-1
