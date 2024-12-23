@@ -52,11 +52,7 @@ auto canonicalize(
   if (lanelet_pose == LaneletPose()) {
     return std::nullopt;
   } else {
-    try {
-      return CanonicalizedLaneletPose(lanelet_pose, hdmap_utils_ptr);
-    } catch (const common::SemanticError &) {
-      return std::nullopt;
-    }
+    return CanonicalizedLaneletPose(lanelet_pose, hdmap_utils_ptr);
   }
 }
 
