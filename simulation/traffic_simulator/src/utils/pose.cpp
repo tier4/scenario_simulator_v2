@@ -54,8 +54,7 @@ auto canonicalize(
   } else {
     try {
       return CanonicalizedLaneletPose(lanelet_pose, hdmap_utils_ptr);
-    }
-    catch(const common::SemanticError &) {
+    } catch (const common::SemanticError &) {
       return std::nullopt;
     }
   }
