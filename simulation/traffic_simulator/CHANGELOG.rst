@@ -21,6 +21,40 @@ Changelog for package traffic_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+7.3.5 (2024-12-20)
+------------------
+* Merge pull request `#1488 <https://github.com/tier4/scenario_simulator_v2/issues/1488>`_ from tier4/refactor/concealer-1
+  Refactor/concealer 1
+* Merge branch 'master' into refactor/concealer-1
+* Merge branch 'master' into refactor/concealer-1
+* Merge branch 'master' into refactor/concealer-1
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-1
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-1
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-1
+* Remove class template `FieldOperatorApplicationFor<T>`
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-1
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-1
+* Remove member function `FieldOperatorApplication::restrictTargetSpeed`
+* Remove class `concealer::Autoware`
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+7.3.4 (2024-12-20)
+------------------
+* Merge pull request `#1490 <https://github.com/tier4/scenario_simulator_v2/issues/1490>`_ from tier4/feature/is_in_intersection
+  Feature/is in intersection
+* Merge branch 'master' into feature/is_in_intersection
+* Merge remote-tracking branch 'origin/master' into feature/is_in_intersection
+* add test case for isInIntersection function
+* Merge remote-tracking branch 'origin/master' into feature/is_in_intersection
+* add auto HdMapUtils::isInIntersection(const lanelet::Id lanelet_id) const -> bool function
+* Contributors: Masaya Kataoka
+
+7.3.3 (2024-12-18)
+------------------
+
+7.3.2 (2024-12-18)
+------------------
+
 7.3.1 (2024-12-17)
 ------------------
 * Merge branch 'master' into fix/math-closest-point
