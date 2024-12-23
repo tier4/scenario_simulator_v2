@@ -21,6 +21,38 @@ Changelog for package cpp_mock_scenarios
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+7.4.0 (2024-12-23)
+------------------
+* Merge pull request `#1464 <https://github.com/tier4/scenario_simulator_v2/issues/1464>`_ from tier4/RJD-1457/traffic_sink_refactor
+  RJD-1457/traffic_sink_refactor
+* Merge branch 'master' into RJD-1457/traffic_sink_refactor
+* style fix
+* Merge branch 'master' into RJD-1457/traffic_sink_refactor
+* Merge branch 'master' into RJD-1457/traffic_sink_refactor
+* Merge branch 'master' into RJD-1457/traffic_sink_refactor
+* code style
+* Merge branch 'master' into RJD-1457/traffic_sink_refactor
+* sink pedestrian test fix
+* simplify auto_sink logic
+* TrafficSinkConfig
+* AutoSinkConfig
+* review suggestions
+* Merge branch 'master' into RJD-1457/traffic_sink_refactor
+* Merge branch 'master' into RJD-1457/traffic_sink_refactor
+* Merge branch 'master' into RJD-1457/traffic_sink_refactor
+* TrafficSink refactor with despawn functionality
+* Merge tag '6.0.1' into RJD-1457/traffic_sink_refactor
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/enable_specify_entity_type_in_autosink
+* fix check condition
+* Merge branch 'master' into feature/enable_specify_entity_type_in_autosink
+* use uint8_t instead of traffic_simulator_msgs::msg::EntityType
+* remap debug marker
+* modify launch file
+* add testcase for autosink
+* enable sink vehicle
+* enable set traffic sink in cpp scenario
+* Contributors: Masaya Kataoka, Michał Ciasnocha, robomic
+
 7.3.5 (2024-12-20)
 ------------------
 * Merge branch 'master' into refactor/concealer-1
