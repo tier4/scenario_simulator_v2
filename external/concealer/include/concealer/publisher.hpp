@@ -12,33 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CONCEALER__PUBLISHER_WRAPPER_HPP_
-#define CONCEALER__PUBLISHER_WRAPPER_HPP_
+#ifndef CONCEALER__PUBLISHER_HPP_
+#define CONCEALER__PUBLISHER_HPP_
 
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 
 namespace concealer
 {
-template <typename MessageType>
-class PublisherWrapper
+template <typename Message>
+class Publisher
 {
-private:
-  typename rclcpp::Publisher<MessageType>::SharedPtr publisher;
+  typename rclcpp::Publisher<Message>::SharedPtr publisher;
 
 public:
-  auto operator()(const MessageType & message) const -> decltype(auto)
+  template <typename Node>
+  explicit Publisher(const std::string & topic, Node & node)
+  : publisher(node.template create_publisher<Message>(topic, rclcpp::QoS(1).reliable()))
   {
-    return publisher->publish(message);
   }
 
-  template <typename NodeInterface>
-  explicit PublisherWrapper(std::string topic, NodeInterface & autoware_interface)
-  : publisher(
-      autoware_interface.template create_publisher<MessageType>(topic, rclcpp::QoS(1).reliable()))
+  template <typename... Ts>
+  auto operator()(Ts &&... xs) const -> decltype(auto)
   {
+    return publisher->publish(std::forward<decltype(xs)>(xs)...);
   }
 };
 }  // namespace concealer
 
-#endif  // CONCEALER__PUBLISHER_WRAPPER_HPP_
+#endif  // CONCEALER__PUBLISHER_HPP_

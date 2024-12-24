@@ -76,34 +76,6 @@ auto toModuleType(const std::string & module_name)
   }
 }
 
-template <typename CooperateStatusType>
-bool isValidCooperateStatus(
-  const CooperateStatusType & cooperate_status, std::uint8_t command_type, std::uint8_t module_type)
-{
-  /**
-   * NOTE1: the finish_distance filter is set to over -20.0,
-   * because some valid rtc statuses has negative finish_distance due to the errors of
-   * localization or numerical calculation. This threshold is advised by a member of TIER IV
-   * planning and control team.
-   */
-
-  /**
-   * NOTE2: The difference in the variable referred as a distance is the impact of the
-   * message specification changes in the following URL.
-   * This was also decided after consulting with a member of TIER IV planning and control team.
-   * ref: https://github.com/tier4/tier4_autoware_msgs/commit/8b85e6e43aa48cf4a439c77bf4bf6aee2e70c3ef
-   */
-  if constexpr (DetectMember_distance<CooperateStatusType>::value) {
-    return cooperate_status.module.type == module_type &&
-           command_type != cooperate_status.command_status.type &&
-           cooperate_status.distance >= -20.0;
-  } else {
-    return cooperate_status.module.type == module_type &&
-           command_type != cooperate_status.command_status.type &&
-           cooperate_status.finish_distance >= -20.0;
-  }
-}
-
 // clang-format off
 FieldOperatorApplication::FieldOperatorApplication(const pid_t pid)
 : rclcpp::Node("concealer_user", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),
@@ -133,7 +105,7 @@ FieldOperatorApplication::FieldOperatorApplication(const pid_t pid)
     autoware_state = state_name_of(message.state);
   }),
   getCommand("/control/command/control_cmd", rclcpp::QoS(1), *this),
-  getCooperateStatusArray("/api/external/get/rtc_status", rclcpp::QoS(1), *this, [this](const auto & v) { latest_cooperate_status_array = v; }),
+  getCooperateStatusArray("/api/external/get/rtc_status", rclcpp::QoS(1), *this),
   getEmergencyState("/api/external/get/emergency", rclcpp::QoS(1), *this, [this](const auto & message) {
     if (message.emergency) {
       throw common::Error("Emergency state received");
@@ -348,7 +320,7 @@ auto FieldOperatorApplication::getWaypoints() const -> traffic_simulator_msgs::m
 
 auto FieldOperatorApplication::initialize(const geometry_msgs::msg::Pose & initial_pose) -> void
 {
-  if (not std::exchange(initialize_was_called, true)) {
+  if (not std::exchange(initialized, true)) {
     task_queue.delay([this, initial_pose]() {
       waitForAutowareStateToBe_WAITING_FOR_ROUTE([&]() {
 #if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)
@@ -446,18 +418,15 @@ auto FieldOperatorApplication::requestAutoModeForCooperation(
 auto FieldOperatorApplication::sendCooperateCommand(
   const std::string & module_name, const std::string & command) -> void
 {
-  auto to_command_type = [](const auto & command) {
-    static const std::unordered_map<std::string, std::uint8_t> command_type_map = {
-      {"ACTIVATE", tier4_rtc_msgs::msg::Command::ACTIVATE},
-      {"DEACTIVATE", tier4_rtc_msgs::msg::Command::DEACTIVATE},
-    };
-    if (const auto command_type = command_type_map.find(command);
-        command_type == command_type_map.end()) {
-      throw common::Error("Unexpected command for tier4_rtc_msgs::msg::Command: ", command, ".");
+  const auto command_type = [&]() {
+    if (command == "ACTIVATE") {
+      return tier4_rtc_msgs::msg::Command::ACTIVATE;
+    } else if (command == "DEACTIVATE") {
+      return tier4_rtc_msgs::msg::Command::DEACTIVATE;
     } else {
-      return command_type->second;
+      throw common::Error("Unexpected command for tier4_rtc_msgs::msg::Command: ", command, ".");
     }
-  };
+  }();
 
   /*
      NOTE: Used cooperate statuses will be deleted correctly in Autoware side
@@ -480,17 +449,40 @@ auto FieldOperatorApplication::sendCooperateCommand(
              }) != used_cooperate_statuses.end();
   };
 
+  auto is_valid_cooperate_status =
+    [](const auto & cooperate_status, auto command_type, auto module_type) {
+      /**
+         The finish_distance filter is set to over -20.0, because some valid rtc
+         statuses has negative finish_distance due to the errors of localization or
+         numerical calculation. This threshold is advised by a member of TIER IV
+         planning and control team.
+
+         The difference in the variable referred as a distance is the impact of the
+         message specification changes in the following URL. This was also decided
+         after consulting with a member of TIER IV planning and control team. ref:
+         https://github.com/tier4/tier4_autoware_msgs/commit/8b85e6e43aa48cf4a439c77bf4bf6aee2e70c3ef
+      */
+      if constexpr (DetectMember_distance<tier4_rtc_msgs::msg::CooperateStatus>::value) {
+        return cooperate_status.module.type == module_type &&
+               command_type != cooperate_status.command_status.type &&
+               cooperate_status.distance >= -20.0;
+      } else {
+        return cooperate_status.module.type == module_type &&
+               command_type != cooperate_status.command_status.type &&
+               cooperate_status.finish_distance >= -20.0;
+      }
+    };
+
+  const auto cooperate_status_array = getCooperateStatusArray();
+
   if (const auto cooperate_status = std::find_if(
-        latest_cooperate_status_array.statuses.begin(),
-        latest_cooperate_status_array.statuses.end(),
-        [module_type = toModuleType<tier4_rtc_msgs::msg::Module>(module_name),
-         command_type = to_command_type(command),
-         is_used_cooperate_status](const auto & cooperate_status) {
-          return isValidCooperateStatus<tier4_rtc_msgs::msg::CooperateStatus>(
-                   cooperate_status, command_type, module_type) &&
+        cooperate_status_array.statuses.begin(), cooperate_status_array.statuses.end(),
+        [&, module_type = toModuleType<tier4_rtc_msgs::msg::Module>(module_name)](
+          const auto & cooperate_status) {
+          return is_valid_cooperate_status(cooperate_status, command_type, module_type) &&
                  not is_used_cooperate_status(cooperate_status);
         });
-      cooperate_status == latest_cooperate_status_array.statuses.end()) {
+      cooperate_status == cooperate_status_array.statuses.end()) {
     std::stringstream what;
     what
       << "Failed to send a cooperate command: Cannot find a valid request to cooperate for module "
@@ -501,10 +493,10 @@ auto FieldOperatorApplication::sendCooperateCommand(
     tier4_rtc_msgs::msg::CooperateCommand cooperate_command;
     cooperate_command.module = cooperate_status->module;
     cooperate_command.uuid = cooperate_status->uuid;
-    cooperate_command.command.type = to_command_type(command);
+    cooperate_command.command.type = command_type;
 
     auto request = std::make_shared<tier4_rtc_msgs::srv::CooperateCommands::Request>();
-    request->stamp = latest_cooperate_status_array.stamp;
+    request->stamp = cooperate_status_array.stamp;
     request->commands.push_back(cooperate_command);
 
     task_queue.delay([this, request]() { requestCooperateCommands(request, 1); });
