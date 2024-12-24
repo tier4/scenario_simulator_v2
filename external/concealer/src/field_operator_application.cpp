@@ -418,18 +418,15 @@ auto FieldOperatorApplication::requestAutoModeForCooperation(
 auto FieldOperatorApplication::sendCooperateCommand(
   const std::string & module_name, const std::string & command) -> void
 {
-  auto to_command_type = [](const auto & command) {
-    static const std::unordered_map<std::string, std::uint8_t> command_type_map = {
-      {"ACTIVATE", tier4_rtc_msgs::msg::Command::ACTIVATE},
-      {"DEACTIVATE", tier4_rtc_msgs::msg::Command::DEACTIVATE},
-    };
-    if (const auto command_type = command_type_map.find(command);
-        command_type == command_type_map.end()) {
-      throw common::Error("Unexpected command for tier4_rtc_msgs::msg::Command: ", command, ".");
+  const auto command_type = [&]() {
+    if (command == "ACTIVATE") {
+      return tier4_rtc_msgs::msg::Command::ACTIVATE;
+    } else if (command == "DEACTIVATE") {
+      return tier4_rtc_msgs::msg::Command::DEACTIVATE;
     } else {
-      return command_type->second;
+      throw common::Error("Unexpected command for tier4_rtc_msgs::msg::Command: ", command, ".");
     }
-  };
+  }();
 
   /*
      NOTE: Used cooperate statuses will be deleted correctly in Autoware side
@@ -480,9 +477,8 @@ auto FieldOperatorApplication::sendCooperateCommand(
 
   if (const auto cooperate_status = std::find_if(
         cooperate_status_array.statuses.begin(), cooperate_status_array.statuses.end(),
-        [&, module_type = toModuleType<tier4_rtc_msgs::msg::Module>(module_name),
-         command_type = to_command_type(command),
-         is_used_cooperate_status](const auto & cooperate_status) {
+        [&, module_type = toModuleType<tier4_rtc_msgs::msg::Module>(module_name)](
+          const auto & cooperate_status) {
           return is_valid_cooperate_status(cooperate_status, command_type, module_type) &&
                  not is_used_cooperate_status(cooperate_status);
         });
@@ -497,7 +493,7 @@ auto FieldOperatorApplication::sendCooperateCommand(
     tier4_rtc_msgs::msg::CooperateCommand cooperate_command;
     cooperate_command.module = cooperate_status->module;
     cooperate_command.uuid = cooperate_status->uuid;
-    cooperate_command.command.type = to_command_type(command);
+    cooperate_command.command.type = command_type;
 
     auto request = std::make_shared<tier4_rtc_msgs::srv::CooperateCommands::Request>();
     request->stamp = cooperate_status_array.stamp;
