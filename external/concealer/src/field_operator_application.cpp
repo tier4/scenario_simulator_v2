@@ -348,7 +348,7 @@ auto FieldOperatorApplication::getWaypoints() const -> traffic_simulator_msgs::m
 
 auto FieldOperatorApplication::initialize(const geometry_msgs::msg::Pose & initial_pose) -> void
 {
-  if (not std::exchange(initialize_was_called, true)) {
+  if (not std::exchange(initialized, true)) {
     task_queue.delay([this, initial_pose]() {
       waitForAutowareStateToBe_WAITING_FOR_ROUTE([&]() {
 #if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)

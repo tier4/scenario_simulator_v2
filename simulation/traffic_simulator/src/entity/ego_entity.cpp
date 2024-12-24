@@ -77,10 +77,7 @@ auto EgoEntity::asFieldOperatorApplication() -> concealer::FieldOperatorApplicat
   return *this;
 }
 
-auto EgoEntity::getCurrentAction() const -> std::string
-{
-  return autoware_state;
-}
+auto EgoEntity::getCurrentAction() const -> std::string { return autoware_state; }
 
 auto EgoEntity::getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter
 {
@@ -190,7 +187,7 @@ void EgoEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &
     route.push_back(pose_stamped);
   }
 
-  if (not initialized()) {
+  if (not initialized) {
     initialize(getMapPose());
     plan(route);
     // NOTE: engage() will be executed at simulation-time 0.

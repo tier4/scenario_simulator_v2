@@ -54,19 +54,6 @@
 
 namespace concealer
 {
-/* ---- NOTE -------------------------------------------------------------------
- *
- *  The magic class 'FieldOperatorApplication' is a class that makes it easy to work with
- *  Autoware from C++. The main features of this class are as follows
- *
- *    (1) Launch Autoware in an independent process upon instantiation of the
- *        class.
- *    (2) Properly terminates the Autoware process started by the constructor
- *        upon destruction of the class.
- *    (3) Probably the simplest instructions to Autoware, consisting of
- *        initialize, plan, and engage.
- *
- * -------------------------------------------------------------------------- */
 struct FieldOperatorApplication : public rclcpp::Node,
                                   public TransitionAssertion<FieldOperatorApplication>
 {
@@ -76,7 +63,7 @@ struct FieldOperatorApplication : public rclcpp::Node,
 
   const pid_t process_id = 0;
 
-  bool initialize_was_called = false;
+  bool initialized = false;
 
   std::string autoware_state = "LAUNCHING";
 
@@ -151,15 +138,7 @@ struct FieldOperatorApplication : public rclcpp::Node,
 
   auto clearRoute() -> void;
 
-  auto getMinimumRiskManeuverBehaviorName() const { return minimum_risk_maneuver_behavior; }
-
-  auto getMinimumRiskManeuverStateName() const { return minimum_risk_maneuver_state; }
-
-  auto getEmergencyStateName() const { return minimum_risk_maneuver_state; }
-
   auto getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray;
-
-  auto initialized() const noexcept { return initialize_was_called; }
 
   auto requestAutoModeForCooperation(const std::string &, bool) -> void;
 
