@@ -78,7 +78,7 @@ struct FieldOperatorApplication : public rclcpp::Node,
 
   bool initialize_was_called = false;
 
-  std::string autoware_state;
+  std::string autoware_state = "LAUNCHING";
 
   std::string minimum_risk_maneuver_state;
 
@@ -150,8 +150,6 @@ struct FieldOperatorApplication : public rclcpp::Node,
   auto plan(const std::vector<geometry_msgs::msg::PoseStamped> &) -> void;
 
   auto clearRoute() -> void;
-
-  auto getAutowareStateName() const { return autoware_state; }
 
   auto getMinimumRiskManeuverBehaviorName() const { return minimum_risk_maneuver_behavior; }
 

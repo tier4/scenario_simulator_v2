@@ -79,8 +79,7 @@ auto EgoEntity::asFieldOperatorApplication() -> concealer::FieldOperatorApplicat
 
 auto EgoEntity::getCurrentAction() const -> std::string
 {
-  const auto state = getAutowareStateName();
-  return state.empty() ? "Launching" : state;
+  return autoware_state;
 }
 
 auto EgoEntity::getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter
