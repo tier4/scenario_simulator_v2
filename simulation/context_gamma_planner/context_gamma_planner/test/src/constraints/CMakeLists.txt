@@ -1,0 +1,2 @@
+ament_add_gtest(test_constraint_activator_base test_constraint_activator_base.cpp)
+target_link_libraries(test_constraint_activator_base context_gamma_planner)
