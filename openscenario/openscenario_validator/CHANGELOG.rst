@@ -10,6 +10,12 @@ Changelog for package openscenario_validator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+7.4.1 (2024-12-24)
+------------------
+* Merge remote-tracking branch 'origin/master' into fix/canonicalize_function
+* Merge remote-tracking branch 'origin/master' into fix/canonicalize_function
+* Contributors: Masaya Kataoka
+
 7.4.0 (2024-12-23)
 ------------------
 * Merge branch 'master' into RJD-1457/traffic_sink_refactor
