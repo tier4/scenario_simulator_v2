@@ -46,17 +46,22 @@ AutowareUniverse::AutowareUniverse(bool simulate_localization)
     [this](
       const ControlModeCommand::Request::SharedPtr request,
       ControlModeCommand::Response::SharedPtr response) {
-      if (request->mode == ControlModeCommand::Request::AUTONOMOUS) {
-        current_control_mode.store(ControlModeReport::AUTONOMOUS);
-        response->success = true;
-      } else if (request->mode == ControlModeCommand::Request::MANUAL) {
-        /*
-          NOTE: MANUAL request will come when a remote override is triggered.
-          But scenario_simulator_v2 don't support a remote override for now.
-        */
-        response->success = false;
-      } else {
-        response->success = false;
+      switch (request->mode) {
+        case ControlModeCommand::Request::AUTONOMOUS:
+          current_control_mode.store(ControlModeReport::AUTONOMOUS);
+          response->success = true;
+          break;
+        case ControlModeCommand::Request::MANUAL:
+          /*
+             NOTE: MANUAL request will come when a remote override is
+             triggered. But scenario_simulator_v2 don't support a remote
+             override for now.
+          */
+          response->success = false;
+          break;
+        default:
+          response->success = false;
+          break;
       }
     })),
   localization_update_timer(
