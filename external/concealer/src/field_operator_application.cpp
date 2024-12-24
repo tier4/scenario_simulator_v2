@@ -76,34 +76,6 @@ auto toModuleType(const std::string & module_name)
   }
 }
 
-template <typename CooperateStatusType>
-bool isValidCooperateStatus(
-  const CooperateStatusType & cooperate_status, std::uint8_t command_type, std::uint8_t module_type)
-{
-  /**
-     The finish_distance filter is set to over -20.0, because some valid rtc
-     statuses has negative finish_distance due to the errors of localization or
-     numerical calculation. This threshold is advised by a member of TIER IV
-     planning and control team.
-  */
-
-  /**
-     The difference in the variable referred as a distance is the impact of the
-     message specification changes in the following URL. This was also decided
-     after consulting with a member of TIER IV planning and control team. ref:
-     https://github.com/tier4/tier4_autoware_msgs/commit/8b85e6e43aa48cf4a439c77bf4bf6aee2e70c3ef
-  */
-  if constexpr (DetectMember_distance<CooperateStatusType>::value) {
-    return cooperate_status.module.type == module_type &&
-           command_type != cooperate_status.command_status.type &&
-           cooperate_status.distance >= -20.0;
-  } else {
-    return cooperate_status.module.type == module_type &&
-           command_type != cooperate_status.command_status.type &&
-           cooperate_status.finish_distance >= -20.0;
-  }
-}
-
 // clang-format off
 FieldOperatorApplication::FieldOperatorApplication(const pid_t pid)
 : rclcpp::Node("concealer_user", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),
@@ -480,15 +452,38 @@ auto FieldOperatorApplication::sendCooperateCommand(
              }) != used_cooperate_statuses.end();
   };
 
+  auto is_valid_cooperate_status =
+    [](const auto & cooperate_status, auto command_type, auto module_type) {
+      /**
+         The finish_distance filter is set to over -20.0, because some valid rtc
+         statuses has negative finish_distance due to the errors of localization or
+         numerical calculation. This threshold is advised by a member of TIER IV
+         planning and control team.
+
+         The difference in the variable referred as a distance is the impact of the
+         message specification changes in the following URL. This was also decided
+         after consulting with a member of TIER IV planning and control team. ref:
+         https://github.com/tier4/tier4_autoware_msgs/commit/8b85e6e43aa48cf4a439c77bf4bf6aee2e70c3ef
+      */
+      if constexpr (DetectMember_distance<tier4_rtc_msgs::msg::CooperateStatus>::value) {
+        return cooperate_status.module.type == module_type &&
+               command_type != cooperate_status.command_status.type &&
+               cooperate_status.distance >= -20.0;
+      } else {
+        return cooperate_status.module.type == module_type &&
+               command_type != cooperate_status.command_status.type &&
+               cooperate_status.finish_distance >= -20.0;
+      }
+    };
+
   const auto cooperate_status_array = getCooperateStatusArray();
 
   if (const auto cooperate_status = std::find_if(
         cooperate_status_array.statuses.begin(), cooperate_status_array.statuses.end(),
-        [module_type = toModuleType<tier4_rtc_msgs::msg::Module>(module_name),
+        [&, module_type = toModuleType<tier4_rtc_msgs::msg::Module>(module_name),
          command_type = to_command_type(command),
          is_used_cooperate_status](const auto & cooperate_status) {
-          return isValidCooperateStatus<tier4_rtc_msgs::msg::CooperateStatus>(
-                   cooperate_status, command_type, module_type) &&
+          return is_valid_cooperate_status(cooperate_status, command_type, module_type) &&
                  not is_used_cooperate_status(cooperate_status);
         });
       cooperate_status == cooperate_status_array.statuses.end()) {
