@@ -26,6 +26,7 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/behavior/follow_trajectory.hpp>
 #include <traffic_simulator/behavior/follow_waypoint_controller.hpp>
+#include <traffic_simulator/utils/pose.hpp>
 
 namespace traffic_simulator
 {
@@ -65,6 +66,11 @@ auto makeUpdatedStatus(
   using math::geometry::norm;
   using math::geometry::normalize;
   using math::geometry::truncate;
+
+  const auto include_crosswalk = [](const auto & entity_type) {
+    return (traffic_simulator_msgs::msg::EntityType::PEDESTRIAN == entity_type.type) ||
+           (traffic_simulator_msgs::msg::EntityType::MISC_OBJECT == entity_type.type);
+  }(entity_status.type);
 
   auto distance_along_lanelet =
     [&](const geometry_msgs::msg::Point & from, const geometry_msgs::msg::Point & to) -> double {
@@ -568,6 +574,27 @@ auto makeUpdatedStatus(
         return math::geometry::convertEulerAngleToQuaternion(direction);
       }
     }();
+
+    // if it is the transition between lanelet pose: overwrite position to improve precision
+    if (entity_status.lanelet_pose_valid) {
+      constexpr bool desired_velocity_is_global{true};
+
+      const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
+        entity_status.pose, entity_status.bounding_box, {entity_status.lanelet_pose.lanelet_id},
+        include_crosswalk, matching_distance, hdmap_utils);
+
+      const auto estimated_next_canonicalized_lanelet_pose =
+        traffic_simulator::pose::toCanonicalizedLaneletPose(
+          updated_status.pose, entity_status.bounding_box, include_crosswalk, matching_distance,
+          hdmap_utils);
+
+      if (canonicalized_lanelet_pose && estimated_next_canonicalized_lanelet_pose) {
+        const auto next_lanelet_pose = pose::moveTowardsLaneletPose(
+          canonicalized_lanelet_pose.value(), estimated_next_canonicalized_lanelet_pose.value(),
+          desired_velocity, desired_velocity_is_global, step_time, hdmap_utils);
+        updated_status.pose.position = pose::toMapPose(next_lanelet_pose, hdmap_utils).position;
+      }
+    }
 
     updated_status.action_status.twist.linear.x = norm(desired_velocity);
 

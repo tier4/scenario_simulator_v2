@@ -13,6 +13,11 @@
 // limitations under the License.
 
 #include <geometry/bounding_box.hpp>
+#include <geometry/quaternion/euler_to_quaternion.hpp>
+#include <geometry/quaternion/quaternion_to_euler.hpp>
+#include <geometry/vector3/norm.hpp>
+#include <geometry/vector3/normalize.hpp>
+#include <geometry/vector3/operator.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator/utils/pose.hpp>
@@ -135,6 +140,63 @@ auto transformRelativePoseToGlobal(
   geometry_msgs::msg::Pose ret;
   tf2::toMsg(ref_transform * relative_transform, ret);
   return ret;
+}
+
+/// @note this function does not modify the orientation of LaneletPose
+// the orientation remains the same as in next_lanelet_pose
+auto moveTowardsLaneletPose(
+  const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
+  const CanonicalizedLaneletPose & next_canonicalized_lanelet_pose,
+  const geometry_msgs::msg::Vector3 & desired_velocity, const bool desired_velocity_is_global,
+  const double step_time, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+  -> LaneletPose
+{
+  using math::geometry::operator*;
+  using math::geometry::operator+;
+  using math::geometry::operator-;
+  using math::geometry::operator+=;
+
+  const auto lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose);
+  const auto next_lanelet_pose = static_cast<LaneletPose>(next_canonicalized_lanelet_pose);
+
+  // determine the displacement in the 2D lanelet coordinate system
+  Eigen::Vector2d displacement;
+  if (desired_velocity_is_global) {
+    // transform desired (global) velocity to local velocity
+    const auto orientation =
+      static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose).orientation;
+    const Eigen::Vector3d global_velocity(
+      desired_velocity.x, desired_velocity.y, desired_velocity.z);
+    const Eigen::Quaterniond quaternion(orientation.w, orientation.x, orientation.y, orientation.z);
+    const Eigen::Vector3d local_velocity = quaternion.inverse() * global_velocity;
+    displacement = Eigen::Rotation2Dd(lanelet_pose.rpy.z) *
+                   Eigen::Vector2d(local_velocity.x(), local_velocity.y()) * step_time;
+  } else {
+    displacement = Eigen::Rotation2Dd(lanelet_pose.rpy.z) *
+                   Eigen::Vector2d(desired_velocity.x, desired_velocity.y) * step_time;
+  }
+  const auto longitudinal_d = displacement.x();
+  const auto lateral_d = displacement.y();
+
+  LaneletPose result_lanelet_pose;
+  const auto remaining_lanelet_length =
+    hdmap_utils_ptr->getLaneletLength(lanelet_pose.lanelet_id) - lanelet_pose.s;
+  const auto next_lanelet_longitudinal_d = longitudinal_d - remaining_lanelet_length;
+  if (longitudinal_d <= remaining_lanelet_length) {
+    result_lanelet_pose.lanelet_id = lanelet_pose.lanelet_id;
+    result_lanelet_pose.s = lanelet_pose.s + longitudinal_d;
+  } else if (  // if longitudinal displacement exceeds the current lanelet length, use next lanelet if possible
+    next_lanelet_longitudinal_d < hdmap_utils_ptr->getLaneletLength(next_lanelet_pose.lanelet_id)) {
+    result_lanelet_pose.lanelet_id = next_lanelet_pose.lanelet_id;
+    result_lanelet_pose.s = next_lanelet_longitudinal_d;
+  } else {
+    THROW_SIMULATION_ERROR(
+      "Next lanelet is too short: lanelet_id==", next_lanelet_pose.lanelet_id, " is shorter than ",
+      next_lanelet_longitudinal_d);
+  }
+  result_lanelet_pose.offset = lanelet_pose.offset + lateral_d;
+  result_lanelet_pose.rpy = lanelet_pose.rpy;
+  return result_lanelet_pose;
 }
 
 auto relativePose(const geometry_msgs::msg::Pose & from, const geometry_msgs::msg::Pose & to)
