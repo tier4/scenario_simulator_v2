@@ -21,6 +21,18 @@ Changelog for package traffic_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+7.4.1 (2024-12-24)
+------------------
+* Merge pull request `#1498 <https://github.com/tier4/scenario_simulator_v2/issues/1498>`_ from tier4/fix/canonicalize_function
+  Fix/canonicalize function
+* Merge remote-tracking branch 'origin/master' into fix/canonicalize_function
+* Merge remote-tracking branch 'origin/master' into fix/canonicalize_function
+* Fix source code
+* Test cases were added, and the source code was reverted to its pre-modified state so that the added test cases would fail.
+* apply reformat
+* catch common::SemanticError inside traffic_simulator::pose::canonicalize function
+* Contributors: Masaya Kataoka
+
 7.4.0 (2024-12-23)
 ------------------
 * Merge pull request `#1464 <https://github.com/tier4/scenario_simulator_v2/issues/1464>`_ from tier4/RJD-1457/traffic_sink_refactor
