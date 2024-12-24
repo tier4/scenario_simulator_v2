@@ -100,8 +100,6 @@ public:
 
   auto rethrow() -> void;
 
-  auto updateVehicleState() -> void;
-
   auto getVehicleCommand() const -> std::tuple<double, double, double, double, int>;
 
   auto getRouteLanelets() const -> std::vector<std::int64_t>;

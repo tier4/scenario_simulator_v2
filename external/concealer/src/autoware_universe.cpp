@@ -110,9 +110,45 @@ AutowareUniverse::AutowareUniverse(bool simulate_localization)
 
       setTransform(current_pose.load());
     })),
-  vehicle_state_update_timer(
-    rclcpp::create_timer(  // Autoware.Universe requires vehicle state topics to send data at 30Hz
-      this, get_clock(), std::chrono::milliseconds(33), [this]() { updateVehicleState(); })),
+  vehicle_state_update_timer(rclcpp::create_timer(
+    this, get_clock(),
+    std::chrono::milliseconds(
+      33),  // Autoware.Universe requires vehicle state topics to send data at 30Hz
+    [this]() {
+      setControlModeReport(getControlModeReport());
+
+      setGearReport([this]() {
+        GearReport message;
+        message.stamp = get_clock()->now();
+        message.report = getGearCommand().command;
+        return message;
+      }());
+
+      setSteeringReport([this]() {
+        SteeringReport message;
+        message.stamp = get_clock()->now();
+        message.steering_tire_angle = getCommand().lateral.steering_tire_angle;
+        return message;
+      }());
+
+      setVelocityReport([this]() {
+        const auto twist = current_twist.load();
+        VelocityReport message;
+        message.header.stamp = get_clock()->now();
+        message.header.frame_id = "base_link";
+        message.longitudinal_velocity = twist.linear.x;
+        message.lateral_velocity = twist.linear.y;
+        message.heading_rate = twist.angular.z;
+        return message;
+      }());
+
+      setTurnIndicatorsReport([this]() {
+        TurnIndicatorsReport message;
+        message.stamp = get_clock()->now();
+        message.report = getTurnIndicatorsCommand().command;
+        return message;
+      }());
+    })),
   spinner(std::thread([this]() {
     try {
       while (rclcpp::ok() and not is_stop_requested.load()) {
@@ -137,43 +173,6 @@ auto AutowareUniverse::rethrow() -> void
   if (is_thrown.load()) {
     throw thrown;
   }
-}
-
-auto AutowareUniverse::updateVehicleState() -> void
-{
-  setControlModeReport(getControlModeReport());
-
-  setGearReport([this]() {
-    GearReport message;
-    message.stamp = get_clock()->now();
-    message.report = getGearCommand().command;
-    return message;
-  }());
-
-  setSteeringReport([this]() {
-    SteeringReport message;
-    message.stamp = get_clock()->now();
-    message.steering_tire_angle = getCommand().lateral.steering_tire_angle;
-    return message;
-  }());
-
-  setVelocityReport([this]() {
-    const auto twist = current_twist.load();
-    VelocityReport message;
-    message.header.stamp = get_clock()->now();
-    message.header.frame_id = "base_link";
-    message.longitudinal_velocity = twist.linear.x;
-    message.lateral_velocity = twist.linear.y;
-    message.heading_rate = twist.angular.z;
-    return message;
-  }());
-
-  setTurnIndicatorsReport([this]() {
-    TurnIndicatorsReport message;
-    message.stamp = get_clock()->now();
-    message.report = getTurnIndicatorsCommand().command;
-    return message;
-  }());
 }
 
 auto AutowareUniverse::getVehicleCommand() const -> std::tuple<double, double, double, double, int>
