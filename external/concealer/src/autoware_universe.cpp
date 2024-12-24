@@ -64,13 +64,56 @@ AutowareUniverse::AutowareUniverse(bool simulate_localization)
           break;
       }
     })),
-  localization_update_timer(
-    rclcpp::create_timer(  // Autoware.Universe requires localization topics to send data at 50Hz
-      this, get_clock(), std::chrono::milliseconds(20), [this]() { updateLocalization(); })),
+  localization_update_timer(rclcpp::create_timer(
+    this, get_clock(),
+    std::chrono::milliseconds(
+      20),  // Autoware.Universe requires localization topics to send data at 50Hz
+    [this]() {
+      setAcceleration([this]() {
+        AccelWithCovarianceStamped message;
+        message.header.stamp = get_clock()->now();
+        message.header.frame_id = "/base_link";
+        message.accel.accel = current_acceleration.load();
+        message.accel.covariance.at(6 * 0 + 0) = 0.001;  // linear x
+        message.accel.covariance.at(6 * 1 + 1) = 0.001;  // linear y
+        message.accel.covariance.at(6 * 2 + 2) = 0.001;  // linear z
+        message.accel.covariance.at(6 * 3 + 3) = 0.001;  // angular x
+        message.accel.covariance.at(6 * 4 + 4) = 0.001;  // angular y
+        message.accel.covariance.at(6 * 5 + 5) = 0.001;  // angular z
+        return message;
+      }());
+
+      setOdometry([this]() {
+        Odometry message;
+        message.header.stamp = get_clock()->now();
+        message.header.frame_id = "map";
+        message.pose.pose = current_pose.load();
+        message.pose.covariance = {};
+        message.twist.twist = current_twist.load();
+        return message;
+      }());
+
+      setPose([this]() {
+        // See https://github.com/tier4/autoware.universe/blob/45ab20af979c5663e5a8d4dda787b1dea8d6e55b/simulator/simple_planning_simulator/src/simple_planning_simulator/simple_planning_simulator_core.cpp#L785-L803
+        PoseWithCovarianceStamped message;
+        message.header.stamp = get_clock()->now();
+        message.header.frame_id = "map";
+        message.pose.pose = current_pose.load();
+        message.pose.covariance.at(6 * 0 + 0) = 0.0225;    // XYZRPY_COV_IDX::X_X
+        message.pose.covariance.at(6 * 1 + 1) = 0.0225;    // XYZRPY_COV_IDX::Y_Y
+        message.pose.covariance.at(6 * 2 + 2) = 0.0225;    // XYZRPY_COV_IDX::Z_Z
+        message.pose.covariance.at(6 * 3 + 3) = 0.000625;  // XYZRPY_COV_IDX::ROLL_ROLL
+        message.pose.covariance.at(6 * 4 + 4) = 0.000625;  // XYZRPY_COV_IDX::PITCH_PITCH
+        message.pose.covariance.at(6 * 5 + 5) = 0.000625;  // XYZRPY_COV_IDX::YAW_YAW
+        return message;
+      }());
+
+      setTransform(current_pose.load());
+    })),
   vehicle_state_update_timer(
     rclcpp::create_timer(  // Autoware.Universe requires vehicle state topics to send data at 30Hz
       this, get_clock(), std::chrono::milliseconds(33), [this]() { updateVehicleState(); })),
-  localization_and_vehicle_state_update_thread(std::thread([this]() {
+  spinner(std::thread([this]() {
     try {
       while (rclcpp::ok() and not is_stop_requested.load()) {
         rclcpp::spin_some(get_node_base_interface());
@@ -86,7 +129,7 @@ AutowareUniverse::AutowareUniverse(bool simulate_localization)
 AutowareUniverse::~AutowareUniverse()
 {
   is_stop_requested.store(true);
-  localization_and_vehicle_state_update_thread.join();
+  spinner.join();
 }
 
 auto AutowareUniverse::rethrow() -> void
@@ -94,50 +137,6 @@ auto AutowareUniverse::rethrow() -> void
   if (is_thrown.load()) {
     throw thrown;
   }
-}
-
-auto AutowareUniverse::updateLocalization() -> void
-{
-  setAcceleration([this]() {
-    AccelWithCovarianceStamped message;
-    message.header.stamp = get_clock()->now();
-    message.header.frame_id = "/base_link";
-    message.accel.accel = current_acceleration.load();
-    message.accel.covariance.at(6 * 0 + 0) = 0.001;  // linear x
-    message.accel.covariance.at(6 * 1 + 1) = 0.001;  // linear y
-    message.accel.covariance.at(6 * 2 + 2) = 0.001;  // linear z
-    message.accel.covariance.at(6 * 3 + 3) = 0.001;  // angular x
-    message.accel.covariance.at(6 * 4 + 4) = 0.001;  // angular y
-    message.accel.covariance.at(6 * 5 + 5) = 0.001;  // angular z
-    return message;
-  }());
-
-  setOdometry([this]() {
-    Odometry message;
-    message.header.stamp = get_clock()->now();
-    message.header.frame_id = "map";
-    message.pose.pose = current_pose.load();
-    message.pose.covariance = {};
-    message.twist.twist = current_twist.load();
-    return message;
-  }());
-
-  setPose([this]() {
-    // See https://github.com/tier4/autoware.universe/blob/45ab20af979c5663e5a8d4dda787b1dea8d6e55b/simulator/simple_planning_simulator/src/simple_planning_simulator/simple_planning_simulator_core.cpp#L785-L803
-    PoseWithCovarianceStamped message;
-    message.header.stamp = get_clock()->now();
-    message.header.frame_id = "map";
-    message.pose.pose = current_pose.load();
-    message.pose.covariance.at(6 * 0 + 0) = 0.0225;    // XYZRPY_COV_IDX::X_X
-    message.pose.covariance.at(6 * 1 + 1) = 0.0225;    // XYZRPY_COV_IDX::Y_Y
-    message.pose.covariance.at(6 * 2 + 2) = 0.0225;    // XYZRPY_COV_IDX::Z_Z
-    message.pose.covariance.at(6 * 3 + 3) = 0.000625;  // XYZRPY_COV_IDX::ROLL_ROLL
-    message.pose.covariance.at(6 * 4 + 4) = 0.000625;  // XYZRPY_COV_IDX::PITCH_PITCH
-    message.pose.covariance.at(6 * 5 + 5) = 0.000625;  // XYZRPY_COV_IDX::YAW_YAW
-    return message;
-  }());
-
-  setTransform(current_pose.load());
 }
 
 auto AutowareUniverse::updateVehicleState() -> void

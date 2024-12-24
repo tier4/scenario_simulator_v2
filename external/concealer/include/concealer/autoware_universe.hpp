@@ -83,7 +83,7 @@ private:
 
   const rclcpp::TimerBase::SharedPtr vehicle_state_update_timer;
 
-  std::thread localization_and_vehicle_state_update_thread;
+  std::thread spinner;
 
   std::atomic<bool> is_stop_requested = false;
 
@@ -99,8 +99,6 @@ public:
   ~AutowareUniverse();
 
   auto rethrow() -> void;
-
-  auto updateLocalization() -> void;
 
   auto updateVehicleState() -> void;
 
