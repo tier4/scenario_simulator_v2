@@ -21,13 +21,12 @@
 namespace concealer
 {
 template <typename Message>
-class Subscriber
+struct Subscriber
 {
   typename Message::ConstSharedPtr current_value = std::make_shared<const Message>();
 
   typename rclcpp::Subscription<Message>::SharedPtr subscription;
 
-public:
   auto operator()() const -> const auto & { return *std::atomic_load(&current_value); }
 
   template <typename Autoware, typename Callback>

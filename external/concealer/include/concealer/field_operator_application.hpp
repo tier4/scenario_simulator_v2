@@ -80,8 +80,6 @@ struct FieldOperatorApplication : public rclcpp::Node,
 
   std::string autoware_state;
 
-  tier4_rtc_msgs::msg::CooperateStatusArray latest_cooperate_status_array;
-
   std::string minimum_risk_maneuver_state;
 
   std::string minimum_risk_maneuver_behavior;

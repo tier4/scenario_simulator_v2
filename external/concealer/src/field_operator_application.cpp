@@ -81,18 +81,18 @@ bool isValidCooperateStatus(
   const CooperateStatusType & cooperate_status, std::uint8_t command_type, std::uint8_t module_type)
 {
   /**
-   * NOTE1: the finish_distance filter is set to over -20.0,
-   * because some valid rtc statuses has negative finish_distance due to the errors of
-   * localization or numerical calculation. This threshold is advised by a member of TIER IV
-   * planning and control team.
-   */
+     The finish_distance filter is set to over -20.0, because some valid rtc
+     statuses has negative finish_distance due to the errors of localization or
+     numerical calculation. This threshold is advised by a member of TIER IV
+     planning and control team.
+  */
 
   /**
-   * NOTE2: The difference in the variable referred as a distance is the impact of the
-   * message specification changes in the following URL.
-   * This was also decided after consulting with a member of TIER IV planning and control team.
-   * ref: https://github.com/tier4/tier4_autoware_msgs/commit/8b85e6e43aa48cf4a439c77bf4bf6aee2e70c3ef
-   */
+     The difference in the variable referred as a distance is the impact of the
+     message specification changes in the following URL. This was also decided
+     after consulting with a member of TIER IV planning and control team. ref:
+     https://github.com/tier4/tier4_autoware_msgs/commit/8b85e6e43aa48cf4a439c77bf4bf6aee2e70c3ef
+  */
   if constexpr (DetectMember_distance<CooperateStatusType>::value) {
     return cooperate_status.module.type == module_type &&
            command_type != cooperate_status.command_status.type &&
@@ -133,7 +133,7 @@ FieldOperatorApplication::FieldOperatorApplication(const pid_t pid)
     autoware_state = state_name_of(message.state);
   }),
   getCommand("/control/command/control_cmd", rclcpp::QoS(1), *this),
-  getCooperateStatusArray("/api/external/get/rtc_status", rclcpp::QoS(1), *this, [this](const auto & v) { latest_cooperate_status_array = v; }),
+  getCooperateStatusArray("/api/external/get/rtc_status", rclcpp::QoS(1), *this),
   getEmergencyState("/api/external/get/emergency", rclcpp::QoS(1), *this, [this](const auto & message) {
     if (message.emergency) {
       throw common::Error("Emergency state received");
@@ -480,9 +480,10 @@ auto FieldOperatorApplication::sendCooperateCommand(
              }) != used_cooperate_statuses.end();
   };
 
+  const auto cooperate_status_array = getCooperateStatusArray();
+
   if (const auto cooperate_status = std::find_if(
-        latest_cooperate_status_array.statuses.begin(),
-        latest_cooperate_status_array.statuses.end(),
+        cooperate_status_array.statuses.begin(), cooperate_status_array.statuses.end(),
         [module_type = toModuleType<tier4_rtc_msgs::msg::Module>(module_name),
          command_type = to_command_type(command),
          is_used_cooperate_status](const auto & cooperate_status) {
@@ -490,7 +491,7 @@ auto FieldOperatorApplication::sendCooperateCommand(
                    cooperate_status, command_type, module_type) &&
                  not is_used_cooperate_status(cooperate_status);
         });
-      cooperate_status == latest_cooperate_status_array.statuses.end()) {
+      cooperate_status == cooperate_status_array.statuses.end()) {
     std::stringstream what;
     what
       << "Failed to send a cooperate command: Cannot find a valid request to cooperate for module "
@@ -504,7 +505,7 @@ auto FieldOperatorApplication::sendCooperateCommand(
     cooperate_command.command.type = to_command_type(command);
 
     auto request = std::make_shared<tier4_rtc_msgs::srv::CooperateCommands::Request>();
-    request->stamp = latest_cooperate_status_array.stamp;
+    request->stamp = cooperate_status_array.stamp;
     request->commands.push_back(cooperate_command);
 
     task_queue.delay([this, request]() { requestCooperateCommands(request, 1); });
