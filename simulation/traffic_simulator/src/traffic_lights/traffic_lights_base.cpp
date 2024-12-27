@@ -115,10 +115,6 @@ auto TrafficLightsBase::isTrafficLightAdded(const lanelet::Id traffic_light_id) 
 
 auto TrafficLightsBase::addTrafficLight(const lanelet::Id traffic_light_id) -> void
 {
-  if (isTrafficLightAdded(traffic_light_id)) {
-    return;
-  }
-
   // emplace will not modify the map if the key already exists
   traffic_lights_map_.emplace(
     std::piecewise_construct, std::forward_as_tuple(traffic_light_id),
@@ -127,6 +123,10 @@ auto TrafficLightsBase::addTrafficLight(const lanelet::Id traffic_light_id) -> v
 
 auto TrafficLightsBase::getTrafficLight(const lanelet::Id traffic_light_id) -> TrafficLight &
 {
+  if (isTrafficLightAdded(traffic_light_id)) {
+    return traffic_lights_map_.at(traffic_light_id);
+  }
+
   addTrafficLight(traffic_light_id);
   return traffic_lights_map_.at(traffic_light_id);
 }
