@@ -108,8 +108,8 @@ public:
     static auto makeNativeRelativeWorldPosition(
       const std::string & from_entity_name, const std::string & to_entity_name)
     {
-      if (const auto from_entity = core->getEntityOrNullptr(from_entity_name)) {
-        if (const auto to_entity = core->getEntityOrNullptr(to_entity_name)) {
+      if (const auto from_entity = core->getEntityPointer(from_entity_name)) {
+        if (const auto to_entity = core->getEntityPointer(to_entity_name)) {
           if (
             const auto relative_pose = traffic_simulator::pose::relativePose(
               from_entity->getMapPose(), to_entity->getMapPose()))
@@ -122,7 +122,7 @@ public:
     static auto makeNativeRelativeWorldPosition(
       const std::string & from_entity_name, const NativeWorldPosition & to_map_pose)
     {
-      if (const auto from_entity = core->getEntityOrNullptr(from_entity_name)) {
+      if (const auto from_entity = core->getEntityPointer(from_entity_name)) {
         if (
           const auto relative_pose =
             traffic_simulator::pose::relativePose(from_entity->getMapPose(), to_map_pose)) {
@@ -135,7 +135,7 @@ public:
     static auto makeNativeRelativeWorldPosition(
       const NativeWorldPosition & from_map_pose, const std::string & to_entity_name)
     {
-      if (const auto to_entity = core->getEntityOrNullptr(to_entity_name)) {
+      if (const auto to_entity = core->getEntityPointer(to_entity_name)) {
         if (
           const auto relative_pose =
             traffic_simulator::pose::relativePose(from_map_pose, to_entity->getMapPose())) {
@@ -150,7 +150,7 @@ public:
       const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined)
       -> traffic_simulator::LaneletPose
     {
-      if (const auto to_entity = core->getEntityOrNullptr(to_entity_name)) {
+      if (const auto to_entity = core->getEntityPointer(to_entity_name)) {
         if (const auto to_lanelet_pose = to_entity->getCanonicalizedLaneletPose()) {
           return makeNativeRelativeLanePosition(
             from_entity_name, to_lanelet_pose.value(), routing_algorithm);
@@ -164,7 +164,7 @@ public:
       const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined)
       -> traffic_simulator::LaneletPose
     {
-      if (const auto from_entity = core->getEntityOrNullptr(from_entity_name)) {
+      if (const auto from_entity = core->getEntityPointer(from_entity_name)) {
         if (const auto from_lanelet_pose = from_entity->getCanonicalizedLaneletPose()) {
           return makeNativeRelativeLanePosition(
             from_lanelet_pose.value(), to_lanelet_pose, routing_algorithm);
@@ -189,8 +189,8 @@ public:
       const std::string & from_entity_name, const std::string & to_entity_name,
       const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined)
     {
-      if (const auto from_entity = core->getEntityOrNullptr(from_entity_name)) {
-        if (const auto to_entity = core->getEntityOrNullptr(to_entity_name)) {
+      if (const auto from_entity = core->getEntityPointer(from_entity_name)) {
+        if (const auto to_entity = core->getEntityPointer(to_entity_name)) {
           if (const auto from_lanelet_pose = from_entity->getCanonicalizedLaneletPose()) {
             if (const auto to_lanelet_pose = to_entity->getCanonicalizedLaneletPose()) {
               return makeNativeBoundingBoxRelativeLanePosition(
@@ -207,7 +207,7 @@ public:
       const std::string & from_entity_name, const NativeLanePosition & to_lanelet_pose,
       const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined)
     {
-      if (const auto from_entity = core->getEntityOrNullptr(from_entity_name)) {
+      if (const auto from_entity = core->getEntityPointer(from_entity_name)) {
         if (const auto from_lanelet_pose = from_entity->getCanonicalizedLaneletPose()) {
           return makeNativeBoundingBoxRelativeLanePosition(
             from_lanelet_pose.value(), from_entity->getBoundingBox(), to_lanelet_pose,
@@ -236,8 +236,8 @@ public:
     static auto makeNativeBoundingBoxRelativeWorldPosition(
       const std::string & from_entity_name, const std::string & to_entity_name)
     {
-      if (const auto from_entity = core->getEntityOrNullptr(from_entity_name)) {
-        if (const auto to_entity = core->getEntityOrNullptr(to_entity_name)) {
+      if (const auto from_entity = core->getEntityPointer(from_entity_name)) {
+        if (const auto to_entity = core->getEntityPointer(to_entity_name)) {
           if (
             const auto relative_pose = traffic_simulator::pose::boundingBoxRelativePose(
               from_entity->getMapPose(), from_entity->getBoundingBox(), to_entity->getMapPose(),
@@ -252,7 +252,7 @@ public:
     static auto makeNativeBoundingBoxRelativeWorldPosition(
       const std::string & from_entity_name, const NativeWorldPosition & to_map_pose)
     {
-      if (const auto from_entity = core->getEntityOrNullptr(from_entity_name)) {
+      if (const auto from_entity = core->getEntityPointer(from_entity_name)) {
         if (
           const auto relative_pose = traffic_simulator::pose::boundingBoxRelativePose(
             from_entity->getMapPose(), from_entity->getBoundingBox(), to_map_pose,
@@ -555,8 +555,8 @@ public:
       const std::string & from_entity_name,
       const std::string & to_entity_name)  // for RelativeDistanceCondition
     {
-      if (const auto from_entity = core->getEntityOrNullptr(from_entity_name)) {
-        if (const auto to_entity = core->getEntityOrNullptr(to_entity_name)) {
+      if (const auto from_entity = core->getEntityPointer(from_entity_name)) {
+        if (const auto to_entity = core->getEntityPointer(to_entity_name)) {
           if (
             const auto distance = traffic_simulator::distance::boundingBoxDistance(
               from_entity->getMapPose(), from_entity->getBoundingBox(), to_entity->getMapPose(),
@@ -570,8 +570,8 @@ public:
 
     static auto evaluateRelativeSpeed(const Entity & from, const Entity & to) -> Eigen::Vector3d
     {
-      if (const auto observer = core->getEntityOrNullptr(from.name())) {
-        if (const auto observed = core->getEntityOrNullptr(to.name())) {
+      if (const auto observer = core->getEntityPointer(from.name())) {
+        if (const auto observed = core->getEntityPointer(to.name())) {
           auto velocity = [](const auto & entity) -> Eigen::Vector3d {
             auto direction = [](const auto & q) -> Eigen::Vector3d {
               return Eigen::Quaternion(q.w, q.x, q.y, q.z) * Eigen::Vector3d::UnitX();
@@ -622,8 +622,8 @@ public:
     static auto evaluateTimeHeadway(
       const std::string & from_entity_name, const std::string & to_entity_name)
     {
-      if (const auto from_entity = core->getEntityOrNullptr(from_entity_name)) {
-        if (const auto to_entity = core->getEntityOrNullptr(to_entity_name)) {
+      if (const auto from_entity = core->getEntityPointer(from_entity_name)) {
+        if (const auto to_entity = core->getEntityPointer(to_entity_name)) {
           if (const auto relative_pose = traffic_simulator::pose::relativePose(
                 from_entity->getMapPose(), to_entity->getMapPose());
               relative_pose && relative_pose->position.x <= 0) {
@@ -669,7 +669,7 @@ public:
     static auto evaluateRelativeHeading(
       const EntityRef & entity_ref, const OSCLanePosition & osc_lane_position)
     {
-      if (const auto entity = core->getEntityOrNullptr(entity_ref)) {
+      if (const auto entity = core->getEntityPointer(entity_ref)) {
         const auto from_map_pose = entity->getMapPose();
         const auto to_map_pose = static_cast<NativeWorldPosition>(osc_lane_position);
         if (
@@ -685,7 +685,7 @@ public:
     template <typename EntityRef>
     static auto evaluateRelativeHeading(const EntityRef & entity_ref)
     {
-      if (const auto entity = core->getEntityOrNullptr(entity_ref)) {
+      if (const auto entity = core->getEntityPointer(entity_ref)) {
         if (const auto canonicalized_lanelet_pose = entity->getCanonicalizedLaneletPose()) {
           return static_cast<Double>(std::abs(
             static_cast<traffic_simulator::LaneletPose>(canonicalized_lanelet_pose.value()).rpy.z));

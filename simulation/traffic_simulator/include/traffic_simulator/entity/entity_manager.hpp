@@ -171,7 +171,7 @@ public:
 
   auto getEntityNames() const -> const std::vector<std::string>;
 
-  auto getEntityOrNullptr(const std::string & name) const
+  auto getEntityPointer(const std::string & name) const
     -> std::shared_ptr<traffic_simulator::entity::EntityBase>;
 
   auto getEntity(const std::string & name) -> entity::EntityBase &;

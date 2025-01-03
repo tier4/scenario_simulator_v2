@@ -140,7 +140,7 @@ auto EntityManager::getEntityNames() const -> const std::vector<std::string>
   return names;
 }
 
-auto EntityManager::getEntityOrNullptr(const std::string & name) const
+auto EntityManager::getEntityPointer(const std::string & name) const
   -> std::shared_ptr<traffic_simulator::entity::EntityBase>
 {
   if (auto it = entities_.find(name); it != entities_.end()) {
