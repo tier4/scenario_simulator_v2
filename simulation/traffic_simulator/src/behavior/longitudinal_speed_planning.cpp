@@ -134,8 +134,8 @@ auto LongitudinalSpeedPlanner::getRunningDistance(
 }
 
 auto LongitudinalSpeedPlanner::isTargetSpeedReached(
-  double target_speed, const geometry_msgs::msg::Twist & current_twist,
-  double tolerance) const noexcept -> bool
+  const double target_speed, const geometry_msgs::msg::Twist & current_twist,
+  const double tolerance) const noexcept -> bool
 {
   return std::abs(target_speed - current_twist.linear.x) <= tolerance;
 }

@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <boost/lexical_cast.hpp>
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/functional/curry.hpp>
 #include <openscenario_interpreter/regex/function_call_expression.hpp>
@@ -129,37 +128,16 @@ UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node
         }),
       std::make_pair(
         "currentMinimumRiskManeuverState.behavior",
-        [result]() {
-          return make<String>(
-            asFieldOperatorApplication(result.str(1)).getMinimumRiskManeuverBehaviorName());
-        }),
+        [result]() { return make<String>(getMinimumRiskManeuverBehaviorName(result.str(1))); }),
       std::make_pair(
         "currentMinimumRiskManeuverState.state",
-        [result]() {
-          return make<String>(
-            asFieldOperatorApplication(result.str(1)).getMinimumRiskManeuverStateName());
-        }),
+        [result]() { return make<String>(getMinimumRiskManeuverStateName(result.str(1))); }),
       std::make_pair(
         "currentEmergencyState",
-        [result]() {
-          return make<String>(asFieldOperatorApplication(result.str(1)).getEmergencyStateName());
-        }),
+        [result]() { return make<String>(getEmergencyStateName(result.str(1))); }),
       std::make_pair(
         "currentTurnIndicatorsState",
-        [result]() {
-          switch (asFieldOperatorApplication(result.str(1)).getTurnIndicatorsCommand().command) {
-            case autoware_vehicle_msgs::msg::TurnIndicatorsCommand::DISABLE:
-              return make<String>("DISABLE");
-            case autoware_vehicle_msgs::msg::TurnIndicatorsCommand::ENABLE_LEFT:
-              return make<String>("ENABLE_LEFT");
-            case autoware_vehicle_msgs::msg::TurnIndicatorsCommand::ENABLE_RIGHT:
-              return make<String>("ENABLE_RIGHT");
-            case autoware_vehicle_msgs::msg::TurnIndicatorsCommand::NO_COMMAND:
-              return make<String>("NO_COMMAND");
-            default:
-              return make<String>();
-          }
-        }),
+        [result]() { return make<String>(getTurnIndicatorsCommandName(result.str(1))); }),
     };
     evaluate_value = dispatch.at(result.str(2));  // XXX catch
   } else if (std::regex_match(name, result, FunctionCallExpression::pattern())) {

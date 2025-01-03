@@ -146,7 +146,7 @@ auto Interpreter::engage() const -> void
       scenario_object.template is<ScenarioObject>() and
       scenario_object.template as<ScenarioObject>().is_added and
       scenario_object.template as<ScenarioObject>().object_controller.isAutoware()) {
-      asFieldOperatorApplication(name).engage();
+      NonStandardOperation::engage(name);
     }
   }
 }
@@ -160,7 +160,7 @@ auto Interpreter::engageable() const -> bool
       return not scenario_object.template is<ScenarioObject>() or
              not scenario_object.template as<ScenarioObject>().is_added or
              not scenario_object.template as<ScenarioObject>().object_controller.isAutoware() or
-             asFieldOperatorApplication(name).engageable();
+             NonStandardOperation::isEngageable(name);
     });
 }
 
@@ -173,7 +173,7 @@ auto Interpreter::engaged() const -> bool
       return not scenario_object.template is<ScenarioObject>() or
              not scenario_object.template as<ScenarioObject>().is_added or
              not scenario_object.template as<ScenarioObject>().object_controller.isAutoware() or
-             asFieldOperatorApplication(name).engaged();
+             NonStandardOperation::isEngaged(name);
     });
 }
 
