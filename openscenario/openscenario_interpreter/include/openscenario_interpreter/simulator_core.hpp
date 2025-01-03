@@ -267,18 +267,18 @@ public:
       const std::string & from_entity_name, const std::string & to_entity_name,
       const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined) -> int
     {
-      traffic_simulator::RoutingConfiguration routing_configuration;
-      routing_configuration.allow_lane_change =
-        (routing_algorithm == RoutingAlgorithm::value_type::shortest);
-      if (const auto from_entity = core->getEntity(from_entity_name)) {
-        if (const auto to_entity = core->getEntity(to_entity_name)) {
-          if (
-            auto lane_changes = traffic_simulator::distance::countLaneChanges(
-              from_entity->getCanonicalizedLaneletPose().value(),
-              to_entity->getCanonicalizedLaneletPose().value(), routing_configuration,
-              core->getHdmapUtils())) {
-            return lane_changes.value().first - lane_changes.value().second;
-          }
+      const auto from_lanelet_pose =
+        core->getEntity(from_entity_name).getCanonicalizedLaneletPose();
+      const auto to_lanelet_pose = core->getEntity(to_entity_name).getCanonicalizedLaneletPose();
+      if (from_lanelet_pose && to_lanelet_pose) {
+        traffic_simulator::RoutingConfiguration routing_configuration;
+        routing_configuration.allow_lane_change =
+          (routing_algorithm == RoutingAlgorithm::value_type::shortest);
+        if (
+          const auto lane_changes = traffic_simulator::distance::countLaneChanges(
+            from_lanelet_pose.value(), to_lanelet_pose.value(), routing_configuration,
+            core->getHdmapUtils())) {
+          return lane_changes.value().first - lane_changes.value().second;
         }
       }
       throw common::Error(
@@ -293,7 +293,7 @@ public:
     template <typename... Ts>
     static auto applyAcquirePositionAction(const std::string & entity_ref, Ts &&... xs)
     {
-      return core->getEntity(entity_ref)->requestAcquirePosition(std::forward<decltype(xs)>(xs)...);
+      return core->getEntity(entity_ref).requestAcquirePosition(std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>
@@ -306,9 +306,9 @@ public:
     static auto applyProfileAction(
       const EntityRef & entity_ref, const DynamicConstraints & dynamic_constraints) -> void
     {
-      auto entity = core->getEntity(entity_ref);
-      entity->setBehaviorParameter([&]() {
-        auto behavior_parameter = entity->getBehaviorParameter();
+      auto & entity = core->getEntity(entity_ref);
+      entity.setBehaviorParameter([&]() {
+        auto behavior_parameter = entity.getBehaviorParameter();
 
         if (not std::isinf(dynamic_constraints.max_speed)) {
           behavior_parameter.dynamic_constraints.max_speed = dynamic_constraints.max_speed;
@@ -342,12 +342,12 @@ public:
     static auto applyAssignControllerAction(
       const std::string & entity_ref, Controller && controller) -> void
     {
-      auto entity = core->getEntity(entity_ref);
-      entity->setVelocityLimit(controller.properties.template get<Double>(
+      auto & entity = core->getEntity(entity_ref);
+      entity.setVelocityLimit(controller.properties.template get<Double>(
         "maxSpeed", std::numeric_limits<Double::value_type>::max()));
 
-      entity->setBehaviorParameter([&]() {
-        auto message = entity->getBehaviorParameter();
+      entity.setBehaviorParameter([&]() {
+        auto message = entity.getBehaviorParameter();
         message.see_around = not controller.properties.template get<Boolean>("isBlind");
         /// The default values written in https://github.com/tier4/scenario_simulator_v2/blob/master/simulation/traffic_simulator_msgs/msg/DynamicConstraints.msg
         message.dynamic_constraints.max_acceleration =
@@ -445,9 +445,9 @@ public:
           return configuration;
         }());
 
-        auto ego_entity = core->getEgoEntity(entity_ref);
+        auto & ego_entity = core->getEgoEntity(entity_ref);
 
-        ego_entity->setParameter<bool>(
+        ego_entity.setParameter<bool>(
           "allow_goal_modification",
           controller.properties.template get<Boolean>("allowGoalModification"));
 
@@ -469,7 +469,7 @@ public:
              }(controller.properties.template get<String>(
                "featureIdentifiersRequiringExternalPermissionForAutonomousDecisions"))) {
           try {
-            ego_entity->requestAutoModeForCooperation(module, false);
+            ego_entity.requestAutoModeForCooperation(module, false);
           } catch (const Error & error) {
             throw Error(
               "featureIdentifiersRequiringExternalPermissionForAutonomousDecisions is not "
@@ -483,7 +483,7 @@ public:
     template <typename... Ts>
     static auto applyAssignRouteAction(const std::string & entity_ref, Ts &&... xs)
     {
-      return core->getEntity(entity_ref)->requestAssignRoute(std::forward<decltype(xs)>(xs)...);
+      return core->getEntity(entity_ref).requestAssignRoute(std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>
@@ -495,20 +495,19 @@ public:
     template <typename... Ts>
     static auto applyFollowTrajectoryAction(const std::string & entity_ref, Ts &&... xs)
     {
-      return core->getEntity(entity_ref)
-        ->requestFollowTrajectory(std::forward<decltype(xs)>(xs)...);
+      return core->getEntity(entity_ref).requestFollowTrajectory(std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>
     static auto applyLaneChangeAction(const std::string & entity_ref, Ts &&... xs)
     {
-      return core->getEntity(entity_ref)->requestLaneChange(std::forward<decltype(xs)>(xs)...);
+      return core->getEntity(entity_ref).requestLaneChange(std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>
     static auto applySpeedAction(const std::string & entity_ref, Ts &&... xs)
     {
-      return core->getEntity(entity_ref)->requestSpeedChange(std::forward<decltype(xs)>(xs)...);
+      return core->getEntity(entity_ref).requestSpeedChange(std::forward<decltype(xs)>(xs)...);
     }
 
     template <
@@ -519,22 +518,21 @@ public:
         std::is_same_v<std::decay_t<PoseType>, traffic_simulator::CanonicalizedLaneletPose>>>
     static auto applyTeleportAction(const std::string & name, const PoseType & pose, Ts &&... xs)
     {
-      return core->getEntity(name)->setStatus(pose, std::forward<decltype(xs)>(xs)...);
+      return core->getEntity(name).setStatus(pose, std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>
     static auto applyTeleportAction(
       const std::string & name, const std::string & reference_entity_name, Ts &&... xs)
     {
-      const auto reference_entity = core->getEntity(reference_entity_name);
-      return core->getEntity(name)->setStatus(
-        reference_entity->getMapPose(), std::forward<decltype(xs)>(xs)...);
+      return core->getEntity(name).setStatus(
+        core->getEntity(reference_entity_name).getMapPose(), std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>
     static auto applyWalkStraightAction(const std::string & entity_ref, Ts &&... xs)
     {
-      return core->getEntity(entity_ref)->requestWalkStraight(std::forward<decltype(xs)>(xs)...);
+      return core->getEntity(entity_ref).requestWalkStraight(std::forward<decltype(xs)>(xs)...);
     }
   };
 
@@ -544,7 +542,7 @@ public:
   protected:
     static auto evaluateAcceleration(const std::string & name)
     {
-      return core->getEntity(name)->getCurrentAccel().linear.x;
+      return core->getEntity(name).getCurrentAccel().linear.x;
     }
 
     template <typename... Ts>
@@ -572,8 +570,8 @@ public:
 
     static auto evaluateRelativeSpeed(const Entity & from, const Entity & to) -> Eigen::Vector3d
     {
-      if (const auto observer = core->getEntity(from.name())) {
-        if (const auto observed = core->getEntity(to.name())) {
+      if (const auto observer = core->getEntityOrNullptr(from.name())) {
+        if (const auto observed = core->getEntityOrNullptr(to.name())) {
           auto velocity = [](const auto & entity) -> Eigen::Vector3d {
             auto direction = [](const auto & q) -> Eigen::Vector3d {
               return Eigen::Quaternion(q.w, q.x, q.y, q.z) * Eigen::Vector3d::UnitX();
@@ -612,13 +610,13 @@ public:
          please note that this function returns velocity, that is, a vector,
          rather than speed, contrary to the name "evaluateSpeed".
       */
-      const auto linear = core->getEntity(name)->getCurrentTwist().linear;
+      const auto linear = core->getEntity(name).getCurrentTwist().linear;
       return Eigen::Vector3d(linear.x, linear.y, linear.z);
     }
 
     static auto evaluateStandStill(const std::string & name)
     {
-      return core->getEntity(name)->getStandStillDuration();
+      return core->getEntity(name).getStandStillDuration();
     }
 
     static auto evaluateTimeHeadway(
@@ -649,7 +647,7 @@ public:
       const Properties & properties)
     {
       core->getEntity(entity_ref)
-        ->activateOutOfRangeJob(
+        .activateOutOfRangeJob(
           -performance.max_speed, +performance.max_speed, -performance.max_deceleration,
           +performance.max_acceleration,
           properties.template get<Double>("minJerk", Double::lowest()),
@@ -664,7 +662,7 @@ public:
     template <typename... Ts>
     static auto evaluateCurrentState(const std::string & entity_ref, Ts &&... xs) -> decltype(auto)
     {
-      return core->getEntity(entity_ref)->getCurrentAction(std::forward<decltype(xs)>(xs)...);
+      return core->getEntity(entity_ref).getCurrentAction(std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename EntityRef, typename OSCLanePosition>
@@ -698,44 +696,49 @@ public:
 
     static auto engage(const std::string & ego_ref) -> decltype(auto)
     {
-      return core->getEgoEntity(ego_ref)->engage();
+      return core->getEgoEntity(ego_ref).engage();
     }
 
     static auto isEngageable(const std::string & ego_ref) -> decltype(auto)
     {
-      return core->getEgoEntity(ego_ref)->isEngageable();
+      return core->getEgoEntity(ego_ref).isEngageable();
     }
 
     static auto isEngaged(const std::string & ego_ref) -> decltype(auto)
     {
-      return core->getEgoEntity(ego_ref)->isEngaged();
+      return core->getEgoEntity(ego_ref).isEngaged();
     }
 
     template <typename... Ts>
     static auto sendCooperateCommand(Ts &&... xs) -> decltype(auto)
     {
       /// @note here ego name is not passed from OpenScenarioInterpreter, it uses first found
-      return core->getEgoEntity()->sendCooperateCommand(std::forward<decltype(xs)>(xs)...);
+      if (const auto ego_name = core->getFirstEgoName()) {
+        return core->getEgoEntity(ego_name.value())
+          .sendCooperateCommand(std::forward<decltype(xs)>(xs)...);
+      } else {
+        throw common::Error("No ego entity exists.");
+      }
     }
 
     static auto getMinimumRiskManeuverBehaviorName(const std::string & ego_ref) -> decltype(auto)
     {
-      return core->getEgoEntity(ego_ref)->getMinimumRiskManeuverBehaviorName();
+      return core->getEgoEntity(ego_ref).getMinimumRiskManeuverBehaviorName();
     }
 
     static auto getMinimumRiskManeuverStateName(const std::string & ego_ref) -> decltype(auto)
     {
-      return core->getEgoEntity(ego_ref)->getMinimumRiskManeuverStateName();
+      return core->getEgoEntity(ego_ref).getMinimumRiskManeuverStateName();
     }
 
     static auto getEmergencyStateName(const std::string & ego_ref) -> decltype(auto)
     {
-      return core->getEgoEntity(ego_ref)->getEmergencyStateName();
+      return core->getEgoEntity(ego_ref).getEmergencyStateName();
     }
 
     static auto getTurnIndicatorsCommandName(const std::string & ego_ref) -> decltype(auto)
     {
-      return core->getEgoEntity(ego_ref)->getTurnIndicatorsCommandName();
+      return core->getEgoEntity(ego_ref).getTurnIndicatorsCommandName();
     }
 
     // TrafficLights - Conventional and V2I

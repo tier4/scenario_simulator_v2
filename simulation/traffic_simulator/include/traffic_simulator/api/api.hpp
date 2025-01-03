@@ -152,7 +152,7 @@ public:
     auto register_to_environment_simulator = [&]() {
       if (configuration.standalone_mode) {
         return true;
-      } else if (const auto entity = entity_manager_ptr_->getEntityOrNullptr(name); not entity) {
+      } else if (!entity_manager_ptr_->isEntityExist(name)) {
         throw common::SemanticError(
           "Entity ", name, " can not be registered in simulator - it has not been spawned yet.");
       } else {
@@ -160,7 +160,8 @@ public:
         simulation_interface::toProto(parameters, *req.mutable_parameters());
         req.mutable_parameters()->set_name(name);
         req.set_asset_key(model3d);
-        simulation_interface::toProto(entity->getMapPose(), *req.mutable_pose());
+        simulation_interface::toProto(
+          entity_manager_ptr_->getEntity(name).getMapPose(), *req.mutable_pose());
         req.set_is_ego(behavior == VehicleBehavior::autoware());
         /// @todo Should be filled from function API
         req.set_initial_speed(0.0);
@@ -186,7 +187,7 @@ public:
     auto register_to_environment_simulator = [&]() {
       if (configuration.standalone_mode) {
         return true;
-      } else if (const auto entity = entity_manager_ptr_->getEntityOrNullptr(name); not entity) {
+      } else if (!entity_manager_ptr_->isEntityExist(name)) {
         throw common::SemanticError(
           "Entity ", name, " can not be registered in simulator - it has not been spawned yet.");
       } else {
@@ -194,7 +195,8 @@ public:
         simulation_interface::toProto(parameters, *req.mutable_parameters());
         req.mutable_parameters()->set_name(name);
         req.set_asset_key(model3d);
-        simulation_interface::toProto(entity->getMapPose(), *req.mutable_pose());
+        simulation_interface::toProto(
+          entity_manager_ptr_->getEntity(name).getMapPose(), *req.mutable_pose());
         return zeromq_client_.call(req).result().success();
       }
     };
@@ -216,7 +218,7 @@ public:
     auto register_to_environment_simulator = [&]() {
       if (configuration.standalone_mode) {
         return true;
-      } else if (const auto entity = entity_manager_ptr_->getEntityOrNullptr(name); not entity) {
+      } else if (!entity_manager_ptr_->isEntityExist(name)) {
         throw common::SemanticError(
           "Entity ", name, " can not be registered in simulator - it has not been spawned yet.");
       } else {
@@ -224,7 +226,8 @@ public:
         simulation_interface::toProto(parameters, *req.mutable_parameters());
         req.mutable_parameters()->set_name(name);
         req.set_asset_key(model3d);
-        simulation_interface::toProto(entity->getMapPose(), *req.mutable_pose());
+        simulation_interface::toProto(
+          entity_manager_ptr_->getEntity(name).getMapPose(), *req.mutable_pose());
         return zeromq_client_.call(req).result().success();
       }
     };
@@ -300,7 +303,9 @@ public:
     return traffic_lights_ptr_->getConventionalTrafficLights();
   }
 
-  auto getEntity(const std::string & name) const -> std::shared_ptr<entity::EntityBase>;
+  auto getEntity(const std::string & name) -> entity::EntityBase &;
+
+  auto getEntity(const std::string & name) const -> const entity::EntityBase &;
 
   // clang-format off
 #define FORWARD_TO_ENTITY_MANAGER(NAME)                                    \
@@ -318,12 +323,12 @@ public:
   static_assert(true, "")
   // clang-format on
 
-  FORWARD_TO_ENTITY_MANAGER(isEntityExist);
   FORWARD_TO_ENTITY_MANAGER(getEgoEntity);
   FORWARD_TO_ENTITY_MANAGER(getEntityNames);
   FORWARD_TO_ENTITY_MANAGER(getEntityOrNullptr);
+  FORWARD_TO_ENTITY_MANAGER(getFirstEgoName);
   FORWARD_TO_ENTITY_MANAGER(getHdmapUtils);
-  FORWARD_TO_ENTITY_MANAGER(isAnyEgoSpawned);
+  FORWARD_TO_ENTITY_MANAGER(isEntityExist);
   FORWARD_TO_ENTITY_MANAGER(isNpcLogicStarted);
   FORWARD_TO_ENTITY_MANAGER(resetBehaviorPlugin);
 
