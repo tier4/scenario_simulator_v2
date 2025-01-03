@@ -100,16 +100,17 @@ auto API::respawn(
 bool API::checkCollision(
   const std::string & first_entity_name, const std::string & second_entity_name)
 {
-  if (first_entity_name != second_entity_name) {
-    if (isEntityExist(first_entity_name) && isEntityExist(second_entity_name)) {
-      const auto & first_entity = getEntity(first_entity_name);
-      const auto & second_entity = getEntity(second_entity_name);
-      return math::geometry::checkCollision2D(
-        first_entity.getMapPose(), first_entity.getBoundingBox(), second_entity.getMapPose(),
-        second_entity.getBoundingBox());
-    }
+  if (
+    first_entity_name != second_entity_name && isEntityExist(first_entity_name) &&
+    isEntityExist(second_entity_name)) {
+    const auto & first_entity = getEntity(first_entity_name);
+    const auto & second_entity = getEntity(second_entity_name);
+    return math::geometry::checkCollision2D(
+      first_entity.getMapPose(), first_entity.getBoundingBox(), second_entity.getMapPose(),
+      second_entity.getBoundingBox());
+  } else {
+    return false;
   }
-  return false;
 }
 
 auto API::getEntity(const std::string & name) -> entity::EntityBase &

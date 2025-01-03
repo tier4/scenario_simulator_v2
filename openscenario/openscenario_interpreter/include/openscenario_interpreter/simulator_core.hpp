@@ -267,23 +267,26 @@ public:
       const std::string & from_entity_name, const std::string & to_entity_name,
       const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined) -> int
     {
-      const auto from_lanelet_pose =
-        core->getEntity(from_entity_name).getCanonicalizedLaneletPose();
-      const auto to_lanelet_pose = core->getEntity(to_entity_name).getCanonicalizedLaneletPose();
-      if (from_lanelet_pose && to_lanelet_pose) {
-        traffic_simulator::RoutingConfiguration routing_configuration;
-        routing_configuration.allow_lane_change =
-          (routing_algorithm == RoutingAlgorithm::value_type::shortest);
+      if (
+        const auto from_lanelet_pose =
+          core->getEntity(from_entity_name).getCanonicalizedLaneletPose()) {
         if (
-          const auto lane_changes = traffic_simulator::distance::countLaneChanges(
-            from_lanelet_pose.value(), to_lanelet_pose.value(), routing_configuration,
-            core->getHdmapUtils())) {
-          return lane_changes.value().first - lane_changes.value().second;
+          const auto to_lanelet_pose =
+            core->getEntity(to_entity_name).getCanonicalizedLaneletPose()) {
+          traffic_simulator::RoutingConfiguration routing_configuration;
+          routing_configuration.allow_lane_change =
+            (routing_algorithm == RoutingAlgorithm::value_type::shortest);
+          if (
+            const auto lane_changes = traffic_simulator::distance::countLaneChanges(
+              from_lanelet_pose.value(), to_lanelet_pose.value(), routing_configuration,
+              core->getHdmapUtils())) {
+            return lane_changes.value().first - lane_changes.value().second;
+          }
         }
+        throw common::Error(
+          "Failed to evaluate lateral relative lanes between ", from_entity_name, " and ",
+          to_entity_name);
       }
-      throw common::Error(
-        "Failed to evaluate lateral relative lanes between ", from_entity_name, " and ",
-        to_entity_name);
     }
   };
 

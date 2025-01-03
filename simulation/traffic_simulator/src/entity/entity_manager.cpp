@@ -210,7 +210,7 @@ auto EntityManager::getNumberOfEgo() const -> std::size_t
   });
 }
 
-auto EntityManager::getFirstEgoName() const -> const std::optional<std::string>
+auto EntityManager::getFirstEgoName() const -> std::optional<std::string>
 {
   for (const auto & [name, entity_ptr] : entities_) {
     if (entity_ptr->template is<EgoEntity>()) {
@@ -273,7 +273,7 @@ void EntityManager::resetBehaviorPlugin(
   const std::string & name, const std::string & behavior_plugin_name)
 {
   const auto & reference_entity = getEntity(name);
-  const auto status = reference_entity.getCanonicalizedStatus();
+  const auto & status = reference_entity.getCanonicalizedStatus();
   const auto behavior_parameter = reference_entity.getBehaviorParameter();
   if (reference_entity.is<EgoEntity>()) {
     THROW_SEMANTIC_ERROR(
@@ -339,21 +339,21 @@ void EntityManager::update(const double current_time, const double step_time)
       configuration.v2i_traffic_light_publish_rate);
   }
   std::unordered_map<std::string, CanonicalizedEntityStatus> all_status;
-  for (auto && [name, entity_ptr] : entities_) {
-    all_status.emplace(name, entity_ptr->getCanonicalizedStatus());
+  for (const auto & [name, entity_ptr] : entities_) {
+    all_status.try_emplace(name, entity_ptr->getCanonicalizedStatus());
   }
-  for (auto && [name, entity_ptr] : entities_) {
+  for (const auto & [name, entity_ptr] : entities_) {
     entity_ptr->setOtherStatus(all_status);
   }
   all_status.clear();
-  for (auto && [name, entity_ptr] : entities_) {
-    all_status.emplace(name, updateNpcLogic(name, current_time, step_time));
+  for (const auto & [name, entity_ptr] : entities_) {
+    all_status.try_emplace(name, updateNpcLogic(name, current_time, step_time));
   }
-  for (auto && [name, entity_ptr] : entities_) {
+  for (const auto & [name, entity_ptr] : entities_) {
     entity_ptr->setOtherStatus(all_status);
   }
   traffic_simulator_msgs::msg::EntityStatusWithTrajectoryArray status_array_msg;
-  for (auto && [name, status] : all_status) {
+  for (const auto & [name, status] : all_status) {
     traffic_simulator_msgs::msg::EntityStatusWithTrajectory status_with_trajectory;
     status_with_trajectory.waypoint = getWaypoints(name);
     for (const auto & goal : getGoalPoses<geometry_msgs::msg::Pose>(name)) {
@@ -394,7 +394,7 @@ auto EntityManager::startNpcLogic(const double current_time) -> void
 {
   npc_logic_started_ = true;
 
-  for ([[maybe_unused]] auto && [name, entity_ptr] : entities_) {
+  for (const auto & [name, entity_ptr] : entities_) {
     entity_ptr->updateEntityStatusTimestamp(current_time);
   }
 }

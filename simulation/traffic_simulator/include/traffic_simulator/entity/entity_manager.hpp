@@ -221,7 +221,7 @@ public:
 
   auto isAnyEgoSpawned() const -> bool;
 
-  auto getFirstEgoName() const -> const std::optional<std::string>;
+  auto getFirstEgoName() const -> std::optional<std::string>;
 
   /**
    * @brief Reset behavior plugin of the target entity.
