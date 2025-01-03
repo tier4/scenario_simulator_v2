@@ -44,14 +44,14 @@ private:
 
   void onUpdate() override
   {
-    auto npc = api_.getEntity("npc");
-    auto ego = api_.getEntity("ego");
+    auto & npc = api_.getEntity("npc");
+    auto & ego = api_.getEntity("ego");
 
     // SUCCESS
     if (
-      npc->requestSynchronize("ego", ego_target, npc_target, 0, 0.5) &&
-      ego->isInPosition(ego_target, 1.0) && npc->isInPosition(npc_target, 1.0) &&
-      npc->getCurrentTwist().linear.x < 0.5) {
+      npc.requestSynchronize("ego", ego_target, npc_target, 0, 0.5) &&
+      ego.isInPosition(ego_target, 1.0) && npc.isInPosition(npc_target, 1.0) &&
+      npc.getCurrentTwist().linear.x < 0.5) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
 
@@ -71,14 +71,14 @@ private:
         34976, 20, 0, api_.getHdmapUtils()),
       getVehicleParameters());
 
-    auto ego = api_.getEntity("ego");
-    ego->setLinearVelocity(3);
-    ego->requestSpeedChange(3, true);
+    auto & ego = api_.getEntity("ego");
+    ego.setLinearVelocity(3);
+    ego.requestSpeedChange(3, true);
 
     std::vector<geometry_msgs::msg::Pose> goal_poses;
     goal_poses.emplace_back(traffic_simulator::helper::constructCanonicalizedLaneletPose(
       34579, 20, 0, api_.getHdmapUtils()));
-    ego->requestAssignRoute(goal_poses);
+    ego.requestAssignRoute(goal_poses);
 
     api_.spawn(
       "npc",
@@ -86,13 +86,13 @@ private:
         34576, 0, 0, api_.getHdmapUtils()),
       getVehicleParameters());
 
-    auto npc = api_.getEntity("npc");
+    auto & npc = api_.getEntity("npc");
 
     std::vector<geometry_msgs::msg::Pose> npc_goal_poses;
     npc_goal_poses.emplace_back(traffic_simulator::helper::constructCanonicalizedLaneletPose(
       34564, 20, 0, api_.getHdmapUtils()));
-    npc->requestAssignRoute(npc_goal_poses);
-    npc->setLinearVelocity(6);
+    npc.requestAssignRoute(npc_goal_poses);
+    npc.setLinearVelocity(6);
   }
 
   auto getSampleLaneletPose(const traffic_simulator::LaneletPose & lanelet_pose)
