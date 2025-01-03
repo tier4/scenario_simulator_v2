@@ -50,13 +50,13 @@ private:
      * @sa https://wandbox.org/permlink/dSNRX7K2bQiqSI7P
      */
     if (t == 1.0) {
-      const auto vel = api_.getEntity("bob")->getCurrentTwist().linear.x;
+      const auto vel = api_.getEntity("bob").getCurrentTwist().linear.x;
       if (t != vel) {
         stop(cpp_mock_scenarios::Result::FAILURE);
       }
     }
     if (t >= 6.65 && 7.25 >= t) {
-      const auto vel = api_.getEntity("ego")->getCurrentTwist().linear.x;
+      const auto vel = api_.getEntity("ego").getCurrentTwist().linear.x;
       if (std::fabs(0.01) <= vel) {
         stop(cpp_mock_scenarios::Result::FAILURE);
       }
@@ -74,10 +74,10 @@ private:
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
         120545, 0.0, 0.0, api_.getHdmapUtils()),
       getVehicleParameters());
-    auto ego_entity = api_.getEntity("ego");
-    ego_entity->setLinearVelocity(10);
-    ego_entity->requestSpeedChange(8, true);
-    ego_entity->requestAssignRoute(std::vector<traffic_simulator::CanonicalizedLaneletPose>{
+    auto & ego_entity = api_.getEntity("ego");
+    ego_entity.setLinearVelocity(10);
+    ego_entity.requestSpeedChange(8, true);
+    ego_entity.requestAssignRoute(std::vector<traffic_simulator::CanonicalizedLaneletPose>{
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
         34675, 0.0, 0.0, api_.getHdmapUtils()),
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
@@ -87,10 +87,10 @@ private:
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
         34378, 0.0, 0.0, api_.getHdmapUtils()),
       getPedestrianParameters());
-    auto bob_entity = api_.getEntity("bob");
-    bob_entity->setLinearVelocity(0);
-    bob_entity->requestWalkStraight();
-    bob_entity->requestSpeedChange(
+    auto & bob_entity = api_.getEntity("bob");
+    bob_entity.setLinearVelocity(0);
+    bob_entity.requestWalkStraight();
+    bob_entity.requestSpeedChange(
       1.0, traffic_simulator::speed_change::Transition::LINEAR,
       traffic_simulator::speed_change::Constraint(
         traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 1.0),
