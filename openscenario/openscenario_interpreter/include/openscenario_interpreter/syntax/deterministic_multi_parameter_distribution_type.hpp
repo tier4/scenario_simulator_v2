@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__DETERMINISTIC_MULTI_PARAMETER_DISTRIBUTION_TYPE_HPP_
-#define OPENSCENARIO_INTERPRETER__DETERMINISTIC_MULTI_PARAMETER_DISTRIBUTION_TYPE_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__DETERMINISTIC_MULTI_PARAMETER_DISTRIBUTION_TYPE_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__DETERMINISTIC_MULTI_PARAMETER_DISTRIBUTION_TYPE_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/value_set_distribution.hpp>
@@ -43,4 +43,4 @@ struct DeterministicMultiParameterDistributionType : public ValueSetDistribution
 //);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
-#endif  // OPENSCENARIO_INTERPRETER__DETERMINISTIC_MULTI_PARAMETER_DISTRIBUTION_TYPE_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__DETERMINISTIC_MULTI_PARAMETER_DISTRIBUTION_TYPE_HPP_

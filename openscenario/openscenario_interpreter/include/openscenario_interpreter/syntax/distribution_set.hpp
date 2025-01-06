@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__DISTRIBUTION_SET_HPP_
-#define OPENSCENARIO_INTERPRETER__DISTRIBUTION_SET_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__DISTRIBUTION_SET_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__DISTRIBUTION_SET_HPP_
 
 #include <openscenario_interpreter/syntax/distribution_set_element.hpp>
 
@@ -38,4 +38,4 @@ struct DistributionSet : private Scope, public ComplexType
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
-#endif  // OPENSCENARIO_INTERPRETER__DISTRIBUTION_SET_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__DISTRIBUTION_SET_HPP_
