@@ -40,8 +40,12 @@ namespace traffic_simulator
 namespace traffic
 {
 TrafficSink::TrafficSink(
+  const std::function<void(const std::string &)> & despawn_function,
   const std::shared_ptr<entity::EntityManager> entity_manager_ptr, const TrafficSinkConfig & config)
-: TrafficModuleBase(), config_(config), entity_manager_ptr_(entity_manager_ptr)
+: TrafficModuleBase(),
+  despawn_function_(despawn_function),
+  entity_manager_ptr_(entity_manager_ptr),
+  config_(config)
 {
 }
 
@@ -50,7 +54,7 @@ auto TrafficSink::execute(
 {
   for (const auto & entity_name : entity_manager_ptr_->getEntityNames()) {
     if (isEntitySinkable(entity_name)) {
-      entity_manager_ptr_->despawnEntity(entity_name);
+      despawn_function_(entity_name);
     }
   }
 }
