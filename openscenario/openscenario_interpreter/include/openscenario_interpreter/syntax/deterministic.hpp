@@ -23,15 +23,17 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- Deterministic 1.2 ------------------------------------------------------
- *
- *  <xsd:complexType name="Deterministic">
- *    <xsd:sequence>
- *      <xsd:group ref="DeterministicParameterDistribution" minOccurs="0" maxOccurs="unbounded"/>
- *    </xsd:sequence>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   Deterministic (OpenSCENARIO XML 1.3.1)
+
+   Top level container containing all deterministic distribution elements.
+
+   <xsd:complexType name="Deterministic">
+     <xsd:sequence>
+       <xsd:group ref="DeterministicParameterDistribution" minOccurs="0" maxOccurs="unbounded"/>
+     </xsd:sequence>
+   </xsd:complexType>
+*/
 struct Deterministic
 {
   const std::list<DeterministicParameterDistribution> deterministic_parameter_distributions;

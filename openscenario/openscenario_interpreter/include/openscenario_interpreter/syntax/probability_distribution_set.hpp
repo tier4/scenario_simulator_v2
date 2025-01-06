@@ -22,16 +22,17 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- ProbabilityDistributionSet 1.2 -----------------------------------------
- *
- *  <xsd:complexType name="ProbabilityDistributionSet">
- *    <xsd:sequence>
- *      <xsd:element name="Element" type="ProbabilityDistributionSetElement" maxOccurs="unbounded"/>
- *    </xsd:sequence>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   ProbabilityDistributionSet (OpenSCENARIO XML 1.3.1)
 
+   Container for a set of single values with a defined probability.
+
+   <xsd:complexType name="ProbabilityDistributionSet">
+     <xsd:sequence>
+       <xsd:element name="Element" type="ProbabilityDistributionSetElement" maxOccurs="unbounded"/>
+     </xsd:sequence>
+   </xsd:complexType>
+*/
 struct ProbabilityDistributionSet : public ComplexType, private Scope
 {
   const std::vector<ProbabilityDistributionSetElement> elements;

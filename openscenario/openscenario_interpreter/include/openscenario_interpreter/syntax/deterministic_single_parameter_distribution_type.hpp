@@ -25,17 +25,19 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- DeterministicSingleParameterDistributionType 1.2 -----------------------
- *
- *  <xsd:group name="DeterministicSingleParameterDistributionType">
- *    <xsd:choice>
- *      <xsd:element name="DistributionSet" type="DistributionSet"/>
- *      <xsd:element name="DistributionRange" type="DistributionRange"/>
- *      <xsd:element name="UserDefinedDistribution" type="UserDefinedDistribution"/>
- *    </xsd:choice>
- *  </xsd:group>
- *
- * -------------------------------------------------------------------------- */
+/*
+   DeterministicSingleParameterDistributionType (OpenSCENARIO XML 1.3.1)
+
+   A deterministic distribution type which can be applied to a single parameter.
+
+   <xsd:group name="DeterministicSingleParameterDistributionType">
+     <xsd:choice>
+       <xsd:element name="DistributionSet" type="DistributionSet"/>
+       <xsd:element name="DistributionRange" type="DistributionRange"/>
+       <xsd:element name="UserDefinedDistribution" type="UserDefinedDistribution"/>
+     </xsd:choice>
+   </xsd:group>
+*/
 struct DeterministicSingleParameterDistributionType : public Group
 {
   explicit DeterministicSingleParameterDistributionType(const pugi::xml_node &, Scope & scope);

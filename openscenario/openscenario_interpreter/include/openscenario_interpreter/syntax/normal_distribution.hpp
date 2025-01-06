@@ -25,18 +25,19 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- NormalDistribution 1.2 -------------------------------------------------
- *
- *  <xsd:complexType name="NormalDistribution">
- *    <xsd:sequence>
- *      <xsd:element name="Range" type="Range"/>
- *    </xsd:sequence>
- *    <xsd:attribute name="expectedValue" type="Double" use="required"/>
- *    <xsd:attribute name="variance" type="Double" use="required"/>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   NormalDistribution (OpenSCENARIO XML 1.3.1)
 
+   Normal distribution which can be applied to a single parameter.
+
+   <xsd:complexType name="NormalDistribution">
+     <xsd:sequence>
+       <xsd:element name="Range" type="Range" minOccurs="0"/>
+     </xsd:sequence>
+     <xsd:attribute name="expectedValue" type="Double" use="required"/>
+     <xsd:attribute name="variance" type="Double" use="required"/>
+   </xsd:complexType>
+*/
 struct NormalDistribution : public ComplexType, private Scope
 {
   const Range range;

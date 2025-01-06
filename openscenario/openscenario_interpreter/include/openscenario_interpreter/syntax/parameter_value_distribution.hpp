@@ -22,16 +22,19 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- ParameterValueDistribution 1.2 -----------------------------------------
- *
- *  <xsd:complexType name="ParameterValueDistribution">
- *    <xsd:sequence>
- *      <xsd:element name="ScenarioFile" type="File"/>
- *      <xsd:group ref="DistributionDefinition"/>
- *    </xsd:sequence>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   ParameterValueDistribution (OpenSCENARIO XML 1.3.1)
+
+   The ParameterValueDistribution represents
+   the top level container of a parameter distribution file.
+
+   <xsd:complexType name="ParameterValueDistribution">
+     <xsd:sequence>
+       <xsd:element name="ScenarioFile" type="File"/>
+       <xsd:group ref="DistributionDefinition"/>
+     </xsd:sequence>
+   </xsd:complexType>
+*/
 struct ParameterValueDistribution : public DistributionDefinition
 {
   const File scenario_file;

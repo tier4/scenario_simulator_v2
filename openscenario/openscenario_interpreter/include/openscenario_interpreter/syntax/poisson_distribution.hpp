@@ -24,16 +24,18 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- PoissonDistribution 1.2 ------------------------------------------------
- *
- *  <xsd:complexType name="PoissonDistribution">
- *    <xsd:sequence>
- *      <xsd:element name="Range" type="Range"/>
- *    </xsd:sequence>
- *    <xsd:attribute name="expectedValue" type="Double" use="required"/>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   PoissonDistribution (OpenSCENARIO XML 1.3.1)
+
+   Poisson distribution which can be applied to a single parameter.
+
+   <xsd:complexType name="PoissonDistribution">
+     <xsd:sequence>
+       <xsd:element name="Range" type="Range" minOccurs="0"/>
+     </xsd:sequence>
+     <xsd:attribute name="expectedValue" type="Double" use="required"/>
+   </xsd:complexType>
+*/
 struct PoissonDistribution : public ComplexType, private Scope
 {
   const Range range;

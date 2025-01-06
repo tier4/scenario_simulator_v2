@@ -21,15 +21,17 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- DistributionSet 1.2 ----------------------------------------------------
- *
- *  <xsd:complexType name="DistributionSet">
- *    <xsd:sequence>
- *      <xsd:element name="Element" type="DistributionSetElement" maxOccurs="unbounded"/>
- *    </xsd:sequence>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   DistributionSet (OpenSCENARIO XML 1.3.1)
+
+   A set of possible values which can occur in a deterministic distribution.
+
+   <xsd:complexType name="DistributionSet">
+     <xsd:sequence>
+       <xsd:element name="Element" type="DistributionSetElement" maxOccurs="unbounded"/>
+     </xsd:sequence>
+   </xsd:complexType>
+*/
 struct DistributionSet : private Scope, public ComplexType
 {
   const std::list<DistributionSetElement> elements;

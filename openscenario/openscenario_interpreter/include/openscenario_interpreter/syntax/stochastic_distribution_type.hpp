@@ -28,20 +28,23 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- StochasticDistributionType 1.2 -----------------------------------------
- *
- *  <xsd:group name="StochasticDistributionType">
- *    <xsd:sequence>
- *      <xsd:element name="ProbabilityDistributionSet" type="ProbabilityDistributionSet"/>
- *      <xsd:element name="NormalDistribution" type="NormalDistribution"/>
- *      <xsd:element name="UniformDistribution" type="UniformDistribution"/>
- *      <xsd:element name="PoissonDistribution" type="PoissonDistribution"/>
- *      <xsd:element name="Histogram" type="Histogram"/>
- *      <xsd:element name="UserDefinedDistribution" type="UserDefinedDistribution"/>
- *    </xsd:sequence>
- *  </xsd:group>
- *
- * -------------------------------------------------------------------------- */
+/*
+   StochasticDistributionType (OpenSCENARIO XML 1.3.1)
+
+   Container for a stochastic distribution type which can be applied to a single parameter.
+
+   <xsd:group name="StochasticDistributionType">
+     <xsd:choice>
+       <xsd:element name="ProbabilityDistributionSet" type="ProbabilityDistributionSet"/>
+       <xsd:element name="NormalDistribution" type="NormalDistribution"/>
+       <xsd:element name="LogNormalDistribution" type="LogNormalDistribution"/>
+       <xsd:element name="UniformDistribution" type="UniformDistribution"/>
+       <xsd:element name="PoissonDistribution" type="PoissonDistribution"/>
+       <xsd:element name="Histogram" type="Histogram"/>
+       <xsd:element name="UserDefinedDistribution" type="UserDefinedDistribution"/>
+     </xsd:choice>
+   </xsd:group>
+*/
 struct StochasticDistributionType : public Group
 {
   explicit StochasticDistributionType(const pugi::xml_node &, Scope & scope);

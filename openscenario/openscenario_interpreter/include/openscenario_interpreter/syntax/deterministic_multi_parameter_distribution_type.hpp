@@ -23,15 +23,17 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- DeterministicMultiParameterDistributionType 1.2 ------------------------
- *
- *  <xsd:group name="DeterministicMultiParameterDistributionType">
- *    <xsd:sequence>
- *      <xsd:element name="ValueSetDistribution" type="ValueSetDistribution"/>
- *    </xsd:sequence>
- *  </xsd:group>
- *
- * -------------------------------------------------------------------------- */
+/*
+   DeterministicMultiParameterDistributionType (OpenSCENARIO XML 1.3.1)
+
+   A deterministic distribution type which can be applied to multiple parameters.
+
+   <xsd:group name="DeterministicMultiParameterDistributionType">
+     <xsd:sequence>
+       <xsd:element name="ValueSetDistribution" type="ValueSetDistribution"/>
+     </xsd:sequence>
+   </xsd:group>
+*/
 struct DeterministicMultiParameterDistributionType : public ValueSetDistribution
 {
   explicit DeterministicMultiParameterDistributionType(const pugi::xml_node &, Scope & scope);
