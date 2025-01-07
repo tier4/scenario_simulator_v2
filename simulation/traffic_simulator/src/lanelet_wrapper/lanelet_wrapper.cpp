@@ -24,18 +24,15 @@ auto LaneletWrapper::activate(const std::string & lanelet_map_path) -> void
 {
   lanelet_map_path_ = lanelet_map_path;
   if (instance) {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard lock(mutex_);
     instance.reset();
   }
 }
 
-auto LaneletWrapper::map() -> const lanelet::LaneletMapPtr
-{
-  return getInstance().lanelet_map_ptr_;
-}
+auto LaneletWrapper::map() -> lanelet::LaneletMapPtr { return getInstance().lanelet_map_ptr_; }
 
 auto LaneletWrapper::routingGraph(const RoutingGraphType type)
-  -> const lanelet::routing::RoutingGraphConstPtr
+  -> lanelet::routing::RoutingGraphConstPtr
 {
   switch (type) {
     case RoutingGraphType::VEHICLE:
@@ -52,7 +49,7 @@ auto LaneletWrapper::routingGraph(const RoutingGraphType type)
 }
 
 auto LaneletWrapper::trafficRules(const RoutingGraphType type)
-  -> const lanelet::traffic_rules::TrafficRulesPtr
+  -> lanelet::traffic_rules::TrafficRulesPtr
 {
   switch (type) {
     case RoutingGraphType::VEHICLE:
@@ -105,7 +102,7 @@ LaneletWrapper::LaneletWrapper(const std::filesystem::path & lanelet_map_path)
 
 LaneletWrapper & LaneletWrapper::getInstance()
 {
-  std::lock_guard<std::mutex> lock(mutex_);
+  std::lock_guard lock(mutex_);
   if (!instance) {
     if (!lanelet_map_path_.empty()) {
       /// `new` is intentionally used here instead of `make_unique` since the LaneletWrapper constructor is private

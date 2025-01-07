@@ -31,6 +31,7 @@ struct Locations
 class GermanRoadShoulderPassableVehicle : public lanelet::traffic_rules::GermanVehicle
 {
 public:
+  using lanelet::traffic_rules::GenericTrafficRules::canPass;
   using lanelet::traffic_rules::GermanVehicle::GermanVehicle;
 
 protected:
@@ -40,7 +41,7 @@ protected:
   {
     using lanelet::AttributeValueString;
     using lanelet::Participants;
-    const static std::map<std::string, std::vector<std::string>> participants_map{
+    const static std::map<std::string, std::vector<std::string>, std::less<>> participants_map{
       // clang-format off
       {"",                                  {Participants::Vehicle}},
       {AttributeValueString::Road,          {Participants::Vehicle, Participants::Bicycle}},
