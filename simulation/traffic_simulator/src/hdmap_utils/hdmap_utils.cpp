@@ -988,7 +988,7 @@ auto HdMapUtils::getLongitudinalDistance(
   const traffic_simulator::RoutingConfiguration & routing_configuration) const
   -> std::optional<double>
 {
-  const auto is_lane_change_required = [this, routing_configuration](
+  const auto is_lane_change_required = [routing_configuration](
                                          const lanelet::Id current_lanelet,
                                          const lanelet::Id next_lanelet) -> bool {
     const auto next_lanelet_ids =

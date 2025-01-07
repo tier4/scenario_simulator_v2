@@ -94,7 +94,7 @@ public:
           shortest_path_ids);
       }
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard lock(mutex_);
     return data_.at({from_lanelet_id, to_lanelet_id, routing_configuration.allow_lane_change});
   }
 
@@ -106,7 +106,7 @@ public:
         "route from : ", from, " to : ", to, (allow_lane_change ? " with" : " without"),
         " lane change does not exists on route cache.");
     } else {
-      std::lock_guard<std::mutex> lock(mutex_);
+      std::lock_guard lock(mutex_);
       return data_.at({from, to, allow_lane_change});
     }
   }
@@ -116,7 +116,7 @@ public:
 
   auto exists(const lanelet::Id from, const lanelet::Id to, const bool allow_lane_change) -> bool
   {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard lock(mutex_);
     std::tuple<lanelet::Id, lanelet::Id, bool> key = {from, to, allow_lane_change};
     return data_.find(key) != data_.end();
   }
@@ -125,7 +125,7 @@ public:
     const lanelet::Id from, const lanelet::Id to, const bool allow_lane_change,
     const lanelet::Ids & route) -> void
   {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard lock(mutex_);
     data_[{from, to, allow_lane_change}] = route;
   }
 };
@@ -138,7 +138,7 @@ public:
     if (!exists(lanelet_id)) {
       THROW_SIMULATION_ERROR("center point of : ", lanelet_id, " does not exists on route cache.");
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard lock(mutex_);
     return data_.at(lanelet_id);
   }
 
@@ -147,7 +147,7 @@ public:
     if (!exists(lanelet_id)) {
       THROW_SIMULATION_ERROR("center point of : ", lanelet_id, " does not exists on route cache.");
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard lock(mutex_);
     return splines_.at(lanelet_id);
   }
 
@@ -157,7 +157,7 @@ public:
     if (!exists(lanelet_id)) {
       appendData(lanelet_id, centerPoints(lanelet_id, lanelet_map));
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard lock(mutex_);
     return data_.at(lanelet_id);
   }
 
@@ -168,7 +168,7 @@ public:
     if (!exists(lanelet_id)) {
       appendData(lanelet_id, centerPoints(lanelet_id, lanelet_map));
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard lock(mutex_);
     return splines_.at(lanelet_id);
   }
 
@@ -178,13 +178,13 @@ public:
 
   auto exists(const lanelet::Id lanelet_id) -> bool
   {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard lock(mutex_);
     return data_.find(lanelet_id) != data_.end();
   }
 
   auto appendData(const lanelet::Id lanelet_id, const std::vector<Point> & route) -> void
   {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard lock(mutex_);
     data_[lanelet_id] = route;
     splines_[lanelet_id] = std::make_shared<Spline>(route);
   }
@@ -220,7 +220,7 @@ public:
     if (!exists(lanelet_id)) {
       THROW_SIMULATION_ERROR("length of : ", lanelet_id, " does not exists on route cache.");
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard lock(mutex_);
     return data_.at(lanelet_id);
   }
 
@@ -230,7 +230,7 @@ public:
       appendData(
         lanelet_id, lanelet::utils::getLaneletLength2d(lanelet_map->laneletLayer.get(lanelet_id)));
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard lock(mutex_);
     return data_.at(lanelet_id);
   }
 
@@ -239,13 +239,13 @@ public:
 
   auto exists(const lanelet::Id lanelet_id) -> bool
   {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard lock(mutex_);
     return data_.find(lanelet_id) != data_.end();
   }
 
   auto appendData(const lanelet::Id lanelet_id, double length) -> void
   {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard lock(mutex_);
     data_[lanelet_id] = length;
   }
 };
@@ -270,11 +270,11 @@ class LaneletWrapper
 public:
   static auto activate(const std::string & lanelet_map_path) -> void;
 
-  [[nodiscard]] static auto map() -> const lanelet::LaneletMapPtr;
+  [[nodiscard]] static auto map() -> lanelet::LaneletMapPtr;
   [[nodiscard]] static auto routingGraph(const RoutingGraphType type)
-    -> const lanelet::routing::RoutingGraphConstPtr;
+    -> lanelet::routing::RoutingGraphConstPtr;
   [[nodiscard]] static auto trafficRules(const RoutingGraphType type)
-    -> const lanelet::traffic_rules::TrafficRulesPtr;
+    -> lanelet::traffic_rules::TrafficRulesPtr;
 
   [[nodiscard]] static auto routeCache(const RoutingGraphType type) -> RouteCache &;
   [[nodiscard]] static auto centerPointsCache() -> CenterPointsCache &;

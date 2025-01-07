@@ -205,8 +205,7 @@ auto toLaneletPoses(
 
 auto alternativeLaneletPoses(const LaneletPose & reference_lanelet_pose) -> std::vector<LaneletPose>
 {
-  const auto alternativesInPreviousLanelet =
-    [](const auto & lanelet_pose) -> std::vector<LaneletPose> {
+  const auto alternativesInPreviousLanelet = [](const auto & lanelet_pose) {
     std::vector<LaneletPose> lanelet_poses_in_previous_lanelet;
     for (const auto & previous_lanelet_id :
          lanelet_map::previousLaneletIds(lanelet_pose.lanelet_id)) {
@@ -226,7 +225,7 @@ auto alternativeLaneletPoses(const LaneletPose & reference_lanelet_pose) -> std:
     return lanelet_poses_in_previous_lanelet;
   };
 
-  const auto alternativesInNextLanelet = [](const auto & lanelet_pose) -> std::vector<LaneletPose> {
+  const auto alternativesInNextLanelet = [](const auto & lanelet_pose) {
     std::vector<LaneletPose> lanelet_poses_in_next_lanelet;
     for (const auto & next_lanelet_id : lanelet_map::nextLaneletIds(lanelet_pose.lanelet_id)) {
       const auto lanelet_pose_in_next_lanelet = helper::constructLaneletPose(
@@ -393,8 +392,7 @@ auto matchToLane(
   const double matching_distance, const double reduction_ratio, const RoutingGraphType type)
   -> std::optional<lanelet::Id>
 {
-  const auto absoluteHullPolygon = [&reduction_ratio,
-                                    &bounding_box](const auto & pose) -> lanelet::BasicPolygon2d {
+  const auto absoluteHullPolygon = [&reduction_ratio, &bounding_box](const auto & pose) {
     auto relative_hull = lanelet::matching::Hull2d{
       lanelet::BasicPoint2d{
         bounding_box.center.x + bounding_box.dimensions.x * 0.5 * reduction_ratio,
