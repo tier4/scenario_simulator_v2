@@ -13,8 +13,7 @@
 // limitations under the License.
 
 #include <boost/lexical_cast.hpp>
-#include <concealer/autoware_universe.hpp>
-#include <concealer/field_operator_application_for_autoware_universe.hpp>
+#include <concealer/field_operator_application.hpp>
 #include <functional>
 #include <memory>
 #include <optional>
@@ -58,12 +57,10 @@ auto EgoEntity::makeFieldOperatorApplication(
     // clang-format on
 
     return getParameter<bool>(node_parameters, "launch_autoware", true)
-             ? std::make_unique<
-                 concealer::FieldOperatorApplicationFor<concealer::AutowareUniverse>>(
+             ? std::make_unique<concealer::FieldOperatorApplication>(
                  getParameter<std::string>(node_parameters, "autoware_launch_package"),
                  getParameter<std::string>(node_parameters, "autoware_launch_file"), parameters)
-             : std::make_unique<
-                 concealer::FieldOperatorApplicationFor<concealer::AutowareUniverse>>();
+             : std::make_unique<concealer::FieldOperatorApplication>();
   } else {
     throw common::SemanticError(
       "Unexpected architecture_type ", std::quoted(architecture_type), " was given.");
@@ -112,7 +109,18 @@ auto EgoEntity::getEmergencyStateName() const -> std::string
 }
 auto EgoEntity::getTurnIndicatorsCommandName() const -> std::string
 {
-  return boost::lexical_cast<std::string>(field_operator_application->getTurnIndicatorsCommand());
+  switch (field_operator_application->getTurnIndicatorsCommand().command) {
+    case autoware_vehicle_msgs::msg::TurnIndicatorsCommand::DISABLE:
+      return "DISABLE";
+    case autoware_vehicle_msgs::msg::TurnIndicatorsCommand::ENABLE_LEFT:
+      return "ENABLE_LEFT";
+    case autoware_vehicle_msgs::msg::TurnIndicatorsCommand::ENABLE_RIGHT:
+      return "ENABLE_RIGHT";
+    case autoware_vehicle_msgs::msg::TurnIndicatorsCommand::NO_COMMAND:
+      return "NO_COMMAND";
+    default:
+      return "";
+  }
 }
 
 auto EgoEntity::getCurrentAction() const -> std::string
@@ -145,8 +153,7 @@ auto EgoEntity::getRouteLanelets(double /*unused horizon*/) -> lanelet::Ids
   lanelet::Ids ids{};
 
   if (const auto universe =
-        dynamic_cast<concealer::FieldOperatorApplicationFor<concealer::AutowareUniverse> *>(
-          field_operator_application.get());
+        dynamic_cast<concealer::FieldOperatorApplication *>(field_operator_application.get());
       universe) {
     for (const auto & point : universe->getPathWithLaneId().points) {
       ids += point.lane_ids;
@@ -321,7 +328,6 @@ auto EgoEntity::requestSpeedChange(double value, bool /* continuous */) -> void
     THROW_SEMANTIC_ERROR("You cannot set target speed to the ego vehicle after starting scenario.");
   } else {
     target_speed_ = value;
-    field_operator_application->restrictTargetSpeed(value);
   }
 }
 

@@ -61,7 +61,15 @@ auto canonicalize(
     ss << lanelet_pose;
     THROW_SEMANTIC_ERROR(ss.str(), " has NaN or inf value.");
   } else {
-    return CanonicalizedLaneletPose(lanelet_pose, hdmap_utils_ptr);
+    try {
+      return CanonicalizedLaneletPose(lanelet_pose, hdmap_utils_ptr);
+    } catch (const common::SemanticError & e) {
+      std::ostringstream ss;
+      ss << lanelet_pose;
+      THROW_SEMANTIC_ERROR(
+        "Failed to canonicalize lanelet pose ", std::quoted(ss.str()), ".", "The error message is ",
+        e.what(), ".");
+    }
   }
 }
 

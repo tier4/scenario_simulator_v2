@@ -15,32 +15,46 @@
 #ifndef CONCEALER__AUTOWARE_USER_HPP_
 #define CONCEALER__AUTOWARE_USER_HPP_
 
-// #define CONCEALER_ISOLATE_STANDARD_OUTPUT
-
 #include <sys/wait.h>
 
+#if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)
+#include <autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>
+#endif
+
 #include <autoware_adapi_v1_msgs/msg/mrm_state.hpp>
+#include <autoware_adapi_v1_msgs/srv/change_operation_mode.hpp>
+#include <autoware_adapi_v1_msgs/srv/clear_route.hpp>
+#include <autoware_adapi_v1_msgs/srv/initialize_localization.hpp>
+#include <autoware_adapi_v1_msgs/srv/set_route_points.hpp>
 #include <autoware_control_msgs/msg/control.hpp>
+#include <autoware_system_msgs/msg/autoware_state.hpp>
+#include <autoware_vehicle_msgs/msg/gear_command.hpp>
 #include <autoware_vehicle_msgs/msg/turn_indicators_command.hpp>
-#include <chrono>
-#include <concealer/autoware_stream.hpp>
+#include <concealer/autoware_universe.hpp>
 #include <concealer/launch.hpp>
+#include <concealer/publisher_wrapper.hpp>
+#include <concealer/service_with_validation.hpp>
+#include <concealer/subscriber_wrapper.hpp>
 #include <concealer/task_queue.hpp>
 #include <concealer/transition_assertion.hpp>
 #include <concealer/visibility.hpp>
-#include <exception>
 #include <geometry_msgs/msg/accel.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
-#include <limits>
+#include <geometry_msgs/msg/pose_with_covariance_stamped.hpp>
 #include <rclcpp/rclcpp.hpp>
+#include <tier4_external_api_msgs/msg/emergency.hpp>
+#include <tier4_external_api_msgs/srv/engage.hpp>
+#include <tier4_external_api_msgs/srv/set_velocity_limit.hpp>
+#include <tier4_planning_msgs/msg/path_with_lane_id.hpp>
+#include <tier4_planning_msgs/msg/trajectory.hpp>
+#include <tier4_rtc_msgs/msg/cooperate_status_array.hpp>
+#include <tier4_rtc_msgs/srv/auto_mode_with_module.hpp>
+#include <tier4_rtc_msgs/srv/cooperate_commands.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 #include <utility>
 
 namespace concealer
 {
-template <typename T>
-class FieldOperatorApplicationFor;
-
 /* ---- NOTE -------------------------------------------------------------------
  *
  *  The magic class 'FieldOperatorApplication' is a class that makes it easy to work with
@@ -54,34 +68,74 @@ class FieldOperatorApplicationFor;
  *        initialize, plan, and engage.
  *
  * -------------------------------------------------------------------------- */
-class FieldOperatorApplication : public rclcpp::Node
+struct FieldOperatorApplication : public rclcpp::Node,
+                                  public TransitionAssertion<FieldOperatorApplication>
 {
   std::atomic<bool> is_stop_requested = false;
 
   bool is_autoware_exited = false;
 
-  auto checkAutowareProcess() -> void;
-
-protected:
   const pid_t process_id = 0;
-
-  TaskQueue task_queue;
 
   bool initialize_was_called = false;
 
-  auto stopRequest() noexcept -> void;
+  std::string autoware_state;
 
-  auto isStopRequested() const noexcept -> bool;
+  tier4_rtc_msgs::msg::CooperateStatusArray latest_cooperate_status_array;
 
-  // this method is purely virtual because different Autoware types are killed differently
-  // currently, we are not sure why this is the case so detailed investigation is needed
-  virtual auto sendSIGINT() -> void = 0;
+  std::string minimum_risk_maneuver_state;
 
-  // method called in destructor of a derived class
-  // because it is difficult to differentiate shutting down behavior in destructor of a base class
-  auto shutdownAutoware() -> void;
+  std::string minimum_risk_maneuver_behavior;
 
-public:
+  // clang-format off
+  using AutowareState                   = autoware_system_msgs::msg::AutowareState;
+  using Control                         = autoware_control_msgs::msg::Control;
+  using CooperateStatusArray            = tier4_rtc_msgs::msg::CooperateStatusArray;
+  using Emergency                       = tier4_external_api_msgs::msg::Emergency;
+  using LocalizationInitializationState = autoware_adapi_v1_msgs::msg::LocalizationInitializationState;
+  using MrmState                        = autoware_adapi_v1_msgs::msg::MrmState;
+  using PathWithLaneId                  = tier4_planning_msgs::msg::PathWithLaneId;
+  using Trajectory                      = tier4_planning_msgs::msg::Trajectory;
+  using TurnIndicatorsCommand           = autoware_vehicle_msgs::msg::TurnIndicatorsCommand;
+
+  using ClearRoute                      = autoware_adapi_v1_msgs::srv::ClearRoute;
+  using CooperateCommands               = tier4_rtc_msgs::srv::CooperateCommands;
+  using Engage                          = tier4_external_api_msgs::srv::Engage;
+  using InitializeLocalization          = autoware_adapi_v1_msgs::srv::InitializeLocalization;
+  using SetRoutePoints                  = autoware_adapi_v1_msgs::srv::SetRoutePoints;
+  using AutoModeWithModule              = tier4_rtc_msgs::srv::AutoModeWithModule;
+  using SetVelocityLimit                = tier4_external_api_msgs::srv::SetVelocityLimit;
+  using ChangeOperationMode             = autoware_adapi_v1_msgs::srv::ChangeOperationMode;
+
+  SubscriberWrapper<AutowareState>                   getAutowareState;
+  SubscriberWrapper<Control>                         getCommand;
+  SubscriberWrapper<CooperateStatusArray>            getCooperateStatusArray;
+  SubscriberWrapper<Emergency>                       getEmergencyState;
+#if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)
+  SubscriberWrapper<LocalizationInitializationState> getLocalizationState;
+#endif
+  SubscriberWrapper<MrmState>                        getMrmState;
+  SubscriberWrapper<PathWithLaneId>                  getPathWithLaneId;
+  SubscriberWrapper<Trajectory>                      getTrajectory;
+  SubscriberWrapper<TurnIndicatorsCommand>           getTurnIndicatorsCommand;
+
+  ServiceWithValidation<ClearRoute>                  requestClearRoute;
+  ServiceWithValidation<CooperateCommands>           requestCooperateCommands;
+  ServiceWithValidation<Engage>                      requestEngage;
+  ServiceWithValidation<InitializeLocalization>      requestInitialPose;
+  ServiceWithValidation<SetRoutePoints>              requestSetRoutePoints;
+  ServiceWithValidation<AutoModeWithModule>          requestSetRtcAutoMode;
+  ServiceWithValidation<SetVelocityLimit>            requestSetVelocityLimit;
+  ServiceWithValidation<ChangeOperationMode>         requestEnableAutowareControl;
+  // clang-format on
+
+  /*
+     The task queue must be deconstructed before any services, so it must be
+     the last class data member. (Class data members are constructed in
+     declaration order and deconstructed in reverse order.)
+  */
+  TaskQueue task_queue;
+
   CONCEALER_PUBLIC explicit FieldOperatorApplication(const pid_t = 0);
 
   template <typename... Ts>
@@ -90,78 +144,44 @@ public:
   {
   }
 
-  ~FieldOperatorApplication() override = default;
+  ~FieldOperatorApplication();
 
   auto spinSome() -> void;
 
-  /* ---- NOTE -------------------------------------------------------------------
-   *
-   *  Send an engagement request to Autoware. If Autoware does not have an
-   *  engagement equivalent, this operation can be nop (No operation).
-   *
-   * -------------------------------------------------------------------------- */
-  virtual auto engage() -> void = 0;
+  auto engage() -> void;
 
-  virtual auto engageable() const -> bool = 0;
+  auto engageable() const -> bool;
 
-  virtual auto engaged() const -> bool = 0;
+  auto engaged() const -> bool;
 
-  /* ---- NOTE -------------------------------------------------------------------
-   *
-   *  Send initial_pose to Autoware.
-   *
-   * -------------------------------------------------------------------------- */
-  virtual auto initialize(const geometry_msgs::msg::Pose &) -> void = 0;
+  auto initialize(const geometry_msgs::msg::Pose &) -> void;
 
-  /* ---- NOTE -------------------------------------------------------------------
-   *
-   *  Send the destination and route constraint points to Autoware. The argument
-   *  route is guaranteed to be size 1 or greater, and its last element is the
-   *  destination. When the size of a route is 2 or greater, the non-last element
-   *  is the route constraint. That is, Autoware must go through the element
-   *  points on the given'route' starting at index 0 and stop at index
-   *  route.size() - 1.
-   *
-   * -------------------------------------------------------------------------- */
-  virtual auto plan(const std::vector<geometry_msgs::msg::PoseStamped> &) -> void = 0;
+  auto plan(const std::vector<geometry_msgs::msg::PoseStamped> &) -> void;
 
-  virtual auto clearRoute() -> void = 0;
+  auto clearRoute() -> void;
 
-  virtual auto getAutowareStateName() const -> std::string = 0;
+  auto getAutowareStateName() const { return autoware_state; }
 
-  virtual auto getMinimumRiskManeuverBehaviorName() const -> std::string = 0;
+  auto getMinimumRiskManeuverBehaviorName() const { return minimum_risk_maneuver_behavior; }
 
-  virtual auto getMinimumRiskManeuverStateName() const -> std::string = 0;
+  auto getMinimumRiskManeuverStateName() const { return minimum_risk_maneuver_state; }
 
-  virtual auto getEmergencyStateName() const -> std::string = 0;
+  auto getEmergencyStateName() const { return minimum_risk_maneuver_state; }
 
-  virtual auto getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray = 0;
+  auto getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray;
 
-  /*   */ auto initialized() const noexcept { return initialize_was_called; }
+  auto initialized() const noexcept { return initialize_was_called; }
 
-  virtual auto requestAutoModeForCooperation(const std::string &, bool) -> void = 0;
+  auto requestAutoModeForCooperation(const std::string &, bool) -> void;
 
-  // different autowares accept different initial target speed
-  virtual auto restrictTargetSpeed(double) const -> double = 0;
+  auto rethrow() const { task_queue.rethrow(); }
 
-  virtual auto getTurnIndicatorsCommand() const
-    -> autoware_vehicle_msgs::msg::TurnIndicatorsCommand;
+  auto sendCooperateCommand(const std::string &, const std::string &) -> void;
 
-  virtual auto rethrow() const noexcept(false) -> void;
+  auto setVelocityLimit(double) -> void;
 
-  virtual auto sendCooperateCommand(const std::string &, const std::string &) -> void = 0;
-
-  virtual auto setVelocityLimit(double) -> void = 0;
-
-  virtual auto enableAutowareControl() -> void = 0;
+  auto enableAutowareControl() -> void;
 };
 }  // namespace concealer
-
-namespace autoware_vehicle_msgs::msg
-{
-auto operator<<(std::ostream &, const TurnIndicatorsCommand &) -> std::ostream &;
-
-auto operator>>(std::istream &, TurnIndicatorsCommand &) -> std::istream &;
-}  // namespace autoware_vehicle_msgs::msg
 
 #endif  // CONCEALER__AUTOWARE_USER_HPP_

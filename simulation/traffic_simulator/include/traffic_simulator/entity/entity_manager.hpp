@@ -78,8 +78,8 @@ public:
 
   // global
   /**
-     This function is necessary because the TrafficLights object is created after the EntityManager, 
-     so it can be assigned during the call of the EntityManager constructor. 
+     This function is necessary because the TrafficLights object is created after the EntityManager,
+     so it can be assigned during the call of the EntityManager constructor.
      TrafficLights cannot be created before the EntityManager due to the dependency on HdMapUtils.
    */
   auto setTrafficLights(const std::shared_ptr<TrafficLights> & traffic_lights_ptr) -> void;

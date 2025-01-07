@@ -82,6 +82,10 @@ TEST_F(PoseTest, canonicalize_invalid)
     traffic_simulator::pose::canonicalize(
       traffic_simulator::pose::quietNaNLaneletPose(), hdmap_utils),
     std::runtime_error);
+  EXPECT_THROW(
+    traffic_simulator::pose::canonicalize(
+      traffic_simulator::helper::constructLaneletPose(203, 1000.0, 0.0), hdmap_utils),
+    common::SemanticError);
 }
 
 /**
