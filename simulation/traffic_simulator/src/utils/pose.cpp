@@ -101,7 +101,11 @@ auto toCanonicalizedLaneletPose(const LaneletPose & lanelet_pose)
   if (lanelet_pose == LaneletPose()) {
     return std::nullopt;
   } else {
-    return CanonicalizedLaneletPose(lanelet_pose);
+    try {
+      return CanonicalizedLaneletPose(lanelet_pose);
+    } catch (const common::SemanticError &) {
+      return std::nullopt;
+    }
   }
 }
 
