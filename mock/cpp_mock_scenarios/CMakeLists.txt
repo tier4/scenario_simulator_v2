@@ -56,6 +56,7 @@ if(BUILD_CPP_MOCK_SCENARIOS)
   add_subdirectory(src/spawn)
   add_subdirectory(src/speed_planning)
   add_subdirectory(src/synchronized_action)
+  add_subdirectory(src/traffic_sink)
   add_subdirectory(src/traffic_source)
   # add_subdirectory(src/respawn_ego)
 
