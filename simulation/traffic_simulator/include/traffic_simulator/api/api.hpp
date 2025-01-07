@@ -25,6 +25,7 @@
 #include <traffic_simulator/simulation_clock/simulation_clock.hpp>
 #include <traffic_simulator/traffic/traffic_controller.hpp>
 #include <traffic_simulator/traffic/traffic_source.hpp>
+#include <traffic_simulator/traffic_lights/traffic_lights.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 
 namespace traffic_simulator
@@ -62,11 +63,7 @@ public:
     entity_manager_ptr_(
       std::make_shared<entity::EntityManager>(node, configuration, node_parameters_)),
     traffic_controller_ptr_(std::make_shared<traffic::TrafficController>(
-      entity_manager_ptr_->getHdmapUtils(),
-      [this]() { return entity_manager_ptr_->getEntityNames(); },
-      [this](const auto & entity_name) { return getEntity(entity_name)->getMapPose(); },
-      [this](const auto & entity_name) { return API::despawn(entity_name); },
-      configuration.auto_sink)),
+      entity_manager_ptr_, configuration.auto_sink_entity_types)),
     traffic_lights_ptr_(std::make_shared<TrafficLights>(
       node, entity_manager_ptr_->getHdmapUtils(),
       getParameter<std::string>(node_parameters_, "architecture_type", "awf/universe/20240605"))),
@@ -267,13 +264,6 @@ public:
     const traffic::TrafficSource::Distribution & distribution,
     const bool allow_spawn_outside_lane = false, const bool require_footprint_fitting = false,
     const bool random_orientation = false, std::optional<int> random_seed = std::nullopt) -> void;
-
-  auto getV2ITrafficLights() { return traffic_lights_ptr_->getV2ITrafficLights(); }
-
-  auto getConventionalTrafficLights()
-  {
-    return traffic_lights_ptr_->getConventionalTrafficLights();
-  }
 
 private:
   auto updateTimeInSim() -> bool;
