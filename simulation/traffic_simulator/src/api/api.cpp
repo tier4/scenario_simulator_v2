@@ -94,6 +94,7 @@ auto API::respawn(
 
       entity_manager_ptr_->asFieldOperatorApplication(name).clearRoute();
       entity_manager_ptr_->asFieldOperatorApplication(name).plan({goal_pose});
+      entity_manager_ptr_->asFieldOperatorApplication(name).enableAutowareControl();
       entity_manager_ptr_->asFieldOperatorApplication(name).engage();
     }
   }
@@ -240,7 +241,7 @@ bool API::attachDetectionSensor(
   double object_recognition_delay)
 {
   return attachDetectionSensor(helper::constructDetectionSensorConfiguration(
-    entity_name, getROS2Parameter<std::string>("architecture_type", "awf/universe"), 0.1,
+    entity_name, getROS2Parameter<std::string>("architecture_type", "awf/universe/20240605"), 0.1,
     detection_sensor_range, detect_all_objects_in_range, pos_noise_stddev, random_seed,
     probability_of_lost, object_recognition_delay));
 }
@@ -273,7 +274,8 @@ bool API::attachLidarSensor(
   const helper::LidarType lidar_type)
 {
   return attachLidarSensor(helper::constructLidarConfiguration(
-    lidar_type, entity_name, getROS2Parameter<std::string>("architecture_type", "awf/universe"),
+    lidar_type, entity_name,
+    getROS2Parameter<std::string>("architecture_type", "awf/universe/20240605"),
     lidar_sensor_delay));
 }
 

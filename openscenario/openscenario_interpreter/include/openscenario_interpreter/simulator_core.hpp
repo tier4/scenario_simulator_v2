@@ -385,7 +385,7 @@ public:
           };
 
           // clang-format off
-          configuration.set_architecture_type(core->getROS2Parameter<std::string>("architecture_type", "awf/universe"));
+          configuration.set_architecture_type(core->getROS2Parameter<std::string>("architecture_type", "awf/universe/20240605"));
           configuration.set_entity(entity_ref);
           configuration.set_horizontal_resolution(degree_to_radian(controller.properties.template get<Double>("pointcloudHorizontalResolution", 1.0)));
           configuration.set_lidar_sensor_delay(controller.properties.template get<Double>("pointcloudPublishingDelay"));
@@ -409,7 +409,7 @@ public:
         core->attachDetectionSensor([&]() {
           simulation_api_schema::DetectionSensorConfiguration configuration;
           // clang-format off
-          configuration.set_architecture_type(core->getROS2Parameter<std::string>("architecture_type", "awf/universe"));
+          configuration.set_architecture_type(core->getROS2Parameter<std::string>("architecture_type", "awf/universe/20240605"));
           configuration.set_entity(entity_ref);
           configuration.set_detect_all_objects_in_range(controller.properties.template get<Boolean>("isClairvoyant"));
           configuration.set_object_recognition_delay(controller.properties.template get<Double>("detectedObjectPublishingDelay"));
@@ -426,7 +426,7 @@ public:
         core->attachOccupancyGridSensor([&]() {
           simulation_api_schema::OccupancyGridSensorConfiguration configuration;
           // clang-format off
-          configuration.set_architecture_type(core->getROS2Parameter<std::string>("architecture_type", "awf/universe"));
+          configuration.set_architecture_type(core->getROS2Parameter<std::string>("architecture_type", "awf/universe/20240605"));
           configuration.set_entity(entity_ref);
           configuration.set_filter_by_range(controller.properties.template get<Boolean>("isClairvoyant"));
           configuration.set_height(200);
@@ -441,7 +441,7 @@ public:
         core->attachPseudoTrafficLightDetector([&]() {
           simulation_api_schema::PseudoTrafficLightDetectorConfiguration configuration;
           configuration.set_architecture_type(
-            core->getROS2Parameter<std::string>("architecture_type", "awf/universe"));
+            core->getROS2Parameter<std::string>("architecture_type", "awf/universe/20240605"));
           return configuration;
         }());
 
@@ -562,15 +562,9 @@ public:
       if (const auto observer = core->getEntity(from.name())) {
         if (const auto observed = core->getEntity(to.name())) {
           auto velocity = [](const auto & entity) -> Eigen::Vector3d {
-            auto direction = [](auto orientation) -> Eigen::Vector3d {
-              const auto euler_angle = math::geometry::convertQuaternionToEulerAngle(orientation);
-              const auto r = euler_angle.x;
-              const auto p = euler_angle.y;
-              const auto y = euler_angle.z;
-              return Eigen::Vector3d(
-                std::cos(y) * std::cos(p), std::sin(y) * std::cos(p), std::sin(p));
+            auto direction = [](const auto & q) -> Eigen::Vector3d {
+              return Eigen::Quaternion(q.w, q.x, q.y, q.z) * Eigen::Vector3d::UnitX();
             };
-
             return direction(entity->getMapPose().orientation) * entity->getCurrentTwist().linear.x;
           };
 
@@ -598,7 +592,16 @@ public:
     template <typename... Ts>
     static auto evaluateSpeed(Ts &&... xs)
     {
-      return core->getCurrentTwist(std::forward<decltype(xs)>(xs)...).linear.x;
+      /*
+         The function name "evaluateSpeed" stands for "evaluate SpeedCondition"
+         and is a part used to implement `SpeedCondition::evaluate`.
+         SpeedCondition can be evaluated in three directions: longitudinal,
+         lateral, and vertical, based on the attribute direction. Therefore,
+         please note that this function returns velocity, that is, a vector,
+         rather than speed, contrary to the name "evaluateSpeed".
+      */
+      const auto linear = core->getCurrentTwist(std::forward<decltype(xs)>(xs)...).linear;
+      return Eigen::Vector3d(linear.x, linear.y, linear.z);
     }
 
     template <typename... Ts>

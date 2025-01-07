@@ -28,10 +28,10 @@
 #include <lanelet2_traffic_rules/TrafficRulesFactory.h>
 #include <tf2/LinearMath/Matrix3x3.h>
 
-#include <autoware_auto_mapping_msgs/msg/had_map_bin.hpp>
 #include <autoware_lanelet2_extension/utility/message_conversion.hpp>
 #include <autoware_lanelet2_extension/utility/query.hpp>
 #include <autoware_lanelet2_extension/utility/utilities.hpp>
+#include <autoware_map_msgs/msg/lanelet_map_bin.hpp>
 #include <boost/filesystem.hpp>
 #include <geographic_msgs/msg/geo_point.hpp>
 #include <geometry/spline/catmull_rom_spline.hpp>
@@ -160,7 +160,7 @@ public:
     const traffic_simulator::RoutingGraphType type =
       traffic_simulator::RoutingConfiguration().routing_graph_type) const -> lanelet::Ids;
 
-  auto getHeight(const traffic_simulator_msgs::msg::LaneletPose &) const -> double;
+  auto getAltitude(const traffic_simulator_msgs::msg::LaneletPose &) const -> double;
 
   auto getLaneChangeTrajectory(
     const geometry_msgs::msg::Pose & from,
@@ -204,7 +204,7 @@ public:
 
   auto getLeftLaneletIds(
     const lanelet::Id, const traffic_simulator::RoutingGraphType,
-    const bool include_opposite_direction = true) const -> lanelet::Ids;
+    const bool include_opposite_direction) const -> lanelet::Ids;
 
   auto getLongitudinalDistance(
     const traffic_simulator_msgs::msg::LaneletPose & from_pose,
@@ -269,7 +269,7 @@ public:
 
   auto getRightLaneletIds(
     const lanelet::Id, const traffic_simulator::RoutingGraphType,
-    const bool include_opposite_direction = true) const -> lanelet::Ids;
+    const bool include_opposite_direction) const -> lanelet::Ids;
 
   auto getRightOfWayLaneletIds(const lanelet::Ids &) const
     -> std::unordered_map<lanelet::Id, lanelet::Ids>;
@@ -314,6 +314,8 @@ public:
   auto insertMarkerArray(
     visualization_msgs::msg::MarkerArray &, const visualization_msgs::msg::MarkerArray &) const
     -> void;
+
+  auto isInIntersection(const lanelet::Id) const -> bool;
 
   auto isInLanelet(const lanelet::Id, const double s) const -> bool;
 
@@ -367,18 +369,25 @@ public:
 
   auto toLaneletPoses(
     const geometry_msgs::msg::Pose &, const lanelet::Id, const double matching_distance = 5.0,
-    const bool include_opposite_direction = true,
+    const bool include_opposite_direction = false,
     const traffic_simulator::RoutingGraphType type =
       traffic_simulator::RoutingConfiguration().routing_graph_type) const
     -> std::vector<traffic_simulator_msgs::msg::LaneletPose>;
 
-  auto toMapBin() const -> autoware_auto_mapping_msgs::msg::HADMapBin;
+  auto toMapBin() const -> autoware_map_msgs::msg::LaneletMapBin;
 
   auto toMapPoints(const lanelet::Id, const std::vector<double> & s) const
     -> std::vector<geometry_msgs::msg::Point>;
 
   auto toMapPose(const traffic_simulator_msgs::msg::LaneletPose &, const bool fill_pitch = true)
     const -> geometry_msgs::msg::PoseStamped;
+
+  auto isAltitudeMatching(const double current_altitude, const double target_altitude) const
+    -> bool;
+
+  auto getLaneletAltitude(
+    const lanelet::Id & lanelet_id, const geometry_msgs::msg::Pose & pose,
+    const double matching_distance = 1.0) const -> std::optional<double>;
 
 private:
   /** @defgroup cache
@@ -486,7 +495,7 @@ private:
   auto getVectorFromPose(const geometry_msgs::msg::Pose &, const double magnitude) const
     -> geometry_msgs::msg::Vector3;
 
-  auto mapCallback(const autoware_auto_mapping_msgs::msg::HADMapBin &) const -> void;
+  auto mapCallback(const autoware_map_msgs::msg::LaneletMapBin &) const -> void;
 
   auto overwriteLaneletsCenterline() -> void;
 

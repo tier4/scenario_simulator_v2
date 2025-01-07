@@ -69,8 +69,9 @@ def on_stdout_output(event: launch.Event) -> None:
         if lines[0] == "cpp_scenario:success":
             print(Color.GREEN + "Scenario Succeed" + Color.END)
 
+
 def architecture_types():
-    return ["awf/universe", "awf/universe/20230906", "awf/universe/20240605"]
+    return ["awf/universe/20230906", "awf/universe/20240605"]
 
 
 def default_autoware_launch_package_of(architecture_type):
@@ -79,7 +80,6 @@ def default_autoware_launch_package_of(architecture_type):
             f"architecture_type := {architecture_type} is not supported. Choose one of {architecture_types()}."
         )
     return {
-        "awf/universe": "autoware_launch",
         "awf/universe/20230906": "autoware_launch",
         "awf/universe/20240605": "autoware_launch",
     }[architecture_type]
@@ -91,17 +91,18 @@ def default_autoware_launch_file_of(architecture_type):
             f"architecture_type := {architecture_type} is not supported. Choose one of {architecture_types()}."
         )
     return {
-        "awf/universe": "planning_simulator.launch.xml",
         "awf/universe/20230906": "planning_simulator.launch.xml",
         "awf/universe/20240605": "planning_simulator.launch.xml",
     }[architecture_type]
 
+
 def default_rviz_config_file():
     return Path(get_package_share_directory("traffic_simulator")) / "config/scenario_simulator_v2.rviz"
 
+
 def launch_setup(context, *args, **kwargs):
     # fmt: off
-    architecture_type                   = LaunchConfiguration("architecture_type",                      default="awf/universe/20230906")
+    architecture_type                   = LaunchConfiguration("architecture_type",                      default="awf/universe/20240605")
     autoware_launch_file                = LaunchConfiguration("autoware_launch_file",                   default=default_autoware_launch_file_of(architecture_type.perform(context)))
     autoware_launch_package             = LaunchConfiguration("autoware_launch_package",                default=default_autoware_launch_package_of(architecture_type.perform(context)))
     consider_acceleration_by_road_slope = LaunchConfiguration("consider_acceleration_by_road_slope",    default=False)
@@ -161,7 +162,7 @@ def launch_setup(context, *args, **kwargs):
             {"initialize_duration": initialize_duration},
             {"launch_autoware": launch_autoware},
             {"port": port},
-            {"publish_empty_context" : publish_empty_context},
+            {"publish_empty_context": publish_empty_context},
             {"record": record},
             {"rviz_config": rviz_config},
             {"sensor_model": sensor_model},
@@ -189,13 +190,13 @@ def launch_setup(context, *args, **kwargs):
         return parameters
 
     cpp_scenario_node = Node(
-            package=scenario_package,
-            executable=scenario,
-            name="scenario_node",
-            output="screen",
-            arguments=[("__log_level:=info")],
-            parameters=make_parameters() + [{"use_sim_time": use_sim_time}],
-            )
+        package=scenario_package,
+        executable=scenario,
+        name="scenario_node",
+        output="screen",
+        arguments=[("__log_level:=info")],
+        parameters=make_parameters() + [{"use_sim_time": use_sim_time}],
+    )
     io_handler = OnProcessIO(
         target_action=cpp_scenario_node,
         on_stderr=on_stderr_output,
@@ -243,6 +244,7 @@ def launch_setup(context, *args, **kwargs):
             namespace="simulation",
             name="visualizer",
             output="screen",
+            remappings=[("/simulation/entity/status", "/entity/status")],
         ),
         Node(
             package="rviz2",
@@ -251,10 +253,15 @@ def launch_setup(context, *args, **kwargs):
             output={"stderr": "log", "stdout": "log"},
             condition=IfCondition(launch_rviz),
             arguments=["-d", str(default_rviz_config_file())],
+            remappings=[
+                ("/simulation/lanelet/marker", "/lanelet/marker"),
+                ("/simulation/debug_marker", "/debug_marker"),
+            ],
         ),
         RegisterEventHandler(event_handler=io_handler),
         RegisterEventHandler(event_handler=shutdown_handler),
     ]
+
 
 def generate_launch_description():
     return LaunchDescription([OpaqueFunction(function=launch_setup)])

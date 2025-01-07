@@ -54,6 +54,8 @@ public:
   auto getMapPose() const noexcept -> const geometry_msgs::msg::Pose &;
   auto setMapPose(const geometry_msgs::msg::Pose & pose) -> void;
 
+  auto getAltitude() const -> double;
+
   auto getTwist() const noexcept -> const geometry_msgs::msg::Twist &;
   auto setTwist(const geometry_msgs::msg::Twist & twist) -> void;
   auto setLinearVelocity(double linear_velocity) -> void;

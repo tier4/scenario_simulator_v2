@@ -33,10 +33,9 @@ from scenario_test_runner.shutdown_once import ShutdownOnce
 
 
 def architecture_types():
-    # awf/universe:          autoware_auto_perception_msgs/TrafficSignalArray for traffic lights
     # awf/universe/20230906: autoware_perception_msgs/TrafficSignalArray for traffic lights
     # awf/universe/20240605: autoware_perception_msgs/TrafficLightGroupArray for traffic lights
-    return ["awf/universe", "awf/universe/20230906", "awf/universe/20240605"]
+    return ["awf/universe/20230906", "awf/universe/20240605"]
 
 
 def default_autoware_launch_package_of(architecture_type):
@@ -45,7 +44,6 @@ def default_autoware_launch_package_of(architecture_type):
             f"architecture_type := {architecture_type} is not supported. Choose one of {architecture_types()}."
         )
     return {
-        "awf/universe": "autoware_launch",
         "awf/universe/20230906": "autoware_launch",
         "awf/universe/20240605": "autoware_launch",
     }[architecture_type]
@@ -57,7 +55,6 @@ def default_autoware_launch_file_of(architecture_type):
             f"architecture_type := {architecture_type} is not supported. Choose one of {architecture_types()}."
         )
     return {
-        "awf/universe": "planning_simulator.launch.xml",
         "awf/universe/20230906": "planning_simulator.launch.xml",
         "awf/universe/20240605": "planning_simulator.launch.xml",
     }[architecture_type]
@@ -69,7 +66,7 @@ def default_rviz_config_file():
 
 def launch_setup(context, *args, **kwargs):
     # fmt: off
-    architecture_type                   = LaunchConfiguration("architecture_type",                      default="awf/universe/20230906")
+    architecture_type                   = LaunchConfiguration("architecture_type",                      default="awf/universe/20240605")
     autoware_launch_file                = LaunchConfiguration("autoware_launch_file",                   default=default_autoware_launch_file_of(architecture_type.perform(context)))
     autoware_launch_package             = LaunchConfiguration("autoware_launch_package",                default=default_autoware_launch_package_of(architecture_type.perform(context)))
     consider_acceleration_by_road_slope = LaunchConfiguration("consider_acceleration_by_road_slope",    default=False)
@@ -90,6 +87,8 @@ def launch_setup(context, *args, **kwargs):
     scenario                            = LaunchConfiguration("scenario",                               default=Path("/dev/null"))
     sensor_model                        = LaunchConfiguration("sensor_model",                           default="")
     sigterm_timeout                     = LaunchConfiguration("sigterm_timeout",                        default=8)
+    simulate_localization               = LaunchConfiguration("simulate_localization",                  default=True)
+    speed_condition                     = LaunchConfiguration("speed_condition",                        default="legacy")
     use_sim_time                        = LaunchConfiguration("use_sim_time",                           default=False)
     vehicle_model                       = LaunchConfiguration("vehicle_model",                          default="")
     # fmt: on
@@ -114,6 +113,8 @@ def launch_setup(context, *args, **kwargs):
     print(f"scenario                            := {scenario.perform(context)}")
     print(f"sensor_model                        := {sensor_model.perform(context)}")
     print(f"sigterm_timeout                     := {sigterm_timeout.perform(context)}")
+    print(f"simulate_localization               := {simulate_localization.perform(context)}")
+    print(f"speed_condition                     := {speed_condition.perform(context)}")
     print(f"use_sim_time                        := {use_sim_time.perform(context)}")
     print(f"vehicle_model                       := {vehicle_model.perform(context)}")
 
@@ -138,6 +139,8 @@ def launch_setup(context, *args, **kwargs):
             {"rviz_config": rviz_config},
             {"sensor_model": sensor_model},
             {"sigterm_timeout": sigterm_timeout},
+            {"simulate_localization": simulate_localization},
+            {"speed_condition": speed_condition},
             {"use_sim_time": use_sim_time},
             {"vehicle_model": vehicle_model},
         ]
@@ -176,12 +179,14 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("global_timeout",                      default_value=global_timeout                     ),
         DeclareLaunchArgument("launch_autoware",                     default_value=launch_autoware                    ),
         DeclareLaunchArgument("launch_rviz",                         default_value=launch_rviz                        ),
-        DeclareLaunchArgument("publish_empty_context",               default_value=publish_empty_context              ),
         DeclareLaunchArgument("output_directory",                    default_value=output_directory                   ),
+        DeclareLaunchArgument("publish_empty_context",               default_value=publish_empty_context              ),
         DeclareLaunchArgument("rviz_config",                         default_value=rviz_config                        ),
         DeclareLaunchArgument("scenario",                            default_value=scenario                           ),
         DeclareLaunchArgument("sensor_model",                        default_value=sensor_model                       ),
         DeclareLaunchArgument("sigterm_timeout",                     default_value=sigterm_timeout                    ),
+        DeclareLaunchArgument("simulate_localization",               default_value=simulate_localization              ),
+        DeclareLaunchArgument("speed_condition",                     default_value=speed_condition                      ),
         DeclareLaunchArgument("use_sim_time",                        default_value=use_sim_time                       ),
         DeclareLaunchArgument("vehicle_model",                       default_value=vehicle_model                      ),
         # fmt: on

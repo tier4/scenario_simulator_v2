@@ -20,10 +20,12 @@ namespace cpp_mock_scenarios
 CppScenarioNode::CppScenarioNode(
   const std::string & node_name, const std::string & map_path,
   const std::string & lanelet2_map_file, const std::string & scenario_filename, const bool verbose,
-  const rclcpp::NodeOptions & option)
+  const rclcpp::NodeOptions & option,
+  const std::set<std::uint8_t> & auto_sink_entity_types /*= {}*/)
 : Node(node_name, option),
   api_(
-    this, configure(map_path, lanelet2_map_file, scenario_filename, verbose),
+    this,
+    configure(map_path, lanelet2_map_file, scenario_filename, verbose, auto_sink_entity_types),
     declare_parameter<double>("global_real_time_factor", 1.0),
     declare_parameter<double>("global_frame_rate", 20.0)),
   scenario_filename_(scenario_filename),
@@ -112,7 +114,7 @@ void CppScenarioNode::spawnEgoEntity(
   api_.attachOccupancyGridSensor([this] {
     simulation_api_schema::OccupancyGridSensorConfiguration configuration;
     // clang-format off
-      configuration.set_architecture_type(api_.getROS2Parameter<std::string>("architecture_type", "awf/universe"));
+      configuration.set_architecture_type(api_.getROS2Parameter<std::string>("architecture_type", "awf/universe/20240605"));
       configuration.set_entity("ego");
       configuration.set_filter_by_range(true);
       configuration.set_height(200);
