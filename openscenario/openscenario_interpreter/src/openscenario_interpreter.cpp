@@ -22,6 +22,7 @@
 #include <openscenario_interpreter/syntax/parameter_value_distribution.hpp>
 #include <openscenario_interpreter/syntax/scenario_definition.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
+#include <openscenario_interpreter/syntax/speed_condition.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
 #include <openscenario_interpreter/visualization_buffer.hpp>
 #include <status_monitor/status_monitor.hpp>
@@ -52,6 +53,10 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   DECLARE_PARAMETER(publish_empty_context);
   DECLARE_PARAMETER(record);
   DECLARE_PARAMETER(publish_visualization);
+
+  declare_parameter<std::string>("speed_condition", "legacy");
+  SpeedCondition::compatibility =
+    boost::lexical_cast<Compatibility>(get_parameter("speed_condition").as_string());
 }
 
 Interpreter::~Interpreter() {}
@@ -73,7 +78,6 @@ auto Interpreter::makeCurrentConfiguration() const -> traffic_simulator::Configu
   auto configuration = traffic_simulator::Configuration(
     logic_file.isDirectory() ? logic_file : logic_file.filepath.parent_path());
   {
-    configuration.auto_sink = false;
     configuration.scenario_path = osc_path;
 
     // XXX DIRTY HACK!!!

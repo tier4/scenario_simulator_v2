@@ -58,7 +58,8 @@ auto SpeedCondition::evaluate(const Entities * entities, const Entity & triggeri
 
 auto SpeedCondition::evaluate(
   const Entities * entities, const Entity & triggering_entity,
-  const std::optional<DirectionalDimension> & direction) -> double
+  const std::optional<DirectionalDimension> & direction, const Compatibility compatibility)
+  -> double
 {
   if (const Eigen::Vector3d v = evaluate(entities, triggering_entity); direction) {
     switch (*direction) {
@@ -71,7 +72,13 @@ auto SpeedCondition::evaluate(
         return v.z();
     }
   } else {
-    return v.norm();
+    switch (compatibility) {
+      default:
+      case Compatibility::legacy:
+        return v.x();
+      case Compatibility::standard:
+        return v.norm();
+    }
   }
 }
 
@@ -81,7 +88,7 @@ auto SpeedCondition::evaluate() -> Object
 
   return asBoolean(triggering_entities.apply([&](const auto & triggering_entity) {
     results.push_back(triggering_entity.apply([&](const auto & triggering_entity) {
-      return evaluate(global().entities, triggering_entity, direction);
+      return evaluate(global().entities, triggering_entity, direction, compatibility);
     }));
     return not results.back().size() or std::invoke(rule, results.back(), value).min();
   }));
