@@ -94,6 +94,8 @@ TEST_F(PoseTest, canonicalize_invalid)
     traffic_simulator::pose::toCanonicalizedLaneletPose(
       traffic_simulator::pose::quietNaNLaneletPose()),
     std::runtime_error);
+  EXPECT_FALSE(traffic_simulator::pose::toCanonicalizedLaneletPose(
+    traffic_simulator::helper::constructLaneletPose(203, 1000.0, 0.0)));
 }
 
 /**

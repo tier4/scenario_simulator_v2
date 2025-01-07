@@ -25,6 +25,7 @@ namespace concealer
 template <typename Autoware>
 struct TransitionAssertion
 {
+protected:
   const std::chrono::steady_clock::time_point start;
 
   const std::chrono::seconds initialize_duration;
@@ -42,16 +43,16 @@ struct TransitionAssertion
 
 #define DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(STATE)                                     \
   template <typename Thunk = void (*)(), typename Interval = std::chrono::seconds>      \
-  auto waitForAutowareStateToBe##STATE(                                                 \
+  auto waitForAutowareStateToBe_##STATE(                                                \
     Thunk && thunk = [] {}, Interval interval = std::chrono::seconds(1))                \
   {                                                                                     \
-    for (thunk(); not static_cast<const Autoware &>(*this).isStopRequested() and        \
-                  not static_cast<const Autoware &>(*this).is##STATE();                 \
+    for (thunk(); not static_cast<const Autoware &>(*this).is_stop_requested.load() and \
+                  static_cast<const Autoware &>(*this).autoware_state != #STATE;        \
          rclcpp::GenericRate<std::chrono::steady_clock>(interval).sleep()) {            \
       if (                                                                              \
         have_never_been_engaged and                                                     \
         start + initialize_duration <= std::chrono::steady_clock::now()) {              \
-        const auto state = static_cast<const Autoware &>(*this).getAutowareStateName(); \
+        const auto state = static_cast<const Autoware &>(*this).autoware_state;         \
         throw common::AutowareError(                                                    \
           "Simulator waited for the Autoware state to transition to " #STATE            \
           ", but time is up. The current Autoware state is ",                           \
@@ -60,19 +61,19 @@ struct TransitionAssertion
         thunk();                                                                        \
       }                                                                                 \
     }                                                                                   \
-    if constexpr (std::string_view(#STATE) == std::string_view("Driving")) {            \
+    if constexpr (std::string_view(#STATE) == std::string_view("DRIVING")) {            \
       have_never_been_engaged = false;                                                  \
     }                                                                                   \
   }                                                                                     \
   static_assert(true)
 
-  DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(Initializing);
-  DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(WaitingForRoute);
-  DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(Planning);
-  DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(WaitingForEngage);
-  DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(Driving);
-  DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(ArrivedGoal);
-  DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(Finalizing);
+  DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(INITIALIZING);
+  DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(WAITING_FOR_ROUTE);
+  DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(PLANNING);
+  DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(WAITING_FOR_ENGAGE);
+  DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(DRIVING);
+  DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(ARRIVED_GOAL);
+  DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(FINALIZING);
 
 #undef DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE
 };
