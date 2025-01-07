@@ -283,10 +283,10 @@ public:
             return lane_changes.value().first - lane_changes.value().second;
           }
         }
-        throw common::Error(
-          "Failed to evaluate lateral relative lanes between ", from_entity_name, " and ",
-          to_entity_name);
       }
+      throw common::Error(
+        "Failed to evaluate lateral relative lanes between ", from_entity_name, " and ",
+        to_entity_name);
     }
   };
 
