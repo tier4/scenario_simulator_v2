@@ -245,10 +245,11 @@ public:
     if (const auto & vertices = polyline_trajectory.shape.vertices; not vertices.empty()) {
       std::stringstream waypoint_details;
       waypoint_details << "Currently followed waypoint: ";
-      const auto first_waypoint_with_arrival_time_specified = std::find_if(
-        vertices.cbegin(), vertices.cend(),
-        [](const auto & vertex) { return not std::isnan(vertex.time); });
-      if (first_waypoint_with_arrival_time_specified != vertices.cend()) {
+
+      if (const auto first_waypoint_with_arrival_time_specified = std::find_if(
+            vertices.cbegin(), vertices.cend(),
+            [](const auto & vertex) { return not std::isnan(vertex.time); });
+          first_waypoint_with_arrival_time_specified != vertices.cend()) {
         waypoint_details << "[" << first_waypoint_with_arrival_time_specified->position.position.x
                          << ", " << first_waypoint_with_arrival_time_specified->position.position.y
                          << "] with specified time equal to "
