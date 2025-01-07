@@ -45,7 +45,7 @@ auto borderlinePoses() -> std::vector<std::pair<lanelet::Id, Pose>>
       LaneletPose lanelet_pose;
       lanelet_pose.lanelet_id = lanelet_id;
       lanelet_pose.s = lanelet_map::laneletLength(lanelet_id);
-      borderline_poses.push_back({lanelet_id, pose::toMapPose(lanelet_pose)});
+      borderline_poses.emplace_back(lanelet_id, pose::toMapPose(lanelet_pose));
     }
   }
   return borderline_poses;

@@ -1985,6 +1985,15 @@ TEST_F(HdMapUtilsTest_IntersectionMap, getLongitudinalDistance_laneChange)
 }
 
 /**
+ * @note Test for isInIntersection function
+ */
+TEST_F(HdMapUtilsTest_IntersectionMap, isInIntersection)
+{
+  EXPECT_TRUE(traffic_simulator::lanelet_wrapper::lanelet_map::isInIntersection(662));
+  EXPECT_FALSE(traffic_simulator::lanelet_wrapper::lanelet_map::isInIntersection(574));
+}
+
+/**
  * @note Test basic functionality.
  * Test obtaining stop line ids correctness with a route that has no stop lines.
  */
