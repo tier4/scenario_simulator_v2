@@ -78,7 +78,7 @@ auto FollowWaypointController::roundTimeToFullStepsWithTolerance(
       " large and the predicted time exceeds the range.");
   } else {
     const auto number_of_steps_source = static_cast<std::size_t>(remaining_time_source / step_time);
-    const double remaining_time = number_of_steps_source * step_time;
+    const double remaining_time = static_cast<double>(number_of_steps_source) * step_time;
     if (const double time_difference =
           (remaining_time_source / step_time) - (remaining_time / step_time);
         time_difference > 1.0 - time_tolerance) {
@@ -309,7 +309,8 @@ auto FollowWaypointController::getAcceleration(
   std::optional<double> best_acceleration = std::nullopt;
 
   for (std::size_t i = 0UL; i <= number_of_acceleration_candidates; ++i) {
-    const double candidate_acceleration = local_min_acceleration + i * step_acceleration;
+    const double candidate_acceleration =
+      local_min_acceleration + static_cast<double>(i) * step_acceleration;
 
     if (const auto predicted_state_opt = getPredictedStopStateWithoutConsideringTime(
           candidate_acceleration, remaining_distance, acceleration, speed);
@@ -426,7 +427,7 @@ auto FollowWaypointController::getAcceleration(
           (local_max_acceleration - local_min_acceleration) / number_of_acceleration_candidates;
         step_acceleration > local_epsilon) {
       for (std::size_t i = 1UL; i < number_of_acceleration_candidates; ++i) {
-        considerCandidate(local_min_acceleration + i * step_acceleration);
+        considerCandidate(local_min_acceleration + static_cast<double>(i) * step_acceleration);
       }
     }
 
