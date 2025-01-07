@@ -21,6 +21,14 @@ Changelog for package openscenario_visualization
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+7.4.3 (2025-01-07)
+------------------
+* Merge branch 'master' into tmp/pc-patch
+* Contributors: Kotaro Yoshimoto
+
+7.4.2 (2025-01-07)
+------------------
+
 7.4.1 (2024-12-24)
 ------------------
 * Merge remote-tracking branch 'origin/master' into fix/canonicalize_function
