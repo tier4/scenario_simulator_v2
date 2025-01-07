@@ -231,7 +231,7 @@ public:
     max_acceleration_rate{behavior_parameter.dynamic_constraints.max_acceleration_rate},
     max_deceleration{behavior_parameter.dynamic_constraints.max_deceleration},
     max_deceleration_rate{behavior_parameter.dynamic_constraints.max_deceleration_rate},
-    target_speed{target_speed.has_value() ? target_speed.value() : max_speed}
+    target_speed{target_speed.value_or(max_speed)}
   {
   }
 
