@@ -35,9 +35,26 @@ auto isInLanelet(const lanelet::Id lanelet_id, const Point point) -> bool
     LaneletWrapper::map()->laneletLayer.get(lanelet_id), lanelet::BasicPoint2d(point.x, point.y));
 }
 
+auto isInIntersection(const lanelet::Id lanelet_id) -> bool
+{
+  return LaneletWrapper::map()->laneletLayer.get(lanelet_id).hasAttribute("turn_direction");
+}
+
 auto laneletLength(const lanelet::Id lanelet_id) -> double
 {
   return LaneletWrapper::laneletLengthCache().getLength(lanelet_id, LaneletWrapper::map());
+}
+
+auto laneletAltitude(
+  const lanelet::Id & lanelet_id, const geometry_msgs::msg::Pose & pose,
+  const double matching_distance) -> std::optional<double>
+{
+  if (const auto spline = centerPointsSpline(lanelet_id)) {
+    if (const auto s = spline->getSValue(pose, matching_distance)) {
+      return spline->getPoint(s.value()).z;
+    }
+  }
+  return std::nullopt;
 }
 
 auto laneletIds() -> lanelet::Ids
@@ -79,17 +96,17 @@ auto nearbyLaneletIds(
   auto excludeSubtypeLanelets =
     [](
       const std::vector<std::pair<double, lanelet::Lanelet>> & pair_distance_lanelet,
-      const char subtype[]) -> std::vector<std::pair<double, lanelet::Lanelet>> {
-    std::vector<std::pair<double, lanelet::Lanelet>> filtered_lanelets;
-    for (const auto & pair : pair_distance_lanelet) {
-      if (
-        pair.second.hasAttribute(lanelet::AttributeName::Subtype) &&
-        pair.second.attribute(lanelet::AttributeName::Subtype).value() != subtype) {
-        filtered_lanelets.push_back(pair);
+      const char subtype[]) {
+      std::vector<std::pair<double, lanelet::Lanelet>> filtered_lanelets;
+      for (const auto & pair : pair_distance_lanelet) {
+        if (
+          pair.second.hasAttribute(lanelet::AttributeName::Subtype) &&
+          pair.second.attribute(lanelet::AttributeName::Subtype).value() != subtype) {
+          filtered_lanelets.push_back(pair);
+        }
       }
-    }
-    return filtered_lanelets;
-  };
+      return filtered_lanelets;
+    };
 
   auto nearest_lanelets = lanelet::geometry::findNearest(
     LaneletWrapper::map()->laneletLayer, lanelet::BasicPoint2d(point.x, point.y),
@@ -167,7 +184,7 @@ auto nextLaneletIds(const lanelet::Ids & lanelet_ids, const RoutingGraphType typ
 }
 
 auto nextLaneletIds(
-  const lanelet::Id lanelet_id, const std::string & turn_direction, const RoutingGraphType type)
+  const lanelet::Id lanelet_id, std::string_view turn_direction, const RoutingGraphType type)
   -> lanelet::Ids
 {
   lanelet::Ids next_lanelet_ids;
@@ -182,7 +199,7 @@ auto nextLaneletIds(
 }
 
 auto nextLaneletIds(
-  const lanelet::Ids & lanelet_ids, const std::string & turn_direction, const RoutingGraphType type)
+  const lanelet::Ids & lanelet_ids, std::string_view turn_direction, const RoutingGraphType type)
   -> lanelet::Ids
 {
   std::set<lanelet::Id> next_lanelet_ids_set;
@@ -216,7 +233,7 @@ auto previousLaneletIds(const lanelet::Ids & lanelet_ids, const RoutingGraphType
 }
 
 auto previousLaneletIds(
-  const lanelet::Id lanelet_id, const std::string & turn_direction, const RoutingGraphType type)
+  const lanelet::Id lanelet_id, std::string_view turn_direction, const RoutingGraphType type)
   -> lanelet::Ids
 {
   lanelet::Ids previous_lanelet_ids;
@@ -231,7 +248,7 @@ auto previousLaneletIds(
 }
 
 auto previousLaneletIds(
-  const lanelet::Ids & lanelet_ids, const std::string & turn_direction, const RoutingGraphType type)
+  const lanelet::Ids & lanelet_ids, std::string_view turn_direction, const RoutingGraphType type)
   -> lanelet::Ids
 {
   std::set<lanelet::Id> previous_lanelet_ids_set;

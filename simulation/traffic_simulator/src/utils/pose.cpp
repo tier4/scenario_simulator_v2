@@ -102,7 +102,11 @@ auto toCanonicalizedLaneletPose(const LaneletPose & lanelet_pose)
   if (lanelet_pose == LaneletPose()) {
     return std::nullopt;
   } else {
-    return CanonicalizedLaneletPose(lanelet_pose);
+    try {
+      return CanonicalizedLaneletPose(lanelet_pose);
+    } catch (const common::SemanticError &) {
+      return std::nullopt;
+    }
   }
 }
 
@@ -133,17 +137,6 @@ auto toCanonicalizedLaneletPose(
   } else {
     return std::nullopt;
   }
-}
-
-auto toCanonicalizedLaneletPose(
-  const geometry_msgs::msg::Point & map_point,
-  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, const bool include_crosswalk,
-  const double matching_distance) -> std::optional<CanonicalizedLaneletPose>
-{
-  return toCanonicalizedLaneletPose(
-    geometry_msgs::build<geometry_msgs::msg::Pose>().position(map_point).orientation(
-      geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0).y(0).z(0).w(1)),
-    bounding_box, include_crosswalk, matching_distance);
 }
 
 auto toCanonicalizedLaneletPose(
@@ -181,6 +174,14 @@ auto transformRelativePoseToGlobal(
 }
 
 // Relative msg::Pose
+auto isAltitudeMatching(
+  const CanonicalizedLaneletPose & lanelet_pose,
+  const CanonicalizedLaneletPose & target_lanelet_pose) -> bool
+{
+  return lanelet_wrapper::pose::isAltitudeWithinThreshold(
+    lanelet_pose.getAltitude(), target_lanelet_pose.getAltitude());
+}
+
 auto relativePose(const geometry_msgs::msg::Pose & from, const geometry_msgs::msg::Pose & to)
   -> std::optional<geometry_msgs::msg::Pose>
 {
@@ -229,7 +230,7 @@ auto relativeLaneletPose(
   const RoutingConfiguration & routing_configuration) -> LaneletPose
 {
   constexpr bool include_adjacent_lanelet{false};
-  constexpr bool include_opposite_direction{true};
+  constexpr bool include_opposite_direction{false};
 
   LaneletPose position = quietNaNLaneletPose();
   // here the s and offset are intentionally assigned independently, even if

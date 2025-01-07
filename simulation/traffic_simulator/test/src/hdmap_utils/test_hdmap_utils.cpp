@@ -1899,9 +1899,11 @@ TEST_F(HdMapUtilsTest_StandardMap, getLongitudinalDistance_differentLanelet)
 TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLongitudinalDistance_differentLaneletNoRoute)
 {
   const auto pose_to = traffic_simulator::lanelet_wrapper::pose::toLaneletPose(
-    makePose(makePoint(81590.79, 50067.66), makeQuaternionFromYaw(90.0)), lanelet::Id{3002185});
+    makePose(makePoint(81590.79, 50067.66, 35.0), makeQuaternionFromYaw(90.0)),
+    lanelet::Id{3002185});
   const auto pose_from = traffic_simulator::lanelet_wrapper::pose::toLaneletPose(
-    makePose(makePoint(81596.20, 50068.04), makeQuaternionFromYaw(90.0)), lanelet::Id{3002166});
+    makePose(makePoint(81596.20, 50068.04, 35.0), makeQuaternionFromYaw(90.0)),
+    lanelet::Id{3002166});
   ASSERT_TRUE(pose_from.has_value());
   ASSERT_TRUE(pose_to.has_value());
 
@@ -2013,6 +2015,15 @@ TEST_F(HdMapUtilsTest_IntersectionMap, getLongitudinalDistance_laneChange)
     ASSERT_TRUE(with_lane_change.has_value());
     EXPECT_NEAR(with_lane_change.value(), 253.0, 1.0);
   }
+}
+
+/**
+ * @note Test for isInIntersection function
+ */
+TEST_F(HdMapUtilsTest_IntersectionMap, isInIntersection)
+{
+  EXPECT_TRUE(traffic_simulator::lanelet_wrapper::lanelet_map::isInIntersection(662));
+  EXPECT_FALSE(traffic_simulator::lanelet_wrapper::lanelet_map::isInIntersection(574));
 }
 
 /**

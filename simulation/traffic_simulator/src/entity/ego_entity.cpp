@@ -13,8 +13,7 @@
 // limitations under the License.
 
 #include <boost/lexical_cast.hpp>
-#include <concealer/autoware_universe.hpp>
-#include <concealer/field_operator_application_for_autoware_universe.hpp>
+#include <concealer/field_operator_application.hpp>
 #include <functional>
 #include <memory>
 #include <optional>
@@ -54,15 +53,14 @@ auto EgoEntity::makeFieldOperatorApplication(
     parameters.push_back("use_foa:=false");
     parameters.push_back("perception/enable_traffic_light:=" + std::string(architecture_type >= "awf/universe/20230906" ? "true" : "false"));
     parameters.push_back("use_sim_time:=" + std::string(getParameter<bool>(node_parameters, "use_sim_time", false) ? "true" : "false"));
+    parameters.push_back("localization_sim_mode:=" + std::string(getParameter<bool>(node_parameters, "simulate_localization") ? "api" : "pose_twist_estimator"));
     // clang-format on
 
     return getParameter<bool>(node_parameters, "launch_autoware", true)
-             ? std::make_unique<
-                 concealer::FieldOperatorApplicationFor<concealer::AutowareUniverse>>(
+             ? std::make_unique<concealer::FieldOperatorApplication>(
                  getParameter<std::string>(node_parameters, "autoware_launch_package"),
                  getParameter<std::string>(node_parameters, "autoware_launch_file"), parameters)
-             : std::make_unique<
-                 concealer::FieldOperatorApplicationFor<concealer::AutowareUniverse>>();
+             : std::make_unique<concealer::FieldOperatorApplication>();
   } else {
     throw common::SemanticError(
       "Unexpected architecture_type ", std::quoted(architecture_type), " was given.");
@@ -116,8 +114,7 @@ auto EgoEntity::getRouteLanelets(double /*unused horizon*/) -> lanelet::Ids
   lanelet::Ids ids{};
 
   if (const auto universe =
-        dynamic_cast<concealer::FieldOperatorApplicationFor<concealer::AutowareUniverse> *>(
-          field_operator_application.get());
+        dynamic_cast<concealer::FieldOperatorApplication *>(field_operator_application.get());
       universe) {
     for (const auto & point : universe->getPathWithLaneId().points) {
       ids += point.lane_ids;
@@ -276,7 +273,6 @@ auto EgoEntity::requestSpeedChange(double value, bool /* continuous */) -> void
     THROW_SEMANTIC_ERROR("You cannot set target speed to the ego vehicle after starting scenario.");
   } else {
     target_speed_ = value;
-    field_operator_application->restrictTargetSpeed(value);
   }
 }
 

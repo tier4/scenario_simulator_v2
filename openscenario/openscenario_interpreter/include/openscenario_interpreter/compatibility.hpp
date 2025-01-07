@@ -12,26 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CONCEALER__HAS_DATA_MEMBER_OPTION_HPP_
-#define CONCEALER__HAS_DATA_MEMBER_OPTION_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__COMPATIBILITY_HPP_
+#define OPENSCENARIO_INTERPRETER__COMPATIBILITY_HPP_
 
-#include <type_traits>
+#include <iostream>
 
-namespace concealer
+namespace openscenario_interpreter
 {
-template <typename T, typename = void>
-struct has_data_member_option : public std::false_type
-{
+enum class Compatibility {
+  legacy,
+  standard,
 };
 
-template <typename T>
-struct has_data_member_option<T, std::void_t<decltype(std::declval<T>().option)>>
-: public std::true_type
-{
-};
+auto operator>>(std::istream &, Compatibility &) -> std::istream &;
+}  // namespace openscenario_interpreter
 
-template <typename... Ts>
-inline constexpr auto has_data_member_option_v = has_data_member_option<Ts...>::value;
-}  // namespace concealer
-
-#endif  // CONCEALER__HAS_DATA_MEMBER_OPTION_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__COMPATIBILITY_HPP_

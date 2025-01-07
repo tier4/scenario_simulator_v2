@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <lanelet2_core/primitives/Primitive.h>
 #include <lanelet2_core/utility/Units.h>
 #include <lanelet2_io/Io.h>
 #include <lanelet2_io/io_handlers/Serialize.h>

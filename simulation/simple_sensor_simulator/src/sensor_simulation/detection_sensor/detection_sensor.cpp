@@ -19,6 +19,8 @@
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
+#include <geometry/quaternion/get_angle_difference.hpp>
+#include <geometry/quaternion/get_normal_vector.hpp>
 #include <geometry/quaternion/get_rotation_matrix.hpp>
 #include <geometry/vector3/hypot.hpp>
 #include <memory>
@@ -59,6 +61,51 @@ auto DetectionSensorBase::findEgoEntityStatusToWhichThisSensorIsAttached(
     return iter;
   } else {
     throw SimulationRuntimeError("Detection sensor can be attached only ego entity.");
+  }
+}
+
+auto DetectionSensorBase::isOnOrAboveEgoPlane(
+  const geometry_msgs::Pose & entity_pose, const geometry_msgs::Pose & ego_pose) -> bool
+{
+  /*
+      The threshold for detecting significant changes in ego vehicle's orientation (unit: radian).
+      The value determines the minimum angular difference required to consider the ego orientation
+      as "changed".
+
+      There is no technical basis for this value, it was determined based on experiments.
+  */
+  constexpr static double rotation_threshold_ = 0.04;
+  /*
+      Maximum downward offset in Z-axis relative to the ego position (unit: meter).
+      If the NPC is lower than this offset relative to the ego position,
+      the NPC will be excluded from detection
+
+      There is no technical basis for this value, it was determined based on experiments.
+  */
+  constexpr static double max_downward_z_offset_ = 1.0;
+
+  const auto hasEgoOrientationChanged = [this](const geometry_msgs::msg::Pose & ego_pose_ros) {
+    return math::geometry::getAngleDifference(
+             ego_pose_ros.orientation, ego_plane_pose_opt_->orientation) > rotation_threshold_;
+  };
+
+  // if other entity is at the same altitude as Ego or within max_downward_z_offset_ below Ego
+  if (entity_pose.position().z() >= (ego_pose.position().z() - max_downward_z_offset_)) {
+    return true;
+    // otherwise check if other entity is above ego plane
+  } else {
+    // update ego plane if needed
+    geometry_msgs::msg::Pose ego_pose_ros;
+    simulation_interface::toMsg(ego_pose, ego_pose_ros);
+    if (!ego_plane_opt_ || !ego_plane_pose_opt_ || hasEgoOrientationChanged(ego_pose_ros)) {
+      ego_plane_opt_.emplace(
+        ego_pose_ros.position, math::geometry::getNormalVector(ego_pose_ros.orientation));
+      ego_plane_pose_opt_ = ego_pose_ros;
+    }
+
+    geometry_msgs::msg::Pose entity_pose_ros;
+    simulation_interface::toMsg(entity_pose, entity_pose_ros);
+    return ego_plane_opt_->offset(entity_pose_ros.position) >= 0.0;
   }
 }
 
@@ -321,6 +368,7 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
     auto is_in_range = [&](const auto & status) {
       return not isEgoEntityStatusToWhichThisSensorIsAttached(status) and
              distance(status.pose(), ego_entity_status->pose()) <= configuration_.range() and
+             isOnOrAboveEgoPlane(status.pose(), ego_entity_status->pose()) and
              (configuration_.detect_all_objects_in_range() or
               std::find(
                 lidar_detected_entities.begin(), lidar_detected_entities.end(), status.name()) !=
