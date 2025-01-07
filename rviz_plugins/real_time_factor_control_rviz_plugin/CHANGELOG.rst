@@ -21,6 +21,9 @@ Changelog for package real_time_factor_control_rviz_plugin
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+7.4.2 (2025-01-07)
+------------------
+
 7.4.1 (2024-12-24)
 ------------------
 * Merge remote-tracking branch 'origin/master' into fix/canonicalize_function
