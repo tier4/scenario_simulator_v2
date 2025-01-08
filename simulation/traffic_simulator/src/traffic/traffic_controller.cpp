@@ -37,10 +37,10 @@ namespace traffic_simulator
 namespace traffic
 {
 TrafficController::TrafficController(
-  const std::function<void(const std::string &)> & despawn_function,
+  const std::function<void(const std::string &)> & despawn,
   const std::shared_ptr<entity::EntityManager> entity_manager_ptr,
   const std::set<std::uint8_t> auto_sink_entity_types)
-: despawn_function_(despawn_function), entity_manager_ptr_(entity_manager_ptr), modules_()
+: despawn_(despawn), entity_manager_ptr_(entity_manager_ptr), modules_()
 {
   if (not auto_sink_entity_types.empty()) {
     appendAutoSinks(auto_sink_entity_types);
@@ -60,7 +60,7 @@ auto TrafficController::appendAutoSinks(const std::set<std::uint8_t> & auto_sink
       const auto pose = pose::toMapPose(lanelet_pose, hdmap_utils_ptr);
       const auto traffic_sink_config = TrafficSinkConfig(
         sink_radius, pose.position, auto_sink_entity_types, std::make_optional(lanelet_id));
-      addModule<TrafficSink>(despawn_function_, entity_manager_ptr_, traffic_sink_config);
+      addModule<TrafficSink>(despawn_, entity_manager_ptr_, traffic_sink_config);
     }
   }
 }

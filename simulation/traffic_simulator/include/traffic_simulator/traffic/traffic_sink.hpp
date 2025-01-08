@@ -96,7 +96,7 @@ public:
 private:
   auto isEntitySinkable(const std::string & entity_name) const noexcept(false) -> bool;
 
-  const std::function<void(const std::string &)> despawn_function_;
+  const std::function<void(const std::string &)> despawn_;
   const std::shared_ptr<entity::EntityManager> entity_manager_ptr_;
   const TrafficSinkConfig config_;
 };
