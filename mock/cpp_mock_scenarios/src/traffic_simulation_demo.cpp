@@ -57,7 +57,7 @@ private:
     }
     const auto ego_entity = api_.getEntity("ego");
     const auto npc2_entity = api_.getEntity("npc2");
-    if (ego_entity->isInPosition(
+    if (ego_entity->isNearbyPosition(
           traffic_simulator::helper::constructCanonicalizedLaneletPose(
             34615, 10.0, 0.0, api_.getHdmapUtils()),
           5)) {
@@ -68,7 +68,7 @@ private:
         npc2_entity->requestSpeedChange(13, true);
       }
     }
-    if (ego_entity->isInPosition(
+    if (ego_entity->isNearbyPosition(
           traffic_simulator::helper::constructCanonicalizedLaneletPose(
             34579, 0.0, 0.0, api_.getHdmapUtils()),
           5)) {
@@ -79,7 +79,7 @@ private:
         npc2_entity->requestSpeedChange(3, true);
       }
     }
-    if (npc2_entity->isInPosition(
+    if (npc2_entity->isNearbyPosition(
           traffic_simulator::helper::constructCanonicalizedLaneletPose(
             34513, 0.0, 0.0, api_.getHdmapUtils()),
           5)) {

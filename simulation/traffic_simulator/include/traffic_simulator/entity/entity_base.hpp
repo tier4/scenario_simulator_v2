@@ -128,10 +128,10 @@ public:
 
   /*   */ auto isStopped() const -> bool;
 
-  /*   */ auto isInPosition(const geometry_msgs::msg::Pose & pose, const double tolerance) const
+  /*   */ auto isNearbyPosition(const geometry_msgs::msg::Pose & pose, const double tolerance) const
     -> bool;
 
-  /*   */ auto isInPosition(
+  /*   */ auto isNearbyPosition(
     const CanonicalizedLaneletPose & lanelet_pose, const double tolerance) const -> bool;
 
   /*   */ auto isInLanelet() const -> bool { return status_->isInLanelet(); };
