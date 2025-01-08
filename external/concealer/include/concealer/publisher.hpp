@@ -20,22 +20,40 @@
 
 namespace concealer
 {
-template <typename Message>
+template <typename>
+struct NormalDistribution
+{
+  template <typename... Ts>
+  explicit NormalDistribution(Ts &&...)
+  {
+  }
+
+  template <typename T>
+  auto operator()(T && x) const -> decltype(auto)
+  {
+    return std::forward<decltype(x)>(x);
+  }
+};
+
+template <typename Message, template <typename> typename Randomizer = NormalDistribution>
 class Publisher
 {
   typename rclcpp::Publisher<Message>::SharedPtr publisher;
 
+  Randomizer<Message> randomize;
+
 public:
   template <typename Node>
   explicit Publisher(const std::string & topic, Node & node)
-  : publisher(node.template create_publisher<Message>(topic, rclcpp::QoS(1).reliable()))
+  : publisher(node.template create_publisher<Message>(topic, rclcpp::QoS(1).reliable())),
+    randomize(topic)
   {
   }
 
   template <typename... Ts>
-  auto operator()(Ts &&... xs) const -> decltype(auto)
+  auto operator()(Ts &&... xs) -> decltype(auto)
   {
-    return publisher->publish(std::forward<decltype(xs)>(xs)...);
+    return publisher->publish(randomize(std::forward<decltype(xs)>(xs)...));
   }
 };
 }  // namespace concealer
