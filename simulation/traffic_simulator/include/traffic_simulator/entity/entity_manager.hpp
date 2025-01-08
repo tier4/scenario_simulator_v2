@@ -55,7 +55,6 @@ public:
     const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node_parameters)
   : configuration_(configuration),
     clock_ptr_(node->get_clock()),
-    node_topics_interface(rclcpp::node_interfaces::get_node_topics_interface(node)),
     node_parameters_(node_parameters),
     broadcaster_(node),
     base_link_broadcaster_(node),
@@ -227,8 +226,6 @@ private:
   /* */ Configuration configuration_;
 
   const rclcpp::Clock::SharedPtr clock_ptr_;
-
-  const rclcpp::node_interfaces::NodeTopicsInterface::SharedPtr node_topics_interface;
 
   const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr node_parameters_;
 
