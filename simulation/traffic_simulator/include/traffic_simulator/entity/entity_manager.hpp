@@ -239,9 +239,9 @@ private:
 
   /* */ std::unordered_map<std::string, std::shared_ptr<entity::EntityBase>> entities_;
 
-  /* */ bool npc_logic_started_ = false;
+  /* */ bool npc_logic_started_{false};
 
-  /* */ std::shared_ptr<TrafficLights> traffic_lights_ptr_ = nullptr;
+  /* */ std::shared_ptr<TrafficLights> traffic_lights_ptr_{nullptr};
 
   const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
 
