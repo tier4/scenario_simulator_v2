@@ -22,6 +22,7 @@
 #include <openscenario_interpreter/syntax/parameter_value_distribution.hpp>
 #include <openscenario_interpreter/syntax/scenario_definition.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
+#include <openscenario_interpreter/syntax/speed_condition.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
 #include <status_monitor/status_monitor.hpp>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
@@ -49,6 +50,10 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   DECLARE_PARAMETER(output_directory);
   DECLARE_PARAMETER(publish_empty_context);
   DECLARE_PARAMETER(record);
+
+  declare_parameter<std::string>("speed_condition", "legacy");
+  SpeedCondition::compatibility =
+    boost::lexical_cast<Compatibility>(get_parameter("speed_condition").as_string());
 }
 
 Interpreter::~Interpreter() {}
@@ -65,7 +70,6 @@ auto Interpreter::currentScenarioDefinition() const -> const std::shared_ptr<Sce
 
 auto Interpreter::makeCurrentConfiguration() const -> traffic_simulator::Configuration
 {
-  constexpr bool auto_sink{false};
   const auto logic_file = currentScenarioDefinition()->road_network.logic_file;
   const auto is_directly_lanelet2_map_file =
     not logic_file.isDirectory() and logic_file.filepath.extension() == ".osm";
@@ -75,9 +79,9 @@ auto Interpreter::makeCurrentConfiguration() const -> traffic_simulator::Configu
   // XXX DIRTY HACK!!!
   if (is_directly_lanelet2_map_file) {
     return traffic_simulator::Configuration(
-      map_files_path, logic_file.filepath.filename().string(), osc_path, auto_sink);
+      map_files_path, logic_file.filepath.filename().string(), osc_path);
   } else {
-    return traffic_simulator::Configuration(map_files_path, osc_path, auto_sink);
+    return traffic_simulator::Configuration(map_files_path, osc_path);
   }
 }
 

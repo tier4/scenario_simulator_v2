@@ -67,6 +67,18 @@ auto toMapPose(const LaneletPose & lanelet_pose, const bool fill_pitch) -> PoseS
   }
 }
 
+auto isAltitudeWithinThreshold(const double current_altitude, const double target_altitude) -> bool
+{
+  return std::abs(current_altitude - target_altitude) <= ALTITUDE_THRESHOLD;
+}
+
+auto isAltitudeWithinRange(
+  const double current_altitude, const double min_altitude, const double max_altitude) -> bool
+{
+  return (current_altitude >= (min_altitude - ALTITUDE_THRESHOLD)) &&
+         (current_altitude <= (max_altitude + ALTITUDE_THRESHOLD));
+}
+
 auto toLaneletPose(
   const Pose & map_pose, const lanelet::Id lanelet_id, const double matching_distance)
   -> std::optional<LaneletPose>
@@ -76,10 +88,12 @@ auto toLaneletPose(
   if (const auto lanelet_pose_s = lanelet_spline->getSValue(map_pose, matching_distance);
       !lanelet_pose_s) {
     return std::nullopt;
+  } else if (const auto pose_on_centerline = lanelet_spline->getPose(lanelet_pose_s.value());
+             !isAltitudeWithinThreshold(map_pose.position.z, pose_on_centerline.position.z)) {
+    return std::nullopt;
   } else {
-    const auto lanelet_quaternion = lanelet_spline->getPose(lanelet_pose_s.value()).orientation;
     if (const auto lanelet_pose_rpy = math::geometry::convertQuaternionToEulerAngle(
-          math::geometry::getRotation(lanelet_quaternion, map_pose.orientation));
+          math::geometry::getRotation(pose_on_centerline.orientation, map_pose.orientation));
         std::fabs(lanelet_pose_rpy.z) > M_PI * yaw_threshold &&
         std::fabs(lanelet_pose_rpy.z) < M_PI * (1 - yaw_threshold)) {
       return std::nullopt;
@@ -184,8 +198,7 @@ auto toLaneletPoses(
 
 auto alternativeLaneletPoses(const LaneletPose & reference_lanelet_pose) -> std::vector<LaneletPose>
 {
-  const auto alternativesInPreviousLanelet =
-    [](const auto & lanelet_pose) -> std::vector<LaneletPose> {
+  const auto alternativesInPreviousLanelet = [](const auto & lanelet_pose) {
     std::vector<LaneletPose> lanelet_poses_in_previous_lanelet;
     for (const auto & previous_lanelet_id :
          lanelet_map::previousLaneletIds(lanelet_pose.lanelet_id)) {
@@ -205,7 +218,7 @@ auto alternativeLaneletPoses(const LaneletPose & reference_lanelet_pose) -> std:
     return lanelet_poses_in_previous_lanelet;
   };
 
-  const auto alternativesInNextLanelet = [](const auto & lanelet_pose) -> std::vector<LaneletPose> {
+  const auto alternativesInNextLanelet = [](const auto & lanelet_pose) {
     std::vector<LaneletPose> lanelet_poses_in_next_lanelet;
     for (const auto & next_lanelet_id : lanelet_map::nextLaneletIds(lanelet_pose.lanelet_id)) {
       const auto lanelet_pose_in_next_lanelet = helper::constructLaneletPose(
@@ -372,8 +385,7 @@ auto matchToLane(
   const double matching_distance, const double reduction_ratio, const RoutingGraphType type)
   -> std::optional<lanelet::Id>
 {
-  const auto absoluteHullPolygon = [&reduction_ratio,
-                                    &bounding_box](const auto & pose) -> lanelet::BasicPolygon2d {
+  const auto absoluteHullPolygon = [&reduction_ratio, &bounding_box](const auto & pose) {
     auto relative_hull = lanelet::matching::Hull2d{
       lanelet::BasicPoint2d{
         bounding_box.center.x + bounding_box.dimensions.x * 0.5 * reduction_ratio,

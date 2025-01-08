@@ -193,12 +193,18 @@ auto splineDistanceToBoundingBox(
   const double width_extension_left, const double length_extension_front,
   const double length_extension_rear) -> std::optional<double>
 {
-  const auto polygon = math::geometry::transformPoints(
-    static_cast<geometry_msgs::msg::Pose>(pose),
-    math::geometry::getPointsFromBbox(
-      bounding_box, width_extension_right, width_extension_left, length_extension_front,
-      length_extension_rear));
-  return spline.getCollisionPointIn2D(polygon, false);
+  constexpr bool search_backward{false};
+  const auto [min_range, max_range] = spline.getAltitudeRange();
+  if (lanelet_wrapper::pose::isAltitudeWithinRange(pose.getAltitude(), min_range, max_range)) {
+    const auto polygon = math::geometry::transformPoints(
+      static_cast<geometry_msgs::msg::Pose>(pose),
+      math::geometry::getPointsFromBbox(
+        bounding_box, width_extension_right, width_extension_left, length_extension_front,
+        length_extension_rear));
+    return spline.getCollisionPointIn2D(polygon, search_backward);
+  } else {
+    return std::nullopt;
+  }
 }
 
 // Bounds
