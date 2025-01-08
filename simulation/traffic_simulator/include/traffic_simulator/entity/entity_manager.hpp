@@ -53,7 +53,7 @@ public:
   explicit EntityManager(
     NodeT && node, const Configuration & configuration,
     const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node_parameters)
-  : configuration(configuration),
+  : configuration_(configuration),
     clock_ptr_(node->get_clock()),
     node_topics_interface(rclcpp::node_interfaces::get_node_topics_interface(node)),
     node_parameters_(node_parameters),
@@ -224,7 +224,7 @@ public:
   auto getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &;
 
 private:
-  /* */ Configuration configuration;
+  /* */ Configuration configuration_;
 
   const rclcpp::Clock::SharedPtr clock_ptr_;
 
