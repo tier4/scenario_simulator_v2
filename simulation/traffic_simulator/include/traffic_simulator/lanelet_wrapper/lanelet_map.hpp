@@ -28,10 +28,16 @@ auto isInLanelet(const lanelet::Id lanelet_id, const double lanelet_pose_s) -> b
 
 auto isInLanelet(const lanelet::Id lanelet_id, const Point point) -> bool;
 
+auto isInIntersection(const lanelet::Id) -> bool;
+
 auto laneletLength(const lanelet::Id lanelet_id) -> double;
 
 auto laneletYaw(const lanelet::Id lanelet_id, const Point & point)
   -> std::tuple<double, Point, Point>;
+
+auto laneletAltitude(
+  const lanelet::Id & lanelet_id, const geometry_msgs::msg::Pose & pose,
+  const double matching_distance) -> std::optional<double>;
 
 template <typename Lanelet>
 auto laneletIds(const std::vector<Lanelet> & lanelets) -> lanelet::Ids
@@ -68,11 +74,11 @@ auto nextLaneletIds(
   const RoutingGraphType type = RoutingConfiguration().routing_graph_type) -> lanelet::Ids;
 
 auto nextLaneletIds(
-  const lanelet::Id lanelet_id, const std::string & turn_direction,
+  const lanelet::Id lanelet_id, std::string_view turn_direction,
   const RoutingGraphType type = RoutingConfiguration().routing_graph_type) -> lanelet::Ids;
 
 auto nextLaneletIds(
-  const lanelet::Ids & lanelet_ids, const std::string & turn_direction,
+  const lanelet::Ids & lanelet_ids, std::string_view turn_direction,
   const RoutingGraphType type = RoutingConfiguration().routing_graph_type) -> lanelet::Ids;
 
 // Previous lanelet
@@ -85,11 +91,11 @@ auto previousLaneletIds(
   const RoutingGraphType type = RoutingConfiguration().routing_graph_type) -> lanelet::Ids;
 
 auto previousLaneletIds(
-  const lanelet::Id lanelet_id, const std::string & turn_direction,
+  const lanelet::Id lanelet_id, std::string_view turn_direction,
   const RoutingGraphType type = RoutingConfiguration().routing_graph_type) -> lanelet::Ids;
 
 auto previousLaneletIds(
-  const lanelet::Ids & lanelet_ids, const std::string & turn_direction,
+  const lanelet::Ids & lanelet_ids, std::string_view turn_direction,
   const RoutingGraphType type = RoutingConfiguration().routing_graph_type) -> lanelet::Ids;
 
 // Bounds

@@ -480,6 +480,15 @@ TEST_F(LaneletWrapperTest_StandardMap, getLaneletLength_cache)
 }
 
 /**
+ * @note Test for isInIntersection function
+ */
+TEST_F(LaneletWrapperTest_IntersectionMap, isInIntersection)
+{
+  EXPECT_TRUE(lanelet_map::isInIntersection(662));
+  EXPECT_FALSE(lanelet_map::isInIntersection(574));
+}
+
+/**
  * @note Test basic functionality.
  * Test obtaining stop line ids correctness with a route that has no stop lines.
  */

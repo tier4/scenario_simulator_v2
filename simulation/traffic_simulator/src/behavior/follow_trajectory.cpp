@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #include <arithmetic/floating_point/comparison.hpp>
-#include <geometry/quaternion/euler_to_quaternion.hpp>
+#include <geometry/quaternion/direction_to_quaternion.hpp>
 #include <geometry/quaternion/get_rotation.hpp>
 #include <geometry/quaternion/quaternion_to_euler.hpp>
 #include <geometry/vector3/hypot.hpp>
@@ -62,25 +62,39 @@ auto makeUpdatedStatus(
   using math::geometry::operator+=;
 
   using math::geometry::CatmullRomSpline;
+  using math::geometry::convertDirectionToQuaternion;
   using math::geometry::hypot;
   using math::geometry::innerProduct;
   using math::geometry::norm;
   using math::geometry::normalize;
   using math::geometry::truncate;
 
+  constexpr bool include_crosswalk{false};
+  constexpr bool include_adjacent_lanelet{false};
+  constexpr bool include_opposite_direction{false};
+  constexpr bool allow_lane_change{true};
+
   auto distance_along_lanelet =
     [&](const geometry_msgs::msg::Point & from, const geometry_msgs::msg::Point & to) -> double {
-    if (const auto from_canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
-          from, entity_status.bounding_box, false, matching_distance);
-        from_canonicalized_lanelet_pose) {
-      if (const auto to_canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
-            to, entity_status.bounding_box, false, matching_distance);
-          to_canonicalized_lanelet_pose) {
-        if (const auto distance = distance::longitudinalDistance(
-              from_canonicalized_lanelet_pose.value(), to_canonicalized_lanelet_pose.value(), false,
-              false, RoutingConfiguration());
-            distance) {
-          return distance.value();
+    using geometry_msgs::msg::Pose;
+    using geometry_msgs::msg::Vector3;
+
+    const auto quaternion = convertDirectionToQuaternion(
+      geometry_msgs::build<Vector3>().x(to.x - from.x).y(to.y - from.y).z(to.z - from.z));
+    const auto from_pose = geometry_msgs::build<Pose>().position(from).orientation(quaternion);
+    if (
+      const auto from_canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
+        from_pose, entity_status.bounding_box, include_crosswalk, matching_distance)) {
+      const auto to_pose = geometry_msgs::build<Pose>().position(to).orientation(quaternion);
+      if (
+        const auto to_canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
+          to_pose, entity_status.bounding_box, include_crosswalk, matching_distance)) {
+        if (
+          const auto longitudinal_distance = distance::longitudinalDistance(
+            from_canonicalized_lanelet_pose.value(), to_canonicalized_lanelet_pose.value(),
+            include_adjacent_lanelet, include_opposite_direction,
+            RoutingConfiguration(allow_lane_change))) {
+          return longitudinal_distance.value();
         }
       }
     }
@@ -563,12 +577,7 @@ auto makeUpdatedStatus(
         return entity_status.pose.orientation;
       } else {
         // if there is a designed_velocity vector, set the orientation in the direction of it
-        const geometry_msgs::msg::Vector3 direction =
-          geometry_msgs::build<geometry_msgs::msg::Vector3>()
-            .x(0.0)
-            .y(std::atan2(-desired_velocity.z, std::hypot(desired_velocity.x, desired_velocity.y)))
-            .z(std::atan2(desired_velocity.y, desired_velocity.x));
-        return math::geometry::convertEulerAngleToQuaternion(direction);
+        return convertDirectionToQuaternion(desired_velocity);
       }
     }();
 

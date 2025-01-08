@@ -10,16 +10,7 @@ OpenSCENARIO:
     revMajor: 1
     revMinor: 0
   ParameterDeclarations:
-    ParameterDeclaration:
-      - name: random_offset
-        parameterType: double
-        value: $(ros2 run openscenario_interpreter_example uniform_distribution -1.0 1.0)
-        ConstraintGroup:
-          - ValueConstraint:
-            - rule: lessOrEqual
-              value: 1.0
-            - rule: greaterOrEqual
-              value: -1.0
+    ParameterDeclaration: []
   CatalogLocations:
     VehicleCatalog:
       Directory:
@@ -54,7 +45,7 @@ OpenSCENARIO:
                       roadId: ''
                       laneId: LANE_ID
                       s: 1
-                      offset: $random_offset
+                      offset: 0
                       Orientation:
                         type: relative
                         h: 0
