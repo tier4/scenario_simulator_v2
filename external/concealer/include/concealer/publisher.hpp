@@ -15,7 +15,8 @@
 #ifndef CONCEALER__PUBLISHER_HPP_
 #define CONCEALER__PUBLISHER_HPP_
 
-#include <memory>
+#include <nav_msgs/msg/odometry.hpp>
+#include <random>
 #include <rclcpp/rclcpp.hpp>
 
 namespace concealer
@@ -33,6 +34,32 @@ struct NormalDistribution
   {
     return std::forward<decltype(x)>(x);
   }
+};
+
+template <>
+struct NormalDistribution<nav_msgs::msg::Odometry>
+{
+  std::random_device::result_type seed;
+
+  std::random_device device;
+
+  std::default_random_engine engine;
+
+  std::uniform_real_distribution<double> position_x, position_y, position_z, orientation_r,
+    orientation_p, orientation_y, linear_x, linear_y, linear_z, angular_x, angular_y, angular_z;
+
+  template <typename T>
+  auto getParameter(const std::string & name, T value = {})
+  {
+    auto node = rclcpp::Node("normal_distribution", "simulation");
+    node.declare_parameter<T>(name, value);
+    node.get_parameter<T>(name, value);
+    return value;
+  }
+
+  explicit NormalDistribution(const std::string &);
+
+  auto operator()(nav_msgs::msg::Odometry odometry) -> nav_msgs::msg::Odometry;
 };
 
 template <typename Message, template <typename> typename Randomizer = NormalDistribution>
