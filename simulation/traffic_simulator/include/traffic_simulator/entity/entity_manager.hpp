@@ -65,8 +65,6 @@ public:
     lanelet_marker_pub_ptr_(rclcpp::create_publisher<MarkerArray>(
       node, "lanelet/marker", LaneletMarkerQoS(),
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
-    npc_logic_started_(false),
-    traffic_lights_ptr_(nullptr),
     hdmap_utils_ptr_(std::make_shared<hdmap_utils::HdMapUtils>(
       configuration.lanelet2_map_path(), getOrigin(node_parameters))),
     markers_raw_(hdmap_utils_ptr_->generateMarker())
@@ -244,9 +242,9 @@ private:
 
   /* */ std::unordered_map<std::string, std::shared_ptr<entity::EntityBase>> entities_;
 
-  /* */ bool npc_logic_started_;
+  /* */ bool npc_logic_started_ = false;
 
-  /* */ std::shared_ptr<TrafficLights> traffic_lights_ptr_;
+  /* */ std::shared_ptr<TrafficLights> traffic_lights_ptr_ = nullptr;
 
   const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
 
