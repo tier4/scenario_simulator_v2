@@ -116,7 +116,7 @@ public:
     using MiscObjectParameters = traffic_simulator_msgs::msg::MiscObjectParameters;
 
     auto register_to_entity_manager = [&]() {
-      if constexpr (std::is_same<ParamsType, VehicleParameters>::value) {
+      if constexpr (std::is_same_v<ParamsType, VehicleParameters>) {
         if (behavior == VehicleBehavior::autoware()) {
           return entity_manager_ptr_->spawnEntity<entity::EgoEntity>(
             name, pose, parameters, getCurrentTime(), configuration_, node_parameters_);
@@ -125,11 +125,11 @@ public:
             name, pose, parameters, getCurrentTime(),
             behavior.empty() ? VehicleBehavior::defaultBehavior() : behavior);
         }
-      } else if constexpr (std::is_same<ParamsType, PedestrianParameters>::value) {
+      } else if constexpr (std::is_same_v<ParamsType, PedestrianParameters>) {
         return entity_manager_ptr_->spawnEntity<entity::PedestrianEntity>(
           name, pose, parameters, getCurrentTime(),
           behavior.empty() ? PedestrianBehavior::defaultBehavior() : behavior);
-      } else if constexpr (std::is_same<ParamsType, MiscObjectParameters>::value) {
+      } else if constexpr (std::is_same_v<ParamsType, MiscObjectParameters>) {
         return entity_manager_ptr_->spawnEntity<entity::MiscObjectEntity>(
           name, pose, parameters, getCurrentTime());
       } else {
@@ -149,16 +149,16 @@ public:
       if (configuration_.standalone_mode) {
         return true;
       } else {
-        if constexpr (std::is_same<ParamsType, VehicleParameters>::value) {
+        if constexpr (std::is_same_v<ParamsType, VehicleParameters>) {
           simulation_api_schema::SpawnVehicleEntityRequest reqest;
           reqest.set_is_ego(behavior == VehicleBehavior::autoware());
           /// @todo Should be filled from function API
           reqest.set_initial_speed(0.0);
           return prepare_and_send_request(entity, reqest);
-        } else if constexpr (std::is_same<ParamsType, PedestrianParameters>::value) {
+        } else if constexpr (std::is_same_v<ParamsType, PedestrianParameters>) {
           simulation_api_schema::SpawnPedestrianEntityRequest reqest;
           return prepare_and_send_request(entity, reqest);
-        } else if constexpr (std::is_same<ParamsType, MiscObjectParameters>::value) {
+        } else if constexpr (std::is_same_v<ParamsType, MiscObjectParameters>) {
           simulation_api_schema::SpawnMiscObjectEntityRequest reqest;
           return prepare_and_send_request(entity, reqest);
         } else {
