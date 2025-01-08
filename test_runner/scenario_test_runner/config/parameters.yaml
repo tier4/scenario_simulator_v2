@@ -1,0 +1,25 @@
+simulation:
+  normal_distribution:
+    ros__parameters:
+      /localization/kinematic_state:
+        seed: 0 # If 0 is specified, a random seed value will be generated for each run.
+        pose:
+          pose:
+            position:
+              x: { mean: 0.0, standard_deviation: 0.0 }
+              y: { mean: 0.0, standard_deviation: 0.0 }
+              z: { mean: 0.0, standard_deviation: 0.0 }
+            orientation:
+              r: { mean: 0.0, standard_deviation: 0.0 }
+              p: { mean: 0.0, standard_deviation: 0.0 }
+              y: { mean: 0.0, standard_deviation: 0.0 }
+        twist:
+          twist:
+            linear:
+              x: { mean: 0.0, standard_deviation: 0.0 }
+              y: { mean: 0.0, standard_deviation: 0.0 }
+              z: { mean: 0.0, standard_deviation: 0.0 }
+            angular:
+              x: { mean: 0.0, standard_deviation: 0.0 }
+              y: { mean: 0.0, standard_deviation: 0.0 }
+              z: { mean: 0.0, standard_deviation: 0.0 }
