@@ -1,7 +1,10 @@
 simulation:
-  normal_distribution:
+  AutowareUniverse:
     ros__parameters:
       /localization/kinematic_state:
+        type:
+          name: nav_msgs::msg::Odometry
+          version: 1
         seed: 0 # If 0 is specified, a random seed value will be generated for each run.
         pose:
           pose:

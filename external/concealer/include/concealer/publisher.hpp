@@ -42,6 +42,8 @@ struct NormalDistribution;
 template <>
 struct NormalDistribution<nav_msgs::msg::Odometry>
 {
+  int version;
+
   std::random_device::result_type seed;
 
   std::random_device device;
@@ -51,16 +53,8 @@ struct NormalDistribution<nav_msgs::msg::Odometry>
   std::uniform_real_distribution<double> position_x, position_y, position_z, orientation_r,
     orientation_p, orientation_y, linear_x, linear_y, linear_z, angular_x, angular_y, angular_z;
 
-  template <typename T>
-  auto getParameter(const std::string & name, T value = {})
-  {
-    auto node = rclcpp::Node("normal_distribution", "simulation");
-    node.declare_parameter<T>(name, value);
-    node.get_parameter<T>(name, value);
-    return value;
-  }
-
-  explicit NormalDistribution(const std::string &);
+  explicit NormalDistribution(
+    const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr &, const std::string &);
 
   auto operator()(nav_msgs::msg::Odometry odometry) -> nav_msgs::msg::Odometry;
 };
@@ -76,7 +70,7 @@ public:
   template <typename Node>
   explicit Publisher(const std::string & topic, Node & node)
   : publisher(node.template create_publisher<Message>(topic, rclcpp::QoS(1).reliable())),
-    randomize(topic)
+    randomize(node.get_node_parameters_interface(), topic)
   {
   }
 
