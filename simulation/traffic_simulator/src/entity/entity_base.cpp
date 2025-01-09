@@ -95,16 +95,16 @@ auto EntityBase::getCanonicalizedLaneletPose(const double matching_distance) con
     matching_distance, hdmap_utils_ptr_);
 }
 
-auto EntityBase::isInPosition(const geometry_msgs::msg::Pose & pose, const double tolerance) const
-  -> bool
+auto EntityBase::isNearbyPosition(
+  const geometry_msgs::msg::Pose & pose, const double tolerance) const -> bool
 {
   return math::geometry::getDistance(getMapPose(), pose) < tolerance;
 }
 
-auto EntityBase::isInPosition(
+auto EntityBase::isNearbyPosition(
   const CanonicalizedLaneletPose & lanelet_pose, const double tolerance) const -> bool
 {
-  return isInPosition(static_cast<geometry_msgs::msg::Pose>(lanelet_pose), tolerance);
+  return isNearbyPosition(static_cast<geometry_msgs::msg::Pose>(lanelet_pose), tolerance);
 }
 
 auto EntityBase::isInLanelet(const lanelet::Id lanelet_id, std::optional<double> tolerance) const
@@ -765,7 +765,7 @@ auto EntityBase::requestSynchronize(
   }
 
   ///@brief Check if the entity has already arrived to the target lanelet.
-  if (isInPosition(entity_target, tolerance)) {
+  if (isNearbyPosition(entity_target, tolerance)) {
     if (getCurrentTwist().linear.x < target_speed + getMaxAcceleration() * step_time_) {
     } else {
       RCLCPP_WARN_ONCE(

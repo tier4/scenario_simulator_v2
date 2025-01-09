@@ -80,14 +80,14 @@ private:
   void update()
   {
     const auto entity = getEntity("ego");
-    if (entity->isInPosition(
+    if (entity->isNearbyPosition(
       traffic_simulator::helper::constructLaneletPose(34615, 10.0), 5))
     {
       api_.requestAcquirePosition("ego",
         traffic_simulator::helper::constructLaneletPose(35026, 0.0) );
       api_.setTargetSpeed("npc2", 13, true);
     }
-    if (entity->isInPosition(
+    if (entity->isNearbyPosition(
       traffic_simulator::helper::constructLaneletPose(34579, 0.0), 5))
     {
       api_.setTargetSpeed("npc2", 3, true);
