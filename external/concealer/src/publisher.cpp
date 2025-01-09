@@ -32,61 +32,57 @@ auto getParameter(
 NormalDistribution<nav_msgs::msg::Odometry>::NormalDistribution(
   const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node,
   const std::string & topic)
-: version([&]() {
-    switch (const auto version = getParameter<int>(node, topic + ".type.version"); version) {
-      case 1:
-        return version;
-      default:
-        throw common::Error(
-          "An unexpected message version ", version, " was specified for topic ",
-          std::quoted(topic));
-    }
-  }()),
-  seed(getParameter<int>(node, topic + ".seed")),
+: seed(getParameter<int>(node, topic + ".seed")),
   engine(seed ? seed : device()),
   position_x(
-    getParameter<double>(node, topic + ".pose.pose.position.x.mean"),
-    getParameter<double>(node, topic + ".pose.pose.position.x.standard_deviation")),
+    getParameter<double>(node, topic + ".nav_msgs::msg::Odometry.pose.pose.position.x.mean"),
+    getParameter<double>(
+      node, topic + ".nav_msgs::msg::Odometry.pose.pose.position.x.standard_deviation")),
   position_y(
-    getParameter<double>(node, topic + ".pose.pose.position.y.mean"),
-    getParameter<double>(node, topic + ".pose.pose.position.y.standard_deviation")),
+    getParameter<double>(node, topic + ".nav_msgs::msg::Odometry.pose.pose.position.y.mean"),
+    getParameter<double>(
+      node, topic + ".nav_msgs::msg::Odometry.pose.pose.position.y.standard_deviation")),
   position_z(
-    getParameter<double>(node, topic + ".pose.pose.position.z.mean"),
-    getParameter<double>(node, topic + ".pose.pose.position.z.standard_deviation")),
+    getParameter<double>(node, topic + ".nav_msgs::msg::Odometry.pose.pose.position.z.mean"),
+    getParameter<double>(
+      node, topic + ".nav_msgs::msg::Odometry.pose.pose.position.z.standard_deviation")),
   orientation_r(
-    getParameter<double>(node, topic + ".pose.pose.orientation.r.mean"),
-    getParameter<double>(node, topic + ".pose.pose.orientation.r.standard_deviation")),
+    getParameter<double>(node, topic + ".nav_msgs::msg::Odometry.pose.pose.orientation.r.mean"),
+    getParameter<double>(
+      node, topic + ".nav_msgs::msg::Odometry.pose.pose.orientation.r.standard_deviation")),
   orientation_p(
-    getParameter<double>(node, topic + ".pose.pose.orientation.p.mean"),
-    getParameter<double>(node, topic + ".pose.pose.orientation.p.standard_deviation")),
+    getParameter<double>(node, topic + ".nav_msgs::msg::Odometry.pose.pose.orientation.p.mean"),
+    getParameter<double>(
+      node, topic + ".nav_msgs::msg::Odometry.pose.pose.orientation.p.standard_deviation")),
   orientation_y(
-    getParameter<double>(node, topic + ".pose.pose.orientation.y.mean"),
-    getParameter<double>(node, topic + ".pose.pose.orientation.y.standard_deviation")),
+    getParameter<double>(node, topic + ".nav_msgs::msg::Odometry.pose.pose.orientation.y.mean"),
+    getParameter<double>(
+      node, topic + ".nav_msgs::msg::Odometry.pose.pose.orientation.y.standard_deviation")),
   linear_x(
-    getParameter<double>(node, topic + ".twist.twist.linear.x.mean"),
-    getParameter<double>(node, topic + ".twist.twist.linear.x.standard_deviation")),
+    getParameter<double>(node, topic + ".nav_msgs::msg::Odometry.twist.twist.linear.x.mean"),
+    getParameter<double>(
+      node, topic + ".nav_msgs::msg::Odometry.twist.twist.linear.x.standard_deviation")),
   linear_y(
-    getParameter<double>(node, topic + ".twist.twist.linear.y.mean"),
-    getParameter<double>(node, topic + ".twist.twist.linear.y.standard_deviation")),
+    getParameter<double>(node, topic + ".nav_msgs::msg::Odometry.twist.twist.linear.y.mean"),
+    getParameter<double>(
+      node, topic + ".nav_msgs::msg::Odometry.twist.twist.linear.y.standard_deviation")),
   linear_z(
-    getParameter<double>(node, topic + ".twist.twist.linear.z.mean"),
-    getParameter<double>(node, topic + ".twist.twist.linear.z.standard_deviation")),
+    getParameter<double>(node, topic + ".nav_msgs::msg::Odometry.twist.twist.linear.z.mean"),
+    getParameter<double>(
+      node, topic + ".nav_msgs::msg::Odometry.twist.twist.linear.z.standard_deviation")),
   angular_x(
-    getParameter<double>(node, topic + ".twist.twist.angular.x.mean"),
-    getParameter<double>(node, topic + ".twist.twist.angular.x.standard_deviation")),
+    getParameter<double>(node, topic + ".nav_msgs::msg::Odometry.twist.twist.angular.x.mean"),
+    getParameter<double>(
+      node, topic + ".nav_msgs::msg::Odometry.twist.twist.angular.x.standard_deviation")),
   angular_y(
-    getParameter<double>(node, topic + ".twist.twist.angular.y.mean"),
-    getParameter<double>(node, topic + ".twist.twist.angular.y.standard_deviation")),
+    getParameter<double>(node, topic + ".nav_msgs::msg::Odometry.twist.twist.angular.y.mean"),
+    getParameter<double>(
+      node, topic + ".nav_msgs::msg::Odometry.twist.twist.angular.y.standard_deviation")),
   angular_z(
-    getParameter<double>(node, topic + ".twist.twist.angular.z.mean"),
-    getParameter<double>(node, topic + ".twist.twist.angular.z.standard_deviation"))
+    getParameter<double>(node, topic + ".nav_msgs::msg::Odometry.twist.twist.angular.z.mean"),
+    getParameter<double>(
+      node, topic + ".nav_msgs::msg::Odometry.twist.twist.angular.z.standard_deviation"))
 {
-  if (const auto name = getParameter<std::string>(node, topic + ".type.name");
-      name != "nav_msgs::msg::Odometry") {
-    throw common::Error(
-      "An unexpected message type ", std::quoted(name), " was specified for topic ",
-      std::quoted(topic));
-  }
 }
 
 auto NormalDistribution<nav_msgs::msg::Odometry>::operator()(nav_msgs::msg::Odometry odometry)

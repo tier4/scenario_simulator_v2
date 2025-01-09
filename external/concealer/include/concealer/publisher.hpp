@@ -42,8 +42,6 @@ struct NormalDistribution;
 template <>
 struct NormalDistribution<nav_msgs::msg::Odometry>
 {
-  int version;
-
   std::random_device::result_type seed;
 
   std::random_device device;

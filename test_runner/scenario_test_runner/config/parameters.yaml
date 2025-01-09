@@ -2,27 +2,26 @@ simulation:
   AutowareUniverse:
     ros__parameters:
       /localization/kinematic_state:
-        type:
-          name: nav_msgs::msg::Odometry
-          version: 1
+        version: 20240605 # architecture_type suffix (mandatory)
         seed: 0 # If 0 is specified, a random seed value will be generated for each run.
-        pose:
+        nav_msgs::msg::Odometry:
           pose:
-            position:
-              x: { mean: 0.0, standard_deviation: 0.0 }
-              y: { mean: 0.0, standard_deviation: 0.0 }
-              z: { mean: 0.0, standard_deviation: 0.0 }
-            orientation:
-              r: { mean: 0.0, standard_deviation: 0.0 }
-              p: { mean: 0.0, standard_deviation: 0.0 }
-              y: { mean: 0.0, standard_deviation: 0.0 }
-        twist:
+            pose:
+              position:
+                x: { mean: 0.0, standard_deviation: 0.0 }
+                y: { mean: 0.0, standard_deviation: 0.0 }
+                z: { mean: 0.0, standard_deviation: 0.0 }
+              orientation:
+                r: { mean: 0.0, standard_deviation: 0.0 }
+                p: { mean: 0.0, standard_deviation: 0.0 }
+                y: { mean: 0.0, standard_deviation: 0.0 }
           twist:
-            linear:
-              x: { mean: 0.0, standard_deviation: 0.0 }
-              y: { mean: 0.0, standard_deviation: 0.0 }
-              z: { mean: 0.0, standard_deviation: 0.0 }
-            angular:
-              x: { mean: 0.0, standard_deviation: 0.0 }
-              y: { mean: 0.0, standard_deviation: 0.0 }
-              z: { mean: 0.0, standard_deviation: 0.0 }
+            twist:
+              linear:
+                x: { mean: 0.0, standard_deviation: 0.0 }
+                y: { mean: 0.0, standard_deviation: 0.0 }
+                z: { mean: 0.0, standard_deviation: 0.0 }
+              angular:
+                x: { mean: 0.0, standard_deviation: 0.0 }
+                y: { mean: 0.0, standard_deviation: 0.0 }
+                z: { mean: 0.0, standard_deviation: 0.0 }
