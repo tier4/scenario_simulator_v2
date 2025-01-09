@@ -21,6 +21,22 @@ Changelog for package traffic_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+7.4.4 (2025-01-09)
+------------------
+* Merge pull request `#1497 <https://github.com/tier4/scenario_simulator_v2/issues/1497>`_ from tier4/refactor/concealer-2
+  Refactor/concealer 2
+* Merge branch 'master' into refactor/concealer-2
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-2
+* Remove some member accessor from struct `FieldOperatorApplication`
+* Remove member function `FieldOperatorApplication::getAutowareStateName`
+* Cleanup `ControlModeCommand` service callback
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-2
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-2
+* Update `EgoEntity` to have `FieldOperatorApplication` as its base class
+* Update `EgoEntity` to have `FieldOperatorApplication` as non-pointer
+* Remove static member function `EgoEntity::makeFieldOperatorApplication`
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
 7.4.3 (2025-01-07)
 ------------------
 * Merge pull request `#1499 <https://github.com/tier4/scenario_simulator_v2/issues/1499>`_ from tier4/tmp/pc-patch
