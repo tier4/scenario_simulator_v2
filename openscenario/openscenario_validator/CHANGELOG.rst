@@ -10,6 +10,14 @@ Changelog for package openscenario_validator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+7.4.4 (2025-01-09)
+------------------
+* Merge branch 'master' into refactor/concealer-2
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-2
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-2
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-2
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
 7.4.3 (2025-01-07)
 ------------------
 * Merge branch 'master' into tmp/pc-patch
