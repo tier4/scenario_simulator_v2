@@ -21,6 +21,29 @@ Changelog for package concealer
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+7.4.4 (2025-01-09)
+------------------
+* Merge pull request `#1497 <https://github.com/tier4/scenario_simulator_v2/issues/1497>`_ from tier4/refactor/concealer-2
+  Refactor/concealer 2
+* Merge branch 'master' into refactor/concealer-2
+* Cleanup member function `FieldOperatorApplication::sendCooperateCommand`
+* Move function `isValidCooperateStatus` into `sendCooperateCommand`
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-2
+* Remove some member accessor from struct `FieldOperatorApplication`
+* Remove member function `FieldOperatorApplication::getAutowareStateName`
+* Remove data member `FieldOperatorApplication::latest_cooperate_status_array`
+* Remove member function `AutowareUniverse::updateVehicleState`
+* Remove member function `AutowareUniverse::updateLocalization`
+* Cleanup `ControlModeCommand` service callback
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-2
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-2
+* Remove static member function `EgoEntity::makeFieldOperatorApplication`
+* Rename class `ServiceWithValidation` to `Service`
+* Rename class `SubscriberWrapper` to `Subscriber`
+* Lipsticks
+* Rename class `PublisherWrapper` to `Publisher`
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
 7.4.3 (2025-01-07)
 ------------------
 * Merge branch 'master' into tmp/pc-patch
