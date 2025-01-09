@@ -22,19 +22,22 @@
 namespace concealer
 {
 template <typename>
-struct NormalDistribution
+struct Identity
 {
   template <typename... Ts>
-  explicit NormalDistribution(Ts &&...)
+  explicit constexpr Identity(Ts &&...)
   {
   }
 
   template <typename T>
-  auto operator()(T && x) const -> decltype(auto)
+  constexpr auto operator()(T && x) const -> decltype(auto)
   {
     return std::forward<decltype(x)>(x);
   }
 };
+
+template <typename>
+struct NormalDistribution;
 
 template <>
 struct NormalDistribution<nav_msgs::msg::Odometry>
@@ -62,7 +65,7 @@ struct NormalDistribution<nav_msgs::msg::Odometry>
   auto operator()(nav_msgs::msg::Odometry odometry) -> nav_msgs::msg::Odometry;
 };
 
-template <typename Message, template <typename> typename Randomizer = NormalDistribution>
+template <typename Message, template <typename> typename Randomizer = Identity>
 class Publisher
 {
   typename rclcpp::Publisher<Message>::SharedPtr publisher;
