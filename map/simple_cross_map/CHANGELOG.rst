@@ -9,6 +9,11 @@ Changelog for package simple_cross_map
 * Merge branch 'master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+7.4.6 (2025-01-10)
+------------------
+* Merge remote-tracking branch 'origin/master' into dependabot/pip/jinja2-3.1.5
+* Contributors: Masaya Kataoka
+
 7.4.5 (2025-01-10)
 ------------------
 * Merge branch 'master' into fix/pass_despawn_function_in_constructor
