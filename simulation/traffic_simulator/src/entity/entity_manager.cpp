@@ -354,7 +354,7 @@ auto EntityManager::updateNpcLogic(
     // Update npc completely if logic has started, otherwise update Autoware only - if it is Ego
     if (npc_logic_started_) {
       entity->onUpdate(current_time, step_time);
-    } else if (const auto ego_entity = std::dynamic_pointer_cast<const EgoEntity>(entity)) {
+    } else if (const auto ego_entity = std::dynamic_pointer_cast<EgoEntity>(entity)) {
       ego_entity->updateFieldOperatorApplication();
     }
     return entity->getCanonicalizedStatus();
