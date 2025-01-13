@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CONCEALER__SUBSCRIBER_WRAPPER_HPP_
-#define CONCEALER__SUBSCRIBER_WRAPPER_HPP_
+#ifndef CONCEALER__SUBSCRIBER_HPP_
+#define CONCEALER__SUBSCRIBER_HPP_
 
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
@@ -21,17 +21,16 @@
 namespace concealer
 {
 template <typename Message>
-class SubscriberWrapper
+struct Subscriber
 {
   typename Message::ConstSharedPtr current_value = std::make_shared<const Message>();
 
   typename rclcpp::Subscription<Message>::SharedPtr subscription;
 
-public:
   auto operator()() const -> const auto & { return *std::atomic_load(&current_value); }
 
   template <typename Autoware, typename Callback>
-  explicit SubscriberWrapper(
+  explicit Subscriber(
     const std::string & topic, const rclcpp::QoS & quality_of_service, Autoware & autoware,
     const Callback & callback)
   : subscription(autoware.template create_subscription<Message>(
@@ -45,7 +44,7 @@ public:
   }
 
   template <typename Autoware>
-  explicit SubscriberWrapper(
+  explicit Subscriber(
     const std::string & topic, const rclcpp::QoS & quality_of_service, Autoware & autoware)
   : subscription(autoware.template create_subscription<Message>(
       topic, quality_of_service, [this](const typename Message::ConstSharedPtr & message) {
@@ -56,4 +55,4 @@ public:
 };
 }  // namespace concealer
 
-#endif  // CONCEALER__SUBSCRIBER_WRAPPER_HPP_
+#endif  // CONCEALER__SUBSCRIBER_HPP_
