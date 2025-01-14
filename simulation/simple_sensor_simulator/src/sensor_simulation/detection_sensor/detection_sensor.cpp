@@ -334,21 +334,31 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
       }
     }
 
-    if (detected_objects_queue.emplace(detected_objects, current_simulation_time);
-        current_simulation_time - detected_objects_queue.front().second >=
-        configuration_.object_recognition_delay()) {
-      // auto apply_noise = CustomNoiseApplicator(
-      //   current_simulation_time, current_ros_time, *ego_entity_status, random_engine_,
-      //   configuration_);
-      detected_objects_publisher->publish(apply_noise(detected_objects_queue.front().first));
-      detected_objects_queue.pop();
+    static constexpr auto history_duration = 3.0;
+
+    unpublished_detected_objects_queue.emplace(detected_objects, current_simulation_time);
+    if (const auto & [object, time] = unpublished_detected_objects_queue.front();
+        current_simulation_time - time >= configuration_.object_recognition_delay()) {
+      const auto message = apply_noise(object);
+      detected_objects_publisher->publish(message);
+      published_detected_objects_queue.emplace(message, time);
+      if (const auto & [published, time] = published_detected_objects_queue.front();
+        current_simulation_time - time >= configuration_.object_recognition_delay() + history_duration) {
+        published_detected_objects_queue.pop();
+      }
+      unpublished_detected_objects_queue.pop();
     }
 
-    if (ground_truth_objects_queue.emplace(ground_truth_objects, current_simulation_time);
-        current_simulation_time - ground_truth_objects_queue.front().second >=
-        configuration_.object_recognition_ground_truth_delay()) {
-      ground_truth_objects_publisher->publish(ground_truth_objects_queue.front().first);
-      ground_truth_objects_queue.pop();
+    unpublished_ground_truth_objects_queue.emplace(ground_truth_objects, current_simulation_time);
+    if (const auto & [object, time] = unpublished_ground_truth_objects_queue.front();
+        current_simulation_time - time >= configuration_.object_recognition_ground_truth_delay()) {
+      ground_truth_objects_publisher->publish(object);
+      published_ground_truth_objects_queue.emplace(object, time);
+      if (const auto & [published, time] = published_ground_truth_objects_queue.front();
+          current_simulation_time - time >= configuration_.object_recognition_ground_truth_delay() + history_duration) {
+        published_ground_truth_objects_queue.pop();
+      }
+      unpublished_ground_truth_objects_queue.pop();
     }
   }
 }
