@@ -375,6 +375,36 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
                 lidar_detected_entities.end());
     };
 
+    /*
+       NOTE: for Autoware developers
+
+       If you need to apply experimental noise to the DetectedObjects that the
+       simulator publishes, comment out the following function and implement
+       new one.
+    */
+    auto apply_noise = [&](auto detected_objects) {
+      auto position_noise_distribution =
+        std::normal_distribution<>(0.0, configuration_.pos_noise_stddev());
+
+      for (auto && detected_object : detected_objects.objects) {
+        detected_object.kinematics.pose_with_covariance.pose.position.x +=
+          position_noise_distribution(random_engine_);
+        detected_object.kinematics.pose_with_covariance.pose.position.y +=
+          position_noise_distribution(random_engine_);
+      }
+
+      detected_objects.objects.erase(
+        std::remove_if(
+          detected_objects.objects.begin(), detected_objects.objects.end(),
+          [this](auto &&) {
+            return std::uniform_real_distribution()(random_engine_) <
+                   configuration_.probability_of_lost();
+          }),
+        detected_objects.objects.end());
+
+      return detected_objects;
+    };
+
     for (const auto & status : statuses) {
       if (is_in_range(status)) {
         const auto detected_object = make<autoware_perception_msgs::msg::DetectedObject>(status);
@@ -387,9 +417,9 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
     if (detected_objects_queue.emplace(detected_objects, current_simulation_time);
         current_simulation_time - detected_objects_queue.front().second >=
         configuration_.object_recognition_delay()) {
-      auto apply_noise = CustomNoiseApplicator(
-        current_simulation_time, current_ros_time, *ego_entity_status, random_engine_,
-        configuration_);
+      // auto apply_noise = CustomNoiseApplicator(
+      //   current_simulation_time, current_ros_time, *ego_entity_status, random_engine_,
+      //   configuration_);
       detected_objects_publisher->publish(apply_noise(detected_objects_queue.front().first));
       detected_objects_queue.pop();
     }
