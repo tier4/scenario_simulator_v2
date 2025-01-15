@@ -47,7 +47,7 @@ auto toMapPose(const LaneletPose & lanelet_pose, const bool fill_pitch) -> PoseS
       math::geometry::normalize(normal_vector) * canonicalized_lanelet_pose->offset;
     pose_stamped.pose = lanelet_spline->getPose(canonicalized_lanelet_pose->s);
     pose_stamped.pose.position += offset_transition_vector;
-    // map orientation
+    /// @note map orientation
     const auto tangent_vector = lanelet_spline->getTangentVector(canonicalized_lanelet_pose->s);
     const auto lanelet_rpy =
       geometry_msgs::build<Vector3>()
