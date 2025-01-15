@@ -309,7 +309,7 @@ auto alongLaneletPose(
   const auto canonicalized = canonicalizeLaneletPose(lanelet_pose, route_lanelets);
   if (
     const auto & canonicalized_lanelet_pose = std::get<std::optional<LaneletPose>>(canonicalized)) {
-    // If canonicalize succeed, just return canonicalized pose
+    /// @note If canonicalize succeed, just return canonicalized pose
     return canonicalized_lanelet_pose.value();
   } else {
     // If canonicalize failed, return lanelet pose as end of road
