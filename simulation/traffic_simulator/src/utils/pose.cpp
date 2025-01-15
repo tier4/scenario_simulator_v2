@@ -47,7 +47,7 @@ auto quietNaNLaneletPose() -> LaneletPose
            .z(std::numeric_limits<double>::quiet_NaN()));
 }
 
-// Conversions
+/// @note Conversions
 auto canonicalize(const LaneletPose & lanelet_pose) -> LaneletPose
 {
   if (
@@ -172,7 +172,7 @@ auto transformRelativePoseToGlobal(
   return ret;
 }
 
-// Relative msg::Pose
+/// @note Relative msg::Pose
 auto isAltitudeMatching(
   const CanonicalizedLaneletPose & lanelet_pose,
   const CanonicalizedLaneletPose & target_lanelet_pose) -> bool
@@ -223,7 +223,8 @@ auto boundingBoxRelativePose(
   return std::nullopt;
 }
 
-// Relative LaneletPose
+/// @note Relative LaneletPose
+/// @todo HdMapUtils will be removed when lanelet_wrapper::distance is added
 auto relativeLaneletPose(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
   const RoutingConfiguration & routing_configuration) -> LaneletPose

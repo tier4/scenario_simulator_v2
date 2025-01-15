@@ -24,6 +24,27 @@ Changelog for package openscenario_utility
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+7.4.6 (2025-01-10)
+------------------
+* Merge remote-tracking branch 'origin/master' into dependabot/pip/jinja2-3.1.5
+* Contributors: Masaya Kataoka
+
+7.4.5 (2025-01-10)
+------------------
+* Merge branch 'master' into fix/pass_despawn_function_in_constructor
+* Merge remote-tracking branch 'origin/master' into fix/pass_despawn_function_in_constructor
+* Merge branch 'master' into fix/pass_despawn_function_in_constructor
+* Merge branch 'master' into fix/pass_despawn_function_in_constructor
+* Contributors: Masaya Kataoka
+
+7.4.4 (2025-01-09)
+------------------
+* Merge branch 'master' into refactor/concealer-2
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-2
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-2
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-2
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
 7.4.3 (2025-01-07)
 ------------------
 * Merge branch 'master' into tmp/pc-patch

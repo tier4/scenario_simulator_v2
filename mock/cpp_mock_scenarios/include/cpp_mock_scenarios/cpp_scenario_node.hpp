@@ -75,7 +75,6 @@ private:
     const std::string & scenario_filename, const bool verbose,
     const std::set<std::uint8_t> & auto_sink_entity_types = {}) -> traffic_simulator::Configuration
   {
-    constexpr bool auto_sink{true};
     auto configuration = traffic_simulator::Configuration(
       map_path, lanelet2_map_file, scenario_filename, auto_sink_entity_types);
     configuration.verbose = verbose;
