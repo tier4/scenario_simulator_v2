@@ -114,7 +114,7 @@ auto LaneletLoader::resamplePoints(
   /// @note Create each segment
   lanelet::BasicPoints3d resampled_points;
   for (auto i = 0; i <= num_segments; ++i) {
-    // Find two nearest points
+    /// @note Find two nearest points
     const double target_length = (static_cast<double>(i) / num_segments) *
                                  static_cast<double>(lanelet::geometry::length(line_string));
     const auto [first_index, second_index] = findNearestIndexPair(target_length);
