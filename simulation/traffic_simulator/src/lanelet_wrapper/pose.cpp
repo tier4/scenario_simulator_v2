@@ -106,8 +106,8 @@ auto toLaneletPose(
     const double yaw_range_max_rad = M_PI - yaw_range_min_rad;
     if (const auto lanelet_pose_rpy = math::geometry::convertQuaternionToEulerAngle(
           math::geometry::getRotation(pose_on_centerline.orientation, map_pose.orientation));
-        std::fabs(lanelet_pose_rpy.z) > yaw_range_max_rad ||
-        std::fabs(lanelet_pose_rpy.z) < yaw_range_min_rad) {
+        std::fabs(lanelet_pose_rpy.z) > yaw_range_min_rad ||
+        std::fabs(lanelet_pose_rpy.z) < yaw_range_max_rad) {
       return std::nullopt;
     } else {
       double lanelet_pose_offset = std::sqrt(
