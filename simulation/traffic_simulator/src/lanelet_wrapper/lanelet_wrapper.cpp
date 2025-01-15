@@ -105,7 +105,7 @@ LaneletWrapper & LaneletWrapper::getInstance()
   std::lock_guard lock(mutex_);
   if (!instance) {
     if (!lanelet_map_path_.empty()) {
-      /// `new` is intentionally used here instead of `make_unique` since the LaneletWrapper constructor is private
+      /// @note `new` is intentionally used here instead of `make_unique` since the LaneletWrapper constructor is private
       instance.reset(new LaneletWrapper(lanelet_map_path_));
     } else {
       THROW_SIMULATION_ERROR(
