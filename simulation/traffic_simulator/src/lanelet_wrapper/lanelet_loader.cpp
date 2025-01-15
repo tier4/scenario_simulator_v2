@@ -119,7 +119,7 @@ auto LaneletLoader::resamplePoints(
                                  static_cast<double>(lanelet::geometry::length(line_string));
     const auto [first_index, second_index] = findNearestIndexPair(target_length);
 
-    // Apply linear interpolation
+    /// @note Apply linear interpolation
     const lanelet::BasicPoint3d back_point = line_string[first_index];
     const lanelet::BasicPoint3d front_point = line_string[second_index];
     const auto direction_vector = (front_point - back_point);
