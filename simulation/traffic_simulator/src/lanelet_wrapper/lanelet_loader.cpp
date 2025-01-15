@@ -130,7 +130,7 @@ auto LaneletLoader::resamplePoints(
     const auto target_point =
       back_point + (direction_vector * (target_length - back_length) / segment_length);
 
-    // Add to list
+    /// @note Add to list
     resampled_points.emplace_back(target_point);
   }
   return resampled_points;
