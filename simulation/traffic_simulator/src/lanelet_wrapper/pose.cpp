@@ -41,7 +41,7 @@ auto toMapPose(const LaneletPose & lanelet_pose, const bool fill_pitch) -> PoseS
     pose_stamped.header.frame_id = "map";
     const auto lanelet_spline =
       lanelet_map::centerPointsSpline(canonicalized_lanelet_pose->lanelet_id);
-    // map position
+    /// @note map position
     const auto normal_vector = lanelet_spline->getNormalVector(canonicalized_lanelet_pose->s);
     const auto offset_transition_vector =
       math::geometry::normalize(normal_vector) * canonicalized_lanelet_pose->offset;
