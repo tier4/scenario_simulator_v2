@@ -62,7 +62,7 @@ protected:
       return {};
     }
 
-    auto startsWith = [](const std::string & str, const std::string & substr) {
+    auto startsWith = [](std::string_view str, std::string_view substr) {
       return str.compare(0, substr.size(), substr) == 0;
     };
     return lanelet::utils::anyOf(participants->second, [this, startsWith](auto & participant) {

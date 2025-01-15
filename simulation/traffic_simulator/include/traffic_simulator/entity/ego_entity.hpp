@@ -31,14 +31,8 @@ namespace traffic_simulator
 {
 namespace entity
 {
-class EgoEntity : public VehicleEntity
+class EgoEntity : public VehicleEntity, private concealer::FieldOperatorApplication
 {
-  const std::unique_ptr<concealer::FieldOperatorApplication> field_operator_application;
-
-  static auto makeFieldOperatorApplication(
-    const Configuration &, const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr &)
-    -> std::unique_ptr<concealer::FieldOperatorApplication>;
-
   bool is_controlled_by_simulator_{false};
   std::optional<double> target_speed_;
   traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter_;
@@ -62,7 +56,7 @@ public:
 
   auto operator=(const EgoEntity &) -> EgoEntity & = delete;
 
-  auto asFieldOperatorApplication() const -> concealer::FieldOperatorApplication & override;
+  auto asFieldOperatorApplication() -> concealer::FieldOperatorApplication & override;
 
   auto getCurrentAction() const -> std::string override;
 
@@ -83,7 +77,7 @@ public:
 
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
 
-  auto updateFieldOperatorApplication() const -> void;
+  auto updateFieldOperatorApplication() -> void;
 
   void onUpdate(double current_time, double step_time) override;
 
