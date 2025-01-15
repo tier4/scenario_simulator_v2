@@ -61,7 +61,7 @@ auto LaneletLoader::overwriteLaneletsCenterline(lanelet::LaneletMapPtr lanelet_m
     const auto longer_distance = (left_length > right_length) ? left_length : right_length;
     const auto num_segments = std::max(static_cast<int32_t>(ceil(longer_distance / resolution)), 1);
 
-    // Resample points
+    /// @note Resample points
     const auto left_points = resamplePoints(lanelet_obj.leftBound(), num_segments);
     const auto right_points = resamplePoints(lanelet_obj.rightBound(), num_segments);
 
