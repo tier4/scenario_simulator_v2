@@ -71,7 +71,7 @@ auto LaneletLoader::overwriteLaneletsCenterline(lanelet::LaneletMapPtr lanelet_m
 
   auto generateFineCenterline =
     [&](const lanelet::ConstLanelet & lanelet_obj) -> lanelet::LineString3d {
-    // Get length of longer border
+    /// @note Get length of longer border
     const auto left_length =
       static_cast<double>(lanelet::geometry::length(lanelet_obj.leftBound()));
     const auto right_length =
@@ -79,14 +79,14 @@ auto LaneletLoader::overwriteLaneletsCenterline(lanelet::LaneletMapPtr lanelet_m
     const auto longer_distance = (left_length > right_length) ? left_length : right_length;
     const auto num_segments = std::max(static_cast<int32_t>(ceil(longer_distance / resolution)), 1);
 
-    // Resample points
+    /// @note Resample points
     const auto left_points = resamplePoints(lanelet_obj.leftBound(), num_segments);
     const auto right_points = resamplePoints(lanelet_obj.rightBound(), num_segments);
 
-    // Create centerline
+    /// @note Create centerline
     lanelet::LineString3d centerline(lanelet::utils::getId());
     for (size_t i = 0; i < static_cast<size_t>(num_segments + 1); i++) {
-      // Add ID for the average point of left and right
+      /// @note Add ID for the average point of left and right
       const auto center_basic_point = (right_points.at(i) + left_points.at(i)) / 2.0;
       const lanelet::Point3d center_point(
         lanelet::utils::getId(), center_basic_point.x(), center_basic_point.y(),
@@ -129,15 +129,15 @@ auto LaneletLoader::resamplePoints(
     THROW_SEMANTIC_ERROR("findNearestIndexPair(): No nearest point found.");
   };
 
-  // Create each segment
+  /// @note Create each segment
   lanelet::BasicPoints3d resampled_points;
   for (auto i = 0; i <= num_segments; ++i) {
-    // Find two nearest points
+    /// @note Find two nearest points
     const double target_length = (static_cast<double>(i) / num_segments) *
                                  static_cast<double>(lanelet::geometry::length(line_string));
     const auto [first_index, second_index] = findNearestIndexPair(target_length);
 
-    // Apply linear interpolation
+    /// @note Apply linear interpolation
     const lanelet::BasicPoint3d back_point = line_string[first_index];
     const lanelet::BasicPoint3d front_point = line_string[second_index];
     const auto direction_vector = (front_point - back_point);
@@ -148,7 +148,7 @@ auto LaneletLoader::resamplePoints(
     const auto target_point =
       back_point + (direction_vector * (target_length - back_length) / segment_length);
 
-    // Add to list
+    /// @note Add to list
     resampled_points.emplace_back(target_point);
   }
   return resampled_points;

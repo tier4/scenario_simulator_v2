@@ -71,7 +71,8 @@ public:
     traffic_lights_ptr_(std::make_shared<TrafficLights>(
       node, getROS2Parameter<std::string>("architecture_type", "awf/universe/20240605"))),
     traffic_controller_ptr_(std::make_shared<traffic::TrafficController>(
-      entity_manager_ptr_, configuration.auto_sink_entity_types)),
+      [this](const std::string & name) { despawn(name); }, entity_manager_ptr_,
+      configuration.auto_sink_entity_types)),
     clock_pub_(rclcpp::create_publisher<rosgraph_msgs::msg::Clock>(
       node, "/clock", rclcpp::QoS(rclcpp::KeepLast(1)).best_effort(),
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
