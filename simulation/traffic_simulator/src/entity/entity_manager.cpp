@@ -122,8 +122,8 @@ auto EntityManager::updateNpcLogic(
   // Update npc completely if logic has started, otherwise update Autoware only - if it is Ego
   if (npc_logic_started_) {
     entity->onUpdate(current_time, step_time);
-  } else if (const auto ego_entity = std::dynamic_pointer_cast<EgoEntity>(entity)) {
-    ego_entity->updateFieldOperatorApplication();
+  } else if (entity->is<EgoEntity>()) {
+    entity->as<EgoEntity>()->updateFieldOperatorApplication();
   }
   return entity->getCanonicalizedStatus();
 }
@@ -233,7 +233,7 @@ auto EntityManager::isAnyEgoSpawned() const -> bool
 auto EntityManager::getEgoName() const -> const std::string &
 {
   for (const auto & [name, entity] : entities_) {
-    if (entity->template is<EgoEntity>()) {
+    if (entity->is<EgoEntity>()) {
       return entity->getName();
     }
   }
@@ -245,8 +245,8 @@ auto EntityManager::getEgoName() const -> const std::string &
 auto EntityManager::getEgoEntity() const -> std::shared_ptr<entity::EgoEntity>
 {
   for (const auto & [name, entity] : entities_) {
-    if (entity->template is<EgoEntity>()) {
-      return std::dynamic_pointer_cast<EgoEntity>(entity);
+    if (entity->is<EgoEntity>()) {
+      return entity->as<EgoEntity>();
     }
   }
   THROW_SEMANTIC_ERROR("EgoEntity does not exist");
@@ -258,10 +258,10 @@ auto EntityManager::getEgoEntity(const std::string & name) const
   if (auto it = entities_.find(name); it == entities_.end()) {
     THROW_SEMANTIC_ERROR("Entity ", std::quoted(name), " does not exist.");
   } else {
-    if (auto ego_entity = std::dynamic_pointer_cast<EgoEntity>(it->second); !ego_entity) {
+    if (not it->second->is<EgoEntity>()) {
       THROW_SEMANTIC_ERROR("Entity : ", std::quoted(name), " exists, but it is not ego");
     } else
-      return ego_entity;
+      return it->second->as<EgoEntity>();
   }
 }
 
