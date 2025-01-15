@@ -172,7 +172,7 @@ auto transformRelativePoseToGlobal(
   return ret;
 }
 
-// Relative msg::Pose
+/// @note Relative msg::Pose
 auto isAltitudeMatching(
   const CanonicalizedLaneletPose & lanelet_pose,
   const CanonicalizedLaneletPose & target_lanelet_pose) -> bool
