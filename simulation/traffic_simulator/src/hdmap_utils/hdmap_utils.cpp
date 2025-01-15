@@ -85,8 +85,6 @@ HdMapUtils::HdMapUtils(
   overwriteLaneletsCenterline();
 }
 
-// If route is not specified, the lanelet_id with the lowest array index is used as a candidate for
-// canonicalize destination.
 auto HdMapUtils::countLaneChanges(
   const traffic_simulator_msgs::msg::LaneletPose & from,
   const traffic_simulator_msgs::msg::LaneletPose & to,

@@ -330,8 +330,22 @@ auto alongLaneletPose(
   }
 }
 
-// If route is not specified, the lanelet_id with the lowest array index is used as a candidate for
-// canonicalize destination.
+/**
+ * @brief Canonicalizes a given LaneletPose by adjusting the longitudinal position (s) to ensure it 
+ *        lies within the bounds of the specified lanelet. If the position is out of bounds, it 
+ *        traverses to previous or next lanelets to find the canonicalized position.
+ *
+ * If the provided pose has a longitudinal position (s) less than 0, the function traverses
+ * to previous lanelets until a valid position is found or no previous lanelets exist.
+ *
+ * If the longitudinal position (s) exceeds the length of the current lanelet, the function traverses
+ * to next lanelets until the position is valid or no next lanelets exist.
+ *
+ * @param lanelet_pose The input LaneletPose to canonicalize, containing a lanelet ID and longitudinal position (s).
+ * @return A tuple where:
+ *         - The first element is an optional canonicalized LaneletPose (std::nullopt if canonicalization fails).
+ *         - The second element is an optional lanelet ID where the process stopped (std::nullopt if successful).
+ */
 auto canonicalizeLaneletPose(const LaneletPose & lanelet_pose)
   -> std::tuple<std::optional<LaneletPose>, std::optional<lanelet::Id>>
 {
