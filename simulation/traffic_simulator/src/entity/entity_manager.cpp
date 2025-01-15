@@ -56,7 +56,7 @@ auto EntityManager::makeDebugMarker() const -> visualization_msgs::msg::MarkerAr
   return marker;
 }
 
-// updatee
+// update
 auto EntityManager::update(const double current_time, const double step_time) -> void
 {
   helper::StopWatch<std::chrono::milliseconds> stop_watch_update(
@@ -99,6 +99,7 @@ auto EntityManager::update(const double current_time, const double step_time) ->
       status_with_trajectory.obstacle_find = false;
     }
     status_with_trajectory.status = static_cast<EntityStatus>(status);
+    status_with_trajectory.status.time = current_time + step_time;
     status_with_trajectory.name = name;
     status_with_trajectory.time = current_time + step_time;
     status_array_msg.data.emplace_back(status_with_trajectory);
@@ -121,7 +122,7 @@ auto EntityManager::updateNpcLogic(
   // Update npc completely if logic has started, otherwise update Autoware only - if it is Ego
   if (npc_logic_started_) {
     entity->onUpdate(current_time, step_time);
-  } else if (const auto ego_entity = std::dynamic_pointer_cast<const EgoEntity>(entity)) {
+  } else if (const auto ego_entity = std::dynamic_pointer_cast<EgoEntity>(entity)) {
     ego_entity->updateFieldOperatorApplication();
   }
   return entity->getCanonicalizedStatus();

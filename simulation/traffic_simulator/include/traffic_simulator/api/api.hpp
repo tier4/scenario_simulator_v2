@@ -63,10 +63,11 @@ public:
     entity_manager_ptr_(
       std::make_shared<entity::EntityManager>(node, configuration, node_parameters_)),
     traffic_controller_ptr_(std::make_shared<traffic::TrafficController>(
-      entity_manager_ptr_, configuration.auto_sink_entity_types)),
+      [this](const std::string & name) { despawn(name); }, entity_manager_ptr_,
+      configuration.auto_sink_entity_types)),
     traffic_lights_ptr_(std::make_shared<TrafficLights>(
       node, entity_manager_ptr_->getHdmapUtils(),
-      getParameter<std::string>(node_parameters_, "architecture_type", "awf/universe/20240605"))),
+      getROS2Parameter<std::string>("architecture_type", "awf/universe/20240605"))),
     real_time_factor_subscriber_(rclcpp::create_subscription<std_msgs::msg::Float64>(
       node, "/real_time_factor", rclcpp::QoS(rclcpp::KeepLast(1)).best_effort(),
       [this](const std_msgs::msg::Float64 & message) {
