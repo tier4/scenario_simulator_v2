@@ -131,18 +131,19 @@ UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node
         "currentMinimumRiskManeuverState.behavior",
         [result]() {
           return make<String>(
-            asFieldOperatorApplication(result.str(1)).getMinimumRiskManeuverBehaviorName());
+            asFieldOperatorApplication(result.str(1)).minimum_risk_maneuver_behavior);
         }),
       std::make_pair(
         "currentMinimumRiskManeuverState.state",
         [result]() {
           return make<String>(
-            asFieldOperatorApplication(result.str(1)).getMinimumRiskManeuverStateName());
+            asFieldOperatorApplication(result.str(1)).minimum_risk_maneuver_state);
         }),
       std::make_pair(
         "currentEmergencyState",
         [result]() {
-          return make<String>(asFieldOperatorApplication(result.str(1)).getEmergencyStateName());
+          return make<String>(
+            asFieldOperatorApplication(result.str(1)).minimum_risk_maneuver_state);
         }),
       std::make_pair(
         "currentTurnIndicatorsState",

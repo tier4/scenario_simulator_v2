@@ -40,13 +40,13 @@ auto toMapPose(const LaneletPose & lanelet_pose, const bool fill_pitch) -> PoseS
     pose_stamped.header.frame_id = "map";
     const auto lanelet_spline =
       lanelet_map::centerPointsSpline(canonicalized_lanelet_pose->lanelet_id);
-    // map position
+    /// @note map position
     const auto normal_vector = lanelet_spline->getNormalVector(canonicalized_lanelet_pose->s);
     const auto offset_transition_vector =
       math::geometry::normalize(normal_vector) * canonicalized_lanelet_pose->offset;
     pose_stamped.pose = lanelet_spline->getPose(canonicalized_lanelet_pose->s);
     pose_stamped.pose.position += offset_transition_vector;
-    // map orientation
+    /// @note map orientation
     const auto tangent_vector = lanelet_spline->getTangentVector(canonicalized_lanelet_pose->s);
     const auto lanelet_rpy =
       geometry_msgs::build<Vector3>()
@@ -308,10 +308,10 @@ auto alongLaneletPose(
   const auto canonicalized = canonicalizeLaneletPose(lanelet_pose, route_lanelets);
   if (
     const auto & canonicalized_lanelet_pose = std::get<std::optional<LaneletPose>>(canonicalized)) {
-    // If canonicalize succeed, just return canonicalized pose
+    /// @note If canonicalize succeed, just return canonicalized pose
     return canonicalized_lanelet_pose.value();
   } else {
-    // If canonicalize failed, return lanelet pose as end of road
+    /// @note If canonicalize failed, return lanelet pose as end of road
     if (const auto end_of_road_lanelet_id = std::get<std::optional<lanelet::Id>>(canonicalized)) {
       return traffic_simulator_msgs::build<LaneletPose>()
         .lanelet_id(end_of_road_lanelet_id.value())

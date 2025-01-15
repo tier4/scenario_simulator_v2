@@ -89,7 +89,7 @@ auto nearbyLaneletIds(
     LaneletWrapper::map()->laneletLayer, lanelet::BasicPoint2d(point.x, point.y),
     static_cast<unsigned>(search_count));
 
-  // check for current content, if not empty then optionally apply filter
+  /// @note check for current content, if not empty then optionally apply filter
   if (nearest_lanelets.empty() || nearest_lanelets.front().first > distance_thresh) {
     return {};
   } else if (!include_crosswalk) {

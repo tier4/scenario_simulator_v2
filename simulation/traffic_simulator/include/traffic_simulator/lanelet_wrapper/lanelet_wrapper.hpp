@@ -46,7 +46,7 @@ public:
   {
     std::hash<lanelet::Id> lanelet_id_hash;
     size_t seed = 0;
-    // hash combine like boost library
+    /// @note hash combine like boost library 2^32 / phi = 0x9e3779b9
     seed ^= lanelet_id_hash(std::get<0>(data)) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
     seed ^= lanelet_id_hash(std::get<1>(data)) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
     seed ^= std::hash<bool>{}(std::get<2>(data)) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
