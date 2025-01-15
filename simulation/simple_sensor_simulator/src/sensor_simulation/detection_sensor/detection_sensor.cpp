@@ -245,13 +245,12 @@ auto make(const traffic_simulator_msgs::EntityStatus & status)
 }
 
 template <>
-auto make(
-  const traffic_simulator_msgs::EntityStatus & status,
-  const autoware_perception_msgs::msg::DetectedObject & detected_object)
+auto make(const traffic_simulator_msgs::EntityStatus & status)
   -> autoware_perception_msgs::msg::TrackedObject
 {
   // ref: https://github.com/autowarefoundation/autoware.universe/blob/main/common/perception_utils/src/conversion.cpp
   auto tracked_object = autoware_perception_msgs::msg::TrackedObject();
+  const auto detected_object = make<autoware_perception_msgs::msg::DetectedObject>(status);
   // clang-format off
   tracked_object.object_id                           = make<unique_identifier_msgs::msg::UUID>(status);
   tracked_object.existence_probability               = detected_object.existence_probability;
@@ -295,27 +294,27 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
        simulator publishes, comment out the following function and implement
        new one.
     */
-    auto apply_noise = [&](auto detected_objects) {
+    auto apply_noise = [&](auto detected_entities) {
       auto position_noise_distribution =
         std::normal_distribution<>(0.0, configuration_.pos_noise_stddev());
 
-      for (auto && detected_object : detected_objects.objects) {
-        detected_object.kinematics.pose_with_covariance.pose.position.x +=
-          position_noise_distribution(random_engine_);
-        detected_object.kinematics.pose_with_covariance.pose.position.y +=
-          position_noise_distribution(random_engine_);
+      for (auto && detected_entity : detected_entities) {
+        detected_entity.mutable_pose()->mutable_position()->set_x(
+          detected_entity.pose().position().x() + position_noise_distribution(random_engine_));
+        detected_entity.mutable_pose()->mutable_position()->set_y(
+          detected_entity.pose().position().y() + position_noise_distribution(random_engine_));
       }
 
-      detected_objects.objects.erase(
+      detected_entities.erase(
         std::remove_if(
-          detected_objects.objects.begin(), detected_objects.objects.end(),
+          detected_entities.begin(), detected_entities.end(),
           [this](auto &&) {
             return std::uniform_real_distribution()(random_engine_) <
                    configuration_.probability_of_lost();
           }),
-        detected_objects.objects.end());
+        detected_entities.end());
 
-      return detected_objects;
+      return detected_entities;
     };
 
     auto detected_entities = std::vector<traffic_simulator_msgs::EntityStatus>();
@@ -347,14 +346,13 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
 
     static constexpr auto history_duration = 3.0;
 
-    unpublished_detected_objects_queue.emplace(
-      make_detected_objects(detected_entities), current_simulation_time);
+    unpublished_detected_objects_queue.emplace(detected_entities, current_simulation_time);
 
-    if (const auto & [object, time] = unpublished_detected_objects_queue.front();
+    if (const auto & [detected_entity, time] = unpublished_detected_objects_queue.front();
         current_simulation_time - time >= configuration_.object_recognition_delay()) {
-      const auto message = apply_noise(object);
-      detected_objects_publisher->publish(message);
-      published_detected_objects_queue.emplace(message, time);
+      const auto modified_detected_entities = apply_noise(detected_entity);
+      detected_objects_publisher->publish(make_detected_objects(modified_detected_entities));
+      published_detected_objects_queue.emplace(modified_detected_entities, time);
       if (
         current_simulation_time - published_detected_objects_queue.front().second >=
         configuration_.object_recognition_delay() + history_duration) {
@@ -363,13 +361,12 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
       unpublished_detected_objects_queue.pop();
     }
 
-    unpublished_ground_truth_objects_queue.emplace(
-      make_ground_truth_objects(detected_entities), current_simulation_time);
+    unpublished_ground_truth_objects_queue.emplace(detected_entities, current_simulation_time);
 
-    if (const auto & [object, time] = unpublished_ground_truth_objects_queue.front();
+    if (const auto & [detected_entity, time] = unpublished_ground_truth_objects_queue.front();
         current_simulation_time - time >= configuration_.object_recognition_ground_truth_delay()) {
-      ground_truth_objects_publisher->publish(object);
-      published_ground_truth_objects_queue.emplace(object, time);
+      ground_truth_objects_publisher->publish(make_ground_truth_objects(detected_entity));
+      published_ground_truth_objects_queue.emplace(detected_entity, time);
       if (
         current_simulation_time - published_ground_truth_objects_queue.front().second >=
         configuration_.object_recognition_ground_truth_delay() + history_duration) {
