@@ -93,6 +93,7 @@ auto HdMapUtils::countLaneChanges(
   const traffic_simulator::RoutingConfiguration & routing_configuration) const
   -> std::optional<std::pair<int, int>>
 {
+  /// a lane change considers the lanes in the same direction as the original, so ignore the lanes in the opposite direction
   constexpr bool include_opposite_direction{false};
   const auto route = getRoute(from.lanelet_id, to.lanelet_id, routing_configuration);
   if (route.empty()) {

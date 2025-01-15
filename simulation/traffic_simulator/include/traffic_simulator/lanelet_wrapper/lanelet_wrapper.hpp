@@ -76,7 +76,7 @@ public:
     const lanelet::routing::RoutingGraphConstPtr & routing_graph) -> lanelet::Ids
   {
     if (!exists(from_lanelet_id, to_lanelet_id, routing_configuration.allow_lane_change)) {
-      constexpr int routing_cost_id = 0;
+      constexpr int routing_cost_id = 0;  ///< to use default routing costs: distance along lanelets
       const auto & from_lanelet = lanelet_map->laneletLayer.get(from_lanelet_id);
       const auto & to_lanelet = lanelet_map->laneletLayer.get(to_lanelet_id);
       if (const auto route = routing_graph->getRoute(

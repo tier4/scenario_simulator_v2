@@ -42,11 +42,10 @@ auto toMapPose(const LaneletPose & lanelet_pose, const bool fill_pitch) -> PoseS
     const auto lanelet_spline =
       lanelet_map::centerPointsSpline(canonicalized_lanelet_pose->lanelet_id);
     // map position
-    const auto normal_vector = lanelet_spline->getNormalVector(canonicalized_lanelet_pose->s);
-    const auto offset_transition_vector =
-      math::geometry::normalize(normal_vector) * canonicalized_lanelet_pose->offset;
     pose_stamped.pose = lanelet_spline->getPose(canonicalized_lanelet_pose->s);
-    pose_stamped.pose.position += offset_transition_vector;
+    pose_stamped.pose.position +=
+      math::geometry::normalize(lanelet_spline->getNormalVector(canonicalized_lanelet_pose->s)) *
+      canonicalized_lanelet_pose->offset;
     // map orientation
     const auto tangent_vector = lanelet_spline->getTangentVector(canonicalized_lanelet_pose->s);
     const auto lanelet_rpy =
@@ -70,18 +69,19 @@ auto toMapPose(const LaneletPose & lanelet_pose, const bool fill_pitch) -> PoseS
 
 auto isAltitudeMatching(const double current_altitude, const double target_altitude) -> bool
 {
-  /*
-     Using a fixed `altitude_threshold` value of 1.0 [m] is justified because the
-     entity's Z-position is always relative to its base. This eliminates the
-     need to dynamically adjust the threshold based on the entity's dimensions,
-     ensuring consistent altitude matching regardless of the entity type.
-
-     The position of the entity is defined relative to its base, typically
-     the center of the rear axle projected onto the ground in the case of vehicles.
-
-     There is no technical basis for this value; it was determined based on
-     experiments.
-  */
+  /**
+   * @brief Justification for using a fixed `altitude_threshold` value of 1.0 [m].
+   *
+   * Using a fixed `altitude_threshold` value of 1.0 [m] is justified because the
+   * entity's Z-position is always relative to its base. This eliminates the need
+   * to dynamically adjust the threshold based on the entity's dimensions, ensuring
+   * consistent altitude matching regardless of the entity type.
+   *
+   * The position of the entity is defined relative to its base, typically the center
+   * of the rear axle projected onto the ground in the case of vehicles.
+   *
+   * @note There is no technical basis for this value; it was determined based on experiments.
+   */
   static constexpr double altitude_threshold = 1.0;
   return std::abs(current_altitude - target_altitude) <= altitude_threshold;
 }
@@ -90,7 +90,9 @@ auto toLaneletPose(
   const Pose & map_pose, const lanelet::Id lanelet_id, const double matching_distance)
   -> std::optional<LaneletPose>
 {
-  constexpr double yaw_threshold = 0.25;
+  /// yaw_threshold [rad] is used to determine whether the entity is going straight,
+  /// it defines the maximum allowed rotation with respect to the lanelet centreline
+  constexpr double yaw_threshold = 0.25;  ///< M_PI * 0.25 ≈ 0.7854 rad -> 45 deegres,
   const auto lanelet_spline = lanelet_map::centerPointsSpline(lanelet_id);
   if (const auto lanelet_pose_s = lanelet_spline->getSValue(map_pose, matching_distance);
       !lanelet_pose_s) {
