@@ -111,7 +111,7 @@ auto LaneletLoader::resamplePoints(
     THROW_SEMANTIC_ERROR("findNearestIndexPair(): No nearest point found.");
   };
 
-  // Create each segment
+  /// @note Create each segment
   lanelet::BasicPoints3d resampled_points;
   for (auto i = 0; i <= num_segments; ++i) {
     // Find two nearest points
