@@ -294,7 +294,7 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
        simulator publishes, comment out the following function and implement
        new one.
     */
-    auto apply_noise = [&](auto detected_entities) {
+    auto noise = [&](auto detected_entities, auto simulation_time) {
       auto position_noise_distribution =
         std::normal_distribution<>(0.0, configuration_.pos_noise_stddev());
 
@@ -316,11 +316,6 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
 
       return detected_entities;
     };
-
-    auto detected_entities = std::vector<traffic_simulator_msgs::EntityStatus>();
-
-    std::copy_if(
-      statuses.begin(), statuses.end(), std::back_inserter(detected_entities), is_in_range);
 
     auto make_detected_objects = [&](const auto & detected_entities) {
       auto detected_objects = autoware_perception_msgs::msg::DetectedObjects();
@@ -346,29 +341,37 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
 
     static constexpr auto history_duration = 3.0;
 
-    unpublished_detected_objects_queue.emplace(detected_entities, current_simulation_time);
+    auto detected_entities = std::vector<traffic_simulator_msgs::EntityStatus>();
 
-    if (const auto & [detected_entity, time] = unpublished_detected_objects_queue.front();
-        current_simulation_time - time >= configuration_.object_recognition_delay()) {
-      const auto modified_detected_entities = apply_noise(detected_entity);
-      detected_objects_publisher->publish(make_detected_objects(modified_detected_entities));
-      published_detected_objects_queue.emplace(modified_detected_entities, time);
-      if (
-        current_simulation_time - published_detected_objects_queue.front().second >=
-        configuration_.object_recognition_delay() + history_duration) {
-        published_detected_objects_queue.pop();
-      }
-      unpublished_detected_objects_queue.pop();
-    }
+    std::copy_if(
+      statuses.begin(), statuses.end(), std::back_inserter(detected_entities), is_in_range);
 
-    ground_truth_entities_queue.emplace(detected_entities, current_simulation_time);
+    unpublished_detected_entities.emplace(detected_entities, current_simulation_time);
 
     if (
-      current_simulation_time - ground_truth_entities_queue.front().second >=
+      current_simulation_time - unpublished_detected_entities.front().second >=
+      configuration_.object_recognition_delay()) {
+      const auto modified_detected_entities =
+        std::apply(noise, unpublished_detected_entities.front());
+      detected_objects_publisher->publish(make_detected_objects(modified_detected_entities));
+      published_detected_entities.emplace(
+        modified_detected_entities, unpublished_detected_entities.front().second);
+      if (
+        current_simulation_time - published_detected_entities.front().second >=
+        configuration_.object_recognition_delay() + history_duration) {
+        published_detected_entities.pop();
+      }
+      unpublished_detected_entities.pop();
+    }
+
+    unpublished_ground_truth_entities.emplace(detected_entities, current_simulation_time);
+
+    if (
+      current_simulation_time - unpublished_ground_truth_entities.front().second >=
       configuration_.object_recognition_ground_truth_delay()) {
       ground_truth_objects_publisher->publish(
-        make_ground_truth_objects(ground_truth_entities_queue.front().first));
-      ground_truth_entities_queue.pop();
+        make_ground_truth_objects(unpublished_ground_truth_entities.front().first));
+      unpublished_ground_truth_entities.pop();
     }
   }
 }
