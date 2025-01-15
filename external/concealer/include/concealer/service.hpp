@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CONCEALER__SERVICE_WITH_VALIDATION_HPP_
-#define CONCEALER__SERVICE_WITH_VALIDATION_HPP_
+#ifndef CONCEALER__SERVICE_HPP_
+#define CONCEALER__SERVICE_HPP_
 
 #include <autoware_adapi_v1_msgs/msg/response_status.hpp>
 #include <chrono>
@@ -28,7 +28,7 @@
 namespace concealer
 {
 template <typename T>
-class ServiceWithValidation
+class Service
 {
   const std::string service_name;
 
@@ -39,13 +39,13 @@ class ServiceWithValidation
   rclcpp::WallRate validation_rate;
 
 public:
-  template <typename FieldOperatorApplication>
-  explicit ServiceWithValidation(
-    const std::string & service_name, FieldOperatorApplication & autoware,
+  template <typename Node>
+  explicit Service(
+    const std::string & service_name, Node & node,
     const std::chrono::nanoseconds validation_interval = std::chrono::seconds(1))
   : service_name(service_name),
-    logger(autoware.get_logger()),
-    client(autoware.template create_client<T>(service_name, rmw_qos_profile_default)),
+    logger(node.get_logger()),
+    client(node.template create_client<T>(service_name, rmw_qos_profile_default)),
     validation_rate(validation_interval)
   {
   }
@@ -142,4 +142,4 @@ public:
 };
 }  // namespace concealer
 
-#endif  //CONCEALER__SERVICE_WITH_VALIDATION_HPP_
+#endif  //CONCEALER__SERVICE_HPP_

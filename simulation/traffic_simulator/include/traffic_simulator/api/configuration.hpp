@@ -68,7 +68,7 @@ struct Configuration
 
   explicit Configuration(
     const Pathname & map_path, const Pathname & scenario_path,
-    const std::set<std::uint8_t> auto_sink_entity_types = {})
+    const std::set<std::uint8_t> & auto_sink_entity_types = {})
   : auto_sink_entity_types(auto_sink_entity_types),
     map_path(assertMapPath(map_path)),
     lanelet2_map_file(findLexicographicallyFirstFilenameOf(map_path, ".osm")),
@@ -80,7 +80,7 @@ struct Configuration
 
   explicit Configuration(
     const Pathname & map_path, const Filename & lanelet2_map_file, const Pathname & scenario_path,
-    const std::set<std::uint8_t> auto_sink_entity_types = {})
+    const std::set<std::uint8_t> & auto_sink_entity_types = {})
   : auto_sink_entity_types(auto_sink_entity_types),
     map_path(assertMapPath(map_path)),
     lanelet2_map_file(lanelet2_map_file),
