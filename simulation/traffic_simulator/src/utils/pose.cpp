@@ -223,7 +223,7 @@ auto boundingBoxRelativePose(
   return std::nullopt;
 }
 
-// Relative LaneletPose
+/// @note Relative LaneletPose
 /// @todo HdMapUtils will be removed when lanelet_wrapper::distance is added
 auto relativeLaneletPose(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
