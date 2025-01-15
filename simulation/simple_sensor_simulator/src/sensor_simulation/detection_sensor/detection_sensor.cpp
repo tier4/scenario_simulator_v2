@@ -276,13 +276,6 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
     -0.002) {
     previous_simulation_time_ = current_simulation_time;
 
-    autoware_perception_msgs::msg::DetectedObjects detected_objects;
-    detected_objects.header.stamp = current_ros_time;
-    detected_objects.header.frame_id = "map";
-
-    autoware_perception_msgs::msg::TrackedObjects ground_truth_objects;
-    ground_truth_objects.header = detected_objects.header;
-
     const auto ego_entity_status = findEgoEntityStatusToWhichThisSensorIsAttached(statuses);
 
     auto is_in_range = [&](const auto & status) {
@@ -325,18 +318,38 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
       return detected_objects;
     };
 
-    for (const auto & status : statuses) {
-      if (is_in_range(status)) {
-        const auto detected_object = make<autoware_perception_msgs::msg::DetectedObject>(status);
-        detected_objects.objects.push_back(detected_object);
-        ground_truth_objects.objects.push_back(
-          make<autoware_perception_msgs::msg::TrackedObject>(status, detected_object));
+    auto detected_entities = std::vector<traffic_simulator_msgs::EntityStatus>();
+
+    std::copy_if(
+      statuses.begin(), statuses.end(), std::back_inserter(detected_entities), is_in_range);
+
+    auto make_detected_objects = [&](const auto & detected_entities) {
+      auto detected_objects = autoware_perception_msgs::msg::DetectedObjects();
+      detected_objects.header.stamp = current_ros_time;
+      detected_objects.header.frame_id = "map";
+      for (const auto & detected_entity : detected_entities) {
+        detected_objects.objects.push_back(
+          make<autoware_perception_msgs::msg::DetectedObject>(detected_entity));
       }
-    }
+      return detected_objects;
+    };
+
+    auto make_ground_truth_objects = [&](const auto & detected_entities) {
+      auto ground_truth_objects = autoware_perception_msgs::msg::TrackedObjects();
+      ground_truth_objects.header.stamp = current_ros_time;
+      ground_truth_objects.header.frame_id = "map";
+      for (const auto & detected_entity : detected_entities) {
+        ground_truth_objects.objects.push_back(
+          make<autoware_perception_msgs::msg::TrackedObject>(detected_entity));
+      }
+      return ground_truth_objects;
+    };
 
     static constexpr auto history_duration = 3.0;
 
-    unpublished_detected_objects_queue.emplace(detected_objects, current_simulation_time);
+    unpublished_detected_objects_queue.emplace(
+      make_detected_objects(detected_entities), current_simulation_time);
+
     if (const auto & [object, time] = unpublished_detected_objects_queue.front();
         current_simulation_time - time >= configuration_.object_recognition_delay()) {
       const auto message = apply_noise(object);
@@ -350,7 +363,9 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
       unpublished_detected_objects_queue.pop();
     }
 
-    unpublished_ground_truth_objects_queue.emplace(ground_truth_objects, current_simulation_time);
+    unpublished_ground_truth_objects_queue.emplace(
+      make_ground_truth_objects(detected_entities), current_simulation_time);
+
     if (const auto & [object, time] = unpublished_ground_truth_objects_queue.front();
         current_simulation_time - time >= configuration_.object_recognition_ground_truth_delay()) {
       ground_truth_objects_publisher->publish(object);
