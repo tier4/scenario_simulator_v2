@@ -82,8 +82,6 @@ class DetectionSensor : public DetectionSensorBase
   std::queue<std::pair<autoware_perception_msgs::msg::TrackedObjects, double>>
     unpublished_ground_truth_objects_queue, published_ground_truth_objects_queue;
 
-  static inline constexpr auto history_duration = 3.0;
-
 public:
   explicit DetectionSensor(
     const double current_simulation_time,

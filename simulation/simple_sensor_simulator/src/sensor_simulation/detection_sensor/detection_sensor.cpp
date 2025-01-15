@@ -342,8 +342,9 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
       const auto message = apply_noise(object);
       detected_objects_publisher->publish(message);
       published_detected_objects_queue.emplace(message, time);
-      if (const auto & [published, time] = published_detected_objects_queue.front();
-        current_simulation_time - time >= configuration_.object_recognition_delay() + history_duration) {
+      if (
+        current_simulation_time - published_detected_objects_queue.front().second >=
+        configuration_.object_recognition_delay() + history_duration) {
         published_detected_objects_queue.pop();
       }
       unpublished_detected_objects_queue.pop();
@@ -354,8 +355,9 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
         current_simulation_time - time >= configuration_.object_recognition_ground_truth_delay()) {
       ground_truth_objects_publisher->publish(object);
       published_ground_truth_objects_queue.emplace(object, time);
-      if (const auto & [published, time] = published_ground_truth_objects_queue.front();
-          current_simulation_time - time >= configuration_.object_recognition_ground_truth_delay() + history_duration) {
+      if (
+        current_simulation_time - published_ground_truth_objects_queue.front().second >=
+        configuration_.object_recognition_ground_truth_delay() + history_duration) {
         published_ground_truth_objects_queue.pop();
       }
       unpublished_ground_truth_objects_queue.pop();
