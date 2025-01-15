@@ -361,18 +361,14 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
       unpublished_detected_objects_queue.pop();
     }
 
-    unpublished_ground_truth_objects_queue.emplace(detected_entities, current_simulation_time);
+    ground_truth_entities_queue.emplace(detected_entities, current_simulation_time);
 
-    if (const auto & [detected_entity, time] = unpublished_ground_truth_objects_queue.front();
-        current_simulation_time - time >= configuration_.object_recognition_ground_truth_delay()) {
-      ground_truth_objects_publisher->publish(make_ground_truth_objects(detected_entity));
-      published_ground_truth_objects_queue.emplace(detected_entity, time);
-      if (
-        current_simulation_time - published_ground_truth_objects_queue.front().second >=
-        configuration_.object_recognition_ground_truth_delay() + history_duration) {
-        published_ground_truth_objects_queue.pop();
-      }
-      unpublished_ground_truth_objects_queue.pop();
+    if (
+      current_simulation_time - ground_truth_entities_queue.front().second >=
+      configuration_.object_recognition_ground_truth_delay()) {
+      ground_truth_objects_publisher->publish(
+        make_ground_truth_objects(ground_truth_entities_queue.front().first));
+      ground_truth_entities_queue.pop();
     }
   }
 }
