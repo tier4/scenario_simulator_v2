@@ -40,7 +40,7 @@ private:
   void onUpdate() override
   {
     const auto ego_entity = api_.getEntity("ego");
-    if (ego_entity->isInPosition(
+    if (ego_entity->isNearbyPosition(
           traffic_simulator::helper::constructLaneletPose(34513, 30, 0), 3.0)) {
       ego_entity->cancelRequest();
       canceled = true;

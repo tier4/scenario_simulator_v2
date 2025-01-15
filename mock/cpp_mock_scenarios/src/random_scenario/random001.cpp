@@ -156,7 +156,7 @@ private:
       constexpr lanelet::Id lanelet_id = 34392;
       if (
         !api_.isEntityExist(entity_name) &&
-        !ego_entity->isInPosition(
+        !ego_entity->isNearbyPosition(
           traffic_simulator::helper::constructLaneletPose(34576, 25.0, 0.0), 5.0)) {
         std::normal_distribution<> offset_distribution(
           0.0, params_.random_parameters.crossing_pedestrian.offset_variance);
@@ -184,7 +184,7 @@ private:
 
     const auto trigger_position = traffic_simulator::helper::constructLaneletPose(34621, 10, 0.0);
     constexpr auto entity_name = "spawn_nearby_ego";
-    if (ego_entity->isInPosition(trigger_position, 20.0) && !api_.isEntityExist(entity_name)) {
+    if (ego_entity->isNearbyPosition(trigger_position, 20.0) && !api_.isEntityExist(entity_name)) {
       api_.spawn(
         entity_name,
         traffic_simulator::pose::transformRelativePoseToGlobal(
@@ -196,12 +196,12 @@ private:
         traffic_simulator::entity::VehicleEntity::BuiltinBehavior::doNothing());
     }
 
-    if (!ego_entity->isInPosition(trigger_position, 20.0) && api_.isEntityExist(entity_name)) {
+    if (!ego_entity->isNearbyPosition(trigger_position, 20.0) && api_.isEntityExist(entity_name)) {
       api_.despawn(entity_name);
     }
 
     const auto ego_goal_position = traffic_simulator::helper::constructLaneletPose(34606, 0.0, 0.0);
-    if (ego_entity->isInPosition(ego_goal_position, 1.0)) {
+    if (ego_entity->isNearbyPosition(ego_goal_position, 1.0)) {
       api_.despawn("ego");
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }

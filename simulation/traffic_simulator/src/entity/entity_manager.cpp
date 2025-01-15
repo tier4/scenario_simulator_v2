@@ -30,7 +30,7 @@ auto EntityManager::setTrafficLights(const std::shared_ptr<TrafficLights> & traf
 
 auto EntityManager::setVerbose(const bool verbose) -> void
 {
-  configuration.verbose = verbose;
+  configuration_.verbose = verbose;
   for (const auto & [name, entity] : entities_) {
     entity->verbose = verbose;
   }
@@ -56,16 +56,16 @@ auto EntityManager::makeDebugMarker() const -> visualization_msgs::msg::MarkerAr
   return marker;
 }
 
-// updatee
+// update
 auto EntityManager::update(const double current_time, const double step_time) -> void
 {
   helper::StopWatch<std::chrono::milliseconds> stop_watch_update(
-    "EntityManager::update", configuration.verbose);
-  setVerbose(configuration.verbose);
+    "EntityManager::update", configuration_.verbose);
+  setVerbose(configuration_.verbose);
   if (npc_logic_started_) {
     traffic_lights_ptr_->startTrafficLightsUpdate(
-      configuration.conventional_traffic_light_publish_rate,
-      configuration.v2i_traffic_light_publish_rate);
+      configuration_.conventional_traffic_light_publish_rate,
+      configuration_.v2i_traffic_light_publish_rate);
   }
   std::unordered_map<std::string, CanonicalizedEntityStatus> all_status;
   for (auto && [name, entity] : entities_) {
@@ -99,13 +99,14 @@ auto EntityManager::update(const double current_time, const double step_time) ->
       status_with_trajectory.obstacle_find = false;
     }
     status_with_trajectory.status = static_cast<EntityStatus>(status);
+    status_with_trajectory.status.time = current_time + step_time;
     status_with_trajectory.name = name;
     status_with_trajectory.time = current_time + step_time;
     status_array_msg.data.emplace_back(status_with_trajectory);
   }
   entity_status_array_pub_ptr_->publish(status_array_msg);
   stop_watch_update.stop();
-  if (configuration.verbose) {
+  if (configuration_.verbose) {
     stop_watch_update.print();
   }
 }
@@ -114,15 +115,15 @@ auto EntityManager::updateNpcLogic(
   const std::string & name, const double current_time, const double step_time)
   -> const CanonicalizedEntityStatus &
 {
-  if (configuration.verbose) {
+  if (configuration_.verbose) {
     std::cout << "update " << name << " behavior" << std::endl;
   }
   const auto entity = getEntity(name);
   // Update npc completely if logic has started, otherwise update Autoware only - if it is Ego
   if (npc_logic_started_) {
     entity->onUpdate(current_time, step_time);
-  } else if (const auto ego_entity = std::dynamic_pointer_cast<const EgoEntity>(entity)) {
-    ego_entity->updateFieldOperatorApplication();
+  } else if (entity->is<EgoEntity>()) {
+    entity->as<EgoEntity>()->updateFieldOperatorApplication();
   }
   return entity->getCanonicalizedStatus();
 }
@@ -232,7 +233,7 @@ auto EntityManager::isAnyEgoSpawned() const -> bool
 auto EntityManager::getEgoName() const -> const std::string &
 {
   for (const auto & [name, entity] : entities_) {
-    if (entity->template is<EgoEntity>()) {
+    if (entity->is<EgoEntity>()) {
       return entity->getName();
     }
   }
@@ -244,8 +245,8 @@ auto EntityManager::getEgoName() const -> const std::string &
 auto EntityManager::getEgoEntity() const -> std::shared_ptr<entity::EgoEntity>
 {
   for (const auto & [name, entity] : entities_) {
-    if (entity->template is<EgoEntity>()) {
-      return std::dynamic_pointer_cast<EgoEntity>(entity);
+    if (entity->is<EgoEntity>()) {
+      return entity->as<EgoEntity>();
     }
   }
   THROW_SEMANTIC_ERROR("EgoEntity does not exist");
@@ -257,10 +258,10 @@ auto EntityManager::getEgoEntity(const std::string & name) const
   if (auto it = entities_.find(name); it == entities_.end()) {
     THROW_SEMANTIC_ERROR("Entity ", std::quoted(name), " does not exist.");
   } else {
-    if (auto ego_entity = std::dynamic_pointer_cast<EgoEntity>(it->second); !ego_entity) {
+    if (not it->second->is<EgoEntity>()) {
       THROW_SEMANTIC_ERROR("Entity : ", std::quoted(name), " exists, but it is not ego");
     } else
-      return ego_entity;
+      return it->second->as<EgoEntity>();
   }
 }
 

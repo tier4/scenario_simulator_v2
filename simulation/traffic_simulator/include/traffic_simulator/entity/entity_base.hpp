@@ -108,7 +108,7 @@ public:
   DEFINE_GETTER(LinearJerk,                      double,                                             status_->getLinearJerk())
   DEFINE_GETTER(MapPose,                         const geometry_msgs::msg::Pose &,                   status_->getMapPose())
   DEFINE_GETTER(StandStillDuration,              double,                                             stand_still_duration_)
-  DEFINE_GETTER(LaneletRelativeYaw,              std::optional<double>,                              status_->getLaneletRelativeYaw()) 
+  DEFINE_GETTER(LaneletRelativeYaw,              std::optional<double>,                              status_->getLaneletRelativeYaw())
   DEFINE_GETTER(TraveledDistance,                double,                                             traveled_distance_)
   DEFINE_GETTER(Name,                            const std::string &,                                status_->getName())
   // clang-format on
@@ -129,10 +129,11 @@ public:
 
   /*   */ auto isStopped() const -> bool;
 
-  /*   */ auto isInPosition(const geometry_msgs::msg::Pose & pose, const double tolerance) const
+  /*   */ auto isNearbyPosition(const geometry_msgs::msg::Pose & pose, const double tolerance) const
     -> bool;
 
-  /*   */ auto isInPosition(const LaneletPose & lanelet_pose, const double tolerance) const -> bool;
+  /*   */ auto isNearbyPosition(const LaneletPose & lanelet_pose, const double tolerance) const
+    -> bool;
 
   /*   */ auto isInLanelet() const -> bool { return status_->isInLanelet(); };
 
@@ -173,7 +174,7 @@ public:
   virtual auto requestLaneChange(const lanelet::Id) -> void
   {
     /**
-     * @note There are Entities such as MiscObjectEntity for which lane change is not possible, 
+     * @note There are Entities such as MiscObjectEntity for which lane change is not possible,
      * and since it is necessary to implement appropriate overrides for each Entity, no operation is performed on the base type.
      */
   }
@@ -181,7 +182,7 @@ public:
   virtual auto requestLaneChange(const lane_change::Parameter &) -> void
   {
     /**
-     * @note There are Entities such as MiscObjectEntity for which lane change is not possible, 
+     * @note There are Entities such as MiscObjectEntity for which lane change is not possible,
      * and since it is necessary to implement appropriate overrides for each Entity, no operation is performed on the base type.
      */
   }

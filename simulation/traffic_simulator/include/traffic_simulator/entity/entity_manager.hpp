@@ -53,9 +53,8 @@ public:
   explicit EntityManager(
     NodeT && node, const Configuration & configuration,
     const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node_parameters)
-  : configuration(configuration),
+  : configuration_(configuration),
     clock_ptr_(node->get_clock()),
-    node_topics_interface(rclcpp::node_interfaces::get_node_topics_interface(node)),
     node_parameters_(node_parameters),
     broadcaster_(node),
     base_link_broadcaster_(node),
@@ -65,8 +64,6 @@ public:
     lanelet_marker_pub_ptr_(rclcpp::create_publisher<MarkerArray>(
       node, "lanelet/marker", LaneletMarkerQoS(),
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
-    npc_logic_started_(false),
-    traffic_lights_ptr_(nullptr),
     hdmap_utils_ptr_(std::make_shared<hdmap_utils::HdMapUtils>(
       configuration.lanelet2_map_path(), getOrigin(node_parameters))),
     markers_raw_(hdmap_utils_ptr_->generateMarker())
@@ -221,11 +218,9 @@ public:
   auto getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &;
 
 private:
-  /* */ Configuration configuration;
+  /* */ Configuration configuration_;
 
   const rclcpp::Clock::SharedPtr clock_ptr_;
-
-  const rclcpp::node_interfaces::NodeTopicsInterface::SharedPtr node_topics_interface;
 
   const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr node_parameters_;
 
@@ -239,9 +234,9 @@ private:
 
   /* */ std::unordered_map<std::string, std::shared_ptr<entity::EntityBase>> entities_;
 
-  /* */ bool npc_logic_started_;
+  /* */ bool npc_logic_started_{false};
 
-  /* */ std::shared_ptr<TrafficLights> traffic_lights_ptr_;
+  /* */ std::shared_ptr<TrafficLights> traffic_lights_ptr_{nullptr};
 
   const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
 

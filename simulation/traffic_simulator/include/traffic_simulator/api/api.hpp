@@ -67,10 +67,11 @@ public:
     entity_manager_ptr_(
       std::make_shared<entity::EntityManager>(node, configuration, node_parameters_)),
     traffic_controller_ptr_(std::make_shared<traffic::TrafficController>(
-      entity_manager_ptr_, configuration.auto_sink_entity_types)),
+      [this](const std::string & name) { despawn(name); }, entity_manager_ptr_,
+      configuration.auto_sink_entity_types)),
     traffic_lights_ptr_(std::make_shared<TrafficLights>(
       node, entity_manager_ptr_->getHdmapUtils(),
-      getParameter<std::string>(node_parameters_, "architecture_type", "awf/universe/20240605"))),
+      getROS2Parameter<std::string>("architecture_type", "awf/universe/20240605"))),
     real_time_factor_subscriber_(rclcpp::create_subscription<std_msgs::msg::Float64>(
       node, "/real_time_factor", rclcpp::QoS(rclcpp::KeepLast(1)).best_effort(),
       [this](const std_msgs::msg::Float64 & message) {
@@ -120,7 +121,7 @@ public:
     using MiscObjectParameters = traffic_simulator_msgs::msg::MiscObjectParameters;
 
     auto register_to_entity_manager = [&]() {
-      if constexpr (std::is_same<ParamsType, VehicleParameters>::value) {
+      if constexpr (std::is_same_v<ParamsType, VehicleParameters>) {
         if (behavior == VehicleBehavior::autoware()) {
           return entity_manager_ptr_->spawnEntity<entity::EgoEntity>(
             name, pose, parameters, getCurrentTime(), configuration_, node_parameters_);
@@ -129,11 +130,11 @@ public:
             name, pose, parameters, getCurrentTime(),
             behavior.empty() ? VehicleBehavior::defaultBehavior() : behavior);
         }
-      } else if constexpr (std::is_same<ParamsType, PedestrianParameters>::value) {
+      } else if constexpr (std::is_same_v<ParamsType, PedestrianParameters>) {
         return entity_manager_ptr_->spawnEntity<entity::PedestrianEntity>(
           name, pose, parameters, getCurrentTime(),
           behavior.empty() ? PedestrianBehavior::defaultBehavior() : behavior);
-      } else if constexpr (std::is_same<ParamsType, MiscObjectParameters>::value) {
+      } else if constexpr (std::is_same_v<ParamsType, MiscObjectParameters>) {
         return entity_manager_ptr_->spawnEntity<entity::MiscObjectEntity>(
           name, pose, parameters, getCurrentTime());
       } else {
@@ -153,16 +154,16 @@ public:
       if (configuration_.standalone_mode) {
         return true;
       } else {
-        if constexpr (std::is_same<ParamsType, VehicleParameters>::value) {
+        if constexpr (std::is_same_v<ParamsType, VehicleParameters>) {
           simulation_api_schema::SpawnVehicleEntityRequest reqest;
           reqest.set_is_ego(behavior == VehicleBehavior::autoware());
           /// @todo Should be filled from function API
           reqest.set_initial_speed(0.0);
           return prepare_and_send_request(entity, reqest);
-        } else if constexpr (std::is_same<ParamsType, PedestrianParameters>::value) {
+        } else if constexpr (std::is_same_v<ParamsType, PedestrianParameters>) {
           simulation_api_schema::SpawnPedestrianEntityRequest reqest;
           return prepare_and_send_request(entity, reqest);
-        } else if constexpr (std::is_same<ParamsType, MiscObjectParameters>::value) {
+        } else if constexpr (std::is_same_v<ParamsType, MiscObjectParameters>) {
           simulation_api_schema::SpawnMiscObjectEntityRequest reqest;
           return prepare_and_send_request(entity, reqest);
         } else {

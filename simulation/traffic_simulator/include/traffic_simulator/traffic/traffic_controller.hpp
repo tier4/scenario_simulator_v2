@@ -43,6 +43,7 @@ class TrafficController
 {
 public:
   explicit TrafficController(
+    const std::function<void(const std::string &)> & despawn_,
     const std::shared_ptr<entity::EntityManager> entity_manager_ptr,
     const std::set<std::uint8_t> auto_sink_entity_types /*= {}*/);
 
@@ -57,6 +58,7 @@ public:
 
 private:
   auto appendAutoSinks(const std::set<std::uint8_t> & auto_sink_entity_types) -> void;
+  const std::function<void(const std::string &)> despawn_;
   const std::shared_ptr<entity::EntityManager> entity_manager_ptr_;
   std::vector<std::shared_ptr<TrafficModuleBase>> modules_;
 };
