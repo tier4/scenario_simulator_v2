@@ -90,10 +90,11 @@ auto toLaneletPose(
   const Pose & map_pose, const lanelet::Id lanelet_id, const double matching_distance)
   -> std::optional<LaneletPose>
 {
-  /// yaw_threshold [rad] is used to determine whether the entity is going straight,
-  /// it defines the maximum allowed rotation with respect to the lanelet centreline
-  constexpr double yaw_threshold = 0.25;  ///< M_PI * 0.25 ≈ 0.7854 rad -> 45 deegres,
-  const auto lanelet_spline = lanelet_map::centerPointsSpline(lanelet_id);
+  /// @note yaw_threshold_deg is used to determine whether the entity is going straight,
+  /// it defines the maximum allowed rotation with respect to the lanelet centreline.
+  constexpr double yaw_threshold_deg = 45.0
+
+    const auto lanelet_spline = lanelet_map::centerPointsSpline(lanelet_id);
   if (const auto lanelet_pose_s = lanelet_spline->getSValue(map_pose, matching_distance);
       !lanelet_pose_s) {
     return std::nullopt;
@@ -101,10 +102,12 @@ auto toLaneletPose(
              !isAltitudeMatching(map_pose.position.z, pose_on_centerline.position.z)) {
     return std::nullopt;
   } else {
+    const double yaw_range_min_rad = M_PI * yaw_threshold_deg / 180.0;
+    const double yaw_range_max_rad = M_PI - yaw_range_min_rad;
     if (const auto lanelet_pose_rpy = math::geometry::convertQuaternionToEulerAngle(
           math::geometry::getRotation(pose_on_centerline.orientation, map_pose.orientation));
-        std::fabs(lanelet_pose_rpy.z) > M_PI * yaw_threshold &&
-        std::fabs(lanelet_pose_rpy.z) < M_PI * (1 - yaw_threshold)) {
+        std::fabs(lanelet_pose_rpy.z) > yaw_range_max_rad ||
+        std::fabs(lanelet_pose_rpy.z) < yaw_range_min_rad) {
       return std::nullopt;
     } else {
       double lanelet_pose_offset = std::sqrt(
