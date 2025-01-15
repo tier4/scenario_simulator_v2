@@ -65,7 +65,7 @@ auto LaneletLoader::overwriteLaneletsCenterline(lanelet::LaneletMapPtr lanelet_m
     const auto left_points = resamplePoints(lanelet_obj.leftBound(), num_segments);
     const auto right_points = resamplePoints(lanelet_obj.rightBound(), num_segments);
 
-    // Create centerline
+    /// @note Create centerline
     lanelet::LineString3d centerline(lanelet::utils::getId());
     for (size_t i = 0; i < static_cast<size_t>(num_segments + 1); i++) {
       // Add ID for the average point of left and right
