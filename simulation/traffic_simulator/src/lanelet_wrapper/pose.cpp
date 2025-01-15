@@ -92,9 +92,9 @@ auto toLaneletPose(
 {
   /// @note yaw_threshold_deg is used to determine whether the entity is going straight,
   /// it defines the maximum allowed rotation with respect to the lanelet centerline.
-  constexpr double yaw_threshold_deg = 45.0
+  constexpr double yaw_threshold_deg = 45.0;
 
-    const auto lanelet_spline = lanelet_map::centerPointsSpline(lanelet_id);
+  const auto lanelet_spline = lanelet_map::centerPointsSpline(lanelet_id);
   if (const auto lanelet_pose_s = lanelet_spline->getSValue(map_pose, matching_distance);
       !lanelet_pose_s) {
     return std::nullopt;
@@ -391,7 +391,6 @@ auto canonicalizeLaneletPose(const LaneletPose & lanelet_pose, const lanelet::Id
   return {canonicalized_lanelet_pose, std::nullopt};
 }
 
-// used only by this namespace
 auto matchToLane(
   const Pose & map_pose, const BoundingBox & bounding_box, const bool include_crosswalk,
   const double matching_distance, const double reduction_ratio, const RoutingGraphType type)

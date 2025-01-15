@@ -92,7 +92,6 @@ auto canonicalizeLaneletPose(const LaneletPose & lanelet_pose)
 auto canonicalizeLaneletPose(const LaneletPose & lanelet_pose, const lanelet::Ids & route_lanelets)
   -> std::tuple<std::optional<LaneletPose>, std::optional<lanelet::Id>>;
 
-// used only by this namespace
 auto matchToLane(
   const Pose & map_pose, const BoundingBox & bounding_box, const bool include_crosswalk,
   const double matching_distance = 1.0,
