@@ -159,7 +159,7 @@ public:
   virtual auto requestLaneChange(const lanelet::Id) -> void
   {
     /**
-     * @note There are Entities such as MiscObjectEntity for which lane change is not possible, 
+     * @note There are Entities such as MiscObjectEntity for which lane change is not possible,
      * and since it is necessary to implement appropriate overrides for each Entity, no operation is performed on the base type.
      */
   }
@@ -167,7 +167,7 @@ public:
   virtual auto requestLaneChange(const lane_change::Parameter &) -> void
   {
     /**
-     * @note There are Entities such as MiscObjectEntity for which lane change is not possible, 
+     * @note There are Entities such as MiscObjectEntity for which lane change is not possible,
      * and since it is necessary to implement appropriate overrides for each Entity, no operation is performed on the base type.
      */
   }
