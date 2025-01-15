@@ -91,7 +91,7 @@ auto toLaneletPose(
   -> std::optional<LaneletPose>
 {
   /// @note yaw_threshold_deg is used to determine whether the entity is going straight,
-  /// it defines the maximum allowed rotation with respect to the lanelet centreline.
+  /// it defines the maximum allowed rotation with respect to the lanelet centerline.
   constexpr double yaw_threshold_deg = 45.0
 
     const auto lanelet_spline = lanelet_map::centerPointsSpline(lanelet_id);
