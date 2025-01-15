@@ -53,7 +53,7 @@ auto LaneletLoader::overwriteLaneletsCenterline(lanelet::LaneletMapPtr lanelet_m
 
   auto generateFineCenterline =
     [&](const lanelet::ConstLanelet & lanelet_obj) -> lanelet::LineString3d {
-    // Get length of longer border
+    /// @note Get length of longer border
     const auto left_length =
       static_cast<double>(lanelet::geometry::length(lanelet_obj.leftBound()));
     const auto right_length =
