@@ -47,7 +47,7 @@ auto quietNaNLaneletPose() -> LaneletPose
            .z(std::numeric_limits<double>::quiet_NaN()));
 }
 
-// Conversions
+/// @note Conversions
 auto canonicalize(const LaneletPose & lanelet_pose) -> LaneletPose
 {
   if (
