@@ -50,6 +50,7 @@ TrafficController::TrafficController(
 auto TrafficController::appendAutoSinks(const std::set<std::uint8_t> & auto_sink_entity_types)
   -> void
 {
+  /// @note Hard coded parameter, this value is radius of the traffic sink circle.
   constexpr double sink_radius{1.0};
   for (const auto & [lanelet_id, pose] : lanelet_map::borderlinePoses()) {
     const auto traffic_sink_config = TrafficSinkConfig(
