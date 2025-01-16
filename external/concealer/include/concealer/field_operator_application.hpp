@@ -132,7 +132,7 @@ protected:
 
   auto clearRoute() -> void;
 
-  auto setVelocityLimit(const double velocity_limit) -> void;
+  auto emplaceSetVelocityLimitTask(const double velocity_limit) -> void;
 
   auto enableAutowareControl() -> void;
 
@@ -166,8 +166,6 @@ public:
   auto getTurnIndicatorsCommandName() const -> std::string;
 
   auto requestAutoModeForCooperation(const std::string & module_name, const bool enable) -> void;
-
-  auto getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray;
 };
 }  // namespace concealer
 
