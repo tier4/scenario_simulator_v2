@@ -102,8 +102,8 @@ auto toLaneletPose(
              !isAltitudeMatching(map_pose.position.z, pose_on_centerline.position.z)) {
     return std::nullopt;
   } else {
-    const double yaw_range_min_rad = M_PI * yaw_threshold_deg / 180.0;
-    const double yaw_range_max_rad = M_PI - yaw_range_min_rad;
+    constexpr double yaw_range_min_rad = M_PI * yaw_threshold_deg / 180.0;
+    constexpr double yaw_range_max_rad = M_PI - yaw_range_min_rad;
     if (const auto lanelet_pose_rpy = math::geometry::convertQuaternionToEulerAngle(
           math::geometry::getRotation(pose_on_centerline.orientation, map_pose.orientation));
         std::fabs(lanelet_pose_rpy.z) > yaw_range_min_rad and
