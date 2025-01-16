@@ -144,6 +144,8 @@ auto toLaneletPose(
   const Pose & map_pose, const bool include_crosswalk, const double matching_distance)
   -> std::optional<LaneletPose>
 {
+  /// @note Hardcoded parameter, this value has no technical basis and is determined based on experimentation.
+  /// @todo Add doxygen comments as soon as you know the meaning and rationale of the value.
   constexpr double distance_threshold{0.1};
   constexpr std::size_t search_count{5};
   const auto nearby_lanelet_ids = lanelet_map::nearbyLaneletIds(
