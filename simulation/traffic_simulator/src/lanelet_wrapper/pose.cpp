@@ -106,7 +106,7 @@ auto toLaneletPose(
     const double yaw_range_max_rad = M_PI - yaw_range_min_rad;
     if (const auto lanelet_pose_rpy = math::geometry::convertQuaternionToEulerAngle(
           math::geometry::getRotation(pose_on_centerline.orientation, map_pose.orientation));
-        std::fabs(lanelet_pose_rpy.z) > yaw_range_min_rad ||
+        std::fabs(lanelet_pose_rpy.z) > yaw_range_min_rad and
         std::fabs(lanelet_pose_rpy.z) < yaw_range_max_rad) {
       return std::nullopt;
     } else {
@@ -331,8 +331,8 @@ auto alongLaneletPose(
 }
 
 /**
- * @brief Canonicalizes a given LaneletPose by adjusting the longitudinal position (s) to ensure it 
- *        lies within the bounds of the specified lanelet. If the position is out of bounds, it 
+ * @brief Canonicalizes a given LaneletPose by adjusting the longitudinal position (s) to ensure it
+ *        lies within the bounds of the specified lanelet. If the position is out of bounds, it
  *        traverses to previous or next lanelets to find the canonicalized position.
  *
  * If the provided pose has a longitudinal position (s) less than 0, the function traverses
