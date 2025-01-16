@@ -46,7 +46,7 @@ struct NormalDistribution<nav_msgs::msg::Odometry>
 
   std::random_device device;
 
-  std::default_random_engine engine;
+  std::mt19937_64 engine;
 
   std::uniform_real_distribution<double> position_x, position_y, position_z, orientation_r,
     orientation_p, orientation_y, linear_x, linear_y, linear_z, angular_x, angular_y, angular_z;
