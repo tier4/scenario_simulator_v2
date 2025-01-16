@@ -111,6 +111,7 @@ public:
     }
   }
 
+private:
   std::unordered_map<std::tuple<lanelet::Id, lanelet::Id, bool>, lanelet::Ids> data_;
   std::mutex mutex_;
 
@@ -172,6 +173,7 @@ public:
     return splines_.at(lanelet_id);
   }
 
+private:
   std::unordered_map<lanelet::Id, std::vector<Point>> data_;
   std::unordered_map<lanelet::Id, std::shared_ptr<Spline>> splines_;
   std::mutex mutex_;
@@ -234,6 +236,7 @@ public:
     return data_.at(lanelet_id);
   }
 
+private:
   std::unordered_map<lanelet::Id, double> data_;
   std::mutex mutex_;
 
