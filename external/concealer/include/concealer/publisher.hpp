@@ -48,8 +48,20 @@ struct NormalDistribution<nav_msgs::msg::Odometry>
 
   std::mt19937_64 engine;
 
-  std::uniform_real_distribution<double> position_x, position_y, position_z, orientation_r,
-    orientation_p, orientation_y, linear_x, linear_y, linear_z, angular_x, angular_y, angular_z;
+  // clang-format off
+  std::normal_distribution<double> position_x,
+                                   position_y,
+                                   position_z,
+                                   orientation_r,
+                                   orientation_p,
+                                   orientation_y,
+                                   linear_x,
+                                   linear_y,
+                                   linear_z,
+                                   angular_x,
+                                   angular_y,
+                                   angular_z;
+  // clang-format on
 
   explicit NormalDistribution(
     const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr &, const std::string &);
