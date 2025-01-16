@@ -23,7 +23,7 @@ auto laneletLength(const lanelet::Id lanelet_id) -> double
   return lanelet_wrapper::lanelet_map::laneletLength(lanelet_id);
 }
 
-auto borderlinePoses() -> std::vector<std::pair<lanelet::Id, Pose>>
+auto noNextLaneletPoses() -> std::vector<std::pair<lanelet::Id, Pose>>
 {
   std::vector<std::pair<lanelet::Id, Pose>> borderline_poses;
   for (const auto & lanelet_id : lanelet_wrapper::lanelet_map::laneletIds()) {
