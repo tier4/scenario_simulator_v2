@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__HISTOGRAM_BIN_HPP_
-#define OPENSCENARIO_INTERPRETER__HISTOGRAM_BIN_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__HISTOGRAM_BIN_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__HISTOGRAM_BIN_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
@@ -23,16 +23,18 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- HistogramBin 1.2 -------------------------------------------------------
- *
- *  <xsd:complexType name="HistogramBin">
- *    <xsd:sequence>
- *      <xsd:element name="Range" type="Range"/>
- *    </xsd:sequence>
- *    <xsd:attribute name="weight" type="Double" use="required"/>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   HistogramBin (OpenSCENARIO XML 1.3.1)
+
+   A bin in a histogram.
+
+   <xsd:complexType name="HistogramBin">
+     <xsd:sequence>
+       <xsd:element name="Range" type="Range"/>
+     </xsd:sequence>
+     <xsd:attribute name="weight" type="Double" use="required"/>
+   </xsd:complexType>
+*/
 struct HistogramBin : public ComplexType
 {
   const Range range;
@@ -43,4 +45,4 @@ struct HistogramBin : public ComplexType
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
-#endif  // OPENSCENARIO_INTERPRETER__HISTOGRAM_BIN_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__HISTOGRAM_BIN_HPP_
