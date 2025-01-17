@@ -35,8 +35,8 @@ auto getParameter(
 template <typename>
 struct Identity
 {
-  template <typename... Ts>
-  explicit constexpr Identity(Ts &&...)
+  explicit constexpr Identity(
+    const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr &, const std::string &)
   {
   }
 
@@ -75,9 +75,9 @@ struct NormalDistribution<nav_msgs::msg::Odometry>
     {
     }
 
-    auto apply(std::mt19937_64 & engine, double & value) -> decltype(auto)
+    auto apply(std::mt19937_64 & engine, double value) -> decltype(auto)
     {
-      return (value *= (multiplicative(engine) + 1.0)) += additive(engine);
+      return value * (multiplicative(engine) + 1.0) + additive(engine);
     }
   };
 

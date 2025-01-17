@@ -21,7 +21,17 @@ namespace concealer
 NormalDistribution<nav_msgs::msg::Odometry>::NormalDistribution(
   const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node,
   const std::string & topic)
-: seed(getParameter<int>(node, topic + ".seed")),
+: seed([&]() {
+    if (const auto value = getParameter<int>(node, topic + ".seed");
+        std::random_device::min() <= value and value <= std::random_device::max()) {
+      return value;
+    } else {
+      throw common::scenario_simulator_exception::Error(
+        "The value of parameter ", std::quoted(topic + ".seed"),
+        " must be greater than or equal to ", std::random_device::min(),
+        " and less than or equal to ", std::random_device::max());
+    }
+  }()),
   engine(seed ? seed : device()),
   position_x_error(node, topic + ".nav_msgs::msg::Odometry.pose.pose.position.x.error"),
   position_y_error(node, topic + ".nav_msgs::msg::Odometry.pose.pose.position.y.error"),
@@ -41,9 +51,9 @@ NormalDistribution<nav_msgs::msg::Odometry>::NormalDistribution(
 auto NormalDistribution<nav_msgs::msg::Odometry>::operator()(nav_msgs::msg::Odometry odometry)
   -> nav_msgs::msg::Odometry
 {
-  position_x_error.apply(engine, odometry.pose.pose.position.x);
-  position_y_error.apply(engine, odometry.pose.pose.position.y);
-  position_z_error.apply(engine, odometry.pose.pose.position.z);
+  odometry.pose.pose.position.x = position_x_error.apply(engine, odometry.pose.pose.position.x);
+  odometry.pose.pose.position.y = position_y_error.apply(engine, odometry.pose.pose.position.y);
+  odometry.pose.pose.position.z = position_z_error.apply(engine, odometry.pose.pose.position.z);
 
   Eigen::Vector3d euler = Eigen::Quaterniond(
                             odometry.pose.pose.orientation.w, odometry.pose.pose.orientation.x,
@@ -51,9 +61,9 @@ auto NormalDistribution<nav_msgs::msg::Odometry>::operator()(nav_msgs::msg::Odom
                             .matrix()
                             .eulerAngles(0, 1, 2);
 
-  orientation_r_error.apply(engine, euler.x());
-  orientation_p_error.apply(engine, euler.y());
-  orientation_y_error.apply(engine, euler.z());
+  euler.x() = orientation_r_error.apply(engine, euler.x());
+  euler.y() = orientation_p_error.apply(engine, euler.y());
+  euler.z() = orientation_y_error.apply(engine, euler.z());
 
   const Eigen::Quaterniond orientation = Eigen::AngleAxisd(euler.x(), Eigen::Vector3d::UnitX()) *
                                          Eigen::AngleAxisd(euler.y(), Eigen::Vector3d::UnitY()) *
@@ -64,13 +74,13 @@ auto NormalDistribution<nav_msgs::msg::Odometry>::operator()(nav_msgs::msg::Odom
   odometry.pose.pose.orientation.z = orientation.z();
   odometry.pose.pose.orientation.w = orientation.w();
 
-  linear_x_error.apply(engine, odometry.twist.twist.linear.x);
-  linear_y_error.apply(engine, odometry.twist.twist.linear.y);
-  linear_z_error.apply(engine, odometry.twist.twist.linear.z);
+  odometry.twist.twist.linear.x = linear_x_error.apply(engine, odometry.twist.twist.linear.x);
+  odometry.twist.twist.linear.y = linear_y_error.apply(engine, odometry.twist.twist.linear.y);
+  odometry.twist.twist.linear.z = linear_z_error.apply(engine, odometry.twist.twist.linear.z);
 
-  angular_x_error.apply(engine, odometry.twist.twist.angular.x);
-  angular_y_error.apply(engine, odometry.twist.twist.angular.y);
-  angular_z_error.apply(engine, odometry.twist.twist.angular.z);
+  odometry.twist.twist.angular.x = angular_x_error.apply(engine, odometry.twist.twist.angular.x);
+  odometry.twist.twist.angular.y = angular_y_error.apply(engine, odometry.twist.twist.angular.y);
+  odometry.twist.twist.angular.z = angular_z_error.apply(engine, odometry.twist.twist.angular.z);
 
   return odometry;
 }
