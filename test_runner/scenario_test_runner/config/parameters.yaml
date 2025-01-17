@@ -8,20 +8,104 @@ simulation:
           pose:
             pose:
               position:
-                x: { mean: 0.0, standard_deviation: 0.0 }
-                y: { mean: 0.0, standard_deviation: 0.0 }
-                z: { mean: 0.0, standard_deviation: 0.0 }
+                x:
+                  error:
+                    additive:
+                      mean: 0.0
+                      standard_deviation: 0.0
+                    multiplicative:
+                      mean: 0.0
+                      standard_deviation: 0.0
+                y:
+                  error:
+                    additive:
+                      mean: 0.0
+                      standard_deviation: 0.0
+                    multiplicative:
+                      mean: 0.0
+                      standard_deviation: 0.0
+                z:
+                  error:
+                    additive:
+                      mean: 0.0
+                      standard_deviation: 0.0
+                    multiplicative:
+                      mean: 0.0
+                      standard_deviation: 0.0
               orientation:
-                r: { mean: 0.0, standard_deviation: 0.0 }
-                p: { mean: 0.0, standard_deviation: 0.0 }
-                y: { mean: 0.0, standard_deviation: 0.0 }
+                r:
+                  error:
+                    additive:
+                      mean: 0.0
+                      standard_deviation: 0.0
+                    multiplicative:
+                      mean: 0.0
+                      standard_deviation: 0.0
+                p:
+                  error:
+                    additive:
+                      mean: 0.0
+                      standard_deviation: 0.0
+                    multiplicative:
+                      mean: 0.0
+                      standard_deviation: 0.0
+                y:
+                  error:
+                    additive:
+                      mean: 0.0
+                      standard_deviation: 0.0
+                    multiplicative:
+                      mean: 0.0
+                      standard_deviation: 0.0
           twist:
             twist:
               linear:
-                x: { mean: 0.0, standard_deviation: 0.0 }
-                y: { mean: 0.0, standard_deviation: 0.0 }
-                z: { mean: 0.0, standard_deviation: 0.0 }
+                x:
+                  error:
+                    additive:
+                      mean: 0.0
+                      standard_deviation: 0.0
+                    multiplicative:
+                      mean: 0.0
+                      standard_deviation: 0.0
+                y:
+                  error:
+                    additive:
+                      mean: 0.0
+                      standard_deviation: 0.0
+                    multiplicative:
+                      mean: 0.0
+                      standard_deviation: 0.0
+                z:
+                  error:
+                    additive:
+                      mean: 0.0
+                      standard_deviation: 0.0
+                    multiplicative:
+                      mean: 0.0
+                      standard_deviation: 0.0
               angular:
-                x: { mean: 0.0, standard_deviation: 0.0 }
-                y: { mean: 0.0, standard_deviation: 0.0 }
-                z: { mean: 0.0, standard_deviation: 0.0 }
+                x:
+                  error:
+                    additive:
+                      mean: 0.0
+                      standard_deviation: 0.0
+                    multiplicative:
+                      mean: 0.0
+                      standard_deviation: 0.0
+                y:
+                  error:
+                    additive:
+                      mean: 0.0
+                      standard_deviation: 0.0
+                    multiplicative:
+                      mean: 0.0
+                      standard_deviation: 0.0
+                z:
+                  error:
+                    additive:
+                      mean: 0.0
+                      standard_deviation: 0.0
+                    multiplicative:
+                      mean: 0.0
+                      standard_deviation: 0.0

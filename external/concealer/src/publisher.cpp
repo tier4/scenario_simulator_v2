@@ -18,79 +18,32 @@
 
 namespace concealer
 {
-template <typename T>
-auto getParameter(
-  const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node,
-  const std::string & name, T value = {})
-{
-  if (not node->has_parameter(name)) {
-    node->declare_parameter(name, rclcpp::ParameterValue(value));
-  }
-  return node->get_parameter(name).get_value<T>();
-}
-
 NormalDistribution<nav_msgs::msg::Odometry>::NormalDistribution(
   const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node,
   const std::string & topic)
 : seed(getParameter<int>(node, topic + ".seed")),
   engine(seed ? seed : device()),
-  position_x(
-    getParameter<double>(node, topic + ".nav_msgs::msg::Odometry.pose.pose.position.x.mean"),
-    getParameter<double>(
-      node, topic + ".nav_msgs::msg::Odometry.pose.pose.position.x.standard_deviation")),
-  position_y(
-    getParameter<double>(node, topic + ".nav_msgs::msg::Odometry.pose.pose.position.y.mean"),
-    getParameter<double>(
-      node, topic + ".nav_msgs::msg::Odometry.pose.pose.position.y.standard_deviation")),
-  position_z(
-    getParameter<double>(node, topic + ".nav_msgs::msg::Odometry.pose.pose.position.z.mean"),
-    getParameter<double>(
-      node, topic + ".nav_msgs::msg::Odometry.pose.pose.position.z.standard_deviation")),
-  orientation_r(
-    getParameter<double>(node, topic + ".nav_msgs::msg::Odometry.pose.pose.orientation.r.mean"),
-    getParameter<double>(
-      node, topic + ".nav_msgs::msg::Odometry.pose.pose.orientation.r.standard_deviation")),
-  orientation_p(
-    getParameter<double>(node, topic + ".nav_msgs::msg::Odometry.pose.pose.orientation.p.mean"),
-    getParameter<double>(
-      node, topic + ".nav_msgs::msg::Odometry.pose.pose.orientation.p.standard_deviation")),
-  orientation_y(
-    getParameter<double>(node, topic + ".nav_msgs::msg::Odometry.pose.pose.orientation.y.mean"),
-    getParameter<double>(
-      node, topic + ".nav_msgs::msg::Odometry.pose.pose.orientation.y.standard_deviation")),
-  linear_x(
-    getParameter<double>(node, topic + ".nav_msgs::msg::Odometry.twist.twist.linear.x.mean"),
-    getParameter<double>(
-      node, topic + ".nav_msgs::msg::Odometry.twist.twist.linear.x.standard_deviation")),
-  linear_y(
-    getParameter<double>(node, topic + ".nav_msgs::msg::Odometry.twist.twist.linear.y.mean"),
-    getParameter<double>(
-      node, topic + ".nav_msgs::msg::Odometry.twist.twist.linear.y.standard_deviation")),
-  linear_z(
-    getParameter<double>(node, topic + ".nav_msgs::msg::Odometry.twist.twist.linear.z.mean"),
-    getParameter<double>(
-      node, topic + ".nav_msgs::msg::Odometry.twist.twist.linear.z.standard_deviation")),
-  angular_x(
-    getParameter<double>(node, topic + ".nav_msgs::msg::Odometry.twist.twist.angular.x.mean"),
-    getParameter<double>(
-      node, topic + ".nav_msgs::msg::Odometry.twist.twist.angular.x.standard_deviation")),
-  angular_y(
-    getParameter<double>(node, topic + ".nav_msgs::msg::Odometry.twist.twist.angular.y.mean"),
-    getParameter<double>(
-      node, topic + ".nav_msgs::msg::Odometry.twist.twist.angular.y.standard_deviation")),
-  angular_z(
-    getParameter<double>(node, topic + ".nav_msgs::msg::Odometry.twist.twist.angular.z.mean"),
-    getParameter<double>(
-      node, topic + ".nav_msgs::msg::Odometry.twist.twist.angular.z.standard_deviation"))
+  position_x_error(node, topic + ".nav_msgs::msg::Odometry.pose.pose.position.x.error"),
+  position_y_error(node, topic + ".nav_msgs::msg::Odometry.pose.pose.position.y.error"),
+  position_z_error(node, topic + ".nav_msgs::msg::Odometry.pose.pose.position.z.error"),
+  orientation_r_error(node, topic + ".nav_msgs::msg::Odometry.pose.pose.orientation.r.error"),
+  orientation_p_error(node, topic + ".nav_msgs::msg::Odometry.pose.pose.orientation.p.error"),
+  orientation_y_error(node, topic + ".nav_msgs::msg::Odometry.pose.pose.orientation.y.error"),
+  linear_x_error(node, topic + ".nav_msgs::msg::Odometry.twist.twist.linear.x.error"),
+  linear_y_error(node, topic + ".nav_msgs::msg::Odometry.twist.twist.linear.y.error"),
+  linear_z_error(node, topic + ".nav_msgs::msg::Odometry.twist.twist.linear.z.error"),
+  angular_x_error(node, topic + ".nav_msgs::msg::Odometry.twist.twist.angular.x.error"),
+  angular_y_error(node, topic + ".nav_msgs::msg::Odometry.twist.twist.angular.y.error"),
+  angular_z_error(node, topic + ".nav_msgs::msg::Odometry.twist.twist.angular.z.error")
 {
 }
 
 auto NormalDistribution<nav_msgs::msg::Odometry>::operator()(nav_msgs::msg::Odometry odometry)
   -> nav_msgs::msg::Odometry
 {
-  odometry.pose.pose.position.x += position_x(engine);
-  odometry.pose.pose.position.y += position_y(engine);
-  odometry.pose.pose.position.z += position_z(engine);
+  position_x_error.apply(engine, odometry.pose.pose.position.x);
+  position_y_error.apply(engine, odometry.pose.pose.position.y);
+  position_z_error.apply(engine, odometry.pose.pose.position.z);
 
   Eigen::Vector3d euler = Eigen::Quaterniond(
                             odometry.pose.pose.orientation.w, odometry.pose.pose.orientation.x,
@@ -98,9 +51,9 @@ auto NormalDistribution<nav_msgs::msg::Odometry>::operator()(nav_msgs::msg::Odom
                             .matrix()
                             .eulerAngles(0, 1, 2);
 
-  euler.x() += orientation_r(engine);
-  euler.y() += orientation_p(engine);
-  euler.z() += orientation_y(engine);
+  orientation_r_error.apply(engine, euler.x());
+  orientation_p_error.apply(engine, euler.y());
+  orientation_y_error.apply(engine, euler.z());
 
   const Eigen::Quaterniond orientation = Eigen::AngleAxisd(euler.x(), Eigen::Vector3d::UnitX()) *
                                          Eigen::AngleAxisd(euler.y(), Eigen::Vector3d::UnitY()) *
@@ -111,13 +64,13 @@ auto NormalDistribution<nav_msgs::msg::Odometry>::operator()(nav_msgs::msg::Odom
   odometry.pose.pose.orientation.z = orientation.z();
   odometry.pose.pose.orientation.w = orientation.w();
 
-  odometry.twist.twist.linear.x += linear_x(engine);
-  odometry.twist.twist.linear.y += linear_y(engine);
-  odometry.twist.twist.linear.z += linear_z(engine);
+  linear_x_error.apply(engine, odometry.twist.twist.linear.x);
+  linear_y_error.apply(engine, odometry.twist.twist.linear.y);
+  linear_z_error.apply(engine, odometry.twist.twist.linear.z);
 
-  odometry.twist.twist.angular.x += angular_x(engine);
-  odometry.twist.twist.angular.y += angular_y(engine);
-  odometry.twist.twist.angular.z += angular_z(engine);
+  angular_x_error.apply(engine, odometry.twist.twist.angular.x);
+  angular_y_error.apply(engine, odometry.twist.twist.angular.y);
+  angular_z_error.apply(engine, odometry.twist.twist.angular.z);
 
   return odometry;
 }

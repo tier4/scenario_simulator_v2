@@ -21,6 +21,17 @@
 
 namespace concealer
 {
+template <typename T>
+auto getParameter(
+  const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node,
+  const std::string & name, T value = {})
+{
+  if (not node->has_parameter(name)) {
+    node->declare_parameter(name, rclcpp::ParameterValue(value));
+  }
+  return node->get_parameter(name).get_value<T>();
+}
+
 template <typename>
 struct Identity
 {
@@ -48,19 +59,41 @@ struct NormalDistribution<nav_msgs::msg::Odometry>
 
   std::mt19937_64 engine;
 
+  struct Error
+  {
+    std::normal_distribution<double> additive, multiplicative;
+
+    explicit Error(
+      const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node,
+      const std::string & prefix)
+    : additive(
+        getParameter<double>(node, prefix + ".additive.mean"),
+        getParameter<double>(node, prefix + ".additive.standard_deviation")),
+      multiplicative(
+        getParameter<double>(node, prefix + ".multiplicative.mean"),
+        getParameter<double>(node, prefix + ".multiplicative.standard_deviation"))
+    {
+    }
+
+    auto apply(std::mt19937_64 & engine, double & value) -> decltype(auto)
+    {
+      return (value *= (multiplicative(engine) + 1.0)) += additive(engine);
+    }
+  };
+
   // clang-format off
-  std::normal_distribution<double> position_x,
-                                   position_y,
-                                   position_z,
-                                   orientation_r,
-                                   orientation_p,
-                                   orientation_y,
-                                   linear_x,
-                                   linear_y,
-                                   linear_z,
-                                   angular_x,
-                                   angular_y,
-                                   angular_z;
+  Error position_x_error,
+        position_y_error,
+        position_z_error,
+        orientation_r_error,
+        orientation_p_error,
+        orientation_y_error,
+        linear_x_error,
+        linear_y_error,
+        linear_z_error,
+        angular_x_error,
+        angular_y_error,
+        angular_z_error;
   // clang-format on
 
   explicit NormalDistribution(
