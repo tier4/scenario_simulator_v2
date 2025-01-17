@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__DISTRIBUTION_DEFINITION_HPP_
-#define OPENSCENARIO_INTERPRETER__DISTRIBUTION_DEFINITION_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__DISTRIBUTION_DEFINITION_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__DISTRIBUTION_DEFINITION_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/deterministic.hpp>
@@ -24,16 +24,18 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- DistributionDefinition 1.2 ---------------------------------------------
- *
- *  <xsd:group name="DistributionDefinition">
- *    <xsd:choice>
- *      <xsd:element name="Deterministic" type="Deterministic"/>
- *      <xsd:element name="Stochastic" type="Stochastic"/>
- *    </xsd:choice>
- *  </xsd:group>
- *
- * -------------------------------------------------------------------------- */
+/*
+   DistributionDefinition (OpenSCENARIO XML 1.3.1)
+
+   Indicates whether the content defines a deterministic or stochastic parameter distribution.
+
+   <xsd:group name="DistributionDefinition">
+     <xsd:choice>
+       <xsd:element name="Deterministic" type="Deterministic"/>
+       <xsd:element name="Stochastic" type="Stochastic"/>
+     </xsd:choice>
+   </xsd:group>
+*/
 struct DistributionDefinition : public Group
 {
   explicit DistributionDefinition(const pugi::xml_node &, Scope & scope);
@@ -47,4 +49,4 @@ DEFINE_LAZY_VISITOR(
 
 }  // namespace syntax
 }  // namespace openscenario_interpreter
-#endif  // OPENSCENARIO_INTERPRETER__DISTRIBUTION_DEFINITION_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__DISTRIBUTION_DEFINITION_HPP_
