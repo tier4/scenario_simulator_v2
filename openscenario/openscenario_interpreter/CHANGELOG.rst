@@ -32,6 +32,15 @@ Changelog for package openscenario_interpreter
 * add publish_empty_context parameter
 * Contributors: Masaya Kataoka
 
+Forthcoming
+-----------
+* Merge pull request `#1504 <https://github.com/tier4/scenario_simulator_v2/issues/1504>`_ from tier4/refactor/parameter_value_distribution
+* Merge branch 'master' into refactor/parameter_value_distribution
+* Merge branch 'master' into refactor/parameter_value_distribution
+* chore: update xsd comments to OpenSCENARIO XML 1.3.1
+* chore: fix include guards
+* Contributors: Kotaro Yoshimoto
+
 7.4.6 (2025-01-10)
 ------------------
 * Merge remote-tracking branch 'origin/master' into dependabot/pip/jinja2-3.1.5
