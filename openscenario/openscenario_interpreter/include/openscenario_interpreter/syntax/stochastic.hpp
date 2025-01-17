@@ -27,7 +27,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 /*
-   Stochastic (OpenSCENARIO XML 1.3)
+   Stochastic (OpenSCENARIO XML 1.3.1)
 
    Top level container for all stochastic distribution elements.
 
@@ -39,7 +39,6 @@ inline namespace syntax
      <xsd:attribute name="randomSeed" type="Double"/>
    </xsd:complexType>
 */
-
 struct Stochastic : public ComplexType, public ParameterDistributionContainer, private Scope
 {
   const UnsignedInt number_of_test_runs;

@@ -24,17 +24,17 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 /*
-   ParameterAssignment (OpenSCENARIO XML 1.3)
+   ParameterAssignment (OpenSCENARIO XML 1.3.1)
 
    Assignment of a value to a named parameter. It is either used when importing
    types of vehicles, controllers etc. from a catalog during startup of a simulator.
    It is also used when generating concrete scenarios from logical scenarios
    with ParameterValueSets during runtime of a scenario generator.
 
-    <xsd:complexType name="ParameterAssignment">
-      <xsd:attribute name="parameterRef" type="String" use="required"/>
-      <xsd:attribute name="value" type="String" use="required"/>
-    </xsd:complexType>
+   <xsd:complexType name="ParameterAssignment">
+     <xsd:attribute name="parameterRef" type="String" use="required"/>
+     <xsd:attribute name="value" type="String" use="required"/>
+   </xsd:complexType>
 */
 struct ParameterAssignment
 {

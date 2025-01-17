@@ -24,7 +24,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 /*
-   ProbabilityDistributionSetElement (OpenSCENARIO XML 1.3)
+   ProbabilityDistributionSetElement (OpenSCENARIO XML 1.3.1)
 
    Indicates a value and probability in a stochastic distribution.
 

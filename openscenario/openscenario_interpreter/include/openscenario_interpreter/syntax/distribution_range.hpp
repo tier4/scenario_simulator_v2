@@ -25,7 +25,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 /*
-   DistributionRange (OpenSCENARIO XML 1.3)
+   DistributionRange (OpenSCENARIO XML 1.3.1)
 
    A range of values used for a deterministic distribution.
    The range starts with lower limit, Each additional value is defined
@@ -39,7 +39,7 @@ inline namespace syntax
      <xsd:attribute name="stepWidth" type="Double" use="required"/>
    </xsd:complexType>
 */
-struct DistributionRange : private Scope, public ComplexType, public SingleParameterDistributionBase
+struct DistributionRange : private Scope, public ComplexType
 {
   const Double step_width;
 

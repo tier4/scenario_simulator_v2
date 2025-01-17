@@ -25,7 +25,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 /*
-   Histogram (OpenSCENARIO XML 1.3)
+   Histogram (OpenSCENARIO XML 1.3.1)
 
    Histogram which can be applied to a single parameter.
 
@@ -35,7 +35,6 @@ inline namespace syntax
      </xsd:sequence>
    </xsd:complexType>
 */
-
 struct Histogram : public ComplexType, private Scope, public StochasticParameterDistributionBase
 {
   /**

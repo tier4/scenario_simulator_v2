@@ -23,7 +23,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 /*
-   DistributionSet (OpenSCENARIO XML 1.3)
+   DistributionSet (OpenSCENARIO XML 1.3.1)
 
    A set of possible values which can occur in a deterministic distribution.
 
@@ -33,8 +33,7 @@ inline namespace syntax
      </xsd:sequence>
    </xsd:complexType>
 */
-
-struct DistributionSet : private Scope, public ComplexType, public SingleParameterDistributionBase
+struct DistributionSet : private Scope, public ComplexType
 {
   const std::list<DistributionSetElement> elements;
 

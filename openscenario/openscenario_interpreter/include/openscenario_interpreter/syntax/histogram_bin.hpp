@@ -24,7 +24,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 /*
-   HistogramBin (OpenSCENARIO XML 1.3)
+   HistogramBin (OpenSCENARIO XML 1.3.1)
 
    A bin in a histogram.
 

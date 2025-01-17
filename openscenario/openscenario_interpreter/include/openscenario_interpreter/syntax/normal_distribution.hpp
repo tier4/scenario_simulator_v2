@@ -27,7 +27,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 /*
-   NormalDistribution (OpenSCENARIO XML 1.3)
+   NormalDistribution (OpenSCENARIO XML 1.3.1)
 
    Normal distribution which can be applied to a single parameter.
 

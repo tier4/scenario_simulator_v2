@@ -25,7 +25,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 /*
-   DistributionDefinition (OpenSCENARIO XML 1.3)
+   DistributionDefinition (OpenSCENARIO XML 1.3.1)
 
    Indicates whether the content defines a deterministic or stochastic parameter distribution.
 

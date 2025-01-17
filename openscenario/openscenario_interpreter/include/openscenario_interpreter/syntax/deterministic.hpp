@@ -25,7 +25,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 /*
-   Deterministic (OpenSCENARIO XML 1.3)
+   Deterministic (OpenSCENARIO XML 1.3.1)
 
    Top level container containing all deterministic distribution elements.
 
@@ -35,7 +35,7 @@ inline namespace syntax
      </xsd:sequence>
    </xsd:complexType>
 */
-struct Deterministic : public ParameterDistributionContainer
+struct Deterministic
 {
   const std::list<DeterministicParameterDistribution> deterministic_parameter_distributions;
 

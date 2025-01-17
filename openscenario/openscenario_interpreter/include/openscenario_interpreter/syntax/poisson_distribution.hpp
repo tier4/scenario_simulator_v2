@@ -26,7 +26,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 /*
-   PoissonDistribution (OpenSCENARIO XML 1.3)
+   PoissonDistribution (OpenSCENARIO XML 1.3.1)
 
    Poisson distribution which can be applied to a single parameter.
 
@@ -37,9 +37,7 @@ inline namespace syntax
      <xsd:attribute name="expectedValue" type="Double" use="required"/>
    </xsd:complexType>
 */
-struct PoissonDistribution : public ComplexType,
-                             private Scope,
-                             public StochasticParameterDistributionBase
+struct PoissonDistribution : public ComplexType, private Scope
 {
   const Range range;
 

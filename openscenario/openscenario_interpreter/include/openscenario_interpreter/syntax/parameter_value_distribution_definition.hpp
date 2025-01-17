@@ -23,7 +23,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 /*
-   ParameterValueDistributionDefinition (OpenSCENARIO XML 1.3)
+   ParameterValueDistributionDefinition (OpenSCENARIO XML 1.3.1)
 
    A marker stating that the OpenSCENARIO file is a parameter value distribution.
 

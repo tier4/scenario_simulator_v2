@@ -25,7 +25,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 /*
-   StochasticDistribution (OpenSCENARIO XML 1.3)
+   StochasticDistribution (OpenSCENARIO XML 1.3.1)
 
    Container for a stochastic distribution which applies to a single parameter.
 
@@ -36,8 +36,7 @@ inline namespace syntax
      <xsd:attribute name="parameterName" type="String" use="required"/>
    </xsd:complexType>
 */
-struct StochasticDistribution : public StochasticDistributionType,
-                                public StochasticParameterDistributionBase
+struct StochasticDistribution : public StochasticDistributionType
 {
   const String parameter_name;
 
