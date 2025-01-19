@@ -141,7 +141,7 @@ auto CanonicalizedEntityStatus::getLaneletId() const -> lanelet::Id
   return getLaneletPose().lanelet_id;
 }
 
-auto CanonicalizedEntityStatus::getLaneletIds() const noexcept -> lanelet::Ids
+auto CanonicalizedEntityStatus::getLaneletIds() const -> lanelet::Ids
 {
   return laneMatchingSucceed() ? lanelet::Ids{getLaneletId()} : lanelet::Ids{};
 }

@@ -69,7 +69,7 @@ public:
 
   auto laneMatchingSucceed() const noexcept -> bool;
   auto getLaneletId() const -> lanelet::Id;
-  auto getLaneletIds() const noexcept -> lanelet::Ids;
+  auto getLaneletIds() const -> lanelet::Ids;
   auto getLaneletPose() const -> const LaneletPose &;
   auto getCanonicalizedLaneletPose() const noexcept
     -> const std::optional<CanonicalizedLaneletPose> &;
