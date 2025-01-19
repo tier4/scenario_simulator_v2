@@ -336,7 +336,7 @@ void EgoEntitySimulation::update(
            `AutowareUniverse::getVehicleCommand`, and at the same time change
            `acceleration` to a signed value.
         */
-        input(0) = gear_sign * (acceleration + acceleration_by_slope);
+        input(0) = gear_sign * acceleration + acceleration_by_slope;
         input(1) = tire_angle;
         break;
 
@@ -364,7 +364,7 @@ void EgoEntitySimulation::update(
 
 auto EgoEntitySimulation::calculateAccelerationBySlope() const -> double
 {
-  if (consider_acceleration_by_road_slope_) {
+  if (consider_acceleration_by_road_slope_ && status_.laneMatchingSucceed()) {
     constexpr double gravity_acceleration = -9.81;
     const double ego_pitch_angle =
       math::geometry::convertQuaternionToEulerAngle(
