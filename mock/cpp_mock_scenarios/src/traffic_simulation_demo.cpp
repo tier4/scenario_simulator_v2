@@ -114,10 +114,10 @@ private:
     api_.spawn(
       "tom", traffic_simulator::helper::constructPose(10, 3, 0, 0, 0, -1.57),
       getPedestrianParameters());
-    api_.getEntity("tom").setStatus(
+    auto & tom_entity = api_.getEntity("tom");
+    tom_entity.setStatus(
       ego_entity.getMapPose(), traffic_simulator::helper::constructPose(10, 3, 0, 0, 0, -1.57),
       traffic_simulator::helper::constructActionStatus());
-    auto & tom_entity = api_.getEntity("tom");
     tom_entity.requestWalkStraight();
     tom_entity.requestSpeedChange(3, true);
 
@@ -155,8 +155,7 @@ private:
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
         34468, 0.0, 0.0, api_.getHdmapUtils()),
       getVehicleParameters());
-    auto & npc3_entity = api_.getEntity("npc3");
-    npc3_entity.setLinearVelocity(10);
+    api_.getEntity("npc3").setLinearVelocity(10);
 
     api_.spawn(
       "obstacle", traffic_simulator::helper::constructPose(10, 5, 0, 0, 0, -1.57),
