@@ -72,7 +72,7 @@ EgoEntity::EgoEntity(
 {
 }
 
-auto EgoEntity::engage() -> void { engage(); }
+auto EgoEntity::engage() -> void { FieldOperatorApplication::engage(); }
 
 auto EgoEntity::isEngaged() const -> bool { return engaged(); }
 
@@ -81,25 +81,25 @@ auto EgoEntity::isEngageable() const -> bool { return engageable(); }
 auto EgoEntity::sendCooperateCommand(const std::string & module_name, const std::string & command)
   -> void
 {
-  sendCooperateCommand(module_name, command);
+  FieldOperatorApplication::sendCooperateCommand(module_name, command);
 }
 
 auto EgoEntity::requestAutoModeForCooperation(const std::string & module_name, bool enable) -> void
 {
-  requestAutoModeForCooperation(module_name, enable);
+  FieldOperatorApplication::requestAutoModeForCooperation(module_name, enable);
 }
 
 auto EgoEntity::getMinimumRiskManeuverBehaviorName() const -> std::string
 {
-  return getMinimumRiskManeuverBehaviorName();
+  return minimum_risk_maneuver_behavior;
 }
 
 auto EgoEntity::getMinimumRiskManeuverStateName() const -> std::string
 {
-  return getMinimumRiskManeuverStateName();
+  return minimum_risk_maneuver_state;
 }
 
-auto EgoEntity::getEmergencyStateName() const -> std::string { return getEmergencyStateName(); }
+auto EgoEntity::getEmergencyStateName() const -> std::string { return minimum_risk_maneuver_state; }
 
 auto EgoEntity::getTurnIndicatorsCommandName() const -> std::string
 {
@@ -230,7 +230,7 @@ void EgoEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &
     // NOTE: engage() will be executed at simulation-time 0.
   } else {
     plan(route);
-    engage();
+    FieldOperatorApplication::engage();
   }
 }
 
@@ -284,7 +284,7 @@ auto EgoEntity::requestReplanRoute(const std::vector<geometry_msgs::msg::PoseSta
   clearRoute();
   plan(route);
   enableAutowareControl();
-  engage();
+  FieldOperatorApplication::engage();
 }
 
 auto EgoEntity::getDefaultDynamicConstraints() const
