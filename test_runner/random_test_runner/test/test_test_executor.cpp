@@ -54,7 +54,7 @@ class MockFieldOperatorApplication
 {
 public:
   MOCK_METHOD(void, declare_parameter_mock, (), ());
-  MOCK_METHOD(bool, isEngageable, (), ());
+  MOCK_METHOD(bool, engageable, (), ());
   MOCK_METHOD(void, engage, (), ());
 
   template <typename T>
