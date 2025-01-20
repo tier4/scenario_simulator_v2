@@ -31,7 +31,7 @@ namespace traffic_simulator
 {
 namespace entity
 {
-class EgoEntity : public VehicleEntity, public concealer::FieldOperatorApplication
+class EgoEntity : public VehicleEntity, private concealer::FieldOperatorApplication
 {
   bool is_controlled_by_simulator_{false};
   std::optional<double> target_speed_;
@@ -65,6 +65,8 @@ public:
     -> const traffic_simulator_msgs::msg::DynamicConstraints & override;
 
   auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter override;
+
+  auto getEntityStatus(const double, const double) const -> const CanonicalizedEntityStatus;
 
   auto getEntityTypename() const -> const std::string & override;
 
@@ -105,6 +107,8 @@ public:
 
   auto requestReplanRoute(const std::vector<geometry_msgs::msg::PoseStamped> & route) -> void;
 
+  auto requestAutoModeForCooperation(const std::string & module_name, bool enable) -> void;
+
   auto isControlledBySimulator() const -> bool override;
 
   auto setControlledBySimulator(bool state) -> void override
@@ -142,6 +146,15 @@ public:
       EntityBase::setStatus(std::forward<decltype(xs)>(xs)...);
     }
   }
+
+  auto engage() -> void;
+  auto isEngaged() const -> bool;
+  auto isEngageable() const -> bool;
+  auto sendCooperateCommand(const std::string & module_name, const std::string & command) -> void;
+  auto getMinimumRiskManeuverBehaviorName() const -> std::string;
+  auto getMinimumRiskManeuverStateName() const -> std::string;
+  auto getEmergencyStateName() const -> std::string;
+  auto getTurnIndicatorsCommandName() const -> std::string;
 };
 }  // namespace entity
 }  // namespace traffic_simulator

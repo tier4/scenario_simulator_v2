@@ -76,6 +76,9 @@ BT::NodeStatus FollowLaneAction::tick()
   }
   if (!canonicalized_entity_status->isInLanelet()) {
     stopEntity();
+    const auto waypoints = traffic_simulator_msgs::msg::WaypointsArray{};
+    setOutput("waypoints", waypoints);
+    setOutput("obstacle", calculateObstacle(waypoints));
     return BT::NodeStatus::RUNNING;
   }
   const auto waypoints = calculateWaypoints();
