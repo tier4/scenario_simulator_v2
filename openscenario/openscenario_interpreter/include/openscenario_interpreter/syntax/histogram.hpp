@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__HISTOGRAM_HPP_
-#define OPENSCENARIO_INTERPRETER__HISTOGRAM_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__HISTOGRAM_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__HISTOGRAM_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/histogram_bin.hpp>
@@ -23,16 +23,17 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- Histogram 1.2 ----------------------------------------------------------
- *
- *  <xsd:complexType name="Histogram">
- *    <xsd:sequence>
- *      <xsd:element name="Bin" type="HistogramBin" maxOccurs="unbounded"/>
- *    </xsd:sequence>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   Histogram (OpenSCENARIO XML 1.3.1)
 
+   Histogram which can be applied to a single parameter.
+
+   <xsd:complexType name="Histogram">
+     <xsd:sequence>
+       <xsd:element name="Bin" type="HistogramBin" maxOccurs="unbounded"/>
+     </xsd:sequence>
+   </xsd:complexType>
+*/
 struct Histogram : public ComplexType, private Scope
 {
   /**
@@ -64,4 +65,4 @@ struct Histogram : public ComplexType, private Scope
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
-#endif  // OPENSCENARIO_INTERPRETER__HISTOGRAM_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__HISTOGRAM_HPP_

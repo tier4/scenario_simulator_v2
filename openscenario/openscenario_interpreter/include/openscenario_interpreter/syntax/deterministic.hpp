@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__DETERMINISTIC_HPP_
-#define OPENSCENARIO_INTERPRETER__DETERMINISTIC_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__DETERMINISTIC_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__DETERMINISTIC_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/deterministic_parameter_distribution.hpp>
@@ -23,15 +23,17 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- Deterministic 1.2 ------------------------------------------------------
- *
- *  <xsd:complexType name="Deterministic">
- *    <xsd:sequence>
- *      <xsd:group ref="DeterministicParameterDistribution" minOccurs="0" maxOccurs="unbounded"/>
- *    </xsd:sequence>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   Deterministic (OpenSCENARIO XML 1.3.1)
+
+   Top level container containing all deterministic distribution elements.
+
+   <xsd:complexType name="Deterministic">
+     <xsd:sequence>
+       <xsd:group ref="DeterministicParameterDistribution" minOccurs="0" maxOccurs="unbounded"/>
+     </xsd:sequence>
+   </xsd:complexType>
+*/
 struct Deterministic
 {
   const std::list<DeterministicParameterDistribution> deterministic_parameter_distributions;
@@ -40,4 +42,4 @@ struct Deterministic
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
-#endif  // OPENSCENARIO_INTERPRETER__DETERMINISTIC_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__DETERMINISTIC_HPP_
