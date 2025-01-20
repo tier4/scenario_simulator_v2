@@ -110,7 +110,7 @@ BT::NodeStatus StopAtStopLineAction::tick()
   }
   distance_to_stopline_ = hdmap_utils->getDistanceToStopLine(route_lanelets, *trajectory);
   const auto distance_to_stop_target = getDistanceToConflictingEntity(route_lanelets, *trajectory);
-  const auto distance_to_front_entity = getDistanceToFrontEntity();
+  const auto distance_to_front_entity = getDistanceToFrontEntity(*trajectory);
   if (!distance_to_stopline_) {
     stopped_ = false;
     return BT::NodeStatus::FAILURE;

@@ -331,6 +331,14 @@ private:
   constexpr static double DEFAULT_MATCH_TO_LANE_REDUCTION_RATIO = 0.8;
 
 public:
+  auto getMatchingLanes(
+    const geometry_msgs::msg::Pose &, const traffic_simulator_msgs::msg::BoundingBox &,
+    const bool include_crosswalk, const double matching_distance = 1.0,
+    const double reduction_ratio = DEFAULT_MATCH_TO_LANE_REDUCTION_RATIO,
+    const traffic_simulator::RoutingGraphType type =
+      traffic_simulator::RoutingConfiguration().routing_graph_type) const
+    -> std::optional<std::vector<std::pair<lanelet::Id, double>>>;
+
   auto matchToLane(
     const geometry_msgs::msg::Pose &, const traffic_simulator_msgs::msg::BoundingBox &,
     const bool include_crosswalk, const double matching_distance = 1.0,

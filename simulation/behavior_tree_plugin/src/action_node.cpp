@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <behavior_tree_plugin/action_node.hpp>
 #include <geometry/bounding_box.hpp>
+#include <geometry/distance.hpp>
 #include <geometry/quaternion/euler_to_quaternion.hpp>
 #include <geometry/quaternion/get_rotation.hpp>
 #include <geometry/quaternion/get_rotation_matrix.hpp>
@@ -233,21 +234,23 @@ auto ActionNode::getDistanceToStopLine(
   return hdmap_utils->getDistanceToStopLine(route_lanelets, waypoints);
 }
 
-auto ActionNode::getDistanceToFrontEntity() const -> std::optional<double>
+auto ActionNode::getDistanceToFrontEntity(
+  const math::geometry::CatmullRomSplineInterface & spline) const -> std::optional<double>
 {
-  if (const auto entity_name_opt = getFrontEntityName()) {
-    return getDistanceToTargetEntityPolygon(getEntityStatus(entity_name_opt.value()));
+  if (const auto entity_name_opt = getFrontEntityName(spline)) {
+    return getDistanceToTargetEntityPolygon(spline, getEntityStatus(entity_name_opt.value()));
   } else {
     return std::nullopt;
   }
 }
 
-auto ActionNode::getFrontEntityName() const -> std::optional<std::string>
+auto ActionNode::getFrontEntityName(const math::geometry::CatmullRomSplineInterface & spline) const
+  -> std::optional<std::string>
 {
   std::vector<double> distances;
   std::vector<std::string> entities;
   for (const auto & each : other_entity_status) {
-    const auto distance = getDistanceToTargetEntityPolygon(each.second);
+    const auto distance = getDistanceToTargetEntityPolygon(spline, each.second);
     const auto quat = math::geometry::getRotation(
       canonicalized_entity_status->getMapPose().orientation,
       other_entity_status.at(each.first).getMapPose().orientation);
@@ -295,7 +298,83 @@ auto ActionNode::getEntityStatus(const std::string & target_name) const
   }
 }
 
+auto ActionNode::getRoutableCanonicalizedLaneletPose(
+  const traffic_simulator::CanonicalizedEntityStatus & status) const
+  -> std::optional<traffic_simulator::CanonicalizedLaneletPose>
+{
+  traffic_simulator::RoutingConfiguration routing_configuration;
+  routing_configuration.allow_lane_change = true;
+
+  const auto & from = canonicalized_entity_status->getCanonicalizedLaneletPose().value();
+  const auto from_id = static_cast<traffic_simulator_msgs::msg::LaneletPose>(from).lanelet_id;
+
+  auto to = status.getCanonicalizedLaneletPose();
+  const auto & to_bounding_box = status.getBoundingBox();
+  const auto current_id =
+    static_cast<traffic_simulator_msgs::msg::LaneletPose>(to.value()).lanelet_id;
+
+  if (hdmap_utils->getRoute(from_id, current_id, routing_configuration).empty()) {
+    // no route between entities find
+    const auto lanelet_ids = hdmap_utils->getMatchingLanes(
+      static_cast<geometry_msgs::msg::Pose>(to.value()), to_bounding_box, false, 5.0, 0.8,
+      routing_configuration.routing_graph_type);
+
+    if (lanelet_ids) {
+      for (const auto & lanelet_id : lanelet_ids.value()) {
+        if (
+          (lanelet_id.first != current_id) and
+          (!hdmap_utils->getRoute(from_id, lanelet_id.first, routing_configuration).empty())) {
+          if (const auto lanelet = hdmap_utils->toLaneletPose(
+                static_cast<geometry_msgs::msg::Pose>(to.value()), lanelet_id.first, 5.0);
+              lanelet) {
+            if (const auto canonicalized =
+                  traffic_simulator::pose::canonicalize(lanelet.value(), hdmap_utils);
+                canonicalized) {
+              to = canonicalized;
+              break;
+            }
+          }
+        }
+      }
+    } else {
+      to = std::nullopt;
+    }
+  }
+
+  return to;
+}
+
+auto ActionNode::getLateralDistance(
+  const math::geometry::CatmullRomSplineInterface & spline,
+  const traffic_simulator::CanonicalizedEntityStatus & status, double longitudinalDistance) const
+  -> double
+{
+  const auto & points = math::geometry::transformPoints(
+    status.getMapPose(), math::geometry::getPointsFromBbox(status.getBoundingBox()));
+  std::vector<double> distances;
+  const auto & diagonal = math::geometry::getDistance(points[0], points[2]);
+  for (const auto & point : points) {
+    double s_start = longitudinalDistance - diagonal / 2;
+    double s_end = longitudinalDistance + diagonal / 2;
+    double start = spline.getSquaredDistanceIn2D(point, s_start);
+    double stop = spline.getSquaredDistanceIn2D(point, s_end);
+
+    while ((s_end - s_start) > 0.1) {
+      if (start > stop) {
+        s_start += (s_end - s_start) / 2;
+        start = spline.getSquaredDistanceIn2D(point, s_start);
+      } else {
+        s_end -= (s_end - s_start) / 2;
+        stop = spline.getSquaredDistanceIn2D(point, s_end);
+      }
+    }
+    distances.push_back(start > stop ? stop : start);
+  }
+  return *std::min_element(distances.begin(), distances.end());
+}
+
 auto ActionNode::getDistanceToTargetEntityPolygon(
+  const math::geometry::CatmullRomSplineInterface & spline,
   const traffic_simulator::CanonicalizedEntityStatus & status) const -> std::optional<double>
 {
   if (status.laneMatchingSucceed() && canonicalized_entity_status->laneMatchingSucceed()) {
@@ -311,33 +390,34 @@ auto ActionNode::getDistanceToTargetEntityPolygon(
     const auto & from = canonicalized_entity_status->getCanonicalizedLaneletPose().value();
     const auto & from_bounding_box = canonicalized_entity_status->getBoundingBox();
 
-    const auto & to = status.getCanonicalizedLaneletPose().value();
+    const auto & to = getRoutableCanonicalizedLaneletPose(status);
     const auto & to_bounding_box = status.getBoundingBox();
 
-    const auto longitudinalDistance =
-      traffic_simulator::distance::boundingBoxLaneLongitudinalDistance(
-        from, from_bounding_box, to, to_bounding_box, include_adjacent_lanelet,
-        include_opposite_direction, routing_configuration, hdmap_utils);
+    if (to.has_value()) {
+      const auto longitudinalDistance =
+        traffic_simulator::distance::boundingBoxLaneLongitudinalDistance(
+          from, from_bounding_box, *to, to_bounding_box, include_adjacent_lanelet,
+          include_opposite_direction, routing_configuration, hdmap_utils);
 
-    if (const auto lateral_distance = lateralDistance(from, to, routing_configuration, hdmap_utils);
-        lateral_distance && longitudinalDistance) {
-      const auto from_bounding_box_distances =
-        math::geometry::getDistancesFromCenterToEdge(from_bounding_box);
-      const auto to_bounding_box_distances =
-        math::geometry::getDistancesFromCenterToEdge(to_bounding_box);
-      auto bounding_box_distance = 0.0;
-      if (lateral_distance.value() > 0.0) {
-        bounding_box_distance =
-          std::abs(from_bounding_box_distances.right) + std::abs(to_bounding_box_distances.left);
-      } else if (lateral_distance.value() < 0.0) {
-        bounding_box_distance =
-          std::abs(from_bounding_box_distances.left) + std::abs(to_bounding_box_distances.right);
-      }
-      // is in front and is within considered width (lateral distance)
-      if (
-        longitudinalDistance.value() >= 0 &&
-        std::abs(lateral_distance.value()) <= bounding_box_distance) {
-        return longitudinalDistance.value() + from_bounding_box.dimensions.x / 2;
+      if (longitudinalDistance) {
+        const auto lateral_distance =
+          std::sqrt(getLateralDistance(spline, status, longitudinalDistance.value()));
+        const auto from_bounding_box_distances =
+          math::geometry::getDistancesFromCenterToEdge(from_bounding_box);
+        const auto to_bounding_box_distances =
+          math::geometry::getDistancesFromCenterToEdge(to_bounding_box);
+        auto bounding_box_distance = 0.0;
+        if (lateral_distance > 0.0) {
+          bounding_box_distance =
+            std::abs(from_bounding_box_distances.right) + std::abs(to_bounding_box_distances.left);
+        } else if (lateral_distance < 0.0) {
+          bounding_box_distance =
+            std::abs(from_bounding_box_distances.left) + std::abs(to_bounding_box_distances.right);
+        }
+        // is in front and is within considered width (lateral distance)
+        if (longitudinalDistance.value() >= 0 && (lateral_distance <= bounding_box_distance)) {
+          return longitudinalDistance.value() + from_bounding_box.dimensions.x / 2;
+        }
       }
     }
   }
@@ -365,7 +445,7 @@ auto ActionNode::getDistanceToConflictingEntity(
     }
   }
   for (const auto & status : lane_entity_status) {
-    if (const auto distance_to_entity = getDistanceToTargetEntityPolygon(status)) {
+    if (const auto distance_to_entity = getDistanceToTargetEntityPolygon(spline, status)) {
       distances.insert(distance_to_entity.value());
     }
   }

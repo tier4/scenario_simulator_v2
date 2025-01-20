@@ -92,7 +92,7 @@ BT::NodeStatus FollowLaneAction::tick()
     if (trajectory == nullptr) {
       return BT::NodeStatus::FAILURE;
     }
-    const auto distance_to_front_entity = getDistanceToFrontEntity();
+    const auto distance_to_front_entity = getDistanceToFrontEntity(*trajectory);
     if (distance_to_front_entity) {
       if (
         distance_to_front_entity.value() <=

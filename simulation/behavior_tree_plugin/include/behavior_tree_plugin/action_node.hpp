@@ -48,10 +48,12 @@ public:
   auto getDistanceToConflictingEntity(
     const lanelet::Ids & route_lanelets,
     const math::geometry::CatmullRomSplineInterface & spline) const -> std::optional<double>;
-  auto getFrontEntityName() const -> std::optional<std::string>;
+  auto getFrontEntityName(const math::geometry::CatmullRomSplineInterface & spline) const
+    -> std::optional<std::string>;
   auto calculateStopDistance(const traffic_simulator_msgs::msg::DynamicConstraints &) const
     -> double;
-  auto getDistanceToFrontEntity() const -> std::optional<double>;
+  auto getDistanceToFrontEntity(const math::geometry::CatmullRomSplineInterface & spline) const
+    -> std::optional<double>;
   auto getDistanceToStopLine(
     const lanelet::Ids & route_lanelets,
     const std::vector<geometry_msgs::msg::Point> & waypoints) const -> std::optional<double>;
@@ -118,6 +120,7 @@ protected:
   lanelet::Ids route_lanelets;
 
   auto getDistanceToTargetEntityPolygon(
+    const math::geometry::CatmullRomSplineInterface & spline,
     const traffic_simulator::CanonicalizedEntityStatus & status) const -> std::optional<double>;
 
 private:
@@ -132,6 +135,13 @@ private:
     -> std::vector<traffic_simulator::CanonicalizedEntityStatus>;
   auto isOtherEntityAtConsideredAltitude(
     const traffic_simulator::CanonicalizedEntityStatus & entity_status) const -> bool;
+  auto getRoutableCanonicalizedLaneletPose(
+    const traffic_simulator::CanonicalizedEntityStatus & status) const
+    -> std::optional<traffic_simulator::CanonicalizedLaneletPose>;
+  auto getLateralDistance(
+    const math::geometry::CatmullRomSplineInterface & spline,
+    const traffic_simulator::CanonicalizedEntityStatus & status, double longitudinalDistance) const
+    -> double;
 };
 }  // namespace entity_behavior
 

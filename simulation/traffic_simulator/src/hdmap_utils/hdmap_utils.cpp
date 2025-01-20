@@ -525,10 +525,11 @@ auto HdMapUtils::toPoint2d(const geometry_msgs::msg::Point & point) const -> lan
   return lanelet::BasicPoint2d{point.x, point.y};
 }
 
-auto HdMapUtils::matchToLane(
+auto HdMapUtils::getMatchingLanes(
   const geometry_msgs::msg::Pose & pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
   const bool include_crosswalk, const double matching_distance, const double reduction_ratio,
-  const traffic_simulator::RoutingGraphType type) const -> std::optional<lanelet::Id>
+  const traffic_simulator::RoutingGraphType type) const
+  -> std::optional<std::vector<std::pair<lanelet::Id, double>>>
 {
   lanelet::matching::Object2d obj;
   obj.pose.translation() = toPoint2d(pose.position);
@@ -562,10 +563,23 @@ auto HdMapUtils::matchToLane(
   if (id_and_distance.empty()) {
     return std::nullopt;
   }
-  const auto min_id_and_distance = std::min_element(
-    id_and_distance.begin(), id_and_distance.end(),
-    [](auto const & lhs, auto const & rhs) { return lhs.second < rhs.second; });
-  return min_id_and_distance->first;
+  std::sort(id_and_distance.begin(), id_and_distance.end(), [](auto const & lhs, auto const & rhs) {
+    return lhs.second < rhs.second;
+  });
+  return id_and_distance;
+}
+
+auto HdMapUtils::matchToLane(
+  const geometry_msgs::msg::Pose & pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
+  const bool include_crosswalk, const double matching_distance, const double reduction_ratio,
+  const traffic_simulator::RoutingGraphType type) const -> std::optional<lanelet::Id>
+{
+  const auto & id_and_distance =
+    getMatchingLanes(pose, bbox, include_crosswalk, matching_distance, reduction_ratio, type);
+  if (id_and_distance) {
+    return id_and_distance->begin()->first;
+  }
+  return std::nullopt;
 }
 
 auto HdMapUtils::toLaneletPose(
