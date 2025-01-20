@@ -72,7 +72,52 @@ EgoEntity::EgoEntity(
 {
 }
 
-auto EgoEntity::getCurrentAction() const -> std::string { return getAutowareStateName(); }
+auto EgoEntity::engage() -> void { FieldOperatorApplication::engage(); }
+
+auto EgoEntity::isEngaged() const -> bool { return engaged(); }
+
+auto EgoEntity::isEngageable() const -> bool { return engageable(); }
+
+auto EgoEntity::sendCooperateCommand(const std::string & module_name, const std::string & command)
+  -> void
+{
+  FieldOperatorApplication::sendCooperateCommand(module_name, command);
+}
+
+auto EgoEntity::requestAutoModeForCooperation(const std::string & module_name, bool enable) -> void
+{
+  FieldOperatorApplication::requestAutoModeForCooperation(module_name, enable);
+}
+
+auto EgoEntity::getMinimumRiskManeuverBehaviorName() const -> std::string
+{
+  return minimum_risk_maneuver_behavior;
+}
+
+auto EgoEntity::getMinimumRiskManeuverStateName() const -> std::string
+{
+  return minimum_risk_maneuver_state;
+}
+
+auto EgoEntity::getEmergencyStateName() const -> std::string { return minimum_risk_maneuver_state; }
+
+auto EgoEntity::getTurnIndicatorsCommandName() const -> std::string
+{
+  switch (getTurnIndicatorsCommand().command) {
+    case autoware_vehicle_msgs::msg::TurnIndicatorsCommand::DISABLE:
+      return "DISABLE";
+    case autoware_vehicle_msgs::msg::TurnIndicatorsCommand::ENABLE_LEFT:
+      return "ENABLE_LEFT";
+    case autoware_vehicle_msgs::msg::TurnIndicatorsCommand::ENABLE_RIGHT:
+      return "ENABLE_RIGHT";
+    case autoware_vehicle_msgs::msg::TurnIndicatorsCommand::NO_COMMAND:
+      return "NO_COMMAND";
+    default:
+      return "";
+  }
+}
+
+auto EgoEntity::getCurrentAction() const -> std::string { return autoware_state; }
 
 auto EgoEntity::getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter
 {
@@ -111,15 +156,7 @@ auto EgoEntity::getCurrentPose() const -> const geometry_msgs::msg::Pose &
 
 auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray
 {
-  traffic_simulator_msgs::msg::WaypointsArray waypoints_array;
-  const auto trajectory = getTrajectory().points;
-  waypoints_array.waypoints.reserve(trajectory.size());
-
-  std::transform(
-    trajectory.cbegin(), trajectory.cend(), std::back_inserter(waypoints_array.waypoints),
-    [](const auto & point) { return point.pose.position; });
-
-  return waypoints_array;
+  return FieldOperatorApplication::getWaypoints();
 }
 
 void EgoEntity::updateFieldOperatorApplication()
@@ -187,13 +224,13 @@ void EgoEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &
   }
 
   requestClearRoute();
-  if (not isInitialized()) {
+  if (not initialized) {
     initialize(getMapPose());
     plan(route);
     // NOTE: engage() will be executed at simulation-time 0.
   } else {
     plan(route);
-    engage();
+    FieldOperatorApplication::engage();
   }
 }
 
@@ -247,7 +284,7 @@ auto EgoEntity::requestReplanRoute(const std::vector<geometry_msgs::msg::PoseSta
   clearRoute();
   plan(route);
   enableAutowareControl();
-  engage();
+  FieldOperatorApplication::engage();
 }
 
 auto EgoEntity::getDefaultDynamicConstraints() const
@@ -279,10 +316,10 @@ auto EgoEntity::requestSpeedChange(
     "purposes only.");
 }
 
-auto EgoEntity::setVelocityLimit(double value) -> void
+auto EgoEntity::setVelocityLimit(double value) -> void  //
 {
   behavior_parameter_.dynamic_constraints.max_speed = value;
-  emplaceSetVelocityLimitTask(value);
+  FieldOperatorApplication::setVelocityLimit(value);
 }
 
 auto EgoEntity::setMapPose(const geometry_msgs::msg::Pose & map_pose) -> void

@@ -57,7 +57,6 @@ namespace concealer
 struct FieldOperatorApplication : public rclcpp::Node,
                                   public TransitionAssertion<FieldOperatorApplication>
 {
-private:
   std::atomic<bool> is_stop_requested = false;
 
   bool is_autoware_exited = false;
@@ -72,7 +71,6 @@ private:
 
   std::string minimum_risk_maneuver_behavior;
 
-protected:
   // clang-format off
   using AutowareState                   = autoware_system_msgs::msg::AutowareState;
   using Control                         = autoware_control_msgs::msg::Control;
@@ -120,52 +118,37 @@ protected:
      the last class data member. (Class data members are constructed in
      declaration order and deconstructed in reverse order.)
   */
-private:
   TaskQueue task_queue;
 
-protected:
   CONCEALER_PUBLIC explicit FieldOperatorApplication(const pid_t);
 
   ~FieldOperatorApplication();
 
-  auto plan(const std::vector<geometry_msgs::msg::PoseStamped> & route) -> void;
-
-  auto clearRoute() -> void;
-
-  auto emplaceSetVelocityLimitTask(const double velocity_limit) -> void;
-
-  auto enableAutowareControl() -> void;
-
   auto spinSome() -> void;
-
-  auto initialize(const geometry_msgs::msg::Pose & initial_pose) -> void;
-
-  auto isInitialized() const -> bool;
-
-  auto rethrow() const { task_queue.rethrow(); }
-
-public:
-  auto isStopRequested() const -> bool;
-
-  auto isEngageable() const -> bool;
-
-  auto isEngaged() const -> bool;
 
   auto engage() -> void;
 
-  auto sendCooperateCommand(const std::string & module_name, const std::string & command) -> void;
+  auto engageable() const -> bool;
 
-  auto getAutowareStateName() const -> const std::string &;
+  auto engaged() const -> bool;
 
-  auto getEmergencyStateName() const -> const std::string &;
+  auto initialize(const geometry_msgs::msg::Pose &) -> void;
 
-  auto getMinimumRiskManeuverBehaviorName() const -> const std::string &;
+  auto plan(const std::vector<geometry_msgs::msg::PoseStamped> &) -> void;
 
-  auto getMinimumRiskManeuverStateName() const -> const std::string &;
+  auto clearRoute() -> void;
 
-  auto getTurnIndicatorsCommandName() const -> std::string;
+  auto getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray;
 
-  auto requestAutoModeForCooperation(const std::string & module_name, const bool enable) -> void;
+  auto requestAutoModeForCooperation(const std::string &, bool) -> void;
+
+  auto rethrow() const { task_queue.rethrow(); }
+
+  auto sendCooperateCommand(const std::string &, const std::string &) -> void;
+
+  auto setVelocityLimit(double) -> void;
+
+  auto enableAutowareControl() -> void;
 };
 }  // namespace concealer
 

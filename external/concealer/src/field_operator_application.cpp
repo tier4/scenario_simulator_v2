@@ -32,7 +32,8 @@ auto toModuleType(const std::string & module_name)
 #define EMPLACE(IDENTIFIER)                                  \
   if constexpr (DetectStaticMember_##IDENTIFIER<T>::value) { \
     module_type_map.emplace(#IDENTIFIER, T::IDENTIFIER);     \
-  }
+  }                                                          \
+  static_assert(true)
 
     /*
        The following elements are in order of definition in the
@@ -294,56 +295,27 @@ auto FieldOperatorApplication::engage() -> void
   });
 }
 
-auto FieldOperatorApplication::isInitialized() const -> bool { return initialized; }
-
-auto FieldOperatorApplication::isStopRequested() const -> bool { return is_stop_requested.load(); }
-
-auto FieldOperatorApplication::isEngageable() const -> bool
+auto FieldOperatorApplication::engageable() const -> bool
 {
   rethrow();
   return task_queue.exhausted() and autoware_state == "WAITING_FOR_ENGAGE";
 }
 
-auto FieldOperatorApplication::isEngaged() const -> bool
+auto FieldOperatorApplication::engaged() const -> bool
 {
   rethrow();
   return task_queue.exhausted() and autoware_state == "DRIVING";
 }
 
-auto FieldOperatorApplication::getAutowareStateName() const -> const std::string &
+auto FieldOperatorApplication::getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray
 {
-  return autoware_state;
-}
+  traffic_simulator_msgs::msg::WaypointsArray waypoints;
 
-auto FieldOperatorApplication::getEmergencyStateName() const -> const std::string &
-{
-  return minimum_risk_maneuver_state;
-}
-
-auto FieldOperatorApplication::getMinimumRiskManeuverBehaviorName() const -> const std::string &
-{
-  return minimum_risk_maneuver_behavior;
-}
-
-auto FieldOperatorApplication::getMinimumRiskManeuverStateName() const -> const std::string &
-{
-  return minimum_risk_maneuver_state;
-}
-
-auto FieldOperatorApplication::getTurnIndicatorsCommandName() const -> std::string
-{
-  switch (getTurnIndicatorsCommand().command) {
-    case autoware_vehicle_msgs::msg::TurnIndicatorsCommand::DISABLE:
-      return "DISABLE";
-    case autoware_vehicle_msgs::msg::TurnIndicatorsCommand::ENABLE_LEFT:
-      return "ENABLE_LEFT";
-    case autoware_vehicle_msgs::msg::TurnIndicatorsCommand::ENABLE_RIGHT:
-      return "ENABLE_RIGHT";
-    case autoware_vehicle_msgs::msg::TurnIndicatorsCommand::NO_COMMAND:
-      return "NO_COMMAND";
-    default:
-      return "";
+  for (const auto & point : getTrajectory().points) {
+    waypoints.waypoints.emplace_back(point.pose.position);
   }
+
+  return waypoints;
 }
 
 auto FieldOperatorApplication::initialize(const geometry_msgs::msg::Pose & initial_pose) -> void
@@ -419,7 +391,7 @@ auto FieldOperatorApplication::plan(const std::vector<geometry_msgs::msg::PoseSt
 }
 
 auto FieldOperatorApplication::requestAutoModeForCooperation(
-  const std::string & module_name, const bool enable) -> void
+  const std::string & module_name, bool enable) -> void
 {
   /*
      The implementation of this function will not work properly if the
@@ -533,7 +505,7 @@ auto FieldOperatorApplication::sendCooperateCommand(
   }
 }
 
-auto FieldOperatorApplication::emplaceSetVelocityLimitTask(const double velocity_limit) -> void
+auto FieldOperatorApplication::setVelocityLimit(double velocity_limit) -> void
 {
   task_queue.delay([this, velocity_limit]() {
     auto request = std::make_shared<SetVelocityLimit::Request>();
