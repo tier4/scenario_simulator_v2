@@ -100,7 +100,7 @@ auto nearbyLaneletIds(
       excludeSubtypeLanelets(nearest_lanelets, lanelet::AttributeValueString::Crosswalk);
   }
 
-  // check again
+  /// @note check again
   if (isEmptyOrBeyondThreshold(nearest_lanelets)) {
     return {};
   } else {

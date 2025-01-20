@@ -77,7 +77,8 @@ public:
   {
     std::lock_guard lock(mutex_);
     if (!exists(from_lanelet_id, to_lanelet_id, routing_configuration.allow_lane_change)) {
-      constexpr int routing_cost_id = 0;  ///< to use default routing costs: distance along lanelets
+      /// @note to use default routing costs: distance along lanelets
+      constexpr int routing_cost_id = 0;
       const auto & from_lanelet = lanelet_map->laneletLayer.get(from_lanelet_id);
       const auto & to_lanelet = lanelet_map->laneletLayer.get(to_lanelet_id);
       if (const auto route = routing_graph->getRoute(

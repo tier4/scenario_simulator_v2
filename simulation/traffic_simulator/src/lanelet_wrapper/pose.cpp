@@ -381,13 +381,13 @@ auto canonicalizeLaneletPose(const LaneletPose & lanelet_pose, const lanelet::Id
   -> std::tuple<std::optional<LaneletPose>, std::optional<lanelet::Id>>
 {
   if (lanelet_pose.s < 0) {
-    // When canonicalizing to backward lanelet_id, do not consider route
+    /// @note When canonicalizing to backward lanelet_id, do not consider route
     return canonicalizeLaneletPose(lanelet_pose);
   }
   auto canonicalized_lanelet_pose = lanelet_pose;
   while (canonicalized_lanelet_pose.s >
          lanelet_map::laneletLength(canonicalized_lanelet_pose.lanelet_id)) {
-    // When canonicalizing to forward lanelet_id, consider route
+    /// @note When canonicalizing to forward lanelet_id, consider route
     bool found_next_lanelet_in_route = false;
     for (const auto & next_lanelet_id :
          lanelet_map::nextLaneletIds(canonicalized_lanelet_pose.lanelet_id)) {
@@ -427,21 +427,21 @@ auto matchToLane(
     }
     return absolute_hull_polygon;
   };
-  // prepare object for matching
+  /// @note prepare object for matching
   const auto yaw = math::geometry::convertQuaternionToEulerAngle(map_pose.orientation).z;
   lanelet::matching::Object2d bounding_box_object;
   bounding_box_object.pose.translation() =
     lanelet::BasicPoint2d(map_pose.position.x, map_pose.position.y);
   bounding_box_object.pose.linear() = Eigen::Rotation2D<double>(yaw).matrix();
   bounding_box_object.absoluteHull = absoluteHullPolygon(bounding_box_object.pose);
-  // find matches and optionally filter
+  /// @note find matches and optionally filter
   auto matches = lanelet::matching::getDeterministicMatches(
     *LaneletWrapper::map(), bounding_box_object, matching_distance);
   if (!include_crosswalk) {
     matches =
       lanelet::matching::removeNonRuleCompliantMatches(matches, LaneletWrapper::trafficRules(type));
   }
-  // find best match (minimize offset)
+  /// @note find best match (minimize offset)
   if (matches.empty()) {
     return std::nullopt;
   } else {
