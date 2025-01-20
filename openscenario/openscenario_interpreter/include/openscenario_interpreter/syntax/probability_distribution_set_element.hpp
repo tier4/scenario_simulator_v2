@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__PROBABILITY_DISTRIBUTION_SET_ELEMENT_HPP_
-#define OPENSCENARIO_INTERPRETER__PROBABILITY_DISTRIBUTION_SET_ELEMENT_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__PROBABILITY_DISTRIBUTION_SET_ELEMENT_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__PROBABILITY_DISTRIBUTION_SET_ELEMENT_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
@@ -23,14 +23,16 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- ProbabilityDistributionSetElement 1.2 ----------------------------------
- *
- *  <xsd:complexType name="ParameterValueSet">
- *    <xsd:attribute name="value" type="String" use="required"/>
- *    <xsd:attribute name="weight" type="Double" use="required"/>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   ProbabilityDistributionSetElement (OpenSCENARIO XML 1.3.1)
+
+   Indicates a value and probability in a stochastic distribution.
+
+   <xsd:complexType name="ProbabilityDistributionSetElement">
+     <xsd:attribute name="value" type="String" use="required"/>
+     <xsd:attribute name="weight" type="Double" use="required"/>
+   </xsd:complexType>
+*/
 struct ProbabilityDistributionSetElement : public ComplexType
 {
   const String value;
@@ -41,4 +43,4 @@ struct ProbabilityDistributionSetElement : public ComplexType
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
-#endif  // OPENSCENARIO_INTERPRETER__PROBABILITY_DISTRIBUTION_SET_ELEMENT_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__PROBABILITY_DISTRIBUTION_SET_ELEMENT_HPP_

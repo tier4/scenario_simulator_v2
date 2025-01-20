@@ -131,24 +131,35 @@ UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node
         "currentMinimumRiskManeuverState.behavior",
         [result]() {
           return make<String>(
-            asFieldOperatorApplication(result.str(1)).getMinimumRiskManeuverBehaviorName());
+            asFieldOperatorApplication(result.str(1)).minimum_risk_maneuver_behavior);
         }),
       std::make_pair(
         "currentMinimumRiskManeuverState.state",
         [result]() {
           return make<String>(
-            asFieldOperatorApplication(result.str(1)).getMinimumRiskManeuverStateName());
+            asFieldOperatorApplication(result.str(1)).minimum_risk_maneuver_state);
         }),
       std::make_pair(
         "currentEmergencyState",
         [result]() {
-          return make<String>(asFieldOperatorApplication(result.str(1)).getEmergencyStateName());
+          return make<String>(
+            asFieldOperatorApplication(result.str(1)).minimum_risk_maneuver_state);
         }),
       std::make_pair(
         "currentTurnIndicatorsState",
         [result]() {
-          return make<String>(boost::lexical_cast<String>(
-            asFieldOperatorApplication(result.str(1)).getTurnIndicatorsCommand()));
+          switch (asFieldOperatorApplication(result.str(1)).getTurnIndicatorsCommand().command) {
+            case autoware_vehicle_msgs::msg::TurnIndicatorsCommand::DISABLE:
+              return make<String>("DISABLE");
+            case autoware_vehicle_msgs::msg::TurnIndicatorsCommand::ENABLE_LEFT:
+              return make<String>("ENABLE_LEFT");
+            case autoware_vehicle_msgs::msg::TurnIndicatorsCommand::ENABLE_RIGHT:
+              return make<String>("ENABLE_RIGHT");
+            case autoware_vehicle_msgs::msg::TurnIndicatorsCommand::NO_COMMAND:
+              return make<String>("NO_COMMAND");
+            default:
+              return make<String>();
+          }
         }),
     };
     evaluate_value = dispatch.at(result.str(2));  // XXX catch

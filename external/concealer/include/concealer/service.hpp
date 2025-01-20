@@ -12,78 +12,65 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CONCEALER__SERVICE_WITH_VALIDATION_HPP_
-#define CONCEALER__SERVICE_WITH_VALIDATION_HPP_
+#ifndef CONCEALER__SERVICE_HPP_
+#define CONCEALER__SERVICE_HPP_
 
 #include <autoware_adapi_v1_msgs/msg/response_status.hpp>
 #include <chrono>
-#include <concealer/field_operator_application.hpp>
+#include <concealer/member_detector.hpp>
 #include <rclcpp/rclcpp.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <tier4_external_api_msgs/msg/response_status.hpp>
 #include <tier4_rtc_msgs/srv/auto_mode_with_module.hpp>
 #include <type_traits>
 
-template <typename T, typename = void>
-struct has_data_member_status : public std::false_type
-{
-};
-
-template <typename T>
-struct has_data_member_status<T, std::void_t<decltype(std::declval<T>().status)>>
-: public std::true_type
-{
-};
-
-template <typename T>
-constexpr auto has_data_member_status_v = has_data_member_status<T>::value;
-
-template <typename T, typename = void>
-struct has_data_member_success : public std::false_type
-{
-};
-
-template <typename T>
-struct has_data_member_success<T, std::void_t<decltype(std::declval<T>().success)>>
-: public std::true_type
-{
-};
-
-template <typename T>
-constexpr auto has_data_member_success_v = has_data_member_success<T>::value;
-
 namespace concealer
 {
 template <typename T>
-class ServiceWithValidation
+class Service
 {
+  const std::string service_name;
+
+  rclcpp::Logger logger;
+
+  typename rclcpp::Client<T>::SharedPtr client;
+
+  rclcpp::WallRate validation_rate;
+
 public:
-  explicit ServiceWithValidation(
-    const std::string & service_name, FieldOperatorApplication & autoware,
+  template <typename Node>
+  explicit Service(
+    const std::string & service_name, Node & node,
     const std::chrono::nanoseconds validation_interval = std::chrono::seconds(1))
   : service_name(service_name),
-    logger(autoware.get_logger()),
-    client(autoware.create_client<T>(service_name, rmw_qos_profile_default)),
+    logger(node.get_logger()),
+    client(node.template create_client<T>(service_name, rmw_qos_profile_default)),
     validation_rate(validation_interval)
   {
   }
 
-  class TimeoutError : public common::Error
-  {
-  public:
-    template <typename... Ts>
-    explicit TimeoutError(Ts &&... xs) : common::Error(std::forward<decltype(xs)>(xs)...)
-    {
-    }
-  };
-
-  auto operator()(const typename T::Request::SharedPtr & request, std::size_t attempts_count = 1)
+  auto operator()(const typename T::Request::SharedPtr & request, std::size_t attempts_count)
     -> void
   {
-    validateAvailability();
+    while (!client->service_is_ready()) {
+      RCLCPP_INFO_STREAM(logger, service_name << " service is not ready.");
+      validation_rate.sleep();
+    }
+
+    auto send = [this](const auto & request) {
+      if (auto future = client->async_send_request(request);
+          future.wait_for(validation_rate.period()) == std::future_status::ready) {
+        return std::optional<typename rclcpp::Client<T>::SharedFuture>(future);
+      } else {
+        RCLCPP_ERROR_STREAM(logger, service_name << " service request has timed out.");
+        return std::optional<typename rclcpp::Client<T>::SharedFuture>();
+      }
+    };
+
     for (std::size_t attempt = 0; attempt < attempts_count; ++attempt, validation_rate.sleep()) {
-      if (const auto & service_call_result = callWithTimeoutValidation(request)) {
-        if constexpr (has_data_member_status_v<typename T::Response>) {
+      if (const auto & service_call_result = send(request)) {
+        if constexpr (DetectMember_status<typename T::Response>::value) {
           if constexpr (std::is_same_v<
                           tier4_external_api_msgs::msg::ResponseStatus,
                           decltype(T::Response::status)>) {
@@ -127,7 +114,7 @@ public:
             RCLCPP_INFO_STREAM(logger, service_name << " service request has been accepted.");
             return;
           }
-        } else if constexpr (has_data_member_success_v<typename T::Response>) {
+        } else if constexpr (DetectMember_success<typename T::Response>::value) {
           if constexpr (std::is_same_v<bool, decltype(T::Response::success)>) {
             if (service_call_result->get()->success) {
               RCLCPP_INFO_STREAM(logger, service_name << " service request has been accepted.");
@@ -147,40 +134,12 @@ public:
         }
       }
     }
-    throw TimeoutError(
+
+    throw common::scenario_simulator_exception::AutowareError(
       "Requested the service ", std::quoted(service_name), " ", attempts_count,
       " times, but was not successful.");
   }
-
-private:
-  auto validateAvailability() -> void
-  {
-    while (!client->service_is_ready()) {
-      RCLCPP_INFO_STREAM(logger, service_name << " service is not ready.");
-      validation_rate.sleep();
-    }
-  }
-
-  auto callWithTimeoutValidation(const typename T::Request::SharedPtr & request)
-    -> std::optional<typename rclcpp::Client<T>::SharedFuture>
-  {
-    if (auto future = client->async_send_request(request);
-        future.wait_for(validation_rate.period()) == std::future_status::ready) {
-      return future;
-    } else {
-      RCLCPP_ERROR_STREAM(logger, service_name << " service request has timed out.");
-      return std::nullopt;
-    }
-  }
-
-  const std::string service_name;
-
-  rclcpp::Logger logger;
-
-  typename rclcpp::Client<T>::SharedPtr client;
-
-  rclcpp::WallRate validation_rate;
 };
 }  // namespace concealer
 
-#endif  //CONCEALER__SERVICE_WITH_VALIDATION_HPP_
+#endif  //CONCEALER__SERVICE_HPP_
