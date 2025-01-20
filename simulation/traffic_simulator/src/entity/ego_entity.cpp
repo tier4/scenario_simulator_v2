@@ -111,15 +111,7 @@ auto EgoEntity::getCurrentPose() const -> const geometry_msgs::msg::Pose &
 
 auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray
 {
-  traffic_simulator_msgs::msg::WaypointsArray waypoints_array;
-  const auto trajectory = getTrajectory().points;
-  waypoints_array.waypoints.reserve(trajectory.size());
-
-  std::transform(
-    trajectory.cbegin(), trajectory.cend(), std::back_inserter(waypoints_array.waypoints),
-    [](const auto & point) { return point.pose.position; });
-
-  return waypoints_array;
+  return FieldOperatorApplication::getWaypoints();
 }
 
 void EgoEntity::updateFieldOperatorApplication()
@@ -282,7 +274,7 @@ auto EgoEntity::requestSpeedChange(
 auto EgoEntity::setVelocityLimit(double value) -> void
 {
   behavior_parameter_.dynamic_constraints.max_speed = value;
-  emplaceSetVelocityLimitTask(value);
+  FieldOperatorApplication::setVelocityLimit(value);
 }
 
 auto EgoEntity::setMapPose(const geometry_msgs::msg::Pose & map_pose) -> void

@@ -346,6 +346,17 @@ auto FieldOperatorApplication::getTurnIndicatorsCommandName() const -> std::stri
   }
 }
 
+auto FieldOperatorApplication::getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray
+{
+  traffic_simulator_msgs::msg::WaypointsArray waypoints;
+
+  for (const auto & point : getTrajectory().points) {
+    waypoints.waypoints.emplace_back(point.pose.position);
+  }
+
+  return waypoints;
+}
+
 auto FieldOperatorApplication::initialize(const geometry_msgs::msg::Pose & initial_pose) -> void
 {
   if (not std::exchange(initialized, true)) {
@@ -533,7 +544,7 @@ auto FieldOperatorApplication::sendCooperateCommand(
   }
 }
 
-auto FieldOperatorApplication::emplaceSetVelocityLimitTask(const double velocity_limit) -> void
+auto FieldOperatorApplication::setVelocityLimit(const double velocity_limit) -> void
 {
   task_queue.delay([this, velocity_limit]() {
     auto request = std::make_shared<SetVelocityLimit::Request>();
