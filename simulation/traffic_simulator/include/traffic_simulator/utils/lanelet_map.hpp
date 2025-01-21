@@ -43,7 +43,9 @@ inline auto laneletAltitude(Ts &&... xs)
   return lanelet_wrapper::lanelet_map::laneletAltitude(std::forward<decltype(xs)>(xs)...);
 }
 
-auto borderlinePoses() -> std::vector<std::pair<lanelet::Id, Pose>>;
+/// @brief Calculates all poses on the map that have no next lanelet (dead ends)
+/// @return A vector of final poses and their corresponding lanelet IDs
+auto noNextLaneletPoses() -> std::vector<std::pair<lanelet::Id, Pose>>;
 }  // namespace lanelet_map
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__UTILS__LANELET_MAP_HPP_

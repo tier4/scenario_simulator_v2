@@ -92,10 +92,11 @@ auto CanonicalizedLaneletPose::alignOrientationToLanelet() -> void
   using math::geometry::convertEulerAngleToQuaternion;
   using math::geometry::convertQuaternionToEulerAngle;
   /// @todo it will be changed to route::toSpline(...)
-  const auto spline = math::geometry::CatmullRomSpline(
-    lanelet_wrapper::lanelet_map::centerPoints({lanelet_pose_.lanelet_id}));
-  const auto lanelet_quaternion = spline.getPose(lanelet_pose_.s, true).orientation;
-  const auto lanelet_rpy = convertQuaternionToEulerAngle(lanelet_quaternion);
+  const auto lanelet_rpy = convertQuaternionToEulerAngle(
+    math::geometry::CatmullRomSpline(
+      lanelet_wrapper::lanelet_map::centerPoints({lanelet_pose_.lanelet_id}))
+      .getPose(lanelet_pose_.s, true)
+      .orientation);
   map_pose_.orientation =
     convertEulerAngleToQuaternion(geometry_msgs::build<geometry_msgs::msg::Vector3>()
                                     .x(lanelet_rpy.x)

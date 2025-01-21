@@ -53,7 +53,7 @@ auto TrafficController::appendAutoSinks(const std::set<std::uint8_t> & auto_sink
 {
   /// @note Hard coded parameter, this value is radius of the traffic sink circle.
   constexpr double sink_radius{1.0};
-  for (const auto & [lanelet_id, pose] : lanelet_map::borderlinePoses()) {
+  for (const auto & [lanelet_id, pose] : lanelet_map::noNextLaneletPoses()) {
     const auto traffic_sink_config = TrafficSinkConfig(
       sink_radius, pose.position, auto_sink_entity_types, std::make_optional(lanelet_id));
     addModule<TrafficSink>(despawn_, entity_manager_ptr_, traffic_sink_config);
