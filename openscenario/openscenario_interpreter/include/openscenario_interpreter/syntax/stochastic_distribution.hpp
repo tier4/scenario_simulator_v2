@@ -36,7 +36,8 @@ inline namespace syntax
      <xsd:attribute name="parameterName" type="String" use="required"/>
    </xsd:complexType>
 */
-struct StochasticDistribution : public StochasticDistributionType
+struct StochasticDistribution : public StochasticDistributionType,
+                                public StochasticParameterDistributionBase
 {
   const String parameter_name;
 

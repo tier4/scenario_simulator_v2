@@ -39,7 +39,7 @@ inline namespace syntax
      <xsd:attribute name="stepWidth" type="Double" use="required"/>
    </xsd:complexType>
 */
-struct DistributionRange : private Scope, public ComplexType
+struct DistributionRange : private Scope, public ComplexType, public SingleParameterDistributionBase
 {
   const Double step_width;
 

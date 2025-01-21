@@ -33,7 +33,7 @@ inline namespace syntax
      </xsd:sequence>
    </xsd:complexType>
 */
-struct DistributionSet : private Scope, public ComplexType
+struct DistributionSet : private Scope, public ComplexType, public SingleParameterDistributionBase
 {
   const std::list<DistributionSetElement> elements;
 

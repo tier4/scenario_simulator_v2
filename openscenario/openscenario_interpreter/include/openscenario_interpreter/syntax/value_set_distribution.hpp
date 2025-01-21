@@ -34,7 +34,7 @@ inline namespace syntax
      </xsd:sequence>
    </xsd:complexType>
 */
-struct ValueSetDistribution : public Scope
+struct ValueSetDistribution : public Scope, public MultiParameterDistributionBase
 {
   const std::list<ParameterValueSet> parameter_value_sets;
 

@@ -37,7 +37,9 @@ inline namespace syntax
      <xsd:attribute name="expectedValue" type="Double" use="required"/>
    </xsd:complexType>
 */
-struct PoissonDistribution : public ComplexType, private Scope
+struct PoissonDistribution : public ComplexType,
+                             private Scope,
+                             public StochasticParameterDistributionBase
 {
   const Range range;
 

@@ -35,7 +35,7 @@ inline namespace syntax
      </xsd:sequence>
    </xsd:complexType>
 */
-struct Deterministic
+struct Deterministic : public ParameterDistributionContainer
 {
   const std::list<DeterministicParameterDistribution> deterministic_parameter_distributions;
 
