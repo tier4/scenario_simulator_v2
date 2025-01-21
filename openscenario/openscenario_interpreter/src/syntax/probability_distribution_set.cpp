@@ -43,7 +43,7 @@ ProbabilityDistributionSet::ProbabilityDistributionSet(
 
 auto ProbabilityDistributionSet::evaluate() -> Object
 {
-  size_t index = distribute(random_engine);
+  std::size_t index = distribute(random_engine);
   return elements.at(index);
 }
 }  // namespace syntax
