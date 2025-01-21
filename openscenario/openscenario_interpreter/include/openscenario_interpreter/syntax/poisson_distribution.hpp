@@ -26,7 +26,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 /*
-   PoissonDistribution (OpenSCENARIO XML 1.3)
+   PoissonDistribution (OpenSCENARIO XML 1.3.1)
 
    Poisson distribution which can be applied to a single parameter.
 

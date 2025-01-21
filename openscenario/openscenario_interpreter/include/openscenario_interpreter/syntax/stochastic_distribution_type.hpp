@@ -29,7 +29,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 /*
-   StochasticDistributionType (OpenSCENARIO XML 1.3)
+   StochasticDistributionType (OpenSCENARIO XML 1.3.1)
 
    Container for a stochastic distribution type which can be applied to a single parameter.
 

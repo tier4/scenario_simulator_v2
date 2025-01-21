@@ -2098,9 +2098,11 @@ TEST_F(HdMapUtilsTest_StandardMap, getLongitudinalDistance_differentLanelet)
 TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLongitudinalDistance_differentLaneletNoRoute)
 {
   const auto pose_to = hdmap_utils.toLaneletPose(
-    makePose(makePoint(81590.79, 50067.66), makeQuaternionFromYaw(90.0)), lanelet::Id{3002185});
+    makePose(makePoint(81590.79, 50067.66, 35.0), makeQuaternionFromYaw(90.0)),
+    lanelet::Id{3002185});
   const auto pose_from = hdmap_utils.toLaneletPose(
-    makePose(makePoint(81596.20, 50068.04), makeQuaternionFromYaw(90.0)), lanelet::Id{3002166});
+    makePose(makePoint(81596.20, 50068.04, 35.0), makeQuaternionFromYaw(90.0)),
+    lanelet::Id{3002166});
   ASSERT_TRUE(pose_from.has_value());
   ASSERT_TRUE(pose_to.has_value());
 
@@ -2202,6 +2204,16 @@ TEST_F(HdMapUtilsTest_IntersectionMap, getLongitudinalDistance_laneChange)
     ASSERT_TRUE(with_lane_change.has_value());
     EXPECT_NEAR(with_lane_change.value(), 253.0, 1.0);
   }
+}
+
+/**
+ * @note Test for isInIntersection function
+ * 
+ */
+TEST_F(HdMapUtilsTest_IntersectionMap, isInIntersection)
+{
+  EXPECT_TRUE(hdmap_utils.isInIntersection(662));
+  EXPECT_FALSE(hdmap_utils.isInIntersection(574));
 }
 
 /**

@@ -24,7 +24,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 /*
-   ProbabilityDistributionSet (OpenSCENARIO XML 1.3)
+   ProbabilityDistributionSet (OpenSCENARIO XML 1.3.1)
 
    Container for a set of single values with a defined probability.
 
@@ -34,7 +34,6 @@ inline namespace syntax
      </xsd:sequence>
    </xsd:complexType>
 */
-
 struct ProbabilityDistributionSet : public ComplexType,
                                     private Scope,
                                     public StochasticParameterDistributionBase

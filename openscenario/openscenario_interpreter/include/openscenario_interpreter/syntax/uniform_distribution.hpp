@@ -26,7 +26,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 /*
-   UniformDistribution (OpenSCENARIO XML 1.3)
+   UniformDistribution (OpenSCENARIO XML 1.3.1)
 
    Uniform distribution which can be applied to a single parameter.
 

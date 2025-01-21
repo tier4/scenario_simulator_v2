@@ -24,7 +24,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 /*
-   DistributionSetElement (OpenSCENARIO XML 1.3)
+   DistributionSetElement (OpenSCENARIO XML 1.3.1)
 
    Indicates an element for a deterministic distribution.
 

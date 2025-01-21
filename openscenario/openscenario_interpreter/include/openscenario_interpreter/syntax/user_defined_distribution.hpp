@@ -23,7 +23,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 /*
-   UserDefinedDistribution (OpenSCENARIO XML 1.3)
+   UserDefinedDistribution (OpenSCENARIO XML 1.3.1)
 
    Indicates a user defined distribution which can be deterministic or stochastic.
    This distribution contains a property with the name type and some user defined content.

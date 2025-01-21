@@ -24,7 +24,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 /*
-   Range (OpenSCENARIO XML 1.3)
+   Range (OpenSCENARIO XML 1.3.1)
 
    Indicates a range for a distribution where the following rule applies: lowerLimit <= value <= upperLimit.
 

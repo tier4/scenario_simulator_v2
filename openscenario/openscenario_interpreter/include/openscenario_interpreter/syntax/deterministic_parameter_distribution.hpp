@@ -25,7 +25,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 /*
-   DeterministicParameterDistribution (OpenSCENARIO XML 1.3)
+   DeterministicParameterDistribution (OpenSCENARIO XML 1.3.1)
 
    Either a DeterministicMultiParameterDistribution or a DeterministicSingleParameterDistribution
 

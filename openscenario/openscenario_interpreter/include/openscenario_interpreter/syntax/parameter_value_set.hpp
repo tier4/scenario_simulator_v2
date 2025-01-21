@@ -22,7 +22,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 /*
-   ParameterValueSet (OpenSCENARIO XML 1.3)
+   ParameterValueSet (OpenSCENARIO XML 1.3.1)
 
    Set of parameter values that have to be assigned for a single concrete scenario.
 

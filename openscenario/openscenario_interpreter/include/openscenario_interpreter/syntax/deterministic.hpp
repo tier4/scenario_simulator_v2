@@ -25,7 +25,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 /*
-   Deterministic (OpenSCENARIO XML 1.3)
+   Deterministic (OpenSCENARIO XML 1.3.1)
 
    Top level container containing all deterministic distribution elements.
 

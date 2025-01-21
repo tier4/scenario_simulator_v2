@@ -562,15 +562,9 @@ public:
       if (const auto observer = core->getEntity(from.name())) {
         if (const auto observed = core->getEntity(to.name())) {
           auto velocity = [](const auto & entity) -> Eigen::Vector3d {
-            auto direction = [](auto orientation) -> Eigen::Vector3d {
-              const auto euler_angle = math::geometry::convertQuaternionToEulerAngle(orientation);
-              const auto r = euler_angle.x;
-              const auto p = euler_angle.y;
-              const auto y = euler_angle.z;
-              return Eigen::Vector3d(
-                std::cos(y) * std::cos(p), std::sin(y) * std::cos(p), std::sin(p));
+            auto direction = [](const auto & q) -> Eigen::Vector3d {
+              return Eigen::Quaternion(q.w, q.x, q.y, q.z) * Eigen::Vector3d::UnitX();
             };
-
             return direction(entity->getMapPose().orientation) * entity->getCurrentTwist().linear.x;
           };
 

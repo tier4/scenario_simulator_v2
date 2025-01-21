@@ -24,7 +24,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 /*
-   ValueSetDistribution (OpenSCENARIO XML 1.3)
+   ValueSetDistribution (OpenSCENARIO XML 1.3.1)
 
    Deterministic multi-parameter distribution, where one or multiple sets of parameter values can be defined.
 

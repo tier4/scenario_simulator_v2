@@ -26,7 +26,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 /*
-   DeterministicSingleParameterDistributionType (OpenSCENARIO XML 1.3)
+   DeterministicSingleParameterDistributionType (OpenSCENARIO XML 1.3.1)
 
    A deterministic distribution type which can be applied to a single parameter.
 

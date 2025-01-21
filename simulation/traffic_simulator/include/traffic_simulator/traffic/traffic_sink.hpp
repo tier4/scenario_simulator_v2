@@ -31,6 +31,8 @@
 #include <functional>
 #include <geometry_msgs/msg/pose.hpp>
 #include <string>
+#include <traffic_simulator/data_type/entity_status.hpp>
+#include <traffic_simulator/entity/entity_manager.hpp>
 #include <traffic_simulator/traffic/traffic_module_base.hpp>
 #include <vector>
 
@@ -38,25 +40,65 @@ namespace traffic_simulator
 {
 namespace traffic
 {
+struct TrafficSinkConfig
+{
+  /**
+   * @brief Construct a new TrafficSinkConfig object
+   * @param radius Radius of the traffic sink
+   * @param position Position of the traffic sink
+   * @param sinkable_entity_types Candidates for despawn.
+   */
+  explicit TrafficSinkConfig(
+    const double radius, const geometry_msgs::msg::Point & position,
+    const std::set<std::uint8_t> & sinkable_entity_types,
+    const std::optional<lanelet::Id> lanelet_id_opt)
+  : radius(radius),
+    position(position),
+    sinkable_entity_types(sinkable_entity_types),
+    description([](const std::optional<lanelet::Id> lanelet_id_opt) -> std::string {
+      static long unique_id = 0L;
+      if (lanelet_id_opt.has_value()) {
+        return std::string("auto_") + std::to_string(lanelet_id_opt.value());
+      } else {
+        return std::string("custom_") + std::to_string(unique_id++);
+      }
+    }(lanelet_id_opt))
+  {
+  }
+
+  const double radius;
+  const geometry_msgs::msg::Point position;
+  const std::set<std::uint8_t> sinkable_entity_types;
+  const std::string description;
+};
+
 class TrafficSink : public TrafficModuleBase
 {
 public:
+  /**
+   * @brief Construct a new Traffic Sink object
+   * @param entity_manager_ptr Shared pointer, refers to the EntityManager
+   * @param config TrafficSink configuration
+   */
   explicit TrafficSink(
-    lanelet::Id lanelet_id, double radius, const geometry_msgs::msg::Point & position,
-    const std::function<std::vector<std::string>(void)> & get_entity_names_function,
-    const std::function<geometry_msgs::msg::Pose(const std::string &)> & get_entity_pose_function,
-    const std::function<void(std::string)> & despawn_function);
-  const lanelet::Id lanelet_id;
-  const double radius;
-  const geometry_msgs::msg::Point position;
-  void execute(const double current_time, const double step_time) override;
+    const std::function<void(const std::string &)> & despawn_function,
+    const std::shared_ptr<entity::EntityManager> entity_manager_ptr,
+    const TrafficSinkConfig & config);
+  /** 
+   *  @note execute calls despawn on each entity only when both:
+   *  1. Its distance from the TrafficSink is <= config.radius [m].
+   *  2. Its EntityType is in config.sinkable_entity_types.
+   */
+  auto execute(const double current_time, const double step_time) -> void override;
   auto appendDebugMarker(visualization_msgs::msg::MarkerArray & marker_array) const
     -> void override;
 
 private:
-  const std::function<std::vector<std::string>(void)> get_entity_names_function;
-  const std::function<geometry_msgs::msg::Pose(const std::string &)> get_entity_pose_function;
-  const std::function<void(const std::string &)> despawn_function;
+  auto isEntitySinkable(const std::string & entity_name) const noexcept(false) -> bool;
+
+  const std::function<void(const std::string &)> despawn_;
+  const std::shared_ptr<entity::EntityManager> entity_manager_ptr_;
+  const TrafficSinkConfig config_;
 };
 }  // namespace traffic
 }  // namespace traffic_simulator
