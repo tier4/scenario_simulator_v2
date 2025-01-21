@@ -22,7 +22,7 @@ inline namespace syntax
 NormalDistribution::NormalDistribution(
   const pugi::xml_node & node, openscenario_interpreter::Scope & scope)
 : Scope(scope),
-  range(readElement<Range>("range", node, scope)),
+  range(readElement<Range>("Range", node, scope)),
   expected_value(readAttribute<Double>("expectedValue", node, scope)),
   variance(readAttribute<Double>("variance", node, scope)),
   distribute(static_cast<double>(expected_value.data), static_cast<double>(variance.data))

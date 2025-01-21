@@ -22,7 +22,7 @@ inline namespace syntax
 PoissonDistribution::PoissonDistribution(
   const pugi::xml_node & node, openscenario_interpreter::Scope & scope)
 : Scope(scope),
-  range(readElement<Range>("range", node, scope)),
+  range(readElement<Range>("Range", node, scope)),
   expected_value(readAttribute<Double>("expectedValue", node, scope)),
   distribute(expected_value.data)
 {

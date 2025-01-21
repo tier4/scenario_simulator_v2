@@ -22,7 +22,7 @@ inline namespace syntax
 UniformDistribution::UniformDistribution(
   const pugi::xml_node & node, openscenario_interpreter::Scope & scope)
 : Scope(scope),
-  range(readElement<Range>("range", node, scope)),
+  range(readElement<Range>("Range", node, scope)),
   distribute(range.lower_limit.data, range.upper_limit.data)
 {
 }
