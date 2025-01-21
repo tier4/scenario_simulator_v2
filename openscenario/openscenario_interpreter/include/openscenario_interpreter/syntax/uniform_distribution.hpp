@@ -40,8 +40,6 @@ struct UniformDistribution : public ComplexType, private Scope
 
   std::uniform_real_distribution<Double::value_type> distribute;
 
-  std::mt19937 random_engine;
-
   explicit UniformDistribution(const pugi::xml_node &, Scope & scope);
 
   auto evaluate() -> Object;

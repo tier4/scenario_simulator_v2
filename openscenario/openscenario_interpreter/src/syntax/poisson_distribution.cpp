@@ -24,8 +24,7 @@ PoissonDistribution::PoissonDistribution(
 : Scope(scope),
   range(readElement<Range>("range", node, scope)),
   expected_value(readAttribute<Double>("expectedValue", node, scope)),
-  distribute(expected_value.data),
-  random_engine(scope.seed)
+  distribute(expected_value.data)
 {
 }
 

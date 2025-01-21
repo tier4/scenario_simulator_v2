@@ -57,8 +57,6 @@ struct Histogram : public ComplexType, private Scope
 
   std::piecewise_constant_distribution<Double::value_type> distribute;
 
-  std::mt19937 random_engine;
-
   explicit Histogram(const pugi::xml_node &, Scope & scope);
 
   auto evaluate() -> Object;

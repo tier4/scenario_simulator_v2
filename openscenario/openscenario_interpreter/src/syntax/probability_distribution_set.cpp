@@ -32,8 +32,7 @@ ProbabilityDistributionSet::ProbabilityDistributionSet(
   elements(
     generateVector(readElements<ProbabilityDistributionSetElement, 1>("Element", node, scope))),
   adaptor(elements),
-  distribute(adaptor.probabilities.begin(), adaptor.probabilities.end()),
-  random_engine(scope.seed)
+  distribute(adaptor.probabilities.begin(), adaptor.probabilities.end())
 {
 }
 

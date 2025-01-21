@@ -25,8 +25,7 @@ NormalDistribution::NormalDistribution(
   range(readElement<Range>("range", node, scope)),
   expected_value(readAttribute<Double>("expectedValue", node, scope)),
   variance(readAttribute<Double>("variance", node, scope)),
-  distribute(static_cast<double>(expected_value.data), static_cast<double>(variance.data)),
-  random_engine(scope.seed)
+  distribute(static_cast<double>(expected_value.data), static_cast<double>(variance.data))
 {
 }
 

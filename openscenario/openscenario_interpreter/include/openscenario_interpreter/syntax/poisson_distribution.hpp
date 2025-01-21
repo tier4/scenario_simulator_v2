@@ -44,8 +44,6 @@ struct PoissonDistribution : public ComplexType, private Scope
 
   std::poisson_distribution<> distribute;
 
-  std::mt19937 random_engine;
-
   explicit PoissonDistribution(const pugi::xml_node &, Scope & scope);
 
   auto evaluate() -> Object;

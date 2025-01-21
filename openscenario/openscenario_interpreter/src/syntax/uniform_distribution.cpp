@@ -23,8 +23,7 @@ UniformDistribution::UniformDistribution(
   const pugi::xml_node & node, openscenario_interpreter::Scope & scope)
 : Scope(scope),
   range(readElement<Range>("range", node, scope)),
-  distribute(range.lower_limit.data, range.upper_limit.data),
-  random_engine(scope.seed)
+  distribute(range.lower_limit.data, range.upper_limit.data)
 {
 }
 

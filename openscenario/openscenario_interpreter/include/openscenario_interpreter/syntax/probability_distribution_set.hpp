@@ -53,8 +53,6 @@ struct ProbabilityDistributionSet : public ComplexType, private Scope
 
   std::discrete_distribution<std::size_t> distribute;
 
-  std::mt19937 random_engine;
-
   explicit ProbabilityDistributionSet(const pugi::xml_node &, Scope & scope);
 
   auto evaluate() -> Object;
