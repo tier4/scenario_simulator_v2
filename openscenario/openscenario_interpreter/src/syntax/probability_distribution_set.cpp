@@ -31,8 +31,13 @@ ProbabilityDistributionSet::ProbabilityDistributionSet(
 : Scope(scope),
   elements(
     generateVector(readElements<ProbabilityDistributionSetElement, 1>("Element", node, scope))),
-  adaptor(elements),
-  distribute(adaptor.probabilities.begin(), adaptor.probabilities.end())
+  distribute([this]() -> std::discrete_distribution<std::size_t> {
+    std::vector<double> probabilities;
+    for (const auto & element : elements) {
+      probabilities.push_back(element.weight);
+    }
+    return {std::begin(probabilities), std::end(probabilities)};
+  }())
 {
 }
 
