@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__EXPRESSION__ATTRIBUTE_HPP_
-#define OPENSCENARIO_INTERPRETER__EXPRESSION__ATTRIBUTE_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__READER__EVALUATE_HPP_
+#define OPENSCENARIO_INTERPRETER__READER__EVALUATE_HPP_
 
 #include <iomanip>
 #include <openscenario_interpreter/object.hpp>
@@ -33,4 +33,4 @@ std::string evaluate(const std::string &, const Scope &);
 }  // namespace reader
 }  // namespace openscenario_interpreter
 
-#endif  // OPENSCENARIO_INTERPRETER__EXPRESSION__ATTRIBUTE_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__READER__EVALUATE_HPP_
