@@ -27,6 +27,6 @@ UniformDistribution::UniformDistribution(
 {
 }
 
-auto UniformDistribution::evaluate() -> Object { return make<Double>(distribute(random_engine)); }
+auto UniformDistribution::derive() -> Object { return make<Double>(distribute(random_engine)); }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

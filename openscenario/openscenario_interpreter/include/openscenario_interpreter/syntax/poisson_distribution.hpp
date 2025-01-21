@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__POISSON_DISTRIBUTION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__POISSON_DISTRIBUTION_HPP_
 
+#include <openscenario_interpreter/parameter_distribution.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/range.hpp>
@@ -36,7 +37,9 @@ inline namespace syntax
      <xsd:attribute name="expectedValue" type="Double" use="required"/>
    </xsd:complexType>
 */
-struct PoissonDistribution : public ComplexType, private Scope
+struct PoissonDistribution : public ComplexType,
+                             private Scope,
+                             public StochasticParameterDistributionBase
 {
   const Range range;
 
@@ -46,7 +49,7 @@ struct PoissonDistribution : public ComplexType, private Scope
 
   explicit PoissonDistribution(const pugi::xml_node &, Scope & scope);
 
-  auto evaluate() -> Object;
+  auto derive() -> Object override;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
