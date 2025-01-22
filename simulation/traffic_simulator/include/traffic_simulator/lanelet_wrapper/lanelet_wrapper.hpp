@@ -81,6 +81,7 @@ public:
     const lanelet::routing::RoutingGraphConstPtr & routing_graph) -> lanelet::Ids
   {
     if (!exists(from_lanelet_id, to_lanelet_id, routing_configuration.allow_lane_change)) {
+      /// @note to use default routing costs: distance along lanelets
       constexpr int routing_cost_id = 0;
       const auto & from_lanelet = lanelet_map->laneletLayer.get(from_lanelet_id);
       const auto & to_lanelet = lanelet_map->laneletLayer.get(to_lanelet_id);
@@ -116,9 +117,7 @@ public:
     }
   }
 
-  std::unordered_map<std::tuple<lanelet::Id, lanelet::Id, bool>, lanelet::Ids> data_;
-  std::mutex mutex_;
-
+private:
   auto exists(const lanelet::Id from, const lanelet::Id to, const bool allow_lane_change) -> bool
   {
     std::lock_guard lock(mutex_);
@@ -133,6 +132,9 @@ public:
     std::lock_guard lock(mutex_);
     data_[{from, to, allow_lane_change}] = route;
   }
+
+  std::unordered_map<std::tuple<lanelet::Id, lanelet::Id, bool>, lanelet::Ids> data_;
+  std::mutex mutex_;
 };
 
 class CenterPointsCache
@@ -177,10 +179,7 @@ public:
     return splines_.at(lanelet_id);
   }
 
-  std::unordered_map<lanelet::Id, std::vector<Point>> data_;
-  std::unordered_map<lanelet::Id, std::shared_ptr<Spline>> splines_;
-  std::mutex mutex_;
-
+private:
   auto exists(const lanelet::Id lanelet_id) -> bool
   {
     std::lock_guard lock(mutex_);
@@ -215,6 +214,10 @@ public:
     }
     return center_points;
   }
+
+  std::unordered_map<lanelet::Id, std::vector<Point>> data_;
+  std::unordered_map<lanelet::Id, std::shared_ptr<Spline>> splines_;
+  std::mutex mutex_;
 };
 
 class LaneletLengthCache
@@ -239,9 +242,7 @@ public:
     return data_.at(lanelet_id);
   }
 
-  std::unordered_map<lanelet::Id, double> data_;
-  std::mutex mutex_;
-
+private:
   auto exists(const lanelet::Id lanelet_id) -> bool
   {
     std::lock_guard lock(mutex_);
@@ -253,6 +254,9 @@ public:
     std::lock_guard lock(mutex_);
     data_[lanelet_id] = length;
   }
+
+  std::unordered_map<lanelet::Id, double> data_;
+  std::mutex mutex_;
 };
 
 struct TrafficRulesWithRoutingGraph

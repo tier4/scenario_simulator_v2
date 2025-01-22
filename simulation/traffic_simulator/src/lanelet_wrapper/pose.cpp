@@ -41,11 +41,10 @@ auto toMapPose(const LaneletPose & lanelet_pose, const bool fill_pitch) -> PoseS
     const auto lanelet_spline =
       lanelet_map::centerPointsSpline(canonicalized_lanelet_pose->lanelet_id);
     /// @note map position
-    const auto normal_vector = lanelet_spline->getNormalVector(canonicalized_lanelet_pose->s);
-    const auto offset_transition_vector =
-      math::geometry::normalize(normal_vector) * canonicalized_lanelet_pose->offset;
     pose_stamped.pose = lanelet_spline->getPose(canonicalized_lanelet_pose->s);
-    pose_stamped.pose.position += offset_transition_vector;
+    pose_stamped.pose.position +=
+      math::geometry::normalize(lanelet_spline->getNormalVector(canonicalized_lanelet_pose->s)) *
+      canonicalized_lanelet_pose->offset;
     /// @note map orientation
     const auto tangent_vector = lanelet_spline->getTangentVector(canonicalized_lanelet_pose->s);
     const auto lanelet_rpy =
@@ -69,6 +68,19 @@ auto toMapPose(const LaneletPose & lanelet_pose, const bool fill_pitch) -> PoseS
 
 auto isAltitudeWithinThreshold(const double current_altitude, const double target_altitude) -> bool
 {
+  /**
+   * @brief Justification for using a fixed `altitude_threshold` value of 1.0 [m].
+   *
+   * Using a fixed `altitude_threshold` value of 1.0 [m] is justified because the
+   * entity's Z-position is always relative to its base. This eliminates the need
+   * to dynamically adjust the threshold based on the entity's dimensions, ensuring
+   * consistent altitude matching regardless of the entity type.
+   *
+   * The position of the entity is defined relative to its base, typically the center
+   * of the rear axle projected onto the ground in the case of vehicles.
+   *
+   * @note There is no technical basis for this value; it was determined based on experiments.
+   */
   return std::abs(current_altitude - target_altitude) <= ALTITUDE_THRESHOLD;
 }
 
@@ -83,7 +95,10 @@ auto toLaneletPose(
   const Pose & map_pose, const lanelet::Id lanelet_id, const double matching_distance)
   -> std::optional<LaneletPose>
 {
-  constexpr double yaw_threshold = 0.25;
+  /// @note yaw_threshold_deg is used to determine whether the entity is going straight,
+  /// it defines the maximum allowed rotation with respect to the lanelet centerline.
+  constexpr double yaw_threshold_deg = 45.0;
+
   const auto lanelet_spline = lanelet_map::centerPointsSpline(lanelet_id);
   if (const auto lanelet_pose_s = lanelet_spline->getSValue(map_pose, matching_distance);
       !lanelet_pose_s) {
@@ -92,10 +107,12 @@ auto toLaneletPose(
              !isAltitudeWithinThreshold(map_pose.position.z, pose_on_centerline.position.z)) {
     return std::nullopt;
   } else {
+    constexpr double yaw_range_min_rad = M_PI * yaw_threshold_deg / 180.0;
+    constexpr double yaw_range_max_rad = M_PI - yaw_range_min_rad;
     if (const auto lanelet_pose_rpy = math::geometry::convertQuaternionToEulerAngle(
           math::geometry::getRotation(pose_on_centerline.orientation, map_pose.orientation));
-        std::fabs(lanelet_pose_rpy.z) > M_PI * yaw_threshold &&
-        std::fabs(lanelet_pose_rpy.z) < M_PI * (1 - yaw_threshold)) {
+        std::fabs(lanelet_pose_rpy.z) > yaw_range_min_rad and
+        std::fabs(lanelet_pose_rpy.z) < yaw_range_max_rad) {
       return std::nullopt;
     } else {
       double lanelet_pose_offset = std::sqrt(
@@ -132,6 +149,8 @@ auto toLaneletPose(
   const Pose & map_pose, const bool include_crosswalk, const double matching_distance)
   -> std::optional<LaneletPose>
 {
+  /// @note Hardcoded parameter, this value has no technical basis and is determined based on experimentation.
+  /// @todo Add doxygen comments as soon as you know the meaning and rationale of the value.
   constexpr double distance_threshold{0.1};
   constexpr std::size_t search_count{5};
   const auto nearby_lanelet_ids = lanelet_map::nearbyLaneletIds(
@@ -318,8 +337,22 @@ auto alongLaneletPose(
   }
 }
 
-// If route is not specified, the lanelet_id with the lowest array index is used as a candidate for
-// canonicalize destination.
+/**
+ * @brief Canonicalizes a given LaneletPose by adjusting the longitudinal position (s) to ensure it
+ *        lies within the bounds of the specified lanelet. If the position is out of bounds, it
+ *        traverses to previous or next lanelets to find the canonicalized position.
+ *
+ * If the provided pose has a longitudinal position (s) less than 0, the function traverses
+ * to previous lanelets until a valid position is found or no previous lanelets exist.
+ *
+ * If the longitudinal position (s) exceeds the length of the current lanelet, the function traverses
+ * to next lanelets until the position is valid or no next lanelets exist.
+ *
+ * @param lanelet_pose The input LaneletPose to canonicalize, containing a lanelet ID and longitudinal position (s).
+ * @return A tuple where:
+ *         - The first element is an optional canonicalized LaneletPose (std::nullopt if canonicalization fails).
+ *         - The second element is an optional lanelet ID where the process stopped (std::nullopt if successful).
+ */
 auto canonicalizeLaneletPose(const LaneletPose & lanelet_pose)
   -> std::tuple<std::optional<LaneletPose>, std::optional<lanelet::Id>>
 {
@@ -353,13 +386,13 @@ auto canonicalizeLaneletPose(const LaneletPose & lanelet_pose, const lanelet::Id
   -> std::tuple<std::optional<LaneletPose>, std::optional<lanelet::Id>>
 {
   if (lanelet_pose.s < 0) {
-    // When canonicalizing to backward lanelet_id, do not consider route
+    /// @note When canonicalizing to backward lanelet_id, do not consider route
     return canonicalizeLaneletPose(lanelet_pose);
   }
   auto canonicalized_lanelet_pose = lanelet_pose;
   while (canonicalized_lanelet_pose.s >
          lanelet_map::laneletLength(canonicalized_lanelet_pose.lanelet_id)) {
-    // When canonicalizing to forward lanelet_id, consider route
+    /// @note When canonicalizing to forward lanelet_id, consider route
     bool found_next_lanelet_in_route = false;
     for (const auto & next_lanelet_id :
          lanelet_map::nextLaneletIds(canonicalized_lanelet_pose.lanelet_id)) {
@@ -379,7 +412,6 @@ auto canonicalizeLaneletPose(const LaneletPose & lanelet_pose, const lanelet::Id
   return {canonicalized_lanelet_pose, std::nullopt};
 }
 
-// used only by this namespace
 auto matchToLane(
   const Pose & map_pose, const BoundingBox & bounding_box, const bool include_crosswalk,
   const double matching_distance, const double reduction_ratio, const RoutingGraphType type)
@@ -400,21 +432,21 @@ auto matchToLane(
     }
     return absolute_hull_polygon;
   };
-  // prepare object for matching
+  /// @note prepare object for matching
   const auto yaw = math::geometry::convertQuaternionToEulerAngle(map_pose.orientation).z;
   lanelet::matching::Object2d bounding_box_object;
   bounding_box_object.pose.translation() =
     lanelet::BasicPoint2d(map_pose.position.x, map_pose.position.y);
   bounding_box_object.pose.linear() = Eigen::Rotation2D<double>(yaw).matrix();
   bounding_box_object.absoluteHull = absoluteHullPolygon(bounding_box_object.pose);
-  // find matches and optionally filter
+  /// @note find matches and optionally filter
   auto matches = lanelet::matching::getDeterministicMatches(
     *LaneletWrapper::map(), bounding_box_object, matching_distance);
   if (!include_crosswalk) {
     matches =
       lanelet::matching::removeNonRuleCompliantMatches(matches, LaneletWrapper::trafficRules(type));
   }
-  // find best match (minimize offset)
+  /// @note find best match (minimize offset)
   if (matches.empty()) {
     return std::nullopt;
   } else {

@@ -112,12 +112,11 @@ auto LaneletLoader::resamplePoints(
   auto findNearestIndexPair =
     [&](const double target_length) -> std::pair<std::size_t, std::size_t> {
     const auto N = accumulated_lengths.size();
-    if (target_length < accumulated_lengths.at(1)) {  // Front
+    if (target_length < accumulated_lengths.at(1)) {
       return std::make_pair(0, 1);
-    } else if (target_length > accumulated_lengths.at(N - 2)) {  // Back
+    } else if (target_length > accumulated_lengths.at(N - 2)) {
       return std::make_pair(N - 2, N - 1);
-    } else  // Middle
-    {
+    } else {
       for (size_t i = 1; i < N; ++i) {
         if (
           accumulated_lengths.at(i - 1) <= target_length &&
