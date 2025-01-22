@@ -93,6 +93,10 @@ auto nearbyLaneletIds(
   const Point & point, const double distance_threshold, const bool include_crosswalk,
   const std::size_t search_count) -> lanelet::Ids
 {
+  auto isEmptyOrBeyondThreshold = [distance_threshold](const auto & lanelets) {
+    return lanelets.empty() || lanelets.front().first > distance_threshold;
+  };
+
   auto excludeSubtypeLanelets =
     [](
       const std::vector<std::pair<double, lanelet::Lanelet>> & pair_distance_lanelet,
@@ -113,15 +117,15 @@ auto nearbyLaneletIds(
     static_cast<unsigned>(search_count));
 
   /// @note check for current content, if not empty then optionally apply filter
-  if (nearest_lanelets.empty() || nearest_lanelets.front().first > distance_threshold) {
+  if (isEmptyOrBeyondThreshold(nearest_lanelets)) {
     return {};
   } else if (!include_crosswalk) {
     nearest_lanelets =
       excludeSubtypeLanelets(nearest_lanelets, lanelet::AttributeValueString::Crosswalk);
   }
 
-  // check again
-  if (nearest_lanelets.empty() || nearest_lanelets.front().first > distance_threshold) {
+  /// @note check again
+  if (isEmptyOrBeyondThreshold(nearest_lanelets)) {
     return {};
   } else {
     lanelet::Ids target_lanelet_ids;

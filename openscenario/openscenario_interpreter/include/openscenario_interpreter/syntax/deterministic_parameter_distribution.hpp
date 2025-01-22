@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__DETERMINISTIC_PARAMETER_DISTRIBUTION_HPP_
-#define OPENSCENARIO_INTERPRETER__DETERMINISTIC_PARAMETER_DISTRIBUTION_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__DETERMINISTIC_PARAMETER_DISTRIBUTION_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__DETERMINISTIC_PARAMETER_DISTRIBUTION_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/deterministic_multi_parameter_distribution.hpp>
@@ -24,18 +24,18 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- DeterministicParameterDistribution 1.2 ---------------------------------
- *
- *  <xsd:group name="DeterministicParameterDistribution">
- *    <xsd:choice>
- *      <xsd:element name="DeterministicMultiParameterDistribution"
- *        type="DeterministicMultiParameterDistribution"/>
- *      <xsd:element name="DeterministicSingleParameterDistribution"
- *        type="DeterministicSingleParameterDistribution"/>
- *    </xsd:choice>
- *  </xsd:group>
- *
- * -------------------------------------------------------------------------- */
+/*
+   DeterministicParameterDistribution (OpenSCENARIO XML 1.3.1)
+
+   Either a DeterministicMultiParameterDistribution or a DeterministicSingleParameterDistribution
+
+   <xsd:group name="DeterministicParameterDistribution">
+     <xsd:choice>
+       <xsd:element name="DeterministicMultiParameterDistribution" type="DeterministicMultiParameterDistribution"/>
+       <xsd:element name="DeterministicSingleParameterDistribution" type="DeterministicSingleParameterDistribution"/>
+     </xsd:choice>
+   </xsd:group>
+*/
 struct DeterministicParameterDistribution : public Group
 {
   explicit DeterministicParameterDistribution(const pugi::xml_node &, Scope & scope);
@@ -48,4 +48,4 @@ DEFINE_LAZY_VISITOR(
 );
 }  // namespace syntax
 }  // namespace openscenario_interpreter
-#endif  // OPENSCENARIO_INTERPRETER__DETERMINISTIC_PARAMETER_DISTRIBUTION_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__DETERMINISTIC_PARAMETER_DISTRIBUTION_HPP_
