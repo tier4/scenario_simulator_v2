@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__VARIANT__VISIBILITY_H_
-#define OPENSCENARIO_INTERPRETER__VARIANT__VISIBILITY_H_
+#ifndef OPENSCENARIO_INTERPRETER__UTILITY__VARIANT_HPP_
+#define OPENSCENARIO_INTERPRETER__UTILITY__VARIANT_HPP_
 
 #if __cplusplus >= 201606
 #include <variant>
@@ -103,4 +103,4 @@ auto visit(Visitor && visitor, boost::variant<Ts...> && var0, Variants &&... var
 #endif
 }  // namespace openscenario_interpreter
 
-#endif  // OPENSCENARIO_INTERPRETER__VARIANT__VISIBILITY_H_
+#endif  // OPENSCENARIO_INTERPRETER__UTILITY__VARIANT_HPP_
