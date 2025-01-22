@@ -141,7 +141,7 @@ private:
   auto getLateralDistance(
     const math::geometry::CatmullRomSplineInterface & spline,
     const traffic_simulator::CanonicalizedEntityStatus & status, double longitudinalDistance) const
-    -> double;
+    -> const double;
 };
 }  // namespace entity_behavior
 

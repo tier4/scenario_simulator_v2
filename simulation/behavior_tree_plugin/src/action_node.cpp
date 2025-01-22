@@ -302,52 +302,64 @@ auto ActionNode::getRoutableCanonicalizedLaneletPose(
   const traffic_simulator::CanonicalizedEntityStatus & status) const
   -> std::optional<traffic_simulator::CanonicalizedLaneletPose>
 {
+  // This default hdmap_utils value
+  constexpr static double DEFAULT_MATCH_TO_LANE_REDUCTION_RATIO = 0.8;
+  // This value has to allow finding neighbor lanelets, it would be perfect if this is parametized to lanelet width
+  constexpr static double ALTERNATIVE_LANELETS_DISTANCE = 3.0;
+
   traffic_simulator::RoutingConfiguration routing_configuration;
   routing_configuration.allow_lane_change = true;
 
-  const auto & from = canonicalized_entity_status->getCanonicalizedLaneletPose().value();
-  const auto from_id = static_cast<traffic_simulator_msgs::msg::LaneletPose>(from).lanelet_id;
+  const auto & from_lanelet_pose =
+    canonicalized_entity_status->getCanonicalizedLaneletPose().value();
+  const auto from_id =
+    static_cast<traffic_simulator_msgs::msg::LaneletPose>(from_lanelet_pose).lanelet_id;
 
-  auto to = status.getCanonicalizedLaneletPose();
+  auto to_lanelet_pose = status.getCanonicalizedLaneletPose();
   const auto & to_bounding_box = status.getBoundingBox();
   const auto current_id =
     static_cast<traffic_simulator_msgs::msg::LaneletPose>(to.value()).lanelet_id;
 
   if (hdmap_utils->getRoute(from_id, current_id, routing_configuration).empty()) {
-    // no route between entities find
-    const auto lanelet_ids = hdmap_utils->getMatchingLanes(
-      static_cast<geometry_msgs::msg::Pose>(to.value()), to_bounding_box, false, 5.0, 0.8,
+    // no route between entities found
+    const auto lanelet_ids = hdmap_utils->findMatchingLanes(
+      static_cast<geometry_msgs::msg::Pose>(to.value()), to_bounding_box, false,
+      ALTERNATIVE_LANELETS_DISTANCE, DEFAULT_MATCH_TO_LANE_REDUCTION_RATIO,
       routing_configuration.routing_graph_type);
 
     if (lanelet_ids) {
+      std::sort(lanelet_ids->begin(), lanelet_ids->end(), [](auto const & lhs, auto const & rhs) {
+        return lhs.second < rhs.second;
+      });
       for (const auto & lanelet_id : lanelet_ids.value()) {
         if (
           (lanelet_id.first != current_id) and
           (!hdmap_utils->getRoute(from_id, lanelet_id.first, routing_configuration).empty())) {
           if (const auto lanelet = hdmap_utils->toLaneletPose(
-                static_cast<geometry_msgs::msg::Pose>(to.value()), lanelet_id.first, 5.0);
+                static_cast<geometry_msgs::msg::Pose>(to_lanelet_pose.value()), lanelet_id.first,
+                ALTERNATIVE_LANELETS_DISTANCE);
               lanelet) {
             if (const auto canonicalized =
                   traffic_simulator::pose::canonicalize(lanelet.value(), hdmap_utils);
                 canonicalized) {
-              to = canonicalized;
+              to_lanelet_pose = canonicalized;
               break;
             }
           }
         }
       }
     } else {
-      to = std::nullopt;
+      to_lanelet_pose = std::nullopt;
     }
   }
 
-  return to;
+  return to_lanelet_pose;
 }
 
 auto ActionNode::getLateralDistance(
   const math::geometry::CatmullRomSplineInterface & spline,
   const traffic_simulator::CanonicalizedEntityStatus & status, double longitudinalDistance) const
-  -> double
+  -> const double
 {
   const auto & points = math::geometry::transformPoints(
     status.getMapPose(), math::geometry::getPointsFromBbox(status.getBoundingBox()));
@@ -387,17 +399,18 @@ auto ActionNode::getDistanceToTargetEntityPolygon(
     constexpr bool include_adjacent_lanelet{false};
     constexpr bool include_opposite_direction{true};
 
-    const auto & from = canonicalized_entity_status->getCanonicalizedLaneletPose().value();
+    const auto & from_lanelet_pose =
+      canonicalized_entity_status->getCanonicalizedLaneletPose().value();
     const auto & from_bounding_box = canonicalized_entity_status->getBoundingBox();
 
-    const auto & to = getRoutableCanonicalizedLaneletPose(status);
+    const auto & to_lanelet_pose = getRoutableCanonicalizedLaneletPose(status);
     const auto & to_bounding_box = status.getBoundingBox();
 
     if (to.has_value()) {
       const auto longitudinalDistance =
         traffic_simulator::distance::boundingBoxLaneLongitudinalDistance(
-          from, from_bounding_box, *to, to_bounding_box, include_adjacent_lanelet,
-          include_opposite_direction, routing_configuration, hdmap_utils);
+          from_lanelet_pose, from_bounding_box, *to_lanelet_pose, to_bounding_box,
+          include_adjacent_lanelet, include_opposite_direction, routing_configuration, hdmap_utils);
 
       if (longitudinalDistance) {
         const auto lateral_distance =

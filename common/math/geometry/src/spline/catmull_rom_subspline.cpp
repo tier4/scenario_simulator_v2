@@ -16,6 +16,7 @@
 #include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 #include <vector>
+
 namespace math
 {
 namespace geometry

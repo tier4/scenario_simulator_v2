@@ -331,7 +331,7 @@ private:
   constexpr static double DEFAULT_MATCH_TO_LANE_REDUCTION_RATIO = 0.8;
 
 public:
-  auto getMatchingLanes(
+  auto findMatchingLanes(
     const geometry_msgs::msg::Pose &, const traffic_simulator_msgs::msg::BoundingBox &,
     const bool include_crosswalk, const double matching_distance = 1.0,
     const double reduction_ratio = DEFAULT_MATCH_TO_LANE_REDUCTION_RATIO,
