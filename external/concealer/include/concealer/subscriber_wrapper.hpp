@@ -35,7 +35,8 @@ public:
     if constexpr (thread_safety == ThreadSafety::unsafe) {
       return *current_value;
     } else {
-      return *std::atomic_load(&current_value);
+      const auto copy = *std::atomic_load(&current_value);
+      return copy;
     }
   }
 
