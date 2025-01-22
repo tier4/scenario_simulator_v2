@@ -91,14 +91,9 @@ auto CanonicalizedLaneletPose::alignOrientationToLanelet() -> void
 {
   using math::geometry::convertEulerAngleToQuaternion;
   using math::geometry::convertQuaternionToEulerAngle;
-  const auto lanelet_rpy = convertQuaternionToEulerAngle(
-    route::toSpline({lanelet_pose_.lanelet_id}).getPose(lanelet_pose_.s, true).orientation);
   map_pose_.orientation =
-    convertEulerAngleToQuaternion(geometry_msgs::build<geometry_msgs::msg::Vector3>()
-                                    .x(lanelet_rpy.x)
-                                    .y(lanelet_rpy.y)
-                                    .z(lanelet_rpy.z));
-  lanelet_pose_.rpy = geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0.0).y(0.0).z(0.0);
+    route::toSpline({lanelet_pose_.lanelet_id}).getPose(lanelet_pose_.s, true).orientation;
+  lanelet_pose_.rpy = geometry_msgs::msg::Vector3();
 }
 
 auto CanonicalizedLaneletPose::adjustOrientationAndOzPosition() -> void
