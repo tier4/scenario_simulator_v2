@@ -21,6 +21,128 @@ Changelog for package concealer
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+7.4.6 (2025-01-10)
+------------------
+* Merge remote-tracking branch 'origin/master' into dependabot/pip/jinja2-3.1.5
+* Contributors: Masaya Kataoka
+
+7.4.5 (2025-01-10)
+------------------
+* Merge branch 'master' into fix/pass_despawn_function_in_constructor
+* Merge remote-tracking branch 'origin/master' into fix/pass_despawn_function_in_constructor
+* Merge branch 'master' into fix/pass_despawn_function_in_constructor
+* Merge branch 'master' into fix/pass_despawn_function_in_constructor
+* Contributors: Masaya Kataoka
+
+7.4.4 (2025-01-09)
+------------------
+* Merge pull request `#1497 <https://github.com/tier4/scenario_simulator_v2/issues/1497>`_ from tier4/refactor/concealer-2
+  Refactor/concealer 2
+* Merge branch 'master' into refactor/concealer-2
+* Cleanup member function `FieldOperatorApplication::sendCooperateCommand`
+* Move function `isValidCooperateStatus` into `sendCooperateCommand`
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-2
+* Remove some member accessor from struct `FieldOperatorApplication`
+* Remove member function `FieldOperatorApplication::getAutowareStateName`
+* Remove data member `FieldOperatorApplication::latest_cooperate_status_array`
+* Remove member function `AutowareUniverse::updateVehicleState`
+* Remove member function `AutowareUniverse::updateLocalization`
+* Cleanup `ControlModeCommand` service callback
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-2
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-2
+* Remove static member function `EgoEntity::makeFieldOperatorApplication`
+* Rename class `ServiceWithValidation` to `Service`
+* Rename class `SubscriberWrapper` to `Subscriber`
+* Lipsticks
+* Rename class `PublisherWrapper` to `Publisher`
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+7.4.3 (2025-01-07)
+------------------
+* Merge branch 'master' into tmp/pc-patch
+* Contributors: Kotaro Yoshimoto
+
+7.4.2 (2025-01-07)
+------------------
+
+7.4.1 (2024-12-24)
+------------------
+* Merge remote-tracking branch 'origin/master' into fix/canonicalize_function
+* Merge remote-tracking branch 'origin/master' into fix/canonicalize_function
+* Contributors: Masaya Kataoka
+
+7.4.0 (2024-12-23)
+------------------
+* Merge branch 'master' into RJD-1457/traffic_sink_refactor
+* Merge branch 'master' into RJD-1457/traffic_sink_refactor
+* Merge branch 'master' into RJD-1457/traffic_sink_refactor
+* Merge branch 'master' into RJD-1457/traffic_sink_refactor
+* Merge branch 'master' into RJD-1457/traffic_sink_refactor
+* Merge branch 'master' into RJD-1457/traffic_sink_refactor
+* Merge branch 'master' into RJD-1457/traffic_sink_refactor
+* Merge branch 'master' into RJD-1457/traffic_sink_refactor
+* Merge tag '6.0.1' into RJD-1457/traffic_sink_refactor
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/enable_specify_entity_type_in_autosink
+* Merge branch 'master' into feature/enable_specify_entity_type_in_autosink
+* Contributors: Masaya Kataoka, Michał Ciasnocha, robomic
+
+7.3.5 (2024-12-20)
+------------------
+* Merge pull request `#1488 <https://github.com/tier4/scenario_simulator_v2/issues/1488>`_ from tier4/refactor/concealer-1
+  Refactor/concealer 1
+* Merge branch 'master' into refactor/concealer-1
+* Merge branch 'master' into refactor/concealer-1
+* Merge branch 'master' into refactor/concealer-1
+* Reformat
+* Remove `getAcceleration`, `getSteeringAngle`, `getVelocity` and `getGearSign`
+* Remove macro `DEFINE_STATE_PREDICATE`
+* Remove member function `TaskQueue::stopAndJoin`
+* Remove free function `sudokill`
+* Remove member function `validateAvailability` and `callWithTimeoutValidation`
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-1
+* Remove class `ServceWithValidation::TimeoutError`
+* Remove member function `FieldOperatorApplication::shutdownAutoware`
+* Add using declarations for subscribers and publishers
+* Add new header file `concealer/member_detector.hpp`
+* Cleanup class template `SubscriberWrapper`
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-1
+* Remove header file `autoware_stream.hpp`
+* Move member function implementations into `field_operator_application.cpp`
+* Remove function template `listup`
+* Remove function template `toAutowareStateString`
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-1
+* Remove class template `FieldOperatorApplicationFor<T>`
+* Update all member function of `FieldOperatorApplication` to be non-virtual
+* Update some member functions of `FieldOperatorApplication` to be non-virtual
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-1
+* Move data members into base class `FieldOperatorApplication`
+* Remove member function `receiveMrmState`
+* Remove member function `receiveEmergencyState`
+* Move base class `TransitionAssertion<T>` to `FieldOperatorApplication`
+* Move `getAutowareState` into `FieldOperatorApplication`
+* Update all members of `FieldOperatorApplicationFor<...>` to be public
+* Remove macro `CONCEALER_ISOLATE_STANDARD_OUTPUT`
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-1
+* Update `~FieldOperatorApplication()` to be non-virtual
+* Remove member function `isStopRequested` and `stopRequest`
+* Remove virtual function `sendSIGINT`
+* Cleanup `FieldOperatorApplication::spinSome`
+* Remove member function `FieldOperatorApplication::checkAutowareProcess`
+* Remove member function `FieldOperatorApplication::restrictTargetSpeed`
+* Remove stream input/output operator for `TurnIndicatorsCommand`
+* Update `FieldOperatorApplication::getTurnIndicatorsCommand` to pure virtual
+* Remove member function `AutowareUniverse::set`
+* Remove member function `AutowareUniverse::stopAndJoin`
+* Remove class `concealer::Autoware`
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+7.3.4 (2024-12-20)
+------------------
+* Merge branch 'master' into feature/is_in_intersection
+* Merge remote-tracking branch 'origin/master' into feature/is_in_intersection
+* Merge remote-tracking branch 'origin/master' into feature/is_in_intersection
+* Contributors: Masaya Kataoka
+
 7.3.3 (2024-12-18)
 ------------------
 

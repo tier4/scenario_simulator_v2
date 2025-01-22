@@ -21,6 +21,139 @@ Changelog for package traffic_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+7.4.6 (2025-01-10)
+------------------
+* Merge remote-tracking branch 'origin/master' into dependabot/pip/jinja2-3.1.5
+* Contributors: Masaya Kataoka
+
+7.4.5 (2025-01-10)
+------------------
+* Merge pull request `#1502 <https://github.com/tier4/scenario_simulator_v2/issues/1502>`_ from tier4/fix/pass_despawn_function_in_constructor
+  add despawn_function argument
+* Merge branch 'master' into fix/pass_despawn_function_in_constructor
+* Merge remote-tracking branch 'origin/master' into fix/pass_despawn_function_in_constructor
+* rename despawn_function to despawn
+* Merge branch 'master' into fix/pass_despawn_function_in_constructor
+* Merge branch 'master' into fix/pass_despawn_function_in_constructor
+* add despawn_function argument
+* Contributors: Masaya Kataoka
+
+7.4.4 (2025-01-09)
+------------------
+* Merge pull request `#1497 <https://github.com/tier4/scenario_simulator_v2/issues/1497>`_ from tier4/refactor/concealer-2
+  Refactor/concealer 2
+* Merge branch 'master' into refactor/concealer-2
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-2
+* Remove some member accessor from struct `FieldOperatorApplication`
+* Remove member function `FieldOperatorApplication::getAutowareStateName`
+* Cleanup `ControlModeCommand` service callback
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-2
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-2
+* Update `EgoEntity` to have `FieldOperatorApplication` as its base class
+* Update `EgoEntity` to have `FieldOperatorApplication` as non-pointer
+* Remove static member function `EgoEntity::makeFieldOperatorApplication`
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+7.4.3 (2025-01-07)
+------------------
+* Merge pull request `#1499 <https://github.com/tier4/scenario_simulator_v2/issues/1499>`_ from tier4/tmp/pc-patch
+* Merge branch 'master' into tmp/pc-patch
+* fix: implementation
+* fix: implementation
+* perf(traffic_light): add condition to add new traffic light
+* Contributors: Kotaro Yoshimoto, satoshi-ota
+
+7.4.2 (2025-01-07)
+------------------
+* Merge pull request `#1501 <https://github.com/tier4/scenario_simulator_v2/issues/1501>`_ from tier4/feature/new_rviz
+* chore: update rviz config based on autoware.rviz
+* Contributors: Kotaro Yoshimoto
+
+7.4.1 (2024-12-24)
+------------------
+* Merge pull request `#1498 <https://github.com/tier4/scenario_simulator_v2/issues/1498>`_ from tier4/fix/canonicalize_function
+  Fix/canonicalize function
+* Merge remote-tracking branch 'origin/master' into fix/canonicalize_function
+* Merge remote-tracking branch 'origin/master' into fix/canonicalize_function
+* Fix source code
+* Test cases were added, and the source code was reverted to its pre-modified state so that the added test cases would fail.
+* apply reformat
+* catch common::SemanticError inside traffic_simulator::pose::canonicalize function
+* Contributors: Masaya Kataoka
+
+7.4.0 (2024-12-23)
+------------------
+* Merge pull request `#1464 <https://github.com/tier4/scenario_simulator_v2/issues/1464>`_ from tier4/RJD-1457/traffic_sink_refactor
+  RJD-1457/traffic_sink_refactor
+* Merge branch 'master' into RJD-1457/traffic_sink_refactor
+* style fix
+* Merge branch 'master' into RJD-1457/traffic_sink_refactor
+* Merge branch 'master' into RJD-1457/traffic_sink_refactor
+* Merge branch 'master' into RJD-1457/traffic_sink_refactor
+* remove unnecessary include directives
+* remove unnecessary funcs
+* code style
+* code style
+* Merge branch 'master' into RJD-1457/traffic_sink_refactor
+* simplify auto_sink logic
+* TrafficSinkConfig
+* AutoSinkConfig
+* review suggestions
+* remove lanelet_id from the constructor
+* Merge branch 'master' into RJD-1457/traffic_sink_refactor
+* Merge branch 'master' into RJD-1457/traffic_sink_refactor
+* reorder fix
+* Merge branch 'master' into RJD-1457/traffic_sink_refactor
+* spell-check happy
+* TrafficSink refactor with despawn functionality
+* Merge tag '6.0.1' into RJD-1457/traffic_sink_refactor
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/enable_specify_entity_type_in_autosink
+* Merge branch 'master' into feature/enable_specify_entity_type_in_autosink
+* remove warning
+* remove sonarcloud warning
+* apply reformat
+* use uint8_t instead of traffic_simulator_msgs::msg::EntityType
+* fix typo
+* fix typo
+* fix typo
+* enable set traffic sink in cpp scenario
+* enable compare entity type
+* add doxygen comment
+* add sinkable_entity_type to the configuration class
+* add sinkable_entity_type variable
+* add get_entity_type function
+* rename variable in TrafficController class
+* rename argument and member variables
+* Contributors: Masaya Kataoka, Michał Ciasnocha, robomic
+
+7.3.5 (2024-12-20)
+------------------
+* Merge pull request `#1488 <https://github.com/tier4/scenario_simulator_v2/issues/1488>`_ from tier4/refactor/concealer-1
+  Refactor/concealer 1
+* Merge branch 'master' into refactor/concealer-1
+* Merge branch 'master' into refactor/concealer-1
+* Merge branch 'master' into refactor/concealer-1
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-1
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-1
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-1
+* Remove class template `FieldOperatorApplicationFor<T>`
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-1
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-1
+* Remove member function `FieldOperatorApplication::restrictTargetSpeed`
+* Remove class `concealer::Autoware`
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+7.3.4 (2024-12-20)
+------------------
+* Merge pull request `#1490 <https://github.com/tier4/scenario_simulator_v2/issues/1490>`_ from tier4/feature/is_in_intersection
+  Feature/is in intersection
+* Merge branch 'master' into feature/is_in_intersection
+* Merge remote-tracking branch 'origin/master' into feature/is_in_intersection
+* add test case for isInIntersection function
+* Merge remote-tracking branch 'origin/master' into feature/is_in_intersection
+* add auto HdMapUtils::isInIntersection(const lanelet::Id lanelet_id) const -> bool function
+* Contributors: Masaya Kataoka
+
 7.3.3 (2024-12-18)
 ------------------
 
