@@ -94,7 +94,7 @@ auto longitudinalDistance(
     /**
      * @brief A matching distance of about 1.5*lane widths is given as the matching distance to match the
      * Entity present on the adjacent Lanelet.
-     * The length of the horizontal bar must intersect with the adjacent lanelet, 
+     * The length of the horizontal bar must intersect with the adjacent lanelet,
      * so it is always 10m regardless of the entity type.
      */
     constexpr double matching_distance = 5.0;
@@ -296,7 +296,7 @@ auto distanceToYieldStop(
     return ret;
   };
 
-  std::set<double> distances;
+  std::vector<double> distances;
   for (const auto & lanelet_id : following_lanelets) {
     const auto right_of_way_ids = lanelet_wrapper::lanelet_map::rightOfWayLaneletIds(lanelet_id);
     for (const auto right_of_way_id : right_of_way_ids) {
@@ -309,14 +309,14 @@ auto distanceToYieldStop(
           helper::constructLaneletPose(lanelet_id, 0.0, 0.0),
           static_cast<LaneletPose>(reference_pose), RoutingConfiguration());
         if (distance_forward) {
-          distances.insert(distance_forward.value());
+          distances.push_back(distance_forward.value());
         } else if (distance_backward) {
-          distances.insert(-distance_backward.value());
+          distances.push_back(-distance_backward.value());
         }
       }
     }
-    if (distances.size() != 0) {
-      return *distances.begin();
+    if (!distances.empty()) {
+      return *std::min_element(distances.begin(), distances.end());
     }
   }
   return std::nullopt;
