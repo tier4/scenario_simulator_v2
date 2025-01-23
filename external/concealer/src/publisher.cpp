@@ -51,28 +51,36 @@ NormalDistribution<nav_msgs::msg::Odometry>::NormalDistribution(
 auto NormalDistribution<nav_msgs::msg::Odometry>::operator()(nav_msgs::msg::Odometry odometry)
   -> nav_msgs::msg::Odometry
 {
-  odometry.pose.pose.position.x = position_x_error.apply(engine, odometry.pose.pose.position.x);
-  odometry.pose.pose.position.y = position_y_error.apply(engine, odometry.pose.pose.position.y);
-  odometry.pose.pose.position.z = position_z_error.apply(engine, odometry.pose.pose.position.z);
+  const Eigen::Quaterniond orientation = Eigen::Quaterniond(
+    odometry.pose.pose.orientation.w, odometry.pose.pose.orientation.x,
+    odometry.pose.pose.orientation.y, odometry.pose.pose.orientation.z);
 
-  Eigen::Vector3d euler = Eigen::Quaterniond(
-                            odometry.pose.pose.orientation.w, odometry.pose.pose.orientation.x,
-                            odometry.pose.pose.orientation.y, odometry.pose.pose.orientation.z)
-                            .matrix()
-                            .eulerAngles(0, 1, 2);
+  Eigen::Vector3d local_position = Eigen::Vector3d(0.0, 0.0, 0.0);
+
+  local_position.x() = position_x_error.apply(engine, local_position.x());
+  local_position.y() = position_y_error.apply(engine, local_position.y());
+  local_position.z() = position_z_error.apply(engine, local_position.z());
+
+  const Eigen::Vector3d world_position = orientation.toRotationMatrix() * local_position;
+
+  odometry.pose.pose.position.x += world_position.x();
+  odometry.pose.pose.position.y += world_position.y();
+  odometry.pose.pose.position.z += world_position.z();
+
+  Eigen::Vector3d euler = orientation.matrix().eulerAngles(0, 1, 2);
 
   euler.x() = orientation_r_error.apply(engine, euler.x());
   euler.y() = orientation_p_error.apply(engine, euler.y());
   euler.z() = orientation_y_error.apply(engine, euler.z());
 
-  const Eigen::Quaterniond orientation = Eigen::AngleAxisd(euler.x(), Eigen::Vector3d::UnitX()) *
-                                         Eigen::AngleAxisd(euler.y(), Eigen::Vector3d::UnitY()) *
-                                         Eigen::AngleAxisd(euler.z(), Eigen::Vector3d::UnitZ());
+  const Eigen::Quaterniond q = Eigen::AngleAxisd(euler.x(), Eigen::Vector3d::UnitX()) *
+                               Eigen::AngleAxisd(euler.y(), Eigen::Vector3d::UnitY()) *
+                               Eigen::AngleAxisd(euler.z(), Eigen::Vector3d::UnitZ());
 
-  odometry.pose.pose.orientation.x = orientation.x();
-  odometry.pose.pose.orientation.y = orientation.y();
-  odometry.pose.pose.orientation.z = orientation.z();
-  odometry.pose.pose.orientation.w = orientation.w();
+  odometry.pose.pose.orientation.x = q.x();
+  odometry.pose.pose.orientation.y = q.y();
+  odometry.pose.pose.orientation.z = q.z();
+  odometry.pose.pose.orientation.w = q.w();
 
   odometry.twist.twist.linear.x = linear_x_error.apply(engine, odometry.twist.twist.linear.x);
   odometry.twist.twist.linear.y = linear_y_error.apply(engine, odometry.twist.twist.linear.y);
