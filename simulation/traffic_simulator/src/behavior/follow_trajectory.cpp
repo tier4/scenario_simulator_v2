@@ -575,24 +575,20 @@ auto makeUpdatedStatus(
       }
     }();
 
-    // if it is the transition between lanelet pose: overwrite position to improve precision
     if (entity_status.lanelet_pose_valid) {
       constexpr bool desired_velocity_is_global{true};
-
-      const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
-        entity_status.pose, entity_status.bounding_box, {entity_status.lanelet_pose.lanelet_id},
-        include_crosswalk, matching_distance, hdmap_utils);
-
       const auto estimated_next_canonicalized_lanelet_pose =
         traffic_simulator::pose::toCanonicalizedLaneletPose(
           updated_status.pose, entity_status.bounding_box, include_crosswalk, matching_distance,
           hdmap_utils);
 
-      if (canonicalized_lanelet_pose && estimated_next_canonicalized_lanelet_pose) {
-        const auto next_lanelet_pose = pose::moveTowardsLaneletPose(
-          canonicalized_lanelet_pose.value(), estimated_next_canonicalized_lanelet_pose.value(),
-          desired_velocity, desired_velocity_is_global, step_time, hdmap_utils);
-        updated_status.pose.position = pose::toMapPose(next_lanelet_pose, hdmap_utils).position;
+      // if it is the transition between lanelets: overwrite position to improve precision
+      if (estimated_next_canonicalized_lanelet_pose) {
+        const auto next_lanelet_id =
+          static_cast<LaneletPose>(estimated_next_canonicalized_lanelet_pose.value()).lanelet_id;
+        updated_status.pose.position = pose::updatePositionForLaneletTransition(
+          updated_status, next_lanelet_id, desired_velocity, desired_velocity_is_global, step_time,
+          hdmap_utils);
       }
     }
 
