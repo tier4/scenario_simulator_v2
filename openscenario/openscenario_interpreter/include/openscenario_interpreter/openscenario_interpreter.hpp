@@ -70,7 +70,7 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode,
 
   std::shared_ptr<rclcpp::TimerBase> timer;
 
-  common::JUnit5 results;
+  common::junit::JUnit5 results;
 
   boost::variant<common::junit::Pass, common::junit::Failure, common::junit::Error> result;
 

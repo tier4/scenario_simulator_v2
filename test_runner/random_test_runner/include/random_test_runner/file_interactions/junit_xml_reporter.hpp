@@ -29,7 +29,9 @@
 class JunitXmlReporterTestCase
 {
 public:
-  explicit JunitXmlReporterTestCase(common::SimpleTestCase & testcase) : testcase_(testcase) {}
+  explicit JunitXmlReporterTestCase(common::junit::SimpleTestCase & testcase) : testcase_(testcase)
+  {
+  }
 
   void reportCollision(const NPCDescription & npc, double time)
   {
@@ -52,7 +54,7 @@ private:
     testcase_.error.push_back(result);
   }
 
-  common::SimpleTestCase & testcase_;
+  common::junit::SimpleTestCase & testcase_;
 };
 
 class JunitXmlReporter
@@ -77,7 +79,7 @@ public:
   }
 
 private:
-  common::JUnit5 results_;
+  common::junit::JUnit5 results_;
   std::string output_directory_;
   rclcpp::Logger logger_;
 };

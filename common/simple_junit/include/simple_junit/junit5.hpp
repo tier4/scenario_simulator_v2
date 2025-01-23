@@ -28,7 +28,7 @@ using string = std::string;
 
 namespace common
 {
-inline namespace junit
+namespace junit
 {
 struct Pass
 {
