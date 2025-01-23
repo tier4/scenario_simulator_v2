@@ -21,7 +21,12 @@ namespace openscenario_interpreter
 {
 struct StochasticParameterDistributionBase
 {
-  virtual auto derive() -> Object = 0;
+  virtual auto derive() -> Object
+  {
+    throw common::scenario_simulator_exception::Error(
+      "Unimplemented derive function is called. Please implement and override "
+      "StochasticParameterDistributionBase::derive.");
+  }
 };
 }  // namespace openscenario_interpreter
 #endif  // OPENSCENARIO_INTERPRETER__PARAMETER_DISTRIBUTION_HPP_
