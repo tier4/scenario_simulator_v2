@@ -216,7 +216,7 @@ auto distanceToTrafficLightStopLine(
   const lanelet::Ids & route_lanelets, const SplineInterface & route_spline)
   -> std::optional<double>
 {
-  if (auto traffic_light_ids =
+  if (const auto & traffic_light_ids =
         lanelet_wrapper::traffic_lights::trafficLightIdsOnPath(route_lanelets);
       traffic_light_ids.empty()) {
     return std::nullopt;

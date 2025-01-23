@@ -60,7 +60,9 @@ auto laneletAltitude(
 auto laneletIds() -> lanelet::Ids
 {
   lanelet::Ids ids;
-  for (const auto & lanelet : LaneletWrapper::map()->laneletLayer) {
+  const auto & lanelet_layer = LaneletWrapper::map()->laneletLayer;
+  ids.reserve(lanelet_layer.size());
+  for (const auto & lanelet : lanelet_layer) {
     ids.push_back(lanelet.id());
   }
   return ids;
@@ -123,7 +125,7 @@ auto centerPoints(const lanelet::Ids & lanelet_ids) -> std::vector<Point>
   } else {
     std::vector<Point> center_points;
     for (const auto & lanelet_id : lanelet_ids) {
-      auto points = centerPoints(lanelet_id);
+      const auto & points = centerPoints(lanelet_id);
       center_points.insert(center_points.end(), points.begin(), points.end());
     }
     center_points.erase(
@@ -147,8 +149,10 @@ auto centerPointsSpline(const lanelet::Id lanelet_id) -> std::shared_ptr<Spline>
 auto nextLaneletIds(const lanelet::Id lanelet_id, const RoutingGraphType type) -> lanelet::Ids
 {
   lanelet::Ids next_lanelet_ids;
-  const auto lanelet = LaneletWrapper::map()->laneletLayer.get(lanelet_id);
-  for (const auto & following_lanelet : LaneletWrapper::routingGraph(type)->following(lanelet)) {
+  const auto & lanelet = LaneletWrapper::map()->laneletLayer.get(lanelet_id);
+  const auto & following_lanelets = LaneletWrapper::routingGraph(type)->following(lanelet);
+  next_lanelet_ids.reserve(following_lanelets.size());
+  for (const auto & following_lanelet : following_lanelets) {
     next_lanelet_ids.push_back(following_lanelet.id());
   }
   return next_lanelet_ids;
@@ -158,7 +162,7 @@ auto nextLaneletIds(const lanelet::Ids & lanelet_ids, const RoutingGraphType typ
 {
   std::set<lanelet::Id> next_lanelet_ids_set;
   for (const auto & lanelet_id : lanelet_ids) {
-    auto next_lanelet_ids = nextLaneletIds(lanelet_id, type);
+    const auto & next_lanelet_ids = nextLaneletIds(lanelet_id, type);
     next_lanelet_ids_set.insert(next_lanelet_ids.begin(), next_lanelet_ids.end());
   }
   return lanelet::Ids(next_lanelet_ids_set.begin(), next_lanelet_ids_set.end());
@@ -195,8 +199,10 @@ auto nextLaneletIds(
 auto previousLaneletIds(const lanelet::Id lanelet_id, const RoutingGraphType type) -> lanelet::Ids
 {
   lanelet::Ids previous_lanelet_ids;
-  const auto lanelet = LaneletWrapper::map()->laneletLayer.get(lanelet_id);
-  for (const auto & previous_lanelet : LaneletWrapper::routingGraph(type)->previous(lanelet)) {
+  const auto & lanelet = LaneletWrapper::map()->laneletLayer.get(lanelet_id);
+  const auto & previous_lanelets = LaneletWrapper::routingGraph(type)->previous(lanelet);
+  previous_lanelet_ids.reserve(previous_lanelets.size());
+  for (const auto & previous_lanelet : previous_lanelets) {
     previous_lanelet_ids.push_back(previous_lanelet.id());
   }
   return previous_lanelet_ids;
@@ -207,7 +213,7 @@ auto previousLaneletIds(const lanelet::Ids & lanelet_ids, const RoutingGraphType
 {
   std::set<lanelet::Id> previous_lanelet_ids_set;
   for (const auto & lanelet_id : lanelet_ids) {
-    auto previous_lanelet_ids = previousLaneletIds(lanelet_id, type);
+    const auto & previous_lanelet_ids = previousLaneletIds(lanelet_id, type);
     previous_lanelet_ids_set.insert(previous_lanelet_ids.begin(), previous_lanelet_ids.end());
   }
   return lanelet::Ids(previous_lanelet_ids_set.begin(), previous_lanelet_ids_set.end());
@@ -256,6 +262,7 @@ auto laneletPolygon(const lanelet::Id lanelet_id) -> std::vector<Point>
 {
   std::vector<Point> points;
   const auto & lanelet_polygon = LaneletWrapper::map()->laneletLayer.get(lanelet_id).polygon3d();
+  points.reserve(lanelet_polygon.size());
   for (const auto & point : lanelet_polygon) {
     points.push_back(geometry_msgs::build<Point>().x(point.x()).y(point.y()).z(point.z()));
   }
@@ -271,6 +278,7 @@ auto stopLinePolygon(const lanelet::Id lanelet_id) -> std::vector<Point>
 auto toPolygon(const lanelet::ConstLineString3d & line_string) -> std::vector<Point>
 {
   std::vector<Point> points;
+  points.reserve(line_string.size());
   for (const auto & point : line_string) {
     points.push_back(geometry_msgs::build<Point>().x(point.x()).y(point.y()).z(point.z()));
   }
@@ -309,8 +317,8 @@ auto trafficSignsOnPath(const lanelet::Ids & lanelet_ids)
 {
   std::vector<std::shared_ptr<const lanelet::TrafficSign>> ret;
   for (const auto & lanelet_id : lanelet_ids) {
-    const auto lanelet = LaneletWrapper::map()->laneletLayer.get(lanelet_id);
-    const auto traffic_signs = lanelet.regulatoryElementsAs<const lanelet::TrafficSign>();
+    const auto & lanelet = LaneletWrapper::map()->laneletLayer.get(lanelet_id);
+    const auto & traffic_signs = lanelet.regulatoryElementsAs<const lanelet::TrafficSign>();
     for (const auto & traffic_sign : traffic_signs) {
       ret.push_back(traffic_sign);
     }
@@ -333,7 +341,9 @@ auto stopLinesOnPath(const lanelet::Ids & lanelet_ids) -> lanelet::ConstLineStri
 auto stopLineIdsOnPath(const lanelet::Ids & lanelet_ids) -> lanelet::Ids
 {
   lanelet::Ids stop_line_ids;
-  for (const auto & ret : stopLinesOnPath(lanelet_ids)) {
+  const auto & stop_lines = stopLinesOnPath(lanelet_ids);
+  stop_line_ids.reserve(stop_lines.size());
+  for (const auto & ret : stop_lines) {
     stop_line_ids.push_back(ret.id());
   }
   return stop_line_ids;
