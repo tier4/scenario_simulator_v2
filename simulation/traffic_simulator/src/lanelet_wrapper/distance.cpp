@@ -248,17 +248,16 @@ auto distanceToCrosswalk(const std::vector<Point> & route_waypoints, const lanel
   if (route_waypoints.empty()) {
     return std::nullopt;
   } else {
-    const Spline route_spline(route_waypoints);
-    return route_spline.getCollisionPointIn2D(
-      lanelet_wrapper::lanelet_map::laneletPolygon(crosswalk_id));
+    return distanceToCrosswalk(Spline{route_waypoints}, crosswalk_id);
   }
 }
 
 auto distanceToCrosswalk(const SplineInterface & route_spline, const lanelet::Id crosswalk_id)
   -> std::optional<double>
 {
+  constexpr bool search_in_backward_direction{false};
   return route_spline.getCollisionPointIn2D(
-    lanelet_wrapper::lanelet_map::laneletPolygon(crosswalk_id), false);
+    lanelet_wrapper::lanelet_map::laneletPolygon(crosswalk_id), search_in_backward_direction);
 }
 }  // namespace distance
 }  // namespace lanelet_wrapper
