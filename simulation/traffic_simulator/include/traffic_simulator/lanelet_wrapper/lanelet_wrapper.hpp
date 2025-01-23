@@ -100,8 +100,7 @@ public:
           shortest_path_ids);
       }
     }
-    std::lock_guard lock(mutex_);
-    return data_.at({from_lanelet_id, to_lanelet_id, routing_configuration.allow_lane_change});
+    return readData(from_lanelet_id, to_lanelet_id, routing_configuration.allow_lane_change);
   }
 
   auto getRoute(const lanelet::Id from, const lanelet::Id to, const bool allow_lane_change)
@@ -112,8 +111,7 @@ public:
         "route from : ", from, " to : ", to, (allow_lane_change ? " with" : " without"),
         " lane change does not exists on route cache.");
     } else {
-      std::lock_guard lock(mutex_);
-      return data_.at({from, to, allow_lane_change});
+      return readData(from, to, allow_lane_change);
     }
   }
 
@@ -123,6 +121,13 @@ private:
     std::lock_guard lock(mutex_);
     std::tuple<lanelet::Id, lanelet::Id, bool> key = {from, to, allow_lane_change};
     return data_.find(key) != data_.end();
+  }
+
+  auto readData(const lanelet::Id from, const lanelet::Id to, const bool allow_lane_change)
+    -> lanelet::Ids
+  {
+    std::lock_guard lock(mutex_);
+    return data_.at({from, to, allow_lane_change});
   }
 
   auto appendData(
@@ -145,8 +150,7 @@ public:
     if (!exists(lanelet_id)) {
       THROW_SIMULATION_ERROR("center point of : ", lanelet_id, " does not exists on route cache.");
     }
-    std::lock_guard lock(mutex_);
-    return data_.at(lanelet_id);
+    return readData(lanelet_id);
   }
 
   auto centerPointsSpline(lanelet::Id lanelet_id) -> decltype(auto)
@@ -154,8 +158,7 @@ public:
     if (!exists(lanelet_id)) {
       THROW_SIMULATION_ERROR("center point of : ", lanelet_id, " does not exists on route cache.");
     }
-    std::lock_guard lock(mutex_);
-    return splines_.at(lanelet_id);
+    return readDataSpline(lanelet_id);
   }
 
   auto getCenterPoints(const lanelet::Id lanelet_id, const lanelet::LaneletMapPtr & lanelet_map)
@@ -164,8 +167,7 @@ public:
     if (!exists(lanelet_id)) {
       appendData(lanelet_id, centerPoints(lanelet_id, lanelet_map));
     }
-    std::lock_guard lock(mutex_);
-    return data_.at(lanelet_id);
+    return readData(lanelet_id);
   }
 
   auto getCenterPointsSpline(
@@ -175,8 +177,7 @@ public:
     if (!exists(lanelet_id)) {
       appendData(lanelet_id, centerPoints(lanelet_id, lanelet_map));
     }
-    std::lock_guard lock(mutex_);
-    return splines_.at(lanelet_id);
+    return readDataSpline(lanelet_id);
   }
 
 private:
@@ -184,6 +185,18 @@ private:
   {
     std::lock_guard lock(mutex_);
     return data_.find(lanelet_id) != data_.end();
+  }
+
+  auto readData(const lanelet::Id lanelet_id) -> std::vector<Point>
+  {
+    std::lock_guard lock(mutex_);
+    return data_.at(lanelet_id);
+  }
+
+  auto readDataSpline(const lanelet::Id lanelet_id) -> std::shared_ptr<Spline>
+  {
+    std::lock_guard lock(mutex_);
+    return splines_.at(lanelet_id);
   }
 
   auto appendData(const lanelet::Id lanelet_id, const std::vector<Point> & route) -> void
@@ -228,8 +241,7 @@ public:
     if (!exists(lanelet_id)) {
       THROW_SIMULATION_ERROR("length of : ", lanelet_id, " does not exists on route cache.");
     }
-    std::lock_guard lock(mutex_);
-    return data_.at(lanelet_id);
+    return readData(lanelet_id);
   }
 
   auto getLength(const lanelet::Id lanelet_id, const lanelet::LaneletMapPtr & lanelet_map) -> double
@@ -238,8 +250,7 @@ public:
       appendData(
         lanelet_id, lanelet::utils::getLaneletLength2d(lanelet_map->laneletLayer.get(lanelet_id)));
     }
-    std::lock_guard lock(mutex_);
-    return data_.at(lanelet_id);
+    return readData(lanelet_id);
   }
 
 private:
@@ -247,6 +258,12 @@ private:
   {
     std::lock_guard lock(mutex_);
     return data_.find(lanelet_id) != data_.end();
+  }
+
+  auto readData(const lanelet::Id lanelet_id) -> double
+  {
+    std::lock_guard lock(mutex_);
+    return data_.at(lanelet_id);
   }
 
   auto appendData(const lanelet::Id lanelet_id, double length) -> void
