@@ -121,6 +121,10 @@ jobs:
           ./src/scenario_simulator_v2/.github/workflows/workflow.sh ./src/scenario_simulator_v2/test_runner/scenario_test_runner/config/workflow.txt global_frame_rate:=20
         shell: bash
 
+      - name: Debug
+        if: ${{ always() }}
+        uses: mxschmitt/action-tmate@v3
+        
       - name: Upload Lcov result
         uses: actions/upload-artifact@v4
         with:
