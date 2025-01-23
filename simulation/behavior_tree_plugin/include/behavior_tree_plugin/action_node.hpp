@@ -135,9 +135,6 @@ private:
     -> std::vector<traffic_simulator::CanonicalizedEntityStatus>;
   auto isOtherEntityAtConsideredAltitude(
     const traffic_simulator::CanonicalizedEntityStatus & entity_status) const -> bool;
-  auto getRoutableCanonicalizedLaneletPose(
-    const traffic_simulator::CanonicalizedEntityStatus & status) const
-    -> std::optional<traffic_simulator::CanonicalizedLaneletPose>;
 };
 }  // namespace entity_behavior
 

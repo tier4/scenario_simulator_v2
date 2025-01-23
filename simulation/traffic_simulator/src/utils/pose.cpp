@@ -282,6 +282,52 @@ auto laneletLength(
   return hdmap_utils_ptr->getLaneletLength(lanelet_id);
 }
 
+auto tranformToRoutableCanonicalizedLaneletPose(
+  const lanelet::Id from_lanelet_id, const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
+  const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+  -> std::optional<traffic_simulator::CanonicalizedLaneletPose>
+{
+  constexpr auto search_distance{3.0};
+  constexpr auto include_crosswalk{false};
+  RoutingConfiguration routing_configuration;
+  routing_configuration.allow_lane_change = true;
+
+  /// @note if there is already a route from_lanelet_id->to_lanelet_id, return it
+  /// if not, transform the 'to_lanelet_id' position into the nearby lanelets and search for a route in relation to them
+  const auto to_lanelet_id = canonicalized_lanelet_pose.getLaneletPose().lanelet_id;
+  if (!hdmap_utils_ptr->getRoute(from_lanelet_id, to_lanelet_id, routing_configuration).empty()) {
+    return canonicalized_lanelet_pose;
+  } else if (const auto nearby_lanelet_ids = hdmap_utils_ptr->findMatchingLanes(
+               static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose), to_bounding_box,
+               include_crosswalk, search_distance, 0.8, routing_configuration.routing_graph_type);
+             nearby_lanelet_ids.has_value()) {
+    std::vector<std::pair<CanonicalizedLaneletPose, lanelet::Ids>> routes;
+    for (const auto & [distance, lanelet_id] : nearby_lanelet_ids.value()) {
+      if (const auto route =
+            hdmap_utils_ptr->getRoute(from_lanelet_id, lanelet_id, routing_configuration);
+          lanelet_id == to_lanelet_id || route.empty()) {
+        continue;
+      } else if (const auto lanelet_pose = hdmap_utils_ptr->toLaneletPose(
+                   static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose), lanelet_id,
+                   search_distance);
+                 !lanelet_pose) {
+        continue;
+      } else if (const auto canonicalized = canonicalize(lanelet_pose.value(), hdmap_utils_ptr);
+                 canonicalized) {
+        routes.emplace_back(std::make_pair(canonicalized.value(), route));
+      }
+    }
+    if (!routes.empty()) {
+      return std::min_element(
+               routes.cbegin(), routes.cend(),
+               [](const auto & a, const auto & b) { return a.second.size() < b.second.size(); })
+        ->first;
+    }
+  }
+  return std::nullopt;
+}
+
 namespace pedestrian
 {
 /*
