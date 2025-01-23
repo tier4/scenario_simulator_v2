@@ -65,10 +65,9 @@ auto toAutowareTrafficLights(const lanelet::Id traffic_light_id)
   const auto & all_lanelets = lanelet::utils::query::laneletLayer(LaneletWrapper::map());
   for (const auto & autoware_traffic_light :
        lanelet::utils::query::autowareTrafficLights(all_lanelets)) {
-    for (auto three_light_bulbs : autoware_traffic_light->lightBulbs()) {
-      if (areBulbsAssignedToTrafficLight(three_light_bulbs)) {
-        autoware_traffic_lights.push_back(autoware_traffic_light);
-      }
+    if (const auto & light_bulbs = autoware_traffic_light->lightBulbs();
+        std::any_of(light_bulbs.cbegin(), light_bulbs.cend(), areBulbsAssignedToTrafficLight)) {
+      autoware_traffic_lights.push_back(autoware_traffic_light);
     }
   }
 
