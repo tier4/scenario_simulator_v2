@@ -144,6 +144,7 @@ jobs:
         with:
           args: >
             --define sonar.cfamily.compile-commands="bw-output/compile_commands.json" 
+          projectBaseDir: src/scenario_simulator_v2/
 
 #      - name: Basic test
 #        run: |
