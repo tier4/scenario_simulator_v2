@@ -201,7 +201,7 @@ auto PolylineTrajectoryPositioner::validatedEntityDesiredVelocity(const double d
   const double dy = nearest_waypoint_position_.y - validated_entity_status_.position().y;
   // if entity is on lane use pitch from lanelet, otherwise use pitch on target
   const double pitch =
-    validated_entity_status_.laneletPoseValid()
+    validated_entity_status_.isLaneletPoseValid()
       ? -math::geometry::convertQuaternionToEulerAngle(validated_entity_status_.orientation()).y
       : std::atan2(
           nearest_waypoint_position_.z - validated_entity_status_.position().z, std::hypot(dy, dx));
@@ -307,8 +307,7 @@ auto PolylineTrajectoryPositioner::makeUpdatedEntityStatus() const -> std::optio
 
   if (const bool target_passed =
         validated_entity_status_.linearSpeed() * step_time_ > distance_to_nearest_waypoint_ and
-        math::geometry::innerProduct(desired_velocity, validated_entity_status_.currentVelocity()) <
-          0.0;
+        math::geometry::innerProduct(desired_velocity, validated_entity_status_.velocity()) < 0.0;
       target_passed) {
     return std::nullopt;
   }

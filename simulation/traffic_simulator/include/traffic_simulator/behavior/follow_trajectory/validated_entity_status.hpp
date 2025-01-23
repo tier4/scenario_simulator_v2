@@ -18,7 +18,7 @@
 #include <geometry/vector3/is_like_vector3.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
-#include <traffic_simulator_msgs/msg/polyline_trajectory.hpp>
+// #include <traffic_simulator_msgs/msg/polyline_trajectory.hpp>
 
 namespace traffic_simulator
 {
@@ -31,35 +31,36 @@ public:
     const traffic_simulator_msgs::msg::EntityStatus & entity_status,
     const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter,
     const double step_time) noexcept(false);
-
-  auto buildUpdatedEntityStatus(const geometry_msgs::msg::Vector3 & desired_velocity) const
-    -> traffic_simulator_msgs::msg::EntityStatus;
+  ValidatedEntityStatus(const ValidatedEntityStatus & other);
+  ~ValidatedEntityStatus() = default;
 
   ValidatedEntityStatus() = delete;
-  ValidatedEntityStatus(const ValidatedEntityStatus & other);
   ValidatedEntityStatus & operator=(const ValidatedEntityStatus & other) = delete;
-  ValidatedEntityStatus(ValidatedEntityStatus && other) noexcept(true) = delete;
-  ValidatedEntityStatus & operator=(ValidatedEntityStatus && other) noexcept(true) = delete;
-  ~ValidatedEntityStatus() = default;
+  ValidatedEntityStatus(ValidatedEntityStatus && other) = delete;
+  ValidatedEntityStatus & operator=(ValidatedEntityStatus && other) = delete;
 
   // clang-format off
   auto name()               const noexcept(true) -> const std::string &                                    { return entity_status_.name;                         }
   auto time()               const noexcept(true) -> double                                                 { return entity_status_.time;                         }
-  auto boundingBox()        const noexcept(true) -> const traffic_simulator_msgs::msg::BoundingBox &       { return entity_status_.bounding_box;                 }
-  auto laneletPoseValid()   const noexcept(true) -> bool                                                   { return entity_status_.lanelet_pose_valid;           }
+  auto isLaneletPoseValid() const noexcept(true) -> bool                                                   { return entity_status_.lanelet_pose_valid;           }
   auto position()           const noexcept(true) -> const geometry_msgs::msg::Point &                      { return entity_status_.pose.position;                }
   auto orientation()        const noexcept(true) -> const geometry_msgs::msg::Quaternion &                 { return entity_status_.pose.orientation;             }
+  auto velocity()           const noexcept(true) -> const geometry_msgs::msg::Vector3 &                    { return velocity_;                                   }
   auto linearSpeed()        const noexcept(true) -> double                                                 { return entity_status_.action_status.twist.linear.x; }
   auto linearAcceleration() const noexcept(true) -> double                                                 { return entity_status_.action_status.accel.linear.x; }
+  auto boundingBox()        const noexcept(true) -> const traffic_simulator_msgs::msg::BoundingBox &       { return entity_status_.bounding_box;                 }
   auto behaviorParameter()  const noexcept(true) -> const traffic_simulator_msgs::msg::BehaviorParameter & { return behavior_parameter_;                         }
-  auto currentVelocity()    const noexcept(true) -> const geometry_msgs::msg::Vector3 &                    { return current_velocity_;                           }
   // clang-format on
 
-private:
-  auto validatePosition(const geometry_msgs::msg::Point & entity_position) const noexcept(false)
-    -> void;
+  auto buildUpdatedEntityStatus(const geometry_msgs::msg::Vector3 & desired_velocity) const
+    -> traffic_simulator_msgs::msg::EntityStatus;
 
-  auto validateLinearSpeed(const double entity_speed) const noexcept(false) -> void;
+private:
+  auto validatePosition(const geometry_msgs::msg::Point & position) const noexcept(false) -> void;
+
+  auto validateLinearSpeed(const double speed) const noexcept(false) -> void;
+
+  auto validateVelocity(const geometry_msgs::msg::Vector3 & velocity) const noexcept(false) -> void;
 
   auto validateLinearAcceleration(
     const double acceleration,
@@ -69,13 +70,6 @@ private:
   auto validateBehaviorParameter(
     const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter) const noexcept(false)
     -> void;
-
-  auto buildUpdatedPoseOrientation(const geometry_msgs::msg::Vector3 & desired_velocity) const
-    noexcept(true) -> geometry_msgs::msg::Quaternion;
-
-  auto buildValidatedCurrentVelocity(
-    const double speed, const geometry_msgs::msg::Quaternion & entity_orientation) const
-    noexcept(false) -> geometry_msgs::msg::Vector3;
 
   template <
     typename T, std::enable_if_t<math::geometry::IsLikeVector3<T>::value, std::nullptr_t> = nullptr>
@@ -101,7 +95,8 @@ private:
   const double step_time_;
   const traffic_simulator_msgs::msg::EntityStatus entity_status_;
   const traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter_;
-  const geometry_msgs::msg::Vector3 current_velocity_;
+  /// @note velocity_ is the global velocity vector (local velocity rotated using the global orientation).
+  const geometry_msgs::msg::Vector3 velocity_;
 };
 
 }  // namespace follow_trajectory
