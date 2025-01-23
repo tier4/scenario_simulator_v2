@@ -55,7 +55,8 @@ auto trafficLightIdsOnPath(const lanelet::Ids & route_lanelets) -> lanelet::Ids
 auto toAutowareTrafficLights(const lanelet::Id traffic_light_id)
   -> std::vector<lanelet::AutowareTrafficLightConstPtr>
 {
-  auto areBulbsAssignedToTrafficLight = [&traffic_light_id](auto red_yellow_green_bulbs) -> bool {
+  auto areBulbsAssignedToTrafficLight =
+    [&traffic_light_id](const auto & red_yellow_green_bulbs) -> bool {
     return red_yellow_green_bulbs.hasAttribute("traffic_light_id") and
            red_yellow_green_bulbs.attribute("traffic_light_id").asId() and
            red_yellow_green_bulbs.attribute("traffic_light_id").asId().value() == traffic_light_id;
