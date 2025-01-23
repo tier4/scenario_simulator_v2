@@ -75,15 +75,16 @@ jobs:
           colcon mixin update default
         shell: bash
 
-      - name: Install sonar-scanner and build-wrapper
-        uses: sonarsource/sonarcloud-github-c-cpp@v3
+      - name: Install Build Wrapper
+        uses: SonarSource/sonarqube-scan-action/install-build-wrapper@v4.2.1
+        id: build_wrapper
         env:
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }} 
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
       - name: Build with SonarCloud Build Wrapper
         run: |
           source /opt/ros/${{ matrix.rosdistro }}/setup.bash
-          $BUILD_WRAPPER_BINARY --out-dir src/scenario_simulator_v2/bw-output \
+          ${{ steps.build_wrapper.outputs.build-wrapper-binary }} --out-dir src/scenario_simulator_v2/bw-output \
           colcon build --symlink-install \
           --cmake-args \
             -DCMAKE_BUILD_TYPE=${{ matrix.cmake_build_type }} \
@@ -134,13 +135,15 @@ jobs:
           path: coverage.xml
           retention-days: 1
 
-      - name: Run SonarCloud scan
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v4.2.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: https://sonarcloud.io/
-        working-directory: src/scenario_simulator_v2/
-        run: sonar-scanner --define sonar.cfamily.compile-commands="bw-output/compile_commands.json"
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        with:
+          args: >
+            --define sonar.cfamily.compile-commands="bw-output/compile_commands.json" 
 
 #      - name: Basic test
 #        run: |
