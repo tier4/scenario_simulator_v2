@@ -33,9 +33,9 @@ NormalDistribution<nav_msgs::msg::Odometry>::NormalDistribution(
     }
   }()),
   engine(seed ? seed : device()),
-  position_x_error(node, topic + ".nav_msgs::msg::Odometry.pose.pose.position.x.error"),
-  position_y_error(node, topic + ".nav_msgs::msg::Odometry.pose.pose.position.y.error"),
-  position_z_error(node, topic + ".nav_msgs::msg::Odometry.pose.pose.position.z.error"),
+  position_local_x_error(node, topic + ".nav_msgs::msg::Odometry.pose.pose.position.local_x.error"),
+  position_local_y_error(node, topic + ".nav_msgs::msg::Odometry.pose.pose.position.local_y.error"),
+  position_local_z_error(node, topic + ".nav_msgs::msg::Odometry.pose.pose.position.local_z.error"),
   orientation_r_error(node, topic + ".nav_msgs::msg::Odometry.pose.pose.orientation.r.error"),
   orientation_p_error(node, topic + ".nav_msgs::msg::Odometry.pose.pose.orientation.p.error"),
   orientation_y_error(node, topic + ".nav_msgs::msg::Odometry.pose.pose.orientation.y.error"),
@@ -57,9 +57,9 @@ auto NormalDistribution<nav_msgs::msg::Odometry>::operator()(nav_msgs::msg::Odom
 
   Eigen::Vector3d local_position = Eigen::Vector3d(0.0, 0.0, 0.0);
 
-  local_position.x() = position_x_error.apply(engine, local_position.x());
-  local_position.y() = position_y_error.apply(engine, local_position.y());
-  local_position.z() = position_z_error.apply(engine, local_position.z());
+  local_position.x() = position_local_x_error.apply(engine, local_position.x());
+  local_position.y() = position_local_y_error.apply(engine, local_position.y());
+  local_position.z() = position_local_z_error.apply(engine, local_position.z());
 
   const Eigen::Vector3d world_position = orientation.toRotationMatrix() * local_position;
 

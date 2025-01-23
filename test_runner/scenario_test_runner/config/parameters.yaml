@@ -8,7 +8,17 @@ simulation:
           pose:
             pose:
               position:
-                x:
+                # The data members of geometry_msgs::msg::Pose.position are x,
+                # y, z, which are world coordinates in
+                # `/localization/kinematic_state`. However, applying error to a
+                # position in world coordinates is unintuitive and tricky, so
+                # we accept the parameters as the entity's local coordinates.
+                # local_x, local_y, local_z express that. The simulator
+                # calculates the error in the local coordinates. It then
+                # transforms the error to the world coordinates, adds the error
+                # to the true position (world coordinates), and publishes it as
+                # `/localization/kinematic_state`.
+                local_x:
                   error:
                     additive:
                       mean: 0.0
@@ -16,7 +26,7 @@ simulation:
                     multiplicative:
                       mean: 0.0
                       standard_deviation: 0.0
-                y:
+                local_y:
                   error:
                     additive:
                       mean: 0.0
@@ -24,7 +34,7 @@ simulation:
                     multiplicative:
                       mean: 0.0
                       standard_deviation: 0.0
-                z:
+                local_z:
                   error:
                     additive:
                       mean: 0.0

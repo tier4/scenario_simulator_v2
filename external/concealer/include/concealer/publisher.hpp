@@ -82,9 +82,9 @@ struct NormalDistribution<nav_msgs::msg::Odometry>
   };
 
   // clang-format off
-  Error position_x_error,
-        position_y_error,
-        position_z_error,
+  Error position_local_x_error,
+        position_local_y_error,
+        position_local_z_error,
         orientation_r_error,
         orientation_p_error,
         orientation_y_error,
