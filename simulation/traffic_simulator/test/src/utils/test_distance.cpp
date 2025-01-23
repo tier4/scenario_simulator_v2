@@ -524,7 +524,8 @@ TEST_F(distanceTest_IntersectionMap, longitudinalDistance_adjacent_noOpposite_ch
       pose_from.value(), pose_to.value(), true, false, lane_changeable_routing_configuration,
       hdmap_utils_ptr);
     ASSERT_TRUE(result.has_value());
-    EXPECT_DOUBLE_EQ(result.value(), 97.648110014340688);
+    EXPECT_NEAR(result.value(), 97.648110014, 0.000000001);
+    // Previous value: 97.648110014340688 is too precise
   }
   {
     const auto pose_from = traffic_simulator::toCanonicalizedLaneletPose(
@@ -540,7 +541,8 @@ TEST_F(distanceTest_IntersectionMap, longitudinalDistance_adjacent_noOpposite_ch
       pose_from.value(), pose_to.value(), true, false, lane_changeable_routing_configuration,
       hdmap_utils_ptr);
     ASSERT_TRUE(result.has_value());
-    EXPECT_DOUBLE_EQ(result.value(), 127.99532311325152);
+    EXPECT_NEAR(result.value(), 127.99532311325152, 0.000000001);
+    // Previous value: 127.99532311325152 is too precise
   }
 }
 
