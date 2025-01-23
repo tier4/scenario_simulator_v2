@@ -108,7 +108,7 @@ auto nearbyLaneletIds(
     lanelet::Ids target_lanelet_ids;
     for (const auto & [distance, lanelet] : nearest_lanelets) {
       if (distance <= distance_thresh) {
-        target_lanelet_ids.emplace_back(lanelet.id());
+        target_lanelet_ids.push_back(lanelet.id());
       }
     }
     return target_lanelet_ids;
@@ -257,7 +257,7 @@ auto laneletPolygon(const lanelet::Id lanelet_id) -> std::vector<Point>
   std::vector<Point> points;
   const auto & lanelet_polygon = LaneletWrapper::map()->laneletLayer.get(lanelet_id).polygon3d();
   for (const auto & point : lanelet_polygon) {
-    points.emplace_back(geometry_msgs::build<Point>().x(point.x()).y(point.y()).z(point.z()));
+    points.push_back(geometry_msgs::build<Point>().x(point.x()).y(point.y()).z(point.z()));
   }
   return points;
 }
@@ -272,7 +272,7 @@ auto toPolygon(const lanelet::ConstLineString3d & line_string) -> std::vector<Po
 {
   std::vector<Point> points;
   for (const auto & point : line_string) {
-    points.emplace_back(geometry_msgs::build<Point>().x(point.x()).y(point.y()).z(point.z()));
+    points.push_back(geometry_msgs::build<Point>().x(point.x()).y(point.y()).z(point.z()));
   }
   return points;
 }
@@ -312,7 +312,7 @@ auto trafficSignsOnPath(const lanelet::Ids & lanelet_ids)
     const auto lanelet = LaneletWrapper::map()->laneletLayer.get(lanelet_id);
     const auto traffic_signs = lanelet.regulatoryElementsAs<const lanelet::TrafficSign>();
     for (const auto & traffic_sign : traffic_signs) {
-      ret.emplace_back(traffic_sign);
+      ret.push_back(traffic_sign);
     }
   }
   return ret;
