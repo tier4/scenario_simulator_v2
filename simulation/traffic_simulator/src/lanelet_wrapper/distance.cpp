@@ -234,7 +234,11 @@ auto distanceToTrafficLightStopLine(
   const lanelet::Ids & route_lanelets, const std::vector<Point> & route_waypoints)
   -> std::optional<double>
 {
-  return distanceToTrafficLightStopLine(route_lanelets, Spline{route_waypoints});
+  if (route_waypoints.empty()) {
+    return std::nullopt;
+  } else {
+    return distanceToTrafficLightStopLine(route_lanelets, Spline{route_waypoints});
+  }
 }
 
 // Crosswalk
