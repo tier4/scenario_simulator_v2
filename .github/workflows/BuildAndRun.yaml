@@ -83,7 +83,7 @@ jobs:
       - name: Build with SonarCloud Build Wrapper
         run: |
           source /opt/ros/${{ matrix.rosdistro }}/setup.bash
-          build-wrapper-linux-x86-64 --out-dir src/scenario_simulator_v2/bw-output \
+          $BUILD_WRAPPER_BINARY --out-dir src/scenario_simulator_v2/bw-output \
           colcon build --symlink-install \
           --cmake-args \
             -DCMAKE_BUILD_TYPE=${{ matrix.cmake_build_type }} \
