@@ -60,7 +60,7 @@ auto transformRelativePoseToGlobal(
   const geometry_msgs::msg::Pose & global_pose, const geometry_msgs::msg::Pose & relative_pose)
   -> geometry_msgs::msg::Pose;
 
-auto updatePositionForLaneletTransition(
+auto updateEntityPositionForLaneletTransition(
   const traffic_simulator_msgs::msg::EntityStatus & entity_status,
   const lanelet::Id next_lanelet_id, const geometry_msgs::msg::Vector3 & desired_velocity,
   const bool desired_velocity_is_global, const double step_time,

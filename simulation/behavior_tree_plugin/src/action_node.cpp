@@ -532,15 +532,15 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
       const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) {
       geometry_msgs::msg::Pose updated_pose;
 
-      // apply yaw change (delta rotation) in radians: yaw_angular_speed (rad/s) * time_step (s)
+      // Apply yaw change (delta rotation) in radians: yaw_angular_speed (rad/s) * time_step (s).
       geometry_msgs::msg::Vector3 delta_rotation;
       delta_rotation.z = desired_twist.angular.z * time_step;
       const auto delta_quaternion = math::geometry::convertEulerAngleToQuaternion(delta_rotation);
       updated_pose.orientation = status->getMapPose().orientation * delta_quaternion;
 
-      // apply position change
+      // Apply position change.
       /// @todo first determine global desired_velocity, calculate position change using it
-      // then pass the same global desired_velocity to adjustPoseForLaneletTransition()
+      // then pass the same global desired_velocity to adjustPoseForLaneletTransition().
       const Eigen::Matrix3d rotation_matrix =
         math::geometry::getRotationMatrix(updated_pose.orientation);
       const auto translation = Eigen::Vector3d(
@@ -555,14 +555,14 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
             updated_pose, status->getBoundingBox(), include_crosswalk, matching_distance,
             hdmap_utils_ptr);
 
-        // if it is the transition between lanelets: overwrite position to improve precision
+        // If it is the transition between lanelets: overwrite position to improve precision.
         if (estimated_next_canonicalized_lanelet_pose) {
           const auto next_lanelet_id = static_cast<traffic_simulator::LaneletPose>(
                                          estimated_next_canonicalized_lanelet_pose.value())
                                          .lanelet_id;
           auto entity_status = static_cast<traffic_simulator::EntityStatus>(*status);
           entity_status.pose = updated_pose;
-          updated_pose.position = traffic_simulator::pose::updatePositionForLaneletTransition(
+          updated_pose.position = traffic_simulator::pose::updateEntityPositionForLaneletTransition(
             entity_status, next_lanelet_id, desired_twist.linear, desired_velocity_is_global,
             time_step, hdmap_utils_ptr);
         }

@@ -142,8 +142,8 @@ auto transformRelativePoseToGlobal(
   return ret;
 }
 
-/// @note this function does not modify the orientation of entity
-auto updatePositionForLaneletTransition(
+/// @note This function does not modify the orientation of entity.
+auto updateEntityPositionForLaneletTransition(
   const traffic_simulator_msgs::msg::EntityStatus & entity_status,
   const lanelet::Id next_lanelet_id, const geometry_msgs::msg::Vector3 & desired_velocity,
   const bool desired_velocity_is_global, const double step_time,
@@ -157,12 +157,12 @@ auto updatePositionForLaneletTransition(
     hdmap_utils_ptr->getLaneletLength(lanelet_pose.lanelet_id) - lanelet_pose.s;
   auto new_position = entity_status.pose.position;
 
-  /// Transition to the next lanelet
+  // Transition to the next lanelet if the entity's displacement exceeds the remaining length
   if (math::geometry::norm(desired_velocity * step_time) > remaining_lanelet_length) {
-    // determine the displacement in the 2D lanelet coordinate system
+    // Determine the displacement in the 2D lanelet coordinate system
     Eigen::Vector2d displacement;
     if (desired_velocity_is_global) {
-      // transform desired (global) velocity to local velocity
+      // Transform desired (global) velocity to local velocity
       const Eigen::Vector3d global_velocity(
         desired_velocity.x, desired_velocity.y, desired_velocity.z);
       const Eigen::Quaterniond quaternion(
