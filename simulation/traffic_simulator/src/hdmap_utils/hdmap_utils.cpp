@@ -526,10 +526,11 @@ auto HdMapUtils::toPoint2d(const geometry_msgs::msg::Point & point) const -> lan
 }
 
 auto HdMapUtils::findMatchingLanes(
-  const geometry_msgs::msg::Pose & map_pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
-  const bool include_crosswalk, const double matching_distance, const double reduction_ratio,
+  const geometry_msgs::msg::Pose & map_pose,
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, const bool include_crosswalk,
+  const double matching_distance, const double reduction_ratio,
   const traffic_simulator::RoutingGraphType type) const
-  -> std::optional<std::vector<std::pair<lanelet::Id, double>>>
+  -> std::optional<std::set<std::pair<double, lanelet::Id>>>
 {
   const auto absoluteHullPolygon = [&reduction_ratio,
                                     &bounding_box](const auto & pose) -> lanelet::BasicPolygon2d {
@@ -556,15 +557,24 @@ auto HdMapUtils::findMatchingLanes(
   bounding_box_object.absoluteHull = absoluteHullPolygon(bounding_box_object.pose);
   // find matches and optionally filter
   auto matches = lanelet::matching::getDeterministicMatches(
-    *LaneletWrapper::map(), bounding_box_object, matching_distance);
+    *lanelet_map_ptr_, bounding_box_object, matching_distance);
   if (!include_crosswalk) {
-    matches =
-      lanelet::matching::removeNonRuleCompliantMatches(matches, LaneletWrapper::trafficRules(type));
+    matches = lanelet::matching::removeNonRuleCompliantMatches(
+      matches, routing_graphs_->traffic_rule(type));
   }
   if (matches.empty()) {
     return std::nullopt;
   }
-  return matches;
+  std::set<std::pair<double, lanelet::Id>> id_and_distance;
+  for (const auto & match : matches) {
+    if (const auto lanelet_pose = toLaneletPose(map_pose, match.lanelet.id(), matching_distance)) {
+      id_and_distance.emplace(lanelet_pose->offset, lanelet_pose->lanelet_id);
+    }
+  }
+  if (id_and_distance.empty()) {
+    return std::nullopt;
+  }
+  return id_and_distance;
 }
 
 auto HdMapUtils::matchToLane(
@@ -572,20 +582,11 @@ auto HdMapUtils::matchToLane(
   const bool include_crosswalk, const double matching_distance, const double reduction_ratio,
   const traffic_simulator::RoutingGraphType type) const -> std::optional<lanelet::Id>
 {
-  // find best match (minimize offset)
-  const auto & matches =
+  const auto & matching_lanes =
     findMatchingLanes(pose, bbox, include_crosswalk, matching_distance, reduction_ratio, type);
-  if (matches) {
-    std::optional<std::pair<lanelet::Id, double>> min_pair_id_offset;
-    for (const auto & match : matches) {
-      if (const auto lanelet_pose =
-            pose::toLaneletPose(map_pose, match.lanelet.id(), matching_distance);
-          lanelet_pose &&
-          (!min_pair_id_offset || lanelet_pose->offset < min_pair_id_offset->second)) {
-        min_pair_id_offset = std::make_pair(lanelet_pose->lanelet_id, lanelet_pose->offset);
-      }
-    }
-    return min_pair_id_offset ? std::optional(min_pair_id_offset->first) : std::nullopt;
+  // find best match (minimize offset)
+  if (matching_lanes) {
+    return matching_lanes->begin()->second;
   }
   return std::nullopt;
 }

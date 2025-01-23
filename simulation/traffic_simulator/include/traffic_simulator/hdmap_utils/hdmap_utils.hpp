@@ -337,7 +337,7 @@ public:
     const double reduction_ratio = DEFAULT_MATCH_TO_LANE_REDUCTION_RATIO,
     const traffic_simulator::RoutingGraphType type =
       traffic_simulator::RoutingConfiguration().routing_graph_type) const
-    -> std::optional<std::vector<std::pair<lanelet::Id, double>>>;
+    -> std::optional<std::set<std::pair<double, lanelet::Id>>>;
 
   auto matchToLane(
     const geometry_msgs::msg::Pose &, const traffic_simulator_msgs::msg::BoundingBox &,

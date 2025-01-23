@@ -138,10 +138,6 @@ private:
   auto getRoutableCanonicalizedLaneletPose(
     const traffic_simulator::CanonicalizedEntityStatus & status) const
     -> std::optional<traffic_simulator::CanonicalizedLaneletPose>;
-  auto getLateralDistance(
-    const math::geometry::CatmullRomSplineInterface & spline,
-    const traffic_simulator::CanonicalizedEntityStatus & status, double longitudinalDistance) const
-    -> const double;
 };
 }  // namespace entity_behavior
 
