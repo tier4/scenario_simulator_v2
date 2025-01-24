@@ -78,8 +78,9 @@ public:
       RCLCPP_INFO_STREAM(logger_, message);
       scenario_completed_ = false;
 
-      if (const auto ego_start_canonicalized_lanelet_pose = traffic_simulator::pose::canonicalize(
-            test_description_.ego_start_position, api_->getHdmapUtils());
+      if (const auto ego_start_canonicalized_lanelet_pose =
+            traffic_simulator::pose::toCanonicalizedLaneletPose(
+              test_description_.ego_start_position);
           !ego_start_canonicalized_lanelet_pose) {
         throw std::runtime_error(
           "Can not canonicalize ego start lanelet pose: id: " +
@@ -135,8 +136,8 @@ public:
 
       for (size_t i = 0; i < test_description_.npcs_descriptions.size(); i++) {
         const auto & npc_descr = test_description_.npcs_descriptions[i];
-        if (const auto npc_start_canonicalized_lanelet_pose = traffic_simulator::pose::canonicalize(
-              npc_descr.start_position, api_->getHdmapUtils());
+        if (const auto npc_start_canonicalized_lanelet_pose =
+              traffic_simulator::pose::toCanonicalizedLaneletPose(npc_descr.start_position);
             !npc_start_canonicalized_lanelet_pose) {
           throw std::runtime_error(
             "Can not canonicalize npc start lanelet pose: id: " +
