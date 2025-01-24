@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #include <arithmetic/floating_point/comparison.hpp>
-#include <geometry/quaternion/euler_to_quaternion.hpp>
+#include <geometry/quaternion/direction_to_quaternion.hpp>
 #include <geometry/quaternion/get_rotation.hpp>
 #include <geometry/quaternion/quaternion_to_euler.hpp>
 #include <geometry/vector3/hypot.hpp>
@@ -74,14 +74,24 @@ auto makeUpdatedStatus(
 
   auto distance_along_lanelet =
     [&](const geometry_msgs::msg::Point & from, const geometry_msgs::msg::Point & to) -> double {
-    if (const auto from_lanelet_pose =
-          hdmap_utils->toLaneletPose(from, entity_status.bounding_box, false, matching_distance);
+    const auto quaternion = math::geometry::convertDirectionToQuaternion(
+      geometry_msgs::build<geometry_msgs::msg::Vector3>()
+        .x(to.x - from.x)
+        .y(to.y - from.y)
+        .z(to.z - from.z));
+    const auto from_pose =
+      geometry_msgs::build<geometry_msgs::msg::Pose>().position(from).orientation(quaternion);
+    const auto to_pose =
+      geometry_msgs::build<geometry_msgs::msg::Pose>().position(to).orientation(quaternion);
+    if (const auto from_lanelet_pose = pose::toCanonicalizedLaneletPose(
+          from_pose, entity_status.bounding_box, false, matching_distance);
         from_lanelet_pose) {
-      if (const auto to_lanelet_pose =
-            hdmap_utils->toLaneletPose(to, entity_status.bounding_box, false, matching_distance);
+      if (const auto to_lanelet_pose = pose::toCanonicalizedLaneletPose(
+            to_pose, entity_status.bounding_box, false, matching_distance);
           to_lanelet_pose) {
         if (const auto distance = hdmap_utils->getLongitudinalDistance(
-              from_lanelet_pose.value(), to_lanelet_pose.value());
+              static_cast<LaneletPose>(from_lanelet_pose.value()),
+              static_cast<LaneletPose>(to_lanelet_pose.value()));
             distance) {
           return distance.value();
         }
@@ -565,13 +575,8 @@ auto makeUpdatedStatus(
         // Do not change orientation if there is no designed_velocity vector
         return entity_status.pose.orientation;
       } else {
-        // If there is a designed_velocity vector, set the orientation in the direction of it
-        const geometry_msgs::msg::Vector3 direction =
-          geometry_msgs::build<geometry_msgs::msg::Vector3>()
-            .x(0.0)
-            .y(std::atan2(-desired_velocity.z, std::hypot(desired_velocity.x, desired_velocity.y)))
-            .z(std::atan2(desired_velocity.y, desired_velocity.x));
-        return math::geometry::convertEulerAngleToQuaternion(direction);
+        // if there is a designed_velocity vector, set the orientation in the direction of it
+        return math::geometry::convertDirectionToQuaternion(desired_velocity);
       }
     }();
 
