@@ -237,8 +237,8 @@ auto ActionNode::getDistanceToStopLine(
 auto ActionNode::getDistanceToFrontEntity(
   const math::geometry::CatmullRomSplineInterface & spline) const -> std::optional<double>
 {
-  if (const auto entity_name_opt = getFrontEntityName(spline)) {
-    return getDistanceToTargetEntityPolygon(spline, getEntityStatus(entity_name_opt.value()));
+  if (const auto entity_name = getFrontEntityName(spline)) {
+    return getDistanceToTargetEntity(spline, getEntityStatus(entity_name.value()));
   } else {
     return std::nullopt;
   }
@@ -250,7 +250,7 @@ auto ActionNode::getFrontEntityName(const math::geometry::CatmullRomSplineInterf
   std::vector<double> distances;
   std::vector<std::string> entities;
   for (const auto & each : other_entity_status) {
-    const auto distance = getDistanceToTargetEntityPolygon(spline, each.second);
+    const auto distance = getDistanceToTargetEntity(spline, each.second);
     const auto quat = math::geometry::getRotation(
       canonicalized_entity_status->getMapPose().orientation,
       other_entity_status.at(each.first).getMapPose().orientation);
@@ -298,59 +298,76 @@ auto ActionNode::getEntityStatus(const std::string & target_name) const
   }
 }
 
-auto ActionNode::getDistanceToTargetEntityPolygon(
+/**
+ * @note getDistanceToTargetEntity working schematics
+ * 
+ * 1. Check if route to target entity from refrence entity exists, if not try to tranform pose to other 
+ *    routable lanelet, within matching distance (transformToRoutableCanonicalizedLaneletPose).
+ * 2. Calculate longitudinal distance between entities bounding boxes -> bounding_box_distance.
+ * 3. Calculate longitudinal distance between entities poses -> position_distance.
+ * 4. Calculate target entity bounding box distance to refrence entity spline (minimal distance from all corners) 
+ *    -> target_to_spline_distance.
+ * 5. If target_to_spline_distance is less than half width of refrence entity target entity is confilicting.
+ * 6. Check corner case where target entity width is bigger than width of entity and target entity
+ *    is excatly on the spline -> spline.getCollisionPointIn2D
+ * 7. If target entity is conflicting return bounding_box_distance enlarged by half of the enity 
+ *    length.
+ */
+auto ActionNode::getDistanceToTargetEntity(
   const math::geometry::CatmullRomSplineInterface & spline,
   const traffic_simulator::CanonicalizedEntityStatus & status) const -> std::optional<double>
 {
   if (
     status.laneMatchingSucceed() && canonicalized_entity_status->laneMatchingSucceed() &&
     isOtherEntityAtConsideredAltitude(status)) {
-    /* 
-     * boundingBoxRelativeLaneletPose requires routing_configuration, 
-     * 'allow_lane_change = true' is needed to check distances to entities on neighbour lanelets
-     */
+    /** 
+      * boundingBoxLaneLongitudinalDistance requires routing_configuration, 
+      * 'allow_lane_change = true' is needed to check distances to entities on neighbour lanelets 
+      * 
+    */
     traffic_simulator::RoutingConfiguration routing_configuration;
     routing_configuration.allow_lane_change = true;
     constexpr bool include_adjacent_lanelet{false};
     constexpr bool include_opposite_direction{true};
+    constexpr bool search_backward{false};
 
-    const auto & from_lanelet_pose =
-      canonicalized_entity_status->getCanonicalizedLaneletPose().value();
-    const auto & from_bounding_box = canonicalized_entity_status->getBoundingBox();
-
-    const auto & to_bounding_box = status.getBoundingBox();
-    const auto & to_lanelet_pose =
-      traffic_simulator::pose::tranformToRoutableCanonicalizedLaneletPose(
+    const auto & target_bounding_box = status.getBoundingBox();
+    const auto & target_lanelet_pose =
+      traffic_simulator::pose::transformToRoutableCanonicalizedLaneletPose(
         canonicalized_entity_status->getLaneletId(), status.getCanonicalizedLaneletPose().value(),
-        to_bounding_box, hdmap_utils);
+        target_bounding_box, hdmap_utils);
 
-    if (to_lanelet_pose.has_value()) {
-      const auto longitudinal_target_distance = traffic_simulator::distance::longitudinalDistance(
-        from_lanelet_pose, *to_lanelet_pose, include_adjacent_lanelet, include_opposite_direction,
-        routing_configuration, hdmap_utils);
+    if (target_lanelet_pose) {
+      const auto & from_lanelet_pose = canonicalized_entity_status->getCanonicalizedLaneletPose();
+      const auto & from_bounding_box = canonicalized_entity_status->getBoundingBox();
+      if (const auto bounding_box_distance =
+            traffic_simulator::distance::boundingBoxLaneLongitudinalDistance(
+              *from_lanelet_pose, from_bounding_box, *target_lanelet_pose, target_bounding_box,
+              include_adjacent_lanelet, include_opposite_direction, routing_configuration,
+              hdmap_utils);
+          not bounding_box_distance || bounding_box_distance.value() < 0.0) {
+        return std::nullopt;
+      } else if (const auto position_distance = traffic_simulator::distance::longitudinalDistance(
+                   *from_lanelet_pose, *target_lanelet_pose, include_adjacent_lanelet,
+                   include_opposite_direction, routing_configuration, hdmap_utils);
+                 not position_distance) {
+        return std::nullopt;
+      } else {
+        const auto target_bounding_box_distance =
+          bounding_box_distance.value() + from_bounding_box.dimensions.x / 2.0;
 
-      if (longitudinal_target_distance) {
-        const auto distance_to_spline = traffic_simulator::distance::distanceToSpline(
-          static_cast<geometry_msgs::msg::Pose>(*to_lanelet_pose), to_bounding_box, spline,
-          longitudinal_target_distance.value());
-
-        const auto longitudinal_bounding_box_target_distance =
-          traffic_simulator::distance::boundingBoxLaneLongitudinalDistance(
-            from_lanelet_pose, from_bounding_box, *to_lanelet_pose, to_bounding_box,
-            include_adjacent_lanelet, include_opposite_direction, routing_configuration,
-            hdmap_utils);
-
-        const auto polygon = math::geometry::transformPoints(
-          status.getMapPose(), math::geometry::getPointsFromBbox(to_bounding_box));
-
-        // is in front and is within considered width (from_bounding_box)
-        if (
-          longitudinal_bounding_box_target_distance &&
-          longitudinal_bounding_box_target_distance.value() >= 0 &&
-          ((distance_to_spline <= (from_bounding_box.dimensions.y / 2)) ||
-           spline.getCollisionPointIn2D(polygon, false))) {
-          return longitudinal_bounding_box_target_distance.value() +
-                 from_bounding_box.dimensions.x / 2;
+        /// @note if the distance of the target entity to the spline is smaller than the width of the reference entity
+        if (const auto target_to_spline_distance = traffic_simulator::distance::distanceToSpline(
+              static_cast<geometry_msgs::msg::Pose>(*target_lanelet_pose), target_bounding_box,
+              spline, position_distance.value());
+            target_to_spline_distance <= from_bounding_box.dimensions.y / 2.0) {
+          return target_bounding_box_distance;
+        }
+        /// @note if the distance of the target entity to the spline cannot be calculated because a collision occurs
+        else if (const auto target_polygon = math::geometry::transformPoints(
+                   status.getMapPose(), math::geometry::getPointsFromBbox(target_bounding_box));
+                 spline.getCollisionPointIn2D(target_polygon, search_backward)) {
+          return target_bounding_box_distance;
         }
       }
     }
@@ -379,7 +396,7 @@ auto ActionNode::getDistanceToConflictingEntity(
     }
   }
   for (const auto & status : lane_entity_status) {
-    if (const auto distance_to_entity = getDistanceToTargetEntityPolygon(spline, status)) {
+    if (const auto distance_to_entity = getDistanceToTargetEntity(spline, status)) {
       distances.insert(distance_to_entity.value());
     }
   }

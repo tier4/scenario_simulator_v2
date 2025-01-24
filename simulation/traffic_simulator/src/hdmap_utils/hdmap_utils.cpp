@@ -562,19 +562,19 @@ auto HdMapUtils::findMatchingLanes(
     matches = lanelet::matching::removeNonRuleCompliantMatches(
       matches, routing_graphs_->traffic_rule(type));
   }
-  if (matches.empty()) {
-    return std::nullopt;
-  }
-  std::set<std::pair<double, lanelet::Id>> id_and_distance;
-  for (const auto & match : matches) {
-    if (const auto lanelet_pose = toLaneletPose(map_pose, match.lanelet.id(), matching_distance)) {
-      id_and_distance.emplace(lanelet_pose->offset, lanelet_pose->lanelet_id);
+  if (not matches.empty()) {
+    std::set<std::pair<double, lanelet::Id>> distances_with_ids;
+    for (const auto & match : matches) {
+      if (
+        const auto lanelet_pose = toLaneletPose(map_pose, match.lanelet.id(), matching_distance)) {
+        distances_with_ids.emplace(lanelet_pose->offset, lanelet_pose->lanelet_id);
+      }
+    }
+    if (not distances_with_ids.empty()) {
+      return distances_with_ids;
     }
   }
-  if (id_and_distance.empty()) {
-    return std::nullopt;
-  }
-  return id_and_distance;
+  return std::nullopt;
 }
 
 auto HdMapUtils::matchToLane(
@@ -582,13 +582,14 @@ auto HdMapUtils::matchToLane(
   const bool include_crosswalk, const double matching_distance, const double reduction_ratio,
   const traffic_simulator::RoutingGraphType type) const -> std::optional<lanelet::Id>
 {
-  const auto & matching_lanes =
-    findMatchingLanes(pose, bbox, include_crosswalk, matching_distance, reduction_ratio, type);
-  // find best match (minimize offset)
-  if (matching_lanes) {
+  /// @note findMatchingLanes returns a container sorted by distance - increasing, return the nearest id
+  if (
+    const auto matching_lanes =
+      findMatchingLanes(pose, bbox, include_crosswalk, matching_distance, reduction_ratio, type)) {
     return matching_lanes->begin()->second;
+  } else {
+    return std::nullopt;
   }
-  return std::nullopt;
 }
 
 auto HdMapUtils::toLaneletPose(
@@ -1233,7 +1234,8 @@ auto HdMapUtils::getLeftLaneletIds(
 {
   if (include_opposite_direction) {
     throw common::Error(
-      "HdMapUtils::getLeftLaneletIds with include_opposite_direction=true is not implemented yet.");
+      "HdMapUtils::getLeftLaneletIds with include_opposite_direction=true is not implemented "
+      "yet.");
   } else {
     return getLaneletIds(
       routing_graphs_->routing_graph(type)->lefts(lanelet_map_ptr_->laneletLayer.get(lanelet_id)));

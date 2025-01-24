@@ -332,7 +332,7 @@ auto distanceToSpline(
     auto s_start_distance = spline.getSquaredDistanceIn2D(point, s_start);
     auto s_end_distance = spline.getSquaredDistanceIn2D(point, s_end);
 
-    while (std::abs(s_start_distance - s_end_distance) > distance_accuracy) {
+    while (std::abs(s_start - s_end) > distance_accuracy) {
       if (s_start_distance > s_end_distance) {
         s_start += (s_end - s_start) / 2;
         s_start_distance = spline.getSquaredDistanceIn2D(point, s_start);

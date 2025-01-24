@@ -119,7 +119,7 @@ protected:
   EntityStatusDict other_entity_status;
   lanelet::Ids route_lanelets;
 
-  auto getDistanceToTargetEntityPolygon(
+  auto getDistanceToTargetEntity(
     const math::geometry::CatmullRomSplineInterface & spline,
     const traffic_simulator::CanonicalizedEntityStatus & status) const -> std::optional<double>;
 
