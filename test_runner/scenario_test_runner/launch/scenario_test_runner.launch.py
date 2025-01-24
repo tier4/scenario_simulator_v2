@@ -166,7 +166,14 @@ def launch_setup(context, *args, **kwargs):
         if (it := collect_prefixed_parameters()) != []:
             parameters += [{"autoware.": it}]
 
-        parameters += [parameter_file_path.perform(context)]
+        path = Path(parameter_file_path.perform(context))
+
+        if not path.is_file():
+            raise Exception(f'The value "{path}" given for parameter `parameter_file_path` is not a file.')
+        elif path.suffix != '.yaml' and path.suffix != '.yml':
+            raise Exception(f'The value "{path}" given for parameter `parameter_file_path` is not a YAML file.')
+        else:
+            parameters += [path]
 
         return parameters
 
