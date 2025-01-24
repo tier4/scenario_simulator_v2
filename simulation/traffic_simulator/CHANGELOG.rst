@@ -21,6 +21,104 @@ Changelog for package traffic_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+8.0.0 (2025-01-24)
+------------------
+* Merge pull request `#1472 <https://github.com/tier4/scenario_simulator_v2/issues/1472>`_ from tier4/ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose
+  HdMapUtils refactor (PR 1/6)  - create lanelet_wrapper: use ::lanelet_map and ::pose
+* Add reader functions to cache classes to mitigate direct data members access and having to lock the mutex in different places
+* Revert "Refactor lanelet_wrapper cache classes: make top level public member functions acquire resources and make non-public member functions NOT thread safe"
+  This reverts commit 41f9dd1e226ea827444aed1d01c207d10b9b61fa.
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose
+* Remove unnecessary comments
+* Adjust comments to use "/// @note" convention
+* Refactor lanelet_wrapper cache classes: make top level public member functions acquire resources and make non-public member functions NOT thread safe
+  This change is a proposal of improving thread safety - now the whole bodies of public member functions can be executed at once without the risk of resources being modified in the middle of the function execution
+* Clean cache code - move cache classes member variables to the end of class declaration
+* Move lanelet_wrapper cache classes member values and some functions to private
+* Add comment explaining parameters
+* Rename variable to match function name change
+* Rename `borderlinePoses` -> `noNextLaneletPoses`
+* Add comment explaining what `lanelet_map::borderlinePoses` does
+* Perform calculations at compile time in lanelet_wrapper::pose::toLaneletPose
+* Fix lanelet pose matching calculation bug
+* fix(lanelet_wrapper): fix toLaneletPose
+* doc(lanelet_wrapper): improve lanelet_wrappe::pose::canonicalizeLaneletPose description
+* fix(lanelet_wrapper): fix pose toLaneletPose typo ";"
+* fix(lanelet_wrapper): fix typo centerline
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose' of github.com:tier4/scenario_simulator_v2 into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose
+* ref(lanelet_wrapper): add toLaneletPose yaw_threshold description
+* ref(traffic_simulator): add comments to lanelet_wrapper::pose, reduce the number of intermediate variables
+* Merge remote-tracking branch 'origin/master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose
+* Update simulation/traffic_simulator/src/traffic/traffic_controller.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Update simulation/traffic_simulator/src/lanelet_wrapper/lanelet_map.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Update simulation/traffic_simulator/src/lanelet_wrapper/pose.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Update simulation/traffic_simulator/src/lanelet_wrapper/pose.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Update simulation/traffic_simulator/src/lanelet_wrapper/lanelet_loader.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Update simulation/traffic_simulator/src/lanelet_wrapper/lanelet_wrapper.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Update simulation/traffic_simulator/src/lanelet_wrapper/lanelet_loader.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Update simulation/traffic_simulator/src/lanelet_wrapper/lanelet_loader.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Update simulation/traffic_simulator/src/lanelet_wrapper/lanelet_loader.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Update simulation/traffic_simulator/src/lanelet_wrapper/lanelet_loader.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Update simulation/traffic_simulator/src/lanelet_wrapper/lanelet_loader.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Update simulation/traffic_simulator/src/lanelet_wrapper/lanelet_loader.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Update simulation/traffic_simulator/src/lanelet_wrapper/lanelet_loader.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Update simulation/traffic_simulator/src/utils/pose.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Update simulation/traffic_simulator/src/utils/pose.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Update simulation/traffic_simulator/src/lanelet_wrapper/pose.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Update simulation/traffic_simulator/src/lanelet_wrapper/pose.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Update simulation/traffic_simulator/src/utils/pose.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Update simulation/traffic_simulator/include/traffic_simulator/lanelet_wrapper/lanelet_wrapper.hpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose
+* ref(traffic_simulator): apply solar changes
+* ref(traffic_simulator): apply sonar required changes
+* Merge remote-tracking branch 'origin' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose
+* ref(traffic_simulator): refactor laneletAltitude and isAltitudeMatching after merge
+* Merge remote-tracking branch 'origin' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose
+* fix(traffic_simulator): fix follow_trajectory_action issue, add orientation to distance calc, remove toCanonicalizedLaneletPose(point...) because it can cause a another issues
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose
+* ref(traffic_simulator): improve hdmaputils::countLaneChanges
+* fix(traffic_simulator): adapt lanelet-wapper::pose to changes in hdmap_utils
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose
+* fix(traffic_simulator): fix lanelet_wrapper::pose::alternativeLaneletPoses
+* fix(traffic_simulator, simple_sensor_simulator): fix after merge, apply sonar recommendations
+* Merge remote-tracking branch 'origin/master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose
+* ref(traffic_simulator): apply sonar recommendations to lanelet_wrapper and utils
+* feat(traffic_simulator): separate lanelet_loader, provide const TrafficRulesWithRoutingGraph
+* ref(traffic_simulator): improve Configuration, traffic_rules, lanelet_wrapper
+* fix(traffic_simulator): fix hdmap_utils tests
+* fix(traffic_simulator): add EOF to traffic_rules
+* fix(traffic_simmulator): fix spell check
+* feat(traffic_simulator): use lanelet_wrapper::lanelet_map in the rest of hdmap_utils, adapt hdmap_utils test to lanelet_wrapper::lanelet_map
+* feat(traffic_simulator, behavior_tree_plugin): use lanelet_wrapper::lanelet_map in parts previusly overlooked
+* feat(traffic_simulator): use lanelet_wrapper::pose in the rest of hdmap_utils, adapt hdmap_utils test to lanelet_wrapper::pose
+* feat(traffic_simulator, behavior_tree_plugin): use lanelet_wrapper::pose in parts previously overlooked
+* ref(traffic_simulator): remove unused parts lanelet_wrapper
+* feat(traffic_simulator, random_test_runner): adapt tests for using pose:: from lanelet_wrapper
+* feat(traffic_simulator, openscenario_interpreter, behavior_tree_plugin, simple_sensor_simulator): use pose:: from lanelet_wrapper instead of hdmap_utils methods
+* feat(traffic_simulator): add lanelet_wrapper as a replacement for hdmap_utils, at this point mainly for pose calculations
+* Contributors: Dawid Moszynski, Dawid Moszyński, Masaya Kataoka, Mateusz Palczuk
+
 7.4.7 (2025-01-20)
 ------------------
 * Merge branch 'master' into RJD-1511/bug_fix
