@@ -60,11 +60,12 @@ auto transformRelativePoseToGlobal(
   const geometry_msgs::msg::Pose & global_pose, const geometry_msgs::msg::Pose & relative_pose)
   -> geometry_msgs::msg::Pose;
 
-auto updateEntityPositionForLaneletTransition(
+auto updatePositionForLaneletTransition(
   const traffic_simulator_msgs::msg::EntityStatus & entity_status,
   const lanelet::Id next_lanelet_id, const geometry_msgs::msg::Vector3 & desired_velocity,
   const bool desired_velocity_is_global, const double step_time,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> geometry_msgs::msg::Point;
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+  -> std::optional<geometry_msgs::msg::Point>;
 
 // Relative msg::Pose
 auto relativePose(const geometry_msgs::msg::Pose & from, const geometry_msgs::msg::Pose & to)

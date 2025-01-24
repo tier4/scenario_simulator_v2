@@ -143,47 +143,54 @@ auto transformRelativePoseToGlobal(
 }
 
 /// @note This function does not modify the orientation of entity.
-auto updateEntityPositionForLaneletTransition(
+auto updatePositionForLaneletTransition(
   const traffic_simulator_msgs::msg::EntityStatus & entity_status,
   const lanelet::Id next_lanelet_id, const geometry_msgs::msg::Vector3 & desired_velocity,
   const bool desired_velocity_is_global, const double step_time,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> geometry_msgs::msg::Point
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+  -> std::optional<geometry_msgs::msg::Point>
 {
   using math::geometry::operator*;
   using math::geometry::operator+=;
 
   const auto lanelet_pose = entity_status.lanelet_pose;
+  // Determine the displacement in the 2D lanelet coordinate system
+  Eigen::Vector2d displacement;
+  if (desired_velocity_is_global) {
+    // Transform desired (global) velocity to local velocity
+    const Eigen::Vector3d global_velocity(
+      desired_velocity.x, desired_velocity.y, desired_velocity.z);
+    const Eigen::Quaterniond quaternion(
+      entity_status.pose.orientation.w, entity_status.pose.orientation.x,
+      entity_status.pose.orientation.y, entity_status.pose.orientation.z);
+    const Eigen::Vector3d local_velocity = quaternion.inverse() * global_velocity;
+    displacement = Eigen::Rotation2Dd(lanelet_pose.rpy.z) *
+                   Eigen::Vector2d(local_velocity.x(), local_velocity.y()) * step_time;
+  } else {
+    displacement = Eigen::Rotation2Dd(lanelet_pose.rpy.z) *
+                   Eigen::Vector2d(desired_velocity.x, desired_velocity.y) * step_time;
+  }
+  const auto longitudinal_d = displacement.x();
+  const auto lateral_d = displacement.y();
+
   const auto remaining_lanelet_length =
     hdmap_utils_ptr->getLaneletLength(lanelet_pose.lanelet_id) - lanelet_pose.s;
-  auto new_position = entity_status.pose.position;
-
-  // Transition to the next lanelet if the entity's displacement exceeds the remaining length
-  if (math::geometry::norm(desired_velocity * step_time) > remaining_lanelet_length) {
-    // Determine the displacement in the 2D lanelet coordinate system
-    Eigen::Vector2d displacement;
-    if (desired_velocity_is_global) {
-      // Transform desired (global) velocity to local velocity
-      const Eigen::Vector3d global_velocity(
-        desired_velocity.x, desired_velocity.y, desired_velocity.z);
-      const Eigen::Quaterniond quaternion(
-        entity_status.pose.orientation.w, entity_status.pose.orientation.x,
-        entity_status.pose.orientation.y, entity_status.pose.orientation.z);
-      const Eigen::Vector3d local_velocity = quaternion.inverse() * global_velocity;
-      displacement = Eigen::Rotation2Dd(lanelet_pose.rpy.z) *
-                     Eigen::Vector2d(local_velocity.x(), local_velocity.y()) * step_time;
-    } else {
-      displacement = Eigen::Rotation2Dd(lanelet_pose.rpy.z) *
-                     Eigen::Vector2d(desired_velocity.x, desired_velocity.y) * step_time;
-    }
-
+  const auto next_lanelet_longitudinal_d = longitudinal_d - remaining_lanelet_length;
+  if (longitudinal_d <= remaining_lanelet_length) {
+    return std::nullopt;
+  } else if (  // if longitudinal displacement exceeds the current lanelet length, use next lanelet if possible
+    next_lanelet_longitudinal_d < hdmap_utils_ptr->getLaneletLength(next_lanelet_id)) {
     LaneletPose result_lanelet_pose;
     result_lanelet_pose.lanelet_id = next_lanelet_id;
-    result_lanelet_pose.s = displacement.x() - remaining_lanelet_length;
-    result_lanelet_pose.offset = lanelet_pose.offset + displacement.y();
+    result_lanelet_pose.s = next_lanelet_longitudinal_d;
+    result_lanelet_pose.offset = lanelet_pose.offset + lateral_d;
     result_lanelet_pose.rpy = lanelet_pose.rpy;
-    new_position = toMapPose(result_lanelet_pose, hdmap_utils_ptr).position;
+    return toMapPose(result_lanelet_pose, hdmap_utils_ptr).position;
+  } else {
+    THROW_SIMULATION_ERROR(
+      "Next lanelet is too short: lanelet_id==", next_lanelet_id, " is shorter than ",
+      next_lanelet_longitudinal_d);
   }
-  return new_position;
 }
 
 auto relativePose(const geometry_msgs::msg::Pose & from, const geometry_msgs::msg::Pose & to)

@@ -562,10 +562,10 @@ auto makeUpdatedStatus(
 
     updated_status.pose.orientation = [&]() {
       if (desired_velocity.y == 0 && desired_velocity.x == 0 && desired_velocity.z == 0) {
-        // Do not change orientation if there is no designed_velocity vector.
+        // Do not change orientation if there is no designed_velocity vector
         return entity_status.pose.orientation;
       } else {
-        // If there is a designed_velocity vector, set the orientation in the direction of it.
+        // If there is a designed_velocity vector, set the orientation in the direction of it
         const geometry_msgs::msg::Vector3 direction =
           geometry_msgs::build<geometry_msgs::msg::Vector3>()
             .x(0.0)
@@ -575,20 +575,22 @@ auto makeUpdatedStatus(
       }
     }();
 
+    // If it is the transition between lanelets: overwrite position to improve precision
     if (entity_status.lanelet_pose_valid) {
       constexpr bool desired_velocity_is_global{true};
       const auto estimated_next_canonicalized_lanelet_pose =
         traffic_simulator::pose::toCanonicalizedLaneletPose(
           updated_status.pose, entity_status.bounding_box, include_crosswalk, matching_distance,
           hdmap_utils);
-
-      // If it is the transition between lanelets: overwrite position to improve precision.
       if (estimated_next_canonicalized_lanelet_pose) {
         const auto next_lanelet_id =
           static_cast<LaneletPose>(estimated_next_canonicalized_lanelet_pose.value()).lanelet_id;
-        updated_status.pose.position = pose::updateEntityPositionForLaneletTransition(
-          updated_status, next_lanelet_id, desired_velocity, desired_velocity_is_global, step_time,
-          hdmap_utils);
+        if (  // Handle lanelet transition
+          const auto updated_position = pose::updatePositionForLaneletTransition(
+            entity_status, next_lanelet_id, desired_velocity, desired_velocity_is_global, step_time,
+            hdmap_utils)) {
+          updated_status.pose.position = updated_position.value();
+        }
       }
     }
 
