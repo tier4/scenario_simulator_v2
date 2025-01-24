@@ -52,9 +52,7 @@ PolylineTrajectoryPositioner::PolylineTrajectoryPositioner(
   total_remaining_distance_(
     totalRemainingDistance()),  // implicitly requires: polyline_trajectory_, hdmap_utils_ptr_, matching_distance_
   /// @todo nearest_waypoint_ does not always have time defined, so is this correct (getWaypoints().front().time)?
-  time_to_nearest_waypoint_(
-    (isAbsoluteBaseTime() ? ABSOLUTE_BASE_TIME : polyline_trajectory_.base_time) +
-    getWaypoints().front().time - validated_entity_status_.time()),
+  time_to_nearest_waypoint_(timeToNearestWaypoint()),
   total_remaining_time_(
     totalRemainingTime()),  // implicitly requires: nearest_waypoint_with_specified_time_it_, polyline_trajectory_, validated_entity_status_, step_time_
   follow_waypoint_controller_(
@@ -142,6 +140,16 @@ auto PolylineTrajectoryPositioner::totalRemainingDistance() const -> double
            total_distance_to(nearest_waypoint_with_specified_time_it_);
   }
 }
+
+auto PolylineTrajectoryPositioner::timeToNearestWaypoint() const noexcept(false) -> double
+{
+  if (not std::isfinite(getWaypoints().front().time)) {
+    return std::numeric_limits<double>::infinity();
+  } else {
+    return (isAbsoluteBaseTime() ? ABSOLUTE_BASE_TIME : polyline_trajectory_.base_time) +
+           getWaypoints().front().time - validated_entity_status_.time();
+  }
+};
 
 auto PolylineTrajectoryPositioner::totalRemainingTime() const noexcept(false) -> double
 {
@@ -318,42 +326,49 @@ auto PolylineTrajectoryPositioner::makeUpdatedEntityStatus() const -> std::optio
 
   validatePredictedState(desired_local_acceleration);
 
-  /// @note if the nearest waypoint has no timestamp specified
+  /**
+   * 
+   * 1. if **Nearest waypoint without a timestamp:**
+   *    - 1.1 If it is the last waypoint:
+   *        - Checks if the arrival conditions are met. If so, ends the movement (cancel step).
+   *        - Otherwise, updates and returns the status with a new velocity.
+   *    - 1.2 If it is an intermediate waypoint:
+   *        - Checks if it can be reached within the current step. 
+   *          If so, considers it as reached (cancel step).
+   *        - Otherwise, updates and returns the status with a new velocity.
+   *
+   * 2. else **Nearest waypoint with a timestamp:**
+   *    - 2.1 If the waypoint should be reached in this step (time remaining is less than step time/2):
+   *        - Checks if the arrival conditions are met. If so, ends the movement (cancel step).
+   *        - Throws an error if the distance exceeds the accepted accuracy.
+   *    - 2.2 If the waypoint should not be reached in this step:
+   *        - Updates and returns the status with a new velocity.
+   *     
+   *  Note 2.1, about step_time_ / 2.0:
+   *    The value of step_time/2 is compared, as the remaining time is affected by floating point
+   *    inaccuracy, sometimes it reaches values of 1e-7 (almost zero, but not zero) or (step_time -
+   *    1e-7) (almost step_time). Because the step is fixed, it should be assumed that the value
+   *    here is either equal to 0 or step_time. Value step_time/2 allows to return true if no next
+   *    step is possible (time_to_nearest_waypoint is almost zero).
+   */
+
   if (not std::isfinite(time_to_nearest_waypoint_)) {
-    /// @note if the nearest waypoint is the last one
-    /// @todo check if 'not std::isfinite(total_remaining_time_)' is necessary here
-    if (getWaypoints().size() == 1UL and not std::isfinite(total_remaining_time_)) {
-      /// @note if nearest waypoint should be reached in this step - check accuracy (meeting of arrival conditions)
-      // the last one waypoint is followed using maximum speed including braking (accuracy of the arrival is relevant)
+    if (getWaypoints().size() == 1UL) {
       if (areConditionsOfArrivalMet()) {
         return std::nullopt;
       } else {
         return validated_entity_status_.buildUpdatedEntityStatus(desired_local_velocity);
       }
-      /// @note if nearest waypoint is reached in this step and it is an intermediate waypoint without a timestamp specified
-      // just consider it as reached (accuracy of the arrival is irrelevant)
-    } else if (const double this_step_speed =
-                 (validated_entity_status_.linearSpeed() + desired_local_acceleration * step_time_);
-               this_step_speed * step_time_ > distance_to_nearest_waypoint_) {
-      return std::nullopt;
-      /// @note if nearest waypoint is not reached in this step - update and return state after this step
     } else {
-      return validated_entity_status_.buildUpdatedEntityStatus(desired_local_velocity);
+      if (const double this_step_speed =
+            (validated_entity_status_.linearSpeed() + desired_local_acceleration * step_time_);
+          this_step_speed * step_time_ > distance_to_nearest_waypoint_) {
+        return std::nullopt;
+      } else {
+        return validated_entity_status_.buildUpdatedEntityStatus(desired_local_velocity);
+      }
     }
-
-    /// @note if the nearest waypoint has a timestamp specified
   } else {
-    /**
-    * @note if nearest waypoint should be reached in this step - check accuracy (meeting of arrival conditions)
-    * 
-    *  About step_time_ / 2.0:
-    *  The value of step_time/2 is compared, as the remaining time is affected by floating point
-    *  inaccuracy, sometimes it reaches values of 1e-7 (almost zero, but not zero) or (step_time -
-    *  1e-7) (almost step_time). Because the step is fixed, it should be assumed that the value
-    *  here is either equal to 0 or step_time. Value step_time/2 allows to return true if no next
-    *  step is possible (time_to_nearest_waypoint is almost zero).
-    * 
-    */
     if (math::arithmetic::isDefinitelyLessThan(time_to_nearest_waypoint_, step_time_ / 2.0)) {
       if (areConditionsOfArrivalMet()) {
         return std::nullopt;
@@ -365,7 +380,6 @@ auto PolylineTrajectoryPositioner::makeUpdatedEntityStatus() const -> std::optio
           getWaypoints().front().time, "s at a distance equal to ", distance_to_nearest_waypoint_,
           " from that waypoint which is greater than the accepted accuracy.");
       }
-      /// @note if should not be reached in this step - update and return state after this step
     } else {
       return validated_entity_status_.buildUpdatedEntityStatus(desired_local_velocity);
     }

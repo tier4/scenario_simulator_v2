@@ -56,6 +56,8 @@ private:
   auto isNearestWaypointWithSpecifiedTimeSameAsLastWaypoint() const -> bool;
 
   // helpers to the constructor
+  auto timeToNearestWaypoint() const noexcept(false) -> double;
+
   auto totalRemainingDistance() const -> double;
 
   auto totalRemainingTime() const noexcept(false) -> double;
