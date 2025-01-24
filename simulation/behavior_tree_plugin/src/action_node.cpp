@@ -302,16 +302,16 @@ auto ActionNode::getEntityStatus(const std::string & target_name) const
 /**
  * @note getDistanceToTargetEntity working schematics
  * 
- * 1. Check if route to target entity from refrence entity exists, if not try to tranform pose to other 
+ * 1. Check if route to target entity from reference entity exists, if not try to transform pose to other 
  *    routable lanelet, within matching distance (transformToRoutableCanonicalizedLaneletPose).
  * 2. Calculate longitudinal distance between entities bounding boxes -> bounding_box_distance.
  * 3. Calculate longitudinal distance between entities poses -> position_distance.
- * 4. Calculate target entity bounding box distance to refrence entity spline (minimal distance from all corners) 
+ * 4. Calculate target entity bounding box distance to reference entity spline (minimal distance from all corners) 
  *    -> target_to_spline_distance.
- * 5. If target_to_spline_distance is less than half width of refrence entity target entity is confilicting.
+ * 5. If target_to_spline_distance is less than half width of reference entity target entity is conflicting.
  * 6. Check corner case where target entity width is bigger than width of entity and target entity
- *    is excatly on the spline -> spline.getCollisionPointIn2D
- * 7. If target entity is conflicting return bounding_box_distance enlarged by half of the enity 
+ *    is exactly on the spline -> spline.getCollisionPointIn2D
+ * 7. If target entity is conflicting return bounding_box_distance enlarged by half of the entity 
  *    length.
  */
 auto ActionNode::getDistanceToTargetEntity(
