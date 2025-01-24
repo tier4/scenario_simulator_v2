@@ -323,8 +323,7 @@ auto ActionNode::getDistanceToTargetEntity(
     /** 
       * boundingBoxLaneLongitudinalDistance requires routing_configuration, 
       * 'allow_lane_change = true' is needed to check distances to entities on neighbour lanelets 
-      * 
-    */
+      */
     traffic_simulator::RoutingConfiguration routing_configuration;
     routing_configuration.allow_lane_change = true;
     constexpr bool include_adjacent_lanelet{false};

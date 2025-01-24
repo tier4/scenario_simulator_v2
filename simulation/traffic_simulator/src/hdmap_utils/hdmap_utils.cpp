@@ -1234,8 +1234,7 @@ auto HdMapUtils::getLeftLaneletIds(
 {
   if (include_opposite_direction) {
     throw common::Error(
-      "HdMapUtils::getLeftLaneletIds with include_opposite_direction=true is not implemented "
-      "yet.");
+      "HdMapUtils::getLeftLaneletIds with include_opposite_direction=true is not implemented yet.");
   } else {
     return getLaneletIds(
       routing_graphs_->routing_graph(type)->lefts(lanelet_map_ptr_->laneletLayer.get(lanelet_id)));
