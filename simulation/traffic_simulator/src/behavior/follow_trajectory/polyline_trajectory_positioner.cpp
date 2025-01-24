@@ -110,6 +110,69 @@ auto PolylineTrajectoryPositioner::isNearestWaypointWithSpecifiedTimeSameAsLastW
   return nearest_waypoint_with_specified_time_it_ >= std::prev(getWaypoints().cend());
 }
 
+/**
+   *  @note isNearestWaypointReachable works as follows
+   * 
+   * 1. if **Nearest waypoint without a timestamp:**
+   *    - 1.1 If it is the last waypoint:
+   *        - Checks if the arrival conditions are met. If so, ends the movement (return false).
+   *        - Otherwise, updates and returns the status with a new velocity.
+   *    - 1.2 If it is an intermediate waypoint:
+   *        - Checks if it can be reached within the current step. 
+   *          If so, considers it as reached (return false).
+   *        - Otherwise, updates and returns the status with a new velocity.
+   *
+   * 2. else **Nearest waypoint with a timestamp:**
+   *    - 2.1 If the waypoint should be reached in this step (time remaining is less than step time/2):
+   *        - Checks if the arrival conditions are met. If so, ends the movement (return false).
+   *        - Throws an error if the distance exceeds the accepted accuracy.
+   *    - 2.2 If the waypoint should not be reached in this step:
+   *        - Updates and returns the status with a new velocity.
+   *     
+   *  Note 2.1, about step_time_ / 2.0:
+   *    The value of step_time/2 is compared, as the remaining time is affected by floating point
+   *    inaccuracy, sometimes it reaches values of 1e-7 (almost zero, but not zero) or (step_time -
+   *    1e-7) (almost step_time). Because the step is fixed, it should be assumed that the value
+   *    here is either equal to 0 or step_time. Value step_time/2 allows to return true if no next
+   *    step is possible (time_to_nearest_waypoint is almost zero).
+   */
+auto PolylineTrajectoryPositioner::isNearestWaypointReachable(
+  const auto desired_local_acceleration) const -> bool
+{
+  if (not std::isfinite(time_to_nearest_waypoint_)) {
+    if (getWaypoints().size() == 1UL) {
+      if (areConditionsOfArrivalMet()) {
+        return false;
+      } else {
+        return true;
+      }
+    } else {
+      if (const double this_step_speed =
+            (validated_entity_status_.linearSpeed() + desired_local_acceleration * step_time_);
+          this_step_speed * step_time_ > distance_to_nearest_waypoint_) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+  } else {
+    if (math::arithmetic::isDefinitelyLessThan(time_to_nearest_waypoint_, step_time_ / 2.0)) {
+      if (areConditionsOfArrivalMet()) {
+        return false;
+      } else {
+        THROW_SIMULATION_ERROR(
+          "Vehicle ", std::quoted(validated_entity_status_.name()), " at time ",
+          validated_entity_status_.time(), "s (remaining time is ", time_to_nearest_waypoint_,
+          "s), has completed a trajectory to the nearest waypoint with specified time equal to ",
+          getWaypoints().front().time, "s at a distance equal to ", distance_to_nearest_waypoint_,
+          " from that waypoint which is greater than the accepted accuracy.");
+      }
+    } else {
+      return true;
+    }
+  }
+}
+
 auto PolylineTrajectoryPositioner::totalRemainingDistance() const -> double
 {
   /*
@@ -325,64 +388,10 @@ auto PolylineTrajectoryPositioner::makeUpdatedEntityStatus() const -> std::optio
   }
 
   validatePredictedState(desired_local_acceleration);
-
-  /**
-   * 
-   * 1. if **Nearest waypoint without a timestamp:**
-   *    - 1.1 If it is the last waypoint:
-   *        - Checks if the arrival conditions are met. If so, ends the movement (cancel step).
-   *        - Otherwise, updates and returns the status with a new velocity.
-   *    - 1.2 If it is an intermediate waypoint:
-   *        - Checks if it can be reached within the current step. 
-   *          If so, considers it as reached (cancel step).
-   *        - Otherwise, updates and returns the status with a new velocity.
-   *
-   * 2. else **Nearest waypoint with a timestamp:**
-   *    - 2.1 If the waypoint should be reached in this step (time remaining is less than step time/2):
-   *        - Checks if the arrival conditions are met. If so, ends the movement (cancel step).
-   *        - Throws an error if the distance exceeds the accepted accuracy.
-   *    - 2.2 If the waypoint should not be reached in this step:
-   *        - Updates and returns the status with a new velocity.
-   *     
-   *  Note 2.1, about step_time_ / 2.0:
-   *    The value of step_time/2 is compared, as the remaining time is affected by floating point
-   *    inaccuracy, sometimes it reaches values of 1e-7 (almost zero, but not zero) or (step_time -
-   *    1e-7) (almost step_time). Because the step is fixed, it should be assumed that the value
-   *    here is either equal to 0 or step_time. Value step_time/2 allows to return true if no next
-   *    step is possible (time_to_nearest_waypoint is almost zero).
-   */
-
-  if (not std::isfinite(time_to_nearest_waypoint_)) {
-    if (getWaypoints().size() == 1UL) {
-      if (areConditionsOfArrivalMet()) {
-        return std::nullopt;
-      } else {
-        return validated_entity_status_.buildUpdatedEntityStatus(desired_local_velocity);
-      }
-    } else {
-      if (const double this_step_speed =
-            (validated_entity_status_.linearSpeed() + desired_local_acceleration * step_time_);
-          this_step_speed * step_time_ > distance_to_nearest_waypoint_) {
-        return std::nullopt;
-      } else {
-        return validated_entity_status_.buildUpdatedEntityStatus(desired_local_velocity);
-      }
-    }
+  if (isNearestWaypointReachable(desired_local_acceleration)) {
+    return validated_entity_status_.buildUpdatedEntityStatus(desired_local_velocity);
   } else {
-    if (math::arithmetic::isDefinitelyLessThan(time_to_nearest_waypoint_, step_time_ / 2.0)) {
-      if (areConditionsOfArrivalMet()) {
-        return std::nullopt;
-      } else {
-        THROW_SIMULATION_ERROR(
-          "Vehicle ", std::quoted(validated_entity_status_.name()), " at time ",
-          validated_entity_status_.time(), "s (remaining time is ", time_to_nearest_waypoint_,
-          "s), has completed a trajectory to the nearest waypoint with specified time equal to ",
-          getWaypoints().front().time, "s at a distance equal to ", distance_to_nearest_waypoint_,
-          " from that waypoint which is greater than the accepted accuracy.");
-      }
-    } else {
-      return validated_entity_status_.buildUpdatedEntityStatus(desired_local_velocity);
-    }
+    return std::nullopt;
   }
 }
 
@@ -441,6 +450,5 @@ auto PolylineTrajectoryPositioner::validatePredictedState(
       ", speed: ", validated_entity_status_.linearSpeed(), ". ", follow_waypoint_controller_);
   }
 }
-
 }  // namespace follow_trajectory
 }  // namespace traffic_simulator

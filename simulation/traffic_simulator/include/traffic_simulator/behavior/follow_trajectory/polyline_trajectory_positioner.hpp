@@ -55,6 +55,8 @@ private:
 
   auto isNearestWaypointWithSpecifiedTimeSameAsLastWaypoint() const -> bool;
 
+  auto isNearestWaypointReachable(const auto desired_local_acceleration) const -> bool;
+
   // helpers to the constructor
   auto timeToNearestWaypoint() const noexcept(false) -> double;
 
