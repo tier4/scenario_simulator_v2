@@ -41,6 +41,42 @@ public:
   auto makeUpdatedEntityStatus() const -> std::optional<EntityStatus>;
 
 private:
+  // getters
+  auto getWaypoints() const noexcept(true)
+    -> const std::vector<traffic_simulator_msgs::msg::Vertex> &;
+
+  auto getNearestWaypointWithSpecifiedTimeIterator() const
+    -> std::vector<traffic_simulator_msgs::msg::Vertex>::const_iterator;
+
+  // checks
+  auto areConditionsOfArrivalMet() const noexcept(true) -> bool;
+
+  auto isAbsoluteBaseTime() const noexcept(true) -> bool;
+
+  auto isNearestWaypointWithSpecifiedTimeSameAsLastWaypoint() const -> bool;
+
+  // helpers to the constructor
+  auto totalRemainingDistance() const -> double;
+
+  auto totalRemainingTime() const noexcept(false) -> double;
+
+  auto validatedEntityTargetPosition() const noexcept(false) -> geometry_msgs::msg::Point;
+
+  // other validators
+  auto validatedEntityDesiredLinearAcceleration() const noexcept(false) -> double;
+
+  auto validatedEntityDesiredSpeed(const double desired_local_acceleration) const noexcept(false)
+    -> double;
+
+  auto validatedEntityDesiredLocalVelocity(const double desired_speed) const noexcept(false)
+    -> geometry_msgs::msg::Vector3;
+
+  auto validatePredictedState(const double desired_local_acceleration) const noexcept(false)
+    -> void;
+
+  /// @todo add note
+  constexpr static double ABSOLUTE_BASE_TIME{0.0};
+
   const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
   const ValidatedEntityStatus validated_entity_status_;
   const traffic_simulator_msgs::msg::PolylineTrajectory polyline_trajectory_;
@@ -56,19 +92,6 @@ private:
   const double total_remaining_time_;
 
   const FollowWaypointController follow_waypoint_controller_;
-
-  auto totalRemainingDistance() const -> double;
-  auto totalRemainingTime() const noexcept(false) -> double;
-  auto isNearestWaypointWithSpecifiedTimeSameAsLastWaypoint() const -> bool;
-  auto nearestWaypointWithSpecifiedTimeIterator() const
-    -> std::vector<traffic_simulator_msgs::msg::Vertex>::const_iterator;
-  auto validatedEntityTargetPosition() const noexcept(false) -> geometry_msgs::msg::Point;
-  auto validatedEntityDesiredAcceleration() const noexcept(false) -> double;
-  auto validatedEntityDesiredVelocity(const double desired_speed) const noexcept(false)
-    -> geometry_msgs::msg::Vector3;
-  auto validatedEntityDesiredSpeed(const double desired_acceleration) const noexcept(false)
-    -> double;
-  auto validatePredictedState(const double desired_acceleration) const noexcept(false) -> void;
 };
 }  // namespace follow_trajectory
 }  // namespace traffic_simulator
