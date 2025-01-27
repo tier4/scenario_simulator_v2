@@ -283,7 +283,13 @@ auto EgoEntity::setMapPose(const geometry_msgs::msg::Pose & map_pose) -> void
   entity_status.lanelet_pose_valid = false;
   // prefer current lanelet on Autoware side
   status_->set(
-    entity_status, helper::getUniqueValues(getRouteLanelets()),
+    entity_status, helper::getUniqueValues([this]() {
+      auto ids = lanelet::Ids();
+      for (const auto & point : getPathWithLaneId().points) {
+        ids += point.lane_ids;
+      }
+      return ids;
+    }()),
     getDefaultMatchingDistanceForLaneletPoseCalculation());
 }
 }  // namespace entity
