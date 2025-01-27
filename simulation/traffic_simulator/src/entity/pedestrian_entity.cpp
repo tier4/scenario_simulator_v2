@@ -104,15 +104,6 @@ auto PedestrianEntity::getDefaultDynamicConstraints() const
   return default_dynamic_constraints;
 }
 
-auto PedestrianEntity::getRouteLanelets(double horizon) -> lanelet::Ids
-{
-  if (const auto canonicalized_lanelet_pose = status_->getCanonicalizedLaneletPose()) {
-    return route_planner_.getRouteLanelets(canonicalized_lanelet_pose.value(), horizon);
-  } else {
-    return {};
-  }
-}
-
 auto PedestrianEntity::getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle>
 {
   return std::nullopt;

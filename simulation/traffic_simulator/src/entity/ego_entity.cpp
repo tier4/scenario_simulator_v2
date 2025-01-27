@@ -98,17 +98,6 @@ auto EgoEntity::getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obst
   return std::nullopt;
 }
 
-auto EgoEntity::getRouteLanelets(double /*unused horizon*/) -> lanelet::Ids
-{
-  lanelet::Ids ids{};
-
-  for (const auto & point : getPathWithLaneId().points) {
-    ids += point.lane_ids;
-  }
-
-  return ids;
-}
-
 auto EgoEntity::getCurrentPose() const -> const geometry_msgs::msg::Pose &
 {
   return status_->getMapPose();

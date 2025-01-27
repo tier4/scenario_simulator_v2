@@ -123,8 +123,6 @@ public:
 
   virtual auto getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle> = 0;
 
-  virtual auto getRouteLanelets(const double horizon = 100.0) -> lanelet::Ids = 0;
-
   virtual auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray = 0;
 
   virtual auto onUpdate(const double current_time, const double step_time) -> void;

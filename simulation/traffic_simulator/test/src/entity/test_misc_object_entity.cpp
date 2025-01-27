@@ -223,22 +223,6 @@ TEST_F(MiscObjectEntityTest_HdMapUtils, requestAcquirePosition_pose)
 }
 
 /**
- * @note Test function behavior when called with any argument - the goal is to test error throwing.
- */
-TEST_F(MiscObjectEntityTest_HdMapUtils, getRouteLanelets)
-{
-  EXPECT_THROW(
-    traffic_simulator::entity::MiscObjectEntity(
-      entity_name,
-      makeCanonicalizedEntityStatus(
-        makeCanonicalizedLaneletPose(120659), makeBoundingBox(), 0.0, entity_name,
-        traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
-      hdmap_utils_ptr, traffic_simulator_msgs::msg::MiscObjectParameters{})
-      .getRouteLanelets(100.0),
-    common::SemanticError);
-}
-
-/**
  * @note Test basic functionality; test whether the function does nothing.
  */
 TEST_F(MiscObjectEntityTest_FullObject, appendDebugMarker)

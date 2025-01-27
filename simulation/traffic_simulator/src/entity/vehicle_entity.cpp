@@ -102,15 +102,6 @@ auto VehicleEntity::getObstacle() -> std::optional<traffic_simulator_msgs::msg::
   return behavior_plugin_ptr_->getObstacle();
 }
 
-auto VehicleEntity::getRouteLanelets(double horizon) -> lanelet::Ids
-{
-  if (const auto canonicalized_lanelet_pose = status_->getCanonicalizedLaneletPose()) {
-    return route_planner_.getRouteLanelets(canonicalized_lanelet_pose.value(), horizon);
-  } else {
-    return {};
-  }
-}
-
 auto VehicleEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray
 {
   try {

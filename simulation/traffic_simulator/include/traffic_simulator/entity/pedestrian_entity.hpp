@@ -110,8 +110,6 @@ public:
   auto getDefaultDynamicConstraints() const
     -> const traffic_simulator_msgs::msg::DynamicConstraints & override;
 
-  auto getRouteLanelets(double horizon = 100) -> lanelet::Ids override;
-
   auto getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle> override;
 
   auto getGoalPoses() -> std::vector<CanonicalizedLaneletPose> override;
