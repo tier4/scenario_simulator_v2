@@ -386,9 +386,11 @@ auto isAtEndOfLanelets(
 
 namespace pedestrian
 {
-/// @note This function has been moved from pedestrian_action_node and modified,
-/// in case of inconsistency please compare in original:
-/// https://github.com/tier4/scenario_simulator_v2/blob/090a8d08bcb065d293a530cf641a953edf311f9f/simulation/behavior_tree_plugin/src/pedestrian/pedestrian_action_node.cpp#L67-L128
+/*
+  This function has been moved from pedestrian_action_node and modified,
+  in case of inconsistency please compare in original:
+  https://github.com/tier4/scenario_simulator_v2/blob/090a8d08bcb065d293a530cf641a953edf311f9f/simulation/behavior_tree_plugin/src/pedestrian/pedestrian_action_node.cpp#L67-L128
+*/
 auto transformToCanonicalizedLaneletPose(
   const geometry_msgs::msg::Pose & map_pose,
   const traffic_simulator_msgs::msg::BoundingBox & bounding_box,
