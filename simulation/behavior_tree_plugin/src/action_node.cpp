@@ -490,7 +490,7 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
 
       // Apply position change
       /// @todo first determine global desired_velocity, calculate position change using it
-      /// then pass the same global desired_velocity to adjustPoseForLaneletTransition()
+      /// then pass the same global desired_velocity to updatePositionForLaneletTransition()
       const Eigen::Matrix3d rotation_matrix =
         math::geometry::getRotationMatrix(updated_pose.orientation);
       const auto translation = Eigen::Vector3d(
