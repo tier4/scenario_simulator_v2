@@ -211,15 +211,6 @@ auto AutowareUniverse::getVehicleCommand() const -> std::tuple<double, double, d
     gear_command.command);
 }
 
-auto AutowareUniverse::getRouteLanelets() const -> std::vector<std::int64_t>
-{
-  std::vector<std::int64_t> ids{};
-  for (const auto & point : getPathWithLaneId().points) {
-    std::copy(point.lane_ids.begin(), point.lane_ids.end(), std::back_inserter(ids));
-  }
-  return ids;
-}
-
 auto AutowareUniverse::getControlModeReport() const -> ControlModeReport
 {
   ControlModeReport message;

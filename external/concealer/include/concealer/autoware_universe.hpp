@@ -102,8 +102,6 @@ public:
 
   auto getVehicleCommand() const -> std::tuple<double, double, double, double, int>;
 
-  auto getRouteLanelets() const -> std::vector<std::int64_t>;
-
   auto getControlModeReport() const -> ControlModeReport;
 
   auto setManualMode() -> void;

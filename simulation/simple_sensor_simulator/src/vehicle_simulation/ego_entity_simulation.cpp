@@ -445,8 +445,13 @@ auto EgoEntitySimulation::setStatus(const traffic_simulator_msgs::msg::EntitySta
 {
   /// @note The lanelet matching algorithm should be equivalent to the one used in
   /// EgoEntity::setStatus
-  const auto unique_route_lanelets =
-    traffic_simulator::helper::getUniqueValues(autoware->getRouteLanelets());
+  const auto unique_route_lanelets = traffic_simulator::helper::getUniqueValues([this]() {
+    auto ids = lanelet::Ids();
+    for (const auto & point : autoware->getPathWithLaneId().points) {
+      std::copy(point.lane_ids.begin(), point.lane_ids.end(), std::back_inserter(ids));
+    }
+    return ids;
+  }());
   /// @note The offset value has been increased to 1.5 because a value of 1.0 was often insufficient when changing lanes. ( @Hans_Robo )
   const auto matching_distance = std::max(
                                    vehicle_parameters.axles.front_axle.track_width,
