@@ -479,19 +479,18 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
   const auto buildUpdatedPose =
     [&include_crosswalk, &matching_distance](
       const std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus> & status,
-      const geometry_msgs::msg::Twist & desired_twist, const double time_step,
-      const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) {
+      const geometry_msgs::msg::Twist & desired_twist, const double time_step) {
       geometry_msgs::msg::Pose updated_pose;
 
       // Apply yaw change (delta rotation) in radians: yaw_angular_speed (rad/s) * time_step (s)
       geometry_msgs::msg::Vector3 delta_rotation;
-      delta_rotation.z = desired_twist.angular.z * time_step;
+      delta_rotation = desired_twist.angular * time_step;
       const auto delta_quaternion = math::geometry::convertEulerAngleToQuaternion(delta_rotation);
       updated_pose.orientation = status->getMapPose().orientation * delta_quaternion;
 
       // Apply position change
       /// @todo first determine global desired_velocity, calculate position change using it
-      // then pass the same global desired_velocity to adjustPoseForLaneletTransition()
+      /// then pass the same global desired_velocity to adjustPoseForLaneletTransition()
       const Eigen::Matrix3d rotation_matrix =
         math::geometry::getRotationMatrix(updated_pose.orientation);
       const auto translation = Eigen::Vector3d(
@@ -504,18 +503,16 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
       if (const auto canonicalized_lanelet_pose = status->getCanonicalizedLaneletPose()) {
         const auto estimated_next_canonicalized_lanelet_pose =
           traffic_simulator::pose::toCanonicalizedLaneletPose(
-            updated_pose, status->getBoundingBox(), include_crosswalk, matching_distance,
-            hdmap_utils_ptr);
+            updated_pose, status->getBoundingBox(), include_crosswalk, matching_distance);
         if (estimated_next_canonicalized_lanelet_pose) {
-          const auto entity_status = static_cast<traffic_simulator::EntityStatus>(*status);
           const auto next_lanelet_id = static_cast<traffic_simulator::LaneletPose>(
                                          estimated_next_canonicalized_lanelet_pose.value())
                                          .lanelet_id;
           if (  // Handle lanelet transition
             const auto updated_position =
               traffic_simulator::pose::updatePositionForLaneletTransition(
-                entity_status, next_lanelet_id, desired_twist.linear, desired_velocity_is_global,
-                time_step, hdmap_utils_ptr)) {
+                canonicalized_lanelet_pose.value(), next_lanelet_id, desired_twist.linear,
+                desired_velocity_is_global, time_step)) {
             updated_pose.position = updated_position.value();
           }
         }
@@ -532,8 +529,7 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
   const auto linear_jerk_new = std::get<2>(dynamics);
   const auto & accel_new = std::get<1>(dynamics);
   const auto & twist_new = std::get<0>(dynamics);
-  const auto pose_new =
-    buildUpdatedPose(canonicalized_entity_status, twist_new, step_time, hdmap_utils);
+  const auto pose_new = buildUpdatedPose(canonicalized_entity_status, twist_new, step_time);
 
   auto entity_status_updated =
     static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status);

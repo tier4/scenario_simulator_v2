@@ -583,17 +583,18 @@ auto makeUpdatedStatus(
     // If it is the transition between lanelets: overwrite position to improve precision
     if (entity_status.lanelet_pose_valid) {
       constexpr bool desired_velocity_is_global{true};
+      const auto canonicalized_lanelet_pose = traffic_simulator::pose::toCanonicalizedLaneletPose(
+        entity_status.pose, entity_status.bounding_box, include_crosswalk, matching_distance);
       const auto estimated_next_canonicalized_lanelet_pose =
         traffic_simulator::pose::toCanonicalizedLaneletPose(
-          updated_status.pose, entity_status.bounding_box, include_crosswalk, matching_distance,
-          hdmap_utils);
-      if (estimated_next_canonicalized_lanelet_pose) {
+          updated_status.pose, entity_status.bounding_box, include_crosswalk, matching_distance);
+      if (canonicalized_lanelet_pose && estimated_next_canonicalized_lanelet_pose) {
         const auto next_lanelet_id =
           static_cast<LaneletPose>(estimated_next_canonicalized_lanelet_pose.value()).lanelet_id;
         if (  // Handle lanelet transition
           const auto updated_position = pose::updatePositionForLaneletTransition(
-            entity_status, next_lanelet_id, desired_velocity, desired_velocity_is_global, step_time,
-            hdmap_utils)) {
+            canonicalized_lanelet_pose.value(), next_lanelet_id, desired_velocity,
+            desired_velocity_is_global, step_time)) {
           updated_status.pose.position = updated_position.value();
         }
       }
