@@ -39,7 +39,6 @@ struct Histogram : public ComplexType, private Scope, public StochasticParameter
 {
   /**
    * Note: HistogramBin must be stored in continuous range and ascending order to `bins`
-   *       due to restriction of `BinAdapter`
    */
   const std::list<HistogramBin> bins;
 

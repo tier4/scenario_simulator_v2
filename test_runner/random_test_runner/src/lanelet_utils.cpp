@@ -27,6 +27,8 @@
 #include <geometry/vector3/operator.hpp>
 #include <optional>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
+#include <traffic_simulator/lanelet_wrapper/pose.hpp>
+#include <traffic_simulator/utils/lanelet_map.hpp>
 
 LaneletUtils::LaneletUtils(const boost::filesystem::path & filename)
 {
@@ -45,6 +47,7 @@ LaneletUtils::LaneletUtils(const boost::filesystem::path & filename)
 
   hdmap_utils_ptr_ =
     std::make_shared<hdmap_utils::HdMapUtils>(filename, geographic_msgs::msg::GeoPoint());
+  traffic_simulator::lanelet_map::activate(filename.string());
 }
 
 std::vector<int64_t> LaneletUtils::getLaneletIds() const
@@ -55,7 +58,7 @@ std::vector<int64_t> LaneletUtils::getLaneletIds() const
 geometry_msgs::msg::PoseStamped LaneletUtils::toMapPose(
   const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose, const bool fill_pitch) const
 {
-  return hdmap_utils_ptr_->toMapPose(lanelet_pose, fill_pitch);
+  return traffic_simulator::lanelet_wrapper::pose::toMapPose(lanelet_pose, fill_pitch);
 }
 
 std::vector<int64_t> LaneletUtils::getRoute(int64_t from_lanelet_id, int64_t to_lanelet_id)
@@ -65,15 +68,15 @@ std::vector<int64_t> LaneletUtils::getRoute(int64_t from_lanelet_id, int64_t to_
 
 double LaneletUtils::getLaneletLength(int64_t lanelet_id) const
 {
-  return hdmap_utils_ptr_->getLaneletLength(lanelet_id);
+  return traffic_simulator::lanelet_wrapper::lanelet_map::laneletLength(lanelet_id);
 }
 
 double LaneletUtils::computeDistance(
   const traffic_simulator_msgs::msg::LaneletPose & p1,
   const traffic_simulator_msgs::msg::LaneletPose & p2) const
 {
-  auto p1_g = hdmap_utils_ptr_->toMapPose(p1).pose.position;
-  auto p2_g = hdmap_utils_ptr_->toMapPose(p2).pose.position;
+  auto p1_g = traffic_simulator::lanelet_wrapper::pose::toMapPose(p1).pose.position;
+  auto p2_g = traffic_simulator::lanelet_wrapper::pose::toMapPose(p2).pose.position;
   geometry_msgs::msg::Point d;
   d.x = p1_g.x - p2_g.x;
   d.y = p1_g.y - p2_g.y;
@@ -139,7 +142,7 @@ std::optional<traffic_simulator_msgs::msg::LaneletPose> LaneletUtils::getOpposit
   global_pose.position.y = opposite_lane_global_position.y;
   global_pose.position.z = opposite_lane_global_position.z;
 
-  return hdmap_utils_ptr_->toLaneletPose(global_pose, false);
+  return traffic_simulator::lanelet_wrapper::pose::toLaneletPose(global_pose, false, 1.0);
 }
 
 enum SearchDirection { FORWARD, BACKWARD, INVALID };
