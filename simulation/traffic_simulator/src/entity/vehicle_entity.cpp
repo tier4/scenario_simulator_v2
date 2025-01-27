@@ -133,7 +133,13 @@ auto VehicleEntity::onUpdate(const double current_time, const double step_time) 
   behavior_plugin_ptr_->setOtherEntityStatus(other_status_);
   behavior_plugin_ptr_->setCanonicalizedEntityStatus(status_);
   behavior_plugin_ptr_->setTargetSpeed(target_speed_);
-  auto route_lanelets = getRouteLanelets();
+  const auto route_lanelets = [this]() -> lanelet::Ids {
+    if (const auto canonicalized_lanelet_pose = status_->getCanonicalizedLaneletPose()) {
+      return route_planner_.getRouteLanelets(canonicalized_lanelet_pose.value(), 100.0);
+    } else {
+      return {};
+    }
+  }();
   behavior_plugin_ptr_->setRouteLanelets(route_lanelets);
 
   // recalculate spline only when input data changes
