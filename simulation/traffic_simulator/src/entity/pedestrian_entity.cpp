@@ -252,7 +252,13 @@ auto PedestrianEntity::onUpdate(const double current_time, const double step_tim
   behavior_plugin_ptr_->setOtherEntityStatus(other_status_);
   behavior_plugin_ptr_->setCanonicalizedEntityStatus(status_);
   behavior_plugin_ptr_->setTargetSpeed(target_speed_);
-  behavior_plugin_ptr_->setRouteLanelets(getRouteLanelets());
+  behavior_plugin_ptr_->setRouteLanelets([this]() -> lanelet::Ids {
+    if (const auto canonicalized_lanelet_pose = status_->getCanonicalizedLaneletPose()) {
+      return route_planner_.getRouteLanelets(canonicalized_lanelet_pose.value(), 100.0);
+    } else {
+      return {};
+    }
+  }());
   /// @note CanonicalizedEntityStatus is updated here, it is not skipped even if isAtEndOfLanelets return true
   behavior_plugin_ptr_->update(current_time, step_time);
   if (const auto canonicalized_lanelet_pose = status_->getCanonicalizedLaneletPose()) {
