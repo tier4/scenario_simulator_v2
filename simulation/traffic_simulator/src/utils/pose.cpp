@@ -188,10 +188,10 @@ auto updatePositionForLaneletTransition(
 
   const auto lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose);
 
-  // Determine the displacement in the 2D lanelet coordinate system
+  /// @note Determine the displacement in the 2D lanelet coordinate system
   Eigen::Vector2d displacement;
   if (desired_velocity_is_global) {
-    // Transform desired (global) velocity to local velocity
+    /// @note Transform desired (global) velocity to local velocity
     const auto map_pose = static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose);
     const Eigen::Vector3d global_velocity(
       desired_velocity.x, desired_velocity.y, desired_velocity.z);
@@ -213,7 +213,7 @@ auto updatePositionForLaneletTransition(
   const auto next_lanelet_longitudinal_d = longitudinal_d - remaining_lanelet_length;
   if (longitudinal_d <= remaining_lanelet_length) {
     return std::nullopt;
-  } else if (  // if longitudinal displacement exceeds the current lanelet length, use next lanelet if possible
+  } else if (  /// @note if longitudinal displacement exceeds the current lanelet length, use next lanelet if possible
     next_lanelet_longitudinal_d < lanelet_wrapper::lanelet_map::laneletLength(next_lanelet_id)) {
     LaneletPose result_lanelet_pose;
     result_lanelet_pose.lanelet_id = next_lanelet_id;
@@ -290,8 +290,8 @@ auto relativeLaneletPose(
   constexpr bool include_opposite_direction{true};
 
   LaneletPose position = quietNaNLaneletPose();
-  // here the s and offset are intentionally assigned independently, even if
-  // it is not possible to calculate one of them - it happens that one is sufficient
+  /// @note here the s and offset are intentionally assigned independently, even if
+  /// it is not possible to calculate one of them - it happens that one is sufficient
   if (
     const auto longitudinal_distance = longitudinalDistance(
       from, to, include_adjacent_lanelet, include_opposite_direction, routing_configuration,
@@ -319,8 +319,8 @@ auto boundingBoxRelativeLaneletPose(
   constexpr bool include_opposite_direction{true};
 
   LaneletPose position = quietNaNLaneletPose();
-  // here the s and offset are intentionally assigned independently, even if
-  // it is not possible to calculate one of them - it happens that one is sufficient
+  /// @note here the s and offset are intentionally assigned independently, even if
+  /// it is not possible to calculate one of them - it happens that one is sufficient
   if (
     const auto longitudinal_bounding_box_distance = boundingBoxLaneLongitudinalDistance(
       from, from_bounding_box, to, to_bounding_box, include_adjacent_lanelet,
@@ -386,11 +386,9 @@ auto isAtEndOfLanelets(
 
 namespace pedestrian
 {
-/*
-  This function has been moved from pedestrian_action_node and modified,
-  in case of inconsistency please compare in original:
-  https://github.com/tier4/scenario_simulator_v2/blob/090a8d08bcb065d293a530cf641a953edf311f9f/simulation/behavior_tree_plugin/src/pedestrian/pedestrian_action_node.cpp#L67-L128
-*/
+/// @note This function has been moved from pedestrian_action_node and modified,
+/// in case of inconsistency please compare in original:
+/// https://github.com/tier4/scenario_simulator_v2/blob/090a8d08bcb065d293a530cf641a953edf311f9f/simulation/behavior_tree_plugin/src/pedestrian/pedestrian_action_node.cpp#L67-L128
 auto transformToCanonicalizedLaneletPose(
   const geometry_msgs::msg::Pose & map_pose,
   const traffic_simulator_msgs::msg::BoundingBox & bounding_box,

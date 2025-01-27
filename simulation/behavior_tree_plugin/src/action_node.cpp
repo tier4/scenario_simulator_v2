@@ -254,7 +254,7 @@ auto ActionNode::getFrontEntityName(const math::geometry::CatmullRomSplineInterf
     const auto quat = math::geometry::getRotation(
       canonicalized_entity_status->getMapPose().orientation,
       other_entity_status.at(each.first).getMapPose().orientation);
-    /// @note hard-coded parameter, if the Yaw value of RPY is in ~1.5708 -> 1.5708, entity is a candidate of front entity.
+    /// @note hard-coded parameter, if the Yaw value of RPY is in [-pi/2, pi/2], entity is a candidate of front entity.
     if (
       std::fabs(math::geometry::convertQuaternionToEulerAngle(quat).z) <=
       boost::math::constants::half_pi<double>()) {
@@ -480,15 +480,15 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
       const geometry_msgs::msg::Twist & desired_twist, const double time_step) {
       geometry_msgs::msg::Pose updated_pose;
 
-      // Apply yaw change (delta rotation) in radians: yaw_angular_speed (rad/s) * time_step (s)
+      /// @note Apply yaw change (delta rotation) in radians: yaw_angular_speed (rad/s) * time_step (s)
       geometry_msgs::msg::Vector3 delta_rotation;
       delta_rotation = desired_twist.angular * time_step;
       const auto delta_quaternion = math::geometry::convertEulerAngleToQuaternion(delta_rotation);
       updated_pose.orientation = status->getMapPose().orientation * delta_quaternion;
 
-      // Apply position change
-      // @todo first determine global desired_velocity, calculate position change using it
-      // then pass the same global desired_velocity to updatePositionForLaneletTransition()
+      /// @note Apply position change
+      /// @todo first determine global desired_velocity, calculate position change using it
+      /// then pass the same global desired_velocity to updatePositionForLaneletTransition()
       const Eigen::Matrix3d rotation_matrix =
         math::geometry::getRotationMatrix(updated_pose.orientation);
       const auto translation = Eigen::Vector3d(
@@ -497,7 +497,7 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
       const Eigen::Vector3d delta_position = rotation_matrix * translation;
       updated_pose.position = status->getMapPose().position + delta_position;
 
-      // If it is the transition between lanelets: overwrite position to improve precision
+      /// @note If it is the transition between lanelets: overwrite position to improve precision
       if (const auto canonicalized_lanelet_pose = status->getCanonicalizedLaneletPose()) {
         const auto estimated_next_canonicalized_lanelet_pose =
           traffic_simulator::pose::toCanonicalizedLaneletPose(
@@ -506,7 +506,7 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
           const auto next_lanelet_id = static_cast<traffic_simulator::LaneletPose>(
                                          estimated_next_canonicalized_lanelet_pose.value())
                                          .lanelet_id;
-          if (  // Handle lanelet transition
+          if (  /// @note Handle lanelet transition
             const auto updated_position =
               traffic_simulator::pose::updatePositionForLaneletTransition(
                 canonicalized_lanelet_pose.value(), next_lanelet_id, desired_twist.linear,
