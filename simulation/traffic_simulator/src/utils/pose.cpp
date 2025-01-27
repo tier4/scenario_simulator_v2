@@ -187,12 +187,12 @@ auto updatePositionForLaneletTransition(
   using math::geometry::operator+=;
 
   const auto lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose);
-  const auto map_pose = static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose);
 
   // Determine the displacement in the 2D lanelet coordinate system
   Eigen::Vector2d displacement;
   if (desired_velocity_is_global) {
     // Transform desired (global) velocity to local velocity
+    const auto map_pose = static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose);
     const Eigen::Vector3d global_velocity(
       desired_velocity.x, desired_velocity.y, desired_velocity.z);
     const Eigen::Quaterniond quaternion(
@@ -402,10 +402,8 @@ auto transformToCanonicalizedLaneletPose(
       map_pose, bounding_box, unique_route_lanelets, include_crosswalk, matching_distance)) {
     return canonicalized_lanelet_pose;
   }
-  /**
-   * @note Hard coded parameter. 2.0 is a matching threshold for lanelet.
-   * In this branch, the algorithm only consider entity pose.
-   */
+  /// @note Hard coded parameter. 2.0 is a matching threshold for lanelet.
+  /// In this branch, the algorithm only consider entity pose.
   if (
     const auto lanelet_pose =
       lanelet_wrapper::pose::toLaneletPose(map_pose, include_crosswalk, 2.0)) {

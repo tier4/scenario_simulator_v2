@@ -254,9 +254,7 @@ auto ActionNode::getFrontEntityName(const math::geometry::CatmullRomSplineInterf
     const auto quat = math::geometry::getRotation(
       canonicalized_entity_status->getMapPose().orientation,
       other_entity_status.at(each.first).getMapPose().orientation);
-    /**
-     * @note hard-coded parameter, if the Yaw value of RPY is in ~1.5708 -> 1.5708, entity is a candidate of front entity.
-     */
+    /// @note hard-coded parameter, if the Yaw value of RPY is in ~1.5708 -> 1.5708, entity is a candidate of front entity.
     if (
       std::fabs(math::geometry::convertQuaternionToEulerAngle(quat).z) <=
       boost::math::constants::half_pi<double>()) {
@@ -489,8 +487,8 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
       updated_pose.orientation = status->getMapPose().orientation * delta_quaternion;
 
       // Apply position change
-      /// @todo first determine global desired_velocity, calculate position change using it
-      /// then pass the same global desired_velocity to updatePositionForLaneletTransition()
+      // @todo first determine global desired_velocity, calculate position change using it
+      // then pass the same global desired_velocity to updatePositionForLaneletTransition()
       const Eigen::Matrix3d rotation_matrix =
         math::geometry::getRotationMatrix(updated_pose.orientation);
       const auto translation = Eigen::Vector3d(
