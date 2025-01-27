@@ -46,7 +46,15 @@ private:
     }
     if (auto ego_entity = api_.getEntity("ego")) {
       const auto distance = traffic_simulator::distance::distanceToLaneBound(
-        ego_entity->getMapPose(), ego_entity->getBoundingBox(), ego_entity->getRouteLanelets(),
+        ego_entity->getMapPose(), ego_entity->getBoundingBox(),
+        [&]() {
+          auto ids = lanelet::Ids();
+          for (const auto & point :
+               ego_entity->asFieldOperatorApplication().getPathWithLaneId().points) {
+            std::copy(point.lane_ids.begin(), point.lane_ids.end(), std::back_inserter(ids));
+          }
+          return ids;
+        }(),
         api_.getHdmapUtils());
       // LCOV_EXCL_START
       if (distance <= 0.4 && distance >= 0.52) {
