@@ -132,8 +132,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
       enableAutowareControl();
       is_controlled_by_simulator_ = false;
     }
-  }
-  if (not is_controlled_by_simulator_) {
+  } else {
     updateEntityStatusTimestamp(current_time + step_time);
   }
   updateFieldOperatorApplication();
