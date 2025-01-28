@@ -38,18 +38,18 @@ namespace openscenario_interpreter
 Interpreter::Interpreter(const rclcpp::NodeOptions & options)
 : rclcpp_lifecycle::LifecycleNode("openscenario_interpreter", options),
   publisher_of_context(create_publisher<Context>("context", rclcpp::QoS(1).transient_local())),
-  local_frame_rate(30),
-  local_real_time_factor(1.0),
-  osc_path(""),
-  output_directory("/tmp"),
-  publish_empty_context(false),
-  record(false),
   evaluate_time_publisher(create_publisher<tier4_simulation_msgs::msg::UserDefinedValue>(
     "/simulation/interpreter/execution_time_ms/evaluate", rclcpp::QoS(1).transient_local())),
   update_time_publisher(create_publisher<tier4_simulation_msgs::msg::UserDefinedValue>(
     "/simulation/interpreter/execution_time_ms/update", rclcpp::QoS(1).transient_local())),
   output_time_publisher(create_publisher<tier4_simulation_msgs::msg::UserDefinedValue>(
-    "/simulation/interpreter/execution_time_ms/output", rclcpp::QoS(1).transient_local()))
+    "/simulation/interpreter/execution_time_ms/output", rclcpp::QoS(1).transient_local())),
+  local_frame_rate(30),
+  local_real_time_factor(1.0),
+  osc_path(""),
+  output_directory("/tmp"),
+  publish_empty_context(false),
+  record(false)
 {
   DECLARE_PARAMETER(local_frame_rate);
   DECLARE_PARAMETER(local_real_time_factor);
