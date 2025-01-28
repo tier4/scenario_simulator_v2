@@ -92,7 +92,7 @@ auto EntityBase::getCanonicalizedLaneletPose(const double matching_distance) con
   // prefer the current lanelet
   return pose::toCanonicalizedLaneletPose(
     status_->getMapPose(), status_->getBoundingBox(), status_->getLaneletIds(), include_crosswalk,
-    matching_distance, hdmap_utils_ptr_);
+    matching_distance);
 }
 
 auto EntityBase::isNearbyPosition(
@@ -582,13 +582,12 @@ auto EntityBase::setCanonicalizedStatus(const CanonicalizedEntityStatus & status
 
 auto EntityBase::setStatus(const EntityStatus & status, const lanelet::Ids & lanelet_ids) -> void
 {
-  status_->set(
-    status, lanelet_ids, getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
+  status_->set(status, lanelet_ids, getDefaultMatchingDistanceForLaneletPoseCalculation());
 }
 
 auto EntityBase::setStatus(const EntityStatus & status) -> void
 {
-  status_->set(status, getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
+  status_->set(status, getDefaultMatchingDistanceForLaneletPoseCalculation());
 }
 
 auto EntityBase::setStatus(
@@ -637,7 +636,9 @@ auto EntityBase::setStatus(
   const LaneletPose & lanelet_pose, const traffic_simulator_msgs::msg::ActionStatus & action_status)
   -> void
 {
-  if (const auto canonicalized_lanelet_pose = pose::canonicalize(lanelet_pose, hdmap_utils_ptr_)) {
+  if (const auto canonicalized_lanelet_pose =
+        toCanonicalizedLaneletPose(pose::canonicalize(lanelet_pose));
+      canonicalized_lanelet_pose.has_value()) {
     setStatus(canonicalized_lanelet_pose.value(), action_status);
   } else {
     std::stringstream ss;
@@ -805,8 +806,8 @@ auto EntityBase::requestSynchronize(
           : other_status_.find(target_name)->second.getLaneletPose();
 
       const auto target_entity_distance = longitudinalDistance(
-        CanonicalizedLaneletPose(target_entity_lanelet_pose, hdmap_utils_ptr_), target_sync_pose,
-        true, false, lane_changeable_routing_configuration, hdmap_utils_ptr_);
+        CanonicalizedLaneletPose(target_entity_lanelet_pose), target_sync_pose, true, false,
+        lane_changeable_routing_configuration, hdmap_utils_ptr_);
       if (!target_entity_distance.has_value() || target_entity_distance.value() < 0.0) {
         RCLCPP_WARN_ONCE(
           rclcpp::get_logger("traffic_simulator"),

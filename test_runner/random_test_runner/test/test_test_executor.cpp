@@ -18,6 +18,7 @@
 
 #include <random_test_runner/test_executor.hpp>
 #include <traffic_simulator/api/configuration.hpp>
+#include <traffic_simulator/utils/lanelet_map.hpp>
 
 /// This class is for all entities to keep it simple
 class MockEntity
@@ -98,6 +99,13 @@ auto getTestDescription() -> TestDescription
 class MockTrafficSimulatorAPI
 {
 public:
+  MockTrafficSimulatorAPI()
+  {
+    const std::string path =
+      ament_index_cpp::get_package_share_directory("random_test_runner") + "/map/lanelet2_map.osm";
+    traffic_simulator::lanelet_map::activate(path);
+  }
+
   traffic_simulator::EntityStatus entity_status_;
   std::shared_ptr<::testing::StrictMock<MockFieldOperatorApplication>>
     field_operator_application_mock =
@@ -190,7 +198,6 @@ TEST(TestExecutor, InitializeWithNoNPCs)
     MockAPI, getTestDescription(), JunitXmlReporterTestCase(test_case), 20.0,
     ArchitectureType::AWF_UNIVERSE, rclcpp::get_logger("test_executor_test"));
 
-  EXPECT_CALL(*MockAPI, getHdmapUtilsMock).Times(1).InSequence(sequence);
   EXPECT_CALL(*MockAPI, updateFrame).Times(1).InSequence(sequence);
   EXPECT_CALL(
     *MockAPI, spawn(
