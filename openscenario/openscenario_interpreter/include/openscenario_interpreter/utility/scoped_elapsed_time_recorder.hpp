@@ -24,17 +24,13 @@ class ScopedElapsedTimeRecorder
 public:
   explicit ScopedElapsedTimeRecorder(double & output_seconds) : output_seconds(output_seconds) {}
 
-  ~ScopedElapsedTimeRecorder() { output_seconds = getElapsedSeconds(start); }
-
-  double elapsedSeconds() const { return getElapsedSec(start); }
+  ~ScopedElapsedTimeRecorder()
+  {
+    output_seconds = std::abs(std::chrono::duration<double>(TClock::now() - start).count());
+  }
 
 private:
   std::chrono::time_point<TClock> start = TClock::now();
-
-  double getElapsedSeconds(std::chrono::time_point<TClock> start) const
-  {
-    return std::abs(std::chrono::duration<double>(TClock::now() - start).count());
-  }
 
   double & output_seconds;
 };
