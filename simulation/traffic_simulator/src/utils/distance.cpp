@@ -15,6 +15,7 @@
 #include <geometry/bounding_box.hpp>
 #include <geometry/distance.hpp>
 #include <geometry/transform.hpp>
+#include <traffic_simulator/lanelet_wrapper/pose.hpp>
 #include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 
@@ -97,12 +98,12 @@ auto longitudinalDistance(
      */
     constexpr double matching_distance = 5.0;
 
-    auto from_poses = hdmap_utils_ptr->toLaneletPoses(
+    auto from_poses = lanelet_wrapper::pose::toLaneletPoses(
       static_cast<geometry_msgs::msg::Pose>(from), static_cast<LaneletPose>(from).lanelet_id,
       matching_distance, include_opposite_direction, routing_configuration.routing_graph_type);
     from_poses.emplace_back(from);
 
-    auto to_poses = hdmap_utils_ptr->toLaneletPoses(
+    auto to_poses = lanelet_wrapper::pose::toLaneletPoses(
       static_cast<geometry_msgs::msg::Pose>(to), static_cast<LaneletPose>(to).lanelet_id,
       matching_distance, include_opposite_direction, routing_configuration.routing_graph_type);
     to_poses.emplace_back(to);
@@ -112,9 +113,8 @@ auto longitudinalDistance(
       for (const auto & to_pose : to_poses) {
         if (
           const auto distance = longitudinalDistance(
-            CanonicalizedLaneletPose(from_pose, hdmap_utils_ptr),
-            CanonicalizedLaneletPose(to_pose, hdmap_utils_ptr), false, include_opposite_direction,
-            routing_configuration, hdmap_utils_ptr)) {
+            CanonicalizedLaneletPose(from_pose), CanonicalizedLaneletPose(to_pose), false,
+            include_opposite_direction, routing_configuration, hdmap_utils_ptr)) {
           distances.emplace_back(distance.value());
         }
       }
