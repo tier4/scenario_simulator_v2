@@ -1,0 +1,219 @@
+OpenSCENARIO:
+  FileHeader:
+    author: 'Kotaro Yoshimoto'
+    date: '2025-01-28T18:06:53+09:00'
+    description: 'scenario for execution time test'
+    revMajor: 1
+    revMinor: 3
+  ParameterDeclarations:
+    ParameterDeclaration: []
+  CatalogLocations:
+    VehicleCatalog:
+      Directory:
+        path: $(ros2 pkg prefix --share openscenario_experimental_catalog)/vehicle
+  RoadNetwork:
+    LogicFile:
+      filepath: $(ros2 pkg prefix --share kashiwanoha_map)/map
+  Entities:
+    ScenarioObject:
+      - name: Car1
+        CatalogReference: &SAMPLE_VEHICLE
+          catalogName: sample_vehicle
+          entryName: sample_vehicle
+      - name: Car2
+        CatalogReference: *SAMPLE_VEHICLE
+      - name: Car3
+        CatalogReference: *SAMPLE_VEHICLE
+      - name: Car4
+        CatalogReference: *SAMPLE_VEHICLE
+      - name: Car5
+        CatalogReference: *SAMPLE_VEHICLE
+      - name: Car6
+        CatalogReference: *SAMPLE_VEHICLE
+  Storyboard:
+    Init:
+      Actions:
+        Private:
+          - entityRef: Car1
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: 34513
+                      s: 0
+                      offset: 0
+                      Orientation: &DEFAULT_ORIENTATION
+                        type: relative
+                        h: 0
+                        p: 0
+                        r: 0
+          - entityRef: Car2
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: 34513
+                      s: 5
+                      offset: 0
+                      Orientation: *DEFAULT_ORIENTATION
+          - entityRef: Car3
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: 34513
+                      s: 10
+                      offset: 0
+                      Orientation: *DEFAULT_ORIENTATION
+          - entityRef: Car4
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: 34513
+                      s: 15
+                      offset: 0
+                      Orientation: *DEFAULT_ORIENTATION
+          - entityRef: Car5
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: 34513
+                      s: 20
+                      offset: 0
+                      Orientation: *DEFAULT_ORIENTATION
+          - entityRef: Car6
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: 34513
+                      s: 25
+                      offset: 0
+                      Orientation: *DEFAULT_ORIENTATION
+    Story:
+      - name: ''
+        Act:
+          - name: _EndCondition
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ''
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef:
+                    - entityRef: Car1
+                Maneuver:
+                  - name: ''
+                    Event:
+                      - name: ''
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: Car1
+                                    EntityCondition:
+                                      ReachPositionCondition:
+                                        Position:
+                                          LanePosition:
+                                            roadId: ''
+                                            laneId: '34513'
+                                            s: 40
+                                            offset: 0
+                                            Orientation: *DEFAULT_ORIENTATION
+                                        tolerance: 0.5
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitSuccess
+                      - name: ''
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 60
+                                      rule: greaterThan
+                            - Condition:
+                                - name: 'evaluate time checker'
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    UserDefinedValueCondition:
+                                      name: /simulation/interpreter/execution_time_ms/evaluate
+                                      rule: greaterThan
+                                      value: 1
+                                - name: 'avoid startup'
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 1
+                                      rule: greaterThan
+                            - Condition:
+                                - name: 'update time checker'
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    UserDefinedValueCondition:
+                                      name: /simulation/interpreter/execution_time_ms/update
+                                      rule: greaterThan
+                                      value: 1
+                                - name: 'avoid startup'
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 1
+                                      rule: greaterThan
+                            - Condition:
+                                - name: 'output time checker'
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    UserDefinedValueCondition:
+                                      name: /simulation/interpreter/execution_time_ms/output
+                                      rule: greaterThan
+                                      value: 1
+                                - name: 'avoid startup'
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 1
+                                      rule: greaterThan
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitFailure
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ''
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
+    StopTrigger:
+      ConditionGroup: []
