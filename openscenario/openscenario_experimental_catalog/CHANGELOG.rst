@@ -21,6 +21,9 @@ Changelog for package openscenario_experimental_catalog
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+8.0.1 (2025-01-28)
+------------------
+
 8.0.0 (2025-01-24)
 ------------------
 * Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose

@@ -33,7 +33,7 @@ This guide provides step-by-step instructions for building and running **Scenari
       ./setup-dev-env.sh
       ```
 !!! note
-    This step will install necessary dependencies, including ROS 2, if not already installed. <br> Make sure to confirm and agree with the licenses for NVIDIA libraries like [CUDA](https://docs.nvidia.com/cuda/eula/index.html), [cuDNN](https://docs.nvidia.com/deeplearning/cudnn/latest/reference/eula.html), and [TensorRT](https://docs.nvidia.com/deeplearning/tensorrt/sla/index.html).
+    This step will install necessary dependencies, including ROS 2, if not already installed. <br> Make sure to confirm and agree with the licenses for NVIDIA libraries like [CUDA](https://docs.nvidia.com/cuda/eula/index.html), cuDNN, and [TensorRT](https://docs.nvidia.com/deeplearning/tensorrt/sla/index.html).
 
    5. Install dependent ROS packages.
       ```bash
