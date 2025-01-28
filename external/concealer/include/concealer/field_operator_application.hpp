@@ -21,6 +21,12 @@
 #include <autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>
 #endif
 
+#if __has_include(<autoware_internal_planning_msgs/msg/path_with_lane_id.hpp>)
+#include <autoware_internal_planning_msgs/msg/path_with_lane_id.hpp>
+#else
+#include <tier4_planning_msgs/msg/path_with_lane_id.hpp>
+#endif
+
 #include <autoware_adapi_v1_msgs/msg/mrm_state.hpp>
 #include <autoware_adapi_v1_msgs/srv/change_operation_mode.hpp>
 #include <autoware_adapi_v1_msgs/srv/clear_route.hpp>
@@ -44,7 +50,6 @@
 #include <tier4_external_api_msgs/msg/emergency.hpp>
 #include <tier4_external_api_msgs/srv/engage.hpp>
 #include <tier4_external_api_msgs/srv/set_velocity_limit.hpp>
-#include <tier4_planning_msgs/msg/path_with_lane_id.hpp>
 #include <tier4_planning_msgs/msg/trajectory.hpp>
 #include <tier4_rtc_msgs/msg/cooperate_status_array.hpp>
 #include <tier4_rtc_msgs/srv/auto_mode_with_module.hpp>
@@ -78,7 +83,11 @@ struct FieldOperatorApplication : public rclcpp::Node,
   using Emergency                       = tier4_external_api_msgs::msg::Emergency;
   using LocalizationInitializationState = autoware_adapi_v1_msgs::msg::LocalizationInitializationState;
   using MrmState                        = autoware_adapi_v1_msgs::msg::MrmState;
+#if __has_include(<autoware_internal_planning_msgs/msg/path_with_lane_id.hpp>)
+  using PathWithLaneId                  = autoware_internal_planning_msgs::msg::PathWithLaneId;
+#else
   using PathWithLaneId                  = tier4_planning_msgs::msg::PathWithLaneId;
+#endif
   using Trajectory                      = tier4_planning_msgs::msg::Trajectory;
   using TurnIndicatorsCommand           = autoware_vehicle_msgs::msg::TurnIndicatorsCommand;
 

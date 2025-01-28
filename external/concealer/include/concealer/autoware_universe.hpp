@@ -15,6 +15,12 @@
 #ifndef CONCEALER__AUTOWARE_UNIVERSE_HPP_
 #define CONCEALER__AUTOWARE_UNIVERSE_HPP_
 
+#if __has_include(<autoware_internal_planning_msgs/msg/path_with_lane_id.hpp>)
+#include <autoware_internal_planning_msgs/msg/path_with_lane_id.hpp>
+#else
+#include <tier4_planning_msgs/msg/path_with_lane_id.hpp>
+#endif
+
 #include <atomic>
 #include <autoware_control_msgs/msg/control.hpp>
 #include <autoware_vehicle_msgs/msg/control_mode_report.hpp>
@@ -34,7 +40,6 @@
 #include <geometry_msgs/msg/twist_stamped.hpp>
 #include <nav_msgs/msg/odometry.hpp>
 #include <rclcpp/rclcpp.hpp>
-#include <tier4_planning_msgs/msg/path_with_lane_id.hpp>
 
 namespace concealer
 {
@@ -50,7 +55,11 @@ public:
   using GearCommand                 = autoware_vehicle_msgs::msg::GearCommand;
   using GearReport                  = autoware_vehicle_msgs::msg::GearReport;
   using Odometry                    = nav_msgs::msg::Odometry;
+#if __has_include(<autoware_internal_planning_msgs/msg/path_with_lane_id.hpp>)
+  using PathWithLaneId              = autoware_internal_planning_msgs::msg::PathWithLaneId;
+#else
   using PathWithLaneId              = tier4_planning_msgs::msg::PathWithLaneId;
+#endif
   using PoseWithCovarianceStamped   = geometry_msgs::msg::PoseWithCovarianceStamped;
   using SteeringReport              = autoware_vehicle_msgs::msg::SteeringReport;
   using TurnIndicatorsCommand       = autoware_vehicle_msgs::msg::TurnIndicatorsCommand;
