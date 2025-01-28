@@ -24,6 +24,7 @@
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <openscenario_interpreter/syntax/speed_condition.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
+#include <openscenario_interpreter/utility/scoped_elapsed_time_recorder.hpp>
 #include <status_monitor/status_monitor.hpp>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
 
@@ -186,23 +187,31 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
       },
       [this]() {
         withTimeoutHandler(defaultTimeoutHandler(), [this]() {
-          if (std::isnan(evaluateSimulationTime())) {
-            if (not waiting_for_engagement_to_be_completed and engageable()) {
-              engage();
-              waiting_for_engagement_to_be_completed = true;  // NOTE: DIRTY HACK!!!
-            } else if (engaged()) {
-              activateNonUserDefinedControllers();
-              waiting_for_engagement_to_be_completed = false;  // NOTE: DIRTY HACK!!!
+          double evaluate_time, update_time, context_time;
+          {
+            ScopedElapsedTimeRecorder evaluate_time_recorder(evaluate_time);
+            if (std::isnan(evaluateSimulationTime())) {
+              if (not waiting_for_engagement_to_be_completed and engageable()) {
+                engage();
+                waiting_for_engagement_to_be_completed = true;  // NOTE: DIRTY HACK!!!
+              } else if (engaged()) {
+                activateNonUserDefinedControllers();
+                waiting_for_engagement_to_be_completed = false;  // NOTE: DIRTY HACK!!!
+              }
+            } else if (currentScenarioDefinition()) {
+              currentScenarioDefinition()->evaluate();
+            } else {
+              throw Error("No script evaluable.");
             }
-          } else if (currentScenarioDefinition()) {
-            currentScenarioDefinition()->evaluate();
-          } else {
-            throw Error("No script evaluable.");
           }
-
-          SimulatorCore::update();
-
-          publishCurrentContext();
+          {
+            ScopedElapsedTimeRecorder update_time_recorder(update_time);
+            SimulatorCore::update();
+          }
+          {
+            ScopedElapsedTimeRecorder context_time_recorder(context_time);
+            publishCurrentContext();
+          }
         });
       });
   };
