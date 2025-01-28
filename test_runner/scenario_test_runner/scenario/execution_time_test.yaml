@@ -38,7 +38,7 @@ OpenSCENARIO:
             PrivateAction:
               - TeleportAction:
                   Position:
-                    LanePosition:
+                    LanePosition: &DEFAULT_LANE_POSITION
                       roadId: ''
                       laneId: 34513
                       s: 0
@@ -53,51 +53,36 @@ OpenSCENARIO:
               - TeleportAction:
                   Position:
                     LanePosition:
-                      roadId: ''
-                      laneId: 34513
+                      <<: *DEFAULT_LANE_POSITION
                       s: 5
-                      offset: 0
-                      Orientation: *DEFAULT_ORIENTATION
           - entityRef: Car3
             PrivateAction:
               - TeleportAction:
                   Position:
                     LanePosition:
-                      roadId: ''
-                      laneId: 34513
+                      <<: *DEFAULT_LANE_POSITION
                       s: 10
-                      offset: 0
-                      Orientation: *DEFAULT_ORIENTATION
           - entityRef: Car4
             PrivateAction:
               - TeleportAction:
                   Position:
                     LanePosition:
-                      roadId: ''
-                      laneId: 34513
+                      <<: *DEFAULT_LANE_POSITION
                       s: 15
-                      offset: 0
-                      Orientation: *DEFAULT_ORIENTATION
           - entityRef: Car5
             PrivateAction:
               - TeleportAction:
                   Position:
                     LanePosition:
-                      roadId: ''
-                      laneId: 34513
+                      <<: *DEFAULT_LANE_POSITION
                       s: 20
-                      offset: 0
-                      Orientation: *DEFAULT_ORIENTATION
           - entityRef: Car6
             PrivateAction:
               - TeleportAction:
                   Position:
                     LanePosition:
-                      roadId: ''
-                      laneId: 34513
+                      <<: *DEFAULT_LANE_POSITION
                       s: 25
-                      offset: 0
-                      Orientation: *DEFAULT_ORIENTATION
     Story:
       - name: ''
         Act:
@@ -129,11 +114,8 @@ OpenSCENARIO:
                                       ReachPositionCondition:
                                         Position:
                                           LanePosition:
-                                            roadId: ''
-                                            laneId: '34513'
+                                            <<: *DEFAULT_LANE_POSITION
                                             s: 40
-                                            offset: 0
-                                            Orientation: *DEFAULT_ORIENTATION
                                         tolerance: 0.5
                         Action:
                           - name: ''
