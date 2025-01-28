@@ -27,7 +27,7 @@ struct Subscriber
 
   typename rclcpp::Subscription<Message>::SharedPtr subscription;
 
-  auto operator()() const -> const auto & { return *std::atomic_load(&current_value); }
+  auto operator()() const -> Message { return *std::atomic_load(&current_value); }
 
   template <typename Autoware, typename Callback>
   explicit Subscriber(
@@ -37,7 +37,7 @@ struct Subscriber
       topic, quality_of_service,
       [this, callback](const typename Message::ConstSharedPtr & message) {
         if (std::atomic_store(&current_value, message); current_value) {
-          callback(*std::atomic_load(&current_value));
+          callback((*this)());
         }
       }))
   {
