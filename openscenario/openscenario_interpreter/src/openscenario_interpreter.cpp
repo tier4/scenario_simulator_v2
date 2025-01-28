@@ -264,6 +264,9 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
         execution_timer.clear();
 
         publisher_of_context->on_activate();
+        evaluate_time_publisher->on_activate();
+        update_time_publisher->on_activate();
+        output_time_publisher->on_activate();
 
         assert(publisher_of_context->is_activated());
 
@@ -334,6 +337,15 @@ auto Interpreter::reset() -> void
 
   if (publisher_of_context->is_activated()) {
     publisher_of_context->on_deactivate();
+  }
+  if (evaluate_time_publisher->is_activated()) {
+    evaluate_time_publisher->on_deactivate();
+  }
+  if (update_time_publisher->is_activated()) {
+    update_time_publisher->on_deactivate();
+  }
+  if (output_time_publisher->is_activated()) {
+    output_time_publisher->on_deactivate();
   }
 
   if (not has_parameter("initialize_duration")) {
