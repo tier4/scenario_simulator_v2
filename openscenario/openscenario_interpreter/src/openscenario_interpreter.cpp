@@ -221,11 +221,11 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 
           tier4_simulation_msgs::msg::UserDefinedValue msg;
           msg.type.data = tier4_simulation_msgs::msg::UserDefinedValueType::DOUBLE;
-          msg.value = std::to_string(evaluate_time * 1e6);
+          msg.value = std::to_string(evaluate_time * 1e3);
           evaluate_time_publisher->publish(msg);
-          msg.value = std::to_string(update_time * 1e6);
+          msg.value = std::to_string(update_time * 1e3);
           update_time_publisher->publish(msg);
-          msg.value = std::to_string(context_time * 1e6);
+          msg.value = std::to_string(context_time * 1e3);
           output_time_publisher->publish(msg);
         });
       });
