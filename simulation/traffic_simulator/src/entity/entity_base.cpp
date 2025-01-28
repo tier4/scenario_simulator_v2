@@ -636,8 +636,7 @@ auto EntityBase::setStatus(
   const LaneletPose & lanelet_pose, const traffic_simulator_msgs::msg::ActionStatus & action_status)
   -> void
 {
-  if (const auto canonicalized_lanelet_pose =
-        toCanonicalizedLaneletPose(pose::canonicalize(lanelet_pose));
+  if (const auto canonicalized_lanelet_pose = toCanonicalizedLaneletPose(lanelet_pose);
       canonicalized_lanelet_pose.has_value()) {
     setStatus(canonicalized_lanelet_pose.value(), action_status);
   } else {
