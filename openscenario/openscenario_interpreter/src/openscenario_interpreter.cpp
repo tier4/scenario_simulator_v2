@@ -43,7 +43,13 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   osc_path(""),
   output_directory("/tmp"),
   publish_empty_context(false),
-  record(false)
+  record(false),
+  evaluate_time_publisher(create_publisher<tier4_simulation_msgs::msg::UserDefinedValue>(
+    "/simulation/interpreter/execution_time_ms/evaluate", rclcpp::QoS(1).transient_local())),
+  update_time_publisher(create_publisher<tier4_simulation_msgs::msg::UserDefinedValue>(
+    "/simulation/interpreter/execution_time_ms/update", rclcpp::QoS(1).transient_local())),
+  output_time_publisher(create_publisher<tier4_simulation_msgs::msg::UserDefinedValue>(
+    "/simulation/interpreter/execution_time_ms/output", rclcpp::QoS(1).transient_local()))
 {
   DECLARE_PARAMETER(local_frame_rate);
   DECLARE_PARAMETER(local_real_time_factor);
@@ -212,6 +218,15 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
             ScopedElapsedTimeRecorder context_time_recorder(context_time);
             publishCurrentContext();
           }
+
+          tier4_simulation_msgs::msg::UserDefinedValue msg;
+          msg.type.data = tier4_simulation_msgs::msg::UserDefinedValueType::DOUBLE;
+          msg.value = std::to_string(evaluate_time * 1e6);
+          evaluate_time_publisher->publish(msg);
+          msg.value = std::to_string(update_time * 1e6);
+          update_time_publisher->publish(msg);
+          msg.value = std::to_string(context_time * 1e6);
+          output_time_publisher->publish(msg);
         });
       });
   };
