@@ -128,6 +128,18 @@ auto centerPoints(const lanelet::Ids & lanelet_ids) -> std::vector<Point>
       const auto & points = centerPoints(lanelet_id);
       center_points.insert(center_points.end(), points.begin(), points.end());
     }
+    std::sort(
+      center_points.begin(), center_points.end(), [](const Point & lhs, const Point & rhs) -> bool {
+        if (lhs.x < rhs.x) {
+          return true;
+        } else if (lhs.x == rhs.x && lhs.y < rhs.y) {
+          return true;
+        } else if (lhs.x == rhs.x && lhs.y == rhs.y && lhs.z < rhs.z) {
+          return true;
+        } else {
+          return false;
+        }
+      });
     center_points.erase(
       std::unique(center_points.begin(), center_points.end()), center_points.end());
     return center_points;
