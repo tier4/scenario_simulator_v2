@@ -358,7 +358,7 @@ auto transformToRoutableCanonicalizedLaneletPose(
              nearby_lanelet_ids.has_value()) {
     std::vector<std::pair<CanonicalizedLaneletPose, lanelet::Ids>> routes;
     for (const auto & [distance, lanelet_id] : nearby_lanelet_ids.value()) {
-      if (const auto route =
+      if (auto route =
             hdmap_utils_ptr->getRoute(from_lanelet_id, lanelet_id, routing_configuration);
           lanelet_id == to_lanelet_id || route.empty()) {
         continue;
@@ -367,9 +367,9 @@ auto transformToRoutableCanonicalizedLaneletPose(
                    search_distance);
                  !lanelet_pose) {
         continue;
-      } else if (const auto canonicalized = toCanonicalizedLaneletPose(lanelet_pose.value());
+      } else if (auto canonicalized = toCanonicalizedLaneletPose(lanelet_pose.value());
                  canonicalized) {
-        routes.emplace_back(canonicalized.value(), route);
+        routes.emplace_back(std::move(canonicalized.value()), std::move(route));
       }
     }
     if (!routes.empty()) {

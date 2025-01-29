@@ -334,12 +334,12 @@ auto ActionNode::getDistanceToTargetEntity(
   constexpr bool search_backward{false};
 
   const auto & target_bounding_box = status.getBoundingBox();
-  const auto & target_lanelet_pose =
-    traffic_simulator::pose::transformToRoutableCanonicalizedLaneletPose(
-      canonicalized_entity_status->getLaneletId(), status.getCanonicalizedLaneletPose().value(),
-      target_bounding_box, hdmap_utils);
 
-  if (target_lanelet_pose) {
+  if (const auto & target_lanelet_pose =
+        traffic_simulator::pose::transformToRoutableCanonicalizedLaneletPose(
+          canonicalized_entity_status->getLaneletId(), status.getCanonicalizedLaneletPose().value(),
+          target_bounding_box, hdmap_utils);
+      target_lanelet_pose) {
     const auto & from_lanelet_pose = canonicalized_entity_status->getCanonicalizedLaneletPose();
     const auto & from_bounding_box = canonicalized_entity_status->getBoundingBox();
     if (const auto bounding_box_distance =

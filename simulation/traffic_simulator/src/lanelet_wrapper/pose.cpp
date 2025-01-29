@@ -443,7 +443,7 @@ auto findMatchingLanes(
     matches =
       lanelet::matching::removeNonRuleCompliantMatches(matches, LaneletWrapper::trafficRules(type));
   }
-  if (not matches.empty()) {
+  if (!matches.empty()) {
     std::set<std::pair<double, lanelet::Id>> distances_with_ids;
     for (const auto & match : matches) {
       if (
@@ -451,7 +451,7 @@ auto findMatchingLanes(
         distances_with_ids.emplace(lanelet_pose->offset, lanelet_pose->lanelet_id);
       }
     }
-    if (not distances_with_ids.empty()) {
+    if (!distances_with_ids.empty()) {
       return distances_with_ids;
     }
   }
