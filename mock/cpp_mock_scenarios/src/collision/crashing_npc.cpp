@@ -52,9 +52,7 @@ private:
   void onInitialize() override
   {
     auto ego_entity = api_.spawn(
-      "ego",
-      traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34741, 0.0, 0.0, api_.getHdmapUtils()),
+      "ego", traffic_simulator::helper::constructCanonicalizedLaneletPose(34741, 0.0, 0.0),
       getVehicleParameters());
     ego_entity->setLinearVelocity(0.0);
     ego_entity->requestSpeedChange(15, true);
@@ -63,9 +61,7 @@ private:
     ego_entity->setBehaviorParameter(behavior_parameter);
 
     auto npc_entity = api_.spawn(
-      "npc",
-      traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34741, 10.0, 0.0, api_.getHdmapUtils()),
+      "npc", traffic_simulator::helper::constructCanonicalizedLaneletPose(34741, 10.0, 0.0),
       getVehicleParameters());
     npc_entity->setLinearVelocity(0.0);
     npc_entity->requestSpeedChange(5, true);
