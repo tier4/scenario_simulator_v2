@@ -49,7 +49,6 @@
   <depend>visualization_msgs</depend>
   <depend>geographic_msgs</depend>
   <depend>traffic_simulator</depend>
-  <depend>autoware_motion_utils</depend>
 
 
   <test_depend>ament_lint_auto</test_depend>
