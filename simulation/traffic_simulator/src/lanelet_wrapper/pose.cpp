@@ -414,8 +414,7 @@ auto findMatchingLanes(
   const traffic_simulator::RoutingGraphType type)
   -> std::optional<std::set<std::pair<double, lanelet::Id>>>
 {
-  const auto absoluteHullPolygon = [&reduction_ratio,
-                                    &bounding_box](const auto & pose) -> lanelet::BasicPolygon2d {
+  const auto absoluteHullPolygon = [&reduction_ratio, &bounding_box](const auto & pose) {
     auto relative_hull = lanelet::matching::Hull2d{
       lanelet::BasicPoint2d{
         bounding_box.center.x + bounding_box.dimensions.x * 0.5 * reduction_ratio,

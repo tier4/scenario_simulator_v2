@@ -348,8 +348,8 @@ auto transformToRoutableCanonicalizedLaneletPose(
 
   /// @note if there is already a route from_lanelet_id->to_lanelet_id, return it
   /// if not, transform the 'to_lanelet_id' position into the nearby lanelets and search for a route in relation to them
-  const auto to_lanelet_id = to_canonicalized_lanelet_pose.getLaneletPose().lanelet_id;
-  if (!hdmap_utils_ptr->getRoute(from_lanelet_id, to_lanelet_id, routing_configuration).empty()) {
+  if (const auto to_lanelet_id = to_canonicalized_lanelet_pose.getLaneletPose().lanelet_id;
+      !hdmap_utils_ptr->getRoute(from_lanelet_id, to_lanelet_id, routing_configuration).empty()) {
     return to_canonicalized_lanelet_pose;
   } else if (const auto nearby_lanelet_ids = lanelet_wrapper::pose::findMatchingLanes(
                static_cast<geometry_msgs::msg::Pose>(to_canonicalized_lanelet_pose),
@@ -369,7 +369,7 @@ auto transformToRoutableCanonicalizedLaneletPose(
         continue;
       } else if (const auto canonicalized = toCanonicalizedLaneletPose(lanelet_pose.value());
                  canonicalized) {
-        routes.emplace_back(std::move(canonicalized.value()), std::move(route));
+        routes.emplace_back(canonicalized.value(), route);
       }
     }
     if (!routes.empty()) {

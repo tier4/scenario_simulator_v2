@@ -324,7 +324,7 @@ auto distanceToSpline(
   const auto bounding_box_diagonal_length =
     math::geometry::getDistance(bounding_box_map_points[0], bounding_box_map_points[2]);
 
-  /// @todo it may be a good idea to develop spline.getSquaredDistanceIn2D(point, s_start, s_end);
+  /// @note it may be a good idea to develop spline.getSquaredDistanceIn2D(point, s_start, s_end);
   std::vector<double> distances;
   for (const auto & point : bounding_box_map_points) {
     auto s_start = s_reference - bounding_box_diagonal_length / 2;
