@@ -25,9 +25,8 @@ auto trafficLightStopLinesPoints(const lanelet::Id traffic_light_id)
 {
   std::vector<std::vector<Point>> stop_lines;
   for (const auto & traffic_light : toAutowareTrafficLights(traffic_light_id)) {
-    stop_lines.emplace_back(std::vector<Point>{});
+    auto & current_stop_line = stop_lines.emplace_back();
     if (const auto & lanelet_stop_line = traffic_light->stopLine()) {
-      auto & current_stop_line = stop_lines.back();
       for (const auto & point : lanelet_stop_line.value()) {
         current_stop_line.push_back(
           geometry_msgs::build<Point>().x(point.x()).y(point.y()).z(point.z()));
@@ -43,7 +42,7 @@ auto trafficLightIdsOnPath(const lanelet::Ids & route_lanelets) -> lanelet::Ids
   for (const auto & autoware_traffic_lights : autowareTrafficLightsOnPath(route_lanelets)) {
     for (const auto & three_light_bulbs : autoware_traffic_lights->lightBulbs()) {
       if (three_light_bulbs.hasAttribute("traffic_light_id")) {
-        if (const auto traffic_light_id = three_light_bulbs.attribute("traffic_light_id").asId();
+        if (const auto & traffic_light_id = three_light_bulbs.attribute("traffic_light_id").asId();
             traffic_light_id) {
           traffic_light_ids.push_back(traffic_light_id.value());
         }
@@ -56,7 +55,8 @@ auto trafficLightIdsOnPath(const lanelet::Ids & route_lanelets) -> lanelet::Ids
 auto toAutowareTrafficLights(const lanelet::Id traffic_light_id)
   -> std::vector<lanelet::AutowareTrafficLightConstPtr>
 {
-  auto areBulbsAssignedToTrafficLight = [&traffic_light_id](auto red_yellow_green_bulbs) -> bool {
+  auto areBulbsAssignedToTrafficLight =
+    [&traffic_light_id](const auto & red_yellow_green_bulbs) -> bool {
     return red_yellow_green_bulbs.hasAttribute("traffic_light_id") and
            red_yellow_green_bulbs.attribute("traffic_light_id").asId() and
            red_yellow_green_bulbs.attribute("traffic_light_id").asId().value() == traffic_light_id;
@@ -66,10 +66,9 @@ auto toAutowareTrafficLights(const lanelet::Id traffic_light_id)
   const auto & all_lanelets = lanelet::utils::query::laneletLayer(LaneletWrapper::map());
   for (const auto & autoware_traffic_light :
        lanelet::utils::query::autowareTrafficLights(all_lanelets)) {
-    for (auto three_light_bulbs : autoware_traffic_light->lightBulbs()) {
-      if (areBulbsAssignedToTrafficLight(three_light_bulbs)) {
-        autoware_traffic_lights.push_back(autoware_traffic_light);
-      }
+    if (const auto & light_bulbs = autoware_traffic_light->lightBulbs();
+        std::any_of(light_bulbs.cbegin(), light_bulbs.cend(), areBulbsAssignedToTrafficLight)) {
+      autoware_traffic_lights.push_back(autoware_traffic_light);
     }
   }
 
