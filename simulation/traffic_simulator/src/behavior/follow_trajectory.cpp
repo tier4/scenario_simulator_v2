@@ -580,8 +580,7 @@ auto makeUpdatedStatus(
       const auto canonicalized_lanelet_pose =
         traffic_simulator::pose::toCanonicalizedLaneletPose(entity_status.lanelet_pose);
       const auto estimated_next_canonicalized_lanelet_pose =
-        traffic_simulator::pose::toCanonicalizedLaneletPose(
-          updated_status.pose, entity_status.bounding_box, include_crosswalk, matching_distance);
+        traffic_simulator::pose::toCanonicalizedLaneletPose(updated_status.pose, include_crosswalk);
       if (canonicalized_lanelet_pose && estimated_next_canonicalized_lanelet_pose) {
         const auto next_lanelet_id =
           static_cast<LaneletPose>(estimated_next_canonicalized_lanelet_pose.value()).lanelet_id;
