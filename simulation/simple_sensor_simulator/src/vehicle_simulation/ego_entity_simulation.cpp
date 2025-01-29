@@ -20,6 +20,7 @@
 #include <geometry/quaternion/quaternion_to_euler.hpp>
 #include <simple_sensor_simulator/vehicle_simulation/ego_entity_simulation.hpp>
 #include <traffic_simulator/helper/helper.hpp>
+#include <traffic_simulator/lanelet_wrapper/pose.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 
 namespace vehicle_simulation
@@ -366,9 +367,12 @@ auto EgoEntitySimulation::calculateAccelerationBySlope() const -> double
 {
   if (consider_acceleration_by_road_slope_ && status_.laneMatchingSucceed()) {
     constexpr double gravity_acceleration = -9.81;
+    /// @todo why there is a need to recalculate orientation using getLaneletPose?
+    /// status_.getMapPose().orientation already contains the orientation
     const double ego_pitch_angle =
       math::geometry::convertQuaternionToEulerAngle(
-        hdmap_utils_ptr_->toMapPose(status_.getLaneletPose(), true).pose.orientation)
+        traffic_simulator::lanelet_wrapper::pose::toMapPose(status_.getLaneletPose(), true)
+          .pose.orientation)
         .y;
     return -std::sin(ego_pitch_angle) * gravity_acceleration;
   } else {
@@ -453,8 +457,7 @@ auto EgoEntitySimulation::setStatus(const traffic_simulator_msgs::msg::EntitySta
   /// value from EntityStatus, therefore canonicalization has to be done in advance,
   /// not inside CanonicalizedEntityStatus
   const auto canonicalized_lanelet_pose = traffic_simulator::pose::toCanonicalizedLaneletPose(
-    status.pose, status.bounding_box, unique_route_lanelets, false, matching_distance,
-    hdmap_utils_ptr_);
+    status.pose, status.bounding_box, unique_route_lanelets, false, matching_distance);
   status_.set(traffic_simulator::CanonicalizedEntityStatus(status, canonicalized_lanelet_pose));
   setAutowareStatus();
 }
