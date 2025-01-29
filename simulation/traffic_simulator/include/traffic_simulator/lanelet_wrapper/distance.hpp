@@ -47,7 +47,7 @@ auto distanceToStopLine(
 auto distanceToStopLine(const std::vector<Point> & route_waypoints, const lanelet::Id stop_line_id)
   -> std::optional<double>;
 
-// TrafficLigthStopLine
+// TrafficLightStopLine
 auto distanceToTrafficLightStopLine(
   const SplineInterface & route_spline, const lanelet::Id traffic_light_id)
   -> std::optional<double>;
