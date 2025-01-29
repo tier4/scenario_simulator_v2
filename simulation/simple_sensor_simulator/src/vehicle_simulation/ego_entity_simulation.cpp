@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <autoware/motion_utils/trajectory/trajectory.hpp>
 #include <concealer/autoware_universe.hpp>
 #include <filesystem>
 #include <geometry/quaternion/euler_to_quaternion.hpp>
@@ -348,17 +349,58 @@ auto EgoEntitySimulation::calculateAccelerationBySlope() const -> double
 {
   if (consider_acceleration_by_road_slope_ && status_.laneMatchingSucceed()) {
     constexpr double gravity_acceleration = -9.81;
-    /// @todo why there is a need to recalculate orientation using getLaneletPose?
-    /// status_.getMapPose().orientation already contains the orientation
-    const double ego_pitch_angle =
-      math::geometry::convertQuaternionToEulerAngle(
-        traffic_simulator::lanelet_wrapper::pose::toMapPose(status_.getLaneletPose(), true)
-          .pose.orientation)
-        .y;
-    return -std::sin(ego_pitch_angle) * gravity_acceleration;
+    return -std::sin(calculate_ego_pitch()) * gravity_acceleration;
   } else {
     return 0.0;
   }
+}
+
+std::vector<geometry_msgs::msg::Point> convert_centerline_to_points(
+  const lanelet::Lanelet & lanelet)
+{
+  std::vector<geometry_msgs::msg::Point> centerline_points;
+  for (const auto & point : lanelet.centerline()) {
+    geometry_msgs::msg::Point center_point;
+    center_point.x = point.basicPoint().x();
+    center_point.y = point.basicPoint().y();
+    center_point.z = point.basicPoint().z();
+    centerline_points.push_back(center_point);
+  }
+  return centerline_points;
+}
+
+double EgoEntitySimulation::calculate_ego_pitch() const
+{
+  // calculate prev/next point of lanelet centerline nearest to ego pose.
+  if (const auto lanelets = hdmap_utils_ptr_->getLanelets({status_.getLaneletPose().lanelet_id});
+      !lanelets.empty()) {
+    lanelet::Lanelet ego_lanelet = lanelets.at(0);
+    geometry_msgs::msg::Pose ego_pose = status_.getMapPose();
+    const auto ego_euler_angle =
+      math::geometry::convertQuaternionToEulerAngle(ego_pose.orientation);
+
+    const auto centerline_points = convert_centerline_to_points(ego_lanelet);
+    const size_t ego_seg_idx =
+      autoware::motion_utils::findNearestSegmentIndex(centerline_points, ego_pose.position);
+
+    const auto & prev_point = centerline_points.at(ego_seg_idx);
+    const auto & next_point = centerline_points.at(ego_seg_idx + 1);
+
+    // calculate ego yaw angle on lanelet coordinates
+    const double lanelet_yaw = std::atan2(next_point.y - prev_point.y, next_point.x - prev_point.x);
+    const double ego_yaw_against_lanelet = ego_euler_angle.z - lanelet_yaw;
+
+    // calculate ego pitch angle considering ego yaw.
+    const double diff_z = next_point.z - prev_point.z;
+    const double diff_xy = std::hypot(next_point.x - prev_point.x, next_point.y - prev_point.y) /
+                           std::cos(ego_yaw_against_lanelet);
+    const bool reverse_sign = std::cos(ego_yaw_against_lanelet) < 0.0;
+    const double ego_pitch_angle =
+      reverse_sign ? -std::atan2(-diff_z, -diff_xy) : -std::atan2(diff_z, diff_xy);
+
+    return ego_pitch_angle;
+  }
+  return 0.0;
 }
 
 auto EgoEntitySimulation::getCurrentTwist() const -> geometry_msgs::msg::Twist
