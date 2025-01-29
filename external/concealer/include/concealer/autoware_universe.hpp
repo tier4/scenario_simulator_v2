@@ -15,12 +15,6 @@
 #ifndef CONCEALER__AUTOWARE_UNIVERSE_HPP_
 #define CONCEALER__AUTOWARE_UNIVERSE_HPP_
 
-#if __has_include(<autoware_internal_planning_msgs/msg/path_with_lane_id.hpp>)
-#include <autoware_internal_planning_msgs/msg/path_with_lane_id.hpp>
-#else
-#include <tier4_planning_msgs/msg/path_with_lane_id.hpp>
-#endif
-
 #include <atomic>
 #include <autoware_control_msgs/msg/control.hpp>
 #include <autoware_vehicle_msgs/msg/control_mode_report.hpp>
@@ -32,6 +26,7 @@
 #include <autoware_vehicle_msgs/msg/velocity_report.hpp>
 #include <autoware_vehicle_msgs/srv/control_mode_command.hpp>
 #include <concealer/continuous_transform_broadcaster.hpp>
+#include <concealer/path_with_lane_id.hpp>
 #include <concealer/publisher.hpp>
 #include <concealer/subscriber.hpp>
 #include <concealer/visibility.hpp>
@@ -55,21 +50,16 @@ public:
   using GearCommand                 = autoware_vehicle_msgs::msg::GearCommand;
   using GearReport                  = autoware_vehicle_msgs::msg::GearReport;
   using Odometry                    = nav_msgs::msg::Odometry;
-#if __has_include(<autoware_internal_planning_msgs/msg/path_with_lane_id.hpp>)
-  using PathWithLaneId              = autoware_internal_planning_msgs::msg::PathWithLaneId;
-#else
-  using PathWithLaneId              = tier4_planning_msgs::msg::PathWithLaneId;
-#endif
   using PoseWithCovarianceStamped   = geometry_msgs::msg::PoseWithCovarianceStamped;
   using SteeringReport              = autoware_vehicle_msgs::msg::SteeringReport;
   using TurnIndicatorsCommand       = autoware_vehicle_msgs::msg::TurnIndicatorsCommand;
   using TurnIndicatorsReport        = autoware_vehicle_msgs::msg::TurnIndicatorsReport;
   using VelocityReport              = autoware_vehicle_msgs::msg::VelocityReport;
 
-  Subscriber<Control>               getCommand;
-  Subscriber<GearCommand>           getGearCommand;
-  Subscriber<TurnIndicatorsCommand> getTurnIndicatorsCommand;
-  Subscriber<PathWithLaneId>        getPathWithLaneId;
+  Subscriber<Control>                  getCommand;
+  Subscriber<GearCommand>              getGearCommand;
+  Subscriber<TurnIndicatorsCommand>    getTurnIndicatorsCommand;
+  Subscriber<priority::PathWithLaneId> getPathWithLaneId;
 
   Publisher<AccelWithCovarianceStamped> setAcceleration;
   Publisher<Odometry>                   setOdometry;
