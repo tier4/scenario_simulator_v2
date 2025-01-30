@@ -357,6 +357,8 @@ auto ActionNode::getDistanceToConflictingEntity(
   for (const auto &status : crosswalk_entity_status) {
     const auto s = getDistanceToTargetEntityOnCrosswalk(spline, status);
     if (s) {
+      std::cout << "getDistanceToTargetEntityOnCrosswalk: " << s.value()
+                << std::endl;
       distances.insert(s.value());
     }
   }
@@ -364,6 +366,8 @@ auto ActionNode::getDistanceToConflictingEntity(
     const auto s =
         getDistanceToTargetEntityPolygon(spline, status, 0.0, 0.0, 0.0, 1.0);
     if (s) {
+      std::cout << "getDistanceToTargetEntityPolygon: " << s.value()
+                << std::endl;
       distances.insert(s.value());
     }
   }
