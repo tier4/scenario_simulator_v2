@@ -23,6 +23,7 @@
 #include <tier4_planning_msgs/msg/path_with_lane_id.hpp>
 #endif
 
+#include <concealer/available.hpp>
 #include <concealer/convert.hpp>
 
 namespace concealer
@@ -43,6 +44,16 @@ using PathWithLaneId = decltype(std::tuple_cat(
 
 static_assert(0 < std::tuple_size_v<PathWithLaneId>);
 }  // namespace priority
+
+#if __has_include(<autoware_internal_planning_msgs/msg/path_with_lane_id.hpp>)
+template <>
+auto available<autoware_internal_planning_msgs::msg::PathWithLaneId>(const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr &) -> bool;
+#endif
+
+#if __has_include(<tier4_planning_msgs/msg/path_with_lane_id.hpp>)
+template <>
+auto available<tier4_planning_msgs::msg::PathWithLaneId>(const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr &) -> bool;
+#endif
 
 #if __has_include(<autoware_internal_planning_msgs/msg/path_with_lane_id.hpp>) and \
     __has_include(<tier4_planning_msgs/msg/path_with_lane_id.hpp>)
