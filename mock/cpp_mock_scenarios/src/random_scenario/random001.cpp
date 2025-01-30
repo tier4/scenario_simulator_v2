@@ -21,6 +21,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <string>
 #include <traffic_simulator/api/api.hpp>
+#include <traffic_simulator/utils/lanelet_map.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <vector>
 
@@ -70,7 +71,7 @@ private:
           traffic_simulator::helper::constructLaneletPose(
             spawn_lanelet_id,
             static_cast<double>(entity_index) / static_cast<double>(number_of_vehicles) *
-                traffic_simulator::pose::laneletLength(spawn_lanelet_id, api_.getHdmapUtils()) +
+                traffic_simulator::lanelet_map::laneletLength(spawn_lanelet_id) +
               normal_dist(engine_),
             offset),
           getVehicleParameters(
@@ -131,7 +132,7 @@ private:
         entity->requestSpeedChange(speed, true);
         entity->setLinearVelocity(speed);
         std::uniform_real_distribution<> lane_change_position_distribution(
-          0.0, traffic_simulator::pose::laneletLength(34684, api_.getHdmapUtils()));
+          0.0, traffic_simulator::lanelet_map::laneletLength(34684));
         lane_change_position = lane_change_position_distribution(engine_);
         lane_change_requested = false;
       }
@@ -184,13 +185,14 @@ private:
 
     const auto trigger_position = traffic_simulator::helper::constructLaneletPose(34621, 10, 0.0);
     constexpr auto entity_name = "spawn_nearby_ego";
+
     if (ego_entity->isNearbyPosition(trigger_position, 20.0) && !api_.isEntityExist(entity_name)) {
       api_.spawn(
         entity_name,
         traffic_simulator::pose::transformRelativePoseToGlobal(
           ego_entity->getMapPose(),
           geometry_msgs::build<geometry_msgs::msg::Pose>()
-            .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(10).y(-5).z(0))
+            .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(10.0).y(-5.0).z(0.0))
             .orientation(geometry_msgs::msg::Quaternion())),
         getVehicleParameters(),
         traffic_simulator::entity::VehicleEntity::BuiltinBehavior::doNothing());

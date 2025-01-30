@@ -26,7 +26,6 @@
 #include <string>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
 #include <traffic_simulator_msgs/msg/action_status.hpp>
-#include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
 #include <unordered_set>
 #include <vector>
 
@@ -67,12 +66,10 @@ LaneletPose constructLaneletPose(
  * @param lanelet_id lanelet id
  * @param s s value in lane coordinate
  * @param offset offset value in lane coordinate
- * @param hdmap_utils_ptr pointer to HdmapUtils
  * @return LaneletPose
  */
-auto constructCanonicalizedLaneletPose(
-  lanelet::Id lanelet_id, double s, double offset,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> CanonicalizedLaneletPose;
+auto constructCanonicalizedLaneletPose(lanelet::Id lanelet_id, double s, double offset)
+  -> CanonicalizedLaneletPose;
 
 /**
  * @brief helper function for constructing canonicalized lanelet pose
@@ -83,12 +80,11 @@ auto constructCanonicalizedLaneletPose(
  * @param roll roll value in the lane coordinate
  * @param pitch pitch value in the lane coordinate
  * @param yaw yaw value in the lane coordinate
- * @param hdmap_utils_ptr pointer to HdmapUtils
  * @return LaneletPose
  */
 auto constructCanonicalizedLaneletPose(
-  lanelet::Id lanelet_id, double s, double offset, double roll, double pitch, double yaw,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> CanonicalizedLaneletPose;
+  lanelet::Id lanelet_id, double s, double offset, double roll, double pitch, double yaw)
+  -> CanonicalizedLaneletPose;
 
 /**
  * @brief helper function for constructing rpy

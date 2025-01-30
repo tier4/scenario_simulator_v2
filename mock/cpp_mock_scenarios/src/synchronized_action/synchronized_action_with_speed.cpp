@@ -71,16 +71,16 @@ private:
     ego_entity->requestSpeedChange(3, true);
 
     std::vector<geometry_msgs::msg::Pose> goal_poses;
-    goal_poses.emplace_back(traffic_simulator::helper::constructCanonicalizedLaneletPose(
-      34579, 20, 0, api_.getHdmapUtils()));
+    goal_poses.emplace_back(
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(34579, 20, 0));
     ego_entity->requestAssignRoute(goal_poses);
 
     auto npc_entity = api_.spawn(
       "npc", traffic_simulator::helper::constructLaneletPose(34576, 0, 0), getVehicleParameters());
 
     std::vector<geometry_msgs::msg::Pose> npc_goal_poses;
-    npc_goal_poses.emplace_back(traffic_simulator::helper::constructCanonicalizedLaneletPose(
-      34564, 20, 0, api_.getHdmapUtils()));
+    npc_goal_poses.emplace_back(
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(34564, 20, 0));
     npc_entity->requestAssignRoute(npc_goal_poses);
     npc_entity->setLinearVelocity(6);
   }

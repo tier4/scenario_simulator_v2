@@ -51,19 +51,24 @@ LaneletPose constructLaneletPose(
 }
 
 auto constructCanonicalizedLaneletPose(
-  lanelet::Id lanelet_id, double s, double offset, double roll, double pitch, double yaw,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> CanonicalizedLaneletPose
+  lanelet::Id lanelet_id, double s, double offset, double roll, double pitch, double yaw)
+  -> CanonicalizedLaneletPose
 {
-  return pose::canonicalize(
-    traffic_simulator::helper::constructLaneletPose(lanelet_id, s, offset, roll, pitch, yaw),
-    hdmap_utils_ptr);
+  const auto & lanelet_pose =
+    traffic_simulator::helper::constructLaneletPose(lanelet_id, s, offset, roll, pitch, yaw);
+  if (auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(lanelet_pose)) {
+    return canonicalized_lanelet_pose.value();
+  } else {
+    std::ostringstream oss;
+    oss << lanelet_pose;
+    THROW_SEMANTIC_ERROR(oss.str(), " is invalid, please check lanelet length and connection.");
+  }
 }
 
-auto constructCanonicalizedLaneletPose(
-  lanelet::Id lanelet_id, double s, double offset,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> CanonicalizedLaneletPose
+auto constructCanonicalizedLaneletPose(lanelet::Id lanelet_id, double s, double offset)
+  -> CanonicalizedLaneletPose
 {
-  return constructCanonicalizedLaneletPose(lanelet_id, s, offset, 0, 0, 0, hdmap_utils_ptr);
+  return constructCanonicalizedLaneletPose(lanelet_id, s, offset, 0, 0, 0);
 }
 
 geometry_msgs::msg::Vector3 constructRPY(double roll, double pitch, double yaw)

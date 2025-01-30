@@ -36,8 +36,8 @@ protected:
   MiscObjectEntityTest_HdMapUtils()
   : hdmap_utils_ptr(makeHdMapUtilsSharedPointer()), entity_name("misc_object_entity")
   {
+    activateLaneletWrapper("standard_map");
   }
-
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr;
   const std::string entity_name;
 };
@@ -47,9 +47,9 @@ class MiscObjectEntityTest_FullObject : public MiscObjectEntityTest_HdMapUtils
 protected:
   MiscObjectEntityTest_FullObject()
   : id(120659),
-    pose(makeCanonicalizedLaneletPose(hdmap_utils_ptr, id)),
+    pose(makeCanonicalizedLaneletPose(id)),
     bbox(makeBoundingBox()),
-    status(makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox, 0.0, entity_name)),
+    status(makeCanonicalizedEntityStatus(pose, bbox, 0.0, entity_name)),
     misc_object(
       entity_name, status, hdmap_utils_ptr, traffic_simulator_msgs::msg::MiscObjectParameters{}),
     entity_base(&misc_object)
@@ -70,21 +70,22 @@ protected:
 TEST_F(MiscObjectEntityTest_HdMapUtils, getCurrentAction_npcNotStarted)
 {
   auto non_canonicalized_status = makeEntityStatus(
-    hdmap_utils_ptr, makeCanonicalizedLaneletPose(hdmap_utils_ptr, 120659), makeBoundingBox(), 0.0,
-    entity_name, traffic_simulator_msgs::msg::EntityType::MISC_OBJECT);
+    makeCanonicalizedLaneletPose(120659), makeBoundingBox(), 0.0, entity_name,
+    traffic_simulator_msgs::msg::EntityType::MISC_OBJECT);
   non_canonicalized_status.action_status.current_action = "current_action_name";
 
   const auto blob = traffic_simulator::entity::MiscObjectEntity(
     entity_name,
     traffic_simulator::entity_status::CanonicalizedEntityStatus(
-      non_canonicalized_status, makeCanonicalizedLaneletPose(hdmap_utils_ptr, 120659)),
+      non_canonicalized_status, makeCanonicalizedLaneletPose(120659)),
     hdmap_utils_ptr, traffic_simulator_msgs::msg::MiscObjectParameters{});
 
   EXPECT_EQ(blob.getCurrentAction(), "current_action_name");
 }
 
 /**
- * @note Test function behavior when absolute speed change is requested - the goal is to test throwing error.
+ * @note Test function behavior when absolute speed change is requested - the goal is to test
+ * throwing error.
  */
 TEST_F(MiscObjectEntityTest_HdMapUtils, requestSpeedChange_absolute)
 {
@@ -92,34 +93,34 @@ TEST_F(MiscObjectEntityTest_HdMapUtils, requestSpeedChange_absolute)
     traffic_simulator::entity::MiscObjectEntity(
       entity_name,
       makeCanonicalizedEntityStatus(
-        hdmap_utils_ptr, makeCanonicalizedLaneletPose(hdmap_utils_ptr, 120659), makeBoundingBox(),
-        0.0, entity_name, traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
+        makeCanonicalizedLaneletPose(120659), makeBoundingBox(), 0.0, entity_name,
+        traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
       hdmap_utils_ptr, traffic_simulator_msgs::msg::MiscObjectParameters{})
       .requestSpeedChange(10.0, false),
     common::SemanticError);
 }
 
 /**
- * @note Test function behavior when relative speed change is requested - the goal is to test throwing error.
+ * @note Test function behavior when relative speed change is requested - the goal is to test
+ * throwing error.
  */
 TEST_F(MiscObjectEntityTest_HdMapUtils, requestSpeedChange_relative)
 {
-  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, 120659);
+  auto pose = makeCanonicalizedLaneletPose(120659);
   auto bbox = makeBoundingBox();
 
   auto blob = traffic_simulator::entity::MiscObjectEntity(
     entity_name,
     makeCanonicalizedEntityStatus(
-      hdmap_utils_ptr, pose, bbox, 0.0, entity_name,
-      traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
+      pose, bbox, 0.0, entity_name, traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
     hdmap_utils_ptr, traffic_simulator_msgs::msg::MiscObjectParameters{});
 
   std::unordered_map<std::string, traffic_simulator::entity_status::CanonicalizedEntityStatus>
     others;
   others.emplace(
-    "other_entity", makeCanonicalizedEntityStatus(
-                      hdmap_utils_ptr, pose, bbox, 17.0, "other_entity_name",
-                      traffic_simulator_msgs::msg::EntityType::MISC_OBJECT));
+    "other_entity",
+    makeCanonicalizedEntityStatus(
+      pose, bbox, 17.0, "other_entity_name", traffic_simulator_msgs::msg::EntityType::MISC_OBJECT));
   blob.setOtherStatus(others);
 
   EXPECT_THROW(
@@ -140,8 +141,8 @@ TEST_F(MiscObjectEntityTest_HdMapUtils, requestSpeedChange_absoluteTransition)
     traffic_simulator::entity::MiscObjectEntity(
       entity_name,
       makeCanonicalizedEntityStatus(
-        hdmap_utils_ptr, makeCanonicalizedLaneletPose(hdmap_utils_ptr, 120659), makeBoundingBox(),
-        0.0, entity_name, traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
+        makeCanonicalizedLaneletPose(120659), makeBoundingBox(), 0.0, entity_name,
+        traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
       hdmap_utils_ptr, traffic_simulator_msgs::msg::MiscObjectParameters{})
       .requestSpeedChange(
         10.0, traffic_simulator::speed_change::Transition::AUTO,
@@ -161,8 +162,8 @@ TEST_F(MiscObjectEntityTest_HdMapUtils, requestAssignRoute_laneletPose)
     traffic_simulator::entity::MiscObjectEntity(
       entity_name,
       makeCanonicalizedEntityStatus(
-        hdmap_utils_ptr, makeCanonicalizedLaneletPose(hdmap_utils_ptr, 120659), makeBoundingBox(),
-        0.0, entity_name, traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
+        makeCanonicalizedLaneletPose(120659), makeBoundingBox(), 0.0, entity_name,
+        traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
       hdmap_utils_ptr, traffic_simulator_msgs::msg::MiscObjectParameters{})
       .requestAssignRoute({makeLaneletPose(120660)}),
     common::SemanticError);
@@ -178,8 +179,8 @@ TEST_F(MiscObjectEntityTest_HdMapUtils, requestAssignRoute_pose)
     traffic_simulator::entity::MiscObjectEntity(
       entity_name,
       makeCanonicalizedEntityStatus(
-        hdmap_utils_ptr, makeCanonicalizedLaneletPose(hdmap_utils_ptr, 120659), makeBoundingBox(),
-        0.0, entity_name, traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
+        makeCanonicalizedLaneletPose(120659), makeBoundingBox(), 0.0, entity_name,
+        traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
       hdmap_utils_ptr, traffic_simulator_msgs::msg::MiscObjectParameters{})
       .requestAssignRoute(
         std::vector<geometry_msgs::msg::Pose>{makePose(makePoint(3759.34, 73791.38))}),
@@ -196,8 +197,8 @@ TEST_F(MiscObjectEntityTest_HdMapUtils, requestAcquirePosition_laneletPose)
     traffic_simulator::entity::MiscObjectEntity(
       entity_name,
       makeCanonicalizedEntityStatus(
-        hdmap_utils_ptr, makeCanonicalizedLaneletPose(hdmap_utils_ptr, 120659), makeBoundingBox(),
-        0.0, entity_name, traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
+        makeCanonicalizedLaneletPose(120659), makeBoundingBox(), 0.0, entity_name,
+        traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
       hdmap_utils_ptr, traffic_simulator_msgs::msg::MiscObjectParameters{})
       .requestAcquirePosition(makeLaneletPose(120660)),
     common::SemanticError);
@@ -213,8 +214,8 @@ TEST_F(MiscObjectEntityTest_HdMapUtils, requestAcquirePosition_pose)
     traffic_simulator::entity::MiscObjectEntity(
       entity_name,
       makeCanonicalizedEntityStatus(
-        hdmap_utils_ptr, makeCanonicalizedLaneletPose(hdmap_utils_ptr, 120659), makeBoundingBox(),
-        0.0, entity_name, traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
+        makeCanonicalizedLaneletPose(120659), makeBoundingBox(), 0.0, entity_name,
+        traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
       hdmap_utils_ptr, traffic_simulator_msgs::msg::MiscObjectParameters{})
       .requestAcquirePosition(makePose(makePoint(3759.34, 73791.38))),
     common::SemanticError);
@@ -229,8 +230,8 @@ TEST_F(MiscObjectEntityTest_HdMapUtils, getRouteLanelets)
     traffic_simulator::entity::MiscObjectEntity(
       entity_name,
       makeCanonicalizedEntityStatus(
-        hdmap_utils_ptr, makeCanonicalizedLaneletPose(hdmap_utils_ptr, 120659), makeBoundingBox(),
-        0.0, entity_name, traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
+        makeCanonicalizedLaneletPose(120659), makeBoundingBox(), 0.0, entity_name,
+        traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
       hdmap_utils_ptr, traffic_simulator_msgs::msg::MiscObjectParameters{})
       .getRouteLanelets(100.0),
     common::SemanticError);
@@ -341,8 +342,7 @@ TEST_F(MiscObjectEntityTest_FullObject, requestLaneChange_relativeTargetLaneletP
   auto other_status =
     std::unordered_map<std::string, traffic_simulator::CanonicalizedEntityStatus>{};
   other_status.emplace(
-    target_name,
-    makeCanonicalizedEntityStatus(hdmap_utils_ptr, makePose(makePoint(3810.0, 73745.0)), bbox));
+    target_name, makeCanonicalizedEntityStatus(makePose(makePoint(3810.0, 73745.0)), bbox));
 
   entity_base->setOtherStatus(other_status);
 
@@ -366,9 +366,7 @@ TEST_F(MiscObjectEntityTest_FullObject, requestLaneChange_relativeTargetName)
   auto other_status =
     std::unordered_map<std::string, traffic_simulator::CanonicalizedEntityStatus>{};
   other_status.emplace(
-    target_name,
-    makeCanonicalizedEntityStatus(
-      hdmap_utils_ptr, makeCanonicalizedLaneletPose(hdmap_utils_ptr, 34468, 5.0), bbox));
+    target_name, makeCanonicalizedEntityStatus(makeCanonicalizedLaneletPose(34468, 5.0), bbox));
 
   entity_base->setOtherStatus(other_status);
   EXPECT_THROW(
@@ -393,9 +391,7 @@ TEST_F(MiscObjectEntityTest_FullObject, requestLaneChange_relativeTargetInvalid)
   auto other_status =
     std::unordered_map<std::string, traffic_simulator::CanonicalizedEntityStatus>{};
   other_status.emplace(
-    target_name,
-    makeCanonicalizedEntityStatus(
-      hdmap_utils_ptr, makeCanonicalizedLaneletPose(hdmap_utils_ptr, 34468, 5.0), bbox));
+    target_name, makeCanonicalizedEntityStatus(makeCanonicalizedLaneletPose(34468, 5.0), bbox));
 
   entity_base->setOtherStatus(other_status);
   EXPECT_THROW(
@@ -454,8 +450,8 @@ TEST_F(
   EXPECT_FALSE(traffic_simulator::entity::MiscObjectEntity(
                  entity_name,
                  makeCanonicalizedEntityStatus(
-                   hdmap_utils_ptr, makePose(makePoint(3810.0, 73745.0)), makeBoundingBox(), 1.0,
-                   0.0, entity_name, traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
+                   makePose(makePoint(3810.0, 73745.0)), makeBoundingBox(), 1.0, 0.0, entity_name,
+                   traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
                  hdmap_utils_ptr, traffic_simulator_msgs::msg::MiscObjectParameters{})
                  .getCanonicalizedLaneletPose(5.0)
                  .has_value());
@@ -472,7 +468,6 @@ TEST_F(MiscObjectEntityTest_HdMapUtils, getCanonicalizedLaneletPose_onRoadAndCro
     traffic_simulator::entity::MiscObjectEntity(
       entity_name,
       makeCanonicalizedEntityStatus(
-        hdmap_utils_ptr,
         makePose(makePoint(3766.1, 73738.2), makeQuaternionFromYaw((120.0) * M_PI / 180.0)),
         makeBoundingBox(), 1.0, 0.0, entity_name,
         traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
@@ -493,7 +488,6 @@ TEST_F(
     traffic_simulator::entity::MiscObjectEntity(
       entity_name,
       makeCanonicalizedEntityStatus(
-        hdmap_utils_ptr,
         makePose(makePoint(3764.5, 73737.5), makeQuaternionFromYaw((120.0) * M_PI / 180.0)),
         makeBoundingBox(), 1.0, 0.0, entity_name,
         traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),

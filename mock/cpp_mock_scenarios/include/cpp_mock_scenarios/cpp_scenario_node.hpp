@@ -75,14 +75,9 @@ private:
     const std::string & scenario_filename, const bool verbose,
     const std::set<std::uint8_t> & auto_sink_entity_types = {}) -> traffic_simulator::Configuration
   {
-    auto configuration = traffic_simulator::Configuration(map_path);
-    {
-      configuration.lanelet2_map_file = lanelet2_map_file;
-      // configuration.lanelet2_map_file = "lanelet2_map_with_private_road_and_walkway_ele_fix.osm";
-      configuration.scenario_path = scenario_filename;
-      configuration.verbose = verbose;
-      configuration.auto_sink_entity_types = auto_sink_entity_types;
-    }
+    auto configuration = traffic_simulator::Configuration(
+      map_path, lanelet2_map_file, scenario_filename, auto_sink_entity_types);
+    configuration.verbose = verbose;
     checkConfiguration(configuration);
     return configuration;
   }

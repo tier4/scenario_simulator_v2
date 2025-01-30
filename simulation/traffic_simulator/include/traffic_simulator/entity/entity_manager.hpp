@@ -152,19 +152,19 @@ public:
       }(parameters);
 
       if constexpr (std::is_same_v<std::decay_t<PoseType>, LaneletPose>) {
-        entity_status.pose = pose::toMapPose(pose, hdmap_utils_ptr_);
+        entity_status.pose = pose::toMapPose(pose);
         // here bounding_box and matching_distance are not used to adjust LaneletPose
         // it is just rewritten, assuming that in the scenario is right, alternatively:
         // toCanonicalizedLaneletPose(entity_status.pose, parameters.bounding_box,
         // {pose.lanelet_id}, include_crosswalk, matching_distance, hdmap_utils_ptr_);
-        return CanonicalizedEntityStatus(entity_status, pose::canonicalize(pose, hdmap_utils_ptr_));
+        return CanonicalizedEntityStatus(entity_status, pose::toCanonicalizedLaneletPose(pose));
       } else if constexpr (std::is_same_v<std::decay_t<PoseType>, CanonicalizedLaneletPose>) {
         entity_status.pose = pose::toMapPose(pose);
         return CanonicalizedEntityStatus(entity_status, pose);
       } else if constexpr (std::is_same_v<std::decay_t<PoseType>, geometry_msgs::msg::Pose>) {
         entity_status.pose = pose;
         const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
-          pose, parameters.bounding_box, include_crosswalk, matching_distance, hdmap_utils_ptr_);
+          pose, parameters.bounding_box, include_crosswalk, matching_distance);
         return CanonicalizedEntityStatus(entity_status, canonicalized_lanelet_pose);
       }
     };

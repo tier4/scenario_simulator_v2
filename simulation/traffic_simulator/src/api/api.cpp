@@ -349,11 +349,9 @@ auto API::checkCollision(
 auto API::laneletRelativeYaw(
   const std::string & entity_name, const LaneletPose & lanelet_pose) const -> std::optional<double>
 {
-  const auto canonicalized_lanelet_pose = pose::canonicalize(lanelet_pose, getHdmapUtils());
   if (
-    const auto relative_pose = pose::relativePose(
-      getEntity(entity_name)->getMapPose(),
-      static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose))) {
+    const auto relative_pose =
+      pose::relativePose(getEntity(entity_name)->getMapPose(), pose::toMapPose(lanelet_pose))) {
     return math::geometry::convertQuaternionToEulerAngle(relative_pose.value().orientation).z;
   } else {
     return std::nullopt;
@@ -495,7 +493,7 @@ auto API::laneletDistance(
   const std::string & from_entity_name, const LaneletPose & to_lanelet_pose,
   const RoutingConfiguration & routing_configuration) -> LaneletDistance
 {
-  const auto canonicalized_lanelet_pose = pose::canonicalize(to_lanelet_pose, getHdmapUtils());
+  const auto canonicalized_lanelet_pose = CanonicalizedLaneletPose(to_lanelet_pose);
   const auto from_entity = getEntity(from_entity_name);
   if (from_entity->isInLanelet()) {
     return distance::laneletDistance(
@@ -510,7 +508,7 @@ auto API::laneletDistance(
   const LaneletPose & from_lanelet_pose, const std::string & to_entity_name,
   const RoutingConfiguration & routing_configuration) -> LaneletDistance
 {
-  const auto canonicalized_lanelet_pose = pose::canonicalize(from_lanelet_pose, getHdmapUtils());
+  const auto canonicalized_lanelet_pose = CanonicalizedLaneletPose(from_lanelet_pose);
   const auto to_entity = getEntity(to_entity_name);
   if (to_entity->isInLanelet()) {
     return distance::laneletDistance(
@@ -542,7 +540,7 @@ auto API::boundingBoxLaneletDistance(
   const std::string & from_entity_name, const LaneletPose & to_lanelet_pose,
   const RoutingConfiguration & routing_configuration) -> LaneletDistance
 {
-  const auto canonicalized_lanelet_pose = pose::canonicalize(to_lanelet_pose, getHdmapUtils());
+  const auto canonicalized_lanelet_pose = CanonicalizedLaneletPose(to_lanelet_pose);
   const auto from_entity = getEntity(from_entity_name);
   if (from_entity->isInLanelet()) {
     return distance::boundingBoxLaneletDistance(

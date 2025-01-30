@@ -57,7 +57,7 @@ private:
     ego_entity->setLinearVelocity(7);
     ego_entity->requestSpeedChange(7, true);
     const geometry_msgs::msg::Pose goal_pose = traffic_simulator::pose::toMapPose(
-      traffic_simulator::helper::constructLaneletPose(34408, 0.0, 0.0), api_.getHdmapUtils());
+      traffic_simulator::helper::constructLaneletPose(34408, 0.0, 0.0));
     ego_entity->requestAcquirePosition(goal_pose);
   }
 };

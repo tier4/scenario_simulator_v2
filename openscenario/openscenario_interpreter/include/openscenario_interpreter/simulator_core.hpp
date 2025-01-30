@@ -73,14 +73,14 @@ public:
   class CoordinateSystemConversion
   {
   protected:
-    static auto convertToNativeLanePosition(const geometry_msgs::msg::Pose & map_pose)
-      -> const traffic_simulator::LaneletPose
+    static auto convertToNativeLanePosition(const NativeWorldPosition & map_pose)
+      -> const NativeLanePosition
     {
       constexpr bool include_crosswalk{false};
       constexpr double matching_distance{1.0};
       if (
-        const auto lanelet_pose = traffic_simulator::pose::toLaneletPose(
-          map_pose, include_crosswalk, matching_distance, core->getHdmapUtils())) {
+        const auto lanelet_pose =
+          traffic_simulator::pose::toLaneletPose(map_pose, include_crosswalk, matching_distance)) {
         return lanelet_pose.value();
       } else {
         throw Error(
@@ -99,7 +99,7 @@ public:
     static auto convertToNativeWorldPosition(const traffic_simulator::LaneletPose & lanelet_pose)
       -> const geometry_msgs::msg::Pose
     {
-      return traffic_simulator::pose::toMapPose(lanelet_pose, core->getHdmapUtils());
+      return traffic_simulator::pose::toMapPose(lanelet_pose);
     }
 
     static auto makeNativeRelativeWorldPosition(

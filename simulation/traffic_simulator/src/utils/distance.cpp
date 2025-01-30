@@ -15,6 +15,7 @@
 #include <geometry/bounding_box.hpp>
 #include <geometry/distance.hpp>
 #include <geometry/transform.hpp>
+#include <traffic_simulator/lanelet_wrapper/pose.hpp>
 #include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
@@ -93,17 +94,17 @@ auto longitudinalDistance(
     /**
      * @brief A matching distance of about 1.5*lane widths is given as the matching distance to match the
      * Entity present on the adjacent Lanelet.
-     * The length of the horizontal bar must intersect with the adjacent lanelet, 
+     * The length of the horizontal bar must intersect with the adjacent lanelet,
      * so it is always 10m regardless of the entity type.
      */
     constexpr double matching_distance = 5.0;
 
-    auto from_poses = hdmap_utils_ptr->toLaneletPoses(
+    auto from_poses = lanelet_wrapper::pose::toLaneletPoses(
       static_cast<geometry_msgs::msg::Pose>(from), static_cast<LaneletPose>(from).lanelet_id,
       matching_distance, include_opposite_direction, routing_configuration.routing_graph_type);
     from_poses.emplace_back(from);
 
-    auto to_poses = hdmap_utils_ptr->toLaneletPoses(
+    auto to_poses = lanelet_wrapper::pose::toLaneletPoses(
       static_cast<geometry_msgs::msg::Pose>(to), static_cast<LaneletPose>(to).lanelet_id,
       matching_distance, include_opposite_direction, routing_configuration.routing_graph_type);
     to_poses.emplace_back(to);
@@ -113,9 +114,8 @@ auto longitudinalDistance(
       for (const auto & to_pose : to_poses) {
         if (
           const auto distance = longitudinalDistance(
-            pose::canonicalize(from_pose, hdmap_utils_ptr),
-            pose::canonicalize(to_pose, hdmap_utils_ptr), false, include_opposite_direction,
-            routing_configuration, hdmap_utils_ptr)) {
+            CanonicalizedLaneletPose(from_pose), CanonicalizedLaneletPose(to_pose), false,
+            include_opposite_direction, routing_configuration, hdmap_utils_ptr)) {
           distances.emplace_back(distance.value());
         }
       }

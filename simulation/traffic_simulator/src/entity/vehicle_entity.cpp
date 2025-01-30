@@ -170,7 +170,7 @@ auto VehicleEntity::onUpdate(const double current_time, const double step_time) 
 
 void VehicleEntity::requestAcquirePosition(const LaneletPose & lanelet_pose)
 {
-  const auto canonicalized_lanelet_pose = pose::canonicalize(lanelet_pose, hdmap_utils_ptr_);
+  const auto canonicalized_lanelet_pose = CanonicalizedLaneletPose(lanelet_pose);
   behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
   if (status_->isInLanelet()) {
     route_planner_.setWaypoints({canonicalized_lanelet_pose});
@@ -185,7 +185,7 @@ void VehicleEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_
   if (
     const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
       map_pose, status_->getBoundingBox(), false,
-      getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_)) {
+      getDefaultMatchingDistanceForLaneletPoseCalculation())) {
     requestAcquirePosition(static_cast<LaneletPose>(canonicalized_lanelet_pose.value()));
   } else {
     THROW_SEMANTIC_ERROR("Goal of the vehicle entity should be on lane.");
@@ -195,7 +195,11 @@ void VehicleEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_
 void VehicleEntity::requestAssignRoute(const std::vector<LaneletPose> & waypoints)
 {
   if (isInLanelet()) {
-    const auto canonicalized_waypoints = pose::canonicalize(waypoints, hdmap_utils_ptr_);
+    std::vector<CanonicalizedLaneletPose> canonicalized_waypoints;
+    std::transform(
+      waypoints.begin(), waypoints.end(), std::back_inserter(canonicalized_waypoints),
+      [](const auto & waypoint) { return CanonicalizedLaneletPose(waypoint); });
+
     behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
     route_planner_.setWaypoints(canonicalized_waypoints);
     std::vector<geometry_msgs::msg::Pose> goal_poses;
@@ -213,7 +217,7 @@ void VehicleEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pos
     if (
       const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
         waypoint, status_->getBoundingBox(), false,
-        getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_)) {
+        getDefaultMatchingDistanceForLaneletPoseCalculation())) {
       route.emplace_back(static_cast<LaneletPose>(canonicalized_lanelet_pose.value()));
     } else {
       THROW_SEMANTIC_ERROR("Waypoint of vehicle entity should be on lane.");
@@ -232,7 +236,7 @@ auto VehicleEntity::requestFollowTrajectory(
     if (
       const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
         vertex.position, status_->getBoundingBox(), false,
-        getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_)) {
+        getDefaultMatchingDistanceForLaneletPoseCalculation())) {
       waypoints.emplace_back(canonicalized_lanelet_pose.value());
     } else {
       /// @todo such a protection most likely makes sense, but test scenario
