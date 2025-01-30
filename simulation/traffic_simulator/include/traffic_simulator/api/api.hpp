@@ -138,12 +138,12 @@ public:
       }
     };
 
-    auto prepare_and_send_request = [&](const auto & entity, auto & reqest) -> bool {
-      simulation_interface::toProto(parameters, *reqest.mutable_parameters());
-      reqest.mutable_parameters()->set_name(name);
-      reqest.set_asset_key(model3d);
-      simulation_interface::toProto(entity->getMapPose(), *reqest.mutable_pose());
-      return zeromq_client_.call(reqest).result().success();
+    auto prepare_and_send_request = [&](const auto & entity, auto & request) -> bool {
+      simulation_interface::toProto(parameters, *request.mutable_parameters());
+      request.mutable_parameters()->set_name(name);
+      request.set_asset_key(model3d);
+      simulation_interface::toProto(entity->getMapPose(), *request.mutable_pose());
+      return zeromq_client_.call(request).result().success();
     };
 
     auto register_to_environment_simulator = [&](const auto & entity) -> bool {
@@ -151,17 +151,17 @@ public:
         return true;
       } else {
         if constexpr (std::is_same_v<ParamsType, VehicleParameters>) {
-          simulation_api_schema::SpawnVehicleEntityRequest reqest;
-          reqest.set_is_ego(behavior == VehicleBehavior::autoware());
+          simulation_api_schema::SpawnVehicleEntityRequest request;
+          request.set_is_ego(behavior == VehicleBehavior::autoware());
           /// @todo Should be filled from function API
-          reqest.set_initial_speed(0.0);
-          return prepare_and_send_request(entity, reqest);
+          request.set_initial_speed(0.0);
+          return prepare_and_send_request(entity, request);
         } else if constexpr (std::is_same_v<ParamsType, PedestrianParameters>) {
-          simulation_api_schema::SpawnPedestrianEntityRequest reqest;
-          return prepare_and_send_request(entity, reqest);
+          simulation_api_schema::SpawnPedestrianEntityRequest request;
+          return prepare_and_send_request(entity, request);
         } else if constexpr (std::is_same_v<ParamsType, MiscObjectParameters>) {
-          simulation_api_schema::SpawnMiscObjectEntityRequest reqest;
-          return prepare_and_send_request(entity, reqest);
+          simulation_api_schema::SpawnMiscObjectEntityRequest request;
+          return prepare_and_send_request(entity, request);
         } else {
           return false;
         }
