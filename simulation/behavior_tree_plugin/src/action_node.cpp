@@ -246,7 +246,7 @@ auto ActionNode::getFrontEntityName(const math::geometry::CatmullRomSplineInterf
   std::vector<double> distances;
   std::vector<std::string> entities;
   for (const auto & [name, status] : other_entity_status) {
-    const auto distance = getDistanceToTargetEntityPolygon(spline, name);
+    const auto distance = getDistanceToTargetEntity(spline, status);
     const auto quat = math::geometry::getRotation(
       canonicalized_entity_status->getMapPose().orientation,
       other_entity_status.at(name).getMapPose().orientation);
