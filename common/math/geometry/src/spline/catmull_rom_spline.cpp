@@ -382,14 +382,13 @@ auto CatmullRomSpline::getCollisionPointIn2D(
   if (s_value_candidates.empty()) {
     return std::nullopt;
   }
-  std::cout << "s_value_candidates.size() = " << s_value_candidates.size();
-  for (const auto &s : s_value_candidates) {
-    std::cout << " s = " << s << std::endl;
-  }
   if (search_backward) {
-    return *(s_value_candidates.rbegin());
+    return *std::max_element(s_value_candidates.begin(),
+                             s_value_candidates.end());
   }
-  return *(s_value_candidates.begin());
+  // return *(s_value_candidates.begin());
+  return *std::min_element(s_value_candidates.begin(),
+                           s_value_candidates.end());
 }
 
 auto CatmullRomSpline::getCollisionPointIn2D(
