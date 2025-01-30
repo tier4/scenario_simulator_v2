@@ -52,10 +52,10 @@ private:
         stop(cpp_mock_scenarios::Result::FAILURE);  // LCOV_EXCL_LINE
       }
       for (const auto & name : names) {
-        if (const auto entity = api_.getEntity(name)) {
-          if (!entity->laneMatchingSucceed() || !isVehicle(name)) {
-            stop(cpp_mock_scenarios::Result::FAILURE);  // LCOV_EXCL_LINE
-          }
+        const auto entity = api_.getEntity(name);
+
+        if (!entity->isInLanelet() || !isVehicle(name)) {
+          stop(cpp_mock_scenarios::Result::FAILURE);  // LCOV_EXCL_LINE
         }
       }
       stop(cpp_mock_scenarios::Result::SUCCESS);
@@ -80,8 +80,9 @@ private:
     api_.spawn(
       "ego", traffic_simulator::helper::constructCanonicalizedLaneletPose(34570, 0.0, 0.0),
       getVehicleParameters());
-    api_.setLinearVelocity("ego", 0.0);
-    api_.requestSpeedChange("ego", 0.0, true);
+    auto ego_entity = api_.getEntity("ego");
+    ego_entity->setLinearVelocity(0.0);
+    ego_entity->requestSpeedChange(0.0, true);
   }
 };
 }  // namespace cpp_mock_scenarios
