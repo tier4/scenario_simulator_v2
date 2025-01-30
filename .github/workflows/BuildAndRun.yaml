@@ -18,7 +18,9 @@ on:
   push:
     branches:
       - master
-
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   job1:
     name: BuildAndRun
@@ -88,8 +90,8 @@ jobs:
             -DCMAKE_BUILD_TYPE=${{ matrix.cmake_build_type }} \
             -DBUILD_CPP_MOCK_SCENARIOS=ON \
             -DBUILD_TESTING=true \
-            -DCMAKE_CXX_FLAGS='-fprofile-arcs -ftest-coverage -ffp-contract=off' \
-            -DCMAKE_C_FLAGS='-fprofile-arcs -ftest-coverage -ffp-contract=off' \
+            -DCMAKE_CXX_FLAGS='-fprofile-arcs -ftest-coverage' \
+            -DCMAKE_C_FLAGS='-fprofile-arcs -ftest-coverage' \
             --packages-up-to ${{ steps.list_packages.outputs.package_list }}
         shell: bash
 
