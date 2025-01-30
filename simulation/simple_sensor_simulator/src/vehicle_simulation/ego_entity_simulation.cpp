@@ -346,7 +346,7 @@ void EgoEntitySimulation::update(
 
 auto EgoEntitySimulation::calculateAccelerationBySlope() const -> double
 {
-  if (consider_acceleration_by_road_slope_ && status_.laneMatchingSucceed()) {
+  if (consider_acceleration_by_road_slope_ && status_.isInLanelet()) {
     constexpr double gravity_acceleration = -9.81;
     /// @todo why there is a need to recalculate orientation using getLaneletPose?
     /// status_.getMapPose().orientation already contains the orientation
