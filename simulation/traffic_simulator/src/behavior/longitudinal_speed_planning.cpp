@@ -111,6 +111,8 @@ auto LongitudinalSpeedPlanner::getDynamicStates(
             << std::endl;
   auto accel = forward(linear_jerk, current_accel, constraints);
   auto twist = forward(accel, current_twist, constraints);
+  if (std::abs(twist.linear.x) < 0.0000001)
+    twist.linear.x = 0;
   accel = timeDerivative(current_twist, twist);
   linear_jerk = timeDerivative(current_accel, accel);
   std::cout << "accel: " << accel.linear.x << " twist: " << twist.linear.x
