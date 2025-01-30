@@ -36,7 +36,7 @@ protected:
   BT::TimePoint first_timestamp_;
   std::vector<BT::TreeNode::StatusChangeSubscriber> subscribers_;
   BT::TimestampType type_;
-  std::string current_action_;
+  std::string current_action_{"none"};
 };
 }  // namespace behavior_tree_plugin
 

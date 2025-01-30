@@ -72,9 +72,49 @@ EgoEntity::EgoEntity(
 {
 }
 
-auto EgoEntity::asFieldOperatorApplication() -> concealer::FieldOperatorApplication &
+auto EgoEntity::engage() -> void { FieldOperatorApplication::engage(); }
+
+auto EgoEntity::isEngaged() const -> bool { return engaged(); }
+
+auto EgoEntity::isEngageable() const -> bool { return engageable(); }
+
+auto EgoEntity::sendCooperateCommand(const std::string & module_name, const std::string & command)
+  -> void
 {
-  return *this;
+  FieldOperatorApplication::sendCooperateCommand(module_name, command);
+}
+
+auto EgoEntity::requestAutoModeForCooperation(const std::string & module_name, bool enable) -> void
+{
+  FieldOperatorApplication::requestAutoModeForCooperation(module_name, enable);
+}
+
+auto EgoEntity::getMinimumRiskManeuverBehaviorName() const -> std::string
+{
+  return minimum_risk_maneuver_behavior;
+}
+
+auto EgoEntity::getMinimumRiskManeuverStateName() const -> std::string
+{
+  return minimum_risk_maneuver_state;
+}
+
+auto EgoEntity::getEmergencyStateName() const -> std::string { return minimum_risk_maneuver_state; }
+
+auto EgoEntity::getTurnIndicatorsCommandName() const -> std::string
+{
+  switch (getTurnIndicatorsCommand().command) {
+    case autoware_vehicle_msgs::msg::TurnIndicatorsCommand::DISABLE:
+      return "DISABLE";
+    case autoware_vehicle_msgs::msg::TurnIndicatorsCommand::ENABLE_LEFT:
+      return "ENABLE_LEFT";
+    case autoware_vehicle_msgs::msg::TurnIndicatorsCommand::ENABLE_RIGHT:
+      return "ENABLE_RIGHT";
+    case autoware_vehicle_msgs::msg::TurnIndicatorsCommand::NO_COMMAND:
+      return "NO_COMMAND";
+    default:
+      return "";
+  }
 }
 
 auto EgoEntity::getCurrentAction() const -> std::string { return autoware_state; }
@@ -165,35 +205,32 @@ void EgoEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose
 void EgoEntity::requestAssignRoute(const std::vector<CanonicalizedLaneletPose> & waypoints)
 {
   std::vector<geometry_msgs::msg::Pose> route;
-
   for (const auto & waypoint : waypoints) {
     route.push_back(static_cast<geometry_msgs::msg::Pose>(waypoint));
   }
-
   requestAssignRoute(route);
 }
 
 void EgoEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> & waypoints)
 {
   std::vector<geometry_msgs::msg::PoseStamped> route;
-
   for (const auto & waypoint : waypoints) {
     geometry_msgs::msg::PoseStamped pose_stamped;
     {
       pose_stamped.header.frame_id = "map";
       pose_stamped.pose = waypoint;
     }
-
     route.push_back(pose_stamped);
   }
 
+  requestClearRoute();
   if (not initialized) {
     initialize(getMapPose());
     plan(route);
     // NOTE: engage() will be executed at simulation-time 0.
   } else {
     plan(route);
-    engage();
+    FieldOperatorApplication::engage();
   }
 }
 
@@ -207,7 +244,7 @@ auto EgoEntity::requestFollowTrajectory(
   is_controlled_by_simulator_ = true;
 }
 
-void EgoEntity::requestLaneChange(const lanelet::Id)
+auto EgoEntity::requestLaneChange(const lanelet::Id) -> void
 {
   THROW_SEMANTIC_ERROR(
     "From scenario, a lane change was requested to Ego type entity ", std::quoted(name),
@@ -239,7 +276,16 @@ auto EgoEntity::requestSpeedChange(
     "purposes only.");
 }
 
-void EgoEntity::requestClearRoute() { clearRoute(); }
+auto EgoEntity::requestClearRoute() -> void { clearRoute(); }
+
+auto EgoEntity::requestReplanRoute(const std::vector<geometry_msgs::msg::PoseStamped> & route)
+  -> void
+{
+  clearRoute();
+  plan(route);
+  enableAutowareControl();
+  FieldOperatorApplication::engage();
+}
 
 auto EgoEntity::getDefaultDynamicConstraints() const
   -> const traffic_simulator_msgs::msg::DynamicConstraints &
