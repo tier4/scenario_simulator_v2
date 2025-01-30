@@ -19,46 +19,43 @@
 #include <utility>
 #include <vector>
 
-namespace entity_behavior
-{
-VehicleActionNode::VehicleActionNode(const std::string & name, const BT::NodeConfiguration & config)
-: ActionNode(name, config)
-{
-}
+namespace entity_behavior {
+VehicleActionNode::VehicleActionNode(const std::string &name,
+                                     const BT::NodeConfiguration &config)
+    : ActionNode(name, config) {}
 
-void VehicleActionNode::getBlackBoardValues()
-{
+void VehicleActionNode::getBlackBoardValues() {
   ActionNode::getBlackBoardValues();
   if (!getInput<traffic_simulator_msgs::msg::BehaviorParameter>(
-        "behavior_parameter", behavior_parameter)) {
+          "behavior_parameter", behavior_parameter)) {
     behavior_parameter = traffic_simulator_msgs::msg::BehaviorParameter();
   }
   if (!getInput<traffic_simulator_msgs::msg::VehicleParameters>(
-        "vehicle_parameters", vehicle_parameters)) {
-    THROW_SIMULATION_ERROR("failed to get input vehicle_parameters in VehicleActionNode");
+          "vehicle_parameters", vehicle_parameters)) {
+    THROW_SIMULATION_ERROR(
+        "failed to get input vehicle_parameters in VehicleActionNode");
   }
   if (!getInput<std::shared_ptr<math::geometry::CatmullRomSpline>>(
-        "reference_trajectory", reference_trajectory)) {
-    THROW_SIMULATION_ERROR("failed to get input reference_trajectory in VehicleActionNode");
+          "reference_trajectory", reference_trajectory)) {
+    THROW_SIMULATION_ERROR(
+        "failed to get input reference_trajectory in VehicleActionNode");
   }
 }
 
 auto VehicleActionNode::calculateUpdatedEntityStatus(double target_speed) const
-  -> traffic_simulator::EntityStatus
-{
+    -> traffic_simulator::EntityStatus {
   return ActionNode::calculateUpdatedEntityStatus(
-    target_speed, behavior_parameter.dynamic_constraints);
+      target_speed, behavior_parameter.dynamic_constraints);
 }
 
-auto VehicleActionNode::calculateUpdatedEntityStatusInWorldFrame(double target_speed) const
-  -> traffic_simulator::EntityStatus
-{
+auto VehicleActionNode::calculateUpdatedEntityStatusInWorldFrame(
+    double target_speed) const -> traffic_simulator::EntityStatus {
   if (target_speed > vehicle_parameters.performance.max_speed) {
     target_speed = vehicle_parameters.performance.max_speed;
   } else {
     target_speed = canonicalized_entity_status->getTwist().linear.x;
   }
   return ActionNode::calculateUpdatedEntityStatusInWorldFrame(
-    target_speed, behavior_parameter.dynamic_constraints);
+      target_speed, behavior_parameter.dynamic_constraints);
 }
-}  // namespace entity_behavior
+} // namespace entity_behavior
