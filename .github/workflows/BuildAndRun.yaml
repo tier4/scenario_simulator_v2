@@ -34,7 +34,7 @@ jobs:
       matrix:
         rosdistro: [humble]
         runs_on: [ubuntu-22.04, ubuntu-22.04-arm] # macos-14 is added for arm support. See also https://x.com/github/status/1752458943245189120?s=20
-        cmake_build_type: [RelWithDebInfo, Release] # Debug build type is currently unavailable. @TODO Fix problem and add Debug build.
+        cmake_build_type: [Debug, RelWithDebInfo, Release] # Debug build type is currently unavailable. @TODO Fix problem and add Debug build.
     steps:
       - name: Suppress warnings
         run: git config --global --add safe.directory '*'
