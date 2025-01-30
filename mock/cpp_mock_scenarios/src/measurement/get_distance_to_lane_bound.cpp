@@ -44,23 +44,23 @@ private:
     if (api_.getCurrentTime() >= 10.0) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
-    if (auto ego_entity = api_.getEntity("ego")) {
-      const auto distance = traffic_simulator::distance::distanceToLaneBound(
-        ego_entity->getMapPose(), ego_entity->getBoundingBox(), ego_entity->getRouteLanelets());
-      // LCOV_EXCL_START
-      if (distance <= 0.4 && distance >= 0.52) {
-        stop(cpp_mock_scenarios::Result::FAILURE);
-      }
-      // LCOV_EXCL_STOP
+    const auto ego_entity = api_.getEntity("ego");
+    const auto distance = traffic_simulator::distance::distanceToLaneBound(
+      ego_entity->getMapPose(), ego_entity->getBoundingBox(), ego_entity->getRouteLanelets());
+    // LCOV_EXCL_START
+    if (distance <= 0.4 && distance >= 0.52) {
+      stop(cpp_mock_scenarios::Result::FAILURE);
     }
+    // LCOV_EXCL_STOP
   }
   void onInitialize() override
   {
     api_.spawn(
       "ego", traffic_simulator::helper::constructCanonicalizedLaneletPose(34513, 5.0, 0.0),
       getVehicleParameters());
-    api_.setLinearVelocity("ego", 10);
-    api_.requestSpeedChange("ego", 3, true);
+    auto ego_entity = api_.getEntity("ego");
+    ego_entity->setLinearVelocity(10);
+    ego_entity->requestSpeedChange(3, true);
   }
 };
 }  // namespace cpp_mock_scenarios
