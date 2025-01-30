@@ -285,9 +285,10 @@ auto ActionNode::getDistanceToTargetEntityOnCrosswalk(
     const traffic_simulator::CanonicalizedEntityStatus &status) const
     -> std::optional<double> {
   if (status.laneMatchingSucceed()) {
-    std::cout << "count:"
-              << hdmap_utils->getLaneletPolygon(status.getLaneletId()).size()
-              << std::endl;
+    const auto poly = hdmap_utils->getLaneletPolygon(status.getLaneletId());
+    for (const auto &point : poly) {
+      std::cout << "x: " << point.x << " y: " << point.y << std::endl;
+    }
     return spline.getCollisionPointIn2D(
         hdmap_utils->getLaneletPolygon(status.getLaneletId()), false);
   }
