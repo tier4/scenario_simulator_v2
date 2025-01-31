@@ -67,9 +67,9 @@ public:
   auto setLinearJerk(double) -> void;
 
   auto isInLanelet() const noexcept -> bool;
-  auto getLaneletId() const noexcept -> lanelet::Id;
-  auto getLaneletIds() const noexcept -> lanelet::Ids;
-  auto getLaneletPose() const noexcept -> const LaneletPose &;
+  auto getLaneletId() const -> lanelet::Id;
+  auto getLaneletIds() const -> lanelet::Ids;
+  auto getLaneletPose() const -> const LaneletPose &;
   auto getCanonicalizedLaneletPose() const noexcept
     -> const std::optional<CanonicalizedLaneletPose> &;
 
