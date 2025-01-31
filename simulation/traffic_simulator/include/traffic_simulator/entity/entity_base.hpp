@@ -54,6 +54,14 @@ public:
     const std::string & name, const CanonicalizedEntityStatus & entity_status,
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr);
 
+  EntityBase(const EntityBase &) = delete;
+
+  EntityBase & operator=(const EntityBase &) = delete;
+
+  EntityBase(EntityBase &&) noexcept = delete;
+
+  EntityBase & operator=(EntityBase &&) noexcept = delete;
+
   virtual ~EntityBase() = default;
 
   template <typename EntityType>

@@ -44,11 +44,11 @@ private:
   void onUpdate() override
   {
     // LCOV_EXCL_START
-    if (const auto ego_entity = api_.getEntity("ego"); !ego_entity->isInLanelet()) {
+    if (const auto & ego_entity = api_.getEntity("ego"); !ego_entity.isInLanelet()) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     } else if (const auto difference = std::abs(
-                 ego_entity->getCanonicalizedStatus().getLaneletPose().s -
-                 ego_entity->getTraveledDistance());
+                 ego_entity.getCanonicalizedStatus().getLaneletPose().s -
+                 ego_entity.getTraveledDistance());
                difference > std::numeric_limits<double>::epsilon()) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }  // LCOV_EXCL_STOP
@@ -62,9 +62,9 @@ private:
     api_.spawn(
       "ego", traffic_simulator::helper::constructCanonicalizedLaneletPose(34741, 0.0, 0.0),
       getVehicleParameters());
-    auto ego_entity = api_.getEntity("ego");
-    ego_entity->setLinearVelocity(3);
-    ego_entity->requestSpeedChange(3, true);
+    auto & ego_entity = api_.getEntity("ego");
+    ego_entity.setLinearVelocity(3);
+    ego_entity.requestSpeedChange(3, true);
   }
 };
 }  // namespace cpp_mock_scenarios

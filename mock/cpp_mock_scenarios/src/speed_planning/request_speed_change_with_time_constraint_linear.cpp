@@ -42,7 +42,7 @@ private:
   {
     if (api_.getCurrentTime() <= 3.999) {
       if (!equals(
-            api_.getCurrentTime() * 2.5, api_.getEntity("ego")->getCurrentTwist().linear.x, 0.01)) {
+            api_.getCurrentTime() * 2.5, api_.getEntity("ego").getCurrentTwist().linear.x, 0.01)) {
         stop(cpp_mock_scenarios::Result::FAILURE);
       }
     } else if (api_.getCurrentTime() >= 4.0) {
@@ -55,10 +55,10 @@ private:
     api_.spawn(
       "ego", traffic_simulator::helper::constructCanonicalizedLaneletPose(34741, 0.0, 0.0),
       getVehicleParameters());
-    auto ego_entity = api_.getEntity("ego");
+    auto & ego_entity = api_.getEntity("ego");
 
-    ego_entity->setLinearVelocity(0);
-    ego_entity->requestSpeedChange(
+    ego_entity.setLinearVelocity(0);
+    ego_entity.requestSpeedChange(
       10.0, traffic_simulator::speed_change::Transition::LINEAR,
       traffic_simulator::speed_change::Constraint(
         traffic_simulator::speed_change::Constraint::Type::TIME, 4.0),
