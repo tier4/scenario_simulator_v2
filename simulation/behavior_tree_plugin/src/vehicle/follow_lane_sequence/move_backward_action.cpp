@@ -60,7 +60,7 @@ BT::NodeStatus MoveBackwardAction::tick()
     request != traffic_simulator::behavior::Request::FOLLOW_LANE) {
     return BT::NodeStatus::FAILURE;
   }
-  if (!canonicalized_entity_status->laneMatchingSucceed()) {
+  if (!canonicalized_entity_status->isInLanelet()) {
     return BT::NodeStatus::FAILURE;
   }
   const auto waypoints = calculateWaypoints();

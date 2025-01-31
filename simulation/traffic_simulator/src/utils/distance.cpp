@@ -346,10 +346,9 @@ auto distanceToNearestConflictingPose(
       lanelet_wrapper::lanelet_map::conflictingCrosswalkIds(following_lanelets);
     for (const auto & status : other_statuses) {
       if (
-        status.laneMatchingSucceed() &&
-        std::count(
-          conflicting_crosswalks.begin(), conflicting_crosswalks.end(), status.getLaneletId()) >=
-          1) {
+        status.isInLanelet() && std::count(
+                                  conflicting_crosswalks.begin(), conflicting_crosswalks.end(),
+                                  status.getLaneletId()) >= 1) {
         conflicting_entity_status.emplace_back(status);
       }
     }
@@ -364,7 +363,7 @@ auto distanceToNearestConflictingPose(
       lanelet_wrapper::lanelet_map::conflictingLaneIds(following_lanelets);
     for (const auto & status : other_statuses) {
       if (
-        status.laneMatchingSucceed() &&
+        status.isInLanelet() &&
         std::count(conflicting_lanes.begin(), conflicting_lanes.end(), status.getLaneletId()) >=
           1) {
         conflicting_entity_status.emplace_back(status);

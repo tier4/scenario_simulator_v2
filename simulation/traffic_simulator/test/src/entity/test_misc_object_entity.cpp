@@ -265,14 +265,6 @@ TEST_F(MiscObjectEntityTest_FullObject, appendDebugMarker)
 }
 
 /**
- * @note Test basic functionality; test whether the function throws an error.
- */
-TEST_F(MiscObjectEntityTest_FullObject, asFieldOperatorApplication)
-{
-  EXPECT_THROW(misc_object.asFieldOperatorApplication(), common::Error);
-}
-
-/**
  * @note Test functionality used by other units; test correctness of 2d polygon calculations.
  */
 TEST_F(MiscObjectEntityTest_FullObject, get2DPolygon)
