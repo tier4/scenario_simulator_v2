@@ -9,6 +9,9 @@ Changelog for package simple_cross_map
 * Merge branch 'master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+9.0.2 (2025-01-31)
+------------------
+
 9.0.1 (2025-01-31)
 ------------------
 * Merge branch 'master' into feat/vel_model_acc

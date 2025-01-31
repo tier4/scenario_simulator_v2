@@ -21,6 +21,9 @@ Changelog for package simple_sensor_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+9.0.2 (2025-01-31)
+------------------
+
 9.0.1 (2025-01-31)
 ------------------
 * Merge pull request `#1516 <https://github.com/tier4/scenario_simulator_v2/issues/1516>`_ from tier4/feat/vel_model_acc
