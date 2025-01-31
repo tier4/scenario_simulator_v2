@@ -139,25 +139,20 @@ auto longitudinalDistance(
 auto distanceToStopLine(const lanelet::Ids & route_lanelets, const SplineInterface & route_spline)
   -> std::optional<double>
 {
-  if (route_spline.getLength() <= 0) {
+  if (route_spline.getLength() <= 0.0) {
     return std::nullopt;
   } else {
-    std::vector<double> collision_points;
-    // fill in collision_points using stop_lines
-    const auto stop_lines = lanelet_wrapper::lanelet_map::stopLinesOnPath({route_lanelets});
+    std::optional<double> min_distance{std::nullopt};
+    const auto & stop_lines = lanelet_wrapper::lanelet_map::stopLinesOnPath({route_lanelets});
     for (const auto & stop_line : stop_lines) {
-      std::vector<Point> stop_line_points;
-      for (const auto & point : stop_line) {
-        stop_line_points.emplace_back(
-          geometry_msgs::build<geometry_msgs::msg::Point>().x(point.x()).y(point.y()).z(point.z()));
-      }
-      if (const auto collision_point = route_spline.getCollisionPointIn2D(stop_line_points)) {
-        collision_points.push_back(collision_point.value());
+      const auto & stop_line_points = lanelet_wrapper::lanelet_map::toPolygon(stop_line);
+      if (const auto & collision_point = route_spline.getCollisionPointIn2D(stop_line_points)) {
+        if (not min_distance.has_value() or collision_point.value() < min_distance.value()) {
+          min_distance = collision_point;
+        }
       }
     }
-    return collision_points.empty()
-             ? std::nullopt
-             : std::optional(*std::min_element(collision_points.begin(), collision_points.end()));
+    return min_distance;
   }
 }
 
@@ -184,7 +179,7 @@ auto distanceToStopLine(const std::vector<Point> & route_waypoints, const lanele
   }
 }
 
-// TrafficLigthStopLine
+// TrafficLightStopLine
 auto distanceToTrafficLightStopLine(
   const SplineInterface & route_spline, const lanelet::Id traffic_light_id) -> std::optional<double>
 {
@@ -216,21 +211,22 @@ auto distanceToTrafficLightStopLine(
   const lanelet::Ids & route_lanelets, const SplineInterface & route_spline)
   -> std::optional<double>
 {
-  if (auto traffic_light_ids =
+  if (const auto & traffic_light_ids =
         lanelet_wrapper::traffic_lights::trafficLightIdsOnPath(route_lanelets);
       traffic_light_ids.empty()) {
     return std::nullopt;
   } else {
-    std::vector<double> collision_points;
+    std::optional<double> min_distance{std::nullopt};
     for (const auto traffic_light_id : traffic_light_ids) {
-      const auto collision_point = distanceToTrafficLightStopLine(route_spline, traffic_light_id);
-      if (collision_point) {
-        collision_points.push_back(collision_point.value());
+      if (
+        const auto & collision_point =
+          distanceToTrafficLightStopLine(route_spline, traffic_light_id)) {
+        if (not min_distance.has_value() or collision_point.value() < min_distance.value()) {
+          min_distance = collision_point;
+        }
       }
     }
-    return collision_points.empty()
-             ? std::nullopt
-             : std::optional(*std::min_element(collision_points.begin(), collision_points.end()));
+    return min_distance;
   }
 }
 
@@ -238,7 +234,11 @@ auto distanceToTrafficLightStopLine(
   const lanelet::Ids & route_lanelets, const std::vector<Point> & route_waypoints)
   -> std::optional<double>
 {
-  return distanceToTrafficLightStopLine(route_lanelets, Spline{route_waypoints});
+  if (route_waypoints.empty()) {
+    return std::nullopt;
+  } else {
+    return distanceToTrafficLightStopLine(route_lanelets, Spline{route_waypoints});
+  }
 }
 
 // Crosswalk
