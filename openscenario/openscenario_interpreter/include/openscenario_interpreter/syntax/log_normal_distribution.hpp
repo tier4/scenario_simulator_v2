@@ -12,42 +12,51 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__UNIFORM_DISTRIBUTION_HPP_
-#define OPENSCENARIO_INTERPRETER__SYNTAX__UNIFORM_DISTRIBUTION_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__LOG_NORMAL_DISTRIBUTION_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__LOG_NORMAL_DISTRIBUTION_HPP_
 
 #include <openscenario_interpreter/parameter_distribution.hpp>
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/range.hpp>
 #include <random>
-#include <typeinfo>
+#include <string>
+
+// cspell: ignore lognormal
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
 /*
-   UniformDistribution (OpenSCENARIO XML 1.3.1)
+   LogNormalDistribution (OpenSCENARIO XML 1.3)
 
-   Uniform distribution which can be applied to a single parameter.
+   Defines a log normal distribution.
 
-   <xsd:complexType name="UniformDistribution">
+   <xsd:complexType name="LogNormalDistribution">
      <xsd:sequence>
-       <xsd:element name="Range" type="Range"/>
+       <xsd:element name="Range" type="Range" minOccurs="0"/>
      </xsd:sequence>
+     <xsd:attribute name="expectedValue" type="Double" use="required"/>
+     <xsd:attribute name="variance" type="Double" use="required"/>
    </xsd:complexType>
 */
-struct UniformDistribution : public ComplexType,
-                             private Scope,
-                             public StochasticParameterDistributionBase
+struct LogNormalDistribution : public ComplexType,
+                               private Scope,
+                               public StochasticParameterDistributionBase
 {
   const Range range;
 
-  std::uniform_real_distribution<Double::value_type> distribute;
+  const Double expected_value;
 
-  explicit UniformDistribution(const pugi::xml_node &, Scope & scope);
+  const Double variance;
+
+  std::lognormal_distribution<Double::value_type> distribute;
+
+  explicit LogNormalDistribution(const pugi::xml_node &, Scope & scope);
 
   auto derive() -> Object override;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
-#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__UNIFORM_DISTRIBUTION_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__LOG_NORMAL_DISTRIBUTION_HPP_
