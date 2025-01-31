@@ -128,6 +128,7 @@ auto centerPoints(const lanelet::Ids & lanelet_ids) -> std::vector<Point>
       const auto & points = centerPoints(lanelet_id);
       center_points.insert(center_points.end(), points.begin(), points.end());
     }
+    /// @note We intentionally do not sort here, because only consecutive duplicates are supposed to be removed
     center_points.erase(
       std::unique(center_points.begin(), center_points.end()), center_points.end());
     return center_points;
