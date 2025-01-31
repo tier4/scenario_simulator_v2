@@ -40,27 +40,24 @@ private:
   bool requested = false;
   void onUpdate() override
   {
-    if (api_.isInLanelet("ego", 34630, 0.1)) {
+    if (api_.getEntity("ego")->isInLanelet(34630, 0.1)) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
   }
   void onInitialize() override
   {
     api_.spawn(
-      "ego",
-      traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34513, 0.0, 0.0, api_.getHdmapUtils()),
+      "ego", traffic_simulator::helper::constructCanonicalizedLaneletPose(34513, 0.0, 0.0),
       getVehicleParameters());
-    api_.setLinearVelocity("ego", 10);
-    api_.requestSpeedChange("ego", 10, true);
+    auto ego_entity = api_.getEntity("ego");
+    ego_entity->setLinearVelocity(10);
+    ego_entity->requestSpeedChange(10, true);
     std::vector<geometry_msgs::msg::Pose> goal_poses;
     goal_poses.emplace_back(traffic_simulator::pose::toMapPose(
-      traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34408, 1.0, 0.0, api_.getHdmapUtils())));
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(34408, 1.0, 0.0)));
     goal_poses.emplace_back(traffic_simulator::pose::toMapPose(
-      traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34408, 10, 0.0, api_.getHdmapUtils())));
-    api_.requestAssignRoute("ego", goal_poses);
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(34408, 10, 0.0)));
+    ego_entity->requestAssignRoute(goal_poses);
   }
 };
 }  // namespace cpp_mock_scenarios

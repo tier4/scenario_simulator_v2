@@ -29,6 +29,7 @@
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/helper/stop_watch.hpp>
 #include <traffic_simulator/traffic_lights/traffic_lights.hpp>
+#include <traffic_simulator/utils/lanelet_map.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator_msgs/msg/obstacle.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
@@ -37,6 +38,8 @@
 
 namespace entity_behavior
 {
+BT::PortsList operator+(const BT::PortsList & ports_0, const BT::PortsList & ports_1);
+
 class ActionNode : public BT::ActionNodeBase
 {
 public:
@@ -92,7 +95,8 @@ public:
       // clang-format on
     };
   }
-  auto getBlackBoardValues() -> void;
+
+  virtual auto getBlackBoardValues() -> void;
   auto getEntityStatus(const std::string & target_name) const
     -> const traffic_simulator::CanonicalizedEntityStatus &;
   auto getDistanceToTargetEntityPolygon(
@@ -103,10 +107,10 @@ public:
 
   auto setCanonicalizedEntityStatus(const traffic_simulator::EntityStatus & entity_status) -> void;
   auto calculateUpdatedEntityStatus(
-    double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints &) const
+    const double local_target_speed, const traffic_simulator_msgs::msg::DynamicConstraints &) const
     -> traffic_simulator::EntityStatus;
   auto calculateUpdatedEntityStatusInWorldFrame(
-    double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints &) const
+    const double local_target_speed, const traffic_simulator_msgs::msg::DynamicConstraints &) const
     -> traffic_simulator::EntityStatus;
 
 protected:
@@ -136,6 +140,8 @@ private:
     -> std::vector<traffic_simulator::CanonicalizedEntityStatus>;
   auto getConflictingEntityStatusOnLane(const lanelet::Ids & route_lanelets) const
     -> std::vector<traffic_simulator::CanonicalizedEntityStatus>;
+  auto isOtherEntityAtConsideredAltitude(
+    const traffic_simulator::CanonicalizedEntityStatus & entity_status) const -> bool;
 };
 }  // namespace entity_behavior
 

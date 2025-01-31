@@ -3,14 +3,14 @@
 
 <package format="3">
   <name>openscenario_interpreter_example</name>
-  <version>6.0.0</version>
+  <version>9.0.2</version>
   <description>Examples for some TIER IV OpenSCENARIO Interpreter's features</description>
   <maintainer email="tatsuya.yamasaki@tier4.jp">Tatsuya Yamasaki</maintainer>
   <license>Apache License 2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <depend>autoware_auto_system_msgs</depend>
+  <depend>autoware_system_msgs</depend>
   <depend>boost</depend>
   <depend>libboost-dev</depend>
   <depend>rclcpp</depend>

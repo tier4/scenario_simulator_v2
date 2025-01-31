@@ -40,13 +40,12 @@ public:
 private:
   void onUpdate() override
   {
-    if (api_.getCurrentTime() <= 3.9 && api_.getCurrentTwist("ego").linear.x >= 3.0) {
+    const auto ego_linear_velocity = api_.getEntity("ego")->getCurrentTwist().linear.x;
+    if (api_.getCurrentTime() <= 3.9 && ego_linear_velocity >= 3.0) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     if (api_.getCurrentTime() >= 3.9999) {
-      if (
-        api_.getCurrentTwist("ego").linear.x <= 3.1 &&
-        api_.getCurrentTwist("ego").linear.x >= 2.9) {
+      if (ego_linear_velocity <= 3.1 && ego_linear_velocity >= 2.9) {
         stop(cpp_mock_scenarios::Result::SUCCESS);
       } else {
         stop(cpp_mock_scenarios::Result::FAILURE);
@@ -57,13 +56,11 @@ private:
   void onInitialize() override
   {
     api_.spawn(
-      "ego",
-      traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34741, 0.0, 0.0, api_.getHdmapUtils()),
+      "ego", traffic_simulator::helper::constructCanonicalizedLaneletPose(34741, 0.0, 0.0),
       getVehicleParameters());
-    api_.setLinearVelocity("ego", 1.0);
-    api_.requestSpeedChange(
-      "ego",
+    auto ego_entity = api_.getEntity("ego");
+    ego_entity->setLinearVelocity(1.0);
+    ego_entity->requestSpeedChange(
       traffic_simulator::speed_change::RelativeTargetSpeed(
         "ego", traffic_simulator::speed_change::RelativeTargetSpeed::Type::DELTA, 2.0),
       traffic_simulator::speed_change::Transition::AUTO,
@@ -72,13 +69,12 @@ private:
       false);
 
     api_.spawn(
-      "front",
-      traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34741, 10.0, 0.0, api_.getHdmapUtils()),
+      "front", traffic_simulator::helper::constructCanonicalizedLaneletPose(34741, 10.0, 0.0),
       getVehicleParameters());
-    api_.setLinearVelocity("front", 10);
-    api_.requestSpeedChange(
-      "front", 10.0, traffic_simulator::speed_change::Transition::LINEAR,
+    auto front_entity = api_.getEntity("front");
+    front_entity->setLinearVelocity(10);
+    front_entity->requestSpeedChange(
+      10.0, traffic_simulator::speed_change::Transition::LINEAR,
       traffic_simulator::speed_change::Constraint(
         traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 4.0),
       true);

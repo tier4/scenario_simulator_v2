@@ -45,12 +45,11 @@ private:
     api_.updateFrame();
 
     const double current_time = api_.getCurrentTime();
-    const double current_speed = api_.getCurrentTwist("front").linear.x;
+    auto front_entity = api_.getEntity("front");
 
     if (current_time >= 0.0 and not request_sent) {
       request_sent = true;
-      api_.requestSpeedChange(
-        "front",
+      front_entity->requestSpeedChange(
         traffic_simulator::speed_change::RelativeTargetSpeed(
           "ego", traffic_simulator::speed_change::RelativeTargetSpeed::Type::DELTA, 2.0),
         traffic_simulator::speed_change::Transition::LINEAR,
@@ -59,6 +58,7 @@ private:
         true);
     }
 
+    const double current_speed = front_entity->getCurrentTwist().linear.x;
     static constexpr double speed_tolerance = 0.05;
     if (current_time >= 0.0 and current_time < 2.0) {
       if (not equals(current_time + 3.0, current_speed, speed_tolerance)) {
@@ -76,19 +76,16 @@ private:
   void onInitialize() override
   {
     api_.spawn(
-      "ego",
-      traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34741, 0.0, 0.0, api_.getHdmapUtils()),
+      "ego", traffic_simulator::helper::constructCanonicalizedLaneletPose(34741, 0.0, 0.0),
       getVehicleParameters());
-    api_.setLinearVelocity("ego", 3);
-    api_.requestSpeedChange("ego", 3.0, true);
+    auto ego_entity = api_.getEntity("ego");
+    ego_entity->setLinearVelocity(3);
+    ego_entity->requestSpeedChange(3.0, true);
 
     api_.spawn(
-      "front",
-      traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34741, 10.0, 0.0, api_.getHdmapUtils()),
+      "front", traffic_simulator::helper::constructCanonicalizedLaneletPose(34741, 10.0, 0.0),
       getVehicleParameters());
-    api_.setLinearVelocity("front", 3);
+    api_.getEntity("front")->setLinearVelocity(3);
   }
 };
 }  // namespace cpp_mock_scenarios

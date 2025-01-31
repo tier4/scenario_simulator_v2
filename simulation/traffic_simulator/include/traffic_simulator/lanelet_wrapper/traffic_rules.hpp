@@ -17,7 +17,9 @@
 
 #include <lanelet2_traffic_rules/GermanTrafficRules.h>
 
-namespace hdmap_utils
+namespace traffic_simulator
+{
+namespace lanelet_wrapper
 {
 struct Locations
 {
@@ -29,16 +31,17 @@ struct Locations
 class GermanRoadShoulderPassableVehicle : public lanelet::traffic_rules::GermanVehicle
 {
 public:
+  using lanelet::traffic_rules::GenericTrafficRules::canPass;
   using lanelet::traffic_rules::GermanVehicle::GermanVehicle;
 
 protected:
   /// @note this function overrides and adds road shoulder handling to GenericTrafficRules::canPass
-  lanelet::Optional<bool> canPass(
-    const std::string & type, const std::string & /*location*/) const override
+  auto canPass(const std::string & type, const std::string & /*location*/) const
+    -> lanelet::Optional<bool> override
   {
     using lanelet::AttributeValueString;
     using lanelet::Participants;
-    const static std::map<std::string, std::vector<std::string>> participants_map{
+    const static std::map<std::string, std::vector<std::string>, std::less<>> participants_map{
       // clang-format off
       {"",                                  {Participants::Vehicle}},
       {AttributeValueString::Road,          {Participants::Vehicle, Participants::Bicycle}},
@@ -59,13 +62,17 @@ protected:
       return {};
     }
 
-    auto startsWith = [](const std::string & str, const std::string & substr) {
+    auto startsWith = [](std::string_view str, std::string_view substr) {
       return str.compare(0, substr.size(), substr) == 0;
     };
     return lanelet::utils::anyOf(participants->second, [this, startsWith](auto & participant) {
       return startsWith(this->participant(), participant);
     });
   }
+
+  lanelet::traffic_rules::LaneChangeType laneChangeType(
+    const lanelet::ConstLineString3d &, bool) const override;
 };
-}  // namespace hdmap_utils
+}  // namespace lanelet_wrapper
+}  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__HDMAP_UTILS__TRAFFIC_RULES_HPP_

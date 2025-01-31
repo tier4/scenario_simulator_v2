@@ -21,6 +21,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <string>
 #include <traffic_simulator/api/api.hpp>
+#include <traffic_simulator/utils/lanelet_map.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <vector>
 
@@ -70,12 +71,12 @@ private:
           traffic_simulator::helper::constructCanonicalizedLaneletPose(
             spawn_lanelet_id,
             static_cast<double>(entity_index) / static_cast<double>(number_of_vehicles) *
-                traffic_simulator::pose::laneletLength(spawn_lanelet_id, api_.getHdmapUtils()) +
+                traffic_simulator::lanelet_map::laneletLength(spawn_lanelet_id) +
               normal_dist(engine_),
-            offset, api_.getHdmapUtils()),
+            offset),
           getVehicleParameters(
             get_entity_subtype(params_.random_parameters.road_parking_vehicle.entity_type)));
-        api_.requestSpeedChange(entity_name, 0, true);
+        api_.getEntity(entity_name)->requestSpeedChange(0, true);
       };
     std::uniform_real_distribution<> dist(
       params_.random_parameters.road_parking_vehicle.min_offset,
@@ -98,7 +99,7 @@ private:
   {
     for (int i = 0; i < params_.random_parameters.crossing_pedestrian.number_of_pedestrian; i++) {
       std::string entity_name = "pedestrian" + std::to_string(i);
-      if (api_.entityExists(entity_name)) {
+      if (api_.isEntityExist(entity_name)) {
         api_.despawn(entity_name);
       }
     }
@@ -106,6 +107,7 @@ private:
 
   void onUpdate() override
   {
+    const auto ego_entity = api_.getEntity("ego");
     {
       if (param_listener_->is_old(params_)) {
         /// When the parameter was updated, clear entity before re-spawning entity.
@@ -119,34 +121,35 @@ private:
     };
 
     const auto spawn_and_change_lane = [&](const auto & entity_name, const auto spawn_s_value) {
-      if (!api_.entityExists(entity_name)) {
+      if (!api_.isEntityExist(entity_name)) {
         api_.spawn(
           entity_name,
-          traffic_simulator::helper::constructCanonicalizedLaneletPose(
-            34513, spawn_s_value, 0.0, api_.getHdmapUtils()),
+          traffic_simulator::helper::constructCanonicalizedLaneletPose(34513, spawn_s_value, 0.0),
           getVehicleParameters());
         std::uniform_real_distribution<> speed_distribution(
           params_.random_parameters.lane_following_vehicle.min_speed,
           params_.random_parameters.lane_following_vehicle.max_speed);
         const auto speed = speed_distribution(engine_);
-        api_.requestSpeedChange(entity_name, speed, true);
-        api_.setLinearVelocity(entity_name, speed);
+        auto entity = api_.getEntity(entity_name);
+        entity->requestSpeedChange(speed, true);
+        entity->setLinearVelocity(speed);
         std::uniform_real_distribution<> lane_change_position_distribution(
-          0.0, traffic_simulator::pose::laneletLength(34684, api_.getHdmapUtils()));
+          0.0, traffic_simulator::lanelet_map::laneletLength(34684));
         lane_change_position = lane_change_position_distribution(engine_);
         lane_change_requested = false;
       }
       /// Checking the ego entity overs the lane change position.
-      if (const auto entity = api_.getEntity("ego"); entity->laneMatchingSucceed()) {
-        const auto lanelet_pose = entity->getCanonicalizedStatus().getLaneletPose();
+      if (ego_entity->isInLanelet()) {
+        const auto lanelet_pose = ego_entity->getCanonicalizedStatus().getLaneletPose();
         if (lanelet_pose.lanelet_id == 34684 && std::abs(lanelet_pose.s) >= lane_change_position) {
-          api_.requestLaneChange(entity_name, traffic_simulator::lane_change::Direction::RIGHT);
+          api_.getEntity(entity_name)
+            ->requestLaneChange(traffic_simulator::lane_change::Direction::RIGHT);
           lane_change_requested = true;
         }
       }
     };
 
-    if (api_.isInLanelet("ego", 34684, 0.1)) {
+    if (ego_entity->isInLanelet(34684, 0.1)) {
       spawn_and_change_lane("lane_following_0", 0.0);
     }
 
@@ -155,12 +158,9 @@ private:
       std::string entity_name = "pedestrian" + std::to_string(entity_index);
       constexpr lanelet::Id lanelet_id = 34392;
       if (
-        !api_.entityExists(entity_name) &&
-        !api_.reachPosition(
-          "ego",
-          traffic_simulator::helper::constructCanonicalizedLaneletPose(
-            34576, 25.0, 0.0, api_.getHdmapUtils()),
-          5.0)) {
+        !api_.isEntityExist(entity_name) &&
+        !ego_entity->isNearbyPosition(
+          traffic_simulator::helper::constructCanonicalizedLaneletPose(34576, 25.0, 0.0), 5.0)) {
         std::normal_distribution<> offset_distribution(
           0.0, params_.random_parameters.crossing_pedestrian.offset_variance);
         std::uniform_real_distribution<> speed_distribution(
@@ -169,13 +169,16 @@ private:
         api_.spawn(
           entity_name,
           traffic_simulator::helper::constructCanonicalizedLaneletPose(
-            lanelet_id, 0.0, offset_distribution(engine_), api_.getHdmapUtils()),
+            lanelet_id, 0.0, offset_distribution(engine_)),
           getPedestrianParameters());
         const auto speed = speed_distribution(engine_);
-        api_.requestSpeedChange(entity_name, speed, true);
-        api_.setLinearVelocity(entity_name, speed);
+        auto entity = api_.getEntity(entity_name);
+        entity->requestSpeedChange(speed, true);
+        entity->setLinearVelocity(speed);
       }
-      if (api_.entityExists(entity_name) && api_.getStandStillDuration(entity_name) >= 0.5) {
+      if (
+        api_.isEntityExist(entity_name) &&
+        api_.getEntity(entity_name)->getStandStillDuration() >= 0.5) {
         api_.despawn(entity_name);
       }
     };
@@ -183,37 +186,34 @@ private:
       spawn_and_cross_pedestrian(i);
     }
 
-    {
-      const auto trigger_position = traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34621, 10, 0.0, api_.getHdmapUtils());
-      const auto ego_goal_position = traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34606, 0.0, 0.0, api_.getHdmapUtils());
-      const auto entity_name = "spawn_nearby_ego";
+    const auto trigger_position =
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(34621, 10.0, 0.0);
+    const auto ego_goal_position =
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(34606, 0.0, 0.0);
+    constexpr auto entity_name = "spawn_nearby_ego";
 
-      if (const auto ego = api_.getEntity("ego")) {
-        if (api_.reachPosition("ego", trigger_position, 20.0) && !api_.entityExists(entity_name)) {
-          api_.spawn(
-            entity_name,
-            traffic_simulator::pose::transformRelativePoseToGlobal(
-              ego->getMapPose(),
-              geometry_msgs::build<geometry_msgs::msg::Pose>()
-                .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(10).y(-5).z(0))
-                .orientation(geometry_msgs::msg::Quaternion())),
-            getVehicleParameters(),
-            traffic_simulator::entity::VehicleEntity::BuiltinBehavior::doNothing());
-        }
+    if (ego_entity->isNearbyPosition(trigger_position, 20.0) && !api_.isEntityExist(entity_name)) {
+      api_.spawn(
+        entity_name,
+        traffic_simulator::pose::transformRelativePoseToGlobal(
+          ego_entity->getMapPose(),
+          geometry_msgs::build<geometry_msgs::msg::Pose>()
+            .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(10.0).y(-5.0).z(0.0))
+            .orientation(geometry_msgs::msg::Quaternion())),
+        getVehicleParameters(),
+        traffic_simulator::entity::VehicleEntity::BuiltinBehavior::doNothing());
+    }
 
-        if (!api_.reachPosition("ego", trigger_position, 20.0) && api_.entityExists(entity_name)) {
-          api_.despawn(entity_name);
-        }
-      }
+    if (!ego_entity->isNearbyPosition(trigger_position, 20.0) && api_.isEntityExist(entity_name)) {
+      api_.despawn(entity_name);
+    }
 
-      if (api_.reachPosition("ego", ego_goal_position, 1.0)) {
-        api_.despawn("ego");
-        stop(cpp_mock_scenarios::Result::SUCCESS);
-      }
+    if (ego_entity->isNearbyPosition(ego_goal_position, 1.0)) {
+      api_.despawn("ego");
+      stop(cpp_mock_scenarios::Result::SUCCESS);
     }
   }
+
   void onInitialize() override
   {
     // api_.setVerbose(true);
@@ -223,10 +223,8 @@ private:
     spawnRoadParkingVehicles();
 
     spawnEgoEntity(
-      traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34621, 10.0, 0.0, api_.getHdmapUtils()),
-      {traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34606, 0.0, 0.0, api_.getHdmapUtils())},
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(34621, 10.0, 0.0),
+      {traffic_simulator::helper::constructCanonicalizedLaneletPose(34606, 0.0, 0.0)},
       getVehicleParameters());
     if (const auto ego = api_.getEntity("ego")) {
       api_.spawn(

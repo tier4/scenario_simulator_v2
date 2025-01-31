@@ -15,12 +15,15 @@
 #ifndef SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__TRAFFIC_LIGHTS__TRAFFIC_LIGHTS_DETECTOR_HPP_
 #define SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__TRAFFIC_LIGHTS__TRAFFIC_LIGHTS_DETECTOR_HPP_
 
-#include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
-#include <autoware_perception_msgs/msg/traffic_signal_array.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <simulation_interface/conversions.hpp>
 #include <string>
 #include <traffic_simulator/traffic_lights/traffic_light_publisher.hpp>
+
+// This message will be deleted in the future
+#if __has_include(<autoware_perception_msgs/msg/traffic_signal_array.hpp>)
+#include <autoware_perception_msgs/msg/traffic_signal_array.hpp>
+#endif
 
 #if __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)
 #include <autoware_perception_msgs/msg/traffic_light_group_array.hpp>
@@ -60,19 +63,20 @@ private:
        TrafficLightsDetector in SimpleSensorSimulator publishes using architecture-dependent topics:
        "/perception/traffic_light_recognition/internal/traffic_signals" for >= "awf/universe/20240605"
        "/perception/traffic_light_recognition/internal/traffic_signals" for == "awf/universe/20230906"
-       "/perception/traffic_light_recognition/traffic_signals" for "awf/universe"
 
-       V2ITrafficLights in TrafficSimulator publishes publishes using architecture-independent topics ("awf/universe..."): 
+       V2ITrafficLights in TrafficSimulator publishes using architecture-independent topics ("awf/universe..."):
        "/v2x/traffic_signals" and "/perception/traffic_light_recognition/external/traffic_signals"
     */
     if (architecture_type == "awf/universe") {
-      using Message = autoware_auto_perception_msgs::msg::TrafficSignalArray;
-      return std::make_unique<traffic_simulator::TrafficLightPublisher<Message>>(
-        &node, "/perception/traffic_light_recognition/traffic_signals");
+      throw common::SemanticError(
+        "This version of scenario_simulator_v2 does not support ", std::quoted(architecture_type),
+        " as ", std::quoted("architecture_type"), ". Please use older version.");
+#if __has_include(<autoware_perception_msgs/msg/traffic_signal_array.hpp>)
     } else if (architecture_type == "awf/universe/20230906") {
       using Message = autoware_perception_msgs::msg::TrafficSignalArray;
       return std::make_unique<traffic_simulator::TrafficLightPublisher<Message>>(
         &node, "/perception/traffic_light_recognition/internal/traffic_signals");
+#endif
 #if __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)
     } else if (architecture_type >= "awf/universe/20240605") {
       using Message = autoware_perception_msgs::msg::TrafficLightGroupArray;

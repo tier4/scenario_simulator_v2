@@ -28,6 +28,7 @@
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
 #include <traffic_simulator/traffic/traffic_controller.hpp>
 #include <traffic_simulator/traffic/traffic_sink.hpp>
+#include <traffic_simulator/utils/lanelet_map.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 #include <utility>
 #include <vector>
@@ -37,48 +38,40 @@ namespace traffic_simulator
 namespace traffic
 {
 TrafficController::TrafficController(
-  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils,
-  const std::function<std::vector<std::string>(void)> & get_entity_names_function,
-  const std::function<geometry_msgs::msg::Pose(const std::string &)> & get_entity_pose_function,
-  const std::function<void(std::string)> & despawn_function, bool auto_sink)
-: hdmap_utils_(hdmap_utils),
-  get_entity_names_function(get_entity_names_function),
-  get_entity_pose_function(get_entity_pose_function),
-  despawn_function(despawn_function),
-  auto_sink(auto_sink)
+  const std::function<void(const std::string &)> & despawn,
+  const std::shared_ptr<entity::EntityManager> entity_manager_ptr,
+  const std::set<std::uint8_t> auto_sink_entity_types)
+: despawn_(despawn), entity_manager_ptr_(entity_manager_ptr), modules_()
 {
-  if (auto_sink) {
-    autoSink();
+  if (not auto_sink_entity_types.empty()) {
+    appendAutoSinks(auto_sink_entity_types);
   }
 }
 
-void TrafficController::autoSink()
+auto TrafficController::appendAutoSinks(const std::set<std::uint8_t> & auto_sink_entity_types)
+  -> void
 {
-  for (const auto & lanelet_id : hdmap_utils_->getLaneletIds()) {
-    if (hdmap_utils_->getNextLaneletIds(lanelet_id).empty()) {
-      LaneletPose lanelet_pose;
-      lanelet_pose.lanelet_id = lanelet_id;
-      lanelet_pose.s = pose::laneletLength(lanelet_id, hdmap_utils_);
-      const auto pose = pose::toMapPose(lanelet_pose, hdmap_utils_);
-      addModule<traffic_simulator::traffic::TrafficSink>(
-        lanelet_id, 1, pose.position, get_entity_names_function, get_entity_pose_function,
-        despawn_function);
-    }
+  /// @note Hard coded parameter, this value is radius of the traffic sink circle.
+  constexpr double sink_radius{1.0};
+  for (const auto & [lanelet_id, pose] : lanelet_map::noNextLaneletPoses()) {
+    const auto traffic_sink_config = TrafficSinkConfig(
+      sink_radius, pose.position, auto_sink_entity_types, std::make_optional(lanelet_id));
+    addModule<TrafficSink>(despawn_, entity_manager_ptr_, traffic_sink_config);
   }
 }
 
-void TrafficController::execute(const double current_time, const double step_time)
+auto TrafficController::execute(const double current_time, const double step_time) -> void
 {
   for (const auto & module : modules_) {
     module->execute(current_time, step_time);
   }
 }
 
-auto TrafficController::makeDebugMarker() const -> const visualization_msgs::msg::MarkerArray
+auto TrafficController::makeDebugMarker() const -> visualization_msgs::msg::MarkerArray
 {
-  static const auto marker_array = [&]() {
+  static const auto marker_array = [this]() {
     visualization_msgs::msg::MarkerArray marker_array;
-    for (size_t i = 0; i < modules_.size(); ++i) {
+    for (std::size_t i = 0UL; i < modules_.size(); ++i) {
       modules_[i]->appendDebugMarker(marker_array);
     }
     return marker_array;

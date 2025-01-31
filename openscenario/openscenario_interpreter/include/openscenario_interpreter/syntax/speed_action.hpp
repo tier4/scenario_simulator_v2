@@ -38,8 +38,7 @@ inline namespace syntax
  *
  * -------------------------------------------------------------------------- */
 struct SpeedAction : private Scope,  // NOTE: Required for access to actors
-                     private SimulatorCore::ActionApplication,
-                     private SimulatorCore::ConditionEvaluation
+                     private SimulatorCore::ActionApplication
 {
   const TransitionDynamics speed_action_dynamics;
 

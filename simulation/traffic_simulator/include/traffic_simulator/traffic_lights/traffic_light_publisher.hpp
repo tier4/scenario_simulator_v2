@@ -30,6 +30,7 @@ public:
   virtual auto publish(
     const rclcpp::Time & current_ros_time,
     const simulation_api_schema::UpdateTrafficLightsRequest & request) const -> void = 0;
+
   virtual ~TrafficLightPublisherBase() = default;
 };
 
@@ -50,9 +51,17 @@ public:
 
   ~TrafficLightPublisher() override = default;
 
+  static auto generateMessage(
+    const rclcpp::Time &, const simulation_api_schema::UpdateTrafficLightsRequest & request,
+    const std::string & frame = "") -> std::unique_ptr<MessageType>;
+
   auto publish(
     const rclcpp::Time & current_ros_time,
-    const simulation_api_schema::UpdateTrafficLightsRequest & request) const -> void override;
+    const simulation_api_schema::UpdateTrafficLightsRequest & request) const -> void override
+  {
+    traffic_light_state_array_publisher_->publish(
+      generateMessage(current_ros_time, request, frame_));
+  }
 
 private:
   const std::string frame_;

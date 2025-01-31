@@ -40,8 +40,9 @@ private:
   void onUpdate() override
   {
     if (
-      api_.getCurrentTime() <= 0.999 && !equals(api_.getCurrentTwist("ego").linear.x, 10.0, 0.01) &&
-      !equals(api_.getCurrentTwist("front").linear.x, 10.0, 0.01)) {
+      api_.getCurrentTime() <= 0.999 &&
+      !equals(api_.getEntity("ego")->getCurrentTwist().linear.x, 10.0, 0.01) &&
+      !equals(api_.getEntity("front")->getCurrentTwist().linear.x, 10.0, 0.01)) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     if (api_.getCurrentTime() >= 1.0) {
@@ -52,25 +53,23 @@ private:
   void onInitialize() override
   {
     api_.spawn(
-      "ego",
-      traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34741, 0.0, 0.0, api_.getHdmapUtils()),
+      "ego", traffic_simulator::helper::constructCanonicalizedLaneletPose(34741, 0.0, 0.0),
       getVehicleParameters());
-    api_.setLinearVelocity("ego", 0);
-    api_.requestSpeedChange(
-      "ego", 10.0, traffic_simulator::speed_change::Transition::STEP,
+    auto ego_entity = api_.getEntity("ego");
+    ego_entity->setLinearVelocity(0);
+    ego_entity->requestSpeedChange(
+      10.0, traffic_simulator::speed_change::Transition::STEP,
       traffic_simulator::speed_change::Constraint(
         traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 10.0),
       true);
 
     api_.spawn(
-      "front",
-      traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34741, 10.0, 0.0, api_.getHdmapUtils()),
+      "front", traffic_simulator::helper::constructCanonicalizedLaneletPose(34741, 10.0, 0.0),
       getVehicleParameters());
-    api_.setLinearVelocity("front", 0);
-    api_.requestSpeedChange(
-      "front", 10.0, traffic_simulator::speed_change::Transition::STEP,
+    auto front_entity = api_.getEntity("front");
+    front_entity->setLinearVelocity(0);
+    front_entity->requestSpeedChange(
+      10.0, traffic_simulator::speed_change::Transition::STEP,
       traffic_simulator::speed_change::Constraint(
         traffic_simulator::speed_change::Constraint::Type::TIME, 0.0),
       true);

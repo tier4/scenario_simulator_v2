@@ -78,8 +78,9 @@ public:
       RCLCPP_INFO_STREAM(logger_, message);
       scenario_completed_ = false;
 
-      if (const auto ego_start_canonicalized_lanelet_pose = traffic_simulator::pose::canonicalize(
-            test_description_.ego_start_position, api_->getHdmapUtils());
+      if (const auto ego_start_canonicalized_lanelet_pose =
+            traffic_simulator::pose::toCanonicalizedLaneletPose(
+              test_description_.ego_start_position);
           !ego_start_canonicalized_lanelet_pose) {
         throw std::runtime_error(
           "Can not canonicalize ego start lanelet pose: id: " +
@@ -91,8 +92,11 @@ public:
         api_->spawn(
           ego_name_, ego_start_canonicalized_lanelet_pose.value(), getVehicleParameters(),
           traffic_simulator::VehicleBehavior::autoware(), "lexus_rx450h");
-        api_->setEntityStatus(
-          ego_name_, ego_start_canonicalized_lanelet_pose.value(),
+
+        auto ego_entity = api_->getEgoEntity(ego_name_);
+
+        ego_entity->setStatus(
+          ego_start_canonicalized_lanelet_pose.value(),
           traffic_simulator::helper::constructActionStatus());
 
         if (architecture_type_ == ArchitectureType::AWF_UNIVERSE) {
@@ -119,38 +123,40 @@ public:
             return configuration;
           }());
 
-          api_->asFieldOperatorApplication(ego_name_).template declare_parameter<bool>(
-            "allow_goal_modification", true);
+          ego_entity->template setParameter<bool>("allow_goal_modification", true);
         }
-      }
 
-      // XXX dirty hack: wait for autoware system to launch
-      // ugly but helps for now
-      std::this_thread::sleep_for(std::chrono::milliseconds{5000});
+        // XXX dirty hack: wait for autoware system to launch
+        // ugly but helps for now
+        std::this_thread::sleep_for(std::chrono::milliseconds{5000});
 
-      api_->requestAssignRoute(ego_name_, std::vector({test_description_.ego_goal_pose}));
-      api_->asFieldOperatorApplication(ego_name_).engage();
+        ego_entity->requestAssignRoute(std::vector({test_description_.ego_goal_pose}));
+        ego_entity->engage();
 
-      goal_reached_metric_.setGoal(test_description_.ego_goal_pose);
+        goal_reached_metric_.setGoal(test_description_.ego_goal_pose);
 
-      for (size_t i = 0; i < test_description_.npcs_descriptions.size(); i++) {
-        const auto & npc_descr = test_description_.npcs_descriptions[i];
-        if (const auto npc_start_canonicalized_lanelet_pose = traffic_simulator::pose::canonicalize(
-              npc_descr.start_position, api_->getHdmapUtils());
-            !npc_start_canonicalized_lanelet_pose) {
-          throw std::runtime_error(
-            "Can not canonicalize npc start lanelet pose: id: " +
-            std::to_string(npc_descr.start_position.lanelet_id) +
-            " s: " + std::to_string(npc_descr.start_position.s) +
-            " offset: " + std::to_string(npc_descr.start_position.offset));
-        } else {
-          api_->spawn(
-            npc_descr.name, npc_start_canonicalized_lanelet_pose.value(), getVehicleParameters(),
-            traffic_simulator::VehicleBehavior::defaultBehavior(), "taxi");
-          api_->setEntityStatus(
-            npc_descr.name, npc_start_canonicalized_lanelet_pose.value(),
-            traffic_simulator::helper::constructActionStatus(npc_descr.speed));
-          api_->requestSpeedChange(npc_descr.name, npc_descr.speed, true);
+        for (const auto & npc_descr : test_description_.npcs_descriptions) {
+          if (const auto npc_start_canonicalized_lanelet_pose =
+                traffic_simulator::pose::toCanonicalizedLaneletPose(npc_descr.start_position);
+              not npc_start_canonicalized_lanelet_pose.has_value()) {
+            throw std::runtime_error(
+              "Can not canonicalize npc start lanelet pose: id: " +
+              std::to_string(npc_descr.start_position.lanelet_id) +
+              " s: " + std::to_string(npc_descr.start_position.s) +
+              " offset: " + std::to_string(npc_descr.start_position.offset));
+          } else {
+            api_->spawn(
+              npc_descr.name, npc_start_canonicalized_lanelet_pose.value(), getVehicleParameters(),
+              traffic_simulator::VehicleBehavior::defaultBehavior(), "taxi");
+
+            auto entity = api_->getEntity(npc_descr.name);
+
+            entity->setStatus(
+              npc_start_canonicalized_lanelet_pose.value(),
+              traffic_simulator::helper::constructActionStatus(npc_descr.speed));
+
+            entity->requestSpeedChange(npc_descr.speed, true);
+          }
         }
       }
     });
@@ -159,25 +165,29 @@ public:
   auto update() -> void
   {
     executeWithErrorHandling([this]() {
-      if (not api_->isEgoSpawned() and not api_->isNpcLogicStarted()) {
-        api_->startNpcLogic();
-      }
-      if (
-        api_->isEgoSpawned() and not api_->isNpcLogicStarted() and
-        api_->asFieldOperatorApplication(api_->getEgoName()).engageable()) {
-        api_->startNpcLogic();
+      if (!api_->isNpcLogicStarted()) {
+        if (api_->isAnyEgoSpawned()) {
+          auto ego_entity = api_->getEgoEntity(ego_name_);
+          if (ego_entity->isEngageable()) {
+            api_->startNpcLogic();
+          }
+        } else {
+          api_->startNpcLogic();
+        }
       }
 
       auto current_time = api_->getCurrentTime();
 
       if (!std::isnan(current_time)) {
-        if (goal_reached_metric_.isGoalReached(api_->getEntityStatus(ego_name_))) {
+        if (goal_reached_metric_.isGoalReached(
+              api_->getEntity(ego_name_)->getCanonicalizedStatus())) {
           scenario_completed_ = true;
         }
 
         bool timeout_reached = current_time >= test_timeout_;
         if (timeout_reached) {
-          if (!goal_reached_metric_.isGoalReached(api_->getEntityStatus(ego_name_))) {
+          if (!goal_reached_metric_.isGoalReached(
+                api_->getEntity(ego_name_)->getCanonicalizedStatus())) {
             RCLCPP_INFO(logger_, "Timeout reached");
             error_reporter_.reportTimeout();
           }
@@ -187,7 +197,7 @@ public:
       }
 
       for (const auto & npc : test_description_.npcs_descriptions) {
-        if (api_->entityExists(npc.name) && api_->checkCollision(ego_name_, npc.name)) {
+        if (api_->isEntityExist(npc.name) && api_->checkCollision(ego_name_, npc.name)) {
           if (ego_collision_metric_.isThereEgosCollisionWith(npc.name, current_time)) {
             std::string message =
               fmt::format("New collision occurred between ego and {}", npc.name);
@@ -197,9 +207,11 @@ public:
         }
       }
 
-      if (almost_standstill_metric_.isAlmostStandingStill(api_->getEntityStatus(ego_name_))) {
+      if (almost_standstill_metric_.isAlmostStandingStill(
+            api_->getEntity(ego_name_)->getCanonicalizedStatus())) {
         RCLCPP_INFO(logger_, "Standstill duration exceeded");
-        if (goal_reached_metric_.isGoalReached(api_->getEntityStatus(ego_name_))) {
+        if (goal_reached_metric_.isGoalReached(
+              api_->getEntity(ego_name_)->getCanonicalizedStatus())) {
           RCLCPP_INFO(logger_, "Goal reached, standstill expected");
         } else {
           error_reporter_.reportStandStill();

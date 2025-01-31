@@ -20,6 +20,7 @@
 #include <geometry/quaternion/quaternion_to_euler.hpp>
 #include <simple_sensor_simulator/vehicle_simulation/ego_entity_simulation.hpp>
 #include <traffic_simulator/helper/helper.hpp>
+#include <traffic_simulator/lanelet_wrapper/pose.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 
 namespace vehicle_simulation
@@ -41,7 +42,8 @@ EgoEntitySimulation::EgoEntitySimulation(
   const traffic_simulator_msgs::msg::VehicleParameters & parameters, double step_time,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
   const rclcpp::Parameter & use_sim_time, const bool consider_acceleration_by_road_slope)
-: autoware(std::make_unique<concealer::AutowareUniverse>()),
+: autoware(
+    std::make_unique<concealer::AutowareUniverse>(getParameter<bool>("simulate_localization"))),
   vehicle_model_type_(getVehicleModelType()),
   vehicle_model_ptr_(makeSimulationModel(vehicle_model_type_, step_time, parameters)),
   status_(initial_status, std::nullopt),
@@ -176,15 +178,15 @@ auto EgoEntitySimulation::makeSimulationModel(
 
 auto EgoEntitySimulation::setAutowareStatus() -> void
 {
-  autoware->set([this]() {
+  autoware->current_acceleration.store([this]() {
     geometry_msgs::msg::Accel message;
     message.linear.x = vehicle_model_ptr_->getAx();
     return message;
   }());
 
-  autoware->set(status_.getMapPose());
+  autoware->current_pose.store(status_.getMapPose());
 
-  autoware->set(getCurrentTwist());
+  autoware->current_twist.store(getCurrentTwist());
 }
 
 void EgoEntitySimulation::requestSpeedChange(double value)
@@ -307,20 +309,42 @@ void EgoEntitySimulation::update(
 
     auto acceleration_by_slope = calculateAccelerationBySlope();
 
+    const auto [speed, acceleration, tire_angle, gear_sign, gear_command] =
+      autoware->getVehicleCommand();
+
     switch (vehicle_model_type_) {
       case VehicleModelType::DELAY_STEER_ACC:
       case VehicleModelType::DELAY_STEER_ACC_GEARED:
       case VehicleModelType::DELAY_STEER_MAP_ACC_GEARED:
       case VehicleModelType::IDEAL_STEER_ACC:
       case VehicleModelType::IDEAL_STEER_ACC_GEARED:
-        input(0) = autoware->getGearSign() * (autoware->getAcceleration() + acceleration_by_slope);
-        input(1) = autoware->getSteeringAngle();
+        /*
+           TODO FIX THIS!!!
+
+           THIS IS MAYBE INCORRECT.
+
+           SHOULD BE
+               gear_sign * acceleration + acceleration_by_slope
+           OR
+               signed_acceleration + acceleration_by_slope
+
+           Currently, acceleration is obtained as an unsigned value
+           (`acceleration`) and a signed value (`gear_sign`), but this is for
+           historical reasons and there is no longer any reason to do so.
+
+           Therefore, when resolving this TODO comment, the assignee should
+           remove `gear_sign` from the tuple returned by
+           `AutowareUniverse::getVehicleCommand`, and at the same time change
+           `acceleration` to a signed value.
+        */
+        input(0) = gear_sign * (acceleration + acceleration_by_slope);
+        input(1) = tire_angle;
         break;
 
       case VehicleModelType::DELAY_STEER_VEL:
       case VehicleModelType::IDEAL_STEER_VEL:
-        input(0) = autoware->getVelocity();
-        input(1) = autoware->getSteeringAngle();
+        input(0) = speed;
+        input(1) = tire_angle;
         break;
 
       default:
@@ -328,7 +352,7 @@ void EgoEntitySimulation::update(
           "Unsupported vehicle_model_type ", toString(vehicle_model_type_), "specified");
     }
 
-    vehicle_model_ptr_->setGear(autoware->getGearCommand().command);
+    vehicle_model_ptr_->setGear(gear_command);
     vehicle_model_ptr_->setInput(input);
     vehicle_model_ptr_->update(step_time);
   }
@@ -343,9 +367,14 @@ auto EgoEntitySimulation::calculateAccelerationBySlope() const -> double
 {
   if (consider_acceleration_by_road_slope_) {
     constexpr double gravity_acceleration = -9.81;
+    /// @todo why there is a need to recalculate orientation using getLaneletPose?
+    /// status_.getMapPose().orientation already contains the orientation
     const double ego_pitch_angle =
-      math::geometry::convertQuaternionToEulerAngle(status_.getMapPose().orientation).y;
-    return gravity_acceleration * std::sin(ego_pitch_angle);
+      math::geometry::convertQuaternionToEulerAngle(
+        traffic_simulator::lanelet_wrapper::pose::toMapPose(status_.getLaneletPose(), true)
+          .pose.orientation)
+        .y;
+    return -std::sin(ego_pitch_angle) * gravity_acceleration;
   } else {
     return 0.0;
   }
@@ -428,8 +457,7 @@ auto EgoEntitySimulation::setStatus(const traffic_simulator_msgs::msg::EntitySta
   /// value from EntityStatus, therefore canonicalization has to be done in advance,
   /// not inside CanonicalizedEntityStatus
   const auto canonicalized_lanelet_pose = traffic_simulator::pose::toCanonicalizedLaneletPose(
-    status.pose, status.bounding_box, unique_route_lanelets, false, matching_distance,
-    hdmap_utils_ptr_);
+    status.pose, status.bounding_box, unique_route_lanelets, false, matching_distance);
   status_.set(traffic_simulator::CanonicalizedEntityStatus(status, canonicalized_lanelet_pose));
   setAutowareStatus();
 }

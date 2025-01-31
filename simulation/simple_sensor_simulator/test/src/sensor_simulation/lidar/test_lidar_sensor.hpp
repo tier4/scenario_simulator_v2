@@ -31,7 +31,8 @@ using namespace simple_sensor_simulator;
 class LidarSensorTest : public ::testing::Test
 {
 protected:
-  LidarSensorTest() : config_(utils::constructLidarConfiguration("ego", "awf/universe", 0.0, 0.5))
+  LidarSensorTest()
+  : config_(utils::constructLidarConfiguration("ego", "awf/universe/20240605", 0.0, 0.5))
   {
     rclcpp::init(0, nullptr);
     node_ = std::make_shared<rclcpp::Node>("lidar_sensor_test_node");

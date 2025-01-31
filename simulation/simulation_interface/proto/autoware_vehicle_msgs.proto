@@ -2,7 +2,7 @@ syntax = "proto3";
 
 import "builtin_interfaces.proto";
 
-package autoware_auto_vehicle_msgs;
+package autoware_vehicle_msgs;
 
 enum GearCommand_Constants {
   NONE = 0;

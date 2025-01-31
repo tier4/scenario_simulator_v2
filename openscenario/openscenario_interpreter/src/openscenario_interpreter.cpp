@@ -22,6 +22,7 @@
 #include <openscenario_interpreter/syntax/parameter_value_distribution.hpp>
 #include <openscenario_interpreter/syntax/scenario_definition.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
+#include <openscenario_interpreter/syntax/speed_condition.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
 #include <status_monitor/status_monitor.hpp>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
@@ -49,6 +50,10 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   DECLARE_PARAMETER(output_directory);
   DECLARE_PARAMETER(publish_empty_context);
   DECLARE_PARAMETER(record);
+
+  declare_parameter<std::string>("speed_condition", "legacy");
+  SpeedCondition::compatibility =
+    boost::lexical_cast<Compatibility>(get_parameter("speed_condition").as_string());
 }
 
 Interpreter::~Interpreter() {}
@@ -66,20 +71,18 @@ auto Interpreter::currentScenarioDefinition() const -> const std::shared_ptr<Sce
 auto Interpreter::makeCurrentConfiguration() const -> traffic_simulator::Configuration
 {
   const auto logic_file = currentScenarioDefinition()->road_network.logic_file;
+  const auto is_directly_lanelet2_map_file =
+    not logic_file.isDirectory() and logic_file.filepath.extension() == ".osm";
+  const auto map_files_path =
+    is_directly_lanelet2_map_file ? logic_file.filepath.parent_path() : logic_file;
 
-  auto configuration = traffic_simulator::Configuration(
-    logic_file.isDirectory() ? logic_file : logic_file.filepath.parent_path());
-  {
-    configuration.auto_sink = false;
-    configuration.scenario_path = osc_path;
-
-    // XXX DIRTY HACK!!!
-    if (not logic_file.isDirectory() and logic_file.filepath.extension() == ".osm") {
-      configuration.lanelet2_map_file = logic_file.filepath.filename().string();
-    }
+  // XXX DIRTY HACK!!!
+  if (is_directly_lanelet2_map_file) {
+    return traffic_simulator::Configuration(
+      map_files_path, logic_file.filepath.filename().string(), osc_path);
+  } else {
+    return traffic_simulator::Configuration(map_files_path, osc_path);
   }
-
-  return configuration;
 }
 
 auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
@@ -142,7 +145,7 @@ auto Interpreter::engage() const -> void
       scenario_object.template is<ScenarioObject>() and
       scenario_object.template as<ScenarioObject>().is_added and
       scenario_object.template as<ScenarioObject>().object_controller.isAutoware()) {
-      asFieldOperatorApplication(name).engage();
+      NonStandardOperation::engage(name);
     }
   }
 }
@@ -156,7 +159,7 @@ auto Interpreter::engageable() const -> bool
       return not scenario_object.template is<ScenarioObject>() or
              not scenario_object.template as<ScenarioObject>().is_added or
              not scenario_object.template as<ScenarioObject>().object_controller.isAutoware() or
-             asFieldOperatorApplication(name).engageable();
+             NonStandardOperation::isEngageable(name);
     });
 }
 
@@ -169,7 +172,7 @@ auto Interpreter::engaged() const -> bool
       return not scenario_object.template is<ScenarioObject>() or
              not scenario_object.template as<ScenarioObject>().is_added or
              not scenario_object.template as<ScenarioObject>().object_controller.isAutoware() or
-             asFieldOperatorApplication(name).engaged();
+             NonStandardOperation::isEngaged(name);
     });
 }
 

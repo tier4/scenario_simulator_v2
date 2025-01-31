@@ -19,6 +19,8 @@
 #include <rclcpp/rclcpp.hpp>
 #include <simple_sensor_simulator/vehicle_simulation/ego_entity_simulation.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
+#include <traffic_simulator/lanelet_wrapper/pose.hpp>
+#include <traffic_simulator/utils/lanelet_map.hpp>
 #include <vector>
 
 using namespace vehicle_simulation;
@@ -36,23 +38,29 @@ TEST(EgoEntitySimulation, calculateAccelerationBySlope)
       .longitude(-1.20294718763)
       .altitude(0.0));
 
+  const auto lanelet_path = ament_index_cpp::get_package_share_directory("traffic_simulator") +
+                            "/map/slope/lanelet2_map.osm";
+  traffic_simulator::lanelet_map::activate(lanelet_path);
+
   constexpr double gravity_acceleration = -9.81;
   // expected value in the lanelet(id:7)
   // first 25m: 1m up
   constexpr double expected_slope_acceleration_first_25m =
-    std::sin(std::atan(1. / 25.)) * gravity_acceleration;
+    -std::sin(-std::atan2(1., 25.)) * gravity_acceleration;
+  EXPECT_LE(expected_slope_acceleration_first_25m, 0.0);  // up -> negative slope acceleration
   // last 25m:  4m up
   constexpr double expected_slope_acceleration_last_25m =
-    std::sin(std::atan(4. / 25.)) * gravity_acceleration;
+    -std::sin(-std::atan2(4., 25.)) * gravity_acceleration;
+  EXPECT_LE(expected_slope_acceleration_last_25m, 0.0);  // up -> negative slope acceleration
 
   auto get_slope_acceleration_at =
     [&](const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose, bool consider_slope) {
       traffic_simulator_msgs::msg::EntityStatus initial_status;
       initial_status.name = "ego";
-      initial_status.lanelet_pose_valid = true;
-      initial_status.lanelet_pose = lanelet_pose;
+      // use pitch-filled map pose
+      initial_status.lanelet_pose_valid = false;
       initial_status.pose =
-        traffic_simulator::pose::toMapPose(initial_status.lanelet_pose, hdmap_utils);
+        traffic_simulator::lanelet_wrapper::pose::toMapPose(lanelet_pose, true).pose;
 
       EgoEntitySimulation ego_entity_simulation(
         initial_status, traffic_simulator_msgs::msg::VehicleParameters(), 1.f / 30.f, hdmap_utils,
@@ -68,45 +76,61 @@ TEST(EgoEntitySimulation, calculateAccelerationBySlope)
   // it will not exactly match the ideal value, so we manually selected the smallest possible value specifically for this test.
   constexpr double compare_epsilon = 1e-7;
 
-  // first 25m, up, with considering slope
-  lanelet_pose.s = 12.5;
-  lanelet_pose.rpy.z = 0.0;
-  EXPECT_NEAR(
-    expected_slope_acceleration_first_25m, get_slope_acceleration_at(lanelet_pose, true),
-    compare_epsilon);
+  // first 25m, up
+  {
+    lanelet_pose.s = 12.5;
+    lanelet_pose.rpy.z = 0.0;
 
-  // first 25m, up, without considering slope
-  EXPECT_DOUBLE_EQ(0.0, get_slope_acceleration_at(lanelet_pose, false));
+    // with considering slope
+    EXPECT_NEAR(
+      expected_slope_acceleration_first_25m, get_slope_acceleration_at(lanelet_pose, true),
+      compare_epsilon);
+
+    // without considering slope
+    EXPECT_DOUBLE_EQ(0.0, get_slope_acceleration_at(lanelet_pose, false));
+  }
 
   // last 25m, up
-  lanelet_pose.s = 37.5;
-  lanelet_pose.rpy.z = 0.0;
-  EXPECT_NEAR(
-    expected_slope_acceleration_last_25m, get_slope_acceleration_at(lanelet_pose, true),
-    compare_epsilon);
+  {
+    lanelet_pose.s = 37.5;
+    lanelet_pose.rpy.z = 0.0;
 
-  // last 25m, up, without considering slope
-  EXPECT_DOUBLE_EQ(0.0, get_slope_acceleration_at(lanelet_pose, false));
+    // with considering slope
+    EXPECT_NEAR(
+      expected_slope_acceleration_last_25m, get_slope_acceleration_at(lanelet_pose, true),
+      compare_epsilon);
+
+    // without considering slope
+    EXPECT_DOUBLE_EQ(0.0, get_slope_acceleration_at(lanelet_pose, false));
+  }
 
   // first 25m, down
-  lanelet_pose.s = 12.5;
-  lanelet_pose.rpy.z = M_PI;
-  EXPECT_NEAR(
-    -expected_slope_acceleration_first_25m, get_slope_acceleration_at(lanelet_pose, true),
-    compare_epsilon);
+  {
+    lanelet_pose.s = 12.5;
+    lanelet_pose.rpy.z = M_PI;
 
-  // first 25m, down, without considering slope
-  EXPECT_DOUBLE_EQ(0.0, get_slope_acceleration_at(lanelet_pose, false));
+    // with considering slope
+    EXPECT_NEAR(
+      -expected_slope_acceleration_first_25m, get_slope_acceleration_at(lanelet_pose, true),
+      compare_epsilon);
+
+    // without considering slope
+    EXPECT_DOUBLE_EQ(0.0, get_slope_acceleration_at(lanelet_pose, false));
+  }
 
   // last 25m, down
-  lanelet_pose.s = 37.5;
-  lanelet_pose.rpy.z = M_PI;
-  EXPECT_NEAR(
-    -expected_slope_acceleration_last_25m, get_slope_acceleration_at(lanelet_pose, true),
-    compare_epsilon);
+  {
+    lanelet_pose.s = 37.5;
+    lanelet_pose.rpy.z = M_PI;
 
-  // last 25m, down, without considering slope
-  EXPECT_DOUBLE_EQ(0.0, get_slope_acceleration_at(lanelet_pose, false));
+    // with considering slope
+    EXPECT_NEAR(
+      -expected_slope_acceleration_last_25m, get_slope_acceleration_at(lanelet_pose, true),
+      compare_epsilon);
+
+    // without considering slope
+    EXPECT_DOUBLE_EQ(0.0, get_slope_acceleration_at(lanelet_pose, false));
+  }
 
   rclcpp::shutdown();
 
