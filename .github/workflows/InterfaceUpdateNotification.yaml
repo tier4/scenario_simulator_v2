@@ -1,8 +1,6 @@
 name: Interface update notification
 on:
   pull_request:
-    branches:
-      - master
     paths:
       - openscenario/openscenario_interpreter_msgs/msg/*.msg
       - simulation/traffic_simulator_msgs/msg/*.msg
