@@ -46,7 +46,7 @@ auto trafficLightIds() -> lanelet::Ids
        lanelet::utils::query::autowareTrafficLights(all_lanelets)) {
     for (auto & three_light_bulbs : autoware_traffic_light->lightBulbs()) {
       if (three_light_bulbs.hasAttribute("traffic_light_id")) {
-        if (auto id = three_light_bulbs.attribute("traffic_light_id").asId()) {
+        if (const auto & id = three_light_bulbs.attribute("traffic_light_id").asId()) {
           ids.emplace_back(id.value());
         }
       }
@@ -70,7 +70,8 @@ auto toTrafficLightRegulatoryElement(const lanelet::Id traffic_light_regulatory_
 auto toAutowareTrafficLights(const lanelet::Id traffic_light_id)
   -> std::vector<lanelet::AutowareTrafficLightConstPtr>
 {
-  auto areBulbsAssignedToTrafficLight = [traffic_light_id](auto red_yellow_green_bulbs) -> bool {
+  auto areBulbsAssignedToTrafficLight =
+    [traffic_light_id](const auto & red_yellow_green_bulbs) -> bool {
     return red_yellow_green_bulbs.hasAttribute("traffic_light_id") and
            red_yellow_green_bulbs.attribute("traffic_light_id").asId() and
            red_yellow_green_bulbs.attribute("traffic_light_id").asId().value() == traffic_light_id;
@@ -81,10 +82,9 @@ auto toAutowareTrafficLights(const lanelet::Id traffic_light_id)
   const auto & all_lanelets = lanelet::utils::query::laneletLayer(LaneletWrapper::map());
   for (const auto & autoware_traffic_light :
        lanelet::utils::query::autowareTrafficLights(all_lanelets)) {
-    for (auto three_light_bulbs : autoware_traffic_light->lightBulbs()) {
-      if (areBulbsAssignedToTrafficLight(three_light_bulbs)) {
-        autoware_traffic_lights.push_back(autoware_traffic_light);
-      }
+    if (const auto & light_bulbs = autoware_traffic_light->lightBulbs();
+        std::any_of(light_bulbs.cbegin(), light_bulbs.cend(), areBulbsAssignedToTrafficLight)) {
+      autoware_traffic_lights.push_back(autoware_traffic_light);
     }
   }
 
@@ -100,13 +100,14 @@ auto toAutowareTrafficLights(const lanelet::Id traffic_light_id)
 auto trafficLightBulbPosition(const lanelet::Id traffic_light_id, const std::string & color_name)
   -> std::optional<geometry_msgs::msg::Point>
 {
-  auto areBulbsAssignedToTrafficLight = [traffic_light_id](auto red_yellow_green_bulbs) -> bool {
+  auto areBulbsAssignedToTrafficLight =
+    [traffic_light_id](const auto & red_yellow_green_bulbs) -> bool {
     return red_yellow_green_bulbs.hasAttribute("traffic_light_id") and
            red_yellow_green_bulbs.attribute("traffic_light_id").asId() and
            red_yellow_green_bulbs.attribute("traffic_light_id").asId().value() == traffic_light_id;
   };
 
-  auto isBulbOfExpectedColor = [color_name](auto bulb) -> bool {
+  auto isBulbOfExpectedColor = [&color_name](const auto & bulb) -> bool {
     return bulb.hasAttribute("color") and !bulb.hasAttribute("arrow") and
            bulb.attribute("color").value().compare(color_name) == 0;
   };

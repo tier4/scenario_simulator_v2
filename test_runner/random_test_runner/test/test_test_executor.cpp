@@ -17,6 +17,39 @@
 #include <gmock/gmock.h>
 
 #include <random_test_runner/test_executor.hpp>
+#include <traffic_simulator/api/configuration.hpp>
+#include <traffic_simulator/utils/lanelet_map.hpp>
+
+/// This class is for all entities to keep it simple
+class MockEntity
+{
+public:
+  MOCK_METHOD(
+    void, setStatus,
+    (const std::optional<traffic_simulator::CanonicalizedLaneletPose> &,
+     const traffic_simulator_msgs::msg::ActionStatus &),
+    ());
+  MOCK_METHOD(void, requestSpeedChange, (double, bool), ());
+  MOCK_METHOD(
+    const traffic_simulator::CanonicalizedEntityStatus &, getCanonicalizedStatus, (), (const));
+
+  // Ego member functions
+  MOCK_METHOD(void, engage, (), ());
+  MOCK_METHOD(bool, isEngageable, (), (const));
+  MOCK_METHOD(bool, setParameterMock, (const std::string &, const bool &), (const));
+  MOCK_METHOD(void, requestAssignRoute, (const std::vector<geometry_msgs::msg::Pose> &), ());
+
+  template <typename ParameterType>
+  auto setParameter(const std::string & name, const ParameterType & default_value = {}) const
+    -> ParameterType
+  {
+    if constexpr (std::is_same_v<ParameterType, bool>) {
+      setParameterMock(name, default_value);
+      return default_value;
+    }
+    throw std::runtime_error("Unexpected typename in MockEntity::setParameter function");
+  }
+};
 
 class MockFieldOperatorApplication
 {
@@ -84,17 +117,11 @@ public:
     (const std::string &, const traffic_simulator::CanonicalizedLaneletPose &,
      const traffic_simulator_msgs::msg::VehicleParameters &, const std::string &, std::string),
     ());
-  MOCK_METHOD(
-    void, setEntityStatus,
-    (const std::string &, const traffic_simulator::CanonicalizedLaneletPose &,
-     const traffic_simulator_msgs::msg::ActionStatus),
-    ());
   MOCK_METHOD(void, attachLidarSensor, (const simulation_api_schema::LidarConfiguration &), ());
   MOCK_METHOD(
     void, attachDetectionSensor, (const simulation_api_schema::DetectionSensorConfiguration &), ());
   MOCK_METHOD(
     bool, attachOccupancyGridSensor, (simulation_api_schema::OccupancyGridSensorConfiguration), ());
-  MOCK_METHOD(void, asFieldOperatorApplicationMock, (const std::string &), ());
   MOCK_METHOD(
     void, requestAssignRoute, (const std::string &, std::vector<geometry_msgs::msg::Pose>), ());
   MOCK_METHOD(
@@ -102,44 +129,52 @@ public:
     (const std::string &, const traffic_simulator::CanonicalizedLaneletPose &,
      const traffic_simulator_msgs::msg::VehicleParameters &),
     ());
-  MOCK_METHOD(void, requestSpeedChange, (const std::string &, double, bool), ());
-  MOCK_METHOD(bool, isEgoSpawned, (), ());
+  MOCK_METHOD(bool, isAnyEgoSpawned, (), ());
   MOCK_METHOD(bool, isNpcLogicStarted, (), ());
   MOCK_METHOD(void, startNpcLogic, (), ());
   MOCK_METHOD(bool, despawn, (const std::string), ());
   MOCK_METHOD(std::string, getEgoName, (), ());
   MOCK_METHOD(double, getCurrentTime, (), ());
-  MOCK_METHOD(void, getEntityStatusMock, (const std::string &), ());
-  MOCK_METHOD(bool, entityExists, (const std::string &), ());
+  MOCK_METHOD(void, getEntityMock, (const std::string &), (const));
+  MOCK_METHOD(void, getEgoEntityMock, (const std::string &), (const));
+  MOCK_METHOD(bool, isEntityExist, (const std::string &), ());
   MOCK_METHOD(bool, checkCollision, (const std::string &, const std::string &), ());
 
-  ::testing::StrictMock<MockFieldOperatorApplication> & asFieldOperatorApplication(
-    const std::string & name)
+  auto getEntity(const std::string & name) const
+    -> std::shared_ptr<::testing::StrictMock<MockEntity>>
   {
-    asFieldOperatorApplicationMock(name);
-    return *field_operator_application_mock;
+    getEntityMock(name);
+    if (name == ego_name_) {
+      return ego_entity_;
+    }
+    return std::make_shared<::testing::StrictMock<MockEntity>>();
   }
 
-  traffic_simulator::CanonicalizedEntityStatus getEntityStatus(const std::string & name)
+  auto getEgoEntity(const std::string & name) const
+    -> std::shared_ptr<::testing::StrictMock<MockEntity>>
   {
-    getEntityStatusMock(name);
-    /// @note set invalid LaneletPose so pass std::nullopt
-    return traffic_simulator::CanonicalizedEntityStatus(entity_status_, std::nullopt);
+    getEgoEntityMock(name);
+    return ego_entity_;
   }
 
-  void setEntityStatusNecessaryValues(
-    double time, geometry_msgs::msg::Pose map_pose, geometry_msgs::msg::Twist twist)
+  auto setEntityStatusNecessaryValues(
+    double time, geometry_msgs::msg::Pose map_pose, geometry_msgs::msg::Twist twist) -> void
   {
     entity_status_.time = time;
     entity_status_.pose = map_pose;
     entity_status_.action_status.twist = twist;
   }
+
+  const std::string ego_name_ = "ego";
+  const std::shared_ptr<::testing::StrictMock<MockEntity>> ego_entity_ =
+    std::make_shared<::testing::StrictMock<MockEntity>>();
 };
 
 TEST(TestExecutor, InitializeWithNoNPCs)
 {
   ::testing::Sequence sequence;
   auto MockAPI = std::make_shared<::testing::StrictMock<MockTrafficSimulatorAPI>>();
+  auto & mock_ego = MockAPI->ego_entity_;
 
   auto test_case = common::junit::SimpleTestCase("test_case");
   auto test_executor = TestExecutor<MockTrafficSimulatorAPI>(
@@ -155,17 +190,14 @@ TEST(TestExecutor, InitializeWithNoNPCs)
                 ::testing::A<const std::string &>(), ::testing::A<std::string>()))
     .Times(1)
     .InSequence(sequence);
-  EXPECT_CALL(*MockAPI, setEntityStatus).Times(1).InSequence(sequence);
+  EXPECT_CALL(*MockAPI, getEgoEntityMock).Times(1).InSequence(sequence);
+  EXPECT_CALL(*mock_ego, setStatus).Times(1).InSequence(sequence);
   EXPECT_CALL(*MockAPI, attachLidarSensor).Times(1).InSequence(sequence);
   EXPECT_CALL(*MockAPI, attachDetectionSensor).Times(1).InSequence(sequence);
   EXPECT_CALL(*MockAPI, attachOccupancyGridSensor).Times(1).InSequence(sequence);
-  EXPECT_CALL(*MockAPI, asFieldOperatorApplicationMock).Times(1).InSequence(sequence);
-  EXPECT_CALL(*(MockAPI->field_operator_application_mock), declare_parameter_mock)
-    .Times(1)
-    .InSequence(sequence);
-  EXPECT_CALL(*MockAPI, requestAssignRoute).Times(1).InSequence(sequence);
-  EXPECT_CALL(*MockAPI, asFieldOperatorApplicationMock).Times(1).InSequence(sequence);
-  EXPECT_CALL(*(MockAPI->field_operator_application_mock), engage).Times(1).InSequence(sequence);
+  EXPECT_CALL(*mock_ego, setParameterMock).Times(1).InSequence(sequence);
+  EXPECT_CALL(*mock_ego, requestAssignRoute).Times(1).InSequence(sequence);
+  EXPECT_CALL(*mock_ego, engage).Times(1).InSequence(sequence);
 
   test_executor.initialize();
 }
@@ -174,30 +206,38 @@ TEST(TestExecutor, UpdateNoNPCs)
 {
   ::testing::Sequence sequence;
   auto MockAPI = std::make_shared<::testing::StrictMock<MockTrafficSimulatorAPI>>();
+  auto & mock_ego = MockAPI->ego_entity_;
 
   auto test_case = common::junit::SimpleTestCase("test_case");
   auto test_executor = TestExecutor<MockTrafficSimulatorAPI>(
     MockAPI, TestDescription(), JunitXmlReporterTestCase(test_case), 20.0,
     ArchitectureType::AWF_UNIVERSE, rclcpp::get_logger("test_executor_test"));
+  traffic_simulator::CanonicalizedEntityStatus status(
+    traffic_simulator_msgs::msg::EntityStatus(), std::nullopt);
 
-  EXPECT_CALL(*MockAPI, isEgoSpawned)
-    .Times(1)
-    .InSequence(sequence)
-    .WillOnce(::testing::Return(false));
   EXPECT_CALL(*MockAPI, isNpcLogicStarted)
     .Times(1)
     .InSequence(sequence)
     .WillOnce(::testing::Return(false));
-  EXPECT_CALL(*MockAPI, startNpcLogic).Times(1).InSequence(sequence);
-  EXPECT_CALL(*MockAPI, isEgoSpawned)
+  EXPECT_CALL(*MockAPI, isAnyEgoSpawned)
     .Times(1)
     .InSequence(sequence)
     .WillOnce(::testing::Return(false));
+  EXPECT_CALL(*MockAPI, startNpcLogic).Times(1).InSequence(sequence);
   EXPECT_CALL(*MockAPI, getCurrentTime)
     .Times(1)
     .InSequence(sequence)
     .WillOnce(::testing::Return(1.0));
-  EXPECT_CALL(*MockAPI, getEntityStatusMock).Times(2).InSequence(sequence);
+  EXPECT_CALL(*MockAPI, getEntityMock).Times(1).InSequence(sequence);
+  EXPECT_CALL(*mock_ego, getCanonicalizedStatus)
+    .Times(1)
+    .InSequence(sequence)
+    .WillOnce(::testing::ReturnRef(status));
+  EXPECT_CALL(*MockAPI, getEntityMock).Times(1).InSequence(sequence);
+  EXPECT_CALL(*mock_ego, getCanonicalizedStatus)
+    .Times(1)
+    .InSequence(sequence)
+    .WillOnce(::testing::ReturnRef(status));
   EXPECT_CALL(*MockAPI, updateFrame).Times(1).InSequence(sequence);
 
   test_executor.update();
