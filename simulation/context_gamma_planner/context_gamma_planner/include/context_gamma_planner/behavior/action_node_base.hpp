@@ -56,8 +56,7 @@ public:
    */
   static BT::PortsList providedPorts()
   {
-    return {
-      // clang-format off
+    return {// clang-format off
       BT::InputPort<std::shared_ptr<constraints::ConstraintActivatorBase>>("activator"),
       BT::InputPort<traffic_simulator::behavior::Request>("request"),
       BT::InputPort<std::shared_ptr<hdmap_utils::HdMapUtils>>("hdmap_utils"),

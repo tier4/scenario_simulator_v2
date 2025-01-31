@@ -14,6 +14,7 @@
 
 #include <algorithm>
 #include <context_gamma_planner/constraints/vehicle/constraint_activator.hpp>
+#include <traffic_simulator/lanelet_wrapper/lanelet_map.hpp>
 
 namespace context_gamma_planner
 {
@@ -26,9 +27,8 @@ using Side = context_gamma_planner::constraints::RoadEdgeConstraint::Side;
 
 ConstraintActivator::ConstraintActivator(
   const std::shared_ptr<hdmap_utils::HdMapUtils> hd_map_utils_ptr,
-  const std::shared_ptr<traffic_simulator::TrafficLights> traffic_lights_ptr)
-: context_gamma_planner::constraints::ConstraintActivatorBase(
-    hd_map_utils_ptr, traffic_lights_ptr)
+  const std::shared_ptr<traffic_simulator::TrafficLightsBase> traffic_lights_ptr)
+: context_gamma_planner::constraints::ConstraintActivatorBase(hd_map_utils_ptr, traffic_lights_ptr)
 {
   for (const auto & id : hd_map_utils_ptr_->getTrafficLightIds()) {
     const auto stop_line_ids = hd_map_utils_ptr_->getTrafficLightStopLineIds(id);
@@ -97,7 +97,7 @@ void ConstraintActivator::appendLaneChangeConstraint(
   const std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus> & entity_status,
   const traffic_simulator::lane_change::Parameter & lane_change_parameter)
 {
-  if (!entity_status->laneMatchingSucceed()) {
+  if (!entity_status->isInLanelet()) {
     return;
   }
   std::optional<lanelet::Id> id = entity_status->getLaneletPose().lanelet_id;
@@ -134,10 +134,11 @@ void ConstraintActivator::appendLaneChangeConstraint(
 
 void ConstraintActivator::appendRoadEndConstraint(const lanelet::Ids & route_ids)
 {
-  if (hd_map_utils_ptr_->getNextLaneletIds(route_ids.back()).empty()) {
+  if (traffic_simulator::lanelet_wrapper::lanelet_map::nextLaneletIds(route_ids.back()).empty()) {
     appendRoadEdgeConstraint(route_ids.back(), Side::FRONT);
   }
-  if (hd_map_utils_ptr_->getPreviousLaneletIds(route_ids.back()).empty()) {
+  if (traffic_simulator::lanelet_wrapper::lanelet_map::previousLaneletIds(route_ids.back())
+        .empty()) {
     appendRoadEdgeConstraint(route_ids.back(), Side::BACK);
   }
 }

@@ -14,6 +14,7 @@
 
 #include <algorithm>
 #include <context_gamma_planner/constraints/constraint_activator_base.hpp>
+#include <traffic_simulator/lanelet_wrapper/lanelet_map.hpp>
 
 namespace context_gamma_planner
 {
@@ -21,10 +22,8 @@ namespace constraints
 {
 ConstraintActivatorBase::ConstraintActivatorBase(
   const std::shared_ptr<hdmap_utils::HdMapUtils> hd_map_utils_ptr,
-  const std::shared_ptr<traffic_simulator::TrafficLights> traffic_lights_ptr)
-: hd_map_utils_ptr_(hd_map_utils_ptr),
-  traffic_lights_ptr_(traffic_lights_ptr),
-  is_stoped_(false)
+  const std::shared_ptr<traffic_simulator::TrafficLightsBase> traffic_lights_ptr)
+: hd_map_utils_ptr_(hd_map_utils_ptr), traffic_lights_ptr_(traffic_lights_ptr), is_stoped_(false)
 {
   for (const auto & id : hd_map_utils_ptr_->getLaneletIds()) {
     lane_constraints_.emplace_back(
@@ -179,9 +178,12 @@ void ConstraintActivatorBase::appendRoadEdgeConstraint(
 
 void ConstraintActivatorBase::appendPreviousRoadEdgeConstraint(const lanelet::Ids & lanelet_ids)
 {
-  if (!hd_map_utils_ptr_->getPreviousLaneletIds(lanelet_ids.front()).empty()) {
+  if (!traffic_simulator::lanelet_wrapper::lanelet_map::previousLaneletIds(lanelet_ids.front())
+         .empty()) {
     appendRoadEdgeConstraint(
-      hd_map_utils_ptr_->getPreviousLaneletIds(lanelet_ids.front()).front(), State::ACTIVE);
+      traffic_simulator::lanelet_wrapper::lanelet_map::previousLaneletIds(lanelet_ids.front())
+        .front(),
+      State::ACTIVE);
   }
 }
 

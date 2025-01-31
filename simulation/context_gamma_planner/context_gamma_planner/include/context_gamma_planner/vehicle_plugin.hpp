@@ -65,7 +65,7 @@ public:
   DEFINE_GETTER_SETTER(ReferenceTrajectory,  std::shared_ptr<math::geometry::CatmullRomSpline>)
   DEFINE_GETTER_SETTER(StepTime,             double)
   DEFINE_GETTER_SETTER(TargetSpeed,          std::optional<double>)
-  DEFINE_GETTER_SETTER(TrafficLights,  std::shared_ptr<traffic_simulator::TrafficLights>)
+  DEFINE_GETTER_SETTER(TrafficLights,        std::shared_ptr<traffic_simulator::TrafficLightsBase>)
   DEFINE_GETTER_SETTER(VehicleParameters,    traffic_simulator_msgs::msg::VehicleParameters)
   DEFINE_GETTER_SETTER(Waypoints,            traffic_simulator_msgs::msg::WaypointsArray)
   DEFINE_GETTER_SETTER(GoalPoses,            std::vector<geometry_msgs::msg::Pose>)

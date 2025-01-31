@@ -18,6 +18,7 @@
 #include <geometry/transform.hpp>
 #include <iostream>
 #include <scenario_simulator_exception/exception.hpp>
+#include <traffic_simulator/lanelet_wrapper/pose.hpp>
 
 namespace context_gamma_planner
 {
@@ -34,7 +35,8 @@ void LaneChangePlanner::setWaypoints(
 {
   clear();
   // calc trajectory
-  const auto lanelet_pose = hdmap_utils->toLaneletPose(status_->getMapPose(), route_ids);
+  const auto lanelet_pose =
+    traffic_simulator::lanelet_wrapper::pose::toLaneletPose(status_->getMapPose(), route_ids);
   if (!lanelet_pose) {
     THROW_SIMULATION_ERROR("Failed to get lanelet pose");
   }
@@ -49,28 +51,29 @@ void LaneChangePlanner::setWaypoints(
       1.0 is a forward_distance_threshold (If the goal x position in the cartesian coordinate was under 1.0, the goal was rejected.)
       */
       lanechange_trajectory = hdmap_utils->getLaneChangeTrajectory(
-        hdmap_utils->toMapPose(lanelet_pose.value()).pose, lane_change_parameter, 10.0, 20.0, 1.0);
-      along_pose = hdmap_utils->getAlongLaneletPose(
+        traffic_simulator::lanelet_wrapper::pose::toMapPose(lanelet_pose.value()).pose,
+        lane_change_parameter, 10.0, 20.0, 1.0);
+      along_pose = traffic_simulator::lanelet_wrapper::pose::alongLaneletPose(
         lanelet_pose.value(),
         traffic_simulator::lane_change::Parameter::default_lanechange_distance);
       break;
     case traffic_simulator::lane_change::Constraint::Type::LATERAL_VELOCITY:
       lanechange_trajectory =
         hdmap_utils->getLaneChangeTrajectory(lanelet_pose.value(), lane_change_parameter);
-      along_pose = hdmap_utils->getAlongLaneletPose(
+      along_pose = traffic_simulator::lanelet_wrapper::pose::alongLaneletPose(
         lanelet_pose.value(),
         traffic_simulator::lane_change::Parameter::default_lanechange_distance);
       break;
     case traffic_simulator::lane_change::Constraint::Type::LONGITUDINAL_DISTANCE:
       lanechange_trajectory =
         hdmap_utils->getLaneChangeTrajectory(lanelet_pose.value(), lane_change_parameter);
-      along_pose = hdmap_utils->getAlongLaneletPose(
+      along_pose = traffic_simulator::lanelet_wrapper::pose::alongLaneletPose(
         lanelet_pose.value(), lane_change_parameter.constraint.value);
       break;
     case traffic_simulator::lane_change::Constraint::Type::TIME:
       lanechange_trajectory =
         hdmap_utils->getLaneChangeTrajectory(lanelet_pose.value(), lane_change_parameter);
-      along_pose = hdmap_utils->getAlongLaneletPose(
+      along_pose = traffic_simulator::lanelet_wrapper::pose::alongLaneletPose(
         lanelet_pose.value(), lane_change_parameter.constraint.value);
       break;
   }
@@ -87,10 +90,10 @@ void LaneChangePlanner::setWaypoints(
   const auto curve_ = lanechange_trajectory->first;
   goal_pose.lanelet_id = lane_change_parameter.target.lanelet_id;
   goal_pose.s = lanechange_trajectory->second;
-  double offset =
-    std::fabs(math::geometry::getRelativePose(
-                hdmap_utils->toMapPose(along_pose).pose, hdmap_utils->toMapPose(goal_pose).pose)
-                .position.y);
+  double offset = std::fabs(math::geometry::getRelativePose(
+                              traffic_simulator::lanelet_wrapper::pose::toMapPose(along_pose).pose,
+                              traffic_simulator::lanelet_wrapper::pose::toMapPose(goal_pose).pose)
+                              .position.y);
   switch (lane_change_parameter.constraint.type) {
     case traffic_simulator::lane_change::Constraint::Type::NONE:
       target_speed_ = max_speed_;

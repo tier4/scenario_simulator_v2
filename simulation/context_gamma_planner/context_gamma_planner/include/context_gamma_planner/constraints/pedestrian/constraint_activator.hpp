@@ -34,7 +34,7 @@ class ConstraintActivator : public context_gamma_planner::constraints::Constrain
 public:
   ConstraintActivator(
     const std::shared_ptr<hdmap_utils::HdMapUtils> hd_map_utils_ptr,
-    const std::shared_ptr<traffic_simulator::TrafficLights> traffic_lights_ptr);
+    const std::shared_ptr<traffic_simulator::TrafficLightsBase> traffic_lights_ptr);
 };
 }  // namespace constraints
 }  // namespace pedestrian

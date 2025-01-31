@@ -62,7 +62,7 @@ class ConstraintActivatorBase
 public:
   ConstraintActivatorBase(
     const std::shared_ptr<hdmap_utils::HdMapUtils> hd_map_utils_ptr,
-    const std::shared_ptr<traffic_simulator::TrafficLights> traffic_lights_ptr);
+    const std::shared_ptr<traffic_simulator::TrafficLightsBase> traffic_lights_ptr);
   const auto calculateRVOObstacles() -> std::vector<std::vector<RVO::Vector2> >;
   void deactivateAllConstraints();
   void appendRoadEdgeConstraint(const lanelet::Id lanelet_id, const State & state = State::ACTIVE);
@@ -96,7 +96,7 @@ protected:
   std::vector<RoadEdgeConstraint> queryRoadEdgeConstraint(
     const geometry_msgs::msg::Point & p, double distance_threashold, const char subtype[]);
   std::shared_ptr<hdmap_utils::HdMapUtils> hd_map_utils_ptr_;
-  std::shared_ptr<traffic_simulator::TrafficLights> traffic_lights_ptr_;
+  std::shared_ptr<traffic_simulator::TrafficLightsBase> traffic_lights_ptr_;
   std::vector<std::string> lanelet_subtypes_;
   std::vector<TrafficLightConstraint> traffic_light_constraints_;
   std::vector<RoadEdgeConstraint> lane_constraints_;

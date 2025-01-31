@@ -17,6 +17,7 @@
 #include <context_gamma_planner/behavior/vehicle/lane_change_action.hpp>
 #include <context_gamma_planner/vehicle_plugin.hpp>
 #include <pugixml.hpp>
+#include <traffic_simulator/lanelet_wrapper/pose.hpp>
 
 namespace context_gamma_planner
 {
@@ -245,9 +246,9 @@ void VehiclePlugin::updateSimulatorStatus()
   ego_status.action_status.twist.linear.y = rvo_ego_->getVelocity().y();
 
   const auto candidate_on_route =
-    getHdMapUtils()->toLaneletPose(ego_status.pose, getRouteLanelets());
-  const auto candidate_not_on_route =
-    getHdMapUtils()->toLaneletPose(ego_status.pose, getHdMapUtils()->getLaneletIds());
+    traffic_simulator::lanelet_wrapper::pose::toLaneletPose(ego_status.pose, getRouteLanelets());
+  const auto candidate_not_on_route = traffic_simulator::lanelet_wrapper::pose::toLaneletPose(
+    ego_status.pose, getHdMapUtils()->getLaneletIds());
   if (candidate_on_route) {
     ego_status.lanelet_pose_valid = true;
     ego_status.lanelet_pose = candidate_on_route.value();
@@ -260,7 +261,7 @@ void VehiclePlugin::updateSimulatorStatus()
   }
   // std::cout << traffic_simulator_msgs::msg::to_yaml(ego_status) << std::endl;
   getCanonicalizedEntityStatus()->set(
-    ego_status, getDefaultMatchingDistanceForLaneletPoseCalculation(), getHdMapUtils());
+    ego_status, getDefaultMatchingDistanceForLaneletPoseCalculation());
 }
 
 void VehiclePlugin::visualize()

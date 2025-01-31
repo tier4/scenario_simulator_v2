@@ -17,6 +17,7 @@
 #include <context_gamma_planner/pedestrian_plugin.hpp>
 #include <iostream>
 #include <pugixml.hpp>
+#include <traffic_simulator/lanelet_wrapper/pose.hpp>
 
 namespace context_gamma_planner
 {
@@ -239,12 +240,13 @@ void PedestrianPlugin::updateSimulatorStatus()
   ego_status.pose = rvo_ego_->getPose();
   ego_status.action_status.twist.linear.x = rvo_ego_->getVelocity().x();
   ego_status.action_status.twist.linear.y = rvo_ego_->getVelocity().y();
-  const auto lanelet_ego_pose = getHdMapUtils()->toLaneletPose(ego_status.pose, getRouteLanelets());
+  const auto lanelet_ego_pose =
+    traffic_simulator::lanelet_wrapper::pose::toLaneletPose(ego_status.pose, getRouteLanelets());
   if (lanelet_ego_pose) {
     ego_status.lanelet_pose = lanelet_ego_pose.value();
   }
   getCanonicalizedEntityStatus()->set(
-    ego_status, getDefaultMatchingDistanceForLaneletPoseCalculation(), getHdMapUtils());
+    ego_status, getDefaultMatchingDistanceForLaneletPoseCalculation());
 }
 
 void PedestrianPlugin::visualize()

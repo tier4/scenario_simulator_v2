@@ -34,7 +34,7 @@ class ConstraintActivator : public context_gamma_planner::constraints::Constrain
 public:
   ConstraintActivator(
     const std::shared_ptr<hdmap_utils::HdMapUtils> hd_map_utils_ptr,
-    const std::shared_ptr<traffic_simulator::TrafficLights> traffic_lights_ptr);
+    const std::shared_ptr<traffic_simulator::TrafficLightsBase> traffic_lights_ptr);
   /// @param stop_velocity_threshold [m/s]  Set a small value since a complete stop is not possible.
   void appendStopLineConstraint(
     const lanelet::Ids & route_ids,
