@@ -19,10 +19,9 @@ namespace concealer
 {
 #if __has_include(<autoware_internal_planning_msgs/msg/path_with_lane_id.hpp>)
 template <>
-auto available<autoware_internal_planning_msgs::msg::PathWithLaneId>(
-  const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node) -> bool
+auto available<autoware_internal_planning_msgs::msg::PathWithLaneId>() -> bool
 {
-  if (const auto architecture_type = getParameter<std::string>(node, "architecture_type");
+  if (const auto architecture_type = getParameter<std::string>("architecture_type");
       architecture_type.find("awf/universe") != std::string::npos) {
     return "awf/universe/20250130" <= architecture_type;
   } else {
@@ -33,10 +32,9 @@ auto available<autoware_internal_planning_msgs::msg::PathWithLaneId>(
 
 #if __has_include(<tier4_planning_msgs/msg/path_with_lane_id.hpp>)
 template <>
-auto available<tier4_planning_msgs::msg::PathWithLaneId>(
-  const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node) -> bool
+auto available<tier4_planning_msgs::msg::PathWithLaneId>() -> bool
 {
-  if (const auto architecture_type = getParameter<std::string>(node, "architecture_type");
+  if (const auto architecture_type = getParameter<std::string>("architecture_type");
       architecture_type.find("awf/universe") != std::string::npos) {
     return architecture_type < "awf/universe/20250130";
   } else {

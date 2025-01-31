@@ -29,6 +29,13 @@ auto getParameter(
   }
   return node->get_parameter(name).get_value<T>();
 }
+
+template <typename T>
+auto getParameter(const std::string & name, T value = {})
+{
+  auto node = rclcpp::Node("get_parameter", "simulation");
+  return getParameter(node.get_node_parameters_interface(), name, value);
+}
 }  // namespace concealer
 
 #endif  // CONCEALER__GET_PARAMETER_HPP_

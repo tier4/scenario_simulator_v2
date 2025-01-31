@@ -15,13 +15,10 @@
 #ifndef CONCEALER__AVAILABLE_HPP_
 #define CONCEALER__AVAILABLE_HPP_
 
-#include <rclcpp/rclcpp.hpp>
-
 namespace concealer
 {
 template <typename T>
-constexpr auto available(const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr &)
-  -> bool
+constexpr auto available() -> bool
 {
   return true;
 }
