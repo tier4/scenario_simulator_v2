@@ -47,12 +47,14 @@ static_assert(0 < std::tuple_size_v<PathWithLaneId>);
 
 #if __has_include(<autoware_internal_planning_msgs/msg/path_with_lane_id.hpp>)
 template <>
-auto available<autoware_internal_planning_msgs::msg::PathWithLaneId>(const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr &) -> bool;
+auto available<autoware_internal_planning_msgs::msg::PathWithLaneId>(
+  const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr &) -> bool;
 #endif
 
 #if __has_include(<tier4_planning_msgs/msg/path_with_lane_id.hpp>)
 template <>
-auto available<tier4_planning_msgs::msg::PathWithLaneId>(const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr &) -> bool;
+auto available<tier4_planning_msgs::msg::PathWithLaneId>(
+  const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr &) -> bool;
 #endif
 
 #if __has_include(<autoware_internal_planning_msgs/msg/path_with_lane_id.hpp>) and \

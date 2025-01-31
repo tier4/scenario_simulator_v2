@@ -20,7 +20,8 @@
 namespace concealer
 {
 template <typename T>
-constexpr auto available(const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr &) -> bool
+constexpr auto available(const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr &)
+  -> bool
 {
   return true;
 }

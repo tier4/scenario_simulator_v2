@@ -17,7 +17,7 @@
 namespace concealer
 {
 AutowareUniverse::AutowareUniverse(bool simulate_localization)
-: rclcpp::Node("concealer", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),
+: rclcpp::Node("concealer", "simulation"),
   getCommand("/control/command/control_cmd", rclcpp::QoS(1), *this),
   getGearCommand("/control/command/gear_cmd", rclcpp::QoS(1), *this),
   getTurnIndicatorsCommand("/control/command/turn_indicators_cmd", rclcpp::QoS(1), *this),

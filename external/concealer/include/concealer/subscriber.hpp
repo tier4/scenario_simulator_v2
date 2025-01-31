@@ -38,23 +38,30 @@ struct Subscriber<Message>
   explicit Subscriber(
     const std::string & topic, const rclcpp::QoS & quality_of_service, Autoware & autoware,
     const Callback & callback)
-  : subscription(available<Message>(autoware.get_node_parameters_interface()) ? autoware.template create_subscription<Message>(
-      topic, quality_of_service,
-      [this, callback](const typename Message::ConstSharedPtr & message) {
-        if (std::atomic_store(&current_value, message); current_value) {
-          callback((*this)());
-        }
-      }) : throw common::scenario_simulator_exception::Error("no viable message type for topic ", std::quoted(topic)))
+  : subscription(
+      available<Message>(autoware.get_node_parameters_interface())
+        ? autoware.template create_subscription<Message>(
+            topic, quality_of_service,
+            [this, callback](const typename Message::ConstSharedPtr & message) {
+              if (std::atomic_store(&current_value, message); current_value) {
+                callback((*this)());
+              }
+            })
+        : nullptr)
   {
   }
 
   template <typename Autoware>
   explicit Subscriber(
     const std::string & topic, const rclcpp::QoS & quality_of_service, Autoware & autoware)
-  : subscription(available<Message>(autoware.get_node_parameters_interface()) ? autoware.template create_subscription<Message>(
-      topic, quality_of_service, [this](const typename Message::ConstSharedPtr & message) {
-        std::atomic_store(&current_value, message);
-      }) : nullptr)
+  : subscription(
+      available<Message>(autoware.get_node_parameters_interface())
+        ? autoware.template create_subscription<Message>(
+            topic, quality_of_service,
+            [this](const typename Message::ConstSharedPtr & message) {
+              std::atomic_store(&current_value, message);
+            })
+        : nullptr)
   {
   }
 };
@@ -80,13 +87,16 @@ struct Subscriber<Message, T, Ts...> : public Subscriber<T, Ts...>
     const std::string & topic, const rclcpp::QoS & quality_of_service, Autoware & autoware,
     const Callback & callback)
   : Subscriber<T, Ts...>(topic, quality_of_service, autoware, callback),
-    subscription(available<Message>(autoware.get_node_parameters_interface()) ? autoware.template create_subscription<Message>(
-      topic, quality_of_service,
-      [this, callback](const typename Message::ConstSharedPtr & message) {
-        if (std::atomic_store(&current_value, message); current_value) {
-          callback((*this)());
-        }
-      }) : nullptr)
+    subscription(
+      available<Message>(autoware.get_node_parameters_interface())
+        ? autoware.template create_subscription<Message>(
+            topic, quality_of_service,
+            [this, callback](const typename Message::ConstSharedPtr & message) {
+              if (std::atomic_store(&current_value, message); current_value) {
+                callback((*this)());
+              }
+            })
+        : nullptr)
   {
   }
 
@@ -94,10 +104,14 @@ struct Subscriber<Message, T, Ts...> : public Subscriber<T, Ts...>
   explicit Subscriber(
     const std::string & topic, const rclcpp::QoS & quality_of_service, Autoware & autoware)
   : Subscriber<T, Ts...>(topic, quality_of_service, autoware),
-    subscription(available<Message>(autoware.get_node_parameters_interface()) ? autoware.template create_subscription<Message>(
-      topic, quality_of_service, [this](const typename Message::ConstSharedPtr & message) {
-        std::atomic_store(&current_value, message);
-      }) : nullptr)
+    subscription(
+      available<Message>(autoware.get_node_parameters_interface())
+        ? autoware.template create_subscription<Message>(
+            topic, quality_of_service,
+            [this](const typename Message::ConstSharedPtr & message) {
+              std::atomic_store(&current_value, message);
+            })
+        : nullptr)
   {
   }
 };
