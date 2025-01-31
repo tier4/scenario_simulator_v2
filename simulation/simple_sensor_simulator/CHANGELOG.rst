@@ -21,6 +21,14 @@ Changelog for package simple_sensor_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+9.0.1 (2025-01-31)
+------------------
+* Merge pull request `#1516 <https://github.com/tier4/scenario_simulator_v2/issues/1516>`_ from tier4/feat/vel_model_acc
+* Merge branch 'master' into feat/vel_model_acc
+* Merge branch 'master' into feat/vel_model_acc
+* feat(simple_sensor_simulator): use vel state for acc state calculation
+* Contributors: Kotaro Yoshimoto, kosuke55
+
 9.0.0 (2025-01-30)
 ------------------
 * merge 8.0.2
