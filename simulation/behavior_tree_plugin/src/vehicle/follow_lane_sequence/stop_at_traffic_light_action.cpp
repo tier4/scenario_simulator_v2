@@ -53,7 +53,7 @@ StopAtTrafficLightAction::calculateObstacle(const traffic_simulator_msgs::msg::W
 
 const traffic_simulator_msgs::msg::WaypointsArray StopAtTrafficLightAction::calculateWaypoints()
 {
-  if (!canonicalized_entity_status->laneMatchingSucceed()) {
+  if (!canonicalized_entity_status->isInLanelet()) {
     THROW_SIMULATION_ERROR("failed to assign lane");
   }
   if (canonicalized_entity_status->getTwist().linear.x >= 0) {
@@ -93,7 +93,7 @@ BT::NodeStatus StopAtTrafficLightAction::tick()
     request != traffic_simulator::behavior::Request::FOLLOW_LANE) {
     return BT::NodeStatus::FAILURE;
   }
-  if (!canonicalized_entity_status->laneMatchingSucceed()) {
+  if (!canonicalized_entity_status->isInLanelet()) {
     return BT::NodeStatus::FAILURE;
   }
   if (!behavior_parameter.see_around) {

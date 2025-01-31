@@ -39,7 +39,7 @@ BT::NodeStatus FollowLaneAction::tick()
     request != traffic_simulator::behavior::Request::FOLLOW_LANE) {
     return BT::NodeStatus::FAILURE;
   }
-  if (!canonicalized_entity_status->laneMatchingSucceed()) {
+  if (!canonicalized_entity_status->isInLanelet()) {
     stopEntity();
     return BT::NodeStatus::RUNNING;
   }
