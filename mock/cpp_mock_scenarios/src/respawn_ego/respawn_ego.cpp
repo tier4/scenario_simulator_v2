@@ -38,7 +38,8 @@ public:
         goal_msg.header.frame_id = "map";
         goal_msg.pose = static_cast<geometry_msgs::msg::Pose>(goal_pose);
         api_.respawn("ego", message, goal_msg);
-      })}
+      })},
+    has_done_respawn{false}
   {
     start();
   }
@@ -46,8 +47,29 @@ public:
 private:
   void onUpdate() override
   {
-    if (api_.getCurrentTime() >= 30) {
+    if (api_.getCurrentTime() >= 60) {
+      stop(cpp_mock_scenarios::Result::FAILURE);
+    }
+
+    if (api_.isInLanelet("ego", 34564, 0.1)) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
+    }
+
+    if (api_.getCurrentTime() >= 10 && !has_done_respawn) {
+      geometry_msgs::msg::PoseWithCovarianceStamped ego_pose;
+      ego_pose.header.frame_id = "map";
+      ego_pose.pose.pose = static_cast<geometry_msgs::msg::Pose>(
+        traffic_simulator::helper::constructCanonicalizedLaneletPose(
+          34576, 10.0, 0.0, api_.getHdmapUtils()));
+
+      geometry_msgs::msg::PoseStamped goal_pose;
+      goal_pose.header.frame_id = "map";
+      goal_pose.pose = static_cast<geometry_msgs::msg::Pose>(
+        traffic_simulator::helper::constructCanonicalizedLaneletPose(
+          34564, 10.0, 0.0, api_.getHdmapUtils()));
+      api_.respawn("ego", ego_pose, goal_pose);
+
+      has_done_respawn = true;
     }
   }
 
@@ -63,6 +85,8 @@ private:
 
   const rclcpp::Subscription<geometry_msgs::msg::PoseWithCovarianceStamped>::SharedPtr
     new_position_subscriber;
+
+  bool has_done_respawn;
 };
 }  // namespace cpp_mock_scenarios
 
