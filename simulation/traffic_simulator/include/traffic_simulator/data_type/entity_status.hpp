@@ -39,11 +39,9 @@ public:
 
   auto set(const CanonicalizedEntityStatus & status) -> void;
   auto set(
-    const EntityStatus & status, const lanelet::Ids & lanelet_ids, const double matching_distance,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> void;
-  auto set(
-    const EntityStatus & status, const double matching_distance,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> void;
+    const EntityStatus & status, const lanelet::Ids & lanelet_ids, const double matching_distance)
+    -> void;
+  auto set(const EntityStatus & status, const double matching_distance) -> void;
 
   auto setAction(const std::string & action) -> void;
   auto getActionStatus() const noexcept -> const traffic_simulator_msgs::msg::ActionStatus &;
@@ -68,9 +66,9 @@ public:
   auto setLinearJerk(double) -> void;
 
   auto isInLanelet() const noexcept -> bool;
-  auto getLaneletId() const noexcept -> lanelet::Id;
-  auto getLaneletIds() const noexcept -> lanelet::Ids;
-  auto getLaneletPose() const noexcept -> const LaneletPose &;
+  auto getLaneletId() const -> lanelet::Id;
+  auto getLaneletIds() const -> lanelet::Ids;
+  auto getLaneletPose() const -> const LaneletPose &;
   auto getCanonicalizedLaneletPose() const noexcept
     -> const std::optional<CanonicalizedLaneletPose> &;
   auto getName() const noexcept -> const std::string & { return entity_status_.name; }

@@ -330,7 +330,7 @@ auto EgoEntity::setMapPose(const geometry_msgs::msg::Pose & map_pose) -> void
   // prefer current lanelet on Autoware side
   status_->set(
     entity_status, helper::getUniqueValues(getRouteLanelets()),
-    getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
+    getDefaultMatchingDistanceForLaneletPoseCalculation());
 }
 }  // namespace entity
 }  // namespace traffic_simulator
