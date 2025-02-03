@@ -300,8 +300,8 @@ auto distanceToYieldStop(
   for (const auto & lanelet_id : following_lanelets) {
     const auto right_of_way_ids = lanelet_wrapper::lanelet_map::rightOfWayLaneletIds(lanelet_id);
     for (const auto right_of_way_id : right_of_way_ids) {
-      const auto other_poses = getPosesOnLanelet(right_of_way_id);
-      if (!other_poses.empty()) {
+      const auto other_poses_on_lanelet = getPosesOnLanelet(right_of_way_id);
+      if (!other_poses_on_lanelet.empty()) {
         const auto distance_forward = lanelet_wrapper::distance::longitudinalDistance(
           static_cast<LaneletPose>(reference_pose),
           helper::constructLaneletPose(lanelet_id, 0.0, 0.0), RoutingConfiguration());
