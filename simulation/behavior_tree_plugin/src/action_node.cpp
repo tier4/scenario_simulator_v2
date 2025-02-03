@@ -298,7 +298,7 @@ auto ActionNode::getEntityStatus(const std::string & target_name) const
  * @note getDistanceToTargetEntity working schematics
  * 
  * 1. Check if route to target entity from reference entity exists, if not try to transform pose to other 
- *    routable lanelet, within matching distance (transformToRoutableCanonicalizedLaneletPose).
+ *    routable lanelet, within matching distance (findRoutableAlternativeLaneletPoseFrom).
  * 2. Calculate longitudinal distance between entities bounding boxes -> bounding_box_distance.
  * 3. Calculate longitudinal distance between entities poses -> position_distance.
  * 4. Calculate target entity bounding box distance to reference entity spline (minimal distance from all corners) 
@@ -331,7 +331,7 @@ auto ActionNode::getDistanceToTargetEntity(
   const auto & target_bounding_box = status.getBoundingBox();
 
   if (const auto & target_lanelet_pose =
-        traffic_simulator::pose::transformToRoutableCanonicalizedLaneletPose(
+        traffic_simulator::pose::findRoutableAlternativeLaneletPoseFrom(
           canonicalized_entity_status->getLaneletId(), status.getCanonicalizedLaneletPose().value(),
           target_bounding_box, hdmap_utils);
       target_lanelet_pose) {

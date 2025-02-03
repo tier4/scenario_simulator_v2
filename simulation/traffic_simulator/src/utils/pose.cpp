@@ -328,7 +328,7 @@ auto isAtEndOfLanelets(
          lanelet_wrapper::lanelet_map::laneletLength(lanelet_pose.lanelet_id) <= lanelet_pose.s;
 }
 
-auto transformToRoutableCanonicalizedLaneletPose(
+auto findRoutableAlternativeLaneletPoseFrom(
   const lanelet::Id from_lanelet_id, const CanonicalizedLaneletPose & to_canonicalized_lanelet_pose,
   const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)

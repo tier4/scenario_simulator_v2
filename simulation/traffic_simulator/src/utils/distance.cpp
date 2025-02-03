@@ -317,6 +317,12 @@ auto distanceToSpline(
   const traffic_simulator_msgs::msg::BoundingBox & bounding_box,
   const math::geometry::CatmullRomSplineInterface & spline, const double s_reference) -> double
 {
+  /*
+  * Convergence threshold for binary search.
+  * The search stops when the interval between `s_start` and `s_end` is below this value.
+  * The value 0.05 was chosen empirically to balance accuracy and performance.
+  * A smaller value improves precision but increases computation time.
+  */
   constexpr double distance_accuracy{0.05};
 
   const auto bounding_box_map_points =
@@ -333,15 +339,17 @@ auto distanceToSpline(
     auto s_end_distance = spline.getSquaredDistanceIn2D(point, s_end);
 
     while (std::abs(s_start - s_end) > distance_accuracy) {
+      double s_mid = std::midpoint(s_start, s_end);
+      double s_mid_distance = spline.getSquaredDistanceIn2D(point, s_mid);
       if (s_start_distance > s_end_distance) {
-        s_start += (s_end - s_start) / 2;
-        s_start_distance = spline.getSquaredDistanceIn2D(point, s_start);
+        s_start = s_mid;
+        s_start_distance = s_mid_distance;
       } else {
-        s_end -= (s_end - s_start) / 2;
-        s_end_distance = spline.getSquaredDistanceIn2D(point, s_end);
+        s_end = s_mid;
+        s_end_distance = s_mid_distance;
       }
     }
-    distances.push_back(s_start_distance > s_end_distance ? s_end_distance : s_start_distance);
+    distances.push_back(std::min(s_start_distance, s_end_distance));
   }
   return std::sqrt(*std::min_element(distances.begin(), distances.end()));
 }

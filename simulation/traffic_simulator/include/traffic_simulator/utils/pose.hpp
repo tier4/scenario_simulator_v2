@@ -106,7 +106,7 @@ auto isAtEndOfLanelets(
   const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> bool;
 
-auto transformToRoutableCanonicalizedLaneletPose(
+auto findRoutableAlternativeLaneletPoseFrom(
   const lanelet::Id from_lanelet_id, const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
   const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
