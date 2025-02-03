@@ -24,6 +24,7 @@
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <openscenario_interpreter/syntax/speed_condition.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
+#include <openscenario_interpreter/utility/scoped_elapsed_time_recorder.hpp>
 #include <status_monitor/status_monitor.hpp>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
 
@@ -37,6 +38,12 @@ namespace openscenario_interpreter
 Interpreter::Interpreter(const rclcpp::NodeOptions & options)
 : rclcpp_lifecycle::LifecycleNode("openscenario_interpreter", options),
   publisher_of_context(create_publisher<Context>("context", rclcpp::QoS(1).transient_local())),
+  evaluate_time_publisher(create_publisher<tier4_simulation_msgs::msg::UserDefinedValue>(
+    "/simulation/interpreter/execution_time_ms/evaluate", rclcpp::QoS(1).transient_local())),
+  update_time_publisher(create_publisher<tier4_simulation_msgs::msg::UserDefinedValue>(
+    "/simulation/interpreter/execution_time_ms/update", rclcpp::QoS(1).transient_local())),
+  output_time_publisher(create_publisher<tier4_simulation_msgs::msg::UserDefinedValue>(
+    "/simulation/interpreter/execution_time_ms/output", rclcpp::QoS(1).transient_local())),
   local_frame_rate(30),
   local_real_time_factor(1.0),
   osc_path(""),
@@ -186,23 +193,40 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
       },
       [this]() {
         withTimeoutHandler(defaultTimeoutHandler(), [this]() {
-          if (std::isnan(evaluateSimulationTime())) {
-            if (not waiting_for_engagement_to_be_completed and engageable()) {
-              engage();
-              waiting_for_engagement_to_be_completed = true;  // NOTE: DIRTY HACK!!!
-            } else if (engaged()) {
-              activateNonUserDefinedControllers();
-              waiting_for_engagement_to_be_completed = false;  // NOTE: DIRTY HACK!!!
+          double evaluate_time, update_time, context_time;
+          {
+            ScopedElapsedTimeRecorder evaluate_time_recorder(evaluate_time);
+            if (std::isnan(evaluateSimulationTime())) {
+              if (not waiting_for_engagement_to_be_completed and engageable()) {
+                engage();
+                waiting_for_engagement_to_be_completed = true;  // NOTE: DIRTY HACK!!!
+              } else if (engaged()) {
+                activateNonUserDefinedControllers();
+                waiting_for_engagement_to_be_completed = false;  // NOTE: DIRTY HACK!!!
+              }
+            } else if (currentScenarioDefinition()) {
+              currentScenarioDefinition()->evaluate();
+            } else {
+              throw Error("No script evaluable.");
             }
-          } else if (currentScenarioDefinition()) {
-            currentScenarioDefinition()->evaluate();
-          } else {
-            throw Error("No script evaluable.");
+          }
+          {
+            ScopedElapsedTimeRecorder update_time_recorder(update_time);
+            SimulatorCore::update();
+          }
+          {
+            ScopedElapsedTimeRecorder context_time_recorder(context_time);
+            publishCurrentContext();
           }
 
-          SimulatorCore::update();
-
-          publishCurrentContext();
+          tier4_simulation_msgs::msg::UserDefinedValue msg;
+          msg.type.data = tier4_simulation_msgs::msg::UserDefinedValueType::DOUBLE;
+          msg.value = std::to_string(evaluate_time * 1e3);
+          evaluate_time_publisher->publish(msg);
+          msg.value = std::to_string(update_time * 1e3);
+          update_time_publisher->publish(msg);
+          msg.value = std::to_string(context_time * 1e3);
+          output_time_publisher->publish(msg);
         });
       });
   };
@@ -240,6 +264,9 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
         execution_timer.clear();
 
         publisher_of_context->on_activate();
+        evaluate_time_publisher->on_activate();
+        update_time_publisher->on_activate();
+        output_time_publisher->on_activate();
 
         assert(publisher_of_context->is_activated());
 
@@ -310,6 +337,15 @@ auto Interpreter::reset() -> void
 
   if (publisher_of_context->is_activated()) {
     publisher_of_context->on_deactivate();
+  }
+  if (evaluate_time_publisher->is_activated()) {
+    evaluate_time_publisher->on_deactivate();
+  }
+  if (update_time_publisher->is_activated()) {
+    update_time_publisher->on_deactivate();
+  }
+  if (output_time_publisher->is_activated()) {
+    output_time_publisher->on_deactivate();
   }
 
   if (not has_parameter("initialize_duration")) {
