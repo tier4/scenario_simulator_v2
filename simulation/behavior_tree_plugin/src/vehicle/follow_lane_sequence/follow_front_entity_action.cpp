@@ -77,7 +77,7 @@ BT::NodeStatus FollowFrontEntityAction::tick()
     request != traffic_simulator::behavior::Request::FOLLOW_LANE) {
     return BT::NodeStatus::FAILURE;
   }
-  if (getRightOfWayEntities(route_lanelets).size() != 0) {
+  if (isNeedToRightOfWay(route_lanelets)) {
     return BT::NodeStatus::FAILURE;
   }
   if (!behavior_parameter.see_around) {
@@ -90,15 +90,19 @@ BT::NodeStatus FollowFrontEntityAction::tick()
   if (trajectory == nullptr) {
     return BT::NodeStatus::FAILURE;
   }
-  auto distance_to_stopline =
+  const auto distance_to_stopline =
     traffic_simulator::distance::distanceToStopLine(route_lanelets, *trajectory);
-  auto distance_to_conflicting_entity = getDistanceToConflictingEntity(route_lanelets, *trajectory);
+  const auto distance_to_conflicting_entity =
+    traffic_simulator::distance::distanceToNearestConflictingPose(
+      route_lanelets, *trajectory, getOtherEntitiesCanonicalizedEntityStatuses());
   const auto front_entity_name = getFrontEntityName(*trajectory);
   if (!front_entity_name) {
     return BT::NodeStatus::FAILURE;
   }
-  distance_to_front_entity_ =
-    getDistanceToTargetEntityPolygon(*trajectory, front_entity_name.value());
+  const auto & front_entity_status = getEntityStatus(front_entity_name.value());
+  distance_to_front_entity_ = traffic_simulator::distance::splineDistanceToBoundingBox(
+    *trajectory, front_entity_status.getCanonicalizedLaneletPose().value(),
+    front_entity_status.getBoundingBox());
   if (!distance_to_front_entity_) {
     return BT::NodeStatus::FAILURE;
   }
@@ -112,7 +116,6 @@ BT::NodeStatus FollowFrontEntityAction::tick()
       return BT::NodeStatus::FAILURE;
     }
   }
-  const auto & front_entity_status = getEntityStatus(front_entity_name.value());
   if (!target_speed) {
     target_speed = hdmap_utils->getSpeedLimit(route_lanelets);
   }
