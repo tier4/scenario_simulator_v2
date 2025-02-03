@@ -17,6 +17,7 @@
 #include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
+#include <traffic_simulator/utils/route.hpp>
 #include <utility>
 #include <vector>
 
@@ -98,7 +99,8 @@ BT::NodeStatus StopAtStopLineAction::tick()
   if (!behavior_parameter.see_around) {
     return BT::NodeStatus::FAILURE;
   }
-  if (isNeedToRightOfWay(route_lanelets)) {
+  if (traffic_simulator::route::isNeedToRightOfWay(
+        route_lanelets, getOtherEntitiesCanonicalizedLaneletPoses())) {
     return BT::NodeStatus::FAILURE;
   }
   const auto waypoints = calculateWaypoints();
@@ -140,7 +142,7 @@ BT::NodeStatus StopAtStopLineAction::tick()
   }
   if (stopped_) {
     if (!target_speed) {
-      target_speed = hdmap_utils->getSpeedLimit(route_lanelets);
+      target_speed = traffic_simulator::route::speedLimit(route_lanelets);
     }
     if (!distance_to_stopline_) {
       stopped_ = false;
