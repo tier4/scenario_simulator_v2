@@ -355,7 +355,7 @@ auto rightOfWayLaneletIds(const lanelet::Ids & lanelet_ids)
 {
   std::unordered_map<lanelet::Id, lanelet::Ids> right_of_way_lanelets_ids;
   for (const auto & lanelet_id : lanelet_ids) {
-    right_of_way_lanelets_ids.emplace(lanelet_id, rightOfWayLaneletIds(lanelet_id));
+    right_of_way_lanelets_ids.try_emplace(lanelet_id, rightOfWayLaneletIds(lanelet_id));
   }
   return right_of_way_lanelets_ids;
 }
