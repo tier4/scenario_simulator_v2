@@ -109,25 +109,20 @@ auto longitudinalDistance(
       matching_distance, include_opposite_direction, routing_configuration.routing_graph_type);
     to_poses.emplace_back(to);
 
-    std::vector<double> distances = {};
+    std::optional<double> min_distance = std::nullopt;
     for (const auto & from_pose : from_poses) {
       for (const auto & to_pose : to_poses) {
-        if (
-          const auto distance = distance::longitudinalDistance(
-            CanonicalizedLaneletPose(from_pose), CanonicalizedLaneletPose(to_pose), false,
-            include_opposite_direction, routing_configuration)) {
-          distances.emplace_back(distance.value());
+        if (const auto distance = distance::longitudinalDistance(
+              CanonicalizedLaneletPose(from_pose), CanonicalizedLaneletPose(to_pose), false,
+              include_opposite_direction, routing_configuration);
+            distance.has_value() and
+            (not min_distance.has_value() or
+             (std::abs(distance.value()) < std::abs(min_distance.value())))) {
+          min_distance = distance;
         }
       }
     }
-
-    if (!distances.empty()) {
-      return *std::min_element(distances.begin(), distances.end(), [](double a, double b) {
-        return std::abs(a) < std::abs(b);
-      });
-    } else {
-      return std::nullopt;
-    }
+    return min_distance;
   }
 }
 
@@ -221,11 +216,14 @@ auto distanceToLeftLaneBound(
   if (lanelet_ids.empty()) {
     THROW_SEMANTIC_ERROR("Failing to calculate distanceToLeftLaneBound given an empty vector.");
   }
-  std::vector<double> distances;
-  std::transform(
-    lanelet_ids.begin(), lanelet_ids.end(), std::back_inserter(distances),
-    [&](auto lanelet_id) { return distanceToLeftLaneBound(map_pose, bounding_box, lanelet_id); });
-  return *std::min_element(distances.begin(), distances.end());
+  double min_distance = std::numeric_limits<double>::max();
+  for (const auto & lanelet_id : lanelet_ids) {
+    const auto distance = distanceToLeftLaneBound(map_pose, bounding_box, lanelet_id);
+    if (distance < min_distance) {
+      min_distance = distance;
+    }
+  }
+  return min_distance;
 }
 
 auto distanceToRightLaneBound(
@@ -233,7 +231,7 @@ auto distanceToRightLaneBound(
   const traffic_simulator_msgs::msg::BoundingBox & bounding_box, const lanelet::Id lanelet_id)
   -> double
 {
-  if (const auto bound = lanelet_wrapper::lanelet_map::rightBound(lanelet_id); bound.empty()) {
+  if (const auto & bound = lanelet_wrapper::lanelet_map::rightBound(lanelet_id); bound.empty()) {
     THROW_SEMANTIC_ERROR(
       "Failed to calculate right bounds of lanelet_id : ", lanelet_id,
       " please check lanelet map.");
@@ -254,11 +252,14 @@ auto distanceToRightLaneBound(
   if (lanelet_ids.empty()) {
     THROW_SEMANTIC_ERROR("Failing to calculate distanceToRightLaneBound for given empty vector.");
   }
-  std::vector<double> distances;
-  std::transform(
-    lanelet_ids.begin(), lanelet_ids.end(), std::back_inserter(distances),
-    [&](auto lanelet_id) { return distanceToRightLaneBound(map_pose, bounding_box, lanelet_id); });
-  return *std::min_element(distances.begin(), distances.end());
+  double min_distance = std::numeric_limits<double>::max();
+  for (const auto & lanelet_id : lanelet_ids) {
+    const double distance = distanceToRightLaneBound(map_pose, bounding_box, lanelet_id);
+    if (distance < min_distance) {
+      min_distance = distance;
+    }
+  }
+  return min_distance;
 }
 
 auto distanceToLaneBound(
@@ -296,7 +297,12 @@ auto distanceToYieldStop(
     return ret;
   };
 
-  std::vector<double> distances;
+  std::optional<double> min_distance = std::nullopt;
+  auto try_min_distance = [&min_distance](const double & distance) {
+    if (not min_distance.has_value() or distance < min_distance.value()) {
+      min_distance = distance;
+    }
+  };
   for (const auto & lanelet_id : following_lanelets) {
     const auto right_of_way_ids = lanelet_wrapper::lanelet_map::rightOfWayLaneletIds(lanelet_id);
     for (const auto right_of_way_id : right_of_way_ids) {
@@ -308,15 +314,16 @@ auto distanceToYieldStop(
         const auto distance_backward = lanelet_wrapper::distance::longitudinalDistance(
           helper::constructLaneletPose(lanelet_id, 0.0, 0.0),
           static_cast<LaneletPose>(reference_pose), RoutingConfiguration());
+
         if (distance_forward) {
-          distances.push_back(distance_forward.value());
+          try_min_distance(distance_forward.value());
         } else if (distance_backward) {
-          distances.push_back(-distance_backward.value());
+          try_min_distance(-distance_backward.value());
         }
       }
     }
-    if (!distances.empty()) {
-      return *std::min_element(distances.begin(), distances.end());
+    if (min_distance.has_value()) {
+      return min_distance.value();
     }
   }
   return std::nullopt;
