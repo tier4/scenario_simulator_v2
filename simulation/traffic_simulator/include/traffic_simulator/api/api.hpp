@@ -34,7 +34,6 @@
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/entity/entity_manager.hpp>
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/simulation_clock/simulation_clock.hpp>
 #include <traffic_simulator/traffic/traffic_controller.hpp>
@@ -70,8 +69,7 @@ public:
     entity_manager_ptr_(
       std::make_shared<entity::EntityManager>(node, configuration, node_parameters_)),
     traffic_lights_ptr_(std::make_shared<TrafficLights>(
-      node, entity_manager_ptr_->getHdmapUtils(),
-      getROS2Parameter<std::string>("architecture_type", "awf/universe/20240605"))),
+      node, getROS2Parameter<std::string>("architecture_type", "awf/universe/20240605"))),
     traffic_controller_ptr_(std::make_shared<traffic::TrafficController>(
       [this](const std::string & name) { despawn(name); }, entity_manager_ptr_,
       configuration.auto_sink_entity_types)),
@@ -323,7 +321,6 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getEgoEntity);
   FORWARD_TO_ENTITY_MANAGER(getEntityNames);
   FORWARD_TO_ENTITY_MANAGER(getEntityOrNullptr);
-  FORWARD_TO_ENTITY_MANAGER(getHdmapUtils);
   FORWARD_TO_ENTITY_MANAGER(isAnyEgoSpawned);
   FORWARD_TO_ENTITY_MANAGER(isNpcLogicStarted);
   FORWARD_TO_ENTITY_MANAGER(resetBehaviorPlugin);
