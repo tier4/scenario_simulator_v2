@@ -31,6 +31,7 @@
 #include <autoware_vehicle_msgs/msg/gear_command.hpp>
 #include <autoware_vehicle_msgs/msg/turn_indicators_command.hpp>
 #include <concealer/autoware_universe.hpp>
+#include <concealer/path_with_lane_id.hpp>
 #include <concealer/publisher.hpp>
 #include <concealer/service.hpp>
 #include <concealer/subscriber.hpp>
@@ -44,7 +45,6 @@
 #include <tier4_external_api_msgs/msg/emergency.hpp>
 #include <tier4_external_api_msgs/srv/engage.hpp>
 #include <tier4_external_api_msgs/srv/set_velocity_limit.hpp>
-#include <tier4_planning_msgs/msg/path_with_lane_id.hpp>
 #include <tier4_planning_msgs/msg/trajectory.hpp>
 #include <tier4_rtc_msgs/msg/cooperate_status_array.hpp>
 #include <tier4_rtc_msgs/srv/auto_mode_with_module.hpp>
@@ -78,7 +78,6 @@ struct FieldOperatorApplication : public rclcpp::Node,
   using Emergency                       = tier4_external_api_msgs::msg::Emergency;
   using LocalizationInitializationState = autoware_adapi_v1_msgs::msg::LocalizationInitializationState;
   using MrmState                        = autoware_adapi_v1_msgs::msg::MrmState;
-  using PathWithLaneId                  = tier4_planning_msgs::msg::PathWithLaneId;
   using Trajectory                      = tier4_planning_msgs::msg::Trajectory;
   using TurnIndicatorsCommand           = autoware_vehicle_msgs::msg::TurnIndicatorsCommand;
 
@@ -98,10 +97,10 @@ struct FieldOperatorApplication : public rclcpp::Node,
 #if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)
   Subscriber<LocalizationInitializationState> getLocalizationState;
 #endif
-  Subscriber<MrmState>                        getMrmState;
-  Subscriber<PathWithLaneId>                  getPathWithLaneId;
-  Subscriber<Trajectory>                      getTrajectory;
-  Subscriber<TurnIndicatorsCommand>           getTurnIndicatorsCommand;
+  Subscriber<MrmState>                 getMrmState;
+  Subscriber<priority::PathWithLaneId> getPathWithLaneId;
+  Subscriber<Trajectory>               getTrajectory;
+  Subscriber<TurnIndicatorsCommand>    getTurnIndicatorsCommand;
 
   Service<ClearRoute>             requestClearRoute;
   Service<CooperateCommands>      requestCooperateCommands;
