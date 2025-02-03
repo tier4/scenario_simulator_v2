@@ -21,7 +21,8 @@ namespace concealer
 template <>
 auto available<autoware_internal_planning_msgs::msg::PathWithLaneId>() -> bool
 {
-  if (const auto architecture_type = getParameter<std::string>("architecture_type");
+  if (const auto architecture_type =
+        getParameter<std::string>("architecture_type", default_architecture_type);
       architecture_type.find("awf/universe") != std::string::npos) {
     return "awf/universe/20250130" <= architecture_type;
   } else {
@@ -34,7 +35,8 @@ auto available<autoware_internal_planning_msgs::msg::PathWithLaneId>() -> bool
 template <>
 auto available<tier4_planning_msgs::msg::PathWithLaneId>() -> bool
 {
-  if (const auto architecture_type = getParameter<std::string>("architecture_type");
+  if (const auto architecture_type =
+        getParameter<std::string>("architecture_type", default_architecture_type);
       architecture_type.find("awf/universe") != std::string::npos) {
     return architecture_type < "awf/universe/20250130";
   } else {

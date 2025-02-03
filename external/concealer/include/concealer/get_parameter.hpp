@@ -19,6 +19,8 @@
 
 namespace concealer
 {
+static constexpr auto default_architecture_type = "awf/universe/20240605";
+
 template <typename T>
 auto getParameter(
   const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node,
