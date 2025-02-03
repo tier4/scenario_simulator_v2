@@ -34,6 +34,8 @@ public:
   virtual std::optional<double> getCollisionPointIn2D(
     const std::vector<geometry_msgs::msg::Point> & polygon,
     const bool search_backward = false) const = 0;
+  virtual double getSquaredDistanceIn2D(
+    const geometry_msgs::msg::Point & point, const double s) const = 0;
 };
 }  // namespace geometry
 }  // namespace math

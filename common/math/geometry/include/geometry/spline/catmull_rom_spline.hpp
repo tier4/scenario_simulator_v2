@@ -46,7 +46,7 @@ public:
   auto getSValue(const geometry_msgs::msg::Pose & pose, double threshold_distance = 3.0) const
     -> std::optional<double>;
   auto getSquaredDistanceIn2D(const geometry_msgs::msg::Point & point, const double s) const
-    -> double;
+    -> double override;
   auto getSquaredDistanceVector(const geometry_msgs::msg::Point & point, const double s) const
     -> geometry_msgs::msg::Vector3;
   auto getCollisionPointsIn2D(
