@@ -93,7 +93,7 @@ auto ActionNode::getOtherEntitiesCanonicalizedLaneletPoses() const
 {
   std::vector<traffic_simulator::CanonicalizedLaneletPose> other_canonicalized_lanelet_poses;
   for (const auto & [name, status] : other_entity_status) {
-    if (auto const canonicalized_lanelet_pose = status.getCanonicalizedLaneletPose()) {
+    if (auto const & canonicalized_lanelet_pose = status.getCanonicalizedLaneletPose()) {
       other_canonicalized_lanelet_poses.push_back(canonicalized_lanelet_pose.value());
     }
   }
