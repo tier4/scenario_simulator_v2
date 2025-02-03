@@ -22,6 +22,7 @@
 #include <autoware_lanelet2_extension/utility/utilities.hpp>
 #include <filesystem>
 #include <geometry/spline/catmull_rom_spline.hpp>
+#include <geometry/spline/catmull_rom_spline_interface.hpp>
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
@@ -65,6 +66,7 @@ using Point = geometry_msgs::msg::Point;
 using Pose = geometry_msgs::msg::Pose;
 using PoseStamped = geometry_msgs::msg::PoseStamped;
 using Spline = math::geometry::CatmullRomSpline;
+using SplineInterface = math::geometry::CatmullRomSplineInterface;
 using Vector3 = geometry_msgs::msg::Vector3;
 
 class RouteCache
@@ -157,7 +159,7 @@ public:
   }
 
   auto getCenterPoints(const lanelet::Id lanelet_id, const lanelet::LaneletMapPtr & lanelet_map)
-    -> std::vector<Point>
+    -> decltype(auto)
   {
     if (!exists(lanelet_id)) {
       appendData(lanelet_id, centerPoints(lanelet_id, lanelet_map));
@@ -166,8 +168,7 @@ public:
   }
 
   auto getCenterPointsSpline(
-    const lanelet::Id lanelet_id, const lanelet::LaneletMapPtr & lanelet_map)
-    -> std::shared_ptr<Spline>
+    const lanelet::Id lanelet_id, const lanelet::LaneletMapPtr & lanelet_map) -> decltype(auto)
   {
     if (!exists(lanelet_id)) {
       appendData(lanelet_id, centerPoints(lanelet_id, lanelet_map));
@@ -182,7 +183,7 @@ private:
     return data_.find(lanelet_id) != data_.end();
   }
 
-  auto readData(const lanelet::Id lanelet_id) -> std::vector<Point>
+  auto readData(const lanelet::Id lanelet_id) -> const std::vector<Point> &
   {
     std::lock_guard lock(mutex_);
     return data_.at(lanelet_id);
@@ -231,7 +232,7 @@ private:
 class LaneletLengthCache
 {
 public:
-  auto getLength(lanelet::Id lanelet_id)
+  auto getLength(lanelet::Id lanelet_id) -> double
   {
     if (!exists(lanelet_id)) {
       THROW_SIMULATION_ERROR("length of : ", lanelet_id, " does not exists on route cache.");
