@@ -109,6 +109,14 @@ auto canonicalizeLaneletPose(const LaneletPose & lanelet_pose)
 auto canonicalizeLaneletPose(const LaneletPose & lanelet_pose, const lanelet::Ids & route_lanelets)
   -> std::tuple<std::optional<LaneletPose>, std::optional<lanelet::Id>>;
 
+auto findMatchingLanes(
+  const geometry_msgs::msg::Pose &, const traffic_simulator_msgs::msg::BoundingBox &,
+  const bool include_crosswalk, const double matching_distance = 1.0,
+  const double reduction_ratio = DEFAULT_MATCH_TO_LANE_REDUCTION_RATIO,
+  const traffic_simulator::RoutingGraphType type =
+    traffic_simulator::RoutingConfiguration().routing_graph_type)
+  -> std::optional<std::set<std::pair<double, lanelet::Id>>>;
+
 auto matchToLane(
   const Pose & map_pose, const BoundingBox & bounding_box, const bool include_crosswalk,
   const double matching_distance = 1.0,

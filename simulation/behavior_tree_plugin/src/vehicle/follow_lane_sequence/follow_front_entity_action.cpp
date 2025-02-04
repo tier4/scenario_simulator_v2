@@ -94,14 +94,17 @@ BT::NodeStatus FollowFrontEntityAction::tick()
     traffic_simulator::distance::distanceToStopLine(route_lanelets, *trajectory);
   const auto distance_to_conflicting_entity =
     traffic_simulator::distance::distanceToNearestConflictingPose(
-      route_lanelets, *trajectory, getOtherEntitiesCanonicalizedEntityStatuses());
+      route_lanelets, *trajectory, *canonicalized_entity_status,
+      getOtherEntitiesCanonicalizedEntityStatuses());
   const auto front_entity_name = getFrontEntityName(*trajectory);
   if (!front_entity_name) {
     return BT::NodeStatus::FAILURE;
   }
   const auto & front_entity_status = getEntityStatus(front_entity_name.value());
   distance_to_front_entity_ = traffic_simulator::distance::splineDistanceToBoundingBox(
-    *trajectory, front_entity_status.getCanonicalizedLaneletPose().value(),
+    *trajectory, canonicalized_entity_status->getCanonicalizedLaneletPose().value(),
+    canonicalized_entity_status->getBoundingBox(),
+    front_entity_status.getCanonicalizedLaneletPose().value(),
     front_entity_status.getBoundingBox());
   if (!distance_to_front_entity_) {
     return BT::NodeStatus::FAILURE;

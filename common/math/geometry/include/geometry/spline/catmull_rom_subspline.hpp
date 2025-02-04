@@ -48,6 +48,9 @@ public:
     const std::vector<geometry_msgs::msg::Point> & polygon,
     const bool search_backward = false) const override;
 
+  auto getSquaredDistanceIn2D(const geometry_msgs::msg::Point & point, const double s) const
+    -> double override;
+
 private:
   std::shared_ptr<math::geometry::CatmullRomSpline> spline_;
   double start_s_;

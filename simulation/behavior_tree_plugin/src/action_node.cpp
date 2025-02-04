@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <behavior_tree_plugin/action_node.hpp>
 #include <geometry/bounding_box.hpp>
+#include <geometry/distance.hpp>
 #include <geometry/quaternion/euler_to_quaternion.hpp>
 #include <geometry/quaternion/get_rotation.hpp>
 #include <geometry/quaternion/get_rotation_matrix.hpp>
@@ -29,6 +30,7 @@
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/lanelet_wrapper/lanelet_map.hpp>
 #include <traffic_simulator/lanelet_wrapper/pose.hpp>
+#include <traffic_simulator/utils/pose.hpp>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -178,11 +180,18 @@ auto ActionNode::isNeedToRightOfWay(const lanelet::Ids & following_lanelets) con
 auto ActionNode::getDistanceToFrontEntity(
   const math::geometry::CatmullRomSplineInterface & spline) const -> std::optional<double>
 {
+  if (not canonicalized_entity_status->isInLanelet()) {
+    return std::nullopt;
+  }
   if (const auto front_entity_name = getFrontEntityName(spline)) {
     const auto & front_entity_status = getEntityStatus(front_entity_name.value());
-    if (auto const canonicalized_lanelet_pose = front_entity_status.getCanonicalizedLaneletPose()) {
+    if (
+      const auto & front_entity_canonicalized_lanelet_pose =
+        front_entity_status.getCanonicalizedLaneletPose()) {
       return traffic_simulator::distance::splineDistanceToBoundingBox(
-        spline, canonicalized_lanelet_pose.value(), front_entity_status.getBoundingBox());
+        spline, canonicalized_entity_status->getCanonicalizedLaneletPose().value(),
+        canonicalized_entity_status->getBoundingBox(),
+        front_entity_canonicalized_lanelet_pose.value(), front_entity_status.getBoundingBox());
     }
   }
   return std::nullopt;
@@ -191,6 +200,9 @@ auto ActionNode::getDistanceToFrontEntity(
 auto ActionNode::getFrontEntityName(const math::geometry::CatmullRomSplineInterface & spline) const
   -> std::optional<std::string>
 {
+  if (not canonicalized_entity_status->isInLanelet()) {
+    return std::nullopt;
+  }
   /**
    * @note hard-coded parameter, if the Yaw value of RPY is in ~1.5708 -> 1.5708, entity is a
    * candidate of front entity.
@@ -199,17 +211,21 @@ auto ActionNode::getFrontEntityName(const math::geometry::CatmullRomSplineInterf
   constexpr double front_entity_horizon{40.0};
 
   std::vector<std::pair<std::string, double>> entities_with_distances;
-  for (const auto & [entity_name, entity_status] : other_entity_status) {
-    if (auto const canonicalized_lanelet_pose = entity_status.getCanonicalizedLaneletPose()) {
+  for (const auto & [other_entity_name, other_entity_status] : other_entity_status) {
+    if (
+      auto const other_canonicalized_lanelet_pose =
+        other_entity_status.getCanonicalizedLaneletPose()) {
       const auto distance = traffic_simulator::distance::splineDistanceToBoundingBox(
-        spline, canonicalized_lanelet_pose.value(), entity_status.getBoundingBox());
+        spline, canonicalized_entity_status->getCanonicalizedLaneletPose().value(),
+        canonicalized_entity_status->getBoundingBox(), other_canonicalized_lanelet_pose.value(),
+        other_entity_status.getBoundingBox());
       if (distance && distance.value() < front_entity_horizon) {
         const auto quaternion = math::geometry::getRotation(
           canonicalized_entity_status->getMapPose().orientation,
-          entity_status.getMapPose().orientation);
+          other_entity_status.getMapPose().orientation);
         const auto yaw = math::geometry::convertQuaternionToEulerAngle(quaternion).z;
         if (std::fabs(yaw) <= front_entity_angle_threshold) {
-          entities_with_distances.push_back({entity_name, distance.value()});
+          entities_with_distances.push_back({other_entity_name, distance.value()});
         }
       }
     }
