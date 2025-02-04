@@ -518,7 +518,7 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
 
   const auto matching_distance = default_matching_distance_for_lanelet_pose_calculation;
 
-  const auto buildUpdatedPose =
+  const auto build_updated_pose =
     [&include_crosswalk, &matching_distance](
       const std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus> & status,
       const geometry_msgs::msg::Twist & desired_twist, const double time_step) {
@@ -571,7 +571,7 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
   const auto linear_jerk_new = std::get<2>(dynamics);
   const auto & accel_new = std::get<1>(dynamics);
   const auto & twist_new = std::get<0>(dynamics);
-  const auto pose_new = buildUpdatedPose(canonicalized_entity_status, twist_new, step_time);
+  const auto pose_new = build_updated_pose(canonicalized_entity_status, twist_new, step_time);
 
   auto entity_status_updated =
     static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status);
