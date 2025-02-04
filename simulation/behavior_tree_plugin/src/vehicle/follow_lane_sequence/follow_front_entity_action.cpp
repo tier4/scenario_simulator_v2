@@ -97,8 +97,8 @@ BT::NodeStatus FollowFrontEntityAction::tick()
   if (!front_entity_name) {
     return BT::NodeStatus::FAILURE;
   }
-  distance_to_front_entity_ =
-    getDistanceToTargetEntityPolygon(*trajectory, front_entity_name.value());
+  const auto & front_entity_status = getEntityStatus(front_entity_name.value());
+  distance_to_front_entity_ = getDistanceToTargetEntity(*trajectory, front_entity_status);
   if (!distance_to_front_entity_) {
     return BT::NodeStatus::FAILURE;
   }
@@ -112,7 +112,6 @@ BT::NodeStatus FollowFrontEntityAction::tick()
       return BT::NodeStatus::FAILURE;
     }
   }
-  const auto & front_entity_status = getEntityStatus(front_entity_name.value());
   if (!target_speed) {
     target_speed = hdmap_utils->getSpeedLimit(route_lanelets);
   }

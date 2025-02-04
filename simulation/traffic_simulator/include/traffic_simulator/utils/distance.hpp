@@ -125,6 +125,12 @@ auto distanceToCrosswalk(Ts &&... xs)
 auto distanceToYieldStop(
   const CanonicalizedLaneletPose & reference_pose, const lanelet::Ids & following_lanelets,
   const std::vector<CanonicalizedLaneletPose> & other_poses) -> std::optional<double>;
+
+// spline
+auto distanceToSpline(
+  const geometry_msgs::msg::Pose & map_pose,
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box,
+  const math::geometry::CatmullRomSplineInterface & spline, const double s_reference) -> double;
 }  // namespace distance
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__UTILS__DISTANCE_HPP_
