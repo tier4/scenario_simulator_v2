@@ -18,7 +18,7 @@
 #include <chrono>
 #include <cmath>
 
-template <typename TClock = std::chrono::high_resolution_clock>
+template <typename Clock = std::chrono::high_resolution_clock>
 class ScopedElapsedTimeRecorder
 {
 public:
@@ -26,11 +26,11 @@ public:
 
   ~ScopedElapsedTimeRecorder()
   {
-    output_seconds = std::abs(std::chrono::duration<double>(TClock::now() - start).count());
+    output_seconds = std::abs(std::chrono::duration<double>(Clock::now() - start).count());
   }
 
 private:
-  std::chrono::time_point<TClock> start = TClock::now();
+  std::chrono::time_point<Clock> start = Clock::now();
 
   double & output_seconds;
 };
