@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <behavior_tree_plugin/action_node.hpp>
 #include <geometry/bounding_box.hpp>
+#include <geometry/distance.hpp>
 #include <geometry/quaternion/euler_to_quaternion.hpp>
 #include <geometry/quaternion/get_rotation.hpp>
 #include <geometry/quaternion/get_rotation_matrix.hpp>
@@ -29,6 +30,7 @@
 #include <traffic_simulator/behavior/longitudinal_speed_planning.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/lanelet_wrapper/pose.hpp>
+#include <traffic_simulator/utils/pose.hpp>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -232,11 +234,11 @@ auto ActionNode::getDistanceToStopLine(
 auto ActionNode::getDistanceToFrontEntity(
   const math::geometry::CatmullRomSplineInterface & spline) const -> std::optional<double>
 {
-  auto name = getFrontEntityName(spline);
-  if (!name) {
+  if (const auto entity_name = getFrontEntityName(spline)) {
+    return getDistanceToTargetEntity(spline, getEntityStatus(entity_name.value()));
+  } else {
     return std::nullopt;
   }
-  return getDistanceToTargetEntityPolygon(spline, name.value());
 }
 
 auto ActionNode::getFrontEntityName(const math::geometry::CatmullRomSplineInterface & spline) const
@@ -245,7 +247,7 @@ auto ActionNode::getFrontEntityName(const math::geometry::CatmullRomSplineInterf
   std::vector<double> distances;
   std::vector<std::string> entities;
   for (const auto & [name, status] : other_entity_status) {
-    const auto distance = getDistanceToTargetEntityPolygon(spline, name);
+    const auto distance = getDistanceToTargetEntity(spline, status);
     const auto quat = math::geometry::getRotation(
       canonicalized_entity_status->getMapPose().orientation,
       other_entity_status.at(name).getMapPose().orientation);
@@ -293,34 +295,81 @@ auto ActionNode::getEntityStatus(const std::string & target_name) const
   }
 }
 
-auto ActionNode::getDistanceToTargetEntityPolygon(
-  const math::geometry::CatmullRomSplineInterface & spline, const std::string target_name,
-  double width_extension_right, double width_extension_left, double length_extension_front,
-  double length_extension_rear) const -> std::optional<double>
-{
-  if (const auto & status = getEntityStatus(target_name); status.isInLanelet()) {
-    return getDistanceToTargetEntityPolygon(
-      spline, status, width_extension_right, width_extension_left, length_extension_front,
-      length_extension_rear);
-  }
-  return std::nullopt;
-}
-
-auto ActionNode::getDistanceToTargetEntityPolygon(
+/**
+ * @note getDistanceToTargetEntity working schematics
+ * 
+ * 1. Check if route to target entity from reference entity exists, if not try to transform pose to other 
+ *    routable lanelet, within matching distance (findRoutableAlternativeLaneletPoseFrom).
+ * 2. Calculate longitudinal distance between entities bounding boxes -> bounding_box_distance.
+ * 3. Calculate longitudinal distance between entities poses -> position_distance.
+ * 4. Calculate target entity bounding box distance to reference entity spline (minimal distance from all corners) 
+ *    -> target_to_spline_distance.
+ * 5. If target_to_spline_distance is less than half width of reference entity target entity is conflicting.
+ * 6. Check corner case where target entity width is bigger than width of entity and target entity
+ *    is exactly on the spline -> spline.getCollisionPointIn2D
+ * 7. If target entity is conflicting return bounding_box_distance enlarged by half of the entity 
+ *    length.
+ */
+auto ActionNode::getDistanceToTargetEntity(
   const math::geometry::CatmullRomSplineInterface & spline,
-  const traffic_simulator::CanonicalizedEntityStatus & status, double width_extension_right,
-  double width_extension_left, double length_extension_front, double length_extension_rear) const
-  -> std::optional<double>
+  const traffic_simulator::CanonicalizedEntityStatus & status) const -> std::optional<double>
 {
-  if (status.isInLanelet() && isOtherEntityAtConsideredAltitude(status)) {
-    const auto polygon = math::geometry::transformPoints(
-      status.getMapPose(), math::geometry::getPointsFromBbox(
-                             status.getBoundingBox(), width_extension_right, width_extension_left,
-                             length_extension_front, length_extension_rear));
-    return spline.getCollisionPointIn2D(polygon, false);
-  } else {
+  if (
+    !status.isInLanelet() || !canonicalized_entity_status->isInLanelet() ||
+    !isOtherEntityAtConsideredAltitude(status)) {
     return std::nullopt;
   }
+  /** 
+      * boundingBoxLaneLongitudinalDistance requires routing_configuration, 
+      * 'allow_lane_change = true' is needed to check distances to entities on neighbour lanelets 
+      */
+  traffic_simulator::RoutingConfiguration routing_configuration;
+  routing_configuration.allow_lane_change = true;
+  constexpr bool include_adjacent_lanelet{false};
+  constexpr bool include_opposite_direction{true};
+  constexpr bool search_backward{false};
+
+  const auto & target_bounding_box = status.getBoundingBox();
+
+  if (const auto & target_lanelet_pose =
+        traffic_simulator::pose::findRoutableAlternativeLaneletPoseFrom(
+          canonicalized_entity_status->getLaneletId(), status.getCanonicalizedLaneletPose().value(),
+          target_bounding_box, hdmap_utils);
+      target_lanelet_pose) {
+    const auto & from_lanelet_pose = canonicalized_entity_status->getCanonicalizedLaneletPose();
+    const auto & from_bounding_box = canonicalized_entity_status->getBoundingBox();
+    if (const auto bounding_box_distance =
+          traffic_simulator::distance::boundingBoxLaneLongitudinalDistance(
+            *from_lanelet_pose, from_bounding_box, *target_lanelet_pose, target_bounding_box,
+            include_adjacent_lanelet, include_opposite_direction, routing_configuration,
+            hdmap_utils);
+        !bounding_box_distance || bounding_box_distance.value() < 0.0) {
+      return std::nullopt;
+    } else if (const auto position_distance = traffic_simulator::distance::longitudinalDistance(
+                 *from_lanelet_pose, *target_lanelet_pose, include_adjacent_lanelet,
+                 include_opposite_direction, routing_configuration, hdmap_utils);
+               !position_distance) {
+      return std::nullopt;
+    } else {
+      const auto target_bounding_box_distance =
+        bounding_box_distance.value() + from_bounding_box.dimensions.x / 2.0;
+
+      /// @note if the distance of the target entity to the spline is smaller than the width of the reference entity
+      if (const auto target_to_spline_distance = traffic_simulator::distance::distanceToSpline(
+            static_cast<geometry_msgs::msg::Pose>(*target_lanelet_pose), target_bounding_box,
+            spline, position_distance.value());
+          target_to_spline_distance <= from_bounding_box.dimensions.y / 2.0) {
+        return target_bounding_box_distance;
+      }
+      /// @note if the distance of the target entity to the spline cannot be calculated because a collision occurs
+      else if (const auto target_polygon = math::geometry::transformPoints(
+                 status.getMapPose(), math::geometry::getPointsFromBbox(target_bounding_box));
+               spline.getCollisionPointIn2D(target_polygon, search_backward)) {
+        return target_bounding_box_distance;
+      }
+    }
+  }
+  return std::nullopt;
 }
 
 auto ActionNode::isOtherEntityAtConsideredAltitude(
@@ -349,9 +398,8 @@ auto ActionNode::getDistanceToConflictingEntity(
     }
   }
   for (const auto & status : lane_entity_status) {
-    const auto s = getDistanceToTargetEntityPolygon(spline, status, 0.0, 0.0, 0.0, 1.0);
-    if (s) {
-      distances.insert(s.value());
+    if (const auto distance_to_entity = getDistanceToTargetEntity(spline, status)) {
+      distances.insert(distance_to_entity.value());
     }
   }
   if (distances.empty()) {

@@ -384,6 +384,63 @@ auto isAtEndOfLanelets(
          lanelet_wrapper::lanelet_map::laneletLength(lanelet_pose.lanelet_id) <= lanelet_pose.s;
 }
 
+auto findRoutableAlternativeLaneletPoseFrom(
+  const lanelet::Id from_lanelet_id, const CanonicalizedLaneletPose & to_canonicalized_lanelet_pose,
+  const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+  -> std::optional<traffic_simulator::CanonicalizedLaneletPose>
+{
+  /// @note search_distance should be minimal, just to check nearest neighbour lanelets
+  constexpr auto search_distance{3.0};
+  /// @note default_match_to_lane_reduction_ratio is constant described in hdmap_utils.hpp
+  constexpr auto default_match_to_lane_reduction_ratio{0.8};
+  constexpr auto include_crosswalk{false};
+  /** 
+    * @note hdmap_utils_ptr->getRoute requires routing_configuration, 
+    * 'allow_lane_change = true' is needed to check distances to entities on neighbour lanelets 
+    */
+  RoutingConfiguration routing_configuration;
+  routing_configuration.allow_lane_change = true;
+
+  /// @note if there is already a route from_lanelet_id->to_lanelet_id, return it
+  /// if not, transform the 'to_lanelet_id' position into the nearby lanelets and search for a route in relation to them
+  if (const auto to_lanelet_id = to_canonicalized_lanelet_pose.getLaneletPose().lanelet_id;
+      !hdmap_utils_ptr->getRoute(from_lanelet_id, to_lanelet_id, routing_configuration).empty()) {
+    return to_canonicalized_lanelet_pose;
+  } else if (const auto nearby_lanelet_ids = lanelet_wrapper::pose::findMatchingLanes(
+               static_cast<geometry_msgs::msg::Pose>(to_canonicalized_lanelet_pose),
+               to_bounding_box, include_crosswalk, search_distance,
+               default_match_to_lane_reduction_ratio, routing_configuration.routing_graph_type);
+             nearby_lanelet_ids.has_value()) {
+    std::vector<std::pair<CanonicalizedLaneletPose, lanelet::Ids>> routes;
+    for (const auto & [distance, lanelet_id] : nearby_lanelet_ids.value()) {
+      if (auto route =
+            hdmap_utils_ptr->getRoute(from_lanelet_id, lanelet_id, routing_configuration);
+          lanelet_id == to_lanelet_id || route.empty()) {
+        continue;
+      } else if (const auto lanelet_pose = lanelet_wrapper::pose::toLaneletPose(
+                   static_cast<geometry_msgs::msg::Pose>(to_canonicalized_lanelet_pose), lanelet_id,
+                   search_distance);
+                 !lanelet_pose) {
+        continue;
+      } else if (auto canonicalized = toCanonicalizedLaneletPose(lanelet_pose.value());
+                 canonicalized) {
+        routes.emplace_back(std::move(canonicalized.value()), std::move(route));
+      }
+    }
+    if (!routes.empty()) {
+      /// @note we want to have alternative lanelet pose with shortest route so we search for minimum
+      return std::min_element(
+               routes.cbegin(), routes.cend(),
+               [](const auto & a, const auto & b) { return a.second.size() < b.second.size(); })
+        ->first;
+    } else {
+      return std::nullopt;
+    }
+  }
+  return std::nullopt;
+}
+
 namespace pedestrian
 {
 /*
