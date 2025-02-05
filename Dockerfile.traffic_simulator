@@ -1,0 +1,49 @@
+ARG ROS_DISTRO="humble"
+FROM ros:${ROS_DISTRO} as build-stage
+SHELL ["/bin/bash", "-c"]
+ENV DEBIAN_FRONTEND=noninteractive
+ENV DEBCONF_NOWARNINGS=yes
+
+# cspell: ignore kisak
+RUN --mount=type=cache,id=apt-cache-amd64,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,id=apt-lib-amd64,target=/var/lib/apt,sharing=locked \
+    apt-get update && apt-get -y install python3-pip python3-rospkg python3-rosdep software-properties-common ccache && \
+    add-apt-repository ppa:kisak/kisak-mesa -y && \
+    apt-get update && apt-get install libegl-mesa0 -y
+
+RUN rm -f /etc/apt/apt.conf.d/docker-clean && \
+    echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
+
+WORKDIR /home/ubuntu/Desktop/scenario_simulator_ws/src/scenario_simulator
+COPY ./simulation/traffic_simulator /home/ubuntu/Desktop/scenario_simulator_ws/src/scenario_simulator/simulation/traffic_simulator
+COPY ./simulation/traffic_simulator_msgs /home/ubuntu/Desktop/scenario_simulator_ws/src/scenario_simulator/simulation/traffic_simulator_msgs
+COPY ./simulation/simulation_interface /home/ubuntu/Desktop/scenario_simulator_ws/src/scenario_simulator/simulation/simulation_interface
+COPY ./external/concealer /home/ubuntu/Desktop/scenario_simulator_ws/src/scenario_simulator/external/concealer
+COPY ./common /home/ubuntu/Desktop/scenario_simulator_ws/src/scenario_simulator/common
+
+WORKDIR /home/ubuntu/Desktop/scenario_simulator_ws/src/scenario_simulator
+COPY ./dependency_humble.repos /home/ubuntu/Desktop/scenario_simulator_ws/src/scenario_simulator/dependency_humble.repos
+RUN vcs import external < dependency_${ROS_DISTRO}.repos
+WORKDIR /home/ubuntu/Desktop/scenario_simulator_ws/src
+RUN --mount=type=cache,id=apt-cache-amd64,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,id=apt-lib-amd64,target=/var/lib/apt,sharing=locked \
+    source /opt/ros/${ROS_DISTRO}/setup.bash \
+    && apt-get update \
+    && rosdep install -iy --from-paths . --rosdistro ${ROS_DISTRO} -t build -t buildtool -t exec
+
+WORKDIR /home/ubuntu/Desktop/scenario_simulator_ws
+
+ENV CC="/usr/lib/ccache/gcc"
+ENV CXX="/usr/lib/ccache/g++"
+ENV CCACHE_DIR="/ccache"
+RUN --mount=type=cache,target=/ccache source /opt/ros/${ROS_DISTRO}/setup.bash && \
+    colcon build --symlink-install \
+    --cmake-args \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+    -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+    -DBUILD_TESTING=OFF
+COPY ./docker-entrypoint.sh /
+RUN chmod a+x /docker-entrypoint.sh
+
+ENTRYPOINT ["/docker-entrypoint.sh"]
