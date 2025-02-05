@@ -24,7 +24,6 @@
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <openscenario_interpreter/syntax/speed_condition.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
-#include <openscenario_interpreter/utility/scoped_elapsed_time_recorder.hpp>
 #include <status_monitor/status_monitor.hpp>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
 
