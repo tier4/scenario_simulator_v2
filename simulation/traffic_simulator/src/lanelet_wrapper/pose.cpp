@@ -417,10 +417,12 @@ auto canonicalizeLaneletPose(const LaneletPose & lanelet_pose, const lanelet::Id
   return {canonicalized_lanelet_pose, std::nullopt};
 }
 
-auto matchToLane(
-  const Pose & map_pose, const BoundingBox & bounding_box, const bool include_crosswalk,
-  const double matching_distance, const double reduction_ratio, const RoutingGraphType type)
-  -> std::optional<lanelet::Id>
+auto findMatchingLanes(
+  const geometry_msgs::msg::Pose & map_pose,
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, const bool include_crosswalk,
+  const double matching_distance, const double reduction_ratio,
+  const traffic_simulator::RoutingGraphType type)
+  -> std::optional<std::set<std::pair<double, lanelet::Id>>>
 {
   const auto absoluteHullPolygon = [&reduction_ratio, &bounding_box](const auto & pose) {
     auto relative_hull = lanelet::matching::Hull2d{
@@ -437,34 +439,47 @@ auto matchToLane(
     }
     return absolute_hull_polygon;
   };
-  /// @note prepare object for matching
+  // prepare object for matching
   const auto yaw = math::geometry::convertQuaternionToEulerAngle(map_pose.orientation).z;
   lanelet::matching::Object2d bounding_box_object;
   bounding_box_object.pose.translation() =
     lanelet::BasicPoint2d(map_pose.position.x, map_pose.position.y);
   bounding_box_object.pose.linear() = Eigen::Rotation2D<double>(yaw).matrix();
   bounding_box_object.absoluteHull = absoluteHullPolygon(bounding_box_object.pose);
-  /// @note find matches and optionally filter
+  // find matches and optionally filter
   auto matches = lanelet::matching::getDeterministicMatches(
     *LaneletWrapper::map(), bounding_box_object, matching_distance);
   if (!include_crosswalk) {
     matches =
       lanelet::matching::removeNonRuleCompliantMatches(matches, LaneletWrapper::trafficRules(type));
   }
-  /// @note find best match (minimize offset)
-  if (matches.empty()) {
-    return std::nullopt;
-  } else {
-    std::optional<std::pair<lanelet::Id, double>> min_pair_id_offset;
+  if (!matches.empty()) {
+    std::set<std::pair<double, lanelet::Id>> distances_with_ids;
     for (const auto & match : matches) {
-      if (const auto lanelet_pose =
-            pose::toLaneletPose(map_pose, match.lanelet.id(), matching_distance);
-          lanelet_pose &&
-          (!min_pair_id_offset || lanelet_pose->offset < min_pair_id_offset->second)) {
-        min_pair_id_offset = std::make_pair(lanelet_pose->lanelet_id, lanelet_pose->offset);
+      if (
+        const auto lanelet_pose = toLaneletPose(map_pose, match.lanelet.id(), matching_distance)) {
+        distances_with_ids.emplace(lanelet_pose->offset, lanelet_pose->lanelet_id);
       }
     }
-    return min_pair_id_offset ? std::optional(min_pair_id_offset->first) : std::nullopt;
+    if (!distances_with_ids.empty()) {
+      return distances_with_ids;
+    }
+  }
+  return std::nullopt;
+}
+
+auto matchToLane(
+  const geometry_msgs::msg::Pose & pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
+  const bool include_crosswalk, const double matching_distance, const double reduction_ratio,
+  const traffic_simulator::RoutingGraphType type) -> std::optional<lanelet::Id>
+{
+  /// @note findMatchingLanes returns a container sorted by distance - increasing, return the nearest id
+  if (
+    const auto matching_lanes =
+      findMatchingLanes(pose, bbox, include_crosswalk, matching_distance, reduction_ratio, type)) {
+    return matching_lanes->begin()->second;
+  } else {
+    return std::nullopt;
   }
 }
 

@@ -64,6 +64,11 @@ auto transformRelativePoseToGlobal(
   const geometry_msgs::msg::Pose & global_pose, const geometry_msgs::msg::Pose & relative_pose)
   -> geometry_msgs::msg::Pose;
 
+auto updatePositionForLaneletTransition(
+  const CanonicalizedLaneletPose & canonicalized_lanelet_pose, const lanelet::Id next_lanelet_id,
+  const geometry_msgs::msg::Vector3 & desired_velocity, const bool desired_velocity_is_global,
+  const double step_time) -> std::optional<geometry_msgs::msg::Point>;
+
 // Relative msg::Pose
 auto relativePose(const geometry_msgs::msg::Pose & from, const geometry_msgs::msg::Pose & to)
   -> std::optional<geometry_msgs::msg::Pose>;
@@ -109,6 +114,12 @@ auto isInLanelet(const geometry_msgs::msg::Point & point, const lanelet::Id lane
 auto isAtEndOfLanelets(
   const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> bool;
+
+auto findRoutableAlternativeLaneletPoseFrom(
+  const lanelet::Id from_lanelet_id, const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
+  const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+  -> std::optional<traffic_simulator::CanonicalizedLaneletPose>;
 
 namespace pedestrian
 {
