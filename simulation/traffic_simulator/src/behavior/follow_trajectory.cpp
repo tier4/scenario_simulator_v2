@@ -69,10 +69,14 @@ auto makeUpdatedStatus(
   using math::geometry::normalize;
   using math::geometry::truncate;
 
-  constexpr bool include_crosswalk{false};
   constexpr bool include_adjacent_lanelet{false};
   constexpr bool include_opposite_direction{false};
   constexpr bool allow_lane_change{true};
+
+  const auto include_crosswalk = [](const auto & entity_type) {
+    return (traffic_simulator_msgs::msg::EntityType::PEDESTRIAN == entity_type.type) ||
+           (traffic_simulator_msgs::msg::EntityType::MISC_OBJECT == entity_type.type);
+  }(entity_status.type);
 
   auto distance_along_lanelet =
     [&](const geometry_msgs::msg::Point & from, const geometry_msgs::msg::Point & to) -> double {
@@ -374,7 +378,7 @@ auto makeUpdatedStatus(
                  if (polyline_trajectory.dynamic_constraints_ignorable) {
                    const auto dx = target_position.x - position.x;
                    const auto dy = target_position.y - position.y;
-                   // if entity is on lane use pitch from lanelet, otherwise use pitch on target
+                   /// @note if entity is on lane use pitch from lanelet, otherwise use pitch on target
                    const auto pitch =
                      entity_status.lanelet_pose_valid
                        ? -math::geometry::convertQuaternionToEulerAngle(
@@ -516,24 +520,18 @@ auto makeUpdatedStatus(
     }
 
     if (std::isnan(remaining_time_to_front_waypoint)) {
-      /*
-        If the nearest waypoint is arrived at in this step without a specific arrival time, it will
-        be considered as achieved
-      */
+      /// @note If the nearest waypoint is arrived at in this step without a specific arrival time, it will
+      /// be considered as achieved
       if (std::isinf(remaining_time) && polyline_trajectory.shape.vertices.size() == 1) {
-        /*
-          If the trajectory has only waypoints with unspecified time, the last one is followed using
-          maximum speed including braking - in this case accuracy of arrival is checked
-        */
+        /// @note If the trajectory has only waypoints with unspecified time, the last one is followed using
+        /// maximum speed including braking - in this case accuracy of arrival is checked
         if (follow_waypoint_controller.areConditionsOfArrivalMet(
               acceleration, speed, distance_to_front_waypoint)) {
           return discard_the_front_waypoint_and_recurse();
         }
       } else {
-        /*
-          If it is an intermediate waypoint with an unspecified time, the accuracy of the arrival is
-          irrelevant
-        */
+        /// @note If it is an intermediate waypoint with an unspecified time, the accuracy of the arrival is
+        /// irrelevant
         if (auto this_step_distance = (speed + desired_acceleration * step_time) * step_time;
             this_step_distance > distance_to_front_waypoint) {
           return discard_the_front_waypoint_and_recurse();
@@ -573,13 +571,32 @@ auto makeUpdatedStatus(
 
     updated_status.pose.orientation = [&]() {
       if (desired_velocity.y == 0 && desired_velocity.x == 0 && desired_velocity.z == 0) {
-        // do not change orientation if there is no designed_velocity vector
+        /// @note Do not change orientation if there is no designed_velocity vector
         return entity_status.pose.orientation;
       } else {
-        // if there is a designed_velocity vector, set the orientation in the direction of it
+        /// @note if there is a designed_velocity vector, set the orientation in the direction of it
         return convertDirectionToQuaternion(desired_velocity);
       }
     }();
+
+    /// @note If it is the transition between lanelets: overwrite position to improve precision
+    if (entity_status.lanelet_pose_valid) {
+      constexpr bool desired_velocity_is_global{true};
+      const auto canonicalized_lanelet_pose =
+        traffic_simulator::pose::toCanonicalizedLaneletPose(entity_status.lanelet_pose);
+      const auto estimated_next_canonicalized_lanelet_pose =
+        traffic_simulator::pose::toCanonicalizedLaneletPose(updated_status.pose, include_crosswalk);
+      if (canonicalized_lanelet_pose && estimated_next_canonicalized_lanelet_pose) {
+        const auto next_lanelet_id =
+          static_cast<LaneletPose>(estimated_next_canonicalized_lanelet_pose.value()).lanelet_id;
+        if (  /// @note Handle lanelet transition
+          const auto updated_position = pose::updatePositionForLaneletTransition(
+            canonicalized_lanelet_pose.value(), next_lanelet_id, desired_velocity,
+            desired_velocity_is_global, step_time)) {
+          updated_status.pose.position = updated_position.value();
+        }
+      }
+    }
 
     updated_status.action_status.twist.linear.x = norm(desired_velocity);
 
