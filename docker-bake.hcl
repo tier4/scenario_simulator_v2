@@ -31,4 +31,5 @@ target "traffic_simulator" {
   args = {"ROS_DISTRO" : "humble"}
   group = ["humble"]
   matrix = {}
+  dockerfile = "Dockerfile.traffic_simulator"
 }
