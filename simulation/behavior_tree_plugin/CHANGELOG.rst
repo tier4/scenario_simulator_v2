@@ -21,6 +21,46 @@ Changelog for package behavior_tree_plugin
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+9.2.0 (2025-02-05)
+------------------
+* Merge pull request `#1493 <https://github.com/tier4/scenario_simulator_v2/issues/1493>`_ from tier4/fix/slope_inaccuracies
+  Fix/slope inaccuracies
+* ref(behavior_tree_plugin): Refactored calculateUpdatedEntityStatusInWorldFrame
+* Merge branch 'master' into fix/slope_inaccuracies
+* Merge branch 'master' into fix/slope_inaccuracies
+* Merge branch 'master' into fix/slope_inaccuracies
+* Merge branch 'master' into fix/slope_inaccuracies
+* Merge branch 'master' into fix/slope_inaccuracies
+* ref(traffic_simulator): Refactor comments
+* ref(traffic_simulator): Refactor comments
+* reref(behavior_tree_plugin) Update commment
+* ref(traffic_simulator> Refactor code according to the lastest master branch changes
+* Merge branch 'master' into fix/slope_inaccuracies
+* fix(traffic_simulator) Improve lanelet transition handling for entity position updates
+* ref(traffic_simulator) Refactor updateEntityPositionForLaneletTransition
+* Merge branch 'master' into fix/slope_inaccuracies
+* fix(traffic_simulator): Fix lanelet slope inaccuracies
+  - Adjusted entity position when transitioning between lanelets to reduce slope errors
+* Merge branch 'master' into fix/slope_inaccuracies
+* Merge branch 'master' into fix/slope_inaccuracies
+* fix(behavior_tree_plugin) fix sonarquebe issues
+* ref(traffic_simulator): tidy up after moveTowardsLaneletPose development
+* fix(behavior_tree_plugin, traffic_simulator): fix moveTowardsLaneletPose for WalkStraightAction, tidy up
+* tmp(behavior_tree_plugin, traffic_simulator): moveTowardsLaneletPose debug
+* Merge branch 'master' into fix/slope_inaccuracies
+* fix(traffis_simulator): use next canonicalized lanelet pose in pose::moveTowardsLaneletPose
+* ref(behavior_tree_plugin, traffic_simulator): improve comments
+* ref(behavior_tree_plugin): refactor ActionNode::calculateUpdatedEntityStatusInWorldFrame
+* fix(traffic_simulator): fix moveTowardsLaneletPose
+* feat(traffic_simulator): improve moveTowardsLaneletPose to calc LaneletPose and return it
+* ref(traffic_simulator): cleanup after removal of pose::moveAlongLanelet
+* fix(behavior_tree_plugin): use moveToLaneletPose in calculateUpdatedEntityStatusInWorldFrame
+* ref(behavior_tree_plugin, traffic_simulator): separate pose::moveAlongLanelet
+* refactor(behavior_tree_plugin): refactor action_node::calculateUpdatedEntityStatusInWorldFrame
+* fix(behavior_tree_plugin) Fix isssue with pedestrian turning
+* fix(behavior_tree_plugin)  Fix lanelet slope inaccuracies - walk straight action
+* Contributors: Dawid Moszynski, Dawid Moszyński, Kotaro Yoshimoto, SzymonParapura
+
 9.1.0 (2025-02-04)
 ------------------
 * Merge pull request `#1487 <https://github.com/tier4/scenario_simulator_v2/issues/1487>`_ from tier4/RJD-1489/NpcCenterLine
