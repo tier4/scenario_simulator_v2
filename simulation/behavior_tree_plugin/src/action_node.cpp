@@ -20,6 +20,7 @@
 #include <geometry/quaternion/get_rotation.hpp>
 #include <geometry/quaternion/get_rotation_matrix.hpp>
 #include <geometry/quaternion/quaternion_to_euler.hpp>
+#include <geometry/vector3/operator.hpp>
 #include <memory>
 #include <optional>
 #include <rclcpp/rclcpp.hpp>
@@ -484,30 +485,73 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
   -> traffic_simulator::EntityStatus
 {
   using math::geometry::operator*;
+  using math::geometry::operator+;
+  using math::geometry::operator+=;
+
+  constexpr bool desired_velocity_is_global{false};
+
+  const auto include_crosswalk = [](const auto & entity_type) {
+    return (traffic_simulator_msgs::msg::EntityType::PEDESTRIAN == entity_type.type) ||
+           (traffic_simulator_msgs::msg::EntityType::MISC_OBJECT == entity_type.type);
+  }(canonicalized_entity_status->getType());
+
+  const auto matching_distance = default_matching_distance_for_lanelet_pose_calculation;
+
+  const auto build_updated_pose =
+    [&include_crosswalk, &matching_distance](
+      const std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus> & status,
+      const geometry_msgs::msg::Twist & desired_twist, const double time_step) {
+      geometry_msgs::msg::Pose updated_pose;
+
+      /// @note Apply yaw change (delta rotation) in radians: yaw_angular_speed (rad/s) * time_step (s)
+      geometry_msgs::msg::Vector3 delta_rotation;
+      delta_rotation = desired_twist.angular * time_step;
+      const auto delta_quaternion = math::geometry::convertEulerAngleToQuaternion(delta_rotation);
+      updated_pose.orientation = status->getMapPose().orientation * delta_quaternion;
+
+      /// @note Apply position change
+      /// @todo first determine global desired_velocity, calculate position change using it
+      /// then pass the same global desired_velocity to updatePositionForLaneletTransition()
+      const Eigen::Matrix3d rotation_matrix =
+        math::geometry::getRotationMatrix(updated_pose.orientation);
+      const auto translation = Eigen::Vector3d(
+        desired_twist.linear.x * time_step, desired_twist.linear.y * time_step,
+        desired_twist.linear.z * time_step);
+      const Eigen::Vector3d delta_position = rotation_matrix * translation;
+      updated_pose.position = status->getMapPose().position + delta_position;
+
+      /// @note If it is the transition between lanelets: overwrite position to improve precision
+      if (const auto canonicalized_lanelet_pose = status->getCanonicalizedLaneletPose()) {
+        const auto estimated_next_canonicalized_lanelet_pose =
+          traffic_simulator::pose::toCanonicalizedLaneletPose(
+            updated_pose, status->getBoundingBox(), include_crosswalk, matching_distance);
+        if (estimated_next_canonicalized_lanelet_pose) {
+          const auto next_lanelet_id = static_cast<traffic_simulator::LaneletPose>(
+                                         estimated_next_canonicalized_lanelet_pose.value())
+                                         .lanelet_id;
+          if (  /// @note Handle lanelet transition
+            const auto updated_position =
+              traffic_simulator::pose::updatePositionForLaneletTransition(
+                canonicalized_lanelet_pose.value(), next_lanelet_id, desired_twist.linear,
+                desired_velocity_is_global, time_step)) {
+            updated_pose.position = updated_position.value();
+          }
+        }
+      }
+      return updated_pose;
+    };
+
   const auto speed_planner =
     traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner(
       step_time, canonicalized_entity_status->getName());
   const auto dynamics = speed_planner.getDynamicStates(
     local_target_speed, constraints, canonicalized_entity_status->getTwist(),
     canonicalized_entity_status->getAccel());
-  double linear_jerk_new = std::get<2>(dynamics);
-  geometry_msgs::msg::Accel accel_new = std::get<1>(dynamics);
-  geometry_msgs::msg::Twist twist_new = std::get<0>(dynamics);
-  geometry_msgs::msg::Pose pose_new;
-  geometry_msgs::msg::Vector3 angular_trans_vec;
-  angular_trans_vec.z = twist_new.angular.z * step_time;
-  geometry_msgs::msg::Quaternion angular_trans_quat =
-    math::geometry::convertEulerAngleToQuaternion(angular_trans_vec);
-  pose_new.orientation = canonicalized_entity_status->getMapPose().orientation * angular_trans_quat;
-  Eigen::Vector3d trans_vec;
-  trans_vec(0) = twist_new.linear.x * step_time;
-  trans_vec(1) = twist_new.linear.y * step_time;
-  trans_vec(2) = 0;
-  Eigen::Matrix3d rotation_mat = math::geometry::getRotationMatrix(pose_new.orientation);
-  trans_vec = rotation_mat * trans_vec;
-  pose_new.position.x = trans_vec(0) + canonicalized_entity_status->getMapPose().position.x;
-  pose_new.position.y = trans_vec(1) + canonicalized_entity_status->getMapPose().position.y;
-  pose_new.position.z = trans_vec(2) + canonicalized_entity_status->getMapPose().position.z;
+  const auto linear_jerk_new = std::get<2>(dynamics);
+  const auto & accel_new = std::get<1>(dynamics);
+  const auto & twist_new = std::get<0>(dynamics);
+  const auto pose_new = build_updated_pose(canonicalized_entity_status, twist_new, step_time);
+
   auto entity_status_updated =
     static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status);
   entity_status_updated.time = current_time + step_time;
