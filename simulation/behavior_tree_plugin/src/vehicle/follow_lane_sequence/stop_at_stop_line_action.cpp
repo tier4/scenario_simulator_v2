@@ -126,7 +126,8 @@ BT::NodeStatus StopAtStopLineAction::tick()
   if (
     const auto distance_to_stop_target =
       traffic_simulator::distance::distanceToNearestConflictingPose(
-        route_lanelets, *trajectory, getOtherEntitiesCanonicalizedEntityStatuses())) {
+        route_lanelets, *trajectory, *canonicalized_entity_status,
+        getOtherEntitiesCanonicalizedEntityStatuses())) {
     if (distance_to_stop_target.value() <= distance_to_stopline_.value()) {
       stopped_ = false;
       return BT::NodeStatus::FAILURE;
