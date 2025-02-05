@@ -70,5 +70,11 @@ std::optional<double> CatmullRomSubspline::getCollisionPointIn2D(
   }
   return *begin - start_s_;
 }
+
+auto CatmullRomSubspline::getSquaredDistanceIn2D(
+  const geometry_msgs::msg::Point & point, const double s) const -> double
+{
+  return spline_->getSquaredDistanceIn2D(point, start_s_ + s);
+}
 }  // namespace geometry
 }  // namespace math
