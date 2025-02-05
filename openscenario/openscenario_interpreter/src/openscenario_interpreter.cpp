@@ -192,42 +192,55 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
         deactivate();
       },
       [this]() {
-        withTimeoutHandler(defaultTimeoutHandler(), [this]() {
-          double evaluate_time, update_time, context_time;
-          {
-            ScopedElapsedTimeRecorder evaluate_time_recorder(evaluate_time);
-            if (std::isnan(evaluateSimulationTime())) {
-              if (not waiting_for_engagement_to_be_completed and engageable()) {
-                engage();
-                waiting_for_engagement_to_be_completed = true;  // NOTE: DIRTY HACK!!!
-              } else if (engaged()) {
-                activateNonUserDefinedControllers();
-                waiting_for_engagement_to_be_completed = false;  // NOTE: DIRTY HACK!!!
-              }
-            } else if (currentScenarioDefinition()) {
-              currentScenarioDefinition()->evaluate();
-            } else {
-              throw Error("No script evaluable.");
+        const auto evaluate_time = execution_timer.invoke("evaluate", [&]() {
+          if (std::isnan(evaluateSimulationTime())) {
+            if (not waiting_for_engagement_to_be_completed and engageable()) {
+              engage();
+              waiting_for_engagement_to_be_completed = true;  // NOTE: DIRTY HACK!!!
+            } else if (engaged()) {
+              activateNonUserDefinedControllers();
+              waiting_for_engagement_to_be_completed = false;  // NOTE: DIRTY HACK!!!
             }
+          } else if (currentScenarioDefinition()) {
+            currentScenarioDefinition()->evaluate();
+          } else {
+            throw Error("No script evaluable.");
           }
-          {
-            ScopedElapsedTimeRecorder update_time_recorder(update_time);
-            SimulatorCore::update();
-          }
-          {
-            ScopedElapsedTimeRecorder context_time_recorder(context_time);
-            publishCurrentContext();
-          }
-
-          tier4_simulation_msgs::msg::UserDefinedValue msg;
-          msg.type.data = tier4_simulation_msgs::msg::UserDefinedValueType::DOUBLE;
-          msg.value = std::to_string(evaluate_time * 1e3);
-          evaluate_time_publisher->publish(msg);
-          msg.value = std::to_string(update_time * 1e3);
-          update_time_publisher->publish(msg);
-          msg.value = std::to_string(context_time * 1e3);
-          output_time_publisher->publish(msg);
         });
+
+        const auto update_time =
+          execution_timer.invoke("update", [&]() { SimulatorCore::update(); });
+
+        const auto output_time =
+          execution_timer.invoke("output", [&]() { publishCurrentContext(); });
+
+        tier4_simulation_msgs::msg::UserDefinedValue msg;
+        msg.type.data = tier4_simulation_msgs::msg::UserDefinedValueType::DOUBLE;
+        msg.value =
+          std::to_string(std::chrono::duration<double, std::milli>(evaluate_time).count());
+        evaluate_time_publisher->publish(msg);
+        msg.value = std::to_string(std::chrono::duration<double, std::milli>(update_time).count());
+        update_time_publisher->publish(msg);
+        msg.value = std::to_string(std::chrono::duration<double, std::milli>(output_time).count());
+        output_time_publisher->publish(msg);
+
+        if (auto time_until_trigger = timer->time_until_trigger(); time_until_trigger.count() < 0) {
+          /*
+            Ideally, the scenario should be terminated with an error if the total
+            time for the ScenarioDefinition evaluation and the traffic_simulator's
+            updateFrame exceeds the time allowed for a single frame. However, we
+            have found that many users are in environments where it is not possible
+            to run the simulator stably at 30 FPS (the default setting) while
+            running Autoware. In order to prioritize comfortable daily use, we
+            decided to give up full reproducibility of the scenario and only provide
+            warnings.
+          */
+          RCLCPP_WARN_STREAM(
+            get_logger(),
+            "Your machine is not powerful enough to run the scenario at the specified frame rate ("
+              << local_frame_rate << " Hz). Current frame execution exceeds "
+              << -time_until_trigger.count() / 1.e6 << " milliseconds.");
+        }
       });
   };
 
