@@ -20,7 +20,7 @@ COPY ./simulation/traffic_simulator_msgs /home/ubuntu/Desktop/scenario_simulator
 COPY ./simulation/simulation_interface /home/ubuntu/Desktop/scenario_simulator_ws/src/scenario_simulator/simulation/simulation_interface
 COPY ./external/concealer /home/ubuntu/Desktop/scenario_simulator_ws/src/scenario_simulator/external/concealer
 COPY ./common /home/ubuntu/Desktop/scenario_simulator_ws/src/scenario_simulator/common
-COPY ./dependency_humble.repos /home/ubuntu/Desktop/scenario_simulator_ws/src/scenario_simulator/dependency_humble.repos
+COPY ./dependency_${ROS_DISTRO}.repos /home/ubuntu/Desktop/scenario_simulator_ws/src/scenario_simulator/dependency_${ROS_DISTRO}.repos
 RUN vcs import external < dependency_${ROS_DISTRO}.repos
 WORKDIR /home/ubuntu/Desktop/scenario_simulator_ws/src
 RUN --mount=type=cache,id=apt-cache-amd64,target=/var/cache/apt,sharing=locked \
