@@ -129,13 +129,14 @@ jobs:
         shell: bash
 
       - name: register command output to github variable
-        run: echo "::set-output name=scenario_test_output::$(cat /tmp/scenario_workflow/optional_workflow/failure_report.md)"
+        id: optional_test_result
+        run: echo "scenario_test_output=$(cat /tmp/scenario_workflow/optional_workflow/failure_report.md)" >> $GITHUB_OUTPUT
 
       - name: comment scenario_test_output
         uses: alawiii521/current-pr-comment@v1.0
         with:
           comment:
-            ${{ steps.scenario_test_output.outputs.scenario_test_output }}
+            ${{ steps.optional_test_result.outputs.scenario_test_output }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload Lcov result
