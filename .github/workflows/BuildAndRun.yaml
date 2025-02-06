@@ -120,15 +120,19 @@ jobs:
           ./src/scenario_simulator_v2/.github/workflows/workflow.sh ./src/scenario_simulator_v2/test_runner/scenario_test_runner/config/workflow.txt global_frame_rate:=20
         shell: bash
 
-      - name: Scenario test
+      - name: Scenario test (optional)
         run: |
           source install/setup.bash
           source install/local_setup.bash
           # execute scenarios but ignore the return code
           ./src/scenario_simulator_v2/.github/workflows/workflow.sh ./src/scenario_simulator_v2/test_runner/scenario_test_runner/config/optional_workflow.txt global_frame_rate:=20 || true
-          # failed to comment if the failure_report.md is empty.
-          gh pr comment  ${{ github.event.pull_request.number }} --body $(cat /tmp/scenario_workflow/optional_workflow/failure_report.md) || true
         shell: bash
+
+      - name: Add scenario failure comment (failed to comment if the failure_report.md is empty)
+        run: |
+          gh pr comment  ${{ github.event.pull_request.number }} --body $(cat /tmp/scenario_workflow/optional_workflow/failure_report.md) || true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload Lcov result
         uses: actions/upload-artifact@v4
