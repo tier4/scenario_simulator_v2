@@ -11,17 +11,39 @@ then
   exit 1
 fi
 
-exit_status=0
+workflow_directory="/tmp/scenario_workflow/$(basename "$file_path" | sed 's/\.[^.]*$//')"
+rm -rf "$workflow_directory"
+mkdir -p "$workflow_directory"
 
 while IFS= read -r line
 do
   ros2 launch scenario_test_runner scenario_test_runner.launch.py scenario:="$line" "$@"
-  ros2 run scenario_test_runner result_checker.py /tmp/scenario_test_runner/result.junit.xml
-  command_exit_status=$?
-  if [ $command_exit_status -ne 0 ]; then
-    echo "Error: caught non-zero exit status（code: $command_exit_status)"
-    exit_status=1
-  fi
+
+  # save the result file before overwriting by next scenario
+  mkdir -p "$(dirname "$dest_file")"
+  cp /tmp/scenario_test_runner/result.junit.xml "$workflow_directory/$(basename "$line" | sed 's/\.[^.]*$//').junit.xml"
 done < "$file_path"
 
-exit $exit_status
+failure_report="$workflow_directory/failure_report.md"
+rm -f "$failure_report"
+touch "$failure_report"
+failure_found=0
+
+for file in "$workflow_directory"/*.junit.xml; do
+  [ -e "$file" ] || continue
+  if grep -q '<failure' "$file"; then
+    failure_found=1
+    {
+      echo "## $(basename "$file")"
+      echo "<details><summary>scenario failed</summary><div>\n\n\`\`\`xml"
+      grep '<failure' "$file"
+      echo "\`\`\`\n</div></details>\n"
+    } >> "$failure_report"
+  fi
+done
+
+if [ $failure_found -eq 1 ]; then
+  exit 1
+else:
+  exit 0
+fi
