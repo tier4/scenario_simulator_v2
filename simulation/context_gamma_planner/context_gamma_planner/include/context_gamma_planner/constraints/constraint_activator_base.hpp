@@ -94,7 +94,7 @@ private:
 
 protected:
   std::vector<RoadEdgeConstraint> queryRoadEdgeConstraint(
-    const geometry_msgs::msg::Point & p, double distance_threashold, const char subtype[]);
+    const geometry_msgs::msg::Point & p, double distance_threshold, const char subtype[]);
   std::shared_ptr<hdmap_utils::HdMapUtils> hd_map_utils_ptr_;
   std::shared_ptr<traffic_simulator::TrafficLightsBase> traffic_lights_ptr_;
   std::vector<std::string> lanelet_subtypes_;

@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CONTEXT_GAMMA_PLANNER__PEDESTRIAN__FOLLW_POLYLINE_TRAJECTORY_ACTION_HPP_
-#define CONTEXT_GAMMA_PLANNER__PEDESTRIAN__FOLLW_POLYLINE_TRAJECTORY_ACTION_HPP_
+#ifndef CONTEXT_GAMMA_PLANNER__PEDESTRIAN__FOLLOW_POLYLINE_TRAJECTORY_ACTION_HPP_
+#define CONTEXT_GAMMA_PLANNER__PEDESTRIAN__FOLLOW_POLYLINE_TRAJECTORY_ACTION_HPP_
 
 #include <context_gamma_planner/behavior/pedestrian/action_node.hpp>
 #include <context_gamma_planner/planner/pedestrian/follow_polyline_trajectory_planner.hpp>
@@ -67,4 +67,4 @@ private:
 }  // namespace pedestrian
 }  // namespace context_gamma_planner
 
-#endif  // CONTEXT_GAMMA_PLANNER__PEDESTRIAN__FOLLW_POLYLINE_TRAJECTORY_ACTION_HPP_
+#endif  // CONTEXT_GAMMA_PLANNER__PEDESTRIAN__FOLLOW_POLYLINE_TRAJECTORY_ACTION_HPP_

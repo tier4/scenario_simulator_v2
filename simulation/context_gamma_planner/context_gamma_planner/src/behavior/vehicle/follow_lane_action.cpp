@@ -47,7 +47,7 @@ BT::NodeStatus FollowLaneAction::tick()
   }
   // update waypoints
   planner_.setWaypoints(hdmap_utils, route_lanelets);
-  /// @todo Goal threashold should be defined by adaptive.
+  /// @todo Goal threshold should be defined by adaptive.
   if (const auto next_goal = planner_.calculateNextGoalPoint()) {
     setOutput("next_goal", next_goal.value());
   } else {

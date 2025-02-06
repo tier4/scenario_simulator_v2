@@ -77,10 +77,10 @@ const auto ConstraintActivatorBase::calculateRVOObstacles()
 }
 
 std::vector<RoadEdgeConstraint> ConstraintActivatorBase::queryRoadEdgeConstraint(
-  const geometry_msgs::msg::Point & p, double distance_threashold, const char subtype[])
+  const geometry_msgs::msg::Point & p, double distance_threshold, const char subtype[])
 {
   const auto ids = hd_map_utils_ptr_->filterLaneletIds(
-    hd_map_utils_ptr_->getNearbyLaneletIds(p, distance_threashold), subtype);
+    hd_map_utils_ptr_->getNearbyLaneletIds(p, distance_threshold), subtype);
   deactivateAll(lane_constraints_);
   setState(lane_constraints_, ids, State::ACTIVE);
   return filter(lane_constraints_, State::ACTIVE);

@@ -407,7 +407,7 @@ TEST_F(Rvo2Test, critical_corner_case)
   EXPECT_FALSE(has_collided);
 }
 /*
-TEST_F(Rvo2Test, chenge_agent_speed)
+TEST_F(Rvo2Test, change_agent_speed)
 {
   std::shared_ptr<RVO::Agent> agent = std::make_shared<RVO::Agent>("agent", RVO::Vector2(0, 0));
   simulator_->addAgent(agent);
