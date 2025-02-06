@@ -124,7 +124,7 @@ public:
   {
   private:
     /// @note this function is necessary because on the OpenScenarioInterpreter side
-    /// there is sometimes no check if the eniity (triggering, reference) exists
+    /// there is sometimes no check if the entity (triggering, reference) exists
     template <typename FirstType, typename SecondType>
     static auto prerequisite(
       const FirstType & from_pose_or_entity_name, const SecondType & to_pose_or_entity_name) -> bool
