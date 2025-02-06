@@ -184,21 +184,20 @@ auto ActionNode::getFrontEntityName(const math::geometry::CatmullRomSplineInterf
   constexpr double front_entity_horizon{40.0};
 
   std::vector<std::pair<std::string, double>> entities_with_distances;
-  for (const auto & [other_entity_name, other_entity_status] : other_entity_status) {
+  for (const auto & [other_name, other_status] : other_entity_status) {
     if (
-      auto const other_canonicalized_lanelet_pose =
-        other_entity_status.getCanonicalizedLaneletPose()) {
+      const auto & other_canonicalized_lanelet_pose = other_status.getCanonicalizedLaneletPose()) {
       const auto distance = traffic_simulator::distance::splineDistanceToBoundingBox(
         spline, canonicalized_entity_status->getCanonicalizedLaneletPose().value(),
         canonicalized_entity_status->getBoundingBox(), other_canonicalized_lanelet_pose.value(),
-        other_entity_status.getBoundingBox());
+        other_status.getBoundingBox());
       if (distance && distance.value() < front_entity_horizon) {
         const auto quaternion = math::geometry::getRotation(
           canonicalized_entity_status->getMapPose().orientation,
-          other_entity_status.getMapPose().orientation);
+          other_status.getMapPose().orientation);
         const auto yaw = math::geometry::convertQuaternionToEulerAngle(quaternion).z;
         if (std::fabs(yaw) <= front_entity_angle_threshold) {
-          entities_with_distances.push_back({other_entity_name, distance.value()});
+          entities_with_distances.emplace_back(other_name, distance.value());
         }
       }
     }

@@ -391,64 +391,53 @@ auto distanceToNearestConflictingPose(
     return std::nullopt;
   }
 
-  const auto conflicting_entities_on_crosswalk =
+  auto conflicting_entities_on_lanelets =
     [&other_statuses](
-      const lanelet::Ids & following_lanelets) -> std::vector<CanonicalizedEntityStatus> {
+      const lanelet::Ids & conflicting_ids) -> std::vector<CanonicalizedEntityStatus> {
     std::vector<CanonicalizedEntityStatus> conflicting_entity_status;
-    const auto conflicting_crosswalks =
-      lanelet_wrapper::lanelet_map::conflictingCrosswalkIds(following_lanelets);
-    for (const auto & status : other_statuses) {
-      if (
-        status.isInLanelet() && std::count(
-                                  conflicting_crosswalks.begin(), conflicting_crosswalks.end(),
-                                  status.getLaneletId()) >= 1) {
-        conflicting_entity_status.emplace_back(status);
-      }
-    }
-    return conflicting_entity_status;
-  }(following_lanelets);
-
-  const auto conflicting_entities_on_lane =
-    [&other_statuses](
-      const lanelet::Ids & following_lanelets) -> std::vector<CanonicalizedEntityStatus> {
-    std::vector<CanonicalizedEntityStatus> conflicting_entity_status;
-    const auto conflicting_lanes =
-      lanelet_wrapper::lanelet_map::conflictingLaneIds(following_lanelets);
     for (const auto & status : other_statuses) {
       if (
         status.isInLanelet() &&
-        std::count(conflicting_lanes.begin(), conflicting_lanes.end(), status.getLaneletId()) >=
-          1) {
-        conflicting_entity_status.emplace_back(status);
+        std::find(conflicting_ids.cbegin(), conflicting_ids.cend(), status.getLaneletId()) !=
+          conflicting_ids.cend()) {
+        conflicting_entity_status.push_back(status);
       }
     }
     return conflicting_entity_status;
-  }(following_lanelets);
+  };
 
-  std::set<double> distances;
+  std::optional<double> min_distance = std::nullopt;
+  auto try_min_distance = [&min_distance](const double & distance) {
+    if (not min_distance.has_value() or distance < min_distance.value()) {
+      min_distance = distance;
+    }
+  };
+
+  const auto & conflicting_entities_on_crosswalk = conflicting_entities_on_lanelets(
+    lanelet_wrapper::lanelet_map::conflictingCrosswalkIds(following_lanelets));
+
   for (const auto & status : conflicting_entities_on_crosswalk) {
-    if (const auto pose = status.getCanonicalizedLaneletPose()) {
+    if (const auto & pose = status.getCanonicalizedLaneletPose()) {
       if (const auto s = distanceToCrosswalk(spline, pose->getLaneletId())) {
-        distances.insert(s.value());
+        try_min_distance(s.value());
       }
     }
   }
+
+  const auto & conflicting_entities_on_lane = conflicting_entities_on_lanelets(
+    lanelet_wrapper::lanelet_map::conflictingLaneIds(following_lanelets));
+
   for (const auto & status : conflicting_entities_on_lane) {
-    if (const auto pose = status.getCanonicalizedLaneletPose()) {
+    if (const auto & pose = status.getCanonicalizedLaneletPose()) {
       if (
         const auto s = splineDistanceToBoundingBox(
           spline, from_status.getCanonicalizedLaneletPose().value(), from_status.getBoundingBox(),
           pose.value(), status.getBoundingBox())) {
-        distances.insert(s.value());
+        try_min_distance(s.value());
       }
     }
   }
-
-  if (distances.empty()) {
-    return std::nullopt;
-  } else {
-    return *distances.begin();
-  }
+  return min_distance;
 }
 
 auto distanceToSpline(
