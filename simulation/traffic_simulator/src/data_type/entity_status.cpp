@@ -19,7 +19,6 @@ namespace traffic_simulator
 {
 inline namespace entity_status
 {
-
 CanonicalizedEntityStatus::CanonicalizedEntityStatus(
   const EntityStatus & may_non_canonicalized_entity_status,
   const std::optional<CanonicalizedLaneletPose> & canonicalized_lanelet_pose)
@@ -99,7 +98,7 @@ auto CanonicalizedEntityStatus::getActionStatus() const noexcept
   return entity_status_.action_status;
 }
 
-auto CanonicalizedEntityStatus::laneMatchingSucceed() const noexcept -> bool
+auto CanonicalizedEntityStatus::isInLanelet() const noexcept -> bool
 {
   return canonicalized_lanelet_pose_.has_value();
 }
@@ -126,7 +125,7 @@ auto CanonicalizedEntityStatus::getAltitude() const -> double
                                      : entity_status_.pose.position.z;
 }
 
-auto CanonicalizedEntityStatus::getLaneletPose() const noexcept -> const LaneletPose &
+auto CanonicalizedEntityStatus::getLaneletPose() const -> const LaneletPose &
 {
   if (canonicalized_lanelet_pose_) {
     return canonicalized_lanelet_pose_->getLaneletPose();
@@ -135,14 +134,14 @@ auto CanonicalizedEntityStatus::getLaneletPose() const noexcept -> const Lanelet
   }
 }
 
-auto CanonicalizedEntityStatus::getLaneletId() const noexcept -> lanelet::Id
+auto CanonicalizedEntityStatus::getLaneletId() const -> lanelet::Id
 {
   return getLaneletPose().lanelet_id;
 }
 
-auto CanonicalizedEntityStatus::getLaneletIds() const noexcept -> lanelet::Ids
+auto CanonicalizedEntityStatus::getLaneletIds() const -> lanelet::Ids
 {
-  return laneMatchingSucceed() ? lanelet::Ids{getLaneletId()} : lanelet::Ids{};
+  return isInLanelet() ? lanelet::Ids{getLaneletId()} : lanelet::Ids{};
 }
 
 auto CanonicalizedEntityStatus::getCanonicalizedLaneletPose() const noexcept
