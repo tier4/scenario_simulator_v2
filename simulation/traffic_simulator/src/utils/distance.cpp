@@ -409,9 +409,8 @@ auto distanceToNearestConflictingPose(
     for (const auto & status : other_statuses) {
       if (
         status.isInLanelet() &&
-        std::any_of(
-          conflicting_ids.begin(), conflicting_ids.end(),
-          [this_id = status.getLaneletId()](const auto & id) -> bool { return this_id == id; })) {
+        std::find(conflicting_ids.cbegin(), conflicting_ids.cend(), status.getLaneletId()) !=
+          conflicting_ids.cend()) {
         conflicting_entity_status.push_back(status);
       }
     }
