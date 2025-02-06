@@ -39,7 +39,7 @@ private:
   bool requested = false;
   void onUpdate() override
   {
-    if (api_.isInLanelet("ego", 34462, 0.1)) {
+    if (api_.getEntity("ego")->isInLanelet(34462, 0.1)) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
     // LCOV_EXCL_START
@@ -53,9 +53,10 @@ private:
     api_.spawn(
       "ego", traffic_simulator::helper::constructCanonicalizedLaneletPose(34513, 10.0, 0.0),
       getVehicleParameters());
-    api_.setLinearVelocity("ego", 10);
-    api_.requestSpeedChange("ego", 10, true);
-    api_.requestLaneChange("ego", 34462);
+    auto ego_entity = api_.getEntity("ego");
+    ego_entity->setLinearVelocity(10);
+    ego_entity->requestSpeedChange(10, true);
+    ego_entity->requestLaneChange(34462);
   }
 };
 }  // namespace cpp_mock_scenarios
