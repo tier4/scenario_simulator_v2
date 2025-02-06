@@ -33,8 +33,7 @@ PedestrianEntity::PedestrianEntity(
   pedestrian_parameters(parameters),
   loader_(pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase>(
     "traffic_simulator", "entity_behavior::BehaviorPluginBase")),
-  behavior_plugin_ptr_(loader_.createSharedInstance(plugin_name)),
-  route_planner_(traffic_simulator::RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER)
+  behavior_plugin_ptr_(loader_.createSharedInstance(plugin_name))
 {
   behavior_plugin_ptr_->configure(rclcpp::get_logger(name));
   behavior_plugin_ptr_->setPedestrianParameters(parameters);
