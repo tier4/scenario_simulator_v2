@@ -130,7 +130,12 @@ jobs:
 
       - name: register command output to github variable
         id: optional_test_result
-        run: echo "scenario_test_output=$(cat /tmp/scenario_workflow/optional_workflow/failure_report.md)" >> $GITHUB_OUTPUT
+        run: |
+          {
+            echo "scenario_test_output=<<EOF"
+            cat /tmp/scenario_workflow/optional_workflow/failure_report.md
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
 
       - name: comment scenario_test_output
         uses: alawiii521/current-pr-comment@v1.0
