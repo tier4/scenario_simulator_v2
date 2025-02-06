@@ -27,10 +27,10 @@ public:
   std::unique_ptr<RVO::RVOSimulator> simulator_;
 };
 
-bool checkVector2(const RVO::Vector2 & vec0, const RVO::Vector2 & vec1, float torelance = 0.01)
+bool checkVector2(const RVO::Vector2 & vec0, const RVO::Vector2 & vec1, float tolerance = 0.01)
 {
   float diff = std::hypot(vec1.x() - vec0.x(), vec1.y() - vec0.y());
-  if (diff <= torelance) {
+  if (diff <= tolerance) {
     return true;
   }
   std::cout << "vec0:" << vec0.x() << "," << vec0.y() << std::endl;

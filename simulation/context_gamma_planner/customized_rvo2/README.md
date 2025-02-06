@@ -15,7 +15,7 @@ Usually use the Obstacle plugin.
     - Call the constructor method of the base class with plugin name.
   - Implement `calcOrcaLines` method (override)
     - Note that the arguments differ depending on the type of plugin
-    - Add the activation implementation at the beggining of the method as follows:
+    - Add the activation implementation at the beginning of the method as follows:
 ```c++
 std::vector<RVO::Line> HogePlugin::calcOrcaLines(...)
 {
