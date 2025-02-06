@@ -31,11 +31,11 @@ namespace openscenario_interpreter
 {
 using NativeWorldPosition = geometry_msgs::msg::Pose;
 
-using NativeRelativeWorldPosition = geometry_msgs::msg::Pose;
+using NativeRelativeWorldPosition = NativeWorldPosition;
 
 using NativeLanePosition = traffic_simulator::LaneletPose;
 
-using NativeRelativeLanePosition = traffic_simulator::LaneletPose;
+using NativeRelativeLanePosition = NativeLanePosition;
 
 class SimulatorCore
 {
@@ -96,14 +96,14 @@ public:
       }
     }
 
-    static auto convertToNativeWorldPosition(const traffic_simulator::LaneletPose & lanelet_pose)
+    static auto convertToNativeWorldPosition(const NativeLanePosition & lanelet_pose)
       -> NativeWorldPosition
     {
       return traffic_simulator::pose::toMapPose(lanelet_pose);
     }
 
     static auto makeNativeRelativeWorldPosition(
-      const geometry_msgs::msg::Pose & from_map_pose, const std::string & to_entity_name)
+      const NativeWorldPosition & from_map_pose, const std::string & to_entity_name)
       -> NativeRelativeWorldPosition
     {
       if (!core->isEntityExist(to_entity_name)) {
@@ -499,9 +499,10 @@ public:
     template <
       typename PoseType, typename... Ts,
       typename = std::enable_if_t<
-        std::is_same_v<std::decay_t<PoseType>, geometry_msgs::msg::Pose> ||
-        std::is_same_v<std::decay_t<PoseType>, traffic_simulator::LaneletPose> ||
-        std::is_same_v<std::decay_t<PoseType>, traffic_simulator::CanonicalizedLaneletPose> > >
+        std::is_same_v<std::decay_t<PoseType>, NativeWorldPosition> ||
+        std::is_same_v<std::decay_t<PoseType>, NativeRelativeWorldPosition> ||
+        std::is_same_v<std::decay_t<PoseType>, NativeLanePosition> ||
+        std::is_same_v<std::decay_t<PoseType>, NativeRelativeLanePosition> > >
     static auto applyTeleportAction(const std::string & name, const PoseType & pose, Ts &&... xs)
       -> void
     {
@@ -668,8 +669,7 @@ public:
     }
 
     static auto evaluateRelativeHeading(
-      const std::string & entity_name, const traffic_simulator::LaneletPose & lanelet_pose)
-      -> double
+      const std::string & entity_name, const NativeLanePosition & lanelet_pose) -> double
     {
       if (core->isEntityExist(entity_name)) {
         if (const auto relative_yaw = core->laneletRelativeYaw(entity_name, lanelet_pose)) {
