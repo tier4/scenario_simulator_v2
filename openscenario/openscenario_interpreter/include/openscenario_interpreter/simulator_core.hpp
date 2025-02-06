@@ -74,7 +74,7 @@ public:
   {
   protected:
     static auto convertToNativeLanePosition(const NativeWorldPosition & map_pose)
-      -> const NativeLanePosition
+      -> NativeLanePosition
     {
       constexpr bool include_crosswalk{false};
       constexpr double matching_distance{1.0};
@@ -97,14 +97,14 @@ public:
     }
 
     static auto convertToNativeWorldPosition(const traffic_simulator::LaneletPose & lanelet_pose)
-      -> const geometry_msgs::msg::Pose
+      -> NativeWorldPosition
     {
       return traffic_simulator::pose::toMapPose(lanelet_pose);
     }
 
     static auto makeNativeRelativeWorldPosition(
       const geometry_msgs::msg::Pose & from_map_pose, const std::string & to_entity_name)
-      -> const geometry_msgs::msg::Pose
+      -> NativeRelativeWorldPosition
     {
       if (!core->isEntityExist(to_entity_name)) {
         throw Error("Reference entity ", std::quoted(to_entity_name), " not exist.");
@@ -658,7 +658,7 @@ public:
     }
 
     // User defined conditions
-    static auto evaluateCurrentState(const std::string & entity_name) -> const std::string
+    static auto evaluateCurrentState(const std::string & entity_name) -> std::string
     {
       if (core->isEntityExist(entity_name)) {
         return core->getEntity(entity_name)->getCurrentAction();
@@ -715,23 +715,22 @@ public:
       core->getEgoEntity()->sendCooperateCommand(module_name, command);
     }
 
-    static auto getMinimumRiskManeuverBehaviorName(const std::string & ego_name)
-      -> const std::string
+    static auto getMinimumRiskManeuverBehaviorName(const std::string & ego_name) -> std::string
     {
       return core->getEgoEntity(ego_name)->getMinimumRiskManeuverBehaviorName();
     }
 
-    static auto getMinimumRiskManeuverStateName(const std::string & ego_name) -> const std::string
+    static auto getMinimumRiskManeuverStateName(const std::string & ego_name) -> std::string
     {
       return core->getEgoEntity(ego_name)->getMinimumRiskManeuverStateName();
     }
 
-    static auto getEmergencyStateName(const std::string & ego_name) -> const std::string
+    static auto getEmergencyStateName(const std::string & ego_name) -> std::string
     {
       return core->getEgoEntity(ego_name)->getEmergencyStateName();
     }
 
-    static auto getTurnIndicatorsCommandName(const std::string & ego_name) -> const std::string
+    static auto getTurnIndicatorsCommandName(const std::string & ego_name) -> std::string
     {
       return core->getEgoEntity(ego_name)->getTurnIndicatorsCommandName();
     }
@@ -753,7 +752,7 @@ public:
     }
 
     static auto getConventionalTrafficLightsComposedState(const lanelet::Id lanelet_id)
-      -> const std::string
+      -> std::string
     {
       return core->getConventionalTrafficLights()->getTrafficLightsComposedState(lanelet_id);
     }

@@ -98,7 +98,7 @@ public:
 
   auto onUpdate(const double current_time, const double step_time) -> void override;
 
-  void requestAcquirePosition(const LaneletPose &);
+  void requestAcquirePosition(const LaneletPose &) override;
 
   void requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose) override;
 

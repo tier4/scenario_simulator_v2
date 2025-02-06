@@ -479,12 +479,11 @@ auto API::laneletDistance(
 {
   const auto from_entity = getEntity(from_entity_name);
   const auto to_entity = getEntity(to_entity_name);
-  if (from_entity_name != to_entity_name) {
-    if (from_entity->isInLanelet() && to_entity->isInLanelet()) {
-      return distance::laneletDistance(
-        from_entity->getCanonicalizedLaneletPose().value(),
-        to_entity->getCanonicalizedLaneletPose().value(), routing_configuration, getHdmapUtils());
-    }
+  if (
+    from_entity_name != to_entity_name && from_entity->isInLanelet() && to_entity->isInLanelet()) {
+    return distance::laneletDistance(
+      from_entity->getCanonicalizedLaneletPose().value(),
+      to_entity->getCanonicalizedLaneletPose().value(), routing_configuration, getHdmapUtils());
   }
   return LaneletDistance();
 }
@@ -525,13 +524,12 @@ auto API::boundingBoxLaneletDistance(
 {
   const auto from_entity = getEntity(from_entity_name);
   const auto to_entity = getEntity(to_entity_name);
-  if (from_entity_name != to_entity_name) {
-    if (from_entity->isInLanelet() && to_entity->isInLanelet()) {
-      return distance::boundingBoxLaneletDistance(
-        from_entity->getCanonicalizedLaneletPose().value(), from_entity->getBoundingBox(),
-        to_entity->getCanonicalizedLaneletPose().value(), to_entity->getBoundingBox(),
-        routing_configuration, getHdmapUtils());
-    }
+  if (
+    from_entity_name != to_entity_name && from_entity->isInLanelet() && to_entity->isInLanelet()) {
+    return distance::boundingBoxLaneletDistance(
+      from_entity->getCanonicalizedLaneletPose().value(), from_entity->getBoundingBox(),
+      to_entity->getCanonicalizedLaneletPose().value(), to_entity->getBoundingBox(),
+      routing_configuration, getHdmapUtils());
   }
   return LaneletDistance();
 }
