@@ -24,6 +24,11 @@ Changelog for package embree_vendor
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+9.3.1 (2025-02-06)
+------------------
+* Merge branch 'master' into chore/delete-target-branch-filter
+* Contributors: Masaya Kataoka
+
 9.3.0 (2025-02-05)
 ------------------
 * Merge remote-tracking branch 'origin/master' into feature/docker/traffic_simulator
