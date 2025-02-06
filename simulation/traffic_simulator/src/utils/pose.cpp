@@ -13,6 +13,11 @@
 // limitations under the License.
 
 #include <geometry/bounding_box.hpp>
+#include <geometry/quaternion/euler_to_quaternion.hpp>
+#include <geometry/quaternion/quaternion_to_euler.hpp>
+#include <geometry/vector3/norm.hpp>
+#include <geometry/vector3/normalize.hpp>
+#include <geometry/vector3/operator.hpp>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/lanelet_wrapper/lanelet_map.hpp>
@@ -172,6 +177,57 @@ auto transformRelativePoseToGlobal(
   return ret;
 }
 
+/// @note This function does not modify the orientation of entity.
+auto updatePositionForLaneletTransition(
+  const CanonicalizedLaneletPose & canonicalized_lanelet_pose, const lanelet::Id next_lanelet_id,
+  const geometry_msgs::msg::Vector3 & desired_velocity, const bool desired_velocity_is_global,
+  const double step_time) -> std::optional<geometry_msgs::msg::Point>
+{
+  using math::geometry::operator*;
+  using math::geometry::operator+=;
+
+  const auto lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose);
+
+  /// @note Determine the displacement in the 2D lanelet coordinate system
+  Eigen::Vector2d displacement;
+  if (desired_velocity_is_global) {
+    /// @note Transform desired (global) velocity to local velocity
+    const auto map_pose = static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose);
+    const Eigen::Vector3d global_velocity(
+      desired_velocity.x, desired_velocity.y, desired_velocity.z);
+    const Eigen::Quaterniond quaternion(
+      map_pose.orientation.w, map_pose.orientation.x, map_pose.orientation.y,
+      map_pose.orientation.z);
+    const Eigen::Vector3d local_velocity = quaternion.inverse() * global_velocity;
+    displacement = Eigen::Rotation2Dd(lanelet_pose.rpy.z) *
+                   Eigen::Vector2d(local_velocity.x(), local_velocity.y()) * step_time;
+  } else {
+    displacement = Eigen::Rotation2Dd(lanelet_pose.rpy.z) *
+                   Eigen::Vector2d(desired_velocity.x, desired_velocity.y) * step_time;
+  }
+  const auto longitudinal_d = displacement.x();
+  const auto lateral_d = displacement.y();
+
+  const auto remaining_lanelet_length =
+    lanelet_wrapper::lanelet_map::laneletLength(lanelet_pose.lanelet_id) - lanelet_pose.s;
+  const auto next_lanelet_longitudinal_d = longitudinal_d - remaining_lanelet_length;
+  if (longitudinal_d <= remaining_lanelet_length) {
+    return std::nullopt;
+  } else if (  /// @note if longitudinal displacement exceeds the current lanelet length, use next lanelet if possible
+    next_lanelet_longitudinal_d < lanelet_wrapper::lanelet_map::laneletLength(next_lanelet_id)) {
+    LaneletPose result_lanelet_pose;
+    result_lanelet_pose.lanelet_id = next_lanelet_id;
+    result_lanelet_pose.s = next_lanelet_longitudinal_d;
+    result_lanelet_pose.offset = lanelet_pose.offset + lateral_d;
+    result_lanelet_pose.rpy = lanelet_pose.rpy;
+    return toMapPose(result_lanelet_pose).position;
+  } else {
+    THROW_SIMULATION_ERROR(
+      "Next lanelet is too short: lanelet_id==", next_lanelet_id, " is shorter than ",
+      next_lanelet_longitudinal_d);
+  }
+}
+
 /// @note Relative msg::Pose
 auto isAltitudeMatching(
   const CanonicalizedLaneletPose & lanelet_pose,
@@ -234,8 +290,8 @@ auto relativeLaneletPose(
   constexpr bool include_opposite_direction{true};
 
   LaneletPose position = quietNaNLaneletPose();
-  // here the s and offset are intentionally assigned independently, even if
-  // it is not possible to calculate one of them - it happens that one is sufficient
+  /// @note here the s and offset are intentionally assigned independently, even if
+  /// it is not possible to calculate one of them - it happens that one is sufficient
   if (
     const auto longitudinal_distance = longitudinalDistance(
       from, to, include_adjacent_lanelet, include_opposite_direction, routing_configuration,
@@ -263,8 +319,8 @@ auto boundingBoxRelativeLaneletPose(
   constexpr bool include_opposite_direction{true};
 
   LaneletPose position = quietNaNLaneletPose();
-  // here the s and offset are intentionally assigned independently, even if
-  // it is not possible to calculate one of them - it happens that one is sufficient
+  /// @note here the s and offset are intentionally assigned independently, even if
+  /// it is not possible to calculate one of them - it happens that one is sufficient
   if (
     const auto longitudinal_bounding_box_distance = boundingBoxLaneLongitudinalDistance(
       from, from_bounding_box, to, to_bounding_box, include_adjacent_lanelet,
@@ -403,10 +459,8 @@ auto transformToCanonicalizedLaneletPose(
       map_pose, bounding_box, unique_route_lanelets, include_crosswalk, matching_distance)) {
     return canonicalized_lanelet_pose;
   }
-  /**
-   * @note Hard coded parameter. 2.0 is a matching threshold for lanelet.
-   * In this branch, the algorithm only consider entity pose.
-   */
+  /// @note Hard coded parameter. 2.0 is a matching threshold for lanelet.
+  /// In this branch, the algorithm only consider entity pose.
   if (
     const auto lanelet_pose =
       lanelet_wrapper::pose::toLaneletPose(map_pose, include_crosswalk, 2.0)) {
