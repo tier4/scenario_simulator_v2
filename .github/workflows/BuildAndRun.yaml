@@ -129,7 +129,7 @@ jobs:
         shell: bash
 
       - name: register command output to github variable
-        run: echo "::set-output name=scenario_test_output::$(cat /tmp/scenario_workflow/optional_workflow/output.txt)"
+        run: echo "::set-output name=scenario_test_output::$(cat /tmp/scenario_workflow/optional_workflow/failure_report.md)"
 
       - name: comment scenario_test_output
         uses: alawiii521/current-pr-comment@v1.0
