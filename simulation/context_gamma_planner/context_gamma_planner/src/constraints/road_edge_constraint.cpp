@@ -41,7 +41,7 @@ RoadEdgeConstraint::RoadEdgeConstraint(
                      }
                    }
                    THROW_SIMULATION_ERROR(
-                     "Please check side of the lanelet, something completely wrong happend.",
+                     "Please check side of the lanelet, something completely wrong happened.",
                      "This message is mainly for developers.",
                      "If you are not developer, please notify to Masaya Kataoka (@hakuturu583)");
                  }()}),

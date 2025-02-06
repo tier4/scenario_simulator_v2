@@ -114,7 +114,7 @@ std::vector<RVO::Line> ObstaclePlugin::calcOrcaLines(RVO::Agent::SharedPtr agent
       continue;
     } else if (s > 1.0f && distSq2 <= radiusSq) {
       /* Collision with right vertex. Ignore if non-convex
-       * or if it will be taken care of by neighoring obstacle */
+       * or if it will be taken care of by neighboring obstacle */
       if (obstacle2->is_convex_ && det(relativePosition2, obstacle2->unit_dir_) >= 0.0f) {
         line.point = Vector2(0.0f, 0.0f);
         line.direction = normalize(Vector2(-relativePosition2.y(), relativePosition2.x()));
