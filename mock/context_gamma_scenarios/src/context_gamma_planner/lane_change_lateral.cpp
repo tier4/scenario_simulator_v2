@@ -15,8 +15,8 @@
 #include <quaternion_operation/quaternion_operation.h>
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
-#include <cpp_mock_scenarios/catalogs.hpp>
-#include <cpp_mock_scenarios/cpp_scenario_node.hpp>
+#include <context_gamma_scenarios/catalogs.hpp>
+#include <context_gamma_scenarios/context_gamma_scenario_node.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <traffic_simulator/api/api.hpp>
 
@@ -25,13 +25,14 @@
 #include <string>
 #include <vector>
 
-class LaneChangeTimeScenario : public cpp_mock_scenarios::CppScenarioNode
+class LaneChangeLateralScenario : public context_gamma_scenarios::ContextGammaScenarioNode
 {
 public:
-  explicit LaneChangeTimeScenario(const rclcpp::NodeOptions & option)
-  : cpp_mock_scenarios::CppScenarioNode(
-      "lane_change_time", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
-      "lanelet2_map.osm", __FILE__, false, option)
+  explicit LaneChangeLateralScenario(const rclcpp::NodeOptions & option)
+  : context_gamma_scenarios::ContextGammaScenarioNode(
+      "lane_change_lateral",
+      ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map", "lanelet2_map.osm",
+      __FILE__, false, option)
   {
     start();
   }
@@ -40,7 +41,6 @@ private:
   void onUpdate() override
   {
     const auto t = api_.getCurrentTime();
-    const double time_threshold = 1.0;
     if (1 < t && t < 1.1) {
       api_.requestLaneChange(
         "ego",
@@ -48,7 +48,7 @@ private:
           "ego", traffic_simulator::lane_change::Direction::RIGHT, 1, 0.0),
         traffic_simulator::lane_change::TrajectoryShape::CUBIC,
         traffic_simulator::lane_change::Constraint(
-          traffic_simulator::lane_change::Constraint::Type::TIME, 4.0,
+          traffic_simulator::lane_change::Constraint::Type::LATERAL_VELOCITY, 1,
           traffic_simulator::lane_change::Constraint::Policy::BEST_EFFORT));
     }
     if (
@@ -56,16 +56,12 @@ private:
       static_cast<traffic_simulator::LaneletPose>(api_.getEntityStatus("ego").getLaneletPose())
           .lanelet_id == 34462 and
       static_cast<traffic_simulator::LaneletPose>(api_.getEntityStatus("ego").getLaneletPose()).s >=
-        23.0377) {
-      if (5.0 - time_threshold < t && t < 5.0 + time_threshold) {
-        stop(cpp_mock_scenarios::Result::SUCCESS);
-      } else {
-        stop(cpp_mock_scenarios::Result::FAILURE);
-      }
+        28.0) {
+      stop(context_gamma_scenarios::Result::SUCCESS);
     }
     // LCOV_EXCL_STOP
-    if (t >= 20) {
-      stop(cpp_mock_scenarios::Result::FAILURE);
+    if (t >= 30) {
+      stop(context_gamma_scenarios::Result::FAILURE);
     }
   }
 
@@ -85,7 +81,7 @@ int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
-  auto component = std::make_shared<LaneChangeTimeScenario>(options);
+  auto component = std::make_shared<LaneChangeLateralScenario>(options);
   rclcpp::spin(component);
   rclcpp::shutdown();
   return 0;

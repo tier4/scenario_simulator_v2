@@ -1,4 +1,4 @@
-// Copyright 2022 TIER IV, Inc. All rights reserved.
+// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
 #include <quaternion_operation/quaternion_operation.h>
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
-#include <cpp_mock_scenarios/catalogs.hpp>
-#include <cpp_mock_scenarios/cpp_scenario_node.hpp>
+#include <context_gamma_scenarios/catalogs.hpp>
+#include <context_gamma_scenarios/context_gamma_scenario_node.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <traffic_simulator/api/api.hpp>
 
@@ -25,37 +25,25 @@
 #include <string>
 #include <vector>
 
-class StopAtCrosswalkScenario : public cpp_mock_scenarios::CppScenarioNode
+class SpawnScenario : public context_gamma_scenarios::ContextGammaScenarioNode
 {
 public:
-  explicit StopAtCrosswalkScenario(const rclcpp::NodeOptions & option)
-  : cpp_mock_scenarios::CppScenarioNode(
-      "stop_at_crosswalk", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
+  explicit SpawnScenario(const rclcpp::NodeOptions & option)
+  : context_gamma_scenarios::ContextGammaScenarioNode(
+      "spawn", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
       "lanelet2_map.osm", __FILE__, false, option)
   {
     start();
   }
 
 private:
-  bool is_stoped_ = false;
   void onUpdate() override
   {
     const auto t = api_.getCurrentTime();
-    if (
-      static_cast<traffic_simulator::LaneletPose>(api_.getEntityStatus("ego").getLaneletPose())
-          .lanelet_id == 34981 &&
-      api_.getCurrentTwist("ego").linear.x < 2.0) {
-      is_stoped_ = true;
-    }
-    if (
-      static_cast<traffic_simulator::LaneletPose>(api_.getEntityStatus("ego").getLaneletPose())
-          .lanelet_id == 34579 &&
-      is_stoped_) {
-      stop(cpp_mock_scenarios::Result::SUCCESS);
-    }
+
     // LCOV_EXCL_STOP
-    if (t >= 40) {
-      stop(cpp_mock_scenarios::Result::FAILURE);
+    if (t >= 5) {
+      stop(context_gamma_scenarios::Result::SUCCESS);
     }
   }
 
@@ -72,13 +60,14 @@ private:
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
         120545, 0, 0, api_.getHdmapUtils()),
       traffic_simulator::helper::constructActionStatus(10));
-    api_.requestSpeedChange("ego", 7, true);
+    api_.requestSpeedChange("ego", 0, true);
     api_.requestAssignRoute(
       "ego", std::vector<traffic_simulator::CanonicalizedLaneletPose>{
                traffic_simulator::helper::constructCanonicalizedLaneletPose(
                  34675, 0.0, 0, api_.getHdmapUtils()),
                traffic_simulator::helper::constructCanonicalizedLaneletPose(
-                 34690, 0.0, 0, api_.getHdmapUtils())});
+                 34690, 0.0, 0, api_.getHdmapUtils()),
+             });
 
     //Pedestrian setting
     api_.spawn(
@@ -87,7 +76,7 @@ private:
         34378, 0.0, 0, api_.getHdmapUtils()),
       getPedestrianParameters(), traffic_simulator::PedestrianBehavior::contextGamma());
     api_.requestSpeedChange(
-      "bob", 0.5, traffic_simulator::speed_change::Transition::LINEAR,
+      "bob", 0.0, traffic_simulator::speed_change::Transition::LINEAR,
       traffic_simulator::speed_change::Constraint(
         traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 1.0),
       true);
@@ -102,7 +91,7 @@ int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
-  auto component = std::make_shared<StopAtCrosswalkScenario>(options);
+  auto component = std::make_shared<SpawnScenario>(options);
   rclcpp::spin(component);
   rclcpp::shutdown();
   return 0;

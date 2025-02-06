@@ -15,8 +15,8 @@
 #include <quaternion_operation/quaternion_operation.h>
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
-#include <cpp_mock_scenarios/catalogs.hpp>
-#include <cpp_mock_scenarios/cpp_scenario_node.hpp>
+#include <context_gamma_scenarios/catalogs.hpp>
+#include <context_gamma_scenarios/context_gamma_scenario_node.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <traffic_simulator/api/api.hpp>
 
@@ -25,11 +25,11 @@
 #include <string>
 #include <vector>
 
-class AdaptiveCruiseScenario : public cpp_mock_scenarios::CppScenarioNode
+class AdaptiveCruiseScenario : public context_gamma_scenarios::ContextGammaScenarioNode
 {
 public:
   explicit AdaptiveCruiseScenario(const rclcpp::NodeOptions & option)
-  : cpp_mock_scenarios::CppScenarioNode(
+  : context_gamma_scenarios::ContextGammaScenarioNode(
       "adaptive_cruise", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
       "lanelet2_map.osm", __FILE__, false, option)
   {
@@ -58,11 +58,11 @@ private:
       is_stoped_bob_ = true;
     }
     if (is_stoped_ego_ and is_stoped_bob_) {
-      stop(cpp_mock_scenarios::Result::SUCCESS);
+      stop(context_gamma_scenarios::Result::SUCCESS);
     }
     // LCOV_EXCL_STOP
     if (t >= 120) {
-      stop(cpp_mock_scenarios::Result::FAILURE);
+      stop(context_gamma_scenarios::Result::FAILURE);
     }
   }
 

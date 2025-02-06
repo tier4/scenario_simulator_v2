@@ -15,8 +15,8 @@
 #include <quaternion_operation/quaternion_operation.h>
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
-#include <cpp_mock_scenarios/catalogs.hpp>
-#include <cpp_mock_scenarios/cpp_scenario_node.hpp>
+#include <context_gamma_scenarios/catalogs.hpp>
+#include <context_gamma_scenarios/context_gamma_scenario_node.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <traffic_simulator/api/api.hpp>
 
@@ -25,12 +25,12 @@
 #include <string>
 #include <vector>
 
-class HeadOnPedestrianScenario : public cpp_mock_scenarios::CppScenarioNode
+class HeadOnPedestrianScenario : public context_gamma_scenarios::ContextGammaScenarioNode
 {
 public:
   explicit HeadOnPedestrianScenario(const rclcpp::NodeOptions & option)
-  : cpp_mock_scenarios::CppScenarioNode(
-      "head_on_pedestrian", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
+  : context_gamma_scenarios::ContextGammaScenarioNode(
+      "head_on_pedstrian", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
       "lanelet2_map.osm", __FILE__, false, option)
   {
     start();
@@ -75,11 +75,11 @@ private:
         goal_threshold and
       (init_pos[3] - toEigenVector3d(api_.getEntityStatus("bob2").getMapPose().position)).norm() <
         goal_threshold) {
-      stop(cpp_mock_scenarios::Result::SUCCESS);
+      stop(context_gamma_scenarios::Result::SUCCESS);
     }
     // LCOV_EXCL_STOP
     if (t >= 60) {
-      stop(cpp_mock_scenarios::Result::FAILURE);
+      stop(context_gamma_scenarios::Result::FAILURE);
     }
   }
 

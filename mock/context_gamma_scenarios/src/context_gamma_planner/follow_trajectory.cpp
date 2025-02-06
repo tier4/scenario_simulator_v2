@@ -15,8 +15,8 @@
 #include <quaternion_operation/quaternion_operation.h>
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
-#include <cpp_mock_scenarios/catalogs.hpp>
-#include <cpp_mock_scenarios/cpp_scenario_node.hpp>
+#include <context_gamma_scenarios/catalogs.hpp>
+#include <context_gamma_scenarios/context_gamma_scenario_node.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <traffic_simulator/api/api.hpp>
 
@@ -25,11 +25,11 @@
 #include <string>
 #include <vector>
 
-class FollowTrajectoryScenario : public cpp_mock_scenarios::CppScenarioNode
+class FollowTrajectoryScenario : public context_gamma_scenarios::ContextGammaScenarioNode
 {
 public:
   explicit FollowTrajectoryScenario(const rclcpp::NodeOptions & option)
-  : cpp_mock_scenarios::CppScenarioNode(
+  : context_gamma_scenarios::ContextGammaScenarioNode(
       "follow_trajectory", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
       "lanelet2_map.osm", __FILE__, false, option)
   {
@@ -57,11 +57,11 @@ private:
     }
 
     if (vertex_num >= static_cast<int>(follow_trajectory.shape.vertices.size())) {
-      stop(cpp_mock_scenarios::Result::SUCCESS);
+      stop(context_gamma_scenarios::Result::SUCCESS);
     }
     // LCOV_EXCL_STOP
     if (t >= 40) {
-      stop(cpp_mock_scenarios::Result::FAILURE);
+      stop(context_gamma_scenarios::Result::FAILURE);
     }
   }
 
