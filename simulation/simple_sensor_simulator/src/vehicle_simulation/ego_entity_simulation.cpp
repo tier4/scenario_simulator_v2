@@ -318,26 +318,7 @@ void EgoEntitySimulation::update(
       case VehicleModelType::DELAY_STEER_MAP_ACC_GEARED:
       case VehicleModelType::IDEAL_STEER_ACC:
       case VehicleModelType::IDEAL_STEER_ACC_GEARED:
-        /*
-           TODO FIX THIS!!!
-
-           THIS IS MAYBE INCORRECT.
-
-           SHOULD BE
-               gear_sign * acceleration + acceleration_by_slope
-           OR
-               signed_acceleration + acceleration_by_slope
-
-           Currently, acceleration is obtained as an unsigned value
-           (`acceleration`) and a signed value (`gear_sign`), but this is for
-           historical reasons and there is no longer any reason to do so.
-
-           Therefore, when resolving this TODO comment, the assignee should
-           remove `gear_sign` from the tuple returned by
-           `AutowareUniverse::getVehicleCommand`, and at the same time change
-           `acceleration` to a signed value.
-        */
-        input(0) = gear_sign * (acceleration + acceleration_by_slope);
+        input(0) = gear_sign * acceleration + acceleration_by_slope;
         input(1) = tire_angle;
         break;
 
@@ -365,7 +346,7 @@ void EgoEntitySimulation::update(
 
 auto EgoEntitySimulation::calculateAccelerationBySlope() const -> double
 {
-  if (consider_acceleration_by_road_slope_) {
+  if (consider_acceleration_by_road_slope_ && status_.isInLanelet()) {
     constexpr double gravity_acceleration = -9.81;
     /// @todo why there is a need to recalculate orientation using getLaneletPose?
     /// status_.getMapPose().orientation already contains the orientation
