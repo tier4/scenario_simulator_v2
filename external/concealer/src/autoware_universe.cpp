@@ -16,8 +16,14 @@
 
 namespace concealer
 {
-AutowareUniverse::AutowareUniverse(bool simulate_localization)
-: rclcpp::Node("concealer", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),
+/*
+   clang-format seems not to understand the constructor function try-block: it
+   misidentifies the try as a jump label and the formatting afterwards falls
+   apart.
+*/
+// clang-format off
+AutowareUniverse::AutowareUniverse(bool simulate_localization) try
+: rclcpp::Node("concealer", "simulation"),
   getCommand("/control/command/control_cmd", rclcpp::QoS(1), *this),
   getGearCommand("/control/command/gear_cmd", rclcpp::QoS(1), *this),
   getTurnIndicatorsCommand("/control/command/turn_indicators_cmd", rclcpp::QoS(1), *this),
@@ -161,6 +167,12 @@ AutowareUniverse::AutowareUniverse(bool simulate_localization)
   }))
 {
 }
+catch (...)
+{
+  thrown = std::current_exception();
+  is_thrown.store(true);
+}
+// clang-format on
 
 AutowareUniverse::~AutowareUniverse()
 {

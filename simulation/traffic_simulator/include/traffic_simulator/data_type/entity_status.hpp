@@ -34,7 +34,7 @@ public:
   explicit CanonicalizedEntityStatus(
     const EntityStatus & may_non_canonicalized_entity_status,
     const std::optional<CanonicalizedLaneletPose> & canonicalized_lanelet_pose);
-  explicit CanonicalizedEntityStatus(const CanonicalizedEntityStatus & obj);
+  CanonicalizedEntityStatus(const CanonicalizedEntityStatus & obj);
   explicit operator EntityStatus() const noexcept { return entity_status_; }
 
   auto set(const CanonicalizedEntityStatus & status) -> void;
@@ -65,10 +65,10 @@ public:
   auto getLinearJerk() const noexcept -> double;
   auto setLinearJerk(double) -> void;
 
-  auto laneMatchingSucceed() const noexcept -> bool;
-  auto getLaneletId() const noexcept -> lanelet::Id;
-  auto getLaneletIds() const noexcept -> lanelet::Ids;
-  auto getLaneletPose() const noexcept -> const LaneletPose &;
+  auto isInLanelet() const noexcept -> bool;
+  auto getLaneletId() const -> lanelet::Id;
+  auto getLaneletIds() const -> lanelet::Ids;
+  auto getLaneletPose() const -> const LaneletPose &;
   auto getCanonicalizedLaneletPose() const noexcept
     -> const std::optional<CanonicalizedLaneletPose> &;
   auto getName() const noexcept -> const std::string & { return entity_status_.name; }
