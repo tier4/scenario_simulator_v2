@@ -201,7 +201,8 @@ auto laneChangeTrajectory(
   const double maximum_curvature_threshold, const double target_trajectory_length,
   const double forward_distance_threshold) -> std::optional<std::pair<Curve, double>>
 {
-  std::vector<double> candidates_evaluation, candidates_s;
+  std::vector<double> candidates_evaluation;
+  std::vector<double> candidates_s;
   std::vector<Curve> candidates_curves;
 
   const auto lanelet_length = lanelet_map::laneletLength(lane_change_parameter.target.lanelet_id);
