@@ -21,6 +21,92 @@ Changelog for package traffic_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+9.3.0 (2025-02-05)
+------------------
+* Merge remote-tracking branch 'origin/master' into feature/docker/traffic_simulator
+* Contributors: Masaya Kataoka
+
+9.2.0 (2025-02-05)
+------------------
+* Merge pull request `#1493 <https://github.com/tier4/scenario_simulator_v2/issues/1493>`_ from tier4/fix/slope_inaccuracies
+  Fix/slope inaccuracies
+* Merge branch 'master' into fix/slope_inaccuracies
+* Merge branch 'master' into fix/slope_inaccuracies
+* Merge branch 'master' into fix/slope_inaccuracies
+* Merge branch 'master' into fix/slope_inaccuracies
+* fix(traffic_simulator): Fix an issue with lanelet transition
+* fix(traffic_simulator) Fix an issue with follow trajectory action
+  - Updated makeUpdatedStatus to fix an issue with toCanonicalizedLaneletPose
+* Merge branch 'master' into fix/slope_inaccuracies
+* ref(traffic_simulator): Refactor comments
+* ref(traffic_simulator): Refactor comments
+* ref(traffic_simulator): Refactor comments
+* ref(traffic_simulator> Refactor code according to the lastest master branch changes
+* Merge branch 'master' into fix/slope_inaccuracies
+* fix(traffic_simulator) Improve lanelet transition handling for entity position updates
+* ref(traffic_simulator) Refactor updateEntityPositionForLaneletTransition
+* Merge branch 'master' into fix/slope_inaccuracies
+* fix(traffic_simulator): Fix lanelet slope inaccuracies
+  - Adjusted entity position when transitioning between lanelets to reduce slope errors
+* Merge branch 'master' into fix/slope_inaccuracies
+* Merge branch 'master' into fix/slope_inaccuracies
+* fix(traffic_simulator): revert adjustOrientationAndOzPosition  change (lanelet rpy)
+* ref(traffic_simulator): tidy up after moveTowardsLaneletPose development
+* fix(behavior_tree_plugin, traffic_simulator): fix moveTowardsLaneletPose for WalkStraightAction, tidy up
+* tmp(behavior_tree_plugin, traffic_simulator): moveTowardsLaneletPose debug
+* Merge branch 'master' into fix/slope_inaccuracies
+* refactor(traffic_simulator) fix spell check issue
+* fix(traffic_simulator) Fix an issue with negative longitudinal displacement
+* fix(traffis_simulator): use next canonicalized lanelet pose in pose::moveTowardsLaneletPose
+* ref(behavior_tree_plugin, traffic_simulator): improve comments
+* fix(traffic_simulator): fix moveTowardsLaneletPose
+* ref(traffic_simulator): remove irrelevant toMapPosition
+* feat(traffic_simulator): improve moveTowardsLaneletPose to calc LaneletPose and return it
+* ref(traffic_simulator): cleanup after removal of pose::moveAlongLanelet
+* fix(behavior_tree_plugin): use moveToLaneletPose in calculateUpdatedEntityStatusInWorldFrame
+* fix(traffic_simulator): fix moveToLaneletPose in FollowTrajectoryAction
+* ref(traffic_simulator): fix pose::moveToTargetLaneletPose
+* ref(traffic_simulator): separete pose::moveToTargetPosition
+* ref(behavior_tree_plugin, traffic_simulator): separate pose::moveAlongLanelet
+* fix(behavior_tree_plugin)  Fix lanelet slope inaccuracies - walk straight action
+* fix(traffic_simulator) Fix lanelet slope inaccuracies - follow trajectory action
+* Contributors: Dawid Moszynski, Dawid Moszyński, Kotaro Yoshimoto, SzymonParapura
+
+9.1.0 (2025-02-04)
+------------------
+* Merge pull request `#1487 <https://github.com/tier4/scenario_simulator_v2/issues/1487>`_ from tier4/RJD-1489/NpcCenterLine
+* Remove std::midpoint
+* Review changes
+* Merge branch 'master' into RJD-1489/NpcCenterLine
+* Merge branch 'master' into RJD-1489/NpcCenterLine
+* Merge branch 'master' into RJD-1489/NpcCenterLine
+* SonarCloud issues changes part 2
+* SonarCloud issues changes
+* Merge branch 'master' into RJD-1489/NpcCenterLine
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into RJD-1489/NpcCenterLine
+* Formatting changes
+* Review changes
+* Move tranformToRoutableCanonicalizedLaneletPose to pose namespace
+* Move distance calculation method to utils
+* Review changes
+* Add new algorithm
+* Merge branch 'master' into RJD-1489/NpcCenterLine
+* Merge branch 'master' into RJD-1489/NpcCenterLine
+* Merge branch 'master' into RJD-1489/NpcCenterLine
+* Merge branch 'master' into RJD-1489/NpcCenterLine
+* Contributors: Dawid Moszyński, Grzegorz Maj, Kotaro Yoshimoto
+
+9.0.3 (2025-01-31)
+------------------
+* Merge pull request `#1509 <https://github.com/tier4/scenario_simulator_v2/issues/1509>`_ from tier4/RJD-1505/fix_slope_acceleration_sign
+* Merge branch 'master' into RJD-1505/fix_slope_acceleration_sign
+* chore: fix a mistake during solving the merge conflict
+* Merge branch 'master' into RJD-1505/fix_slope_acceleration_sign
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into RJD-1505/fix_slope_acceleration_sign
+* Remove noexcept
+* Change sign of slope acceleration  and check canonicalization status in acceleration calculation
+* Contributors: Grzegorz Maj, Kotaro Yoshimoto
+
 9.0.2 (2025-01-31)
 ------------------
 
