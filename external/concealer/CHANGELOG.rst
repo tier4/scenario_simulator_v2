@@ -21,6 +21,22 @@ Changelog for package concealer
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+9.4.0 (2025-02-06)
+------------------
+* Merge pull request `#1518 <https://github.com/tier4/scenario_simulator_v2/issues/1518>`_ from tier4/feature/support-latest-autoware-message-type
+  Support message type `autoware_internal_planning_msgs::msg::PathWithLaneId`
+* Merge branch 'master' into feature/support-latest-autoware-message-type
+* Merge branch 'master' into feature/support-latest-autoware-message-type
+* Add new constant `concealer::default_architecture_type`
+* Merge remote-tracking branch 'origin/master' into feature/support-latest-autoware-message-type
+* Update function template `available<T>` to prepare its own node
+* Update the concealer node to use global arguments
+* Add new architecture-type `awf/universe/20250130`
+* Merge branch 'master' into feature/support-latest-autoware-message-type
+* Update `Subscriber` to handle multiple message types with priorities
+* Support message type `autoware_internal_planning_msgs::msg::PathWithLaneId`
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
 9.3.1 (2025-02-06)
 ------------------
 * Merge branch 'master' into chore/delete-target-branch-filter

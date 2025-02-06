@@ -21,6 +21,14 @@ Changelog for package junit_exporter
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+9.4.0 (2025-02-06)
+------------------
+* Merge branch 'master' into feature/support-latest-autoware-message-type
+* Merge branch 'master' into feature/support-latest-autoware-message-type
+* Merge remote-tracking branch 'origin/master' into feature/support-latest-autoware-message-type
+* Merge branch 'master' into feature/support-latest-autoware-message-type
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
 9.3.1 (2025-02-06)
 ------------------
 * Merge branch 'master' into chore/delete-target-branch-filter
