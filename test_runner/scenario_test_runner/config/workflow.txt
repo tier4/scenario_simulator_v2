@@ -9,7 +9,6 @@ $(find-pkg-share scenario_test_runner)/scenario/ByEntityCondition.EntityConditio
 $(find-pkg-share scenario_test_runner)/scenario/ByEntityCondition.EntityCondition.RelativeSpeedCondition.yaml
 $(find-pkg-share scenario_test_runner)/scenario/ByEntityCondition.EntityCondition.TimeToCollisionCondition.yaml
 $(find-pkg-share scenario_test_runner)/scenario/ControllerAction.AssignControllerAction.yaml
-$(find-pkg-share scenario_test_runner)/scenario/execution_time_test.yaml
 $(find-pkg-share scenario_test_runner)/scenario/LateralAction.LaneChangeAction-RoadShoulder.yaml
 $(find-pkg-share scenario_test_runner)/scenario/LongitudinalAction.SpeedAction.yaml
 $(find-pkg-share scenario_test_runner)/scenario/Property.isBlind.yaml
