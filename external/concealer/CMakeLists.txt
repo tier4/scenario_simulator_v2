@@ -28,6 +28,14 @@ target_link_libraries(${PROJECT_NAME}
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
+
+  file(GLOB ${PROJECT_NAME}_TESTS ${CMAKE_CURRENT_SOURCE_DIR}/test/*.cpp)
+
+  foreach(EACH IN LISTS ${PROJECT_NAME}_TESTS)
+    get_filename_component(TEST_NAME ${EACH} NAME_WE)
+    ament_add_gtest(${TEST_NAME} ${EACH})
+    target_link_libraries(${TEST_NAME} ${PROJECT_NAME})
+  endforeach()
 endif()
 
 ament_auto_package()
