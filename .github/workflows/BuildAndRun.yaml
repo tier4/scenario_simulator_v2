@@ -128,21 +128,17 @@ jobs:
           ./src/scenario_simulator_v2/.github/workflows/workflow.sh ./src/scenario_simulator_v2/test_runner/scenario_test_runner/config/optional_workflow.txt global_frame_rate:=20 || true
         shell: bash
 
-      - name: register command output to github variable
-        id: optional_test_result
-        run: |
-          {
-            echo "scenario_test_output=<<EOF"
-            cat /tmp/scenario_workflow/optional_workflow/failure_report.md
-            echo "EOF"
-          } >> "$GITHUB_OUTPUT"
-
-      - name: comment scenario_test_output
-        uses: alawiii521/current-pr-comment@v1.0
+      - uses: actions/github-script@v7
         with:
-          comment:
-            ${{ steps.optional_test_result.outputs.scenario_test_output }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const commentBody = fs.readFileSync('/tmp/scenario_workflow/optional_workflow/failure_report.md', 'utf8');
+            octokit.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: commentBody
+            })
 
       - name: Upload Lcov result
         uses: actions/upload-artifact@v4
