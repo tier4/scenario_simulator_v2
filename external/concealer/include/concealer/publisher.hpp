@@ -15,23 +15,13 @@
 #ifndef CONCEALER__PUBLISHER_HPP_
 #define CONCEALER__PUBLISHER_HPP_
 
+#include <concealer/get_parameter.hpp>
 #include <nav_msgs/msg/odometry.hpp>
 #include <random>
 #include <rclcpp/rclcpp.hpp>
 
 namespace concealer
 {
-template <typename T>
-auto getParameter(
-  const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node,
-  const std::string & name, T value = {})
-{
-  if (not node->has_parameter(name)) {
-    node->declare_parameter(name, rclcpp::ParameterValue(value));
-  }
-  return node->get_parameter(name).get_value<T>();
-}
-
 template <typename>
 struct Identity
 {

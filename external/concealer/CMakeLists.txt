@@ -18,6 +18,7 @@ ament_auto_add_library(${PROJECT_NAME} SHARED
   src/execute.cpp
   src/field_operator_application.cpp
   src/is_package_exists.cpp
+  src/path_with_lane_id.cpp
   src/publisher.cpp
   src/task_queue.cpp)
 
