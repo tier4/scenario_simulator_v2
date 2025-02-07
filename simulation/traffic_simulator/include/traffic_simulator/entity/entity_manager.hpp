@@ -171,16 +171,16 @@ public:
 
   auto getEntityNames() const -> const std::vector<std::string>;
 
-  auto getEntityOrNullptr(const std::string & name) const
+  auto getEntityPointer(const std::string & name) const
     -> std::shared_ptr<traffic_simulator::entity::EntityBase>;
 
-  auto getEntity(const std::string & name) const
-    -> std::shared_ptr<traffic_simulator::entity::EntityBase>;
+  auto getEntity(const std::string & name) -> entity::EntityBase &;
 
-  auto getEgoEntity() const -> std::shared_ptr<traffic_simulator::entity::EgoEntity>;
+  auto getEntity(const std::string & name) const -> const entity::EntityBase &;
 
-  auto getEgoEntity(const std::string & name) const
-    -> std::shared_ptr<traffic_simulator::entity::EgoEntity>;
+  auto getEgoEntity(const std::string & name) -> entity::EgoEntity &;
+
+  auto getEgoEntity(const std::string & name) const -> const entity::EgoEntity &;
 
   auto getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &;
 
@@ -221,7 +221,7 @@ public:
 
   auto isAnyEgoSpawned() const -> bool;
 
-  auto getEgoName() const -> const std::string &;
+  auto getFirstEgoName() const -> std::optional<std::string>;
 
   /**
    * @brief Reset behavior plugin of the target entity.

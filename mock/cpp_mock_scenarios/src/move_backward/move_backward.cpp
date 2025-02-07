@@ -42,7 +42,7 @@ private:
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
     // LCOV_EXCL_START
-    if (api_.getEntity("ego")->getCurrentTwist().linear.x >= -2.9) {
+    if (api_.getEntity("ego").getCurrentTwist().linear.x >= -2.9) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     // LCOV_EXCL_STOP
@@ -53,9 +53,9 @@ private:
     api_.spawn(
       "ego", traffic_simulator::helper::constructCanonicalizedLaneletPose(34741, 0.0, 0.0),
       getVehicleParameters());
-    auto ego_entity = api_.getEntity("ego");
-    ego_entity->setLinearVelocity(-3);
-    ego_entity->requestSpeedChange(-3, true);
+    auto & ego_entity = api_.getEntity("ego");
+    ego_entity.setLinearVelocity(-3);
+    ego_entity.requestSpeedChange(-3, true);
   }
 };
 }  // namespace cpp_mock_scenarios
