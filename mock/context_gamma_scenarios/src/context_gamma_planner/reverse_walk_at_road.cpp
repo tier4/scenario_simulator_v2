@@ -40,13 +40,13 @@ private:
   void onUpdate() override
   {
     const auto t = api_.getCurrentTime();
+    auto & ego = api_.getEntity("ego");
+    const auto & bob = api_.getEntity("bob");
     if (6.5 < t && t < 7) {
-      api_.requestSpeedChange("ego", 0, true);
+      ego.requestSpeedChange(0, true);
     }
     const Eigen::Vector3d target_pose{goal_pose_.position.x, goal_pose_.position.y, 0};
-    const Eigen::Vector3d current_pose{
-      api_.getEntityStatus("bob").getMapPose().position.x,
-      api_.getEntityStatus("bob").getMapPose().position.y, 0};
+    const Eigen::Vector3d current_pose{bob.getMapPose().position.x, bob.getMapPose().position.y, 0};
     if ((target_pose - current_pose).norm() < 2.0) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
@@ -61,21 +61,22 @@ private:
     api_.spawn(
       "ego", traffic_simulator::helper::constructCanonicalizedLaneletPose(34976, 0, 0),
       getVehicleParameters(), traffic_simulator::VehicleBehavior::contextGamma());
-    api_.setEntityStatus(
-      "ego", traffic_simulator::helper::constructCanonicalizedLaneletPose(34976, 0, 0),
+    auto & ego = api_.getEntity("ego");
+    ego.setStatus(
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(34976, 0, 0),
       traffic_simulator::helper::constructActionStatus());
-    api_.requestAssignRoute(
-      "ego", std::vector<traffic_simulator::CanonicalizedLaneletPose>{
-               traffic_simulator::helper::constructCanonicalizedLaneletPose(34591, 0.0, 0),
-               traffic_simulator::helper::constructCanonicalizedLaneletPose(34690, 0.0, 0),
-             });
-    api_.requestSpeedChange("ego", 7, true);
+    ego.requestAssignRoute(std::vector<traffic_simulator::CanonicalizedLaneletPose>{
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(34591, 0.0, 0),
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(34690, 0.0, 0),
+    });
+    ego.requestSpeedChange(7, true);
 
     api_.spawn(
       "bob", traffic_simulator::helper::constructCanonicalizedLaneletPose(34981, 0.0, 0),
       getPedestrianParameters(), traffic_simulator::PedestrianBehavior::contextGamma());
-    api_.requestSpeedChange(
-      "bob", 1, traffic_simulator::speed_change::Transition::LINEAR,
+    auto & bob = api_.getEntity("bob");
+    bob.requestSpeedChange(
+      1, traffic_simulator::speed_change::Transition::LINEAR,
       traffic_simulator::speed_change::Constraint(
         traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 1.0),
       true);
@@ -98,7 +99,7 @@ private:
     follow_trajectory.closed = false;
     std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> follow_trajectory_ptr =
       std::make_shared<traffic_simulator_msgs::msg::PolylineTrajectory>(follow_trajectory);
-    api_.requestFollowTrajectory("bob", follow_trajectory_ptr);
+    bob.requestFollowTrajectory(follow_trajectory_ptr);
   }
 };
 

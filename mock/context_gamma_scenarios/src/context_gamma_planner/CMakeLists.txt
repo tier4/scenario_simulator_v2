@@ -28,15 +28,15 @@ target_link_libraries(parked_at_crosswalk
   zmq
 )
 
-# ament_auto_add_executable(reverse_walk_at_road
-#   reverse_walk_at_road.cpp
-# )
-# target_link_libraries(reverse_walk_at_road
-#   ${PROTOBUF_LIBRARY}
-#   pthread
-#   sodium
-#   zmq
-# )
+ament_auto_add_executable(reverse_walk_at_road
+  reverse_walk_at_road.cpp
+)
+target_link_libraries(reverse_walk_at_road
+  ${PROTOBUF_LIBRARY}
+  pthread
+  sodium
+  zmq
+)
 
 # ament_auto_add_executable(pedestrian_follow_lane
 #   pedestrian_follow_lane.cpp
