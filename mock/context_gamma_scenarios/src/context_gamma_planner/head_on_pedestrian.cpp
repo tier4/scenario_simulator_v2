@@ -47,35 +47,27 @@ private:
   {
     const auto t = api_.getCurrentTime();
     float goal_threshold = 1.5;
-    if (
-      (init_pos[0] - toEigenVector3d(api_.getEntityStatus("ego").getMapPose().position)).norm() <
-      goal_threshold) {
-      api_.requestSpeedChange("ego", 0, true);
+    auto & ego = api_.getEntity("ego");
+    auto & ego2 = api_.getEntity("ego2");
+    auto & bob = api_.getEntity("bob");
+    auto & bob2 = api_.getEntity("bob2");
+    if ((init_pos[0] - toEigenVector3d(ego.getMapPose().position)).norm() < goal_threshold) {
+      ego.requestSpeedChange(0, true);
+    }
+    if ((init_pos[1] - toEigenVector3d(ego2.getMapPose().position)).norm() < goal_threshold) {
+      ego2.requestSpeedChange(0, true);
+    }
+    if ((init_pos[2] - toEigenVector3d(bob.getMapPose().position)).norm() < goal_threshold) {
+      bob.requestSpeedChange(0, true);
+    }
+    if ((init_pos[3] - toEigenVector3d(bob2.getMapPose().position)).norm() < goal_threshold) {
+      bob2.requestSpeedChange(0, true);
     }
     if (
-      (init_pos[1] - toEigenVector3d(api_.getEntityStatus("ego2").getMapPose().position)).norm() <
-      goal_threshold) {
-      api_.requestSpeedChange("ego2", 0, true);
-    }
-    if (
-      (init_pos[2] - toEigenVector3d(api_.getEntityStatus("bob").getMapPose().position)).norm() <
-      goal_threshold) {
-      api_.requestSpeedChange("bob", 0, true);
-    }
-    if (
-      (init_pos[3] - toEigenVector3d(api_.getEntityStatus("bob2").getMapPose().position)).norm() <
-      goal_threshold) {
-      api_.requestSpeedChange("bob2", 0, true);
-    }
-    if (
-      (init_pos[0] - toEigenVector3d(api_.getEntityStatus("ego").getMapPose().position)).norm() <
-        goal_threshold and
-      (init_pos[1] - toEigenVector3d(api_.getEntityStatus("ego2").getMapPose().position)).norm() <
-        goal_threshold and
-      (init_pos[2] - toEigenVector3d(api_.getEntityStatus("bob").getMapPose().position)).norm() <
-        goal_threshold and
-      (init_pos[3] - toEigenVector3d(api_.getEntityStatus("bob2").getMapPose().position)).norm() <
-        goal_threshold) {
+      (init_pos[0] - toEigenVector3d(ego.getMapPose().position)).norm() < goal_threshold and
+      (init_pos[1] - toEigenVector3d(ego2.getMapPose().position)).norm() < goal_threshold and
+      (init_pos[2] - toEigenVector3d(bob.getMapPose().position)).norm() < goal_threshold and
+      (init_pos[3] - toEigenVector3d(bob2.getMapPose().position)).norm() < goal_threshold) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
     // LCOV_EXCL_STOP
@@ -107,8 +99,9 @@ private:
     api_.spawn(
       "bob", traffic_simulator::helper::constructCanonicalizedLaneletPose(34378, 0.0, -1),
       getPedestrianParameters(), traffic_simulator::PedestrianBehavior::contextGamma());
-    api_.requestSpeedChange(
-      "bob", 0.5, traffic_simulator::speed_change::Transition::LINEAR,
+    auto & bob = api_.getEntity("bob");
+    bob.requestSpeedChange(
+      0.5, traffic_simulator::speed_change::Transition::LINEAR,
       traffic_simulator::speed_change::Constraint(
         traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 1.0),
       true);
@@ -118,13 +111,14 @@ private:
           traffic_simulator::helper::constructCanonicalizedLaneletPose(34378, 0.0, -1, 0, 0, 0)),
         traffic_simulator::pose::toMapPose(
           traffic_simulator::helper::constructCanonicalizedLaneletPose(34378, 7.5, 1, 0, 0, 0))));
-    api_.requestFollowTrajectory("bob", follow_trajectory_ptr1);
+    bob.requestFollowTrajectory(follow_trajectory_ptr1);
     //Pedestrian2 setting
     api_.spawn(
       "bob2", traffic_simulator::helper::constructCanonicalizedLaneletPose(34378, 0.0, 1),
       getPedestrianParameters(), traffic_simulator::PedestrianBehavior::contextGamma());
-    api_.requestSpeedChange(
-      "bob2", 0.5, traffic_simulator::speed_change::Transition::LINEAR,
+    auto & bob2 = api_.getEntity("bob2");
+    bob2.requestSpeedChange(
+      0.5, traffic_simulator::speed_change::Transition::LINEAR,
       traffic_simulator::speed_change::Constraint(
         traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 1.0),
       true);
@@ -134,14 +128,15 @@ private:
           traffic_simulator::helper::constructCanonicalizedLaneletPose(34378, 0.0, 1, 0, 0, 0)),
         traffic_simulator::pose::toMapPose(
           traffic_simulator::helper::constructCanonicalizedLaneletPose(34378, 7.5, -1, 0, 0, 0))));
-    api_.requestFollowTrajectory("bob2", follow_trajectory_ptr2);
+    bob2.requestFollowTrajectory(follow_trajectory_ptr2);
 
     //Pedestrian3 setting
     api_.spawn(
       "ego", traffic_simulator::helper::constructCanonicalizedLaneletPose(34378, 7.5, 1),
       getPedestrianParameters(), traffic_simulator::PedestrianBehavior::contextGamma());
-    api_.requestSpeedChange(
-      "ego", 0.5, traffic_simulator::speed_change::Transition::LINEAR,
+    auto & ego = api_.getEntity("ego");
+    ego.requestSpeedChange(
+      0.5, traffic_simulator::speed_change::Transition::LINEAR,
       traffic_simulator::speed_change::Constraint(
         traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 1.0),
       true);
@@ -151,14 +146,15 @@ private:
           traffic_simulator::helper::constructCanonicalizedLaneletPose(34378, 7.5, 1, 0, 0, 0)),
         traffic_simulator::pose::toMapPose(
           traffic_simulator::helper::constructCanonicalizedLaneletPose(34378, 0.0, -1, 0, 0, 0))));
-    api_.requestFollowTrajectory("ego", follow_trajectory_ptr3);
+    ego.requestFollowTrajectory(follow_trajectory_ptr3);
 
     //Pedestrian4 setting
     api_.spawn(
       "ego2", traffic_simulator::helper::constructCanonicalizedLaneletPose(34378, 7.5, -1),
       getPedestrianParameters(), traffic_simulator::PedestrianBehavior::contextGamma());
-    api_.requestSpeedChange(
-      "ego2", 0.5, traffic_simulator::speed_change::Transition::LINEAR,
+    auto & ego2 = api_.getEntity("ego");
+    ego2.requestSpeedChange(
+      0.5, traffic_simulator::speed_change::Transition::LINEAR,
       traffic_simulator::speed_change::Constraint(
         traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 1.0),
       true);
@@ -168,12 +164,12 @@ private:
           traffic_simulator::helper::constructCanonicalizedLaneletPose(34378, 7.5, -1, 0, 0, 0)),
         traffic_simulator::pose::toMapPose(
           traffic_simulator::helper::constructCanonicalizedLaneletPose(34378, 0.0, 1, 0, 0, 0))));
-    api_.requestFollowTrajectory("ego2", follow_trajectory_ptr4);
+    ego2.requestFollowTrajectory(follow_trajectory_ptr4);
 
-    init_pos.emplace_back(toEigenVector3d(api_.getEntityStatus("bob").getMapPose().position));
-    init_pos.emplace_back(toEigenVector3d(api_.getEntityStatus("bob2").getMapPose().position));
-    init_pos.emplace_back(toEigenVector3d(api_.getEntityStatus("ego").getMapPose().position));
-    init_pos.emplace_back(toEigenVector3d(api_.getEntityStatus("ego2").getMapPose().position));
+    init_pos.emplace_back(toEigenVector3d(bob.getMapPose().position));
+    init_pos.emplace_back(toEigenVector3d(bob2.getMapPose().position));
+    init_pos.emplace_back(toEigenVector3d(ego.getMapPose().position));
+    init_pos.emplace_back(toEigenVector3d(ego2.getMapPose().position));
   }
 };
 

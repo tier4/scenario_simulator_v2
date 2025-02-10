@@ -68,15 +68,15 @@ target_link_libraries(traffic_light_running
   zmq
 )
 
-# ament_auto_add_executable(head_on_pedestrian
-# head_on_pedestrian.cpp
-# )
-# target_link_libraries(head_on_pedestrian
-#   ${PROTOBUF_LIBRARY}
-#   pthread
-#   sodium
-#   zmq
-# )
+ament_auto_add_executable(head_on_pedestrian
+head_on_pedestrian.cpp
+)
+target_link_libraries(head_on_pedestrian
+  ${PROTOBUF_LIBRARY}
+  pthread
+  sodium
+  zmq
+)
 
 # ament_auto_add_executable(adaptive_cruise
 # adaptive_cruise.cpp
