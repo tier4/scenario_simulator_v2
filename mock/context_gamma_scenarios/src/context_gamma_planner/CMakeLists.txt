@@ -138,15 +138,15 @@ target_link_libraries(lane_change_longitudinal
   zmq
 )
 
-# ament_auto_add_executable(follow_trajectory_dynamic_constraints
-# follow_trajectory_dynamic_constraints.cpp
-# )
-# target_link_libraries(follow_trajectory_dynamic_constraints
-#   ${PROTOBUF_LIBRARY}
-#   pthread
-#   sodium
-#   zmq
-# )
+ament_auto_add_executable(follow_trajectory_dynamic_constraints
+follow_trajectory_dynamic_constraints.cpp
+)
+target_link_libraries(follow_trajectory_dynamic_constraints
+  ${PROTOBUF_LIBRARY}
+  pthread
+  sodium
+  zmq
+)
 
 # ament_auto_add_executable(road_end
 # road_end.cpp
