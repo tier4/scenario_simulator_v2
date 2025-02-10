@@ -43,10 +43,11 @@ private:
   void onUpdate() override
   {
     const auto t = api_.getCurrentTime();
-    if (
-      static_cast<traffic_simulator::LaneletPose>(api_.getEntityStatus("ego").getLaneletPose())
-        .lanelet_id == checkpoint_ids_.at(step_)) {
-      step_++;
+    const auto & ego = api_.getEntity("ego");
+    if (const auto & lanelet_pose = ego.getCanonicalizedLaneletPose()) {
+      if (lanelet_pose.value().getLaneletPose().lanelet_id == checkpoint_ids_.at(step_)) {
+        step_++;
+      }
     }
     if (step_ == static_cast<int>(checkpoint_ids_.size())) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
@@ -63,17 +64,17 @@ private:
     api_.spawn(
       "ego", traffic_simulator::helper::constructCanonicalizedLaneletPose(34426, 10.0, 0),
       getPedestrianParameters(), traffic_simulator::PedestrianBehavior::contextGamma());
-    api_.requestSpeedChange(
-      "ego", 4.0, traffic_simulator::speed_change::Transition::LINEAR,
+    auto & ego = api_.getEntity("ego");
+    ego.requestSpeedChange(
+      4.0, traffic_simulator::speed_change::Transition::LINEAR,
       traffic_simulator::speed_change::Constraint(
         traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 1.0),
       true);
-    api_.requestAssignRoute(
-      "ego", std::vector<traffic_simulator::CanonicalizedLaneletPose>{
-               traffic_simulator::helper::constructCanonicalizedLaneletPose(35016, 0.0, 0),
-               traffic_simulator::helper::constructCanonicalizedLaneletPose(35026, 0.0, 0),
-               traffic_simulator::helper::constructCanonicalizedLaneletPose(35036, 0.0, 0),
-               traffic_simulator::helper::constructCanonicalizedLaneletPose(34981, 1.0, 0)});
+    ego.requestAssignRoute(std::vector<traffic_simulator::CanonicalizedLaneletPose>{
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(35016, 0.0, 0),
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(35026, 0.0, 0),
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(35036, 0.0, 0),
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(34981, 1.0, 0)});
   }
 };
 

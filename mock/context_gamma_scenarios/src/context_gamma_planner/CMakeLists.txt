@@ -38,15 +38,15 @@ target_link_libraries(reverse_walk_at_road
   zmq
 )
 
-# ament_auto_add_executable(pedestrian_follow_lane
-#   pedestrian_follow_lane.cpp
-# )
-# target_link_libraries(pedestrian_follow_lane
-#   ${PROTOBUF_LIBRARY}
-#   pthread
-#   sodium
-#   zmq
-# )
+ament_auto_add_executable(pedestrian_follow_lane
+  pedestrian_follow_lane.cpp
+)
+target_link_libraries(pedestrian_follow_lane
+  ${PROTOBUF_LIBRARY}
+  pthread
+  sodium
+  zmq
+)
 
 # ament_auto_add_executable(stop_line_running
 #   stop_line_running.cpp
