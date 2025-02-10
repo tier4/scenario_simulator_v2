@@ -148,15 +148,15 @@ target_link_libraries(follow_trajectory_dynamic_constraints
   zmq
 )
 
-# ament_auto_add_executable(road_end
-# road_end.cpp
-# )
-# target_link_libraries(road_end
-#   ${PROTOBUF_LIBRARY}
-#   pthread
-#   sodium
-#   zmq
-# )
+ament_auto_add_executable(road_end
+road_end.cpp
+)
+target_link_libraries(road_end
+  ${PROTOBUF_LIBRARY}
+  pthread
+  sodium
+  zmq
+)
 
 if(${tf2_geometry_msgs_VERSION} VERSION_LESS 0.18.0)
   target_compile_definitions(spawn PUBLIC

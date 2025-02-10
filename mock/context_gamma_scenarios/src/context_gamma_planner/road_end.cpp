@@ -40,11 +40,14 @@ private:
   void onUpdate() override
   {
     const auto t = api_.getCurrentTime();
-    if (
-      api_.getEntityStatus("ego").getLaneletPose().s > 55.0 and
-      api_.getEntityStatus("ego").getLaneletPose().lanelet_id == 34468 and
-      api_.getEntityStatus("ego").getTwist().linear.x < 0.01) {
-      stop(cpp_mock_scenarios::Result::SUCCESS);
+    const auto & ego = api_.getEntity("ego");
+    if (const auto & lanelet_pose = ego.getCanonicalizedLaneletPose()) {
+      if (
+        lanelet_pose.value().getLaneletPose().s > 55.0 and
+        lanelet_pose.value().getLaneletPose().lanelet_id == 34468 and
+        ego.getCurrentTwist().linear.x < 0.01) {
+        stop(cpp_mock_scenarios::Result::SUCCESS);
+      }
     }
     // LCOV_EXCL_STOP
     if (t >= 30) {
@@ -58,12 +61,12 @@ private:
     api_.spawn(
       "ego", traffic_simulator::helper::constructCanonicalizedLaneletPose(34468, 30, 0),
       getVehicleParameters(), traffic_simulator::VehicleBehavior::contextGamma());
-    api_.requestSpeedChange("ego", 5, true);
-    api_.requestAssignRoute(
-      "ego", std::vector<traffic_simulator::CanonicalizedLaneletPose>{
-               traffic_simulator::helper::constructCanonicalizedLaneletPose(34468, 0.0, 0),
-               traffic_simulator::helper::constructCanonicalizedLaneletPose(34696, 0.0, 0),
-             });
+    auto & ego = api_.getEntity("ego");
+    ego.requestSpeedChange(5, true);
+    ego.requestAssignRoute(std::vector<traffic_simulator::CanonicalizedLaneletPose>{
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(34468, 0.0, 0),
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(34696, 0.0, 0),
+    });
   }
 };
 
