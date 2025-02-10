@@ -48,30 +48,32 @@ private:
   void onUpdate() override
   {
     const auto t = api_.getCurrentTime();
+    auto & ego = api_.getEntity("ego");
 
     // traffic light control
     if (1.0 <= t && t <= 1.1) {
-      api_.getConventionalTrafficLight(34836).emplace(red_);
-      api_.getConventionalTrafficLight(34802).emplace(red_);
+      api_.getConventionalTrafficLights()->getTrafficLight(34836).emplace(red_);
+      api_.getConventionalTrafficLights()->getTrafficLight(34802).emplace(red_);
     }
     if (10.0 <= t && t <= 10.1) {
-      api_.getConventionalTrafficLight(34836).clear();
-      api_.getConventionalTrafficLight(34802).clear();
-      api_.getConventionalTrafficLight(34836).emplace(green_);
-      api_.getConventionalTrafficLight(34802).emplace(green_);
+      api_.getConventionalTrafficLights()->getTrafficLight(34836).clear();
+      api_.getConventionalTrafficLights()->getTrafficLight(34802).clear();
+      api_.getConventionalTrafficLights()->getTrafficLight(34836).emplace(green_);
+      api_.getConventionalTrafficLights()->getTrafficLight(34802).emplace(green_);
     }
-
-    if (
-      t < 10.1 &&
-      static_cast<traffic_simulator::LaneletPose>(api_.getEntityStatus("ego").getLaneletPose())
-          .lanelet_id == 34624) {
-      stop(cpp_mock_scenarios::Result::FAILURE);
+    if (t < 10.1) {
+      if (const auto & lanelet_pose = ego.getCanonicalizedLaneletPose()) {
+        if (lanelet_pose.value().getLaneletPose().lanelet_id == 34675) {
+          stop(cpp_mock_scenarios::Result::FAILURE);
+        }
+      }
     }
-    if (
-      t >= 10.1 &&
-      static_cast<traffic_simulator::LaneletPose>(api_.getEntityStatus("ego").getLaneletPose())
-          .lanelet_id == 34624) {
-      stop(cpp_mock_scenarios::Result::SUCCESS);
+    if (t >= 10.1) {
+      if (const auto & lanelet_pose = ego.getCanonicalizedLaneletPose()) {
+        if (lanelet_pose.value().getLaneletPose().lanelet_id == 34624) {
+          stop(cpp_mock_scenarios::Result::SUCCESS);
+        }
+      }
     }
     // LCOV_EXCL_STOP
     if (t >= 30) {
@@ -85,14 +87,14 @@ private:
     api_.spawn(
       "ego", traffic_simulator::helper::constructCanonicalizedLaneletPose(34408, 0, 0),
       getVehicleParameters(), traffic_simulator::VehicleBehavior::contextGamma());
-    api_.setEntityStatus(
-      "ego", traffic_simulator::helper::constructCanonicalizedLaneletPose(34408, 0, 0),
+    auto & ego = api_.getEntity("ego");
+    ego.setStatus(
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(34408, 0, 0),
       traffic_simulator::helper::constructActionStatus(10));
-    api_.requestSpeedChange("ego", 5, true);
-    api_.requestAssignRoute(
-      "ego", std::vector<traffic_simulator::CanonicalizedLaneletPose>{
-               traffic_simulator::helper::constructCanonicalizedLaneletPose(34630, 0.0, 0),
-               traffic_simulator::helper::constructCanonicalizedLaneletPose(34696, 0.0, 0)});
+    ego.requestSpeedChange(5, true);
+    ego.requestAssignRoute(std::vector<traffic_simulator::CanonicalizedLaneletPose>{
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(34630, 0.0, 0),
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(34696, 0.0, 0)});
   }
 };
 
