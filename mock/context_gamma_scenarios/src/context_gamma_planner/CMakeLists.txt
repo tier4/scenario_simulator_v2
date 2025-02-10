@@ -18,15 +18,15 @@ target_link_libraries(stop_at_crosswalk
   zmq
 )
 
-# ament_auto_add_executable(parked_at_crosswalk
-#   parked_at_crosswalk.cpp
-# )
-# target_link_libraries(parked_at_crosswalk
-#   ${PROTOBUF_LIBRARY}
-#   pthread
-#   sodium
-#   zmq
-# )
+ament_auto_add_executable(parked_at_crosswalk
+  parked_at_crosswalk.cpp
+)
+target_link_libraries(parked_at_crosswalk
+  ${PROTOBUF_LIBRARY}
+  pthread
+  sodium
+  zmq
+)
 
 # ament_auto_add_executable(reverse_walk_at_road
 #   reverse_walk_at_road.cpp

@@ -15,18 +15,18 @@
 #include <quaternion_operation/quaternion_operation.h>
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
-#include <context_gamma_scenarios/catalogs.hpp>
-#include <context_gamma_scenarios/context_gamma_scenario_node.hpp>
+#include <cpp_mock_scenarios/catalogs.hpp>
+#include <cpp_mock_scenarios/cpp_scenario_node.hpp>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <string>
 #include <traffic_simulator/api/api.hpp>
 #include <vector>
-class ReverseWalkAtRoadScenario : public context_gamma_scenarios::ContextGammaScenarioNode
+class ReverseWalkAtRoadScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
   explicit ReverseWalkAtRoadScenario(const rclcpp::NodeOptions & option)
-  : context_gamma_scenarios::ContextGammaScenarioNode(
+  : cpp_mock_scenarios::CppScenarioNode(
       "reverse_walk_at_road",
       ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map", "lanelet2_map.osm",
       __FILE__, false, option)
@@ -35,9 +35,8 @@ public:
   }
 
 private:
-  const geometry_msgs::msg::Pose goal_pose_ =
-    traffic_simulator::pose::toMapPose(traffic_simulator::helper::constructCanonicalizedLaneletPose(
-      34976, 2, 0, 0, 0, 0, api_.getHdmapUtils()));
+  const geometry_msgs::msg::Pose goal_pose_ = traffic_simulator::pose::toMapPose(
+    traffic_simulator::helper::constructCanonicalizedLaneletPose(34976, 2, 0, 0, 0, 0));
   void onUpdate() override
   {
     const auto t = api_.getCurrentTime();
@@ -49,39 +48,31 @@ private:
       api_.getEntityStatus("bob").getMapPose().position.x,
       api_.getEntityStatus("bob").getMapPose().position.y, 0};
     if ((target_pose - current_pose).norm() < 2.0) {
-      stop(context_gamma_scenarios::Result::SUCCESS);
+      stop(cpp_mock_scenarios::Result::SUCCESS);
     }
     // LCOV_EXCL_STOP
     if (t >= 120) {
-      stop(context_gamma_scenarios::Result::FAILURE);
+      stop(cpp_mock_scenarios::Result::FAILURE);
     }
   }
 
   void onInitialize() override
   {
     api_.spawn(
-      "ego",
-      traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34976, 0, 0, api_.getHdmapUtils()),
+      "ego", traffic_simulator::helper::constructCanonicalizedLaneletPose(34976, 0, 0),
       getVehicleParameters(), traffic_simulator::VehicleBehavior::contextGamma());
     api_.setEntityStatus(
-      "ego",
-      traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34976, 0, 0, api_.getHdmapUtils()),
+      "ego", traffic_simulator::helper::constructCanonicalizedLaneletPose(34976, 0, 0),
       traffic_simulator::helper::constructActionStatus());
     api_.requestAssignRoute(
       "ego", std::vector<traffic_simulator::CanonicalizedLaneletPose>{
-               traffic_simulator::helper::constructCanonicalizedLaneletPose(
-                 34591, 0.0, 0, api_.getHdmapUtils()),
-               traffic_simulator::helper::constructCanonicalizedLaneletPose(
-                 34690, 0.0, 0, api_.getHdmapUtils()),
+               traffic_simulator::helper::constructCanonicalizedLaneletPose(34591, 0.0, 0),
+               traffic_simulator::helper::constructCanonicalizedLaneletPose(34690, 0.0, 0),
              });
     api_.requestSpeedChange("ego", 7, true);
 
     api_.spawn(
-      "bob",
-      traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34981, 0.0, 0, api_.getHdmapUtils()),
+      "bob", traffic_simulator::helper::constructCanonicalizedLaneletPose(34981, 0.0, 0),
       getPedestrianParameters(), traffic_simulator::PedestrianBehavior::contextGamma());
     api_.requestSpeedChange(
       "bob", 1, traffic_simulator::speed_change::Transition::LINEAR,
@@ -98,8 +89,7 @@ private:
     traffic_simulator_msgs::msg::PolylineTrajectory follow_trajectory;
     follow_trajectory.shape.vertices.push_back(toVertex(
       0.0, traffic_simulator::pose::toMapPose(
-             traffic_simulator::helper::constructCanonicalizedLaneletPose(
-               34981, 0, 0, 0, 0, 0, api_.getHdmapUtils()))));
+             traffic_simulator::helper::constructCanonicalizedLaneletPose(34981, 0, 0, 0, 0, 0))));
     follow_trajectory.shape.vertices.push_back(toVertex(30.0, goal_pose_));
 
     follow_trajectory.initial_distance_offset = 0.0;

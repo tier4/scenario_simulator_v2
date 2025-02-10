@@ -15,8 +15,8 @@
 #include <quaternion_operation/quaternion_operation.h>
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
-#include <context_gamma_scenarios/catalogs.hpp>
-#include <context_gamma_scenarios/context_gamma_scenario_node.hpp>
+#include <cpp_mock_scenarios/catalogs.hpp>
+#include <cpp_mock_scenarios/cpp_scenario_node.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <traffic_simulator/api/api.hpp>
 
@@ -25,11 +25,11 @@
 #include <string>
 #include <vector>
 
-class LaneChangeTimeScenario : public context_gamma_scenarios::ContextGammaScenarioNode
+class LaneChangeTimeScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
   explicit LaneChangeTimeScenario(const rclcpp::NodeOptions & option)
-  : context_gamma_scenarios::ContextGammaScenarioNode(
+  : cpp_mock_scenarios::CppScenarioNode(
       "lane_change_time", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
       "lanelet2_map.osm", __FILE__, false, option)
   {
@@ -58,14 +58,14 @@ private:
       static_cast<traffic_simulator::LaneletPose>(api_.getEntityStatus("ego").getLaneletPose()).s >=
         23.0377) {
       if (5.0 - time_threshold < t && t < 5.0 + time_threshold) {
-        stop(context_gamma_scenarios::Result::SUCCESS);
+        stop(cpp_mock_scenarios::Result::SUCCESS);
       } else {
-        stop(context_gamma_scenarios::Result::FAILURE);
+        stop(cpp_mock_scenarios::Result::FAILURE);
       }
     }
     // LCOV_EXCL_STOP
     if (t >= 20) {
-      stop(context_gamma_scenarios::Result::FAILURE);
+      stop(cpp_mock_scenarios::Result::FAILURE);
     }
   }
 
@@ -73,9 +73,7 @@ private:
   {
     //Vehicle setting
     api_.spawn(
-      "ego",
-      traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34513, 0, 0, api_.getHdmapUtils()),
+      "ego", traffic_simulator::helper::constructCanonicalizedLaneletPose(34513, 0, 0),
       getVehicleParameters(), traffic_simulator::VehicleBehavior::contextGamma());
     api_.requestSpeedChange("ego", 7, true);
   }

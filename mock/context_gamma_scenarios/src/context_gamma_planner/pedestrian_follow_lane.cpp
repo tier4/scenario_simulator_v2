@@ -15,8 +15,8 @@
 #include <quaternion_operation/quaternion_operation.h>
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
-#include <context_gamma_scenarios/catalogs.hpp>
-#include <context_gamma_scenarios/context_gamma_scenario_node.hpp>
+#include <cpp_mock_scenarios/catalogs.hpp>
+#include <cpp_mock_scenarios/cpp_scenario_node.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <traffic_simulator/api/api.hpp>
 
@@ -25,11 +25,11 @@
 #include <string>
 #include <vector>
 
-class PedestrianFollowLane : public context_gamma_scenarios::ContextGammaScenarioNode
+class PedestrianFollowLane : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
   explicit PedestrianFollowLane(const rclcpp::NodeOptions & option)
-  : context_gamma_scenarios::ContextGammaScenarioNode(
+  : cpp_mock_scenarios::CppScenarioNode(
       "pedestrian_follow_lane",
       ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map", "lanelet2_map.osm",
       __FILE__, false, option)
@@ -49,21 +49,19 @@ private:
       step_++;
     }
     if (step_ == static_cast<int>(checkpoint_ids_.size())) {
-      stop(context_gamma_scenarios::Result::SUCCESS);
+      stop(cpp_mock_scenarios::Result::SUCCESS);
     }
 
     // LCOV_EXCL_STOP
     if (t >= 100) {
-      stop(context_gamma_scenarios::Result::FAILURE);
+      stop(cpp_mock_scenarios::Result::FAILURE);
     }
   }
 
   void onInitialize() override
   {
     api_.spawn(
-      "ego",
-      traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34426, 10.0, 0, api_.getHdmapUtils()),
+      "ego", traffic_simulator::helper::constructCanonicalizedLaneletPose(34426, 10.0, 0),
       getPedestrianParameters(), traffic_simulator::PedestrianBehavior::contextGamma());
     api_.requestSpeedChange(
       "ego", 4.0, traffic_simulator::speed_change::Transition::LINEAR,
@@ -72,14 +70,10 @@ private:
       true);
     api_.requestAssignRoute(
       "ego", std::vector<traffic_simulator::CanonicalizedLaneletPose>{
-               traffic_simulator::helper::constructCanonicalizedLaneletPose(
-                 35016, 0.0, 0, api_.getHdmapUtils()),
-               traffic_simulator::helper::constructCanonicalizedLaneletPose(
-                 35026, 0.0, 0, api_.getHdmapUtils()),
-               traffic_simulator::helper::constructCanonicalizedLaneletPose(
-                 35036, 0.0, 0, api_.getHdmapUtils()),
-               traffic_simulator::helper::constructCanonicalizedLaneletPose(
-                 34981, 1.0, 0, api_.getHdmapUtils())});
+               traffic_simulator::helper::constructCanonicalizedLaneletPose(35016, 0.0, 0),
+               traffic_simulator::helper::constructCanonicalizedLaneletPose(35026, 0.0, 0),
+               traffic_simulator::helper::constructCanonicalizedLaneletPose(35036, 0.0, 0),
+               traffic_simulator::helper::constructCanonicalizedLaneletPose(34981, 1.0, 0)});
   }
 };
 

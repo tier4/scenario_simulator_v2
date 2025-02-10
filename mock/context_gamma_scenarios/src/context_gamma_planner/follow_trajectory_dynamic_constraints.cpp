@@ -15,8 +15,8 @@
 #include <quaternion_operation/quaternion_operation.h>
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
-#include <context_gamma_scenarios/catalogs.hpp>
-#include <context_gamma_scenarios/context_gamma_scenario_node.hpp>
+#include <cpp_mock_scenarios/catalogs.hpp>
+#include <cpp_mock_scenarios/cpp_scenario_node.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <traffic_simulator/api/api.hpp>
 
@@ -25,12 +25,11 @@
 #include <string>
 #include <vector>
 
-class FollowTrajectoryDynamicConstraintsScenario
-: public context_gamma_scenarios::ContextGammaScenarioNode
+class FollowTrajectoryDynamicConstraintsScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
   explicit FollowTrajectoryDynamicConstraintsScenario(const rclcpp::NodeOptions & option)
-  : context_gamma_scenarios::ContextGammaScenarioNode(
+  : cpp_mock_scenarios::CppScenarioNode(
       "follow_trajectory_dynamic_constraints",
       ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map", "lanelet2_map.osm",
       __FILE__, false, option)
@@ -65,11 +64,11 @@ private:
     }
 
     if (vertex_num >= static_cast<int>(follow_trajectory.shape.vertices.size()) - 1) {
-      stop(context_gamma_scenarios::Result::SUCCESS);
+      stop(cpp_mock_scenarios::Result::SUCCESS);
     }
     // LCOV_EXCL_STOP
     if (t >= 40) {
-      stop(context_gamma_scenarios::Result::FAILURE);
+      stop(cpp_mock_scenarios::Result::FAILURE);
     }
   }
 
@@ -77,14 +76,10 @@ private:
   {
     //Vehicle setting
     api_.spawn(
-      "ego",
-      traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34579, 0, 0, api_.getHdmapUtils()),
+      "ego", traffic_simulator::helper::constructCanonicalizedLaneletPose(34579, 0, 0),
       getVehicleParameters(), traffic_simulator::VehicleBehavior::contextGamma());
     api_.setEntityStatus(
-      "ego",
-      traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34579, 0, 0, api_.getHdmapUtils()),
+      "ego", traffic_simulator::helper::constructCanonicalizedLaneletPose(34579, 0, 0),
       traffic_simulator::helper::constructActionStatus(10));
     api_.requestSpeedChange("ego", 7, true);
 
@@ -95,29 +90,29 @@ private:
       return vertex;
     };
     follow_trajectory.shape.vertices.push_back(toVertex(
-      0.0, traffic_simulator::pose::toMapPose(
-             traffic_simulator::helper::constructCanonicalizedLaneletPose(
-               34579, 0.0, 0, 0, 0, 0, api_.getHdmapUtils()))));
+      0.0,
+      traffic_simulator::pose::toMapPose(
+        traffic_simulator::helper::constructCanonicalizedLaneletPose(34579, 0.0, 0, 0, 0, 0))));
     follow_trajectory.shape.vertices.push_back(toVertex(
-      10.0, traffic_simulator::pose::toMapPose(
-              traffic_simulator::helper::constructCanonicalizedLaneletPose(
-                34579, 10.0, 0, 0, 0, 0, api_.getHdmapUtils()))));
+      10.0,
+      traffic_simulator::pose::toMapPose(
+        traffic_simulator::helper::constructCanonicalizedLaneletPose(34579, 10.0, 0, 0, 0, 0))));
     follow_trajectory.shape.vertices.push_back(toVertex(
-      12.0, traffic_simulator::pose::toMapPose(
-              traffic_simulator::helper::constructCanonicalizedLaneletPose(
-                34600, 30.0, 0, 0, 0, 0, api_.getHdmapUtils()))));
+      12.0,
+      traffic_simulator::pose::toMapPose(
+        traffic_simulator::helper::constructCanonicalizedLaneletPose(34600, 30.0, 0, 0, 0, 0))));
     follow_trajectory.shape.vertices.push_back(toVertex(
-      13.0, traffic_simulator::pose::toMapPose(
-              traffic_simulator::helper::constructCanonicalizedLaneletPose(
-                34600, 20.0, 0, 0, 0, 0, api_.getHdmapUtils()))));
+      13.0,
+      traffic_simulator::pose::toMapPose(
+        traffic_simulator::helper::constructCanonicalizedLaneletPose(34600, 20.0, 0, 0, 0, 0))));
     follow_trajectory.shape.vertices.push_back(toVertex(
-      14.0, traffic_simulator::pose::toMapPose(
-              traffic_simulator::helper::constructCanonicalizedLaneletPose(
-                34579, 40.0, 0, 0, 0, 0, api_.getHdmapUtils()))));
+      14.0,
+      traffic_simulator::pose::toMapPose(
+        traffic_simulator::helper::constructCanonicalizedLaneletPose(34579, 40.0, 0, 0, 0, 0))));
     follow_trajectory.shape.vertices.push_back(toVertex(
-      25.0, traffic_simulator::pose::toMapPose(
-              traffic_simulator::helper::constructCanonicalizedLaneletPose(
-                34579, 50.0, 0, 0, 0, 0, api_.getHdmapUtils()))));
+      25.0,
+      traffic_simulator::pose::toMapPose(
+        traffic_simulator::helper::constructCanonicalizedLaneletPose(34579, 50.0, 0, 0, 0, 0))));
 
     follow_trajectory.initial_distance_offset = 0.0;
     follow_trajectory.dynamic_constraints_ignorable = false;
