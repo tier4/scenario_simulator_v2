@@ -30,7 +30,7 @@ class HeadOnPedestrianScenario : public context_gamma_scenarios::ContextGammaSce
 public:
   explicit HeadOnPedestrianScenario(const rclcpp::NodeOptions & option)
   : context_gamma_scenarios::ContextGammaScenarioNode(
-      "head_on_pedstrian", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
+      "head_on_pedestrian", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
       "lanelet2_map.osm", __FILE__, false, option)
   {
     start();
