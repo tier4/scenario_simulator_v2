@@ -49,7 +49,7 @@ private:
   {
     const auto t = api_.getCurrentTime();
     const double distance_threshold = 5.0;
-    const auto ego_pos = toEigenVector3d(api_.getEntityStatus("ego").getMapPose().position);
+    const auto ego_pos = toEigenVector3d(api_.getEntity("ego").getMapPose().position);
     const auto reference_pos =
       toEigenVector3d(follow_trajectory.shape.vertices.at(vertex_num).position.position);
     if ((ego_pos - reference_pos).norm() < distance_threshold) {
@@ -77,10 +77,11 @@ private:
     api_.spawn(
       "ego", traffic_simulator::helper::constructCanonicalizedLaneletPose(34579, 0, 0),
       getVehicleParameters(), traffic_simulator::VehicleBehavior::contextGamma());
-    api_.setEntityStatus(
-      "ego", (traffic_simulator::helper::constructCanonicalizedLaneletPose(34579, 0, 0)),
+    auto & ego = api_.getEntity("ego");
+    ego.setStatus(
+      (traffic_simulator::helper::constructCanonicalizedLaneletPose(34579, 0, 0)),
       traffic_simulator::helper::constructActionStatus(10));
-    api_.requestSpeedChange("ego", 7, true);
+    ego.requestSpeedChange(7, true);
 
     auto toVertex = [](double time, const geometry_msgs::msg::Pose & pose) {
       traffic_simulator_msgs::msg::Vertex vertex;
@@ -148,7 +149,7 @@ private:
     follow_trajectory.closed = true;
     std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> follow_trajectory_ptr =
       std::make_shared<traffic_simulator_msgs::msg::PolylineTrajectory>(follow_trajectory);
-    api_.requestFollowTrajectory("ego", follow_trajectory_ptr);
+    ego.requestFollowTrajectory(follow_trajectory_ptr);
   }
 };
 

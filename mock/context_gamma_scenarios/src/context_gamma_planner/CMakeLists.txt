@@ -98,15 +98,15 @@ target_link_libraries(follow_trajectory
   zmq
 )
 
-# ament_auto_add_executable(follow_trajectory_closed
-# follow_trajectory_closed.cpp
-# )
-# target_link_libraries(follow_trajectory_closed
-#   ${PROTOBUF_LIBRARY}
-#   pthread
-#   sodium
-#   zmq
-# )
+ament_auto_add_executable(follow_trajectory_closed
+follow_trajectory_closed.cpp
+)
+target_link_libraries(follow_trajectory_closed
+  ${PROTOBUF_LIBRARY}
+  pthread
+  sodium
+  zmq
+)
 
 # ament_auto_add_executable(lane_change_time
 # lane_change_time.cpp
