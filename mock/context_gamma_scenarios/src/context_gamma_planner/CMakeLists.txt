@@ -118,15 +118,15 @@ target_link_libraries(lane_change_time
   zmq
 )
 
-# ament_auto_add_executable(lane_change_lateral
-# lane_change_lateral.cpp
-# )
-# target_link_libraries(lane_change_lateral
-#   ${PROTOBUF_LIBRARY}
-#   pthread
-#   sodium
-#   zmq
-# )
+ament_auto_add_executable(lane_change_lateral
+lane_change_lateral.cpp
+)
+target_link_libraries(lane_change_lateral
+  ${PROTOBUF_LIBRARY}
+  pthread
+  sodium
+  zmq
+)
 
 # ament_auto_add_executable(lane_change_longitudinal
 # lane_change_longitudinal.cpp
