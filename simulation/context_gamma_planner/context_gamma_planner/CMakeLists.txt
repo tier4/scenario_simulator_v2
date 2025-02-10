@@ -63,7 +63,7 @@ if(BUILD_TESTING)
 endif()
 
 install(
-  DIRECTORY config launch #test/maps
+  DIRECTORY config launch test/maps
   DESTINATION share/${PROJECT_NAME}
 )
 
