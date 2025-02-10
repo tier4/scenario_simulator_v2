@@ -40,10 +40,10 @@ private:
   void onUpdate() override
   {
     const auto t = api_.getCurrentTime();
+    auto & ego = api_.getEntity("ego");
     const double time_threshold = 1.0;
     if (1 < t && t < 1.1) {
-      api_.requestLaneChange(
-        "ego",
+      ego.requestLaneChange(
         traffic_simulator::lane_change::RelativeTarget(
           "ego", traffic_simulator::lane_change::Direction::RIGHT, 1, 0.0),
         traffic_simulator::lane_change::TrajectoryShape::CUBIC,
@@ -51,16 +51,15 @@ private:
           traffic_simulator::lane_change::Constraint::Type::TIME, 4.0,
           traffic_simulator::lane_change::Constraint::Policy::BEST_EFFORT));
     }
-    if (
-      // api_.getEntityStatus("ego").getLaneletPose() and
-      static_cast<traffic_simulator::LaneletPose>(api_.getEntityStatus("ego").getLaneletPose())
-          .lanelet_id == 34462 and
-      static_cast<traffic_simulator::LaneletPose>(api_.getEntityStatus("ego").getLaneletPose()).s >=
-        23.0377) {
-      if (5.0 - time_threshold < t && t < 5.0 + time_threshold) {
-        stop(cpp_mock_scenarios::Result::SUCCESS);
-      } else {
-        stop(cpp_mock_scenarios::Result::FAILURE);
+    if (const auto & lanelet_pose = ego.getCanonicalizedLaneletPose()) {
+      if (
+        lanelet_pose.value().getLaneletPose().lanelet_id == 34462 &&
+        lanelet_pose.value().getLaneletPose().s >= 23.0377) {
+        if (5.0 - time_threshold < t && t < 5.0 + time_threshold) {
+          stop(cpp_mock_scenarios::Result::SUCCESS);
+        } else {
+          stop(cpp_mock_scenarios::Result::FAILURE);
+        }
       }
     }
     // LCOV_EXCL_STOP
@@ -75,7 +74,8 @@ private:
     api_.spawn(
       "ego", traffic_simulator::helper::constructCanonicalizedLaneletPose(34513, 0, 0),
       getVehicleParameters(), traffic_simulator::VehicleBehavior::contextGamma());
-    api_.requestSpeedChange("ego", 7, true);
+    auto & ego = api_.getEntity("ego");
+    ego.requestSpeedChange(7, true);
   }
 };
 
