@@ -86,7 +86,7 @@ def launch_setup(context, *args, **kwargs):
     port                                = LaunchConfiguration("port",                                   default=5555)
     publish_empty_context               = LaunchConfiguration("publish_empty_context",                  default=False)
     record                              = LaunchConfiguration("record",                                 default=True)
-    record_storage_id                   = LaunchConfiguration("record_storage_id",                      default="sqlite3")
+    record_storage_id                   = LaunchConfiguration("record_storage_id",                      default="")
     rviz_config                         = LaunchConfiguration("rviz_config",                            default=default_rviz_config_file())
     scenario                            = LaunchConfiguration("scenario",                               default=Path("/dev/null"))
     sensor_model                        = LaunchConfiguration("sensor_model",                           default="")

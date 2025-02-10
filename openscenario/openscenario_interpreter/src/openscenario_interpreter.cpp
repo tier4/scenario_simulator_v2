@@ -43,7 +43,7 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   output_directory("/tmp"),
   publish_empty_context(false),
   record(false),
-  record_storage_id("sqlite3")
+  record_storage_id("")
 {
   DECLARE_PARAMETER(local_frame_rate);
   DECLARE_PARAMETER(local_real_time_factor);
@@ -221,9 +221,14 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
       },
       [&]() {
         if (record) {
-          record::start(
-            "-a", "-s", record_storage_id, "-o",
-            boost::filesystem::path(osc_path).replace_extension("").string());
+          if (record_storage_id == "") {
+            record::start(
+              "-a", "-o", boost::filesystem::path(osc_path).replace_extension("").string());
+          } else {
+            record::start(
+              "-a", "-o", boost::filesystem::path(osc_path).replace_extension("").string(), "-s",
+              record_storage_id);
+          }
         }
 
         SimulatorCore::activate(
