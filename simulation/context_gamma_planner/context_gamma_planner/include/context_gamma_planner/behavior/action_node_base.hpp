@@ -73,7 +73,7 @@ public:
       BT::OutputPort<traffic_simulator::behavior::Request>("request"),
       BT::InputPort<entity_behavior::EntityStatusDict>("other_entity_status"),
       BT::InputPort<std::vector<lanelet::Id>>("route_lanelets"),
-      BT::InputPort<std::shared_ptr<traffic_simulator::TrafficLights>>("traffic_lights"),
+      BT::InputPort<std::shared_ptr<traffic_simulator::TrafficLightsBase>>("traffic_lights"),
       BT::OutputPort<std::shared_ptr<hdmap_utils::HdMapUtils>>("hdmap_utils"),
       BT::OutputPort<std::optional<traffic_simulator_msgs::msg::Obstacle>>("obstacle"),
       BT::OutputPort<traffic_simulator_msgs::msg::WaypointsArray>("waypoints")};
@@ -89,7 +89,7 @@ protected:
   std::shared_ptr<constraints::ConstraintActivatorBase> activator;
   traffic_simulator::behavior::Request request;
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils;
-  std::shared_ptr<traffic_simulator::TrafficLights> traffic_lights;
+  std::shared_ptr<traffic_simulator::TrafficLightsBase> traffic_lights;
   std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus> entity_status;
   double current_time;
   double step_time;
