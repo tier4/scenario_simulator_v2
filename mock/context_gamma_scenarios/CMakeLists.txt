@@ -23,21 +23,6 @@ include(FindProtobuf REQUIRED)
 
 ament_auto_find_build_dependencies()
 
-ament_auto_add_library(context_gamma_scenario_node SHARED
-  src/context_gamma_scenario_node.cpp
-)
-target_link_libraries(context_gamma_scenario_node
-  ${PROTOBUF_LIBRARY}
-  pthread
-  sodium
-  zmq
-)
-
-# ament_auto_add_executable(traffic_simulation_context_gamma_demo
-#   src/traffic_simulation_demo.cpp
-# )
-# target_link_libraries(traffic_simulation_context_gamma_demo context_gamma_scenario_node)
-
 option(BUILD_CPP_MOCK_SCENARIOS "Building the C++ scenarios" OFF)
 if(BUILD_CPP_MOCK_SCENARIOS)
   add_subdirectory(src/context_gamma_planner)

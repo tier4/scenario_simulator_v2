@@ -16,6 +16,7 @@
   <depend>simple_junit</depend>
   <depend>simple_sensor_simulator</depend>
   <depend>traffic_simulator</depend>
+  <depend>cpp_mock_scenarios</depend>
 
   <exec_depend>openscenario_visualization</exec_depend>
   <exec_depend>scenario_test_runner</exec_depend>

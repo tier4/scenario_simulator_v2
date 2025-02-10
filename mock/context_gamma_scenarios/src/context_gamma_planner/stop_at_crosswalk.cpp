@@ -15,8 +15,8 @@
 #include <quaternion_operation/quaternion_operation.h>
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
-#include <context_gamma_scenarios/catalogs.hpp>
-#include <context_gamma_scenarios/context_gamma_scenario_node.hpp>
+#include <cpp_mock_scenarios/catalogs.hpp>
+#include <cpp_mock_scenarios/cpp_scenario_node.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <traffic_simulator/api/api.hpp>
 
@@ -25,11 +25,11 @@
 #include <string>
 #include <vector>
 
-class StopAtCrosswalkScenario : public context_gamma_scenarios::ContextGammaScenarioNode
+class StopAtCrosswalkScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
   explicit StopAtCrosswalkScenario(const rclcpp::NodeOptions & option)
-  : context_gamma_scenarios::ContextGammaScenarioNode(
+  : cpp_mock_scenarios::CppScenarioNode(
       "stop_at_crosswalk", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
       "lanelet2_map.osm", __FILE__, false, option)
   {
@@ -41,21 +41,20 @@ private:
   void onUpdate() override
   {
     const auto t = api_.getCurrentTime();
-    if (
-      static_cast<traffic_simulator::LaneletPose>(api_.getEntityStatus("ego").getLaneletPose())
-          .lanelet_id == 34981 &&
-      api_.getCurrentTwist("ego").linear.x < 2.0) {
-      is_stoped_ = true;
+    const auto & ego = api_.getEntity("ego");
+    if (const auto & lanelet_pose = ego.getCanonicalizedLaneletPose()) {
+      if (lanelet_pose.value().getLaneletId() == 34981 && ego.getCurrentTwist().linear.x < 2.0) {
+        is_stoped_ = true;
+      }
     }
-    if (
-      static_cast<traffic_simulator::LaneletPose>(api_.getEntityStatus("ego").getLaneletPose())
-          .lanelet_id == 34579 &&
-      is_stoped_) {
-      stop(context_gamma_scenarios::Result::SUCCESS);
+    if (const auto & lanelet_pose = ego.getCanonicalizedLaneletPose()) {
+      if (lanelet_pose.value().getLaneletId() == 34579 && is_stoped_) {
+        stop(cpp_mock_scenarios::Result::SUCCESS);
+      }
     }
     // LCOV_EXCL_STOP
     if (t >= 40) {
-      stop(context_gamma_scenarios::Result::FAILURE);
+      stop(cpp_mock_scenarios::Result::FAILURE);
     }
   }
 
@@ -63,38 +62,30 @@ private:
   {
     //Vehicle setting
     api_.spawn(
-      "ego",
-      traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        120545, 0, 0, api_.getHdmapUtils()),
+      "ego", traffic_simulator::helper::constructCanonicalizedLaneletPose(120545, 0, 0),
       getVehicleParameters(), traffic_simulator::VehicleBehavior::contextGamma());
-    api_.setEntityStatus(
-      "ego",
-      traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        120545, 0, 0, api_.getHdmapUtils()),
+    auto & ego = api_.getEntity("ego");
+    ego.setStatus(
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(120545, 0, 0),
       traffic_simulator::helper::constructActionStatus(10));
-    api_.requestSpeedChange("ego", 7, true);
-    api_.requestAssignRoute(
-      "ego", std::vector<traffic_simulator::CanonicalizedLaneletPose>{
-               traffic_simulator::helper::constructCanonicalizedLaneletPose(
-                 34675, 0.0, 0, api_.getHdmapUtils()),
-               traffic_simulator::helper::constructCanonicalizedLaneletPose(
-                 34690, 0.0, 0, api_.getHdmapUtils())});
+    ego.requestSpeedChange(7, true);
+    ego.requestAssignRoute(std::vector<traffic_simulator::CanonicalizedLaneletPose>{
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(34675, 0.0, 0),
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(34690, 0.0, 0)});
 
     //Pedestrian setting
     api_.spawn(
-      "bob",
-      traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34378, 0.0, 0, api_.getHdmapUtils()),
+      "bob", traffic_simulator::helper::constructCanonicalizedLaneletPose(34378, 0.0, 0),
       getPedestrianParameters(), traffic_simulator::PedestrianBehavior::contextGamma());
-    api_.requestSpeedChange(
-      "bob", 0.5, traffic_simulator::speed_change::Transition::LINEAR,
+    auto & bob = api_.getEntity("bob");
+    bob.requestSpeedChange(
+      0.5, traffic_simulator::speed_change::Transition::LINEAR,
       traffic_simulator::speed_change::Constraint(
         traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 1.0),
       true);
     const geometry_msgs::msg::Pose goal_pose = traffic_simulator::pose::toMapPose(
-      traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34378, 7.5, 0, 0, 0, 0, api_.getHdmapUtils()));
-    api_.requestAcquirePosition("bob", goal_pose);
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(34378, 7.5, 0, 0, 0, 0));
+    bob.requestAcquirePosition(goal_pose);
   }
 };
 
