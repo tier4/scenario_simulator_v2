@@ -1,0 +1,165 @@
+// Copyright 2015 TIER IV, Inc. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#include <context_gamma_scenarios/context_gamma_scenario_node.hpp>
+#include <iostream>
+
+namespace context_gamma_scenarios
+{
+ContextGammaScenarioNode::ContextGammaScenarioNode(
+  const std::string & node_name, const std::string & map_path,
+  const std::string & lanelet2_map_file, const std::string & scenario_filename, const bool verbose,
+  const rclcpp::NodeOptions & option,
+  const std::set<std::uint8_t> & auto_sink_entity_types /*= {}*/)
+: Node(node_name, option),
+  api_(
+    this,
+    configure(map_path, lanelet2_map_file, scenario_filename, verbose, auto_sink_entity_types),
+    declare_parameter<double>("global_real_time_factor", 1.0),
+    declare_parameter<double>("global_frame_rate", 20.0)),
+  scenario_filename_(scenario_filename),
+  exception_expect_(false)
+{
+  declare_parameter<std::string>("junit_path", "/tmp");
+  get_parameter<std::string>("junit_path", junit_path_);
+  declare_parameter<int>("global_timeout", 10.0);
+  get_parameter<int>("global_timeout", timeout_);
+
+  traffic_simulator::lanelet_pose::CanonicalizedLaneletPose::setConsiderPoseByRoadSlope([&]() {
+    if (not has_parameter("consider_pose_by_road_slope")) {
+      declare_parameter("consider_pose_by_road_slope", false);
+    }
+    return get_parameter("consider_pose_by_road_slope").as_bool();
+  }());
+}
+
+void ContextGammaScenarioNode::update()
+{
+  onUpdate();
+  try {
+    api_.updateFrame();
+    if (api_.getCurrentTime() >= timeout_) {
+      stop(Result::FAILURE);
+    }
+  } catch (const common::scenario_simulator_exception::Error & e) {
+    RCLCPP_ERROR_STREAM(get_logger(), e.what());
+    if (exception_expect_) {
+      stop(Result::SUCCESS);
+    } else {
+      stop(Result::FAILURE);
+    }
+  }
+}
+
+void ContextGammaScenarioNode::start()
+{
+  onInitialize();
+  api_.startNpcLogic();
+  const auto rate =
+    std::chrono::duration<double>(1.0 / get_parameter("global_frame_rate").as_double());
+  update_timer_ = this->create_wall_timer(rate, std::bind(&ContextGammaScenarioNode::update, this));
+}
+
+void ContextGammaScenarioNode::stop(Result result, const std::string & description)
+{
+  junit_.testsuite("context_gamma_scenario");
+  switch (result) {
+    case Result::SUCCESS: {
+      common::junit::Pass pass_case;
+      junit_.testsuite("context_gamma_scenario")
+        .testcase(scenario_filename_)
+        .pass.push_back(pass_case);
+      std::cout << "context_gamma_scenario:success" << std::endl;
+      break;
+    }
+    case Result::FAILURE: {
+      common::junit::Failure failure_case("result", "failure");
+      failure_case.message = description;
+      junit_.testsuite("context_gamma_scenario")
+        .testcase(scenario_filename_)
+        .failure.push_back(failure_case);
+      std::cerr << "context_gamma_scenario:failure" << std::endl;
+      break;
+    }
+  }
+  // junit_.testsuite("context_gamma_scenario").testcase(scenario_filename_).time = api_.getCurrentTime();
+  junit_.write_to(junit_path_.c_str(), "  ");
+  update_timer_->cancel();
+  rclcpp::shutdown();
+  std::exit(0);
+}
+
+void ContextGammaScenarioNode::spawnEgoEntity(
+  const traffic_simulator::CanonicalizedLaneletPose & spawn_lanelet_pose,
+  const std::vector<traffic_simulator::CanonicalizedLaneletPose> & goal_lanelet_poses,
+  const traffic_simulator_msgs::msg::VehicleParameters & parameters)
+{
+  api_.updateFrame();
+  std::this_thread::sleep_for(std::chrono::duration<double>(1.0 / 20.0));
+  api_.spawn("ego", spawn_lanelet_pose, parameters, traffic_simulator::VehicleBehavior::autoware());
+  auto ego_entity = api_.getEgoEntity("ego");
+  ego_entity->setParameter<bool>("allow_goal_modification", true);
+  api_.attachLidarSensor("ego", 0.0);
+
+  api_.attachDetectionSensor("ego", 200.0, true, 0.0, 0, 0.0, 0.0);
+
+  api_.attachOccupancyGridSensor([this] {
+    simulation_api_schema::OccupancyGridSensorConfiguration configuration;
+    // clang-format off
+      configuration.set_architecture_type(api_.getROS2Parameter<std::string>("architecture_type", "awf/universe/20240605"));
+      configuration.set_entity("ego");
+      configuration.set_filter_by_range(true);
+      configuration.set_height(200);
+      configuration.set_range(300);
+      configuration.set_resolution(0.5);
+      configuration.set_update_duration(0.1);
+      configuration.set_width(200);
+    // clang-format on
+    return configuration;
+  }());
+  ego_entity->requestAssignRoute(goal_lanelet_poses);
+
+  using namespace std::chrono_literals;
+  while (!ego_entity->isEngaged()) {
+    if (ego_entity->isEngageable()) {
+      ego_entity->engage();
+    }
+    api_.updateFrame();
+    std::this_thread::sleep_for(std::chrono::duration<double>(1.0 / 20.0));
+  }
+}
+
+auto ContextGammaScenarioNode::isVehicle(const std::string & name) const -> bool
+{
+  return api_.getEntity(name)->getEntityType().type ==
+         traffic_simulator_msgs::msg::EntityType::VEHICLE;
+}
+
+auto ContextGammaScenarioNode::isPedestrian(const std::string & name) const -> bool
+{
+  return api_.getEntity(name)->getEntityType().type ==
+         traffic_simulator_msgs::msg::EntityType::PEDESTRIAN;
+}
+
+void ContextGammaScenarioNode::checkConfiguration(
+  const traffic_simulator::Configuration & configuration)
+{
+  try {
+    configuration.getLanelet2MapFile();
+    configuration.getPointCloudMapFile();
+  } catch (const common::SimulationError &) {
+    stop(Result::FAILURE);
+  }
+}
+}  // namespace context_gamma_scenarios

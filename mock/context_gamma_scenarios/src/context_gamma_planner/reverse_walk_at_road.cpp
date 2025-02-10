@@ -15,18 +15,18 @@
 #include <quaternion_operation/quaternion_operation.h>
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
-#include <cpp_mock_scenarios/catalogs.hpp>
-#include <cpp_mock_scenarios/cpp_scenario_node.hpp>
+#include <context_gamma_scenarios/catalogs.hpp>
+#include <context_gamma_scenarios/context_gamma_scenario_node.hpp>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <string>
 #include <traffic_simulator/api/api.hpp>
 #include <vector>
-class ReverseWalkAtRoadScenario : public cpp_mock_scenarios::CppScenarioNode
+class ReverseWalkAtRoadScenario : public context_gamma_scenarios::ContextGammaScenarioNode
 {
 public:
   explicit ReverseWalkAtRoadScenario(const rclcpp::NodeOptions & option)
-  : cpp_mock_scenarios::CppScenarioNode(
+  : context_gamma_scenarios::ContextGammaScenarioNode(
       "reverse_walk_at_road",
       ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map", "lanelet2_map.osm",
       __FILE__, false, option)
@@ -49,11 +49,11 @@ private:
       api_.getEntityStatus("bob").getMapPose().position.x,
       api_.getEntityStatus("bob").getMapPose().position.y, 0};
     if ((target_pose - current_pose).norm() < 2.0) {
-      stop(cpp_mock_scenarios::Result::SUCCESS);
+      stop(context_gamma_scenarios::Result::SUCCESS);
     }
     // LCOV_EXCL_STOP
     if (t >= 120) {
-      stop(cpp_mock_scenarios::Result::FAILURE);
+      stop(context_gamma_scenarios::Result::FAILURE);
     }
   }
 

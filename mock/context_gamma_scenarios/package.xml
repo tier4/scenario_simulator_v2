@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>cpp_mock_scenarios</name>
-  <version>10.0.0</version>
-  <description>C++ mock scenarios</description>
+  <name>context_gamma_scenarios</name>
+  <version>9.0.2</version>
+  <description>C++ mock scenarios for context_gamma_planner plugin</description>
   <maintainer email="masaya.kataoka@tier4.jp">masaya</maintainer>
   <license>Apache License 2.0</license>
 
@@ -20,7 +20,7 @@
   <exec_depend>openscenario_visualization</exec_depend>
   <exec_depend>scenario_test_runner</exec_depend>
   <exec_depend>behavior_tree_plugin</exec_depend>
-  <!-- <exec_depend>context_gamma_planner</exec_depend> -->
+  <exec_depend>context_gamma_planner</exec_depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_cmake_clang_format</test_depend>
