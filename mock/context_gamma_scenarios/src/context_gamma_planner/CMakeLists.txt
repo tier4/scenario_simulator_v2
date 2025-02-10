@@ -48,15 +48,15 @@ target_link_libraries(pedestrian_follow_lane
   zmq
 )
 
-# ament_auto_add_executable(stop_line_running
-#   stop_line_running.cpp
-# )
-# target_link_libraries(stop_line_running
-#   ${PROTOBUF_LIBRARY}
-#   pthread
-#   sodium
-#   zmq
-# )
+ament_auto_add_executable(stop_line_running
+  stop_line_running.cpp
+)
+target_link_libraries(stop_line_running
+  ${PROTOBUF_LIBRARY}
+  pthread
+  sodium
+  zmq
+)
 
 # ament_auto_add_executable(traffic_light_running
 #   traffic_light_running.cpp
