@@ -21,6 +21,33 @@ Changelog for package traffic_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+10.0.0 (2025-02-07)
+-------------------
+* Merge pull request `#1500 <https://github.com/tier4/scenario_simulator_v2/issues/1500>`_ from tier4/RJD-1057-remove-functions-forwarded-to-entity-base-middle-get-entity
+  [extra] RJD-1057 (3+/5): change getEntity return type to the reference
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-middle-get-entity
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-middle-get-entity
+* Merge remote-tracking branch 'tier4/master' into RJD-1057-remove-functions-forwarded-to-entity-base-middle-get-entity
+* Merge branch 'RJD-1057-remove-functions-forwarded-to-entity-base-middle' into RJD-1057-remove-functions-forwarded-to-entity-base-middle-get-entity
+* Merge branch 'RJD-1057-remove-functions-forwarded-to-entity-base-middle' into RJD-1057-remove-functions-forwarded-to-entity-base-middle-get-entity
+* Merge remote-tracking branch 'tier4/RJD-1057-remove-functions-forwarded-to-entity-base-middle' into RJD-1057-remove-functions-forwarded-to-entity-base-middle-get-entity
+* Merge remote-tracking branch 'tier4/RJD-1057-remove-functions-forwarded-to-entity-base-middle' into RJD-1057-remove-functions-forwarded-to-entity-base-middle-get-entity
+* Merge branch 'RJD-1057-remove-functions-forwarded-to-entity-base-middle' into RJD-1057-remove-functions-forwarded-to-entity-base-middle-get-entity
+* ref(traffic_simulator, simulator_core): apply solar required changes
+* ref(traffic_simulator): apply clang reformat
+* ref(traffic_simulator): add guard to EntityBase - remove copy and move constuctor, as well as assignments
+* ref(traffic_simulator, simulator_core): rename getEntityOrNullptr to getEntityPointer
+* ref(traffic_simulator): change getEntity return type to reference, adapt api and core
+* Contributors: Dawid Moszynski, Dawid Moszyński, Mateusz Palczuk, Tatsuya Yamasaki
+
+9.4.0 (2025-02-06)
+------------------
+* Merge branch 'master' into feature/support-latest-autoware-message-type
+* Merge branch 'master' into feature/support-latest-autoware-message-type
+* Merge remote-tracking branch 'origin/master' into feature/support-latest-autoware-message-type
+* Merge branch 'master' into feature/support-latest-autoware-message-type
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
 9.3.1 (2025-02-06)
 ------------------
 * Merge branch 'master' into chore/delete-target-branch-filter
