@@ -1,12 +1,12 @@
-# ament_auto_add_executable(spawn
-#   spawn.cpp
-# )
-# target_link_libraries(spawn
-#   ${PROTOBUF_LIBRARY}
-#   pthread
-#   sodium
-#   zmq
-# )
+ament_auto_add_executable(spawn
+  spawn.cpp
+)
+target_link_libraries(spawn
+  ${PROTOBUF_LIBRARY}
+  pthread
+  sodium
+  zmq
+)
 
 ament_auto_add_executable(stop_at_crosswalk
   stop_at_crosswalk.cpp
