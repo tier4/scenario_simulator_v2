@@ -109,14 +109,13 @@ public:
   template <typename PoseType, typename ParamsType>
   auto spawn(
     const std::string & name, const PoseType & pose, const ParamsType & parameters,
-    const std::string & behavior = "", const std::string & model3d = "")
-    -> std::shared_ptr<entity::EntityBase>
+    const std::string & behavior = "", const std::string & model3d = "") -> entity::EntityBase &
   {
     using VehicleParameters = traffic_simulator_msgs::msg::VehicleParameters;
     using PedestrianParameters = traffic_simulator_msgs::msg::PedestrianParameters;
     using MiscObjectParameters = traffic_simulator_msgs::msg::MiscObjectParameters;
 
-    auto register_to_entity_manager = [&]() {
+    auto register_to_entity_manager = [&]() -> entity::EntityBase & {
       if constexpr (std::is_same_v<ParamsType, VehicleParameters>) {
         if (behavior == VehicleBehavior::autoware()) {
           return entity_manager_ptr_->spawnEntity<entity::EgoEntity>(
@@ -142,7 +141,7 @@ public:
       simulation_interface::toProto(parameters, *request.mutable_parameters());
       request.mutable_parameters()->set_name(name);
       request.set_asset_key(model3d);
-      simulation_interface::toProto(entity->getMapPose(), *request.mutable_pose());
+      simulation_interface::toProto(entity.getMapPose(), *request.mutable_pose());
       return zeromq_client_.call(request).result().success();
     };
 
@@ -168,8 +167,8 @@ public:
       }
     };
 
-    const auto entity = register_to_entity_manager();
-    if (entity && register_to_environment_simulator(entity)) {
+    auto & entity = register_to_entity_manager();
+    if (register_to_environment_simulator(entity)) {
       return entity;
     } else {
       THROW_SEMANTIC_ERROR("Spawn entity ", std::quoted(name), " resulted in failure.");
@@ -203,20 +202,22 @@ public:
   // ego - checks, getters
   auto isAnyEgoSpawned() const -> bool;
 
-  auto getEgoName() const -> const std::string &;
+  auto getFirstEgoName() const -> std::optional<std::string>;
 
-  auto getEgoEntity() const -> std::shared_ptr<entity::EgoEntity>;
+  auto getEgoEntity(const std::string & name) -> entity::EgoEntity &;
 
-  auto getEgoEntity(const std::string & name) const -> std::shared_ptr<entity::EgoEntity>;
+  auto getEgoEntity(const std::string & name) const -> const entity::EgoEntity &;
 
   // entities - checks, getters
   auto isEntityExist(const std::string & name) const -> bool;
 
   auto getEntityNames() const -> std::vector<std::string>;
 
-  auto getEntity(const std::string & name) const -> std::shared_ptr<entity::EntityBase>;
+  auto getEntity(const std::string & name) -> entity::EntityBase &;
 
-  auto getEntityOrNullptr(const std::string & name) const -> std::shared_ptr<entity::EntityBase>;
+  auto getEntity(const std::string & name) const -> const entity::EntityBase &;
+
+  auto getEntityPointer(const std::string & name) const -> std::shared_ptr<entity::EntityBase>;
 
   // entities - respawn, despawn, reset
   auto resetBehaviorPlugin(const std::string & name, const std::string & behavior_plugin_name)

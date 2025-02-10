@@ -75,12 +75,12 @@ private:
         stop(cpp_mock_scenarios::Result::FAILURE);  // LCOV_EXCL_LINE
       }
       for (const auto & name : names) {
-        const auto entity = api_.getEntity(name);
-        if (!entity->isInLanelet()) {
+        const auto & entity = api_.getEntity(name);
+        if (!entity.isInLanelet()) {
           stop(cpp_mock_scenarios::Result::FAILURE);  // LCOV_EXCL_LINE
         } else {
           const bool valid_vehicle_lanelet =
-            entity->isInLanelet(34705, 50.0) || entity->isInLanelet(34696, 50.0);
+            entity.isInLanelet(34705, 50.0) || entity.isInLanelet(34696, 50.0);
           if (!valid_vehicle_lanelet || !isVehicle(name)) {
             stop(cpp_mock_scenarios::Result::FAILURE);  // LCOV_EXCL_LINE
           }
@@ -92,11 +92,11 @@ private:
 
   void onInitialize() override
   {
-    auto ego_entity = api_.spawn(
+    auto & ego_entity = api_.spawn(
       "ego", traffic_simulator::helper::constructCanonicalizedLaneletPose(34570, 0.0, 0.0),
       getVehicleParameters());
-    ego_entity->setLinearVelocity(0.0);
-    ego_entity->requestSpeedChange(0.0, true);
+    ego_entity.setLinearVelocity(0.0);
+    ego_entity.requestSpeedChange(0.0, true);
   }
 
   bool traffic_source_added_ = false;

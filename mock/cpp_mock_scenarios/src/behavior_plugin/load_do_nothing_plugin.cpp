@@ -42,13 +42,13 @@ private:
     /// @note When using the do_nothing plugin, the return value of the `getCurrentAction` function is always do_nothing.
 
     if (
-      api_.getEntity("ego")->getCurrentAction() != "do_nothing" ||
-      api_.getEntity("pedestrian")->getCurrentAction() != "do_nothing") {
+      api_.getEntity("ego").getCurrentAction() != "do_nothing" ||
+      api_.getEntity("pedestrian").getCurrentAction() != "do_nothing") {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     if (
-      api_.getEntity("vehicle_spawn_with_behavior_tree")->getCurrentAction() == "do_nothing" ||
-      api_.getEntity("pedestrian_spawn_with_behavior_tree")->getCurrentAction() == "do_nothing") {
+      api_.getEntity("vehicle_spawn_with_behavior_tree").getCurrentAction() == "do_nothing" ||
+      api_.getEntity("pedestrian_spawn_with_behavior_tree").getCurrentAction() == "do_nothing") {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     api_.resetBehaviorPlugin(
@@ -60,8 +60,8 @@ private:
 
     /// @note After the reset, the Entity objects are invalidated, so we need to obtain new ones.
     if (
-      api_.getEntity("vehicle_spawn_with_behavior_tree")->getCurrentAction() != "do_nothing" ||
-      api_.getEntity("pedestrian_spawn_with_behavior_tree")->getCurrentAction() != "do_nothing") {
+      api_.getEntity("vehicle_spawn_with_behavior_tree").getCurrentAction() != "do_nothing" ||
+      api_.getEntity("pedestrian_spawn_with_behavior_tree").getCurrentAction() != "do_nothing") {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
 

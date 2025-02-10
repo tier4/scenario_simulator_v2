@@ -39,11 +39,11 @@ private:
   int lanechange_frames = 0;
   void onUpdate() override
   {
-    const auto ego_entity = api_.getEntity("ego");
-    if (ego_entity->getCurrentAction() == "lane_change") {
+    const auto & ego_entity = api_.getEntity("ego");
+    if (ego_entity.getCurrentAction() == "lane_change") {
       lanechange_frames++;
     }
-    if (ego_entity->getCurrentAction() != "lane_change" && api_.getCurrentTime() >= 10.0) {
+    if (ego_entity.getCurrentAction() != "lane_change" && api_.getCurrentTime() >= 10.0) {
       if (const double step_time = 50e-3, expected_time = 20.0,
           real_time = static_cast<double>(lanechange_frames) * step_time;
           expected_time - step_time <= real_time && real_time <= expected_time + step_time) {
@@ -60,12 +60,12 @@ private:
   }
   void onInitialize() override
   {
-    auto ego_entity = api_.spawn(
+    auto & ego_entity = api_.spawn(
       "ego", traffic_simulator::helper::constructCanonicalizedLaneletPose(34462, 10.0, 0.0),
       getVehicleParameters());
-    ego_entity->setLinearVelocity(10);
-    ego_entity->requestSpeedChange(10, true);
-    ego_entity->requestLaneChange(
+    ego_entity.setLinearVelocity(10);
+    ego_entity.requestSpeedChange(10, true);
+    ego_entity.requestLaneChange(
       traffic_simulator::lane_change::RelativeTarget(
         "ego", traffic_simulator::lane_change::Direction::LEFT, 1, 0),
       traffic_simulator::lane_change::TrajectoryShape::LINEAR,
