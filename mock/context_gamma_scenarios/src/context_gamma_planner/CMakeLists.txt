@@ -211,42 +211,42 @@ endif()
 
 install(TARGETS
   stop_at_crosswalk
-  # parked_at_crosswalk
-  # reverse_walk_at_road
-  # spawn
-  # pedestrian_follow_lane
-  # stop_line_running
-  # traffic_light_running
-  # head_on_pedestrian
-  # adaptive_cruise
-  # follow_trajectory
-  # follow_trajectory_closed
-  # lane_change_time
-  # lane_change_lateral
-  # lane_change_longitudinal
-  # follow_trajectory_dynamic_constraints
-  # road_end
+  parked_at_crosswalk
+  reverse_walk_at_road
+  spawn
+  pedestrian_follow_lane
+  stop_line_running
+  traffic_light_running
+  head_on_pedestrian
+  adaptive_cruise
+  follow_trajectory
+  follow_trajectory_closed
+  lane_change_time
+  lane_change_lateral
+  lane_change_longitudinal
+  follow_trajectory_dynamic_constraints
+  road_end
   DESTINATION lib/${PROJECT_NAME}
 )
 
-# if(BUILD_TESTING)
-#   find_package(ament_lint_auto REQUIRED)
-#   ament_lint_auto_find_test_dependencies()
-#   include(../../cmake/add_context_gamma_scenario_test.cmake)
-#   add_context_gamma_scenario_test(${PROJECT_NAME} "spawn" "20.0")
-#   add_context_gamma_scenario_test(${PROJECT_NAME} "parked_at_crosswalk" "60.0")
-#   add_context_gamma_scenario_test(${PROJECT_NAME} "pedestrian_follow_lane" "60.0")
-#   add_context_gamma_scenario_test(${PROJECT_NAME} "reverse_walk_at_road" "120.0")
-#   add_context_gamma_scenario_test(${PROJECT_NAME} "stop_at_crosswalk" "40.0")
-#   add_context_gamma_scenario_test(${PROJECT_NAME} "stop_line_running" "200.0")
-#   add_context_gamma_scenario_test(${PROJECT_NAME} "traffic_light_running" "30.0")
-#   add_context_gamma_scenario_test(${PROJECT_NAME} "head_on_pedestrian" "60.0")
-#   add_context_gamma_scenario_test(${PROJECT_NAME} "adaptive_cruise" "120.0")
-#   add_context_gamma_scenario_test(${PROJECT_NAME} "follow_trajectory" "40.0")
-#   add_context_gamma_scenario_test(${PROJECT_NAME} "follow_trajectory_closed" "80.0")
-#   add_context_gamma_scenario_test(${PROJECT_NAME} "lane_change_time" "20.0")
-#   add_context_gamma_scenario_test(${PROJECT_NAME} "lane_change_lateral" "20.0")
-#   add_context_gamma_scenario_test(${PROJECT_NAME} "lane_change_longitudinal" "20.0")
-#   add_context_gamma_scenario_test(${PROJECT_NAME} "follow_trajectory_dynamic_constraints" "40.0")
-#   add_context_gamma_scenario_test(${PROJECT_NAME} "road_end" "30.0")
-# endif()
+if(BUILD_TESTING)
+  find_package(ament_lint_auto REQUIRED)
+  ament_lint_auto_find_test_dependencies()
+  include(../../cmake/add_context_gamma_scenario_test.cmake)
+  add_context_gamma_scenario_test(${PROJECT_NAME} "spawn" "20.0")
+  add_context_gamma_scenario_test(${PROJECT_NAME} "parked_at_crosswalk" "60.0")
+  add_context_gamma_scenario_test(${PROJECT_NAME} "pedestrian_follow_lane" "60.0")
+  add_context_gamma_scenario_test(${PROJECT_NAME} "reverse_walk_at_road" "120.0")
+  add_context_gamma_scenario_test(${PROJECT_NAME} "stop_at_crosswalk" "40.0")
+  add_context_gamma_scenario_test(${PROJECT_NAME} "stop_line_running" "200.0")
+  add_context_gamma_scenario_test(${PROJECT_NAME} "traffic_light_running" "30.0")
+  add_context_gamma_scenario_test(${PROJECT_NAME} "head_on_pedestrian" "60.0")
+  add_context_gamma_scenario_test(${PROJECT_NAME} "adaptive_cruise" "120.0")
+  add_context_gamma_scenario_test(${PROJECT_NAME} "follow_trajectory" "40.0")
+  add_context_gamma_scenario_test(${PROJECT_NAME} "follow_trajectory_closed" "80.0")
+  add_context_gamma_scenario_test(${PROJECT_NAME} "lane_change_time" "20.0")
+  add_context_gamma_scenario_test(${PROJECT_NAME} "lane_change_lateral" "20.0")
+  add_context_gamma_scenario_test(${PROJECT_NAME} "lane_change_longitudinal" "20.0")
+  add_context_gamma_scenario_test(${PROJECT_NAME} "follow_trajectory_dynamic_constraints" "40.0")
+  add_context_gamma_scenario_test(${PROJECT_NAME} "road_end" "30.0")
+endif()
