@@ -332,9 +332,9 @@ public:
     template <typename PoseType, typename ParamsType>
     static auto applyAddEntityAction(
       const std::string & entity_name, const PoseType & pose, const ParamsType & parameters,
-      const std::string & behavior, const std::string & model3d) -> bool
+      const std::string & behavior, const std::string & model3d) -> void
     {
-      return static_cast<bool>(core->spawn(entity_name, pose, parameters, behavior, model3d));
+      core->spawn(entity_name, pose, parameters, behavior, model3d);
     }
 
     /// @note this is called during AddEntityAction
@@ -344,7 +344,7 @@ public:
       const PropertiesType & properties) -> void
     {
       core->getEntity(entity_name)
-        ->activateOutOfRangeJob(
+        .activateOutOfRangeJob(
           -performance.max_speed, +performance.max_speed, -performance.max_deceleration,
           +performance.max_acceleration,
           properties.template get<Double>("minJerk", Double::lowest()),
@@ -360,15 +360,15 @@ public:
     static auto applyAssignControllerAction(
       const std::string & entity_name, ControllerType && controller) -> void
     {
-      auto entity = core->getEntity(entity_name);
-      entity->setVelocityLimit(controller.properties.template get<Double>(
+      auto & entity = core->getEntity(entity_name);
+      entity.setVelocityLimit(controller.properties.template get<Double>(
         "maxSpeed", std::numeric_limits<Double::value_type>::max()));
 
-      entity->setBehaviorParameter([&]() {
+      entity.setBehaviorParameter([&]() {
         /// The default values written in
         /// https://github.com/tier4/scenario_simulator_v2/blob/master/simulation/traffic_simulator_msgs/msg/DynamicConstraints.msg
         // clang-format off
-        auto behavior_parameter = entity->getBehaviorParameter();
+        auto behavior_parameter = entity.getBehaviorParameter();
         behavior_parameter.see_around = not controller.properties.template get<Boolean>("isBlind");
         behavior_parameter.dynamic_constraints.max_acceleration = controller.properties.template get<Double>("maxAcceleration", 10.0);
         behavior_parameter.dynamic_constraints.max_acceleration_rate = controller.properties.template get<Double>("maxAccelerationRate", 3.0);
@@ -461,7 +461,9 @@ public:
           return configuration;
         }());
 
-        entity->as<traffic_simulator::entity::EgoEntity>()->setParameter<bool>(
+        auto & ego_entity = core->getEgoEntity(entity_name);
+
+        ego_entity.setParameter<bool>(
           "allow_goal_modification",
           controller.properties.template get<Boolean>("allowGoalModification"));
 
@@ -485,8 +487,7 @@ public:
 
         for (const auto & module : modules) {
           try {
-            entity->as<traffic_simulator::entity::EgoEntity>()->requestAutoModeForCooperation(
-              module, false);
+            ego_entity.requestAutoModeForCooperation(module, false);
           } catch (const Error & error) {
             throw Error(
               "featureIdentifiersRequiringExternalPermissionForAutonomousDecisions: module ",
@@ -506,62 +507,62 @@ public:
     static auto applyTeleportAction(const std::string & name, const PoseType & pose, Ts &&... xs)
       -> void
     {
-      core->getEntity(name)->setStatus(pose, std::forward<decltype(xs)>(xs)...);
+      core->getEntity(name).setStatus(pose, std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>
     static auto applyTeleportAction(
       const std::string & name, const std::string & reference_entity_name, Ts &&... xs) -> void
     {
-      core->getEntity(name)->setStatus(
-        core->getEntity(reference_entity_name)->getMapPose(), std::forward<decltype(xs)>(xs)...);
+      core->getEntity(name).setStatus(
+        core->getEntity(reference_entity_name).getMapPose(), std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>
     static auto applyAcquirePositionAction(const std::string & entity_name, Ts &&... xs) -> void
     {
-      auto entity = core->getEntity(entity_name);
-      entity->requestClearRoute();
-      return entity->requestAcquirePosition(std::forward<decltype(xs)>(xs)...);
+      auto & entity = core->getEntity(entity_name);
+      entity.requestClearRoute();
+      return entity.requestAcquirePosition(std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>
     static auto applyAssignRouteAction(const std::string & entity_name, Ts &&... xs) -> void
     {
-      core->getEntity(entity_name)->requestAssignRoute(std::forward<decltype(xs)>(xs)...);
+      core->getEntity(entity_name).requestAssignRoute(std::forward<decltype(xs)>(xs)...);
     }
 
     static auto applyWalkStraightAction(const std::string & entity_name) -> void
     {
-      core->getEntity(entity_name)->requestWalkStraight();
+      core->getEntity(entity_name).requestWalkStraight();
     }
 
     static auto applyFollowTrajectoryAction(
       const std::string & entity_name,
       const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & parameter) -> void
     {
-      core->getEntity(entity_name)->requestFollowTrajectory(parameter);
+      core->getEntity(entity_name).requestFollowTrajectory(parameter);
     }
 
     template <typename... Ts>
     static auto applyLaneChangeAction(const std::string & entity_name, Ts &&... xs) -> void
     {
-      core->getEntity(entity_name)->requestLaneChange(std::forward<decltype(xs)>(xs)...);
+      core->getEntity(entity_name).requestLaneChange(std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>
     static auto applySpeedAction(const std::string & entity_name, Ts &&... xs) -> void
     {
-      core->getEntity(entity_name)->requestSpeedChange(std::forward<decltype(xs)>(xs)...);
+      core->getEntity(entity_name).requestSpeedChange(std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename DynamicConstraints>
     static auto applyProfileAction(
       const std::string & entity_name, const DynamicConstraints & dynamic_constraints) -> void
     {
-      auto entity = core->getEntity(entity_name);
-      entity->setBehaviorParameter([&]() {
-        auto behavior_parameter = entity->getBehaviorParameter();
+      auto & entity = core->getEntity(entity_name);
+      entity.setBehaviorParameter([&]() {
+        auto behavior_parameter = entity.getBehaviorParameter();
         if (not std::isinf(dynamic_constraints.max_speed)) {
           behavior_parameter.dynamic_constraints.max_speed = dynamic_constraints.max_speed;
         }
@@ -601,7 +602,7 @@ public:
     static auto evaluateStandStill(const std::string & entity_name) -> double
     {
       if (core->isEntityExist(entity_name)) {
-        return core->getEntity(entity_name)->getStandStillDuration();
+        return core->getEntity(entity_name).getStandStillDuration();
       } else {
         return std::numeric_limits<double>::quiet_NaN();
       }
@@ -610,7 +611,7 @@ public:
     static auto evaluateSpeed(const std::string & entity_name) -> Eigen::Vector3d
     {
       if (core->isEntityExist(entity_name)) {
-        const auto linear = core->getEntity(entity_name)->getCurrentTwist().linear;
+        const auto linear = core->getEntity(entity_name).getCurrentTwist().linear;
         return Eigen::Vector3d(linear.x, linear.y, linear.z);
       } else {
         const auto nan = std::numeric_limits<double>::quiet_NaN();
@@ -631,7 +632,7 @@ public:
     static auto evaluateAcceleration(const std::string & entity_name) -> double
     {
       if (core->isEntityExist(entity_name)) {
-        return core->getEntity(entity_name)->getCurrentAccel().linear.x;
+        return core->getEntity(entity_name).getCurrentAccel().linear.x;
       } else {
         return std::numeric_limits<double>::quiet_NaN();
       }
@@ -662,7 +663,7 @@ public:
     static auto evaluateCurrentState(const std::string & entity_name) -> std::string
     {
       if (core->isEntityExist(entity_name)) {
-        return core->getEntity(entity_name)->getCurrentAction();
+        return core->getEntity(entity_name).getCurrentAction();
       } else {
         return "not spawned";
       }
@@ -682,7 +683,7 @@ public:
     static auto evaluateRelativeHeading(const std::string & entity_name) -> double
     {
       if (core->isEntityExist(entity_name)) {
-        if (const auto relative_yaw = core->getEntity(entity_name)->getLaneletRelativeYaw()) {
+        if (const auto relative_yaw = core->getEntity(entity_name).getLaneletRelativeYaw()) {
           return std::abs(relative_yaw.value());
         }
       }
@@ -695,44 +696,48 @@ public:
   protected:
     static auto engage(const std::string & ego_name) -> void
     {
-      core->getEgoEntity(ego_name)->engage();
+      core->getEgoEntity(ego_name).engage();
     }
 
     static auto isEngageable(const std::string & ego_name) -> bool
     {
-      return core->getEgoEntity(ego_name)->isEngageable();
+      return core->getEgoEntity(ego_name).isEngageable();
     }
 
     static auto isEngaged(const std::string & ego_name) -> bool
     {
-      return core->getEgoEntity(ego_name)->isEngaged();
+      return core->getEgoEntity(ego_name).isEngaged();
     }
 
     static auto sendCooperateCommand(const std::string & module_name, const std::string & command)
       -> void
     {
       /// @note here ego name is not passed from OpenScenarioInterpreter, it uses first found
-      core->getEgoEntity()->sendCooperateCommand(module_name, command);
+      if (const auto ego_name = core->getFirstEgoName()) {
+        core->getEgoEntity(ego_name.value()).sendCooperateCommand(module_name, command);
+      } else {
+        throw Error("EgoEntity does not exist");
+      }
     }
 
     static auto getMinimumRiskManeuverBehaviorName(const std::string & ego_name) -> std::string
     {
-      return core->getEgoEntity(ego_name)->getMinimumRiskManeuverBehaviorName();
+      return core->getEgoEntity(ego_name).getMinimumRiskManeuverBehaviorName();
     }
 
     static auto getMinimumRiskManeuverStateName(const std::string & ego_name) -> std::string
     {
-      return core->getEgoEntity(ego_name)->getMinimumRiskManeuverStateName();
+      return core->getEgoEntity(ego_name).getMinimumRiskManeuverStateName();
     }
 
     static auto getEmergencyStateName(const std::string & ego_name) -> std::string
     {
-      return core->getEgoEntity(ego_name)->getEmergencyStateName();
+      return core->getEgoEntity(ego_name).getEmergencyStateName();
     }
 
     static auto getTurnIndicatorsCommandName(const std::string & ego_name) -> std::string
     {
-      return core->getEgoEntity(ego_name)->getTurnIndicatorsCommandName();
+      return core->getEgoEntity(ego_name).getTurnIndicatorsCommandName();
     }
   };
 

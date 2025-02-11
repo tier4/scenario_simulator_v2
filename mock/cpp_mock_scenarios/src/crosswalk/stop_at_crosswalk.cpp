@@ -50,11 +50,11 @@ private:
      * @sa https://wandbox.org/permlink/dSNRX7K2bQiqSI7P
      */
     if (t == 1.0) {
-      if (t != api_.getEntity("bob")->getCurrentTwist().linear.x) {
+      if (t != api_.getEntity("bob").getCurrentTwist().linear.x) {
         stop(cpp_mock_scenarios::Result::FAILURE);
       }
     }
-    const auto ego_linear_velocity = api_.getEntity("ego")->getCurrentTwist().linear.x;
+    const auto ego_linear_velocity = api_.getEntity("ego").getCurrentTwist().linear.x;
     if (t >= 6.6) {
       if (7.5 >= t) {
         if (std::fabs(0.1) <= ego_linear_velocity) {
@@ -74,20 +74,20 @@ private:
 
   void onInitialize() override
   {
-    auto ego_entity = api_.spawn(
+    auto & ego_entity = api_.spawn(
       "ego", traffic_simulator::helper::constructLaneletPose(120545, 0.0, 0.0),
       getVehicleParameters());
-    ego_entity->setLinearVelocity(10);
-    ego_entity->requestSpeedChange(8, true);
-    ego_entity->requestAssignRoute(
+    ego_entity.setLinearVelocity(10);
+    ego_entity.requestSpeedChange(8, true);
+    ego_entity.requestAssignRoute(
       {traffic_simulator::helper::constructLaneletPose(34675, 0.0, 0.0),
        traffic_simulator::helper::constructLaneletPose(34690, 0.0, 0.0)});
 
-    auto bob_entity = api_.spawn(
+    auto & bob_entity = api_.spawn(
       "bob", traffic_simulator::helper::constructLaneletPose(34378, 0.0, 0.0),
       getPedestrianParameters());
-    bob_entity->setLinearVelocity(0);
-    bob_entity->requestSpeedChange(
+    bob_entity.setLinearVelocity(0);
+    bob_entity.requestSpeedChange(
       1.0, traffic_simulator::speed_change::Transition::LINEAR,
       traffic_simulator::speed_change::Constraint(
         traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 1.0),

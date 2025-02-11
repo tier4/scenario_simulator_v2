@@ -47,36 +47,36 @@ private:
     }
     if (api_.getCurrentTime() >= 4 && api_.isEntityExist("obstacle")) {
       api_.getEntity("obstacle")
-        ->setStatus(
+        .setStatus(
           traffic_simulator::helper::constructLaneletPose(120545, 0.0, 0.0),
           traffic_simulator::helper::constructActionStatus(10));
     }
     if (api_.getCurrentTime() >= 6 && api_.isEntityExist("obstacle")) {
       api_.despawn("obstacle");
     }
-    const auto ego_entity = api_.getEntity("ego");
-    const auto npc2_entity = api_.getEntity("npc2");
-    if (ego_entity->isNearbyPosition(
+    auto & ego_entity = api_.getEntity("ego");
+    auto & npc2_entity = api_.getEntity("npc2");
+    if (ego_entity.isNearbyPosition(
           traffic_simulator::helper::constructLaneletPose(34615, 10.0, 0.0), 5)) {
-      ego_entity->requestAcquirePosition(
+      ego_entity.requestAcquirePosition(
         traffic_simulator::helper::constructLaneletPose(35026, 0.0, 0.0));
       if (api_.isEntityExist("npc2")) {
-        npc2_entity->requestSpeedChange(13, true);
+        npc2_entity.requestSpeedChange(13, true);
       }
     }
-    if (ego_entity->isNearbyPosition(
+    if (ego_entity.isNearbyPosition(
           traffic_simulator::helper::constructLaneletPose(34579, 0.0, 0.0), 5)) {
-      ego_entity->requestAcquirePosition(
+      ego_entity.requestAcquirePosition(
         traffic_simulator::helper::constructLaneletPose(34675, 0.0, 0.0));
       if (api_.isEntityExist("npc2")) {
-        npc2_entity->requestSpeedChange(3, true);
+        npc2_entity.requestSpeedChange(3, true);
       }
     }
-    if (npc2_entity->isNearbyPosition(
+    if (npc2_entity.isNearbyPosition(
           traffic_simulator::helper::constructLaneletPose(34513, 0.0, 0.0), 5)) {
-      npc2_entity->requestAcquirePosition(
+      npc2_entity.requestAcquirePosition(
         traffic_simulator::helper::constructLaneletPose(34630, 0.0, 0.0));
-      npc2_entity->requestSpeedChange(13, true);
+      npc2_entity.requestSpeedChange(13, true);
     }
     if (api_.getCurrentTime() > 10.0 && api_.isEntityExist("bob")) {
       api_.despawn("bob");
@@ -87,55 +87,54 @@ private:
   {
     lanechange_executed_ = false;
 
-    auto ego_entity = api_.spawn(
+    auto & ego_entity = api_.spawn(
       "ego", traffic_simulator::helper::constructLaneletPose(120545, 0.0, 0.0),
       getVehicleParameters());
-    ego_entity->setLinearVelocity(10);
-    ego_entity->requestSpeedChange(8, true);
-    ego_entity->requestAssignRoute(
+    ego_entity.setLinearVelocity(10);
+    ego_entity.requestSpeedChange(8, true);
+    ego_entity.requestAssignRoute(
       {traffic_simulator::helper::constructLaneletPose(34675, 0.0, 0.0),
        traffic_simulator::helper::constructLaneletPose(34690, 0.0, 0.0)});
 
-    auto tom_entity = api_.spawn(
+    auto & tom_entity = api_.spawn(
       "tom", traffic_simulator::helper::constructPose(10, 3, 0, 0, 0, -1.57),
       getPedestrianParameters());
-    tom_entity->setStatus(
-      ego_entity->getMapPose(), traffic_simulator::helper::constructPose(10, 3, 0, 0, 0, -1.57),
+    tom_entity.setStatus(
+      ego_entity.getMapPose(), traffic_simulator::helper::constructPose(10, 3, 0, 0, 0, -1.57),
       traffic_simulator::helper::constructActionStatus());
-    tom_entity->requestWalkStraight();
-    tom_entity->requestSpeedChange(3, true);
+    tom_entity.requestWalkStraight();
+    tom_entity.requestSpeedChange(3, true);
 
-    auto bob_entity = api_.spawn(
+    auto & bob_entity = api_.spawn(
       "bob", traffic_simulator::helper::constructLaneletPose(34378, 0.0, 0.0),
       getPedestrianParameters());
-    bob_entity->setLinearVelocity(1.0);
-    bob_entity->requestSpeedChange(1, true);
+    bob_entity.setLinearVelocity(1.0);
+    bob_entity.requestSpeedChange(1, true);
 
-    auto npc1_entity = api_.spawn(
+    auto & npc1_entity = api_.spawn(
       "npc1", traffic_simulator::helper::constructLaneletPose(34579, 20.0, 0.0),
       getVehicleParameters());
-    npc1_entity->setLinearVelocity(5.0);
-    npc1_entity->requestSpeedChange(5, true);
-    npc1_entity->requestAcquirePosition(
+    npc1_entity.setLinearVelocity(5.0);
+    npc1_entity.requestSpeedChange(5, true);
+    npc1_entity.requestAcquirePosition(
       traffic_simulator::helper::constructLaneletPose(34675, 0.0, 0.0));
 
-    auto npc2_entity = api_.spawn(
+    auto & npc2_entity = api_.spawn(
       "npc2", traffic_simulator::helper::constructLaneletPose(34606, 20.0, 0.0),
       getVehicleParameters());
-    npc2_entity->setLinearVelocity(5);
-    npc2_entity->requestSpeedChange(0, true);
+    npc2_entity.setLinearVelocity(5);
+    npc2_entity.requestSpeedChange(0, true);
 
-    auto npc3_entity = api_.spawn(
+    auto & npc3_entity = api_.spawn(
       "npc3", traffic_simulator::helper::constructLaneletPose(34468, 0.0, 0.0),
       getVehicleParameters());
-    npc3_entity->setLinearVelocity(10);
+    npc3_entity.setLinearVelocity(10);
 
-    auto obstacle_entity = api_.spawn(
+    auto & obstacle_entity = api_.spawn(
       "obstacle", traffic_simulator::helper::constructPose(10, 5, 0, 0, 0, -1.57),
       getMiscObjectParameters());
-
-    obstacle_entity->setStatus(
-      ego_entity->getMapPose(), traffic_simulator::helper::constructPose(10, 5, 0, 0, 0, -1.57),
+    obstacle_entity.setStatus(
+      ego_entity.getMapPose(), traffic_simulator::helper::constructPose(10, 5, 0, 0, 0, -1.57),
       traffic_simulator::helper::constructActionStatus());
 
     api_.getConventionalTrafficLights()->setTrafficLightsColor(

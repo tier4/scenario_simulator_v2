@@ -45,11 +45,11 @@ private:
     api_.updateFrame();
 
     const double current_time = api_.getCurrentTime();
-    auto front_entity = api_.getEntity("front");
+    auto & front_entity = api_.getEntity("front");
 
     if (current_time >= 0.0 and not request_sent) {
       request_sent = true;
-      front_entity->requestSpeedChange(
+      front_entity.requestSpeedChange(
         traffic_simulator::speed_change::RelativeTargetSpeed(
           "ego", traffic_simulator::speed_change::RelativeTargetSpeed::Type::DELTA, 2.0),
         traffic_simulator::speed_change::Transition::LINEAR,
@@ -58,7 +58,7 @@ private:
         true);
     }
 
-    const double current_speed = front_entity->getCurrentTwist().linear.x;
+    const double current_speed = front_entity.getCurrentTwist().linear.x;
     static constexpr double speed_tolerance = 0.05;
     if (current_time >= 0.0 and current_time < 2.0) {
       if (not equals(current_time + 3.0, current_speed, speed_tolerance)) {
@@ -75,16 +75,16 @@ private:
 
   void onInitialize() override
   {
-    auto ego_entity = api_.spawn(
+    auto & ego_entity = api_.spawn(
       "ego", traffic_simulator::helper::constructLaneletPose(34741, 0.0, 0.0),
       getVehicleParameters());
-    ego_entity->setLinearVelocity(3);
-    ego_entity->requestSpeedChange(3.0, true);
+    ego_entity.setLinearVelocity(3);
+    ego_entity.requestSpeedChange(3.0, true);
 
-    auto front_entity = api_.spawn(
+    auto & front_entity = api_.spawn(
       "front", traffic_simulator::helper::constructLaneletPose(34741, 10.0, 0.0),
       getVehicleParameters());
-    front_entity->setLinearVelocity(3);
+    front_entity.setLinearVelocity(3);
   }
 };
 }  // namespace cpp_mock_scenarios

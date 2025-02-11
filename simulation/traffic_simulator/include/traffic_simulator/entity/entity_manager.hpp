@@ -106,7 +106,7 @@ public:
   template <typename EntityType, typename PoseType, typename ParametersType, typename... Ts>
   auto spawnEntity(
     const std::string & name, const PoseType & pose, const ParametersType & parameters,
-    const double current_time, Ts &&... xs) -> std::shared_ptr<entity::EntityBase>
+    const double current_time, Ts &&... xs) -> entity::EntityBase &
   {
     auto makeEntityStatus = [&]() -> CanonicalizedEntityStatus {
       EntityStatus entity_status;
@@ -176,7 +176,7 @@ public:
         success) {
       // FIXME: this ignores V2I traffic lights
       iter->second->setTrafficLights(traffic_lights_ptr_->getConventionalTrafficLights());
-      return iter->second;
+      return *(iter->second);
     } else {
       THROW_SEMANTIC_ERROR("Entity ", std::quoted(name), " is already exists.");
     }
@@ -187,18 +187,22 @@ public:
 
   auto isAnyEgoSpawned() const -> bool;
 
-  auto getEgoName() const -> const std::string &;
+  auto getFirstEgoName() const -> std::optional<std::string>;
 
-  auto getEgoEntity() const -> std::shared_ptr<entity::EgoEntity>;
+  auto getEgoEntity(const std::string & name) -> entity::EgoEntity &;
 
-  auto getEgoEntity(const std::string & name) const -> std::shared_ptr<entity::EgoEntity>;
+  auto getEgoEntity(const std::string & name) const -> const entity::EgoEntity &;
 
   // entities - checks, getters
   auto isEntityExist(const std::string & name) const -> bool;
 
   auto getEntityNames() const -> const std::vector<std::string>;
 
-  auto getEntity(const std::string & name) const -> std::shared_ptr<entity::EntityBase>;
+  auto getEntity(const std::string & name) -> entity::EntityBase &;
+
+  auto getEntity(const std::string & name) const -> const entity::EntityBase &;
+
+  auto getEntityPointer(const std::string & name) const -> std::shared_ptr<entity::EntityBase>;
 
   // entities - respawn, despawn, reset
   /**

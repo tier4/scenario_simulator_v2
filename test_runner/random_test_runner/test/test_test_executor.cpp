@@ -129,7 +129,6 @@ public:
     (const std::string &, const traffic_simulator::LaneletPose &,
      const traffic_simulator_msgs::msg::VehicleParameters &),
     ());
-  MOCK_METHOD(bool, isAnyEgoSpawned, (), ());
   MOCK_METHOD(bool, isNpcLogicStarted, (), ());
   MOCK_METHOD(void, startNpcLogic, (), ());
   MOCK_METHOD(bool, despawn, (const std::string), ());
@@ -141,21 +140,20 @@ public:
   MOCK_METHOD(bool, isEntityExist, (const std::string &), ());
   MOCK_METHOD(bool, checkCollision, (const std::string &, const std::string &), ());
 
-  auto getEntity(const std::string & name) const
-    -> std::shared_ptr<::testing::StrictMock<MockEntity>>
+  auto getEntity(const std::string & name) -> ::testing::StrictMock<MockEntity> &
   {
     getEntityMock(name);
     if (name == ego_name_) {
-      return ego_entity_;
+      return *ego_entity_;
+    } else {
+      throw std::runtime_error("Entity " + name + " does not exist");
     }
-    return std::make_shared<::testing::StrictMock<MockEntity>>();
   }
 
-  auto getEgoEntity(const std::string & name) const
-    -> std::shared_ptr<::testing::StrictMock<MockEntity>>
+  auto getEgoEntity(const std::string & name) -> ::testing::StrictMock<MockEntity> &
   {
     getEgoEntityMock(name);
-    return ego_entity_;
+    return *ego_entity_;
   }
 
   /// Real member function required for the canonicalization of the lanelet pose in TestExecutor.InitializeWithNoNPCs test
@@ -236,7 +234,7 @@ TEST(TestExecutor, UpdateNoNPCs)
     .Times(1)
     .InSequence(sequence)
     .WillOnce(::testing::Return(false));
-  EXPECT_CALL(*MockAPI, isAnyEgoSpawned)
+  EXPECT_CALL(*MockAPI, isEntityExist)
     .Times(1)
     .InSequence(sequence)
     .WillOnce(::testing::Return(false));

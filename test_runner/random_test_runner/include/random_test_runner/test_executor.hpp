@@ -83,8 +83,8 @@ public:
         ego_name_, test_description_.ego_start_position, getVehicleParameters(),
         traffic_simulator::VehicleBehavior::autoware(), "lexus_rx450h");
 
-      auto ego_entity = api_->getEgoEntity(ego_name_);
-      ego_entity->setStatus(
+      auto & ego_entity = api_->getEgoEntity(ego_name_);
+      ego_entity.setStatus(
         test_description_.ego_start_position, traffic_simulator::helper::constructActionStatus());
 
       if (architecture_type_ == ArchitectureType::AWF_UNIVERSE) {
@@ -110,14 +110,14 @@ public:
           return configuration;
         }());
 
-        ego_entity->template setParameter<bool>("allow_goal_modification", true);
+        ego_entity.template setParameter<bool>("allow_goal_modification", true);
 
         // XXX dirty hack: wait for autoware system to launch
         // ugly but helps for now
         std::this_thread::sleep_for(std::chrono::milliseconds{5000});
 
-        ego_entity->requestAssignRoute(std::vector({test_description_.ego_goal_pose}));
-        ego_entity->engage();
+        ego_entity.requestAssignRoute(std::vector({test_description_.ego_goal_pose}));
+        ego_entity.engage();
 
         goal_reached_metric_.setGoal(test_description_.ego_goal_pose);
 
@@ -126,11 +126,11 @@ public:
             npc_descr.name, npc_descr.start_position, getVehicleParameters(),
             traffic_simulator::VehicleBehavior::defaultBehavior(), "taxi");
 
-          auto entity = api_->getEntity(npc_descr.name);
-          entity->setStatus(
+          auto & entity = api_->getEntity(npc_descr.name);
+          entity.setStatus(
             npc_descr.start_position,
             traffic_simulator::helper::constructActionStatus(npc_descr.speed));
-          entity->requestSpeedChange(npc_descr.speed, true);
+          entity.requestSpeedChange(npc_descr.speed, true);
         }
       }
     });
@@ -140,9 +140,9 @@ public:
   {
     executeWithErrorHandling([this]() {
       if (!api_->isNpcLogicStarted()) {
-        if (api_->isAnyEgoSpawned()) {
-          auto ego_entity = api_->getEgoEntity(ego_name_);
-          if (ego_entity->isEngageable()) {
+        if (api_->isEntityExist(ego_name_)) {
+          auto & ego_entity = api_->getEgoEntity(ego_name_);
+          if (ego_entity.isEngageable()) {
             api_->startNpcLogic();
           }
         } else {
@@ -154,14 +154,14 @@ public:
 
       if (!std::isnan(current_time)) {
         if (goal_reached_metric_.isGoalReached(
-              api_->getEntity(ego_name_)->getCanonicalizedStatus())) {
+              api_->getEntity(ego_name_).getCanonicalizedStatus())) {
           scenario_completed_ = true;
         }
 
         bool timeout_reached = current_time >= test_timeout_;
         if (timeout_reached) {
           if (!goal_reached_metric_.isGoalReached(
-                api_->getEntity(ego_name_)->getCanonicalizedStatus())) {
+                api_->getEntity(ego_name_).getCanonicalizedStatus())) {
             RCLCPP_INFO(logger_, "Timeout reached");
             error_reporter_.reportTimeout();
           }
@@ -182,10 +182,10 @@ public:
       }
 
       if (almost_standstill_metric_.isAlmostStandingStill(
-            api_->getEntity(ego_name_)->getCanonicalizedStatus())) {
+            api_->getEntity(ego_name_).getCanonicalizedStatus())) {
         RCLCPP_INFO(logger_, "Standstill duration exceeded");
         if (goal_reached_metric_.isGoalReached(
-              api_->getEntity(ego_name_)->getCanonicalizedStatus())) {
+              api_->getEntity(ego_name_).getCanonicalizedStatus())) {
           RCLCPP_INFO(logger_, "Goal reached, standstill expected");
         } else {
           error_reporter_.reportStandStill();

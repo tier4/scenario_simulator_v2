@@ -40,23 +40,23 @@ private:
   bool requested = false;
   void onUpdate() override
   {
-    if (api_.getEntity("ego")->isInLanelet(34630, 0.1)) {
+    if (api_.getEntity("ego").isInLanelet(34630, 0.1)) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
   }
   void onInitialize() override
   {
-    auto ego_entity = api_.spawn(
+    auto & ego_entity = api_.spawn(
       "ego", traffic_simulator::helper::constructLaneletPose(34513, 0.0, 0.0),
       getVehicleParameters());
-    ego_entity->setLinearVelocity(10);
-    ego_entity->requestSpeedChange(10, true);
+    ego_entity.setLinearVelocity(10);
+    ego_entity.requestSpeedChange(10, true);
     std::vector<geometry_msgs::msg::Pose> goal_poses;
     goal_poses.emplace_back(traffic_simulator::pose::toMapPose(
       traffic_simulator::helper::constructLaneletPose(34408, 1.0, 0.0)));
     goal_poses.emplace_back(traffic_simulator::pose::toMapPose(
       traffic_simulator::helper::constructLaneletPose(34408, 10, 0.0)));
-    ego_entity->requestAssignRoute(goal_poses);
+    ego_entity.requestAssignRoute(goal_poses);
   }
 };
 }  // namespace cpp_mock_scenarios

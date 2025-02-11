@@ -39,10 +39,9 @@ public:
 private:
   void onUpdate() override
   {
-    double ego_linear_acceleration = api_.getEntity("ego")->getCurrentAccel().linear.x;
-    double ego_linear_velocity = api_.getEntity("ego")->getCurrentTwist().linear.x;
-    // double npc_linear_acceleration =  api_.getEntity("npc")->getCurrentAccel().linear.x;
-    double npc_linear_velocity = api_.getEntity("npc")->getCurrentTwist().linear.x;
+    const double ego_linear_acceleration = api_.getEntity("ego").getCurrentAccel().linear.x;
+    const double ego_linear_velocity = api_.getEntity("ego").getCurrentTwist().linear.x;
+    const double npc_linear_velocity = api_.getEntity("npc").getCurrentTwist().linear.x;
 
     // LCOV_EXCL_START
     if (npc_linear_velocity > (ego_linear_velocity + 1) && ego_linear_acceleration < 0) {
@@ -58,16 +57,16 @@ private:
   }
   void onInitialize() override
   {
-    auto ego_entity = api_.spawn(
+    auto & ego_entity = api_.spawn(
       "ego", traffic_simulator::helper::constructLaneletPose(34741, 0.0, 0.0),
       getVehicleParameters());
-    ego_entity->setLinearVelocity(3);
+    ego_entity.setLinearVelocity(3);
 
-    auto npc_entity = api_.spawn(
+    auto & npc_entity = api_.spawn(
       "npc", traffic_simulator::helper::constructLaneletPose(34741, 10.0, 0.0),
       getVehicleParameters());
-    npc_entity->setLinearVelocity(10);
-    npc_entity->requestSpeedChange(10, true);
+    npc_entity.setLinearVelocity(10);
+    npc_entity.requestSpeedChange(10, true);
   }
 };
 }  // namespace cpp_mock_scenarios

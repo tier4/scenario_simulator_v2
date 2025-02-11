@@ -86,28 +86,28 @@ auto API::updateEntitiesStatusInSim() -> bool
   simulation_api_schema::UpdateEntityStatusRequest req;
   req.set_npc_logic_started(entity_manager_ptr_->isNpcLogicStarted());
   for (const auto & entity_name : entity_manager_ptr_->getEntityNames()) {
-    const auto entity = entity_manager_ptr_->getEntity(entity_name);
-    const auto entity_status = static_cast<EntityStatus>(entity->getCanonicalizedStatus());
+    const auto & entity = entity_manager_ptr_->getEntity(entity_name);
+    const auto entity_status = static_cast<EntityStatus>(entity.getCanonicalizedStatus());
     simulation_interface::toProto(entity_status, *req.add_status());
-    if (entity->is<entity::EgoEntity>()) {
-      req.set_overwrite_ego_status(entity->isControlledBySimulator());
+    if (entity.is<entity::EgoEntity>()) {
+      req.set_overwrite_ego_status(entity.isControlledBySimulator());
     }
   }
 
   simulation_api_schema::UpdateEntityStatusResponse res;
   if (auto res = zeromq_client_.call(req); res.result().success()) {
     for (const auto & res_status : res.status()) {
-      auto entity = entity_manager_ptr_->getEntity(res_status.name());
-      auto entity_status = static_cast<EntityStatus>(entity->getCanonicalizedStatus());
+      auto & entity = entity_manager_ptr_->getEntity(res_status.name());
+      auto entity_status = static_cast<EntityStatus>(entity.getCanonicalizedStatus());
       simulation_interface::toMsg(res_status.pose(), entity_status.pose);
       simulation_interface::toMsg(res_status.action_status(), entity_status.action_status);
 
-      if (entity->is<entity::EgoEntity>()) {
-        entity->setMapPose(entity_status.pose);
-        entity->setTwist(entity_status.action_status.twist);
-        entity->setAcceleration(entity_status.action_status.accel);
+      if (entity.is<entity::EgoEntity>()) {
+        entity.setMapPose(entity_status.pose);
+        entity.setTwist(entity_status.action_status.twist);
+        entity.setAcceleration(entity_status.action_status.accel);
       } else {
-        entity->setStatus(entity_status);
+        entity.setStatus(entity_status);
       }
     }
     return true;
@@ -118,7 +118,7 @@ auto API::updateEntitiesStatusInSim() -> bool
 auto API::updateTrafficLightsInSim() -> bool
 {
   if (traffic_lights_ptr_->isAnyTrafficLightChanged()) {
-    auto request =
+    const auto request =
       traffic_lights_ptr_->getConventionalTrafficLights()->generateUpdateTrafficLightsRequest();
     return zeromq_client_.call(request).result().success();
   }
@@ -210,7 +210,7 @@ auto API::attachDetectionSensor(
   double object_recognition_delay) -> bool
 {
   return attachDetectionSensor(helper::constructDetectionSensorConfiguration(
-    entity_name, getROS2Parameter<std::string>("architecture_type", "awf/universe"), 0.1,
+    entity_name, getROS2Parameter<std::string>("architecture_type", "awf/universe/20240605"), 0.1,
     detection_sensor_range, detect_all_objects_in_range, pos_noise_stddev, random_seed,
     probability_of_lost, object_recognition_delay));
 }
@@ -230,14 +230,17 @@ auto API::attachOccupancyGridSensor(
 // ego - checks, getters
 auto API::isAnyEgoSpawned() const -> bool { return entity_manager_ptr_->isAnyEgoSpawned(); }
 
-auto API::getEgoName() const -> const std::string & { return entity_manager_ptr_->getEgoName(); }
-
-auto API::getEgoEntity() const -> std::shared_ptr<entity::EgoEntity>
+auto API::getFirstEgoName() const -> std::optional<std::string>
 {
-  return entity_manager_ptr_->getEgoEntity();
+  return entity_manager_ptr_->getFirstEgoName();
 }
 
-auto API::getEgoEntity(const std::string & name) const -> std::shared_ptr<entity::EgoEntity>
+auto API::getEgoEntity(const std::string & name) -> entity::EgoEntity &
+{
+  return entity_manager_ptr_->getEgoEntity(name);
+}
+
+auto API::getEgoEntity(const std::string & name) const -> const entity::EgoEntity &
 {
   return entity_manager_ptr_->getEgoEntity(name);
 }
@@ -253,9 +256,19 @@ auto API::getEntityNames() const -> std::vector<std::string>
   return entity_manager_ptr_->getEntityNames();
 }
 
-auto API::getEntity(const std::string & name) const -> std::shared_ptr<entity::EntityBase>
+auto API::getEntity(const std::string & name) -> entity::EntityBase &
 {
   return entity_manager_ptr_->getEntity(name);
+}
+
+auto API::getEntity(const std::string & name) const -> const entity::EntityBase &
+{
+  return entity_manager_ptr_->getEntity(name);
+}
+
+auto API::getEntityPointer(const std::string & name) const -> std::shared_ptr<entity::EntityBase>
+{
+  return entity_manager_ptr_->getEntityPointer(name);
 }
 
 // entities - respawn, despawn, reset
@@ -272,19 +285,19 @@ auto API::respawn(
   if (new_pose.header.frame_id != "map") {
     throw std::runtime_error("Respawn request with frame id other than map not supported.");
   } else {
-    auto ego_entity = entity_manager_ptr_->getEgoEntity(name);
+    auto & ego_entity = entity_manager_ptr_->getEgoEntity(name);
     // set new pose and default action status in EntityManager
-    ego_entity->setControlledBySimulator(true);
-    ego_entity->setStatus(new_pose.pose.pose);
+    ego_entity.setControlledBySimulator(true);
+    ego_entity.setStatus(new_pose.pose.pose);
 
     // read status from EntityManager, then send it to SimpleSensorSimulator
     simulation_api_schema::UpdateEntityStatusRequest req;
     simulation_interface::toProto(
-      static_cast<EntityStatus>(entity_manager_ptr_->getEntity(name)->getCanonicalizedStatus()),
+      static_cast<EntityStatus>(entity_manager_ptr_->getEntity(name).getCanonicalizedStatus()),
       *req.add_status());
     req.set_npc_logic_started(entity_manager_ptr_->isNpcLogicStarted());
-    req.set_overwrite_ego_status(ego_entity->isControlledBySimulator());
-    ego_entity->setControlledBySimulator(false);
+    req.set_overwrite_ego_status(ego_entity.isControlledBySimulator());
+    ego_entity.setControlledBySimulator(false);
 
     // check response
     if (const auto res = zeromq_client_.call(req); not res.result().success()) {
@@ -299,13 +312,13 @@ auto API::respawn(
         res_name + "\".");
     } else {
       // if valid, set response in EntityManager, then plan path and engage
-      auto entity_status = static_cast<EntityStatus>(ego_entity->getCanonicalizedStatus());
+      auto entity_status = static_cast<EntityStatus>(ego_entity.getCanonicalizedStatus());
       simulation_interface::toMsg(res_status->pose(), entity_status.pose);
       simulation_interface::toMsg(res_status->action_status(), entity_status.action_status);
-      ego_entity->setMapPose(entity_status.pose);
-      ego_entity->setTwist(entity_status.action_status.twist);
-      ego_entity->setAcceleration(entity_status.action_status.accel);
-      ego_entity->requestReplanRoute({goal_pose});
+      ego_entity.setMapPose(entity_status.pose);
+      ego_entity.setTwist(entity_status.action_status.twist);
+      ego_entity.setAcceleration(entity_status.action_status.accel);
+      ego_entity.requestReplanRoute({goal_pose});
     }
   }
 }
@@ -336,11 +349,11 @@ auto API::checkCollision(
   const std::string & first_entity_name, const std::string & second_entity_name) const -> bool
 {
   if (first_entity_name != second_entity_name) {
-    const auto first_entity = getEntity(first_entity_name);
-    const auto second_entity = getEntity(second_entity_name);
+    const auto & first_entity = getEntity(first_entity_name);
+    const auto & second_entity = getEntity(second_entity_name);
     return math::geometry::checkCollision2D(
-      first_entity->getMapPose(), first_entity->getBoundingBox(), second_entity->getMapPose(),
-      second_entity->getBoundingBox());
+      first_entity.getMapPose(), first_entity.getBoundingBox(), second_entity.getMapPose(),
+      second_entity.getBoundingBox());
   } else {
     return false;
   }
@@ -351,7 +364,7 @@ auto API::laneletRelativeYaw(
 {
   if (
     const auto relative_pose =
-      pose::relativePose(getEntity(entity_name)->getMapPose(), pose::toMapPose(lanelet_pose))) {
+      pose::relativePose(getEntity(entity_name).getMapPose(), pose::toMapPose(lanelet_pose))) {
     return math::geometry::convertQuaternionToEulerAngle(relative_pose.value().orientation).z;
   } else {
     return std::nullopt;
@@ -362,12 +375,13 @@ auto API::timeHeadway(const std::string & from_entity_name, const std::string & 
   -> std::optional<double>
 {
   if (from_entity_name != to_entity_name) {
-    const auto from_entity = getEntity(from_entity_name);
-    const auto to_entity = getEntity(to_entity_name);
-    if (auto relative_pose = pose::relativePose(from_entity->getMapPose(), to_entity->getMapPose());
+    const auto & from_entity = getEntity(from_entity_name);
+    const auto & to_entity = getEntity(to_entity_name);
+    if (const auto relative_pose =
+          pose::relativePose(from_entity.getMapPose(), to_entity.getMapPose());
         relative_pose && relative_pose->position.x <= 0) {
       const double time_headway =
-        (relative_pose->position.x * -1) / to_entity->getCurrentTwist().linear.x;
+        (relative_pose->position.x * -1.0) / to_entity.getCurrentTwist().linear.x;
       return std::isnan(time_headway) ? std::numeric_limits<double>::infinity() : time_headway;
     }
   }
@@ -378,11 +392,11 @@ auto API::boundingBoxDistance(
   const std::string & from_entity_name, const std::string & to_entity_name) -> std::optional<double>
 {
   if (from_entity_name != to_entity_name) {
-    const auto from_entity = getEntity(from_entity_name);
-    const auto to_entity = getEntity(to_entity_name);
+    const auto & from_entity = getEntity(from_entity_name);
+    const auto & to_entity = getEntity(to_entity_name);
     return distance::boundingBoxDistance(
-      from_entity->getMapPose(), from_entity->getBoundingBox(), to_entity->getMapPose(),
-      to_entity->getBoundingBox());
+      from_entity.getMapPose(), from_entity.getBoundingBox(), to_entity.getMapPose(),
+      to_entity.getBoundingBox());
   } else {
     return std::nullopt;
   }
@@ -392,9 +406,9 @@ auto API::boundingBoxRelativePose(
   const std::string & from_entity_name, const geometry_msgs::msg::Pose & to_map_pose)
   -> std::optional<geometry_msgs::msg::Pose>
 {
-  const auto from_entity = getEntity(from_entity_name);
+  const auto & from_entity = getEntity(from_entity_name);
   return pose::boundingBoxRelativePose(
-    from_entity->getMapPose(), from_entity->getBoundingBox(), to_map_pose,
+    from_entity.getMapPose(), from_entity.getBoundingBox(), to_map_pose,
     traffic_simulator_msgs::msg::BoundingBox());
 }
 
@@ -403,11 +417,11 @@ auto API::boundingBoxRelativePose(
   -> std::optional<geometry_msgs::msg::Pose>
 {
   if (from_entity_name != to_entity_name) {
-    const auto from_entity = getEntity(from_entity_name);
-    const auto to_entity = getEntity(to_entity_name);
+    const auto & from_entity = getEntity(from_entity_name);
+    const auto & to_entity = getEntity(to_entity_name);
     return pose::boundingBoxRelativePose(
-      from_entity->getMapPose(), from_entity->getBoundingBox(), to_entity->getMapPose(),
-      to_entity->getBoundingBox());
+      from_entity.getMapPose(), from_entity.getBoundingBox(), to_entity.getMapPose(),
+      to_entity.getBoundingBox());
   } else {
     return std::nullopt;
   }
@@ -417,9 +431,9 @@ auto API::relativePose(const std::string & from_entity_name, const std::string &
   -> std::optional<geometry_msgs::msg::Pose>
 {
   if (from_entity_name != to_entity_name) {
-    const auto from_entity = getEntity(from_entity_name);
-    const auto to_entity = getEntity(to_entity_name);
-    return pose::relativePose(from_entity->getMapPose(), to_entity->getMapPose());
+    const auto & from_entity = getEntity(from_entity_name);
+    const auto & to_entity = getEntity(to_entity_name);
+    return pose::relativePose(from_entity.getMapPose(), to_entity.getMapPose());
   } else {
     return std::nullopt;
   }
@@ -429,16 +443,16 @@ auto API::relativePose(
   const std::string & from_entity_name, const geometry_msgs::msg::Pose & to_map_pose)
   -> std::optional<geometry_msgs::msg::Pose>
 {
-  const auto from_entity = getEntity(from_entity_name);
-  return pose::relativePose(from_entity->getMapPose(), to_map_pose);
+  const auto & from_entity = getEntity(from_entity_name);
+  return pose::relativePose(from_entity.getMapPose(), to_map_pose);
 }
 
 auto API::relativePose(
   const geometry_msgs::msg::Pose & from_map_pose, const std::string & to_entity_name)
   -> std::optional<geometry_msgs::msg::Pose>
 {
-  const auto to_entity = getEntity(to_entity_name);
-  return pose::relativePose(from_map_pose, to_entity->getMapPose());
+  const auto & to_entity = getEntity(to_entity_name);
+  return pose::relativePose(from_map_pose, to_entity.getMapPose());
 }
 
 auto API::relativeSpeed(const std::string & from_entity_name, const std::string & to_entity_name)
@@ -448,13 +462,13 @@ auto API::relativeSpeed(const std::string & from_entity_name, const std::string 
     auto direction = [](const auto & q) -> Eigen::Vector3d {
       return Eigen::Quaternion(q.w, q.x, q.y, q.z) * Eigen::Vector3d::UnitX();
     };
-    return direction(entity->getMapPose().orientation) * entity->getCurrentTwist().linear.x;
+    return direction(entity.getMapPose().orientation) * entity.getCurrentTwist().linear.x;
   };
 
-  const auto observer = getEntity(from_entity_name);
-  const auto observed = getEntity(to_entity_name);
+  const auto & observer = getEntity(from_entity_name);
+  const auto & observed = getEntity(to_entity_name);
   const Eigen::Matrix3d rotation =
-    math::geometry::getRotationMatrix(observer->getMapPose().orientation);
+    math::geometry::getRotationMatrix(observer.getMapPose().orientation);
   return rotation.transpose() * velocity(observed) - rotation.transpose() * velocity(observer);
 }
 
@@ -463,11 +477,11 @@ auto API::countLaneChanges(
   const RoutingConfiguration & routing_configuration) const -> std::optional<std::pair<int, int>>
 {
   if (from_entity_name != to_entity_name) {
-    const auto from_entity = getEntity(from_entity_name);
-    const auto to_entity = getEntity(to_entity_name);
+    const auto & from_entity = getEntity(from_entity_name);
+    const auto & to_entity = getEntity(to_entity_name);
     return traffic_simulator::distance::countLaneChanges(
-      from_entity->getCanonicalizedLaneletPose().value(),
-      to_entity->getCanonicalizedLaneletPose().value(), routing_configuration, getHdmapUtils());
+      from_entity.getCanonicalizedLaneletPose().value(),
+      to_entity.getCanonicalizedLaneletPose().value(), routing_configuration, getHdmapUtils());
   } else {
     return std::nullopt;
   }
@@ -477,13 +491,12 @@ auto API::laneletDistance(
   const std::string & from_entity_name, const std::string & to_entity_name,
   const RoutingConfiguration & routing_configuration) -> LaneletDistance
 {
-  const auto from_entity = getEntity(from_entity_name);
-  const auto to_entity = getEntity(to_entity_name);
-  if (
-    from_entity_name != to_entity_name && from_entity->isInLanelet() && to_entity->isInLanelet()) {
+  const auto & from_entity = getEntity(from_entity_name);
+  const auto & to_entity = getEntity(to_entity_name);
+  if (from_entity_name != to_entity_name && from_entity.isInLanelet() && to_entity.isInLanelet()) {
     return distance::laneletDistance(
-      from_entity->getCanonicalizedLaneletPose().value(),
-      to_entity->getCanonicalizedLaneletPose().value(), routing_configuration, getHdmapUtils());
+      from_entity.getCanonicalizedLaneletPose().value(),
+      to_entity.getCanonicalizedLaneletPose().value(), routing_configuration, getHdmapUtils());
   }
   return LaneletDistance();
 }
@@ -493,10 +506,10 @@ auto API::laneletDistance(
   const RoutingConfiguration & routing_configuration) -> LaneletDistance
 {
   const auto canonicalized_lanelet_pose = CanonicalizedLaneletPose(to_lanelet_pose);
-  const auto from_entity = getEntity(from_entity_name);
-  if (from_entity->isInLanelet()) {
+  const auto & from_entity = getEntity(from_entity_name);
+  if (from_entity.isInLanelet()) {
     return distance::laneletDistance(
-      from_entity->getCanonicalizedLaneletPose().value(), canonicalized_lanelet_pose,
+      from_entity.getCanonicalizedLaneletPose().value(), canonicalized_lanelet_pose,
       routing_configuration, getHdmapUtils());
   } else {
     return LaneletDistance();
@@ -508,10 +521,10 @@ auto API::laneletDistance(
   const RoutingConfiguration & routing_configuration) -> LaneletDistance
 {
   const auto canonicalized_lanelet_pose = CanonicalizedLaneletPose(from_lanelet_pose);
-  const auto to_entity = getEntity(to_entity_name);
-  if (to_entity->isInLanelet()) {
+  const auto & to_entity = getEntity(to_entity_name);
+  if (to_entity.isInLanelet()) {
     return distance::laneletDistance(
-      canonicalized_lanelet_pose, to_entity->getCanonicalizedLaneletPose().value(),
+      canonicalized_lanelet_pose, to_entity.getCanonicalizedLaneletPose().value(),
       routing_configuration, getHdmapUtils());
   } else {
     return LaneletDistance();
@@ -522,13 +535,12 @@ auto API::boundingBoxLaneletDistance(
   const std::string & from_entity_name, const std::string & to_entity_name,
   const RoutingConfiguration & routing_configuration) -> LaneletDistance
 {
-  const auto from_entity = getEntity(from_entity_name);
-  const auto to_entity = getEntity(to_entity_name);
-  if (
-    from_entity_name != to_entity_name && from_entity->isInLanelet() && to_entity->isInLanelet()) {
+  const auto & from_entity = getEntity(from_entity_name);
+  const auto & to_entity = getEntity(to_entity_name);
+  if (from_entity_name != to_entity_name && from_entity.isInLanelet() && to_entity.isInLanelet()) {
     return distance::boundingBoxLaneletDistance(
-      from_entity->getCanonicalizedLaneletPose().value(), from_entity->getBoundingBox(),
-      to_entity->getCanonicalizedLaneletPose().value(), to_entity->getBoundingBox(),
+      from_entity.getCanonicalizedLaneletPose().value(), from_entity.getBoundingBox(),
+      to_entity.getCanonicalizedLaneletPose().value(), to_entity.getBoundingBox(),
       routing_configuration, getHdmapUtils());
   }
   return LaneletDistance();
@@ -539,10 +551,10 @@ auto API::boundingBoxLaneletDistance(
   const RoutingConfiguration & routing_configuration) -> LaneletDistance
 {
   const auto canonicalized_lanelet_pose = CanonicalizedLaneletPose(to_lanelet_pose);
-  const auto from_entity = getEntity(from_entity_name);
-  if (from_entity->isInLanelet()) {
+  const auto & from_entity = getEntity(from_entity_name);
+  if (from_entity.isInLanelet()) {
     return distance::boundingBoxLaneletDistance(
-      from_entity->getCanonicalizedLaneletPose().value(), from_entity->getBoundingBox(),
+      from_entity.getCanonicalizedLaneletPose().value(), from_entity.getBoundingBox(),
       canonicalized_lanelet_pose, traffic_simulator_msgs::msg::BoundingBox(), routing_configuration,
       getHdmapUtils());
   } else {
@@ -581,7 +593,7 @@ auto API::addTrafficSource(
     radius, rate, pose, distribution, seed, getCurrentTime(), configuration,
     entity_manager_ptr_->getHdmapUtils(), [this, speed](const auto & name, auto &&... xs) {
       this->spawn(name, std::forward<decltype(xs)>(xs)...);
-      getEntity(name)->setLinearVelocity(speed);
+      getEntity(name).setLinearVelocity(speed);
     });
 }
 }  // namespace traffic_simulator
