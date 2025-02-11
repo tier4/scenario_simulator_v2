@@ -46,13 +46,13 @@ public:
   virtual const std::string & getCurrentAction() const = 0;
 
   // clang-format off
-#define DEFINE_GETTER_SETTER(NAME, KEY, TYPE)      \
-  virtual TYPE get##NAME() = 0;                    \
-  virtual void set##NAME(const TYPE & value) = 0;  \
-  auto get##NAME##Key() const->const std::string & \
-  {                                                \
-    static const std::string key = KEY;            \
-    return key;                                    \
+#define DEFINE_GETTER_SETTER(NAME, KEY, TYPE)                \
+  virtual auto get##NAME() -> TYPE = 0;                      \
+  virtual auto set##NAME(const TYPE & value) -> void = 0;    \
+  /*   */ auto get##NAME##Key() const -> const std::string & \
+  {                                                          \
+    static const std::string key = KEY;                      \
+    return key;                                              \
   }
 
   DEFINE_GETTER_SETTER(BehaviorParameter,                                "behavior_parameter",                             traffic_simulator_msgs::msg::BehaviorParameter)
