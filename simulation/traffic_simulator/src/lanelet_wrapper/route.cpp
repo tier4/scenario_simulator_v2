@@ -110,46 +110,6 @@ auto followingLanelets(
   return following_lanelets_ids;
 }
 
-// auto followingLanelets(
-//   const lanelet::Id lanelet_id, const lanelet::Ids & candidate_lanelet_ids, const double
-//   distance, const bool include_self) -> lanelet::Ids
-// {
-//   if (candidate_lanelet_ids.empty()) {
-//     return {};
-//   } else {
-//     lanelet::Ids following_lanelets_ids;
-//     double total_distance = 0.0;
-//     bool found_reference_lanelet_id = false;
-//     for (const auto & candidate_lanelet_id : candidate_lanelet_ids) {
-//       if (found_reference_lanelet_id) {
-//         following_lanelets_ids.push_back(candidate_lanelet_id);
-//         total_distance += lanelet_map::laneletLength(candidate_lanelet_id);
-//         if (total_distance > distance) {
-//           return following_lanelets_ids;
-//         }
-//       }
-//       if (!found_reference_lanelet_id && candidate_lanelet_id == lanelet_id) {
-//         found_reference_lanelet_id = true;
-//         if (include_self) {
-//           following_lanelets_ids.push_back(candidate_lanelet_id);
-//         }
-//       }
-//     }
-
-//     if (!found_reference_lanelet_id) {
-//       THROW_SEMANTIC_ERROR("lanelet id does not match");
-//     } else if (total_distance > distance) {
-//       return following_lanelets_ids;
-//     } else {
-//       const auto remaining_lanelets =
-//         followingLanelets(candidate_lanelet_ids.back(), distance - total_distance, false);
-//       following_lanelets_ids.insert(
-//         following_lanelets_ids.end(), remaining_lanelets.begin(), remaining_lanelets.end());
-//       return following_lanelets_ids;
-//     }
-//   }
-// }
-
 auto followingLanelets(
   const lanelet::Id lanelet_id, const double distance, const bool include_self,
   const RoutingGraphType type) -> lanelet::Ids

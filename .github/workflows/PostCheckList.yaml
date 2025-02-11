@@ -1,8 +1,6 @@
 name: Post check list
 on:
   pull_request:
-    branches:
-      - master
     types: [opened, reopened]
 
 jobs:
