@@ -71,24 +71,24 @@ public:
   }
 
   template <typename EntityType>
-  /*   */ auto as() -> std::shared_ptr<EntityType>
+  /*   */ auto as() -> EntityType &
   {
-    if (auto derived = std::dynamic_pointer_cast<EntityType>(shared_from_this()); !derived) {
+    if (const auto derived_ptr = dynamic_cast<EntityType *>(this); !derived_ptr) {
       THROW_SEMANTIC_ERROR(
         "Entity ", std::quoted(name), " is not ", std::quoted(typeid(EntityType).name()), "type");
     } else {
-      return derived;
+      return *derived_ptr;
     }
   }
 
   template <typename EntityType>
-  /*   */ auto as() const -> std::shared_ptr<const EntityType>
+  /*   */ auto as() const -> const EntityType &
   {
-    if (auto derived = std::dynamic_pointer_cast<const EntityType>(shared_from_this()); !derived) {
+    if (const auto derived_ptr = dynamic_cast<EntityType const *>(this); !derived_ptr) {
       THROW_SEMANTIC_ERROR(
         "Entity ", std::quoted(name), " is not ", std::quoted(typeid(EntityType).name()), "type");
     } else {
-      return derived;
+      return *derived_ptr;
     }
   }
 

@@ -123,7 +123,7 @@ auto EntityManager::updateNpcLogic(
   if (npc_logic_started_) {
     entity.onUpdate(current_time, step_time);
   } else if (entity.is<entity::EgoEntity>()) {
-    entity.as<EgoEntity>()->updateFieldOperatorApplication();
+    entity.as<EgoEntity>().updateFieldOperatorApplication();
   }
   return entity.getCanonicalizedStatus();
 }
@@ -328,12 +328,12 @@ auto EntityManager::resetBehaviorPlugin(
       "Entity :", name, "is MiscObjectEntity.",
       "You cannot reset behavior plugin of MiscObjectEntity.");
   } else if (reference_entity.is<VehicleEntity>()) {
-    const auto parameters = reference_entity.as<VehicleEntity>()->getParameters();
+    const auto parameters = reference_entity.as<VehicleEntity>().getParameters();
     despawnEntity(name);
     spawnEntity<VehicleEntity>(
       name, status.getMapPose(), parameters, status.getTime(), behavior_plugin_name);
   } else if (reference_entity.is<PedestrianEntity>()) {
-    const auto parameters = reference_entity.as<PedestrianEntity>()->getParameters();
+    const auto parameters = reference_entity.as<PedestrianEntity>().getParameters();
     despawnEntity(name);
     spawnEntity<PedestrianEntity>(
       name, status.getMapPose(), parameters, status.getTime(), behavior_plugin_name);
