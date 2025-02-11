@@ -34,7 +34,7 @@ public:
   CatmullRomSpline() = default;
   explicit CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> & control_points);
   auto getLength() const -> double override { return total_length_; }
-  auto getAltitudeRange() const -> std::pair<double, double>;
+  auto getAltitudeRange() const -> std::pair<double, double> override;
   auto getMaximum2DCurvature() const -> double;
   auto getPoint(const double s) const -> geometry_msgs::msg::Point;
   auto getPoint(const double s, const double offset) const -> geometry_msgs::msg::Point;
