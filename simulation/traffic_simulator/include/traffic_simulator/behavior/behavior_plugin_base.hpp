@@ -41,18 +41,18 @@ class BehaviorPluginBase
 {
 public:
   virtual ~BehaviorPluginBase() = default;
-  virtual void configure(const rclcpp::Logger & logger) = 0;
+  virtual auto configure(const rclcpp::Logger & logger) -> void = 0;
   virtual auto update(const double current_time, const double step_time) -> void = 0;
-  virtual const std::string & getCurrentAction() const = 0;
+  virtual auto getCurrentAction() const -> const std::string & = 0;
 
   // clang-format off
-#define DEFINE_GETTER_SETTER(NAME, KEY, TYPE)      \
-  virtual TYPE get##NAME() = 0;                    \
-  virtual void set##NAME(const TYPE & value) = 0;  \
-  auto get##NAME##Key() const->const std::string & \
-  {                                                \
-    static const std::string key = KEY;            \
-    return key;                                    \
+#define DEFINE_GETTER_SETTER(NAME, KEY, TYPE)                \
+  virtual auto get##NAME() -> TYPE = 0;                      \
+  virtual auto set##NAME(const TYPE & value) -> void = 0;    \
+  /*   */ auto get##NAME##Key() const -> const std::string & \
+  {                                                          \
+    static const std::string key = KEY;                      \
+    return key;                                              \
   }
 
   DEFINE_GETTER_SETTER(BehaviorParameter,                                "behavior_parameter",                             traffic_simulator_msgs::msg::BehaviorParameter)

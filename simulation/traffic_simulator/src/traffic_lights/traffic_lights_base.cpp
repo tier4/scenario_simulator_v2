@@ -155,7 +155,7 @@ auto TrafficLightsBase::getDistanceToActiveTrafficLightStopLine(
     using Color = traffic_simulator::TrafficLight::Color;
     using Status = traffic_simulator::TrafficLight::Status;
     using Shape = traffic_simulator::TrafficLight::Shape;
-    if (auto && traffic_light = getTrafficLight(id);
+    if (const auto & traffic_light = getTrafficLight(id);
         traffic_light.contains(Color::red, Status::solid_on, Shape::circle) or
         traffic_light.contains(Color::yellow, Status::solid_on, Shape::circle)) {
       const auto collision_point =

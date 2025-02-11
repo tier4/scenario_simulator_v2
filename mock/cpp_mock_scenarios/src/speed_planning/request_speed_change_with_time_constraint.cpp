@@ -39,7 +39,7 @@ public:
 private:
   void onUpdate() override
   {
-    const auto ego_linear_velocity = api_.getEntity("ego")->getCurrentTwist().linear.x;
+    const auto ego_linear_velocity = api_.getEntity("ego").getCurrentTwist().linear.x;
     if (api_.getCurrentTime() <= 3.9 && ego_linear_velocity > 10.0) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
@@ -57,9 +57,9 @@ private:
     api_.spawn(
       "ego", traffic_simulator::helper::constructCanonicalizedLaneletPose(34741, 0.0, 0.0),
       getVehicleParameters());
-    auto ego_entity = api_.getEntity("ego");
-    ego_entity->setLinearVelocity(0);
-    ego_entity->requestSpeedChange(
+    auto & ego_entity = api_.getEntity("ego");
+    ego_entity.setLinearVelocity(0);
+    ego_entity.requestSpeedChange(
       10.0, traffic_simulator::speed_change::Transition::AUTO,
       traffic_simulator::speed_change::Constraint(
         traffic_simulator::speed_change::Constraint::Type::TIME, 4.0),
@@ -68,9 +68,9 @@ private:
     api_.spawn(
       "front", traffic_simulator::helper::constructCanonicalizedLaneletPose(34741, 10.0, 0.0),
       getVehicleParameters());
-    auto front_entity = api_.getEntity("front");
-    front_entity->setLinearVelocity(10);
-    front_entity->requestSpeedChange(
+    auto & front_entity = api_.getEntity("front");
+    front_entity.setLinearVelocity(10);
+    front_entity.requestSpeedChange(
       10.0, traffic_simulator::speed_change::Transition::LINEAR,
       traffic_simulator::speed_change::Constraint(
         traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 4.0),

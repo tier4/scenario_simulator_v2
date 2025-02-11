@@ -51,6 +51,14 @@ class EntityBase
 public:
   explicit EntityBase(const std::string & name, const CanonicalizedEntityStatus & entity_status);
 
+  EntityBase(const EntityBase &) = delete;
+
+  EntityBase & operator=(const EntityBase &) = delete;
+
+  EntityBase(EntityBase &&) noexcept = delete;
+
+  EntityBase & operator=(EntityBase &&) noexcept = delete;
+
   virtual ~EntityBase() = default;
 
   template <typename EntityType>

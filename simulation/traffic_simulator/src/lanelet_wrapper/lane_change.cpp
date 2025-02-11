@@ -161,14 +161,10 @@ auto laneChangeTrajectory(
   const LaneletPose & from_lanelet_pose, const Parameter & lane_change_parameter)
   -> std::optional<std::pair<Curve, double>>
 {
-  double longitudinal_distance = [&]() {
-    switch (lane_change_parameter.constraint.type) {
-      case Constraint::Type::LONGITUDINAL_DISTANCE:
-        return lane_change_parameter.constraint.value;
-      default:
-        return Parameter::default_lanechange_distance;
-    }
-  }();
+  const double longitudinal_distance =
+    lane_change_parameter.constraint.type == Constraint::Type::LONGITUDINAL_DISTANCE
+      ? lane_change_parameter.constraint.value
+      : Parameter::default_lanechange_distance;
 
   const auto along_lanelet_pose = pose::alongLaneletPose(from_lanelet_pose, longitudinal_distance);
   auto left_boundary_lanelet_pose = along_lanelet_pose;
@@ -201,7 +197,8 @@ auto laneChangeTrajectory(
   const double maximum_curvature_threshold, const double target_trajectory_length,
   const double forward_distance_threshold) -> std::optional<std::pair<Curve, double>>
 {
-  std::vector<double> candidates_evaluation, candidates_s;
+  std::vector<double> candidates_evaluation;
+  std::vector<double> candidates_s;
   std::vector<Curve> candidates_curves;
 
   const auto lanelet_length = lanelet_map::laneletLength(lane_change_parameter.target.lanelet_id);
