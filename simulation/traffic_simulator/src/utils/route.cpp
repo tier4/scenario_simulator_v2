@@ -181,7 +181,7 @@ auto laneChangePoints(
     const auto center_points = lanelet_wrapper::lanelet_map::centerPoints(following_lanelets);
     // DIFFERENT SPLINE - recalculation needed
     const Spline spline(center_points);
-    /// @note not the same as orginal one - here were duplicates and curve_waypoints
+    /// @note not the same as original one - here were duplicates and curve_waypoints
     return spline.getTrajectory(target_s, target_s + rest_s, 1.0);
   }
 }
