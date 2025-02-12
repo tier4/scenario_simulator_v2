@@ -113,13 +113,11 @@ auto distanceToStopLine(
   const lanelet::Id target_stop_line_id,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<double>;
 
-auto distanceAlongLanelet(
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
-  const geometry_msgs::msg::Point & from_position,
-  const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
-  const geometry_msgs::msg::Point & to_position,
-  const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box, const double matching_distance)
-  -> double;
+// spline
+auto distanceToSpline(
+  const geometry_msgs::msg::Pose & map_pose,
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box,
+  const math::geometry::CatmullRomSplineInterface & spline, const double s_reference) -> double;
 }  // namespace distance
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__UTILS__DISTANCE_HPP_

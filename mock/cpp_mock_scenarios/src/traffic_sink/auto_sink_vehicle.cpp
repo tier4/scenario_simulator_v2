@@ -40,7 +40,7 @@ private:
   void onUpdate() override
   {
     if (api_.getCurrentTime() >= 0.1) {
-      if (api_.entityExists("car") and not api_.entityExists("bob")) {
+      if (api_.isEntityExist("car") and not api_.isEntityExist("bob")) {
         stop(cpp_mock_scenarios::Result::SUCCESS);
       } else {
         stop(cpp_mock_scenarios::Result::FAILURE);
@@ -51,8 +51,7 @@ private:
   void onInitialize() override
   {
     const auto map_pose = traffic_simulator::pose::toMapPose(
-      traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34774, 11.0, 0.0, api_.getHdmapUtils()));
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(34774, 11.0, 0.0));
     api_.spawn("car", map_pose, getVehicleParameters());
     api_.spawn("bob", map_pose, getPedestrianParameters());
   }

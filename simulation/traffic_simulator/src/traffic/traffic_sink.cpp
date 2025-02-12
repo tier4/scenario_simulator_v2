@@ -40,8 +40,9 @@ namespace traffic_simulator
 namespace traffic
 {
 TrafficSink::TrafficSink(
+  const std::function<void(const std::string &)> & despawn,
   const std::shared_ptr<entity::EntityManager> entity_manager_ptr, const TrafficSinkConfig & config)
-: TrafficModuleBase(), config_(config), entity_manager_ptr_(entity_manager_ptr)
+: TrafficModuleBase(), despawn_(despawn), entity_manager_ptr_(entity_manager_ptr), config_(config)
 {
 }
 
@@ -50,7 +51,7 @@ auto TrafficSink::execute(
 {
   for (const auto & entity_name : entity_manager_ptr_->getEntityNames()) {
     if (isEntitySinkable(entity_name)) {
-      entity_manager_ptr_->despawnEntity(entity_name);
+      despawn_(entity_name);
     }
   }
 }
@@ -86,18 +87,16 @@ auto TrafficSink::appendDebugMarker(visualization_msgs::msg::MarkerArray & marke
 
 auto TrafficSink::isEntitySinkable(const std::string & entity_name) const noexcept(false) -> bool
 {
-  if (const auto entity = entity_manager_ptr_->getEntity(entity_name); entity == nullptr) {
-    THROW_SEMANTIC_ERROR("Entity ", std::quoted(entity_name), " does not exists.");
-  } else if (
-    config_.sinkable_entity_types.find(entity->getEntityType().type) ==
+  const auto & entity = entity_manager_ptr_->getEntity(entity_name);
+  if (
+    config_.sinkable_entity_types.find(entity.getEntityType().type) ==
     config_.sinkable_entity_types.end()) {
     return false;
-  } else if (math::geometry::getDistance(config_.position, entity->getMapPose()) > config_.radius) {
+  } else if (math::geometry::getDistance(config_.position, entity.getMapPose()) > config_.radius) {
     return false;
   } else {
     return true;
   }
 }
-
 }  // namespace traffic
 }  // namespace traffic_simulator

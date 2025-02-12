@@ -63,31 +63,32 @@ private:
 
   void onUpdate() override
   {
+    const auto & ego_entity = api_.getEntity("ego");
     // LCOV_EXCL_START
     if (api_.getCurrentTime() >= 10.0) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     // LCOV_EXCL_STOP
-    if (equals(api_.getCurrentTime(), 0.0, 0.01) && !api_.reachPosition("ego", spawn_pose, 0.1)) {
+    if (equals(api_.getCurrentTime(), 0.0, 0.01) && !ego_entity.isNearbyPosition(spawn_pose, 0.1)) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     if (
       equals(api_.getCurrentTime(), 1.0, 0.01) &&
-      !api_.reachPosition("ego", trajectory_start_pose, 0.1)) {
+      !ego_entity.isNearbyPosition(trajectory_start_pose, 0.1)) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     if (
       equals(api_.getCurrentTime(), 1.5, 0.01) &&
-      !api_.reachPosition("ego", trajectory_waypoint_pose, 0.1)) {
+      !ego_entity.isNearbyPosition(trajectory_waypoint_pose, 0.1)) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     if (
       equals(api_.getCurrentTime(), 2.0, 0.01) &&
-      !api_.reachPosition("ego", trajectory_goal_pose, 0.1)) {
+      !ego_entity.isNearbyPosition(trajectory_goal_pose, 0.1)) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     if (equals(api_.getCurrentTime(), 2.5, 0.01)) {
-      if (api_.reachPosition("ego", trajectory_goal_pose, 0.1)) {
+      if (ego_entity.isNearbyPosition(trajectory_goal_pose, 0.1)) {
         stop(cpp_mock_scenarios::Result::SUCCESS);
       } else {
         stop(cpp_mock_scenarios::Result::FAILURE);
@@ -99,10 +100,10 @@ private:
     api_.spawn(
       "ego", spawn_pose, getVehicleParameters(),
       traffic_simulator::entity::VehicleEntity::BuiltinBehavior::doNothing());
-    api_.setLinearVelocity("ego", 10);
-    api_.requestSpeedChange("ego", 10, true);
-    api_.requestFollowTrajectory(
-      "ego",
+    auto & ego_entity = api_.getEntity("ego");
+    ego_entity.setLinearVelocity(10);
+    ego_entity.requestSpeedChange(10, true);
+    ego_entity.requestFollowTrajectory(
       std::make_shared<traffic_simulator_msgs::msg::PolylineTrajectory>(
         traffic_simulator_msgs::build<traffic_simulator_msgs::msg::PolylineTrajectory>()
           .initial_distance_offset(0.0)

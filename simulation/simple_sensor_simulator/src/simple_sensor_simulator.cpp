@@ -22,6 +22,7 @@
 #include <simple_sensor_simulator/simple_sensor_simulator.hpp>
 #include <simulation_interface/conversions.hpp>
 #include <string>
+#include <traffic_simulator/utils/lanelet_map.hpp>
 #include <utility>
 #include <vector>
 
@@ -83,6 +84,7 @@ auto ScenarioSimulator::initialize(const simulation_api_schema::InitializeReques
   step_time_ = req.step_time();
   current_simulation_time_ = req.initialize_time();
   current_scenario_time_ = std::numeric_limits<double>::quiet_NaN();
+  traffic_simulator::lanelet_map::activate(req.lanelet2_map_path());
   builtin_interfaces::msg::Time t;
   simulation_interface::toMsg(req.initialize_ros_time(), t);
   current_ros_time_ = t;
