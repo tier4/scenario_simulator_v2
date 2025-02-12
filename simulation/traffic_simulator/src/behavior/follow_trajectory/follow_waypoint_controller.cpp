@@ -337,7 +337,7 @@ auto FollowWaypointController::getAcceleration(
   const double remaining_time_source, const double remaining_distance, const double acceleration,
   const double speed) const -> double
 {
-  const auto && [local_min_acceleration, local_max_acceleration] =
+  const auto [local_min_acceleration, local_max_acceleration] =
     getAccelerationLimits(acceleration, speed);
 
   if ((speed + local_min_acceleration * step_time) * step_time > remaining_distance) {
