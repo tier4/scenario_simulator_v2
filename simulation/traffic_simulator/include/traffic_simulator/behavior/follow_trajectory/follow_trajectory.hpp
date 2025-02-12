@@ -31,10 +31,9 @@ namespace follow_trajectory
 /// @note side effects on polyline_trajectory
 auto makeUpdatedEntityStatus(
   const ValidatedEntityStatus & validated_entity_status,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
   traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
-  const double matching_distance, const std::optional<double> target_speed, const double step_time)
-  -> std::optional<EntityStatus>;
+  const double matching_distance, const std::optional<double> target_speed, const double step_time,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<EntityStatus>;
 
 }  // namespace follow_trajectory
 }  // namespace traffic_simulator

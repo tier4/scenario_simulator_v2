@@ -79,9 +79,8 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
                  traffic_simulator::follow_trajectory::ValidatedEntityStatus(
                    static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status),
                    behavior_parameter, step_time),
-                 hdmap_utils, *polyline_trajectory,
-                 default_matching_distance_for_lanelet_pose_calculation, getTargetSpeed(),
-                 step_time);
+                 *polyline_trajectory, default_matching_distance_for_lanelet_pose_calculation,
+                 getTargetSpeed(), step_time, hdmap_utils);
              entity_status_updated.has_value()) {
     setCanonicalizedEntityStatus(entity_status_updated.value());
     setOutput("waypoints", calculateWaypoints());
