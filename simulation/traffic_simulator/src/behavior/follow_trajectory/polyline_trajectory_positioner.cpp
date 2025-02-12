@@ -47,8 +47,9 @@ PolylineTrajectoryPositioner::PolylineTrajectoryPositioner(
   nearest_waypoint_position_(
     validatedEntityTargetPosition()),  // implicitly requires: polyline_trajectory_
   distance_to_nearest_waypoint_(distanceAlongLanelet(
-    hdmap_utils_ptr_, validated_entity_status_.position(), validated_entity_status_.boundingBox(),
-    nearest_waypoint_position_, validated_entity_status_.boundingBox(), matching_distance_)),
+    validated_entity_status_.position(), validated_entity_status_.boundingBox(),
+    nearest_waypoint_position_, validated_entity_status_.boundingBox(), matching_distance_,
+    hdmap_utils_ptr_)),
   total_remaining_distance_(
     totalRemainingDistance()),  // implicitly requires: polyline_trajectory_, hdmap_utils_ptr_, matching_distance_
   /// @todo nearest_waypoint_ does not always have time defined, so is this correct (getWaypoints().front().time)?
@@ -187,11 +188,11 @@ auto PolylineTrajectoryPositioner::totalRemainingDistance() const -> double
         getWaypoints().cbegin(), last, 0.0,
         [this](const double total_distance, const auto & vertex) {
           const auto next_vertex = std::next(&vertex);
-          return total_distance + distanceAlongLanelet(
-                                    hdmap_utils_ptr_, vertex.position.position,
-                                    validated_entity_status_.boundingBox(),
-                                    next_vertex->position.position,
-                                    validated_entity_status_.boundingBox(), matching_distance_);
+          return total_distance +
+                 distanceAlongLanelet(
+                   vertex.position.position, validated_entity_status_.boundingBox(),
+                   next_vertex->position.position, validated_entity_status_.boundingBox(),
+                   matching_distance_, hdmap_utils_ptr_);
         });
     };
 
