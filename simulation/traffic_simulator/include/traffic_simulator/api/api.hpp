@@ -110,7 +110,12 @@ public:
   auto updateFrame() -> bool;
 
   // entities, ego - spawn
-  template <typename PoseType, typename ParamsType>
+  template <
+    typename PoseType, typename ParamsType,
+    typename = std::enable_if_t<std::disjunction_v<
+      std::is_same<std::decay_t<ParamsType>, traffic_simulator_msgs::msg::VehicleParameters>,
+      std::is_same<std::decay_t<ParamsType>, traffic_simulator_msgs::msg::PedestrianParameters>,
+      std::is_same<std::decay_t<ParamsType>, traffic_simulator_msgs::msg::MiscObjectParameters>>>>
   auto spawn(
     const std::string & name, const PoseType & pose, const ParamsType & parameters,
     const std::string & behavior = "", const std::string & model3d = "") -> entity::EntityBase &
@@ -136,8 +141,6 @@ public:
       } else if constexpr (std::is_same_v<ParamsType, MiscObjectParameters>) {
         return entity_manager_ptr_->spawnEntity<entity::MiscObjectEntity>(
           name, pose, parameters, getCurrentTime());
-      } else {
-        THROW_SEMANTIC_ERROR("Entity ", std::quoted(name), " has an undefined type.");
       }
     };
 
