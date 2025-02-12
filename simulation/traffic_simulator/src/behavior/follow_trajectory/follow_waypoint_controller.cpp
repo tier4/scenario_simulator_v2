@@ -275,7 +275,7 @@ auto FollowWaypointController::getPredictedWaypointArrivalState(
 
       // Count the distance and time of movement with constant speed, use this to prediction.
       if (const double const_speed_distance = remaining_distance - state.traveled_distance;
-          const_speed_distance == std::numeric_limits<double>::infinity()) {
+          const_speed_distance >= std::numeric_limits<double>::max() * const_speed_value) {
         throw ControllerError(
           "Exceeded the range of the variable type <double> (", const_speed_distance, "/",
           const_speed_value, ") - the value is too large. Probably the distance",
