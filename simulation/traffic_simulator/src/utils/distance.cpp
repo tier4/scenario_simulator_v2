@@ -314,12 +314,11 @@ auto distanceToStopLine(
 }
 
 auto distanceAlongLanelet(
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
   const geometry_msgs::msg::Point & from_position,
   const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
   const geometry_msgs::msg::Point & to_position,
-  const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box, const double matching_distance)
-  -> double
+  const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box, const double matching_distance,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> double
 {
   if (const auto from_lanelet_pose =
         hdmap_utils_ptr->toLaneletPose(from_position, from_bounding_box, false, matching_distance);
