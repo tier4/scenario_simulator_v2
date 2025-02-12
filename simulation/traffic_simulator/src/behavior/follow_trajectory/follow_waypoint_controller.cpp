@@ -178,7 +178,7 @@ auto FollowWaypointController::clampAcceleration(
   const double candidate_acceleration, const double acceleration, const double speed) const
   -> double
 {
-  const auto && [local_min_acceleration, local_max_acceleration] =
+  const auto [local_min_acceleration, local_max_acceleration] =
     getAccelerationLimits(acceleration, speed);
   return std::clamp(candidate_acceleration, local_min_acceleration, local_max_acceleration);
 }
