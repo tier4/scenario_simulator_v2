@@ -45,21 +45,26 @@ ament_auto_add_library(traffic_simulator SHARED
   src/entity/pedestrian_entity.cpp
   src/entity/vehicle_entity.cpp
   src/hdmap_utils/hdmap_utils.cpp
-  src/hdmap_utils/traffic_rules.cpp
   src/helper/helper.cpp
-  src/job/job_list.cpp
   src/job/job.cpp
+  src/job/job_list.cpp
+  src/lanelet_wrapper/lanelet_loader.cpp
+  src/lanelet_wrapper/lanelet_map.cpp
+  src/lanelet_wrapper/lanelet_wrapper.cpp
+  src/lanelet_wrapper/pose.cpp
+  src/lanelet_wrapper/traffic_rules.cpp
   src/simulation_clock/simulation_clock.cpp
-  src/traffic_lights/configurable_rate_updater.cpp
-  src/traffic_lights/traffic_light_marker_publisher.cpp
-  src/traffic_lights/traffic_light_publisher.cpp
-  src/traffic_lights/traffic_light.cpp
-  src/traffic_lights/traffic_lights_base.cpp
-  src/traffic_lights/traffic_lights.cpp
   src/traffic/traffic_controller.cpp
   src/traffic/traffic_sink.cpp
   src/traffic/traffic_source.cpp
+  src/traffic_lights/configurable_rate_updater.cpp
+  src/traffic_lights/traffic_light.cpp
+  src/traffic_lights/traffic_light_marker_publisher.cpp
+  src/traffic_lights/traffic_light_publisher.cpp
+  src/traffic_lights/traffic_lights.cpp
+  src/traffic_lights/traffic_lights_base.cpp
   src/utils/distance.cpp
+  src/utils/lanelet_map.cpp
   src/utils/pose.cpp
 )
 

@@ -155,67 +155,6 @@ public:
   ~EntityManager() = default;
 
 public:
-  // clang-format off
-#define FORWARD_TO_ENTITY(IDENTIFIER, ...)                                       \
-  /*!                                                                            \
-   @brief Forward to arguments to the EntityBase::IDENTIFIER function.           \
-   @return return value of the EntityBase::IDENTIFIER function.                  \
-   @note This function was defined by FORWARD_TO_ENTITY macro.    　  　　　　　   \
-   */                                                                            \
-  template <typename... Ts>                                                      \
-  decltype(auto) IDENTIFIER(const std::string & name, Ts &&... xs) __VA_ARGS__   \
-  try {                                                                          \
-    return entities_.at(name)->IDENTIFIER(std::forward<decltype(xs)>(xs)...);    \
-  } catch (const std::out_of_range &) {                                          \
-    THROW_SEMANTIC_ERROR("entity : ", name, "does not exist");                   \
-  }                                                                              \
-  static_assert(true, "")
-  // clang-format on
-
-  FORWARD_TO_ENTITY(activateOutOfRangeJob, );
-  FORWARD_TO_ENTITY(asFieldOperatorApplication, const);
-  FORWARD_TO_ENTITY(cancelRequest, );
-  FORWARD_TO_ENTITY(get2DPolygon, const);
-  FORWARD_TO_ENTITY(getBehaviorParameter, const);
-  FORWARD_TO_ENTITY(getBoundingBox, const);
-  FORWARD_TO_ENTITY(getCanonicalizedStatusBeforeUpdate, const);
-  FORWARD_TO_ENTITY(getCurrentAccel, const);
-  FORWARD_TO_ENTITY(getCurrentTwist, const);
-  FORWARD_TO_ENTITY(getDefaultMatchingDistanceForLaneletPoseCalculation, const);
-  FORWARD_TO_ENTITY(getEntityType, const);
-  FORWARD_TO_ENTITY(getEntityTypename, const);
-  FORWARD_TO_ENTITY(getLinearJerk, const);
-  FORWARD_TO_ENTITY(getRouteLanelets, const);
-  FORWARD_TO_ENTITY(getStandStillDuration, const);
-  FORWARD_TO_ENTITY(getTraveledDistance, const);
-  FORWARD_TO_ENTITY(isControlledBySimulator, );
-  FORWARD_TO_ENTITY(laneMatchingSucceed, const);
-  FORWARD_TO_ENTITY(reachPosition, const);
-  FORWARD_TO_ENTITY(requestAcquirePosition, );
-  FORWARD_TO_ENTITY(requestAssignRoute, );
-  FORWARD_TO_ENTITY(requestClearRoute, );
-  FORWARD_TO_ENTITY(requestFollowTrajectory, );
-  FORWARD_TO_ENTITY(requestLaneChange, );
-  FORWARD_TO_ENTITY(requestSynchronize, );
-  FORWARD_TO_ENTITY(requestWalkStraight, );
-  FORWARD_TO_ENTITY(setAcceleration, );
-  FORWARD_TO_ENTITY(setAccelerationLimit, );
-  FORWARD_TO_ENTITY(setAccelerationRateLimit, );
-  FORWARD_TO_ENTITY(setBehaviorParameter, );
-  FORWARD_TO_ENTITY(setControlledBySimulator, );
-  FORWARD_TO_ENTITY(setDecelerationLimit, );
-  FORWARD_TO_ENTITY(setDecelerationRateLimit, );
-  FORWARD_TO_ENTITY(setLinearJerk, );
-  FORWARD_TO_ENTITY(setLinearVelocity, );
-  FORWARD_TO_ENTITY(setMapPose, );
-  FORWARD_TO_ENTITY(setTwist, );
-  FORWARD_TO_ENTITY(setVelocityLimit, );
-  FORWARD_TO_ENTITY(requestSpeedChange, );
-
-#undef FORWARD_TO_ENTITY
-
-  auto getCurrentAction(const std::string & name) const -> std::string;
-
   visualization_msgs::msg::MarkerArray makeDebugMarker() const;
 
   auto updateNpcLogic(const std::string & name, const double current_time, const double step_time)
@@ -226,19 +165,22 @@ public:
   void broadcastTransform(
     const geometry_msgs::msg::PoseStamped & pose, const bool static_transform = true);
 
-  bool checkCollision(
-    const std::string & first_entity_name, const std::string & second_entity_name);
-
   bool despawnEntity(const std::string & name);
 
-  bool entityExists(const std::string & name);
+  auto isEntityExist(const std::string & name) const -> bool;
 
   auto getEntityNames() const -> const std::vector<std::string>;
 
-  auto getEntity(const std::string & name) const
+  auto getEntityPointer(const std::string & name) const
     -> std::shared_ptr<traffic_simulator::entity::EntityBase>;
 
-  auto getEntityStatus(const std::string & name) const -> const CanonicalizedEntityStatus &;
+  auto getEntity(const std::string & name) -> entity::EntityBase &;
+
+  auto getEntity(const std::string & name) const -> const entity::EntityBase &;
+
+  auto getEgoEntity(const std::string & name) -> entity::EgoEntity &;
+
+  auto getEgoEntity(const std::string & name) const -> const entity::EgoEntity &;
 
   auto getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &;
 
@@ -277,22 +219,9 @@ public:
     }
   }
 
-  template <typename EntityType>
-  bool is(const std::string & name) const
-  {
-    return dynamic_cast<EntityType const *>(entities_.at(name).get()) != nullptr;
-  }
+  auto isAnyEgoSpawned() const -> bool;
 
-  bool isEgoSpawned() const;
-
-  const std::string getEgoName() const;
-
-  bool isInLanelet(const std::string & name, const lanelet::Id lanelet_id, const double tolerance);
-
-  bool isStopping(const std::string & name) const;
-
-  void requestLaneChange(
-    const std::string & name, const traffic_simulator::lane_change::Direction & direction);
+  auto getFirstEgoName() const -> std::optional<std::string>;
 
   /**
    * @brief Reset behavior plugin of the target entity.
@@ -321,10 +250,7 @@ public:
       EntityStatus entity_status;
 
       if constexpr (std::is_same_v<std::decay_t<Entity>, EgoEntity>) {
-        if (auto iter = std::find_if(
-              std::begin(entities_), std::end(entities_),
-              [this](auto && each) { return is<EgoEntity>(each.first); });
-            iter != std::end(entities_)) {
+        if (isAnyEgoSpawned()) {
           THROW_SEMANTIC_ERROR("multi ego simulation does not support yet");
         } else {
           entity_status.type.type = traffic_simulator_msgs::msg::EntityType::EGO;
@@ -372,7 +298,7 @@ public:
       } else if constexpr (std::is_same_v<std::decay_t<Pose>, geometry_msgs::msg::Pose>) {
         entity_status.pose = pose;
         const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
-          pose, parameters.bounding_box, include_crosswalk, matching_distance, hdmap_utils_ptr_);
+          pose, parameters.bounding_box, include_crosswalk, matching_distance);
         return CanonicalizedEntityStatus(entity_status, canonicalized_lanelet_pose);
       }
     };

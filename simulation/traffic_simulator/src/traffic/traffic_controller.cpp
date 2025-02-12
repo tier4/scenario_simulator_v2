@@ -28,6 +28,7 @@
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
 #include <traffic_simulator/traffic/traffic_controller.hpp>
 #include <traffic_simulator/traffic/traffic_sink.hpp>
+#include <traffic_simulator/utils/lanelet_map.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 #include <utility>
 #include <vector>
@@ -37,9 +38,10 @@ namespace traffic_simulator
 namespace traffic
 {
 TrafficController::TrafficController(
+  const std::function<void(const std::string &)> & despawn,
   const std::shared_ptr<entity::EntityManager> entity_manager_ptr,
   const std::set<std::uint8_t> auto_sink_entity_types)
-: entity_manager_ptr_(entity_manager_ptr), modules_()
+: despawn_(despawn), entity_manager_ptr_(entity_manager_ptr), modules_()
 {
   if (not auto_sink_entity_types.empty()) {
     appendAutoSinks(auto_sink_entity_types);
@@ -49,18 +51,12 @@ TrafficController::TrafficController(
 auto TrafficController::appendAutoSinks(const std::set<std::uint8_t> & auto_sink_entity_types)
   -> void
 {
-  static constexpr double sink_radius = 1.0;
-  const auto hdmap_utils_ptr = entity_manager_ptr_->getHdmapUtils();
-  for (const auto & lanelet_id : hdmap_utils_ptr->getLaneletIds()) {
-    if (hdmap_utils_ptr->getNextLaneletIds(lanelet_id).empty()) {
-      LaneletPose lanelet_pose;
-      lanelet_pose.lanelet_id = lanelet_id;
-      lanelet_pose.s = pose::laneletLength(lanelet_id, hdmap_utils_ptr);
-      const auto pose = pose::toMapPose(lanelet_pose, hdmap_utils_ptr);
-      const auto traffic_sink_config = TrafficSinkConfig(
-        sink_radius, pose.position, auto_sink_entity_types, std::make_optional(lanelet_id));
-      addModule<TrafficSink>(entity_manager_ptr_, traffic_sink_config);
-    }
+  /// @note Hard coded parameter, this value is radius of the traffic sink circle.
+  constexpr double sink_radius{1.0};
+  for (const auto & [lanelet_id, pose] : lanelet_map::noNextLaneletPoses()) {
+    const auto traffic_sink_config = TrafficSinkConfig(
+      sink_radius, pose.position, auto_sink_entity_types, std::make_optional(lanelet_id));
+    addModule<TrafficSink>(despawn_, entity_manager_ptr_, traffic_sink_config);
   }
 }
 
