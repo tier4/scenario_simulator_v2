@@ -144,7 +144,7 @@ public:
   virtual void requestLaneChange(const lanelet::Id)
   {
     /**
-     * @note There are Entities such as MiscObjectEntity for which lane change is not possible,
+     * @note There are Entities such as MiscObjectEntity for which lane change is not possible, 
      * and since it is necessary to implement appropriate overrides for each Entity, no operation is performed on the base type.
      */
   }
@@ -152,7 +152,7 @@ public:
   virtual void requestLaneChange(const traffic_simulator::lane_change::Parameter &)
   {
     /**
-     * @note There are Entities such as MiscObjectEntity for which lane change is not possible,
+     * @note There are Entities such as MiscObjectEntity for which lane change is not possible, 
      * and since it is necessary to implement appropriate overrides for each Entity, no operation is performed on the base type.
      */
   }
@@ -182,7 +182,7 @@ public:
   virtual void requestClearRoute()
   {
     /**
-     * @note Since there are Entities such as MiscObjectEntity that do not perform routing,
+     * @note Since there are Entities such as MiscObjectEntity that do not perform routing, 
      * and routing methods differ from Entity to Entity, this function performs no operation in the base type.
      */
   }
