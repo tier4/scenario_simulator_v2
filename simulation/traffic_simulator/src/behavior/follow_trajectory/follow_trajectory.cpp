@@ -33,7 +33,6 @@ namespace follow_trajectory
 {
 
 /// @note side effects on polyline_trajectory
-/// @todo let Dawid know to analyse these free functions
 auto discardTheFrontWaypoint(
   traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory, const double current_time)
   -> void;

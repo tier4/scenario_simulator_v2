@@ -368,7 +368,7 @@ auto PolylineTrajectoryPositioner::makeUpdatedEntityStatus() const -> std::optio
   /**
    * @note This clause is to avoid division-by-zero errors in later clauses with distance_to_nearest_waypoint 
    * as the denominator if the distance miraculously becomes zero.
-   * @todo extendhis comment about < 0.0
+   * @todo extend this comment about < 0.0
   */
   if (distance_to_nearest_waypoint_ <= 0.0 || total_remaining_distance_ <= 0) {
     return std::nullopt;
