@@ -55,7 +55,7 @@ private:
 
   auto isNearestWaypointWithSpecifiedTimeSameAsLastWaypoint() const -> bool;
 
-  auto isNearestWaypointReachable(const auto desired_local_acceleration) const -> bool;
+  auto isNearestWaypointReachable(const double desired_local_acceleration) const -> bool;
 
   // helpers to the constructor
   auto timeToNearestWaypoint() const noexcept(false) -> double;
@@ -64,7 +64,7 @@ private:
 
   auto totalRemainingTime() const noexcept(false) -> double;
 
-  auto validatedEntityTargetPosition() const noexcept(false) -> geometry_msgs::msg::Point;
+  auto validatedEntityTargetPose() const noexcept(false) -> geometry_msgs::msg::Pose;
 
   // other validators
   auto validatedEntityDesiredLinearAcceleration() const noexcept(false) -> double;
@@ -89,7 +89,7 @@ private:
 
   const std::vector<traffic_simulator_msgs::msg::Vertex>::const_iterator
     nearest_waypoint_with_specified_time_it_;
-  const geometry_msgs::msg::Point nearest_waypoint_position_;
+  const geometry_msgs::msg::Pose nearest_waypoint_pose_;
   const double distance_to_nearest_waypoint_;
   const double total_remaining_distance_;
   const double time_to_nearest_waypoint_;

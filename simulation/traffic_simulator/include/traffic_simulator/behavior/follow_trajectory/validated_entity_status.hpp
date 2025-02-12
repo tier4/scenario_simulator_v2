@@ -43,6 +43,7 @@ public:
   auto name()               const noexcept(true) -> const std::string &                                    { return entity_status_.name;                         }
   auto time()               const noexcept(true) -> double                                                 { return entity_status_.time;                         }
   auto isLaneletPoseValid() const noexcept(true) -> bool                                                   { return entity_status_.lanelet_pose_valid;           }
+  auto pose()               const noexcept(true) -> const geometry_msgs::msg::Pose &                       { return entity_status_.pose;                         }
   auto position()           const noexcept(true) -> const geometry_msgs::msg::Point &                      { return entity_status_.pose.position;                }
   auto orientation()        const noexcept(true) -> const geometry_msgs::msg::Quaternion &                 { return entity_status_.pose.orientation;             }
   auto velocity()           const noexcept(true) -> const geometry_msgs::msg::Vector3 &                    { return velocity_;                                   }

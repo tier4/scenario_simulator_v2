@@ -43,16 +43,15 @@ PolylineTrajectoryPositioner::PolylineTrajectoryPositioner(
   step_time_(step_time),
   matching_distance_(matching_distance),
   nearest_waypoint_with_specified_time_it_(
-    getNearestWaypointWithSpecifiedTimeIterator()),  // implicitly requires: polyline_trajectory_
-  nearest_waypoint_position_(
-    validatedEntityTargetPosition()),  // implicitly requires: polyline_trajectory_
+    getNearestWaypointWithSpecifiedTimeIterator()),     // implicitly requires: polyline_trajectory_
+  nearest_waypoint_pose_(validatedEntityTargetPose()),  // implicitly requires: polyline_trajectory_
   distance_to_nearest_waypoint_(
     distance::distanceAlongLanelet(
-      validated_entity_status_.position(), validated_entity_status_.boundingBox(),
-      nearest_waypoint_position_, validated_entity_status_.boundingBox(), matching_distance_,
+      validated_entity_status_.pose(), validated_entity_status_.boundingBox(),
+      nearest_waypoint_pose_, validated_entity_status_.boundingBox(), matching_distance_,
       hdmap_utils_ptr_)
-      .value_or(
-        math::geometry::hypot(validated_entity_status_.position(), nearest_waypoint_position_))),
+      .value_or(math::geometry::hypot(
+        validated_entity_status_.position(), nearest_waypoint_pose_.position))),
   total_remaining_distance_(
     totalRemainingDistance()),  // implicitly requires: polyline_trajectory_, hdmap_utils_ptr_, matching_distance_
   /// @todo nearest_waypoint_ does not always have time defined, so is this correct (getWaypoints().front().time)?
@@ -141,7 +140,7 @@ auto PolylineTrajectoryPositioner::isNearestWaypointWithSpecifiedTimeSameAsLastW
    *    step is possible (time_to_nearest_waypoint is almost zero).
    */
 auto PolylineTrajectoryPositioner::isNearestWaypointReachable(
-  const auto desired_local_acceleration) const -> bool
+  const double desired_local_acceleration) const -> bool
 {
   if (not std::isfinite(time_to_nearest_waypoint_)) {
     if (getWaypoints().size() == 1UL) {
@@ -189,15 +188,14 @@ auto PolylineTrajectoryPositioner::totalRemainingDistance() const -> double
     [this](const std::vector<traffic_simulator_msgs::msg::Vertex>::const_iterator last) {
       return std::accumulate(
         getWaypoints().cbegin(), last, 0.0,
-        [this](const double total_distance, const auto & vertex) {
+        [this](const double total_distance, const traffic_simulator_msgs::msg::Vertex & vertex) {
           const auto next_vertex = std::next(&vertex);
-          return total_distance +
-                 distance::distanceAlongLanelet(
-                   vertex.position.position, validated_entity_status_.boundingBox(),
-                   next_vertex->position.position, validated_entity_status_.boundingBox(),
-                   matching_distance_, hdmap_utils_ptr_)
-                   .value_or(math::geometry::hypot(
-                     vertex.position.position, next_vertex->position.position));
+          return total_distance + distance::distanceAlongLanelet(
+                                    vertex.position, validated_entity_status_.boundingBox(),
+                                    next_vertex->position, validated_entity_status_.boundingBox(),
+                                    matching_distance_, hdmap_utils_ptr_)
+                                    .value_or(math::geometry::hypot(
+                                      vertex.position.position, next_vertex->position.position));
         });
     };
 
@@ -283,15 +281,16 @@ auto PolylineTrajectoryPositioner::validatedEntityDesiredLocalVelocity(
     THROW_SIMULATION_ERROR("The followingMode is only supported for position.");
   }
 
-  const double dx = nearest_waypoint_position_.x - validated_entity_status_.position().x;
-  const double dy = nearest_waypoint_position_.y - validated_entity_status_.position().y;
+  const double dx = nearest_waypoint_pose_.position.x - validated_entity_status_.position().x;
+  const double dy = nearest_waypoint_pose_.position.y - validated_entity_status_.position().y;
 
   /// @note if entity is on lane use pitch from lanelet, otherwise use pitch on target
   const double pitch =
     validated_entity_status_.isLaneletPoseValid()
       ? -math::geometry::convertQuaternionToEulerAngle(validated_entity_status_.orientation()).y
       : std::atan2(
-          nearest_waypoint_position_.z - validated_entity_status_.position().z, std::hypot(dy, dx));
+          nearest_waypoint_pose_.position.z - validated_entity_status_.position().z,
+          std::hypot(dy, dx));
   /// @note use yaw on target
   const double yaw = std::atan2(dy, dx);
 
@@ -401,24 +400,24 @@ auto PolylineTrajectoryPositioner::makeUpdatedEntityStatus() const -> std::optio
   }
 }
 
-auto PolylineTrajectoryPositioner::validatedEntityTargetPosition() const noexcept(false)
-  -> geometry_msgs::msg::Point
+auto PolylineTrajectoryPositioner::validatedEntityTargetPose() const noexcept(false)
+  -> geometry_msgs::msg::Pose
 {
   if (getWaypoints().empty()) {
     THROW_SIMULATION_ERROR(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "attempted to dereference an element of an empty PolylineTrajectory for vehicle ",
       std::quoted(validated_entity_status_.name()));
-  } else if (const auto & target_position = getWaypoints().front().position.position;
-             not math::geometry::isFinite(target_position)) {
+  } else if (const auto & target_pose = getWaypoints().front().position;
+             not math::geometry::isFinite(target_pose.position)) {
     THROW_SIMULATION_ERROR(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
       std::quoted(validated_entity_status_.name()),
       "'s target position coordinate value contains NaN or infinity. The value is [",
-      target_position.x, ", ", target_position.y, ", ", target_position.z, "].");
+      target_pose.position.x, ", ", target_pose.position.y, ", ", target_pose.position.z, "].");
   } else {
-    return target_position;
+    return target_pose;
   }
 }
 

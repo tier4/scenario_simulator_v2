@@ -27,6 +27,7 @@
 #include <geometry_msgs/msg/twist.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/behavior/follow_trajectory/validated_entity_status.hpp>
+#include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator_msgs/msg/action_status.hpp>
 
 namespace traffic_simulator
@@ -70,15 +71,39 @@ auto ValidatedEntityStatus::buildUpdatedEntityStatus(
 
   const auto updated_time = entity_status_.time + step_time_;
 
-  const auto updated_pose_position =
-    entity_status_.pose.position + desired_local_velocity * step_time_;
   const auto updated_pose_orientation =
     desired_local_velocity == geometry_msgs::msg::Vector3()
       ? entity_status_.pose.orientation
       : math::geometry::convertDirectionToQuaternion(desired_local_velocity);
-  const auto updated_pose = geometry_msgs::build<geometry_msgs::msg::Pose>()
-                              .position(updated_pose_position)
-                              .orientation(updated_pose_orientation);
+
+  auto updated_pose =
+    geometry_msgs::build<geometry_msgs::msg::Pose>()
+      .position(entity_status_.pose.position + desired_local_velocity * step_time_)
+      .orientation(updated_pose_orientation);
+
+  const auto include_crosswalk = [](const auto & entity_type) {
+    return (traffic_simulator_msgs::msg::EntityType::PEDESTRIAN == entity_type.type) ||
+           (traffic_simulator_msgs::msg::EntityType::MISC_OBJECT == entity_type.type);
+  }(entity_status_.type);
+
+  /// @note If it is the transition between lanelets: overwrite position to improve precision
+  if (entity_status_.lanelet_pose_valid) {
+    constexpr bool desired_velocity_is_global = true;
+    const auto canonicalized_lanelet_pose =
+      traffic_simulator::pose::toCanonicalizedLaneletPose(entity_status_.lanelet_pose);
+    const auto estimated_next_canonicalized_lanelet_pose =
+      traffic_simulator::pose::toCanonicalizedLaneletPose(updated_pose, include_crosswalk);
+    if (canonicalized_lanelet_pose && estimated_next_canonicalized_lanelet_pose) {
+      const auto next_lanelet_id =
+        static_cast<LaneletPose>(estimated_next_canonicalized_lanelet_pose.value()).lanelet_id;
+      if (  /// @note Handle lanelet transition
+        const auto updated_position = pose::updatePositionForLaneletTransition(
+          canonicalized_lanelet_pose.value(), next_lanelet_id, desired_local_velocity,
+          desired_velocity_is_global, step_time_)) {
+        updated_pose.position = updated_position.value();
+      }
+    }
+  }
 
   const auto updated_twist_linear = geometry_msgs::build<geometry_msgs::msg::Vector3>()
                                       .x(math::geometry::norm(desired_local_velocity))

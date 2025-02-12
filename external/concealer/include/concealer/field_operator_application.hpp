@@ -31,10 +31,10 @@
 #include <autoware_vehicle_msgs/msg/gear_command.hpp>
 #include <autoware_vehicle_msgs/msg/turn_indicators_command.hpp>
 #include <concealer/autoware_universe.hpp>
-#include <concealer/launch.hpp>
-#include <concealer/publisher_wrapper.hpp>
-#include <concealer/service_with_validation.hpp>
-#include <concealer/subscriber_wrapper.hpp>
+#include <concealer/path_with_lane_id.hpp>
+#include <concealer/publisher.hpp>
+#include <concealer/service.hpp>
+#include <concealer/subscriber.hpp>
 #include <concealer/task_queue.hpp>
 #include <concealer/transition_assertion.hpp>
 #include <concealer/visibility.hpp>
@@ -45,7 +45,6 @@
 #include <tier4_external_api_msgs/msg/emergency.hpp>
 #include <tier4_external_api_msgs/srv/engage.hpp>
 #include <tier4_external_api_msgs/srv/set_velocity_limit.hpp>
-#include <tier4_planning_msgs/msg/path_with_lane_id.hpp>
 #include <tier4_planning_msgs/msg/trajectory.hpp>
 #include <tier4_rtc_msgs/msg/cooperate_status_array.hpp>
 #include <tier4_rtc_msgs/srv/auto_mode_with_module.hpp>
@@ -55,19 +54,6 @@
 
 namespace concealer
 {
-/* ---- NOTE -------------------------------------------------------------------
- *
- *  The magic class 'FieldOperatorApplication' is a class that makes it easy to work with
- *  Autoware from C++. The main features of this class are as follows
- *
- *    (1) Launch Autoware in an independent process upon instantiation of the
- *        class.
- *    (2) Properly terminates the Autoware process started by the constructor
- *        upon destruction of the class.
- *    (3) Probably the simplest instructions to Autoware, consisting of
- *        initialize, plan, and engage.
- *
- * -------------------------------------------------------------------------- */
 struct FieldOperatorApplication : public rclcpp::Node,
                                   public TransitionAssertion<FieldOperatorApplication>
 {
@@ -77,11 +63,9 @@ struct FieldOperatorApplication : public rclcpp::Node,
 
   const pid_t process_id = 0;
 
-  bool initialize_was_called = false;
+  bool initialized = false;
 
-  std::string autoware_state;
-
-  tier4_rtc_msgs::msg::CooperateStatusArray latest_cooperate_status_array;
+  std::string autoware_state = "LAUNCHING";
 
   std::string minimum_risk_maneuver_state;
 
@@ -94,7 +78,6 @@ struct FieldOperatorApplication : public rclcpp::Node,
   using Emergency                       = tier4_external_api_msgs::msg::Emergency;
   using LocalizationInitializationState = autoware_adapi_v1_msgs::msg::LocalizationInitializationState;
   using MrmState                        = autoware_adapi_v1_msgs::msg::MrmState;
-  using PathWithLaneId                  = tier4_planning_msgs::msg::PathWithLaneId;
   using Trajectory                      = tier4_planning_msgs::msg::Trajectory;
   using TurnIndicatorsCommand           = autoware_vehicle_msgs::msg::TurnIndicatorsCommand;
 
@@ -107,26 +90,26 @@ struct FieldOperatorApplication : public rclcpp::Node,
   using SetVelocityLimit                = tier4_external_api_msgs::srv::SetVelocityLimit;
   using ChangeOperationMode             = autoware_adapi_v1_msgs::srv::ChangeOperationMode;
 
-  SubscriberWrapper<AutowareState>                   getAutowareState;
-  SubscriberWrapper<Control>                         getCommand;
-  SubscriberWrapper<CooperateStatusArray>            getCooperateStatusArray;
-  SubscriberWrapper<Emergency>                       getEmergencyState;
+  Subscriber<AutowareState>                   getAutowareState;
+  Subscriber<Control>                         getCommand;
+  Subscriber<CooperateStatusArray>            getCooperateStatusArray;
+  Subscriber<Emergency>                       getEmergencyState;
 #if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)
-  SubscriberWrapper<LocalizationInitializationState> getLocalizationState;
+  Subscriber<LocalizationInitializationState> getLocalizationState;
 #endif
-  SubscriberWrapper<MrmState>                        getMrmState;
-  SubscriberWrapper<PathWithLaneId>                  getPathWithLaneId;
-  SubscriberWrapper<Trajectory>                      getTrajectory;
-  SubscriberWrapper<TurnIndicatorsCommand>           getTurnIndicatorsCommand;
+  Subscriber<MrmState>                 getMrmState;
+  Subscriber<priority::PathWithLaneId> getPathWithLaneId;
+  Subscriber<Trajectory>               getTrajectory;
+  Subscriber<TurnIndicatorsCommand>    getTurnIndicatorsCommand;
 
-  ServiceWithValidation<ClearRoute>                  requestClearRoute;
-  ServiceWithValidation<CooperateCommands>           requestCooperateCommands;
-  ServiceWithValidation<Engage>                      requestEngage;
-  ServiceWithValidation<InitializeLocalization>      requestInitialPose;
-  ServiceWithValidation<SetRoutePoints>              requestSetRoutePoints;
-  ServiceWithValidation<AutoModeWithModule>          requestSetRtcAutoMode;
-  ServiceWithValidation<SetVelocityLimit>            requestSetVelocityLimit;
-  ServiceWithValidation<ChangeOperationMode>         requestEnableAutowareControl;
+  Service<ClearRoute>             requestClearRoute;
+  Service<CooperateCommands>      requestCooperateCommands;
+  Service<Engage>                 requestEngage;
+  Service<InitializeLocalization> requestInitialPose;
+  Service<SetRoutePoints>         requestSetRoutePoints;
+  Service<AutoModeWithModule>     requestSetRtcAutoMode;
+  Service<SetVelocityLimit>       requestSetVelocityLimit;
+  Service<ChangeOperationMode>    requestEnableAutowareControl;
   // clang-format on
 
   /*
@@ -136,13 +119,7 @@ struct FieldOperatorApplication : public rclcpp::Node,
   */
   TaskQueue task_queue;
 
-  CONCEALER_PUBLIC explicit FieldOperatorApplication(const pid_t = 0);
-
-  template <typename... Ts>
-  CONCEALER_PUBLIC explicit FieldOperatorApplication(Ts &&... xs)
-  : FieldOperatorApplication(ros2_launch(std::forward<decltype(xs)>(xs)...))
-  {
-  }
+  CONCEALER_PUBLIC explicit FieldOperatorApplication(const pid_t);
 
   ~FieldOperatorApplication();
 
@@ -160,17 +137,7 @@ struct FieldOperatorApplication : public rclcpp::Node,
 
   auto clearRoute() -> void;
 
-  auto getAutowareStateName() const { return autoware_state; }
-
-  auto getMinimumRiskManeuverBehaviorName() const { return minimum_risk_maneuver_behavior; }
-
-  auto getMinimumRiskManeuverStateName() const { return minimum_risk_maneuver_state; }
-
-  auto getEmergencyStateName() const { return minimum_risk_maneuver_state; }
-
   auto getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray;
-
-  auto initialized() const noexcept { return initialize_was_called; }
 
   auto requestAutoModeForCooperation(const std::string &, bool) -> void;
 
