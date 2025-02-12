@@ -318,7 +318,7 @@ auto distanceAlongLanelet(
   const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
   const geometry_msgs::msg::Point & to_position,
   const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box, const double matching_distance,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> double
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<double>
 {
   /// @note due to this hardcoded value, the method cannot be used for calculations along a crosswalk (for pedestrians)
   constexpr bool include_crosswalk{false};
@@ -329,14 +329,13 @@ auto distanceAlongLanelet(
     if (const auto to_lanelet_pose = hdmap_utils_ptr->toLaneletPose(
           to_position, to_bounding_box, include_crosswalk, matching_distance);
         to_lanelet_pose.has_value()) {
-      if (const auto distance = hdmap_utils_ptr->getLongitudinalDistance(
-            from_lanelet_pose.value(), to_lanelet_pose.value());
-          distance.has_value()) {
-        return distance.value();
-      }
+      return hdmap_utils_ptr->getLongitudinalDistance(
+        from_lanelet_pose.value(), to_lanelet_pose.value());
     }
   }
-  return math::geometry::hypot(from_position, to_position);
+  return std::nullopt;
+}
+
 }
 }  // namespace distance
 }  // namespace traffic_simulator
