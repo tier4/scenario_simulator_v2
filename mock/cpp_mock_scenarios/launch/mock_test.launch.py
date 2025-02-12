@@ -122,6 +122,7 @@ def launch_setup(context, *args, **kwargs):
     scenario                            = LaunchConfiguration("scenario",                               default=Path("/dev/null"))
     sensor_model                        = LaunchConfiguration("sensor_model",                           default="")
     sigterm_timeout                     = LaunchConfiguration("sigterm_timeout",                        default=8)
+    simulate_localization               = LaunchConfiguration("simulate_localization",                  default=True)
     use_sim_time                        = LaunchConfiguration("use_sim_time",                           default=False)
     vehicle_model                       = LaunchConfiguration("vehicle_model",                          default="")
     scenario_package                    = LaunchConfiguration("package",                                default="cpp_mock_scenarios")
@@ -147,6 +148,7 @@ def launch_setup(context, *args, **kwargs):
     print(f"scenario                            := {scenario.perform(context)}")
     print(f"sensor_model                        := {sensor_model.perform(context)}")
     print(f"sigterm_timeout                     := {sigterm_timeout.perform(context)}")
+    print(f"simulate_localization               := {simulate_localization.perform(context)}")
     print(f"use_sim_time                        := {use_sim_time.perform(context)}")
     print(f"vehicle_model                       := {vehicle_model.perform(context)}")
     print(f"scenario_package                    := {scenario_package.perform(context)}")
@@ -167,6 +169,7 @@ def launch_setup(context, *args, **kwargs):
             {"rviz_config": rviz_config},
             {"sensor_model": sensor_model},
             {"sigterm_timeout": sigterm_timeout},
+            {"simulate_localization": simulate_localization},
             {"vehicle_model": vehicle_model},
             {"global_real_time_factor": global_real_time_factor},
             {"global_frame_rate": global_frame_rate},
@@ -224,6 +227,7 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("scenario",                            default_value=scenario                           ),
         DeclareLaunchArgument("sensor_model",                        default_value=sensor_model                       ),
         DeclareLaunchArgument("sigterm_timeout",                     default_value=sigterm_timeout                    ),
+        DeclareLaunchArgument("simulate_localization",               default_value=simulate_localization              ),
         DeclareLaunchArgument("use_sim_time",                        default_value=use_sim_time                       ),
         DeclareLaunchArgument("vehicle_model",                       default_value=vehicle_model                      ),
         DeclareLaunchArgument("scenario_package",                    default_value=scenario_package                   ),
