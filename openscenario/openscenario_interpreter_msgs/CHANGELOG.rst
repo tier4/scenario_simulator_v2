@@ -21,6 +21,11 @@ Changelog for package openscenario_interpreter_msgs
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+10.1.0 (2025-02-12)
+-------------------
+* Merge branch 'master' into fix/respawn-ego-test
+* Contributors: Kotaro Yoshimoto
+
 10.0.0 (2025-02-07)
 -------------------
 * Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-middle-get-entity
