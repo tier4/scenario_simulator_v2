@@ -33,7 +33,7 @@ jobs:
       fail-fast: false
       matrix:
         rosdistro: [humble]
-        runs_on: [ubuntu-22.04] # macos-14 is added for arm support. See also https://x.com/github/status/1752458943245189120?s=20
+        runs_on: [ubuntu-22.04, ubuntu-22.04-arm]
         cmake_build_type: [RelWithDebInfo, Release] # Debug build type is currently unavailable. @TODO Fix problem and add Debug build.
     steps:
       - name: Suppress warnings
@@ -75,22 +75,23 @@ jobs:
           colcon mixin update default
         shell: bash
 
-      - name: Install sonar-scanner and build-wrapper
-        uses: sonarsource/sonarcloud-github-c-cpp@v3
+      - name: Install Build Wrapper
+        uses: SonarSource/sonarqube-scan-action/install-build-wrapper@v4.2.1
+        id: build_wrapper
         env:
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }} 
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
       - name: Build with SonarCloud Build Wrapper
         run: |
           source /opt/ros/${{ matrix.rosdistro }}/setup.bash
-          build-wrapper-linux-x86-64 --out-dir src/scenario_simulator_v2/bw-output \
+          ${{ steps.build_wrapper.outputs.build-wrapper-binary }} --out-dir src/scenario_simulator_v2/bw-output \
           colcon build --symlink-install \
           --cmake-args \
             -DCMAKE_BUILD_TYPE=${{ matrix.cmake_build_type }} \
             -DBUILD_CPP_MOCK_SCENARIOS=ON \
             -DBUILD_TESTING=true \
-            -DCMAKE_CXX_FLAGS='-fprofile-arcs -ftest-coverage' \
-            -DCMAKE_C_FLAGS='-fprofile-arcs -ftest-coverage' \
+            -DCMAKE_CXX_FLAGS='-ffp-contract=off -fprofile-arcs -ftest-coverage' \
+            -DCMAKE_C_FLAGS='-ffp-contract=off -fprofile-arcs -ftest-coverage' \
             --packages-up-to ${{ steps.list_packages.outputs.package_list }}
         shell: bash
 
@@ -134,13 +135,16 @@ jobs:
           path: coverage.xml
           retention-days: 1
 
-      - name: Run SonarCloud scan
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v4.2.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: https://sonarcloud.io/
-        working-directory: src/scenario_simulator_v2/
-        run: sonar-scanner --define sonar.cfamily.compile-commands="bw-output/compile_commands.json"
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        with:
+          args: >
+            --define sonar.cfamily.compile-commands="bw-output/compile_commands.json" 
+          projectBaseDir: src/scenario_simulator_v2/
 
 #      - name: Basic test
 #        run: |
