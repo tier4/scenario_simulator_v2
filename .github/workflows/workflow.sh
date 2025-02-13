@@ -34,8 +34,7 @@ for file in "$workflow_directory"/*.junit.xml; do
   if grep -q '<failure' "$file"; then
     failure_found=1
     {
-      echo "## $(basename "$file")"
-      echo "<details><summary>scenario failed</summary><div>\n\n\`\`\`xml"
+      echo "<details><summary>scenario failed: $(basename "$file")</summary><div>\n\n\`\`\`xml"
       grep '<failure' "$file"
       echo "\`\`\`\n</div></details>\n"
     } >> "$failure_report"
