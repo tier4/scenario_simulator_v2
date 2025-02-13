@@ -129,12 +129,12 @@ public:
     static auto prerequisite(
       const FirstType & from_pose_or_entity_name, const SecondType & to_pose_or_entity_name) -> bool
     {
-      if constexpr (std::is_same_v<FirstType, std::string>) {
+      if constexpr (std::is_convertible_v<FirstType, std::string>) {
         if (!core->isEntityExist(from_pose_or_entity_name)) {
           return false;
         }
       }
-      if constexpr (std::is_same_v<SecondType, std::string>) {
+      if constexpr (std::is_convertible_v<SecondType, std::string>) {
         if (!core->isEntityExist(to_pose_or_entity_name)) {
           return false;
         }
