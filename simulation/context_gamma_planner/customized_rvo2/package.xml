@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>customized_rvo2</name>
-  <version>10.0.1</version>
+  <version>10.1.0</version>
   <description>a package for customized RVO2 library</description>
   <maintainer email="kotaro.yoshiomoto@tier4.jp">Kotaro Yoshimoto</maintainer>
   <license>Apache-2.0</license>
