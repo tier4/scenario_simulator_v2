@@ -168,9 +168,9 @@ void toMsg(const rosgraph_msgs::Clock & proto, rosgraph_msgs::msg::Clock & time)
 void toProto(const std_msgs::msg::Header & header, std_msgs::Header & proto);
 void toMsg(const std_msgs::Header & proto, std_msgs::msg::Header & header);
 
-#define DEFINE_CONVERSION(PACKAGE, TYPENAME)                                 \
-  auto toProto(const PACKAGE::msg::TYPENAME &, PACKAGE::TYPENAME &) -> void; \
-  auto toMsg(const PACKAGE::TYPENAME &, PACKAGE::msg::TYPENAME &) -> void
+#define DEFINE_CONVERSION(PACKAGE, TYPENAME)                               \
+  auto toProto(const PACKAGE::msg::TYPENAME &, PACKAGE::TYPENAME &)->void; \
+  auto toMsg(const PACKAGE::TYPENAME &, PACKAGE::msg::TYPENAME &)->void
 
 DEFINE_CONVERSION(autoware_control_msgs, Lateral);
 DEFINE_CONVERSION(autoware_control_msgs, Longitudinal);
@@ -190,7 +190,8 @@ auto toMsg(
 {
   using namespace simulation_api_schema;
 
-  auto convert_color = [](auto color) constexpr {
+  auto convert_color = [](auto color) constexpr
+  {
     switch (color) {
       case TrafficLight_Color_RED:
         return TrafficLightBulbMessageType::RED;
@@ -205,7 +206,8 @@ auto toMsg(
     }
   };
 
-  auto convert_shape = [](auto shape) constexpr {
+  auto convert_shape = [](auto shape) constexpr
+  {
     switch (shape) {
       case TrafficLight_Shape_CIRCLE:
         return TrafficLightBulbMessageType::CIRCLE;
@@ -233,7 +235,8 @@ auto toMsg(
     }
   };
 
-  auto convert_status = [](auto status) constexpr {
+  auto convert_status = [](auto status) constexpr
+  {
     switch (status) {
       case TrafficLight_Status_SOLID_OFF:
         return TrafficLightBulbMessageType::SOLID_OFF;
