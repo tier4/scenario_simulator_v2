@@ -57,26 +57,26 @@ public:
   static BT::PortsList providedPorts()
   {
     return {// clang-format off
-      BT::InputPort<std::shared_ptr<constraints::ConstraintActivatorBase>>("activator"),
-      BT::InputPort<traffic_simulator::behavior::Request>("request"),
-      BT::InputPort<std::shared_ptr<hdmap_utils::HdMapUtils>>("hdmap_utils"),
-      BT::InputPort<std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>>("canonicalized_entity_status"),
       BT::InputPort<double>("current_time"),
       BT::InputPort<double>("step_time"),
       BT::InputPort<entity_behavior::EntityStatusDict>("other_entity_status"),
+      BT::InputPort<entity_behavior::EntityStatusDict>("other_entity_status"),
+      BT::InputPort<std::optional<double>>("target_speed"),
+      BT::InputPort<std::shared_ptr<constraints::ConstraintActivatorBase>>("activator"),
+      BT::InputPort<std::shared_ptr<hdmap_utils::HdMapUtils>>("hdmap_utils"),
+      BT::InputPort<std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>>("canonicalized_entity_status"),
+      BT::InputPort<std::shared_ptr<traffic_simulator::TrafficLightsBase>>("traffic_lights"),
       BT::InputPort<std::vector<geometry_msgs::msg::Pose>>("goal_poses"),
       BT::InputPort<std::vector<lanelet::Id>>("route_lanelets"),
-      BT::InputPort<std::optional<double>>("target_speed"),
-      BT::OutputPort<std::optional<double>>("planning_speed"),
+      BT::InputPort<traffic_simulator::behavior::Request>("request"),
       BT::OutputPort<geometry_msgs::msg::Point>("next_goal"),
-      BT::OutputPort<std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>>("updated_status"),
-      BT::OutputPort<traffic_simulator::behavior::Request>("request"),
-      BT::InputPort<entity_behavior::EntityStatusDict>("other_entity_status"),
-      BT::InputPort<std::vector<lanelet::Id>>("route_lanelets"),
-      BT::InputPort<std::shared_ptr<traffic_simulator::TrafficLightsBase>>("traffic_lights"),
-      BT::OutputPort<std::shared_ptr<hdmap_utils::HdMapUtils>>("hdmap_utils"),
+      BT::OutputPort<std::optional<double>>("planning_speed"),
       BT::OutputPort<std::optional<traffic_simulator_msgs::msg::Obstacle>>("obstacle"),
-      BT::OutputPort<traffic_simulator_msgs::msg::WaypointsArray>("waypoints")};
+      BT::OutputPort<std::shared_ptr<hdmap_utils::HdMapUtils>>("hdmap_utils"),
+      BT::OutputPort<std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>>("updated_status"),
+      BT::OutputPort<traffic_simulator_msgs::msg::WaypointsArray>("waypoints"),
+      BT::OutputPort<traffic_simulator::behavior::Request>("request")
+      };
     // clang-format on
   }
 
