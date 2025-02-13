@@ -121,14 +121,17 @@ jobs:
         shell: bash
 
       - name: Scenario test (optional)
+        id: optional-scenario-test
         run: |
           source install/setup.bash
           source install/local_setup.bash
           # execute scenarios but ignore the return code
           ./src/scenario_simulator_v2/.github/workflows/workflow.sh ./src/scenario_simulator_v2/test_runner/scenario_test_runner/config/optional_workflow.txt global_frame_rate:=20 || true
+          echo failure=$(grep -c "<failure"  /tmp/scenario_workflow/optional_workflow/failure_report.md) >> $GITHUB_OUTPUT
         shell: bash
 
       - uses: actions/github-script@v7
+        if: steps.optional-scenario-test.outputs.failure > 0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
