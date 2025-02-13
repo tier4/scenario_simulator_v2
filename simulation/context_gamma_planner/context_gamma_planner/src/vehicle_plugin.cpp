@@ -246,9 +246,9 @@ void VehiclePlugin::updateSimulatorStatus()
   ego_status.action_status.twist.linear.y = rvo_ego_->getVelocity().y();
 
   const auto candidate_on_route =
-    traffic_simulator::lanelet_wrapper::pose::toLaneletPose(ego_status.pose, getRouteLanelets());
+    traffic_simulator::lanelet_wrapper::pose::toLaneletPose(ego_status.pose, getRouteLanelets(), 2.0);
   const auto candidate_not_on_route = traffic_simulator::lanelet_wrapper::pose::toLaneletPose(
-    ego_status.pose, getHdMapUtils()->getLaneletIds());
+    ego_status.pose, ego_status.bounding_box, false, 3.0, traffic_simulator::RoutingGraphType::VEHICLE);
   if (candidate_on_route) {
     ego_status.lanelet_pose_valid = true;
     ego_status.lanelet_pose = candidate_on_route.value();
