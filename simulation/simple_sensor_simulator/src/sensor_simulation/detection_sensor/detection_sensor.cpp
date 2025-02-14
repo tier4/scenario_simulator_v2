@@ -339,8 +339,6 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
       return ground_truth_objects;
     };
 
-    static constexpr auto history_duration = 3.0;
-
     auto detected_entities = std::vector<traffic_simulator_msgs::EntityStatus>();
 
     std::copy_if(
@@ -354,13 +352,6 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
       const auto modified_detected_entities =
         std::apply(noise, unpublished_detected_entities.front());
       detected_objects_publisher->publish(make_detected_objects(modified_detected_entities));
-      published_detected_entities.emplace(
-        modified_detected_entities, unpublished_detected_entities.front().second);
-      if (
-        current_simulation_time - published_detected_entities.front().second >=
-        configuration_.object_recognition_delay() + history_duration) {
-        published_detected_entities.pop();
-      }
       unpublished_detected_entities.pop();
     }
 

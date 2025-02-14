@@ -77,7 +77,7 @@ class DetectionSensor : public DetectionSensorBase
   std::default_random_engine random_engine_;
 
   std::queue<std::pair<std::vector<traffic_simulator_msgs::EntityStatus>, double>>
-    unpublished_detected_entities, published_detected_entities, unpublished_ground_truth_entities;
+    unpublished_detected_entities, unpublished_ground_truth_entities;
 
 public:
   explicit DetectionSensor(
