@@ -152,7 +152,7 @@ private:
     api_.spawn(
       "ego2", traffic_simulator::helper::constructCanonicalizedLaneletPose(34378, 7.5, -1),
       getPedestrianParameters(), traffic_simulator::PedestrianBehavior::contextGamma());
-    auto & ego2 = api_.getEntity("ego");
+    auto & ego2 = api_.getEntity("ego2");
     ego2.requestSpeedChange(
       0.5, traffic_simulator::speed_change::Transition::LINEAR,
       traffic_simulator::speed_change::Constraint(
