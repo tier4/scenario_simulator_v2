@@ -21,6 +21,37 @@ Changelog for package cpp_mock_scenarios
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+10.2.0 (2025-02-14)
+-------------------
+* Merge branch 'master' into feature/rosbag_storage
+* Merge branch 'master' into feature/rosbag_storage
+* Merge branch 'master' into feature/rosbag_storage
+* Contributors: Kotaro Yoshimoto
+
+10.1.2 (2025-02-14)
+-------------------
+
+10.1.1 (2025-02-13)
+-------------------
+* Merge pull request `#1525 <https://github.com/tier4/scenario_simulator_v2/issues/1525>`_ from tier4/doc/comment_about_respawn_ego
+  add comment about respawn_ego scenario
+* Merge branch 'master' into doc/comment_about_respawn_ego
+* add comment about respawn_ego scenario
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka
+
+10.1.0 (2025-02-12)
+-------------------
+* Merge pull request `#1496 <https://github.com/tier4/scenario_simulator_v2/issues/1496>`_ from tier4/fix/respawn-ego-test
+  fix: mock test launch option
+* Merge branch 'master' into fix/respawn-ego-test
+* fix: add missing test
+* fix: disable respawn mock test
+* fix: unusual word
+* fix: launch option
+* fix: respawn ego mock test
+* fix: add respawn ego test
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, satoshi-ota
+
 10.0.0 (2025-02-07)
 -------------------
 * Merge pull request `#1500 <https://github.com/tier4/scenario_simulator_v2/issues/1500>`_ from tier4/RJD-1057-remove-functions-forwarded-to-entity-base-middle-get-entity
