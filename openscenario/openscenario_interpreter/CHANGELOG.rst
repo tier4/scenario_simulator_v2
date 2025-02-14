@@ -32,6 +32,17 @@ Changelog for package openscenario_interpreter
 * add publish_empty_context parameter
 * Contributors: Masaya Kataoka
 
+10.2.0 (2025-02-14)
+-------------------
+* Merge pull request `#1524 <https://github.com/tier4/scenario_simulator_v2/issues/1524>`_ from tier4/feature/rosbag_storage
+  feat: implement rosbag storage switching
+* Merge branch 'master' into feature/rosbag_storage
+* Merge branch 'master' into feature/rosbag_storage
+* Merge branch 'master' into feature/rosbag_storage
+* feat: use rosbag command default as record_storage_id default value
+* feat: implement rosbag storage switching
+* Contributors: Kotaro Yoshimoto
+
 10.1.2 (2025-02-14)
 -------------------
 

@@ -35,6 +35,17 @@ Changelog for package scenario_test_runner
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+10.2.0 (2025-02-14)
+-------------------
+* Merge pull request `#1524 <https://github.com/tier4/scenario_simulator_v2/issues/1524>`_ from tier4/feature/rosbag_storage
+  feat: implement rosbag storage switching
+* Merge branch 'master' into feature/rosbag_storage
+* Merge branch 'master' into feature/rosbag_storage
+* Merge branch 'master' into feature/rosbag_storage
+* feat: use rosbag command default as record_storage_id default value
+* feat: add record_storage_id argument to launch
+* Contributors: Kotaro Yoshimoto
+
 10.1.2 (2025-02-14)
 -------------------
 
