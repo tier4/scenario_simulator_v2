@@ -245,23 +245,18 @@ void VehiclePlugin::updateSimulatorStatus()
   ego_status.pose.position.z = this->getCanonicalizedEntityStatus()->getAltitude();
   ego_status.action_status.twist.linear.x = rvo_ego_->getVelocity().x();
   ego_status.action_status.twist.linear.y = rvo_ego_->getVelocity().y();
-
-  const auto candidate_on_route = traffic_simulator::lanelet_wrapper::pose::toLaneletPose(
-    ego_status.pose, getRouteLanelets(), 2.0);
-  const auto candidate_not_on_route = traffic_simulator::lanelet_wrapper::pose::toLaneletPose(
-    ego_status.pose, ego_status.bounding_box, false, 3.0,
-    traffic_simulator::RoutingGraphType::VEHICLE);
-  if (candidate_on_route) {
-    ego_status.lanelet_pose_valid = true;
-    ego_status.lanelet_pose = candidate_on_route.value();
-  } else if (candidate_not_on_route) {
-    ego_status.lanelet_pose_valid = true;
-    ego_status.lanelet_pose = candidate_not_on_route.value();
-  } else {
-    ego_status.lanelet_pose_valid = false;
-    ego_status.lanelet_pose = traffic_simulator::LaneletPose();
+  if (
+    const auto lanelet_pose = traffic_simulator::lanelet_wrapper::pose::toLaneletPose(
+      ego_status.pose, ego_status.bounding_box, false, 1.5,
+      traffic_simulator::RoutingGraphType::VEHICLE)) {
+    if (lanelet_pose) {
+      ego_status.lanelet_pose_valid = true;
+      ego_status.lanelet_pose = lanelet_pose.value();
+    } else {
+      ego_status.lanelet_pose_valid = false;
+      ego_status.lanelet_pose = traffic_simulator::LaneletPose();
+    }
   }
-  // std::cout << traffic_simulator_msgs::msg::to_yaml(ego_status) << std::endl;
   getCanonicalizedEntityStatus()->set(
     ego_status, getDefaultMatchingDistanceForLaneletPoseCalculation());
 }
