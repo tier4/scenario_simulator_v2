@@ -21,6 +21,7 @@
 #include <openscenario_interpreter/syntax/position.hpp>
 #include <openscenario_interpreter/syntax/rule.hpp>
 #include <openscenario_interpreter/syntax/triggering_entities.hpp>
+#include <openscenario_interpreter/visualization_buffer.hpp>
 #include <pugixml.hpp>
 #include <valarray>
 
@@ -38,7 +39,8 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct ReachPositionCondition : private SimulatorCore::CoordinateSystemConversion
+struct ReachPositionCondition : private SimulatorCore::CoordinateSystemConversion,
+                                private VisualizationBuffer::Target
 {
   const Double tolerance;
 
@@ -51,6 +53,8 @@ struct ReachPositionCondition : private SimulatorCore::CoordinateSystemConversio
   std::vector<std::valarray<double>> results;  // for description
 
   explicit ReachPositionCondition(const pugi::xml_node &, Scope &, const TriggeringEntities &);
+
+  auto visualize() const -> void;
 
   auto description() const -> String;
 

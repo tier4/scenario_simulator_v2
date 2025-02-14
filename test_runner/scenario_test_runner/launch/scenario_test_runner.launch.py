@@ -85,6 +85,7 @@ def launch_setup(context, *args, **kwargs):
     output_directory                    = LaunchConfiguration("output_directory",                       default=Path("/tmp"))
     port                                = LaunchConfiguration("port",                                   default=5555)
     publish_empty_context               = LaunchConfiguration("publish_empty_context",                  default=False)
+    publish_visualization               = LaunchConfiguration("publish_visualization",                  default=False)
     record                              = LaunchConfiguration("record",                                 default=True)
     rviz_config                         = LaunchConfiguration("rviz_config",                            default=default_rviz_config_file())
     scenario                            = LaunchConfiguration("scenario",                               default=Path("/dev/null"))
@@ -111,6 +112,7 @@ def launch_setup(context, *args, **kwargs):
     print(f"output_directory                    := {output_directory.perform(context)}")
     print(f"port                                := {port.perform(context)}")
     print(f"publish_empty_context               := {publish_empty_context.perform(context)}")
+    print(f"publish_visualization               := {publish_visualization.perform(context)}")
     print(f"record                              := {record.perform(context)}")
     print(f"rviz_config                         := {rviz_config.perform(context)}")
     print(f"scenario                            := {scenario.perform(context)}")
@@ -138,6 +140,7 @@ def launch_setup(context, *args, **kwargs):
             {"launch_autoware": launch_autoware},
             {"port": port},
             {"publish_empty_context" : publish_empty_context},
+            {"publish_visualization": publish_visualization},
             {"record": record},
             {"rviz_config": rviz_config},
             {"sensor_model": sensor_model},
@@ -184,12 +187,13 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("launch_rviz",                         default_value=launch_rviz                        ),
         DeclareLaunchArgument("output_directory",                    default_value=output_directory                   ),
         DeclareLaunchArgument("publish_empty_context",               default_value=publish_empty_context              ),
+        DeclareLaunchArgument("publish_visualization",               default_value=publish_visualization              ),
         DeclareLaunchArgument("rviz_config",                         default_value=rviz_config                        ),
         DeclareLaunchArgument("scenario",                            default_value=scenario                           ),
         DeclareLaunchArgument("sensor_model",                        default_value=sensor_model                       ),
         DeclareLaunchArgument("sigterm_timeout",                     default_value=sigterm_timeout                    ),
         DeclareLaunchArgument("simulate_localization",               default_value=simulate_localization              ),
-        DeclareLaunchArgument("speed_condition",                     default_value=speed_condition                      ),
+        DeclareLaunchArgument("speed_condition",                     default_value=speed_condition                    ),
         DeclareLaunchArgument("use_sim_time",                        default_value=use_sim_time                       ),
         DeclareLaunchArgument("vehicle_model",                       default_value=vehicle_model                      ),
         # fmt: on
