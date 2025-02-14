@@ -240,6 +240,7 @@ void PedestrianPlugin::updateSimulatorStatus()
   ego_status.pose = rvo_ego_->getPose();
   ego_status.action_status.twist.linear.x = rvo_ego_->getVelocity().x();
   ego_status.action_status.twist.linear.y = rvo_ego_->getVelocity().y();
+  ego_status.pose.position.z = this->getCanonicalizedEntityStatus()->getAltitude();
   const auto lanelet_ego_pose =
     traffic_simulator::lanelet_wrapper::pose::toLaneletPose(ego_status.pose, getRouteLanelets());
   if (lanelet_ego_pose) {

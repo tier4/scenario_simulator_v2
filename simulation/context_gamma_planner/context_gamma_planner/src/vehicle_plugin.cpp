@@ -242,13 +242,15 @@ void VehiclePlugin::updateSimulatorStatus()
   auto ego_status =
     static_cast<traffic_simulator::EntityStatus>(*this->getCanonicalizedEntityStatus());
   ego_status.pose = rvo_ego_->getPose();
+  ego_status.pose.position.z = this->getCanonicalizedEntityStatus()->getAltitude();
   ego_status.action_status.twist.linear.x = rvo_ego_->getVelocity().x();
   ego_status.action_status.twist.linear.y = rvo_ego_->getVelocity().y();
 
-  const auto candidate_on_route =
-    traffic_simulator::lanelet_wrapper::pose::toLaneletPose(ego_status.pose, getRouteLanelets(), 2.0);
+  const auto candidate_on_route = traffic_simulator::lanelet_wrapper::pose::toLaneletPose(
+    ego_status.pose, getRouteLanelets(), 2.0);
   const auto candidate_not_on_route = traffic_simulator::lanelet_wrapper::pose::toLaneletPose(
-    ego_status.pose, ego_status.bounding_box, false, 3.0, traffic_simulator::RoutingGraphType::VEHICLE);
+    ego_status.pose, ego_status.bounding_box, false, 3.0,
+    traffic_simulator::RoutingGraphType::VEHICLE);
   if (candidate_on_route) {
     ego_status.lanelet_pose_valid = true;
     ego_status.lanelet_pose = candidate_on_route.value();
