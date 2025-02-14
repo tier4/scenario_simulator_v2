@@ -76,7 +76,7 @@ std::optional<double> StopAtCrossingEntityAction::calculateTargetSpeed(double cu
     return std::nullopt;
   }
   double rest_distance =
-    distance_to_stop_target_.value() - (vehicle_parameters.bounding_box.dimensions.x * 0.5 + 1);
+    distance_to_stop_target_.value() - (vehicle_parameters.bounding_box.dimensions.x * 0.5 + 2);
   if (rest_distance < calculateStopDistance(behavior_parameter.dynamic_constraints)) {
     return 0;
   }
