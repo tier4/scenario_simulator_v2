@@ -376,18 +376,18 @@ TEST(NormalDistribution_nav_msgs_msg_Odometry, when_all_parameters_are_given)
   const auto randomized_odometry = randomize(odometry);
 
   // clang-format off
-  ASSERT_NEAR(randomized_odometry.pose.pose.position.x,     4.0604709175379767,    std::numeric_limits<double>::epsilon());
-  ASSERT_NEAR(randomized_odometry.pose.pose.position.y,    19.565623431299677,     std::numeric_limits<double>::epsilon());
-  ASSERT_NEAR(randomized_odometry.pose.pose.position.z,     2.8688348437534232,    std::numeric_limits<double>::epsilon());
-  ASSERT_NEAR(randomized_odometry.pose.pose.orientation.x, -0.80099847581632522,   std::numeric_limits<double>::epsilon());
-  ASSERT_NEAR(randomized_odometry.pose.pose.orientation.y, -0.29036040347964753,   std::numeric_limits<double>::epsilon());
-  ASSERT_NEAR(randomized_odometry.pose.pose.orientation.z,  0.52344585659820897,   std::numeric_limits<double>::epsilon());
-  ASSERT_NEAR(randomized_odometry.pose.pose.orientation.w,  0.0098342788870005027, std::numeric_limits<double>::epsilon());
-  ASSERT_NEAR(randomized_odometry.twist.twist.linear.x,    13.010296958573839,     std::numeric_limits<double>::epsilon());
-  ASSERT_NEAR(randomized_odometry.twist.twist.linear.y,    42.186386919810495,     std::numeric_limits<double>::epsilon());
-  ASSERT_NEAR(randomized_odometry.twist.twist.linear.z,    22.434366843481051,     std::numeric_limits<double>::epsilon());
-  ASSERT_NEAR(randomized_odometry.twist.twist.angular.x,   41.550077290481802,     std::numeric_limits<double>::epsilon());
-  ASSERT_NEAR(randomized_odometry.twist.twist.angular.y,   40.801412395444473,     std::numeric_limits<double>::epsilon());
-  ASSERT_NEAR(randomized_odometry.twist.twist.angular.z,   44.530605885302229,     std::numeric_limits<double>::epsilon());
+  ASSERT_DOUBLE_EQ(randomized_odometry.pose.pose.position.x,     4.0604709175379767   );
+  ASSERT_DOUBLE_EQ(randomized_odometry.pose.pose.position.y,    19.565623431299677    );
+  ASSERT_DOUBLE_EQ(randomized_odometry.pose.pose.position.z,     2.8688348437534232   );
+  ASSERT_DOUBLE_EQ(randomized_odometry.pose.pose.orientation.x, -0.80099847581632522  );
+  ASSERT_DOUBLE_EQ(randomized_odometry.pose.pose.orientation.y, -0.29036040347964753  );
+  ASSERT_DOUBLE_EQ(randomized_odometry.pose.pose.orientation.z,  0.52344585659820897  );
+  ASSERT_DOUBLE_EQ(randomized_odometry.pose.pose.orientation.w,  0.0098342788870005027);
+  ASSERT_DOUBLE_EQ(randomized_odometry.twist.twist.linear.x,    13.010296958573839    );
+  ASSERT_DOUBLE_EQ(randomized_odometry.twist.twist.linear.y,    42.186386919810495    );
+  ASSERT_DOUBLE_EQ(randomized_odometry.twist.twist.linear.z,    22.434366843481051    );
+  ASSERT_DOUBLE_EQ(randomized_odometry.twist.twist.angular.x,   41.550077290481802    );
+  ASSERT_DOUBLE_EQ(randomized_odometry.twist.twist.angular.y,   40.801412395444473    );
+  ASSERT_DOUBLE_EQ(randomized_odometry.twist.twist.angular.z,   44.530605885302229    );
   // clang-format on
 }
