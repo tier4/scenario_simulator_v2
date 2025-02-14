@@ -21,6 +21,16 @@ Changelog for package cpp_mock_scenarios
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+10.2.0 (2025-02-14)
+-------------------
+* Merge branch 'master' into feature/rosbag_storage
+* Merge branch 'master' into feature/rosbag_storage
+* Merge branch 'master' into feature/rosbag_storage
+* Contributors: Kotaro Yoshimoto
+
+10.1.2 (2025-02-14)
+-------------------
+
 10.1.1 (2025-02-13)
 -------------------
 * Merge pull request `#1525 <https://github.com/tier4/scenario_simulator_v2/issues/1525>`_ from tier4/doc/comment_about_respawn_ego
