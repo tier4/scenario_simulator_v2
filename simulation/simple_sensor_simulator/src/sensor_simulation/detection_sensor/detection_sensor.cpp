@@ -29,6 +29,7 @@
 #include <simple_sensor_simulator/sensor_simulation/detection_sensor/detection_sensor.hpp>
 #include <simulation_interface/conversions.hpp>
 #include <string>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 #include <vector>
 
 namespace simple_sensor_simulator
@@ -294,7 +295,7 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
        simulator publishes, comment out the following function and implement
        new one.
     */
-    auto noise = [&](auto detected_entities, auto simulation_time) {
+    auto noise_v0 = [&](auto detected_entities, [[maybe_unused]] auto simulation_time) {
       auto position_noise_distribution =
         std::normal_distribution<>(0.0, configuration_.pos_noise_stddev());
 
@@ -315,6 +316,154 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
         detected_entities.end());
 
       return detected_entities;
+    };
+
+    auto noise_v1 = [&](const auto & detected_entities, auto simulation_time) {
+      auto noised_detected_entities = std::decay_t<decltype(detected_entities)>();
+
+      for (auto detected_entity : detected_entities) {
+        auto [noise_output, success] =
+          noise_outputs.emplace(detected_entity.name(), simulation_time);
+
+        const auto x =
+          detected_entity.pose().position().x() - ego_entity_status->pose().position().x();
+        const auto y =
+          detected_entity.pose().position().y() - ego_entity_status->pose().position().y();
+        const auto velocity = std::hypot(
+          detected_entity.action_status().twist().linear().x(),
+          detected_entity.action_status().twist().linear().y());
+        const auto interval =
+          simulation_time - std::exchange(noise_output->second.simulation_time, simulation_time);
+
+        /*
+           We use AR(1) model to model noises' autocorrelation coefficients for
+           all kinds of noises. We define the `tau` used for AR(1) from
+           `delta_t`, which means the time interval when the autocorrelation
+           coefficient becomes `correlation_for_delta_t` (0.5). the flowwing
+           values are all handly tuned, need to be determined by statistics of
+           real data.
+
+           Autocorrelation coefficient=0.5 for an interval of delta_t.
+        */
+        static constexpr auto correlation_for_delta_t = 0.5;
+
+        auto find = [&](auto ellipse_normalized_x_radius, const auto & targets) {
+          const std::vector<double> ellipse_y_radiuses = {10, 20, 40, 60, 80, 120, 150, 180, 1000};
+          const auto distance = std::hypot(x / ellipse_normalized_x_radius, y);
+          for (auto i = std::size_t(0); i < ellipse_y_radiuses.size(); ++i) {
+            if (distance < ellipse_y_radiuses[i]) {
+              return targets[i];
+            }
+          }
+          return 0.0;
+        };
+
+        auto ar1_noise = [this](auto prev_noise, auto mean, auto standard_deviation, auto phi) {
+          return mean + phi * (prev_noise - mean) +
+                 std::normal_distribution<double>(
+                   0, standard_deviation * std::sqrt(1 - phi * phi))(random_engine_);
+        };
+
+        noise_output->second.distance_noise = [&]() {
+          static constexpr auto delta_t = 0.5;  // [s]
+          static constexpr auto ellipse_normalized_x_radius_mean = 1.8;
+          static constexpr auto ellipse_normalized_x_radius_standard_deviation = 1.8;
+
+          static const std::vector<double> means = {0.25, 0.27, 0.44, 0.67, 1.00,
+                                                    3.00, 4.09, 3.40, 0.00};
+          static const std::vector<double> standard_deviations = {0.35, 0.54, 0.83, 1.14, 1.60,
+                                                                  3.56, 4.31, 3.61, 0.00};
+
+          const auto tau = -delta_t / std::log(correlation_for_delta_t);
+          const auto phi = std::exp(-interval / tau);
+
+          const auto mean = find(ellipse_normalized_x_radius_mean, means);
+          const auto standard_deviation =
+            find(ellipse_normalized_x_radius_standard_deviation, standard_deviations);
+
+          return ar1_noise(noise_output->second.distance_noise, mean, standard_deviation, phi);
+        }();
+
+        noise_output->second.yaw_noise = [&]() {
+          static constexpr auto delta_t = 0.3;  // [s]
+          static constexpr auto ellipse_normalized_x_radius_mean = 0.6;
+          static constexpr auto ellipse_normalized_x_radius_standard_deviation = 1.6;
+
+          static const std::vector<double> means = {0.01, 0.01, 0.00, 0.03, 0.04,
+                                                    0.00, 0.01, 0.00, 0.00};
+          static const std::vector<double> standard_deviations = {0.05, 0.1, 0.15, 0.15, 0.2,
+                                                                  0.2,  0.3, 0.4,  0.5};
+
+          const auto tau = -delta_t / std::log(correlation_for_delta_t);
+          const auto phi = std::exp(-interval / tau);
+
+          const auto mean = find(ellipse_normalized_x_radius_mean, means);
+          const auto standard_deviation =
+            find(ellipse_normalized_x_radius_standard_deviation, standard_deviations);
+
+          return ar1_noise(noise_output->second.yaw_noise, mean, standard_deviation, phi);
+        }();
+
+        noise_output->second.flip = [&]() {
+          static constexpr auto delta_t = 0.1;  // [s]
+          static constexpr auto velocity_threshold = 0.1;
+          static constexpr auto rate_for_stop_objects = 0.3;
+
+          const auto tau = -delta_t / std::log(correlation_for_delta_t);
+          const auto phi = std::exp(-interval / tau);
+          const auto rate =
+            (noise_output->second.flip ? 1.0 : 0.0) * phi + (1 - phi) * rate_for_stop_objects;
+
+          return velocity < velocity_threshold and
+                 std::uniform_real_distribution<double>()(random_engine_) < rate;
+        }();
+
+        noise_output->second.mask = [&]() {
+          static constexpr auto delta_t = 0.3;  // [s]
+          static constexpr auto ellipse_normalized_x_radius = 0.6;
+
+          static const std::vector<double> unmask_rates = {0.92, 0.77, 0.74, 0.66, 0.57,
+                                                           0.28, 0.09, 0.03, 0.00};
+
+          const auto tau = -delta_t / std::log(correlation_for_delta_t);
+          const auto phi = std::exp(-interval / tau);
+          const auto rate = (noise_output->second.mask ? 1.0 : 0.0) * phi +
+                            (1 - phi) * (1 - find(ellipse_normalized_x_radius, unmask_rates));
+
+          return std::uniform_real_distribution()(random_engine_) < rate;
+        }();
+
+        if (noise_output->second.mask) {
+          const auto angle = std::atan2(y, x);
+
+          const auto yaw_rotated_orientation =
+            tf2::Quaternion(
+              detected_entity.pose().orientation().x(), detected_entity.pose().orientation().y(),
+              detected_entity.pose().orientation().z(), detected_entity.pose().orientation().w()) *
+            tf2::Quaternion(
+              tf2::Vector3(0, 0, 1),
+              noise_output->second.yaw_noise + (noise_output->second.flip ? M_PI : 0.0));
+
+          detected_entity.mutable_pose()->mutable_position()->set_x(
+            detected_entity.pose().position().x() +
+            noise_output->second.distance_noise * std::cos(angle));
+          detected_entity.mutable_pose()->mutable_position()->set_y(
+            detected_entity.pose().position().y() +
+            noise_output->second.distance_noise * std::sin(angle));
+          detected_entity.mutable_pose()->mutable_orientation()->set_x(
+            yaw_rotated_orientation.getX());
+          detected_entity.mutable_pose()->mutable_orientation()->set_y(
+            yaw_rotated_orientation.getY());
+          detected_entity.mutable_pose()->mutable_orientation()->set_z(
+            yaw_rotated_orientation.getZ());
+          detected_entity.mutable_pose()->mutable_orientation()->set_w(
+            yaw_rotated_orientation.getW());
+
+          noised_detected_entities.push_back(detected_entity);
+        }
+      }
+
+      return noised_detected_entities;
     };
 
     auto make_detected_objects = [&](const auto & detected_entities) {
@@ -350,7 +499,7 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
       current_simulation_time - unpublished_detected_entities.front().second >=
       configuration_.object_recognition_delay()) {
       const auto modified_detected_entities =
-        std::apply(noise, unpublished_detected_entities.front());
+        std::apply(noise_v1, unpublished_detected_entities.front());
       detected_objects_publisher->publish(make_detected_objects(modified_detected_entities));
       unpublished_detected_entities.pop();
     }

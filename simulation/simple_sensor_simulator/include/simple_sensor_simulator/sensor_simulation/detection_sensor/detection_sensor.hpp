@@ -25,6 +25,7 @@
 #include <random>
 #include <rclcpp/rclcpp.hpp>
 #include <string>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -78,6 +79,17 @@ class DetectionSensor : public DetectionSensorBase
 
   std::queue<std::pair<std::vector<traffic_simulator_msgs::EntityStatus>, double>>
     unpublished_detected_entities, unpublished_ground_truth_entities;
+
+  struct NoiseOutput
+  {
+    double simulation_time, distance_noise, yaw_noise;
+
+    bool mask, flip;
+
+    explicit NoiseOutput(double simulation_time = 0.0) : simulation_time(simulation_time) {}
+  };
+
+  std::unordered_map<std::string, NoiseOutput> noise_outputs;
 
 public:
   explicit DetectionSensor(
