@@ -24,6 +24,11 @@ Changelog for package openscenario_utility
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+10.3.1 (2025-02-17)
+-------------------
+* Merge branch 'master' into fix/use-capital-as
+* Contributors: Kotaro Yoshimoto
+
 10.3.0 (2025-02-14)
 -------------------
 * Merge branch 'master' into feature/publisher-with-customizable-randomizer
