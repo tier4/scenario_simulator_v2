@@ -127,3 +127,33 @@ simulation:
                     multiplicative:
                       mean: 0.0
                       standard_deviation: 0.0
+      /perception/object_recognition/detection/objects:
+        version: 20240605 # architecture_type suffix (mandatory)
+        seed: 0 # If 0 is specified, a random seed value will be generated for each run.
+        noise:
+          model:
+            version: 1 # Any of [0, 1]
+          v1:
+            correlation_for_delta_t: 0.5
+            distance:
+              delta_t: 0.5
+              ellipse_normalized_x_radius:
+                mean: 1.0
+                standard_deviation: 1.0
+              means: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+              standard_deviations: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+            yaw:
+              delta_t: 0.3
+              ellipse_normalized_x_radius:
+                mean: 1.0
+                standard_deviation: 1.0
+              means: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+              standard_deviations: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+            yaw_flip:
+              delta_t: 0.1
+              velocity_threshold: 0.1
+              rate_for_stop_objects: 0.0
+            mask:
+              delta_t: 0.3
+              ellipse_normalized_x_radius: 1.0
+              rates: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]

@@ -35,7 +35,15 @@ auto getParameter(
 template <typename T>
 auto getParameter(const std::string & name, T value = {})
 {
-  auto node = rclcpp::Node("get_parameter", "simulation");
+  /*
+     The parameter file should be
+
+     <namespace-name>:
+       <node-name>:
+         ros__parameters:
+           ...
+  */
+  static auto node = rclcpp::Node("AutowareUniverse", "simulation");
   return getParameter(node.get_node_parameters_interface(), name, value);
 }
 }  // namespace concealer
