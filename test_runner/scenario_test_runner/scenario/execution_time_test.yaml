@@ -140,9 +140,9 @@ OpenSCENARIO:
                                   conditionEdge: none
                                   ByValueCondition:
                                     UserDefinedValueCondition:
-                                      name: /simulation/interpreter/execution_time_ms/evaluate
+                                      name: /simulation/interpreter/execution_time/evaluate
                                       rule: greaterThan
-                                      value: 1
+                                      value: 0.001
                                 - name: 'avoid startup'
                                   delay: 0
                                   conditionEdge: none
@@ -156,9 +156,9 @@ OpenSCENARIO:
                                   conditionEdge: none
                                   ByValueCondition:
                                     UserDefinedValueCondition:
-                                      name: /simulation/interpreter/execution_time_ms/update
+                                      name: /simulation/interpreter/execution_time/update
                                       rule: greaterThan
-                                      value: 5
+                                      value: 0.005
                                 - name: 'avoid startup'
                                   delay: 0
                                   conditionEdge: none
@@ -172,9 +172,9 @@ OpenSCENARIO:
                                   conditionEdge: none
                                   ByValueCondition:
                                     UserDefinedValueCondition:
-                                      name: /simulation/interpreter/execution_time_ms/output
+                                      name: /simulation/interpreter/execution_time/output
                                       rule: greaterThan
-                                      value: 1
+                                      value: 0.001
                                 - name: 'avoid startup'
                                   delay: 0
                                   conditionEdge: none

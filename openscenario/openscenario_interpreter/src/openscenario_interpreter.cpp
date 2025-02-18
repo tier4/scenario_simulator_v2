@@ -38,11 +38,11 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
 : rclcpp_lifecycle::LifecycleNode("openscenario_interpreter", options),
   publisher_of_context(create_publisher<Context>("context", rclcpp::QoS(1).transient_local())),
   evaluate_time_publisher(create_publisher<tier4_simulation_msgs::msg::UserDefinedValue>(
-    "/simulation/interpreter/execution_time_ms/evaluate", rclcpp::QoS(1).transient_local())),
+    "/simulation/interpreter/execution_time/evaluate", rclcpp::QoS(1).transient_local())),
   update_time_publisher(create_publisher<tier4_simulation_msgs::msg::UserDefinedValue>(
-    "/simulation/interpreter/execution_time_ms/update", rclcpp::QoS(1).transient_local())),
+    "/simulation/interpreter/execution_time/update", rclcpp::QoS(1).transient_local())),
   output_time_publisher(create_publisher<tier4_simulation_msgs::msg::UserDefinedValue>(
-    "/simulation/interpreter/execution_time_ms/output", rclcpp::QoS(1).transient_local())),
+    "/simulation/interpreter/execution_time/output", rclcpp::QoS(1).transient_local())),
   local_frame_rate(30),
   local_real_time_factor(1.0),
   osc_path(""),
@@ -223,11 +223,11 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
           return message;
         };
         evaluate_time_publisher->publish(generate_double_user_defined_value_message(
-          std::chrono::duration<double, std::milli>(evaluate_time).count()));
+          std::chrono::duration<double>(evaluate_time).count()));
         update_time_publisher->publish(generate_double_user_defined_value_message(
-          std::chrono::duration<double, std::milli>(update_time).count()));
+          std::chrono::duration<double>(update_time).count()));
         output_time_publisher->publish(generate_double_user_defined_value_message(
-          std::chrono::duration<double, std::milli>(output_time).count()));
+          std::chrono::duration<double>(output_time).count()));
 
         if (auto time_until_trigger = timer->time_until_trigger(); time_until_trigger.count() < 0) {
           /*
