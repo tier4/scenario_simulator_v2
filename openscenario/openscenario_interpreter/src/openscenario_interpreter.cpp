@@ -194,7 +194,7 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
         deactivate();
       },
       [this]() {
-        const auto evaluate_time = execution_timer.invoke("evaluate", [&]() {
+        const auto evaluate_time = execution_timer.invoke("evaluate", [this]() {
           if (std::isnan(evaluateSimulationTime())) {
             if (not waiting_for_engagement_to_be_completed and engageable()) {
               engage();
@@ -211,10 +211,10 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
         });
 
         const auto update_time =
-          execution_timer.invoke("update", [&]() { SimulatorCore::update(); });
+          execution_timer.invoke("update", []() { SimulatorCore::update(); });
 
         const auto output_time =
-          execution_timer.invoke("output", [&]() { publishCurrentContext(); });
+          execution_timer.invoke("output", [this]() { publishCurrentContext(); });
 
         auto generate_double_user_defined_value_message = [](double value) {
           tier4_simulation_msgs::msg::UserDefinedValue message;
