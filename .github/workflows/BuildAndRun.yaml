@@ -139,7 +139,7 @@ jobs:
             const fs = require('fs');
             let commentBody = fs.readFileSync('/tmp/scenario_workflow/optional_workflow/failure_report.md', 'utf8');
             if (commentBody) {
-              commentBody = '## Failure optional scenarios\nThis is an experimental check and does not block merging the pull-request. But, please be aware that this may indicate a regression.\n' + commentBody;
+              commentBody = '## Failure optional scenarios\n> [!NOTE]\n> This is an experimental check and does not block merging the pull-request. \n> But, please be aware that this may indicate a regression.\n' + commentBody;
             }
             await github.rest.issues.createComment({
               issue_number: context.issue.number,
