@@ -32,9 +32,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        rosdistro: [humble]
-        runs_on: [ubuntu-22.04] # macos-14 is added for arm support. See also https://x.com/github/status/1752458943245189120?s=20
-        cmake_build_type: [RelWithDebInfo, Release] # Debug build type is currently unavailable. @TODO Fix problem and add Debug build.
+        rosdistro: [ humble ]
+        runs_on: [ ubuntu-22.04 ] # macos-14 is added for arm support. See also https://x.com/github/status/1752458943245189120?s=20
+        cmake_build_type: [ RelWithDebInfo, Release ] # Debug build type is currently unavailable. @TODO Fix problem and add Debug build.
     steps:
       - name: Suppress warnings
         run: git config --global --add safe.directory '*'
@@ -78,7 +78,7 @@ jobs:
       - name: Install sonar-scanner and build-wrapper
         uses: sonarsource/sonarcloud-github-c-cpp@v3
         env:
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }} 
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
       - name: Build with SonarCloud Build Wrapper
         run: |
@@ -138,7 +138,7 @@ jobs:
             const fs = require('fs');
             let commentBody = fs.readFileSync('/tmp/scenario_workflow/optional_workflow/failure_report.md', 'utf8');
             if (commentBody) {
-              commentBody = '## failure optional scenarios\n' + commentBody;
+              commentBody = '## Failure optional scenarios\nThis is an experimental check and does not block merging the pull-request. But, please be aware that this may indicate a regression.\n' + commentBody;
             }
             await github.rest.issues.createComment({
               issue_number: context.issue.number,
