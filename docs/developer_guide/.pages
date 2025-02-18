@@ -1,21 +1,22 @@
+# cspell: ignore TIERIV
+
 nav:
     - About: About.md
     - AutowareAPI.md
-    - DistanceCalculation.md
-    - NPCBehavior.md
     - BehaviorPlugin.md
-    # - ErrorCategories.md
-    - OpenSCENARIOSupport.md
-    - SimpleSensorSimulator.md
-    - SystemArchitecture.md
-    - TrafficSimulator.md
-    - ZeroMQ.md
-    - VehicleDynamics.md
-    - SimulationResultFormat.md
-    - Lane Pose Calculation: lane_pose_calculation
-    # cspell: ignore TIERIV
-    - TIERIVScenarioFormatVersion2.md
     - CONTRIBUTING.md
     - Communication.md
+    - ConfiguringLocalizationTopics.md
     - ConfiguringPerceptionTopics.md
+    - DistanceCalculation.md
+    - Lane Pose Calculation: lane_pose_calculation
     - ManualOverrideWithFollowTrajectoryAction.md
+    - NPCBehavior.md
+    - OpenSCENARIOSupport.md
+    - SimpleSensorSimulator.md
+    - SimulationResultFormat.md
+    - SystemArchitecture.md
+    - TIERIVScenarioFormatVersion2.md
+    - TrafficSimulator.md
+    - VehicleDynamics.md
+    - ZeroMQ.md
