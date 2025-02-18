@@ -1,0 +1,45 @@
+
+// Copyright 2015 Tier IV, Inc. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#include <lanelet2_core/geometry/Lanelet.h>
+#include <lanelet2_core/primitives/BasicRegulatoryElements.h>
+#include <lanelet2_core/utility/Units.h>
+#include <lanelet2_routing/RoutingGraphContainer.h>
+
+#include <autoware_lanelet2_extension/utility/utilities.hpp>
+#include <traffic_simulator/helper/helper.hpp>
+#include <traffic_simulator/lanelet_wrapper/lanelet_map.hpp>
+#include <traffic_simulator/lanelet_wrapper/lanelet_wrapper.hpp>
+#include <traffic_simulator/lanelet_wrapper/route.hpp>
+
+namespace traffic_simulator
+{
+namespace lanelet_wrapper
+{
+namespace route
+{
+auto route(
+  const lanelet::Id from_lanelet_id, const lanelet::Id to_lanelet_id,
+  const RoutingConfiguration & routing_configuration) -> lanelet::Ids
+{
+  /// @todo improve architecture in terms of access to cache of the graph
+  return LaneletWrapper::routeCache(routing_configuration.routing_graph_type)
+    .getRoute(
+      from_lanelet_id, to_lanelet_id, LaneletWrapper::map(), routing_configuration,
+      LaneletWrapper::routingGraph(routing_configuration.routing_graph_type));
+}
+}  // namespace route
+}  // namespace lanelet_wrapper
+}  // namespace traffic_simulator
