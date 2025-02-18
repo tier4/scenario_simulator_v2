@@ -24,6 +24,7 @@ StochasticDistributionType::StochasticDistributionType(const pugi::xml_node & no
 : Group(
     choice(node,
       std::make_pair("ProbabilityDistributionSet", [&](auto && node){return make<ProbabilityDistributionSet>(node, scope);}),
+      std::make_pair("LogNormalDistribution",      [&](auto && node){return make<LogNormalDistribution     >(node, scope);}),
       std::make_pair("NormalDistribution",         [&](auto && node){return make<NormalDistribution        >(node, scope);}),
       std::make_pair("UniformDistribution",        [&](auto && node){return make<UniformDistribution       >(node, scope);}),
       std::make_pair("PoissonDistribution",        [&](auto && node){return make<PoissonDistribution       >(node, scope);}),
