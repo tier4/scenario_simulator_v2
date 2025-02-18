@@ -342,14 +342,16 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
            We use AR(1) model to model noises' autocorrelation coefficients for
            all kinds of noises. We define the `tau` used for AR(1) from
            `delta_t`, which means the time interval when the autocorrelation
-           coefficient becomes `correlation_for_delta_t` (0.5). the flowwing
-           values are all handly tuned, need to be determined by statistics of
-           real data.
-
-           Autocorrelation coefficient=0.5 for an interval of delta_t.
+           coefficient becomes `correlation_for_delta_t`.
         */
         static const auto correlation_for_delta_t = concealer::getParameter<double>(
           detected_objects_publisher->get_topic_name() + ".noise.v1.correlation_for_delta_t"s);
+
+        auto ar1_noise = [this](auto previous_noise, auto mean, auto standard_deviation, auto phi) {
+          return mean + phi * (previous_noise - mean) +
+                 std::normal_distribution<double>(
+                   0, standard_deviation * std::sqrt(1 - phi * phi))(random_engine_);
+        };
 
         auto find = [&](auto ellipse_normalized_x_radius, const auto & targets) {
           const std::vector<double> ellipse_y_radiuses = {10, 20, 40, 60, 80, 120, 150, 180, 1000};
@@ -360,12 +362,6 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
             }
           }
           return 0.0;
-        };
-
-        auto ar1_noise = [this](auto previous_noise, auto mean, auto standard_deviation, auto phi) {
-          return mean + phi * (previous_noise - mean) +
-                 std::normal_distribution<double>(
-                   0, standard_deviation * std::sqrt(1 - phi * phi))(random_engine_);
         };
 
         noise_output->second.distance_noise = [&]() {
