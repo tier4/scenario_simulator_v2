@@ -61,14 +61,14 @@ public:
   Subscriber<TurnIndicatorsCommand>    getTurnIndicatorsCommand;
   Subscriber<priority::PathWithLaneId> getPathWithLaneId;
 
-  Publisher<AccelWithCovarianceStamped> setAcceleration;
-  Publisher<Odometry>                   setOdometry;
-  Publisher<PoseWithCovarianceStamped>  setPose;
-  Publisher<SteeringReport>             setSteeringReport;
-  Publisher<GearReport>                 setGearReport;
-  Publisher<ControlModeReport>          setControlModeReport;
-  Publisher<VelocityReport>             setVelocityReport;
-  Publisher<TurnIndicatorsReport>       setTurnIndicatorsReport;
+  Publisher<AccelWithCovarianceStamped>   setAcceleration;
+  Publisher<Odometry, NormalDistribution> setOdometry;
+  Publisher<PoseWithCovarianceStamped>    setPose;
+  Publisher<SteeringReport>               setSteeringReport;
+  Publisher<GearReport>                   setGearReport;
+  Publisher<ControlModeReport>            setControlModeReport;
+  Publisher<VelocityReport>               setVelocityReport;
+  Publisher<TurnIndicatorsReport>         setTurnIndicatorsReport;
 
   std::atomic<geometry_msgs::msg::Accel> current_acceleration;
   std::atomic<geometry_msgs::msg::Pose>  current_pose;
