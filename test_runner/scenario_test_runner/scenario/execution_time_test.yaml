@@ -158,7 +158,7 @@ OpenSCENARIO:
                                     UserDefinedValueCondition:
                                       name: /simulation/interpreter/execution_time/update
                                       rule: greaterThan
-                                      value: 0.005
+                                      value: 0.000
                                 - name: 'avoid startup'
                                   delay: 0
                                   conditionEdge: none
