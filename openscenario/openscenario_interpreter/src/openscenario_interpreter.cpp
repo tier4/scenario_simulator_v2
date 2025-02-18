@@ -216,15 +216,18 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
         const auto output_time =
           execution_timer.invoke("output", [&]() { publishCurrentContext(); });
 
-        tier4_simulation_msgs::msg::UserDefinedValue msg;
-        msg.type.data = tier4_simulation_msgs::msg::UserDefinedValueType::DOUBLE;
-        msg.value =
-          std::to_string(std::chrono::duration<double, std::milli>(evaluate_time).count());
-        evaluate_time_publisher->publish(msg);
-        msg.value = std::to_string(std::chrono::duration<double, std::milli>(update_time).count());
-        update_time_publisher->publish(msg);
-        msg.value = std::to_string(std::chrono::duration<double, std::milli>(output_time).count());
-        output_time_publisher->publish(msg);
+        auto generate_double_user_defined_value_message = [](double value) {
+          tier4_simulation_msgs::msg::UserDefinedValue message;
+          message.type.data = tier4_simulation_msgs::msg::UserDefinedValueType::DOUBLE;
+          message.value = std::to_string(value);
+          return message;
+        };
+        evaluate_time_publisher->publish(generate_double_user_defined_value_message(
+          std::chrono::duration<double, std::milli>(evaluate_time).count()));
+        update_time_publisher->publish(generate_double_user_defined_value_message(
+          std::chrono::duration<double, std::milli>(update_time).count()));
+        output_time_publisher->publish(generate_double_user_defined_value_message(
+          std::chrono::duration<double, std::milli>(output_time).count()));
 
         if (auto time_until_trigger = timer->time_until_trigger(); time_until_trigger.count() < 0) {
           /*
