@@ -12,6 +12,9 @@ then
 fi
 
 exit_status=0
+workflow_directory="/tmp/scenario_workflow/$(basename "$file_path" | sed 's/\.[^.]*$//')"
+rm -rf "$workflow_directory"
+mkdir -p "$workflow_directory"
 
 while IFS= read -r line
 do
@@ -22,6 +25,10 @@ do
     echo "Error: caught non-zero exit status（code: $command_exit_status)"
     exit_status=1
   fi
+
+  # save the result file before overwriting by next scenario
+  mkdir -p "$(dirname "$dest_file")"
+  cp /tmp/scenario_test_runner/result.junit.xml "$workflow_directory/$(basename "$line" | sed 's/\.[^.]*$//').junit.xml"
 done < "$file_path"
 
 exit $exit_status
