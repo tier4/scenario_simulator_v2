@@ -17,6 +17,7 @@
 
 #include <simulation_api_schema.pb.h>
 
+#include <concealer/get_parameter.hpp>
 #include <geometry/plane.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 #include <memory>
@@ -91,6 +92,8 @@ class DetectionSensor : public DetectionSensorBase
 
   std::unordered_map<std::string, NoiseOutput> noise_outputs;
 
+  int noise_model_version;
+
 public:
   explicit DetectionSensor(
     const double current_simulation_time,
@@ -100,7 +103,9 @@ public:
   : DetectionSensorBase(current_simulation_time, configuration),
     detected_objects_publisher(publisher),
     ground_truth_objects_publisher(ground_truth_publisher),
-    random_engine_(configuration.random_seed())
+    random_engine_(configuration.random_seed()),
+    noise_model_version(concealer::getParameter<int>(
+      detected_objects_publisher->get_topic_name() + std::string(".noise.model.version")))
   {
   }
 

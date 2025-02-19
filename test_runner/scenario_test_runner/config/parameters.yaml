@@ -132,8 +132,8 @@ simulation:
         seed: 0 # If 0 is specified, a random seed value will be generated for each run.
         noise:
           model:
-            version: 1 # Any of [0, 1]
-          v1:
+            version: 2 # Any of [1, 2].
+          v2:
             correlation_for_delta_t: 0.5
             ellipse_y_radiuses: [10.0, 20.0, 40.0, 60.0, 80.0, 120.0, 150.0, 180.0, 1000.0]
             distance:
@@ -153,7 +153,7 @@ simulation:
             yaw_flip:
               delta_t: 0.1
               velocity_threshold: 0.1
-              rate_for_stop_objects: 0.3
+              stop_rate: 0.3
             mask:
               delta_t: 0.3
               ellipse_normalized_x_radius: 0.6

@@ -19,7 +19,6 @@
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
-#include <concealer/get_parameter.hpp>
 #include <geometry/quaternion/get_angle_difference.hpp>
 #include <geometry/quaternion/get_normal_vector.hpp>
 #include <geometry/quaternion/get_rotation_matrix.hpp>
@@ -296,7 +295,7 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
        simulator publishes, comment out the following function and implement
        new one.
     */
-    auto noise_v0 = [&](auto detected_entities, [[maybe_unused]] auto simulation_time) {
+    auto noise_v1 = [&](auto detected_entities, [[maybe_unused]] auto simulation_time) {
       auto position_noise_distribution =
         std::normal_distribution<>(0.0, configuration_.pos_noise_stddev());
 
@@ -319,7 +318,7 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
       return detected_entities;
     };
 
-    auto noise_v1 = [&](const auto & detected_entities, auto simulation_time) {
+    auto noise_v2 = [&](const auto & detected_entities, auto simulation_time) {
       auto noised_detected_entities = std::decay_t<decltype(detected_entities)>();
 
       for (auto detected_entity : detected_entities) {
@@ -338,12 +337,12 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
 
         auto parameter = [this](const auto & name) {
           return concealer::getParameter<double>(
-            detected_objects_publisher->get_topic_name() + std::string(".noise.v1.") + name);
+            detected_objects_publisher->get_topic_name() + std::string(".noise.v2.") + name);
         };
 
         auto parameters = [this](const auto & name) {
           return concealer::getParameter<std::vector<double>>(
-            detected_objects_publisher->get_topic_name() + std::string(".noise.v1.") + name);
+            detected_objects_publisher->get_topic_name() + std::string(".noise.v2.") + name);
         };
 
         /*
@@ -361,10 +360,10 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
         };
 
         auto selector = [&](auto ellipse_normalized_x_radius, const auto & targets) {
-          return [&, ellipse_normalized_x_radius,
-                  ellipse_y_radiuses = parameters("ellipse_y_radiuses"), targets]() {
+          static const auto ellipse_y_radiuses = parameters("ellipse_y_radiuses");
+          return [&, ellipse_normalized_x_radius, targets]() {
             /*
-               If the parameter `<topic-name>.noise.v1.ellipse_y_radiuses`
+               If the parameter `<topic-name>.noise.v2.ellipse_y_radiuses`
                contains the value 0.0, division by zero will occur here. However,
                in that case, the distance will be NaN, which correctly expresses
                the meaning that "the distance cannot be defined", and this
@@ -388,9 +387,7 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
           static const auto standard_deviation = selector(
             parameter("distance.ellipse_normalized_x_radius.standard_deviation"),
             parameters("distance.standard_deviations"));
-
           const auto phi = std::exp(-interval / tau);
-
           return ar1_noise(noise_output->second.distance_noise, mean(), standard_deviation(), phi);
         }();
 
@@ -401,9 +398,7 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
           static const auto standard_deviation = selector(
             parameter("yaw.ellipse_normalized_x_radius.standard_deviation"),
             parameters("yaw.standard_deviations"));
-
           const auto phi = std::exp(-interval / tau);
-
           return ar1_noise(noise_output->second.yaw_noise, mean(), standard_deviation(), phi);
         }();
 
@@ -411,12 +406,9 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
           static const auto tau =
             -parameter("yaw_flip.delta_t") / std::log(correlation_for_delta_t);
           static const auto velocity_threshold = parameter("yaw_flip.velocity_threshold");
-          static const auto rate_for_stop_objects = parameter("yaw_flip.rate_for_stop_objects");
-
+          static const auto stop_rate = parameter("yaw_flip.stop_rate");
           const auto phi = std::exp(-interval / tau);
-          const auto rate =
-            (noise_output->second.flip ? 1.0 : 0.0) * phi + (1 - phi) * rate_for_stop_objects;
-
+          const auto rate = (noise_output->second.flip ? 1.0 : 0.0) * phi + (1 - phi) * stop_rate;
           return velocity < velocity_threshold and
                  std::uniform_real_distribution<double>()(random_engine_) < rate;
         }();
@@ -425,11 +417,9 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
           static const auto tau = -parameter("mask.delta_t") / std::log(correlation_for_delta_t);
           static const auto unmask_rate = selector(
             parameter("mask.ellipse_normalized_x_radius"), parameters("mask.unmask_rates"));
-
           const auto phi = std::exp(-interval / tau);
           const auto rate =
             (noise_output->second.mask ? 1.0 : 0.0) * phi + (1 - phi) * (1 - unmask_rate());
-
           return std::uniform_real_distribution()(random_engine_) < rate;
         }();
 
@@ -466,6 +456,17 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
       return noised_detected_entities;
     };
 
+    auto noise = [&](auto &&... xs) {
+      switch (noise_model_version) {
+        default:
+          [[fallthrough]];
+        case 1:
+          return noise_v1(std::forward<decltype(xs)>(xs)...);
+        case 2:
+          return noise_v2(std::forward<decltype(xs)>(xs)...);
+      }
+    };
+
     auto make_detected_objects = [&](const auto & detected_entities) {
       auto detected_objects = autoware_perception_msgs::msg::DetectedObjects();
       detected_objects.header.stamp = current_ros_time;
@@ -499,7 +500,7 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
       current_simulation_time - unpublished_detected_entities.front().second >=
       configuration_.object_recognition_delay()) {
       const auto modified_detected_entities =
-        std::apply(noise_v1, unpublished_detected_entities.front());
+        std::apply(noise, unpublished_detected_entities.front());
       detected_objects_publisher->publish(make_detected_objects(modified_detected_entities));
       unpublished_detected_entities.pop();
     }
