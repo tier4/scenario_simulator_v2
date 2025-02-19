@@ -108,6 +108,14 @@ public:
     const std::string & name, const PoseType & pose, const ParametersType & parameters,
     const double current_time, Ts &&... xs) -> entity::EntityBase &
   {
+    static_assert(
+      std::disjunction_v<
+        std::is_same<std::decay_t<PoseType>, LaneletPose>,
+        std::is_same<std::decay_t<PoseType>, CanonicalizedLaneletPose>,
+        std::is_same<std::decay_t<PoseType>, geometry_msgs::msg::Pose>>,
+      "PoseType must be either a LaneletPose, a CanonicalizedLaneletPose, or a "
+      "geometry_msgs::msg::Pose");
+
     auto makeEntityStatus = [&]() -> CanonicalizedEntityStatus {
       EntityStatus entity_status;
 
