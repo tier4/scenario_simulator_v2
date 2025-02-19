@@ -132,7 +132,8 @@ private:
 
   const std::shared_ptr<entity_behavior::BehaviorPluginBase> behavior_plugin_ptr_;
 
-  traffic_simulator::RoutePlanner route_planner_;
+  traffic_simulator::RoutePlanner route_planner_{
+    traffic_simulator::RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER};
 
   std::shared_ptr<math::geometry::CatmullRomSpline> spline_;
 
