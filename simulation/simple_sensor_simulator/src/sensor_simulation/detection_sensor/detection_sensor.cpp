@@ -323,8 +323,6 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
       auto noised_detected_entities = std::decay_t<decltype(detected_entities)>();
 
       for (auto detected_entity : detected_entities) {
-        using namespace std::literals::string_literals;
-
         auto [noise_output, success] =
           noise_outputs.emplace(detected_entity.name(), simulation_time);
 
@@ -338,14 +336,23 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
         const auto interval =
           simulation_time - std::exchange(noise_output->second.simulation_time, simulation_time);
 
+        auto parameter = [this](const auto & name) {
+          return concealer::getParameter<double>(
+            detected_objects_publisher->get_topic_name() + std::string(".noise.v1.") + name);
+        };
+
+        auto parameters = [this](const auto & name) {
+          return concealer::getParameter<std::vector<double>>(
+            detected_objects_publisher->get_topic_name() + std::string(".noise.v1.") + name);
+        };
+
         /*
            We use AR(1) model to model noises' autocorrelation coefficients for
            all kinds of noises. We define the `tau` used for AR(1) from
            `delta_t`, which means the time interval when the autocorrelation
            coefficient becomes `correlation_for_delta_t`.
         */
-        static const auto correlation_for_delta_t = concealer::getParameter<double>(
-          detected_objects_publisher->get_topic_name() + ".noise.v1.correlation_for_delta_t"s);
+        static const auto correlation_for_delta_t = parameter("correlation_for_delta_t");
 
         auto ar1_noise = [this](auto previous_noise, auto mean, auto standard_deviation, auto phi) {
           return mean + phi * (previous_noise - mean) +
@@ -354,9 +361,8 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
         };
 
         auto selector = [&](auto ellipse_normalized_x_radius, const auto & targets) {
-          static const auto ellipse_y_radiuses = concealer::getParameter<std::vector<double>>(
-            detected_objects_publisher->get_topic_name() + ".noise.v1.ellipse_y_radiuses"s);
-          return [&, ellipse_normalized_x_radius, ellipse_y_radiuses, targets]() {
+          return [&, ellipse_normalized_x_radius,
+                  ellipse_y_radiuses = parameters("ellipse_y_radiuses"), targets]() {
             /*
                If the parameter `<topic-name>.noise.v1.ellipse_y_radiuses`
                contains the value 0.0, division by zero will occur here. However,
@@ -375,77 +381,38 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
         };
 
         noise_output->second.distance_noise = [&]() {
-          static const auto delta_t = concealer::getParameter<double>(
-            detected_objects_publisher->get_topic_name() + ".noise.v1.distance.delta_t"s);
+          static const auto tau =
+            -parameter("distance.delta_t") / std::log(correlation_for_delta_t);
+          static const auto mean = selector(
+            parameter("distance.ellipse_normalized_x_radius.mean"), parameters("distance.means"));
+          static const auto standard_deviation = selector(
+            parameter("distance.ellipse_normalized_x_radius.standard_deviation"),
+            parameters("distance.standard_deviations"));
 
-          static const auto ellipse_normalized_x_radius_mean = concealer::getParameter<double>(
-            detected_objects_publisher->get_topic_name() +
-            ".noise.v1.distance.ellipse_normalized_x_radius.mean"s);
-
-          static const auto ellipse_normalized_x_radius_standard_deviation =
-            concealer::getParameter<double>(
-              detected_objects_publisher->get_topic_name() +
-              ".noise.v1.distance.ellipse_normalized_x_radius.standard_deviation"s);
-
-          static const auto means = concealer::getParameter<std::vector<double>>(
-            detected_objects_publisher->get_topic_name() + ".noise.v1.distance.means"s);
-
-          static const auto standard_deviations = concealer::getParameter<std::vector<double>>(
-            detected_objects_publisher->get_topic_name() +
-            ".noise.v1.distance.standard_deviations"s);
-
-          const auto tau = -delta_t / std::log(correlation_for_delta_t);
           const auto phi = std::exp(-interval / tau);
-
-          static const auto mean = selector(ellipse_normalized_x_radius_mean, means);
-          static const auto standard_deviation =
-            selector(ellipse_normalized_x_radius_standard_deviation, standard_deviations);
 
           return ar1_noise(noise_output->second.distance_noise, mean(), standard_deviation(), phi);
         }();
 
         noise_output->second.yaw_noise = [&]() {
-          static const auto delta_t = concealer::getParameter<double>(
-            detected_objects_publisher->get_topic_name() + ".noise.v1.distance.delta_t"s);
+          static const auto tau = -parameter("yaw.delta_t") / std::log(correlation_for_delta_t);
+          static const auto mean =
+            selector(parameter("yaw.ellipse_normalized_x_radius.mean"), parameters("yaw.means"));
+          static const auto standard_deviation = selector(
+            parameter("yaw.ellipse_normalized_x_radius.standard_deviation"),
+            parameters("yaw.standard_deviations"));
 
-          static const auto ellipse_normalized_x_radius_mean = concealer::getParameter<double>(
-            detected_objects_publisher->get_topic_name() +
-            ".noise.v1.yaw.ellipse_normalized_x_radius.mean"s);
-
-          static const auto ellipse_normalized_x_radius_standard_deviation =
-            concealer::getParameter<double>(
-              detected_objects_publisher->get_topic_name() +
-              ".noise.v1.yaw.ellipse_normalized_x_radius.standard_deviation"s);
-
-          static const auto means = concealer::getParameter<std::vector<double>>(
-            detected_objects_publisher->get_topic_name() + ".noise.v1.yaw.means"s);
-
-          static const auto standard_deviations = concealer::getParameter<std::vector<double>>(
-            detected_objects_publisher->get_topic_name() + ".noise.v1.yaw.standard_deviations"s);
-
-          const auto tau = -delta_t / std::log(correlation_for_delta_t);
           const auto phi = std::exp(-interval / tau);
-
-          static const auto mean = selector(ellipse_normalized_x_radius_mean, means);
-          static const auto standard_deviation =
-            selector(ellipse_normalized_x_radius_standard_deviation, standard_deviations);
 
           return ar1_noise(noise_output->second.yaw_noise, mean(), standard_deviation(), phi);
         }();
 
         noise_output->second.flip = [&]() {
-          static const auto delta_t = concealer::getParameter<double>(
-            detected_objects_publisher->get_topic_name() + ".noise.v1.yaw_flip.delta_t"s);
+          static const auto tau =
+            -parameter("yaw_flip.delta_t") / std::log(correlation_for_delta_t);
+          static const auto velocity_threshold = parameter("yaw_flip.velocity_threshold");
+          static const auto rate_for_stop_objects = parameter("yaw_flip.rate_for_stop_objects");
 
-          static const auto velocity_threshold = concealer::getParameter<double>(
-            detected_objects_publisher->get_topic_name() +
-            ".noise.v1.yaw_flip.velocity_threshold"s);
-
-          static const auto rate_for_stop_objects = concealer::getParameter<double>(
-            detected_objects_publisher->get_topic_name() +
-            ".noise.v1.yaw_flip.rate_for_stop_objects"s);
-
-          const auto tau = -delta_t / std::log(correlation_for_delta_t);
           const auto phi = std::exp(-interval / tau);
           const auto rate =
             (noise_output->second.flip ? 1.0 : 0.0) * phi + (1 - phi) * rate_for_stop_objects;
@@ -455,21 +422,11 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
         }();
 
         noise_output->second.mask = [&]() {
-          static const auto delta_t = concealer::getParameter<double>(
-            detected_objects_publisher->get_topic_name() + ".noise.v1.mask.delta_t"s);
+          static const auto tau = -parameter("mask.delta_t") / std::log(correlation_for_delta_t);
+          static const auto unmask_rate = selector(
+            parameter("mask.ellipse_normalized_x_radius"), parameters("mask.unmask_rates"));
 
-          static const auto ellipse_normalized_x_radius = concealer::getParameter<double>(
-            detected_objects_publisher->get_topic_name() +
-            ".noise.v1.mask.ellipse_normalized_x_radius"s);
-
-          static const auto unmask_rates = concealer::getParameter<std::vector<double>>(
-            detected_objects_publisher->get_topic_name() + ".noise.v1.mask.rates"s);
-
-          const auto tau = -delta_t / std::log(correlation_for_delta_t);
           const auto phi = std::exp(-interval / tau);
-
-          static const auto unmask_rate = selector(ellipse_normalized_x_radius, unmask_rates);
-
           const auto rate =
             (noise_output->second.mask ? 1.0 : 0.0) * phi + (1 - phi) * (1 - unmask_rate());
 
