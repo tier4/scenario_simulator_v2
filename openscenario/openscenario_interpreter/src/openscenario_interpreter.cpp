@@ -42,7 +42,8 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   osc_path(""),
   output_directory("/tmp"),
   publish_empty_context(false),
-  record(false)
+  record(false),
+  record_storage_id("")
 {
   DECLARE_PARAMETER(local_frame_rate);
   DECLARE_PARAMETER(local_real_time_factor);
@@ -50,6 +51,7 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   DECLARE_PARAMETER(output_directory);
   DECLARE_PARAMETER(publish_empty_context);
   DECLARE_PARAMETER(record);
+  DECLARE_PARAMETER(record_storage_id);
 
   declare_parameter<std::string>("speed_condition", "legacy");
   SpeedCondition::compatibility =
@@ -111,6 +113,7 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
       GET_PARAMETER(output_directory);
       GET_PARAMETER(publish_empty_context);
       GET_PARAMETER(record);
+      GET_PARAMETER(record_storage_id);
 
       script = std::make_shared<OpenScenario>(osc_path);
 
@@ -218,8 +221,14 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
       },
       [&]() {
         if (record) {
-          record::start(
-            "-a", "-o", boost::filesystem::path(osc_path).replace_extension("").string());
+          if (record_storage_id == "") {
+            record::start(
+              "-a", "-o", boost::filesystem::path(osc_path).replace_extension("").string());
+          } else {
+            record::start(
+              "-a", "-o", boost::filesystem::path(osc_path).replace_extension("").string(), "-s",
+              record_storage_id);
+          }
         }
 
         SimulatorCore::activate(
