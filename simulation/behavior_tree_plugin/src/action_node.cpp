@@ -110,6 +110,7 @@ auto ActionNode::getOtherEntitiesCanonicalizedEntityStatuses() const
   -> std::vector<traffic_simulator::CanonicalizedEntityStatus>
 {
   std::vector<traffic_simulator::CanonicalizedEntityStatus> other_status;
+  other_status.reserve(other_entity_status.size());
   for (const auto & [entity_name, entity_status] : other_entity_status) {
     other_status.push_back(entity_status);
   }
@@ -183,7 +184,14 @@ auto ActionNode::getFrontEntityName(const math::geometry::CatmullRomSplineInterf
   constexpr double front_entity_angle_threshold{boost::math::constants::half_pi<double>()};
   constexpr double front_entity_horizon{40.0};
 
-  std::vector<std::pair<std::string, double>> entities_with_distances;
+  std::optional<std::string> front_entity_name;
+  auto try_front_entity = [&front_entity_name, min_distance = std::numeric_limits<double>::max()](
+                            const std::string & name, const double distance) mutable {
+    if (distance < min_distance) {
+      min_distance = distance;
+      front_entity_name = name;
+    }
+  };
   for (const auto & [other_name, other_status] : other_entity_status) {
     if (
       const auto & other_canonicalized_lanelet_pose = other_status.getCanonicalizedLaneletPose()) {
@@ -197,20 +205,13 @@ auto ActionNode::getFrontEntityName(const math::geometry::CatmullRomSplineInterf
           other_status.getMapPose().orientation);
         const auto yaw = math::geometry::convertQuaternionToEulerAngle(quaternion).z;
         if (std::fabs(yaw) <= front_entity_angle_threshold) {
-          entities_with_distances.emplace_back(other_name, distance.value());
+          try_front_entity(other_name, distance.value());
         }
       }
     }
   }
 
-  if (!entities_with_distances.empty()) {
-    auto min_entity_with_distance_it = std::min_element(
-      entities_with_distances.begin(), entities_with_distances.end(),
-      [](const auto & lhs, const auto & rhs) { return lhs.second < rhs.second; });
-    return min_entity_with_distance_it->first;
-  } else {
-    return std::nullopt;
-  }
+  return front_entity_name;
 }
 
 auto ActionNode::getEntityStatus(const std::string & target_name) const
