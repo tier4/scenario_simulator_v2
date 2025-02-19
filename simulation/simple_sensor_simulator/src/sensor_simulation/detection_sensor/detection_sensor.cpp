@@ -353,15 +353,25 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
                    0, standard_deviation * std::sqrt(1 - phi * phi))(random_engine_);
         };
 
-        auto find = [&](auto ellipse_normalized_x_radius, const auto & targets) {
-          const std::vector<double> ellipse_y_radiuses = {10, 20, 40, 60, 80, 120, 150, 180, 1000};
-          const auto distance = std::hypot(x / ellipse_normalized_x_radius, y);
-          for (auto i = std::size_t(0); i < ellipse_y_radiuses.size(); ++i) {
-            if (distance < ellipse_y_radiuses[i]) {
-              return targets[i];
+        auto selector = [&](auto ellipse_normalized_x_radius, const auto & targets) {
+          static const auto ellipse_y_radiuses = concealer::getParameter<std::vector<double>>(
+            detected_objects_publisher->get_topic_name() + ".noise.v1.ellipse_y_radiuses"s);
+          return [&, ellipse_normalized_x_radius, ellipse_y_radiuses, targets]() {
+            /*
+               If the parameter `<topic-name>.noise.v1.ellipse_y_radiuses`
+               contains the value 0.0, division by zero will occur here. However,
+               in that case, the distance will be NaN, which correctly expresses
+               the meaning that "the distance cannot be defined", and this
+               function will work without any problems (zero will be returned).
+            */
+            const auto distance = std::hypot(x / ellipse_normalized_x_radius, y);
+            for (auto i = std::size_t(0); i < ellipse_y_radiuses.size(); ++i) {
+              if (distance < ellipse_y_radiuses[i]) {
+                return targets[i];
+              }
             }
-          }
-          return 0.0;
+            return 0.0;
+          };
         };
 
         noise_output->second.distance_noise = [&]() {
@@ -386,11 +396,12 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
 
           const auto tau = -delta_t / std::log(correlation_for_delta_t);
           const auto phi = std::exp(-interval / tau);
-          const auto mean = find(ellipse_normalized_x_radius_mean, means);
-          const auto standard_deviation =
-            find(ellipse_normalized_x_radius_standard_deviation, standard_deviations);
 
-          return ar1_noise(noise_output->second.distance_noise, mean, standard_deviation, phi);
+          static const auto mean = selector(ellipse_normalized_x_radius_mean, means);
+          static const auto standard_deviation =
+            selector(ellipse_normalized_x_radius_standard_deviation, standard_deviations);
+
+          return ar1_noise(noise_output->second.distance_noise, mean(), standard_deviation(), phi);
         }();
 
         noise_output->second.yaw_noise = [&]() {
@@ -414,11 +425,12 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
 
           const auto tau = -delta_t / std::log(correlation_for_delta_t);
           const auto phi = std::exp(-interval / tau);
-          const auto mean = find(ellipse_normalized_x_radius_mean, means);
-          const auto standard_deviation =
-            find(ellipse_normalized_x_radius_standard_deviation, standard_deviations);
 
-          return ar1_noise(noise_output->second.yaw_noise, mean, standard_deviation, phi);
+          static const auto mean = selector(ellipse_normalized_x_radius_mean, means);
+          static const auto standard_deviation =
+            selector(ellipse_normalized_x_radius_standard_deviation, standard_deviations);
+
+          return ar1_noise(noise_output->second.yaw_noise, mean(), standard_deviation(), phi);
         }();
 
         noise_output->second.flip = [&]() {
@@ -455,8 +467,11 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
 
           const auto tau = -delta_t / std::log(correlation_for_delta_t);
           const auto phi = std::exp(-interval / tau);
-          const auto rate = (noise_output->second.mask ? 1.0 : 0.0) * phi +
-                            (1 - phi) * (1 - find(ellipse_normalized_x_radius, unmask_rates));
+
+          static const auto unmask_rate = selector(ellipse_normalized_x_radius, unmask_rates);
+
+          const auto rate =
+            (noise_output->second.mask ? 1.0 : 0.0) * phi + (1 - phi) * (1 - unmask_rate());
 
           return std::uniform_real_distribution()(random_engine_) < rate;
         }();
