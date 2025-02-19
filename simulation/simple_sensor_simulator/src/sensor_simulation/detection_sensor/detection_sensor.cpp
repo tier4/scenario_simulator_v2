@@ -25,6 +25,7 @@
 #include <geometry/vector3/hypot.hpp>
 #include <memory>
 #include <random>
+#include <scenario_simulator_exception/exception.hpp>
 #include <simple_sensor_simulator/exception.hpp>
 #include <simple_sensor_simulator/sensor_simulation/detection_sensor/detection_sensor.hpp>
 #include <simulation_interface/conversions.hpp>
@@ -341,8 +342,19 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
         };
 
         auto parameters = [this](const auto & name) {
-          return concealer::getParameter<std::vector<double>>(
-            detected_objects_publisher->get_topic_name() + std::string(".noise.v2.") + name);
+          const auto full_name =
+            detected_objects_publisher->get_topic_name() + std::string(".noise.v2.") + name;
+          const auto parameters = concealer::getParameter<std::vector<double>>(full_name);
+          static const auto size = parameters.size();
+          if (parameters.size() != size) {
+            throw common::Error(
+              "The sizes of the arrays given to the parameters of noise model version 2 must be "
+              "the same. The parameter ",
+              std::quoted(full_name), " is an array of size ", parameters.size(),
+              ", and the other arrays are of size ", size, ".");
+          } else {
+            return parameters;
+          }
         };
 
         /*
@@ -360,18 +372,19 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
         };
 
         auto selector = [&](auto ellipse_normalized_x_radius, const auto & targets) {
-          static const auto ellipse_y_radiuses = parameters("ellipse_y_radiuses");
+          static const auto ellipse_y_radii = parameters("ellipse_y_radii");
           return [&, ellipse_normalized_x_radius, targets]() {
             /*
-               If the parameter `<topic-name>.noise.v2.ellipse_y_radiuses`
-               contains the value 0.0, division by zero will occur here. However,
-               in that case, the distance will be NaN, which correctly expresses
-               the meaning that "the distance cannot be defined", and this
-               function will work without any problems (zero will be returned).
+               If the parameter `<topic-name>.noise.v2.ellipse_y_radii`
+               contains the value 0.0, division by zero will occur here.
+               However, in that case, the distance will be NaN, which correctly
+               expresses the meaning that "the distance cannot be defined", and
+               this function will work without any problems (zero will be
+               returned).
             */
             const auto distance = std::hypot(x / ellipse_normalized_x_radius, y);
-            for (auto i = std::size_t(0); i < ellipse_y_radiuses.size(); ++i) {
-              if (distance < ellipse_y_radiuses[i]) {
+            for (auto i = std::size_t(0); i < ellipse_y_radii.size(); ++i) {
+              if (distance < ellipse_y_radii[i]) {
                 return targets[i];
               }
             }

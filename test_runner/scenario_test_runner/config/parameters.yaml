@@ -135,7 +135,7 @@ simulation:
             version: 2 # Any of [1, 2].
           v2:
             correlation_for_delta_t: 0.5
-            ellipse_y_radiuses: [10.0, 20.0, 40.0, 60.0, 80.0, 120.0, 150.0, 180.0, 1000.0]
+            ellipse_y_radii: [10.0, 20.0, 40.0, 60.0, 80.0, 120.0, 150.0, 180.0, 1000.0]
             distance:
               delta_t: 0.5
               ellipse_normalized_x_radius:
