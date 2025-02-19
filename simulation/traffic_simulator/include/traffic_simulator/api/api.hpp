@@ -110,12 +110,7 @@ public:
   auto updateFrame() -> bool;
 
   // entities, ego - spawn
-  template <
-    typename PoseType, typename ParamsType,
-    typename = std::enable_if_t<std::disjunction_v<
-      std::is_same<std::decay_t<ParamsType>, traffic_simulator_msgs::msg::VehicleParameters>,
-      std::is_same<std::decay_t<ParamsType>, traffic_simulator_msgs::msg::PedestrianParameters>,
-      std::is_same<std::decay_t<ParamsType>, traffic_simulator_msgs::msg::MiscObjectParameters>>>>
+  template <typename PoseType, typename ParamsType>
   auto spawn(
     const std::string & name, const PoseType & pose, const ParamsType & parameters,
     const std::string & behavior = "", const std::string & model3d = "") -> entity::EntityBase &
@@ -123,6 +118,14 @@ public:
     using VehicleParameters = traffic_simulator_msgs::msg::VehicleParameters;
     using PedestrianParameters = traffic_simulator_msgs::msg::PedestrianParameters;
     using MiscObjectParameters = traffic_simulator_msgs::msg::MiscObjectParameters;
+
+    static_assert(
+      std::disjunction_v<
+        std::is_same<std::decay_t<ParamsType>, VehicleParameters>,
+        std::is_same<std::decay_t<ParamsType>, PedestrianParameters>,
+        std::is_same<std::decay_t<ParamsType>, MiscObjectParameters>>,
+      "ParamsType must be either a VehicleParameters, a PedestrianParameters, or a "
+      "MiscObjectParameters");
 
     auto register_to_entity_manager = [&]() -> entity::EntityBase & {
       if constexpr (std::is_same_v<ParamsType, VehicleParameters>) {
