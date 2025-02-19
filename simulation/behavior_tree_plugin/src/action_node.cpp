@@ -110,6 +110,7 @@ auto ActionNode::getOtherEntitiesCanonicalizedEntityStatuses() const
   -> std::vector<traffic_simulator::CanonicalizedEntityStatus>
 {
   std::vector<traffic_simulator::CanonicalizedEntityStatus> other_status;
+  other_status.reserve(other_entity_status.size());
   for (const auto & [entity_name, entity_status] : other_entity_status) {
     other_status.push_back(entity_status);
   }

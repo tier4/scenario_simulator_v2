@@ -72,6 +72,7 @@ auto filterLaneletIds(const lanelet::Ids & lanelet_ids, const char subtype[]) ->
 {
   const auto convertToLanelets = [](const lanelet::Ids & lanelet_ids) -> lanelet::Lanelets {
     lanelet::Lanelets lanelets;
+    lanelets.reserve(lanelet_ids.size());
     for (const auto & id : lanelet_ids) {
       lanelets.emplace_back(LaneletWrapper::map()->laneletLayer.get(id));
     }
