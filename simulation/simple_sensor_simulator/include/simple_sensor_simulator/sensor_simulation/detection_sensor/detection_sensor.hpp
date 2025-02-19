@@ -17,6 +17,7 @@
 
 #include <simulation_api_schema.pb.h>
 
+#include <concealer/get_parameter.hpp>
 #include <geometry/plane.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 #include <memory>
@@ -25,6 +26,7 @@
 #include <random>
 #include <rclcpp/rclcpp.hpp>
 #include <string>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -79,6 +81,19 @@ class DetectionSensor : public DetectionSensorBase
   std::queue<std::pair<std::vector<traffic_simulator_msgs::EntityStatus>, double>>
     unpublished_detected_entities, unpublished_ground_truth_entities;
 
+  struct NoiseOutput
+  {
+    double simulation_time, distance_noise, yaw_noise;
+
+    bool mask, flip;
+
+    explicit NoiseOutput(double simulation_time = 0.0) : simulation_time(simulation_time) {}
+  };
+
+  std::unordered_map<std::string, NoiseOutput> noise_outputs;
+
+  int noise_model_version;
+
 public:
   explicit DetectionSensor(
     const double current_simulation_time,
@@ -88,7 +103,9 @@ public:
   : DetectionSensorBase(current_simulation_time, configuration),
     detected_objects_publisher(publisher),
     ground_truth_objects_publisher(ground_truth_publisher),
-    random_engine_(configuration.random_seed())
+    random_engine_(configuration.random_seed()),
+    noise_model_version(concealer::getParameter<int>(
+      detected_objects_publisher->get_topic_name() + std::string(".noise.model.version")))
   {
   }
 
