@@ -161,7 +161,7 @@ auto TrafficLightsBase::getDistanceToActiveTrafficLightStopLine(
   if (traffic_light_ids.empty()) {
     return std::nullopt;
   }
-  std::set<double> collision_points = {};
+  std::optional<double> min_distance{std::nullopt};
   for (const auto id : traffic_light_ids) {
     using Color = traffic_simulator::TrafficLight::Color;
     using Status = traffic_simulator::TrafficLight::Status;
@@ -171,14 +171,13 @@ auto TrafficLightsBase::getDistanceToActiveTrafficLightStopLine(
         traffic_light.contains(Color::yellow, Status::solid_on, Shape::circle)) {
       const auto collision_point =
         traffic_simulator::distance::distanceToTrafficLightStopLine(spline, id);
-      if (collision_point) {
-        collision_points.insert(collision_point.value());
+      if (
+        collision_point.has_value() and
+        (not min_distance.has_value() or collision_point.value() < min_distance.value())) {
+        min_distance = collision_point;
       }
     }
   }
-  if (collision_points.empty()) {
-    return std::nullopt;
-  }
-  return *collision_points.begin();
+  return min_distance;
 }
 }  // namespace traffic_simulator
