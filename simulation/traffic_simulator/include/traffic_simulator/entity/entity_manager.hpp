@@ -224,12 +224,6 @@ public:
   // traffics, lanelet
   auto getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &;
 
-  auto getPedestrianParameters(const std::string & name) const
-    -> const traffic_simulator_msgs::msg::PedestrianParameters &;
-
-  auto getVehicleParameters(const std::string & name) const
-    -> const traffic_simulator_msgs::msg::VehicleParameters &;
-
 private:
   /* */ Configuration configuration_;
 
