@@ -135,7 +135,7 @@ public:
   template <typename EntityType, typename PoseType, typename ParametersType, typename... Ts>
   auto spawnEntity(
     const std::string & name, const PoseType & pose, const ParametersType & parameters,
-    const double current_time, Ts &&... xs)
+    const double current_time, Ts &&... xs) -> entity::EntityBase &
   {
     static_assert(
       std::disjunction<
@@ -208,7 +208,7 @@ public:
         success) {
       // FIXME: this ignores V2I traffic lights
       iter->second->setTrafficLights(traffic_lights_ptr_->getConventionalTrafficLights());
-      return success;
+      return *(iter->second);
     } else {
       THROW_SEMANTIC_ERROR("Entity ", std::quoted(name), " is already exists.");
     }
