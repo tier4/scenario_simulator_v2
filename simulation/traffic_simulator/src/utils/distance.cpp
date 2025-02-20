@@ -69,7 +69,7 @@ auto longitudinalDistance(
     if (to.hasAlternativeLaneletPose()) {
       if (
         const auto to_canonicalized_opt = to.getAlternativeLaneletPoseBaseOnShortestRouteFrom(
-          static_cast<LaneletPose>(from), hdmap_utils_ptr, routing_configuration)) {
+          static_cast<LaneletPose>(from), routing_configuration)) {
         to_canonicalized = to_canonicalized_opt.value();
       }
     }
