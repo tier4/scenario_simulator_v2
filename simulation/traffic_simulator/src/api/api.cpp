@@ -12,20 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <tf2/LinearMath/Quaternion.h>
-
 #include <geometry/intersection/collision.hpp>
-#include <geometry/quaternion/euler_to_quaternion.hpp>
-#include <limits>
-#include <memory>
-#include <optional>
-#include <rclcpp/rclcpp.hpp>
-#include <scenario_simulator_exception/exception.hpp>
-#include <stdexcept>
-#include <string>
 #include <traffic_simulator/api/api.hpp>
-#include <traffic_simulator/traffic/traffic_source.hpp>
-#include <traffic_simulator/utils/pose.hpp>
 
 namespace traffic_simulator
 {

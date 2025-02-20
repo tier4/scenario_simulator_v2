@@ -15,43 +15,16 @@
 #ifndef TRAFFIC_SIMULATOR__ENTITY__ENTITY_MANAGER_HPP_
 #define TRAFFIC_SIMULATOR__ENTITY__ENTITY_MANAGER_HPP_
 
-#include <tf2/LinearMath/Quaternion.h>
 #include <tf2_ros/static_transform_broadcaster.h>
 #include <tf2_ros/transform_broadcaster.h>
 
-#include <memory>
-#include <optional>
-#include <rclcpp/node_interfaces/get_node_topics_interface.hpp>
-#include <rclcpp/node_interfaces/node_topics_interface.hpp>
-#include <rclcpp/rclcpp.hpp>
-#include <scenario_simulator_exception/exception.hpp>
-#include <stdexcept>
-#include <string>
-#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 #include <traffic_simulator/api/configuration.hpp>
-#include <traffic_simulator/data_type/lane_change.hpp>
-#include <traffic_simulator/data_type/speed_change.hpp>
 #include <traffic_simulator/entity/ego_entity.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/entity/misc_object_entity.hpp>
 #include <traffic_simulator/entity/pedestrian_entity.hpp>
 #include <traffic_simulator/entity/vehicle_entity.hpp>
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
-#include <traffic_simulator/traffic_lights/configurable_rate_updater.hpp>
-#include <traffic_simulator/traffic_lights/traffic_light_marker_publisher.hpp>
-#include <traffic_simulator/traffic_lights/traffic_light_publisher.hpp>
-#include <traffic_simulator/traffic_lights/traffic_lights.hpp>
-#include <traffic_simulator/utils/node_parameters.hpp>
-#include <traffic_simulator/utils/pose.hpp>
-#include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
-#include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/entity_status_with_trajectory_array.hpp>
-#include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
-#include <type_traits>
-#include <unordered_map>
-#include <utility>
-#include <vector>
-#include <visualization_msgs/msg/marker_array.hpp>
 
 namespace traffic_simulator
 {

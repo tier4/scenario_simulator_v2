@@ -12,26 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <cstdint>
-#include <geometry/bounding_box.hpp>
-#include <geometry/distance.hpp>
-#include <geometry/transform.hpp>
 #include <geometry/vector3/operator.hpp>
-#include <limits>
-#include <memory>
-#include <optional>
-#include <queue>
-#include <scenario_simulator_exception/exception.hpp>
-#include <sstream>
 #include <std_msgs/msg/header.hpp>
-#include <stdexcept>
-#include <string>
 #include <traffic_simulator/entity/entity_manager.hpp>
-#include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/helper/stop_watch.hpp>
-#include <traffic_simulator/utils/distance.hpp>
-#include <unordered_map>
-#include <vector>
 
 namespace traffic_simulator
 {

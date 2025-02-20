@@ -17,32 +17,16 @@
 
 #include <simulation_api_schema.pb.h>
 
-#include <boost/variant.hpp>
-#include <cassert>
-#include <memory>
-#include <optional>
-#include <rclcpp/rclcpp.hpp>
-#include <rosgraph_msgs/msg/clock.hpp>
 #include <simulation_interface/conversions.hpp>
 #include <simulation_interface/zmq_multi_client.hpp>
 #include <std_msgs/msg/float64.hpp>
-#include <stdexcept>
-#include <string>
-#include <traffic_simulator/api/configuration.hpp>
-#include <traffic_simulator/data_type/entity_status.hpp>
-#include <traffic_simulator/data_type/lane_change.hpp>
-#include <traffic_simulator/data_type/lanelet_pose.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/entity/entity_manager.hpp>
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
-#include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/simulation_clock/simulation_clock.hpp>
 #include <traffic_simulator/traffic/traffic_controller.hpp>
 #include <traffic_simulator/traffic/traffic_source.hpp>
-#include <traffic_simulator/traffic_lights/traffic_light.hpp>
 #include <traffic_simulator/traffic_lights/traffic_lights.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
-#include <utility>
 
 namespace traffic_simulator
 {
