@@ -113,25 +113,25 @@ public:
     traffic_lights_ptr_ = traffic_lights_ptr;
   }
 
-  void setVerbose(const bool verbose);
+  auto setVerbose(const bool verbose) -> void;
 
   auto startNpcLogic(const double current_time) -> void;
 
   auto isNpcLogicStarted() const -> bool { return npc_logic_started_; }
 
-  visualization_msgs::msg::MarkerArray makeDebugMarker() const;
+  auto makeDebugMarker() const -> visualization_msgs::msg::MarkerArray;
 
-  void update(const double current_time, const double step_time);
+  auto update(const double current_time, const double step_time) -> void;
 
   auto updateNpcLogic(const std::string & name, const double current_time, const double step_time)
     -> const CanonicalizedEntityStatus &;
 
-  void updateHdmapMarker();
+  auto updateHdmapMarker() -> void;
 
-  void broadcastEntityTransform();
+  auto broadcastEntityTransform() -> void;
 
-  void broadcastTransform(
-    const geometry_msgs::msg::PoseStamped & pose, const bool static_transform = true);
+  auto broadcastTransform(
+    const geometry_msgs::msg::PoseStamped & pose, const bool static_transform = true) -> void;
 
   template <typename Entity, typename Pose, typename Parameters, typename... Ts>
   auto spawnEntity(
@@ -243,9 +243,10 @@ public:
    * @sa traffic_simulator::entity::PedestrianEntity::BuiltinBehavior
    * @sa traffic_simulator::entity::VehicleEntity::BuiltinBehavior
    */
-  void resetBehaviorPlugin(const std::string & name, const std::string & behavior_plugin_name);
+  auto resetBehaviorPlugin(const std::string & name, const std::string & behavior_plugin_name)
+    -> void;
 
-  bool despawnEntity(const std::string & name);
+  auto despawnEntity(const std::string & name) -> bool;
 
   auto getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &;
 

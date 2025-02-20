@@ -37,7 +37,7 @@ namespace traffic_simulator
 {
 namespace entity
 {
-void EntityManager::setVerbose(const bool verbose)
+auto EntityManager::setVerbose(const bool verbose) -> void
 {
   configuration.verbose = verbose;
   for (const auto & [name, entity_ptr] : entities_) {
@@ -54,7 +54,7 @@ auto EntityManager::startNpcLogic(const double current_time) -> void
   }
 }
 
-visualization_msgs::msg::MarkerArray EntityManager::makeDebugMarker() const
+auto EntityManager::makeDebugMarker() const -> visualization_msgs::msg::MarkerArray
 {
   visualization_msgs::msg::MarkerArray marker;
   for (const auto & [name, entity_ptr] : entities_) {
@@ -63,7 +63,7 @@ visualization_msgs::msg::MarkerArray EntityManager::makeDebugMarker() const
   return marker;
 }
 
-void EntityManager::update(const double current_time, const double step_time)
+auto EntityManager::update(const double current_time, const double step_time) -> void
 {
   traffic_simulator::helper::StopWatch<std::chrono::milliseconds> stop_watch_update(
     "EntityManager::update", configuration.verbose);
@@ -130,7 +130,7 @@ auto EntityManager::updateNpcLogic(
   return entity.getCanonicalizedStatus();
 }
 
-void EntityManager::updateHdmapMarker()
+auto EntityManager::updateHdmapMarker() -> void
 {
   MarkerArray markers;
   const auto stamp = clock_ptr_->now();
@@ -196,8 +196,8 @@ auto EntityManager::broadcastEntityTransform() -> void
   }
 }
 
-void EntityManager::broadcastTransform(
-  const geometry_msgs::msg::PoseStamped & pose, const bool static_transform)
+auto EntityManager::broadcastTransform(
+  const geometry_msgs::msg::PoseStamped & pose, const bool static_transform) -> void
 {
   geometry_msgs::msg::TransformStamped transform_stamped;
   {
@@ -313,8 +313,8 @@ auto EntityManager::getEntityPointer(const std::string & name) const
   }
 };
 
-void EntityManager::resetBehaviorPlugin(
-  const std::string & name, const std::string & behavior_plugin_name)
+auto EntityManager::resetBehaviorPlugin(
+  const std::string & name, const std::string & behavior_plugin_name) -> void
 {
   const auto & reference_entity = getEntity(name);
   const auto & status = reference_entity.getCanonicalizedStatus();
@@ -347,7 +347,7 @@ void EntityManager::resetBehaviorPlugin(
   spawned_entity.setBehaviorParameter(behavior_parameter);
 }
 
-bool EntityManager::despawnEntity(const std::string & name)
+auto EntityManager::despawnEntity(const std::string & name) -> bool
 {
   return isEntityExist(name) && entities_.erase(name);
 }
