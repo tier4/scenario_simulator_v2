@@ -44,6 +44,10 @@ auto API::startNpcLogic() -> void
 
 auto API::isNpcLogicStarted() const -> bool { return entity_manager_ptr_->isNpcLogicStarted(); }
 
+auto API::getCurrentTime() const noexcept -> double { return clock_.getCurrentScenarioTime(); }
+
+auto API::closeZMQConnection() -> void { zeromq_client_.closeConnection(); }
+
 // update
 auto API::updateTimeInSim() -> bool
 {
@@ -337,6 +341,16 @@ auto API::checkCollision(
 auto API::getHdmapUtils() const -> const std::shared_ptr<hdmap_utils::HdMapUtils> &
 {
   return entity_manager_ptr_->getHdmapUtils();
+}
+
+auto API::getV2ITrafficLights() const -> std::shared_ptr<V2ITrafficLights>
+{
+  return traffic_lights_ptr_->getV2ITrafficLights();
+}
+
+auto API::getConventionalTrafficLights() const -> std::shared_ptr<ConventionalTrafficLights>
+{
+  return traffic_lights_ptr_->getConventionalTrafficLights();
 }
 
 auto API::addTrafficSource(

@@ -135,9 +135,9 @@ public:
 
   auto isNpcLogicStarted() const -> bool;
 
-  auto getCurrentTime() const noexcept -> double { return clock_.getCurrentScenarioTime(); }
+  auto getCurrentTime() const noexcept -> double;
 
-  auto closeZMQConnection() -> void { zeromq_client_.closeConnection(); }
+  auto closeZMQConnection() -> void;
 
   // update
   auto updateFrame() -> bool;
@@ -308,16 +308,9 @@ public:
   // traffics, lanelet
   auto getHdmapUtils() const -> const std::shared_ptr<hdmap_utils::HdMapUtils> &;
 
-  auto getV2ITrafficLights() const -> std::shared_ptr<V2ITrafficLights>
-  {
-    return traffic_lights_ptr_->getV2ITrafficLights();
-  }
+  auto getV2ITrafficLights() const -> std::shared_ptr<V2ITrafficLights>;
 
-  auto getConventionalTrafficLights() const -> std::shared_ptr<ConventionalTrafficLights>
-  {
-    return traffic_lights_ptr_->getConventionalTrafficLights();
-  }
-
+  auto getConventionalTrafficLights() const -> std::shared_ptr<ConventionalTrafficLights>;
   /**
    * @brief Add a traffic source to the simulation
    * @param radius The radius defining the area on which entities will be spawned

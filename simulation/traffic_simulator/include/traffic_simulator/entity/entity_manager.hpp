@@ -109,16 +109,13 @@ public:
      TrafficLights cannot be created before the EntityManager due to the dependency on HdMapUtils.
    */
   auto setTrafficLights(
-    const std::shared_ptr<traffic_simulator::TrafficLights> & traffic_lights_ptr) -> void
-  {
-    traffic_lights_ptr_ = traffic_lights_ptr;
-  }
+    const std::shared_ptr<traffic_simulator::TrafficLights> & traffic_lights_ptr) -> void;
 
   auto setVerbose(const bool verbose) -> void;
 
   auto startNpcLogic(const double current_time) -> void;
 
-  auto isNpcLogicStarted() const -> bool { return npc_logic_started_; }
+  auto isNpcLogicStarted() const -> bool;
 
   auto makeDebugMarker() const -> visualization_msgs::msg::MarkerArray;
 
