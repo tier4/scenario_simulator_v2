@@ -41,6 +41,8 @@ auto API::startNpcLogic() -> void
   }
 }
 
+auto API::isNpcLogicStarted() const -> bool { return entity_manager_ptr_->isNpcLogicStarted(); }
+
 auto API::updateTimeInSim() -> bool
 {
   simulation_api_schema::UpdateFrameRequest request;
@@ -196,6 +198,31 @@ auto API::attachOccupancyGridSensor(
   }
 }
 
+auto API::getFirstEgoName() const -> std::optional<std::string>
+{
+  return entity_manager_ptr_->getFirstEgoName();
+}
+
+auto API::getEgoEntity(const std::string & name) -> entity::EgoEntity &
+{
+  return entity_manager_ptr_->getEgoEntity(name);
+}
+
+auto API::getEgoEntity(const std::string & name) const -> const entity::EgoEntity &
+{
+  return entity_manager_ptr_->getEgoEntity(name);
+}
+
+auto API::isEntityExist(const std::string & name) const -> bool
+{
+  return entity_manager_ptr_->isEntityExist(name);
+}
+
+auto API::getEntityNames() const -> std::vector<std::string>
+{
+  return entity_manager_ptr_->getEntityNames();
+}
+
 auto API::getEntity(const std::string & name) -> entity::EntityBase &
 {
   return entity_manager_ptr_->getEntity(name);
@@ -204,6 +231,17 @@ auto API::getEntity(const std::string & name) -> entity::EntityBase &
 auto API::getEntity(const std::string & name) const -> const entity::EntityBase &
 {
   return entity_manager_ptr_->getEntity(name);
+}
+
+auto API::getEntityPointer(const std::string & name) const -> std::shared_ptr<entity::EntityBase>
+{
+  return entity_manager_ptr_->getEntityPointer(name);
+}
+
+auto API::resetBehaviorPlugin(const std::string & name, const std::string & behavior_plugin_name)
+  -> void
+{
+  return entity_manager_ptr_->resetBehaviorPlugin(name, behavior_plugin_name);
 }
 
 auto API::respawn(
@@ -286,6 +324,12 @@ auto API::checkCollision(
   } else {
     return false;
   }
+}
+
+// traffics, lanelet
+auto API::getHdmapUtils() const -> const std::shared_ptr<hdmap_utils::HdMapUtils> &
+{
+  return entity_manager_ptr_->getHdmapUtils();
 }
 
 auto API::addTrafficSource(
