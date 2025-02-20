@@ -115,6 +115,7 @@ public:
     }
   }
 
+  // global
   template <typename ParameterT, typename... Ts>
   auto getROS2Parameter(Ts &&... xs) const -> decltype(auto)
   {
@@ -138,8 +139,10 @@ public:
 
   auto closeZMQConnection() -> void { zeromq_client_.closeConnection(); }
 
+  // update
   auto updateFrame() -> bool;
 
+  // entities, ego - spawn
   template <typename Pose>
   auto spawn(
     const std::string & name, const Pose & pose,
@@ -244,6 +247,7 @@ public:
     return register_to_entity_manager() and register_to_environment_simulator();
   }
 
+  // sensors - attach
   auto attachImuSensor(
     const std::string &, const simulation_api_schema::ImuSensorConfiguration & configuration)
     -> bool;
@@ -267,12 +271,14 @@ public:
   auto attachOccupancyGridSensor(const simulation_api_schema::OccupancyGridSensorConfiguration &)
     -> bool;
 
+  // ego - checks, getters
   auto getFirstEgoName() const -> std::optional<std::string>;
 
   auto getEgoEntity(const std::string & name) -> entity::EgoEntity &;
 
   auto getEgoEntity(const std::string & name) const -> const entity::EgoEntity &;
 
+  // entities - checks, getters
   auto isEntityExist(const std::string & name) const -> bool;
 
   auto getEntityNames() const -> std::vector<std::string>;
@@ -283,6 +289,7 @@ public:
 
   auto getEntityPointer(const std::string & name) const -> std::shared_ptr<entity::EntityBase>;
 
+  // entities - respawn, despawn, reset
   auto resetBehaviorPlugin(const std::string & name, const std::string & behavior_plugin_name)
     -> void;
 
@@ -294,9 +301,11 @@ public:
 
   auto despawnEntities() -> bool;
 
+  // entities - features
   auto checkCollision(const std::string & first_entity_name, const std::string & second_entity_name)
     -> bool;
 
+  // traffics, lanelet
   auto getHdmapUtils() const -> const std::shared_ptr<hdmap_utils::HdMapUtils> &;
 
   auto getV2ITrafficLights() const -> std::shared_ptr<V2ITrafficLights>

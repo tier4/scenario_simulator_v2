@@ -102,6 +102,7 @@ public:
 
   ~EntityManager() = default;
 
+  // global
   /**
      This function is necessary because the TrafficLights object is created after the EntityManager,
      so it can be assigned during the call of the EntityManager constructor.
@@ -121,6 +122,7 @@ public:
 
   auto makeDebugMarker() const -> visualization_msgs::msg::MarkerArray;
 
+  // update
   auto update(const double current_time, const double step_time) -> void;
 
   auto updateNpcLogic(const std::string & name, const double current_time, const double step_time)
@@ -133,6 +135,7 @@ public:
   auto broadcastTransform(
     const geometry_msgs::msg::PoseStamped & pose, const bool static_transform = true) -> void;
 
+  // entities, ego - spawn
   template <typename EntityType, typename PoseType, typename ParametersType, typename... Ts>
   auto spawnEntity(
     const std::string & name, const PoseType & pose, const ParametersType & parameters,
@@ -215,6 +218,7 @@ public:
     }
   }
 
+  // ego - checks, getters
   auto getNumberOfEgo() const -> std::size_t;
 
   auto isAnyEgoSpawned() const -> bool;
@@ -225,6 +229,7 @@ public:
 
   auto getEgoEntity(const std::string & name) const -> const entity::EgoEntity &;
 
+  // entities - checks, getters
   auto isEntityExist(const std::string & name) const -> bool;
 
   auto getEntityNames() const -> const std::vector<std::string>;
@@ -236,6 +241,7 @@ public:
   auto getEntityPointer(const std::string & name) const
     -> std::shared_ptr<traffic_simulator::entity::EntityBase>;
 
+  // entities - respawn, despawn, reset
   /**
    * @brief Reset behavior plugin of the target entity.
    * The internal behavior is to take over the various parameters and save them, then respawn the Entity and set the parameters.
@@ -249,6 +255,7 @@ public:
 
   auto despawnEntity(const std::string & name) -> bool;
 
+  // traffics, lanelet
   auto getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &;
 
   template <typename Node>
