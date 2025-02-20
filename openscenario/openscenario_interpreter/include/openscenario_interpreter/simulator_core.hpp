@@ -367,14 +367,14 @@ public:
       entity.setBehaviorParameter([&]() {
         /// The default values written in
         /// https://github.com/tier4/scenario_simulator_v2/blob/master/simulation/traffic_simulator_msgs/msg/DynamicConstraints.msg
-        // clang-format off
         auto behavior_parameter = entity.getBehaviorParameter();
-        behavior_parameter.see_around = not controller.properties.template get<Boolean>("isBlind");
-        behavior_parameter.dynamic_constraints.max_acceleration = controller.properties.template get<Double>("maxAcceleration", 10.0);
+        // clang-format off
+        behavior_parameter.see_around =                            not controller.properties.template get<Boolean>("isBlind");
+        behavior_parameter.dynamic_constraints.max_acceleration =      controller.properties.template get<Double>("maxAcceleration", 10.0);
         behavior_parameter.dynamic_constraints.max_acceleration_rate = controller.properties.template get<Double>("maxAccelerationRate", 3.0);
-        behavior_parameter.dynamic_constraints.max_deceleration = controller.properties.template get<Double>("maxDeceleration", 10.0);
+        behavior_parameter.dynamic_constraints.max_deceleration =      controller.properties.template get<Double>("maxDeceleration", 10.0);
         behavior_parameter.dynamic_constraints.max_deceleration_rate = controller.properties.template get<Double>("maxDecelerationRate", 3.0);
-        behavior_parameter.dynamic_constraints.max_speed = controller.properties.template get<Double>("maxSpeed", 50.0);
+        behavior_parameter.dynamic_constraints.max_speed =             controller.properties.template get<Double>("maxSpeed", 50.0);
         // clang-format on
         return behavior_parameter;
       }());
@@ -499,11 +499,11 @@ public:
 
     template <
       typename PoseType, typename... Ts,
-      typename = std::enable_if_t<
-        std::is_same_v<std::decay_t<PoseType>, NativeWorldPosition> ||
-        std::is_same_v<std::decay_t<PoseType>, NativeRelativeWorldPosition> ||
-        std::is_same_v<std::decay_t<PoseType>, NativeLanePosition> ||
-        std::is_same_v<std::decay_t<PoseType>, NativeRelativeLanePosition> > >
+      typename = std::enable_if_t<std::disjunction_v<
+        std::is_same<std::decay_t<PoseType>, NativeWorldPosition>,
+        std::is_same<std::decay_t<PoseType>, NativeRelativeWorldPosition>,
+        std::is_same<std::decay_t<PoseType>, NativeLanePosition>,
+        std::is_same<std::decay_t<PoseType>, NativeRelativeLanePosition>>>>
     static auto applyTeleportAction(const std::string & name, const PoseType & pose, Ts &&... xs)
       -> void
     {
