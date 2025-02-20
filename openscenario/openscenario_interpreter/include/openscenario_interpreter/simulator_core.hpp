@@ -561,27 +561,22 @@ public:
       const std::string & entity_name, const DynamicConstraints & dynamic_constraints) -> void
     {
       auto & entity = core->getEntity(entity_name);
-      entity.setBehaviorParameter([&]() {
+      entity.setBehaviorParameter([&entity, &dynamic_constraints] {
         auto behavior_parameter = entity.getBehaviorParameter();
-        if (not std::isinf(dynamic_constraints.max_speed)) {
-          behavior_parameter.dynamic_constraints.max_speed = dynamic_constraints.max_speed;
-        }
-        if (not std::isinf(dynamic_constraints.max_acceleration)) {
-          behavior_parameter.dynamic_constraints.max_acceleration =
-            dynamic_constraints.max_acceleration;
-        }
-        if (not std::isinf(dynamic_constraints.max_acceleration_rate)) {
-          behavior_parameter.dynamic_constraints.max_acceleration_rate =
-            dynamic_constraints.max_acceleration_rate;
-        }
-        if (not std::isinf(dynamic_constraints.max_deceleration)) {
-          behavior_parameter.dynamic_constraints.max_deceleration =
-            dynamic_constraints.max_deceleration;
-        }
-        if (not std::isinf(dynamic_constraints.max_deceleration_rate)) {
-          behavior_parameter.dynamic_constraints.max_deceleration_rate =
-            dynamic_constraints.max_deceleration_rate;
-        }
+
+        const auto setIfNotInf = [](auto & target, const auto & value) {
+          if (not std::isinf(value)) {
+            target = value;
+          }
+        };
+        // clang-format off
+        setIfNotInf(behavior_parameter.dynamic_constraints.max_speed,             dynamic_constraints.max_speed);
+        setIfNotInf(behavior_parameter.dynamic_constraints.max_acceleration,      dynamic_constraints.max_acceleration);
+        setIfNotInf(behavior_parameter.dynamic_constraints.max_acceleration_rate, dynamic_constraints.max_acceleration_rate);
+        setIfNotInf(behavior_parameter.dynamic_constraints.max_deceleration,      dynamic_constraints.max_deceleration);
+        setIfNotInf(behavior_parameter.dynamic_constraints.max_deceleration_rate, dynamic_constraints.max_deceleration_rate);
+        // clang-format on
+
         return behavior_parameter;
       }());
     }
