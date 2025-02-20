@@ -213,7 +213,7 @@ auto EntityManager::getNumberOfEgo() const -> std::size_t
 auto EntityManager::getFirstEgoName() const -> std::optional<std::string>
 {
   for (const auto & [name, entity_ptr] : entities_) {
-    if (entity_ptr->template is<EgoEntity>()) {
+    if (entity_ptr->is<EgoEntity>()) {
       return entity_ptr->getName();
     }
   }
@@ -283,12 +283,12 @@ void EntityManager::resetBehaviorPlugin(
       "Entity :", name, "is MiscObjectEntity.",
       "You cannot reset behavior plugin of MiscObjectEntity.");
   } else if (reference_entity.is<VehicleEntity>()) {
-    const auto parameters = getVehicleParameters(name);
+    const auto parameters = reference_entity.as<VehicleEntity>().getParameters();
     despawnEntity(name);
     spawnEntity<VehicleEntity>(
       name, status.getMapPose(), parameters, status.getTime(), behavior_plugin_name);
   } else if (reference_entity.is<PedestrianEntity>()) {
-    const auto parameters = getPedestrianParameters(name);
+    const auto parameters = reference_entity.as<PedestrianEntity>().getParameters();
     despawnEntity(name);
     spawnEntity<PedestrianEntity>(
       name, status.getMapPose(), parameters, status.getTime(), behavior_plugin_name);
@@ -323,7 +323,7 @@ auto EntityManager::updateNpcLogic(
   if (npc_logic_started_) {
     entity.onUpdate(current_time, step_time);
   } else if (entity.is<entity::EgoEntity>()) {
-    getEgoEntity(name).updateFieldOperatorApplication();
+    entity.as<EgoEntity>().updateFieldOperatorApplication();
   }
   return entity.getCanonicalizedStatus();
 }
