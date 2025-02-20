@@ -236,6 +236,17 @@ auto previousLaneletIds(
   return lanelet::Ids(previous_lanelet_ids_set.begin(), previous_lanelet_ids_set.end());
 }
 
+// Bounds
+auto leftBound(const lanelet::Id lanelet_id) -> std::vector<Point>
+{
+  return toPolygon(LaneletWrapper::map()->laneletLayer.get(lanelet_id).leftBound());
+}
+
+auto rightBound(const lanelet::Id lanelet_id) -> std::vector<Point>
+{
+  return toPolygon(LaneletWrapper::map()->laneletLayer.get(lanelet_id).rightBound());
+}
+
 // Polygons
 auto toPolygon(const lanelet::ConstLineString3d & line_string) -> std::vector<Point>
 {
