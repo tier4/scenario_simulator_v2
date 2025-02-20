@@ -127,7 +127,7 @@ jobs:
           source install/local_setup.bash
           # execute scenarios but ignore the return code
           ./src/scenario_simulator_v2/.github/workflows/workflow.sh ./src/scenario_simulator_v2/test_runner/scenario_test_runner/config/optional_workflow.txt global_frame_rate:=20 || true
-          ./src/scenario_simulator_v2/.github/workflows/generate_workflow_report.sh
+          ./src/scenario_simulator_v2/.github/workflows/generate_workflow_report.sh /tmp/scenario_workflow/optional_workflow
           echo failure=$(grep -c "<failure"  /tmp/scenario_workflow/failure_report.md) >> $GITHUB_OUTPUT
         shell: bash
 
