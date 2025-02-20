@@ -96,7 +96,7 @@ auto API::updateEntitiesStatusInSim() -> bool
 auto API::updateTrafficLightsInSim() -> bool
 {
   if (traffic_lights_ptr_->isAnyTrafficLightChanged()) {
-    auto request =
+    const auto request =
       traffic_lights_ptr_->getConventionalTrafficLights()->generateUpdateTrafficLightsRequest();
     return zeromq_client_.call(request).result().success();
   }
@@ -322,7 +322,7 @@ auto API::despawnEntities() -> bool
 
 // entities - features
 auto API::checkCollision(
-  const std::string & first_entity_name, const std::string & second_entity_name) -> bool
+  const std::string & first_entity_name, const std::string & second_entity_name) const -> bool
 {
   if (
     first_entity_name != second_entity_name && isEntityExist(first_entity_name) &&
