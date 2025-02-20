@@ -31,25 +31,178 @@ namespace traffic_simulator
 {
 void API::setVerbose(const bool verbose) { entity_manager_ptr_->setVerbose(verbose); }
 
-bool API::despawn(const std::string & name)
+void API::startNpcLogic()
 {
-  const auto result = entity_manager_ptr_->despawnEntity(name);
-  if (!result) {
+  if (entity_manager_ptr_->isNpcLogicStarted()) {
+    THROW_SIMULATION_ERROR("NPC logics are already started.");
+  } else {
+    clock_.start();
+    entity_manager_ptr_->startNpcLogic(getCurrentTime());
+  }
+}
+
+bool API::updateTimeInSim()
+{
+  simulation_api_schema::UpdateFrameRequest request;
+  request.set_current_simulation_time(clock_.getCurrentSimulationTime());
+  request.set_current_scenario_time(getCurrentTime());
+  simulation_interface::toProto(
+    clock_.getCurrentRosTimeAsMsg().clock, *request.mutable_current_ros_time());
+  return zeromq_client_.call(request).result().success();
+}
+
+bool API::updateEntitiesStatusInSim()
+{
+  simulation_api_schema::UpdateEntityStatusRequest req;
+  req.set_npc_logic_started(entity_manager_ptr_->isNpcLogicStarted());
+  for (const auto & entity_name : entity_manager_ptr_->getEntityNames()) {
+    const auto & entity = entity_manager_ptr_->getEntity(entity_name);
+    const auto entity_status = static_cast<EntityStatus>(entity.getCanonicalizedStatus());
+    simulation_interface::toProto(entity_status, *req.add_status());
+    if (entity.is<entity::EgoEntity>()) {
+      req.set_overwrite_ego_status(entity.isControlledBySimulator());
+    }
+  }
+
+  simulation_api_schema::UpdateEntityStatusResponse res;
+  if (auto res = zeromq_client_.call(req); res.result().success()) {
+    for (const auto & res_status : res.status()) {
+      auto & entity = entity_manager_ptr_->getEntity(res_status.name());
+      auto entity_status = static_cast<EntityStatus>(entity.getCanonicalizedStatus());
+      simulation_interface::toMsg(res_status.pose(), entity_status.pose);
+      simulation_interface::toMsg(res_status.action_status(), entity_status.action_status);
+
+      if (entity.is<entity::EgoEntity>()) {
+        entity.setMapPose(entity_status.pose);
+        entity.setTwist(entity_status.action_status.twist);
+        entity.setAcceleration(entity_status.action_status.accel);
+      } else {
+        entity.setStatus(entity_status);
+      }
+    }
+    return true;
+  }
+  return false;
+}
+
+bool API::updateTrafficLightsInSim()
+{
+  if (traffic_lights_ptr_->isAnyTrafficLightChanged()) {
+    auto request =
+      traffic_lights_ptr_->getConventionalTrafficLights()->generateUpdateTrafficLightsRequest();
+    return zeromq_client_.call(request).result().success();
+  }
+  /// @todo handle response
+  return simulation_api_schema::UpdateTrafficLightsResponse().result().success();
+}
+
+bool API::updateFrame()
+{
+  if (configuration.standalone_mode && entity_manager_ptr_->isAnyEgoSpawned()) {
+    THROW_SEMANTIC_ERROR("Ego simulation is no longer supported in standalone mode");
+  }
+
+  if (!updateEntitiesStatusInSim()) {
     return false;
   }
+
+  entity_manager_ptr_->update(getCurrentTime(), clock_.getStepTime());
+  traffic_controller_ptr_->execute(getCurrentTime(), clock_.getStepTime());
+
   if (not configuration.standalone_mode) {
-    simulation_api_schema::DespawnEntityRequest req;
-    req.set_name(name);
-    return zeromq_client_.call(req).result().success();
+    if (!updateTrafficLightsInSim() || !updateTimeInSim()) {
+      return false;
+    }
   }
+
+  entity_manager_ptr_->broadcastEntityTransform();
+  clock_.update();
+  clock_pub_->publish(clock_.getCurrentRosTimeAsMsg());
+  debug_marker_pub_->publish(entity_manager_ptr_->makeDebugMarker());
+  debug_marker_pub_->publish(traffic_controller_ptr_->makeDebugMarker());
   return true;
 }
 
-bool API::despawnEntities()
+auto API::attachImuSensor(
+  const std::string &, const simulation_api_schema::ImuSensorConfiguration & configuration) -> bool
 {
-  const auto entities = entity_manager_ptr_->getEntityNames();
-  return std::all_of(
-    entities.begin(), entities.end(), [&](const auto & entity) { return despawn(entity); });
+  simulation_api_schema::AttachImuSensorRequest req;
+  *req.mutable_configuration() = configuration;
+  return zeromq_client_.call(req).result().success();
+}
+
+bool API::attachPseudoTrafficLightDetector(
+  const simulation_api_schema::PseudoTrafficLightDetectorConfiguration & configuration)
+{
+  simulation_api_schema::AttachPseudoTrafficLightDetectorRequest req;
+  *req.mutable_configuration() = configuration;
+  return zeromq_client_.call(req).result().success();
+}
+
+bool API::attachLidarSensor(const simulation_api_schema::LidarConfiguration & lidar_configuration)
+{
+  if (configuration.standalone_mode) {
+    return true;
+  } else {
+    simulation_api_schema::AttachLidarSensorRequest req;
+    *req.mutable_configuration() = lidar_configuration;
+    return zeromq_client_.call(req).result().success();
+  }
+}
+
+bool API::attachLidarSensor(
+  const std::string & entity_name, const double lidar_sensor_delay,
+  const helper::LidarType lidar_type)
+{
+  return attachLidarSensor(helper::constructLidarConfiguration(
+    lidar_type, entity_name,
+    getROS2Parameter<std::string>("architecture_type", "awf/universe/20240605"),
+    lidar_sensor_delay));
+}
+
+bool API::attachDetectionSensor(
+  const simulation_api_schema::DetectionSensorConfiguration & sensor_configuration)
+{
+  if (configuration.standalone_mode) {
+    return true;
+  } else {
+    simulation_api_schema::AttachDetectionSensorRequest req;
+    *req.mutable_configuration() = sensor_configuration;
+    return zeromq_client_.call(req).result().success();
+  }
+}
+
+bool API::attachDetectionSensor(
+  const std::string & entity_name, double detection_sensor_range, bool detect_all_objects_in_range,
+  double pos_noise_stddev, int random_seed, double probability_of_lost,
+  double object_recognition_delay)
+{
+  return attachDetectionSensor(helper::constructDetectionSensorConfiguration(
+    entity_name, getROS2Parameter<std::string>("architecture_type", "awf/universe/20240605"), 0.1,
+    detection_sensor_range, detect_all_objects_in_range, pos_noise_stddev, random_seed,
+    probability_of_lost, object_recognition_delay));
+}
+
+bool API::attachOccupancyGridSensor(
+  const simulation_api_schema::OccupancyGridSensorConfiguration & sensor_configuration)
+{
+  if (configuration.standalone_mode) {
+    return true;
+  } else {
+    simulation_api_schema::AttachOccupancyGridSensorRequest req;
+    *req.mutable_configuration() = sensor_configuration;
+    return zeromq_client_.call(req).result().success();
+  }
+}
+
+auto API::getEntity(const std::string & name) -> entity::EntityBase &
+{
+  return entity_manager_ptr_->getEntity(name);
+}
+
+auto API::getEntity(const std::string & name) const -> const entity::EntityBase &
+{
+  return entity_manager_ptr_->getEntity(name);
 }
 
 auto API::respawn(
@@ -97,6 +250,27 @@ auto API::respawn(
   }
 }
 
+bool API::despawn(const std::string & name)
+{
+  const auto result = entity_manager_ptr_->despawnEntity(name);
+  if (!result) {
+    return false;
+  }
+  if (not configuration.standalone_mode) {
+    simulation_api_schema::DespawnEntityRequest req;
+    req.set_name(name);
+    return zeromq_client_.call(req).result().success();
+  }
+  return true;
+}
+
+bool API::despawnEntities()
+{
+  const auto entities = entity_manager_ptr_->getEntityNames();
+  return std::all_of(
+    entities.begin(), entities.end(), [&](const auto & entity) { return despawn(entity); });
+}
+
 bool API::checkCollision(
   const std::string & first_entity_name, const std::string & second_entity_name)
 {
@@ -110,180 +284,6 @@ bool API::checkCollision(
       second_entity.getBoundingBox());
   } else {
     return false;
-  }
-}
-
-auto API::getEntity(const std::string & name) -> entity::EntityBase &
-{
-  return entity_manager_ptr_->getEntity(name);
-}
-
-auto API::getEntity(const std::string & name) const -> const entity::EntityBase &
-{
-  return entity_manager_ptr_->getEntity(name);
-}
-
-auto API::attachImuSensor(
-  const std::string &, const simulation_api_schema::ImuSensorConfiguration & configuration) -> bool
-{
-  simulation_api_schema::AttachImuSensorRequest req;
-  *req.mutable_configuration() = configuration;
-  return zeromq_client_.call(req).result().success();
-}
-
-bool API::attachPseudoTrafficLightDetector(
-  const simulation_api_schema::PseudoTrafficLightDetectorConfiguration & configuration)
-{
-  simulation_api_schema::AttachPseudoTrafficLightDetectorRequest req;
-  *req.mutable_configuration() = configuration;
-  return zeromq_client_.call(req).result().success();
-}
-
-bool API::attachDetectionSensor(
-  const simulation_api_schema::DetectionSensorConfiguration & sensor_configuration)
-{
-  if (configuration.standalone_mode) {
-    return true;
-  } else {
-    simulation_api_schema::AttachDetectionSensorRequest req;
-    *req.mutable_configuration() = sensor_configuration;
-    return zeromq_client_.call(req).result().success();
-  }
-}
-
-bool API::attachDetectionSensor(
-  const std::string & entity_name, double detection_sensor_range, bool detect_all_objects_in_range,
-  double pos_noise_stddev, int random_seed, double probability_of_lost,
-  double object_recognition_delay)
-{
-  return attachDetectionSensor(helper::constructDetectionSensorConfiguration(
-    entity_name, getROS2Parameter<std::string>("architecture_type", "awf/universe/20240605"), 0.1,
-    detection_sensor_range, detect_all_objects_in_range, pos_noise_stddev, random_seed,
-    probability_of_lost, object_recognition_delay));
-}
-
-bool API::attachOccupancyGridSensor(
-  const simulation_api_schema::OccupancyGridSensorConfiguration & sensor_configuration)
-{
-  if (configuration.standalone_mode) {
-    return true;
-  } else {
-    simulation_api_schema::AttachOccupancyGridSensorRequest req;
-    *req.mutable_configuration() = sensor_configuration;
-    return zeromq_client_.call(req).result().success();
-  }
-}
-
-bool API::attachLidarSensor(const simulation_api_schema::LidarConfiguration & lidar_configuration)
-{
-  if (configuration.standalone_mode) {
-    return true;
-  } else {
-    simulation_api_schema::AttachLidarSensorRequest req;
-    *req.mutable_configuration() = lidar_configuration;
-    return zeromq_client_.call(req).result().success();
-  }
-}
-
-bool API::attachLidarSensor(
-  const std::string & entity_name, const double lidar_sensor_delay,
-  const helper::LidarType lidar_type)
-{
-  return attachLidarSensor(helper::constructLidarConfiguration(
-    lidar_type, entity_name,
-    getROS2Parameter<std::string>("architecture_type", "awf/universe/20240605"),
-    lidar_sensor_delay));
-}
-
-bool API::updateTimeInSim()
-{
-  simulation_api_schema::UpdateFrameRequest request;
-  request.set_current_simulation_time(clock_.getCurrentSimulationTime());
-  request.set_current_scenario_time(getCurrentTime());
-  simulation_interface::toProto(
-    clock_.getCurrentRosTimeAsMsg().clock, *request.mutable_current_ros_time());
-  return zeromq_client_.call(request).result().success();
-}
-
-bool API::updateTrafficLightsInSim()
-{
-  if (traffic_lights_ptr_->isAnyTrafficLightChanged()) {
-    auto request =
-      traffic_lights_ptr_->getConventionalTrafficLights()->generateUpdateTrafficLightsRequest();
-    return zeromq_client_.call(request).result().success();
-  }
-  /// @todo handle response
-  return simulation_api_schema::UpdateTrafficLightsResponse().result().success();
-}
-
-bool API::updateEntitiesStatusInSim()
-{
-  simulation_api_schema::UpdateEntityStatusRequest req;
-  req.set_npc_logic_started(entity_manager_ptr_->isNpcLogicStarted());
-  for (const auto & entity_name : entity_manager_ptr_->getEntityNames()) {
-    const auto & entity = entity_manager_ptr_->getEntity(entity_name);
-    const auto entity_status = static_cast<EntityStatus>(entity.getCanonicalizedStatus());
-    simulation_interface::toProto(entity_status, *req.add_status());
-    if (entity.is<entity::EgoEntity>()) {
-      req.set_overwrite_ego_status(entity.isControlledBySimulator());
-    }
-  }
-
-  simulation_api_schema::UpdateEntityStatusResponse res;
-  if (auto res = zeromq_client_.call(req); res.result().success()) {
-    for (const auto & res_status : res.status()) {
-      auto & entity = entity_manager_ptr_->getEntity(res_status.name());
-      auto entity_status = static_cast<EntityStatus>(entity.getCanonicalizedStatus());
-      simulation_interface::toMsg(res_status.pose(), entity_status.pose);
-      simulation_interface::toMsg(res_status.action_status(), entity_status.action_status);
-
-      if (entity.is<entity::EgoEntity>()) {
-        entity.setMapPose(entity_status.pose);
-        entity.setTwist(entity_status.action_status.twist);
-        entity.setAcceleration(entity_status.action_status.accel);
-      } else {
-        entity.setStatus(entity_status);
-      }
-    }
-    return true;
-  }
-  return false;
-}
-
-bool API::updateFrame()
-{
-  if (configuration.standalone_mode && entity_manager_ptr_->isAnyEgoSpawned()) {
-    THROW_SEMANTIC_ERROR("Ego simulation is no longer supported in standalone mode");
-  }
-
-  if (!updateEntitiesStatusInSim()) {
-    return false;
-  }
-
-  entity_manager_ptr_->update(getCurrentTime(), clock_.getStepTime());
-  traffic_controller_ptr_->execute(getCurrentTime(), clock_.getStepTime());
-
-  if (not configuration.standalone_mode) {
-    if (!updateTrafficLightsInSim() || !updateTimeInSim()) {
-      return false;
-    }
-  }
-
-  entity_manager_ptr_->broadcastEntityTransform();
-  clock_.update();
-  clock_pub_->publish(clock_.getCurrentRosTimeAsMsg());
-  debug_marker_pub_->publish(entity_manager_ptr_->makeDebugMarker());
-  debug_marker_pub_->publish(traffic_controller_ptr_->makeDebugMarker());
-  return true;
-}
-
-void API::startNpcLogic()
-{
-  if (entity_manager_ptr_->isNpcLogicStarted()) {
-    THROW_SIMULATION_ERROR("NPC logics are already started.");
-  } else {
-    clock_.start();
-    entity_manager_ptr_->startNpcLogic(getCurrentTime());
   }
 }
 
