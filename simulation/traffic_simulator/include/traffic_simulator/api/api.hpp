@@ -77,7 +77,7 @@ public:
     entity_manager_ptr_->setVerbose(configuration_.verbose);
     entity_manager_ptr_->setTrafficLights(traffic_lights_ptr_);
     if (not init()) {
-        throw common::SimulationError("Failed to initialize simulator by InitializeRequest");
+      throw common::SimulationError("Failed to initialize simulator by InitializeRequest");
     }
   }
 
@@ -122,11 +122,11 @@ public:
 
     auto register_to_entity_manager = [&]() -> entity::EntityBase & {
       if constexpr (std::is_same_v<ParamsType, VehicleParameters>) {
-      if (behavior == VehicleBehavior::autoware()) {
+        if (behavior == VehicleBehavior::autoware()) {
           return entity_manager_ptr_->spawnEntity<entity::EgoEntity>(
-                 name, pose, parameters, getCurrentTime(), configuration_, node_parameters_);
-      } else {
-        return entity_manager_ptr_->spawnEntity<entity::VehicleEntity>(
+            name, pose, parameters, getCurrentTime(), configuration_, node_parameters_);
+        } else {
+          return entity_manager_ptr_->spawnEntity<entity::VehicleEntity>(
             name, pose, parameters, getCurrentTime(),
             behavior.empty() ? VehicleBehavior::defaultBehavior() : behavior);
         }
@@ -173,7 +173,7 @@ public:
     auto & entity = register_to_entity_manager();
     if (register_to_environment_simulator(entity)) {
       return entity;
-      } else {
+    } else {
       THROW_SEMANTIC_ERROR("Spawn entity ", std::quoted(name), " resulted in failure.");
     }
   }

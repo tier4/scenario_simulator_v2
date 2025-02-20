@@ -123,7 +123,7 @@ auto EntityManager::updateNpcLogic(
   if (npc_logic_started_) {
     entity.onUpdate(current_time, step_time);
   } else if (entity.is<entity::EgoEntity>()) {
-    getEgoEntity(name).updateFieldOperatorApplication();
+    entity.as<EgoEntity>().updateFieldOperatorApplication();
   }
   return entity.getCanonicalizedStatus();
 }
@@ -233,7 +233,7 @@ auto EntityManager::isAnyEgoSpawned() const -> bool
 auto EntityManager::getFirstEgoName() const -> std::optional<std::string>
 {
   for (const auto & [name, entity_ptr] : entities_) {
-    if (entity_ptr->template is<EgoEntity>()) {
+    if (entity_ptr->is<EgoEntity>()) {
       return entity_ptr->getName();
     }
   }
@@ -328,12 +328,12 @@ auto EntityManager::resetBehaviorPlugin(
       "Entity :", name, "is MiscObjectEntity.",
       "You cannot reset behavior plugin of MiscObjectEntity.");
   } else if (reference_entity.is<VehicleEntity>()) {
-    const auto parameters = getVehicleParameters(name);
+    const auto parameters = reference_entity.as<VehicleEntity>().getParameters();
     despawnEntity(name);
     spawnEntity<VehicleEntity>(
       name, status.getMapPose(), parameters, status.getTime(), behavior_plugin_name);
   } else if (reference_entity.is<PedestrianEntity>()) {
-    const auto parameters = getPedestrianParameters(name);
+    const auto parameters = reference_entity.as<PedestrianEntity>().getParameters();
     despawnEntity(name);
     spawnEntity<PedestrianEntity>(
       name, status.getMapPose(), parameters, status.getTime(), behavior_plugin_name);
@@ -358,48 +358,5 @@ auto EntityManager::getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapU
 {
   return hdmap_utils_ptr_;
 }
-
-auto EntityManager::getObstacle(const std::string & name)
-  -> std::optional<traffic_simulator_msgs::msg::Obstacle>
-{
-  if (not npc_logic_started_) {
-    return std::nullopt;
-  } else {
-    return entities_.at(name)->getObstacle();
-  }
-}
-
-auto EntityManager::getPedestrianParameters(const std::string & name) const
-  -> const traffic_simulator_msgs::msg::PedestrianParameters &
-{
-  if (const auto entity_ptr = dynamic_cast<PedestrianEntity const *>(entities_.at(name).get())) {
-    return entity_ptr->pedestrian_parameters;
-  }
-  THROW_SIMULATION_ERROR(
-    "EntityType: ", getEntity(name).getEntityTypename(), ", does not have pedestrian parameter.",
-    "Please check description of the scenario and entity type of the Entity: " + name);
-}
-
-auto EntityManager::getVehicleParameters(const std::string & name) const
-  -> const traffic_simulator_msgs::msg::VehicleParameters &
-{
-  if (const auto vehicle = dynamic_cast<VehicleEntity const *>(entities_.at(name).get())) {
-    return vehicle->vehicle_parameters;
-  }
-  THROW_SIMULATION_ERROR(
-    "EntityType: ", getEntity(name).getEntityTypename(), ", does not have pedestrian parameter.",
-    "Please check description of the scenario and entity type of the Entity: " + name);
-}
-
-auto EntityManager::getWaypoints(const std::string & name)
-  -> traffic_simulator_msgs::msg::WaypointsArray
-{
-  if (not npc_logic_started_) {
-    return traffic_simulator_msgs::msg::WaypointsArray();
-  } else {
-    return entities_.at(name)->getWaypoints();
-  }
-}
-
 }  // namespace entity
 }  // namespace traffic_simulator
