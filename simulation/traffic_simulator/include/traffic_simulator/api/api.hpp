@@ -128,9 +128,33 @@ public:
     return node.get_parameter("port").as_int();
   }
 
+  void setVerbose(const bool verbose);
+
+  void startNpcLogic();
+
+  // clang-format off
+#define FORWARD_TO_ENTITY_MANAGER(NAME)                                    \
+  /*!                                                                      \
+   @brief Forward to arguments to the EntityManager::NAME function.        \
+   @return return value of the EntityManager::NAME function.               \
+   @note This function was defined by FORWARD_TO_ENTITY_MANAGER macro.     \
+   */                                                                      \
+  template <typename... Ts>                                                \
+  decltype(auto) NAME(Ts &&... xs)                                         \
+  {                                                                        \
+    assert(entity_manager_ptr_);                                           \
+    return (*entity_manager_ptr_).NAME(std::forward<decltype(xs)>(xs)...); \
+  }                                                                        \
+  static_assert(true, "")
+  // clang-format on
+
+  FORWARD_TO_ENTITY_MANAGER(isNpcLogicStarted);
+
+  double getCurrentTime() const noexcept { return clock_.getCurrentScenarioTime(); }
+
   void closeZMQConnection() { zeromq_client_.closeConnection(); }
 
-  void setVerbose(const bool verbose);
+  bool updateFrame();
 
   template <typename Pose>
   auto spawn(
@@ -236,16 +260,6 @@ public:
     return register_to_entity_manager() and register_to_environment_simulator();
   }
 
-  bool despawn(const std::string & name);
-  bool despawnEntities();
-
-  bool checkCollision(
-    const std::string & first_entity_name, const std::string & second_entity_name);
-
-  auto respawn(
-    const std::string & name, const geometry_msgs::msg::PoseWithCovarianceStamped & new_pose,
-    const geometry_msgs::msg::PoseStamped & goal_pose) -> void;
-
   auto attachImuSensor(
     const std::string &, const simulation_api_schema::ImuSensorConfiguration & configuration)
     -> bool;
@@ -254,11 +268,13 @@ public:
     const simulation_api_schema::PseudoTrafficLightDetectorConfiguration &);
 
   bool attachLidarSensor(const simulation_api_schema::LidarConfiguration &);
+
   bool attachLidarSensor(
     const std::string &, const double lidar_sensor_delay,
     const helper::LidarType = helper::LidarType::VLP16);
 
   bool attachDetectionSensor(const simulation_api_schema::DetectionSensorConfiguration &);
+
   bool attachDetectionSensor(
     const std::string &, double detection_sensor_range, bool detect_all_objects_in_range,
     double pos_noise_stddev, int random_seed, double probability_of_lost,
@@ -266,11 +282,41 @@ public:
 
   bool attachOccupancyGridSensor(const simulation_api_schema::OccupancyGridSensorConfiguration &);
 
-  bool updateFrame();
+  FORWARD_TO_ENTITY_MANAGER(getFirstEgoName);
 
-  double getCurrentTime() const noexcept { return clock_.getCurrentScenarioTime(); }
+  FORWARD_TO_ENTITY_MANAGER(getEgoEntity);
 
-  void startNpcLogic();
+  FORWARD_TO_ENTITY_MANAGER(isEntityExist);
+
+  FORWARD_TO_ENTITY_MANAGER(getEntityNames);
+
+  auto getEntity(const std::string & name) -> entity::EntityBase &;
+
+  auto getEntity(const std::string & name) const -> const entity::EntityBase &;
+
+  FORWARD_TO_ENTITY_MANAGER(getEntityPointer);
+
+  FORWARD_TO_ENTITY_MANAGER(resetBehaviorPlugin);
+
+  auto respawn(
+    const std::string & name, const geometry_msgs::msg::PoseWithCovarianceStamped & new_pose,
+    const geometry_msgs::msg::PoseStamped & goal_pose) -> void;
+
+  bool despawn(const std::string & name);
+
+  bool despawnEntities();
+
+  bool checkCollision(
+    const std::string & first_entity_name, const std::string & second_entity_name);
+
+  FORWARD_TO_ENTITY_MANAGER(getHdmapUtils);
+
+  auto getV2ITrafficLights() { return traffic_lights_ptr_->getV2ITrafficLights(); }
+
+  auto getConventionalTrafficLights()
+  {
+    return traffic_lights_ptr_->getConventionalTrafficLights();
+  }
 
   /**
    * @brief Add a traffic source to the simulation
@@ -297,43 +343,6 @@ public:
     const bool allow_spawn_outside_lane = false, const bool require_footprint_fitting = false,
     const bool random_orientation = false, std::optional<int> random_seed = std::nullopt) -> void;
 
-  auto getV2ITrafficLights() { return traffic_lights_ptr_->getV2ITrafficLights(); }
-
-  auto getConventionalTrafficLights()
-  {
-    return traffic_lights_ptr_->getConventionalTrafficLights();
-  }
-
-  auto getEntity(const std::string & name) -> entity::EntityBase &;
-
-  auto getEntity(const std::string & name) const -> const entity::EntityBase &;
-
-  // clang-format off
-#define FORWARD_TO_ENTITY_MANAGER(NAME)                                    \
-  /*!                                                                      \
-   @brief Forward to arguments to the EntityManager::NAME function.        \
-   @return return value of the EntityManager::NAME function.               \
-   @note This function was defined by FORWARD_TO_ENTITY_MANAGER macro.     \
-   */                                                                      \
-  template <typename... Ts>                                                \
-  decltype(auto) NAME(Ts &&... xs)                                         \
-  {                                                                        \
-    assert(entity_manager_ptr_);                                           \
-    return (*entity_manager_ptr_).NAME(std::forward<decltype(xs)>(xs)...); \
-  }                                                                        \
-  static_assert(true, "")
-  // clang-format on
-
-  FORWARD_TO_ENTITY_MANAGER(getEgoEntity);
-  FORWARD_TO_ENTITY_MANAGER(getEntityNames);
-  FORWARD_TO_ENTITY_MANAGER(getEntityPointer);
-  FORWARD_TO_ENTITY_MANAGER(getFirstEgoName);
-  FORWARD_TO_ENTITY_MANAGER(getHdmapUtils);
-  FORWARD_TO_ENTITY_MANAGER(isEntityExist);
-  FORWARD_TO_ENTITY_MANAGER(isNpcLogicStarted);
-  FORWARD_TO_ENTITY_MANAGER(resetBehaviorPlugin);
-
-public:
 #undef FORWARD_TO_ENTITY_MANAGER
 
 private:
