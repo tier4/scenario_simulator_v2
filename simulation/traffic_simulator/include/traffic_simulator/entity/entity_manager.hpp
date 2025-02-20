@@ -81,12 +81,10 @@ public:
     NodeT && node, const Configuration & configuration,
     const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node_parameters)
   : configuration_(configuration),
-    node_topics_interface(rclcpp::node_interfaces::get_node_topics_interface(node)),
+    clock_ptr_(node->get_clock()),
     node_parameters_(node_parameters),
     broadcaster_(node),
     base_link_broadcaster_(node),
-    clock_ptr_(node->get_clock()),
-    npc_logic_started_(false),
     entity_status_array_pub_ptr_(rclcpp::create_publisher<EntityStatusWithTrajectoryArray>(
       node, "entity/status", EntityMarkerQoS(),
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
@@ -253,78 +251,37 @@ public:
   // traffics, lanelet
   auto getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &;
 
-  auto getObstacle(const std::string & name)
-    -> std::optional<traffic_simulator_msgs::msg::Obstacle>;
-
   auto getPedestrianParameters(const std::string & name) const
     -> const traffic_simulator_msgs::msg::PedestrianParameters &;
 
   auto getVehicleParameters(const std::string & name) const
     -> const traffic_simulator_msgs::msg::VehicleParameters &;
 
-  auto getWaypoints(const std::string & name) -> traffic_simulator_msgs::msg::WaypointsArray;
-
-  template <typename T>
-  auto getGoalPoses(const std::string & name) -> std::vector<T>
-  {
-    if constexpr (std::is_same_v<std::decay_t<T>, CanonicalizedLaneletPose>) {
-      if (not npc_logic_started_) {
-        return {};
-      } else {
-        return entities_.at(name)->getGoalPoses();
-      }
-    } else {
-      if (not npc_logic_started_) {
-        return {};
-      } else {
-        std::vector<geometry_msgs::msg::Pose> poses;
-        for (const auto & lanelet_pose : getGoalPoses<CanonicalizedLaneletPose>(name)) {
-          poses.push_back(pose::toMapPose(lanelet_pose));
-        }
-        return poses;
-      }
-    }
-  }
-
-  template <typename MessageT, typename... Args>
-  auto createPublisher(Args &&... args)
-  {
-    return rclcpp::create_publisher<MessageT>(node_topics_interface, std::forward<Args>(args)...);
-  }
-
-  template <typename MessageT, typename... Args>
-  auto createSubscription(Args &&... args)
-  {
-    return rclcpp::create_subscription<MessageT>(
-      node_topics_interface, std::forward<Args>(args)...);
-  }
-
 private:
-  Configuration configuration_;
-
-  std::shared_ptr<rclcpp::node_interfaces::NodeTopicsInterface> node_topics_interface;
-  const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr node_parameters_;
-
-  tf2_ros::StaticTransformBroadcaster broadcaster_;
-  tf2_ros::TransformBroadcaster base_link_broadcaster_;
+  /* */ Configuration configuration_;
 
   const rclcpp::Clock::SharedPtr clock_ptr_;
 
-  std::unordered_map<std::string, std::shared_ptr<entity::EntityBase>> entities_;
+  const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr node_parameters_;
 
-  bool npc_logic_started_;
+  /* */ tf2_ros::StaticTransformBroadcaster broadcaster_;
+
+  /* */ tf2_ros::TransformBroadcaster base_link_broadcaster_;
 
   const rclcpp::Publisher<EntityStatusWithTrajectoryArray>::SharedPtr entity_status_array_pub_ptr_;
 
   const rclcpp::Publisher<MarkerArray>::SharedPtr lanelet_marker_pub_ptr_;
 
+  /* */ std::unordered_map<std::string, std::shared_ptr<entity::EntityBase>> entities_;
+
+  /* */ bool npc_logic_started_{false};
+
+  /* */ std::shared_ptr<TrafficLights> traffic_lights_ptr_{nullptr};
+
   const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
 
-  MarkerArray markers_raw_;
-
-  std::shared_ptr<TrafficLights> traffic_lights_ptr_;
+  /* */ MarkerArray markers_raw_;
 };
 }  // namespace entity
 }  // namespace traffic_simulator
-
 #endif  // TRAFFIC_SIMULATOR__ENTITY__ENTITY_MANAGER_HPP_

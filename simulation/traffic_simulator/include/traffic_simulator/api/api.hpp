@@ -67,51 +67,33 @@ public:
   : configuration_(configuration),
     node_parameters_(
       rclcpp::node_interfaces::get_node_parameters_interface(std::forward<NodeT>(node))),
-    entity_manager_ptr_(
-      std::make_shared<entity::EntityManager>(node, configuration, node_parameters_)),
-    traffic_lights_ptr_(std::make_shared<TrafficLights>(
-      node, entity_manager_ptr_->getHdmapUtils(),
-      getROS2Parameter<std::string>("architecture_type", "awf/universe/20240605"))),
-    traffic_controller_ptr_(std::make_shared<traffic::TrafficController>(
-      [this](const std::string & name) { despawn(name); }, entity_manager_ptr_,
-      configuration_.auto_sink_entity_types)),
     clock_pub_(rclcpp::create_publisher<rosgraph_msgs::msg::Clock>(
       node, "/clock", rclcpp::QoS(rclcpp::KeepLast(1)).best_effort(),
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
     debug_marker_pub_(rclcpp::create_publisher<visualization_msgs::msg::MarkerArray>(
       node, "debug_marker", rclcpp::QoS(100), rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
-    real_time_factor_subscriber(rclcpp::create_subscription<std_msgs::msg::Float64>(
+    clock_(getROS2Parameter<bool>("use_sim_time", true), std::forward<decltype(xs)>(xs)...),
+    zeromq_client_(
+      simulation_interface::protocol, configuration.simulator_host,
+      getROS2Parameter<int>("port", 5555)),
+    entity_manager_ptr_(
+      std::make_shared<entity::EntityManager>(node, configuration, node_parameters_)),
+    traffic_controller_ptr_(std::make_shared<traffic::TrafficController>(
+      [this](const std::string & name) { despawn(name); }, entity_manager_ptr_,
+      configuration.auto_sink_entity_types)),
+    traffic_lights_ptr_(std::make_shared<TrafficLights>(
+      node, entity_manager_ptr_->getHdmapUtils(),
+      getROS2Parameter<std::string>("architecture_type", "awf/universe/20240605"))),
+    real_time_factor_subscriber_(rclcpp::create_subscription<std_msgs::msg::Float64>(
       node, "/real_time_factor", rclcpp::QoS(rclcpp::KeepLast(1)).best_effort(),
       [this](const std_msgs::msg::Float64 & message) {
-        /**
-         * @note Pausing the simulation by setting the realtime_factor_ value to 0 is not supported and causes the simulation crash.
-         * For that reason, before performing the action, it needs to be ensured that the incoming request data is a positive number.
-         */
-        if (message.data >= 0.001) {
-          clock_.realtime_factor = message.data;
-          simulation_api_schema::UpdateStepTimeRequest request;
-          request.set_simulation_step_time(clock_.getStepTime());
-          zeromq_client_.call(request);
-        }
-      })),
-    clock_(node->get_parameter("use_sim_time").as_bool(), std::forward<decltype(xs)>(xs)...),
-    zeromq_client_(
-      simulation_interface::protocol, configuration_.simulator_host, getZMQSocketPort(*node))
+        return setSimulationStepTime(message.data);
+      }))
   {
+    entity_manager_ptr_->setVerbose(configuration_.verbose);
     entity_manager_ptr_->setTrafficLights(traffic_lights_ptr_);
-    setVerbose(configuration_.verbose);
-
-    if (not configuration_.standalone_mode) {
-      simulation_api_schema::InitializeRequest request;
-      request.set_initialize_time(clock_.getCurrentSimulationTime());
-      request.set_lanelet2_map_path(configuration_.lanelet2_map_path().string());
-      request.set_realtime_factor(clock_.realtime_factor);
-      request.set_step_time(clock_.getStepTime());
-      simulation_interface::toProto(
-        clock_.getCurrentRosTime(), *request.mutable_initialize_ros_time());
-      if (not zeromq_client_.call(request).result().success()) {
+    if (not init()) {
         throw common::SimulationError("Failed to initialize simulator by InitializeRequest");
-      }
     }
   }
 
@@ -122,14 +104,11 @@ public:
     return getParameter<ParameterT>(node_parameters_, std::forward<Ts>(xs)...);
   }
 
-  template <typename Node>
-  int getZMQSocketPort(Node & node)
-  {
-    if (!node.has_parameter("port")) node.declare_parameter("port", 5555);
-    return node.get_parameter("port").as_int();
-  }
+  auto init() -> bool;
 
   auto setVerbose(const bool verbose) -> void;
+
+  auto setSimulationStepTime(const double step_time) -> bool;
 
   auto startNpcLogic() -> void;
 
@@ -315,21 +294,21 @@ private:
 
   const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr node_parameters_;
 
-  const std::shared_ptr<entity::EntityManager> entity_manager_ptr_;
-
-  const std::shared_ptr<TrafficLights> traffic_lights_ptr_;
-
-  const std::shared_ptr<traffic::TrafficController> traffic_controller_ptr_;
-
   const rclcpp::Publisher<rosgraph_msgs::msg::Clock>::SharedPtr clock_pub_;
 
   const rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr debug_marker_pub_;
 
-  const rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr real_time_factor_subscriber;
-
   SimulationClock clock_;
 
   zeromq::MultiClient zeromq_client_;
+
+  const std::shared_ptr<entity::EntityManager> entity_manager_ptr_;
+
+  const std::shared_ptr<traffic::TrafficController> traffic_controller_ptr_;
+
+  const std::shared_ptr<TrafficLights> traffic_lights_ptr_;
+
+  const rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr real_time_factor_subscriber_;
 };
 }  // namespace traffic_simulator
 
