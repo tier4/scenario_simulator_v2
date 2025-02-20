@@ -83,12 +83,16 @@ auto EntityManager::update(const double current_time, const double step_time) ->
   }
   traffic_simulator_msgs::msg::EntityStatusWithTrajectoryArray status_array_msg;
   for (const auto & [name, status] : all_status) {
+    auto & entity = getEntity(name);
     traffic_simulator_msgs::msg::EntityStatusWithTrajectory status_with_trajectory;
-    status_with_trajectory.waypoint = getWaypoints(name);
-    for (const auto & goal : getGoalPoses<geometry_msgs::msg::Pose>(name)) {
+    status_with_trajectory.waypoint =
+      npc_logic_started_ ? entity.getWaypoints() : traffic_simulator_msgs::msg::WaypointsArray();
+    for (const auto & goal : entity.getGoalPoses()) {
       status_with_trajectory.goal_pose.push_back(goal);
     }
-    if (const auto obstacle = getObstacle(name); obstacle) {
+    if (
+      const std::optional<traffic_simulator_msgs::msg::Obstacle> obstacle =
+        npc_logic_started_ ? entity.getObstacle() : std::nullopt) {
       status_with_trajectory.obstacle = obstacle.value();
       status_with_trajectory.obstacle_find = true;
     } else {
