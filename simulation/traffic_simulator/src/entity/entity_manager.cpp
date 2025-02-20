@@ -75,7 +75,7 @@ auto EntityManager::makeDebugMarker() const -> visualization_msgs::msg::MarkerAr
 // update
 auto EntityManager::update(const double current_time, const double step_time) -> void
 {
-  traffic_simulator::helper::StopWatch<std::chrono::milliseconds> stop_watch_update(
+  helper::StopWatch<std::chrono::milliseconds> stop_watch_update(
     "EntityManager::update", configuration_.verbose);
   setVerbose(configuration_.verbose);
   if (npc_logic_started_) {

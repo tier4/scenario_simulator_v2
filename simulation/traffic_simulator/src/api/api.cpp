@@ -359,12 +359,12 @@ auto API::addTrafficSource(
   const bool require_footprint_fitting, const bool random_orientation, std::optional<int> seed)
   -> void
 {
-  traffic_simulator::traffic::TrafficSource::Configuration configuration;
+  traffic::TrafficSource::Configuration configuration;
   configuration.allow_spawn_outside_lane = allow_spawn_outside_lane;
   configuration.require_footprint_fitting = require_footprint_fitting;
   configuration.use_random_orientation = random_orientation;
 
-  traffic_controller_ptr_->addModule<traffic_simulator::traffic::TrafficSource>(
+  traffic_controller_ptr_->addModule<traffic::TrafficSource>(
     radius, rate, pose, distribution, seed, getCurrentTime(), configuration,
     entity_manager_ptr_->getHdmapUtils(), [this, speed](const auto & name, auto &&... xs) {
       this->spawn(name, std::forward<decltype(xs)>(xs)...);

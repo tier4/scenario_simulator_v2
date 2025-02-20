@@ -108,8 +108,7 @@ public:
      so it can be assigned during the call of the EntityManager constructor.
      TrafficLights cannot be created before the EntityManager due to the dependency on HdMapUtils.
    */
-  auto setTrafficLights(
-    const std::shared_ptr<traffic_simulator::TrafficLights> & traffic_lights_ptr) -> void;
+  auto setTrafficLights(const std::shared_ptr<TrafficLights> & traffic_lights_ptr) -> void;
 
   auto setVerbose(const bool verbose) -> void;
 
@@ -235,8 +234,7 @@ public:
 
   auto getEntity(const std::string & name) const -> const entity::EntityBase &;
 
-  auto getEntityPointer(const std::string & name) const
-    -> std::shared_ptr<traffic_simulator::entity::EntityBase>;
+  auto getEntityPointer(const std::string & name) const -> std::shared_ptr<entity::EntityBase>;
 
   // entities - respawn, despawn, reset
   /**
@@ -244,8 +242,8 @@ public:
    * The internal behavior is to take over the various parameters and save them, then respawn the Entity and set the parameters.
    * @param name The name of the target entity.
    * @param behavior_plugin_name The name of the behavior plugin you want to set.
-   * @sa traffic_simulator::entity::PedestrianEntity::BuiltinBehavior
-   * @sa traffic_simulator::entity::VehicleEntity::BuiltinBehavior
+   * @sa entity::PedestrianEntity::BuiltinBehavior
+   * @sa entity::VehicleEntity::BuiltinBehavior
    */
   auto resetBehaviorPlugin(const std::string & name, const std::string & behavior_plugin_name)
     -> void;
@@ -312,7 +310,7 @@ private:
 
   const rclcpp::Clock::SharedPtr clock_ptr_;
 
-  std::unordered_map<std::string, std::shared_ptr<traffic_simulator::entity::EntityBase>> entities_;
+  std::unordered_map<std::string, std::shared_ptr<entity::EntityBase>> entities_;
 
   bool npc_logic_started_;
 
@@ -324,7 +322,7 @@ private:
 
   MarkerArray markers_raw_;
 
-  std::shared_ptr<traffic_simulator::TrafficLights> traffic_lights_ptr_;
+  std::shared_ptr<TrafficLights> traffic_lights_ptr_;
 };
 }  // namespace entity
 }  // namespace traffic_simulator
