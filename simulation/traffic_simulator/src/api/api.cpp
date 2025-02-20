@@ -226,6 +226,8 @@ auto API::attachOccupancyGridSensor(
 }
 
 // ego - checks, getters
+auto API::isAnyEgoSpawned() const -> bool { return entity_manager_ptr_->isAnyEgoSpawned(); }
+
 auto API::getFirstEgoName() const -> std::optional<std::string>
 {
   return entity_manager_ptr_->getFirstEgoName();
