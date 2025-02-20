@@ -20,6 +20,7 @@
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
 #include <traffic_simulator/lanelet_wrapper/lanelet_map.hpp>
 #include <traffic_simulator/utils/pose.hpp>
+#include <traffic_simulator/utils/route.hpp>
 
 namespace traffic_simulator
 {
@@ -67,18 +68,17 @@ auto CanonicalizedLaneletPose::operator=(const CanonicalizedLaneletPose & other)
 }
 
 auto CanonicalizedLaneletPose::getAlternativeLaneletPoseBaseOnShortestRouteFrom(
-  LaneletPose from, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
-  const RoutingConfiguration & routing_configuration) const -> std::optional<LaneletPose>
+  LaneletPose from, const RoutingConfiguration & routing_configuration) const
+  -> std::optional<LaneletPose>
 {
   if (lanelet_poses_.empty()) {
     return std::nullopt;
   }
-  lanelet::Ids shortest_route =
-    hdmap_utils->getRoute(from.lanelet_id, lanelet_poses_[0].lanelet_id, routing_configuration);
+  auto shortest_route =
+    route::route(from.lanelet_id, lanelet_poses_[0].lanelet_id, routing_configuration);
   LaneletPose alternative_lanelet_pose = lanelet_poses_[0];
   for (const auto & laneletPose : lanelet_poses_) {
-    const auto route =
-      hdmap_utils->getRoute(from.lanelet_id, laneletPose.lanelet_id, routing_configuration);
+    const auto route = route::route(from.lanelet_id, laneletPose.lanelet_id, routing_configuration);
     if (shortest_route.size() > route.size()) {
       shortest_route = route;
       alternative_lanelet_pose = laneletPose;
