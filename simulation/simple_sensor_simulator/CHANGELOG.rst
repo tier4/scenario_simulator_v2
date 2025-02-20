@@ -21,6 +21,11 @@ Changelog for package simple_sensor_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+11.0.0 (2025-02-20)
+-------------------
+* Merge branch 'master' into refactor/lanelet_wrapper_route
+* Contributors: Tatsuya Yamasaki
+
 10.3.3 (2025-02-18)
 -------------------
 * Merge pull request `#1506 <https://github.com/tier4/scenario_simulator_v2/issues/1506>`_ from tier4/refactor/simple_sensor_simulator/noise
