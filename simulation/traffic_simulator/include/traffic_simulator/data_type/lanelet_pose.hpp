@@ -42,7 +42,7 @@ public:
   auto alignOrientationToLanelet() -> void;
   auto hasAlternativeLaneletPose() const -> bool { return lanelet_poses_.size() > 1; }
   auto getAlternativeLaneletPoseBaseOnShortestRouteFrom(
-    LaneletPose from, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
+    LaneletPose from,
     const RoutingConfiguration & routing_configuration = RoutingConfiguration()) const
     -> std::optional<LaneletPose>;
   static auto setConsiderPoseByRoadSlope(bool consider_pose_by_road_slope) -> void

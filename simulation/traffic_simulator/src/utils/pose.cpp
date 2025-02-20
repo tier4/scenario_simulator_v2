@@ -24,6 +24,7 @@
 #include <traffic_simulator/lanelet_wrapper/pose.hpp>
 #include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator/utils/pose.hpp>
+#include <traffic_simulator/utils/route.hpp>
 #include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
 
 namespace traffic_simulator
@@ -406,8 +407,7 @@ auto isAtEndOfLanelets(
 
 auto findRoutableAlternativeLaneletPoseFrom(
   const lanelet::Id from_lanelet_id, const CanonicalizedLaneletPose & to_canonicalized_lanelet_pose,
-  const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+  const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box)
   -> std::optional<traffic_simulator::CanonicalizedLaneletPose>
 {
   /// @note search_distance should be minimal, just to check nearest neighbour lanelets
@@ -415,17 +415,17 @@ auto findRoutableAlternativeLaneletPoseFrom(
   /// @note default_match_to_lane_reduction_ratio is constant described in hdmap_utils.hpp
   constexpr auto default_match_to_lane_reduction_ratio{0.8};
   constexpr auto include_crosswalk{false};
-  /** 
-    * @note hdmap_utils_ptr->getRoute requires routing_configuration, 
-    * 'allow_lane_change = true' is needed to check distances to entities on neighbour lanelets 
-    */
+  /**
+   * @note route::route requires routing_configuration,
+   * 'allow_lane_change = true' is needed to check distances to entities on neighbour lanelets
+   */
   RoutingConfiguration routing_configuration;
   routing_configuration.allow_lane_change = true;
 
   /// @note if there is already a route from_lanelet_id->to_lanelet_id, return it
   /// if not, transform the 'to_lanelet_id' position into the nearby lanelets and search for a route in relation to them
   if (const auto to_lanelet_id = to_canonicalized_lanelet_pose.getLaneletPose().lanelet_id;
-      !hdmap_utils_ptr->getRoute(from_lanelet_id, to_lanelet_id, routing_configuration).empty()) {
+      !route::route(from_lanelet_id, to_lanelet_id, routing_configuration).empty()) {
     return to_canonicalized_lanelet_pose;
   } else if (const auto nearby_lanelet_ids = lanelet_wrapper::pose::findMatchingLanes(
                static_cast<geometry_msgs::msg::Pose>(to_canonicalized_lanelet_pose),
@@ -434,8 +434,7 @@ auto findRoutableAlternativeLaneletPoseFrom(
              nearby_lanelet_ids.has_value()) {
     std::vector<std::pair<CanonicalizedLaneletPose, lanelet::Ids>> routes;
     for (const auto & [distance, lanelet_id] : nearby_lanelet_ids.value()) {
-      if (auto route =
-            hdmap_utils_ptr->getRoute(from_lanelet_id, lanelet_id, routing_configuration);
+      if (auto route = route::route(from_lanelet_id, lanelet_id, routing_configuration);
           lanelet_id == to_lanelet_id || route.empty()) {
         continue;
       } else if (const auto lanelet_pose = lanelet_wrapper::pose::toLaneletPose(
