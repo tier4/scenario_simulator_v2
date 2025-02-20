@@ -128,9 +128,9 @@ public:
     return node.get_parameter("port").as_int();
   }
 
-  void setVerbose(const bool verbose);
+  auto setVerbose(const bool verbose) -> void;
 
-  void startNpcLogic();
+  auto startNpcLogic() -> void;
 
   // clang-format off
 #define FORWARD_TO_ENTITY_MANAGER(NAME)                                    \
@@ -150,11 +150,11 @@ public:
 
   FORWARD_TO_ENTITY_MANAGER(isNpcLogicStarted);
 
-  double getCurrentTime() const noexcept { return clock_.getCurrentScenarioTime(); }
+  auto getCurrentTime() const noexcept -> double { return clock_.getCurrentScenarioTime(); }
 
-  void closeZMQConnection() { zeromq_client_.closeConnection(); }
+  auto closeZMQConnection() -> void { zeromq_client_.closeConnection(); }
 
-  bool updateFrame();
+  auto updateFrame() -> bool;
 
   template <typename Pose>
   auto spawn(
@@ -264,23 +264,24 @@ public:
     const std::string &, const simulation_api_schema::ImuSensorConfiguration & configuration)
     -> bool;
 
-  bool attachPseudoTrafficLightDetector(
-    const simulation_api_schema::PseudoTrafficLightDetectorConfiguration &);
+  auto attachPseudoTrafficLightDetector(
+    const simulation_api_schema::PseudoTrafficLightDetectorConfiguration &) -> bool;
 
-  bool attachLidarSensor(const simulation_api_schema::LidarConfiguration &);
+  auto attachLidarSensor(const simulation_api_schema::LidarConfiguration &) -> bool;
 
-  bool attachLidarSensor(
+  auto attachLidarSensor(
     const std::string &, const double lidar_sensor_delay,
-    const helper::LidarType = helper::LidarType::VLP16);
+    const helper::LidarType = helper::LidarType::VLP16) -> bool;
 
-  bool attachDetectionSensor(const simulation_api_schema::DetectionSensorConfiguration &);
+  auto attachDetectionSensor(const simulation_api_schema::DetectionSensorConfiguration &) -> bool;
 
-  bool attachDetectionSensor(
+  auto attachDetectionSensor(
     const std::string &, double detection_sensor_range, bool detect_all_objects_in_range,
     double pos_noise_stddev, int random_seed, double probability_of_lost,
-    double object_recognition_delay);
+    double object_recognition_delay) -> bool;
 
-  bool attachOccupancyGridSensor(const simulation_api_schema::OccupancyGridSensorConfiguration &);
+  auto attachOccupancyGridSensor(const simulation_api_schema::OccupancyGridSensorConfiguration &)
+    -> bool;
 
   FORWARD_TO_ENTITY_MANAGER(getFirstEgoName);
 
@@ -302,18 +303,21 @@ public:
     const std::string & name, const geometry_msgs::msg::PoseWithCovarianceStamped & new_pose,
     const geometry_msgs::msg::PoseStamped & goal_pose) -> void;
 
-  bool despawn(const std::string & name);
+  auto despawn(const std::string & name) -> bool;
 
-  bool despawnEntities();
+  auto despawnEntities() -> bool;
 
-  bool checkCollision(
-    const std::string & first_entity_name, const std::string & second_entity_name);
+  auto checkCollision(const std::string & first_entity_name, const std::string & second_entity_name)
+    -> bool;
 
   FORWARD_TO_ENTITY_MANAGER(getHdmapUtils);
 
-  auto getV2ITrafficLights() { return traffic_lights_ptr_->getV2ITrafficLights(); }
+  auto getV2ITrafficLights() const -> std::shared_ptr<V2ITrafficLights>
+  {
+    return traffic_lights_ptr_->getV2ITrafficLights();
+  }
 
-  auto getConventionalTrafficLights()
+  auto getConventionalTrafficLights() const -> std::shared_ptr<ConventionalTrafficLights>
   {
     return traffic_lights_ptr_->getConventionalTrafficLights();
   }
@@ -346,11 +350,11 @@ public:
 #undef FORWARD_TO_ENTITY_MANAGER
 
 private:
-  bool updateTimeInSim();
+  auto updateTimeInSim() -> bool;
 
-  bool updateEntitiesStatusInSim();
+  auto updateEntitiesStatusInSim() -> bool;
 
-  bool updateTrafficLightsInSim();
+  auto updateTrafficLightsInSim() -> bool;
 
   const Configuration configuration;
 

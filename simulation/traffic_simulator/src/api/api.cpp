@@ -29,9 +29,9 @@
 
 namespace traffic_simulator
 {
-void API::setVerbose(const bool verbose) { entity_manager_ptr_->setVerbose(verbose); }
+auto API::setVerbose(const bool verbose) -> void { entity_manager_ptr_->setVerbose(verbose); }
 
-void API::startNpcLogic()
+auto API::startNpcLogic() -> void
 {
   if (entity_manager_ptr_->isNpcLogicStarted()) {
     THROW_SIMULATION_ERROR("NPC logics are already started.");
@@ -41,7 +41,7 @@ void API::startNpcLogic()
   }
 }
 
-bool API::updateTimeInSim()
+auto API::updateTimeInSim() -> bool
 {
   simulation_api_schema::UpdateFrameRequest request;
   request.set_current_simulation_time(clock_.getCurrentSimulationTime());
@@ -51,7 +51,7 @@ bool API::updateTimeInSim()
   return zeromq_client_.call(request).result().success();
 }
 
-bool API::updateEntitiesStatusInSim()
+auto API::updateEntitiesStatusInSim() -> bool
 {
   simulation_api_schema::UpdateEntityStatusRequest req;
   req.set_npc_logic_started(entity_manager_ptr_->isNpcLogicStarted());
@@ -85,7 +85,7 @@ bool API::updateEntitiesStatusInSim()
   return false;
 }
 
-bool API::updateTrafficLightsInSim()
+auto API::updateTrafficLightsInSim() -> bool
 {
   if (traffic_lights_ptr_->isAnyTrafficLightChanged()) {
     auto request =
@@ -96,7 +96,7 @@ bool API::updateTrafficLightsInSim()
   return simulation_api_schema::UpdateTrafficLightsResponse().result().success();
 }
 
-bool API::updateFrame()
+auto API::updateFrame() -> bool
 {
   if (configuration.standalone_mode && entity_manager_ptr_->isAnyEgoSpawned()) {
     THROW_SEMANTIC_ERROR("Ego simulation is no longer supported in standalone mode");
@@ -131,15 +131,16 @@ auto API::attachImuSensor(
   return zeromq_client_.call(req).result().success();
 }
 
-bool API::attachPseudoTrafficLightDetector(
-  const simulation_api_schema::PseudoTrafficLightDetectorConfiguration & configuration)
+auto API::attachPseudoTrafficLightDetector(
+  const simulation_api_schema::PseudoTrafficLightDetectorConfiguration & configuration) -> bool
 {
   simulation_api_schema::AttachPseudoTrafficLightDetectorRequest req;
   *req.mutable_configuration() = configuration;
   return zeromq_client_.call(req).result().success();
 }
 
-bool API::attachLidarSensor(const simulation_api_schema::LidarConfiguration & lidar_configuration)
+auto API::attachLidarSensor(const simulation_api_schema::LidarConfiguration & lidar_configuration)
+  -> bool
 {
   if (configuration.standalone_mode) {
     return true;
@@ -150,9 +151,9 @@ bool API::attachLidarSensor(const simulation_api_schema::LidarConfiguration & li
   }
 }
 
-bool API::attachLidarSensor(
+auto API::attachLidarSensor(
   const std::string & entity_name, const double lidar_sensor_delay,
-  const helper::LidarType lidar_type)
+  const helper::LidarType lidar_type) -> bool
 {
   return attachLidarSensor(helper::constructLidarConfiguration(
     lidar_type, entity_name,
@@ -160,8 +161,8 @@ bool API::attachLidarSensor(
     lidar_sensor_delay));
 }
 
-bool API::attachDetectionSensor(
-  const simulation_api_schema::DetectionSensorConfiguration & sensor_configuration)
+auto API::attachDetectionSensor(
+  const simulation_api_schema::DetectionSensorConfiguration & sensor_configuration) -> bool
 {
   if (configuration.standalone_mode) {
     return true;
@@ -172,10 +173,10 @@ bool API::attachDetectionSensor(
   }
 }
 
-bool API::attachDetectionSensor(
+auto API::attachDetectionSensor(
   const std::string & entity_name, double detection_sensor_range, bool detect_all_objects_in_range,
   double pos_noise_stddev, int random_seed, double probability_of_lost,
-  double object_recognition_delay)
+  double object_recognition_delay) -> bool
 {
   return attachDetectionSensor(helper::constructDetectionSensorConfiguration(
     entity_name, getROS2Parameter<std::string>("architecture_type", "awf/universe/20240605"), 0.1,
@@ -183,8 +184,8 @@ bool API::attachDetectionSensor(
     probability_of_lost, object_recognition_delay));
 }
 
-bool API::attachOccupancyGridSensor(
-  const simulation_api_schema::OccupancyGridSensorConfiguration & sensor_configuration)
+auto API::attachOccupancyGridSensor(
+  const simulation_api_schema::OccupancyGridSensorConfiguration & sensor_configuration) -> bool
 {
   if (configuration.standalone_mode) {
     return true;
@@ -250,7 +251,7 @@ auto API::respawn(
   }
 }
 
-bool API::despawn(const std::string & name)
+auto API::despawn(const std::string & name) -> bool
 {
   const auto result = entity_manager_ptr_->despawnEntity(name);
   if (!result) {
@@ -264,15 +265,15 @@ bool API::despawn(const std::string & name)
   return true;
 }
 
-bool API::despawnEntities()
+auto API::despawnEntities() -> bool
 {
   const auto entities = entity_manager_ptr_->getEntityNames();
   return std::all_of(
     entities.begin(), entities.end(), [&](const auto & entity) { return despawn(entity); });
 }
 
-bool API::checkCollision(
-  const std::string & first_entity_name, const std::string & second_entity_name)
+auto API::checkCollision(
+  const std::string & first_entity_name, const std::string & second_entity_name) -> bool
 {
   if (
     first_entity_name != second_entity_name && isEntityExist(first_entity_name) &&
