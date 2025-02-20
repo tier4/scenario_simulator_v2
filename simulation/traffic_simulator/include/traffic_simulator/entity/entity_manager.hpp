@@ -119,7 +119,7 @@ public:
 
       if constexpr (std::is_same_v<std::decay_t<EntityType>, EgoEntity>) {
         if (isAnyEgoSpawned()) {
-          THROW_SEMANTIC_ERROR("multi ego simulation does not support yet");
+          THROW_SEMANTIC_ERROR("Multiple egos in the simulation are unsupported yet.");
         } else {
           entity_status.type.type = traffic_simulator_msgs::msg::EntityType::EGO;
         }

@@ -283,7 +283,7 @@ auto EntityManager::getEntity(const std::string & name) -> entity::EntityBase &
   if (const auto it = entities_.find(name); it != entities_.end()) {
     return *(it->second);
   } else {
-    THROW_SEMANTIC_ERROR("Entity ", std::quoted(name), " does not exist.");
+    THROW_SEMANTIC_ERROR("Entity : ", std::quoted(name), " does not exist.");
   }
 }
 
@@ -292,7 +292,7 @@ auto EntityManager::getEntity(const std::string & name) const -> const entity::E
   if (const auto it = entities_.find(name); it != entities_.end()) {
     return *(it->second);
   } else {
-    THROW_SEMANTIC_ERROR("Entity ", std::quoted(name), " does not exist.");
+    THROW_SEMANTIC_ERROR("Entity : ", std::quoted(name), " does not exist.");
   }
 }
 
