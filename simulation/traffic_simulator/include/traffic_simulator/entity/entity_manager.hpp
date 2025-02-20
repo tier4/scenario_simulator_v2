@@ -94,7 +94,7 @@ public:
       node, "lanelet/marker", LaneletMarkerQoS(),
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
     hdmap_utils_ptr_(std::make_shared<hdmap_utils::HdMapUtils>(
-      configuration_.lanelet2_map_path(), getOrigin(*node))),
+      configuration.lanelet2_map_path(), getOrigin(node_parameters))),
     markers_raw_(hdmap_utils_ptr_->generateMarker())
   {
     updateHdmapMarker();
@@ -257,24 +257,6 @@ public:
 
   // traffics, lanelet
   auto getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &;
-
-  template <typename Node>
-  auto getOrigin(Node & node) const
-  {
-    geographic_msgs::msg::GeoPoint origin;
-    {
-      if (!node.has_parameter("origin_latitude")) {
-        node.declare_parameter("origin_latitude", 0.0);
-      }
-      if (!node.has_parameter("origin_longitude")) {
-        node.declare_parameter("origin_longitude", 0.0);
-      }
-      node.get_parameter("origin_latitude", origin.latitude);
-      node.get_parameter("origin_longitude", origin.longitude);
-    }
-
-    return origin;
-  }
 
   auto getObstacle(const std::string & name)
     -> std::optional<traffic_simulator_msgs::msg::Obstacle>;
