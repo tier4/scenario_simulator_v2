@@ -71,63 +71,11 @@ public:
 
 class EntityManager
 {
-  Configuration configuration;
-
-  std::shared_ptr<rclcpp::node_interfaces::NodeTopicsInterface> node_topics_interface;
-  const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr node_parameters_;
-
-  tf2_ros::StaticTransformBroadcaster broadcaster_;
-  tf2_ros::TransformBroadcaster base_link_broadcaster_;
-
-  const rclcpp::Clock::SharedPtr clock_ptr_;
-
-  std::unordered_map<std::string, std::shared_ptr<traffic_simulator::entity::EntityBase>> entities_;
-
-  bool npc_logic_started_;
-
   using EntityStatusWithTrajectoryArray =
     traffic_simulator_msgs::msg::EntityStatusWithTrajectoryArray;
-  const rclcpp::Publisher<EntityStatusWithTrajectoryArray>::SharedPtr entity_status_array_pub_ptr_;
-
   using MarkerArray = visualization_msgs::msg::MarkerArray;
-  const rclcpp::Publisher<MarkerArray>::SharedPtr lanelet_marker_pub_ptr_;
-
-  const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
-
-  MarkerArray markers_raw_;
-
-  std::shared_ptr<traffic_simulator::TrafficLights> traffic_lights_ptr_;
 
 public:
-  /**
-   * This function is necessary because the TrafficLights object is created after the EntityManager,
-   * so it cannot be assigned during the call of the EntityManager constructor.
-   * TrafficLights cannot be created before the EntityManager due to the dependency on HdMapUtils.
-   */
-  auto setTrafficLights(
-    const std::shared_ptr<traffic_simulator::TrafficLights> & traffic_lights_ptr) -> void
-  {
-    traffic_lights_ptr_ = traffic_lights_ptr;
-  }
-
-  template <typename Node>
-  auto getOrigin(Node & node) const
-  {
-    geographic_msgs::msg::GeoPoint origin;
-    {
-      if (!node.has_parameter("origin_latitude")) {
-        node.declare_parameter("origin_latitude", 0.0);
-      }
-      if (!node.has_parameter("origin_longitude")) {
-        node.declare_parameter("origin_longitude", 0.0);
-      }
-      node.get_parameter("origin_latitude", origin.latitude);
-      node.get_parameter("origin_longitude", origin.longitude);
-    }
-
-    return origin;
-  }
-
   template <class NodeT, class AllocatorT = std::allocator<void>>
   explicit EntityManager(
     NodeT && node, const Configuration & configuration,
@@ -154,86 +102,36 @@ public:
 
   ~EntityManager() = default;
 
-public:
+  /**
+     This function is necessary because the TrafficLights object is created after the EntityManager,
+     so it can be assigned during the call of the EntityManager constructor.
+     TrafficLights cannot be created before the EntityManager due to the dependency on HdMapUtils.
+   */
+  auto setTrafficLights(
+    const std::shared_ptr<traffic_simulator::TrafficLights> & traffic_lights_ptr) -> void
+  {
+    traffic_lights_ptr_ = traffic_lights_ptr;
+  }
+
+  void setVerbose(const bool verbose);
+
+  auto startNpcLogic(const double current_time) -> void;
+
+  auto isNpcLogicStarted() const -> bool { return npc_logic_started_; }
+
   visualization_msgs::msg::MarkerArray makeDebugMarker() const;
+
+  void update(const double current_time, const double step_time);
 
   auto updateNpcLogic(const std::string & name, const double current_time, const double step_time)
     -> const CanonicalizedEntityStatus &;
+
+  void updateHdmapMarker();
 
   void broadcastEntityTransform();
 
   void broadcastTransform(
     const geometry_msgs::msg::PoseStamped & pose, const bool static_transform = true);
-
-  bool despawnEntity(const std::string & name);
-
-  auto isEntityExist(const std::string & name) const -> bool;
-
-  auto getEntityNames() const -> const std::vector<std::string>;
-
-  auto getEntityPointer(const std::string & name) const
-    -> std::shared_ptr<traffic_simulator::entity::EntityBase>;
-
-  auto getEntity(const std::string & name) -> entity::EntityBase &;
-
-  auto getEntity(const std::string & name) const -> const entity::EntityBase &;
-
-  auto getEgoEntity(const std::string & name) -> entity::EgoEntity &;
-
-  auto getEgoEntity(const std::string & name) const -> const entity::EgoEntity &;
-
-  auto getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &;
-
-  auto getNumberOfEgo() const -> std::size_t;
-
-  auto getObstacle(const std::string & name)
-    -> std::optional<traffic_simulator_msgs::msg::Obstacle>;
-
-  auto getPedestrianParameters(const std::string & name) const
-    -> const traffic_simulator_msgs::msg::PedestrianParameters &;
-
-  auto getVehicleParameters(const std::string & name) const
-    -> const traffic_simulator_msgs::msg::VehicleParameters &;
-
-  auto getWaypoints(const std::string & name) -> traffic_simulator_msgs::msg::WaypointsArray;
-
-  template <typename T>
-  auto getGoalPoses(const std::string & name) -> std::vector<T>
-  {
-    if constexpr (std::is_same_v<std::decay_t<T>, CanonicalizedLaneletPose>) {
-      if (not npc_logic_started_) {
-        return {};
-      } else {
-        return entities_.at(name)->getGoalPoses();
-      }
-    } else {
-      if (not npc_logic_started_) {
-        return {};
-      } else {
-        std::vector<geometry_msgs::msg::Pose> poses;
-        for (const auto & lanelet_pose : getGoalPoses<CanonicalizedLaneletPose>(name)) {
-          poses.push_back(pose::toMapPose(lanelet_pose));
-        }
-        return poses;
-      }
-    }
-  }
-
-  auto isAnyEgoSpawned() const -> bool;
-
-  auto getFirstEgoName() const -> std::optional<std::string>;
-
-  /**
-   * @brief Reset behavior plugin of the target entity.
-   * The internal behavior is to take over the various parameters and save them, then respawn the Entity and set the parameters.
-   * @param name The name of the target entity.
-   * @param behavior_plugin_name The name of the behavior plugin you want to set.
-   * @sa traffic_simulator::entity::PedestrianEntity::BuiltinBehavior
-   * @sa traffic_simulator::entity::VehicleEntity::BuiltinBehavior
-   */
-  void resetBehaviorPlugin(const std::string & name, const std::string & behavior_plugin_name);
-
-  void setVerbose(const bool verbose);
 
   template <typename Entity, typename Pose, typename Parameters, typename... Ts>
   auto spawnEntity(
@@ -316,6 +214,92 @@ public:
     }
   }
 
+  auto getNumberOfEgo() const -> std::size_t;
+
+  auto isAnyEgoSpawned() const -> bool;
+
+  auto getFirstEgoName() const -> std::optional<std::string>;
+
+  auto getEgoEntity(const std::string & name) -> entity::EgoEntity &;
+
+  auto getEgoEntity(const std::string & name) const -> const entity::EgoEntity &;
+
+  auto isEntityExist(const std::string & name) const -> bool;
+
+  auto getEntityNames() const -> const std::vector<std::string>;
+
+  auto getEntity(const std::string & name) -> entity::EntityBase &;
+
+  auto getEntity(const std::string & name) const -> const entity::EntityBase &;
+
+  auto getEntityPointer(const std::string & name) const
+    -> std::shared_ptr<traffic_simulator::entity::EntityBase>;
+
+  /**
+   * @brief Reset behavior plugin of the target entity.
+   * The internal behavior is to take over the various parameters and save them, then respawn the Entity and set the parameters.
+   * @param name The name of the target entity.
+   * @param behavior_plugin_name The name of the behavior plugin you want to set.
+   * @sa traffic_simulator::entity::PedestrianEntity::BuiltinBehavior
+   * @sa traffic_simulator::entity::VehicleEntity::BuiltinBehavior
+   */
+  void resetBehaviorPlugin(const std::string & name, const std::string & behavior_plugin_name);
+
+  bool despawnEntity(const std::string & name);
+
+  auto getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &;
+
+  template <typename Node>
+  auto getOrigin(Node & node) const
+  {
+    geographic_msgs::msg::GeoPoint origin;
+    {
+      if (!node.has_parameter("origin_latitude")) {
+        node.declare_parameter("origin_latitude", 0.0);
+      }
+      if (!node.has_parameter("origin_longitude")) {
+        node.declare_parameter("origin_longitude", 0.0);
+      }
+      node.get_parameter("origin_latitude", origin.latitude);
+      node.get_parameter("origin_longitude", origin.longitude);
+    }
+
+    return origin;
+  }
+
+  auto getObstacle(const std::string & name)
+    -> std::optional<traffic_simulator_msgs::msg::Obstacle>;
+
+  auto getPedestrianParameters(const std::string & name) const
+    -> const traffic_simulator_msgs::msg::PedestrianParameters &;
+
+  auto getVehicleParameters(const std::string & name) const
+    -> const traffic_simulator_msgs::msg::VehicleParameters &;
+
+  auto getWaypoints(const std::string & name) -> traffic_simulator_msgs::msg::WaypointsArray;
+
+  template <typename T>
+  auto getGoalPoses(const std::string & name) -> std::vector<T>
+  {
+    if constexpr (std::is_same_v<std::decay_t<T>, CanonicalizedLaneletPose>) {
+      if (not npc_logic_started_) {
+        return {};
+      } else {
+        return entities_.at(name)->getGoalPoses();
+      }
+    } else {
+      if (not npc_logic_started_) {
+        return {};
+      } else {
+        std::vector<geometry_msgs::msg::Pose> poses;
+        for (const auto & lanelet_pose : getGoalPoses<CanonicalizedLaneletPose>(name)) {
+          poses.push_back(pose::toMapPose(lanelet_pose));
+        }
+        return poses;
+      }
+    }
+  }
+
   template <typename MessageT, typename... Args>
   auto createPublisher(Args &&... args)
   {
@@ -329,13 +313,30 @@ public:
       node_topics_interface, std::forward<Args>(args)...);
   }
 
-  void update(const double current_time, const double step_time);
+private:
+  Configuration configuration;
 
-  void updateHdmapMarker();
+  std::shared_ptr<rclcpp::node_interfaces::NodeTopicsInterface> node_topics_interface;
+  const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr node_parameters_;
 
-  auto startNpcLogic(const double current_time) -> void;
+  tf2_ros::StaticTransformBroadcaster broadcaster_;
+  tf2_ros::TransformBroadcaster base_link_broadcaster_;
 
-  auto isNpcLogicStarted() const -> bool { return npc_logic_started_; }
+  const rclcpp::Clock::SharedPtr clock_ptr_;
+
+  std::unordered_map<std::string, std::shared_ptr<traffic_simulator::entity::EntityBase>> entities_;
+
+  bool npc_logic_started_;
+
+  const rclcpp::Publisher<EntityStatusWithTrajectoryArray>::SharedPtr entity_status_array_pub_ptr_;
+
+  const rclcpp::Publisher<MarkerArray>::SharedPtr lanelet_marker_pub_ptr_;
+
+  const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
+
+  MarkerArray markers_raw_;
+
+  std::shared_ptr<traffic_simulator::TrafficLights> traffic_lights_ptr_;
 };
 }  // namespace entity
 }  // namespace traffic_simulator
