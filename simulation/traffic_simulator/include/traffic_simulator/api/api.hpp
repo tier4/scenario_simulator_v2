@@ -64,7 +64,7 @@ class API
 public:
   template <typename NodeT, typename AllocatorT = std::allocator<void>, typename... Ts>
   explicit API(NodeT && node, const Configuration & configuration, Ts &&... xs)
-  : configuration(configuration),
+  : configuration_(configuration),
     node_parameters_(
       rclcpp::node_interfaces::get_node_parameters_interface(std::forward<NodeT>(node))),
     entity_manager_ptr_(
@@ -74,7 +74,7 @@ public:
       getROS2Parameter<std::string>("architecture_type", "awf/universe/20240605"))),
     traffic_controller_ptr_(std::make_shared<traffic::TrafficController>(
       [this](const std::string & name) { despawn(name); }, entity_manager_ptr_,
-      configuration.auto_sink_entity_types)),
+      configuration_.auto_sink_entity_types)),
     clock_pub_(rclcpp::create_publisher<rosgraph_msgs::msg::Clock>(
       node, "/clock", rclcpp::QoS(rclcpp::KeepLast(1)).best_effort(),
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
@@ -96,15 +96,15 @@ public:
       })),
     clock_(node->get_parameter("use_sim_time").as_bool(), std::forward<decltype(xs)>(xs)...),
     zeromq_client_(
-      simulation_interface::protocol, configuration.simulator_host, getZMQSocketPort(*node))
+      simulation_interface::protocol, configuration_.simulator_host, getZMQSocketPort(*node))
   {
     entity_manager_ptr_->setTrafficLights(traffic_lights_ptr_);
-    setVerbose(configuration.verbose);
+    setVerbose(configuration_.verbose);
 
-    if (not configuration.standalone_mode) {
+    if (not configuration_.standalone_mode) {
       simulation_api_schema::InitializeRequest request;
       request.set_initialize_time(clock_.getCurrentSimulationTime());
-      request.set_lanelet2_map_path(configuration.lanelet2_map_path().string());
+      request.set_lanelet2_map_path(configuration_.lanelet2_map_path().string());
       request.set_realtime_factor(clock_.realtime_factor);
       request.set_step_time(clock_.getStepTime());
       simulation_interface::toProto(
@@ -167,7 +167,7 @@ public:
       if (behavior == VehicleBehavior::autoware()) {
         return entity_manager_ptr_->isEntityExist(name) or
                entity_manager_ptr_->spawnEntity<entity::EgoEntity>(
-                 name, pose, parameters, getCurrentTime(), configuration, node_parameters_);
+                 name, pose, parameters, getCurrentTime(), configuration_, node_parameters_);
       } else {
         return entity_manager_ptr_->spawnEntity<entity::VehicleEntity>(
           name, pose, parameters, getCurrentTime(), behavior);
@@ -175,7 +175,7 @@ public:
     };
 
     auto register_to_environment_simulator = [&]() {
-      if (configuration.standalone_mode) {
+      if (configuration_.standalone_mode) {
         return true;
       } else if (!entity_manager_ptr_->isEntityExist(name)) {
         throw common::SemanticError(
@@ -210,7 +210,7 @@ public:
     };
 
     auto register_to_environment_simulator = [&]() {
-      if (configuration.standalone_mode) {
+      if (configuration_.standalone_mode) {
         return true;
       } else if (!entity_manager_ptr_->isEntityExist(name)) {
         throw common::SemanticError(
@@ -241,7 +241,7 @@ public:
     };
 
     auto register_to_environment_simulator = [&]() {
-      if (configuration.standalone_mode) {
+      if (configuration_.standalone_mode) {
         return true;
       } else if (!entity_manager_ptr_->isEntityExist(name)) {
         throw common::SemanticError(
@@ -356,7 +356,7 @@ private:
 
   auto updateTrafficLightsInSim() -> bool;
 
-  const Configuration configuration;
+  const Configuration configuration_;
 
   const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr node_parameters_;
 

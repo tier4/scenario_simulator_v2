@@ -39,7 +39,7 @@ namespace entity
 {
 auto EntityManager::setVerbose(const bool verbose) -> void
 {
-  configuration.verbose = verbose;
+  configuration_.verbose = verbose;
   for (const auto & [name, entity_ptr] : entities_) {
     entity_ptr->verbose = verbose;
   }
@@ -66,12 +66,12 @@ auto EntityManager::makeDebugMarker() const -> visualization_msgs::msg::MarkerAr
 auto EntityManager::update(const double current_time, const double step_time) -> void
 {
   traffic_simulator::helper::StopWatch<std::chrono::milliseconds> stop_watch_update(
-    "EntityManager::update", configuration.verbose);
-  setVerbose(configuration.verbose);
+    "EntityManager::update", configuration_.verbose);
+  setVerbose(configuration_.verbose);
   if (npc_logic_started_) {
     traffic_lights_ptr_->startTrafficLightsUpdate(
-      configuration.conventional_traffic_light_publish_rate,
-      configuration.v2i_traffic_light_publish_rate);
+      configuration_.conventional_traffic_light_publish_rate,
+      configuration_.v2i_traffic_light_publish_rate);
   }
   std::unordered_map<std::string, CanonicalizedEntityStatus> all_status;
   for (const auto & [name, entity_ptr] : entities_) {
@@ -108,7 +108,7 @@ auto EntityManager::update(const double current_time, const double step_time) ->
   }
   entity_status_array_pub_ptr_->publish(status_array_msg);
   stop_watch_update.stop();
-  if (configuration.verbose) {
+  if (configuration_.verbose) {
     stop_watch_update.print();
   }
 }
@@ -117,7 +117,7 @@ auto EntityManager::updateNpcLogic(
   const std::string & name, const double current_time, const double step_time)
   -> const CanonicalizedEntityStatus &
 {
-  if (configuration.verbose) {
+  if (configuration_.verbose) {
     std::cout << "update " << name << " behavior" << std::endl;
   }
   auto & entity = getEntity(name);

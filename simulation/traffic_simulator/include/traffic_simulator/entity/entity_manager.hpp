@@ -80,7 +80,7 @@ public:
   explicit EntityManager(
     NodeT && node, const Configuration & configuration,
     const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node_parameters)
-  : configuration(configuration),
+  : configuration_(configuration),
     node_topics_interface(rclcpp::node_interfaces::get_node_topics_interface(node)),
     node_parameters_(node_parameters),
     broadcaster_(node),
@@ -94,7 +94,7 @@ public:
       node, "lanelet/marker", LaneletMarkerQoS(),
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
     hdmap_utils_ptr_(std::make_shared<hdmap_utils::HdMapUtils>(
-      configuration.lanelet2_map_path(), getOrigin(*node))),
+      configuration_.lanelet2_map_path(), getOrigin(*node))),
     markers_raw_(hdmap_utils_ptr_->generateMarker())
   {
     updateHdmapMarker();
@@ -316,7 +316,7 @@ public:
   }
 
 private:
-  Configuration configuration;
+  Configuration configuration_;
 
   std::shared_ptr<rclcpp::node_interfaces::NodeTopicsInterface> node_topics_interface;
   const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr node_parameters_;

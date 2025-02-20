@@ -98,7 +98,7 @@ auto API::updateTrafficLightsInSim() -> bool
 
 auto API::updateFrame() -> bool
 {
-  if (configuration.standalone_mode && entity_manager_ptr_->isAnyEgoSpawned()) {
+  if (configuration_.standalone_mode && entity_manager_ptr_->isAnyEgoSpawned()) {
     THROW_SEMANTIC_ERROR("Ego simulation is no longer supported in standalone mode");
   }
 
@@ -109,7 +109,7 @@ auto API::updateFrame() -> bool
   entity_manager_ptr_->update(getCurrentTime(), clock_.getStepTime());
   traffic_controller_ptr_->execute(getCurrentTime(), clock_.getStepTime());
 
-  if (not configuration.standalone_mode) {
+  if (not configuration_.standalone_mode) {
     if (!updateTrafficLightsInSim() || !updateTimeInSim()) {
       return false;
     }
@@ -142,7 +142,7 @@ auto API::attachPseudoTrafficLightDetector(
 auto API::attachLidarSensor(const simulation_api_schema::LidarConfiguration & lidar_configuration)
   -> bool
 {
-  if (configuration.standalone_mode) {
+  if (configuration_.standalone_mode) {
     return true;
   } else {
     simulation_api_schema::AttachLidarSensorRequest req;
@@ -164,7 +164,7 @@ auto API::attachLidarSensor(
 auto API::attachDetectionSensor(
   const simulation_api_schema::DetectionSensorConfiguration & sensor_configuration) -> bool
 {
-  if (configuration.standalone_mode) {
+  if (configuration_.standalone_mode) {
     return true;
   } else {
     simulation_api_schema::AttachDetectionSensorRequest req;
@@ -187,7 +187,7 @@ auto API::attachDetectionSensor(
 auto API::attachOccupancyGridSensor(
   const simulation_api_schema::OccupancyGridSensorConfiguration & sensor_configuration) -> bool
 {
-  if (configuration.standalone_mode) {
+  if (configuration_.standalone_mode) {
     return true;
   } else {
     simulation_api_schema::AttachOccupancyGridSensorRequest req;
@@ -257,7 +257,7 @@ auto API::despawn(const std::string & name) -> bool
   if (!result) {
     return false;
   }
-  if (not configuration.standalone_mode) {
+  if (not configuration_.standalone_mode) {
     simulation_api_schema::DespawnEntityRequest req;
     req.set_name(name);
     return zeromq_client_.call(req).result().success();
