@@ -36,7 +36,6 @@
 #include <traffic_simulator/entity/misc_object_entity.hpp>
 #include <traffic_simulator/entity/pedestrian_entity.hpp>
 #include <traffic_simulator/entity/vehicle_entity.hpp>
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/traffic_lights/configurable_rate_updater.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_marker_publisher.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_publisher.hpp>
@@ -92,8 +91,6 @@ class EntityManager
   using MarkerArray = visualization_msgs::msg::MarkerArray;
   const rclcpp::Publisher<MarkerArray>::SharedPtr lanelet_marker_pub_ptr_;
 
-  const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
-
   MarkerArray markers_raw_;
 
   std::shared_ptr<traffic_simulator::TrafficLights> traffic_lights_ptr_;
@@ -108,24 +105,6 @@ public:
     const std::shared_ptr<traffic_simulator::TrafficLights> & traffic_lights_ptr) -> void
   {
     traffic_lights_ptr_ = traffic_lights_ptr;
-  }
-
-  template <typename Node>
-  auto getOrigin(Node & node) const
-  {
-    geographic_msgs::msg::GeoPoint origin;
-    {
-      if (!node.has_parameter("origin_latitude")) {
-        node.declare_parameter("origin_latitude", 0.0);
-      }
-      if (!node.has_parameter("origin_longitude")) {
-        node.declare_parameter("origin_longitude", 0.0);
-      }
-      node.get_parameter("origin_latitude", origin.latitude);
-      node.get_parameter("origin_longitude", origin.longitude);
-    }
-
-    return origin;
   }
 
   template <class NodeT, class AllocatorT = std::allocator<void>>
@@ -145,11 +124,9 @@ public:
     lanelet_marker_pub_ptr_(rclcpp::create_publisher<MarkerArray>(
       node, "lanelet/marker", LaneletMarkerQoS(),
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
-    hdmap_utils_ptr_(std::make_shared<hdmap_utils::HdMapUtils>(
-      configuration.lanelet2_map_path(), getOrigin(*node))),
-    markers_raw_(hdmap_utils_ptr_->generateMarker())
+    markers_raw_(lanelet_map::visualizationMarker())
   {
-    updateHdmapMarker();
+    updateLaneletMarker();
   }
 
   ~EntityManager() = default;
@@ -181,8 +158,6 @@ public:
   auto getEgoEntity(const std::string & name) -> entity::EgoEntity &;
 
   auto getEgoEntity(const std::string & name) const -> const entity::EgoEntity &;
-
-  auto getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &;
 
   auto getNumberOfEgo() const -> std::size_t;
 
@@ -305,8 +280,7 @@ public:
 
     if (const auto [iter, success] = entities_.emplace(
           name, std::make_unique<Entity>(
-                  name, makeEntityStatus(), hdmap_utils_ptr_, parameters,
-                  std::forward<decltype(xs)>(xs)...));
+                  name, makeEntityStatus(), parameters, std::forward<decltype(xs)>(xs)...));
         success) {
       // FIXME: this ignores V2I traffic lights
       iter->second->setTrafficLights(traffic_lights_ptr_->getConventionalTrafficLights());
@@ -331,7 +305,7 @@ public:
 
   void update(const double current_time, const double step_time);
 
-  void updateHdmapMarker();
+  void updateLaneletMarker();
 
   auto startNpcLogic(const double current_time) -> void;
 

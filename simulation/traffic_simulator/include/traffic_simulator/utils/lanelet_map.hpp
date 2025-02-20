@@ -37,6 +37,9 @@ inline auto activate(Ts &&... xs)
 
 auto laneletLength(const lanelet::Id lanelet_id) -> double;
 
+auto laneletYaw(const Point & point, const lanelet::Id lanelet_id)
+  -> std::tuple<double, Point, Point>;
+
 auto laneletAltitude(
   const lanelet::Id & lanelet_id, const geometry_msgs::msg::Pose & pose,
   const double matching_distance) -> std::optional<double>;
@@ -48,6 +51,8 @@ auto nearbyLaneletIds(
 /// @brief Calculates all poses on the map that have no next lanelet (dead ends)
 /// @return A vector of final poses and their corresponding lanelet IDs
 auto noNextLaneletPoses() -> std::vector<std::pair<lanelet::Id, Pose>>;
+
+auto visualizationMarker() -> visualization_msgs::msg::MarkerArray;
 }  // namespace lanelet_map
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__UTILS__LANELET_MAP_HPP_
