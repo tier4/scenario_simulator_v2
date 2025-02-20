@@ -140,7 +140,7 @@ auto EntityManager::updateNpcLogic(
   return entity.getCanonicalizedStatus();
 }
 
-auto EntityManager::updateHdmapMarker() -> void
+auto EntityManager::updateHdmapMarker() const -> void
 {
   MarkerArray markers;
   const auto stamp = clock_ptr_->now();

@@ -302,8 +302,8 @@ public:
   auto despawnEntities() -> bool;
 
   // entities - features
-  auto checkCollision(const std::string & first_entity_name, const std::string & second_entity_name)
-    -> bool;
+  auto checkCollision(
+    const std::string & first_entity_name, const std::string & second_entity_name) const -> bool;
 
   // traffics, lanelet
   auto getHdmapUtils() const -> const std::shared_ptr<hdmap_utils::HdMapUtils> &;

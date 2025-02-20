@@ -124,7 +124,7 @@ public:
   auto updateNpcLogic(const std::string & name, const double current_time, const double step_time)
     -> const CanonicalizedEntityStatus &;
 
-  auto updateHdmapMarker() -> void;
+  auto updateHdmapMarker() const -> void;
 
   auto broadcastEntityTransform() -> void;
 
