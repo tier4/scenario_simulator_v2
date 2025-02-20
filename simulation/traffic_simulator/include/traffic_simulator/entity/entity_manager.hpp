@@ -191,7 +191,7 @@ public:
           "LaneletPose is not supported type as pose argument. Only CanonicalizedLaneletPose and "
           "msg::Pose are supported as pose argument of EntityManager::spawnEntity().");
       } else if constexpr (std::is_same_v<std::decay_t<PoseType>, CanonicalizedLaneletPose>) {
-        entity_status.pose = pose::toMapPose(pose);
+        entity_status.pose = toMapPose(pose);
         return CanonicalizedEntityStatus(entity_status, pose);
       } else if constexpr (std::is_same_v<std::decay_t<PoseType>, geometry_msgs::msg::Pose>) {
         entity_status.pose = pose;
