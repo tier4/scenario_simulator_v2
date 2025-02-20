@@ -1,21 +1,15 @@
 #!/bin/sh
 
-if [ $# -ne 1 ]; then
-    echo "Usage: $0 <workflow_directory>"
-    exit 1
-fi
-
-workflow_directory="$1"
-failure_report="$workflow_directory/failure_report.md"
+failure_report="/tmp/scenario_workflow/failure_report.md"
 
 rm -f "$failure_report"
 touch "$failure_report"
 
-for file in "$workflow_directory"/*.junit.xml; do
+find /tmp/scenario_workflow -name "result.junit.xml" | while read file; do
   [ -e "$file" ] || continue
   if grep -q '<failure' "$file"; then
     {
-      echo "<details><summary>scenario failed: $(basename "$file")</summary><div>\n\n\`\`\`xml"
+      echo "<details><summary>scenario failed: $(dirname "${file#/tmp/scenario_workflow/}" | cut -d'/' -f1)</summary><div>\n\n\`\`\`xml"
       grep '<failure' "$file"
       echo "\`\`\`\n</div></details>\n"
     } >> "$failure_report"
