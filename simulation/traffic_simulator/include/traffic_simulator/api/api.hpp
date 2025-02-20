@@ -197,9 +197,9 @@ public:
     return register_to_entity_manager() and register_to_environment_simulator();
   }
 
-  template <typename Pose>
+  template <typename PoseType>
   auto spawn(
-    const std::string & name, const Pose & pose,
+    const std::string & name, const PoseType & pose,
     const traffic_simulator_msgs::msg::PedestrianParameters & parameters,
     const std::string & behavior = PedestrianBehavior::defaultBehavior(),
     const std::string & model3d = "")
@@ -229,9 +229,9 @@ public:
     return register_to_entity_manager() and register_to_environment_simulator();
   }
 
-  template <typename Pose>
+  template <typename PoseType>
   auto spawn(
-    const std::string & name, const Pose & pose,
+    const std::string & name, const PoseType & pose,
     const traffic_simulator_msgs::msg::MiscObjectParameters & parameters,
     const std::string & model3d = "")
   {
