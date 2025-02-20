@@ -21,6 +21,18 @@ Changelog for package traffic_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+11.0.0 (2025-02-20)
+-------------------
+* Merge pull request `#1531 <https://github.com/tier4/scenario_simulator_v2/issues/1531>`_ from tier4/refactor/lanelet_wrapper_route
+  HdMapUtils refactor lanelet_wrapper::route
+* Merge branch 'master' into refactor/lanelet_wrapper_route
+* fix format
+* use non member route function `getAlternativeLaneletPoseBaseOnShortestRouteFrom`
+* use non member route function `findRoutableAlternativeLaneletPoseFrom`
+* add route::route utils
+* Implement static route function in lanelet_wrapper
+* Contributors: Masaya Kataoka, Tatsuya Yamasaki, abco20
+
 10.3.3 (2025-02-18)
 -------------------
 * Merge branch 'master' into refactor/simple_sensor_simulator/noise

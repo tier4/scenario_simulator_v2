@@ -21,6 +21,11 @@ Changelog for package openscenario_msgs
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+11.0.0 (2025-02-20)
+-------------------
+* Merge branch 'master' into refactor/lanelet_wrapper_route
+* Contributors: Tatsuya Yamasaki
+
 10.3.3 (2025-02-18)
 -------------------
 * Merge branch 'master' into refactor/simple_sensor_simulator/noise
