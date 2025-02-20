@@ -86,7 +86,7 @@ double LaneletUtils::computeDistance(
 
 bool LaneletUtils::isInLanelet(int64_t lanelet_id, double s) const
 {
-  return hdmap_utils_ptr_->isInLanelet(lanelet_id, s);
+  return traffic_simulator::lanelet_wrapper::lanelet_map::isInLanelet(lanelet_id, s);
 }
 
 std::optional<traffic_simulator_msgs::msg::LaneletPose> LaneletUtils::getOppositeLaneLet(

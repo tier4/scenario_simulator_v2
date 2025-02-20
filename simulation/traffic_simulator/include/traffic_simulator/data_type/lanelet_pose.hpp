@@ -22,7 +22,6 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/data_type/routing_configuration.hpp>
 #include <traffic_simulator/data_type/routing_graph_type.hpp>
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
 
 namespace traffic_simulator
