@@ -774,7 +774,8 @@ auto EntityBase::requestSynchronize(
       RoutingConfiguration lane_changeable_routing_configuration;
       lane_changeable_routing_configuration.allow_lane_change = true;
 
-      if (other_status_.find(target_name) == other_status_.end()) {
+      if (const auto target_entity_status_it = other_status_.find(target_name);
+          target_entity_status_it == other_status_.end()) {
         THROW_SEMANTIC_ERROR(
           "requestSynchronize(): Entity ", std::quoted(target_name), " does not exist.");
       } else if (const auto canonicalized_lanelet_pose = getCanonicalizedLaneletPose();
@@ -782,7 +783,7 @@ auto EntityBase::requestSynchronize(
         THROW_SEMANTIC_ERROR(
           "requestSynchronize(): Failed to get lanelet pose of the entity: ", std::quoted(name));
       } else if (const auto target_entity_canonicalized_lanelet_pose =
-                   other_status_.find(target_name)->second.getCanonicalizedLaneletPose();
+                   target_entity_status_it->second.getCanonicalizedLaneletPose();
                  !target_entity_canonicalized_lanelet_pose.has_value()) {
         THROW_SEMANTIC_ERROR(
           "requestSynchronize(): Failed to get lanelet pose of the target entity: ",
@@ -809,8 +810,7 @@ auto EntityBase::requestSynchronize(
             << std::quoted(target_name) << " has already passed the target lanelet.");
         return true;
       } else {
-        const auto target_entity_velocity =
-          other_status_.find(target_name)->second.getTwist().linear.x;
+        const auto target_entity_velocity = target_entity_status_it->second.getTwist().linear.x;
         const auto entity_velocity = getCurrentTwist().linear.x;
         const auto target_entity_arrival_time =
           (std::abs(target_entity_velocity) > std::numeric_limits<double>::epsilon())
