@@ -29,6 +29,7 @@
 
 namespace traffic_simulator
 {
+// global
 auto API::setVerbose(const bool verbose) -> void { entity_manager_ptr_->setVerbose(verbose); }
 
 auto API::startNpcLogic() -> void
@@ -43,6 +44,7 @@ auto API::startNpcLogic() -> void
 
 auto API::isNpcLogicStarted() const -> bool { return entity_manager_ptr_->isNpcLogicStarted(); }
 
+// update
 auto API::updateTimeInSim() -> bool
 {
   simulation_api_schema::UpdateFrameRequest request;
@@ -125,6 +127,7 @@ auto API::updateFrame() -> bool
   return true;
 }
 
+// sensors - attach
 auto API::attachImuSensor(
   const std::string &, const simulation_api_schema::ImuSensorConfiguration & configuration) -> bool
 {
@@ -198,6 +201,7 @@ auto API::attachOccupancyGridSensor(
   }
 }
 
+// ego - checks, getters
 auto API::getFirstEgoName() const -> std::optional<std::string>
 {
   return entity_manager_ptr_->getFirstEgoName();
@@ -213,6 +217,7 @@ auto API::getEgoEntity(const std::string & name) const -> const entity::EgoEntit
   return entity_manager_ptr_->getEgoEntity(name);
 }
 
+// entities - checks, getters
 auto API::isEntityExist(const std::string & name) const -> bool
 {
   return entity_manager_ptr_->isEntityExist(name);
@@ -238,6 +243,7 @@ auto API::getEntityPointer(const std::string & name) const -> std::shared_ptr<en
   return entity_manager_ptr_->getEntityPointer(name);
 }
 
+// entities - respawn, despawn, reset
 auto API::resetBehaviorPlugin(const std::string & name, const std::string & behavior_plugin_name)
   -> void
 {
@@ -310,6 +316,7 @@ auto API::despawnEntities() -> bool
     entities.begin(), entities.end(), [&](const auto & entity) { return despawn(entity); });
 }
 
+// entities - features
 auto API::checkCollision(
   const std::string & first_entity_name, const std::string & second_entity_name) -> bool
 {

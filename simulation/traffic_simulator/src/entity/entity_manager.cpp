@@ -37,6 +37,7 @@ namespace traffic_simulator
 {
 namespace entity
 {
+// global
 auto EntityManager::setVerbose(const bool verbose) -> void
 {
   configuration_.verbose = verbose;
@@ -63,6 +64,7 @@ auto EntityManager::makeDebugMarker() const -> visualization_msgs::msg::MarkerAr
   return marker;
 }
 
+// update
 auto EntityManager::update(const double current_time, const double step_time) -> void
 {
   traffic_simulator::helper::StopWatch<std::chrono::milliseconds> stop_watch_update(
@@ -217,6 +219,7 @@ auto EntityManager::broadcastTransform(
   }
 }
 
+// ego - checks, getters
 auto EntityManager::getNumberOfEgo() const -> std::size_t
 {
   return std::count_if(std::begin(entities_), std::end(entities_), [this](const auto & each) {
@@ -264,6 +267,7 @@ auto EntityManager::getEgoEntity(const std::string & name) const -> const entity
   }
 }
 
+// entities - checks, getters
 auto EntityManager::isEntityExist(const std::string & name) const -> bool
 {
   return entities_.find(name) != std::end(entities_);
@@ -313,6 +317,7 @@ auto EntityManager::getEntityPointer(const std::string & name) const
   }
 };
 
+// entities - respawn, despawn, reset
 auto EntityManager::resetBehaviorPlugin(
   const std::string & name, const std::string & behavior_plugin_name) -> void
 {
@@ -352,6 +357,7 @@ auto EntityManager::despawnEntity(const std::string & name) -> bool
   return isEntityExist(name) && entities_.erase(name);
 }
 
+// traffics, lanelet
 auto EntityManager::getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &
 {
   return hdmap_utils_ptr_;
