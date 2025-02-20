@@ -44,6 +44,10 @@ auto API::startNpcLogic() -> void
 
 auto API::isNpcLogicStarted() const -> bool { return entity_manager_ptr_->isNpcLogicStarted(); }
 
+auto API::getCurrentTime() const noexcept -> double { return clock_.getCurrentScenarioTime(); }
+
+auto API::closeZMQConnection() -> void { zeromq_client_.closeConnection(); }
+
 // update
 auto API::updateTimeInSim() -> bool
 {
@@ -339,18 +343,28 @@ auto API::getHdmapUtils() const -> const std::shared_ptr<hdmap_utils::HdMapUtils
   return entity_manager_ptr_->getHdmapUtils();
 }
 
+auto API::getV2ITrafficLights() const -> std::shared_ptr<V2ITrafficLights>
+{
+  return traffic_lights_ptr_->getV2ITrafficLights();
+}
+
+auto API::getConventionalTrafficLights() const -> std::shared_ptr<ConventionalTrafficLights>
+{
+  return traffic_lights_ptr_->getConventionalTrafficLights();
+}
+
 auto API::addTrafficSource(
   const double radius, const double rate, const double speed, const geometry_msgs::msg::Pose & pose,
   const traffic::TrafficSource::Distribution & distribution, const bool allow_spawn_outside_lane,
   const bool require_footprint_fitting, const bool random_orientation, std::optional<int> seed)
   -> void
 {
-  traffic_simulator::traffic::TrafficSource::Configuration configuration;
+  traffic::TrafficSource::Configuration configuration;
   configuration.allow_spawn_outside_lane = allow_spawn_outside_lane;
   configuration.require_footprint_fitting = require_footprint_fitting;
   configuration.use_random_orientation = random_orientation;
 
-  traffic_controller_ptr_->addModule<traffic_simulator::traffic::TrafficSource>(
+  traffic_controller_ptr_->addModule<traffic::TrafficSource>(
     radius, rate, pose, distribution, seed, getCurrentTime(), configuration,
     entity_manager_ptr_->getHdmapUtils(), [this, speed](const auto & name, auto &&... xs) {
       this->spawn(name, std::forward<decltype(xs)>(xs)...);

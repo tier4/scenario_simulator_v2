@@ -108,17 +108,13 @@ public:
      so it can be assigned during the call of the EntityManager constructor.
      TrafficLights cannot be created before the EntityManager due to the dependency on HdMapUtils.
    */
-  auto setTrafficLights(
-    const std::shared_ptr<traffic_simulator::TrafficLights> & traffic_lights_ptr) -> void
-  {
-    traffic_lights_ptr_ = traffic_lights_ptr;
-  }
+  auto setTrafficLights(const std::shared_ptr<TrafficLights> & traffic_lights_ptr) -> void;
 
   auto setVerbose(const bool verbose) -> void;
 
   auto startNpcLogic(const double current_time) -> void;
 
-  auto isNpcLogicStarted() const -> bool { return npc_logic_started_; }
+  auto isNpcLogicStarted() const -> bool;
 
   auto makeDebugMarker() const -> visualization_msgs::msg::MarkerArray;
 
@@ -195,7 +191,7 @@ public:
           "LaneletPose is not supported type as pose argument. Only CanonicalizedLaneletPose and "
           "msg::Pose are supported as pose argument of EntityManager::spawnEntity().");
       } else if constexpr (std::is_same_v<std::decay_t<PoseType>, CanonicalizedLaneletPose>) {
-        entity_status.pose = pose::toMapPose(pose);
+        entity_status.pose = toMapPose(pose);
         return CanonicalizedEntityStatus(entity_status, pose);
       } else if constexpr (std::is_same_v<std::decay_t<PoseType>, geometry_msgs::msg::Pose>) {
         entity_status.pose = pose;
@@ -238,8 +234,7 @@ public:
 
   auto getEntity(const std::string & name) const -> const entity::EntityBase &;
 
-  auto getEntityPointer(const std::string & name) const
-    -> std::shared_ptr<traffic_simulator::entity::EntityBase>;
+  auto getEntityPointer(const std::string & name) const -> std::shared_ptr<entity::EntityBase>;
 
   // entities - respawn, despawn, reset
   /**
@@ -247,8 +242,8 @@ public:
    * The internal behavior is to take over the various parameters and save them, then respawn the Entity and set the parameters.
    * @param name The name of the target entity.
    * @param behavior_plugin_name The name of the behavior plugin you want to set.
-   * @sa traffic_simulator::entity::PedestrianEntity::BuiltinBehavior
-   * @sa traffic_simulator::entity::VehicleEntity::BuiltinBehavior
+   * @sa entity::PedestrianEntity::BuiltinBehavior
+   * @sa entity::VehicleEntity::BuiltinBehavior
    */
   auto resetBehaviorPlugin(const std::string & name, const std::string & behavior_plugin_name)
     -> void;
@@ -333,7 +328,7 @@ private:
 
   const rclcpp::Clock::SharedPtr clock_ptr_;
 
-  std::unordered_map<std::string, std::shared_ptr<traffic_simulator::entity::EntityBase>> entities_;
+  std::unordered_map<std::string, std::shared_ptr<entity::EntityBase>> entities_;
 
   bool npc_logic_started_;
 
@@ -345,7 +340,7 @@ private:
 
   MarkerArray markers_raw_;
 
-  std::shared_ptr<traffic_simulator::TrafficLights> traffic_lights_ptr_;
+  std::shared_ptr<TrafficLights> traffic_lights_ptr_;
 };
 }  // namespace entity
 }  // namespace traffic_simulator

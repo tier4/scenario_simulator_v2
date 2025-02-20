@@ -38,6 +38,12 @@ namespace traffic_simulator
 namespace entity
 {
 // global
+auto EntityManager::setTrafficLights(const std::shared_ptr<TrafficLights> & traffic_lights_ptr)
+  -> void
+{
+  traffic_lights_ptr_ = traffic_lights_ptr;
+}
+
 auto EntityManager::setVerbose(const bool verbose) -> void
 {
   configuration_.verbose = verbose;
@@ -55,6 +61,8 @@ auto EntityManager::startNpcLogic(const double current_time) -> void
   }
 }
 
+auto EntityManager::isNpcLogicStarted() const -> bool { return npc_logic_started_; }
+
 auto EntityManager::makeDebugMarker() const -> visualization_msgs::msg::MarkerArray
 {
   visualization_msgs::msg::MarkerArray marker;
@@ -67,7 +75,7 @@ auto EntityManager::makeDebugMarker() const -> visualization_msgs::msg::MarkerAr
 // update
 auto EntityManager::update(const double current_time, const double step_time) -> void
 {
-  traffic_simulator::helper::StopWatch<std::chrono::milliseconds> stop_watch_update(
+  helper::StopWatch<std::chrono::milliseconds> stop_watch_update(
     "EntityManager::update", configuration_.verbose);
   setVerbose(configuration_.verbose);
   if (npc_logic_started_) {
