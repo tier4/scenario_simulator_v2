@@ -36,7 +36,6 @@
 #include <concealer/service.hpp>
 #include <concealer/subscriber.hpp>
 #include <concealer/task_queue.hpp>
-#include <concealer/transition_assertion.hpp>
 #include <concealer/visibility.hpp>
 #include <geometry_msgs/msg/accel.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
@@ -54,8 +53,7 @@
 
 namespace concealer
 {
-struct FieldOperatorApplication : public rclcpp::Node,
-                                  public TransitionAssertion<FieldOperatorApplication>
+struct FieldOperatorApplication : public rclcpp::Node
 {
   std::atomic<bool> is_stop_requested = false;
 
@@ -63,7 +61,11 @@ struct FieldOperatorApplication : public rclcpp::Node,
 
   const pid_t process_id = 0;
 
-  bool initialized = false;
+  bool initialized = false, engaged_ = false;
+
+  std::chrono::steady_clock::time_point start;
+
+  std::chrono::seconds initialize_duration;
 
   std::string autoware_state = "LAUNCHING";
 
@@ -118,6 +120,23 @@ struct FieldOperatorApplication : public rclcpp::Node,
      declaration order and deconstructed in reverse order.)
   */
   TaskQueue task_queue;
+
+  template <typename Thunk = void (*)(), typename Interval = std::chrono::seconds>
+  auto waitForAutowareStateToBe(
+    const std::string & state, Thunk thunk = [] {}, Interval interval = std::chrono::seconds(1))
+  {
+    for (thunk(); not is_stop_requested.load() and autoware_state != state;
+         rclcpp::GenericRate<std::chrono::steady_clock>(interval).sleep()) {
+      if (not engaged_ and start + initialize_duration <= std::chrono::steady_clock::now()) {
+        throw common::AutowareError(
+          "Simulator waited for the Autoware state to transition to ", state,
+          ", but time is up. The current Autoware state is ",
+          (autoware_state.empty() ? "not published yet" : autoware_state));
+      } else {
+        thunk();
+      }
+    }
+  }
 
   CONCEALER_PUBLIC explicit FieldOperatorApplication(const pid_t);
 

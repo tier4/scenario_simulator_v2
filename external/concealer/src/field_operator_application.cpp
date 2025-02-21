@@ -80,6 +80,8 @@ auto toModuleType(const std::string & module_name)
 FieldOperatorApplication::FieldOperatorApplication(const pid_t pid)
 : rclcpp::Node("concealer_user", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),
   process_id(pid),
+  start(std::chrono::steady_clock::now()),
+  initialize_duration(getParameter<int>("initialize_duration")),
   getAutowareState("/autoware/state", rclcpp::QoS(1), *this, [this](const auto & message) {
     auto state_name_of = [](auto state) constexpr {
       switch (state) {
@@ -292,6 +294,7 @@ auto FieldOperatorApplication::engage() -> void
         return;  // Ignore error because this service is validated by Autoware state transition.
       }
     });
+    engaged_ = true;
   });
 }
 
