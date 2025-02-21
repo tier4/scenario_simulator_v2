@@ -141,8 +141,6 @@ struct FieldOperatorApplication : public rclcpp::Node,
 
   auto requestAutoModeForCooperation(const std::string &, bool) -> void;
 
-  auto rethrow() const { task_queue.rethrow(); }
-
   auto sendCooperateCommand(const std::string &, const std::string &) -> void;
 
   auto setVelocityLimit(double) -> void;

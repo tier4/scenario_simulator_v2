@@ -297,13 +297,13 @@ auto FieldOperatorApplication::engage() -> void
 
 auto FieldOperatorApplication::engageable() const -> bool
 {
-  rethrow();
+  task_queue.rethrow();
   return task_queue.exhausted() and autoware_state == "WAITING_FOR_ENGAGE";
 }
 
 auto FieldOperatorApplication::engaged() const -> bool
 {
-  rethrow();
+  task_queue.rethrow();
   return task_queue.exhausted() and autoware_state == "DRIVING";
 }
 
@@ -520,6 +520,8 @@ auto FieldOperatorApplication::setVelocityLimit(double velocity_limit) -> void
 
 auto FieldOperatorApplication::spinSome() -> void
 {
+  task_queue.rethrow();
+
   if (rclcpp::ok() and not is_stop_requested.load()) {
     if (process_id != 0) {
       auto status = 0;
