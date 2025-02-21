@@ -16,6 +16,7 @@
 #define CONCEALER__TRANSITION_ASSERTION_HPP_
 
 #include <chrono>
+#include <concealer/get_parameter.hpp>
 #include <rclcpp/node.hpp>
 #include <rclcpp/rate.hpp>
 #include <scenario_simulator_exception/exception.hpp>
@@ -26,18 +27,15 @@ template <typename Autoware>
 struct TransitionAssertion
 {
 protected:
-  const std::chrono::steady_clock::time_point start;
+  std::chrono::steady_clock::time_point start;
 
-  const std::chrono::seconds initialize_duration;
+  std::chrono::seconds initialize_duration;
 
-  bool have_never_been_engaged = true;
+  bool engaged = false;
 
   explicit TransitionAssertion()
-  : start(std::chrono::steady_clock::now()), initialize_duration([]() {
-      auto node = rclcpp::Node("get_parameter", "simulation");
-      node.declare_parameter("initialize_duration", 0);
-      return node.get_parameter("initialize_duration").as_int();
-    }())
+  : start(std::chrono::steady_clock::now()),
+    initialize_duration(getParameter<int>("initialize_duration"))
   {
   }
 
@@ -48,21 +46,20 @@ protected:
     for (thunk(); not static_cast<const Autoware &>(*this).is_stop_requested.load() and
                   static_cast<const Autoware &>(*this).autoware_state != state;
          rclcpp::GenericRate<std::chrono::steady_clock>(interval).sleep()) {
-      if (
-        have_never_been_engaged and
-        start + initialize_duration <= std::chrono::steady_clock::now()) {
-        const auto state = static_cast<const Autoware &>(*this).autoware_state;
+      if (not engaged and start + initialize_duration <= std::chrono::steady_clock::now()) {
         throw common::AutowareError(
           "Simulator waited for the Autoware state to transition to ", state,
           ", but time is up. The current Autoware state is ",
-          (state.empty() ? "not published yet" : state));
+          (static_cast<const Autoware &>(*this).autoware_state.empty()
+             ? "not published yet"
+             : static_cast<const Autoware &>(*this).autoware_state));
       } else {
         thunk();
       }
     }
 
     if (state == "DRIVING") {
-      have_never_been_engaged = false;
+      engaged = true;
     }
   }
 };
