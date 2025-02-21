@@ -283,7 +283,7 @@ auto FieldOperatorApplication::enableAutowareControl() -> void
 auto FieldOperatorApplication::engage() -> void
 {
   task_queue.delay([this]() {
-    waitForAutowareStateToBe_DRIVING([this]() {
+    waitForAutowareStateToBe("DRIVING", [this]() {
       auto request = std::make_shared<Engage::Request>();
       request->engage = true;
       try {
@@ -322,7 +322,7 @@ auto FieldOperatorApplication::initialize(const geometry_msgs::msg::Pose & initi
 {
   if (not std::exchange(initialized, true)) {
     task_queue.delay([this, initial_pose]() {
-      waitForAutowareStateToBe_WAITING_FOR_ROUTE([&]() {
+      waitForAutowareStateToBe("WAITING_FOR_ROUTE", [&]() {
 #if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)
         if (getLocalizationState().state != LocalizationInitializationState::UNINITIALIZED) {
           return;
@@ -352,7 +352,7 @@ auto FieldOperatorApplication::plan(const std::vector<geometry_msgs::msg::PoseSt
   assert(not route.empty());
 
   task_queue.delay([this, route] {
-    waitForAutowareStateToBe_WAITING_FOR_ROUTE();  // NOTE: This is assertion.
+    waitForAutowareStateToBe("WAITING_FOR_ROUTE");  // NOTE: This is assertion.
 
     auto request = std::make_shared<SetRoutePoints::Request>();
 
@@ -386,7 +386,7 @@ auto FieldOperatorApplication::plan(const std::vector<geometry_msgs::msg::PoseSt
 
     requestSetRoutePoints(request, 1);
 
-    waitForAutowareStateToBe_WAITING_FOR_ENGAGE();
+    waitForAutowareStateToBe("WAITING_FOR_ENGAGE");
   });
 }
 
@@ -522,7 +522,7 @@ auto FieldOperatorApplication::spinSome() -> void
 {
   task_queue.rethrow();
 
-  if (rclcpp::ok() and not is_stop_requested.load()) {
+  if (rclcpp::ok()) {
     if (process_id != 0) {
       auto status = 0;
       if (const auto id = waitpid(process_id, &status, WNOHANG); id < 0) {
