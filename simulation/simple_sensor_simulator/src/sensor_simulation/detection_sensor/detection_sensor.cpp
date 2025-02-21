@@ -358,17 +358,37 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
         };
 
         /*
-           We use AR(1) model to model noises' autocorrelation coefficients for
-           all kinds of noises. We define the `tau` used for AR(1) from
-           `delta_t`, which means the time interval when the autocorrelation
-           coefficient becomes `correlation_for_delta_t`.
+           We use AR(1) model to model the autocorrelation coefficients `phi` for 
+           noises(distance_noise, yaw_noise) with Gaussian distribution, by the 
+           following formula:
+            noise(prev_noise) = mean + phi * (prev_noise - mean) + N(0, 1 - phi^2) * standard_deviation
+  
+           We use Markov process to model the autocorrelation coefficients `rho` 
+           for noises(flip, tp) with Bernoulli distribution, by the transition matrix:
+            | p_00 p_01 |   ==   | p0 + rho * p1         p1(1 - rho)   |
+            | p_10 p_11 |   ==   | p0(1 - rho)           p1 - rho * p0 |
+
+           In the code, we use `phi` for the above autocorrelation coefficients `phi` or `rho`,
+           Which is calculated from the time_interval `dt` by the following formula:
+            phi(dt) = amplitude * exp(-decay * dt) + offset
         */
-        static const auto correlation_for_delta_t = parameter("correlation_for_delta_t");
 
         auto ar1_noise = [this](auto previous_noise, auto mean, auto standard_deviation, auto phi) {
           return mean + phi * (previous_noise - mean) +
                  std::normal_distribution<double>(
                    0, standard_deviation * std::sqrt(1 - phi * phi))(random_engine_);
+        };
+
+        auto mp_noise = [this](bool is_previous_noise_1, auto p1, auto phi) {
+          auto rate = (is_previous_noise_1 ? 1.0 : 0.0) * phi + (1 - phi) * p1;
+          return std::uniform_real_distribution<double>()(random_engine_) < rate;
+        };
+
+        auto get_phi = [&](const auto & interval, const std::string & name) {
+          static const auto amplitude = parameter(name + ".phi_amplitude");
+          static const auto decay = parameter(name + ".phi_decay");
+          static const auto offset = parameter(name + ".phi_offset");
+          return std::clamp(amplitude * std::exp(-interval * decay) + offset, 0.0, 1.0);
         };
 
         auto selector = [&](auto ellipse_normalized_x_radius, const auto & targets) {
@@ -393,50 +413,41 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
         };
 
         noise_output->second.distance_noise = [&]() {
-          static const auto tau =
-            -parameter("distance.delta_t") / std::log(correlation_for_delta_t);
           static const auto mean = selector(
             parameter("distance.ellipse_normalized_x_radius.mean"), parameters("distance.means"));
           static const auto standard_deviation = selector(
             parameter("distance.ellipse_normalized_x_radius.standard_deviation"),
             parameters("distance.standard_deviations"));
-          const auto phi = std::exp(-interval / tau);
+          const auto phi = get_phi(interval, "distance");
           return ar1_noise(noise_output->second.distance_noise, mean(), standard_deviation(), phi);
         }();
 
         noise_output->second.yaw_noise = [&]() {
-          static const auto tau = -parameter("yaw.delta_t") / std::log(correlation_for_delta_t);
           static const auto mean =
             selector(parameter("yaw.ellipse_normalized_x_radius.mean"), parameters("yaw.means"));
           static const auto standard_deviation = selector(
             parameter("yaw.ellipse_normalized_x_radius.standard_deviation"),
             parameters("yaw.standard_deviations"));
-          const auto phi = std::exp(-interval / tau);
+          const auto phi = get_phi(interval, "yaw");
           return ar1_noise(noise_output->second.yaw_noise, mean(), standard_deviation(), phi);
         }();
 
         noise_output->second.flip = [&]() {
-          static const auto tau =
-            -parameter("yaw_flip.delta_t") / std::log(correlation_for_delta_t);
           static const auto velocity_threshold = parameter("yaw_flip.velocity_threshold");
-          static const auto stop_rate = parameter("yaw_flip.stop_rate");
-          const auto phi = std::exp(-interval / tau);
-          const auto rate = (noise_output->second.flip ? 1.0 : 0.0) * phi + (1 - phi) * stop_rate;
+          static const auto flip_rate = parameter("yaw_flip.flip_rate");
+          const auto phi = get_phi(interval, "yaw_flip");
           return velocity < velocity_threshold and
-                 std::uniform_real_distribution<double>()(random_engine_) < rate;
+                  mp_noise(noise_output->second.flip, flip_rate, phi);
         }();
 
-        noise_output->second.mask = [&]() {
-          static const auto tau = -parameter("mask.delta_t") / std::log(correlation_for_delta_t);
-          static const auto unmask_rate = selector(
-            parameter("mask.ellipse_normalized_x_radius"), parameters("mask.unmask_rates"));
-          const auto phi = std::exp(-interval / tau);
-          const auto rate =
-            (noise_output->second.mask ? 1.0 : 0.0) * phi + (1 - phi) * (1 - unmask_rate());
-          return std::uniform_real_distribution()(random_engine_) < rate;
+        noise_output->second.tp = [&]() {
+          static const auto tp_rate = selector(
+            parameter("tp.ellipse_normalized_x_radius"), parameters("tp.tp_rates"));
+          const auto phi = get_phi(interval, "tp");
+          return mp_noise(noise_output->second.tp, tp_rate(), phi);
         }();
 
-        if (noise_output->second.mask) {
+        if (noise_output->second.tp) {
           const auto angle = std::atan2(y, x);
 
           const auto yaw_rotated_orientation =
