@@ -21,6 +21,23 @@ Changelog for package simulation_interface
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+11.1.0 (2025-02-21)
+-------------------
+* Merge branch 'master' into feature/execution_time
+* Merge remote-tracking branch 'origin/master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
 11.0.0 (2025-02-20)
 -------------------
 * Merge branch 'master' into refactor/lanelet_wrapper_route
