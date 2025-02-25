@@ -97,6 +97,10 @@ auto rightBound(const lanelet::Id lanelet_id) -> std::vector<Point>;
 
 // Polygons
 auto toPolygon(const lanelet::ConstLineString3d & line_string) -> std::vector<Point>;
+
+// Objects on path
+auto trafficSignsOnPath(const lanelet::Ids & lanelet_ids)
+  -> std::vector<std::shared_ptr<const lanelet::TrafficSign>>;
 }  // namespace lanelet_map
 }  // namespace lanelet_wrapper
 }  // namespace traffic_simulator

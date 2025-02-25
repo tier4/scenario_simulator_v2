@@ -257,6 +257,21 @@ auto toPolygon(const lanelet::ConstLineString3d & line_string) -> std::vector<Po
   }
   return points;
 }
+
+// Objects on path
+auto trafficSignsOnPath(const lanelet::Ids & lanelet_ids)
+  -> std::vector<std::shared_ptr<const lanelet::TrafficSign>>
+{
+  std::vector<std::shared_ptr<const lanelet::TrafficSign>> ret;
+  for (const auto & lanelet_id : lanelet_ids) {
+    const auto & lanelet = LaneletWrapper::map()->laneletLayer.get(lanelet_id);
+    const auto & traffic_signs = lanelet.regulatoryElementsAs<const lanelet::TrafficSign>();
+    for (const auto & traffic_sign : traffic_signs) {
+      ret.push_back(traffic_sign);
+    }
+  }
+  return ret;
+}
 }  // namespace lanelet_map
 }  // namespace lanelet_wrapper
 }  // namespace traffic_simulator
