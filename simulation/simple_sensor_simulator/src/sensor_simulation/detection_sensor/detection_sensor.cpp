@@ -293,8 +293,7 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
        NOTE: for Autoware developers
 
        If you need to apply experimental noise to the DetectedObjects that the
-       simulator publishes, comment out the following function and implement
-       new one.
+       simulator publishes, copy the following function and implement new one.
     */
     auto noise_v1 = [&](auto detected_entities, [[maybe_unused]] auto simulation_time) {
       auto position_noise_distribution =
@@ -321,21 +320,21 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
 
     /*
        We use AR(1) model to model the autocorrelation coefficients `phi` for
-       noises(distance_noise, yaw_noise) with Gaussian distribution, by the
+       `distance_noise` and `yaw_noise` with Gaussian distribution, by the
        following formula:
 
          noise(prev_noise) = mean + phi * (prev_noise - mean) + N(0, 1 - phi^2) * standard_deviation
 
-       We use Markov process to model the autocorrelation coefficients `rho`
-       for noises(flip, tp) with Bernoulli distribution, by the transition
-       matrix:
+       We use Markov process to model the autocorrelation coefficients `phi`
+       for `flip` and `true_positive` with Bernoulli distribution, by the
+       transition matrix:
 
-         | p_00 p_01 | == | p0 + rho * p1   p1 (1 - rho)  |
-         | p_10 p_11 | == | p0 (1 - rho)    p1 - rho * p0 |
+         | p_00 p_01 | == | p0 + phi * p1   p1 (1 - phi)  |
+         | p_10 p_11 | == | p0 (1 - phi)    p1 - phi * p0 |
 
        In the code, we use `phi` for the above autocorrelation coefficients
-       `phi` or `rho`, Which is calculated from the time_interval `dt` by the
-       following formula:
+       `phi`, which is calculated from the time_interval `dt` by the following
+       formula:
 
          phi(dt) = amplitude * exp(-decay * dt) + offset
     */
@@ -443,13 +442,14 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
                  mp_noise(noise_output->second.flip, rate, phi("yaw_flip"));
         }();
 
-        noise_output->second.tp = [&]() {
-          static const auto tp_rate =
-            selector(parameter("tp.ellipse_normalized_x_radius"), parameters("tp.rates"));
-          return mp_noise(noise_output->second.tp, tp_rate(), phi("tp"));
+        noise_output->second.true_positive = [&]() {
+          static const auto rate = selector(
+            parameter("true_positive.ellipse_normalized_x_radius"),
+            parameters("true_positive.rates"));
+          return mp_noise(noise_output->second.true_positive, rate(), phi("true_positive"));
         }();
 
-        if (noise_output->second.tp) {
+        if (noise_output->second.true_positive) {
           const auto angle = std::atan2(y, x);
 
           const auto yaw_rotated_orientation =

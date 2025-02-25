@@ -162,7 +162,7 @@ simulation:
                 offset: 0.49
               velocity_threshold: 0.1
               rate: 0.12
-            tp:
+            true_positive:
               phi:
                 amplitude: 0.32
                 decay: 0.26

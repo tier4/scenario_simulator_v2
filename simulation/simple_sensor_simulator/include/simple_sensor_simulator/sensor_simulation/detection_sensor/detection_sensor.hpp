@@ -85,7 +85,7 @@ class DetectionSensor : public DetectionSensorBase
   {
     double simulation_time, distance_noise, yaw_noise;
 
-    bool tp, flip;
+    bool true_positive, flip;
 
     explicit NoiseOutput(double simulation_time = 0.0) : simulation_time(simulation_time) {}
   };
