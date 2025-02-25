@@ -21,6 +21,15 @@ Changelog for package cpp_mock_scenarios
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+12.0.0 (2025-02-25)
+-------------------
+* Merge pull request `#1533 <https://github.com/tier4/scenario_simulator_v2/issues/1533>`_ from tier4/refactor/lanelet_wrapper_bound
+  HdMapUtils refactor lanelet_wrapper::lanelet_map::leftBound rightBound
+* Merge branch 'master' into refactor/lanelet_wrapper_bound
+* Merge branch 'master' into refactor/lanelet_wrapper_bound
+* remove hdmap_utils from `distanceToLaneBound`
+* Contributors: Masaya Kataoka, Tatsuya Yamasaki, abco20
+
 11.1.0 (2025-02-21)
 -------------------
 * Merge branch 'master' into feature/execution_time
