@@ -50,9 +50,9 @@ TaskQueue::~TaskQueue()
   }
 }
 
-bool TaskQueue::exhausted() const noexcept { return is_exhausted.load(); }
+auto TaskQueue::exhausted() const noexcept -> bool { return is_exhausted.load(); }
 
-void TaskQueue::rethrow() const
+auto TaskQueue::rethrow() const -> void
 {
   if (is_thrown.load(std::memory_order_acquire)) {
     std::rethrow_exception(thrown);

@@ -63,9 +63,7 @@ struct FieldOperatorApplication : public rclcpp::Node
 
   bool initialized = false, engaged_ = false;
 
-  std::chrono::steady_clock::time_point start;
-
-  std::chrono::seconds initialize_duration;
+  std::chrono::steady_clock::time_point time_limit;
 
   std::string autoware_state = "LAUNCHING";
 
@@ -125,15 +123,17 @@ struct FieldOperatorApplication : public rclcpp::Node
   auto waitForAutowareStateToBe(
     const std::string & state, Thunk thunk = [] {}, Interval interval = std::chrono::seconds(1))
   {
-    for (thunk(); not is_stop_requested.load() and autoware_state != state;
-         rclcpp::GenericRate<std::chrono::steady_clock>(interval).sleep()) {
-      if (not engaged_ and start + initialize_duration <= std::chrono::steady_clock::now()) {
+    thunk();
+
+    while (not is_stop_requested.load() and autoware_state != state) {
+      if (not engaged_ and time_limit <= std::chrono::steady_clock::now()) {
         throw common::AutowareError(
           "Simulator waited for the Autoware state to transition to ", state,
           ", but time is up. The current Autoware state is ",
           (autoware_state.empty() ? "not published yet" : autoware_state));
       } else {
         thunk();
+        rclcpp::GenericRate<std::chrono::steady_clock>(interval).sleep();
       }
     }
   }

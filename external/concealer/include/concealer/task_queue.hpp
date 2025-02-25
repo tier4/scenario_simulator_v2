@@ -48,16 +48,16 @@ public:
   ~TaskQueue();
 
   template <typename F>
-  decltype(auto) delay(F && f)
+  auto delay(F && f) -> void
   {
     rethrow();
     std::unique_lock lk(thunks_mutex);
     thunks.emplace(std::forward<F>(f));
   }
 
-  bool exhausted() const noexcept;
+  auto exhausted() const noexcept -> bool;
 
-  void rethrow() const;
+  auto rethrow() const -> void;
 };
 }  // namespace concealer
 
