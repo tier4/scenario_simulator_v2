@@ -55,13 +55,11 @@ namespace concealer
 {
 struct FieldOperatorApplication : public rclcpp::Node
 {
-  std::atomic<bool> is_stop_requested = false;
-
-  bool is_autoware_exited = false;
-
-  const pid_t process_id = 0;
+  pid_t process_id;
 
   bool initialized = false, engaged_ = false;
+
+  std::atomic<bool> finalized = false;
 
   std::chrono::steady_clock::time_point time_limit;
 
@@ -125,7 +123,7 @@ struct FieldOperatorApplication : public rclcpp::Node
   {
     thunk();
 
-    while (not is_stop_requested.load() and autoware_state != state) {
+    while (not finalized.load() and autoware_state != state) {
       if (not engaged_ and time_limit <= std::chrono::steady_clock::now()) {
         throw common::AutowareError(
           "Simulator waited for the Autoware state to transition to ", state,

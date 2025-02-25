@@ -185,8 +185,7 @@ FieldOperatorApplication::FieldOperatorApplication(const pid_t pid)
 
 FieldOperatorApplication::~FieldOperatorApplication()
 {
-  if (is_stop_requested.store(true);
-      process_id != 0 && not std::exchange(is_autoware_exited, true)) {
+  if (process_id) {
     const auto sigset = [this]() {
       if (auto signal_set = sigset_t();
           sigemptyset(&signal_set) or sigaddset(&signal_set, SIGCHLD)) {
@@ -258,7 +257,11 @@ FieldOperatorApplication::~FieldOperatorApplication()
         RCLCPP_ERROR_STREAM(get_logger(), std::system_error(errno, std::system_category()).what());
       }
     }
+
+    process_id = 0;
   }
+
+  finalized.store(true);
 }
 
 auto FieldOperatorApplication::clearRoute() -> void
@@ -525,12 +528,12 @@ auto FieldOperatorApplication::spinSome() -> void
   task_queue.rethrow();
 
   if (rclcpp::ok()) {
-    if (process_id != 0) {
+    if (process_id) {
       auto status = 0;
       if (const auto id = waitpid(process_id, &status, WNOHANG); id < 0) {
         switch (errno) {
           case ECHILD:
-            is_autoware_exited = true;
+            process_id = 0;
             throw common::AutowareError("Autoware process is already terminated");
           default:
             RCLCPP_ERROR_STREAM(
@@ -539,11 +542,11 @@ auto FieldOperatorApplication::spinSome() -> void
         }
       } else if (0 < id) {
         if (WIFEXITED(status)) {
-          is_autoware_exited = true;
+          process_id = 0;
           throw common::AutowareError(
             "Autoware process is unintentionally exited. exit code: ", WEXITSTATUS(status));
         } else if (WIFSIGNALED(status)) {
-          is_autoware_exited = true;
+          process_id = 0;
           throw common::AutowareError("Autoware process is killed. signal is ", WTERMSIG(status));
         }
       }

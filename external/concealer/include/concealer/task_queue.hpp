@@ -34,7 +34,7 @@ class TaskQueue
 
   std::thread dispatcher;
 
-  std::atomic<bool> is_stop_requested = false;
+  std::atomic<bool> finalized = false;
 
   std::atomic<bool> is_thrown = false;
 

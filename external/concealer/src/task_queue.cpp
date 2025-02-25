@@ -22,7 +22,7 @@ namespace concealer
 TaskQueue::TaskQueue()
 : dispatcher([this] {
     try {
-      while (rclcpp::ok() and not is_stop_requested.load(std::memory_order_acquire)) {
+      while (rclcpp::ok() and not finalized.load(std::memory_order_acquire)) {
         is_exhausted.store(thunks.empty());
         if (auto lock = std::unique_lock(thunks_mutex); not is_exhausted.load()) {
           auto thunk = std::move(thunks.front());
@@ -45,7 +45,7 @@ TaskQueue::TaskQueue()
 TaskQueue::~TaskQueue()
 {
   if (dispatcher.joinable()) {
-    is_stop_requested.store(true, std::memory_order_release);
+    finalized.store(true, std::memory_order_release);
     dispatcher.join();
   }
 }
