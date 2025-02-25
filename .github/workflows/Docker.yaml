@@ -69,7 +69,7 @@ jobs:
             *.cache-to=type=gha,mode=max
             *.cache-from=type=gha
             *.tags=ghcr.io/tier4/scenario_simulator_v2:traffic_simulator_${{ matrix.rosdistro }}-${{ github.event.inputs.version }}
-            *.tags=ghcr.io/tier4/scenario_simulator_v2:traffic_simulator_latest
+            *.tags=ghcr.io/tier4/scenario_simulator_v2:traffic_simulator-latest
             push: true
           targets: |
             traffic_simulator_${{ matrix.rosdistro }}
@@ -136,7 +136,7 @@ jobs:
             *.cache-to=type=gha,mode=max
             *.cache-from=type=gha
             *.tags=ghcr.io/tier4/scenario_simulator_v2:humble-${{ github.event.inputs.version }}
-            *.tags=ghcr.io/tier4/scenario_simulator_v2:latest
+            *.tags=ghcr.io/tier4/scenario_simulator_v2:humble-latest
           push: true
           targets: |
             ${{ matrix.rosdistro }}_base_${{ matrix.arch }}
