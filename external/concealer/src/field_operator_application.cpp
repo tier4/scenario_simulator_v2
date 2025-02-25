@@ -511,10 +511,10 @@ auto FieldOperatorApplication::setVelocityLimit(double velocity_limit) -> void
     auto request = std::make_shared<SetVelocityLimit::Request>();
     request->velocity = velocity_limit;
     /*
-       We attempt to resend the service up to 30 times, but this number of
+       We attempt to resend the service up to 200 times, but this number of
        times was determined by heuristics, not for any technical reason.
     */
-    requestSetVelocityLimit(request, 30);
+    requestSetVelocityLimit(request, 200);
   });
 }
 
