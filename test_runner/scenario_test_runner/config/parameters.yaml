@@ -136,7 +136,7 @@ simulation:
           v2:
             ellipse_y_radii: [10.0, 20.0, 40.0, 60.0, 80.0, 120.0, 150.0, 180.0, 1000.0]
             distance:
-              phi:
+              autocorrelation_coefficient:
                 amplitude: 0.32
                 decay: 0.45
                 offset: 0.26
@@ -146,7 +146,7 @@ simulation:
               means: [-0.06, -0.04, -0.04, -0.07, -0.26, -0.56, -1.02, -1.05, 0.0]
               standard_deviations: [0.17, 0.20, 0.27, 0.40, 0.67, 0.94, 1.19, 1.17, 0.0]
             yaw:
-              phi:
+              autocorrelation_coefficient:
                 amplitude: 0.22
                 decay: 0.52
                 offset: 0.21
@@ -156,14 +156,14 @@ simulation:
               means: [0.0, 0.01, 0.0, 0.0, 0.0, -0.07, 0.18, 0.06, 0.0]
               standard_deviations: [0.09, 0.15, 0.21, 0.18, 0.17, 0.19, 0.39, 0.15, 0.0]
             yaw_flip:
-              phi:
+              autocorrelation_coefficient:
                 amplitude: 0.29
                 decay: 0.12
                 offset: 0.49
               velocity_threshold: 0.1
               rate: 0.12
             true_positive:
-              phi:
+              autocorrelation_coefficient:
                 amplitude: 0.32
                 decay: 0.26
                 offset: 0.40

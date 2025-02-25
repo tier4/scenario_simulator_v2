@@ -318,26 +318,6 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
       return detected_entities;
     };
 
-    /*
-       We use AR(1) model to model the autocorrelation coefficients `phi` for
-       `distance_noise` and `yaw_noise` with Gaussian distribution, by the
-       following formula:
-
-         noise(prev_noise) = mean + phi * (prev_noise - mean) + N(0, 1 - phi^2) * standard_deviation
-
-       We use Markov process to model the autocorrelation coefficients `phi`
-       for `flip` and `true_positive` with Bernoulli distribution, by the
-       transition matrix:
-
-         | p_00 p_01 | == | p0 + phi * p1   p1 (1 - phi)  |
-         | p_10 p_11 | == | p0 (1 - phi)    p1 - phi * p0 |
-
-       In the code, we use `phi` for the above autocorrelation coefficients
-       `phi`, which is calculated from the time_interval `dt` by the following
-       formula:
-
-         phi(dt) = amplitude * exp(-decay * dt) + offset
-    */
     auto noise_v2 = [&](const auto & detected_entities, auto simulation_time) {
       auto noised_detected_entities = std::decay_t<decltype(detected_entities)>();
 
@@ -376,21 +356,47 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
           }
         };
 
-        auto ar1_noise = [this](auto previous_noise, auto mean, auto standard_deviation, auto phi) {
-          return mean + phi * (previous_noise - mean) +
+        /*
+           We use AR(1) model to model the autocorrelation coefficients `phi`
+           for `distance_noise` and `yaw_noise` with Gaussian distribution, by
+           the following formula:
+
+             noise(prev_noise) = mean + phi * (prev_noise - mean) + N(0, 1 - phi^2) * standard_deviation
+        */
+        auto autoregressive_noise = [this](
+                                      auto previous_noise, auto mean, auto standard_deviation,
+                                      auto autocorrelation_coefficient) {
+          return mean + autocorrelation_coefficient * (previous_noise - mean) +
                  std::normal_distribution<double>(
-                   0, standard_deviation * std::sqrt(1 - phi * phi))(random_engine_);
+                   0, standard_deviation *
+                        std::sqrt(1 - std::pow(autocorrelation_coefficient, 2)))(random_engine_);
         };
 
-        auto mp_noise = [this](bool is_previous_noise_1, auto p1, auto phi) {
-          const auto rate = (is_previous_noise_1 ? 1.0 : 0.0) * phi + (1 - phi) * p1;
-          return std::uniform_real_distribution<double>()(random_engine_) < rate;
-        };
+        /*
+           We use Markov process to model the autocorrelation coefficients
+           `phi` for `flip` and `true_positive` with Bernoulli distribution, by
+           the transition matrix:
 
-        auto phi = [&](const std::string & name) {
-          static const auto amplitude = parameter(name + ".phi.amplitude");
-          static const auto decay = parameter(name + ".phi.decay");
-          static const auto offset = parameter(name + ".phi.offset");
+             | p_00 p_01 | == | p0 + phi * p1   p1 (1 - phi)  |
+             | p_10 p_11 | == | p0 (1 - phi)    p1 - phi * p0 |
+
+           In the code, we use `phi` for the above autocorrelation coefficients
+           `phi`, which is calculated from the time_interval `dt` by the
+           following formula:
+
+             phi(dt) = amplitude * exp(-decay * dt) + offset
+        */
+        auto markov_process_noise =
+          [this](bool is_previous_noise_1, auto p1, auto autocorrelation_coefficient) {
+            const auto rate = (is_previous_noise_1 ? 1.0 : 0.0) * autocorrelation_coefficient +
+                              (1 - autocorrelation_coefficient) * p1;
+            return std::uniform_real_distribution<double>()(random_engine_) < rate;
+          };
+
+        auto autocorrelation_coefficient = [&](const std::string & name) {
+          static const auto amplitude = parameter(name + ".autocorrelation_coefficient.amplitude");
+          static const auto decay = parameter(name + ".autocorrelation_coefficient.decay");
+          static const auto offset = parameter(name + ".autocorrelation_coefficient.offset");
           return std::clamp(amplitude * std::exp(-interval * decay) + offset, 0.0, 1.0);
         };
 
@@ -421,8 +427,9 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
           static const auto standard_deviation = selector(
             parameter("distance.ellipse_normalized_x_radius.standard_deviation"),
             parameters("distance.standard_deviations"));
-          return ar1_noise(
-            noise_output->second.distance_noise, mean(), standard_deviation(), phi("distance"));
+          return autoregressive_noise(
+            noise_output->second.distance_noise, mean(), standard_deviation(),
+            autocorrelation_coefficient("distance"));
         }();
 
         noise_output->second.yaw_noise = [&]() {
@@ -431,22 +438,26 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
           static const auto standard_deviation = selector(
             parameter("yaw.ellipse_normalized_x_radius.standard_deviation"),
             parameters("yaw.standard_deviations"));
-          return ar1_noise(
-            noise_output->second.yaw_noise, mean(), standard_deviation(), phi("yaw"));
+          return autoregressive_noise(
+            noise_output->second.yaw_noise, mean(), standard_deviation(),
+            autocorrelation_coefficient("yaw"));
         }();
 
         noise_output->second.flip = [&]() {
           static const auto velocity_threshold = parameter("yaw_flip.velocity_threshold");
           static const auto rate = parameter("yaw_flip.rate");
           return velocity < velocity_threshold and
-                 mp_noise(noise_output->second.flip, rate, phi("yaw_flip"));
+                 markov_process_noise(
+                   noise_output->second.flip, rate, autocorrelation_coefficient("yaw_flip"));
         }();
 
         noise_output->second.true_positive = [&]() {
           static const auto rate = selector(
             parameter("true_positive.ellipse_normalized_x_radius"),
             parameters("true_positive.rates"));
-          return mp_noise(noise_output->second.true_positive, rate(), phi("true_positive"));
+          return markov_process_noise(
+            noise_output->second.true_positive, rate(),
+            autocorrelation_coefficient("true_positive"));
         }();
 
         if (noise_output->second.true_positive) {
