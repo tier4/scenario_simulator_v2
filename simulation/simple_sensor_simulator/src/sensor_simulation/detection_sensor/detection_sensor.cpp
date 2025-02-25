@@ -319,6 +319,26 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
       return detected_entities;
     };
 
+    /*
+       We use AR(1) model to model the autocorrelation coefficients `phi` for
+       noises(distance_noise, yaw_noise) with Gaussian distribution, by the
+       following formula:
+
+         noise(prev_noise) = mean + phi * (prev_noise - mean) + N(0, 1 - phi^2) * standard_deviation
+
+       We use Markov process to model the autocorrelation coefficients `rho`
+       for noises(flip, tp) with Bernoulli distribution, by the transition
+       matrix:
+
+         | p_00 p_01 | == | p0 + rho * p1   p1 (1 - rho)  |
+         | p_10 p_11 | == | p0 (1 - rho)    p1 - rho * p0 |
+
+       In the code, we use `phi` for the above autocorrelation coefficients
+       `phi` or `rho`, Which is calculated from the time_interval `dt` by the
+       following formula:
+
+         phi(dt) = amplitude * exp(-decay * dt) + offset
+    */
     auto noise_v2 = [&](const auto & detected_entities, auto simulation_time) {
       auto noised_detected_entities = std::decay_t<decltype(detected_entities)>();
 
@@ -357,22 +377,6 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
           }
         };
 
-        /*
-           We use AR(1) model to model the autocorrelation coefficients `phi` for 
-           noises(distance_noise, yaw_noise) with Gaussian distribution, by the 
-           following formula:
-            noise(prev_noise) = mean + phi * (prev_noise - mean) + N(0, 1 - phi^2) * standard_deviation
-  
-           We use Markov process to model the autocorrelation coefficients `rho` 
-           for noises(flip, tp) with Bernoulli distribution, by the transition matrix:
-            | p_00 p_01 |   ==   | p0 + rho * p1         p1(1 - rho)   |
-            | p_10 p_11 |   ==   | p0(1 - rho)           p1 - rho * p0 |
-
-           In the code, we use `phi` for the above autocorrelation coefficients `phi` or `rho`,
-           Which is calculated from the time_interval `dt` by the following formula:
-            phi(dt) = amplitude * exp(-decay * dt) + offset
-        */
-
         auto ar1_noise = [this](auto previous_noise, auto mean, auto standard_deviation, auto phi) {
           return mean + phi * (previous_noise - mean) +
                  std::normal_distribution<double>(
@@ -380,14 +384,14 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
         };
 
         auto mp_noise = [this](bool is_previous_noise_1, auto p1, auto phi) {
-          auto rate = (is_previous_noise_1 ? 1.0 : 0.0) * phi + (1 - phi) * p1;
+          const auto rate = (is_previous_noise_1 ? 1.0 : 0.0) * phi + (1 - phi) * p1;
           return std::uniform_real_distribution<double>()(random_engine_) < rate;
         };
 
-        auto get_phi = [&](const auto & interval, const std::string & name) {
-          static const auto amplitude = parameter(name + ".phi_amplitude");
-          static const auto decay = parameter(name + ".phi_decay");
-          static const auto offset = parameter(name + ".phi_offset");
+        auto phi = [&](const std::string & name) {
+          static const auto amplitude = parameter(name + ".phi.amplitude");
+          static const auto decay = parameter(name + ".phi.decay");
+          static const auto offset = parameter(name + ".phi.offset");
           return std::clamp(amplitude * std::exp(-interval * decay) + offset, 0.0, 1.0);
         };
 
@@ -418,8 +422,8 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
           static const auto standard_deviation = selector(
             parameter("distance.ellipse_normalized_x_radius.standard_deviation"),
             parameters("distance.standard_deviations"));
-          const auto phi = get_phi(interval, "distance");
-          return ar1_noise(noise_output->second.distance_noise, mean(), standard_deviation(), phi);
+          return ar1_noise(
+            noise_output->second.distance_noise, mean(), standard_deviation(), phi("distance"));
         }();
 
         noise_output->second.yaw_noise = [&]() {
@@ -428,23 +432,21 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
           static const auto standard_deviation = selector(
             parameter("yaw.ellipse_normalized_x_radius.standard_deviation"),
             parameters("yaw.standard_deviations"));
-          const auto phi = get_phi(interval, "yaw");
-          return ar1_noise(noise_output->second.yaw_noise, mean(), standard_deviation(), phi);
+          return ar1_noise(
+            noise_output->second.yaw_noise, mean(), standard_deviation(), phi("yaw"));
         }();
 
         noise_output->second.flip = [&]() {
           static const auto velocity_threshold = parameter("yaw_flip.velocity_threshold");
-          static const auto flip_rate = parameter("yaw_flip.flip_rate");
-          const auto phi = get_phi(interval, "yaw_flip");
+          static const auto rate = parameter("yaw_flip.rate");
           return velocity < velocity_threshold and
-                  mp_noise(noise_output->second.flip, flip_rate, phi);
+                 mp_noise(noise_output->second.flip, rate, phi("yaw_flip"));
         }();
 
         noise_output->second.tp = [&]() {
-          static const auto tp_rate = selector(
-            parameter("tp.ellipse_normalized_x_radius"), parameters("tp.tp_rates"));
-          const auto phi = get_phi(interval, "tp");
-          return mp_noise(noise_output->second.tp, tp_rate(), phi);
+          static const auto tp_rate =
+            selector(parameter("tp.ellipse_normalized_x_radius"), parameters("tp.rates"));
+          return mp_noise(noise_output->second.tp, tp_rate(), phi("tp"));
         }();
 
         if (noise_output->second.tp) {
