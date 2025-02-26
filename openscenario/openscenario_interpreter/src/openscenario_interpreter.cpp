@@ -262,10 +262,12 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
         if (record) {
           if (record_storage_id == "") {
             record::start(
-              "-a", "-o", boost::filesystem::path(osc_path).replace_extension("").string());
+              "-a", "--exclude", "/sensing/camera/.*", "-o",
+              boost::filesystem::path(osc_path).replace_extension("").string());
           } else {
             record::start(
-              "-a", "-o", boost::filesystem::path(osc_path).replace_extension("").string(), "-s",
+              "-a", "--exclude", "/sensing/camera/.*", "-o",
+              boost::filesystem::path(osc_path).replace_extension("").string(), "-s",
               record_storage_id);
           }
         }
