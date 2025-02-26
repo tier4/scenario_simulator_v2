@@ -20,6 +20,7 @@
 #include <chrono>
 #include <cmath>
 #include <functional>
+#include <nlohmann/json.hpp>
 #include <unordered_map>
 
 namespace openscenario_interpreter
@@ -33,7 +34,7 @@ class ExecutionTimer
     std::int64_t,
     boost::accumulators::stats<
       boost::accumulators::tag::min, boost::accumulators::tag::max, boost::accumulators::tag::mean,
-      boost::accumulators::tag::sum, boost::accumulators::tag::variance>>;
+      boost::accumulators::tag::variance, boost::accumulators::tag::count>>;
 
   std::unordered_map<std::string, Statistics> statistics_map;
 
@@ -50,6 +51,27 @@ public:
     statistics_map[tag](std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count());
 
     return end - begin;
+  }
+
+  void saveStatistics(boost::filesystem::path output_directory)
+  {
+    nlohmann::json json_data;
+    for (const auto & [name, statistics] : statistics_map) {
+      json_data[name + "/min"] = boost::accumulators::extract::min(statistics) * 1e-9;
+      json_data[name + "/max"] = boost::accumulators::extract::max(statistics) * 1e-9;
+      json_data[name + "/mean"] = boost::accumulators::extract::mean(statistics) * 1e-9;
+      json_data[name + "/variance"] = boost::accumulators::extract::variance(statistics) * 1e-18;
+      json_data[name + "/count"] = boost::accumulators::extract::count(statistics);
+    }
+
+    boost::filesystem::path output_file = output_directory / "execution_timer.json";
+    std::ofstream file(output_file);
+    if (file.is_open()) {
+      file << json_data.dump(4);
+      file.close();
+    } else {
+      throw common::Error("Failed to open file: " + output_file.string());
+    }
   }
 
   auto clear() { statistics_map.clear(); }
