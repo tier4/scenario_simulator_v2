@@ -25,6 +25,7 @@
 #include <queue>
 #include <random>
 #include <rclcpp/rclcpp.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -76,6 +77,8 @@ class DetectionSensor : public DetectionSensorBase
 
   const typename rclcpp::Publisher<U>::SharedPtr ground_truth_objects_publisher;
 
+  int noise_model_version;
+
   std::default_random_engine random_engine_;
 
   std::queue<std::pair<std::vector<traffic_simulator_msgs::EntityStatus>, double>>
@@ -92,8 +95,6 @@ class DetectionSensor : public DetectionSensorBase
 
   std::unordered_map<std::string, NoiseOutput> noise_outputs;
 
-  int noise_model_version;
-
 public:
   explicit DetectionSensor(
     const double current_simulation_time,
@@ -103,9 +104,34 @@ public:
   : DetectionSensorBase(current_simulation_time, configuration),
     detected_objects_publisher(publisher),
     ground_truth_objects_publisher(ground_truth_publisher),
-    random_engine_(configuration.random_seed()),
     noise_model_version(concealer::getParameter<int>(
-      detected_objects_publisher->get_topic_name() + std::string(".noise.model.version")))
+      detected_objects_publisher->get_topic_name() + std::string(".noise.model.version"))),
+    random_engine_([this]() {
+      if (const auto seed = [this]() -> std::random_device::result_type {
+            switch (noise_model_version) {
+              default:
+                [[fallthrough]];
+              case 1:
+                return configuration_.random_seed();
+              case 2:
+                return concealer::getParameter<int>(
+                  detected_objects_publisher->get_topic_name() + std::string(".seed"));
+            }
+          }();
+          seed) {
+        if (std::random_device::min() <= seed and seed <= std::random_device::max()) {
+          return seed;
+        } else {
+          throw common::scenario_simulator_exception::Error(
+            "The value of parameter ",
+            std::quoted(detected_objects_publisher->get_topic_name() + std::string(".seed")),
+            " must be greater than or equal to ", std::random_device::min(),
+            " and less than or equal to ", std::random_device::max());
+        }
+      } else {
+        return std::random_device()();
+      }
+    }())
   {
   }
 

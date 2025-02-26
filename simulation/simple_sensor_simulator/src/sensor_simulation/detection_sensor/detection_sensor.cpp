@@ -363,6 +363,7 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
 
              noise(prev_noise) = mean + phi * (prev_noise - mean) + N(0, 1 - phi^2) * standard_deviation
         */
+        // cspell: ignore autoregressive
         auto autoregressive_noise = [this](
                                       auto previous_noise, auto mean, auto standard_deviation,
                                       auto autocorrelation_coefficient) {
