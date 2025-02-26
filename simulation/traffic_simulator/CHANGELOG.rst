@@ -21,6 +21,11 @@ Changelog for package traffic_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+12.0.1 (2025-02-26)
+-------------------
+* Merge branch 'master' into feature/push-latest-docker-tag
+* Contributors: Masaya Kataoka
+
 12.0.0 (2025-02-25)
 -------------------
 * Merge pull request `#1533 <https://github.com/tier4/scenario_simulator_v2/issues/1533>`_ from tier4/refactor/lanelet_wrapper_bound

@@ -35,6 +35,11 @@ Changelog for package scenario_test_runner
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+12.0.1 (2025-02-26)
+-------------------
+* Merge branch 'master' into feature/push-latest-docker-tag
+* Contributors: Masaya Kataoka
+
 12.0.0 (2025-02-25)
 -------------------
 * Merge branch 'master' into refactor/lanelet_wrapper_bound
