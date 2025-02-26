@@ -281,9 +281,9 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
 
     auto is_in_range = [&](const auto & status) {
       return not isEgoEntityStatusToWhichThisSensorIsAttached(status) and
-             distance(status.pose(), ego_entity_status->pose()) <= configuration_.range() and
+             distance(status.pose(), ego_entity_status->pose()) <= range() and
              isOnOrAboveEgoPlane(status.pose(), ego_entity_status->pose()) and
-             (configuration_.detect_all_objects_in_range() or
+             (detect_all_objects_in_range() or
               std::find(
                 lidar_detected_entities.begin(), lidar_detected_entities.end(), status.name()) !=
                 lidar_detected_entities.end());
@@ -296,8 +296,23 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
        simulator publishes, copy the following function and implement new one.
     */
     auto noise_v1 = [&](auto detected_entities, [[maybe_unused]] auto simulation_time) {
-      auto position_noise_distribution =
-        std::normal_distribution<>(0.0, configuration_.pos_noise_stddev());
+      static const auto override_legacy_configuration = concealer::getParameter<bool>(
+        detected_objects_publisher->get_topic_name() +
+        std::string(".override_legacy_configuration"));
+
+      static const auto standard_deviation =
+        override_legacy_configuration ? concealer::getParameter<double>(
+                                          detected_objects_publisher->get_topic_name() +
+                                          std::string(".noise.v1.position.standard_deviation"))
+                                      : configuration_.pos_noise_stddev();
+
+      static const auto missing_probability = override_legacy_configuration
+                                                ? concealer::getParameter<double>(
+                                                    detected_objects_publisher->get_topic_name() +
+                                                    std::string(".noise.v1.missing_probability"))
+                                                : configuration_.probability_of_lost();
+
+      auto position_noise_distribution = std::normal_distribution<>(0.0, standard_deviation);
 
       for (auto && detected_entity : detected_entities) {
         detected_entity.mutable_pose()->mutable_position()->set_x(
@@ -310,8 +325,7 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
         std::remove_if(
           detected_entities.begin(), detected_entities.end(),
           [this](auto &&) {
-            return std::uniform_real_distribution()(random_engine_) <
-                   configuration_.probability_of_lost();
+            return std::uniform_real_distribution()(random_engine_) < missing_probability;
           }),
         detected_entities.end());
 
@@ -529,7 +543,7 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
 
     if (
       current_simulation_time - unpublished_detected_entities.front().second >=
-      configuration_.object_recognition_delay()) {
+      delay<autoware_perception_msgs::msg::DetectedObjects>()) {
       const auto modified_detected_entities =
         std::apply(noise, unpublished_detected_entities.front());
       detected_objects_publisher->publish(make_detected_objects(modified_detected_entities));
@@ -540,7 +554,7 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
 
     if (
       current_simulation_time - unpublished_ground_truth_entities.front().second >=
-      configuration_.object_recognition_ground_truth_delay()) {
+      delay<autoware_perception_msgs::msg::TrackedObjects>()) {
       ground_truth_objects_publisher->publish(
         make_ground_truth_objects(unpublished_ground_truth_entities.front().first));
       unpublished_ground_truth_entities.pop();

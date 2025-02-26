@@ -95,6 +95,61 @@ class DetectionSensor : public DetectionSensorBase
 
   std::unordered_map<std::string, NoiseOutput> noise_outputs;
 
+  template <typename Message, typename std::enable_if_t<std::is_same_v<Message, T>, int> = 0>
+  auto delay() const
+  {
+    static const auto override_legacy_configuration = concealer::getParameter<bool>(
+      detected_objects_publisher->get_topic_name() + std::string(".override_legacy_configuration"));
+    if (override_legacy_configuration) {
+      static const auto delay = concealer::getParameter<double>(
+        detected_objects_publisher->get_topic_name() + std::string(".delay"));
+      return delay;
+    } else {
+      return configuration_.object_recognition_delay();
+    }
+  }
+
+  template <typename Message, typename std::enable_if_t<std::is_same_v<Message, U>, int> = 0>
+  auto delay() const
+  {
+    static const auto override_legacy_configuration = concealer::getParameter<bool>(
+      ground_truth_objects_publisher->get_topic_name() +
+      std::string(".override_legacy_configuration"));
+    if (override_legacy_configuration) {
+      static const auto delay = concealer::getParameter<double>(
+        ground_truth_objects_publisher->get_topic_name() + std::string(".delay"));
+      return delay;
+    } else {
+      return configuration_.object_recognition_ground_truth_delay();
+    }
+  }
+
+  auto range() const
+  {
+    static const auto override_legacy_configuration = concealer::getParameter<bool>(
+      detected_objects_publisher->get_topic_name() + std::string(".override_legacy_configuration"));
+    if (override_legacy_configuration) {
+      static const auto range = concealer::getParameter<double>(
+        detected_objects_publisher->get_topic_name() + std::string(".range"), 300.0);
+      return range;
+    } else {
+      return configuration_.range();
+    }
+  }
+
+  auto detect_all_objects_in_range() const
+  {
+    static const auto override_legacy_configuration = concealer::getParameter<bool>(
+      detected_objects_publisher->get_topic_name() + std::string(".override_legacy_configuration"));
+    if (override_legacy_configuration) {
+      static const auto clairvoyant = concealer::getParameter<bool>(
+        detected_objects_publisher->get_topic_name() + std::string(".clairvoyant"));
+      return clairvoyant;
+    } else {
+      return configuration_.detect_all_objects_in_range();
+    }
+  }
+
 public:
   explicit DetectionSensor(
     const double current_simulation_time,
