@@ -310,7 +310,8 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 auto Interpreter::on_deactivate(const rclcpp_lifecycle::State &) -> Result
 {
   reset();
-  execution_timer.saveStatistics(boost::filesystem::path(output_directory) / "metrics");
+  execution_timer.saveStatistics(
+    boost::filesystem::path(output_directory) / "metrics" / "execution_timer.json");
 
   return Interpreter::Result::SUCCESS;  // => Inactive
 }

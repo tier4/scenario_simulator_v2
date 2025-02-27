@@ -53,7 +53,7 @@ public:
     return end - begin;
   }
 
-  void saveStatistics(boost::filesystem::path output_directory)
+  void saveStatistics(boost::filesystem::path output_file)
   {
     nlohmann::json json_data;
     for (const auto & [name, statistics] : statistics_map) {
@@ -65,14 +65,9 @@ public:
       json_data[name + "/count"] = boost::accumulators::extract::count(statistics);
     }
 
-    boost::filesystem::path output_file = output_directory / "execution_timer.json";
     std::ofstream file(output_file);
-    if (file.is_open()) {
-      file << json_data.dump(4);
-      file.close();
-    } else {
-      throw common::Error("Failed to open file: " + output_file.string());
-    }
+    file << json_data.dump(4);
+    file.close();
   }
 
   auto clear() { statistics_map.clear(); }
