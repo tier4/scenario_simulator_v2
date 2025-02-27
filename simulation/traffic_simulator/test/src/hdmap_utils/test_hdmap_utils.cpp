@@ -2265,7 +2265,9 @@ TEST_F(HdMapUtilsTest_IntersectionMap, isInIntersection)
 TEST_F(HdMapUtilsTest_StandardMap, getStopLineIdsOnPath_noStopLines)
 {
   EXPECT_EQ(
-    hdmap_utils.getStopLineIdsOnPath({34507, 34795, 34606, 34672}).size(), static_cast<size_t>(0));
+    traffic_simulator::lanelet_wrapper::lanelet_map::stopLineIdsOnPath({34507, 34795, 34606, 34672})
+      .size(),
+    static_cast<size_t>(0));
 }
 
 /**
@@ -2275,7 +2277,8 @@ TEST_F(HdMapUtilsTest_StandardMap, getStopLineIdsOnPath_noStopLines)
 TEST_F(HdMapUtilsTest_StandardMap, getStopLineIdsOnPath_someStopLines)
 {
   EXPECT_EQ(
-    hdmap_utils.getStopLineIdsOnPath({34408, 34633, 34579, 34780, 34675, 34744, 34690}),
+    traffic_simulator::lanelet_wrapper::lanelet_map::stopLineIdsOnPath(
+      {34408, 34633, 34579, 34780, 34675, 34744, 34690}),
     (lanelet::Ids{120635}));
 }
 
@@ -2284,7 +2287,9 @@ TEST_F(HdMapUtilsTest_StandardMap, getStopLineIdsOnPath_someStopLines)
  */
 TEST_F(HdMapUtilsTest_StandardMap, getStopLineIdsOnPath_empty)
 {
-  EXPECT_EQ(hdmap_utils.getStopLineIdsOnPath(lanelet::Ids{}).size(), static_cast<size_t>(0));
+  EXPECT_EQ(
+    traffic_simulator::lanelet_wrapper::lanelet_map::stopLineIdsOnPath(lanelet::Ids{}).size(),
+    static_cast<size_t>(0));
 }
 
 /**

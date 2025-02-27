@@ -272,6 +272,29 @@ auto trafficSignsOnPath(const lanelet::Ids & lanelet_ids)
   }
   return ret;
 }
+
+auto stopLinesOnPath(const lanelet::Ids & lanelet_ids) -> lanelet::ConstLineStrings3d
+{
+  lanelet::ConstLineStrings3d stop_lines;
+  for (const auto & traffic_sign : lanelet_wrapper::lanelet_map::trafficSignsOnPath(lanelet_ids)) {
+    if (traffic_sign->type() == "stop_sign") {
+      const auto & ref_lines = traffic_sign->refLines();
+      stop_lines.insert(stop_lines.end(), ref_lines.begin(), ref_lines.end());
+    }
+  }
+  return stop_lines;
+}
+
+auto stopLineIdsOnPath(const lanelet::Ids & lanelet_ids) -> lanelet::Ids
+{
+  lanelet::Ids stop_line_ids;
+  const auto & stop_lines = stopLinesOnPath(lanelet_ids);
+  stop_line_ids.reserve(stop_lines.size());
+  for (const auto & ret : stop_lines) {
+    stop_line_ids.push_back(ret.id());
+  }
+  return stop_line_ids;
+}
 }  // namespace lanelet_map
 }  // namespace lanelet_wrapper
 }  // namespace traffic_simulator
