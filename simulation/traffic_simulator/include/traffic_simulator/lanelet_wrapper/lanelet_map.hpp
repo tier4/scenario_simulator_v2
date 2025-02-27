@@ -96,6 +96,8 @@ auto leftBound(const lanelet::Id lanelet_id) -> std::vector<Point>;
 auto rightBound(const lanelet::Id lanelet_id) -> std::vector<Point>;
 
 // Polygons
+auto stopLinePolygon(const lanelet::Id lanelet_id) -> std::vector<Point>;
+
 auto toPolygon(const lanelet::ConstLineString3d & line_string) -> std::vector<Point>;
 
 // Objects on path

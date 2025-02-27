@@ -1285,21 +1285,6 @@ auto HdMapUtils::getTrafficLightStopLinesPoints(const lanelet::Id traffic_light_
   return ret;
 }
 
-auto HdMapUtils::getStopLinePolygon(const lanelet::Id lanelet_id) const
-  -> std::vector<geometry_msgs::msg::Point>
-{
-  std::vector<geometry_msgs::msg::Point> points;
-  const auto stop_line = lanelet_map_ptr_->lineStringLayer.get(lanelet_id);
-  for (const auto & point : stop_line) {
-    geometry_msgs::msg::Point p;
-    p.x = point.x();
-    p.y = point.y();
-    p.z = point.z();
-    points.emplace_back(p);
-  }
-  return points;
-}
-
 auto HdMapUtils::getTrafficLightIdsOnPath(const lanelet::Ids & route_lanelets) const -> lanelet::Ids
 {
   lanelet::Ids ids;

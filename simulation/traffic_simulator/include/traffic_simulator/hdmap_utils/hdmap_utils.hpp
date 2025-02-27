@@ -213,8 +213,6 @@ public:
                             traffic_simulator::RoutingConfiguration().routing_graph_type) const
     -> double;
 
-  auto getStopLinePolygon(const lanelet::Id) const -> std::vector<geometry_msgs::msg::Point>;
-
   auto getTangentVector(const lanelet::Id, const double s) const
     -> std::optional<geometry_msgs::msg::Vector3>;
 

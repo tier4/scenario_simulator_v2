@@ -2418,7 +2418,8 @@ TEST_F(
  */
 TEST_F(HdMapUtilsTest_CrossroadsWithStoplinesMap, getStopLinePolygon_stopLine)
 {
-  const auto result_stoplines_points = hdmap_utils.getStopLinePolygon(lanelet::Id{120663});
+  const auto result_stoplines_points =
+    traffic_simulator::lanelet_wrapper::lanelet_map::stopLinePolygon(lanelet::Id{120663});
   const auto actual_stoplines_points = std::vector<geometry_msgs::msg::Point>{
     makePoint(3768.5, 73737.5, -0.5), makePoint(3765.5, 73735.5, -0.5)};
 
@@ -2433,7 +2434,8 @@ TEST_F(HdMapUtilsTest_CrossroadsWithStoplinesMap, getStopLinePolygon_stopLine)
  */
 TEST_F(HdMapUtilsTest_CrossroadsWithStoplinesMap, getStopLinePolygon_invalidLaneletId)
 {
-  EXPECT_THROW(hdmap_utils.getStopLinePolygon(1000039), std::runtime_error);
+  EXPECT_THROW(
+    traffic_simulator::lanelet_wrapper::lanelet_map::stopLinePolygon(1000039), std::runtime_error);
 }
 
 /**

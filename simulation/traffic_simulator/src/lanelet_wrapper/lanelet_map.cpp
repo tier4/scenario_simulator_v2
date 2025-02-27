@@ -248,6 +248,12 @@ auto rightBound(const lanelet::Id lanelet_id) -> std::vector<Point>
 }
 
 // Polygons
+auto stopLinePolygon(const lanelet::Id lanelet_id) -> std::vector<Point>
+{
+  /// @todo here you should probably add a verify if the passed lanelet_id is indeed a stop_line
+  return toPolygon(LaneletWrapper::map()->lineStringLayer.get(lanelet_id));
+}
+
 auto toPolygon(const lanelet::ConstLineString3d & line_string) -> std::vector<Point>
 {
   std::vector<Point> points;
