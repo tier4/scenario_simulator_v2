@@ -89,6 +89,14 @@ auto previousLaneletIds(
 auto previousLaneletIds(
   const lanelet::Ids & lanelet_ids, std::string_view turn_direction,
   const RoutingGraphType type = RoutingConfiguration().routing_graph_type) -> lanelet::Ids;
+
+// Bounds
+auto leftBound(const lanelet::Id lanelet_id) -> std::vector<Point>;
+
+auto rightBound(const lanelet::Id lanelet_id) -> std::vector<Point>;
+
+// Polygons
+auto toPolygon(const lanelet::ConstLineString3d & line_string) -> std::vector<Point>;
 }  // namespace lanelet_map
 }  // namespace lanelet_wrapper
 }  // namespace traffic_simulator
