@@ -291,31 +291,30 @@ public:
   }
 
 private:
-  Configuration configuration_;
-
-  std::shared_ptr<rclcpp::node_interfaces::NodeTopicsInterface> node_topics_interface;
-  const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr node_parameters_;
-
-  tf2_ros::StaticTransformBroadcaster broadcaster_;
-  tf2_ros::TransformBroadcaster base_link_broadcaster_;
+  /* */ Configuration configuration_;
 
   const rclcpp::Clock::SharedPtr clock_ptr_;
 
-  std::unordered_map<std::string, std::shared_ptr<entity::EntityBase>> entities_;
+  const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr node_parameters_;
 
-  bool npc_logic_started_;
+  /* */ tf2_ros::StaticTransformBroadcaster broadcaster_;
+
+  /* */ tf2_ros::TransformBroadcaster base_link_broadcaster_;
 
   const rclcpp::Publisher<EntityStatusWithTrajectoryArray>::SharedPtr entity_status_array_pub_ptr_;
 
   const rclcpp::Publisher<MarkerArray>::SharedPtr lanelet_marker_pub_ptr_;
 
+  /* */ std::unordered_map<std::string, std::shared_ptr<entity::EntityBase>> entities_;
+
+  /* */ bool npc_logic_started_{false};
+
+  /* */ std::shared_ptr<TrafficLights> traffic_lights_ptr_{nullptr};
+
   const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
 
-  MarkerArray markers_raw_;
-
-  std::shared_ptr<TrafficLights> traffic_lights_ptr_;
+  /* */ MarkerArray markers_raw_;
 };
 }  // namespace entity
 }  // namespace traffic_simulator
-
 #endif  // TRAFFIC_SIMULATOR__ENTITY__ENTITY_MANAGER_HPP_

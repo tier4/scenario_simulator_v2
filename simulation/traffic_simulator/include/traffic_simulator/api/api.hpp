@@ -331,21 +331,21 @@ private:
 
   const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr node_parameters_;
 
-  const std::shared_ptr<entity::EntityManager> entity_manager_ptr_;
-
-  const std::shared_ptr<TrafficLights> traffic_lights_ptr_;
-
-  const std::shared_ptr<traffic::TrafficController> traffic_controller_ptr_;
-
   const rclcpp::Publisher<rosgraph_msgs::msg::Clock>::SharedPtr clock_pub_;
 
   const rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr debug_marker_pub_;
 
-  const rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr real_time_factor_subscriber;
-
   SimulationClock clock_;
 
   zeromq::MultiClient zeromq_client_;
+
+  const std::shared_ptr<entity::EntityManager> entity_manager_ptr_;
+
+  const std::shared_ptr<traffic::TrafficController> traffic_controller_ptr_;
+
+  const std::shared_ptr<TrafficLights> traffic_lights_ptr_;
+
+  const rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr real_time_factor_subscriber_;
 };
 }  // namespace traffic_simulator
 
