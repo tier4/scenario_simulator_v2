@@ -343,7 +343,7 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
           detected_entity.pose().position().x() - ego_entity_status->pose().position().x();
         const auto y =
           detected_entity.pose().position().y() - ego_entity_status->pose().position().y();
-        const auto velocity = std::hypot(
+        const auto speed = std::hypot(
           detected_entity.action_status().twist().linear().x(),
           detected_entity.action_status().twist().linear().y());
         const auto interval =
@@ -454,9 +454,9 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
         }();
 
         noise_output->second.flip = [&]() {
-          static const auto velocity_threshold = parameter("yaw_flip.velocity_threshold");
+          static const auto speed_threshold = parameter("yaw_flip.speed_threshold");
           static const auto rate = parameter("yaw_flip.rate");
-          return velocity < velocity_threshold and
+          return speed < speed_threshold and
                  markov_process_noise(
                    noise_output->second.flip, rate, autocorrelation_coefficient("yaw_flip"));
         }();
