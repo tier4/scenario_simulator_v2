@@ -1,3 +1,5 @@
+# cspell: ignore occlusionless
+
 simulation:
   AutowareUniverse:
     ros__parameters:

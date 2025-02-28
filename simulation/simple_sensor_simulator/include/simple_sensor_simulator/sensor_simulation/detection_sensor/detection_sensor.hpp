@@ -139,6 +139,7 @@ class DetectionSensor : public DetectionSensorBase
 
   auto detect_all_objects_in_range() const
   {
+    // cspell: ignore occlusionless
     static const auto override_legacy_configuration = concealer::getParameter<bool>(
       detected_objects_publisher->get_topic_name() + std::string(".override_legacy_configuration"));
     if (override_legacy_configuration) {
