@@ -18,7 +18,39 @@
 namespace traffic_simulator
 {
 // global
+auto API::init() -> bool
+{
+  if (not configuration_.standalone_mode) {
+    simulation_api_schema::InitializeRequest request;
+    request.set_initialize_time(clock_.getCurrentSimulationTime());
+    request.set_lanelet2_map_path(configuration_.lanelet2_map_path().string());
+    request.set_realtime_factor(clock_.realtime_factor);
+    request.set_step_time(clock_.getStepTime());
+    simulation_interface::toProto(
+      clock_.getCurrentRosTime(), *request.mutable_initialize_ros_time());
+    return zeromq_client_.call(request).result().success();
+  } else {
+    return true;
+  }
+}
+
 auto API::setVerbose(const bool verbose) -> void { entity_manager_ptr_->setVerbose(verbose); }
+
+auto API::setSimulationStepTime(const double step_time) -> bool
+{
+  /**
+   * @note Pausing the simulation by setting the realtime_factor_ value to 0 is not supported and causes the simulation crash.
+   * For that reason, before performing the action, it needs to be ensured that the incoming request data is a positive number.
+   */
+  if (step_time >= 0.001) {
+    clock_.realtime_factor = step_time;
+    simulation_api_schema::UpdateStepTimeRequest request;
+    request.set_simulation_step_time(clock_.getStepTime());
+    return zeromq_client_.call(request).result().success();
+  } else {
+    return false;
+  }
+}
 
 auto API::startNpcLogic() -> void
 {

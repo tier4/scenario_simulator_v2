@@ -54,12 +54,10 @@ public:
     NodeT && node, const Configuration & configuration,
     const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node_parameters)
   : configuration_(configuration),
-    node_topics_interface(rclcpp::node_interfaces::get_node_topics_interface(node)),
+    clock_ptr_(node->get_clock()),
     node_parameters_(node_parameters),
     broadcaster_(node),
     base_link_broadcaster_(node),
-    clock_ptr_(node->get_clock()),
-    npc_logic_started_(false),
     entity_status_array_pub_ptr_(rclcpp::create_publisher<EntityStatusWithTrajectoryArray>(
       node, "entity/status", EntityMarkerQoS(),
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
