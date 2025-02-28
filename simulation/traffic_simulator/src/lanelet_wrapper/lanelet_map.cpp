@@ -235,6 +235,28 @@ auto previousLaneletIds(
   }
   return lanelet::Ids(previous_lanelet_ids_set.begin(), previous_lanelet_ids_set.end());
 }
+
+// Bounds
+auto leftBound(const lanelet::Id lanelet_id) -> std::vector<Point>
+{
+  return toPolygon(LaneletWrapper::map()->laneletLayer.get(lanelet_id).leftBound());
+}
+
+auto rightBound(const lanelet::Id lanelet_id) -> std::vector<Point>
+{
+  return toPolygon(LaneletWrapper::map()->laneletLayer.get(lanelet_id).rightBound());
+}
+
+// Polygons
+auto toPolygon(const lanelet::ConstLineString3d & line_string) -> std::vector<Point>
+{
+  std::vector<Point> points;
+  points.reserve(line_string.size());
+  for (const auto & point : line_string) {
+    points.push_back(geometry_msgs::build<Point>().x(point.x()).y(point.y()).z(point.z()));
+  }
+  return points;
+}
 }  // namespace lanelet_map
 }  // namespace lanelet_wrapper
 }  // namespace traffic_simulator
