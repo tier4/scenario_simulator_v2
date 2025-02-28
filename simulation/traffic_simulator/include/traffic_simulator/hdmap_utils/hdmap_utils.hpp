@@ -179,8 +179,6 @@ public:
     const traffic_simulator::RoutingConfiguration & routing_configuration =
       traffic_simulator::RoutingConfiguration()) const -> std::optional<double>;
 
-  auto getLeftBound(const lanelet::Id) const -> std::vector<geometry_msgs::msg::Point>;
-
   auto getLongitudinalDistance(
     const traffic_simulator_msgs::msg::LaneletPose & from_pose,
     const traffic_simulator_msgs::msg::LaneletPose & to_pose,
@@ -199,8 +197,6 @@ public:
     const lanelet::Id, const double backward_horizon = 100,
     const traffic_simulator::RoutingGraphType type =
       traffic_simulator::RoutingConfiguration().routing_graph_type) const -> lanelet::Ids;
-
-  auto getRightBound(const lanelet::Id) const -> std::vector<geometry_msgs::msg::Point>;
 
   auto getRightOfWayLaneletIds(const lanelet::Ids &) const
     -> std::unordered_map<lanelet::Id, lanelet::Ids>;

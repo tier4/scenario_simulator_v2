@@ -53,6 +53,7 @@ ament_auto_add_library(traffic_simulator SHARED
   src/lanelet_wrapper/lanelet_map.cpp
   src/lanelet_wrapper/lanelet_wrapper.cpp
   src/lanelet_wrapper/pose.cpp
+  src/lanelet_wrapper/route.cpp
   src/lanelet_wrapper/traffic_rules.cpp
   src/simulation_clock/simulation_clock.cpp
   src/traffic/traffic_controller.cpp

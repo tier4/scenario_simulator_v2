@@ -76,11 +76,8 @@ class DetectionSensor : public DetectionSensorBase
 
   std::default_random_engine random_engine_;
 
-  std::queue<std::pair<autoware_perception_msgs::msg::DetectedObjects, double>>
-    detected_objects_queue;
-
-  std::queue<std::pair<autoware_perception_msgs::msg::TrackedObjects, double>>
-    ground_truth_objects_queue;
+  std::queue<std::pair<std::vector<traffic_simulator_msgs::EntityStatus>, double>>
+    unpublished_detected_entities, unpublished_ground_truth_entities;
 
 public:
   explicit DetectionSensor(

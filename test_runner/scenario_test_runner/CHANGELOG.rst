@@ -35,6 +35,117 @@ Changelog for package scenario_test_runner
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+12.0.1 (2025-02-26)
+-------------------
+* Merge branch 'master' into feature/push-latest-docker-tag
+* Contributors: Masaya Kataoka
+
+12.0.0 (2025-02-25)
+-------------------
+* Merge branch 'master' into refactor/lanelet_wrapper_bound
+* Merge branch 'master' into refactor/lanelet_wrapper_bound
+* Contributors: Tatsuya Yamasaki
+
+11.1.0 (2025-02-21)
+-------------------
+* Merge pull request `#1517 <https://github.com/tier4/scenario_simulator_v2/issues/1517>`_ from tier4/feature/execution_time
+* Revert "Revert "Revert "chore: modify scenario threshold for test"""
+  This reverts commit 7d343c55b229f3c1eb4aabb28340b4dfd7f9ff98.
+* Merge branch 'master' into feature/execution_time
+* Revert "Revert "chore: modify scenario threshold for test""
+  This reverts commit 603273f93910854a0fdd228dfef0aee537fb6398.
+* Revert "chore: modify scenario threshold for test"
+  This reverts commit 30e525ccdce49cc2f13d21f9fa9b9b15f58ccbbb.
+* Merge remote-tracking branch 'origin/master' into feature/execution_time
+* chore: modify scenario threshold for test
+* Merge branch 'master' into feature/execution_time
+* chore: use seconds as time unit in execution_time topics
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Revert "chore: change scenario condition for test"
+  This reverts commit 868aae6e9077d8f9c2e58d3431d01e300b1f1c70.
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* chore: change scenario condition for test
+* chore: move execution_time_test.yaml into optional_workflow.txt
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* feat: add execution_time_test.yaml into test scenario line-up
+* Merge branch 'master' into feature/execution_time
+* chore: update threshold for update time in execution_time_test.yaml
+* refactor: use anchor and aliases in execution_time_test.yaml
+* feat: add execution_time_test.yaml
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
+11.0.0 (2025-02-20)
+-------------------
+* Merge branch 'master' into refactor/lanelet_wrapper_route
+* Contributors: Tatsuya Yamasaki
+
+10.3.3 (2025-02-18)
+-------------------
+* Merge branch 'master' into refactor/simple_sensor_simulator/noise
+* Merge branch 'master' into refactor/simple_sensor_simulator/noise
+* Merge branch 'master' into refactor/simple_sensor_simulator/noise
+* Merge branch 'master' into refactor/simple_sensor_simulator/noise
+* Merge remote-tracking branch 'origin/master' into refactor/simple_sensor_simulator/noise
+* Merge branch 'master' into refactor/simple_sensor_simulator/noise
+* Merge branch 'master' into refactor/simple_sensor_simulator/noise
+* Merge branch 'master' into refactor/simple_sensor_simulator/noise
+* Merge branch 'master' into refactor/simple_sensor_simulator/noise
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+10.3.2 (2025-02-17)
+-------------------
+
+10.3.1 (2025-02-17)
+-------------------
+* Merge branch 'master' into fix/use-capital-as
+* Contributors: Kotaro Yoshimoto
+
+10.3.0 (2025-02-14)
+-------------------
+* Merge pull request `#1503 <https://github.com/tier4/scenario_simulator_v2/issues/1503>`_ from tier4/feature/publisher-with-customizable-randomizer
+  Feature/publisher with customizable randomizer
+* Merge branch 'master' into feature/publisher-with-customizable-randomizer
+* Merge branch 'master' into feature/publisher-with-customizable-randomizer
+* Update test `normal_distribution.cpp` to use `ASSERT_DOUBLE_EQ`
+* Merge branch 'master' into feature/publisher-with-customizable-randomizer
+* Merge branch 'master' into feature/publisher-with-customizable-randomizer
+* Merge branch 'master' into feature/publisher-with-customizable-randomizer
+* Merge remote-tracking branch 'origin/master' into feature/publisher-with-customizable-randomizer
+* Merge branch 'master' into feature/publisher-with-customizable-randomizer
+* Merge branch 'master' into feature/publisher-with-customizable-randomizer
+* Merge branch 'master' into feature/publisher-with-customizable-randomizer
+* Update `scenario_test_runner` to check the path given as a parameter
+* Rename the parameter `(x|y|z)` to `local\_(x|y|z)`
+* Update the position error to apply in the entity's local coordinate
+* Merge branch 'master' into feature/publisher-with-customizable-randomizer
+* Add support for multiplicative errors as well as additive errors
+* Merge remote-tracking branch 'origin/master' into feature/publisher-with-customizable-randomizer
+* Merge remote-tracking branch 'origin/master' into feature/publisher-with-customizable-randomizer
+* Update parameter file format
+* Update randomizer to receive `NodeParametersInterface`
+* Add launch argument `parameter_file_path` to `scenario_test_runner`
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+10.2.0 (2025-02-14)
+-------------------
+* Merge pull request `#1524 <https://github.com/tier4/scenario_simulator_v2/issues/1524>`_ from tier4/feature/rosbag_storage
+  feat: implement rosbag storage switching
+* Merge branch 'master' into feature/rosbag_storage
+* Merge branch 'master' into feature/rosbag_storage
+* Merge branch 'master' into feature/rosbag_storage
+* feat: use rosbag command default as record_storage_id default value
+* feat: add record_storage_id argument to launch
+* Contributors: Kotaro Yoshimoto
+
+10.1.2 (2025-02-14)
+-------------------
+
 10.1.1 (2025-02-13)
 -------------------
 * Merge branch 'master' into doc/comment_about_respawn_ego

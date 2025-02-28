@@ -740,18 +740,6 @@ auto HdMapUtils::getTrafficLightBulbPosition(
   return std::nullopt;
 }
 
-auto HdMapUtils::getLeftBound(const lanelet::Id lanelet_id) const
-  -> std::vector<geometry_msgs::msg::Point>
-{
-  return toPolygon(lanelet_map_ptr_->laneletLayer.get(lanelet_id).leftBound());
-}
-
-auto HdMapUtils::getRightBound(const lanelet::Id lanelet_id) const
-  -> std::vector<geometry_msgs::msg::Point>
-{
-  return toPolygon(lanelet_map_ptr_->laneletLayer.get(lanelet_id).rightBound());
-}
-
 auto HdMapUtils::getLaneChangeTrajectory(
   const traffic_simulator_msgs::msg::LaneletPose & from_pose,
   const traffic_simulator::lane_change::Parameter & lane_change_parameter) const

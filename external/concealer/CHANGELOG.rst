@@ -21,6 +21,101 @@ Changelog for package concealer
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+12.0.1 (2025-02-26)
+-------------------
+* Merge branch 'master' into feature/push-latest-docker-tag
+* Contributors: Masaya Kataoka
+
+12.0.0 (2025-02-25)
+-------------------
+* Merge branch 'master' into refactor/lanelet_wrapper_bound
+* Merge branch 'master' into refactor/lanelet_wrapper_bound
+* Contributors: Tatsuya Yamasaki
+
+11.1.0 (2025-02-21)
+-------------------
+* Merge branch 'master' into feature/execution_time
+* Merge remote-tracking branch 'origin/master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
+11.0.0 (2025-02-20)
+-------------------
+* Merge branch 'master' into refactor/lanelet_wrapper_route
+* Contributors: Tatsuya Yamasaki
+
+10.3.3 (2025-02-18)
+-------------------
+* Merge branch 'master' into refactor/simple_sensor_simulator/noise
+* Merge branch 'master' into refactor/simple_sensor_simulator/noise
+* Merge branch 'master' into refactor/simple_sensor_simulator/noise
+* Merge branch 'master' into refactor/simple_sensor_simulator/noise
+* Merge remote-tracking branch 'origin/master' into refactor/simple_sensor_simulator/noise
+* Merge branch 'master' into refactor/simple_sensor_simulator/noise
+* Merge branch 'master' into refactor/simple_sensor_simulator/noise
+* Merge branch 'master' into refactor/simple_sensor_simulator/noise
+* Merge branch 'master' into refactor/simple_sensor_simulator/noise
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+10.3.2 (2025-02-17)
+-------------------
+
+10.3.1 (2025-02-17)
+-------------------
+* Merge branch 'master' into fix/use-capital-as
+* Contributors: Kotaro Yoshimoto
+
+10.3.0 (2025-02-14)
+-------------------
+* Merge pull request `#1503 <https://github.com/tier4/scenario_simulator_v2/issues/1503>`_ from tier4/feature/publisher-with-customizable-randomizer
+  Feature/publisher with customizable randomizer
+* Merge branch 'master' into feature/publisher-with-customizable-randomizer
+* Merge branch 'master' into feature/publisher-with-customizable-randomizer
+* Update test `normal_distribution.cpp` to use `ASSERT_DOUBLE_EQ`
+* Merge branch 'master' into feature/publisher-with-customizable-randomizer
+* Merge branch 'master' into feature/publisher-with-customizable-randomizer
+* Merge branch 'master' into feature/publisher-with-customizable-randomizer
+* Add new test file `concealer/test/normal_distribution.cpp`
+* Merge remote-tracking branch 'origin/master' into feature/publisher-with-customizable-randomizer
+* Merge branch 'master' into feature/publisher-with-customizable-randomizer
+* Merge branch 'master' into feature/publisher-with-customizable-randomizer
+* Merge branch 'master' into feature/publisher-with-customizable-randomizer
+* Rename the parameter `(x|y|z)` to `local\_(x|y|z)`
+* Update the position error to apply in the entity's local coordinate
+* Merge branch 'master' into feature/publisher-with-customizable-randomizer
+* Cleanup
+* Add support for multiplicative errors as well as additive errors
+* Update `NormalDistribution<Odometry>` to use `std::normal_distribution`
+* Update `NormalDistribution<Odometry>::device` type to `std::mt19937_64`
+* Merge remote-tracking branch 'origin/master' into feature/publisher-with-customizable-randomizer
+* Merge remote-tracking branch 'origin/master' into feature/publisher-with-customizable-randomizer
+* Update parameter file format
+* Update randomizer to receive `NodeParametersInterface`
+* Add new struct template `Identity`
+* Add template specialization `NormalDistribution<nav_msgs::msg::Odometry>`
+* Add new struct template `concealer::NormalDistribution`
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+10.2.0 (2025-02-14)
+-------------------
+* Merge branch 'master' into feature/rosbag_storage
+* Merge branch 'master' into feature/rosbag_storage
+* Merge branch 'master' into feature/rosbag_storage
+* Contributors: Kotaro Yoshimoto
+
+10.1.2 (2025-02-14)
+-------------------
+
 10.1.1 (2025-02-13)
 -------------------
 * Merge branch 'master' into doc/comment_about_respawn_ego
