@@ -277,19 +277,6 @@ public:
     }
   }
 
-  template <typename MessageT, typename... Args>
-  auto createPublisher(Args &&... args)
-  {
-    return rclcpp::create_publisher<MessageT>(node_topics_interface, std::forward<Args>(args)...);
-  }
-
-  template <typename MessageT, typename... Args>
-  auto createSubscription(Args &&... args)
-  {
-    return rclcpp::create_subscription<MessageT>(
-      node_topics_interface, std::forward<Args>(args)...);
-  }
-
 private:
   /* */ Configuration configuration_;
 
