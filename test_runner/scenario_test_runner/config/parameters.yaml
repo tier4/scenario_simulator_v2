@@ -131,16 +131,16 @@ simulation:
         version: 20240605 # architecture_type suffix (mandatory)
         seed: 0 # If 0 is specified, a random seed value will be generated for each run.
         override_legacy_configuration: false
-        delay: 0.0 # This value is used only if `override_legacy_configuration` is true. If it is false, the value of `detectedObjectPublishingDelay` in `ObjectController.Properties` in the scenario file is used.
-        range: 300.0 # This value is used only if `override_legacy_configuration` is true. If it is false, the value of `detectionSensorRange` in `ObjectController.Properties` in the scenario file is used.
-        clairvoyant: false # This value is used only if `override_legacy_configuration` is true. If it is false, the value of `isClairvoyant` in `ObjectController.Properties` in the scenario file is used.
+        delay: 0.0 # This parameter is used only if `override_legacy_configuration` is true. If it is false, the value of `detectedObjectPublishingDelay` in `ObjectController.Properties` in the scenario file is used.
+        range: 300.0 # This parameter is used only if `override_legacy_configuration` is true. If it is false, the value of `detectionSensorRange` in `ObjectController.Properties` in the scenario file is used.
+        occlusionless: false # This parameter is used only if `override_legacy_configuration` is true. If it is false, the value of `isClairvoyant` in `ObjectController.Properties` in the scenario file is used.
         noise:
           model:
             version: 1 # Any of [1, 2].
           v1: # This clause is used only if `model.version` is 1.
             position:
-              standard_deviation: 0.0 # This value is used only if `override_legacy_configuration` is true. If it is false, the value of `detectedObjectPositionStandardDeviation` in `ObjectController.Properties` in the scenario file is used.
-            missing_probability: 0.0 # This value is used only if `override_legacy_configuration` is true. If it is false, the value of `detectedObjectMissingProbability` in `ObjectController.Properties` in the scenario file is used.
+              standard_deviation: 0.0 # This parameter is used only if `override_legacy_configuration` is true. If it is false, the value of `detectedObjectPositionStandardDeviation` in `ObjectController.Properties` in the scenario file is used.
+            missing_probability: 0.0 # This parameter is used only if `override_legacy_configuration` is true. If it is false, the value of `detectedObjectMissingProbability` in `ObjectController.Properties` in the scenario file is used.
           v2: # This clause is used only if `model.version` is 2.
             ellipse_y_radii: [10.0, 20.0, 40.0, 60.0, 80.0, 120.0, 150.0, 180.0, 1000.0]
             distance:
@@ -183,4 +183,4 @@ simulation:
       /perception/object_recognition/ground_truth/objects:
         version: 20240605 # architecture_type suffix (mandatory)
         override_legacy_configuration: false
-        delay: 0.0  # This value is used only if `override_legacy_configuration` is true. If it is false, the value of `detectedObjectGroundTruthPublishingDelay` in `ObjectController.Properties` in the scenario file is used.
+        delay: 0.0  # This parameter is used only if `override_legacy_configuration` is true. If it is false, the value of `detectedObjectGroundTruthPublishingDelay` in `ObjectController.Properties` in the scenario file is used.

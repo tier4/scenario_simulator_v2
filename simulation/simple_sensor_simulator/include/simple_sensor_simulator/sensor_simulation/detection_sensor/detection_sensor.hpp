@@ -142,9 +142,9 @@ class DetectionSensor : public DetectionSensorBase
     static const auto override_legacy_configuration = concealer::getParameter<bool>(
       detected_objects_publisher->get_topic_name() + std::string(".override_legacy_configuration"));
     if (override_legacy_configuration) {
-      static const auto clairvoyant = concealer::getParameter<bool>(
-        detected_objects_publisher->get_topic_name() + std::string(".clairvoyant"));
-      return clairvoyant;
+      static const auto occlusionless = concealer::getParameter<bool>(
+        detected_objects_publisher->get_topic_name() + std::string(".occlusionless"));
+      return occlusionless;
     } else {
       return configuration_.detect_all_objects_in_range();
     }

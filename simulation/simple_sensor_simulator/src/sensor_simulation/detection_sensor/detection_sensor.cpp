@@ -396,10 +396,10 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
              | p_10 p_11 | == | p0 (1 - phi)    p1 - phi * p0 |
         */
         auto markov_process_noise =
-          [this](bool previous_noise, auto p1, auto autocorrelation_coefficient) {
-            const auto rate = (previous_noise ? 1.0 : 0.0) * autocorrelation_coefficient +
-                              (1 - autocorrelation_coefficient) * p1;
-            return std::uniform_real_distribution<double>()(random_engine_) < rate;
+          [this](bool previous_noise, auto rate, auto autocorrelation_coefficient) {
+            return std::uniform_real_distribution<double>()(random_engine_) <
+                   (previous_noise ? 1.0 : 0.0) * autocorrelation_coefficient +
+                     (1 - autocorrelation_coefficient) * rate;
           };
 
         /*
