@@ -32,6 +32,7 @@
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <simple_junit/junit5.hpp>
+#include <tier4_simulation_msgs/msg/user_defined_value.hpp>
 #include <utility>
 
 #define INTERPRETER_INFO_STREAM(...) \
@@ -52,6 +53,15 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode,
 
   const rclcpp_lifecycle::LifecyclePublisher<Context>::SharedPtr publisher_of_context;
 
+  rclcpp_lifecycle::LifecyclePublisher<tier4_simulation_msgs::msg::UserDefinedValue>::SharedPtr
+    evaluate_time_publisher;
+
+  rclcpp_lifecycle::LifecyclePublisher<tier4_simulation_msgs::msg::UserDefinedValue>::SharedPtr
+    update_time_publisher;
+
+  rclcpp_lifecycle::LifecyclePublisher<tier4_simulation_msgs::msg::UserDefinedValue>::SharedPtr
+    output_time_publisher;
+
   double local_frame_rate;
 
   double local_real_time_factor;
@@ -63,6 +73,8 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode,
   bool publish_empty_context;
 
   bool record;
+
+  String record_storage_id;
 
   std::shared_ptr<OpenScenario> script;
 
@@ -192,36 +204,6 @@ public:
       set<common::junit::Error>("UnknownError", "An unknown exception has occurred");
       return handle();
     }
-  }
-
-  template <typename TimeoutHandler, typename Thunk>
-  auto withTimeoutHandler(TimeoutHandler && handle, Thunk && thunk) -> decltype(auto)
-  {
-    if (const auto time = execution_timer.invoke("", thunk); currentLocalFrameRate() < time) {
-      handle(execution_timer.getStatistics(""));
-    }
-  }
-
-  auto defaultTimeoutHandler() const
-  {
-    /*
-       Ideally, the scenario should be terminated with an error if the total
-       time for the ScenarioDefinition evaluation and the traffic_simulator's
-       updateFrame exceeds the time allowed for a single frame. However, we
-       have found that many users are in environments where it is not possible
-       to run the simulator stably at 30 FPS (the default setting) while
-       running Autoware. In order to prioritize comfortable daily use, we
-       decided to give up full reproducibility of the scenario and only provide
-       warnings.
-    */
-
-    return [this](const auto & statistics) {
-      RCLCPP_WARN_STREAM(
-        get_logger(),
-        "Your machine is not powerful enough to run the scenario at the specified frame rate ("
-          << local_frame_rate << " Hz). We recommend that you reduce the frame rate to "
-          << 1000.0 / statistics.template max<std::chrono::milliseconds>().count() << " or less.");
-    };
   }
 };
 }  // namespace openscenario_interpreter
