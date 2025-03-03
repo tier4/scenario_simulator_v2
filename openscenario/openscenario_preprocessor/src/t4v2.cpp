@@ -43,6 +43,7 @@ import yaml
 import os
 import sys
 import xml.etree.ElementTree as ET
+import cProfile
 from yaml import CSafeLoader
 
 
@@ -85,12 +86,7 @@ def from_yaml(keyword, node):
     #
     # ???: [ ... ]
     #
-    result = []
-
-    for index, item in enumerate(node):
-      result.append(from_yaml(keyword, item))
-
-    return result
+    return [from_yaml(keyword, item) for item in node]
 
   elif isinstance(node, str):
     return node
