@@ -26,7 +26,8 @@ namespace traffic_simulator
 class RoutePlanner
 {
 public:
-  explicit RoutePlanner(const std::shared_ptr<hdmap_utils::HdMapUtils> &);
+  explicit RoutePlanner(
+    const traffic_simulator::RoutingGraphType &, const std::shared_ptr<hdmap_utils::HdMapUtils> &);
 
   auto getRouteLanelets(const CanonicalizedLaneletPose & entity_lanelet_pose, double horizon = 100)
     -> lanelet::Ids;
@@ -44,6 +45,7 @@ private:
 
   std::optional<lanelet::Ids> route_;
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
+  const traffic_simulator::RoutingGraphType routing_graph_type_;
 
   /*
      What we need is a queue, but we need to be able to iterate over the

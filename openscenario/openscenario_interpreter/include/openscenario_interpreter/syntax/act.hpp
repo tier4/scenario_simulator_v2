@@ -25,18 +25,18 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- Act --------------------------------------------------------------------
- *
- *  <xsd:complexType name="Act">
- *    <xsd:sequence>
- *      <xsd:element name="ManeuverGroup" maxOccurs="unbounded" type="ManeuverGroup"/>
- *      <xsd:element name="StartTrigger" type="Trigger"/>
- *      <xsd:element name="StopTrigger" minOccurs="0" type="Trigger"/>
- *    </xsd:sequence>
- *    <xsd:attribute name="name" type="String" use="required"/>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   Act(OpenSCENARIO XML 1.3)
+
+   <xsd:complexType name="Act">
+     <xsd:sequence>
+       <xsd:element name="ManeuverGroup" maxOccurs="unbounded" type="ManeuverGroup"/>
+       <xsd:element name="StartTrigger" minOccurs="0" type="Trigger"/>
+       <xsd:element name="StopTrigger" minOccurs="0" type="Trigger"/>
+     </xsd:sequence>
+     <xsd:attribute name="name" type="String" use="required"/>
+   </xsd:complexType>
+*/
 struct Act : public Scope, public StoryboardElement
 {
   explicit Act(const pugi::xml_node &, Scope &);

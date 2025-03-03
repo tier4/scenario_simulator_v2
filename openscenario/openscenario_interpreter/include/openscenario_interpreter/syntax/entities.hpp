@@ -24,18 +24,25 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- Entities ---------------------------------------------------------------
- *
- *  <xsd:complexType name="Entities">
- *    <xsd:sequence>
- *      <xsd:element name="ScenarioObject" minOccurs="0" maxOccurs="unbounded" type="ScenarioObject"/>
- *      <xsd:element name="EntitySelection" minOccurs="0" maxOccurs="unbounded" type="EntitySelection"/>
- *    </xsd:sequence>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
-struct Entities : public std::unordered_map<std::string, Object>  // TODO to be data member
+/*
+   Entities (OpenSCENARIO XML 1.3.1)
+
+   Definition of entities (scenario objects or entity selections) in
+   a scenario.
+
+   <xsd:complexType name="Entities">
+     <xsd:sequence>
+       <xsd:element name="ScenarioObject" type="ScenarioObject" minOccurs="0" maxOccurs="unbounded"/>
+       <xsd:element name="EntitySelection" type="EntitySelection" minOccurs="0" maxOccurs="unbounded"/>
+     </xsd:sequence>
+   </xsd:complexType>
+*/
+struct Entities : private std::unordered_map<std::string, Object>
 {
+  using std::unordered_map<std::string, Object>::at;
+  using std::unordered_map<std::string, Object>::begin;
+  using std::unordered_map<std::string, Object>::end;
+
   explicit Entities(const pugi::xml_node &, Scope &);
 
   auto isAdded(const Entity &) const -> bool;

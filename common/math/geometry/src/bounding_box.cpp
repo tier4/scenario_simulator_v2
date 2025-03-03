@@ -62,22 +62,12 @@ std::optional<std::pair<geometry_msgs::msg::Pose, geometry_msgs::msg::Pose>> get
   const auto poly0 = toPolygon2D(pose0, bbox0);
   const auto poly1 = toPolygon2D(pose1, bbox1);
 
-  if (boost::geometry::intersects(poly0, poly1)) {
-    return std::nullopt;
-  }
-  if (boost::geometry::intersects(poly1, poly0)) {
-    return std::nullopt;
-  }
   if (boost::geometry::disjoint(poly0, poly1)) {
     auto point0 = boost_point();
     auto point1 = boost_point();
     auto min_distance = boost::numeric::bounds<double>::highest();
 
-    auto segments = boost::make_iterator_range(
-      boost::geometry::segments_begin(poly0), boost::geometry::segments_end(poly0));
-    auto points = boost::make_iterator_range(
-      boost::geometry::points_begin(poly1), boost::geometry::points_end(poly1));
-    auto findNearestPointInSegment = [&](const auto & segment, const auto & points) {
+    auto findNearestPointToSegment = [&](const auto & segment, const auto & points) {
       for (auto && point : points) {
         auto nearest_point_from_segment =
           pointToSegmentProjection(point, *segment.first, *segment.second);
@@ -90,9 +80,18 @@ std::optional<std::pair<geometry_msgs::msg::Pose, geometry_msgs::msg::Pose>> get
       }
     };
 
-    for (auto && segment : segments) {
-      findNearestPointInSegment(segment, points);
-    }
+    auto findNearestPointInPolygon = [&](const auto & poly0, const auto & poly1) {
+      auto segments = boost::make_iterator_range(
+        boost::geometry::segments_begin(poly0), boost::geometry::segments_end(poly0));
+      auto points = boost::geometry::exterior_ring(poly1);
+
+      for (auto && segment : segments) {
+        findNearestPointToSegment(segment, points);
+      }
+    };
+
+    findNearestPointInPolygon(poly0, poly1);
+    findNearestPointInPolygon(poly1, poly0);
 
     return std::make_pair(toPose(point0), toPose(point1));
   }
@@ -102,7 +101,8 @@ std::optional<std::pair<geometry_msgs::msg::Pose, geometry_msgs::msg::Pose>> get
 boost_point pointToSegmentProjection(
   const boost_point & p, const boost_point & p1, const boost_point & p2)
 {
-  boost_point v = p2, w = p;
+  auto v = p2;
+  auto w = p;
   boost::geometry::subtract_point(v, p1);
   boost::geometry::subtract_point(w, p1);
 
@@ -121,14 +121,15 @@ boost_point pointToSegmentProjection(
 
 auto toPolygon2D(
   const geometry_msgs::msg::Pose & pose,
-  const traffic_simulator_msgs::msg::BoundingBox & bounding_box) -> const boost_polygon
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box) -> boost_polygon
 {
   return toBoostPolygon(transformPoints(pose, getPointsFromBbox(bounding_box)));
 }
 
 std::vector<geometry_msgs::msg::Point> getPointsFromBbox(
-  traffic_simulator_msgs::msg::BoundingBox bounding_box, double width_extension_right,
-  double width_extension_left, double length_extension_front, double length_extension_rear)
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, const double width_extension_right,
+  const double width_extension_left, const double length_extension_front,
+  const double length_extension_rear)
 {
   std::vector<geometry_msgs::msg::Point> points;
   auto distances_from_center_to_edge = getDistancesFromCenterToEdge(bounding_box);
@@ -159,7 +160,14 @@ auto toPolygon2D(const traffic_simulator_msgs::msg::BoundingBox & bounding_box)
   -> std::vector<geometry_msgs::msg::Point>
 {
   std::vector<geometry_msgs::msg::Point> points_bounding_box;
-  geometry_msgs::msg::Point p0, p1, p2, p3, p4, p5, p6, p7;
+  geometry_msgs::msg::Point p0;
+  geometry_msgs::msg::Point p1;
+  geometry_msgs::msg::Point p2;
+  geometry_msgs::msg::Point p3;
+  geometry_msgs::msg::Point p4;
+  geometry_msgs::msg::Point p5;
+  geometry_msgs::msg::Point p6;
+  geometry_msgs::msg::Point p7;
 
   p0.x = bounding_box.center.x + bounding_box.dimensions.x * 0.5;
   p0.y = bounding_box.center.y + bounding_box.dimensions.y * 0.5;

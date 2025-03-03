@@ -33,6 +33,7 @@
 #if __has_include(<autoware_perception_msgs/msg/traffic_signal_array.hpp>)
 #include <autoware_perception_msgs/msg/traffic_signal_array.hpp>
 #endif
+
 #if __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)
 #include <autoware_perception_msgs/msg/traffic_light_group_array.hpp>
 #endif
@@ -101,35 +102,10 @@ public:
   auto attachPseudoTrafficLightsDetector(
     const double /*current_simulation_time*/,
     const simulation_api_schema::PseudoTrafficLightDetectorConfiguration & configuration,
-    rclcpp::Node & node, std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils) -> void
+    rclcpp::Node & node) -> void
   {
-    bool has_attached = false;
-#if __has_include(<autoware_perception_msgs/msg/traffic_signal_array.hpp>)
-    if (configuration.architecture_type() == "awf/universe/20230906") {
-      using Message = autoware_perception_msgs::msg::TrafficSignalArray;
-      traffic_lights_detectors_.push_back(std::make_unique<traffic_lights::TrafficLightsDetector>(
-        std::make_shared<traffic_simulator::TrafficLightPublisher<Message>>(
-          "/perception/traffic_light_recognition/internal/traffic_signals", &node, hdmap_utils)));
-      has_attached = true;
-    }
-#endif
-
-#if __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)
-    if (configuration.architecture_type() == "awf/universe/20240605") {
-      using Message = autoware_perception_msgs::msg::TrafficLightGroupArray;
-      traffic_lights_detectors_.push_back(std::make_unique<traffic_lights::TrafficLightsDetector>(
-        std::make_shared<traffic_simulator::TrafficLightPublisher<Message>>(
-          "/perception/traffic_light_recognition/internal/traffic_signals", &node, hdmap_utils)));
-      has_attached = true;
-    }
-#endif
-
-    if (not has_attached) {
-      std::stringstream ss;
-      ss << "Unexpected architecture_type " << std::quoted(configuration.architecture_type())
-         << " given for traffic light.";
-      throw std::runtime_error(ss.str());
-    }
+    traffic_lights_detectors_.push_back(std::make_unique<traffic_lights::TrafficLightsDetector>(
+      node, configuration.architecture_type()));
   }
 
   auto attachImuSensor(

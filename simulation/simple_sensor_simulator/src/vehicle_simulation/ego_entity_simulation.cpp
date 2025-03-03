@@ -20,6 +20,7 @@
 #include <geometry/quaternion/quaternion_to_euler.hpp>
 #include <simple_sensor_simulator/vehicle_simulation/ego_entity_simulation.hpp>
 #include <traffic_simulator/helper/helper.hpp>
+#include <traffic_simulator/lanelet_wrapper/pose.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 
 namespace vehicle_simulation
@@ -41,7 +42,8 @@ EgoEntitySimulation::EgoEntitySimulation(
   const traffic_simulator_msgs::msg::VehicleParameters & parameters, double step_time,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
   const rclcpp::Parameter & use_sim_time, const bool consider_acceleration_by_road_slope)
-: autoware(std::make_unique<concealer::AutowareUniverse>()),
+: autoware(
+    std::make_unique<concealer::AutowareUniverse>(getParameter<bool>("simulate_localization"))),
   vehicle_model_type_(getVehicleModelType()),
   vehicle_model_ptr_(makeSimulationModel(vehicle_model_type_, step_time, parameters)),
   status_(initial_status, std::nullopt),
@@ -186,15 +188,15 @@ auto EgoEntitySimulation::makeSimulationModel(
 
 auto EgoEntitySimulation::setAutowareStatus() -> void
 {
-  autoware->set([this]() {
+  autoware->current_acceleration.store([this]() {
     geometry_msgs::msg::Accel message;
     message.linear.x = vehicle_model_ptr_->getAx();
     return message;
   }());
 
-  autoware->set(status_.getMapPose());
+  autoware->current_pose.store(status_.getMapPose());
 
-  autoware->set(getCurrentTwist());
+  autoware->current_twist.store(getCurrentTwist());
 }
 
 void EgoEntitySimulation::requestSpeedChange(double value)
@@ -320,17 +322,10 @@ void EgoEntitySimulation::update(
   if (is_npc_logic_started) {
     auto input = Eigen::VectorXd(vehicle_model_ptr_->getDimU());
 
-    auto acceleration_by_slope = [this]() {
-      if (consider_acceleration_by_road_slope_) {
-        // calculate longitudinal acceleration by slope
-        constexpr double gravity_acceleration = -9.81;
-        const double ego_pitch_angle = calculateEgoPitch();
-        const double slope_angle = -ego_pitch_angle;
-        return gravity_acceleration * std::sin(slope_angle);
-      } else {
-        return 0.0;
-      }
-    }();
+    auto acceleration_by_slope = calculateAccelerationBySlope();
+
+    const auto [speed, acceleration, tire_angle, gear_sign, gear_command] =
+      autoware->getVehicleCommand();
 
     switch (vehicle_model_type_) {
       case VehicleModelType::DELAY_STEER_ACC:
@@ -338,8 +333,8 @@ void EgoEntitySimulation::update(
       case VehicleModelType::DELAY_STEER_MAP_ACC_GEARED:
       case VehicleModelType::IDEAL_STEER_ACC:
       case VehicleModelType::IDEAL_STEER_ACC_GEARED:
-        input(0) = autoware->getGearSign() * (autoware->getAcceleration() + acceleration_by_slope);
-        input(1) = autoware->getSteeringAngle();
+        input(0) = gear_sign * acceleration + acceleration_by_slope;
+        input(1) = tire_angle;
         break;
 
       case VehicleModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD:
@@ -351,8 +346,8 @@ void EgoEntitySimulation::update(
 
       case VehicleModelType::DELAY_STEER_VEL:
       case VehicleModelType::IDEAL_STEER_VEL:
-        input(0) = autoware->getVelocity();
-        input(1) = autoware->getSteeringAngle();
+        input(0) = speed;
+        input(1) = tire_angle;
         break;
 
       default:
@@ -360,7 +355,7 @@ void EgoEntitySimulation::update(
           "Unsupported vehicle_model_type ", toString(vehicle_model_type_), "specified");
     }
 
-    vehicle_model_ptr_->setGear(autoware->getGearCommand().command);
+    vehicle_model_ptr_->setGear(gear_command);
     vehicle_model_ptr_->setInput(input);
     vehicle_model_ptr_->update(step_time);
   }
@@ -371,56 +366,21 @@ void EgoEntitySimulation::update(
   updatePreviousValues();
 }
 
-auto EgoEntitySimulation::calculateEgoPitch() const -> double
+auto EgoEntitySimulation::calculateAccelerationBySlope() const -> double
 {
-  // calculate prev/next point of lanelet centerline nearest to ego pose.
-  if (!status_.laneMatchingSucceed()) {
+  if (consider_acceleration_by_road_slope_ && status_.isInLanelet()) {
+    constexpr double gravity_acceleration = -9.81;
+    /// @todo why there is a need to recalculate orientation using getLaneletPose?
+    /// status_.getMapPose().orientation already contains the orientation
+    const double ego_pitch_angle =
+      math::geometry::convertQuaternionToEulerAngle(
+        traffic_simulator::lanelet_wrapper::pose::toMapPose(status_.getLaneletPose(), true)
+          .pose.orientation)
+        .y;
+    return -std::sin(ego_pitch_angle) * gravity_acceleration;
+  } else {
     return 0.0;
   }
-
-  /// @note Copied from motion_util::findNearestSegmentIndex
-  auto centerline_points = hdmap_utils_ptr_->getCenterPoints(status_.getLaneletId());
-  auto find_nearest_segment_index =
-    [](const std::vector<geometry_msgs::msg::Point> & points, const Eigen::Vector3d & point) {
-      assert(not points.empty());
-
-      double min_dist = std::numeric_limits<double>::max();
-      size_t min_idx = 0;
-
-      for (size_t i = 0; i < points.size(); ++i) {
-        const auto dist =
-          [](const geometry_msgs::msg::Point & point1, const Eigen::Vector3d & point2) {
-            const auto dx = point1.x - point2.x();
-            const auto dy = point1.y - point2.y();
-            return dx * dx + dy * dy;
-          }(points.at(i), point);
-
-        if (dist < min_dist) {
-          min_dist = dist;
-          min_idx = i;
-        }
-      }
-      return min_idx;
-    };
-
-  const size_t ego_seg_idx =
-    find_nearest_segment_index(centerline_points, world_relative_position_);
-
-  const auto & prev_point = centerline_points.at(ego_seg_idx);
-  const auto & next_point = centerline_points.at(ego_seg_idx + 1);
-
-  /// @note Calculate ego yaw angle on lanelet coordinates
-  const double lanelet_yaw = std::atan2(next_point.y - prev_point.y, next_point.x - prev_point.x);
-  const double ego_yaw_against_lanelet = vehicle_model_ptr_->getYaw() - lanelet_yaw;
-
-  /// @note calculate ego pitch angle considering ego yaw.
-  const double diff_z = next_point.z - prev_point.z;
-  const double diff_xy = std::hypot(next_point.x - prev_point.x, next_point.y - prev_point.y) /
-                         std::cos(ego_yaw_against_lanelet);
-  const bool reverse_sign = std::cos(ego_yaw_against_lanelet) < 0.0;
-  const double ego_pitch_angle =
-    reverse_sign ? -std::atan2(-diff_z, -diff_xy) : -std::atan2(diff_z, diff_xy);
-  return ego_pitch_angle;
 }
 
 auto EgoEntitySimulation::getCurrentTwist() const -> geometry_msgs::msg::Twist
@@ -490,17 +450,17 @@ auto EgoEntitySimulation::setStatus(const traffic_simulator_msgs::msg::EntitySta
   /// EgoEntity::setStatus
   const auto unique_route_lanelets =
     traffic_simulator::helper::getUniqueValues(autoware->getRouteLanelets());
+  /// @note The offset value has been increased to 1.5 because a value of 1.0 was often insufficient when changing lanes. ( @Hans_Robo )
   const auto matching_distance = std::max(
                                    vehicle_parameters.axles.front_axle.track_width,
                                    vehicle_parameters.axles.rear_axle.track_width) *
                                    0.5 +
-                                 1.0;
+                                 1.5;
   /// @note Ego uses the unique_route_lanelets get from Autoware, instead of the current lanelet_id
   /// value from EntityStatus, therefore canonicalization has to be done in advance,
   /// not inside CanonicalizedEntityStatus
   const auto canonicalized_lanelet_pose = traffic_simulator::pose::toCanonicalizedLaneletPose(
-    status.pose, status.bounding_box, unique_route_lanelets, false, matching_distance,
-    hdmap_utils_ptr_);
+    status.pose, status.bounding_box, unique_route_lanelets, false, matching_distance);
   status_.set(traffic_simulator::CanonicalizedEntityStatus(status, canonicalized_lanelet_pose));
   setAutowareStatus();
 }

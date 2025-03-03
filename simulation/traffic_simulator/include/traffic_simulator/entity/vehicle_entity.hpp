@@ -107,9 +107,9 @@ public:
   auto requestFollowTrajectory(
     const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &) -> void override;
 
-  void requestLaneChange(const lanelet::Id to_lanelet_id) override;
+  auto requestLaneChange(const lanelet::Id to_lanelet_id) -> void override;
 
-  void requestLaneChange(const traffic_simulator::lane_change::Parameter &) override;
+  auto requestLaneChange(const traffic_simulator::lane_change::Parameter &) -> void override;
 
   void setVelocityLimit(double linear_velocity) override;
 
@@ -123,8 +123,7 @@ public:
 
   void setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &) override;
 
-  void setTrafficLightManager(
-    const std::shared_ptr<traffic_simulator::TrafficLightManager> &) override;
+  void setTrafficLights(const std::shared_ptr<traffic_simulator::TrafficLightsBase> &) override;
 
   const traffic_simulator_msgs::msg::VehicleParameters vehicle_parameters;
 

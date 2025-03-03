@@ -78,8 +78,7 @@ public:
 
   void cancelRequest() override;
 
-  void setTrafficLightManager(
-    const std::shared_ptr<traffic_simulator::TrafficLightManager> & ptr) override;
+  void setTrafficLights(const std::shared_ptr<traffic_simulator::TrafficLightsBase> & ptr) override;
 
   auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter;
 

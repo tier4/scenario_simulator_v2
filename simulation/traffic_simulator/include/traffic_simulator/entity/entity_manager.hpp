@@ -19,13 +19,6 @@
 #include <tf2_ros/static_transform_broadcaster.h>
 #include <tf2_ros/transform_broadcaster.h>
 
-#if __has_include(<autoware_perception_msgs/msg/traffic_signal_array.hpp>)
-#include <autoware_perception_msgs/msg/traffic_signal_array.hpp>
-#endif
-#if __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)
-#include <autoware_perception_msgs/msg/traffic_light_group_array.hpp>
-#endif
-
 #include <memory>
 #include <optional>
 #include <rclcpp/node_interfaces/get_node_topics_interface.hpp>
@@ -44,16 +37,15 @@
 #include <traffic_simulator/entity/pedestrian_entity.hpp>
 #include <traffic_simulator/entity/vehicle_entity.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
-#include <traffic_simulator/traffic/traffic_sink.hpp>
 #include <traffic_simulator/traffic_lights/configurable_rate_updater.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_marker_publisher.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_publisher.hpp>
+#include <traffic_simulator/traffic_lights/traffic_lights.hpp>
 #include <traffic_simulator/utils/node_parameters.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/entity_status_with_trajectory_array.hpp>
-#include <traffic_simulator_msgs/msg/traffic_light_array_v1.hpp>
 #include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
 #include <type_traits>
 #include <unordered_map>
@@ -104,18 +96,20 @@ class EntityManager
 
   MarkerArray markers_raw_;
 
-  const std::shared_ptr<TrafficLightManager> conventional_traffic_light_manager_ptr_;
-  const std::shared_ptr<TrafficLightMarkerPublisher>
-    conventional_traffic_light_marker_publisher_ptr_;
-  const std::shared_ptr<TrafficLightPublisherBase>
-    conventional_backward_compatible_traffic_light_publisher_ptr_;
-  const std::shared_ptr<TrafficLightManager> v2i_traffic_light_manager_ptr_;
-  const std::shared_ptr<TrafficLightMarkerPublisher> v2i_traffic_light_marker_publisher_ptr_;
-  const std::shared_ptr<TrafficLightPublisherBase> v2i_traffic_light_legacy_topic_publisher_ptr_;
-  const std::shared_ptr<TrafficLightPublisherBase> v2i_traffic_light_publisher_ptr_;
-  ConfigurableRateUpdater v2i_traffic_light_updater_, conventional_traffic_light_updater_;
+  std::shared_ptr<traffic_simulator::TrafficLights> traffic_lights_ptr_;
 
 public:
+  /**
+   * This function is necessary because the TrafficLights object is created after the EntityManager,
+   * so it cannot be assigned during the call of the EntityManager constructor.
+   * TrafficLights cannot be created before the EntityManager due to the dependency on HdMapUtils.
+   */
+  auto setTrafficLights(
+    const std::shared_ptr<traffic_simulator::TrafficLights> & traffic_lights_ptr) -> void
+  {
+    traffic_lights_ptr_ = traffic_lights_ptr;
+  }
+
   template <typename Node>
   auto getOrigin(Node & node) const
   {
@@ -132,36 +126,6 @@ public:
     }
 
     return origin;
-  }
-
-  template <typename... Ts>
-  auto makeV2ITrafficLightPublisher(Ts &&... xs) -> std::shared_ptr<TrafficLightPublisherBase>
-  {
-    const auto architecture_type = getParameter<std::string>(node_parameters_, "architecture_type");
-    bool has_made_publisher = false;
-
-#if __has_include(<autoware_perception_msgs/msg/traffic_signal_array.hpp>)
-    if (architecture_type == "awf/universe/20230906") {
-      return std::make_shared<
-        TrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>>(
-        std::forward<decltype(xs)>(xs)...);
-      has_made_publisher = true;
-    }
-#endif
-#if __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)
-    if (architecture_type == "awf/universe/20240605") {
-      return std::make_shared<
-        TrafficLightPublisher<autoware_perception_msgs::msg::TrafficLightGroupArray>>(
-        std::forward<decltype(xs)>(xs)...);
-      has_made_publisher = true;
-    }
-#endif
-
-    if (not has_made_publisher) {
-      throw common::SemanticError(
-        "Unexpected architecture_type ", std::quoted(architecture_type),
-        " given for V2I traffic lights simulation.");
-    }
   }
 
   template <class NodeT, class AllocatorT = std::allocator<void>>
@@ -183,36 +147,7 @@ public:
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
     hdmap_utils_ptr_(std::make_shared<hdmap_utils::HdMapUtils>(
       configuration.lanelet2_map_path(), getOrigin(*node))),
-    markers_raw_(hdmap_utils_ptr_->generateMarker()),
-    conventional_traffic_light_manager_ptr_(
-      std::make_shared<TrafficLightManager>(hdmap_utils_ptr_)),
-    conventional_traffic_light_marker_publisher_ptr_(
-      std::make_shared<TrafficLightMarkerPublisher>(conventional_traffic_light_manager_ptr_, node)),
-    conventional_backward_compatible_traffic_light_publisher_ptr_(
-      std::make_shared<TrafficLightPublisher<traffic_simulator_msgs::msg::TrafficLightArrayV1>>(
-        "/simulation/traffic_lights", node, hdmap_utils_ptr_)),
-    v2i_traffic_light_manager_ptr_(std::make_shared<TrafficLightManager>(hdmap_utils_ptr_)),
-    v2i_traffic_light_marker_publisher_ptr_(
-      std::make_shared<TrafficLightMarkerPublisher>(v2i_traffic_light_manager_ptr_, node)),
-    v2i_traffic_light_legacy_topic_publisher_ptr_(
-      makeV2ITrafficLightPublisher("/v2x/traffic_signals", node, hdmap_utils_ptr_)),
-    v2i_traffic_light_publisher_ptr_(makeV2ITrafficLightPublisher(
-      "/perception/traffic_light_recognition/external/traffic_signals", node, hdmap_utils_ptr_)),
-    v2i_traffic_light_updater_(
-      node,
-      [this]() {
-        v2i_traffic_light_marker_publisher_ptr_->publish();
-        v2i_traffic_light_publisher_ptr_->publish(
-          clock_ptr_->now(), v2i_traffic_light_manager_ptr_->generateUpdateTrafficLightsRequest());
-        v2i_traffic_light_legacy_topic_publisher_ptr_->publish(
-          clock_ptr_->now(), v2i_traffic_light_manager_ptr_->generateUpdateTrafficLightsRequest());
-      }),
-    conventional_traffic_light_updater_(node, [this]() {
-      conventional_traffic_light_marker_publisher_ptr_->publish();
-      conventional_backward_compatible_traffic_light_publisher_ptr_->publish(
-        clock_ptr_->now(),
-        conventional_traffic_light_manager_ptr_->generateUpdateTrafficLightsRequest());
-    })
+    markers_raw_(hdmap_utils_ptr_->generateMarker())
   {
     updateHdmapMarker();
   }
@@ -220,111 +155,7 @@ public:
   ~EntityManager() = default;
 
 public:
-#define FORWARD_GETTER_TO_TRAFFIC_LIGHT_MANAGER(NAME)                 \
-  template <typename... Ts>                                           \
-  decltype(auto) getConventional##NAME(Ts &&... xs) const             \
-  {                                                                   \
-    return conventional_traffic_light_manager_ptr_->get##NAME(xs...); \
-  }                                                                   \
-  static_assert(true, "");                                            \
-  template <typename... Ts>                                           \
-  decltype(auto) getV2I##NAME(Ts &&... xs) const                      \
-  {                                                                   \
-    return v2i_traffic_light_manager_ptr_->get##NAME(xs...);          \
-  }                                                                   \
-  static_assert(true, "")
-
-  FORWARD_GETTER_TO_TRAFFIC_LIGHT_MANAGER(TrafficLights);
-  FORWARD_GETTER_TO_TRAFFIC_LIGHT_MANAGER(TrafficLight);
-
-#undef FORWARD_GETTER_TO_TRAFFIC_LIGHT_MANAGER
-
-  auto generateUpdateRequestForConventionalTrafficLights()
-  {
-    return conventional_traffic_light_manager_ptr_->generateUpdateTrafficLightsRequest();
-  }
-
-  auto resetConventionalTrafficLightPublishRate(double rate) -> void
-  {
-    conventional_traffic_light_updater_.resetUpdateRate(rate);
-  }
-
-  auto resetV2ITrafficLightPublishRate(double rate) -> void
-  {
-    v2i_traffic_light_updater_.resetUpdateRate(rate);
-  }
-
-  auto setConventionalTrafficLightConfidence(lanelet::Id id, double confidence) -> void
-  {
-    for (auto & traffic_light : conventional_traffic_light_manager_ptr_->getTrafficLights(id)) {
-      traffic_light.get().confidence = confidence;
-    }
-  }
-
-  // clang-format off
-#define FORWARD_TO_ENTITY(IDENTIFIER, ...)                                       \
-  /*!                                                                            \
-   @brief Forward to arguments to the EntityBase::IDENTIFIER function.           \
-   @return return value of the EntityBase::IDENTIFIER function.                  \
-   @note This function was defined by FORWARD_TO_ENTITY macro.    　  　　　　　   \
-   */                                                                            \
-  template <typename... Ts>                                                      \
-  decltype(auto) IDENTIFIER(const std::string & name, Ts &&... xs) __VA_ARGS__   \
-  try {                                                                          \
-    return entities_.at(name)->IDENTIFIER(std::forward<decltype(xs)>(xs)...);    \
-  } catch (const std::out_of_range &) {                                          \
-    THROW_SEMANTIC_ERROR("entity : ", name, "does not exist");                   \
-  }                                                                              \
-  static_assert(true, "")
-  // clang-format on
-
-  FORWARD_TO_ENTITY(activateOutOfRangeJob, );
-  FORWARD_TO_ENTITY(asFieldOperatorApplication, const);
-  FORWARD_TO_ENTITY(cancelRequest, );
-  FORWARD_TO_ENTITY(get2DPolygon, const);
-  FORWARD_TO_ENTITY(getBehaviorParameter, const);
-  FORWARD_TO_ENTITY(getBoundingBox, const);
-  FORWARD_TO_ENTITY(getCanonicalizedStatusBeforeUpdate, const);
-  FORWARD_TO_ENTITY(getCurrentAccel, const);
-  FORWARD_TO_ENTITY(getCurrentTwist, const);
-  FORWARD_TO_ENTITY(getDefaultMatchingDistanceForLaneletPoseCalculation, const);
-  FORWARD_TO_ENTITY(getEntityType, const);
-  FORWARD_TO_ENTITY(getEntityTypename, const);
-  FORWARD_TO_ENTITY(getLinearJerk, const);
-  FORWARD_TO_ENTITY(getRouteLanelets, const);
-  FORWARD_TO_ENTITY(getStandStillDuration, const);
-  FORWARD_TO_ENTITY(getTraveledDistance, const);
-  FORWARD_TO_ENTITY(isControlledBySimulator, );
-  FORWARD_TO_ENTITY(laneMatchingSucceed, const);
-  FORWARD_TO_ENTITY(reachPosition, const);
-  FORWARD_TO_ENTITY(requestAcquirePosition, );
-  FORWARD_TO_ENTITY(requestAssignRoute, );
-  FORWARD_TO_ENTITY(requestClearRoute, );
-  FORWARD_TO_ENTITY(requestFollowTrajectory, );
-  FORWARD_TO_ENTITY(requestLaneChange, );
-  FORWARD_TO_ENTITY(requestSynchronize, );
-  FORWARD_TO_ENTITY(requestWalkStraight, );
-  FORWARD_TO_ENTITY(setAcceleration, );
-  FORWARD_TO_ENTITY(setAccelerationLimit, );
-  FORWARD_TO_ENTITY(setAccelerationRateLimit, );
-  FORWARD_TO_ENTITY(setBehaviorParameter, );
-  FORWARD_TO_ENTITY(setControlledBySimulator, );
-  FORWARD_TO_ENTITY(setDecelerationLimit, );
-  FORWARD_TO_ENTITY(setDecelerationRateLimit, );
-  FORWARD_TO_ENTITY(setLinearJerk, );
-  FORWARD_TO_ENTITY(setLinearVelocity, );
-  FORWARD_TO_ENTITY(setMapPose, );
-  FORWARD_TO_ENTITY(setTwist, );
-  FORWARD_TO_ENTITY(setVelocityLimit, );
-  FORWARD_TO_ENTITY(requestSpeedChange, );
-
-#undef FORWARD_TO_ENTITY
-
-  auto getCurrentAction(const std::string & name) const -> std::string;
-
   visualization_msgs::msg::MarkerArray makeDebugMarker() const;
-
-  bool trafficLightsChanged();
 
   auto updateNpcLogic(const std::string & name, const double current_time, const double step_time)
     -> const CanonicalizedEntityStatus &;
@@ -334,19 +165,22 @@ public:
   void broadcastTransform(
     const geometry_msgs::msg::PoseStamped & pose, const bool static_transform = true);
 
-  bool checkCollision(
-    const std::string & first_entity_name, const std::string & second_entity_name);
-
   bool despawnEntity(const std::string & name);
 
-  bool entityExists(const std::string & name);
+  auto isEntityExist(const std::string & name) const -> bool;
 
   auto getEntityNames() const -> const std::vector<std::string>;
 
-  auto getEntity(const std::string & name) const
+  auto getEntityPointer(const std::string & name) const
     -> std::shared_ptr<traffic_simulator::entity::EntityBase>;
 
-  auto getEntityStatus(const std::string & name) const -> const CanonicalizedEntityStatus &;
+  auto getEntity(const std::string & name) -> entity::EntityBase &;
+
+  auto getEntity(const std::string & name) const -> const entity::EntityBase &;
+
+  auto getEgoEntity(const std::string & name) -> entity::EgoEntity &;
+
+  auto getEgoEntity(const std::string & name) const -> const entity::EgoEntity &;
 
   auto getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &;
 
@@ -385,22 +219,9 @@ public:
     }
   }
 
-  template <typename EntityType>
-  bool is(const std::string & name) const
-  {
-    return dynamic_cast<EntityType const *>(entities_.at(name).get()) != nullptr;
-  }
+  auto isAnyEgoSpawned() const -> bool;
 
-  bool isEgoSpawned() const;
-
-  const std::string getEgoName() const;
-
-  bool isInLanelet(const std::string & name, const lanelet::Id lanelet_id, const double tolerance);
-
-  bool isStopping(const std::string & name) const;
-
-  void requestLaneChange(
-    const std::string & name, const traffic_simulator::lane_change::Direction & direction);
+  auto getFirstEgoName() const -> std::optional<std::string>;
 
   /**
    * @brief Reset behavior plugin of the target entity.
@@ -429,10 +250,7 @@ public:
       EntityStatus entity_status;
 
       if constexpr (std::is_same_v<std::decay_t<Entity>, EgoEntity>) {
-        if (auto iter = std::find_if(
-              std::begin(entities_), std::end(entities_),
-              [this](auto && each) { return is<EgoEntity>(each.first); });
-            iter != std::end(entities_)) {
+        if (isAnyEgoSpawned()) {
           THROW_SEMANTIC_ERROR("multi ego simulation does not support yet");
         } else {
           entity_status.type.type = traffic_simulator_msgs::msg::EntityType::EGO;
@@ -457,16 +275,16 @@ public:
                (traffic_simulator_msgs::msg::EntityType::MISC_OBJECT == entity_type.type);
       }(entity_status.type);
 
-      const auto matching_distance = [](const auto & parameters) {
+      const auto matching_distance = [](const auto & local_parameters) {
         if constexpr (std::is_same_v<
                         std::decay_t<Parameters>, traffic_simulator_msgs::msg::VehicleParameters>) {
           return std::max(
-                   parameters.axles.front_axle.track_width,
-                   parameters.axles.rear_axle.track_width) *
+                   local_parameters.axles.front_axle.track_width,
+                   local_parameters.axles.rear_axle.track_width) *
                    0.5 +
                  1.0;
         } else {
-          return parameters.bounding_box.dimensions.y * 0.5 + 1.0;
+          return local_parameters.bounding_box.dimensions.y * 0.5 + 1.0;
         }
       }(parameters);
 
@@ -480,7 +298,7 @@ public:
       } else if constexpr (std::is_same_v<std::decay_t<Pose>, geometry_msgs::msg::Pose>) {
         entity_status.pose = pose;
         const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
-          pose, parameters.bounding_box, include_crosswalk, matching_distance, hdmap_utils_ptr_);
+          pose, parameters.bounding_box, include_crosswalk, matching_distance);
         return CanonicalizedEntityStatus(entity_status, canonicalized_lanelet_pose);
       }
     };
@@ -491,7 +309,7 @@ public:
                   std::forward<decltype(xs)>(xs)...));
         success) {
       // FIXME: this ignores V2I traffic lights
-      iter->second->setTrafficLightManager(conventional_traffic_light_manager_ptr_);
+      iter->second->setTrafficLights(traffic_lights_ptr_->getConventionalTrafficLights());
       return success;
     } else {
       THROW_SEMANTIC_ERROR("Entity ", std::quoted(name), " is already exists.");

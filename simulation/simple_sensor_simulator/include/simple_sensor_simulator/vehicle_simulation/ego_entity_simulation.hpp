@@ -15,7 +15,7 @@
 #ifndef TRAFFIC_SIMULATOR__VEHICLE_SIMULATION__EGO_ENTITY_SIMULATION_HPP_
 #define TRAFFIC_SIMULATOR__VEHICLE_SIMULATION__EGO_ENTITY_SIMULATION_HPP_
 
-#include <concealer/autoware.hpp>
+#include <concealer/autoware_universe.hpp>
 #include <memory>
 #include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model.hpp>
 #include <traffic_simulator/data_type/entity_status.hpp>
@@ -41,7 +41,7 @@ enum class VehicleModelType {
 class EgoEntitySimulation
 {
 public:
-  const std::unique_ptr<concealer::Autoware> autoware;
+  const std::unique_ptr<concealer::AutowareUniverse> autoware;
 
 private:
   const VehicleModelType vehicle_model_type_;
@@ -72,9 +72,9 @@ public:
 
   const traffic_simulator_msgs::msg::VehicleParameters vehicle_parameters;
 
-private:
-  auto calculateEgoPitch() const -> double;
+  auto calculateAccelerationBySlope() const -> double;
 
+private:
   auto getCurrentPose(const double pitch_angle) const -> geometry_msgs::msg::Pose;
 
   auto getCurrentTwist() const -> geometry_msgs::msg::Twist;

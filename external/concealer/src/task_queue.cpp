@@ -23,9 +23,8 @@ TaskQueue::TaskQueue()
 : dispatcher([this] {
     try {
       while (rclcpp::ok() and not is_stop_requested.load(std::memory_order_acquire)) {
-        if (auto lock = std::unique_lock(thunks_mutex); not thunks.empty()) {
-          // NOTE: To ensure that the task to be queued is completed as expected is the
-          // responsibility of the side to create a task.
+        is_exhausted.store(thunks.empty());
+        if (auto lock = std::unique_lock(thunks_mutex); not is_exhausted.load()) {
           auto thunk = std::move(thunks.front());
           thunks.pop();
           lock.unlock();
@@ -43,7 +42,7 @@ TaskQueue::TaskQueue()
 {
 }
 
-void TaskQueue::stopAndJoin()
+TaskQueue::~TaskQueue()
 {
   if (dispatcher.joinable()) {
     is_stop_requested.store(true, std::memory_order_release);
@@ -51,9 +50,7 @@ void TaskQueue::stopAndJoin()
   }
 }
 
-TaskQueue::~TaskQueue() { stopAndJoin(); }
-
-bool TaskQueue::exhausted() const noexcept { return thunks.empty(); }
+bool TaskQueue::exhausted() const noexcept { return is_exhausted.load(); }
 
 void TaskQueue::rethrow() const
 {

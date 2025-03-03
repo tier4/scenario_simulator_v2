@@ -18,6 +18,7 @@
     "euclidian",
     "gcda",
     "gcno",
+    "gcovr",
     "libunwind",
     "linelint",
     "Mersenne",
@@ -37,12 +38,16 @@
     "pyproject",
     "randomizer",
     "randomizers",
+    "sonarcloud",
+    "sonarqube",
     "subspline",
     "TESTRANDOMIZER",
     "travelling",
     "Tschirnhaus",
     "walltime",
     "xerces",
-    "xercesc"
+    "xercesc",
+    "Szymon",
+    "Parapura"
   ]
 }

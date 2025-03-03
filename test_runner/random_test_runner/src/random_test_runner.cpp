@@ -67,10 +67,13 @@ RandomTestRunner::RandomTestRunner(const rclcpp::NodeOptions & option)
   std::string map_path =
     ament_index_cpp::get_package_share_directory(test_suite_params.map_name) + "/map";
 
+  const std::set<std::uint8_t> auto_sink_entity_types{
+    traffic_simulator_msgs::msg::EntityType::VEHICLE,
+    traffic_simulator_msgs::msg::EntityType::PEDESTRIAN};
+
   message = fmt::format("Map path found: {}", map_path);
   RCLCPP_INFO_STREAM(get_logger(), message);
-
-  traffic_simulator::Configuration configuration(map_path);
+  traffic_simulator::Configuration configuration(map_path, "", auto_sink_entity_types);
   configuration.simulator_host = test_control_parameters.simulator_host;
   auto lanelet_utils = std::make_shared<LaneletUtils>(configuration.lanelet2_map_path());
 

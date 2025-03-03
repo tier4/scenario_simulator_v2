@@ -39,7 +39,7 @@ const std::optional<traffic_simulator_msgs::msg::Obstacle> FollowLaneAction::cal
 
 const traffic_simulator_msgs::msg::WaypointsArray FollowLaneAction::calculateWaypoints()
 {
-  if (!canonicalized_entity_status->laneMatchingSucceed()) {
+  if (!canonicalized_entity_status->isInLanelet()) {
     THROW_SIMULATION_ERROR("failed to assign lane");
   }
   if (canonicalized_entity_status->getTwist().linear.x >= 0) {
@@ -74,8 +74,11 @@ BT::NodeStatus FollowLaneAction::tick()
     request != traffic_simulator::behavior::Request::FOLLOW_LANE) {
     return BT::NodeStatus::FAILURE;
   }
-  if (!canonicalized_entity_status->laneMatchingSucceed()) {
+  if (!canonicalized_entity_status->isInLanelet()) {
     stopEntity();
+    const auto waypoints = traffic_simulator_msgs::msg::WaypointsArray{};
+    setOutput("waypoints", waypoints);
+    setOutput("obstacle", calculateObstacle(waypoints));
     return BT::NodeStatus::RUNNING;
   }
   const auto waypoints = calculateWaypoints();
@@ -89,7 +92,7 @@ BT::NodeStatus FollowLaneAction::tick()
     if (trajectory == nullptr) {
       return BT::NodeStatus::FAILURE;
     }
-    auto distance_to_front_entity = getDistanceToFrontEntity(*trajectory);
+    const auto distance_to_front_entity = getDistanceToFrontEntity(*trajectory);
     if (distance_to_front_entity) {
       if (
         distance_to_front_entity.value() <=

@@ -19,6 +19,8 @@
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
+#include <geometry/quaternion/get_angle_difference.hpp>
+#include <geometry/quaternion/get_normal_vector.hpp>
 #include <geometry/quaternion/get_rotation_matrix.hpp>
 #include <geometry/vector3/hypot.hpp>
 #include <memory>
@@ -59,6 +61,51 @@ auto DetectionSensorBase::findEgoEntityStatusToWhichThisSensorIsAttached(
     return iter;
   } else {
     throw SimulationRuntimeError("Detection sensor can be attached only ego entity.");
+  }
+}
+
+auto DetectionSensorBase::isOnOrAboveEgoPlane(
+  const geometry_msgs::Pose & entity_pose, const geometry_msgs::Pose & ego_pose) -> bool
+{
+  /*
+      The threshold for detecting significant changes in ego vehicle's orientation (unit: radian).
+      The value determines the minimum angular difference required to consider the ego orientation
+      as "changed".
+
+      There is no technical basis for this value, it was determined based on experiments.
+  */
+  constexpr static double rotation_threshold_ = 0.04;
+  /*
+      Maximum downward offset in Z-axis relative to the ego position (unit: meter).
+      If the NPC is lower than this offset relative to the ego position,
+      the NPC will be excluded from detection
+
+      There is no technical basis for this value, it was determined based on experiments.
+  */
+  constexpr static double max_downward_z_offset_ = 1.0;
+
+  const auto hasEgoOrientationChanged = [this](const geometry_msgs::msg::Pose & ego_pose_ros) {
+    return math::geometry::getAngleDifference(
+             ego_pose_ros.orientation, ego_plane_pose_opt_->orientation) > rotation_threshold_;
+  };
+
+  // if other entity is at the same altitude as Ego or within max_downward_z_offset_ below Ego
+  if (entity_pose.position().z() >= (ego_pose.position().z() - max_downward_z_offset_)) {
+    return true;
+    // otherwise check if other entity is above ego plane
+  } else {
+    // update ego plane if needed
+    geometry_msgs::msg::Pose ego_pose_ros;
+    simulation_interface::toMsg(ego_pose, ego_pose_ros);
+    if (!ego_plane_opt_ || !ego_plane_pose_opt_ || hasEgoOrientationChanged(ego_pose_ros)) {
+      ego_plane_opt_.emplace(
+        ego_pose_ros.position, math::geometry::getNormalVector(ego_pose_ros.orientation));
+      ego_plane_pose_opt_ = ego_pose_ros;
+    }
+
+    geometry_msgs::msg::Pose entity_pose_ros;
+    simulation_interface::toMsg(entity_pose, entity_pose_ros);
+    return ego_plane_opt_->offset(entity_pose_ros.position) >= 0.0;
   }
 }
 
@@ -198,13 +245,12 @@ auto make(const traffic_simulator_msgs::EntityStatus & status)
 }
 
 template <>
-auto make(
-  const traffic_simulator_msgs::EntityStatus & status,
-  const autoware_perception_msgs::msg::DetectedObject & detected_object)
+auto make(const traffic_simulator_msgs::EntityStatus & status)
   -> autoware_perception_msgs::msg::TrackedObject
 {
   // ref: https://github.com/autowarefoundation/autoware.universe/blob/main/common/perception_utils/src/conversion.cpp
   auto tracked_object = autoware_perception_msgs::msg::TrackedObject();
+  const auto detected_object = make<autoware_perception_msgs::msg::DetectedObject>(status);
   // clang-format off
   tracked_object.object_id                           = make<unique_identifier_msgs::msg::UUID>(status);
   tracked_object.existence_probability               = detected_object.existence_probability;
@@ -215,86 +261,6 @@ auto make(
   tracked_object.shape                               = detected_object.shape;
   // clang-format on
   return tracked_object;
-};
-
-struct DefaultNoiseApplicator
-{
-  const double current_simulation_time;
-
-  const rclcpp::Time & current_ros_time;
-
-  const traffic_simulator_msgs::EntityStatus & ego_entity_status;
-
-  std::default_random_engine & random_engine;
-
-  const simulation_api_schema::DetectionSensorConfiguration & detection_sensor_configuration;
-
-  explicit DefaultNoiseApplicator(
-    double current_simulation_time, const rclcpp::Time & current_ros_time,
-    const traffic_simulator_msgs::EntityStatus & ego_entity_status,
-    std::default_random_engine & random_engine,
-    const simulation_api_schema::DetectionSensorConfiguration & detection_sensor_configuration)
-  : current_simulation_time(current_simulation_time),
-    current_ros_time(current_ros_time),
-    ego_entity_status(ego_entity_status),
-    random_engine(random_engine),
-    detection_sensor_configuration(detection_sensor_configuration)
-  {
-  }
-
-  DefaultNoiseApplicator(const DefaultNoiseApplicator &) = delete;
-
-  DefaultNoiseApplicator(DefaultNoiseApplicator &&) = delete;
-
-  auto operator=(const DefaultNoiseApplicator &) = delete;
-
-  auto operator=(DefaultNoiseApplicator &&) = delete;
-
-  auto operator()(autoware_perception_msgs::msg::DetectedObjects detected_objects) -> decltype(auto)
-  {
-    auto position_noise_distribution =
-      std::normal_distribution<>(0.0, detection_sensor_configuration.pos_noise_stddev());
-
-    for (auto && detected_object : detected_objects.objects) {
-      detected_object.kinematics.pose_with_covariance.pose.position.x +=
-        position_noise_distribution(random_engine);
-      detected_object.kinematics.pose_with_covariance.pose.position.y +=
-        position_noise_distribution(random_engine);
-    }
-
-    detected_objects.objects.erase(
-      std::remove_if(
-        detected_objects.objects.begin(), detected_objects.objects.end(),
-        [this](auto &&) {
-          return std::uniform_real_distribution()(random_engine) <
-                 detection_sensor_configuration.probability_of_lost();
-        }),
-      detected_objects.objects.end());
-
-    return detected_objects;
-  }
-};
-
-struct CustomNoiseApplicator : public DefaultNoiseApplicator
-{
-  using DefaultNoiseApplicator::DefaultNoiseApplicator;
-
-  /*
-     NOTE: for Autoware developers
-
-     If you need to apply experimental noise to the DetectedObjects that the
-     simulator publishes, comment out the following member functions and
-     implement them.
-
-     See class DefaultNoiseApplicator for the default noise implementation.
-     This class inherits from DefaultNoiseApplicator, so you can use its data
-     members, or you can explicitly call DefaultNoiseApplicator::operator().
-  */
-  // auto operator()(autoware_perception_msgs::msg::DetectedObjects detected_objects)
-  //   -> decltype(auto)
-  // {
-  //   return detected_objects;
-  // }
 };
 
 template <>
@@ -309,48 +275,94 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
     -0.002) {
     previous_simulation_time_ = current_simulation_time;
 
-    autoware_perception_msgs::msg::DetectedObjects detected_objects;
-    detected_objects.header.stamp = current_ros_time;
-    detected_objects.header.frame_id = "map";
-
-    autoware_perception_msgs::msg::TrackedObjects ground_truth_objects;
-    ground_truth_objects.header = detected_objects.header;
-
     const auto ego_entity_status = findEgoEntityStatusToWhichThisSensorIsAttached(statuses);
 
     auto is_in_range = [&](const auto & status) {
       return not isEgoEntityStatusToWhichThisSensorIsAttached(status) and
              distance(status.pose(), ego_entity_status->pose()) <= configuration_.range() and
+             isOnOrAboveEgoPlane(status.pose(), ego_entity_status->pose()) and
              (configuration_.detect_all_objects_in_range() or
               std::find(
                 lidar_detected_entities.begin(), lidar_detected_entities.end(), status.name()) !=
                 lidar_detected_entities.end());
     };
 
-    for (const auto & status : statuses) {
-      if (is_in_range(status)) {
-        const auto detected_object = make<autoware_perception_msgs::msg::DetectedObject>(status);
-        detected_objects.objects.push_back(detected_object);
-        ground_truth_objects.objects.push_back(
-          make<autoware_perception_msgs::msg::TrackedObject>(status, detected_object));
+    /*
+       NOTE: for Autoware developers
+
+       If you need to apply experimental noise to the DetectedObjects that the
+       simulator publishes, comment out the following function and implement
+       new one.
+    */
+    auto noise = [&](auto detected_entities, auto simulation_time) {
+      auto position_noise_distribution =
+        std::normal_distribution<>(0.0, configuration_.pos_noise_stddev());
+
+      for (auto && detected_entity : detected_entities) {
+        detected_entity.mutable_pose()->mutable_position()->set_x(
+          detected_entity.pose().position().x() + position_noise_distribution(random_engine_));
+        detected_entity.mutable_pose()->mutable_position()->set_y(
+          detected_entity.pose().position().y() + position_noise_distribution(random_engine_));
       }
+
+      detected_entities.erase(
+        std::remove_if(
+          detected_entities.begin(), detected_entities.end(),
+          [this](auto &&) {
+            return std::uniform_real_distribution()(random_engine_) <
+                   configuration_.probability_of_lost();
+          }),
+        detected_entities.end());
+
+      return detected_entities;
+    };
+
+    auto make_detected_objects = [&](const auto & detected_entities) {
+      auto detected_objects = autoware_perception_msgs::msg::DetectedObjects();
+      detected_objects.header.stamp = current_ros_time;
+      detected_objects.header.frame_id = "map";
+      for (const auto & detected_entity : detected_entities) {
+        detected_objects.objects.push_back(
+          make<autoware_perception_msgs::msg::DetectedObject>(detected_entity));
+      }
+      return detected_objects;
+    };
+
+    auto make_ground_truth_objects = [&](const auto & detected_entities) {
+      auto ground_truth_objects = autoware_perception_msgs::msg::TrackedObjects();
+      ground_truth_objects.header.stamp = current_ros_time;
+      ground_truth_objects.header.frame_id = "map";
+      for (const auto & detected_entity : detected_entities) {
+        ground_truth_objects.objects.push_back(
+          make<autoware_perception_msgs::msg::TrackedObject>(detected_entity));
+      }
+      return ground_truth_objects;
+    };
+
+    auto detected_entities = std::vector<traffic_simulator_msgs::EntityStatus>();
+
+    std::copy_if(
+      statuses.begin(), statuses.end(), std::back_inserter(detected_entities), is_in_range);
+
+    unpublished_detected_entities.emplace(detected_entities, current_simulation_time);
+
+    if (
+      current_simulation_time - unpublished_detected_entities.front().second >=
+      configuration_.object_recognition_delay()) {
+      const auto modified_detected_entities =
+        std::apply(noise, unpublished_detected_entities.front());
+      detected_objects_publisher->publish(make_detected_objects(modified_detected_entities));
+      unpublished_detected_entities.pop();
     }
 
-    if (detected_objects_queue.emplace(detected_objects, current_simulation_time);
-        current_simulation_time - detected_objects_queue.front().second >=
-        configuration_.object_recognition_delay()) {
-      auto apply_noise = CustomNoiseApplicator(
-        current_simulation_time, current_ros_time, *ego_entity_status, random_engine_,
-        configuration_);
-      detected_objects_publisher->publish(apply_noise(detected_objects_queue.front().first));
-      detected_objects_queue.pop();
-    }
+    unpublished_ground_truth_entities.emplace(detected_entities, current_simulation_time);
 
-    if (ground_truth_objects_queue.emplace(ground_truth_objects, current_simulation_time);
-        current_simulation_time - ground_truth_objects_queue.front().second >=
-        configuration_.object_recognition_ground_truth_delay()) {
-      ground_truth_objects_publisher->publish(ground_truth_objects_queue.front().first);
-      ground_truth_objects_queue.pop();
+    if (
+      current_simulation_time - unpublished_ground_truth_entities.front().second >=
+      configuration_.object_recognition_ground_truth_delay()) {
+      ground_truth_objects_publisher->publish(
+        make_ground_truth_objects(unpublished_ground_truth_entities.front().first));
+      unpublished_ground_truth_entities.pop();
     }
   }
 }
