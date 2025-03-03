@@ -17,8 +17,8 @@
 
 #include <geometry/spline/catmull_rom_spline_interface.hpp>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
-#include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 #include <traffic_simulator/lanelet_wrapper/distance.hpp>
+#include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 
 namespace traffic_simulator
 {
