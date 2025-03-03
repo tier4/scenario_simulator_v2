@@ -250,6 +250,8 @@ public:
 
   auto isTrafficLight(const lanelet::Id) const -> bool;
 
+  auto getLaneletsForTrafficLights() const -> std::unordered_map<lanelet::Id, lanelet::Ids>;
+
   auto isTrafficLightRegulatoryElement(const lanelet::Id) const -> bool;
 
 private:

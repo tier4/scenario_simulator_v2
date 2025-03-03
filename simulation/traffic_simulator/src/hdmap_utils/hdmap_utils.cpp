@@ -1308,6 +1308,30 @@ auto HdMapUtils::getTrafficLightStopLineIds(const lanelet::Id traffic_light_id) 
   return ids;
 }
 
+auto HdMapUtils::getLaneletsForTrafficLights() const
+  -> std::unordered_map<lanelet::Id, lanelet::Ids>
+{
+  using TrafficLightId = lanelet::Id;
+  std::unordered_map<TrafficLightId, lanelet::Ids> traffic_light_to_lanelets_map;
+
+  for (const auto & lanelet : lanelet_map_ptr_->laneletLayer) {
+    const auto traffic_lights =
+      lanelet.regulatoryElementsAs<const lanelet::autoware::AutowareTrafficLight>();
+
+    for (const auto & traffic_light : traffic_lights) {
+      for (const auto & light_bulb : traffic_light->lightBulbs()) {
+        if (!light_bulb.hasAttribute("traffic_light_id")) {
+          continue;
+        } else if (auto traffic_light_id = light_bulb.attribute("traffic_light_id").asId()) {
+          traffic_light_to_lanelets_map.try_emplace(*traffic_light_id)
+            .first->second.emplace_back(lanelet.id());
+        }
+      }
+    }
+  }
+  return traffic_light_to_lanelets_map;
+}
+
 auto HdMapUtils::getTrafficLightStopLinesPoints(const lanelet::Id traffic_light_id) const
   -> std::vector<std::vector<geometry_msgs::msg::Point>>
 {
