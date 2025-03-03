@@ -43,6 +43,7 @@ import yaml
 import os
 import sys
 import xml.etree.ElementTree as ET
+from yaml import CSafeLoader
 
 
 def from_yaml(keyword, node):
@@ -108,7 +109,7 @@ if __name__ == "__main__":
 
   if os.path.exists(input_yaml_path):
     with open(input_yaml_path, "r") as file:
-      openscenario_yaml = from_yaml("OpenSCENARIO", yaml.safe_load(file))
+      openscenario_yaml = from_yaml("OpenSCENARIO", yaml.load(file, Loader=CSafeLoader))
       openscenario_yaml.pop("ScenarioModifiers", None)
       xosc, errors = schema.encode(
         openscenario_yaml,
