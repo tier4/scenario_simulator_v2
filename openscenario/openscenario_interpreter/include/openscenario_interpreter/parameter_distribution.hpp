@@ -12,21 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/reader/element.hpp>
-#include <openscenario_interpreter/syntax/distribution_definition.hpp>
+#ifndef OPENSCENARIO_INTERPRETER__PARAMETER_DISTRIBUTION_HPP_
+#define OPENSCENARIO_INTERPRETER__PARAMETER_DISTRIBUTION_HPP_
+
+#include <openscenario_interpreter/object.hpp>
 
 namespace openscenario_interpreter
 {
-inline namespace syntax
+struct StochasticParameterDistributionBase
 {
-DistributionDefinition::DistributionDefinition(const pugi::xml_node & tree, Scope & scope)
-// clang-format off
-: Group(
-    choice(tree,
-      std::make_pair("Deterministic", [&](auto && node){return make<Deterministic>(node,scope);}),
-      std::make_pair("Stochastic",    [&](auto && node){return make<Stochastic   >(node,scope);})))
-// clang-format on
-{
-}
-}  // namespace syntax
+  virtual auto derive() -> Object
+  {
+    throw common::scenario_simulator_exception::Error(
+      "Unimplemented derive function is called. Please implement and override "
+      "StochasticParameterDistributionBase::derive.");
+  }
+};
 }  // namespace openscenario_interpreter
+#endif  // OPENSCENARIO_INTERPRETER__PARAMETER_DISTRIBUTION_HPP_
