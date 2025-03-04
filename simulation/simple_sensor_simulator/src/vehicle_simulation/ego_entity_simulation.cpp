@@ -150,7 +150,8 @@ auto EgoEntitySimulation::makeSimulationModel(
         debug_acc_scaling_factor, debug_steer_scaling_factor);
 
     case VehicleModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD:
-      return std::make_shared<SimModelDelaySteerAccGearedWoFallGuard>(
+      return std::make_shared<
+        autoware::simulator::simple_planning_simulator::SimModelDelaySteerAccGearedWoFallGuard>(
         vel_lim, steer_lim, vel_rate_lim, steer_rate_lim, wheel_base, step_time, acc_time_delay,
         acc_time_constant, steer_time_delay, steer_time_constant, steer_dead_band, steer_bias,
         debug_acc_scaling_factor, debug_steer_scaling_factor);
