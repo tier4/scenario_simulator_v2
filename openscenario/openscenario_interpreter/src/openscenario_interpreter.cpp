@@ -196,12 +196,10 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
       [this]() {
         const auto evaluate_time = execution_timer.invoke("evaluate", [this]() {
           if (std::isnan(evaluateSimulationTime())) {
-            if (not waiting_for_engagement_to_be_completed and engageable()) {
+            if (engageable()) {
               engage();
-              waiting_for_engagement_to_be_completed = true;  // NOTE: DIRTY HACK!!!
             } else if (engaged()) {
               activateNonUserDefinedControllers();
-              waiting_for_engagement_to_be_completed = false;  // NOTE: DIRTY HACK!!!
             }
           } else if (currentScenarioDefinition()) {
             currentScenarioDefinition()->evaluate();

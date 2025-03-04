@@ -90,8 +90,6 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode,
 
   using Result = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
 
-  bool waiting_for_engagement_to_be_completed = false;  // NOTE: DIRTY HACK!!!
-
 public:
   OPENSCENARIO_INTERPRETER_PUBLIC
   explicit Interpreter(const rclcpp::NodeOptions &);

@@ -22,15 +22,12 @@ namespace concealer
 TaskQueue::TaskQueue()
 : dispatcher([this] {
     try {
-      while (rclcpp::ok() and not is_stop_requested.load(std::memory_order_acquire)) {
-        is_exhausted.store(thunks.empty());
-        if (auto lock = std::unique_lock(thunks_mutex); not is_exhausted.load()) {
-          auto thunk = std::move(thunks.front());
-          thunks.pop();
-          lock.unlock();
+      while (rclcpp::ok() and not finalized.load(std::memory_order_acquire)) {
+        if (not empty()) {
+          auto thunk = front();
           thunk();
+          pop();
         } else {
-          lock.unlock();
           std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
       }
@@ -45,14 +42,30 @@ TaskQueue::TaskQueue()
 TaskQueue::~TaskQueue()
 {
   if (dispatcher.joinable()) {
-    is_stop_requested.store(true, std::memory_order_release);
+    finalized.store(true, std::memory_order_release);
     dispatcher.join();
   }
 }
 
-bool TaskQueue::exhausted() const noexcept { return is_exhausted.load(); }
+auto TaskQueue::empty() const -> bool
+{
+  auto lock = std::unique_lock(thunks_mutex);
+  return thunks.empty();
+}
 
-void TaskQueue::rethrow() const
+auto TaskQueue::front() const -> Thunk
+{
+  auto lock = std::unique_lock(thunks_mutex);
+  return thunks.front();
+}
+
+auto TaskQueue::pop() -> void
+{
+  auto lock = std::unique_lock(thunks_mutex);
+  thunks.pop();
+}
+
+auto TaskQueue::rethrow() const -> void
 {
   if (is_thrown.load(std::memory_order_acquire)) {
     std::rethrow_exception(thrown);
