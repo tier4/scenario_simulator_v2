@@ -153,17 +153,6 @@ const simulation_api_schema::DetectionSensorConfiguration constructDetectionSens
 }  // namespace helper
 }  // namespace traffic_simulator
 
-std::ostream & operator<<(
-  std::ostream & os, const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose);
-
-std::ostream & operator<<(std::ostream & os, const geometry_msgs::msg::Point & point);
-
-std::ostream & operator<<(std::ostream & os, const geometry_msgs::msg::Vector3 & vector);
-
-std::ostream & operator<<(std::ostream & os, const geometry_msgs::msg::Quaternion & quat);
-
-std::ostream & operator<<(std::ostream & os, const geometry_msgs::msg::Pose & pose);
-
 template <typename T>
 auto operator+(const std::vector<T> & v0, const std::vector<T> & v1) -> decltype(auto)
 {
@@ -189,5 +178,4 @@ auto sortAndUnique(const std::vector<T> & data) -> std::vector<T>
   ret.erase(std::unique(ret.begin(), ret.end()), ret.end());
   return ret;
 }
-
 #endif  // TRAFFIC_SIMULATOR__HELPER__HELPER_HPP_
