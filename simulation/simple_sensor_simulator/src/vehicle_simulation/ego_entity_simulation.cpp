@@ -338,10 +338,10 @@ void EgoEntitySimulation::update(
         break;
 
       case VehicleModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD:
-        input(0) = autoware->getAcceleration();
+        input(0) = acceleration;
         input(1) = autoware->getGearCommand().command;
         input(2) = acceleration_by_slope;
-        input(3) = autoware->getSteeringAngle();
+        input(3) = tire_angle;
         break;
 
       case VehicleModelType::DELAY_STEER_VEL:
