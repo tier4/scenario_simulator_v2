@@ -81,7 +81,6 @@ public:
     parser->setErrorHandler(&error_handler);
     parser->setValidationSchemaFullChecking(true);
     parser->setValidationScheme(xercesc::XercesDOMParser::Val_Always);
-
     parser->setExternalNoNamespaceSchemaLocation(
       (ament_index_cpp::get_package_share_directory("openscenario_validator") +
        "/schema/OpenSCENARIO-1.3.xsd")
