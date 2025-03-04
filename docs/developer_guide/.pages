@@ -13,6 +13,7 @@ nav:
     - ManualOverrideWithFollowTrajectoryAction.md
     - NPCBehavior.md
     - OpenSCENARIOSupport.md
+    - Parameters.md
     - SimpleSensorSimulator.md
     - SimulationResultFormat.md
     - SystemArchitecture.md

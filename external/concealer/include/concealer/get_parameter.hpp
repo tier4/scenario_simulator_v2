@@ -35,7 +35,7 @@ auto getParameter(
 template <typename T>
 auto getParameter(const std::string & name, T value = {})
 {
-  auto node = rclcpp::Node("get_parameter", "simulation");
+  static auto node = rclcpp::Node("getParameter", "simulation");
   return getParameter(node.get_node_parameters_interface(), name, value);
 }
 }  // namespace concealer
