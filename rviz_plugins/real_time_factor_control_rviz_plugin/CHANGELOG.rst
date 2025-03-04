@@ -21,6 +21,11 @@ Changelog for package real_time_factor_control_rviz_plugin
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+12.0.2 (2025-03-04)
+-------------------
+* Merge branch 'master' into RJD-1057/reorgnize-ostream-helper
+* Contributors: ぐるぐる
+
 12.0.1 (2025-02-26)
 -------------------
 * Merge branch 'master' into feature/push-latest-docker-tag
