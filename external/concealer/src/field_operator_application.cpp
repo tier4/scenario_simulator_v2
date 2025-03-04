@@ -303,13 +303,13 @@ auto FieldOperatorApplication::engage() -> void
 auto FieldOperatorApplication::engageable() const -> bool
 {
   task_queue.rethrow();
-  return task_queue.exhausted() and autoware_state == "WAITING_FOR_ENGAGE";
+  return task_queue.empty() and autoware_state == "WAITING_FOR_ENGAGE";
 }
 
 auto FieldOperatorApplication::engaged() const -> bool
 {
   task_queue.rethrow();
-  return task_queue.exhausted() and autoware_state == "DRIVING";
+  return task_queue.empty() and autoware_state == "DRIVING";
 }
 
 auto FieldOperatorApplication::getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray

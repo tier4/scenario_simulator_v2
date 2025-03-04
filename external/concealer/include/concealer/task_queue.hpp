@@ -30,7 +30,7 @@ class TaskQueue
 
   std::queue<Thunk> thunks;
 
-  std::mutex thunks_mutex;
+  mutable std::mutex thunks_mutex;
 
   std::thread dispatcher;
 
@@ -40,7 +40,9 @@ class TaskQueue
 
   std::exception_ptr thrown;
 
-  std::atomic<bool> is_exhausted = true;
+  auto front() const -> Thunk;
+
+  auto pop() -> void;
 
 public:
   explicit TaskQueue();
@@ -51,11 +53,11 @@ public:
   auto delay(F && f) -> void
   {
     rethrow();
-    std::unique_lock lk(thunks_mutex);
+    auto lock = std::unique_lock(thunks_mutex);
     thunks.emplace(std::forward<F>(f));
   }
 
-  auto exhausted() const noexcept -> bool;
+  auto empty() const -> bool;
 
   auto rethrow() const -> void;
 };
