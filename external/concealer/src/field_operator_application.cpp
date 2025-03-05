@@ -296,7 +296,8 @@ auto FieldOperatorApplication::engage() -> void
         return;  // Ignore error because this service is validated by Autoware state transition.
       }
     });
-    engaged_ = true;
+
+    time_limit = std::decay_t<decltype(time_limit)>::max();
   });
 }
 

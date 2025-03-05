@@ -57,7 +57,7 @@ struct FieldOperatorApplication : public rclcpp::Node
 {
   pid_t process_id;
 
-  bool initialized = false, engaged_ = false;
+  bool initialized = false;
 
   std::atomic<bool> finalized = false;
 
@@ -117,21 +117,21 @@ struct FieldOperatorApplication : public rclcpp::Node
   */
   TaskQueue task_queue;
 
-  template <typename Thunk = void (*)(), typename Interval = std::chrono::seconds>
+  template <typename Thunk = void (*)()>
   auto waitForAutowareStateToBe(
-    const std::string & state, Thunk thunk = [] {}, Interval interval = std::chrono::seconds(1))
+    const std::string & state, Thunk thunk = [] {})
   {
     thunk();
 
     while (not finalized.load() and autoware_state != state) {
-      if (not engaged_ and time_limit <= std::chrono::steady_clock::now()) {
+      if (time_limit <= std::chrono::steady_clock::now()) {
         throw common::AutowareError(
           "Simulator waited for the Autoware state to transition to ", state,
           ", but time is up. The current Autoware state is ",
           (autoware_state.empty() ? "not published yet" : autoware_state));
       } else {
         thunk();
-        rclcpp::GenericRate<std::chrono::steady_clock>(interval).sleep();
+        rclcpp::GenericRate<std::chrono::steady_clock>(std::chrono::seconds(1)).sleep();
       }
     }
   }
