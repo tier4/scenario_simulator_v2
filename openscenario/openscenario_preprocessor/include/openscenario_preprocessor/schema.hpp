@@ -12,20 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__DATA_TYPE__ROUTING_GRAPH_TYPE_HPP_
-#define TRAFFIC_SIMULATOR__DATA_TYPE__ROUTING_GRAPH_TYPE_HPP_
-
-#include <cstdint>
-#include <iostream>
-
-namespace traffic_simulator
+namespace openscenario_preprocessor
 {
-inline namespace routing_graph_type
-{
-enum class RoutingGraphType : std::uint8_t { VEHICLE, PEDESTRIAN, VEHICLE_WITH_ROAD_SHOULDER };
-
-char const * to_string(const RoutingGraphType &);
-}  // namespace routing_graph_type
-}  // namespace traffic_simulator
-
-#endif  // TRAFFIC_SIMULATOR__DATA_TYPE__ROUTING_GRAPH_TYPE_HPP_
+extern const char schema[];
+}  // namespace openscenario_preprocessor
