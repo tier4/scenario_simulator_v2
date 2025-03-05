@@ -96,6 +96,10 @@ try {
     boost::filesystem::create_directories(tmp_output_directory);
   }
 
+  auto file = std::ofstream("/tmp/openscenario_preprocessor/schema.xsd", std::ios::trunc);
+  file << openscenario_preprocessor::schema;
+  file.close();
+
   std::vector<boost::filesystem::path> xosc_scenario_paths;
 
   boost::filesystem::path scenario_modifiers_path{};

@@ -52,12 +52,7 @@ class Preprocessor
 {
 public:
   explicit Preprocessor(const boost::filesystem::path & output_directory)
-  : output_directory(output_directory), derive([]() -> std::string {
-      auto file = std::ofstream("/tmp/openscenario_preprocessor/schema.xsd", std::ios::trunc);
-      file << openscenario_preprocessor::schema;
-      file.close();
-      return "/tmp/openscenario_preprocessor/schema.xsd";
-    }())
+  : output_directory(output_directory), derive("/tmp/openscenario_preprocessor/schema.xsd")
   {
     if (not boost::filesystem::exists(output_directory)) {
       boost::filesystem::create_directories(output_directory);
