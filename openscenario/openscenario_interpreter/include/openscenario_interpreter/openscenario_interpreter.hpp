@@ -100,12 +100,6 @@ public:
 
   auto currentScenarioDefinition() const -> const std::shared_ptr<ScenarioDefinition> &;
 
-  auto engage() const -> void;
-
-  auto engageable() const -> bool;
-
-  auto engaged() const -> bool;
-
   auto makeCurrentConfiguration() const -> traffic_simulator::Configuration;
 
   auto on_activate(const rclcpp_lifecycle::State &) -> Result override;
