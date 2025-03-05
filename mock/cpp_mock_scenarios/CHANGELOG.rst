@@ -21,6 +21,13 @@ Changelog for package cpp_mock_scenarios
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+12.1.0 (2025-03-05)
+-------------------
+* Merge branch 'master' into feature/simple_sensor_simulator/new-noise-model
+* Merge branch 'master' into feature/simple_sensor_simulator/new-noise-model
+* Merge remote-tracking branch 'origin/master' into feature/simple_sensor_simulator/new-noise-model
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki, yamacir-kit
+
 12.0.2 (2025-03-04)
 -------------------
 * Merge branch 'master' into RJD-1057/reorgnize-ostream-helper
