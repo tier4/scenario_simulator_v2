@@ -36,8 +36,6 @@ class TaskQueue
 
   std::atomic<bool> finalized = false;
 
-  std::atomic<bool> is_thrown = false;
-
   std::exception_ptr thrown;
 
   auto front() const -> Thunk;

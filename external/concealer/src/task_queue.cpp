@@ -33,7 +33,6 @@ TaskQueue::TaskQueue()
       }
     } catch (...) {
       thrown = std::current_exception();
-      is_thrown.store(true, std::memory_order_release);
     }
   })
 {
@@ -67,7 +66,7 @@ auto TaskQueue::pop() -> void
 
 auto TaskQueue::rethrow() const -> void
 {
-  if (is_thrown.load(std::memory_order_acquire)) {
+  if (thrown) {
     std::rethrow_exception(thrown);
   }
 }

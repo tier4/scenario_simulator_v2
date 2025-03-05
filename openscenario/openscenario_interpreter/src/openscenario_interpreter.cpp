@@ -202,9 +202,9 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
             };
 
             if (engaged()) {
-              activateNonUserDefinedControllers();
+              return activateNonUserDefinedControllers();
             } else if (engageable()) {
-              engage();
+              return engage();
             }
           } else if (currentScenarioDefinition()) {
             currentScenarioDefinition()->evaluate();
