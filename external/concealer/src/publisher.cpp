@@ -54,6 +54,12 @@ auto NormalDistribution<nav_msgs::msg::Odometry>::operator()(nav_msgs::msg::Odom
   const Eigen::Quaterniond orientation = Eigen::Quaterniond(
     odometry.pose.pose.orientation.w, odometry.pose.pose.orientation.x,
     odometry.pose.pose.orientation.y, odometry.pose.pose.orientation.z);
+  // calculate the speed 
+  const double speed =  std::hypot(
+    odometry.twist.twist.linear.x, odometry.twist.twist.linear.y, odometry.twist.twist.linear.z);
+  if (speed < 0.1) {
+    return odometry;
+  }
 
   Eigen::Vector3d local_position = Eigen::Vector3d(0.0, 0.0, 0.0);
 
