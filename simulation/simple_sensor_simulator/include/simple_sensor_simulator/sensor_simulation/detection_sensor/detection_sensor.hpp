@@ -90,7 +90,12 @@ class DetectionSensor : public DetectionSensorBase
 
     bool true_positive, flip;
 
-    explicit NoiseOutput(double simulation_time = 0.0) : simulation_time(simulation_time) {}
+    explicit NoiseOutput(double simulation_time = 0.0) : simulation_time(simulation_time) {
+      distance_noise=0.0;
+      yaw_noise=0.0;
+      true_positive=true;
+      flip=false;
+    }
   };
 
   std::unordered_map<std::string, NoiseOutput> noise_outputs;
