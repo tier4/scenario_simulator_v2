@@ -20,6 +20,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <system_error>
+#include <memory>
 #include <xercesc/parsers/XercesDOMParser.hpp>
 #include <xercesc/sax/HandlerBase.hpp>
 
