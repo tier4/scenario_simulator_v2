@@ -17,6 +17,7 @@
 
 #include <yaml-cpp/yaml.h>
 
+#include <fstream>
 #include <memory>
 #include <openscenario_interpreter/syntax/open_scenario.hpp>
 #include <openscenario_preprocessor/deriver.hpp>

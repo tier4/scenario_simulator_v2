@@ -15,6 +15,7 @@
 #include <yaml-cpp/yaml.h>
 
 #include <boost/range/adaptor/indexed.hpp>
+#include <fstream>
 #include <iostream>
 #include <openscenario_preprocessor/deriver.hpp>
 #include <openscenario_preprocessor/t4v2.hpp>

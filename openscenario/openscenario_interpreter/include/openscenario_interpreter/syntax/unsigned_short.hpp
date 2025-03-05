@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__UNSIGNED_SHORT_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__UNSIGNED_SHORT_HPP_
 
+#include <cstdint>
 #include <iostream>
 #include <string>
 

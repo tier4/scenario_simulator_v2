@@ -27,6 +27,7 @@
 #include <openscenario_interpreter/syntax/entity.hpp>
 #endif  // PARAMETER_VALUE_DISTRIBUTION_ONLY
 
+#include <map>
 #include <openscenario_interpreter/utility/demangle.hpp>
 #include <random>
 #include <unordered_map>
