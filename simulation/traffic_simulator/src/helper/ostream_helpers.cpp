@@ -38,7 +38,10 @@ std::ostream & operator<<(std::ostream & os, const geometry_msgs::msg::Quaternio
 
 std::ostream & operator<<(std::ostream & os, const geometry_msgs::msg::Pose & pose)
 {
-  os << "Pose(position: " << pose.position << ", orientation: " << pose.orientation;
+  os << "Pose(\n";
+  os << "  position: " << pose.position << "\n";
+  os << "  orientation: " << pose.orientation << "\n";
+  os << ")";
   return os;
 }
 

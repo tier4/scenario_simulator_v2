@@ -15,6 +15,7 @@
 #include <geometry/bounding_box.hpp>
 #include <geometry/distance.hpp>
 #include <geometry/transform.hpp>
+#include <traffic_simulator/lanelet_wrapper/lanelet_map.hpp>
 #include <traffic_simulator/lanelet_wrapper/pose.hpp>
 #include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator/utils/pose.hpp>
@@ -251,12 +252,13 @@ auto boundingBoxLaneletDistance(
   return lanelet_distance;
 }
 
+// Bounds
 auto distanceToLeftLaneBound(
   const geometry_msgs::msg::Pose & map_pose,
-  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, lanelet::Id lanelet_id,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> double
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, const lanelet::Id lanelet_id)
+  -> double
 {
-  if (const auto bound = hdmap_utils_ptr->getLeftBound(lanelet_id); bound.empty()) {
+  if (const auto bound = lanelet_wrapper::lanelet_map::leftBound(lanelet_id); bound.empty()) {
     THROW_SEMANTIC_ERROR(
       "Failed to calculate left bounds of lanelet_id : ", lanelet_id, " please check lanelet map.");
   } else if (const auto polygon =
@@ -270,26 +272,28 @@ auto distanceToLeftLaneBound(
 
 auto distanceToLeftLaneBound(
   const geometry_msgs::msg::Pose & map_pose,
-  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, const lanelet::Ids & lanelet_ids,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> double
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, const lanelet::Ids & lanelet_ids)
+  -> double
 {
   if (lanelet_ids.empty()) {
     THROW_SEMANTIC_ERROR("Failing to calculate distanceToLeftLaneBound given an empty vector.");
   }
-  std::vector<double> distances;
-  std::transform(
-    lanelet_ids.begin(), lanelet_ids.end(), std::back_inserter(distances), [&](auto lanelet_id) {
-      return distanceToLeftLaneBound(map_pose, bounding_box, lanelet_id, hdmap_utils_ptr);
-    });
-  return *std::min_element(distances.begin(), distances.end());
+  double min_distance = std::numeric_limits<double>::max();
+  for (const auto & lanelet_id : lanelet_ids) {
+    const auto distance = distanceToLeftLaneBound(map_pose, bounding_box, lanelet_id);
+    if (distance < min_distance) {
+      min_distance = distance;
+    }
+  }
+  return min_distance;
 }
 
 auto distanceToRightLaneBound(
   const geometry_msgs::msg::Pose & map_pose,
-  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, lanelet::Id lanelet_id,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> double
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, const lanelet::Id lanelet_id)
+  -> double
 {
-  if (const auto bound = hdmap_utils_ptr->getRightBound(lanelet_id); bound.empty()) {
+  if (const auto & bound = lanelet_wrapper::lanelet_map::rightBound(lanelet_id); bound.empty()) {
     THROW_SEMANTIC_ERROR(
       "Failed to calculate right bounds of lanelet_id : ", lanelet_id,
       " please check lanelet map.");
@@ -304,38 +308,40 @@ auto distanceToRightLaneBound(
 
 auto distanceToRightLaneBound(
   const geometry_msgs::msg::Pose & map_pose,
-  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, const lanelet::Ids & lanelet_ids,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> double
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, const lanelet::Ids & lanelet_ids)
+  -> double
 {
   if (lanelet_ids.empty()) {
     THROW_SEMANTIC_ERROR("Failing to calculate distanceToRightLaneBound for given empty vector.");
   }
-  std::vector<double> distances;
-  std::transform(
-    lanelet_ids.begin(), lanelet_ids.end(), std::back_inserter(distances), [&](auto lanelet_id) {
-      return distanceToRightLaneBound(map_pose, bounding_box, lanelet_id, hdmap_utils_ptr);
-    });
-  return *std::min_element(distances.begin(), distances.end());
+  double min_distance = std::numeric_limits<double>::max();
+  for (const auto & lanelet_id : lanelet_ids) {
+    const double distance = distanceToRightLaneBound(map_pose, bounding_box, lanelet_id);
+    if (distance < min_distance) {
+      min_distance = distance;
+    }
+  }
+  return min_distance;
 }
 
 auto distanceToLaneBound(
   const geometry_msgs::msg::Pose & map_pose,
-  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, lanelet::Id lanelet_id,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> double
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, const lanelet::Id lanelet_id)
+  -> double
 {
   return std::min(
-    distanceToLeftLaneBound(map_pose, bounding_box, lanelet_id, hdmap_utils_ptr),
-    distanceToRightLaneBound(map_pose, bounding_box, lanelet_id, hdmap_utils_ptr));
+    distanceToLeftLaneBound(map_pose, bounding_box, lanelet_id),
+    distanceToRightLaneBound(map_pose, bounding_box, lanelet_id));
 }
 
 auto distanceToLaneBound(
   const geometry_msgs::msg::Pose & map_pose,
-  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, const lanelet::Ids & lanelet_ids,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> double
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, const lanelet::Ids & lanelet_ids)
+  -> double
 {
   return std::min(
-    distanceToLeftLaneBound(map_pose, bounding_box, lanelet_ids, hdmap_utils_ptr),
-    distanceToRightLaneBound(map_pose, bounding_box, lanelet_ids, hdmap_utils_ptr));
+    distanceToLeftLaneBound(map_pose, bounding_box, lanelet_ids),
+    distanceToRightLaneBound(map_pose, bounding_box, lanelet_ids));
 }
 
 auto distanceToCrosswalk(
