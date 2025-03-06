@@ -36,7 +36,6 @@
 
 namespace openscenario_interpreter
 {
-
 struct Scope;
 
 inline namespace syntax

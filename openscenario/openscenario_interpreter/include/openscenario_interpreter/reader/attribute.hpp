@@ -133,4 +133,5 @@ auto readAttribute(const std::string & name, const Node & node, const Scope & sc
 }
 }  // namespace reader
 }  // namespace openscenario_interpreter
+
 #endif  // OPENSCENARIO_INTERPRETER__READER__ATTRIBUTE_HPP_
