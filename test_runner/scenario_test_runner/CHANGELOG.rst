@@ -35,6 +35,82 @@ Changelog for package scenario_test_runner
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+12.1.0 (2025-03-05)
+-------------------
+* Merge pull request `#1532 <https://github.com/tier4/scenario_simulator_v2/issues/1532>`_ from tier4/feature/simple_sensor_simulator/new-noise-model
+  Feature/simple sensor simulator/new noise model
+* Merge branch 'master' into feature/simple_sensor_simulator/new-noise-model
+* Update the parameter file to read from any named node
+* Merge branch 'master' into feature/simple_sensor_simulator/new-noise-model
+* Add some comments for cspell to ignore false-positive warnings
+* Add new document `Parameters.md`
+* Cleanup parameter file
+* Add parameters to maintain backward compatibility
+* Organize the parameter file structure to be more reasonable
+* Rename parameter `phi` to `autocorrelation_coefficient`
+* Rename parameter `tp` to `true_positive`
+* Cleanup
+* updated config, currected the modeling of bernoulli distribution noises to Markov process.
+  rename rho to phi
+  update description.
+* Add array size check to local function `parameters`
+* Update `DetectionSensor` to switch noise models according to parameter
+* Add new local function `parameter` and `parameters`
+* Add new parameter `ellipse_y_radiuses`
+* Merge remote-tracking branch 'origin/master' into feature/simple_sensor_simulator/new-noise-model
+* Add parameters for new noise model
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki, xtk8532704, yamacir-kit
+
+12.0.2 (2025-03-04)
+-------------------
+* Merge branch 'master' into RJD-1057/reorgnize-ostream-helper
+* Contributors: ぐるぐる
+
+12.0.1 (2025-02-26)
+-------------------
+* Merge branch 'master' into feature/push-latest-docker-tag
+* Contributors: Masaya Kataoka
+
+12.0.0 (2025-02-25)
+-------------------
+* Merge branch 'master' into refactor/lanelet_wrapper_bound
+* Merge branch 'master' into refactor/lanelet_wrapper_bound
+* Contributors: Tatsuya Yamasaki
+
+11.1.0 (2025-02-21)
+-------------------
+* Merge pull request `#1517 <https://github.com/tier4/scenario_simulator_v2/issues/1517>`_ from tier4/feature/execution_time
+* Revert "Revert "Revert "chore: modify scenario threshold for test"""
+  This reverts commit 7d343c55b229f3c1eb4aabb28340b4dfd7f9ff98.
+* Merge branch 'master' into feature/execution_time
+* Revert "Revert "chore: modify scenario threshold for test""
+  This reverts commit 603273f93910854a0fdd228dfef0aee537fb6398.
+* Revert "chore: modify scenario threshold for test"
+  This reverts commit 30e525ccdce49cc2f13d21f9fa9b9b15f58ccbbb.
+* Merge remote-tracking branch 'origin/master' into feature/execution_time
+* chore: modify scenario threshold for test
+* Merge branch 'master' into feature/execution_time
+* chore: use seconds as time unit in execution_time topics
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Revert "chore: change scenario condition for test"
+  This reverts commit 868aae6e9077d8f9c2e58d3431d01e300b1f1c70.
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* chore: change scenario condition for test
+* chore: move execution_time_test.yaml into optional_workflow.txt
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* feat: add execution_time_test.yaml into test scenario line-up
+* Merge branch 'master' into feature/execution_time
+* chore: update threshold for update time in execution_time_test.yaml
+* refactor: use anchor and aliases in execution_time_test.yaml
+* feat: add execution_time_test.yaml
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
 11.0.0 (2025-02-20)
 -------------------
 * Merge branch 'master' into refactor/lanelet_wrapper_route
