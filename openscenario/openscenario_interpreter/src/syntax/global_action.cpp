@@ -23,11 +23,11 @@ GlobalAction::GlobalAction(const pugi::xml_node & node, Scope & scope)
 // clang-format off
 : ComplexType(
     choice(node, {
-      {   "EnvironmentAction", [&](auto && node) { return make<   EnvironmentAction>(std::forward<decltype(node)>(node), scope); } },
-      {        "EntityAction", [&](auto && node) { return make<        EntityAction>(std::forward<decltype(node)>(node), scope); } },
-      {     "ParameterAction", [&](auto && node) { return make<     ParameterAction>(std::forward<decltype(node)>(node), scope); } },
-      {"InfrastructureAction", [&](auto && node) { return make<InfrastructureAction>(std::forward<decltype(node)>(node), scope); } },
-      {       "TrafficAction", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified;         } },
+      {   "EnvironmentAction", [&](auto && node) { return make<   EnvironmentAction>(node, scope);                       } },
+      {        "EntityAction", [&](auto && node) { return make<        EntityAction>(node, scope);                       } },
+      {     "ParameterAction", [&](auto && node) { return make<     ParameterAction>(node, scope);                       } },
+      {"InfrastructureAction", [&](auto && node) { return make<InfrastructureAction>(node, scope);                       } },
+      {       "TrafficAction", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; } },
     }))
 // clang-format on
 {
