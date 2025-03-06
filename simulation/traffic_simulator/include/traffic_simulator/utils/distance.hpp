@@ -74,33 +74,33 @@ auto boundingBoxLaneLongitudinalDistance(
 // Bounds
 auto distanceToLaneBound(
   const geometry_msgs::msg::Pose & map_pose,
-  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, lanelet::Id lanelet_id,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> double;
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, const lanelet::Id lanelet_id)
+  -> double;
 
 auto distanceToLaneBound(
   const geometry_msgs::msg::Pose & map_pose,
-  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, const lanelet::Ids & lanelet_ids,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> double;
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, const lanelet::Ids & lanelet_ids)
+  -> double;
 
 auto distanceToLeftLaneBound(
   const geometry_msgs::msg::Pose & map_pose,
-  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, lanelet::Id lanelet_id,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> double;
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, const lanelet::Id lanelet_id)
+  -> double;
 
 auto distanceToLeftLaneBound(
   const geometry_msgs::msg::Pose & map_pose,
-  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, const lanelet::Ids & lanelet_ids,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> double;
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, const lanelet::Ids & lanelet_ids)
+  -> double;
 
 auto distanceToRightLaneBound(
   const geometry_msgs::msg::Pose & map_pose,
-  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, lanelet::Id lanelet_id,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> double;
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, const lanelet::Id lanelet_id)
+  -> double;
 
 auto distanceToRightLaneBound(
   const geometry_msgs::msg::Pose & map_pose,
-  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, const lanelet::Ids & lanelet_ids,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> double;
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, const lanelet::Ids & lanelet_ids)
+  -> double;
 
 // Other objects
 auto distanceToCrosswalk(
