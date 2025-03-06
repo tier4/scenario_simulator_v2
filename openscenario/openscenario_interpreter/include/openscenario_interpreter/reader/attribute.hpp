@@ -40,7 +40,7 @@ struct Rule;
 
 inline namespace reader
 {
-auto substitute(std::string attribute, const Scope & scope) -> String;
+auto substitute(const std::string & attribute, const Scope & scope) -> String;
 
 template <typename T, typename Node, typename Scope>
 auto readAttribute(const std::string & name, const Node & node, const Scope & scope) -> T
