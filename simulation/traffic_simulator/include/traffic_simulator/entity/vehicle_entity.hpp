@@ -86,7 +86,7 @@ public:
 
   auto getEntityTypename() const -> const std::string & override;
 
-  auto getGoalPoses() -> std::vector<CanonicalizedLaneletPose> override;
+  auto getParameters() const -> const traffic_simulator_msgs::msg::VehicleParameters &;
 
   auto getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle> override;
 

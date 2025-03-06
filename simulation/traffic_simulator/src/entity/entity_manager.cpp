@@ -324,12 +324,12 @@ auto EntityManager::resetBehaviorPlugin(
       "Entity :", name, "is MiscObjectEntity.",
       "You cannot reset behavior plugin of MiscObjectEntity.");
   } else if (reference_entity.is<VehicleEntity>()) {
-    const auto parameters = getVehicleParameters(name);
+    const auto parameters = reference_entity.as<VehicleEntity>().getParameters();
     despawnEntity(name);
     spawnEntity<VehicleEntity>(
       name, status.getMapPose(), parameters, status.getTime(), behavior_plugin_name);
   } else if (reference_entity.is<PedestrianEntity>()) {
-    const auto parameters = getPedestrianParameters(name);
+    const auto parameters = reference_entity.as<PedestrianEntity>().getParameters();
     despawnEntity(name);
     spawnEntity<PedestrianEntity>(
       name, status.getMapPose(), parameters, status.getTime(), behavior_plugin_name);
