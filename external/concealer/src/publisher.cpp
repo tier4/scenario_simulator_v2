@@ -56,7 +56,7 @@ auto NormalDistribution<nav_msgs::msg::Odometry>::operator()(nav_msgs::msg::Odom
     odometry.pose.pose.orientation.w, odometry.pose.pose.orientation.x,
     odometry.pose.pose.orientation.y, odometry.pose.pose.orientation.z);
 
-  const double speed =  std::hypot(
+  const double speed = std::hypot(
     odometry.twist.twist.linear.x, odometry.twist.twist.linear.y, odometry.twist.twist.linear.z);
   if (speed < speed_threshold) {
     return odometry;
