@@ -198,11 +198,6 @@ auto EntityManager::getEgoEntity(const std::string & name) const -> const entity
   }
 }
 
-auto EntityManager::getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &
-{
-  return hdmap_utils_ptr_;
-}
-
 auto EntityManager::getNumberOfEgo() const -> std::size_t
 {
   return std::count_if(std::begin(entities_), std::end(entities_), [this](const auto & each) {
@@ -378,7 +373,7 @@ void EntityManager::update(const double current_time, const double step_time)
   }
 }
 
-void EntityManager::updateHdmapMarker()
+void EntityManager::updateLaneletMarker()
 {
   MarkerArray markers;
   const auto stamp = clock_ptr_->now();
