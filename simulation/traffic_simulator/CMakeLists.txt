@@ -45,6 +45,7 @@ ament_auto_add_library(traffic_simulator SHARED
   src/entity/pedestrian_entity.cpp
   src/entity/vehicle_entity.cpp
   src/helper/helper.cpp
+  src/helper/ostream_helpers.cpp
   src/job/job.cpp
   src/job/job_list.cpp
   src/lanelet_wrapper/distance.cpp
