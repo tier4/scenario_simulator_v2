@@ -59,6 +59,9 @@ void SimModelDelaySteerVel::update(const double & dt)
   // do not use deadzone_delta_steer (Steer IF does not exist in this model)
   const double prev_vx = state_(IDX::VX);
   updateRungeKutta(dt, delayed_input);
+  if (std::abs(state_(IDX::VX)) < 0.01) {
+    state_(IDX::VX) = 0.0;
+  }
   current_ax_ = (state_(IDX::VX) - prev_vx) / dt;
 }
 
