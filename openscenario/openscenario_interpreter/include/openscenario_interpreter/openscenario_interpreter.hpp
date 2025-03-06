@@ -153,13 +153,8 @@ public:
     results.write_to(
       (boost::filesystem::path(output_directory) / "result.junit.xml").c_str(), "  ");
 
-    auto metrics_directory = boost::filesystem::path(output_directory) / "metrics";
-    if (boost::filesystem::exists(metrics_directory)) {
-      boost::filesystem::remove(metrics_directory);
-    }
-    boost::filesystem::create_directories(metrics_directory);
     execution_timer.saveStatistics(
-      boost::filesystem::path(output_directory) / "metrics" / "execution_timer.json");
+      boost::filesystem::path(output_directory) / "execution_timer.json");
   }
 
   template <typename ExceptionHandler, typename Thunk>
