@@ -18,6 +18,62 @@ on:
         required: true
 
 jobs:
+  push_traffic_sim_docker:
+    name: Push Docker Image for traffic_simulator
+    runs-on: ubuntu-22.04
+    timeout-minutes: 720
+    strategy:
+      matrix:
+        rosdistro: [humble]
+
+    steps:
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+
+      - name: Install docker for ubuntu runner
+        uses: docker/setup-buildx-action@v3
+
+      - uses: actions/checkout@v4
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build
+        if: github.event_name == 'pull_request'
+        uses: docker/bake-action@v6.3.0
+        with:
+          files: |
+            ./docker-bake.hcl
+          workdir: .
+          set: |
+            *.cache-to=type=gha,mode=max
+            *.cache-from=type=gha
+          push: false
+          targets: |
+            traffic_simulator_${{ matrix.rosdistro }}
+
+      - name: Build and push
+        if: github.event_name == 'workflow_dispatch'
+        uses: docker/bake-action@v6.3.0
+        with:
+          files: |
+            ./docker-bake.hcl
+          workdir: .
+          set: |
+            *.cache-to=type=gha,mode=max
+            *.cache-from=type=gha
+            *.tags=ghcr.io/tier4/scenario_simulator_v2:traffic_simulator_${{ matrix.rosdistro }}-${{ github.event.inputs.version }}
+            *.tags=ghcr.io/tier4/scenario_simulator_v2:traffic_simulator-latest
+            push: true
+          targets: |
+            traffic_simulator_${{ matrix.rosdistro }}
+
   push_docker:
     name: Push Docker Image
     runs-on: ubuntu-22.04
@@ -25,11 +81,9 @@ jobs:
     strategy:
       matrix:
         rosdistro: [humble]
-        arch: [amd64]
-        # Build test for arm64 CPU is broken.
-        # This is a temporary solution and will be repaired in the future.
-        # See also https://github.com/tier4/scenario_simulator_v2/pull/1295
         # arch: [amd64, arm64]
+        arch: [amd64]
+
     steps:
       - name: Free Disk Space (Ubuntu)
         uses: jlumbroso/free-disk-space@main
@@ -51,9 +105,15 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Docker Qemu Setup
+        run: |
+          docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+          docker buildx create --use
+          docker buildx inspect --bootstrap
+
       - name: Build (${{ matrix.arch }})
         if: github.event_name == 'pull_request'
-        uses: docker/bake-action@v3
+        uses: docker/bake-action@v6.3.0
         with:
           files: |
             ./docker-bake.hcl
@@ -67,7 +127,7 @@ jobs:
 
       - name: Build and push (${{ matrix.arch }})
         if: github.event_name == 'workflow_dispatch'
-        uses: docker/bake-action@v3
+        uses: docker/bake-action@v6.3.0
         with:
           files: |
             ./docker-bake.hcl
@@ -76,6 +136,7 @@ jobs:
             *.cache-to=type=gha,mode=max
             *.cache-from=type=gha
             *.tags=ghcr.io/tier4/scenario_simulator_v2:humble-${{ github.event.inputs.version }}
+            *.tags=ghcr.io/tier4/scenario_simulator_v2:humble-latest
           push: true
           targets: |
             ${{ matrix.rosdistro }}_base_${{ matrix.arch }}

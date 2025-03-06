@@ -63,11 +63,11 @@ auto toPolygon2D(const traffic_simulator_msgs::msg::BoundingBox & bounding_box)
   -> std::vector<geometry_msgs::msg::Point>;
 auto toPolygon2D(
   const geometry_msgs::msg::Pose & pose,
-  const traffic_simulator_msgs::msg::BoundingBox & bounding_box) -> const boost_polygon;
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box) -> boost_polygon;
 std::vector<geometry_msgs::msg::Point> getPointsFromBbox(
-  traffic_simulator_msgs::msg::BoundingBox bounding_box, double width_extension_right = 0.0,
-  double width_extension_left = 0.0, double length_extension_front = 0.0,
-  double length_extension_rear = 0.0);
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box,
+  const double width_extension_right = 0.0, const double width_extension_left = 0.0,
+  const double length_extension_front = 0.0, const double length_extension_rear = 0.0);
 DistancesFromCenterToEdge getDistancesFromCenterToEdge(
   const traffic_simulator_msgs::msg::BoundingBox & bounding_box);
 

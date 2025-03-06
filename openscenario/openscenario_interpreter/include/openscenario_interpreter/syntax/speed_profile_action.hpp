@@ -40,8 +40,7 @@ inline namespace syntax
  *
  * -------------------------------------------------------------------------- */
 struct SpeedProfileAction : private Scope,  // NOTE: Required for access to actors
-                            private SimulatorCore::ActionApplication,
-                            private SimulatorCore::ConditionEvaluation
+                            private SimulatorCore::ActionApplication
 {
   /*
      Reference entity. If set, the speed values will be interpreted as relative

@@ -32,9 +32,20 @@ class HermiteCurve
 {
 private:
   friend class HermiteCurveTest;
-  double ax_, bx_, cx_, dx_;
-  double ay_, by_, cy_, dy_;
-  double az_, bz_, cz_, dz_;
+  double ax_;
+  double bx_;
+  double cx_;
+  double dx_;
+
+  double ay_;
+  double by_;
+  double cy_;
+  double dy_;
+
+  double az_;
+  double bz_;
+  double cz_;
+  double dz_;
   math::geometry::PolynomialSolver solver_;
 
 public:

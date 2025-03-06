@@ -23,8 +23,10 @@ namespace geometry
 {
 bool isIntersect2D(const LineSegment & line0, const LineSegment & line1)
 {
-  const auto &p0 = line0.start_point, &q0 = line0.end_point;
-  const auto &p1 = line1.start_point, &q1 = line1.end_point;
+  const auto & p0 = line0.start_point;
+  const auto & q0 = line0.end_point;
+  const auto & p1 = line1.start_point;
+  const auto & q1 = line1.end_point;
 
   const int relative_position_p0 = line1.relativePointPosition2D(p0);
   const int relative_position_q0 = line1.relativePointPosition2D(q0);
@@ -91,16 +93,22 @@ std::optional<geometry_msgs::msg::Point> getIntersection2D(
 std::vector<geometry_msgs::msg::Point> getIntersection2D(const std::vector<LineSegment> & lines)
 {
   std::vector<geometry_msgs::msg::Point> ret;
-  for (size_t i = 0; i < lines.size(); ++i) {
-    for (size_t m = 0; m < lines.size(); ++m) {
-      if (i != m) {
-        const auto point = getIntersection2D(lines[i], lines[m]);
-        if (point) {
-          ret.emplace_back(point.value());
-        }
+
+  auto addIntersectionIfExists = [&](size_t i, size_t m) {
+    if (i != m) {
+      const auto point = getIntersection2D(lines[i], lines[m]);
+      if (point) {
+        ret.emplace_back(point.value());
       }
     }
+  };
+
+  for (size_t i = 0; i < lines.size(); ++i) {
+    for (size_t m = 0; m < lines.size(); ++m) {
+      addIntersectionIfExists(i, m);
+    }
   }
+
   return ret;
 }
 }  // namespace geometry

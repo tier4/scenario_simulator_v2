@@ -68,7 +68,7 @@ jobs:
       - name: Resolve rosdep and install colcon mixin
         run: |
           apt-get update
-          apt-get install -y python3-pip python3-colcon-lcov-result lcov unzip
+          apt-get install -y python3-pip python3-colcon-lcov-result lcov unzip gcovr
           rosdep update --include-eol-distros
           rosdep install -iy --from-paths src --rosdistro ${{ matrix.rosdistro }}
           colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml
@@ -78,13 +78,20 @@ jobs:
       - name: Install sonar-scanner and build-wrapper
         uses: sonarsource/sonarcloud-github-c-cpp@v3
         env:
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }} 
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
       - name: Build with SonarCloud Build Wrapper
         run: |
           source /opt/ros/${{ matrix.rosdistro }}/setup.bash
           build-wrapper-linux-x86-64 --out-dir src/scenario_simulator_v2/bw-output \
-          colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=${{ matrix.cmake_build_type }} -DBUILD_CPP_MOCK_SCENARIOS=ON -DBUILD_TESTING=true -DCMAKE_CXX_FLAGS='-fprofile-arcs -ftest-coverage' -DCMAKE_C_FLAGS='-fprofile-arcs -ftest-coverage' --packages-up-to ${{ steps.list_packages.outputs.package_list }}
+          colcon build --symlink-install \
+          --cmake-args \
+            -DCMAKE_BUILD_TYPE=${{ matrix.cmake_build_type }} \
+            -DBUILD_CPP_MOCK_SCENARIOS=ON \
+            -DBUILD_TESTING=true \
+            -DCMAKE_CXX_FLAGS='-fprofile-arcs -ftest-coverage' \
+            -DCMAKE_C_FLAGS='-fprofile-arcs -ftest-coverage' \
+            --packages-up-to ${{ steps.list_packages.outputs.package_list }}
         shell: bash
 
       - name: Colcon test
@@ -95,14 +102,8 @@ jobs:
           colcon lcov-result --packages-select ${{ steps.list_packages.outputs.package_list }}
         shell: bash
 
-      - name: Collect and run gcov on coverage data
-        run: |
-          mkdir -p ./gcov && \
-          find ./build -name "*.gcda" -o -name "*.gcno" | \
-          while read -r line; do \
-            gcov -o $(dirname "$line") $(echo "$line" | sed 's/\.gcda$/.cpp/;s/\.gcno$/.cpp/;s/\.gcda$/.hpp/;s/\.gcno$/.hpp/'); \
-          done && mv *.gcov ./gcov/
-    
+      - name: generate gcov report for sonarcloud
+        run: gcovr -r src/scenario_simulator_v2 build --sonarqube coverage.xml
 
       - name: Show test result
         if: always()
@@ -119,11 +120,46 @@ jobs:
           ./src/scenario_simulator_v2/.github/workflows/workflow.sh ./src/scenario_simulator_v2/test_runner/scenario_test_runner/config/workflow.txt global_frame_rate:=20
         shell: bash
 
+      - name: Scenario test (optional)
+        id: optional-scenario-test
+        run: |
+          source install/setup.bash
+          source install/local_setup.bash
+          # execute scenarios but ignore the return code
+          ./src/scenario_simulator_v2/.github/workflows/workflow.sh ./src/scenario_simulator_v2/test_runner/scenario_test_runner/config/optional_workflow.txt global_frame_rate:=20 || true
+          ./src/scenario_simulator_v2/.github/workflows/generate_workflow_report.sh /tmp/scenario_workflow/optional_workflow
+          echo failure=$(grep -c "<failure"  /tmp/scenario_workflow/optional_workflow/failure_report.md) >> $GITHUB_OUTPUT
+        shell: bash
+
+      - uses: actions/github-script@v7
+        if: steps.optional-scenario-test.outputs.failure > 0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            let commentBody = fs.readFileSync('/tmp/scenario_workflow/optional_workflow/failure_report.md', 'utf8');
+            if (commentBody) {
+              commentBody = '## Failure optional scenarios\n> [!NOTE]\n> This is an experimental check and does not block merging the pull-request. \n> But, please be aware that this may indicate a regression.\n' + commentBody;
+            }
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: commentBody
+            })
+
       - name: Upload Lcov result
         uses: actions/upload-artifact@v4
         with:
           name: lcov-${{ matrix.cmake_build_type }}
           path: lcov
+          retention-days: 1
+
+      - name: Upload Gcov result
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage${{ matrix.cmake_build_type }}.xml
+          path: coverage.xml
           retention-days: 1
 
       - name: Run SonarCloud scan

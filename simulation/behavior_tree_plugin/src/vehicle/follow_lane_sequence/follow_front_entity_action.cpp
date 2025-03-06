@@ -52,7 +52,7 @@ FollowFrontEntityAction::calculateObstacle(const traffic_simulator_msgs::msg::Wa
 
 const traffic_simulator_msgs::msg::WaypointsArray FollowFrontEntityAction::calculateWaypoints()
 {
-  if (!canonicalized_entity_status->laneMatchingSucceed()) {
+  if (!canonicalized_entity_status->isInLanelet()) {
     THROW_SIMULATION_ERROR("failed to assign lane");
   }
   if (canonicalized_entity_status->getTwist().linear.x >= 0) {
@@ -96,8 +96,8 @@ BT::NodeStatus FollowFrontEntityAction::tick()
   if (!front_entity_name) {
     return BT::NodeStatus::FAILURE;
   }
-  distance_to_front_entity_ =
-    getDistanceToTargetEntityPolygon(*trajectory, front_entity_name.value());
+  const auto & front_entity_status = getEntityStatus(front_entity_name.value());
+  distance_to_front_entity_ = getDistanceToTargetEntity(*trajectory, front_entity_status);
   if (!distance_to_front_entity_) {
     return BT::NodeStatus::FAILURE;
   }
@@ -111,7 +111,6 @@ BT::NodeStatus FollowFrontEntityAction::tick()
       return BT::NodeStatus::FAILURE;
     }
   }
-  const auto & front_entity_status = getEntityStatus(front_entity_name.value());
   if (!target_speed) {
     target_speed = hdmap_utils->getSpeedLimit(route_lanelets);
   }

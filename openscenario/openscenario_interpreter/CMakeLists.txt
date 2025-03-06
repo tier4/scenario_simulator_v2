@@ -62,7 +62,9 @@ ament_auto_add_library(${PROJECT_NAME} SHARED
   ${${PROJECT_NAME}_UTILITY_SOURCES}
   ${${PROJECT_NAME}_READER_SOURCES}
   src/object.cpp
+  src/compatibility.cpp
   src/evaluate.cpp
+  src/object.cpp
   src/openscenario_interpreter.cpp
   src/record.cpp
   src/scope.cpp)

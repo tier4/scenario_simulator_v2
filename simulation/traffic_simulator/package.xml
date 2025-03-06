@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="3">
   <name>traffic_simulator</name>
-  <version>4.3.18</version>
+  <version>12.1.0</version>
   <description>control traffic flow</description>
 
   <maintainer email="masaya.kataoka@tier4.jp">masaya kataoka</maintainer>
@@ -36,8 +36,8 @@
   <depend>tf2_geometry_msgs</depend>
   <depend>tf2_ros</depend>
   <depend>tier4_debug_msgs</depend>
-  <depend>autoware_auto_perception_msgs</depend>
   <depend>autoware_perception_msgs</depend>
+  <depend>autoware_map_msgs</depend>
   <depend>tinyxml2_vendor</depend>
   <depend>pluginlib</depend>
   <depend>traffic_simulator_msgs</depend>

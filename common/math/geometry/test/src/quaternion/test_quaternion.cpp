@@ -21,8 +21,6 @@
 #include "../expect_eq_macros.hpp"
 #include "../test_utils.hpp"
 
-constexpr double EPS = 1e-6;
-
 /**
  * @note Test result correctness with a basic example.
  */

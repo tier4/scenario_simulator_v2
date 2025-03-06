@@ -322,6 +322,7 @@ message TrafficLight {
 message TrafficSignal {
   int32 id = 1;
   repeated TrafficLight traffic_light_status = 2;
+  repeated int32 relation_ids = 3; // TrafficLightRegulatoryElement ids based on TrafficLight id
 }
 
 /**

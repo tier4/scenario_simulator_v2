@@ -20,8 +20,6 @@
 
 #include "../expect_eq_macros.hpp"
 
-constexpr double EPS = 1e-6;
-
 /**
  * @brief Custom Vector3 struct using T type with multiplication and division operators
  */

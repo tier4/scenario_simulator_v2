@@ -35,7 +35,7 @@ class RaycasterTest : public ::testing::Test
 protected:
   RaycasterTest()
   : raycaster_(std::make_unique<Raycaster>()),
-    config_(utils::constructLidarConfiguration("ego", "awf/universe", 0.0, 0.1)),
+    config_(utils::constructLidarConfiguration("ego", "awf/universe/20240605", 0.0, 0.1)),
     origin_(utils::makePose(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0)),
     box_pose_(utils::makePose(5.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0))
   {

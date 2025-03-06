@@ -22,6 +22,7 @@
 #include <simple_sensor_simulator/simple_sensor_simulator.hpp>
 #include <simulation_interface/conversions.hpp>
 #include <string>
+#include <traffic_simulator/utils/lanelet_map.hpp>
 #include <utility>
 #include <vector>
 
@@ -83,6 +84,7 @@ auto ScenarioSimulator::initialize(const simulation_api_schema::InitializeReques
   step_time_ = req.step_time();
   current_simulation_time_ = req.initialize_time();
   current_scenario_time_ = std::numeric_limits<double>::quiet_NaN();
+  traffic_simulator::lanelet_map::activate(req.lanelet2_map_path());
   builtin_interfaces::msg::Time t;
   simulation_interface::toMsg(req.initialize_ros_time(), t);
   current_ros_time_ = t;
@@ -163,7 +165,11 @@ auto ScenarioSimulator::updateEntityStatus(
     try {
       if (isEgo(status.name())) {
         assert(ego_entity_simulation_ && "Ego is spawned but ego_entity_simulation_ is nullptr!");
-        if (req.overwrite_ego_status()) {
+        if (
+          req.overwrite_ego_status() or
+          ego_entity_simulation_->autoware->getControlModeReport().mode ==
+            autoware_vehicle_msgs::msg::ControlModeReport::MANUAL) {
+          ego_entity_simulation_->autoware->setManualMode();
           traffic_simulator_msgs::msg::EntityStatus ego_status_msg;
           simulation_interface::toMsg(status, ego_status_msg);
           ego_entity_simulation_->overwrite(
@@ -354,7 +360,7 @@ auto ScenarioSimulator::attachPseudoTrafficLightDetector(
 {
   auto response = simulation_api_schema::AttachPseudoTrafficLightDetectorResponse();
   sensor_sim_.attachPseudoTrafficLightsDetector(
-    current_simulation_time_, req.configuration(), *this, hdmap_utils_);
+    current_simulation_time_, req.configuration(), *this);
   response.mutable_result()->set_success(true);
   return response;
 }

@@ -20,9 +20,11 @@
 #include <openscenario_interpreter/syntax/reach_position_condition.hpp>
 #include <openscenario_interpreter/syntax/relative_clearance_condition.hpp>
 #include <openscenario_interpreter/syntax/relative_distance_condition.hpp>
+#include <openscenario_interpreter/syntax/relative_speed_condition.hpp>
 #include <openscenario_interpreter/syntax/speed_condition.hpp>
 #include <openscenario_interpreter/syntax/stand_still_condition.hpp>
 #include <openscenario_interpreter/syntax/time_headway_condition.hpp>
+#include <openscenario_interpreter/syntax/time_to_collision_condition.hpp>
 
 namespace openscenario_interpreter
 {
@@ -37,11 +39,11 @@ EntityCondition::EntityCondition(
       {         "CollisionCondition", [&](const auto & node) { return make<        CollisionCondition>(node, scope, triggering_entities); } },
       {           "OffroadCondition", [&](const auto & node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified;      } },
       {       "TimeHeadwayCondition", [&](const auto & node) { return make<      TimeHeadwayCondition>(node, scope, triggering_entities); } },
-      {   "TimeToCollisionCondition", [&](const auto & node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified;      } },
+      {   "TimeToCollisionCondition", [&](const auto & node) { return make<  TimeToCollisionCondition>(node, scope, triggering_entities); } },
       {      "AccelerationCondition", [&](const auto & node) { return make<     AccelerationCondition>(node, scope, triggering_entities); } },
       {        "StandStillCondition", [&](const auto & node) { return make<       StandStillCondition>(node, scope, triggering_entities); } },
       {             "SpeedCondition", [&](const auto & node) { return make<            SpeedCondition>(node, scope, triggering_entities); } },
-      {     "RelativeSpeedCondition", [&](const auto & node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified;      } },
+      {     "RelativeSpeedCondition", [&](const auto & node) { return make<    RelativeSpeedCondition>(node, scope, triggering_entities); } },
       {  "TraveledDistanceCondition", [&](const auto & node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified;      } },
       {     "ReachPositionCondition", [&](const auto & node) { return make<    ReachPositionCondition>(node, scope, triggering_entities); } },
       {          "DistanceCondition", [&](const auto & node) { return make<         DistanceCondition>(node, scope, triggering_entities); } },

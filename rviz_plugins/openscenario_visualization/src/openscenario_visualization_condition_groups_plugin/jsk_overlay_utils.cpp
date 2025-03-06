@@ -64,7 +64,7 @@ Ogre::HardwarePixelBufferSharedPtr ScopedPixelBuffer::getPixelBuffer() { return 
 QImage ScopedPixelBuffer::getQImage(unsigned int width, unsigned int height)
 {
   const Ogre::PixelBox & pixelBox = pixel_buffer_->getCurrentLock();
-  Ogre::uint8 * pDest = static_cast<Ogre::uint8 *>(pixelBox.data);
+  Ogre::uint8 * pDest = pixelBox.data;
   memset(pDest, 0, width * height);
   return QImage(pDest, width, height, QImage::Format_ARGB32);
 }
@@ -110,7 +110,7 @@ OverlayObject::OverlayObject(
 
 OverlayObject::~OverlayObject()
 {
-  hide();
+  this->hide();
   panel_material_->unload();
   Ogre::MaterialManager::getSingleton().remove(panel_material_->getName());
 }
