@@ -20,7 +20,7 @@ namespace openscenario_interpreter
 {
 inline namespace reader
 {
-auto substitute(std::string attribute, const Scope & scope) -> String
+auto substitute(const std::string & attribute, const Scope & scope) -> String
 {
   auto dirname = [](auto &&, auto && scope) { return scope.dirname(); };
 
