@@ -75,15 +75,16 @@ auto substitute(const std::string & attribute, const Scope & scope) -> String
 
   static const auto pattern = std::regex(R"((.*)\$\((([\w-]+)\s?([^\)]*))\)(.*))");
 
-  for (std::smatch result; std::regex_match(attribute, result, pattern);) {
+  auto substituted = attribute;
+  for (std::smatch result; std::regex_match(substituted, result, pattern);) {
     if (const auto iter = substitutions.find(result.str(3)); iter != std::end(substitutions)) {
-      attribute = result.str(1) + std::get<1>(*iter)(result.str(4), scope) + result.str(5);
+      substituted = result.str(1) + std::get<1>(*iter)(result.str(4), scope) + result.str(5);
     } else {
       throw SyntaxError("Unknown substitution ", std::quoted(result.str(3)), " specified");
     }
   }
 
-  return attribute;
+  return substituted;
 }
 
 template auto readAttribute(const std::string &, const pugi::xml_node &, const Scope &) -> Boolean;

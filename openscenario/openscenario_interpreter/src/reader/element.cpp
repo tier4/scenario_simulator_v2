@@ -32,7 +32,7 @@ template auto readElement(const std::string &, const pugi::xml_node &, Scope &) 
 
 auto choice(
   const pugi::xml_node & node,
-  std::unordered_map<std::string, std::function<Object(const pugi::xml_node &)>> callees) -> Object
+  const std::unordered_map<std::string, std::function<Object(const pugi::xml_node &)>> & callees) -> Object
 {
   std::unordered_map<std::string, pugi::xml_node> specs{};
 
