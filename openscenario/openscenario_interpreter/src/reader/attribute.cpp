@@ -88,13 +88,13 @@ auto substitute(const std::string & attribute, const Scope & scope) -> String
 }
 
 template auto readAttribute(const std::string &, const pugi::xml_node &, const Scope &) -> Boolean;
+template auto readAttribute(const std::string &, const pugi::xml_node &, const Scope &) -> Double;
+template auto readAttribute(const std::string &, const pugi::xml_node &, const Scope &)
+  -> syntax::Rule;
+template auto readAttribute(const std::string &, const pugi::xml_node &, const Scope &) -> String;
 template auto readAttribute(const std::string &, const pugi::xml_node &, const Scope &)
   -> UnsignedShort;
 template auto readAttribute(const std::string &, const pugi::xml_node &, const Scope &)
   -> UnsignedInteger;
-template auto readAttribute(const std::string &, const pugi::xml_node &, const Scope &) -> Double;
-template auto readAttribute(const std::string &, const pugi::xml_node &, const Scope &) -> String;
-template auto readAttribute(const std::string &, const pugi::xml_node &, const Scope &)
-  -> syntax::Rule;
 }  // namespace reader
 }  // namespace openscenario_interpreter

@@ -101,15 +101,15 @@ auto readAttribute(const std::string & name, const Node & node, const Scope & sc
 extern template auto readAttribute(const std::string &, const pugi::xml_node &, const Scope &)
   -> Boolean;
 extern template auto readAttribute(const std::string &, const pugi::xml_node &, const Scope &)
-  -> UnsignedShort;
-extern template auto readAttribute(const std::string &, const pugi::xml_node &, const Scope &)
-  -> UnsignedInteger;
-extern template auto readAttribute(const std::string &, const pugi::xml_node &, const Scope &)
   -> Double;
+extern template auto readAttribute(const std::string &, const pugi::xml_node &, const Scope &)
+  -> syntax::Rule;
 extern template auto readAttribute(const std::string &, const pugi::xml_node &, const Scope &)
   -> String;
 extern template auto readAttribute(const std::string &, const pugi::xml_node &, const Scope &)
-  -> syntax::Rule;
+  -> UnsignedShort;
+extern template auto readAttribute(const std::string &, const pugi::xml_node &, const Scope &)
+  -> UnsignedInteger;
 
 template <typename T, typename Node, typename Scope>
 auto readAttribute(const std::string & name, const Node & node, const Scope & scope, T && value)
