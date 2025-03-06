@@ -86,16 +86,19 @@ class DetectionSensor : public DetectionSensorBase
 
   struct NoiseOutput
   {
-    double simulation_time, distance_noise, yaw_noise;
+    double simulation_time;
+    double distance_noise;
+    double yaw_noise;
+    bool true_positive;
+    bool flip;
 
-    bool true_positive, flip;
-
-    explicit NoiseOutput(double simulation_time = 0.0) : simulation_time(simulation_time)
+    constexpr NoiseOutput(double simulation_time = 0.0)
+    : simulation_time(simulation_time),
+      distance_noise(0.0),
+      yaw_noise(0.0),
+      true_positive(true),
+      flip(false)
     {
-      distance_noise = 0.0;
-      yaw_noise = 0.0;
-      true_positive = true;
-      flip = false;
     }
   };
 
