@@ -234,7 +234,7 @@ auto isAltitudeMatching(
   const CanonicalizedLaneletPose & lanelet_pose,
   const CanonicalizedLaneletPose & target_lanelet_pose) -> bool
 {
-  return lanelet_wrapper::pose::isAltitudeMatching(
+  return lanelet_wrapper::pose::isAltitudeWithinThreshold(
     lanelet_pose.getAltitude(), target_lanelet_pose.getAltitude());
 }
 
