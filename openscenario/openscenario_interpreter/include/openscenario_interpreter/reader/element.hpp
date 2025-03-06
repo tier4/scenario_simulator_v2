@@ -174,7 +174,8 @@ auto readGroups(const pugi::xml_node & node, Ts &&... xs)
 
 auto choice(
   const pugi::xml_node & node,
-  const std::unordered_map<std::string, std::function<Object(const pugi::xml_node &)>> & callees) -> Object;
+  const std::unordered_map<std::string, std::function<Object(const pugi::xml_node &)>> & callees)
+  -> Object;
 }  // namespace reader
 }  // namespace openscenario_interpreter
 
