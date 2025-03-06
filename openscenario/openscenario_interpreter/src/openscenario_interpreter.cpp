@@ -310,8 +310,6 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 auto Interpreter::on_deactivate(const rclcpp_lifecycle::State &) -> Result
 {
   reset();
-  execution_timer.saveStatistics(
-    boost::filesystem::path(output_directory) / "metrics" / "execution_timer.json");
 
   return Interpreter::Result::SUCCESS;  // => Inactive
 }
@@ -409,11 +407,5 @@ auto Interpreter::reset() -> void
   if (record) {
     record::stop();
   }
-
-  auto metrics_directory = boost::filesystem::path(output_directory) / "metrics";
-  if (boost::filesystem::exists(metrics_directory)) {
-    boost::filesystem::remove(metrics_directory);
-  }
-  boost::filesystem::create_directories(metrics_directory);
 }
 }  // namespace openscenario_interpreter
