@@ -609,13 +609,6 @@ auto DistanceCondition::distance<
     position);
 }
 
-auto DistanceCondition::distance(const EntityRef & triggering_entity) const -> double
-{
-  SWITCH_COORDINATE_SYSTEM(
-    SWITCH_RELATIVE_DISTANCE_TYPE, SWITCH_ROUTING_ALGORITHM, SWITCH_FREESPACE, DISTANCE);
-  return Double::nan();
-}
-
 auto DistanceCondition::evaluate() -> Object
 {
   results.clear();
