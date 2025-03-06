@@ -35,6 +35,48 @@ Changelog for package scenario_test_runner
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+12.1.0 (2025-03-05)
+-------------------
+* Merge pull request `#1532 <https://github.com/tier4/scenario_simulator_v2/issues/1532>`_ from tier4/feature/simple_sensor_simulator/new-noise-model
+  Feature/simple sensor simulator/new noise model
+* Merge branch 'master' into feature/simple_sensor_simulator/new-noise-model
+* Update the parameter file to read from any named node
+* Merge branch 'master' into feature/simple_sensor_simulator/new-noise-model
+* Add some comments for cspell to ignore false-positive warnings
+* Add new document `Parameters.md`
+* Cleanup parameter file
+* Add parameters to maintain backward compatibility
+* Organize the parameter file structure to be more reasonable
+* Rename parameter `phi` to `autocorrelation_coefficient`
+* Rename parameter `tp` to `true_positive`
+* Cleanup
+* updated config, currected the modeling of bernoulli distribution noises to Markov process.
+  rename rho to phi
+  update description.
+* Add array size check to local function `parameters`
+* Update `DetectionSensor` to switch noise models according to parameter
+* Add new local function `parameter` and `parameters`
+* Add new parameter `ellipse_y_radiuses`
+* Merge remote-tracking branch 'origin/master' into feature/simple_sensor_simulator/new-noise-model
+* Add parameters for new noise model
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki, xtk8532704, yamacir-kit
+
+12.0.2 (2025-03-04)
+-------------------
+* Merge branch 'master' into RJD-1057/reorgnize-ostream-helper
+* Contributors: ぐるぐる
+
+12.0.1 (2025-02-26)
+-------------------
+* Merge branch 'master' into feature/push-latest-docker-tag
+* Contributors: Masaya Kataoka
+
+12.0.0 (2025-02-25)
+-------------------
+* Merge branch 'master' into refactor/lanelet_wrapper_bound
+* Merge branch 'master' into refactor/lanelet_wrapper_bound
+* Contributors: Tatsuya Yamasaki
+
 11.1.0 (2025-02-21)
 -------------------
 * Merge pull request `#1517 <https://github.com/tier4/scenario_simulator_v2/issues/1517>`_ from tier4/feature/execution_time
