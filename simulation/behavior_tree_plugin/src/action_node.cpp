@@ -224,13 +224,6 @@ auto ActionNode::getDistanceToTrafficLightStopLine(
   return std::nullopt;
 }
 
-auto ActionNode::getDistanceToStopLine(
-  const lanelet::Ids & route_lanelets,
-  const std::vector<geometry_msgs::msg::Point> & waypoints) const -> std::optional<double>
-{
-  return hdmap_utils->getDistanceToStopLine(route_lanelets, waypoints);
-}
-
 auto ActionNode::getDistanceToFrontEntity(
   const math::geometry::CatmullRomSplineInterface & spline) const -> std::optional<double>
 {
