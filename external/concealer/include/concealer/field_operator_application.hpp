@@ -36,7 +36,6 @@
 #include <concealer/service.hpp>
 #include <concealer/subscriber.hpp>
 #include <concealer/task_queue.hpp>
-#include <concealer/transition_assertion.hpp>
 #include <concealer/visibility.hpp>
 #include <geometry_msgs/msg/accel.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
@@ -54,16 +53,15 @@
 
 namespace concealer
 {
-struct FieldOperatorApplication : public rclcpp::Node,
-                                  public TransitionAssertion<FieldOperatorApplication>
+struct FieldOperatorApplication : public rclcpp::Node
 {
-  std::atomic<bool> is_stop_requested = false;
-
-  bool is_autoware_exited = false;
-
-  const pid_t process_id = 0;
+  pid_t process_id;
 
   bool initialized = false;
+
+  std::atomic<bool> finalized = false;
+
+  std::chrono::steady_clock::time_point time_limit;
 
   std::string autoware_state = "LAUNCHING";
 
@@ -119,6 +117,25 @@ struct FieldOperatorApplication : public rclcpp::Node,
   */
   TaskQueue task_queue;
 
+  template <typename Thunk = void (*)()>
+  auto waitForAutowareStateToBe(
+    const std::string & state, Thunk thunk = [] {})
+  {
+    thunk();
+
+    while (not finalized.load() and autoware_state != state) {
+      if (time_limit <= std::chrono::steady_clock::now()) {
+        throw common::AutowareError(
+          "Simulator waited for the Autoware state to transition to ", state,
+          ", but time is up. The current Autoware state is ",
+          (autoware_state.empty() ? "not published yet" : autoware_state));
+      } else {
+        thunk();
+        rclcpp::GenericRate<std::chrono::steady_clock>(std::chrono::seconds(1)).sleep();
+      }
+    }
+  }
+
   CONCEALER_PUBLIC explicit FieldOperatorApplication(const pid_t);
 
   ~FieldOperatorApplication();
@@ -140,8 +157,6 @@ struct FieldOperatorApplication : public rclcpp::Node,
   auto getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray;
 
   auto requestAutoModeForCooperation(const std::string &, bool) -> void;
-
-  auto rethrow() const { task_queue.rethrow(); }
 
   auto sendCooperateCommand(const std::string &, const std::string &) -> void;
 

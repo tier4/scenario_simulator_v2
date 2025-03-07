@@ -90,8 +90,6 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode,
 
   using Result = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
 
-  bool waiting_for_engagement_to_be_completed = false;  // NOTE: DIRTY HACK!!!
-
 public:
   OPENSCENARIO_INTERPRETER_PUBLIC
   explicit Interpreter(const rclcpp::NodeOptions &);
@@ -101,12 +99,6 @@ public:
   auto currentLocalFrameRate() const -> std::chrono::milliseconds;
 
   auto currentScenarioDefinition() const -> const std::shared_ptr<ScenarioDefinition> &;
-
-  auto engage() const -> void;
-
-  auto engageable() const -> bool;
-
-  auto engaged() const -> bool;
 
   auto makeCurrentConfiguration() const -> traffic_simulator::Configuration;
 
