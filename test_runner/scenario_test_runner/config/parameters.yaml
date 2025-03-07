@@ -6,6 +6,7 @@
       version: 20240605 # architecture_type suffix (mandatory)
       seed: 0 # If 0 is specified, a random seed value will be generated for each run.
       nav_msgs::msg::Odometry:
+        speed_threshold: 0.1
         pose:
           pose:
             position:
