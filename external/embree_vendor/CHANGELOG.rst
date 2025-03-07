@@ -24,6 +24,9 @@ Changelog for package embree_vendor
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+12.1.1 (2025-03-07)
+-------------------
+
 12.1.0 (2025-03-05)
 -------------------
 * Merge branch 'master' into feature/simple_sensor_simulator/new-noise-model
