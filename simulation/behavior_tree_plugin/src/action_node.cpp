@@ -334,7 +334,7 @@ auto ActionNode::getDistanceToTargetEntity(
   if (const auto & target_lanelet_pose =
         traffic_simulator::pose::findRoutableAlternativeLaneletPoseFrom(
           canonicalized_entity_status->getLaneletId(), status.getCanonicalizedLaneletPose().value(),
-          target_bounding_box, hdmap_utils);
+          target_bounding_box);
       target_lanelet_pose) {
     const auto & from_lanelet_pose = canonicalized_entity_status->getCanonicalizedLaneletPose();
     const auto & from_bounding_box = canonicalized_entity_status->getBoundingBox();

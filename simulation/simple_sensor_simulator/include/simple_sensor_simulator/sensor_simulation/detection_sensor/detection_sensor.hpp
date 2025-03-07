@@ -17,6 +17,7 @@
 
 #include <simulation_api_schema.pb.h>
 
+#include <concealer/get_parameter.hpp>
 #include <geometry/plane.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 #include <memory>
@@ -24,7 +25,9 @@
 #include <queue>
 #include <random>
 #include <rclcpp/rclcpp.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 #include <string>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -74,10 +77,86 @@ class DetectionSensor : public DetectionSensorBase
 
   const typename rclcpp::Publisher<U>::SharedPtr ground_truth_objects_publisher;
 
+  int noise_model_version;
+
   std::default_random_engine random_engine_;
 
   std::queue<std::pair<std::vector<traffic_simulator_msgs::EntityStatus>, double>>
     unpublished_detected_entities, unpublished_ground_truth_entities;
+
+  struct NoiseOutput
+  {
+    double simulation_time, distance_noise, yaw_noise;
+
+    bool true_positive, flip;
+
+    explicit NoiseOutput(double simulation_time = 0.0)
+    : simulation_time(simulation_time),
+      distance_noise(0.0),
+      yaw_noise(0.0),
+      true_positive(true),
+      flip(false)
+    {
+    }
+  };
+
+  std::unordered_map<std::string, NoiseOutput> noise_outputs;
+
+  template <typename Message, typename std::enable_if_t<std::is_same_v<Message, T>, int> = 0>
+  auto delay() const
+  {
+    static const auto override_legacy_configuration = concealer::getParameter<bool>(
+      detected_objects_publisher->get_topic_name() + std::string(".override_legacy_configuration"));
+    if (override_legacy_configuration) {
+      static const auto delay = concealer::getParameter<double>(
+        detected_objects_publisher->get_topic_name() + std::string(".delay"));
+      return delay;
+    } else {
+      return configuration_.object_recognition_delay();
+    }
+  }
+
+  template <typename Message, typename std::enable_if_t<std::is_same_v<Message, U>, int> = 0>
+  auto delay() const
+  {
+    static const auto override_legacy_configuration = concealer::getParameter<bool>(
+      ground_truth_objects_publisher->get_topic_name() +
+      std::string(".override_legacy_configuration"));
+    if (override_legacy_configuration) {
+      static const auto delay = concealer::getParameter<double>(
+        ground_truth_objects_publisher->get_topic_name() + std::string(".delay"));
+      return delay;
+    } else {
+      return configuration_.object_recognition_ground_truth_delay();
+    }
+  }
+
+  auto range() const
+  {
+    static const auto override_legacy_configuration = concealer::getParameter<bool>(
+      detected_objects_publisher->get_topic_name() + std::string(".override_legacy_configuration"));
+    if (override_legacy_configuration) {
+      static const auto range = concealer::getParameter<double>(
+        detected_objects_publisher->get_topic_name() + std::string(".range"), 300.0);
+      return range;
+    } else {
+      return configuration_.range();
+    }
+  }
+
+  auto detect_all_objects_in_range() const
+  {
+    // cspell: ignore occlusionless
+    static const auto override_legacy_configuration = concealer::getParameter<bool>(
+      detected_objects_publisher->get_topic_name() + std::string(".override_legacy_configuration"));
+    if (override_legacy_configuration) {
+      static const auto occlusionless = concealer::getParameter<bool>(
+        detected_objects_publisher->get_topic_name() + std::string(".occlusionless"));
+      return occlusionless;
+    } else {
+      return configuration_.detect_all_objects_in_range();
+    }
+  }
 
 public:
   explicit DetectionSensor(
@@ -88,7 +167,34 @@ public:
   : DetectionSensorBase(current_simulation_time, configuration),
     detected_objects_publisher(publisher),
     ground_truth_objects_publisher(ground_truth_publisher),
-    random_engine_(configuration.random_seed())
+    noise_model_version(concealer::getParameter<int>(
+      detected_objects_publisher->get_topic_name() + std::string(".noise.model.version"))),
+    random_engine_([this]() {
+      if (const auto seed = [this]() -> std::random_device::result_type {
+            switch (noise_model_version) {
+              default:
+                [[fallthrough]];
+              case 1:
+                return configuration_.random_seed();
+              case 2:
+                return concealer::getParameter<int>(
+                  detected_objects_publisher->get_topic_name() + std::string(".seed"));
+            }
+          }();
+          seed) {
+        if (std::random_device::min() <= seed and seed <= std::random_device::max()) {
+          return seed;
+        } else {
+          throw common::scenario_simulator_exception::Error(
+            "The value of parameter ",
+            std::quoted(detected_objects_publisher->get_topic_name() + std::string(".seed")),
+            " must be greater than or equal to ", std::random_device::min(),
+            " and less than or equal to ", std::random_device::max());
+        }
+      } else {
+        return std::random_device()();
+      }
+    }())
   {
   }
 
