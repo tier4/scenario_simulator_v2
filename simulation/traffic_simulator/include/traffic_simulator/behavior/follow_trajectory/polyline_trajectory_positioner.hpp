@@ -78,7 +78,7 @@ private:
   auto validatePredictedState(const double desired_local_acceleration) const noexcept(false)
     -> void;
 
-  /// @todo add note
+  /// @note 0.0 has been adopted as the start of the simulation
   constexpr static double ABSOLUTE_BASE_TIME{0.0};
 
   const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;

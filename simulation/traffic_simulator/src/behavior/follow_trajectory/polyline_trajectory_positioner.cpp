@@ -54,7 +54,6 @@ PolylineTrajectoryPositioner::PolylineTrajectoryPositioner(
         validated_entity_status_.position(), nearest_waypoint_pose_.position))),
   total_remaining_distance_(
     totalRemainingDistance()),  // implicitly requires: polyline_trajectory_, hdmap_utils_ptr_, matching_distance_
-  /// @todo nearest_waypoint_ does not always have time defined, so is this correct (getWaypoints().front().time)?
   time_to_nearest_waypoint_(timeToNearestWaypoint()),
   total_remaining_time_(
     totalRemainingTime()),  // implicitly requires: nearest_waypoint_with_specified_time_it_, polyline_trajectory_, validated_entity_status_, step_time_
@@ -199,7 +198,6 @@ auto PolylineTrajectoryPositioner::totalRemainingDistance() const -> double
         });
     };
 
-  /// @todo think about what if nearest_waypoint_==nearest_waypoint_with_specified_time_it_
   if (nearest_waypoint_with_specified_time_it_ == getWaypoints().cend()) {
     return distance_to_nearest_waypoint_ + total_distance_to(std::prev(getWaypoints().cend()));
   } else {
@@ -218,6 +216,15 @@ auto PolylineTrajectoryPositioner::timeToNearestWaypoint() const noexcept(false)
   }
 };
 
+/*
+tiem to waypoint
+isAbsoluteBaseTime() ? ABSOLUTE_BASE_TIME : polyline_trajectory_.base_time) +
+           getWaypoints().front().time - validated_entity_status_.time();
+
+time to wayponint
+  isAbsoluteBaseTime() ? ABSOLUTE_BASE_TIME : polyline_trajectory_.base_time) +
+nearest_waypoint_with_specified_time_it_->time - validated_entity_status_.time()
+*/
 auto PolylineTrajectoryPositioner::totalRemainingTime() const noexcept(false) -> double
 {
   if (nearest_waypoint_with_specified_time_it_ == getWaypoints().cend()) {
@@ -363,6 +370,7 @@ auto PolylineTrajectoryPositioner::validatedEntityDesiredLinearAcceleration() co
   steering.
 */
 /// @todo add more explanations on how this method works (here)
+// explain if few steps. input -> output. basen on entity status we calculate smething
 auto PolylineTrajectoryPositioner::makeUpdatedEntityStatus() const -> std::optional<EntityStatus>
 {
   using math::geometry::operator+;
@@ -372,10 +380,13 @@ auto PolylineTrajectoryPositioner::makeUpdatedEntityStatus() const -> std::optio
   using math::geometry::operator+=;
 
   /**
-   * @note This clause is to avoid division-by-zero errors in later clauses with distance_to_nearest_waypoint 
+   * @note This clause is to avoid division-by-zero errors in later clauses with distance_to_nearest_waypoint_ 
    * as the denominator if the distance miraculously becomes zero.
    * @todo extend this comment about < 0.0
   */
+  /// @todo add scenario yaml
+  /// throw exception if it does not work; no nullopt. always if < 0
+  /// should not work if the waypoint has been achieved
   if (distance_to_nearest_waypoint_ <= 0.0 || total_remaining_distance_ <= 0) {
     return std::nullopt;
   }

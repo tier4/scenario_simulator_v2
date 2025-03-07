@@ -45,7 +45,8 @@ ValidatedEntityStatus::ValidatedEntityStatus(
   velocity_(math::geometry::rotate(
     entity_status_.action_status.twist.linear, entity_status_.pose.orientation))
 {
-  /// @todo add validate time, add validate orientation
+  /// @todo add validate orientation
+  validateStepTime(step_time_);
   validateBehaviorParameter(behaviorParameter());
   validatePosition(position());
   validateLinearSpeed(linearSpeed());
@@ -69,6 +70,13 @@ auto ValidatedEntityStatus::buildUpdatedEntityStatus(
   using math::geometry::operator*;
   using math::geometry::operator/;
 
+  constexpr bool desired_velocity_is_global = true;
+
+  const auto include_crosswalk = [](const auto & entity_type) {
+    return (traffic_simulator_msgs::msg::EntityType::PEDESTRIAN == entity_type.type) ||
+           (traffic_simulator_msgs::msg::EntityType::MISC_OBJECT == entity_type.type);
+  }(entity_status_.type);
+
   const auto updated_time = entity_status_.time + step_time_;
 
   const auto updated_pose_orientation =
@@ -81,14 +89,8 @@ auto ValidatedEntityStatus::buildUpdatedEntityStatus(
       .position(entity_status_.pose.position + desired_local_velocity * step_time_)
       .orientation(updated_pose_orientation);
 
-  const auto include_crosswalk = [](const auto & entity_type) {
-    return (traffic_simulator_msgs::msg::EntityType::PEDESTRIAN == entity_type.type) ||
-           (traffic_simulator_msgs::msg::EntityType::MISC_OBJECT == entity_type.type);
-  }(entity_status_.type);
-
   /// @note If it is the transition between lanelets: overwrite position to improve precision
   if (entity_status_.lanelet_pose_valid) {
-    constexpr bool desired_velocity_is_global = true;
     const auto canonicalized_lanelet_pose =
       traffic_simulator::pose::toCanonicalizedLaneletPose(entity_status_.lanelet_pose);
     const auto estimated_next_canonicalized_lanelet_pose =
@@ -96,7 +98,7 @@ auto ValidatedEntityStatus::buildUpdatedEntityStatus(
     if (canonicalized_lanelet_pose && estimated_next_canonicalized_lanelet_pose) {
       const auto next_lanelet_id =
         static_cast<LaneletPose>(estimated_next_canonicalized_lanelet_pose.value()).lanelet_id;
-      if (  /// @note Handle lanelet transition
+      if (
         const auto updated_position = pose::updatePositionForLaneletTransition(
           canonicalized_lanelet_pose.value(), next_lanelet_id, desired_local_velocity,
           desired_velocity_is_global, step_time_)) {
@@ -142,6 +144,14 @@ auto ValidatedEntityStatus::buildUpdatedEntityStatus(
     .pose(updated_pose)
     .lanelet_pose(traffic_simulator_msgs::msg::LaneletPose())
     .lanelet_pose_valid(false);
+}
+
+auto ValidatedEntityStatus::validateStepTime(const double step_time) const noexcept(false) -> void
+{
+  // defined epsilon
+  if (step_time <= 0.0) {
+    throwDetailedValidationError("step_time", step_time);
+  }
 }
 
 auto ValidatedEntityStatus::validatePosition(const geometry_msgs::msg::Point & position) const

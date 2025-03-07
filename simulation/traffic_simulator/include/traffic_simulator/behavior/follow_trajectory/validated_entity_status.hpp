@@ -57,6 +57,8 @@ public:
     -> traffic_simulator_msgs::msg::EntityStatus;
 
 private:
+  auto validateStepTime(const double step_time) const noexcept(false) -> void;
+
   auto validatePosition(const geometry_msgs::msg::Point & position) const noexcept(false) -> void;
 
   auto validateLinearSpeed(const double speed) const noexcept(false) -> void;
