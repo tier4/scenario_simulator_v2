@@ -89,21 +89,19 @@ auto isAltitudeMatching(
 
 auto relativeLaneletPose(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
-  const RoutingConfiguration & routing_configuration,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> LaneletPose;
+  const RoutingConfiguration & routing_configuration) -> LaneletPose;
 
 auto boundingBoxRelativeLaneletPose(
   const CanonicalizedLaneletPose & from,
   const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
   const CanonicalizedLaneletPose & to,
   const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box,
-  const RoutingConfiguration & routing_configuration,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> LaneletPose;
+  const RoutingConfiguration & routing_configuration) -> LaneletPose;
 
 // Others
 auto isInLanelet(
   const CanonicalizedLaneletPose & canonicalized_lanelet_pose, const lanelet::Id lanelet_id,
-  const double tolerance, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> bool;
+  const double tolerance) -> bool;
 
 auto isInLanelet(const geometry_msgs::msg::Point & point, const lanelet::Id lanelet_id) -> bool;
 
