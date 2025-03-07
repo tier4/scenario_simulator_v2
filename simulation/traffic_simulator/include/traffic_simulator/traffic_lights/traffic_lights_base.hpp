@@ -74,14 +74,14 @@ public:
   auto generateUpdateTrafficLightsRequest() const
     -> simulation_api_schema::UpdateTrafficLightsRequest;
 
+  auto getTrafficLight(const lanelet::Id traffic_light_id) -> TrafficLight &;
+
 protected:
   virtual auto update() const -> void = 0;
 
   auto isTrafficLightAdded(const lanelet::Id traffic_light_id) const -> bool;
 
   auto addTrafficLight(const lanelet::Id traffic_light_id) -> void;
-
-  auto getTrafficLight(const lanelet::Id traffic_light_id) -> TrafficLight &;
 
   auto getTrafficLights(const lanelet::Id lanelet_id)
     -> std::vector<std::reference_wrapper<TrafficLight>>;
