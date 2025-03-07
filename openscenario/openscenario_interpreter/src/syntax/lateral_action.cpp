@@ -22,10 +22,11 @@ inline namespace syntax
 LateralAction::LateralAction(const pugi::xml_node & node, Scope & scope)
 // clang-format off
 : ComplexType(
-    choice(node,
-      std::make_pair(     "LaneChangeAction", [&](auto && node) { return make<LaneChangeAction>(node, scope); }),
-      std::make_pair(     "LaneOffsetAction", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
-      std::make_pair("LateralDistanceAction", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; })))
+    choice(node, {
+      {      "LaneChangeAction", [&](auto && node) { return make<LaneChangeAction>(node, scope);                           } },
+      {      "LaneOffsetAction", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; } },
+      { "LateralDistanceAction", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; } },
+    }))
 // clang-format on
 {
 }

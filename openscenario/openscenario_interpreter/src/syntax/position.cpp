@@ -23,17 +23,18 @@ inline namespace syntax
 Position::Position(const pugi::xml_node & node, Scope & scope)
 // clang-format off
 : ComplexType(
-    choice(node,
-      std::make_pair(         "WorldPosition", [&](auto && node) { return make<         WorldPosition>(node, scope); }),
-      std::make_pair( "RelativeWorldPosition", [&](auto && node) { return make< RelativeWorldPosition>(node, scope); }),
-      std::make_pair("RelativeObjectPosition", [&](auto && node) { return make<RelativeObjectPosition>(node, scope); }),
-      std::make_pair(          "RoadPosition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
-      std::make_pair(  "RelativeRoadPosition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
-      std::make_pair(          "LanePosition", [&](auto && node) { return make<         LanePosition>(node, scope); }),
-      std::make_pair(  "RelativeLanePosition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
-      std::make_pair(         "RoutePosition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
-      std::make_pair(           "GeoPosition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
-      std::make_pair(    "TrajectoryPosition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; })))
+    choice(node, {
+      {          "WorldPosition", [&](auto && node) { return make<         WorldPosition>(node, scope);                     } },
+      {  "RelativeWorldPosition", [&](auto && node) { return make< RelativeWorldPosition>(node, scope);                     } },
+      { "RelativeObjectPosition", [&](auto && node) { return make<RelativeObjectPosition>(node, scope);                     } },
+      {           "RoadPosition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; } },
+      {   "RelativeRoadPosition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; } },
+      {           "LanePosition", [&](auto && node) { return make<         LanePosition>(node, scope);                      } },
+      {   "RelativeLanePosition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; } },
+      {          "RoutePosition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; } },
+      {            "GeoPosition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; } },
+      {     "TrajectoryPosition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; } },
+    }))
 // clang-format on
 {
 }
