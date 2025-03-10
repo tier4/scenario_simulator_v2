@@ -40,29 +40,31 @@ EgoEntity::EgoEntity(
   const Configuration & configuration,
   const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node_parameters)
 : VehicleEntity(name, entity_status, hdmap_utils_ptr, parameters), FieldOperatorApplication([&]() {
-    if (const auto architecture_type =
-          getParameter<std::string>(node_parameters, "architecture_type", "awf/universe/20240605");
+    if (const auto architecture_type = common::getParameter<std::string>(
+          node_parameters, "architecture_type", "awf/universe/20240605");
         architecture_type.find("awf/universe") != std::string::npos) {
-      auto parameters = getParameter<std::vector<std::string>>(node_parameters, "autoware.", {});
+      auto parameters =
+        common::getParameter<std::vector<std::string>>(node_parameters, "autoware.", {});
 
       // clang-format off
       parameters.push_back("map_path:=" + configuration.map_path.string());
       parameters.push_back("lanelet2_map_file:=" + configuration.getLanelet2MapFile());
       parameters.push_back("pointcloud_map_file:=" + configuration.getPointCloudMapFile());
-      parameters.push_back("sensor_model:=" + getParameter<std::string>(node_parameters, "sensor_model"));
-      parameters.push_back("vehicle_model:=" + getParameter<std::string>(node_parameters, "vehicle_model"));
-      parameters.push_back("rviz_config:=" + getParameter<std::string>(node_parameters, "rviz_config"));
+      parameters.push_back("sensor_model:=" + common::getParameter<std::string>(node_parameters, "sensor_model"));
+      parameters.push_back("vehicle_model:=" + common::getParameter<std::string>(node_parameters, "vehicle_model"));
+      parameters.push_back("rviz_config:=" + common::getParameter<std::string>(node_parameters, "rviz_config"));
       parameters.push_back("scenario_simulation:=true");
       parameters.push_back("use_foa:=false");
       parameters.push_back("perception/enable_traffic_light:=" + std::string(architecture_type >= "awf/universe/20230906" ? "true" : "false"));
-      parameters.push_back("use_sim_time:=" + std::string(getParameter<bool>(node_parameters, "use_sim_time", false) ? "true" : "false"));
-      parameters.push_back("localization_sim_mode:=" + std::string(getParameter<bool>(node_parameters, "simulate_localization") ? "api" : "pose_twist_estimator"));
+      parameters.push_back("use_sim_time:=" + std::string(common::getParameter<bool>(node_parameters, "use_sim_time", false) ? "true" : "false"));
+      parameters.push_back("localization_sim_mode:=" + std::string(common::getParameter<bool>(node_parameters, "simulate_localization") ? "api" : "pose_twist_estimator"));
       // clang-format on
 
-      return getParameter<bool>(node_parameters, "launch_autoware", true)
+      return common::getParameter<bool>(node_parameters, "launch_autoware", true)
                ? concealer::ros2_launch(
-                   getParameter<std::string>(node_parameters, "autoware_launch_package"),
-                   getParameter<std::string>(node_parameters, "autoware_launch_file"), parameters)
+                   common::getParameter<std::string>(node_parameters, "autoware_launch_package"),
+                   common::getParameter<std::string>(node_parameters, "autoware_launch_file"),
+                   parameters)
                : 0;
     } else {
       throw common::SemanticError(
