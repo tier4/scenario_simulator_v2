@@ -114,17 +114,10 @@ public:
   auto getOrigin(Node & node) const
   {
     geographic_msgs::msg::GeoPoint origin;
-    {
-      if (!node.has_parameter("origin_latitude")) {
-        node.declare_parameter("origin_latitude", 0.0);
-      }
-      if (!node.has_parameter("origin_longitude")) {
-        node.declare_parameter("origin_longitude", 0.0);
-      }
-      node.get_parameter("origin_latitude", origin.latitude);
-      node.get_parameter("origin_longitude", origin.longitude);
-    }
-
+    origin.latitude = common::getParameter<decltype(origin.latitude)>(
+      node.get_node_parameters_interface(), "origin_latitude");
+    origin.longitude = common::getParameter<decltype(origin.longitude)>(
+      node.get_node_parameters_interface(), "origin_longitude");
     return origin;
   }
 
