@@ -71,7 +71,8 @@ public:
       std::make_shared<entity::EntityManager>(node, configuration, node_parameters_)),
     traffic_lights_ptr_(std::make_shared<TrafficLights>(
       node, entity_manager_ptr_->getHdmapUtils(),
-      getROS2Parameter<std::string>("architecture_type", "awf/universe/20240605"))),
+      common::getParameter<std::string>(
+        node_parameters_, "architecture_type", "awf/universe/20240605"))),
     traffic_controller_ptr_(std::make_shared<traffic::TrafficController>(
       [this](const std::string & name) { despawn(name); }, entity_manager_ptr_,
       configuration.auto_sink_entity_types)),
@@ -94,7 +95,9 @@ public:
           zeromq_client_.call(request);
         }
       })),
-    clock_(node->get_parameter("use_sim_time").as_bool(), std::forward<decltype(xs)>(xs)...),
+    clock_(
+      common::getParameter<bool>(node_parameters_, "use_sim_time"),
+      std::forward<decltype(xs)>(xs)...),
     zeromq_client_(
       simulation_interface::protocol, configuration.simulator_host, getZMQSocketPort(*node))
   {
@@ -115,17 +118,10 @@ public:
     }
   }
 
-  template <typename ParameterT, typename... Ts>
-  auto getROS2Parameter(Ts &&... xs) const -> decltype(auto)
-  {
-    return common::getParameter<ParameterT>(node_parameters_, std::forward<Ts>(xs)...);
-  }
-
   template <typename Node>
   int getZMQSocketPort(Node & node)
   {
-    if (!node.has_parameter("port")) node.declare_parameter("port", 5555);
-    return node.get_parameter("port").as_int();
+    return common::getParameter<int>(node.get_node_parameters_interface(), "port", 5556);
   }
 
   void closeZMQConnection() { zeromq_client_.closeConnection(); }
