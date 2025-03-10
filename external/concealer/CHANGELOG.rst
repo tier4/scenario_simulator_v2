@@ -21,6 +21,17 @@ Changelog for package concealer
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+12.1.2 (2025-03-07)
+-------------------
+* Merge pull request `#1542 <https://github.com/tier4/scenario_simulator_v2/issues/1542>`_ from tier4/xtk/loc-noise-exp
+  feat: disable the localization noises when ego speed is slow
+* Merge branch 'master' into xtk/loc-noise-exp
+* Replace early-return with if-else
+* remove unused space.
+* configurize the speed_threshold
+* remove the noises when ego stop.
+* Contributors: Tatsuya Yamasaki, t4-adc, yamacir-kit
+
 12.1.1 (2025-03-07)
 -------------------
 
