@@ -25,25 +25,13 @@
 
 namespace vehicle_simulation
 {
-/// @todo find some shared space for this function
-template <typename T>
-static auto getParameter(const std::string & name, T value = {})
-{
-  rclcpp::Node node{"get_parameter", "simulation"};
-
-  node.declare_parameter<T>(name, value);
-  node.get_parameter<T>(name, value);
-
-  return value;
-}
-
 EgoEntitySimulation::EgoEntitySimulation(
   const traffic_simulator_msgs::msg::EntityStatus & initial_status,
   const traffic_simulator_msgs::msg::VehicleParameters & parameters, double step_time,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
   const rclcpp::Parameter & use_sim_time, const bool consider_acceleration_by_road_slope)
-: autoware(
-    std::make_unique<concealer::AutowareUniverse>(getParameter<bool>("simulate_localization"))),
+: autoware(std::make_unique<concealer::AutowareUniverse>(
+    common::getParameter<bool>("simulate_localization"))),
   vehicle_model_type_(getVehicleModelType()),
   vehicle_model_ptr_(makeSimulationModel(vehicle_model_type_, step_time, parameters)),
   status_(initial_status, std::nullopt),
@@ -81,7 +69,7 @@ auto toString(const VehicleModelType datum) -> std::string
 auto EgoEntitySimulation::getVehicleModelType() -> VehicleModelType
 {
   const auto vehicle_model_type =
-    getParameter<std::string>("vehicle_model_type", "IDEAL_STEER_VEL");
+    common::getParameter<std::string>("vehicle_model_type", "IDEAL_STEER_VEL");
 
   static const std::unordered_map<std::string, VehicleModelType> table{
     {"DELAY_STEER_ACC", VehicleModelType::DELAY_STEER_ACC},
