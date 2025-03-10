@@ -26,6 +26,7 @@
   <!-- Common -->
   <depend>ament_index_cpp</depend>
   <depend>geometry_msgs</depend>
+  <depend>get_parameter</depend>
   <depend>libboost-dev</depend>
   <depend>nav_msgs</depend>
   <depend>rclcpp</depend>

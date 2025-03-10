@@ -296,18 +296,18 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
        simulator publishes, copy the following function and implement new one.
     */
     auto noise_v1 = [&](auto detected_entities, [[maybe_unused]] auto simulation_time) {
-      static const auto override_legacy_configuration = concealer::getParameter<bool>(
+      static const auto override_legacy_configuration = common::getParameter<bool>(
         detected_objects_publisher->get_topic_name() +
         std::string(".override_legacy_configuration"));
 
       static const auto standard_deviation =
-        override_legacy_configuration ? concealer::getParameter<double>(
+        override_legacy_configuration ? common::getParameter<double>(
                                           detected_objects_publisher->get_topic_name() +
                                           std::string(".noise.v1.position.standard_deviation"))
                                       : configuration_.pos_noise_stddev();
 
       static const auto missing_probability = override_legacy_configuration
-                                                ? concealer::getParameter<double>(
+                                                ? common::getParameter<double>(
                                                     detected_objects_publisher->get_topic_name() +
                                                     std::string(".noise.v1.missing_probability"))
                                                 : configuration_.probability_of_lost();
@@ -350,14 +350,14 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
           simulation_time - std::exchange(noise_output->second.simulation_time, simulation_time);
 
         auto parameter = [this](const auto & name) {
-          return concealer::getParameter<double>(
+          return common::getParameter<double>(
             detected_objects_publisher->get_topic_name() + std::string(".noise.v2.") + name);
         };
 
         auto parameters = [this](const auto & name) {
           const auto full_name =
             detected_objects_publisher->get_topic_name() + std::string(".noise.v2.") + name;
-          const auto parameters = concealer::getParameter<std::vector<double>>(full_name);
+          const auto parameters = common::getParameter<std::vector<double>>(full_name);
           static const auto size = parameters.size();
           if (parameters.size() != size) {
             throw common::Error(
