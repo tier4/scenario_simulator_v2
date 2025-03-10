@@ -33,6 +33,7 @@ NormalDistribution<nav_msgs::msg::Odometry>::NormalDistribution(
     }
   }()),
   engine(seed ? seed : device()),
+  speed_threshold(getParameter<double>(node, topic + ".nav_msgs::msg::Odometry.speed_threshold")),
   position_local_x_error(node, topic + ".nav_msgs::msg::Odometry.pose.pose.position.local_x.error"),
   position_local_y_error(node, topic + ".nav_msgs::msg::Odometry.pose.pose.position.local_y.error"),
   position_local_z_error(node, topic + ".nav_msgs::msg::Odometry.pose.pose.position.local_z.error"),
@@ -51,45 +52,52 @@ NormalDistribution<nav_msgs::msg::Odometry>::NormalDistribution(
 auto NormalDistribution<nav_msgs::msg::Odometry>::operator()(nav_msgs::msg::Odometry odometry)
   -> nav_msgs::msg::Odometry
 {
-  const Eigen::Quaterniond orientation = Eigen::Quaterniond(
-    odometry.pose.pose.orientation.w, odometry.pose.pose.orientation.x,
-    odometry.pose.pose.orientation.y, odometry.pose.pose.orientation.z);
+  if (const double speed = std::hypot(
+        odometry.twist.twist.linear.x, odometry.twist.twist.linear.y,
+        odometry.twist.twist.linear.z);
+      speed < speed_threshold) {
+    return odometry;
+  } else {
+    const Eigen::Quaterniond orientation = Eigen::Quaterniond(
+      odometry.pose.pose.orientation.w, odometry.pose.pose.orientation.x,
+      odometry.pose.pose.orientation.y, odometry.pose.pose.orientation.z);
 
-  Eigen::Vector3d local_position = Eigen::Vector3d(0.0, 0.0, 0.0);
+    Eigen::Vector3d local_position = Eigen::Vector3d(0.0, 0.0, 0.0);
 
-  local_position.x() = position_local_x_error.apply(engine, local_position.x());
-  local_position.y() = position_local_y_error.apply(engine, local_position.y());
-  local_position.z() = position_local_z_error.apply(engine, local_position.z());
+    local_position.x() = position_local_x_error.apply(engine, local_position.x());
+    local_position.y() = position_local_y_error.apply(engine, local_position.y());
+    local_position.z() = position_local_z_error.apply(engine, local_position.z());
 
-  const Eigen::Vector3d world_position = orientation.toRotationMatrix() * local_position;
+    const Eigen::Vector3d world_position = orientation.toRotationMatrix() * local_position;
 
-  odometry.pose.pose.position.x += world_position.x();
-  odometry.pose.pose.position.y += world_position.y();
-  odometry.pose.pose.position.z += world_position.z();
+    odometry.pose.pose.position.x += world_position.x();
+    odometry.pose.pose.position.y += world_position.y();
+    odometry.pose.pose.position.z += world_position.z();
 
-  Eigen::Vector3d euler = orientation.matrix().eulerAngles(0, 1, 2);
+    Eigen::Vector3d euler = orientation.matrix().eulerAngles(0, 1, 2);
 
-  euler.x() = orientation_r_error.apply(engine, euler.x());
-  euler.y() = orientation_p_error.apply(engine, euler.y());
-  euler.z() = orientation_y_error.apply(engine, euler.z());
+    euler.x() = orientation_r_error.apply(engine, euler.x());
+    euler.y() = orientation_p_error.apply(engine, euler.y());
+    euler.z() = orientation_y_error.apply(engine, euler.z());
 
-  const Eigen::Quaterniond q = Eigen::AngleAxisd(euler.x(), Eigen::Vector3d::UnitX()) *
-                               Eigen::AngleAxisd(euler.y(), Eigen::Vector3d::UnitY()) *
-                               Eigen::AngleAxisd(euler.z(), Eigen::Vector3d::UnitZ());
+    const Eigen::Quaterniond q = Eigen::AngleAxisd(euler.x(), Eigen::Vector3d::UnitX()) *
+                                 Eigen::AngleAxisd(euler.y(), Eigen::Vector3d::UnitY()) *
+                                 Eigen::AngleAxisd(euler.z(), Eigen::Vector3d::UnitZ());
 
-  odometry.pose.pose.orientation.x = q.x();
-  odometry.pose.pose.orientation.y = q.y();
-  odometry.pose.pose.orientation.z = q.z();
-  odometry.pose.pose.orientation.w = q.w();
+    odometry.pose.pose.orientation.x = q.x();
+    odometry.pose.pose.orientation.y = q.y();
+    odometry.pose.pose.orientation.z = q.z();
+    odometry.pose.pose.orientation.w = q.w();
 
-  odometry.twist.twist.linear.x = linear_x_error.apply(engine, odometry.twist.twist.linear.x);
-  odometry.twist.twist.linear.y = linear_y_error.apply(engine, odometry.twist.twist.linear.y);
-  odometry.twist.twist.linear.z = linear_z_error.apply(engine, odometry.twist.twist.linear.z);
+    odometry.twist.twist.linear.x = linear_x_error.apply(engine, odometry.twist.twist.linear.x);
+    odometry.twist.twist.linear.y = linear_y_error.apply(engine, odometry.twist.twist.linear.y);
+    odometry.twist.twist.linear.z = linear_z_error.apply(engine, odometry.twist.twist.linear.z);
 
-  odometry.twist.twist.angular.x = angular_x_error.apply(engine, odometry.twist.twist.angular.x);
-  odometry.twist.twist.angular.y = angular_y_error.apply(engine, odometry.twist.twist.angular.y);
-  odometry.twist.twist.angular.z = angular_z_error.apply(engine, odometry.twist.twist.angular.z);
+    odometry.twist.twist.angular.x = angular_x_error.apply(engine, odometry.twist.twist.angular.x);
+    odometry.twist.twist.angular.y = angular_y_error.apply(engine, odometry.twist.twist.angular.y);
+    odometry.twist.twist.angular.z = angular_z_error.apply(engine, odometry.twist.twist.angular.z);
 
-  return odometry;
+    return odometry;
+  }
 }
 }  // namespace concealer

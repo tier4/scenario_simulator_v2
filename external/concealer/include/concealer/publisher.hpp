@@ -49,6 +49,8 @@ struct NormalDistribution<nav_msgs::msg::Odometry>
 
   std::mt19937_64 engine;
 
+  double speed_threshold;
+
   struct Error
   {
     std::normal_distribution<double> additive, multiplicative;
