@@ -48,6 +48,8 @@ private:
   auto getNearestWaypointWithSpecifiedTimeIterator() const
     -> std::vector<traffic_simulator_msgs::msg::Vertex>::const_iterator;
 
+  auto getTimeToWaypoint(const traffic_simulator_msgs::msg::Vertex & waypoint) const -> double;
+
   // checks
   auto areConditionsOfArrivalMet() const noexcept(true) -> bool;
 
@@ -60,9 +62,11 @@ private:
   // helpers to the constructor
   auto timeToNearestWaypoint() const noexcept(false) -> double;
 
-  auto totalRemainingDistance() const -> double;
+  auto validatedDistanceToNearestWaypoint() const noexcept(false) -> double;
 
-  auto totalRemainingTime() const noexcept(false) -> double;
+  auto validatedTotalRemainingDistance() const noexcept(false) -> double;
+
+  auto validatedTotalRemainingTime() const noexcept(false) -> double;
 
   auto validatedEntityTargetPose() const noexcept(false) -> geometry_msgs::msg::Pose;
 
@@ -79,7 +83,7 @@ private:
     -> void;
 
   /// @note 0.0 has been adopted as the start of the simulation
-  constexpr static double ABSOLUTE_BASE_TIME{0.0};
+  constexpr static double ABSOLUTE_BASE_TIME = 0.0;
 
   const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
   const ValidatedEntityStatus validated_entity_status_;

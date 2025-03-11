@@ -37,6 +37,7 @@ auto discardTheFrontWaypoint(
   traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory, const double current_time)
   -> void;
 
+/// @todo add more explanations on how this method works
 auto makeUpdatedEntityStatus(
   const ValidatedEntityStatus & validated_entity_status,
   traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
@@ -63,23 +64,24 @@ auto discardTheFrontWaypoint(
   -> void
 {
   assert(not polyline_trajectory.shape.vertices.empty());
-  /*
-      The OpenSCENARIO standard does not define the behavior when the value of
-      Timing.domainAbsoluteRelative is "relative". The standard only states
-      "Definition of time value context as either absolute or relative", and
-      it is completely unclear when the relative time starts.
+  /**
+   * @note The OpenSCENARIO standard does not define the behavior when the value of
+   * Timing.domainAbsoluteRelative is "relative". The standard only states
+   * "Definition of time value context as either absolute or relative", and
+   * it is completely unclear when the relative time starts.
+   *
+   * This implementation has interpreted the specification as follows:
+   * Relative time starts from the start of FollowTrajectoryAction or from
+   * the time of reaching the previous "waypoint with arrival time".
+   *
+   * Note: std::isfinite(polyline_trajectory.base_time) means
+   * "Timing.domainAbsoluteRelative is relative".
+   *
+   * Note: std::isfinite(polyline_trajectory.shape.vertices.front().time)
+   * means "The waypoint about to be popped is the waypoint with the
+   * specified arrival time".
+   */
 
-      This implementation has interpreted the specification as follows:
-      Relative time starts from the start of FollowTrajectoryAction or from
-      the time of reaching the previous "waypoint with arrival time".
-
-      Note: std::isfinite(polyline_trajectory.base_time) means
-      "Timing.domainAbsoluteRelative is relative".
-
-      Note: std::isfinite(polyline_trajectory.shape.vertices.front().time)
-      means "The waypoint about to be popped is the waypoint with the
-      specified arrival time".
-  */
   if (
     std::isfinite(polyline_trajectory.base_time) and
     std::isfinite(polyline_trajectory.shape.vertices.front().time)) {
