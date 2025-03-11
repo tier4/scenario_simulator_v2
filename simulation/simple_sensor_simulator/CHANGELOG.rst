@@ -21,6 +21,37 @@ Changelog for package simple_sensor_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+12.2.1 (2025-03-11)
+-------------------
+* Merge branch 'master' into refactor/concealer-4
+* Merge branch 'master' into refactor/concealer-4
+* Merge branch 'master' into refactor/concealer-4
+* Merge branch 'master' into refactor/concealer-4
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
+12.2.0 (2025-03-10)
+-------------------
+* Merge pull request `#1355 <https://github.com/tier4/scenario_simulator_v2/issues/1355>`_ from tier4/feat/add_new_vehicle_model
+  feat: add new vehicle model
+* Merge branch 'master' into feat/add_new_vehicle_model
+* Merge branch 'master' into feat/add_new_vehicle_model
+* Merge branch 'master' into feat/add_new_vehicle_model
+* Merge branch 'master' into feat/add_new_vehicle_model
+* Resync `SimModelDelaySteerAccGearedWoFallGuard` with the upstream one
+  - https://github.com/autowarefoundation/autoware.universe/blob/337f0acb44a472c73b48dd89c5ca7e3df3937fcb/simulator/autoware_simple_planning_simulator/include/autoware/simple_planning_simulator/vehicle_model/sim_model_delay_steer_acc_geared_wo_fall_guard.hpp
+  - https://github.com/autowarefoundation/autoware.universe/blob/337f0acb44a472c73b48dd89c5ca7e3df3937fcb/simulator/autoware_simple_planning_simulator/src/simple_planning_simulator/vehicle_model/sim_model_delay_steer_acc_geared_wo_fall_guard.cpp
+* Replace obsolete member function call with new one
+* Merge branch 'master' into feat/add_new_vehicle_model
+* Revert "fix(simple_sensor_simulator): fix ego overwrite for DELAY_STEER_ACC_GEARED_WO_FALL_GUARD"
+  This reverts commit 61132540a2ca1ea88382ff189f5be2b25b2d0680.
+* fix(simple_sensor_sumulator): hard-copy source code of SimModelDelaySteerAccGearedWoFallGuard  from simple_planning_simulator from autoware.universe
+* ref(simple_sensor_simulator): apply clang reformat
+* fix(simple_sensor_simulator): fix ego overwrite for DELAY_STEER_ACC_GEARED_WO_FALL_GUARD
+* remove brake dead band
+* add vehicle case
+* add new file from psim
+* Contributors: Dawid Moszynski, Tatsuya Yamasaki, Yuki Takagi, yamacir-kit
+
 12.1.2 (2025-03-07)
 -------------------
 * Merge branch 'master' into xtk/loc-noise-exp
