@@ -38,6 +38,8 @@ class ExecutionTimer
 
   std::unordered_map<std::string, Statistics> statistics_map;
 
+  static constexpr double nanoseconds_to_seconds = 1e-9;
+
 public:
   template <typename Thunk, typename... Ts>
   auto invoke(const std::string & tag, Thunk && thunk)
@@ -55,13 +57,17 @@ public:
 
   auto save(const boost::filesystem::path & output_file) -> void
   {
+    // the unit of each statistics is seconds
     nlohmann::json json_data;
     for (const auto & [name, statistics] : statistics_map) {
-      json_data[name + "/min"] = boost::accumulators::extract::min(statistics) * 1e-9;
-      json_data[name + "/max"] = boost::accumulators::extract::max(statistics) * 1e-9;
-      json_data[name + "/mean"] = boost::accumulators::extract::mean(statistics) * 1e-9;
+      json_data[name + "/min"] =
+        boost::accumulators::extract::min(statistics) * nanoseconds_to_seconds;
+      json_data[name + "/max"] =
+        boost::accumulators::extract::max(statistics) * nanoseconds_to_seconds;
+      json_data[name + "/mean"] =
+        boost::accumulators::extract::mean(statistics) * nanoseconds_to_seconds;
       json_data[name + "/stddev"] =
-        std::sqrt(boost::accumulators::extract::variance(statistics)) * 1e-9;
+        std::sqrt(boost::accumulators::extract::variance(statistics)) * nanoseconds_to_seconds;
       json_data[name + "/count"] = boost::accumulators::extract::count(statistics);
     }
 
