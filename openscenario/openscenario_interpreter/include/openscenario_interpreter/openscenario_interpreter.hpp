@@ -145,8 +145,7 @@ public:
     results.write_to(
       (boost::filesystem::path(output_directory) / "result.junit.xml").c_str(), "  ");
 
-    execution_timer.saveStatistics(
-      boost::filesystem::path(output_directory) / "execution_timer.json");
+    execution_timer.save(boost::filesystem::path(output_directory) / "execution_timer.json");
   }
 
   template <typename ExceptionHandler, typename Thunk>

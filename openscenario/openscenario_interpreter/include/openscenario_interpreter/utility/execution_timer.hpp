@@ -53,7 +53,7 @@ public:
     return end - begin;
   }
 
-  void saveStatistics(boost::filesystem::path output_file)
+  auto save(const boost::filesystem::path & output_file) -> void
   {
     nlohmann::json json_data;
     for (const auto & [name, statistics] : statistics_map) {
