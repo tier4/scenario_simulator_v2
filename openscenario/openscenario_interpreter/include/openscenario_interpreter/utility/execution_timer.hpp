@@ -27,20 +27,20 @@ namespace openscenario_interpreter
 {
 inline namespace utility
 {
-template <typename Clock = std::chrono::system_clock>
-class ExecutionTimer
-{
-  using Statistics = boost::accumulators::accumulator_set<
+template <
+  typename Clock = std::chrono::system_clock,
+  typename Accumulators = boost::accumulators::accumulator_set<
     std::int64_t,
     boost::accumulators::stats<
       boost::accumulators::tag::min, boost::accumulators::tag::max, boost::accumulators::tag::mean,
-      boost::accumulators::tag::variance, boost::accumulators::tag::count>>;
-
-  std::unordered_map<std::string, Statistics> statistics_map;
-
+      boost::accumulators::tag::variance, boost::accumulators::tag::count>>>
+class ExecutionTimer : private std::unordered_map<std::string, Accumulators>
+{
   static constexpr double nanoseconds_to_seconds = 1e-9;
 
 public:
+  using std::unordered_map<std::string, Accumulators>::clear;
+
   template <typename Thunk, typename... Ts>
   auto invoke(const std::string & tag, Thunk && thunk)
   {
@@ -50,7 +50,7 @@ public:
 
     const auto end = Clock::now();
 
-    statistics_map[tag](std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count());
+    (*this)[tag](std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count());
 
     return end - begin;
   }
@@ -59,7 +59,7 @@ public:
   {
     // the unit of each statistics is seconds
     nlohmann::json json_data;
-    for (const auto & [name, statistics] : statistics_map) {
+    for (const auto & [name, statistics] : *this) {
       json_data[name + "/min"] =
         boost::accumulators::extract::min(statistics) * nanoseconds_to_seconds;
       json_data[name + "/max"] =
@@ -75,13 +75,7 @@ public:
     file << json_data.dump(4);
   }
 
-  auto clear() { statistics_map.clear(); }
-
-  auto getStatistics(const std::string & tag) -> const auto & { return statistics_map[tag]; }
-
-  auto begin() const { return statistics_map.begin(); }
-
-  auto end() const { return statistics_map.end(); }
+  auto getStatistics(const std::string & tag) -> const auto & { return (*this)[tag]; }
 };
 }  // namespace utility
 }  // namespace openscenario_interpreter
