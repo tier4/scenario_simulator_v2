@@ -118,6 +118,12 @@ public:
     }
   }
 
+  template <typename ParameterT, typename... Ts>
+  auto getROS2Parameter(Ts &&... xs) const -> decltype(auto)
+  {
+    return common::getParameter<ParameterT>(node_parameters_, std::forward<Ts>(xs)...);
+  }
+
   template <typename Node>
   int getZMQSocketPort(Node & node)
   {
