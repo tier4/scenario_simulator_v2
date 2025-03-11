@@ -159,11 +159,7 @@ auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsAr
   return FieldOperatorApplication::getWaypoints();
 }
 
-void EgoEntity::updateFieldOperatorApplication()
-{
-  rethrow();
-  spinSome();
-}
+auto EgoEntity::updateFieldOperatorApplication() -> void { spinSome(); }
 
 void EgoEntity::onUpdate(double current_time, double step_time)
 {
@@ -183,10 +179,10 @@ void EgoEntity::onUpdate(double current_time, double step_time)
       enableAutowareControl();
       is_controlled_by_simulator_ = false;
     }
-  }
-  if (not is_controlled_by_simulator_) {
+  } else {
     updateEntityStatusTimestamp(current_time + step_time);
   }
+
   updateFieldOperatorApplication();
 
   EntityBase::onPostUpdate(current_time, step_time);
