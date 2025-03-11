@@ -73,54 +73,27 @@ public:
         if constexpr (std::is_same_v<
                         tier4_external_api_msgs::msg::ResponseStatus,
                         decltype(T::Response::status)>) {
-          if (const auto & status = response->get()->status;
-              status.code == tier4_external_api_msgs::msg::ResponseStatus::SUCCESS) {
-            // clang-format off
-            RCLCPP_INFO_STREAM(logger, service_name << " service request has been accepted" << (status.message.empty() ? "." : " (" + status.message + ")."));
-            // clang-format on
-            return true;
-          } else {
-            // clang-format off
-            RCLCPP_ERROR_STREAM(logger, service_name << " service request was accepted, but ResponseStatus is FAILURE" << (status.message.empty() ? "." : " (" + status.message + ")"));
-            // clang-format on
-            return false;
-          }
+          return response->get()->status.code ==
+                 tier4_external_api_msgs::msg::ResponseStatus::SUCCESS;
         } else if constexpr (std::is_same_v<
                                autoware_adapi_v1_msgs::msg::ResponseStatus,
                                decltype(T::Response::status)>) {
-          if (const auto & status = response->get()->status; status.success) {
-            // clang-format off
-            RCLCPP_INFO_STREAM(logger, service_name << " service request has been accepted" << (status.message.empty() ? "." : " (" + status.message + ")."));
-            // clang-format on
-            return true;
-          } else {
-            // clang-format off
-            RCLCPP_ERROR_STREAM(logger, service_name << " service request was accepted, but " "ResponseStatus::success is false with error code: " << status.code << ", and message: " << (status.message.empty() ? "" : " (" + status.message + ")"));
-            // clang-format on
-            return false;
-          }
+          return response->get()->status.success;
         } else {
-          RCLCPP_INFO_STREAM(logger, service_name << " service request has been accepted.");
-          return true;
+          static_assert([]() { return false; });
         }
       } else if constexpr (DetectMember_success<typename T::Response>::value) {
         if constexpr (std::is_same_v<bool, decltype(T::Response::success)>) {
-          if (response->get()->success) {
-            RCLCPP_INFO_STREAM(logger, service_name << " service request has been accepted.");
-            return true;
-          } else {
-            // clang-format off
-            RCLCPP_ERROR_STREAM(logger, service_name << " service request has been accepted, but Response::success is false.");
-            // clang-format off
-            return false;
-          }
+          return response->get()->success;
         } else {
-          RCLCPP_INFO_STREAM(logger, service_name << " service request has been accepted.");
-          return true;
+          static_assert([]() { return false; });
         }
+      } else if constexpr (DetectMember_responses<typename T::Response>::value) {
+        return std::all_of(
+          response->get()->responses.begin(), response->get()->responses.end(),
+          [](const auto & response) { return response.success; });
       } else {
-        RCLCPP_INFO_STREAM(logger, service_name << " service request has been accepted.");
-        return true;
+        static_assert([]() { return false; });
       }
     };
 
