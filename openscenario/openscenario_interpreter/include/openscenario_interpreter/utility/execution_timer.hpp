@@ -67,7 +67,6 @@ public:
 
     std::ofstream file(output_file);
     file << json_data.dump(4);
-    file.close();
   }
 
   auto clear() { statistics_map.clear(); }
