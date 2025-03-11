@@ -124,14 +124,6 @@ public:
 
   auto getLanelets(const lanelet::Ids &) const -> lanelet::Lanelets;
 
-  auto getNearbyLaneletIds(
-    const geometry_msgs::msg::Point &, const double distance_threshold,
-    const bool include_crosswalk, const std::size_t search_count = 5) const -> lanelet::Ids;
-
-  auto getNearbyLaneletIds(
-    const geometry_msgs::msg::Point &, const double distance_threshold,
-    const std::size_t search_count = 5) const -> lanelet::Ids;
-
   auto getPreviousLanelets(
     const lanelet::Id, const double backward_horizon = 100,
     const traffic_simulator::RoutingGraphType type =
