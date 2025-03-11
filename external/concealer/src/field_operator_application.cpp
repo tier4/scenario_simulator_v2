@@ -80,6 +80,7 @@ auto toModuleType(const std::string & module_name)
 FieldOperatorApplication::FieldOperatorApplication(const pid_t pid)
 : rclcpp::Node("concealer_user", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),
   process_id(pid),
+  time_limit(std::chrono::steady_clock::now() + std::chrono::seconds(common::getParameter<int>("initialize_duration"))),
   getAutowareState("/autoware/state", rclcpp::QoS(1), *this, [this](const auto & message) {
     auto state_name_of = [](auto state) constexpr {
       switch (state) {
@@ -184,8 +185,7 @@ FieldOperatorApplication::FieldOperatorApplication(const pid_t pid)
 
 FieldOperatorApplication::~FieldOperatorApplication()
 {
-  if (is_stop_requested.store(true);
-      process_id != 0 && not std::exchange(is_autoware_exited, true)) {
+  if (process_id) {
     const auto sigset = [this]() {
       if (auto signal_set = sigset_t();
           sigemptyset(&signal_set) or sigaddset(&signal_set, SIGCHLD)) {
@@ -251,7 +251,11 @@ FieldOperatorApplication::~FieldOperatorApplication()
         RCLCPP_ERROR_STREAM(get_logger(), std::system_error(errno, std::system_category()).what());
       }
     }
+
+    process_id = 0;
   }
+
+  finalized.store(true);
 }
 
 auto FieldOperatorApplication::clearRoute() -> void
@@ -277,7 +281,7 @@ auto FieldOperatorApplication::enableAutowareControl() -> void
 auto FieldOperatorApplication::engage() -> void
 {
   task_queue.delay([this]() {
-    waitForAutowareStateToBe_DRIVING([this]() {
+    waitForAutowareStateToBe("DRIVING", [this]() {
       auto request = std::make_shared<Engage::Request>();
       request->engage = true;
       try {
@@ -286,19 +290,21 @@ auto FieldOperatorApplication::engage() -> void
         return;  // Ignore error because this service is validated by Autoware state transition.
       }
     });
+
+    time_limit = std::decay_t<decltype(time_limit)>::max();
   });
 }
 
 auto FieldOperatorApplication::engageable() const -> bool
 {
-  rethrow();
-  return task_queue.exhausted() and autoware_state == "WAITING_FOR_ENGAGE";
+  task_queue.rethrow();
+  return task_queue.empty() and autoware_state == "WAITING_FOR_ENGAGE";
 }
 
 auto FieldOperatorApplication::engaged() const -> bool
 {
-  rethrow();
-  return task_queue.exhausted() and autoware_state == "DRIVING";
+  task_queue.rethrow();
+  return task_queue.empty() and autoware_state == "DRIVING";
 }
 
 auto FieldOperatorApplication::getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray
@@ -316,7 +322,7 @@ auto FieldOperatorApplication::initialize(const geometry_msgs::msg::Pose & initi
 {
   if (not std::exchange(initialized, true)) {
     task_queue.delay([this, initial_pose]() {
-      waitForAutowareStateToBe_WAITING_FOR_ROUTE([&]() {
+      waitForAutowareStateToBe("WAITING_FOR_ROUTE", [&]() {
 #if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)
         if (getLocalizationState().state != LocalizationInitializationState::UNINITIALIZED) {
           return;
@@ -346,7 +352,7 @@ auto FieldOperatorApplication::plan(const std::vector<geometry_msgs::msg::PoseSt
   assert(not route.empty());
 
   task_queue.delay([this, route] {
-    waitForAutowareStateToBe_WAITING_FOR_ROUTE();  // NOTE: This is assertion.
+    waitForAutowareStateToBe("WAITING_FOR_ROUTE");  // NOTE: This is assertion.
 
     auto request = std::make_shared<SetRoutePoints::Request>();
 
@@ -380,7 +386,7 @@ auto FieldOperatorApplication::plan(const std::vector<geometry_msgs::msg::PoseSt
 
     requestSetRoutePoints(request, 1);
 
-    waitForAutowareStateToBe_WAITING_FOR_ENGAGE();
+    waitForAutowareStateToBe("WAITING_FOR_ENGAGE");
   });
 }
 
@@ -514,13 +520,15 @@ auto FieldOperatorApplication::setVelocityLimit(double velocity_limit) -> void
 
 auto FieldOperatorApplication::spinSome() -> void
 {
-  if (rclcpp::ok() and not is_stop_requested.load()) {
-    if (process_id != 0) {
+  task_queue.rethrow();
+
+  if (rclcpp::ok()) {
+    if (process_id) {
       auto status = 0;
       if (const auto id = waitpid(process_id, &status, WNOHANG); id < 0) {
         switch (errno) {
           case ECHILD:
-            is_autoware_exited = true;
+            process_id = 0;
             throw common::AutowareError("Autoware process is already terminated");
           default:
             RCLCPP_ERROR_STREAM(
@@ -529,11 +537,11 @@ auto FieldOperatorApplication::spinSome() -> void
         }
       } else if (0 < id) {
         if (WIFEXITED(status)) {
-          is_autoware_exited = true;
+          process_id = 0;
           throw common::AutowareError(
             "Autoware process is unintentionally exited. exit code: ", WEXITSTATUS(status));
         } else if (WIFSIGNALED(status)) {
-          is_autoware_exited = true;
+          process_id = 0;
           throw common::AutowareError("Autoware process is killed. signal is ", WTERMSIG(status));
         }
       }

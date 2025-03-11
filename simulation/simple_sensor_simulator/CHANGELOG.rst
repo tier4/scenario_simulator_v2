@@ -21,6 +21,14 @@ Changelog for package simple_sensor_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+12.2.1 (2025-03-11)
+-------------------
+* Merge branch 'master' into refactor/concealer-4
+* Merge branch 'master' into refactor/concealer-4
+* Merge branch 'master' into refactor/concealer-4
+* Merge branch 'master' into refactor/concealer-4
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
 12.2.0 (2025-03-10)
 -------------------
 * Merge pull request `#1355 <https://github.com/tier4/scenario_simulator_v2/issues/1355>`_ from tier4/feat/add_new_vehicle_model
