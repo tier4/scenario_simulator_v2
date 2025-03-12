@@ -37,7 +37,16 @@ auto discardTheFrontWaypoint(
   traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory, const double current_time)
   -> void;
 
-/// @todo add more explanations on how this method works
+/**
+ * @note follow_trajectory::makeUpdatedEntityStatus is the entry function for the FollowTrajectoryAction behavior.
+ * follow_trajectory::makeUpdatedEntityStatus advances on the trajectory (note the side effects)
+ * while trying to obtain a value from PolylineTrajectoryPositioner::makeUpdatedEntityStatus.
+ * Note that PolylineTrajectoryPositioner::makeUpdatedEntityStatus either:
+ *  - returns std::nullopt
+ *  - returns EntityStatus inside std::optional<EntityStatus>
+ *  - throws, in case of, for example, an invalid initial state (failed construction) or
+ *    FollowWaypointController error
+ */
 auto makeUpdatedEntityStatus(
   const ValidatedEntityStatus & validated_entity_status,
   traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,

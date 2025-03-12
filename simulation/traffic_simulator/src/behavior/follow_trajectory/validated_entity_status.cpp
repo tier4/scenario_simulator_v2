@@ -45,7 +45,6 @@ ValidatedEntityStatus::ValidatedEntityStatus(
   velocity_(math::geometry::rotate(
     entity_status_.action_status.twist.linear, entity_status_.pose.orientation))
 {
-  /// @todo add validate orientation
   validateStepTime(step_time_);
   validateBehaviorParameter(behaviorParameter());
   validatePosition(position());

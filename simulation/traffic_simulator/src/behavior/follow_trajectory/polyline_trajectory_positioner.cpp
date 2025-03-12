@@ -119,7 +119,7 @@ auto PolylineTrajectoryPositioner::isNearestWaypointWithSpecifiedTimeSameAsLastW
 }
 
 /**
- *  @note isNearestWaypointReachable works as follows
+ * @note isNearestWaypointReachable works as follows
  * 
  * 1. if **Nearest waypoint without a timestamp:**
  *    - 1.1 If it is the last waypoint:
