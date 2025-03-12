@@ -287,15 +287,15 @@ auto FieldOperatorApplication::enableAutowareControl() -> void
 auto FieldOperatorApplication::engage() -> void
 {
   task_queue.delay([this]() {
-    waitForAutowareStateToBe("DRIVING", [this]() {
+    try {
       auto request = std::make_shared<Engage::Request>();
       request->engage = true;
-      try {
-        return requestEngage(request, 1);
-      } catch (const common::AutowareError &) {
-        return;  // Ignore error because this service is validated by Autoware state transition.
-      }
-    });
+      return requestEngage(request, 1);
+    } catch (const common::AutowareError &) {
+      return;  // Ignore error because this service is validated by Autoware state transition.
+    }
+
+    waitForAutowareStateToBe("DRIVING");
 
     time_limit = std::decay_t<decltype(time_limit)>::max();
   });
@@ -328,26 +328,27 @@ auto FieldOperatorApplication::initialize(const geometry_msgs::msg::Pose & initi
 {
   if (not std::exchange(initialized, true)) {
     task_queue.delay([this, initial_pose]() {
-      waitForAutowareStateToBe("WAITING_FOR_ROUTE", [&]() {
 #if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)
-        if (getLocalizationState().state != LocalizationInitializationState::UNINITIALIZED) {
-          return;
-        }
+      if (getLocalizationState().state != LocalizationInitializationState::UNINITIALIZED) {
+        return;
+      }
 #endif
-        geometry_msgs::msg::PoseWithCovarianceStamped initial_pose_msg;
-        initial_pose_msg.header.stamp = get_clock()->now();
-        initial_pose_msg.header.frame_id = "map";
-        initial_pose_msg.pose.pose = initial_pose;
-
+      try {
         auto request =
           std::make_shared<autoware_adapi_v1_msgs::srv::InitializeLocalization::Request>();
-        request->pose.push_back(initial_pose_msg);
-        try {
-          return requestInitialPose(request, 1);
-        } catch (const common::AutowareError &) {
-          return;  // Ignore error because this service is validated by Autoware state transition.
-        }
-      });
+        request->pose.push_back([&]() {
+          auto initial_pose_stamped = geometry_msgs::msg::PoseWithCovarianceStamped();
+          initial_pose_stamped.header.stamp = get_clock()->now();
+          initial_pose_stamped.header.frame_id = "map";
+          initial_pose_stamped.pose.pose = initial_pose;
+          return initial_pose_stamped;
+        }());
+        return requestInitialPose(request, 1);
+      } catch (const common::AutowareError &) {
+        return;  // Ignore error because this service is validated by Autoware state transition.
+      }
+
+      waitForAutowareStateToBe("WAITING_FOR_ROUTE");
     });
   }
 }
