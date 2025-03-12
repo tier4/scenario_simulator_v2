@@ -22,6 +22,7 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <tier4_external_api_msgs/msg/response_status.hpp>
+#include <tier4_rtc_msgs/msg/cooperate_response.hpp>
 #include <tier4_rtc_msgs/srv/auto_mode_with_module.hpp>
 #include <type_traits>
 
@@ -51,54 +52,50 @@ public:
   }
 
   auto operator()(const typename T::Request::SharedPtr & request, std::size_t attempts_count)
-    -> void
   {
     while (!client->service_is_ready()) {
       RCLCPP_INFO_STREAM(logger, service_name << " service is not ready.");
       validation_rate.sleep();
     }
 
-    auto send = [this](const auto & request) {
-      if (auto future = client->async_send_request(request);
-          future.wait_for(validation_rate.period()) == std::future_status::ready) {
-        return std::optional<typename rclcpp::Client<T>::SharedFuture>(future);
-      } else {
-        RCLCPP_ERROR_STREAM(logger, service_name << " service request has timed out.");
-        return std::optional<typename rclcpp::Client<T>::SharedFuture>();
-      }
-    };
-
     auto receive = [this](const auto & response) {
       if constexpr (DetectMember_status<typename T::Response>::value) {
         if constexpr (std::is_same_v<
                         tier4_external_api_msgs::msg::ResponseStatus,
                         decltype(T::Response::status)>) {
-          return response->get()->status.code ==
-                 tier4_external_api_msgs::msg::ResponseStatus::SUCCESS;
+          return response->status.code == tier4_external_api_msgs::msg::ResponseStatus::SUCCESS;
         } else if constexpr (std::is_same_v<
                                autoware_adapi_v1_msgs::msg::ResponseStatus,
                                decltype(T::Response::status)>) {
-          return response->get()->status.success;
+          return response->status.success;
         } else {
           static_assert([]() { return false; });
         }
       } else if constexpr (DetectMember_success<typename T::Response>::value) {
         if constexpr (std::is_same_v<bool, decltype(T::Response::success)>) {
-          return response->get()->success;
+          return response->success;
         } else {
           static_assert([]() { return false; });
         }
       } else if constexpr (DetectMember_responses<typename T::Response>::value) {
-        return std::all_of(
-          response->get()->responses.begin(), response->get()->responses.end(),
-          [](const auto & response) { return response.success; });
+        if constexpr (std::is_same_v<
+                        std::vector<tier4_rtc_msgs::msg::CooperateResponse>,
+                        decltype(T::Response::responses)>) {
+          return std::all_of(
+            response->responses.begin(), response->responses.end(),
+            [](const auto & response) { return response.success; });
+        } else {
+          static_assert([]() { return false; });
+        }
       } else {
         static_assert([]() { return false; });
       }
     };
 
     for (std::size_t attempt = 0; attempt < attempts_count; ++attempt, validation_rate.sleep()) {
-      if (receive(send(request))) {
+      if (auto future = client->async_send_request(request);
+          future.wait_for(validation_rate.period()) == std::future_status::ready and
+          receive(future.get())) {
         return;
       }
     }
