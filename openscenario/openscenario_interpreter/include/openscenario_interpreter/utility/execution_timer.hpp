@@ -15,85 +15,32 @@
 #ifndef OPENSCENARIO_INTERPRETER__UTILITY__EXECUTION_TIMER_HPP_
 #define OPENSCENARIO_INTERPRETER__UTILITY__EXECUTION_TIMER_HPP_
 
+#include <boost/accumulators/accumulators.hpp>
+#include <boost/accumulators/statistics.hpp>
 #include <chrono>
 #include <cmath>
 #include <functional>
+#include <nlohmann/json.hpp>
 #include <unordered_map>
 
 namespace openscenario_interpreter
 {
 inline namespace utility
 {
-template <typename Clock = std::chrono::system_clock>
-class ExecutionTimer
+template <
+  typename Clock = std::chrono::system_clock,
+  typename Accumulators = boost::accumulators::accumulator_set<
+    std::int64_t,
+    boost::accumulators::stats<
+      boost::accumulators::tag::min, boost::accumulators::tag::max, boost::accumulators::tag::mean,
+      boost::accumulators::tag::variance, boost::accumulators::tag::count>>>
+class ExecutionTimer : private std::unordered_map<std::string, Accumulators>
 {
-  class Statistics
-  {
-    std::int64_t ns_max = 0;
-
-    std::int64_t ns_min = std::numeric_limits<std::int64_t>::max();
-
-    std::int64_t ns_sum = 0;
-
-    std::int64_t ns_square_sum = 0;
-
-    int count = 0;
-
-  public:
-    template <typename Duration>
-    auto add(Duration diff) -> void
-    {
-      std::int64_t diff_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(diff).count();
-      count++;
-      ns_max = std::max(ns_max, diff_ns);
-      ns_min = std::min(ns_max, diff_ns);
-      ns_sum += diff_ns;
-      ns_square_sum += std::pow(diff_ns, 2);
-    }
-
-    template <typename T>
-    auto max() const
-    {
-      return std::chrono::duration_cast<T>(std::chrono::nanoseconds(ns_max));
-    }
-
-    template <typename T>
-    auto min() const
-    {
-      return std::chrono::duration_cast<T>(std::chrono::nanoseconds(ns_min));
-    }
-
-    template <typename T>
-    auto mean() const
-    {
-      return std::chrono::duration_cast<T>(std::chrono::nanoseconds(ns_sum / count));
-    }
-
-    template <typename T>
-    auto standardDeviation() const
-    {
-      std::int64_t mean_of_square = ns_square_sum / count;
-      std::int64_t square_of_mean = std::pow(ns_sum / count, 2);
-      std::int64_t var = mean_of_square - square_of_mean;
-      double standard_deviation = std::sqrt(var);
-      return std::chrono::duration_cast<T>(
-        std::chrono::nanoseconds(static_cast<std::int64_t>(standard_deviation)));
-    }
-
-    friend auto operator<<(std::ostream & os, const Statistics & statistics) -> std::ostream &
-    {
-      using namespace std::chrono;
-
-      return os << "mean = " << statistics.template mean<milliseconds>().count() << " ms, "
-                << "max = " << statistics.template max<milliseconds>().count() << " ms, "
-                << "standard deviation = "
-                << statistics.template standardDeviation<milliseconds>().count() / 1000.0 << " ms";
-    }
-  };
-
-  std::unordered_map<std::string, Statistics> statistics_map;
+  static constexpr double nanoseconds_to_seconds = 1e-9;
 
 public:
+  using std::unordered_map<std::string, Accumulators>::clear;
+
   template <typename Thunk, typename... Ts>
   auto invoke(const std::string & tag, Thunk && thunk)
   {
@@ -103,18 +50,32 @@ public:
 
     const auto end = Clock::now();
 
-    statistics_map[tag].add(end - begin);
+    (*this)[tag](std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count());
 
     return end - begin;
   }
 
-  auto clear() { statistics_map.clear(); }
+  auto save(const boost::filesystem::path & output_file) -> void
+  {
+    // the unit of each statistics is seconds
+    nlohmann::json json_data;
+    for (const auto & [name, statistics] : *this) {
+      json_data[name + "/min"] =
+        boost::accumulators::extract::min(statistics) * nanoseconds_to_seconds;
+      json_data[name + "/max"] =
+        boost::accumulators::extract::max(statistics) * nanoseconds_to_seconds;
+      json_data[name + "/mean"] =
+        boost::accumulators::extract::mean(statistics) * nanoseconds_to_seconds;
+      json_data[name + "/stddev"] =
+        std::sqrt(boost::accumulators::extract::variance(statistics)) * nanoseconds_to_seconds;
+      json_data[name + "/count"] = boost::accumulators::extract::count(statistics);
+    }
 
-  auto getStatistics(const std::string & tag) -> const auto & { return statistics_map[tag]; }
+    std::ofstream file(output_file);
+    file << json_data.dump(4);
+  }
 
-  auto begin() const { return statistics_map.begin(); }
-
-  auto end() const { return statistics_map.end(); }
+  auto getStatistics(const std::string & tag) -> const auto & { return (*this)[tag]; }
 };
 }  // namespace utility
 }  // namespace openscenario_interpreter
