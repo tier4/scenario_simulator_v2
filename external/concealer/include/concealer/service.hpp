@@ -31,31 +31,25 @@ namespace concealer
 template <typename T>
 class Service
 {
-  const std::string service_name;
-
-  rclcpp::Logger logger;
+  const std::string name;
 
   typename rclcpp::Client<T>::SharedPtr client;
 
-  rclcpp::WallRate validation_rate;
+  rclcpp::WallRate rate;
 
 public:
   template <typename Node>
   explicit Service(
-    const std::string & service_name, Node & node,
-    const std::chrono::nanoseconds validation_interval = std::chrono::seconds(1))
-  : service_name(service_name),
-    logger(node.get_logger()),
-    client(node.template create_client<T>(service_name, rmw_qos_profile_default)),
-    validation_rate(validation_interval)
+    const std::string & name, Node & node,
+    const std::chrono::nanoseconds & rate = std::chrono::seconds(1))
+  : name(name), client(node.template create_client<T>(name, rmw_qos_profile_default)), rate(rate)
   {
   }
 
   auto operator()(const typename T::Request::SharedPtr & request, std::size_t attempts_count)
   {
     while (!client->service_is_ready()) {
-      RCLCPP_INFO_STREAM(logger, service_name << " service is not ready.");
-      validation_rate.sleep();
+      rate.sleep();
     }
 
     auto receive = [this](const auto & response) {
@@ -92,16 +86,15 @@ public:
       }
     };
 
-    for (std::size_t attempt = 0; attempt < attempts_count; ++attempt, validation_rate.sleep()) {
+    for (std::size_t attempt = 0; attempt < attempts_count; ++attempt, rate.sleep()) {
       if (auto future = client->async_send_request(request);
-          future.wait_for(validation_rate.period()) == std::future_status::ready and
-          receive(future.get())) {
+          future.wait_for(rate.period()) == std::future_status::ready and receive(future.get())) {
         return;
       }
     }
 
     throw common::scenario_simulator_exception::AutowareError(
-      "Requested the service ", std::quoted(service_name), " ", attempts_count,
+      "Requested the service ", std::quoted(name), " ", attempts_count,
       " times, but was not successful.");
   }
 };
