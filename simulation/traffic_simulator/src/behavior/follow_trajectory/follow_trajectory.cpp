@@ -39,13 +39,19 @@ auto discardTheFrontWaypoint(
 
 /**
  * @note follow_trajectory::makeUpdatedEntityStatus is the entry function for the FollowTrajectoryAction behavior.
- * follow_trajectory::makeUpdatedEntityStatus advances on the trajectory (note the side effects)
- * while trying to obtain a value from PolylineTrajectoryPositioner::makeUpdatedEntityStatus.
- * Note that PolylineTrajectoryPositioner::makeUpdatedEntityStatus either:
- *  - returns std::nullopt
- *  - returns EntityStatus inside std::optional<EntityStatus>
- *  - throws, in case of, for example, an invalid initial state (failed construction) or
- *    FollowWaypointController error
+ *
+ * Initially, a ValidatedEntityStatus is constructed and passed as a parameter. During its construction,
+ * values such as position, velocity, and step_time are validated.
+ *
+ * Then, follow_trajectory::makeUpdatedEntityStatus advances along the trajectory (note the side effects)
+ * while attempting to obtain a value from PolylineTrajectoryPositioner::makeUpdatedEntityStatus.
+ *
+ * If PolylineTrajectoryPositioner::makeUpdatedEntityStatus returns a value, the computation concludes,
+ * and the value propagates. Notably, PolylineTrajectoryPositioner::makeUpdatedEntityStatus may:
+ *  - return std::nullopt,
+ *  - return an EntityStatus inside std::optional<EntityStatus>, or
+ *  - throw an exception in cases such as an invalid initial state (failed PolylineTrajectoryPositioner construction)
+ *    or a FollowWaypointController error.
  */
 auto makeUpdatedEntityStatus(
   const ValidatedEntityStatus & validated_entity_status,
