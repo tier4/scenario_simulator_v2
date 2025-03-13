@@ -35,15 +35,14 @@ namespace entity
 {
 EgoEntity::EgoEntity(
   const std::string & name, const CanonicalizedEntityStatus & entity_status,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
   const traffic_simulator_msgs::msg::VehicleParameters & parameters,
   const Configuration & configuration,
   const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node_parameters)
-: VehicleEntity(name, entity_status, hdmap_utils_ptr, parameters), FieldOperatorApplication([&]() {
+: VehicleEntity(name, entity_status, parameters), FieldOperatorApplication([&]() {
     if (const auto architecture_type =
           getParameter<std::string>(node_parameters, "architecture_type", "awf/universe/20240605");
         architecture_type.find("awf/universe") != std::string::npos) {
-      auto parameters = getParameter<std::vector<std::string>>(node_parameters, "autoware.", {});
+      auto parameters = getParameter<std::vector<std::string> >(node_parameters, "autoware.", {});
 
       // clang-format off
       parameters.push_back("map_path:=" + configuration.map_path.string());
