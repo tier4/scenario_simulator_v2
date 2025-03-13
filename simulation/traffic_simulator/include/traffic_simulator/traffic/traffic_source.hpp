@@ -18,10 +18,10 @@
 #include <functional>
 #include <geometry_msgs/msg/pose.hpp>
 #include <random>
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/traffic/traffic_module_base.hpp>
 #include <traffic_simulator_msgs/msg/pedestrian_parameters.hpp>
 #include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
+#include <variant>
 
 namespace traffic_simulator
 {
@@ -42,16 +42,14 @@ public:
 
     const lanelet::Ids ids;
 
-    const lanelet::Lanelets lanelets;
-
     explicit Validator(
-      const std::shared_ptr<hdmap_utils::HdMapUtils> &, const geometry_msgs::msg::Pose &,
-      const double source_radius, const bool include_crosswalk);
+      const geometry_msgs::msg::Pose &, const double source_radius, const bool include_crosswalk);
 
     /**
      * @brief whether the 2D polygon does fit inside the lanelet with the given id
      */
-    auto operator()(const std::vector<geometry_msgs::msg::Point> &, lanelet::Id) const -> bool;
+    auto operator()(const std::vector<geometry_msgs::msg::Point> &, const lanelet::Id) const
+      -> bool;
   };
 
   struct Configuration
@@ -77,8 +75,7 @@ public:
   explicit TrafficSource(
     const double radius, const double rate, const geometry_msgs::msg::Pose & pose,
     const Distribution & distribution, const std::optional<int> seed, const double current_time,
-    const Configuration & configuration,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils, const Spawner & spawn)
+    const Configuration & configuration, const Spawner & spawn)
   : rate(rate),
     pose(pose),
     id(source_count_++),
@@ -86,7 +83,6 @@ public:
     spawn_pedestrian_in_lane_coordinate(spawn),
     spawn_vehicle_in_world_coordinate(spawn),
     spawn_pedestrian_in_world_coordinate(spawn),
-    hdmap_utils_(hdmap_utils),
     engine_(seed ? seed.value() : std::random_device()()),
     angle_distribution_(0.0, boost::math::constants::two_pi<double>()),
     radius_distribution_(0.0, radius),
@@ -103,8 +99,8 @@ public:
       (std::isnan(current_time) ? 0.0 : current_time) + std::max(configuration.start_delay, 0.0)),
     configuration_(configuration),
     distribution_(distribution),
-    validate(hdmap_utils, pose, radius_distribution_.max(), false),
-    validate_considering_crosswalk(hdmap_utils, pose, radius_distribution_.max(), true)
+    validate(pose, radius_distribution_.max(), false),
+    validate_considering_crosswalk(pose, radius_distribution_.max(), true)
   {
   }
 
@@ -134,8 +130,6 @@ private:
   const Spawner<geometry_msgs::msg::Pose, VehicleParameter> spawn_vehicle_in_world_coordinate;
 
   const Spawner<geometry_msgs::msg::Pose, PedestrianParameter> spawn_pedestrian_in_world_coordinate;
-
-  const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_;
 
   std::mt19937 engine_;
 
