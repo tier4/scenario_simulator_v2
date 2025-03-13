@@ -32,6 +32,42 @@ Changelog for package openscenario_interpreter
 * add publish_empty_context parameter
 * Contributors: Masaya Kataoka
 
+12.3.2 (2025-03-13)
+-------------------
+* Merge pull request `#1419 <https://github.com/tier4/scenario_simulator_v2/issues/1419>`_ from tier4/feature/faster-template-instantiation
+  Reduce build time by suppressing template instantiation
+* Merge branch 'master' into feature/faster-template-instantiation
+* Merge remote-tracking branch 'origin/master' into feature/faster-template-instantiation
+* Format
+* Reorder in lexicographic order
+* Update not to rewrite argument
+* Change call by value to call by reference
+  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
+* Update args for `choice`
+* Adjust empty lines
+  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
+* Change call by value to call by reference
+  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
+* Remove unused function
+* Sort in lexicographical order
+* Merge remote-tracking branch 'origin/master' into feature/faster-template-instantiation
+* Merge remote-tracking branch 'origin/master' into feature/faster-template-instantiation
+* Merge branch 'master' into feature/faster-template-instantiation
+* Add missing copyright notice
+* Make `substitute()` non-templated to make build faster
+* Add some `extern template` to make build faster
+* Format comment
+* Merge remote-tracking branch 'origin/master' into feature/faster-template-instantiation
+* Format comment
+* Merge remote-tracking branch 'origin/master' into feature/faster-template-instantiation
+* Format
+* Merge remote-tracking branch 'origin/master' into feature/faster-template-instantiation
+* Change `choice()` to be non-templated function
+* Remove unneccessary template specialization declaration
+* Add new sources to CMakeLists.txt
+* Utilize extern template to make build faster
+* Contributors: Shota Minami, Tatsuya Yamasaki
+
 12.3.1 (2025-03-13)
 -------------------
 
