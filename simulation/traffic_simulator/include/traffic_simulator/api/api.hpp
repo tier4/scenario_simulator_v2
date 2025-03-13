@@ -127,7 +127,7 @@ public:
   template <typename Node>
   int getZMQSocketPort(Node & node)
   {
-    return common::getParameter<int>(node.get_node_parameters_interface(), "port", 5556);
+    return common::getParameter<int>(node.get_node_parameters_interface(), "port", 5555);
   }
 
   void closeZMQConnection() { zeromq_client_.closeConnection(); }
