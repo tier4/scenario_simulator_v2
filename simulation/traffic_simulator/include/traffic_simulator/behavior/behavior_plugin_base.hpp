@@ -17,7 +17,7 @@
 
 #include <optional>
 #include <string>
-#include <traffic_simulator/behavior/follow_trajectory.hpp>
+#include <traffic_simulator/behavior/follow_trajectory/follow_trajectory.hpp>
 #include <traffic_simulator/data_type/behavior.hpp>
 #include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
