@@ -61,7 +61,7 @@ private:
   {
     speed_reached = false;
     auto & ego_entity = api_.spawn(
-      "ego", traffic_simulator::helper::constructCanonicalizedLaneletPose(34741, 0.0, 0.0),
+      "ego", traffic_simulator::helper::constructLaneletPose(34741, 0.0, 0.0),
       getVehicleParameters());
     ego_entity.setLinearVelocity(0);
     ego_entity.requestSpeedChange(

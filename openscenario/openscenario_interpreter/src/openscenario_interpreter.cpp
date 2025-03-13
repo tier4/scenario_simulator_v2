@@ -202,7 +202,7 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
             };
 
             if (engaged()) {
-              return activateNonUserDefinedControllers();
+              return SimulatorCore::activateNonUserDefinedControllers();
             } else if (engageable()) {
               return engage();
             }
