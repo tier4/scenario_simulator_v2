@@ -19,6 +19,7 @@
 #include <tf2_ros/static_transform_broadcaster.h>
 #include <tf2_ros/transform_broadcaster.h>
 
+#include <get_parameter/get_parameter.hpp>
 #include <memory>
 #include <optional>
 #include <rclcpp/node_interfaces/get_node_topics_interface.hpp>
@@ -41,7 +42,6 @@
 #include <traffic_simulator/traffic_lights/traffic_light_marker_publisher.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_publisher.hpp>
 #include <traffic_simulator/traffic_lights/traffic_lights.hpp>
-#include <traffic_simulator/utils/node_parameters.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
@@ -114,17 +114,10 @@ public:
   auto getOrigin(Node & node) const
   {
     geographic_msgs::msg::GeoPoint origin;
-    {
-      if (!node.has_parameter("origin_latitude")) {
-        node.declare_parameter("origin_latitude", 0.0);
-      }
-      if (!node.has_parameter("origin_longitude")) {
-        node.declare_parameter("origin_longitude", 0.0);
-      }
-      node.get_parameter("origin_latitude", origin.latitude);
-      node.get_parameter("origin_longitude", origin.longitude);
-    }
-
+    origin.latitude = common::getParameter<decltype(origin.latitude)>(
+      node.get_node_parameters_interface(), "origin_latitude");
+    origin.longitude = common::getParameter<decltype(origin.longitude)>(
+      node.get_node_parameters_interface(), "origin_longitude");
     return origin;
   }
 

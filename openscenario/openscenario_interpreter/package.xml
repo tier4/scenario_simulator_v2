@@ -11,6 +11,7 @@
 
   <depend>concealer</depend>
   <depend>geometry_msgs</depend>
+  <depend>get_parameter</depend>
   <depend>libboost-dev</depend>
   <depend>libgoogle-glog-dev</depend>
   <depend>lifecycle_msgs</depend>
