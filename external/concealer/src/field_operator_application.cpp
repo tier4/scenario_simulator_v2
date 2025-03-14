@@ -81,30 +81,7 @@ FieldOperatorApplication::FieldOperatorApplication(const pid_t pid)
 : rclcpp::Node("concealer_user", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),
   process_id(pid),
   time_limit(std::chrono::steady_clock::now() + std::chrono::seconds(getParameter<int>("initialize_duration"))),
-  getAutowareState("/autoware/state", rclcpp::QoS(1), *this, [this](const auto & message) {
-    auto state_name_of = [](auto state) constexpr {
-      switch (state) {
-        case AutowareState::INITIALIZING:
-          return "INITIALIZING";
-        case AutowareState::WAITING_FOR_ROUTE:
-          return "WAITING_FOR_ROUTE";
-        case AutowareState::PLANNING:
-          return "PLANNING";
-        case AutowareState::WAITING_FOR_ENGAGE:
-          return "WAITING_FOR_ENGAGE";
-        case AutowareState::DRIVING:
-          return "DRIVING";
-        case AutowareState::ARRIVED_GOAL:
-          return "ARRIVED_GOAL";
-        case AutowareState::FINALIZING:
-          return "FINALIZING";
-        default:
-          return "";
-      }
-    };
-
-    autoware_state = state_name_of(message.state);
-  }),
+  getAutowareState("/autoware/state", rclcpp::QoS(1), *this),
   getCommand("/control/command/control_cmd", rclcpp::QoS(1), *this),
   getCooperateStatusArray("/api/external/get/rtc_status", rclcpp::QoS(1), *this),
   getEmergencyState("/api/external/get/emergency", rclcpp::QoS(1), *this, [this](const auto & message) {
@@ -167,7 +144,13 @@ FieldOperatorApplication::FieldOperatorApplication(const pid_t pid)
     minimum_risk_maneuver_state = state_name_of(message.state);
     minimum_risk_maneuver_behavior = behavior_name_of(message.behavior);
   }),
+#if __has_include(<autoware_adapi_v1_msgs/msg/operation_mode_state.hpp>)
+  getOperationModeState("/api/operation_mode/state", rclcpp::QoS(1), *this),
+#endif
   getPathWithLaneId("/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", rclcpp::QoS(1), *this),
+#if __has_include(<autoware_adapi_v1_msgs/msg/route_state.hpp>)
+  getRouteState("/api/routing/state", rclcpp::QoS(1), *this),
+#endif
   getTrajectory("/api/iv_msgs/planning/scenario_planning/trajectory", rclcpp::QoS(1), *this),
   getTurnIndicatorsCommand("/control/command/turn_indicators_cmd", rclcpp::QoS(1), *this),
   requestClearRoute("/api/routing/clear_route", *this),
@@ -287,15 +270,15 @@ auto FieldOperatorApplication::enableAutowareControl() -> void
 auto FieldOperatorApplication::engage() -> void
 {
   task_queue.delay([this]() {
-    waitForAutowareStateToBe("DRIVING", [this]() {
+    try {
       auto request = std::make_shared<Engage::Request>();
       request->engage = true;
-      try {
-        return requestEngage(request, 1);
-      } catch (const common::AutowareError &) {
-        return;  // Ignore error because this service is validated by Autoware state transition.
-      }
-    });
+      return requestEngage(request, 30);
+    } catch (const common::AutowareError &) {
+      return;  // Ignore error because this service is validated by Autoware state transition.
+    }
+
+    waitForAutowareStateToBe("DRIVING");
 
     time_limit = std::decay_t<decltype(time_limit)>::max();
   });
@@ -304,13 +287,13 @@ auto FieldOperatorApplication::engage() -> void
 auto FieldOperatorApplication::engageable() const -> bool
 {
   task_queue.rethrow();
-  return task_queue.empty() and autoware_state == "WAITING_FOR_ENGAGE";
+  return task_queue.empty() and state() == "WAITING_FOR_ENGAGE";
 }
 
 auto FieldOperatorApplication::engaged() const -> bool
 {
   task_queue.rethrow();
-  return task_queue.empty() and autoware_state == "DRIVING";
+  return task_queue.empty() and state() == "DRIVING";
 }
 
 auto FieldOperatorApplication::getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray
@@ -328,26 +311,27 @@ auto FieldOperatorApplication::initialize(const geometry_msgs::msg::Pose & initi
 {
   if (not std::exchange(initialized, true)) {
     task_queue.delay([this, initial_pose]() {
-      waitForAutowareStateToBe("WAITING_FOR_ROUTE", [&]() {
 #if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)
-        if (getLocalizationState().state != LocalizationInitializationState::UNINITIALIZED) {
-          return;
-        }
+      if (getLocalizationState().state != LocalizationInitializationState::UNINITIALIZED) {
+        return;
+      }
 #endif
-        geometry_msgs::msg::PoseWithCovarianceStamped initial_pose_msg;
-        initial_pose_msg.header.stamp = get_clock()->now();
-        initial_pose_msg.header.frame_id = "map";
-        initial_pose_msg.pose.pose = initial_pose;
-
+      try {
         auto request =
           std::make_shared<autoware_adapi_v1_msgs::srv::InitializeLocalization::Request>();
-        request->pose.push_back(initial_pose_msg);
-        try {
-          return requestInitialPose(request, 1);
-        } catch (const common::AutowareError &) {
-          return;  // Ignore error because this service is validated by Autoware state transition.
-        }
-      });
+        request->pose.push_back([&]() {
+          auto initial_pose_stamped = geometry_msgs::msg::PoseWithCovarianceStamped();
+          initial_pose_stamped.header.stamp = get_clock()->now();
+          initial_pose_stamped.header.frame_id = "map";
+          initial_pose_stamped.pose.pose = initial_pose;
+          return initial_pose_stamped;
+        }());
+        return requestInitialPose(request, 30);
+      } catch (const common::AutowareError &) {
+        return;  // Ignore error because this service is validated by Autoware state transition.
+      }
+
+      waitForAutowareStateToBe("WAITING_FOR_ROUTE");
     });
   }
 }
@@ -390,7 +374,7 @@ auto FieldOperatorApplication::plan(const std::vector<geometry_msgs::msg::PoseSt
       request->waypoints.push_back(each.pose);
     }
 
-    requestSetRoutePoints(request, 1);
+    requestSetRoutePoints(request, 30);
 
     waitForAutowareStateToBe("WAITING_FOR_ENGAGE");
   });
@@ -505,7 +489,7 @@ auto FieldOperatorApplication::sendCooperateCommand(
     request->stamp = cooperate_status_array.stamp;
     request->commands.push_back(cooperate_command);
 
-    task_queue.delay([this, request]() { requestCooperateCommands(request, 1); });
+    task_queue.delay([this, request]() { requestCooperateCommands(request, 30); });
 
     used_cooperate_statuses.push_back(*cooperate_status);
   }
@@ -522,6 +506,83 @@ auto FieldOperatorApplication::setVelocityLimit(double velocity_limit) -> void
     */
     requestSetVelocityLimit(request, 30);
   });
+}
+
+auto FieldOperatorApplication::state() const -> std::string
+{
+#if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>) and \
+    __has_include(<autoware_adapi_v1_msgs/msg/route_state.hpp>) and \
+    __has_include(<autoware_adapi_v1_msgs/msg/operation_mode_state.hpp>)
+  /*
+     See https://github.com/autowarefoundation/autoware.universe/blob/e60daf7d1c85208eaac083b90c181e224c2ac513/system/autoware_default_adapi/document/autoware-state.md
+  */
+  switch (const auto localization_state = getLocalizationState(); localization_state.state) {
+    case LocalizationInitializationState::UNKNOWN:
+    case LocalizationInitializationState::UNINITIALIZED:
+    case LocalizationInitializationState::INITIALIZING:
+      return "INITIALIZING";
+
+    case LocalizationInitializationState::INITIALIZED:
+      switch (const auto route_state = getRouteState(); route_state.state) {
+        case RouteState::UNKNOWN:
+          return "INITIALIZING";
+
+        case RouteState::UNSET:
+          return "WAITING_FOR_ROUTE";
+
+        case RouteState::ARRIVED:
+          return "ARRIVED_GOAL";
+
+        case RouteState::SET:
+        case RouteState::CHANGING:
+          switch (const auto operation_mode_state = getOperationModeState();
+                  operation_mode_state.mode) {
+            case OperationModeState::UNKNOWN:
+              return "INITIALIZING";
+
+            case OperationModeState::AUTONOMOUS:
+            case OperationModeState::LOCAL:
+            case OperationModeState::REMOTE:
+              if (operation_mode_state.is_autoware_control_enabled) {
+                return "DRIVING";
+              }
+              [[fallthrough]];
+
+            case OperationModeState::STOP:
+              return operation_mode_state.is_autonomous_mode_available ? "WAITING_FOR_ENGAGE"
+                                                                       : "PLANNING";
+
+            default:
+              return "";
+          }
+
+        default:
+          return "";
+      }
+
+    default:
+      return "";
+  }
+#else
+  switch (const auto autoware_state = getAutowareState().state) {
+    case AutowareState::INITIALIZING:
+      return "INITIALIZING";
+    case AutowareState::WAITING_FOR_ROUTE:
+      return "WAITING_FOR_ROUTE";
+    case AutowareState::PLANNING:
+      return "PLANNING";
+    case AutowareState::WAITING_FOR_ENGAGE:
+      return "WAITING_FOR_ENGAGE";
+    case AutowareState::DRIVING:
+      return "DRIVING";
+    case AutowareState::ARRIVED_GOAL:
+      return "ARRIVED_GOAL";
+    case AutowareState::FINALIZING:
+      return "FINALIZING";
+    default:
+      return "";
+  }
+#endif
 }
 
 auto FieldOperatorApplication::spinSome() -> void

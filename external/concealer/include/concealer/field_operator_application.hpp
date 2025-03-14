@@ -21,6 +21,14 @@
 #include <autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>
 #endif
 
+#if __has_include(<autoware_adapi_v1_msgs/msg/operation_mode_state.hpp>)
+#include <autoware_adapi_v1_msgs/msg/operation_mode_state.hpp>
+#endif
+
+#if __has_include(<autoware_adapi_v1_msgs/msg/route_state.hpp>)
+#include <autoware_adapi_v1_msgs/msg/route_state.hpp>
+#endif
+
 #include <autoware_adapi_v1_msgs/msg/mrm_state.hpp>
 #include <autoware_adapi_v1_msgs/srv/change_operation_mode.hpp>
 #include <autoware_adapi_v1_msgs/srv/clear_route.hpp>
@@ -63,8 +71,6 @@ struct FieldOperatorApplication : public rclcpp::Node
 
   std::chrono::steady_clock::time_point time_limit;
 
-  std::string autoware_state = "LAUNCHING";
-
   std::string minimum_risk_maneuver_state;
 
   std::string minimum_risk_maneuver_behavior;
@@ -76,6 +82,8 @@ struct FieldOperatorApplication : public rclcpp::Node
   using Emergency                       = tier4_external_api_msgs::msg::Emergency;
   using LocalizationInitializationState = autoware_adapi_v1_msgs::msg::LocalizationInitializationState;
   using MrmState                        = autoware_adapi_v1_msgs::msg::MrmState;
+  using OperationModeState              = autoware_adapi_v1_msgs::msg::OperationModeState;
+  using RouteState                      = autoware_adapi_v1_msgs::msg::RouteState;
   using Trajectory                      = tier4_planning_msgs::msg::Trajectory;
   using TurnIndicatorsCommand           = autoware_vehicle_msgs::msg::TurnIndicatorsCommand;
 
@@ -96,7 +104,13 @@ struct FieldOperatorApplication : public rclcpp::Node
   Subscriber<LocalizationInitializationState> getLocalizationState;
 #endif
   Subscriber<MrmState>                 getMrmState;
+#if __has_include(<autoware_adapi_v1_msgs/msg/operation_mode_state.hpp>)
+  Subscriber<OperationModeState>       getOperationModeState;
+#endif
   Subscriber<priority::PathWithLaneId> getPathWithLaneId;
+#if __has_include(<autoware_adapi_v1_msgs/msg/route_state.hpp>)
+  Subscriber<RouteState>               getRouteState;
+#endif
   Subscriber<Trajectory>               getTrajectory;
   Subscriber<TurnIndicatorsCommand>    getTurnIndicatorsCommand;
 
@@ -119,16 +133,16 @@ struct FieldOperatorApplication : public rclcpp::Node
 
   template <typename Thunk = void (*)()>
   auto waitForAutowareStateToBe(
-    const std::string & state, Thunk thunk = [] {})
+    const std::string & expect, Thunk thunk = [] {})
   {
     thunk();
 
-    while (not finalized.load() and autoware_state != state) {
+    while (not finalized.load() and state() != expect) {
       if (time_limit <= std::chrono::steady_clock::now()) {
         throw common::AutowareError(
-          "Simulator waited for the Autoware state to transition to ", state,
+          "Simulator waited for the Autoware state to transition to ", expect,
           ", but time is up. The current Autoware state is ",
-          (autoware_state.empty() ? "not published yet" : autoware_state));
+          (state().empty() ? "unknown" : state()));
       } else {
         thunk();
         rclcpp::GenericRate<std::chrono::steady_clock>(std::chrono::seconds(1)).sleep();
@@ -161,6 +175,8 @@ struct FieldOperatorApplication : public rclcpp::Node
   auto sendCooperateCommand(const std::string &, const std::string &) -> void;
 
   auto setVelocityLimit(double) -> void;
+
+  auto state() const -> std::string;
 
   auto enableAutowareControl() -> void;
 };
