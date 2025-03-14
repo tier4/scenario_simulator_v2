@@ -163,11 +163,10 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
               currentScenarioDefinition()->entities.begin(),
               currentScenarioDefinition()->entities.end(), [this](const auto & each) {
                 return std::apply(
-                  [this](const auto & name, const auto & object) {
-                    return not object.template is<ScenarioObject>() or
-                           not object.template as<ScenarioObject>().is_added or
-                           not object.template as<ScenarioObject>()
-                                 .object_controller.isAutoware() or
+                  [this](const auto & name, const Object & object) {
+                    return not object.is<ScenarioObject>() or
+                           not object.as<ScenarioObject>().is_added or
+                           not object.as<ScenarioObject>().object_controller.isAutoware() or
                            NonStandardOperation::isEngaged(name);
                   },
                   each);
