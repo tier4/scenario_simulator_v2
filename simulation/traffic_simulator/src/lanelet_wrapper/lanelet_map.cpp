@@ -248,6 +248,12 @@ auto rightBound(const lanelet::Id lanelet_id) -> std::vector<Point>
 }
 
 // Polygons
+auto stopLinePolygon(const lanelet::Id lanelet_id) -> std::vector<Point>
+{
+  /// @todo here you should probably add a verify if the passed lanelet_id is indeed a stop_line
+  return toPolygon(LaneletWrapper::map()->lineStringLayer.get(lanelet_id));
+}
+
 auto toPolygon(const lanelet::ConstLineString3d & line_string) -> std::vector<Point>
 {
   std::vector<Point> points;
@@ -256,6 +262,44 @@ auto toPolygon(const lanelet::ConstLineString3d & line_string) -> std::vector<Po
     points.push_back(geometry_msgs::build<Point>().x(point.x()).y(point.y()).z(point.z()));
   }
   return points;
+}
+
+// Objects on path
+auto trafficSignsOnPath(const lanelet::Ids & lanelet_ids)
+  -> std::vector<std::shared_ptr<const lanelet::TrafficSign>>
+{
+  std::vector<std::shared_ptr<const lanelet::TrafficSign>> ret;
+  for (const auto & lanelet_id : lanelet_ids) {
+    const auto & lanelet = LaneletWrapper::map()->laneletLayer.get(lanelet_id);
+    const auto & traffic_signs = lanelet.regulatoryElementsAs<const lanelet::TrafficSign>();
+    for (const auto & traffic_sign : traffic_signs) {
+      ret.push_back(traffic_sign);
+    }
+  }
+  return ret;
+}
+
+auto stopLinesOnPath(const lanelet::Ids & lanelet_ids) -> lanelet::ConstLineStrings3d
+{
+  lanelet::ConstLineStrings3d stop_lines;
+  for (const auto & traffic_sign : lanelet_wrapper::lanelet_map::trafficSignsOnPath(lanelet_ids)) {
+    if (traffic_sign->type() == "stop_sign") {
+      const auto & ref_lines = traffic_sign->refLines();
+      stop_lines.insert(stop_lines.end(), ref_lines.begin(), ref_lines.end());
+    }
+  }
+  return stop_lines;
+}
+
+auto stopLineIdsOnPath(const lanelet::Ids & lanelet_ids) -> lanelet::Ids
+{
+  lanelet::Ids stop_line_ids;
+  const auto & stop_lines = stopLinesOnPath(lanelet_ids);
+  stop_line_ids.reserve(stop_lines.size());
+  for (const auto & ret : stop_lines) {
+    stop_line_ids.push_back(ret.id());
+  }
+  return stop_line_ids;
 }
 }  // namespace lanelet_map
 }  // namespace lanelet_wrapper
