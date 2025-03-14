@@ -167,7 +167,13 @@ FieldOperatorApplication::FieldOperatorApplication(const pid_t pid)
     minimum_risk_maneuver_state = state_name_of(message.state);
     minimum_risk_maneuver_behavior = behavior_name_of(message.behavior);
   }),
+#if __has_include(<autoware_adapi_v1_msgs/msg/operation_mode_state.hpp>)
+  getOperationModeState("/api/operation_mode/state", rclcpp::QoS(1), *this),
+#endif
   getPathWithLaneId("/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", rclcpp::QoS(1), *this),
+#if __has_include(<autoware_adapi_v1_msgs/msg/route_state.hpp>)
+  getRouteState("/api/routing/state", rclcpp::QoS(1), *this),
+#endif
   getTrajectory("/api/iv_msgs/planning/scenario_planning/trajectory", rclcpp::QoS(1), *this),
   getTurnIndicatorsCommand("/control/command/turn_indicators_cmd", rclcpp::QoS(1), *this),
   requestClearRoute("/api/routing/clear_route", *this),
@@ -523,6 +529,69 @@ auto FieldOperatorApplication::setVelocityLimit(double velocity_limit) -> void
     */
     requestSetVelocityLimit(request, 30);
   });
+}
+
+auto FieldOperatorApplication::state() const -> std::string
+{
+#if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>) and \
+    __has_include(<autoware_adapi_v1_msgs/msg/route_state.hpp>) and \
+    __has_include(<autoware_adapi_v1_msgs/msg/operation_mode_state.hpp>)
+  /*
+     See https://github.com/autowarefoundation/autoware.universe/blob/e60daf7d1c85208eaac083b90c181e224c2ac513/system/autoware_default_adapi/document/autoware-state.md
+  */
+  switch (const auto localization_state = getLocalizationState(); localization_state.state) {
+    case LocalizationInitializationState::UNKNOWN:
+    case LocalizationInitializationState::UNINITIALIZED:
+    case LocalizationInitializationState::INITIALIZING:
+      return "INITIALIZING";
+
+    case LocalizationInitializationState::INITIALIZED:
+      switch (const auto route_state = getRouteState(); route_state.state) {
+        case RouteState::UNKNOWN:
+          return "INITIALIZING";
+
+        case RouteState::UNSET:
+          return "WAITING_FOR_ROUTE";
+
+        case RouteState::ARRIVED:
+          return "ARRIVED_GOAL";
+
+        case RouteState::SET:
+        case RouteState::CHANGING:
+          switch (const auto operation_mode_state = getOperationModeState();
+                  operation_mode_state.mode) {
+            case OperationModeState::UNKNOWN:
+              return "INITIALIZING";
+
+            case OperationModeState::AUTONOMOUS:
+            case OperationModeState::LOCAL:
+            case OperationModeState::REMOTE:
+              if (operation_mode_state.is_autoware_control_enabled) {
+                return "DRIVING";
+              }
+              [[fallthrough]];
+
+            case OperationModeState::STOP:
+              return operation_mode_state.is_autonomous_mode_available ? "WAITING_FOR_ENGAGE"
+                                                                       : "PLANNING";
+
+            default:
+              return "";
+          }
+
+        default:
+          return "";
+      }
+
+    default:
+      return "";
+  }
+#else
+  static_assert(__has_include(<autoware_system_msgs/msg/autoware_state.hpp>));
+  static_assert(false);
+
+  return autoware_state;
+#endif
 }
 
 auto FieldOperatorApplication::spinSome() -> void

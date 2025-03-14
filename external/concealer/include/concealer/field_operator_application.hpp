@@ -21,6 +21,14 @@
 #include <autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>
 #endif
 
+#if __has_include(<autoware_adapi_v1_msgs/msg/operation_mode_state.hpp>)
+#include <autoware_adapi_v1_msgs/msg/operation_mode_state.hpp>
+#endif
+
+#if __has_include(<autoware_adapi_v1_msgs/msg/route_state.hpp>)
+#include <autoware_adapi_v1_msgs/msg/route_state.hpp>
+#endif
+
 #include <autoware_adapi_v1_msgs/msg/mrm_state.hpp>
 #include <autoware_adapi_v1_msgs/srv/change_operation_mode.hpp>
 #include <autoware_adapi_v1_msgs/srv/clear_route.hpp>
@@ -76,6 +84,8 @@ struct FieldOperatorApplication : public rclcpp::Node
   using Emergency                       = tier4_external_api_msgs::msg::Emergency;
   using LocalizationInitializationState = autoware_adapi_v1_msgs::msg::LocalizationInitializationState;
   using MrmState                        = autoware_adapi_v1_msgs::msg::MrmState;
+  using OperationModeState              = autoware_adapi_v1_msgs::msg::OperationModeState;
+  using RouteState                      = autoware_adapi_v1_msgs::msg::RouteState;
   using Trajectory                      = tier4_planning_msgs::msg::Trajectory;
   using TurnIndicatorsCommand           = autoware_vehicle_msgs::msg::TurnIndicatorsCommand;
 
@@ -96,7 +106,13 @@ struct FieldOperatorApplication : public rclcpp::Node
   Subscriber<LocalizationInitializationState> getLocalizationState;
 #endif
   Subscriber<MrmState>                 getMrmState;
+#if __has_include(<autoware_adapi_v1_msgs/msg/operation_mode_state.hpp>)
+  Subscriber<OperationModeState>       getOperationModeState;
+#endif
   Subscriber<priority::PathWithLaneId> getPathWithLaneId;
+#if __has_include(<autoware_adapi_v1_msgs/msg/route_state.hpp>)
+  Subscriber<RouteState>               getRouteState;
+#endif
   Subscriber<Trajectory>               getTrajectory;
   Subscriber<TurnIndicatorsCommand>    getTurnIndicatorsCommand;
 
@@ -161,6 +177,8 @@ struct FieldOperatorApplication : public rclcpp::Node
   auto sendCooperateCommand(const std::string &, const std::string &) -> void;
 
   auto setVelocityLimit(double) -> void;
+
+  auto state() const -> std::string;
 
   auto enableAutowareControl() -> void;
 };
