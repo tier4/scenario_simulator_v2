@@ -117,7 +117,7 @@ auto EgoEntity::getTurnIndicatorsCommandName() const -> std::string
   }
 }
 
-auto EgoEntity::getCurrentAction() const -> std::string { return autoware_state; }
+auto EgoEntity::getCurrentAction() const -> std::string { return state(); }
 
 auto EgoEntity::getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter
 {

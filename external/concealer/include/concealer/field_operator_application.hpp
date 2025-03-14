@@ -71,8 +71,6 @@ struct FieldOperatorApplication : public rclcpp::Node
 
   std::chrono::steady_clock::time_point time_limit;
 
-  std::string autoware_state = "LAUNCHING";
-
   std::string minimum_risk_maneuver_state;
 
   std::string minimum_risk_maneuver_behavior;
@@ -135,16 +133,16 @@ struct FieldOperatorApplication : public rclcpp::Node
 
   template <typename Thunk = void (*)()>
   auto waitForAutowareStateToBe(
-    const std::string & state, Thunk thunk = [] {})
+    const std::string & expect, Thunk thunk = [] {})
   {
     thunk();
 
-    while (not finalized.load() and autoware_state != state) {
+    while (not finalized.load() and state() != expect) {
       if (time_limit <= std::chrono::steady_clock::now()) {
         throw common::AutowareError(
-          "Simulator waited for the Autoware state to transition to ", state,
+          "Simulator waited for the Autoware state to transition to ", expect,
           ", but time is up. The current Autoware state is ",
-          (autoware_state.empty() ? "not published yet" : autoware_state));
+          (state().empty() ? "unknown" : state()));
       } else {
         thunk();
         rclcpp::GenericRate<std::chrono::steady_clock>(std::chrono::seconds(1)).sleep();

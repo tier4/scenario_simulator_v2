@@ -81,30 +81,7 @@ FieldOperatorApplication::FieldOperatorApplication(const pid_t pid)
 : rclcpp::Node("concealer_user", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),
   process_id(pid),
   time_limit(std::chrono::steady_clock::now() + std::chrono::seconds(getParameter<int>("initialize_duration"))),
-  getAutowareState("/autoware/state", rclcpp::QoS(1), *this, [this](const auto & message) {
-    auto state_name_of = [](auto state) constexpr {
-      switch (state) {
-        case AutowareState::INITIALIZING:
-          return "INITIALIZING";
-        case AutowareState::WAITING_FOR_ROUTE:
-          return "WAITING_FOR_ROUTE";
-        case AutowareState::PLANNING:
-          return "PLANNING";
-        case AutowareState::WAITING_FOR_ENGAGE:
-          return "WAITING_FOR_ENGAGE";
-        case AutowareState::DRIVING:
-          return "DRIVING";
-        case AutowareState::ARRIVED_GOAL:
-          return "ARRIVED_GOAL";
-        case AutowareState::FINALIZING:
-          return "FINALIZING";
-        default:
-          return "";
-      }
-    };
-
-    autoware_state = state_name_of(message.state);
-  }),
+  getAutowareState("/autoware/state", rclcpp::QoS(1), *this),
   getCommand("/control/command/control_cmd", rclcpp::QoS(1), *this),
   getCooperateStatusArray("/api/external/get/rtc_status", rclcpp::QoS(1), *this),
   getEmergencyState("/api/external/get/emergency", rclcpp::QoS(1), *this, [this](const auto & message) {
@@ -310,13 +287,13 @@ auto FieldOperatorApplication::engage() -> void
 auto FieldOperatorApplication::engageable() const -> bool
 {
   task_queue.rethrow();
-  return task_queue.empty() and autoware_state == "WAITING_FOR_ENGAGE";
+  return task_queue.empty() and state() == "WAITING_FOR_ENGAGE";
 }
 
 auto FieldOperatorApplication::engaged() const -> bool
 {
   task_queue.rethrow();
-  return task_queue.empty() and autoware_state == "DRIVING";
+  return task_queue.empty() and state() == "DRIVING";
 }
 
 auto FieldOperatorApplication::getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray
@@ -587,10 +564,24 @@ auto FieldOperatorApplication::state() const -> std::string
       return "";
   }
 #else
-  static_assert(__has_include(<autoware_system_msgs/msg/autoware_state.hpp>));
-  static_assert(false);
-
-  return autoware_state;
+  switch (const auto autoware_state = getAutowareState().state) {
+    case AutowareState::INITIALIZING:
+      return "INITIALIZING";
+    case AutowareState::WAITING_FOR_ROUTE:
+      return "WAITING_FOR_ROUTE";
+    case AutowareState::PLANNING:
+      return "PLANNING";
+    case AutowareState::WAITING_FOR_ENGAGE:
+      return "WAITING_FOR_ENGAGE";
+    case AutowareState::DRIVING:
+      return "DRIVING";
+    case AutowareState::ARRIVED_GOAL:
+      return "ARRIVED_GOAL";
+    case AutowareState::FINALIZING:
+      return "FINALIZING";
+    default:
+      return "";
+  }
 #endif
 }
 
