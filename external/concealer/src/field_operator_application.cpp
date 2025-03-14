@@ -273,7 +273,7 @@ auto FieldOperatorApplication::engage() -> void
     try {
       auto request = std::make_shared<Engage::Request>();
       request->engage = true;
-      return requestEngage(request, 1);
+      return requestEngage(request, 30);
     } catch (const common::AutowareError &) {
       return;  // Ignore error because this service is validated by Autoware state transition.
     }
@@ -326,7 +326,7 @@ auto FieldOperatorApplication::initialize(const geometry_msgs::msg::Pose & initi
           initial_pose_stamped.pose.pose = initial_pose;
           return initial_pose_stamped;
         }());
-        return requestInitialPose(request, 1);
+        return requestInitialPose(request, 30);
       } catch (const common::AutowareError &) {
         return;  // Ignore error because this service is validated by Autoware state transition.
       }
@@ -374,7 +374,7 @@ auto FieldOperatorApplication::plan(const std::vector<geometry_msgs::msg::PoseSt
       request->waypoints.push_back(each.pose);
     }
 
-    requestSetRoutePoints(request, 1);
+    requestSetRoutePoints(request, 30);
 
     waitForAutowareStateToBe("WAITING_FOR_ENGAGE");
   });
@@ -489,7 +489,7 @@ auto FieldOperatorApplication::sendCooperateCommand(
     request->stamp = cooperate_status_array.stamp;
     request->commands.push_back(cooperate_command);
 
-    task_queue.delay([this, request]() { requestCooperateCommands(request, 1); });
+    task_queue.delay([this, request]() { requestCooperateCommands(request, 30); });
 
     used_cooperate_statuses.push_back(*cooperate_status);
   }
