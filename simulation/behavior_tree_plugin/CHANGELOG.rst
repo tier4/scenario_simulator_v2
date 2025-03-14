@@ -21,6 +21,18 @@ Changelog for package behavior_tree_plugin
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+13.0.0 (2025-03-14)
+-------------------
+* Merge pull request `#1538 <https://github.com/tier4/scenario_simulator_v2/issues/1538>`_ from tier4/refactor/lanelet_wrapper_distance_to_stop_line
+  HdMapUtils refactor `lanelet_wrapper::distance::distanceToStopLine`
+* Merge branch 'master' into refactor/lanelet_wrapper_distance_to_stop_line
+* Merge branch 'master' into refactor/lanelet_wrapper_distance_to_stop_line
+* Merge branch 'master' into refactor/lanelet_wrapper_distance_to_stop_line
+* Merge branch 'master' into refactor/lanelet_wrapper_distance_to_stop_line
+* Merge branch 'master' into refactor/lanelet_wrapper_distance_to_stop_line
+* move `getDistanceToStopLine` method
+* Contributors: Masaya Kataoka, Tatsuya Yamasaki, abco20
+
 12.3.2 (2025-03-13)
 -------------------
 * Merge branch 'master' into feature/faster-template-instantiation
