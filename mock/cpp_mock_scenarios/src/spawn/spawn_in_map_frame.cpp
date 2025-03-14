@@ -29,7 +29,7 @@ class SpawnInMapFrameScenario : public cpp_mock_scenarios::CppScenarioNode
 public:
   explicit SpawnInMapFrameScenario(const rclcpp::NodeOptions & option)
   : cpp_mock_scenarios::CppScenarioNode(
-      "stop_at_crosswalk", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
+      "spawn_in_map_frame", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
       "lanelet2_map.osm", __FILE__, false, option)
   {
     start();
