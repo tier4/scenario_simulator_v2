@@ -19,6 +19,18 @@
 #include <autoware_system_msgs/msg/autoware_state.hpp>
 #endif
 
+#if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)
+#include <autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>
+#endif
+
+#if __has_include(<autoware_adapi_v1_msgs/msg/operation_mode_state.hpp>)
+#include <autoware_adapi_v1_msgs/msg/operation_mode_state.hpp>
+#endif
+
+#if __has_include(<autoware_adapi_v1_msgs/msg/route_state.hpp>)
+#include <autoware_adapi_v1_msgs/msg/route_state.hpp>
+#endif
+
 namespace concealer
 {
 struct LegacyAutowareState
@@ -39,23 +51,85 @@ struct LegacyAutowareState
   constexpr LegacyAutowareState(value_type value) : value(value) {}
 
 #if __has_include(<autoware_system_msgs/msg/autoware_state.hpp>)
-  LegacyAutowareState(const autoware_system_msgs::msg::AutowareState & autoware_state)
+  explicit LegacyAutowareState(const autoware_system_msgs::msg::AutowareState & autoware_state)
   : value([&]() {
       switch (autoware_state.state) {
         case autoware_system_msgs::msg::AutowareState::INITIALIZING:
-          return LegacyAutowareState::initializing;
+          return initializing;
         case autoware_system_msgs::msg::AutowareState::WAITING_FOR_ROUTE:
-          return LegacyAutowareState::waiting_for_route;
+          return waiting_for_route;
         case autoware_system_msgs::msg::AutowareState::PLANNING:
-          return LegacyAutowareState::planning;
+          return planning;
         case autoware_system_msgs::msg::AutowareState::WAITING_FOR_ENGAGE:
-          return LegacyAutowareState::waiting_for_engage;
+          return waiting_for_engage;
         case autoware_system_msgs::msg::AutowareState::DRIVING:
-          return LegacyAutowareState::driving;
+          return driving;
         case autoware_system_msgs::msg::AutowareState::ARRIVED_GOAL:
-          return LegacyAutowareState::arrived_goal;
+          return arrived_goal;
         case autoware_system_msgs::msg::AutowareState::FINALIZING:
-          return LegacyAutowareState::finalizing;
+          return finalizing;
+      }
+    }())
+  {
+  }
+#endif
+
+#if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>) and \
+    __has_include(<autoware_adapi_v1_msgs/msg/route_state.hpp>) and \
+    __has_include(<autoware_adapi_v1_msgs/msg/operation_mode_state.hpp>)
+  explicit LegacyAutowareState(
+    const autoware_adapi_v1_msgs::msg::LocalizationInitializationState & localization_state,
+    const autoware_adapi_v1_msgs::msg::RouteState & route_state,
+    const autoware_adapi_v1_msgs::msg::OperationModeState & operation_mode_state)
+  : value([&]() {
+      /*
+         See https://github.com/autowarefoundation/autoware.universe/blob/e60daf7d1c85208eaac083b90c181e224c2ac513/system/autoware_default_adapi/document/autoware-state.md
+      */
+      switch (localization_state.state) {
+        case autoware_adapi_v1_msgs::msg::LocalizationInitializationState::UNKNOWN:
+        case autoware_adapi_v1_msgs::msg::LocalizationInitializationState::UNINITIALIZED:
+        case autoware_adapi_v1_msgs::msg::LocalizationInitializationState::INITIALIZING:
+          return initializing;
+
+        case autoware_adapi_v1_msgs::msg::LocalizationInitializationState::INITIALIZED:
+          switch (route_state.state) {
+            case autoware_adapi_v1_msgs::msg::RouteState::UNKNOWN:
+              return initializing;
+
+            case autoware_adapi_v1_msgs::msg::RouteState::UNSET:
+              return waiting_for_route;
+
+            case autoware_adapi_v1_msgs::msg::RouteState::ARRIVED:
+              return arrived_goal;
+
+            case autoware_adapi_v1_msgs::msg::RouteState::SET:
+            case autoware_adapi_v1_msgs::msg::RouteState::CHANGING:
+              switch (operation_mode_state.mode) {
+                case autoware_adapi_v1_msgs::msg::OperationModeState::UNKNOWN:
+                  return initializing;
+
+                case autoware_adapi_v1_msgs::msg::OperationModeState::AUTONOMOUS:
+                case autoware_adapi_v1_msgs::msg::OperationModeState::LOCAL:
+                case autoware_adapi_v1_msgs::msg::OperationModeState::REMOTE:
+                  if (operation_mode_state.is_autoware_control_enabled) {
+                    return driving;
+                  }
+                  [[fallthrough]];
+
+                case autoware_adapi_v1_msgs::msg::OperationModeState::STOP:
+                  return operation_mode_state.is_autonomous_mode_available ? waiting_for_engage
+                                                                           : planning;
+
+                default:
+                  return undefined;
+              }
+
+            default:
+              return undefined;
+          }
+
+        default:
+          return undefined;
       }
     }())
   {

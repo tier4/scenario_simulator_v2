@@ -498,59 +498,9 @@ auto FieldOperatorApplication::getLegacyAutowareState() const -> LegacyAutowareS
 #if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>) and \
     __has_include(<autoware_adapi_v1_msgs/msg/route_state.hpp>) and \
     __has_include(<autoware_adapi_v1_msgs/msg/operation_mode_state.hpp>)
-  /*
-     See https://github.com/autowarefoundation/autoware.universe/blob/e60daf7d1c85208eaac083b90c181e224c2ac513/system/autoware_default_adapi/document/autoware-state.md
-  */
-  switch (const auto localization_state = getLocalizationState(); localization_state.state) {
-    case LocalizationInitializationState::UNKNOWN:
-    case LocalizationInitializationState::UNINITIALIZED:
-    case LocalizationInitializationState::INITIALIZING:
-      return LegacyAutowareState::initializing;
-
-    case LocalizationInitializationState::INITIALIZED:
-      switch (const auto route_state = getRouteState(); route_state.state) {
-        case RouteState::UNKNOWN:
-          return LegacyAutowareState::initializing;
-
-        case RouteState::UNSET:
-          return LegacyAutowareState::waiting_for_route;
-
-        case RouteState::ARRIVED:
-          return LegacyAutowareState::arrived_goal;
-
-        case RouteState::SET:
-        case RouteState::CHANGING:
-          switch (const auto operation_mode_state = getOperationModeState();
-                  operation_mode_state.mode) {
-            case OperationModeState::UNKNOWN:
-              return LegacyAutowareState::initializing;
-
-            case OperationModeState::AUTONOMOUS:
-            case OperationModeState::LOCAL:
-            case OperationModeState::REMOTE:
-              if (operation_mode_state.is_autoware_control_enabled) {
-                return LegacyAutowareState::driving;
-              }
-              [[fallthrough]];
-
-            case OperationModeState::STOP:
-              return operation_mode_state.is_autonomous_mode_available
-                       ? LegacyAutowareState::waiting_for_engage
-                       : LegacyAutowareState::planning;
-
-            default:
-              return LegacyAutowareState::undefined;
-          }
-
-        default:
-          return LegacyAutowareState::undefined;
-      }
-
-    default:
-      return LegacyAutowareState::undefined;
-  }
+  return LegacyAutowareState(getLocalizationState(), getRouteState(), getOperationModeState());
 #else
-  return getAutowareState();
+  return LegacyAutowareState(getAutowareState());
 #endif
 }
 

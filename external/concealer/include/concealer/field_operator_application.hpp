@@ -17,18 +17,6 @@
 
 #include <sys/wait.h>
 
-#if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)
-#include <autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>
-#endif
-
-#if __has_include(<autoware_adapi_v1_msgs/msg/operation_mode_state.hpp>)
-#include <autoware_adapi_v1_msgs/msg/operation_mode_state.hpp>
-#endif
-
-#if __has_include(<autoware_adapi_v1_msgs/msg/route_state.hpp>)
-#include <autoware_adapi_v1_msgs/msg/route_state.hpp>
-#endif
-
 #include <autoware_adapi_v1_msgs/msg/mrm_state.hpp>
 #include <autoware_adapi_v1_msgs/srv/change_operation_mode.hpp>
 #include <autoware_adapi_v1_msgs/srv/clear_route.hpp>
