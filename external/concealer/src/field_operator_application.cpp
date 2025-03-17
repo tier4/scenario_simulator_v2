@@ -268,7 +268,7 @@ auto FieldOperatorApplication::engage() -> void
     request->engage = true;
     requestEngage(request, 30);
 
-    waitForAutowareStateToBe("DRIVING");
+    waitForAutowareStateToBe(LegacyAutowareState::driving);
 
     time_limit = std::decay_t<decltype(time_limit)>::max();
   });
@@ -277,13 +277,14 @@ auto FieldOperatorApplication::engage() -> void
 auto FieldOperatorApplication::engageable() const -> bool
 {
   task_queue.rethrow();
-  return task_queue.empty() and state() == "WAITING_FOR_ENGAGE";
+  return task_queue.empty() and
+         getLegacyAutowareState().value == LegacyAutowareState::waiting_for_engage;
 }
 
 auto FieldOperatorApplication::engaged() const -> bool
 {
   task_queue.rethrow();
-  return task_queue.empty() and state() == "DRIVING";
+  return task_queue.empty() and getLegacyAutowareState().value == LegacyAutowareState::driving;
 }
 
 auto FieldOperatorApplication::getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray
@@ -317,7 +318,7 @@ auto FieldOperatorApplication::initialize(const geometry_msgs::msg::Pose & initi
       }());
       requestInitialPose(request, 30);
 
-      waitForAutowareStateToBe("WAITING_FOR_ROUTE");
+      waitForAutowareStateToBe(LegacyAutowareState::waiting_for_route);
     });
   }
 }
@@ -360,7 +361,7 @@ auto FieldOperatorApplication::plan(const std::vector<geometry_msgs::msg::PoseSt
 
     requestSetRoutePoints(request, 30);
 
-    waitForAutowareStateToBe("WAITING_FOR_ENGAGE");
+    waitForAutowareStateToBe(LegacyAutowareState::waiting_for_engage);
   });
 }
 
@@ -492,7 +493,7 @@ auto FieldOperatorApplication::setVelocityLimit(double velocity_limit) -> void
   });
 }
 
-auto FieldOperatorApplication::state() const -> std::string
+auto FieldOperatorApplication::getLegacyAutowareState() const -> LegacyAutowareState
 {
 #if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>) and \
     __has_include(<autoware_adapi_v1_msgs/msg/route_state.hpp>) and \
@@ -504,68 +505,52 @@ auto FieldOperatorApplication::state() const -> std::string
     case LocalizationInitializationState::UNKNOWN:
     case LocalizationInitializationState::UNINITIALIZED:
     case LocalizationInitializationState::INITIALIZING:
-      return "INITIALIZING";
+      return LegacyAutowareState::initializing;
 
     case LocalizationInitializationState::INITIALIZED:
       switch (const auto route_state = getRouteState(); route_state.state) {
         case RouteState::UNKNOWN:
-          return "INITIALIZING";
+          return LegacyAutowareState::initializing;
 
         case RouteState::UNSET:
-          return "WAITING_FOR_ROUTE";
+          return LegacyAutowareState::waiting_for_route;
 
         case RouteState::ARRIVED:
-          return "ARRIVED_GOAL";
+          return LegacyAutowareState::arrived_goal;
 
         case RouteState::SET:
         case RouteState::CHANGING:
           switch (const auto operation_mode_state = getOperationModeState();
                   operation_mode_state.mode) {
             case OperationModeState::UNKNOWN:
-              return "INITIALIZING";
+              return LegacyAutowareState::initializing;
 
             case OperationModeState::AUTONOMOUS:
             case OperationModeState::LOCAL:
             case OperationModeState::REMOTE:
               if (operation_mode_state.is_autoware_control_enabled) {
-                return "DRIVING";
+                return LegacyAutowareState::driving;
               }
               [[fallthrough]];
 
             case OperationModeState::STOP:
-              return operation_mode_state.is_autonomous_mode_available ? "WAITING_FOR_ENGAGE"
-                                                                       : "PLANNING";
+              return operation_mode_state.is_autonomous_mode_available
+                       ? LegacyAutowareState::waiting_for_engage
+                       : LegacyAutowareState::planning;
 
             default:
-              return "";
+              return LegacyAutowareState::undefined;
           }
 
         default:
-          return "";
+          return LegacyAutowareState::undefined;
       }
 
     default:
-      return "";
+      return LegacyAutowareState::undefined;
   }
 #else
-  switch (const auto autoware_state = getAutowareState().state) {
-    case AutowareState::INITIALIZING:
-      return "INITIALIZING";
-    case AutowareState::WAITING_FOR_ROUTE:
-      return "WAITING_FOR_ROUTE";
-    case AutowareState::PLANNING:
-      return "PLANNING";
-    case AutowareState::WAITING_FOR_ENGAGE:
-      return "WAITING_FOR_ENGAGE";
-    case AutowareState::DRIVING:
-      return "DRIVING";
-    case AutowareState::ARRIVED_GOAL:
-      return "ARRIVED_GOAL";
-    case AutowareState::FINALIZING:
-      return "FINALIZING";
-    default:
-      return "";
-  }
+  return getAutowareState();
 #endif
 }
 

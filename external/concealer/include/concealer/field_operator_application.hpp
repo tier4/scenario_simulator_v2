@@ -35,10 +35,10 @@
 #include <autoware_adapi_v1_msgs/srv/initialize_localization.hpp>
 #include <autoware_adapi_v1_msgs/srv/set_route_points.hpp>
 #include <autoware_control_msgs/msg/control.hpp>
-#include <autoware_system_msgs/msg/autoware_state.hpp>
 #include <autoware_vehicle_msgs/msg/gear_command.hpp>
 #include <autoware_vehicle_msgs/msg/turn_indicators_command.hpp>
 #include <concealer/autoware_universe.hpp>
+#include <concealer/legacy_autoware_state.hpp>
 #include <concealer/path_with_lane_id.hpp>
 #include <concealer/publisher.hpp>
 #include <concealer/service.hpp>
@@ -133,16 +133,15 @@ struct FieldOperatorApplication : public rclcpp::Node
 
   template <typename Thunk = void (*)()>
   auto waitForAutowareStateToBe(
-    const std::string & expect, Thunk thunk = [] {})
+    const LegacyAutowareState & state, Thunk thunk = [] {})
   {
     thunk();
 
-    while (not finalized.load() and state() != expect) {
+    while (not finalized.load() and getLegacyAutowareState().value != state.value) {
       if (time_limit <= std::chrono::steady_clock::now()) {
         throw common::AutowareError(
-          "Simulator waited for the Autoware state to transition to ", expect,
-          ", but time is up. The current Autoware state is ",
-          (state().empty() ? "unknown" : state()));
+          "Simulator waited for the Autoware state to transition to ", state,
+          ", but time is up. The current Autoware state is ", getLegacyAutowareState());
       } else {
         thunk();
         rclcpp::GenericRate<std::chrono::steady_clock>(std::chrono::seconds(1)).sleep();
@@ -168,6 +167,8 @@ struct FieldOperatorApplication : public rclcpp::Node
 
   auto clearRoute() -> void;
 
+  auto getLegacyAutowareState() const -> LegacyAutowareState;
+
   auto getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray;
 
   auto requestAutoModeForCooperation(const std::string &, bool) -> void;
@@ -175,8 +176,6 @@ struct FieldOperatorApplication : public rclcpp::Node
   auto sendCooperateCommand(const std::string &, const std::string &) -> void;
 
   auto setVelocityLimit(double) -> void;
-
-  auto state() const -> std::string;
 
   auto enableAutowareControl() -> void;
 };
