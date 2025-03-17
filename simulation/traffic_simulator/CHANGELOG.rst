@@ -21,6 +21,55 @@ Changelog for package traffic_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+14.0.0 (2025-03-14)
+-------------------
+* Merge pull request `#1546 <https://github.com/tier4/scenario_simulator_v2/issues/1546>`_ from tier4/refactor/concealer-5
+  Refactor/concealer 5
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-5
+* Cleanup
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-5
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-5
+* Restore member function template `API::getROS2Parameter`
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-5
+* Replace miscellaneous `get_parameter` calls with `common::getParameter`
+* Remove member function `API::getROS2Parameter`
+* Remove free function `traffic_simulator::getParameter`
+* Contributors: Masaya Kataoka, yamacir-kit
+
+13.0.0 (2025-03-14)
+-------------------
+* Merge pull request `#1538 <https://github.com/tier4/scenario_simulator_v2/issues/1538>`_ from tier4/refactor/lanelet_wrapper_distance_to_stop_line
+  HdMapUtils refactor `lanelet_wrapper::distance::distanceToStopLine`
+* Merge branch 'master' into refactor/lanelet_wrapper_distance_to_stop_line
+* Merge branch 'master' into refactor/lanelet_wrapper_distance_to_stop_line
+* Merge branch 'master' into refactor/lanelet_wrapper_distance_to_stop_line
+* Merge branch 'master' into refactor/lanelet_wrapper_distance_to_stop_line
+* Merge branch 'master' into refactor/lanelet_wrapper_distance_to_stop_line
+* Fix include order
+* move `getDistanceToStopLine` method
+* move `getStopLinePolygon` method
+* move `getStopLineIds` method and `getStopLineIdsOnPath` method
+* add `trafficSignsOnPath`  method
+* Contributors: Masaya Kataoka, Tatsuya Yamasaki, abco20
+
+12.3.2 (2025-03-13)
+-------------------
+* Merge branch 'master' into feature/faster-template-instantiation
+* Merge remote-tracking branch 'origin/master' into feature/faster-template-instantiation
+* Merge remote-tracking branch 'origin/master' into feature/faster-template-instantiation
+* Merge remote-tracking branch 'origin/master' into feature/faster-template-instantiation
+* Merge branch 'master' into feature/faster-template-instantiation
+* Merge remote-tracking branch 'origin/master' into feature/faster-template-instantiation
+* Merge remote-tracking branch 'origin/master' into feature/faster-template-instantiation
+* Contributors: Shota Minami, Tatsuya Yamasaki
+
+12.3.1 (2025-03-13)
+-------------------
+* Merge pull request `#1548 <https://github.com/tier4/scenario_simulator_v2/issues/1548>`_ from tier4/chore/update_rviz_config_for_motion_veloicty_planner
+  Add missing debug marker for motion velocity planner
+* add debug marker for motion velocity obstacle\_(stop|slow_down|cruise) module
+* Contributors: Autumn60, Kotaro Yoshimoto
+
 12.3.0 (2025-03-12)
 -------------------
 * Merge branch 'master' into metrics_output

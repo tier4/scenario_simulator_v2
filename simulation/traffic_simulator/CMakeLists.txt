@@ -51,6 +51,7 @@ ament_auto_add_library(traffic_simulator SHARED
   src/helper/ostream_helpers.cpp
   src/job/job.cpp
   src/job/job_list.cpp
+  src/lanelet_wrapper/distance.cpp
   src/lanelet_wrapper/lanelet_loader.cpp
   src/lanelet_wrapper/lanelet_map.cpp
   src/lanelet_wrapper/lanelet_wrapper.cpp

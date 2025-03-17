@@ -21,6 +21,40 @@ Changelog for package behavior_tree_plugin
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+14.0.0 (2025-03-14)
+-------------------
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-5
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-5
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-5
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-5
+* Contributors: yamacir-kit
+
+13.0.0 (2025-03-14)
+-------------------
+* Merge pull request `#1538 <https://github.com/tier4/scenario_simulator_v2/issues/1538>`_ from tier4/refactor/lanelet_wrapper_distance_to_stop_line
+  HdMapUtils refactor `lanelet_wrapper::distance::distanceToStopLine`
+* Merge branch 'master' into refactor/lanelet_wrapper_distance_to_stop_line
+* Merge branch 'master' into refactor/lanelet_wrapper_distance_to_stop_line
+* Merge branch 'master' into refactor/lanelet_wrapper_distance_to_stop_line
+* Merge branch 'master' into refactor/lanelet_wrapper_distance_to_stop_line
+* Merge branch 'master' into refactor/lanelet_wrapper_distance_to_stop_line
+* move `getDistanceToStopLine` method
+* Contributors: Masaya Kataoka, Tatsuya Yamasaki, abco20
+
+12.3.2 (2025-03-13)
+-------------------
+* Merge branch 'master' into feature/faster-template-instantiation
+* Merge remote-tracking branch 'origin/master' into feature/faster-template-instantiation
+* Merge remote-tracking branch 'origin/master' into feature/faster-template-instantiation
+* Merge remote-tracking branch 'origin/master' into feature/faster-template-instantiation
+* Merge branch 'master' into feature/faster-template-instantiation
+* Merge remote-tracking branch 'origin/master' into feature/faster-template-instantiation
+* Merge remote-tracking branch 'origin/master' into feature/faster-template-instantiation
+* Contributors: Shota Minami, Tatsuya Yamasaki
+
+12.3.1 (2025-03-13)
+-------------------
+
 12.3.0 (2025-03-12)
 -------------------
 * Merge branch 'master' into metrics_output

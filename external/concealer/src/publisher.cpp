@@ -22,7 +22,7 @@ NormalDistribution<nav_msgs::msg::Odometry>::NormalDistribution(
   const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node,
   const std::string & topic)
 : seed([&]() {
-    if (const auto value = getParameter<int>(node, topic + ".seed");
+    if (const auto value = common::getParameter<int>(node, topic + ".seed");
         std::random_device::min() <= value and value <= std::random_device::max()) {
       return value;
     } else {
@@ -33,7 +33,8 @@ NormalDistribution<nav_msgs::msg::Odometry>::NormalDistribution(
     }
   }()),
   engine(seed ? seed : device()),
-  speed_threshold(getParameter<double>(node, topic + ".nav_msgs::msg::Odometry.speed_threshold")),
+  speed_threshold(
+    common::getParameter<double>(node, topic + ".nav_msgs::msg::Odometry.speed_threshold")),
   position_local_x_error(node, topic + ".nav_msgs::msg::Odometry.pose.pose.position.local_x.error"),
   position_local_y_error(node, topic + ".nav_msgs::msg::Odometry.pose.pose.position.local_y.error"),
   position_local_z_error(node, topic + ".nav_msgs::msg::Odometry.pose.pose.position.local_z.error"),
