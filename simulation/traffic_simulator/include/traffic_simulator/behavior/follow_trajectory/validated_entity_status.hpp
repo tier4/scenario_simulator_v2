@@ -18,7 +18,6 @@
 #include <geometry/vector3/is_like_vector3.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
-// #include <traffic_simulator_msgs/msg/polyline_trajectory.hpp>
 
 namespace traffic_simulator
 {

@@ -55,26 +55,46 @@ PolylineTrajectoryPositioner::PolylineTrajectoryPositioner(
   follow_waypoint_controller_(
     validated_entity_status_.behaviorParameter(), step_time_,
     isNearestWaypointWithSpecifiedTimeSameAsLastWaypoint(),  // implicitly requires: nearest_waypoint_with_specified_time_it_, polyline_trajectory_
-    std::isinf(total_remaining_time_) ? target_speed : std::nullopt)
+    std::isfinite(total_remaining_time_) ? std::nullopt : target_speed)
 {
 }
 
-auto PolylineTrajectoryPositioner::getWaypoints() const noexcept(true)
-  -> const std::vector<traffic_simulator_msgs::msg::Vertex> &
+auto PolylineTrajectoryPositioner::makeUpdatedEntityStatus() const -> std::optional<EntityStatus>
+{
+  const auto desired_local_acceleration = validatedEntityDesiredLinearAcceleration();
+  const auto desired_speed = validatedEntityDesiredSpeed(desired_local_acceleration);
+  const auto desired_local_velocity = validatedEntityDesiredLocalVelocity(desired_speed);
+
+  /// @note cancel step if is close to the nearest waypoint and requires a large change of direction
+  if (
+    validated_entity_status_.linearSpeed() * step_time_ > distance_to_nearest_waypoint_ and
+    math::geometry::innerProduct(desired_local_velocity, validated_entity_status_.velocity()) <
+      0.0) {
+    return std::nullopt;
+  }
+
+  validatePredictedState(desired_local_acceleration);
+  if (isNearestWaypointReachable(desired_local_acceleration)) {
+    return validated_entity_status_.buildUpdatedEntityStatus(desired_local_velocity);
+  } else {
+    return std::nullopt;
+  }
+}
+
+auto PolylineTrajectoryPositioner::getWaypoints() const noexcept(true) -> const Waypoints &
 {
   return polyline_trajectory_.shape.vertices;
 }
 
 auto PolylineTrajectoryPositioner::getNearestWaypointWithSpecifiedTimeIterator() const
-  -> std::vector<traffic_simulator_msgs::msg::Vertex>::const_iterator
+  -> WaypointIterator
 {
   return std::find_if(getWaypoints().cbegin(), getWaypoints().cend(), [](const auto & vertex) {
-    return not std::isnan(vertex.time);
+    return std::isfinite(vertex.time);
   });
 }
 
-auto PolylineTrajectoryPositioner::getTimeToWaypoint(
-  const traffic_simulator_msgs::msg::Vertex & waypoint) const -> double
+auto PolylineTrajectoryPositioner::getTimeToWaypoint(const Waypoint & waypoint) const -> double
 {
   const double time_difference = waypoint.time - validated_entity_status_.time();
   if (isAbsoluteBaseTime()) {
@@ -93,7 +113,7 @@ auto PolylineTrajectoryPositioner::areConditionsOfArrivalMet() const noexcept(tr
 
 auto PolylineTrajectoryPositioner::isAbsoluteBaseTime() const noexcept(true) -> bool
 {
-  return std::isnan(polyline_trajectory_.base_time);
+  return not std::isfinite(polyline_trajectory_.base_time);
 }
 /**
  * @note
@@ -212,20 +232,19 @@ auto PolylineTrajectoryPositioner::validatedTotalRemainingDistance() const -> do
    * future: if followingMode is follow, this distance calculation may be
    * inappropriate.
    */
-  const auto total_distance_to =
-    [this](const std::vector<traffic_simulator_msgs::msg::Vertex>::const_iterator last) {
-      return std::accumulate(
-        getWaypoints().cbegin(), last, 0.0,
-        [this](const double total_distance, const traffic_simulator_msgs::msg::Vertex & vertex) {
-          const auto next_vertex = std::next(&vertex);
-          return total_distance + distance::distanceAlongLanelet(
-                                    vertex.position, validated_entity_status_.boundingBox(),
-                                    next_vertex->position, validated_entity_status_.boundingBox(),
-                                    matching_distance_, hdmap_utils_ptr_)
-                                    .value_or(math::geometry::hypot(
-                                      vertex.position.position, next_vertex->position.position));
-        });
-    };
+  const auto total_distance_to = [this](const WaypointIterator last) {
+    return std::accumulate(
+      getWaypoints().cbegin(), last, 0.0,
+      [this](const double total_distance, const Waypoint & vertex) {
+        const auto next_vertex = std::next(&vertex);
+        return total_distance + distance::distanceAlongLanelet(
+                                  vertex.position, validated_entity_status_.boundingBox(),
+                                  next_vertex->position, validated_entity_status_.boundingBox(),
+                                  matching_distance_, hdmap_utils_ptr_)
+                                  .value_or(math::geometry::hypot(
+                                    vertex.position.position, next_vertex->position.position));
+      });
+  };
 
   const double total_remaining_distance = [&] {
     if (nearest_waypoint_with_specified_time_it_ == getWaypoints().cend()) {
@@ -385,28 +404,6 @@ auto PolylineTrajectoryPositioner::validatedEntityDesiredLinearAcceleration() co
       "Vehicle ", std::quoted(validated_entity_status_.name()),
       " - controller operation problem encountered. ",
       follow_waypoint_controller_.getFollowedWaypointDetails(polyline_trajectory_), e.what());
-  }
-}
-
-auto PolylineTrajectoryPositioner::makeUpdatedEntityStatus() const -> std::optional<EntityStatus>
-{
-  const auto desired_local_acceleration = validatedEntityDesiredLinearAcceleration();
-  const auto desired_speed = validatedEntityDesiredSpeed(desired_local_acceleration);
-  const auto desired_local_velocity = validatedEntityDesiredLocalVelocity(desired_speed);
-
-  /// @note cancel step if is close to the nearest waypoint and requires a large change of direction
-  if (
-    validated_entity_status_.linearSpeed() * step_time_ > distance_to_nearest_waypoint_ and
-    math::geometry::innerProduct(desired_local_velocity, validated_entity_status_.velocity()) <
-      0.0) {
-    return std::nullopt;
-  }
-
-  validatePredictedState(desired_local_acceleration);
-  if (isNearestWaypointReachable(desired_local_acceleration)) {
-    return validated_entity_status_.buildUpdatedEntityStatus(desired_local_velocity);
-  } else {
-    return std::nullopt;
   }
 }
 

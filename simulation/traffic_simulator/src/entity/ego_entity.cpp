@@ -166,12 +166,9 @@ auto EgoEntity::updateFieldOperatorApplication() -> void { spinSome(); }
 void EgoEntity::onUpdate(double current_time, double step_time)
 {
   const auto getTargetSpeed = [this]() -> double {
-    if (target_speed_.has_value()) {
-      return target_speed_.value();
-    } else {
-      return status_->getTwist().linear.x;
-    }
+    return target_speed_.value_or(status_->getTwist().linear.x);
   };
+
   EntityBase::onUpdate(current_time, step_time);
   if (is_controlled_by_simulator_) {
     if (const auto non_canonicalized_updated_status =

@@ -91,9 +91,9 @@ auto ValidatedEntityStatus::buildUpdatedEntityStatus(
   /// @note If it is the transition between lanelets: overwrite position to improve precision
   if (entity_status_.lanelet_pose_valid) {
     const auto canonicalized_lanelet_pose =
-      traffic_simulator::pose::toCanonicalizedLaneletPose(entity_status_.lanelet_pose);
+      pose::toCanonicalizedLaneletPose(entity_status_.lanelet_pose);
     const auto estimated_next_canonicalized_lanelet_pose =
-      traffic_simulator::pose::toCanonicalizedLaneletPose(updated_pose, include_crosswalk);
+      pose::toCanonicalizedLaneletPose(updated_pose, include_crosswalk);
     if (canonicalized_lanelet_pose && estimated_next_canonicalized_lanelet_pose) {
       const auto next_lanelet_id =
         static_cast<LaneletPose>(estimated_next_canonicalized_lanelet_pose.value()).lanelet_id;
@@ -118,19 +118,19 @@ auto ValidatedEntityStatus::buildUpdatedEntityStatus(
                                .linear(updated_twist_linear)
                                .angular(updated_twist_angular);
 
-  const auto updated_accel =
+  const auto updated_acceleration =
     geometry_msgs::build<geometry_msgs::msg::Accel>()
       .linear((updated_twist_linear - entity_status_.action_status.twist.linear) / step_time_)
       .angular((updated_twist_angular - entity_status_.action_status.twist.angular) / step_time_);
 
   const auto updated_linear_jerk =
-    (updated_accel.linear.x - entity_status_.action_status.accel.linear.x) / step_time_;
+    (updated_acceleration.linear.x - entity_status_.action_status.accel.linear.x) / step_time_;
 
   const auto updated_action_status =
     traffic_simulator_msgs::build<traffic_simulator_msgs::msg::ActionStatus>()
       .current_action(entity_status_.action_status.current_action)
       .twist(updated_twist)
-      .accel(updated_accel)
+      .accel(updated_acceleration)
       .linear_jerk(updated_linear_jerk);
 
   return traffic_simulator_msgs::build<traffic_simulator_msgs::msg::EntityStatus>()
@@ -147,8 +147,8 @@ auto ValidatedEntityStatus::buildUpdatedEntityStatus(
 
 auto ValidatedEntityStatus::validateStepTime(const double step_time) const noexcept(false) -> void
 {
-  // defined epsilon
-  if (step_time <= 0.0) {
+  static constexpr double step_time_tolerance = 1e-6;
+  if (step_time <= step_time_tolerance) {
     throwDetailedValidationError("step_time", step_time);
   }
 }

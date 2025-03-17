@@ -57,11 +57,7 @@ auto FollowPolylineTrajectoryAction::providedPorts() -> BT::PortsList
 auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
 {
   const auto getTargetSpeed = [this]() -> double {
-    if (target_speed.has_value()) {
-      return target_speed.value();
-    } else {
-      return canonicalized_entity_status->getTwist().linear.x;
-    }
+    return target_speed.value_or(canonicalized_entity_status->getTwist().linear.x);
   };
 
   if (getBlackBoardValues();

@@ -27,7 +27,9 @@ namespace traffic_simulator
 {
 namespace follow_trajectory
 {
-
+using Waypoint = traffic_simulator_msgs::msg::Vertex;
+using Waypoints = std::vector<Waypoint>;
+using WaypointIterator = Waypoints::const_iterator;
 struct PolylineTrajectoryPositioner
 {
 public:
@@ -42,13 +44,11 @@ public:
 
 private:
   // getters
-  auto getWaypoints() const noexcept(true)
-    -> const std::vector<traffic_simulator_msgs::msg::Vertex> &;
+  auto getWaypoints() const noexcept(true) -> const Waypoints &;
 
-  auto getNearestWaypointWithSpecifiedTimeIterator() const
-    -> std::vector<traffic_simulator_msgs::msg::Vertex>::const_iterator;
+  auto getNearestWaypointWithSpecifiedTimeIterator() const -> WaypointIterator;
 
-  auto getTimeToWaypoint(const traffic_simulator_msgs::msg::Vertex & waypoint) const -> double;
+  auto getTimeToWaypoint(const Waypoint & waypoint) const -> double;
 
   // checks
   auto areConditionsOfArrivalMet() const noexcept(true) -> bool;
@@ -91,8 +91,7 @@ private:
   const double step_time_;
   const double matching_distance_;
 
-  const std::vector<traffic_simulator_msgs::msg::Vertex>::const_iterator
-    nearest_waypoint_with_specified_time_it_;
+  const WaypointIterator nearest_waypoint_with_specified_time_it_;
   const geometry_msgs::msg::Pose nearest_waypoint_pose_;
   const double distance_to_nearest_waypoint_;
   const double total_remaining_distance_;
