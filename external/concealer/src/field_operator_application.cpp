@@ -264,13 +264,9 @@ auto FieldOperatorApplication::enableAutowareControl() -> void
 auto FieldOperatorApplication::engage() -> void
 {
   task_queue.delay([this]() {
-    try {
-      auto request = std::make_shared<Engage::Request>();
-      request->engage = true;
-      return requestEngage(request, 30);
-    } catch (const common::AutowareError &) {
-      return;  // Ignore error because this service is validated by Autoware state transition.
-    }
+    auto request = std::make_shared<Engage::Request>();
+    request->engage = true;
+    requestEngage(request, 30);
 
     waitForAutowareStateToBe("DRIVING");
 
@@ -310,20 +306,16 @@ auto FieldOperatorApplication::initialize(const geometry_msgs::msg::Pose & initi
         return;
       }
 #endif
-      try {
-        auto request =
-          std::make_shared<autoware_adapi_v1_msgs::srv::InitializeLocalization::Request>();
-        request->pose.push_back([&]() {
-          auto initial_pose_stamped = geometry_msgs::msg::PoseWithCovarianceStamped();
-          initial_pose_stamped.header.stamp = get_clock()->now();
-          initial_pose_stamped.header.frame_id = "map";
-          initial_pose_stamped.pose.pose = initial_pose;
-          return initial_pose_stamped;
-        }());
-        return requestInitialPose(request, 30);
-      } catch (const common::AutowareError &) {
-        return;  // Ignore error because this service is validated by Autoware state transition.
-      }
+      auto request =
+        std::make_shared<autoware_adapi_v1_msgs::srv::InitializeLocalization::Request>();
+      request->pose.push_back([&]() {
+        auto initial_pose_stamped = geometry_msgs::msg::PoseWithCovarianceStamped();
+        initial_pose_stamped.header.stamp = get_clock()->now();
+        initial_pose_stamped.header.frame_id = "map";
+        initial_pose_stamped.pose.pose = initial_pose;
+        return initial_pose_stamped;
+      }());
+      requestInitialPose(request, 30);
 
       waitForAutowareStateToBe("WAITING_FOR_ROUTE");
     });
@@ -336,8 +328,6 @@ auto FieldOperatorApplication::plan(const std::vector<geometry_msgs::msg::PoseSt
   assert(not route.empty());
 
   task_queue.delay([this, route] {
-    waitForAutowareStateToBe("WAITING_FOR_ROUTE");  // NOTE: This is assertion.
-
     auto request = std::make_shared<SetRoutePoints::Request>();
 
     request->header = route.back().header;
