@@ -80,7 +80,8 @@ struct LegacyAutowareState
   explicit LegacyAutowareState(
     const autoware_adapi_v1_msgs::msg::LocalizationInitializationState & localization_state,
     const autoware_adapi_v1_msgs::msg::RouteState & route_state,
-    const autoware_adapi_v1_msgs::msg::OperationModeState & operation_mode_state)
+    const autoware_adapi_v1_msgs::msg::OperationModeState & operation_mode_state,
+    const rclcpp::Time & now)
   : value([&]() {
       /*
          See https://github.com/autowarefoundation/autoware.universe/blob/e60daf7d1c85208eaac083b90c181e224c2ac513/system/autoware_default_adapi/document/autoware-state.md
@@ -96,11 +97,15 @@ struct LegacyAutowareState
             case autoware_adapi_v1_msgs::msg::RouteState::UNKNOWN:
               return initializing;
 
+            case autoware_adapi_v1_msgs::msg::RouteState::ARRIVED:
+              if (const auto duration = now - rclcpp::Time(route_state.stamp);
+                  duration.seconds() < 2.0) {
+                return arrived_goal;
+              }
+              [[fallthrough]];
+
             case autoware_adapi_v1_msgs::msg::RouteState::UNSET:
               return waiting_for_route;
-
-            case autoware_adapi_v1_msgs::msg::RouteState::ARRIVED:
-              return arrived_goal;
 
             case autoware_adapi_v1_msgs::msg::RouteState::SET:
             case autoware_adapi_v1_msgs::msg::RouteState::CHANGING:
