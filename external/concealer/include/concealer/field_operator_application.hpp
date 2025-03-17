@@ -91,16 +91,16 @@ struct FieldOperatorApplication : public rclcpp::Node
 #if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)
   Subscriber<LocalizationInitializationState> getLocalizationState;
 #endif
-  Subscriber<MrmState>                 getMrmState;
+  Subscriber<MrmState>                        getMrmState;
 #if __has_include(<autoware_adapi_v1_msgs/msg/operation_mode_state.hpp>)
-  Subscriber<OperationModeState>       getOperationModeState;
+  Subscriber<OperationModeState>              getOperationModeState;
 #endif
-  Subscriber<priority::PathWithLaneId> getPathWithLaneId;
+  Subscriber<priority::PathWithLaneId>        getPathWithLaneId;
 #if __has_include(<autoware_adapi_v1_msgs/msg/route_state.hpp>)
-  Subscriber<RouteState>               getRouteState;
+  Subscriber<RouteState>                      getRouteState;
 #endif
-  Subscriber<Trajectory>               getTrajectory;
-  Subscriber<TurnIndicatorsCommand>    getTurnIndicatorsCommand;
+  Subscriber<Trajectory>                      getTrajectory;
+  Subscriber<TurnIndicatorsCommand>           getTurnIndicatorsCommand;
 
   Service<ClearRoute>             requestClearRoute;
   Service<CooperateCommands>      requestCooperateCommands;

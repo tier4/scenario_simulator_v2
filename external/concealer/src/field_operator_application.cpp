@@ -264,13 +264,26 @@ auto FieldOperatorApplication::enableAutowareControl() -> void
 auto FieldOperatorApplication::engage() -> void
 {
   task_queue.delay([this]() {
-    auto request = std::make_shared<Engage::Request>();
-    request->engage = true;
-    requestEngage(request, 30);
-
-    waitForAutowareStateToBe(LegacyAutowareState::driving);
-
-    time_limit = std::decay_t<decltype(time_limit)>::max();
+    switch (const auto state = getLegacyAutowareState(); state.value) {
+      default:
+        throw common::AutowareError(
+          "The simulator attempted to request Autoware to engage, but was aborted because "
+          "Autoware's current state is ",
+          state, ".");
+      case LegacyAutowareState::planning:
+        waitForAutowareStateToBe(LegacyAutowareState::waiting_for_engage);
+        [[fallthrough]];
+      case LegacyAutowareState::waiting_for_engage:
+        requestEngage(
+          [&]() {
+            auto request = std::make_shared<Engage::Request>();
+            request->engage = true;
+            return request;
+          }(),
+          30);
+        time_limit = std::decay_t<decltype(time_limit)>::max();
+        break;
+    }
   });
 }
 
@@ -302,23 +315,29 @@ auto FieldOperatorApplication::initialize(const geometry_msgs::msg::Pose & initi
 {
   if (not std::exchange(initialized, true)) {
     task_queue.delay([this, initial_pose]() {
-#if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)
-      if (getLocalizationState().state != LocalizationInitializationState::UNINITIALIZED) {
-        return;
+      switch (const auto state = getLegacyAutowareState(); state.value) {
+        default:
+          throw common::AutowareError(
+            "The simulator attempted to initialize Autoware, but aborted because Autoware's "
+            "current state is ",
+            state, ".");
+        case LegacyAutowareState::initializing:
+          requestInitialPose(
+            [&]() {
+              auto request =
+                std::make_shared<autoware_adapi_v1_msgs::srv::InitializeLocalization::Request>();
+              request->pose.push_back([&]() {
+                auto initial_pose_stamped = geometry_msgs::msg::PoseWithCovarianceStamped();
+                initial_pose_stamped.header.stamp = get_clock()->now();
+                initial_pose_stamped.header.frame_id = "map";
+                initial_pose_stamped.pose.pose = initial_pose;
+                return initial_pose_stamped;
+              }());
+              return request;
+            }(),
+            30);
+          break;
       }
-#endif
-      auto request =
-        std::make_shared<autoware_adapi_v1_msgs::srv::InitializeLocalization::Request>();
-      request->pose.push_back([&]() {
-        auto initial_pose_stamped = geometry_msgs::msg::PoseWithCovarianceStamped();
-        initial_pose_stamped.header.stamp = get_clock()->now();
-        initial_pose_stamped.header.frame_id = "map";
-        initial_pose_stamped.pose.pose = initial_pose;
-        return initial_pose_stamped;
-      }());
-      requestInitialPose(request, 30);
-
-      waitForAutowareStateToBe(LegacyAutowareState::waiting_for_route);
     });
   }
 }
@@ -329,39 +348,53 @@ auto FieldOperatorApplication::plan(const std::vector<geometry_msgs::msg::PoseSt
   assert(not route.empty());
 
   task_queue.delay([this, route] {
-    auto request = std::make_shared<SetRoutePoints::Request>();
+    switch (const auto state = getLegacyAutowareState(); state.value) {
+      default:
+        throw common::AutowareError(
+          "The simulator attempted to send a goal to Autoware, but was aborted because Autoware's "
+          "current state is ",
+          state, ".");
+      case LegacyAutowareState::initializing:
+      case LegacyAutowareState::arrived_goal:
+        waitForAutowareStateToBe(LegacyAutowareState::waiting_for_route);
+        [[fallthrough]];
+      case LegacyAutowareState::waiting_for_route:
+        requestSetRoutePoints(
+          [&]() {
+            auto request = std::make_shared<SetRoutePoints::Request>();
 
-    request->header = route.back().header;
+            request->header = route.back().header;
+            request->goal = route.back().pose;
 
-    /*
-       NOTE: The autoware_adapi_v1_msgs::srv::SetRoutePoints::Request type was
-       created on 2022/09/05 [1], and the autoware_adapi_v1_msgs::msg::Option
-       type data member was added to the
-       autoware_adapi_v1_msgs::srv::SetRoutePoints::Request type on 2023/04/12
-       [2]. Therefore, we cannot expect
-       autoware_adapi_v1_msgs::srv::SetRoutePoints::Request to always have a
-       data member `option`.
+            for (const auto & each : route | boost::adaptors::sliced(0, route.size() - 1)) {
+              request->waypoints.push_back(each.pose);
+            }
 
-       [1] https://github.com/autowarefoundation/autoware_adapi_msgs/commit/805f8ebd3ca24564844df9889feeaf183101fbef
-       [2] https://github.com/autowarefoundation/autoware_adapi_msgs/commit/cf310bd038673b6cbef3ae3b61dfe607212de419
-    */
-    if constexpr (
-      DetectMember_option<SetRoutePoints::Request>::value and
-      DetectMember_allow_goal_modification<
-        decltype(std::declval<SetRoutePoints::Request>().option)>::value) {
-      request->option.allow_goal_modification =
-        common::getParameter<bool>(get_node_parameters_interface(), "allow_goal_modification");
+            /*
+               NOTE: The autoware_adapi_v1_msgs::srv::SetRoutePoints::Request
+               type was created on 2022/09/05 [1], and the
+               autoware_adapi_v1_msgs::msg::Option type data member was added
+               to the autoware_adapi_v1_msgs::srv::SetRoutePoints::Request type
+               on 2023/04/12 [2]. Therefore, we cannot expect
+               autoware_adapi_v1_msgs::srv::SetRoutePoints::Request to always
+               have a data member `option`.
+
+               [1] https://github.com/autowarefoundation/autoware_adapi_msgs/commit/805f8ebd3ca24564844df9889feeaf183101fbef
+               [2] https://github.com/autowarefoundation/autoware_adapi_msgs/commit/cf310bd038673b6cbef3ae3b61dfe607212de419
+             */
+            if constexpr (
+              DetectMember_option<SetRoutePoints::Request>::value and
+              DetectMember_allow_goal_modification<
+                decltype(std::declval<SetRoutePoints::Request>().option)>::value) {
+              request->option.allow_goal_modification = common::getParameter<bool>(
+                get_node_parameters_interface(), "allow_goal_modification");
+            }
+
+            return request;
+          }(),
+          30);
+        break;
     }
-
-    request->goal = route.back().pose;
-
-    for (const auto & each : route | boost::adaptors::sliced(0, route.size() - 1)) {
-      request->waypoints.push_back(each.pose);
-    }
-
-    requestSetRoutePoints(request, 30);
-
-    waitForAutowareStateToBe(LegacyAutowareState::waiting_for_engage);
   });
 }
 
