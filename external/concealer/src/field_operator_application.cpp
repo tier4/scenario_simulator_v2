@@ -80,7 +80,7 @@ auto toModuleType(const std::string & module_name)
 FieldOperatorApplication::FieldOperatorApplication(const pid_t pid)
 : rclcpp::Node("concealer_user", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),
   process_id(pid),
-  time_limit(std::chrono::steady_clock::now() + std::chrono::seconds(getParameter<int>("initialize_duration"))),
+  time_limit(std::chrono::steady_clock::now() + std::chrono::seconds(common::getParameter<int>("initialize_duration"))),
   getAutowareState("/autoware/state", rclcpp::QoS(1), *this, [this](const auto & message) {
     auto state_name_of = [](auto state) constexpr {
       switch (state) {
@@ -200,14 +200,8 @@ FieldOperatorApplication::~FieldOperatorApplication()
     }();
 
     const auto timeout = []() {
-      auto sigterm_timeout = [](auto value) {
-        auto node = rclcpp::Node("get_parameter_sigterm_timeout", "simulation");
-        node.declare_parameter<int>("sigterm_timeout", value);
-        node.get_parameter<int>("sigterm_timeout", value);
-        return value;
-      };
       auto timeout = timespec();
-      timeout.tv_sec = sigterm_timeout(5);
+      timeout.tv_sec = common::getParameter<int>("sigterm_timeout", 5);
       timeout.tv_nsec = 0;
       return timeout;
     }();
@@ -382,7 +376,7 @@ auto FieldOperatorApplication::plan(const std::vector<geometry_msgs::msg::PoseSt
       DetectMember_allow_goal_modification<
         decltype(std::declval<SetRoutePoints::Request>().option)>::value) {
       request->option.allow_goal_modification =
-        get_parameter("allow_goal_modification").get_value<bool>();
+        common::getParameter<bool>(get_node_parameters_interface(), "allow_goal_modification");
     }
 
     request->goal = route.back().pose;
