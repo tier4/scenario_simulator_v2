@@ -59,9 +59,9 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   DECLARE_PARAMETER(record);
   DECLARE_PARAMETER(record_storage_id);
 
-  declare_parameter<std::string>("speed_condition", "legacy");
   SpeedCondition::compatibility =
-    boost::lexical_cast<Compatibility>(get_parameter("speed_condition").as_string());
+    boost::lexical_cast<Compatibility>(common::getParameter<std::string>(
+      get_node_parameters_interface(), "speed_condition", "legacy"));
 }
 
 Interpreter::~Interpreter() {}
@@ -125,12 +125,8 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
 
       // CanonicalizedLaneletPose is also used on the OpenScenarioInterpreter side as NativeLanePose.
       // so canonicalization takes place here - it uses the value of the consider_pose_by_road_slope parameter
-      traffic_simulator::lanelet_pose::CanonicalizedLaneletPose::setConsiderPoseByRoadSlope([&]() {
-        if (not has_parameter("consider_pose_by_road_slope")) {
-          declare_parameter("consider_pose_by_road_slope", false);
-        }
-        return get_parameter("consider_pose_by_road_slope").as_bool();
-      }());
+      traffic_simulator::lanelet_pose::CanonicalizedLaneletPose::setConsiderPoseByRoadSlope(
+        common::getParameter<bool>("consider_pose_by_road_slope"));
 
       if (script->category.is<ScenarioDefinition>()) {
         scenarios = {std::dynamic_pointer_cast<ScenarioDefinition>(script->category)};
