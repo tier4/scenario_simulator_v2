@@ -153,55 +153,21 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
       },
       [this]() {
         const auto evaluate_time = execution_timer.invoke("evaluate", [this]() {
-          if (std::isnan(evaluateSimulationTime())) {
-            auto engaged = [this]() {
-              return std::all_of(
-                currentScenarioDefinition()->entities.begin(),
-                currentScenarioDefinition()->entities.end(), [this](const auto & each) {
-                  return std::apply(
-                    [this](const auto & name, const auto & object) {
-                      return not object.template is<ScenarioObject>() or
-                             not object.template as<ScenarioObject>().is_added or
-                             not object.template as<ScenarioObject>()
-                                   .object_controller.isAutoware() or
-                             NonStandardOperation::isEngaged(name);
-                    },
-                    each);
-                });
-            };
-
-            auto engageable = [this]() {
-              return std::all_of(
-                currentScenarioDefinition()->entities.begin(),
-                currentScenarioDefinition()->entities.end(), [this](const auto & each) {
-                  return std::apply(
-                    [this](const auto & name, const auto & object) {
-                      return not object.template is<ScenarioObject>() or
-                             not object.template as<ScenarioObject>().is_added or
-                             not object.template as<ScenarioObject>()
-                                   .object_controller.isAutoware() or
-                             NonStandardOperation::isEngageable(name);
-                    },
-                    each);
-                });
-            };
-
-            auto engage = [this]() {
-              for (const auto & [name, object] : currentScenarioDefinition()->entities) {
-                if (
-                  object.template is<ScenarioObject>() and
-                  object.template as<ScenarioObject>().is_added and
-                  object.template as<ScenarioObject>().object_controller.isAutoware()) {
-                  NonStandardOperation::engage(name);
-                }
-              }
-            };
-
-            if (engaged()) {
-              return activateNonUserDefinedControllers();
-            } else if (engageable()) {
-              return engage();
-            }
+          if (
+            std::isnan(evaluateSimulationTime()) and
+            std::all_of(
+              currentScenarioDefinition()->entities.begin(),
+              currentScenarioDefinition()->entities.end(), [this](const auto & each) {
+                return std::apply(
+                  [this](const auto & name, const Object & object) {
+                    return not object.is<ScenarioObject>() or
+                           not object.as<ScenarioObject>().is_added or
+                           not object.as<ScenarioObject>().object_controller.isAutoware() or
+                           NonStandardOperation::isEngaged(name);
+                  },
+                  each);
+              })) {
+            return activateNonUserDefinedControllers();
           } else if (currentScenarioDefinition()) {
             currentScenarioDefinition()->evaluate();
           } else {
@@ -295,6 +261,15 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 
         if (currentScenarioDefinition()) {
           currentScenarioDefinition()->storyboard.init.evaluateInstantaneousActions();
+
+          for (const auto & [name, object] : currentScenarioDefinition()->entities) {
+            if (
+              object.template is<ScenarioObject>() and
+              object.template as<ScenarioObject>().is_added and
+              object.template as<ScenarioObject>().object_controller.isAutoware()) {
+              NonStandardOperation::engage(name);
+            }
+          }
         } else {
           throw Error("No script evaluable.");
         }
