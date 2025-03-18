@@ -21,6 +21,16 @@ Changelog for package traffic_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+14.0.1 (2025-03-18)
+-------------------
+* Merge pull request `#1536 <https://github.com/tier4/scenario_simulator_v2/issues/1536>`_ from tier4/feature/support-internal-repository
+  Make Certain Member Functions Public for context_gamma_planner
+* Merge branch 'master' into feature/support-internal-repository
+* Merge branch 'master' into feature/support-internal-repository
+* Merge branch 'master' into feature/support-internal-repository
+* Fix for intternal repository
+* Contributors: Masaya Kataoka, Taiga, Taiga Takano
+
 14.0.0 (2025-03-14)
 -------------------
 * Merge pull request `#1546 <https://github.com/tier4/scenario_simulator_v2/issues/1546>`_ from tier4/refactor/concealer-5
