@@ -106,14 +106,6 @@ public:
                             traffic_simulator::RoutingConfiguration().routing_graph_type) const
     -> lanelet::Ids;
 
-  auto getDistanceToStopLine(
-    const lanelet::Ids & route_lanelets,
-    const math::geometry::CatmullRomSplineInterface & spline) const -> std::optional<double>;
-
-  auto getDistanceToStopLine(
-    const lanelet::Ids & route_lanelets,
-    const std::vector<geometry_msgs::msg::Point> & waypoints) const -> std::optional<double>;
-
   auto getDistanceToTrafficLightStopLine(
     const lanelet::Ids & route_lanelets,
     const math::geometry::CatmullRomSplineInterface & spline) const -> std::optional<double>;
@@ -212,12 +204,6 @@ public:
     const lanelet::Ids &, const traffic_simulator::RoutingGraphType type =
                             traffic_simulator::RoutingConfiguration().routing_graph_type) const
     -> double;
-
-  auto getStopLineIds() const -> lanelet::Ids;
-
-  auto getStopLineIdsOnPath(const lanelet::Ids & route_lanelets) const -> lanelet::Ids;
-
-  auto getStopLinePolygon(const lanelet::Id) const -> std::vector<geometry_msgs::msg::Point>;
 
   auto getTangentVector(const lanelet::Id, const double s) const
     -> std::optional<geometry_msgs::msg::Vector3>;
@@ -349,10 +335,6 @@ private:
     const geometry_msgs::msg::Pose & from, const traffic_simulator_msgs::msg::LaneletPose & to,
     const traffic_simulator::lane_change::TrajectoryShape,
     const double tangent_vector_size = 100) const -> math::geometry::HermiteCurve;
-
-  auto getStopLines() const -> lanelet::ConstLineStrings3d;
-
-  auto getStopLinesOnPath(const lanelet::Ids &) const -> lanelet::ConstLineStrings3d;
 
   auto getTrafficLightRegulatoryElementsOnPath(const lanelet::Ids &) const
     -> std::vector<std::shared_ptr<const lanelet::autoware::AutowareTrafficLight>>;

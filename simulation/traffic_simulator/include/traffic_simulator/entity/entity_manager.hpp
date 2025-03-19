@@ -18,6 +18,7 @@
 #include <tf2_ros/static_transform_broadcaster.h>
 #include <tf2_ros/transform_broadcaster.h>
 
+#include <get_parameter/get_parameter.hpp>
 #include <traffic_simulator/api/configuration.hpp>
 #include <traffic_simulator/entity/ego_entity.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
@@ -65,7 +66,7 @@ public:
       node, "lanelet/marker", LaneletMarkerQoS(),
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
     hdmap_utils_ptr_(std::make_shared<hdmap_utils::HdMapUtils>(
-      configuration.lanelet2_map_path(), getOrigin(node_parameters))),
+      configuration_.lanelet2_map_path(), getOrigin(*node))),
     markers_raw_(hdmap_utils_ptr_->generateMarker())
   {
     updateHdmapMarker();
@@ -223,6 +224,17 @@ public:
 
   // traffics, lanelet
   auto getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &;
+
+  template <typename Node>
+  auto getOrigin(Node & node) const
+  {
+    geographic_msgs::msg::GeoPoint origin;
+    origin.latitude = common::getParameter<decltype(origin.latitude)>(
+      node.get_node_parameters_interface(), "origin_latitude");
+    origin.longitude = common::getParameter<decltype(origin.longitude)>(
+      node.get_node_parameters_interface(), "origin_longitude");
+    return origin;
+  }
 
 private:
   /* */ Configuration configuration_;
