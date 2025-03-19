@@ -1,17 +1,19 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>openscenario_utility</name>
+  <name>get_parameter</name>
   <version>14.0.1</version>
-  <description>Utility tools for ASAM OpenSCENARIO 1.2.0</description>
+  <description>Thin wrapper for rclcpp::Node::get_parameter</description>
   <maintainer email="tatsuya.yamasaki@tier4.jp">Tatsuya Yamasaki</maintainer>
   <license>Apache License 2.0</license>
   <buildtool_depend>ament_cmake</buildtool_depend>
-  <buildtool_depend>ament_cmake_python</buildtool_depend>
-  <depend>python3-numpy</depend>
-  <depend>python3-xmlschema</depend>
-  <depend>python3-yaml</depend>
-  <depend>rclpy</depend>
+  <buildtool_depend>ament_cmake_auto</buildtool_depend>
+  <depend>rclcpp</depend>
+  <test_depend>ament_cmake_clang_format</test_depend>
+  <test_depend>ament_cmake_copyright</test_depend>
+  <test_depend>ament_cmake_gtest</test_depend>
+  <test_depend>ament_cmake_lint_cmake</test_depend>
+  <test_depend>ament_lint_auto</test_depend>
   <export>
     <build_type>ament_cmake</build_type>
   </export>
