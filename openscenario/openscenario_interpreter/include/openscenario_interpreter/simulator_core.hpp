@@ -300,7 +300,7 @@ public:
     }
 
     template <typename... Ts>
-    static auto applyAddEntityAction(Ts &&... xs)
+    static auto applyAddEntityAction(Ts &&... xs) -> decltype(auto)
     {
       return core->spawn(std::forward<decltype(xs)>(xs)...);
     }

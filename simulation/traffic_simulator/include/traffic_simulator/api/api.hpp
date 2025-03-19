@@ -109,108 +109,76 @@ public:
   auto updateFrame() -> bool;
 
   // entities, ego - spawn
-  template <typename Pose>
+  template <
+    typename PoseType, typename ParamsType,
+    typename = std::enable_if_t<std::disjunction_v<
+      std::is_same<std::decay_t<ParamsType>, traffic_simulator_msgs::msg::VehicleParameters>,
+      std::is_same<std::decay_t<ParamsType>, traffic_simulator_msgs::msg::PedestrianParameters>,
+      std::is_same<std::decay_t<ParamsType>, traffic_simulator_msgs::msg::MiscObjectParameters>>>>
   auto spawn(
-    const std::string & name, const Pose & pose,
-    const traffic_simulator_msgs::msg::VehicleParameters & parameters,
-    const std::string & behavior = VehicleBehavior::defaultBehavior(),
-    const std::string & model3d = "")
+    const std::string & name, const PoseType & pose, const ParamsType & parameters,
+    const std::string & behavior = "", const std::string & model3d = "") -> entity::EntityBase &
   {
-    auto register_to_entity_manager = [&]() {
-      if (behavior == VehicleBehavior::autoware()) {
-        return entity_manager_ptr_->isEntityExist(name) or
-               entity_manager_ptr_->spawnEntity<entity::EgoEntity>(
-                 name, pose, parameters, getCurrentTime(), configuration_, node_parameters_);
-      } else {
-        return entity_manager_ptr_->spawnEntity<entity::VehicleEntity>(
-          name, pose, parameters, getCurrentTime(), behavior);
+    using VehicleParameters = traffic_simulator_msgs::msg::VehicleParameters;
+    using PedestrianParameters = traffic_simulator_msgs::msg::PedestrianParameters;
+    using MiscObjectParameters = traffic_simulator_msgs::msg::MiscObjectParameters;
+
+    auto register_to_entity_manager = [&]() -> entity::EntityBase & {
+      if constexpr (std::is_same_v<ParamsType, VehicleParameters>) {
+        if (behavior == VehicleBehavior::autoware()) {
+          return entity_manager_ptr_->spawnEntity<entity::EgoEntity>(
+            name, pose, parameters, getCurrentTime(), configuration_, node_parameters_);
+        } else {
+          return entity_manager_ptr_->spawnEntity<entity::VehicleEntity>(
+            name, pose, parameters, getCurrentTime(),
+            behavior.empty() ? VehicleBehavior::defaultBehavior() : behavior);
+        }
+      } else if constexpr (std::is_same_v<ParamsType, PedestrianParameters>) {
+        return entity_manager_ptr_->spawnEntity<entity::PedestrianEntity>(
+          name, pose, parameters, getCurrentTime(),
+          behavior.empty() ? PedestrianBehavior::defaultBehavior() : behavior);
+      } else if constexpr (std::is_same_v<ParamsType, MiscObjectParameters>) {
+        return entity_manager_ptr_->spawnEntity<entity::MiscObjectEntity>(
+          name, pose, parameters, getCurrentTime());
       }
     };
 
-    auto register_to_environment_simulator = [&]() {
+    auto prepare_and_send_request = [&](const auto & entity, auto & request) -> bool {
+      simulation_interface::toProto(parameters, *request.mutable_parameters());
+      request.mutable_parameters()->set_name(name);
+      request.set_asset_key(model3d);
+      simulation_interface::toProto(entity.getMapPose(), *request.mutable_pose());
+      return zeromq_client_.call(request).result().success();
+    };
+
+    auto register_to_environment_simulator = [&](const auto & entity) -> bool {
       if (configuration_.standalone_mode) {
         return true;
-      } else if (!entity_manager_ptr_->isEntityExist(name)) {
-        throw common::SemanticError(
-          "Entity ", name, " can not be registered in simulator - it has not been spawned yet.");
       } else {
-        simulation_api_schema::SpawnVehicleEntityRequest req;
-        simulation_interface::toProto(parameters, *req.mutable_parameters());
-        req.mutable_parameters()->set_name(name);
-        req.set_asset_key(model3d);
-        simulation_interface::toProto(
-          entity_manager_ptr_->getEntity(name).getMapPose(), *req.mutable_pose());
-        req.set_is_ego(behavior == VehicleBehavior::autoware());
-        /// @todo Should be filled from function API
-        req.set_initial_speed(0.0);
-        return zeromq_client_.call(req).result().success();
+        if constexpr (std::is_same_v<ParamsType, VehicleParameters>) {
+          simulation_api_schema::SpawnVehicleEntityRequest request;
+          request.set_is_ego(behavior == VehicleBehavior::autoware());
+          /// @todo Should be filled from function API
+          request.set_initial_speed(0.0);
+          return prepare_and_send_request(entity, request);
+        } else if constexpr (std::is_same_v<ParamsType, PedestrianParameters>) {
+          simulation_api_schema::SpawnPedestrianEntityRequest request;
+          return prepare_and_send_request(entity, request);
+        } else if constexpr (std::is_same_v<ParamsType, MiscObjectParameters>) {
+          simulation_api_schema::SpawnMiscObjectEntityRequest request;
+          return prepare_and_send_request(entity, request);
+        } else {
+          return false;
+        }
       }
     };
 
-    return register_to_entity_manager() and register_to_environment_simulator();
-  }
-
-  template <typename PoseType>
-  auto spawn(
-    const std::string & name, const PoseType & pose,
-    const traffic_simulator_msgs::msg::PedestrianParameters & parameters,
-    const std::string & behavior = PedestrianBehavior::defaultBehavior(),
-    const std::string & model3d = "")
-  {
-    auto register_to_entity_manager = [&]() {
-      return entity_manager_ptr_->spawnEntity<entity::PedestrianEntity>(
-        name, pose, parameters, getCurrentTime(), behavior);
-    };
-
-    auto register_to_environment_simulator = [&]() {
-      if (configuration_.standalone_mode) {
-        return true;
-      } else if (!entity_manager_ptr_->isEntityExist(name)) {
-        throw common::SemanticError(
-          "Entity ", name, " can not be registered in simulator - it has not been spawned yet.");
-      } else {
-        simulation_api_schema::SpawnPedestrianEntityRequest req;
-        simulation_interface::toProto(parameters, *req.mutable_parameters());
-        req.mutable_parameters()->set_name(name);
-        req.set_asset_key(model3d);
-        simulation_interface::toProto(
-          entity_manager_ptr_->getEntity(name).getMapPose(), *req.mutable_pose());
-        return zeromq_client_.call(req).result().success();
-      }
-    };
-
-    return register_to_entity_manager() and register_to_environment_simulator();
-  }
-
-  template <typename PoseType>
-  auto spawn(
-    const std::string & name, const PoseType & pose,
-    const traffic_simulator_msgs::msg::MiscObjectParameters & parameters,
-    const std::string & model3d = "")
-  {
-    auto register_to_entity_manager = [&]() {
-      return entity_manager_ptr_->spawnEntity<entity::MiscObjectEntity>(
-        name, pose, parameters, getCurrentTime());
-    };
-
-    auto register_to_environment_simulator = [&]() {
-      if (configuration_.standalone_mode) {
-        return true;
-      } else if (!entity_manager_ptr_->isEntityExist(name)) {
-        throw common::SemanticError(
-          "Entity ", name, " can not be registered in simulator - it has not been spawned yet.");
-      } else {
-        simulation_api_schema::SpawnMiscObjectEntityRequest req;
-        simulation_interface::toProto(parameters, *req.mutable_parameters());
-        req.mutable_parameters()->set_name(name);
-        req.set_asset_key(model3d);
-        simulation_interface::toProto(
-          entity_manager_ptr_->getEntity(name).getMapPose(), *req.mutable_pose());
-        return zeromq_client_.call(req).result().success();
-      }
-    };
-
-    return register_to_entity_manager() and register_to_environment_simulator();
+    auto & entity = register_to_entity_manager();
+    if (register_to_environment_simulator(entity)) {
+      return entity;
+    } else {
+      THROW_SEMANTIC_ERROR("Spawn entity ", std::quoted(name), " resulted in failure.");
+    }
   }
 
   // sensors - attach
