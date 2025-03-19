@@ -1,0 +1,42 @@
+name: Repository Dispatch Trigger
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [ "master" ]
+  push:
+    branches: [ "master" ]
+
+jobs:
+  trigger-repository-dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set Repository and Branch Info
+        id: set_repo_branch_info
+        run: |
+          echo "TARGET_REPOSITORY=${GITHUB_REPOSITORY}" >> $GITHUB_ENV
+          if [[ "$GITHUB_EVENT_NAME" == "pull_request" ]]; then
+            echo "TARGET_BRANCH=${{ github.event.pull_request.head.sha }}" >> $GITHUB_ENV
+          else
+            echo "TARGET_BRANCH=${GITHUB_SHA}" >> $GITHUB_ENV
+          fi
+
+      - name: Print Dispatch Data
+        run: |
+          echo "Dispatch Event Data:"
+          echo "Branch: ${{ env.TARGET_BRANCH }}"
+          echo "Repository: ${{ env.TARGET_REPOSITORY }}"
+
+      - name: Send Repository Dispatch Event
+        run: |
+          DISPATCH_OWNER=tier4
+          DISPATCH_REPOSITORY=context_gamma_planner
+          TARGET_BRANCH=${{ env.TARGET_BRANCH }}
+          TARGET_REPOSITORY=${{ env.TARGET_REPOSITORY }}
+
+          curl --fail \
+            -X POST \
+            -H "Authorization: token ${{ secrets.SECRET_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/$DISPATCH_OWNER/$DISPATCH_REPOSITORY/dispatches \
+            -d "{\"event_type\":\"on-demand-test\",\"client_payload\":{\"ref\":\"$TARGET_BRANCH\",\"repo\":\"$TARGET_REPOSITORY\"}}"
