@@ -75,10 +75,10 @@ auto longitudinalDistance(
       }
     }
 
-    const auto forward_distance = hdmap_utils_ptr->getLongitudinalDistance(
+    const auto forward_distance = lanelet_wrapper::distance::longitudinalDistance(
       static_cast<LaneletPose>(from), to_canonicalized, routing_configuration);
 
-    const auto backward_distance = hdmap_utils_ptr->getLongitudinalDistance(
+    const auto backward_distance = lanelet_wrapper::distance::longitudinalDistance(
       to_canonicalized, static_cast<LaneletPose>(from), routing_configuration);
 
     if (forward_distance && backward_distance) {
