@@ -48,7 +48,7 @@ struct PedestrianBehavior : public entity::PedestrianEntity::BuiltinBehavior
 class API
 {
 public:
-  template <typename NodeT, typename AllocatorT = std::allocator<void>, typename... Ts>
+  template <typename NodeT, typename AllocatorT = std::allocator<void>>
   explicit API(
     NodeT && node, const Configuration & configuration, const double realtime_factor,
     const double frame_rate)
