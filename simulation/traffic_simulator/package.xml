@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="3">
   <name>traffic_simulator</name>
-  <version>12.1.0</version>
+  <version>14.0.1</version>
   <description>control traffic flow</description>
 
   <maintainer email="masaya.kataoka@tier4.jp">masaya kataoka</maintainer>
@@ -43,6 +43,7 @@
   <depend>traffic_simulator_msgs</depend>
   <depend>visualization_msgs</depend>
   <depend>geometry</depend>
+  <depend>get_parameter</depend>
 
   <test_depend>ament_cmake_gtest</test_depend>
   <test_depend>ament_lint_auto</test_depend>

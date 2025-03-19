@@ -21,6 +21,106 @@ Changelog for package simple_sensor_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+14.0.1 (2025-03-18)
+-------------------
+* Merge branch 'master' into feature/support-internal-repository
+* Merge branch 'master' into feature/support-internal-repository
+* Merge branch 'master' into feature/support-internal-repository
+* Contributors: Masaya Kataoka, Taiga
+
+14.0.0 (2025-03-14)
+-------------------
+* Merge pull request `#1546 <https://github.com/tier4/scenario_simulator_v2/issues/1546>`_ from tier4/refactor/concealer-5
+  Refactor/concealer 5
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-5
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-5
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-5
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-5
+* Replace miscellaneous `get_parameter` calls with `common::getParameter`
+* Remove local function `get_parameter`
+* Remove free function `vehicle_simulation::getParameter`
+* Remove free function `concealer::getParameter`
+* Contributors: Masaya Kataoka, yamacir-kit
+
+13.0.0 (2025-03-14)
+-------------------
+* Merge branch 'master' into refactor/lanelet_wrapper_distance_to_stop_line
+* Merge branch 'master' into refactor/lanelet_wrapper_distance_to_stop_line
+* Merge branch 'master' into refactor/lanelet_wrapper_distance_to_stop_line
+* Merge branch 'master' into refactor/lanelet_wrapper_distance_to_stop_line
+* Merge branch 'master' into refactor/lanelet_wrapper_distance_to_stop_line
+* Contributors: Tatsuya Yamasaki
+
+12.3.2 (2025-03-13)
+-------------------
+* Merge branch 'master' into feature/faster-template-instantiation
+* Merge remote-tracking branch 'origin/master' into feature/faster-template-instantiation
+* Merge remote-tracking branch 'origin/master' into feature/faster-template-instantiation
+* Merge remote-tracking branch 'origin/master' into feature/faster-template-instantiation
+* Merge branch 'master' into feature/faster-template-instantiation
+* Merge remote-tracking branch 'origin/master' into feature/faster-template-instantiation
+* Merge remote-tracking branch 'origin/master' into feature/faster-template-instantiation
+* Contributors: Shota Minami, Tatsuya Yamasaki
+
+12.3.1 (2025-03-13)
+-------------------
+
+12.3.0 (2025-03-12)
+-------------------
+* Merge branch 'master' into metrics_output
+* Merge branch 'master' into metrics_output
+* Merge branch 'master' into metrics_output
+* Merge remote-tracking branch 'origin/master' into metrics_output
+* Merge branch 'master' into metrics_output
+* Merge branch 'master' into metrics_output
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
+12.2.1 (2025-03-11)
+-------------------
+* Merge branch 'master' into refactor/concealer-4
+* Merge branch 'master' into refactor/concealer-4
+* Merge branch 'master' into refactor/concealer-4
+* Merge branch 'master' into refactor/concealer-4
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
+12.2.0 (2025-03-10)
+-------------------
+* Merge pull request `#1355 <https://github.com/tier4/scenario_simulator_v2/issues/1355>`_ from tier4/feat/add_new_vehicle_model
+  feat: add new vehicle model
+* Merge branch 'master' into feat/add_new_vehicle_model
+* Merge branch 'master' into feat/add_new_vehicle_model
+* Merge branch 'master' into feat/add_new_vehicle_model
+* Merge branch 'master' into feat/add_new_vehicle_model
+* Resync `SimModelDelaySteerAccGearedWoFallGuard` with the upstream one
+  - https://github.com/autowarefoundation/autoware.universe/blob/337f0acb44a472c73b48dd89c5ca7e3df3937fcb/simulator/autoware_simple_planning_simulator/include/autoware/simple_planning_simulator/vehicle_model/sim_model_delay_steer_acc_geared_wo_fall_guard.hpp
+  - https://github.com/autowarefoundation/autoware.universe/blob/337f0acb44a472c73b48dd89c5ca7e3df3937fcb/simulator/autoware_simple_planning_simulator/src/simple_planning_simulator/vehicle_model/sim_model_delay_steer_acc_geared_wo_fall_guard.cpp
+* Replace obsolete member function call with new one
+* Merge branch 'master' into feat/add_new_vehicle_model
+* Revert "fix(simple_sensor_simulator): fix ego overwrite for DELAY_STEER_ACC_GEARED_WO_FALL_GUARD"
+  This reverts commit 61132540a2ca1ea88382ff189f5be2b25b2d0680.
+* fix(simple_sensor_sumulator): hard-copy source code of SimModelDelaySteerAccGearedWoFallGuard  from simple_planning_simulator from autoware.universe
+* ref(simple_sensor_simulator): apply clang reformat
+* fix(simple_sensor_simulator): fix ego overwrite for DELAY_STEER_ACC_GEARED_WO_FALL_GUARD
+* remove brake dead band
+* add vehicle case
+* add new file from psim
+* Contributors: Dawid Moszynski, Tatsuya Yamasaki, Yuki Takagi, yamacir-kit
+
+12.1.2 (2025-03-07)
+-------------------
+* Merge branch 'master' into xtk/loc-noise-exp
+* Contributors: Tatsuya Yamasaki
+
+12.1.1 (2025-03-07)
+-------------------
+* Merge pull request `#1541 <https://github.com/tier4/scenario_simulator_v2/issues/1541>`_ from tier4/fix/init_noise
+  fix: the noises are not initialized in detection_sensor's noise_v2
+* remove unnecessary changes.
+* use  member initializer list
+* clang-format
+* fix the bug that the noise is not initualized.
+* Contributors: Tatsuya Yamasaki, t4-adc
+
 12.1.0 (2025-03-05)
 -------------------
 * Merge pull request `#1532 <https://github.com/tier4/scenario_simulator_v2/issues/1532>`_ from tier4/feature/simple_sensor_simulator/new-noise-model

@@ -21,6 +21,100 @@ Changelog for package concealer
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+14.0.1 (2025-03-18)
+-------------------
+* Merge branch 'master' into feature/support-internal-repository
+* Merge branch 'master' into feature/support-internal-repository
+* Merge branch 'master' into feature/support-internal-repository
+* Contributors: Masaya Kataoka, Taiga
+
+14.0.0 (2025-03-14)
+-------------------
+* Merge pull request `#1546 <https://github.com/tier4/scenario_simulator_v2/issues/1546>`_ from tier4/refactor/concealer-5
+  Refactor/concealer 5
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-5
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-5
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-5
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-5
+* Replace miscellaneous `get_parameter` calls with `common::getParameter`
+* Remove free function `concealer::getParameter`
+* Contributors: Masaya Kataoka, yamacir-kit
+
+13.0.0 (2025-03-14)
+-------------------
+* Merge branch 'master' into refactor/lanelet_wrapper_distance_to_stop_line
+* Merge branch 'master' into refactor/lanelet_wrapper_distance_to_stop_line
+* Merge branch 'master' into refactor/lanelet_wrapper_distance_to_stop_line
+* Merge branch 'master' into refactor/lanelet_wrapper_distance_to_stop_line
+* Merge branch 'master' into refactor/lanelet_wrapper_distance_to_stop_line
+* Contributors: Tatsuya Yamasaki
+
+12.3.2 (2025-03-13)
+-------------------
+* Merge branch 'master' into feature/faster-template-instantiation
+* Merge remote-tracking branch 'origin/master' into feature/faster-template-instantiation
+* Merge remote-tracking branch 'origin/master' into feature/faster-template-instantiation
+* Merge remote-tracking branch 'origin/master' into feature/faster-template-instantiation
+* Merge branch 'master' into feature/faster-template-instantiation
+* Merge remote-tracking branch 'origin/master' into feature/faster-template-instantiation
+* Merge remote-tracking branch 'origin/master' into feature/faster-template-instantiation
+* Contributors: Shota Minami, Tatsuya Yamasaki
+
+12.3.1 (2025-03-13)
+-------------------
+
+12.3.0 (2025-03-12)
+-------------------
+* Merge branch 'master' into metrics_output
+* Merge branch 'master' into metrics_output
+* Merge branch 'master' into metrics_output
+* Merge remote-tracking branch 'origin/master' into metrics_output
+* Merge branch 'master' into metrics_output
+* Merge branch 'master' into metrics_output
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
+12.2.1 (2025-03-11)
+-------------------
+* Merge pull request `#1534 <https://github.com/tier4/scenario_simulator_v2/issues/1534>`_ from tier4/refactor/concealer-4
+  Refactor/concealer 4
+* Merge branch 'master' into refactor/concealer-4
+* Merge branch 'master' into refactor/concealer-4
+* Merge branch 'master' into refactor/concealer-4
+* Merge branch 'master' into refactor/concealer-4
+* Remove data member `Interpreter::engaged\_`
+* Remove data member `concealer::TaskQueue::is_thrown`
+* Remove data member `Interpreter::waiting_for_engagement_to_be_completed`
+* Remove data member `FieldOperatorApplication::is_autoware_exited`
+* Lipsticks
+* Remove struct template `TransitionAssertion`
+* Cleanup struct template `concealer::TransitionAssertion`
+* Remove macro `DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE`
+* Remove member function `FieldOperatorApplication::rethrow`
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki, yamacir-kit
+
+12.2.0 (2025-03-10)
+-------------------
+* Merge branch 'master' into feat/add_new_vehicle_model
+* Merge branch 'master' into feat/add_new_vehicle_model
+* Merge branch 'master' into feat/add_new_vehicle_model
+* Merge branch 'master' into feat/add_new_vehicle_model
+* Merge branch 'master' into feat/add_new_vehicle_model
+* Contributors: Tatsuya Yamasaki
+
+12.1.2 (2025-03-07)
+-------------------
+* Merge pull request `#1542 <https://github.com/tier4/scenario_simulator_v2/issues/1542>`_ from tier4/xtk/loc-noise-exp
+  feat: disable the localization noises when ego speed is slow
+* Merge branch 'master' into xtk/loc-noise-exp
+* Replace early-return with if-else
+* remove unused space.
+* configurize the speed_threshold
+* remove the noises when ego stop.
+* Contributors: Tatsuya Yamasaki, t4-adc, yamacir-kit
+
+12.1.1 (2025-03-07)
+-------------------
+
 12.1.0 (2025-03-05)
 -------------------
 * Merge pull request `#1532 <https://github.com/tier4/scenario_simulator_v2/issues/1532>`_ from tier4/feature/simple_sensor_simulator/new-noise-model
