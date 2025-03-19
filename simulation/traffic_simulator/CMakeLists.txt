@@ -49,6 +49,7 @@ ament_auto_add_library(traffic_simulator SHARED
   src/helper/ostream_helpers.cpp
   src/job/job.cpp
   src/job/job_list.cpp
+  src/lanelet_wrapper/distance.cpp
   src/lanelet_wrapper/lanelet_loader.cpp
   src/lanelet_wrapper/lanelet_map.cpp
   src/lanelet_wrapper/lanelet_wrapper.cpp
@@ -67,7 +68,6 @@ ament_auto_add_library(traffic_simulator SHARED
   src/traffic_lights/traffic_lights_base.cpp
   src/utils/distance.cpp
   src/utils/lanelet_map.cpp
-  src/utils/node_parameters.cpp
   src/utils/pose.cpp
 )
 

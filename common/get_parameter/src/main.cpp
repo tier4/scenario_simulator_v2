@@ -12,16 +12,4 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <traffic_simulator/utils/node_parameters.hpp>
-
-namespace traffic_simulator
-{
-auto getOrigin(const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node_parameters)
-  -> geographic_msgs::msg::GeoPoint
-{
-  geographic_msgs::msg::GeoPoint origin;
-  origin.latitude = getParameter(node_parameters, "origin_latitude", 0.0);
-  origin.longitude = getParameter(node_parameters, "origin_longitude", 0.0);
-  return origin;
-}
-}  // namespace traffic_simulator
+#include <get_parameter/get_parameter.hpp>

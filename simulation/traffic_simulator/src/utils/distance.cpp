@@ -15,6 +15,7 @@
 #include <geometry/bounding_box.hpp>
 #include <geometry/distance.hpp>
 #include <geometry/transform.hpp>
+#include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/lanelet_wrapper/lanelet_map.hpp>
 #include <traffic_simulator/lanelet_wrapper/pose.hpp>
 #include <traffic_simulator/utils/distance.hpp>
@@ -354,20 +355,6 @@ auto distanceToCrosswalk(
   } else {
     math::geometry::CatmullRomSpline spline(waypoints_array.waypoints);
     auto polygon = hdmap_utils_ptr->getLaneletPolygon(target_crosswalk_id);
-    return spline.getCollisionPointIn2D(polygon);
-  }
-}
-
-auto distanceToStopLine(
-  const traffic_simulator_msgs::msg::WaypointsArray & waypoints_array,
-  const lanelet::Id target_stop_line_id,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<double>
-{
-  if (waypoints_array.waypoints.empty()) {
-    return std::nullopt;
-  } else {
-    const math::geometry::CatmullRomSpline spline(waypoints_array.waypoints);
-    const auto polygon = hdmap_utils_ptr->getStopLinePolygon(target_stop_line_id);
     return spline.getCollisionPointIn2D(polygon);
   }
 }
