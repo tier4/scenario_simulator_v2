@@ -299,9 +299,7 @@ auto relativeLaneletPose(
       hdmap_utils_ptr)) {
     position.s = longitudinal_distance.value();
   }
-  if (
-    const auto lateral_distance =
-      lateralDistance(from, to, routing_configuration, hdmap_utils_ptr)) {
+  if (const auto lateral_distance = distance::lateralDistance(from, to, routing_configuration)) {
     position.offset = lateral_distance.value();
   }
   return position;
