@@ -21,6 +21,31 @@ Changelog for package traffic_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+14.0.2 (2025-03-19)
+-------------------
+* Merge pull request `#1540 <https://github.com/tier4/scenario_simulator_v2/issues/1540>`_ from tier4/RJD1057/change-order-of-members
+  RJD-1057: Change order of functions / variables
+* Merge remote-tracking branch 'origin/master' into RJD1057/change-order-of-members
+* Merge branch 'master' into RJD1057/change-order-of-members
+* Merge branch 'master' into RJD1057/change-order-of-members
+* Merge branch 'master' into RJD1057/change-order-of-members
+* Merge branch 'master' into RJD1057/change-order-of-members
+* Split constructor to some methods
+* Remove unused method
+* Change member declaration for styling
+* Remove unused include
+* Add missing const
+* Remove unnecessary namespace
+* Add comment for method category
+* Remove FORWARD_TO_ENTITY_MANAGER
+* Rename configuration like other private variables
+* Add Type suffix for some typename
+* Use auto for method
+* Refactor function order in traffic_simulator
+* Refactor order of api
+* Refactor function order in EntityManager
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, f0reachARR, ぐるぐる
+
 14.0.1 (2025-03-18)
 -------------------
 * Merge pull request `#1536 <https://github.com/tier4/scenario_simulator_v2/issues/1536>`_ from tier4/feature/support-internal-repository
