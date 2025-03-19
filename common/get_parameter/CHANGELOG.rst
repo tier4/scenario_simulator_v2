@@ -2,6 +2,11 @@
 Changelog for package get_parameter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+14.0.2 (2025-03-19)
+-------------------
+* Merge remote-tracking branch 'origin/master' into RJD1057/change-order-of-members
+* Contributors: f0reachARR
+
 14.0.1 (2025-03-18)
 -------------------
 * Merge branch 'master' into feature/support-internal-repository
