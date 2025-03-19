@@ -327,8 +327,8 @@ auto boundingBoxRelativeLaneletPose(
     position.s = longitudinal_bounding_box_distance.value();
   }
   if (
-    const auto lateral_bounding_box_distance = boundingBoxLaneLateralDistance(
-      from, from_bounding_box, to, to_bounding_box, routing_configuration, hdmap_utils_ptr)) {
+    const auto lateral_bounding_box_distance = distance::boundingBoxLaneLateralDistance(
+      from, from_bounding_box, to, to_bounding_box, routing_configuration)) {
     position.offset = lateral_bounding_box_distance.value();
   }
   return position;
