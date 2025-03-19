@@ -165,12 +165,6 @@ public:
 
   auto getLanelets(const lanelet::Ids &) const -> lanelet::Lanelets;
 
-  auto getLateralDistance(
-    const traffic_simulator_msgs::msg::LaneletPose & from,
-    const traffic_simulator_msgs::msg::LaneletPose & to,
-    const traffic_simulator::RoutingConfiguration & routing_configuration =
-      traffic_simulator::RoutingConfiguration()) const -> std::optional<double>;
-
   auto getLongitudinalDistance(
     const traffic_simulator_msgs::msg::LaneletPose & from_pose,
     const traffic_simulator_msgs::msg::LaneletPose & to_pose,
