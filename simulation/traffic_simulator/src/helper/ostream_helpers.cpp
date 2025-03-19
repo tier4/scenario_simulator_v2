@@ -55,6 +55,15 @@ std::ostream & operator<<(
 }
 
 std::ostream & operator<<(
+  std::ostream & os, const std::vector<traffic_simulator_msgs::msg::LaneletPose> & lanelet_poses)
+{
+  for (size_t i = 0; i < lanelet_poses.size(); ++i) {
+    os << "[" << i << "] " << lanelet_poses[i] << std::endl;
+  }
+  return os;
+}
+
+std::ostream & operator<<(
   std::ostream & os, const traffic_simulator_msgs::msg::EntitySubtype & subtype)
 {
   using EntitySubtype = traffic_simulator_msgs::msg::EntitySubtype;
