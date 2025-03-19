@@ -174,6 +174,12 @@ void PedestrianEntity::setTrafficLights(
   behavior_plugin_ptr_->setTrafficLights(traffic_lights_);
 }
 
+auto PedestrianEntity::getParameters() const
+  -> const traffic_simulator_msgs::msg::PedestrianParameters &
+{
+  return pedestrian_parameters;
+}
+
 auto PedestrianEntity::getBehaviorParameter() const
   -> traffic_simulator_msgs::msg::BehaviorParameter
 {
