@@ -43,13 +43,14 @@ class SimulatorCore
   static inline std::unique_ptr<traffic_simulator::API> core = nullptr;
 
 public:
-  template <typename Node, typename... Ts>
+  template <typename NodeType>
   static auto activate(
-    const Node & node, const traffic_simulator::Configuration & configuration, Ts &&... xs) -> void
+    const NodeType & node, const traffic_simulator::Configuration & configuration,
+    const double realtime_factor, const double frame_rate) -> void
   {
     if (not active()) {
-      core = std::make_unique<traffic_simulator::API>(
-        node, configuration, std::forward<decltype(xs)>(xs)...);
+      core =
+        std::make_unique<traffic_simulator::API>(node, configuration, realtime_factor, frame_rate);
     } else {
       throw Error("The simulator core has already been instantiated.");
     }
