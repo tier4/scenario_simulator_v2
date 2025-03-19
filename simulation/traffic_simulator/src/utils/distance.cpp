@@ -16,6 +16,7 @@
 #include <geometry/distance.hpp>
 #include <geometry/transform.hpp>
 #include <traffic_simulator/helper/helper.hpp>
+#include <traffic_simulator/lanelet_wrapper/distance.hpp>
 #include <traffic_simulator/lanelet_wrapper/lanelet_map.hpp>
 #include <traffic_simulator/lanelet_wrapper/pose.hpp>
 #include <traffic_simulator/utils/distance.hpp>
@@ -30,7 +31,7 @@ auto lateralDistance(
   const traffic_simulator::RoutingConfiguration & routing_configuration,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<double>
 {
-  return hdmap_utils_ptr->getLateralDistance(
+  return lanelet_wrapper::distance::lateralDistance(
     static_cast<LaneletPose>(from), static_cast<LaneletPose>(to), routing_configuration);
 }
 
