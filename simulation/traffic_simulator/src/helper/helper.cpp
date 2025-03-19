@@ -54,15 +54,14 @@ auto constructCanonicalizedLaneletPose(
   lanelet::Id lanelet_id, double s, double offset, double roll, double pitch, double yaw)
   -> CanonicalizedLaneletPose
 {
-  if (
-    auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
-      traffic_simulator::helper::constructLaneletPose(lanelet_id, s, offset, roll, pitch, yaw))) {
+  const auto & lanelet_pose =
+    traffic_simulator::helper::constructLaneletPose(lanelet_id, s, offset, roll, pitch, yaw);
+  if (auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(lanelet_pose)) {
     return canonicalized_lanelet_pose.value();
   } else {
-    THROW_SEMANTIC_ERROR(
-      "Lanelet pose (id=", lanelet_id, ",s=", s, ",offset=", offset, ",rpy.x=", roll,
-      ",rpy.y=", pitch, ",rpy.z=", yaw,
-      ") is invalid, please check lanelet length and connection.");
+    std::ostringstream oss;
+    oss << lanelet_pose;
+    THROW_SEMANTIC_ERROR(oss.str(), " is invalid, please check lanelet length and connection.");
   }
 }
 

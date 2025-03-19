@@ -43,7 +43,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct LaneChangeAction : private Scope,
                           private SimulatorCore::ActionApplication,
-                          private SimulatorCore::NonStandardOperation
+                          private SimulatorCore::ConditionEvaluation
 {
   const Double target_lane_offset;
 
