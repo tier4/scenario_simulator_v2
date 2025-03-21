@@ -15,6 +15,7 @@
 #ifndef TRAFFIC_SIMULATOR__DATA_TYPE__ROUTING_GRAPH_TYPE_HPP_
 #define TRAFFIC_SIMULATOR__DATA_TYPE__ROUTING_GRAPH_TYPE_HPP_
 
+#include <cstdint>
 #include <iostream>
 
 namespace traffic_simulator

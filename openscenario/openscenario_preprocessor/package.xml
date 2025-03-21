@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>openscenario_preprocessor</name>
-  <version>12.0.1</version>
+  <version>12.1.0</version>
   <description>Example package for TIER IV OpenSCENARIO Interpreter</description>
   <maintainer email="kotaro.yoshimoto@tier4.jp">Kotaro Yoshimoto</maintainer>
   <license>Apache License 2.0</license>
@@ -13,6 +13,9 @@
   <depend>openscenario_preprocessor_msgs</depend>
   <depend>openscenario_validator</depend>
   <depend>rclcpp</depend>
+  <depend>pugixml-dev</depend>
+  <depend>yaml-cpp</depend>
+  <depend>nlohmann-json-dev</depend>
 
   <test_depend>ament_cmake_clang_format</test_depend>
   <test_depend>ament_cmake_copyright</test_depend>
@@ -20,6 +23,9 @@
   <test_depend>ament_cmake_pep257</test_depend>
   <test_depend>ament_cmake_xmllint</test_depend>
   <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_cmake_pytest</test_depend>
+  <test_depend>openscenario_utility</test_depend>
+  <test_depend>ament_index_python</test_depend>
 
   <export>
     <build_type>ament_cmake</build_type>

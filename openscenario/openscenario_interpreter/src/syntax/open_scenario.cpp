@@ -12,10 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <boost/json/src.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/open_scenario.hpp>
 #include <openscenario_interpreter/syntax/open_scenario_category.hpp>
+
+#ifndef PARAMETER_VALUE_DISTRIBUTION_ONLY
 #include <openscenario_interpreter/syntax/scenario_definition.hpp>
+#endif  // PARAMETER_VALUE_DISTRIBUTION_ONLY
 
 namespace openscenario_interpreter
 {
@@ -48,6 +52,7 @@ auto operator<<(boost::json::object & json, const OpenScenario & datum) -> boost
 {
   json["version"] = "1.0";
 
+#ifndef PARAMETER_VALUE_DISTRIBUTION_ONLY
   json["frame"] = datum.frame;
 
   json["CurrentStates"].emplace_object();
@@ -63,6 +68,7 @@ auto operator<<(boost::json::object & json, const OpenScenario & datum) -> boost
   if (datum.category.is<ScenarioDefinition>()) {
     json["OpenSCENARIO"].emplace_object() << datum.category.as<ScenarioDefinition>();
   }
+#endif  // PARAMETER_VALUE_DISTRIBUTION_ONLY
 
   return json;
 }
