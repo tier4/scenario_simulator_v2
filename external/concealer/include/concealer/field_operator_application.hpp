@@ -68,10 +68,16 @@ struct FieldOperatorApplication : public rclcpp::Node
   using Control                         = autoware_control_msgs::msg::Control;
   using CooperateStatusArray            = tier4_rtc_msgs::msg::CooperateStatusArray;
   using Emergency                       = tier4_external_api_msgs::msg::Emergency;
+#if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)
   using LocalizationInitializationState = autoware_adapi_v1_msgs::msg::LocalizationInitializationState;
+#endif
   using MrmState                        = autoware_adapi_v1_msgs::msg::MrmState;
+#if __has_include(<autoware_adapi_v1_msgs/msg/operation_mode_state.hpp>)
   using OperationModeState              = autoware_adapi_v1_msgs::msg::OperationModeState;
+#endif
+#if __has_include(<autoware_adapi_v1_msgs/msg/route_state.hpp>)
   using RouteState                      = autoware_adapi_v1_msgs::msg::RouteState;
+#endif
   using Trajectory                      = tier4_planning_msgs::msg::Trajectory;
   using TurnIndicatorsCommand           = autoware_vehicle_msgs::msg::TurnIndicatorsCommand;
 
