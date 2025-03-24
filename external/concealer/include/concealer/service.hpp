@@ -35,21 +35,23 @@ class Service
 
   typename rclcpp::Client<T>::SharedPtr client;
 
-  rclcpp::WallRate rate;
+  rclcpp::WallRate interval;
 
 public:
   template <typename Node>
   explicit Service(
     const std::string & name, Node & node,
-    const std::chrono::nanoseconds & rate = std::chrono::seconds(1))
-  : name(name), client(node.template create_client<T>(name, rmw_qos_profile_default)), rate(rate)
+    const std::chrono::nanoseconds & interval = std::chrono::seconds(1))
+  : name(name),
+    client(node.template create_client<T>(name, rmw_qos_profile_default)),
+    interval(interval)
   {
   }
 
   auto operator()(const typename T::Request::SharedPtr & request, std::size_t attempts_count)
   {
     while (!client->service_is_ready()) {
-      rate.sleep();
+      interval.sleep();
     }
 
     auto receive = [this](const auto & response) {
@@ -86,9 +88,10 @@ public:
       }
     };
 
-    for (std::size_t attempt = 0; attempt < attempts_count; ++attempt, rate.sleep()) {
+    for (std::size_t attempt = 0; attempt < attempts_count; ++attempt, interval.sleep()) {
       if (auto future = client->async_send_request(request);
-          future.wait_for(rate.period()) == std::future_status::ready and receive(future.get())) {
+          future.wait_for(interval.period()) == std::future_status::ready and
+          receive(future.get())) {
         return;
       }
     }
