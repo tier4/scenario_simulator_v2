@@ -49,7 +49,7 @@ struct ReorderRequest
 };
 
 inline void fixElementOrderRecursive(
-  DOMNode * node, const std::vector<ReorderRequest> & reorder_requests)
+  DOMNode * node, const std::vector<ReorderRequest> & reorder_requests, const bool verbose = false)
 {
   if (!node || node->getNodeType() != DOMNode::ELEMENT_NODE) {
     return;
@@ -91,17 +91,19 @@ inline void fixElementOrderRecursive(
 
   if (reorder_request_optional.has_value()) {
     ReorderRequest reorder_request = reorder_request_optional.value();
-    std::cout << "re-order required: " << reorder_request.element_name << std::endl;
-    std::cout << "\tcurrent order: ";
-    for (const auto & child : child_elements) {
-      std::cout << child.first << " ";
+    if (verbose) {
+      std::cout << "re-order required: " << reorder_request.element_name << std::endl;
+      std::cout << "\tcurrent order: ";
+      for (const auto & child : child_elements) {
+        std::cout << child.first << " ";
+      }
+      std::cout << std::endl;
+      std::cout << "\trequired order: ";
+      for (const auto & required_order : reorder_request.required_order) {
+        std::cout << required_order << " ";
+      }
+      std::cout << std::endl;
     }
-    std::cout << std::endl;
-    std::cout << "\trequired order: ";
-    for (const auto & required_order : reorder_request.required_order) {
-      std::cout << required_order << " ";
-    }
-    std::cout << std::endl;
 
     // delete first
     for (auto & [element_name, elements] : child_elements) {
@@ -145,6 +147,8 @@ private:
   struct ErrorHandler : public xercesc::HandlerBase
   {
   public:
+    bool verbose = false;
+
     std::vector<ReorderRequest> reorder_requests;
 
     ErrorHandler() {}
@@ -197,13 +201,15 @@ private:
           }
         }
 
-        std::cerr << "re-order request for '" << reorder_request.element_name
-                  << "' is added. required content model: " << reorder_request.content_model
-                  << " required order: ";
-        for (const auto & required_element : reorder_request.required_order) {
-          std::cerr << required_element << " ";
+        if (verbose) {
+          std::cerr << "re-order request for '" << reorder_request.element_name
+                    << "' is added. required content model: " << reorder_request.content_model
+                    << " required order: ";
+          for (const auto & required_element : reorder_request.required_order) {
+            std::cerr << required_element << " ";
+          }
+          std::cerr << std::endl;
         }
-        std::cerr << std::endl;
         reorder_requests.push_back(reorder_request);
       } else {
         std::cout << "ignore error： " << message << std::endl;
