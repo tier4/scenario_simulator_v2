@@ -258,7 +258,7 @@ void convertYAMLtoXML(const YAML::Node & yaml, XMLClass & xml)
           continue;
         }
 
-        // add @ to tags that begin with lower charactor
+        // add @ to tags that begin with lower character
         std::string processed_key = key;
         if (!key.empty() && std::islower(key[0])) {
           processed_key = "@" + key;

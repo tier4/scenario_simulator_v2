@@ -332,6 +332,7 @@ public:
       XMLCh * fStr;
     };
 
+    // cspell: ignore DOMLS
     DOMLSSerializer * serializer =
       ((DOMImplementationLS *)DOMImplementationRegistry::getDOMImplementation(
          XStr("LS").unicodeForm()))
