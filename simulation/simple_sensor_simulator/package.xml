@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="3">
   <name>simple_sensor_simulator</name>
-  <version>12.0.1</version>
+  <version>14.0.3</version>
   <description>simple_sensor_simulator package</description>
 
   <maintainer email="masaya.kataoka@tier4.jp">masaya kataoka</maintainer>
@@ -39,6 +39,7 @@
   <depend>boost</depend>
   <depend>eigen</depend>
   <depend>embree_vendor</depend>
+  <depend>get_parameter</depend>
   <depend>libgoogle-glog-dev</depend>
   <depend>libpcl-all-dev</depend>
   <depend>nav_msgs</depend>
