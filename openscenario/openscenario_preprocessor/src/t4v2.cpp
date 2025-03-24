@@ -18,6 +18,7 @@
 #include <fstream>
 #include <iostream>
 #include <openscenario_preprocessor/deriver.hpp>
+#include <openscenario_preprocessor/simple_xml_formatter.hpp>
 #include <openscenario_preprocessor/t4v2.hpp>
 #include <openscenario_validator/validator.hpp>
 #include <pugixml.hpp>
@@ -37,89 +38,6 @@ const std::string_view scenario_modifiers_distribution_base = R"###(
         </Deterministic>
     </ParameterValueDistribution>
 </OpenSCENARIO>)###";
-
-const std::string_view load_yaml_to_xosc_with_encode_python_script = R"###(
-import xmlschema
-import yaml
-import os
-import sys
-import xml.etree.ElementTree as ET
-import cProfile
-from yaml import CSafeLoader
-
-
-def from_yaml(keyword, node):
-
-  if isinstance(node, dict):
-    #
-    # ???: { ... }
-    #
-    result = {}
-
-    for tag, value in node.items():
-
-      if isinstance(value, list) and len(value) == 0:
-        #
-        # Tag: []
-        #
-        # => REMOVE
-        #
-        continue
-
-      if str.islower(tag[0]):
-        #
-        # tag: { ... }
-        #
-        # => @tag: { ... }
-        #
-        result["@" + tag] = str(value)
-      else:
-        #
-        # Tag: { ... }
-        #
-        # => NO CHANGES
-        #
-        result[tag] = from_yaml(tag, value)
-
-    return result
-
-  elif isinstance(node, list):
-    #
-    # ???: [ ... ]
-    #
-    return [from_yaml(keyword, item) for item in node]
-
-  elif isinstance(node, str):
-    return node
-
-  else:
-    return None
-
-
-if __name__ == "__main__":
-  # parse arguments here (input yaml path, output xosc path)
-  input_yaml_path = sys.argv[1]
-  output_xosc_path = sys.argv[2]
-
-  xsd = open("/tmp/openscenario_preprocessor/schema.xsd")
-  schema = xmlschema.XMLSchema(xsd)
-
-  if os.path.exists(input_yaml_path):
-    with open(input_yaml_path, "r") as file:
-      openscenario_yaml = from_yaml("OpenSCENARIO", yaml.load(file, Loader=CSafeLoader))
-      openscenario_yaml.pop("ScenarioModifiers", None)
-      xosc, errors = schema.encode(
-        openscenario_yaml,
-        indent=2,
-        preserve_root=True,
-        unordered=True,  # Reorder elements
-        # The "strict" mode is too strict than we would like.
-        validation="lax",
-      )
-      xosc = xmlschema.XMLResource(xosc).tostring().replace("True", "true").replace("False", "false")
-      with open(output_xosc_path, "w") as file:
-        file.write(xosc)
-)###";
 
 auto T4V2::deriveToXoscStringScenarios(
   boost::filesystem::path scenario_path, boost::filesystem::path modifiers_path)
@@ -175,7 +93,6 @@ std::pair<boost::filesystem::path, boost::filesystem::path> T4V2::splitScenarioM
 
   auto scenario_string = scenario_ss.str();
 
-  ;
   if (auto modifiers_pos = scenario_string.find("ScenarioModifiers");
       modifiers_pos != std::string::npos) {
     auto openscenario_pos = scenario_string.find("OpenSCENARIO");
@@ -377,20 +294,24 @@ auto convertYAMLtoXML(const boost::filesystem::path & path) -> pugi::xml_documen
 
 auto T4V2::loadScenarioFile(boost::filesystem::path path) -> pugi::xml_document
 {
-  std::string script_path = "/tmp/openscenario_preprocessor/load_yaml_to_xosc_with_encode.py";
-  std::ofstream ofs(script_path);
-  ofs << load_yaml_to_xosc_with_encode_python_script;
-  ofs.close();
+  std::stringstream xml_stringstream;
+  auto xml = convertYAMLtoXML(path);
+  xml.save_file("/tmp/openscenario_preprocessor/intermediate.xosc");
 
-  std::stringstream command_ss;
-  command_ss << "python3 " << script_path << " " << path.string()
-             << " /tmp/openscenario_preprocessor/normalized.xosc";
+  xml.save(xml_stringstream);
 
-  if (system(command_ss.str().c_str()) != 0) {
-    throw std::runtime_error("failed to execute python script : " + command_ss.str());
-  }
   pugi::xml_document doc;
-  doc.load_file("/tmp/openscenario_preprocessor/normalized.xosc");
+
+  SimpleXMLFormatter formatter;
+  if (auto formatted_xml = formatter.formatXML(
+        "/tmp/openscenario_preprocessor/intermediate.xosc",
+        "/tmp/openscenario_preprocessor/schema.xsd");
+      formatted_xml) {
+    std::cout << formatted_xml->c_str() << std::endl;
+    doc.load_file(formatted_xml->c_str());
+  } else {
+    std::cout << "Failed to format XML with schema : " << path.string() << std::endl;
+  }
   return doc;
 }
 }  // namespace openscenario_preprocessor
