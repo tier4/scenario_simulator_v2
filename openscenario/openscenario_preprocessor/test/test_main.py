@@ -39,10 +39,14 @@ def test(scenario_name, desired_diff_num):
                            + " --parameters '{\"random_offset\": true}'" + " -f t4v2" + " --skip-full-derivation"
     print(preprocessor_command)
     os.system(preprocessor_command)
+    os.system("xmllint --format " + input_xosc + " > /tmp/openscenario_preprocessor/before.xosc")
+    os.system("xmllint --format /tmp/openscenario_preprocessor/formatted.xosc > /tmp/openscenario_preprocessor/after.xosc")
+    os.system("xmllint --c14n11 /tmp/openscenario_preprocessor/before.xosc > /tmp/openscenario_preprocessor/before.xml")
+    os.system("xmllint --c14n11 /tmp/openscenario_preprocessor/after.xosc > /tmp/openscenario_preprocessor/after.xml")
     sleep(1)
 
-    file1 = open(input_xosc)
-    file2 = open("/tmp/openscenario_preprocessor/normalized.xosc")
+    file1 = open("/tmp/openscenario_preprocessor/before.xml")
+    file2 = open("/tmp/openscenario_preprocessor/after.xml")
     diff = difflib.Differ()
     output_diff = diff.compare(file1.readlines(), file2.readlines())
     diff_num = 0
