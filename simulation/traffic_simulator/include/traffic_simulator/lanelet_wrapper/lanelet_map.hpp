@@ -116,7 +116,13 @@ auto rightOfWayLaneletIds(const lanelet::Id lanelet_id) -> lanelet::Ids;
 auto trafficSignsOnPath(const lanelet::Ids & lanelet_ids)
   -> std::vector<std::shared_ptr<const lanelet::TrafficSign>>;
 
+auto trafficSigns() -> std::vector<std::shared_ptr<const lanelet::TrafficSign>>;
+
+auto stopLines() -> lanelet::ConstLineStrings3d;
+
 auto stopLinesOnPath(const lanelet::Ids & lanelet_ids) -> lanelet::ConstLineStrings3d;
+
+auto stopLineIds() -> lanelet::Ids;
 
 auto stopLineIdsOnPath(const lanelet::Ids & lanelet_ids) -> lanelet::Ids;
 }  // namespace lanelet_map

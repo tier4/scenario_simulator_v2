@@ -15,7 +15,7 @@
 #ifndef CONCEALER__PUBLISHER_HPP_
 #define CONCEALER__PUBLISHER_HPP_
 
-#include <concealer/get_parameter.hpp>
+#include <get_parameter/get_parameter.hpp>
 #include <nav_msgs/msg/odometry.hpp>
 #include <random>
 #include <rclcpp/rclcpp.hpp>
@@ -59,11 +59,11 @@ struct NormalDistribution<nav_msgs::msg::Odometry>
       const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node,
       const std::string & prefix)
     : additive(
-        getParameter<double>(node, prefix + ".additive.mean"),
-        getParameter<double>(node, prefix + ".additive.standard_deviation")),
+        common::getParameter<double>(node, prefix + ".additive.mean"),
+        common::getParameter<double>(node, prefix + ".additive.standard_deviation")),
       multiplicative(
-        getParameter<double>(node, prefix + ".multiplicative.mean"),
-        getParameter<double>(node, prefix + ".multiplicative.standard_deviation"))
+        common::getParameter<double>(node, prefix + ".multiplicative.mean"),
+        common::getParameter<double>(node, prefix + ".multiplicative.standard_deviation"))
     {
     }
 
