@@ -26,14 +26,15 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 OpenScenarioCategory::OpenScenarioCategory(const pugi::xml_node & tree, Scope & scope)
-: Group(
-    choice(tree, {
+: Group(choice(
+    tree, {
 #ifndef PARAMETER_VALUE_DISTRIBUTION_ONLY
-      { "Storyboard",                [&](auto &&) { return make<ScenarioDefinition                  >(tree, scope); } },  // DIRTY HACK!!!
-      { "Catalog",                   [&](auto &&) { return make<CatalogDefinition                   >(tree, scope); } },
+            {"Storyboard",
+             [&](auto &&) { return make<ScenarioDefinition>(tree, scope); }},  // DIRTY HACK!!!
+            {"Catalog", [&](auto &&) { return make<CatalogDefinition>(tree, scope); }},
 #endif  // PARAMETER_VALUE_DISTRIBUTION_ONLY
-      { "ParameterValueDistribution",[&](auto &&) { return make<ParameterValueDistributionDefinition>(tree, scope); } }
-    }))
+            {"ParameterValueDistribution",
+             [&](auto &&) { return make<ParameterValueDistributionDefinition>(tree, scope); }}}))
 // clang-format on
 {
 }

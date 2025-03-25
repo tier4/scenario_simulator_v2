@@ -136,6 +136,7 @@ add_library(parameter_value_distribution_without_ros STATIC
   src/syntax/poisson_distribution.cpp
   src/syntax/probability_distribution_set.cpp
   src/syntax/probability_distribution_set_element.cpp
+  src/syntax/rule.cpp
   src/syntax/uniform_distribution.cpp
 
   src/syntax/boolean.cpp
@@ -145,6 +146,9 @@ add_library(parameter_value_distribution_without_ros STATIC
   src/syntax/unsigned_short.cpp
 
   src/syntax/parameter_value_set.cpp
+
+  src/reader/attribute.cpp
+  src/reader/element.cpp
 
   src/utility/demangle.cpp
 
