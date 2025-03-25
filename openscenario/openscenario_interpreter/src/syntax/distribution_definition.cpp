@@ -22,9 +22,10 @@ inline namespace syntax
 DistributionDefinition::DistributionDefinition(const pugi::xml_node & tree, Scope & scope)
 // clang-format off
 : Group(
-    choice(tree,
-      {"Deterministic", [&](auto && node){return make<Deterministic>(node,scope);}},
-      {"Stochastic",    [&](auto && node){return make<Stochastic   >(node,scope);}}))
+    choice(tree, {
+      { "Deterministic", [&](auto && node) { return make<Deterministic>(node,scope); } },
+      { "Stochastic",    [&](auto && node) { return make<Stochastic   >(node,scope); } }
+    }))
 // clang-format on
 {
 }
