@@ -71,7 +71,8 @@ auto ScenarioSimulator::initialize(const simulation_api_schema::InitializeReques
   simulation_interface::toMsg(req.initialize_ros_time(), t);
   current_ros_time_ = t;
   traffic_simulator::lanelet_pose::CanonicalizedLaneletPose::setConsiderPoseByRoadSlope(
-    common::getParameter<bool>(get_node_parameters_interface(), "consider_pose_by_road_slope"));
+    common::getParameter<bool>(
+      get_node_parameters_interface(), "consider_pose_by_road_slope", false));
   auto res = simulation_api_schema::InitializeResponse();
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("succeed to initialize simulation");
@@ -210,7 +211,7 @@ auto ScenarioSimulator::spawnVehicleEntity(
       initial_status, parameters, step_time_,
       get_parameter_or("use_sim_time", rclcpp::Parameter("use_sim_time", false)),
       common::getParameter<bool>(
-        get_node_parameters_interface(), "consider_acceleration_by_road_slope"));
+        get_node_parameters_interface(), "consider_acceleration_by_road_slope", false));
   } else {
     vehicles_.emplace_back(req.parameters());
   }
