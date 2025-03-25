@@ -57,6 +57,7 @@ auto toString(const VehicleModelType datum) -> std::string
     BOILERPLATE(DELAY_STEER_ACC_GEARED_WO_FALL_GUARD);
     BOILERPLATE(DELAY_STEER_MAP_ACC_GEARED);
     BOILERPLATE(DELAY_STEER_VEL);
+    BOILERPLATE(DELAY_STEER_VEL_GEARED);
     BOILERPLATE(IDEAL_STEER_ACC);
     BOILERPLATE(IDEAL_STEER_ACC_GEARED);
     BOILERPLATE(IDEAL_STEER_VEL);
@@ -79,6 +80,7 @@ auto EgoEntitySimulation::getVehicleModelType() -> VehicleModelType
      VehicleModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD},
     {"DELAY_STEER_MAP_ACC_GEARED", VehicleModelType::DELAY_STEER_MAP_ACC_GEARED},
     {"DELAY_STEER_VEL", VehicleModelType::DELAY_STEER_VEL},
+    {"DELAY_STEER_VEL_GEARED", VehicleModelType::DELAY_STEER_VEL_GEARED},
     {"IDEAL_STEER_ACC", VehicleModelType::IDEAL_STEER_ACC},
     {"IDEAL_STEER_ACC_GEARED", VehicleModelType::IDEAL_STEER_ACC_GEARED},
     {"IDEAL_STEER_VEL", VehicleModelType::IDEAL_STEER_VEL},
@@ -153,6 +155,12 @@ auto EgoEntitySimulation::makeSimulationModel(
         vel_lim, steer_lim, vel_rate_lim, steer_rate_lim, wheel_base, step_time, vel_time_delay,
         vel_time_constant, steer_time_delay, steer_time_constant, steer_dead_band);
 
+    case VehicleModelType::DELAY_STEER_VEL_GEARED:
+      return std::make_shared<SimModelDelaySteerVelGeared>(
+        vel_lim, steer_lim, vel_rate_lim, steer_rate_lim, wheel_base, step_time, vel_time_delay,
+        vel_time_constant, steer_time_delay, steer_time_constant, steer_dead_band,
+        debug_acc_scaling_factor, debug_steer_scaling_factor);
+
     case VehicleModelType::IDEAL_STEER_ACC:
       return std::make_shared<SimModelIdealSteerAcc>(wheel_base);
 
@@ -206,6 +214,7 @@ void EgoEntitySimulation::requestSpeedChange(double value)
       break;
 
     case VehicleModelType::DELAY_STEER_VEL:
+    case VehicleModelType::DELAY_STEER_VEL_GEARED:
       v << 0, 0, 0, value, 0;
       break;
 
@@ -259,6 +268,7 @@ auto EgoEntitySimulation::overwrite(
         [[fallthrough]];
 
       case VehicleModelType::DELAY_STEER_VEL:
+      case VehicleModelType::DELAY_STEER_VEL_GEARED:
         state(4) = 0;
         [[fallthrough]];
 
@@ -327,6 +337,7 @@ void EgoEntitySimulation::update(
         break;
 
       case VehicleModelType::DELAY_STEER_VEL:
+      case VehicleModelType::DELAY_STEER_VEL_GEARED:
       case VehicleModelType::IDEAL_STEER_VEL:
         input(0) = speed;
         input(1) = tire_angle;
