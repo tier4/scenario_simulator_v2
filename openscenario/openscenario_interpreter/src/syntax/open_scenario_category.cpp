@@ -30,10 +30,10 @@ OpenScenarioCategory::OpenScenarioCategory(const pugi::xml_node & tree, Scope & 
     // clang-format off
     choice(tree,
 #ifndef PARAMETER_VALUE_DISTRIBUTION_ONLY
-      std::make_pair("Storyboard",                [&](auto &&) { return make<ScenarioDefinition                  >(tree, scope);}),  // DIRTY HACK!!!
-      std::make_pair("Catalog",                   [&](auto &&) { return make<CatalogDefinition                   >(tree, scope);}),
+      {"Storyboard",                [&](auto &&) { return make<ScenarioDefinition                  >(tree, scope);}},  // DIRTY HACK!!!
+      {"Catalog",                   [&](auto &&) { return make<CatalogDefinition                   >(tree, scope);}},
 #endif  // PARAMETER_VALUE_DISTRIBUTION_ONLY
-      std::make_pair("ParameterValueDistribution",[&](auto &&) { return make<ParameterValueDistributionDefinition>(tree, scope);})))
+      {"ParameterValueDistribution",[&](auto &&) { return make<ParameterValueDistributionDefinition>(tree, scope);}}))
 // clang-format on
 {
 }

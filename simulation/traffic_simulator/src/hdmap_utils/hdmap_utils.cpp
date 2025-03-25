@@ -1229,51 +1229,6 @@ auto HdMapUtils::getTrafficLightRegulatoryElementsOnPath(const lanelet::Ids & la
   return ret;
 }
 
-auto HdMapUtils::getStopLines() const -> lanelet::ConstLineStrings3d
-{
-  lanelet::ConstLineStrings3d ret;
-  for (const auto & traffic_sign : getTrafficSignRegulatoryElements()) {
-    if (traffic_sign->type() == "stop_sign") {
-      for (const auto & stop_line : traffic_sign->refLines()) {
-        ret.emplace_back(stop_line);
-      }
-    }
-  }
-  return ret;
-}
-
-auto HdMapUtils::getStopLinesOnPath(const lanelet::Ids & lanelet_ids) const
-  -> lanelet::ConstLineStrings3d
-{
-  lanelet::ConstLineStrings3d ret;
-  for (const auto & traffic_sign : getTrafficSignRegulatoryElementsOnPath(lanelet_ids)) {
-    if (traffic_sign->type() == "stop_sign") {
-      for (const auto & stop_line : traffic_sign->refLines()) {
-        ret.emplace_back(stop_line);
-      }
-    }
-  }
-  return ret;
-}
-
-auto HdMapUtils::getStopLineIds() const -> lanelet::Ids
-{
-  lanelet::Ids stop_line_ids;
-  for (const auto & ret : getStopLines()) {
-    stop_line_ids.push_back(ret.id());
-  }
-  return stop_line_ids;
-}
-
-auto HdMapUtils::getStopLineIdsOnPath(const lanelet::Ids & route_lanelets) const -> lanelet::Ids
-{
-  lanelet::Ids stop_line_ids;
-  for (const auto & ret : getStopLinesOnPath(route_lanelets)) {
-    stop_line_ids.push_back(ret.id());
-  }
-  return stop_line_ids;
-}
-
 auto HdMapUtils::getTrafficLights(const lanelet::Id traffic_light_id) const
   -> std::vector<lanelet::AutowareTrafficLightConstPtr>
 {
@@ -1328,21 +1283,6 @@ auto HdMapUtils::getTrafficLightStopLinesPoints(const lanelet::Id traffic_light_
     }
   }
   return ret;
-}
-
-auto HdMapUtils::getStopLinePolygon(const lanelet::Id lanelet_id) const
-  -> std::vector<geometry_msgs::msg::Point>
-{
-  std::vector<geometry_msgs::msg::Point> points;
-  const auto stop_line = lanelet_map_ptr_->lineStringLayer.get(lanelet_id);
-  for (const auto & point : stop_line) {
-    geometry_msgs::msg::Point p;
-    p.x = point.x();
-    p.y = point.y();
-    p.z = point.z();
-    points.emplace_back(p);
-  }
-  return points;
 }
 
 auto HdMapUtils::getTrafficLightIdsOnPath(const lanelet::Ids & route_lanelets) const -> lanelet::Ids
@@ -1435,68 +1375,6 @@ auto HdMapUtils::getDistanceToTrafficLightStopLine(
     }
   }
   return std::nullopt;
-}
-
-auto HdMapUtils::getDistanceToStopLine(
-  const lanelet::Ids & route_lanelets,
-  const std::vector<geometry_msgs::msg::Point> & waypoints) const -> std::optional<double>
-{
-  if (waypoints.empty()) {
-    return std::nullopt;
-  }
-  std::set<double> collision_points;
-  if (waypoints.empty()) {
-    return std::nullopt;
-  }
-  math::geometry::CatmullRomSpline spline(waypoints);
-  const auto stop_lines = getStopLinesOnPath({route_lanelets});
-  for (const auto & stop_line : stop_lines) {
-    std::vector<geometry_msgs::msg::Point> stop_line_points;
-    for (const auto & point : stop_line) {
-      geometry_msgs::msg::Point p;
-      p.x = point.x();
-      p.y = point.y();
-      p.z = point.z();
-      stop_line_points.emplace_back(p);
-    }
-    const auto collision_point = spline.getCollisionPointIn2D(stop_line_points);
-    if (collision_point) {
-      collision_points.insert(collision_point.value());
-    }
-  }
-  if (collision_points.empty()) {
-    return std::nullopt;
-  }
-  return *collision_points.begin();
-}
-
-auto HdMapUtils::getDistanceToStopLine(
-  const lanelet::Ids & route_lanelets,
-  const math::geometry::CatmullRomSplineInterface & spline) const -> std::optional<double>
-{
-  if (spline.getLength() <= 0) {
-    return std::nullopt;
-  }
-  std::set<double> collision_points;
-  const auto stop_lines = getStopLinesOnPath({route_lanelets});
-  for (const auto & stop_line : stop_lines) {
-    std::vector<geometry_msgs::msg::Point> stop_line_points;
-    for (const auto & point : stop_line) {
-      geometry_msgs::msg::Point p;
-      p.x = point.x();
-      p.y = point.y();
-      p.z = point.z();
-      stop_line_points.emplace_back(p);
-    }
-    const auto collision_point = spline.getCollisionPointIn2D(stop_line_points);
-    if (collision_point) {
-      collision_points.insert(collision_point.value());
-    }
-  }
-  if (collision_points.empty()) {
-    return std::nullopt;
-  }
-  return *collision_points.begin();
 }
 
 auto HdMapUtils::calculateSegmentDistances(const lanelet::ConstLineString3d & line_string) const

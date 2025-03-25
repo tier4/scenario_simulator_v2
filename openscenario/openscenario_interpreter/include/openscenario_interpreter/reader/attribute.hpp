@@ -34,79 +34,16 @@
 
 namespace openscenario_interpreter
 {
+struct Scope;
+
+inline namespace syntax
+{
+struct Rule;
+}  // namespace syntax
+
 inline namespace reader
 {
-template <typename Scope>
-auto substitute(std::string attribute, Scope & scope)
-{
-  auto dirname = [](auto &&, auto && scope) { return scope.dirname(); };
-
-#ifndef PARAMETER_VALUE_DISTRIBUTION_ONLY
-  auto find_pkg_share = [](auto && package_name, auto &&) {
-    return ament_index_cpp::get_package_share_directory(package_name);
-  };
-
-  auto ros2 = [](auto && arguments, auto &&) {
-    auto remove_trailing_newline = [](auto && s) {
-      while (s.back() == '\n') {
-        s.pop_back();
-      }
-      return s;
-    };
-    if (auto && result = remove_trailing_newline(concealer::dollar("ros2 " + arguments));
-        result.find('\n') != std::string::npos) {
-      throw SyntaxError(
-        "The substitution result by `$(ros2 ...)` must not contain a newline character. "
-        "You gave `$(ros2 ",
-        arguments, ")` and the result was ",
-        std::quoted(boost::replace_all_copy(result, "\n", "\\n")),
-        ", which is unacceptable for the reasons stated above.");
-    } else {
-      return result;
-    }
-  };
-#endif  // PARAMETER_VALUE_DISTRIBUTION_ONLY
-
-  auto var = [](auto && name, auto && scope) {
-    // TODO: Return the value of the launch configuration variable instead of the OpenSCENARIO
-    // parameter.
-    if (const auto found = scope.ref(name); found) {
-      return boost::lexical_cast<String>(found);
-    } else {
-      return String();
-    }
-  };
-
-  // NOTE: https://design.ros2.org/articles/roslaunch_xml.html#dynamic-configuration
-  static const std::unordered_map<
-    std::string, std::function<std::string(const std::string &, Scope &)> >
-    substitutions{
-      {"dirname", dirname},
-  // TODO {"env", env},
-  // TODO {"eval", eval},
-  // TODO {"exec-in-package", exec_in_package},
-  // TODO {"find-exec", find_exec},
-  // TODO {"find-pkg-prefix", find_pkg_prefix},
-#ifndef PARAMETER_VALUE_DISTRIBUTION_ONLY
-      {"find-pkg-share", find_pkg_share},
-      {"ros2",
-       ros2},  // NOTE: TIER IV extension (Not included in the ROS 2 Launch XML Substitution)
-#endif         // PARAMETER_VALUE_DISTRIBUTION_ONLY
-      {"var", var},
-    };
-
-  static const auto pattern = std::regex(R"((.*)\$\((([\w-]+)\s?([^\)]*))\)(.*))");
-
-  for (std::smatch result; std::regex_match(attribute, result, pattern);) {
-    if (const auto iter = substitutions.find(result.str(3)); iter != std::end(substitutions)) {
-      attribute = result.str(1) + std::get<1>(*iter)(result.str(4), scope) + result.str(5);
-    } else {
-      throw SyntaxError("Unknown substitution ", std::quoted(result.str(3)), " specified");
-    }
-  }
-
-  return attribute;
-}
+auto substitute(const std::string & attribute, const Scope & scope) -> String;
 
 template <typename T, typename Node, typename Scope>
 auto readAttribute(const std::string & name, const Node & node, const Scope & scope) -> T
@@ -144,8 +81,7 @@ auto readAttribute(const std::string & name, const Node & node, const Scope & sc
     }
   };
 
-  // NOTE:
-  // https://www.asam.net/index.php?eID=dumpFile&t=f&f=4092&token=d3b6a55e911b22179e3c0895fe2caae8f5492467#_parameters
+  // NOTE: https://www.asam.net/index.php?eID=dumpFile&t=f&f=4092&token=d3b6a55e911b22179e3c0895fe2caae8f5492467#_parameters
 
   if (const auto & attribute = node.attribute(name.c_str())) {
     // NOTE: `substitute` is TIER IV extension (Non-OpenSCENARIO standard)
@@ -165,8 +101,22 @@ auto readAttribute(const std::string & name, const Node & node, const Scope & sc
   }
 }
 
+extern template auto readAttribute(const std::string &, const pugi::xml_node &, const Scope &)
+  -> Boolean;
+extern template auto readAttribute(const std::string &, const pugi::xml_node &, const Scope &)
+  -> Double;
+extern template auto readAttribute(const std::string &, const pugi::xml_node &, const Scope &)
+  -> syntax::Rule;
+extern template auto readAttribute(const std::string &, const pugi::xml_node &, const Scope &)
+  -> String;
+extern template auto readAttribute(const std::string &, const pugi::xml_node &, const Scope &)
+  -> UnsignedShort;
+extern template auto readAttribute(const std::string &, const pugi::xml_node &, const Scope &)
+  -> UnsignedInteger;
+
 template <typename T, typename Node, typename Scope>
 auto readAttribute(const std::string & name, const Node & node, const Scope & scope, T && value)
+  -> T
 {
   if (node.attribute(name.c_str())) {
     return readAttribute<T>(name, node, scope);
