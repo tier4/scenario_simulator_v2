@@ -21,6 +21,15 @@ Changelog for package traffic_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+14.1.0 (2025-03-25)
+-------------------
+* Merge pull request `#1553 <https://github.com/tier4/scenario_simulator_v2/issues/1553>`_ from tier4/feature/revival_getStopLineIds
+  Renamed getStopLineIds to stopLineIds to revive functionality.
+* Added unit tests for the `stopLineIds` function.
+* Merge branch 'master' into feature/revival_getStopLineIds
+* Renamed getStopLineIds to stopLineIds to revive functionality.
+* Contributors: Masaya Kataoka, Taiga, Taiga Takano
+
 14.0.3 (2025-03-24)
 -------------------
 * Merge remote-tracking branch 'origin/master' into refactor/concealer-6
