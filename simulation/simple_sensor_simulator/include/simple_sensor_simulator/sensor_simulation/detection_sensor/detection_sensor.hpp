@@ -17,9 +17,9 @@
 
 #include <simulation_api_schema.pb.h>
 
-#include <concealer/get_parameter.hpp>
 #include <geometry/plane.hpp>
 #include <geometry_msgs/msg/pose.hpp>
+#include <get_parameter/get_parameter.hpp>
 #include <memory>
 #include <optional>
 #include <queue>
@@ -105,10 +105,10 @@ class DetectionSensor : public DetectionSensorBase
   template <typename Message, typename std::enable_if_t<std::is_same_v<Message, T>, int> = 0>
   auto delay() const
   {
-    static const auto override_legacy_configuration = concealer::getParameter<bool>(
+    static const auto override_legacy_configuration = common::getParameter<bool>(
       detected_objects_publisher->get_topic_name() + std::string(".override_legacy_configuration"));
     if (override_legacy_configuration) {
-      static const auto delay = concealer::getParameter<double>(
+      static const auto delay = common::getParameter<double>(
         detected_objects_publisher->get_topic_name() + std::string(".delay"));
       return delay;
     } else {
@@ -119,11 +119,11 @@ class DetectionSensor : public DetectionSensorBase
   template <typename Message, typename std::enable_if_t<std::is_same_v<Message, U>, int> = 0>
   auto delay() const
   {
-    static const auto override_legacy_configuration = concealer::getParameter<bool>(
+    static const auto override_legacy_configuration = common::getParameter<bool>(
       ground_truth_objects_publisher->get_topic_name() +
       std::string(".override_legacy_configuration"));
     if (override_legacy_configuration) {
-      static const auto delay = concealer::getParameter<double>(
+      static const auto delay = common::getParameter<double>(
         ground_truth_objects_publisher->get_topic_name() + std::string(".delay"));
       return delay;
     } else {
@@ -133,10 +133,10 @@ class DetectionSensor : public DetectionSensorBase
 
   auto range() const
   {
-    static const auto override_legacy_configuration = concealer::getParameter<bool>(
+    static const auto override_legacy_configuration = common::getParameter<bool>(
       detected_objects_publisher->get_topic_name() + std::string(".override_legacy_configuration"));
     if (override_legacy_configuration) {
-      static const auto range = concealer::getParameter<double>(
+      static const auto range = common::getParameter<double>(
         detected_objects_publisher->get_topic_name() + std::string(".range"), 300.0);
       return range;
     } else {
@@ -147,10 +147,10 @@ class DetectionSensor : public DetectionSensorBase
   auto detect_all_objects_in_range() const
   {
     // cspell: ignore occlusionless
-    static const auto override_legacy_configuration = concealer::getParameter<bool>(
+    static const auto override_legacy_configuration = common::getParameter<bool>(
       detected_objects_publisher->get_topic_name() + std::string(".override_legacy_configuration"));
     if (override_legacy_configuration) {
-      static const auto occlusionless = concealer::getParameter<bool>(
+      static const auto occlusionless = common::getParameter<bool>(
         detected_objects_publisher->get_topic_name() + std::string(".occlusionless"));
       return occlusionless;
     } else {
@@ -167,7 +167,7 @@ public:
   : DetectionSensorBase(current_simulation_time, configuration),
     detected_objects_publisher(publisher),
     ground_truth_objects_publisher(ground_truth_publisher),
-    noise_model_version(concealer::getParameter<int>(
+    noise_model_version(common::getParameter<int>(
       detected_objects_publisher->get_topic_name() + std::string(".noise.model.version"))),
     random_engine_([this]() {
       if (const auto seed = [this]() -> std::random_device::result_type {
@@ -177,7 +177,7 @@ public:
               case 1:
                 return configuration_.random_seed();
               case 2:
-                return concealer::getParameter<int>(
+                return common::getParameter<int>(
                   detected_objects_publisher->get_topic_name() + std::string(".seed"));
             }
           }();

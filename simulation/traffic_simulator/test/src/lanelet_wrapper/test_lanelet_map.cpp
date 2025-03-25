@@ -517,6 +517,30 @@ TEST_F(LaneletWrapperTest_StandardMap, getStopLineIdsOnPath_empty)
   EXPECT_EQ(lanelet_map::stopLineIdsOnPath(lanelet::Ids{}).size(), static_cast<size_t>(0));
 }
 
+/**
+ * @note Test obtaining stop line ids for a standard map.
+ */
+TEST_F(LaneletWrapperTest_StandardMap, stopLineIds_standardMap)
+{
+  EXPECT_EQ(traffic_simulator::lanelet_wrapper::lanelet_map::stopLineIds(), (lanelet::Ids{120635}));
+}
+
+/**
+ * @note Test obtaining stop line ids for an intersection map.
+ */
+TEST_F(LaneletWrapperTest_IntersectionMap, stopLineIds_intersectionMap)
+{
+  EXPECT_EQ(traffic_simulator::lanelet_wrapper::lanelet_map::stopLineIds(), (lanelet::Ids{6960}));
+}
+
+/**
+ * @note Test function behavior when used with an empty map.
+ */
+TEST_F(LaneletWrapperTest_EmptyMap, stopLineIds_emptyMap)
+{
+  EXPECT_THROW(traffic_simulator::lanelet_wrapper::lanelet_map::stopLineIds(), std::runtime_error);
+}
+
 void sortStoplines(std::vector<std::vector<geometry_msgs::msg::Point>> & stoplines)
 {
   auto point_comparator =
