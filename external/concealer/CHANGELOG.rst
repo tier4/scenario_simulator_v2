@@ -21,6 +21,24 @@ Changelog for package concealer
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+14.0.3 (2025-03-24)
+-------------------
+* Merge pull request `#1547 <https://github.com/tier4/scenario_simulator_v2/issues/1547>`_ from tier4/refactor/concealer-6
+  Refactor/concealer 6
+* Rename data member `Service<T>::rate` to `interval`
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-6
+* Merge branch 'master' into refactor/concealer-6
+* Fix several service calls that contained unintended returns
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-6
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-6
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-6
+* Cleanup class template `Service`
+* Update service calls to not be called inside `waitForAutowareStateToBe`
+* Remove local function `receive` from `concealer::Service::operator ()`
+* Cleanup local function `receive`
+* Move complex internal branches into a local function `receive`
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
 14.0.2 (2025-03-19)
 -------------------
 * Merge remote-tracking branch 'origin/master' into RJD1057/change-order-of-members
