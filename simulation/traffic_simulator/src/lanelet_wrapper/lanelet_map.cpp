@@ -97,8 +97,9 @@ auto filterLaneletIds(const lanelet::Ids & lanelet_ids, const char subtype[]) ->
 {
   const auto convertToLanelets = [](const lanelet::Ids & lanelet_ids) -> lanelet::Lanelets {
     lanelet::Lanelets lanelets;
+    lanelets.reserve(lanelet_ids.size());
     for (const auto & id : lanelet_ids) {
-      lanelets.emplace_back(LaneletWrapper::map()->laneletLayer.get(id));
+      lanelets.push_back(LaneletWrapper::map()->laneletLayer.get(id));
     }
     return lanelets;
   };
@@ -373,7 +374,7 @@ auto conflictingCrosswalkIds(const lanelet::Ids & lanelet_ids) -> lanelet::Ids
     const auto & conflicting_crosswalks = graphs_container.conflictingInGraph(
       LaneletWrapper::map()->laneletLayer.get(lanelet_id), routing_graph_id, height_clearance);
     for (const auto & conflicting_crosswalk : conflicting_crosswalks) {
-      conflicting_crosswalk_ids.emplace_back(conflicting_crosswalk.id());
+      conflicting_crosswalk_ids.push_back(conflicting_crosswalk.id());
     }
   }
   return conflicting_crosswalk_ids;
