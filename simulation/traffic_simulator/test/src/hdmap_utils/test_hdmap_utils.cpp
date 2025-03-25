@@ -1971,6 +1971,30 @@ TEST_F(HdMapUtilsTest_StandardMap, getStopLineIdsOnPath_empty)
 }
 
 /**
+ * @note Test obtaining stop line ids for a standard map.
+ */
+TEST_F(HdMapUtilsTest_StandardMap, stopLineIds_standardMap)
+{
+  EXPECT_EQ(traffic_simulator::lanelet_wrapper::lanelet_map::stopLineIds(), (lanelet::Ids{120635}));
+}
+
+/**
+ * @note Test obtaining stop line ids for an intersection map.
+ */
+TEST_F(HdMapUtilsTest_IntersectionMap, stopLineIds_intersectionMap)
+{
+  EXPECT_EQ(traffic_simulator::lanelet_wrapper::lanelet_map::stopLineIds(), (lanelet::Ids{6960}));
+}
+
+/**
+ * @note Test function behavior when used with an empty map.
+ */
+TEST_F(HdMapUtilsTest_EmptyMap, stopLineIds_emptyMap)
+{
+  EXPECT_THROW(traffic_simulator::lanelet_wrapper::lanelet_map::stopLineIds(), std::runtime_error);
+}
+
+/**
  * @note Test basic functionality.
  * Test obtaining traffic light stop line ids
  * correctness with a traffic light that has one stop line.
