@@ -88,20 +88,21 @@ try {
   store(parse_command_line(argc, argv, description), vm);
   notify(vm);
 
-  auto output_directory_option = boost::filesystem::path(vm["output-directory"].as<std::string>());
-  auto format_option = vm["format"].as<openscenario_preprocessor::ScenarioFormat>();
-  auto parameters_option = boost::filesystem::path(vm["parameters"].as<std::string>());
-  auto scenario_option = boost::filesystem::path(vm["scenario"].as<std::string>());
-  bool skip_full_derivation_option = (vm.count("skip-full-derivation") > 0);
+  const auto output_directory_option =
+    boost::filesystem::path(vm["output-directory"].as<std::string>());
+  const auto format_option = vm["format"].as<openscenario_preprocessor::ScenarioFormat>();
+  const auto parameters_option = boost::filesystem::path(vm["parameters"].as<std::string>());
+  const auto scenario_option = boost::filesystem::path(vm["scenario"].as<std::string>());
+  const bool skip_full_derivation_option = (vm.count("skip-full-derivation") > 0);
 
   auto scenario_path = boost::filesystem::path(scenario_option);
 
-  boost::filesystem::path tmp_output_directory = "/tmp/openscenario_preprocessor";
-  if (not boost::filesystem::exists(tmp_output_directory)) {
-    boost::filesystem::create_directories(tmp_output_directory);
+  const boost::filesystem::path output_directory(output_directory_option);
+  if (not boost::filesystem::exists(output_directory / "work")) {
+    boost::filesystem::create_directories(output_directory / "work");
   }
 
-  auto file = std::ofstream("/tmp/openscenario_preprocessor/schema.xsd", std::ios::trunc);
+  auto file = std::ofstream(output_directory / "work" / "schema.xsd", std::ios::trunc);
   file << openscenario_preprocessor::schema;
   file.close();
 
@@ -111,7 +112,7 @@ try {
 
   // preprocess t4v2 format and convert to xosc scenarios
   if (scenario_path.extension() == ".yaml" or scenario_path.extension() == ".yml") {
-    openscenario_preprocessor::T4V2 t4v2;
+    openscenario_preprocessor::T4V2 t4v2(output_directory);
 
     auto [modifiers_path, base_scenario_path] = t4v2.splitScenarioModifiers(scenario_path);
     scenario_modifiers_path = modifiers_path;
@@ -124,7 +125,7 @@ try {
       }
     }();
 
-    boost::filesystem::path t4v2_output_directory = "/tmp/openscenario_preprocessor/t4v2_derived";
+    boost::filesystem::path t4v2_output_directory = output_directory / "work" / "t4v2_derived";
     if (not boost::filesystem::exists(t4v2_output_directory)) {
       boost::filesystem::create_directories(t4v2_output_directory);
     }
@@ -161,13 +162,13 @@ try {
       auto parameter_value_distribution =
         create_parameter_value_distribution_from_json(scenario_path, parameters_json);
 
-      parameter_value_distribution.save_file(
-        "/tmp/openscenario_preprocessor/parameter_value_distribution.xosc");
+      boost::filesystem::path parameter_value_distribution_path =
+        output_directory / "work" / "parameter_value_distribution.xosc";
+      parameter_value_distribution.save_file(parameter_value_distribution_path.c_str());
 
       openscenario_preprocessor::Preprocessor preprocessor(output_directory_option);
 
-      preprocessor.preprocessScenario(
-        "/tmp/openscenario_preprocessor/parameter_value_distribution.xosc", format_option);
+      preprocessor.preprocessScenario(parameter_value_distribution_path, format_option);
 
       // merge scenario modifiers if skip_full_derivation_option is ON
       if (

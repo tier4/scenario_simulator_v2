@@ -23,7 +23,14 @@ namespace openscenario_preprocessor
 {
 class T4V2
 {
+  boost::filesystem::path output_directory;
+
 public:
+  explicit T4V2(boost::filesystem::path output_directory) : output_directory(output_directory)
+  {
+    boost::filesystem::create_directories(output_directory / "work" / "t4v2");
+  }
+
   auto deriveScenarioWithScenarioModifiers(
     const pugi::xml_document & base_scenario_doc,
     const openscenario_interpreter::ParameterDistribution & scenario_modifier_distribution)

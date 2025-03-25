@@ -54,7 +54,7 @@ auto T4V2::deriveToXoscStringScenarios(
     auto parameter_value_distribution =
       generateParameterValueDistributionFromScenarioModifiers(modifiers_ss.str());
     boost::filesystem::path parameter_value_distribution_path =
-      "/tmp/openscenario_preprocessor/scenario_modifiers_distribution.xosc";
+      output_directory / "work" / "t4v2" / "scenario_modifiers_distribution.xosc";
     parameter_value_distribution.save_file(parameter_value_distribution_path.string().c_str());
 
     Deriver derive(output_directory / "work" / "schema.xsd");
@@ -91,6 +91,8 @@ std::pair<boost::filesystem::path, boost::filesystem::path> T4V2::splitScenarioM
   scenario_ss << file.rdbuf();
   file.close();
 
+  boost::filesystem::path work_directory = output_directory / "work" / "t4v2";
+
   auto scenario_string = scenario_ss.str();
 
   if (auto modifiers_pos = scenario_string.find("ScenarioModifiers");
@@ -103,8 +105,8 @@ std::pair<boost::filesystem::path, boost::filesystem::path> T4V2::splitScenarioM
         "scenario.");
     }
 
-    std::ofstream modifiers_ofs("/tmp/openscenario_preprocessor/t4v2_modifiers.yaml");
-    std::ofstream base_scenario_ofs("/tmp/openscenario_preprocessor/t4v2_openscenario.yaml");
+    std::ofstream modifiers_ofs(work_directory / "t4v2_modifiers.yaml");
+    std::ofstream base_scenario_ofs(work_directory / "t4v2_openscenario.yaml");
 
     if (openscenario_pos > modifiers_pos) {
       std::regex re("(.*\n|^)(OpenSCENARIO.*)");
@@ -122,14 +124,13 @@ std::pair<boost::filesystem::path, boost::filesystem::path> T4V2::splitScenarioM
     modifiers_ofs.close();
     base_scenario_ofs.close();
     return std::make_pair<boost::filesystem::path, boost::filesystem::path>(
-      "/tmp/openscenario_preprocessor/t4v2_modifiers.yaml",
-      "/tmp/openscenario_preprocessor/t4v2_openscenario.yaml");
+      work_directory / "t4v2_modifiers.yaml", work_directory / "t4v2_openscenario.yaml");
   } else {
-    std::ofstream base_scenario_ofs("/tmp/openscenario_preprocessor/t4v2_openscenario.yaml");
+    std::ofstream base_scenario_ofs(work_directory / "t4v2_openscenario.yaml");
     base_scenario_ofs << scenario_string;
     base_scenario_ofs.close();
     return std::make_pair<boost::filesystem::path, boost::filesystem::path>(
-      "", "/tmp/openscenario_preprocessor/t4v2_openscenario.yaml");
+      "", work_directory / "t4v2_openscenario.yaml");
   }
 }
 
@@ -296,16 +297,18 @@ auto T4V2::loadScenarioFile(boost::filesystem::path path) -> pugi::xml_document
 {
   std::stringstream xml_stringstream;
   auto xml = convertYAMLtoXML(path);
-  xml.save_file("/tmp/openscenario_preprocessor/intermediate.xosc");
+
+  boost::filesystem::path intermediate_path =
+    output_directory / "work" / "t4v2" / "intermediate.xosc";
+  xml.save_file(intermediate_path.c_str());
 
   xml.save(xml_stringstream);
 
   pugi::xml_document doc;
 
-  SimpleXMLFormatter formatter;
-  if (auto formatted_xml = formatter.formatXML(
-        "/tmp/openscenario_preprocessor/intermediate.xosc",
-        "/tmp/openscenario_preprocessor/schema.xsd");
+  SimpleXMLFormatter formatter(output_directory);
+  if (auto formatted_xml =
+        formatter.formatXML(intermediate_path, output_directory / "work" / "schema.xsd");
       formatted_xml) {
     std::cout << formatted_xml->c_str() << std::endl;
     doc.load_file(formatted_xml->c_str());

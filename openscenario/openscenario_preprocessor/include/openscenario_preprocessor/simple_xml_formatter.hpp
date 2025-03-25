@@ -224,8 +224,11 @@ private:
 
   std::unique_ptr<XercesDOMParser> parser = nullptr;
 
+  const boost::filesystem::path output_directory;
+
 public:
-  SimpleXMLFormatter()
+  explicit SimpleXMLFormatter(boost::filesystem::path output_directory)
+  : output_directory(output_directory)
   {
     try {
       XMLPlatformUtils::Initialize();
@@ -247,7 +250,7 @@ public:
     const boost::filesystem::path & xml_path, const boost::filesystem::path & schema_path)
     -> std::optional<boost::filesystem::path>
   {
-    boost::filesystem::path output_path = "/tmp/openscenario_preprocessor/formatted.xosc";
+    boost::filesystem::path output_path = output_directory / "work" / "formatted.xosc";
 
     if (formatXMLImpl(xml_path, schema_path, output_path)) {
       return output_path;
@@ -300,6 +303,7 @@ public:
     }
   }
 
+private:
   auto formatXMLImpl(
     const boost::filesystem::path & xml_path, const boost::filesystem::path & schema_path,
     const boost::filesystem::path & output_path) -> std::optional<bool>
