@@ -71,6 +71,7 @@ using PoseStamped = geometry_msgs::msg::PoseStamped;
 using Spline = math::geometry::CatmullRomSpline;
 using SplineInterface = math::geometry::CatmullRomSplineInterface;
 using Vector3 = geometry_msgs::msg::Vector3;
+using SplineInterface = math::geometry::CatmullRomSplineInterface;
 
 class RouteCache
 {
