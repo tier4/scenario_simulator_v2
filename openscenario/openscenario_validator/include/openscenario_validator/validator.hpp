@@ -74,7 +74,7 @@ class OpenSCENARIOValidator
   static inline XMLPlatformLifecycleHandler xml_platform_lifecycle_handler;
 
 public:
-  explicit OpenSCENARIOValidator(std::string schema_path)
+  explicit OpenSCENARIOValidator(boost::filesystem::path schema_path)
   : parser(std::make_unique<xercesc::XercesDOMParser>())
   {
     parser->setDoNamespaces(true);

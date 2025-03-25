@@ -57,7 +57,7 @@ auto T4V2::deriveToXoscStringScenarios(
       "/tmp/openscenario_preprocessor/scenario_modifiers_distribution.xosc";
     parameter_value_distribution.save_file(parameter_value_distribution_path.string().c_str());
 
-    Deriver derive("/tmp/openscenario_preprocessor/schema.xsd");
+    Deriver derive(output_directory / "work" / "schema.xsd");
     auto distribution = derive(parameter_value_distribution_path, false);
 
     if (not distribution.empty()) {

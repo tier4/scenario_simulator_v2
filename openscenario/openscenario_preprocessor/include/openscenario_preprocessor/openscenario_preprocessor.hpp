@@ -52,7 +52,7 @@ class Preprocessor
 {
 public:
   explicit Preprocessor(const boost::filesystem::path & output_directory)
-  : output_directory(output_directory), derive("/tmp/openscenario_preprocessor/schema.xsd")
+  : output_directory(output_directory), derive(output_directory / "work" / "schema.xsd")
   {
     if (not boost::filesystem::exists(output_directory)) {
       boost::filesystem::create_directories(output_directory);

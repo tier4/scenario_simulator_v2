@@ -27,7 +27,7 @@ namespace openscenario_preprocessor
 class Deriver
 {
 public:
-  explicit Deriver(std::string schema_path) : validate(schema_path) {}
+  explicit Deriver(boost::filesystem::path schema_path) : validate(schema_path) {}
   auto operator()(boost::filesystem::path path, bool check_scenario_path = true)
     -> openscenario_interpreter::ParameterDistribution
   {
