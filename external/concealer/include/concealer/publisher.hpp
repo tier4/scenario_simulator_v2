@@ -15,104 +15,27 @@
 #ifndef CONCEALER__PUBLISHER_HPP_
 #define CONCEALER__PUBLISHER_HPP_
 
-#include <get_parameter/get_parameter.hpp>
-#include <nav_msgs/msg/odometry.hpp>
-#include <random>
+#include <memory>
 #include <rclcpp/rclcpp.hpp>
 
 namespace concealer
 {
-template <typename>
-struct Identity
-{
-  explicit constexpr Identity(
-    const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr &, const std::string &)
-  {
-  }
-
-  template <typename T>
-  constexpr auto operator()(T && x) const -> decltype(auto)
-  {
-    return std::forward<decltype(x)>(x);
-  }
-};
-
-template <typename>
-struct NormalDistribution;
-
-template <>
-struct NormalDistribution<nav_msgs::msg::Odometry>
-{
-  std::random_device::result_type seed;
-
-  std::random_device device;
-
-  std::mt19937_64 engine;
-
-  double speed_threshold;
-
-  struct Error
-  {
-    std::normal_distribution<double> additive, multiplicative;
-
-    explicit Error(
-      const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node,
-      const std::string & prefix)
-    : additive(
-        common::getParameter<double>(node, prefix + ".additive.mean"),
-        common::getParameter<double>(node, prefix + ".additive.standard_deviation")),
-      multiplicative(
-        common::getParameter<double>(node, prefix + ".multiplicative.mean"),
-        common::getParameter<double>(node, prefix + ".multiplicative.standard_deviation"))
-    {
-    }
-
-    auto apply(std::mt19937_64 & engine, double value) -> decltype(auto)
-    {
-      return value * (multiplicative(engine) + 1.0) + additive(engine);
-    }
-  };
-
-  // clang-format off
-  Error position_local_x_error,
-        position_local_y_error,
-        position_local_z_error,
-        orientation_r_error,
-        orientation_p_error,
-        orientation_y_error,
-        linear_x_error,
-        linear_y_error,
-        linear_z_error,
-        angular_x_error,
-        angular_y_error,
-        angular_z_error;
-  // clang-format on
-
-  explicit NormalDistribution(
-    const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr &, const std::string &);
-
-  auto operator()(nav_msgs::msg::Odometry odometry) -> nav_msgs::msg::Odometry;
-};
-
-template <typename Message, template <typename> typename Randomizer = Identity>
+template <typename Message>
 class Publisher
 {
   typename rclcpp::Publisher<Message>::SharedPtr publisher;
 
-  Randomizer<Message> randomize;
-
 public:
   template <typename Node>
   explicit Publisher(const std::string & topic, Node & node)
-  : publisher(node.template create_publisher<Message>(topic, rclcpp::QoS(1).reliable())),
-    randomize(node.get_node_parameters_interface(), topic)
+  : publisher(node.template create_publisher<Message>(topic, rclcpp::QoS(1).reliable()))
   {
   }
 
   template <typename... Ts>
-  auto operator()(Ts &&... xs) -> decltype(auto)
+  auto operator()(Ts &&... xs) const -> decltype(auto)
   {
-    return publisher->publish(randomize(std::forward<decltype(xs)>(xs)...));
+    return publisher->publish(std::forward<decltype(xs)>(xs)...);
   }
 };
 }  // namespace concealer

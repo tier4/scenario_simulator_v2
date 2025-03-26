@@ -29,10 +29,9 @@ ObjectController::ObjectController()  //
 ObjectController::ObjectController(const pugi::xml_node & node, Scope & scope)
 // clang-format off
 : ComplexType(
-    choice(node, {
-      { "CatalogReference", [&](auto && node) { return CatalogReference(node, scope).make(); } },
-      { "Controller",       [&](auto && node) { return make<Controller>(node, scope);        } },
-    }))
+    choice(node,
+      std::make_pair("CatalogReference", [&](auto && node) { return CatalogReference(node, scope).make(); }),
+      std::make_pair("Controller",       [&](auto && node) { return make<Controller>(node, scope);        })))
 // clang-format on
 {
 }

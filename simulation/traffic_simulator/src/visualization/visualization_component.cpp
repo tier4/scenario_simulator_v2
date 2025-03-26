@@ -357,6 +357,7 @@ const visualization_msgs::msg::MarkerArray VisualizationComponent::generateMarke
   pr = math::geometry::transformPoint(status.pose, pr);
   arrow.points = {pf, pl, pr};
   arrow.colors = {color};
+  arrow.pose.orientation = status.pose.orientation;
   arrow.type = visualization_msgs::msg::Marker::TRIANGLE_LIST;
   arrow.scale.x = 1.0;
   arrow.scale.y = 1.0;

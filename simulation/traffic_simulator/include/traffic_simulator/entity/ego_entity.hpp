@@ -18,12 +18,12 @@
 #include <algorithm>
 #include <boost/filesystem.hpp>
 #include <concealer/field_operator_application.hpp>
-#include <get_parameter/get_parameter.hpp>
 #include <memory>
 #include <optional>
 #include <string>
 #include <traffic_simulator/api/configuration.hpp>
 #include <traffic_simulator/entity/vehicle_entity.hpp>
+#include <traffic_simulator/utils/node_parameters.hpp>
 #include <traffic_simulator_msgs/msg/entity_type.hpp>
 #include <vector>
 

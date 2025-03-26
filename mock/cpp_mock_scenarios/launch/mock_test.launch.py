@@ -115,7 +115,6 @@ def launch_setup(context, *args, **kwargs):
     launch_rviz                         = LaunchConfiguration("launch_rviz",                            default=False)
     launch_simple_sensor_simulator      = LaunchConfiguration("launch_simple_sensor_simulator",         default=True)
     output_directory                    = LaunchConfiguration("output_directory",                       default=Path("/tmp"))
-    parameter_file_path                 = LaunchConfiguration("parameter_file_path",                    default=Path(get_package_share_directory("scenario_test_runner")) / "config/parameters.yaml")
     port                                = LaunchConfiguration("port",                                   default=5555)
     publish_empty_context               = LaunchConfiguration("publish_empty_context",                  default=False)
     record                              = LaunchConfiguration("record",                                 default=False)
@@ -142,7 +141,6 @@ def launch_setup(context, *args, **kwargs):
     print(f"launch_autoware                     := {launch_autoware.perform(context)}")
     print(f"launch_rviz                         := {launch_rviz.perform(context)}")
     print(f"output_directory                    := {output_directory.perform(context)}")
-    print(f"parameter_file_path                 := {parameter_file_path.perform(context)}")
     print(f"port                                := {port.perform(context)}")
     print(f"publish_empty_context               := {publish_empty_context.perform(context)}")
     print(f"record                              := {record.perform(context)}")
@@ -179,7 +177,6 @@ def launch_setup(context, *args, **kwargs):
             {"junit_path": junit_path},
         ]
         parameters += make_vehicle_parameters()
-        parameters += [parameter_file_path.perform(context)]
         return parameters
 
     def make_vehicle_parameters():
@@ -224,7 +221,6 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("global_timeout",                      default_value=global_timeout                     ),
         DeclareLaunchArgument("launch_autoware",                     default_value=launch_autoware                    ),
         DeclareLaunchArgument("launch_rviz",                         default_value=launch_rviz                        ),
-        DeclareLaunchArgument("parameter_file_path",                 default_value=parameter_file_path                ),
         DeclareLaunchArgument("publish_empty_context",               default_value=publish_empty_context              ),
         DeclareLaunchArgument("output_directory",                    default_value=output_directory                   ),
         DeclareLaunchArgument("rviz_config",                         default_value=rviz_config                        ),

@@ -24,10 +24,9 @@ inline namespace syntax
 LaneChangeTarget::LaneChangeTarget(const pugi::xml_node & node, Scope & scope)
 // clang-format off
 : ComplexType(
-    choice(node, {
-      { "RelativeTargetLane", [&](auto && node) { return make<RelativeTargetLane>(node, scope); } },
-      { "AbsoluteTargetLane", [&](auto && node) { return make<AbsoluteTargetLane>(node, scope); } },
-    }))
+    choice(node,
+      std::make_pair("RelativeTargetLane", [&](auto && node) { return make<RelativeTargetLane>(node, scope); }),
+      std::make_pair("AbsoluteTargetLane", [&](auto && node) { return make<AbsoluteTargetLane>(node, scope); })))
 // clang-format on
 {
 }

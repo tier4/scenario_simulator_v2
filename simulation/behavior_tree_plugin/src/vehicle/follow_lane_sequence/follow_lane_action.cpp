@@ -108,8 +108,7 @@ BT::NodeStatus FollowLaneAction::tick()
         return BT::NodeStatus::FAILURE;
       }
     }
-    auto distance_to_stopline =
-      traffic_simulator::distance::distanceToStopLine(route_lanelets, *trajectory);
+    auto distance_to_stopline = hdmap_utils->getDistanceToStopLine(route_lanelets, *trajectory);
     auto distance_to_conflicting_entity =
       getDistanceToConflictingEntity(route_lanelets, *trajectory);
     if (distance_to_stopline) {

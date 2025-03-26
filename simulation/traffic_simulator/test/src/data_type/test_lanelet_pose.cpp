@@ -191,8 +191,8 @@ TEST_F(CanonicalizedLaneletPoseTest, getAlternativeLaneletPoseBaseOnShortestRout
   const auto from1 = traffic_simulator::helper::constructLaneletPose(34603, 10.0, 0.0);
   const auto from2 = traffic_simulator::helper::constructLaneletPose(34579, 10.0, 0.0);
 
-  const auto result1 = pose.getAlternativeLaneletPoseBaseOnShortestRouteFrom(from1);
-  const auto result2 = pose.getAlternativeLaneletPoseBaseOnShortestRouteFrom(from2);
+  const auto result1 = pose.getAlternativeLaneletPoseBaseOnShortestRouteFrom(from1, hdmap_utils);
+  const auto result2 = pose.getAlternativeLaneletPoseBaseOnShortestRouteFrom(from2, hdmap_utils);
 
   ASSERT_TRUE(result1.has_value());
   ASSERT_TRUE(result2.has_value());
@@ -210,8 +210,8 @@ TEST_F(CanonicalizedLaneletPoseTest, getAlternativeLaneletPoseBaseOnShortestRout
   const auto from1 = traffic_simulator::helper::constructLaneletPose(34603, 10.0, 0.0);
   const auto from2 = traffic_simulator::helper::constructLaneletPose(34579, 10.0, 0.0);
 
-  const auto result1 = pose.getAlternativeLaneletPoseBaseOnShortestRouteFrom(from1);
-  const auto result2 = pose.getAlternativeLaneletPoseBaseOnShortestRouteFrom(from2);
+  const auto result1 = pose.getAlternativeLaneletPoseBaseOnShortestRouteFrom(from1, hdmap_utils);
+  const auto result2 = pose.getAlternativeLaneletPoseBaseOnShortestRouteFrom(from2, hdmap_utils);
 
   ASSERT_TRUE(result1.has_value());
   ASSERT_TRUE(result2.has_value());
@@ -230,8 +230,8 @@ TEST_F(CanonicalizedLaneletPoseTest, getAlternativeLaneletPoseBaseOnShortestRout
   const auto from1 = traffic_simulator::helper::constructLaneletPose(34603, 10.0, 0.0);
   const auto from2 = traffic_simulator::helper::constructLaneletPose(34579, 10.0, 0.0);
 
-  const auto result1 = pose.getAlternativeLaneletPoseBaseOnShortestRouteFrom(from1);
-  const auto result2 = pose.getAlternativeLaneletPoseBaseOnShortestRouteFrom(from2);
+  const auto result1 = pose.getAlternativeLaneletPoseBaseOnShortestRouteFrom(from1, hdmap_utils);
+  const auto result2 = pose.getAlternativeLaneletPoseBaseOnShortestRouteFrom(from2, hdmap_utils);
 
   ASSERT_TRUE(result1.has_value());
   ASSERT_TRUE(result2.has_value());

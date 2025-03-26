@@ -22,7 +22,6 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <tier4_external_api_msgs/msg/response_status.hpp>
-#include <tier4_rtc_msgs/msg/cooperate_response.hpp>
 #include <tier4_rtc_msgs/srv/auto_mode_with_module.hpp>
 #include <type_traits>
 
@@ -31,73 +30,113 @@ namespace concealer
 template <typename T>
 class Service
 {
-  const std::string name;
+  const std::string service_name;
+
+  rclcpp::Logger logger;
 
   typename rclcpp::Client<T>::SharedPtr client;
 
-  rclcpp::WallRate interval;
+  rclcpp::WallRate validation_rate;
 
 public:
   template <typename Node>
   explicit Service(
-    const std::string & name, Node & node,
-    const std::chrono::nanoseconds & interval = std::chrono::seconds(1))
-  : name(name),
-    client(node.template create_client<T>(name, rmw_qos_profile_default)),
-    interval(interval)
+    const std::string & service_name, Node & node,
+    const std::chrono::nanoseconds validation_interval = std::chrono::seconds(1))
+  : service_name(service_name),
+    logger(node.get_logger()),
+    client(node.template create_client<T>(service_name, rmw_qos_profile_default)),
+    validation_rate(validation_interval)
   {
   }
 
   auto operator()(const typename T::Request::SharedPtr & request, std::size_t attempts_count)
+    -> void
   {
     while (!client->service_is_ready()) {
-      interval.sleep();
+      RCLCPP_INFO_STREAM(logger, service_name << " service is not ready.");
+      validation_rate.sleep();
     }
 
-    auto receive = [this](const auto & response) {
-      if constexpr (DetectMember_status<typename T::Response>::value) {
-        if constexpr (std::is_same_v<
-                        tier4_external_api_msgs::msg::ResponseStatus,
-                        decltype(T::Response::status)>) {
-          return response->status.code == tier4_external_api_msgs::msg::ResponseStatus::SUCCESS;
-        } else if constexpr (std::is_same_v<
-                               autoware_adapi_v1_msgs::msg::ResponseStatus,
-                               decltype(T::Response::status)>) {
-          return response->status.success;
-        } else {
-          static_assert([]() { return false; });
-        }
-      } else if constexpr (DetectMember_success<typename T::Response>::value) {
-        if constexpr (std::is_same_v<bool, decltype(T::Response::success)>) {
-          return response->success;
-        } else {
-          static_assert([]() { return false; });
-        }
-      } else if constexpr (DetectMember_responses<typename T::Response>::value) {
-        if constexpr (std::is_same_v<
-                        std::vector<tier4_rtc_msgs::msg::CooperateResponse>,
-                        decltype(T::Response::responses)>) {
-          return std::all_of(
-            response->responses.begin(), response->responses.end(),
-            [](const auto & response) { return response.success; });
-        } else {
-          static_assert([]() { return false; });
-        }
+    auto send = [this](const auto & request) {
+      if (auto future = client->async_send_request(request);
+          future.wait_for(validation_rate.period()) == std::future_status::ready) {
+        return std::optional<typename rclcpp::Client<T>::SharedFuture>(future);
       } else {
-        static_assert([]() { return false; });
+        RCLCPP_ERROR_STREAM(logger, service_name << " service request has timed out.");
+        return std::optional<typename rclcpp::Client<T>::SharedFuture>();
       }
     };
 
-    for (std::size_t attempt = 0; attempt < attempts_count; ++attempt, interval.sleep()) {
-      if (auto future = client->async_send_request(request);
-          future.wait_for(interval.period()) == std::future_status::ready and
-          receive(future.get())) {
-        return;
+    for (std::size_t attempt = 0; attempt < attempts_count; ++attempt, validation_rate.sleep()) {
+      if (const auto & service_call_result = send(request)) {
+        if constexpr (DetectMember_status<typename T::Response>::value) {
+          if constexpr (std::is_same_v<
+                          tier4_external_api_msgs::msg::ResponseStatus,
+                          decltype(T::Response::status)>) {
+            if (const auto & service_call_status = service_call_result->get()->status;
+                service_call_status.code == tier4_external_api_msgs::msg::ResponseStatus::SUCCESS) {
+              RCLCPP_INFO_STREAM(
+                logger, service_name << " service request has been accepted"
+                                     << (service_call_status.message.empty()
+                                           ? "."
+                                           : " (" + service_call_status.message + ")."));
+              return;
+            } else {
+              RCLCPP_ERROR_STREAM(
+                logger, service_name
+                          << " service request was accepted, but ResponseStatus is FAILURE"
+                          << (service_call_status.message.empty()
+                                ? "."
+                                : " (" + service_call_status.message + ")"));
+            }
+          } else if constexpr (std::is_same_v<
+                                 autoware_adapi_v1_msgs::msg::ResponseStatus,
+                                 decltype(T::Response::status)>) {
+            if (const auto & service_call_status = service_call_result->get()->status;
+                service_call_status.success) {
+              RCLCPP_INFO_STREAM(
+                logger, service_name << " service request has been accepted"
+                                     << (service_call_status.message.empty()
+                                           ? "."
+                                           : " (" + service_call_status.message + ")."));
+              return;
+            } else {
+              RCLCPP_ERROR_STREAM(
+                logger, service_name << " service request was accepted, but "
+                                        "ResponseStatus::success is false with error code: "
+                                     << service_call_status.code << ", and message: "
+                                     << (service_call_status.message.empty()
+                                           ? ""
+                                           : " (" + service_call_status.message + ")"));
+            }
+          } else {
+            RCLCPP_INFO_STREAM(logger, service_name << " service request has been accepted.");
+            return;
+          }
+        } else if constexpr (DetectMember_success<typename T::Response>::value) {
+          if constexpr (std::is_same_v<bool, decltype(T::Response::success)>) {
+            if (service_call_result->get()->success) {
+              RCLCPP_INFO_STREAM(logger, service_name << " service request has been accepted.");
+              return;
+            } else {
+              RCLCPP_ERROR_STREAM(
+                logger, service_name
+                          << " service request has been accepted, but Response::success is false.");
+            }
+          } else {
+            RCLCPP_INFO_STREAM(logger, service_name << " service request has been accepted.");
+            return;
+          }
+        } else {
+          RCLCPP_INFO_STREAM(logger, service_name << " service request has been accepted.");
+          return;
+        }
       }
     }
 
     throw common::scenario_simulator_exception::AutowareError(
-      "Requested the service ", std::quoted(name), " ", attempts_count,
+      "Requested the service ", std::quoted(service_name), " ", attempts_count,
       " times, but was not successful.");
   }
 };

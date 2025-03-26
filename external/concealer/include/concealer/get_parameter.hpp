@@ -12,13 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef COMMON__GET_PARAMETER_HPP_
-#define COMMON__GET_PARAMETER_HPP_
+#ifndef CONCEALER__GET_PARAMETER_HPP_
+#define CONCEALER__GET_PARAMETER_HPP_
 
 #include <rclcpp/rclcpp.hpp>
 
-namespace common
+namespace concealer
 {
+static constexpr auto default_architecture_type = "awf/universe/20240605";
+
 template <typename T>
 auto getParameter(
   const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node,
@@ -33,9 +35,9 @@ auto getParameter(
 template <typename T>
 auto getParameter(const std::string & name, T value = {})
 {
-  static auto node = rclcpp::Node(__func__, "simulation");
+  auto node = rclcpp::Node("get_parameter", "simulation");
   return getParameter(node.get_node_parameters_interface(), name, value);
 }
-}  // namespace common
+}  // namespace concealer
 
-#endif  // COMMON__GET_PARAMETER_HPP_
+#endif  // CONCEALER__GET_PARAMETER_HPP_

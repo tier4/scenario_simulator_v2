@@ -23,10 +23,9 @@ inline namespace syntax
 ParameterAction::ParameterAction(const pugi::xml_node & parent, Scope & scope)
 // clang-format off
 : ComplexType(
-    choice(parent, {
-      {    "SetAction", [&](auto && node) { return make<   ParameterSetAction>(node, scope, readAttribute<String>("parameterRef", parent, scope)); } },
-      { "ModifyAction", [&](auto && node) { return make<ParameterModifyAction>(node, scope, readAttribute<String>("parameterRef", parent, scope)); } },
-    }))
+    choice(parent,
+      std::make_pair(   "SetAction", [&](auto && node) { return make<   ParameterSetAction>(node, scope, readAttribute<String>("parameterRef", parent, scope)); }),
+      std::make_pair("ModifyAction", [&](auto && node) { return make<ParameterModifyAction>(node, scope, readAttribute<String>("parameterRef", parent, scope)); })))
 // clang-format on
 {
 }
