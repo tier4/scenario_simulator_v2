@@ -90,8 +90,7 @@ BT::NodeStatus FollowFrontEntityAction::tick()
   if (trajectory == nullptr) {
     return BT::NodeStatus::FAILURE;
   }
-  auto distance_to_stopline =
-    traffic_simulator::distance::distanceToStopLine(route_lanelets, *trajectory);
+  auto distance_to_stopline = hdmap_utils->getDistanceToStopLine(route_lanelets, *trajectory);
   auto distance_to_conflicting_entity = getDistanceToConflictingEntity(route_lanelets, *trajectory);
   const auto front_entity_name = getFrontEntityName(*trajectory);
   if (!front_entity_name) {

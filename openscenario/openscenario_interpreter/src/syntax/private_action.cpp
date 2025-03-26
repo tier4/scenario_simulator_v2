@@ -22,16 +22,15 @@ inline namespace syntax
 PrivateAction::PrivateAction(const pugi::xml_node & node, Scope & scope)
 // clang-format off
 : ComplexType(
-    choice(node, {
-      {       "LongitudinalAction", [&](const auto & node) { return make<LongitudinalAction>(node, scope);                         } },
-      {            "LateralAction", [&](const auto & node) { return make<     LateralAction>(node, scope);                         } },
-      {         "VisibilityAction", [&](const auto & node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; } },
-      {        "SynchronizeAction", [&](const auto & node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; } },
-      { "ActivateControllerAction", [&](const auto & node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; } },
-      {         "ControllerAction", [&](const auto & node) { return make<  ControllerAction>(node, scope);                         } },
-      {           "TeleportAction", [&](const auto & node) { return make<    TeleportAction>(node, scope);                         } },
-      {            "RoutingAction", [&](const auto & node) { return make<     RoutingAction>(node, scope);                         } },
-    }))
+    choice(node,
+      std::make_pair(      "LongitudinalAction", [&](const auto & node) { return make<LongitudinalAction>(node, scope); }),
+      std::make_pair(           "LateralAction", [&](const auto & node) { return make<     LateralAction>(node, scope); }),
+      std::make_pair(        "VisibilityAction", [&](const auto & node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
+      std::make_pair(       "SynchronizeAction", [&](const auto & node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
+      std::make_pair("ActivateControllerAction", [&](const auto & node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
+      std::make_pair(        "ControllerAction", [&](const auto & node) { return make<  ControllerAction>(node, scope); }),
+      std::make_pair(          "TeleportAction", [&](const auto & node) { return make<    TeleportAction>(node, scope); }),
+      std::make_pair(           "RoutingAction", [&](const auto & node) { return make<     RoutingAction>(node, scope); })))
 // clang-format on
 {
 }

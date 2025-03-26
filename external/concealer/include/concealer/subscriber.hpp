@@ -16,7 +16,7 @@
 #define CONCEALER__SUBSCRIBER_HPP_
 
 #include <concealer/convert.hpp>
-#include <get_parameter/get_parameter.hpp>
+#include <concealer/get_parameter.hpp>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
@@ -139,7 +139,7 @@ struct Subscriber<std::tuple<Messages...>> : public Subscriber<Messages...>
     if (not any(subscription_available, static_cast<const Subscriber<Messages...> &>(*this))) {
       throw common::scenario_simulator_exception::Error(
         "No viable subscription for topic ", std::quoted(topic), " in ",
-        common::getParameter<std::string>("architecture_type"), ".");
+        getParameter<std::string>("architecture_type"), ".");
     }
   }
 };

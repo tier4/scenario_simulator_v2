@@ -23,10 +23,9 @@ inline namespace syntax
 TrajectoryRef::TrajectoryRef(const pugi::xml_node & node, Scope & scope)
 // clang-format off
 : trajectory(
-    choice(node, {
-      {       "Trajectory", [&](const auto & node) { return make<Trajectory>(node, scope);        } },
-      { "CatalogReference", [&](const auto & node) { return CatalogReference(node, scope).make(); } },
-    }))
+    choice(node,
+      std::make_pair(      "Trajectory", [&](const auto & node) { return make<Trajectory>(node, scope);        }),
+      std::make_pair("CatalogReference", [&](const auto & node) { return CatalogReference(node, scope).make(); })))
 // clang-format on
 {
 }

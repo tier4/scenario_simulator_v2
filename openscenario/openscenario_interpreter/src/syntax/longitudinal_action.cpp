@@ -22,11 +22,10 @@ inline namespace syntax
 LongitudinalAction::LongitudinalAction(const pugi::xml_node & node, Scope & scope)
 // clang-format off
 : ComplexType(
-    choice(node, {
-      {                "SpeedAction", [&](const auto & node) { return make<SpeedAction>(node, scope);                                } },
-      { "LongitudinalDistanceAction", [&](const auto & node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; } },
-      {         "SpeedProfileAction", [&](const auto & node) { return make<SpeedProfileAction>(node, scope);                         } },
-    }))
+    choice(node,
+      std::make_pair(               "SpeedAction", [&](const auto & node) { return make<SpeedAction>(node, scope); }),
+      std::make_pair("LongitudinalDistanceAction", [&](const auto & node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
+      std::make_pair(        "SpeedProfileAction", [&](const auto & node) { return make<SpeedProfileAction>(node, scope); })))
 // clang-format on
 {
 }

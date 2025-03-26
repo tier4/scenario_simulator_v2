@@ -34,7 +34,6 @@ namespace concealer
 DEFINE_MEMBER_DETECTOR(allow_goal_modification);
 DEFINE_MEMBER_DETECTOR(distance);
 DEFINE_MEMBER_DETECTOR(option);
-DEFINE_MEMBER_DETECTOR(responses);
 DEFINE_MEMBER_DETECTOR(status);
 DEFINE_MEMBER_DETECTOR(success);
 

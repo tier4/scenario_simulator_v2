@@ -23,10 +23,9 @@ inline namespace syntax
 SpeedActionTarget::SpeedActionTarget(const pugi::xml_node & node, Scope & scope)
 // clang-format off
 : ComplexType(
-    choice(node, {
-      { "RelativeTargetSpeed", [&](const auto & node) { return make<RelativeTargetSpeed>(node, scope); } },
-      { "AbsoluteTargetSpeed", [&](const auto & node) { return make<AbsoluteTargetSpeed>(node, scope); } },
-    }))
+    choice(node,
+      std::make_pair("RelativeTargetSpeed", [&](const auto & node) { return make<RelativeTargetSpeed>(node, scope); }),
+      std::make_pair("AbsoluteTargetSpeed", [&](const auto & node) { return make<AbsoluteTargetSpeed>(node, scope); })))
 // clang-format on
 {
 }

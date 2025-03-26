@@ -23,10 +23,9 @@ DeterministicParameterDistribution::DeterministicParameterDistribution(
   const pugi::xml_node & node, Scope & scope)
 // clang-format off
 : Group(
-    choice(node, {
-      { "DeterministicMultiParameterDistribution",  [&](auto && node) { return make<DeterministicMultiParameterDistribution >(node,scope); } },
-      { "DeterministicSingleParameterDistribution", [&](auto && node) { return make<DeterministicSingleParameterDistribution>(node,scope); } },
-    }))
+    choice(node,
+      std::make_pair("DeterministicMultiParameterDistribution",  [&](auto && node){return make<DeterministicMultiParameterDistribution >(node,scope);}),
+      std::make_pair("DeterministicSingleParameterDistribution", [&](auto && node){return make<DeterministicSingleParameterDistribution>(node,scope);})))
 // clang-format on
 {
 }

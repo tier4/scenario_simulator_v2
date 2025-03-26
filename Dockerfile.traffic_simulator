@@ -1,5 +1,5 @@
 ARG ROS_DISTRO="humble"
-FROM ros:${ROS_DISTRO} AS build-stage
+FROM ros:${ROS_DISTRO} as build-stage
 SHELL ["/bin/bash", "-c"]
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NOWARNINGS=yes

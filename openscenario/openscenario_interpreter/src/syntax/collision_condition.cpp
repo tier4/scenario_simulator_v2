@@ -29,10 +29,9 @@ CollisionCondition::CollisionCondition(
 // clang-format off
 : Scope(scope),
   another_given_entity(
-    choice(node, {
-      { "EntityRef", [&](auto && node) { return make<      Entity>(node, scope); } },
-      {    "ByType", [&](auto && node) { return make<ByObjectType>(node, scope); } },
-    })),
+    choice(node,
+      std::make_pair("EntityRef", [&](auto && node) { return make<Entity>(node, scope); }),
+      std::make_pair("ByType",    [&](auto && node) { return make<ByObjectType>(node, scope); }))),
   triggering_entities(triggering_entities)
 // clang-format on
 {

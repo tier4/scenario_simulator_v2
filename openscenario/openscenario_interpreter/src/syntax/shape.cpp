@@ -23,11 +23,10 @@ inline namespace syntax
 Shape::Shape(const pugi::xml_node & node, Scope & scope)
 // clang-format off
 : ComplexType(
-    choice(node, {
-      { "Polyline", [&](const auto & node) { return make<Polyline>(node, scope);                                   } },
-      { "Clothoid", [&](const auto & node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; } },
-      {    "Nurbs", [&](const auto & node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; } },
-    }))
+    choice(node,
+      std::make_pair("Polyline", [&](const auto & node) { return make<Polyline>(node, scope); }),
+      std::make_pair("Clothoid", [&](const auto & node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
+      std::make_pair(   "Nurbs", [&](const auto & node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; })))
 // clang-format on
 {
 }

@@ -593,57 +593,57 @@ TEST_F(distanceTest_StandardMap, distanceToLeftLaneBound_single)
   {
     const auto pose = makePose(3818.33, 73726.18, 0.0, 30.0);
     const auto bounding_box = makeCustom2DBoundingBox(0.1, 0.1, 0.0, 0.0);
-    const double result =
-      traffic_simulator::distance::distanceToLeftLaneBound(pose, bounding_box, lanelet_id);
+    const double result = traffic_simulator::distance::distanceToLeftLaneBound(
+      pose, bounding_box, lanelet_id, hdmap_utils_ptr);
     EXPECT_NEAR(result, 0.5, tolerance);
   }
   {
     const auto pose = makePose(3816.89, 73723.09, 0.0, 30.0);
     const auto bounding_box = makeCustom2DBoundingBox(0.1, 0.1, 0.0, 0.0);
-    const double result =
-      traffic_simulator::distance::distanceToLeftLaneBound(pose, bounding_box, lanelet_id);
+    const double result = traffic_simulator::distance::distanceToLeftLaneBound(
+      pose, bounding_box, lanelet_id, hdmap_utils_ptr);
     EXPECT_NEAR(result, 2.6, tolerance);
   }
   {
     const auto pose = makePose(3813.42, 73721.11, 0.0, 30.0);
     const auto bounding_box = makeCustom2DBoundingBox(3.0, 0.1, 0.0, 0.0);
-    const double result =
-      traffic_simulator::distance::distanceToLeftLaneBound(pose, bounding_box, lanelet_id);
+    const double result = traffic_simulator::distance::distanceToLeftLaneBound(
+      pose, bounding_box, lanelet_id, hdmap_utils_ptr);
     EXPECT_NEAR(result, 2.7, tolerance);
   }
   {
     const auto pose = makePose(3813.42, 73721.11, 0.0, 120.0);
     const auto bounding_box = makeCustom2DBoundingBox(3.0, 0.1, 0.0, 0.0);
-    const double result =
-      traffic_simulator::distance::distanceToLeftLaneBound(pose, bounding_box, lanelet_id);
+    const double result = traffic_simulator::distance::distanceToLeftLaneBound(
+      pose, bounding_box, lanelet_id, hdmap_utils_ptr);
     EXPECT_NEAR(result, 1.3, tolerance);
   }
   {
     const auto pose = makePose(3810.99, 73721.40, 0.0, 30.0);
     const auto bounding_box = makeCustom2DBoundingBox(0.1, 0.1, 1.0, 0.0);
-    const double result =
-      traffic_simulator::distance::distanceToLeftLaneBound(pose, bounding_box, lanelet_id);
+    const double result = traffic_simulator::distance::distanceToLeftLaneBound(
+      pose, bounding_box, lanelet_id, hdmap_utils_ptr);
     EXPECT_NEAR(result, 1.4, tolerance);
   }
   {
     const auto pose = makePose(3810.99, 73721.40, 0.0, 30.0);
     const auto bounding_box = makeCustom2DBoundingBox(0.1, 0.1, 0.0, -1.0);
-    const double result =
-      traffic_simulator::distance::distanceToLeftLaneBound(pose, bounding_box, lanelet_id);
+    const double result = traffic_simulator::distance::distanceToLeftLaneBound(
+      pose, bounding_box, lanelet_id, hdmap_utils_ptr);
     EXPECT_NEAR(result, 2.4, tolerance);
   }
   {
     const auto pose = makePose(3680.81, 73757.27, 0.0, 30.0);
     const auto bounding_box = makeCustom2DBoundingBox(0.1, 0.1, 0.0, 0.0);
-    const double result =
-      traffic_simulator::distance::distanceToLeftLaneBound(pose, bounding_box, 34684L);
+    const double result = traffic_simulator::distance::distanceToLeftLaneBound(
+      pose, bounding_box, 34684L, hdmap_utils_ptr);
     EXPECT_NEAR(result, 5.1, tolerance);
   }
   {
     const auto pose = makePose(3692.79, 73753.00, 0.0, 30.0);
     const auto bounding_box = makeCustom2DBoundingBox(0.1, 0.1, 0.0, 0.0);
-    const double result =
-      traffic_simulator::distance::distanceToLeftLaneBound(pose, bounding_box, 34684L);
+    const double result = traffic_simulator::distance::distanceToLeftLaneBound(
+      pose, bounding_box, 34684L, hdmap_utils_ptr);
     EXPECT_NEAR(result, 7.2, tolerance);
   }
 }
@@ -661,10 +661,11 @@ TEST_F(distanceTest_StandardMap, distanceToLeftLaneBound_multipleVector)
     lanelet_ids.cbegin(), lanelet_ids.cend(), std::numeric_limits<double>::max(),
     [](const double lhs, const double rhs) { return std::min(lhs, rhs); },
     [&pose, &bounding_box, this](const lanelet::Id lanelet_id) {
-      return traffic_simulator::distance::distanceToLeftLaneBound(pose, bounding_box, lanelet_id);
+      return traffic_simulator::distance::distanceToLeftLaneBound(
+        pose, bounding_box, lanelet_id, hdmap_utils_ptr);
     });
-  const double result_distance =
-    traffic_simulator::distance::distanceToLeftLaneBound(pose, bounding_box, lanelet_ids);
+  const double result_distance = traffic_simulator::distance::distanceToLeftLaneBound(
+    pose, bounding_box, lanelet_ids, hdmap_utils_ptr);
   EXPECT_NEAR(actual_distance, result_distance, std::numeric_limits<double>::epsilon());
   EXPECT_NEAR(result_distance, 1.4, 0.1);
 }
@@ -678,10 +679,10 @@ TEST_F(distanceTest_StandardMap, distanceToLeftLaneBound_singleVector)
   constexpr lanelet::Id lanelet_id = 34426L;
   const auto pose = makePose(3693.34, 73738.37, 0.0, 300.0);
   const auto bounding_box = makeCustom2DBoundingBox(0.1, 0.1, 0.0, 0.0);
-  const double actual_distance =
-    traffic_simulator::distance::distanceToLeftLaneBound(pose, bounding_box, lanelet_id);
-  const double result_distance =
-    traffic_simulator::distance::distanceToLeftLaneBound(pose, bounding_box, {lanelet_id});
+  const double actual_distance = traffic_simulator::distance::distanceToLeftLaneBound(
+    pose, bounding_box, lanelet_id, hdmap_utils_ptr);
+  const double result_distance = traffic_simulator::distance::distanceToLeftLaneBound(
+    pose, bounding_box, {lanelet_id}, hdmap_utils_ptr);
   EXPECT_NEAR(actual_distance, result_distance, std::numeric_limits<double>::epsilon());
   EXPECT_NEAR(result_distance, 1.8, 0.1);
 }
@@ -694,7 +695,8 @@ TEST_F(distanceTest_StandardMap, distanceToLeftLaneBound_emptyVector)
   const auto pose = makePose(3825.87, 73773.08, 0.0, 135.0);
   const auto bounding_box = makeCustom2DBoundingBox(0.1, 0.1, 0.0, 0.0);
   EXPECT_THROW(
-    traffic_simulator::distance::distanceToLeftLaneBound(pose, bounding_box, lanelet::Ids{}),
+    traffic_simulator::distance::distanceToLeftLaneBound(
+      pose, bounding_box, lanelet::Ids{}, hdmap_utils_ptr),
     common::SemanticError);
 }
 
@@ -708,57 +710,57 @@ TEST_F(distanceTest_IntersectionMap, distanceToRightLaneBound_single)
   {
     const auto pose = makePose(86651.84, 44941.47, 0.0, 135.0);
     const auto bounding_box = makeCustom2DBoundingBox(0.1, 0.1, 0.0, 0.0);
-    const double result =
-      traffic_simulator::distance::distanceToRightLaneBound(pose, bounding_box, lanelet_id);
+    const double result = traffic_simulator::distance::distanceToRightLaneBound(
+      pose, bounding_box, lanelet_id, hdmap_utils_ptr);
     EXPECT_NEAR(result, 4.1, tolerance);
   }
   {
     const auto pose = makePose(86653.05, 44946.74, 0.0, 135.0);
     const auto bounding_box = makeCustom2DBoundingBox(0.1, 0.1, 0.0, 0.0);
-    const double result =
-      traffic_simulator::distance::distanceToRightLaneBound(pose, bounding_box, lanelet_id);
+    const double result = traffic_simulator::distance::distanceToRightLaneBound(
+      pose, bounding_box, lanelet_id, hdmap_utils_ptr);
     EXPECT_NEAR(result, 0.6, tolerance);
   }
   {
     const auto pose = makePose(86651.47, 44941.07, 0.0, 120.0);
     const auto bounding_box = makeCustom2DBoundingBox(3.0, 0.1, 0.0, 0.0);
-    const double result =
-      traffic_simulator::distance::distanceToRightLaneBound(pose, bounding_box, lanelet_id);
+    const double result = traffic_simulator::distance::distanceToRightLaneBound(
+      pose, bounding_box, lanelet_id, hdmap_utils_ptr);
     EXPECT_NEAR(result, 4.3, tolerance);
   }
   {
     const auto pose = makePose(86651.47, 44941.07, 0.0, 210.0);
     const auto bounding_box = makeCustom2DBoundingBox(3.0, 0.1, 0.0, 0.0);
-    const double result =
-      traffic_simulator::distance::distanceToRightLaneBound(pose, bounding_box, lanelet_id);
+    const double result = traffic_simulator::distance::distanceToRightLaneBound(
+      pose, bounding_box, lanelet_id, hdmap_utils_ptr);
     EXPECT_NEAR(result, 3.1, tolerance);
   }
   {
     const auto pose = makePose(86644.10, 44951.86, 0.0, 150.0);
     const auto bounding_box = makeCustom2DBoundingBox(0.1, 0.1, 1.0, 0.0);
-    const double result =
-      traffic_simulator::distance::distanceToRightLaneBound(pose, bounding_box, lanelet_id);
+    const double result = traffic_simulator::distance::distanceToRightLaneBound(
+      pose, bounding_box, lanelet_id, hdmap_utils_ptr);
     EXPECT_NEAR(result, 2.0, tolerance);
   }
   {
     const auto pose = makePose(86644.10, 44951.86, 0.0, 150.0);
     const auto bounding_box = makeCustom2DBoundingBox(0.1, 0.1, 0.0, -1.0);
-    const double result =
-      traffic_simulator::distance::distanceToRightLaneBound(pose, bounding_box, lanelet_id);
+    const double result = traffic_simulator::distance::distanceToRightLaneBound(
+      pose, bounding_box, lanelet_id, hdmap_utils_ptr);
     EXPECT_NEAR(result, 1.1, tolerance);
   }
   {
     const auto pose = makePose(86644.11, 44941.21, 0.0, 0.0);
     const auto bounding_box = makeCustom2DBoundingBox(0.1, 0.1, 0.0, 0.0);
-    const double result =
-      traffic_simulator::distance::distanceToRightLaneBound(pose, bounding_box, lanelet_id);
+    const double result = traffic_simulator::distance::distanceToRightLaneBound(
+      pose, bounding_box, lanelet_id, hdmap_utils_ptr);
     EXPECT_NEAR(result, 11.2, tolerance);
   }
   {
     const auto pose = makePose(86656.83, 44946.96, 0.0, 0.0);
     const auto bounding_box = makeCustom2DBoundingBox(0.1, 0.1, 0.0, 0.0);
-    const double result =
-      traffic_simulator::distance::distanceToRightLaneBound(pose, bounding_box, lanelet_id);
+    const double result = traffic_simulator::distance::distanceToRightLaneBound(
+      pose, bounding_box, lanelet_id, hdmap_utils_ptr);
     EXPECT_NEAR(result, 2.6, tolerance);
   }
 }
@@ -776,10 +778,11 @@ TEST_F(distanceTest_IntersectionMap, distanceToRightLaneBound_multipleVector)
     lanelet_ids.cbegin(), lanelet_ids.cend(), std::numeric_limits<double>::max(),
     [](const double lhs, const double rhs) { return std::min(lhs, rhs); },
     [&pose, &bounding_box, this](const lanelet::Id lanelet_id) {
-      return traffic_simulator::distance::distanceToRightLaneBound(pose, bounding_box, lanelet_id);
+      return traffic_simulator::distance::distanceToRightLaneBound(
+        pose, bounding_box, lanelet_id, hdmap_utils_ptr);
     });
-  const double result_distance =
-    traffic_simulator::distance::distanceToRightLaneBound(pose, bounding_box, lanelet_ids);
+  const double result_distance = traffic_simulator::distance::distanceToRightLaneBound(
+    pose, bounding_box, lanelet_ids, hdmap_utils_ptr);
   EXPECT_NEAR(actual_distance, result_distance, std::numeric_limits<double>::epsilon());
   EXPECT_NEAR(result_distance, 2.7, 0.1);
 }
@@ -793,10 +796,10 @@ TEST_F(distanceTest_IntersectionMap, distanceToRightLaneBound_singleVector)
   constexpr lanelet::Id lanelet_id = 654L;
   const auto pose = makePose(86702.79, 44929.05, 0.0, 150.0);
   const auto bounding_box = makeCustom2DBoundingBox(0.1, 0.1, 0.0, 0.0);
-  const double actual_distance =
-    traffic_simulator::distance::distanceToRightLaneBound(pose, bounding_box, lanelet_id);
-  const double result_distance =
-    traffic_simulator::distance::distanceToRightLaneBound(pose, bounding_box, {lanelet_id});
+  const double actual_distance = traffic_simulator::distance::distanceToRightLaneBound(
+    pose, bounding_box, lanelet_id, hdmap_utils_ptr);
+  const double result_distance = traffic_simulator::distance::distanceToRightLaneBound(
+    pose, bounding_box, {lanelet_id}, hdmap_utils_ptr);
   EXPECT_NEAR(actual_distance, result_distance, std::numeric_limits<double>::epsilon());
   EXPECT_NEAR(result_distance, 2.4, 0.1);
 }
@@ -809,6 +812,7 @@ TEST_F(distanceTest_IntersectionMap, distanceToRightLaneBound_emptyVector)
   const auto pose = makePose(3825.87, 73773.08, 0.0, 135.0);
   const auto bounding_box = makeCustom2DBoundingBox(0.1, 0.1, 0.0, 0.0);
   EXPECT_THROW(
-    traffic_simulator::distance::distanceToRightLaneBound(pose, bounding_box, lanelet::Ids{}),
+    traffic_simulator::distance::distanceToRightLaneBound(
+      pose, bounding_box, lanelet::Ids{}, hdmap_utils_ptr),
     common::SemanticError);
 }

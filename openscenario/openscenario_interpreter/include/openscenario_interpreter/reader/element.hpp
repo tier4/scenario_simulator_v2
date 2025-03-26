@@ -36,16 +36,6 @@
 
 namespace openscenario_interpreter
 {
-struct Scope;
-
-inline namespace syntax
-{
-struct Orientation;
-struct Position;
-struct Properties;
-struct Range;
-}  // namespace syntax
-
 inline namespace reader
 {
 using Cardinality =
@@ -82,7 +72,7 @@ auto traverse(const pugi::xml_node & parent, const std::string & name, F && f) -
 }
 
 template <typename T, typename Scope>
-auto readElement(const std::string & name, const pugi::xml_node & parent, Scope & scope) -> T
+auto readElement(const std::string & name, const pugi::xml_node & parent, Scope & scope)
 {
   if (const auto child = parent.child(name.c_str())) {
     return T(child, scope);
@@ -98,15 +88,6 @@ auto readElement(const std::string & name, const pugi::xml_node & parent, Scope 
       parent.name(), " requires class ", name, " as element, but there is no declaration"));
   }
 }
-
-extern template auto readElement(const std::string &, const pugi::xml_node &, Scope &)
-  -> syntax::Orientation;
-extern template auto readElement(const std::string &, const pugi::xml_node &, Scope &)
-  -> syntax::Position;
-extern template auto readElement(const std::string &, const pugi::xml_node &, Scope &)
-  -> syntax::Properties;
-extern template auto readElement(const std::string &, const pugi::xml_node &, Scope &)
-  -> syntax::Range;
 
 template <typename T, typename U, typename Scope>
 auto readElement(const std::string & name, const pugi::xml_node & parent, Scope & scope, U && value)
@@ -172,10 +153,62 @@ auto readGroups(const pugi::xml_node & node, Ts &&... xs)
   return groups;
 }
 
-auto choice(
-  const pugi::xml_node & node,
-  const std::unordered_map<std::string, std::function<Object(const pugi::xml_node &)>> & callees)
-  -> Object;
+template <typename... Ts>
+auto choice(const pugi::xml_node & node, Ts &&... xs) -> decltype(auto)
+{
+  const std::unordered_map<std::string, std::function<Object(const pugi::xml_node &)>> callees{
+    std::forward<decltype(xs)>(xs)...};
+
+  std::unordered_map<std::string, pugi::xml_node> specs{};
+
+  for (const auto & each : callees) {
+    if (const auto child = node.child(std::get<0>(each).c_str())) {
+      specs.emplace(std::get<0>(each), child);
+    }
+  }
+
+  auto print_keys_to = [&](auto & os, const auto & xs) -> decltype(auto) {
+    if (not xs.empty()) {
+      for (auto iter = std::begin(xs); iter != std::end(xs); ++iter) {
+        os << std::get<0>(*iter);
+
+        switch (std::distance(iter, std::end(xs))) {
+          case 1:
+            return os;
+
+          case 2:
+            os << " and ";
+            break;
+
+          default:
+            os << ", ";
+            break;
+        }
+      }
+    }
+
+    return os;
+  };
+
+  if (specs.empty()) {
+    std::stringstream what;
+    what << "Class " << node.name() << " requires one of following elements: ";
+    print_keys_to(what, callees);
+    what << ". But no element specified";
+    throw SyntaxError(what.str());
+  } else if (1 < specs.size()) {
+    std::stringstream what;
+    what << "Class " << node.name() << " requires just one of following elements: ";
+    print_keys_to(what, callees);
+    what << ". But " << specs.size() << " element" << (1 < specs.size() ? "s" : "") << " (";
+    print_keys_to(what, specs);
+    what << ") specified";
+    throw SyntaxError(what.str());
+  } else {
+    const auto iter = std::cbegin(specs);
+    return callees.at(std::get<0>(*iter))(std::get<1>(*iter));
+  }
+}
 }  // namespace reader
 }  // namespace openscenario_interpreter
 

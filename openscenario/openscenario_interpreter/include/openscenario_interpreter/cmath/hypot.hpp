@@ -16,7 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__CMATH__HYPOT_HPP_
 
 #include <cmath>
-#include <get_parameter/get_parameter.hpp>
+#include <rclcpp/rclcpp.hpp>
 
 namespace openscenario_interpreter
 {
@@ -30,8 +30,11 @@ inline namespace cmath
 template <typename T>
 auto hypot(T x, T y, T z)
 {
-  static const auto consider_pose_by_road_slope =
-    common::getParameter<bool>("consider_pose_by_road_slope", false);
+  static const auto consider_pose_by_road_slope = []() {
+    auto node = rclcpp::Node("get_parameter", "simulation");
+    node.declare_parameter("consider_pose_by_road_slope", false);
+    return node.get_parameter("consider_pose_by_road_slope").as_bool();
+  }();
 
   return consider_pose_by_road_slope ? std::hypot(x, y, z) : std::hypot(x, y);
 }

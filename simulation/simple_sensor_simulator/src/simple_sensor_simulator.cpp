@@ -54,10 +54,17 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
 geographic_msgs::msg::GeoPoint ScenarioSimulator::getOrigin()
 {
   geographic_msgs::msg::GeoPoint origin;
-  origin.latitude = common::getParameter<decltype(origin.latitude)>(
-    get_node_parameters_interface(), "origin_latitude");
-  origin.longitude = common::getParameter<decltype(origin.longitude)>(
-    get_node_parameters_interface(), "origin_longitude");
+  {
+    if (!has_parameter("origin_latitude")) {
+      declare_parameter("origin_latitude", 0.0);
+    }
+    if (!has_parameter("origin_longitude")) {
+      declare_parameter("origin_longitude", 0.0);
+    }
+    get_parameter("origin_latitude", origin.latitude);
+    get_parameter("origin_longitude", origin.longitude);
+  }
+
   return origin;
 }
 
@@ -65,7 +72,8 @@ ScenarioSimulator::~ScenarioSimulator() {}
 
 int ScenarioSimulator::getSocketPort()
 {
-  return common::getParameter<int>(get_node_parameters_interface(), "port", 5555);
+  if (!has_parameter("port")) declare_parameter("port", 5555);
+  return get_parameter("port").as_int();
 }
 
 auto ScenarioSimulator::initialize(const simulation_api_schema::InitializeRequest & req)
@@ -81,8 +89,12 @@ auto ScenarioSimulator::initialize(const simulation_api_schema::InitializeReques
   simulation_interface::toMsg(req.initialize_ros_time(), t);
   current_ros_time_ = t;
   hdmap_utils_ = std::make_shared<hdmap_utils::HdMapUtils>(req.lanelet2_map_path(), getOrigin());
-  traffic_simulator::lanelet_pose::CanonicalizedLaneletPose::setConsiderPoseByRoadSlope(
-    common::getParameter<bool>(get_node_parameters_interface(), "consider_pose_by_road_slope"));
+  traffic_simulator::lanelet_pose::CanonicalizedLaneletPose::setConsiderPoseByRoadSlope([&]() {
+    if (not has_parameter("consider_pose_by_road_slope")) {
+      declare_parameter("consider_pose_by_road_slope", false);
+    }
+    return get_parameter("consider_pose_by_road_slope").as_bool();
+  }());
   auto res = simulation_api_schema::InitializeResponse();
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("succeed to initialize simulation");
@@ -213,6 +225,12 @@ auto ScenarioSimulator::spawnVehicleEntity(
     ego_vehicles_.emplace_back(req.parameters());
     traffic_simulator_msgs::msg::VehicleParameters parameters;
     simulation_interface::toMsg(req.parameters(), parameters);
+    auto get_consider_acceleration_by_road_slope = [&]() {
+      if (!has_parameter("consider_acceleration_by_road_slope")) {
+        declare_parameter("consider_acceleration_by_road_slope", false);
+      }
+      return get_parameter("consider_acceleration_by_road_slope").as_bool();
+    };
     traffic_simulator_msgs::msg::EntityStatus initial_status;
     initial_status.name = parameters.name;
     initial_status.bounding_box = parameters.bounding_box;
@@ -220,8 +238,7 @@ auto ScenarioSimulator::spawnVehicleEntity(
     ego_entity_simulation_ = std::make_shared<vehicle_simulation::EgoEntitySimulation>(
       initial_status, parameters, step_time_, hdmap_utils_,
       get_parameter_or("use_sim_time", rclcpp::Parameter("use_sim_time", false)),
-      common::getParameter<bool>(
-        get_node_parameters_interface(), "consider_acceleration_by_road_slope"));
+      get_consider_acceleration_by_road_slope());
   } else {
     vehicles_.emplace_back(req.parameters());
   }

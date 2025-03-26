@@ -24,11 +24,10 @@ Action::Action(const pugi::xml_node & node, Scope & scope)
 // clang-format off
 : Scope(readAttribute<String>("name", node, scope), scope),
   ComplexType(
-    choice(node, {
-      {      "GlobalAction", [this](auto && node) { return make<     GlobalAction>(node, local()); } },
-      { "UserDefinedAction", [this](auto && node) { return make<UserDefinedAction>(node, local()); } },
-      {     "PrivateAction", [this](auto && node) { return make<    PrivateAction>(node, local()); } },
-    }))
+    choice(node,
+      std::make_pair(     "GlobalAction", [this](auto && node) { return make<     GlobalAction>(node, local()); }),
+      std::make_pair("UserDefinedAction", [this](auto && node) { return make<UserDefinedAction>(node, local()); }),
+      std::make_pair(    "PrivateAction", [this](auto && node) { return make<    PrivateAction>(node, local()); })))
 // clang-format on
 {
 }
