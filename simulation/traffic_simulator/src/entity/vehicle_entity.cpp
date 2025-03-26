@@ -105,7 +105,26 @@ auto VehicleEntity::getObstacle() -> std::optional<traffic_simulator_msgs::msg::
 auto VehicleEntity::getRouteLanelets(double horizon) -> lanelet::Ids
 {
   if (const auto canonicalized_lanelet_pose = status_->getCanonicalizedLaneletPose()) {
-    return route_planner_.getRouteLanelets(canonicalized_lanelet_pose.value(), horizon);
+    // WARNING: TEMPORARY FIX ##################################################################################
+    // temporary fix to avoid the error of getRouteLanelets
+    auto canonicalized_lanelet_pose_value = canonicalized_lanelet_pose.value();
+    if (previous_route_lanelets_.size() > 0) {
+      if (
+        std::find(
+          previous_route_lanelets_.begin(), previous_route_lanelets_.end(),
+          canonicalized_lanelet_pose_value.getLaneletId()) == previous_route_lanelets_.end()) {
+        // set previous lanelet as current lanelet
+        CanonicalizedLaneletPose previous_pose =
+          toCanonicalizedLaneletPose(
+            status_->getMapPose(), status_->getBoundingBox(), previous_route_lanelets_, false,
+            getDefaultMatchingDistanceForLaneletPoseCalculation())
+            .value();
+        return previous_route_lanelets_;
+      }
+    }
+    return route_planner_.getRouteLanelets(canonicalized_lanelet_pose_value, horizon);
+    // #########################################################################################################
+    // return route_planner_.getRouteLanelets(canonicalized_lanelet_pose.value(), horizon);
   } else {
     return {};
   }
