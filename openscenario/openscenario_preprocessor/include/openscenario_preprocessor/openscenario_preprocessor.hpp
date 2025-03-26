@@ -18,11 +18,9 @@
 #include <yaml-cpp/yaml.h>
 
 #include <fstream>
-#include <memory>
 #include <openscenario_interpreter/syntax/open_scenario.hpp>
 #include <openscenario_preprocessor/deriver.hpp>
 #include <openscenario_preprocessor/schema.hpp>
-#include <openscenario_validator/validator.hpp>
 #include <queue>
 
 namespace openscenario_preprocessor
@@ -38,7 +36,7 @@ struct Scenario
 
   boost::filesystem::path path;
 
-  float frame_rate;
+  double frame_rate;
 };
 
 enum class ScenarioFormat {

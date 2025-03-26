@@ -12,23 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <algorithm>
 #include <boost/lexical_cast.hpp>
 #include <boost/range/adaptor/indexed.hpp>
 #include <openscenario_interpreter/syntax/open_scenario.hpp>
-#include <openscenario_interpreter/syntax/parameter_value_distribution_definition.hpp>
 #include <openscenario_preprocessor/openscenario_preprocessor.hpp>
-#include <regex>
 
 namespace openscenario_preprocessor
 {
 void Preprocessor::preprocessScenario(
   const boost::filesystem::path & scenario_path, ScenarioFormat output_format)
 {
-  using openscenario_interpreter::OpenScenario;
-  using openscenario_interpreter::ParameterValueDistribution;
-  using openscenario_interpreter::ParameterValueDistributionDefinition;
-
   auto distribution = derive(scenario_path);
   if (distribution.empty()) {
     preprocessed_scenarios.push(scenario_path);  // normal scenario
