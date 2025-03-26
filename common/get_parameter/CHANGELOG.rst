@@ -2,6 +2,11 @@
 Changelog for package get_parameter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+14.1.0 (2025-03-25)
+-------------------
+* Merge branch 'master' into feature/revival_getStopLineIds
+* Contributors: Taiga
+
 14.0.3 (2025-03-24)
 -------------------
 * Merge remote-tracking branch 'origin/master' into refactor/concealer-6
