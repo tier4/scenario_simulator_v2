@@ -36,7 +36,7 @@ jobs:
 
           curl --fail \
             -X POST \
-            -H "Authorization: token ${{ secrets.SECRET_TOKEN }}" \
+            -H "Authorization: token ${{ secrets.BLOOM_GITHUB_TOKEN }}" \
             -H "Accept: application/vnd.github.v3+json" \
             https://api.github.com/repos/$DISPATCH_OWNER/$DISPATCH_REPOSITORY/dispatches \
             -d "{\"event_type\":\"on-demand-test\",\"client_payload\":{\"ref\":\"$TARGET_BRANCH\",\"repo\":\"$TARGET_REPOSITORY\"}}"
