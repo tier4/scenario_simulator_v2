@@ -21,6 +21,34 @@ Changelog for package traffic_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+14.2.0 (2025-03-26)
+-------------------
+* Merge pull request `#1550 <https://github.com/tier4/scenario_simulator_v2/issues/1550>`_ from tier4/refactor/lanelet_wrapper_traffic_lights
+  HdMapUtils refactor `lanelet_wrapper::traffic_lights`
+* Merge branch 'master' into refactor/lanelet_wrapper_traffic_lights
+* Merge branch 'master' into refactor/lanelet_wrapper_traffic_lights
+* Merge branch 'master' into refactor/lanelet_wrapper_traffic_lights
+* Add traffic lights functions
+* Contributors: Masaya Kataoka, Tatsuya Yamasaki, abco20
+
+14.1.0 (2025-03-25)
+-------------------
+* Merge pull request `#1553 <https://github.com/tier4/scenario_simulator_v2/issues/1553>`_ from tier4/feature/revival_getStopLineIds
+  Renamed getStopLineIds to stopLineIds to revive functionality.
+* Added unit tests for the `stopLineIds` function.
+* Merge branch 'master' into feature/revival_getStopLineIds
+* Renamed getStopLineIds to stopLineIds to revive functionality.
+* Contributors: Masaya Kataoka, Taiga, Taiga Takano
+
+14.0.3 (2025-03-24)
+-------------------
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-6
+* Merge branch 'master' into refactor/concealer-6
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-6
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-6
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-6
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
 14.0.2 (2025-03-19)
 -------------------
 * Merge pull request `#1540 <https://github.com/tier4/scenario_simulator_v2/issues/1540>`_ from tier4/RJD1057/change-order-of-members
