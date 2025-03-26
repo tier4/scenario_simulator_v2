@@ -89,6 +89,30 @@ auto previousLaneletIds(
 auto previousLaneletIds(
   const lanelet::Ids & lanelet_ids, std::string_view turn_direction,
   const RoutingGraphType type = RoutingConfiguration().routing_graph_type) -> lanelet::Ids;
+
+// Bounds
+auto leftBound(const lanelet::Id lanelet_id) -> std::vector<Point>;
+
+auto rightBound(const lanelet::Id lanelet_id) -> std::vector<Point>;
+
+// Polygons
+auto stopLinePolygon(const lanelet::Id lanelet_id) -> std::vector<Point>;
+
+auto toPolygon(const lanelet::ConstLineString3d & line_string) -> std::vector<Point>;
+
+// Objects on path
+auto trafficSignsOnPath(const lanelet::Ids & lanelet_ids)
+  -> std::vector<std::shared_ptr<const lanelet::TrafficSign>>;
+
+auto trafficSigns() -> std::vector<std::shared_ptr<const lanelet::TrafficSign>>;
+
+auto stopLines() -> lanelet::ConstLineStrings3d;
+
+auto stopLinesOnPath(const lanelet::Ids & lanelet_ids) -> lanelet::ConstLineStrings3d;
+
+auto stopLineIds() -> lanelet::Ids;
+
+auto stopLineIdsOnPath(const lanelet::Ids & lanelet_ids) -> lanelet::Ids;
 }  // namespace lanelet_map
 }  // namespace lanelet_wrapper
 }  // namespace traffic_simulator

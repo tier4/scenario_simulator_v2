@@ -22,10 +22,11 @@ inline namespace syntax
 RoutingAction::RoutingAction(const pugi::xml_node & node, Scope & scope)
 // clang-format off
 : ComplexType(
-    choice(node,
-      std::make_pair(     "AssignRouteAction", [&](const auto & node) { return make<     AssignRouteAction>(node, scope); }),
-      std::make_pair("FollowTrajectoryAction", [&](const auto & node) { return make<FollowTrajectoryAction>(node, scope); }),
-      std::make_pair( "AcquirePositionAction", [&](const auto & node) { return make< AcquirePositionAction>(node, scope); })))
+    choice(node, {
+      {      "AssignRouteAction", [&](const auto & node) { return make<     AssignRouteAction>(node, scope); } },
+      { "FollowTrajectoryAction", [&](const auto & node) { return make<FollowTrajectoryAction>(node, scope); } },
+      {  "AcquirePositionAction", [&](const auto & node) { return make< AcquirePositionAction>(node, scope); } },
+    }))
 // clang-format on
 {
 }
