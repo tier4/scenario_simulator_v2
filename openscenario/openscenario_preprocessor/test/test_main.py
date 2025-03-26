@@ -16,6 +16,7 @@ from time import sleep
 
 import pytest
 import os
+import shutil
 from openscenario_utility.conversion import convert
 from ament_index_python.packages import get_package_share_directory
 from pathlib import Path
@@ -30,6 +31,7 @@ def test(scenario_name, desired_diff_num):
     # sample_scenario_path = Path(share_dir + "/test/scenarios/" + scenario_name + ".yaml")
     sample_scenario_path = Path(test_runner_share_dir + "/scenario/" + scenario_name + ".yaml")
     output_dir = Path("/tmp/openscenario_preprocessor/test")
+    shutil.rmtree(output_dir)
     os.makedirs(output_dir, exist_ok=True)
     convert(sample_scenario_path, output_dir)
     input_xosc = "/tmp/openscenario_preprocessor/test/" + scenario_name + "_0.xosc"
@@ -40,7 +42,7 @@ def test(scenario_name, desired_diff_num):
     print(preprocessor_command)
     os.system(preprocessor_command)
     os.system("xmllint --format " + input_xosc + " > /tmp/openscenario_preprocessor/before.xosc")
-    os.system("xmllint --format /tmp/openscenario_preprocessor/formatted.xosc > /tmp/openscenario_preprocessor/after.xosc")
+    os.system("xmllint --format /tmp/openscenario_preprocessor/test/work/formatted.xosc > /tmp/openscenario_preprocessor/after.xosc")
     os.system("xmllint --c14n11 /tmp/openscenario_preprocessor/before.xosc > /tmp/openscenario_preprocessor/before.xml")
     os.system("xmllint --c14n11 /tmp/openscenario_preprocessor/after.xosc > /tmp/openscenario_preprocessor/after.xml")
     sleep(1)
