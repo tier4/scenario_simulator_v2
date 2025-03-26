@@ -83,12 +83,6 @@ void Preprocessor::generateDerivedScenarioFromDistribution(
         derived_scenario_yaml << yaml_emitter.c_str();
         derived_scenario_yaml.close();
 
-        // NOTE: for debug, write out yaml to
-        // "/tmp/openscenario_preprocessor/preprocessed_scenario.yaml"
-        std::ofstream debug_yaml{"/tmp/openscenario_preprocessor/preprocessed_scenario.yaml"};
-        debug_yaml << yaml_emitter.c_str();
-        debug_yaml.close();
-
         return derived_scenario_path_t4v2;
       } else {
         derived_script.save_file(derived_scenario_path_xosc.c_str());
