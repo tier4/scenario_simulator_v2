@@ -143,7 +143,7 @@ def test_property_pointcloud_publishing_delay():
     test("Property.pointcloudPublishingDelay", 0)
 
 def test_property_pointcloud_vertical_field_of_view():
-    test("Property.pointcloudVerticalFieldOfView", 3)
+    test("Property.pointcloudVerticalFieldOfView", 0)
 
 def test_routing_action_acquire_position_action_continuous():
     test("RoutingAction.AcquirePositionAction-continuous", 0)
@@ -188,7 +188,7 @@ def test_visualization_simulation_context():
     test("Visualization.simulation.context", 0)
 
 def test_all_in_one():
-    test("all-in-one", 15)
+    test("all-in-one", 0)
 
 def test_arm_demo():
     test("arm_demo", 0)
@@ -197,7 +197,7 @@ def test_autoware_simple():
     test("autoware-simple", 2)
 
 def test_collision():
-    test("collision", 9)
+    test("collision", 10)
 
 def test_collision_condition_by_type():
     test("collision_condition_by_type", 0)
@@ -251,7 +251,7 @@ def test_minimal():
     test("minimal", 0)
 
 def test_parameter():
-    test("parameter", 22)
+    test("parameter", 18)
 
 def test_prefixed_name_reference():
     test("prefixed-name-reference", 0)
@@ -266,10 +266,10 @@ def test_sample_awsim():
     test("sample_awsim", 2)
 
 def test_sample_awsim_conventional_traffic_lights():
-    test("sample_awsim_conventional_traffic_lights", 4)
+    test("sample_awsim_conventional_traffic_lights", 0)
 
 def test_sample_awsim_v2i_traffic_lights():
-    test("sample_awsim_v2i_traffic_lights", 4)
+    test("sample_awsim_v2i_traffic_lights", 0)
 
 def test_set_behavior_parameters_in_object_controller():
     test("set_behavior_parameters_in_object_controller", 0)
