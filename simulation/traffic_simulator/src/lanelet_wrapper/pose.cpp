@@ -351,6 +351,11 @@ auto alongLaneletPose(
 auto canonicalizeLaneletPose(const LaneletPose & lanelet_pose)
   -> std::tuple<std::optional<LaneletPose>, std::optional<lanelet::Id>>
 {
+  assert(std::isfinite(lanelet_pose.s));
+  assert(std::isfinite(lanelet_pose.offset));
+  assert(std::isfinite(lanelet_pose.rpy.x));
+  assert(std::isfinite(lanelet_pose.rpy.y));
+  assert(std::isfinite(lanelet_pose.rpy.z));
   auto canonicalized_lanelet_pose = lanelet_pose;
   while (canonicalized_lanelet_pose.s < 0) {
     if (const auto previous_lanelet_ids =
@@ -380,6 +385,11 @@ auto canonicalizeLaneletPose(const LaneletPose & lanelet_pose)
 auto canonicalizeLaneletPose(const LaneletPose & lanelet_pose, const lanelet::Ids & route_lanelets)
   -> std::tuple<std::optional<LaneletPose>, std::optional<lanelet::Id>>
 {
+  assert(std::isfinite(lanelet_pose.s));
+  assert(std::isfinite(lanelet_pose.offset));
+  assert(std::isfinite(lanelet_pose.rpy.x));
+  assert(std::isfinite(lanelet_pose.rpy.y));
+  assert(std::isfinite(lanelet_pose.rpy.z));
   if (lanelet_pose.s < 0) {
     /// @note When canonicalizing to backward lanelet_id, do not consider route
     return canonicalizeLaneletPose(lanelet_pose);
