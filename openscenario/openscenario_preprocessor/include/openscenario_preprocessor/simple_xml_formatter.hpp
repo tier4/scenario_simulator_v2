@@ -361,7 +361,7 @@ private:
     output->release();
     serializer->release();
 
-    return false;
+    return true;
   }
 };
 }  // namespace openscenario_preprocessor
