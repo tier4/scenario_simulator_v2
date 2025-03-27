@@ -41,6 +41,10 @@ auto alternativeLaneletPoses(const LaneletPose & lanelet_pose) -> std::vector<La
 auto toCanonicalizedLaneletPose(const LaneletPose & lanelet_pose)
   -> std::optional<CanonicalizedLaneletPose>;
 
+auto toLaneletPose(
+  const geometry_msgs::msg::Pose & map_pose, const bool include_crosswalk,
+  const double matching_distance) -> std::optional<LaneletPose>;
+
 auto toCanonicalizedLaneletPose(
   const geometry_msgs::msg::Pose & map_pose, const bool include_crosswalk)
   -> std::optional<CanonicalizedLaneletPose>;

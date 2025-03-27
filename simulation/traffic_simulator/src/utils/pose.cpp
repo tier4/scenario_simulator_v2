@@ -61,10 +61,9 @@ auto canonicalize(const LaneletPose & lanelet_pose) -> LaneletPose
       lanelet_wrapper::pose::canonicalizeLaneletPose(lanelet_pose))) {
     return canonicalized.value();
   } else {
-    THROW_SEMANTIC_ERROR(
-      "Lanelet pose (id=", lanelet_pose.lanelet_id, ",s=", lanelet_pose.s,
-      ",offset=", lanelet_pose.offset, ",rpy.x=", lanelet_pose.rpy.x, ",rpy.y=", lanelet_pose.rpy.y,
-      ",rpy.z=", lanelet_pose.rpy.z, ") is invalid, please check lanelet length and connection.");
+    std::ostringstream oss;
+    oss << lanelet_pose;
+    THROW_SEMANTIC_ERROR(oss.str(), " is invalid, please check lanelet length and connection.");
   }
 }
 
@@ -76,12 +75,20 @@ auto canonicalize(const LaneletPose & lanelet_pose, const lanelet::Ids & route_l
       lanelet_wrapper::pose::canonicalizeLaneletPose(lanelet_pose, route_lanelets))) {
     return canonicalized.value();
   } else {
+    std::ostringstream oss;
+    oss << lanelet_pose;
     THROW_SEMANTIC_ERROR(
-      "Lanelet pose (id=", lanelet_pose.lanelet_id, ",s=", lanelet_pose.s,
-      ",offset=", lanelet_pose.offset, ",rpy.x=", lanelet_pose.rpy.x, ",rpy.y=", lanelet_pose.rpy.y,
-      ",rpy.z=", lanelet_pose.rpy.z,
-      ") is invalid, please check lanelet length, connection and entity route.");
+      oss.str(), " is invalid, please check lanelet length, connection and entity route.");
   }
+}
+
+auto canonicalize(const std::vector<LaneletPose> & lanelet_poses) -> std::vector<LaneletPose>
+{
+  std::vector<LaneletPose> canonicalized_lanelet_poses;
+  for (const auto & lanelet_pose : lanelet_poses) {
+    canonicalized_lanelet_poses.push_back(pose::canonicalize(lanelet_pose));
+  }
+  return canonicalized_lanelet_poses;
 }
 
 auto toMapPose(const CanonicalizedLaneletPose & lanelet_pose) -> geometry_msgs::msg::Pose
@@ -94,6 +101,19 @@ auto toMapPose(const LaneletPose & lanelet_pose) -> geometry_msgs::msg::Pose
   return lanelet_wrapper::pose::toMapPose(
            lanelet_pose, CanonicalizedLaneletPose::getConsiderPoseByRoadSlope())
     .pose;
+}
+
+auto toLaneletPose(
+  const geometry_msgs::msg::Pose & map_pose, const bool include_crosswalk,
+  const double matching_distance) -> std::optional<LaneletPose>
+{
+  if (
+    const auto lanelet_pose =
+      lanelet_wrapper::pose::toLaneletPose(map_pose, include_crosswalk, matching_distance)) {
+    return pose::canonicalize(lanelet_pose.value());
+  } else {
+    return std::nullopt;
+  }
 }
 
 auto alternativeLaneletPoses(const LaneletPose & lanelet_pose) -> std::vector<LaneletPose>
