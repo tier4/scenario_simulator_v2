@@ -34,8 +34,7 @@ def test(scenario_name, desired_diff_num):
     if os.path.exists(output_dir):
         shutil.rmtree(output_dir)
     os.makedirs(output_dir)
-    converted_xoscs = convert(sample_scenario_path, output_dir)
-    converted_xosc = str(converted_xoscs[0])
+    converted_xosc = str(convert(sample_scenario_path, output_dir)[0])
 
     command_path = preprocessor_share_dir + "/../../lib/openscenario_preprocessor/openscenario_preprocessor_command"
     preprocessor_command = command_path + " -s " + str(sample_scenario_path) + " -o " + str(output_dir) \
