@@ -52,9 +52,10 @@ private:
 
   void onInitialize() override
   {
-    auto & ego_entity = api_.spawn(
-      "ego", traffic_simulator::helper::constructLaneletPose(34741, 0.0, 0.0),
+    api_.spawn(
+      "ego", traffic_simulator::helper::constructCanonicalizedLaneletPose(34741, 0.0, 0.0),
       getVehicleParameters());
+    auto & ego_entity = api_.getEntity("ego");
 
     ego_entity.setLinearVelocity(0);
     ego_entity.requestSpeedChange(

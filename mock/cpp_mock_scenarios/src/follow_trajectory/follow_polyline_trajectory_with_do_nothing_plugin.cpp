@@ -97,9 +97,10 @@ private:
   }
   void onInitialize() override
   {
-    auto & ego_entity = api_.spawn(
+    api_.spawn(
       "ego", spawn_pose, getVehicleParameters(),
       traffic_simulator::entity::VehicleEntity::BuiltinBehavior::doNothing());
+    auto & ego_entity = api_.getEntity("ego");
     ego_entity.setLinearVelocity(10);
     ego_entity.requestSpeedChange(10, true);
     ego_entity.requestFollowTrajectory(

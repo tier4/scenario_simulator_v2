@@ -30,7 +30,7 @@ public:
   : cpp_mock_scenarios::CppScenarioNode(
       "respawn_ego", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
       "lanelet2_map.osm", __FILE__, false, option),
-    goal_pose{traffic_simulator::helper::constructLaneletPose(34606, 0, 0)},
+    goal_pose{traffic_simulator::helper::constructCanonicalizedLaneletPose(34606, 0, 0)},
     new_position_subscriber{create_subscription<geometry_msgs::msg::PoseWithCovarianceStamped>(
       "/initialpose", rclcpp::QoS(rclcpp::KeepLast(1)).reliable(),
       [this](const geometry_msgs::msg::PoseWithCovarianceStamped & message) {
@@ -76,12 +76,12 @@ private:
   void onInitialize() override
   {
     spawnEgoEntity(
-      traffic_simulator::helper::constructLaneletPose(34621, 10.0, 0.0), {goal_pose},
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(34621, 10.0, 0.0), {goal_pose},
       getVehicleParameters());
   }
 
 private:
-  const traffic_simulator_msgs::msg::LaneletPose goal_pose;
+  const traffic_simulator::lanelet_pose::CanonicalizedLaneletPose goal_pose;
 
   const rclcpp::Subscription<geometry_msgs::msg::PoseWithCovarianceStamped>::SharedPtr
     new_position_subscriber;

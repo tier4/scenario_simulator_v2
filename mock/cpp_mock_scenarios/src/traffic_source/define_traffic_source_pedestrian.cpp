@@ -56,7 +56,8 @@ private:
         if (!entity.isInLanelet()) {
           stop(cpp_mock_scenarios::Result::FAILURE);  // LCOV_EXCL_LINE
         } else {
-          if (!entity.isInLanelet(34385, 10.0) || !isPedestrian(name)) {
+          const bool valid_pedestrian_lanelet = entity.isInLanelet(34385, 10.0);
+          if (!valid_pedestrian_lanelet || !isPedestrian(name)) {
             stop(cpp_mock_scenarios::Result::FAILURE);  // LCOV_EXCL_LINE
           }
         }
@@ -81,9 +82,10 @@ private:
       ,
       false, true, true, 0);
 
-    auto & ego_entity = api_.spawn(
-      "ego", traffic_simulator::helper::constructLaneletPose(34570, 0.0, 0.0),
+    api_.spawn(
+      "ego", traffic_simulator::helper::constructCanonicalizedLaneletPose(34570, 0.0, 0.0),
       getVehicleParameters());
+    auto & ego_entity = api_.getEntity("ego");
     ego_entity.setLinearVelocity(0.0);
     ego_entity.requestSpeedChange(0.0, true);
   }
