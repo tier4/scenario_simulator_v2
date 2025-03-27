@@ -87,6 +87,8 @@ public:
 
   auto getGoalPoses() -> std::vector<CanonicalizedLaneletPose> override;
 
+  auto getParameters() const -> const traffic_simulator_msgs::msg::VehicleParameters &;
+
   auto getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle> override;
 
   auto getRouteLanelets(double horizon = 100) -> lanelet::Ids override;

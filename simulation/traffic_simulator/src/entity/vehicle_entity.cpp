@@ -79,6 +79,11 @@ auto VehicleEntity::getDefaultMatchingDistanceForLaneletPoseCalculation() const 
          1.5;
 }
 
+auto VehicleEntity::getParameters() const -> const traffic_simulator_msgs::msg::VehicleParameters &
+{
+  return vehicle_parameters;
+}
+
 auto VehicleEntity::getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter
 {
   return behavior_plugin_ptr_->getBehaviorParameter();

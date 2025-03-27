@@ -32,6 +32,21 @@ Changelog for package openscenario_interpreter
 * add publish_empty_context parameter
 * Contributors: Masaya Kataoka
 
+14.2.2 (2025-03-27)
+-------------------
+* Merge pull request `#1543 <https://github.com/tier4/scenario_simulator_v2/issues/1543>`_ from tier4/RJD-1057/unify-spawn
+* Merge branch 'master' into RJD-1057/unify-spawn
+* Merge branch 'master' into RJD-1057/unify-spawn
+* Merge branch 'master' into RJD-1057/unify-spawn
+* Merge branch 'RJD1057/change-order-of-members' into RJD-1057/unify-spawn
+* Unify spawn API
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, f0reachARR, ぐるぐる
+
+14.2.1 (2025-03-27)
+-------------------
+* Merge remote-tracking branch 'origin/master' into RJD-1057/no-specific-param-in-manager
+* Contributors: f0reachARR
+
 14.2.0 (2025-03-26)
 -------------------
 * Merge branch 'master' into refactor/lanelet_wrapper_traffic_lights
