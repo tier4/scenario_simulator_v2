@@ -119,6 +119,11 @@ auto CanonicalizedEntityStatus::getMapPose() const noexcept -> const geometry_ms
   return entity_status_.pose;
 }
 
+auto CanonicalizedEntityStatus::getLaneletRelativeYaw() const -> std::optional<double>
+{
+  return isInLanelet() ? std::make_optional<double>(getLaneletPose().rpy.z) : std::nullopt;
+}
+
 auto CanonicalizedEntityStatus::getAltitude() const -> double
 {
   return canonicalized_lanelet_pose_ ? canonicalized_lanelet_pose_->getAltitude()
