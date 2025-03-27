@@ -168,7 +168,6 @@ FieldOperatorApplication::FieldOperatorApplication(const pid_t pid)
     minimum_risk_maneuver_behavior = behavior_name_of(message.behavior);
   }),
   getPathWithLaneId("/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", rclcpp::QoS(1), *this),
-  getTrajectory("/api/iv_msgs/planning/scenario_planning/trajectory", rclcpp::QoS(1), *this),
   getTurnIndicatorsCommand("/control/command/turn_indicators_cmd", rclcpp::QoS(1), *this),
   requestClearRoute("/api/routing/clear_route", *this),
   requestCooperateCommands("/api/external/set/rtc_commands", *this),
@@ -301,17 +300,6 @@ auto FieldOperatorApplication::engaged() const -> bool
 {
   task_queue.rethrow();
   return task_queue.empty() and autoware_state == "DRIVING";
-}
-
-auto FieldOperatorApplication::getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray
-{
-  traffic_simulator_msgs::msg::WaypointsArray waypoints;
-
-  for (const auto & point : getTrajectory().points) {
-    waypoints.waypoints.emplace_back(point.pose.position);
-  }
-
-  return waypoints;
 }
 
 auto FieldOperatorApplication::initialize(const geometry_msgs::msg::Pose & initial_pose) -> void
