@@ -259,13 +259,9 @@ void convertYAMLtoXML(const YAML::Node & yaml, XMLClass & xml)
           continue;
         }
 
-        // add @ to tags that begin with lower character
-        std::string processed_key = key;
-        if (!key.empty() && std::islower(key[0])) {
-          processed_key = "@" + key;
-        }
-
         if (element.second.IsScalar()) {
+          // delete the existing attribute due to has merge
+          xml.remove_attribute(key.c_str());
           xml.append_attribute(key.c_str()).set_value(element.second.as<std::string>().c_str());
         } else if (element.second.IsSequence()) {
           for (const auto & sequence_element : element.second) {
@@ -273,8 +269,13 @@ void convertYAMLtoXML(const YAML::Node & yaml, XMLClass & xml)
             convertYAMLtoXML(sequence_element, child);
           }
         } else {
-          auto child = xml.append_child(key.c_str());
-          convertYAMLtoXML(element.second, child);
+          if (key == "<<") {
+            // hash merge
+            convertYAMLtoXML(element.second, xml);
+          }else {
+            auto child = xml.append_child(key.c_str());
+            convertYAMLtoXML(element.second, child);
+          }
         }
       }
       break;
