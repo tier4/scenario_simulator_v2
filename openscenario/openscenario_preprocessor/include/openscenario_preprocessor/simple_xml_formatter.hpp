@@ -314,9 +314,6 @@ private:
     }
 
     const auto reorder_requests = ret->second;
-    if (reorder_requests.empty()) {
-      return true;
-    }
 
     auto document = ret->first;
     DOMElement * root = document->getDocumentElement();
