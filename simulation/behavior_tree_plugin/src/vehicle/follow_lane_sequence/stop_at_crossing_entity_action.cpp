@@ -18,6 +18,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
+#include <traffic_simulator/utils/route.hpp>
 #include <utility>
 #include <vector>
 
@@ -100,7 +101,8 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
     in_stop_sequence_ = false;
     return BT::NodeStatus::FAILURE;
   }
-  if (isNeedToRightOfWay(route_lanelets)) {
+  if (traffic_simulator::route::isNeedToRightOfWay(
+        route_lanelets, getOtherEntitiesCanonicalizedLaneletPoses())) {
     in_stop_sequence_ = false;
     return BT::NodeStatus::FAILURE;
   }
