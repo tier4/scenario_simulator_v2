@@ -128,7 +128,7 @@ auto EntityManager::updateNpcLogic(
   return entity.getCanonicalizedStatus();
 }
 
-auto EntityManager::updateHdmapMarker() const -> void
+auto EntityManager::updateLaneletMarker() const -> void
 {
   MarkerArray markers;
   const auto stamp = clock_ptr_->now();
@@ -354,11 +354,6 @@ auto EntityManager::despawnEntity(const std::string & name) -> bool
 }
 
 // traffics, lanelet
-auto EntityManager::getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &
-{
-  return hdmap_utils_ptr_;
-}
-
 auto EntityManager::getObstacle(const std::string & name)
   -> std::optional<traffic_simulator_msgs::msg::Obstacle>
 {

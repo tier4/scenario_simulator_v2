@@ -26,7 +26,6 @@
 #include <traffic_simulator/data_type/behavior.hpp>
 #include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/helper/stop_watch.hpp>
 #include <traffic_simulator/traffic_lights/traffic_lights.hpp>
 #include <traffic_simulator_msgs/msg/obstacle.hpp>
@@ -72,7 +71,6 @@ public:
       BT::InputPort<EntityStatusDict>("other_entity_status"),
       BT::InputPort<lanelet::Ids>("route_lanelets"),
       BT::InputPort<std::optional<double>>("target_speed"),
-      BT::InputPort<std::shared_ptr<hdmap_utils::HdMapUtils>>("hdmap_utils"),
       BT::InputPort<std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>>("canonicalized_entity_status"),
       BT::InputPort<std::shared_ptr<traffic_simulator::TrafficLightsBase>>("traffic_lights"),
       BT::InputPort<traffic_simulator::behavior::Request>("request"),
@@ -97,7 +95,6 @@ public:
 
 protected:
   traffic_simulator::behavior::Request request;
-  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils;
   std::shared_ptr<traffic_simulator::TrafficLightsBase> traffic_lights;
   std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus> canonicalized_entity_status;
   double current_time;

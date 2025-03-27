@@ -18,6 +18,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
+#include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator/utils/route.hpp>
 #include <utility>
 #include <vector>
