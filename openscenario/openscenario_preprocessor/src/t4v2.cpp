@@ -268,7 +268,11 @@ void convertYAMLtoXML(const YAML::Node & yaml, XMLClass & xml)
             auto child = xml.append_child(key.c_str());
             convertYAMLtoXML(sequence_element, child);
           }
-        } else {
+        } else if (element.second.IsNull() && not key.empty() && std::islower(key[0])) {
+          // maybe empty attribute
+          xml.remove_attribute(key.c_str());
+          xml.append_attribute(key.c_str()).set_value("None");
+        }else {
           if (key == "<<") {
             // hash merge
             convertYAMLtoXML(element.second, xml);
