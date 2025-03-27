@@ -53,18 +53,17 @@ private:
   }
   void onInitialize() override
   {
-    api_.spawn(
-      "ego", traffic_simulator::helper::constructCanonicalizedLaneletPose(34462, 15.0, 0.0),
+    auto & ego_entity = api_.spawn(
+      "ego", traffic_simulator::helper::constructLaneletPose(34462, 15.0, 0.0),
       getVehicleParameters());
-    auto & ego_entity = api_.getEntity("ego");
     ego_entity.setLinearVelocity(5);
     ego_entity.requestSpeedChange(5, true);
     ego_entity.requestLaneChange(34513);
 
-    api_.spawn(
-      "npc", traffic_simulator::helper::constructCanonicalizedLaneletPose(34513, 0.0, 0.0),
+    auto & npc_entity = api_.spawn(
+      "npc", traffic_simulator::helper::constructLaneletPose(34513, 0.0, 0.0),
       getVehicleParameters());
-    api_.getEntity("npc").setLinearVelocity(10);
+    npc_entity.setLinearVelocity(10);
   }
 };
 }  // namespace cpp_mock_scenarios
