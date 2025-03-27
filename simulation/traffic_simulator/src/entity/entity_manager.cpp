@@ -400,6 +400,5 @@ auto EntityManager::getWaypoints(const std::string & name)
     return entities_.at(name)->getWaypoints();
   }
 }
-
 }  // namespace entity
 }  // namespace traffic_simulator
