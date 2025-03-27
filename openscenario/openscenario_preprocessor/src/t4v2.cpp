@@ -277,6 +277,7 @@ void convertYAMLtoXML(const YAML::Node & yaml, XMLClass & xml)
             // hash merge
             convertYAMLtoXML(element.second, xml);
           }else {
+            xml.remove_child(key.c_str());
             auto child = xml.append_child(key.c_str());
             convertYAMLtoXML(element.second, child);
           }
