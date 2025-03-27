@@ -56,10 +56,12 @@ public:
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
     debug_marker_pub_(rclcpp::create_publisher<visualization_msgs::msg::MarkerArray>(
       node, "debug_marker", rclcpp::QoS(100), rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
-    clock_(getROS2Parameter<bool>("use_sim_time", true), std::forward<decltype(xs)>(xs)...),
+    clock_(
+      common::getParameter<bool>(node_parameters_, "use_sim_time"),
+      std::forward<decltype(xs)>(xs)...),
     zeromq_client_(
       simulation_interface::protocol, configuration.simulator_host,
-      getROS2Parameter<int>("port", 5555)),
+      common::getParameter<int>(node_parameters_, "port", 5555)),
     entity_manager_ptr_(
       std::make_shared<entity::EntityManager>(node, configuration, node_parameters_)),
     traffic_controller_ptr_(std::make_shared<traffic::TrafficController>(
@@ -67,7 +69,8 @@ public:
       configuration.auto_sink_entity_types)),
     traffic_lights_ptr_(std::make_shared<TrafficLights>(
       node, entity_manager_ptr_->getHdmapUtils(),
-      getROS2Parameter<std::string>("architecture_type", "awf/universe/20240605"))),
+      common::getParameter<std::string>(
+        node_parameters_, "architecture_type", "awf/universe/20240605"))),
     real_time_factor_subscriber_(rclcpp::create_subscription<std_msgs::msg::Float64>(
       node, "/real_time_factor", rclcpp::QoS(rclcpp::KeepLast(1)).best_effort(),
       [this](const std_msgs::msg::Float64 & message) {
@@ -85,7 +88,7 @@ public:
   template <typename ParameterT, typename... Ts>
   auto getROS2Parameter(Ts &&... xs) const -> decltype(auto)
   {
-    return getParameter<ParameterT>(node_parameters_, std::forward<Ts>(xs)...);
+    return common::getParameter<ParameterT>(node_parameters_, std::forward<Ts>(xs)...);
   }
 
   auto init() -> bool;
@@ -122,11 +125,11 @@ public:
 
     auto register_to_entity_manager = [&]() -> entity::EntityBase & {
       if constexpr (std::is_same_v<ParamsType, VehicleParameters>) {
-      if (behavior == VehicleBehavior::autoware()) {
+        if (behavior == VehicleBehavior::autoware()) {
           return entity_manager_ptr_->spawnEntity<entity::EgoEntity>(
-                 name, pose, parameters, getCurrentTime(), configuration_, node_parameters_);
-      } else {
-        return entity_manager_ptr_->spawnEntity<entity::VehicleEntity>(
+            name, pose, parameters, getCurrentTime(), configuration_, node_parameters_);
+        } else {
+          return entity_manager_ptr_->spawnEntity<entity::VehicleEntity>(
             name, pose, parameters, getCurrentTime(),
             behavior.empty() ? VehicleBehavior::defaultBehavior() : behavior);
         }
@@ -173,7 +176,7 @@ public:
     auto & entity = register_to_entity_manager();
     if (register_to_environment_simulator(entity)) {
       return entity;
-      } else {
+    } else {
       THROW_SEMANTIC_ERROR("Spawn entity ", std::quoted(name), " resulted in failure.");
     }
   }

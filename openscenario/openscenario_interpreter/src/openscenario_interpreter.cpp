@@ -59,9 +59,9 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   DECLARE_PARAMETER(record);
   DECLARE_PARAMETER(record_storage_id);
 
-  declare_parameter<std::string>("speed_condition", "legacy");
   SpeedCondition::compatibility =
-    boost::lexical_cast<Compatibility>(get_parameter("speed_condition").as_string());
+    boost::lexical_cast<Compatibility>(common::getParameter<std::string>(
+      get_node_parameters_interface(), "speed_condition", "legacy"));
 }
 
 Interpreter::~Interpreter() {}
@@ -125,12 +125,8 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
 
       // CanonicalizedLaneletPose is also used on the OpenScenarioInterpreter side as NativeLanePose.
       // so canonicalization takes place here - it uses the value of the consider_pose_by_road_slope parameter
-      traffic_simulator::lanelet_pose::CanonicalizedLaneletPose::setConsiderPoseByRoadSlope([&]() {
-        if (not has_parameter("consider_pose_by_road_slope")) {
-          declare_parameter("consider_pose_by_road_slope", false);
-        }
-        return get_parameter("consider_pose_by_road_slope").as_bool();
-      }());
+      traffic_simulator::lanelet_pose::CanonicalizedLaneletPose::setConsiderPoseByRoadSlope(
+        common::getParameter<bool>("consider_pose_by_road_slope"));
 
       if (script->category.is<ScenarioDefinition>()) {
         scenarios = {std::dynamic_pointer_cast<ScenarioDefinition>(script->category)};
@@ -147,44 +143,6 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
     });
 }
 
-auto Interpreter::engage() const -> void
-{
-  for (const auto & [name, scenario_object] : currentScenarioDefinition()->entities) {
-    if (
-      scenario_object.template is<ScenarioObject>() and
-      scenario_object.template as<ScenarioObject>().is_added and
-      scenario_object.template as<ScenarioObject>().object_controller.isAutoware()) {
-      NonStandardOperation::engage(name);
-    }
-  }
-}
-
-auto Interpreter::engageable() const -> bool
-{
-  return std::all_of(
-    std::cbegin(currentScenarioDefinition()->entities),
-    std::cend(currentScenarioDefinition()->entities), [this](const auto & each) {
-      const auto & [name, scenario_object] = each;
-      return not scenario_object.template is<ScenarioObject>() or
-             not scenario_object.template as<ScenarioObject>().is_added or
-             not scenario_object.template as<ScenarioObject>().object_controller.isAutoware() or
-             NonStandardOperation::isEngageable(name);
-    });
-}
-
-auto Interpreter::engaged() const -> bool
-{
-  return std::all_of(
-    std::cbegin(currentScenarioDefinition()->entities),
-    std::cend(currentScenarioDefinition()->entities), [this](const auto & each) {
-      const auto & [name, scenario_object] = each;
-      return not scenario_object.template is<ScenarioObject>() or
-             not scenario_object.template as<ScenarioObject>().is_added or
-             not scenario_object.template as<ScenarioObject>().object_controller.isAutoware() or
-             NonStandardOperation::isEngaged(name);
-    });
-}
-
 auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 {
   auto evaluate_storyboard = [this]() {
@@ -196,12 +154,53 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
       [this]() {
         const auto evaluate_time = execution_timer.invoke("evaluate", [this]() {
           if (std::isnan(evaluateSimulationTime())) {
-            if (not waiting_for_engagement_to_be_completed and engageable()) {
-              engage();
-              waiting_for_engagement_to_be_completed = true;  // NOTE: DIRTY HACK!!!
-            } else if (engaged()) {
-              activateNonUserDefinedControllers();
-              waiting_for_engagement_to_be_completed = false;  // NOTE: DIRTY HACK!!!
+            auto engaged = [this]() {
+              return std::all_of(
+                currentScenarioDefinition()->entities.begin(),
+                currentScenarioDefinition()->entities.end(), [this](const auto & each) {
+                  return std::apply(
+                    [this](const auto & name, const auto & object) {
+                      return not object.template is<ScenarioObject>() or
+                             not object.template as<ScenarioObject>().is_added or
+                             not object.template as<ScenarioObject>()
+                                   .object_controller.isAutoware() or
+                             NonStandardOperation::isEngaged(name);
+                    },
+                    each);
+                });
+            };
+
+            auto engageable = [this]() {
+              return std::all_of(
+                currentScenarioDefinition()->entities.begin(),
+                currentScenarioDefinition()->entities.end(), [this](const auto & each) {
+                  return std::apply(
+                    [this](const auto & name, const auto & object) {
+                      return not object.template is<ScenarioObject>() or
+                             not object.template as<ScenarioObject>().is_added or
+                             not object.template as<ScenarioObject>()
+                                   .object_controller.isAutoware() or
+                             NonStandardOperation::isEngageable(name);
+                    },
+                    each);
+                });
+            };
+
+            auto engage = [this]() {
+              for (const auto & [name, object] : currentScenarioDefinition()->entities) {
+                if (
+                  object.template is<ScenarioObject>() and
+                  object.template as<ScenarioObject>().is_added and
+                  object.template as<ScenarioObject>().object_controller.isAutoware()) {
+                  NonStandardOperation::engage(name);
+                }
+              }
+            };
+
+            if (engaged()) {
+              return activateNonUserDefinedControllers();
+            } else if (engageable()) {
+              return engage();
             }
           } else if (currentScenarioDefinition()) {
             currentScenarioDefinition()->evaluate();
