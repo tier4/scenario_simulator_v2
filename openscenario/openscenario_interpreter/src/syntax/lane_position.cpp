@@ -46,12 +46,12 @@ LanePosition::operator NativeLanePosition() const
   native_lane_position.rpy.x = orientation.r;
   native_lane_position.rpy.y = orientation.p;
   native_lane_position.rpy.z = orientation.h;
-  return canonicalize(native_lane_position);
+  return native_lane_position;
 }
 
 LanePosition::operator NativeWorldPosition() const
 {
-  return convert<NativeWorldPosition>(static_cast<NativeLanePosition>(*this));
+  return convertToNativeWorldPosition(static_cast<NativeLanePosition>(*this));
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

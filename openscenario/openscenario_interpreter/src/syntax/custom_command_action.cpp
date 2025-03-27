@@ -106,7 +106,7 @@ struct ApplyFaultInjectionAction : public CustomCommand
 template <auto Version>
 struct ApplyPseudoTrafficSignalDetectorConfidenceSetAction
 : public CustomCommand,
-  public SimulatorCore::NonStandardOperation
+  public SimulatorCore::TrafficLightsOperation
 {
   using CustomCommand::CustomCommand;
 
@@ -147,7 +147,7 @@ struct ApplyRequestToCorporateCommandAction : public CustomCommand,
 };
 
 struct ApplyV2ITrafficSignalStateAction : public CustomCommand,
-                                          public SimulatorCore::NonStandardOperation
+                                          public SimulatorCore::TrafficLightsOperation
 {
   using CustomCommand::CustomCommand;
 
