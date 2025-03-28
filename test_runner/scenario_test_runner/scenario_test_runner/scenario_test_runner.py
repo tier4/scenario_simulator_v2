@@ -19,6 +19,7 @@
 import os
 import rclpy
 import time
+import json
 
 from argparse import ArgumentParser
 from glob import glob
@@ -70,7 +71,8 @@ class ScenarioTestRunner(LifecycleController):
         global_frame_rate: float,
         global_real_time_factor: float,
         global_timeout: int,  # [sec]
-        output_directory: Path
+        output_directory: Path,
+        override_parameters: str
     ):
         """
         Initialize the class ScenarioTestRunner.
@@ -108,6 +110,11 @@ class ScenarioTestRunner(LifecycleController):
                 else:
                     os.remove(target)
         self.output_directory.mkdir(parents=True, exist_ok=True)
+
+        if len(override_parameters) > 0:
+            self.override_parameters = json.loads(override_parameters)
+        else:
+            self.override_parameters = None
 
         self.check_preprocessor_client = self.create_client(CheckDerivativeRemained,
                                                             '/simulation/openscenario_preprocessor/check')
@@ -276,6 +283,8 @@ def main(args=None):
 
     parser.add_argument("--output-directory", default=Path("/tmp"), type=Path)
 
+    parser.add_argument("--override-parameters", default=None, type=str)
+
     parser.add_argument("--global-frame-rate", default=30, type=float)
 
     parser.add_argument("-x", "--global-real-time-factor", default=1.0, type=float)
@@ -294,6 +303,7 @@ def main(args=None):
         global_real_time_factor=args.global_real_time_factor,
         global_timeout=args.global_timeout,
         output_directory=args.output_directory / "scenario_test_runner",
+        override_parameters=args.override_parameters,
     )
 
     if args.scenario != Path("/dev/null"):
