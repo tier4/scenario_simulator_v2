@@ -16,6 +16,7 @@
 
 #include <gtest/gtest.h>
 
+#include <fstream>
 #include <random_test_runner/file_interactions/junit_xml_reporter.hpp>
 
 #include "test_utils.hpp"
