@@ -19,6 +19,7 @@
 #include <boost/accumulators/statistics.hpp>
 #include <chrono>
 #include <cmath>
+#include <fstream>
 #include <functional>
 #include <nlohmann/json.hpp>
 #include <unordered_map>
