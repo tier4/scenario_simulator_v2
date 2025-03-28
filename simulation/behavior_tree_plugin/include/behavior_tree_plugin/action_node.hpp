@@ -62,10 +62,10 @@ public:
   auto getRightOfWayEntities(const lanelet::Ids & following_lanelets) const
     -> std::vector<traffic_simulator::CanonicalizedEntityStatus>;
   auto getYieldStopDistance(const lanelet::Ids & following_lanelets) const -> std::optional<double>;
-  auto getOtherEntityStatus(lanelet::Id lanelet_id) const
-    -> std::vector<traffic_simulator::CanonicalizedEntityStatus>;
   auto stopEntity() const -> void;
   auto getHorizon() const -> double;
+  auto getOtherEntitiesCanonicalizedLaneletPoses() const
+    -> std::vector<traffic_simulator::CanonicalizedLaneletPose>;
 
   /// throws if the derived class return RUNNING.
   auto executeTick() -> BT::NodeStatus override;
