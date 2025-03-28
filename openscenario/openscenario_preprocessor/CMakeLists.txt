@@ -51,7 +51,6 @@ target_link_libraries(${PROJECT_NAME}_command Boost::filesystem Boost::program_o
 target_link_libraries(${PROJECT_NAME}_command XercesC::XercesC)
 target_link_libraries(${PROJECT_NAME}_command pugixml)
 target_link_libraries(${PROJECT_NAME}_command yaml-cpp)
-target_link_libraries(${PROJECT_NAME}_command glog)
 
 target_link_libraries(${PROJECT_NAME}_command ${parameter_value_distribution_LIBRARIES})
 

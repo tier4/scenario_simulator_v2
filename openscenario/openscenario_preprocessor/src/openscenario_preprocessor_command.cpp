@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <glog/logging.h>
-
 #include <boost/program_options.hpp>
 #include <boost/range/adaptor/indexed.hpp>
 #include <nlohmann/json.hpp>
@@ -66,9 +64,6 @@ auto create_parameter_value_distribution_from_json(
 
 int main(const int argc, char const * const * const argv)
 try {
-  google::InitGoogleLogging(argv[0]);
-  google::InstallFailureSignalHandler();
-
   using namespace boost::program_options;
 
   options_description description("openscenario_preprocessor_command");
