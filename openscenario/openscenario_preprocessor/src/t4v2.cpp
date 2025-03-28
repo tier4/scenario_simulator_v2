@@ -316,7 +316,6 @@ auto T4V2::loadScenarioFile(boost::filesystem::path path) -> pugi::xml_document
   if (auto formatted_xml =
         formatter.formatXML(intermediate_path, output_directory / "work" / "schema.xsd");
       formatted_xml) {
-    std::cout << formatted_xml->c_str() << std::endl;
     doc.load_file(formatted_xml->c_str());
   } else {
     std::cout << "Failed to format XML with schema : " << path.string() << std::endl;
