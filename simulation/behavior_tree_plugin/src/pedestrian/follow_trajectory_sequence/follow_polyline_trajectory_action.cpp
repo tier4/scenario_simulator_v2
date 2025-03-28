@@ -56,12 +56,8 @@ auto FollowPolylineTrajectoryAction::providedPorts() -> BT::PortsList
 
 auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
 {
-  auto getTargetSpeed = [&]() -> double {
-    if (target_speed.has_value()) {
-      return target_speed.value();
-    } else {
-      return canonicalized_entity_status->getTwist().linear.x;
-    }
+  const auto getTargetSpeed = [this]() -> double {
+    return target_speed.value_or(canonicalized_entity_status->getTwist().linear.x);
   };
 
   if (getBlackBoardValues();
@@ -74,11 +70,14 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
     THROW_SIMULATION_ERROR(
       "Time in canonicalized_entity_status is NaN - FollowTrajectoryAction does not support such "
       "case.");
-  } else if (
-    const auto entity_status_updated = traffic_simulator::follow_trajectory::makeUpdatedStatus(
-      static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status),
-      *polyline_trajectory, behavior_parameter, hdmap_utils, step_time,
-      default_matching_distance_for_lanelet_pose_calculation, getTargetSpeed())) {
+  } else if (const auto entity_status_updated =
+               traffic_simulator::follow_trajectory::makeUpdatedEntityStatus(
+                 traffic_simulator::follow_trajectory::ValidatedEntityStatus(
+                   static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status),
+                   behavior_parameter, step_time),
+                 *polyline_trajectory, default_matching_distance_for_lanelet_pose_calculation,
+                 getTargetSpeed(), step_time, hdmap_utils);
+             entity_status_updated.has_value()) {
     setCanonicalizedEntityStatus(entity_status_updated.value());
     setOutput("waypoints", calculateWaypoints());
     setOutput("obstacle", calculateObstacle(calculateWaypoints()));
