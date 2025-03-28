@@ -279,6 +279,31 @@ auto trafficSignsOnPath(const lanelet::Ids & lanelet_ids)
   return ret;
 }
 
+auto trafficSigns() -> std::vector<std::shared_ptr<const lanelet::TrafficSign>>
+{
+  std::vector<std::shared_ptr<const lanelet::TrafficSign>> ret;
+  for (const auto & lanelet_id : laneletIds()) {
+    const auto lanelet = LaneletWrapper::map()->laneletLayer.get(lanelet_id);
+    const auto traffic_signs = lanelet.regulatoryElementsAs<const lanelet::TrafficSign>();
+    for (const auto & traffic_sign : traffic_signs) {
+      ret.push_back(traffic_sign);
+    }
+  }
+  return ret;
+}
+
+auto stopLines() -> lanelet::ConstLineStrings3d
+{
+  lanelet::ConstLineStrings3d stop_lines;
+  for (const auto & traffic_sign : lanelet_wrapper::lanelet_map::trafficSigns()) {
+    if (traffic_sign->type() == "stop_sign") {
+      const auto & ref_lines = traffic_sign->refLines();
+      stop_lines.insert(stop_lines.end(), ref_lines.begin(), ref_lines.end());
+    }
+  }
+  return stop_lines;
+}
+
 auto stopLinesOnPath(const lanelet::Ids & lanelet_ids) -> lanelet::ConstLineStrings3d
 {
   lanelet::ConstLineStrings3d stop_lines;
@@ -289,6 +314,17 @@ auto stopLinesOnPath(const lanelet::Ids & lanelet_ids) -> lanelet::ConstLineStri
     }
   }
   return stop_lines;
+}
+
+auto stopLineIds() -> lanelet::Ids
+{
+  lanelet::Ids stop_line_ids;
+  const auto & stop_lines = stopLines();
+  stop_line_ids.reserve(stop_lines.size());
+  for (const auto & ret : stop_lines) {
+    stop_line_ids.push_back(ret.id());
+  }
+  return stop_line_ids;
 }
 
 auto stopLineIdsOnPath(const lanelet::Ids & lanelet_ids) -> lanelet::Ids
