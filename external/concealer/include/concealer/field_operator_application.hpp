@@ -17,20 +17,16 @@
 
 #include <sys/wait.h>
 
-#if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)
-#include <autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>
-#endif
-
 #include <autoware_adapi_v1_msgs/msg/mrm_state.hpp>
 #include <autoware_adapi_v1_msgs/srv/change_operation_mode.hpp>
 #include <autoware_adapi_v1_msgs/srv/clear_route.hpp>
 #include <autoware_adapi_v1_msgs/srv/initialize_localization.hpp>
 #include <autoware_adapi_v1_msgs/srv/set_route_points.hpp>
 #include <autoware_control_msgs/msg/control.hpp>
-#include <autoware_system_msgs/msg/autoware_state.hpp>
 #include <autoware_vehicle_msgs/msg/gear_command.hpp>
 #include <autoware_vehicle_msgs/msg/turn_indicators_command.hpp>
 #include <concealer/autoware_universe.hpp>
+#include <concealer/legacy_autoware_state.hpp>
 #include <concealer/path_with_lane_id.hpp>
 #include <concealer/publisher.hpp>
 #include <concealer/service.hpp>
@@ -63,8 +59,6 @@ struct FieldOperatorApplication : public rclcpp::Node
 
   std::chrono::steady_clock::time_point time_limit;
 
-  std::string autoware_state = "LAUNCHING";
-
   std::string minimum_risk_maneuver_state;
 
   std::string minimum_risk_maneuver_behavior;
@@ -74,8 +68,16 @@ struct FieldOperatorApplication : public rclcpp::Node
   using Control                         = autoware_control_msgs::msg::Control;
   using CooperateStatusArray            = tier4_rtc_msgs::msg::CooperateStatusArray;
   using Emergency                       = tier4_external_api_msgs::msg::Emergency;
+#if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)
   using LocalizationInitializationState = autoware_adapi_v1_msgs::msg::LocalizationInitializationState;
+#endif
   using MrmState                        = autoware_adapi_v1_msgs::msg::MrmState;
+#if __has_include(<autoware_adapi_v1_msgs/msg/operation_mode_state.hpp>)
+  using OperationModeState              = autoware_adapi_v1_msgs::msg::OperationModeState;
+#endif
+#if __has_include(<autoware_adapi_v1_msgs/msg/route_state.hpp>)
+  using RouteState                      = autoware_adapi_v1_msgs::msg::RouteState;
+#endif
   using Trajectory                      = tier4_planning_msgs::msg::Trajectory;
   using TurnIndicatorsCommand           = autoware_vehicle_msgs::msg::TurnIndicatorsCommand;
 
@@ -95,10 +97,16 @@ struct FieldOperatorApplication : public rclcpp::Node
 #if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)
   Subscriber<LocalizationInitializationState> getLocalizationState;
 #endif
-  Subscriber<MrmState>                 getMrmState;
-  Subscriber<priority::PathWithLaneId> getPathWithLaneId;
-  Subscriber<Trajectory>               getTrajectory;
-  Subscriber<TurnIndicatorsCommand>    getTurnIndicatorsCommand;
+  Subscriber<MrmState>                        getMrmState;
+#if __has_include(<autoware_adapi_v1_msgs/msg/operation_mode_state.hpp>)
+  Subscriber<OperationModeState>              getOperationModeState;
+#endif
+  Subscriber<priority::PathWithLaneId>        getPathWithLaneId;
+#if __has_include(<autoware_adapi_v1_msgs/msg/route_state.hpp>)
+  Subscriber<RouteState>                      getRouteState;
+#endif
+  Subscriber<Trajectory>                      getTrajectory;
+  Subscriber<TurnIndicatorsCommand>           getTurnIndicatorsCommand;
 
   Service<ClearRoute>             requestClearRoute;
   Service<CooperateCommands>      requestCooperateCommands;
@@ -119,16 +127,15 @@ struct FieldOperatorApplication : public rclcpp::Node
 
   template <typename Thunk = void (*)()>
   auto waitForAutowareStateToBe(
-    const std::string & state, Thunk thunk = [] {})
+    const LegacyAutowareState & state, Thunk thunk = [] {})
   {
     thunk();
 
-    while (not finalized.load() and autoware_state != state) {
+    while (not finalized.load() and getLegacyAutowareState().value != state.value) {
       if (time_limit <= std::chrono::steady_clock::now()) {
         throw common::AutowareError(
           "Simulator waited for the Autoware state to transition to ", state,
-          ", but time is up. The current Autoware state is ",
-          (autoware_state.empty() ? "not published yet" : autoware_state));
+          ", but time is up. The current Autoware state is ", getLegacyAutowareState());
       } else {
         thunk();
         rclcpp::GenericRate<std::chrono::steady_clock>(std::chrono::seconds(1)).sleep();
@@ -153,6 +160,8 @@ struct FieldOperatorApplication : public rclcpp::Node
   auto plan(const std::vector<geometry_msgs::msg::PoseStamped> &) -> void;
 
   auto clearRoute() -> void;
+
+  auto getLegacyAutowareState() const -> LegacyAutowareState;
 
   auto getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray;
 
