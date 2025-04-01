@@ -21,6 +21,24 @@ Changelog for package cpp_mock_scenarios
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+15.0.0 (2025-03-31)
+-------------------
+* Merge pull request `#1551 <https://github.com/tier4/scenario_simulator_v2/issues/1551>`_ from tier4/refactor/get_lateral_distance
+  HdMapUtils refactor `lanelet_wrapper::distance::lateralDistance`
+* Merge branch 'master' into refactor/get_lateral_distance
+* Merge branch 'master' into refactor/get_lateral_distance
+* remove hdmap_utils from `lateralDistance` function
+* Contributors: Masaya Kataoka, Tatsuya Yamasaki, abco20
+
+14.2.3 (2025-03-28)
+-------------------
+* Merge branch 'master' into refactor/concealer-7
+* Merge branch 'master' into refactor/concealer-7
+* Merge branch 'master' into refactor/concealer-7
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-7
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-7
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
 14.2.2 (2025-03-27)
 -------------------
 * Merge branch 'master' into RJD-1057/unify-spawn

@@ -922,53 +922,6 @@ auto HdMapUtils::canChangeLane(
   return routing_graphs_->traffic_rule(type)->canChangeLane(from_lanelet, to_lanelet);
 }
 
-auto HdMapUtils::getLateralDistance(
-  const traffic_simulator_msgs::msg::LaneletPose & from,
-  const traffic_simulator_msgs::msg::LaneletPose & to,
-  const traffic_simulator::RoutingConfiguration & routing_configuration) const
-  -> std::optional<double>
-{
-  const auto route = getRoute(from.lanelet_id, to.lanelet_id, routing_configuration);
-  if (route.empty()) {
-    return std::nullopt;
-  }
-  if (routing_configuration.allow_lane_change) {
-    double lateral_distance_by_lane_change = 0.0;
-    for (unsigned int i = 0; i < route.size() - 1; i++) {
-      auto next_lanelet_ids =
-        lanelet_map::nextLaneletIds(route[i], routing_configuration.routing_graph_type);
-      if (auto next_lanelet = std::find_if(
-            next_lanelet_ids.begin(), next_lanelet_ids.end(),
-            [&route, i](const lanelet::Id & id) { return id == route[i + 1]; });
-          next_lanelet == next_lanelet_ids.end()) {
-        traffic_simulator_msgs::msg::LaneletPose next_lanelet_pose;
-        next_lanelet_pose.lanelet_id = route[i + 1];
-        next_lanelet_pose.s = 0.0;
-        next_lanelet_pose.offset = 0.0;
-
-        if (
-          auto next_lanelet_origin_from_current_lanelet =
-            pose::toLaneletPose(pose::toMapPose(next_lanelet_pose).pose, route[i], 10.0)) {
-          lateral_distance_by_lane_change += next_lanelet_origin_from_current_lanelet->offset;
-        } else {
-          traffic_simulator_msgs::msg::LaneletPose current_lanelet_pose = next_lanelet_pose;
-          current_lanelet_pose.lanelet_id = route[i];
-          if (
-            auto current_lanelet_origin_from_next_lanelet =
-              pose::toLaneletPose(pose::toMapPose(current_lanelet_pose).pose, route[i + 1], 10.0)) {
-            lateral_distance_by_lane_change -= current_lanelet_origin_from_next_lanelet->offset;
-          } else {
-            return std::nullopt;
-          }
-        }
-      }
-    }
-    return to.offset - from.offset + lateral_distance_by_lane_change;
-  } else {
-    return to.offset - from.offset;
-  }
-}
-
 auto HdMapUtils::getLongitudinalDistance(
   const traffic_simulator_msgs::msg::LaneletPose & from_pose,
   const traffic_simulator_msgs::msg::LaneletPose & to_pose,
