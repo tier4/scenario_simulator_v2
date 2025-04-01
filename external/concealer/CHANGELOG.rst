@@ -21,6 +21,33 @@ Changelog for package concealer
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+15.0.0 (2025-03-31)
+-------------------
+* Merge branch 'master' into refactor/get_lateral_distance
+* Merge branch 'master' into refactor/get_lateral_distance
+* Contributors: Tatsuya Yamasaki
+
+14.2.3 (2025-03-28)
+-------------------
+* Merge pull request `#1549 <https://github.com/tier4/scenario_simulator_v2/issues/1549>`_ from tier4/refactor/concealer-7
+  Refactor/concealer 7
+* Merge branch 'master' into refactor/concealer-7
+* Add a link to the code referenced for `LegacyAutowareState` construction in comment
+* Merge branch 'master' into refactor/concealer-7
+* Merge branch 'master' into refactor/concealer-7
+* Add missing `__has_include`
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-7
+* Fix `LegacyAutowareState` to correctly transition from `arrived_goal` to `waiting_for_route`
+* Update `initialize`, `plan`, and `engage` to take into account AutowareState
+* Add message conversion constructor to `LegacyAutowareState`
+* Add new struct `LegacyAutowareState`
+* Merge remote-tracking branch 'origin/refactor/concealer-6' into refactor/concealer-7
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-7
+* Update interpreter to call `engage` only once immediately after evaluating `Storyboard.Init`
+* Remove data member `concealer::FieldOperatorApplication::autoware_state`
+* Add new member function `FieldOperatorApplication::state`
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
 14.2.2 (2025-03-27)
 -------------------
 * Merge branch 'master' into RJD-1057/unify-spawn
