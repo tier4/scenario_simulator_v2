@@ -27,13 +27,12 @@ inline namespace distance
 // Lateral
 auto lateralDistance(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
-  const traffic_simulator::RoutingConfiguration & routing_configuration,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<double>;
+  const RoutingConfiguration & routing_configuration) -> std::optional<double>;
 
 auto lateralDistance(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
-  double matching_distance, const traffic_simulator::RoutingConfiguration & routing_configuration,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<double>;
+  const double matching_distance, const RoutingConfiguration & routing_configuration)
+  -> std::optional<double>;
 
 // Lateral (unit: lanes)
 auto countLaneChanges(
@@ -61,8 +60,7 @@ auto boundingBoxLaneLateralDistance(
   const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
   const CanonicalizedLaneletPose & to,
   const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box,
-  const traffic_simulator::RoutingConfiguration & routing_configuration,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<double>;
+  const RoutingConfiguration & routing_configuration) -> std::optional<double>;
 
 auto boundingBoxLaneLongitudinalDistance(
   const CanonicalizedLaneletPose & from,
