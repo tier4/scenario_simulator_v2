@@ -160,7 +160,7 @@ auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsAr
 {
   /**
    * @note return empty array because this function is used for visualization
-   * Autowares' trajectory is already visualized in RViz
+   * Autoware's trajectory is already visualized in RViz
    * there is no need to visualize it second time
    */
   return traffic_simulator_msgs::msg::WaypointsArray{};
