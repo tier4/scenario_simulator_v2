@@ -95,12 +95,12 @@ TEST_F(distanceTest_FourTrackHighwayMap, lateralDistance_impossible_noChange)
   {
     const auto result = traffic_simulator::distance::lateralDistance(
       pose_from, pose_to, std::numeric_limits<double>::infinity(),
-      traffic_simulator::RoutingConfiguration(), hdmap_utils_ptr);
+      traffic_simulator::RoutingConfiguration());
     EXPECT_FALSE(result.has_value());
   }
   {
     const auto result = traffic_simulator::distance::lateralDistance(
-      pose_from, pose_to, traffic_simulator::RoutingConfiguration(), hdmap_utils_ptr);
+      pose_from, pose_to, traffic_simulator::RoutingConfiguration());
     EXPECT_FALSE(result.has_value());
   }
 }
@@ -118,13 +118,13 @@ TEST_F(distanceTest_FourTrackHighwayMap, lateralDistance_possible_noChange)
   {
     const auto result = traffic_simulator::distance::lateralDistance(
       pose_from, pose_to, std::numeric_limits<double>::infinity(),
-      traffic_simulator::RoutingConfiguration(), hdmap_utils_ptr);
+      traffic_simulator::RoutingConfiguration());
     ASSERT_TRUE(result.has_value());
     EXPECT_NEAR(result.value(), 0.0, std::numeric_limits<double>::epsilon());
   }
   {
     const auto result = traffic_simulator::distance::lateralDistance(
-      pose_from, pose_to, traffic_simulator::RoutingConfiguration(), hdmap_utils_ptr);
+      pose_from, pose_to, traffic_simulator::RoutingConfiguration());
     ASSERT_TRUE(result.has_value());
     EXPECT_NEAR(result.value(), 0.0, std::numeric_limits<double>::epsilon());
   }
@@ -146,14 +146,14 @@ TEST_F(distanceTest_FourTrackHighwayMap, lateralDistance_impossible_change)
     lane_changeable_routing_configuration.allow_lane_change = true;
     const auto result = traffic_simulator::distance::lateralDistance(
       pose_from, pose_to, std::numeric_limits<double>::infinity(),
-      lane_changeable_routing_configuration, hdmap_utils_ptr);
+      lane_changeable_routing_configuration);
     EXPECT_FALSE(result.has_value());
   }
   {
     traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
     lane_changeable_routing_configuration.allow_lane_change = true;
     const auto result = traffic_simulator::distance::lateralDistance(
-      pose_from, pose_to, lane_changeable_routing_configuration, hdmap_utils_ptr);
+      pose_from, pose_to, lane_changeable_routing_configuration);
     EXPECT_FALSE(result.has_value());
   }
 }
@@ -175,7 +175,7 @@ TEST_F(distanceTest_FourTrackHighwayMap, lateralDistance_possible_change)
     lane_changeable_routing_configuration.allow_lane_change = true;
     const auto result = traffic_simulator::distance::lateralDistance(
       pose_from, pose_to, std::numeric_limits<double>::infinity(),
-      lane_changeable_routing_configuration, hdmap_utils_ptr);
+      lane_changeable_routing_configuration);
     ASSERT_TRUE(result.has_value());
     EXPECT_NEAR(result.value(), approx_distance, tolerance);
   }
@@ -183,7 +183,7 @@ TEST_F(distanceTest_FourTrackHighwayMap, lateralDistance_possible_change)
     traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
     lane_changeable_routing_configuration.allow_lane_change = true;
     const auto result = traffic_simulator::distance::lateralDistance(
-      pose_from, pose_to, lane_changeable_routing_configuration, hdmap_utils_ptr);
+      pose_from, pose_to, lane_changeable_routing_configuration);
     ASSERT_TRUE(result.has_value());
     EXPECT_NEAR(result.value(), approx_distance, tolerance);
   }
@@ -203,7 +203,7 @@ TEST_F(distanceTest_FourTrackHighwayMap, lateralDistance_impossible_matching)
     traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
     lane_changeable_routing_configuration.allow_lane_change = true;
     const auto result = traffic_simulator::distance::lateralDistance(
-      pose_from, pose_to, 2.0, lane_changeable_routing_configuration, hdmap_utils_ptr);
+      pose_from, pose_to, 2.0, lane_changeable_routing_configuration);
     EXPECT_FALSE(result.has_value());
   }
 }
@@ -222,7 +222,7 @@ TEST_F(distanceTest_FourTrackHighwayMap, lateralDistance_possible_matching)
     traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
     lane_changeable_routing_configuration.allow_lane_change = true;
     const auto result = traffic_simulator::distance::lateralDistance(
-      pose_from, pose_to, 3.0, lane_changeable_routing_configuration, hdmap_utils_ptr);
+      pose_from, pose_to, 3.0, lane_changeable_routing_configuration);
     ASSERT_TRUE(result.has_value());
     EXPECT_NEAR(result.value(), -3.0, 0.5);
   }
