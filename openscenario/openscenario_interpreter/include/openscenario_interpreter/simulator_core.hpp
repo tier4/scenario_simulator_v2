@@ -783,7 +783,7 @@ public:
     template <typename... Ts>
     static auto setV2ITrafficLightExtraInfo(Ts &&... xs) -> decltype(auto)
     {
-      return core->setV2ITrafficLightExtraInfo(std::forward<decltype(xs)>(xs)...);
+      return core->getV2ITrafficLights()->setV2ITrafficLightExtraInfo(std::forward<decltype(xs)>(xs)...);
     }
   };
 };

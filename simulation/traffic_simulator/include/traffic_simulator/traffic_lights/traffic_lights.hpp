@@ -26,6 +26,7 @@
 
 #include <traffic_simulator/traffic_lights/traffic_light_publisher.hpp>
 #include <traffic_simulator/traffic_lights/traffic_lights_base.hpp>
+#include <traffic_simulator/traffic_lights/v2i_traffic_light_info_publisher.hpp>
 
 namespace traffic_simulator
 {
@@ -69,11 +70,19 @@ public:
     publisher_ptr_(makePublisher(
       node_ptr, architecture_type,
       "/perception/traffic_light_recognition/external/traffic_signals")),
-    legacy_topic_publisher_ptr_(makePublisher(node_ptr, architecture_type, "/v2x/traffic_signals"))
+    legacy_topic_publisher_ptr_(makePublisher(node_ptr, architecture_type, "/v2x/traffic_signals")),
+    v2i_info_publisher_ptr_(std::make_unique<V2ITrafficLightInfoPublisher>(
+      "/v2i/external/v2i_traffic_light_info", node_ptr, this, hdmap_utils))
   {
   }
 
   ~V2ITrafficLights() override = default;
+
+  template <typename... Ts>
+  auto setV2ITrafficLightExtraInfo(Ts &&... xs) -> decltype(auto)
+  {
+    return v2i_info_publisher_ptr_->setTrafficLightExtraInfo(std::forward<decltype(xs)>(xs)...);
+  }
 
 private:
   auto update() const -> void override
@@ -126,6 +135,7 @@ private:
 
   const std::unique_ptr<TrafficLightPublisherBase> publisher_ptr_;
   const std::unique_ptr<TrafficLightPublisherBase> legacy_topic_publisher_ptr_;
+  const std::unique_ptr<V2ITrafficLightInfoPublisher> v2i_info_publisher_ptr_;
 };
 
 class TrafficLights

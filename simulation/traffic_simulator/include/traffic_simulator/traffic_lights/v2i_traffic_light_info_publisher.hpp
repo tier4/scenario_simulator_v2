@@ -21,7 +21,7 @@
 #include <simulation_interface/conversions.hpp>
 #include <string>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
-#include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
+#include <traffic_simulator/traffic_lights/traffic_lights_base.hpp>
 
 namespace traffic_simulator
 {
@@ -42,7 +42,7 @@ class V2ITrafficLightInfoPublisher
 
   std::unordered_map<lanelet::Id, TrafficLightExtraInfo> traffic_light_extra_info_;
 
-  const std::shared_ptr<TrafficLightManager> traffic_light_manager_;
+  TrafficLightsBase * traffic_lights_base_;
 
   const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_;
 
@@ -50,11 +50,11 @@ public:
   template <typename NodePointer>
   explicit V2ITrafficLightInfoPublisher(
     const std::string & topic_name, const NodePointer & node,
-    const std::shared_ptr<TrafficLightManager> & traffic_light_manager,
+    TrafficLightsBase * traffic_lights_base,
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils)
   : publisher_(
       rclcpp::create_publisher<Message>(node, topic_name, rclcpp::QoS(10).transient_local())),
-    traffic_light_manager_(traffic_light_manager),
+    traffic_lights_base_(traffic_lights_base),
     hdmap_utils_(hdmap_utils)
   {
     // TODO: get vehicle ID from ros parameter and set
@@ -67,7 +67,7 @@ public:
     msg.header.frame_id = "map";
 
     for (const auto & extra_info : traffic_light_extra_info_) {
-      auto traffic_light = traffic_light_manager_->getTrafficLight(extra_info.second.way_id);
+      auto traffic_light = traffic_lights_base_->getTrafficLight(extra_info.second.way_id);
 
       jpn_signal_v2i_msgs::msg::ExtraTrafficSignal extra_traffic_signal;
       extra_traffic_signal.header = msg.header;
@@ -82,12 +82,12 @@ public:
 
       auto relation_ids =
         hdmap_utils_->getTrafficLightRegulatoryElementIDsFromTrafficLight(extra_info.second.way_id);
-      autoware_perception_msgs::msg::TrafficSignal traffic_signal_msg;
+      autoware_perception_msgs::msg::TrafficLightGroup traffic_signal_msg;
       {
         auto traffic_light_proto = static_cast<simulation_api_schema::TrafficSignal>(traffic_light);
         for (auto bulb_status : traffic_light_proto.traffic_light_status()) {
           using TrafficLightBulbType =
-            autoware_perception_msgs::msg::TrafficSignal::_elements_type::value_type;
+            autoware_perception_msgs::msg::TrafficLightGroup::_elements_type::value_type;
           TrafficLightBulbType light_bulb_message;
           simulation_interface::toMsg<TrafficLightBulbType>(bulb_status, light_bulb_message);
           traffic_signal_msg.elements.push_back(light_bulb_message);
@@ -95,7 +95,7 @@ public:
       }
 
       for (const auto & relation_id : relation_ids) {
-        traffic_signal_msg.traffic_signal_id = relation_id;
+        traffic_signal_msg.traffic_light_group_id = relation_id;
         extra_traffic_signal.states.push_back(traffic_signal_msg);
       }
       msg.car_lights.push_back(extra_traffic_signal);
@@ -112,7 +112,7 @@ public:
     info.rest_time_to_red = rest_time_to_red;
 
     if (hdmap_utils_->isTrafficLightRegulatoryElement(id)) {
-      for (const auto & traffic_light : traffic_light_manager_->getTrafficLights(id)) {
+      for (const auto & traffic_light : traffic_lights_base_->getTrafficLights(id)) {
         info.way_id = traffic_light.get().way_id;
         traffic_light_extra_info_.insert_or_assign(info.way_id, info);
       }
