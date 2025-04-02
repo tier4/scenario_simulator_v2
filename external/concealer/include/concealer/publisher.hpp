@@ -15,6 +15,7 @@
 #ifndef CONCEALER__PUBLISHER_HPP_
 #define CONCEALER__PUBLISHER_HPP_
 
+#include <autoware_vehicle_msgs/msg/velocity_report.hpp>
 #include <get_parameter/get_parameter.hpp>
 #include <nav_msgs/msg/odometry.hpp>
 #include <random>
@@ -107,6 +108,24 @@ struct NormalDistribution<nav_msgs::msg::Odometry> : public RandomNumberEngine
     const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr &, const std::string &);
 
   auto operator()(nav_msgs::msg::Odometry odometry) -> nav_msgs::msg::Odometry;
+};
+
+template <>
+struct NormalDistribution<autoware_vehicle_msgs::msg::VelocityReport> : public RandomNumberEngine
+{
+  double speed_threshold;
+
+  // clang-format off
+  NormalDistributionError<float> longitudinal_velocity_error,
+                                 lateral_velocity_error,
+                                 heading_rate_error;
+  // clang-format on
+
+  explicit NormalDistribution(
+    const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr &, const std::string &);
+
+  auto operator()(autoware_vehicle_msgs::msg::VelocityReport velocity_report)
+    -> autoware_vehicle_msgs::msg::VelocityReport;
 };
 
 template <typename Message, template <typename> typename Randomizer = Identity>

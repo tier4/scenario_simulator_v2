@@ -108,4 +108,37 @@ auto NormalDistribution<nav_msgs::msg::Odometry>::operator()(nav_msgs::msg::Odom
     return odometry;
   }
 }
+
+NormalDistribution<autoware_vehicle_msgs::msg::VelocityReport>::NormalDistribution(
+  const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node,
+  const std::string & topic)
+: RandomNumberEngine(node, topic),
+  speed_threshold(common::getParameter<double>(
+    node, topic + ".autoware_vehicle_msgs::msg::VelocityReport.speed_threshold")),
+  longitudinal_velocity_error(
+    node, topic + ".autoware_vehicle_msgs::msg::VelocityReport.longitudinal_velocity.error"),
+  lateral_velocity_error(
+    node, topic + ".autoware_vehicle_msgs::msg::VelocityReport.lateral_velocity.error"),
+  heading_rate_error(node, topic + ".autoware_vehicle_msgs::msg::VelocityReport.heading_rate.error")
+{
+}
+
+auto NormalDistribution<autoware_vehicle_msgs::msg::VelocityReport>::operator()(
+  autoware_vehicle_msgs::msg::VelocityReport velocity_report)
+  -> autoware_vehicle_msgs::msg::VelocityReport
+{
+  if (const double speed =
+        std::hypot(velocity_report.longitudinal_velocity, velocity_report.lateral_velocity);
+      speed < speed_threshold) {
+    return velocity_report;
+  } else {
+    velocity_report.longitudinal_velocity =
+      longitudinal_velocity_error.apply(engine, velocity_report.longitudinal_velocity);
+    velocity_report.lateral_velocity =
+      lateral_velocity_error.apply(engine, velocity_report.lateral_velocity);
+    velocity_report.heading_rate = heading_rate_error.apply(engine, velocity_report.heading_rate);
+    return velocity_report;
+  }
+}
+
 }  // namespace concealer
