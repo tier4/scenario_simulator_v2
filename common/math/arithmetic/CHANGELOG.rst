@@ -21,6 +21,11 @@ Changelog for package arithmetic
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+15.0.2 (2025-04-02)
+-------------------
+* Merge branch 'master' into dependabot/pip/jinja2-3.1.6
+* Contributors: Masaya Kataoka
+
 15.0.1 (2025-04-02)
 -------------------
 * Merge branch 'master' into feature/support-context-gamma-test
