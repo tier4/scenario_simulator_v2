@@ -37,6 +37,37 @@ struct Identity
   }
 };
 
+template <typename ValueType>
+struct NormalDistributionError
+{
+  static_assert(
+    std::disjunction_v<
+      std::is_same<std::decay_t<ValueType>, float>, std::is_same<std::decay_t<ValueType>, double>,
+      std::is_same<std::decay_t<ValueType>, long double> >,
+    "Unsupported error type");
+
+  std::normal_distribution<ValueType> additive, multiplicative;
+
+  explicit NormalDistributionError(
+    const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node,
+    const std::string & prefix)
+  // clang-format off
+  : additive(
+      static_cast<ValueType>(common::getParameter<double>(node, prefix + ".additive.mean")),
+      static_cast<ValueType>(common::getParameter<double>(node, prefix + ".additive.standard_deviation"))),
+    multiplicative(
+      static_cast<ValueType>(common::getParameter<double>(node, prefix + ".multiplicative.mean")),
+      static_cast<ValueType>(common::getParameter<double>(node, prefix + ".multiplicative.standard_deviation")))
+  // clang-format on
+  {
+  }
+
+  auto apply(std::mt19937_64 & engine, const ValueType value) -> decltype(auto)
+  {
+    return value * (multiplicative(engine) + static_cast<ValueType>(1)) + additive(engine);
+  }
+};
+
 template <typename>
 struct NormalDistribution;
 
@@ -51,41 +82,19 @@ struct NormalDistribution<nav_msgs::msg::Odometry>
 
   double speed_threshold;
 
-  struct Error
-  {
-    std::normal_distribution<double> additive, multiplicative;
-
-    explicit Error(
-      const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node,
-      const std::string & prefix)
-    : additive(
-        common::getParameter<double>(node, prefix + ".additive.mean"),
-        common::getParameter<double>(node, prefix + ".additive.standard_deviation")),
-      multiplicative(
-        common::getParameter<double>(node, prefix + ".multiplicative.mean"),
-        common::getParameter<double>(node, prefix + ".multiplicative.standard_deviation"))
-    {
-    }
-
-    auto apply(std::mt19937_64 & engine, double value) -> decltype(auto)
-    {
-      return value * (multiplicative(engine) + 1.0) + additive(engine);
-    }
-  };
-
   // clang-format off
-  Error position_local_x_error,
-        position_local_y_error,
-        position_local_z_error,
-        orientation_r_error,
-        orientation_p_error,
-        orientation_y_error,
-        linear_x_error,
-        linear_y_error,
-        linear_z_error,
-        angular_x_error,
-        angular_y_error,
-        angular_z_error;
+  NormalDistributionError<double> position_local_x_error,
+                                  position_local_y_error,
+                                  position_local_z_error,
+                                  orientation_r_error,
+                                  orientation_p_error,
+                                  orientation_y_error,
+                                  linear_x_error,
+                                  linear_y_error,
+                                  linear_z_error,
+                                  angular_x_error,
+                                  angular_y_error,
+                                  angular_z_error;
   // clang-format on
 
   explicit NormalDistribution(
