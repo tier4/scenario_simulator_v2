@@ -60,6 +60,13 @@ Preprocessor::Preprocessor(const rclcpp::NodeOptions & options)
       -> void {
       auto lock = std::lock_guard(preprocessed_scenarios_mutex);
       response->derivative_remained = not preprocessed_scenarios.empty();
+    })),
+  set_parameter_server(create_service<openscenario_preprocessor_msgs::srv::SetParameter>(
+    "~/set_parameter",
+    [this](
+      const openscenario_preprocessor_msgs::srv::SetParameter::Request::SharedPtr request,
+      openscenario_preprocessor_msgs::srv::SetParameter::Response::SharedPtr response) -> void {
+      override_parameters[request->name] = request->value;
     }))
 {
 }
