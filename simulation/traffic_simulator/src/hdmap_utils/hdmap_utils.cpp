@@ -922,53 +922,6 @@ auto HdMapUtils::canChangeLane(
   return routing_graphs_->traffic_rule(type)->canChangeLane(from_lanelet, to_lanelet);
 }
 
-auto HdMapUtils::getLateralDistance(
-  const traffic_simulator_msgs::msg::LaneletPose & from,
-  const traffic_simulator_msgs::msg::LaneletPose & to,
-  const traffic_simulator::RoutingConfiguration & routing_configuration) const
-  -> std::optional<double>
-{
-  const auto route = getRoute(from.lanelet_id, to.lanelet_id, routing_configuration);
-  if (route.empty()) {
-    return std::nullopt;
-  }
-  if (routing_configuration.allow_lane_change) {
-    double lateral_distance_by_lane_change = 0.0;
-    for (unsigned int i = 0; i < route.size() - 1; i++) {
-      auto next_lanelet_ids =
-        lanelet_map::nextLaneletIds(route[i], routing_configuration.routing_graph_type);
-      if (auto next_lanelet = std::find_if(
-            next_lanelet_ids.begin(), next_lanelet_ids.end(),
-            [&route, i](const lanelet::Id & id) { return id == route[i + 1]; });
-          next_lanelet == next_lanelet_ids.end()) {
-        traffic_simulator_msgs::msg::LaneletPose next_lanelet_pose;
-        next_lanelet_pose.lanelet_id = route[i + 1];
-        next_lanelet_pose.s = 0.0;
-        next_lanelet_pose.offset = 0.0;
-
-        if (
-          auto next_lanelet_origin_from_current_lanelet =
-            pose::toLaneletPose(pose::toMapPose(next_lanelet_pose).pose, route[i], 10.0)) {
-          lateral_distance_by_lane_change += next_lanelet_origin_from_current_lanelet->offset;
-        } else {
-          traffic_simulator_msgs::msg::LaneletPose current_lanelet_pose = next_lanelet_pose;
-          current_lanelet_pose.lanelet_id = route[i];
-          if (
-            auto current_lanelet_origin_from_next_lanelet =
-              pose::toLaneletPose(pose::toMapPose(current_lanelet_pose).pose, route[i + 1], 10.0)) {
-            lateral_distance_by_lane_change -= current_lanelet_origin_from_next_lanelet->offset;
-          } else {
-            return std::nullopt;
-          }
-        }
-      }
-    }
-    return to.offset - from.offset + lateral_distance_by_lane_change;
-  } else {
-    return to.offset - from.offset;
-  }
-}
-
 auto HdMapUtils::getLongitudinalDistance(
   const traffic_simulator_msgs::msg::LaneletPose & from_pose,
   const traffic_simulator_msgs::msg::LaneletPose & to_pose,
@@ -1229,51 +1182,6 @@ auto HdMapUtils::getTrafficLightRegulatoryElementsOnPath(const lanelet::Ids & la
   return ret;
 }
 
-auto HdMapUtils::getStopLines() const -> lanelet::ConstLineStrings3d
-{
-  lanelet::ConstLineStrings3d ret;
-  for (const auto & traffic_sign : getTrafficSignRegulatoryElements()) {
-    if (traffic_sign->type() == "stop_sign") {
-      for (const auto & stop_line : traffic_sign->refLines()) {
-        ret.emplace_back(stop_line);
-      }
-    }
-  }
-  return ret;
-}
-
-auto HdMapUtils::getStopLinesOnPath(const lanelet::Ids & lanelet_ids) const
-  -> lanelet::ConstLineStrings3d
-{
-  lanelet::ConstLineStrings3d ret;
-  for (const auto & traffic_sign : getTrafficSignRegulatoryElementsOnPath(lanelet_ids)) {
-    if (traffic_sign->type() == "stop_sign") {
-      for (const auto & stop_line : traffic_sign->refLines()) {
-        ret.emplace_back(stop_line);
-      }
-    }
-  }
-  return ret;
-}
-
-auto HdMapUtils::getStopLineIds() const -> lanelet::Ids
-{
-  lanelet::Ids stop_line_ids;
-  for (const auto & ret : getStopLines()) {
-    stop_line_ids.push_back(ret.id());
-  }
-  return stop_line_ids;
-}
-
-auto HdMapUtils::getStopLineIdsOnPath(const lanelet::Ids & route_lanelets) const -> lanelet::Ids
-{
-  lanelet::Ids stop_line_ids;
-  for (const auto & ret : getStopLinesOnPath(route_lanelets)) {
-    stop_line_ids.push_back(ret.id());
-  }
-  return stop_line_ids;
-}
-
 auto HdMapUtils::getTrafficLights(const lanelet::Id traffic_light_id) const
   -> std::vector<lanelet::AutowareTrafficLightConstPtr>
 {
@@ -1328,21 +1236,6 @@ auto HdMapUtils::getTrafficLightStopLinesPoints(const lanelet::Id traffic_light_
     }
   }
   return ret;
-}
-
-auto HdMapUtils::getStopLinePolygon(const lanelet::Id lanelet_id) const
-  -> std::vector<geometry_msgs::msg::Point>
-{
-  std::vector<geometry_msgs::msg::Point> points;
-  const auto stop_line = lanelet_map_ptr_->lineStringLayer.get(lanelet_id);
-  for (const auto & point : stop_line) {
-    geometry_msgs::msg::Point p;
-    p.x = point.x();
-    p.y = point.y();
-    p.z = point.z();
-    points.emplace_back(p);
-  }
-  return points;
 }
 
 auto HdMapUtils::getTrafficLightIdsOnPath(const lanelet::Ids & route_lanelets) const -> lanelet::Ids
@@ -1435,68 +1328,6 @@ auto HdMapUtils::getDistanceToTrafficLightStopLine(
     }
   }
   return std::nullopt;
-}
-
-auto HdMapUtils::getDistanceToStopLine(
-  const lanelet::Ids & route_lanelets,
-  const std::vector<geometry_msgs::msg::Point> & waypoints) const -> std::optional<double>
-{
-  if (waypoints.empty()) {
-    return std::nullopt;
-  }
-  std::set<double> collision_points;
-  if (waypoints.empty()) {
-    return std::nullopt;
-  }
-  math::geometry::CatmullRomSpline spline(waypoints);
-  const auto stop_lines = getStopLinesOnPath({route_lanelets});
-  for (const auto & stop_line : stop_lines) {
-    std::vector<geometry_msgs::msg::Point> stop_line_points;
-    for (const auto & point : stop_line) {
-      geometry_msgs::msg::Point p;
-      p.x = point.x();
-      p.y = point.y();
-      p.z = point.z();
-      stop_line_points.emplace_back(p);
-    }
-    const auto collision_point = spline.getCollisionPointIn2D(stop_line_points);
-    if (collision_point) {
-      collision_points.insert(collision_point.value());
-    }
-  }
-  if (collision_points.empty()) {
-    return std::nullopt;
-  }
-  return *collision_points.begin();
-}
-
-auto HdMapUtils::getDistanceToStopLine(
-  const lanelet::Ids & route_lanelets,
-  const math::geometry::CatmullRomSplineInterface & spline) const -> std::optional<double>
-{
-  if (spline.getLength() <= 0) {
-    return std::nullopt;
-  }
-  std::set<double> collision_points;
-  const auto stop_lines = getStopLinesOnPath({route_lanelets});
-  for (const auto & stop_line : stop_lines) {
-    std::vector<geometry_msgs::msg::Point> stop_line_points;
-    for (const auto & point : stop_line) {
-      geometry_msgs::msg::Point p;
-      p.x = point.x();
-      p.y = point.y();
-      p.z = point.z();
-      stop_line_points.emplace_back(p);
-    }
-    const auto collision_point = spline.getCollisionPointIn2D(stop_line_points);
-    if (collision_point) {
-      collision_points.insert(collision_point.value());
-    }
-  }
-  if (collision_points.empty()) {
-    return std::nullopt;
-  }
-  return *collision_points.begin();
 }
 
 auto HdMapUtils::calculateSegmentDistances(const lanelet::ConstLineString3d & line_string) const

@@ -59,9 +59,9 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   DECLARE_PARAMETER(record);
   DECLARE_PARAMETER(record_storage_id);
 
-  declare_parameter<std::string>("speed_condition", "legacy");
   SpeedCondition::compatibility =
-    boost::lexical_cast<Compatibility>(get_parameter("speed_condition").as_string());
+    boost::lexical_cast<Compatibility>(common::getParameter<std::string>(
+      get_node_parameters_interface(), "speed_condition", "legacy"));
 }
 
 Interpreter::~Interpreter() {}
@@ -125,12 +125,8 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
 
       // CanonicalizedLaneletPose is also used on the OpenScenarioInterpreter side as NativeLanePose.
       // so canonicalization takes place here - it uses the value of the consider_pose_by_road_slope parameter
-      traffic_simulator::lanelet_pose::CanonicalizedLaneletPose::setConsiderPoseByRoadSlope([&]() {
-        if (not has_parameter("consider_pose_by_road_slope")) {
-          declare_parameter("consider_pose_by_road_slope", false);
-        }
-        return get_parameter("consider_pose_by_road_slope").as_bool();
-      }());
+      traffic_simulator::lanelet_pose::CanonicalizedLaneletPose::setConsiderPoseByRoadSlope(
+        common::getParameter<bool>("consider_pose_by_road_slope"));
 
       if (script->category.is<ScenarioDefinition>()) {
         scenarios = {std::dynamic_pointer_cast<ScenarioDefinition>(script->category)};
@@ -157,55 +153,21 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
       },
       [this]() {
         const auto evaluate_time = execution_timer.invoke("evaluate", [this]() {
-          if (std::isnan(evaluateSimulationTime())) {
-            auto engaged = [this]() {
-              return std::all_of(
-                currentScenarioDefinition()->entities.begin(),
-                currentScenarioDefinition()->entities.end(), [this](const auto & each) {
-                  return std::apply(
-                    [this](const auto & name, const auto & object) {
-                      return not object.template is<ScenarioObject>() or
-                             not object.template as<ScenarioObject>().is_added or
-                             not object.template as<ScenarioObject>()
-                                   .object_controller.isAutoware() or
-                             NonStandardOperation::isEngaged(name);
-                    },
-                    each);
-                });
-            };
-
-            auto engageable = [this]() {
-              return std::all_of(
-                currentScenarioDefinition()->entities.begin(),
-                currentScenarioDefinition()->entities.end(), [this](const auto & each) {
-                  return std::apply(
-                    [this](const auto & name, const auto & object) {
-                      return not object.template is<ScenarioObject>() or
-                             not object.template as<ScenarioObject>().is_added or
-                             not object.template as<ScenarioObject>()
-                                   .object_controller.isAutoware() or
-                             NonStandardOperation::isEngageable(name);
-                    },
-                    each);
-                });
-            };
-
-            auto engage = [this]() {
-              for (const auto & [name, object] : currentScenarioDefinition()->entities) {
-                if (
-                  object.template is<ScenarioObject>() and
-                  object.template as<ScenarioObject>().is_added and
-                  object.template as<ScenarioObject>().object_controller.isAutoware()) {
-                  NonStandardOperation::engage(name);
-                }
-              }
-            };
-
-            if (engaged()) {
-              return activateNonUserDefinedControllers();
-            } else if (engageable()) {
-              return engage();
-            }
+          if (
+            std::isnan(evaluateSimulationTime()) and
+            std::all_of(
+              currentScenarioDefinition()->entities.begin(),
+              currentScenarioDefinition()->entities.end(), [this](const auto & each) {
+                return std::apply(
+                  [this](const auto & name, const Object & object) {
+                    return not object.is<ScenarioObject>() or
+                           not object.as<ScenarioObject>().is_added or
+                           not object.as<ScenarioObject>().object_controller.isAutoware() or
+                           NonStandardOperation::isEngaged(name);
+                  },
+                  each);
+              })) {
+            return activateNonUserDefinedControllers();
           } else if (currentScenarioDefinition()) {
             currentScenarioDefinition()->evaluate();
           } else {
@@ -299,6 +261,15 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 
         if (currentScenarioDefinition()) {
           currentScenarioDefinition()->storyboard.init.evaluateInstantaneousActions();
+
+          for (const auto & [name, object] : currentScenarioDefinition()->entities) {
+            if (
+              object.template is<ScenarioObject>() and
+              object.template as<ScenarioObject>().is_added and
+              object.template as<ScenarioObject>().object_controller.isAutoware()) {
+              NonStandardOperation::engage(name);
+            }
+          }
         } else {
           throw Error("No script evaluable.");
         }
