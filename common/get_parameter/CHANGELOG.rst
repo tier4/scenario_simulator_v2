@@ -2,6 +2,12 @@
 Changelog for package get_parameter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+15.0.0 (2025-03-31)
+-------------------
+* Merge branch 'master' into refactor/get_lateral_distance
+* Merge branch 'master' into refactor/get_lateral_distance
+* Contributors: Tatsuya Yamasaki
+
 14.2.3 (2025-03-28)
 -------------------
 * Merge branch 'master' into refactor/concealer-7
