@@ -66,11 +66,9 @@ public:
 
   void appendDebugMarker(visualization_msgs::msg::MarkerArray & marker_array) override;
 
-  auto getEntityType() const -> const traffic_simulator_msgs::msg::EntityType & override;
-
   auto getEntityTypename() const -> const std::string & override;
 
-  void onUpdate(double current_time, double step_time) override;
+  auto onUpdate(const double current_time, const double step_time) -> void override;
 
   void requestAcquirePosition(const CanonicalizedLaneletPose & lanelet_pose) override;
 
@@ -80,10 +78,13 @@ public:
 
   void cancelRequest() override;
 
-  void setTrafficLightManager(
-    const std::shared_ptr<traffic_simulator::TrafficLightManager> & ptr) override;
+  void setTrafficLights(const std::shared_ptr<traffic_simulator::TrafficLightsBase> & ptr) override;
 
   auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter;
+
+  auto getMaxAcceleration() const -> double override;
+
+  auto getMaxDeceleration() const -> double override;
 
   void setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &);
 
@@ -111,13 +112,13 @@ public:
 
   auto getRouteLanelets(double horizon = 100) -> lanelet::Ids override;
 
+  auto getParameters() const -> const traffic_simulator_msgs::msg::PedestrianParameters &;
+
   auto getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle> override;
 
   auto getGoalPoses() -> std::vector<CanonicalizedLaneletPose> override;
 
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
-
-  auto fillLaneletPose(CanonicalizedEntityStatus & status) -> void override;
 
   const std::string plugin_name;
 

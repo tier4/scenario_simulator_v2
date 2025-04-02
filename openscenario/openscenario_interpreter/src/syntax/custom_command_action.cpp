@@ -164,11 +164,8 @@ struct ApplyV2ITrafficSignalStateAction : public CustomCommand,
         [[fallthrough]];
 
       case 2:
-        for (auto & traffic_light :
-             getV2ITrafficLights(boost::lexical_cast<std::int64_t>(parameters[0]))) {
-          traffic_light.get().clear();
-          traffic_light.get().set(unquote(parameters.at(1)));
-        }
+        setV2ITrafficLightsState(
+          boost::lexical_cast<std::int64_t>(parameters[0]), unquote(parameters.at(1)));
         break;
 
       default:
@@ -191,7 +188,7 @@ struct ApplyWalkStraightAction : public CustomCommand, private SimulatorCore::Ac
     }
 
     for (const auto & actor : scope.actors) {
-      applyWalkStraightAction(actor);
+      actor.apply([&](const auto & object) { applyWalkStraightAction(object); });
     }
   };
 };

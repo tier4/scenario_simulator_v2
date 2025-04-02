@@ -15,6 +15,7 @@
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/catalog_reference.hpp>
 #include <openscenario_interpreter/syntax/entity_object.hpp>
+#include <openscenario_interpreter/syntax/object_type.hpp>
 
 namespace openscenario_interpreter
 {
@@ -23,13 +24,20 @@ inline namespace syntax
 EntityObject::EntityObject(const pugi::xml_node & node, Scope & scope)
 // clang-format off
 : Group(
-    choice(node,
-      std::make_pair("CatalogReference", [&](auto && node) { return CatalogReference(node, scope).make(); }),
-      std::make_pair("Vehicle",          [&](auto && node) { return make<Vehicle   >(node, scope);        }),
-      std::make_pair("Pedestrian",       [&](auto && node) { return make<Pedestrian>(node, scope);        }),
-      std::make_pair("MiscObject",       [&](auto && node) { return make<MiscObject>(node, scope);        })))
+    choice(node, {
+      { "CatalogReference", [&](auto && node) { return CatalogReference(node, scope).make(); } },
+      { "Vehicle",          [&](auto && node) { return make<Vehicle   >(node, scope);        } },
+      { "Pedestrian",       [&](auto && node) { return make<Pedestrian>(node, scope);        } },
+      { "MiscObject",       [&](auto && node) { return make<MiscObject>(node, scope);        } },
+    }))
 // clang-format on
 {
+}
+
+auto EntityObject::objectType() const -> ObjectType::value_type
+{
+  return apply<ObjectType::value_type>(
+    [](const auto & object) { return object.object_type; }, *this);
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

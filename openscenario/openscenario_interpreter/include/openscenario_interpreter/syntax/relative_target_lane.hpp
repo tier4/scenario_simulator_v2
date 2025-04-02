@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_TARGET_LANE_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/entity.hpp>
 #include <pugixml.hpp>
 #include <traffic_simulator/data_type/lane_change.hpp>
 
@@ -33,7 +34,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct RelativeTargetLane
 {
-  const String entity_ref;
+  const Entity entity_ref;
 
   const Integer value;
 

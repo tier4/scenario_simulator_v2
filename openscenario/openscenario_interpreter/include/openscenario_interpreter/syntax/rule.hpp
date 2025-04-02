@@ -19,11 +19,23 @@
 #include <openscenario_interpreter/functional/equal_to.hpp>
 #include <string>
 #include <utility>
+#include <valarray>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+template <typename T, typename U>
+struct RuleResultDeduction
+{
+  using type = bool;
+};
+
+template <typename T, typename U>
+struct RuleResultDeduction<std::valarray<T>, U>
+{
+  using type = std::valarray<bool>;
+};
 /*
    Rule (OpenSCENARIO XML 1.3)
 
@@ -63,28 +75,27 @@ struct Rule
   constexpr operator value_type() const noexcept { return value; }
 
   template <typename T, typename U = T>
-  constexpr auto operator()(const T & lhs, const U & rhs) const noexcept
+  constexpr auto operator()(const T & lhs, const U & rhs) const noexcept ->
+    typename RuleResultDeduction<T, U>::type
   {
     switch (value) {
       case equalTo:
         return equal_to<T>()(std::forward<decltype(lhs)>(lhs), std::forward<decltype(rhs)>(rhs));
       case greaterThan:
-        return std::greater<void>()(
-          std::forward<decltype(lhs)>(lhs), std::forward<decltype(rhs)>(rhs));
+        return std::greater()(std::forward<decltype(lhs)>(lhs), std::forward<decltype(rhs)>(rhs));
       case lessThan:
-        return std::less<void>()(
-          std::forward<decltype(lhs)>(lhs), std::forward<decltype(rhs)>(rhs));
+        return std::less()(std::forward<decltype(lhs)>(lhs), std::forward<decltype(rhs)>(rhs));
       case greaterOrEqual:
-        return std::greater_equal<T>()(
+        return std::greater_equal()(
           std::forward<decltype(lhs)>(lhs), std::forward<decltype(rhs)>(rhs));
       case lessOrEqual:
-        return std::less_equal<T>()(
+        return std::less_equal()(
           std::forward<decltype(lhs)>(lhs), std::forward<decltype(rhs)>(rhs));
       case notEqualTo:
-        return std::not_equal_to<T>()(
+        return std::not_equal_to()(
           std::forward<decltype(lhs)>(lhs), std::forward<decltype(rhs)>(rhs));
       default:
-        return false;
+        return {};
     }
   }
 };

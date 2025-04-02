@@ -25,7 +25,7 @@ StandStillCondition::StandStillCondition(
 : duration(readAttribute<Double>("duration", node, scope)),
   compare(Rule::greaterThan),
   triggering_entities(triggering_entities),
-  results(triggering_entities.entity_refs.size(), Double::nan())
+  results(triggering_entities.entity_refs.size(), {Double::nan()})
 {
 }
 
@@ -47,8 +47,9 @@ auto StandStillCondition::evaluate() -> Object
   results.clear();
 
   return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
-    results.push_back(evaluateStandStill(triggering_entity));
-    return compare(results.back(), duration);
+    results.push_back(
+      triggering_entity.apply([&](const auto & object) { return evaluateStandStill(object); }));
+    return not results.back().size() or compare(results.back(), duration).min();
   }));
 }
 }  // namespace syntax

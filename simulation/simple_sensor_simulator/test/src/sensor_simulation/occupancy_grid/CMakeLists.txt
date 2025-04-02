@@ -1,0 +1,2 @@
+ament_add_gtest(test_grid_traversal test_grid_traversal.cpp)
+target_link_libraries(test_grid_traversal simple_sensor_simulator_component)

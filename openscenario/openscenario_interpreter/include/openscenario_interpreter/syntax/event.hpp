@@ -15,7 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__EVENT_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__EVENT_HPP_
 
-#include <nlohmann/json.hpp>
+#include <boost/json.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/action.hpp>
 #include <openscenario_interpreter/syntax/maneuver.hpp>
@@ -53,7 +53,7 @@ struct Event : private Scope, public StoryboardElement
 
   auto evaluate() -> Object override;
 
-  friend auto operator<<(nlohmann::json &, const Event &) -> nlohmann::json &;
+  friend auto operator<<(boost::json::object &, const Event &) -> boost::json::object &;
 
 private:
   Maneuver & parent_maneuver;

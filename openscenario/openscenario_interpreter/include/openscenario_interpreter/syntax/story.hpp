@@ -15,7 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__STORY_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__STORY_HPP_
 
-#include <nlohmann/json.hpp>
+#include <boost/json.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element.hpp>
 #include <pugixml.hpp>
@@ -41,7 +41,7 @@ struct Story : public Scope, public StoryboardElement
 
   auto run() -> void override;
 
-  friend auto operator<<(nlohmann::json &, const Story &) -> nlohmann::json &;
+  friend auto operator<<(boost::json::object &, const Story &) -> boost::json::object &;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

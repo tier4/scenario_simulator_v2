@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__TRIGGERING_ENTITIES_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/entity.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <openscenario_interpreter/syntax/triggering_entities_rule.hpp>
@@ -39,7 +40,7 @@ struct TriggeringEntities
 {
   const TriggeringEntitiesRule triggering_entities_rule;
 
-  const std::list<EntityRef> entity_refs;
+  const std::list<Entity> entity_refs;
 
   explicit TriggeringEntities(const pugi::xml_node &, Scope &);
 

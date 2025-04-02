@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="3">
   <name>traffic_simulator</name>
-  <version>2.1.7</version>
+  <version>15.0.2</version>
   <description>control traffic flow</description>
 
   <maintainer email="masaya.kataoka@tier4.jp">masaya kataoka</maintainer>
@@ -13,13 +13,13 @@
 
   <depend>ament_index_cpp</depend>
   <depend>arithmetic</depend>
+  <depend>autoware_lanelet2_extension</depend>
   <depend>concealer</depend>
   <depend>color_names</depend>
   <depend>geographic_msgs</depend>
   <depend>geometry_msgs</depend>
   <depend>jpn_signal_v2i_msgs</depend>
   <depend>lanelet2_core</depend>
-  <depend>lanelet2_extension</depend>
   <depend>lanelet2_io</depend>
   <depend>lanelet2_matching</depend>
   <depend>lanelet2_projection</depend>
@@ -37,13 +37,14 @@
   <depend>tf2_geometry_msgs</depend>
   <depend>tf2_ros</depend>
   <depend>tier4_debug_msgs</depend>
-  <depend>autoware_auto_perception_msgs</depend>
   <depend>autoware_perception_msgs</depend>
+  <depend>autoware_map_msgs</depend>
   <depend>tinyxml2_vendor</depend>
   <depend>pluginlib</depend>
   <depend>traffic_simulator_msgs</depend>
   <depend>visualization_msgs</depend>
   <depend>geometry</depend>
+  <depend>get_parameter</depend>
 
 
 
@@ -54,6 +55,7 @@
   <test_depend>ament_cmake_lint_cmake</test_depend>
   <test_depend>ament_cmake_pep257</test_depend>
   <test_depend>ament_cmake_xmllint</test_depend>
+  <test_depend>kashiwanoha_map</test_depend>
 
   <export>
     <build_type>ament_cmake</build_type>

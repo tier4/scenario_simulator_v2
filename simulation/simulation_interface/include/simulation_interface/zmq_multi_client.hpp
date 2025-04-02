@@ -67,6 +67,9 @@ public:
   auto call(const simulation_api_schema::UpdateEntityStatusRequest &)
     -> simulation_api_schema::UpdateEntityStatusResponse;
 
+  auto call(const simulation_api_schema::AttachImuSensorRequest &)
+    -> simulation_api_schema::AttachImuSensorResponse;
+
   auto call(const simulation_api_schema::AttachLidarSensorRequest &)
     -> simulation_api_schema::AttachLidarSensorResponse;
 

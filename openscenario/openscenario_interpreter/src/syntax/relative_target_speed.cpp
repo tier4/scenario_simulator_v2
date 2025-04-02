@@ -22,7 +22,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 RelativeTargetSpeed::RelativeTargetSpeed(const pugi::xml_node & node, Scope & scope)
-: entity_ref(readAttribute<String>("entityRef", node, scope)),
+: entity_ref(readAttribute<String>("entityRef", node, scope), scope),
   value(readAttribute<Double>("value", node, scope)),
   speed_target_value_type(readAttribute<SpeedTargetValueType>(
     "speedTargetValueType", node, scope, SpeedTargetValueType())),

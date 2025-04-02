@@ -31,46 +31,61 @@ public:
   : cpp_mock_scenarios::CppScenarioNode(
       "request_speed_change",
       ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
-      "private_road_and_walkway_ele_fix/lanelet2_map.osm", __FILE__, false, option)
+      "private_road_and_walkway_ele_fix/lanelet2_map.osm", __FILE__, false, option),
+    request_sent(false)
   {
     start();
   }
 
 private:
+  bool request_sent;
+
   void onUpdate() override
   {
-    if (api_.getCurrentTime() <= 1.9) {
-      if (!equals(api_.getCurrentTime() + 3.0, api_.getCurrentTwist("front").linear.x, 0.01)) {
+    api_.updateFrame();
+
+    const double current_time = api_.getCurrentTime();
+    auto & front_entity = api_.getEntity("front");
+
+    if (current_time >= 0.0 and not request_sent) {
+      request_sent = true;
+      front_entity.requestSpeedChange(
+        traffic_simulator::speed_change::RelativeTargetSpeed(
+          "ego", traffic_simulator::speed_change::RelativeTargetSpeed::Type::DELTA, 2.0),
+        traffic_simulator::speed_change::Transition::LINEAR,
+        traffic_simulator::speed_change::Constraint(
+          traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 1.0),
+        true);
+    }
+
+    const double current_speed = front_entity.getCurrentTwist().linear.x;
+    static constexpr double speed_tolerance = 0.05;
+    if (current_time >= 0.0 and current_time < 2.0) {
+      if (not equals(current_time + 3.0, current_speed, speed_tolerance)) {
         stop(cpp_mock_scenarios::Result::FAILURE);
       }
-    }
-    if (
-      api_.getCurrentTime() >= 2.0 && api_.getCurrentTwist("front").linear.x <= 5.05 &&
-      api_.getCurrentTwist("front").linear.x >= 4.95) {
-      stop(cpp_mock_scenarios::Result::SUCCESS);
+    } else {
+      if (equals(current_speed, 5.0, speed_tolerance)) {
+        stop(cpp_mock_scenarios::Result::SUCCESS);
+      } else {
+        stop(cpp_mock_scenarios::Result::FAILURE);
+      }
     }
   }
 
   void onInitialize() override
   {
     api_.spawn(
-      "ego", api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34741, 0, 0)),
+      "ego", traffic_simulator::helper::constructCanonicalizedLaneletPose(34741, 0.0, 0.0),
       getVehicleParameters());
-    api_.setLinearVelocity("ego", 3);
-    api_.requestSpeedChange("ego", 3.0, true);
+    auto & ego_entity = api_.getEntity("ego");
+    ego_entity.setLinearVelocity(3);
+    ego_entity.requestSpeedChange(3.0, true);
 
     api_.spawn(
-      "front", api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34741, 10, 0)),
+      "front", traffic_simulator::helper::constructCanonicalizedLaneletPose(34741, 10.0, 0.0),
       getVehicleParameters());
-    api_.setLinearVelocity("front", 3);
-    api_.requestSpeedChange(
-      "front",
-      traffic_simulator::speed_change::RelativeTargetSpeed(
-        "ego", traffic_simulator::speed_change::RelativeTargetSpeed::Type::DELTA, 2.0),
-      traffic_simulator::speed_change::Transition::LINEAR,
-      traffic_simulator::speed_change::Constraint(
-        traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 1.0),
-      true);
+    api_.getEntity("front").setLinearVelocity(3);
   }
 };
 }  // namespace cpp_mock_scenarios

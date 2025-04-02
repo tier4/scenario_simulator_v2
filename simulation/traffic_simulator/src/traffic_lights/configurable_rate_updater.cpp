@@ -12,33 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <stdexcept>
 #include <traffic_simulator/traffic_lights/configurable_rate_updater.hpp>
 
 namespace traffic_simulator
 {
-auto ConfigurableRateUpdater::createTimer(double update_rate) -> void
+auto ConfigurableRateUpdater::startTimer(const double update_rate) -> void
 {
   if (!timer_) {
     update_rate_ = update_rate;
-    using namespace std::chrono_literals;
+    const auto period = std::chrono::duration<double>(1.0 / update_rate_);
     timer_ = rclcpp::create_timer(
-      node_base_interface_, node_timers_interface_, clock_ptr_, 1s / update_rate_,
-      [this]() -> void { thunk_(); });
+      node_base_interface_, node_timers_interface_, clock_ptr_, period, [this]() { thunk_(); });
   }
 }
 
-auto ConfigurableRateUpdater::resetUpdateRate(double update_rate) -> void
+auto ConfigurableRateUpdater::resetTimer(const double update_rate) -> void
 {
-  if (update_rate_ != update_rate) {
-    update_rate_ = update_rate;
-    if (timer_ && not timer_->is_canceled()) {
-      timer_->cancel();
-    }
-
-    using namespace std::chrono_literals;
-    timer_ = rclcpp::create_timer(
-      node_base_interface_, node_timers_interface_, clock_ptr_, 1s / update_rate_,
-      [this]() -> void { thunk_(); });
+  if (timer_ and not timer_->is_canceled()) {
+    timer_->cancel();
+    timer_.reset();
   }
+  startTimer(update_rate);
 }
 }  // namespace traffic_simulator

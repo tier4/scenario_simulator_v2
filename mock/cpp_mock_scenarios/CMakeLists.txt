@@ -53,8 +53,12 @@ if(BUILD_CPP_MOCK_SCENARIOS)
   add_subdirectory(src/move_backward)
   add_subdirectory(src/pedestrian)
   add_subdirectory(src/random_scenario)
+  add_subdirectory(src/spawn)
   add_subdirectory(src/speed_planning)
+  add_subdirectory(src/synchronized_action)
+  add_subdirectory(src/traffic_sink)
   add_subdirectory(src/traffic_source)
+  # The scenarios recorded in this directory are commented out as they require EgoEntity and cannot be used for CI.
   # add_subdirectory(src/respawn_ego)
 
 endif()
@@ -62,6 +66,9 @@ endif()
 install(
   DIRECTORY launch rviz
   DESTINATION share/${PROJECT_NAME})
+install(
+  FILES cmake/add_cpp_mock_scenario_test.cmake
+  DESTINATION share/${PROJECT_NAME}/cmake)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

@@ -16,6 +16,7 @@
 #include <geometry/quaternion/quaternion_to_euler.hpp>
 #include <string>
 #include <traffic_simulator/helper/helper.hpp>
+#include <traffic_simulator/utils/pose.hpp>
 
 namespace traffic_simulator
 {
@@ -47,6 +48,28 @@ LaneletPose constructLaneletPose(
   lanelet_pose.rpy.y = pitch;
   lanelet_pose.rpy.z = yaw;
   return lanelet_pose;
+}
+
+auto constructCanonicalizedLaneletPose(
+  lanelet::Id lanelet_id, double s, double offset, double roll, double pitch, double yaw)
+  -> CanonicalizedLaneletPose
+{
+  if (
+    auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
+      traffic_simulator::helper::constructLaneletPose(lanelet_id, s, offset, roll, pitch, yaw))) {
+    return canonicalized_lanelet_pose.value();
+  } else {
+    THROW_SEMANTIC_ERROR(
+      "Lanelet pose (id=", lanelet_id, ",s=", s, ",offset=", offset, ",rpy.x=", roll,
+      ",rpy.y=", pitch, ",rpy.z=", yaw,
+      ") is invalid, please check lanelet length and connection.");
+  }
+}
+
+auto constructCanonicalizedLaneletPose(lanelet::Id lanelet_id, double s, double offset)
+  -> CanonicalizedLaneletPose
+{
+  return constructCanonicalizedLaneletPose(lanelet_id, s, offset, 0, 0, 0);
 }
 
 geometry_msgs::msg::Vector3 constructRPY(double roll, double pitch, double yaw)
@@ -163,37 +186,3 @@ const simulation_api_schema::LidarConfiguration constructLidarConfiguration(
 
 }  // namespace helper
 }  // namespace traffic_simulator
-
-std::ostream & operator<<(std::ostream & os, const traffic_simulator::LaneletPose & ll_pose)
-{
-  os << "lanelet id : " << ll_pose.lanelet_id << "\ns : " << ll_pose.s;
-  return os;
-}
-
-std::ostream & operator<<(std::ostream & os, const geometry_msgs::msg::Point & point)
-{
-  os << "x : " << point.x << ",y : " << point.y << ",z : " << point.z << std::endl;
-  return os;
-}
-
-std::ostream & operator<<(std::ostream & os, const geometry_msgs::msg::Vector3 & vector)
-{
-  os << "x : " << vector.x << ",y : " << vector.y << ",z : " << vector.z << std::endl;
-  return os;
-}
-
-std::ostream & operator<<(std::ostream & os, const geometry_msgs::msg::Quaternion & quat)
-{
-  os << "x : " << quat.x << ",y : " << quat.y << ",z : " << quat.z << ",w : " << quat.w
-     << std::endl;
-  return os;
-}
-
-std::ostream & operator<<(std::ostream & os, const geometry_msgs::msg::Pose & pose)
-{
-  os << "position : " << std::endl;
-  os << pose.position << std::endl;
-  os << "orientation : " << std::endl;
-  os << pose.orientation << std::endl;
-  return os;
-}

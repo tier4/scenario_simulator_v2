@@ -48,24 +48,22 @@ HermiteCurve::HermiteCurve(
 }
 
 HermiteCurve::HermiteCurve(
-  geometry_msgs::msg::Pose start_pose, geometry_msgs::msg::Pose goal_pose,
-  geometry_msgs::msg::Vector3 start_vec, geometry_msgs::msg::Vector3 goal_vec)
+  const geometry_msgs::msg::Pose & start_pose, const geometry_msgs::msg::Pose & goal_pose,
+  const geometry_msgs::msg::Vector3 & start_vec, const geometry_msgs::msg::Vector3 & goal_vec)
+: ax_(2 * start_pose.position.x - 2 * goal_pose.position.x + start_vec.x + goal_vec.x),
+  bx_(-3 * start_pose.position.x + 3 * goal_pose.position.x - 2 * start_vec.x - goal_vec.x),
+  cx_(start_vec.x),
+  dx_(start_pose.position.x),
+  ay_(2 * start_pose.position.y - 2 * goal_pose.position.y + start_vec.y + goal_vec.y),
+  by_(-3 * start_pose.position.y + 3 * goal_pose.position.y - 2 * start_vec.y - goal_vec.y),
+  cy_(start_vec.y),
+  dy_(start_pose.position.y),
+  az_(2 * start_pose.position.z - 2 * goal_pose.position.z + start_vec.z + goal_vec.z),
+  bz_(-3 * start_pose.position.z + 3 * goal_pose.position.z - 2 * start_vec.z - goal_vec.z),
+  cz_(start_vec.z),
+  dz_(start_pose.position.z),
+  length_(getLength(100))
 {
-  ax_ = 2 * start_pose.position.x - 2 * goal_pose.position.x + start_vec.x + goal_vec.x;
-  bx_ = -3 * start_pose.position.x + 3 * goal_pose.position.x - 2 * start_vec.x - goal_vec.x;
-  cx_ = start_vec.x;
-  dx_ = start_pose.position.x;
-
-  ay_ = 2 * start_pose.position.y - 2 * goal_pose.position.y + start_vec.y + goal_vec.y;
-  by_ = -3 * start_pose.position.y + 3 * goal_pose.position.y - 2 * start_vec.y - goal_vec.y;
-  cy_ = start_vec.y;
-  dy_ = start_pose.position.y;
-
-  az_ = 2 * start_pose.position.z - 2 * goal_pose.position.z + start_vec.z + goal_vec.z;
-  bz_ = -3 * start_pose.position.z + 3 * goal_pose.position.z - 2 * start_vec.z - goal_vec.z;
-  cz_ = start_vec.z;
-  dz_ = start_pose.position.z;
-  length_ = getLength(100);
 }
 
 double HermiteCurve::getSquaredDistanceIn2D(
@@ -96,13 +94,13 @@ std::set<double> HermiteCurve::getCollisionPointsIn2D(
   }
   std::set<double> s_values;
   for (size_t i = 0; i < (n - 1); i++) {
-    const auto p0 = polygon[i];
-    const auto p1 = polygon[i + 1];
+    const auto & p0 = polygon[i];
+    const auto & p1 = polygon[i + 1];
     s_values.merge(getCollisionPointsIn2D(p0, p1, search_backward, denormalize_s));
   }
   if (close_start_end) {
-    const auto p0 = polygon[n - 1];
-    const auto p1 = polygon[0];
+    const auto & p0 = polygon[n - 1];
+    const auto & p1 = polygon[0];
     s_values.merge(getCollisionPointsIn2D(p0, p1, search_backward, denormalize_s));
   }
   return s_values;
@@ -204,7 +202,8 @@ std::optional<double> HermiteCurve::getCollisionPointIn2D(
 std::optional<double> HermiteCurve::getSValue(
   const geometry_msgs::msg::Pose & pose, double threshold_distance, bool denormalize_s) const
 {
-  geometry_msgs::msg::Point p0, p1;
+  geometry_msgs::msg::Point p0;
+  geometry_msgs::msg::Point p1;
   p0.y = threshold_distance;
   p1.y = -threshold_distance;
   const auto line = math::geometry::transformPoints(pose, {p0, p1});
@@ -315,13 +314,19 @@ std::pair<double, double> HermiteCurve::get2DMinMaxCurvatureValue() const
 {
   std::pair<double, double> ret;
   std::vector<double> curvatures;
-  /**
-   * @brief 0.1 is a sampling resolution of the curvature
-   */
-  for (double s = 0; s <= 1; s = s + 0.1) {
+
+  /// @note Specifies the number of samples. The curve is divided into 10 segments for calculation.
+  constexpr int sample_count = 10;
+
+  /// @note Sampling resolution. Calculated as 1.0 divided by sample_count.
+  constexpr double resolution = 1.0 / sample_count;
+
+  for (int i = 0; i <= sample_count; ++i) {
+    double s = i * resolution;
     double curvature = get2DCurvature(s);
     curvatures.push_back(curvature);
   }
+
   ret.first = *std::min_element(curvatures.begin(), curvatures.end());
   ret.second = *std::max_element(curvatures.begin(), curvatures.end());
   return ret;

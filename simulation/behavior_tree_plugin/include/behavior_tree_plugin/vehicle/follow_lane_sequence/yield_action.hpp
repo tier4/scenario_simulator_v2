@@ -34,12 +34,7 @@ public:
   BT::NodeStatus tick() override;
   static BT::PortsList providedPorts()
   {
-    BT::PortsList ports = {};
-    BT::PortsList parent_ports = entity_behavior::VehicleActionNode::providedPorts();
-    for (const auto & parent_port : parent_ports) {
-      ports.emplace(parent_port.first, parent_port.second);
-    }
-    return ports;
+    return entity_behavior::VehicleActionNode::providedPorts();
   }
   std::optional<double> calculateTargetSpeed();
   const traffic_simulator_msgs::msg::WaypointsArray calculateWaypoints() override;

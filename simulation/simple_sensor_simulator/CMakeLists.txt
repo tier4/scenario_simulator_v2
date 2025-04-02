@@ -35,17 +35,20 @@ include_directories(
 ament_auto_add_library(simple_sensor_simulator_component SHARED
   src/sensor_simulation/detection_sensor/detection_sensor.cpp
   src/sensor_simulation/lidar/lidar_sensor.cpp
+  src/sensor_simulation/imu/imu_sensor.cpp
   src/sensor_simulation/lidar/raycaster.cpp
-  src/sensor_simulation/occupancy_grid/occupancy_grid_sensor.cpp
-  src/sensor_simulation/occupancy_grid/occupancy_grid_builder.cpp
   src/sensor_simulation/occupancy_grid/grid_traversal.cpp
+  src/sensor_simulation/occupancy_grid/occupancy_grid_builder.cpp
+  src/sensor_simulation/occupancy_grid/occupancy_grid_sensor.cpp
   src/sensor_simulation/primitives/box.cpp
+  src/sensor_simulation/primitives/primitive.cpp
   src/sensor_simulation/primitives/primitive.cpp
   src/sensor_simulation/sensor_simulation.cpp
   src/simple_sensor_simulator.cpp
   src/vehicle_simulation/ego_entity_simulation.cpp
   src/vehicle_simulation/vehicle_model/sim_model_delay_steer_acc.cpp
   src/vehicle_simulation/vehicle_model/sim_model_delay_steer_acc_geared.cpp
+  src/vehicle_simulation/vehicle_model/sim_model_delay_steer_acc_geared_wo_fall_guard.cpp
   src/vehicle_simulation/vehicle_model/sim_model_delay_steer_map_acc_geared.cpp
   src/vehicle_simulation/vehicle_model/sim_model_delay_steer_vel.cpp
   src/vehicle_simulation/vehicle_model/sim_model_ideal_steer_acc.cpp
@@ -54,6 +57,7 @@ ament_auto_add_library(simple_sensor_simulator_component SHARED
   src/vehicle_simulation/vehicle_model/sim_model_interface.cpp
 )
 target_link_libraries(simple_sensor_simulator_component
+  glog
   pthread
   sodium
   zmq
@@ -85,6 +89,7 @@ EXPORT export_simple_sensor_simulator_component
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
-endif()
 
+  add_subdirectory(test)
+endif()
 ament_auto_package()

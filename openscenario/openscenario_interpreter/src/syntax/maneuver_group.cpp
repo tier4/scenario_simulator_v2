@@ -59,7 +59,8 @@ auto ManeuverGroup::start() -> void
   }
 }
 
-auto operator<<(nlohmann::json & json, const ManeuverGroup & maneuver_group) -> nlohmann::json &
+auto operator<<(boost::json::object & json, const ManeuverGroup & maneuver_group)
+  -> boost::json::object &
 {
   json["name"] = maneuver_group.name;
 
@@ -68,12 +69,12 @@ auto operator<<(nlohmann::json & json, const ManeuverGroup & maneuver_group) -> 
   json["currentExecutionCount"] = maneuver_group.current_execution_count;
   json["maximumExecutionCount"] = maneuver_group.maximum_execution_count;
 
-  json["Maneuver"] = nlohmann::json::array();
+  auto & maneuvers = json["Maneuver"].emplace_array();
 
   for (auto && maneuver : maneuver_group.elements) {
-    nlohmann::json json_maneuver;
+    boost::json::object json_maneuver(json.storage());
     json_maneuver << maneuver.as<Maneuver>();
-    json["Maneuver"].push_back(json_maneuver);
+    maneuvers.push_back(std::move(json_maneuver));
   }
 
   return json;

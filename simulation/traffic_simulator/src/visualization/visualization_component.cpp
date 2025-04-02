@@ -74,14 +74,14 @@ void VisualizationComponent::entityStatusCallback(
     entity_name_lists.emplace_back(data.status.name);
   }
   std::vector<std::string> erase_names;
-  for (const auto & marker : markers_) {
-    auto itr = std::find(entity_name_lists.begin(), entity_name_lists.end(), marker.first);
+  for (const auto & [key, _] : markers_) {
+    auto itr = std::find(entity_name_lists.begin(), entity_name_lists.end(), key);
     if (itr == entity_name_lists.end()) {
-      auto delete_marker = generateDeleteMarker(marker.first);
+      auto delete_marker = generateDeleteMarker(key);
       std::copy(
         delete_marker.markers.begin(), delete_marker.markers.end(),
         std::back_inserter(current_marker.markers));
-      erase_names.emplace_back(marker.first);
+      erase_names.emplace_back(key);
     }
   }
   for (const auto & name : erase_names) {
@@ -105,7 +105,7 @@ const visualization_msgs::msg::MarkerArray VisualizationComponent::generateDelet
   auto stamp = get_clock()->now();
   for (const auto & marker : markers_[ns].markers) {
     visualization_msgs::msg::Marker marker_msg;
-    marker_msg.action = marker_msg.DELETE;
+    marker_msg.action = visualization_msgs::msg::Marker::DELETE;
     marker_msg.header.frame_id = ns;
     marker_msg.header.stamp = stamp;
     marker_msg.ns = marker.ns;
@@ -124,18 +124,20 @@ const visualization_msgs::msg::MarkerArray VisualizationComponent::generateMarke
   constexpr auto default_quaternion = rosidl_runtime_cpp::MessageInitialization::DEFAULTS_ONLY;
   auto ret = visualization_msgs::msg::MarkerArray();
   auto stamp = get_clock()->now();
-  std_msgs::msg::ColorRGBA color;
-  switch (status.type.type) {
-    case status.type.EGO:
-      color = color_names::makeColorMsg("limegreen", 0.99);
-      break;
-    case status.type.PEDESTRIAN:
-      color = color_names::makeColorMsg("orange", 0.99);
-      break;
-    case status.type.VEHICLE:
-      color = color_names::makeColorMsg("lightskyblue", 0.99);
-      break;
-  }
+
+  const auto color = [&]() {
+    switch (status.type.type) {
+      case status.type.EGO:
+        return color_names::makeColorMsg("limegreen", 0.99);
+      case status.type.PEDESTRIAN:
+        return color_names::makeColorMsg("orange", 0.99);
+      case status.type.VEHICLE:
+        return color_names::makeColorMsg("lightskyblue", 0.99);
+      default:
+      case status.type.MISC_OBJECT:
+        return color_names::makeColorMsg("magenta", 0.99);
+    }
+  }();
 
   if (goal_pose.size() != 0) {
     goal_pose_max_size = std::max(goal_pose_max_size, int(goal_pose.size()));
@@ -147,7 +149,7 @@ const visualization_msgs::msg::MarkerArray VisualizationComponent::generateMarke
         goal_pose_marker.header.stamp = stamp;
         goal_pose_marker.ns = status.name;
         goal_pose_marker.id = 10 + int(goal_pose_max_size - goal_pose.size() + i);
-        goal_pose_marker.action = goal_pose_marker.ADD;
+        goal_pose_marker.action = visualization_msgs::msg::Marker::ADD;
         goal_pose_marker.type = 0;  //arrow
         goal_pose_marker.pose = goal_pose[i];
         goal_pose_marker.color = color;
@@ -158,7 +160,7 @@ const visualization_msgs::msg::MarkerArray VisualizationComponent::generateMarke
         ret.markers.emplace_back(goal_pose_marker);
 
         visualization_msgs::msg::Marker goal_pose_text_marker;
-        goal_pose_text_marker.type = goal_pose_text_marker.TEXT_VIEW_FACING;
+        goal_pose_text_marker.type = visualization_msgs::msg::Marker::TEXT_VIEW_FACING;
         goal_pose_text_marker.header.frame_id = "map";
         goal_pose_text_marker.header.stamp = stamp;
         goal_pose_text_marker.ns = status.name;
@@ -168,7 +170,6 @@ const visualization_msgs::msg::MarkerArray VisualizationComponent::generateMarke
         goal_pose_text_marker.pose.position.y = goal_pose[i].position.y;
         goal_pose_text_marker.pose.position.z = goal_pose[i].position.z + 1.0;
         goal_pose_text_marker.pose.orientation = geometry_msgs::msg::Quaternion(default_quaternion);
-        goal_pose_text_marker.type = goal_pose_text_marker.TEXT_VIEW_FACING;
         goal_pose_text_marker.scale.x = 0.0;
         goal_pose_text_marker.scale.y = 0.0;
         goal_pose_text_marker.scale.z = 0.6;
@@ -179,12 +180,12 @@ const visualization_msgs::msg::MarkerArray VisualizationComponent::generateMarke
         ret.markers.emplace_back(goal_pose_text_marker);
       } else {
         visualization_msgs::msg::Marker goal_pose_marker;
-        goal_pose_marker.action = goal_pose_marker.DELETE;
+        goal_pose_marker.action = visualization_msgs::msg::Marker::DELETE;
         goal_pose_marker.id = 10 + int(i - (goal_pose_max_size - goal_pose.size()));
         goal_pose_marker.ns = status.name;
         ret.markers.emplace_back(goal_pose_marker);
         visualization_msgs::msg::Marker goal_pose_text_marker;
-        goal_pose_text_marker.action = goal_pose_text_marker.DELETE;
+        goal_pose_text_marker.action = visualization_msgs::msg::Marker::ADD;
         goal_pose_text_marker.id = 100 + int(i - (goal_pose_max_size - goal_pose.size()));
         goal_pose_text_marker.ns = status.name;
         ret.markers.emplace_back(goal_pose_text_marker);
@@ -192,12 +193,12 @@ const visualization_msgs::msg::MarkerArray VisualizationComponent::generateMarke
     }
   } else {
     visualization_msgs::msg::Marker goal_pose_marker;
-    goal_pose_marker.action = goal_pose_marker.DELETE;
+    goal_pose_marker.action = visualization_msgs::msg::Marker::DELETE;
     goal_pose_marker.id = 10 + int(goal_pose_max_size - 1);
     goal_pose_marker.ns = status.name;
     ret.markers.emplace_back(goal_pose_marker);
     visualization_msgs::msg::Marker goal_pose_text_marker;
-    goal_pose_text_marker.action = goal_pose_text_marker.DELETE;
+    goal_pose_text_marker.action = visualization_msgs::msg::Marker::DELETE;
     goal_pose_text_marker.id = 100 + int(goal_pose_max_size - 1);
     goal_pose_text_marker.ns = status.name;
     ret.markers.emplace_back(goal_pose_text_marker);
@@ -208,8 +209,8 @@ const visualization_msgs::msg::MarkerArray VisualizationComponent::generateMarke
   bbox.header.stamp = stamp;
   bbox.ns = status.name;
   bbox.id = 0;
-  bbox.action = bbox.ADD;
-  bbox.type = bbox.LINE_LIST;
+  bbox.action = visualization_msgs::msg::Marker::ADD;
+  bbox.type = visualization_msgs::msg::Marker::LINE_LIST;
   bbox.lifetime = rclcpp::Duration::from_seconds(0.1);
   geometry_msgs::msg::Point p0, p1, p2, p3, p4, p5, p6, p7;
 
@@ -312,14 +313,14 @@ const visualization_msgs::msg::MarkerArray VisualizationComponent::generateMarke
   text.header.stamp = stamp;
   text.ns = status.name;
   text.id = 1;
-  text.action = text.ADD;
+  text.action = visualization_msgs::msg::Marker::ADD;
   text.pose.position.x = status.bounding_box.center.x;
   text.pose.position.y = status.bounding_box.center.y;
   text.pose.position.z =
     status.bounding_box.center.z + status.bounding_box.dimensions.z * 0.5 + 1.0;
   text.pose.position = math::geometry::transformPoint(status.pose, text.pose.position);
   text.pose.orientation = status.pose.orientation;
-  text.type = text.TEXT_VIEW_FACING;
+  text.type = visualization_msgs::msg::Marker::TEXT_VIEW_FACING;
   text.scale.x = 0.0;
   text.scale.y = 0.0;
   text.scale.z = 0.6;
@@ -333,9 +334,8 @@ const visualization_msgs::msg::MarkerArray VisualizationComponent::generateMarke
   arrow.header.stamp = stamp;
   arrow.ns = status.name;
   arrow.id = 2;
-  arrow.action = arrow.ADD;
+  arrow.action = visualization_msgs::msg::Marker::ADD;
 
-  // constexpr double arrow_size = 0.3;
   double arrow_size = 0.4 * status.bounding_box.dimensions.y;
   constexpr double arrow_ratio = 1.0;
   geometry_msgs::msg::Point pf, pl, pr;
@@ -357,8 +357,7 @@ const visualization_msgs::msg::MarkerArray VisualizationComponent::generateMarke
   pr = math::geometry::transformPoint(status.pose, pr);
   arrow.points = {pf, pl, pr};
   arrow.colors = {color};
-  arrow.pose.orientation = status.pose.orientation;
-  arrow.type = arrow.TRIANGLE_LIST;
+  arrow.type = visualization_msgs::msg::Marker::TRIANGLE_LIST;
   arrow.scale.x = 1.0;
   arrow.scale.y = 1.0;
   arrow.scale.z = 1.0;
@@ -371,11 +370,11 @@ const visualization_msgs::msg::MarkerArray VisualizationComponent::generateMarke
   text_action.header.stamp = stamp;
   text_action.ns = status.name;
   text_action.id = 3;
-  text_action.action = text_action.ADD;
+  text_action.action = visualization_msgs::msg::Marker::ADD;
   text_action.pose.position =
     math::geometry::transformPoint(status.pose, status.bounding_box.center);
   text_action.pose.orientation = status.pose.orientation;
-  text_action.type = text_action.TEXT_VIEW_FACING;
+  text_action.type = visualization_msgs::msg::Marker::TEXT_VIEW_FACING;
   text_action.scale.x = 0.0;
   text_action.scale.y = 0.0;
   text_action.scale.z = 0.4;
@@ -406,8 +405,8 @@ const visualization_msgs::msg::MarkerArray VisualizationComponent::generateMarke
     waypoints_marker.header.stamp = stamp;
     waypoints_marker.ns = status.name;
     waypoints_marker.id = 4;
-    waypoints_marker.action = waypoints_marker.ADD;
-    waypoints_marker.type = waypoints_marker.TRIANGLE_LIST;
+    waypoints_marker.action = visualization_msgs::msg::Marker::ADD;
+    waypoints_marker.type = visualization_msgs::msg::Marker::TRIANGLE_LIST;
     size_t num_points = 20;
     waypoints_marker.points = spline.getPolygon(status.bounding_box.dimensions.y, num_points);
     waypoints_marker.color = color;
@@ -427,8 +426,8 @@ const visualization_msgs::msg::MarkerArray VisualizationComponent::generateMarke
       obstacle_marker.header.stamp = stamp;
       obstacle_marker.ns = status.name;
       obstacle_marker.id = 5;
-      obstacle_marker.action = obstacle_marker.ADD;
-      obstacle_marker.type = obstacle_marker.CUBE;
+      obstacle_marker.action = visualization_msgs::msg::Marker::ADD;
+      obstacle_marker.type = visualization_msgs::msg::Marker::CUBE;
       obstacle_marker.pose = spline.getPose(obstacle.s);
       obstacle_marker.pose.position.z =
         obstacle_marker.pose.position.z + status.bounding_box.dimensions.z * 0.5;
@@ -439,19 +438,19 @@ const visualization_msgs::msg::MarkerArray VisualizationComponent::generateMarke
       ret.markers.emplace_back(obstacle_marker);
     } else {
       visualization_msgs::msg::Marker obstacle_marker;
-      obstacle_marker.action = obstacle_marker.DELETE;
+      obstacle_marker.action = visualization_msgs::msg::Marker::DELETE;
       obstacle_marker.id = 5;
       obstacle_marker.ns = status.name;
       ret.markers.emplace_back(obstacle_marker);
     }
   } else {
     visualization_msgs::msg::Marker waypoints_marker;
-    waypoints_marker.action = waypoints_marker.DELETE;
+    waypoints_marker.action = visualization_msgs::msg::Marker::DELETE;
     waypoints_marker.id = 4;
     waypoints_marker.ns = status.name;
     ret.markers.emplace_back(waypoints_marker);
     visualization_msgs::msg::Marker obstacle_marker;
-    obstacle_marker.action = obstacle_marker.DELETE;
+    obstacle_marker.action = visualization_msgs::msg::Marker::DELETE;
     obstacle_marker.id = 5;
     obstacle_marker.ns = status.name;
     ret.markers.emplace_back(obstacle_marker);
@@ -463,7 +462,7 @@ const visualization_msgs::msg::MarkerArray VisualizationComponent::generateDelet
 {
   visualization_msgs::msg::MarkerArray ret;
   visualization_msgs::msg::Marker marker;
-  marker.action = marker.DELETEALL;
+  marker.action = visualization_msgs::msg::Marker::DELETEALL;
   ret.markers.emplace_back(marker);
   return ret;
 }

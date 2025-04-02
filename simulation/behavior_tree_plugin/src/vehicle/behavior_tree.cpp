@@ -142,7 +142,7 @@ const std::string & VehicleBehaviorTree::getCurrentAction() const
   return logging_event_ptr_->getCurrentAction();
 }
 
-void VehicleBehaviorTree::update(double current_time, double step_time)
+auto VehicleBehaviorTree::update(const double current_time, const double step_time) -> void
 {
   tickOnce(current_time, step_time);
   while (getCurrentAction() == "root") {
@@ -150,7 +150,8 @@ void VehicleBehaviorTree::update(double current_time, double step_time)
   }
 }
 
-BT::NodeStatus VehicleBehaviorTree::tickOnce(double current_time, double step_time)
+auto VehicleBehaviorTree::tickOnce(const double current_time, const double step_time)
+  -> BT::NodeStatus
 {
   setCurrentTime(current_time);
   setStepTime(step_time);

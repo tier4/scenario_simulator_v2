@@ -1,0 +1,18 @@
+/**:
+  ros__parameters:
+    map_frame: "map"
+    map_config:
+      capacity: 1000000
+      min_point:
+        x: -100000.0
+        y: -100000.0
+        z: -3.0
+      max_point:
+        x: 100000.0
+        y: 100000.0
+        z: 3.0
+      voxel_size:
+        x: 3.5
+        y: 3.5
+        z: 3.5
+    viz_map: True

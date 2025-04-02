@@ -26,27 +26,18 @@ MiscObjectEntity::MiscObjectEntity(
 {
 }
 
-void MiscObjectEntity::onUpdate(double, double step_time)
+auto MiscObjectEntity::onUpdate(const double /*current_time*/, const double) -> void
 {
-  auto status = static_cast<EntityStatus>(status_);
-  status.action_status.twist = geometry_msgs::msg::Twist();
-  status.action_status.accel = geometry_msgs::msg::Accel();
-  status.action_status.linear_jerk = 0;
-  status.action_status.current_action = "static";
-  status_ = CanonicalizedEntityStatus(status, hdmap_utils_ptr_);
-  status_before_update_ = CanonicalizedEntityStatus(status, hdmap_utils_ptr_);
-  if (npc_logic_started_) {
-    updateStandStillDuration(step_time);
-  }
+  setTwist(geometry_msgs::msg::Twist());
+  setAcceleration(geometry_msgs::msg::Accel());
+  setLinearJerk(0.0);
+  setAction("static");
+  status_before_update_.set(*status_);
 }
 
 auto MiscObjectEntity::getCurrentAction() const -> std::string
 {
-  if (not npc_logic_started_) {
-    return "waiting";
-  } else {
-    return static_cast<EntityStatus>(status_).action_status.current_action;
-  }
+  return static_cast<EntityStatus>(*status_).action_status.current_action;
 }
 
 auto MiscObjectEntity::getBehaviorParameter() const
@@ -90,11 +81,6 @@ void MiscObjectEntity::requestSpeedChange(
   const double, const speed_change::Transition, const speed_change::Constraint, const bool)
 {
   THROW_SEMANTIC_ERROR("requestSpeedChange function cannot not use in MiscObjectEntity");
-}
-
-auto MiscObjectEntity::fillLaneletPose(CanonicalizedEntityStatus & status) -> void
-{
-  EntityBase::fillLaneletPose(status, false);
 }
 
 }  // namespace entity

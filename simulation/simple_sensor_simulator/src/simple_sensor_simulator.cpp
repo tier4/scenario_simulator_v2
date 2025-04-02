@@ -22,6 +22,7 @@
 #include <simple_sensor_simulator/simple_sensor_simulator.hpp>
 #include <simulation_interface/conversions.hpp>
 #include <string>
+#include <traffic_simulator/utils/lanelet_map.hpp>
 #include <utility>
 #include <vector>
 
@@ -38,6 +39,7 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
     [this](auto &&... xs) { return spawnMiscObjectEntity(std::forward<decltype(xs)>(xs)...); },
     [this](auto &&... xs) { return despawnEntity(std::forward<decltype(xs)>(xs)...); },
     [this](auto &&... xs) { return updateEntityStatus(std::forward<decltype(xs)>(xs)...); },
+    [this](auto &&... xs) { return attachImuSensor(std::forward<decltype(xs)>(xs)...); },
     [this](auto &&... xs) { return attachLidarSensor(std::forward<decltype(xs)>(xs)...); },
     [this](auto &&... xs) { return attachDetectionSensor(std::forward<decltype(xs)>(xs)...); },
     [this](auto &&... xs) { return attachOccupancyGridSensor(std::forward<decltype(xs)>(xs)...); },
@@ -52,17 +54,10 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
 geographic_msgs::msg::GeoPoint ScenarioSimulator::getOrigin()
 {
   geographic_msgs::msg::GeoPoint origin;
-  {
-    if (!has_parameter("origin_latitude")) {
-      declare_parameter("origin_latitude", 0.0);
-    }
-    if (!has_parameter("origin_longitude")) {
-      declare_parameter("origin_longitude", 0.0);
-    }
-    get_parameter("origin_latitude", origin.latitude);
-    get_parameter("origin_longitude", origin.longitude);
-  }
-
+  origin.latitude = common::getParameter<decltype(origin.latitude)>(
+    get_node_parameters_interface(), "origin_latitude");
+  origin.longitude = common::getParameter<decltype(origin.longitude)>(
+    get_node_parameters_interface(), "origin_longitude");
   return origin;
 }
 
@@ -70,8 +65,7 @@ ScenarioSimulator::~ScenarioSimulator() {}
 
 int ScenarioSimulator::getSocketPort()
 {
-  if (!has_parameter("port")) declare_parameter("port", 5555);
-  return get_parameter("port").as_int();
+  return common::getParameter<int>(get_node_parameters_interface(), "port", 5555);
 }
 
 auto ScenarioSimulator::initialize(const simulation_api_schema::InitializeRequest & req)
@@ -82,10 +76,13 @@ auto ScenarioSimulator::initialize(const simulation_api_schema::InitializeReques
   step_time_ = req.step_time();
   current_simulation_time_ = req.initialize_time();
   current_scenario_time_ = std::numeric_limits<double>::quiet_NaN();
+  traffic_simulator::lanelet_map::activate(req.lanelet2_map_path());
   builtin_interfaces::msg::Time t;
   simulation_interface::toMsg(req.initialize_ros_time(), t);
   current_ros_time_ = t;
   hdmap_utils_ = std::make_shared<hdmap_utils::HdMapUtils>(req.lanelet2_map_path(), getOrigin());
+  traffic_simulator::lanelet_pose::CanonicalizedLaneletPose::setConsiderPoseByRoadSlope(
+    common::getParameter<bool>(get_node_parameters_interface(), "consider_pose_by_road_slope"));
   auto res = simulation_api_schema::InitializeResponse();
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("succeed to initialize simulation");
@@ -156,7 +153,11 @@ auto ScenarioSimulator::updateEntityStatus(
     try {
       if (isEgo(status.name())) {
         assert(ego_entity_simulation_ && "Ego is spawned but ego_entity_simulation_ is nullptr!");
-        if (req.overwrite_ego_status()) {
+        if (
+          req.overwrite_ego_status() or
+          ego_entity_simulation_->autoware->getControlModeReport().mode ==
+            autoware_vehicle_msgs::msg::ControlModeReport::MANUAL) {
+          ego_entity_simulation_->autoware->setManualMode();
           traffic_simulator_msgs::msg::EntityStatus ego_status_msg;
           simulation_interface::toMsg(status, ego_status_msg);
           ego_entity_simulation_->overwrite(
@@ -212,28 +213,15 @@ auto ScenarioSimulator::spawnVehicleEntity(
     ego_vehicles_.emplace_back(req.parameters());
     traffic_simulator_msgs::msg::VehicleParameters parameters;
     simulation_interface::toMsg(req.parameters(), parameters);
-    auto get_consider_acceleration_by_road_slope = [&]() {
-      if (!has_parameter("consider_acceleration_by_road_slope")) {
-        declare_parameter("consider_acceleration_by_road_slope", false);
-      }
-      return get_parameter("consider_acceleration_by_road_slope").as_bool();
-    };
-    auto get_consider_pose_by_road_slope = [&]() {
-      if (!has_parameter("consider_pose_by_road_slope")) {
-        declare_parameter("consider_pose_by_road_slope", false);
-      }
-      return get_parameter("consider_pose_by_road_slope").as_bool();
-    };
-    ego_entity_simulation_ = std::make_shared<vehicle_simulation::EgoEntitySimulation>(
-      parameters, step_time_, hdmap_utils_,
-      get_parameter_or("use_sim_time", rclcpp::Parameter("use_sim_time", false)),
-      get_consider_acceleration_by_road_slope(), get_consider_pose_by_road_slope());
     traffic_simulator_msgs::msg::EntityStatus initial_status;
     initial_status.name = parameters.name;
-    simulation_interface::toMsg(req.pose(), initial_status.pose);
     initial_status.bounding_box = parameters.bounding_box;
-    ego_entity_simulation_->fillLaneletDataAndSnapZToLanelet(initial_status);
-    ego_entity_simulation_->setInitialStatus(initial_status);
+    simulation_interface::toMsg(req.pose(), initial_status.pose);
+    ego_entity_simulation_ = std::make_shared<vehicle_simulation::EgoEntitySimulation>(
+      initial_status, parameters, step_time_, hdmap_utils_,
+      get_parameter_or("use_sim_time", rclcpp::Parameter("use_sim_time", false)),
+      common::getParameter<bool>(
+        get_node_parameters_interface(), "consider_acceleration_by_road_slope"));
   } else {
     vehicles_.emplace_back(req.parameters());
   }
@@ -300,6 +288,15 @@ auto ScenarioSimulator::despawnEntity(const simulation_api_schema::DespawnEntity
   return res;
 }
 
+auto ScenarioSimulator::attachImuSensor(const simulation_api_schema::AttachImuSensorRequest & req)
+  -> simulation_api_schema::AttachImuSensorResponse
+{
+  sensor_sim_.attachImuSensor(current_simulation_time_, req.configuration(), *this);
+  auto res = simulation_api_schema::AttachImuSensorResponse();
+  res.mutable_result()->set_success(true);
+  return res;
+}
+
 auto ScenarioSimulator::attachDetectionSensor(
   const simulation_api_schema::AttachDetectionSensorRequest & req)
   -> simulation_api_schema::AttachDetectionSensorResponse
@@ -346,7 +343,7 @@ auto ScenarioSimulator::attachPseudoTrafficLightDetector(
 {
   auto response = simulation_api_schema::AttachPseudoTrafficLightDetectorResponse();
   sensor_sim_.attachPseudoTrafficLightsDetector(
-    current_simulation_time_, req.configuration(), *this, hdmap_utils_);
+    current_simulation_time_, req.configuration(), *this);
   response.mutable_result()->set_success(true);
   return response;
 }

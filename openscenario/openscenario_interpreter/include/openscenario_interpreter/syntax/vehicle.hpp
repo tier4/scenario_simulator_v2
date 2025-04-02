@@ -18,6 +18,7 @@
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/axles.hpp>
 #include <openscenario_interpreter/syntax/bounding_box.hpp>
+#include <openscenario_interpreter/syntax/object_type.hpp>
 #include <openscenario_interpreter/syntax/parameter_declarations.hpp>
 #include <openscenario_interpreter/syntax/performance.hpp>
 #include <openscenario_interpreter/syntax/properties.hpp>
@@ -47,6 +48,8 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct Vehicle : public Scope  // for ParameterDeclarations
 {
+  static constexpr ObjectType object_type{ObjectType::vehicle};
+
   const VehicleCategory vehicle_category;  // Category of the vehicle (bicycle, train,...).
 
   const String

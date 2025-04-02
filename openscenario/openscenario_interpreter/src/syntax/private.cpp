@@ -22,7 +22,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 Private::Private(const pugi::xml_node & node, Scope & scope)
-: Scope(scope), entity_ref(readAttribute<String>("entityRef", node, local()))
+: Scope(scope), entity_ref(readAttribute<String>("entityRef", node, local()), scope)
 {
   actors.emplace_back(entity_ref);
 
@@ -85,16 +85,16 @@ auto Private::startNonInstantaneousActions() -> void
   }
 }
 
-auto operator<<(nlohmann::json & json, const Private & datum) -> nlohmann::json &
+auto operator<<(boost::json::object & json, const Private & datum) -> boost::json::object &
 {
-  json["entityRef"] = datum.entity_ref;
+  json["entityRef"] = datum.entity_ref.name();
 
-  json["PrivateAction"] = nlohmann::json::array();
+  auto & private_actions = json["PrivateAction"].emplace_array();
 
   for (const auto & private_action : datum.private_actions) {
-    nlohmann::json action;
+    boost::json::object action(json.storage());
     action["type"] = makeTypename(private_action.type());
-    json["PrivateAction"].push_back(action);
+    private_actions.push_back(std::move(action));
   }
 
   return json;

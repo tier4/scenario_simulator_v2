@@ -17,6 +17,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+#include <array>
 #include <concealer/execute.hpp>
 #include <cstdio>
 #include <cstdlib>
@@ -70,22 +71,4 @@ auto dollar(const std::string & command) -> std::string
     return result;
   }
 }
-
-void sudokill(const pid_t process_id)
-{
-  const auto process_str = std::to_string(process_id);
-
-  const pid_t pid = fork();
-
-  switch (pid) {
-    case -1:
-      std::cout << std::system_error(errno, std::system_category()).what() << std::endl;
-      break;
-    case 0:
-      ::execlp("sudo", "sudo", "kill", "-2", process_str.c_str(), static_cast<char *>(nullptr));
-      std::cout << std::system_error(errno, std::system_category()).what() << std::endl;
-      break;
-  }
-}
-
 }  // namespace concealer

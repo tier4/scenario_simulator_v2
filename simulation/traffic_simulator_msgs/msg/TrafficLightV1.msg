@@ -1,0 +1,2 @@
+int64 lanelet_way_id
+traffic_simulator_msgs/TrafficLightBulbV1[] traffic_light_bulbs

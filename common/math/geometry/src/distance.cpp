@@ -58,8 +58,8 @@ double getDistance2D(
   const std::vector<geometry_msgs::msg::Point> & polygon0,
   const std::vector<geometry_msgs::msg::Point> & polygon1)
 {
-  typedef boost::geometry::model::d2::point_xy<double> boost_point;
-  typedef boost::geometry::model::polygon<boost_point> boost_polygon;
+  using boost_point = boost::geometry::model::d2::point_xy<double>;
+  using boost_polygon = boost::geometry::model::polygon<boost_point>;
   boost_polygon poly0;
   for (const auto & point : polygon0) {
     boost::geometry::exterior_ring(poly0).push_back(boost_point(point.x, point.y));

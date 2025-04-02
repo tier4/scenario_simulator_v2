@@ -60,7 +60,7 @@ StatusMonitor::~StatusMonitor()
 {
   auto lock = std::scoped_lock<std::mutex>(mutex);
 
-  auto mark_as_exited = [this]() {
+  auto mark_as_exited = []() {
     if (auto iter = statuses.find(std::this_thread::get_id()); iter != std::end(statuses)) {
       std::get<1>(*iter).exited = true;
     }

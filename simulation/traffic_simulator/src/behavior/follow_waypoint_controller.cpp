@@ -1,4 +1,4 @@
-// Copyright 2023 TIER IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -69,7 +69,9 @@ auto FollowWaypointController::roundTimeToFullStepsWithTolerance(
     throw ControllerError(
       "Value remaining_time_source (", remaining_time_source,
       ") is NaN or inf - it cannot be rounded.");
-  } else if (remaining_time_source >= std::numeric_limits<std::size_t>::max() * step_time) {
+  } else if (
+    remaining_time_source >=
+    static_cast<double>(std::numeric_limits<std::size_t>::max()) * step_time) {
     throw ControllerError(
       "Exceeded the range of the variable type <std::size_t> (", remaining_time_source, "/",
       step_time, ") - the value is too large. Probably the distance to the waypoint is extremely",
