@@ -21,6 +21,12 @@ Changelog for package junit_exporter
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+15.0.1 (2025-04-02)
+-------------------
+* Merge branch 'master' into feature/support-context-gamma-test
+* Merge branch 'master' into feature/support-context-gamma-test
+* Contributors: Masaya Kataoka, Taiga
+
 15.0.0 (2025-03-31)
 -------------------
 * Merge branch 'master' into refactor/get_lateral_distance
