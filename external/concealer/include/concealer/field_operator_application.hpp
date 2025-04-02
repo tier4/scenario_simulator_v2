@@ -17,26 +17,21 @@
 
 #include <sys/wait.h>
 
-#if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)
-#include <autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>
-#endif
-
 #include <autoware_adapi_v1_msgs/msg/mrm_state.hpp>
 #include <autoware_adapi_v1_msgs/srv/change_operation_mode.hpp>
 #include <autoware_adapi_v1_msgs/srv/clear_route.hpp>
 #include <autoware_adapi_v1_msgs/srv/initialize_localization.hpp>
 #include <autoware_adapi_v1_msgs/srv/set_route_points.hpp>
 #include <autoware_control_msgs/msg/control.hpp>
-#include <autoware_system_msgs/msg/autoware_state.hpp>
 #include <autoware_vehicle_msgs/msg/gear_command.hpp>
 #include <autoware_vehicle_msgs/msg/turn_indicators_command.hpp>
 #include <concealer/autoware_universe.hpp>
+#include <concealer/legacy_autoware_state.hpp>
 #include <concealer/path_with_lane_id.hpp>
 #include <concealer/publisher.hpp>
 #include <concealer/service.hpp>
 #include <concealer/subscriber.hpp>
 #include <concealer/task_queue.hpp>
-#include <concealer/transition_assertion.hpp>
 #include <concealer/visibility.hpp>
 #include <geometry_msgs/msg/accel.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
@@ -54,18 +49,15 @@
 
 namespace concealer
 {
-struct FieldOperatorApplication : public rclcpp::Node,
-                                  public TransitionAssertion<FieldOperatorApplication>
+struct FieldOperatorApplication : public rclcpp::Node
 {
-  std::atomic<bool> is_stop_requested = false;
-
-  bool is_autoware_exited = false;
-
-  const pid_t process_id = 0;
+  pid_t process_id;
 
   bool initialized = false;
 
-  std::string autoware_state = "LAUNCHING";
+  std::atomic<bool> finalized = false;
+
+  std::chrono::steady_clock::time_point time_limit;
 
   std::string minimum_risk_maneuver_state;
 
@@ -76,8 +68,16 @@ struct FieldOperatorApplication : public rclcpp::Node,
   using Control                         = autoware_control_msgs::msg::Control;
   using CooperateStatusArray            = tier4_rtc_msgs::msg::CooperateStatusArray;
   using Emergency                       = tier4_external_api_msgs::msg::Emergency;
+#if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)
   using LocalizationInitializationState = autoware_adapi_v1_msgs::msg::LocalizationInitializationState;
+#endif
   using MrmState                        = autoware_adapi_v1_msgs::msg::MrmState;
+#if __has_include(<autoware_adapi_v1_msgs/msg/operation_mode_state.hpp>)
+  using OperationModeState              = autoware_adapi_v1_msgs::msg::OperationModeState;
+#endif
+#if __has_include(<autoware_adapi_v1_msgs/msg/route_state.hpp>)
+  using RouteState                      = autoware_adapi_v1_msgs::msg::RouteState;
+#endif
   using Trajectory                      = tier4_planning_msgs::msg::Trajectory;
   using TurnIndicatorsCommand           = autoware_vehicle_msgs::msg::TurnIndicatorsCommand;
 
@@ -97,10 +97,16 @@ struct FieldOperatorApplication : public rclcpp::Node,
 #if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)
   Subscriber<LocalizationInitializationState> getLocalizationState;
 #endif
-  Subscriber<MrmState>                 getMrmState;
-  Subscriber<priority::PathWithLaneId> getPathWithLaneId;
-  Subscriber<Trajectory>               getTrajectory;
-  Subscriber<TurnIndicatorsCommand>    getTurnIndicatorsCommand;
+  Subscriber<MrmState>                        getMrmState;
+#if __has_include(<autoware_adapi_v1_msgs/msg/operation_mode_state.hpp>)
+  Subscriber<OperationModeState>              getOperationModeState;
+#endif
+  Subscriber<priority::PathWithLaneId>        getPathWithLaneId;
+#if __has_include(<autoware_adapi_v1_msgs/msg/route_state.hpp>)
+  Subscriber<RouteState>                      getRouteState;
+#endif
+  Subscriber<Trajectory>                      getTrajectory;
+  Subscriber<TurnIndicatorsCommand>           getTurnIndicatorsCommand;
 
   Service<ClearRoute>             requestClearRoute;
   Service<CooperateCommands>      requestCooperateCommands;
@@ -118,6 +124,24 @@ struct FieldOperatorApplication : public rclcpp::Node,
      declaration order and deconstructed in reverse order.)
   */
   TaskQueue task_queue;
+
+  template <typename Thunk = void (*)()>
+  auto waitForAutowareStateToBe(
+    const LegacyAutowareState & state, Thunk thunk = [] {})
+  {
+    thunk();
+
+    while (not finalized.load() and getLegacyAutowareState().value != state.value) {
+      if (time_limit <= std::chrono::steady_clock::now()) {
+        throw common::AutowareError(
+          "Simulator waited for the Autoware state to transition to ", state,
+          ", but time is up. The current Autoware state is ", getLegacyAutowareState());
+      } else {
+        thunk();
+        rclcpp::GenericRate<std::chrono::steady_clock>(std::chrono::seconds(1)).sleep();
+      }
+    }
+  }
 
   CONCEALER_PUBLIC explicit FieldOperatorApplication(const pid_t);
 
@@ -137,11 +161,11 @@ struct FieldOperatorApplication : public rclcpp::Node,
 
   auto clearRoute() -> void;
 
+  auto getLegacyAutowareState() const -> LegacyAutowareState;
+
   auto getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray;
 
   auto requestAutoModeForCooperation(const std::string &, bool) -> void;
-
-  auto rethrow() const { task_queue.rethrow(); }
 
   auto sendCooperateCommand(const std::string &, const std::string &) -> void;
 
