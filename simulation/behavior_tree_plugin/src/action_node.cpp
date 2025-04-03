@@ -336,8 +336,7 @@ auto ActionNode::getDistanceToTargetEntity(
     if (const auto bounding_box_distance =
           traffic_simulator::distance::boundingBoxLaneLongitudinalDistance(
             *from_lanelet_pose, from_bounding_box, *target_lanelet_pose, target_bounding_box,
-            include_adjacent_lanelet, include_opposite_direction, routing_configuration,
-            hdmap_utils);
+            include_adjacent_lanelet, include_opposite_direction, routing_configuration);
         !bounding_box_distance || bounding_box_distance.value() < 0.0) {
       return std::nullopt;
     } else if (const auto position_distance = traffic_simulator::distance::longitudinalDistance(

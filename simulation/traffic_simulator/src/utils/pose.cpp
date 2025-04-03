@@ -320,9 +320,9 @@ auto boundingBoxRelativeLaneletPose(
   /// @note here the s and offset are intentionally assigned independently, even if
   /// it is not possible to calculate one of them - it happens that one is sufficient
   if (
-    const auto longitudinal_bounding_box_distance = boundingBoxLaneLongitudinalDistance(
+    const auto longitudinal_bounding_box_distance = distance::boundingBoxLaneLongitudinalDistance(
       from, from_bounding_box, to, to_bounding_box, include_adjacent_lanelet,
-      include_opposite_direction, routing_configuration, hdmap_utils_ptr)) {
+      include_opposite_direction, routing_configuration)) {
     position.s = longitudinal_bounding_box_distance.value();
   }
   if (
