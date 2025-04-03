@@ -419,7 +419,7 @@ TEST_F(PoseTest, relativeLaneletPose_s_invalid)
   const auto to = traffic_simulator::helper::constructCanonicalizedLaneletPose(196, 0.0, 0.0);
 
   const auto relative = traffic_simulator::pose::relativeLaneletPose(
-    from, to, traffic_simulator::RoutingConfiguration(), hdmap_utils);
+    from, to, traffic_simulator::RoutingConfiguration());
 
   EXPECT_TRUE(std::isnan(relative.s));
 }
@@ -433,7 +433,7 @@ TEST_F(PoseTest, relativeLaneletPose_s_valid)
   const auto to = traffic_simulator::helper::constructCanonicalizedLaneletPose(3002163, 0.0, 0.0);
 
   const auto relative = traffic_simulator::pose::relativeLaneletPose(
-    from, to, traffic_simulator::RoutingConfiguration(), hdmap_utils);
+    from, to, traffic_simulator::RoutingConfiguration());
 
   EXPECT_NEAR(relative.s, 107.74, 0.001);
 }
@@ -447,7 +447,7 @@ TEST_F(PoseTest, relativeLaneletPose_offset_invalid)
   const auto to = traffic_simulator::helper::constructCanonicalizedLaneletPose(196, 0.0, 0.0);
 
   const auto relative = traffic_simulator::pose::relativeLaneletPose(
-    from, to, traffic_simulator::RoutingConfiguration(), hdmap_utils);
+    from, to, traffic_simulator::RoutingConfiguration());
 
   EXPECT_TRUE(std::isnan(relative.offset));
 }
@@ -462,8 +462,8 @@ TEST_F(PoseTest, relativeLaneletPose_offset_valid)
 
   traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
   lane_changeable_routing_configuration.allow_lane_change = true;
-  const auto relative = traffic_simulator::pose::relativeLaneletPose(
-    from, to, lane_changeable_routing_configuration, hdmap_utils);
+  const auto relative =
+    traffic_simulator::pose::relativeLaneletPose(from, to, lane_changeable_routing_configuration);
 
   EXPECT_EQ(relative.offset, 1.0);
 }

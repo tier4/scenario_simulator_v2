@@ -284,11 +284,10 @@ auto boundingBoxRelativePose(
 /// @todo HdMapUtils will be removed when lanelet_wrapper::distance is added
 auto relativeLaneletPose(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
-  const RoutingConfiguration & routing_configuration,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> LaneletPose
+  const RoutingConfiguration & routing_configuration) -> LaneletPose
 {
   constexpr bool include_adjacent_lanelet{false};
-  constexpr bool include_opposite_direction{true};
+  constexpr bool include_opposite_direction{false};
 
   LaneletPose position = quietNaNLaneletPose();
   /// @note here the s and offset are intentionally assigned independently, even if

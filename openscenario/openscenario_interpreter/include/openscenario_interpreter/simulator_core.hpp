@@ -182,7 +182,7 @@ public:
       routing_configuration.allow_lane_change =
         (routing_algorithm == RoutingAlgorithm::value_type::shortest);
       return traffic_simulator::pose::relativeLaneletPose(
-        from_lanelet_pose, to_lanelet_pose, routing_configuration, core->getHdmapUtils());
+        from_lanelet_pose, to_lanelet_pose, routing_configuration);
     }
 
     static auto makeNativeBoundingBoxRelativeLanePosition(

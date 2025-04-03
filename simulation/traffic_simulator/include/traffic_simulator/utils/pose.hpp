@@ -89,8 +89,7 @@ auto isAltitudeMatching(
 
 auto relativeLaneletPose(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
-  const RoutingConfiguration & routing_configuration,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> LaneletPose;
+  const RoutingConfiguration & routing_configuration) -> LaneletPose;
 
 auto boundingBoxRelativeLaneletPose(
   const CanonicalizedLaneletPose & from,
