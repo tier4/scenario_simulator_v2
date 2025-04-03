@@ -40,12 +40,12 @@ struct ScenarioSet
   auto getDeriveResponse() -> openscenario_preprocessor_msgs::srv::Derive::Response
   {
     openscenario_preprocessor_msgs::srv::Derive::Response response;
-    response.path = path;
+    response.path = path.string();
     response.frame_rate = frame_rate;
     return response;
   }
 
-  std::string path;
+  boost::filesystem::path path;
 
   float frame_rate;
 };
@@ -59,6 +59,8 @@ private:
   void preprocessScenario(ScenarioSet &);
 
   [[nodiscard]] bool validateXOSC(const boost::filesystem::path &, bool);
+
+  boost::filesystem::path output_directory;
 
   rclcpp::Service<openscenario_preprocessor_msgs::srv::Load>::SharedPtr load_server;
 
