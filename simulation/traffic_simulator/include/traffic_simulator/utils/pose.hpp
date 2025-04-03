@@ -101,7 +101,7 @@ auto boundingBoxRelativeLaneletPose(
 // Others
 auto isInLanelet(
   const CanonicalizedLaneletPose & canonicalized_lanelet_pose, const lanelet::Id lanelet_id,
-  const double tolerance, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> bool;
+  const double tolerance) -> bool;
 
 auto isInLanelet(const geometry_msgs::msg::Point & point, const lanelet::Id lanelet_id) -> bool;
 

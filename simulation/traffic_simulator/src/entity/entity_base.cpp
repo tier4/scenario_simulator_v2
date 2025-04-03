@@ -113,7 +113,7 @@ auto EntityBase::isInLanelet(const lanelet::Id lanelet_id, std::optional<double>
   if (const auto lanelet_pose = getCanonicalizedLaneletPose()) {
     const auto tolerance_value =
       tolerance ? tolerance.value() : getDefaultMatchingDistanceForLaneletPoseCalculation();
-    return pose::isInLanelet(lanelet_pose.value(), lanelet_id, tolerance_value, hdmap_utils_ptr_);
+    return pose::isInLanelet(lanelet_pose.value(), lanelet_id, tolerance_value);
   }
   return false;
 }

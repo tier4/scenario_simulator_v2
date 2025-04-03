@@ -330,10 +330,9 @@ auto boundingBoxRelativeLaneletPose(
   return position;
 }
 
-/// @todo HdMapUtils will be removed when lanelet_wrapper::distance is added
 auto isInLanelet(
   const CanonicalizedLaneletPose & canonicalized_lanelet_pose, const lanelet::Id lanelet_id,
-  const double tolerance, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> bool
+  const double tolerance) -> bool
 {
   constexpr bool include_adjacent_lanelet{false};
   constexpr bool include_opposite_direction{false};
