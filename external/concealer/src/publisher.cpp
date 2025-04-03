@@ -18,7 +18,7 @@
 
 namespace concealer
 {
-NormalDistribution<nav_msgs::msg::Odometry>::NormalDistribution(
+NormalDistributionBase::NormalDistributionBase(
   const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node,
   const std::string & topic)
 : seed([&]() {
@@ -32,7 +32,14 @@ NormalDistribution<nav_msgs::msg::Odometry>::NormalDistribution(
         " and less than or equal to ", std::random_device::max());
     }
   }()),
-  engine(seed ? seed : device()),
+  engine(seed ? seed : device())
+{
+}
+
+NormalDistribution<nav_msgs::msg::Odometry>::NormalDistribution(
+  const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node,
+  const std::string & topic)
+: NormalDistributionBase(node, topic),
   speed_threshold(
     common::getParameter<double>(node, topic + ".nav_msgs::msg::Odometry.speed_threshold")),
   position_local_x_error(node, topic + ".nav_msgs::msg::Odometry.pose.pose.position.local_x.error"),
