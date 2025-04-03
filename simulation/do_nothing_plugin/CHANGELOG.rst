@@ -21,6 +21,9 @@ Changelog for package do_nothing_plugin
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+15.0.4 (2025-04-03)
+-------------------
+
 15.0.3 (2025-04-03)
 -------------------
 * Merge branch 'master' into feature/remove-trajectory-subscription

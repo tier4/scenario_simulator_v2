@@ -2,6 +2,9 @@
 Changelog for package get_parameter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+15.0.4 (2025-04-03)
+-------------------
+
 15.0.3 (2025-04-03)
 -------------------
 * Merge branch 'master' into feature/remove-trajectory-subscription
