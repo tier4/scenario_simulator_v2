@@ -331,26 +331,21 @@ auto ActionNode::getDistanceToTargetEntity(
       target_lanelet_pose) {
     const auto & from_lanelet_pose = canonicalized_entity_status->getCanonicalizedLaneletPose();
     const auto & from_bounding_box = canonicalized_entity_status->getBoundingBox();
-    if (const auto bounding_box_distance =
-          traffic_simulator::distance::boundingBoxLaneLongitudinalDistance(
+    if (const auto bounding_box_distances =
+          traffic_simulator::distance::laneLongitudinalDistances(
             *from_lanelet_pose, from_bounding_box, *target_lanelet_pose, target_bounding_box,
             include_adjacent_lanelet, include_opposite_direction, routing_configuration,
             hdmap_utils);
-        !bounding_box_distance || bounding_box_distance.value() < 0.0) {
-      return std::nullopt;
-    } else if (const auto position_distance = traffic_simulator::distance::longitudinalDistance(
-                 *from_lanelet_pose, *target_lanelet_pose, include_adjacent_lanelet,
-                 include_opposite_direction, routing_configuration, hdmap_utils);
-               !position_distance) {
+        !bounding_box_distances || bounding_box_distances.value().first < 0.0) {
       return std::nullopt;
     } else {
       const auto target_bounding_box_distance =
-        bounding_box_distance.value() + from_bounding_box.dimensions.x / 2.0;
+        bounding_box_distances.value().first + from_bounding_box.dimensions.x / 2.0;
 
       /// @note if the distance of the target entity to the spline is smaller than the width of the reference entity
       if (const auto target_to_spline_distance = traffic_simulator::distance::distanceToSpline(
             static_cast<geometry_msgs::msg::Pose>(*target_lanelet_pose), target_bounding_box,
-            spline, position_distance.value());
+            spline, bounding_box_distances.value().second);
           target_to_spline_distance <= from_bounding_box.dimensions.y / 2.0) {
         return target_bounding_box_distance;
       }

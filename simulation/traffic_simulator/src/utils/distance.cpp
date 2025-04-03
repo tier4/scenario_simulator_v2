@@ -197,6 +197,36 @@ auto boundingBoxLaneLongitudinalDistance(
   return std::nullopt;
 }
 
+auto laneLongitudinalDistances(
+  const CanonicalizedLaneletPose & from,
+  const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
+  const CanonicalizedLaneletPose & to,
+  const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box, bool include_adjacent_lanelet,
+  bool include_opposite_direction,
+  const traffic_simulator::RoutingConfiguration & routing_configuration,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<std::pair<double,double>>
+{
+  if (const auto longitudinal_distance = longitudinalDistance(
+        from, to, include_adjacent_lanelet, include_opposite_direction, routing_configuration,
+        hdmap_utils_ptr);
+      longitudinal_distance) {
+    const auto from_bounding_box_distances =
+      math::geometry::getDistancesFromCenterToEdge(from_bounding_box);
+    const auto to_bounding_box_distances =
+      math::geometry::getDistancesFromCenterToEdge(to_bounding_box);
+    auto bounding_box_distance = 0.0;
+    if (longitudinal_distance.value() > 0.0) {
+      bounding_box_distance =
+        -std::abs(from_bounding_box_distances.front) - std::abs(to_bounding_box_distances.rear);
+    } else if (longitudinal_distance.value() < 0.0) {
+      bounding_box_distance =
+        +std::abs(from_bounding_box_distances.rear) + std::abs(to_bounding_box_distances.front);
+    }
+    return std::make_pair(longitudinal_distance.value() + bounding_box_distance, longitudinal_distance.value());
+  }
+  return std::nullopt;
+}
+
 // Bounds
 auto distanceToLeftLaneBound(
   const geometry_msgs::msg::Pose & map_pose,
