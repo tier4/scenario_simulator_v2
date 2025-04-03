@@ -18,7 +18,7 @@
 
 namespace concealer
 {
-NormalDistribution<nav_msgs::msg::Odometry>::NormalDistribution(
+NormalDistributionBase::NormalDistributionBase(
   const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node,
   const std::string & topic)
 : seed([&]() {
@@ -32,7 +32,14 @@ NormalDistribution<nav_msgs::msg::Odometry>::NormalDistribution(
         " and less than or equal to ", std::random_device::max());
     }
   }()),
-  engine(seed ? seed : device()),
+  engine(seed ? seed : device())
+{
+}
+
+NormalDistribution<nav_msgs::msg::Odometry>::NormalDistribution(
+  const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node,
+  const std::string & topic)
+: NormalDistributionBase(node, topic),
   speed_threshold(
     common::getParameter<double>(node, topic + ".nav_msgs::msg::Odometry.speed_threshold")),
   position_local_x_error(node, topic + ".nav_msgs::msg::Odometry.pose.pose.position.local_x.error"),
@@ -105,18 +112,7 @@ auto NormalDistribution<nav_msgs::msg::Odometry>::operator()(nav_msgs::msg::Odom
 NormalDistribution<autoware_vehicle_msgs::msg::VelocityReport>::NormalDistribution(
   const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node,
   const std::string & topic)
-: seed([&]() {
-    if (const auto value = common::getParameter<int>(node, topic + ".seed");
-        std::random_device::min() <= value and value <= std::random_device::max()) {
-      return value;
-    } else {
-      throw common::scenario_simulator_exception::Error(
-        "The value of parameter ", std::quoted(topic + ".seed"),
-        " must be greater than or equal to ", std::random_device::min(),
-        " and less than or equal to ", std::random_device::max());
-    }
-  }()),
-  engine(seed ? seed : device()),
+: NormalDistributionBase(node, topic),
   speed_threshold(common::getParameter<double>(
     node, topic + ".autoware_vehicle_msgs::msg::VelocityReport.speed_threshold")),
   longitudinal_velocity_error(

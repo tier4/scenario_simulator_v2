@@ -72,8 +72,12 @@ struct NormalDistributionError
 template <typename>
 struct NormalDistribution;
 
-template <>
-struct NormalDistribution<nav_msgs::msg::Odometry>
+/**
+ * @brief Provides common components for obtaining the seed and initializing the pseudo random number generator engine
+ * obtains the seed from the parameter <topic>.seed
+ * initializes `engine` appropriately
+ */
+struct NormalDistributionBase
 {
   std::random_device::result_type seed;
 
@@ -81,6 +85,14 @@ struct NormalDistribution<nav_msgs::msg::Odometry>
 
   std::mt19937_64 engine;
 
+  NormalDistributionBase(
+    const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node,
+    const std::string & topic);
+};
+
+template <>
+struct NormalDistribution<nav_msgs::msg::Odometry> : public NormalDistributionBase
+{
   double speed_threshold;
 
   // clang-format off
@@ -106,13 +118,8 @@ struct NormalDistribution<nav_msgs::msg::Odometry>
 
 template <>
 struct NormalDistribution<autoware_vehicle_msgs::msg::VelocityReport>
+: public NormalDistributionBase
 {
-  std::random_device::result_type seed;
-
-  std::random_device device;
-
-  std::mt19937_64 engine;
-
   double speed_threshold;
 
   // clang-format off
