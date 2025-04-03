@@ -331,11 +331,14 @@ auto ActionNode::getDistanceToTargetEntity(
       target_lanelet_pose) {
     const auto & from_lanelet_pose = canonicalized_entity_status->getCanonicalizedLaneletPose();
     const auto & from_bounding_box = canonicalized_entity_status->getBoundingBox();
-    if (const auto bounding_box_distances =
-          traffic_simulator::distance::laneLongitudinalDistances(
-            *from_lanelet_pose, from_bounding_box, *target_lanelet_pose, target_bounding_box,
-            include_adjacent_lanelet, include_opposite_direction, routing_configuration,
-            hdmap_utils);
+    const auto bounding_box_map_points = math::geometry::transformPoints(
+      static_cast<geometry_msgs::msg::Pose>(*target_lanelet_pose),
+      math::geometry::getPointsFromBbox(target_bounding_box));
+    const auto bounding_box_diagonal_length =
+      math::geometry::getDistance(bounding_box_map_points[0], bounding_box_map_points[2]);
+    if (const auto bounding_box_distances = traffic_simulator::distance::laneLongitudinalDistances(
+          *from_lanelet_pose, from_bounding_box, *target_lanelet_pose, target_bounding_box,
+          include_adjacent_lanelet, include_opposite_direction, routing_configuration, hdmap_utils);
         !bounding_box_distances || bounding_box_distances.value().first < 0.0) {
       return std::nullopt;
     } else {
@@ -352,7 +355,11 @@ auto ActionNode::getDistanceToTargetEntity(
       /// @note if the distance of the target entity to the spline cannot be calculated because a collision occurs
       else if (const auto target_polygon = math::geometry::transformPoints(
                  status.getMapPose(), math::geometry::getPointsFromBbox(target_bounding_box));
-               spline.getCollisionPointIn2D(target_polygon, search_backward)) {
+               spline.getCollisionPointIn2D(
+                 target_polygon, search_backward,
+                 std::make_pair(
+                   bounding_box_distances.value().first,
+                   bounding_box_distances.value().first + bounding_box_diagonal_length))) {
         return target_bounding_box_distance;
       }
     }
