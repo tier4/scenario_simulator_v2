@@ -478,7 +478,7 @@ TEST_F(PoseTest, boundingBoxRelativeLaneletPose_s_invalid)
   const auto bounding_box = makeBoundingBox();
 
   const auto relative = traffic_simulator::pose::boundingBoxRelativeLaneletPose(
-    from, bounding_box, to, bounding_box, traffic_simulator::RoutingConfiguration(), hdmap_utils);
+    from, bounding_box, to, bounding_box, traffic_simulator::RoutingConfiguration());
 
   EXPECT_TRUE(std::isnan(relative.s));
 }
@@ -493,7 +493,7 @@ TEST_F(PoseTest, boundingBoxRelativeLaneletPose_s_valid)
   const auto bounding_box = makeBoundingBox();
 
   const auto relative = traffic_simulator::pose::boundingBoxRelativeLaneletPose(
-    from, bounding_box, to, bounding_box, traffic_simulator::RoutingConfiguration(), hdmap_utils);
+    from, bounding_box, to, bounding_box, traffic_simulator::RoutingConfiguration());
 
   EXPECT_NEAR(relative.s, 103.74, 0.01);
 }
@@ -508,7 +508,7 @@ TEST_F(PoseTest, boundingBoxRelativeLaneletPose_offset_invalid)
   const auto bounding_box = makeBoundingBox();
 
   const auto relative = traffic_simulator::pose::boundingBoxRelativeLaneletPose(
-    from, bounding_box, to, bounding_box, traffic_simulator::RoutingConfiguration(), hdmap_utils);
+    from, bounding_box, to, bounding_box, traffic_simulator::RoutingConfiguration());
 
   EXPECT_TRUE(std::isnan(relative.s));
 }
@@ -523,7 +523,7 @@ TEST_F(PoseTest, boundingBoxRelativeLaneletPose_offset_valid)
   const auto bounding_box = makeBoundingBox();
 
   const auto relative = traffic_simulator::pose::boundingBoxRelativeLaneletPose(
-    from, bounding_box, to, bounding_box, traffic_simulator::RoutingConfiguration(), hdmap_utils);
+    from, bounding_box, to, bounding_box, traffic_simulator::RoutingConfiguration());
 
   EXPECT_EQ(relative.offset, 0.0);
 }

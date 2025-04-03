@@ -96,8 +96,7 @@ auto boundingBoxRelativeLaneletPose(
   const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
   const CanonicalizedLaneletPose & to,
   const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box,
-  const RoutingConfiguration & routing_configuration,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> LaneletPose;
+  const RoutingConfiguration & routing_configuration) -> LaneletPose;
 
 // Others
 auto isInLanelet(

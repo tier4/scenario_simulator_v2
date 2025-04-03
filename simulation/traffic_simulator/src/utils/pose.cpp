@@ -303,14 +303,12 @@ auto relativeLaneletPose(
   return position;
 }
 
-/// @todo HdMapUtils will be removed when lanelet_wrapper::distance is added
 auto boundingBoxRelativeLaneletPose(
   const CanonicalizedLaneletPose & from,
   const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
   const CanonicalizedLaneletPose & to,
   const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box,
-  const RoutingConfiguration & routing_configuration,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> LaneletPose
+  const RoutingConfiguration & routing_configuration) -> LaneletPose
 {
   constexpr bool include_adjacent_lanelet{false};
   constexpr bool include_opposite_direction{true};

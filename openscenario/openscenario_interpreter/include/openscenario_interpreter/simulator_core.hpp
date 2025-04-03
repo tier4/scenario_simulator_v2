@@ -230,7 +230,7 @@ public:
         (routing_algorithm == RoutingAlgorithm::value_type::shortest);
       return traffic_simulator::pose::boundingBoxRelativeLaneletPose(
         from_lanelet_pose, from_bounding_box, to_lanelet_pose, to_bounding_box,
-        routing_configuration, core->getHdmapUtils());
+        routing_configuration);
     }
 
     static auto makeNativeBoundingBoxRelativeWorldPosition(
