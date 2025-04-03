@@ -112,7 +112,8 @@ auto longitudinalDistance(
     std::vector<double> distances = {};
     for (const auto & from_pose : from_poses) {
       for (const auto & to_pose : to_poses) {
-         if (const auto distance = distance::longitudinalDistance(
+        if (
+          const auto distance = distance::longitudinalDistance(
             CanonicalizedLaneletPose(from_pose), CanonicalizedLaneletPose(to_pose), false,
             include_opposite_direction, routing_configuration)) {
           distances.emplace_back(distance.value());
