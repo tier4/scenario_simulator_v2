@@ -61,9 +61,8 @@ auto countLaneChanges(
 /// @sa https://github.com/tier4/scenario_simulator_v2/blob/729e4e6372cdba60e377ae097d032905b80763a9/docs/developer_guide/lane_pose_calculation/GetLongitudinalDistance.md
 auto longitudinalDistance(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
-  bool include_adjacent_lanelet, bool include_opposite_direction,
-  const traffic_simulator::RoutingConfiguration & routing_configuration,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<double>
+  bool const include_adjacent_lanelet, bool const include_opposite_direction,
+  const RoutingConfiguration & routing_configuration) -> std::optional<double>
 {
   if (!include_adjacent_lanelet) {
     auto to_canonicalized = static_cast<LaneletPose>(to);
@@ -113,10 +112,9 @@ auto longitudinalDistance(
     std::vector<double> distances = {};
     for (const auto & from_pose : from_poses) {
       for (const auto & to_pose : to_poses) {
-        if (
-          const auto distance = longitudinalDistance(
+         if (const auto distance = distance::longitudinalDistance(
             CanonicalizedLaneletPose(from_pose), CanonicalizedLaneletPose(to_pose), false,
-            include_opposite_direction, routing_configuration, hdmap_utils_ptr)) {
+            include_opposite_direction, routing_configuration)) {
           distances.emplace_back(distance.value());
         }
       }
@@ -176,9 +174,8 @@ auto boundingBoxLaneLongitudinalDistance(
   const traffic_simulator::RoutingConfiguration & routing_configuration,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<double>
 {
-  if (const auto longitudinal_distance = longitudinalDistance(
-        from, to, include_adjacent_lanelet, include_opposite_direction, routing_configuration,
-        hdmap_utils_ptr);
+  if (const auto longitudinal_distance = distance::longitudinalDistance(
+        from, to, include_adjacent_lanelet, include_opposite_direction, routing_configuration);
       longitudinal_distance) {
     const auto from_bounding_box_distances =
       math::geometry::getDistancesFromCenterToEdge(from_bounding_box);

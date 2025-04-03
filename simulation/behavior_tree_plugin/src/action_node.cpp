@@ -342,7 +342,7 @@ auto ActionNode::getDistanceToTargetEntity(
       return std::nullopt;
     } else if (const auto position_distance = traffic_simulator::distance::longitudinalDistance(
                  *from_lanelet_pose, *target_lanelet_pose, include_adjacent_lanelet,
-                 include_opposite_direction, routing_configuration, hdmap_utils);
+                 include_opposite_direction, routing_configuration);
                !position_distance) {
       return std::nullopt;
     } else {

@@ -789,9 +789,9 @@ auto EntityBase::requestSynchronize(
       RoutingConfiguration lane_changeable_routing_configuration;
       lane_changeable_routing_configuration.allow_lane_change = true;
 
-      const auto entity_distance = longitudinalDistance(
+      const auto entity_distance = distance::longitudinalDistance(
         entity_lanelet_pose.value(), entity_target, true, false,
-        lane_changeable_routing_configuration, hdmap_utils_ptr_);
+        lane_changeable_routing_configuration);
       if (!entity_distance.has_value()) {
         THROW_SEMANTIC_ERROR(
           "Failed to get distance between entity and target lanelet pose. Check if the entity has "
@@ -804,9 +804,9 @@ auto EntityBase::requestSynchronize(
           ? THROW_SEMANTIC_ERROR("Failed to find target entity. Check if the target entity exists.")
           : other_status_.find(target_name)->second.getLaneletPose();
 
-      const auto target_entity_distance = longitudinalDistance(
+      const auto target_entity_distance = distance::longitudinalDistance(
         CanonicalizedLaneletPose(target_entity_lanelet_pose), target_sync_pose, true, false,
-        lane_changeable_routing_configuration, hdmap_utils_ptr_);
+        lane_changeable_routing_configuration);
       if (!target_entity_distance.has_value() || target_entity_distance.value() < 0.0) {
         RCLCPP_WARN_ONCE(
           rclcpp::get_logger("traffic_simulator"),

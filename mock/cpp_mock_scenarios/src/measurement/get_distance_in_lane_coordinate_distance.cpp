@@ -80,7 +80,7 @@ private:
       return traffic_simulator::distance::longitudinalDistance(
         from_entity.getCanonicalizedLaneletPose().value(),
         to_entity.getCanonicalizedLaneletPose().value(), false, false,
-        traffic_simulator::RoutingConfiguration(), api_.getHdmapUtils());
+        traffic_simulator::RoutingConfiguration());
     }
     return std::nullopt;
   }

@@ -44,9 +44,8 @@ auto countLaneChanges(
 // Longitudinal
 auto longitudinalDistance(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
-  bool include_adjacent_lanelet, bool include_opposite_direction,
-  const traffic_simulator::RoutingConfiguration & routing_configuration,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<double>;
+  const bool include_adjacent_lanelet, const bool include_opposite_direction,
+  const RoutingConfiguration & routing_configuration) -> std::optional<double>;
 
 // BoundingBox
 auto boundingBoxDistance(

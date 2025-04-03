@@ -294,9 +294,8 @@ auto relativeLaneletPose(
   /// @note here the s and offset are intentionally assigned independently, even if
   /// it is not possible to calculate one of them - it happens that one is sufficient
   if (
-    const auto longitudinal_distance = longitudinalDistance(
-      from, to, include_adjacent_lanelet, include_opposite_direction, routing_configuration,
-      hdmap_utils_ptr)) {
+    const auto longitudinal_distance = distance::longitudinalDistance(
+      from, to, include_adjacent_lanelet, include_opposite_direction, routing_configuration)) {
     position.s = longitudinal_distance.value();
   }
   if (const auto lateral_distance = distance::lateralDistance(from, to, routing_configuration)) {
@@ -347,9 +346,9 @@ auto isInLanelet(
     return true;
   } else {
     const auto start_lanelet_pose = helper::constructCanonicalizedLaneletPose(lanelet_id, 0.0, 0.0);
-    if (const auto distance_to_start_lanelet_pose = longitudinalDistance(
+    if (const auto distance_to_start_lanelet_pose = distance::longitudinalDistance(
           start_lanelet_pose, canonicalized_lanelet_pose, include_adjacent_lanelet,
-          include_opposite_direction, routing_configuration, hdmap_utils_ptr);
+          include_opposite_direction, routing_configuration);
         distance_to_start_lanelet_pose and
         std::abs(distance_to_start_lanelet_pose.value()) <= tolerance) {
       return true;
@@ -357,9 +356,9 @@ auto isInLanelet(
 
     const auto end_lanelet_pose = helper::constructCanonicalizedLaneletPose(
       lanelet_id, lanelet_wrapper::lanelet_map::laneletLength(lanelet_id), 0.0);
-    if (const auto distance_to_end_lanelet_pose = longitudinalDistance(
+    if (const auto distance_to_end_lanelet_pose = distance::longitudinalDistance(
           canonicalized_lanelet_pose, end_lanelet_pose, include_adjacent_lanelet,
-          include_opposite_direction, routing_configuration, hdmap_utils_ptr);
+          include_opposite_direction, routing_configuration);
         distance_to_end_lanelet_pose and
         std::abs(distance_to_end_lanelet_pose.value()) <= tolerance) {
       return true;
