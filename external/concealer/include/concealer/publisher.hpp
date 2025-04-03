@@ -16,6 +16,7 @@
 #define CONCEALER__PUBLISHER_HPP_
 
 #include <autoware_vehicle_msgs/msg/velocity_report.hpp>
+#include <geometry_msgs/msg/pose_with_covariance_stamped.hpp>
 #include <get_parameter/get_parameter.hpp>
 #include <nav_msgs/msg/odometry.hpp>
 #include <random>
@@ -126,6 +127,26 @@ struct NormalDistribution<autoware_vehicle_msgs::msg::VelocityReport> : public R
 
   auto operator()(autoware_vehicle_msgs::msg::VelocityReport velocity_report)
     -> autoware_vehicle_msgs::msg::VelocityReport;
+};
+
+template <>
+struct NormalDistribution<geometry_msgs::msg::PoseWithCovarianceStamped>
+: public NormalDistributionBase
+{
+  // clang-format off
+  NormalDistributionError<double> position_local_x_error,
+                                  position_local_y_error,
+                                  position_local_z_error,
+                                  orientation_r_error,
+                                  orientation_p_error,
+                                  orientation_y_error;
+  // clang-format on
+
+  explicit NormalDistribution(
+    const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr &, const std::string &);
+
+  auto operator()(geometry_msgs::msg::PoseWithCovarianceStamped pose)
+    -> geometry_msgs::msg::PoseWithCovarianceStamped;
 };
 
 template <typename Message, template <typename> typename Randomizer = Identity>
