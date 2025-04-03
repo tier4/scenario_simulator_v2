@@ -172,8 +172,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
       const auto non_canonicalized_updated_status =
         traffic_simulator::follow_trajectory::makeUpdatedStatus(
           static_cast<traffic_simulator::EntityStatus>(*status_), *polyline_trajectory_,
-          behavior_parameter_, hdmap_utils_ptr_, step_time,
-          getDefaultMatchingDistanceForLaneletPoseCalculation(),
+          behavior_parameter_, step_time, getDefaultMatchingDistanceForLaneletPoseCalculation(),
           target_speed_ ? target_speed_.value() : status_->getTwist().linear.x)) {
       // prefer current lanelet on ss2 side
       setStatus(non_canonicalized_updated_status.value(), status_->getLaneletIds());
