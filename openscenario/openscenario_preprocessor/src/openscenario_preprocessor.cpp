@@ -22,6 +22,10 @@ namespace openscenario_preprocessor
 {
 Preprocessor::Preprocessor(const rclcpp::NodeOptions & options)
 : rclcpp::Node("openscenario_preprocessor", options),
+  output_directory([this]() {
+    declare_parameter<std::string>("output_directory", "/tmp/openscenario_preprocessor");
+    return get_parameter("output_directory").as_string();
+  }()),
   load_server(create_service<openscenario_preprocessor_msgs::srv::Load>(
     "~/load",
     [this](
@@ -60,6 +64,13 @@ Preprocessor::Preprocessor(const rclcpp::NodeOptions & options)
       -> void {
       auto lock = std::lock_guard(preprocessed_scenarios_mutex);
       response->derivative_remained = not preprocessed_scenarios.empty();
+    })),
+  set_parameter_server(create_service<openscenario_preprocessor_msgs::srv::SetParameter>(
+    "~/set_parameter",
+    [this](
+      const openscenario_preprocessor_msgs::srv::SetParameter::Request::SharedPtr request,
+      openscenario_preprocessor_msgs::srv::SetParameter::Response::SharedPtr response) -> void {
+      override_parameters[request->name] = request->value;
     }))
 {
 }
@@ -102,8 +113,37 @@ void Preprocessor::preprocessScenario(ScenarioSet & scenario)
       std::cout << "base scenario is valid!" << std::endl;
 
     } else {
-      // normal scenario
-      preprocessed_scenarios.emplace_back(scenario);
+      auto parameter_declarations =
+        script->script.document_element()
+          .select_node(pugi::xpath_query{"/OpenSCENARIO/ParameterDeclarations"})
+          .node();
+      for (const auto & [name, value] : override_parameters) {
+        if (
+          auto parameter_node =
+            parameter_declarations.find_child_by_attribute("name", name.c_str())) {
+          parameter_node.attribute("value").set_value(value.c_str());
+        } else {
+          RCLCPP_WARN_STREAM(
+            get_logger(), "Parameter " << std::quoted(name) << " is not declared in scenario "
+                                       << std::quoted(scenario.path.string()) << ", so ignore it."
+                                       << std::endl);
+        }
+      }
+
+      boost::filesystem::create_directories(output_directory);
+
+      boost::filesystem::path preprocessed_scenario_path =
+        output_directory / scenario.path.filename();
+
+      if (script->script.save_file(preprocessed_scenario_path.c_str())) {
+        scenario.path = preprocessed_scenario_path;
+        preprocessed_scenarios.emplace_back(scenario);
+      } else {
+        std::stringstream what;
+        what << "Failed to save preprocessed scenario to " << preprocessed_scenario_path.string()
+             << ". Please check output directory. current output directory is " << output_directory;
+        throw common::Error(what.str());
+      }
     }
   } else {
     throw common::Error("the scenario file is not valid. Please check your scenario");
