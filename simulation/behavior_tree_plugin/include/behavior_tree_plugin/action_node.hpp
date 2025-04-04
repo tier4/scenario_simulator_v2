@@ -86,6 +86,7 @@ public:
       BT::InputPort<std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>>("canonicalized_entity_status"),
       BT::InputPort<std::shared_ptr<traffic_simulator::TrafficLightsBase>>("traffic_lights"),
       BT::InputPort<traffic_simulator::behavior::Request>("request"),
+      BT::InputPort<std::shared_ptr<DistancesMap>>("distances_map"),
       BT::OutputPort<std::optional<traffic_simulator_msgs::msg::Obstacle>>("obstacle"),
       BT::OutputPort<traffic_simulator_msgs::msg::WaypointsArray>("waypoints"),
       BT::OutputPort<traffic_simulator::behavior::Request>("request"),
@@ -116,6 +117,7 @@ protected:
   std::optional<double> target_speed;
   EntityStatusDict other_entity_status;
   lanelet::Ids route_lanelets;
+  std::shared_ptr<DistancesMap> distances_map;
 
   auto getDistanceToTargetEntity(
     const math::geometry::CatmullRomSplineInterface & spline,

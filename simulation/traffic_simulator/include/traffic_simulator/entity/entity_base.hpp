@@ -47,6 +47,7 @@ namespace traffic_simulator
 {
 namespace entity
 {
+using DistancesMap = std::unordered_map<std::pair<std::string, std::string>, double>;
 class EntityBase : public std::enable_shared_from_this<EntityBase>
 {
 public:
@@ -312,6 +313,8 @@ public:
 
   bool verbose;
 
+  void setDistances(const std::shared_ptr<DistancesMap> & distances);
+
 protected:
   std::shared_ptr<CanonicalizedEntityStatus> status_;
 
@@ -332,6 +335,8 @@ protected:
 
   std::unique_ptr<traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner>
     speed_planner_;
+
+  std::shared_ptr<DistancesMap> distances_map_;
 
 private:
   virtual auto requestSpeedChangeWithConstantAcceleration(

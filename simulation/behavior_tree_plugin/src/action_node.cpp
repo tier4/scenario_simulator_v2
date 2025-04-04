@@ -91,6 +91,9 @@ auto ActionNode::getBlackBoardValues() -> void
   if (!getInput<lanelet::Ids>("route_lanelets", route_lanelets)) {
     THROW_SIMULATION_ERROR("failed to get input route_lanelets in ActionNode");
   }
+  if (!getInput<std::shared_ptr<DistancesMap>>("distances_map", distances_map)) {
+    THROW_SIMULATION_ERROR("failed to get input distances_map in ActionNode");
+  }
 }
 
 auto ActionNode::getHorizon() const -> double
@@ -237,10 +240,21 @@ auto ActionNode::getDistanceToFrontEntity(
 auto ActionNode::getFrontEntityName(const math::geometry::CatmullRomSplineInterface & spline) const
   -> std::optional<std::string>
 {
-  std::vector<double> distances;
-  std::vector<std::string> entities;
-  for (const auto & [name, status] : other_entity_status) {
-    const auto distance = getDistanceToTargetEntity(spline, status);
+  if (distances_map == nullptr) {
+    return std::nullopt;
+  }
+  std::map<double, std::string> rough_distances;
+  for (const auto & [name_pair, distance] : *distances_map) {
+    if (
+      name_pair.first == canonicalized_entity_status->getName() && distance < spline.getLength()) {
+      rough_distances.emplace(distance, name_pair.second);
+    } else if (
+      name_pair.second == canonicalized_entity_status->getName() && distance < spline.getLength()) {
+      rough_distances.emplace(distance, name_pair.first);
+    }
+  }
+
+  for (const auto & [rough_distance, name] : rough_distances) {
     const auto quat = math::geometry::getRotation(
       canonicalized_entity_status->getMapPose().orientation,
       other_entity_status.at(name).getMapPose().orientation);
@@ -250,21 +264,14 @@ auto ActionNode::getFrontEntityName(const math::geometry::CatmullRomSplineInterf
     if (
       std::fabs(math::geometry::convertQuaternionToEulerAngle(quat).z) <=
       boost::math::constants::half_pi<double>()) {
-      if (distance && distance.value() < 40) {
-        entities.emplace_back(name);
-        distances.emplace_back(distance.value());
+      const auto distance = getDistanceToTargetEntity(spline, other_entity_status.at(name));
+
+      if (distance && distance.value() < spline.getLength()) {
+        return name;
       }
     }
   }
-  if (entities.size() != distances.size()) {
-    THROW_SIMULATION_ERROR("size of entities and distances vector does not match.");
-  }
-  if (distances.empty()) {
-    return std::nullopt;
-  }
-  std::vector<double>::iterator iter = std::min_element(distances.begin(), distances.end());
-  size_t index = std::distance(distances.begin(), iter);
-  return entities[index];
+  return std::nullopt;
 }
 
 auto ActionNode::getDistanceToTargetEntityOnCrosswalk(
