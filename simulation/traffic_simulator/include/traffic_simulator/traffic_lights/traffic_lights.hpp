@@ -91,6 +91,7 @@ private:
     const auto request = generateUpdateTrafficLightsRequest();
     publisher_ptr_->publish(now, request);
     legacy_topic_publisher_ptr_->publish(now, request);
+    v2i_info_publisher_ptr_->publish();
     if (isAnyTrafficLightChanged()) {
       marker_publisher_ptr_->deleteMarkers();
     }
