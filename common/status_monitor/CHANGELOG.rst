@@ -21,6 +21,15 @@ Changelog for package status_monitor
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+15.0.4 (2025-04-03)
+-------------------
+
+15.0.3 (2025-04-03)
+-------------------
+* Merge branch 'master' into feature/remove-trajectory-subscription
+* Merge remote-tracking branch 'tier4/master' into feature/remove-trajectory-subscription
+* Contributors: Mateusz Palczuk
+
 15.0.2 (2025-04-02)
 -------------------
 * Merge branch 'master' into dependabot/pip/jinja2-3.1.6
