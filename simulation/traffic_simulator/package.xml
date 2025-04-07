@@ -38,7 +38,6 @@
   <depend>tier4_debug_msgs</depend>
   <depend>autoware_perception_msgs</depend>
   <depend>autoware_map_msgs</depend>
-  <depend>tinyxml2_vendor</depend>
   <depend>pluginlib</depend>
   <depend>traffic_simulator_msgs</depend>
   <depend>visualization_msgs</depend>
