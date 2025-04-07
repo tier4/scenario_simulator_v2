@@ -44,7 +44,7 @@ public:
 
   std::optional<double> getCollisionPointIn2D(
     const std::vector<geometry_msgs::msg::Point> & polygon, const bool search_backward = false,
-    std::optional<std::pair<double, double>> s_part = std::nullopt) const override;
+    const std::optional<std::pair<double, double>> & s_range = std::nullopt) const override;
 
   auto getSquaredDistanceIn2D(const geometry_msgs::msg::Point & point, const double s) const
     -> double override;

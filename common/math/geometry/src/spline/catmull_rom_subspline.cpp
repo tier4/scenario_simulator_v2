@@ -25,7 +25,7 @@ double CatmullRomSubspline::getLength() const { return end_s_ - start_s_; }
 
 std::optional<double> CatmullRomSubspline::getCollisionPointIn2D(
   const std::vector<geometry_msgs::msg::Point> & polygon, const bool search_backward,
-  std::optional<std::pair<double, double>> s_part) const
+  const std::optional<std::pair<double, double>> & s_range) const
 {
   /// @note Make sure end is greater than start, otherwise the spline is invalid
   if (end_s_ < start_s_) {
@@ -38,7 +38,8 @@ std::optional<double> CatmullRomSubspline::getCollisionPointIn2D(
       "contact the developer of traffic_simulator.");
   }
 
-  std::set<double> s_value_candidates = spline_->getCollisionPointsIn2D(polygon, false, s_part);
+  std::set<double> s_value_candidates =
+    spline_->getCollisionPointsIn2D(polygon, search_backward, s_range);
 
   if (s_value_candidates.empty()) {
     return std::nullopt;

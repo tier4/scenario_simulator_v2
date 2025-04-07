@@ -280,7 +280,7 @@ auto CatmullRomSpline::getSInSplineCurve(const size_t curve_index, const double 
 
 auto CatmullRomSpline::getCollisionPointsIn2D(
   const std::vector<geometry_msgs::msg::Point> & polygon, const bool search_backward,
-  std::optional<std::pair<double, double>> s_part) const -> std::set<double>
+  const std::optional<std::pair<double, double>> & s_range) const -> std::set<double>
 {
   if (polygon.size() <= 1) {
     THROW_SIMULATION_ERROR(
@@ -290,23 +290,27 @@ auto CatmullRomSpline::getCollisionPointsIn2D(
       "developer of traffic_simulator.");
   }
   /// @note If the spline has three or more control points.
-  const auto get_collision_point_2d_with_curve =
-    [this, s_part](const auto & local_polygon, const auto local_search_backward) {
-      std::set<double> s_value_candidates;
-      double s_all = 0;
-      for (size_t i = 0; i < curves_.size(); ++i) {
-        if (s_part == std::nullopt || (s_all >= s_part->first && s_all <= s_part->second)) {
-          /// @note The local_polygon is assumed to be closed
-          const auto s =
-            curves_[i].getCollisionPointsIn2D(local_polygon, local_search_backward, true, true);
-          std::for_each(s.begin(), s.end(), [&s_value_candidates, i, this](const auto & s) {
-            s_value_candidates.insert(getSInSplineCurve(i, s));
+  const auto get_collision_point_2d_with_curve = [this, &s_range](
+                                                   const auto & local_polygon,
+                                                   const auto local_search_backward) {
+    std::set<double> s_value_candidates;
+    auto current_curve_start_s = 0.0;
+    for (size_t i = 0; i < curves_.size(); ++i) {
+      if (
+        s_range == std::nullopt ||
+        (current_curve_start_s >= s_range->first && current_curve_start_s <= s_range->second)) {
+        /// @note The local_polygon is assumed to be closed
+        const auto s =
+          curves_[i].getCollisionPointsIn2D(local_polygon, local_search_backward, true, true);
+        std::for_each(
+          s.begin(), s.end(), [&s_value_candidates, &current_curve_start_s, this](const auto & s) {
+            s_value_candidates.insert(current_curve_start_s + s);
           });
-        }
-        s_all += curves_[i].getLength();
       }
-      return s_value_candidates;
-    };
+      current_curve_start_s += curves_[i].getLength();
+    }
+    return s_value_candidates;
+  };
   /// @note If the spline has two control points. (Same as single line segment.)
   const auto get_collision_point_2d_with_line = [this](const auto & local_polygon) {
     std::set<double> s_value_candidates;
@@ -363,9 +367,9 @@ auto CatmullRomSpline::getCollisionPointsIn2D(
  */
 auto CatmullRomSpline::getCollisionPointIn2D(
   const std::vector<geometry_msgs::msg::Point> & polygon, const bool search_backward,
-  std::optional<std::pair<double, double>> s_part) const -> std::optional<double>
+  const std::optional<std::pair<double, double>> & s_range) const -> std::optional<double>
 {
-  std::set<double> s_value_candidates = getCollisionPointsIn2D(polygon, search_backward, s_part);
+  std::set<double> s_value_candidates = getCollisionPointsIn2D(polygon, search_backward, s_range);
   if (s_value_candidates.empty()) {
     return std::nullopt;
   }

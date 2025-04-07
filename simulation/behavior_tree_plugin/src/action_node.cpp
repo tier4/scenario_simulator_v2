@@ -336,19 +336,26 @@ auto ActionNode::getDistanceToTargetEntity(
       math::geometry::getPointsFromBbox(target_bounding_box));
     const auto bounding_box_diagonal_length =
       math::geometry::getDistance(bounding_box_map_points[0], bounding_box_map_points[2]);
-    if (const auto bounding_box_distances = traffic_simulator::distance::laneLongitudinalDistances(
-          *from_lanelet_pose, from_bounding_box, *target_lanelet_pose, target_bounding_box,
-          include_adjacent_lanelet, include_opposite_direction, routing_configuration, hdmap_utils);
-        !bounding_box_distances || bounding_box_distances.value().first < 0.0) {
+    if (const auto position_distance = traffic_simulator::distance::longitudinalDistance(
+          *from_lanelet_pose, *target_lanelet_pose, include_adjacent_lanelet,
+          include_opposite_direction, routing_configuration, hdmap_utils);
+        !position_distance) {
+      return std::nullopt;
+    } else if (const auto bounding_box_distance =
+                 traffic_simulator::distance::boundingBoxLaneLongitudinalDistance(
+                   position_distance, from_bounding_box, target_bounding_box);
+               !bounding_box_distance || bounding_box_distance.value() < 0.0) {
       return std::nullopt;
     } else {
+      // TODO rotation of NPC is not taken into account, same as in boundingBoxLaneLongitudinalDistance
+      // this should be considered to be changed in separate task in the future
       const auto target_bounding_box_distance =
-        bounding_box_distances.value().first + from_bounding_box.dimensions.x / 2.0;
+        bounding_box_distance.value() + from_bounding_box.dimensions.x / 2.0;
 
       /// @note if the distance of the target entity to the spline is smaller than the width of the reference entity
       if (const auto target_to_spline_distance = traffic_simulator::distance::distanceToSpline(
             static_cast<geometry_msgs::msg::Pose>(*target_lanelet_pose), target_bounding_box,
-            spline, bounding_box_distances.value().second);
+            spline, position_distance.value());
           target_to_spline_distance <= from_bounding_box.dimensions.y / 2.0) {
         return target_bounding_box_distance;
       }
@@ -358,8 +365,8 @@ auto ActionNode::getDistanceToTargetEntity(
                spline.getCollisionPointIn2D(
                  target_polygon, search_backward,
                  std::make_pair(
-                   bounding_box_distances.value().first,
-                   bounding_box_distances.value().first + bounding_box_diagonal_length))) {
+                   bounding_box_distance.value(),
+                   bounding_box_distance.value() + bounding_box_diagonal_length))) {
         return target_bounding_box_distance;
       }
     }
