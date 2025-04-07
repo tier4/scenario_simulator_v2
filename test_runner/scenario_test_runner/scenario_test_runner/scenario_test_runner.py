@@ -27,6 +27,7 @@ from lifecycle_controller import LifecycleController
 from openscenario_preprocessor_msgs.srv import CheckDerivativeRemained
 from openscenario_preprocessor_msgs.srv import Derive
 from openscenario_preprocessor_msgs.srv import Load
+from openscenario_preprocessor_msgs.srv import SetParameter
 from openscenario_utility.conversion import convert
 from pathlib import Path
 from rclpy.executors import ExternalShutdownException
@@ -111,10 +112,11 @@ class ScenarioTestRunner(LifecycleController):
                     os.remove(target)
         self.output_directory.mkdir(parents=True, exist_ok=True)
 
-        if len(override_parameters) > 0:
-            self.override_parameters = json.loads(override_parameters)
-        else:
-            self.override_parameters = None
+        self.set_parameters_preprocessor_client = self.create_client(SetParameter,
+                                                                     '/simulation/openscenario_preprocessor/set_parameter')
+
+        while not self.set_parameters_preprocessor_client.wait_for_service(timeout_sec=1.0):
+            self.get_logger().warn('/simulation/openscenario_preprocessor/set_parameter service not available, waiting again...')
 
         self.check_preprocessor_client = self.create_client(CheckDerivativeRemained,
                                                             '/simulation/openscenario_preprocessor/check')
@@ -132,6 +134,18 @@ class ScenarioTestRunner(LifecycleController):
             self.get_logger().warn('/simulation/openscenario_preprocessor/load service not available, waiting again...')
 
         self.print_debug('connection established with preprocessor')
+
+        if len(override_parameters) > 0:
+            for parameter_name, parameter_value in json.loads(override_parameters).items():
+                request = SetParameter.Request()
+                request.name = parameter_name
+                request.value = str(parameter_value)
+                future = self.set_parameters_preprocessor_client.call_async(request)
+                rclpy.spin_until_future_complete(self, future, timeout_sec=1.0)
+                if future.result() is None:
+                    self.print_debug('/simulation/openscenario_preprocessor/set_parameter: timeout')
+                    exit(1)
+
 
     def spin(self):
         """Run scenario."""
