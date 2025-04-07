@@ -21,6 +21,47 @@ Changelog for package traffic_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+15.0.5 (2025-04-04)
+-------------------
+* Merge branch 'master' into fix-turn-indicator-report
+* Merge branch 'master' into fix-turn-indicator-report
+* Contributors: Kem (TiankuiXian), Kotaro Yoshimoto
+
+15.0.4 (2025-04-03)
+-------------------
+
+15.0.3 (2025-04-03)
+-------------------
+* Merge pull request `#1555 <https://github.com/tier4/scenario_simulator_v2/issues/1555>`_ from tier4/feature/remove-trajectory-subscription
+  Remove Autoware trajectory subscription
+* Merge branch 'master' into feature/remove-trajectory-subscription
+* Fix spelling
+* Merge remote-tracking branch 'tier4/master' into feature/remove-trajectory-subscription
+* Remove Autoware trajectory subscription
+* Contributors: Mateusz Palczuk, Tatsuya Yamasaki
+
+15.0.2 (2025-04-02)
+-------------------
+* Merge branch 'master' into dependabot/pip/jinja2-3.1.6
+* Contributors: Masaya Kataoka
+
+15.0.1 (2025-04-02)
+-------------------
+* Merge branch 'master' into feature/support-context-gamma-test
+* Merge branch 'master' into feature/support-context-gamma-test
+* Contributors: Masaya Kataoka, Taiga
+
+15.0.0 (2025-03-31)
+-------------------
+* Merge pull request `#1551 <https://github.com/tier4/scenario_simulator_v2/issues/1551>`_ from tier4/refactor/get_lateral_distance
+  HdMapUtils refactor `lanelet_wrapper::distance::lateralDistance`
+* Merge branch 'master' into refactor/get_lateral_distance
+* Merge branch 'master' into refactor/get_lateral_distance
+* remove hdmap_utils from `boundingBoxLaneLateralDistance`
+* remove hdmap_utils from `lateralDistance` function
+* move `getLateralDistance` method
+* Contributors: Masaya Kataoka, Tatsuya Yamasaki, abco20
+
 14.2.3 (2025-03-28)
 -------------------
 * Merge pull request `#1549 <https://github.com/tier4/scenario_simulator_v2/issues/1549>`_ from tier4/refactor/concealer-7

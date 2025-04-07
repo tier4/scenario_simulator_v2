@@ -151,7 +151,6 @@ FieldOperatorApplication::FieldOperatorApplication(const pid_t pid)
 #if __has_include(<autoware_adapi_v1_msgs/msg/route_state.hpp>)
   getRouteState("/api/routing/state", rclcpp::QoS(1), *this),
 #endif
-  getTrajectory("/api/iv_msgs/planning/scenario_planning/trajectory", rclcpp::QoS(1), *this),
   getTurnIndicatorsCommand("/control/command/turn_indicators_cmd", rclcpp::QoS(1), *this),
   requestClearRoute("/api/routing/clear_route", *this),
   requestCooperateCommands("/api/external/set/rtc_commands", *this),
@@ -298,17 +297,6 @@ auto FieldOperatorApplication::engaged() const -> bool
 {
   task_queue.rethrow();
   return task_queue.empty() and getLegacyAutowareState().value == LegacyAutowareState::driving;
-}
-
-auto FieldOperatorApplication::getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray
-{
-  traffic_simulator_msgs::msg::WaypointsArray waypoints;
-
-  for (const auto & point : getTrajectory().points) {
-    waypoints.waypoints.emplace_back(point.pose.position);
-  }
-
-  return waypoints;
 }
 
 auto FieldOperatorApplication::initialize(const geometry_msgs::msg::Pose & initial_pose) -> void
