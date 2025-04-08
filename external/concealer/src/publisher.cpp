@@ -32,7 +32,7 @@ NormalDistributionBase::NormalDistributionBase(
         " and less than or equal to ", std::random_device::max());
     }
   }()),
-  engine(seed ? seed : device())
+  engine(seed ? seed : std::random_device{}())
 {
 }
 
