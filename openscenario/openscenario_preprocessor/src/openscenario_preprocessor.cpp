@@ -79,9 +79,6 @@ bool Preprocessor::validateXOSC(const boost::filesystem::path & file_name, bool 
 {
   auto result =
     concealer::dollar("ros2 run openscenario_utility validation.py " + file_name.string());
-  if (verbose) {
-    std::cout << "validate : " << result << std::endl;
-  }
   return result.find("All xosc files given are standard compliant.") != std::string::npos;
 }
 
@@ -93,10 +90,8 @@ void Preprocessor::preprocessScenario(ScenarioSet & scenario)
   if (validateXOSC(scenario.path)) {
     if (auto script = std::make_shared<OpenScenario>(scenario.path);
         script->category.is<ParameterValueDistribution>()) {
-      std::cout << "ParameterValueDistribution!!" << std::endl;
       auto base_scenario_path =
         script->category.as<ParameterValueDistribution>().scenario_file.filepath;
-      std::cout << "base_scenario_path : " << base_scenario_path << std::endl;
       if (boost::filesystem::exists(base_scenario_path)) {
         if (validateXOSC(base_scenario_path, true)) {
           // TODO : implement in feature/parameter_value_distribution branch
@@ -110,8 +105,6 @@ void Preprocessor::preprocessScenario(ScenarioSet & scenario)
       } else {
         throw common::Error("base scenario does not exist : " + base_scenario_path.string());
       }
-      std::cout << "base scenario is valid!" << std::endl;
-
     } else {
       auto parameter_declarations =
         script->script.document_element()
