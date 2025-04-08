@@ -157,7 +157,12 @@ auto EgoEntity::getCurrentPose() const -> const geometry_msgs::msg::Pose &
 
 auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray
 {
-  return FieldOperatorApplication::getWaypoints();
+  /**
+   * @note return empty array because this function is used for visualization
+   * Autoware's trajectory is already visualized in RViz
+   * there is no need to visualize it second time
+   */
+  return traffic_simulator_msgs::msg::WaypointsArray{};
 }
 
 auto EgoEntity::updateFieldOperatorApplication() -> void { spinSome(); }
