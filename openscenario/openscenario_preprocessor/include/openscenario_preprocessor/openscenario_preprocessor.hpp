@@ -60,8 +60,6 @@ private:
 
   [[nodiscard]] bool validateXOSC(const boost::filesystem::path &, bool);
 
-  boost::filesystem::path output_directory;
-
   rclcpp::Service<openscenario_preprocessor_msgs::srv::Load>::SharedPtr load_server;
 
   rclcpp::Service<openscenario_preprocessor_msgs::srv::Derive>::SharedPtr derive_server;

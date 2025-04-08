@@ -21,11 +21,7 @@
 namespace openscenario_preprocessor
 {
 Preprocessor::Preprocessor(const rclcpp::NodeOptions & options)
-: rclcpp::Node("openscenario_preprocessor", options),
-  output_directory([this]() {
-    declare_parameter<std::string>("output_directory", "/tmp/openscenario_preprocessor");
-    return get_parameter("output_directory").as_string();
-  }()),
+: rclcpp::Node("openscenario_preprocessor", options)
   load_server(create_service<openscenario_preprocessor_msgs::srv::Load>(
     "~/load",
     [this](
@@ -123,18 +119,19 @@ void Preprocessor::preprocessScenario(ScenarioSet & scenario)
         }
       }
 
-      boost::filesystem::create_directories(output_directory);
+      // move original scenario file to "raw" directory
+      auto raw_scenario_directory = scenario.path.parent_path() / "raw";
+      boost::filesystem::create_directories(raw_scenario_directory);
+      boost::filesystem::rename(scenario.path, raw_scenario_directory / scenario.path.filename());
 
-      boost::filesystem::path preprocessed_scenario_path =
-        output_directory / scenario.path.filename();
+      const auto & preprocessed_scenario_path = scenario.path;
 
       if (script->script.save_file(preprocessed_scenario_path.c_str())) {
         scenario.path = preprocessed_scenario_path;
         preprocessed_scenarios.emplace_back(scenario);
       } else {
         std::stringstream what;
-        what << "Failed to save preprocessed scenario to " << preprocessed_scenario_path.string()
-             << ". Please check output directory. current output directory is " << output_directory;
+        what << "Failed to save preprocessed scenario to " << preprocessed_scenario_path.string();
         throw common::Error(what.str());
       }
     }
