@@ -851,9 +851,9 @@ auto EntityBase::requestSynchronize(
   return false;
 }
 
-void EntityBase::setDistances(const std::shared_ptr<DistancesMap> & distances)
+void EntityBase::setEuclideanDistancesMap(const std::shared_ptr<EuclideanDistancesMap> & distances)
 {
-  distances_map_ = distances;
+  euclidean_distances_map_ = distances;
 }
 
 }  // namespace entity

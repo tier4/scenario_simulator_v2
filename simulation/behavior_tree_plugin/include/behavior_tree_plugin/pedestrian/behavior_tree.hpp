@@ -70,7 +70,7 @@ public:
   DEFINE_GETTER_SETTER(TrafficLights,                                    std::shared_ptr<traffic_simulator::TrafficLightsBase>)
   DEFINE_GETTER_SETTER(VehicleParameters,                                traffic_simulator_msgs::msg::VehicleParameters)
   DEFINE_GETTER_SETTER(Waypoints,                                        traffic_simulator_msgs::msg::WaypointsArray)
-  DEFINE_GETTER_SETTER(DistancesMap,                                     std::shared_ptr<DistancesMap>)
+  DEFINE_GETTER_SETTER(EuclideanDistancesMap,                            std::shared_ptr<EuclideanDistancesMap>)
   // clang-format on
 
 #undef DEFINE_GETTER_SETTER
