@@ -124,8 +124,6 @@ class ScenarioTestRunner(LifecycleController):
         while not self.load_preprocessor_client.wait_for_service(timeout_sec=1.0):
             self.get_logger().warn('/simulation/openscenario_preprocessor/load service not available, waiting again...')
 
-        self.print_debug('connection established with preprocessor')
-
     def spin(self):
         """Run scenario."""
         time.sleep(self.SLEEP_RATE)
@@ -158,20 +156,14 @@ class ScenarioTestRunner(LifecycleController):
                     if future.result() is not None:
                         result = Scenario(future.result().path,
                                           future.result().frame_rate)
-                        self.print_debug("derived : " + str(future.result().path))
                         preprocessed_scenarios.append(result)
                     else:
                         self.print_debug(
                             'Exception while calling service /simulation/openscenario_preprocessor/derive: '
                             + str(future.exception()))
                         exit(1)
-                self.print_debug('finish derivation')
-
-                for preprocessed_scenario in preprocessed_scenarios:
-                    self.print_debug(str(preprocessed_scenario.path))
 
                 self.run_preprocessed_scenarios(preprocessed_scenarios)
-                self.print_debug('finish execution')
             else:
                 exit(1)
 
@@ -243,8 +235,6 @@ class ScenarioTestRunner(LifecycleController):
         future = self.load_preprocessor_client.call_async(request)
         rclpy.spin_until_future_complete(self, future)
         if future.result() is not None:
-            self.print_debug('Result of /simulation/openscenario_preprocessor/load: '
-                             + str(future.result().message))
             return True
         else:
             self.print_debug('Exception while calling service /simulation/openscenario_preprocessor/load: '
@@ -256,8 +246,6 @@ class ScenarioTestRunner(LifecycleController):
         future = self.check_preprocessor_client.call_async(CheckDerivativeRemained.Request())
         rclpy.spin_until_future_complete(self, future, timeout_sec=1.0)
         if future.result() is not None:
-            self.print_debug('Result of /simulation/openscenario_preprocessor/check: '
-                             + str(future.result().derivative_remained))
             return future.result().derivative_remained
         else:
             self.print_debug('Exception while calling service /simulation/openscenario_preprocessor/check: '
