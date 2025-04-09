@@ -114,7 +114,7 @@ public:
     -> void
   {
     imu_sensors_.push_back(std::make_unique<ImuSensor<sensor_msgs::msg::Imu>>(
-      configuration, node.create_publisher<sensor_msgs::msg::Imu>("/sensing/imu/imu_data", 1)));
+      configuration, "/sensing/imu/imu_data", node));
   }
 
   auto updateSensorFrame(

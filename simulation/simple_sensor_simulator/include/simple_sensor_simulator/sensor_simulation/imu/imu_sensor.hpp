@@ -18,6 +18,7 @@
 #include <simulation_api_schema.pb.h>
 
 #include <array>
+#include <concealer/publisher.hpp>
 #include <geometry_msgs/msg/accel.hpp>
 #include <geometry_msgs/msg/twist.hpp>
 #include <random>
@@ -25,6 +26,30 @@
 #include <sensor_msgs/msg/imu.hpp>
 #include <simulation_interface/conversions.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
+
+namespace concealer
+{
+template <>
+struct NormalDistribution<sensor_msgs::msg::Imu> : public NormalDistributionBase
+{
+  // clang-format off
+  NormalDistributionError<double> orientation_r_error,
+                                  orientation_p_error,
+                                  orientation_y_error,
+                                  angular_velocity_x_error,
+                                  angular_velocity_y_error,
+                                  angular_velocity_z_error,
+                                  linear_acceleration_x_error,
+                                  linear_acceleration_y_error,
+                                  linear_acceleration_z_error;
+  // clang-format on
+
+  explicit NormalDistribution(
+    const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr &, const std::string &);
+
+  auto operator()(sensor_msgs::msg::Imu imu) -> sensor_msgs::msg::Imu;
+};
+}  // namespace concealer
 
 namespace simple_sensor_simulator
 {
@@ -40,9 +65,11 @@ public:
     noise_distribution_orientation_(0.0, noise_standard_deviation_orientation_),
     noise_distribution_twist_(0.0, noise_standard_deviation_twist_),
     noise_distribution_acceleration_(0.0, noise_standard_deviation_acceleration_),
-    orientation_covariance_(calculateCovariance(noise_standard_deviation_orientation_)),
-    angular_velocity_covariance_(calculateCovariance(noise_standard_deviation_twist_)),
-    linear_acceleration_covariance_(calculateCovariance(noise_standard_deviation_acceleration_))
+    orientation_covariance_(
+      calculateCovariance(std::pow(noise_standard_deviation_orientation_, 2))),
+    angular_velocity_covariance_(calculateCovariance(std::pow(noise_standard_deviation_twist_, 2))),
+    linear_acceleration_covariance_(
+      calculateCovariance(std::pow(noise_standard_deviation_acceleration_, 2)))
   {
   }
 
@@ -61,28 +88,86 @@ protected:
   mutable std::normal_distribution<> noise_distribution_orientation_;
   mutable std::normal_distribution<> noise_distribution_twist_;
   mutable std::normal_distribution<> noise_distribution_acceleration_;
-  const std::array<double, 9> orientation_covariance_;
-  const std::array<double, 9> angular_velocity_covariance_;
-  const std::array<double, 9> linear_acceleration_covariance_;
+  std::array<double, 9> orientation_covariance_;
+  std::array<double, 9> angular_velocity_covariance_;
+  std::array<double, 9> linear_acceleration_covariance_;
 
-  auto calculateCovariance(const double stddev) const -> std::array<double, 9>
+  static auto calculateCovariance(
+    const double variance0, const double variance1, const double variance2) -> std::array<double, 9>
   {
-    return {std::pow(stddev, 2), 0, 0, 0, std::pow(stddev, 2), 0, 0, 0, std::pow(stddev, 2)};
+    return {
+      // clang-format off
+      variance0, 0.0,       0.0,
+      0.0,       variance1, 0.0,
+      0.0,       0.0,       variance2
+      // clang-format on
+    };
   };
+
+  static auto calculateCovariance(const double variance) -> std::array<double, 9>
+  {
+    return calculateCovariance(variance, variance, variance);
+  }
 };
 
 template <typename MessageType>
 class ImuSensor : public ImuSensorBase
 {
 public:
+  template <typename NodeType>
   explicit ImuSensor(
-    const simulation_api_schema::ImuSensorConfiguration & configuration,
-    const typename rclcpp::Publisher<MessageType>::SharedPtr & publisher)
+    const simulation_api_schema::ImuSensorConfiguration & configuration, const std::string & topic,
+    NodeType & node)
   : ImuSensorBase(configuration),
     entity_name_(configuration.entity()),
     frame_id_(configuration.frame_id()),
-    publisher_(publisher)
+    publish(topic, node)
   {
+    /**
+     * @note Calculate covariance matrices based on some nominal values
+     * These values have no technical reason, they are an educated guess of what is reasonable
+     */
+    constexpr double nominal_angle{M_PI_4};
+    // clang-format off
+    orientation_covariance_ = calculateCovariance(
+      calculateVariance(nominal_angle,
+        publish.getRandomizer().orientation_r_error.multiplicative.stddev(),
+        publish.getRandomizer().orientation_r_error.additive.stddev()),
+      calculateVariance(nominal_angle,
+        publish.getRandomizer().orientation_p_error.multiplicative.stddev(),
+        publish.getRandomizer().orientation_p_error.additive.stddev()),
+      calculateVariance(nominal_angle,
+        publish.getRandomizer().orientation_y_error.multiplicative.stddev(),
+        publish.getRandomizer().orientation_y_error.additive.stddev()));
+    // clang-format on
+
+    constexpr double nominal_velocity{5.0};
+    // clang-format off
+    angular_velocity_covariance_ = calculateCovariance(
+      calculateVariance(nominal_velocity,
+        publish.getRandomizer().angular_velocity_x_error.multiplicative.stddev(),
+        publish.getRandomizer().angular_velocity_x_error.additive.stddev()),
+      calculateVariance(nominal_velocity,
+        publish.getRandomizer().angular_velocity_y_error.multiplicative.stddev(),
+        publish.getRandomizer().angular_velocity_y_error.additive.stddev()),
+      calculateVariance(nominal_velocity,
+        publish.getRandomizer().angular_velocity_z_error.multiplicative.stddev(),
+        publish.getRandomizer().angular_velocity_z_error.additive.stddev()));
+    // clang-format on
+
+    constexpr double nominal_acceleration{0.5};
+    // clang-format off
+    linear_acceleration_covariance_ = calculateCovariance(
+      calculateVariance(nominal_acceleration,
+        publish.getRandomizer().linear_acceleration_x_error.multiplicative.stddev(),
+        publish.getRandomizer().linear_acceleration_x_error.additive.stddev()),
+      calculateVariance(nominal_acceleration,
+        publish.getRandomizer().linear_acceleration_y_error.multiplicative.stddev(),
+        publish.getRandomizer().linear_acceleration_y_error.additive.stddev()),
+      calculateVariance(nominal_acceleration,
+        publish.getRandomizer().linear_acceleration_z_error.multiplicative.stddev(),
+        publish.getRandomizer().linear_acceleration_z_error.additive.stddev()));
+    // clang-format on
   }
 
   auto update(
@@ -93,7 +178,7 @@ public:
       if (status.name() == entity_name_) {
         traffic_simulator_msgs::msg::EntityStatus status_msg;
         simulation_interface::toMsg(status, status_msg);
-        publisher_->publish(generateMessage(current_ros_time, status_msg));
+        publish(generateMessage(current_ros_time, status_msg));
         return true;
       }
     }
@@ -105,9 +190,17 @@ private:
     const rclcpp::Time & current_ros_time,
     const traffic_simulator_msgs::msg::EntityStatus & status) const -> const MessageType;
 
+  static auto calculateVariance(
+    const double nominal_value, const double multiplicative_stddev, const double additive_stddev)
+    -> double
+  {
+    return std::pow(nominal_value, 2) * std::pow(multiplicative_stddev, 2) +
+           std::pow(additive_stddev, 2);
+  }
+
   const std::string entity_name_;
   const std::string frame_id_;
-  const typename rclcpp::Publisher<MessageType>::SharedPtr publisher_;
+  const concealer::Publisher<MessageType, concealer::NormalDistribution> publish;
 };
 }  // namespace simple_sensor_simulator
 #endif  // SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__IMU_SENSOR_HPP_
