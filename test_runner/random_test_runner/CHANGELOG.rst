@@ -21,6 +21,13 @@ Changelog for package random_test_runner
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+15.0.6 (2025-04-09)
+-------------------
+* Merge pull request `#1564 <https://github.com/tier4/scenario_simulator_v2/issues/1564>`_ from tier4/HansRobo-patch-2
+  fix: add workaround to avoid build CI fail due to tinyxml2
+* fix: move workaround
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka
+
 15.0.5 (2025-04-04)
 -------------------
 * Merge branch 'master' into fix-turn-indicator-report
