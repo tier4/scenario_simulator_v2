@@ -16,10 +16,55 @@
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2/LinearMath/Transform.h>
 
+// #include <Eigen/Geometry>
 #include <algorithm>
 #include <geometry/quaternion/euler_to_quaternion.hpp>
 #include <geometry/quaternion/quaternion_to_euler.hpp>
 #include <simple_sensor_simulator/sensor_simulation/imu/imu_sensor.hpp>
+
+namespace concealer
+{
+NormalDistribution<sensor_msgs::msg::Imu>::NormalDistribution(
+  const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node,
+  const std::string & topic)
+: NormalDistributionBase(node, topic),
+  // clang-format off
+  orientation_r_error(        node, topic + ".sensor_msgs::msg::Imu.orientation.r.error"),
+  orientation_p_error(        node, topic + ".sensor_msgs::msg::Imu.orientation.p.error"),
+  orientation_y_error(        node, topic + ".sensor_msgs::msg::Imu.orientation.y.error"),
+  angular_velocity_x_error(   node, topic + ".sensor_msgs::msg::Imu.angular_velocity.x.error"),
+  angular_velocity_y_error(   node, topic + ".sensor_msgs::msg::Imu.angular_velocity.y.error"),
+  angular_velocity_z_error(   node, topic + ".sensor_msgs::msg::Imu.angular_velocity.z.error"),
+  linear_acceleration_x_error(node, topic + ".sensor_msgs::msg::Imu.linear_acceleration.x.error"),
+  linear_acceleration_y_error(node, topic + ".sensor_msgs::msg::Imu.linear_acceleration.y.error"),
+  linear_acceleration_z_error(node, topic + ".sensor_msgs::msg::Imu.linear_acceleration.z.error")
+// clang-format on
+{
+}
+
+auto NormalDistribution<sensor_msgs::msg::Imu>::operator()(sensor_msgs::msg::Imu imu)
+  -> sensor_msgs::msg::Imu
+{
+  imu.orientation = math::geometry::convertEulerAngleToQuaternion([this, &imu] {
+    auto rpy = math::geometry::convertQuaternionToEulerAngle(imu.orientation);
+
+    rpy.x = orientation_r_error.apply(engine, rpy.x);
+    rpy.y = orientation_p_error.apply(engine, rpy.y);
+    rpy.z = orientation_y_error.apply(engine, rpy.z);
+    return rpy;
+  }());
+
+  imu.angular_velocity.x = angular_velocity_x_error.apply(engine, imu.angular_velocity.x);
+  imu.angular_velocity.y = angular_velocity_y_error.apply(engine, imu.angular_velocity.y);
+  imu.angular_velocity.z = angular_velocity_z_error.apply(engine, imu.angular_velocity.z);
+
+  imu.linear_acceleration.x = linear_acceleration_x_error.apply(engine, imu.linear_acceleration.x);
+  imu.linear_acceleration.y = linear_acceleration_y_error.apply(engine, imu.linear_acceleration.y);
+  imu.linear_acceleration.z = linear_acceleration_z_error.apply(engine, imu.linear_acceleration.z);
+
+  return imu;
+}
+}  // namespace concealer
 
 namespace simple_sensor_simulator
 {
@@ -28,12 +73,14 @@ auto ImuSensor<sensor_msgs::msg::Imu>::generateMessage(
   const rclcpp::Time & current_ros_time,
   const traffic_simulator_msgs::msg::EntityStatus & status) const -> const sensor_msgs::msg::Imu
 {
+  /*
   const auto applyNoise =
     [&](geometry_msgs::msg::Vector3 & v, std::normal_distribution<> & distribution) {
       v.x += distribution(random_generator_);
       v.y += distribution(random_generator_);
       v.z += distribution(random_generator_);
     };
+  */
 
   auto imu_msg = sensor_msgs::msg::Imu();
   imu_msg.header.stamp = current_ros_time;
@@ -43,6 +90,7 @@ auto ImuSensor<sensor_msgs::msg::Imu>::generateMessage(
   auto twist = status.action_status.twist;
   auto accel = status.action_status.accel;
 
+  /*
   // Apply noise
   if (noise_standard_deviation_orientation_ > 0.0) {
     applyNoise(orientation_rpy, noise_distribution_orientation_);
@@ -53,6 +101,7 @@ auto ImuSensor<sensor_msgs::msg::Imu>::generateMessage(
   if (noise_standard_deviation_acceleration_ > 0.0) {
     applyNoise(accel.linear, noise_distribution_acceleration_);
   }
+  */
 
   // Apply gravity
   if (add_gravity_) {
