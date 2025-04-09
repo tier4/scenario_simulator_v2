@@ -36,18 +36,16 @@ from scenario import Scenario
 from scenario import substitute_ros_package
 
 
-def convert_scenarios_to_xosc(scenarios: List[Scenario], output_directory: Path):
+def convert_scenario_to_xosc(scenario: Scenario, output_directory: Path):
 
     result = []
 
-    for each in scenarios:
+    if scenario.path.suffix == ".xosc":
+        result.append(scenario)
 
-        if each.path.suffix == ".xosc":
-            result.append(each)
-
-        else:  # == '.yaml' or == '.yml'
-            for path in convert(each.path, output_directory / each.path.stem, False):
-                result.append(Scenario(path, each.frame_rate))
+    else:  # == '.yaml' or == '.yml'
+        for path in convert(scenario.path, output_directory / scenario.path.stem, False):
+            result.append(Scenario(path, scenario.frame_rate))
 
     return result
 
@@ -140,10 +138,10 @@ class ScenarioTestRunner(LifecycleController):
                 else:
                     time.sleep(self.SLEEP_RATE)
 
-    def run_scenarios(self, scenarios: List[Scenario]):
+    def run_scenario(self, scenario: Scenario):
 
         # convert t4v2/xosc to xosc
-        xosc_scenarios = convert_scenarios_to_xosc(scenarios, self.output_directory)
+        xosc_scenarios = convert_scenario_to_xosc(scenario, self.output_directory)
 
         # post to preprocessor
         for xosc_scenario in xosc_scenarios:
@@ -285,11 +283,11 @@ def main(args=None):
     )
 
     if args.scenario != Path("/dev/null"):
-        test_runner.run_scenarios(
-            [Scenario(
+        test_runner.run_scenario(
+            Scenario(
                 substitute_ros_package(args.scenario).resolve(),
                 args.global_frame_rate,
-            )]
+            )
         )
     else:
         print("No scenario is specified. Specify one.")
