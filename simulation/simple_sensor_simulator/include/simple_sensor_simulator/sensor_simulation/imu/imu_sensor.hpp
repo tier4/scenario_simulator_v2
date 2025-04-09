@@ -47,6 +47,8 @@ struct NormalDistribution<sensor_msgs::msg::Imu> : public NormalDistributionBase
   explicit NormalDistribution(
     const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr &, const std::string &);
 
+  auto deactivate() -> void;
+
   auto operator()(sensor_msgs::msg::Imu imu) -> sensor_msgs::msg::Imu;
 };
 }  // namespace concealer
@@ -119,10 +121,21 @@ public:
     const simulation_api_schema::ImuSensorConfiguration & configuration, const std::string & topic,
     NodeType & node)
   : ImuSensorBase(configuration),
+    override_legacy_configuration_(common::getParameter<bool>(
+      node.get_node_parameters_interface(), topic + ".override_legacy_configuration", false)),
     entity_name_(configuration.entity()),
     frame_id_(configuration.frame_id()),
     publish(topic, node)
   {
+    /**
+     * @note By default publisher randomization will be active, so we need to deactivate it
+     * If legacy is not overriden we don't want to recalculate covariance matrices, so return early
+     */
+    if (not override_legacy_configuration_) {
+      publish.getMutableRandomizer().deactivate();
+      return;
+    }
+
     /**
      * @note Calculate covariance matrices based on some nominal values
      * These values have no technical reason, they are an educated guess of what is reasonable
@@ -198,6 +211,7 @@ private:
            std::pow(additive_stddev, 2);
   }
 
+  const bool override_legacy_configuration_;
   const std::string entity_name_;
   const std::string frame_id_;
   const concealer::Publisher<MessageType, concealer::NormalDistribution> publish;

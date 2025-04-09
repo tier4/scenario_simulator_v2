@@ -48,6 +48,9 @@ struct NormalDistributionError
       std::is_same<std::decay_t<ValueType>, long double> >,
     "Unsupported error type");
 
+  /// @note set this to false to disable randomization
+  bool active{true};
+
   std::normal_distribution<ValueType> additive, multiplicative;
 
   explicit NormalDistributionError(
@@ -64,9 +67,13 @@ struct NormalDistributionError
   {
   }
 
-  auto apply(std::mt19937_64 & engine, const ValueType value) -> decltype(auto)
+  auto apply(std::mt19937_64 & engine, const ValueType value) -> ValueType
   {
-    return value * (multiplicative(engine) + static_cast<ValueType>(1)) + additive(engine);
+    if (active) {
+      return value * (multiplicative(engine) + static_cast<ValueType>(1)) + additive(engine);
+    } else {
+      return value;
+    }
   }
 };
 
@@ -180,6 +187,7 @@ public:
   }
 
   auto getRandomizer() const noexcept -> const Randomizer<Message> & { return randomize; }
+  auto getMutableRandomizer() const noexcept -> Randomizer<Message> & { return randomize; }
 };
 }  // namespace concealer
 

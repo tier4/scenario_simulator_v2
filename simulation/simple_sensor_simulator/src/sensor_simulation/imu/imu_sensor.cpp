@@ -42,6 +42,19 @@ NormalDistribution<sensor_msgs::msg::Imu>::NormalDistribution(
 {
 }
 
+auto NormalDistribution<sensor_msgs::msg::Imu>::deactivate() -> void
+{
+  orientation_r_error.active = false;
+  orientation_p_error.active = false;
+  orientation_y_error.active = false;
+  angular_velocity_x_error.active = false;
+  angular_velocity_y_error.active = false;
+  angular_velocity_z_error.active = false;
+  linear_acceleration_x_error.active = false;
+  linear_acceleration_y_error.active = false;
+  linear_acceleration_z_error.active = false;
+}
+
 auto NormalDistribution<sensor_msgs::msg::Imu>::operator()(sensor_msgs::msg::Imu imu)
   -> sensor_msgs::msg::Imu
 {
@@ -73,14 +86,12 @@ auto ImuSensor<sensor_msgs::msg::Imu>::generateMessage(
   const rclcpp::Time & current_ros_time,
   const traffic_simulator_msgs::msg::EntityStatus & status) const -> const sensor_msgs::msg::Imu
 {
-  /*
   const auto applyNoise =
     [&](geometry_msgs::msg::Vector3 & v, std::normal_distribution<> & distribution) {
       v.x += distribution(random_generator_);
       v.y += distribution(random_generator_);
       v.z += distribution(random_generator_);
     };
-  */
 
   auto imu_msg = sensor_msgs::msg::Imu();
   imu_msg.header.stamp = current_ros_time;
@@ -90,18 +101,18 @@ auto ImuSensor<sensor_msgs::msg::Imu>::generateMessage(
   auto twist = status.action_status.twist;
   auto accel = status.action_status.accel;
 
-  /*
-  // Apply noise
-  if (noise_standard_deviation_orientation_ > 0.0) {
-    applyNoise(orientation_rpy, noise_distribution_orientation_);
+  if (not override_legacy_configuration_) {
+    // Apply noise
+    if (noise_standard_deviation_orientation_ > 0.0) {
+      applyNoise(orientation_rpy, noise_distribution_orientation_);
+    }
+    if (noise_standard_deviation_twist_ > 0.0) {
+      applyNoise(twist.angular, noise_distribution_twist_);
+    }
+    if (noise_standard_deviation_acceleration_ > 0.0) {
+      applyNoise(accel.linear, noise_distribution_acceleration_);
+    }
   }
-  if (noise_standard_deviation_twist_ > 0.0) {
-    applyNoise(twist.angular, noise_distribution_twist_);
-  }
-  if (noise_standard_deviation_acceleration_ > 0.0) {
-    applyNoise(accel.linear, noise_distribution_acceleration_);
-  }
-  */
 
   // Apply gravity
   if (add_gravity_) {
