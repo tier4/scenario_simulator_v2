@@ -54,7 +54,7 @@ StopAtCrossingEntityAction::calculateObstacle(const traffic_simulator_msgs::msg:
 
 const traffic_simulator_msgs::msg::WaypointsArray StopAtCrossingEntityAction::calculateWaypoints()
 {
-  if (!canonicalized_entity_status->laneMatchingSucceed()) {
+  if (!canonicalized_entity_status->isInLanelet()) {
     THROW_SIMULATION_ERROR("failed to assign lane");
   }
   if (canonicalized_entity_status->getTwist().linear.x >= 0) {
@@ -92,7 +92,7 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
     in_stop_sequence_ = false;
     return BT::NodeStatus::FAILURE;
   }
-  if (!canonicalized_entity_status->laneMatchingSucceed()) {
+  if (!canonicalized_entity_status->isInLanelet()) {
     in_stop_sequence_ = false;
     return BT::NodeStatus::FAILURE;
   }
@@ -112,7 +112,8 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
     return BT::NodeStatus::FAILURE;
   }
   distance_to_stop_target_ = getDistanceToConflictingEntity(route_lanelets, *trajectory);
-  auto distance_to_stopline = hdmap_utils->getDistanceToStopLine(route_lanelets, *trajectory);
+  auto distance_to_stopline =
+    traffic_simulator::distance::distanceToStopLine(route_lanelets, *trajectory);
   const auto distance_to_front_entity = getDistanceToFrontEntity(*trajectory);
   if (!distance_to_stop_target_) {
     in_stop_sequence_ = false;

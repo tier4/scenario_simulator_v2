@@ -69,6 +69,7 @@ def on_stdout_output(event: launch.Event) -> None:
         if lines[0] == "cpp_scenario:success":
             print(Color.GREEN + "Scenario Succeed" + Color.END)
 
+
 def architecture_types():
     return ["awf/universe/20230906", "awf/universe/20240605"]
 
@@ -94,8 +95,10 @@ def default_autoware_launch_file_of(architecture_type):
         "awf/universe/20240605": "planning_simulator.launch.xml",
     }[architecture_type]
 
+
 def default_rviz_config_file():
     return Path(get_package_share_directory("traffic_simulator")) / "config/scenario_simulator_v2.rviz"
+
 
 def launch_setup(context, *args, **kwargs):
     # fmt: off
@@ -112,6 +115,7 @@ def launch_setup(context, *args, **kwargs):
     launch_rviz                         = LaunchConfiguration("launch_rviz",                            default=False)
     launch_simple_sensor_simulator      = LaunchConfiguration("launch_simple_sensor_simulator",         default=True)
     output_directory                    = LaunchConfiguration("output_directory",                       default=Path("/tmp"))
+    parameter_file_path                 = LaunchConfiguration("parameter_file_path",                    default=Path(get_package_share_directory("scenario_test_runner")) / "config/parameters.yaml")
     port                                = LaunchConfiguration("port",                                   default=5555)
     publish_empty_context               = LaunchConfiguration("publish_empty_context",                  default=False)
     record                              = LaunchConfiguration("record",                                 default=False)
@@ -119,6 +123,7 @@ def launch_setup(context, *args, **kwargs):
     scenario                            = LaunchConfiguration("scenario",                               default=Path("/dev/null"))
     sensor_model                        = LaunchConfiguration("sensor_model",                           default="")
     sigterm_timeout                     = LaunchConfiguration("sigterm_timeout",                        default=8)
+    simulate_localization               = LaunchConfiguration("simulate_localization",                  default=True)
     use_sim_time                        = LaunchConfiguration("use_sim_time",                           default=False)
     vehicle_model                       = LaunchConfiguration("vehicle_model",                          default="")
     scenario_package                    = LaunchConfiguration("package",                                default="cpp_mock_scenarios")
@@ -137,6 +142,7 @@ def launch_setup(context, *args, **kwargs):
     print(f"launch_autoware                     := {launch_autoware.perform(context)}")
     print(f"launch_rviz                         := {launch_rviz.perform(context)}")
     print(f"output_directory                    := {output_directory.perform(context)}")
+    print(f"parameter_file_path                 := {parameter_file_path.perform(context)}")
     print(f"port                                := {port.perform(context)}")
     print(f"publish_empty_context               := {publish_empty_context.perform(context)}")
     print(f"record                              := {record.perform(context)}")
@@ -144,6 +150,7 @@ def launch_setup(context, *args, **kwargs):
     print(f"scenario                            := {scenario.perform(context)}")
     print(f"sensor_model                        := {sensor_model.perform(context)}")
     print(f"sigterm_timeout                     := {sigterm_timeout.perform(context)}")
+    print(f"simulate_localization               := {simulate_localization.perform(context)}")
     print(f"use_sim_time                        := {use_sim_time.perform(context)}")
     print(f"vehicle_model                       := {vehicle_model.perform(context)}")
     print(f"scenario_package                    := {scenario_package.perform(context)}")
@@ -159,11 +166,12 @@ def launch_setup(context, *args, **kwargs):
             {"initialize_duration": initialize_duration},
             {"launch_autoware": launch_autoware},
             {"port": port},
-            {"publish_empty_context" : publish_empty_context},
+            {"publish_empty_context": publish_empty_context},
             {"record": record},
             {"rviz_config": rviz_config},
             {"sensor_model": sensor_model},
             {"sigterm_timeout": sigterm_timeout},
+            {"simulate_localization": simulate_localization},
             {"vehicle_model": vehicle_model},
             {"global_real_time_factor": global_real_time_factor},
             {"global_frame_rate": global_frame_rate},
@@ -171,6 +179,7 @@ def launch_setup(context, *args, **kwargs):
             {"junit_path": junit_path},
         ]
         parameters += make_vehicle_parameters()
+        parameters += [parameter_file_path.perform(context)]
         return parameters
 
     def make_vehicle_parameters():
@@ -187,13 +196,13 @@ def launch_setup(context, *args, **kwargs):
         return parameters
 
     cpp_scenario_node = Node(
-            package=scenario_package,
-            executable=scenario,
-            name="scenario_node",
-            output="screen",
-            arguments=[("__log_level:=info")],
-            parameters=make_parameters() + [{"use_sim_time": use_sim_time}],
-            )
+        package=scenario_package,
+        executable=scenario,
+        name="scenario_node",
+        output="screen",
+        arguments=[("__log_level:=info")],
+        parameters=make_parameters() + [{"use_sim_time": use_sim_time}],
+    )
     io_handler = OnProcessIO(
         target_action=cpp_scenario_node,
         on_stderr=on_stderr_output,
@@ -215,12 +224,14 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("global_timeout",                      default_value=global_timeout                     ),
         DeclareLaunchArgument("launch_autoware",                     default_value=launch_autoware                    ),
         DeclareLaunchArgument("launch_rviz",                         default_value=launch_rviz                        ),
+        DeclareLaunchArgument("parameter_file_path",                 default_value=parameter_file_path                ),
         DeclareLaunchArgument("publish_empty_context",               default_value=publish_empty_context              ),
         DeclareLaunchArgument("output_directory",                    default_value=output_directory                   ),
         DeclareLaunchArgument("rviz_config",                         default_value=rviz_config                        ),
         DeclareLaunchArgument("scenario",                            default_value=scenario                           ),
         DeclareLaunchArgument("sensor_model",                        default_value=sensor_model                       ),
         DeclareLaunchArgument("sigterm_timeout",                     default_value=sigterm_timeout                    ),
+        DeclareLaunchArgument("simulate_localization",               default_value=simulate_localization              ),
         DeclareLaunchArgument("use_sim_time",                        default_value=use_sim_time                       ),
         DeclareLaunchArgument("vehicle_model",                       default_value=vehicle_model                      ),
         DeclareLaunchArgument("scenario_package",                    default_value=scenario_package                   ),
@@ -241,6 +252,7 @@ def launch_setup(context, *args, **kwargs):
             namespace="simulation",
             name="visualizer",
             output="screen",
+            remappings=[("/simulation/entity/status", "/entity/status")],
         ),
         Node(
             package="rviz2",
@@ -249,10 +261,15 @@ def launch_setup(context, *args, **kwargs):
             output={"stderr": "log", "stdout": "log"},
             condition=IfCondition(launch_rviz),
             arguments=["-d", str(default_rviz_config_file())],
+            remappings=[
+                ("/simulation/lanelet/marker", "/lanelet/marker"),
+                ("/simulation/debug_marker", "/debug_marker"),
+            ],
         ),
         RegisterEventHandler(event_handler=io_handler),
         RegisterEventHandler(event_handler=shutdown_handler),
     ]
+
 
 def generate_launch_description():
     return LaunchDescription([OpaqueFunction(function=launch_setup)])

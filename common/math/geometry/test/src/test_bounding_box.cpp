@@ -19,6 +19,7 @@
 #include <scenario_simulator_exception/exception.hpp>
 
 #include "expect_eq_macros.hpp"
+#include "geometry/distance.hpp"
 #include "test_utils.hpp"
 
 TEST(BoundingBox, getPointsFromBboxDefault)
@@ -83,7 +84,8 @@ TEST(BoundingBox, toPolygon2D_onlyTranslation)
 }
 
 /**
- * @note Test obtaining polygon from bounding box with full transformation applied (translation + rotation).
+ * @note Test obtaining polygon from bounding box with full transformation applied (translation +
+ * rotation).
  */
 TEST(BoundingBox, toPolygon2D_fullPose)
 {
@@ -133,6 +135,65 @@ TEST(BoundingBox, getPolygonDistanceWithoutCollision)
   const auto ans = math::geometry::getPolygonDistance(pose0, bbox0, pose1, bbox1);
   EXPECT_TRUE(ans);
   EXPECT_DOUBLE_EQ(ans.value(), 3.0);
+}
+
+TEST(BoundingBox, getClosestPoses)
+{
+  traffic_simulator_msgs::msg::BoundingBox bbox = makeBbox(1.0, 1.0, 1.0);
+  geometry_msgs::msg::Pose pose0;
+  geometry_msgs::msg::Pose pose1 = makePose(5.0, 5.0);
+
+  {
+    const auto actual = math::geometry::getClosestPoses(pose0, bbox, pose1, bbox);
+    ASSERT_TRUE(actual);
+
+    geometry_msgs::msg::Pose expected_pose0 = makePose(0.5, 0.5);
+    geometry_msgs::msg::Pose expected_pose1 = makePose(4.5, 4.5);
+    EXPECT_POSE_EQ(actual.value().first, expected_pose1);
+    EXPECT_POSE_EQ(actual.value().second, expected_pose0);
+  }
+
+  {  // reverse order
+    const auto actual = math::geometry::getClosestPoses(pose1, bbox, pose0, bbox);
+    ASSERT_TRUE(actual);
+
+    geometry_msgs::msg::Pose expected_pose0 = makePose(0.5, 0.5);
+    geometry_msgs::msg::Pose expected_pose1 = makePose(4.5, 4.5);
+    EXPECT_POSE_EQ(actual.value().first, expected_pose0);
+    EXPECT_POSE_EQ(actual.value().second, expected_pose1);
+  }
+}
+
+TEST(BoundingBox, getClosestPosesWithAlmostTouch)
+{
+  traffic_simulator_msgs::msg::BoundingBox bbox0 = makeBbox(1.0, 1.0, 1.0);
+  geometry_msgs::msg::Pose pose0;
+  traffic_simulator_msgs::msg::BoundingBox bbox1 = makeBbox(1.0, 10.0, 1.0);
+  geometry_msgs::msg::Pose pose1 = makePose(1.1, 0.0);
+
+  {
+    const auto actual = math::geometry::getClosestPoses(pose0, bbox0, pose1, bbox1);
+    ASSERT_TRUE(actual);
+    const auto distance = math::geometry::getDistance(actual.value().first, actual.value().second);
+    EXPECT_NEAR(distance, 0.1, 0.0001);
+  }
+
+  {  // reverse order
+    const auto actual = math::geometry::getClosestPoses(pose1, bbox1, pose0, bbox0);
+    ASSERT_TRUE(actual);
+    const auto distance = math::geometry::getDistance(actual.value().first, actual.value().second);
+    EXPECT_NEAR(distance, 0.1, 0.0001);
+  }
+}
+
+TEST(BoundingBox, getClosestPosesWithIntersection)
+{
+  traffic_simulator_msgs::msg::BoundingBox bbox = makeBbox(1.0, 1.0, 1.0);
+  geometry_msgs::msg::Pose pose0;
+  geometry_msgs::msg::Pose pose1 = makePose(0.6, 0.6);
+
+  const auto actual = math::geometry::getClosestPoses(pose0, bbox, pose1, bbox);
+  ASSERT_FALSE(actual);
 }
 
 int main(int argc, char ** argv)

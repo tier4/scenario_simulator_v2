@@ -21,7 +21,9 @@
 #include <boost/range/iterator_range.hpp>
 #include <iomanip>
 #include <scenario_simulator_exception/exception.hpp>
+#include <set>
 #include <string>
+#include <traffic_simulator/utils/lanelet_map.hpp>
 
 namespace traffic_simulator
 {
@@ -31,17 +33,17 @@ struct Configuration
 
   using Pathname = boost::filesystem::path;
 
-  bool auto_sink = true;
-
   bool verbose = false;
-
-  bool standalone_mode = false;
 
   std::string simulator_host = "localhost";
 
-  double conventional_traffic_light_publish_rate = 30.0;
+  const bool standalone_mode = false;
 
-  double v2i_traffic_light_publish_rate = 10.0;
+  const double conventional_traffic_light_publish_rate = 30.0;
+
+  const double v2i_traffic_light_publish_rate = 10.0;
+
+  const std::set<std::uint8_t> auto_sink_entity_types;
 
   /* ---- NOTE -----------------------------------------------------------------
    *
@@ -58,17 +60,34 @@ struct Configuration
    * ------------------------------------------------------------------------ */
   const Pathname map_path;
 
-  Filename lanelet2_map_file;
+  const Filename lanelet2_map_file;
 
-  Filename pointcloud_map_file;
+  const Filename pointcloud_map_file;
 
-  Pathname scenario_path = "";
+  const Pathname scenario_path;
 
-  explicit Configuration(const Pathname & map_path)  //
-  : map_path(assertMapPath(map_path)),
+  explicit Configuration(
+    const Pathname & map_path, const Pathname & scenario_path,
+    const std::set<std::uint8_t> & auto_sink_entity_types = {})
+  : auto_sink_entity_types(auto_sink_entity_types),
+    map_path(assertMapPath(map_path)),
     lanelet2_map_file(findLexicographicallyFirstFilenameOf(map_path, ".osm")),
-    pointcloud_map_file(findLexicographicallyFirstFilenameOf(map_path, ".pcd"))
+    pointcloud_map_file(findLexicographicallyFirstFilenameOf(map_path, ".pcd")),
+    scenario_path(scenario_path)
   {
+    traffic_simulator::lanelet_map::activate(lanelet2_map_path().string());
+  }
+
+  explicit Configuration(
+    const Pathname & map_path, const Filename & lanelet2_map_file, const Pathname & scenario_path,
+    const std::set<std::uint8_t> & auto_sink_entity_types = {})
+  : auto_sink_entity_types(auto_sink_entity_types),
+    map_path(assertMapPath(map_path)),
+    lanelet2_map_file(lanelet2_map_file),
+    pointcloud_map_file(findLexicographicallyFirstFilenameOf(map_path, ".pcd")),
+    scenario_path(scenario_path)
+  {
+    traffic_simulator::lanelet_map::activate(lanelet2_map_path().string());
   }
 
   auto assertMapPath(const Pathname & map_path) const -> const Pathname &
@@ -130,9 +149,12 @@ struct Configuration
     }
   }
 
-  auto lanelet2_map_path() const { return map_path / lanelet2_map_file; }
+  auto lanelet2_map_path() const -> boost::filesystem::path { return map_path / lanelet2_map_file; }
 
-  auto pointcloud_map_path() const { return map_path / pointcloud_map_file; }
+  auto pointcloud_map_path() const -> boost::filesystem::path
+  {
+    return map_path / pointcloud_map_file;
+  }
 };
 }  // namespace traffic_simulator
 

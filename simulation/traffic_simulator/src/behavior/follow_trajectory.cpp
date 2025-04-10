@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #include <arithmetic/floating_point/comparison.hpp>
-#include <geometry/quaternion/euler_to_quaternion.hpp>
+#include <geometry/quaternion/direction_to_quaternion.hpp>
 #include <geometry/quaternion/get_rotation.hpp>
 #include <geometry/quaternion/quaternion_to_euler.hpp>
 #include <geometry/vector3/hypot.hpp>
@@ -26,6 +26,7 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/behavior/follow_trajectory.hpp>
 #include <traffic_simulator/behavior/follow_waypoint_controller.hpp>
+#include <traffic_simulator/utils/pose.hpp>
 
 namespace traffic_simulator
 {
@@ -66,16 +67,31 @@ auto makeUpdatedStatus(
   using math::geometry::normalize;
   using math::geometry::truncate;
 
+  const auto include_crosswalk = [](const auto & entity_type) {
+    return (traffic_simulator_msgs::msg::EntityType::PEDESTRIAN == entity_type.type) ||
+           (traffic_simulator_msgs::msg::EntityType::MISC_OBJECT == entity_type.type);
+  }(entity_status.type);
+
   auto distance_along_lanelet =
     [&](const geometry_msgs::msg::Point & from, const geometry_msgs::msg::Point & to) -> double {
-    if (const auto from_lanelet_pose =
-          hdmap_utils->toLaneletPose(from, entity_status.bounding_box, false, matching_distance);
+    const auto quaternion = math::geometry::convertDirectionToQuaternion(
+      geometry_msgs::build<geometry_msgs::msg::Vector3>()
+        .x(to.x - from.x)
+        .y(to.y - from.y)
+        .z(to.z - from.z));
+    const auto from_pose =
+      geometry_msgs::build<geometry_msgs::msg::Pose>().position(from).orientation(quaternion);
+    const auto to_pose =
+      geometry_msgs::build<geometry_msgs::msg::Pose>().position(to).orientation(quaternion);
+    if (const auto from_lanelet_pose = pose::toCanonicalizedLaneletPose(
+          from_pose, entity_status.bounding_box, false, matching_distance);
         from_lanelet_pose) {
-      if (const auto to_lanelet_pose =
-            hdmap_utils->toLaneletPose(to, entity_status.bounding_box, false, matching_distance);
+      if (const auto to_lanelet_pose = pose::toCanonicalizedLaneletPose(
+            to_pose, entity_status.bounding_box, false, matching_distance);
           to_lanelet_pose) {
         if (const auto distance = hdmap_utils->getLongitudinalDistance(
-              from_lanelet_pose.value(), to_lanelet_pose.value());
+              static_cast<LaneletPose>(from_lanelet_pose.value()),
+              static_cast<LaneletPose>(to_lanelet_pose.value()));
             distance) {
           return distance.value();
         }
@@ -357,7 +373,7 @@ auto makeUpdatedStatus(
                  if (polyline_trajectory.dynamic_constraints_ignorable) {
                    const auto dx = target_position.x - position.x;
                    const auto dy = target_position.y - position.y;
-                   // if entity is on lane use pitch from lanelet, otherwise use pitch on target
+                   /// @note if entity is on lane use pitch from lanelet, otherwise use pitch on target
                    const auto pitch =
                      entity_status.lanelet_pose_valid
                        ? -math::geometry::convertQuaternionToEulerAngle(
@@ -499,24 +515,18 @@ auto makeUpdatedStatus(
     }
 
     if (std::isnan(remaining_time_to_front_waypoint)) {
-      /*
-        If the nearest waypoint is arrived at in this step without a specific arrival time, it will
-        be considered as achieved
-      */
+      /// @note If the nearest waypoint is arrived at in this step without a specific arrival time, it will
+      /// be considered as achieved
       if (std::isinf(remaining_time) && polyline_trajectory.shape.vertices.size() == 1) {
-        /*
-          If the trajectory has only waypoints with unspecified time, the last one is followed using
-          maximum speed including braking - in this case accuracy of arrival is checked
-        */
+        /// @note If the trajectory has only waypoints with unspecified time, the last one is followed using
+        /// maximum speed including braking - in this case accuracy of arrival is checked
         if (follow_waypoint_controller.areConditionsOfArrivalMet(
               acceleration, speed, distance_to_front_waypoint)) {
           return discard_the_front_waypoint_and_recurse();
         }
       } else {
-        /*
-          If it is an intermediate waypoint with an unspecified time, the accuracy of the arrival is
-          irrelevant
-        */
+        /// @note If it is an intermediate waypoint with an unspecified time, the accuracy of the arrival is
+        /// irrelevant
         if (auto this_step_distance = (speed + desired_acceleration * step_time) * step_time;
             this_step_distance > distance_to_front_waypoint) {
           return discard_the_front_waypoint_and_recurse();
@@ -556,18 +566,32 @@ auto makeUpdatedStatus(
 
     updated_status.pose.orientation = [&]() {
       if (desired_velocity.y == 0 && desired_velocity.x == 0 && desired_velocity.z == 0) {
-        // do not change orientation if there is no designed_velocity vector
+        /// @note Do not change orientation if there is no designed_velocity vector
         return entity_status.pose.orientation;
       } else {
-        // if there is a designed_velocity vector, set the orientation in the direction of it
-        const geometry_msgs::msg::Vector3 direction =
-          geometry_msgs::build<geometry_msgs::msg::Vector3>()
-            .x(0.0)
-            .y(std::atan2(-desired_velocity.z, std::hypot(desired_velocity.x, desired_velocity.y)))
-            .z(std::atan2(desired_velocity.y, desired_velocity.x));
-        return math::geometry::convertEulerAngleToQuaternion(direction);
+        /// @note if there is a designed_velocity vector, set the orientation in the direction of it
+        return math::geometry::convertDirectionToQuaternion(desired_velocity);
       }
     }();
+
+    /// @note If it is the transition between lanelets: overwrite position to improve precision
+    if (entity_status.lanelet_pose_valid) {
+      constexpr bool desired_velocity_is_global{true};
+      const auto canonicalized_lanelet_pose =
+        traffic_simulator::pose::toCanonicalizedLaneletPose(entity_status.lanelet_pose);
+      const auto estimated_next_canonicalized_lanelet_pose =
+        traffic_simulator::pose::toCanonicalizedLaneletPose(updated_status.pose, include_crosswalk);
+      if (canonicalized_lanelet_pose && estimated_next_canonicalized_lanelet_pose) {
+        const auto next_lanelet_id =
+          static_cast<LaneletPose>(estimated_next_canonicalized_lanelet_pose.value()).lanelet_id;
+        if (  /// @note Handle lanelet transition
+          const auto updated_position = pose::updatePositionForLaneletTransition(
+            canonicalized_lanelet_pose.value(), next_lanelet_id, desired_velocity,
+            desired_velocity_is_global, step_time)) {
+          updated_status.pose.position = updated_position.value();
+        }
+      }
+    }
 
     updated_status.action_status.twist.linear.x = norm(desired_velocity);
 

@@ -22,15 +22,17 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- ParameterValueDistributionDefinition 1.2 ------------------------------
- *
- * <xsd:group name="ParameterValueDistributionDefinition">
- *   <xsd:sequence>
- *     <xsd:element name="ParameterValueDistribution" type="ParameterValueDistribution"/>
- *   </xsd:sequence>
- * </xsd:group>
- *
- * -------------------------------------------------------------------------- */
+/*
+   ParameterValueDistributionDefinition (OpenSCENARIO XML 1.3.1)
+
+   A marker stating that the OpenSCENARIO file is a parameter value distribution.
+
+   <xsd:group name="ParameterValueDistributionDefinition">
+     <xsd:sequence>
+       <xsd:element name="ParameterValueDistribution" type="ParameterValueDistribution"/>
+     </xsd:sequence>
+   </xsd:group>
+*/
 struct ParameterValueDistributionDefinition : public ParameterValueDistribution
 {
   explicit ParameterValueDistributionDefinition(const pugi::xml_node &, Scope &);

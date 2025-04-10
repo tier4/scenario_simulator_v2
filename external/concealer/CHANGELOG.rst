@@ -21,6 +21,723 @@ Changelog for package concealer
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+15.0.6 (2025-04-09)
+-------------------
+
+15.0.5 (2025-04-04)
+-------------------
+* Merge pull request `#1558 <https://github.com/tier4/scenario_simulator_v2/issues/1558>`_ from tier4/fix-turn-indicator-report
+  fix: a small bug about turn indicator
+* Merge branch 'master' into fix-turn-indicator-report
+* Merge branch 'master' into fix-turn-indicator-report
+* fix a small bug about turn indicator
+* Contributors: Kem (TiankuiXian), Kotaro Yoshimoto, xtk8532704
+
+15.0.4 (2025-04-03)
+-------------------
+
+15.0.3 (2025-04-03)
+-------------------
+* Merge pull request `#1555 <https://github.com/tier4/scenario_simulator_v2/issues/1555>`_ from tier4/feature/remove-trajectory-subscription
+  Remove Autoware trajectory subscription
+* Merge branch 'master' into feature/remove-trajectory-subscription
+* Merge remote-tracking branch 'tier4/master' into feature/remove-trajectory-subscription
+* Remove Autoware trajectory subscription
+* Contributors: Mateusz Palczuk, Tatsuya Yamasaki
+
+15.0.2 (2025-04-02)
+-------------------
+* Merge branch 'master' into dependabot/pip/jinja2-3.1.6
+* Contributors: Masaya Kataoka
+
+15.0.1 (2025-04-02)
+-------------------
+* Merge branch 'master' into feature/support-context-gamma-test
+* Merge branch 'master' into feature/support-context-gamma-test
+* Contributors: Masaya Kataoka, Taiga
+
+15.0.0 (2025-03-31)
+-------------------
+* Merge branch 'master' into refactor/get_lateral_distance
+* Merge branch 'master' into refactor/get_lateral_distance
+* Contributors: Tatsuya Yamasaki
+
+14.2.3 (2025-03-28)
+-------------------
+* Merge pull request `#1549 <https://github.com/tier4/scenario_simulator_v2/issues/1549>`_ from tier4/refactor/concealer-7
+  Refactor/concealer 7
+* Merge branch 'master' into refactor/concealer-7
+* Add a link to the code referenced for `LegacyAutowareState` construction in comment
+* Merge branch 'master' into refactor/concealer-7
+* Merge branch 'master' into refactor/concealer-7
+* Add missing `__has_include`
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-7
+* Fix `LegacyAutowareState` to correctly transition from `arrived_goal` to `waiting_for_route`
+* Update `initialize`, `plan`, and `engage` to take into account AutowareState
+* Add message conversion constructor to `LegacyAutowareState`
+* Add new struct `LegacyAutowareState`
+* Merge remote-tracking branch 'origin/refactor/concealer-6' into refactor/concealer-7
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-7
+* Update interpreter to call `engage` only once immediately after evaluating `Storyboard.Init`
+* Remove data member `concealer::FieldOperatorApplication::autoware_state`
+* Add new member function `FieldOperatorApplication::state`
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+14.2.2 (2025-03-27)
+-------------------
+* Merge branch 'master' into RJD-1057/unify-spawn
+* Merge branch 'master' into RJD-1057/unify-spawn
+* Merge branch 'master' into RJD-1057/unify-spawn
+* Merge branch 'RJD1057/change-order-of-members' into RJD-1057/unify-spawn
+* Contributors: Kotaro Yoshimoto, f0reachARR, ぐるぐる
+
+14.2.1 (2025-03-27)
+-------------------
+* Merge remote-tracking branch 'origin/master' into RJD-1057/no-specific-param-in-manager
+* Contributors: f0reachARR
+
+14.2.0 (2025-03-26)
+-------------------
+* Merge branch 'master' into refactor/lanelet_wrapper_traffic_lights
+* Merge branch 'master' into refactor/lanelet_wrapper_traffic_lights
+* Merge branch 'master' into refactor/lanelet_wrapper_traffic_lights
+* Contributors: Masaya Kataoka, Tatsuya Yamasaki
+
+14.1.0 (2025-03-25)
+-------------------
+* Merge branch 'master' into feature/revival_getStopLineIds
+* Contributors: Taiga
+
+14.0.3 (2025-03-24)
+-------------------
+* Merge pull request `#1547 <https://github.com/tier4/scenario_simulator_v2/issues/1547>`_ from tier4/refactor/concealer-6
+  Refactor/concealer 6
+* Rename data member `Service<T>::rate` to `interval`
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-6
+* Merge branch 'master' into refactor/concealer-6
+* Fix several service calls that contained unintended returns
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-6
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-6
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-6
+* Cleanup class template `Service`
+* Update service calls to not be called inside `waitForAutowareStateToBe`
+* Remove local function `receive` from `concealer::Service::operator ()`
+* Cleanup local function `receive`
+* Move complex internal branches into a local function `receive`
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+14.0.2 (2025-03-19)
+-------------------
+* Merge remote-tracking branch 'origin/master' into RJD1057/change-order-of-members
+* Merge branch 'master' into RJD1057/change-order-of-members
+* Merge branch 'master' into RJD1057/change-order-of-members
+* Merge branch 'master' into RJD1057/change-order-of-members
+* Merge branch 'master' into RJD1057/change-order-of-members
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, f0reachARR, ぐるぐる
+
+14.0.1 (2025-03-18)
+-------------------
+* Merge branch 'master' into feature/support-internal-repository
+* Merge branch 'master' into feature/support-internal-repository
+* Merge branch 'master' into feature/support-internal-repository
+* Contributors: Masaya Kataoka, Taiga
+
+14.0.0 (2025-03-14)
+-------------------
+* Merge pull request `#1546 <https://github.com/tier4/scenario_simulator_v2/issues/1546>`_ from tier4/refactor/concealer-5
+  Refactor/concealer 5
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-5
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-5
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-5
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-5
+* Replace miscellaneous `get_parameter` calls with `common::getParameter`
+* Remove free function `concealer::getParameter`
+* Contributors: Masaya Kataoka, yamacir-kit
+
+13.0.0 (2025-03-14)
+-------------------
+* Merge branch 'master' into refactor/lanelet_wrapper_distance_to_stop_line
+* Merge branch 'master' into refactor/lanelet_wrapper_distance_to_stop_line
+* Merge branch 'master' into refactor/lanelet_wrapper_distance_to_stop_line
+* Merge branch 'master' into refactor/lanelet_wrapper_distance_to_stop_line
+* Merge branch 'master' into refactor/lanelet_wrapper_distance_to_stop_line
+* Contributors: Tatsuya Yamasaki
+
+12.3.2 (2025-03-13)
+-------------------
+* Merge branch 'master' into feature/faster-template-instantiation
+* Merge remote-tracking branch 'origin/master' into feature/faster-template-instantiation
+* Merge remote-tracking branch 'origin/master' into feature/faster-template-instantiation
+* Merge remote-tracking branch 'origin/master' into feature/faster-template-instantiation
+* Merge branch 'master' into feature/faster-template-instantiation
+* Merge remote-tracking branch 'origin/master' into feature/faster-template-instantiation
+* Merge remote-tracking branch 'origin/master' into feature/faster-template-instantiation
+* Contributors: Shota Minami, Tatsuya Yamasaki
+
+12.3.1 (2025-03-13)
+-------------------
+
+12.3.0 (2025-03-12)
+-------------------
+* Merge branch 'master' into metrics_output
+* Merge branch 'master' into metrics_output
+* Merge branch 'master' into metrics_output
+* Merge remote-tracking branch 'origin/master' into metrics_output
+* Merge branch 'master' into metrics_output
+* Merge branch 'master' into metrics_output
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
+12.2.1 (2025-03-11)
+-------------------
+* Merge pull request `#1534 <https://github.com/tier4/scenario_simulator_v2/issues/1534>`_ from tier4/refactor/concealer-4
+  Refactor/concealer 4
+* Merge branch 'master' into refactor/concealer-4
+* Merge branch 'master' into refactor/concealer-4
+* Merge branch 'master' into refactor/concealer-4
+* Merge branch 'master' into refactor/concealer-4
+* Remove data member `Interpreter::engaged\_`
+* Remove data member `concealer::TaskQueue::is_thrown`
+* Remove data member `Interpreter::waiting_for_engagement_to_be_completed`
+* Remove data member `FieldOperatorApplication::is_autoware_exited`
+* Lipsticks
+* Remove struct template `TransitionAssertion`
+* Cleanup struct template `concealer::TransitionAssertion`
+* Remove macro `DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE`
+* Remove member function `FieldOperatorApplication::rethrow`
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki, yamacir-kit
+
+12.2.0 (2025-03-10)
+-------------------
+* Merge branch 'master' into feat/add_new_vehicle_model
+* Merge branch 'master' into feat/add_new_vehicle_model
+* Merge branch 'master' into feat/add_new_vehicle_model
+* Merge branch 'master' into feat/add_new_vehicle_model
+* Merge branch 'master' into feat/add_new_vehicle_model
+* Contributors: Tatsuya Yamasaki
+
+12.1.2 (2025-03-07)
+-------------------
+* Merge pull request `#1542 <https://github.com/tier4/scenario_simulator_v2/issues/1542>`_ from tier4/xtk/loc-noise-exp
+  feat: disable the localization noises when ego speed is slow
+* Merge branch 'master' into xtk/loc-noise-exp
+* Replace early-return with if-else
+* remove unused space.
+* configurize the speed_threshold
+* remove the noises when ego stop.
+* Contributors: Tatsuya Yamasaki, t4-adc, yamacir-kit
+
+12.1.1 (2025-03-07)
+-------------------
+
+12.1.0 (2025-03-05)
+-------------------
+* Merge pull request `#1532 <https://github.com/tier4/scenario_simulator_v2/issues/1532>`_ from tier4/feature/simple_sensor_simulator/new-noise-model
+  Feature/simple sensor simulator/new noise model
+* Merge branch 'master' into feature/simple_sensor_simulator/new-noise-model
+* Lipsticks
+* Merge branch 'master' into feature/simple_sensor_simulator/new-noise-model
+* Merge remote-tracking branch 'origin/master' into feature/simple_sensor_simulator/new-noise-model
+* Add parameters for new noise model
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki, yamacir-kit
+
+12.0.2 (2025-03-04)
+-------------------
+* Merge branch 'master' into RJD-1057/reorgnize-ostream-helper
+* Contributors: ぐるぐる
+
+12.0.1 (2025-02-26)
+-------------------
+* Merge branch 'master' into feature/push-latest-docker-tag
+* Contributors: Masaya Kataoka
+
+12.0.0 (2025-02-25)
+-------------------
+* Merge branch 'master' into refactor/lanelet_wrapper_bound
+* Merge branch 'master' into refactor/lanelet_wrapper_bound
+* Contributors: Tatsuya Yamasaki
+
+11.1.0 (2025-02-21)
+-------------------
+* Merge branch 'master' into feature/execution_time
+* Merge remote-tracking branch 'origin/master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
+11.0.0 (2025-02-20)
+-------------------
+* Merge branch 'master' into refactor/lanelet_wrapper_route
+* Contributors: Tatsuya Yamasaki
+
+10.3.3 (2025-02-18)
+-------------------
+* Merge branch 'master' into refactor/simple_sensor_simulator/noise
+* Merge branch 'master' into refactor/simple_sensor_simulator/noise
+* Merge branch 'master' into refactor/simple_sensor_simulator/noise
+* Merge branch 'master' into refactor/simple_sensor_simulator/noise
+* Merge remote-tracking branch 'origin/master' into refactor/simple_sensor_simulator/noise
+* Merge branch 'master' into refactor/simple_sensor_simulator/noise
+* Merge branch 'master' into refactor/simple_sensor_simulator/noise
+* Merge branch 'master' into refactor/simple_sensor_simulator/noise
+* Merge branch 'master' into refactor/simple_sensor_simulator/noise
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+10.3.2 (2025-02-17)
+-------------------
+
+10.3.1 (2025-02-17)
+-------------------
+* Merge branch 'master' into fix/use-capital-as
+* Contributors: Kotaro Yoshimoto
+
+10.3.0 (2025-02-14)
+-------------------
+* Merge pull request `#1503 <https://github.com/tier4/scenario_simulator_v2/issues/1503>`_ from tier4/feature/publisher-with-customizable-randomizer
+  Feature/publisher with customizable randomizer
+* Merge branch 'master' into feature/publisher-with-customizable-randomizer
+* Merge branch 'master' into feature/publisher-with-customizable-randomizer
+* Update test `normal_distribution.cpp` to use `ASSERT_DOUBLE_EQ`
+* Merge branch 'master' into feature/publisher-with-customizable-randomizer
+* Merge branch 'master' into feature/publisher-with-customizable-randomizer
+* Merge branch 'master' into feature/publisher-with-customizable-randomizer
+* Add new test file `concealer/test/normal_distribution.cpp`
+* Merge remote-tracking branch 'origin/master' into feature/publisher-with-customizable-randomizer
+* Merge branch 'master' into feature/publisher-with-customizable-randomizer
+* Merge branch 'master' into feature/publisher-with-customizable-randomizer
+* Merge branch 'master' into feature/publisher-with-customizable-randomizer
+* Rename the parameter `(x|y|z)` to `local\_(x|y|z)`
+* Update the position error to apply in the entity's local coordinate
+* Merge branch 'master' into feature/publisher-with-customizable-randomizer
+* Cleanup
+* Add support for multiplicative errors as well as additive errors
+* Update `NormalDistribution<Odometry>` to use `std::normal_distribution`
+* Update `NormalDistribution<Odometry>::device` type to `std::mt19937_64`
+* Merge remote-tracking branch 'origin/master' into feature/publisher-with-customizable-randomizer
+* Merge remote-tracking branch 'origin/master' into feature/publisher-with-customizable-randomizer
+* Update parameter file format
+* Update randomizer to receive `NodeParametersInterface`
+* Add new struct template `Identity`
+* Add template specialization `NormalDistribution<nav_msgs::msg::Odometry>`
+* Add new struct template `concealer::NormalDistribution`
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+10.2.0 (2025-02-14)
+-------------------
+* Merge branch 'master' into feature/rosbag_storage
+* Merge branch 'master' into feature/rosbag_storage
+* Merge branch 'master' into feature/rosbag_storage
+* Contributors: Kotaro Yoshimoto
+
+10.1.2 (2025-02-14)
+-------------------
+
+10.1.1 (2025-02-13)
+-------------------
+* Merge branch 'master' into doc/comment_about_respawn_ego
+* Contributors: Masaya Kataoka
+
+10.1.0 (2025-02-12)
+-------------------
+* Merge branch 'master' into fix/respawn-ego-test
+* Contributors: Kotaro Yoshimoto
+
+10.0.0 (2025-02-07)
+-------------------
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-middle-get-entity
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-middle-get-entity
+* Merge remote-tracking branch 'tier4/master' into RJD-1057-remove-functions-forwarded-to-entity-base-middle-get-entity
+* Merge branch 'RJD-1057-remove-functions-forwarded-to-entity-base-middle' into RJD-1057-remove-functions-forwarded-to-entity-base-middle-get-entity
+* Merge branch 'RJD-1057-remove-functions-forwarded-to-entity-base-middle' into RJD-1057-remove-functions-forwarded-to-entity-base-middle-get-entity
+* Merge remote-tracking branch 'tier4/RJD-1057-remove-functions-forwarded-to-entity-base-middle' into RJD-1057-remove-functions-forwarded-to-entity-base-middle-get-entity
+* Merge branch 'RJD-1057-remove-functions-forwarded-to-entity-base-middle' into RJD-1057-remove-functions-forwarded-to-entity-base-middle-get-entity
+* Contributors: Dawid Moszyński, Mateusz Palczuk
+
+9.4.0 (2025-02-06)
+------------------
+* Merge pull request `#1518 <https://github.com/tier4/scenario_simulator_v2/issues/1518>`_ from tier4/feature/support-latest-autoware-message-type
+  Support message type `autoware_internal_planning_msgs::msg::PathWithLaneId`
+* Merge branch 'master' into feature/support-latest-autoware-message-type
+* Merge branch 'master' into feature/support-latest-autoware-message-type
+* Add new constant `concealer::default_architecture_type`
+* Merge remote-tracking branch 'origin/master' into feature/support-latest-autoware-message-type
+* Update function template `available<T>` to prepare its own node
+* Update the concealer node to use global arguments
+* Add new architecture-type `awf/universe/20250130`
+* Merge branch 'master' into feature/support-latest-autoware-message-type
+* Update `Subscriber` to handle multiple message types with priorities
+* Support message type `autoware_internal_planning_msgs::msg::PathWithLaneId`
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+9.3.1 (2025-02-06)
+------------------
+* Merge branch 'master' into chore/delete-target-branch-filter
+* Contributors: Masaya Kataoka
+
+9.3.0 (2025-02-05)
+------------------
+* Merge remote-tracking branch 'origin/master' into feature/docker/traffic_simulator
+* Contributors: Masaya Kataoka
+
+9.2.0 (2025-02-05)
+------------------
+* Merge branch 'master' into fix/slope_inaccuracies
+* Merge branch 'master' into fix/slope_inaccuracies
+* Merge branch 'master' into fix/slope_inaccuracies
+* Merge branch 'master' into fix/slope_inaccuracies
+* Merge branch 'master' into fix/slope_inaccuracies
+* Merge branch 'master' into fix/slope_inaccuracies
+* Merge branch 'master' into fix/slope_inaccuracies
+* Merge branch 'master' into fix/slope_inaccuracies
+* Merge branch 'master' into fix/slope_inaccuracies
+* Merge branch 'master' into fix/slope_inaccuracies
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto, SzymonParapura
+
+9.1.0 (2025-02-04)
+------------------
+* Merge branch 'master' into RJD-1489/NpcCenterLine
+* Merge branch 'master' into RJD-1489/NpcCenterLine
+* Merge branch 'master' into RJD-1489/NpcCenterLine
+* Merge branch 'master' into RJD-1489/NpcCenterLine
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into RJD-1489/NpcCenterLine
+* Merge branch 'master' into RJD-1489/NpcCenterLine
+* Merge branch 'master' into RJD-1489/NpcCenterLine
+* Merge branch 'master' into RJD-1489/NpcCenterLine
+* Merge branch 'master' into RJD-1489/NpcCenterLine
+* Contributors: Dawid Moszyński, Grzegorz Maj, Kotaro Yoshimoto
+
+9.0.3 (2025-01-31)
+------------------
+* Merge branch 'master' into RJD-1505/fix_slope_acceleration_sign
+* Merge branch 'master' into RJD-1505/fix_slope_acceleration_sign
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into RJD-1505/fix_slope_acceleration_sign
+* Contributors: Grzegorz Maj, Kotaro Yoshimoto
+
+9.0.2 (2025-01-31)
+------------------
+
+9.0.1 (2025-01-31)
+------------------
+* Merge branch 'master' into feat/vel_model_acc
+* Merge branch 'master' into feat/vel_model_acc
+* Contributors: Kotaro Yoshimoto
+
+9.0.0 (2025-01-30)
+------------------
+* merge 8.0.2
+* Merge tag '7.4.7' into RJD-1057-remove-functions-forwarded-to-entity-base-middle
+* Revert "move functions from EgoEntity to FieldOperatorApplication"
+  This reverts commit 8d90c0e2c2f66795f299859bfa675ef2f11abdd3.
+* Revert "remove function shadowing"
+  This reverts commit 82d6085784271ea59d8fa69f359e0437543e9d57.
+* remove function shadowing
+* move functions from EgoEntity to FieldOperatorApplication
+* Merge remote-tracking branch 'origin/master' into RJD-1057-remove-functions-forwarded-to-entity-base-middle
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-middle
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-middle
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-middle
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-middle
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-middle
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-middle
+* Merge remote-tracking branch 'origin/master' into RJD-1057-remove-functions-forwarded-to-entity-base-middle
+* Merge remote-tracking branch 'origin/master' into RJD-1057-remove-functions-forwarded-to-entity-base-middle
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-middle
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-middle
+* Merge branch 'RJD-1057-traffic-lights-tests' into RJD-1057-remove-functions-forwarded-to-entity-base-middle
+* Merge remote-tracking branch 'origin/RJD-1057-traffic-lights-tests' into RJD-1057-remove-functions-forwarded-to-entity-base-middle
+* Merge remote-tracking branch 'origin/RJD-1057-traffic-lights-tests' into RJD-1057-remove-functions-forwarded-to-entity-base-middle
+* Merge branch 'RJD-1057-traffic-lights-tests' into RJD-1057-remove-functions-forwarded-to-entity-base-middle
+* Merge remote-tracking branch 'tier4/RJD-1057-remove-traffic-lights-from-entity-manager' into RJD-1057-remove-functions-forwarded-to-entity-base-middle
+* Fix concealer local address returning
+* feat(ego_entity, sumulator_core): remove asFieldOperatorApplication, develop getEgoEntity and dedicated methods in EgoEntity
+* Merge remote-tracking branch 'origin/RJD-1056-remove-current-time-step-time' into RJD-1057-remove-functions-forwarded-to-entity-base
+* Contributors: Dawid Moszynski, Dawid Moszyński, Mateusz Palczuk, robomic
+
+8.0.2 (2025-01-28)
+------------------
+* Merge pull request `#1511 <https://github.com/tier4/scenario_simulator_v2/issues/1511>`_ from tier4/RJD-1495/fix
+  RJD-1495/fix
+* Merge branch 'master' into RJD-1495/fix
+* Merge branch 'master' into RJD-1495/fix
+* Merge tag '7.4.7' into RJD-1495/fix
+* avoid race condition by returning by value
+* avoid race condition by returning by value
+* Contributors: Dawid Moszyński, Tatsuya Yamasaki, robomic
+
+8.0.1 (2025-01-28)
+------------------
+
+8.0.0 (2025-01-24)
+------------------
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose' of github.com:tier4/scenario_simulator_v2 into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose
+* Merge remote-tracking branch 'origin/master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose
+* Merge remote-tracking branch 'origin' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose
+* Merge remote-tracking branch 'origin' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose
+* Merge remote-tracking branch 'origin/master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose
+* Contributors: Dawid Moszynski, Dawid Moszyński, Mateusz Palczuk
+
+7.4.7 (2025-01-20)
+------------------
+* Merge branch 'master' into RJD-1511/bug_fix
+* Bump version of scenario_simulator_v2 from version 7.4.5 to version 7.4.6
+* Merge branch 'master' into RJD-1511/bug_fix
+* Merge branch 'master' into refactor/parameter_value_distribution
+* Merge branch 'master' into refactor/parameter_value_distribution
+* Contributors: Kotaro Yoshimoto, Michał Ciasnocha, Release Bot
+
+* Merge branch 'master' into refactor/parameter_value_distribution
+* Merge branch 'master' into refactor/parameter_value_distribution
+* Contributors: Kotaro Yoshimoto
+
+7.4.6 (2025-01-10)
+------------------
+* Merge remote-tracking branch 'origin/master' into dependabot/pip/jinja2-3.1.5
+* Contributors: Masaya Kataoka
+
+7.4.5 (2025-01-10)
+------------------
+* Merge branch 'master' into fix/pass_despawn_function_in_constructor
+* Merge remote-tracking branch 'origin/master' into fix/pass_despawn_function_in_constructor
+* Merge branch 'master' into fix/pass_despawn_function_in_constructor
+* Merge branch 'master' into fix/pass_despawn_function_in_constructor
+* Contributors: Masaya Kataoka
+
+7.4.4 (2025-01-09)
+------------------
+* Merge pull request `#1497 <https://github.com/tier4/scenario_simulator_v2/issues/1497>`_ from tier4/refactor/concealer-2
+  Refactor/concealer 2
+* Merge branch 'master' into refactor/concealer-2
+* Cleanup member function `FieldOperatorApplication::sendCooperateCommand`
+* Move function `isValidCooperateStatus` into `sendCooperateCommand`
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-2
+* Remove some member accessor from struct `FieldOperatorApplication`
+* Remove member function `FieldOperatorApplication::getAutowareStateName`
+* Remove data member `FieldOperatorApplication::latest_cooperate_status_array`
+* Remove member function `AutowareUniverse::updateVehicleState`
+* Remove member function `AutowareUniverse::updateLocalization`
+* Cleanup `ControlModeCommand` service callback
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-2
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-2
+* Remove static member function `EgoEntity::makeFieldOperatorApplication`
+* Rename class `ServiceWithValidation` to `Service`
+* Rename class `SubscriberWrapper` to `Subscriber`
+* Lipsticks
+* Rename class `PublisherWrapper` to `Publisher`
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+7.4.3 (2025-01-07)
+------------------
+* Merge branch 'master' into tmp/pc-patch
+* Contributors: Kotaro Yoshimoto
+
+7.4.2 (2025-01-07)
+------------------
+
+7.4.1 (2024-12-24)
+------------------
+* Merge remote-tracking branch 'origin/master' into fix/canonicalize_function
+* Merge remote-tracking branch 'origin/master' into fix/canonicalize_function
+* Contributors: Masaya Kataoka
+
+7.4.0 (2024-12-23)
+------------------
+* Merge branch 'master' into RJD-1457/traffic_sink_refactor
+* Merge branch 'master' into RJD-1457/traffic_sink_refactor
+* Merge branch 'master' into RJD-1457/traffic_sink_refactor
+* Merge branch 'master' into RJD-1457/traffic_sink_refactor
+* Merge branch 'master' into RJD-1457/traffic_sink_refactor
+* Merge branch 'master' into RJD-1457/traffic_sink_refactor
+* Merge branch 'master' into RJD-1457/traffic_sink_refactor
+* Merge branch 'master' into RJD-1457/traffic_sink_refactor
+* Merge tag '6.0.1' into RJD-1457/traffic_sink_refactor
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/enable_specify_entity_type_in_autosink
+* Merge branch 'master' into feature/enable_specify_entity_type_in_autosink
+* Contributors: Masaya Kataoka, Michał Ciasnocha, robomic
+
+7.3.5 (2024-12-20)
+------------------
+* Merge pull request `#1488 <https://github.com/tier4/scenario_simulator_v2/issues/1488>`_ from tier4/refactor/concealer-1
+  Refactor/concealer 1
+* Merge branch 'master' into refactor/concealer-1
+* Merge branch 'master' into refactor/concealer-1
+* Merge branch 'master' into refactor/concealer-1
+* Reformat
+* Remove `getAcceleration`, `getSteeringAngle`, `getVelocity` and `getGearSign`
+* Remove macro `DEFINE_STATE_PREDICATE`
+* Remove member function `TaskQueue::stopAndJoin`
+* Remove free function `sudokill`
+* Remove member function `validateAvailability` and `callWithTimeoutValidation`
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-1
+* Remove class `ServceWithValidation::TimeoutError`
+* Remove member function `FieldOperatorApplication::shutdownAutoware`
+* Add using declarations for subscribers and publishers
+* Add new header file `concealer/member_detector.hpp`
+* Cleanup class template `SubscriberWrapper`
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-1
+* Remove header file `autoware_stream.hpp`
+* Move member function implementations into `field_operator_application.cpp`
+* Remove function template `listup`
+* Remove function template `toAutowareStateString`
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-1
+* Remove class template `FieldOperatorApplicationFor<T>`
+* Update all member function of `FieldOperatorApplication` to be non-virtual
+* Update some member functions of `FieldOperatorApplication` to be non-virtual
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-1
+* Move data members into base class `FieldOperatorApplication`
+* Remove member function `receiveMrmState`
+* Remove member function `receiveEmergencyState`
+* Move base class `TransitionAssertion<T>` to `FieldOperatorApplication`
+* Move `getAutowareState` into `FieldOperatorApplication`
+* Update all members of `FieldOperatorApplicationFor<...>` to be public
+* Remove macro `CONCEALER_ISOLATE_STANDARD_OUTPUT`
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-1
+* Update `~FieldOperatorApplication()` to be non-virtual
+* Remove member function `isStopRequested` and `stopRequest`
+* Remove virtual function `sendSIGINT`
+* Cleanup `FieldOperatorApplication::spinSome`
+* Remove member function `FieldOperatorApplication::checkAutowareProcess`
+* Remove member function `FieldOperatorApplication::restrictTargetSpeed`
+* Remove stream input/output operator for `TurnIndicatorsCommand`
+* Update `FieldOperatorApplication::getTurnIndicatorsCommand` to pure virtual
+* Remove member function `AutowareUniverse::set`
+* Remove member function `AutowareUniverse::stopAndJoin`
+* Remove class `concealer::Autoware`
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+7.3.4 (2024-12-20)
+------------------
+* Merge branch 'master' into feature/is_in_intersection
+* Merge remote-tracking branch 'origin/master' into feature/is_in_intersection
+* Merge remote-tracking branch 'origin/master' into feature/is_in_intersection
+* Contributors: Masaya Kataoka
+
+7.3.3 (2024-12-18)
+------------------
+
+7.3.2 (2024-12-18)
+------------------
+
+7.3.1 (2024-12-17)
+------------------
+* Merge branch 'master' into fix/math-closest-point
+* Merge branch 'master' into fix/math-closest-point
+* Merge branch 'master' into fix/math-closest-point
+* Merge branch 'master' into fix/math-closest-point
+* Merge branch 'master' into fix/math-closest-point
+* Contributors: Kotaro Yoshimoto
+
+7.3.0 (2024-12-16)
+------------------
+* Merge branch 'master' into feature/multi-level-lanelet-support
+* Merge branch 'master' into feature/multi-level-lanelet-support
+* Merge branch 'master' into feature/multi-level-lanelet-support
+* Merge branch 'master' into feature/multi-level-lanelet-support
+* Merge branch 'master' into feature/multi-level-lanelet-support
+* Contributors: Kotaro Yoshimoto, SzymonParapura
+
+7.2.0 (2024-12-16)
+------------------
+* Merge pull request `#1484 <https://github.com/tier4/scenario_simulator_v2/issues/1484>`_ from tier4/RJD-736/autoware_msgs_support_and_localization_sim_mode_support
+  Rjd 736/autoware msgs support and localization sim mode support
+* Merge branch 'master' into RJD-736/autoware_msgs_support_and_localization_sim_mode_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support_and_localization_sim_mode_support
+* Merge branch 'master' into RJD-736/autoware_msgs_support_and_localization_sim_mode_support
+* Merge branch 'master' into RJD-736/autoware_msgs_support_and_localization_sim_mode_support
+* Merge branch 'master' into RJD-736/autoware_msgs_support_and_localization_sim_mode_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support_and_localization_sim_mode_support
+* Merge remote-tracking branch 'origin/RJD-736/autoware_msgs_support' into RJD-736/autoware_msgs_support_and_localization_sim_mode_support
+* Merge remote-tracking branch 'origin/RJD-736/autoware_msgs_support' into RJD-736/autoware_msgs_support_and_localization_sim_mode_support
+* Merge remote-tracking branch 'origin/RJD-736/autoware_msgs_support' into RJD-736/autoware_msgs_support_and_localization_sim_mode_support
+* Add the missing semicolon
+* Merge remote-tracking branch 'origin/RJD-736/autoware_msgs_support' into RJD-736/autoware_msgs_support_and_localization_sim_mode_support
+* Merge remote-tracking branch 'origin/RJD-736/autoware_msgs_support' into RJD-736/autoware_msgs_support_and_localization_sim_mode_support
+* Add launch argument `simulate_localization` to `scenario_test_runner`
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+7.1.0 (2024-12-16)
+------------------
+* Merge remote-tracking branch 'origin/master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge remote-tracking branch 'origin/master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge remote-tracking branch 'origin/master' into feature/time-to-collision-condition
+* Merge remote-tracking branch 'origin/master' into feature/time-to-collision-condition
+* Merge remote-tracking branch 'origin/master' into feature/time-to-collision-condition
+* Merge remote-tracking branch 'origin/master' into feature/time-to-collision-condition
+* Merge remote-tracking branch 'origin/master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge remote-tracking branch 'origin/master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge remote-tracking branch 'origin/master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge remote-tracking branch 'origin/master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge remote-tracking branch 'origin/master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge remote-tracking branch 'origin/master' into feature/time-to-collision-condition
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+7.0.4 (2024-12-13)
+------------------
+* Merge branch 'master' into fix/speed-condition/backward-compatibility
+* Merge remote-tracking branch 'origin/master' into fix/speed-condition/backward-compatibility
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+7.0.3 (2024-12-13)
+------------------
+* Merge pull request `#1465 <https://github.com/tier4/scenario_simulator_v2/issues/1465>`_ from tier4/fix/request-enable-autoware-control
+* Merge branch 'master' into fix/request-enable-autoware-control
+* Merge branch 'master' into fix/request-enable-autoware-control
+* Merge branch 'master' into fix/request-enable-autoware-control
+* Merge branch 'master' into fix/request-enable-autoware-control
+* fix(concealer): increase max time to request enable autoware control
+* Contributors: Kotaro Yoshimoto, satoshi-ota
+
+7.0.2 (2024-12-12)
+------------------
+* Merge branch 'master' into fix/snor-cloud-issue-8-1
+* Merge branch 'master' into fix/snor-cloud-issue-8-1
+* Merge branch 'master' into fix/snor-cloud-issue-8-1
+* Merge branch 'master' into fix/snor-cloud-issue-8-1
+* Contributors: Masaya Kataoka, Taiga
+
+7.0.1 (2024-12-11)
+------------------
+* Merge branch 'master' into feature/act-starttrigger-optional
+* Merge branch 'master' into feature/act-starttrigger-optional
+* Contributors: Kotaro Yoshimoto, ぐるぐる
+
 7.0.0 (2024-12-10)
 ------------------
 * Merge pull request `#1454 <https://github.com/tier4/scenario_simulator_v2/issues/1454>`_ from tier4/RJD-736/autoware_msgs_support

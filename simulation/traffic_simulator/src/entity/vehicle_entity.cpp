@@ -81,6 +81,11 @@ auto VehicleEntity::getDefaultMatchingDistanceForLaneletPoseCalculation() const 
          1.5;
 }
 
+auto VehicleEntity::getParameters() const -> const traffic_simulator_msgs::msg::VehicleParameters &
+{
+  return vehicle_parameters;
+}
+
 auto VehicleEntity::getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter
 {
   return behavior_plugin_ptr_->getBehaviorParameter();
@@ -116,7 +121,7 @@ auto VehicleEntity::getWaypoints() -> const traffic_simulator_msgs::msg::Waypoin
   try {
     return behavior_plugin_ptr_->getWaypoints();
   } catch (const std::runtime_error & e) {
-    if (not status_->laneMatchingSucceed()) {
+    if (not status_->isInLanelet()) {
       THROW_SIMULATION_ERROR(
         "Failed to calculate waypoints in NPC logics, please check Entity : ", name,
         " is in a lane coordinate.");
@@ -162,7 +167,7 @@ auto VehicleEntity::onUpdate(const double current_time, const double step_time) 
 void VehicleEntity::requestAcquirePosition(const CanonicalizedLaneletPose & lanelet_pose)
 {
   behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
-  if (status_->laneMatchingSucceed()) {
+  if (status_->isInLanelet()) {
     route_planner_.setWaypoints({lanelet_pose});
   }
   behavior_plugin_ptr_->setGoalPoses({static_cast<geometry_msgs::msg::Pose>(lanelet_pose)});
@@ -174,7 +179,7 @@ void VehicleEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_
   if (
     const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
       map_pose, status_->getBoundingBox(), false,
-      getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_)) {
+      getDefaultMatchingDistanceForLaneletPoseCalculation())) {
     requestAcquirePosition(canonicalized_lanelet_pose.value());
   } else {
     THROW_SEMANTIC_ERROR("Goal of the vehicle entity should be on lane.");
@@ -183,7 +188,7 @@ void VehicleEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_
 
 void VehicleEntity::requestAssignRoute(const std::vector<CanonicalizedLaneletPose> & waypoints)
 {
-  if (!laneMatchingSucceed()) {
+  if (!isInLanelet()) {
     return;
   }
   behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
@@ -202,7 +207,7 @@ void VehicleEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pos
     if (
       const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
         waypoint, status_->getBoundingBox(), false,
-        getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_)) {
+        getDefaultMatchingDistanceForLaneletPoseCalculation())) {
       route.emplace_back(canonicalized_lanelet_pose.value());
     } else {
       THROW_SEMANTIC_ERROR("Waypoint of vehicle entity should be on lane.");
@@ -221,7 +226,7 @@ auto VehicleEntity::requestFollowTrajectory(
     if (
       const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
         vertex.position, status_->getBoundingBox(), false,
-        getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_)) {
+        getDefaultMatchingDistanceForLaneletPoseCalculation())) {
       waypoints.emplace_back(canonicalized_lanelet_pose.value());
     } else {
       /// @todo such a protection most likely makes sense, but test scenario
@@ -232,7 +237,7 @@ auto VehicleEntity::requestFollowTrajectory(
   route_planner_.setWaypoints(waypoints);
 }
 
-void VehicleEntity::requestLaneChange(const lanelet::Id to_lanelet_id)
+auto VehicleEntity::requestLaneChange(const lanelet::Id to_lanelet_id) -> void
 {
   behavior_plugin_ptr_->setRequest(behavior::Request::LANE_CHANGE);
   const auto parameter = lane_change::Parameter(
@@ -241,7 +246,8 @@ void VehicleEntity::requestLaneChange(const lanelet::Id to_lanelet_id)
   behavior_plugin_ptr_->setLaneChangeParameters(parameter);
 }
 
-void VehicleEntity::requestLaneChange(const traffic_simulator::lane_change::Parameter & parameter)
+auto VehicleEntity::requestLaneChange(const traffic_simulator::lane_change::Parameter & parameter)
+  -> void
 {
   behavior_plugin_ptr_->setRequest(behavior::Request::LANE_CHANGE);
   behavior_plugin_ptr_->setLaneChangeParameters(parameter);

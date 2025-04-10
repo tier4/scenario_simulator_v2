@@ -20,10 +20,12 @@ namespace cpp_mock_scenarios
 CppScenarioNode::CppScenarioNode(
   const std::string & node_name, const std::string & map_path,
   const std::string & lanelet2_map_file, const std::string & scenario_filename, const bool verbose,
-  const rclcpp::NodeOptions & option)
+  const rclcpp::NodeOptions & option,
+  const std::set<std::uint8_t> & auto_sink_entity_types /*= {}*/)
 : Node(node_name, option),
   api_(
-    this, configure(map_path, lanelet2_map_file, scenario_filename, verbose),
+    this,
+    configure(map_path, lanelet2_map_file, scenario_filename, verbose, auto_sink_entity_types),
     declare_parameter<double>("global_real_time_factor", 1.0),
     declare_parameter<double>("global_frame_rate", 20.0)),
   scenario_filename_(scenario_filename),
@@ -104,7 +106,8 @@ void CppScenarioNode::spawnEgoEntity(
   api_.updateFrame();
   std::this_thread::sleep_for(std::chrono::duration<double>(1.0 / 20.0));
   api_.spawn("ego", spawn_lanelet_pose, parameters, traffic_simulator::VehicleBehavior::autoware());
-  api_.asFieldOperatorApplication("ego").declare_parameter<bool>("allow_goal_modification", true);
+  auto & ego_entity = api_.getEgoEntity("ego");
+  ego_entity.setParameter<bool>("allow_goal_modification", true);
   api_.attachLidarSensor("ego", 0.0);
 
   api_.attachDetectionSensor("ego", 200.0, true, 0.0, 0, 0.0, 0.0);
@@ -123,12 +126,12 @@ void CppScenarioNode::spawnEgoEntity(
     // clang-format on
     return configuration;
   }());
-  api_.requestAssignRoute("ego", goal_lanelet_poses);
+  ego_entity.requestAssignRoute(goal_lanelet_poses);
 
   using namespace std::chrono_literals;
-  while (!api_.asFieldOperatorApplication("ego").engaged()) {
-    if (api_.asFieldOperatorApplication("ego").engageable()) {
-      api_.asFieldOperatorApplication("ego").engage();
+  while (!ego_entity.isEngaged()) {
+    if (ego_entity.isEngageable()) {
+      ego_entity.engage();
     }
     api_.updateFrame();
     std::this_thread::sleep_for(std::chrono::duration<double>(1.0 / 20.0));
@@ -137,13 +140,13 @@ void CppScenarioNode::spawnEgoEntity(
 
 auto CppScenarioNode::isVehicle(const std::string & name) const -> bool
 {
-  return api_.getEntity(name)->getEntityType().type ==
+  return api_.getEntity(name).getEntityType().type ==
          traffic_simulator_msgs::msg::EntityType::VEHICLE;
 }
 
 auto CppScenarioNode::isPedestrian(const std::string & name) const -> bool
 {
-  return api_.getEntity(name)->getEntityType().type ==
+  return api_.getEntity(name).getEntityType().type ==
          traffic_simulator_msgs::msg::EntityType::PEDESTRIAN;
 }
 

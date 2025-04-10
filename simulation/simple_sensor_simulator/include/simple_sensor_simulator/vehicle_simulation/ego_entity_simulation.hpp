@@ -15,7 +15,7 @@
 #ifndef TRAFFIC_SIMULATOR__VEHICLE_SIMULATION__EGO_ENTITY_SIMULATION_HPP_
 #define TRAFFIC_SIMULATOR__VEHICLE_SIMULATION__EGO_ENTITY_SIMULATION_HPP_
 
-#include <concealer/autoware.hpp>
+#include <concealer/autoware_universe.hpp>
 #include <memory>
 #include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model.hpp>
 #include <traffic_simulator/data_type/entity_status.hpp>
@@ -30,6 +30,7 @@ namespace vehicle_simulation
 enum class VehicleModelType {
   DELAY_STEER_ACC,
   DELAY_STEER_ACC_GEARED,
+  DELAY_STEER_ACC_GEARED_WO_FALL_GUARD,
   DELAY_STEER_MAP_ACC_GEARED,
   DELAY_STEER_VEL,
   IDEAL_STEER_ACC,
@@ -40,7 +41,7 @@ enum class VehicleModelType {
 class EgoEntitySimulation
 {
 public:
-  const std::unique_ptr<concealer::Autoware> autoware;
+  const std::unique_ptr<concealer::AutowareUniverse> autoware;
 
 private:
   const VehicleModelType vehicle_model_type_;

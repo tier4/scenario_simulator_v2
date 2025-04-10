@@ -171,7 +171,6 @@ void VisualizationConditionGroupsDisplay::processMessage(const Context::ConstSha
 
   QPainter painter(&hud);
   painter.setRenderHint(QPainter::Antialiasing, true);
-  // QColor text_color = property_text_color_->getColor();
   QColor text_color(property_text_color_->getColor());
   text_color.setAlpha(255);
   painter.setPen(QPen(text_color, 2, Qt::SolidLine));

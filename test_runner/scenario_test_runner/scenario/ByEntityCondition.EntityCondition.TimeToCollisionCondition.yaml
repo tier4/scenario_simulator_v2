@@ -1,0 +1,235 @@
+ScenarioModifiers:
+  ScenarioModifier: []
+OpenSCENARIO:
+  FileHeader: { revMajor: 1, revMinor: 1, date: '2024-11-25T04:18:18.703Z', description: '', author: Tatsuya Yamasaki }
+  ParameterDeclarations:
+    ParameterDeclaration: []
+  CatalogLocations:
+    VehicleCatalog:
+      Directory: { path: $(ros2 pkg prefix --share openscenario_experimental_catalog)/vehicle }
+  RoadNetwork:
+    LogicFile: { filepath: $(ros2 pkg prefix --share kashiwanoha_map)/map }
+  Entities:
+    ScenarioObject:
+      - name: ego
+        CatalogReference: { catalogName: sample_vehicle, entryName: sample_vehicle }
+        ObjectController:
+          Controller:
+            name: ''
+            Properties:
+              Property: []
+      - name: vehicle_01
+        CatalogReference: { catalogName: sample_vehicle, entryName: sample_vehicle }
+        ObjectController:
+          Controller:
+            name: ''
+            Properties:
+              Property: []
+  Storyboard:
+    Init:
+      Actions:
+        Private:
+          - entityRef: ego
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '34976'
+                      s: 10
+                      offset: 0
+                      Orientation:
+                        type: relative
+                        h: 0
+                        p: 0
+                        r: 0
+          - entityRef: vehicle_01
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '34579'
+                      s: 0
+                      offset: 0
+                      Orientation:
+                        type: relative
+                        h: 0
+                        p: 0
+                        r: 0
+              - ControllerAction:
+                  AssignControllerAction:
+                    Controller:
+                      name: ''
+                      Properties:
+                        Property:
+                          - name: maxSpeed
+                            value: '0.5'
+    Story:
+      - name: ''
+        Act:
+          - name: _EndCondition
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ''
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef:
+                    - entityRef: ego
+                Maneuver:
+                  - name: ''
+                    Event:
+                      - name: ''
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 30
+                                      rule: greaterThan
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitSuccess
+                  - name: ''
+                    Event:
+                      - name: ''
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef: [ entityRef: ego ]
+                                    EntityCondition:
+                                      TimeToCollisionCondition:
+                                        freespace: true
+                                        rule: lessThan
+                                        value: 0
+                                        relativeDistanceType: longitudinal
+                                        coordinateSystem: lane
+                                        routingAlgorithm: undefined
+                                        TimeToCollisionConditionTarget:
+                                          EntityRef:
+                                            entityRef: vehicle_01
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef: [ entityRef: ego ]
+                                    EntityCondition:
+                                      TimeToCollisionCondition:
+                                        freespace: false
+                                        rule: lessThan
+                                        value: 0
+                                        relativeDistanceType: longitudinal
+                                        coordinateSystem: lane
+                                        routingAlgorithm: undefined
+                                        TimeToCollisionConditionTarget:
+                                          EntityRef:
+                                            entityRef: vehicle_01
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef: [ entityRef: ego ]
+                                    EntityCondition:
+                                      TimeToCollisionCondition:
+                                        freespace: true
+                                        rule: lessThan
+                                        value: 0
+                                        relativeDistanceType: longitudinal
+                                        coordinateSystem: entity
+                                        routingAlgorithm: undefined
+                                        TimeToCollisionConditionTarget:
+                                          EntityRef:
+                                            entityRef: vehicle_01
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef: [ entityRef: ego ]
+                                    EntityCondition:
+                                      TimeToCollisionCondition:
+                                        freespace: false
+                                        rule: lessThan
+                                        value: 0
+                                        relativeDistanceType: longitudinal
+                                        coordinateSystem: entity
+                                        routingAlgorithm: undefined
+                                        TimeToCollisionConditionTarget:
+                                          EntityRef:
+                                            entityRef: vehicle_01
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef: [ entityRef: ego ]
+                                    EntityCondition:
+                                      TimeToCollisionCondition:
+                                        freespace: true
+                                        rule: lessThan
+                                        value: 0
+                                        relativeDistanceType: cartesianDistance
+                                        coordinateSystem: entity
+                                        routingAlgorithm: undefined
+                                        TimeToCollisionConditionTarget:
+                                          EntityRef:
+                                            entityRef: vehicle_01
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef: [ entityRef: ego ]
+                                    EntityCondition:
+                                      TimeToCollisionCondition:
+                                        freespace: false
+                                        rule: lessThan
+                                        value: 0
+                                        relativeDistanceType: cartesianDistance
+                                        coordinateSystem: entity
+                                        routingAlgorithm: undefined
+                                        TimeToCollisionConditionTarget:
+                                          EntityRef:
+                                            entityRef: vehicle_01
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitFailure
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ''
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
+    StopTrigger:
+      ConditionGroup: []

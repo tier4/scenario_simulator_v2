@@ -52,11 +52,12 @@ private:
         stop(cpp_mock_scenarios::Result::FAILURE);  // LCOV_EXCL_LINE
       }
       for (const auto & name : names) {
-        if (const auto entity = api_.getEntity(name)) {
-          const bool valid_pedestrian_lanelet =
-            api_.isInLanelet(name, static_cast<lanelet::Id>(34385), 10.0);
-
-          if (!entity->laneMatchingSucceed() || !valid_pedestrian_lanelet || !isPedestrian(name)) {
+        const auto & entity = api_.getEntity(name);
+        if (!entity.isInLanelet()) {
+          stop(cpp_mock_scenarios::Result::FAILURE);  // LCOV_EXCL_LINE
+        } else {
+          const bool valid_pedestrian_lanelet = entity.isInLanelet(34385, 10.0);
+          if (!valid_pedestrian_lanelet || !isPedestrian(name)) {
             stop(cpp_mock_scenarios::Result::FAILURE);  // LCOV_EXCL_LINE
           }
         }
@@ -82,12 +83,11 @@ private:
       false, true, true, 0);
 
     api_.spawn(
-      "ego",
-      traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34570, 0.0, 0.0, api_.getHdmapUtils()),
+      "ego", traffic_simulator::helper::constructCanonicalizedLaneletPose(34570, 0.0, 0.0),
       getVehicleParameters());
-    api_.setLinearVelocity("ego", 0.0);
-    api_.requestSpeedChange("ego", 0.0, true);
+    auto & ego_entity = api_.getEntity("ego");
+    ego_entity.setLinearVelocity(0.0);
+    ego_entity.requestSpeedChange(0.0, true);
   }
 };
 }  // namespace cpp_mock_scenarios

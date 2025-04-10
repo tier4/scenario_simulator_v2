@@ -30,36 +30,34 @@ class TaskQueue
 
   std::queue<Thunk> thunks;
 
-  std::mutex thunks_mutex;
+  mutable std::mutex thunks_mutex;
 
   std::thread dispatcher;
 
-  std::atomic<bool> is_stop_requested = false;
-
-  std::atomic<bool> is_thrown = false;
+  std::atomic<bool> finalized = false;
 
   std::exception_ptr thrown;
 
-  std::atomic<bool> is_exhausted = true;
+  auto front() const -> Thunk;
+
+  auto pop() -> void;
 
 public:
   explicit TaskQueue();
 
-  void stopAndJoin();
-
   ~TaskQueue();
 
   template <typename F>
-  decltype(auto) delay(F && f)
+  auto delay(F && f) -> void
   {
     rethrow();
-    std::unique_lock lk(thunks_mutex);
+    auto lock = std::unique_lock(thunks_mutex);
     thunks.emplace(std::forward<F>(f));
   }
 
-  bool exhausted() const noexcept;
+  auto empty() const -> bool;
 
-  void rethrow() const;
+  auto rethrow() const -> void;
 };
 }  // namespace concealer
 

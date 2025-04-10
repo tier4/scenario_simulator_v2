@@ -88,6 +88,8 @@ public:
 
   auto getGoalPoses() -> std::vector<CanonicalizedLaneletPose> override;
 
+  auto getParameters() const -> const traffic_simulator_msgs::msg::VehicleParameters &;
+
   auto getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle> override;
 
   auto getRouteLanelets(double horizon = 100) -> lanelet::Ids override;
@@ -107,9 +109,9 @@ public:
   auto requestFollowTrajectory(
     const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &) -> void override;
 
-  void requestLaneChange(const lanelet::Id to_lanelet_id) override;
+  auto requestLaneChange(const lanelet::Id to_lanelet_id) -> void override;
 
-  void requestLaneChange(const traffic_simulator::lane_change::Parameter &) override;
+  auto requestLaneChange(const traffic_simulator::lane_change::Parameter &) -> void override;
 
   void setVelocityLimit(double linear_velocity) override;
 
