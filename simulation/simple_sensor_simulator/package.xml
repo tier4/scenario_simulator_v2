@@ -50,6 +50,7 @@
   <depend>visualization_msgs</depend>
   <depend>geographic_msgs</depend>
   <depend>traffic_simulator</depend>
+  <depend>agnocast_wrapper</depend>
 
 
   <test_depend>ament_lint_auto</test_depend>
