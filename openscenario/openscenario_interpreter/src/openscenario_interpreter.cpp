@@ -20,6 +20,7 @@
 #include <openscenario_interpreter/record.hpp>
 #include <openscenario_interpreter/syntax/object_controller.hpp>
 #include <openscenario_interpreter/syntax/parameter_value_distribution.hpp>
+#include <openscenario_interpreter/syntax/pedestrian.hpp>
 #include <openscenario_interpreter/syntax/scenario_definition.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <openscenario_interpreter/syntax/speed_condition.hpp>
@@ -62,6 +63,8 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   SpeedCondition::compatibility =
     boost::lexical_cast<Compatibility>(common::getParameter<std::string>(
       get_node_parameters_interface(), "speed_condition", "legacy"));
+  Pedestrian::compatibility = boost::lexical_cast<Compatibility>(common::getParameter<std::string>(
+    get_node_parameters_interface(), "pedestrian_behavior_mode", "legacy"));
 }
 
 Interpreter::~Interpreter() {}

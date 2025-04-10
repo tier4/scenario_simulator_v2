@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__PEDESTRIAN_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__PEDESTRIAN_HPP_
 
+#include <openscenario_interpreter/compatibility.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/bounding_box.hpp>
 #include <openscenario_interpreter/syntax/object_type.hpp>
@@ -61,6 +62,8 @@ struct Pedestrian : public Scope
   const BoundingBox bounding_box;
 
   const Properties properties;
+
+  static inline auto compatibility = Compatibility::legacy;
 
   explicit Pedestrian(const pugi::xml_node &, Scope &);
 

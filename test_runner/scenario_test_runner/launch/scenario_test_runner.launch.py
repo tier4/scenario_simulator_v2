@@ -96,6 +96,7 @@ def launch_setup(context, *args, **kwargs):
     speed_condition                     = LaunchConfiguration("speed_condition",                        default="legacy")
     use_sim_time                        = LaunchConfiguration("use_sim_time",                           default=False)
     vehicle_model                       = LaunchConfiguration("vehicle_model",                          default="")
+    pedestrian_behavior_mode            = LaunchConfiguration("pedestrian_behavior_mode",               default="legacy")
     # fmt: on
 
     print(f"architecture_type                   := {architecture_type.perform(context)}")
@@ -124,6 +125,7 @@ def launch_setup(context, *args, **kwargs):
     print(f"speed_condition                     := {speed_condition.perform(context)}")
     print(f"use_sim_time                        := {use_sim_time.perform(context)}")
     print(f"vehicle_model                       := {vehicle_model.perform(context)}")
+    print(f"pedestrian_behavior_mode            := {pedestrian_behavior_mode.perform(context)}")
 
     def make_launch_prefix():
         if enable_perf.perform(context) == "True":
@@ -151,6 +153,7 @@ def launch_setup(context, *args, **kwargs):
             {"speed_condition": speed_condition},
             {"use_sim_time": use_sim_time},
             {"vehicle_model": vehicle_model},
+            {"pedestrian_behavior_mode": pedestrian_behavior_mode},
         ]
 
         def collect_vehicle_parameters():
@@ -207,6 +210,7 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("speed_condition",                     default_value=speed_condition                    ),
         DeclareLaunchArgument("use_sim_time",                        default_value=use_sim_time                       ),
         DeclareLaunchArgument("vehicle_model",                       default_value=vehicle_model                      ),
+        DeclareLaunchArgument("pedestrian_behavior_mode",            default_value=pedestrian_behavior_mode           ),
         # fmt: on
         Node(
             package="scenario_test_runner",

@@ -42,6 +42,10 @@ Pedestrian::operator traffic_simulator_msgs::msg::PedestrianParameters() const
     parameter.name = name;
     parameter.subtype = static_cast<msg::EntitySubtype>(pedestrian_category);
     parameter.bounding_box = static_cast<msg::BoundingBox>(bounding_box);
+    parameter.obstacle_detect_mode =
+      compatibility == Compatibility::legacy
+        ? traffic_simulator_msgs::msg::PedestrianParameters::LEGACY
+        : traffic_simulator_msgs::msg::PedestrianParameters::STANDARD;
   }
 
   return parameter;
