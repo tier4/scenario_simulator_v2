@@ -112,7 +112,8 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
     return BT::NodeStatus::FAILURE;
   }
   distance_to_stop_target_ = getDistanceToConflictingEntity(route_lanelets, *trajectory);
-  auto distance_to_stopline = hdmap_utils->getDistanceToStopLine(route_lanelets, *trajectory);
+  auto distance_to_stopline =
+    traffic_simulator::distance::distanceToStopLine(route_lanelets, *trajectory);
   const auto distance_to_front_entity = getDistanceToFrontEntity(*trajectory);
   if (!distance_to_stop_target_) {
     in_stop_sequence_ = false;

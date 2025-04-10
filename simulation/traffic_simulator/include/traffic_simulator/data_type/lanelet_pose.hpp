@@ -15,15 +15,8 @@
 #ifndef TRAFFIC_SIMULATOR__DATA_TYPE__LANELET_POSE_HPP_
 #define TRAFFIC_SIMULATOR__DATA_TYPE__LANELET_POSE_HPP_
 
-#include <lanelet2_core/geometry/Lanelet.h>
-
-#include <geometry_msgs/msg/pose.hpp>
-#include <optional>
-#include <scenario_simulator_exception/exception.hpp>
-#include <traffic_simulator/data_type/routing_configuration.hpp>
-#include <traffic_simulator/data_type/routing_graph_type.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
-#include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
+#include <traffic_simulator/helper/ostream_helpers.hpp>
 
 namespace traffic_simulator
 {
@@ -49,7 +42,7 @@ public:
   auto alignOrientationToLanelet() -> void;
   auto hasAlternativeLaneletPose() const -> bool { return lanelet_poses_.size() > 1; }
   auto getAlternativeLaneletPoseBaseOnShortestRouteFrom(
-    LaneletPose from, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
+    LaneletPose from,
     const RoutingConfiguration & routing_configuration = RoutingConfiguration()) const
     -> std::optional<LaneletPose>;
 
@@ -80,6 +73,26 @@ public:
   DEFINE_COMPARISON_OPERATOR(>=)
   DEFINE_COMPARISON_OPERATOR(>)
 #undef DEFINE_COMPARISON_OPERATOR
+
+  friend std::ostream & operator<<(std::ostream & os, const CanonicalizedLaneletPose & obj)
+  {
+    os << "CanonicalizedLaneletPose(\n";
+    os << obj.lanelet_pose_ << "\n";
+    if (obj.lanelet_poses_.size() == 1) {
+      os << "  alternative from lanelet_poses_: " << obj.lanelet_poses_.front() << "\n";
+    } else if (obj.lanelet_poses_.size() > 1) {
+      os << "  lanelet_poses_: [\n";
+      for (const auto & pose : obj.lanelet_poses_) {
+        os << "    - " << pose << "\n";
+      }
+      os << "  ]\n";
+    }
+    os << "  map_pose_: " << obj.map_pose_ << "\n";
+    os << "  consider_pose_by_road_slope_: "
+       << (CanonicalizedLaneletPose::consider_pose_by_road_slope_ ? "true" : "false") << "\n";
+    os << ")";
+    return os;
+  }
 
 private:
   auto adjustOrientationAndOzPosition() -> void;

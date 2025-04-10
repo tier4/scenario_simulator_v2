@@ -47,12 +47,20 @@ namespace traffic_simulator
 {
 namespace entity
 {
-class EntityBase
+class EntityBase : public std::enable_shared_from_this<EntityBase>
 {
 public:
   explicit EntityBase(
     const std::string & name, const CanonicalizedEntityStatus & entity_status,
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr);
+
+  EntityBase(const EntityBase &) = delete;
+
+  EntityBase & operator=(const EntityBase &) = delete;
+
+  EntityBase(EntityBase &&) noexcept = delete;
+
+  EntityBase & operator=(EntityBase &&) noexcept = delete;
 
   virtual ~EntityBase() = default;
 
@@ -60,6 +68,28 @@ public:
   /*   */ auto is() const -> bool
   {
     return dynamic_cast<EntityType const *>(this) != nullptr;
+  }
+
+  template <typename EntityType>
+  /*   */ auto as() -> EntityType &
+  {
+    if (const auto derived_ptr = dynamic_cast<EntityType *>(this); !derived_ptr) {
+      THROW_SEMANTIC_ERROR(
+        "Entity ", std::quoted(name), " is not ", std::quoted(typeid(EntityType).name()), "type");
+    } else {
+      return *derived_ptr;
+    }
+  }
+
+  template <typename EntityType>
+  /*   */ auto as() const -> const EntityType &
+  {
+    if (const auto derived_ptr = dynamic_cast<EntityType const *>(this); !derived_ptr) {
+      THROW_SEMANTIC_ERROR(
+        "Entity ", std::quoted(name), " is not ", std::quoted(typeid(EntityType).name()), "type");
+    } else {
+      return *derived_ptr;
+    }
   }
 
   virtual void appendDebugMarker(visualization_msgs::msg::MarkerArray & /*unused*/);

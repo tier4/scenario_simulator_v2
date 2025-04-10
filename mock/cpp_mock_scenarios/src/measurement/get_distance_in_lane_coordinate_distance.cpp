@@ -44,13 +44,12 @@ private:
   auto lateralDistance(const std::string & from_entity_name, const std::string & to_entity_name)
     -> std::optional<double>
   {
-    const auto from_entity = api_.getEntity(from_entity_name);
-    const auto to_entity = api_.getEntity(to_entity_name);
-    if (from_entity->isInLanelet() && to_entity->isInLanelet()) {
+    const auto & from_entity = api_.getEntity(from_entity_name);
+    const auto & to_entity = api_.getEntity(to_entity_name);
+    if (from_entity.isInLanelet() && to_entity.isInLanelet()) {
       return traffic_simulator::distance::lateralDistance(
-        from_entity->getCanonicalizedLaneletPose().value(),
-        to_entity->getCanonicalizedLaneletPose().value(), traffic_simulator::RoutingConfiguration(),
-        api_.getHdmapUtils());
+        from_entity.getCanonicalizedLaneletPose().value(),
+        to_entity.getCanonicalizedLaneletPose().value(), traffic_simulator::RoutingConfiguration());
     }
     return std::nullopt;
   };
@@ -60,13 +59,13 @@ private:
     const double matching_distance) -> std::optional<double>
   {
     const auto from_entity_lanelet_pose =
-      api_.getEntity(from_entity_name)->getCanonicalizedLaneletPose(matching_distance);
+      api_.getEntity(from_entity_name).getCanonicalizedLaneletPose(matching_distance);
     const auto to_entity_lanelet_pose =
-      api_.getEntity(to_entity_name)->getCanonicalizedLaneletPose(matching_distance);
+      api_.getEntity(to_entity_name).getCanonicalizedLaneletPose(matching_distance);
     if (from_entity_lanelet_pose && to_entity_lanelet_pose) {
       return traffic_simulator::distance::lateralDistance(
         from_entity_lanelet_pose.value(), to_entity_lanelet_pose.value(),
-        traffic_simulator::RoutingConfiguration(), api_.getHdmapUtils());
+        traffic_simulator::RoutingConfiguration());
     }
     return std::nullopt;
   };
@@ -75,12 +74,12 @@ private:
     const std::string & from_entity_name, const std::string & to_entity_name)
     -> std::optional<double>
   {
-    const auto from_entity = api_.getEntity(from_entity_name);
-    const auto to_entity = api_.getEntity(to_entity_name);
-    if (from_entity->isInLanelet() && to_entity->isInLanelet()) {
+    const auto & from_entity = api_.getEntity(from_entity_name);
+    const auto & to_entity = api_.getEntity(to_entity_name);
+    if (from_entity.isInLanelet() && to_entity.isInLanelet()) {
       return traffic_simulator::distance::longitudinalDistance(
-        from_entity->getCanonicalizedLaneletPose().value(),
-        to_entity->getCanonicalizedLaneletPose().value(), false, false,
+        from_entity.getCanonicalizedLaneletPose().value(),
+        to_entity.getCanonicalizedLaneletPose().value(), false, false,
         traffic_simulator::RoutingConfiguration(), api_.getHdmapUtils());
     }
     return std::nullopt;
@@ -140,23 +139,23 @@ private:
     api_.spawn(
       "ego", traffic_simulator::helper::constructCanonicalizedLaneletPose(34513, 5.0, 0.0),
       getVehicleParameters());
-    auto ego_entity = api_.getEntity("ego");
-    ego_entity->setLinearVelocity(10);
-    ego_entity->requestSpeedChange(3, true);
+    auto & ego_entity = api_.getEntity("ego");
+    ego_entity.setLinearVelocity(10);
+    ego_entity.requestSpeedChange(3, true);
 
     api_.spawn(
       "front", traffic_simulator::helper::constructCanonicalizedLaneletPose(34513, 10.0, 1.0),
       getVehicleParameters());
-    auto front_entity = api_.getEntity("front");
-    front_entity->setLinearVelocity(10);
-    front_entity->requestSpeedChange(3, true);
+    auto & front_entity = api_.getEntity("front");
+    front_entity.setLinearVelocity(10);
+    front_entity.requestSpeedChange(3, true);
 
     api_.spawn(
       "behind", traffic_simulator::helper::constructCanonicalizedLaneletPose(34513, 0.0, -1.0),
       getVehicleParameters());
-    auto behind_entity = api_.getEntity("behind");
-    behind_entity->setLinearVelocity(10);
-    behind_entity->requestSpeedChange(3, true);
+    auto & behind_entity = api_.getEntity("behind");
+    behind_entity.setLinearVelocity(10);
+    behind_entity.requestSpeedChange(3, true);
   }
 };
 }  // namespace cpp_mock_scenarios
