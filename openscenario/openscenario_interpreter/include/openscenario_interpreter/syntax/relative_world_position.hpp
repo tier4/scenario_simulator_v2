@@ -40,7 +40,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct RelativeWorldPosition : private SimulatorCore::CoordinateSystemConversion
+struct RelativeWorldPosition
 {
   const Orientation orientation;
 
