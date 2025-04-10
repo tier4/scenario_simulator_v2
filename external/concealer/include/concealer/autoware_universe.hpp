@@ -62,7 +62,7 @@ public:
   Subscriber<priority::PathWithLaneId> getPathWithLaneId;
 
   Publisher<AccelWithCovarianceStamped>   setAcceleration;
-  Publisher<Odometry, NormalDistribution> setOdometry;
+  Publisher<Odometry, false, NormalDistribution> setOdometry;
   Publisher<PoseWithCovarianceStamped>    setPose;
   Publisher<SteeringReport>               setSteeringReport;
   Publisher<GearReport>                   setGearReport;
