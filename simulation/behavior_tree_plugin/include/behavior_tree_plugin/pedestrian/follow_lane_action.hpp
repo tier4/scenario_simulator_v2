@@ -24,7 +24,6 @@
 #include <string>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
-#include <traffic_simulator_msgs/msg/pedestrian_parameters.hpp>
 #include <vector>
 
 namespace entity_behavior
@@ -44,7 +43,7 @@ public:
     return entity_behavior::PedestrianActionNode::providedPorts();
   }
   DetectorStatus detectObstacleInLane(
-    const lanelet::Ids & pedestrian_lanes, const bool & see_around);
+    const lanelet::Ids & pedestrian_lanes, const bool & see_around) const;
 };
 }  // namespace pedestrian
 }  // namespace entity_behavior
