@@ -341,14 +341,12 @@ public:
 
       entity.setBehaviorParameter([&]() {
         auto message = entity.getBehaviorParameter();
+        message.see_around = not controller.properties.template get<Boolean>("isBlind");
         if (
           entity.getEntityType().type == traffic_simulator_msgs::msg::EntityType::PEDESTRIAN &&
           Pedestrian::compatibility == Compatibility::legacy) {
           message.see_around = false;
-        } else {
-          message.see_around = not controller.properties.template get<Boolean>("isBlind");
         }
-
         /// The default values written in https://github.com/tier4/scenario_simulator_v2/blob/master/simulation/traffic_simulator_msgs/msg/DynamicConstraints.msg
         message.dynamic_constraints.max_acceleration =
           controller.properties.template get<Double>("maxAcceleration", 10.0);
