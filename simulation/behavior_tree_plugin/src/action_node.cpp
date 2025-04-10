@@ -134,10 +134,12 @@ auto ActionNode::getYieldStopDistance(const lanelet::Ids & following_lanelets) c
       const auto other_status = getOtherEntityStatus(right_of_way_id);
       if (!other_status.empty() && canonicalized_entity_status->isInLanelet()) {
         const auto lanelet_pose = canonicalized_entity_status->getLaneletPose();
-        const auto distance_forward = hdmap_utils->getLongitudinalDistance(
-          lanelet_pose, traffic_simulator::helper::constructLaneletPose(lanelet, 0));
-        const auto distance_backward = hdmap_utils->getLongitudinalDistance(
-          traffic_simulator::helper::constructLaneletPose(lanelet, 0), lanelet_pose);
+        const auto distance_forward =
+          traffic_simulator::lanelet_wrapper::distance::longitudinalDistance(
+            lanelet_pose, traffic_simulator::helper::constructLaneletPose(lanelet, 0));
+        const auto distance_backward =
+          traffic_simulator::lanelet_wrapper::distance::longitudinalDistance(
+            traffic_simulator::helper::constructLaneletPose(lanelet, 0), lanelet_pose);
         if (distance_forward) {
           distances.insert(distance_forward.value());
         } else if (distance_backward) {
@@ -334,13 +336,12 @@ auto ActionNode::getDistanceToTargetEntity(
     if (const auto bounding_box_distance =
           traffic_simulator::distance::boundingBoxLaneLongitudinalDistance(
             *from_lanelet_pose, from_bounding_box, *target_lanelet_pose, target_bounding_box,
-            include_adjacent_lanelet, include_opposite_direction, routing_configuration,
-            hdmap_utils);
+            include_adjacent_lanelet, include_opposite_direction, routing_configuration);
         !bounding_box_distance || bounding_box_distance.value() < 0.0) {
       return std::nullopt;
     } else if (const auto position_distance = traffic_simulator::distance::longitudinalDistance(
                  *from_lanelet_pose, *target_lanelet_pose, include_adjacent_lanelet,
-                 include_opposite_direction, routing_configuration, hdmap_utils);
+                 include_opposite_direction, routing_configuration);
                !position_distance) {
       return std::nullopt;
     } else {
