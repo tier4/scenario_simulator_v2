@@ -31,7 +31,7 @@ namespace entity_behavior
 {
 namespace pedestrian
 {
-enum class DetectorStatus { DETECTED, NOT_DETECTED, LEGACY_MODE };
+enum class DetectorStatus { DETECTED, NOT_DETECTED };
 
 class FollowLaneAction : public entity_behavior::PedestrianActionNode
 {
@@ -44,9 +44,7 @@ public:
     return entity_behavior::PedestrianActionNode::providedPorts();
   }
   DetectorStatus detectObstacleInLane(
-    const lanelet::Ids & pedestrian_lanes, const bool & see_around,
-    const uint8_t pedestrian_behavior_mode =
-      traffic_simulator_msgs::msg::PedestrianParameters::LEGACY);
+    const lanelet::Ids & pedestrian_lanes, const bool & see_around);
 };
 }  // namespace pedestrian
 }  // namespace entity_behavior

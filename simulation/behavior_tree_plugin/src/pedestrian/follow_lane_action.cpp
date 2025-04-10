@@ -31,15 +31,10 @@ FollowLaneAction::FollowLaneAction(const std::string & name, const BT::NodeConfi
 void FollowLaneAction::getBlackBoardValues() { PedestrianActionNode::getBlackBoardValues(); }
 
 DetectorStatus FollowLaneAction::detectObstacleInLane(
-  const lanelet::Ids & pedestrian_lanes, const bool & see_around,
-  const uint8_t pedestrian_behavior_mode)
+  const lanelet::Ids & pedestrian_lanes, const bool & see_around)
 {
   if (!see_around) {
     return DetectorStatus::NOT_DETECTED;
-  }
-
-  if (pedestrian_behavior_mode == traffic_simulator_msgs::msg::PedestrianParameters::LEGACY) {
-    return DetectorStatus::LEGACY_MODE;
   }
 
   auto hasObstacleInPedestrianLanes =
@@ -104,7 +99,7 @@ BT::NodeStatus FollowLaneAction::tick()
   }
 
   const auto obstacle_detector_result = detectObstacleInLane(
-    following_lanelets, behavior_parameter.see_around, pedestrian_parameters.obstacle_detect_mode);
+    following_lanelets, behavior_parameter.see_around);
   target_speed = (obstacle_detector_result == DetectorStatus::DETECTED) ? 0.0 : target_speed;
 
   setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(target_speed.value()));
