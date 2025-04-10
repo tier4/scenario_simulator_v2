@@ -38,5 +38,5 @@ repositories:
     version: tier4/universe # for Autoware.Universe (TIER IV)
   agnocast:
     type: git
-    url: git@github.com:tier4/agnocast.git
+    url: https://github.com/tier4/agnocast.git
     version: main
