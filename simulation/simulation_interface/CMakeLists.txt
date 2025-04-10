@@ -19,6 +19,7 @@ endif()
 find_package(ament_cmake_auto REQUIRED)
 find_package(Boost REQUIRED thread)
 find_package(rclcpp REQUIRED)
+find_package(zmqpp_vendor REQUIRED)
 include(FindProtobuf REQUIRED)
 ament_auto_find_build_dependencies()
 
