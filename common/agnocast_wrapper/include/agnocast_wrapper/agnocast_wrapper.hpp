@@ -15,6 +15,9 @@
 #ifndef AGNOCAST_WRAPPER__AGNOCAST_WRAPPER_HPP_
 #define AGNOCAST_WRAPPER__AGNOCAST_WRAPPER_HPP_
 
+#include <string>
+#include <utility>
+
 /**
  * @brief Define includes
  */
@@ -76,7 +79,7 @@ template<
   typename NodePointerT>
 SubscriptionPtr<MessageT>
 create_subscription(
-  NodePointerT  node_ptr,
+  NodePointerT node_ptr,
   const std::string & topic_name,
   const rclcpp::QoS & qos,
   CallbackT && callback,
@@ -103,7 +106,7 @@ template<
   typename NodePointerT>
 PublisherPtr<MessageT>
 create_publisher(
-  NodePointerT  node_ptr,
+  NodePointerT node_ptr,
   const std::string & topic_name,
   const rclcpp::QoS & qos,
   const PublisherOptions & options = PublisherOptions{})
