@@ -299,7 +299,9 @@ auto CatmullRomSpline::getCollisionPointsIn2D(
     for (std::size_t i = 0; i < curves_.size(); ++i) {
       if (
         s_range == std::nullopt ||
-        (current_curve_start_s >= s_range->first && current_curve_start_s <= s_range->second)) {
+        (((current_curve_start_s >= s_range->first) ||
+          (current_curve_start_s + curves_[i].getLength()) > s_range->first) &&
+         (current_curve_start_s <= s_range->second))) {
         /// @note The local_polygon is assumed to be closed
         const auto s =
           curves_[i].getCollisionPointsIn2D(local_polygon, local_search_backward, true, true);

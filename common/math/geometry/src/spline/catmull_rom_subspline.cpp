@@ -37,9 +37,9 @@ std::optional<double> CatmullRomSubspline::getCollisionPointIn2D(
       "This message is not originally intended to be displayed, if you see it, please "
       "contact the developer of traffic_simulator.");
   }
-
-  std::set<double> s_value_candidates =
-    spline_->getCollisionPointsIn2D(polygon, search_backward, s_range);
+  std::set<double> s_value_candidates = spline_->getCollisionPointsIn2D(
+    polygon, search_backward,
+    std::make_pair(s_range->first + start_s_, s_range->second + start_s_));
 
   if (s_value_candidates.empty()) {
     return std::nullopt;

@@ -366,7 +366,7 @@ auto ActionNode::getDistanceToTargetEntity(
                  target_polygon, search_backward,
                  std::make_pair(
                    bounding_box_distance.value(),
-                   bounding_box_distance.value() + bounding_box_diagonal_length))) {
+                   target_bounding_box_distance + bounding_box_diagonal_length))) {
         return target_bounding_box_distance;
       }
     }
