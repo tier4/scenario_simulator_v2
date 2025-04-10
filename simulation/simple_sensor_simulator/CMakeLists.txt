@@ -65,12 +65,18 @@ target_link_libraries(simple_sensor_simulator_component
 ament_target_dependencies(simple_sensor_simulator_component
   simulation_interface
 )
+
+agnocast_wrapper_setup_target(simple_sensor_simulator_component)
+
 rclcpp_components_register_nodes(simple_sensor_simulator_component
   "simple_sensor_simulator::ScenarioSimulator")
 
 ament_auto_add_executable(simple_sensor_simulator_node
   src/simple_sensor_simulator_node.cpp
 )
+
+agnocast_wrapper_setup_target(simple_sensor_simulator_node)
+
 target_link_libraries(simple_sensor_simulator_node
   simple_sensor_simulator_component
 )

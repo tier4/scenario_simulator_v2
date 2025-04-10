@@ -15,6 +15,7 @@
 #ifndef CONCEALER__PUBLISHER_HPP_
 #define CONCEALER__PUBLISHER_HPP_
 
+#include <agnocast_wrapper/agnocast_wrapper.hpp>
 #include <get_parameter/get_parameter.hpp>
 #include <nav_msgs/msg/odometry.hpp>
 #include <random>
@@ -94,17 +95,28 @@ struct NormalDistribution<nav_msgs::msg::Odometry>
   auto operator()(nav_msgs::msg::Odometry odometry) -> nav_msgs::msg::Odometry;
 };
 
-template <typename Message, template <typename> typename Randomizer = Identity>
+template <
+  typename Message, bool use_agnocast = false, template <typename> typename Randomizer = Identity>
 class Publisher
 {
-  typename rclcpp::Publisher<Message>::SharedPtr publisher;
+  using PublisherPtrType = typename std::conditional_t<
+    use_agnocast, agnocast_wrapper::PublisherPtr<Message>,
+    typename rclcpp::Publisher<Message>::SharedPtr>;
+
+  PublisherPtrType publisher;
 
   Randomizer<Message> randomize;
 
 public:
   template <typename Node>
   explicit Publisher(const std::string & topic, Node & node)
-  : publisher(node.template create_publisher<Message>(topic, rclcpp::QoS(1).reliable())),
+  : publisher([&] {
+      if constexpr (use_agnocast) {
+        return agnocast_wrapper::create_publisher<Message>(&node, topic, rclcpp::QoS(1).reliable());
+      } else {
+        return node.template create_publisher<Message>(topic, rclcpp::QoS(1).reliable());
+      }
+    }()),
     randomize(node.get_node_parameters_interface(), topic)
   {
   }
@@ -112,7 +124,13 @@ public:
   template <typename... Ts>
   auto operator()(Ts &&... xs) -> decltype(auto)
   {
-    return publisher->publish(randomize(std::forward<decltype(xs)>(xs)...));
+    if constexpr (use_agnocast) {
+      auto message_ptr = agnocast_wrapper::create_message(publisher);
+      *message_ptr = randomize(std::forward<decltype(xs)>(xs)...);
+      return publisher->publish(std::move(message_ptr));
+    } else {
+      return publisher->publish(randomize(std::forward<decltype(xs)>(xs)...));
+    }
   }
 };
 }  // namespace concealer
