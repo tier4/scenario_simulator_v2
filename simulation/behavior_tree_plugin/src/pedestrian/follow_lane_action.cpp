@@ -37,8 +37,7 @@ DetectorStatus FollowLaneAction::detectObstacleInLane(
     return DetectorStatus::NOT_DETECTED;
   }
 
-  auto hasObstacleInPedestrianLanes =
-    [this](const lanelet::Ids & pedestrian_lanes_local){
+  auto hasObstacleInPedestrianLanes = [this](const lanelet::Ids & pedestrian_lanes_local) {
     lanelet::Ids other_entity_lane_ids;
     for (const auto & [_, status] : other_entity_status) {
       if (status.isInLanelet()) {
@@ -55,7 +54,7 @@ DetectorStatus FollowLaneAction::detectObstacleInLane(
     return DetectorStatus::NOT_DETECTED;
   };
 
-  auto hasObstacleInFrontOfPedestrian = [this](){
+  auto hasObstacleInFrontOfPedestrian = [this]() {
     using math::geometry::operator-;
 
     const auto & pedestrian_position = canonicalized_entity_status->getMapPose().position;
@@ -98,8 +97,8 @@ BT::NodeStatus FollowLaneAction::tick()
     target_speed = hdmap_utils->getSpeedLimit(following_lanelets);
   }
 
-  const auto obstacle_detector_result = detectObstacleInLane(
-    following_lanelets, behavior_parameter.see_around);
+  const auto obstacle_detector_result =
+    detectObstacleInLane(following_lanelets, behavior_parameter.see_around);
   target_speed = (obstacle_detector_result == DetectorStatus::DETECTED) ? 0.0 : target_speed;
 
   setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(target_speed.value()));
