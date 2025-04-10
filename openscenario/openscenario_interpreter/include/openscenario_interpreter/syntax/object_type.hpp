@@ -15,6 +15,9 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__OBJECT_TYPE_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__OBJECT_TYPE_HPP_
 
+#include <istream>
+#include <ostream>
+
 namespace openscenario_interpreter
 {
 inline namespace syntax
@@ -39,7 +42,22 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct ObjectType
 {
+  enum value_type {
+    vehicle,
+
+    external,
+    miscellaneous,
+    pedestrian,
+  } value;
+
+  ObjectType() = default;
+
+  operator value_type() const noexcept { return value; }
 };
+
+auto operator>>(std::istream &, ObjectType &) -> std::istream &;
+
+auto operator<<(std::ostream &, const ObjectType &) -> std::ostream &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

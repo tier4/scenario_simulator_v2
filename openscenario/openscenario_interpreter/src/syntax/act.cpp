@@ -24,8 +24,8 @@ inline namespace syntax
 Act::Act(const pugi::xml_node & node, Scope & scope)
 : Scope(readAttribute<String>("name", node, scope), scope),
   StoryboardElement(
-    readElement<Trigger>("StartTrigger", node, local()),
-    readElement<Trigger>("StopTrigger", node, local()))  // NOTE: Optional element
+    readElement<Trigger>("StartTrigger", node, local(), Trigger::truthy()),
+    readElement<Trigger>("StopTrigger", node, local()))
 {
   traverse<1, unbounded>(node, "ManeuverGroup", [&](auto && node) {
     return elements.push_back(readStoryboardElement<ManeuverGroup>(node, local()));
@@ -46,18 +46,18 @@ auto Act::run() -> void
   }
 }
 
-auto operator<<(nlohmann::json & json, const Act & datum) -> nlohmann::json &
+auto operator<<(boost::json::object & json, const Act & datum) -> boost::json::object &
 {
   json["name"] = datum.name;
 
   json["currentState"] = boost::lexical_cast<std::string>(datum.state());
 
-  json["ManeuverGroup"] = nlohmann::json::array();
+  auto & maneuver_groups = json["ManeuverGroup"].emplace_array();
 
   for (auto && maneuver_group : datum.elements) {
-    nlohmann::json act;
+    boost::json::object act(json.storage());
     act << maneuver_group.as<ManeuverGroup>();
-    json["ManeuverGroup"].push_back(act);
+    maneuver_groups.push_back(std::move(act));
   }
 
   return json;

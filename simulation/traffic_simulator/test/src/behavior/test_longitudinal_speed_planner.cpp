@@ -121,6 +121,49 @@ TEST_F(LongitudinalSpeedPlannerTest, getAccelerationDuration_acceleration)
       8.5, constraints, makeTwistWithLinearX(1.0), makeAccelWithLinearX(1.0)),
     4.0, 1e-5);
 }
+/**
+ * @note Test calculations correctness when difference between getVelocityWithConstantJerk 
+ * and target_speed is more than 0.01, https://github.com/tier4/scenario_simulator_v2/issues/1395
+ */
+
+TEST_F(LongitudinalSpeedPlannerTest, getAccelerationDuration_targetSpeed_difference)
+{
+  geometry_msgs::msg::Twist current_twist{};
+  geometry_msgs::msg::Accel current_accel{};
+  current_twist.linear.x = 1.0;
+  current_accel.linear.x = 1.0;
+
+  const auto constraints =
+    traffic_simulator_msgs::build<traffic_simulator_msgs::msg::DynamicConstraints>()
+      .max_acceleration(1.0)
+      .max_acceleration_rate(1.0)
+      .max_deceleration(1.0)
+      .max_deceleration_rate(1.0)
+      .max_speed(10.0);
+
+  constexpr double epsilon = 1e-5;
+  {
+    const double target_speed = current_twist.linear.x + epsilon;
+    const double result_duration =
+      planner.getAccelerationDuration(target_speed, constraints, current_twist, current_accel);
+    EXPECT_GE(result_duration, 0.0);
+    EXPECT_LE(result_duration, epsilon);
+  }
+  {
+    const double target_speed = current_twist.linear.x + 0.0100;
+    const double result_duration =
+      planner.getAccelerationDuration(target_speed, constraints, current_twist, current_accel);
+    EXPECT_GE(result_duration, 0.0);
+    EXPECT_LE(result_duration, 0.0100 + epsilon);
+  }
+  {
+    const double target_speed = current_twist.linear.x + 0.0099;
+    const double result_duration =
+      planner.getAccelerationDuration(target_speed, constraints, current_twist, current_accel);
+    EXPECT_GE(result_duration, 0.0);
+    EXPECT_LE(result_duration, 0.0099 + epsilon);
+  }
+}
 
 /**
  * @note Test functionality aggregation used in other classes.

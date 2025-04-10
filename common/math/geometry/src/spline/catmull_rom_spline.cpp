@@ -36,7 +36,7 @@ auto CatmullRomSpline::getPolygon(
   std::vector<geometry_msgs::msg::Point> points;
   std::vector<geometry_msgs::msg::Point> left_bounds = getLeftBounds(width, num_points, z_offset);
   std::vector<geometry_msgs::msg::Point> right_bounds = getRightBounds(width, num_points, z_offset);
-  for (size_t i = 0; i < static_cast<size_t>(left_bounds.size() - 1); i++) {
+  for (size_t i = 0; i < left_bounds.size() - 1; i++) {
     geometry_msgs::msg::Point pr_0 = right_bounds[i];
     geometry_msgs::msg::Point pl_0 = left_bounds[i];
     geometry_msgs::msg::Point pr_1 = right_bounds[i + 1];
@@ -57,18 +57,17 @@ auto CatmullRomSpline::getRightBounds(
 {
   std::vector<geometry_msgs::msg::Point> points;
   double step_size = getLength() / static_cast<double>(num_points);
-  for (size_t i = 0; i < static_cast<size_t>(num_points + 1); i++) {
+  for (size_t i = 0; i < num_points + 1; i++) {
     double s = step_size * static_cast<double>(i);
     points.emplace_back(
-      [this](
-        const double width, const double s, const double z_offset) -> geometry_msgs::msg::Point {
-        geometry_msgs::msg::Vector3 vec = getNormalVector(s);
+      [this](const double local_width, const double local_s, const double local_z_offset) {
+        geometry_msgs::msg::Vector3 vec = getNormalVector(local_s);
         double theta = std::atan2(vec.y, vec.x);
-        geometry_msgs::msg::Point p = getPoint(s);
+        geometry_msgs::msg::Point p = getPoint(local_s);
         geometry_msgs::msg::Point point;
-        point.x = p.x + 0.5 * width * std::cos(theta);
-        point.y = p.y + 0.5 * width * std::sin(theta);
-        point.z = p.z + z_offset;
+        point.x = p.x + 0.5 * local_width * std::cos(theta);
+        point.y = p.y + 0.5 * local_width * std::sin(theta);
+        point.z = p.z + local_z_offset;
         return point;
       }(width, s, z_offset));
   }
@@ -81,18 +80,17 @@ auto CatmullRomSpline::getLeftBounds(
 {
   std::vector<geometry_msgs::msg::Point> points;
   double step_size = getLength() / static_cast<double>(num_points);
-  for (size_t i = 0; i < static_cast<size_t>(num_points + 1); i++) {
+  for (size_t i = 0; i < num_points + 1; i++) {
     double s = step_size * static_cast<double>(i);
     points.emplace_back(
-      [this](
-        const double width, const double s, const double z_offset) -> geometry_msgs::msg::Point {
-        geometry_msgs::msg::Vector3 vec = getNormalVector(s);
+      [this](const double local_width, const double local_s, const double local_z_offset) {
+        geometry_msgs::msg::Vector3 vec = getNormalVector(local_s);
         double theta = std::atan2(vec.y, vec.x);
-        geometry_msgs::msg::Point p = getPoint(s);
+        geometry_msgs::msg::Point p = getPoint(local_s);
         geometry_msgs::msg::Point point;
-        point.x = p.x - 0.5 * width * std::cos(theta);
-        point.y = p.y - 0.5 * width * std::sin(theta);
-        point.z = p.z + z_offset;
+        point.x = p.x - 0.5 * local_width * std::cos(theta);
+        point.y = p.y - 0.5 * local_width * std::sin(theta);
+        point.z = p.z + local_z_offset;
         return point;
       }(width, s, z_offset));
   }
@@ -139,7 +137,7 @@ CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> 
       break;
     /// @note In this case, spline is interpreted as line segment.
     case 2:
-      total_length_ = line_segments_[0].getLength();
+      total_length_ = line_segments_[0].length;
       break;
     /// @note In this case, spline is interpreted as curve.
     default:
@@ -171,7 +169,7 @@ CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> 
             bz = bz * 0.5;
             cz = cz * 0.5;
             dz = dz * 0.5;
-            curves_.emplace_back(HermiteCurve(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz));
+            curves_.emplace_back(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz);
           } else if (i == (n - 1)) {
             double ax = 0;
             double bx = control_points[i - 1].x - 2 * control_points[i].x + control_points[i + 1].x;
@@ -197,7 +195,7 @@ CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> 
             bz = bz * 0.5;
             cz = cz * 0.5;
             dz = dz * 0.5;
-            curves_.emplace_back(HermiteCurve(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz));
+            curves_.emplace_back(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz);
           } else {
             double ax = -1 * control_points[i - 1].x + 3 * control_points[i].x -
                         3 * control_points[i + 1].x + control_points[i + 2].x;
@@ -229,7 +227,7 @@ CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> 
             bz = bz * 0.5;
             cz = cz * 0.5;
             dz = dz * 0.5;
-            curves_.emplace_back(HermiteCurve(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz));
+            curves_.emplace_back(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz);
           }
         }
         for (const auto & curve : curves_) {
@@ -293,21 +291,22 @@ auto CatmullRomSpline::getCollisionPointsIn2D(
   }
   /// @note If the spline has three or more control points.
   const auto get_collision_point_2d_with_curve =
-    [this](const auto & polygon, const auto search_backward) -> std::set<double> {
-    std::set<double> s_value_candidates;
-    for (size_t i = 0; i < curves_.size(); ++i) {
-      /// @note The polygon is assumed to be closed
-      const auto s = curves_[i].getCollisionPointsIn2D(polygon, search_backward, true, true);
-      std::for_each(s.begin(), s.end(), [&s_value_candidates, i, this](const auto & s) {
-        s_value_candidates.insert(getSInSplineCurve(i, s));
-      });
-    }
-    return s_value_candidates;
-  };
+    [this](const auto & local_polygon, const auto local_search_backward) {
+      std::set<double> s_value_candidates;
+      for (size_t i = 0; i < curves_.size(); ++i) {
+        /// @note The local_polygon is assumed to be closed
+        const auto s =
+          curves_[i].getCollisionPointsIn2D(local_polygon, local_search_backward, true, true);
+        std::for_each(s.begin(), s.end(), [&s_value_candidates, i, this](const auto & s) {
+          s_value_candidates.insert(getSInSplineCurve(i, s));
+        });
+      }
+      return s_value_candidates;
+    };
   /// @note If the spline has two control points. (Same as single line segment.)
-  const auto get_collision_point_2d_with_line = [this](const auto & polygon) -> std::set<double> {
+  const auto get_collision_point_2d_with_line = [this](const auto & local_polygon) {
     std::set<double> s_value_candidates;
-    for (const auto & line : getLineSegments(polygon)) {
+    for (const auto & line : getLineSegments(local_polygon)) {
       if (static_cast<int>(line_segments_.size()) != 1) {
         THROW_SIMULATION_ERROR(
           "Number of the line segments are invalid : ", static_cast<int>(line_segments_.size()),
@@ -316,16 +315,16 @@ auto CatmullRomSpline::getCollisionPointsIn2D(
           "This message is not originally intended to be displayed, if you see it, please "
           "contact the developer of traffic_simulator.");
       }
-      if (const auto s = line_segments_[0].getIntersection2DSValue(line, true)) {
+      if (const auto s = line_segments_[0].get2DIntersectionSValue(line, true)) {
         s_value_candidates.insert(s.value());
       }
     }
     return s_value_candidates;
   };
   /// @note If the spline has one control point. (Same as point.)
-  const auto get_collision_point_2d_with_point = [this](const auto & polygon) -> std::set<double> {
+  const auto get_collision_point_2d_with_point = [this](const auto & local_polygon) {
     std::set<double> s_value_candidates;
-    for (const auto & line : getLineSegments(polygon)) {
+    for (const auto & line : getLineSegments(local_polygon)) {
       if (line.isIntersect2D(control_points[0])) {
         s_value_candidates.insert(0.0);
       }
@@ -471,8 +470,8 @@ auto CatmullRomSpline::getSquaredDistanceIn2D(
       }
       return line_segments_[0].getSquaredDistanceIn2D(point, s, true);
     default:
-      const auto index_and_s = getCurveIndexAndS(s);
-      return curves_[index_and_s.first].getSquaredDistanceIn2D(point, index_and_s.second, true);
+      const auto [index, s_value] = getCurveIndexAndS(s);
+      return curves_[index].getSquaredDistanceIn2D(point, s_value, true);
   }
 }
 
@@ -509,8 +508,8 @@ auto CatmullRomSpline::getSquaredDistanceVector(
       }
       return line_segments_[0].getSquaredDistanceVector(point, s, true);
     default:
-      const auto index_and_s = getCurveIndexAndS(s);
-      return curves_[index_and_s.first].getSquaredDistanceVector(point, index_and_s.second, true);
+      const auto [index, s_value] = getCurveIndexAndS(s);
+      return curves_[index].getSquaredDistanceVector(point, s_value, true);
   }
 }
 
@@ -543,8 +542,8 @@ auto CatmullRomSpline::getPoint(const double s) const -> geometry_msgs::msg::Poi
       }
       return line_segments_[0].getPoint(s, true);
     default:
-      const auto index_and_s = getCurveIndexAndS(s);
-      return curves_[index_and_s.first].getPoint(index_and_s.second, true);
+      const auto [index, s_value] = getCurveIndexAndS(s);
+      return curves_[index].getPoint(s_value, true);
   }
 }
 
@@ -598,8 +597,8 @@ auto CatmullRomSpline::getNormalVector(const double s) const -> geometry_msgs::m
         "This message is not originally intended to be displayed, if you see it, please "
         "contact the developer of traffic_simulator.");
     default:
-      const auto index_and_s = getCurveIndexAndS(s);
-      return curves_[index_and_s.first].getNormalVector(index_and_s.second, true);
+      const auto [index, s_value] = getCurveIndexAndS(s);
+      return curves_[index].getNormalVector(s_value, true);
   }
 }
 
@@ -628,13 +627,21 @@ auto CatmullRomSpline::getTangentVector(const double s) const -> geometry_msgs::
           "contact the developer of traffic_simulator.");
       }
       if (0 <= s && s <= getLength()) {
-        return line_segments_[0].getVector();
+        return line_segments_[0].vector;
       }
       THROW_SIMULATION_ERROR(
         "Invalid S value is specified, while getting tangent vector.",
         "This message is not originally intended to be displayed, if you see it, please "
         "contact the developer of traffic_simulator.");
     default:
+      /**
+       * @note The current implementation uses `index_and_s` instead of structured binding
+       * (`const auto [index, s_value] = getCurveIndexAndS(s)`) because some tests fail
+       * when using structured binding. The root cause of these test failures is under investigation.
+       */
+      // const auto [index, s_value] = getCurveIndexAndS(s);
+      // return curves_[index].getTangentVector(s_value, true);
+
       const auto index_and_s = getCurveIndexAndS(s);
       return curves_[index_and_s.first].getTangentVector(index_and_s.second, true);
   }
@@ -666,8 +673,8 @@ auto CatmullRomSpline::getPose(const double s, const bool fill_pitch) const
       }
       return line_segments_[0].getPose(s, true, fill_pitch);
     default:
-      const auto index_and_s = getCurveIndexAndS(s);
-      return curves_[index_and_s.first].getPose(index_and_s.second, true, fill_pitch);
+      const auto [index, s_value] = getCurveIndexAndS(s);
+      return curves_[index].getPose(s_value, true, fill_pitch);
   }
 }
 

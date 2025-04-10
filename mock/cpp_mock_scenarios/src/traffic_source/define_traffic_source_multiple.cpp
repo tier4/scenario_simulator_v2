@@ -53,37 +53,24 @@ private:
       }
       unsigned int vehicle_count = 0u, pedestrian_count = 0u;
       for (const auto & name : names) {
-        const traffic_simulator::CanonicalizedEntityStatus entity_status =
-          api_.getEntityStatus(name);
-
-        const bool is_vehicle =
-          static_cast<traffic_simulator_msgs::msg::EntityStatus>(entity_status).type.type ==
-          traffic_simulator_msgs::msg::EntityType::VEHICLE;
-        const bool is_pedestrian =
-          static_cast<traffic_simulator_msgs::msg::EntityStatus>(entity_status).type.type ==
-          traffic_simulator_msgs::msg::EntityType::PEDESTRIAN;
-
-        const bool valid_vehicle_lanelet =
-          api_.isInLanelet(name, static_cast<lanelet::Id>(34705), 50.0) ||
-          api_.isInLanelet(name, static_cast<lanelet::Id>(34696), 50.0);
-
-        const bool valid_pedestrian_lanelet =
-          api_.isInLanelet(name, static_cast<lanelet::Id>(34385), 10.0);
-
-        if (is_vehicle) {
-          ++vehicle_count;
-        } else if (is_pedestrian) {
-          ++pedestrian_count;
-        }
-
-        if (
-          // clang-format off
-          !entity_status.laneMatchingSucceed() ||
-          (is_vehicle && !valid_vehicle_lanelet) ||
-          (is_pedestrian && !valid_pedestrian_lanelet))
-        // clang-format on
-        {
+        const auto & entity = api_.getEntity(name);
+        if (!entity.isInLanelet()) {
           stop(cpp_mock_scenarios::Result::FAILURE);  // LCOV_EXCL_LINE
+        } else {
+          const bool valid_vehicle_lanelet =
+            entity.isInLanelet(34705, 50.0) || entity.isInLanelet(34696, 50.0);
+          const bool valid_pedestrian_lanelet = entity.isInLanelet(34385, 10.0);
+          if (isVehicle(name)) {
+            ++vehicle_count;
+          } else if (isPedestrian(name)) {
+            ++pedestrian_count;
+          }
+
+          if (
+            (isVehicle(name) && !valid_vehicle_lanelet) ||
+            (isPedestrian(name) && !valid_pedestrian_lanelet)) {
+            stop(cpp_mock_scenarios::Result::FAILURE);  // LCOV_EXCL_LINE
+          }
         }
       }
       if (vehicle_count != 6u || pedestrian_count != 15u) {
@@ -123,10 +110,11 @@ private:
       false, true, true, 0);
 
     api_.spawn(
-      "ego", api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34570, 0, 0)),
+      "ego", traffic_simulator::helper::constructCanonicalizedLaneletPose(34570, 0.0, 0.0),
       getVehicleParameters());
-    api_.setLinearVelocity("ego", 0.0);
-    api_.requestSpeedChange("ego", 0.0, true);
+    auto & ego_entity = api_.getEntity("ego");
+    ego_entity.setLinearVelocity(0.0);
+    ego_entity.requestSpeedChange(0.0, true);
   }
 };
 }  // namespace cpp_mock_scenarios

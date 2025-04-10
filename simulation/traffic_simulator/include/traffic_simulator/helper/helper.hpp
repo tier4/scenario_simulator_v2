@@ -26,7 +26,6 @@
 #include <string>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
 #include <traffic_simulator_msgs/msg/action_status.hpp>
-#include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
 #include <unordered_set>
 #include <vector>
 
@@ -60,6 +59,32 @@ traffic_simulator_msgs::msg::ActionStatus constructActionStatus(
 LaneletPose constructLaneletPose(
   lanelet::Id lanelet_id, double s, double offset = 0, double roll = 0, double pitch = 0,
   double yaw = 0);
+
+/**
+ * @brief helper function for constructing canonicalized lanelet pose
+ *
+ * @param lanelet_id lanelet id
+ * @param s s value in lane coordinate
+ * @param offset offset value in lane coordinate
+ * @return LaneletPose
+ */
+auto constructCanonicalizedLaneletPose(lanelet::Id lanelet_id, double s, double offset)
+  -> CanonicalizedLaneletPose;
+
+/**
+ * @brief helper function for constructing canonicalized lanelet pose
+ *
+ * @param lanelet_id lanelet id
+ * @param s s value in lane coordinate
+ * @param offset offset value in lane coordinate
+ * @param roll roll value in the lane coordinate
+ * @param pitch pitch value in the lane coordinate
+ * @param yaw yaw value in the lane coordinate
+ * @return LaneletPose
+ */
+auto constructCanonicalizedLaneletPose(
+  lanelet::Id lanelet_id, double s, double offset, double roll, double pitch, double yaw)
+  -> CanonicalizedLaneletPose;
 
 /**
  * @brief helper function for constructing rpy
@@ -128,16 +153,6 @@ const simulation_api_schema::DetectionSensorConfiguration constructDetectionSens
 }  // namespace helper
 }  // namespace traffic_simulator
 
-std::ostream & operator<<(std::ostream & os, const traffic_simulator::LaneletPose & ll_pose);
-
-std::ostream & operator<<(std::ostream & os, const geometry_msgs::msg::Point & point);
-
-std::ostream & operator<<(std::ostream & os, const geometry_msgs::msg::Vector3 & vector);
-
-std::ostream & operator<<(std::ostream & os, const geometry_msgs::msg::Quaternion & quat);
-
-std::ostream & operator<<(std::ostream & os, const geometry_msgs::msg::Pose & pose);
-
 template <typename T>
 auto operator+(const std::vector<T> & v0, const std::vector<T> & v1) -> decltype(auto)
 {
@@ -163,5 +178,4 @@ auto sortAndUnique(const std::vector<T> & data) -> std::vector<T>
   ret.erase(std::unique(ret.begin(), ret.end()), ret.end());
   return ret;
 }
-
 #endif  // TRAFFIC_SIMULATOR__HELPER__HELPER_HPP_

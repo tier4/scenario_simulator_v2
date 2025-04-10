@@ -88,13 +88,13 @@ private Q_SLOTS:
 protected:
   void processMessage(const Context::ConstSharedPtr msg_ptr);
   jsk_rviz_plugins::OverlayObject::Ptr overlay_;
-  rviz_common::properties::ColorProperty * property_text_color_;
-  rviz_common::properties::IntProperty * property_left_;
-  rviz_common::properties::IntProperty * property_top_;
-  rviz_common::properties::IntProperty * property_length_;
-  rviz_common::properties::IntProperty * property_width_;
-  rviz_common::properties::StringProperty * property_topic_name_;
-  rviz_common::properties::FloatProperty * property_value_scale_;
+  std::unique_ptr<rviz_common::properties::ColorProperty> property_text_color_;
+  std::unique_ptr<rviz_common::properties::IntProperty> property_left_;
+  std::unique_ptr<rviz_common::properties::IntProperty> property_top_;
+  std::unique_ptr<rviz_common::properties::IntProperty> property_length_;
+  std::unique_ptr<rviz_common::properties::IntProperty> property_width_;
+  std::unique_ptr<rviz_common::properties::StringProperty> property_topic_name_;
+  std::unique_ptr<rviz_common::properties::FloatProperty> property_value_scale_;
 
 private:
   void loadConditionGroups(const Context::ConstSharedPtr msg_ptr);

@@ -1,0 +1,2 @@
+ament_add_gtest(test_lanelet_pose test_lanelet_pose.cpp)
+target_link_libraries(test_lanelet_pose traffic_simulator)

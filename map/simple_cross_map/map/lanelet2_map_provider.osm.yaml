@@ -1,0 +1,8 @@
+/**:
+   ros__parameters:
+     # The earth-map transform is given by the point cloud map, but when the osm file is projected
+     # into the map frame, they might not match exactly. These parameters allow specifying a small
+     # correction to the position of the map frame origin for the purpose of this projection.
+     # Added as part of issue #847. The values are in degrees.
+     origin_offset_lat: -5.239983224214484e-06
+     origin_offset_lon: 4.5845488187978845e-06

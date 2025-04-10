@@ -23,14 +23,16 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- Range 1.2 --------------------------------------------------------------
- *
- *  <xsd:complexType name="Range">
- *    <xsd:attribute name="lowerLimit" type="Double" use="required"/>
- *    <xsd:attribute name="upperLimit" type="Double" use="required"/>
- *  </xsd:complexType>
- *
- * ------------------------------------------------------------------------ */
+/*
+   Range (OpenSCENARIO XML 1.3.1)
+
+   Indicates a range for a distribution where the following rule applies: lowerLimit <= value <= upperLimit.
+
+   <xsd:complexType name="Range">
+     <xsd:attribute name="lowerLimit" type="Double" use="required"/>
+     <xsd:attribute name="upperLimit" type="Double" use="required"/>
+   </xsd:complexType>
+*/
 struct Range
 {
   const Double lower_limit = Double::infinity();

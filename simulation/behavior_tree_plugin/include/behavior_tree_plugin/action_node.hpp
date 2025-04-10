@@ -28,7 +28,9 @@
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/helper/stop_watch.hpp>
-#include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
+#include <traffic_simulator/traffic_lights/traffic_lights.hpp>
+#include <traffic_simulator/utils/lanelet_map.hpp>
+#include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator_msgs/msg/obstacle.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 #include <unordered_map>
@@ -36,6 +38,8 @@
 
 namespace entity_behavior
 {
+BT::PortsList operator+(const BT::PortsList & ports_0, const BT::PortsList & ports_1);
+
 class ActionNode : public BT::ActionNodeBase
 {
 public:
@@ -51,9 +55,6 @@ public:
     -> double;
   auto getDistanceToFrontEntity(const math::geometry::CatmullRomSplineInterface & spline) const
     -> std::optional<double>;
-  auto getDistanceToStopLine(
-    const lanelet::Ids & route_lanelets,
-    const std::vector<geometry_msgs::msg::Point> & waypoints) const -> std::optional<double>;
   auto getDistanceToTrafficLightStopLine(
     const lanelet::Ids & route_lanelets,
     const math::geometry::CatmullRomSplineInterface & spline) const -> std::optional<double>;
@@ -65,8 +66,6 @@ public:
     -> std::vector<traffic_simulator::CanonicalizedEntityStatus>;
   auto stopEntity() const -> void;
   auto getHorizon() const -> double;
-  auto getActionStatus() const noexcept -> traffic_simulator_msgs::msg::ActionStatus;
-  auto getEntityName() const noexcept -> std::string;
 
   /// throws if the derived class return RUNNING.
   auto executeTick() -> BT::NodeStatus override;
@@ -84,59 +83,56 @@ public:
       BT::InputPort<lanelet::Ids>("route_lanelets"),
       BT::InputPort<std::optional<double>>("target_speed"),
       BT::InputPort<std::shared_ptr<hdmap_utils::HdMapUtils>>("hdmap_utils"),
-      BT::InputPort<std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>>("entity_status"),
-      BT::InputPort<std::shared_ptr<traffic_simulator::TrafficLightManager>>("traffic_light_manager"),
+      BT::InputPort<std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>>("canonicalized_entity_status"),
+      BT::InputPort<std::shared_ptr<traffic_simulator::TrafficLightsBase>>("traffic_lights"),
       BT::InputPort<traffic_simulator::behavior::Request>("request"),
       BT::OutputPort<std::optional<traffic_simulator_msgs::msg::Obstacle>>("obstacle"),
-      BT::OutputPort<std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>>("updated_status"),
       BT::OutputPort<traffic_simulator_msgs::msg::WaypointsArray>("waypoints"),
       BT::OutputPort<traffic_simulator::behavior::Request>("request"),
       // clang-format on
     };
   }
-  auto getBlackBoardValues() -> void;
+
+  virtual auto getBlackBoardValues() -> void;
   auto getEntityStatus(const std::string & target_name) const
-    -> traffic_simulator::CanonicalizedEntityStatus;
-  auto getDistanceToTargetEntityPolygon(
-    const math::geometry::CatmullRomSplineInterface & spline, const std::string target_name,
-    double width_extension_right = 0.0, double width_extension_left = 0.0,
-    double length_extension_front = 0.0, double length_extension_rear = 0.0) const
-    -> std::optional<double>;
+    -> const traffic_simulator::CanonicalizedEntityStatus &;
+
+  auto setCanonicalizedEntityStatus(const traffic_simulator::EntityStatus & entity_status) -> void;
   auto calculateUpdatedEntityStatus(
-    double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints &) const
-    -> traffic_simulator::CanonicalizedEntityStatus;
+    const double local_target_speed, const traffic_simulator_msgs::msg::DynamicConstraints &) const
+    -> traffic_simulator::EntityStatus;
   auto calculateUpdatedEntityStatusInWorldFrame(
-    double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints &) const
-    -> traffic_simulator::CanonicalizedEntityStatus;
+    const double local_target_speed, const traffic_simulator_msgs::msg::DynamicConstraints &) const
+    -> traffic_simulator::EntityStatus;
 
 protected:
   traffic_simulator::behavior::Request request;
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils;
-  std::shared_ptr<traffic_simulator::TrafficLightManager> traffic_light_manager;
-  std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus> entity_status;
+  std::shared_ptr<traffic_simulator::TrafficLightsBase> traffic_lights;
+  std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus> canonicalized_entity_status;
   double current_time;
   double step_time;
   double default_matching_distance_for_lanelet_pose_calculation;
   std::optional<double> target_speed;
-  std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus> updated_status;
   EntityStatusDict other_entity_status;
   lanelet::Ids route_lanelets;
+
+  auto getDistanceToTargetEntity(
+    const math::geometry::CatmullRomSplineInterface & spline,
+    const traffic_simulator::CanonicalizedEntityStatus & status) const -> std::optional<double>;
 
 private:
   auto getDistanceToTargetEntityOnCrosswalk(
     const math::geometry::CatmullRomSplineInterface & spline,
     const traffic_simulator::CanonicalizedEntityStatus & status) const -> std::optional<double>;
-  auto getDistanceToTargetEntityPolygon(
-    const math::geometry::CatmullRomSplineInterface & spline,
-    const traffic_simulator::CanonicalizedEntityStatus & status, double width_extension_right = 0.0,
-    double width_extension_left = 0.0, double length_extension_front = 0.0,
-    double length_extension_rear = 0.0) const -> std::optional<double>;
   auto getConflictingEntityStatus(const lanelet::Ids & following_lanelets) const
     -> std::optional<traffic_simulator::CanonicalizedEntityStatus>;
   auto getConflictingEntityStatusOnCrossWalk(const lanelet::Ids & route_lanelets) const
     -> std::vector<traffic_simulator::CanonicalizedEntityStatus>;
   auto getConflictingEntityStatusOnLane(const lanelet::Ids & route_lanelets) const
     -> std::vector<traffic_simulator::CanonicalizedEntityStatus>;
+  auto isOtherEntityAtConsideredAltitude(
+    const traffic_simulator::CanonicalizedEntityStatus & entity_status) const -> bool;
 };
 }  // namespace entity_behavior
 

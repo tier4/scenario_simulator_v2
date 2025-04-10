@@ -23,7 +23,8 @@ namespace traffic_simulator
 {
 namespace longitudinal_speed_planning
 {
-LongitudinalSpeedPlanner::LongitudinalSpeedPlanner(double step_time, const std::string & entity)
+LongitudinalSpeedPlanner::LongitudinalSpeedPlanner(
+  const double step_time, const std::string & entity)
 : step_time(step_time), entity(entity)
 {
 }
@@ -55,23 +56,34 @@ auto LongitudinalSpeedPlanner::planConstraintsFromJerkAndTimeConstraint(
       (acceleration_duration * acceleration_duration);
   } else {
     if (isAccelerating(target_speed, current_twist)) {
+      double discriminant =
+        (constraints.max_acceleration_rate * acceleration_duration *
+         constraints.max_acceleration_rate * acceleration_duration) +
+        2 * constraints.max_acceleration_rate *
+          (current_twist.linear.x + current_accel.linear.x * acceleration_duration - target_speed);
+
+      if (discriminant < 0) {
+        THROW_SEMANTIC_ERROR(
+          "Negative discriminant: the target speed is too high compared to the acceleration.");
+      }
+
       ret.max_acceleration = constraints.max_acceleration_rate * acceleration_duration -
-                             std::sqrt(
-                               (constraints.max_acceleration_rate * acceleration_duration *
-                                constraints.max_acceleration_rate * acceleration_duration) +
-                               2 * constraints.max_acceleration_rate *
-                                 (current_twist.linear.x +
-                                  current_accel.linear.x * acceleration_duration - target_speed)) +
-                             current_accel.linear.x;
+                             std::sqrt(discriminant) + current_accel.linear.x;
+
     } else {
+      double discriminant =
+        (constraints.max_deceleration_rate * acceleration_duration *
+         constraints.max_deceleration_rate * acceleration_duration) -
+        2 * constraints.max_deceleration_rate *
+          (current_twist.linear.x - current_accel.linear.x * acceleration_duration - target_speed);
+
+      if (discriminant < 0) {
+        THROW_SEMANTIC_ERROR(
+          "Negative discriminant: the target speed is too high compared to the deceleration.");
+      }
+
       ret.max_deceleration = -constraints.max_deceleration_rate * acceleration_duration +
-                             std::sqrt(
-                               (constraints.max_deceleration_rate * acceleration_duration *
-                                constraints.max_deceleration_rate * acceleration_duration) -
-                               2 * constraints.max_deceleration_rate *
-                                 (current_twist.linear.x -
-                                  current_accel.linear.x * acceleration_duration - target_speed)) +
-                             current_accel.linear.x;
+                             std::sqrt(discriminant) + current_accel.linear.x;
     }
   }
   return ret;
@@ -122,8 +134,8 @@ auto LongitudinalSpeedPlanner::getRunningDistance(
 }
 
 auto LongitudinalSpeedPlanner::isTargetSpeedReached(
-  double target_speed, const geometry_msgs::msg::Twist & current_twist,
-  double tolerance) const noexcept -> bool
+  const double target_speed, const geometry_msgs::msg::Twist & current_twist,
+  const double tolerance) const noexcept -> bool
 {
   return std::abs(target_speed - current_twist.linear.x) <= tolerance;
 }
@@ -182,7 +194,7 @@ auto LongitudinalSpeedPlanner::getQuadraticAccelerationDuration(
     double v = getVelocityWithConstantJerk(
       current_twist, current_accel, constraints.max_acceleration_rate, duration);
     // While quadratic acceleration, the entity does not reached the target speed.
-    if (std::abs(v - target_speed) >= 0.01) {
+    if (v < target_speed) {
       return duration;
     }
     // While quadratic acceleration, the entity reached the target speed.
@@ -196,7 +208,7 @@ auto LongitudinalSpeedPlanner::getQuadraticAccelerationDuration(
     double v = getVelocityWithConstantJerk(
       current_twist, current_accel, -constraints.max_deceleration_rate, duration);
     // While quadratic acceleration, the entity does not reached the target speed.
-    if (std::abs(v - target_speed) >= 0.01) {
+    if (v < target_speed) {
       return duration;
     }
     // While quadratic acceleration, the entity reached the target speed.

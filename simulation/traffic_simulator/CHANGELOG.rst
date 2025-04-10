@@ -13,6 +13,2401 @@ Changelog for package traffic_simulator
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+2.5.0 (2024-07-08)
+------------------
+* Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
+* Merge branch 'master' into feature/publish_empty_context
+* Merge branch 'master' into feature/publish_empty_context
+* Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
+* Contributors: Masaya Kataoka
+
+15.0.6 (2025-04-09)
+-------------------
+* fix: move workaround
+* fix: add workaround to avoid build CI fail due to tinyxml2
+* Contributors: Kotaro Yoshimoto
+
+15.0.5 (2025-04-04)
+-------------------
+* Merge branch 'master' into fix-turn-indicator-report
+* Merge branch 'master' into fix-turn-indicator-report
+* Contributors: Kem (TiankuiXian), Kotaro Yoshimoto
+
+15.0.4 (2025-04-03)
+-------------------
+
+15.0.3 (2025-04-03)
+-------------------
+* Merge pull request `#1555 <https://github.com/tier4/scenario_simulator_v2/issues/1555>`_ from tier4/feature/remove-trajectory-subscription
+  Remove Autoware trajectory subscription
+* Merge branch 'master' into feature/remove-trajectory-subscription
+* Fix spelling
+* Merge remote-tracking branch 'tier4/master' into feature/remove-trajectory-subscription
+* Remove Autoware trajectory subscription
+* Contributors: Mateusz Palczuk, Tatsuya Yamasaki
+
+15.0.2 (2025-04-02)
+-------------------
+* Merge branch 'master' into dependabot/pip/jinja2-3.1.6
+* Contributors: Masaya Kataoka
+
+15.0.1 (2025-04-02)
+-------------------
+* Merge branch 'master' into feature/support-context-gamma-test
+* Merge branch 'master' into feature/support-context-gamma-test
+* Contributors: Masaya Kataoka, Taiga
+
+15.0.0 (2025-03-31)
+-------------------
+* Merge pull request `#1551 <https://github.com/tier4/scenario_simulator_v2/issues/1551>`_ from tier4/refactor/get_lateral_distance
+  HdMapUtils refactor `lanelet_wrapper::distance::lateralDistance`
+* Merge branch 'master' into refactor/get_lateral_distance
+* Merge branch 'master' into refactor/get_lateral_distance
+* remove hdmap_utils from `boundingBoxLaneLateralDistance`
+* remove hdmap_utils from `lateralDistance` function
+* move `getLateralDistance` method
+* Contributors: Masaya Kataoka, Tatsuya Yamasaki, abco20
+
+14.2.3 (2025-03-28)
+-------------------
+* Merge pull request `#1549 <https://github.com/tier4/scenario_simulator_v2/issues/1549>`_ from tier4/refactor/concealer-7
+  Refactor/concealer 7
+* Merge branch 'master' into refactor/concealer-7
+* Merge branch 'master' into refactor/concealer-7
+* Merge branch 'master' into refactor/concealer-7
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-7
+* Add new struct `LegacyAutowareState`
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-7
+* Remove data member `concealer::FieldOperatorApplication::autoware_state`
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+14.2.2 (2025-03-27)
+-------------------
+* Merge pull request `#1543 <https://github.com/tier4/scenario_simulator_v2/issues/1543>`_ from tier4/RJD-1057/unify-spawn
+* Merge branch 'master' into RJD-1057/unify-spawn
+* Merge branch 'master' into RJD-1057/unify-spawn
+* Merge branch 'master' into RJD-1057/unify-spawn
+* Merge branch 'master' into RJD-1057/unify-spawn
+* Merge branch 'RJD1057/change-order-of-members' into RJD-1057/unify-spawn
+* Apply formatter
+* Unify spawn API
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, f0reachARR, ぐるぐる
+
+14.2.1 (2025-03-27)
+-------------------
+* Merge pull request `#1552 <https://github.com/tier4/scenario_simulator_v2/issues/1552>`_ from tier4/RJD-1057/no-specific-param-in-manager
+  RJD-1057: Remove some entity type specific functions in EntityManager
+* Merge remote-tracking branch 'origin/master' into RJD-1057/no-specific-param-in-manager
+* Use as<> for get parameters of each type of entity
+* Add `as` to EntityBase for type cast
+* Contributors: Masaya Kataoka, f0reachARR
+
+14.2.0 (2025-03-26)
+-------------------
+* Merge pull request `#1550 <https://github.com/tier4/scenario_simulator_v2/issues/1550>`_ from tier4/refactor/lanelet_wrapper_traffic_lights
+  HdMapUtils refactor `lanelet_wrapper::traffic_lights`
+* Merge branch 'master' into refactor/lanelet_wrapper_traffic_lights
+* Merge branch 'master' into refactor/lanelet_wrapper_traffic_lights
+* Merge branch 'master' into refactor/lanelet_wrapper_traffic_lights
+* Add traffic lights functions
+* Contributors: Masaya Kataoka, Tatsuya Yamasaki, abco20
+
+14.1.0 (2025-03-25)
+-------------------
+* Merge pull request `#1553 <https://github.com/tier4/scenario_simulator_v2/issues/1553>`_ from tier4/feature/revival_getStopLineIds
+  Renamed getStopLineIds to stopLineIds to revive functionality.
+* Added unit tests for the `stopLineIds` function.
+* Merge branch 'master' into feature/revival_getStopLineIds
+* Renamed getStopLineIds to stopLineIds to revive functionality.
+* Contributors: Masaya Kataoka, Taiga, Taiga Takano
+
+14.0.3 (2025-03-24)
+-------------------
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-6
+* Merge branch 'master' into refactor/concealer-6
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-6
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-6
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-6
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+14.0.2 (2025-03-19)
+-------------------
+* Merge pull request `#1540 <https://github.com/tier4/scenario_simulator_v2/issues/1540>`_ from tier4/RJD1057/change-order-of-members
+  RJD-1057: Change order of functions / variables
+* Merge remote-tracking branch 'origin/master' into RJD1057/change-order-of-members
+* Merge branch 'master' into RJD1057/change-order-of-members
+* Merge branch 'master' into RJD1057/change-order-of-members
+* Merge branch 'master' into RJD1057/change-order-of-members
+* Merge branch 'master' into RJD1057/change-order-of-members
+* Split constructor to some methods
+* Remove unused method
+* Change member declaration for styling
+* Remove unused include
+* Add missing const
+* Remove unnecessary namespace
+* Add comment for method category
+* Remove FORWARD_TO_ENTITY_MANAGER
+* Rename configuration like other private variables
+* Add Type suffix for some typename
+* Use auto for method
+* Refactor function order in traffic_simulator
+* Refactor order of api
+* Refactor function order in EntityManager
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, f0reachARR, ぐるぐる
+
+14.0.1 (2025-03-18)
+-------------------
+* Merge pull request `#1536 <https://github.com/tier4/scenario_simulator_v2/issues/1536>`_ from tier4/feature/support-internal-repository
+  Make Certain Member Functions Public for context_gamma_planner
+* Merge branch 'master' into feature/support-internal-repository
+* Merge branch 'master' into feature/support-internal-repository
+* Merge branch 'master' into feature/support-internal-repository
+* Fix for intternal repository
+* Contributors: Masaya Kataoka, Taiga, Taiga Takano
+
+14.0.0 (2025-03-14)
+-------------------
+* Merge pull request `#1546 <https://github.com/tier4/scenario_simulator_v2/issues/1546>`_ from tier4/refactor/concealer-5
+  Refactor/concealer 5
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-5
+* Cleanup
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-5
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-5
+* Restore member function template `API::getROS2Parameter`
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-5
+* Replace miscellaneous `get_parameter` calls with `common::getParameter`
+* Remove member function `API::getROS2Parameter`
+* Remove free function `traffic_simulator::getParameter`
+* Contributors: Masaya Kataoka, yamacir-kit
+
+13.0.0 (2025-03-14)
+-------------------
+* Merge pull request `#1538 <https://github.com/tier4/scenario_simulator_v2/issues/1538>`_ from tier4/refactor/lanelet_wrapper_distance_to_stop_line
+  HdMapUtils refactor `lanelet_wrapper::distance::distanceToStopLine`
+* Merge branch 'master' into refactor/lanelet_wrapper_distance_to_stop_line
+* Merge branch 'master' into refactor/lanelet_wrapper_distance_to_stop_line
+* Merge branch 'master' into refactor/lanelet_wrapper_distance_to_stop_line
+* Merge branch 'master' into refactor/lanelet_wrapper_distance_to_stop_line
+* Merge branch 'master' into refactor/lanelet_wrapper_distance_to_stop_line
+* Fix include order
+* move `getDistanceToStopLine` method
+* move `getStopLinePolygon` method
+* move `getStopLineIds` method and `getStopLineIdsOnPath` method
+* add `trafficSignsOnPath`  method
+* Contributors: Masaya Kataoka, Tatsuya Yamasaki, abco20
+
+12.3.2 (2025-03-13)
+-------------------
+* Merge branch 'master' into feature/faster-template-instantiation
+* Merge remote-tracking branch 'origin/master' into feature/faster-template-instantiation
+* Merge remote-tracking branch 'origin/master' into feature/faster-template-instantiation
+* Merge remote-tracking branch 'origin/master' into feature/faster-template-instantiation
+* Merge branch 'master' into feature/faster-template-instantiation
+* Merge remote-tracking branch 'origin/master' into feature/faster-template-instantiation
+* Merge remote-tracking branch 'origin/master' into feature/faster-template-instantiation
+* Contributors: Shota Minami, Tatsuya Yamasaki
+
+12.3.1 (2025-03-13)
+-------------------
+* Merge pull request `#1548 <https://github.com/tier4/scenario_simulator_v2/issues/1548>`_ from tier4/chore/update_rviz_config_for_motion_veloicty_planner
+  Add missing debug marker for motion velocity planner
+* add debug marker for motion velocity obstacle\_(stop|slow_down|cruise) module
+* Contributors: Autumn60, Kotaro Yoshimoto
+
+12.3.0 (2025-03-12)
+-------------------
+* Merge branch 'master' into metrics_output
+* Merge branch 'master' into metrics_output
+* Merge branch 'master' into metrics_output
+* Merge remote-tracking branch 'origin/master' into metrics_output
+* Merge branch 'master' into metrics_output
+* Merge branch 'master' into metrics_output
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
+12.2.1 (2025-03-11)
+-------------------
+* Merge pull request `#1534 <https://github.com/tier4/scenario_simulator_v2/issues/1534>`_ from tier4/refactor/concealer-4
+  Refactor/concealer 4
+* Merge branch 'master' into refactor/concealer-4
+* Merge branch 'master' into refactor/concealer-4
+* Merge branch 'master' into refactor/concealer-4
+* Merge branch 'master' into refactor/concealer-4
+* Reformat
+* Remove macro `DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE`
+* Remove member function `FieldOperatorApplication::rethrow`
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki, yamacir-kit
+
+12.2.0 (2025-03-10)
+-------------------
+* Merge branch 'master' into feat/add_new_vehicle_model
+* Merge branch 'master' into feat/add_new_vehicle_model
+* Merge branch 'master' into feat/add_new_vehicle_model
+* Merge branch 'master' into feat/add_new_vehicle_model
+* Merge branch 'master' into feat/add_new_vehicle_model
+* Merge branch 'master' into feat/add_new_vehicle_model
+* Contributors: Tatsuya Yamasaki
+
+12.1.2 (2025-03-07)
+-------------------
+* Merge branch 'master' into xtk/loc-noise-exp
+* Contributors: Tatsuya Yamasaki
+
+12.1.1 (2025-03-07)
+-------------------
+
+12.1.0 (2025-03-05)
+-------------------
+* Merge branch 'master' into feature/simple_sensor_simulator/new-noise-model
+* Merge branch 'master' into feature/simple_sensor_simulator/new-noise-model
+* Merge remote-tracking branch 'origin/master' into feature/simple_sensor_simulator/new-noise-model
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki, yamacir-kit
+
+12.0.2 (2025-03-04)
+-------------------
+* Merge pull request `#1539 <https://github.com/tier4/scenario_simulator_v2/issues/1539>`_ from tier4/RJD-1057/reorgnize-ostream-helper
+  RJD-1057: Reorganize ostream operators
+* fix: add missing ")" and structured output
+* Merge branch 'master' into RJD-1057/reorgnize-ostream-helper
+* Update ostream helper
+  Co-authored-by: Dawid Moszynski <dawid.moszynski@robotec.ai>
+  Co-authored-by: Mateusz Palczuk <mateusz.palczuk@robotec.ai>
+* Contributors: Kotaro Yoshimoto, f0reachARR, ぐるぐる
+
+12.0.1 (2025-02-26)
+-------------------
+* Merge branch 'master' into feature/push-latest-docker-tag
+* Contributors: Masaya Kataoka
+
+12.0.0 (2025-02-25)
+-------------------
+* Merge pull request `#1533 <https://github.com/tier4/scenario_simulator_v2/issues/1533>`_ from tier4/refactor/lanelet_wrapper_bound
+  HdMapUtils refactor lanelet_wrapper::lanelet_map::leftBound rightBound
+* Merge branch 'master' into refactor/lanelet_wrapper_bound
+* Merge branch 'master' into refactor/lanelet_wrapper_bound
+* remove hdmap_utils from `distanceToLaneBound`
+* remove hdmap_utils from `distanceToLeftLaneBound` and `distanceToRightLaneBound`
+* move `getLeftBound` and `getRightBound` methods
+* Add toPolygon function
+* Contributors: Masaya Kataoka, Tatsuya Yamasaki, abco20
+
+11.1.0 (2025-02-21)
+-------------------
+* Merge branch 'master' into feature/execution_time
+* Merge remote-tracking branch 'origin/master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Merge branch 'master' into feature/execution_time
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
+11.0.0 (2025-02-20)
+-------------------
+* Merge pull request `#1531 <https://github.com/tier4/scenario_simulator_v2/issues/1531>`_ from tier4/refactor/lanelet_wrapper_route
+  HdMapUtils refactor lanelet_wrapper::route
+* Merge branch 'master' into refactor/lanelet_wrapper_route
+* fix format
+* use non member route function `getAlternativeLaneletPoseBaseOnShortestRouteFrom`
+* use non member route function `findRoutableAlternativeLaneletPoseFrom`
+* add route::route utils
+* Implement static route function in lanelet_wrapper
+* Contributors: Masaya Kataoka, Tatsuya Yamasaki, abco20
+
+10.3.3 (2025-02-18)
+-------------------
+* Merge branch 'master' into refactor/simple_sensor_simulator/noise
+* Merge branch 'master' into refactor/simple_sensor_simulator/noise
+* Merge branch 'master' into refactor/simple_sensor_simulator/noise
+* Merge branch 'master' into refactor/simple_sensor_simulator/noise
+* Merge remote-tracking branch 'origin/master' into refactor/simple_sensor_simulator/noise
+* Merge branch 'master' into refactor/simple_sensor_simulator/noise
+* Merge branch 'master' into refactor/simple_sensor_simulator/noise
+* Merge branch 'master' into refactor/simple_sensor_simulator/noise
+* Merge branch 'master' into refactor/simple_sensor_simulator/noise
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+10.3.2 (2025-02-17)
+-------------------
+* Merge pull request `#1530 <https://github.com/tier4/scenario_simulator_v2/issues/1530>`_ from tier4/fix/visualization_triangle
+  fix: remove double applied orientation for visualization entity triangle marker
+* fix: remove double applied orientation for visualization entity triangle marker
+* Contributors: Kotaro Yoshimoto
+
+10.3.1 (2025-02-17)
+-------------------
+* Merge branch 'master' into fix/use-capital-as
+* Contributors: Kotaro Yoshimoto
+
+10.3.0 (2025-02-14)
+-------------------
+* Merge branch 'master' into feature/publisher-with-customizable-randomizer
+* Merge branch 'master' into feature/publisher-with-customizable-randomizer
+* Merge branch 'master' into feature/publisher-with-customizable-randomizer
+* Merge branch 'master' into feature/publisher-with-customizable-randomizer
+* Merge branch 'master' into feature/publisher-with-customizable-randomizer
+* Merge remote-tracking branch 'origin/master' into feature/publisher-with-customizable-randomizer
+* Merge branch 'master' into feature/publisher-with-customizable-randomizer
+* Merge branch 'master' into feature/publisher-with-customizable-randomizer
+* Merge branch 'master' into feature/publisher-with-customizable-randomizer
+* Merge branch 'master' into feature/publisher-with-customizable-randomizer
+* Merge remote-tracking branch 'origin/master' into feature/publisher-with-customizable-randomizer
+* Merge remote-tracking branch 'origin/master' into feature/publisher-with-customizable-randomizer
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+10.2.0 (2025-02-14)
+-------------------
+* Merge branch 'master' into feature/rosbag_storage
+* Merge branch 'master' into feature/rosbag_storage
+* Merge branch 'master' into feature/rosbag_storage
+* Contributors: Kotaro Yoshimoto
+
+10.1.2 (2025-02-14)
+-------------------
+* Merge pull request `#1527 <https://github.com/tier4/scenario_simulator_v2/issues/1527>`_ from tier4/fix/copyright_date
+  Change copyright date to 2015
+* Change copyright date to 2015
+* Contributors: Tatsuya Yamasaki, abco20
+
+10.1.1 (2025-02-13)
+-------------------
+* Merge branch 'master' into doc/comment_about_respawn_ego
+* Contributors: Masaya Kataoka
+
+10.1.0 (2025-02-12)
+-------------------
+* Merge branch 'master' into fix/respawn-ego-test
+* Contributors: Kotaro Yoshimoto
+
+10.0.0 (2025-02-07)
+-------------------
+* Merge pull request `#1500 <https://github.com/tier4/scenario_simulator_v2/issues/1500>`_ from tier4/RJD-1057-remove-functions-forwarded-to-entity-base-middle-get-entity
+  [extra] RJD-1057 (3+/5): change getEntity return type to the reference
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-middle-get-entity
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-middle-get-entity
+* Merge remote-tracking branch 'tier4/master' into RJD-1057-remove-functions-forwarded-to-entity-base-middle-get-entity
+* Merge branch 'RJD-1057-remove-functions-forwarded-to-entity-base-middle' into RJD-1057-remove-functions-forwarded-to-entity-base-middle-get-entity
+* Merge branch 'RJD-1057-remove-functions-forwarded-to-entity-base-middle' into RJD-1057-remove-functions-forwarded-to-entity-base-middle-get-entity
+* Merge remote-tracking branch 'tier4/RJD-1057-remove-functions-forwarded-to-entity-base-middle' into RJD-1057-remove-functions-forwarded-to-entity-base-middle-get-entity
+* Merge remote-tracking branch 'tier4/RJD-1057-remove-functions-forwarded-to-entity-base-middle' into RJD-1057-remove-functions-forwarded-to-entity-base-middle-get-entity
+* Merge branch 'RJD-1057-remove-functions-forwarded-to-entity-base-middle' into RJD-1057-remove-functions-forwarded-to-entity-base-middle-get-entity
+* ref(traffic_simulator, simulator_core): apply solar required changes
+* ref(traffic_simulator): apply clang reformat
+* ref(traffic_simulator): add guard to EntityBase - remove copy and move constuctor, as well as assignments
+* ref(traffic_simulator, simulator_core): rename getEntityOrNullptr to getEntityPointer
+* ref(traffic_simulator): change getEntity return type to reference, adapt api and core
+* Contributors: Dawid Moszynski, Dawid Moszyński, Mateusz Palczuk, Tatsuya Yamasaki
+
+9.4.0 (2025-02-06)
+------------------
+* Merge branch 'master' into feature/support-latest-autoware-message-type
+* Merge branch 'master' into feature/support-latest-autoware-message-type
+* Merge remote-tracking branch 'origin/master' into feature/support-latest-autoware-message-type
+* Merge branch 'master' into feature/support-latest-autoware-message-type
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+9.3.1 (2025-02-06)
+------------------
+* Merge branch 'master' into chore/delete-target-branch-filter
+* Contributors: Masaya Kataoka
+
+9.3.0 (2025-02-05)
+------------------
+* Merge remote-tracking branch 'origin/master' into feature/docker/traffic_simulator
+* Contributors: Masaya Kataoka
+
+9.2.0 (2025-02-05)
+------------------
+* Merge pull request `#1493 <https://github.com/tier4/scenario_simulator_v2/issues/1493>`_ from tier4/fix/slope_inaccuracies
+  Fix/slope inaccuracies
+* Merge branch 'master' into fix/slope_inaccuracies
+* Merge branch 'master' into fix/slope_inaccuracies
+* Merge branch 'master' into fix/slope_inaccuracies
+* Merge branch 'master' into fix/slope_inaccuracies
+* fix(traffic_simulator): Fix an issue with lanelet transition
+* fix(traffic_simulator) Fix an issue with follow trajectory action
+  - Updated makeUpdatedStatus to fix an issue with toCanonicalizedLaneletPose
+* Merge branch 'master' into fix/slope_inaccuracies
+* ref(traffic_simulator): Refactor comments
+* ref(traffic_simulator): Refactor comments
+* ref(traffic_simulator): Refactor comments
+* ref(traffic_simulator> Refactor code according to the lastest master branch changes
+* Merge branch 'master' into fix/slope_inaccuracies
+* fix(traffic_simulator) Improve lanelet transition handling for entity position updates
+* ref(traffic_simulator) Refactor updateEntityPositionForLaneletTransition
+* Merge branch 'master' into fix/slope_inaccuracies
+* fix(traffic_simulator): Fix lanelet slope inaccuracies
+  - Adjusted entity position when transitioning between lanelets to reduce slope errors
+* Merge branch 'master' into fix/slope_inaccuracies
+* Merge branch 'master' into fix/slope_inaccuracies
+* fix(traffic_simulator): revert adjustOrientationAndOzPosition  change (lanelet rpy)
+* ref(traffic_simulator): tidy up after moveTowardsLaneletPose development
+* fix(behavior_tree_plugin, traffic_simulator): fix moveTowardsLaneletPose for WalkStraightAction, tidy up
+* tmp(behavior_tree_plugin, traffic_simulator): moveTowardsLaneletPose debug
+* Merge branch 'master' into fix/slope_inaccuracies
+* refactor(traffic_simulator) fix spell check issue
+* fix(traffic_simulator) Fix an issue with negative longitudinal displacement
+* fix(traffis_simulator): use next canonicalized lanelet pose in pose::moveTowardsLaneletPose
+* ref(behavior_tree_plugin, traffic_simulator): improve comments
+* fix(traffic_simulator): fix moveTowardsLaneletPose
+* ref(traffic_simulator): remove irrelevant toMapPosition
+* feat(traffic_simulator): improve moveTowardsLaneletPose to calc LaneletPose and return it
+* ref(traffic_simulator): cleanup after removal of pose::moveAlongLanelet
+* fix(behavior_tree_plugin): use moveToLaneletPose in calculateUpdatedEntityStatusInWorldFrame
+* fix(traffic_simulator): fix moveToLaneletPose in FollowTrajectoryAction
+* ref(traffic_simulator): fix pose::moveToTargetLaneletPose
+* ref(traffic_simulator): separete pose::moveToTargetPosition
+* ref(behavior_tree_plugin, traffic_simulator): separate pose::moveAlongLanelet
+* fix(behavior_tree_plugin)  Fix lanelet slope inaccuracies - walk straight action
+* fix(traffic_simulator) Fix lanelet slope inaccuracies - follow trajectory action
+* Contributors: Dawid Moszynski, Dawid Moszyński, Kotaro Yoshimoto, SzymonParapura
+
+9.1.0 (2025-02-04)
+------------------
+* Merge pull request `#1487 <https://github.com/tier4/scenario_simulator_v2/issues/1487>`_ from tier4/RJD-1489/NpcCenterLine
+* Remove std::midpoint
+* Review changes
+* Merge branch 'master' into RJD-1489/NpcCenterLine
+* Merge branch 'master' into RJD-1489/NpcCenterLine
+* Merge branch 'master' into RJD-1489/NpcCenterLine
+* SonarCloud issues changes part 2
+* SonarCloud issues changes
+* Merge branch 'master' into RJD-1489/NpcCenterLine
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into RJD-1489/NpcCenterLine
+* Formatting changes
+* Review changes
+* Move tranformToRoutableCanonicalizedLaneletPose to pose namespace
+* Move distance calculation method to utils
+* Review changes
+* Add new algorithm
+* Merge branch 'master' into RJD-1489/NpcCenterLine
+* Merge branch 'master' into RJD-1489/NpcCenterLine
+* Merge branch 'master' into RJD-1489/NpcCenterLine
+* Merge branch 'master' into RJD-1489/NpcCenterLine
+* Contributors: Dawid Moszyński, Grzegorz Maj, Kotaro Yoshimoto
+
+9.0.3 (2025-01-31)
+------------------
+* Merge pull request `#1509 <https://github.com/tier4/scenario_simulator_v2/issues/1509>`_ from tier4/RJD-1505/fix_slope_acceleration_sign
+* Merge branch 'master' into RJD-1505/fix_slope_acceleration_sign
+* chore: fix a mistake during solving the merge conflict
+* Merge branch 'master' into RJD-1505/fix_slope_acceleration_sign
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into RJD-1505/fix_slope_acceleration_sign
+* Remove noexcept
+* Change sign of slope acceleration  and check canonicalization status in acceleration calculation
+* Contributors: Grzegorz Maj, Kotaro Yoshimoto
+
+9.0.2 (2025-01-31)
+------------------
+
+9.0.1 (2025-01-31)
+------------------
+* Merge branch 'master' into feat/vel_model_acc
+* Merge branch 'master' into feat/vel_model_acc
+* Contributors: Kotaro Yoshimoto
+
+9.0.0 (2025-01-30)
+------------------
+* Merge pull request `#1473 <https://github.com/tier4/scenario_simulator_v2/issues/1473>`_ from tier4/RJD-1057-remove-functions-forwarded-to-entity-base-middle
+  RJD-1057 (3/5): Remove non-API member functions: EntityManager’s member functions forwarded to EntityBase (1/2)
+* remove double canonicalization
+* merge 8.0.2
+* remove recursive calls after merge
+* Merge tag '7.4.7' into RJD-1057-remove-functions-forwarded-to-entity-base-middle
+* Revert "move functions from EgoEntity to FieldOperatorApplication"
+  This reverts commit 8d90c0e2c2f66795f299859bfa675ef2f11abdd3.
+* Revert "remove function shadowing"
+  This reverts commit 82d6085784271ea59d8fa69f359e0437543e9d57.
+* remove function shadowing
+* move functions from EgoEntity to FieldOperatorApplication
+* Merge remote-tracking branch 'origin/master' into RJD-1057-remove-functions-forwarded-to-entity-base-middle
+* ref(traffic_simulator, simulator_interface): revert format unexpected changes
+* ref(traffic_simulator, cpp_mock_scenarios): rename isInPosition to isNerbyPosition
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-middle
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-middle
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-middle
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-middle
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-middle
+* ref(traffic_simulator): rename isEntitySpawned to isEntityExist
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-middle
+* Merge remote-tracking branch 'origin/master' into RJD-1057-remove-functions-forwarded-to-entity-base-middle
+* Merge remote-tracking branch 'origin/master' into RJD-1057-remove-functions-forwarded-to-entity-base-middle
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-middle
+* ref(traffic_simulator): tiny formatting change
+* ref(traffic_simulator): improve requestClearRoute call for ego_entity
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-middle
+* Merge branch 'RJD-1057-traffic-lights-tests' into RJD-1057-remove-functions-forwarded-to-entity-base-middle
+* ref(traffic_simulator): add const to LongitudinalSpeedPlanner::isTargetSpeedReached arguments
+* Merge remote-tracking branch 'origin/RJD-1057-traffic-lights-tests' into RJD-1057-remove-functions-forwarded-to-entity-base-middle
+* ref(traffic_simulator): improve requestLaneChange, getEgoName
+* ref(traffic_simulator, simulator_core): improve overall
+* ref(cpp_mock_scenarios): improve overall
+* ref(behavior_tree,traffic_simulator): improve code by basing on sonarcloud
+* Merge remote-tracking branch 'origin/RJD-1057-traffic-lights-tests' into RJD-1057-remove-functions-forwarded-to-entity-base-middle
+* Merge branch 'RJD-1057-traffic-lights-tests' into RJD-1057-remove-functions-forwarded-to-entity-base-middle
+* Merge remote-tracking branch 'tier4/RJD-1057-traffic-lights-tests' into RJD-1057-remove-functions-forwarded-to-entity-base-middle
+* Merge remote-tracking branch 'tier4/RJD-1057-remove-traffic-lights-from-entity-manager' into RJD-1057-remove-functions-forwarded-to-entity-base-middle
+* feat(entity_base, entity_status): improve ::setStatus
+* Fix concealer local address returning
+* feat(simulator_core, api, entity_base, cpp_mock): move setEntityStatus to EntityBase, remove from api
+* feat(api, simulator_core): emove getTimeHeadway from API, use directly in calc it directly in evaluateTimeHeadway
+* Merge branch 'RJD-1057-remove-traffic-lights-from-entity-manager' into RJD-1057-remove-functions-forwarded-to-entity-base
+* feat(ego_entity, sumulator_core): remove asFieldOperatorApplication, develop getEgoEntity and dedicated methods in EgoEntity
+* feat(api, entity_manager, cpp_mock): rename entityExist to isEntitySpawned, move checkCollision directly to API
+* feat(entity_manager, simulator_core): remove activateOutOfRangeJob forwarding
+* feat(entity_manager, behavior_tree, cpp_mock): remove getCurrentAction forwarding, set "waiting" as init action state in behavior_tree
+* feat(entity_base, traffic_simulator, simulator_core): remove forwarding request*, move requestLaneChange to EntityBase
+* feat(entity_base, traffic_simulator, simulator_core): remove forwarding setBehaviorParameter and setVelocityLimit
+* feat(entity_base, traffic_simulator): move isStopping to EntityBase, develop templated is() in EntityBase and use it, rename isEgoSpawned to isAnyEgoSpawned, refactor
+* feat(entity_base, traffic_simulator): remove forwarding setters to EntityBase, also some getters, left setVelocityLimit and setBehaviorParameter
+* feat(entity_base, traffic_simulator): rename laneMatchingSucceed to isInLanelet, remove forwarding
+* feat(entity_base, traffic_simulator): move reachPosition as isInPosition to EntityBase, remove forwarding
+* feat(entity_base, traffic_simulator, cpp_mock): move isInLanelet to EntityBase, remove forwarding
+* Merge remote-tracking branch 'origin/RJD-1056-remove-npc-logic-started' into RJD-1057-remove-functions-forwarded-to-entity-base
+* Merge remote-tracking branch 'origin/RJD-1056-remove-current-time-step-time' into RJD-1057-remove-functions-forwarded-to-entity-base
+* feat(cpp_mock, traffic_simulator): change getEntity, use getEntityOrNullptr
+* Remove forwarding of getStandStillDuration in EntityManager and API
+* Remove forwarding of get2DPolygon in EntityManager
+* Remove forwarding of getBoundingBox in EntityManager and API
+* Remove forwarding of getLinearJerk in EntityManager and API
+* Remove forwarding of getCurrentAccel in EntityManager and API
+* Remove forwarding of getCurrentTwist in EntityManager and API
+* Remove forwarding of getBehaviorParameter in EntityManager and API
+* Remove forwarding of getEntityStatusBeforeUpdate in EntityManager and API
+* Add const
+* Remove forwarding of getEntityStatus in EntityManager and API
+* Forward getEntityOrThrow from API to EntityManager
+* Remove forwarding of getEntityType in EntityManager
+* Add getEntityOrThrow function to mimic forwarding functionality where exceptions were thrown
+* Contributors: Dawid Moszynski, Dawid Moszyński, Masaya Kataoka, Mateusz Palczuk, robomic
+
+8.0.2 (2025-01-28)
+------------------
+* Merge branch 'master' into RJD-1495/fix
+* Merge branch 'master' into RJD-1495/fix
+* Merge tag '7.4.7' into RJD-1495/fix
+* avoid race condition by returning by value
+* Contributors: Dawid Moszyński, Tatsuya Yamasaki, robomic
+
+8.0.1 (2025-01-28)
+------------------
+
+8.0.0 (2025-01-24)
+------------------
+* Merge pull request `#1472 <https://github.com/tier4/scenario_simulator_v2/issues/1472>`_ from tier4/ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose
+  HdMapUtils refactor (PR 1/6)  - create lanelet_wrapper: use ::lanelet_map and ::pose
+* Add reader functions to cache classes to mitigate direct data members access and having to lock the mutex in different places
+* Revert "Refactor lanelet_wrapper cache classes: make top level public member functions acquire resources and make non-public member functions NOT thread safe"
+  This reverts commit 41f9dd1e226ea827444aed1d01c207d10b9b61fa.
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose
+* Remove unnecessary comments
+* Adjust comments to use "/// @note" convention
+* Refactor lanelet_wrapper cache classes: make top level public member functions acquire resources and make non-public member functions NOT thread safe
+  This change is a proposal of improving thread safety - now the whole bodies of public member functions can be executed at once without the risk of resources being modified in the middle of the function execution
+* Clean cache code - move cache classes member variables to the end of class declaration
+* Move lanelet_wrapper cache classes member values and some functions to private
+* Add comment explaining parameters
+* Rename variable to match function name change
+* Rename `borderlinePoses` -> `noNextLaneletPoses`
+* Add comment explaining what `lanelet_map::borderlinePoses` does
+* Perform calculations at compile time in lanelet_wrapper::pose::toLaneletPose
+* Fix lanelet pose matching calculation bug
+* fix(lanelet_wrapper): fix toLaneletPose
+* doc(lanelet_wrapper): improve lanelet_wrappe::pose::canonicalizeLaneletPose description
+* fix(lanelet_wrapper): fix pose toLaneletPose typo ";"
+* fix(lanelet_wrapper): fix typo centerline
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose' of github.com:tier4/scenario_simulator_v2 into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose
+* ref(lanelet_wrapper): add toLaneletPose yaw_threshold description
+* ref(traffic_simulator): add comments to lanelet_wrapper::pose, reduce the number of intermediate variables
+* Merge remote-tracking branch 'origin/master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose
+* Update simulation/traffic_simulator/src/traffic/traffic_controller.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Update simulation/traffic_simulator/src/lanelet_wrapper/lanelet_map.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Update simulation/traffic_simulator/src/lanelet_wrapper/pose.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Update simulation/traffic_simulator/src/lanelet_wrapper/pose.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Update simulation/traffic_simulator/src/lanelet_wrapper/lanelet_loader.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Update simulation/traffic_simulator/src/lanelet_wrapper/lanelet_wrapper.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Update simulation/traffic_simulator/src/lanelet_wrapper/lanelet_loader.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Update simulation/traffic_simulator/src/lanelet_wrapper/lanelet_loader.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Update simulation/traffic_simulator/src/lanelet_wrapper/lanelet_loader.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Update simulation/traffic_simulator/src/lanelet_wrapper/lanelet_loader.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Update simulation/traffic_simulator/src/lanelet_wrapper/lanelet_loader.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Update simulation/traffic_simulator/src/lanelet_wrapper/lanelet_loader.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Update simulation/traffic_simulator/src/lanelet_wrapper/lanelet_loader.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Update simulation/traffic_simulator/src/utils/pose.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Update simulation/traffic_simulator/src/utils/pose.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Update simulation/traffic_simulator/src/lanelet_wrapper/pose.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Update simulation/traffic_simulator/src/lanelet_wrapper/pose.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Update simulation/traffic_simulator/src/utils/pose.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Update simulation/traffic_simulator/include/traffic_simulator/lanelet_wrapper/lanelet_wrapper.hpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose
+* ref(traffic_simulator): apply solar changes
+* ref(traffic_simulator): apply sonar required changes
+* Merge remote-tracking branch 'origin' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose
+* ref(traffic_simulator): refactor laneletAltitude and isAltitudeMatching after merge
+* Merge remote-tracking branch 'origin' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose
+* fix(traffic_simulator): fix follow_trajectory_action issue, add orientation to distance calc, remove toCanonicalizedLaneletPose(point...) because it can cause a another issues
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose
+* ref(traffic_simulator): improve hdmaputils::countLaneChanges
+* fix(traffic_simulator): adapt lanelet-wapper::pose to changes in hdmap_utils
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose
+* fix(traffic_simulator): fix lanelet_wrapper::pose::alternativeLaneletPoses
+* fix(traffic_simulator, simple_sensor_simulator): fix after merge, apply sonar recommendations
+* Merge remote-tracking branch 'origin/master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose
+* ref(traffic_simulator): apply sonar recommendations to lanelet_wrapper and utils
+* feat(traffic_simulator): separate lanelet_loader, provide const TrafficRulesWithRoutingGraph
+* ref(traffic_simulator): improve Configuration, traffic_rules, lanelet_wrapper
+* fix(traffic_simulator): fix hdmap_utils tests
+* fix(traffic_simulator): add EOF to traffic_rules
+* fix(traffic_simmulator): fix spell check
+* feat(traffic_simulator): use lanelet_wrapper::lanelet_map in the rest of hdmap_utils, adapt hdmap_utils test to lanelet_wrapper::lanelet_map
+* feat(traffic_simulator, behavior_tree_plugin): use lanelet_wrapper::lanelet_map in parts previusly overlooked
+* feat(traffic_simulator): use lanelet_wrapper::pose in the rest of hdmap_utils, adapt hdmap_utils test to lanelet_wrapper::pose
+* feat(traffic_simulator, behavior_tree_plugin): use lanelet_wrapper::pose in parts previously overlooked
+* ref(traffic_simulator): remove unused parts lanelet_wrapper
+* feat(traffic_simulator, random_test_runner): adapt tests for using pose:: from lanelet_wrapper
+* feat(traffic_simulator, openscenario_interpreter, behavior_tree_plugin, simple_sensor_simulator): use pose:: from lanelet_wrapper instead of hdmap_utils methods
+* feat(traffic_simulator): add lanelet_wrapper as a replacement for hdmap_utils, at this point mainly for pose calculations
+* Contributors: Dawid Moszynski, Dawid Moszyński, Masaya Kataoka, Mateusz Palczuk
+
+7.4.7 (2025-01-20)
+------------------
+* Merge branch 'master' into RJD-1511/bug_fix
+* Bump version of scenario_simulator_v2 from version 7.4.5 to version 7.4.6
+* Merge branch 'master' into RJD-1511/bug_fix
+* Merge branch 'master' into refactor/parameter_value_distribution
+* Merge branch 'master' into refactor/parameter_value_distribution
+* Contributors: Kotaro Yoshimoto, Michał Ciasnocha, Release Bot
+
+* Merge branch 'master' into refactor/parameter_value_distribution
+* Merge branch 'master' into refactor/parameter_value_distribution
+* Contributors: Kotaro Yoshimoto
+
+7.4.6 (2025-01-10)
+------------------
+* Merge remote-tracking branch 'origin/master' into dependabot/pip/jinja2-3.1.5
+* Contributors: Masaya Kataoka
+
+7.4.5 (2025-01-10)
+------------------
+* Merge pull request `#1502 <https://github.com/tier4/scenario_simulator_v2/issues/1502>`_ from tier4/fix/pass_despawn_function_in_constructor
+  add despawn_function argument
+* Merge branch 'master' into fix/pass_despawn_function_in_constructor
+* Merge remote-tracking branch 'origin/master' into fix/pass_despawn_function_in_constructor
+* rename despawn_function to despawn
+* Merge branch 'master' into fix/pass_despawn_function_in_constructor
+* Merge branch 'master' into fix/pass_despawn_function_in_constructor
+* add despawn_function argument
+* Contributors: Masaya Kataoka
+
+7.4.4 (2025-01-09)
+------------------
+* Merge pull request `#1497 <https://github.com/tier4/scenario_simulator_v2/issues/1497>`_ from tier4/refactor/concealer-2
+  Refactor/concealer 2
+* Merge branch 'master' into refactor/concealer-2
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-2
+* Remove some member accessor from struct `FieldOperatorApplication`
+* Remove member function `FieldOperatorApplication::getAutowareStateName`
+* Cleanup `ControlModeCommand` service callback
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-2
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-2
+* Update `EgoEntity` to have `FieldOperatorApplication` as its base class
+* Update `EgoEntity` to have `FieldOperatorApplication` as non-pointer
+* Remove static member function `EgoEntity::makeFieldOperatorApplication`
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+7.4.3 (2025-01-07)
+------------------
+* Merge pull request `#1499 <https://github.com/tier4/scenario_simulator_v2/issues/1499>`_ from tier4/tmp/pc-patch
+* Merge branch 'master' into tmp/pc-patch
+* fix: implementation
+* fix: implementation
+* perf(traffic_light): add condition to add new traffic light
+* Contributors: Kotaro Yoshimoto, satoshi-ota
+
+7.4.2 (2025-01-07)
+------------------
+* Merge pull request `#1501 <https://github.com/tier4/scenario_simulator_v2/issues/1501>`_ from tier4/feature/new_rviz
+* chore: update rviz config based on autoware.rviz
+* Contributors: Kotaro Yoshimoto
+
+7.4.1 (2024-12-24)
+------------------
+* Merge pull request `#1498 <https://github.com/tier4/scenario_simulator_v2/issues/1498>`_ from tier4/fix/canonicalize_function
+  Fix/canonicalize function
+* Merge remote-tracking branch 'origin/master' into fix/canonicalize_function
+* Merge remote-tracking branch 'origin/master' into fix/canonicalize_function
+* Fix source code
+* Test cases were added, and the source code was reverted to its pre-modified state so that the added test cases would fail.
+* apply reformat
+* catch common::SemanticError inside traffic_simulator::pose::canonicalize function
+* Contributors: Masaya Kataoka
+
+7.4.0 (2024-12-23)
+------------------
+* Merge pull request `#1464 <https://github.com/tier4/scenario_simulator_v2/issues/1464>`_ from tier4/RJD-1457/traffic_sink_refactor
+  RJD-1457/traffic_sink_refactor
+* Merge branch 'master' into RJD-1457/traffic_sink_refactor
+* style fix
+* Merge branch 'master' into RJD-1457/traffic_sink_refactor
+* Merge branch 'master' into RJD-1457/traffic_sink_refactor
+* Merge branch 'master' into RJD-1457/traffic_sink_refactor
+* remove unnecessary include directives
+* remove unnecessary funcs
+* code style
+* code style
+* Merge branch 'master' into RJD-1457/traffic_sink_refactor
+* simplify auto_sink logic
+* TrafficSinkConfig
+* AutoSinkConfig
+* review suggestions
+* remove lanelet_id from the constructor
+* Merge branch 'master' into RJD-1457/traffic_sink_refactor
+* Merge branch 'master' into RJD-1457/traffic_sink_refactor
+* reorder fix
+* Merge branch 'master' into RJD-1457/traffic_sink_refactor
+* spell-check happy
+* TrafficSink refactor with despawn functionality
+* Merge tag '6.0.1' into RJD-1457/traffic_sink_refactor
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/enable_specify_entity_type_in_autosink
+* Merge branch 'master' into feature/enable_specify_entity_type_in_autosink
+* remove warning
+* remove sonarcloud warning
+* apply reformat
+* use uint8_t instead of traffic_simulator_msgs::msg::EntityType
+* fix typo
+* fix typo
+* fix typo
+* enable set traffic sink in cpp scenario
+* enable compare entity type
+* add doxygen comment
+* add sinkable_entity_type to the configuration class
+* add sinkable_entity_type variable
+* add get_entity_type function
+* rename variable in TrafficController class
+* rename argument and member variables
+* Contributors: Masaya Kataoka, Michał Ciasnocha, robomic
+
+7.3.5 (2024-12-20)
+------------------
+* Merge pull request `#1488 <https://github.com/tier4/scenario_simulator_v2/issues/1488>`_ from tier4/refactor/concealer-1
+  Refactor/concealer 1
+* Merge branch 'master' into refactor/concealer-1
+* Merge branch 'master' into refactor/concealer-1
+* Merge branch 'master' into refactor/concealer-1
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-1
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-1
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-1
+* Remove class template `FieldOperatorApplicationFor<T>`
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-1
+* Merge remote-tracking branch 'origin/master' into refactor/concealer-1
+* Remove member function `FieldOperatorApplication::restrictTargetSpeed`
+* Remove class `concealer::Autoware`
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+7.3.4 (2024-12-20)
+------------------
+* Merge pull request `#1490 <https://github.com/tier4/scenario_simulator_v2/issues/1490>`_ from tier4/feature/is_in_intersection
+  Feature/is in intersection
+* Merge branch 'master' into feature/is_in_intersection
+* Merge remote-tracking branch 'origin/master' into feature/is_in_intersection
+* add test case for isInIntersection function
+* Merge remote-tracking branch 'origin/master' into feature/is_in_intersection
+* add auto HdMapUtils::isInIntersection(const lanelet::Id lanelet_id) const -> bool function
+* Contributors: Masaya Kataoka
+
+7.3.3 (2024-12-18)
+------------------
+
+7.3.2 (2024-12-18)
+------------------
+
+7.3.1 (2024-12-17)
+------------------
+* Merge branch 'master' into fix/math-closest-point
+* Merge branch 'master' into fix/math-closest-point
+* Merge branch 'master' into fix/math-closest-point
+* Merge branch 'master' into fix/math-closest-point
+* Merge branch 'master' into fix/math-closest-point
+* Contributors: Kotaro Yoshimoto
+
+7.3.0 (2024-12-16)
+------------------
+* Merge pull request `#1481 <https://github.com/tier4/scenario_simulator_v2/issues/1481>`_ from tier4/feature/multi-level-lanelet-support
+  Feature/multi level lanelet support
+* Merge branch 'master' into feature/multi-level-lanelet-support
+* Merge branch 'master' into feature/multi-level-lanelet-support
+* Merge branch 'master' into feature/multi-level-lanelet-support
+* fix(traffic_simulator): revert clang changes
+* ref(traffic_simulator, simple_sensor_simulator): refactor altitude checks
+* Merge branch 'master' into feature/multi-level-lanelet-support
+* [RJD-1370] Fix 3D Lanelet Matching Issue in cpp_mock_scenario
+  - Updated the makeRandomPose method to correctly support 3D lanelet matching.
+* Fix an issue with unit tests - distanceTest
+* Merge branch 'master' into feature/multi-level-lanelet-support
+* Removed unrecognized words because spell-check flagged them as invalid
+* [RJD-1369] Improve lanelet matching - 3D support
+  - Enhanced lanelet matching algorithm (`toLaneletPose` method) by incorporating lanelet altitude.
+  - Defined the `altitude_threshold` parameter that sets the maximum altitude difference to determine when an entity can be matched with a specific lanelet.
+* Contributors: Dawid Moszynski, Kotaro Yoshimoto, SzymonParapura
+
+7.2.0 (2024-12-16)
+------------------
+* Merge pull request `#1484 <https://github.com/tier4/scenario_simulator_v2/issues/1484>`_ from tier4/RJD-736/autoware_msgs_support_and_localization_sim_mode_support
+  Rjd 736/autoware msgs support and localization sim mode support
+* Merge branch 'master' into RJD-736/autoware_msgs_support_and_localization_sim_mode_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support_and_localization_sim_mode_support
+* Merge branch 'master' into RJD-736/autoware_msgs_support_and_localization_sim_mode_support
+* Merge branch 'master' into RJD-736/autoware_msgs_support_and_localization_sim_mode_support
+* Merge branch 'master' into RJD-736/autoware_msgs_support_and_localization_sim_mode_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support_and_localization_sim_mode_support
+* Merge remote-tracking branch 'origin/RJD-736/autoware_msgs_support' into RJD-736/autoware_msgs_support_and_localization_sim_mode_support
+* Merge remote-tracking branch 'origin/RJD-736/autoware_msgs_support' into RJD-736/autoware_msgs_support_and_localization_sim_mode_support
+* Merge remote-tracking branch 'origin/RJD-736/autoware_msgs_support' into RJD-736/autoware_msgs_support_and_localization_sim_mode_support
+* Merge remote-tracking branch 'origin/RJD-736/autoware_msgs_support' into RJD-736/autoware_msgs_support_and_localization_sim_mode_support
+* Merge remote-tracking branch 'origin/RJD-736/autoware_msgs_support' into RJD-736/autoware_msgs_support_and_localization_sim_mode_support
+* Add launch argument `simulate_localization` to `scenario_test_runner`
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+7.1.0 (2024-12-16)
+------------------
+* Merge remote-tracking branch 'origin/master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge remote-tracking branch 'origin/master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge remote-tracking branch 'origin/master' into feature/time-to-collision-condition
+* Merge remote-tracking branch 'origin/master' into feature/time-to-collision-condition
+* Merge remote-tracking branch 'origin/master' into feature/time-to-collision-condition
+* Merge remote-tracking branch 'origin/master' into feature/time-to-collision-condition
+* Merge remote-tracking branch 'origin/master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge remote-tracking branch 'origin/master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge remote-tracking branch 'origin/master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge remote-tracking branch 'origin/master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge remote-tracking branch 'origin/master' into feature/time-to-collision-condition
+* Merge branch 'master' into feature/time-to-collision-condition
+* Merge remote-tracking branch 'origin/master' into feature/time-to-collision-condition
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+7.0.4 (2024-12-13)
+------------------
+* Merge branch 'master' into fix/speed-condition/backward-compatibility
+* Merge remote-tracking branch 'origin/master' into fix/speed-condition/backward-compatibility
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+7.0.3 (2024-12-13)
+------------------
+* Merge pull request `#1465 <https://github.com/tier4/scenario_simulator_v2/issues/1465>`_ from tier4/fix/request-enable-autoware-control
+* Merge branch 'master' into fix/request-enable-autoware-control
+* Merge branch 'master' into fix/request-enable-autoware-control
+* Merge branch 'master' into fix/request-enable-autoware-control
+* Merge branch 'master' into fix/request-enable-autoware-control
+* fix(api): request enable autoware control
+* Contributors: Kotaro Yoshimoto, satoshi-ota
+
+7.0.2 (2024-12-12)
+------------------
+* Merge pull request `#1470 <https://github.com/tier4/scenario_simulator_v2/issues/1470>`_ from tier4/fix/snor-cloud-issue-8-1
+  Fix/sonor cloud issue 8-1
+* Merge branch 'master' into fix/snor-cloud-issue-8-1
+* Merge branch 'master' into fix/snor-cloud-issue-8-1
+* Merge branch 'master' into fix/snor-cloud-issue-8-1
+* Merge branch 'master' into fix/snor-cloud-issue-8-1
+* Remove the commented out code.
+  Replace this declaration by a structured binding declaration.
+* Contributors: Masaya Kataoka, Taiga, Taiga Takano
+
+7.0.1 (2024-12-11)
+------------------
+* Merge branch 'master' into feature/act-starttrigger-optional
+* Merge branch 'master' into feature/act-starttrigger-optional
+* Contributors: Kotaro Yoshimoto, ぐるぐる
+
+7.0.0 (2024-12-10)
+------------------
+* Merge pull request `#1454 <https://github.com/tier4/scenario_simulator_v2/issues/1454>`_ from tier4/RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge branch 'master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* chore: apply linter
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* fix: replace "awf/universe" with "awf/universe/20240605" for architecture_type
+* chore: delete a test using autoware_auto_perception_msgs
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+  # Conflicts:
+  #	simulation/traffic_simulator/src/traffic_lights/traffic_light_publisher.cpp
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* refactor: added handling when autoware_perception_msgs/msg/traffic_signal_array.hpp is not present
+* chore: delete wrongly doubled word
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+  # Conflicts:
+  #	external/concealer/include/concealer/autoware.hpp
+  #	external/concealer/include/concealer/autoware_universe.hpp
+  #	external/concealer/include/concealer/field_operator_application_for_autoware_universe.hpp
+  #	external/concealer/src/autoware_universe.cpp
+  #	external/concealer/src/field_operator_application_for_autoware_universe.cpp
+* Merge branch 'master' into RJD-736/autoware_msgs_support
+* fix: delete autoware_auto_xx_msgs from include
+* Merge branch 'master' into RJD-736/autoware_msgs_support
+* apply linter
+* Merge branch 'master' into RJD-736/autoware_msgs_support
+* Merge branch 'master' into RJD-736/autoware_msgs_support
+* Merge branch 'master' into RJD-736/autoware_msgs_support
+* Merge branch 'master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge branch 'master' into RJD-736/autoware_msgs_support
+* Merge branch 'master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Fix conflicts in includes
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Revert "add autoware\_ prefix"
+  This reverts commit a3591f038b30ca35f9188d552556a482a2ffbe17.
+* add autoware\_ prefix
+* Merge remote-tracking branch 'origin/feature/manual_on_follow_trajectory' into feature/manual_on_follow_trajectory_not_auto
+  # Conflicts:
+  #	simulation/traffic_simulator/include/traffic_simulator/entity/entity_manager.hpp
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge pull request `#1277 <https://github.com/tier4/scenario_simulator_v2/issues/1277>`_ from tier4/RJD-736/autoware_msgs_support_new_traffic_light_group
+  Rjd 736/autoware msgs support new traffic light group
+* Merge remote-tracking branch 'origin/RJD-736/autoware_msgs_support_new_traffic_light_group' into feature/manual_on_follow_trajectory_not_auto
+  # Conflicts:
+  #	external/concealer/src/autoware_universe.cpp
+* feat(traffic_simulator): support TrafficLightGroup for V2I traffic lights
+* feat(traffic_simulator): support TrafficLightGroupArray in TrafficLightPublisher
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Merge remote-tracking branch 'origin/master' into RJD-736/autoware_msgs_support
+* Delete unused autoware_auto_system_msgs package
+* Port DetectedObjects and TrackedObjects
+* Port TrafficSignalArray from autoware_auto_perception_msgs to autoware_perception_msgs
+* Port AckermannControlCommand to Control
+* Port HADMapBin to LaneletMapBin
+* Port GearCommand
+* Delete unused vehicle_state_command and vehicle_control_command
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, Michał Kiełczykowski, Yutaka Kondo
+
+6.3.1 (2024-12-10)
+------------------
+* Merge branch 'master' into fix/sonor-cloud-issue-8-3
+* Merge branch 'master' into fix/sonor-cloud-issue-8-3
+* Contributors: Masaya Kataoka
+
+6.3.0 (2024-12-10)
+------------------
+* Merge pull request `#1468 <https://github.com/tier4/scenario_simulator_v2/issues/1468>`_ from tier4/feature/lane-change-everywhere
+* fix:　disable default argument value for include_oppsite_direction in  HdMapUtils::getLeftLaneletIds/getRightLaneletIds
+* Merge branch 'master' into feature/lane-change-everywhere
+* fix: fit test constants to latest algorithm
+* Merge remote-tracking branch 'origin/master' into feature/lane-change-everywhere
+* replace true with false for include_opposite_direction option
+* fix:　use lanelet2 functions correctly in HdMapUtils::getLeftLaneletIds/getRightLaneletIds
+* chore: fix linelint error
+* Merge remote-tracking branch 'origin/master' into feature/lane-change-everywhere
+* feat: allow lane-change everywhere in `VEHICLE_WITH_ROAD_SHOULDER` routing graph
+* Contributors: Kotaro Yoshimoto
+
+6.2.5 (2024-12-09)
+------------------
+* Merge branch 'master' into fix/acc_by_slope
+* Contributors: Kotaro Yoshimoto
+
+6.2.4 (2024-12-09)
+------------------
+* Merge branch 'master' into refactor/speed-condition
+* Merge branch 'master' into refactor/speed-condition
+* Contributors: Tatsuya Yamasaki
+
+6.2.3 (2024-12-05)
+------------------
+* Merge branch 'master' into fix/sonor-cloud-issue-8-2
+* Contributors: Masaya Kataoka
+
+6.2.2 (2024-12-04)
+------------------
+* Merge branch 'master' into refactor/distance-condition
+* Merge remote-tracking branch 'origin/master' into refactor/distance-condition
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+6.2.1 (2024-12-03)
+------------------
+* Merge branch 'master' into refactor/distance-condition-and-relative-distance-condition
+* Contributors: Tatsuya Yamasaki
+
+6.2.0 (2024-12-02)
+------------------
+* Merge branch 'master' into feature/relative-speed-condition
+* Merge remote-tracking branch 'origin/master' into feature/relative-speed-condition
+* Merge remote-tracking branch 'origin/master' into feature/relative-speed-condition
+* Merge remote-tracking branch 'origin/master' into feature/relative-speed-condition
+* Merge remote-tracking branch 'origin/master' into feature/relative-speed-condition
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+6.1.3 (2024-11-29)
+------------------
+* Merge pull request `#1444 <https://github.com/tier4/scenario_simulator_v2/issues/1444>`_ from tier4/RJD-1057-traffic-lights-tests
+  RJD-1057 (2/5): Remove non-API member functions: EntityManager’s TrafficLight related member functions (tests)
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Improve traffic lights tests subscribers
+  Make the variables const and add scope for subscribers so they stop listening (only in tests with more than one subscriber + remove .reset() as scopes take care of that
+* fix(traffic_simulator): fix traffic_lights test - reset subscribers
+* ref(traffic_simulator): add blank line to traffic_simulator test
+* ref(traffic_simulator): traffic_lights tests improve
+* Use new architecture in traffic lights tests: "awf/universe/20230906" instead of "awf/universe"
+* Use compile-time check instead of run-time check
+* Improve traffic lights tests epsilons and threshold situation
+  Add clear thresholds for tests with explanations and use these thresholds instead of hardcoded values
+* Improve traffic lights tests publishing timing
+  Change 'random' numbers to round ones like one second or half a second
+* Improve traffic lights tests comments
+* Apply patch created by Yoshimoto-san
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge remote-tracking branch 'tier4/RJD-1057-traffic-lights-tests' into RJD-1057-traffic-lights-tests
+* Implement missing traffic lights tests and move "new architecture" tests to new file
+* Rename common traffic lights tests file
+* Move V2I tests to new file
+* Add include guards to traffic lights test fixtures
+* Move traffic light test fixtures to header file
+* Add possibility to test traffic lights with different architectures
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Add missing tests for traffic lights type conversions
+* Use unique pointer for returning generated traffic light messages
+* Update TrafficLightPublisher and TrafficLightPublisherBase to comply with new standard
+  Move message transformation to TrafficLightPublisherBase static member functions
+* Merge remote-tracking branch 'tier4/master' into RJD-1057-traffic-lights-tests
+* Merge branch 'master' into RJD-1057-traffic-lights-tests
+* Merge remote-tracking branch 'tier4/RJD-1057-remove-traffic-lights-from-entity-manager' into RJD-1057-traffic-lights-tests
+* fix(traffic_simulator): fix traffic_lights tests
+* Merge remote-tracking branch 'origin/RJD-1057-remove-traffic-lights-from-entity-manager' into RJD-1057-traffic-lights-tests
+* Merge branch 'RJD-1057-remove-traffic-lights-from-entity-manager' into RJD-1057-traffic-lights-tests
+* Merge branch 'RJD-1057-remove-traffic-lights-from-entity-manager' into RJD-1057-traffic-lights-tests
+* Merge remote-tracking branch 'tier4/RJD-1057-remove-traffic-lights-from-entity-manager' into RJD-1057-traffic-lights-tests
+* Merge branch 'RJD-1057-remove-traffic-lights-from-entity-manager' into RJD-1057-traffic-lights-tests
+* Revert "Remove traffic lights tests"
+  This reverts commit 433019c50f796cfc3543922e78263fe7606b21f0.
+* Contributors: Dawid Moszynski, Dawid Moszyński, Kotaro Yoshimoto, Mateusz Palczuk, Tatsuya Yamasaki
+
+6.1.2 (2024-11-29)
+------------------
+* Merge branch 'master' into refactor/interpreter
+* Contributors: Tatsuya Yamasaki
+
+6.1.1 (2024-11-29)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/sonarcloud_warning
+* Merge branch 'master' into fix/sonarcloud_warning
+* Merge branch 'master' into fix/sonarcloud_warning
+* Contributors: Masaya Kataoka
+
+6.1.0 (2024-11-29)
+------------------
+* Merge pull request `#1461 <https://github.com/tier4/scenario_simulator_v2/issues/1461>`_ from tier4/entity_on_road_shoulder
+  Support road shoulders as an `Entity` operating area
+* refactor: add routing graph argument to RoutePlanner
+* feat: change default RoutingGraphType from VEHICLE to VEHICLE_WITH_ROAD_SHOULDER
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka
+
+6.0.1 (2024-11-27)
+------------------
+
+6.0.0 (2024-11-27)
+------------------
+* Merge pull request `#1458 <https://github.com/tier4/scenario_simulator_v2/issues/1458>`_ from tier4/refactor/add_routing_graph_argument
+* docs: add comment for HdMapUtils::DEFAULT_MATCH_TO_LANE_REDUCTION_RATIO
+* refactor: delete unused hash function
+* Merge branch 'master' into refactor/add_routing_graph_argument
+* chore: fix spell miss
+* chore: fix build error
+* chore: fix linelint error
+* feat: introduce RoutingConfiguration to traffic_simulator::pose
+* feat: introduce RoutingConfiguration to traffic_simulator::distance
+* feat: introduce RoutingConfiguration to CanonicalizedLaneletPose
+* feat: introduce RoutingConfiguration to HDMapUtils
+* feat: add RoutingConfiguration
+* refactor: add routing graph argument to HdMapUtils::getFollowingLanelets
+* refactor: add routing graph argument to HdMapUtils::getAlongLaneletPose
+* refactor: add routing graph argument to HdMapUtils::getLongitudinalDistance
+* refactor: add routing graph argument to HdMapUtils::getLateralDistance
+* fix: correct wrong usage of toLaneletPose
+* Merge branch 'master' into refactor/add_routing_graph_argument
+* refactor: add routing graph argument to HdMapUtils::getLaneChangeableLaneletId
+* refactor: add routing graph argument to HdMapUtils::getSpeedLimit
+* refactor: add routing graph argument to HdMapUtils::toLaneletPose(s)
+* refactor: add routing graph argument to HdMapUtils::matchToLane
+* refactor: add routing graph argument to HdMapUtils::getConflictingLaneIds
+* refactor: add routing graph argument to HdMapUtils::countLaneChanges
+* refactor: add routing graph argument to HdMapUtils::canChangeLane
+* refactor: add routing graph argument to HdMapUtils::getPreviousLanelets
+* Contributors: Kotaro Yoshimoto
+
+5.5.0 (2024-11-27)
+------------------
+
+5.4.0 (2024-11-26)
+------------------
+* Merge pull request `#1456 <https://github.com/tier4/scenario_simulator_v2/issues/1456>`_ from tier4/feature/shoulder_routing_graph
+  Add new routing graph for road shoulder
+* chore: add last empty line to test_hdmap_utils.cpp
+* refactor: delete unused code
+* chore: add routingWithRoadShoulder test
+* refactor: add routing graph argument to HdMapUtils::getRoute
+* refactor: GermanRoadShoulderPassableVehicle::canPass
+* refactor: add routing graph argument to HdMapUtils::get{Next|Previous}LaneletIds
+* refactor: delete HdMapUtils::shoulder_lanelet
+* refactor: add routing graph argument and stop giving special treatment to shoulder_lanelet in HdMapUtils::get{Next|Previous}LaneletIds
+* feat: add RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER
+* chore: fix cspell error
+* chore: fix typo
+* Merge branch 'master' into feature/shoulder_routing_graph
+* feat: add new traffic rule "germanRoadShoulderPassableVehicleRules"
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka
+
+5.3.4 (2024-11-21)
+------------------
+* Merge pull request `#1447 <https://github.com/tier4/scenario_simulator_v2/issues/1447>`_ from tier4/fix/find_nearest_segment_index
+  fix pitch and slope acceleration calculation for ego vehicle
+* Merge branch 'master' into fix/find_nearest_segment_index
+* feat: add tests for EgoEntitySimulation::calculateAccelerationBySlope
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka
+
+5.3.3 (2024-11-21)
+------------------
+* Merge pull request `#1451 <https://github.com/tier4/scenario_simulator_v2/issues/1451>`_ from tier4/fix/sonor-cloud-issue-7
+  Fix/sonor cloud issue 7
+* Merge branch 'master' into fix/sonor-cloud-issue-7
+* fix typo
+* Replace "." with "::" for access
+* Contributors: Masaya Kataoka, Taiga Takano
+
+5.3.2 (2024-11-18)
+------------------
+* Merge branch 'master' into fix/interpreter/assign-route-action
+* Merge branch 'master' into fix/interpreter/assign-route-action
+* Contributors: Tatsuya Yamasaki
+
+5.3.1 (2024-11-18)
+------------------
+* Merge pull request `#1450 <https://github.com/tier4/scenario_simulator_v2/issues/1450>`_ from tier4/refactor/routing_graph
+  refactor HDMapUtils class about routing graph
+* Merge branch 'master' into refactor/routing_graph
+* refactor: modify member function name of RoutingGraphs class
+* Merge branch 'master' into refactor/routing_graph
+* refactor: add RoutingGraphType argument to get{Next|Previous}LaneletIds
+* refactor: move implementation of getRoute into RoutingGraphs class
+* refactor: use RoutingGraphType instead of EntityType for an argument in get{Right|Left}LaneletIds
+* refactor: add HdMapUtils::RoutingGraphs class to manage routing graphs
+* refactor: delete operator<< and add to_string for RoutingGraphType
+* feat: add routing_graph_type.hpp
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka
+
+5.3.0 (2024-11-18)
+------------------
+* Merge pull request `#1421 <https://github.com/tier4/scenario_simulator_v2/issues/1421>`_ from tier4/feature/manual_on_follow_trajectory_with_new_state
+* Merge branch 'master' into feature/manual_on_follow_trajectory_with_new_state
+* Merge branch 'master' into feature/manual_on_follow_trajectory_with_new_state
+* Merge branch 'master' into feature/manual_on_follow_trajectory_with_new_state
+* Merge branch 'master' into feature/manual_on_follow_trajectory_with_new_state
+* Merge remote-tracking branch 'origin/master' into feature/manual_on_follow_trajectory_with_new_state
+* Merge remote-tracking branch 'origin/master' into feature/manual_on_follow_trajectory_with_new_state
+* Merge branch 'master' into feature/manual_on_follow_trajectory
+* Merge remote-tracking branch 'origin/master' into feature/manual_on_follow_trajectory
+* Merge branch 'master' into feature/manual_on_follow_trajectory
+* Merge branch 'master' into feature/manual_on_follow_trajectory
+* Merge branch 'master' into feature/manual_on_follow_trajectory
+* Merge branch 'master' into feature/manual_on_follow_trajectory
+* Merge remote-tracking branch 'origin/feature/manual_on_follow_trajectory' into feature/manual_on_follow_trajectory
+* Merge branch 'master' into feature/manual_on_follow_trajectory
+* fix(concealer): delete MANUAL control trigger via API
+* Merge branch 'master' into feature/manual_on_follow_trajectory
+* feat: use ADAPI for change autoware control
+* Merge branch 'master' into feature/manual_on_follow_trajectory
+* Merge branch 'master' into feature/manual_on_follow_trajectory
+* Merge remote-tracking branch 'origin/fix/RJD-955-fix-followtrajectoryaction-nan-time' into feature/manual_on_follow_trajectory
+* fix: build errors
+* Merge remote-tracking branch 'origin/master' into feature/manual_on_follow_trajectory
+* feat: add requestAutowareControl to FieldOperatorApplicationFor class
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
+5.2.3 (2024-11-18)
+------------------
+
+5.2.2 (2024-11-15)
+------------------
+* Merge pull request `#1445 <https://github.com/tier4/scenario_simulator_v2/issues/1445>`_ from tier4/fix/sonor-cloud-issue-6
+  Renamed lambda parameters to avoid variable shadowing.
+* Merge branch 'master' into fix/sonor-cloud-issue-6
+* Renamed lambda parameters to avoid variable shadowing.
+* Contributors: Masaya Kataoka, Taiga, Taiga Takano
+
+5.2.1 (2024-11-14)
+------------------
+* Merge pull request `#1415 <https://github.com/tier4/scenario_simulator_v2/issues/1415>`_ from tier4/RJD-1333/previous_following_lanelets
+  RJD-1333/previous following lanelets
+* Resolve sonarcloud issues
+* Merge branch 'master' into RJD-1333/previous_following_lanelets
+* Merge branch 'master' into RJD-1333/previous_following_lanelets
+* Merge branch 'master' into RJD-1333/previous_following_lanelets
+* Move lambda to begginig of function
+* Fix review comments
+* Fix behaviour when starting lanelet is not included
+* Changed imlementation to not use iterators
+* Change candidate_lanelet_ids to candidate_route
+* Change iterators to const
+* Fix github comments
+* Fix getFollowingLanelets returns wrong result
+* Fix getPreviousLanelets returns wrong result
+* Contributors: Grzegorz Maj, Masaya Kataoka
+
+5.2.0 (2024-11-14)
+------------------
+* Merge branch 'master' into feature/by_object_type
+* Merge branch 'master' into feature/by_object_type
+* Merge branch 'master' into feature/by_object_type
+* Merge branch 'master' into feature/by_object_type
+* Contributors: Tatsuya Yamasaki
+
+5.1.1 (2024-11-13)
+------------------
+* Merge branch 'master' into fix/sonor-cloud-issue-5
+* Merge branch 'master' into fix/sonor-cloud-issue-5
+* Merge branch 'master' into fix/sonor-cloud-issue-5
+* Contributors: Masaya Kataoka, Taiga
+
+5.1.0 (2024-11-12)
+------------------
+* Merge pull request `#1357 <https://github.com/tier4/scenario_simulator_v2/issues/1357>`_ from tier4/feature/traffic_light_group
+* refactor: delete unused member variable
+* Merge branch 'master' into feature/traffic_light_group
+* fix: fix build errors with autoware_perception_msgs/msg/traffic_light_group_array.hpp
+* refactor: adjust include
+* feat: support awf/universe/20240605 as architecture_type for V2I traffic light
+* refactor: modify TrafficLightPublisher to publish from proto
+* Merge remote-tracking branch 'origin/master' into feature/traffic_light_group
+  # Conflicts:
+  #	simulation/simple_sensor_simulator/include/simple_sensor_simulator/sensor_simulation/sensor_simulation.hpp
+  #	simulation/traffic_simulator/include/traffic_simulator/entity/entity_manager.hpp
+  #	simulation/traffic_simulator/src/traffic_lights/traffic_light_publisher.cpp
+* Merge branch 'master' into feature/traffic_light_group
+* Merge branch 'master' into feature/traffic_light_group
+* Merge branch 'master' into feature/traffic_light_group
+* Merge branch 'master' into feature/traffic_light_group
+* Merge branch 'master' into feature/traffic_light_group
+* Merge branch 'master' into feature/traffic_light_group
+* chore: apply formatter
+* feat(traffic_simulator): support TrafficLightGroup for V2I traffic lights
+* feat(traffic_simulator): support TrafficLightGroupArray in TrafficLightPublisher
+* Contributors: Kotaro Yoshimoto
+
+5.0.2 (2024-11-11)
+------------------
+* Merge branch 'master' into fix/sonor-cloud-issue
+* Merge branch 'master' into fix/sonor-cloud-issue
+* Contributors: Masaya Kataoka, Taiga
+
+5.0.1 (2024-11-11)
+------------------
+
+5.0.0 (2024-11-08)
+------------------
+* Merge pull request `#1406 <https://github.com/tier4/scenario_simulator_v2/issues/1406>`_ from tier4/RJD-1057-remove-traffic-lights-from-entity-manager
+  RJD-1057 (1/5): Remove non-API member functions: EntityManager’s TrafficLight related member functions
+* Merge remote-tracking branch 'tier4/master' into RJD-1057-remove-traffic-lights-from-entity-manager
+* Utilize compile time check for TrafficLight
+  Do not use 'default' in switch over enum to get compilation error when not all cases are considered
+* Remove unused headers
+* ref(traffic_simulator): simple traffic_light_publisher refactor
+* Merge branch 'master' into RJD-1057-remove-traffic-lights-from-entity-manager
+* ref(traffic_simulator): remove autoware::msgs dependency, go back to a proto-centric conversion architecture
+* Merge branch 'master' into RJD-1057-remove-traffic-lights-from-entity-manager
+* Change variable names to be different from lambda names
+  - color => color_message
+  - status => status_message
+  - shape => shape_message
+* Use alternative operators
+* Change traffic_lights_msg to traffic_lights_message
+* Use explicit in traffic lights constructors
+* Fix copyright notice date
+* Merge branch 'master' into RJD-1057-remove-traffic-lights-from-entity-manager
+* fix(traffic_lights): improve the meaning of comments
+* Fix comment style
+* Fix comment
+* Merge branch 'master' into RJD-1057-remove-traffic-lights-from-entity-manager
+* Add traffic light status unknown & Take advantage of compile time enum check
+  Use switch without 'default' so that compiler warns when any case is not covered
+* Merge remote-tracking branch 'tier4/master' into RJD-1057-remove-traffic-lights-from-entity-manager
+* Rename traffic light classes to match filenames
+* Revert "ref(traffic_lights): rename rest of TrafficLight**->TrafficLights**"
+  This reverts commit 87bcb80e204684c476e64c9db6fa5a2bb78e6313.
+* Remove traffic lights tests
+* Merge branch 'RJD-1057-base' into RJD-1057-remove-traffic-lights-from-entity-manager
+* Merge branch 'RJD-1057-base' into RJD-1057-remove-traffic-lights-from-entity-manager
+* Merge branch 'RJD-1057-base' into RJD-1057-remove-traffic-lights-from-entity-manager
+* Remove exception throwing when starting a timer again in configurable rate updater
+* Add TrafficLights tests + clean up other tests and verify frequency
+* Rename internal traffic lights tests file
+* Rename internal traffic lights tests
+* Add explicit destructors for traffic lights
+* Rename traffic lights test file
+* Resolve problems with resources not released
+* Simplify traffic lights tests
+  Use pointer for traffic lights
+* Use typed tests in traffic lights
+* Add publishing tests for V2I traffic lights
+* Add ROS message generation tests for TrafficLights
+* Add message timing verification in tests
+* Add conventional traffic lights tests
+* feat(traffic_lights): last code improvements
+* Merge branch 'RJD-1057-remove-traffic-lights-from-entity-manager' of https://github.com/tier4/scenario_simulator_v2 into RJD-1057-remove-traffic-lights-from-entity-manager
+* feat(traffic_lights): use conversions instead operator() overlaod, remove overloads, improve publisher
+* Remove compile error - reorder
+* ref(traffic_lights): rename rest of TrafficLight**->TrafficLights**
+* feat(traffic_lights): add converions for autoware_auto_perception_msgs
+* feat(traffic_lights): improve traffic_lights_publisher in traffic_simulator
+* feat(traffic_lights): develop cast for autoware msgs
+* feat(scenario_sensor_simulator/traffic_lights_detector): remove dependencies on hdmap_utils, improve creation
+* ref(traffic_simulator/traffic_lights): refactor all classes insead of TrafficLight
+* feat(traffic_light_manager): use TrafficLightsBase and TrafficLights instead of TrafficLightsManager/Supervisor
+* feat(traffic_lights): develop TrafficLightsBase and TrafficLights
+* Merge branch 'RJD-1057-base' into RJD-1057-remove-traffic-lights-from-entity-manager
+* Add TrafficLightSupervisor and move traffic lights to API
+* Contributors: Dawid Moszynski, Dawid Moszyński, Kotaro Yoshimoto, Mateusz Palczuk, Tatsuya Yamasaki
+
+4.5.0 (2024-11-07)
+------------------
+* Merge pull request `#1437 <https://github.com/tier4/scenario_simulator_v2/issues/1437>`_ from tier4/chore/extend-npc-matching-distance
+* docs: add memos for default lanelet matching distance
+* Merge branch 'master' into chore/extend-npc-matching-distance
+* reset EntityBase::getDefaultMatchingDistanceForLaneletPoseCalculation
+* use 1.5 for default lanelet matching distance for vehicle NPCs
+* reset matching distance for spawning
+* Merge branch 'master' into chore/extend-npc-matching-distance
+* extend for default lanelet matching distance for NPCs
+* Contributors: Kotaro Yoshimoto
+
+4.4.1 (2024-11-07)
+------------------
+* Merge pull request `#1404 <https://github.com/tier4/scenario_simulator_v2/issues/1404>`_ from tier4/RJD-1336/fix_request_speed_change
+  RJD-1336/fix_request_speed_change_throws
+* Merge branch 'master' into RJD-1336/fix_request_speed_change
+* Merge branch 'master' into RJD-1336/fix_request_speed_change
+* Merge branch 'RJD-1336/fix_request_speed_change' of github.com:tier4/scenario_simulator_v2 into RJD-1336/fix_request_speed_change
+* add constexpr
+* Merge branch 'master' into RJD-1336/fix_request_speed_change
+* add update frame to update other_statuses
+* Merge branch 'master' into RJD-1336/fix_request_speed_change
+* invert check, add const, add variable names
+* Contributors: Masaya Kataoka, Michał Ciasnocha, robomic
+
+4.4.0 (2024-11-07)
+------------------
+* Merge pull request `#1403 <https://github.com/tier4/scenario_simulator_v2/issues/1403>`_ from tier4/fix/longitudinal_distance
+  RJD-1334/fix_longitudinal_distance
+* add comment
+* Merge branch 'master' into fix/longitudinal_distance
+* Merge branch 'master' into fix/longitudinal_distance
+* Merge branch 'master' into fix/longitudinal_distance
+* typo
+* remove underflow
+* remove negative distance, unify logic
+* Merge branch 'master' into fix/longitudinal_distance
+* early return, update tests
+* Merge branch 'fix/longitudinal_distance' of github.com:tier4/scenario_simulator_v2 into fix/longitudinal_distance
+* consider negative longitudinal distance
+* Merge branch 'master' into fix/longitudinal_distance
+* remove no longer used pngs
+* Merge branch 'fix/longitudinal_distance' of github.com:tier4/scenario_simulator_v2 into fix/longitudinal_distance
+* Merge branch 'master' into fix/longitudinal_distance
+* getLongitudinalDistance refactor
+* name values explicitly
+* add negated tests
+* simplify lambda
+* additional lane change check, logic simplification
+* lanelet extension approach
+* Contributors: Masaya Kataoka, Michał Ciasnocha, robomic
+
+4.3.27 (2024-11-07)
+-------------------
+* Merge pull request `#1438 <https://github.com/tier4/scenario_simulator_v2/issues/1438>`_ from tier4/fix/add_comment_for_empty_function
+  Add comment for empty functions.
+* remove warnings about misc object entity
+* fix problem about https://sonarcloud.io/project/issues?open=AZJwAY5JlcZ2d3dSAT64&id=tier4_scenario_simulator_v2
+* fix problems about https://sonarcloud.io/project/issues?open=AZINWTDsjvEq9OQMnL7a&id=tier4_scenario_simulator_v2
+* fix warnings about https://sonarcloud.io/project/issues?open=AZJwAY5JlcZ2d3dSAT63&id=tier4_scenario_simulator_v2
+* Contributors: Masaya Kataoka
+
+4.3.26 (2024-11-06)
+-------------------
+* Merge pull request `#1430 <https://github.com/tier4/scenario_simulator_v2/issues/1430>`_ from tier4/fix/refactor-code
+  Code Optimization and Refactoring
+* Performing explicit casts.
+* Removed unnecessary lambda captures.
+* Added missing inline directives.
+* remove unuse variable
+* Contributors: Masaya Kataoka, Taiga Takano
+
+4.3.25 (2024-11-05)
+-------------------
+
+4.3.24 (2024-11-01)
+-------------------
+* Merge branch 'master' into fix/remove-topic-logic
+* Merge branch 'master' into fix/remove-topic-logic
+* Contributors: Masaya Kataoka
+
+4.3.23 (2024-11-01)
+-------------------
+
+4.3.22 (2024-10-31)
+-------------------
+* Merge branch 'master' into fix/improved-readability
+* Contributors: Masaya Kataoka
+
+4.3.21 (2024-10-31)
+-------------------
+* Merge pull request `#1411 <https://github.com/tier4/scenario_simulator_v2/issues/1411>`_ from tier4/RJD-1337/getQuadraticAccelerationDuration
+  RJD-1337 Fix getQuadraticAccelerationDuration returning negative duration
+* Merge branch 'master' into RJD-1337/getQuadraticAccelerationDuration
+* Merge branch 'master' into RJD-1337/getQuadraticAccelerationDuration
+* Merge branch 'master' into RJD-1337/getQuadraticAccelerationDuration
+* Merge branch 'master' into RJD-1337/getQuadraticAccelerationDuration
+* Fix review comments
+* Fix getQuadraticAccelerationDuration returning negative duration
+* Contributors: Grzegorz Maj, Masaya Kataoka
+
+4.3.20 (2024-10-31)
+-------------------
+* Merge pull request `#1410 <https://github.com/tier4/scenario_simulator_v2/issues/1410>`_ from tier4/RJD-1335/requestSpeedChange
+  RJD-1335 Fix requestSpeedChange sets target_speed only when it's reached
+* Merge branch 'master' into RJD-1335/requestSpeedChange
+* Fix requestSpeedChange sets target_speed only when it's reached
+* Contributors: Grzegorz Maj, Masaya Kataoka
+
+4.3.19 (2024-10-30)
+-------------------
+
+4.3.18 (2024-10-18)
+-------------------
+* Merge branch 'master' into feature/json/boost-json
+* Merge branch 'master' into feature/json/boost-json
+* Merge remote-tracking branch 'origin/master' into feature/json/boost-json
+* Contributors: Kotaro Yoshimoto, f0reachARR, ぐるぐる
+
+4.3.17 (2024-10-17)
+-------------------
+* Merge branch 'master' into fix/remove_warnings_from_sonarcloud
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/remove_warnings_from_sonarcloud
+* Contributors: Masaya Kataoka
+
+4.3.16 (2024-10-15)
+-------------------
+* Merge pull request `#1420 <https://github.com/tier4/scenario_simulator_v2/issues/1420>`_ from tier4/fix/negative-sqrt-in-planConstraints2
+  Added checks for negative discriminants
+* Added checks for negative discriminants before sqrt to prevent invalid calculations.
+* Contributors: Masaya Kataoka, Taiga Takano
+
+4.3.15 (2024-10-10)
+-------------------
+* Merge branch 'master' into feature/faster-compilation
+* Merge remote-tracking branch 'origin/master' into feature/faster-compilation
+* Merge branch 'master' into fix/RJD-1296-fix-random001-ego-issue
+* Merge branch 'master' into fix/RJD-1296-fix-random001-ego-issue
+* Merge branch 'master' into fix/RJD-1296-fix-random001-ego-issue
+* Merge remote-tracking branch 'origin/master' into feature/faster-compilation
+* Merge branch 'master' into feature/faster-compilation
+* Merge branch 'master' into fix/RJD-1296-fix-random001-ego-issue
+* Merge branch 'master' into fix/RJD-1296-fix-random001-ego-issue
+* Merge remote-tracking branch 'origin/master' into feature/faster-compilation
+* Merge branch 'master' into fix/RJD-1296-fix-random001-ego-issue
+* Merge remote-tracking branch 'origin/master' into feature/faster-compilation
+* Merge remote-tracking branch 'origin/master' into feature/faster-compilation
+* Contributors: Dawid Moszyński, Shota Minami
+
+4.3.14 (2024-10-10)
+-------------------
+* Merge pull request `#1409 <https://github.com/tier4/scenario_simulator_v2/issues/1409>`_ from tier4/feature/joblist-update-stand-still-duration
+  Register StandStillDuration to job list
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/joblist-update-stand-still-duration
+* Merge branch 'master' into feature/joblist-update-stand-still-duration
+* Revised the method for obtaining time.
+* fix format
+* Register StandStillDuration to job list
+* Contributors: Masaya Kataoka, Taiga Takano
+
+4.3.13 (2024-10-09)
+-------------------
+* Merge branch 'master' into feature/use-autoware-state
+* Merge branch 'master' into feature/use-autoware-state
+* Merge branch 'master' into feature/use-autoware-state
+* Merge branch 'master' into feature/use-autoware-state
+* Contributors: Kotaro Yoshimoto
+
+4.3.12 (2024-10-09)
+-------------------
+
+4.3.11 (2024-10-07)
+-------------------
+* Merge pull request `#1408 <https://github.com/tier4/scenario_simulator_v2/issues/1408>`_ from tier4/feature/jpblist-update-traveled-distance
+  Feature/joblist update traveled distance
+* Merge branch 'master' into feature/jpblist-update-traveled-distance
+* Revised the method for obtaining time.
+* Merge branch 'master' into feature/jpblist-update-traveled-distance
+* fixed the code error.
+* remove unuse code
+* fix format
+* Register updateTraveledDistance to job list
+* Contributors: Masaya Kataoka, Taiga Takano
+
+4.3.10 (2024-10-03)
+-------------------
+
+4.3.9 (2024-10-03)
+------------------
+* Merge branch 'master' into test/cmake_flag_with_debug_and_relwithdebinfo
+* Contributors: Masaya Kataoka
+
+4.3.8 (2024-10-02)
+------------------
+* Merge pull request `#1389 <https://github.com/tier4/scenario_simulator_v2/issues/1389>`_ from tier4/1377/isInLanelet
+  Change comparison oparator in isInLanelet
+* Merge branch 'master' into 1377/isInLanelet
+* Merge branch 'master' into 1377/isInLanelet
+* Change comparison oparator in isInLanelet to assure result is correct for 0.0 tolerance
+* Contributors: Grzegorz Maj, Masaya Kataoka
+
+4.3.7 (2024-09-27)
+------------------
+* Merge branch 'master' into feature/sonar_cloud
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/sonar_cloud
+* Contributors: Masaya Kataoka
+
+4.3.6 (2024-09-27)
+------------------
+
+4.3.5 (2024-09-27)
+------------------
+* Merge branch 'master' into feature/lcov
+* Contributors: Masaya Kataoka
+
+4.3.4 (2024-09-27)
+------------------
+* Merge branch 'master' into RJD-1201/fix_quick_start
+* Merge branch 'master' into RJD-1201/fix_quick_start
+* Contributors: SzymonParapura
+
+4.3.3 (2024-09-26)
+------------------
+* Merge pull request `#1369 <https://github.com/tier4/scenario_simulator_v2/issues/1369>`_ from tier4/fix/acquire-position-action
+  Fix/acquire position action
+* Merge branch 'master' into fix/acquire-position-action
+* Merge branch 'master' into fix/acquire-position-action
+* Merge branch 'master' into fix/acquire-position-action
+* Merge remote-tracking branch 'origin/master' into fix/acquire-position-action
+* Merge remote-tracking branch 'origin/master' into fix/acquire-position-action
+* Update `AcquirePositionAction` to request route clearing before applying
+* Merge remote-tracking branch 'origin/master' into fix/acquire-position-action
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+4.3.2 (2024-09-24)
+------------------
+* Merge branch 'master' into fix/imu_frame
+* Merge branch 'master' into fix/imu_frame
+* Contributors: Kotaro Yoshimoto
+
+4.3.1 (2024-09-19)
+------------------
+* Merge branch 'master' into fix/fix-eigen-variable-definition
+* Merge branch 'master' into fix/fix-eigen-variable-definition
+* Merge branch 'master' into fix/fix-eigen-variable-definition
+* Merge branch 'master' into fix/fix-eigen-variable-definition
+* Contributors: Masaya Kataoka
+
+4.3.0 (2024-09-19)
+------------------
+* Merge branch 'master' into RJD-1201/documentation_update
+* Contributors: SzymonParapura
+
+4.2.9 (2024-09-19)
+------------------
+* Merge pull request `#1366 <https://github.com/tier4/scenario_simulator_v2/issues/1366>`_ from tier4/RJD-1197/distance
+  RJD-1197/distance
+* Merge branch 'master' into RJD-1197/distance
+* Merge branch 'master' into RJD-1197/distance
+* resolve conflict
+* Merge branch 'master' into RJD-1197/distance
+* move helper functions to the helper file
+* rm bug example
+* BUG EXAMPLE
+* remove the failing case
+* distanceToRightLaneBound tests, cleanup
+* distance.cpp bug fixes, distanceToRightLaneBound tests
+* remove redundant constructor call
+* clean-up; test_fixture
+* distance tests skeleton, add intersection map and move standard map to its folder
+* longitudinal distance tests
+* longitudinal distance tests
+* Contributors: Masaya Kataoka, Michał Ciasnocha, robomic
+
+4.2.8 (2024-09-18)
+------------------
+* Merge pull request `#1387 <https://github.com/tier4/scenario_simulator_v2/issues/1387>`_ from tier4/fix/set-flag-invalid-lane-pose
+  fix(traffic_simulator): set flag valid lanelet pose
+* fix(traffic_simulator): set flag valid lanelet pose
+* Contributors: Masaya Kataoka, satoshi-ota
+
+4.2.7 (2024-09-13)
+------------------
+
+4.2.6 (2024-09-13)
+------------------
+* Merge pull request `#1371 <https://github.com/tier4/scenario_simulator_v2/issues/1371>`_ from tier4/RJD-1197/pose_module
+  Rjd 1197/pose module
+* Change names of relativePose tests
+* Fix typos in comments
+* Merge branch 'master' into RJD-1197/pose_module
+* CR requested changes part 2
+* CR requested changes
+* Pose module unit tests
+* Contributors: Grzegorz Maj, Masaya Kataoka
+
+4.2.5 (2024-09-12)
+------------------
+
+4.2.4 (2024-09-12)
+------------------
+
+4.2.3 (2024-09-11)
+------------------
+
+4.2.2 (2024-09-10)
+------------------
+* Merge branch 'master' into RJD-1278/geometry-update
+* Merge branch 'master' into RJD-1278/geometry-update
+* Merge branch 'master' into RJD-1278/geometry-update
+* Merge branch 'master' into RJD-1278/geometry-update
+* Contributors: Masaya Kataoka, Michał Ciasnocha
+
+4.2.1 (2024-09-10)
+------------------
+* Merge pull request `#1367 <https://github.com/tier4/scenario_simulator_v2/issues/1367>`_ from tier4/RJD-1197/canonicalized_lanelet_pose
+  Rjd 1197/canonicalized lanelet pose
+* Spelling changes
+* Lint changes
+* Change assert check from bool to has_value
+* Change invalid test cases to more obvious values
+* Unit tests review changes
+* CanonicalizedLaneletPose unit tests
+* Contributors: Grzegorz Maj, Masaya Kataoka
+
+4.2.0 (2024-09-09)
+------------------
+* Merge pull request `#1362 <https://github.com/tier4/scenario_simulator_v2/issues/1362>`_ from tier4/feature/ros2-parameter-forwarding
+* Cleanup
+* Move parameter `use_sim_time` into function `make_parameters`
+* Remove data member `traffic_simulator::Configuration::rviz_config_path`
+* Add feature to forward parameters prefixed with `autoware.` to Autoware
+* Contributors: Kotaro Yoshimoto, yamacir-kit
+
+4.1.1 (2024-09-03)
+------------------
+* Merge pull request `#1207 <https://github.com/tier4/scenario_simulator_v2/issues/1207>`_ from tier4/fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* feat(use_sim_time): set default as false
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into fix/use-sim-time-for-real-time-factor-control
+* Merge remote-tracking branch 'origin/master' into fix/use-sim-time-for-real-time-factor-control
+* Merge branch 'master' into doc/RJD-1273-add-realtime-factor-doc
+* use_sim_time used in concealer initialization
+* Contributors: Dawid Moszynski, Dawid Moszyński, Kotaro Yoshimoto, Paweł Lech
+
+4.1.0 (2024-09-03)
+------------------
+* Merge branch 'master' into RJD-1278/fix-line-segment
+* Merge branch 'master' into RJD-1278/fix-line-segment
+* Merge branch 'master' into RJD-1278/fix-line-segment
+* Merge branch 'master' into RJD-1278/fix-1344-getIntersection2DSValue
+* Merge branch 'master' into RJD-1278/fix-1343-isIntersect2D
+* Contributors: Michał Ciasnocha
+
+4.0.4 (2024-09-02)
+------------------
+* Merge branch 'master' into feature/simple_sensor_simulator_unit_tests_lidar
+* Merge branch 'master' into feature/simple_sensor_simulator_unit_tests_lidar
+* Merge branch 'master' into feature/simple_sensor_simulator_unit_tests_lidar
+* Contributors: Masaya Kataoka, SzymonParapura
+
+4.0.3 (2024-08-29)
+------------------
+* Merge pull request `#1358 <https://github.com/tier4/scenario_simulator_v2/issues/1358>`_ from tier4/RJD-1056-remove-npc-logic-started
+  Remove unused data members: npc_logic_started
+* feat(traffic_simulator): apply clang reforamt
+* Merge remote-tracking branch 'origin/master' into RJD-1056-remove-npc-logic-started
+* Merge branch 'RJD-1056-remove-current-time-step-time' into RJD-1057-base
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-npc-logic-started
+* Merge branch 'RJD-1056-remove-npc-logic-started' into RJD-1057-base
+* Merge branch 'RJD-1056-remove-current-time-step-time' into RJD-1057-base
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-npc-logic-started
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-npc-logic-started
+* Merge remote-tracking branch 'tier4/RJD-1056-remove-npc-logic-started' into RJD-1057-base
+* Merge remote-tracking branch 'tier4/RJD-1056-remove-current-time-step-time' into RJD-1057-base
+* fix(traffic_simulator): remove unnecessary misc_object tests
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-npc-logic-started
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-npc-logic-started
+* Merge remote-tracking branch 'origin/RJD-1056-remove-current-time-step-time' into RJD-1057-base
+* Merge remote-tracking branch 'origin/RJD-1056-remove-npc-logic-started' into RJD-1057-base
+* fix(ego_entity): fix autoware update when not npc_logic_started
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-npc-logic-started
+* Corrections for adapting removed npc logic started
+* Merge remote-tracking branch 'origin/ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-npc-logic-started
+* Merge remote-tracking branch 'origin/RJD-1056-remove-npc-logic-started' into RJD-1057-base
+* Correct EntityManager::getCurrentAction
+* Add else
+* Trailing return type
+* Use member instead of getter
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-npc-logic-started
+* Forward isNpcLogicStarted to API and restore TestExecutor
+* Add else
+* Move implementation to cpp file
+* Remove npc_logic_started from API
+* Update NPC logic only when it has been started
+* Correct style
+* Restore previous getCurrentAction behavior
+* Remove npc_logic_started from Entities
+* Contributors: DMoszynski, Dawid Moszynski, Masaya Kataoka, Mateusz Palczuk
+
+4.0.2 (2024-08-28)
+------------------
+* Merge pull request `#1356 <https://github.com/tier4/scenario_simulator_v2/issues/1356>`_ from tier4/RJD-1056-remove-current-time-step-time
+  Remove unused data members: current_time step_time
+* Merge branch 'master' into RJD-1056-remove-current-time-step-time
+* Fix after using pointer to store entity status
+* Merge branch 'master' into RJD-1056-remove-current-time-step-time
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-current-time-step-time
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-current-time-step-time
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-current-time-step-time
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-current-time-step-time
+* Resolve conflicts with stored time
+* Merge remote-tracking branch 'origin/ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-current-time-step-time
+* Trailing return type
+* Correct style - add else
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' into RJD-1056-remove-current-time-step-time
+* Add const to time argument in behavior
+* Add const to time argument
+* Use member instead of getter
+* Revert to previous macro definition
+* Move requestSpeedChange time check responsibility to EgoEntity and simplify
+* Correct style
+* Remove step_time\_ and current_time\_ data members from EntityManager
+  Adjust the code so that the time is managed in API only
+* Contributors: DMoszynski, Dawid Moszynski, Dawid Moszyński, Masaya Kataoka, Mateusz Palczuk
+
+4.0.1 (2024-08-28)
+------------------
+* Merge pull request `#1354 <https://github.com/tier4/scenario_simulator_v2/issues/1354>`_ from tier4/fix/follow_trajectory
+  Fix follow trajectory action and timestamp in entity status
+* Merge branch 'master' into fix/follow_trajectory
+* Merge branch 'master' into fix/follow_trajectory
+* Merge remote-tracking branch 'origin' into fix/follow_trajectory
+* fix timestamp
+* fix timestamp in status_with_trajectory
+* Contributors: Masaya Kataoka, Tatsuya Yamasaki
+
+4.0.0 (2024-08-27)
+------------------
+* Merge pull request `#1320 <https://github.com/tier4/scenario_simulator_v2/issues/1320>`_ from tier4/ref/RJD-1053-set-update-canonicalized-entity-status
+  ref(behavior_tree, traffic_simulator): move responsibility for canonicalization to traffic_simulator, simplify
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge remote-tracking branch 'origin/master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* doc(distance): use doxygen format
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Fix EgoEntity bug where status time was incremented only when Ego was controlled by simulator
+  This bug lead to problems in other checks which relied on the correct status time
+* Fix EgoEntity error where map pose was unable to be set after scenario start, which should be possible for Ego
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* ref(behavior_tree): use CanonicalizedEntityStatus as shared_ptr inside BT and use ::set
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* fix(ego_entity): fix setMapPose
+* ref(traffic_simulator): remove souvenir
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* fix(spell): fix string in api
+* feat(traffic_simulator, entity_base): improve setStatus - add passing lanelet_id - use it
+* ref(traffic_simulator): use getCanonicalizedStatus, remove getStatus
+* ref(traffic_simulator): remove virutla getEntityType, tidy up CanonicalizedEntityStatus getters
+* feat(cpp_mock_scenarios): add isPedestrain and isVehicle - use it
+* ref(utils, pose): global use pose:: namespace
+* fix(traffic_simulator): apply clang reformat
+* ref(traffic_simulator): improve CanonicalizedEntityStatus getters - use const ref
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* ref(entity_base): fix retuned type def, fix typo
+* doc(developer_guide, traffic_simulator): update doc after review changes, add code notes
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'master' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* fix(traffic_simulator): fix helper_functions for tests and misc object tests
+* Merge branch 'ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge remote-tracking branch 'origin/ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* fix(follow_trajectory_action): fix after merge FTA changes
+* Merge branch 'ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* doc(developer_guide, pose utils): adopt lane_pose_calculation doc to canonicalization laneletpose in CanonicalizedEntityStatus
+* Merge branch 'ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* Merge branch 'ref/RJD-1053-set-update-canonicalized-entity-status' of https://github.com/tier4/scenario_simulator_v2 into ref/RJD-1053-set-update-canonicalized-entity-status
+* fix(traffic_simulator): improve assertions in CanonicalizedEntityStatus::set
+* Merge branch 'ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* fix(conversions, behavior_plugin_base): add new line at the end
+* ref(traffic_simulator): move toCanonicalizeLaneletPose to CanonicalizedEntityStatus::set, little tidy up
+* fix(traffic_simulator): fix behavior_plugin_base
+* ref(traffic_simulator, behavior_tree_plugin): revert unnecessary changes
+* ref(traffic_simulator, behavior_tree_plugin): revert unnecessary changes
+* ref(traffic_simulator): remove operator= for CanonicalizedEntityStatus, use set and assertions
+* fix(traffic_simulator, behavior_tree_plugin): fix returned EntityStatus from bt, fix canonicalize in vehicle_entity and pedestrian_entity
+* feat(behavior_tree_plugin, entity_base): move toCanonicalizedEntityPose to traffic_simulator, use EntityStatus as updated_state in BehaviorTree
+* feat(traffic_simulator): use CanonicalizedEntityStatus only with single constructor
+* Merge remote-tracking branch 'origin/ref/RJD-1053-implement-pose-utils' into ref/RJD-1053-set-update-canonicalized-entity-status
+* tmp
+* ref(traffic_simulator): remove unnecessary cast to EnrityStatus in EntityManager and MicObjectEntity
+* ref(traffic_simulator): remove unecessary casts to EntityStatus in EntityBase
+* Contributors: DMoszynski, Dawid Moszynski, Dawid Moszyński, Masaya Kataoka, Mateusz Palczuk, Tatsuya Yamasaki
+
+3.5.5 (2024-08-27)
+------------------
+* Merge pull request `#1348 <https://github.com/tier4/scenario_simulator_v2/issues/1348>`_ from tier4/fix/distance-with-lane-change
+  Fix longitudinal dintance calculation with lane-change in `HdMapUtils::getLongitudinalDistance`
+* Merge branch 'master' into fix/distance-with-lane-change
+* Merge branch 'master' into fix/distance-with-lane-change
+* chore: add a test for corner case
+* Merge branch 'master' into fix/distance-with-lane-change
+* Merge branch 'master' into fix/distance-with-lane-change
+* fix: longitudinal calculation with lane-change
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka
+
+3.5.4 (2024-08-26)
+------------------
+* Merge branch 'master' into feature/use_workflow_dispatch_in_docker_build
+* Merge branch 'master' into feature/use_workflow_dispatch_in_docker_build
+* Merge remote-tracking branch 'origin/master' into feature/use_workflow_dispatch_in_docker_build
+* Merge remote-tracking branch 'origin/master' into feature/trigger_docker_build_by_tag
+* Contributors: Masaya Kataoka
+
+3.5.3 (2024-08-26)
+------------------
+* Merge pull request `#1340 <https://github.com/tier4/scenario_simulator_v2/issues/1340>`_ from tier4/RJD-1278/traffic_simulator-update
+  Rjd 1278/traffic simulator update
+* Merge branch 'master' into RJD-1278/traffic_simulator-update
+* Merge branch 'master' into RJD-1278/traffic_simulator-update
+* Merge branch 'master' into RJD-1278/traffic_simulator-update
+* Merge branch 'master' into RJD-1278/traffic_simulator-update
+* spellcheck
+* review changes
+* test_traffic_light.cpp refactor, sort
+* test_traffic_lights_manager.cpp refactor
+* remove ros nodes
+* test_simulation_clock.cpp refacton
+* refactor test_helper.cpp file
+* Contributors: Masaya Kataoka, Michał Ciasnocha, robomic
+
+3.5.2 (2024-08-23)
+------------------
+* Merge branch 'master' into fix/interpreter/user-defined-value-condition
+* Merge branch 'master' into fix/interpreter/user-defined-value-condition
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/user-defined-value-condition
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+3.5.1 (2024-08-22)
+------------------
+* Merge pull request `#1335 <https://github.com/tier4/scenario_simulator_v2/issues/1335>`_ from tier4/feat/RJD-1283-add-traffic-controller-visualization
+  feat(traffic_controller, api): add rviz marker for TrafficSink
+* Merge branch 'master' into feat/RJD-1283-add-traffic-controller-visualization
+* Merge branch 'master' into feat/RJD-1283-add-traffic-controller-visualization
+* Merge branch 'master' into feat/RJD-1283-add-traffic-controller-visualization
+* ref(traffic_controller): rename make->appendDebugMarker
+* Merge branch 'master' into feat/RJD-1283-add-traffic-controller-visualization
+* feat(traffic_controller, api): add rviz marker for TrafficSink
+* Contributors: Dawid Moszynski, Dawid Moszyński, Tatsuya Yamasaki
+
+3.5.0 (2024-08-21)
+------------------
+* Merge pull request `#1316 <https://github.com/tier4/scenario_simulator_v2/issues/1316>`_ from tier4/relative-clearance-condition
+* Merge branch 'master' into relative-clearance-condition
+* refactor: use std::size_t instead of raw size_t
+  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
+* Merge branch 'master' into relative-clearance-condition
+* refactor: use std::find instead of std::find_if
+* Merge branch 'master' into relative-clearance-condition
+* Merge branch 'master' into relative-clearance-condition
+* Merge branch 'master' into relative-clearance-condition
+* Merge remote-tracking branch 'origin/master' into relative-clearance-condition
+* Merge remote-tracking branch 'origin/master' into relative-clearance-condition
+* fix tests for HdMapUtils::countLaneChanges
+* Merge remote-tracking branch 'origin/relative-clearance-condition' into relative-clearance-condition
+* Implement HdMapUtils::countLaneChanges
+* Implement HdMapUtils::countLaneChangesAlongRoute
+* Merge branch 'master' into relative-clearance-condition
+* Merge remote-tracking branch 'origin/master' into relative-clearance-condition
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
+3.4.4 (2024-08-20)
+------------------
+
+3.4.3 (2024-08-19)
+------------------
+
+3.4.2 (2024-08-05)
+------------------
+* Merge branch 'master' into doc/longitudinal-control
+* Merge pull request `#1321 <https://github.com/tier4/scenario_simulator_v2/issues/1321>`_ from tier4/feat/RJD-1199-add-imu-sensor-to-simple-sensor-simulator
+* Merge commit 'c1cab6eb1ece2df58982f50a78fef5a5ecaa7234' into doc/longitudinal-control
+* Merge branch 'master' into feat/RJD-1199-add-imu-sensor-to-simple-sensor-simulator
+* Merge branch 'master' into feat/RJD-1199-add-imu-sensor-to-simple-sensor-simulator
+* Merge branch 'master' into feat/RJD-1199-add-imu-sensor-to-simple-sensor-simulator
+* Merge branch 'master' into feat/RJD-1199-add-imu-sensor-to-simple-sensor-simulator
+* Merge branch 'master' into doc/longitudinal-control
+* Merge branch 'master' into doc/longitudinal-control
+* Merge branch 'master' into feat/RJD-1199-add-imu-sensor-to-simple-sensor-simulator
+* Merge branch 'master' into doc/longitudinal-control
+* Merge branch 'master' into feat/RJD-1199-add-imu-sensor-to-simple-sensor-simulator
+* feat(simulator_core, api, zmq): add attachImuSensor, add update imu sensors
+* Contributors: Dawid Moszynski, Koki Suzuki, Kotaro Yoshimoto, Masaya Kataoka, SzymonParapura, koki suzuki
+
+3.4.1 (2024-07-30)
+------------------
+* Merge branch 'master' into doc/open_scenario_support
+* Contributors: Tatsuya Yamasaki
+
+3.4.0 (2024-07-26)
+------------------
+* Merge pull request `#1325 <https://github.com/tier4/scenario_simulator_v2/issues/1325>`_ from tier4/feature/interpreter/lidar-configuration
+  Feature/interpreter/lidar configuration
+* Update `MiscObjectEntity` to display with a magenta bounding box
+* Contributors: Masaya Kataoka, yamacir-kit
+
+3.3.0 (2024-07-23)
+------------------
+* Merge branch 'master' into feature/interpreter/entity_selection
+* Merge branch 'master' into feature/interpreter/entity_selection
+* Merge branch 'master' into feature/interpreter/entity_selection
+* Merge branch 'master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Merge branch 'feature/interpreter/entity_selection' into feature/interpreter/refactoring_entity
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/refactoring_entity
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Contributors: Shota Minami, Tatsuya Yamasaki
+
+3.2.0 (2024-07-18)
+------------------
+* Merge pull request `#1323 <https://github.com/tier4/scenario_simulator_v2/issues/1323>`_ from tier4/fix/spawn_position_of_map_pose
+  Fill x/y value when spawning entity in map frame.
+* Merge remote-tracking branch 'origin/master' into fix/spawn_position_of_map_pose
+* comment in entity_status.pose = pose;
+* add test scenario for validation
+* Contributors: Masaya Kataoka, Tatsuya Yamasaki
+
+3.1.0 (2024-07-16)
+------------------
+* Merge pull request `#1309 <https://github.com/tier4/scenario_simulator_v2/issues/1309>`_ from tier4/autoware_lanelet2_extension
+  feat: use autoware_lanelet2_extension instead of lanelet2_extension
+* Merge branch 'master' into autoware_lanelet2_extension
+* Merge branch 'master' into autoware_lanelet2_extension
+* chore: apply linter
+* add autoware\_ prefix
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki, Yutaka Kondo
+
+3.0.3 (2024-07-12)
+------------------
+* Merge branch 'master' into test/synchronized-action-kashiwanoha-map
+* Contributors: Masaya Kataoka
+
+3.0.2 (2024-07-11)
+------------------
+
+3.0.1 (2024-07-10)
+------------------
+* Merge branch 'master' into feature/docker_tag
+* Contributors: Tatsuya Yamasaki
+
+3.0.0 (2024-07-10)
+------------------
+* Merge pull request `#1266 <https://github.com/tier4/scenario_simulator_v2/issues/1266>`_ from tier4/ref/RJD-1053-implement-pose-utils
+  ref(traffic_simulator): extend utils/pose - use it globally, improve canonization process
+* Merge branch 'master' into ref/RJD-1053-implement-pose-utils
+* Merge branch 'master' into ref/RJD-1053-implement-pose-utils
+* Merge branch 'master' into ref/RJD-1053-implement-pose-utils
+* feat(entity_manager): add Pose type assertion to ::spawnEntity
+* Merge remote-tracking branch 'origin/master' into ref/RJD-1053-implement-pose-utils
+* feat(traffic_simulator): remove deprecated test
+* fix(tests): fix traffic_simulator test after merge
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into ref/RJD-1053-implement-pose-utils
+* feat(entity_manager): remove LaneletPose support from spawnEntity()
+* Merge branch 'master' into ref/RJD-1053-implement-pose-utils
+* feat(pose utils): apply requested changes
+* fix(lanelet_pose): fix after merge - remove quaternion::
+* Merge remote-tracking branch 'origin' into ref/RJD-1053-implement-pose-utils
+* Merge branch 'master' into ref/RJD-1053-implement-pose-utils
+* Merge branch 'ref/RJD-1053-implement-pose-utils' of https://github.com/tier4/scenario_simulator_v2 into ref/RJD-1053-implement-pose-utils
+* ref(pose utils, pedestrian_action_node): rename estimateCanonicalizedLaneletPose to pedestrian::transformToCanonicalizedLaneletPose
+* Merge branch 'master' into ref/RJD-1053-implement-pose-utils
+* Merge remote-tracking branch 'origin' into ref/RJD-1053-implement-pose-utils
+* Merge remote-tracking branch 'origin/master' into ref/RJD-1053-implement-pose-utils
+* Merge remote-tracking branch 'origin/master' into ref/RJD-1053-implement-pose-utils
+* ref(behavior_tree_plugin, traffic_simulator): apply requested changes
+* ref(traffic_simulator, pose utils): add the missing brackets
+* Merge branch 'master' into ref/RJD-1053-implement-pose-utils
+* Merge branch 'master' into ref/RJD-1053-implement-pose-utils
+* fix(traffic_simulator): fix spell
+* Merge master->ref/RJD-1053-implement-pose-utils
+* Merge branch 'ref/RJD-1054-implement-distance-utils' into ref/RJD-1053-implement-pose-utils
+* ref(rviz): fix last line ss2 config
+* ref(rviz): add new line at the end - ss2 config
+* ref(rviz): revert changes ss2 config
+* Merge branch 'ref/RJD-1054-implement-distance-utils' into ref/RJD-1053-implement-pose-utils
+* fix(entity_manager): fix reachPosition - unused target
+* fix(entity_status): add operator= for CanonicalizedEntityStatus
+* Revert "tmp"
+  This reverts commit 6149b4cd77fa9e18ced8152c9ca0242228b5966f.
+* Merge remote-tracking branch 'origin/ref/RJD-1054-implement-distance-utils' into ref/RJD-1053-implement-pose-utils
+* tmp
+* ref(traffic_simulator): tidy up pose::estimateCanonicalizedLaneletPose
+* ref(traffic_simulator): tidy up namespace usage, rename bbox to bounding_box
+* ref(traffic_simulator): tidy up namespace usage, use inline namespace
+* fix(traffic_simulator): revert rviz config changes
+* ref(traffic_simulator): global improvements, comments, revert unnecessary changes
+* ref(traffic_simulator): use only toMapPose and laneletLength from ::pose
+* feat(traffic_simulator): use getCanonicalizedLaneletPose instead of HdMapUtils
+* fix(traffic_simulator): fix map_pose after canonicalize
+* feat(traffic_simulator): use consider_pose_by_road_slope as static variable in CanonicaliedLaneletPose
+* ref(traffic_simulator): remove remains getMapPose
+* fix(toCanonicalizeLaneletPose):  fix using unique_lanelets (current)
+* fix(api, simulator_core): fix canonicalize in setEntityStatus, apply optional to canonicalize
+* fix(entity_base): fix requestLaneChange
+* Merge remote-tracking branch 'origin/ref/RJD-1054-implement-distance-utils' into ref/RJD-1053-implement-pose-utils
+* fix(toCanonicalizeLaneletPose): add use current lanelet id to provide better match
+* feat(api): add throwing exception if getEntity issue durning register
+* ref(simulator_core,sss,pose): revert unintended changes
+* Merge branch 'ref/RJD-1054-implement-distance-utils' into ref/RJD-1053-implement-pose-utils
+* ref(traffic_simulator, cpp_mock_scenarios): separate getLaneletLength and adapt entire code
+* ref(traffic_simulator): remove commented out for refactor
+* fix(traffic_simulator): fix CanonicalizedEntityStatus with HdmapUtils constructor
+* ref(traffic_simulator): remove fillLaneletPose
+* ref(traffic_simulator): tidyup requestLaneChange
+* ref(traffic_simulator): separate getMapPoseFromRelativePose
+* ref(traffic_simulator): tidyup names and unused
+* feat(traffic_simulator): add adjust Oz and pitch to CanonicalizedLaneletPose contructor
+* ref(traffic_simulator, behavior_tree): separate isInLanelet, isAtEndOfLanelet, estimateLaneletPose
+* ref(behavior_tree): add getLaneletId to CanonicalizedEntityStatus
+* ref(traffic_simulator): tidy up constructCanonicalizedLaneletPose
+* ref(traffic_simulator): improve setEntityManager - use ::pose, improve CanonicalizedEntityStatus
+* ref(traffic_simulator): simply setEntityStatus - move canonicalize to EntityManager
+* feat(traffic_simulator): add extend ::pose collection
+* ref(traffic_simulator): adapt EntityManager to getCanonicalizedLaneletPose()
+* ref(traffic_simulator): adapt pedestrian and vehicle entities to getCanonicalizedLaneletPose
+* feat(traffic_simulator): add canonicalized_lanelet_pose, getCanonicalizedLaneletPose to: EntityStatus and EntityBase
+* ref(traffic_simulator): use toCanonicalizedLaneletPose
+* Merge branch 'ref/RJD-1054-implement-distance-utils' into ref/RJD-1053-implement-pose-utils
+* ref(traffic_simulator): use toLaneletPose() from separated pose collection
+* feat(traffic_simulator): transform PoseUtils to pose collection
+* Merge branch 'ref/RJD-1054-implement-distance-utils' into ref/RJD-1053-implement-pose-utils
+* Merge branch 'ref/RJD-1054-implement-distance-utils' into ref/RJD-1053-implement-pose-utils
+* feat(helper): add constructCanonicalizedLaneletPose
+* ref(pose): use separated toMapPose
+* feat(pose): separate pose utils methods
+* Contributors: DMoszynski, Dawid Moszynski, Dawid Moszyński, Masaya Kataoka, Tatsuya Yamasaki
+
+2.6.0 (2024-07-08)
+------------------
+* Bump version of scenario_simulator_v2 from version 2.4.2 to version 2.5.0
+* Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
+* Merge branch 'master' into feature/publish_empty_context
+* Merge branch 'master' into feature/publish_empty_context
+* Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
+* Contributors: Masaya Kataoka, Release Bot
+
+2.4.2 (2024-07-08)
+------------------
+
+2.4.1 (2024-07-05)
+------------------
+
+2.4.0 (2024-07-01)
+------------------
+* Merge pull request `#1262 <https://github.com/tier4/scenario_simulator_v2/issues/1262>`_ from tier4/feature/traffic_light_for_evaluator
+  Add traffic light publisher for external services
+* refactor: delete unused dependencies for tarffic_simulator
+* feat: use traffic_simulator_msgs for traffic light
+* Merge branch 'master' into feature/traffic_light_for_evaluator
+* Merge branch 'master' into feature/traffic_light_for_evaluator
+* Merge branch 'master' into feature/traffic_light_for_evaluator
+* refactor: use const ref
+* Merge branch 'master' into feature/traffic_light_for_evaluator
+* Merge branch 'master' into feature/traffic_light_for_evaluator
+* chore: use conditional compilation implementation in the absence of TrafficLightArrayV1
+* feat: integrate TrafficLightPublisher for evaluator to EntityManager
+* feat: implement TrafficLightPublisher specialization for tier4_simulation_msgs
+* Contributors: Kotaro Yoshimoto
+
+2.3.0 (2024-06-28)
+------------------
+* Merge pull request `#1234 <https://github.com/tier4/scenario_simulator_v2/issues/1234>`_ from tier4/feature/synchronized_action
+  Feature/synchronized action
+* Merge branch 'master' into feature/synchronized_action
+* chore: format miss
+* chore: Update requestSynchronize function parameter name for clarity
+* Update requestSynchronize function and added new test scenario.
+* chore: Update requestSynchronize function to fix border distance calculation
+* chore: Update requestSynchronize function to fix border distance calculation
+* chore: Update requestSynchronize function signature to include target_speed parameter
+* Merge commit 'c50d79fce98242d76671360029b97c166412e76f' into feature/synchronized_action
+* Merge remote-tracking branch 'origin/master' into feature/synchronized_action
+* Merge commit 'bf6a962e14e3e85627fca226574120cdba30080e' into feature/synchronized_action
+* removed comment
+* Merge commit 'bd366bce147e65d5991b62db333cf35153dd96fb' into feature/synchronized_action
+* Remove unused function and update step time in EntityBase
+* Add synchronized_action subdirectory and change return type of keepStepTime function
+* Refactor requestSynchronize function and add keepStepTime function
+* Refactor requestSynchronize function signature
+* Merge commit 'b03fd92759845935be79f7ac32366848c78a2a66' into feature/synchronized_action
+* Fix synchronization bug in entity_base.cpp
+* add getMaxAcceleration/getMaxDeceleration function
+* fix reachPosition function
+* add EntityBase::reachPosition function
+* remvoe ReachPosition function
+* fix comment and bump version package
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/synchronized_action
+* Fix typo in comment
+* Refactor entity_base.hpp and .cpp
+* Merge commit '45d42a79d92c370387749ad16c10665deb42e02c' into feature/synchronized_action
+* Merge branch 'master' into feature/synchronized_action
+* Update entity_base.hpp
+* refuctured code of synchronized action
+* Merge commit '1ceb05c7206e163eb8214ceb68f5e35e7880d7a4' into feature/synchronized_action
+* Fix requestLaneChange function signatures
+* Fix requestLaneChange function formatting
+* Merge commit 'f74901b45bbec4b3feb288c4ad86491de642f5ca' into feature/synchronized_action
+* Remove unused function reachPosition
+* Merge commit '8a9b141aaf6cf5a58f537781a47f66e4c305cea3' into feature/synchronized_action
+* Update package version and refactor reachPosition method
+* Refactor synchronization logic in EntityBase::requestSynchronize()
+* Update package version and fix const correctness in entity manager and entity base
+* Refactor entity_base.cpp to improve code readability
+* Remove unnecessary code and include statements
+* Merge branch 'master' into feature/synchronized_action
+* Fix distance margin typo and update comments in entity_base.cpp
+* added new line at the end of the code
+* Remove debug logging statements and update function names
+* Merge commit '27266909414686613cea4f9aa17162d33ecf4668' into feature/synchronized_action
+* Fix lanelet target pose in synchronized action
+* Merge commit 'ada77d59ffd6545105e40e88e4ad50050062a3d6' into feature/synchronized_action
+* Merge commit '253fa785573217ad3a6bde882724a9e35a0c99ed' into feature/synchronized_action
+* Update entity_base.hpp and synchronized_action.cpp
+* Update synchronized action behavior
+* Update entity synchronization logic to consider acceleration limit
+* Update target lanelet poses and velocities
+* 途中経過
+* Refactor synchronization logic and add new API method
+* Disable building of C++ mock scenarios and update requestSynchronize function
+* Add requestSynchronize method to API and EntityManager and few bug fix
+* tried to format
+* implemented atleast functions with no error
+* Fix synchronization issue in EntityBase class
+* Fix distance calculation in EntityBase::getDistanceToTargetLaneletPose()
+* error is not fixed but pushing today's implements
+* fixed revert and errors
+* Implemented a draft of getDistanceToTargetLaneletPose and requestSynchronize methods
+* changed the function and made it simple
+* Add draft functions for synchronized action
+* Contributors: Koki Suzuki, Masaya Kataoka, hakuturu583, koki suzuki
+
+2.2.2 (2024-06-28)
+------------------
+
+2.2.1 (2024-06-27)
+------------------
+* Merge pull request `#1293 <https://github.com/tier4/scenario_simulator_v2/issues/1293>`_ from tier4/fix/issue1276-re
+  Optimize entity frame computation.
+* Merge remote-tracking branch 'origin/master' into fix/issue1276-re
+* Optimize entity frame computation.
+* Contributors: Masaya Kataoka, Taiga Takano
+
+2.2.0 (2024-06-24)
+------------------
+* Merge pull request `#1292 <https://github.com/tier4/scenario_simulator_v2/issues/1292>`_ from tier4/feature/clear_route_api
+  add API::clearRoute()
+* Merge branch 'master' into feature/clear_route_api
+* Merge remote-tracking branch 'origin/master' into feature/clear_route_api
+* Merge branch 'master' into feature/clear_route_api
+* Merge branch 'master' into feature/clear_route_api
+* add API::clearRoute()
+* Contributors: Masaya Kataoka, Taiga, Taiga Takano
+
+2.1.11 (2024-06-24)
+-------------------
+* Merge pull request `#1287 <https://github.com/tier4/scenario_simulator_v2/issues/1287>`_ from tier4/feature/unit_tests/miscellaneous
+  Feature/unit tests/miscellaneous
+* resolve conflict
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/unit_tests/miscellaneous
+* fix typo
+* remove unecessary assignment
+* add newlines
+* add copy of helper_functions, apply review requests
+* remove misc tests
+* resolve merge confilct
+* resolve merge
+* remove test list file
+* use test fixtures
+* rename literal
+* use test fixture
+* remove variables that are used only once
+* remove unnecesary checks
+* newlines
+* add tes descriptions
+* prepare notes for descriptions
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/unit_tests/miscellaneous
+* remove conversions tests
+* remove tests that exist in other branches and refactor wht is left
+* style
+* getDistanceToLeftLaneBound
+* getRouteLanelets_empty
+* simulation clock tests
+* entity_base tests
+* entity_base tests; code cleanup
+* EntityBase onUpdate. onPostUpdate tests
+* entity_base dummy class with a couple of tests
+* job accessor tests
+* make linter happy
+* job and job_list unit tests
+* behavior getRequestString
+* vertex, toPoints
+* traffic light bulb tests
+* traffic_light status shape color tests
+* traffic_simulator unit tests
+* Contributors: Masaya Kataoka, robomic
+
+2.1.10 (2024-06-24)
+-------------------
+* Merge pull request `#1286 <https://github.com/tier4/scenario_simulator_v2/issues/1286>`_ from tier4/feature/unit_tests/misc_object_entity
+  Feature/unit tests/misc object entity
+* resolve conflict
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/unit_tests/misc_object_entity
+* internal review corrections
+* use better naming
+* merge tests into a singular file
+* clean up
+* add newline
+* rename file definition
+* use builder
+* remove variables used only once
+* make it work; some tests have been deleted
+* collect tests, will not compile
+* Contributors: Masaya Kataoka, robomic
+
+2.1.9 (2024-06-24)
+------------------
+
+2.1.8 (2024-06-20)
+------------------
+* Merge branch 'master' into feature/simple_sensor_simulator_unit_test
+* Merge branch 'master' into feature/simple_sensor_simulator_unit_test
+* Contributors: Kotaro Yoshimoto, SzymonParapura
+
 2.1.7 (2024-06-19)
 ------------------
 * Merge pull request `#1275 <https://github.com/tier4/scenario_simulator_v2/issues/1275>`_ from tier4/feature/improve-ros-parameter-handling

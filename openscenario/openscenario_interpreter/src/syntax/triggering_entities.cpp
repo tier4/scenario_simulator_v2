@@ -24,7 +24,7 @@ inline namespace syntax
 TriggeringEntities::TriggeringEntities(const pugi::xml_node & node, Scope & scope)
 : triggering_entities_rule(
     readAttribute<TriggeringEntitiesRule>("triggeringEntitiesRule", node, scope)),
-  entity_refs(readElements<EntityRef, 1>("EntityRef", node, scope))
+  entity_refs(readElements<Entity, 1>("EntityRef", node, scope))
 {
 }
 

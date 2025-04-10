@@ -1,0 +1,259 @@
+OpenSCENARIO:
+  FileHeader:
+    author: 'Tatsuya Yamasaki'
+    date: '2022-03-04T18:06:53+09:00'
+    description: 'Sample scenario (with Autoware)'
+    revMajor: 1
+    revMinor: 0
+  ParameterDeclarations:
+    ParameterDeclaration: []
+  CatalogLocations:
+    VehicleCatalog:
+      Directory:
+        path: $(ros2 pkg prefix --share openscenario_experimental_catalog)/vehicle
+  RoadNetwork:
+    LogicFile:
+      filepath: $(ros2 pkg prefix --share kashiwanoha_map)/map
+  Entities:
+    ScenarioObject:
+      - name: ego
+        CatalogReference:
+          catalogName: sample_vehicle
+          entryName: sample_vehicle
+        ObjectController:
+          Controller:
+            name: 'Autoware'
+            Properties:
+              Property:
+                - name: maxJerk
+                  value: "1.5"
+                - name: minJerk
+                  value: "-1.5"
+                - name: pointcloudChannels
+                  value: '67'
+                - name: pointcloudHorizontalResolution
+                  value: '1.5'
+                - name: pointcloudVerticalFieldOfView
+                  value: '45.678'
+      - name: boundary
+        MiscObject: &BARRICADE
+          mass: 1.0
+          miscObjectCategory: obstacle
+          name: ''
+          BoundingBox:
+            Center:
+              x: 0
+              y: 0
+              z: 0
+            Dimensions:
+              width: 100
+              length: 100
+              height: 100
+          Properties:
+            Property: []
+      - name: barricade
+        MiscObject:
+          mass: 1.0
+          miscObjectCategory: obstacle
+          name: ''
+          BoundingBox:
+            Center:
+              x: 0
+              y: 0
+              z: 0
+            Dimensions:
+              width: 10
+              length: 1
+              height: 10
+          Properties:
+            Property: []
+  Storyboard:
+    Init:
+      Actions:
+        Private:
+          - entityRef: ego
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: 34513
+                      s: 10
+                      offset: 0
+                      Orientation: &ORIENTATION_ZERO
+                        type: relative
+                        h: 0
+                        p: 0
+                        r: 0
+              - RoutingAction:
+                  AcquirePositionAction:
+                    Position:
+                      LanePosition:
+                        roadId: ''
+                        laneId: '34507'
+                        s: 50
+                        offset: 0
+                        Orientation: *ORIENTATION_ZERO
+          - entityRef: boundary
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: 34513
+                      s: 10
+                      offset: 0
+                      Orientation: *ORIENTATION_ZERO
+          - entityRef: barricade
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: 34513
+                      s: 20
+                      offset: 0
+                      Orientation: *ORIENTATION_ZERO
+    Story:
+      - name: ''
+        Act:
+          - name: remove_barricade
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ''
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef:
+                    - entityRef: barricade
+                Maneuver:
+                  - name: ''
+                    Event:
+                      - name: ''
+                        priority: parallel
+                        maximumExecutionCount: 1
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: barricade
+                                    EntityCondition:
+                                      StandStillCondition:
+                                        duration: 90
+                        Action:
+                          - name: ''
+                            GlobalAction:
+                              EntityAction:
+                                entityRef: barricade
+                                DeleteEntityAction:
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name:
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
+          - name: _EndCondition
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ''
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef:
+                    - entityRef: ego
+                Maneuver:
+                  - name: ''
+                    Event:
+                      - name: ''
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      ReachPositionCondition:
+                                        Position:
+                                          LanePosition:
+                                            roadId: ''
+                                            laneId: '34507'
+                                            s: 50
+                                            offset: 0
+                                            Orientation:
+                                              type: relative
+                                              h: 0
+                                              p: 0
+                                              r: 0
+                                        tolerance: 0.5
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    UserDefinedValueCondition:
+                                      name: RelativeHeadingCondition(ego, 34507, 50)
+                                      rule: lessThan
+                                      value: 0.1
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    UserDefinedValueCondition:
+                                      name: RelativeHeadingCondition(ego)
+                                      rule: lessThan
+                                      value: 0.1
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    UserDefinedValueCondition:
+                                      name: ego.currentMinimumRiskManeuverState.state
+                                      rule: equalTo
+                                      value: NORMAL
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitSuccess
+                      - name: ''
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 180
+                                      rule: greaterThan
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitFailure
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ''
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
+    StopTrigger:
+      ConditionGroup: []

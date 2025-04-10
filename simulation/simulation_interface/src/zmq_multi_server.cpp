@@ -57,6 +57,10 @@ void MultiServer::poll()
         *sim_response.mutable_update_entity_status() =
           std::get<UpdateEntityStatus>(functions_)(proto.update_entity_status());
         break;
+      case simulation_api_schema::SimulationRequest::RequestCase::kAttachImuSensor:
+        *sim_response.mutable_attach_imu_sensor() =
+          std::get<AttachImuSensor>(functions_)(proto.attach_imu_sensor());
+        break;
       case simulation_api_schema::SimulationRequest::RequestCase::kAttachLidarSensor:
         *sim_response.mutable_attach_lidar_sensor() =
           std::get<AttachLidarSensor>(functions_)(proto.attach_lidar_sensor());

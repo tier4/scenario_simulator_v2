@@ -17,11 +17,14 @@
 
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
+#include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
 
 namespace traffic_simulator
 {
 using EntityStatus = traffic_simulator_msgs::msg::EntityStatus;
+using EntityType = traffic_simulator_msgs::msg::EntityType;
+using EntitySubtype = traffic_simulator_msgs::msg::EntitySubtype;
 
 inline namespace entity_status
 {
@@ -30,48 +33,59 @@ class CanonicalizedEntityStatus
 public:
   explicit CanonicalizedEntityStatus(
     const EntityStatus & may_non_canonicalized_entity_status,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils);
-  explicit CanonicalizedEntityStatus(
-    const EntityStatus & may_non_canonicalized_entity_status,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
-    const lanelet::Ids & route_lanelets);
-  explicit CanonicalizedEntityStatus(const CanonicalizedEntityStatus & obj);
+    const std::optional<CanonicalizedLaneletPose> & canonicalized_lanelet_pose);
+  CanonicalizedEntityStatus(const CanonicalizedEntityStatus & obj);
   explicit operator EntityStatus() const noexcept { return entity_status_; }
-  CanonicalizedEntityStatus & operator=(const CanonicalizedEntityStatus & obj)
-  {
-    this->entity_status_ = obj.entity_status_;
-    return *this;
-  }
-  auto getName() const noexcept -> const std::string & { return entity_status_.name; };
-  auto getBoundingBox() const noexcept -> traffic_simulator_msgs::msg::BoundingBox;
-  auto laneMatchingSucceed() const noexcept -> bool { return entity_status_.lanelet_pose_valid; }
-  auto getMapPose() const noexcept -> geometry_msgs::msg::Pose { return entity_status_.pose; }
-  auto getLaneletPose() const -> LaneletPose;
-  auto setTwist(const geometry_msgs::msg::Twist & twist) -> void;
-  auto getTwist() const noexcept -> geometry_msgs::msg::Twist;
-  auto setLinearVelocity(double linear_velocity) -> void;
-  auto setAccel(const geometry_msgs::msg::Accel & accel) -> void;
-  auto getAccel() const noexcept -> geometry_msgs::msg::Accel;
-  auto setLinearJerk(double) -> void;
-  auto getLinearJerk() const noexcept -> double;
-  auto setTime(double) -> void;
+
+  auto set(const CanonicalizedEntityStatus & status) -> void;
+  auto set(
+    const EntityStatus & status, const lanelet::Ids & lanelet_ids, const double matching_distance)
+    -> void;
+  auto set(const EntityStatus & status, const double matching_distance) -> void;
+
+  auto setAction(const std::string & action) -> void;
+  auto getActionStatus() const noexcept -> const traffic_simulator_msgs::msg::ActionStatus &;
+
   auto getTime() const noexcept -> double;
+  auto setTime(double) -> void;
+
+  auto getMapPose() const noexcept -> const geometry_msgs::msg::Pose &;
+  auto setMapPose(const geometry_msgs::msg::Pose & pose) -> void;
+
+  auto getAltitude() const -> double;
+
+  auto getTwist() const noexcept -> const geometry_msgs::msg::Twist &;
+  auto setTwist(const geometry_msgs::msg::Twist & twist) -> void;
+  auto setLinearVelocity(double linear_velocity) -> void;
+
+  auto getAccel() const noexcept -> const geometry_msgs::msg::Accel &;
+  auto setAccel(const geometry_msgs::msg::Accel & accel) -> void;
+  auto setLinearAcceleration(double linear_acceleration) -> void;
+
+  auto getLinearJerk() const noexcept -> double;
+  auto setLinearJerk(double) -> void;
+
+  auto isInLanelet() const noexcept -> bool;
+  auto getLaneletId() const -> lanelet::Id;
+  auto getLaneletIds() const -> lanelet::Ids;
+  auto getLaneletPose() const -> const LaneletPose &;
+  auto getCanonicalizedLaneletPose() const noexcept
+    -> const std::optional<CanonicalizedLaneletPose> &;
+  auto getName() const noexcept -> const std::string & { return entity_status_.name; }
+  auto getType() const noexcept -> const EntityType & { return entity_status_.type; }
+  auto getSubtype() const noexcept -> const EntitySubtype & { return entity_status_.subtype; }
+  auto getBoundingBox() const noexcept -> const traffic_simulator_msgs::msg::BoundingBox &;
 
 private:
-  auto canonicalize(
-    const EntityStatus & may_non_canonicalized_entity_status,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils) -> EntityStatus;
-  auto canonicalize(
-    const EntityStatus & may_non_canonicalized_entity_status,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
-    const lanelet::Ids & route_lanelets) -> EntityStatus;
+  std::optional<CanonicalizedLaneletPose> canonicalized_lanelet_pose_;
   EntityStatus entity_status_;
 };
 }  // namespace entity_status
-
-bool isSameLaneletId(const CanonicalizedEntityStatus &, const CanonicalizedEntityStatus &);
-bool isSameLaneletId(const CanonicalizedEntityStatus &, const lanelet::Id lanelet_id);
-
+auto isSameLaneletId(
+  const CanonicalizedEntityStatus & first_status, const CanonicalizedEntityStatus & second_status)
+  -> bool;
+auto isSameLaneletId(const CanonicalizedEntityStatus & status, const lanelet::Id lanelet_id)
+  -> bool;
 }  // namespace traffic_simulator
 
 #endif  // TRAFFIC_SIMULATOR__DATA_TYPE__ENTITY_STATUS_HPP_

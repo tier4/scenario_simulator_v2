@@ -2,4 +2,5 @@ nav:
   - Overview: ScenarioTestRunner.md
   - ScenarioFormatConversion.md
   - HowToWriteWorkflowFile.md
+  - RealtimeFactor.md
   - Tips.md

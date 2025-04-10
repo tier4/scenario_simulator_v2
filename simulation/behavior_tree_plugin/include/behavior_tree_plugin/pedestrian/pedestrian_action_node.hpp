@@ -28,33 +28,23 @@ class PedestrianActionNode : public ActionNode
 {
 public:
   PedestrianActionNode(const std::string & name, const BT::NodeConfiguration & config);
-  void getBlackBoardValues();
+  void getBlackBoardValues() override;
   static BT::PortsList providedPorts()
   {
-    BT::PortsList ports = {
-      // clang-format off
+    // clang-format off
+    return BT::PortsList({
       BT::InputPort<traffic_simulator_msgs::msg::BehaviorParameter>("behavior_parameter"),
       BT::InputPort<traffic_simulator_msgs::msg::PedestrianParameters>("pedestrian_parameters"),
-      // clang-format on
-    };
-    BT::PortsList parent_ports = entity_behavior::ActionNode::providedPorts();
-    for (const auto & parent_port : parent_ports) {
-      ports.emplace(parent_port.first, parent_port.second);
-    }
-    return ports;
+    }) + entity_behavior::ActionNode::providedPorts();
+    // clang-format on
   }
   traffic_simulator_msgs::msg::PedestrianParameters pedestrian_parameters;
   auto calculateUpdatedEntityStatusInWorldFrame(double target_speed) const
-    -> traffic_simulator::CanonicalizedEntityStatus;
-  auto calculateUpdatedEntityStatus(double target_speed) const
-    -> traffic_simulator::CanonicalizedEntityStatus;
+    -> traffic_simulator::EntityStatus;
+  auto calculateUpdatedEntityStatus(double target_speed) const -> traffic_simulator::EntityStatus;
 
 protected:
   traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter;
-
-private:
-  auto estimateLaneletPose(const geometry_msgs::msg::Pose & pose) const
-    -> std::optional<traffic_simulator::CanonicalizedLaneletPose>;
 };
 }  // namespace entity_behavior
 

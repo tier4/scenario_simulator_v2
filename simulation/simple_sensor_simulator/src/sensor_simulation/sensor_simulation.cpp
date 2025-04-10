@@ -24,8 +24,11 @@ auto SensorSimulation::updateSensorFrame(
   const std::vector<traffic_simulator_msgs::EntityStatus> & entities,
   const simulation_api_schema::UpdateTrafficLightsRequest & update_traffic_lights_request) -> void
 {
-  std::vector<std::string> lidar_detected_objects = {};
+  for (auto & sensor : imu_sensors_) {
+    sensor->update(current_ros_time, entities);
+  }
 
+  std::vector<std::string> lidar_detected_objects = {};
   for (auto & sensor : lidar_sensors_) {
     sensor->update(current_simulation_time, entities, current_ros_time);
     for (const auto & object : sensor->getDetectedObjects()) {

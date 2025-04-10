@@ -15,8 +15,10 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__SELECTED_ENTITIES_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__SELECTED_ENTITIES_HPP_
 
+#include <openscenario_interpreter/object.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/by_type.hpp>
-#include <openscenario_interpreter/syntax/entity_ref.hpp>
+#include <openscenario_interpreter/syntax/entity.hpp>
 
 namespace openscenario_interpreter
 {
@@ -32,8 +34,13 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct SelectedEntities
+struct SelectedEntities : public ComplexType
 {
+  const std::list<Entity> entityRef;
+
+  const std::list<ByType> byType;
+
+  explicit SelectedEntities(const pugi::xml_node &, Scope &);
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

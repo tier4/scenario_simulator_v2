@@ -39,12 +39,12 @@ const std::optional<traffic_simulator_msgs::msg::Obstacle> FollowLaneAction::cal
 
 const traffic_simulator_msgs::msg::WaypointsArray FollowLaneAction::calculateWaypoints()
 {
-  if (!entity_status->laneMatchingSucceed()) {
+  if (!canonicalized_entity_status->isInLanelet()) {
     THROW_SIMULATION_ERROR("failed to assign lane");
   }
-  if (entity_status->getTwist().linear.x >= 0) {
+  if (canonicalized_entity_status->getTwist().linear.x >= 0) {
     traffic_simulator_msgs::msg::WaypointsArray waypoints;
-    const auto lanelet_pose = entity_status->getLaneletPose();
+    const auto lanelet_pose = canonicalized_entity_status->getLaneletPose();
     waypoints.waypoints = reference_trajectory->getTrajectory(
       lanelet_pose.s, lanelet_pose.s + getHorizon(), 1.0, lanelet_pose.offset);
     trajectory = std::make_unique<math::geometry::CatmullRomSubspline>(
@@ -74,9 +74,11 @@ BT::NodeStatus FollowLaneAction::tick()
     request != traffic_simulator::behavior::Request::FOLLOW_LANE) {
     return BT::NodeStatus::FAILURE;
   }
-  if (!entity_status->laneMatchingSucceed()) {
+  if (!canonicalized_entity_status->isInLanelet()) {
     stopEntity();
-    setOutput("updated_status", entity_status);
+    const auto waypoints = traffic_simulator_msgs::msg::WaypointsArray{};
+    setOutput("waypoints", waypoints);
+    setOutput("obstacle", calculateObstacle(waypoints));
     return BT::NodeStatus::RUNNING;
   }
   const auto waypoints = calculateWaypoints();
@@ -90,7 +92,7 @@ BT::NodeStatus FollowLaneAction::tick()
     if (trajectory == nullptr) {
       return BT::NodeStatus::FAILURE;
     }
-    auto distance_to_front_entity = getDistanceToFrontEntity(*trajectory);
+    const auto distance_to_front_entity = getDistanceToFrontEntity(*trajectory);
     if (distance_to_front_entity) {
       if (
         distance_to_front_entity.value() <=
@@ -106,7 +108,8 @@ BT::NodeStatus FollowLaneAction::tick()
         return BT::NodeStatus::FAILURE;
       }
     }
-    auto distance_to_stopline = hdmap_utils->getDistanceToStopLine(route_lanelets, *trajectory);
+    auto distance_to_stopline =
+      traffic_simulator::distance::distanceToStopLine(route_lanelets, *trajectory);
     auto distance_to_conflicting_entity =
       getDistanceToConflictingEntity(route_lanelets, *trajectory);
     if (distance_to_stopline) {
@@ -129,9 +132,7 @@ BT::NodeStatus FollowLaneAction::tick()
   if (!target_speed) {
     target_speed = hdmap_utils->getSpeedLimit(route_lanelets);
   }
-  setOutput(
-    "updated_status", std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(
-                        calculateUpdatedEntityStatus(target_speed.value())));
+  setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(target_speed.value()));
   setOutput("waypoints", waypoints);
   setOutput("obstacle", calculateObstacle(waypoints));
   return BT::NodeStatus::RUNNING;

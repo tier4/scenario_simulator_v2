@@ -33,7 +33,8 @@ public:
   explicit CppScenarioNode(
     const std::string & node_name, const std::string & map_path,
     const std::string & lanelet2_map_file, const std::string & scenario_filename,
-    const bool verbose, const rclcpp::NodeOptions & option);
+    const bool verbose, const rclcpp::NodeOptions & option,
+    const std::set<std::uint8_t> & auto_sink_entity_types = {});
   void start();
   void stop(Result result, const std::string & description = "");
   void expectThrow() { exception_expect_ = true; }
@@ -52,6 +53,10 @@ public:
     const std::vector<traffic_simulator::CanonicalizedLaneletPose> & goal_lanelet_pose,
     const traffic_simulator_msgs::msg::VehicleParameters & parameters);
 
+  auto isVehicle(const std::string & name) const -> bool;
+
+  auto isPedestrian(const std::string & name) const -> bool;
+
 protected:
   traffic_simulator::API api_;
   common::junit::JUnit5 junit_;
@@ -64,18 +69,15 @@ private:
   virtual void onUpdate() = 0;
   virtual void onInitialize() = 0;
   rclcpp::TimerBase::SharedPtr update_timer_;
-  double timeout_;
+  int timeout_;
   auto configure(
     const std::string & map_path, const std::string & lanelet2_map_file,
-    const std::string & scenario_filename, const bool verbose) -> traffic_simulator::Configuration
+    const std::string & scenario_filename, const bool verbose,
+    const std::set<std::uint8_t> & auto_sink_entity_types = {}) -> traffic_simulator::Configuration
   {
-    auto configuration = traffic_simulator::Configuration(map_path);
-    {
-      configuration.lanelet2_map_file = lanelet2_map_file;
-      // configuration.lanelet2_map_file = "lanelet2_map_with_private_road_and_walkway_ele_fix.osm";
-      configuration.scenario_path = scenario_filename;
-      configuration.verbose = verbose;
-    }
+    auto configuration = traffic_simulator::Configuration(
+      map_path, lanelet2_map_file, scenario_filename, auto_sink_entity_types);
+    configuration.verbose = verbose;
     checkConfiguration(configuration);
     return configuration;
   }

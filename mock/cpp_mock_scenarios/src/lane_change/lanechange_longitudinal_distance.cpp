@@ -40,20 +40,19 @@ private:
   bool lanechange_finished = false;
   void onUpdate() override
   {
-    if (api_.isInLanelet("ego", 34513, 0.1)) {
+    if (api_.getEntity("ego").isInLanelet(34513, 0.1)) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
   }
   void onInitialize() override
   {
     api_.spawn(
-      "ego",
-      api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34462, 10, 0, 0, 0, 0)),
+      "ego", traffic_simulator::helper::constructCanonicalizedLaneletPose(34462, 10.0, 0.0),
       getVehicleParameters());
-    api_.setLinearVelocity("ego", 1);
-    api_.requestSpeedChange("ego", 1, true);
-    api_.requestLaneChange(
-      "ego",
+    auto & ego_entity = api_.getEntity("ego");
+    ego_entity.setLinearVelocity(1);
+    ego_entity.requestSpeedChange(1, true);
+    ego_entity.requestLaneChange(
       traffic_simulator::lane_change::RelativeTarget(
         "ego", traffic_simulator::lane_change::Direction::LEFT, 1, 0),
       traffic_simulator::lane_change::TrajectoryShape::CUBIC,

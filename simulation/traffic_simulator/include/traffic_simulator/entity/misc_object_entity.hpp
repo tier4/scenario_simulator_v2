@@ -38,13 +38,6 @@ public:
   auto getDefaultDynamicConstraints() const
     -> const traffic_simulator_msgs::msg::DynamicConstraints & override;
 
-  auto getEntityType() const -> const traffic_simulator_msgs::msg::EntityType & override
-  {
-    static traffic_simulator_msgs::msg::EntityType type;
-    type.type = traffic_simulator_msgs::msg::EntityType::MISC_OBJECT;
-    return type;
-  }
-
   auto getEntityTypename() const -> const std::string & override
   {
     static const std::string result = "MiscObjectEntity";
@@ -64,8 +57,6 @@ public:
   {
     THROW_SEMANTIC_ERROR("getRouteLanelets function cannot not use in MiscObjectEntity");
   }
-
-  auto fillLaneletPose(CanonicalizedEntityStatus &) -> void override;
 
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override
   {
@@ -104,15 +95,40 @@ public:
 
   void setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &) override;
 
-  void setVelocityLimit(double) override{};
+  void setVelocityLimit(double) override
+  {
+    /// @note Misc object entity does not move, so this function is no operation.
+  }
 
-  void setAccelerationLimit(double) override {}
+  void setAccelerationLimit(double) override
+  {
+    /// @note Misc object entity does not move, so this function is no operation.
+  }
 
-  void setAccelerationRateLimit(double) override {}
+  void setAccelerationRateLimit(double) override
+  {
+    /// @note Misc object entity does not move, so this function is no operation.
+  }
 
-  void setDecelerationLimit(double) override {}
+  void setDecelerationLimit(double) override
+  {
+    /// @note Misc object entity does not move, so this function is no operation.
+  }
 
-  void setDecelerationRateLimit(double) override {}
+  void setDecelerationRateLimit(double) override
+  {
+    /// @note Misc object entity does not move, so this function is no operation.
+  }
+
+  auto getMaxAcceleration() const -> double override
+  {
+    THROW_SEMANTIC_ERROR("getMaxAcceleration function cannot not use in MiscObjectEntity");
+  }
+
+  auto getMaxDeceleration() const -> double override
+  {
+    THROW_SEMANTIC_ERROR("getMaxDeceleration function cannot not use in MiscObjectEntity");
+  }
 };
 }  // namespace entity
 }  // namespace traffic_simulator

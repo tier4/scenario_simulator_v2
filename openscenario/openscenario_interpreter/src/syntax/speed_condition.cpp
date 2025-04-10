@@ -14,6 +14,7 @@
 
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
+#include <openscenario_interpreter/syntax/entities.hpp>
 #include <openscenario_interpreter/syntax/speed_condition.hpp>
 #include <openscenario_interpreter/utility/print.hpp>
 
@@ -23,10 +24,12 @@ inline namespace syntax
 {
 SpeedCondition::SpeedCondition(
   const pugi::xml_node & node, Scope & scope, const TriggeringEntities & triggering_entities)
-: value(readAttribute<Double>("value", node, scope)),
-  compare(readAttribute<Rule>("rule", node, scope)),
+: Scope(scope),
+  rule(readAttribute<Rule>("rule", node, scope)),
+  value(readAttribute<Double>("value", node, scope)),
+  direction(readAttribute<DirectionalDimension>("direction", node, scope, std::nullopt)),
   triggering_entities(triggering_entities),
-  results(triggering_entities.entity_refs.size(), Double::nan())
+  results(triggering_entities.entity_refs.size(), {Double::nan()})
 {
 }
 
@@ -38,18 +41,56 @@ auto SpeedCondition::description() const -> String
 
   print_to(description, results);
 
-  description << " " << compare << " " << value << "?";
+  description << " " << rule << " " << value << "?";
 
   return description.str();
+}
+
+auto SpeedCondition::evaluate(const Entities * entities, const Entity & triggering_entity)
+  -> Eigen::Vector3d
+{
+  if (entities->isAdded(triggering_entity)) {
+    return evaluateSpeed(triggering_entity);
+  } else {
+    return Eigen::Vector3d(Double::nan(), Double::nan(), Double::nan());
+  }
+}
+
+auto SpeedCondition::evaluate(
+  const Entities * entities, const Entity & triggering_entity,
+  const std::optional<DirectionalDimension> & direction, const Compatibility compatibility)
+  -> double
+{
+  if (const Eigen::Vector3d v = evaluate(entities, triggering_entity); direction) {
+    switch (*direction) {
+      default:
+      case DirectionalDimension::longitudinal:
+        return v.x();
+      case DirectionalDimension::lateral:
+        return v.y();
+      case DirectionalDimension::vertical:
+        return v.z();
+    }
+  } else {
+    switch (compatibility) {
+      default:
+      case Compatibility::legacy:
+        return v.x();
+      case Compatibility::standard:
+        return v.norm();
+    }
+  }
 }
 
 auto SpeedCondition::evaluate() -> Object
 {
   results.clear();
 
-  return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
-    results.push_back(evaluateSpeed(triggering_entity));
-    return compare(results.back(), value);
+  return asBoolean(triggering_entities.apply([&](const auto & triggering_entity) {
+    results.push_back(triggering_entity.apply([&](const auto & triggering_entity) {
+      return evaluate(global().entities, triggering_entity, direction, compatibility);
+    }));
+    return not results.back().size() or std::invoke(rule, results.back(), value).min();
   }));
 }
 }  // namespace syntax

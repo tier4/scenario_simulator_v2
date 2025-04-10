@@ -1,18 +1,14 @@
 ARG ROS_DISTRO="humble"
-FROM ros:${ROS_DISTRO} as build-stage
+FROM ros:${ROS_DISTRO} AS build-stage
 SHELL ["/bin/bash", "-c"]
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NOWARNINGS=yes
 
-RUN --mount=type=cache,id=apt-cache-amd64,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,id=apt-lib-amd64,target=/var/lib/apt,sharing=locked \
-    apt-get update && apt-get -y install python3-pip python3-rospkg python3-rosdep software-properties-common ccache
 # cspell: ignore kisak
 RUN --mount=type=cache,id=apt-cache-amd64,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,id=apt-lib-amd64,target=/var/lib/apt,sharing=locked \
-    add-apt-repository ppa:kisak/kisak-mesa -y
-RUN --mount=type=cache,id=apt-cache-amd64,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,id=apt-lib-amd64,target=/var/lib/apt,sharing=locked \
+    apt-get update && apt-get -y install python3-pip python3-rospkg python3-rosdep software-properties-common ccache && \
+    add-apt-repository ppa:kisak/kisak-mesa -y && \
     apt-get update && apt-get install libegl-mesa0 -y
 
 RUN rm -f /etc/apt/apt.conf.d/docker-clean && \

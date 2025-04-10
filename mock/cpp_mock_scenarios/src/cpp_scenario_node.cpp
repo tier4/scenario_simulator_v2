@@ -20,16 +20,28 @@ namespace cpp_mock_scenarios
 CppScenarioNode::CppScenarioNode(
   const std::string & node_name, const std::string & map_path,
   const std::string & lanelet2_map_file, const std::string & scenario_filename, const bool verbose,
-  const rclcpp::NodeOptions & option)
+  const rclcpp::NodeOptions & option,
+  const std::set<std::uint8_t> & auto_sink_entity_types /*= {}*/)
 : Node(node_name, option),
-  api_(this, configure(map_path, lanelet2_map_file, scenario_filename, verbose), 1.0, 20),
+  api_(
+    this,
+    configure(map_path, lanelet2_map_file, scenario_filename, verbose, auto_sink_entity_types),
+    declare_parameter<double>("global_real_time_factor", 1.0),
+    declare_parameter<double>("global_frame_rate", 20.0)),
   scenario_filename_(scenario_filename),
   exception_expect_(false)
 {
   declare_parameter<std::string>("junit_path", "/tmp");
   get_parameter<std::string>("junit_path", junit_path_);
-  declare_parameter<double>("timeout", 10.0);
-  get_parameter<double>("timeout", timeout_);
+  declare_parameter<int>("global_timeout", 10.0);
+  get_parameter<int>("global_timeout", timeout_);
+
+  traffic_simulator::lanelet_pose::CanonicalizedLaneletPose::setConsiderPoseByRoadSlope([&]() {
+    if (not has_parameter("consider_pose_by_road_slope")) {
+      declare_parameter("consider_pose_by_road_slope", false);
+    }
+    return get_parameter("consider_pose_by_road_slope").as_bool();
+  }());
 }
 
 void CppScenarioNode::update()
@@ -54,8 +66,9 @@ void CppScenarioNode::start()
 {
   onInitialize();
   api_.startNpcLogic();
-  using namespace std::chrono_literals;
-  update_timer_ = this->create_wall_timer(50ms, std::bind(&CppScenarioNode::update, this));
+  const auto rate =
+    std::chrono::duration<double>(1.0 / get_parameter("global_frame_rate").as_double());
+  update_timer_ = this->create_wall_timer(rate, std::bind(&CppScenarioNode::update, this));
 }
 
 void CppScenarioNode::stop(Result result, const std::string & description)
@@ -93,7 +106,8 @@ void CppScenarioNode::spawnEgoEntity(
   api_.updateFrame();
   std::this_thread::sleep_for(std::chrono::duration<double>(1.0 / 20.0));
   api_.spawn("ego", spawn_lanelet_pose, parameters, traffic_simulator::VehicleBehavior::autoware());
-  api_.asFieldOperatorApplication("ego").declare_parameter<bool>("allow_goal_modification", true);
+  auto & ego_entity = api_.getEgoEntity("ego");
+  ego_entity.setParameter<bool>("allow_goal_modification", true);
   api_.attachLidarSensor("ego", 0.0);
 
   api_.attachDetectionSensor("ego", 200.0, true, 0.0, 0, 0.0, 0.0);
@@ -101,7 +115,7 @@ void CppScenarioNode::spawnEgoEntity(
   api_.attachOccupancyGridSensor([this] {
     simulation_api_schema::OccupancyGridSensorConfiguration configuration;
     // clang-format off
-      configuration.set_architecture_type(api_.getROS2Parameter<std::string>("architecture_type", "awf/universe"));
+      configuration.set_architecture_type(api_.getROS2Parameter<std::string>("architecture_type", "awf/universe/20240605"));
       configuration.set_entity("ego");
       configuration.set_filter_by_range(true);
       configuration.set_height(200);
@@ -112,16 +126,28 @@ void CppScenarioNode::spawnEgoEntity(
     // clang-format on
     return configuration;
   }());
-  api_.requestAssignRoute("ego", goal_lanelet_poses);
+  ego_entity.requestAssignRoute(goal_lanelet_poses);
 
   using namespace std::chrono_literals;
-  while (!api_.asFieldOperatorApplication("ego").engaged()) {
-    if (api_.asFieldOperatorApplication("ego").engageable()) {
-      api_.asFieldOperatorApplication("ego").engage();
+  while (!ego_entity.isEngaged()) {
+    if (ego_entity.isEngageable()) {
+      ego_entity.engage();
     }
     api_.updateFrame();
     std::this_thread::sleep_for(std::chrono::duration<double>(1.0 / 20.0));
   }
+}
+
+auto CppScenarioNode::isVehicle(const std::string & name) const -> bool
+{
+  return api_.getEntity(name).getEntityType().type ==
+         traffic_simulator_msgs::msg::EntityType::VEHICLE;
+}
+
+auto CppScenarioNode::isPedestrian(const std::string & name) const -> bool
+{
+  return api_.getEntity(name).getEntityType().type ==
+         traffic_simulator_msgs::msg::EntityType::PEDESTRIAN;
 }
 
 void CppScenarioNode::checkConfiguration(const traffic_simulator::Configuration & configuration)

@@ -15,6 +15,8 @@
 #ifndef TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_HPP_
 #define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_HPP_
 
+#include <simulation_api_schema.pb.h>
+
 #include <color_names/color_names.hpp>
 #include <cstdint>
 #include <geometry_msgs/msg/point.hpp>
@@ -25,9 +27,9 @@
 #include <regex>
 #include <scenario_simulator_exception/exception.hpp>
 #include <set>
-#include <simulation_interface/conversions.hpp>
 #include <stdexcept>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
+#include <traffic_simulator_msgs/msg/traffic_light_array_v1.hpp>
 #include <tuple>
 #include <type_traits>
 #include <unordered_map>
@@ -260,65 +262,85 @@ struct TrafficLight
 
     explicit operator simulation_api_schema::TrafficLight() const
     {
-      auto color = [this]() {
+      const auto color = [this]() {
+        auto color_message = simulation_api_schema::TrafficLight_Color_UNKNOWN_COLOR;
         switch (std::get<Color>(value).value) {
           case Color::green:
-            return simulation_api_schema::TrafficLight_Color_GREEN;
+            color_message = simulation_api_schema::TrafficLight_Color_GREEN;
+            break;
           case Color::yellow:
-            return simulation_api_schema::TrafficLight_Color_AMBER;
+            color_message = simulation_api_schema::TrafficLight_Color_AMBER;
+            break;
           case Color::red:
-            return simulation_api_schema::TrafficLight_Color_RED;
+            color_message = simulation_api_schema::TrafficLight_Color_RED;
+            break;
           case Color::white:
-            return simulation_api_schema::TrafficLight_Color_WHITE;
+            color_message = simulation_api_schema::TrafficLight_Color_WHITE;
           case Color::unknown:
-            return simulation_api_schema::TrafficLight_Color_UNKNOWN_COLOR;
+            color_message = simulation_api_schema::TrafficLight_Color_UNKNOWN_COLOR;
           default:
             throw common::SyntaxError(std::get<Color>(value), " is not supported color.");
         }
+        return color_message;
       };
 
-      auto status = [this]() {
+      const auto status = [this]() {
+        auto status_message = simulation_api_schema::TrafficLight_Status_UNKNOWN_STATUS;
         switch (std::get<Status>(value).value) {
           case Status::solid_on:
-            return simulation_api_schema::TrafficLight_Status_SOLID_ON;
+            status_message = simulation_api_schema::TrafficLight_Status_SOLID_ON;
+            break;
           case Status::solid_off:
-            return simulation_api_schema::TrafficLight_Status_SOLID_OFF;
+            status_message = simulation_api_schema::TrafficLight_Status_SOLID_OFF;
+            break;
           case Status::flashing:
-            return simulation_api_schema::TrafficLight_Status_FLASHING;
+            status_message = simulation_api_schema::TrafficLight_Status_FLASHING;
+            break;
           case Status::unknown:
-            return simulation_api_schema::TrafficLight_Status_UNKNOWN_STATUS;
-          default:
-            throw common::SyntaxError(std::get<Status>(value), " is not supported as a status.");
+            status_message = simulation_api_schema::TrafficLight_Status_UNKNOWN_STATUS;
+            break;
         }
+        return status_message;
       };
 
-      auto shape = [this]() {
+      const auto shape = [this]() {
+        auto shape_message = simulation_api_schema::TrafficLight_Shape_UNKNOWN_SHAPE;
         switch (std::get<Shape>(value).value) {
           case Shape::circle:
-            return simulation_api_schema::TrafficLight_Shape_CIRCLE;
+            shape_message = simulation_api_schema::TrafficLight_Shape_CIRCLE;
+            break;
           case Shape::cross:
-            return simulation_api_schema::TrafficLight_Shape_CROSS;
+            shape_message = simulation_api_schema::TrafficLight_Shape_CROSS;
+            break;
           case Shape::left:
-            return simulation_api_schema::TrafficLight_Shape_LEFT_ARROW;
+            shape_message = simulation_api_schema::TrafficLight_Shape_LEFT_ARROW;
+            break;
           case Shape::down:
-            return simulation_api_schema::TrafficLight_Shape_DOWN_ARROW;
+            shape_message = simulation_api_schema::TrafficLight_Shape_DOWN_ARROW;
+            break;
           case Shape::up:
-            return simulation_api_schema::TrafficLight_Shape_UP_ARROW;
+            shape_message = simulation_api_schema::TrafficLight_Shape_UP_ARROW;
+            break;
           case Shape::right:
-            return simulation_api_schema::TrafficLight_Shape_RIGHT_ARROW;
+            shape_message = simulation_api_schema::TrafficLight_Shape_RIGHT_ARROW;
+            break;
           case Shape::lower_left:
-            return simulation_api_schema::TrafficLight_Shape_DOWN_LEFT_ARROW;
+            shape_message = simulation_api_schema::TrafficLight_Shape_DOWN_LEFT_ARROW;
+            break;
           case Shape::lower_right:
-            return simulation_api_schema::TrafficLight_Shape_DOWN_RIGHT_ARROW;
+            shape_message = simulation_api_schema::TrafficLight_Shape_DOWN_RIGHT_ARROW;
+            break;
           case Shape::upper_left:
-            return simulation_api_schema::TrafficLight_Shape_UP_LEFT_ARROW;
+            shape_message = simulation_api_schema::TrafficLight_Shape_UP_LEFT_ARROW;
+            break;
           case Shape::upper_right:
-            return simulation_api_schema::TrafficLight_Shape_UP_RIGHT_ARROW;
+            shape_message = simulation_api_schema::TrafficLight_Shape_UP_RIGHT_ARROW;
           case Shape::unknown:
-            return simulation_api_schema::TrafficLight_Shape_UNKNOWN_SHAPE;
+            shape_message = simulation_api_schema::TrafficLight_Shape_UNKNOWN_SHAPE;
           default:
             throw common::SyntaxError(std::get<Shape>(value), " is not supported as a shape.");
         }
+        return shape_message;
       };
 
       simulation_api_schema::TrafficLight traffic_light_bulb_proto;
@@ -330,17 +352,107 @@ struct TrafficLight
 
       return traffic_light_bulb_proto;
     }
+
+    explicit operator traffic_simulator_msgs::msg::TrafficLightBulbV1() const
+    {
+      const auto color = [this] {
+        auto color_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::UNKNOWN;
+        switch (std::get<Color>(value).value) {
+          case Color::green:
+            color_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::GREEN;
+            break;
+          case Color::yellow:
+            color_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::AMBER;
+            break;
+          case Color::red:
+            color_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::RED;
+            break;
+          case Color::white:
+            color_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::WHITE;
+            break;
+        }
+        return color_message;
+      };
+
+      const auto status = [this] {
+        auto status_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::UNKNOWN;
+        switch (std::get<Status>(value).value) {
+          case Status::solid_on:
+            status_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::SOLID_ON;
+            break;
+          case Status::solid_off:
+            status_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::SOLID_OFF;
+            break;
+          case Status::flashing:
+            status_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::FLASHING;
+            break;
+          case Status::unknown:
+            status_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::UNKNOWN;
+            break;
+        }
+        return status_message;
+      };
+
+      const auto shape = [this] {
+        auto shape_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::UNKNOWN;
+        switch (std::get<Shape>(value).value) {
+          case Shape::circle:
+            shape_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::CIRCLE;
+            break;
+          case Shape::cross:
+            shape_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::CROSS;
+            break;
+          case Shape::left:
+            shape_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::LEFT_ARROW;
+            break;
+          case Shape::down:
+            shape_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::DOWN_ARROW;
+            break;
+          case Shape::up:
+            shape_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::UP_ARROW;
+            break;
+          case Shape::right:
+            shape_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::RIGHT_ARROW;
+            break;
+          case Shape::lower_left:
+            shape_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::DOWN_LEFT_ARROW;
+            break;
+          case Shape::lower_right:
+            shape_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::DOWN_RIGHT_ARROW;
+            break;
+          case Shape::upper_left:
+            shape_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::UP_LEFT_ARROW;
+            break;
+          case Shape::upper_right:
+            shape_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::UP_RIGHT_ARROW;
+            break;
+        }
+        return shape_message;
+      };
+
+      traffic_simulator_msgs::msg::TrafficLightBulbV1 msg;
+      msg.color = color();
+      msg.status = status();
+      msg.shape = shape();
+      // NOTE: confidence will be overwritten
+      msg.confidence = 1.0;
+      // NOTE: unused data member 'enum_revision' for
+      // traffic_simulator_msgs::msg::TrafficLightBulbV1
+      return msg;
+    }
   };
 
+  explicit TrafficLight(const lanelet::Id, const hdmap_utils::HdMapUtils &);
+
   const lanelet::Id way_id;
+
+  const lanelet::Ids regulatory_elements_ids;
 
   double confidence = 1.0;
 
   std::set<Bulb> bulbs;
 
   const std::map<Bulb::Hash, std::optional<geometry_msgs::msg::Point>> positions;
-
-  explicit TrafficLight(const lanelet::Id, hdmap_utils::HdMapUtils &);
 
   auto clear() { bulbs.clear(); }
 
@@ -408,6 +520,18 @@ struct TrafficLight
       *traffic_signal_proto.add_traffic_light_status() = traffic_light_bulb_proto;
     }
     return traffic_signal_proto;
+  }
+
+  explicit operator traffic_simulator_msgs::msg::TrafficLightV1() const
+  {
+    traffic_simulator_msgs::msg::TrafficLightV1 traffic_signal;
+    traffic_signal.lanelet_way_id = way_id;
+    for (const auto & bulb : bulbs) {
+      auto traffic_light_bulb = static_cast<traffic_simulator_msgs::msg::TrafficLightBulbV1>(bulb);
+      traffic_light_bulb.confidence = confidence;
+      traffic_signal.traffic_light_bulbs.push_back(traffic_light_bulb);
+    }
+    return traffic_signal;
   }
 };
 }  // namespace traffic_simulator

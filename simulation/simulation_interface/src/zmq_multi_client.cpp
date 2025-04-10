@@ -146,6 +146,18 @@ auto MultiClient::call(const simulation_api_schema::UpdateEntityStatusRequest & 
   }
 }
 
+auto MultiClient::call(const simulation_api_schema::AttachImuSensorRequest & request)
+  -> simulation_api_schema::AttachImuSensorResponse
+{
+  if (is_running) {
+    auto simulation_request = simulation_api_schema::SimulationRequest();
+    *simulation_request.mutable_attach_imu_sensor() = request;
+    return call(simulation_request).attach_imu_sensor();
+  } else {
+    return {};
+  }
+}
+
 auto MultiClient::call(const simulation_api_schema::AttachLidarSensorRequest & request)
   -> simulation_api_schema::AttachLidarSensorResponse
 {

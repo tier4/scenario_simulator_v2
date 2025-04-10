@@ -30,7 +30,7 @@ namespace geometry
 {
 template <
   typename T, std::enable_if_t<std::conjunction_v<IsLikeQuaternion<T>>, std::nullptr_t> = nullptr>
-auto getRotationMatrix(T quat)
+auto getRotationMatrix(T quat) -> Eigen::Matrix3d
 {
   auto x = quat.x;
   auto y = quat.y;
