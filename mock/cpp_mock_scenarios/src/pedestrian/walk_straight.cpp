@@ -29,7 +29,7 @@ class WalkStraightScenario : public cpp_mock_scenarios::CppScenarioNode
 public:
   explicit WalkStraightScenario(const rclcpp::NodeOptions & option)
   : cpp_mock_scenarios::CppScenarioNode(
-      "stop_at_crosswalk", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
+      "walk_straight", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
       "lanelet2_map.osm", __FILE__, false, option)
   {
     start();
