@@ -294,7 +294,7 @@ auto ActionNode::getEntityStatus(const std::string & target_name) const
  * 1. Check if route to target entity from reference entity exists, if not try to transform pose to other 
  *    routable lanelet, within matching distance (findRoutableAlternativeLaneletPoseFrom).
  * 2. Calculate longitudinal distance between entities bounding boxes -> bounding_box_distance.
- * 3. Calculate longitudinal distance between entities poses -> position_distance.
+ * 3. Calculate longitudinal distance between entities poses -> longitudinal_distance.
  * 4. Calculate target entity bounding box distance to reference entity spline (minimal distance from all corners) 
  *    -> target_to_spline_distance.
  * 5. If target_to_spline_distance is less than half width of reference entity target entity is conflicting.
@@ -336,26 +336,26 @@ auto ActionNode::getDistanceToTargetEntity(
       math::geometry::getPointsFromBbox(target_bounding_box));
     const auto bounding_box_diagonal_length =
       math::geometry::getDistance(bounding_box_map_points[0], bounding_box_map_points[2]);
-    if (const auto position_distance = traffic_simulator::distance::longitudinalDistance(
+    if (const auto longitudinal_distance = traffic_simulator::distance::longitudinalDistance(
           *from_lanelet_pose, *target_lanelet_pose, include_adjacent_lanelet,
           include_opposite_direction, routing_configuration, hdmap_utils);
-        !position_distance) {
+        !longitudinal_distance) {
       return std::nullopt;
     } else if (const auto bounding_box_distance =
                  traffic_simulator::distance::boundingBoxLaneLongitudinalDistance(
-                   position_distance, from_bounding_box, target_bounding_box);
+                   longitudinal_distance, from_bounding_box, target_bounding_box);
                !bounding_box_distance || bounding_box_distance.value() < 0.0) {
       return std::nullopt;
     } else {
-      // TODO rotation of NPC is not taken into account, same as in boundingBoxLaneLongitudinalDistance
-      // this should be considered to be changed in separate task in the future
+      /// @todo rotation of NPC is not taken into account, same as in boundingBoxLaneLongitudinalDistance
+      /// this should be considered to be changed in separate task in the future
       const auto target_bounding_box_distance =
         bounding_box_distance.value() + from_bounding_box.dimensions.x / 2.0;
 
       /// @note if the distance of the target entity to the spline is smaller than the width of the reference entity
       if (const auto target_to_spline_distance = traffic_simulator::distance::distanceToSpline(
             static_cast<geometry_msgs::msg::Pose>(*target_lanelet_pose), target_bounding_box,
-            spline, position_distance.value());
+            spline, longitudinal_distance.value());
           target_to_spline_distance <= from_bounding_box.dimensions.y / 2.0) {
         return target_bounding_box_distance;
       }
