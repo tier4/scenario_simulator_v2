@@ -19,16 +19,20 @@
 #include <behaviortree_cpp_v3/bt_factory.h>
 
 #include <behavior_tree_plugin/pedestrian/pedestrian_action_node.hpp>
+#include <geometry/vector3/operator.hpp>
 #include <memory>
 #include <string>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
+#include <traffic_simulator_msgs/msg/pedestrian_parameters.hpp>
 #include <vector>
 
 namespace entity_behavior
 {
 namespace pedestrian
 {
+enum class DetectorStatus { DETECTED, NOT_DETECTED, LEGACY_MODE };
+
 class FollowLaneAction : public entity_behavior::PedestrianActionNode
 {
 public:
@@ -39,6 +43,10 @@ public:
   {
     return entity_behavior::PedestrianActionNode::providedPorts();
   }
+  DetectorStatus detectObstacleInLane(
+    const lanelet::Ids & pedestrian_lanes, const bool & see_around,
+    const uint8_t pedestrian_behavior_mode =
+      traffic_simulator_msgs::msg::PedestrianParameters::LEGACY);
 };
 }  // namespace pedestrian
 }  // namespace entity_behavior

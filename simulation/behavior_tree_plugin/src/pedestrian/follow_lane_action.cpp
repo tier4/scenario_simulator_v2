@@ -30,6 +30,61 @@ FollowLaneAction::FollowLaneAction(const std::string & name, const BT::NodeConfi
 
 void FollowLaneAction::getBlackBoardValues() { PedestrianActionNode::getBlackBoardValues(); }
 
+DetectorStatus FollowLaneAction::detectObstacleInLane(
+  const lanelet::Ids & pedestrian_lanes, const bool & see_around,
+  const uint8_t pedestrian_behavior_mode)
+{
+  if (!see_around) {
+    return DetectorStatus::NOT_DETECTED;
+  }
+
+  if (pedestrian_behavior_mode == traffic_simulator_msgs::msg::PedestrianParameters::LEGACY) {
+    return DetectorStatus::LEGACY_MODE;
+  }
+
+  auto hasObstacleInPedestrianLanes =
+    [this](const lanelet::Ids pedestrian_lanes_local) -> DetectorStatus {
+    lanelet::Ids other_entity_lane_ids;
+    for (const auto & [_, status] : other_entity_status) {
+      if (status.isInLanelet()) {
+        other_entity_lane_ids.push_back(status.getLaneletId());
+      }
+    }
+    std::unordered_set<lanelet::Id> other_lane_id_set(
+      other_entity_lane_ids.begin(), other_entity_lane_ids.end());
+    for (const auto & pedestrian_lane : pedestrian_lanes_local) {
+      if (other_lane_id_set.count(pedestrian_lane)) {
+        return DetectorStatus::DETECTED;
+      }
+    }
+    return DetectorStatus::NOT_DETECTED;
+  };
+
+  auto hasObstacleInFrontOfPedestrian = [this]() -> DetectorStatus {
+    using math::geometry::operator-;
+
+    const auto & pedestrian_position = canonicalized_entity_status->getMapPose().position;
+
+    for (const auto & [_, entity_status] : other_entity_status) {
+      const auto & other_position = entity_status.getMapPose().position;
+      const auto relative_position = other_position - pedestrian_position;
+      const double relative_angle_rad = std::atan2(relative_position.y, relative_position.x);
+      if (relative_angle_rad > 0) {
+        return DetectorStatus::DETECTED;
+      }
+    }
+    return DetectorStatus::NOT_DETECTED;
+  };
+
+  if (
+    hasObstacleInPedestrianLanes(pedestrian_lanes) == DetectorStatus::DETECTED &&
+    hasObstacleInFrontOfPedestrian() == DetectorStatus::DETECTED) {
+    return DetectorStatus::DETECTED;
+  }
+
+  return DetectorStatus::NOT_DETECTED;
+}
+
 BT::NodeStatus FollowLaneAction::tick()
 {
   getBlackBoardValues();
@@ -47,6 +102,11 @@ BT::NodeStatus FollowLaneAction::tick()
   if (!target_speed) {
     target_speed = hdmap_utils->getSpeedLimit(following_lanelets);
   }
+
+  const auto obstacle_detector_result = detectObstacleInLane(
+    following_lanelets, behavior_parameter.see_around, pedestrian_parameters.obstacle_detect_mode);
+  target_speed = (obstacle_detector_result == DetectorStatus::DETECTED) ? 0.0 : target_speed;
+
   setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(target_speed.value()));
   return BT::NodeStatus::RUNNING;
 }
