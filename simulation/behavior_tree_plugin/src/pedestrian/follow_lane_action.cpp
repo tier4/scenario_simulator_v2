@@ -31,14 +31,14 @@ FollowLaneAction::FollowLaneAction(const std::string & name, const BT::NodeConfi
 void FollowLaneAction::getBlackBoardValues() { PedestrianActionNode::getBlackBoardValues(); }
 
 DetectorStatus FollowLaneAction::detectObstacleInLane(
-  const lanelet::Ids & pedestrian_lanes, const bool & see_around)
+  const lanelet::Ids & pedestrian_lanes, const bool & see_around) const
 {
   if (!see_around) {
     return DetectorStatus::NOT_DETECTED;
   }
 
   auto hasObstacleInPedestrianLanes =
-    [this](const lanelet::Ids pedestrian_lanes_local) -> DetectorStatus {
+    [this](const lanelet::Ids & pedestrian_lanes_local){
     lanelet::Ids other_entity_lane_ids;
     for (const auto & [_, status] : other_entity_status) {
       if (status.isInLanelet()) {
@@ -55,7 +55,7 @@ DetectorStatus FollowLaneAction::detectObstacleInLane(
     return DetectorStatus::NOT_DETECTED;
   };
 
-  auto hasObstacleInFrontOfPedestrian = [this]() -> DetectorStatus {
+  auto hasObstacleInFrontOfPedestrian = [this](){
     using math::geometry::operator-;
 
     const auto & pedestrian_position = canonicalized_entity_status->getMapPose().position;
