@@ -2,6 +2,12 @@
 Changelog for package get_parameter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+15.0.7 (2025-04-10)
+-------------------
+* Merge branch 'master' into fix/scenario_name
+* Merge branch 'master' into fix/scenario_name
+* Contributors: Masaya Kataoka
+
 15.0.6 (2025-04-09)
 -------------------
 
