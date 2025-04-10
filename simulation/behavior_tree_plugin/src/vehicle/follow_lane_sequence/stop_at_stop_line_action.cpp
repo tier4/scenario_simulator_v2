@@ -53,7 +53,7 @@ const std::optional<traffic_simulator_msgs::msg::Obstacle> StopAtStopLineAction:
 
 const traffic_simulator_msgs::msg::WaypointsArray StopAtStopLineAction::calculateWaypoints()
 {
-  if (!canonicalized_entity_status->laneMatchingSucceed()) {
+  if (!canonicalized_entity_status->isInLanelet()) {
     THROW_SIMULATION_ERROR("failed to assign lane");
   }
   if (canonicalized_entity_status->getTwist().linear.x >= 0) {
@@ -108,7 +108,8 @@ BT::NodeStatus StopAtStopLineAction::tick()
   if (trajectory == nullptr) {
     return BT::NodeStatus::FAILURE;
   }
-  distance_to_stopline_ = hdmap_utils->getDistanceToStopLine(route_lanelets, *trajectory);
+  distance_to_stopline_ =
+    traffic_simulator::distance::distanceToStopLine(route_lanelets, *trajectory);
   const auto distance_to_stop_target = getDistanceToConflictingEntity(route_lanelets, *trajectory);
   const auto distance_to_front_entity = getDistanceToFrontEntity(*trajectory);
   if (!distance_to_stopline_) {

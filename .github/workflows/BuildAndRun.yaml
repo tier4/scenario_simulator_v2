@@ -78,7 +78,7 @@ jobs:
       - name: Install sonar-scanner and build-wrapper
         uses: sonarsource/sonarcloud-github-c-cpp@v3
         env:
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }} 
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
       - name: Build with SonarCloud Build Wrapper
         run: |
@@ -119,6 +119,34 @@ jobs:
           source install/local_setup.bash
           ./src/scenario_simulator_v2/.github/workflows/workflow.sh ./src/scenario_simulator_v2/test_runner/scenario_test_runner/config/workflow.txt global_frame_rate:=20
         shell: bash
+
+      - name: Scenario test (optional)
+        id: optional-scenario-test
+        run: |
+          source install/setup.bash
+          source install/local_setup.bash
+          # execute scenarios but ignore the return code
+          ./src/scenario_simulator_v2/.github/workflows/workflow.sh ./src/scenario_simulator_v2/test_runner/scenario_test_runner/config/optional_workflow.txt global_frame_rate:=20 || true
+          ./src/scenario_simulator_v2/.github/workflows/generate_workflow_report.sh /tmp/scenario_workflow/optional_workflow
+          echo failure=$(grep -c "<failure"  /tmp/scenario_workflow/optional_workflow/failure_report.md) >> $GITHUB_OUTPUT
+        shell: bash
+
+      - uses: actions/github-script@v7
+        if: steps.optional-scenario-test.outputs.failure > 0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            let commentBody = fs.readFileSync('/tmp/scenario_workflow/optional_workflow/failure_report.md', 'utf8');
+            if (commentBody) {
+              commentBody = '## Failure optional scenarios\n> [!NOTE]\n> This is an experimental check and does not block merging the pull-request. \n> But, please be aware that this may indicate a regression.\n' + commentBody;
+            }
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: commentBody
+            })
 
       - name: Upload Lcov result
         uses: actions/upload-artifact@v4

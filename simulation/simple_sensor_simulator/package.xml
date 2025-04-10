@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="3">
   <name>simple_sensor_simulator</name>
-  <version>5.3.4</version>
+  <version>15.0.6</version>
   <description>simple_sensor_simulator package</description>
 
   <maintainer email="masaya.kataoka@tier4.jp">masaya kataoka</maintainer>
@@ -35,11 +35,12 @@
   <exec_depend>tf2_ros</exec_depend>
   <exec_depend>tf2</exec_depend>
 
-  <depend>autoware_auto_perception_msgs</depend>
   <depend>autoware_perception_msgs</depend>
   <depend>boost</depend>
   <depend>eigen</depend>
   <depend>embree_vendor</depend>
+  <depend>get_parameter</depend>
+  <depend>libgoogle-glog-dev</depend>
   <depend>libpcl-all-dev</depend>
   <depend>nav_msgs</depend>
   <depend>pcl_conversions</depend>

@@ -55,8 +55,10 @@ if(BUILD_CPP_MOCK_SCENARIOS)
   add_subdirectory(src/random_scenario)
   add_subdirectory(src/spawn)
   add_subdirectory(src/speed_planning)
-  add_subdirectory(src/traffic_source)
   add_subdirectory(src/synchronized_action)
+  add_subdirectory(src/traffic_sink)
+  add_subdirectory(src/traffic_source)
+  # The scenarios recorded in this directory are commented out as they require EgoEntity and cannot be used for CI.
   # add_subdirectory(src/respawn_ego)
 
 endif()
