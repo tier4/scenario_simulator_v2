@@ -33,7 +33,7 @@ jobs:
       fail-fast: false
       matrix:
         rosdistro: [humble]
-        runs_on: [ubuntu-22.04] # macos-14 is added for arm support. See also https://x.com/github/status/1752458943245189120?s=20
+        runs_on: [ubuntu-22.04, ubuntu-22.04-arm]
         cmake_build_type: [RelWithDebInfo, Release] # Debug build type is currently unavailable. @TODO Fix problem and add Debug build.
     steps:
       - name: Suppress warnings
@@ -75,26 +75,42 @@ jobs:
           colcon mixin update default
         shell: bash
 
-      - name: Install sonar-scanner and build-wrapper
-        uses: sonarsource/sonarcloud-github-c-cpp@v3
+      - name: Install Build Wrapper
+        if: ${{ matrix.runs_on == 'ubuntu-22.04' }} # @TODO Support unit/integration test with ARM CPU.
+        uses: SonarSource/sonarqube-scan-action/install-build-wrapper@v4.2.1
+        id: build_wrapper
         env:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
       - name: Build with SonarCloud Build Wrapper
+        if: ${{ matrix.runs_on == 'ubuntu-22.04' }} # @TODO Support unit/integration test with ARM CPU.
         run: |
           source /opt/ros/${{ matrix.rosdistro }}/setup.bash
-          build-wrapper-linux-x86-64 --out-dir src/scenario_simulator_v2/bw-output \
+          ${{ steps.build_wrapper.outputs.build-wrapper-binary }} --out-dir src/scenario_simulator_v2/bw-output \
           colcon build --symlink-install \
           --cmake-args \
             -DCMAKE_BUILD_TYPE=${{ matrix.cmake_build_type }} \
             -DBUILD_CPP_MOCK_SCENARIOS=ON \
             -DBUILD_TESTING=true \
-            -DCMAKE_CXX_FLAGS='-fprofile-arcs -ftest-coverage' \
-            -DCMAKE_C_FLAGS='-fprofile-arcs -ftest-coverage' \
+            -DCMAKE_CXX_FLAGS='-ffp-contract=off -fprofile-arcs -ftest-coverage' \
+            -DCMAKE_C_FLAGS='-ffp-contract=off -fprofile-arcs -ftest-coverage' \
+            --packages-up-to ${{ steps.list_packages.outputs.package_list }}
+        shell: bash
+
+      - name: Build
+        if: ${{ matrix.runs_on == 'ubuntu-22.04-arm' }} # @TODO Support unit/integration test with ARM CPU.
+        run: |
+          source /opt/ros/${{ matrix.rosdistro }}/setup.bash
+          colcon build --symlink-install \
+          --cmake-args \
+            -DCMAKE_BUILD_TYPE=${{ matrix.cmake_build_type }} \
+            -DBUILD_CPP_MOCK_SCENARIOS=OFF \
+            -DBUILD_TESTING=true \
             --packages-up-to ${{ steps.list_packages.outputs.package_list }}
         shell: bash
 
       - name: Colcon test
+        if: ${{ matrix.runs_on == 'ubuntu-22.04' }} # @TODO Support unit/integration test with ARM CPU.
         run: |
           source /opt/ros/${{ matrix.rosdistro }}/setup.bash
           source install/local_setup.bash
@@ -103,10 +119,11 @@ jobs:
         shell: bash
 
       - name: generate gcov report for sonarcloud
+        if: ${{ matrix.runs_on == 'ubuntu-22.04' }} # @TODO Support unit/integration test with ARM CPU.
         run: gcovr -r src/scenario_simulator_v2 build --sonarqube coverage.xml
 
       - name: Show test result
-        if: always()
+        if: failure() and ${{ matrix.runs_on == 'ubuntu-22.04' }} # @TODO Support unit/integration test with ARM CPU.
         run: |
           source /opt/ros/${{ matrix.rosdistro }}/setup.bash
           source install/local_setup.bash
@@ -114,6 +131,7 @@ jobs:
         shell: bash
 
       - name: Scenario test
+        if: ${{ matrix.runs_on == 'ubuntu-22.04' }} # @TODO Support unit/integration test with ARM CPU.
         run: |
           source install/setup.bash
           source install/local_setup.bash
@@ -121,6 +139,7 @@ jobs:
         shell: bash
 
       - name: Scenario test (optional)
+        if: ${{ matrix.runs_on == 'ubuntu-22.04' }} # @TODO Support unit/integration test with ARM CPU.
         id: optional-scenario-test
         run: |
           source install/setup.bash
@@ -132,7 +151,7 @@ jobs:
         shell: bash
 
       - uses: actions/github-script@v7
-        if: steps.optional-scenario-test.outputs.failure > 0
+        if: steps.optional-scenario-test.outputs.failure > 0 and ${{ matrix.runs_on == 'ubuntu-22.04' }} # @TODO Support unit/integration test with ARM CPU.
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -150,6 +169,7 @@ jobs:
 
       - name: Upload Lcov result
         uses: actions/upload-artifact@v4
+        if: ${{ matrix.runs_on == 'ubuntu-22.04' }} # @TODO Support unit/integration test with ARM CPU.
         with:
           name: lcov-${{ matrix.cmake_build_type }}
           path: lcov
@@ -157,18 +177,23 @@ jobs:
 
       - name: Upload Gcov result
         uses: actions/upload-artifact@v4
+        if: ${{ matrix.runs_on == 'ubuntu-22.04' }} # @TODO Support unit/integration test with ARM CPU.
         with:
           name: coverage${{ matrix.cmake_build_type }}.xml
           path: coverage.xml
           retention-days: 1
 
-      - name: Run SonarCloud scan
+      - name: SonarQube Scan
+        if: ${{ matrix.runs_on == 'ubuntu-22.04' }} # @TODO Support unit/integration test with ARM CPU.
+        uses: SonarSource/sonarqube-scan-action@v4.2.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: https://sonarcloud.io/
-        working-directory: src/scenario_simulator_v2/
-        run: sonar-scanner --define sonar.cfamily.compile-commands="bw-output/compile_commands.json"
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        with:
+          args: >
+            --define sonar.cfamily.compile-commands="bw-output/compile_commands.json" 
+          projectBaseDir: src/scenario_simulator_v2/
 
 #      - name: Basic test
 #        run: |
