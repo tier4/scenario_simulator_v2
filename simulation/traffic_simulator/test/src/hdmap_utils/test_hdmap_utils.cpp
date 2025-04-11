@@ -2163,12 +2163,10 @@ TEST_F(HdMapUtilsTest_KashiwanohaMap, getLongitudinalDistance_PullRequest1348)
 
   traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
   lane_changeable_routing_configuration.allow_lane_change = true;
-
-  EXPECT_NO_THROW(EXPECT_NEAR(
+  EXPECT_NO_THROW(EXPECT_DOUBLE_EQ(
     hdmap_utils.getLongitudinalDistance(pose_from, pose_to, lane_changeable_routing_configuration)
       .value(),
-    54.188674664, 0.000000001));
-  // Previous value: 54.18867466433655977198213804513216018676757812500000 is too precise to absorb the error between architectures.
+    54.18867466433655977198213804513216018676757812500000));
 }
 
 /**
