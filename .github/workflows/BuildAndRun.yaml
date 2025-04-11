@@ -76,7 +76,7 @@ jobs:
         shell: bash
 
       - name: Install Build Wrapper
-        if: ${{ matrix.resource != ubuntu-22.04 }} # @TODO Support unit/integration test with ARM CPU.
+        if: ${{ matrix.runs_on != ubuntu-22.04 }} # @TODO Support unit/integration test with ARM CPU.
         uses: SonarSource/sonarqube-scan-action/install-build-wrapper@v4.2.1
         id: build_wrapper
         env:
