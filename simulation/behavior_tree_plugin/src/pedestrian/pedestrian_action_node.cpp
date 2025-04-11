@@ -30,10 +30,6 @@ PedestrianActionNode::PedestrianActionNode(
 void PedestrianActionNode::getBlackBoardValues()
 {
   ActionNode::getBlackBoardValues();
-  if (!getInput<traffic_simulator_msgs::msg::BehaviorParameter>(
-        "behavior_parameter", behavior_parameter)) {
-    behavior_parameter = traffic_simulator_msgs::msg::BehaviorParameter();
-  }
   if (!getInput<traffic_simulator_msgs::msg::PedestrianParameters>(
         "pedestrian_parameters", pedestrian_parameters)) {
     THROW_SIMULATION_ERROR("failed to get input pedestrian_parameters in PedestrianActionNode");

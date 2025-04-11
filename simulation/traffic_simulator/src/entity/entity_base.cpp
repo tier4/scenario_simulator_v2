@@ -851,5 +851,10 @@ auto EntityBase::requestSynchronize(
   return false;
 }
 
+void EntityBase::setEuclideanDistancesMap(const std::shared_ptr<EuclideanDistancesMap> & distances)
+{
+  euclidean_distances_map_ = distances;
+}
+
 }  // namespace entity
 }  // namespace traffic_simulator

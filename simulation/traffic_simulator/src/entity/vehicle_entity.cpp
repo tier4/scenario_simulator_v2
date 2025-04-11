@@ -140,6 +140,7 @@ auto VehicleEntity::onUpdate(const double current_time, const double step_time) 
   behavior_plugin_ptr_->setTargetSpeed(target_speed_);
   auto route_lanelets = getRouteLanelets();
   behavior_plugin_ptr_->setRouteLanelets(route_lanelets);
+  behavior_plugin_ptr_->setEuclideanDistancesMap(euclidean_distances_map_);
 
   // recalculate spline only when input data changes
   if (previous_route_lanelets_ != route_lanelets) {

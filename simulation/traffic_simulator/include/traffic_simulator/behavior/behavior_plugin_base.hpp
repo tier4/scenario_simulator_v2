@@ -36,6 +36,8 @@ namespace entity_behavior
 using EntityStatusDict =
   std::unordered_map<std::string, traffic_simulator::CanonicalizedEntityStatus>;
 
+using EuclideanDistancesMap = std::unordered_map<std::pair<std::string, std::string>, double>;
+
 class BehaviorPluginBase
 {
 public:
@@ -74,6 +76,7 @@ public:
   DEFINE_GETTER_SETTER(TrafficLights,                                    "traffic_lights",                                 std::shared_ptr<traffic_simulator::TrafficLightsBase>)
   DEFINE_GETTER_SETTER(VehicleParameters,                                "vehicle_parameters",                             traffic_simulator_msgs::msg::VehicleParameters)
   DEFINE_GETTER_SETTER(Waypoints,                                        "waypoints",                                      traffic_simulator_msgs::msg::WaypointsArray)
+  DEFINE_GETTER_SETTER(EuclideanDistancesMap,                            "euclidean_distances_map",                        std::shared_ptr<EuclideanDistancesMap>)
   // clang-format on
 #undef DEFINE_GETTER_SETTER
 };

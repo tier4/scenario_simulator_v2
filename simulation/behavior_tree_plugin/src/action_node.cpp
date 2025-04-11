@@ -91,6 +91,14 @@ auto ActionNode::getBlackBoardValues() -> void
   if (!getInput<lanelet::Ids>("route_lanelets", route_lanelets)) {
     THROW_SIMULATION_ERROR("failed to get input route_lanelets in ActionNode");
   }
+  if (!getInput<std::shared_ptr<EuclideanDistancesMap>>(
+        "euclidean_distances_map", euclidean_distances_map)) {
+    THROW_SIMULATION_ERROR("failed to get input euclidean_distances_map in ActionNode");
+  }
+  if (!getInput<traffic_simulator_msgs::msg::BehaviorParameter>(
+        "behavior_parameter", behavior_parameter)) {
+    behavior_parameter = traffic_simulator_msgs::msg::BehaviorParameter();
+  }
 }
 
 auto ActionNode::getHorizon() const -> double
@@ -237,34 +245,40 @@ auto ActionNode::getDistanceToFrontEntity(
 auto ActionNode::getFrontEntityName(const math::geometry::CatmullRomSplineInterface & spline) const
   -> std::optional<std::string>
 {
-  std::vector<double> distances;
-  std::vector<std::string> entities;
-  for (const auto & [name, status] : other_entity_status) {
-    const auto distance = getDistanceToTargetEntity(spline, status);
-    const auto quat = math::geometry::getRotation(
-      canonicalized_entity_status->getMapPose().orientation,
-      other_entity_status.at(name).getMapPose().orientation);
-    /**
-     * @note hard-coded parameter, if the Yaw value of RPY is in ~1.5708 -> 1.5708, entity is a candidate of front entity.
-     */
-    if (
-      std::fabs(math::geometry::convertQuaternionToEulerAngle(quat).z) <=
-      boost::math::constants::half_pi<double>()) {
-      if (distance && distance.value() < 40) {
-        entities.emplace_back(name);
-        distances.emplace_back(distance.value());
+  if (euclidean_distances_map != nullptr) {
+    std::map<double, std::string> local_euclidean_distances_map;
+    const double stop_distance = calculateStopDistance(behavior_parameter.dynamic_constraints);
+    const double horizon = spline.getLength() > stop_distance ? spline.getLength() : stop_distance;
+    for (const auto & [name_pair, euclidean_distance] : *euclidean_distances_map) {
+      if (euclidean_distance < horizon) {
+        if (name_pair.first == canonicalized_entity_status->getName()) {
+          local_euclidean_distances_map.emplace(euclidean_distance, name_pair.second);
+        } else if (name_pair.second == canonicalized_entity_status->getName()) {
+          local_euclidean_distances_map.emplace(euclidean_distance, name_pair.first);
+        }
+      }
+    }
+
+    for (const auto & [euclidean_distance, name] : local_euclidean_distances_map) {
+      const auto quaternion = math::geometry::getRotation(
+        canonicalized_entity_status->getMapPose().orientation,
+        other_entity_status.at(name).getMapPose().orientation);
+      /**
+       * @note hard-coded parameter, if the Yaw value of RPY is in ~1.5708 -> 1.5708, entity is a candidate of front entity.
+       */
+      if (
+        std::fabs(math::geometry::convertQuaternionToEulerAngle(quaternion).z) <=
+        boost::math::constants::half_pi<double>()) {
+        const auto longitudinal_distance =
+          getDistanceToTargetEntity(spline, other_entity_status.at(name));
+
+        if (longitudinal_distance && longitudinal_distance.value() < horizon) {
+          return name;
+        }
       }
     }
   }
-  if (entities.size() != distances.size()) {
-    THROW_SIMULATION_ERROR("size of entities and distances vector does not match.");
-  }
-  if (distances.empty()) {
-    return std::nullopt;
-  }
-  std::vector<double>::iterator iter = std::min_element(distances.begin(), distances.end());
-  size_t index = std::distance(distances.begin(), iter);
-  return entities[index];
+  return std::nullopt;
 }
 
 auto ActionNode::getDistanceToTargetEntityOnCrosswalk(
