@@ -76,14 +76,14 @@ jobs:
         shell: bash
 
       - name: Install Build Wrapper
-        if: ${{ matrix.resource != ubuntu-22.04 }} # @TODO Support unit/integration test with ARM CPU.
+        if: ${{ matrix.runs_on != ubuntu-22.04 }} # @TODO Support unit/integration test with ARM CPU.
         uses: SonarSource/sonarqube-scan-action/install-build-wrapper@v4.2.1
         id: build_wrapper
         env:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
       - name: Build with SonarCloud Build Wrapper
-        if: ${{ matrix.resource == ubuntu-22.04 }} # @TODO Support unit/integration test with ARM CPU.
+        if: ${{ matrix.runs_on == ubuntu-22.04 }} # @TODO Support unit/integration test with ARM CPU.
         run: |
           source /opt/ros/${{ matrix.rosdistro }}/setup.bash
           ${{ steps.build_wrapper.outputs.build-wrapper-binary }} --out-dir src/scenario_simulator_v2/bw-output \
@@ -110,7 +110,7 @@ jobs:
         shell: bash
 
       - name: Colcon test
-        if: ${{ matrix.resource == ubuntu-22.04 }} # @TODO Support unit/integration test with ARM CPU.
+        if: ${{ matrix.runs_on == ubuntu-22.04 }} # @TODO Support unit/integration test with ARM CPU.
         run: |
           source /opt/ros/${{ matrix.rosdistro }}/setup.bash
           source install/local_setup.bash
@@ -119,11 +119,11 @@ jobs:
         shell: bash
 
       - name: generate gcov report for sonarcloud
-        if: ${{ matrix.resource == ubuntu-22.04 }} # @TODO Support unit/integration test with ARM CPU.
+        if: ${{ matrix.runs_on == ubuntu-22.04 }} # @TODO Support unit/integration test with ARM CPU.
         run: gcovr -r src/scenario_simulator_v2 build --sonarqube coverage.xml
 
       - name: Show test result
-        if: failure() and ${{ matrix.resource == ubuntu-22.04 }} # @TODO Support unit/integration test with ARM CPU.
+        if: failure() and ${{ matrix.runs_on == ubuntu-22.04 }} # @TODO Support unit/integration test with ARM CPU.
         run: |
           source /opt/ros/${{ matrix.rosdistro }}/setup.bash
           source install/local_setup.bash
@@ -131,7 +131,7 @@ jobs:
         shell: bash
 
       - name: Scenario test
-        if: ${{ matrix.resource == ubuntu-22.04 }} # @TODO Support unit/integration test with ARM CPU.
+        if: ${{ matrix.runs_on == ubuntu-22.04 }} # @TODO Support unit/integration test with ARM CPU.
         run: |
           source install/setup.bash
           source install/local_setup.bash
@@ -139,7 +139,7 @@ jobs:
         shell: bash
 
       - name: Scenario test (optional)
-        if: ${{ matrix.resource == ubuntu-22.04 }} # @TODO Support unit/integration test with ARM CPU.
+        if: ${{ matrix.runs_on == ubuntu-22.04 }} # @TODO Support unit/integration test with ARM CPU.
         id: optional-scenario-test
         run: |
           source install/setup.bash
@@ -151,7 +151,7 @@ jobs:
         shell: bash
 
       - uses: actions/github-script@v7
-        if: ${{ matrix.resource == ubuntu-22.04 }} and steps.optional-scenario-test.outputs.failure > 0 # @TODO Support unit/integration test with ARM CPU.
+        if: ${{ matrix.runs_on == ubuntu-22.04 }} and steps.optional-scenario-test.outputs.failure > 0 # @TODO Support unit/integration test with ARM CPU.
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -169,7 +169,7 @@ jobs:
 
       - name: Upload Lcov result
         uses: actions/upload-artifact@v4
-        if: ${{ matrix.resource == ubuntu-22.04 }} # @TODO Support unit/integration test with ARM CPU.
+        if: ${{ matrix.runs_on == ubuntu-22.04 }} # @TODO Support unit/integration test with ARM CPU.
         with:
           name: lcov-${{ matrix.cmake_build_type }}
           path: lcov
@@ -177,14 +177,14 @@ jobs:
 
       - name: Upload Gcov result
         uses: actions/upload-artifact@v4
-        if: ${{ matrix.resource == ubuntu-22.04 }} # @TODO Support unit/integration test with ARM CPU.
+        if: ${{ matrix.runs_on == ubuntu-22.04 }} # @TODO Support unit/integration test with ARM CPU.
         with:
           name: coverage${{ matrix.cmake_build_type }}.xml
           path: coverage.xml
           retention-days: 1
 
       - name: SonarQube Scan
-        if: ${{ matrix.resource == ubuntu-22.04 }} # @TODO Support unit/integration test with ARM CPU.
+        if: ${{ matrix.runs_on == ubuntu-22.04 }} # @TODO Support unit/integration test with ARM CPU.
         uses: SonarSource/sonarqube-scan-action@v4.2.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
