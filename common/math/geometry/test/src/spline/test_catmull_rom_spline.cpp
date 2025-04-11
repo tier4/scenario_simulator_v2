@@ -533,8 +533,7 @@ TEST(CatmullRomSpline, getSValue2)
   pose0.orientation.w = 0.891092;
   const auto result0 = spline.getSValue(pose0);
   EXPECT_TRUE(result0);
-  EXPECT_NEAR(result0.value(), 0.924331784, 0.000000001);
-  // Previous value: 0.92433178422155371 is too precise
+  EXPECT_DOUBLE_EQ(result0.value(), 0.92433178422155371);
 
   geometry_msgs::msg::Pose pose1;
   pose1.position.x = 89122.5;
@@ -546,8 +545,7 @@ TEST(CatmullRomSpline, getSValue2)
   pose1.orientation.w = 0.894575;
   const auto result1 = spline.getSValue(pose1);
   EXPECT_TRUE(result1);
-  EXPECT_NEAR(result1.value(), 0.424404421, 0.000000001);
-  // Previous value: 0.42440442127906564 is too precise
+  EXPECT_DOUBLE_EQ(result1.value(), 0.42440442127906564);
 }
 
 TEST(CatmullRomSpline, getSValueEdge)
