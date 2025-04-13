@@ -18,28 +18,27 @@
 #include <string>
 #include <utility>
 
-/**
- * @brief Define includes
- */
+/// @sa https://github.com/veqcc/autoware.universe/blob/252ae60788a8388585780a6b1935a5682c688464/common/autoware_agnocast_wrapper/include/autoware_agnocast_wrapper/autoware_agnocast_wrapper.hpp
+
 #ifdef USE_AGNOCAST_ENABLED
-
-#include <agnocast/agnocast.hpp>
-
+#pragma message("Building with USE_AGNOCAST_ENABLED defined")
 #else
+#pragma message("Building without USE_AGNOCAST_ENABLED defined")
+#endif
 
+#ifdef USE_AGNOCAST_ENABLED
+#include <agnocast/agnocast.hpp>
+#else
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
-
 #endif  // USE_AGNOCAST_ENABLED
 
 namespace agnocast_wrapper
 {
 /**
- * @brief Define types for agnocast_wrapper
+ * @brief Templated types
  */
-
 #ifdef USE_AGNOCAST_ENABLED
-
 template <typename MessageT>
 using MessagePtr = agnocast::ipc_shared_ptr<MessageT>;
 
@@ -51,9 +50,7 @@ using PublisherPtr = typename agnocast::Publisher<MessageT>::SharedPtr;
 
 using SubscriptionOptions = agnocast::SubscriptionOptions;
 using PublisherOptions = agnocast::PublisherOptions;
-
 #else
-
 template <typename MessageT>
 using MessagePtr = std::shared_ptr<MessageT>;
 
@@ -65,68 +62,63 @@ using PublisherPtr = typename rclcpp::Publisher<MessageT>::SharedPtr;
 
 using SubscriptionOptions = rclcpp::SubscriptionOptions;
 using PublisherOptions = rclcpp::PublisherOptions;
-
 #endif  // USE_AGNOCAST_ENABLED
 
 /**
- * @brief Define wrapper functions
+ * @brief Create subscription
  */
-
-// clang-format off
-template<
-  typename MessageT,
-  typename CallbackT,
-  typename NodePointerT>
-SubscriptionPtr<MessageT>
-create_subscription(
-  NodePointerT node_ptr,
-  const std::string & topic_name,
-  const rclcpp::QoS & qos,
-  CallbackT && callback,
-  const SubscriptionOptions & options = SubscriptionOptions{})
-// clang-format on
+template <typename MessageT, typename CallbackT, typename NodeT>
+auto create_subscription(
+  NodeT & node, const std::string & topic_name, const rclcpp::QoS & qos, CallbackT && callback,
+  const SubscriptionOptions & options = SubscriptionOptions{}) -> SubscriptionPtr<MessageT>
 {
 #ifdef USE_AGNOCAST_ENABLED
-  if constexpr (std::is_same_v<std::decay_t<NodePointerT>, rclcpp::Node::SharedPtr>) {
+  if constexpr (std::is_same_v<std::decay_t<NodeT>, rclcpp::Node::SharedPtr>) {
     return agnocast::create_subscription<MessageT>(
-      node_ptr.get(), topic_name, qos, std::forward<CallbackT>(callback), options);
+      node.get(), topic_name, qos, std::forward<CallbackT>(callback), options);
   } else {
     return agnocast::create_subscription<MessageT>(
-      node_ptr, topic_name, qos, std::forward<CallbackT>(callback), options);
+      node, topic_name, qos, std::forward<CallbackT>(callback), options);
   }
 #else
-  return node_ptr->template create_subscription<MessageT>(
-    topic_name, qos, std::forward<CallbackT>(callback), options);
-#endif  // USE_AGNOCAST_ENABLED
-}
-
-// clang-format off
-template<
-  typename MessageT,
-  typename NodePointerT>
-PublisherPtr<MessageT>
-create_publisher(
-  NodePointerT node_ptr,
-  const std::string & topic_name,
-  const rclcpp::QoS & qos,
-  const PublisherOptions & options = PublisherOptions{})
-// clang-format on
-{
-#ifdef USE_AGNOCAST_ENABLED
-  if constexpr (std::is_same_v<std::decay_t<NodePointerT>, rclcpp::Node::SharedPtr>) {
-    return agnocast::create_publisher<MessageT>(node_ptr.get(), topic_name, qos, options);
+  if constexpr (std::is_same_v<std::decay_t<NodeT>, rclcpp::Node::SharedPtr>) {
+    return node->template create_subscription<MessageT>(
+      topic_name, qos, std::forward<CallbackT>(callback), options);
   } else {
-    return agnocast::create_publisher<MessageT>(node_ptr, topic_name, qos, options);
+    return node.template create_subscription<MessageT>(
+      topic_name, qos, std::forward<CallbackT>(callback), options);
   }
-#else
-  return node_ptr->template create_publisher<MessageT>(topic_name, qos, options);
 #endif  // USE_AGNOCAST_ENABLED
 }
 
 /**
- * @brief Create a message object pointer
- * @param publisher_ptr pointer to the publisher for which the message will be created. The message type will be deduced from the passed publisher.
- * @return pointer to the message, the pointer type will be different if agnocast is enabled
+ * @brief Create publisher
+ */
+template <typename MessageT, typename NodeT>
+auto create_publisher(
+  NodeT & node, const std::string & topic_name, const rclcpp::QoS & qos,
+  const PublisherOptions & options = PublisherOptions{}) -> PublisherPtr<MessageT>
+{
+#ifdef USE_AGNOCAST_ENABLED
+  if constexpr (std::is_same_v<std::decay_t<NodeT>, rclcpp::Node::SharedPtr>) {
+    return agnocast::create_publisher<MessageT>(node.get(), topic_name, qos, options);
+  } else {
+    return agnocast::create_publisher<MessageT>(&node, topic_name, qos, options);
+  }
+#else
+  if constexpr (std::is_same_v<std::decay_t<NodeT>, rclcpp::Node::SharedPtr>) {
+    return node->template create_publisher<MessageT>(topic_name, qos, options);
+  } else {
+    return node.template create_publisher<MessageT>(topic_name, qos, options);
+  }
+#endif  // USE_AGNOCAST_ENABLED
+}
+
+/**
+ * @brief Create message object pointer
+ * @param publisher_ptr pointer to the publisher for which the message will be
+ * created. The message type will be deduced from the passed publisher.
+ * @return pointer to the message - dependent on the publisher type
  */
 template <typename PublisherPtrT>
 auto create_message(PublisherPtrT publisher_ptr)
@@ -134,7 +126,6 @@ auto create_message(PublisherPtrT publisher_ptr)
 #ifdef USE_AGNOCAST_ENABLED
   return publisher_ptr->borrow_loaned_message();
 #else
-  /// @sa https://github.com/veqcc/autoware.universe/blob/252ae60788a8388585780a6b1935a5682c688464/common/autoware_agnocast_wrapper/include/autoware_agnocast_wrapper/autoware_agnocast_wrapper.hpp#L54C44-L54C138
   using ROSMessageT =
     typename std::remove_reference<decltype(*publisher_ptr)>::type::ROSMessageType;
   return std::make_unique<ROSMessageT>();

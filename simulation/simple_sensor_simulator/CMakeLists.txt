@@ -22,6 +22,7 @@ add_definitions("-DBOOST_ALLOW_DEPRECATED_HEADERS")
 find_package(ament_cmake_auto REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(PCL REQUIRED)
+find_package(agnocast_wrapper REQUIRED)
 
 ament_auto_find_build_dependencies()
 
@@ -62,11 +63,14 @@ target_link_libraries(simple_sensor_simulator_component
   sodium
   zmq
 )
-ament_target_dependencies(simple_sensor_simulator_component
+ament_target_dependencies(simple_sensor_simulator_component agnocast_wrapper
   simulation_interface
 )
+target_include_directories(${PROJECT_NAME}_component PRIVATE
+  ${agnocast_wrapper_INCLUDE_DIRS}
+)
 
-agnocast_wrapper_setup_target(simple_sensor_simulator_component)
+agnocast_wrapper_setup(${PROJECT_NAME}_component)
 
 rclcpp_components_register_nodes(simple_sensor_simulator_component
   "simple_sensor_simulator::ScenarioSimulator")
@@ -74,12 +78,11 @@ rclcpp_components_register_nodes(simple_sensor_simulator_component
 ament_auto_add_executable(simple_sensor_simulator_node
   src/simple_sensor_simulator_node.cpp
 )
-
-agnocast_wrapper_setup_target(simple_sensor_simulator_node)
-
 target_link_libraries(simple_sensor_simulator_node
   simple_sensor_simulator_component
 )
+
+agnocast_wrapper_setup(${PROJECT_NAME}_node)
 
 install(TARGETS
   simple_sensor_simulator_node

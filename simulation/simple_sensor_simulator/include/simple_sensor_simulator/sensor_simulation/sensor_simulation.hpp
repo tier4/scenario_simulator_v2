@@ -52,7 +52,7 @@ public:
       lidar_sensors_.push_back(std::make_unique<LidarSensor<sensor_msgs::msg::PointCloud2>>(
         current_simulation_time, configuration,
         agnocast_wrapper::create_publisher<sensor_msgs::msg::PointCloud2>(
-          &node, "/perception/obstacle_segmentation/pointcloud", 1)));
+          node, "/perception/obstacle_segmentation/pointcloud", 1)));
     } else {
       std::stringstream ss;
       ss << "Unexpected architecture_type " << std::quoted(configuration.architecture_type())

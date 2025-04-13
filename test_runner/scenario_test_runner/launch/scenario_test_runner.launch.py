@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
+
 from ament_index_python.packages import get_package_share_directory
 
 from launch import LaunchDescription
@@ -233,6 +235,10 @@ def launch_setup(context, *args, **kwargs):
             on_exit=ShutdownOnce(),
             parameters=make_parameters(),
             condition=IfCondition(launch_simple_sensor_simulator),
+            additional_env={
+                'LD_PRELOAD': f"/opt/ros/humble/lib/libagnocast_heaphook.so:{os.getenv('LD_PRELOAD', '')}",
+                'AGNOCAST_MEMPOOL_SIZE': '134217728',
+            }
         ),
         # The `name` keyword overrides the name for all created nodes, so duplicated nodes appear.
         # For LifecycleNode the `name` parameter is required
