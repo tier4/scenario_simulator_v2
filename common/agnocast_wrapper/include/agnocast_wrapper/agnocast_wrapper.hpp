@@ -78,7 +78,7 @@ auto create_subscription(
       node.get(), topic_name, qos, std::forward<CallbackT>(callback), options);
   } else {
     return agnocast::create_subscription<MessageT>(
-      node, topic_name, qos, std::forward<CallbackT>(callback), options);
+      &node, topic_name, qos, std::forward<CallbackT>(callback), options);
   }
 #else
   if constexpr (std::is_same_v<std::decay_t<NodeT>, rclcpp::Node::SharedPtr>) {
