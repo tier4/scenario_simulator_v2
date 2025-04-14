@@ -39,25 +39,25 @@ namespace agnocast_wrapper
  * @brief Templated types
  */
 #ifdef USE_AGNOCAST_ENABLED
-template <typename MessageT>
+template<typename MessageT>
 using MessagePtr = agnocast::ipc_shared_ptr<MessageT>;
 
-template <typename MessageT>
+template<typename MessageT>
 using SubscriptionPtr = typename agnocast::Subscription<MessageT>::SharedPtr;
 
-template <typename MessageT>
+template<typename MessageT>
 using PublisherPtr = typename agnocast::Publisher<MessageT>::SharedPtr;
 
 using SubscriptionOptions = agnocast::SubscriptionOptions;
 using PublisherOptions = agnocast::PublisherOptions;
 #else
-template <typename MessageT>
+template<typename MessageT>
 using MessagePtr = std::shared_ptr<MessageT>;
 
-template <typename MessageT>
+template<typename MessageT>
 using SubscriptionPtr = typename rclcpp::Subscription<MessageT>::SharedPtr;
 
-template <typename MessageT>
+template<typename MessageT>
 using PublisherPtr = typename rclcpp::Publisher<MessageT>::SharedPtr;
 
 using SubscriptionOptions = rclcpp::SubscriptionOptions;
@@ -67,7 +67,7 @@ using PublisherOptions = rclcpp::PublisherOptions;
 /**
  * @brief Create subscription
  */
-template <typename MessageT, typename CallbackT, typename NodeT>
+template<typename MessageT, typename CallbackT, typename NodeT>
 auto create_subscription(
   NodeT & node, const std::string & topic_name, const rclcpp::QoS & qos, CallbackT && callback,
   const SubscriptionOptions & options = SubscriptionOptions{}) -> SubscriptionPtr<MessageT>
@@ -94,7 +94,7 @@ auto create_subscription(
 /**
  * @brief Create publisher
  */
-template <typename MessageT, typename NodeT>
+template<typename MessageT, typename NodeT>
 auto create_publisher(
   NodeT & node, const std::string & topic_name, const rclcpp::QoS & qos,
   const PublisherOptions & options = PublisherOptions{}) -> PublisherPtr<MessageT>
@@ -120,7 +120,7 @@ auto create_publisher(
  * created. The message type will be deduced from the passed publisher.
  * @return pointer to the message - dependent on the publisher type
  */
-template <typename PublisherPtrT>
+template<typename PublisherPtrT>
 auto create_message(PublisherPtrT publisher_ptr)
 {
 #ifdef USE_AGNOCAST_ENABLED
