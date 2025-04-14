@@ -2,6 +2,9 @@
 Changelog for package get_parameter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+15.1.1 (2025-04-14)
+-------------------
+
 15.1.0 (2025-04-14)
 -------------------
 * Merge branch 'master' into feature/parameter_override
