@@ -83,6 +83,7 @@ def launch_setup(context, *args, **kwargs):
     launch_rviz                         = LaunchConfiguration("launch_rviz",                            default=False)
     launch_simple_sensor_simulator      = LaunchConfiguration("launch_simple_sensor_simulator",         default=True)
     output_directory                    = LaunchConfiguration("output_directory",                       default=Path("/tmp"))
+    override_parameters                 = LaunchConfiguration("override_parameters",                    default="")
     parameter_file_path                 = LaunchConfiguration("parameter_file_path",                    default=Path(get_package_share_directory("scenario_test_runner")) / "config/parameters.yaml")
     port                                = LaunchConfiguration("port",                                   default=5555)
     publish_empty_context               = LaunchConfiguration("publish_empty_context",                  default=False)
@@ -112,6 +113,7 @@ def launch_setup(context, *args, **kwargs):
     print(f"launch_autoware                     := {launch_autoware.perform(context)}")
     print(f"launch_rviz                         := {launch_rviz.perform(context)}")
     print(f"output_directory                    := {output_directory.perform(context)}")
+    print(f"override_parameters                 := {override_parameters.perform(context)}")
     print(f"parameter_file_path                 := {parameter_file_path.perform(context)}")
     print(f"port                                := {port.perform(context)}")
     print(f"publish_empty_context               := {publish_empty_context.perform(context)}")
@@ -225,6 +227,7 @@ def launch_setup(context, *args, **kwargs):
                 "--global-real-time-factor", global_real_time_factor,
                 "--global-timeout",          global_timeout,
                 "--output-directory",        output_directory,
+                "--override-parameters",     override_parameters,
                 "--scenario",                scenario,
                 # fmt: on
             ],

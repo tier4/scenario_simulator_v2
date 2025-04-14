@@ -22,6 +22,7 @@
 #include <openscenario_preprocessor_msgs/srv/check_derivative_remained.hpp>
 #include <openscenario_preprocessor_msgs/srv/derive.hpp>
 #include <openscenario_preprocessor_msgs/srv/load.hpp>
+#include <openscenario_preprocessor_msgs/srv/set_parameter.hpp>
 #include <rclcpp/rclcpp.hpp>
 
 namespace openscenario_preprocessor
@@ -39,12 +40,12 @@ struct ScenarioSet
   auto getDeriveResponse() -> openscenario_preprocessor_msgs::srv::Derive::Response
   {
     openscenario_preprocessor_msgs::srv::Derive::Response response;
-    response.path = path;
+    response.path = path.string();
     response.frame_rate = frame_rate;
     return response;
   }
 
-  std::string path;
+  boost::filesystem::path path;
 
   float frame_rate;
 };
@@ -66,9 +67,14 @@ private:
   rclcpp::Service<openscenario_preprocessor_msgs::srv::CheckDerivativeRemained>::SharedPtr
     check_server;
 
+  rclcpp::Service<openscenario_preprocessor_msgs::srv::SetParameter>::SharedPtr
+    set_parameter_server;
+
   std::deque<ScenarioSet> preprocessed_scenarios;
 
   std::mutex preprocessed_scenarios_mutex;
+
+  std::unordered_map<std::string, std::string> override_parameters;
 };
 }  // namespace openscenario_preprocessor
 
