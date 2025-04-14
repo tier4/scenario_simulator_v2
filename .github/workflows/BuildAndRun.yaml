@@ -65,13 +65,11 @@ jobs:
         run: |
           vcs import src < src/scenario_simulator_v2/dependency_${{ matrix.rosdistro }}.repos
       
-      - name: xmlschema workaround
-        run: pip3 install xmlschema==3.4.5
-        
       - name: Resolve rosdep and install colcon mixin
         run: |
           apt-get update
           apt-get install -y python3-pip python3-colcon-lcov-result lcov unzip gcovr
+          pip3 install xmlschema==3.4.5 # xmlschema workaround (4.x occurs errors)
           rosdep update --include-eol-distros
           rosdep install -iy --from-paths src --rosdistro ${{ matrix.rosdistro }}
           colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml
