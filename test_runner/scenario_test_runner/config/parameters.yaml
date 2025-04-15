@@ -203,6 +203,34 @@
                   multiplicative:
                     mean: 0.0
                     standard_deviation: 0.0
+    /vehicle/status/velocity_status:
+      version: 20240605 # architecture_type suffix (mandatory)
+      seed: 0 # If 0 is specified, a random seed value will be generated for each run.
+      autoware_vehicle_msgs::msg::VelocityReport:
+        longitudinal_velocity:
+          error:
+            additive:
+              mean: 0.0
+              standard_deviation: 0.0
+            multiplicative:
+              mean: 0.0
+              standard_deviation: 0.0
+        lateral_velocity:
+          error:
+            additive:
+              mean: 0.0
+              standard_deviation: 0.0
+            multiplicative:
+              mean: 0.0
+              standard_deviation: 0.0
+        heading_rate:
+          error:
+            additive:
+              mean: 0.0
+              standard_deviation: 0.0
+            multiplicative:
+              mean: 0.0
+              standard_deviation: 0.0
     /perception/object_recognition/detection/objects:
       version: 20240605 # architecture_type suffix (mandatory)
       seed: 0 # If 0 is specified, a random seed value will be generated for each run.
