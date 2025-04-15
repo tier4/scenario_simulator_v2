@@ -295,7 +295,7 @@
       seed: 0 # If 0 is specified, a random seed value will be generated for each run.
       sensor_msgs::msg::Imu:
         orientation:
-          # The type of geometry_msgs::msg::Pose.orientation is Quaternion,
+          # The type of sensor_msgs::msg::Imu.orientation is Quaternion,
           # and the actual orientation data members are x, y, z, and w.
           # However, applying error to Quaternions can be unintuitive and
           # tricky, so we accept the parameters as Euler angles here. The
