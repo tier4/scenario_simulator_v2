@@ -157,6 +157,80 @@
             multiplicative:
               mean: 0.0
               standard_deviation: 0.0
+    /localization/pose_estimator/pose_with_covariance:
+      version: 20240605 # architecture_type suffix (mandatory)
+      seed: 0 # If 0 is specified, a random seed value will be generated for each run.
+      geometry_msgs::msg::PoseWithCovarianceStamped:
+        pose:
+          pose:
+            position:
+              # The data members of geometry_msgs::msg::Pose.position are x, y,
+              # z, which are world coordinates in
+              # `/localization/pose_estimator/pose_with_covariance`. However, applying error to a
+              # position in world coordinates is unintuitive and tricky, so we
+              # accept the parameters as the entity's local coordinates.
+              # local_x, local_y, local_z express that. The simulator
+              # calculates the error in the local coordinates. It then
+              # transforms the error to the world coordinates, adds the error
+              # to the true position (world coordinates), and publishes it as
+              # `/localization/pose_estimator/pose_with_covariance`.
+              local_x:
+                error:
+                  additive:
+                    mean: 0.0
+                    standard_deviation: 0.0
+                  multiplicative:
+                    mean: 0.0
+                    standard_deviation: 0.0
+              local_y:
+                error:
+                  additive:
+                    mean: 0.0
+                    standard_deviation: 0.0
+                  multiplicative:
+                    mean: 0.0
+                    standard_deviation: 0.0
+              local_z:
+                error:
+                  additive:
+                    mean: 0.0
+                    standard_deviation: 0.0
+                  multiplicative:
+                    mean: 0.0
+                    standard_deviation: 0.0
+            orientation:
+              # The type of geometry_msgs::msg::Pose.orientation is Quaternion,
+              # and the actual orientation data members are x, y, z, and w.
+              # However, applying error to Quaternions can be unintuitive and
+              # tricky, so we accept the parameters as Euler angles here. The
+              # simulator internally converts Quaternion to Euler angles and
+              # applies the error to them. It then converts the error-applied
+              # Euler angles back to Quaternion and publishes them as
+              # `/localization/pose_estimator/pose_with_covariance`.
+              r:
+                error:
+                  additive:
+                    mean: 0.0
+                    standard_deviation: 0.0
+                  multiplicative:
+                    mean: 0.0
+                    standard_deviation: 0.0
+              p:
+                error:
+                  additive:
+                    mean: 0.0
+                    standard_deviation: 0.0
+                  multiplicative:
+                    mean: 0.0
+                    standard_deviation: 0.0
+              y:
+                error:
+                  additive:
+                    mean: 0.0
+                    standard_deviation: 0.0
+                  multiplicative:
+                    mean: 0.0
+                    standard_deviation: 0.0
     /perception/object_recognition/detection/objects:
       version: 20240605 # architecture_type suffix (mandatory)
       seed: 0 # If 0 is specified, a random seed value will be generated for each run.
