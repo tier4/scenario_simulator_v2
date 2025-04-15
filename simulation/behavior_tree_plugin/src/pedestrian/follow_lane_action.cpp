@@ -26,6 +26,16 @@ namespace pedestrian
 FollowLaneAction::FollowLaneAction(const std::string & name, const BT::NodeConfiguration & config)
 : entity_behavior::PedestrianActionNode(name, config)
 {
+  auto parameterToSeeAroundMode = [](const std::string & parameter) {
+    if (parameter == "ignore")
+      return SeeAroundMode::ignore;
+    else if (parameter == "respect")
+      return SeeAroundMode::respect;
+    THROW_SIMULATION_ERROR("Unknown see_around mode. It must be \"ignore\" or \"respect\".");
+  };
+
+  should_respect_see_around = parameterToSeeAroundMode(
+    common::getParameter<std::string>("ignore_see_around_for_pedestrian", "ignore"));
 }
 
 void FollowLaneAction::getBlackBoardValues() { PedestrianActionNode::getBlackBoardValues(); }
@@ -33,8 +43,12 @@ void FollowLaneAction::getBlackBoardValues() { PedestrianActionNode::getBlackBoa
 DetectorStatus FollowLaneAction::detectObstacleInLane(
   const lanelet::Ids & pedestrian_lanes, const bool & see_around) const
 {
+  if (should_respect_see_around == SeeAroundMode::ignore) {
+    return DetectorStatus::not_detected;
+  }
+
   if (!see_around) {
-    return DetectorStatus::NOT_DETECTED;
+    return DetectorStatus::not_detected;
   }
 
   auto hasObstacleInPedestrianLanes = [this](const lanelet::Ids & pedestrian_lanes_local) {
@@ -48,10 +62,10 @@ DetectorStatus FollowLaneAction::detectObstacleInLane(
       other_entity_lane_ids.begin(), other_entity_lane_ids.end());
     for (const auto & pedestrian_lane : pedestrian_lanes_local) {
       if (other_lane_id_set.count(pedestrian_lane)) {
-        return DetectorStatus::DETECTED;
+        return DetectorStatus::detected;
       }
     }
-    return DetectorStatus::NOT_DETECTED;
+    return DetectorStatus::not_detected;
   };
 
   auto hasObstacleInFrontOfPedestrian = [this]() {
@@ -64,19 +78,19 @@ DetectorStatus FollowLaneAction::detectObstacleInLane(
       const auto relative_position = other_position - pedestrian_position;
       const double relative_angle_rad = std::atan2(relative_position.y, relative_position.x);
       if (relative_angle_rad > 0) {
-        return DetectorStatus::DETECTED;
+        return DetectorStatus::detected;
       }
     }
-    return DetectorStatus::NOT_DETECTED;
+    return DetectorStatus::not_detected;
   };
 
   if (
-    hasObstacleInPedestrianLanes(pedestrian_lanes) == DetectorStatus::DETECTED &&
-    hasObstacleInFrontOfPedestrian() == DetectorStatus::DETECTED) {
-    return DetectorStatus::DETECTED;
+    hasObstacleInPedestrianLanes(pedestrian_lanes) == DetectorStatus::detected &&
+    hasObstacleInFrontOfPedestrian() == DetectorStatus::detected) {
+    return DetectorStatus::detected;
   }
 
-  return DetectorStatus::NOT_DETECTED;
+  return DetectorStatus::not_detected;
 }
 
 BT::NodeStatus FollowLaneAction::tick()
@@ -99,7 +113,7 @@ BT::NodeStatus FollowLaneAction::tick()
 
   const auto obstacle_detector_result =
     detectObstacleInLane(following_lanelets, behavior_parameter.see_around);
-  target_speed = (obstacle_detector_result == DetectorStatus::DETECTED) ? 0.0 : target_speed;
+  target_speed = (obstacle_detector_result == DetectorStatus::detected) ? 0.0 : target_speed;
 
   setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(target_speed.value()));
   return BT::NodeStatus::RUNNING;

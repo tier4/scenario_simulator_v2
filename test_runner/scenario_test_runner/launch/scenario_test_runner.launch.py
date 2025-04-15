@@ -78,6 +78,7 @@ def launch_setup(context, *args, **kwargs):
     global_frame_rate                   = LaunchConfiguration("global_frame_rate",                      default=30.0)
     global_real_time_factor             = LaunchConfiguration("global_real_time_factor",                default=1.0)
     global_timeout                      = LaunchConfiguration("global_timeout",                         default=180)
+    ignore_see_around_for_pedestrian    = LaunchConfiguration("ignore_see_around_for_pedestrian",       default="ignore")
     initialize_duration                 = LaunchConfiguration("initialize_duration",                    default=30)
     launch_autoware                     = LaunchConfiguration("launch_autoware",                        default=True)
     launch_rviz                         = LaunchConfiguration("launch_rviz",                            default=False)
@@ -97,7 +98,6 @@ def launch_setup(context, *args, **kwargs):
     speed_condition                     = LaunchConfiguration("speed_condition",                        default="legacy")
     use_sim_time                        = LaunchConfiguration("use_sim_time",                           default=False)
     vehicle_model                       = LaunchConfiguration("vehicle_model",                          default="")
-    pedestrian_behavior_mode            = LaunchConfiguration("pedestrian_behavior_mode",               default="legacy")
     # fmt: on
 
     print(f"architecture_type                   := {architecture_type.perform(context)}")
@@ -109,6 +109,7 @@ def launch_setup(context, *args, **kwargs):
     print(f"global_frame_rate                   := {global_frame_rate.perform(context)}")
     print(f"global_real_time_factor             := {global_real_time_factor.perform(context)}")
     print(f"global_timeout                      := {global_timeout.perform(context)}")
+    print(f"ignore_see_around_for_pedestrian    := {ignore_see_around_for_pedestrian.perform(context)}")
     print(f"initialize_duration                 := {initialize_duration.perform(context)}")
     print(f"launch_autoware                     := {launch_autoware.perform(context)}")
     print(f"launch_rviz                         := {launch_rviz.perform(context)}")
@@ -126,8 +127,7 @@ def launch_setup(context, *args, **kwargs):
     print(f"simulate_localization               := {simulate_localization.perform(context)}")
     print(f"speed_condition                     := {speed_condition.perform(context)}")
     print(f"use_sim_time                        := {use_sim_time.perform(context)}")
-    print(f"vehicle_model                       := {vehicle_model.perform(context)}")
-    print(f"pedestrian_behavior_mode            := {pedestrian_behavior_mode.perform(context)}")
+    print(f"vehicle_model                       := {vehicle_model.perform(context)}")  
 
     def make_launch_prefix():
         if enable_perf.perform(context) == "True":
@@ -142,6 +142,7 @@ def launch_setup(context, *args, **kwargs):
             {"autoware_launch_package": autoware_launch_package},
             {"consider_acceleration_by_road_slope": consider_acceleration_by_road_slope},
             {"consider_pose_by_road_slope": consider_pose_by_road_slope},
+            {"ignore_see_around_for_pedestrian": ignore_see_around_for_pedestrian},
             {"initialize_duration": initialize_duration},
             {"launch_autoware": launch_autoware},
             {"port": port},
@@ -155,7 +156,6 @@ def launch_setup(context, *args, **kwargs):
             {"speed_condition": speed_condition},
             {"use_sim_time": use_sim_time},
             {"vehicle_model": vehicle_model},
-            {"pedestrian_behavior_mode": pedestrian_behavior_mode},
         ]
 
         def collect_vehicle_parameters():
@@ -199,6 +199,7 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("global_frame_rate",                   default_value=global_frame_rate                  ),
         DeclareLaunchArgument("global_real_time_factor",             default_value=global_real_time_factor            ),
         DeclareLaunchArgument("global_timeout",                      default_value=global_timeout                     ),
+        DeclareLaunchArgument("ignore_see_around_for_pedestrian",    default_value=ignore_see_around_for_pedestrian   ),
         DeclareLaunchArgument("launch_autoware",                     default_value=launch_autoware                    ),
         DeclareLaunchArgument("launch_rviz",                         default_value=launch_rviz                        ),
         DeclareLaunchArgument("output_directory",                    default_value=output_directory                   ),
@@ -212,7 +213,6 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("speed_condition",                     default_value=speed_condition                    ),
         DeclareLaunchArgument("use_sim_time",                        default_value=use_sim_time                       ),
         DeclareLaunchArgument("vehicle_model",                       default_value=vehicle_model                      ),
-        DeclareLaunchArgument("pedestrian_behavior_mode",            default_value=pedestrian_behavior_mode           ),
         # fmt: on
         Node(
             package="scenario_test_runner",

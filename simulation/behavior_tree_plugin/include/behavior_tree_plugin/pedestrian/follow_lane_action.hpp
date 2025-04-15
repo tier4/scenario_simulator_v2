@@ -20,7 +20,9 @@
 
 #include <behavior_tree_plugin/pedestrian/pedestrian_action_node.hpp>
 #include <geometry/vector3/operator.hpp>
+#include <get_parameter/get_parameter.hpp>
 #include <memory>
+#include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
@@ -30,7 +32,8 @@ namespace entity_behavior
 {
 namespace pedestrian
 {
-enum class DetectorStatus { DETECTED, NOT_DETECTED };
+enum class DetectorStatus { detected, not_detected };
+enum class SeeAroundMode { ignore, respect };
 
 class FollowLaneAction : public entity_behavior::PedestrianActionNode
 {
@@ -44,6 +47,9 @@ public:
   }
   DetectorStatus detectObstacleInLane(
     const lanelet::Ids & pedestrian_lanes, const bool & see_around) const;
+
+private:
+  SeeAroundMode should_respect_see_around;
 };
 }  // namespace pedestrian
 }  // namespace entity_behavior
