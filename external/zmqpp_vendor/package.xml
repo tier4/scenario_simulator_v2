@@ -6,9 +6,9 @@
   <description>Vendor package for zmqpp</description>
   <maintainer email="masaya.kataoka@tier4.jp">Masaya Kataoka</maintainer>
   <license>Apache License 2.0</license>
-  <license>Mozilla Public License 2.0</license> <!-- sol2 is MPLv2 -->
 
   <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>ament_cmake_auto</buildtool_depend>
   <buildtool_depend>git</buildtool_depend>
 
   <depend>libzmq3-dev</depend>
