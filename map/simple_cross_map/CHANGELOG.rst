@@ -9,6 +9,9 @@ Changelog for package simple_cross_map
 * Merge branch 'master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+15.1.1 (2025-04-14)
+-------------------
+
 15.1.0 (2025-04-14)
 -------------------
 * Merge branch 'master' into feature/parameter_override
