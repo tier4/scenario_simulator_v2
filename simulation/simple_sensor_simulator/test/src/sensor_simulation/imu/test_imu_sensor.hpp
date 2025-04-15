@@ -52,21 +52,21 @@ protected:
     node_ = std::make_shared<rclcpp::Node>("imu_sensor_test_node");
 
     subscription_ = node_->create_subscription<sensor_msgs::msg::Imu>(
-      "imu_output", 10,
-      [this](const sensor_msgs::msg::Imu::SharedPtr msg) { received_msg_ = msg; });
+      topic_, 10, [this](const sensor_msgs::msg::Imu::SharedPtr msg) { received_msg_ = msg; });
   }
 
   auto initializeSensor() -> void
   {
     initializeEntityStatuses();
 
-    imu_ = std::make_unique<ImuSensor<sensor_msgs::msg::Imu>>(config_, "imu_output", *node_);
+    imu_ = std::make_unique<ImuSensor<sensor_msgs::msg::Imu>>(config_, topic_, *node_);
   }
 
   ~ImuSensorTest() { rclcpp::shutdown(); }
 
   rclcpp::Node::SharedPtr node_;
 
+  const std::string topic_{"/imu_output"};
   simulation_api_schema::ImuSensorConfiguration config_;
   std::unique_ptr<ImuSensorBase> imu_;
   rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr subscription_;
