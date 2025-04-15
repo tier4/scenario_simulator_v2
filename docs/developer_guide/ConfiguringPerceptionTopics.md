@@ -34,8 +34,6 @@ where `<NAME>` and `<VALUE>` can be set to:
 | `pointcloudHorizontalResolution`           | A positive `double` type value                | `1.0`   | Horizontal angular resolution of the pseudo LiDAR inside the simulator used to generate the pointcloud.                                                                                                               |
 | `pointcloudVerticalFieldOfView`            | A positive `double` type value                | `30.0`  | Vertical field of view of the pseudo LiDAR inside the simulator used to generate the pointcloud.                                                                                                                      |
 | `randomSeed`                               | A positive `integer` type value               | `0`     | Specifies the seed value for the random number generator.                                                                                                                                                             |
-| `isBlind`                                  | A `boolean` type value                        | `false` | Specifies whether the behavior takes surrounding entities into consideration.           |
-
 
 These properties are not exclusive. In other words, multiple properties can be
 specified at the same time. However, these properties only take effect for
@@ -373,29 +371,4 @@ deterministic.
               Property:
                 - name: "randomSeed"
                   value: "0"
-```
-
-## Property `isBlind`
-
-**Summary** - Specifies whether the behavior takes surrounding entities into consideration.
-
-**Purpose** - Prevents specific scenarios from failing, such as a pedestrian colliding with a stopped vehicle, by behaving considerately toward surrounding entities. 
-
-**Specification** - The vehicle stops only when it enters a lane currently occupied by another entity and the entity is located ahead.
-
-**Guarantee** - The defined behavior is Specification. 
-
-**Note** - For pedestrians, this feature is disabled by default to maintain backward compatibility. It can be enabled by setting the `pedestrian_behavior_mode` to `standard` in the launch file execution options.
-
-**Default behavior** - If the property is not specified, the default value is `"false"`.
-
-**Example** -
-```
-        ObjectController:
-          Controller:
-            name: '...'
-            Properties:
-              Property:
-                - name: "isBlind"
-                  value: "false"
 ```
