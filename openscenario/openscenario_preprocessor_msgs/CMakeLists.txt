@@ -18,6 +18,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   srv/CheckDerivativeRemained.srv
   srv/Derive.srv
   srv/Load.srv
+  srv/SetParameter.srv
   DEPENDENCIES builtin_interfaces)
 
 ament_auto_package()
