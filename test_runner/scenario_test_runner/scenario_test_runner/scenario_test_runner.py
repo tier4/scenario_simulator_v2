@@ -19,6 +19,7 @@
 import os
 import rclpy
 import time
+import json
 
 from argparse import ArgumentParser
 from glob import glob
@@ -26,6 +27,7 @@ from lifecycle_controller import LifecycleController
 from openscenario_preprocessor_msgs.srv import CheckDerivativeRemained
 from openscenario_preprocessor_msgs.srv import Derive
 from openscenario_preprocessor_msgs.srv import Load
+from openscenario_preprocessor_msgs.srv import SetParameter
 from openscenario_utility.conversion import convert
 from pathlib import Path
 from rclpy.executors import ExternalShutdownException
@@ -70,7 +72,8 @@ class ScenarioTestRunner(LifecycleController):
         global_frame_rate: float,
         global_real_time_factor: float,
         global_timeout: int,  # [sec]
-        output_directory: Path
+        output_directory: Path,
+        override_parameters: str
     ):
         """
         Initialize the class ScenarioTestRunner.
@@ -109,6 +112,12 @@ class ScenarioTestRunner(LifecycleController):
                     os.remove(target)
         self.output_directory.mkdir(parents=True, exist_ok=True)
 
+        self.set_parameters_preprocessor_client = self.create_client(SetParameter,
+                                                                     '/simulation/openscenario_preprocessor/set_parameter')
+
+        while not self.set_parameters_preprocessor_client.wait_for_service(timeout_sec=1.0):
+            self.get_logger().warn('/simulation/openscenario_preprocessor/set_parameter service not available, waiting again...')
+
         self.check_preprocessor_client = self.create_client(CheckDerivativeRemained,
                                                             '/simulation/openscenario_preprocessor/check')
         while not self.check_preprocessor_client.wait_for_service(timeout_sec=1.0):
@@ -125,6 +134,18 @@ class ScenarioTestRunner(LifecycleController):
             self.get_logger().warn('/simulation/openscenario_preprocessor/load service not available, waiting again...')
 
         self.print_debug('connection established with preprocessor')
+
+        if len(override_parameters) > 0:
+            for parameter_name, parameter_value in json.loads(override_parameters).items():
+                request = SetParameter.Request()
+                request.name = parameter_name
+                request.value = str(parameter_value)
+                future = self.set_parameters_preprocessor_client.call_async(request)
+                rclpy.spin_until_future_complete(self, future, timeout_sec=1.0)
+                if future.result() is None:
+                    self.print_debug('/simulation/openscenario_preprocessor/set_parameter: timeout')
+                    exit(1)
+
 
     def spin(self):
         """Run scenario."""
@@ -276,6 +297,8 @@ def main(args=None):
 
     parser.add_argument("--output-directory", default=Path("/tmp"), type=Path)
 
+    parser.add_argument("--override-parameters", default=None, type=str)
+
     parser.add_argument("--global-frame-rate", default=30, type=float)
 
     parser.add_argument("-x", "--global-real-time-factor", default=1.0, type=float)
@@ -294,6 +317,7 @@ def main(args=None):
         global_real_time_factor=args.global_real_time_factor,
         global_timeout=args.global_timeout,
         output_directory=args.output_directory / "scenario_test_runner",
+        override_parameters=args.override_parameters,
     )
 
     if args.scenario != Path("/dev/null"):
