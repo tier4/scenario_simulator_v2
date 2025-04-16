@@ -79,6 +79,8 @@ struct MagicSubscription : private T
 
   typename rclcpp::Subscription<T>::SharedPtr subscription;
 
+  mutable std::mutex data_mutex;
+
   explicit MagicSubscription(const std::string & topic_name)
   {
     if (not count++) {
@@ -87,7 +89,10 @@ struct MagicSubscription : private T
 
     subscription = node->template create_subscription<T>(
       topic_name, rclcpp::QoS(1).best_effort(),
-      [this](const typename T::SharedPtr message) { static_cast<T &>(*this) = *message; });
+      [this](const typename T::SharedPtr message) {
+        std::lock_guard<std::mutex> lock(data_mutex);
+        static_cast<T &>(*this) = *message;
+      });
   }
 
   ~MagicSubscription()
@@ -97,10 +102,11 @@ struct MagicSubscription : private T
     }
   }
 
-  auto get() const -> const auto &
+  auto get() const -> const T
   {
     node->rethrow();
-    return static_cast<const T &>(*this);
+    std::lock_guard<std::mutex> lock(data_mutex);
+    return static_cast<T>(*this);
   }
 };
 
