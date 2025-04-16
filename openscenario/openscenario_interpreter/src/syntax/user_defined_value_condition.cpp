@@ -88,8 +88,7 @@ struct MagicSubscription : private T
     }
 
     subscription = node->template create_subscription<T>(
-      topic_name, rclcpp::QoS(1).best_effort(),
-      [this](const typename T::SharedPtr message) {
+      topic_name, rclcpp::QoS(1).best_effort(), [this](const typename T::SharedPtr message) {
         std::lock_guard<std::mutex> lock(data_mutex);
         static_cast<T &>(*this) = *message;
       });
