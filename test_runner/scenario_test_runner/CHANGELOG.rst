@@ -35,6 +35,30 @@ Changelog for package scenario_test_runner
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+15.1.2 (2025-04-16)
+-------------------
+
+15.1.1 (2025-04-14)
+-------------------
+
+15.1.0 (2025-04-14)
+-------------------
+* Merge pull request `#1561 <https://github.com/tier4/scenario_simulator_v2/issues/1561>`_ from tier4/feature/parameter_override
+* Merge branch 'master' into feature/parameter_override
+* feat: pass `override_parameters` to ``/simulation/openscenario_preprocessor/set_parameter` service
+* Merge branch 'master' into feature/parameter_override
+* feat: add override_parameters argument to scenario_test_runner
+* Contributors: Kotaro Yoshimoto
+
+15.0.7 (2025-04-10)
+-------------------
+* Merge branch 'master' into fix/scenario_name
+* Merge branch 'master' into fix/scenario_name
+* Contributors: Masaya Kataoka
+
+15.0.6 (2025-04-09)
+-------------------
+
 15.0.5 (2025-04-04)
 -------------------
 * Merge branch 'master' into fix-turn-indicator-report
