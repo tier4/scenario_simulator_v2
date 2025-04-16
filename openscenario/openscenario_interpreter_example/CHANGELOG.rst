@@ -21,6 +21,9 @@ Changelog for package openscenario_interpreter_example
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+15.1.2 (2025-04-16)
+-------------------
+
 15.1.1 (2025-04-14)
 -------------------
 
