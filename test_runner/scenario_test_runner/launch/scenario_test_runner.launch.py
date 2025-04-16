@@ -78,7 +78,6 @@ def launch_setup(context, *args, **kwargs):
     global_frame_rate                   = LaunchConfiguration("global_frame_rate",                      default=30.0)
     global_real_time_factor             = LaunchConfiguration("global_real_time_factor",                default=1.0)
     global_timeout                      = LaunchConfiguration("global_timeout",                         default=180)
-    pedestrian_ignore_see_around    = LaunchConfiguration("pedestrian_ignore_see_around",       default="ignore")
     initialize_duration                 = LaunchConfiguration("initialize_duration",                    default=30)
     launch_autoware                     = LaunchConfiguration("launch_autoware",                        default=True)
     launch_rviz                         = LaunchConfiguration("launch_rviz",                            default=False)
@@ -86,6 +85,7 @@ def launch_setup(context, *args, **kwargs):
     output_directory                    = LaunchConfiguration("output_directory",                       default=Path("/tmp"))
     override_parameters                 = LaunchConfiguration("override_parameters",                    default="")
     parameter_file_path                 = LaunchConfiguration("parameter_file_path",                    default=Path(get_package_share_directory("scenario_test_runner")) / "config/parameters.yaml")
+    pedestrian_ignore_see_around        = LaunchConfiguration("pedestrian_ignore_see_around",           default="ignore")
     port                                = LaunchConfiguration("port",                                   default=5555)
     publish_empty_context               = LaunchConfiguration("publish_empty_context",                  default=False)
     record                              = LaunchConfiguration("record",                                 default=True)
@@ -109,13 +109,13 @@ def launch_setup(context, *args, **kwargs):
     print(f"global_frame_rate                   := {global_frame_rate.perform(context)}")
     print(f"global_real_time_factor             := {global_real_time_factor.perform(context)}")
     print(f"global_timeout                      := {global_timeout.perform(context)}")
-    print(f"pedestrian_ignore_see_around    := {pedestrian_ignore_see_around.perform(context)}")
     print(f"initialize_duration                 := {initialize_duration.perform(context)}")
     print(f"launch_autoware                     := {launch_autoware.perform(context)}")
     print(f"launch_rviz                         := {launch_rviz.perform(context)}")
     print(f"output_directory                    := {output_directory.perform(context)}")
     print(f"override_parameters                 := {override_parameters.perform(context)}")
     print(f"parameter_file_path                 := {parameter_file_path.perform(context)}")
+    print(f"pedestrian_ignore_see_around        := {pedestrian_ignore_see_around.perform(context)}")
     print(f"port                                := {port.perform(context)}")
     print(f"publish_empty_context               := {publish_empty_context.perform(context)}")
     print(f"record                              := {record.perform(context)}")
@@ -127,7 +127,7 @@ def launch_setup(context, *args, **kwargs):
     print(f"simulate_localization               := {simulate_localization.perform(context)}")
     print(f"speed_condition                     := {speed_condition.perform(context)}")
     print(f"use_sim_time                        := {use_sim_time.perform(context)}")
-    print(f"vehicle_model                       := {vehicle_model.perform(context)}")  
+    print(f"vehicle_model                       := {vehicle_model.perform(context)}")
 
     def make_launch_prefix():
         if enable_perf.perform(context) == "True":
@@ -142,9 +142,9 @@ def launch_setup(context, *args, **kwargs):
             {"autoware_launch_package": autoware_launch_package},
             {"consider_acceleration_by_road_slope": consider_acceleration_by_road_slope},
             {"consider_pose_by_road_slope": consider_pose_by_road_slope},
-            {"pedestrian_ignore_see_around": pedestrian_ignore_see_around},
             {"initialize_duration": initialize_duration},
             {"launch_autoware": launch_autoware},
+            {"pedestrian_ignore_see_around": pedestrian_ignore_see_around},
             {"port": port},
             {"publish_empty_context" : publish_empty_context},
             {"record": record},
@@ -199,11 +199,11 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("global_frame_rate",                   default_value=global_frame_rate                  ),
         DeclareLaunchArgument("global_real_time_factor",             default_value=global_real_time_factor            ),
         DeclareLaunchArgument("global_timeout",                      default_value=global_timeout                     ),
-        DeclareLaunchArgument("pedestrian_ignore_see_around",    default_value=pedestrian_ignore_see_around   ),
         DeclareLaunchArgument("launch_autoware",                     default_value=launch_autoware                    ),
         DeclareLaunchArgument("launch_rviz",                         default_value=launch_rviz                        ),
         DeclareLaunchArgument("output_directory",                    default_value=output_directory                   ),
         DeclareLaunchArgument("parameter_file_path",                 default_value=parameter_file_path                ),
+        DeclareLaunchArgument("pedestrian_ignore_see_around",        default_value=pedestrian_ignore_see_around       ),
         DeclareLaunchArgument("publish_empty_context",               default_value=publish_empty_context              ),
         DeclareLaunchArgument("rviz_config",                         default_value=rviz_config                        ),
         DeclareLaunchArgument("scenario",                            default_value=scenario                           ),
