@@ -53,6 +53,7 @@ struct LegacyAutowareState
 #if __has_include(<autoware_system_msgs/msg/autoware_state.hpp>)
   explicit LegacyAutowareState(const autoware_system_msgs::msg::AutowareState & autoware_state)
   : value([&]() {
+      std::cout << "LegacyAutowareState(OLD): " << autoware_state.state << std::endl;
       switch (autoware_state.state) {
         case autoware_system_msgs::msg::AutowareState::INITIALIZING:
           return initializing;
@@ -83,6 +84,8 @@ struct LegacyAutowareState
     const autoware_adapi_v1_msgs::msg::OperationModeState & operation_mode_state,
     const rclcpp::Time & now)
   : value([&]() {
+      std::cout << "LegacyAutowareState(NEW): " << localization_state.state << ", "
+                << route_state.state << ", " << operation_mode_state.mode << std::endl;
       /*
          See
          - https://github.com/autowarefoundation/autoware.universe/blob/e60daf7d1c85208eaac083b90c181e224c2ac513/system/autoware_default_adapi/document/autoware-state.md
