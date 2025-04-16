@@ -151,7 +151,12 @@ AutowareUniverse::AutowareUniverse(bool simulate_localization) try
       setTurnIndicatorsReport([this]() {
         TurnIndicatorsReport message;
         message.stamp = get_clock()->now();
-        message.report = getTurnIndicatorsCommand().command;
+
+        auto turn_indicators_command = getTurnIndicatorsCommand();
+        message.report = turn_indicators_command.command == TurnIndicatorsCommand::NO_COMMAND 
+                          ? TurnIndicatorsReport::DISABLE
+                          : turn_indicators_command.command;
+
         return message;
       }());
     })),

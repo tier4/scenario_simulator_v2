@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>openscenario_interpreter</name>
-  <version>11.1.0</version>
+  <version>15.1.3</version>
   <description>OpenSCENARIO 1.2.0 interpreter package for Autoware</description>
   <maintainer email="tatsuya.yamasaki@tier4.jp">Tatsuya Yamasaki</maintainer>
   <license>Apache License 2.0</license>
@@ -11,6 +11,7 @@
 
   <depend>concealer</depend>
   <depend>geometry_msgs</depend>
+  <depend>get_parameter</depend>
   <depend>libboost-dev</depend>
   <depend>libgoogle-glog-dev</depend>
   <depend>lifecycle_msgs</depend>
