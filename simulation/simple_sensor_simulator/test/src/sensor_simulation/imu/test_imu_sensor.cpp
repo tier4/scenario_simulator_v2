@@ -14,6 +14,10 @@
 
 #include "test_imu_sensor.hpp"
 
+/**
+ * @note Test publishing IMU data correctness without noise and gravity applied.
+ * The goal is to check whether data is published correctly.
+ */
 TEST_F(ImuSensorTest, update_noNoiseNoGravity)
 {
   // Reset noise
@@ -39,6 +43,10 @@ TEST_F(ImuSensorTest, update_noNoiseNoGravity)
   EXPECT_DOUBLE_EQ(received_msg_->linear_acceleration.z, 0.0);
 }
 
+/**
+ * @note Test publishing IMU data correctness without noise applied.
+ * The goal is to check whether data is published correctly.
+ */
 TEST_F(ImuSensorTest, update_noNoise)
 {
   // Reset noise
@@ -62,6 +70,10 @@ TEST_F(ImuSensorTest, update_noNoise)
   EXPECT_DOUBLE_EQ(received_msg_->linear_acceleration.z, -9.81);
 }
 
+/**
+ * @note Test publishing IMU data correctness with legacy noise configuration and gravity not applied.
+ * The goal is to check whether data is published correctly using the legacy noise.
+ */
 TEST_F(ImuSensorTest, update_noiseLegacyNoGravity)
 {
   config_.set_add_gravity(false);
@@ -87,6 +99,10 @@ TEST_F(ImuSensorTest, update_noiseLegacyNoGravity)
   // clang-format on
 }
 
+/**
+ * @note Test publishing IMU data correctness with legacy noise configuration.
+ * The goal is to check whether data is published correctly using the legacy noise.
+ */
 TEST_F(ImuSensorTest, update_noiseLegacy)
 {
   initializeSensor();
@@ -110,6 +126,11 @@ TEST_F(ImuSensorTest, update_noiseLegacy)
   // clang-format on
 }
 
+/**
+ * @note Test publishing IMU data correctness with legacy noise configuration and new noise
+ * configuration, but without noise override parameter with gravity not applied.
+ * The goal is to check whether data is published correctly using the legacy noise.
+ */
 TEST_F(ImuSensorTest, update_noiseLegacyParamsSetNoGravity)
 {
   config_.set_add_gravity(false);
@@ -175,6 +196,10 @@ TEST_F(ImuSensorTest, update_noiseLegacyParamsSetNoGravity)
   // clang-format on
 }
 
+/**
+ * @note Test publishing IMU data correctness with new noise configuration with gravity not applied.
+ * The goal is to check whether data is published correctly using the new noise.
+ */
 TEST_F(ImuSensorTest, update_noiseNoGravity)
 {
   config_.set_add_gravity(false);
@@ -242,6 +267,11 @@ TEST_F(ImuSensorTest, update_noiseNoGravity)
   // clang-format on
 }
 
+/**
+ * @note Test publishing IMU data correctness with legacy noise configuration and new noise
+ * configuration, but without noise override parameter.
+ * The goal is to check whether data is published correctly using the legacy noise.
+ */
 TEST_F(ImuSensorTest, update_noiseLegacyParamsSet)
 {
   // clang-format off
@@ -305,6 +335,10 @@ TEST_F(ImuSensorTest, update_noiseLegacyParamsSet)
   // clang-format on
 }
 
+/**
+ * @note Test publishing IMU data correctness with new noise configuration.
+ * The goal is to check whether data is published correctly using the new noise.
+ */
 TEST_F(ImuSensorTest, update_noise)
 {
   node_->declare_parameter<bool>(topic_ + ".override_legacy_configuration", true);
