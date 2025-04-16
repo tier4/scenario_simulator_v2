@@ -167,7 +167,7 @@ graph TD
 
 **Specification** - The vehicle stops only when it enters a lane currently occupied by another entity and the entity is located ahead.
 
-**Note** - For pedestrians, this feature is disabled by default to maintain backward compatibility. It can be enabled by setting the `ignore_see_around_for_pedestrian` to `respect` in the launch file execution options.
+**Note** - For pedestrians, this feature is disabled by default to maintain backward compatibility. It can be enabled by setting the `pedestrian_ignore_see_around` to `respect` in the launch file execution options.
 
 **Default behavior** - If the property is not specified, the default value is `"false"`.
 

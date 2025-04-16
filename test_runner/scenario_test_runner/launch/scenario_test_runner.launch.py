@@ -78,7 +78,7 @@ def launch_setup(context, *args, **kwargs):
     global_frame_rate                   = LaunchConfiguration("global_frame_rate",                      default=30.0)
     global_real_time_factor             = LaunchConfiguration("global_real_time_factor",                default=1.0)
     global_timeout                      = LaunchConfiguration("global_timeout",                         default=180)
-    ignore_see_around_for_pedestrian    = LaunchConfiguration("ignore_see_around_for_pedestrian",       default="ignore")
+    pedestrian_ignore_see_around    = LaunchConfiguration("pedestrian_ignore_see_around",       default="ignore")
     initialize_duration                 = LaunchConfiguration("initialize_duration",                    default=30)
     launch_autoware                     = LaunchConfiguration("launch_autoware",                        default=True)
     launch_rviz                         = LaunchConfiguration("launch_rviz",                            default=False)
@@ -109,7 +109,7 @@ def launch_setup(context, *args, **kwargs):
     print(f"global_frame_rate                   := {global_frame_rate.perform(context)}")
     print(f"global_real_time_factor             := {global_real_time_factor.perform(context)}")
     print(f"global_timeout                      := {global_timeout.perform(context)}")
-    print(f"ignore_see_around_for_pedestrian    := {ignore_see_around_for_pedestrian.perform(context)}")
+    print(f"pedestrian_ignore_see_around    := {pedestrian_ignore_see_around.perform(context)}")
     print(f"initialize_duration                 := {initialize_duration.perform(context)}")
     print(f"launch_autoware                     := {launch_autoware.perform(context)}")
     print(f"launch_rviz                         := {launch_rviz.perform(context)}")
@@ -142,7 +142,7 @@ def launch_setup(context, *args, **kwargs):
             {"autoware_launch_package": autoware_launch_package},
             {"consider_acceleration_by_road_slope": consider_acceleration_by_road_slope},
             {"consider_pose_by_road_slope": consider_pose_by_road_slope},
-            {"ignore_see_around_for_pedestrian": ignore_see_around_for_pedestrian},
+            {"pedestrian_ignore_see_around": pedestrian_ignore_see_around},
             {"initialize_duration": initialize_duration},
             {"launch_autoware": launch_autoware},
             {"port": port},
@@ -199,7 +199,7 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("global_frame_rate",                   default_value=global_frame_rate                  ),
         DeclareLaunchArgument("global_real_time_factor",             default_value=global_real_time_factor            ),
         DeclareLaunchArgument("global_timeout",                      default_value=global_timeout                     ),
-        DeclareLaunchArgument("ignore_see_around_for_pedestrian",    default_value=ignore_see_around_for_pedestrian   ),
+        DeclareLaunchArgument("pedestrian_ignore_see_around",    default_value=pedestrian_ignore_see_around   ),
         DeclareLaunchArgument("launch_autoware",                     default_value=launch_autoware                    ),
         DeclareLaunchArgument("launch_rviz",                         default_value=launch_rviz                        ),
         DeclareLaunchArgument("output_directory",                    default_value=output_directory                   ),

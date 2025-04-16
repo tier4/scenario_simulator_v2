@@ -37,7 +37,7 @@ FollowLaneAction::FollowLaneAction(const std::string & name, const BT::NodeConfi
   };
 
   should_respect_see_around = parameterToSeeAroundMode(
-    common::getParameter<std::string>("ignore_see_around_for_pedestrian", "ignore"));
+    common::getParameter<std::string>("pedestrian_ignore_see_around", "ignore"));
 }
 
 void FollowLaneAction::getBlackBoardValues() { PedestrianActionNode::getBlackBoardValues(); }
