@@ -64,7 +64,10 @@ def default_autoware_launch_file_of(architecture_type):
 
 
 def default_rviz_config_file():
-    return Path(get_package_share_directory("traffic_simulator")) / "config/scenario_simulator_v2.rviz"
+    return (
+        Path(get_package_share_directory("traffic_simulator"))
+        / "config/scenario_simulator_v2.rviz"
+    )
 
 
 def launch_setup(context, *args, **kwargs):
@@ -99,30 +102,56 @@ def launch_setup(context, *args, **kwargs):
     vehicle_model                       = LaunchConfiguration("vehicle_model",                          default="")
     # fmt: on
 
-    print(f"architecture_type                   := {architecture_type.perform(context)}")
-    print(f"autoware_launch_file                := {autoware_launch_file.perform(context)}")
-    print(f"autoware_launch_package             := {autoware_launch_package.perform(context)}")
-    print(f"consider_acceleration_by_road_slope := {consider_acceleration_by_road_slope.perform(context)}")
-    print(f"consider_pose_by_road_slope         := {consider_pose_by_road_slope.perform(context)}")
+    print(
+        f"architecture_type                   := {architecture_type.perform(context)}"
+    )
+    print(
+        f"autoware_launch_file                := {autoware_launch_file.perform(context)}"
+    )
+    print(
+        f"autoware_launch_package             := {autoware_launch_package.perform(context)}"
+    )
+    print(
+        f"consider_acceleration_by_road_slope := {consider_acceleration_by_road_slope.perform(context)}"
+    )
+    print(
+        f"consider_pose_by_road_slope         := {consider_pose_by_road_slope.perform(context)}"
+    )
     print(f"enable_perf                         := {enable_perf.perform(context)}")
-    print(f"global_frame_rate                   := {global_frame_rate.perform(context)}")
-    print(f"global_real_time_factor             := {global_real_time_factor.perform(context)}")
+    print(
+        f"global_frame_rate                   := {global_frame_rate.perform(context)}"
+    )
+    print(
+        f"global_real_time_factor             := {global_real_time_factor.perform(context)}"
+    )
     print(f"global_timeout                      := {global_timeout.perform(context)}")
-    print(f"initialize_duration                 := {initialize_duration.perform(context)}")
+    print(
+        f"initialize_duration                 := {initialize_duration.perform(context)}"
+    )
     print(f"launch_autoware                     := {launch_autoware.perform(context)}")
     print(f"launch_rviz                         := {launch_rviz.perform(context)}")
     print(f"output_directory                    := {output_directory.perform(context)}")
-    print(f"override_parameters                 := {override_parameters.perform(context)}")
-    print(f"parameter_file_path                 := {parameter_file_path.perform(context)}")
+    print(
+        f"override_parameters                 := {override_parameters.perform(context)}"
+    )
+    print(
+        f"parameter_file_path                 := {parameter_file_path.perform(context)}"
+    )
     print(f"port                                := {port.perform(context)}")
-    print(f"publish_empty_context               := {publish_empty_context.perform(context)}")
+    print(
+        f"publish_empty_context               := {publish_empty_context.perform(context)}"
+    )
     print(f"record                              := {record.perform(context)}")
-    print(f"record_storage_id                   := {record_storage_id.perform(context)}")
+    print(
+        f"record_storage_id                   := {record_storage_id.perform(context)}"
+    )
     print(f"rviz_config                         := {rviz_config.perform(context)}")
     print(f"scenario                            := {scenario.perform(context)}")
     print(f"sensor_model                        := {sensor_model.perform(context)}")
     print(f"sigterm_timeout                     := {sigterm_timeout.perform(context)}")
-    print(f"simulate_localization               := {simulate_localization.perform(context)}")
+    print(
+        f"simulate_localization               := {simulate_localization.perform(context)}"
+    )
     print(f"speed_condition                     := {speed_condition.perform(context)}")
     print(f"use_sim_time                        := {use_sim_time.perform(context)}")
     print(f"vehicle_model                       := {vehicle_model.perform(context)}")
@@ -138,12 +167,14 @@ def launch_setup(context, *args, **kwargs):
             {"architecture_type": architecture_type},
             {"autoware_launch_file": autoware_launch_file},
             {"autoware_launch_package": autoware_launch_package},
-            {"consider_acceleration_by_road_slope": consider_acceleration_by_road_slope},
+            {
+                "consider_acceleration_by_road_slope": consider_acceleration_by_road_slope
+            },
             {"consider_pose_by_road_slope": consider_pose_by_road_slope},
             {"initialize_duration": initialize_duration},
             {"launch_autoware": launch_autoware},
             {"port": port},
-            {"publish_empty_context" : publish_empty_context},
+            {"publish_empty_context": publish_empty_context},
             {"record": record},
             {"record_storage_id": record_storage_id},
             {"rviz_config": rviz_config},
@@ -157,7 +188,9 @@ def launch_setup(context, *args, **kwargs):
 
         def collect_vehicle_parameters():
             if vehicle_model_name := vehicle_model.perform(context):
-                description = get_package_share_directory(vehicle_model_name + "_description")
+                description = get_package_share_directory(
+                    vehicle_model_name + "_description"
+                )
                 return [
                     description + "/config/vehicle_info.param.yaml",
                     description + "/config/simulator_model.param.yaml",
@@ -169,7 +202,11 @@ def launch_setup(context, *args, **kwargs):
             parameters += it
 
         def collect_prefixed_parameters():
-            return [item[0][9:] + ':=' + item[1] for item in context.launch_configurations.items() if item[0][:9] == 'autoware.']
+            return [
+                item[0][9:] + ":=" + item[1]
+                for item in context.launch_configurations.items()
+                if item[0][:9] == "autoware."
+            ]
 
         if (it := collect_prefixed_parameters()) != []:
             parameters += [{"autoware.": it}]
@@ -177,9 +214,13 @@ def launch_setup(context, *args, **kwargs):
         path = Path(parameter_file_path.perform(context))
 
         if not path.is_file():
-            raise Exception(f'The value "{path}" given for parameter `parameter_file_path` is not a file.')
-        elif path.suffix not in {'.yaml', '.yml'}:
-            raise Exception(f'The value "{path}" given for parameter `parameter_file_path` is not a YAML file.')
+            raise Exception(
+                f'The value "{path}" given for parameter `parameter_file_path` is not a file.'
+            )
+        elif path.suffix not in {".yaml", ".yml"}:
+            raise Exception(
+                f'The value "{path}" given for parameter `parameter_file_path` is not a YAML file.'
+            )
         else:
             parameters += [path]
 

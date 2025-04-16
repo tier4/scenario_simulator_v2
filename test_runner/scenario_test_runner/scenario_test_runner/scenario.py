@@ -28,6 +28,7 @@ def substitute_ros_package(pathname: Path):
         sub("\\$\\(find-pkg-share\\s+([^\\)]+)\\)", find_pkg_share, str(pathname))
     )
 
+
 class Scenario:
     """
     Manages a scenario.
@@ -44,6 +45,7 @@ class Scenario:
         self.path = substitute_ros_package(path).resolve()
 
         self.frame_rate = frame_rate
+
 
 if __name__ == "__main__":
     """Entrypoint."""

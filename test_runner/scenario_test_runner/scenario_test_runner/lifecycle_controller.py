@@ -224,9 +224,13 @@ class LifecycleController(Node):
         request = ChangeState.Request()
         request.transition.id = transition_id
         future = self.client_change_state.call_async(request)
-        rclpy.spin_until_future_complete(self, future, executor=self.executor, timeout_sec=self.timeout_sec)
+        rclpy.spin_until_future_complete(
+            self, future, executor=self.executor, timeout_sec=self.timeout_sec
+        )
         if future.result() is None:
-            raise RuntimeError("Interpreter tried to set current lifecycle state, but failed.")
+            raise RuntimeError(
+                "Interpreter tried to set current lifecycle state, but failed."
+            )
         return future.result().success
 
     def get_lifecycle_state(self):
@@ -243,9 +247,13 @@ class LifecycleController(Node):
 
         """
         future = self.client_get_state.call_async(GetState.Request())
-        rclpy.spin_until_future_complete(self, future, executor=self.executor, timeout_sec=self.timeout_sec)
+        rclpy.spin_until_future_complete(
+            self, future, executor=self.executor, timeout_sec=self.timeout_sec
+        )
         if future.result() is None:
-            raise RuntimeError("Interpreter tried to get current lifecycle state, but failed.")
+            raise RuntimeError(
+                "Interpreter tried to get current lifecycle state, but failed."
+            )
         return future.result().current_state.label
 
 

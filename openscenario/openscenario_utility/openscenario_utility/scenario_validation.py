@@ -104,6 +104,7 @@ def validate_file(
             overall_result = False
         print(str(path) + " : " + str(overall_result))
 
+
 def validate_scenario():
 
     schema = xmlschema.XMLSchema(

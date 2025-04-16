@@ -30,7 +30,13 @@ from launch.conditions import IfCondition
 from launch.events import Shutdown
 from launch.event_handlers import OnProcessExit, OnProcessIO
 
-from launch.actions import EmitEvent, RegisterEventHandler, LogInfo, TimerAction, OpaqueFunction
+from launch.actions import (
+    EmitEvent,
+    RegisterEventHandler,
+    LogInfo,
+    TimerAction,
+    OpaqueFunction,
+)
 from launch.actions.declare_launch_argument import DeclareLaunchArgument
 from launch.substitutions.launch_configuration import LaunchConfiguration
 
@@ -39,6 +45,7 @@ from launch_ros.actions import Node
 from typing import cast
 
 from pathlib import Path
+
 
 class Color:
     BLACK = "\033[30m"
@@ -97,7 +104,10 @@ def default_autoware_launch_file_of(architecture_type):
 
 
 def default_rviz_config_file():
-    return Path(get_package_share_directory("traffic_simulator")) / "config/scenario_simulator_v2.rviz"
+    return (
+        Path(get_package_share_directory("traffic_simulator"))
+        / "config/scenario_simulator_v2.rviz"
+    )
 
 
 def launch_setup(context, *args, **kwargs):
@@ -130,27 +140,49 @@ def launch_setup(context, *args, **kwargs):
     junit_path                          = LaunchConfiguration("junit_path",                             default="/tmp/output.xunit.xml")
     # fmt: on
 
-    print(f"architecture_type                   := {architecture_type.perform(context)}")
-    print(f"autoware_launch_file                := {autoware_launch_file.perform(context)}")
-    print(f"autoware_launch_package             := {autoware_launch_package.perform(context)}")
-    print(f"consider_acceleration_by_road_slope := {consider_acceleration_by_road_slope.perform(context)}")
-    print(f"consider_pose_by_road_slope         := {consider_pose_by_road_slope.perform(context)}")
-    print(f"global_frame_rate                   := {global_frame_rate.perform(context)}")
-    print(f"global_real_time_factor             := {global_real_time_factor.perform(context)}")
+    print(
+        f"architecture_type                   := {architecture_type.perform(context)}"
+    )
+    print(
+        f"autoware_launch_file                := {autoware_launch_file.perform(context)}"
+    )
+    print(
+        f"autoware_launch_package             := {autoware_launch_package.perform(context)}"
+    )
+    print(
+        f"consider_acceleration_by_road_slope := {consider_acceleration_by_road_slope.perform(context)}"
+    )
+    print(
+        f"consider_pose_by_road_slope         := {consider_pose_by_road_slope.perform(context)}"
+    )
+    print(
+        f"global_frame_rate                   := {global_frame_rate.perform(context)}"
+    )
+    print(
+        f"global_real_time_factor             := {global_real_time_factor.perform(context)}"
+    )
     print(f"global_timeout                      := {global_timeout.perform(context)}")
-    print(f"initialize_duration                 := {initialize_duration.perform(context)}")
+    print(
+        f"initialize_duration                 := {initialize_duration.perform(context)}"
+    )
     print(f"launch_autoware                     := {launch_autoware.perform(context)}")
     print(f"launch_rviz                         := {launch_rviz.perform(context)}")
     print(f"output_directory                    := {output_directory.perform(context)}")
-    print(f"parameter_file_path                 := {parameter_file_path.perform(context)}")
+    print(
+        f"parameter_file_path                 := {parameter_file_path.perform(context)}"
+    )
     print(f"port                                := {port.perform(context)}")
-    print(f"publish_empty_context               := {publish_empty_context.perform(context)}")
+    print(
+        f"publish_empty_context               := {publish_empty_context.perform(context)}"
+    )
     print(f"record                              := {record.perform(context)}")
     print(f"rviz_config                         := {rviz_config.perform(context)}")
     print(f"scenario                            := {scenario.perform(context)}")
     print(f"sensor_model                        := {sensor_model.perform(context)}")
     print(f"sigterm_timeout                     := {sigterm_timeout.perform(context)}")
-    print(f"simulate_localization               := {simulate_localization.perform(context)}")
+    print(
+        f"simulate_localization               := {simulate_localization.perform(context)}"
+    )
     print(f"use_sim_time                        := {use_sim_time.perform(context)}")
     print(f"vehicle_model                       := {vehicle_model.perform(context)}")
     print(f"scenario_package                    := {scenario_package.perform(context)}")
@@ -161,7 +193,9 @@ def launch_setup(context, *args, **kwargs):
             {"architecture_type": architecture_type},
             {"autoware_launch_file": autoware_launch_file},
             {"autoware_launch_package": autoware_launch_package},
-            {"consider_acceleration_by_road_slope": consider_acceleration_by_road_slope},
+            {
+                "consider_acceleration_by_road_slope": consider_acceleration_by_road_slope
+            },
             {"consider_pose_by_road_slope": consider_pose_by_road_slope},
             {"initialize_duration": initialize_duration},
             {"launch_autoware": launch_autoware},

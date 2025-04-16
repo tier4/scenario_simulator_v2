@@ -27,22 +27,23 @@ from launch.events import Shutdown as ShutdownEvent
 from launch.events.process import ProcessExited
 from launch.launch_context import LaunchContext
 
-_logger = logging.getLogger(name='launch')
+_logger = logging.getLogger(name="launch")
+
 
 class ShutdownOnce(EmitEvent):
     shutdown_called = False
     """Action that shuts down a launched system by emitting Shutdown when executed."""
 
-    def __init__(self, *, reason: Text = 'reason not given', **kwargs):
+    def __init__(self, *, reason: Text = "reason not given", **kwargs):
         super().__init__(event=ShutdownEvent(reason=reason), **kwargs)
 
     @classmethod
     def parse(cls, entity: Entity, parser: Parser):
         """Return `Shutdown` action and kwargs for constructing it."""
         _, kwargs = super().parse(entity, parser)
-        reason = entity.get_attr('reason', optional=True)
+        reason = entity.get_attr("reason", optional=True)
         if reason:
-            kwargs['reason'] = parser.parse_substitution(reason)
+            kwargs["reason"] = parser.parse_substitution(reason)
         return cls, kwargs
 
     def execute(self, context: LaunchContext):
@@ -57,7 +58,10 @@ class ShutdownOnce(EmitEvent):
                 event = None
 
             if isinstance(event, ProcessExited):
-                _logger.info('process[{}] was required: shutting down launched system'.format(
-                    event.process_name))
+                _logger.info(
+                    "process[{}] was required: shutting down launched system".format(
+                        event.process_name
+                    )
+                )
 
             super().execute(context)

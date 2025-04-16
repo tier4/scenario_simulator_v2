@@ -73,7 +73,7 @@ class ScenarioTestRunner(LifecycleController):
         global_real_time_factor: float,
         global_timeout: int,  # [sec]
         output_directory: Path,
-        override_parameters: str
+        override_parameters: str,
     ):
         """
         Initialize the class ScenarioTestRunner.
@@ -112,40 +112,57 @@ class ScenarioTestRunner(LifecycleController):
                     os.remove(target)
         self.output_directory.mkdir(parents=True, exist_ok=True)
 
-        self.set_parameters_preprocessor_client = self.create_client(SetParameter,
-                                                                     '/simulation/openscenario_preprocessor/set_parameter')
+        self.set_parameters_preprocessor_client = self.create_client(
+            SetParameter, "/simulation/openscenario_preprocessor/set_parameter"
+        )
 
-        while not self.set_parameters_preprocessor_client.wait_for_service(timeout_sec=1.0):
-            self.get_logger().warn('/simulation/openscenario_preprocessor/set_parameter service not available, waiting again...')
+        while not self.set_parameters_preprocessor_client.wait_for_service(
+            timeout_sec=1.0
+        ):
+            self.get_logger().warn(
+                "/simulation/openscenario_preprocessor/set_parameter service not available, waiting again..."
+            )
 
-        self.check_preprocessor_client = self.create_client(CheckDerivativeRemained,
-                                                            '/simulation/openscenario_preprocessor/check')
+        self.check_preprocessor_client = self.create_client(
+            CheckDerivativeRemained, "/simulation/openscenario_preprocessor/check"
+        )
         while not self.check_preprocessor_client.wait_for_service(timeout_sec=1.0):
-            self.get_logger().warn('/simulation/openscenario_preprocessor/check service not available, waiting again...')
+            self.get_logger().warn(
+                "/simulation/openscenario_preprocessor/check service not available, waiting again..."
+            )
 
-        self.derive_preprocessor_client = self.create_client(Derive,
-                                                             '/simulation/openscenario_preprocessor/derive')
+        self.derive_preprocessor_client = self.create_client(
+            Derive, "/simulation/openscenario_preprocessor/derive"
+        )
         while not self.derive_preprocessor_client.wait_for_service(timeout_sec=1.0):
-            self.get_logger().warn('/simulation/openscenario_preprocessor/derive service not available, waiting again...')
+            self.get_logger().warn(
+                "/simulation/openscenario_preprocessor/derive service not available, waiting again..."
+            )
 
-        self.load_preprocessor_client = self.create_client(Load,
-                                                           '/simulation/openscenario_preprocessor/load')
+        self.load_preprocessor_client = self.create_client(
+            Load, "/simulation/openscenario_preprocessor/load"
+        )
         while not self.load_preprocessor_client.wait_for_service(timeout_sec=1.0):
-            self.get_logger().warn('/simulation/openscenario_preprocessor/load service not available, waiting again...')
+            self.get_logger().warn(
+                "/simulation/openscenario_preprocessor/load service not available, waiting again..."
+            )
 
-        self.print_debug('connection established with preprocessor')
+        self.print_debug("connection established with preprocessor")
 
         if len(override_parameters) > 0:
-            for parameter_name, parameter_value in json.loads(override_parameters).items():
+            for parameter_name, parameter_value in json.loads(
+                override_parameters
+            ).items():
                 request = SetParameter.Request()
                 request.name = parameter_name
                 request.value = str(parameter_value)
                 future = self.set_parameters_preprocessor_client.call_async(request)
                 rclpy.spin_until_future_complete(self, future, timeout_sec=1.0)
                 if future.result() is None:
-                    self.print_debug('/simulation/openscenario_preprocessor/set_parameter: timeout')
+                    self.print_debug(
+                        "/simulation/openscenario_preprocessor/set_parameter: timeout"
+                    )
                     exit(1)
-
 
     def spin(self):
         """Run scenario."""
@@ -155,9 +172,14 @@ class ScenarioTestRunner(LifecycleController):
             while rclpy.ok():
                 if self.get_lifecycle_state() == "inactive":
                     break
-                elif ((time.time() - start) > self.global_timeout
-                        if self.global_timeout is not None else False):
-                    self.get_logger().error("The simulation has timed out. Forcibly inactivate.")
+                elif (
+                    (time.time() - start) > self.global_timeout
+                    if self.global_timeout is not None
+                    else False
+                ):
+                    self.get_logger().error(
+                        "The simulation has timed out. Forcibly inactivate."
+                    )
                     self.deactivate_node()
                     break
                 else:
@@ -173,26 +195,30 @@ class ScenarioTestRunner(LifecycleController):
             if self.post_scenario_to_preprocessor(xosc_scenario):
                 preprocessed_scenarios = []
                 while self.derivative_remained_on_preprocessor():
-                    future = self.derive_preprocessor_client.call_async(Derive.Request())
+                    future = self.derive_preprocessor_client.call_async(
+                        Derive.Request()
+                    )
                     rclpy.spin_until_future_complete(self, future, timeout_sec=1.0)
 
                     if future.result() is not None:
-                        result = Scenario(future.result().path,
-                                          future.result().frame_rate)
+                        result = Scenario(
+                            future.result().path, future.result().frame_rate
+                        )
                         self.print_debug("derived : " + str(future.result().path))
                         preprocessed_scenarios.append(result)
                     else:
                         self.print_debug(
-                            'Exception while calling service /simulation/openscenario_preprocessor/derive: '
-                            + str(future.exception()))
+                            "Exception while calling service /simulation/openscenario_preprocessor/derive: "
+                            + str(future.exception())
+                        )
                         exit(1)
-                self.print_debug('finish derivation')
+                self.print_debug("finish derivation")
 
                 for preprocessed_scenario in preprocessed_scenarios:
                     self.print_debug(str(preprocessed_scenario.path))
 
                 self.run_preprocessed_scenarios(preprocessed_scenarios)
-                self.print_debug('finish execution')
+                self.print_debug("finish execution")
             else:
                 exit(1)
 
@@ -264,25 +290,35 @@ class ScenarioTestRunner(LifecycleController):
         future = self.load_preprocessor_client.call_async(request)
         rclpy.spin_until_future_complete(self, future)
         if future.result() is not None:
-            self.print_debug('Result of /simulation/openscenario_preprocessor/load: '
-                             + str(future.result().message))
+            self.print_debug(
+                "Result of /simulation/openscenario_preprocessor/load: "
+                + str(future.result().message)
+            )
             return True
         else:
-            self.print_debug('Exception while calling service /simulation/openscenario_preprocessor/load: '
-                             + str(future.exception()))
+            self.print_debug(
+                "Exception while calling service /simulation/openscenario_preprocessor/load: "
+                + str(future.exception())
+            )
             return False
 
     def derivative_remained_on_preprocessor(self):
 
-        future = self.check_preprocessor_client.call_async(CheckDerivativeRemained.Request())
+        future = self.check_preprocessor_client.call_async(
+            CheckDerivativeRemained.Request()
+        )
         rclpy.spin_until_future_complete(self, future, timeout_sec=1.0)
         if future.result() is not None:
-            self.print_debug('Result of /simulation/openscenario_preprocessor/check: '
-                             + str(future.result().derivative_remained))
+            self.print_debug(
+                "Result of /simulation/openscenario_preprocessor/check: "
+                + str(future.result().derivative_remained)
+            )
             return future.result().derivative_remained
         else:
-            self.print_debug('Exception while calling service /simulation/openscenario_preprocessor/check: '
-                             + str(future.exception()))
+            self.print_debug(
+                "Exception while calling service /simulation/openscenario_preprocessor/check: "
+                + str(future.exception())
+            )
             exit(1)
 
     def print_debug(self, message: str):
@@ -322,10 +358,12 @@ def main(args=None):
 
     if args.scenario != Path("/dev/null"):
         test_runner.run_scenarios(
-            [Scenario(
-                substitute_ros_package(args.scenario).resolve(),
-                args.global_frame_rate,
-            )]
+            [
+                Scenario(
+                    substitute_ros_package(args.scenario).resolve(),
+                    args.global_frame_rate,
+                )
+            ]
         )
     else:
         print("No scenario is specified. Specify one.")
