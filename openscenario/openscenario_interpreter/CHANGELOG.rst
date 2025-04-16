@@ -32,6 +32,15 @@ Changelog for package openscenario_interpreter
 * add publish_empty_context parameter
 * Contributors: Masaya Kataoka
 
+15.1.3 (2025-04-16)
+-------------------
+* Merge pull request `#1574 <https://github.com/tier4/scenario_simulator_v2/issues/1574>`_ from tier4/fix/concealer/engage
+  Fix/concealer/engage
+* Merge branch 'master' into fix/concealer/engage
+* Merge branch 'master' into fix/concealer/engage
+* Fix interpreter to not evaluate Storyboard.Story until engage is complete
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki, yamacir-kit
+
 15.1.2 (2025-04-16)
 -------------------
 
