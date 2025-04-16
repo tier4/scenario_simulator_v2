@@ -296,21 +296,21 @@ auto CatmullRomSpline::getCollisionPointsIn2D(
                                                    const auto local_search_backward) {
     std::set<double> s_value_candidates;
     auto current_curve_start_s = 0.0;
-    for (std::size_t i = 0; i < curves_.size(); ++i) {
+    for (const auto & curve : curves_) {
       if (
         s_range == std::nullopt ||
         (((current_curve_start_s >= s_range->first) ||
-          (current_curve_start_s + curves_[i].getLength()) > s_range->first) &&
+          (current_curve_start_s + curve.getLength()) > s_range->first) &&
          (current_curve_start_s <= s_range->second))) {
         /// @note The local_polygon is assumed to be closed
         const auto s =
-          curves_[i].getCollisionPointsIn2D(local_polygon, local_search_backward, true, true);
+          curve.getCollisionPointsIn2D(local_polygon, local_search_backward, true, true);
         std::for_each(
           s.begin(), s.end(), [&s_value_candidates, &current_curve_start_s, this](const auto & s) {
             s_value_candidates.insert(current_curve_start_s + s);
           });
       }
-      current_curve_start_s += curves_[i].getLength();
+      current_curve_start_s += curve.getLength();
     }
     return s_value_candidates;
   };
@@ -438,13 +438,13 @@ auto CatmullRomSpline::getSValue(
       return line_segments_[0].getSValue(pose, threshold_distance, true);
     default:
       double s = 0;
-      for (std::size_t i = 0; i < curves_.size(); i++) {
-        auto s_value = curves_[i].getSValue(pose, threshold_distance, true);
+      for (const auto & curve : curves_) {
+        auto s_value = curve.getSValue(pose, threshold_distance, true);
         if (s_value) {
           s = s + s_value.value();
           return s;
         }
-        s = s + curves_[i].getLength();
+        s = s + curve.getLength();
       }
       return std::nullopt;
   }
