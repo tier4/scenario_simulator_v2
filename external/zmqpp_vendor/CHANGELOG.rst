@@ -15,6 +15,11 @@ Changelog for package zmqpp_vendor
 * Add missing buildtool_depend on git
 * Contributors: Masaya Kataoka, MasayaKataoka, Scott K Logan
 
+15.1.3 (2025-04-16)
+-------------------
+* Merge branch 'master' into fix/concealer/engage
+* Contributors: Kotaro Yoshimoto
+
 15.1.2 (2025-04-16)
 -------------------
 * Merge pull request `#1575 <https://github.com/tier4/scenario_simulator_v2/issues/1575>`_ from tier4/feature/add_zmqpp_vendor_source
