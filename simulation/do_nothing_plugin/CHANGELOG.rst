@@ -21,6 +21,12 @@ Changelog for package do_nothing_plugin
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+15.1.3 (2025-04-16)
+-------------------
+* Merge branch 'master' into fix/concealer/engage
+* Merge branch 'master' into fix/concealer/engage
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
 15.1.2 (2025-04-16)
 -------------------
 
