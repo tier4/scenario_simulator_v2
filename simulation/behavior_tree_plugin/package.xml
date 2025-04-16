@@ -11,10 +11,10 @@
 
   <depend>behaviortree_cpp_v3</depend>
   <depend>geometry</depend>
+  <depend>get_parameter</depend>
   <depend>pluginlib</depend>
   <depend>rclcpp</depend>
   <depend>traffic_simulator</depend>
-  <depend>get_parameter</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_cmake_clang_format</test_depend>

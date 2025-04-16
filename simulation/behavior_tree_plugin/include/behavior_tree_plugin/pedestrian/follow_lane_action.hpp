@@ -32,7 +32,6 @@ namespace entity_behavior
 {
 namespace pedestrian
 {
-enum class DetectorStatus { detected, not_detected };
 enum class SeeAroundMode { ignore, respect };
 
 class FollowLaneAction : public entity_behavior::PedestrianActionNode
@@ -45,8 +44,7 @@ public:
   {
     return entity_behavior::PedestrianActionNode::providedPorts();
   }
-  DetectorStatus detectObstacleInLane(
-    const lanelet::Ids & pedestrian_lanes, const bool & see_around) const;
+  bool detectObstacleInLane(const lanelet::Ids pedestrian_lanes, const bool see_around) const;
 
 private:
   SeeAroundMode should_respect_see_around;
