@@ -53,6 +53,7 @@ struct LegacyAutowareState
 #if __has_include(<autoware_system_msgs/msg/autoware_state.hpp>)
   explicit LegacyAutowareState(const autoware_system_msgs::msg::AutowareState & autoware_state)
   : value([&]() {
+      std::cout << "LegacyAutowareState(OLD): " << autoware_state.state << std::endl;
       switch (autoware_state.state) {
         case autoware_system_msgs::msg::AutowareState::INITIALIZING:
           return initializing;
@@ -83,6 +84,8 @@ struct LegacyAutowareState
     const autoware_adapi_v1_msgs::msg::OperationModeState & operation_mode_state,
     const rclcpp::Time & now)
   : value([&]() {
+      std::cout << "LegacyAutowareState(NEW): " << localization_state.state << ", "
+                << route_state.state << ", " << static_cast<int>(operation_mode_state.mode);
       /*
          See
          - https://github.com/autowarefoundation/autoware.universe/blob/e60daf7d1c85208eaac083b90c181e224c2ac513/system/autoware_default_adapi/document/autoware-state.md
@@ -92,33 +95,39 @@ struct LegacyAutowareState
         case autoware_adapi_v1_msgs::msg::LocalizationInitializationState::UNKNOWN:
         case autoware_adapi_v1_msgs::msg::LocalizationInitializationState::UNINITIALIZED:
         case autoware_adapi_v1_msgs::msg::LocalizationInitializationState::INITIALIZING:
+          std::cout << " (initializing) " << std::endl;
           return initializing;
 
         case autoware_adapi_v1_msgs::msg::LocalizationInitializationState::INITIALIZED:
           switch (route_state.state) {
             case autoware_adapi_v1_msgs::msg::RouteState::UNKNOWN:
+              std::cout << " (initializing) " << std::endl;
               return initializing;
 
             case autoware_adapi_v1_msgs::msg::RouteState::ARRIVED:
               if (const auto duration = now - rclcpp::Time(route_state.stamp);
                   duration.seconds() < 2.0) {
+                std::cout << " (arrived_goal) " << std::endl;
                 return arrived_goal;
               }
               [[fallthrough]];
 
             case autoware_adapi_v1_msgs::msg::RouteState::UNSET:
+              std::cout << " (waiting_for_route) " << std::endl;
               return waiting_for_route;
 
             case autoware_adapi_v1_msgs::msg::RouteState::SET:
             case autoware_adapi_v1_msgs::msg::RouteState::CHANGING:
               switch (operation_mode_state.mode) {
                 case autoware_adapi_v1_msgs::msg::OperationModeState::UNKNOWN:
+                  std::cout << " (initializing) " << std::endl;
                   return initializing;
 
                 case autoware_adapi_v1_msgs::msg::OperationModeState::AUTONOMOUS:
                 case autoware_adapi_v1_msgs::msg::OperationModeState::LOCAL:
                 case autoware_adapi_v1_msgs::msg::OperationModeState::REMOTE:
                   if (operation_mode_state.is_autoware_control_enabled) {
+                    std::cout << " (driving) " << std::endl;
                     return driving;
                   }
                   [[fallthrough]];
@@ -128,14 +137,17 @@ struct LegacyAutowareState
                                                                            : planning;
 
                 default:
+                  std::cout << " (undefined) " << std::endl;
                   return undefined;
               }
 
             default:
+              std::cout << " (undefined) " << std::endl;
               return undefined;
           }
 
         default:
+          std::cout << " (undefined) " << std::endl;
           return undefined;
       }
     }())
