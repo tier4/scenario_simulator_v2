@@ -91,6 +91,10 @@ struct LegacyAutowareState
          - https://github.com/autowarefoundation/autoware.universe/blob/e60daf7d1c85208eaac083b90c181e224c2ac513/system/autoware_default_adapi/document/autoware-state.md
          - https://github.com/autowarefoundation/autoware_universe/blob/e60daf7d1c85208eaac083b90c181e224c2ac513/system/autoware_default_adapi/src/compatibility/autoware_state.cpp#L80-L141
       */
+      if (operation_mode_state.mode == autoware_adapi_v1_msgs::msg::OperationModeState::UNKNOWN ) {
+        std::cout << " (initializing) " << std::endl;
+        return initializing;
+      }
       switch (localization_state.state) {
         case autoware_adapi_v1_msgs::msg::LocalizationInitializationState::UNKNOWN:
         case autoware_adapi_v1_msgs::msg::LocalizationInitializationState::UNINITIALIZED:
