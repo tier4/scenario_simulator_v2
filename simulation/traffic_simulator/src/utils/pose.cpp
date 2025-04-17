@@ -61,10 +61,9 @@ auto canonicalize(const LaneletPose & lanelet_pose) -> LaneletPose
       lanelet_wrapper::pose::canonicalizeLaneletPose(lanelet_pose))) {
     return canonicalized.value();
   } else {
-    THROW_SEMANTIC_ERROR(
-      "Lanelet pose (id=", lanelet_pose.lanelet_id, ",s=", lanelet_pose.s,
-      ",offset=", lanelet_pose.offset, ",rpy.x=", lanelet_pose.rpy.x, ",rpy.y=", lanelet_pose.rpy.y,
-      ",rpy.z=", lanelet_pose.rpy.z, ") is invalid, please check lanelet length and connection.");
+    std::ostringstream oss;
+    oss << lanelet_pose;
+    THROW_SEMANTIC_ERROR(oss.str(), " is invalid, please check lanelet length and connection.");
   }
 }
 
@@ -76,11 +75,10 @@ auto canonicalize(const LaneletPose & lanelet_pose, const lanelet::Ids & route_l
       lanelet_wrapper::pose::canonicalizeLaneletPose(lanelet_pose, route_lanelets))) {
     return canonicalized.value();
   } else {
+    std::ostringstream oss;
+    oss << lanelet_pose;
     THROW_SEMANTIC_ERROR(
-      "Lanelet pose (id=", lanelet_pose.lanelet_id, ",s=", lanelet_pose.s,
-      ",offset=", lanelet_pose.offset, ",rpy.x=", lanelet_pose.rpy.x, ",rpy.y=", lanelet_pose.rpy.y,
-      ",rpy.z=", lanelet_pose.rpy.z,
-      ") is invalid, please check lanelet length, connection and entity route.");
+      oss.str(), " is invalid, please check lanelet length, connection and entity route.");
   }
 }
 
