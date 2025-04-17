@@ -43,19 +43,20 @@ class SimulatorCore
   static inline std::unique_ptr<traffic_simulator::API> core = nullptr;
 
 public:
-  template <typename Node, typename... Ts>
+  template <typename NodeType>
   static auto activate(
-    const Node & node, const traffic_simulator::Configuration & configuration, Ts &&... xs) -> void
+    const NodeType & node, const traffic_simulator::Configuration & configuration,
+    const double realtime_factor, const double frame_rate) -> void
   {
     if (not active()) {
-      core = std::make_unique<traffic_simulator::API>(
-        node, configuration, std::forward<decltype(xs)>(xs)...);
+      core =
+        std::make_unique<traffic_simulator::API>(node, configuration, realtime_factor, frame_rate);
     } else {
       throw Error("The simulator core has already been instantiated.");
     }
   }
 
-  static auto active() { return static_cast<bool>(core); }
+  static auto active() -> bool { return static_cast<bool>(core); }
 
   static auto deactivate() -> void
   {
@@ -297,10 +298,12 @@ public:
       return core->getEntity(entity_ref).requestAcquirePosition(std::forward<decltype(xs)>(xs)...);
     }
 
-    template <typename... Ts>
-    static auto applyAddEntityAction(Ts &&... xs) -> decltype(auto)
+    template <typename PoseType, typename ParamsType>
+    static auto applyAddEntityAction(
+      const std::string & entity_name, const PoseType & pose, const ParamsType & parameters,
+      const std::string & behavior, const std::string & model3d) -> void
     {
-      return core->spawn(std::forward<decltype(xs)>(xs)...);
+      core->spawn(entity_name, pose, parameters, behavior, model3d);
     }
 
     template <typename EntityRef, typename DynamicConstraints>
@@ -580,11 +583,10 @@ public:
       return Eigen::Vector3d(Double::nan(), Double::nan(), Double::nan());
     }
 
-    template <typename... Ts>
-    static auto evaluateSimulationTime(Ts &&... xs) -> double
+    static auto evaluateSimulationTime() -> double
     {
       if (SimulatorCore::active()) {
-        return core->getCurrentTime(std::forward<decltype(xs)>(xs)...);
+        return core->getCurrentTime();
       } else {
         return std::numeric_limits<double>::quiet_NaN();
       }
@@ -699,15 +701,14 @@ public:
       return core->getEgoEntity(ego_ref).isEngaged();
     }
 
-    template <typename... Ts>
-    static auto sendCooperateCommand(Ts &&... xs) -> decltype(auto)
+    static auto sendCooperateCommand(const std::string & module_name, const std::string & command)
+      -> void
     {
       /// @note here ego name is not passed from OpenScenarioInterpreter, it uses first found
       if (const auto ego_name = core->getFirstEgoName()) {
-        return core->getEgoEntity(ego_name.value())
-          .sendCooperateCommand(std::forward<decltype(xs)>(xs)...);
+        core->getEgoEntity(ego_name.value()).sendCooperateCommand(module_name, command);
       } else {
-        throw common::Error("No ego entity exists.");
+        throw Error("EgoEntity does not exist");
       }
     }
 
@@ -732,50 +733,44 @@ public:
     }
 
     // TrafficLights - Conventional and V2I
-    template <typename... Ts>
-    static auto setConventionalTrafficLightsState(Ts &&... xs) -> decltype(auto)
+    static auto setConventionalTrafficLightsState(
+      const lanelet::Id lanelet_id, const std::string & state) -> void
     {
-      return core->getConventionalTrafficLights()->setTrafficLightsState(
-        std::forward<decltype(xs)>(xs)...);
+      core->getConventionalTrafficLights()->setTrafficLightsState(lanelet_id, state);
     }
 
-    template <typename... Ts>
-    static auto setConventionalTrafficLightConfidence(Ts &&... xs) -> decltype(auto)
+    static auto setConventionalTrafficLightConfidence(
+      const lanelet::Id lanelet_id, const double confidence) -> void
     {
-      return core->getConventionalTrafficLights()->setTrafficLightsConfidence(
-        std::forward<decltype(xs)>(xs)...);
+      core->getConventionalTrafficLights()->setTrafficLightsConfidence(lanelet_id, confidence);
     }
 
-    template <typename... Ts>
-    static auto getConventionalTrafficLightsComposedState(Ts &&... xs) -> decltype(auto)
+    static auto getConventionalTrafficLightsComposedState(const lanelet::Id lanelet_id)
+      -> std::string
     {
-      return core->getConventionalTrafficLights()->getTrafficLightsComposedState(
-        std::forward<decltype(xs)>(xs)...);
+      return core->getConventionalTrafficLights()->getTrafficLightsComposedState(lanelet_id);
     }
 
-    template <typename... Ts>
-    static auto compareConventionalTrafficLightsState(Ts &&... xs) -> decltype(auto)
+    static auto compareConventionalTrafficLightsState(
+      const lanelet::Id lanelet_id, const std::string & states) -> bool
     {
-      return core->getConventionalTrafficLights()->compareTrafficLightsState(
-        std::forward<decltype(xs)>(xs)...);
+      return core->getConventionalTrafficLights()->compareTrafficLightsState(lanelet_id, states);
     }
 
-    template <typename... Ts>
-    static auto resetConventionalTrafficLightPublishRate(Ts &&... xs) -> decltype(auto)
+    static auto resetConventionalTrafficLightPublishRate(const double update_rate) -> void
     {
-      return core->getConventionalTrafficLights()->resetUpdate(std::forward<decltype(xs)>(xs)...);
+      core->getConventionalTrafficLights()->resetUpdate(update_rate);
     }
 
-    template <typename... Ts>
-    static auto setV2ITrafficLightsState(Ts &&... xs) -> decltype(auto)
+    static auto setV2ITrafficLightsState(const lanelet::Id lanelet_id, const std::string & state)
+      -> void
     {
-      return core->getV2ITrafficLights()->setTrafficLightsState(std::forward<decltype(xs)>(xs)...);
+      core->getV2ITrafficLights()->setTrafficLightsState(lanelet_id, state);
     }
 
-    template <typename... Ts>
-    static auto resetV2ITrafficLightPublishRate(Ts &&... xs) -> decltype(auto)
+    static auto resetV2ITrafficLightPublishRate(const double update_rate) -> void
     {
-      return core->getV2ITrafficLights()->resetUpdate(std::forward<decltype(xs)>(xs)...);
+      core->getV2ITrafficLights()->resetUpdate(update_rate);
     }
   };
 };
