@@ -32,6 +32,52 @@ Changelog for package openscenario_interpreter
 * add publish_empty_context parameter
 * Contributors: Masaya Kataoka
 
+16.0.0 (2025-04-17)
+-------------------
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge remote-tracking branch 'tier4/master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge remote-tracking branch 'tier4/master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge remote-tracking branch 'tier4/master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge remote-tracking branch 'tier4/RJD-1057-remove-functions-forwarded-to-entity-base-refactor' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Make `SimulatorCore::ActionApplication::applyAddEntityAction` deduce return type is reference
+* Merge remote-tracking branch 'tier4/master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge remote-tracking branch 'tier4/RJD-1057-remove-functions-forwarded-to-entity-base-middle' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'RJD-1057-remove-functions-forwarded-to-entity-base-middle' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge remote-tracking branch 'tier4/RJD-1057-remove-functions-forwarded-to-entity-base-middle' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'RJD-1057-remove-functions-forwarded-to-entity-base-middle' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'RJD-1057-remove-functions-forwarded-to-entity-base-middle' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'RJD-1057-remove-functions-forwarded-to-entity-base-middle' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'RJD-1057-remove-functions-forwarded-to-entity-base-middle' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge remote-tracking branch 'origin/RJD-1057-remove-functions-forwarded-to-entity-base-middle' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'RJD-1057-remove-functions-forwarded-to-entity-base-middle' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Fix applyTeleportAction to correctly use templated function
+* Merge branch 'RJD-1057-remove-traffic-lights-from-entity-manager' into RJD-1057-remove-functions-forwarded-to-entity-base
+* Merge branch 'RJD-1057-remove-traffic-lights-from-entity-manager' into RJD-1057-remove-functions-forwarded-to-entity-base
+* Contributors: Dawid Moszynski, Dawid Moszyński, Kotaro Yoshimoto, Masaya Kataoka, Mateusz Palczuk
+
 15.1.3 (2025-04-16)
 -------------------
 * Merge pull request `#1574 <https://github.com/tier4/scenario_simulator_v2/issues/1574>`_ from tier4/fix/concealer/engage
