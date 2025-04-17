@@ -44,7 +44,7 @@ RelativeObjectPosition::operator geometry_msgs::msg::Point() const
 
 RelativeObjectPosition::operator NativeLanePosition() const
 {
-  return convert<NativeLanePosition>(static_cast<NativeWorldPosition>(*this));
+  return convertToNativeLanePosition(static_cast<NativeWorldPosition>(*this));
 }
 
 RelativeObjectPosition::operator NativeWorldPosition() const

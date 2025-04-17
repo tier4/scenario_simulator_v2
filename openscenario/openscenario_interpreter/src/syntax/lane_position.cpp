@@ -51,7 +51,7 @@ LanePosition::operator NativeLanePosition() const
 
 LanePosition::operator NativeWorldPosition() const
 {
-  return convert<NativeWorldPosition>(static_cast<NativeLanePosition>(*this));
+  return convertToNativeWorldPosition(static_cast<NativeLanePosition>(*this));
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

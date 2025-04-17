@@ -77,8 +77,7 @@ public:
       return NativeLanePosition(non_canonicalized);
     }
 
-    template <typename T, typename std::enable_if_t<std::is_same_v<T, NativeLanePosition>, int> = 0>
-    static auto convert(const NativeWorldPosition & pose) -> NativeLanePosition
+    static auto convertToNativeLanePosition(const NativeWorldPosition & pose) -> NativeLanePosition
     {
       constexpr bool include_crosswalk{false};
       if (
@@ -98,11 +97,10 @@ public:
       }
     }
 
-    template <
-      typename T, typename std::enable_if_t<std::is_same_v<T, NativeWorldPosition>, int> = 0>
-    static auto convert(const NativeLanePosition & native_lane_position) -> NativeWorldPosition
+    static auto convertToNativeWorldPosition(const NativeLanePosition & lanelet_pose)
+      -> NativeWorldPosition
     {
-      return traffic_simulator::pose::toMapPose(native_lane_position);
+      return traffic_simulator::pose::toMapPose(lanelet_pose);
     }
 
     static auto makeNativeRelativeWorldPosition(
