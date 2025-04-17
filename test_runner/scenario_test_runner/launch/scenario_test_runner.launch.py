@@ -85,7 +85,7 @@ def launch_setup(context, *args, **kwargs):
     output_directory                    = LaunchConfiguration("output_directory",                       default=Path("/tmp"))
     override_parameters                 = LaunchConfiguration("override_parameters",                    default="")
     parameter_file_path                 = LaunchConfiguration("parameter_file_path",                    default=Path(get_package_share_directory("scenario_test_runner")) / "config/parameters.yaml")
-    pedestrian_ignore_see_around        = LaunchConfiguration("pedestrian_ignore_see_around",           default="ignore")
+    pedestrian_ignore_see_around        = LaunchConfiguration("pedestrian_ignore_see_around",           default="blind")
     port                                = LaunchConfiguration("port",                                   default=5555)
     publish_empty_context               = LaunchConfiguration("publish_empty_context",                  default=False)
     record                              = LaunchConfiguration("record",                                 default=True)

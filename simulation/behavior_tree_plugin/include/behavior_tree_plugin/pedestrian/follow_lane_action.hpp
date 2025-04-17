@@ -32,7 +32,7 @@ namespace entity_behavior
 {
 namespace pedestrian
 {
-enum class SeeAroundMode { ignore, respect };
+enum class SeeAroundMode { blind, aware };
 
 class FollowLaneAction : public entity_behavior::PedestrianActionNode
 {
