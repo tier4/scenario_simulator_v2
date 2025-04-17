@@ -516,7 +516,14 @@ auto FieldOperatorApplication::setVelocityLimit(double velocity_limit) -> void
 
 auto FieldOperatorApplication::getLegacyAutowareState() const -> LegacyAutowareState
 {
+#if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>) and \
+    __has_include(<autoware_adapi_v1_msgs/msg/route_state.hpp>) and \
+    __has_include(<autoware_adapi_v1_msgs/msg/operation_mode_state.hpp>)
+  return LegacyAutowareState(
+    getLocalizationState(), getRouteState(), getOperationModeState(), now());
+#else
   return LegacyAutowareState(getAutowareState());
+#endif
 }
 
 auto FieldOperatorApplication::spinSome() -> void
