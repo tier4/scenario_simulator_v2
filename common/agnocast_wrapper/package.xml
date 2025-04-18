@@ -11,8 +11,7 @@
   <buildtool_depend>ament_cmake_auto</buildtool_depend>
 
   <depend>rclcpp</depend>
-  <depend>agnocastlib</depend>
-
+  <!-- <depend>agnocastlib</depend> agnocastlib is an optional dependency only required when USE_AGNOCAST_ENABLED is defined, therefore must be ignored here -->
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
 

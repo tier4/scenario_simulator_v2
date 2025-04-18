@@ -10,8 +10,14 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-# find dependencies
 find_package(ament_cmake_auto REQUIRED)
+
+if(DEFINED ENV{ENABLE_AGNOCAST_SIMULATOR} AND "$ENV{ENABLE_AGNOCAST_SIMULATOR}" STREQUAL "1")
+  message(WARNING "Building with agnocastlib dependency")
+  find_package(agnocastlib REQUIRED)
+else()
+  message(WARNING "Building without agnocastlib dependency")
+endif()
 
 ament_auto_find_build_dependencies()
 
@@ -20,6 +26,4 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
-ament_auto_package(
-  CONFIG_EXTRAS "cmake/agnocast_wrapper_setup_target.cmake"
-)
+ament_auto_package(CONFIG_EXTRAS "cmake/agnocast_wrapper_setup_target.cmake")
