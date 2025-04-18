@@ -32,6 +32,20 @@ Changelog for package openscenario_interpreter
 * add publish_empty_context parameter
 * Contributors: Masaya Kataoka
 
+16.1.1 (2025-04-18)
+-------------------
+* Merge pull request `#1580 <https://github.com/tier4/scenario_simulator_v2/issues/1580>`_ from tier4/fix/magic_subscription_data_race
+* Merge branch 'master' into fix/magic_subscription_data_race
+* fix(openscenario_interpreter) : Clarify mutex usage and add comments
+  - Clarified mutex naming and comments for exception_mutex and message_mutex.
+  - Improved consistency of get() return type and removed redundant const.
+  - Ensured rethrow() is thread-safe and accurately documented.
+* Merge branch 'master' into fix/magic_subscription_data_race
+* Merge branch 'master' into fix/magic_subscription_data_race
+* ref(OpenscenarioInterpreter) Fix issue with formating
+* fix(openscenario_interpreter): Prevent data race in callback and get()
+* Contributors: Kotaro Yoshimoto, SzymonParapura
+
 16.1.0 (2025-04-18)
 -------------------
 * Merge pull request `#1566 <https://github.com/tier4/scenario_simulator_v2/issues/1566>`_ from tier4/feature/pedestrian_awareness
