@@ -145,11 +145,11 @@ FieldOperatorApplication::FieldOperatorApplication(const pid_t pid)
     minimum_risk_maneuver_behavior = behavior_name_of(message.behavior);
   }),
 #if __has_include(<autoware_adapi_v1_msgs/msg/operation_mode_state.hpp>)
-  getOperationModeState("/api/operation_mode/state", rclcpp::QoS(1), *this),
+  getOperationModeState("/api/operation_mode/state", rclcpp::QoS(1).transient_local(), *this),
 #endif
   getPathWithLaneId("/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", rclcpp::QoS(1), *this),
 #if __has_include(<autoware_adapi_v1_msgs/msg/route_state.hpp>)
-  getRouteState("/api/routing/state", rclcpp::QoS(1), *this),
+  getRouteState("/api/routing/state", rclcpp::QoS(1).transient_local(), *this),
 #endif
   getTurnIndicatorsCommand("/control/command/turn_indicators_cmd", rclcpp::QoS(1), *this),
   requestClearRoute("/api/routing/clear_route", *this),
