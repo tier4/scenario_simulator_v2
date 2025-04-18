@@ -11,6 +11,7 @@
 
   <depend>behaviortree_cpp_v3</depend>
   <depend>geometry</depend>
+  <depend>get_parameter</depend>
   <depend>pluginlib</depend>
   <depend>rclcpp</depend>
   <depend>traffic_simulator</depend>
