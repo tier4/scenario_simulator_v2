@@ -32,6 +32,23 @@ Changelog for package openscenario_interpreter
 * add publish_empty_context parameter
 * Contributors: Masaya Kataoka
 
+16.1.0 (2025-04-18)
+-------------------
+* Merge pull request `#1566 <https://github.com/tier4/scenario_simulator_v2/issues/1566>`_ from tier4/feature/pedestrian_awareness
+  Feature/pedestrian awareness
+* Merge branch 'master' into feature/pedestrian_awareness
+* Merge branch 'master' into feature/pedestrian_awareness
+* Improved parameter retrieval method.
+* Merge branch 'master' into feature/pedestrian_awareness
+* Merge branch 'master' into feature/pedestrian_awareness
+* Merge branch 'master' into feature/pedestrian_awareness
+* Fix sonor cloud issue
+* Fixed a bug caused by incorrect conditional branching
+* Improved the propagation method of the compatibility option.
+* Fixed a bug where the isBlind parameter could not be read.
+* Added pedestrian_behavior_mode to allow selection between legacy and standard modes.
+* Contributors: Masaya Kataoka, Taiga, Taiga Takano
+
 16.0.0 (2025-04-17)
 -------------------
 * Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
