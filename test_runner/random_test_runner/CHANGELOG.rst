@@ -21,6 +21,28 @@ Changelog for package random_test_runner
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+16.1.2 (2025-04-18)
+-------------------
+* Merge branch 'master' into docs/fix_architecture_type
+* Merge branch 'master' into docs/fix_architecture_type
+* Merge branch 'master' into docs/fix_architecture_type
+* Contributors: Dawid Moszyński, Masaya Kataoka
+
+16.1.1 (2025-04-18)
+-------------------
+* Merge branch 'master' into fix/magic_subscription_data_race
+* Merge branch 'master' into fix/magic_subscription_data_race
+* Contributors: Kotaro Yoshimoto, SzymonParapura
+
+16.1.0 (2025-04-18)
+-------------------
+* Merge branch 'master' into feature/pedestrian_awareness
+* Merge branch 'master' into feature/pedestrian_awareness
+* Merge branch 'master' into feature/pedestrian_awareness
+* Merge branch 'master' into feature/pedestrian_awareness
+* Merge branch 'master' into feature/pedestrian_awareness
+* Contributors: Masaya Kataoka, Taiga
+
 16.0.0 (2025-04-17)
 -------------------
 * Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
