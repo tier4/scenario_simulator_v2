@@ -206,6 +206,8 @@ public:
     -> bool;
 
   // ego - checks, getters
+  auto isAnyEgoSpawned() const -> bool;
+
   auto getFirstEgoName() const -> std::optional<std::string>;
 
   auto getEgoEntity(const std::string & name) -> entity::EgoEntity &;
