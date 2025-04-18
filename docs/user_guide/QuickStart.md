@@ -69,7 +69,7 @@ This guide provides step-by-step instructions for building and running **Scenari
 #### scenario_test_runner
    ```bash
    ros2 launch scenario_test_runner scenario_test_runner.launch.py \
-   architecture_type:=awf/universe/20230906 \
+   architecture_type:=awf/universe/20250130 \
    record:=false \
    scenario:='$(find-pkg-share scenario_test_runner)/scenario/sample.yaml' \
    sensor_model:=sample_sensor_kit \
@@ -84,7 +84,7 @@ This guide provides step-by-step instructions for building and running **Scenari
 #### random_test_runner
    ```bash
    ros2 launch random_test_runner random_test.launch.py \
-   architecture_type:=awf/universe/20230906 \
+   architecture_type:=awf/universe/20250130 \
    sensor_model:=sample_sensor_kit \
    vehicle_model:=sample_vehicle timeout:=120.0
    ``` 
