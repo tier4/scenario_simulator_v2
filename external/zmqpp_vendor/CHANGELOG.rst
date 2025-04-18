@@ -15,6 +15,19 @@ Changelog for package zmqpp_vendor
 * Add missing buildtool_depend on git
 * Contributors: Masaya Kataoka, MasayaKataoka, Scott K Logan
 
+16.1.0 (2025-04-18)
+-------------------
+* Merge branch 'master' into feature/pedestrian_awareness
+* Merge branch 'master' into feature/pedestrian_awareness
+* Contributors: Masaya Kataoka, Taiga
+
+16.0.0 (2025-04-17)
+-------------------
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Contributors: Masaya Kataoka
+
 15.1.3 (2025-04-16)
 -------------------
 * Merge branch 'master' into fix/concealer/engage
