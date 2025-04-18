@@ -70,7 +70,7 @@ target_link_libraries(simple_sensor_simulator_component
   sodium
   zmq
 )
-ament_target_dependencies(simple_sensor_simulator_component 
+ament_target_dependencies(simple_sensor_simulator_component
   agnocast_wrapper
   simulation_interface
 )
