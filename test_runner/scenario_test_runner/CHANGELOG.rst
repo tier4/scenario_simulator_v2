@@ -35,6 +35,28 @@ Changelog for package scenario_test_runner
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+16.1.1 (2025-04-18)
+-------------------
+* Merge branch 'master' into fix/magic_subscription_data_race
+* Merge branch 'master' into fix/magic_subscription_data_race
+* Contributors: Kotaro Yoshimoto, SzymonParapura
+
+16.1.0 (2025-04-18)
+-------------------
+* Merge pull request `#1566 <https://github.com/tier4/scenario_simulator_v2/issues/1566>`_ from tier4/feature/pedestrian_awareness
+  Feature/pedestrian awareness
+* Merge branch 'master' into feature/pedestrian_awareness
+* Rename member variable: SeeAroundMode
+* Merge branch 'master' into feature/pedestrian_awareness
+* Formatted the launch file.
+* Renamed the parameter to `pedestrian_ignore_see_around`.
+* Improved parameter retrieval method.
+* Merge branch 'master' into feature/pedestrian_awareness
+* Merge branch 'master' into feature/pedestrian_awareness
+* Merge branch 'master' into feature/pedestrian_awareness
+* Added pedestrian_behavior_mode to allow selection between legacy and standard modes.
+* Contributors: Masaya Kataoka, Taiga, Taiga Takano
+
 16.0.0 (2025-04-17)
 -------------------
 * Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
