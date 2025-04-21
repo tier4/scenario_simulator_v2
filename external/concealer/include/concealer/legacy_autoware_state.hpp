@@ -91,68 +91,71 @@ struct LegacyAutowareState
          - https://github.com/autowarefoundation/autoware.universe/blob/e60daf7d1c85208eaac083b90c181e224c2ac513/system/autoware_default_adapi/document/autoware-state.md
          - https://github.com/autowarefoundation/autoware_universe/blob/e60daf7d1c85208eaac083b90c181e224c2ac513/system/autoware_default_adapi/src/compatibility/autoware_state.cpp#L80-L141
       */
-      if (operation_mode_state.mode == autoware_adapi_v1_msgs::msg::OperationModeState::UNKNOWN ) {
+      if (
+        localization_state.state ==
+          autoware_adapi_v1_msgs::msg::LocalizationInitializationState::UNKNOWN or
+        route_state.state == autoware_adapi_v1_msgs::msg::RouteState::UNKNOWN or
+        operation_mode_state.mode == autoware_adapi_v1_msgs::msg::OperationModeState::UNKNOWN) {
         std::cout << " (initializing) " << std::endl;
         return initializing;
-      }
-      switch (localization_state.state) {
-        case autoware_adapi_v1_msgs::msg::LocalizationInitializationState::UNKNOWN:
-        case autoware_adapi_v1_msgs::msg::LocalizationInitializationState::UNINITIALIZED:
-        case autoware_adapi_v1_msgs::msg::LocalizationInitializationState::INITIALIZING:
-          std::cout << " (initializing) " << std::endl;
-          return initializing;
+      } else {
+        switch (localization_state.state) {
+          case autoware_adapi_v1_msgs::msg::LocalizationInitializationState::UNINITIALIZED:
+          case autoware_adapi_v1_msgs::msg::LocalizationInitializationState::INITIALIZING:
+            std::cout << " (initializing) " << std::endl;
+            return initializing;
 
-        case autoware_adapi_v1_msgs::msg::LocalizationInitializationState::INITIALIZED:
-          switch (route_state.state) {
-            case autoware_adapi_v1_msgs::msg::RouteState::UNKNOWN:
-              std::cout << " (initializing) " << std::endl;
-              return initializing;
+          case autoware_adapi_v1_msgs::msg::LocalizationInitializationState::INITIALIZED:
+            switch (route_state.state) {
+              case autoware_adapi_v1_msgs::msg::RouteState::ARRIVED:
+                if (const auto duration = now - rclcpp::Time(route_state.stamp);
+                    duration.seconds() < 2.0) {
+                  std::cout << " (arrived_goal) " << std::endl;
+                  return arrived_goal;
+                }
+                [[fallthrough]];
 
-            case autoware_adapi_v1_msgs::msg::RouteState::ARRIVED:
-              if (const auto duration = now - rclcpp::Time(route_state.stamp);
-                  duration.seconds() < 2.0) {
-                std::cout << " (arrived_goal) " << std::endl;
-                return arrived_goal;
-              }
-              [[fallthrough]];
+              case autoware_adapi_v1_msgs::msg::RouteState::UNSET:
+                std::cout << " (waiting_for_route) " << std::endl;
+                return waiting_for_route;
 
-            case autoware_adapi_v1_msgs::msg::RouteState::UNSET:
-              std::cout << " (waiting_for_route) " << std::endl;
-              return waiting_for_route;
+              case autoware_adapi_v1_msgs::msg::RouteState::SET:
+              case autoware_adapi_v1_msgs::msg::RouteState::CHANGING:
+                switch (operation_mode_state.mode) {
+                  case autoware_adapi_v1_msgs::msg::OperationModeState::AUTONOMOUS:
+                  case autoware_adapi_v1_msgs::msg::OperationModeState::LOCAL:
+                  case autoware_adapi_v1_msgs::msg::OperationModeState::REMOTE:
+                    if (operation_mode_state.is_autoware_control_enabled) {
+                      std::cout << " (driving) " << std::endl;
+                      return driving;
+                    }
+                    [[fallthrough]];
 
-            case autoware_adapi_v1_msgs::msg::RouteState::SET:
-            case autoware_adapi_v1_msgs::msg::RouteState::CHANGING:
-              switch (operation_mode_state.mode) {
-                case autoware_adapi_v1_msgs::msg::OperationModeState::UNKNOWN:
-                  std::cout << " (initializing) " << std::endl;
-                  return initializing;
+                  case autoware_adapi_v1_msgs::msg::OperationModeState::STOP:
+                    return [&](){
+                      if( operation_mode_state.is_autonomous_mode_available ) {
+                        std::cout << " (waiting_for_engage) " << std::endl;
+                        return waiting_for_engage;
+                      } else {
+                        std::cout << " (planning) " << std::endl;
+                        retun planning;
+                      }
+                    }();
+                    
+                  default:
+                    std::cout << " (undefined) " << std::endl;
+                    return undefined;
+                }
 
-                case autoware_adapi_v1_msgs::msg::OperationModeState::AUTONOMOUS:
-                case autoware_adapi_v1_msgs::msg::OperationModeState::LOCAL:
-                case autoware_adapi_v1_msgs::msg::OperationModeState::REMOTE:
-                  if (operation_mode_state.is_autoware_control_enabled) {
-                    std::cout << " (driving) " << std::endl;
-                    return driving;
-                  }
-                  [[fallthrough]];
+              default:
+                std::cout << " (undefined) " << std::endl;
+                return undefined;
+            }
 
-                case autoware_adapi_v1_msgs::msg::OperationModeState::STOP:
-                  return operation_mode_state.is_autonomous_mode_available ? waiting_for_engage
-                                                                           : planning;
-
-                default:
-                  std::cout << " (undefined) " << std::endl;
-                  return undefined;
-              }
-
-            default:
-              std::cout << " (undefined) " << std::endl;
-              return undefined;
-          }
-
-        default:
-          std::cout << " (undefined) " << std::endl;
-          return undefined;
+          default:
+            std::cout << " (undefined) " << std::endl;
+            return undefined;
+        }
       }
     }())
   {
