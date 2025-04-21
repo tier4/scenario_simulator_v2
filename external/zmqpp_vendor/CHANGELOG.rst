@@ -15,6 +15,13 @@ Changelog for package zmqpp_vendor
 * Add missing buildtool_depend on git
 * Contributors: Masaya Kataoka, MasayaKataoka, Scott K Logan
 
+16.1.3 (2025-04-21)
+-------------------
+* Merge branch 'master' into fix/concealer-7
+* Merge branch 'master' into fix/concealer-7
+* Merge branch 'master' into fix/concealer-7
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
 16.1.2 (2025-04-18)
 -------------------
 * Merge branch 'master' into docs/fix_architecture_type
