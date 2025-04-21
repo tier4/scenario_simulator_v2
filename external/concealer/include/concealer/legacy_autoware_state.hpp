@@ -132,16 +132,16 @@ struct LegacyAutowareState
                     [[fallthrough]];
 
                   case autoware_adapi_v1_msgs::msg::OperationModeState::STOP:
-                    return [&](){
-                      if( operation_mode_state.is_autonomous_mode_available ) {
+                    return [&]() {
+                      if (operation_mode_state.is_autonomous_mode_available) {
                         std::cout << " (waiting_for_engage) " << std::endl;
                         return waiting_for_engage;
                       } else {
                         std::cout << " (planning) " << std::endl;
-                        retun planning;
+                        return planning;
                       }
                     }();
-                    
+
                   default:
                     std::cout << " (undefined) " << std::endl;
                     return undefined;
