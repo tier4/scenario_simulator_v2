@@ -10,6 +10,114 @@ Changelog for package openscenario_validator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+16.1.3 (2025-04-21)
+-------------------
+* Merge branch 'master' into fix/concealer-7
+* Merge branch 'master' into fix/concealer-7
+* Merge branch 'master' into fix/concealer-7
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
+16.1.2 (2025-04-18)
+-------------------
+* Merge branch 'master' into docs/fix_architecture_type
+* Merge branch 'master' into docs/fix_architecture_type
+* Merge branch 'master' into docs/fix_architecture_type
+* Contributors: Dawid Moszyński, Masaya Kataoka
+
+16.1.1 (2025-04-18)
+-------------------
+* Merge branch 'master' into fix/magic_subscription_data_race
+* Merge branch 'master' into fix/magic_subscription_data_race
+* Contributors: Kotaro Yoshimoto, SzymonParapura
+
+16.1.0 (2025-04-18)
+-------------------
+* Merge branch 'master' into feature/pedestrian_awareness
+* Merge branch 'master' into feature/pedestrian_awareness
+* Merge branch 'master' into feature/pedestrian_awareness
+* Merge branch 'master' into feature/pedestrian_awareness
+* Merge branch 'master' into feature/pedestrian_awareness
+* Contributors: Masaya Kataoka, Taiga
+
+16.0.0 (2025-04-17)
+-------------------
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge remote-tracking branch 'tier4/master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge remote-tracking branch 'tier4/master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge remote-tracking branch 'tier4/master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge remote-tracking branch 'tier4/RJD-1057-remove-functions-forwarded-to-entity-base-refactor' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge remote-tracking branch 'tier4/master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge remote-tracking branch 'tier4/RJD-1057-remove-functions-forwarded-to-entity-base-middle' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'RJD-1057-remove-functions-forwarded-to-entity-base-middle' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge remote-tracking branch 'tier4/RJD-1057-remove-functions-forwarded-to-entity-base-middle' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'RJD-1057-remove-functions-forwarded-to-entity-base-middle' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'RJD-1057-remove-functions-forwarded-to-entity-base-middle' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'RJD-1057-remove-functions-forwarded-to-entity-base-middle' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge remote-tracking branch 'origin/RJD-1057-remove-functions-forwarded-to-entity-base-middle' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'RJD-1057-remove-functions-forwarded-to-entity-base-middle' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'RJD-1057-remove-traffic-lights-from-entity-manager' into RJD-1057-remove-functions-forwarded-to-entity-base
+* Merge branch 'RJD-1057-remove-traffic-lights-from-entity-manager' into RJD-1057-remove-functions-forwarded-to-entity-base
+* Contributors: Dawid Moszynski, Dawid Moszyński, Kotaro Yoshimoto, Masaya Kataoka, Mateusz Palczuk
+
+15.1.3 (2025-04-16)
+-------------------
+* Merge branch 'master' into fix/concealer/engage
+* Merge branch 'master' into fix/concealer/engage
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
+15.1.2 (2025-04-16)
+-------------------
+
+15.1.1 (2025-04-14)
+-------------------
+
+15.1.0 (2025-04-14)
+-------------------
+* Merge branch 'master' into feature/parameter_override
+* Merge branch 'master' into feature/parameter_override
+* Contributors: Kotaro Yoshimoto
+
+15.0.7 (2025-04-10)
+-------------------
+* Merge branch 'master' into fix/scenario_name
+* Merge branch 'master' into fix/scenario_name
+* Contributors: Masaya Kataoka
+
+15.0.6 (2025-04-09)
+-------------------
+
+15.0.5 (2025-04-04)
+-------------------
+* Merge branch 'master' into fix-turn-indicator-report
+* Merge branch 'master' into fix-turn-indicator-report
+* Contributors: Kem (TiankuiXian), Kotaro Yoshimoto
+
+15.0.4 (2025-04-03)
+-------------------
+
 15.0.3 (2025-04-03)
 -------------------
 * Merge branch 'master' into feature/remove-trajectory-subscription

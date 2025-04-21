@@ -139,6 +139,7 @@ try {
       }
 
       TeleportAction::teleport(entity_ref, position);
+      AssignControllerAction(entity.as<ScenarioObject>().object_controller)(entity_ref);
     },
     [&](const MiscObject & misc_object) {
       if (position.is<WorldPosition>()) {
