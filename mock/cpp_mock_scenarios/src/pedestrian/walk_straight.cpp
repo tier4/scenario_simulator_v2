@@ -29,7 +29,7 @@ class WalkStraightScenario : public cpp_mock_scenarios::CppScenarioNode
 public:
   explicit WalkStraightScenario(const rclcpp::NodeOptions & option)
   : cpp_mock_scenarios::CppScenarioNode(
-      "stop_at_crosswalk", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
+      "walk_straight", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
       "lanelet2_map.osm", __FILE__, false, option)
   {
     start();
@@ -69,19 +69,17 @@ private:
 
   void onInitialize() override
   {
-    api_.spawn(
+    auto & ego_entity = api_.spawn(
       "ego", traffic_simulator::helper::constructCanonicalizedLaneletPose(120545, 0.0, 0.0),
       getVehicleParameters());
-    auto & ego_entity = api_.getEntity("ego");
     ego_entity.setLinearVelocity(10);
     ego_entity.requestSpeedChange(8, true);
     ego_entity.requestAssignRoute(std::vector<traffic_simulator::CanonicalizedLaneletPose>{
       traffic_simulator::helper::constructCanonicalizedLaneletPose(34675, 0.0, 0.0),
       traffic_simulator::helper::constructCanonicalizedLaneletPose(34690, 0.0, 0.0)});
-    api_.spawn(
+    auto & bob_entity = api_.spawn(
       "bob", traffic_simulator::helper::constructCanonicalizedLaneletPose(34378, 0.0, 0.0),
       getPedestrianParameters());
-    auto & bob_entity = api_.getEntity("bob");
     bob_entity.setLinearVelocity(0);
     bob_entity.requestWalkStraight();
     bob_entity.requestSpeedChange(
