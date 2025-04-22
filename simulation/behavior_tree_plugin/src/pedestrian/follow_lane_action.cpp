@@ -106,9 +106,9 @@ BT::NodeStatus FollowLaneAction::tick()
     stopEntity();
     return BT::NodeStatus::RUNNING;
   }
+  const auto following_lanelets =
+    traffic_simulator::route::followingLanelets(canonicalized_entity_status->getLaneletId());
   if (!target_speed) {
-    const auto following_lanelets =
-      traffic_simulator::route::followingLanelets(canonicalized_entity_status->getLaneletId());
     target_speed = traffic_simulator::route::speedLimit(following_lanelets);
   }
 
