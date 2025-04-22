@@ -300,11 +300,11 @@ auto CatmullRomSpline::getCollisionPointsIn2D(
     const auto is_curve_in_range = [this, &s_range](
                                      const auto & curve, const auto & current_curve_start_s) {
       bool is_in_range{false};
-      // range starts after beggining of current curve or on current curve
+      // range starts after beginning of current curve or on current curve
       if (
         (current_curve_start_s >= s_range->first) ||
         (current_curve_start_s + curve.getLength()) > s_range->first) {
-        // beggining of current curve is before end of range
+        // beginning of current curve is before end of range
         if (current_curve_start_s <= s_range->second) {
           is_in_range = true;
         }
