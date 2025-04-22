@@ -21,6 +21,11 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <system_error>
 
+#define LINE() \
+  std::cout << "\x1b[33m" __FILE__ "\x1b[31m:\x1b[36m" << __LINE__ << "\x1b[0m" << std::endl
+
+#define PRINT(...) std::cout << #__VA_ARGS__ " = " << std::boolalpha << (__VA_ARGS__) << std::endl
+
 namespace concealer
 {
 template <typename T>
@@ -263,22 +268,34 @@ auto FieldOperatorApplication::enableAutowareControl() -> void
 auto FieldOperatorApplication::engage() -> void
 {
   task_queue.delay([this]() {
+    LINE();
+    PRINT(getLegacyAutowareState());
     switch (const auto state = getLegacyAutowareState(); state.value) {
       default:
+        LINE();
         throw common::AutowareError(
           "The simulator attempted to request Autoware to engage, but was aborted because "
           "Autoware's current state is ",
           state, ".");
-      case LegacyAutowareState::initializing:  // The initial pose has been sent but has not yet reached Autoware.
+      case LegacyAutowareState::initializing:
+        // The initial pose has been sent but has not yet reached Autoware.
+        LINE();
         waitForAutowareStateToBe(LegacyAutowareState::waiting_for_route);
+        LINE();
         [[fallthrough]];
-      case LegacyAutowareState::waiting_for_route:  // The route has been sent but has not yet reached Autoware.
+      case LegacyAutowareState::waiting_for_route:
+        // The route has been sent but has not yet reached Autoware.
+        LINE();
         waitForAutowareStateToBe(LegacyAutowareState::planning);
+        LINE();
         [[fallthrough]];
       case LegacyAutowareState::planning:
+        LINE();
         waitForAutowareStateToBe(LegacyAutowareState::waiting_for_engage);
+        LINE();
         [[fallthrough]];
       case LegacyAutowareState::waiting_for_engage:
+        LINE();
         requestEngage(
           [&]() {
             auto request = std::make_shared<Engage::Request>();
@@ -286,10 +303,13 @@ auto FieldOperatorApplication::engage() -> void
             return request;
           }(),
           30);
+        LINE();
         waitForAutowareStateToBe(LegacyAutowareState::driving);
+        LINE();
         time_limit = std::decay_t<decltype(time_limit)>::max();
         break;
       case LegacyAutowareState::driving:
+        LINE();
         break;
     }
   });
@@ -311,17 +331,23 @@ auto FieldOperatorApplication::engaged() const -> bool
 auto FieldOperatorApplication::initialize(const geometry_msgs::msg::Pose & initial_pose) -> void
 {
   if (not std::exchange(initialized, true)) {
+    LINE();
+    PRINT(getLegacyAutowareState());
     task_queue.delay([this, initial_pose]() {
       switch (const auto state = getLegacyAutowareState(); state.value) {
         default:
+          LINE();
           throw common::AutowareError(
             "The simulator attempted to initialize Autoware, but aborted because Autoware's "
             "current state is ",
             state, ".");
         case LegacyAutowareState::undefined:
+          LINE();
           waitForAutowareStateToBe(LegacyAutowareState::initializing);
+          LINE();
           [[fallthrough]];
         case LegacyAutowareState::initializing:
+          LINE();
           requestInitialPose(
             [&]() {
               auto request =
@@ -336,7 +362,9 @@ auto FieldOperatorApplication::initialize(const geometry_msgs::msg::Pose & initi
               return request;
             }(),
             30);
+          LINE();
           waitForAutowareStateToBe(LegacyAutowareState::waiting_for_route);
+          LINE();
           break;
       }
     });
@@ -349,17 +377,25 @@ auto FieldOperatorApplication::plan(const std::vector<geometry_msgs::msg::PoseSt
   assert(not route.empty());
 
   task_queue.delay([this, route] {
+    LINE();
+    PRINT(getLegacyAutowareState());
     switch (const auto state = getLegacyAutowareState(); state.value) {
       default:
+        LINE();
         throw common::AutowareError(
           "The simulator attempted to send a goal to Autoware, but was aborted because Autoware's "
           "current state is ",
           state, ".");
-      case LegacyAutowareState::initializing:  // The initial pose has been sent but has not yet reached Autoware.
+      case LegacyAutowareState::initializing:
+        // The initial pose has been sent but has not yet reached Autoware.
+        LINE();
       case LegacyAutowareState::arrived_goal:
+        LINE();
         waitForAutowareStateToBe(LegacyAutowareState::waiting_for_route);
+        LINE();
         [[fallthrough]];
       case LegacyAutowareState::waiting_for_route:
+        LINE();
         requestSetRoutePoints(
           [&]() {
             auto request = std::make_shared<SetRoutePoints::Request>();
@@ -394,8 +430,11 @@ auto FieldOperatorApplication::plan(const std::vector<geometry_msgs::msg::PoseSt
             return request;
           }(),
           30);
+        LINE();
         waitForAutowareStateToBe(LegacyAutowareState::planning);
+        LINE();
         waitForAutowareStateToBe(LegacyAutowareState::waiting_for_engage);
+        LINE();
         break;
     }
   });
