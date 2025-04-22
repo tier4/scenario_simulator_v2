@@ -129,7 +129,7 @@ public:
 
   virtual auto getEntityTypename() const -> const std::string & = 0;
 
-  virtual auto getGoalPoses() -> std::vector<CanonicalizedLaneletPose> = 0;
+  virtual auto getGoalPoses() -> std::vector<geometry_msgs::msg::Pose> = 0;
 
   /*   */ auto isStopped() const -> bool;
 

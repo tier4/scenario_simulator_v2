@@ -45,7 +45,7 @@ public:
 
   ~MiscObjectEntity() override = default;
 
-  auto getGoalPoses() -> std::vector<CanonicalizedLaneletPose> override { return {}; }
+  auto getGoalPoses() -> std::vector<geometry_msgs::msg::Pose> override { return {}; }
 
   std::optional<traffic_simulator_msgs::msg::Obstacle> getObstacle() override
   {

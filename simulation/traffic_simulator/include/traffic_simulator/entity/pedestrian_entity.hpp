@@ -115,7 +115,7 @@ public:
 
   auto getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle> override;
 
-  auto getGoalPoses() -> std::vector<CanonicalizedLaneletPose> override;
+  auto getGoalPoses() -> std::vector<geometry_msgs::msg::Pose> override;
 
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
 
