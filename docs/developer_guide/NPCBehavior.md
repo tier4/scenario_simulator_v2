@@ -159,29 +159,6 @@ graph TD
 | FollowLane   | Entity following the lane which it is exist.      |         |         |
 | WalkStraight | Entity walk forward and without considering lane. |         |         |
 
-### Property `isBlind`
-
-**Summary** - Specifies whether the behavior takes surrounding entities into consideration.
-
-**Purpose** - Prevents specific scenarios from failing, such as a pedestrian colliding with a stopped vehicle, by behaving considerately toward surrounding entities. 
-
-**Specification** - The vehicle stops only when it enters a lane currently occupied by another entity and the entity is located ahead.
-
-**Note** - For pedestrians, this feature is disabled by default to maintain backward compatibility. It can be enabled by setting the `pedestrian_ignore_see_around` to `aware` in the launch file execution options.
-
-**Default behavior** - If the property is not specified, the default value is `"false"`.
-
-**Example** -
-```
-        ObjectController:
-          Controller:
-            name: '...'
-            Properties:
-              Property:
-                - name: "isBlind"
-                  value: "false"
-```
-
 ## Pedestrian NPC (with Do-Nothing)
 
 When this behavior is used, entity can only be moved by specifying its pose, velocity, acceleration, jerk, etc. via the `API::setEntityStatus` function, etc.  

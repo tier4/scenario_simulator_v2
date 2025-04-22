@@ -57,8 +57,6 @@ private:
     api_.resetBehaviorPlugin(
       "pedestrian_spawn_with_behavior_tree",
       traffic_simulator::entity::PedestrianEntity::BuiltinBehavior::doNothing());
-
-    /// @note After the reset, the Entity objects are invalidated, so we need to obtain new ones.
     if (
       api_.getEntity("vehicle_spawn_with_behavior_tree").getCurrentAction() != "do_nothing" ||
       api_.getEntity("pedestrian_spawn_with_behavior_tree").getCurrentAction() != "do_nothing") {

@@ -97,13 +97,9 @@ auto VehicleEntity::getEntityTypename() const -> const std::string &
   return result;
 }
 
-auto VehicleEntity::getGoalPoses() -> std::vector<geometry_msgs::msg::Pose>
+auto VehicleEntity::getGoalPoses() -> std::vector<CanonicalizedLaneletPose>
 {
-  std::vector<geometry_msgs::msg::Pose> poses;
-  for (const auto & lanelet_pose : route_planner_.getGoalPoses()) {
-    poses.push_back(pose::toMapPose(lanelet_pose));
-  }
-  return poses;
+  return route_planner_.getGoalPoses();
 }
 
 auto VehicleEntity::getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle>

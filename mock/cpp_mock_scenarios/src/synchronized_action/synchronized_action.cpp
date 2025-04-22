@@ -44,14 +44,14 @@ private:
 
   void onUpdate() override
   {
-    auto & ego_entity = api_.getEntity("ego");
-    auto & npc_entity = api_.getEntity("npc");
+    auto & npc = api_.getEntity("npc");
+    auto & ego = api_.getEntity("ego");
 
     // SUCCESS
     if (
-      npc_entity.requestSynchronize("ego", ego_target, npc_target, 0, 0.5) &&
-      ego_entity.isNearbyPosition(ego_target, 1.0) &&
-      npc_entity.isNearbyPosition(npc_target, 1.0) && npc_entity.getCurrentTwist().linear.x < 0.5) {
+      npc.requestSynchronize("ego", ego_target, npc_target, 0, 0.5) &&
+      ego.isNearbyPosition(ego_target, 1.0) && npc.isNearbyPosition(npc_target, 1.0) &&
+      npc.getCurrentTwist().linear.x < 0.5) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
 
@@ -65,27 +65,30 @@ private:
   }
   void onInitialize() override
   {
-    auto & ego_entity = api_.spawn(
+    api_.spawn(
       "ego", traffic_simulator::helper::constructCanonicalizedLaneletPose(34976, 20, 0),
       getVehicleParameters());
 
-    ego_entity.setLinearVelocity(3);
-    ego_entity.requestSpeedChange(3, true);
+    auto & ego = api_.getEntity("ego");
+    ego.setLinearVelocity(3);
+    ego.requestSpeedChange(3, true);
 
     std::vector<geometry_msgs::msg::Pose> goal_poses;
     goal_poses.emplace_back(
       traffic_simulator::helper::constructCanonicalizedLaneletPose(34579, 20, 0));
-    ego_entity.requestAssignRoute(goal_poses);
+    ego.requestAssignRoute(goal_poses);
 
-    auto & npc_entity = api_.spawn(
+    api_.spawn(
       "npc", traffic_simulator::helper::constructCanonicalizedLaneletPose(34576, 0, 0),
       getVehicleParameters());
+
+    auto & npc = api_.getEntity("npc");
 
     std::vector<geometry_msgs::msg::Pose> npc_goal_poses;
     npc_goal_poses.emplace_back(
       traffic_simulator::helper::constructCanonicalizedLaneletPose(34564, 20, 0));
-    npc_entity.requestAssignRoute(npc_goal_poses);
-    npc_entity.setLinearVelocity(6);
+    npc.requestAssignRoute(npc_goal_poses);
+    npc.setLinearVelocity(6);
   }
 
   auto getSampleLaneletPose(const traffic_simulator::LaneletPose & lanelet_pose)

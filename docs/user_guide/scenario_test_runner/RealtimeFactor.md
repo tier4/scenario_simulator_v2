@@ -11,7 +11,7 @@ It is possible to modify the speed of simulation (the speed of time published on
 
    ```bash
    ros2 launch scenario_test_runner scenario_test_runner.launch.py \
-   architecture_type:=awf/universe/20250130 \
+   architecture_type:=awf/universe/20230906 \
    record:=false \
    scenario:='$(find-pkg-share scenario_test_runner)/scenario/sample.yaml' \
    sensor_model:=sample_sensor_kit \
@@ -47,7 +47,7 @@ Parameter `use_sim_time` of `openscenario_interpreter` is **false** by default a
 
    ```bash
    ros2 launch scenario_test_runner scenario_test_runner.launch.py \
-   architecture_type:=awf/universe/20250130 \
+   architecture_type:=awf/universe/20230906 \
    record:=false \
    scenario:='$(find-pkg-share scenario_test_runner)/scenario/sample.yaml' \
    sensor_model:=sample_sensor_kit \
