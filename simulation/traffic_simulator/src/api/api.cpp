@@ -226,6 +226,8 @@ auto API::attachOccupancyGridSensor(
 }
 
 // ego - checks, getters
+auto API::isAnyEgoSpawned() const -> bool { return entity_manager_ptr_->isAnyEgoSpawned(); }
+
 auto API::getFirstEgoName() const -> std::optional<std::string>
 {
   return entity_manager_ptr_->getFirstEgoName();
@@ -284,7 +286,7 @@ auto API::respawn(
     auto & ego_entity = entity_manager_ptr_->getEgoEntity(name);
     // set new pose and default action status in EntityManager
     ego_entity.setControlledBySimulator(true);
-    ego_entity.setStatus(new_pose.pose.pose, helper::constructActionStatus());
+    ego_entity.setStatus(new_pose.pose.pose);
 
     // read status from EntityManager, then send it to SimpleSensorSimulator
     simulation_api_schema::UpdateEntityStatusRequest req;

@@ -115,9 +115,13 @@ auto PedestrianEntity::getObstacle() -> std::optional<traffic_simulator_msgs::ms
   return std::nullopt;
 }
 
-auto PedestrianEntity::getGoalPoses() -> std::vector<CanonicalizedLaneletPose>
+auto PedestrianEntity::getGoalPoses() -> std::vector<geometry_msgs::msg::Pose>
 {
-  return route_planner_.getGoalPoses();
+  std::vector<geometry_msgs::msg::Pose> poses;
+  for (const auto & lanelet_pose : route_planner_.getGoalPoses()) {
+    poses.push_back(pose::toMapPose(lanelet_pose));
+  }
+  return poses;
 }
 
 const traffic_simulator_msgs::msg::WaypointsArray PedestrianEntity::getWaypoints()

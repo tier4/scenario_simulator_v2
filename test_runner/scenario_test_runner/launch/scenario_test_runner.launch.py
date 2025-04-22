@@ -85,6 +85,7 @@ def launch_setup(context, *args, **kwargs):
     output_directory                    = LaunchConfiguration("output_directory",                       default=Path("/tmp"))
     override_parameters                 = LaunchConfiguration("override_parameters",                    default="")
     parameter_file_path                 = LaunchConfiguration("parameter_file_path",                    default=Path(get_package_share_directory("scenario_test_runner")) / "config/parameters.yaml")
+    pedestrian_ignore_see_around        = LaunchConfiguration("pedestrian_ignore_see_around",           default="blind")
     port                                = LaunchConfiguration("port",                                   default=5555)
     publish_empty_context               = LaunchConfiguration("publish_empty_context",                  default=False)
     record                              = LaunchConfiguration("record",                                 default=True)
@@ -114,6 +115,7 @@ def launch_setup(context, *args, **kwargs):
     print(f"output_directory                    := {output_directory.perform(context)}")
     print(f"override_parameters                 := {override_parameters.perform(context)}")
     print(f"parameter_file_path                 := {parameter_file_path.perform(context)}")
+    print(f"pedestrian_ignore_see_around        := {pedestrian_ignore_see_around.perform(context)}")
     print(f"port                                := {port.perform(context)}")
     print(f"publish_empty_context               := {publish_empty_context.perform(context)}")
     print(f"record                              := {record.perform(context)}")
@@ -142,6 +144,7 @@ def launch_setup(context, *args, **kwargs):
             {"consider_pose_by_road_slope": consider_pose_by_road_slope},
             {"initialize_duration": initialize_duration},
             {"launch_autoware": launch_autoware},
+            {"pedestrian_ignore_see_around": pedestrian_ignore_see_around},
             {"port": port},
             {"publish_empty_context" : publish_empty_context},
             {"record": record},
@@ -200,6 +203,7 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("launch_rviz",                         default_value=launch_rviz                        ),
         DeclareLaunchArgument("output_directory",                    default_value=output_directory                   ),
         DeclareLaunchArgument("parameter_file_path",                 default_value=parameter_file_path                ),
+        DeclareLaunchArgument("pedestrian_ignore_see_around",        default_value=pedestrian_ignore_see_around       ),
         DeclareLaunchArgument("publish_empty_context",               default_value=publish_empty_context              ),
         DeclareLaunchArgument("rviz_config",                         default_value=rviz_config                        ),
         DeclareLaunchArgument("scenario",                            default_value=scenario                           ),
