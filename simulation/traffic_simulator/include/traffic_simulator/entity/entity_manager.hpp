@@ -120,7 +120,7 @@ public:
 
       if constexpr (std::is_same_v<std::decay_t<EntityType>, EgoEntity>) {
         if (isAnyEgoSpawned()) {
-          THROW_SEMANTIC_ERROR("multi ego simulation does not support yet");
+          THROW_SEMANTIC_ERROR("Multiple egos in the simulation are unsupported yet.");
         } else {
           entity_status.type.type = traffic_simulator_msgs::msg::EntityType::EGO;
         }
@@ -234,39 +234,6 @@ public:
     origin.longitude = common::getParameter<decltype(origin.longitude)>(
       node.get_node_parameters_interface(), "origin_longitude");
     return origin;
-  }
-
-  auto getObstacle(const std::string & name)
-    -> std::optional<traffic_simulator_msgs::msg::Obstacle>;
-
-  auto getPedestrianParameters(const std::string & name) const
-    -> const traffic_simulator_msgs::msg::PedestrianParameters &;
-
-  auto getVehicleParameters(const std::string & name) const
-    -> const traffic_simulator_msgs::msg::VehicleParameters &;
-
-  auto getWaypoints(const std::string & name) -> traffic_simulator_msgs::msg::WaypointsArray;
-
-  template <typename T>
-  auto getGoalPoses(const std::string & name) -> std::vector<T>
-  {
-    if constexpr (std::is_same_v<std::decay_t<T>, CanonicalizedLaneletPose>) {
-      if (not npc_logic_started_) {
-        return {};
-      } else {
-        return entities_.at(name)->getGoalPoses();
-      }
-    } else {
-      if (not npc_logic_started_) {
-        return {};
-      } else {
-        std::vector<geometry_msgs::msg::Pose> poses;
-        for (const auto & lanelet_pose : getGoalPoses<CanonicalizedLaneletPose>(name)) {
-          poses.push_back(pose::toMapPose(lanelet_pose));
-        }
-        return poses;
-      }
-    }
   }
 
 private:
