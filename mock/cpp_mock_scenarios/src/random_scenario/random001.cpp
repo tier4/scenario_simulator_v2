@@ -65,7 +65,7 @@ private:
 
         std::string entity_name = "road_parking_" + std::to_string(entity_index);
         constexpr lanelet::Id spawn_lanelet_id = 34705;
-        api_.spawn(
+        auto & road_parking_entity = api_.spawn(
           entity_name,
           traffic_simulator::helper::constructCanonicalizedLaneletPose(
             spawn_lanelet_id,
@@ -75,7 +75,7 @@ private:
             offset),
           getVehicleParameters(
             get_entity_subtype(params_.random_parameters.road_parking_vehicle.entity_type)));
-        api_.getEntity(entity_name).requestSpeedChange(0, true);
+        road_parking_entity.requestSpeedChange(0, true);
       };
     std::uniform_real_distribution<> dist(
       params_.random_parameters.road_parking_vehicle.min_offset,
@@ -121,7 +121,7 @@ private:
 
     const auto spawn_and_change_lane = [&](const auto & entity_name, const auto spawn_s_value) {
       if (!api_.isEntityExist(entity_name)) {
-        api_.spawn(
+        auto & entity = api_.spawn(
           entity_name,
           traffic_simulator::helper::constructCanonicalizedLaneletPose(34513, spawn_s_value, 0.0),
           getVehicleParameters());
@@ -129,7 +129,6 @@ private:
           params_.random_parameters.lane_following_vehicle.min_speed,
           params_.random_parameters.lane_following_vehicle.max_speed);
         const auto speed = speed_distribution(engine_);
-        auto & entity = api_.getEntity(entity_name);
         entity.requestSpeedChange(speed, true);
         entity.setLinearVelocity(speed);
         std::uniform_real_distribution<> lane_change_position_distribution(
@@ -165,13 +164,12 @@ private:
         std::uniform_real_distribution<> speed_distribution(
           params_.random_parameters.crossing_pedestrian.min_speed,
           params_.random_parameters.crossing_pedestrian.max_speed);
-        api_.spawn(
+        auto & entity = api_.spawn(
           entity_name,
           traffic_simulator::helper::constructCanonicalizedLaneletPose(
             lanelet_id, 0.0, offset_distribution(engine_)),
           getPedestrianParameters());
         const auto speed = speed_distribution(engine_);
-        auto & entity = api_.getEntity(entity_name);
         entity.requestSpeedChange(speed, true);
         entity.setLinearVelocity(speed);
       }
