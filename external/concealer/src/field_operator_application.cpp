@@ -280,18 +280,21 @@ auto FieldOperatorApplication::engage() -> void
       case LegacyAutowareState::initializing:
         // The initial pose has been sent but has not yet reached Autoware.
         LINE();
-        waitForAutowareStateToBe(LegacyAutowareState::waiting_for_route);
+        waitForAutowareStateToBe(
+          LegacyAutowareState::initializing, LegacyAutowareState::waiting_for_route);
         LINE();
         [[fallthrough]];
       case LegacyAutowareState::waiting_for_route:
         // The route has been sent but has not yet reached Autoware.
         LINE();
-        waitForAutowareStateToBe(LegacyAutowareState::planning);
+        waitForAutowareStateToBe(
+          LegacyAutowareState::waiting_for_route, LegacyAutowareState::planning);
         LINE();
         [[fallthrough]];
       case LegacyAutowareState::planning:
         LINE();
-        waitForAutowareStateToBe(LegacyAutowareState::waiting_for_engage);
+        waitForAutowareStateToBe(
+          LegacyAutowareState::planning, LegacyAutowareState::waiting_for_engage);
         LINE();
         [[fallthrough]];
       case LegacyAutowareState::waiting_for_engage:
@@ -304,7 +307,8 @@ auto FieldOperatorApplication::engage() -> void
           }(),
           30);
         LINE();
-        waitForAutowareStateToBe(LegacyAutowareState::driving);
+        waitForAutowareStateToBe(
+          LegacyAutowareState::waiting_for_engage, LegacyAutowareState::driving);
         LINE();
         time_limit = std::decay_t<decltype(time_limit)>::max();
         break;
@@ -343,7 +347,8 @@ auto FieldOperatorApplication::initialize(const geometry_msgs::msg::Pose & initi
             state, ".");
         case LegacyAutowareState::undefined:
           LINE();
-          waitForAutowareStateToBe(LegacyAutowareState::initializing);
+          waitForAutowareStateToBe(
+            LegacyAutowareState::undefined, LegacyAutowareState::initializing);
           LINE();
           [[fallthrough]];
         case LegacyAutowareState::initializing:
@@ -363,7 +368,8 @@ auto FieldOperatorApplication::initialize(const geometry_msgs::msg::Pose & initi
             }(),
             30);
           LINE();
-          waitForAutowareStateToBe(LegacyAutowareState::waiting_for_route);
+          waitForAutowareStateToBe(
+            LegacyAutowareState::initializing, LegacyAutowareState::waiting_for_route);
           LINE();
           break;
       }
@@ -389,9 +395,11 @@ auto FieldOperatorApplication::plan(const std::vector<geometry_msgs::msg::PoseSt
       case LegacyAutowareState::initializing:
         // The initial pose has been sent but has not yet reached Autoware.
         LINE();
+        [[fallthrough]];
       case LegacyAutowareState::arrived_goal:
         LINE();
-        waitForAutowareStateToBe(LegacyAutowareState::waiting_for_route);
+        waitForAutowareStateToBe(
+          LegacyAutowareState::arrived_goal, LegacyAutowareState::waiting_for_route);
         LINE();
         [[fallthrough]];
       case LegacyAutowareState::waiting_for_route:
@@ -431,9 +439,11 @@ auto FieldOperatorApplication::plan(const std::vector<geometry_msgs::msg::PoseSt
           }(),
           30);
         LINE();
-        waitForAutowareStateToBe(LegacyAutowareState::planning);
+        waitForAutowareStateToBe(
+          LegacyAutowareState::waiting_for_route, LegacyAutowareState::planning);
         LINE();
-        waitForAutowareStateToBe(LegacyAutowareState::waiting_for_engage);
+        waitForAutowareStateToBe(
+          LegacyAutowareState::planning, LegacyAutowareState::waiting_for_engage);
         LINE();
         break;
     }
