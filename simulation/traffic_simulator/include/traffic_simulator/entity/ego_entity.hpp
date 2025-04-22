@@ -82,7 +82,11 @@ public:
 
   void requestAcquirePosition(const CanonicalizedLaneletPose &) override;
 
-  void requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose) override;
+  void requestAcquirePosition(const geometry_msgs::msg::Pose &) override;
+
+  void requestAcquirePosition(const CanonicalizedLaneletPose &, const bool);
+
+  void requestAcquirePosition(const geometry_msgs::msg::Pose &, const bool);
 
   void requestAssignRoute(const std::vector<CanonicalizedLaneletPose> &) override;
 

@@ -197,12 +197,24 @@ void EgoEntity::onUpdate(double current_time, double step_time)
 
 void EgoEntity::requestAcquirePosition(const CanonicalizedLaneletPose & lanelet_pose)
 {
-  requestAssignRoute({lanelet_pose});
+  return requestAcquirePosition(lanelet_pose, false);
 }
 
 void EgoEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose)
 {
-  requestAssignRoute({map_pose});
+  return requestAcquirePosition(map_pose, false);
+}
+
+void EgoEntity::requestAcquirePosition(
+  const CanonicalizedLaneletPose & lanelet_pose, const bool allow_goal_modification)
+{
+  requestAssignRoute({lanelet_pose}, allow_goal_modification);
+}
+
+void EgoEntity::requestAcquirePosition(
+  const geometry_msgs::msg::Pose & map_pose, const bool allow_goal_modification)
+{
+  requestAssignRoute({map_pose}, allow_goal_modification);
 }
 
 void EgoEntity::requestAssignRoute(const std::vector<CanonicalizedLaneletPose> & waypoints)
