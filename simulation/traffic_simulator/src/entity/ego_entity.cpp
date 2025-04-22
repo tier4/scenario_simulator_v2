@@ -216,6 +216,22 @@ void EgoEntity::requestAssignRoute(const std::vector<CanonicalizedLaneletPose> &
 
 void EgoEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> & waypoints)
 {
+  return requestAssignRoute(waypoints, false);
+}
+
+void EgoEntity::requestAssignRoute(
+  const std::vector<CanonicalizedLaneletPose> & waypoints, const bool allow_goal_modification)
+{
+  std::vector<geometry_msgs::msg::Pose> route;
+  for (const auto & waypoint : waypoints) {
+    route.push_back(static_cast<geometry_msgs::msg::Pose>(waypoint));
+  }
+  requestAssignRoute(route, allow_goal_modification);
+}
+
+void EgoEntity::requestAssignRoute(
+  const std::vector<geometry_msgs::msg::Pose> & waypoints, const bool allow_goal_modification)
+{
   std::vector<geometry_msgs::msg::PoseStamped> route;
   for (const auto & waypoint : waypoints) {
     geometry_msgs::msg::PoseStamped pose_stamped;
@@ -229,10 +245,10 @@ void EgoEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &
   requestClearRoute();
   if (not initialized) {
     initialize(getMapPose());
-    plan(route);
+    plan(route, allow_goal_modification);
     // NOTE: engage() will be executed at simulation-time 0.
   } else {
-    plan(route);
+    plan(route, allow_goal_modification);
     FieldOperatorApplication::engage();
   }
 }

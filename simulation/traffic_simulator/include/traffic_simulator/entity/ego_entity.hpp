@@ -88,6 +88,10 @@ public:
 
   void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) override;
 
+  void requestAssignRoute(const std::vector<CanonicalizedLaneletPose> &, const bool);
+
+  void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &, const bool);
+
   auto requestFollowTrajectory(
     const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &) -> void override;
 
