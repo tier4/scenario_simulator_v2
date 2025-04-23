@@ -18,6 +18,7 @@
 #include <simulation_api_schema.pb.h>
 
 #include <array>
+#include <boost/math/constants/constants.hpp>
 #include <concealer/publisher.hpp>
 #include <geometry_msgs/msg/accel.hpp>
 #include <geometry_msgs/msg/twist.hpp>
@@ -132,7 +133,7 @@ public:
      * @note Calculate covariance matrices based on some nominal values
      * These values have no technical reason, they are an educated guess of what is reasonable
      */
-    constexpr double nominal_angle{M_PI_4};
+    constexpr double nominal_angle{boost::math::constants::quarter_pi<double>()};
     // clang-format off
     orientation_covariance_ = calculateCovariance(
       calculateVariance(nominal_angle,
