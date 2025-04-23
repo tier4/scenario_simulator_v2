@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>behavior_tree_plugin</name>
-  <version>16.0.0</version>
+  <version>16.1.4</version>
   <description>Behavior tree plugin for traffic_simulator</description>
   <maintainer email="masaya.kataoka@tier4.jp">masaya</maintainer>
   <license>Apache 2.0</license>
@@ -11,6 +11,7 @@
 
   <depend>behaviortree_cpp_v3</depend>
   <depend>geometry</depend>
+  <depend>get_parameter</depend>
   <depend>pluginlib</depend>
   <depend>rclcpp</depend>
   <depend>traffic_simulator</depend>
