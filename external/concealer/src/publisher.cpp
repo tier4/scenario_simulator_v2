@@ -42,20 +42,18 @@ NormalDistribution<nav_msgs::msg::Odometry>::NormalDistribution(
 : NormalDistributionBase(node, topic),
   speed_threshold(
     common::getParameter<double>(node, topic + ".nav_msgs::msg::Odometry.speed_threshold")),
-  // clang-format off
   position_local_x_error(node, topic + ".nav_msgs::msg::Odometry.pose.pose.position.local_x.error"),
   position_local_y_error(node, topic + ".nav_msgs::msg::Odometry.pose.pose.position.local_y.error"),
   position_local_z_error(node, topic + ".nav_msgs::msg::Odometry.pose.pose.position.local_z.error"),
-  orientation_r_error(   node, topic + ".nav_msgs::msg::Odometry.pose.pose.orientation.r.error"),
-  orientation_p_error(   node, topic + ".nav_msgs::msg::Odometry.pose.pose.orientation.p.error"),
-  orientation_y_error(   node, topic + ".nav_msgs::msg::Odometry.pose.pose.orientation.y.error"),
-  linear_x_error(        node, topic + ".nav_msgs::msg::Odometry.twist.twist.linear.x.error"),
-  linear_y_error(        node, topic + ".nav_msgs::msg::Odometry.twist.twist.linear.y.error"),
-  linear_z_error(        node, topic + ".nav_msgs::msg::Odometry.twist.twist.linear.z.error"),
-  angular_x_error(       node, topic + ".nav_msgs::msg::Odometry.twist.twist.angular.x.error"),
-  angular_y_error(       node, topic + ".nav_msgs::msg::Odometry.twist.twist.angular.y.error"),
-  angular_z_error(       node, topic + ".nav_msgs::msg::Odometry.twist.twist.angular.z.error")
-// clang-format on
+  orientation_r_error(node, topic + ".nav_msgs::msg::Odometry.pose.pose.orientation.r.error"),
+  orientation_p_error(node, topic + ".nav_msgs::msg::Odometry.pose.pose.orientation.p.error"),
+  orientation_y_error(node, topic + ".nav_msgs::msg::Odometry.pose.pose.orientation.y.error"),
+  linear_x_error(node, topic + ".nav_msgs::msg::Odometry.twist.twist.linear.x.error"),
+  linear_y_error(node, topic + ".nav_msgs::msg::Odometry.twist.twist.linear.y.error"),
+  linear_z_error(node, topic + ".nav_msgs::msg::Odometry.twist.twist.linear.z.error"),
+  angular_x_error(node, topic + ".nav_msgs::msg::Odometry.twist.twist.angular.x.error"),
+  angular_y_error(node, topic + ".nav_msgs::msg::Odometry.twist.twist.angular.y.error"),
+  angular_z_error(node, topic + ".nav_msgs::msg::Odometry.twist.twist.angular.z.error")
 {
 }
 
