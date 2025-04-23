@@ -18,7 +18,7 @@
 
 namespace concealer
 {
-NormalDistributionBase::NormalDistributionBase(
+RandomNumberEngine::RandomNumberEngine(
   const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node,
   const std::string & topic)
 : seed([&]() {
@@ -39,7 +39,7 @@ NormalDistributionBase::NormalDistributionBase(
 NormalDistribution<nav_msgs::msg::Odometry>::NormalDistribution(
   const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node,
   const std::string & topic)
-: NormalDistributionBase(node, topic),
+: RandomNumberEngine(node, topic),
   speed_threshold(
     common::getParameter<double>(node, topic + ".nav_msgs::msg::Odometry.speed_threshold")),
   position_local_x_error(node, topic + ".nav_msgs::msg::Odometry.pose.pose.position.local_x.error"),
@@ -112,7 +112,7 @@ auto NormalDistribution<nav_msgs::msg::Odometry>::operator()(nav_msgs::msg::Odom
 NormalDistribution<autoware_vehicle_msgs::msg::VelocityReport>::NormalDistribution(
   const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node,
   const std::string & topic)
-: NormalDistributionBase(node, topic),
+: RandomNumberEngine(node, topic),
   speed_threshold(common::getParameter<double>(
     node, topic + ".autoware_vehicle_msgs::msg::VelocityReport.speed_threshold")),
   // clang-format off
@@ -144,7 +144,7 @@ auto NormalDistribution<autoware_vehicle_msgs::msg::VelocityReport>::operator()(
 NormalDistribution<geometry_msgs::msg::PoseWithCovarianceStamped>::NormalDistribution(
   const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node,
   const std::string & topic)
-: NormalDistributionBase(node, topic),
+: RandomNumberEngine(node, topic),
   // clang-format off
   position_local_x_error(node, topic + ".geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_x.error"),
   position_local_y_error(node, topic + ".geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_y.error"),

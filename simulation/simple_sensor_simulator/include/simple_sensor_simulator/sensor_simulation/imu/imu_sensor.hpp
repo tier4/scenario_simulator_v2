@@ -30,7 +30,7 @@
 namespace concealer
 {
 template <>
-struct NormalDistribution<sensor_msgs::msg::Imu> : public NormalDistributionBase
+struct NormalDistribution<sensor_msgs::msg::Imu> : public RandomNumberEngine
 {
   // clang-format off
   NormalDistributionError<double> orientation_r_error,

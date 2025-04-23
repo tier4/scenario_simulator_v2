@@ -27,7 +27,7 @@ namespace concealer
 NormalDistribution<sensor_msgs::msg::Imu>::NormalDistribution(
   const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node,
   const std::string & topic)
-: NormalDistributionBase(node, topic),
+: RandomNumberEngine(node, topic),
   // clang-format off
   orientation_r_error(        node, topic + ".sensor_msgs::msg::Imu.orientation.r.error"),
   orientation_p_error(        node, topic + ".sensor_msgs::msg::Imu.orientation.p.error"),
