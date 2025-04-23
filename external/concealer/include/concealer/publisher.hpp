@@ -45,9 +45,6 @@ struct NormalDistributionError
 {
   static_assert(std::is_floating_point_v<std::decay_t<ValueType> >, "Unsupported error type");
 
-  /// @note set this to false to disable randomization
-  bool active{true};
-
   std::normal_distribution<ValueType> additive, multiplicative;
 
   explicit NormalDistributionError(
@@ -66,11 +63,7 @@ struct NormalDistributionError
 
   auto apply(std::mt19937_64 & engine, const ValueType value) -> ValueType
   {
-    if (active) {
-      return value * (multiplicative(engine) + static_cast<ValueType>(1)) + additive(engine);
-    } else {
-      return value;
-    }
+    return value * (multiplicative(engine) + static_cast<ValueType>(1)) + additive(engine);
   }
 };
 
@@ -171,10 +164,11 @@ struct NormalDistribution<sensor_msgs::msg::Imu> : public RandomNumberEngine
                                   linear_acceleration_z_error;
   // clang-format on
 
+  /// @note set this to false to disable randomization
+  bool active{true};
+
   explicit NormalDistribution(
     const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr &, const std::string &);
-
-  auto deactivate() -> void;
 
   auto operator()(sensor_msgs::msg::Imu imu) -> sensor_msgs::msg::Imu;
 };

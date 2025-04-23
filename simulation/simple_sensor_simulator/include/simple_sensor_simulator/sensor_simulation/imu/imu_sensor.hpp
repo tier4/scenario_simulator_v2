@@ -99,7 +99,7 @@ public:
      * If legacy is not overriden we don't want to recalculate covariance matrices, so return early
      */
     if (not override_legacy_configuration_) {
-      publish.getMutableRandomizer().deactivate();
+      publish.getMutableRandomizer().active = false;
       return;
     }
 

@@ -215,22 +215,13 @@ NormalDistribution<sensor_msgs::msg::Imu>::NormalDistribution(
 {
 }
 
-auto NormalDistribution<sensor_msgs::msg::Imu>::deactivate() -> void
-{
-  orientation_r_error.active = false;
-  orientation_p_error.active = false;
-  orientation_y_error.active = false;
-  angular_velocity_x_error.active = false;
-  angular_velocity_y_error.active = false;
-  angular_velocity_z_error.active = false;
-  linear_acceleration_x_error.active = false;
-  linear_acceleration_y_error.active = false;
-  linear_acceleration_z_error.active = false;
-}
-
 auto NormalDistribution<sensor_msgs::msg::Imu>::operator()(sensor_msgs::msg::Imu imu)
   -> sensor_msgs::msg::Imu
 {
+  if (not active) {
+    return imu;
+  }
+
   imu.orientation = math::geometry::convertEulerAngleToQuaternion([this, &imu] {
     auto rpy = math::geometry::convertQuaternionToEulerAngle(imu.orientation);
 
