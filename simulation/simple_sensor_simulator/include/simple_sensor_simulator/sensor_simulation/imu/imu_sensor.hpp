@@ -67,11 +67,9 @@ public:
     noise_distribution_orientation_(0.0, noise_standard_deviation_orientation_),
     noise_distribution_twist_(0.0, noise_standard_deviation_twist_),
     noise_distribution_acceleration_(0.0, noise_standard_deviation_acceleration_),
-    orientation_covariance_(
-      calculateCovariance(std::pow(noise_standard_deviation_orientation_, 2))),
-    angular_velocity_covariance_(calculateCovariance(std::pow(noise_standard_deviation_twist_, 2))),
-    linear_acceleration_covariance_(
-      calculateCovariance(std::pow(noise_standard_deviation_acceleration_, 2)))
+    orientation_covariance_(calculateCovariance(noise_standard_deviation_orientation_)),
+    angular_velocity_covariance_(calculateCovariance(noise_standard_deviation_twist_)),
+    linear_acceleration_covariance_(calculateCovariance(noise_standard_deviation_acceleration_))
   {
   }
 
@@ -94,22 +92,16 @@ protected:
   std::array<double, 9> angular_velocity_covariance_;
   std::array<double, 9> linear_acceleration_covariance_;
 
-  static auto calculateCovariance(
-    const double variance0, const double variance1, const double variance2) -> std::array<double, 9>
+  auto calculateCovariance(const double stddev) const -> std::array<double, 9>
   {
-    return {
-      // clang-format off
-      variance0, 0.0,       0.0,
-      0.0,       variance1, 0.0,
-      0.0,       0.0,       variance2
-      // clang-format on
-    };
-  };
-
-  static auto calculateCovariance(const double variance) -> std::array<double, 9>
-  {
-    return calculateCovariance(variance, variance, variance);
+    return {std::pow(stddev, 2), 0, 0, 0, std::pow(stddev, 2), 0, 0, 0, std::pow(stddev, 2)};
   }
+
+  auto calculateCovariance(const double variance0, const double variance1, const double variance2)
+    const -> std::array<double, 9>
+  {
+    return {variance0, 0, 0, 0, variance1, 0, 0, 0, variance2};
+  };
 };
 
 template <typename MessageType>
