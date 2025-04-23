@@ -95,7 +95,7 @@ struct NormalDistributionBase
 template <>
 struct NormalDistribution<nav_msgs::msg::Odometry> : public NormalDistributionBase
 {
-  const double speed_threshold;
+  double speed_threshold;
 
   // clang-format off
   NormalDistributionError<double> position_local_x_error,
@@ -122,7 +122,7 @@ template <>
 struct NormalDistribution<autoware_vehicle_msgs::msg::VelocityReport>
 : public NormalDistributionBase
 {
-  const double speed_threshold;
+  double speed_threshold;
 
   // clang-format off
   NormalDistributionError<float> longitudinal_velocity_error,
