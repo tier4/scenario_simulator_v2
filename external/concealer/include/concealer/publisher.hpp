@@ -129,6 +129,9 @@ public:
   {
     return publisher->publish(randomize(std::forward<decltype(xs)>(xs)...));
   }
+
+  auto getRandomizer() const noexcept -> const Randomizer<Message> & { return randomize; }
+  auto getRandomizer() noexcept -> Randomizer<Message> & { return randomize; }
 };
 }  // namespace concealer
 
