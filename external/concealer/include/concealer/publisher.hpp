@@ -72,21 +72,19 @@ struct NormalDistribution;
  * obtains the seed from the parameter <topic>.seed
  * initializes `engine` appropriately
  */
-struct NormalDistributionBase
+struct RandomNumberEngine
 {
-  std::random_device::result_type seed;
-
-  std::random_device device;
+  const std::random_device::result_type seed;
 
   std::mt19937_64 engine;
 
-  NormalDistributionBase(
+  explicit RandomNumberEngine(
     const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node,
     const std::string & topic);
 };
 
 template <>
-struct NormalDistribution<nav_msgs::msg::Odometry> : public NormalDistributionBase
+struct NormalDistribution<nav_msgs::msg::Odometry> : public RandomNumberEngine
 {
   double speed_threshold;
 
