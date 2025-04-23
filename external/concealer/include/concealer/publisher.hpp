@@ -201,7 +201,7 @@ public:
   }
 
   auto getRandomizer() const noexcept -> const Randomizer<Message> & { return randomize; }
-  auto getMutableRandomizer() const noexcept -> Randomizer<Message> & { return randomize; }
+  auto getRandomizer() noexcept -> Randomizer<Message> & { return randomize; }
 };
 }  // namespace concealer
 
