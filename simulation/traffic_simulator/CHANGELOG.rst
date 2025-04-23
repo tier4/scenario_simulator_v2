@@ -21,6 +21,17 @@ Changelog for package traffic_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+16.1.4 (2025-04-23)
+-------------------
+* Merge pull request `#1578 <https://github.com/tier4/scenario_simulator_v2/issues/1578>`_ from tier4/RJD-1752/fix_asserts
+  RJD-1752 Fix assert in CanonicalizedEntityStatus constructor
+* Merge branch 'master' into RJD-1752/fix_asserts
+* Merge branch 'master' into RJD-1752/fix_asserts
+* Merge branch 'master' into RJD-1752/fix_asserts
+* Merge branch 'master' into RJD-1752/fix_asserts
+* RJD-1752 Fix wrongly placed assert in CanonicalizedEntityStatus constructor
+* Contributors: Grzegorz Maj, Masaya Kataoka
+
 16.1.3 (2025-04-21)
 -------------------
 * Merge branch 'master' into fix/concealer-7
