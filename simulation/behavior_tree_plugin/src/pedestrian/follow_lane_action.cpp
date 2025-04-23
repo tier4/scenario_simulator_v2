@@ -97,7 +97,7 @@ bool FollowLaneAction::detectObstacleInLane(
     return false;
   };
 
-  if (hasObstacleInPedestrianLanes(pedestrian_lanes, 40) && hasObstacleInFrontOfPedestrian()) {
+  if (hasObstacleInPedestrianLanes(pedestrian_lanes, 10) && hasObstacleInFrontOfPedestrian()) {
     return true;
   } else {
     return false;
