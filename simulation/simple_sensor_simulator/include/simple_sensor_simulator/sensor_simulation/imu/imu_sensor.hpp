@@ -28,32 +28,6 @@
 #include <simulation_interface/conversions.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
 
-namespace concealer
-{
-template <>
-struct NormalDistribution<sensor_msgs::msg::Imu> : public RandomNumberEngine
-{
-  // clang-format off
-  NormalDistributionError<double> orientation_r_error,
-                                  orientation_p_error,
-                                  orientation_y_error,
-                                  angular_velocity_x_error,
-                                  angular_velocity_y_error,
-                                  angular_velocity_z_error,
-                                  linear_acceleration_x_error,
-                                  linear_acceleration_y_error,
-                                  linear_acceleration_z_error;
-  // clang-format on
-
-  explicit NormalDistribution(
-    const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr &, const std::string &);
-
-  auto deactivate() -> void;
-
-  auto operator()(sensor_msgs::msg::Imu imu) -> sensor_msgs::msg::Imu;
-};
-}  // namespace concealer
-
 namespace simple_sensor_simulator
 {
 class ImuSensorBase

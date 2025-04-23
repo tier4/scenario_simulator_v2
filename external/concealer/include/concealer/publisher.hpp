@@ -21,6 +21,7 @@
 #include <nav_msgs/msg/odometry.hpp>
 #include <random>
 #include <rclcpp/rclcpp.hpp>
+#include <sensor_msgs/msg/imu.hpp>
 
 namespace concealer
 {
@@ -153,6 +154,29 @@ struct NormalDistribution<geometry_msgs::msg::PoseWithCovarianceStamped> : publi
 
   auto operator()(geometry_msgs::msg::PoseWithCovarianceStamped pose)
     -> geometry_msgs::msg::PoseWithCovarianceStamped;
+};
+
+template <>
+struct NormalDistribution<sensor_msgs::msg::Imu> : public RandomNumberEngine
+{
+  // clang-format off
+  NormalDistributionError<double> orientation_r_error,
+                                  orientation_p_error,
+                                  orientation_y_error,
+                                  angular_velocity_x_error,
+                                  angular_velocity_y_error,
+                                  angular_velocity_z_error,
+                                  linear_acceleration_x_error,
+                                  linear_acceleration_y_error,
+                                  linear_acceleration_z_error;
+  // clang-format on
+
+  explicit NormalDistribution(
+    const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr &, const std::string &);
+
+  auto deactivate() -> void;
+
+  auto operator()(sensor_msgs::msg::Imu imu) -> sensor_msgs::msg::Imu;
 };
 
 template <typename Message, template <typename> typename Randomizer = Identity>
