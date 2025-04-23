@@ -16,7 +16,6 @@
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2/LinearMath/Transform.h>
 
-// #include <Eigen/Geometry>
 #include <algorithm>
 #include <geometry/quaternion/euler_to_quaternion.hpp>
 #include <geometry/quaternion/quaternion_to_euler.hpp>
