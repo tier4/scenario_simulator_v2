@@ -108,6 +108,7 @@ struct NormalDistribution<nav_msgs::msg::Odometry> : public RandomNumberEngine
 
   auto operator()(nav_msgs::msg::Odometry odometry) -> nav_msgs::msg::Odometry;
 };
+
 template <typename Message, template <typename> typename Randomizer = Identity>
 class Publisher
 {
