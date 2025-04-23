@@ -42,11 +42,7 @@ struct Identity
 template <typename ValueType>
 struct NormalDistributionError
 {
-  static_assert(
-    std::disjunction_v<
-      std::is_same<std::decay_t<ValueType>, float>, std::is_same<std::decay_t<ValueType>, double>,
-      std::is_same<std::decay_t<ValueType>, long double> >,
-    "Unsupported error type");
+  static_assert(std::is_floating_point_v<std::decay_t<ValueType> >, "Unsupported error type");
 
   /// @note set this to false to disable randomization
   bool active{true};
