@@ -52,7 +52,7 @@ public:
 
   virtual auto update(
     const rclcpp::Time & current_ros_time,
-    const std::vector<traffic_simulator_msgs::EntityStatus> & statuses) const -> bool = 0;
+    const std::vector<traffic_simulator_msgs::EntityStatus> & statuses) -> bool = 0;
 
 protected:
   const bool add_gravity_;
@@ -99,7 +99,7 @@ public:
      * If legacy is not overriden we don't want to recalculate covariance matrices, so return early
      */
     if (not override_legacy_configuration_) {
-      publish.getMutableRandomizer().active = false;
+      publish.getRandomizer().active = false;
       return;
     }
 
@@ -152,7 +152,7 @@ public:
 
   auto update(
     const rclcpp::Time & current_ros_time,
-    const std::vector<traffic_simulator_msgs::EntityStatus> & statuses) const -> bool override
+    const std::vector<traffic_simulator_msgs::EntityStatus> & statuses) -> bool override
   {
     for (const auto & status : statuses) {
       if (status.name() == entity_name_) {
@@ -181,7 +181,7 @@ private:
   const bool override_legacy_configuration_;
   const std::string entity_name_;
   const std::string frame_id_;
-  const concealer::Publisher<MessageType, concealer::NormalDistribution> publish;
+  concealer::Publisher<MessageType, concealer::NormalDistribution> publish;
 };
 }  // namespace simple_sensor_simulator
 #endif  // SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__IMU_SENSOR_HPP_

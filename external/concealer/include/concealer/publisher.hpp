@@ -178,11 +178,7 @@ class Publisher
 {
   typename rclcpp::Publisher<Message>::SharedPtr publisher;
 
-  /**
-   * @note Randomizer is declared mutable because it may require internal state to change between invocations.
-   * This is especially the case for normal distributions above.
-   */
-  mutable Randomizer<Message> randomize;
+  Randomizer<Message> randomize;
 
 public:
   template <typename Node>
@@ -193,13 +189,13 @@ public:
   }
 
   template <typename... Ts>
-  auto operator()(Ts &&... xs) const -> decltype(auto)
+  auto operator()(Ts &&... xs) -> decltype(auto)
   {
     return publisher->publish(randomize(std::forward<decltype(xs)>(xs)...));
   }
 
   auto getRandomizer() const noexcept -> const Randomizer<Message> & { return randomize; }
-  auto getMutableRandomizer() const noexcept -> Randomizer<Message> & { return randomize; }
+  auto getRandomizer() noexcept -> Randomizer<Message> & { return randomize; }
 };
 }  // namespace concealer
 
