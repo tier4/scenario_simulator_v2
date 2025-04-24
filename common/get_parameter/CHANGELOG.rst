@@ -2,6 +2,9 @@
 Changelog for package get_parameter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+16.2.0 (2025-04-24)
+-------------------
+
 16.1.4 (2025-04-23)
 -------------------
 * Merge branch 'master' into RJD-1752/fix_asserts

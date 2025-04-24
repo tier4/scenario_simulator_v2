@@ -54,22 +54,33 @@ bool FollowLaneAction::detectObstacleInLane(
     return false;
   }
 
-  auto hasObstacleInPedestrianLanes = [this](const lanelet::Ids pedestrian_lanes_local) {
-    lanelet::Ids other_entity_lane_ids;
-    for (const auto & [_, status] : other_entity_status) {
-      if (status.isInLanelet()) {
+  auto hasObstacleInPedestrianLanes =
+    [this](const lanelet::Ids pedestrian_lanes_local, const double max_detect_length) {
+      using math::geometry::operator-;
+      const auto & pedestrian_position = canonicalized_entity_status->getMapPose().position;
+      lanelet::Ids other_entity_lane_ids;
+      for (const auto & [_, status] : other_entity_status) {
+        if (status.getType().type != traffic_simulator_msgs::msg::EntityType::EGO) {
+          continue;
+        }
+        if (!status.isInLanelet()) {
+          continue;
+        }
+        const auto norm = math::geometry::norm(status.getMapPose().position - pedestrian_position);
+        if (!(norm < max_detect_length)) {
+          continue;
+        }
         other_entity_lane_ids.push_back(status.getLaneletId());
       }
-    }
-    std::unordered_set<lanelet::Id> other_lane_id_set(
-      other_entity_lane_ids.begin(), other_entity_lane_ids.end());
-    for (const auto & pedestrian_lane : pedestrian_lanes_local) {
-      if (other_lane_id_set.count(pedestrian_lane)) {
-        return true;
+      std::unordered_set<lanelet::Id> other_lane_id_set(
+        other_entity_lane_ids.begin(), other_entity_lane_ids.end());
+      for (const auto & pedestrian_lane : pedestrian_lanes_local) {
+        if (other_lane_id_set.count(pedestrian_lane)) {
+          return true;
+        }
       }
-    }
-    return false;
-  };
+      return false;
+    };
 
   auto hasObstacleInFrontOfPedestrian = [this]() {
     using math::geometry::operator-;
@@ -87,7 +98,7 @@ bool FollowLaneAction::detectObstacleInLane(
     return false;
   };
 
-  if (hasObstacleInPedestrianLanes(pedestrian_lanes) && hasObstacleInFrontOfPedestrian()) {
+  if (hasObstacleInPedestrianLanes(pedestrian_lanes, 10) && hasObstacleInFrontOfPedestrian()) {
     return true;
   } else {
     return false;
