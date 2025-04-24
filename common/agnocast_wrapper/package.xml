@@ -3,7 +3,7 @@
 <package format="3">
   <name>agnocast_wrapper</name>
   <version>16.2.0</version>
-  <description>TODO: Package description</description>
+  <description>A wrapper package for agnocast</description>
   <maintainer email="mateusz.palczuk@robotec.ai">Mateusz Palczuk</maintainer>
   <license>Apache License 2.0</license>
 
