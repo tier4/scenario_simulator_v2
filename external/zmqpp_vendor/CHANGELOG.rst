@@ -15,6 +15,9 @@ Changelog for package zmqpp_vendor
 * Add missing buildtool_depend on git
 * Contributors: Masaya Kataoka, MasayaKataoka, Scott K Logan
 
+16.2.0 (2025-04-24)
+-------------------
+
 16.1.4 (2025-04-23)
 -------------------
 * Merge branch 'master' into RJD-1752/fix_asserts
