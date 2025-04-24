@@ -21,6 +21,9 @@ Changelog for package openscenario_experimental_catalog
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+16.2.0 (2025-04-24)
+-------------------
+
 16.1.4 (2025-04-23)
 -------------------
 * Merge branch 'master' into RJD-1752/fix_asserts
