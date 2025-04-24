@@ -24,6 +24,14 @@ Changelog for package embree_vendor
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+16.1.4 (2025-04-23)
+-------------------
+* Merge branch 'master' into RJD-1752/fix_asserts
+* Merge branch 'master' into RJD-1752/fix_asserts
+* Merge branch 'master' into RJD-1752/fix_asserts
+* Merge branch 'master' into RJD-1752/fix_asserts
+* Contributors: Grzegorz Maj, Masaya Kataoka
+
 16.1.3 (2025-04-21)
 -------------------
 * Merge branch 'master' into fix/concealer-7
