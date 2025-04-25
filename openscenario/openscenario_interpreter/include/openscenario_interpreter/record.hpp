@@ -65,6 +65,36 @@ auto start(Ts &&... xs) -> pid_t
   }
 }
 
+inline auto start_with_vector(const std::vector<std::string> & args) -> pid_t
+{
+  std::vector<std::string> command{
+    "python3", boost::algorithm::replace_all_copy(concealer::dollar("which ros2"), "\n", ""), "bag",
+    "record"};
+
+  command.insert(command.end(), args.begin(), args.end());
+
+  switch (process_id = fork()) {
+    case -1:
+      throw std::system_error(errno, std::system_category());
+
+    case 0:
+#ifndef OPENSCENARIO_INTERPRETER_VERBOSE_RECORD
+      if (const auto fd = ::open("/dev/null", O_WRONLY)) {
+        ::dup2(fd, STDOUT_FILENO);
+        ::close(fd);
+      }
+#endif
+      if (concealer::execute(command) < 0) {
+        std::cerr << std::system_error(errno, std::system_category()).what() << std::endl;
+        std::exit(EXIT_FAILURE);
+      }
+      return 0;
+
+    default:
+      return process_id;
+  }
+}
+
 auto stop() -> void;
 }  // namespace record
 }  // namespace openscenario_interpreter
