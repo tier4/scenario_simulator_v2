@@ -49,7 +49,8 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   output_directory("/tmp"),
   publish_empty_context(false),
   record(false),
-  record_storage_id("")
+  record_storage_id(""),
+  record_option("")
 {
   DECLARE_PARAMETER(local_frame_rate);
   DECLARE_PARAMETER(local_real_time_factor);
@@ -58,6 +59,7 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   DECLARE_PARAMETER(publish_empty_context);
   DECLARE_PARAMETER(record);
   DECLARE_PARAMETER(record_storage_id);
+  DECLARE_PARAMETER(record_option);
 
   SpeedCondition::compatibility =
     boost::lexical_cast<Compatibility>(common::getParameter<std::string>(
@@ -120,6 +122,7 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
       GET_PARAMETER(publish_empty_context);
       GET_PARAMETER(record);
       GET_PARAMETER(record_storage_id);
+      GET_PARAMETER(record_option);
 
       script = std::make_shared<OpenScenario>(osc_path);
 
@@ -225,14 +228,29 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
       },
       [&]() {
         if (record) {
-          if (record_storage_id == "") {
-            record::start(
-              "-a", "-o", boost::filesystem::path(osc_path).replace_extension("").string());
-          } else {
-            record::start(
-              "-a", "-o", boost::filesystem::path(osc_path).replace_extension("").string(), "-s",
-              record_storage_id);
+          std::vector<std::string> options;
+          options.push_back("-a");
+          options.push_back("-o");
+          options.push_back(boost::filesystem::path(osc_path).replace_extension("").string());
+          if (record_storage_id != "") {
+            options.push_back("-s");
+            options.push_back(record_storage_id);
           }
+          if (record_option != "") {
+            auto split = [](const std::string & s) -> std::vector<std::string> {
+              std::istringstream iss(s);
+              std::vector<std::string> result;
+              std::string token;
+
+              while (iss >> token) {
+                result.push_back(token);
+              }
+              return result;
+            };
+            auto splitted = split(record_option);
+            options.insert(options.end(), splitted.begin(), splitted.end());
+          }
+          record::start_with_vector(options);
         }
 
         SimulatorCore::activate(

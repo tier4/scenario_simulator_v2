@@ -76,6 +76,8 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode,
 
   String record_storage_id;
 
+  String record_option;
+
   std::shared_ptr<OpenScenario> script;
 
   std::list<std::shared_ptr<ScenarioDefinition>> scenarios;
