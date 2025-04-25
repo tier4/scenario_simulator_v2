@@ -9,6 +9,16 @@ Changelog for package simple_cross_map
 * Merge branch 'master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+16.3.2 (2025-04-25)
+-------------------
+* Merge branch 'master' into RJD-1509/methods_optimization
+* Merge branch 'master' into RJD-1509/methods_optimization
+* Merge branch 'master' into RJD-1509/methods_optimization
+* Merge branch 'master' into RJD-1509/methods_optimization
+* Merge branch 'master' into RJD-1509/methods_optimization
+* Merge branch 'master' into RJD-1509/methods_optimization
+* Contributors: Grzegorz Maj, Masaya Kataoka
+
 16.3.1 (2025-04-25)
 -------------------
 * Merge branch 'master' into fix/concealer-7/transition

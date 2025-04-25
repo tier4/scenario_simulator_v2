@@ -15,6 +15,16 @@ Changelog for package zmqpp_vendor
 * Add missing buildtool_depend on git
 * Contributors: Masaya Kataoka, MasayaKataoka, Scott K Logan
 
+16.3.2 (2025-04-25)
+-------------------
+* Merge branch 'master' into RJD-1509/methods_optimization
+* Merge branch 'master' into RJD-1509/methods_optimization
+* Merge branch 'master' into RJD-1509/methods_optimization
+* Merge branch 'master' into RJD-1509/methods_optimization
+* Merge branch 'master' into RJD-1509/methods_optimization
+* Merge branch 'master' into RJD-1509/methods_optimization
+* Contributors: Grzegorz Maj, Masaya Kataoka
+
 16.3.1 (2025-04-25)
 -------------------
 * Merge branch 'master' into fix/concealer-7/transition

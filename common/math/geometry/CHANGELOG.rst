@@ -21,6 +21,26 @@ Changelog for package geometry
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+16.3.2 (2025-04-25)
+-------------------
+* Merge pull request `#1567 <https://github.com/tier4/scenario_simulator_v2/issues/1567>`_ from tier4/RJD-1509/methods_optimization
+  RJD-1509 ActionNode methods optimization
+* Merge branch 'master' into RJD-1509/methods_optimization
+* Merge branch 'master' into RJD-1509/methods_optimization
+* Merge branch 'master' into RJD-1509/methods_optimization
+* Spell check resolve
+* Move conditional statements to lambda
+* Merge branch 'master' into RJD-1509/methods_optimization
+* Review changes: range based for loops
+* Merge branch 'master' into RJD-1509/methods_optimization
+* Merge branch 'master' into RJD-1509/methods_optimization
+* Fix bad optional access in subspline
+* Fix problem with Subspline
+* Review changes
+* Review changes
+* RJD-1509 Add using only part of spline for getCollisionPointIn2D
+* Contributors: Grzegorz Maj, Masaya Kataoka
+
 16.3.1 (2025-04-25)
 -------------------
 * Merge branch 'master' into fix/concealer-7/transition
