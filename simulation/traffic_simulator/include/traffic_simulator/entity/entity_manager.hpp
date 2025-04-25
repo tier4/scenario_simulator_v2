@@ -236,7 +236,7 @@ public:
       node.get_node_parameters_interface(), "origin_longitude");
     return origin;
   }
-  
+
   auto calculateEuclideanDistances() -> std::shared_ptr<EuclideanDistancesMap>;
 
 private:

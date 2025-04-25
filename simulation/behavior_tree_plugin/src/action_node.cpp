@@ -93,7 +93,7 @@ auto ActionNode::getBlackBoardValues() -> void
   }
   if (!getInput<std::shared_ptr<EuclideanDistancesMap>>(
         "euclidean_distances_map", euclidean_distances_map)) {
-    THROW_SIMULATION_ERROR("failed to get input euclidean_distances_map in ActionNode");
+    euclidean_distances_map = std::make_shared<EuclideanDistancesMap>();
   }
   if (!getInput<traffic_simulator_msgs::msg::BehaviorParameter>(
         "behavior_parameter", behavior_parameter)) {
