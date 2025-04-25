@@ -779,6 +779,12 @@ public:
     {
       return core->getV2ITrafficLights()->resetUpdate(std::forward<decltype(xs)>(xs)...);
     }
+
+    template <typename... Ts>
+    static auto setV2ITrafficLightExtraInfo(Ts &&... xs) -> decltype(auto)
+    {
+      return core->getV2ITrafficLights()->setV2ITrafficLightExtraInfo(std::forward<decltype(xs)>(xs)...);
+    }
   };
 };
 }  // namespace openscenario_interpreter

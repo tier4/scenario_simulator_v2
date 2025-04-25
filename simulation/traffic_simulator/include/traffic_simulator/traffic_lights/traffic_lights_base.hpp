@@ -76,15 +76,15 @@ public:
 
   auto getTrafficLight(const lanelet::Id traffic_light_id) -> TrafficLight &;
 
+  auto getTrafficLights(const lanelet::Id lanelet_id)
+    -> std::vector<std::reference_wrapper<TrafficLight>>;
+
 protected:
   virtual auto update() const -> void = 0;
 
   auto isTrafficLightAdded(const lanelet::Id traffic_light_id) const -> bool;
 
   auto addTrafficLight(const lanelet::Id traffic_light_id) -> void;
-
-  auto getTrafficLights(const lanelet::Id lanelet_id)
-    -> std::vector<std::reference_wrapper<TrafficLight>>;
 
   const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_;
   const rclcpp::Clock::SharedPtr clock_ptr_;
