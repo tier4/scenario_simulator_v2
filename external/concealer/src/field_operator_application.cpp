@@ -365,10 +365,8 @@ auto FieldOperatorApplication::plan(const std::vector<geometry_msgs::msg::PoseSt
           state, ".");
       case LegacyAutowareState::initializing:
         // The initial pose has been sent but has not yet reached Autoware.
-        [[fallthrough]];
       case LegacyAutowareState::arrived_goal:
-        waitForAutowareStateToBe(
-          LegacyAutowareState::arrived_goal, LegacyAutowareState::waiting_for_route);
+        waitForAutowareStateToBe(state, LegacyAutowareState::waiting_for_route);
         [[fallthrough]];
       case LegacyAutowareState::waiting_for_route:
         requestSetRoutePoints(

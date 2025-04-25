@@ -1,5 +1,14 @@
 <?xml version="1.0"?>
 <launch>
+    <!-- Agnocast -->
+    <arg name="use_system_agnocast_heaphook" default="true" description="true: apt installed library, false: locally built"/>
+    <let name="agnocast_heaphook_path" value="/opt/ros/humble/lib/libagnocast_heaphook.so" if="$(var use_system_agnocast_heaphook)"/>
+    <let name="agnocast_heaphook_path" value="$(env AGNOCAST_HEAPHOOK_PATH)" unless="$(var use_system_agnocast_heaphook)"/>
+    
+    <let name="enable_agnocast" value="$(env ENABLE_AGNOCAST_SIMULATOR 0)" />
+    <let name="current_ld_preload" value="$(env LD_PRELOAD '')" />
+    <let name="new_ld_preload" value="$(eval &quot;\'$(var agnocast_heaphook_path):$(env LD_PRELOAD '')\' if \'$(var enable_agnocast)\' == \'1\' else \'$(var current_ld_preload)\'&quot;)"/>
+    <!--  -->
     <arg name="load_map" default="true"/>
     <arg name="map_path"/>
     <arg name="lanelet2_map_file" default="lanelet2_map.osm"/>
@@ -7,10 +16,14 @@
     <arg name="port" default="9000"/>
 
     <node pkg="simple_sensor_simulator" type="simple_sensor_simulator_node" name="simple_sensor_simulator_node" output="screen" respawn="false" respawn_delay="0">
+        <env name="LD_PRELOAD" value="$(var new_ld_preload)" />
+        <env name="AGNOCAST_MEMPOOL_SIZE" value="134217728"/>
         <param name="port" value="$(arg port)"/>
     </node>
 
     <node pkg="simple_sensor_simulator" type="scenario_runner_moc_node" name="scenario_runner_moc_node" output="screen" respawn="false" respawn_delay="0">
+        <env name="LD_PRELOAD" value="$(var new_ld_preload)" />
+        <env name="AGNOCAST_MEMPOOL_SIZE" value="134217728"/>
         <param name="port" value="$(arg port)"/>
     </node>
 

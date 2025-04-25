@@ -19,6 +19,7 @@
 #include <behaviortree_cpp_v3/bt_factory.h>
 
 #include <behavior_tree_plugin/pedestrian/pedestrian_action_node.hpp>
+#include <geometry/vector3/norm.hpp>
 #include <geometry/vector3/operator.hpp>
 #include <get_parameter/get_parameter.hpp>
 #include <memory>
