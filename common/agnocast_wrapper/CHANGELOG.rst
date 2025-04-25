@@ -2,6 +2,11 @@
 Changelog for package agnocast_wrapper
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+16.3.1 (2025-04-25)
+-------------------
+* Merge branch 'master' into fix/concealer-7/transition
+* Contributors: Kotaro Yoshimoto
+
 16.3.0 (2025-04-25)
 -------------------
 * Merge pull request `#1569 <https://github.com/tier4/scenario_simulator_v2/issues/1569>`_ from tier4/feature/agnocast

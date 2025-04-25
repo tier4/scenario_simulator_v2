@@ -9,6 +9,13 @@ Changelog for package simple_cross_map
 * Merge branch 'master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+16.3.1 (2025-04-25)
+-------------------
+* Merge branch 'master' into fix/concealer-7/transition
+* Merge branch 'master' into fix/concealer-7/transition
+* Merge branch 'master' into fix/concealer-7/transition
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
 16.3.0 (2025-04-25)
 -------------------
 * Merge branch 'master' into feature/agnocast
