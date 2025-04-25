@@ -36,7 +36,7 @@ TEST_F(LidarSensorTest, update_correct)
   // Spin the node to process callbacks
   rclcpp::spin_some(node_);
 
-  ASSERT_NE(received_msg_, nullptr);
+  ASSERT_TRUE(received_msg_);
   const auto total_num_of_points = received_msg_->width * received_msg_->height;
   EXPECT_GT(total_num_of_points, 0);
   EXPECT_EQ(received_msg_->header.frame_id, "base_link");
