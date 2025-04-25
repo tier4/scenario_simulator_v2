@@ -24,6 +24,20 @@ Changelog for package openscenario_utility
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+16.3.0 (2025-04-25)
+-------------------
+* Merge branch 'master' into feature/agnocast
+* Merge branch 'master' into feature/agnocast
+* Revert "Revert "Merge branch 'master' into feature/agnocast""
+  This reverts commit b54960a3492c52964556d54d5943c00cdfa10f50.
+* Revert "Merge branch 'master' into feature/agnocast"
+  This reverts commit a01992c8e365edd59a52d918cccfec61885234f2, reversing
+  changes made to 7f892377f23e4a7bfec460cbfa9f7cdd1b644806.
+* Merge branch 'master' into feature/agnocast
+* Merge branch 'master' into feature/agnocast
+* Merge branch 'master' into feature/agnocast
+* Contributors: Dawid Moszynski, Dawid Moszyński, Kotaro Yoshimoto, Mateusz Palczuk
+
 16.2.0 (2025-04-24)
 -------------------
 
