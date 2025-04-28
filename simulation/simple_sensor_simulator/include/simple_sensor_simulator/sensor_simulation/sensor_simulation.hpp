@@ -17,6 +17,7 @@
 
 #include <simulation_api_schema.pb.h>
 
+#include <agnocast_wrapper/agnocast_wrapper.hpp>
 #include <autoware_perception_msgs/msg/detected_objects.hpp>
 #include <autoware_perception_msgs/msg/tracked_objects.hpp>
 #include <iomanip>
@@ -50,8 +51,8 @@ public:
     if (configuration.architecture_type().find("awf/universe") != std::string::npos) {
       lidar_sensors_.push_back(std::make_unique<LidarSensor<sensor_msgs::msg::PointCloud2>>(
         current_simulation_time, configuration,
-        node.create_publisher<sensor_msgs::msg::PointCloud2>(
-          "/perception/obstacle_segmentation/pointcloud", 1)));
+        agnocast_wrapper::create_publisher<sensor_msgs::msg::PointCloud2>(
+          node, "/perception/obstacle_segmentation/pointcloud", 1)));
     } else {
       std::stringstream ss;
       ss << "Unexpected architecture_type " << std::quoted(configuration.architecture_type())

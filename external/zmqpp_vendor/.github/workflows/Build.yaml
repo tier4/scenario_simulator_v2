@@ -1,0 +1,62 @@
+name: BuildTest
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: 0 0 * * *
+  pull_request:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    name: build
+    runs-on: ${{ matrix.rosdistro[0] }}
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      max-parallel: 8
+      matrix:
+        rosdistro: [
+          [ubuntu-18.04, dashing],
+          [ubuntu-18.04, eloquent],
+          [ubuntu-20.04, foxy],
+          [ubuntu-20.04, galactic],
+          #[ubuntu-22.04, humble],
+          [ubuntu-20.04, rolling]] #,
+          #[ubuntu-22.04, rolling]]
+    env:
+      ROS_DISTRO: ${{ matrix.rosdistro[1] }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2-beta
+        with:
+          fetch-depth: 0
+      - name: Setup ROS2 ${{ matrix.rosdistro[1] }} environment
+        uses: ros-tooling/setup-ros@v0.2
+        with:
+          required-ros-distributions: ${{ matrix.rosdistro[1] }}
+      - name: Search packages in this repository
+        id: list_packages
+        run: |
+          echo ::set-output name=package_list::$(colcon list --names-only | sed -e ':loop; N; $!b loop; s/\n/ /g')
+      - name: Show target packages
+        run: |
+          echo "Target packages: ${{ steps.list_packages.outputs.package_list }}"
+      - name: Run build test
+        uses: ros-tooling/action-ros-ci@v0.2
+        with:
+          package-name: ${{ steps.list_packages.outputs.package_list }}
+          target-ros2-distro: ${{ matrix.rosdistro[1] }}
+          colcon-defaults: |
+            {
+              "build": {
+                "mixin": ["coverage-gcc", "coverage-pytest"]
+              },
+              "test": {
+                "mixin": ["coverage-pytest"]
+              }
+            }
+          # If possible, pin the repository in the workflow to a specific commit to avoid
+          # changes in colcon-mixin-repository from breaking your tests.
+          colcon-mixin-repository: https://raw.githubusercontent.com/colcon/colcon-mixin-repository/1ddb69bedfd1f04c2f000e95452f7c24a4d6176b/index.yaml

@@ -38,7 +38,8 @@ struct MagicSubscription : private T
   {
     std::atomic_bool stop_requested = false;
 
-    std::mutex mutex;
+    /// @note Synchronizes access to `thrown` to avoid data races between spin thread and rethrow().
+    std::mutex exception_mutex;
 
     std::exception_ptr thrown;
 
@@ -50,7 +51,7 @@ struct MagicSubscription : private T
           try {
             rclcpp::spin_some(get_node_base_interface());
           } catch (...) {
-            auto lock = std::lock_guard(mutex);
+            auto lock = std::lock_guard(exception_mutex);
             thrown = std::current_exception();
           }
         }
@@ -67,7 +68,7 @@ struct MagicSubscription : private T
 
     auto rethrow()
     {
-      if (auto lock = std::lock_guard(mutex); thrown) {
+      if (auto lock = std::lock_guard(exception_mutex); thrown) {
         std::rethrow_exception(thrown);
       }
     }
@@ -79,6 +80,10 @@ struct MagicSubscription : private T
 
   typename rclcpp::Subscription<T>::SharedPtr subscription;
 
+  /// @note Protects access to the stored message,
+  /// ensuring get() and callback() are synchronized.
+  mutable std::mutex message_mutex;
+
   explicit MagicSubscription(const std::string & topic_name)
   {
     if (not count++) {
@@ -86,8 +91,10 @@ struct MagicSubscription : private T
     }
 
     subscription = node->template create_subscription<T>(
-      topic_name, rclcpp::QoS(1).best_effort(),
-      [this](const typename T::SharedPtr message) { static_cast<T &>(*this) = *message; });
+      topic_name, rclcpp::QoS(1).best_effort(), [this](const typename T::SharedPtr message) {
+        std::lock_guard<std::mutex> lock(message_mutex);
+        static_cast<T &>(*this) = *message;
+      });
   }
 
   ~MagicSubscription()
@@ -97,9 +104,10 @@ struct MagicSubscription : private T
     }
   }
 
-  auto get() const -> const auto &
+  auto get() const -> T
   {
     node->rethrow();
+    std::lock_guard<std::mutex> lock(message_mutex);
     return static_cast<const T &>(*this);
   }
 };

@@ -35,6 +35,138 @@ Changelog for package scenario_test_runner
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+16.3.2 (2025-04-25)
+-------------------
+* Merge branch 'master' into RJD-1509/methods_optimization
+* Merge branch 'master' into RJD-1509/methods_optimization
+* Merge branch 'master' into RJD-1509/methods_optimization
+* Merge branch 'master' into RJD-1509/methods_optimization
+* Merge branch 'master' into RJD-1509/methods_optimization
+* Merge branch 'master' into RJD-1509/methods_optimization
+* Contributors: Grzegorz Maj, Masaya Kataoka
+
+16.3.1 (2025-04-25)
+-------------------
+* Merge branch 'master' into fix/concealer-7/transition
+* Merge branch 'master' into fix/concealer-7/transition
+* Merge branch 'master' into fix/concealer-7/transition
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
+16.3.0 (2025-04-25)
+-------------------
+* Merge pull request `#1569 <https://github.com/tier4/scenario_simulator_v2/issues/1569>`_ from tier4/feature/agnocast
+* Merge branch 'master' into feature/agnocast
+* Merge branch 'master' into feature/agnocast
+* Revert "Revert "Merge branch 'master' into feature/agnocast""
+  This reverts commit b54960a3492c52964556d54d5943c00cdfa10f50.
+* Revert "Merge branch 'master' into feature/agnocast"
+  This reverts commit a01992c8e365edd59a52d918cccfec61885234f2, reversing
+  changes made to 7f892377f23e4a7bfec460cbfa9f7cdd1b644806.
+* Merge branch 'master' into feature/agnocast
+* Merge branch 'master' into feature/agnocast
+* feat(simple_sensor_simulator, agnocast_wrapper): improve agnocast
+* Merge branch 'master' into feature/agnocast
+* Contributors: Dawid Moszynski, Dawid Moszyński, Kotaro Yoshimoto, Mateusz Palczuk
+
+16.2.0 (2025-04-24)
+-------------------
+
+16.1.4 (2025-04-23)
+-------------------
+* Merge branch 'master' into RJD-1752/fix_asserts
+* Merge branch 'master' into RJD-1752/fix_asserts
+* Merge branch 'master' into RJD-1752/fix_asserts
+* Merge branch 'master' into RJD-1752/fix_asserts
+* Contributors: Grzegorz Maj, Masaya Kataoka
+
+16.1.3 (2025-04-21)
+-------------------
+* Merge branch 'master' into fix/concealer-7
+* Merge branch 'master' into fix/concealer-7
+* Merge branch 'master' into fix/concealer-7
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
+16.1.2 (2025-04-18)
+-------------------
+* Merge branch 'master' into docs/fix_architecture_type
+* Merge branch 'master' into docs/fix_architecture_type
+* Merge branch 'master' into docs/fix_architecture_type
+* Contributors: Dawid Moszyński, Masaya Kataoka
+
+16.1.1 (2025-04-18)
+-------------------
+* Merge branch 'master' into fix/magic_subscription_data_race
+* Merge branch 'master' into fix/magic_subscription_data_race
+* Contributors: Kotaro Yoshimoto, SzymonParapura
+
+16.1.0 (2025-04-18)
+-------------------
+* Merge pull request `#1566 <https://github.com/tier4/scenario_simulator_v2/issues/1566>`_ from tier4/feature/pedestrian_awareness
+  Feature/pedestrian awareness
+* Merge branch 'master' into feature/pedestrian_awareness
+* Rename member variable: SeeAroundMode
+* Merge branch 'master' into feature/pedestrian_awareness
+* Formatted the launch file.
+* Renamed the parameter to `pedestrian_ignore_see_around`.
+* Improved parameter retrieval method.
+* Merge branch 'master' into feature/pedestrian_awareness
+* Merge branch 'master' into feature/pedestrian_awareness
+* Merge branch 'master' into feature/pedestrian_awareness
+* Added pedestrian_behavior_mode to allow selection between legacy and standard modes.
+* Contributors: Masaya Kataoka, Taiga, Taiga Takano
+
+16.0.0 (2025-04-17)
+-------------------
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge remote-tracking branch 'tier4/master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge remote-tracking branch 'tier4/master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge remote-tracking branch 'tier4/master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge remote-tracking branch 'tier4/RJD-1057-remove-functions-forwarded-to-entity-base-refactor' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge remote-tracking branch 'tier4/master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'master' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge remote-tracking branch 'tier4/RJD-1057-remove-functions-forwarded-to-entity-base-middle' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'RJD-1057-remove-functions-forwarded-to-entity-base-middle' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge remote-tracking branch 'tier4/RJD-1057-remove-functions-forwarded-to-entity-base-middle' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'RJD-1057-remove-functions-forwarded-to-entity-base-middle' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'RJD-1057-remove-functions-forwarded-to-entity-base-middle' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'RJD-1057-remove-functions-forwarded-to-entity-base-middle' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge remote-tracking branch 'origin/RJD-1057-remove-functions-forwarded-to-entity-base-middle' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'RJD-1057-remove-functions-forwarded-to-entity-base-middle' into RJD-1057-remove-functions-forwarded-to-entity-base-refactor
+* Merge branch 'RJD-1057-remove-traffic-lights-from-entity-manager' into RJD-1057-remove-functions-forwarded-to-entity-base
+* Merge branch 'RJD-1057-remove-traffic-lights-from-entity-manager' into RJD-1057-remove-functions-forwarded-to-entity-base
+* Contributors: Dawid Moszynski, Dawid Moszyński, Kotaro Yoshimoto, Masaya Kataoka, Mateusz Palczuk
+
+15.1.3 (2025-04-16)
+-------------------
+* Merge branch 'master' into fix/concealer/engage
+* Merge branch 'master' into fix/concealer/engage
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
+15.1.2 (2025-04-16)
+-------------------
+
 15.1.1 (2025-04-14)
 -------------------
 
