@@ -71,6 +71,11 @@ auto boundingBoxLaneLongitudinalDistance(
   const bool include_adjacent_lanelet, const bool include_opposite_direction,
   const RoutingConfiguration & routing_configuration) -> std::optional<double>;
 
+auto boundingBoxLaneLongitudinalDistance(
+  const std::optional<double> & longitudinal_distance,
+  const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
+  const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box) -> std::optional<double>;
+
 // Bounds
 auto distanceToLaneBound(
   const geometry_msgs::msg::Pose & map_pose,
