@@ -44,6 +44,7 @@ public:
   virtual auto update(const double current_time, const double step_time) -> void = 0;
   virtual const std::string & getCurrentAction() const = 0;
 
+  // clang-format off
 #define DEFINE_GETTER_SETTER(NAME, KEY, TYPE)      \
   virtual TYPE get##NAME() = 0;                    \
   virtual void set##NAME(const TYPE & value) = 0;  \
@@ -53,7 +54,6 @@ public:
     return key;                                    \
   }
 
-  // clang-format off
   DEFINE_GETTER_SETTER(BehaviorParameter,                                "behavior_parameter",                             traffic_simulator_msgs::msg::BehaviorParameter)
   DEFINE_GETTER_SETTER(CanonicalizedEntityStatus,                        "canonicalized_entity_status",                    std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>)
   DEFINE_GETTER_SETTER(CurrentTime,                                      "current_time",                                   double)
