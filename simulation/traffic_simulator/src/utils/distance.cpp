@@ -193,6 +193,29 @@ auto boundingBoxLaneLongitudinalDistance(
   return std::nullopt;
 }
 
+auto boundingBoxLaneLongitudinalDistance(
+  const std::optional<double> & longitudinal_distance,
+  const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
+  const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box) -> std::optional<double>
+{
+  if (longitudinal_distance) {
+    const auto from_bounding_box_distances =
+      math::geometry::getDistancesFromCenterToEdge(from_bounding_box);
+    const auto to_bounding_box_distances =
+      math::geometry::getDistancesFromCenterToEdge(to_bounding_box);
+    auto bounding_box_distance = 0.0;
+    if (longitudinal_distance.value() > 0.0) {
+      bounding_box_distance =
+        -std::abs(from_bounding_box_distances.front) - std::abs(to_bounding_box_distances.rear);
+    } else if (longitudinal_distance.value() < 0.0) {
+      bounding_box_distance =
+        +std::abs(from_bounding_box_distances.rear) + std::abs(to_bounding_box_distances.front);
+    }
+    return longitudinal_distance.value() + bounding_box_distance;
+  }
+  return std::nullopt;
+}
+
 auto splineDistanceToBoundingBox(
   const math::geometry::CatmullRomSplineInterface & spline,
   const CanonicalizedLaneletPose & from_lanelet_pose,
@@ -219,26 +242,31 @@ auto splineDistanceToBoundingBox(
         traffic_simulator::pose::findRoutableAlternativeLaneletPoseFrom(
           from_lanelet_pose.getLaneletId(), target_lanelet_pose, target_bounding_box);
       target_lanelet_pose_alternative) {
-    if (const auto bounding_box_distance =
-          traffic_simulator::distance::boundingBoxLaneLongitudinalDistance(
-            from_lanelet_pose, from_bounding_box, target_lanelet_pose_alternative.value(),
-            target_bounding_box, include_adjacent_lanelet, include_opposite_direction,
-            routing_configuration);
-        !bounding_box_distance || bounding_box_distance.value() < 0.0) {
+    const auto bounding_box_map_points = math::geometry::transformPoints(
+      static_cast<geometry_msgs::msg::Pose>(target_lanelet_pose_alternative.value()),
+      math::geometry::getPointsFromBbox(target_bounding_box));
+    const auto bounding_box_diagonal_length =
+      math::geometry::getDistance(bounding_box_map_points[0], bounding_box_map_points[2]);
+    if (const auto longitudinal_distance = distance::longitudinalDistance(
+          from_lanelet_pose, target_lanelet_pose_alternative.value(), include_adjacent_lanelet,
+          include_opposite_direction, routing_configuration);
+        not longitudinal_distance) {
       return std::nullopt;
-    } else if (const auto position_distance = traffic_simulator::distance::longitudinalDistance(
-                 from_lanelet_pose, target_lanelet_pose_alternative.value(),
-                 include_adjacent_lanelet, include_opposite_direction, routing_configuration);
-               !position_distance) {
+    } else if (const auto bounding_box_distance =
+                 traffic_simulator::distance::boundingBoxLaneLongitudinalDistance(
+                   longitudinal_distance, from_bounding_box, target_bounding_box);
+               !bounding_box_distance || bounding_box_distance.value() < 0.0) {
       return std::nullopt;
     } else {
+      /// @todo rotation of NPC is not taken into account, same as in boundingBoxLaneLongitudinalDistance
+      /// this should be considered to be changed in separate task in the future
       const auto target_bounding_box_distance =
         bounding_box_distance.value() + from_bounding_box.dimensions.x / 2.0;
 
       /// @note if the distance of the target entity to the spline is smaller than the width of the reference entity
       if (const auto target_to_spline_distance = traffic_simulator::distance::distanceToSpline(
             static_cast<geometry_msgs::msg::Pose>(target_lanelet_pose_alternative.value()),
-            target_bounding_box, spline, position_distance.value());
+            target_bounding_box, spline, longitudinal_distance.value());
           target_to_spline_distance <= from_bounding_box.dimensions.y / 2.0) {
         return target_bounding_box_distance;
       }
@@ -246,7 +274,11 @@ auto splineDistanceToBoundingBox(
       else if (const auto target_polygon = math::geometry::transformPoints(
                  static_cast<geometry_msgs::msg::Pose>(target_lanelet_pose_alternative.value()),
                  math::geometry::getPointsFromBbox(target_bounding_box));
-               spline.getCollisionPointIn2D(target_polygon, search_backward)) {
+               spline.getCollisionPointIn2D(
+                 target_polygon, search_backward,
+                 std::make_pair(
+                   bounding_box_distance.value(),
+                   target_bounding_box_distance + bounding_box_diagonal_length))) {
         return target_bounding_box_distance;
       }
     }
