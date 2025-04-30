@@ -21,6 +21,51 @@ Changelog for package concealer
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+16.3.2 (2025-04-25)
+-------------------
+* Merge branch 'master' into RJD-1509/methods_optimization
+* Merge branch 'master' into RJD-1509/methods_optimization
+* Merge branch 'master' into RJD-1509/methods_optimization
+* Merge branch 'master' into RJD-1509/methods_optimization
+* Merge branch 'master' into RJD-1509/methods_optimization
+* Merge branch 'master' into RJD-1509/methods_optimization
+* Contributors: Grzegorz Maj, Masaya Kataoka
+
+16.3.1 (2025-04-25)
+-------------------
+* Merge pull request `#1584 <https://github.com/tier4/scenario_simulator_v2/issues/1584>`_ from tier4/fix/concealer-7/transition
+* Merge branch 'master' into fix/concealer-7/transition
+* Fix `FieldOperatorApplication::plan` to correctly handle state `initializing`
+* Merge branch 'master' into fix/concealer-7/transition
+* Merge branch 'master' into fix/concealer-7/transition
+* Cleanup
+* Change `concealer`'s default service request resend interval to 3 [sec]
+* Update `waitForAutowareStateToBe` to handle states as ranges
+* Add debug prints to `concealer`
+* Update `FieldOperatorApplication` to wait for Autoware to transition to target state
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki, yamacir-kit
+
+16.3.0 (2025-04-25)
+-------------------
+* Merge branch 'master' into feature/agnocast
+* Merge branch 'master' into feature/agnocast
+* Revert "Revert "Merge branch 'master' into feature/agnocast""
+  This reverts commit b54960a3492c52964556d54d5943c00cdfa10f50.
+* Revert "Merge branch 'master' into feature/agnocast"
+  This reverts commit a01992c8e365edd59a52d918cccfec61885234f2, reversing
+  changes made to 7f892377f23e4a7bfec460cbfa9f7cdd1b644806.
+* Merge branch 'master' into feature/agnocast
+* Merge branch 'master' into feature/agnocast
+* revert(concealer): undo unnecessary formatting changes
+* fix(concealer): fix setOdometry
+* revert(concealer): remove agnocast
+* Merge branch 'master' into feature/agnocast
+* First prototype of using agnocast_wrapper in concealer::Publisher
+* Contributors: Dawid Moszynski, Dawid Moszyński, Kotaro Yoshimoto, Mateusz Palczuk
+
+16.2.0 (2025-04-24)
+-------------------
+
 16.1.4 (2025-04-23)
 -------------------
 * Merge branch 'master' into RJD-1752/fix_asserts
