@@ -250,6 +250,9 @@ auto ActionNode::getFrontEntityName(const math::geometry::CatmullRomSplineInterf
     const double stop_distance = calculateStopDistance(behavior_parameter.dynamic_constraints);
     const double horizon = spline.getLength() > stop_distance ? spline.getLength() : stop_distance;
     for (const auto & [name_pair, euclidean_distance] : *euclidean_distances_map) {
+      /**
+       * @note Euclidean distance is here used as a "rough" distance to filter only NPCs which possibly are in range of current horizon. Because euclidean distance is the shortest possible distance comparing it with horizon will never omit NPCs for which actual lane distance is in range of horizon.
+       */
       if (euclidean_distance < horizon) {
         if (name_pair.first == canonicalized_entity_status->getName()) {
           local_euclidean_distances_map.emplace(euclidean_distance, name_pair.second);
