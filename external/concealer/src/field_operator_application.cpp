@@ -356,7 +356,6 @@ auto FieldOperatorApplication::plan(const std::vector<geometry_msgs::msg::PoseSt
 {
   assert(not route.empty());
 
-  task_queue.delay([this, route] {
   task_queue.delay([this, route, allow_goal_modification]() {
     switch (const auto state = getLegacyAutowareState(); state.value) {
       default:
