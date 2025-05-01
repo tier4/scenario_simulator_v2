@@ -319,11 +319,12 @@ auto EgoEntity::requestSpeedChange(
 
 auto EgoEntity::requestClearRoute() -> void { clearRoute(); }
 
-auto EgoEntity::requestReplanRoute(const std::vector<geometry_msgs::msg::PoseStamped> & route)
+auto EgoEntity::requestReplanRoute(
+  const std::vector<geometry_msgs::msg::PoseStamped> & route, const bool allow_goal_modification)
   -> void
 {
   clearRoute();
-  plan(route);
+  plan(route, allow_goal_modification);
   enableAutowareControl();
   FieldOperatorApplication::engage();
 }

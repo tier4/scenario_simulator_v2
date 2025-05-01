@@ -113,7 +113,9 @@ public:
 
   auto requestClearRoute() -> void;
 
-  auto requestReplanRoute(const std::vector<geometry_msgs::msg::PoseStamped> & route) -> void;
+  auto requestReplanRoute(
+    const std::vector<geometry_msgs::msg::PoseStamped> & route,
+    const bool allow_goal_modification = false) -> void;
 
   auto requestAutoModeForCooperation(const std::string & module_name, bool enable) -> void;
 
