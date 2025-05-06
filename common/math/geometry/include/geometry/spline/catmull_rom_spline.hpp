@@ -51,14 +51,16 @@ public:
   auto getSquaredDistanceVector(const geometry_msgs::msg::Point & point, const double s) const
     -> geometry_msgs::msg::Vector3;
   auto getCollisionPointsIn2D(
-    const std::vector<geometry_msgs::msg::Point> & polygon,
-    const bool search_backward = false) const -> std::set<double>;
+    const std::vector<geometry_msgs::msg::Point> & polygon, const bool search_backward = false,
+    const std::optional<std::pair<double, double>> & s_range = std::nullopt) const
+    -> std::set<double>;
   auto getCollisionPointIn2D(
     const geometry_msgs::msg::Point & point0, const geometry_msgs::msg::Point & point1,
     const bool search_backward = false) const -> std::optional<double>;
   auto getCollisionPointIn2D(
-    const std::vector<geometry_msgs::msg::Point> & polygon,
-    const bool search_backward = false) const -> std::optional<double> override;
+    const std::vector<geometry_msgs::msg::Point> & polygon, const bool search_backward = false,
+    const std::optional<std::pair<double, double>> & s_range = std::nullopt) const
+    -> std::optional<double> override;
   auto getPolygon(const double width, const size_t num_points = 30, const double z_offset = 0)
     -> std::vector<geometry_msgs::msg::Point>;
   const std::vector<geometry_msgs::msg::Point> control_points;

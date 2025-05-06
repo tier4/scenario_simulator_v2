@@ -124,14 +124,19 @@ struct FieldOperatorApplication : public rclcpp::Node
 
   template <typename Thunk = void (*)()>
   auto waitForAutowareStateToBe(
-    const LegacyAutowareState & state, Thunk thunk = [] {})
+    const LegacyAutowareState & from_state, const LegacyAutowareState & to_state,
+    Thunk thunk = [] {})
   {
     thunk();
 
-    while (not finalized.load() and getLegacyAutowareState().value != state.value) {
+    auto not_to_be = [&](auto current_state) {
+      return from_state.value <= current_state.value and current_state.value < to_state.value;
+    };
+
+    while (not finalized.load() and not_to_be(getLegacyAutowareState())) {
       if (time_limit <= std::chrono::steady_clock::now()) {
         throw common::AutowareError(
-          "Simulator waited for the Autoware state to transition to ", state,
+          "Simulator waited for the Autoware state to transition to ", to_state,
           ", but time is up. The current Autoware state is ", getLegacyAutowareState());
       } else {
         thunk();
