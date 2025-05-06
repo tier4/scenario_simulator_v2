@@ -81,6 +81,11 @@ auto VehicleEntity::getDefaultMatchingDistanceForLaneletPoseCalculation() const 
          1.5;
 }
 
+auto VehicleEntity::getParameters() const -> const traffic_simulator_msgs::msg::VehicleParameters &
+{
+  return vehicle_parameters;
+}
+
 auto VehicleEntity::getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter
 {
   return behavior_plugin_ptr_->getBehaviorParameter();
@@ -92,9 +97,13 @@ auto VehicleEntity::getEntityTypename() const -> const std::string &
   return result;
 }
 
-auto VehicleEntity::getGoalPoses() -> std::vector<CanonicalizedLaneletPose>
+auto VehicleEntity::getGoalPoses() -> std::vector<geometry_msgs::msg::Pose>
 {
-  return route_planner_.getGoalPoses();
+  std::vector<geometry_msgs::msg::Pose> poses;
+  for (const auto & lanelet_pose : route_planner_.getGoalPoses()) {
+    poses.push_back(pose::toMapPose(lanelet_pose));
+  }
+  return poses;
 }
 
 auto VehicleEntity::getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle>
@@ -135,6 +144,7 @@ auto VehicleEntity::onUpdate(const double current_time, const double step_time) 
   behavior_plugin_ptr_->setTargetSpeed(target_speed_);
   auto route_lanelets = getRouteLanelets();
   behavior_plugin_ptr_->setRouteLanelets(route_lanelets);
+  behavior_plugin_ptr_->setEuclideanDistancesMap(euclidean_distances_map_);
 
   // recalculate spline only when input data changes
   if (previous_route_lanelets_ != route_lanelets) {

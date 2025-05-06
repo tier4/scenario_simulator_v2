@@ -20,6 +20,7 @@
 #include <string>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/helper/helper.hpp>
+#include <traffic_simulator/lanelet_wrapper/distance.hpp>
 #include <traffic_simulator/lanelet_wrapper/lanelet_map.hpp>
 #include <traffic_simulator/lanelet_wrapper/pose.hpp>
 
@@ -1758,7 +1759,7 @@ TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLateralDistance_sameLane)
 {
   const auto from = traffic_simulator::helper::constructLaneletPose(3002185, 0.0, 0.5);
   const auto to = traffic_simulator::helper::constructLaneletPose(3002185, 10.0, 0.2);
-  const auto result = hdmap_utils.getLateralDistance(from, to);
+  const auto result = traffic_simulator::lanelet_wrapper::distance::lateralDistance(from, to);
 
   EXPECT_TRUE(result.has_value());
   EXPECT_NEAR(result.value(), to.offset - from.offset, 1e-3);
@@ -1771,10 +1772,9 @@ TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLateralDistance_sameLane)
  */
 TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLateralDistance_parallelLanesCanNotChange)
 {
-  EXPECT_FALSE(hdmap_utils
-                 .getLateralDistance(
-                   traffic_simulator::helper::constructLaneletPose(3002185, 0.0, 0.5),
-                   traffic_simulator::helper::constructLaneletPose(3002184, 10.0, 0.2))
+  EXPECT_FALSE(traffic_simulator::lanelet_wrapper::distance::lateralDistance(
+                 traffic_simulator::helper::constructLaneletPose(3002185, 0.0, 0.5),
+                 traffic_simulator::helper::constructLaneletPose(3002184, 10.0, 0.2))
                  .has_value());
 }
 
@@ -1790,8 +1790,8 @@ TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLateralDistance_parallelLanesCanCh
 
   traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
   lane_changeable_routing_configuration.allow_lane_change = true;
-  const auto result =
-    hdmap_utils.getLateralDistance(from, to, lane_changeable_routing_configuration);
+  const auto result = traffic_simulator::lanelet_wrapper::distance::lateralDistance(
+    from, to, lane_changeable_routing_configuration);
 
   EXPECT_TRUE(result.has_value());
   EXPECT_NEAR(result.value(), 2.80373 / 2.0 + 3.03463 / 2.0 + to.offset - from.offset, 1e-3);
@@ -1808,11 +1808,10 @@ TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLateralDistance_notConnected)
 {
   traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
   lane_changeable_routing_configuration.allow_lane_change = true;
-  EXPECT_FALSE(hdmap_utils
-                 .getLateralDistance(
-                   traffic_simulator::helper::constructLaneletPose(3002185, 0.0, 0.5),
-                   traffic_simulator::helper::constructLaneletPose(3002166, 10.0, 0.2),
-                   lane_changeable_routing_configuration)
+  EXPECT_FALSE(traffic_simulator::lanelet_wrapper::distance::lateralDistance(
+                 traffic_simulator::helper::constructLaneletPose(3002185, 0.0, 0.5),
+                 traffic_simulator::helper::constructLaneletPose(3002166, 10.0, 0.2),
+                 lane_changeable_routing_configuration)
                  .has_value());
 }
 
@@ -2290,6 +2289,30 @@ TEST_F(HdMapUtilsTest_StandardMap, getStopLineIdsOnPath_empty)
   EXPECT_EQ(
     traffic_simulator::lanelet_wrapper::lanelet_map::stopLineIdsOnPath(lanelet::Ids{}).size(),
     static_cast<size_t>(0));
+}
+
+/**
+ * @note Test obtaining stop line ids for a standard map.
+ */
+TEST_F(HdMapUtilsTest_StandardMap, stopLineIds_standardMap)
+{
+  EXPECT_EQ(traffic_simulator::lanelet_wrapper::lanelet_map::stopLineIds(), (lanelet::Ids{120635}));
+}
+
+/**
+ * @note Test obtaining stop line ids for an intersection map.
+ */
+TEST_F(HdMapUtilsTest_IntersectionMap, stopLineIds_intersectionMap)
+{
+  EXPECT_EQ(traffic_simulator::lanelet_wrapper::lanelet_map::stopLineIds(), (lanelet::Ids{6960}));
+}
+
+/**
+ * @note Test function behavior when used with an empty map.
+ */
+TEST_F(HdMapUtilsTest_EmptyMap, stopLineIds_emptyMap)
+{
+  EXPECT_THROW(traffic_simulator::lanelet_wrapper::lanelet_map::stopLineIds(), std::runtime_error);
 }
 
 /**

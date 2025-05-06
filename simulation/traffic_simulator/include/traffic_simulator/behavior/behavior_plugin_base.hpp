@@ -36,6 +36,8 @@ namespace entity_behavior
 using EntityStatusDict =
   std::unordered_map<std::string, traffic_simulator::CanonicalizedEntityStatus>;
 
+using EuclideanDistancesMap = std::unordered_map<std::pair<std::string, std::string>, double>;
+
 class BehaviorPluginBase
 {
 public:
@@ -44,6 +46,7 @@ public:
   virtual auto update(const double current_time, const double step_time) -> void = 0;
   virtual const std::string & getCurrentAction() const = 0;
 
+  // clang-format off
 #define DEFINE_GETTER_SETTER(NAME, KEY, TYPE)      \
   virtual TYPE get##NAME() = 0;                    \
   virtual void set##NAME(const TYPE & value) = 0;  \
@@ -53,7 +56,6 @@ public:
     return key;                                    \
   }
 
-  // clang-format off
   DEFINE_GETTER_SETTER(BehaviorParameter,                                "behavior_parameter",                             traffic_simulator_msgs::msg::BehaviorParameter)
   DEFINE_GETTER_SETTER(CanonicalizedEntityStatus,                        "canonicalized_entity_status",                    std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>)
   DEFINE_GETTER_SETTER(CurrentTime,                                      "current_time",                                   double)
@@ -74,6 +76,7 @@ public:
   DEFINE_GETTER_SETTER(TrafficLights,                                    "traffic_lights",                                 std::shared_ptr<traffic_simulator::TrafficLightsBase>)
   DEFINE_GETTER_SETTER(VehicleParameters,                                "vehicle_parameters",                             traffic_simulator_msgs::msg::VehicleParameters)
   DEFINE_GETTER_SETTER(Waypoints,                                        "waypoints",                                      traffic_simulator_msgs::msg::WaypointsArray)
+  DEFINE_GETTER_SETTER(EuclideanDistancesMap,                            "euclidean_distances_map",                        std::shared_ptr<EuclideanDistancesMap>)
   // clang-format on
 #undef DEFINE_GETTER_SETTER
 };

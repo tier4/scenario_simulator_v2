@@ -47,7 +47,8 @@ namespace traffic_simulator
 {
 namespace entity
 {
-class EntityBase
+using EuclideanDistancesMap = std::unordered_map<std::pair<std::string, std::string>, double>;
+class EntityBase : public std::enable_shared_from_this<EntityBase>
 {
 public:
   explicit EntityBase(
@@ -68,6 +69,28 @@ public:
   /*   */ auto is() const -> bool
   {
     return dynamic_cast<EntityType const *>(this) != nullptr;
+  }
+
+  template <typename EntityType>
+  /*   */ auto as() -> EntityType &
+  {
+    if (const auto derived_ptr = dynamic_cast<EntityType *>(this); !derived_ptr) {
+      THROW_SEMANTIC_ERROR(
+        "Entity ", std::quoted(name), " is not ", std::quoted(typeid(EntityType).name()), "type");
+    } else {
+      return *derived_ptr;
+    }
+  }
+
+  template <typename EntityType>
+  /*   */ auto as() const -> const EntityType &
+  {
+    if (const auto derived_ptr = dynamic_cast<EntityType const *>(this); !derived_ptr) {
+      THROW_SEMANTIC_ERROR(
+        "Entity ", std::quoted(name), " is not ", std::quoted(typeid(EntityType).name()), "type");
+    } else {
+      return *derived_ptr;
+    }
   }
 
   virtual void appendDebugMarker(visualization_msgs::msg::MarkerArray & /*unused*/);
@@ -110,7 +133,7 @@ public:
 
   virtual auto getEntityTypename() const -> const std::string & = 0;
 
-  virtual auto getGoalPoses() -> std::vector<CanonicalizedLaneletPose> = 0;
+  virtual auto getGoalPoses() -> std::vector<geometry_msgs::msg::Pose> = 0;
 
   /*   */ auto isStopped() const -> bool;
 
@@ -290,6 +313,8 @@ public:
 
   bool verbose;
 
+  void setEuclideanDistancesMap(const std::shared_ptr<EuclideanDistancesMap> & distances);
+
 protected:
   std::shared_ptr<CanonicalizedEntityStatus> status_;
 
@@ -310,6 +335,8 @@ protected:
 
   std::unique_ptr<traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner>
     speed_planner_;
+
+  std::shared_ptr<EuclideanDistancesMap> euclidean_distances_map_;
 
 private:
   virtual auto requestSpeedChangeWithConstantAcceleration(
