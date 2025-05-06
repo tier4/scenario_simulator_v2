@@ -21,6 +21,9 @@ Changelog for package geometry
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+16.3.3 (2025-05-02)
+-------------------
+
 16.3.2 (2025-04-25)
 -------------------
 * Merge pull request `#1567 <https://github.com/tier4/scenario_simulator_v2/issues/1567>`_ from tier4/RJD-1509/methods_optimization

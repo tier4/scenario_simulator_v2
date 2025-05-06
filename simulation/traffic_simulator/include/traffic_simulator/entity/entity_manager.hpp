@@ -98,8 +98,9 @@ public:
   // update
   auto update(const double current_time, const double step_time) -> void;
 
-  auto updateNpcLogic(const std::string & name, const double current_time, const double step_time)
-    -> const CanonicalizedEntityStatus &;
+  auto updateNpcLogic(
+    const std::string & name, const double current_time, const double step_time,
+    const std::shared_ptr<EuclideanDistancesMap> & distances) -> const CanonicalizedEntityStatus &;
 
   auto updateLaneletMarker() const -> void;
 
@@ -227,6 +228,8 @@ public:
   auto despawnEntity(const std::string & name) -> bool;
 
   // traffics, lanelet
+
+  auto calculateEuclideanDistances() -> std::shared_ptr<EuclideanDistancesMap>;
 
 private:
   /* */ Configuration configuration_;
