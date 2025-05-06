@@ -21,6 +21,16 @@ Changelog for package behavior_tree_plugin
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+16.3.3 (2025-05-02)
+-------------------
+* Merge pull request `#1568 <https://github.com/tier4/scenario_simulator_v2/issues/1568>`_ from tier4/RJD-1509/rough_distances
+  RJD-1509 Filter nearest NPCs to calculate distance
+* Update simulation/behavior_tree_plugin/src/action_node.cpp
+* Resolve cpp_mock_scenarios failures and clang format
+* Review changes
+* RJD-1509 Filter nearest NPCs to calculate distance
+* Contributors: Grzegorz Maj, Masaya Kataoka
+
 16.3.2 (2025-04-25)
 -------------------
 * Merge pull request `#1567 <https://github.com/tier4/scenario_simulator_v2/issues/1567>`_ from tier4/RJD-1509/methods_optimization
