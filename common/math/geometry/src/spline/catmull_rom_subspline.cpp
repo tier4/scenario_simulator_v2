@@ -33,7 +33,8 @@ std::pair<double, double> CatmullRomSubspline::getAltitudeRange() const
 }
 
 std::optional<double> CatmullRomSubspline::getCollisionPointIn2D(
-  const std::vector<geometry_msgs::msg::Point> & polygon, const bool search_backward) const
+  const std::vector<geometry_msgs::msg::Point> & polygon, const bool search_backward,
+  const std::optional<std::pair<double, double>> & s_range) const
 {
   /// @note Make sure end is greater than start, otherwise the spline is invalid
   if (end_s_ < start_s_) {
@@ -45,8 +46,10 @@ std::optional<double> CatmullRomSubspline::getCollisionPointIn2D(
       "This message is not originally intended to be displayed, if you see it, please "
       "contact the developer of traffic_simulator.");
   }
-
-  std::set<double> s_value_candidates = spline_->getCollisionPointsIn2D(polygon);
+  std::optional<std::pair<double, double>> s_subrange =
+    s_range ? std::make_pair(s_range->first + start_s_, s_range->second + start_s_) : s_range;
+  std::set<double> s_value_candidates =
+    spline_->getCollisionPointsIn2D(polygon, search_backward, s_subrange);
 
   if (s_value_candidates.empty()) {
     return std::nullopt;
