@@ -43,7 +43,6 @@ public:
     // clang-format off
     return BT::PortsList({
         BT::InputPort<std::shared_ptr<math::geometry::CatmullRomSpline>>("reference_trajectory"),
-        BT::InputPort<traffic_simulator_msgs::msg::BehaviorParameter>("behavior_parameter"),
         BT::InputPort<traffic_simulator_msgs::msg::VehicleParameters>("vehicle_parameters")}) +
       entity_behavior::ActionNode::providedPorts();
     // clang-format on
@@ -56,7 +55,6 @@ public:
     const traffic_simulator_msgs::msg::WaypointsArray & waypoints) = 0;
 
 protected:
-  traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter;
   traffic_simulator_msgs::msg::VehicleParameters vehicle_parameters;
   std::shared_ptr<math::geometry::CatmullRomSpline> reference_trajectory;
   std::unique_ptr<math::geometry::CatmullRomSubspline> trajectory;

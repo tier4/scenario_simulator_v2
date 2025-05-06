@@ -2,6 +2,9 @@
 Changelog for package get_parameter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+16.3.3 (2025-05-02)
+-------------------
+
 16.3.2 (2025-04-25)
 -------------------
 * Merge branch 'master' into RJD-1509/methods_optimization

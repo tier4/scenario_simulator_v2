@@ -92,6 +92,14 @@ auto ActionNode::getBlackBoardValues() -> void
   if (!getInput<lanelet::Ids>("route_lanelets", route_lanelets)) {
     THROW_SIMULATION_ERROR("failed to get input route_lanelets in ActionNode");
   }
+  if (!getInput<std::shared_ptr<EuclideanDistancesMap>>(
+        "euclidean_distances_map", euclidean_distances_map)) {
+    euclidean_distances_map = std::make_shared<EuclideanDistancesMap>();
+  }
+  if (!getInput<traffic_simulator_msgs::msg::BehaviorParameter>(
+        "behavior_parameter", behavior_parameter)) {
+    behavior_parameter = traffic_simulator_msgs::msg::BehaviorParameter();
+  }
 }
 
 auto ActionNode::getOtherEntitiesCanonicalizedLaneletPoses() const
@@ -182,36 +190,49 @@ auto ActionNode::getFrontEntityName(const math::geometry::CatmullRomSplineInterf
    * candidate of front entity.
    */
   constexpr double front_entity_angle_threshold{boost::math::constants::half_pi<double>()};
-  constexpr double front_entity_horizon{40.0};
 
-  std::optional<std::string> front_entity_name;
-  auto try_front_entity = [&front_entity_name, min_distance = std::numeric_limits<double>::max()](
-                            const std::string & name, const double distance) mutable {
-    if (distance < min_distance) {
-      min_distance = distance;
-      front_entity_name = name;
+  if (euclidean_distances_map != nullptr) {
+    std::map<double, std::string> local_euclidean_distances_map;
+    const double stop_distance = calculateStopDistance(behavior_parameter.dynamic_constraints);
+    const double horizon = spline.getLength() > stop_distance ? spline.getLength() : stop_distance;
+    for (const auto & [name_pair, euclidean_distance] : *euclidean_distances_map) {
+      /**
+       * @note Euclidean distance is here used as a "rough" distance to filter only NPCs which possibly are in range of current horizon. Because euclidean distance is the shortest possible distance comparing it with horizon will never omit NPCs for which actual lane distance is in range of horizon.
+       */
+      if (euclidean_distance < horizon) {
+        if (name_pair.first == canonicalized_entity_status->getName()) {
+          local_euclidean_distances_map.emplace(euclidean_distance, name_pair.second);
+        } else if (name_pair.second == canonicalized_entity_status->getName()) {
+          local_euclidean_distances_map.emplace(euclidean_distance, name_pair.first);
+        }
+      }
     }
-  };
-  for (const auto & [other_name, other_status] : other_entity_status) {
-    if (
-      const auto & other_canonicalized_lanelet_pose = other_status.getCanonicalizedLaneletPose()) {
-      const auto distance = traffic_simulator::distance::splineDistanceToBoundingBox(
-        spline, canonicalized_entity_status->getCanonicalizedLaneletPose().value(),
-        canonicalized_entity_status->getBoundingBox(), other_canonicalized_lanelet_pose.value(),
-        other_status.getBoundingBox());
-      if (distance && distance.value() < front_entity_horizon) {
+
+    for (const auto & [euclidean_distance, name] : local_euclidean_distances_map) {
+      const auto & other_status = other_entity_status.at(name);
+      if (
+        const auto & other_canonicalized_lanelet_pose =
+          other_status.getCanonicalizedLaneletPose()) {
         const auto quaternion = math::geometry::getRotation(
           canonicalized_entity_status->getMapPose().orientation,
           other_status.getMapPose().orientation);
         const auto yaw = math::geometry::convertQuaternionToEulerAngle(quaternion).z;
+
         if (std::fabs(yaw) <= front_entity_angle_threshold) {
-          try_front_entity(other_name, distance.value());
+          const auto longitudinal_distance =
+            traffic_simulator::distance::splineDistanceToBoundingBox(
+              spline, canonicalized_entity_status->getCanonicalizedLaneletPose().value(),
+              canonicalized_entity_status->getBoundingBox(),
+              other_canonicalized_lanelet_pose.value(), other_status.getBoundingBox());
+
+          if (longitudinal_distance && longitudinal_distance.value() < horizon) {
+            return name;
+          }
         }
       }
     }
   }
-
-  return front_entity_name;
+  return std::nullopt;
 }
 
 auto ActionNode::getEntityStatus(const std::string & target_name) const
