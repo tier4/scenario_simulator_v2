@@ -239,7 +239,7 @@ auto ActionNode::getFrontEntityName(const math::geometry::CatmullRomSplineInterf
     for (const auto & [euclidean_distance, name] : local_euclidean_distances_map) {
       const auto & other_status = other_entity_status.at(name);
       if (
-        const auto & other_canonicalized_lanalet_pose =
+        const auto & other_canonicalized_lanelet_pose =
           other_status.getCanonicalizedLaneletPose()) {
         const auto quaternion = math::geometry::getRotation(
           canonicalized_entity_status->getMapPose().orientation,
@@ -251,7 +251,7 @@ auto ActionNode::getFrontEntityName(const math::geometry::CatmullRomSplineInterf
             traffic_simulator::distance::splineDistanceToBoundingBox(
               spline, canonicalized_entity_status->getCanonicalizedLaneletPose().value(),
               canonicalized_entity_status->getBoundingBox(),
-              other_canonicalized_lanalet_pose.value(), other_status.getBoundingBox());
+              other_canonicalized_lanelet_pose.value(), other_status.getBoundingBox());
 
           if (longitudinal_distance && longitudinal_distance.value() < horizon) {
             return name;
