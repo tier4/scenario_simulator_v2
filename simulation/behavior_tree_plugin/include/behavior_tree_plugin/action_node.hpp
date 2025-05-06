@@ -31,6 +31,7 @@
 #include <traffic_simulator/traffic_lights/traffic_lights.hpp>
 #include <traffic_simulator/utils/lanelet_map.hpp>
 #include <traffic_simulator/utils/pose.hpp>
+#include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/obstacle.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 #include <unordered_map>
@@ -86,6 +87,8 @@ public:
       BT::InputPort<std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>>("canonicalized_entity_status"),
       BT::InputPort<std::shared_ptr<traffic_simulator::TrafficLightsBase>>("traffic_lights"),
       BT::InputPort<traffic_simulator::behavior::Request>("request"),
+      BT::InputPort<std::shared_ptr<EuclideanDistancesMap>>("euclidean_distances_map"),
+      BT::InputPort<traffic_simulator_msgs::msg::BehaviorParameter>("behavior_parameter"),
       BT::OutputPort<std::optional<traffic_simulator_msgs::msg::Obstacle>>("obstacle"),
       BT::OutputPort<traffic_simulator_msgs::msg::WaypointsArray>("waypoints"),
       BT::OutputPort<traffic_simulator::behavior::Request>("request"),
@@ -116,6 +119,8 @@ protected:
   std::optional<double> target_speed;
   EntityStatusDict other_entity_status;
   lanelet::Ids route_lanelets;
+  std::shared_ptr<EuclideanDistancesMap> euclidean_distances_map;
+  traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter;
 
   auto getDistanceToTargetEntity(
     const math::geometry::CatmullRomSplineInterface & spline,
