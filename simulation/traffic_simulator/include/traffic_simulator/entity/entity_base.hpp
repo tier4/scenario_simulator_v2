@@ -303,15 +303,11 @@ public:
 
   /*   */ void updateEntityStatusTimestamp(const double current_time);
 
-  /*   */ auto updateStandStillDuration(const double step_time) -> double;
-
-  /*   */ auto updateTraveledDistance(const double step_time) -> double;
+  /*   */ void setEuclideanDistancesMap(const std::shared_ptr<EuclideanDistancesMap> & distances);
 
   const std::string name;
 
   bool verbose;
-
-  void setEuclideanDistancesMap(const std::shared_ptr<EuclideanDistancesMap> & distances);
 
 protected:
   std::shared_ptr<CanonicalizedEntityStatus> status_;
