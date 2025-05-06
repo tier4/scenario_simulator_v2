@@ -47,6 +47,7 @@ namespace traffic_simulator
 {
 namespace entity
 {
+using EuclideanDistancesMap = std::unordered_map<std::pair<std::string, std::string>, double>;
 class EntityBase : public std::enable_shared_from_this<EntityBase>
 {
 public:
@@ -310,6 +311,8 @@ public:
 
   bool verbose;
 
+  void setEuclideanDistancesMap(const std::shared_ptr<EuclideanDistancesMap> & distances);
+
 protected:
   std::shared_ptr<CanonicalizedEntityStatus> status_;
 
@@ -330,6 +333,8 @@ protected:
 
   std::unique_ptr<traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner>
     speed_planner_;
+
+  std::shared_ptr<EuclideanDistancesMap> euclidean_distances_map_;
 
 private:
   virtual auto requestSpeedChangeWithConstantAcceleration(

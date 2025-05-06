@@ -844,5 +844,11 @@ auto EntityBase::requestSynchronize(
     []() {}, job::Type::LINEAR_ACCELERATION, true, job::Event::POST_UPDATE);
   return false;
 }
+
+void EntityBase::setEuclideanDistancesMap(const std::shared_ptr<EuclideanDistancesMap> & distances)
+{
+  euclidean_distances_map_ = distances;
+}
+
 }  // namespace entity
 }  // namespace traffic_simulator
