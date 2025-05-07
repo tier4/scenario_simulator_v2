@@ -483,7 +483,7 @@
           # simulator internally converts Quaternion to Euler angles and
           # applies the error to them. It then converts the error-applied
           # Euler angles back to Quaternion and publishes them as
-          # `/localization/kinematic_state`.
+          # `/sensing/imu/imu_data`.
           r:
             error:
               additive:
