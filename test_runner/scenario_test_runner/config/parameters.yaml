@@ -138,14 +138,14 @@
             position:
               # The data members of geometry_msgs::msg::Pose.position are x, y,
               # z, which are world coordinates in
-              # `/localization/kinematic_state`. However, applying error to a
+              # `/localization/pose_estimator/pose_with_covariance`. However, applying error to a
               # position in world coordinates is unintuitive and tricky, so we
               # accept the parameters as the entity's local coordinates.
               # local_x, local_y, local_z express that. The simulator
               # calculates the error in the local coordinates. It then
               # transforms the error to the world coordinates, adds the error
               # to the true position (world coordinates), and publishes it as
-              # `/localization/kinematic_state`.
+              # `/localization/pose_estimator/pose_with_covariance`.
               local_x:
                 error:
                   additive:
@@ -178,7 +178,7 @@
               # simulator internally converts Quaternion to Euler angles and
               # applies the error to them. It then converts the error-applied
               # Euler angles back to Quaternion and publishes them as
-              # `/localization/kinematic_state`.
+              # `/localization/pose_estimator/pose_with_covariance`.
               r:
                 error:
                   additive:
@@ -302,7 +302,7 @@
           # simulator internally converts Quaternion to Euler angles and
           # applies the error to them. It then converts the error-applied
           # Euler angles back to Quaternion and publishes them as
-          # `/localization/kinematic_state`.
+          # `/sensing/imu/imu_data`.
           r:
             error:
               additive:
