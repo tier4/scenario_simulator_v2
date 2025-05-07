@@ -227,12 +227,15 @@ void EgoEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &
   }
 
   requestClearRoute();
+
+  auto allow_goal_modification =
+    common::getParameter<bool>(get_node_parameters_interface(), "allow_goal_modification");
   if (not initialized) {
     initialize(getMapPose());
-    plan(route);
+    plan(route, allow_goal_modification);
     // NOTE: engage() will be executed at simulation-time 0.
   } else {
-    plan(route);
+    plan(route, allow_goal_modification);
     FieldOperatorApplication::engage();
   }
 }
@@ -285,7 +288,9 @@ auto EgoEntity::requestReplanRoute(const std::vector<geometry_msgs::msg::PoseSta
   -> void
 {
   clearRoute();
-  plan(route);
+  auto allow_goal_modification =
+    common::getParameter<bool>(get_node_parameters_interface(), "allow_goal_modification");
+  plan(route, allow_goal_modification);
   enableAutowareControl();
   FieldOperatorApplication::engage();
 }
