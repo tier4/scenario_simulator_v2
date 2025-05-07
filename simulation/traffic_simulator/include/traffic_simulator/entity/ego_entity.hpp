@@ -82,11 +82,19 @@ public:
 
   void requestAcquirePosition(const CanonicalizedLaneletPose &) override;
 
-  void requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose) override;
+  void requestAcquirePosition(const geometry_msgs::msg::Pose &) override;
+
+  void requestAcquirePosition(const CanonicalizedLaneletPose &, const bool);
+
+  void requestAcquirePosition(const geometry_msgs::msg::Pose &, const bool);
 
   void requestAssignRoute(const std::vector<CanonicalizedLaneletPose> &) override;
 
   void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) override;
+
+  void requestAssignRoute(const std::vector<CanonicalizedLaneletPose> &, const bool);
+
+  void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &, const bool);
 
   auto requestFollowTrajectory(
     const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &) -> void override;
@@ -105,7 +113,9 @@ public:
 
   auto requestClearRoute() -> void;
 
-  auto requestReplanRoute(const std::vector<geometry_msgs::msg::PoseStamped> & route) -> void;
+  auto requestReplanRoute(
+    const std::vector<geometry_msgs::msg::PoseStamped> & route,
+    const bool allow_goal_modification = false) -> void;
 
   auto requestAutoModeForCooperation(const std::string & module_name, bool enable) -> void;
 
