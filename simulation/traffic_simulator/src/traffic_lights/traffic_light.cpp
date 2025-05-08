@@ -181,15 +181,9 @@ TrafficLight::TrafficLight(
   }()),
   regulatory_elements_ids(hdmap_utils.getTrafficLightRegulatoryElementIDsFromTrafficLight(way_id)),
   positions{
-    std::make_pair(
-      Bulb(Color::green, Status::solid_on, Shape::circle).hash(),
-      hdmap_utils.getTrafficLightBulbPosition(way_id, "green", true)),
-    std::make_pair(
-      Bulb(Color::yellow, Status::solid_on, Shape::circle).hash(),
-      hdmap_utils.getTrafficLightBulbPosition(way_id, "yellow", true)),
-    std::make_pair(
-      Bulb(Color::red, Status::solid_on, Shape::circle).hash(),
-      hdmap_utils.getTrafficLightBulbPosition(way_id, "red", true)),
+    std::make_pair(Color::green, hdmap_utils.getTrafficLightBulbPosition(way_id, "green", true)),
+    std::make_pair(Color::yellow, hdmap_utils.getTrafficLightBulbPosition(way_id, "yellow", true)),
+    std::make_pair(Color::red, hdmap_utils.getTrafficLightBulbPosition(way_id, "red", true)),
   }
 {
 }
