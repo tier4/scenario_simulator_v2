@@ -467,10 +467,10 @@ struct TrafficLight
         visualization_msgs::msg::Marker marker;
         marker.header.stamp = now;
         marker.header.frame_id = frame_id;
-        marker.action = marker.ADD;
+        marker.action = visualization_msgs::msg::Marker::ADD;
         marker.ns = "bulb";
         marker.id = way_id;
-        marker.type = marker.SPHERE;
+        marker.type = visualization_msgs::msg::Marker::SPHERE;
         marker.pose.position = optional_position(bulb).value();
         marker.pose.orientation = geometry_msgs::msg::Quaternion();
         marker.scale.x = 0.3;
