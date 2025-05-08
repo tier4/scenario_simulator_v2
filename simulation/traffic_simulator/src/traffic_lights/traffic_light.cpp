@@ -183,13 +183,13 @@ TrafficLight::TrafficLight(
   positions{
     std::make_pair(
       Bulb(Color::green, Status::solid_on, Shape::circle).hash(),
-      hdmap_utils.getTrafficLightBulbPosition(way_id, "green")),
+      hdmap_utils.getTrafficLightBulbPosition(way_id, "green", true)),
     std::make_pair(
       Bulb(Color::yellow, Status::solid_on, Shape::circle).hash(),
-      hdmap_utils.getTrafficLightBulbPosition(way_id, "yellow")),
+      hdmap_utils.getTrafficLightBulbPosition(way_id, "yellow", true)),
     std::make_pair(
       Bulb(Color::red, Status::solid_on, Shape::circle).hash(),
-      hdmap_utils.getTrafficLightBulbPosition(way_id, "red")),
+      hdmap_utils.getTrafficLightBulbPosition(way_id, "red", true)),
   }
 {
 }
