@@ -287,6 +287,14 @@ auto relativeLaneletPose(
   const RoutingConfiguration & routing_configuration) -> LaneletPose
 {
   constexpr bool include_adjacent_lanelet{false};
+  /**
+   * @note include_opposite_direction value was changed, because of https://github.com/tier4/scenario_simulator_v2/pull/1468
+   * (exactly these changes: https://github.com/tier4/scenario_simulator_v2/commit/e6f8c24f614b1a2236b0ee31de51f2a6748e8fec)
+   * Calling lanelet_wrapper::pose::leftLaneletIds and rightLaneletIds with
+   * include_opposite_direction=true throws error, because it is not implemented yet.
+   * Call stack for this to happen is pose::relativeLaneletPose -> distance::longitudinalDistance ->
+   * lanelet_wrapper::pose::toLaneletPose -> lanelet_wrapper::pose::leftLaneletIds
+   */
   constexpr bool include_opposite_direction{false};
 
   LaneletPose position = quietNaNLaneletPose();
