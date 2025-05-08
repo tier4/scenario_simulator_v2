@@ -83,6 +83,9 @@ jobs:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
       - name: Build with SonarCloud Build Wrapper
+        # Note: `-Wno-error=class-memaccess` is temporary workaround for aarch64 GCC error
+        # This should be removed when Eigen is updated in Ubuntu package repository
+        # See also: https://gitlab.com/libeigen/eigen/-/issues/2326
         run: |
           source /opt/ros/${{ matrix.rosdistro }}/setup.bash
           ${{ steps.build_wrapper.outputs.build-wrapper-binary }} --out-dir src/scenario_simulator_v2/bw-output \
