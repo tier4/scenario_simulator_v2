@@ -41,7 +41,7 @@ public:
   template <typename Node>
   explicit Service(
     const std::string & name, Node & node,
-    const std::chrono::nanoseconds & interval = std::chrono::seconds(1))
+    const std::chrono::nanoseconds & interval = std::chrono::seconds(3))
   : name(name),
     client(node.template create_client<T>(name, rmw_qos_profile_default)),
     interval(interval)

@@ -91,6 +91,14 @@ auto ActionNode::getBlackBoardValues() -> void
   if (!getInput<lanelet::Ids>("route_lanelets", route_lanelets)) {
     THROW_SIMULATION_ERROR("failed to get input route_lanelets in ActionNode");
   }
+  if (!getInput<std::shared_ptr<EuclideanDistancesMap>>(
+        "euclidean_distances_map", euclidean_distances_map)) {
+    euclidean_distances_map = std::make_shared<EuclideanDistancesMap>();
+  }
+  if (!getInput<traffic_simulator_msgs::msg::BehaviorParameter>(
+        "behavior_parameter", behavior_parameter)) {
+    behavior_parameter = traffic_simulator_msgs::msg::BehaviorParameter();
+  }
 }
 
 auto ActionNode::getHorizon() const -> double
@@ -237,34 +245,43 @@ auto ActionNode::getDistanceToFrontEntity(
 auto ActionNode::getFrontEntityName(const math::geometry::CatmullRomSplineInterface & spline) const
   -> std::optional<std::string>
 {
-  std::vector<double> distances;
-  std::vector<std::string> entities;
-  for (const auto & [name, status] : other_entity_status) {
-    const auto distance = getDistanceToTargetEntity(spline, status);
-    const auto quat = math::geometry::getRotation(
-      canonicalized_entity_status->getMapPose().orientation,
-      other_entity_status.at(name).getMapPose().orientation);
-    /**
-     * @note hard-coded parameter, if the Yaw value of RPY is in ~1.5708 -> 1.5708, entity is a candidate of front entity.
-     */
-    if (
-      std::fabs(math::geometry::convertQuaternionToEulerAngle(quat).z) <=
-      boost::math::constants::half_pi<double>()) {
-      if (distance && distance.value() < 40) {
-        entities.emplace_back(name);
-        distances.emplace_back(distance.value());
+  if (euclidean_distances_map != nullptr) {
+    std::map<double, std::string> local_euclidean_distances_map;
+    const double stop_distance = calculateStopDistance(behavior_parameter.dynamic_constraints);
+    const double horizon = spline.getLength() > stop_distance ? spline.getLength() : stop_distance;
+    for (const auto & [name_pair, euclidean_distance] : *euclidean_distances_map) {
+      /**
+       * @note Euclidean distance is here used as a "rough" distance to filter only NPCs which possibly are in range of current horizon. Because euclidean distance is the shortest possible distance comparing it with horizon will never omit NPCs for which actual lane distance is in range of horizon.
+       */
+      if (euclidean_distance < horizon) {
+        if (name_pair.first == canonicalized_entity_status->getName()) {
+          local_euclidean_distances_map.emplace(euclidean_distance, name_pair.second);
+        } else if (name_pair.second == canonicalized_entity_status->getName()) {
+          local_euclidean_distances_map.emplace(euclidean_distance, name_pair.first);
+        }
+      }
+    }
+
+    for (const auto & [euclidean_distance, name] : local_euclidean_distances_map) {
+      const auto quaternion = math::geometry::getRotation(
+        canonicalized_entity_status->getMapPose().orientation,
+        other_entity_status.at(name).getMapPose().orientation);
+      /**
+       * @note hard-coded parameter, if the Yaw value of RPY is in ~1.5708 -> 1.5708, entity is a candidate of front entity.
+       */
+      if (
+        std::fabs(math::geometry::convertQuaternionToEulerAngle(quaternion).z) <=
+        boost::math::constants::half_pi<double>()) {
+        const auto longitudinal_distance =
+          getDistanceToTargetEntity(spline, other_entity_status.at(name));
+
+        if (longitudinal_distance && longitudinal_distance.value() < horizon) {
+          return name;
+        }
       }
     }
   }
-  if (entities.size() != distances.size()) {
-    THROW_SIMULATION_ERROR("size of entities and distances vector does not match.");
-  }
-  if (distances.empty()) {
-    return std::nullopt;
-  }
-  std::vector<double>::iterator iter = std::min_element(distances.begin(), distances.end());
-  size_t index = std::distance(distances.begin(), iter);
-  return entities[index];
+  return std::nullopt;
 }
 
 auto ActionNode::getDistanceToTargetEntityOnCrosswalk(
@@ -294,7 +311,7 @@ auto ActionNode::getEntityStatus(const std::string & target_name) const
  * 1. Check if route to target entity from reference entity exists, if not try to transform pose to other 
  *    routable lanelet, within matching distance (findRoutableAlternativeLaneletPoseFrom).
  * 2. Calculate longitudinal distance between entities bounding boxes -> bounding_box_distance.
- * 3. Calculate longitudinal distance between entities poses -> position_distance.
+ * 3. Calculate longitudinal distance between entities poses -> longitudinal_distance.
  * 4. Calculate target entity bounding box distance to reference entity spline (minimal distance from all corners) 
  *    -> target_to_spline_distance.
  * 5. If target_to_spline_distance is less than half width of reference entity target entity is conflicting.
@@ -331,33 +348,42 @@ auto ActionNode::getDistanceToTargetEntity(
       target_lanelet_pose) {
     const auto & from_lanelet_pose = canonicalized_entity_status->getCanonicalizedLaneletPose();
     const auto & from_bounding_box = canonicalized_entity_status->getBoundingBox();
-    if (const auto bounding_box_distance =
-          traffic_simulator::distance::boundingBoxLaneLongitudinalDistance(
-            *from_lanelet_pose, from_bounding_box, *target_lanelet_pose, target_bounding_box,
-            include_adjacent_lanelet, include_opposite_direction, routing_configuration,
-            hdmap_utils);
-        !bounding_box_distance || bounding_box_distance.value() < 0.0) {
+    const auto bounding_box_map_points = math::geometry::transformPoints(
+      static_cast<geometry_msgs::msg::Pose>(*target_lanelet_pose),
+      math::geometry::getPointsFromBbox(target_bounding_box));
+    const auto bounding_box_diagonal_length =
+      math::geometry::getDistance(bounding_box_map_points[0], bounding_box_map_points[2]);
+    if (const auto longitudinal_distance = traffic_simulator::distance::longitudinalDistance(
+          *from_lanelet_pose, *target_lanelet_pose, include_adjacent_lanelet,
+          include_opposite_direction, routing_configuration, hdmap_utils);
+        !longitudinal_distance) {
       return std::nullopt;
-    } else if (const auto position_distance = traffic_simulator::distance::longitudinalDistance(
-                 *from_lanelet_pose, *target_lanelet_pose, include_adjacent_lanelet,
-                 include_opposite_direction, routing_configuration, hdmap_utils);
-               !position_distance) {
+    } else if (const auto bounding_box_distance =
+                 traffic_simulator::distance::boundingBoxLaneLongitudinalDistance(
+                   longitudinal_distance, from_bounding_box, target_bounding_box);
+               !bounding_box_distance || bounding_box_distance.value() < 0.0) {
       return std::nullopt;
     } else {
+      /// @todo rotation of NPC is not taken into account, same as in boundingBoxLaneLongitudinalDistance
+      /// this should be considered to be changed in separate task in the future
       const auto target_bounding_box_distance =
         bounding_box_distance.value() + from_bounding_box.dimensions.x / 2.0;
 
       /// @note if the distance of the target entity to the spline is smaller than the width of the reference entity
       if (const auto target_to_spline_distance = traffic_simulator::distance::distanceToSpline(
             static_cast<geometry_msgs::msg::Pose>(*target_lanelet_pose), target_bounding_box,
-            spline, position_distance.value());
+            spline, longitudinal_distance.value());
           target_to_spline_distance <= from_bounding_box.dimensions.y / 2.0) {
         return target_bounding_box_distance;
       }
       /// @note if the distance of the target entity to the spline cannot be calculated because a collision occurs
       else if (const auto target_polygon = math::geometry::transformPoints(
                  status.getMapPose(), math::geometry::getPointsFromBbox(target_bounding_box));
-               spline.getCollisionPointIn2D(target_polygon, search_backward)) {
+               spline.getCollisionPointIn2D(
+                 target_polygon, search_backward,
+                 std::make_pair(
+                   bounding_box_distance.value(),
+                   target_bounding_box_distance + bounding_box_diagonal_length))) {
         return target_bounding_box_distance;
       }
     }
