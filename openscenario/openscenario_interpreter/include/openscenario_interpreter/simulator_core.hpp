@@ -439,9 +439,11 @@ public:
 
         auto & ego_entity = core->getEgoEntity(entity_ref);
 
-        ego_entity.setParameter<bool>(
-          "allow_goal_modification",
-          controller.properties.template get<Boolean>("allowGoalModification"));
+        if (controller.properties.exists("allowGoalModification")) {
+          ego_entity.setParameter<bool>(
+            "allow_goal_modification",
+            controller.properties.template get<Boolean>("allowGoalModification"));
+        }
 
         for (const auto & module :
              [](std::string manual_modules_string) {
