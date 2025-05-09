@@ -13,4 +13,3 @@ Scenario testing framework for Autoware.
 
 See [Documentation](https://tier4.github.io/scenario_simulator_v2-docs/)
 See [C++ API Documentation](https://tier4.github.io/scenario_simulator_v2-api-docs/index.html)
-
