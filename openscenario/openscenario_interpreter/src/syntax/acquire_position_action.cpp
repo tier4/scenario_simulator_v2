@@ -28,22 +28,37 @@ AcquirePositionAction::AcquirePositionAction(const pugi::xml_node & node, Scope 
 
 auto AcquirePositionAction::start() -> void
 {
+  bool allow_goal_modification = [&]() -> bool {
+    try {
+      return ref<Boolean>(std::string("AcquirePositionAction.allow_goal_modification"));
+    } catch (const SyntaxError &) {
+      // default value of allow_goal_modification
+      return false;
+    }
+  }();
+
   const auto acquire_position = overload(
-    [](const WorldPosition & position, auto && actor) {
-      return applyAcquirePositionAction(actor, static_cast<NativeWorldPosition>(position));
+    [](const WorldPosition & position, auto && actor, const bool allow_goal_modification) {
+      return applyAcquirePositionAction(
+        actor, static_cast<NativeWorldPosition>(position), allow_goal_modification);
     },
-    [](const RelativeWorldPosition & position, auto && actor) {
-      return applyAcquirePositionAction(actor, static_cast<NativeLanePosition>(position));
+    [](const RelativeWorldPosition & position, auto && actor, const bool allow_goal_modification) {
+      return applyAcquirePositionAction(
+        actor, static_cast<NativeLanePosition>(position), allow_goal_modification);
     },
-    [](const RelativeObjectPosition & position, auto && actor) {
-      return applyAcquirePositionAction(actor, static_cast<NativeLanePosition>(position));
+    [](const RelativeObjectPosition & position, auto && actor, const bool allow_goal_modification) {
+      return applyAcquirePositionAction(
+        actor, static_cast<NativeLanePosition>(position), allow_goal_modification);
     },
-    [](const LanePosition & position, auto && actor) {
-      return applyAcquirePositionAction(actor, static_cast<NativeLanePosition>(position));
+    [](const LanePosition & position, auto && actor, const bool allow_goal_modification) {
+      return applyAcquirePositionAction(
+        actor, static_cast<NativeLanePosition>(position), allow_goal_modification);
     });
 
   for (const auto & actor : actors) {
-    actor.apply([&](const auto & object) { apply<void>(acquire_position, position, object); });
+    actor.apply([&](const auto & object) {
+      apply<void>(acquire_position, position, object, allow_goal_modification);
+    });
   }
 }
 }  // namespace syntax
