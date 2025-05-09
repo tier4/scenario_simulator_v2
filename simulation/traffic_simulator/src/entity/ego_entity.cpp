@@ -256,12 +256,21 @@ void EgoEntity::requestAssignRoute(
 
   requestClearRoute();
 
+  auto get_allow_goal_modification = [&]() {
+    if (has_parameter("allow_goal_modification")) {
+      // override if Controller.Properties.Property.allowGoalModification is defined
+      return get_parameter("allow_goal_modification").get_value<bool>();
+    } else {
+      return allow_goal_modification;
+    }
+  };
+
   if (not initialized) {
     initialize(getMapPose());
-    plan(route, allow_goal_modification);
+    plan(route, get_allow_goal_modification());
     // NOTE: engage() will be executed at simulation-time 0.
   } else {
-    plan(route, allow_goal_modification);
+    plan(route, get_allow_goal_modification());
     FieldOperatorApplication::engage();
   }
 }
