@@ -29,6 +29,7 @@ TrafficSignalState::TrafficSignalState(const pugi::xml_node & node, Scope & scop
 auto TrafficSignalState::evaluate() const -> Object
 {
   setConventionalTrafficLightsState(id(), state);
+  setV2ITrafficLightsState(id(), state);
   return unspecified;
 }
 
