@@ -40,12 +40,16 @@ class RandomTestRunnerLaunch(object):
 
         self.autoware_launch_arguments = {
             # autoware arguments #
-            "architecture_type": {"default": "awf/universe/20230906", "description": "Autoware architecture type",
-                                  "values": ["awf/universe/20230906", "awf/universe/20240605"]},
+            "architecture_type": {
+                "default": "awf/universe/20230906", "description": "Autoware architecture type",
+                "values": ["awf/universe/20230906", "awf/universe/20240605"]},
             "sensor_model": {"default": "sample_sensor_kit", "description": "Ego sensor model"},
             "vehicle_model": {"default": "sample_vehicle", "description": "Ego vehicle model"},
             "autoware_launch_file": {"default": "planning_simulator.launch.xml", "description": "Launch file name for Autoware running"},
             "autoware_launch_package": {"default": "autoware_launch", "description": "Launch file package name for Autoware running"},
+            "rviz_config": {
+                "default": os.path.join(get_package_share_directory("traffic_simulator"), "config", "scenario_simulator_v2.rviz"), 
+                "description": "RViz config file"},
         }
 
         self.random_test_arguments = {
@@ -182,7 +186,6 @@ class RandomTestRunnerLaunch(object):
             package="random_test_runner",
             executable="random_test_runner_node",
             namespace="simulation",
-            name="random_test_runner_node",
             output="screen",
             arguments=[("__log_level:=info")],
             parameters=parameters
@@ -205,7 +208,6 @@ class RandomTestRunnerLaunch(object):
             Node(
                 package="simple_sensor_simulator",
                 executable="simple_sensor_simulator_node",
-                name="simple_sensor_simulator_node",
                 namespace="simulation",
                 output="log",
                 arguments=[("__log_level:=warn")],
