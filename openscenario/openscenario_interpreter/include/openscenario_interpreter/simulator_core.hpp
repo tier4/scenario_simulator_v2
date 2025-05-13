@@ -462,7 +462,7 @@ public:
 
         auto & ego_entity = core->getEgoEntity(entity_ref);
 
-        if (controller.properties.exists("allowGoalModification")) {
+        if (controller.properties.contains("allowGoalModification")) {
           ego_entity.setParameter<bool>(
             "allow_goal_modification",
             controller.properties.template get<Boolean>("allowGoalModification"));

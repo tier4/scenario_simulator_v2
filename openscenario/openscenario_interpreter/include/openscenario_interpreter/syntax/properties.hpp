@@ -60,7 +60,7 @@ struct Properties
 
   explicit Properties(const pugi::xml_node &, Scope &);
 
-  auto exists(const String & name) const -> bool
+  auto contains(const String & name) const -> bool
   {
     return properties.find(name) != std::end(properties);
   }
