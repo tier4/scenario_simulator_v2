@@ -78,6 +78,9 @@ auto LaneletLoader::overwriteLaneletsCenterline(lanelet::LaneletMapPtr lanelet_m
     return centerline;
   };
   for (auto & lanelet_obj : lanelet_map_ptr->laneletLayer) {
+    if (lanelet_obj.hasCustomCenterline()) {
+      THROW_SIMULATION_ERROR("Detected custom centerline in lanelet map");
+    }
     lanelet_obj.setCenterline(generateFineCenterline(lanelet_obj));
   }
 }

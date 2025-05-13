@@ -1080,6 +1080,9 @@ auto HdMapUtils::generateMarker() const -> visualization_msgs::msg::MarkerArray
 auto HdMapUtils::overwriteLaneletsCenterline() -> void
 {
   for (auto & lanelet_obj : lanelet_map_ptr_->laneletLayer) {
+    if (lanelet_obj.hasCustomCenterline()) {
+      THROW_SIMULATION_ERROR("Detected custom centerline in lanelet map");
+    }
     const auto fine_center_line = generateFineCenterline(lanelet_obj, 2.0);
     lanelet_obj.setCenterline(fine_center_line);
   }
