@@ -35,6 +35,7 @@ public:
 
   // Ego member functions
   MOCK_METHOD(void, engage, (), ());
+  MOCK_METHOD(bool, isEngaged, (), (const));
   MOCK_METHOD(bool, isEngageable, (), (const));
   MOCK_METHOD(bool, setParameterMock, (const std::string &, const bool &), (const));
   MOCK_METHOD(void, requestAssignRoute, (const std::vector<geometry_msgs::msg::Pose> &), ());
@@ -119,6 +120,9 @@ public:
     ());
   MOCK_METHOD(void, attachLidarSensor, (const simulation_api_schema::LidarConfiguration &), ());
   MOCK_METHOD(
+    bool, attachImuSensor,
+    (const std::string &, const simulation_api_schema::ImuSensorConfiguration & configuration), ());
+  MOCK_METHOD(
     void, attachDetectionSensor, (const simulation_api_schema::DetectionSensorConfiguration &), ());
   MOCK_METHOD(
     bool, attachOccupancyGridSensor, (simulation_api_schema::OccupancyGridSensorConfiguration), ());
@@ -193,6 +197,7 @@ TEST(TestExecutor, InitializeWithNoNPCs)
   EXPECT_CALL(*MockAPI, attachLidarSensor).Times(1).InSequence(sequence);
   EXPECT_CALL(*MockAPI, attachDetectionSensor).Times(1).InSequence(sequence);
   EXPECT_CALL(*MockAPI, attachOccupancyGridSensor).Times(1).InSequence(sequence);
+  EXPECT_CALL(*MockAPI, attachImuSensor).Times(1).InSequence(sequence);
   EXPECT_CALL(*mock_ego, setParameterMock).Times(1).InSequence(sequence);
   EXPECT_CALL(*mock_ego, requestAssignRoute).Times(1).InSequence(sequence);
   EXPECT_CALL(*mock_ego, engage).Times(1).InSequence(sequence);
