@@ -2,6 +2,12 @@
 Changelog for package get_parameter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+16.3.6 (2025-05-14)
+-------------------
+* Merge branch 'master' into feature/arm64-buildtest
+* Merge branch 'master' into feature/arm64-buildtest
+* Contributors: Kotaro Yoshimoto, ぐるぐる
+
 16.3.5 (2025-05-12)
 -------------------
 * Merge pull request `#1588 <https://github.com/tier4/scenario_simulator_v2/issues/1588>`_ from tier4/fix/missing-rviz-config-and-npc-start
