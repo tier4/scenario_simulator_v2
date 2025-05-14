@@ -21,6 +21,14 @@ Changelog for package kashiwanoha_map
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+16.3.5 (2025-05-12)
+-------------------
+* Merge branch 'master' into fix/missing-rviz-config-and-npc-start
+* Contributors: SzymonParapura
+
+16.3.4 (2025-05-12)
+-------------------
+
 16.3.3 (2025-05-02)
 -------------------
 

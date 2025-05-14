@@ -6,7 +6,8 @@ on:
   schedule:
     - cron: 0 0 * * *
   pull_request:
-
+    paths:
+      - "**/*.md"
 jobs:
   linkChecker:
     runs-on: ubuntu-latest
@@ -18,6 +19,6 @@ jobs:
         uses: lycheeverse/lychee-action@v1.5.0
         with:
           fail: true
-          args: "--verbose --no-progress './**/*.md' './**/*.html' --timeout 1000 --max-concurrency 1 -T 1 --retry-wait-time 10 --github-token ${{secrets.GITHUB_TOKEN}}"
+          args: "--verbose --no-progress './**/*.md' './**/*.html' --timeout 1000 --max-concurrency 1 -T 1 --retry-wait-time 10"
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
