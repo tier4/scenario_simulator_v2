@@ -21,6 +21,23 @@ Changelog for package simple_sensor_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+16.3.6 (2025-05-14)
+-------------------
+* Merge branch 'master' into feature/arm64-buildtest
+* Merge branch 'master' into feature/arm64-buildtest
+* Contributors: Kotaro Yoshimoto, ぐるぐる
+
+16.3.5 (2025-05-12)
+-------------------
+* Merge branch 'master' into fix/missing-rviz-config-and-npc-start
+* Contributors: SzymonParapura
+
+16.3.4 (2025-05-12)
+-------------------
+
+16.3.3 (2025-05-02)
+-------------------
+
 16.3.2 (2025-04-25)
 -------------------
 * Merge branch 'master' into RJD-1509/methods_optimization

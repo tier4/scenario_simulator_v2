@@ -21,6 +21,28 @@ Changelog for package random_test_runner
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+16.3.6 (2025-05-14)
+-------------------
+* Merge branch 'master' into feature/arm64-buildtest
+* Merge branch 'master' into feature/arm64-buildtest
+* Contributors: Kotaro Yoshimoto, ぐるぐる
+
+16.3.5 (2025-05-12)
+-------------------
+* Merge pull request `#1588 <https://github.com/tier4/scenario_simulator_v2/issues/1588>`_ from tier4/fix/missing-rviz-config-and-npc-start
+* Merge branch 'master' into fix/missing-rviz-config-and-npc-start
+* fix(random_test_runner) Fix Rviz config path and NPC start condition
+  - Added missing RViz config file path
+  - Removed explicit node names to avoid duplicate node error
+  - Fixed NPC startup condition
+* Contributors: Kotaro Yoshimoto, SzymonParapura
+
+16.3.4 (2025-05-12)
+-------------------
+
+16.3.3 (2025-05-02)
+-------------------
+
 16.3.2 (2025-04-25)
 -------------------
 * Merge branch 'master' into RJD-1509/methods_optimization
