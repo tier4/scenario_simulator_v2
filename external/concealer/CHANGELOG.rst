@@ -21,6 +21,12 @@ Changelog for package concealer
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+16.3.6 (2025-05-14)
+-------------------
+* Merge branch 'master' into feature/arm64-buildtest
+* Merge branch 'master' into feature/arm64-buildtest
+* Contributors: Kotaro Yoshimoto, ぐるぐる
+
 16.3.5 (2025-05-12)
 -------------------
 * Merge branch 'master' into fix/missing-rviz-config-and-npc-start
