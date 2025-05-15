@@ -31,6 +31,11 @@ auto lateralDistance(
   const RoutingConfiguration & routing_configuration = RoutingConfiguration())
   -> std::optional<double>;
 
+auto longitudinalDistance(
+  const LaneletPose & from, const LaneletPose & to,
+  const RoutingConfiguration & routing_configuration = RoutingConfiguration())
+  -> std::optional<double>;
+
 // StopLine
 auto distanceToStopLine(const lanelet::Ids & route_lanelets, const SplineInterface & route_spline)
   -> std::optional<double>;
@@ -40,6 +45,30 @@ auto distanceToStopLine(
   -> std::optional<double>;
 
 auto distanceToStopLine(const std::vector<Point> & route_waypoints, const lanelet::Id stop_line_id)
+  -> std::optional<double>;
+
+// TrafficLightStopLine
+auto distanceToTrafficLightStopLine(
+  const SplineInterface & route_spline, const lanelet::Id traffic_light_id)
+  -> std::optional<double>;
+
+auto distanceToTrafficLightStopLine(
+  const std::vector<Point> & route_waypoints, const lanelet::Id traffic_light_id)
+  -> std::optional<double>;
+
+auto distanceToTrafficLightStopLine(
+  const lanelet::Ids & route_lanelets, const SplineInterface & route_spline)
+  -> std::optional<double>;
+
+auto distanceToTrafficLightStopLine(
+  const lanelet::Ids & route_lanelets, const std::vector<Point> & route_waypoints)
+  -> std::optional<double>;
+
+// Crosswalk
+auto distanceToCrosswalk(const std::vector<Point> & route_waypoints, const lanelet::Id crosswalk_id)
+  -> std::optional<double>;
+
+auto distanceToCrosswalk(const SplineInterface & route_spline, const lanelet::Id crosswalk_id)
   -> std::optional<double>;
 }  // namespace distance
 }  // namespace lanelet_wrapper
