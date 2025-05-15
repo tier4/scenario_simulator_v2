@@ -21,6 +21,12 @@ Changelog for package openscenario_preprocessor
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+16.3.7 (2025-05-15)
+-------------------
+* Merge branch 'master' into fix/mics-objects-model3d
+* Merge branch 'master' into fix/mics-objects-model3d
+* Contributors: Tatsuya Yamasaki
+
 16.3.6 (2025-05-14)
 -------------------
 * Merge branch 'master' into feature/arm64-buildtest
