@@ -83,9 +83,9 @@ private:
     bob_entity.setLinearVelocity(0);
     bob_entity.requestWalkStraight();
     bob_entity.requestSpeedChange(
-      1.0, traffic_simulator::speed_change::Transition::LINEAR,
+      1.0, traffic_simulator::speed_change::Transition::linear,
       traffic_simulator::speed_change::Constraint(
-        traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 1.0),
+        traffic_simulator::speed_change::Constraint::Type::longitudinal_acceleration, 1.0),
       true);
   }
 
