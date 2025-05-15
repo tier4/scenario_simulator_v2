@@ -504,18 +504,20 @@ public:
         std::is_same<std::decay_t<PoseType>, NativeRelativeWorldPosition>,
         std::is_same<std::decay_t<PoseType>, NativeLanePosition>,
         std::is_same<std::decay_t<PoseType>, NativeRelativeLanePosition>>>>
-    static auto applyTeleportAction(const std::string & name, const PoseType & pose, Ts &&... xs)
-      -> void
+    static auto applyTeleportAction(
+      const std::string & entity_name, const PoseType & pose, Ts &&... xs) -> void
     {
-      core->getEntity(name).setStatus(pose, std::forward<decltype(xs)>(xs)...);
+      core->getEntity(entity_name).setStatus(pose, std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>
     static auto applyTeleportAction(
-      const std::string & name, const std::string & reference_entity_name, Ts &&... xs) -> void
+      const std::string & entity_name, const std::string & reference_entity_name, Ts &&... xs)
+      -> void
     {
-      core->getEntity(name).setStatus(
-        core->getEntity(reference_entity_name).getMapPose(), std::forward<decltype(xs)>(xs)...);
+      core->getEntity(entity_name)
+        .setStatus(
+          core->getEntity(reference_entity_name).getMapPose(), std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>
