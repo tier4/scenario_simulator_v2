@@ -293,9 +293,9 @@ auto HdMapUtils::getConflictingCrosswalkIds(const lanelet::Ids & lanelet_ids) co
   lanelet::Ids ids;
   std::vector<lanelet::routing::RoutingGraphConstPtr> graphs;
   graphs.emplace_back(routing_graphs_->routing_graph(
-    traffic_simulator::RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER));
+    traffic_simulator::RoutingGraphType::vehicle_with_road_shoulder));
   graphs.emplace_back(
-    routing_graphs_->routing_graph(traffic_simulator::RoutingGraphType::PEDESTRIAN));
+    routing_graphs_->routing_graph(traffic_simulator::RoutingGraphType::pedestrian));
   lanelet::routing::RoutingGraphContainer container(graphs);
   for (const auto & lanelet_id : lanelet_ids) {
     const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
@@ -1523,11 +1523,11 @@ lanelet::routing::RoutingGraphPtr HdMapUtils::RoutingGraphs::routing_graph(
   const traffic_simulator::RoutingGraphType type) const
 {
   switch (type) {
-    case traffic_simulator::RoutingGraphType::VEHICLE:
+    case traffic_simulator::RoutingGraphType::vehicle:
       return vehicle.graph;
-    case traffic_simulator::RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER:
+    case traffic_simulator::RoutingGraphType::vehicle_with_road_shoulder:
       return vehicle_with_road_shoulder.graph;
-    case traffic_simulator::RoutingGraphType::PEDESTRIAN:
+    case traffic_simulator::RoutingGraphType::pedestrian:
       return pedestrian.graph;
     default:
       std::stringstream what;
@@ -1540,11 +1540,11 @@ lanelet::traffic_rules::TrafficRulesPtr HdMapUtils::RoutingGraphs::traffic_rule(
   const traffic_simulator::RoutingGraphType type) const
 {
   switch (type) {
-    case traffic_simulator::RoutingGraphType::VEHICLE:
+    case traffic_simulator::RoutingGraphType::vehicle:
       return vehicle.rules;
-    case traffic_simulator::RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER:
+    case traffic_simulator::RoutingGraphType::vehicle_with_road_shoulder:
       return vehicle_with_road_shoulder.rules;
-    case traffic_simulator::RoutingGraphType::PEDESTRIAN:
+    case traffic_simulator::RoutingGraphType::pedestrian:
       return pedestrian.rules;
     default:
       std::stringstream what;
@@ -1556,11 +1556,11 @@ lanelet::traffic_rules::TrafficRulesPtr HdMapUtils::RoutingGraphs::traffic_rule(
 RouteCache & HdMapUtils::RoutingGraphs::route_cache(const traffic_simulator::RoutingGraphType type)
 {
   switch (type) {
-    case traffic_simulator::RoutingGraphType::VEHICLE:
+    case traffic_simulator::RoutingGraphType::vehicle:
       return vehicle.route_cache;
-    case traffic_simulator::RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER:
+    case traffic_simulator::RoutingGraphType::vehicle_with_road_shoulder:
       return vehicle_with_road_shoulder.route_cache;
-    case traffic_simulator::RoutingGraphType::PEDESTRIAN:
+    case traffic_simulator::RoutingGraphType::pedestrian:
       return pedestrian.route_cache;
     default:
       std::stringstream what;

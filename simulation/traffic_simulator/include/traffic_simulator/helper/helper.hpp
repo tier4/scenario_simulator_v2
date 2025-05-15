@@ -138,7 +138,7 @@ std::vector<T> getUniqueValues(const std::vector<T> & input_vector)
   return output_vector;
 }
 
-enum class LidarType { VLP16, VLP32 };
+enum class LidarType { vlp16, vlp32 };
 
 const simulation_api_schema::LidarConfiguration constructLidarConfiguration(
   const LidarType type, const std::string & entity, const std::string & architecture_type,
