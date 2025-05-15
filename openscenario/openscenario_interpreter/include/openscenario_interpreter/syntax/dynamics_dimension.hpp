@@ -62,7 +62,7 @@ struct DynamicsDimension
   {
     switch (value) {
       case rate:
-        return traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION;
+        return traffic_simulator::speed_change::Constraint::Type::longitudinal_acceleration;
       default:
         return {};
     }
@@ -72,11 +72,11 @@ struct DynamicsDimension
   {
     switch (value) {
       case rate:
-        return traffic_simulator::lane_change::Constraint::Type::LATERAL_VELOCITY;
+        return traffic_simulator::lane_change::Constraint::Type::lateral_velocity;
       case time:
-        return traffic_simulator::lane_change::Constraint::Type::TIME;
+        return traffic_simulator::lane_change::Constraint::Type::time;
       case distance:
-        return traffic_simulator::lane_change::Constraint::Type::LONGITUDINAL_DISTANCE;
+        return traffic_simulator::lane_change::Constraint::Type::longitudinal_distance;
       default:
         return {};
     }

@@ -347,14 +347,15 @@ TEST_F(MiscObjectEntityTest_FullObject, requestLaneChange_relativeTargetLaneletP
 
   entity_base->setOtherStatus(other_status);
 
-  EXPECT_THROW(entity_base->requestLaneChange(
-    traffic_simulator::lane_change::RelativeTarget(
-      target_name, traffic_simulator::lane_change::Direction::STRAIGHT, 3, 1.0),
-    traffic_simulator::lane_change::TrajectoryShape::LINEAR,
-    traffic_simulator::lane_change::Constraint(
-      traffic_simulator::lane_change::Constraint::Type::TIME, 30.0,
-      traffic_simulator::lane_change::Constraint::Policy::BEST_EFFORT));
-               , common::Error);
+  EXPECT_THROW(
+    entity_base->requestLaneChange(
+      traffic_simulator::lane_change::RelativeTarget(
+        target_name, traffic_simulator::lane_change::Direction::straight, 3, 1.0),
+      traffic_simulator::lane_change::TrajectoryShape::linear,
+      traffic_simulator::lane_change::Constraint(
+        traffic_simulator::lane_change::Constraint::Type::time, 30.0,
+        traffic_simulator::lane_change::Constraint::Policy::best_effort)),
+    common::Error);
 }
 
 /**
@@ -373,11 +374,11 @@ TEST_F(MiscObjectEntityTest_FullObject, requestLaneChange_relativeTargetName)
   EXPECT_THROW(
     entity_base->requestLaneChange(
       traffic_simulator::lane_change::RelativeTarget(
-        target_name + "_wrong", traffic_simulator::lane_change::Direction::STRAIGHT, 3, 1.0),
-      traffic_simulator::lane_change::TrajectoryShape::LINEAR,
+        target_name + "_wrong", traffic_simulator::lane_change::Direction::straight, 3, 1.0),
+      traffic_simulator::lane_change::TrajectoryShape::linear,
       traffic_simulator::lane_change::Constraint(
-        traffic_simulator::lane_change::Constraint::Type::TIME, 30.0,
-        traffic_simulator::lane_change::Constraint::Policy::BEST_EFFORT)),
+        traffic_simulator::lane_change::Constraint::Type::time, 30.0,
+        traffic_simulator::lane_change::Constraint::Policy::best_effort)),
     common::Error);
 }
 
@@ -398,12 +399,12 @@ TEST_F(MiscObjectEntityTest_FullObject, requestLaneChange_relativeTargetInvalid)
   EXPECT_THROW(
     entity_base->requestLaneChange(
       traffic_simulator::lane_change::RelativeTarget(
-        target_name, traffic_simulator::lane_change::Direction::RIGHT,
+        target_name, traffic_simulator::lane_change::Direction::right,
         std::numeric_limits<std::uint8_t>::max(), 1.0),
-      traffic_simulator::lane_change::TrajectoryShape::LINEAR,
+      traffic_simulator::lane_change::TrajectoryShape::linear,
       traffic_simulator::lane_change::Constraint(
-        traffic_simulator::lane_change::Constraint::Type::TIME, 30.0,
-        traffic_simulator::lane_change::Constraint::Policy::BEST_EFFORT)),
+        traffic_simulator::lane_change::Constraint::Type::time, 30.0,
+        traffic_simulator::lane_change::Constraint::Policy::best_effort)),
     common::Error);
 }
 
