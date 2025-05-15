@@ -202,7 +202,7 @@ public:
 
   auto attachLidarSensor(
     const std::string &, const double lidar_sensor_delay,
-    const helper::LidarType = helper::LidarType::VLP16) -> bool;
+    const helper::LidarType = helper::LidarType::vlp16) -> bool;
 
   auto attachDetectionSensor(const simulation_api_schema::DetectionSensorConfiguration &) -> bool;
 

@@ -2865,7 +2865,7 @@ TEST_F(HdMapUtilsTest_WithRoadShoulderMap, routingWithRoadShoulder)
     hdmap_utils.getRoute(34693, 34615, routing_configuration_without_road_shoulder);
   EXPECT_EQ(route_without_road_shoulder.size(), 0);
 
-  // default: traffic_simulator::RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER
+  // default: traffic_simulator::RoutingGraphType::vehicle_with_road_shoulder
   const auto route_with_road_shoulder =
     hdmap_utils.getRoute(34693, 34615, traffic_simulator::RoutingConfiguration());
   EXPECT_EQ(route_with_road_shoulder.size(), 4);

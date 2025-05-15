@@ -66,9 +66,9 @@ struct SpeedTargetValueType
   {
     switch (value) {
       case delta:
-        return traffic_simulator::speed_change::RelativeTargetSpeed::Type::DELTA;
+        return traffic_simulator::speed_change::RelativeTargetSpeed::Type::delta;
       case factor:
-        return traffic_simulator::speed_change::RelativeTargetSpeed::Type::FACTOR;
+        return traffic_simulator::speed_change::RelativeTargetSpeed::Type::factor;
       default:
         return traffic_simulator::speed_change::RelativeTargetSpeed::Type();
     }

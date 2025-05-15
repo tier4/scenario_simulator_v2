@@ -92,9 +92,9 @@ struct DynamicsShape
   {
     switch (value) {
       case linear:
-        return traffic_simulator::speed_change::Transition::LINEAR;
+        return traffic_simulator::speed_change::Transition::linear;
       case step:
-        return traffic_simulator::speed_change::Transition::STEP;
+        return traffic_simulator::speed_change::Transition::step;
       default:
         return {};
     }
@@ -104,9 +104,9 @@ struct DynamicsShape
   {
     switch (value) {
       case linear:
-        return traffic_simulator::lane_change::TrajectoryShape::LINEAR;
+        return traffic_simulator::lane_change::TrajectoryShape::linear;
       case cubic:
-        return traffic_simulator::lane_change::TrajectoryShape::CUBIC;
+        return traffic_simulator::lane_change::TrajectoryShape::cubic;
       default:
         return {};
     }

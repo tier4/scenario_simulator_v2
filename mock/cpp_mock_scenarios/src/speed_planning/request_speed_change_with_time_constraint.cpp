@@ -59,9 +59,9 @@ private:
       getVehicleParameters());
     ego_entity.setLinearVelocity(0);
     ego_entity.requestSpeedChange(
-      10.0, traffic_simulator::speed_change::Transition::AUTO,
+      10.0, traffic_simulator::speed_change::Transition::auto_transition,
       traffic_simulator::speed_change::Constraint(
-        traffic_simulator::speed_change::Constraint::Type::TIME, 4.0),
+        traffic_simulator::speed_change::Constraint::Type::time, 4.0),
       false);
 
     auto & front_entity = api_.spawn(

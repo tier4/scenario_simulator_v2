@@ -23,22 +23,22 @@ namespace traffic_simulator
 namespace job
 {
 enum class Type {
-  UNKOWN = 0,
-  LINEAR_VELOCITY = 1,
-  LINEAR_ACCELERATION = 2,
-  STAND_STILL_DURATION = 3,
-  TRAVELED_DISTANCE = 4,
-  OUT_OF_RANGE = 5
+  unknown = 0,
+  linear_velocity = 1,
+  linear_acceleration = 2,
+  stand_still_duration = 3,
+  traveled_distance = 4,
+  out_of_range = 5
 };
 
 enum class Status {
-  ACTIVE = 0,
-  INACTIVE = 1,
+  active = 0,
+  inactive = 1,
 };
 
 enum class Event {
-  PRE_UPDATE = 0,
-  POST_UPDATE = 1,
+  pre_update = 0,
+  post_update = 1,
 };
 
 class Job

@@ -58,9 +58,9 @@ private:
 
     ego_entity.setLinearVelocity(0);
     ego_entity.requestSpeedChange(
-      10.0, traffic_simulator::speed_change::Transition::LINEAR,
+      10.0, traffic_simulator::speed_change::Transition::linear,
       traffic_simulator::speed_change::Constraint(
-        traffic_simulator::speed_change::Constraint::Type::TIME, 4.0),
+        traffic_simulator::speed_change::Constraint::Type::time, 4.0),
       false);
   }
 };

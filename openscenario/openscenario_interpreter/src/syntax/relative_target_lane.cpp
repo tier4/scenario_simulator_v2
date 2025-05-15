@@ -28,11 +28,11 @@ RelativeTargetLane::RelativeTargetLane(const pugi::xml_node & node, Scope & scop
 RelativeTargetLane::operator traffic_simulator::lane_change::Direction() const
 {
   if (value < 0) {
-    return traffic_simulator::lane_change::Direction::RIGHT;
+    return traffic_simulator::lane_change::Direction::right;
   } else if (value == 0) {
-    return traffic_simulator::lane_change::Direction::STRAIGHT;
+    return traffic_simulator::lane_change::Direction::straight;
   } else {
-    return traffic_simulator::lane_change::Direction::LEFT;
+    return traffic_simulator::lane_change::Direction::left;
   }
 }
 }  // namespace syntax

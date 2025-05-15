@@ -57,9 +57,9 @@ private:
       getVehicleParameters());
     ego_entity.setLinearVelocity(0);
     ego_entity.requestSpeedChange(
-      10.0, traffic_simulator::speed_change::Transition::STEP,
+      10.0, traffic_simulator::speed_change::Transition::step,
       traffic_simulator::speed_change::Constraint(
-        traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 10.0),
+        traffic_simulator::speed_change::Constraint::Type::longitudinal_acceleration, 10.0),
       true);
 
     auto & front_entity = api_.spawn(
@@ -67,9 +67,9 @@ private:
       getVehicleParameters());
     front_entity.setLinearVelocity(0);
     front_entity.requestSpeedChange(
-      10.0, traffic_simulator::speed_change::Transition::STEP,
+      10.0, traffic_simulator::speed_change::Transition::step,
       traffic_simulator::speed_change::Constraint(
-        traffic_simulator::speed_change::Constraint::Type::TIME, 0.0),
+        traffic_simulator::speed_change::Constraint::Type::time, 0.0),
       true);
   }
 };

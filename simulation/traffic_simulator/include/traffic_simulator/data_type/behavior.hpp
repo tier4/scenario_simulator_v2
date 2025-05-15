@@ -23,13 +23,13 @@ namespace traffic_simulator
 namespace behavior
 {
 enum class Request {
-  NONE,
-  LANE_CHANGE,
-  FOLLOW_LANE,
-  FOLLOW_POLYLINE_TRAJECTORY,
-  FOLLOW_CLOTHOID_TRAJECTORY,
-  FOLLOW_NURBS_TRAJECTORY,
-  WALK_STRAIGHT,
+  none,
+  lane_change,
+  follow_lane,
+  follow_polyline_trajectory,
+  follow_clothoid_trajectory,
+  follow_nurbs_trajectory,
+  walk_straight,
 };
 
 std::string getRequestString(const Request &);

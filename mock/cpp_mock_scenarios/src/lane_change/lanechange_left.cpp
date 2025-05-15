@@ -55,7 +55,7 @@ private:
       getVehicleParameters());
     ego_entity.setLinearVelocity(10);
     ego_entity.requestSpeedChange(10, true);
-    ego_entity.requestLaneChange(traffic_simulator::lane_change::Direction::LEFT);
+    ego_entity.requestLaneChange(traffic_simulator::lane_change::Direction::left);
   }
 };
 }  // namespace cpp_mock_scenarios

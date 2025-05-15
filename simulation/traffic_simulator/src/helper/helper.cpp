@@ -127,7 +127,7 @@ const simulation_api_schema::LidarConfiguration constructLidarConfiguration(
   configuration.set_entity(entity);
   configuration.set_lidar_sensor_delay(lidar_sensor_delay);
   switch (type) {
-    case LidarType::VLP16:
+    case LidarType::vlp16:
       configuration.set_scan_duration(0.1);
       configuration.add_vertical_angles(-15.0 / 180.0 * M_PI);
       configuration.add_vertical_angles(-13.0 / 180.0 * M_PI);
@@ -146,7 +146,7 @@ const simulation_api_schema::LidarConfiguration constructLidarConfiguration(
       configuration.add_vertical_angles(13.0 / 180.0 * M_PI);
       configuration.add_vertical_angles(15.0 / 180.0 * M_PI);
       break;
-    case LidarType::VLP32:
+    case LidarType::vlp32:
       configuration.set_scan_duration(0.1);
       configuration.add_vertical_angles(-15.0 / 180.0 * M_PI);
       configuration.add_vertical_angles(-13.66666667 / 180.0 * M_PI);
