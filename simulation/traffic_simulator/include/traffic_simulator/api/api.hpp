@@ -45,6 +45,15 @@ struct PedestrianBehavior : public entity::PedestrianEntity::BuiltinBehavior
 {
 };
 
+struct MicsObjectBehavior
+{
+  static auto noBehavior() noexcept -> const std::string &
+  {
+    static const std::string name = "";
+    return name;
+  }
+};
+
 class API
 {
 public:
