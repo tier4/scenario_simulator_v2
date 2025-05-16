@@ -27,7 +27,13 @@ OpenSCENARIO:
           Controller:
             name: 'Autoware'
             Properties:
-              Property: []
+              Property:
+                - name: isEgo
+                  value: 'true'
+#                 This is the legacy way to specify allow_goal_modification option to goal / route for Autoware.
+#                 If you specify by legacy way, all options will be overridden and specification by new way will be ignored.
+#                - name: allowGoalModification
+#                  value: 'true'
       - name: car_1
         CatalogReference: *SAMPLE_VEHICLE
   Storyboard:
