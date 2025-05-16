@@ -123,11 +123,6 @@ struct TrafficLight
 
     constexpr operator Value() const noexcept { return value; }
 
-    friend constexpr auto operator<(const Status & lhs, const Status & rhs) -> bool
-    {
-      return lhs.value < rhs.value;
-    }
-
     friend auto operator>>(std::istream & is, Status & status) -> std::istream &;
 
     friend auto operator<<(std::ostream & os, const Status & status) -> std::ostream &;
