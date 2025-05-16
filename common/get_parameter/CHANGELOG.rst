@@ -2,6 +2,29 @@
 Changelog for package get_parameter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+16.3.7 (2025-05-15)
+-------------------
+* Merge branch 'master' into fix/mics-objects-model3d
+* Merge branch 'master' into fix/mics-objects-model3d
+* Contributors: Tatsuya Yamasaki
+
+16.3.6 (2025-05-14)
+-------------------
+* Merge branch 'master' into feature/arm64-buildtest
+* Merge branch 'master' into feature/arm64-buildtest
+* Contributors: Kotaro Yoshimoto, ぐるぐる
+
+16.3.5 (2025-05-12)
+-------------------
+* Merge pull request `#1588 <https://github.com/tier4/scenario_simulator_v2/issues/1588>`_ from tier4/fix/missing-rviz-config-and-npc-start
+* Merge branch 'master' into fix/missing-rviz-config-and-npc-start
+* Merge branch 'fix/duplicated-parameter-nodes' into fix/missing-rviz-config-and-npc-start
+* Force at most one parameter node for each process and guarantee unique name of this node by adding pid to the name
+* Contributors: Kotaro Yoshimoto, Mateusz Palczuk, SzymonParapura
+
+16.3.4 (2025-05-12)
+-------------------
+
 16.3.3 (2025-05-02)
 -------------------
 
