@@ -26,6 +26,7 @@
 #include <traffic_simulator/behavior/longitudinal_speed_planning.hpp>
 #include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator/data_type/lane_change.hpp>
+#include <traffic_simulator/data_type/route_options.hpp>
 #include <traffic_simulator/data_type/speed_change.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/helper/helper.hpp>
@@ -171,13 +172,39 @@ public:
 
   /*   */ void resetDynamicConstraints();
 
-  virtual void requestAcquirePosition(const CanonicalizedLaneletPose &) = 0;
+  virtual void requestAcquirePosition(
+    const CanonicalizedLaneletPose & pose)
+  {
+    return requestAcquirePosition(pose, {});
+  }
 
-  virtual void requestAcquirePosition(const geometry_msgs::msg::Pose &) = 0;
+  virtual void requestAcquirePosition(const CanonicalizedLaneletPose &, const RouteOptions &) = 0;
 
-  virtual void requestAssignRoute(const std::vector<CanonicalizedLaneletPose> &) = 0;
+  virtual void requestAcquirePosition(
+    const geometry_msgs::msg::Pose & pose)
+  {
+    return requestAcquirePosition(pose, {});
+  }
 
-  virtual void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) = 0;
+  virtual void requestAcquirePosition(const geometry_msgs::msg::Pose &, const RouteOptions &) = 0;
+
+  virtual void requestAssignRoute(
+    const std::vector<CanonicalizedLaneletPose> & pose)
+  {
+    return requestAssignRoute(pose, {});
+  }
+
+  virtual void requestAssignRoute(
+    const std::vector<CanonicalizedLaneletPose> &, const RouteOptions &) = 0;
+
+  virtual void requestAssignRoute(
+    const std::vector<geometry_msgs::msg::Pose> & pose)
+  {
+    return requestAssignRoute(pose, {});
+  }
+
+  virtual void requestAssignRoute(
+    const std::vector<geometry_msgs::msg::Pose> &, const RouteOptions &) = 0;
 
   virtual auto requestLaneChange(const lanelet::Id) -> void
   {

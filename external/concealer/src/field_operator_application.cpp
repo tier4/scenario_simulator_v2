@@ -351,12 +351,13 @@ auto FieldOperatorApplication::initialize(const geometry_msgs::msg::Pose & initi
   }
 }
 
-auto FieldOperatorApplication::plan(const std::vector<geometry_msgs::msg::PoseStamped> & route)
+auto FieldOperatorApplication::plan(
+  const std::vector<geometry_msgs::msg::PoseStamped> & route, const bool allow_goal_modification)
   -> void
 {
   assert(not route.empty());
 
-  task_queue.delay([this, route] {
+  task_queue.delay([this, route, allow_goal_modification]() {
     switch (const auto state = getLegacyAutowareState(); state.value) {
       default:
         throw common::AutowareError(
@@ -396,8 +397,7 @@ auto FieldOperatorApplication::plan(const std::vector<geometry_msgs::msg::PoseSt
               DetectMember_option<SetRoutePoints::Request>::value and
               DetectMember_allow_goal_modification<
                 decltype(std::declval<SetRoutePoints::Request>().option)>::value) {
-              request->option.allow_goal_modification = common::getParameter<bool>(
-                get_node_parameters_interface(), "allow_goal_modification");
+              request->option.allow_goal_modification = allow_goal_modification;
             }
 
             return request;

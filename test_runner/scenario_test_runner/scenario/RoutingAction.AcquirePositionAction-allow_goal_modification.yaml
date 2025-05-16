@@ -1,0 +1,350 @@
+OpenSCENARIO:
+  FileHeader:
+    author: 'Kotaro Yoshimoto'
+    date: '1970-01-01T09:00:00+09:00'
+    description: ''
+    revMajor: 1
+    revMinor: 3
+  ParameterDeclarations:
+    ParameterDeclaration:
+      - name: AcquirePositionAction.allow_goal_modification
+        parameterType: boolean
+        value: true
+  CatalogLocations:
+    VehicleCatalog:
+      Directory:
+        path: $(ros2 pkg prefix --share openscenario_experimental_catalog)/vehicle
+  RoadNetwork:
+    LogicFile:
+      filepath: $(ros2 pkg prefix --share kashiwanoha_map)/map
+  Entities:
+    ScenarioObject:
+      - name: ego
+        CatalogReference: &SAMPLE_VEHICLE
+          catalogName: sample_vehicle
+          entryName: sample_vehicle
+        ObjectController:
+          Controller:
+            name: 'Autoware'
+            Properties:
+              Property:
+                - name: isEgo
+                  value: 'true'
+#                 This is the legacy way to specify allow_goal_modification option to goal / route for Autoware.
+#                 If you specify by legacy way, all options will be overridden and specification by new way will be ignored.
+#                - name: allowGoalModification
+#                  value: 'true'
+      - name: car_1
+        CatalogReference: *SAMPLE_VEHICLE
+  Storyboard:
+    Init:
+      Actions:
+        Private:
+          - entityRef: ego
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: 34513
+                      s: 10
+                      offset: 0
+                      Orientation: &DEFAULT_ORIENTATION
+                        type: relative
+                        h: 0
+                        p: 0
+                        r: 0
+              - RoutingAction:
+                  AcquirePositionAction:
+                    Position: &FIRST_GOAL
+                      LanePosition:
+                        roadId: ''
+                        laneId: 34513
+                        s: 40
+                        offset: 0
+                        Orientation: *DEFAULT_ORIENTATION
+          - entityRef: car_1
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: 34462
+                      s: 40
+                      offset: 0
+                      Orientation: *DEFAULT_ORIENTATION
+              - LongitudinalAction:
+                  SpeedAction:
+                    SpeedActionDynamics:
+                      dynamicsDimension: time
+                      value: 0
+                      dynamicsShape: step
+                    SpeedActionTarget:
+                      AbsoluteTargetSpeed:
+                        value: 0
+    Story:
+      - name: ''
+        Act:
+          - name: 'ego act'
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ''
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef:
+                    - entityRef: ego
+                Maneuver:
+                  - name: ''
+                    ParameterDeclarations:
+                      ParameterDeclaration:
+                        - name: AcquirePositionAction.allow_goal_modification
+                          parameterType: boolean
+                          value: false
+                    Event:
+                      - maximumExecutionCount: 1
+                        name: 'set second goal event'
+                        priority: parallel
+                        Action:
+                          - name: ''
+                            PrivateAction:
+                              - RoutingAction:
+                                  AcquirePositionAction:
+                                    Position: &SECOND_GOAL
+                                      LanePosition:
+                                        roadId: ''
+                                        laneId: 34507
+                                        s: 10
+                                        offset: 0
+                                        Orientation: *DEFAULT_ORIENTATION
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: 'check ARRIVED_GOAL'
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    UserDefinedValueCondition:
+                                      name: ego.currentState
+                                      rule: equalTo
+                                      value: ARRIVED_GOAL
+                                - name: 'check far from first goal'
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      DistanceCondition:
+                                        coordinateSystem: entity
+                                        freespace: false
+                                        relativeDistanceType: euclidianDistance
+                                        rule: greaterThan
+                                        value: 3.0
+                                        Position: *FIRST_GOAL
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ''
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
+          - name: 'car_1 act'
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ''
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef:
+                    - entityRef: car_1
+                Maneuver:
+                  - name: ''
+                    Event:
+                      - name: 'cover first goal immediately after engage'
+                        priority: parallel
+                        Action:
+                          - name: ''
+                            PrivateAction:
+                              - TeleportAction:
+                                  Position: *FIRST_GOAL
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: 'check ego is moving'
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      SpeedCondition:
+                                        rule: greaterThan
+                                        value: 1.0
+                      - name: 'clear route for first goal and cover second goal'
+                        priority: parallel
+                        Action:
+                          - name: ''
+                            PrivateAction:
+                              - TeleportAction:
+                                  Position: *SECOND_GOAL
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                              - name: 'check ego is in check point'
+                                delay: 0
+                                conditionEdge: none
+                                ByEntityCondition:
+                                  TriggeringEntities:
+                                    triggeringEntitiesRule: any
+                                    EntityRef:
+                                      - entityRef: ego
+                                  EntityCondition:
+                                    DistanceCondition:
+                                      coordinateSystem: entity
+                                      freespace: false
+                                      relativeDistanceType: euclidianDistance
+                                      rule: lessThan
+                                      value: 1.0
+                                      Position:
+                                        LanePosition:
+                                          roadId: ''
+                                          laneId: 34513
+                                          s: 30
+                                          offset: 0
+                                          Orientation: *DEFAULT_ORIENTATION
+                      - name: 'clear route for second goal'
+                        priority: parallel
+                        Action:
+                          - name: 'teleport to position next to second goal'
+                            PrivateAction:
+                              - TeleportAction:
+                                  Position:
+                                    LanePosition:
+                                      roadId: ''
+                                      laneId: 34468
+                                      s: 10
+                                      offset: 0
+                                      Orientation: *DEFAULT_ORIENTATION
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: 'check ego is in check point for second goal'
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      DistanceCondition:
+                                        coordinateSystem: entity
+                                        freespace: false
+                                        relativeDistanceType: euclidianDistance
+                                        rule: lessThan
+                                        value: 1.0
+                                        Position:
+                                          LanePosition:
+                                            roadId: ''
+                                            laneId: 34507
+                                            s: 0
+                                            offset: 0
+                                            Orientation: *DEFAULT_ORIENTATION
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ''
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
+          - name: _EndCondition
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ''
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef:
+                    - entityRef: ego
+                Maneuver:
+                  - name: ''
+                    Event:
+                      - name: 'success if arrived second goal'
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      ReachPositionCondition:
+                                        Position: *SECOND_GOAL
+                                        tolerance: 1
+                                - name: 'check ARRIVED_GOAL'
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    UserDefinedValueCondition:
+                                      name: ego.currentState
+                                      rule: equalTo
+                                      value: ARRIVED_GOAL
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitSuccess
+                      - name: 'failure if standstill or timeout'
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      StandStillCondition:
+                                        duration: 10
+                            - Condition:
+                              - name: ''
+                                delay: 0
+                                conditionEdge: none
+                                ByValueCondition:
+                                  SimulationTimeCondition:
+                                    value: 90
+                                    rule: greaterThan
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitFailure
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ''
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
+    StopTrigger:
+      ConditionGroup: []
