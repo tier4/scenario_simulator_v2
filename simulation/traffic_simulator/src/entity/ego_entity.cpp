@@ -197,24 +197,28 @@ void EgoEntity::onUpdate(double current_time, double step_time)
 
 void EgoEntity::requestAcquirePosition(const CanonicalizedLaneletPose & lanelet_pose)
 {
-  return requestAcquirePosition(lanelet_pose, false);
+  RouteOptions options;
+  options.allow_goal_modification = get_parameter_or<bool>("allow_goal_modification", false);
+  return requestAcquirePosition(lanelet_pose, options);
 }
 
 void EgoEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose)
 {
-  return requestAcquirePosition(map_pose, false);
+  RouteOptions options;
+  options.allow_goal_modification = get_parameter_or<bool>("allow_goal_modification", false);
+  return requestAcquirePosition(map_pose, options);
 }
 
 void EgoEntity::requestAcquirePosition(
-  const CanonicalizedLaneletPose & lanelet_pose, const bool allow_goal_modification)
+  const CanonicalizedLaneletPose & lanelet_pose, const RouteOptions & options)
 {
-  requestAssignRoute({lanelet_pose}, allow_goal_modification);
+  requestAssignRoute({lanelet_pose}, options);
 }
 
 void EgoEntity::requestAcquirePosition(
-  const geometry_msgs::msg::Pose & map_pose, const bool allow_goal_modification)
+  const geometry_msgs::msg::Pose & map_pose, const RouteOptions & options)
 {
-  requestAssignRoute({map_pose}, allow_goal_modification);
+  requestAssignRoute({map_pose}, options);
 }
 
 void EgoEntity::requestAssignRoute(const std::vector<CanonicalizedLaneletPose> & waypoints)
@@ -228,21 +232,23 @@ void EgoEntity::requestAssignRoute(const std::vector<CanonicalizedLaneletPose> &
 
 void EgoEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> & waypoints)
 {
-  return requestAssignRoute(waypoints, false);
+  RouteOptions options;
+  options.allow_goal_modification = get_parameter_or<bool>("allow_goal_modification", false);
+  return requestAssignRoute(waypoints, options);
 }
 
 void EgoEntity::requestAssignRoute(
-  const std::vector<CanonicalizedLaneletPose> & waypoints, const bool allow_goal_modification)
+  const std::vector<CanonicalizedLaneletPose> & waypoints, const RouteOptions & options)
 {
   std::vector<geometry_msgs::msg::Pose> route;
   for (const auto & waypoint : waypoints) {
     route.push_back(static_cast<geometry_msgs::msg::Pose>(waypoint));
   }
-  requestAssignRoute(route, allow_goal_modification);
+  requestAssignRoute(route, options);
 }
 
 void EgoEntity::requestAssignRoute(
-  const std::vector<geometry_msgs::msg::Pose> & waypoints, const bool allow_goal_modification)
+  const std::vector<geometry_msgs::msg::Pose> & waypoints, const RouteOptions & options)
 {
   std::vector<geometry_msgs::msg::PoseStamped> route;
   for (const auto & waypoint : waypoints) {
@@ -256,21 +262,12 @@ void EgoEntity::requestAssignRoute(
 
   requestClearRoute();
 
-  auto get_allow_goal_modification = [&]() {
-    if (has_parameter("allow_goal_modification")) {
-      // override if Controller.Properties.Property.allowGoalModification is defined
-      return get_parameter("allow_goal_modification").get_value<bool>();
-    } else {
-      return allow_goal_modification;
-    }
-  };
-
   if (not initialized) {
     initialize(getMapPose());
-    plan(route, get_allow_goal_modification());
+    plan(route, options.allow_goal_modification);
     // NOTE: engage() will be executed at simulation-time 0.
   } else {
-    plan(route, get_allow_goal_modification());
+    plan(route, options.allow_goal_modification);
     FieldOperatorApplication::engage();
   }
 }
