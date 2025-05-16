@@ -80,8 +80,6 @@ private:                                                               \
   DEFINE_GETTER_SETTER(StepTime,                  double,                                                           step_time_)
   // clang-format on
 #undef DEFINE_GETTER_SETTER
-private:
-  rclcpp::Logger logger_;
 };
 }  // namespace entity_behavior
 

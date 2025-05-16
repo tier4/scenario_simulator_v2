@@ -154,10 +154,9 @@ auto interpolateEntityStatusFromPolylineTrajectory(
 }  // namespace follow_trajectory
 }  // namespace do_nothing_behavior
 
-void DoNothingBehavior::configure(const rclcpp::Logger & logger)
+void DoNothingBehavior::configure(const rclcpp::Logger &)
 {
   setRequest(traffic_simulator::behavior::Request::NONE);
-  logger_ = logger;
 }
 
 void DoNothingBehavior::update(double current_time, double step_time)
