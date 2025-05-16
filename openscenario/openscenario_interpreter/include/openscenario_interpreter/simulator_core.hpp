@@ -292,34 +292,11 @@ public:
 
   class ActionApplication  // OpenSCENARIO 1.1.1 Section 3.1.5
   {
-    template <typename NonEgoEntity, typename... Args>
-    static auto requestAcquirePositionWithoutLastArg(
-      NonEgoEntity && non_ego_entity, Args &&... args)
-    {
-      return requestAcquirePositionWithoutLastArgImpl(
-        std::forward<NonEgoEntity>(non_ego_entity), std::make_index_sequence<sizeof...(Args) - 1>{},
-        std::forward<Args>(args)...);
-    }
-
-    template <typename NonEgoEntity, size_t... Is, typename... Args>
-    static auto requestAcquirePositionWithoutLastArgImpl(
-      NonEgoEntity && non_ego_entity, std::index_sequence<Is...>, Args &&... args)
-    {
-      return std::forward<NonEgoEntity>(non_ego_entity)
-        .requestAcquirePosition(
-          std::get<Is>(std::forward_as_tuple(std::forward<Args>(args)...))...);
-    }
-
   protected:
     template <typename... Ts>
     static auto applyAcquirePositionAction(const std::string & entity_ref, Ts &&... xs)
     {
-      try {
-        core->getEgoEntity(entity_ref).requestAcquirePosition(std::forward<decltype(xs)>(xs)...);
-      } catch (...) {
-        return requestAcquirePositionWithoutLastArg(
-          core->getEntity(entity_ref), std::forward<decltype(xs)>(xs)...);
-      }
+      return core->getEntity(entity_ref).requestAcquirePosition(std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>
