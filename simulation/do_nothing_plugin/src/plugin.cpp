@@ -154,9 +154,10 @@ auto interpolateEntityStatusFromPolylineTrajectory(
 }  // namespace follow_trajectory
 }  // namespace do_nothing_behavior
 
-void DoNothingBehavior::configure(const rclcpp::Logger &)
+void DoNothingBehavior::configure(const rclcpp::Logger & logger)
 {
-  /// @note The do nothing plugin currently does not use rclcpp::Logger and the configure function is no operation.
+  setRequest(traffic_simulator::behavior::Request::NONE);
+  logger_ = logger;
 }
 
 void DoNothingBehavior::update(double current_time, double step_time)
@@ -178,6 +179,7 @@ void DoNothingBehavior::update(double current_time, double step_time)
   };
 
   canonicalized_entity_status_->setTime(current_time);
+  // In this case, the entity follows polyline trajectory.
   if (getRequest() == traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY) {
     canonicalized_entity_status_->set(
       interpolate_entity_status_on_polyline_trajectory(),
@@ -187,7 +189,9 @@ void DoNothingBehavior::update(double current_time, double step_time)
       do_nothing_behavior::follow_trajectory::getLastVertexTimestamp(getPolylineTrajectory())) {
       setRequest(traffic_simulator::behavior::Request::NONE);
     }
-  } else {
+  }
+  // In this case, the entity does not anything.
+  else {
     canonicalized_entity_status_->set(
       static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status_),
       getDefaultMatchingDistanceForLaneletPoseCalculation());
