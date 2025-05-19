@@ -172,24 +172,33 @@ public:
 
   /*   */ void resetDynamicConstraints();
 
-  virtual void requestAcquirePosition(
-    const CanonicalizedLaneletPose & pose)
+  [[deprecated(
+    "This function was deprecated from 16.4.0 (released on 20250520)  and will be deleted after a "
+    "half-year transition period (~20251120). Please use one with RouteOptions argument "
+    "instead.")]] virtual void
+  requestAcquirePosition(const CanonicalizedLaneletPose & pose)
   {
     return requestAcquirePosition(pose, {});
   }
 
   virtual void requestAcquirePosition(const CanonicalizedLaneletPose &, const RouteOptions &) = 0;
 
-  virtual void requestAcquirePosition(
-    const geometry_msgs::msg::Pose & pose)
+  [[deprecated(
+    "This function was deprecated from 16.4.0 (released on 20250520)  and will be deleted after a "
+    "half-year transition period (~20251120). Please use one with RouteOptions argument "
+    "instead.")]] virtual void
+  requestAcquirePosition(const geometry_msgs::msg::Pose & pose)
   {
     return requestAcquirePosition(pose, {});
   }
 
   virtual void requestAcquirePosition(const geometry_msgs::msg::Pose &, const RouteOptions &) = 0;
 
-  virtual void requestAssignRoute(
-    const std::vector<CanonicalizedLaneletPose> & pose)
+  [[deprecated(
+    "This function was deprecated from 16.4.0 (released on 20250520)  and will be deleted after a "
+    "half-year transition period (~20251120). Please use one with RouteOptions argument "
+    "instead.")]] virtual void
+  requestAssignRoute(const std::vector<CanonicalizedLaneletPose> & pose)
   {
     return requestAssignRoute(pose, {});
   }
@@ -197,8 +206,11 @@ public:
   virtual void requestAssignRoute(
     const std::vector<CanonicalizedLaneletPose> &, const RouteOptions &) = 0;
 
-  virtual void requestAssignRoute(
-    const std::vector<geometry_msgs::msg::Pose> & pose)
+  [[deprecated(
+    "This function was deprecated from 16.4.0 (released on 20250520)  and will be deleted after a "
+    "half-year transition period (~20251120). Please use one with RouteOptions argument "
+    "instead.")]] virtual void
+  requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> & pose)
   {
     return requestAssignRoute(pose, {});
   }
