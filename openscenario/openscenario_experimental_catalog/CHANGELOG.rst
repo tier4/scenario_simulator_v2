@@ -21,6 +21,74 @@ Changelog for package openscenario_experimental_catalog
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+16.3.8 (2025-05-19)
+-------------------
+
+16.3.7 (2025-05-15)
+-------------------
+* Merge branch 'master' into fix/mics-objects-model3d
+* Merge branch 'master' into fix/mics-objects-model3d
+* Contributors: Tatsuya Yamasaki
+
+16.3.6 (2025-05-14)
+-------------------
+* Merge branch 'master' into feature/arm64-buildtest
+* Merge branch 'master' into feature/arm64-buildtest
+* Contributors: Kotaro Yoshimoto, ぐるぐる
+
+16.3.5 (2025-05-12)
+-------------------
+* Merge branch 'master' into fix/missing-rviz-config-and-npc-start
+* Contributors: SzymonParapura
+
+16.3.4 (2025-05-12)
+-------------------
+
+16.3.3 (2025-05-02)
+-------------------
+
+16.3.2 (2025-04-25)
+-------------------
+* Merge branch 'master' into RJD-1509/methods_optimization
+* Merge branch 'master' into RJD-1509/methods_optimization
+* Merge branch 'master' into RJD-1509/methods_optimization
+* Merge branch 'master' into RJD-1509/methods_optimization
+* Merge branch 'master' into RJD-1509/methods_optimization
+* Merge branch 'master' into RJD-1509/methods_optimization
+* Contributors: Grzegorz Maj, Masaya Kataoka
+
+16.3.1 (2025-04-25)
+-------------------
+* Merge branch 'master' into fix/concealer-7/transition
+* Merge branch 'master' into fix/concealer-7/transition
+* Merge branch 'master' into fix/concealer-7/transition
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
+16.3.0 (2025-04-25)
+-------------------
+* Merge branch 'master' into feature/agnocast
+* Merge branch 'master' into feature/agnocast
+* Revert "Revert "Merge branch 'master' into feature/agnocast""
+  This reverts commit b54960a3492c52964556d54d5943c00cdfa10f50.
+* Revert "Merge branch 'master' into feature/agnocast"
+  This reverts commit a01992c8e365edd59a52d918cccfec61885234f2, reversing
+  changes made to 7f892377f23e4a7bfec460cbfa9f7cdd1b644806.
+* Merge branch 'master' into feature/agnocast
+* Merge branch 'master' into feature/agnocast
+* Merge branch 'master' into feature/agnocast
+* Contributors: Dawid Moszynski, Dawid Moszyński, Kotaro Yoshimoto, Mateusz Palczuk
+
+16.2.0 (2025-04-24)
+-------------------
+
+16.1.4 (2025-04-23)
+-------------------
+* Merge branch 'master' into RJD-1752/fix_asserts
+* Merge branch 'master' into RJD-1752/fix_asserts
+* Merge branch 'master' into RJD-1752/fix_asserts
+* Merge branch 'master' into RJD-1752/fix_asserts
+* Contributors: Grzegorz Maj, Masaya Kataoka
+
 16.1.3 (2025-04-21)
 -------------------
 * Merge branch 'master' into fix/concealer-7
