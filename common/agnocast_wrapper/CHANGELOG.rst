@@ -2,6 +2,9 @@
 Changelog for package agnocast_wrapper
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+16.3.8 (2025-05-19)
+-------------------
+
 16.3.7 (2025-05-15)
 -------------------
 * Merge branch 'master' into fix/mics-objects-model3d
