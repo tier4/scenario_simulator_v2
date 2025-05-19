@@ -173,8 +173,8 @@ public:
   /*   */ void resetDynamicConstraints();
 
   [[deprecated(
-    "This function was deprecated from 16.4.0 (released on 20250520)  and will be deleted after a "
-    "half-year transition period (~20251120). Please use one with RouteOptions argument "
+    "This function was deprecated since version 16.4.0 (released on 20250520). It will be deleted "
+    "after a half-year transition period (~20251120). Please use one with RouteOptions argument "
     "instead.")]] virtual void
   requestAcquirePosition(const CanonicalizedLaneletPose & pose)
   {
@@ -184,8 +184,8 @@ public:
   virtual void requestAcquirePosition(const CanonicalizedLaneletPose &, const RouteOptions &) = 0;
 
   [[deprecated(
-    "This function was deprecated from 16.4.0 (released on 20250520)  and will be deleted after a "
-    "half-year transition period (~20251120). Please use one with RouteOptions argument "
+    "This function was deprecated since version 16.4.0 (released on 20250520). It will be deleted "
+    "after a half-year transition period (~20251120). Please use one with RouteOptions argument "
     "instead.")]] virtual void
   requestAcquirePosition(const geometry_msgs::msg::Pose & pose)
   {
@@ -195,8 +195,8 @@ public:
   virtual void requestAcquirePosition(const geometry_msgs::msg::Pose &, const RouteOptions &) = 0;
 
   [[deprecated(
-    "This function was deprecated from 16.4.0 (released on 20250520)  and will be deleted after a "
-    "half-year transition period (~20251120). Please use one with RouteOptions argument "
+    "This function was deprecated since version 16.4.0 (released on 20250520). It will be deleted "
+    "after a half-year transition period (~20251120). Please use one with RouteOptions argument "
     "instead.")]] virtual void
   requestAssignRoute(const std::vector<CanonicalizedLaneletPose> & pose)
   {
@@ -207,8 +207,8 @@ public:
     const std::vector<CanonicalizedLaneletPose> &, const RouteOptions &) = 0;
 
   [[deprecated(
-    "This function was deprecated from 16.4.0 (released on 20250520)  and will be deleted after a "
-    "half-year transition period (~20251120). Please use one with RouteOptions argument "
+    "This function was deprecated since version 16.4.0 (released on 20250520). It will be deleted "
+    "after a half-year transition period (~20251120). Please use one with RouteOptions argument "
     "instead.")]] virtual void
   requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> & pose)
   {
