@@ -21,6 +21,21 @@ Changelog for package do_nothing_plugin
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+16.3.8 (2025-05-19)
+-------------------
+
+16.3.7 (2025-05-15)
+-------------------
+* Merge branch 'master' into fix/mics-objects-model3d
+* Merge branch 'master' into fix/mics-objects-model3d
+* Contributors: Tatsuya Yamasaki
+
+16.3.6 (2025-05-14)
+-------------------
+* Merge branch 'master' into feature/arm64-buildtest
+* Merge branch 'master' into feature/arm64-buildtest
+* Contributors: Kotaro Yoshimoto, ぐるぐる
+
 16.3.5 (2025-05-12)
 -------------------
 * Merge branch 'master' into fix/missing-rviz-config-and-npc-start
