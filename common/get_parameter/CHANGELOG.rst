@@ -2,6 +2,12 @@
 Changelog for package get_parameter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+16.3.10 (2025-05-20)
+--------------------
+* Merge branch 'master' into fix/agnocastpreload
+* Merge branch 'master' into dependabot/pip/setuptools-78.1.1
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka
+
 16.3.9 (2025-05-20)
 -------------------
 
