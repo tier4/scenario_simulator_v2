@@ -10,6 +10,12 @@ Changelog for package openscenario_validator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+16.3.9 (2025-05-20)
+-------------------
+
+16.3.8 (2025-05-19)
+-------------------
+
 16.3.7 (2025-05-15)
 -------------------
 * Merge branch 'master' into fix/mics-objects-model3d

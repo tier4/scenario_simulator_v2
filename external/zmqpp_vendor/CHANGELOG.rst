@@ -15,6 +15,12 @@ Changelog for package zmqpp_vendor
 * Add missing buildtool_depend on git
 * Contributors: Masaya Kataoka, MasayaKataoka, Scott K Logan
 
+16.3.9 (2025-05-20)
+-------------------
+
+16.3.8 (2025-05-19)
+-------------------
+
 16.3.7 (2025-05-15)
 -------------------
 * Merge branch 'master' into fix/mics-objects-model3d
