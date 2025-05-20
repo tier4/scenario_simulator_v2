@@ -51,7 +51,6 @@ public:
     -> double;
   auto getDistanceToFrontEntity(const math::geometry::CatmullRomSplineInterface & spline) const
     -> std::optional<double>;
-  auto isNeedToRightOfWay(const lanelet::Ids & following_lanelets) const -> bool;
   auto getYieldStopDistance(const lanelet::Ids & following_lanelets) const -> std::optional<double>;
   auto stopEntity() const -> void;
   auto getHorizon() const -> double;
