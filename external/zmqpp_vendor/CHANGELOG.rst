@@ -15,6 +15,12 @@ Changelog for package zmqpp_vendor
 * Add missing buildtool_depend on git
 * Contributors: Masaya Kataoka, MasayaKataoka, Scott K Logan
 
+16.3.10 (2025-05-20)
+--------------------
+* Merge branch 'master' into fix/agnocastpreload
+* Merge branch 'master' into dependabot/pip/setuptools-78.1.1
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka
+
 16.3.9 (2025-05-20)
 -------------------
 
