@@ -190,6 +190,15 @@ def launch_setup(context, *args, **kwargs):
 
         return parameters
 
+    def make_agnocast_additional_environment():
+        if os.getenv('ENABLE_AGNOCAST', '') == '1':
+            return {
+                'LD_PRELOAD': f"/opt/ros/{os.environ['ROS_DISTRO']}/lib/libagnocast_heaphook.so:{os.getenv('LD_PRELOAD', '')}",
+                'AGNOCAST_MEMPOOL_SIZE': '134217728',
+            }
+        else:
+            return {}
+
     return [
         # fmt: off
         DeclareLaunchArgument("architecture_type",                   default_value=architecture_type                  ),
@@ -242,10 +251,7 @@ def launch_setup(context, *args, **kwargs):
             on_exit=ShutdownOnce(),
             parameters=make_parameters(),
             condition=IfCondition(launch_simple_sensor_simulator),
-            additional_env={
-                'LD_PRELOAD': f"/opt/ros/humble/lib/libagnocast_heaphook.so:{os.getenv('LD_PRELOAD', '')}",
-                'AGNOCAST_MEMPOOL_SIZE': '134217728',
-            }
+            additional_env=make_agnocast_additional_environment(),
         ),
         # The `name` keyword overrides the name for all created nodes, so duplicated nodes appear.
         # For LifecycleNode the `name` parameter is required
