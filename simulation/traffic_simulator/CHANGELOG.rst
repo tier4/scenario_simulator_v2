@@ -21,6 +21,18 @@ Changelog for package traffic_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+16.3.10 (2025-05-20)
+--------------------
+* Merge branch 'master' into fix/agnocastpreload
+* Merge branch 'master' into dependabot/pip/setuptools-78.1.1
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka
+
+16.3.9 (2025-05-20)
+-------------------
+
+16.3.8 (2025-05-19)
+-------------------
+
 16.3.7 (2025-05-15)
 -------------------
 * Merge pull request `#1589 <https://github.com/tier4/scenario_simulator_v2/issues/1589>`_ from tier4/fix/mics-objects-model3d
