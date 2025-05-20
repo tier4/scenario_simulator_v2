@@ -193,7 +193,7 @@ def launch_setup(context, *args, **kwargs):
     def make_agnocast_additional_environment():
         if os.getenv('ENABLE_AGNOCAST', '') == '1':
             return {
-                'LD_PRELOAD': f"/opt/ros/humble/lib/libagnocast_heaphook.so:{os.getenv('LD_PRELOAD', '')}",
+                'LD_PRELOAD': f"/opt/ros/{os.environ['ROS_DISTRO']}/lib/libagnocast_heaphook.so:{os.getenv('LD_PRELOAD', '')}",
                 'AGNOCAST_MEMPOOL_SIZE': '134217728',
             }
         else:
