@@ -2,6 +2,11 @@
 Changelog for package agnocast_wrapper
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+16.3.11 (2025-05-21)
+--------------------
+* Merge branch 'master' into refactor/lanelet_matching
+* Contributors: Masaya Kataoka
+
 16.3.10 (2025-05-20)
 --------------------
 * Merge branch 'master' into fix/agnocastpreload
