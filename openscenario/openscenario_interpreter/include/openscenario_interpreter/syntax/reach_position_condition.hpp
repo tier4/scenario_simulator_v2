@@ -38,7 +38,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct ReachPositionCondition : private SimulatorCore::CoordinateSystemConversion
+struct ReachPositionCondition : private SimulatorCore::DistanceConditionEvaluation
 {
   const Double tolerance;
 

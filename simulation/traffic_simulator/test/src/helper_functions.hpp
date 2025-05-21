@@ -97,6 +97,15 @@ auto makeHdMapUtilsSharedPointer() -> std::shared_ptr<hdmap_utils::HdMapUtils>
       .altitude(0.0));
 }
 
+auto makeLaneletPose(const int lanelet_id, const double s = 0)
+  -> traffic_simulator_msgs::msg::LaneletPose
+{
+  traffic_simulator_msgs::msg::LaneletPose lanelet_pose;
+  lanelet_pose.lanelet_id = lanelet_id;
+  lanelet_pose.s = s;
+  return lanelet_pose;
+}
+
 auto activateLaneletWrapper(const std::string map_name) -> void
 {
   const auto lanelet_path = ament_index_cpp::get_package_share_directory("traffic_simulator") +
