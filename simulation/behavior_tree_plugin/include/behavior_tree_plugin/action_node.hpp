@@ -46,7 +46,6 @@ class ActionNode : public BT::ActionNodeBase
 public:
   ActionNode(const std::string & name, const BT::NodeConfiguration & config);
   ~ActionNode() override = default;
-  auto foundConflictingEntity(const lanelet::Ids & following_lanelets) const -> bool;
   auto getDistanceToConflictingEntity(
     const lanelet::Ids & route_lanelets,
     const math::geometry::CatmullRomSplineInterface & spline) const -> std::optional<double>;
@@ -63,8 +62,6 @@ public:
   auto getRightOfWayEntities(const lanelet::Ids & following_lanelets) const
     -> std::vector<traffic_simulator::CanonicalizedEntityStatus>;
   auto getYieldStopDistance(const lanelet::Ids & following_lanelets) const -> std::optional<double>;
-  auto getOtherEntityStatus(lanelet::Id lanelet_id) const
-    -> std::vector<traffic_simulator::CanonicalizedEntityStatus>;
   auto stopEntity() const -> void;
   auto getHorizon() const -> double;
 
@@ -119,7 +116,6 @@ protected:
   std::optional<double> target_speed_;
   EntityStatusDict other_entity_status_;
   lanelet::Ids route_lanelets_;
-  std::shared_ptr<EuclideanDistancesMap> euclidean_distances_map_;
   traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter_;
 
   auto getDistanceToTargetEntity(
@@ -127,6 +123,7 @@ protected:
     const traffic_simulator::CanonicalizedEntityStatus & status) const -> std::optional<double>;
 
 private:
+  auto foundConflictingEntity(const lanelet::Ids & following_lanelets) const -> bool;
   auto getDistanceToTargetEntityOnCrosswalk(
     const math::geometry::CatmullRomSplineInterface & spline,
     const traffic_simulator::CanonicalizedEntityStatus & status) const -> std::optional<double>;
@@ -136,8 +133,12 @@ private:
     -> std::vector<traffic_simulator::CanonicalizedEntityStatus>;
   auto getConflictingEntityStatusOnLane(const lanelet::Ids & route_lanelets) const
     -> std::vector<traffic_simulator::CanonicalizedEntityStatus>;
+  auto getOtherEntityStatus(lanelet::Id lanelet_id) const
+    -> std::vector<traffic_simulator::CanonicalizedEntityStatus>;
   auto isOtherEntityAtConsideredAltitude(
     const traffic_simulator::CanonicalizedEntityStatus & entity_status) const -> bool;
+
+  std::shared_ptr<EuclideanDistancesMap> euclidean_distances_map_; 
 };
 }  // namespace entity_behavior
 
