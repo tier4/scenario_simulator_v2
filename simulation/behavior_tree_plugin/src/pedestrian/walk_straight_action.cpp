@@ -41,13 +41,13 @@ void WalkStraightAction::getBlackBoardValues() { PedestrianActionNode::getBlackB
 BT::NodeStatus WalkStraightAction::tick()
 {
   getBlackBoardValues();
-  if (request != traffic_simulator::behavior::Request::WALK_STRAIGHT) {
+  if (request_ != traffic_simulator::behavior::Request::WALK_STRAIGHT) {
     return BT::NodeStatus::FAILURE;
   }
-  if (!target_speed) {
-    target_speed = 1.111;
+  if (!target_speed_) {
+    target_speed_ = 1.111;
   }
-  setCanonicalizedEntityStatus(calculateUpdatedEntityStatusInWorldFrame(target_speed.value()));
+  setCanonicalizedEntityStatus(calculateUpdatedEntityStatusInWorldFrame(target_speed_.value()));
   return BT::NodeStatus::RUNNING;
 }
 }  // namespace pedestrian
