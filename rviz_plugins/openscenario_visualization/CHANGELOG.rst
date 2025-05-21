@@ -21,6 +21,15 @@ Changelog for package openscenario_visualization
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+16.3.11 (2025-05-21)
+--------------------
+* Merge branch 'master' into refactor/lanelet_matching
+* Merge branch 'master' into refactor/lanelet_matching
+* Merge branch 'master' into refactor/lanelet_matching
+* Merge branch 'master' into refactor/lanelet_matching
+* Merge commit '2be47bbd1a1a69ba584d2a37b11b3140e40f5f3d' into refactor/lanelet_matching
+* Contributors: Koki Suzuki, Masaya Kataoka, koki suzuki
+
 16.3.10 (2025-05-20)
 --------------------
 * Merge branch 'master' into fix/agnocastpreload

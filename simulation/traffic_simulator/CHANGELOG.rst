@@ -21,6 +21,18 @@ Changelog for package traffic_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+16.3.11 (2025-05-21)
+--------------------
+* Merge pull request `#1579 <https://github.com/tier4/scenario_simulator_v2/issues/1579>`_ from tier4/refactor/lanelet_matching
+  [FIX] Lanelet matching with absolute distance
+* Merge branch 'master' into refactor/lanelet_matching
+* Merge branch 'master' into refactor/lanelet_matching
+* Merge branch 'master' into refactor/lanelet_matching
+* Merge branch 'master' into refactor/lanelet_matching
+* Improve lane matching by using absolute distance for nearest lane selection
+* Merge commit '2be47bbd1a1a69ba584d2a37b11b3140e40f5f3d' into refactor/lanelet_matching
+* Contributors: Koki Suzuki, Masaya Kataoka, Taiga, koki suzuki
+
 16.3.10 (2025-05-20)
 --------------------
 * Merge branch 'master' into fix/agnocastpreload
