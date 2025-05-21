@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
+
 from ament_index_python.packages import get_package_share_directory
 
 from launch import LaunchDescription
@@ -188,6 +190,15 @@ def launch_setup(context, *args, **kwargs):
 
         return parameters
 
+    def make_agnocast_additional_environment():
+        if os.getenv('ENABLE_AGNOCAST', '') == '1':
+            return {
+                'LD_PRELOAD': f"/opt/ros/{os.environ['ROS_DISTRO']}/lib/libagnocast_heaphook.so:{os.getenv('LD_PRELOAD', '')}",
+                'AGNOCAST_MEMPOOL_SIZE': '134217728',
+            }
+        else:
+            return {}
+
     return [
         # fmt: off
         DeclareLaunchArgument("architecture_type",                   default_value=architecture_type                  ),
@@ -240,6 +251,7 @@ def launch_setup(context, *args, **kwargs):
             on_exit=ShutdownOnce(),
             parameters=make_parameters(),
             condition=IfCondition(launch_simple_sensor_simulator),
+            additional_env=make_agnocast_additional_environment(),
         ),
         # The `name` keyword overrides the name for all created nodes, so duplicated nodes appear.
         # For LifecycleNode the `name` parameter is required

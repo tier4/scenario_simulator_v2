@@ -2,6 +2,78 @@
 Changelog for package get_parameter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+16.3.10 (2025-05-20)
+--------------------
+* Merge branch 'master' into fix/agnocastpreload
+* Merge branch 'master' into dependabot/pip/setuptools-78.1.1
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka
+
+16.3.9 (2025-05-20)
+-------------------
+
+16.3.8 (2025-05-19)
+-------------------
+
+16.3.7 (2025-05-15)
+-------------------
+* Merge branch 'master' into fix/mics-objects-model3d
+* Merge branch 'master' into fix/mics-objects-model3d
+* Contributors: Tatsuya Yamasaki
+
+16.3.6 (2025-05-14)
+-------------------
+* Merge branch 'master' into feature/arm64-buildtest
+* Merge branch 'master' into feature/arm64-buildtest
+* Contributors: Kotaro Yoshimoto, ぐるぐる
+
+16.3.5 (2025-05-12)
+-------------------
+* Merge pull request `#1588 <https://github.com/tier4/scenario_simulator_v2/issues/1588>`_ from tier4/fix/missing-rviz-config-and-npc-start
+* Merge branch 'master' into fix/missing-rviz-config-and-npc-start
+* Merge branch 'fix/duplicated-parameter-nodes' into fix/missing-rviz-config-and-npc-start
+* Force at most one parameter node for each process and guarantee unique name of this node by adding pid to the name
+* Contributors: Kotaro Yoshimoto, Mateusz Palczuk, SzymonParapura
+
+16.3.4 (2025-05-12)
+-------------------
+
+16.3.3 (2025-05-02)
+-------------------
+
+16.3.2 (2025-04-25)
+-------------------
+* Merge branch 'master' into RJD-1509/methods_optimization
+* Merge branch 'master' into RJD-1509/methods_optimization
+* Merge branch 'master' into RJD-1509/methods_optimization
+* Merge branch 'master' into RJD-1509/methods_optimization
+* Merge branch 'master' into RJD-1509/methods_optimization
+* Merge branch 'master' into RJD-1509/methods_optimization
+* Contributors: Grzegorz Maj, Masaya Kataoka
+
+16.3.1 (2025-04-25)
+-------------------
+* Merge branch 'master' into fix/concealer-7/transition
+* Merge branch 'master' into fix/concealer-7/transition
+* Merge branch 'master' into fix/concealer-7/transition
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
+16.3.0 (2025-04-25)
+-------------------
+* Merge branch 'master' into feature/agnocast
+* Merge branch 'master' into feature/agnocast
+* Revert "Revert "Merge branch 'master' into feature/agnocast""
+  This reverts commit b54960a3492c52964556d54d5943c00cdfa10f50.
+* Revert "Merge branch 'master' into feature/agnocast"
+  This reverts commit a01992c8e365edd59a52d918cccfec61885234f2, reversing
+  changes made to 7f892377f23e4a7bfec460cbfa9f7cdd1b644806.
+* Merge branch 'master' into feature/agnocast
+* Merge branch 'master' into feature/agnocast
+* Merge branch 'master' into feature/agnocast
+* Contributors: Dawid Moszynski, Dawid Moszyński, Kotaro Yoshimoto, Mateusz Palczuk
+
+16.2.0 (2025-04-24)
+-------------------
+
 16.1.4 (2025-04-23)
 -------------------
 * Merge branch 'master' into RJD-1752/fix_asserts
