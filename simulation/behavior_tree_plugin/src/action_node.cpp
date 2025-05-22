@@ -53,28 +53,28 @@ auto ActionNode::executeTick() -> BT::NodeStatus { return BT::ActionNodeBase::ex
 
 auto ActionNode::getBlackBoardValues() -> void
 {
-  if (!getInput<traffic_simulator::behavior::Request>("request_", request_)) {
-    THROW_SIMULATION_ERROR("failed to get input request_ in ActionNode");
+  if (!getInput<traffic_simulator::behavior::Request>("request", request_)) {
+    THROW_SIMULATION_ERROR("failed to get input request in ActionNode");
   }
-  if (!getInput<double>("step_time_", step_time_)) {
-    THROW_SIMULATION_ERROR("failed to get input step_time_ in ActionNode");
+  if (!getInput<double>("step_time", step_time_)) {
+    THROW_SIMULATION_ERROR("failed to get input step_time in ActionNode");
   }
-  if (!getInput<double>("current_time_", current_time_)) {
-    THROW_SIMULATION_ERROR("failed to get input current_time_ in ActionNode");
+  if (!getInput<double>("current_time", current_time_)) {
+    THROW_SIMULATION_ERROR("failed to get input current_time in ActionNode");
   }
-  if (!getInput<std::shared_ptr<hdmap_utils::HdMapUtils>>("hdmap_utils_", hdmap_utils_)) {
-    THROW_SIMULATION_ERROR("failed to get input hdmap_utils_ in ActionNode");
+  if (!getInput<std::shared_ptr<hdmap_utils::HdMapUtils>>("hdmap_utils", hdmap_utils_)) {
+    THROW_SIMULATION_ERROR("failed to get input hdmap_utils in ActionNode");
   }
   if (!getInput<std::shared_ptr<traffic_simulator::TrafficLightsBase>>(
-        "traffic_lights_", traffic_lights_)) {
-    THROW_SIMULATION_ERROR("failed to get input traffic_lights_ in ActionNode");
+        "traffic_lights", traffic_lights_)) {
+    THROW_SIMULATION_ERROR("failed to get input traffic_lights in ActionNode");
   }
   if (!getInput<std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>>(
-        "canonicalized_entity_status_", canonicalized_entity_status_)) {
-    THROW_SIMULATION_ERROR("failed to get input canonicalized_entity_status_ in ActionNode");
+        "canonicalized_entity_status", canonicalized_entity_status_)) {
+    THROW_SIMULATION_ERROR("failed to get input canonicalized_entity_status in ActionNode");
   }
 
-  if (!getInput<std::optional<double>>("target_speed_", target_speed_)) {
+  if (!getInput<std::optional<double>>("target_speed", target_speed_)) {
     target_speed_ = std::nullopt;
   }
 
@@ -85,18 +85,18 @@ auto ActionNode::getBlackBoardValues() -> void
       "failed to get input matching_distance_for_lanelet_pose_calculation in ActionNode");
   }
 
-  if (!getInput<EntityStatusDict>("other_entity_status_", other_entity_status_)) {
+  if (!getInput<EntityStatusDict>("other_entity_status", other_entity_status_)) {
     THROW_SIMULATION_ERROR("failed to get input other_entity_status_ in ActionNode");
   }
-  if (!getInput<lanelet::Ids>("route_lanelets_", route_lanelets_)) {
+  if (!getInput<lanelet::Ids>("route_lanelets", route_lanelets_)) {
     THROW_SIMULATION_ERROR("failed to get input route_lanelets_ in ActionNode");
   }
   if (!getInput<std::shared_ptr<EuclideanDistancesMap>>(
-        "euclidean_distances_map_", euclidean_distances_map_)) {
+        "euclidean_distances_map", euclidean_distances_map_)) {
     euclidean_distances_map_ = std::make_shared<EuclideanDistancesMap>();
   }
   if (!getInput<traffic_simulator_msgs::msg::BehaviorParameter>(
-        "behavior_parameter_", behavior_parameter_)) {
+        "behavior_parameter", behavior_parameter_)) {
     behavior_parameter_ = traffic_simulator_msgs::msg::BehaviorParameter();
   }
 }

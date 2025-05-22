@@ -138,7 +138,7 @@ private:
   auto isOtherEntityAtConsideredAltitude(
     const traffic_simulator::CanonicalizedEntityStatus & entity_status) const -> bool;
 
-  std::shared_ptr<EuclideanDistancesMap> euclidean_distances_map_; 
+  std::shared_ptr<EuclideanDistancesMap> euclidean_distances_map_;
 };
 }  // namespace entity_behavior
 
