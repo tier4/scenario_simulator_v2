@@ -19,8 +19,10 @@
 #include <geometry/spline/catmull_rom_spline_interface.hpp>
 #include <geometry/spline/hermite_curve.hpp>
 #include <geometry_msgs/msg/point.hpp>
+#include <memory>
 #include <optional>
 #include <string>
+#include <traffic_simulator_msgs/msg/polyline_trajectory.hpp>
 #include <utility>
 #include <vector>
 
@@ -33,6 +35,8 @@ class CatmullRomSpline : public CatmullRomSplineInterface
 public:
   CatmullRomSpline() = default;
   explicit CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> & control_points);
+  explicit CatmullRomSpline(
+    const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & trajectory);
   auto getLength() const -> double override { return total_length_; }
   auto getMaximum2DCurvature() const -> double;
   auto getPoint(const double s) const -> geometry_msgs::msg::Point;

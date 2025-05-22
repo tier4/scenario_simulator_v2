@@ -84,8 +84,22 @@ void PedestrianEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::
 auto PedestrianEntity::requestFollowTrajectory(
   const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & parameter) -> void
 {
-  behavior_plugin_ptr_->setPolylineTrajectory(parameter);
-  behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_POLYLINE_TRAJECTORY);
+  if (parameter) {
+    if (parameter->closed) {
+      const auto curve = math::geometry::CatmullRomSpline(parameter);
+      /// @note Hardcodedparameter: 1.0 is a sample resolution of the trajectory. (Unit: m)
+      const auto traj = curve.getTrajectory(0.0, curve.getLength(), 1.0);
+      // for (const auto & point : traj) {
+      // }
+    }
+    behavior_plugin_ptr_->setPolylineTrajectory(parameter);
+    behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_POLYLINE_TRAJECTORY);
+  } else {
+    THROW_SIMULATION_ERROR(
+      "Traffic simulator send requests of FollowTrajectory, but the trajectory is empty.",
+      "This message is not originally intended to be displayed, if you see it, please "
+      "contact the developer of traffic_simulator.");
+  }
 }
 
 std::string PedestrianEntity::getCurrentAction() const

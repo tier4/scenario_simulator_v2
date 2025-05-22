@@ -122,6 +122,31 @@ auto CatmullRomSpline::getTrajectory(
   }
 }
 
+CatmullRomSpline::CatmullRomSpline(
+  const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & trajectory)
+: CatmullRomSpline([trajectory] {
+    if (!trajectory) {
+      THROW_SIMULATION_ERROR(
+        "Trajectory is empty.",
+        "This message is not originally intended to be displayed, if you see it, please contact "
+        "the developer of traffic_simulator.");
+    }
+    if (trajectory->shape.vertices.empty()) {
+      THROW_SEMANTIC_ERROR("Control points are empty. We cannot determine the shape of the curve.");
+    }
+    std::vector<geometry_msgs::msg::Point> control_points;
+    control_points.reserve(trajectory->shape.vertices.size() + 1UL);
+    for (const auto & vertex : trajectory->shape.vertices) {
+      control_points.emplace_back(vertex.position.position);
+    }
+    if (trajectory->closed) {
+      control_points.emplace_back(control_points[0]);
+    }
+    return control_points;
+  }())
+{
+}
+
 CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> & control_points)
 : control_points(control_points), line_segments_(getLineSegments(control_points)), total_length_(0)
 {
