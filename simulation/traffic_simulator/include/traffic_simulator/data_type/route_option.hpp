@@ -15,11 +15,11 @@
 #ifndef TRAFFIC_SIMULATOR__DATA_TYPE__ROUTE_OPTION_HPP_
 #define TRAFFIC_SIMULATOR__DATA_TYPE__ROUTE_OPTION_HPP_
 
-namespace traffic_simulator
+namespace traffic_simulator::inline route_option::inline v1
 {
 struct RouteOption
 {
   bool allow_goal_modification = false;
 };
-}  // namespace traffic_simulator
+}  // namespace traffic_simulator::inline route_option::inline v1
 #endif  // TRAFFIC_SIMULATOR__DATA_TYPE__ROUTE_OPTION_HPP_
