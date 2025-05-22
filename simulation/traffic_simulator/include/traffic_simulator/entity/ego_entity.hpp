@@ -82,21 +82,21 @@ public:
 
   void requestAcquirePosition(const CanonicalizedLaneletPose &) override;
 
-  void requestAcquirePosition(const CanonicalizedLaneletPose &, const RouteOptions &) override;
+  void requestAcquirePosition(const CanonicalizedLaneletPose &, const RouteOption &) override;
 
   void requestAcquirePosition(const geometry_msgs::msg::Pose &) override;
 
-  void requestAcquirePosition(const geometry_msgs::msg::Pose &, const RouteOptions &) override;
+  void requestAcquirePosition(const geometry_msgs::msg::Pose &, const RouteOption &) override;
 
   void requestAssignRoute(const std::vector<CanonicalizedLaneletPose> &) override;
 
   void requestAssignRoute(
-    const std::vector<CanonicalizedLaneletPose> &, const RouteOptions &) override;
+    const std::vector<CanonicalizedLaneletPose> &, const RouteOption &) override;
 
   void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) override;
 
   void requestAssignRoute(
-    const std::vector<geometry_msgs::msg::Pose> &, const RouteOptions &) override;
+    const std::vector<geometry_msgs::msg::Pose> &, const RouteOption &) override;
 
   auto requestFollowTrajectory(
     const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &) -> void override;

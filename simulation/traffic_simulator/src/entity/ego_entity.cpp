@@ -197,26 +197,26 @@ void EgoEntity::onUpdate(double current_time, double step_time)
 
 void EgoEntity::requestAcquirePosition(const CanonicalizedLaneletPose & lanelet_pose)
 {
-  RouteOptions options;
+  RouteOption options;
   options.allow_goal_modification = get_parameter_or<bool>("allow_goal_modification", false);
   return requestAcquirePosition(lanelet_pose, options);
 }
 
 void EgoEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose)
 {
-  RouteOptions options;
+  RouteOption options;
   options.allow_goal_modification = get_parameter_or<bool>("allow_goal_modification", false);
   return requestAcquirePosition(map_pose, options);
 }
 
 void EgoEntity::requestAcquirePosition(
-  const CanonicalizedLaneletPose & lanelet_pose, const RouteOptions & options)
+  const CanonicalizedLaneletPose & lanelet_pose, const RouteOption & options)
 {
   requestAssignRoute({lanelet_pose}, options);
 }
 
 void EgoEntity::requestAcquirePosition(
-  const geometry_msgs::msg::Pose & map_pose, const RouteOptions & options)
+  const geometry_msgs::msg::Pose & map_pose, const RouteOption & options)
 {
   requestAssignRoute({map_pose}, options);
 }
@@ -232,13 +232,13 @@ void EgoEntity::requestAssignRoute(const std::vector<CanonicalizedLaneletPose> &
 
 void EgoEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> & waypoints)
 {
-  RouteOptions options;
+  RouteOption options;
   options.allow_goal_modification = get_parameter_or<bool>("allow_goal_modification", false);
   return requestAssignRoute(waypoints, options);
 }
 
 void EgoEntity::requestAssignRoute(
-  const std::vector<CanonicalizedLaneletPose> & waypoints, const RouteOptions & options)
+  const std::vector<CanonicalizedLaneletPose> & waypoints, const RouteOption & options)
 {
   std::vector<geometry_msgs::msg::Pose> route;
   for (const auto & waypoint : waypoints) {
@@ -248,7 +248,7 @@ void EgoEntity::requestAssignRoute(
 }
 
 void EgoEntity::requestAssignRoute(
-  const std::vector<geometry_msgs::msg::Pose> & waypoints, const RouteOptions & options)
+  const std::vector<geometry_msgs::msg::Pose> & waypoints, const RouteOption & options)
 {
   std::vector<geometry_msgs::msg::PoseStamped> route;
   for (const auto & waypoint : waypoints) {

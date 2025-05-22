@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__DATA_TYPE__ROUTE_OPTIONS_HPP_
-#define TRAFFIC_SIMULATOR__DATA_TYPE__ROUTE_OPTIONS_HPP_
+#ifndef TRAFFIC_SIMULATOR__DATA_TYPE__ROUTE_OPTION_HPP_
+#define TRAFFIC_SIMULATOR__DATA_TYPE__ROUTE_OPTION_HPP_
 
 namespace traffic_simulator
 {
-struct RouteOptions
+struct RouteOption
 {
   bool allow_goal_modification = false;
 };
 }  // namespace traffic_simulator
-#endif  // TRAFFIC_SIMULATOR__DATA_TYPE__ROUTE_OPTIONS_HPP_
+#endif  // TRAFFIC_SIMULATOR__DATA_TYPE__ROUTE_OPTION_HPP_

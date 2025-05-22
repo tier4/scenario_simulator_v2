@@ -34,22 +34,22 @@ auto AcquirePositionAction::start() -> void
   const auto acquire_position = overload(
     [](
       const WorldPosition & position, auto && actor,
-      const traffic_simulator::RouteOptions & options) {
+      const traffic_simulator::RouteOption & options) {
       return applyAcquirePositionAction(actor, static_cast<NativeWorldPosition>(position), options);
     },
     [](
       const RelativeWorldPosition & position, auto && actor,
-      const traffic_simulator::RouteOptions & options) {
+      const traffic_simulator::RouteOption & options) {
       return applyAcquirePositionAction(actor, static_cast<NativeLanePosition>(position), options);
     },
     [](
       const RelativeObjectPosition & position, auto && actor,
-      const traffic_simulator::RouteOptions & options) {
+      const traffic_simulator::RouteOption & options) {
       return applyAcquirePositionAction(actor, static_cast<NativeLanePosition>(position), options);
     },
     [](
       const LanePosition & position, auto && actor,
-      const traffic_simulator::RouteOptions & options) {
+      const traffic_simulator::RouteOption & options) {
       return applyAcquirePositionAction(actor, static_cast<NativeLanePosition>(position), options);
     });
 
@@ -79,7 +79,7 @@ auto AcquirePositionAction::start() -> void
 
   for (const auto & actor : actors) {
     actor.apply([&](const auto & object) {
-      traffic_simulator::RouteOptions options;
+      traffic_simulator::RouteOption options;
       options.allow_goal_modification = [&]() {
         if (auto allow_goal_modification_from_property =
               get_allow_goal_modification_from_property(object);

@@ -52,7 +52,7 @@ void PedestrianEntity::appendDebugMarker(visualization_msgs::msg::MarkerArray & 
 }
 
 void PedestrianEntity::requestAssignRoute(
-  const std::vector<CanonicalizedLaneletPose> & waypoints, const RouteOptions &)
+  const std::vector<CanonicalizedLaneletPose> & waypoints, const RouteOption &)
 {
   if (!isInLanelet()) {
     return;
@@ -67,7 +67,7 @@ void PedestrianEntity::requestAssignRoute(
 }
 
 void PedestrianEntity::requestAssignRoute(
-  const std::vector<geometry_msgs::msg::Pose> & waypoints, const RouteOptions & options)
+  const std::vector<geometry_msgs::msg::Pose> & waypoints, const RouteOption & options)
 {
   std::vector<CanonicalizedLaneletPose> route;
   for (const auto & waypoint : waypoints) {
@@ -140,7 +140,7 @@ void PedestrianEntity::requestWalkStraight()
 }
 
 void PedestrianEntity::requestAcquirePosition(
-  const CanonicalizedLaneletPose & lanelet_pose, const RouteOptions &)
+  const CanonicalizedLaneletPose & lanelet_pose, const RouteOption &)
 {
   behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
   if (status_->isInLanelet()) {
@@ -150,7 +150,7 @@ void PedestrianEntity::requestAcquirePosition(
 }
 
 void PedestrianEntity::requestAcquirePosition(
-  const geometry_msgs::msg::Pose & map_pose, const RouteOptions & options)
+  const geometry_msgs::msg::Pose & map_pose, const RouteOption & options)
 {
   behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
   if (
