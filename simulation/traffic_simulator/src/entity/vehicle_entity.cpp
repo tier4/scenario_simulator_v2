@@ -235,7 +235,7 @@ auto VehicleEntity::requestFollowTrajectory(
     std::vector<CanonicalizedLaneletPose> waypoints;
     lanelet::Ids route_lanelets;
     const auto curve = math::geometry::CatmullRomSpline(parameter);
-    /// @note Hardcodedparameter: 1.0 is a sample resolution of the trajectory. (Unit: m)
+    /// @note Hard coded parameter: 1.0 is a sample resolution of the trajectory. (Unit: m)
     for (const auto & waypoint : curve.getTrajectoryPoses(0.0, curve.getLength(), 1.0)) {
       if (
         const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
