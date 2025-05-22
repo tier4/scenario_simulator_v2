@@ -159,7 +159,7 @@ struct FieldOperatorApplication : public rclcpp::Node
 
   auto initialize(const geometry_msgs::msg::Pose &) -> void;
 
-  auto plan(const std::vector<geometry_msgs::msg::PoseStamped> &) -> void;
+  auto plan(const std::vector<geometry_msgs::msg::PoseStamped> &, const bool) -> void;
 
   auto clearRoute() -> void;
 
