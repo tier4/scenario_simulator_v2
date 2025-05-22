@@ -9,6 +9,16 @@ Changelog for package simple_cross_map
 * Merge branch 'master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+16.4.0 (2025-05-22)
+-------------------
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Contributors: Kotaro Yoshimoto
+
 16.3.11 (2025-05-21)
 --------------------
 * Merge branch 'master' into refactor/lanelet_matching
