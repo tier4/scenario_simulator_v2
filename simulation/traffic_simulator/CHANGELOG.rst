@@ -21,6 +21,33 @@ Changelog for package traffic_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+16.4.0 (2025-05-22)
+-------------------
+* Merge pull request `#1590 <https://github.com/tier4/scenario_simulator_v2/issues/1590>`_ from tier4/feature/change_allow_goal_modification
+* Stop using C++ 20 feature to fix a build error
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Update deprecated notice in EntityBase class
+* Add inline namespaces to RouteOption for versioning
+* Rename RouteOptions -> RouteOption
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Adjust deprecation notice from EntityBase::requestAcquirePosition/requestAssignRoute
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Apply linter
+* Add deprecation notice
+* Modify MiscObjectEntity implementation to follow EntityBase
+* Modify EgoEntity implementation to follow EntityBase
+* Modify PedestrianEntity implementation to follow EntityBase
+* Modify VehicleEntity implementation to follow EntityBase
+* Add EgoEntity::requestAcquirePosition/requestAssignRoute with RouteOptions
+* Add traffic_simulator::RouteOptions struct
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Merge branch 'master' into feature/change_allow_goal_modification
+* chore: override allow_goal_modification in EgoEntity::requestAssignRoute only if Controller.Properties.Property.allowGoalModification is defined
+* Add allow_goal_modification argument to EgoEntity::requestAcquirePosition / requestAssignRoute
+* Add allow_goal_modification argument to FieldOperatorApplication::plan
+* Contributors: Kotaro Yoshimoto
+
 16.3.11 (2025-05-21)
 --------------------
 * Merge pull request `#1579 <https://github.com/tier4/scenario_simulator_v2/issues/1579>`_ from tier4/refactor/lanelet_matching

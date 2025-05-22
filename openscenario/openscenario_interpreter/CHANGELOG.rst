@@ -32,6 +32,24 @@ Changelog for package openscenario_interpreter
 * add publish_empty_context parameter
 * Contributors: Masaya Kataoka
 
+16.4.0 (2025-05-22)
+-------------------
+* Merge pull request `#1590 <https://github.com/tier4/scenario_simulator_v2/issues/1590>`_ from tier4/feature/change_allow_goal_modification
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Rename RouteOptions -> RouteOption
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Resolve allow_goal_modification from parameter and property in AcquirePositionAction::start
+* Use traffic_simulator::RouteOptions in AcquirePositionAction::start
+* Delete argument workaround in ActionApplication::applyAcquirePositionAction
+* Rename Properties::exists to contains
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Merge branch 'master' into feature/change_allow_goal_modification
+* feat: resolve AcquirePositionAction.allow_goal_modification parameter and pass to ego entity
+* chore: add allow_goal_modification parameter of ego entity only if allowGoalModification parameter is defined in Controller.Properties
+* Contributors: Kotaro Yoshimoto
+
 16.3.11 (2025-05-21)
 --------------------
 * Merge branch 'master' into refactor/lanelet_matching
