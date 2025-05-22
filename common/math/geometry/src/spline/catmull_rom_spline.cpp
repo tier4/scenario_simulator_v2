@@ -280,10 +280,6 @@ CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> 
             curves_.emplace_back(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz);
           }
         }
-        for (const auto & curve : curves_) {
-          length_list_.emplace_back(curve.getLength());
-          maximum_2d_curvatures_.emplace_back(curve.getMaximum2DCurvature());
-        }
         total_length_ = 0;
         for (const auto & length : length_list_) {
           total_length_ = total_length_ + length;
@@ -635,8 +631,18 @@ auto CatmullRomSpline::getPoint(const double s, const double offset) const
 
 auto CatmullRomSpline::getMaximum2DCurvature() const -> double
 {
+  if(curves_.empty()) {
+    THROW_SEMANTIC_ERROR(
+      "Curves are empty. We cannot determine the maximum 2D curvature of the spline.",
+      "This message is not originally intended to be displayed, if you see it, please contact "
+      "the developer of traffic_simulator.");
+  }
+  /// @note Maximum 2D curvature is empyt means that it is not calculated yet.
   if (maximum_2d_curvatures_.empty()) {
-    THROW_SIMULATION_ERROR("maximum 2D curvature vector size is 0.");  // LCOV_EXCL_LINE
+    for (const auto & curve : curves_) {
+      length_list_.emplace_back(curve.getLength());
+      maximum_2d_curvatures_.emplace_back(curve.getMaximum2DCurvature());
+    }
   }
   const auto [min, max] =
     std::minmax_element(maximum_2d_curvatures_.begin(), maximum_2d_curvatures_.end());
