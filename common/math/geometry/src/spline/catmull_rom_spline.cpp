@@ -280,6 +280,9 @@ CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> 
             curves_.emplace_back(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz);
           }
         }
+        for (const auto & curve : curves_) {
+          length_list_.emplace_back(curve.getLength());
+        }
         total_length_ = 0;
         for (const auto & length : length_list_) {
           total_length_ = total_length_ + length;
@@ -631,7 +634,7 @@ auto CatmullRomSpline::getPoint(const double s, const double offset) const
 
 auto CatmullRomSpline::getMaximum2DCurvature() const -> double
 {
-  if(curves_.empty()) {
+  if (curves_.empty()) {
     THROW_SEMANTIC_ERROR(
       "Curves are empty. We cannot determine the maximum 2D curvature of the spline.",
       "This message is not originally intended to be displayed, if you see it, please contact "
@@ -640,7 +643,6 @@ auto CatmullRomSpline::getMaximum2DCurvature() const -> double
   /// @note Maximum 2D curvature is empyt means that it is not calculated yet.
   if (maximum_2d_curvatures_.empty()) {
     for (const auto & curve : curves_) {
-      length_list_.emplace_back(curve.getLength());
       maximum_2d_curvatures_.emplace_back(curve.getMaximum2DCurvature());
     }
   }

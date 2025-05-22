@@ -84,7 +84,8 @@ private:
   std::vector<LineSegment> line_segments_;
   std::vector<HermiteCurve> curves_;
   std::vector<double> length_list_;
-  std::vector<double> maximum_2d_curvatures_;
+  /// @note Since curvature calculation requires a large computational cost, it is inefficient to calculate it in the member initializer list and must be calculated when the getMaximum2DCurvature function is first called.
+  mutable std::vector<double> maximum_2d_curvatures_;
   double total_length_;
 };
 }  // namespace geometry
