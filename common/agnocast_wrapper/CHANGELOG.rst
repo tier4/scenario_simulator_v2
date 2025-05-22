@@ -2,6 +2,30 @@
 Changelog for package agnocast_wrapper
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+16.4.0 (2025-05-22)
+-------------------
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Contributors: Kotaro Yoshimoto
+
+16.3.11 (2025-05-21)
+--------------------
+* Merge branch 'master' into refactor/lanelet_matching
+* Contributors: Masaya Kataoka
+
+16.3.10 (2025-05-20)
+--------------------
+* Merge branch 'master' into fix/agnocastpreload
+* Merge branch 'master' into dependabot/pip/setuptools-78.1.1
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka
+
+16.3.9 (2025-05-20)
+-------------------
+
 16.3.8 (2025-05-19)
 -------------------
 

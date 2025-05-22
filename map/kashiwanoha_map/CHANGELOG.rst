@@ -21,6 +21,34 @@ Changelog for package kashiwanoha_map
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+16.4.0 (2025-05-22)
+-------------------
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Contributors: Kotaro Yoshimoto
+
+16.3.11 (2025-05-21)
+--------------------
+* Merge branch 'master' into refactor/lanelet_matching
+* Merge branch 'master' into refactor/lanelet_matching
+* Merge branch 'master' into refactor/lanelet_matching
+* Merge branch 'master' into refactor/lanelet_matching
+* Merge commit '2be47bbd1a1a69ba584d2a37b11b3140e40f5f3d' into refactor/lanelet_matching
+* Contributors: Koki Suzuki, Masaya Kataoka, koki suzuki
+
+16.3.10 (2025-05-20)
+--------------------
+* Merge branch 'master' into fix/agnocastpreload
+* Merge branch 'master' into dependabot/pip/setuptools-78.1.1
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka
+
+16.3.9 (2025-05-20)
+-------------------
+
 16.3.8 (2025-05-19)
 -------------------
 
