@@ -122,6 +122,31 @@ auto CatmullRomSpline::getTrajectory(
   }
 }
 
+auto CatmullRomSpline::getTrajectoryPoses(
+  const double start_s, const double end_s, const double resolution) const
+  -> std::vector<geometry_msgs::msg::Pose>
+{
+  if (start_s > end_s) {
+    std::vector<geometry_msgs::msg::Pose> ret;
+    double s = start_s;
+    while (s > end_s) {
+      ret.emplace_back(getPose(s));
+      s = s - std::fabs(resolution);
+    }
+    ret.emplace_back(getPose(end_s));
+    return ret;
+  } else {
+    std::vector<geometry_msgs::msg::Pose> ret;
+    double s = start_s;
+    while (s < end_s) {
+      ret.emplace_back(getPose(s));
+      s = s + std::fabs(resolution);
+    }
+    ret.emplace_back(getPose(end_s));
+    return ret;
+  }
+}
+
 CatmullRomSpline::CatmullRomSpline(
   const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & trajectory)
 : CatmullRomSpline([trajectory] {

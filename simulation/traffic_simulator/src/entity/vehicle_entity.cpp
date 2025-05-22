@@ -226,19 +226,20 @@ auto VehicleEntity::requestFollowTrajectory(
 {
   behavior_plugin_ptr_->setPolylineTrajectory(parameter);
   behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_POLYLINE_TRAJECTORY);
+
   std::vector<CanonicalizedLaneletPose> waypoints;
-  for (const auto & vertex : parameter->shape.vertices) {
+  lanelet::Ids route_lanelets;
+  const auto curve = math::geometry::CatmullRomSpline(parameter);
+  /// @note Hardcodedparameter: 1.0 is a sample resolution of the trajectory. (Unit: m)
+  for (const auto & waypoint : curve.getTrajectoryPoses(0.0, curve.getLength(), 1.0)) {
     if (
       const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
-        vertex.position, status_->getBoundingBox(), false,
-        getDefaultMatchingDistanceForLaneletPoseCalculation())) {
+        waypoint, getBoundingBox(), true, getDefaultMatchingDistanceForLaneletPoseCalculation())) {
+      route_lanelets.push_back(canonicalized_lanelet_pose.value().getLaneletId());
       waypoints.emplace_back(canonicalized_lanelet_pose.value());
-    } else {
-      /// @todo such a protection most likely makes sense, but test scenario
-      /// RoutingAction.FollowTrajectoryAction-star has waypoints outside lanelet2
-      // THROW_SEMANTIC_ERROR("FollowTrajectory waypoint should be on lane.");
     }
   }
+  behavior_plugin_ptr_->setRouteLanelets(route_lanelets);
   route_planner_.setWaypoints(waypoints);
 }
 

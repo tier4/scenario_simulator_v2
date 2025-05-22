@@ -47,6 +47,8 @@ public:
   auto getTrajectory(
     const double start_s, const double end_s, const double resolution,
     const double offset = 0.0) const -> std::vector<geometry_msgs::msg::Point>;
+  auto getTrajectoryPoses(const double start_s, const double end_s, const double resolution) const
+    -> std::vector<geometry_msgs::msg::Pose>;
   auto getSValue(const geometry_msgs::msg::Pose & pose, double threshold_distance = 3.0) const
     -> std::optional<double>;
   auto getSquaredDistanceIn2D(const geometry_msgs::msg::Point & point, const double s) const

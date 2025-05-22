@@ -71,8 +71,7 @@ void PedestrianEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::
   for (const auto & waypoint : waypoints) {
     if (
       const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
-        waypoint, status_->getBoundingBox(), true,
-        getDefaultMatchingDistanceForLaneletPoseCalculation())) {
+        waypoint, getBoundingBox(), true, getDefaultMatchingDistanceForLaneletPoseCalculation())) {
       route.emplace_back(canonicalized_lanelet_pose.value());
     } else {
       THROW_SEMANTIC_ERROR("Waypoint of pedestrian entity should be on lane.");
@@ -85,15 +84,20 @@ auto PedestrianEntity::requestFollowTrajectory(
   const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & parameter) -> void
 {
   if (parameter) {
-    if (parameter->closed) {
-      const auto curve = math::geometry::CatmullRomSpline(parameter);
-      /// @note Hardcodedparameter: 1.0 is a sample resolution of the trajectory. (Unit: m)
-      const auto traj = curve.getTrajectory(0.0, curve.getLength(), 1.0);
-      // for (const auto & point : traj) {
-      // }
-    }
     behavior_plugin_ptr_->setPolylineTrajectory(parameter);
     behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_POLYLINE_TRAJECTORY);
+    lanelet::Ids route_lanelets;
+    const auto curve = math::geometry::CatmullRomSpline(parameter);
+    /// @note Hardcodedparameter: 1.0 is a sample resolution of the trajectory. (Unit: m)
+    for (const auto & waypoint : curve.getTrajectoryPoses(0.0, curve.getLength(), 1.0)) {
+      if (
+        const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
+          waypoint, getBoundingBox(), true,
+          getDefaultMatchingDistanceForLaneletPoseCalculation())) {
+        route_lanelets.push_back(canonicalized_lanelet_pose.value().getLaneletId());
+      }
+    }
+    behavior_plugin_ptr_->setRouteLanelets(route_lanelets);
   } else {
     THROW_SIMULATION_ERROR(
       "Traffic simulator send requests of FollowTrajectory, but the trajectory is empty.",
