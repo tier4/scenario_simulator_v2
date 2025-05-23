@@ -42,6 +42,9 @@ public:
 
 private:
   std::optional<double> distance_to_front_entity_;
+  static constexpr double kWaypointInterval = 1.0;
+  static constexpr double kFrontEntityMargin = 5.0;
+  static constexpr double kSpeedStep = 2.0;
 };
 }  // namespace follow_lane_sequence
 }  // namespace vehicle

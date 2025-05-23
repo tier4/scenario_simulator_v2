@@ -43,7 +43,6 @@ public:
 
 private:
   std::optional<double> distance_to_stop_target_;
-  bool in_stop_sequence_;
 };
 }  // namespace follow_lane_sequence
 }  // namespace vehicle
