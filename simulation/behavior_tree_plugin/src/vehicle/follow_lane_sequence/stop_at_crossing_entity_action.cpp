@@ -106,11 +106,14 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
   if (trajectory == nullptr) {
     return BT::NodeStatus::FAILURE;
   }
-  distance_to_stop_target_ = getDistanceToConflictingEntity(route_lanelets_, *trajectory);
+  std::optional<double> target_linear_speed;
   auto distance_to_stopline =
     traffic_simulator::distance::distanceToStopLine(route_lanelets_, *trajectory);
   const auto distance_to_front_entity = getDistanceToFrontEntity(*trajectory);
-  if (!distance_to_stop_target_) {
+  distance_to_stop_target_ = getDistanceToConflictingEntity(route_lanelets_, *trajectory);
+  if (distance_to_stop_target_) {
+    target_linear_speed = calculateTargetSpeed(canonicalized_entity_status_->getTwist().linear.x);
+  } else {
     return BT::NodeStatus::FAILURE;
   }
   if (distance_to_front_entity) {
@@ -122,12 +125,6 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
     if (distance_to_stopline.value() <= distance_to_stop_target_.value()) {
       return BT::NodeStatus::FAILURE;
     }
-  }
-  std::optional<double> target_linear_speed;
-  if (distance_to_stop_target_) {
-    target_linear_speed = calculateTargetSpeed(canonicalized_entity_status_->getTwist().linear.x);
-  } else {
-    target_linear_speed = std::nullopt;
   }
   if (target_speed_) {
     if (target_speed_.value() > target_linear_speed.value()) {
