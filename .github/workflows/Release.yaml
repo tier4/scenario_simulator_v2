@@ -66,13 +66,10 @@ jobs:
       - name: Get old version
         id: old_version
         run: |
-          echo "old_version=$(catkin_package_version)" >> $GITHUB_OUTPUT
-          
-      - name: echo payload
-        run: echo ${{ github.event.pull_request }}   
+          echo "old_version=$(catkin_package_version)" >> $GITHUB_OUTPUT  
 
       - name: Merge branch
-        run: git pull origin ${{ github.head_ref }}
+        run: git pull ${{ github.event.pull_request.head.repo.clone_url }} ${{ github.head_ref }}
 
       - name: Bump patch version
         if: (contains(github.event.pull_request.labels.*.name, 'bump patch'))
