@@ -38,18 +38,16 @@ from scenario import Scenario
 from scenario import substitute_ros_package
 
 
-def convert_scenarios_to_xosc(scenarios: List[Scenario], output_directory: Path):
+def convert_scenario_to_xosc(scenario: Scenario, output_directory: Path):
 
     result = []
 
-    for each in scenarios:
+    if scenario.path.suffix == ".xosc":
+        result.append(scenario)
 
-        if each.path.suffix == ".xosc":
-            result.append(each)
-
-        else:  # == '.yaml' or == '.yml'
-            for path in convert(each.path, output_directory / each.path.stem, False):
-                result.append(Scenario(path, each.frame_rate))
+    else:  # == '.yaml' or == '.yml'
+        for path in convert(scenario.path, output_directory / scenario.path.stem, False):
+            result.append(Scenario(path, scenario.frame_rate))
 
     return result
 
@@ -133,8 +131,6 @@ class ScenarioTestRunner(LifecycleController):
         while not self.load_preprocessor_client.wait_for_service(timeout_sec=1.0):
             self.get_logger().warn('/simulation/openscenario_preprocessor/load service not available, waiting again...')
 
-        self.print_debug('connection established with preprocessor')
-
         if len(override_parameters) > 0:
             for parameter_name, parameter_value in json.loads(override_parameters).items():
                 request = SetParameter.Request()
@@ -163,10 +159,10 @@ class ScenarioTestRunner(LifecycleController):
                 else:
                     time.sleep(self.SLEEP_RATE)
 
-    def run_scenarios(self, scenarios: List[Scenario]):
+    def run_scenario(self, scenario: Scenario):
 
         # convert t4v2/xosc to xosc
-        xosc_scenarios = convert_scenarios_to_xosc(scenarios, self.output_directory)
+        xosc_scenarios = convert_scenario_to_xosc(scenario, self.output_directory)
 
         # post to preprocessor
         for xosc_scenario in xosc_scenarios:
@@ -179,20 +175,14 @@ class ScenarioTestRunner(LifecycleController):
                     if future.result() is not None:
                         result = Scenario(future.result().path,
                                           future.result().frame_rate)
-                        self.print_debug("derived : " + str(future.result().path))
                         preprocessed_scenarios.append(result)
                     else:
                         self.print_debug(
                             'Exception while calling service /simulation/openscenario_preprocessor/derive: '
                             + str(future.exception()))
                         exit(1)
-                self.print_debug('finish derivation')
-
-                for preprocessed_scenario in preprocessed_scenarios:
-                    self.print_debug(str(preprocessed_scenario.path))
 
                 self.run_preprocessed_scenarios(preprocessed_scenarios)
-                self.print_debug('finish execution')
             else:
                 exit(1)
 
@@ -264,8 +254,6 @@ class ScenarioTestRunner(LifecycleController):
         future = self.load_preprocessor_client.call_async(request)
         rclpy.spin_until_future_complete(self, future)
         if future.result() is not None:
-            self.print_debug('Result of /simulation/openscenario_preprocessor/load: '
-                             + str(future.result().message))
             return True
         else:
             self.print_debug('Exception while calling service /simulation/openscenario_preprocessor/load: '
@@ -277,8 +265,6 @@ class ScenarioTestRunner(LifecycleController):
         future = self.check_preprocessor_client.call_async(CheckDerivativeRemained.Request())
         rclpy.spin_until_future_complete(self, future, timeout_sec=1.0)
         if future.result() is not None:
-            self.print_debug('Result of /simulation/openscenario_preprocessor/check: '
-                             + str(future.result().derivative_remained))
             return future.result().derivative_remained
         else:
             self.print_debug('Exception while calling service /simulation/openscenario_preprocessor/check: '
@@ -321,11 +307,11 @@ def main(args=None):
     )
 
     if args.scenario != Path("/dev/null"):
-        test_runner.run_scenarios(
-            [Scenario(
+        test_runner.run_scenario(
+            Scenario(
                 substitute_ros_package(args.scenario).resolve(),
                 args.global_frame_rate,
-            )]
+            )
         )
     else:
         print("No scenario is specified. Specify one.")
