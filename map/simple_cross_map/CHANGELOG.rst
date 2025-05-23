@@ -9,6 +9,12 @@ Changelog for package simple_cross_map
 * Merge branch 'master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+16.4.1 (2025-05-23)
+-------------------
+* Merge branch 'master' into refactor/behavior-tree-1
+* Merge branch 'master' into refactor/behavior-tree-1
+* Contributors: Taiga
+
 16.4.0 (2025-05-22)
 -------------------
 * Merge branch 'master' into feature/change_allow_goal_modification
