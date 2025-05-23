@@ -42,7 +42,6 @@ public:
     const traffic_simulator_msgs::msg::WaypointsArray & waypoints) override;
 
 private:
-  bool stopped_;
   std::optional<double> distance_to_stopline_;
 };
 }  // namespace follow_lane_sequence

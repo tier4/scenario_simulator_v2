@@ -30,7 +30,6 @@ StopAtStopLineAction::StopAtStopLineAction(
   const std::string & name, const BT::NodeConfiguration & config)
 : entity_behavior::VehicleActionNode(name, config)
 {
-  stopped_ = false;
 }
 
 const std::optional<traffic_simulator_msgs::msg::Obstacle> StopAtStopLineAction::calculateObstacle(
@@ -92,7 +91,6 @@ BT::NodeStatus StopAtStopLineAction::tick()
   if (
     request_ != traffic_simulator::behavior::Request::NONE &&
     request_ != traffic_simulator::behavior::Request::FOLLOW_LANE) {
-    stopped_ = false;
     return BT::NodeStatus::FAILURE;
   }
   if (!behavior_parameter_.see_around) {
@@ -113,18 +111,15 @@ BT::NodeStatus StopAtStopLineAction::tick()
   const auto distance_to_stop_target = getDistanceToConflictingEntity(route_lanelets_, *trajectory);
   const auto distance_to_front_entity = getDistanceToFrontEntity(*trajectory);
   if (!distance_to_stopline_) {
-    stopped_ = false;
     return BT::NodeStatus::FAILURE;
   }
   if (distance_to_front_entity) {
     if (distance_to_front_entity.value() <= distance_to_stopline_.value()) {
-      stopped_ = false;
       return BT::NodeStatus::FAILURE;
     }
   }
   if (distance_to_stop_target) {
     if (distance_to_stop_target.value() <= distance_to_stopline_.value()) {
-      stopped_ = false;
       return BT::NodeStatus::FAILURE;
     }
   }
@@ -132,23 +127,19 @@ BT::NodeStatus StopAtStopLineAction::tick()
   if (std::fabs(canonicalized_entity_status_->getTwist().linear.x) < 0.001) {
     if (distance_to_stopline_) {
       if (distance_to_stopline_.value() <= vehicle_parameters.bounding_box.dimensions.x + 5) {
-        stopped_ = true;
+        if (!target_speed_) {
+          target_speed_ = hdmap_utils_->getSpeedLimit(route_lanelets_);
+        }
+        setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(target_speed_.value()));
+        setOutput("waypoints", waypoints);
+        setOutput("obstacle", calculateObstacle(waypoints));
+        return BT::NodeStatus::RUNNING;
       }
     }
-  }
-  if (stopped_) {
-    if (!target_speed_) {
-      target_speed_ = hdmap_utils_->getSpeedLimit(route_lanelets_);
-    }
-    setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(target_speed_.value()));
-    setOutput("waypoints", waypoints);
-    setOutput("obstacle", calculateObstacle(waypoints));
-    return BT::NodeStatus::RUNNING;
   }
   auto target_linear_speed =
     calculateTargetSpeed(canonicalized_entity_status_->getTwist().linear.x);
   if (!target_linear_speed) {
-    stopped_ = false;
     return BT::NodeStatus::FAILURE;
   }
   if (target_speed_) {
@@ -159,7 +150,6 @@ BT::NodeStatus StopAtStopLineAction::tick()
     target_speed_ = target_linear_speed.value();
   }
   setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(target_speed_.value()));
-  stopped_ = false;
   setOutput("waypoints", waypoints);
   setOutput("obstacle", calculateObstacle(waypoints));
   return BT::NodeStatus::RUNNING;
