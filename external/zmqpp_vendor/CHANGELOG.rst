@@ -15,6 +15,9 @@ Changelog for package zmqpp_vendor
 * Add missing buildtool_depend on git
 * Contributors: Masaya Kataoka, MasayaKataoka, Scott K Logan
 
+16.4.2 (2025-05-23)
+-------------------
+
 16.4.1 (2025-05-23)
 -------------------
 * Merge branch 'master' into refactor/behavior-tree-1

@@ -32,6 +32,9 @@ Changelog for package openscenario_interpreter
 * add publish_empty_context parameter
 * Contributors: Masaya Kataoka
 
+16.4.2 (2025-05-23)
+-------------------
+
 16.4.1 (2025-05-23)
 -------------------
 * Merge branch 'master' into refactor/behavior-tree-1
