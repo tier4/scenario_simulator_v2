@@ -67,8 +67,7 @@ const traffic_simulator_msgs::msg::WaypointsArray LaneChangeAction::calculateWay
       waypoints.waypoints = straight_waypoints;
       const auto curve_waypoints = curve_->getTrajectory(current_s_, l, 1.0, true);
       std::copy(
-        straight_waypoints.begin(), straight_waypoints.end(),
-        std::back_inserter(waypoints.waypoints));
+        curve_waypoints.begin(), curve_waypoints.end(), std::back_inserter(waypoints.waypoints));
     }
     return waypoints;
   } else {
@@ -170,6 +169,9 @@ BT::NodeStatus LaneChangeAction::tick()
           case traffic_simulator::lane_change::Constraint::Type::TIME:
             lane_change_velocity_ = curve_->getLength() / lane_change_parameters_->constraint.value;
             break;
+        }
+        if (target_speed_) {
+          lane_change_velocity_ = std::clamp(lane_change_velocity_, 0.0, target_speed_.value());
         }
       } else {
         return BT::NodeStatus::FAILURE;
