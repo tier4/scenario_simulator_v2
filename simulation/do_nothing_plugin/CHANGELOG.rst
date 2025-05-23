@@ -21,6 +21,15 @@ Changelog for package do_nothing_plugin
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+16.4.1 (2025-05-23)
+-------------------
+* Merge pull request `#1602 <https://github.com/tier4/scenario_simulator_v2/issues/1602>`_ from tier4/refactor/behavior-tree-1
+  Refactor/behavior_tree-1
+* Merge branch 'master' into refactor/behavior-tree-1
+* Merge branch 'master' into refactor/behavior-tree-1
+* Changed the methods in `behavior_tree.hpp` to use trailing return types.
+* Contributors: Masaya Kataoka, Taiga, Taiga Takano
+
 16.4.0 (2025-05-22)
 -------------------
 * Merge branch 'master' into feature/change_allow_goal_modification
