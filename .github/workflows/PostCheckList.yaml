@@ -33,6 +33,5 @@ jobs:
             - [ ] Labels of this pull request are valid?
             - [ ] All unit tests/integration tests are included in this pull request? If you think adding test cases is unnecessary, please describe why and cross out this line.
             - [ ] The documentation for this pull request is enough? If you think adding documents for this pull request is unnecessary, please describe why and cross out this line.
-          github-token: ${{ secrets.GITHUB_TOKEN }}
           pr-number: ${{ github.event.pull_request.number }}
           comment-identifier: 'check-list'
