@@ -646,7 +646,7 @@ auto CatmullRomSpline::getMaximum2DCurvature() const -> double
       "This message is not originally intended to be displayed, if you see it, please contact "
       "the developer of traffic_simulator.");
   }
-  /// @note Maximum 2D curvature is empyt means that it is not calculated yet.
+  /// @note Maximum 2D curvature is empty means that it is not calculated yet.
   if (maximum_2d_curvatures_.empty()) {
     for (const auto & curve : curves_) {
       maximum_2d_curvatures_.emplace_back(curve.getMaximum2DCurvature());
