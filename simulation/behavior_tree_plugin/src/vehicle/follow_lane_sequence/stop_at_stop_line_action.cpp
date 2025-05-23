@@ -52,9 +52,6 @@ const std::optional<traffic_simulator_msgs::msg::Obstacle> StopAtStopLineAction:
 
 const traffic_simulator_msgs::msg::WaypointsArray StopAtStopLineAction::calculateWaypoints()
 {
-  if (!canonicalized_entity_status_->isInLanelet()) {
-    THROW_SIMULATION_ERROR("failed to assign lane");
-  }
   if (canonicalized_entity_status_->getTwist().linear.x >= 0) {
     traffic_simulator_msgs::msg::WaypointsArray waypoints;
     double horizon = getHorizon();
@@ -97,6 +94,9 @@ BT::NodeStatus StopAtStopLineAction::tick()
     return BT::NodeStatus::FAILURE;
   }
   if (getRightOfWayEntities(route_lanelets_).size() != 0) {
+    return BT::NodeStatus::FAILURE;
+  }
+  if (!canonicalized_entity_status_->isInLanelet()) {
     return BT::NodeStatus::FAILURE;
   }
   const auto waypoints = calculateWaypoints();
