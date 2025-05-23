@@ -1,8 +1,8 @@
 name: Post check list
 on:
   pull_request:
-    types: [opened, reopened]
-
+    branches:
+      - master
 jobs:
   post_check_list:
     name: Post check list
@@ -20,9 +20,11 @@ jobs:
       security-events: write
       statuses: write
     steps:
-      - uses: alawiii521/current-pr-comment@v1.0
+      - name: checkout sim_evaluation_tools
+        uses: actions/checkout@v4
+      - uses: ./.github/actions/comment
         with:
-          comment: |
+          comment-content: |
             # Checklist for reviewers ☑️
             All references to "You" in the following text refer to the code reviewer.
             - [ ] Is this pull request written in a way that is easy to read from a third-party perspective?
@@ -31,4 +33,6 @@ jobs:
             - [ ] Labels of this pull request are valid?
             - [ ] All unit tests/integration tests are included in this pull request? If you think adding test cases is unnecessary, please describe why and cross out this line.
             - [ ] The documentation for this pull request is enough? If you think adding documents for this pull request is unnecessary, please describe why and cross out this line.
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          pr-number: ${{ github.event.pull_request.number }}
+          comment-identifier: 'check-list'
