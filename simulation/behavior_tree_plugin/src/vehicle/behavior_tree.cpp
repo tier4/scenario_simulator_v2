@@ -137,7 +137,7 @@ auto VehicleBehaviorTree::setBehaviorParameter(
     getBehaviorParameterKey(), clamp(behavior_parameter));
 }
 
-const std::string & VehicleBehaviorTree::getCurrentAction() const
+auto VehicleBehaviorTree::getCurrentAction() -> const std::string &
 {
   return logging_event_ptr_->getCurrentAction();
 }

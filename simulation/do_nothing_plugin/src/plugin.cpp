@@ -194,8 +194,7 @@ void DoNothingBehavior::update(double current_time, double step_time)
       getRouteLanelets(), getDefaultMatchingDistanceForLaneletPoseCalculation());
   }
 }
-
-const std::string & DoNothingBehavior::getCurrentAction() const
+auto DoNothingBehavior::getCurrentAction() -> const std::string &
 {
   static const std::string behavior = "do_nothing";
   return behavior;
