@@ -89,7 +89,7 @@ auto PedestrianEntity::requestFollowTrajectory(
     behavior_plugin_ptr_->setPolylineTrajectory(parameter);
     behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_POLYLINE_TRAJECTORY);
     lanelet::Ids route_lanelets;
-    const auto curve = math::geometry::CatmullRomSpline(parameter);
+    const auto curve = math::geometry::CatmullRomSpline(status_->getMapPose().position, parameter);
     /// @note Hard coded parameter: 1.0 is a sample resolution of the trajectory. (Unit: m)
     for (const auto & waypoint : curve.getTrajectoryPoses(0.0, curve.getLength(), 1.0)) {
       if (
