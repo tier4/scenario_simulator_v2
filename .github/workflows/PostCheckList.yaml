@@ -1,6 +1,7 @@
 name: Post check list
 on:
   pull_request_target:
+    types: [assigned, opened, synchronize, reopened, labeled, edited]
     branches:
       - master
 jobs:
