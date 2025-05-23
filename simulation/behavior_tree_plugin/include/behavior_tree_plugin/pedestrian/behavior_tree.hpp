@@ -40,7 +40,7 @@ class PedestrianBehaviorTree : public BehaviorPluginBase
 public:
   void configure(const rclcpp::Logger & logger) override;
   auto update(const double current_time, const double step_time) -> void override;
-  const std::string & getCurrentAction() const override;
+  auto getCurrentAction() -> const std::string & override;
 
 #define DEFINE_GETTER_SETTER(NAME, TYPE)                                                    \
   TYPE get##NAME() override { return tree_.rootBlackboard()->get<TYPE>(get##NAME##Key()); } \

@@ -32,6 +32,15 @@ Changelog for package openscenario_interpreter
 * add publish_empty_context parameter
 * Contributors: Masaya Kataoka
 
+16.4.2 (2025-05-23)
+-------------------
+
+16.4.1 (2025-05-23)
+-------------------
+* Merge branch 'master' into refactor/behavior-tree-1
+* Merge branch 'master' into refactor/behavior-tree-1
+* Contributors: Taiga
+
 16.4.0 (2025-05-22)
 -------------------
 * Merge pull request `#1590 <https://github.com/tier4/scenario_simulator_v2/issues/1590>`_ from tier4/feature/change_allow_goal_modification
