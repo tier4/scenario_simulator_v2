@@ -1,0 +1,87 @@
+name: 'comment'
+description: ''
+author: 'Kotaro Yoshimoto'
+
+inputs:
+  github-token:
+    description: ''
+    required: true
+    default: ${{ github.token }}
+  pr-number:
+    description: ''
+    required: true
+    default: ${{ github.event.pull_request.number }}
+  comment-content:
+    description: ''
+    required: true
+  comment-identifier:
+    description: 'A unique comment identifier (embedded as invisible comment)'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Post or Update Comment
+      uses: actions/github-script@v7
+      env:
+        PR_NUMBER_INPUT: ${{ inputs.pr-number }}
+        COMMENT_CONTENT_INPUT: ${{ inputs.comment-content }}
+        COMMENT_IDENTIFIER_INPUT: ${{ inputs.comment-identifier }}
+      with:
+        github-token: ${{ inputs.github-token }}
+        script: |
+          const prNumber = parseInt(process.env.PR_NUMBER_INPUT, 10);
+          if (isNaN(prNumber)) {
+            core.setFailed(`Invalid PR number: ${process.env.PR_NUMBER_INPUT}`);
+            return;
+          }
+
+          const owner = context.repo.owner;
+          const repo = context.repo.repo;
+          
+          const commentIdentifier = process.env.COMMENT_IDENTIFIER_INPUT;
+          if (!commentIdentifier || commentIdentifier.trim() === "") {
+            core.setFailed("Input 'comment-identifier' is required and cannot be empty.");
+            return;
+          }
+
+          const rawCommentContent = process.env.COMMENT_CONTENT_INPUT;
+          const commentBody = `${rawCommentContent}\n\n${commentIdentifier}`;
+
+          core.info(`Operating on PR #${prNumber} in ${owner}/${repo}`);
+          core.info(`Using comment identifier: "${commentIdentifier}"`);
+
+          try {
+            const { data: comments } = await github.rest.issues.listComments({
+              owner,
+              repo,
+              issue_number: prNumber,
+            });
+
+            const existingComment = comments.find(comment => 
+              comment.user && comment.user.login === 'github-actions[bot]' && 
+              comment.body && comment.body.includes(commentIdentifier)
+            );
+
+            if (existingComment) {
+              core.info(`Found existing comment ID: ${existingComment.id}. Updating.`);
+              await github.rest.issues.updateComment({
+                owner,
+                repo,
+                comment_id: existingComment.id,
+                body: commentBody,
+              });
+              core.info(`Comment ${existingComment.id} updated successfully.`);
+            } else {
+              core.info("No existing comment found. Creating a new one.");
+              const { data: newComment } = await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: prNumber,
+                body: commentBody,
+              });
+              core.info(`New comment created successfully with ID: ${newComment.id}.`);
+            }
+          } catch (error) {
+            core.setFailed(`Action failed with error: ${error.message}`);
+          }
