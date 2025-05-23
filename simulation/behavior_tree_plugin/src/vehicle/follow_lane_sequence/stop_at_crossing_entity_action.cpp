@@ -31,7 +31,6 @@ StopAtCrossingEntityAction::StopAtCrossingEntityAction(
   const std::string & name, const BT::NodeConfiguration & config)
 : entity_behavior::VehicleActionNode(name, config)
 {
-  in_stop_sequence_ = false;
 }
 
 const std::optional<traffic_simulator_msgs::msg::Obstacle>
@@ -89,19 +88,15 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
   if (
     request_ != traffic_simulator::behavior::Request::NONE &&
     request_ != traffic_simulator::behavior::Request::FOLLOW_LANE) {
-    in_stop_sequence_ = false;
     return BT::NodeStatus::FAILURE;
   }
   if (!canonicalized_entity_status_->isInLanelet()) {
-    in_stop_sequence_ = false;
     return BT::NodeStatus::FAILURE;
   }
   if (!behavior_parameter_.see_around) {
-    in_stop_sequence_ = false;
     return BT::NodeStatus::FAILURE;
   }
   if (getRightOfWayEntities(route_lanelets_).size() != 0) {
-    in_stop_sequence_ = false;
     return BT::NodeStatus::FAILURE;
   }
   const auto waypoints = calculateWaypoints();
@@ -116,18 +111,15 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
     traffic_simulator::distance::distanceToStopLine(route_lanelets_, *trajectory);
   const auto distance_to_front_entity = getDistanceToFrontEntity(*trajectory);
   if (!distance_to_stop_target_) {
-    in_stop_sequence_ = false;
     return BT::NodeStatus::FAILURE;
   }
   if (distance_to_front_entity) {
     if (distance_to_front_entity.value() <= distance_to_stop_target_.value()) {
-      in_stop_sequence_ = false;
       return BT::NodeStatus::FAILURE;
     }
   }
   if (distance_to_stopline) {
     if (distance_to_stopline.value() <= distance_to_stop_target_.value()) {
-      in_stop_sequence_ = false;
       return BT::NodeStatus::FAILURE;
     }
   }
@@ -147,7 +139,6 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
   setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(target_speed_.value()));
   setOutput("waypoints", waypoints);
   setOutput("obstacle", calculateObstacle(waypoints));
-  in_stop_sequence_ = true;
   return BT::NodeStatus::RUNNING;
 }
 }  // namespace follow_lane_sequence
