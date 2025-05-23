@@ -33,7 +33,7 @@ jobs:
       new_version: ${{ steps.new_version.outputs.new_version }}
     steps:
       - name: Restore branch
-        uses: levonet/action-restore-branch@master
+        uses: HansRobo/action-restore-branch@master
 
       - name: Install bloom
         run: apt update && apt install -y python3-bloom git curl
