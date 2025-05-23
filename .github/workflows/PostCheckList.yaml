@@ -21,11 +21,9 @@ jobs:
       security-events: write
       statuses: write
     steps:
-      - name: checkout sim_evaluation_tools
-        uses: actions/checkout@v4
-      - uses: ./.github/actions/comment
+      - uses: alawiii521/current-pr-comment@v1.0
         with:
-          comment-content: |
+          comment: |
             # Checklist for reviewers ☑️
             All references to "You" in the following text refer to the code reviewer.
             - [ ] Is this pull request written in a way that is easy to read from a third-party perspective?
@@ -34,5 +32,4 @@ jobs:
             - [ ] Labels of this pull request are valid?
             - [ ] All unit tests/integration tests are included in this pull request? If you think adding test cases is unnecessary, please describe why and cross out this line.
             - [ ] The documentation for this pull request is enough? If you think adding documents for this pull request is unnecessary, please describe why and cross out this line.
-          pr-number: ${{ github.event.pull_request.number }}
-          comment-identifier: 'check-list'
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
