@@ -21,9 +21,6 @@
 
 int main(const int argc, char const * const * const argv)
 {
-  google::InitGoogleLogging(argv[0]);
-  google::InstallFailureSignalHandler();
-
   rclcpp::init(argc, argv);
 
   rclcpp::executors::SingleThreadedExecutor executor;
