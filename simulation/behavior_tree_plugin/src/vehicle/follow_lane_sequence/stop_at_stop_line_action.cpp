@@ -140,13 +140,6 @@ BT::NodeStatus StopAtStopLineAction::tick()
     if (!target_speed_) {
       target_speed_ = hdmap_utils_->getSpeedLimit(route_lanelets_);
     }
-    if (!distance_to_stopline_) {
-      stopped_ = false;
-      setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(target_speed_.value()));
-      setOutput("waypoints", waypoints);
-      setOutput("obstacle", calculateObstacle(waypoints));
-      return BT::NodeStatus::SUCCESS;
-    }
     setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(target_speed_.value()));
     setOutput("waypoints", waypoints);
     setOutput("obstacle", calculateObstacle(waypoints));

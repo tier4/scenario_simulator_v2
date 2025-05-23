@@ -118,12 +118,6 @@ BT::NodeStatus StopAtTrafficLightAction::tick()
   } else {
     return BT::NodeStatus::FAILURE;
   }
-  if (!distance_to_stop_target_) {
-    setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(0));
-    setOutput("waypoints", waypoints);
-    setOutput("obstacle", calculateObstacle(waypoints));
-    return BT::NodeStatus::SUCCESS;
-  }
   if (target_speed_) {
     if (target_speed_.value() > target_linear_speed.value()) {
       target_speed_ = target_linear_speed.value();
