@@ -51,8 +51,11 @@ jobs:
           git config --global user.name  "Release Bot"
           git config --global user.email "action@github.com"
           git config --global --add safe.directory /__w/scenario_simulator_v2/scenario_simulator_v2
-          git config --global credential.helper ${{ secrets.BLOOM_GITHUB_TOKEN }}
           git config pull.rebase false
+          
+      - name: Setup git credential
+        if: github.event.pull_request.merged == true
+        run: git config --global credential.helper ${{ secrets.BLOOM_GITHUB_TOKEN }}
 
       - name: Get old version
         id: old_version
