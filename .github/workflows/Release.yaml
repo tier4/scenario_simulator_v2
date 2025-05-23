@@ -67,6 +67,9 @@ jobs:
         id: old_version
         run: |
           echo "old_version=$(catkin_package_version)" >> $GITHUB_OUTPUT
+          
+      - name: echo payload
+        run: echo ${{ github.event.pull_request }}   
 
       - name: Merge branch
         run: git pull origin ${{ github.head_ref }}
