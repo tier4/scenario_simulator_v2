@@ -60,7 +60,7 @@ const traffic_simulator_msgs::msg::WaypointsArray FollowFrontEntityAction::calcu
     double horizon = getHorizon();
     const auto lanelet_pose = canonicalized_entity_status_->getLaneletPose();
     waypoints.waypoints = reference_trajectory->getTrajectory(
-      lanelet_pose.s, lanelet_pose.s + horizon, 1.0, lanelet_pose.offset);
+      lanelet_pose.s, lanelet_pose.s + horizon, kWaypointInterval, lanelet_pose.offset);
     trajectory = std::make_unique<math::geometry::CatmullRomSubspline>(
       reference_trajectory, lanelet_pose.s, lanelet_pose.s + horizon);
     return waypoints;
@@ -127,15 +127,17 @@ BT::NodeStatus FollowFrontEntityAction::tick()
   if (
     distance_to_front_entity_.value() >=
     (calculateStopDistance(behavior_parameter_.dynamic_constraints) +
-     vehicle_parameters.bounding_box.dimensions.x + 5)) {
-    setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(front_entity_linear_velocity + 2));
+     vehicle_parameters.bounding_box.dimensions.x + kFrontEntityMargin)) {
+    setCanonicalizedEntityStatus(
+      calculateUpdatedEntityStatus(front_entity_linear_velocity + kSpeedStep));
     setOutput("waypoints", waypoints);
     setOutput("obstacle", calculateObstacle(waypoints));
     return BT::NodeStatus::RUNNING;
   } else if (
     distance_to_front_entity_.value() <=
     calculateStopDistance(behavior_parameter_.dynamic_constraints)) {
-    setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(front_entity_linear_velocity - 2));
+    setCanonicalizedEntityStatus(
+      calculateUpdatedEntityStatus(front_entity_linear_velocity - kSpeedStep));
     setOutput("waypoints", waypoints);
     setOutput("obstacle", calculateObstacle(waypoints));
     return BT::NodeStatus::RUNNING;

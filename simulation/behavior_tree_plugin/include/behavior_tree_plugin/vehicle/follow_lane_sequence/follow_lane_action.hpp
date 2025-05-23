@@ -43,6 +43,11 @@ public:
 
 private:
   std::optional<traffic_simulator::LaneletPose> target_lanelet_pose_;
+  static constexpr double kWaypointInterval = 1.0;
+  static constexpr double kFrontEntityStopMargin = 5.0;
+  static constexpr double kBoundingBoxHalfFactor = 0.5;
+  static constexpr double kStopLineMargin = 5.0;
+  static constexpr double kConflictingEntityMargin = 3.0;
 };
 }  // namespace follow_lane_sequence
 }  // namespace vehicle
