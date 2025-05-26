@@ -97,7 +97,7 @@ auto makeUpdatedStatus(
             from_canonicalized_lanelet_pose.value(), to_canonicalized_lanelet_pose.value(),
             include_adjacent_lanelet, include_opposite_direction,
             RoutingConfiguration(allow_lane_change))) {
-          return longitudinal_distance.value();
+          return std::abs(longitudinal_distance.value());
         }
       }
     }
