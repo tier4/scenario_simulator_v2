@@ -33,6 +33,7 @@ jobs:
       new_version: ${{ steps.new_version.outputs.new_version }}
     steps:
       - name: Restore branch
+        if: github.event.pull_request.merged == true
         uses: levonet/action-restore-branch@master
 
       - name: Install bloom
@@ -42,6 +43,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: master
+          repository: ${{ github.event.pull_request.base.repo.full_name }}
           fetch-depth: 0
           fetch-tags: true
 
@@ -50,16 +52,19 @@ jobs:
           git config --global user.name  "Release Bot"
           git config --global user.email "action@github.com"
           git config --global --add safe.directory /__w/scenario_simulator_v2/scenario_simulator_v2
-          git config --global credential.helper ${{ secrets.BLOOM_GITHUB_TOKEN }}
           git config pull.rebase false
+
+      - name: Setup git credential
+        if: github.event.pull_request.merged == true
+        run: git config --global credential.helper ${{ secrets.BLOOM_GITHUB_TOKEN }}
 
       - name: Get old version
         id: old_version
         run: |
           echo "old_version=$(catkin_package_version)" >> $GITHUB_OUTPUT
 
-      - name: Merge branch
-        run: git pull origin ${{ github.head_ref }}
+      - name: Pull head branch
+        run: git pull ${{ github.event.pull_request.head.repo.clone_url }} ${{ github.head_ref }}
 
       - name: Bump patch version
         if: (contains(github.event.pull_request.labels.*.name, 'bump patch'))

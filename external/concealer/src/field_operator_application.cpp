@@ -269,8 +269,19 @@ auto FieldOperatorApplication::engage() -> void
           "The simulator attempted to request Autoware to engage, but was aborted because "
           "Autoware's current state is ",
           state, ".");
+      case LegacyAutowareState::initializing:
+        // The initial pose has been sent but has not yet reached Autoware.
+        waitForAutowareStateToBe(
+          LegacyAutowareState::initializing, LegacyAutowareState::waiting_for_route);
+        [[fallthrough]];
+      case LegacyAutowareState::waiting_for_route:
+        // The route has been sent but has not yet reached Autoware.
+        waitForAutowareStateToBe(
+          LegacyAutowareState::waiting_for_route, LegacyAutowareState::planning);
+        [[fallthrough]];
       case LegacyAutowareState::planning:
-        waitForAutowareStateToBe(LegacyAutowareState::waiting_for_engage);
+        waitForAutowareStateToBe(
+          LegacyAutowareState::planning, LegacyAutowareState::waiting_for_engage);
         [[fallthrough]];
       case LegacyAutowareState::waiting_for_engage:
         requestEngage(
@@ -280,7 +291,11 @@ auto FieldOperatorApplication::engage() -> void
             return request;
           }(),
           30);
+        waitForAutowareStateToBe(
+          LegacyAutowareState::waiting_for_engage, LegacyAutowareState::driving);
         time_limit = std::decay_t<decltype(time_limit)>::max();
+        break;
+      case LegacyAutowareState::driving:
         break;
     }
   });
@@ -309,6 +324,10 @@ auto FieldOperatorApplication::initialize(const geometry_msgs::msg::Pose & initi
             "The simulator attempted to initialize Autoware, but aborted because Autoware's "
             "current state is ",
             state, ".");
+        case LegacyAutowareState::undefined:
+          waitForAutowareStateToBe(
+            LegacyAutowareState::undefined, LegacyAutowareState::initializing);
+          [[fallthrough]];
         case LegacyAutowareState::initializing:
           requestInitialPose(
             [&]() {
@@ -324,18 +343,21 @@ auto FieldOperatorApplication::initialize(const geometry_msgs::msg::Pose & initi
               return request;
             }(),
             30);
+          waitForAutowareStateToBe(
+            LegacyAutowareState::initializing, LegacyAutowareState::waiting_for_route);
           break;
       }
     });
   }
 }
 
-auto FieldOperatorApplication::plan(const std::vector<geometry_msgs::msg::PoseStamped> & route)
+auto FieldOperatorApplication::plan(
+  const std::vector<geometry_msgs::msg::PoseStamped> & route, const bool allow_goal_modification)
   -> void
 {
   assert(not route.empty());
 
-  task_queue.delay([this, route] {
+  task_queue.delay([this, route, allow_goal_modification]() {
     switch (const auto state = getLegacyAutowareState(); state.value) {
       default:
         throw common::AutowareError(
@@ -343,8 +365,9 @@ auto FieldOperatorApplication::plan(const std::vector<geometry_msgs::msg::PoseSt
           "current state is ",
           state, ".");
       case LegacyAutowareState::initializing:
+        // The initial pose has been sent but has not yet reached Autoware.
       case LegacyAutowareState::arrived_goal:
-        waitForAutowareStateToBe(LegacyAutowareState::waiting_for_route);
+        waitForAutowareStateToBe(state, LegacyAutowareState::waiting_for_route);
         [[fallthrough]];
       case LegacyAutowareState::waiting_for_route:
         requestSetRoutePoints(
@@ -369,18 +392,21 @@ auto FieldOperatorApplication::plan(const std::vector<geometry_msgs::msg::PoseSt
 
                [1] https://github.com/autowarefoundation/autoware_adapi_msgs/commit/805f8ebd3ca24564844df9889feeaf183101fbef
                [2] https://github.com/autowarefoundation/autoware_adapi_msgs/commit/cf310bd038673b6cbef3ae3b61dfe607212de419
-             */
+            */
             if constexpr (
               DetectMember_option<SetRoutePoints::Request>::value and
               DetectMember_allow_goal_modification<
                 decltype(std::declval<SetRoutePoints::Request>().option)>::value) {
-              request->option.allow_goal_modification = common::getParameter<bool>(
-                get_node_parameters_interface(), "allow_goal_modification");
+              request->option.allow_goal_modification = allow_goal_modification;
             }
 
             return request;
           }(),
           30);
+        waitForAutowareStateToBe(
+          LegacyAutowareState::waiting_for_route, LegacyAutowareState::planning);
+        waitForAutowareStateToBe(
+          LegacyAutowareState::planning, LegacyAutowareState::waiting_for_engage);
         break;
     }
   });

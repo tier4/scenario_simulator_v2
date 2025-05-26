@@ -124,14 +124,19 @@ struct FieldOperatorApplication : public rclcpp::Node
 
   template <typename Thunk = void (*)()>
   auto waitForAutowareStateToBe(
-    const LegacyAutowareState & state, Thunk thunk = [] {})
+    const LegacyAutowareState & from_state, const LegacyAutowareState & to_state,
+    Thunk thunk = [] {})
   {
     thunk();
 
-    while (not finalized.load() and getLegacyAutowareState().value != state.value) {
+    auto not_to_be = [&](auto current_state) {
+      return from_state.value <= current_state.value and current_state.value < to_state.value;
+    };
+
+    while (not finalized.load() and not_to_be(getLegacyAutowareState())) {
       if (time_limit <= std::chrono::steady_clock::now()) {
         throw common::AutowareError(
-          "Simulator waited for the Autoware state to transition to ", state,
+          "Simulator waited for the Autoware state to transition to ", to_state,
           ", but time is up. The current Autoware state is ", getLegacyAutowareState());
       } else {
         thunk();
@@ -154,7 +159,7 @@ struct FieldOperatorApplication : public rclcpp::Node
 
   auto initialize(const geometry_msgs::msg::Pose &) -> void;
 
-  auto plan(const std::vector<geometry_msgs::msg::PoseStamped> &) -> void;
+  auto plan(const std::vector<geometry_msgs::msg::PoseStamped> &, const bool) -> void;
 
   auto clearRoute() -> void;
 

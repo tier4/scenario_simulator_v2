@@ -26,6 +26,7 @@
 #include <traffic_simulator/behavior/longitudinal_speed_planning.hpp>
 #include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator/data_type/lane_change.hpp>
+#include <traffic_simulator/data_type/route_option.hpp>
 #include <traffic_simulator/data_type/speed_change.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/helper/helper.hpp>
@@ -47,6 +48,7 @@ namespace traffic_simulator
 {
 namespace entity
 {
+using EuclideanDistancesMap = std::unordered_map<std::pair<std::string, std::string>, double>;
 class EntityBase : public std::enable_shared_from_this<EntityBase>
 {
 public:
@@ -170,13 +172,51 @@ public:
 
   /*   */ void resetDynamicConstraints();
 
-  virtual void requestAcquirePosition(const CanonicalizedLaneletPose &) = 0;
+  [[deprecated(
+    "This function was deprecated since version 16.4.0 (released on 20250522). It will be deleted "
+    "after a half-year transition period (~20251122). Please use one with RouteOption argument "
+    "instead.")]] virtual void
+  requestAcquirePosition(const CanonicalizedLaneletPose & pose)
+  {
+    return requestAcquirePosition(pose, {});
+  }
 
-  virtual void requestAcquirePosition(const geometry_msgs::msg::Pose &) = 0;
+  virtual void requestAcquirePosition(const CanonicalizedLaneletPose &, const RouteOption &) = 0;
 
-  virtual void requestAssignRoute(const std::vector<CanonicalizedLaneletPose> &) = 0;
+  [[deprecated(
+    "This function was deprecated since version 16.4.0 (released on 20250522). It will be deleted "
+    "after a half-year transition period (~20251122). Please use one with RouteOption argument "
+    "instead.")]] virtual void
+  requestAcquirePosition(const geometry_msgs::msg::Pose & pose)
+  {
+    return requestAcquirePosition(pose, {});
+  }
 
-  virtual void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) = 0;
+  virtual void requestAcquirePosition(const geometry_msgs::msg::Pose &, const RouteOption &) = 0;
+
+  [[deprecated(
+    "This function was deprecated since version 16.4.0 (released on 20250522). It will be deleted "
+    "after a half-year transition period (~20251122). Please use one with RouteOption argument "
+    "instead.")]] virtual void
+  requestAssignRoute(const std::vector<CanonicalizedLaneletPose> & pose)
+  {
+    return requestAssignRoute(pose, {});
+  }
+
+  virtual void requestAssignRoute(
+    const std::vector<CanonicalizedLaneletPose> &, const RouteOption &) = 0;
+
+  [[deprecated(
+    "This function was deprecated since version 16.4.0 (released on 20250522). It will be deleted "
+    "after a half-year transition period (~20251122). Please use one with RouteOption argument "
+    "instead.")]] virtual void
+  requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> & pose)
+  {
+    return requestAssignRoute(pose, {});
+  }
+
+  virtual void requestAssignRoute(
+    const std::vector<geometry_msgs::msg::Pose> &, const RouteOption &) = 0;
 
   virtual auto requestLaneChange(const lanelet::Id) -> void
   {
@@ -312,6 +352,8 @@ public:
 
   bool verbose;
 
+  void setEuclideanDistancesMap(const std::shared_ptr<EuclideanDistancesMap> & distances);
+
 protected:
   std::shared_ptr<CanonicalizedEntityStatus> status_;
 
@@ -332,6 +374,8 @@ protected:
 
   std::unique_ptr<traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner>
     speed_planner_;
+
+  std::shared_ptr<EuclideanDistancesMap> euclidean_distances_map_;
 
 private:
   virtual auto requestSpeedChangeWithConstantAcceleration(

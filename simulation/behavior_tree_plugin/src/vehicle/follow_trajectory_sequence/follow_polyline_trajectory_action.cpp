@@ -22,7 +22,7 @@ auto FollowPolylineTrajectoryAction::calculateWaypoints()
   -> const traffic_simulator_msgs::msg::WaypointsArray
 {
   auto waypoints = traffic_simulator_msgs::msg::WaypointsArray();
-  waypoints.waypoints.push_back(canonicalized_entity_status->getMapPose().position);
+  waypoints.waypoints.push_back(canonicalized_entity_status_->getMapPose().position);
   for (const auto & vertex : polyline_trajectory->shape.vertices) {
     waypoints.waypoints.push_back(vertex.position.position);
   }
@@ -50,27 +50,27 @@ auto FollowPolylineTrajectoryAction::providedPorts() -> BT::PortsList
 {
   auto ports = VehicleActionNode::providedPorts();
   ports.emplace(BT::InputPort<decltype(polyline_trajectory)>("polyline_trajectory"));
-  ports.emplace(BT::InputPort<decltype(target_speed)>("target_speed"));
+  ports.emplace(BT::InputPort<decltype(target_speed_)>("target_speed"));
   return ports;
 }
 
 auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
 {
   auto getTargetSpeed = [&]() -> double {
-    if (target_speed.has_value()) {
-      return target_speed.value();
+    if (target_speed_.has_value()) {
+      return target_speed_.value();
     } else {
-      return canonicalized_entity_status->getTwist().linear.x;
+      return canonicalized_entity_status_->getTwist().linear.x;
     }
   };
 
   if (getBlackBoardValues();
-      request != traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY or
+      request_ != traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY or
       not getInput<decltype(polyline_trajectory)>("polyline_trajectory", polyline_trajectory) or
-      not getInput<decltype(target_speed)>("target_speed", target_speed) or
+      not getInput<decltype(target_speed_)>("target_speed", target_speed_) or
       not polyline_trajectory) {
     return BT::NodeStatus::FAILURE;
-  } else if (std::isnan(canonicalized_entity_status->getTime())) {
+  } else if (std::isnan(canonicalized_entity_status_->getTime())) {
     THROW_SIMULATION_ERROR(
       "Time in canonicalized_entity_status is NaN - FollowTrajectoryAction does not support such "
       "case.");
