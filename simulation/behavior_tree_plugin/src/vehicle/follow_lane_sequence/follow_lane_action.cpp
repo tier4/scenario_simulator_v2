@@ -116,7 +116,8 @@ BT::NodeStatus FollowLaneAction::tick()
       if (
         distance_to_stopline.value() <=
         calculateStopDistance(behavior_parameter_.dynamic_constraints) +
-          vehicle_parameters.bounding_box.dimensions.x * bounding_box_half_factor + stop_line_margin) {
+          vehicle_parameters.bounding_box.dimensions.x * bounding_box_half_factor +
+          stop_line_margin) {
         return BT::NodeStatus::FAILURE;
       }
     }
