@@ -135,10 +135,9 @@ std::set<double> HermiteCurve::getCollisionPointsIn2D(
   double d = dy_ * ex - dx_ * ey - ex * fy + ey * fx;
 
   const auto get_solutions = [search_backward, a, b, c, d, this]() -> std::vector<double> {
-    if (solver_.isApproximatelyEqualTo(a, 0.0) &&
-        solver_.isApproximatelyEqualTo(b, 0.0) &&
-        solver_.isApproximatelyEqualTo(c, 0.0) &&
-        solver_.isApproximatelyEqualTo(d, 0.0)) {
+    if (
+      solver_.isApproximatelyEqualTo(a, 0.0) && solver_.isApproximatelyEqualTo(b, 0.0) &&
+      solver_.isApproximatelyEqualTo(c, 0.0) && solver_.isApproximatelyEqualTo(d, 0.0)) {
       /**
        * @note If all coefficients are zero, the cubic equation is satisfied for all x values.
        * In this case, return 0 or 1 depending on the search direction.
