@@ -76,9 +76,9 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
       "case.");
   } else if (
     const auto entity_status_updated = traffic_simulator::follow_trajectory::makeUpdatedStatus(
-      static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status),
-      *polyline_trajectory, behavior_parameter, step_time,
-      default_matching_distance_for_lanelet_pose_calculation, getTargetSpeed())) {
+      static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status_),
+      *polyline_trajectory, behavior_parameter_, step_time_,
+      default_matching_distance_for_lanelet_pose_calculation_, getTargetSpeed())) {
     setCanonicalizedEntityStatus(entity_status_updated.value());
     setOutput("waypoints", calculateWaypoints());
     setOutput("obstacle", calculateObstacle(calculateWaypoints()));
