@@ -57,7 +57,7 @@ const traffic_simulator_msgs::msg::WaypointsArray StopAtStopLineAction::calculat
     double horizon = getHorizon();
     const auto lanelet_pose = canonicalized_entity_status_->getLaneletPose();
     waypoints.waypoints = reference_trajectory->getTrajectory(
-      lanelet_pose.s, lanelet_pose.s + horizon, kWaypointInterval, lanelet_pose.offset);
+      lanelet_pose.s, lanelet_pose.s + horizon, waypoint_interval, lanelet_pose.offset);
     trajectory = std::make_unique<math::geometry::CatmullRomSubspline>(
       reference_trajectory, lanelet_pose.s, lanelet_pose.s + horizon);
     return waypoints;
@@ -76,7 +76,7 @@ std::optional<double> StopAtStopLineAction::calculateTargetSpeed(double current_
    */
   double rest_distance =
     distance_to_stopline_.value() -
-    (vehicle_parameters.bounding_box.dimensions.x * kBoundingBoxHalfFactor + kStopMargin);
+    (vehicle_parameters.bounding_box.dimensions.x * bounding_box_half_factor + stop_margin);
   if (rest_distance < calculateStopDistance(behavior_parameter_.dynamic_constraints)) {
     return 0;
   }
@@ -125,11 +125,11 @@ BT::NodeStatus StopAtStopLineAction::tick()
     }
   }
 
-  if (std::fabs(canonicalized_entity_status_->getTwist().linear.x) < kVelocityEpsilon) {
+  if (std::fabs(canonicalized_entity_status_->getTwist().linear.x) < velocity_epsilon) {
     if (distance_to_stopline_) {
       if (
         distance_to_stopline_.value() <=
-        vehicle_parameters.bounding_box.dimensions.x + kFrontStoplineMargin) {
+        vehicle_parameters.bounding_box.dimensions.x + front_stopline_margin) {
         if (!target_speed_) {
           target_speed_ = hdmap_utils_->getSpeedLimit(route_lanelets_);
         }
