@@ -243,36 +243,76 @@ void EgoEntity::requestAssignRoute(
   const std::vector<CanonicalizedLaneletPose> & waypoints,
   const traffic_simulator::RouteOption & option)
 {
-  std::vector<geometry_msgs::msg::Pose> route;
-  for (const auto & waypoint : waypoints) {
-    route.push_back(static_cast<geometry_msgs::msg::Pose>(waypoint));
+  if (option.use_lane_level_specification_for_waypoints) {
+    concealer::FieldOperatorApplication::RouteOption route_option;
+    route_option.allow_goal_modification = option.allow_goal_modification;
+
+    assert(not route.empty());
+
+    auto goal = static_cast<geometry_msgs::msg::Pose>(route.back());
+    using autoware_adapi_v1_msgs::msg::RouteSegment;
+    std::vector<RouteSegment> route_segments;
+    for (size_t i = 0; i < route.size(); ++i) {
+      RouteSegment segment;
+      segment.preferred.id = id;
+      segment.preferred.type = "lane";
+      // NOTE: If traffic_simulator supports to the overlap of lanelet pose,
+      //       the second and subsequent lanelet pose are packed into segment.alternatives.
+      route_segments.push_back(segment);
+    }
+
+    requestClearRoute();
+
+    if (not initialized) {
+      initialize(getMapPose());
+      setRoute(goal, route_segments, route_option);
+      // NOTE: engage() will be executed at simulation-time 0.
+    } else {
+      setRoute(goal, route_segments, route_option);
+      FieldOperatorApplication::engage();
+    }
+  } else {
+    std::vector<geometry_msgs::msg::Pose> route;
+    for (const auto & waypoint : waypoints) {
+      route.push_back(static_cast<geometry_msgs::msg::Pose>(waypoint));
+    }
+    requestAssignRoute(route, option);
   }
-  requestAssignRoute(route, option);
 }
 
 void EgoEntity::requestAssignRoute(
   const std::vector<geometry_msgs::msg::Pose> & waypoints,
   const traffic_simulator::RouteOption & option)
 {
-  std::vector<geometry_msgs::msg::PoseStamped> route;
-  for (const auto & waypoint : waypoints) {
-    geometry_msgs::msg::PoseStamped pose_stamped;
-    {
-      pose_stamped.header.frame_id = "map";
-      pose_stamped.pose = waypoint;
+  if (option.use_lane_level_specification_for_waypoints) {
+    std::vector<CanonicalizedLaneletPose> lanelet_poses;
+    for (const auto & pose : route) {
+      if (auto lanelet_pose = pose::toCanonicalizedLaneletPose(pose, false)) {
+        lanelet_poses.push_back(*lanelet_pose);
+      }
     }
-    route.push_back(pose_stamped);
-  }
-
-  requestClearRoute();
-
-  if (not initialized) {
-    initialize(getMapPose());
-    plan(route, option.allow_goal_modification);
-    // NOTE: engage() will be executed at simulation-time 0.
+    requestAssignRoute(lanelet_poses, option);
   } else {
-    plan(route, option.allow_goal_modification);
-    FieldOperatorApplication::engage();
+    std::vector<geometry_msgs::msg::PoseStamped> route;
+    for (const auto & waypoint : waypoints) {
+      geometry_msgs::msg::PoseStamped pose_stamped;
+      {
+        pose_stamped.header.frame_id = "map";
+        pose_stamped.pose = waypoint;
+      }
+      route.push_back(pose_stamped);
+    }
+
+    requestClearRoute();
+
+    if (not initialized) {
+      initialize(getMapPose());
+      plan(route, option.allow_goal_modification);
+      // NOTE: engage() will be executed at simulation-time 0.
+    } else {
+      plan(route, option.allow_goal_modification);
+      FieldOperatorApplication::engage();
+    }
   }
 }
 
