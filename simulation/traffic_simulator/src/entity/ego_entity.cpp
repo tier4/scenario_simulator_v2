@@ -247,19 +247,43 @@ void EgoEntity::requestAssignRoute(
     concealer::FieldOperatorApplication::RouteOption route_option;
     route_option.allow_goal_modification = option.allow_goal_modification;
 
-    assert(not route.empty());
+    assert(not waypoints.empty());
 
-    auto goal = static_cast<geometry_msgs::msg::Pose>(route.back());
+    auto goal = static_cast<geometry_msgs::msg::Pose>(waypoints.back());
     using autoware_adapi_v1_msgs::msg::RouteSegment;
-    std::vector<RouteSegment> route_segments;
-    for (size_t i = 0; i < route.size(); ++i) {
+    auto make_segment = [](const int64_t id) {
       RouteSegment segment;
       segment.preferred.id = id;
       segment.preferred.type = "lane";
       // NOTE: If traffic_simulator supports to the overlap of lanelet pose,
       //       the second and subsequent lanelet pose are packed into segment.alternatives.
-      route_segments.push_back(segment);
+      return segment;
+    };
+
+    std::vector<RouteSegment> route_segments;
+    traffic_simulator::RoutingConfiguration routing_configration;
+    routing_configration.allow_lane_change = true;
+    if (auto current_lanelet_pose = getCanonicalizedLaneletPose()) {
+      route_segments.push_back(make_segment(current_lanelet_pose->getLaneletId()));
     }
+
+    for (size_t i = 0; i < waypoints.size(); ++i) {
+      // NOTE: Interpolating between lanelets because set route API requires continuous lanelet ids on lanelet graph
+      auto segment_route = hdmap_utils_ptr_->getRoute(
+        route_segments.back().preferred.id, waypoints[i].getLaneletId(), routing_configration);
+      for (auto lanelet_id : segment_route) {
+        route_segments.push_back(make_segment(lanelet_id));
+      }
+    }
+
+    // NOTE: Make the lanelet IDs unique, because set route API recognizes duplicate IDs as loops and does not accept.
+    route_segments.erase(
+      std::unique(
+        route_segments.begin(), route_segments.end(),
+        [](const RouteSegment & a, const RouteSegment & b) {
+          return a.preferred.id == b.preferred.id;
+        }),
+      route_segments.end());
 
     requestClearRoute();
 
