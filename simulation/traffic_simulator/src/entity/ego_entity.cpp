@@ -261,8 +261,8 @@ void EgoEntity::requestAssignRoute(
     };
 
     std::vector<RouteSegment> route_segments;
-    traffic_simulator::RoutingConfiguration routing_configration;
-    routing_configration.allow_lane_change = true;
+    traffic_simulator::RoutingConfiguration routing_configuration;
+    routing_configuration.allow_lane_change = true;
     if (auto current_lanelet_pose = getCanonicalizedLaneletPose()) {
       route_segments.push_back(make_segment(current_lanelet_pose->getLaneletId()));
     }
@@ -270,7 +270,7 @@ void EgoEntity::requestAssignRoute(
     for (size_t i = 0; i < route.size(); ++i) {
       // NOTE: Interpolating between lanelets because set route API requires continuous lanelet ids on lanelet graph
       auto segment_route = hdmap_utils_ptr_->getRoute(
-        route_segments.back().preferred.id, route[i].getLaneletId(), routing_configration);
+        route_segments.back().preferred.id, route[i].getLaneletId(), routing_configuration);
       for (auto lanelet_id : segment_route) {
         route_segments.push_back(make_segment(lanelet_id));
       }
