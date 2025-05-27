@@ -33,6 +33,15 @@ namespace v1
 struct RouteOption
 {
   bool allow_goal_modification = false;
+
+  // conversion without loss of information
+  operator v2::RouteOption() const
+  {
+    v2::RouteOption v2;
+    v2.allow_goal_modification = allow_goal_modification;
+    v2.use_lane_level_specification_for_waypoints = false;
+    return v2;
+  }
 };
 }  // namespace v1
 }  // namespace route_option
