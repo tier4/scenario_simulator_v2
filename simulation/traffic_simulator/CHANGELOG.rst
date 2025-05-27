@@ -21,6 +21,64 @@ Changelog for package traffic_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+16.4.2 (2025-05-23)
+-------------------
+
+16.4.3 (2025-05-27)
+-------------------
+* Merge branch 'master' into refactor/behavior-tree-2
+* Bump version of scenario_simulator_v2 from version version 16.4.1 to version 16.4.2
+* Merge branch 'master' into refactor/behavior-tree-2
+* Contributors: Kotaro Yoshimoto, Taiga
+
+16.4.1 (2025-05-23)
+-------------------
+* Merge pull request `#1602 <https://github.com/tier4/scenario_simulator_v2/issues/1602>`_ from tier4/refactor/behavior-tree-1
+  Refactor/behavior_tree-1
+* Merge branch 'master' into refactor/behavior-tree-1
+* Merge branch 'master' into refactor/behavior-tree-1
+* Changed the methods in `behavior_tree.hpp` to use trailing return types.
+* Contributors: Masaya Kataoka, Taiga, Taiga Takano
+
+16.4.0 (2025-05-22)
+-------------------
+* Merge pull request `#1590 <https://github.com/tier4/scenario_simulator_v2/issues/1590>`_ from tier4/feature/change_allow_goal_modification
+* Stop using C++ 20 feature to fix a build error
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Update deprecated notice in EntityBase class
+* Add inline namespaces to RouteOption for versioning
+* Rename RouteOptions -> RouteOption
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Adjust deprecation notice from EntityBase::requestAcquirePosition/requestAssignRoute
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Apply linter
+* Add deprecation notice
+* Modify MiscObjectEntity implementation to follow EntityBase
+* Modify EgoEntity implementation to follow EntityBase
+* Modify PedestrianEntity implementation to follow EntityBase
+* Modify VehicleEntity implementation to follow EntityBase
+* Add EgoEntity::requestAcquirePosition/requestAssignRoute with RouteOptions
+* Add traffic_simulator::RouteOptions struct
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Merge branch 'master' into feature/change_allow_goal_modification
+* chore: override allow_goal_modification in EgoEntity::requestAssignRoute only if Controller.Properties.Property.allowGoalModification is defined
+* Add allow_goal_modification argument to EgoEntity::requestAcquirePosition / requestAssignRoute
+* Add allow_goal_modification argument to FieldOperatorApplication::plan
+* Contributors: Kotaro Yoshimoto
+
+16.3.11 (2025-05-21)
+--------------------
+* Merge pull request `#1579 <https://github.com/tier4/scenario_simulator_v2/issues/1579>`_ from tier4/refactor/lanelet_matching
+  [FIX] Lanelet matching with absolute distance
+* Merge branch 'master' into refactor/lanelet_matching
+* Merge branch 'master' into refactor/lanelet_matching
+* Merge branch 'master' into refactor/lanelet_matching
+* Merge branch 'master' into refactor/lanelet_matching
+* Improve lane matching by using absolute distance for nearest lane selection
+* Merge commit '2be47bbd1a1a69ba584d2a37b11b3140e40f5f3d' into refactor/lanelet_matching
+* Contributors: Koki Suzuki, Masaya Kataoka, Taiga, koki suzuki
+
 16.3.10 (2025-05-20)
 --------------------
 * Merge branch 'master' into fix/agnocastpreload

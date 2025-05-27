@@ -21,6 +21,44 @@ Changelog for package do_nothing_plugin
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+16.4.2 (2025-05-23)
+-------------------
+
+16.4.3 (2025-05-27)
+-------------------
+* Merge branch 'master' into refactor/behavior-tree-2
+* Bump version of scenario_simulator_v2 from version version 16.4.1 to version 16.4.2
+* Merge branch 'master' into refactor/behavior-tree-2
+* Contributors: Kotaro Yoshimoto, Taiga
+
+16.4.1 (2025-05-23)
+-------------------
+* Merge pull request `#1602 <https://github.com/tier4/scenario_simulator_v2/issues/1602>`_ from tier4/refactor/behavior-tree-1
+  Refactor/behavior_tree-1
+* Merge branch 'master' into refactor/behavior-tree-1
+* Merge branch 'master' into refactor/behavior-tree-1
+* Changed the methods in `behavior_tree.hpp` to use trailing return types.
+* Contributors: Masaya Kataoka, Taiga, Taiga Takano
+
+16.4.0 (2025-05-22)
+-------------------
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Contributors: Kotaro Yoshimoto
+
+16.3.11 (2025-05-21)
+--------------------
+* Merge branch 'master' into refactor/lanelet_matching
+* Merge branch 'master' into refactor/lanelet_matching
+* Merge branch 'master' into refactor/lanelet_matching
+* Merge branch 'master' into refactor/lanelet_matching
+* Merge commit '2be47bbd1a1a69ba584d2a37b11b3140e40f5f3d' into refactor/lanelet_matching
+* Contributors: Koki Suzuki, Masaya Kataoka, koki suzuki
+
 16.3.10 (2025-05-20)
 --------------------
 * Merge branch 'master' into fix/agnocastpreload

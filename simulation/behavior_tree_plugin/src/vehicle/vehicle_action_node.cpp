@@ -43,7 +43,7 @@ auto VehicleActionNode::calculateUpdatedEntityStatus(double target_speed) const
   -> traffic_simulator::EntityStatus
 {
   return ActionNode::calculateUpdatedEntityStatus(
-    target_speed, behavior_parameter.dynamic_constraints);
+    target_speed, behavior_parameter_.dynamic_constraints);
 }
 
 auto VehicleActionNode::calculateUpdatedEntityStatusInWorldFrame(double target_speed) const
@@ -52,9 +52,9 @@ auto VehicleActionNode::calculateUpdatedEntityStatusInWorldFrame(double target_s
   if (target_speed > vehicle_parameters.performance.max_speed) {
     target_speed = vehicle_parameters.performance.max_speed;
   } else {
-    target_speed = canonicalized_entity_status->getTwist().linear.x;
+    target_speed = canonicalized_entity_status_->getTwist().linear.x;
   }
   return ActionNode::calculateUpdatedEntityStatusInWorldFrame(
-    target_speed, behavior_parameter.dynamic_constraints);
+    target_speed, behavior_parameter_.dynamic_constraints);
 }
 }  // namespace entity_behavior

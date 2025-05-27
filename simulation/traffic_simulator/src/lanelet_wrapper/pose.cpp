@@ -462,11 +462,15 @@ auto matchToLane(
   const bool include_crosswalk, const double matching_distance, const double reduction_ratio,
   const traffic_simulator::RoutingGraphType type) -> std::optional<lanelet::Id>
 {
-  /// @note findMatchingLanes returns a container sorted by distance - increasing, return the nearest id
+  /// @note findMatchingLanes returns a container sorted by distance - increasing, but not absolute value
   if (
     const auto matching_lanes =
       findMatchingLanes(pose, bbox, include_crosswalk, matching_distance, reduction_ratio, type)) {
-    return matching_lanes->begin()->second;
+    std::set<std::pair<double, lanelet::Id>> sorted_lanes;
+    for (const auto & lane : *matching_lanes) {
+      sorted_lanes.insert(std::make_pair(std::abs(lane.first), lane.second));
+    }
+    return sorted_lanes.begin()->second;
   } else {
     return std::nullopt;
   }

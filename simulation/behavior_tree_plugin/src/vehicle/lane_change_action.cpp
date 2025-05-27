@@ -47,11 +47,11 @@ const traffic_simulator_msgs::msg::WaypointsArray LaneChangeAction::calculateWay
   if (!lane_change_parameters_) {
     THROW_SIMULATION_ERROR("lane change parameter is null");
   }
-  if (canonicalized_entity_status->getTwist().linear.x >= 0) {
+  if (canonicalized_entity_status_->getTwist().linear.x >= 0) {
     traffic_simulator_msgs::msg::WaypointsArray waypoints;
     double horizon = getHorizon();
     auto following_lanelets =
-      hdmap_utils->getFollowingLanelets(lane_change_parameters_->target.lanelet_id, 0);
+      hdmap_utils_->getFollowingLanelets(lane_change_parameters_->target.lanelet_id, 0);
     double l = curve_->getLength();
     double rest_s = current_s_ + horizon - l;
     if (rest_s < 0) {
@@ -60,7 +60,7 @@ const traffic_simulator_msgs::msg::WaypointsArray LaneChangeAction::calculateWay
       waypoints.waypoints = curve_waypoints;
     } else {
       std::vector<geometry_msgs::msg::Point> center_points =
-        hdmap_utils->getCenterPoints(following_lanelets);
+        hdmap_utils_->getCenterPoints(following_lanelets);
       // DIFFERENT SPLINE - recalculation needed
       math::geometry::CatmullRomSpline spline(center_points);
       const auto straight_waypoints = spline.getTrajectory(target_s_, target_s_ + rest_s, 1.0);
@@ -91,7 +91,7 @@ void LaneChangeAction::getBlackBoardValues()
 BT::NodeStatus LaneChangeAction::tick()
 {
   getBlackBoardValues();
-  if (request != traffic_simulator::behavior::Request::LANE_CHANGE) {
+  if (request_ != traffic_simulator::behavior::Request::LANE_CHANGE) {
     curve_ = std::nullopt;
     current_s_ = 0;
     return BT::NodeStatus::FAILURE;
@@ -102,12 +102,12 @@ BT::NodeStatus LaneChangeAction::tick()
     return BT::NodeStatus::FAILURE;
   }
   if (!curve_) {
-    if (request == traffic_simulator::behavior::Request::LANE_CHANGE) {
-      if (!canonicalized_entity_status->isInLanelet()) {
+    if (request_ == traffic_simulator::behavior::Request::LANE_CHANGE) {
+      if (!canonicalized_entity_status_->isInLanelet()) {
         return BT::NodeStatus::FAILURE;
       }
-      const auto lanelet_pose = canonicalized_entity_status->getLaneletPose();
-      if (!hdmap_utils->canChangeLane(
+      const auto lanelet_pose = canonicalized_entity_status_->getLaneletPose();
+      if (!hdmap_utils_->canChangeLane(
             lanelet_pose.lanelet_id, lane_change_parameters_->target.lanelet_id)) {
         return BT::NodeStatus::FAILURE;
       }
@@ -122,7 +122,7 @@ BT::NodeStatus LaneChangeAction::tick()
           20.0 is a target_trajectory_length (The one with the closest length to 20 m is selected from the candidate trajectories.)
           1.0 is a forward_distance_threshold (If the goal x position in the cartesian coordinate was under 1.0, the goal was rejected.)
           */
-          traj_with_goal = hdmap_utils->getLaneChangeTrajectory(
+          traj_with_goal = hdmap_utils_->getLaneChangeTrajectory(
             traffic_simulator::pose::toMapPose(lanelet_pose), lane_change_parameters_.value(), 10.0,
             20.0, 1.0);
           along_pose = traffic_simulator::lanelet_wrapper::pose::alongLaneletPose(
@@ -130,19 +130,19 @@ BT::NodeStatus LaneChangeAction::tick()
           break;
         case traffic_simulator::lane_change::Constraint::Type::LATERAL_VELOCITY:
           traj_with_goal =
-            hdmap_utils->getLaneChangeTrajectory(lanelet_pose, lane_change_parameters_.value());
+            hdmap_utils_->getLaneChangeTrajectory(lanelet_pose, lane_change_parameters_.value());
           along_pose = traffic_simulator::lanelet_wrapper::pose::alongLaneletPose(
             lanelet_pose, traffic_simulator::lane_change::Parameter::default_lanechange_distance);
           break;
         case traffic_simulator::lane_change::Constraint::Type::LONGITUDINAL_DISTANCE:
           traj_with_goal =
-            hdmap_utils->getLaneChangeTrajectory(lanelet_pose, lane_change_parameters_.value());
+            hdmap_utils_->getLaneChangeTrajectory(lanelet_pose, lane_change_parameters_.value());
           along_pose = traffic_simulator::lanelet_wrapper::pose::alongLaneletPose(
             lanelet_pose, lane_change_parameters_->constraint.value);
           break;
         case traffic_simulator::lane_change::Constraint::Type::TIME:
           traj_with_goal =
-            hdmap_utils->getLaneChangeTrajectory(lanelet_pose, lane_change_parameters_.value());
+            hdmap_utils_->getLaneChangeTrajectory(lanelet_pose, lane_change_parameters_.value());
           along_pose = traffic_simulator::lanelet_wrapper::pose::alongLaneletPose(
             lanelet_pose, lane_change_parameters_->constraint.value);
           break;
@@ -158,18 +158,21 @@ BT::NodeStatus LaneChangeAction::tick()
                                     .position.y);
         switch (lane_change_parameters_->constraint.type) {
           case traffic_simulator::lane_change::Constraint::Type::NONE:
-            lane_change_velocity_ = canonicalized_entity_status->getTwist().linear.x;
+            lane_change_velocity_ = canonicalized_entity_status_->getTwist().linear.x;
             break;
           case traffic_simulator::lane_change::Constraint::Type::LATERAL_VELOCITY:
             lane_change_velocity_ =
               curve_->getLength() / (offset / lane_change_parameters_->constraint.value);
             break;
           case traffic_simulator::lane_change::Constraint::Type::LONGITUDINAL_DISTANCE:
-            lane_change_velocity_ = canonicalized_entity_status->getTwist().linear.x;
+            lane_change_velocity_ = canonicalized_entity_status_->getTwist().linear.x;
             break;
           case traffic_simulator::lane_change::Constraint::Type::TIME:
             lane_change_velocity_ = curve_->getLength() / lane_change_parameters_->constraint.value;
             break;
+        }
+        if (target_speed_) {
+          lane_change_velocity_ = std::clamp(lane_change_velocity_, 0.0, target_speed_.value());
         }
       } else {
         return BT::NodeStatus::FAILURE;
@@ -183,23 +186,23 @@ BT::NodeStatus LaneChangeAction::tick()
        * @brief Force changing speed in order to fulfill constraint.
        */
       case traffic_simulator::lane_change::Constraint::Policy::FORCE:
-        canonicalized_entity_status->setTwist(geometry_msgs::msg::Twist());
-        canonicalized_entity_status->setAccel(geometry_msgs::msg::Accel());
-        canonicalized_entity_status->setLinearVelocity(lane_change_velocity_);
-        current_s_ = current_s_ + canonicalized_entity_status->getTwist().linear.x * step_time;
+        canonicalized_entity_status_->setTwist(geometry_msgs::msg::Twist());
+        canonicalized_entity_status_->setAccel(geometry_msgs::msg::Accel());
+        canonicalized_entity_status_->setLinearVelocity(lane_change_velocity_);
+        current_s_ = current_s_ + canonicalized_entity_status_->getTwist().linear.x * step_time_;
         break;
       /**
        * @brief Changing linear speed and try to fulfill constraint.
        */
       case traffic_simulator::lane_change::Constraint::Policy::BEST_EFFORT:
         target_accel =
-          (lane_change_velocity_ - canonicalized_entity_status->getTwist().linear.x) / step_time;
-        if (canonicalized_entity_status->getTwist().linear.x > target_speed) {
+          (lane_change_velocity_ - canonicalized_entity_status_->getTwist().linear.x) / step_time_;
+        if (canonicalized_entity_status_->getTwist().linear.x > target_speed_) {
           target_accel = std::clamp(
-            target_accel, behavior_parameter.dynamic_constraints.max_deceleration * -1.0, 0.0);
+            target_accel, behavior_parameter_.dynamic_constraints.max_deceleration * -1.0, 0.0);
         } else {
           target_accel =
-            std::clamp(target_accel, 0.0, behavior_parameter.dynamic_constraints.max_acceleration);
+            std::clamp(target_accel, 0.0, behavior_parameter_.dynamic_constraints.max_acceleration);
         }
         geometry_msgs::msg::Accel accel_new;
         accel_new.linear.x = target_accel;
@@ -208,25 +211,25 @@ BT::NodeStatus LaneChangeAction::tick()
          * @note Hard coded parameter, -10.0 is a minimum linear velocity of the entity.
         */
         twist_new.linear.x = std::clamp(
-          canonicalized_entity_status->getTwist().linear.x + accel_new.linear.x * step_time, -10.0,
-          vehicle_parameters.performance.max_speed);
+          canonicalized_entity_status_->getTwist().linear.x + accel_new.linear.x * step_time_,
+          -10.0, vehicle_parameters.performance.max_speed);
         twist_new.linear.y = 0.0;
         twist_new.linear.z = 0.0;
         twist_new.angular.x = 0.0;
         twist_new.angular.y = 0.0;
         twist_new.angular.z = 0.0;
-        canonicalized_entity_status->setTwist(twist_new);
-        canonicalized_entity_status->setAccel(accel_new);
-        current_s_ = current_s_ + canonicalized_entity_status->getTwist().linear.x * step_time;
+        canonicalized_entity_status_->setTwist(twist_new);
+        canonicalized_entity_status_->setAccel(accel_new);
+        current_s_ = current_s_ + canonicalized_entity_status_->getTwist().linear.x * step_time_;
         break;
     }
     if (current_s_ < curve_->getLength()) {
       geometry_msgs::msg::Pose pose = curve_->getPose(current_s_, true);
       auto entity_status_updated =
-        static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status);
+        static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status_);
       entity_status_updated.pose = pose;
       entity_status_updated.lanelet_pose_valid = false;
-      entity_status_updated.action_status = canonicalized_entity_status->getActionStatus();
+      entity_status_updated.action_status = canonicalized_entity_status_->getActionStatus();
       setCanonicalizedEntityStatus(entity_status_updated);
       const auto waypoints = calculateWaypoints();
       if (waypoints.waypoints.empty()) {
@@ -249,7 +252,7 @@ BT::NodeStatus LaneChangeAction::tick()
       current_s_ = 0;
       lane_change_velocity_ = 0;
       auto entity_status_updated =
-        static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status);
+        static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status_);
       traffic_simulator::LaneletPose lanelet_pose;
       lanelet_pose.lanelet_id = lane_change_parameters_->target.lanelet_id;
       lanelet_pose.s = s;
@@ -257,7 +260,7 @@ BT::NodeStatus LaneChangeAction::tick()
       entity_status_updated.lanelet_pose = lanelet_pose;
       entity_status_updated.lanelet_pose_valid = true;
       entity_status_updated.pose = traffic_simulator::pose::toMapPose(lanelet_pose);
-      entity_status_updated.action_status = canonicalized_entity_status->getActionStatus();
+      entity_status_updated.action_status = canonicalized_entity_status_->getActionStatus();
       setCanonicalizedEntityStatus(entity_status_updated);
       return BT::NodeStatus::SUCCESS;
     }
