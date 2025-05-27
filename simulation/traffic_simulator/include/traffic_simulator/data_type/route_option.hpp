@@ -19,7 +19,16 @@ namespace traffic_simulator
 {
 inline namespace route_option
 {
-inline namespace v1
+inline namespace v2
+{
+struct RouteOption
+{
+  bool allow_goal_modification = false;
+  bool use_lane_level_specification_for_waypoints = false;
+};
+}  // namespace v2
+
+namespace v1
 {
 struct RouteOption
 {
