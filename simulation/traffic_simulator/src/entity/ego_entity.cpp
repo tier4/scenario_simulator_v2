@@ -227,7 +227,9 @@ void EgoEntity::requestAssignRoute(const std::vector<CanonicalizedLaneletPose> &
   for (const auto & waypoint : waypoints) {
     route.push_back(static_cast<geometry_msgs::msg::Pose>(waypoint));
   }
-  requestAssignRoute(route);
+  traffic_simulator::RouteOption option;
+  option.allow_goal_modification = get_parameter_or<bool>("allow_goal_modification", false);
+  return requestAssignRoute(waypoints, option);
 }
 
 void EgoEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> & waypoints)
