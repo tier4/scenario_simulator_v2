@@ -358,59 +358,17 @@ auto FieldOperatorApplication::plan(
 {
   assert(not route.empty());
 
-  task_queue.delay([this, route, allow_goal_modification]() {
-    switch (const auto state = getLegacyAutowareState(); state.value) {
-      default:
-        throw common::AutowareError(
-          "The simulator attempted to send a goal to Autoware, but was aborted because Autoware's "
-          "current state is ",
-          state, ".");
-      case LegacyAutowareState::initializing:
-        // The initial pose has been sent but has not yet reached Autoware.
-      case LegacyAutowareState::arrived_goal:
-        waitForAutowareStateToBe(state, LegacyAutowareState::waiting_for_route);
-        [[fallthrough]];
-      case LegacyAutowareState::waiting_for_route:
-        requestSetRoutePoints(
-          [&]() {
-            auto request = std::make_shared<SetRoutePoints::Request>();
+  std::vector<geometry_msgs::msg::Pose> waypoints;
+  for (size_t i = 0; i < route.size() - 1; ++i) {
+    waypoints.push_back(route[i].pose);
+  }
 
-            request->header = route.back().header;
-            request->goal = route.back().pose;
+  RouteOption route_option;
+  if (DetectMember_allow_goal_modification<RouteOption>::value) {
+    route_option.allow_goal_modification = allow_goal_modification;
+  }
 
-            for (const auto & each : route | boost::adaptors::sliced(0, route.size() - 1)) {
-              request->waypoints.push_back(each.pose);
-            }
-
-            /*
-               NOTE: The autoware_adapi_v1_msgs::srv::SetRoutePoints::Request
-               type was created on 2022/09/05 [1], and the
-               autoware_adapi_v1_msgs::msg::Option type data member was added
-               to the autoware_adapi_v1_msgs::srv::SetRoutePoints::Request type
-               on 2023/04/12 [2]. Therefore, we cannot expect
-               autoware_adapi_v1_msgs::srv::SetRoutePoints::Request to always
-               have a data member `option`.
-
-               [1] https://github.com/autowarefoundation/autoware_adapi_msgs/commit/805f8ebd3ca24564844df9889feeaf183101fbef
-               [2] https://github.com/autowarefoundation/autoware_adapi_msgs/commit/cf310bd038673b6cbef3ae3b61dfe607212de419
-            */
-            if constexpr (
-              DetectMember_option<SetRoutePoints::Request>::value and
-              DetectMember_allow_goal_modification<
-                decltype(std::declval<SetRoutePoints::Request>().option)>::value) {
-              request->option.allow_goal_modification = allow_goal_modification;
-            }
-
-            return request;
-          }(),
-          30);
-        waitForAutowareStateToBe(
-          LegacyAutowareState::waiting_for_route, LegacyAutowareState::planning);
-        waitForAutowareStateToBe(
-          LegacyAutowareState::planning, LegacyAutowareState::waiting_for_engage);
-        break;
-    }
-  });
+  setRoutePoints(route.back().pose, waypoints, route_option);
 }
 
 template <typename Request, typename Waypoint>
