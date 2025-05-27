@@ -24,6 +24,24 @@ Changelog for package behavior_tree_plugin
 16.4.2 (2025-05-23)
 -------------------
 
+16.4.3 (2025-05-27)
+-------------------
+* Merge pull request `#1606 <https://github.com/tier4/scenario_simulator_v2/issues/1606>`_ from tier4/refactor/behavior-tree-2
+  Refactor/behavior tree 2
+* fix format
+* rename kHungarian to snake_case
+* Merge branch 'master' into refactor/behavior-tree-2
+* Bump version of scenario_simulator_v2 from version version 16.4.1 to version 16.4.2
+* Merge branch 'master' into refactor/behavior-tree-2
+* Replaced hardcoded values with named constants.
+* Added a check for the value of `lane_change_velocity\_`.
+* Added lane matching failure condition in StopAtStopLineAction.
+* Avoided redundant checks for identical conditions in StopAtCrossingAction.
+* Removed unused `in_stop_sequence\_`.
+* Reviewed and simplified the logic in StopAtStopLineAction.
+* Removed unreachable section.
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, Taiga, Taiga Takano
+
 16.4.1 (2025-05-23)
 -------------------
 * Merge pull request `#1602 <https://github.com/tier4/scenario_simulator_v2/issues/1602>`_ from tier4/refactor/behavior-tree-1
