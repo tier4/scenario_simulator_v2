@@ -53,10 +53,22 @@ auto AssignRouteAction::run() -> void {}
 
 auto AssignRouteAction::start() -> void
 {
+  traffic_simulator::v2::RouteOption route_option;
+  route_option.use_lane_level_specification_for_waypoints = [&]() -> bool {
+    try {
+      return ref<Boolean>(
+        std::string("AssignRouteAction.use_lane_level_specification_for_waypoints"));
+    } catch (const SyntaxError &) {
+      // default value
+      return false;
+    }
+  }();
+
   for (const auto & actor : actors) {
     actor.apply([&](const auto & object) {
       applyAssignRouteAction(
-        object, static_cast<std::vector<NativeLanePosition>>(route.as<const Route>()));
+        object, static_cast<std::vector<NativeLanePosition>>(route.as<const Route>()),
+        route_option);
     });
   }
 }
