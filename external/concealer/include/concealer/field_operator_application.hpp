@@ -21,6 +21,7 @@
 #include <autoware_adapi_v1_msgs/srv/change_operation_mode.hpp>
 #include <autoware_adapi_v1_msgs/srv/clear_route.hpp>
 #include <autoware_adapi_v1_msgs/srv/initialize_localization.hpp>
+#include <autoware_adapi_v1_msgs/srv/set_route.hpp>
 #include <autoware_adapi_v1_msgs/srv/set_route_points.hpp>
 #include <autoware_control_msgs/msg/control.hpp>
 #include <autoware_vehicle_msgs/msg/gear_command.hpp>
@@ -83,6 +84,7 @@ struct FieldOperatorApplication : public rclcpp::Node
   using CooperateCommands               = tier4_rtc_msgs::srv::CooperateCommands;
   using Engage                          = tier4_external_api_msgs::srv::Engage;
   using InitializeLocalization          = autoware_adapi_v1_msgs::srv::InitializeLocalization;
+  using SetRoute                        = autoware_adapi_v1_msgs::srv::SetRoute;
   using SetRoutePoints                  = autoware_adapi_v1_msgs::srv::SetRoutePoints;
   using AutoModeWithModule              = tier4_rtc_msgs::srv::AutoModeWithModule;
   using SetVelocityLimit                = tier4_external_api_msgs::srv::SetVelocityLimit;
@@ -109,6 +111,7 @@ struct FieldOperatorApplication : public rclcpp::Node
   Service<CooperateCommands>      requestCooperateCommands;
   Service<Engage>                 requestEngage;
   Service<InitializeLocalization> requestInitialPose;
+  Service<SetRoute>               requestSetRoute;
   Service<SetRoutePoints>         requestSetRoutePoints;
   Service<AutoModeWithModule>     requestSetRtcAutoMode;
   Service<SetVelocityLimit>       requestSetVelocityLimit;

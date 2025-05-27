@@ -156,7 +156,8 @@ FieldOperatorApplication::FieldOperatorApplication(const pid_t pid)
   requestCooperateCommands("/api/external/set/rtc_commands", *this),
   requestEngage("/api/external/set/engage", *this),
   requestInitialPose("/api/localization/initialize", *this),
-  // NOTE: /api/routing/set_route_points takes a long time to return. But the specified duration is not decided by any technical reasons.
+  // NOTE: routing takes a long time to return. But the specified duration is not decided by any technical reasons.
+  requestSetRoute("/api/routing/set_route", *this, std::chrono::seconds(10)),
   requestSetRoutePoints("/api/routing/set_route_points", *this, std::chrono::seconds(10)),
   requestSetRtcAutoMode("/api/external/set/rtc_auto_mode", *this),
   requestSetVelocityLimit("/api/autoware/set/velocity_limit", *this),
