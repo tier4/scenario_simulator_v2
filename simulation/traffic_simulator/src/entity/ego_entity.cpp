@@ -221,35 +221,35 @@ void EgoEntity::requestAcquirePosition(
   requestAssignRoute({map_pose}, option);
 }
 
-void EgoEntity::requestAssignRoute(const std::vector<CanonicalizedLaneletPose> & waypoints)
+void EgoEntity::requestAssignRoute(const std::vector<CanonicalizedLaneletPose> & route)
 {
-  std::vector<geometry_msgs::msg::Pose> route;
-  for (const auto & waypoint : waypoints) {
-    route.push_back(static_cast<geometry_msgs::msg::Pose>(waypoint));
+  std::vector<geometry_msgs::msg::Pose> route_poses;
+  for (const auto & lanelet_pose : route) {
+    route_poses.push_back(static_cast<geometry_msgs::msg::Pose>(lanelet_pose));
   }
   traffic_simulator::RouteOption option;
   option.allow_goal_modification = get_parameter_or<bool>("allow_goal_modification", false);
-  return requestAssignRoute(waypoints, option);
+  return requestAssignRoute(route_poses, option);
 }
 
-void EgoEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> & waypoints)
+void EgoEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> & route)
 {
   traffic_simulator::RouteOption option;
   option.allow_goal_modification = get_parameter_or<bool>("allow_goal_modification", false);
-  return requestAssignRoute(waypoints, option);
+  return requestAssignRoute(route, option);
 }
 
 void EgoEntity::requestAssignRoute(
-  const std::vector<CanonicalizedLaneletPose> & waypoints,
+  const std::vector<CanonicalizedLaneletPose> & route,
   const traffic_simulator::RouteOption & option)
 {
   if (option.use_lane_level_specification_for_waypoints) {
     concealer::FieldOperatorApplication::RouteOption route_option;
     route_option.allow_goal_modification = option.allow_goal_modification;
 
-    assert(not waypoints.empty());
+    assert(not route.empty());
 
-    auto goal = static_cast<geometry_msgs::msg::Pose>(waypoints.back());
+    auto goal = static_cast<geometry_msgs::msg::Pose>(route.back());
     using autoware_adapi_v1_msgs::msg::RouteSegment;
     auto make_segment = [](const int64_t id) {
       RouteSegment segment;
@@ -267,10 +267,10 @@ void EgoEntity::requestAssignRoute(
       route_segments.push_back(make_segment(current_lanelet_pose->getLaneletId()));
     }
 
-    for (size_t i = 0; i < waypoints.size(); ++i) {
+    for (size_t i = 0; i < route.size(); ++i) {
       // NOTE: Interpolating between lanelets because set route API requires continuous lanelet ids on lanelet graph
       auto segment_route = hdmap_utils_ptr_->getRoute(
-        route_segments.back().preferred.id, waypoints[i].getLaneletId(), routing_configration);
+        route_segments.back().preferred.id, route[i].getLaneletId(), routing_configration);
       for (auto lanelet_id : segment_route) {
         route_segments.push_back(make_segment(lanelet_id));
       }
@@ -296,16 +296,16 @@ void EgoEntity::requestAssignRoute(
       FieldOperatorApplication::engage();
     }
   } else {
-    std::vector<geometry_msgs::msg::Pose> route;
-    for (const auto & waypoint : waypoints) {
-      route.push_back(static_cast<geometry_msgs::msg::Pose>(waypoint));
+    std::vector<geometry_msgs::msg::Pose> route_poses;
+    for (const auto & lanelet_pose : route) {
+      route_poses.push_back(static_cast<geometry_msgs::msg::Pose>(lanelet_pose));
     }
-    requestAssignRoute(route, option);
+    requestAssignRoute(route_poses, option);
   }
 }
 
 void EgoEntity::requestAssignRoute(
-  const std::vector<geometry_msgs::msg::Pose> & waypoints,
+  const std::vector<geometry_msgs::msg::Pose> & route,
   const traffic_simulator::RouteOption & option)
 {
   if (option.use_lane_level_specification_for_waypoints) {
@@ -317,24 +317,24 @@ void EgoEntity::requestAssignRoute(
     }
     requestAssignRoute(lanelet_poses, option);
   } else {
-    std::vector<geometry_msgs::msg::PoseStamped> route;
-    for (const auto & waypoint : waypoints) {
+    std::vector<geometry_msgs::msg::PoseStamped> pose_stamped_array;
+    for (const auto & waypoint : route) {
       geometry_msgs::msg::PoseStamped pose_stamped;
       {
         pose_stamped.header.frame_id = "map";
         pose_stamped.pose = waypoint;
       }
-      route.push_back(pose_stamped);
+      pose_stamped_array.push_back(pose_stamped);
     }
 
     requestClearRoute();
 
     if (not initialized) {
       initialize(getMapPose());
-      plan(route, option.allow_goal_modification);
+      plan(pose_stamped_array, option.allow_goal_modification);
       // NOTE: engage() will be executed at simulation-time 0.
     } else {
-      plan(route, option.allow_goal_modification);
+      plan(pose_stamped_array, option.allow_goal_modification);
       FieldOperatorApplication::engage();
     }
   }
