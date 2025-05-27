@@ -46,7 +46,7 @@ const traffic_simulator_msgs::msg::WaypointsArray FollowLaneAction::calculateWay
     traffic_simulator_msgs::msg::WaypointsArray waypoints;
     const auto lanelet_pose = canonicalized_entity_status_->getLaneletPose();
     waypoints.waypoints = reference_trajectory->getTrajectory(
-      lanelet_pose.s, lanelet_pose.s + getHorizon(), 1.0, lanelet_pose.offset);
+      lanelet_pose.s, lanelet_pose.s + getHorizon(), waypoint_interval, lanelet_pose.offset);
     trajectory = std::make_unique<math::geometry::CatmullRomSubspline>(
       reference_trajectory, lanelet_pose.s, lanelet_pose.s + getHorizon());
     return waypoints;
@@ -97,7 +97,7 @@ BT::NodeStatus FollowLaneAction::tick()
       if (
         distance_to_front_entity.value() <=
         calculateStopDistance(behavior_parameter_.dynamic_constraints) +
-          vehicle_parameters.bounding_box.dimensions.x + 5) {
+          vehicle_parameters.bounding_box.dimensions.x + front_entity_stop_margin) {
         return BT::NodeStatus::FAILURE;
       }
     }
@@ -116,14 +116,15 @@ BT::NodeStatus FollowLaneAction::tick()
       if (
         distance_to_stopline.value() <=
         calculateStopDistance(behavior_parameter_.dynamic_constraints) +
-          vehicle_parameters.bounding_box.dimensions.x * 0.5 + 5) {
+          vehicle_parameters.bounding_box.dimensions.x * bounding_box_half_factor +
+          stop_line_margin) {
         return BT::NodeStatus::FAILURE;
       }
     }
     if (distance_to_conflicting_entity) {
       if (
         distance_to_conflicting_entity.value() <
-        (vehicle_parameters.bounding_box.dimensions.x + 3 +
+        (vehicle_parameters.bounding_box.dimensions.x + conflicting_entity_margin +
          calculateStopDistance(behavior_parameter_.dynamic_constraints))) {
         return BT::NodeStatus::FAILURE;
       }
