@@ -317,24 +317,25 @@ void EgoEntity::requestAssignRoute(
     }
     requestAssignRoute(lanelet_poses, option);
   } else {
-    std::vector<geometry_msgs::msg::PoseStamped> pose_stamped_array;
-    for (const auto & waypoint : route) {
-      geometry_msgs::msg::PoseStamped pose_stamped;
-      {
-        pose_stamped.header.frame_id = "map";
-        pose_stamped.pose = waypoint;
-      }
-      pose_stamped_array.push_back(pose_stamped);
-    }
-
     requestClearRoute();
+
+    concealer::FieldOperatorApplication::RouteOption route_option;
+    route_option.allow_goal_modification = option.allow_goal_modification;
+
+    assert(not route.empty());
+
+    auto goal = route.back();
+    std::vector<geometry_msgs::msg::Pose> waypoints;
+    for (size_t i = 0; i < route.size() - 1; ++i) {
+      waypoints.push_back(route[i]);
+    }
 
     if (not initialized) {
       initialize(getMapPose());
-      plan(pose_stamped_array, option.allow_goal_modification);
+      setRoutePoints(goal, waypoints, route_option);
       // NOTE: engage() will be executed at simulation-time 0.
     } else {
-      plan(pose_stamped_array, option.allow_goal_modification);
+      setRoutePoints(goal, waypoints, route_option);
       FieldOperatorApplication::engage();
     }
   }
