@@ -385,6 +385,11 @@ static auto make(
     for (const auto & waypoint : waypoints) {
       request->waypoints.push_back(waypoint);
     }
+  } else if constexpr (std::is_same_v<Request, autoware_adapi_v1_msgs::srv::SetRoute::Request>) {
+    for (const auto & waypoint : waypoints) {
+      std::cout << "segment: " << waypoint.preferred.id << std::endl;
+      request->segments.push_back(waypoint);
+    }
   } else {
     std::stringstream what;
     what << "Unsupported type of Request for make in" << __FILE__ << " : " << typeid(Request).name()
@@ -431,6 +436,34 @@ auto FieldOperatorApplication::setRoutePoints(
         [[fallthrough]];
       case LegacyAutowareState::waiting_for_route:
         requestSetRoutePoints(make<SetRoutePoints::Request>(goal, waypoints, option), 30);
+        waitForAutowareStateToBe(
+          LegacyAutowareState::waiting_for_route, LegacyAutowareState::planning);
+        waitForAutowareStateToBe(
+          LegacyAutowareState::planning, LegacyAutowareState::waiting_for_engage);
+        break;
+    }
+  });
+}
+
+auto FieldOperatorApplication::setRoute(
+  const geometry_msgs::msg::Pose & goal,
+  const std::vector<autoware_adapi_v1_msgs::msg::RouteSegment> & waypoints,
+  const RouteOption & option) -> void
+{
+  task_queue.delay([this, goal, waypoints, option]() {
+    switch (const auto state = getLegacyAutowareState(); state.value) {
+      default:
+        throw common::AutowareError(
+          "The simulator attempted to send a goal to Autoware, but was aborted because Autoware's "
+          "current state is ",
+          state, ".");
+      case LegacyAutowareState::initializing:
+        // The initial pose has been sent but has not yet reached Autoware.
+      case LegacyAutowareState::arrived_goal:
+        waitForAutowareStateToBe(state, LegacyAutowareState::waiting_for_route);
+        [[fallthrough]];
+      case LegacyAutowareState::waiting_for_route:
+        requestSetRoute(make<SetRoute::Request>(goal, waypoints, option), 30);
         waitForAutowareStateToBe(
           LegacyAutowareState::waiting_for_route, LegacyAutowareState::planning);
         waitForAutowareStateToBe(
