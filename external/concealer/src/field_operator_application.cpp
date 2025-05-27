@@ -387,7 +387,6 @@ static auto make(
     }
   } else if constexpr (std::is_same_v<Request, autoware_adapi_v1_msgs::srv::SetRoute::Request>) {
     for (const auto & waypoint : waypoints) {
-      std::cout << "segment: " << waypoint.preferred.id << std::endl;
       request->segments.push_back(waypoint);
     }
   } else {
