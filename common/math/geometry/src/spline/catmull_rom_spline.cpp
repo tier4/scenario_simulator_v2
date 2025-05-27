@@ -101,6 +101,12 @@ auto CatmullRomSpline::getTrajectory(
   const double start_s, const double end_s, const double resolution, const double offset) const
   -> std::vector<geometry_msgs::msg::Point>
 {
+  if (std::fabs(resolution) <= std::numeric_limits<double>::epsilon()) {
+    THROW_SIMULATION_ERROR(
+      "Resolution should not be zero.",
+      "This message is not originally intended to be displayed, if you see it, please contact ",
+      "the developer of traffic_simulator.");
+  }
   if (start_s > end_s) {
     std::vector<geometry_msgs::msg::Point> ret;
     double s = start_s;
@@ -126,6 +132,12 @@ auto CatmullRomSpline::getTrajectoryPoses(
   const double start_s, const double end_s, const double resolution) const
   -> std::vector<geometry_msgs::msg::Pose>
 {
+  if (std::fabs(resolution) <= std::numeric_limits<double>::epsilon()) {
+    THROW_SIMULATION_ERROR(
+      "Resolution should not be zero.",
+      "This message is not originally intended to be displayed, if you see it, please contact ",
+      "the developer of traffic_simulator.");
+  }
   if (start_s > end_s) {
     std::vector<geometry_msgs::msg::Pose> ret;
     double s = start_s;
