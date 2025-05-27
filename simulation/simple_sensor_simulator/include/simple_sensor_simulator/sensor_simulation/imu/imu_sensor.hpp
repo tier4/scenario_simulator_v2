@@ -46,6 +46,9 @@ public:
     angular_velocity_covariance_(calculateCovariance(noise_standard_deviation_twist_)),
     linear_acceleration_covariance_(calculateCovariance(noise_standard_deviation_acceleration_))
   {
+    validateCovariance(orientation_covariance_);
+    validateCovariance(angular_velocity_covariance_);
+    validateCovariance(linear_acceleration_covariance_);
   }
 
   virtual ~ImuSensorBase() = default;
@@ -77,6 +80,19 @@ protected:
   {
     return {variance0, 0, 0, 0, variance1, 0, 0, 0, variance2};
   };
+
+  /**
+   * @note This is a hacky way to make sure that the variances are never actual 0.0.
+   * This is used because of the issue with Autoware localization, which seems to require
+   * covariance with non-zero variances (otherwise it works incorrectly).
+   */
+  auto validateCovariance(std::array<double, 9> & covariance) const -> void
+  {
+    constexpr double minimal_allowed_variance{0.0001};
+    covariance[0] = std::max(minimal_allowed_variance, covariance[0]);
+    covariance[4] = std::max(minimal_allowed_variance, covariance[4]);
+    covariance[8] = std::max(minimal_allowed_variance, covariance[8]);
+  }
 };
 
 template <typename MessageType>
@@ -148,6 +164,10 @@ public:
         publish.getRandomizer().linear_acceleration_z_error.multiplicative.stddev(),
         publish.getRandomizer().linear_acceleration_z_error.additive.stddev()));
     // clang-format on
+
+    validateCovariance(orientation_covariance_);
+    validateCovariance(angular_velocity_covariance_);
+    validateCovariance(linear_acceleration_covariance_);
   }
 
   auto update(
