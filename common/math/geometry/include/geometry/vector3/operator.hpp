@@ -137,7 +137,7 @@ template <
   typename T, typename U,
   std::enable_if_t<std::conjunction_v<IsLikeVector3<T>, IsLikeVector3<U>>, std::nullptr_t> =
     nullptr>
-auto operator==(T & a, const U & b) -> bool
+auto operator==(const T & a, const U & b) -> bool
 {
   constexpr decltype(a.x) e = std::numeric_limits<decltype(a.x)>::epsilon();
   return (std::abs(a.x - b.x) < e) && (std::abs(a.y - b.y) < e) && (std::abs(a.z - b.z) < e);
