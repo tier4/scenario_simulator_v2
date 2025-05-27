@@ -164,6 +164,16 @@ struct FieldOperatorApplication : public rclcpp::Node
 
   auto plan(const std::vector<geometry_msgs::msg::PoseStamped> &, const bool) -> void;
 
+#if __has_include(<autoware_adapi_v1_msgs/msg/route_option.hpp>)
+  using RouteOption = autoware_adapi_v1_msgs::msg::RouteOption;
+#else
+  using RouteOption = void;
+#endif
+
+  auto setRoutePoints(
+    const geometry_msgs::msg::Pose & goal, const std::vector<geometry_msgs::msg::Pose> &,
+    const RouteOption &) -> void;
+
   auto clearRoute() -> void;
 
   auto getLegacyAutowareState() const -> LegacyAutowareState;
