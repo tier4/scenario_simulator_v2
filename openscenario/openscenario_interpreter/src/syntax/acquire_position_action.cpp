@@ -53,45 +53,43 @@ auto AcquirePositionAction::start() -> void
       return applyAcquirePositionAction(actor, static_cast<NativeLanePosition>(position), options);
     });
 
-  auto allow_goal_modification_from_parameter = [&]() -> bool {
-    try {
-      return ref<Boolean>(std::string("AcquirePositionAction.allow_goal_modification"));
-    } catch (const SyntaxError &) {
-      // default value of allow_goal_modification
-      return false;
-    }
-  }();
-
-  auto get_allow_goal_modification_from_property =
-    [this](const EntityRef & entity_ref) -> std::optional<bool> {
+  auto get_from_controller_property =
+    [this](const EntityRef & entity_ref, const std::string & property_name) -> std::optional<bool> {
     if (const auto & entity = global().entities->ref(entity_ref);
         entity.template is<ScenarioObject>()) {
       const auto & object_controller = entity.as<ScenarioObject>().object_controller;
       if (object_controller.isAutoware() && object_controller.is<Controller>()) {
         auto controller = object_controller.as<Controller>();
-        if (controller.properties.contains("allowGoalModification")) {
-          return controller.properties.template get<Boolean>("allowGoalModification");
+        if (controller.properties.contains(property_name)) {
+          return controller.properties.template get<Boolean>(property_name);
         }
       }
     }
     return std::nullopt;
   };
 
+  auto get_from_parameter =
+    [&](const std::string & parameter_name, const bool default_value) -> bool {
+    try {
+      return ref<Boolean>(parameter_name);
+    } catch (const SyntaxError &) {
+      return default_value;
+    }
+  };
+
   for (const auto & actor : actors) {
     actor.apply([&](const auto & object) {
-      traffic_simulator::RouteOption options;
-      options.allow_goal_modification = [&]() {
-        if (auto allow_goal_modification_from_property =
-              get_allow_goal_modification_from_property(object);
-            allow_goal_modification_from_property.has_value()) {
+      traffic_simulator::v2::RouteOption route_option;
+      route_option.allow_goal_modification = [&]() {
+        if (auto from_property = get_from_controller_property(object, "allowGoalModification")) {
           // property specification takes precedence
-          return allow_goal_modification_from_property.value();
+          return from_property.value();
         } else {
-          return allow_goal_modification_from_parameter;
+          return get_from_parameter("RoutingAction.allow_goal_modification", false);
         }
       }();
 
-      apply<void>(acquire_position, position, object, options);
+      apply<void>(acquire_position, position, object, route_option);
     });
   }
 }
