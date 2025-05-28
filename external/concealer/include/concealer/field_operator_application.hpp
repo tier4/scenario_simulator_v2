@@ -170,11 +170,11 @@ struct FieldOperatorApplication : public rclcpp::Node
   using RouteOption = void;
 #endif
 
-  auto setRoutePoints(
+  auto plan(
     const geometry_msgs::msg::Pose & goal, const std::vector<geometry_msgs::msg::Pose> &,
     const RouteOption &) -> void;
 
-  auto setRoute(
+  auto plan(
     const geometry_msgs::msg::Pose & goal,
     const std::vector<autoware_adapi_v1_msgs::msg::RouteSegment> &, const RouteOption &) -> void;
 

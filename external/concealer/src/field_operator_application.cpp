@@ -368,7 +368,7 @@ auto FieldOperatorApplication::plan(
     route_option.allow_goal_modification = allow_goal_modification;
   }
 
-  setRoutePoints(route.back().pose, waypoints, route_option);
+  plan(route.back().pose, waypoints, route_option);
 }
 
 template <typename Request, typename Waypoint>
@@ -417,7 +417,7 @@ static auto make(
   return request;
 }
 
-auto FieldOperatorApplication::setRoutePoints(
+auto FieldOperatorApplication::plan(
   const geometry_msgs::msg::Pose & goal, const std::vector<geometry_msgs::msg::Pose> & waypoints,
   const RouteOption & option) -> void
 {
@@ -444,7 +444,7 @@ auto FieldOperatorApplication::setRoutePoints(
   });
 }
 
-auto FieldOperatorApplication::setRoute(
+auto FieldOperatorApplication::plan(
   const geometry_msgs::msg::Pose & goal,
   const std::vector<autoware_adapi_v1_msgs::msg::RouteSegment> & waypoints,
   const RouteOption & option) -> void

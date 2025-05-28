@@ -289,10 +289,10 @@ void EgoEntity::requestAssignRoute(
 
     if (not initialized) {
       initialize(getMapPose());
-      setRoute(goal, route_segments, route_option);
+      plan(goal, route_segments, route_option);
       // NOTE: engage() will be executed at simulation-time 0.
     } else {
-      setRoute(goal, route_segments, route_option);
+      plan(goal, route_segments, route_option);
       FieldOperatorApplication::engage();
     }
   } else {
@@ -332,10 +332,10 @@ void EgoEntity::requestAssignRoute(
 
     if (not initialized) {
       initialize(getMapPose());
-      setRoutePoints(goal, waypoints, route_option);
+      plan(goal, waypoints, route_option);
       // NOTE: engage() will be executed at simulation-time 0.
     } else {
-      setRoutePoints(goal, waypoints, route_option);
+      plan(goal, waypoints, route_option);
       FieldOperatorApplication::engage();
     }
   }
