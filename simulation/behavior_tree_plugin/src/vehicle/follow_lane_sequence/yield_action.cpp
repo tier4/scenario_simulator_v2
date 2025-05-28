@@ -99,8 +99,7 @@ BT::NodeStatus YieldAction::tick()
   if (!canonicalized_entity_status_->isInLanelet()) {
     return BT::NodeStatus::FAILURE;
   }
-  const auto right_of_way_entities = getRightOfWayEntities(route_lanelets_);
-  if (right_of_way_entities.empty()) {
+  if (!isNeedToRightOfWay(route_lanelets_)) {
     if (!target_speed_) {
       target_speed_ = hdmap_utils_->getSpeedLimit(route_lanelets_);
     }
