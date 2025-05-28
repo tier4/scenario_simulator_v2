@@ -36,17 +36,17 @@ const std::optional<traffic_simulator_msgs::msg::Obstacle> MoveBackwardAction::c
 
 const traffic_simulator_msgs::msg::WaypointsArray MoveBackwardAction::calculateWaypoints()
 {
-  if (canonicalized_entity_status->getTwist().linear.x >= 0) {
+  if (canonicalized_entity_status_->getTwist().linear.x >= 0) {
     return traffic_simulator_msgs::msg::WaypointsArray();
   } else if (
     const auto canonicalized_lanelet_pose =
-      canonicalized_entity_status->getCanonicalizedLaneletPose()) {
+      canonicalized_entity_status_->getCanonicalizedLaneletPose()) {
     return traffic_simulator_msgs::build<traffic_simulator_msgs::msg::WaypointsArray>().waypoints(
       traffic_simulator::route::moveBackPoints(canonicalized_lanelet_pose.value()));
   } else {
     THROW_SIMULATION_ERROR(
       "Cannot move backward along lanelet - entity ",
-      std::quoted(canonicalized_entity_status->getName()), " has invalid lanelet pose.");
+      std::quoted(canonicalized_entity_status_->getName()), " has invalid lanelet pose.");
   }
 }
 
@@ -56,23 +56,23 @@ BT::NodeStatus MoveBackwardAction::tick()
 {
   getBlackBoardValues();
   if (
-    request != traffic_simulator::behavior::Request::NONE &&
-    request != traffic_simulator::behavior::Request::FOLLOW_LANE) {
+    request_ != traffic_simulator::behavior::Request::NONE &&
+    request_ != traffic_simulator::behavior::Request::FOLLOW_LANE) {
     return BT::NodeStatus::FAILURE;
   }
-  if (!canonicalized_entity_status->isInLanelet()) {
+  if (!canonicalized_entity_status_->isInLanelet()) {
     return BT::NodeStatus::FAILURE;
   }
   const auto waypoints = calculateWaypoints();
   if (waypoints.waypoints.empty()) {
     return BT::NodeStatus::FAILURE;
   }
-  if (!target_speed) {
-    target_speed = traffic_simulator::route::speedLimit(
-      traffic_simulator::route::previousLanelets(canonicalized_entity_status->getLaneletId()));
+  if (!target_speed_) {
+    target_speed_ = traffic_simulator::route::speedLimit(
+      traffic_simulator::route::previousLanelets(canonicalized_entity_status_->getLaneletId()));
   }
 
-  setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(target_speed.value()));
+  setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(target_speed_.value()));
   setOutput("waypoints", waypoints);
   setOutput("obstacle", calculateObstacle(waypoints));
   return BT::NodeStatus::RUNNING;
