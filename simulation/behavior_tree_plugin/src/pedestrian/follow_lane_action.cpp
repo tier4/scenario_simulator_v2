@@ -57,9 +57,9 @@ bool FollowLaneAction::detectObstacleInLane(
   auto hasObstacleInPedestrianLanes =
     [this](const lanelet::Ids pedestrian_lanes_local, const double max_detect_length) {
       using math::geometry::operator-;
-      const auto & pedestrian_position = canonicalized_entity_status->getMapPose().position;
+      const auto & pedestrian_position = canonicalized_entity_status_->getMapPose().position;
       lanelet::Ids other_entity_lane_ids;
-      for (const auto & [_, status] : other_entity_status) {
+      for (const auto & [_, status] : other_entity_status_) {
         if (status.getType().type != traffic_simulator_msgs::msg::EntityType::EGO) {
           continue;
         }
@@ -85,9 +85,9 @@ bool FollowLaneAction::detectObstacleInLane(
   auto hasObstacleInFrontOfPedestrian = [this]() {
     using math::geometry::operator-;
 
-    const auto & pedestrian_position = canonicalized_entity_status->getMapPose().position;
+    const auto & pedestrian_position = canonicalized_entity_status_->getMapPose().position;
 
-    for (const auto & [_, entity_status] : other_entity_status) {
+    for (const auto & [_, entity_status] : other_entity_status_) {
       const auto & other_position = entity_status.getMapPose().position;
       const auto relative_position = other_position - pedestrian_position;
       const double relative_angle_rad = std::atan2(relative_position.y, relative_position.x);
@@ -109,25 +109,25 @@ BT::NodeStatus FollowLaneAction::tick()
 {
   getBlackBoardValues();
   if (
-    request != traffic_simulator::behavior::Request::NONE &&
-    request != traffic_simulator::behavior::Request::FOLLOW_LANE) {
+    request_ != traffic_simulator::behavior::Request::NONE &&
+    request_ != traffic_simulator::behavior::Request::FOLLOW_LANE) {
     return BT::NodeStatus::FAILURE;
   }
-  if (!canonicalized_entity_status->isInLanelet()) {
+  if (!canonicalized_entity_status_->isInLanelet()) {
     stopEntity();
     return BT::NodeStatus::RUNNING;
   }
   const auto following_lanelets =
-    traffic_simulator::route::followingLanelets(canonicalized_entity_status->getLaneletId());
-  if (!target_speed) {
-    target_speed = traffic_simulator::route::speedLimit(following_lanelets);
+    traffic_simulator::route::followingLanelets(canonicalized_entity_status_->getLaneletId());
+  if (!target_speed_) {
+    target_speed_ = traffic_simulator::route::speedLimit(following_lanelets);
   }
 
   const auto obstacle_detector_result =
-    detectObstacleInLane(following_lanelets, behavior_parameter.see_around);
-  target_speed = obstacle_detector_result ? 0.0 : target_speed;
+    detectObstacleInLane(following_lanelets, behavior_parameter_.see_around);
+  target_speed_ = obstacle_detector_result ? 0.0 : target_speed_;
 
-  setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(target_speed.value()));
+  setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(target_speed_.value()));
   return BT::NodeStatus::RUNNING;
 }
 }  // namespace pedestrian

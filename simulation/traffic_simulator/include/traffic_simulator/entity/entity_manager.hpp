@@ -72,6 +72,7 @@ public:
     lanelet_marker_pub_ptr_(rclcpp::create_publisher<MarkerArray>(
       node, "lanelet/marker", LaneletMarkerQoS(),
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
+    entities_(128),
     markers_raw_(lanelet_map::visualizationMarker())
   {
     updateLaneletMarker();

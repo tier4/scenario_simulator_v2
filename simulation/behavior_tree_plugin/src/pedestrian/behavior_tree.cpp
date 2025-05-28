@@ -78,7 +78,7 @@ auto PedestrianBehaviorTree::createBehaviorTree(const std::string & format_path)
   return factory_.createTreeFromText(xml_str.str());
 }
 
-const std::string & PedestrianBehaviorTree::getCurrentAction() const
+auto PedestrianBehaviorTree::getCurrentAction() const -> const std::string &
 {
   return logging_event_ptr_->getCurrentAction();
 }
