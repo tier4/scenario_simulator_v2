@@ -228,22 +228,31 @@ void VehicleEntity::requestAssignRoute(
 auto VehicleEntity::requestFollowTrajectory(
   const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & parameter) -> void
 {
-  behavior_plugin_ptr_->setPolylineTrajectory(parameter);
-  behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_POLYLINE_TRAJECTORY);
-  std::vector<CanonicalizedLaneletPose> waypoints;
-  for (const auto & vertex : parameter->shape.vertices) {
-    if (
-      const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
-        vertex.position, status_->getBoundingBox(), false,
-        getDefaultMatchingDistanceForLaneletPoseCalculation())) {
-      waypoints.emplace_back(canonicalized_lanelet_pose.value());
-    } else {
-      /// @todo such a protection most likely makes sense, but test scenario
-      /// RoutingAction.FollowTrajectoryAction-star has waypoints outside lanelet2
-      // THROW_SEMANTIC_ERROR("FollowTrajectory waypoint should be on lane.");
+  if (parameter) {
+    behavior_plugin_ptr_->setPolylineTrajectory(parameter);
+    behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_POLYLINE_TRAJECTORY);
+
+    std::vector<CanonicalizedLaneletPose> waypoints;
+    lanelet::Ids route_lanelets;
+    const auto curve = math::geometry::CatmullRomSpline(status_->getMapPose().position, parameter);
+    /// @note Hard coded parameter: 1.0 is a sample resolution of the trajectory. (Unit: m)
+    for (const auto & waypoint : curve.getTrajectoryPoses(0.0, curve.getLength(), 1.0)) {
+      if (
+        const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
+          waypoint, getBoundingBox(), true,
+          getDefaultMatchingDistanceForLaneletPoseCalculation())) {
+        route_lanelets.push_back(canonicalized_lanelet_pose.value().getLaneletId());
+        waypoints.emplace_back(canonicalized_lanelet_pose.value());
+      }
     }
+    behavior_plugin_ptr_->setRouteLanelets(route_lanelets);
+    route_planner_.setWaypoints(waypoints);
+  } else {
+    THROW_SIMULATION_ERROR(
+      "Traffic simulator send requests of FollowTrajectory, but the trajectory is empty.",
+      "This message is not originally intended to be displayed, if you see it, please "
+      "contact the developer of traffic_simulator.");
   }
-  route_planner_.setWaypoints(waypoints);
 }
 
 auto VehicleEntity::requestLaneChange(const lanelet::Id to_lanelet_id) -> void

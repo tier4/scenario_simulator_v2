@@ -24,6 +24,17 @@ Changelog for package cpp_mock_scenarios
 16.4.2 (2025-05-23)
 -------------------
 
+16.4.4 (2025-05-28)
+-------------------
+* Merge pull request `#1609 <https://github.com/tier4/scenario_simulator_v2/issues/1609>`_ from tier4/feature/delay_curventure_calculation
+  Feature/delay curventure calculation
+* Merge remote-tracking branch 'origin/master' into feature/delay_curventure_calculation
+* Merge branch 'master' into feature/delay_curventure_calculation
+* Merge remote-tracking branch 'origin/master' into feature/delay_curventure_calculation
+* Merge remote-tracking branch 'origin/master' into feature/speed_up
+* add enable_perf option
+* Contributors: Masaya Kataoka, Taiga
+
 16.4.3 (2025-05-27)
 -------------------
 * Merge branch 'master' into refactor/behavior-tree-2
