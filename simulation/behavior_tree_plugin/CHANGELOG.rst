@@ -24,6 +24,14 @@ Changelog for package behavior_tree_plugin
 16.4.2 (2025-05-23)
 -------------------
 
+16.4.4 (2025-05-28)
+-------------------
+* Merge remote-tracking branch 'origin/master' into feature/delay_curventure_calculation
+* Merge branch 'master' into feature/delay_curventure_calculation
+* Merge remote-tracking branch 'origin/master' into feature/delay_curventure_calculation
+* Merge remote-tracking branch 'origin/master' into feature/speed_up
+* Contributors: Masaya Kataoka
+
 16.4.3 (2025-05-27)
 -------------------
 * Merge pull request `#1606 <https://github.com/tier4/scenario_simulator_v2/issues/1606>`_ from tier4/refactor/behavior-tree-2
