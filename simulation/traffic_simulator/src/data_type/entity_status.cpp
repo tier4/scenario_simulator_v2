@@ -43,8 +43,19 @@ CanonicalizedEntityStatus::CanonicalizedEntityStatus(
     } else {
       entity_status_.lanelet_poses.emplace_back(LaneletPose());
     }
-    assert(entity_status_.lanelet_poses.back().lanelet_pose_valid == canonicalized_lanelet_pose.has_value());
+    assert(
+      entity_status_.lanelet_poses.back().lanelet_pose_valid ==
+      canonicalized_lanelet_pose.has_value());
   }
+}
+
+CanonicalizedEntityStatus::CanonicalizedEntityStatus(
+  const EntityStatus & may_non_canonicalized_entity_status,
+  const std::optional<CanonicalizedLaneletPose> & canonicalized_lanelet_pose)
+: CanonicalizedEntityStatus(
+    may_non_canonicalized_entity_status,
+    std::vector<std::optional<CanonicalizedLaneletPose>>{canonicalized_lanelet_pose})
+{
 }
 
 CanonicalizedEntityStatus::CanonicalizedEntityStatus(const CanonicalizedEntityStatus & obj)
@@ -81,8 +92,7 @@ auto CanonicalizedEntityStatus::set(
   // }
   for (const auto & lanelet_pose : status.lanelet_poses) {
     if (lanelet_pose.lanelet_pose_valid) {
-      canonicalized_lanelet_poses.emplace_back(
-        pose::toCanonicalizedLaneletPose(lanelet_pose));
+      canonicalized_lanelet_poses.emplace_back(pose::toCanonicalizedLaneletPose(lanelet_pose));
     } else {
       canonicalized_lanelet_poses.emplace_back(
         pose::toCanonicalizedLaneletPose(

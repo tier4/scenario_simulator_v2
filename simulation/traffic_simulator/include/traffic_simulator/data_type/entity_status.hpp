@@ -33,7 +33,10 @@ class CanonicalizedEntityStatus
 public:
   explicit CanonicalizedEntityStatus(
     const EntityStatus & may_non_canonicalized_entity_status,
-    const std::vector<std::optional<CanonicalizedLaneletPose>> & canonicalized_lanelet_pose);
+    const std::vector<std::optional<CanonicalizedLaneletPose>> & canonicalized_lanelet_poses);
+  explicit CanonicalizedEntityStatus(
+      const EntityStatus & may_non_canonicalized_entity_status,
+      const std::optional<CanonicalizedLaneletPose> & canonicalized_lanelet_pose);
   CanonicalizedEntityStatus(const CanonicalizedEntityStatus & obj);
   explicit operator EntityStatus() const noexcept { return entity_status_; }
 
