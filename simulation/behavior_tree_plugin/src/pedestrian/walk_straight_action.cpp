@@ -38,12 +38,17 @@ WalkStraightAction::WalkStraightAction(
 
 void WalkStraightAction::getBlackBoardValues() { PedestrianActionNode::getBlackBoardValues(); }
 
-BT::NodeStatus WalkStraightAction::tick()
+bool WalkStraightAction::checkPreconditions()
 {
-  getBlackBoardValues();
   if (request_ != traffic_simulator::behavior::Request::WALK_STRAIGHT) {
-    return BT::NodeStatus::FAILURE;
+    return false;
+  } else {
+    return true;
   }
+}
+
+BT::NodeStatus WalkStraightAction::doAction()
+{
   if (!target_speed_) {
     target_speed_ = 1.111;
   }

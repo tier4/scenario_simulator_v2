@@ -31,7 +31,8 @@ class StopAtTrafficLightAction : public entity_behavior::VehicleActionNode
 {
 public:
   StopAtTrafficLightAction(const std::string & name, const BT::NodeConfiguration & config);
-  BT::NodeStatus tick() override;
+  bool checkPreconditions() override;
+  BT::NodeStatus doAction() override;
   static BT::PortsList providedPorts()
   {
     return entity_behavior::VehicleActionNode::providedPorts();
