@@ -627,8 +627,7 @@ auto EntityBase::setStatus(
   auto status = static_cast<EntityStatus>(getCanonicalizedStatus());
   status.action_status = action_status;
   status.pose = static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose);
-  status.lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose);
-  status.lanelet_pose_valid = true;
+  status.lanelet_poses.emplace_back(static_cast<LaneletPose>(canonicalized_lanelet_pose));
   setCanonicalizedStatus(CanonicalizedEntityStatus(status, canonicalized_lanelet_pose));
 }
 

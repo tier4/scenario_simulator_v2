@@ -135,7 +135,14 @@
   EXPECT_EQ(MSG.lanelet_id, PROTO.lanelet_id()); \
   EXPECT_DOUBLE_EQ(MSG.s, PROTO.s());            \
   EXPECT_DOUBLE_EQ(MSG.offset, PROTO.offset());  \
-  EXPECT_VECTOR3_EQ(MSG.rpy, PROTO.rpy());
+  EXPECT_VECTOR3_EQ(MSG.rpy, PROTO.rpy());       \
+  EXPECT_EQ(MSG.lanelet_pose_valid, PROTO.lanelet_pose_valid());
+
+#define EXPECT_LANELET_POSES_EQ(MSG, PROTO)         \
+  ASSERT_EQ(MSG.size(), PROTO.size());              \
+  for (size_t i = 0; i < MSG.size(); ++i) {         \
+    EXPECT_LANELET_POSE_EQ(MSG.at(i), PROTO.at(i)); \
+  }
 
 #define EXPECT_ENTITY_STATUS_EQ(MSG, PROTO)                          \
   EXPECT_DOUBLE_EQ(MSG.time, PROTO.time());                          \
@@ -143,8 +150,7 @@
   EXPECT_BOUNDING_BOX_EQ(MSG.bounding_box, PROTO.bounding_box());    \
   EXPECT_ACTION_STATUS_EQ(MSG.action_status, PROTO.action_status()); \
   EXPECT_POSE_EQ(MSG.pose, PROTO.pose());                            \
-  EXPECT_LANELET_POSES_EQ(MSG.lanelet_poses, PROTO.lanelet_poses()); \
-  EXPECT_EQ(MSG.lanelet_pose_valid, PROTO.lanelet_pose_valid());
+  EXPECT_LANELET_POSES_EQ(MSG.lanelet_poses, PROTO.lanelet_poses());
 
 #define EXPECT_SENT_ENTITY_STATUS_EQ(MSG, PROTO)                     \
   EXPECT_DOUBLE_EQ(MSG.time, PROTO.time());                          \

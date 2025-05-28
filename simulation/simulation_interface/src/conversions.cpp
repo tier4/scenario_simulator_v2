@@ -418,7 +418,6 @@ void toProto(
   toProto(status.action_status, *proto.mutable_action_status());
   toProto(status.pose, *proto.mutable_pose());
   toProto(status.lanelet_poses, *proto.mutable_lanelet_poses());
-  proto.set_lanelet_pose_valid(status.lanelet_pose_valid);
   // proto.PrintDebugString();
 }
 
@@ -434,7 +433,6 @@ void toMsg(
   toMsg(proto.action_status(), status.action_status);
   toMsg(proto.pose(), status.pose);
   toMsg(proto.lanelet_poses(), status.lanelet_poses);
-  status.lanelet_pose_valid = proto.lanelet_pose_valid();
 }
 
 void toProto(
@@ -461,7 +459,6 @@ void toMsg(
   toMsg(proto.pose(), status.pose);
   status.bounding_box = traffic_simulator_msgs::msg::BoundingBox();
   status.lanelet_poses = std::vector<traffic_simulator_msgs::msg::LaneletPose>();
-  status.lanelet_pose_valid = false;
 }
 
 void toProto(
