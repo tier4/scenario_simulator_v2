@@ -463,9 +463,11 @@ public:
 
         auto & ego_entity = core->getEgoEntity(entity_name);
 
-        ego_entity.setParameter<bool>(
-          "allow_goal_modification",
-          controller.properties.template get<Boolean>("allowGoalModification"));
+        if (controller.properties.contains("allowGoalModification")) {
+          ego_entity.setParameter<bool>(
+            "allow_goal_modification",
+            controller.properties.template get<Boolean>("allowGoalModification"));
+        }
 
         const auto modules = [&]() {
           auto nonparsed_string = controller.properties.template get<String>(

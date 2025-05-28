@@ -165,7 +165,7 @@ TEST_F(MiscObjectEntityTest_HdMapUtils, requestAssignRoute_laneletPose)
         makeCanonicalizedLaneletPose(120659), makeBoundingBox(), 0.0, entity_name,
         traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
       hdmap_utils_ptr, traffic_simulator_msgs::msg::MiscObjectParameters{})
-      .requestAssignRoute({makeLaneletPose(120660)}),
+      .requestAssignRoute({makeLaneletPose(120660)}, {}),
     common::SemanticError);
 }
 
@@ -183,7 +183,7 @@ TEST_F(MiscObjectEntityTest_HdMapUtils, requestAssignRoute_pose)
         traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
       hdmap_utils_ptr, traffic_simulator_msgs::msg::MiscObjectParameters{})
       .requestAssignRoute(
-        std::vector<geometry_msgs::msg::Pose>{makePose(makePoint(3759.34, 73791.38))}),
+        std::vector<geometry_msgs::msg::Pose>{makePose(makePoint(3759.34, 73791.38))}, {}),
     common::SemanticError);
 }
 
@@ -200,7 +200,7 @@ TEST_F(MiscObjectEntityTest_HdMapUtils, requestAcquirePosition_laneletPose)
         makeCanonicalizedLaneletPose(120659), makeBoundingBox(), 0.0, entity_name,
         traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
       hdmap_utils_ptr, traffic_simulator_msgs::msg::MiscObjectParameters{})
-      .requestAcquirePosition(makeLaneletPose(120660)),
+      .requestAcquirePosition(makeLaneletPose(120660), {}),
     common::SemanticError);
 }
 
@@ -217,7 +217,7 @@ TEST_F(MiscObjectEntityTest_HdMapUtils, requestAcquirePosition_pose)
         makeCanonicalizedLaneletPose(120659), makeBoundingBox(), 0.0, entity_name,
         traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
       hdmap_utils_ptr, traffic_simulator_msgs::msg::MiscObjectParameters{})
-      .requestAcquirePosition(makePose(makePoint(3759.34, 73791.38))),
+      .requestAcquirePosition(makePose(makePoint(3759.34, 73791.38)), {}),
     common::SemanticError);
 }
 
