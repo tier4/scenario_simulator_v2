@@ -37,7 +37,7 @@ public:
    * @brief Get the Current Action object
    * @return const std::string& always return "do_nothing"
    */
-  const std::string & getCurrentAction() const override;
+  auto getCurrentAction() -> const std::string & override;
 
 /// @note Getters defined by this macro return default values and setters are behaved as no-operation functions.
 #define DEFINE_GETTER_SETTER(NAME, TYPE)        \

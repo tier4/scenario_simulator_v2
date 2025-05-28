@@ -51,7 +51,8 @@ void PedestrianEntity::appendDebugMarker(visualization_msgs::msg::MarkerArray & 
   std::copy(marker.begin(), marker.end(), std::back_inserter(marker_array.markers));
 }
 
-void PedestrianEntity::requestAssignRoute(const std::vector<CanonicalizedLaneletPose> & waypoints)
+void PedestrianEntity::requestAssignRoute(
+  const std::vector<CanonicalizedLaneletPose> & waypoints, const RouteOption &)
 {
   if (!isInLanelet()) {
     return;
@@ -65,27 +66,46 @@ void PedestrianEntity::requestAssignRoute(const std::vector<CanonicalizedLanelet
   behavior_plugin_ptr_->setGoalPoses(goal_poses);
 }
 
-void PedestrianEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> & waypoints)
+void PedestrianEntity::requestAssignRoute(
+  const std::vector<geometry_msgs::msg::Pose> & waypoints, const RouteOption & options)
 {
   std::vector<CanonicalizedLaneletPose> route;
   for (const auto & waypoint : waypoints) {
     if (
       const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
-        waypoint, status_->getBoundingBox(), true,
-        getDefaultMatchingDistanceForLaneletPoseCalculation())) {
+        waypoint, getBoundingBox(), true, getDefaultMatchingDistanceForLaneletPoseCalculation())) {
       route.emplace_back(canonicalized_lanelet_pose.value());
     } else {
       THROW_SEMANTIC_ERROR("Waypoint of pedestrian entity should be on lane.");
     }
   }
-  requestAssignRoute(route);
+  requestAssignRoute(route, options);
 }
 
 auto PedestrianEntity::requestFollowTrajectory(
   const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & parameter) -> void
 {
-  behavior_plugin_ptr_->setPolylineTrajectory(parameter);
-  behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_POLYLINE_TRAJECTORY);
+  if (parameter) {
+    behavior_plugin_ptr_->setPolylineTrajectory(parameter);
+    behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_POLYLINE_TRAJECTORY);
+    lanelet::Ids route_lanelets;
+    const auto curve = math::geometry::CatmullRomSpline(status_->getMapPose().position, parameter);
+    /// @note Hard coded parameter: 1.0 is a sample resolution of the trajectory. (Unit: m)
+    for (const auto & waypoint : curve.getTrajectoryPoses(0.0, curve.getLength(), 1.0)) {
+      if (
+        const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
+          waypoint, getBoundingBox(), true,
+          getDefaultMatchingDistanceForLaneletPoseCalculation())) {
+        route_lanelets.push_back(canonicalized_lanelet_pose.value().getLaneletId());
+      }
+    }
+    behavior_plugin_ptr_->setRouteLanelets(route_lanelets);
+  } else {
+    THROW_SIMULATION_ERROR(
+      "Traffic simulator send requests of FollowTrajectory, but the trajectory is empty.",
+      "This message is not originally intended to be displayed, if you see it, please "
+      "contact the developer of traffic_simulator.");
+  }
 }
 
 std::string PedestrianEntity::getCurrentAction() const
@@ -137,7 +157,8 @@ void PedestrianEntity::requestWalkStraight()
   behavior_plugin_ptr_->setRequest(behavior::Request::WALK_STRAIGHT);
 }
 
-void PedestrianEntity::requestAcquirePosition(const CanonicalizedLaneletPose & lanelet_pose)
+void PedestrianEntity::requestAcquirePosition(
+  const CanonicalizedLaneletPose & lanelet_pose, const RouteOption &)
 {
   behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
   if (status_->isInLanelet()) {
@@ -146,14 +167,15 @@ void PedestrianEntity::requestAcquirePosition(const CanonicalizedLaneletPose & l
   behavior_plugin_ptr_->setGoalPoses({static_cast<geometry_msgs::msg::Pose>(lanelet_pose)});
 }
 
-void PedestrianEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose)
+void PedestrianEntity::requestAcquirePosition(
+  const geometry_msgs::msg::Pose & map_pose, const RouteOption & options)
 {
   behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
   if (
     const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
       map_pose, status_->getBoundingBox(), true,
       getDefaultMatchingDistanceForLaneletPoseCalculation())) {
-    requestAcquirePosition(canonicalized_lanelet_pose.value());
+    requestAcquirePosition(canonicalized_lanelet_pose.value(), options);
   } else {
     THROW_SEMANTIC_ERROR("Goal of the pedestrian entity should be on lane.");
   }

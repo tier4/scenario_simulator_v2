@@ -52,13 +52,13 @@ const std::optional<traffic_simulator_msgs::msg::Obstacle> YieldAction::calculat
 
 const traffic_simulator_msgs::msg::WaypointsArray YieldAction::calculateWaypoints()
 {
-  if (!canonicalized_entity_status->isInLanelet()) {
+  if (!canonicalized_entity_status_->isInLanelet()) {
     THROW_SIMULATION_ERROR("failed to assign lane");
   }
-  if (canonicalized_entity_status->getTwist().linear.x >= 0) {
+  if (canonicalized_entity_status_->getTwist().linear.x >= 0) {
     traffic_simulator_msgs::msg::WaypointsArray waypoints;
     double horizon = getHorizon();
-    const auto lanelet_pose = canonicalized_entity_status->getLaneletPose();
+    const auto lanelet_pose = canonicalized_entity_status_->getLaneletPose();
     waypoints.waypoints = reference_trajectory->getTrajectory(
       lanelet_pose.s, lanelet_pose.s + horizon, 1.0, lanelet_pose.offset);
     trajectory = std::make_unique<math::geometry::CatmullRomSubspline>(
@@ -79,31 +79,31 @@ std::optional<double> YieldAction::calculateTargetSpeed()
    */
   double rest_distance =
     distance_to_stop_target_.value() - (vehicle_parameters.bounding_box.dimensions.x * 0.5 + 1.0);
-  if (rest_distance < calculateStopDistance(behavior_parameter.dynamic_constraints)) {
+  if (rest_distance < calculateStopDistance(behavior_parameter_.dynamic_constraints)) {
     return 0;
   }
-  return canonicalized_entity_status->getTwist().linear.x;
+  return canonicalized_entity_status_->getTwist().linear.x;
 }
 
 BT::NodeStatus YieldAction::tick()
 {
   getBlackBoardValues();
   if (
-    request != traffic_simulator::behavior::Request::NONE &&
-    request != traffic_simulator::behavior::Request::FOLLOW_LANE) {
+    request_ != traffic_simulator::behavior::Request::NONE &&
+    request_ != traffic_simulator::behavior::Request::FOLLOW_LANE) {
     return BT::NodeStatus::FAILURE;
   }
-  if (!behavior_parameter.see_around) {
+  if (!behavior_parameter_.see_around) {
     return BT::NodeStatus::FAILURE;
   }
-  if (!canonicalized_entity_status->isInLanelet()) {
+  if (!canonicalized_entity_status_->isInLanelet()) {
     return BT::NodeStatus::FAILURE;
   }
-  if (!isNeedToRightOfWay(route_lanelets)) {
-    if (!target_speed) {
-      target_speed = hdmap_utils->getSpeedLimit(route_lanelets);
+  if (!isNeedToRightOfWay(route_lanelets_)) {
+    if (!target_speed_) {
+      target_speed_ = hdmap_utils_->getSpeedLimit(route_lanelets_);
     }
-    setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(target_speed.value()));
+    setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(target_speed_.value()));
     const auto waypoints = calculateWaypoints();
     if (waypoints.waypoints.empty()) {
       return BT::NodeStatus::FAILURE;
@@ -113,12 +113,12 @@ BT::NodeStatus YieldAction::tick()
     setOutput("obstacle", obstacle);
     return BT::NodeStatus::SUCCESS;
   }
-  distance_to_stop_target_ = getYieldStopDistance(route_lanelets);
-  target_speed = calculateTargetSpeed();
-  if (!target_speed) {
-    target_speed = hdmap_utils->getSpeedLimit(route_lanelets);
+  distance_to_stop_target_ = getYieldStopDistance(route_lanelets_);
+  target_speed_ = calculateTargetSpeed();
+  if (!target_speed_) {
+    target_speed_ = hdmap_utils_->getSpeedLimit(route_lanelets_);
   }
-  setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(target_speed.value()));
+  setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(target_speed_.value()));
   const auto waypoints = calculateWaypoints();
   if (waypoints.waypoints.empty()) {
     return BT::NodeStatus::FAILURE;
