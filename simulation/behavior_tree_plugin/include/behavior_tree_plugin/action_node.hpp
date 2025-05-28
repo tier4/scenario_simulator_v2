@@ -100,18 +100,18 @@ public:
     -> traffic_simulator::EntityStatus;
 
 protected:
-  traffic_simulator::behavior::Request request;
-  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils;
-  std::shared_ptr<traffic_simulator::TrafficLightsBase> traffic_lights;
-  std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus> canonicalized_entity_status;
-  double current_time;
-  double step_time;
-  double default_matching_distance_for_lanelet_pose_calculation;
-  std::optional<double> target_speed;
-  EntityStatusDict other_entity_status;
-  lanelet::Ids route_lanelets;
-  std::shared_ptr<EuclideanDistancesMap> euclidean_distances_map;
-  traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter;
+  traffic_simulator::behavior::Request request_;
+  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_;
+  std::shared_ptr<traffic_simulator::TrafficLightsBase> traffic_lights_;
+  std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus> canonicalized_entity_status_;
+  double current_time_;
+  double step_time_;
+  double default_matching_distance_for_lanelet_pose_calculation_;
+  std::optional<double> target_speed_;
+  EntityStatusDict other_entity_status_;
+  lanelet::Ids route_lanelets_;
+  std::shared_ptr<EuclideanDistancesMap> euclidean_distances_map_;
+  traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter_;
 };
 }  // namespace entity_behavior
 

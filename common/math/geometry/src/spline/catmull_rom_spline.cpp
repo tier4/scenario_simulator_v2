@@ -101,6 +101,12 @@ auto CatmullRomSpline::getTrajectory(
   const double start_s, const double end_s, const double resolution, const double offset) const
   -> std::vector<geometry_msgs::msg::Point>
 {
+  if (std::fabs(resolution) <= std::numeric_limits<double>::epsilon()) {
+    THROW_SIMULATION_ERROR(
+      "Resolution should not be zero.",
+      "This message is not originally intended to be displayed, if you see it, please contact ",
+      "the developer of traffic_simulator.");
+  }
   if (start_s > end_s) {
     std::vector<geometry_msgs::msg::Point> ret;
     double s = start_s;
@@ -122,8 +128,70 @@ auto CatmullRomSpline::getTrajectory(
   }
 }
 
-CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> & control_points)
-: control_points(control_points), line_segments_(getLineSegments(control_points)), total_length_(0)
+auto CatmullRomSpline::getTrajectoryPoses(
+  const double start_s, const double end_s, const double resolution) const
+  -> std::vector<geometry_msgs::msg::Pose>
+{
+  if (std::fabs(resolution) <= std::numeric_limits<double>::epsilon()) {
+    THROW_SIMULATION_ERROR(
+      "Resolution should not be zero.",
+      "This message is not originally intended to be displayed, if you see it, please contact ",
+      "the developer of traffic_simulator.");
+  }
+  if (start_s > end_s) {
+    std::vector<geometry_msgs::msg::Pose> ret;
+    double s = start_s;
+    while (s > end_s) {
+      ret.emplace_back(getPose(s));
+      s = s - std::fabs(resolution);
+    }
+    ret.emplace_back(getPose(end_s));
+    return ret;
+  } else {
+    std::vector<geometry_msgs::msg::Pose> ret;
+    double s = start_s;
+    while (s < end_s) {
+      ret.emplace_back(getPose(s));
+      s = s + std::fabs(resolution);
+    }
+    ret.emplace_back(getPose(end_s));
+    return ret;
+  }
+}
+
+CatmullRomSpline::CatmullRomSpline(
+  const geometry_msgs::msg::Point & start_point,
+  const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & trajectory)
+: CatmullRomSpline([start_point, trajectory] {
+    if (!trajectory) {
+      THROW_SIMULATION_ERROR(
+        "Trajectory is empty.",
+        "This message is not originally intended to be displayed, if you see it, please contact "
+        "the developer of traffic_simulator.");
+    }
+    std::vector<geometry_msgs::msg::Point> control_points;
+    control_points.reserve(trajectory->shape.vertices.size() + 2UL);
+    control_points.emplace_back(start_point);
+    for (const auto & vertex : trajectory->shape.vertices) {
+      control_points.emplace_back(vertex.position.position);
+    }
+    if (trajectory->closed) {
+      control_points.emplace_back(control_points[0]);
+    }
+    return control_points;
+  }())
+{
+}
+
+CatmullRomSpline::CatmullRomSpline(
+  const std::vector<geometry_msgs::msg::Point> & raw_control_points)
+: control_points([raw_control_points]() {
+    std::vector<geometry_msgs::msg::Point> ret = raw_control_points;
+    ret.erase(std::unique(ret.begin(), ret.end()), ret.end());
+    return ret;
+  }()),
+  line_segments_(getLineSegments(control_points)),
+  total_length_(0)
 {
   switch (control_points.size()) {
     case 0:
@@ -232,7 +300,6 @@ CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> 
         }
         for (const auto & curve : curves_) {
           length_list_.emplace_back(curve.getLength());
-          maximum_2d_curvatures_.emplace_back(curve.getMaximum2DCurvature());
         }
         total_length_ = 0;
         for (const auto & length : length_list_) {
@@ -599,8 +666,17 @@ auto CatmullRomSpline::getAltitudeRange() const -> std::pair<double, double>
 
 auto CatmullRomSpline::getMaximum2DCurvature() const -> double
 {
+  if (curves_.empty()) {
+    THROW_SEMANTIC_ERROR(
+      "Curves are empty. We cannot determine the maximum 2D curvature of the spline.",
+      "This message is not originally intended to be displayed, if you see it, please contact "
+      "the developer of traffic_simulator.");
+  }
+  /// @note Maximum 2D curvature is empty means that it is not calculated yet.
   if (maximum_2d_curvatures_.empty()) {
-    THROW_SIMULATION_ERROR("maximum 2D curvature vector size is 0.");  // LCOV_EXCL_LINE
+    for (const auto & curve : curves_) {
+      maximum_2d_curvatures_.emplace_back(curve.getMaximum2DCurvature());
+    }
   }
   const auto [min, max] =
     std::minmax_element(maximum_2d_curvatures_.begin(), maximum_2d_curvatures_.end());
