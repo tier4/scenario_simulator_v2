@@ -56,17 +56,6 @@ auto AssignRouteAction::run() -> void {}
 
 auto AssignRouteAction::start() -> void
 {
-  traffic_simulator::v2::RouteOption route_option;
-  route_option.use_lane_level_specification_for_waypoints = [&]() -> bool {
-    try {
-      return ref<Boolean>(
-        std::string("RoutingAction.use_lane_level_specification_for_waypoints"));
-    } catch (const SyntaxError &) {
-      // default value
-      return false;
-    }
-  }();
-
   auto get_from_controller_property =
     [this](const EntityRef & entity_ref, const std::string & property_name) -> std::optional<bool> {
     if (const auto & entity = global().entities->ref(entity_ref);
@@ -90,6 +79,10 @@ auto AssignRouteAction::start() -> void
       return default_value;
     }
   };
+
+  traffic_simulator::v2::RouteOption route_option;
+  route_option.use_lane_level_specification_for_waypoints =
+    get_from_parameter("RoutingAction.use_lane_level_specification_for_waypoints", false);
 
   for (const auto & actor : actors) {
     actor.apply([&](const auto & object) {
