@@ -13,4 +13,3 @@ geometry_msgs/Pose pose
 
 # fields for lane frame
 traffic_simulator_msgs/LaneletPose[] lanelet_poses
-bool lanelet_pose_valid true
