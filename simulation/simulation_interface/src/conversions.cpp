@@ -620,6 +620,7 @@ auto toProtobufMessage(const traffic_simulator_msgs::msg::Polyline & message)
   -> traffic_simulator_msgs::Polyline
 {
   auto proto = traffic_simulator_msgs::Polyline();
+  proto.mutable_vertices()->Reserve(message.vertices.size());
   for (const auto & vertex : message.vertices) {
     *proto.add_vertices() = toProtobufMessage(vertex);
   }
@@ -631,7 +632,7 @@ auto toROS2Message(const traffic_simulator_msgs::Polyline & proto)
 {
   auto message = traffic_simulator_msgs::msg::Polyline();
   for (const auto & vertex : proto.vertices()) {
-    message.vertices.push_back(toROS2Message(vertex));
+    message.vertices.emplace_back(toROS2Message(vertex));
   }
   return message;
 }

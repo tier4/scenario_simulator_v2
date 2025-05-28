@@ -83,6 +83,7 @@ auto API::updateEntitiesStatusInSim() -> bool
 {
   simulation_api_schema::UpdateEntityStatusRequest req;
   req.set_npc_logic_started(entity_manager_ptr_->isNpcLogicStarted());
+  req.mutable_status()->Reserve(static_cast<int>(entity_manager_ptr_->getEntityNames().size()));
   for (const auto & entity_name : entity_manager_ptr_->getEntityNames()) {
     const auto & entity = entity_manager_ptr_->getEntity(entity_name);
     const auto entity_status = static_cast<EntityStatus>(entity.getCanonicalizedStatus());
