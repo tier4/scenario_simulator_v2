@@ -97,8 +97,10 @@ auto TrafficLightsBase::generateUpdateTrafficLightsRequest() const
   -> simulation_api_schema::UpdateTrafficLightsRequest
 {
   simulation_api_schema::UpdateTrafficLightsRequest update_traffic_lights_request;
+  update_traffic_lights_request.mutable_states()->Reserve(traffic_lights_map_.size());
   for (auto && [lanelet_id, traffic_light] : traffic_lights_map_) {
     auto traffic_signal = static_cast<simulation_api_schema::TrafficSignal>(traffic_light);
+    traffic_signal.mutable_relation_ids()->Reserve(traffic_light.regulatory_elements_ids.size());
     for (const auto & relation_id : traffic_light.regulatory_elements_ids) {
       traffic_signal.add_relation_ids(relation_id);
     }

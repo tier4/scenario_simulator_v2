@@ -500,6 +500,7 @@ struct TrafficLight
     simulation_api_schema::TrafficSignal traffic_signal_proto;
 
     traffic_signal_proto.set_id(way_id);
+    traffic_signal_proto.mutable_traffic_light_status()->Reserve(bulbs.size());
     for (const auto & bulb : bulbs) {
       auto traffic_light_bulb_proto = static_cast<simulation_api_schema::TrafficLight>(bulb);
       traffic_light_bulb_proto.set_confidence(confidence);
