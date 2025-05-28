@@ -149,18 +149,33 @@ auto CanonicalizedEntityStatus::getAltitude() const -> double
 {
   // return canonicalized_lanelet_pose_ ? canonicalized_lanelet_pose_->getAltitude()
   //                                    : entity_status_.pose.position.z;
+  // ###########################################################
+  // WIP this part is to heavy to refactor, so just return the first one
+  // ###########################################################
   if (canonicalized_lanelet_poses_.empty()) {
     THROW_SEMANTIC_ERROR("Target entity status did not matched to lanelet pose.");
   }
+  return canonicalized_lanelet_poses_.front()->getAltitude();
 }
 
-auto CanonicalizedEntityStatus::getLaneletPoses() const -> const std::vector<LaneletPose> &
+auto CanonicalizedEntityStatus::getLaneletPose() const -> LaneletPose
 {
   // if (canonicalized_lanelet_pose_) {
   //   return canonicalized_lanelet_pose_->getLaneletPose();
   // } else {
   //   THROW_SEMANTIC_ERROR("Target entity status did not matched to lanelet pose.");
   // }
+  // ###########################################################
+  // WIP this part is to heavy to refactor, so just return the first one
+  // ###########################################################
+  if (canonicalized_lanelet_poses_.empty()) {
+    THROW_SEMANTIC_ERROR("Target entity status did not matched to lanelet pose.");
+  }
+  return canonicalized_lanelet_poses_.front()->getLaneletPose();
+}
+
+auto CanonicalizedEntityStatus::getLaneletPoses() const -> const std::vector<LaneletPose> &
+{
   if (canonicalized_lanelet_poses_.empty()) {
     THROW_SEMANTIC_ERROR("Target entity status did not matched to lanelet pose.");
   }

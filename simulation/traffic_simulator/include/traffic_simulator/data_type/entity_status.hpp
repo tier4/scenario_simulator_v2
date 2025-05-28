@@ -71,6 +71,7 @@ public:
   auto isInLanelet() const noexcept -> bool;
   auto getLaneletId() const -> lanelet::Id;
   auto getLaneletIds() const -> lanelet::Ids;
+  auto getLaneletPose() const -> LaneletPose;
   auto getLaneletPoses() const -> const std::vector<LaneletPose> &;
   auto getCanonicalizedLaneletPose() const noexcept
     -> const std::optional<CanonicalizedLaneletPose> &;
