@@ -60,7 +60,7 @@ auto AssignRouteAction::start() -> void
   route_option.use_lane_level_specification_for_waypoints = [&]() -> bool {
     try {
       return ref<Boolean>(
-        std::string("AssignRouteAction.use_lane_level_specification_for_waypoints"));
+        std::string("RoutingAction.use_lane_level_specification_for_waypoints"));
     } catch (const SyntaxError &) {
       // default value
       return false;
