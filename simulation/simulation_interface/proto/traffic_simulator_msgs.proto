@@ -32,6 +32,7 @@ message LaneletPose {
   double s = 2;                  // S value in the lane coordinate.
   double offset = 3;             // Offset value in the lane coordinate.
   geometry_msgs.Vector3 rpy = 4; // RPY(roll/pitch/yaw) value in the lane coordinate.
+  bool lanelet_pose_valid = 5;   // If true, the lane matching of the entity is succeeded.
 }
 
 /**
