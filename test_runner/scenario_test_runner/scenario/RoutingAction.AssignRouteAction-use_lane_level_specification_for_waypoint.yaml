@@ -67,7 +67,7 @@ OpenSCENARIO:
                   - name: ''
                     ParameterDeclarations:
                       ParameterDeclaration:
-                        - name: AssignRouteAction.use_lane_level_specification_for_waypoints
+                        - name: RoutingAction.use_lane_level_specification_for_waypoints
                           parameterType: boolean
                           value: true
                     Event:
