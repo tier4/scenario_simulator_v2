@@ -17,4 +17,13 @@ install(
             ${CMAKE_CURRENT_SOURCE_DIR}/scenario
   DESTINATION share/${PROJECT_NAME})
 
+install(
+  PROGRAMS  ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/scenario_test_runner.py
+            ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/lifecycle_controller.py
+            ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/result_checker.py
+            ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/scenario.py
+            ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/shutdown_once.py
+  DESTINATION lib/${PROJECT_NAME}
+)
+
 ament_package()
