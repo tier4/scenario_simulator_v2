@@ -19,6 +19,7 @@
 #include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
+#include <traffic_simulator/utils/route.hpp>
 #include <vector>
 
 namespace entity_behavior
@@ -99,9 +100,10 @@ BT::NodeStatus YieldAction::tick()
   if (!canonicalized_entity_status_->isInLanelet()) {
     return BT::NodeStatus::FAILURE;
   }
-  if (!isNeedToRightOfWay(route_lanelets_)) {
+  if (!traffic_simulator::route::isNeedToRightOfWay(
+        route_lanelets_, getOtherEntitiesCanonicalizedLaneletPoses())) {
     if (!target_speed_) {
-      target_speed_ = hdmap_utils_->getSpeedLimit(route_lanelets_);
+      target_speed_ = traffic_simulator::route::speedLimit(route_lanelets_);
     }
     setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(target_speed_.value()));
     const auto waypoints = calculateWaypoints();
@@ -116,7 +118,7 @@ BT::NodeStatus YieldAction::tick()
   distance_to_stop_target_ = getYieldStopDistance(route_lanelets_);
   target_speed_ = calculateTargetSpeed();
   if (!target_speed_) {
-    target_speed_ = hdmap_utils_->getSpeedLimit(route_lanelets_);
+    target_speed_ = traffic_simulator::route::speedLimit(route_lanelets_);
   }
   setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(target_speed_.value()));
   const auto waypoints = calculateWaypoints();

@@ -18,6 +18,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
+#include <traffic_simulator/utils/route.hpp>
 #include <utility>
 #include <vector>
 
@@ -96,7 +97,8 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
   if (!behavior_parameter_.see_around) {
     return BT::NodeStatus::FAILURE;
   }
-  if (isNeedToRightOfWay(route_lanelets_)) {
+  if (traffic_simulator::route::isNeedToRightOfWay(
+        route_lanelets_, getOtherEntitiesCanonicalizedLaneletPoses())) {
     return BT::NodeStatus::FAILURE;
   }
   const auto waypoints = calculateWaypoints();
