@@ -162,7 +162,10 @@ struct FieldOperatorApplication : public rclcpp::Node
 
   auto initialize(const geometry_msgs::msg::Pose &) -> void;
 
-  auto plan(const std::vector<geometry_msgs::msg::PoseStamped> &, const bool) -> void;
+  [[deprecated(
+    "This function was deprecated since version 16.5.0 (released on 20250530). It will be deleted "
+    "after a half-year transition period (~20251130). Please use other overloads instead.")]] auto
+  plan(const std::vector<geometry_msgs::msg::PoseStamped> &, const bool) -> void;
 
 #if __has_include(<autoware_adapi_v1_msgs/msg/route_option.hpp>)
   using RouteOption = autoware_adapi_v1_msgs::msg::RouteOption;
