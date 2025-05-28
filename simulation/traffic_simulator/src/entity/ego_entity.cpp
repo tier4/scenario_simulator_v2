@@ -265,6 +265,9 @@ void EgoEntity::requestAssignRoute(
     routing_configuration.allow_lane_change = true;
     if (auto current_lanelet_pose = getCanonicalizedLaneletPose()) {
       route_segments.push_back(make_segment(current_lanelet_pose->getLaneletId()));
+    } else {
+      throw common::Error(
+        "Failed to get current lanelet of ego entity. (", __FILE__, ":", __LINE__, ")");
     }
 
     for (size_t i = 0; i < route.size(); ++i) {
