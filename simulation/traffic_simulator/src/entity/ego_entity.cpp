@@ -393,7 +393,22 @@ auto EgoEntity::requestReplanRoute(
   -> void
 {
   clearRoute();
-  plan(route, allow_goal_modification);
+  /*
+    NOTE:
+      This function does not support use_lane_level_specification_for_waypoints option.
+      The developers should consider manual override simulation to determine whether support it or not.
+   */
+  {
+    concealer::FieldOperatorApplication::RouteOption route_option;
+    route_option.allow_goal_modification = allow_goal_modification;
+    assert(not route.empty());
+    auto goal = route.back().pose;
+    std::vector<geometry_msgs::msg::Pose> waypoints;
+    for (size_t i = 0; i < route.size() - 1; ++i) {
+      waypoints.push_back(route[i].pose);
+    }
+    plan(goal, waypoints, route_option);
+  }
   enableAutowareControl();
   FieldOperatorApplication::engage();
 }
