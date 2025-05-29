@@ -169,60 +169,76 @@ auto VehicleEntity::onUpdate(const double current_time, const double step_time) 
   EntityBase::onPostUpdate(current_time, step_time);
 }
 
-void VehicleEntity::requestAcquirePosition(const LaneletPose & lanelet_pose, const RouteOption &)
+void VehicleEntity::requestAcquirePosition(
+  const CanonicalizedLaneletPose & lanelet_pose, const RouteOption &)
 {
-  const auto canonicalized_lanelet_pose = CanonicalizedLaneletPose(lanelet_pose);
   behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
   if (status_->isInLanelet()) {
-    route_planner_.setWaypoints({canonicalized_lanelet_pose});
+    route_planner_.setWaypoints({lanelet_pose});
   }
-  behavior_plugin_ptr_->setGoalPoses(
-    {static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose)});
+  behavior_plugin_ptr_->setGoalPoses({static_cast<geometry_msgs::msg::Pose>(lanelet_pose)});
+}
+
+void VehicleEntity::requestAcquirePosition(
+  const LaneletPose & lanelet_pose, const RouteOption & options)
+{
+  const auto canonicalized_lanelet_pose = CanonicalizedLaneletPose(lanelet_pose);
+  requestAcquirePosition(canonicalized_lanelet_pose, options);
 }
 
 void VehicleEntity::requestAcquirePosition(
   const geometry_msgs::msg::Pose & map_pose, const RouteOption & options)
 {
-  behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
   if (
     const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
       map_pose, status_->getBoundingBox(), false,
       getDefaultMatchingDistanceForLaneletPoseCalculation())) {
-    requestAcquirePosition(static_cast<LaneletPose>(canonicalized_lanelet_pose.value()), options);
+    requestAcquirePosition(canonicalized_lanelet_pose.value(), options);
   } else {
     THROW_SEMANTIC_ERROR("Goal of the vehicle entity should be on lane.");
   }
 }
 
 void VehicleEntity::requestAssignRoute(
-  const std::vector<LaneletPose> & waypoints, const RouteOption &)
+  const std::vector<CanonicalizedLaneletPose> & waypoints, const RouteOption &)
 {
-  if (isInLanelet()) {
-    std::vector<CanonicalizedLaneletPose> canonicalized_waypoints;
-    std::transform(
-      waypoints.begin(), waypoints.end(), std::back_inserter(canonicalized_waypoints),
-      [](const auto & waypoint) { return CanonicalizedLaneletPose(waypoint); });
-
-    behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
-    route_planner_.setWaypoints(canonicalized_waypoints);
-    std::vector<geometry_msgs::msg::Pose> goal_poses;
-    for (const auto & waypoint : canonicalized_waypoints) {
-      goal_poses.emplace_back(static_cast<geometry_msgs::msg::Pose>(waypoint));
-    }
-    behavior_plugin_ptr_->setGoalPoses(goal_poses);
+  if (!isInLanelet()) {
+    return;
   }
+  behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
+
+  route_planner_.setWaypoints(waypoints);
+
+  std::vector<geometry_msgs::msg::Pose> goal_poses;
+  for (const auto & waypoint : waypoints) {
+    goal_poses.emplace_back(static_cast<geometry_msgs::msg::Pose>(waypoint));
+  }
+  behavior_plugin_ptr_->setGoalPoses(goal_poses);
+}
+
+void VehicleEntity::requestAssignRoute(
+  const std::vector<LaneletPose> & waypoints, const RouteOption & options)
+{
+  std::vector<CanonicalizedLaneletPose> canonicalized_waypoints;
+  canonicalized_waypoints.reserve(waypoints.size());
+  std::transform(
+    waypoints.begin(), waypoints.end(), std::back_inserter(canonicalized_waypoints),
+    [](const auto & waypoint) { return CanonicalizedLaneletPose(waypoint); });
+
+  requestAssignRoute(canonicalized_waypoints, options);
 }
 
 void VehicleEntity::requestAssignRoute(
   const std::vector<geometry_msgs::msg::Pose> & waypoints, const RouteOption & options)
 {
-  std::vector<LaneletPose> route;
+  std::vector<CanonicalizedLaneletPose> route;
+  route.reserve(waypoints.size());
   for (const auto & waypoint : waypoints) {
     if (
       const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
         waypoint, status_->getBoundingBox(), false,
         getDefaultMatchingDistanceForLaneletPoseCalculation())) {
-      route.emplace_back(static_cast<LaneletPose>(canonicalized_lanelet_pose.value()));
+      route.emplace_back(canonicalized_lanelet_pose.value());
     } else {
       THROW_SEMANTIC_ERROR("Waypoint of vehicle entity should be on lane.");
     }

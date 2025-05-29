@@ -171,6 +171,9 @@ public:
   auto getMinimumRiskManeuverStateName() const -> std::string;
   auto getEmergencyStateName() const -> std::string;
   auto getTurnIndicatorsCommandName() const -> std::string;
+
+protected:
+  void requestAssignRoute(const std::vector<CanonicalizedLaneletPose> &, const RouteOption &);
 };
 }  // namespace entity
 }  // namespace traffic_simulator

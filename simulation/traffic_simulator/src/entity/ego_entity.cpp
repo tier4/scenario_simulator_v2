@@ -212,7 +212,7 @@ void EgoEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose
 void EgoEntity::requestAcquirePosition(
   const LaneletPose & lanelet_pose, const RouteOption & options)
 {
-  requestAssignRoute({pose::canonicalize(lanelet_pose)}, options);
+  requestAssignRoute({lanelet_pose}, options);
 }
 
 void EgoEntity::requestAcquirePosition(
@@ -237,6 +237,18 @@ void EgoEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &
 
 void EgoEntity::requestAssignRoute(
   const std::vector<LaneletPose> & waypoints, const RouteOption & options)
+{
+  std::vector<CanonicalizedLaneletPose> route;
+  route.reserve(waypoints.size());
+  std::transform(
+    waypoints.begin(), waypoints.end(), std::back_inserter(route),
+    [](const auto & waypoint) { return CanonicalizedLaneletPose(waypoint); });
+
+  requestAssignRoute(route, options);
+}
+
+void EgoEntity::requestAssignRoute(
+  const std::vector<CanonicalizedLaneletPose> & waypoints, const RouteOption & options)
 {
   std::vector<geometry_msgs::msg::Pose> route;
   for (const auto & waypoint : waypoints) {

@@ -131,6 +131,11 @@ public:
 
   const traffic_simulator_msgs::msg::VehicleParameters vehicle_parameters;
 
+protected:
+  void requestAcquirePosition(const CanonicalizedLaneletPose &, const RouteOption &);
+
+  void requestAssignRoute(const std::vector<CanonicalizedLaneletPose> &, const RouteOption &);
+
 private:
   pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase> loader_;
 

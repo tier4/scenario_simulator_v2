@@ -126,6 +126,11 @@ public:
 
   const traffic_simulator_msgs::msg::PedestrianParameters pedestrian_parameters;
 
+protected:
+  void requestAcquirePosition(const CanonicalizedLaneletPose &, const RouteOption &);
+
+  void requestAssignRoute(const std::vector<CanonicalizedLaneletPose> &, const RouteOption &);
+
 private:
   pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase> loader_;
   const std::shared_ptr<entity_behavior::BehaviorPluginBase> behavior_plugin_ptr_;
