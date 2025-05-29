@@ -223,11 +223,9 @@ void EgoEntity::requestAcquirePosition(
 
 void EgoEntity::requestAssignRoute(const std::vector<LaneletPose> & waypoints)
 {
-  std::vector<geometry_msgs::msg::Pose> route;
-  for (const auto & waypoint : waypoints) {
-    route.push_back(traffic_simulator::pose::toMapPose(waypoint));
-  }
-  requestAssignRoute(route);
+  RouteOption options;
+  options.allow_goal_modification = get_parameter_or<bool>("allow_goal_modification", false);
+  return requestAssignRoute(waypoints, options);
 }
 
 void EgoEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> & waypoints)
