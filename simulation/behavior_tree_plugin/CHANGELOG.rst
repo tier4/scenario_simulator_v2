@@ -2494,7 +2494,7 @@ Changelog for package behavior_tree_plugin
 * Update `FollowPolylineTrajectoryAction` to receive parameter
 * Add accessors for `Follow*TrajectoryAction` to `BehaviorPluginBase`
 * Update enumeration `traffic_simulator::behavior::Request`
-* Add new behavior request `Request::FOLLOW_TRAJECTORY`
+* Add new behavior request `request::follow_trajectory`
 * Add new VehicleActionNode `FollowPolylineTrajectoryAction`
 * Add new VehicleActionNode `FollowNurbsTrajectoryAction`
 * Add new VehicleActionNode `FollowClothoidTrajectoryAction`

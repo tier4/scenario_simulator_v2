@@ -65,7 +65,7 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
   };
 
   if (getBlackBoardValues();
-      request_ != traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY or
+      request_ != traffic_simulator::behavior::Request::follow_polyline_trajectory or
       not getInput<decltype(polyline_trajectory)>("polyline_trajectory", polyline_trajectory) or
       not getInput<decltype(target_speed_)>("target_speed", target_speed_) or
       not polyline_trajectory) {

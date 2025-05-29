@@ -41,7 +41,7 @@ void WalkStraightAction::getBlackBoardValues() { PedestrianActionNode::getBlackB
 BT::NodeStatus WalkStraightAction::tick()
 {
   getBlackBoardValues();
-  if (request_ != traffic_simulator::behavior::Request::WALK_STRAIGHT) {
+  if (request_ != traffic_simulator::behavior::Request::walk_straight) {
     return BT::NodeStatus::FAILURE;
   }
   if (!target_speed_) {

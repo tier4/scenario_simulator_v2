@@ -142,7 +142,7 @@ private:
         const auto lanelet_pose = ego_entity.getCanonicalizedStatus().getLaneletPose();
         if (lanelet_pose.lanelet_id == 34684 && std::abs(lanelet_pose.s) >= lane_change_position) {
           api_.getEntity(entity_name)
-            .requestLaneChange(traffic_simulator::lane_change::Direction::RIGHT);
+            .requestLaneChange(traffic_simulator::lane_change::Direction::right);
           lane_change_requested = true;
         }
       }

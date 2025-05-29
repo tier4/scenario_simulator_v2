@@ -22,31 +22,39 @@ std::ostream & operator<<(std::ostream & stream, const Request & value)
 {
   switch (value) {
     default:
-    case Request::NONE:
-      return stream << "NONE";
-    case Request::LANE_CHANGE:
-      return stream << "LANE_CHANGE";
-    case Request::FOLLOW_LANE:
-      return stream << "FOLLOW_LANE";
-    case Request::FOLLOW_POLYLINE_TRAJECTORY:
-      return stream << "FOLLOW_POLYLINE_TRAJECTORY";
-    case Request::WALK_STRAIGHT:
-      return stream << "WALK_STRAIGHT";
+    case Request::none:
+      return stream << "none";
+    case Request::lane_change:
+      return stream << "lane_change";
+    case Request::follow_lane:
+      return stream << "follow_lane";
+    case Request::follow_polyline_trajectory:
+      return stream << "follow_polyline_trajectory";
+    case Request::follow_clothoid_trajectory:
+      return stream << "follow_clothoid_trajectory";
+    case Request::follow_nurbs_trajectory:
+      return stream << "follow_nurbs_trajectory";
+    case Request::walk_straight:
+      return stream << "walk_straight";
   }
 }
 
 std::string getRequestString(const Request & request)
 {
   switch (request) {
-    case Request::NONE:
+    case Request::none:
       return "none";
-    case Request::LANE_CHANGE:
+    case Request::lane_change:
       return "lane_change";
-    case Request::FOLLOW_LANE:
+    case Request::follow_lane:
       return "follow_lane";
-    case Request::FOLLOW_POLYLINE_TRAJECTORY:
+    case Request::follow_polyline_trajectory:
       return "follow_polyline_trajectory";
-    case Request::WALK_STRAIGHT:
+    case Request::follow_clothoid_trajectory:
+      return "follow_clothoid_trajectory";
+    case Request::follow_nurbs_trajectory:
+      return "follow_nurbs_trajectory";
+    case Request::walk_straight:
       return "walk_straight";
     default:
       THROW_SEMANTIC_ERROR(request, " is invalid");

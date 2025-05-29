@@ -120,9 +120,9 @@ TEST(helper, constructPose)
 TEST(helper, constructLidarConfiguration)
 {
   EXPECT_NO_THROW(traffic_simulator::helper::constructLidarConfiguration(
-    traffic_simulator::helper::LidarType::VLP16, "ego", "test"));
+    traffic_simulator::helper::LidarType::vlp16, "ego", "test"));
   EXPECT_NO_THROW(traffic_simulator::helper::constructLidarConfiguration(
-    traffic_simulator::helper::LidarType::VLP32, "ego", "test"));
+    traffic_simulator::helper::LidarType::vlp32, "ego", "test"));
 }
 
 /**

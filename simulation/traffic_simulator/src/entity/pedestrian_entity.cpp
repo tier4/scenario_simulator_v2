@@ -34,7 +34,7 @@ PedestrianEntity::PedestrianEntity(
   loader_(pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase>(
     "traffic_simulator", "entity_behavior::BehaviorPluginBase")),
   behavior_plugin_ptr_(loader_.createSharedInstance(plugin_name)),
-  route_planner_(traffic_simulator::RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER, hdmap_utils_ptr_)
+  route_planner_(traffic_simulator::RoutingGraphType::vehicle_with_road_shoulder, hdmap_utils_ptr_)
 {
   behavior_plugin_ptr_->configure(rclcpp::get_logger(name));
   behavior_plugin_ptr_->setPedestrianParameters(parameters);
@@ -57,7 +57,7 @@ void PedestrianEntity::requestAssignRoute(
   if (!isInLanelet()) {
     return;
   }
-  behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
+  behavior_plugin_ptr_->setRequest(behavior::Request::follow_lane);
   route_planner_.setWaypoints(waypoints);
   std::vector<geometry_msgs::msg::Pose> goal_poses;
   for (const auto & waypoint : waypoints) {
@@ -87,7 +87,7 @@ auto PedestrianEntity::requestFollowTrajectory(
 {
   if (parameter) {
     behavior_plugin_ptr_->setPolylineTrajectory(parameter);
-    behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_POLYLINE_TRAJECTORY);
+    behavior_plugin_ptr_->setRequest(behavior::Request::follow_polyline_trajectory);
     lanelet::Ids route_lanelets;
     const auto curve = math::geometry::CatmullRomSpline(status_->getMapPose().position, parameter);
     /// @note Hard coded parameter: 1.0 is a sample resolution of the trajectory. (Unit: m)
@@ -154,13 +154,13 @@ const traffic_simulator_msgs::msg::WaypointsArray PedestrianEntity::getWaypoints
 
 void PedestrianEntity::requestWalkStraight()
 {
-  behavior_plugin_ptr_->setRequest(behavior::Request::WALK_STRAIGHT);
+  behavior_plugin_ptr_->setRequest(behavior::Request::walk_straight);
 }
 
 void PedestrianEntity::requestAcquirePosition(
   const CanonicalizedLaneletPose & lanelet_pose, const RouteOption &)
 {
-  behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
+  behavior_plugin_ptr_->setRequest(behavior::Request::follow_lane);
   if (status_->isInLanelet()) {
     route_planner_.setWaypoints({lanelet_pose});
   }
@@ -170,7 +170,7 @@ void PedestrianEntity::requestAcquirePosition(
 void PedestrianEntity::requestAcquirePosition(
   const geometry_msgs::msg::Pose & map_pose, const RouteOption & options)
 {
-  behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
+  behavior_plugin_ptr_->setRequest(behavior::Request::follow_lane);
   if (
     const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
       map_pose, status_->getBoundingBox(), true,
@@ -183,7 +183,7 @@ void PedestrianEntity::requestAcquirePosition(
 
 void PedestrianEntity::cancelRequest()
 {
-  behavior_plugin_ptr_->setRequest(behavior::Request::NONE);
+  behavior_plugin_ptr_->setRequest(behavior::Request::none);
   route_planner_.cancelRoute();
 }
 

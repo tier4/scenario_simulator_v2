@@ -58,7 +58,7 @@
 
 namespace hdmap_utils
 {
-enum class LaneletType { LANE, CROSSWALK };
+enum class LaneletType { lane, crosswalk };
 
 class HdMapUtils
 {

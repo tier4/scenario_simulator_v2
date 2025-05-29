@@ -58,7 +58,7 @@ private:
       getVehicleParameters());
     ego_entity.setLinearVelocity(0);
     ego_entity.requestSpeedChange(
-      10.0, traffic_simulator::speed_change::Transition::LINEAR,
+      10.0, traffic_simulator::speed_change::Transition::linear,
       traffic_simulator::speed_change::Constraint(
         traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 10.0),
       true);
@@ -68,7 +68,8 @@ private:
       getVehicleParameters());
     front_entity.setLinearVelocity(0);
     front_entity.requestSpeedChange(
-      10.0, traffic_simulator::speed_change::Transition::STEP,
+      10.0, traffic_simulator::speed_change::Transition::linear,
+      10.0, traffic_simulator::speed_change::Transition::step,
       traffic_simulator::speed_change::Constraint(
         traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 10.0),
       true);

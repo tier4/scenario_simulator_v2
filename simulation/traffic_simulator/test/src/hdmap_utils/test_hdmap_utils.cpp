@@ -1273,7 +1273,7 @@ TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLaneChangeableLaneletId_straight)
 {
   const lanelet::Id start_and_end_lanelet = 199;
   const auto result_lanelet = hdmap_utils.getLaneChangeableLaneletId(
-    start_and_end_lanelet, traffic_simulator::lane_change::Direction::STRAIGHT);
+    start_and_end_lanelet, traffic_simulator::lane_change::Direction::straight);
 
   EXPECT_TRUE(result_lanelet.has_value());
   EXPECT_EQ(start_and_end_lanelet, result_lanelet);
@@ -1287,7 +1287,7 @@ TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLaneChangeableLaneletId_straight)
 TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLaneChangeableLaneletId_leftNoChangeable)
 {
   EXPECT_FALSE(
-    hdmap_utils.getLaneChangeableLaneletId(199, traffic_simulator::lane_change::Direction::LEFT)
+    hdmap_utils.getLaneChangeableLaneletId(199, traffic_simulator::lane_change::Direction::left)
       .has_value());
 }
 
@@ -1299,7 +1299,7 @@ TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLaneChangeableLaneletId_leftNoChan
 TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLaneChangeableLaneletId_leftChangeable)
 {
   const auto result_lanelet =
-    hdmap_utils.getLaneChangeableLaneletId(200, traffic_simulator::lane_change::Direction::LEFT);
+    hdmap_utils.getLaneChangeableLaneletId(200, traffic_simulator::lane_change::Direction::left);
 
   EXPECT_TRUE(result_lanelet.has_value());
   EXPECT_EQ(result_lanelet.value(), 199);
@@ -1313,7 +1313,7 @@ TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLaneChangeableLaneletId_leftChange
 TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLaneChangeableLaneletId_rightNoChangeable)
 {
   EXPECT_FALSE(
-    hdmap_utils.getLaneChangeableLaneletId(202, traffic_simulator::lane_change::Direction::RIGHT)
+    hdmap_utils.getLaneChangeableLaneletId(202, traffic_simulator::lane_change::Direction::right)
       .has_value());
 }
 
@@ -1325,7 +1325,7 @@ TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLaneChangeableLaneletId_rightNoCha
 TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLaneChangeableLaneletId_rightChangeable)
 {
   const auto result_lanelet =
-    hdmap_utils.getLaneChangeableLaneletId(200, traffic_simulator::lane_change::Direction::RIGHT);
+    hdmap_utils.getLaneChangeableLaneletId(200, traffic_simulator::lane_change::Direction::right);
 
   EXPECT_TRUE(result_lanelet.has_value());
   EXPECT_EQ(result_lanelet.value(), 201);
@@ -1340,7 +1340,7 @@ TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLaneChangeableLaneletId_rightChang
 TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLaneChangeableLaneletId_shift2LeftPossible)
 {
   const auto result_lanelet =
-    hdmap_utils.getLaneChangeableLaneletId(201, traffic_simulator::lane_change::Direction::LEFT, 2);
+    hdmap_utils.getLaneChangeableLaneletId(201, traffic_simulator::lane_change::Direction::left, 2);
 
   EXPECT_TRUE(result_lanelet.has_value());
   EXPECT_EQ(result_lanelet.value(), 199);
@@ -1356,7 +1356,7 @@ TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLaneChangeableLaneletId_shift2Left
 TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLaneChangeableLaneletId_shift2LeftNotPossible)
 {
   EXPECT_FALSE(
-    hdmap_utils.getLaneChangeableLaneletId(200, traffic_simulator::lane_change::Direction::LEFT, 2)
+    hdmap_utils.getLaneChangeableLaneletId(200, traffic_simulator::lane_change::Direction::left, 2)
       .has_value());
 }
 
@@ -1369,7 +1369,7 @@ TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLaneChangeableLaneletId_shift2Left
 TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLaneChangeableLaneletId_shift2RightPossible)
 {
   const auto result_lanelet = hdmap_utils.getLaneChangeableLaneletId(
-    200, traffic_simulator::lane_change::Direction::RIGHT, 2);
+    200, traffic_simulator::lane_change::Direction::right, 2);
 
   EXPECT_TRUE(result_lanelet.has_value());
   EXPECT_EQ(result_lanelet.value(), 202);
@@ -1385,7 +1385,7 @@ TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLaneChangeableLaneletId_shift2Righ
 TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLaneChangeableLaneletId_shift2RightNotPossible)
 {
   EXPECT_FALSE(
-    hdmap_utils.getLaneChangeableLaneletId(201, traffic_simulator::lane_change::Direction::RIGHT, 2)
+    hdmap_utils.getLaneChangeableLaneletId(201, traffic_simulator::lane_change::Direction::right, 2)
       .has_value());
 }
 
@@ -1396,7 +1396,7 @@ TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLaneChangeableLaneletId_shift0)
 {
   const lanelet::Id start_and_end_lanelet = 201;
   const auto result_lanelet = hdmap_utils.getLaneChangeableLaneletId(
-    start_and_end_lanelet, traffic_simulator::lane_change::Direction::RIGHT, 0);
+    start_and_end_lanelet, traffic_simulator::lane_change::Direction::right, 0);
 
   EXPECT_TRUE(result_lanelet.has_value());
   EXPECT_EQ(result_lanelet.value(), start_and_end_lanelet);
@@ -2662,7 +2662,7 @@ TEST_F(
  * Test distance to traffic light stop line obtaining correctness
  * with a road (waypoints) and a route that is not coherent with the road
  * and has a traffic light on it - the goal is to test the situation where
- * the traffic light and its stop line are checked against a road that does not overlay with them.
+ * the traffic light and its stop line are checked against a road that does not overlay with it.
  */
 TEST_F(
   HdMapUtilsTest_CrossroadsWithStoplinesMap,
@@ -2860,12 +2860,12 @@ TEST_F(HdMapUtilsTest_WithRoadShoulderMap, routingWithRoadShoulder)
 {
   traffic_simulator::RoutingConfiguration routing_configuration_without_road_shoulder;
   routing_configuration_without_road_shoulder.routing_graph_type =
-    traffic_simulator::RoutingGraphType::VEHICLE;
+    traffic_simulator::RoutingGraphType::vehicle;
   const auto route_without_road_shoulder =
     hdmap_utils.getRoute(34693, 34615, routing_configuration_without_road_shoulder);
   EXPECT_EQ(route_without_road_shoulder.size(), 0);
 
-  // default: traffic_simulator::RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER
+  // default: traffic_simulator::RoutingGraphType::vehicle_with_road_shoulder
   const auto route_with_road_shoulder =
     hdmap_utils.getRoute(34693, 34615, traffic_simulator::RoutingConfiguration());
   EXPECT_EQ(route_with_road_shoulder.size(), 4);

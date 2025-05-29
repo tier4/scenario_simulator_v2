@@ -38,9 +38,9 @@ double RelativeTargetSpeed::getAbsoluteValue(
     if (static_cast<EntityStatus>(status).name == reference_entity_name) {
       switch (type) {
         default:
-        case Type::DELTA:
+        case Type::delta:
           return status.getTwist().linear.x + value;
-        case Type::FACTOR:
+        case Type::factor:
           return status.getTwist().linear.x * value;
       }
     } else {
@@ -53,9 +53,9 @@ double RelativeTargetSpeed::getAbsoluteValue(
   } else {
     switch (type) {
       default:
-      case Type::DELTA:
+      case Type::delta:
         return iter->second.getTwist().linear.x + value;
-      case Type::FACTOR:
+      case Type::factor:
         return iter->second.getTwist().linear.x * value;
     }
   }

@@ -28,12 +28,12 @@ Job::Job(
   exclusive(exclusive),
   event(event)
 {
-  status_ = Status::ACTIVE;
+  status_ = Status::active;
 }
 
 void Job::inactivate()
 {
-  status_ = Status::INACTIVE;
+  status_ = Status::inactive;
   func_on_cleanup_();
 }
 
@@ -42,13 +42,13 @@ Status Job::getStatus() const { return status_; }
 void Job::onUpdate(const double step_time)
 {
   switch (status_) {
-    case Status::ACTIVE:
+    case Status::active:
       if (func_on_update_(job_duration_)) {
         inactivate();
       }
       job_duration_ = job_duration_ + step_time;
       return;
-    case Status::INACTIVE:
+    case Status::inactive:
       return;
   }
 }

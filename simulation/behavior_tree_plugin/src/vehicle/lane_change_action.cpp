@@ -91,7 +91,7 @@ void LaneChangeAction::getBlackBoardValues()
 BT::NodeStatus LaneChangeAction::tick()
 {
   getBlackBoardValues();
-  if (request_ != traffic_simulator::behavior::Request::LANE_CHANGE) {
+  if (request_ != traffic_simulator::behavior::Request::lane_change) {
     curve_ = std::nullopt;
     current_s_ = 0;
     return BT::NodeStatus::FAILURE;
@@ -102,7 +102,7 @@ BT::NodeStatus LaneChangeAction::tick()
     return BT::NodeStatus::FAILURE;
   }
   if (!curve_) {
-    if (request_ == traffic_simulator::behavior::Request::LANE_CHANGE) {
+    if (request_ == traffic_simulator::behavior::Request::lane_change) {
       if (!canonicalized_entity_status_->isInLanelet()) {
         return BT::NodeStatus::FAILURE;
       }
@@ -115,7 +115,7 @@ BT::NodeStatus LaneChangeAction::tick()
       traffic_simulator::LaneletPose along_pose, goal_pose;
       /// @todo traffic_simulator::lanelet_wrapper::pose::alongLaneletPose(...) will be moved to traffic_simulator::route::moveAlongLaneletPose(...)
       switch (lane_change_parameters_->constraint.type) {
-        case traffic_simulator::lane_change::Constraint::Type::NONE:
+        case traffic_simulator::lane_change::Constraint::Type::none:
           /**
           @note Hard coded parameter,
           10.0 is a maximum_curvature_threshold (If the curvature of the trajectory is over 10.0, the trajectory was not selected.)
@@ -134,13 +134,14 @@ BT::NodeStatus LaneChangeAction::tick()
           along_pose = traffic_simulator::lanelet_wrapper::pose::alongLaneletPose(
             lanelet_pose, traffic_simulator::lane_change::Parameter::default_lanechange_distance);
           break;
-        case traffic_simulator::lane_change::Constraint::Type::LONGITUDINAL_DISTANCE:
+        case traffic_simulator::lane_change::Constraint::Type::lateral_velocity:
+        case traffic_simulator::lane_change::Constraint::Type::longitudinal_distance:
           traj_with_goal =
             hdmap_utils_->getLaneChangeTrajectory(lanelet_pose, lane_change_parameters_.value());
           along_pose = traffic_simulator::lanelet_wrapper::pose::alongLaneletPose(
             lanelet_pose, lane_change_parameters_->constraint.value);
           break;
-        case traffic_simulator::lane_change::Constraint::Type::TIME:
+        case traffic_simulator::lane_change::Constraint::Type::time:
           traj_with_goal =
             hdmap_utils_->getLaneChangeTrajectory(lanelet_pose, lane_change_parameters_.value());
           along_pose = traffic_simulator::lanelet_wrapper::pose::alongLaneletPose(
@@ -157,17 +158,17 @@ BT::NodeStatus LaneChangeAction::tick()
                                     traffic_simulator::pose::toMapPose(goal_pose))
                                     .position.y);
         switch (lane_change_parameters_->constraint.type) {
-          case traffic_simulator::lane_change::Constraint::Type::NONE:
+          case traffic_simulator::lane_change::Constraint::Type::none:
             lane_change_velocity_ = canonicalized_entity_status_->getTwist().linear.x;
             break;
-          case traffic_simulator::lane_change::Constraint::Type::LATERAL_VELOCITY:
+          case traffic_simulator::lane_change::Constraint::Type::lateral_velocity:
             lane_change_velocity_ =
               curve_->getLength() / (offset / lane_change_parameters_->constraint.value);
             break;
-          case traffic_simulator::lane_change::Constraint::Type::LONGITUDINAL_DISTANCE:
+          case traffic_simulator::lane_change::Constraint::Type::longitudinal_distance:
             lane_change_velocity_ = canonicalized_entity_status_->getTwist().linear.x;
             break;
-          case traffic_simulator::lane_change::Constraint::Type::TIME:
+          case traffic_simulator::lane_change::Constraint::Type::time:
             lane_change_velocity_ = curve_->getLength() / lane_change_parameters_->constraint.value;
             break;
         }
@@ -185,7 +186,7 @@ BT::NodeStatus LaneChangeAction::tick()
       /**
        * @brief Force changing speed in order to fulfill constraint.
        */
-      case traffic_simulator::lane_change::Constraint::Policy::FORCE:
+      case traffic_simulator::lane_change::Constraint::Policy::force:
         canonicalized_entity_status_->setTwist(geometry_msgs::msg::Twist());
         canonicalized_entity_status_->setAccel(geometry_msgs::msg::Accel());
         canonicalized_entity_status_->setLinearVelocity(lane_change_velocity_);
@@ -194,7 +195,7 @@ BT::NodeStatus LaneChangeAction::tick()
       /**
        * @brief Changing linear speed and try to fulfill constraint.
        */
-      case traffic_simulator::lane_change::Constraint::Policy::BEST_EFFORT:
+      case traffic_simulator::lane_change::Constraint::Policy::best_effort:
         target_accel =
           (lane_change_velocity_ - canonicalized_entity_status_->getTwist().linear.x) / step_time_;
         if (canonicalized_entity_status_->getTwist().linear.x > target_speed_) {

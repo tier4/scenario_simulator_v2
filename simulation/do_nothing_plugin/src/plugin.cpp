@@ -179,14 +179,14 @@ void DoNothingBehavior::update(double current_time, double step_time)
   };
 
   canonicalized_entity_status_->setTime(current_time);
-  if (getRequest() == traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY) {
+  if (getRequest() == traffic_simulator::behavior::Request::follow_polyline_trajectory) {
     canonicalized_entity_status_->set(
       interpolate_entity_status_on_polyline_trajectory(), getRouteLanelets(),
       getDefaultMatchingDistanceForLaneletPoseCalculation());
     if (
       getCurrentTime() + getStepTime() >=
       do_nothing_behavior::follow_trajectory::getLastVertexTimestamp(getPolylineTrajectory())) {
-      setRequest(traffic_simulator::behavior::Request::NONE);
+      setRequest(traffic_simulator::behavior::Request::none);
     }
   } else {
     canonicalized_entity_status_->set(

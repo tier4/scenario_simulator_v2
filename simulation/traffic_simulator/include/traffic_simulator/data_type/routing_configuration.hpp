@@ -24,7 +24,7 @@ struct RoutingConfiguration
 {
   bool allow_lane_change = false;
   traffic_simulator::RoutingGraphType routing_graph_type =
-    traffic_simulator::RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER;
+    traffic_simulator::RoutingGraphType::vehicle_with_road_shoulder;
 
   bool operator==(const RoutingConfiguration & routing_configuration) const
   {

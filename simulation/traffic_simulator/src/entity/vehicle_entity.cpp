@@ -34,7 +34,7 @@ VehicleEntity::VehicleEntity(
   loader_(pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase>(
     "traffic_simulator", "entity_behavior::BehaviorPluginBase")),
   behavior_plugin_ptr_(loader_.createSharedInstance(plugin_name)),
-  route_planner_(traffic_simulator::RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER, hdmap_utils_ptr_)
+  route_planner_(traffic_simulator::RoutingGraphType::vehicle_with_road_shoulder, hdmap_utils_ptr_)
 {
   behavior_plugin_ptr_->configure(rclcpp::get_logger(name));
   behavior_plugin_ptr_->setVehicleParameters(parameters);
@@ -53,7 +53,7 @@ void VehicleEntity::appendDebugMarker(visualization_msgs::msg::MarkerArray & mar
 
 void VehicleEntity::cancelRequest()
 {
-  behavior_plugin_ptr_->setRequest(behavior::Request::NONE);
+  behavior_plugin_ptr_->setRequest(behavior::Request::none);
   route_planner_.cancelRoute();
 }
 
@@ -172,7 +172,7 @@ auto VehicleEntity::onUpdate(const double current_time, const double step_time) 
 void VehicleEntity::requestAcquirePosition(
   const CanonicalizedLaneletPose & lanelet_pose, const RouteOption &)
 {
-  behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
+  behavior_plugin_ptr_->setRequest(behavior::Request::follow_lane);
   if (status_->isInLanelet()) {
     route_planner_.setWaypoints({lanelet_pose});
   }
@@ -182,7 +182,7 @@ void VehicleEntity::requestAcquirePosition(
 void VehicleEntity::requestAcquirePosition(
   const geometry_msgs::msg::Pose & map_pose, const RouteOption & options)
 {
-  behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
+  behavior_plugin_ptr_->setRequest(behavior::Request::follow_lane);
   if (
     const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
       map_pose, status_->getBoundingBox(), false,
@@ -199,7 +199,7 @@ void VehicleEntity::requestAssignRoute(
   if (!isInLanelet()) {
     return;
   }
-  behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
+  behavior_plugin_ptr_->setRequest(behavior::Request::follow_lane);
   route_planner_.setWaypoints(waypoints);
   std::vector<geometry_msgs::msg::Pose> goal_poses;
   for (const auto & waypoint : waypoints) {
@@ -230,7 +230,7 @@ auto VehicleEntity::requestFollowTrajectory(
 {
   if (parameter) {
     behavior_plugin_ptr_->setPolylineTrajectory(parameter);
-    behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_POLYLINE_TRAJECTORY);
+    behavior_plugin_ptr_->setRequest(behavior::Request::follow_polyline_trajectory);
 
     std::vector<CanonicalizedLaneletPose> waypoints;
     lanelet::Ids route_lanelets;
@@ -257,9 +257,9 @@ auto VehicleEntity::requestFollowTrajectory(
 
 auto VehicleEntity::requestLaneChange(const lanelet::Id to_lanelet_id) -> void
 {
-  behavior_plugin_ptr_->setRequest(behavior::Request::LANE_CHANGE);
+  behavior_plugin_ptr_->setRequest(behavior::Request::lane_change);
   const auto parameter = lane_change::Parameter(
-    lane_change::AbsoluteTarget(to_lanelet_id), lane_change::TrajectoryShape::CUBIC,
+    lane_change::AbsoluteTarget(to_lanelet_id), lane_change::TrajectoryShape::cubic,
     lane_change::Constraint());
   behavior_plugin_ptr_->setLaneChangeParameters(parameter);
 }
@@ -267,7 +267,7 @@ auto VehicleEntity::requestLaneChange(const lanelet::Id to_lanelet_id) -> void
 auto VehicleEntity::requestLaneChange(const traffic_simulator::lane_change::Parameter & parameter)
   -> void
 {
-  behavior_plugin_ptr_->setRequest(behavior::Request::LANE_CHANGE);
+  behavior_plugin_ptr_->setRequest(behavior::Request::lane_change);
   behavior_plugin_ptr_->setLaneChangeParameters(parameter);
 }
 

@@ -35,11 +35,11 @@ auto LaneletWrapper::routingGraph(const RoutingGraphType type)
   -> lanelet::routing::RoutingGraphConstPtr
 {
   switch (type) {
-    case RoutingGraphType::VEHICLE:
+    case RoutingGraphType::vehicle:
       return getInstance().vehicle_.graph;
-    case RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER:
+    case RoutingGraphType::vehicle_with_road_shoulder:
       return getInstance().vehicle_with_road_shoulder_.graph;
-    case RoutingGraphType::PEDESTRIAN:
+    case RoutingGraphType::pedestrian:
       return getInstance().pedestrian_.graph;
     default:
       std::stringstream what;
@@ -52,11 +52,11 @@ auto LaneletWrapper::trafficRules(const RoutingGraphType type)
   -> lanelet::traffic_rules::TrafficRulesPtr
 {
   switch (type) {
-    case RoutingGraphType::VEHICLE:
+    case RoutingGraphType::vehicle:
       return getInstance().vehicle_.rules;
-    case RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER:
+    case RoutingGraphType::vehicle_with_road_shoulder:
       return getInstance().vehicle_with_road_shoulder_.rules;
-    case RoutingGraphType::PEDESTRIAN:
+    case RoutingGraphType::pedestrian:
       return getInstance().pedestrian_.rules;
     default:
       std::stringstream what;
@@ -68,11 +68,11 @@ auto LaneletWrapper::trafficRules(const RoutingGraphType type)
 auto LaneletWrapper::routeCache(const RoutingGraphType type) -> RouteCache &
 {
   switch (type) {
-    case RoutingGraphType::VEHICLE:
+    case RoutingGraphType::vehicle:
       return getInstance().vehicle_.route_cache;
-    case RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER:
+    case RoutingGraphType::vehicle_with_road_shoulder:
       return getInstance().vehicle_with_road_shoulder_.route_cache;
-    case RoutingGraphType::PEDESTRIAN:
+    case RoutingGraphType::pedestrian:
       return getInstance().pedestrian_.route_cache;
     default:
       std::stringstream what;

@@ -226,13 +226,13 @@ void EntityBase::requestSpeedChangeWithConstantAcceleration(
     return;
   }
   switch (transition) {
-    case speed_change::Transition::LINEAR: {
+    case speed_change::Transition::linear: {
       setLinearAcceleration(acceleration);
       requestSpeedChangeWithConstantAcceleration(
-        target_speed, speed_change::Transition::AUTO, acceleration, continuous);
+        target_speed, speed_change::Transition::auto_, acceleration, continuous);
       break;
     }
-    case speed_change::Transition::AUTO: {
+    case speed_change::Transition::auto_: {
       if (speed_planner_->isAccelerating(target_speed, getCurrentTwist())) {
         setAccelerationLimit(std::abs(acceleration));
         job_list_.append(
@@ -261,7 +261,7 @@ void EntityBase::requestSpeedChangeWithConstantAcceleration(
       requestSpeedChange(target_speed, continuous);
       break;
     }
-    case speed_change::Transition::STEP: {
+    case speed_change::Transition::step: {
       requestSpeedChange(target_speed, continuous);
       setLinearVelocity(target_speed);
       break;
@@ -278,19 +278,19 @@ void EntityBase::requestSpeedChangeWithTimeConstraint(
   }
   if (
     std::abs(acceleration_time) <= std::numeric_limits<double>::epsilon() &&
-    transition != speed_change::Transition::STEP) {
+    transition != speed_change::Transition::step) {
     requestSpeedChangeWithTimeConstraint(
-      target_speed, speed_change::Transition::STEP, acceleration_time);
+      target_speed, speed_change::Transition::step, acceleration_time);
     return;
   }
   switch (transition) {
-    case speed_change::Transition::LINEAR: {
+    case speed_change::Transition::linear: {
       requestSpeedChangeWithConstantAcceleration(
         target_speed, transition, (target_speed - getCurrentTwist().linear.x) / acceleration_time,
         false);
       break;
     }
-    case speed_change::Transition::AUTO: {
+    case speed_change::Transition::auto_: {
       setDynamicConstraints(speed_planner_->planConstraintsFromJerkAndTimeConstraint(
         target_speed, getCurrentTwist(), getCurrentAccel(), acceleration_time,
         getDynamicConstraints()));
@@ -314,7 +314,7 @@ void EntityBase::requestSpeedChangeWithTimeConstraint(
       requestSpeedChange(target_speed, false);
       break;
     }
-    case speed_change::Transition::STEP: {
+    case speed_change::Transition::step: {
       requestSpeedChange(target_speed, false);
       setLinearVelocity(target_speed);
       break;
@@ -330,14 +330,14 @@ void EntityBase::requestSpeedChange(
     return;
   }
   switch (constraint.type) {
-    case speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION:
+    case speed_change::Constraint::Type::longitudinal_acceleration:
       requestSpeedChangeWithConstantAcceleration(
         target_speed, transition, constraint.value, continuous);
       break;
-    case speed_change::Constraint::Type::TIME:
+    case speed_change::Constraint::Type::time:
       requestSpeedChangeWithTimeConstraint(target_speed, transition, constraint.value);
       break;
-    case speed_change::Constraint::Type::NONE:
+    case speed_change::Constraint::Type::none:
       requestSpeedChange(target_speed, continuous);
       break;
   }
@@ -351,13 +351,13 @@ void EntityBase::requestSpeedChangeWithConstantAcceleration(
     return;
   }
   switch (transition) {
-    case speed_change::Transition::LINEAR: {
+    case speed_change::Transition::linear: {
       setLinearAcceleration(acceleration);
       requestSpeedChangeWithConstantAcceleration(
-        target_speed, speed_change::Transition::AUTO, acceleration, continuous);
+        target_speed, speed_change::Transition::auto_, acceleration, continuous);
       break;
     }
-    case speed_change::Transition::AUTO: {
+    case speed_change::Transition::auto_: {
       job_list_.append(
         /**
          * @brief Checking if the entity reaches target speed.
@@ -391,7 +391,7 @@ void EntityBase::requestSpeedChangeWithConstantAcceleration(
       requestSpeedChange(target_speed, continuous);
       break;
     }
-    case speed_change::Transition::STEP: {
+    case speed_change::Transition::step: {
       requestSpeedChange(target_speed, continuous);
       setLinearVelocity(target_speed.getAbsoluteValue(getCanonicalizedStatus(), other_status_));
       break;
@@ -408,25 +408,25 @@ void EntityBase::requestSpeedChangeWithTimeConstraint(
   }
   if (
     std::abs(acceleration_time) <= std::numeric_limits<double>::epsilon() &&
-    transition != speed_change::Transition::STEP) {
+    transition != speed_change::Transition::step) {
     requestSpeedChangeWithTimeConstraint(
-      target_speed, speed_change::Transition::STEP, acceleration_time);
+      target_speed, speed_change::Transition::step, acceleration_time);
     return;
   }
   switch (transition) {
-    case speed_change::Transition::LINEAR: {
+    case speed_change::Transition::linear: {
       requestSpeedChangeWithTimeConstraint(
         target_speed.getAbsoluteValue(getCanonicalizedStatus(), other_status_), transition,
         acceleration_time);
       break;
     }
-    case speed_change::Transition::AUTO: {
+    case speed_change::Transition::auto_: {
       requestSpeedChangeWithTimeConstraint(
         target_speed.getAbsoluteValue(getCanonicalizedStatus(), other_status_), transition,
         acceleration_time);
       break;
     }
-    case speed_change::Transition::STEP: {
+    case speed_change::Transition::step: {
       requestSpeedChange(target_speed, false);
       setLinearVelocity(target_speed.getAbsoluteValue(getCanonicalizedStatus(), other_status_));
       break;
@@ -442,17 +442,17 @@ void EntityBase::requestSpeedChange(
     return;
   }
   switch (constraint.type) {
-    case speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION:
+    case speed_change::Constraint::Type::longitudinal_acceleration:
       requestSpeedChangeWithConstantAcceleration(
         target_speed, transition, constraint.value, continuous);
       break;
-    case speed_change::Constraint::Type::TIME:
+    case speed_change::Constraint::Type::time:
       if (continuous) {
         THROW_SEMANTIC_ERROR("continuous = true is not allowed with time constraint.");
       }
       requestSpeedChangeWithTimeConstraint(target_speed, transition, constraint.value);
       break;
-    case speed_change::Constraint::Type::NONE:
+    case speed_change::Constraint::Type::none:
       requestSpeedChange(target_speed, continuous);
       break;
   }

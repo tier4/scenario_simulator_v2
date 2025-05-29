@@ -101,7 +101,7 @@ public:
 
         if (architecture_type_ == ArchitectureType::AWF_UNIVERSE) {
           api_->attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
-            traffic_simulator::helper::LidarType::VLP16, ego_name_,
+            traffic_simulator::helper::LidarType::vlp16, ego_name_,
             stringFromArchitectureType(architecture_type_)));
 
           double constexpr detection_update_duration = 0.1;

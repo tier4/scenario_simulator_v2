@@ -31,7 +31,7 @@ TEST(Behavior, getRequestString)
     std::string str;
     EXPECT_NO_THROW(
       str =
-        traffic_simulator::behavior::getRequestString(traffic_simulator::behavior::Request::NONE));
+        traffic_simulator::behavior::getRequestString(traffic_simulator::behavior::Request::none));
     EXPECT_TRUE("none" == str);
   }
 
@@ -39,7 +39,7 @@ TEST(Behavior, getRequestString)
     std::string str;
     EXPECT_NO_THROW(
       str = traffic_simulator::behavior::getRequestString(
-        traffic_simulator::behavior::Request::LANE_CHANGE));
+        traffic_simulator::behavior::Request::lane_change));
     EXPECT_TRUE("lane_change" == str);
   }
 
@@ -47,7 +47,7 @@ TEST(Behavior, getRequestString)
     std::string str;
     EXPECT_NO_THROW(
       str = traffic_simulator::behavior::getRequestString(
-        traffic_simulator::behavior::Request::FOLLOW_LANE));
+        traffic_simulator::behavior::Request::follow_lane));
     EXPECT_TRUE("follow_lane" == str);
   }
 
@@ -55,7 +55,7 @@ TEST(Behavior, getRequestString)
     std::string str;
     EXPECT_NO_THROW(
       str = traffic_simulator::behavior::getRequestString(
-        traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY));
+        traffic_simulator::behavior::Request::follow_polyline_trajectory));
     EXPECT_TRUE("follow_polyline_trajectory" == str);
   }
 
@@ -63,7 +63,7 @@ TEST(Behavior, getRequestString)
     std::string str;
     EXPECT_NO_THROW(
       str = traffic_simulator::behavior::getRequestString(
-        traffic_simulator::behavior::Request::WALK_STRAIGHT));
+        traffic_simulator::behavior::Request::walk_straight));
     EXPECT_TRUE("walk_straight" == str);
   }
 }

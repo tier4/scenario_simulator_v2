@@ -25,19 +25,19 @@ namespace speed_change
 {
 enum class Transition {
   /// @todo Add CUBIC transition.
-  LINEAR,
+  linear,
   /// @todo Add SINUSOIDAL transition.
-  STEP,
-  AUTO
+  step,
+  auto_
 };
 
 struct Constraint
 {
   enum class Type {
     /// @todo Add DISTANCE constraint type.
-    LONGITUDINAL_ACCELERATION,
-    TIME,
-    NONE
+    longitudinal_acceleration,
+    time,
+    none
   };
   explicit constexpr Constraint(const Constraint::Type type, const double value)
   : type(type), value(value)
@@ -50,8 +50,8 @@ struct Constraint
 struct RelativeTargetSpeed
 {
   enum class Type {
-    DELTA,
-    FACTOR,
+    delta,
+    factor,
   };
   explicit RelativeTargetSpeed(
     const std::string & reference_entity_name, const RelativeTargetSpeed::Type type,

@@ -293,9 +293,9 @@ auto HdMapUtils::getConflictingCrosswalkIds(const lanelet::Ids & lanelet_ids) co
   lanelet::Ids ids;
   std::vector<lanelet::routing::RoutingGraphConstPtr> graphs;
   graphs.emplace_back(routing_graphs_->routing_graph(
-    traffic_simulator::RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER));
+    traffic_simulator::RoutingGraphType::vehicle_with_road_shoulder));
   graphs.emplace_back(
-    routing_graphs_->routing_graph(traffic_simulator::RoutingGraphType::PEDESTRIAN));
+    routing_graphs_->routing_graph(traffic_simulator::RoutingGraphType::pedestrian));
   lanelet::routing::RoutingGraphContainer container(graphs);
   for (const auto & lanelet_id : lanelet_ids) {
     const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
@@ -462,7 +462,7 @@ auto HdMapUtils::getLaneChangeableLaneletId(
 {
   if (shift == 0) {
     return getLaneChangeableLaneletId(
-      lanelet_id, traffic_simulator::lane_change::Direction::STRAIGHT, type);
+      lanelet_id, traffic_simulator::lane_change::Direction::straight, type);
   } else {
     auto reference_id = lanelet_id;
     for (uint8_t i = 0; i < shift; i++) {
@@ -487,15 +487,15 @@ auto HdMapUtils::getLaneChangeableLaneletId(
   const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
   std::optional<lanelet::Id> target = std::nullopt;
   switch (direction) {
-    case traffic_simulator::lane_change::Direction::STRAIGHT:
+    case traffic_simulator::lane_change::Direction::straight:
       target = lanelet.id();
       break;
-    case traffic_simulator::lane_change::Direction::LEFT:
+    case traffic_simulator::lane_change::Direction::left:
       if (routing_graphs_->routing_graph(type)->left(lanelet)) {
         target = routing_graphs_->routing_graph(type)->left(lanelet)->id();
       }
       break;
-    case traffic_simulator::lane_change::Direction::RIGHT:
+    case traffic_simulator::lane_change::Direction::right:
       if (routing_graphs_->routing_graph(type)->right(lanelet)) {
         target = routing_graphs_->routing_graph(type)->right(lanelet)->id();
       }
@@ -748,18 +748,18 @@ auto HdMapUtils::getLaneChangeTrajectory(
   double longitudinal_distance =
     traffic_simulator::lane_change::Parameter::default_lanechange_distance;
   switch (lane_change_parameter.constraint.type) {
-    case traffic_simulator::lane_change::Constraint::Type::NONE:
+    case traffic_simulator::lane_change::Constraint::Type::none:
       longitudinal_distance =
         traffic_simulator::lane_change::Parameter::default_lanechange_distance;
       break;
-    case traffic_simulator::lane_change::Constraint::Type::LATERAL_VELOCITY:
+    case traffic_simulator::lane_change::Constraint::Type::lateral_velocity:
       longitudinal_distance =
         traffic_simulator::lane_change::Parameter::default_lanechange_distance;
       break;
-    case traffic_simulator::lane_change::Constraint::Type::LONGITUDINAL_DISTANCE:
+    case traffic_simulator::lane_change::Constraint::Type::longitudinal_distance:
       longitudinal_distance = lane_change_parameter.constraint.value;
       break;
-    case traffic_simulator::lane_change::Constraint::Type::TIME:
+    case traffic_simulator::lane_change::Constraint::Type::time:
       longitudinal_distance =
         traffic_simulator::lane_change::Parameter::default_lanechange_distance;
       break;
@@ -848,7 +848,7 @@ auto HdMapUtils::getLaneChangeTrajectory(
   geometry_msgs::msg::Pose goal_pose = pose::toMapPose(to_pose).pose;
   double tangent_vector_size_in_curve = 0.0;
   switch (trajectory_shape) {
-    case traffic_simulator::lane_change::TrajectoryShape::CUBIC:
+    case traffic_simulator::lane_change::TrajectoryShape::cubic:
       start_vec = getVectorFromPose(from_pose, tangent_vector_size);
       if (getTangentVector(to_pose.lanelet_id, to_pose.s)) {
         to_vec = getTangentVector(to_pose.lanelet_id, to_pose.s).value();
@@ -859,7 +859,7 @@ auto HdMapUtils::getLaneChangeTrajectory(
       }
       tangent_vector_size_in_curve = tangent_vector_size;
       break;
-    case traffic_simulator::lane_change::TrajectoryShape::LINEAR:
+    case traffic_simulator::lane_change::TrajectoryShape::linear:
       start_vec.x = (goal_pose.position.x - from_pose.position.x);
       start_vec.y = (goal_pose.position.y - from_pose.position.y);
       start_vec.z = (goal_pose.position.z - from_pose.position.z);
@@ -1523,11 +1523,11 @@ lanelet::routing::RoutingGraphPtr HdMapUtils::RoutingGraphs::routing_graph(
   const traffic_simulator::RoutingGraphType type) const
 {
   switch (type) {
-    case traffic_simulator::RoutingGraphType::VEHICLE:
+    case traffic_simulator::RoutingGraphType::vehicle:
       return vehicle.graph;
-    case traffic_simulator::RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER:
+    case traffic_simulator::RoutingGraphType::vehicle_with_road_shoulder:
       return vehicle_with_road_shoulder.graph;
-    case traffic_simulator::RoutingGraphType::PEDESTRIAN:
+    case traffic_simulator::RoutingGraphType::pedestrian:
       return pedestrian.graph;
     default:
       std::stringstream what;
@@ -1540,11 +1540,11 @@ lanelet::traffic_rules::TrafficRulesPtr HdMapUtils::RoutingGraphs::traffic_rule(
   const traffic_simulator::RoutingGraphType type) const
 {
   switch (type) {
-    case traffic_simulator::RoutingGraphType::VEHICLE:
+    case traffic_simulator::RoutingGraphType::vehicle:
       return vehicle.rules;
-    case traffic_simulator::RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER:
+    case traffic_simulator::RoutingGraphType::vehicle_with_road_shoulder:
       return vehicle_with_road_shoulder.rules;
-    case traffic_simulator::RoutingGraphType::PEDESTRIAN:
+    case traffic_simulator::RoutingGraphType::pedestrian:
       return pedestrian.rules;
     default:
       std::stringstream what;
@@ -1556,11 +1556,11 @@ lanelet::traffic_rules::TrafficRulesPtr HdMapUtils::RoutingGraphs::traffic_rule(
 RouteCache & HdMapUtils::RoutingGraphs::route_cache(const traffic_simulator::RoutingGraphType type)
 {
   switch (type) {
-    case traffic_simulator::RoutingGraphType::VEHICLE:
+    case traffic_simulator::RoutingGraphType::vehicle:
       return vehicle.route_cache;
-    case traffic_simulator::RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER:
+    case traffic_simulator::RoutingGraphType::vehicle_with_road_shoulder:
       return vehicle_with_road_shoulder.route_cache;
-    case traffic_simulator::RoutingGraphType::PEDESTRIAN:
+    case traffic_simulator::RoutingGraphType::pedestrian:
       return pedestrian.route_cache;
     default:
       std::stringstream what;

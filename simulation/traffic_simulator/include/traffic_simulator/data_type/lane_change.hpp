@@ -26,9 +26,9 @@ namespace traffic_simulator
 {
 namespace lane_change
 {
-enum class Direction { STRAIGHT = 0, LEFT = 1, RIGHT = 2 };
+enum class Direction { straight = 0, left = 1, right = 2 };
 
-enum class TrajectoryShape { CUBIC = 0, LINEAR = 1 };
+enum class TrajectoryShape { cubic = 0, linear = 1 };
 
 struct AbsoluteTarget
 {
@@ -42,10 +42,10 @@ struct AbsoluteTarget
 
 struct Constraint
 {
-  enum class Type { NONE = 0, LATERAL_VELOCITY = 1, LONGITUDINAL_DISTANCE = 2, TIME = 3 };
-  enum class Policy { FORCE = 0, BEST_EFFORT = 1 };
+  enum class Type { none = 0, lateral_velocity = 1, longitudinal_distance = 2, time = 3 };
+  enum class Policy { force = 0, best_effort = 1 };
   explicit constexpr Constraint(
-    const Type type = Type::NONE, const double value = 0, const Policy policy = Policy::FORCE)
+    const Type type = Type::none, const double value = 0, const Policy policy = Policy::force)
   : type(type), value(value), policy(policy)
   {
   }

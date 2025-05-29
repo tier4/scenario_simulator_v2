@@ -57,7 +57,7 @@ auto SpeedProfileAction::apply(const Entity & actor, const SpeedProfileEntry & s
   auto relative_target_speed = [&]() {
     return traffic_simulator::speed_change::RelativeTargetSpeed(
       entity_ref,                                                         //
-      traffic_simulator::speed_change::RelativeTargetSpeed::Type::DELTA,  //
+      traffic_simulator::speed_change::RelativeTargetSpeed::Type::delta,  //
       speed_profile_entry.speed);
   };
 
@@ -66,26 +66,26 @@ auto SpeedProfileAction::apply(const Entity & actor, const SpeedProfileEntry & s
       switch (following_mode) {
         case FollowingMode::position:
           return traffic_simulator::speed_change::Constraint(
-            traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION,
+            traffic_simulator::speed_change::Constraint::Type::longitudinal_acceleration,
             traffic_simulator_msgs::msg::BehaviorParameter().dynamic_constraints.max_acceleration);
         default:
         case FollowingMode::follow:
           return traffic_simulator::speed_change::Constraint(
-            traffic_simulator::speed_change::Constraint::Type::NONE, 0);
+            traffic_simulator::speed_change::Constraint::Type::none, 0);
       }
     } else {
       return traffic_simulator::speed_change::Constraint(
-        traffic_simulator::speed_change::Constraint::Type::TIME, speed_profile_entry.time);
+        traffic_simulator::speed_change::Constraint::Type::time, speed_profile_entry.time);
     }
   };
 
   auto transition = [&]() {
     switch (following_mode) {
       case FollowingMode::position:
-        return traffic_simulator::speed_change::Transition::LINEAR;
+        return traffic_simulator::speed_change::Transition::linear;
       default:
       case FollowingMode::follow:
-        return traffic_simulator::speed_change::Transition::AUTO;
+        return traffic_simulator::speed_change::Transition::auto_;
     }
   };
 

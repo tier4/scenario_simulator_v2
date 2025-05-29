@@ -35,7 +35,7 @@ TEST(Job, onUpdate)
   auto job = traffic_simulator::job::Job(
     [](const double) { return true; },
     [&was_cleanup_func_called]() { was_cleanup_func_called = true; },
-    traffic_simulator::job::Type::UNKOWN, true, traffic_simulator::job::Event::POST_UPDATE);
+    traffic_simulator::job::Type::unknown, true, traffic_simulator::job::Event::post_update);
   job.onUpdate(0.0);
 
   EXPECT_TRUE(was_cleanup_func_called);

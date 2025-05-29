@@ -29,14 +29,14 @@ int main(int argc, char ** argv)
 TEST(JobList, append)
 {
   bool was_cleanup_func_called = false;
-  const auto event = traffic_simulator::job::Event::POST_UPDATE;
+  const auto event = traffic_simulator::job::Event::post_update;
 
   auto job_list = traffic_simulator::job::JobList();
 
   job_list.append(
     [](const double) { return true; },
     [&was_cleanup_func_called]() { was_cleanup_func_called = true; },
-    traffic_simulator::job::Type::UNKOWN, true, event);
+    traffic_simulator::job::Type::unknown, true, event);
 
   job_list.update(0.0, event);
 
@@ -55,8 +55,8 @@ TEST(JobList, append_doubled)
   bool second_cleanup = false;
   bool second_update = false;
 
-  const auto type = traffic_simulator::job::Type::UNKOWN;
-  const auto event = traffic_simulator::job::Event::POST_UPDATE;
+  const auto type = traffic_simulator::job::Type::unknown;
+  const auto event = traffic_simulator::job::Event::post_update;
   const bool is_exclusive = true;
 
   auto job_list = traffic_simulator::job::JobList();
@@ -85,7 +85,7 @@ TEST(JobList, update)
   int update_count = 0;
   int cleanup_count = 0;
 
-  const auto event = traffic_simulator::job::Event::POST_UPDATE;
+  const auto event = traffic_simulator::job::Event::post_update;
   auto job_list = traffic_simulator::job::JobList();
 
   job_list.append(
@@ -93,7 +93,7 @@ TEST(JobList, update)
       update_count++;
       return update_count >= 2;
     },
-    [&cleanup_count]() { cleanup_count++; }, traffic_simulator::job::Type::UNKOWN, true, event);
+    [&cleanup_count]() { cleanup_count++; }, traffic_simulator::job::Type::unknown, true, event);
 
   const double step_time = 0.0;
 

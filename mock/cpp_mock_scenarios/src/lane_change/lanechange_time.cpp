@@ -67,10 +67,10 @@ private:
     ego_entity.requestSpeedChange(10, true);
     ego_entity.requestLaneChange(
       traffic_simulator::lane_change::RelativeTarget(
-        "ego", traffic_simulator::lane_change::Direction::LEFT, 1, 0),
-      traffic_simulator::lane_change::TrajectoryShape::CUBIC,
+      "ego", traffic_simulator::lane_change::Direction::left, 1, 0),
+      traffic_simulator::lane_change::TrajectoryShape::cubic,
       traffic_simulator::lane_change::Constraint(
-        traffic_simulator::lane_change::Constraint::Type::TIME, 20.0));
+        traffic_simulator::lane_change::Constraint::Type::time, 20.0));
   }
 };
 }  // namespace cpp_mock_scenarios

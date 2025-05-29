@@ -21,12 +21,14 @@ namespace routing_graph_type
 char const * to_string(const RoutingGraphType & type)
 {
   switch (type) {
-    case RoutingGraphType::VEHICLE:
-      return "VEHICLE";
-    case RoutingGraphType::PEDESTRIAN:
-      return "PEDESTRIAN";
+    case RoutingGraphType::vehicle:
+      return "vehicle";
+    case RoutingGraphType::pedestrian:
+      return "pedestrian";
+    case RoutingGraphType::vehicle_with_road_shoulder:
+      return "vehicle_with_road_shoulder";
     default:
-      return "UNKNOWN";
+      return "unknown";
   }
 }
 }  // namespace routing_graph_type

@@ -4349,7 +4349,7 @@ Changelog for package traffic_simulator
 * Fix typo
 * Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
 * Update enumeration `traffic_simulator::behavior::Request`
-* Add new behavior request `Request::FOLLOW_TRAJECTORY`
+* Add new behavior request `request::follow_trajectory`
 * Add new API `requestFollowTrajectory`
 * Add new struct `follow_trajectory::Parameter` for behavior plugin
 * Contributors: Dawid Moszynski, Dawid Moszyński, Kosuke Takeuchi, Kotaro Yoshimoto, Lukasz Chojnacki, Masaya Kataoka, Piotr Zyskowski, Tatsuya Yamasaki, hrjp, kosuke55, yamacir-kit

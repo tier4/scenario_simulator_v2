@@ -52,7 +52,7 @@ private:
       front_entity.requestSpeedChange(
         traffic_simulator::speed_change::RelativeTargetSpeed(
           "ego", traffic_simulator::speed_change::RelativeTargetSpeed::Type::DELTA, 2.0),
-        traffic_simulator::speed_change::Transition::LINEAR,
+      traffic_simulator::speed_change::Transition::linear,
         traffic_simulator::speed_change::Constraint(
           traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 1.0),
         true);

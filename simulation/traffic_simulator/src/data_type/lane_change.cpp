@@ -46,12 +46,12 @@ std::ostream & operator<<(std::ostream & stream, const Direction & value)
 {
   switch (value) {
     default:
-    case Direction::STRAIGHT:
-      return stream << "STRAIGHT";
-    case Direction::LEFT:
-      return stream << "LEFT";
-    case Direction::RIGHT:
-      return stream << "RIGHT";
+    case Direction::straight:
+      return stream << "straight";
+    case Direction::left:
+      return stream << "left";
+    case Direction::right:
+      return stream << "right";
   }
 }
 
@@ -59,10 +59,10 @@ std::ostream & operator<<(std::ostream & stream, const TrajectoryShape & value)
 {
   switch (value) {
     default:
-    case TrajectoryShape::CUBIC:
-      return stream << "CUBIC";
-    case TrajectoryShape::LINEAR:
-      return stream << "LINEAR";
+    case TrajectoryShape::cubic:
+      return stream << "cubic";
+    case TrajectoryShape::linear:
+      return stream << "linear";
   }
 }
 
@@ -70,10 +70,10 @@ std::ostream & operator<<(std::ostream & stream, const Constraint::Policy & valu
 {
   switch (value) {
     default:
-    case Constraint::Policy::FORCE:
-      return stream << "FORCE";
-    case Constraint::Policy::BEST_EFFORT:
-      return stream << "BEST_EFFORT";
+    case Constraint::Policy::force:
+      return stream << "force";
+    case Constraint::Policy::best_effort:
+      return stream << "best_effort";
   }
 }
 
@@ -81,14 +81,14 @@ std::ostream & operator<<(std::ostream & stream, const Constraint::Type & value)
 {
   switch (value) {
     default:
-    case Constraint::Type::NONE:
-      return stream << "NONE";
-    case Constraint::Type::LATERAL_VELOCITY:
-      return stream << "LATERAL_VELOCITY";
-    case Constraint::Type::LONGITUDINAL_DISTANCE:
-      return stream << "LONGITUDINAL_DISTANCE";
-    case Constraint::Type::TIME:
-      return stream << "TIME";
+    case Constraint::Type::none:
+      return stream << "none";
+    case Constraint::Type::lateral_velocity:
+      return stream << "lateral_velocity";
+    case Constraint::Type::longitudinal_distance:
+      return stream << "longitudinal_distance";
+    case Constraint::Type::time:
+      return stream << "time";
   }
 }
 

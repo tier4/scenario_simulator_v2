@@ -73,8 +73,8 @@ BT::NodeStatus FollowFrontEntityAction::tick()
 {
   getBlackBoardValues();
   if (
-    request_ != traffic_simulator::behavior::Request::NONE &&
-    request_ != traffic_simulator::behavior::Request::FOLLOW_LANE) {
+    request_ != traffic_simulator::behavior::Request::none &&
+    request_ != traffic_simulator::behavior::Request::follow_lane) {
     return BT::NodeStatus::FAILURE;
   }
   if (getRightOfWayEntities(route_lanelets_).size() != 0) {
