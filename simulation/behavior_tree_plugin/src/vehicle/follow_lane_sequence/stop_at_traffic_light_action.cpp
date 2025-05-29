@@ -94,7 +94,7 @@ bool StopAtTrafficLightAction::checkPreconditions()
     return false;
   } else if (!behavior_parameter_.see_around) {
     return false;
-  } else if (getRightOfWayEntities(route_lanelets_).empty()) {
+  } else if (!getRightOfWayEntities(route_lanelets_).empty()) {
     return false;
   } else {
     return true;
