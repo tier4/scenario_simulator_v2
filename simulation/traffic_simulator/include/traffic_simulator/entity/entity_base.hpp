@@ -255,7 +255,8 @@ public:
 
   virtual void requestSpeedChange(const double target_speed, const bool continuous);
 
-  virtual void requestSpeedChange(const speed_change::RelativeTargetSpeed &, bool);
+  virtual void requestSpeedChange(
+    const speed_change::RelativeTargetSpeed & target_speed, const bool continuous);
 
   virtual auto requestSynchronize(
     const std::string & target_name, const LaneletPose & target_sync_pose,
