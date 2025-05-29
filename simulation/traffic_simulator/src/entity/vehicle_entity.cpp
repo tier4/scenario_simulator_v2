@@ -159,7 +159,15 @@ auto VehicleEntity::onUpdate(const double current_time, const double step_time) 
   }
   behavior_plugin_ptr_->setReferenceTrajectory(spline_);
   /// @note CanonicalizedEntityStatus is updated here, it is not skipped even if isAtEndOfLanelets return true
-  behavior_plugin_ptr_->update(current_time, step_time);
+  try {
+    behavior_plugin_ptr_->update(current_time, step_time);
+  } catch (const common::scenario_simulator_exception::SemanticError & e) {
+    THROW_SIMULATION_ERROR(
+      "VehicleEntity ", getName(), " failed to update behavior plugin: ", e.what());
+  } catch (const common::scenario_simulator_exception::SimulationError & e) {
+    THROW_SIMULATION_ERROR(
+      "VehicleEntity ", getName(), " failed to update behavior plugin: ", e.what());
+  }
   if (const auto canonicalized_lanelet_pose = status_->getCanonicalizedLaneletPose()) {
     if (pose::isAtEndOfLanelets(canonicalized_lanelet_pose.value(), hdmap_utils_ptr_)) {
       stopAtCurrentPosition();
