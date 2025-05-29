@@ -28,58 +28,45 @@ namespace do_nothing_behavior
 {
 namespace follow_trajectory
 {
-bool checkPolylineTrajectory(
-  const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & trajectory)
+bool checkPolylineTrajectory(const traffic_simulator_msgs::msg::PolylineTrajectory & trajectory)
 {
-  if (trajectory) {
-    if (trajectory->closed) {
-      THROW_SIMULATION_ERROR("Currently, closed trajectory does not supported.");
-    }
-    if (!trajectory->dynamic_constraints_ignorable) {
-      THROW_SIMULATION_ERROR(
-        "Currently, dynamic_constraints_ignorable = true (in OpenSCENARIO, followingMode = "
-        "follow) does not support in DoNothingBehavior.");
-    }
-    if (std::abs(trajectory->initial_distance_offset) > std::numeric_limits<double>::epsilon()) {
-      THROW_SIMULATION_ERROR(
-        "Currently, initial_distance_offset should be 0 when following trajectory in "
-        "DoNothingBehavior.",
-        "You specified : ", trajectory->initial_distance_offset);
-    }
-    if (trajectory->shape.vertices.size() <= 1) {
-      THROW_SIMULATION_ERROR(
-        "FollowPolylineTrajectory is requested, but vertex points are less than 1 point.",
-        "At least 2 vertex points are required.", "Please check description of the scenario.");
-    }
-  } else {
+  if (trajectory.closed) {
+    THROW_SIMULATION_ERROR("Currently, closed trajectory does not supported.");
+  }
+  if (!trajectory.dynamic_constraints_ignorable) {
     THROW_SIMULATION_ERROR(
-      "Traffic simulator send requests of FollowTrajectory, but the trajectory is empty.",
-      "This message is not originally intended to be displayed, if you see it, please "
-      "contact the developer of traffic_simulator.");
+      "Currently, dynamic_constraints_ignorable = true (in OpenSCENARIO, followingMode = "
+      "follow) does not support in DoNothingBehavior.");
+  }
+  if (std::abs(trajectory.initial_distance_offset) > std::numeric_limits<double>::epsilon()) {
+    THROW_SIMULATION_ERROR(
+      "Currently, initial_distance_offset should be 0 when following trajectory in "
+      "DoNothingBehavior.",
+      "You specified : ", trajectory.initial_distance_offset);
+  }
+  if (trajectory.shape.vertices.size() <= 1) {
+    THROW_SIMULATION_ERROR(
+      "FollowPolylineTrajectory is requested, but vertex points are less than 1 point.",
+      "At least 2 vertex points are required.", "Please check description of the scenario.");
   }
   return true;
 }
 
-auto getLastVertexTimestamp(
-  const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & trajectory)
+auto getLastVertexTimestamp(const traffic_simulator_msgs::msg::PolylineTrajectory & trajectory)
   -> std::optional<double>
 {
   checkPolylineTrajectory(trajectory);
-  return trajectory->base_time + trajectory->shape.vertices.back().time;
+  return trajectory.base_time + trajectory.shape.vertices.back().time;
 }
 
 auto interpolateEntityStatusFromPolylineTrajectory(
-  const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & trajectory,
+  const traffic_simulator_msgs::msg::PolylineTrajectory & trajectory,
   const std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus> & entity_status,
   double current_time, double step_time) -> std::optional<traffic_simulator::EntityStatus>
 {
   using math::geometry::operator*;
   using math::geometry::operator-;
   using math::geometry::operator+;
-
-  if (!trajectory) {
-    return std::nullopt;
-  }
 
   const auto interpolate_entity_status =
     [&](
@@ -127,25 +114,24 @@ auto interpolateEntityStatusFromPolylineTrajectory(
 
   if (
     (current_time + step_time) <=
-    (trajectory->base_time + trajectory->shape.vertices.begin()->time)) {
+    (trajectory.base_time + trajectory.shape.vertices.begin()->time)) {
     return std::nullopt;
   }
   if (
-    (trajectory->base_time + trajectory->shape.vertices.back().time) <=
-    (current_time + step_time)) {
+    (trajectory.base_time + trajectory.shape.vertices.back().time) <= (current_time + step_time)) {
     return interpolate_entity_status(
-      1, *std::prev(trajectory->shape.vertices.end(), 2),
-      *std::prev(trajectory->shape.vertices.end(), 1));
+      1, *std::prev(trajectory.shape.vertices.end(), 2),
+      *std::prev(trajectory.shape.vertices.end(), 1));
   }
   if (const auto vertex_iter = std::adjacent_find(
-        trajectory->shape.vertices.begin(), trajectory->shape.vertices.end(),
+        trajectory.shape.vertices.begin(), trajectory.shape.vertices.end(),
         [&](const auto & vertex_a, const auto & vertex_b) {
-          return (trajectory->base_time + vertex_a.time) <= (current_time + step_time) and
-                 (current_time + step_time) <= (trajectory->base_time + vertex_b.time);
+          return (trajectory.base_time + vertex_a.time) <= (current_time + step_time) and
+                 (current_time + step_time) <= (trajectory.base_time + vertex_b.time);
         });
-      vertex_iter != trajectory->shape.vertices.end()) {
+      vertex_iter != trajectory.shape.vertices.end()) {
     return interpolate_entity_status(
-      (current_time + step_time - trajectory->base_time - vertex_iter->time) /
+      (current_time + step_time - trajectory.base_time - vertex_iter->time) /
         (std::next(vertex_iter)->time - vertex_iter->time),
       *vertex_iter, *std::next(vertex_iter));
   } else {

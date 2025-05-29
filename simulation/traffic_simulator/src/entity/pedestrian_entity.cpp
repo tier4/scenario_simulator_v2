@@ -83,9 +83,9 @@ void PedestrianEntity::requestAssignRoute(
 }
 
 auto PedestrianEntity::requestFollowTrajectory(
-  const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & parameter) -> void
+  const traffic_simulator_msgs::msg::PolylineTrajectory & parameter) -> void
 {
-  if (parameter) {
+  if (!parameter.shape.vertices.empty()) {
     behavior_plugin_ptr_->setPolylineTrajectory(parameter);
     behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_POLYLINE_TRAJECTORY);
     lanelet::Ids route_lanelets;

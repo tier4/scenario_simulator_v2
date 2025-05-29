@@ -23,7 +23,7 @@ auto FollowPolylineTrajectoryAction::calculateWaypoints()
 {
   auto waypoints = traffic_simulator_msgs::msg::WaypointsArray();
   waypoints.waypoints.push_back(canonicalized_entity_status_->getMapPose().position);
-  for (const auto & vertex : polyline_trajectory->shape.vertices) {
+  for (const auto & vertex : polyline_trajectory.shape.vertices) {
     waypoints.waypoints.push_back(vertex.position.position);
   }
   return waypoints;
@@ -67,8 +67,7 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
   if (getBlackBoardValues();
       request_ != traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY or
       not getInput<decltype(polyline_trajectory)>("polyline_trajectory", polyline_trajectory) or
-      not getInput<decltype(target_speed_)>("target_speed", target_speed_) or
-      not polyline_trajectory) {
+      not getInput<decltype(target_speed_)>("target_speed", target_speed_)) {
     return BT::NodeStatus::FAILURE;
   } else if (std::isnan(canonicalized_entity_status_->getTime())) {
     THROW_SIMULATION_ERROR(
@@ -77,7 +76,7 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
   } else if (
     const auto entity_status_updated = traffic_simulator::follow_trajectory::makeUpdatedStatus(
       static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status_),
-      *polyline_trajectory, behavior_parameter_, hdmap_utils_, step_time_,
+      polyline_trajectory, behavior_parameter_, hdmap_utils_, step_time_,
       default_matching_distance_for_lanelet_pose_calculation_, getTargetSpeed())) {
     setCanonicalizedEntityStatus(entity_status_updated.value());
     setOutput("waypoints", calculateWaypoints());

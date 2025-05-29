@@ -102,17 +102,17 @@ auto FollowTrajectoryAction::start() -> void
       }
     };
 
-    auto parameter = std::make_shared<traffic_simulator_msgs::msg::PolylineTrajectory>();
+    auto parameter = traffic_simulator_msgs::msg::PolylineTrajectory();
 
-    parameter->initial_distance_offset = initial_distance_offset;
-    parameter->dynamic_constraints_ignorable =
+    parameter.initial_distance_offset = initial_distance_offset;
+    parameter.dynamic_constraints_ignorable =
       trajectory_following_mode.following_mode == FollowingMode::position;
-    parameter->base_time =
+    parameter.base_time =
       time_reference.as<Timing>().domain_absolute_relative == ReferenceContext::absolute
         ? std::numeric_limits<double>::quiet_NaN()
         : evaluateSimulationTime();
-    parameter->closed = trajectory_ref.trajectory.as<Trajectory>().closed;
-    parameter->shape = repack_trajectory();
+    parameter.closed = trajectory_ref.trajectory.as<Trajectory>().closed;
+    parameter.shape = repack_trajectory();
 
     actor.apply([&](const auto & object) { applyFollowTrajectoryAction(object, parameter); });
   }

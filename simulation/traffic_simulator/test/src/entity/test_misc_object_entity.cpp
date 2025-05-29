@@ -415,8 +415,7 @@ TEST_F(MiscObjectEntityTest_FullObject, requestLaneChange_relativeTargetInvalid)
 TEST_F(MiscObjectEntityTest_FullObject, requestFollowTrajectory)
 {
   EXPECT_THROW(
-    misc_object.requestFollowTrajectory(
-      std::make_shared<traffic_simulator_msgs::msg::PolylineTrajectory>()),
+    misc_object.requestFollowTrajectory(traffic_simulator_msgs::msg::PolylineTrajectory()),
     common::Error);
 }
 

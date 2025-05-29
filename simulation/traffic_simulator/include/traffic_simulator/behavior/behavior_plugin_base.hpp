@@ -67,7 +67,7 @@ public:
   DEFINE_GETTER_SETTER(Obstacle,                                         "obstacle",                                       std::optional<traffic_simulator_msgs::msg::Obstacle>)
   DEFINE_GETTER_SETTER(OtherEntityStatus,                                "other_entity_status",                            EntityStatusDict)
   DEFINE_GETTER_SETTER(PedestrianParameters,                             "pedestrian_parameters",                          traffic_simulator_msgs::msg::PedestrianParameters)
-  DEFINE_GETTER_SETTER(PolylineTrajectory,                               "polyline_trajectory",                            std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory>)
+  DEFINE_GETTER_SETTER(PolylineTrajectory,                               "polyline_trajectory",                            traffic_simulator_msgs::msg::PolylineTrajectory)
   DEFINE_GETTER_SETTER(ReferenceTrajectory,                              "reference_trajectory",                           std::shared_ptr<math::geometry::CatmullRomSpline>)
   DEFINE_GETTER_SETTER(Request,                                          "request",                                        traffic_simulator::behavior::Request)
   DEFINE_GETTER_SETTER(RouteLanelets,                                    "route_lanelets",                                 lanelet::Ids)
