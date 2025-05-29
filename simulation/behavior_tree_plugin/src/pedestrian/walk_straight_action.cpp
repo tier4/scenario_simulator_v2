@@ -40,11 +40,7 @@ void WalkStraightAction::getBlackBoardValues() { PedestrianActionNode::getBlackB
 
 bool WalkStraightAction::checkPreconditions()
 {
-  if (request_ != traffic_simulator::behavior::Request::WALK_STRAIGHT) {
-    return false;
-  } else {
-    return true;
-  }
+  return request_ == traffic_simulator::behavior::Request::WALK_STRAIGHT;
 }
 
 BT::NodeStatus WalkStraightAction::doAction()
