@@ -34,7 +34,8 @@ struct FollowPolylineTrajectoryAction : public VehicleActionNode
 
   static auto providedPorts() -> BT::PortsList;
 
-  auto tick() -> BT::NodeStatus override;
+  bool checkPreconditions() override;
+  BT::NodeStatus doAction() override;
 };
 }  // namespace vehicle
 }  // namespace entity_behavior

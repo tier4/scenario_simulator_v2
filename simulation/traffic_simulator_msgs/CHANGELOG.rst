@@ -24,6 +24,9 @@ Changelog for package openscenario_msgs
 16.4.2 (2025-05-23)
 -------------------
 
+16.4.5 (2025-05-30)
+-------------------
+
 16.4.4 (2025-05-28)
 -------------------
 * Merge remote-tracking branch 'origin/master' into feature/delay_curventure_calculation
