@@ -371,7 +371,11 @@ auto FieldOperatorApplication::plan(
   plan(route.back().pose, waypoints, route_option);
 }
 
-template <typename Request, typename Waypoint>
+template <
+  typename Request, typename Waypoint,
+  typename = std::enable_if_t<
+    std::is_same_v<Request, autoware_adapi_v1_msgs::srv::SetRoutePoints::Request> ||
+    std::is_same_v<Request, autoware_adapi_v1_msgs::srv::SetRoute::Request> > >
 static auto make(
   const geometry_msgs::msg::Pose & goal, const std::vector<Waypoint> & waypoints,
   const FieldOperatorApplication::RouteOption & option) -> std::shared_ptr<Request>
@@ -389,11 +393,6 @@ static auto make(
     for (const auto & waypoint : waypoints) {
       request->segments.push_back(waypoint);
     }
-  } else {
-    std::stringstream what;
-    what << "Unsupported type of Request for make in" << __FILE__ << " : " << typeid(Request).name()
-         << ". autoware_adapi_v1_msgs::srv::SetRoutePoints::Request expected.";
-    throw common::Error(what.str());
   }
 
   /*
