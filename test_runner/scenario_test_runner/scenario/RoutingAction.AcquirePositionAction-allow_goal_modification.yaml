@@ -7,7 +7,7 @@ OpenSCENARIO:
     revMinor: 3
   ParameterDeclarations:
     ParameterDeclaration:
-      - name: RoutingAction.allow_goal_modification
+      - name: RoutingAction__allow_goal_modification
         parameterType: boolean
         value: true
   CatalogLocations:
@@ -97,7 +97,7 @@ OpenSCENARIO:
                   - name: ''
                     ParameterDeclarations:
                       ParameterDeclaration:
-                        - name: RoutingAction.allow_goal_modification
+                        - name: RoutingAction__allow_goal_modification
                           parameterType: boolean
                           value: false
                     Event:

@@ -85,7 +85,7 @@ auto AcquirePositionAction::start() -> void
           // property specification takes precedence
           return from_property.value();
         } else {
-          return get_from_parameter("RoutingAction.allow_goal_modification", false);
+          return get_from_parameter("RoutingAction__allow_goal_modification", false);
         }
       }();
 

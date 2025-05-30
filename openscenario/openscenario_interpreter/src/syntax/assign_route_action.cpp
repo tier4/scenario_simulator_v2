@@ -82,7 +82,7 @@ auto AssignRouteAction::start() -> void
 
   traffic_simulator::v2::RouteOption route_option;
   route_option.use_lane_ids_for_routing =
-    get_from_parameter("RoutingAction.use_lane_ids_for_routing", false);
+    get_from_parameter("RoutingAction__use_lane_ids_for_routing", false);
 
   for (const auto & actor : actors) {
     actor.apply([&](const auto & object) {
@@ -91,7 +91,7 @@ auto AssignRouteAction::start() -> void
           // property specification takes precedence
           return from_property.value();
         } else {
-          return get_from_parameter("RoutingAction.allow_goal_modification", false);
+          return get_from_parameter("RoutingAction__allow_goal_modification", false);
         }
       }();
       applyAssignRouteAction(

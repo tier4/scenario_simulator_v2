@@ -67,7 +67,7 @@ OpenSCENARIO:
                   - name: ''
                     ParameterDeclarations:
                       ParameterDeclaration:
-                        - name: RoutingAction.use_lane_ids_for_routing
+                        - name: RoutingAction__use_lane_ids_for_routing
                           parameterType: boolean
                           value: true
                     Event:
