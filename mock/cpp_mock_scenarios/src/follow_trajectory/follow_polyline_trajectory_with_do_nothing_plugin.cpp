@@ -103,29 +103,28 @@ private:
     ego_entity.setLinearVelocity(10);
     ego_entity.requestSpeedChange(10, true);
     ego_entity.requestFollowTrajectory(
-      std::make_shared<traffic_simulator_msgs::msg::PolylineTrajectory>(
-        traffic_simulator_msgs::build<traffic_simulator_msgs::msg::PolylineTrajectory>()
-          .initial_distance_offset(0.0)
-          .dynamic_constraints_ignorable(true)
-          .base_time(0.0)
-          .closed(false)
-          .shape(traffic_simulator_msgs::build<traffic_simulator_msgs::msg::Polyline>().vertices(
-            [this]() {
-              std::vector<traffic_simulator_msgs::msg::Vertex> vertices;
-              vertices.emplace_back(
-                traffic_simulator_msgs::build<traffic_simulator_msgs::msg::Vertex>()
-                  .time(1.0)
-                  .position(trajectory_start_pose));
-              vertices.emplace_back(
-                traffic_simulator_msgs::build<traffic_simulator_msgs::msg::Vertex>()
-                  .time(1.5)
-                  .position(trajectory_waypoint_pose));
-              vertices.emplace_back(
-                traffic_simulator_msgs::build<traffic_simulator_msgs::msg::Vertex>()
-                  .time(2.0)
-                  .position(trajectory_goal_pose));
-              return vertices;
-            }()))));
+      traffic_simulator_msgs::build<traffic_simulator_msgs::msg::PolylineTrajectory>()
+        .initial_distance_offset(0.0)
+        .dynamic_constraints_ignorable(true)
+        .base_time(0.0)
+        .closed(false)
+        .shape(
+          traffic_simulator_msgs::build<traffic_simulator_msgs::msg::Polyline>().vertices([this]() {
+            std::vector<traffic_simulator_msgs::msg::Vertex> vertices;
+            vertices.emplace_back(
+              traffic_simulator_msgs::build<traffic_simulator_msgs::msg::Vertex>()
+                .time(1.0)
+                .position(trajectory_start_pose));
+            vertices.emplace_back(
+              traffic_simulator_msgs::build<traffic_simulator_msgs::msg::Vertex>()
+                .time(1.5)
+                .position(trajectory_waypoint_pose));
+            vertices.emplace_back(
+              traffic_simulator_msgs::build<traffic_simulator_msgs::msg::Vertex>()
+                .time(2.0)
+                .position(trajectory_goal_pose));
+            return vertices;
+          }())));
   }
 };
 }  // namespace cpp_mock_scenarios
