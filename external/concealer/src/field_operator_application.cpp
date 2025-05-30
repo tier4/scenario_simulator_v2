@@ -359,8 +359,10 @@ auto FieldOperatorApplication::plan(
   assert(not route.empty());
 
   std::vector<geometry_msgs::msg::Pose> waypoints;
-  for (size_t i = 0; i < route.size() - 1; ++i) {
-    waypoints.push_back(route[i].pose);
+  if (route.size() > 1) {
+    std::transform(
+      route.begin(), route.end() - 1, std::back_inserter(waypoints),
+      [](const auto & stamped_pose) { return stamped_pose.pose; });
   }
 
   RouteOption route_option;
@@ -386,13 +388,9 @@ static auto make(
   request->goal = goal;
 
   if constexpr (std::is_same_v<Request, autoware_adapi_v1_msgs::srv::SetRoutePoints::Request>) {
-    for (const auto & waypoint : waypoints) {
-      request->waypoints.push_back(waypoint);
-    }
+    request->waypoints.assign(waypoints.begin(), waypoints.end());
   } else if constexpr (std::is_same_v<Request, autoware_adapi_v1_msgs::srv::SetRoute::Request>) {
-    for (const auto & waypoint : waypoints) {
-      request->segments.push_back(waypoint);
-    }
+    request->segments.assign(waypoints.begin(), waypoints.end());
   }
 
   /*

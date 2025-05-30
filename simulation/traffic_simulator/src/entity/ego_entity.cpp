@@ -270,13 +270,13 @@ void EgoEntity::requestAssignRoute(
         "Failed to get current lanelet of ego entity. (", __FILE__, ":", __LINE__, ")");
     }
 
-    for (size_t i = 0; i < route.size(); ++i) {
+    for (const auto & route_point : route) {
       // NOTE: Interpolating between lanelets because set route API requires continuous lanelet ids on lanelet graph
       auto segment_route = hdmap_utils_ptr_->getRoute(
-        route_segments.back().preferred.id, route[i].getLaneletId(), routing_configuration);
-      for (auto lanelet_id : segment_route) {
-        route_segments.push_back(make_segment(lanelet_id));
-      }
+        route_segments.back().preferred.id, route_point.getLaneletId(), routing_configuration);
+      std::transform(
+        segment_route.begin(), segment_route.end(), std::back_inserter(route_segments),
+        [make_segment](const int64_t & lanelet_id) { return make_segment(lanelet_id); });
     }
 
     // NOTE: Make the lanelet IDs unique, because set route API recognizes duplicate IDs as loops and does not accept.
@@ -329,8 +329,8 @@ void EgoEntity::requestAssignRoute(
 
     auto goal = route.back();
     std::vector<geometry_msgs::msg::Pose> waypoints;
-    for (size_t i = 0; i < route.size() - 1; ++i) {
-      waypoints.push_back(route[i]);
+    if (route.size() > 1) {
+      waypoints.assign(route.begin(), route.end() - 1);
     }
 
     if (not initialized) {
@@ -402,12 +402,13 @@ auto EgoEntity::requestReplanRoute(
     concealer::FieldOperatorApplication::RouteOption route_option;
     route_option.allow_goal_modification = allow_goal_modification;
     assert(not route.empty());
-    auto goal = route.back().pose;
     std::vector<geometry_msgs::msg::Pose> waypoints;
-    for (size_t i = 0; i < route.size() - 1; ++i) {
-      waypoints.push_back(route[i].pose);
+    if (route.size() > 1) {
+      std::transform(
+        route.begin(), route.end() - 1, waypoints.begin(),
+        [](const geometry_msgs::msg::PoseStamped & pose) { return pose.pose; });
     }
-    plan(goal, waypoints, route_option);
+    plan(route.back().pose, waypoints, route_option);
   }
   enableAutowareControl();
   FieldOperatorApplication::engage();
