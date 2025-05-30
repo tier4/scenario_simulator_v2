@@ -129,8 +129,6 @@ private:
   auto getDistanceToTargetEntityOnCrosswalk(
     const math::geometry::CatmullRomSplineInterface & spline,
     const traffic_simulator::CanonicalizedEntityStatus & status) const -> std::optional<double>;
-  auto getConflictingEntityStatus(const lanelet::Ids & following_lanelets) const
-    -> std::optional<traffic_simulator::CanonicalizedEntityStatus>;
   auto getConflictingEntityStatusOnCrossWalk(const lanelet::Ids & route_lanelets) const
     -> std::vector<traffic_simulator::CanonicalizedEntityStatus>;
   auto getConflictingEntityStatusOnLane(const lanelet::Ids & route_lanelets) const

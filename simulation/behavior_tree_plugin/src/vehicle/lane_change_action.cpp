@@ -67,8 +67,7 @@ const traffic_simulator_msgs::msg::WaypointsArray LaneChangeAction::calculateWay
       waypoints.waypoints = straight_waypoints;
       const auto curve_waypoints = curve_->getTrajectory(current_s_, l, 1.0, true);
       std::copy(
-        straight_waypoints.begin(), straight_waypoints.end(),
-        std::back_inserter(waypoints.waypoints));
+        curve_waypoints.begin(), curve_waypoints.end(), std::back_inserter(waypoints.waypoints));
     }
     return waypoints;
   } else {
