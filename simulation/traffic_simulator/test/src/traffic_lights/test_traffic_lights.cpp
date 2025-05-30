@@ -127,7 +127,15 @@ TEST_F(TrafficLightsTest, startTrafficLightsUpdate)
   std::vector<std_msgs::msg::Header> headers;
   for (std::size_t i = 0; i < markers.size(); ++i) {
     const auto & one_marker = markers[i].markers;
-    EXPECT_EQ(one_marker.size(), static_cast<std::size_t>(1));
+    if (one_marker.size() == 1) {
+      // DELETEALL marker
+      EXPECT_EQ(one_marker.front().action, visualization_msgs::msg::Marker::DELETEALL);
+    } else {
+      // ADD marker
+      EXPECT_EQ(one_marker.size(), static_cast<std::size_t>(3));
+      EXPECT_EQ(one_marker.front().action, visualization_msgs::msg::Marker::ADD);
+      EXPECT_EQ(one_marker.front().ns, "bulb");
+    }
     if (
       one_marker.front().header.stamp.sec != 0 and one_marker.front().header.stamp.nanosec != 0u) {
       headers.push_back(one_marker.front().header);

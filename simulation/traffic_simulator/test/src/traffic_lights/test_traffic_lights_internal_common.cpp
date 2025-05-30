@@ -181,7 +181,7 @@ TYPED_TEST(TrafficLightsInternalTest, compareTrafficLightsState)
 
 TYPED_TEST(TrafficLightsInternalTest, startUpdate_publishMarkers)
 {
-  const auto marker_id = this->id;
+  const auto base_marker_id = this->id;
   constexpr const char * color_name = "red";
   this->lights->setTrafficLightsState(this->id, stateFromColor(color_name));
 
@@ -205,25 +205,56 @@ TYPED_TEST(TrafficLightsInternalTest, startUpdate_publishMarkers)
       EXPECT_EQ(marker.action, visualization_msgs::msg::Marker::DELETEALL) << info;
     };
 
-  const auto verify_add_marker = [&color_name, &marker_id](
-                                   const visualization_msgs::msg::Marker & marker,
+  const auto verify_add_marker = [&base_marker_id](
+                                   const visualization_msgs::msg::Marker marker,
+                                   const geometry_msgs::msg::Point position,
+                                   const std::string color_name, const bool is_on,
                                    const auto info = "") {
     EXPECT_EQ(marker.ns, "bulb") << info;
-    EXPECT_EQ(marker.id, marker_id) << info;
+    EXPECT_EQ(marker.id >> 2, base_marker_id) << info;
     EXPECT_EQ(marker.type, visualization_msgs::msg::Marker::SPHERE) << info;
     EXPECT_EQ(marker.action, visualization_msgs::msg::Marker::ADD) << info;
 
-    EXPECT_POINT_NEAR_STREAM(
-      marker.pose.position,
-      geometry_msgs::build<geometry_msgs::msg::Point>().x(3770.02).y(73738.34).z(5.80),
-      position_eps, info);
+    EXPECT_POINT_NEAR_STREAM(marker.pose.position, position, position_eps, info);
 
     EXPECT_QUATERNION_EQ_STREAM(marker.pose.orientation, geometry_msgs::msg::Quaternion(), info);
 
     EXPECT_POINT_EQ_STREAM(
       marker.scale, geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0.3).y(0.3).z(0.3), info);
 
-    EXPECT_COLOR_RGBA_NEAR_STREAM(marker.color, color_names::makeColorMsg(color_name), eps, info);
+    auto expected_color = color_names::makeColorMsg(color_name);
+    expected_color.a = is_on ? 1.0 : 0.3;
+    EXPECT_COLOR_RGBA_NEAR_STREAM(marker.color, expected_color, eps, info);
+  };
+
+  const auto verify_add_markers = [&base_marker_id, &color_name, &verify_add_marker](
+                                    const std::vector<visualization_msgs::msg::Marker> & markers) {
+    EXPECT_EQ(markers.size(), static_cast<std::size_t>(3));
+    for (auto & marker : markers) {
+      using Color = traffic_simulator::TrafficLight::Color;
+
+      const auto color_value = static_cast<Color::Value>(marker.id & 0b11);
+      const auto color = static_cast<Color>(color_value);
+
+      if (color.is(Color::red)) {
+        const auto red_position =
+          geometry_msgs::build<geometry_msgs::msg::Point>().x(3769.15).y(73737.92).z(5.81);
+        verify_add_marker(
+          marker, red_position, "red", true, "red marker " + std::to_string(marker.id));
+      } else if (color.is(Color::yellow)) {
+        const auto yellow_position =
+          geometry_msgs::build<geometry_msgs::msg::Point>().x(3769.60).y(73738.12).z(5.81);
+        verify_add_marker(
+          marker, yellow_position, "yellow", false, "yellow marker " + std::to_string(marker.id));
+      } else if (color.is(Color::green)) {
+        const auto green_position =
+          geometry_msgs::build<geometry_msgs::msg::Point>().x(3770.02).y(73738.34).z(5.80);
+        verify_add_marker(
+          marker, green_position, "green", false, "green marker " + std::to_string(marker.id));
+      } else {
+        FAIL() << "Unknown color for marker id: " << marker.id;
+      }
+    }
   };
 
   // verify contents of messages
@@ -237,8 +268,7 @@ TYPED_TEST(TrafficLightsInternalTest, startUpdate_publishMarkers)
     }
     {
       const auto & one_marker = markers[i + 1].markers;
-      EXPECT_EQ(one_marker.size(), static_cast<std::size_t>(1));
-      verify_add_marker(one_marker[0], "marker " + std::to_string(i + 1));
+      verify_add_markers(one_marker);
 
       headers.push_back(one_marker[0].header);
     }
@@ -254,7 +284,7 @@ TYPED_TEST(TrafficLightsInternalTest, startUpdate_publishMarkers)
 
 TYPED_TEST(TrafficLightsInternalTest, resetUpdate_publishMarkers)
 {
-  const auto marker_id = this->id;
+  const auto base_marker_id = this->id;
   constexpr const char * color_name = "green";
   this->lights->setTrafficLightsState(this->id, stateFromColor(color_name));
 
@@ -297,27 +327,57 @@ TYPED_TEST(TrafficLightsInternalTest, resetUpdate_publishMarkers)
       EXPECT_EQ(marker.action, visualization_msgs::msg::Marker::DELETEALL) << info;
     };
 
-  const auto verify_add_marker = [&color_name, &marker_id](
-                                   const visualization_msgs::msg::Marker & marker,
+  const auto verify_add_marker = [&base_marker_id](
+                                   const visualization_msgs::msg::Marker marker,
+                                   const geometry_msgs::msg::Point position,
+                                   const std::string color_name, const bool is_on,
                                    const auto info = "") {
     EXPECT_EQ(marker.ns, "bulb") << info;
-    EXPECT_EQ(marker.id, marker_id) << info;
+    EXPECT_EQ(marker.id >> 2, base_marker_id) << info;
     EXPECT_EQ(marker.type, visualization_msgs::msg::Marker::SPHERE) << info;
     EXPECT_EQ(marker.action, visualization_msgs::msg::Marker::ADD) << info;
 
-    EXPECT_POINT_NEAR_STREAM(
-      marker.pose.position,
-      geometry_msgs::build<geometry_msgs::msg::Point>().x(3770.02).y(73738.34).z(5.80),
-      position_eps, info);
+    EXPECT_POINT_NEAR_STREAM(marker.pose.position, position, position_eps, info);
 
     EXPECT_QUATERNION_EQ_STREAM(marker.pose.orientation, geometry_msgs::msg::Quaternion(), info);
 
     EXPECT_POINT_EQ_STREAM(
       marker.scale, geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0.3).y(0.3).z(0.3), info);
 
-    EXPECT_COLOR_RGBA_NEAR_STREAM(marker.color, color_names::makeColorMsg(color_name), eps, info);
+    auto expected_color = color_names::makeColorMsg(color_name);
+    expected_color.a = is_on ? 1.0 : 0.3;
+    EXPECT_COLOR_RGBA_NEAR_STREAM(marker.color, expected_color, eps, info);
   };
 
+  const auto verify_add_markers = [&base_marker_id, &color_name, &verify_add_marker](
+                                    const std::vector<visualization_msgs::msg::Marker> & markers) {
+    EXPECT_EQ(markers.size(), static_cast<std::size_t>(3));
+    for (auto & marker : markers) {
+      using Color = traffic_simulator::TrafficLight::Color;
+
+      const auto color_value = static_cast<Color::Value>(marker.id & 0b11);
+      const auto color = static_cast<Color>(color_value);
+
+      if (color.is(Color::red)) {
+        const auto red_position =
+          geometry_msgs::build<geometry_msgs::msg::Point>().x(3769.15).y(73737.92).z(5.81);
+        verify_add_marker(
+          marker, red_position, "red", false, "red marker " + std::to_string(marker.id));
+      } else if (color.is(Color::yellow)) {
+        const auto yellow_position =
+          geometry_msgs::build<geometry_msgs::msg::Point>().x(3769.60).y(73738.12).z(5.81);
+        verify_add_marker(
+          marker, yellow_position, "yellow", false, "yellow marker " + std::to_string(marker.id));
+      } else if (color.is(Color::green)) {
+        const auto green_position =
+          geometry_msgs::build<geometry_msgs::msg::Point>().x(3770.02).y(73738.34).z(5.80);
+        verify_add_marker(
+          marker, green_position, "green", true, "green marker " + std::to_string(marker.id));
+      } else {
+        FAIL() << "Unknown color for marker id: " << marker.id;
+      }
+    }
+  };
   // verify contents of messages - before reset
   std::vector<std_msgs::msg::Header> headers;
   for (std::size_t i = 0; i < markers.size(); i += 2) {
@@ -329,8 +389,7 @@ TYPED_TEST(TrafficLightsInternalTest, resetUpdate_publishMarkers)
     }
     {
       const auto & one_marker = markers[i + 1].markers;
-      EXPECT_EQ(one_marker.size(), static_cast<std::size_t>(1));
-      verify_add_marker(one_marker[0], "marker " + std::to_string(i + 1));
+      verify_add_markers(one_marker);
 
       headers.push_back(one_marker[0].header);
     }
@@ -355,8 +414,7 @@ TYPED_TEST(TrafficLightsInternalTest, resetUpdate_publishMarkers)
     }
     {
       const auto & one_marker = markers_reset[i + 1].markers;
-      EXPECT_EQ(one_marker.size(), static_cast<std::size_t>(1));
-      verify_add_marker(one_marker[0], "marker " + std::to_string(i + 1));
+      verify_add_markers(one_marker);
 
       headers_reset.push_back(one_marker[0].header);
     }
