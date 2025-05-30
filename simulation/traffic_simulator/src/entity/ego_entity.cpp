@@ -243,7 +243,7 @@ void EgoEntity::requestAssignRoute(
   const std::vector<CanonicalizedLaneletPose> & route,
   const traffic_simulator::RouteOption & option)
 {
-  if (option.use_lane_level_specification_for_waypoints) {
+  if (option.use_lane_ids_for_routing) {
     concealer::FieldOperatorApplication::RouteOption route_option;
     route_option.allow_goal_modification = option.allow_goal_modification;
 
@@ -311,7 +311,7 @@ void EgoEntity::requestAssignRoute(
   const std::vector<geometry_msgs::msg::Pose> & route,
   const traffic_simulator::RouteOption & option)
 {
-  if (option.use_lane_level_specification_for_waypoints) {
+  if (option.use_lane_ids_for_routing) {
     std::vector<CanonicalizedLaneletPose> lanelet_poses;
     for (const auto & pose : route) {
       if (auto lanelet_pose = pose::toCanonicalizedLaneletPose(pose, false)) {
@@ -395,7 +395,7 @@ auto EgoEntity::requestReplanRoute(
   clearRoute();
   /*
     NOTE:
-      This function does not support use_lane_level_specification_for_waypoints option.
+      This function does not support use_lane_ids_for_routing option.
       The developers should consider manual override simulation to determine whether support it or not.
    */
   {

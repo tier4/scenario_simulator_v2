@@ -81,8 +81,8 @@ auto AssignRouteAction::start() -> void
   };
 
   traffic_simulator::v2::RouteOption route_option;
-  route_option.use_lane_level_specification_for_waypoints =
-    get_from_parameter("RoutingAction.use_lane_level_specification_for_waypoints", false);
+  route_option.use_lane_ids_for_routing =
+    get_from_parameter("RoutingAction.use_lane_ids_for_routing", false);
 
   for (const auto & actor : actors) {
     actor.apply([&](const auto & object) {

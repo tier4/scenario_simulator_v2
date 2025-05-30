@@ -24,7 +24,7 @@ inline namespace v2
 struct RouteOption
 {
   bool allow_goal_modification = false;
-  bool use_lane_level_specification_for_waypoints = false;
+  bool use_lane_ids_for_routing = false;
 };
 }  // namespace v2
 
@@ -39,7 +39,7 @@ struct RouteOption
   {
     v2::RouteOption v2;
     v2.allow_goal_modification = allow_goal_modification;
-    v2.use_lane_level_specification_for_waypoints = false;
+    v2.use_lane_ids_for_routing = false;
     return v2;
   }
 };
