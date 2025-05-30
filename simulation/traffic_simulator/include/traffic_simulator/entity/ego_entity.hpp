@@ -36,7 +36,7 @@ class EgoEntity : public VehicleEntity, private concealer::FieldOperatorApplicat
   bool is_controlled_by_simulator_{false};
   std::optional<double> target_speed_;
   traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter_;
-  std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> polyline_trajectory_;
+  traffic_simulator_msgs::msg::PolylineTrajectory polyline_trajectory_;
 
 public:
   explicit EgoEntity() = delete;
@@ -98,8 +98,8 @@ public:
   void requestAssignRoute(
     const std::vector<geometry_msgs::msg::Pose> &, const RouteOption &) override;
 
-  auto requestFollowTrajectory(
-    const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &) -> void override;
+  auto requestFollowTrajectory(const traffic_simulator_msgs::msg::PolylineTrajectory &)
+    -> void override;
 
   auto requestLaneChange(const lanelet::Id) -> void override;
 

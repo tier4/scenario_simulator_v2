@@ -263,7 +263,7 @@ public:
   virtual auto setControlledBySimulator(const bool /*unused*/) -> void;
 
   virtual auto requestFollowTrajectory(
-    const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & /*unused*/) -> void;
+    const traffic_simulator_msgs::msg::PolylineTrajectory & /*unused*/) -> void;
 
   virtual void requestWalkStraight();
 

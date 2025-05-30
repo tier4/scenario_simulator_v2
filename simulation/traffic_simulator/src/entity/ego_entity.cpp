@@ -176,7 +176,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
     if (
       const auto non_canonicalized_updated_status =
         traffic_simulator::follow_trajectory::makeUpdatedStatus(
-          static_cast<traffic_simulator::EntityStatus>(*status_), *polyline_trajectory_,
+          static_cast<traffic_simulator::EntityStatus>(*status_), polyline_trajectory_,
           behavior_parameter_, hdmap_utils_ptr_, step_time,
           getDefaultMatchingDistanceForLaneletPoseCalculation(),
           target_speed_ ? target_speed_.value() : status_->getTwist().linear.x)) {
@@ -275,7 +275,7 @@ void EgoEntity::requestAssignRoute(
 auto EgoEntity::isControlledBySimulator() const -> bool { return is_controlled_by_simulator_; }
 
 auto EgoEntity::requestFollowTrajectory(
-  const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & parameter) -> void
+  const traffic_simulator_msgs::msg::PolylineTrajectory & parameter) -> void
 {
   polyline_trajectory_ = parameter;
   VehicleEntity::requestFollowTrajectory(parameter);
