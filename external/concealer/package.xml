@@ -35,6 +35,8 @@
   <depend>tf2_geometry_msgs</depend>
   <depend>tf2_ros</depend>
   <depend>traffic_simulator_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>geometry</depend>
 
   <test_depend>ament_cmake_clang_format</test_depend>
   <test_depend>ament_cmake_copyright</test_depend>

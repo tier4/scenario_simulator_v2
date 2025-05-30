@@ -18,6 +18,8 @@
 #include <simulation_api_schema.pb.h>
 
 #include <array>
+#include <boost/math/constants/constants.hpp>
+#include <concealer/publisher.hpp>
 #include <geometry_msgs/msg/accel.hpp>
 #include <geometry_msgs/msg/twist.hpp>
 #include <random>
@@ -44,13 +46,16 @@ public:
     angular_velocity_covariance_(calculateCovariance(noise_standard_deviation_twist_)),
     linear_acceleration_covariance_(calculateCovariance(noise_standard_deviation_acceleration_))
   {
+    validateCovariance(orientation_covariance_);
+    validateCovariance(angular_velocity_covariance_);
+    validateCovariance(linear_acceleration_covariance_);
   }
 
   virtual ~ImuSensorBase() = default;
 
   virtual auto update(
     const rclcpp::Time & current_ros_time,
-    const std::vector<traffic_simulator_msgs::EntityStatus> & statuses) const -> bool = 0;
+    const std::vector<traffic_simulator_msgs::EntityStatus> & statuses) -> bool = 0;
 
 protected:
   const bool add_gravity_;
@@ -61,39 +66,119 @@ protected:
   mutable std::normal_distribution<> noise_distribution_orientation_;
   mutable std::normal_distribution<> noise_distribution_twist_;
   mutable std::normal_distribution<> noise_distribution_acceleration_;
-  const std::array<double, 9> orientation_covariance_;
-  const std::array<double, 9> angular_velocity_covariance_;
-  const std::array<double, 9> linear_acceleration_covariance_;
+  std::array<double, 9> orientation_covariance_;
+  std::array<double, 9> angular_velocity_covariance_;
+  std::array<double, 9> linear_acceleration_covariance_;
 
   auto calculateCovariance(const double stddev) const -> std::array<double, 9>
   {
     return {std::pow(stddev, 2), 0, 0, 0, std::pow(stddev, 2), 0, 0, 0, std::pow(stddev, 2)};
+  }
+
+  auto calculateCovariance(const double variance0, const double variance1, const double variance2)
+    const -> std::array<double, 9>
+  {
+    return {variance0, 0, 0, 0, variance1, 0, 0, 0, variance2};
   };
+
+  /**
+   * @note This is a hacky way to make sure that the variances are never actual 0.0.
+   * This is used because of the issue with Autoware localization, which seems to require
+   * covariance with non-zero variances (otherwise it works incorrectly).
+   */
+  auto validateCovariance(std::array<double, 9> & covariance) const -> void
+  {
+    constexpr double minimal_allowed_variance{0.0001};
+    covariance[0] = std::max(minimal_allowed_variance, covariance[0]);
+    covariance[4] = std::max(minimal_allowed_variance, covariance[4]);
+    covariance[8] = std::max(minimal_allowed_variance, covariance[8]);
+  }
 };
 
 template <typename MessageType>
 class ImuSensor : public ImuSensorBase
 {
 public:
+  template <typename NodeType>
   explicit ImuSensor(
-    const simulation_api_schema::ImuSensorConfiguration & configuration,
-    const typename rclcpp::Publisher<MessageType>::SharedPtr & publisher)
+    const simulation_api_schema::ImuSensorConfiguration & configuration, const std::string & topic,
+    NodeType & node)
   : ImuSensorBase(configuration),
+    override_legacy_configuration_(common::getParameter<bool>(
+      node.get_node_parameters_interface(), topic + ".override_legacy_configuration", false)),
     entity_name_(configuration.entity()),
     frame_id_(configuration.frame_id()),
-    publisher_(publisher)
+    publish(topic, node)
   {
+    /**
+     * @note By default publisher randomization will be active, so we need to deactivate it
+     * If legacy is not overriden we don't want to recalculate covariance matrices, so return early
+     */
+    if (not override_legacy_configuration_) {
+      publish.getRandomizer().active = false;
+      return;
+    }
+
+    /**
+     * @note Calculate covariance matrices based on some nominal values
+     * These values have no technical reason, they are an educated guess of what is reasonable
+     */
+    constexpr double nominal_angle{boost::math::constants::quarter_pi<double>()};
+    // clang-format off
+    orientation_covariance_ = calculateCovariance(
+      calculateVariance(nominal_angle,
+        publish.getRandomizer().orientation_r_error.multiplicative.stddev(),
+        publish.getRandomizer().orientation_r_error.additive.stddev()),
+      calculateVariance(nominal_angle,
+        publish.getRandomizer().orientation_p_error.multiplicative.stddev(),
+        publish.getRandomizer().orientation_p_error.additive.stddev()),
+      calculateVariance(nominal_angle,
+        publish.getRandomizer().orientation_y_error.multiplicative.stddev(),
+        publish.getRandomizer().orientation_y_error.additive.stddev()));
+    // clang-format on
+
+    constexpr double nominal_velocity{5.0};
+    // clang-format off
+    angular_velocity_covariance_ = calculateCovariance(
+      calculateVariance(nominal_velocity,
+        publish.getRandomizer().angular_velocity_x_error.multiplicative.stddev(),
+        publish.getRandomizer().angular_velocity_x_error.additive.stddev()),
+      calculateVariance(nominal_velocity,
+        publish.getRandomizer().angular_velocity_y_error.multiplicative.stddev(),
+        publish.getRandomizer().angular_velocity_y_error.additive.stddev()),
+      calculateVariance(nominal_velocity,
+        publish.getRandomizer().angular_velocity_z_error.multiplicative.stddev(),
+        publish.getRandomizer().angular_velocity_z_error.additive.stddev()));
+    // clang-format on
+
+    constexpr double nominal_acceleration{0.5};
+    // clang-format off
+    linear_acceleration_covariance_ = calculateCovariance(
+      calculateVariance(nominal_acceleration,
+        publish.getRandomizer().linear_acceleration_x_error.multiplicative.stddev(),
+        publish.getRandomizer().linear_acceleration_x_error.additive.stddev()),
+      calculateVariance(nominal_acceleration,
+        publish.getRandomizer().linear_acceleration_y_error.multiplicative.stddev(),
+        publish.getRandomizer().linear_acceleration_y_error.additive.stddev()),
+      calculateVariance(nominal_acceleration,
+        publish.getRandomizer().linear_acceleration_z_error.multiplicative.stddev(),
+        publish.getRandomizer().linear_acceleration_z_error.additive.stddev()));
+    // clang-format on
+
+    validateCovariance(orientation_covariance_);
+    validateCovariance(angular_velocity_covariance_);
+    validateCovariance(linear_acceleration_covariance_);
   }
 
   auto update(
     const rclcpp::Time & current_ros_time,
-    const std::vector<traffic_simulator_msgs::EntityStatus> & statuses) const -> bool override
+    const std::vector<traffic_simulator_msgs::EntityStatus> & statuses) -> bool override
   {
     for (const auto & status : statuses) {
       if (status.name() == entity_name_) {
         traffic_simulator_msgs::msg::EntityStatus status_msg;
         simulation_interface::toMsg(status, status_msg);
-        publisher_->publish(generateMessage(current_ros_time, status_msg));
+        publish(generateMessage(current_ros_time, status_msg));
         return true;
       }
     }
@@ -105,9 +190,18 @@ private:
     const rclcpp::Time & current_ros_time,
     const traffic_simulator_msgs::msg::EntityStatus & status) const -> const MessageType;
 
+  static auto calculateVariance(
+    const double nominal_value, const double multiplicative_stddev, const double additive_stddev)
+    -> double
+  {
+    return std::pow(nominal_value, 2) * std::pow(multiplicative_stddev, 2) +
+           std::pow(additive_stddev, 2);
+  }
+
+  const bool override_legacy_configuration_;
   const std::string entity_name_;
   const std::string frame_id_;
-  const typename rclcpp::Publisher<MessageType>::SharedPtr publisher_;
+  concealer::Publisher<MessageType, concealer::NormalDistribution> publish;
 };
 }  // namespace simple_sensor_simulator
 #endif  // SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__IMU_SENSOR_HPP_
