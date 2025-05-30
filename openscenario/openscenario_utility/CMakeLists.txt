@@ -8,7 +8,8 @@ find_package(ament_cmake_python REQUIRED)
 ament_python_install_package(${PROJECT_NAME})
 
 install(
-  DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/
+  PROGRAMS ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/conversion.py
+           ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/validation.py
   DESTINATION lib/${PROJECT_NAME})
 
 ament_package()
