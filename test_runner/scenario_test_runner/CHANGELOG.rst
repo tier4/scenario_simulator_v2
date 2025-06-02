@@ -38,6 +38,12 @@ Changelog for package scenario_test_runner
 16.4.2 (2025-05-23)
 -------------------
 
+16.4.6 (2025-06-02)
+-------------------
+
+16.4.5 (2025-05-30)
+-------------------
+
 16.4.4 (2025-05-28)
 -------------------
 * Merge remote-tracking branch 'origin/master' into feature/delay_curventure_calculation
