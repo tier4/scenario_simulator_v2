@@ -32,6 +32,19 @@ jobs:
     outputs:
       new_version: ${{ steps.new_version.outputs.new_version }}
     steps:
+# workaround until the fix release in the official ros image
+      - name: Delete old ros2 apt source
+        run: |
+          rm /etc/apt/sources.list.d/ros2-latest.list
+          rm /usr/share/keyrings/ros2-latest-archive-keyring.gpg
+
+      - name: Setup new ros2 apt source
+        run: |
+          sudo apt-get update && sudo apt-get install curl
+          export ROS_APT_SOURCE_VERSION=$(curl -s https://api.github.com/repos/ros-infrastructure/ros-apt-source/releases/latest | grep -F "tag_name" | awk -F\" '{print $4}')
+          curl -L -o /tmp/ros2-apt-source.deb "https://github.com/ros-infrastructure/ros-apt-source/releases/download/${ROS_APT_SOURCE_VERSION}/ros2-apt-source_${ROS_APT_SOURCE_VERSION}.$(. /etc/os-release && echo $VERSION_CODENAME)_all.deb" 
+          sudo apt install /tmp/ros2-apt-source.deb
+
       - name: Restore branch
         if: github.event.pull_request.merged == true
         uses: levonet/action-restore-branch@master

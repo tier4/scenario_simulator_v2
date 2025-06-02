@@ -24,6 +24,9 @@ Changelog for package behavior_tree_plugin
 16.4.2 (2025-05-23)
 -------------------
 
+16.4.6 (2025-06-02)
+-------------------
+
 16.4.5 (2025-05-30)
 -------------------
 * Merge pull request `#1612 <https://github.com/tier4/scenario_simulator_v2/issues/1612>`_ from tier4/refactor/behavior_tree_5
