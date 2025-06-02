@@ -35,7 +35,8 @@ jobs:
         rosdistro: [humble]
         runs_on: [ubuntu-22.04, ubuntu-22.04-arm]
         cmake_build_type: [RelWithDebInfo, Release] # Debug build type is currently unavailable. @TODO Fix problem and add Debug build.
-    steps: 
+    steps:
+# workaround until the fix release in the official ros image
       - name: Delete old ros2 apt source
         run: |
           rm /etc/apt/sources.list.d/ros2-latest.list
