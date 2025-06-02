@@ -20,6 +20,7 @@
 #include <geometry/vector3/operator.hpp>
 #include <geometry_msgs/msg/accel.hpp>
 #include <geometry_msgs/msg/twist.hpp>
+#include <traffic_simulator/lanelet_wrapper/lanelet_map.hpp>
 
 namespace entity_behavior
 {
@@ -180,7 +181,7 @@ void DoNothingBehavior::update(double current_time, double step_time)
   canonicalized_entity_status_->setTime(current_time);
   if (getRequest() == traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY) {
     canonicalized_entity_status_->set(
-      interpolate_entity_status_on_polyline_trajectory(),
+      interpolate_entity_status_on_polyline_trajectory(), getRouteLanelets(),
       getDefaultMatchingDistanceForLaneletPoseCalculation());
     if (
       getCurrentTime() + getStepTime() >=
@@ -190,7 +191,7 @@ void DoNothingBehavior::update(double current_time, double step_time)
   } else {
     canonicalized_entity_status_->set(
       static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status_),
-      getDefaultMatchingDistanceForLaneletPoseCalculation());
+      getRouteLanelets(), getDefaultMatchingDistanceForLaneletPoseCalculation());
   }
 }
 auto DoNothingBehavior::getCurrentAction() -> const std::string &

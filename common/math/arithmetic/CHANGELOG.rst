@@ -24,6 +24,17 @@ Changelog for package arithmetic
 16.4.2 (2025-05-23)
 -------------------
 
+16.4.5 (2025-05-30)
+-------------------
+
+16.4.4 (2025-05-28)
+-------------------
+* Merge remote-tracking branch 'origin/master' into feature/delay_curventure_calculation
+* Merge branch 'master' into feature/delay_curventure_calculation
+* Merge remote-tracking branch 'origin/master' into feature/delay_curventure_calculation
+* Merge remote-tracking branch 'origin/master' into feature/speed_up
+* Contributors: Masaya Kataoka
+
 16.4.3 (2025-05-27)
 -------------------
 * Merge branch 'master' into refactor/behavior-tree-2
