@@ -25,7 +25,16 @@ CppScenarioNode::CppScenarioNode(
 : Node(node_name, option),
   api_(
     this,
-    configure(map_path, lanelet2_map_file, scenario_filename, verbose, auto_sink_entity_types),
+    configure(
+      [this, &map_path]() {
+        if (map_path.empty()) {
+          declare_parameter<std::string>("map_path", "");
+          return get_parameter("map_path").as_string();
+        } else {
+          return map_path;
+        }
+      }(),
+      lanelet2_map_file, scenario_filename, verbose, auto_sink_entity_types),
     declare_parameter<double>("global_real_time_factor", 1.0),
     declare_parameter<double>("global_frame_rate", 20.0)),
   scenario_filename_(scenario_filename),
