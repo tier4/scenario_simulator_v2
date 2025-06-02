@@ -87,19 +87,23 @@ void LaneChangeAction::getBlackBoardValues()
   }
 }
 
-BT::NodeStatus LaneChangeAction::tick()
+bool LaneChangeAction::checkPreconditions()
 {
-  getBlackBoardValues();
   if (request_ != traffic_simulator::behavior::Request::LANE_CHANGE) {
     curve_ = std::nullopt;
     current_s_ = 0;
-    return BT::NodeStatus::FAILURE;
-  }
-  if (!lane_change_parameters_) {
+    return false;
+  } else if (!lane_change_parameters_) {
     curve_ = std::nullopt;
     current_s_ = 0;
-    return BT::NodeStatus::FAILURE;
+    return false;
+  } else {
+    return true;
   }
+}
+
+BT::NodeStatus LaneChangeAction::doAction()
+{
   if (!curve_) {
     if (request_ == traffic_simulator::behavior::Request::LANE_CHANGE) {
       if (!canonicalized_entity_status_->isInLanelet()) {
