@@ -130,6 +130,7 @@ def launch_setup(context, *args, **kwargs):
     scenario_package                    = LaunchConfiguration("package",                                default="cpp_mock_scenarios")
     junit_path                          = LaunchConfiguration("junit_path",                             default="/tmp/output.xunit.xml")
     ego_model                           = LaunchConfiguration("ego_model",                              default="")
+    map_path                            = LaunchConfiguration("map_path",                               default="")
     # fmt: on
 
     print(f"architecture_type                   := {architecture_type.perform(context)}")
@@ -159,6 +160,7 @@ def launch_setup(context, *args, **kwargs):
     print(f"scenario_package                    := {scenario_package.perform(context)}")
     print(f"junit_path                          := {junit_path.perform(context)}")
     print(f"ego_model                           := {ego_model.perform(context)}")
+    print(f"map_path                            := {map_path.perform(context)}")
 
     def make_parameters():
         parameters = [
@@ -182,6 +184,7 @@ def launch_setup(context, *args, **kwargs):
             {"global_timeout": global_timeout},
             {"junit_path": junit_path},
             {"ego_model": ego_model}
+            {"map_path": map_path}
         ]
         parameters += make_vehicle_parameters()
         parameters += [parameter_file_path.perform(context)]
@@ -250,6 +253,7 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("scenario_package",                    default_value=scenario_package                   ),
         DeclareLaunchArgument("junit_path",                          default_value=junit_path                         ),
         DeclareLaunchArgument("ego_model",                           default_value=ego_model                          ),
+        DeclareLaunchArgument("map_path",                            default_value=map_path                           ),
         # fmt: on
         cpp_scenario_node,
         Node(
