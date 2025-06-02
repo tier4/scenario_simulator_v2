@@ -35,7 +35,7 @@ public:
     const std::string & lanelet2_map_file, const std::string & scenario_filename,
     const bool verbose, const rclcpp::NodeOptions & option,
     const std::set<std::uint8_t> & auto_sink_entity_types = {});
-  void start();
+  void start(const bool start_scenario_clock = true);
   void stop(Result result, const std::string & description = "");
   void expectThrow() { exception_expect_ = true; }
   void expectNoThrow() { exception_expect_ = false; }
@@ -63,6 +63,7 @@ protected:
 
 private:
   std::string scenario_filename_;
+  std::string ego_model_;
   bool exception_expect_;
   std::string junit_path_;
   void update();
