@@ -29,7 +29,7 @@ namespace do_nothing_behavior
 namespace follow_trajectory
 {
 bool checkPolylineTrajectory(
-  const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & trajectory)
+  const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> trajectory)
 {
   if (trajectory) {
     if (trajectory->closed) {
@@ -61,7 +61,7 @@ bool checkPolylineTrajectory(
 }
 
 auto getLastVertexTimestamp(
-  const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & trajectory)
+  const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> trajectory)
   -> std::optional<double>
 {
   checkPolylineTrajectory(trajectory);
@@ -69,7 +69,7 @@ auto getLastVertexTimestamp(
 }
 
 auto interpolateEntityStatusFromPolylineTrajectory(
-  const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & trajectory,
+  const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> trajectory,
   const std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus> & entity_status,
   double current_time, double step_time) -> std::optional<traffic_simulator::EntityStatus>
 {

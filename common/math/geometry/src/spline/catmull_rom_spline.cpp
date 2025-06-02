@@ -161,7 +161,7 @@ auto CatmullRomSpline::getTrajectoryPoses(
 
 CatmullRomSpline::CatmullRomSpline(
   const geometry_msgs::msg::Point & start_point,
-  const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & trajectory)
+  const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> trajectory)
 : CatmullRomSpline([start_point, trajectory] {
     if (!trajectory) {
       THROW_SIMULATION_ERROR(

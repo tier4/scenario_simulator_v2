@@ -99,7 +99,7 @@ public:
     const std::vector<geometry_msgs::msg::Pose> &, const RouteOption &) override;
 
   auto requestFollowTrajectory(
-    const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &) -> void override;
+    const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory>) -> void override;
 
   auto requestLaneChange(const lanelet::Id) -> void override;
 

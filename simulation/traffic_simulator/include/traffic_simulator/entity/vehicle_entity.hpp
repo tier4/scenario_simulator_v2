@@ -110,7 +110,7 @@ public:
     const std::vector<CanonicalizedLaneletPose> &, const RouteOption &) override;
 
   auto requestFollowTrajectory(
-    const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &) -> void override;
+    const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory>) -> void override;
 
   auto requestLaneChange(const lanelet::Id to_lanelet_id) -> void override;
 

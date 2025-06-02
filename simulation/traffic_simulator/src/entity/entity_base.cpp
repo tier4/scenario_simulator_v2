@@ -549,7 +549,7 @@ auto EntityBase::setControlledBySimulator(const bool /*unused*/) -> void
 }
 
 auto EntityBase::requestFollowTrajectory(
-  const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & /*unused*/) -> void
+  const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> /*unused*/) -> void
 {
   THROW_SEMANTIC_ERROR(
     getEntityTypename(), " type entities do not support follow trajectory action.");

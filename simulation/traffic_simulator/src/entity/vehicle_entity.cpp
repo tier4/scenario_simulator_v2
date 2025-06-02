@@ -226,7 +226,7 @@ void VehicleEntity::requestAssignRoute(
 }
 
 auto VehicleEntity::requestFollowTrajectory(
-  const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & parameter) -> void
+  const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> parameter) -> void
 {
   if (parameter) {
     behavior_plugin_ptr_->setPolylineTrajectory(parameter);

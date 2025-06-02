@@ -37,7 +37,7 @@ public:
   explicit CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> & control_points);
   explicit CatmullRomSpline(
     const geometry_msgs::msg::Point & start_point,
-    const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & trajectory);
+    const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> trajectory);
   auto getLength() const -> double override { return total_length_; }
   auto getMaximum2DCurvature() const -> double;
   auto getPoint(const double s) const -> geometry_msgs::msg::Point;

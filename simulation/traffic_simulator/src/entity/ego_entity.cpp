@@ -275,7 +275,7 @@ void EgoEntity::requestAssignRoute(
 auto EgoEntity::isControlledBySimulator() const -> bool { return is_controlled_by_simulator_; }
 
 auto EgoEntity::requestFollowTrajectory(
-  const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & parameter) -> void
+  const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> parameter) -> void
 {
   polyline_trajectory_ = parameter;
   VehicleEntity::requestFollowTrajectory(parameter);
