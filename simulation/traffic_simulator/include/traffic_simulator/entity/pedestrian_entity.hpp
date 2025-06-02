@@ -70,8 +70,7 @@ public:
 
   auto onUpdate(const double current_time, const double step_time) -> void override;
 
-  void requestAcquirePosition(
-    const CanonicalizedLaneletPose & lanelet_pose, const RouteOption &) override;
+  void requestAcquirePosition(const LaneletPose & lanelet_pose, const RouteOption &) override;
 
   void requestAcquirePosition(
     const geometry_msgs::msg::Pose & map_pose, const RouteOption &) override;
@@ -100,8 +99,7 @@ public:
 
   void setDecelerationRateLimit(double deceleration) override;
 
-  void requestAssignRoute(
-    const std::vector<CanonicalizedLaneletPose> & waypoints, const RouteOption &) override;
+  void requestAssignRoute(const std::vector<LaneletPose> & waypoints, const RouteOption &) override;
 
   void requestAssignRoute(
     const std::vector<geometry_msgs::msg::Pose> &, const RouteOption &) override;
@@ -127,6 +125,11 @@ public:
   const std::string plugin_name;
 
   const traffic_simulator_msgs::msg::PedestrianParameters pedestrian_parameters;
+
+protected:
+  void requestAcquirePosition(const CanonicalizedLaneletPose &, const RouteOption &);
+
+  void requestAssignRoute(const std::vector<CanonicalizedLaneletPose> &, const RouteOption &);
 
 private:
   pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase> loader_;

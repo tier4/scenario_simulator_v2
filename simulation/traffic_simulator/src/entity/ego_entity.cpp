@@ -195,7 +195,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
   EntityBase::onPostUpdate(current_time, step_time);
 }
 
-void EgoEntity::requestAcquirePosition(const CanonicalizedLaneletPose & lanelet_pose)
+void EgoEntity::requestAcquirePosition(const LaneletPose & lanelet_pose)
 {
   RouteOption options;
   options.allow_goal_modification = get_parameter_or<bool>("allow_goal_modification", false);
@@ -210,7 +210,7 @@ void EgoEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose
 }
 
 void EgoEntity::requestAcquirePosition(
-  const CanonicalizedLaneletPose & lanelet_pose, const RouteOption & options)
+  const LaneletPose & lanelet_pose, const RouteOption & options)
 {
   requestAssignRoute({lanelet_pose}, options);
 }
@@ -221,13 +221,11 @@ void EgoEntity::requestAcquirePosition(
   requestAssignRoute({map_pose}, options);
 }
 
-void EgoEntity::requestAssignRoute(const std::vector<CanonicalizedLaneletPose> & waypoints)
+void EgoEntity::requestAssignRoute(const std::vector<LaneletPose> & waypoints)
 {
-  std::vector<geometry_msgs::msg::Pose> route;
-  for (const auto & waypoint : waypoints) {
-    route.push_back(static_cast<geometry_msgs::msg::Pose>(waypoint));
-  }
-  requestAssignRoute(route);
+  RouteOption options;
+  options.allow_goal_modification = get_parameter_or<bool>("allow_goal_modification", false);
+  return requestAssignRoute(waypoints, options);
 }
 
 void EgoEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> & waypoints)
@@ -238,11 +236,23 @@ void EgoEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &
 }
 
 void EgoEntity::requestAssignRoute(
+  const std::vector<LaneletPose> & waypoints, const RouteOption & options)
+{
+  std::vector<CanonicalizedLaneletPose> route;
+  route.reserve(waypoints.size());
+  std::transform(
+    waypoints.begin(), waypoints.end(), std::back_inserter(route),
+    [](const auto & waypoint) { return CanonicalizedLaneletPose(waypoint); });
+
+  requestAssignRoute(route, options);
+}
+
+void EgoEntity::requestAssignRoute(
   const std::vector<CanonicalizedLaneletPose> & waypoints, const RouteOption & options)
 {
   std::vector<geometry_msgs::msg::Pose> route;
   for (const auto & waypoint : waypoints) {
-    route.push_back(static_cast<geometry_msgs::msg::Pose>(waypoint));
+    route.push_back(traffic_simulator::pose::toMapPose(waypoint));
   }
   requestAssignRoute(route, options);
 }
@@ -312,6 +322,14 @@ auto EgoEntity::requestSpeedChange(
   THROW_SEMANTIC_ERROR(
     "The traffic_simulator's request to set speed to the Ego type entity is for initialization "
     "purposes only.");
+}
+
+auto EgoEntity::requestSynchronize(
+  const std::string & /*target_name*/, const LaneletPose & /*target_sync_pose*/,
+  const LaneletPose & /*entity_target*/, const double /*target_speed*/, const double /*tolerance*/)
+  -> bool
+{
+  THROW_SYNTAX_ERROR("Request synchronize is only for non-ego entities.");
 }
 
 auto EgoEntity::requestClearRoute() -> void { clearRoute(); }

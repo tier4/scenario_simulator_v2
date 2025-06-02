@@ -180,9 +180,15 @@ void VehicleEntity::requestAcquirePosition(
 }
 
 void VehicleEntity::requestAcquirePosition(
+  const LaneletPose & lanelet_pose, const RouteOption & options)
+{
+  const auto canonicalized_lanelet_pose = CanonicalizedLaneletPose(lanelet_pose);
+  requestAcquirePosition(canonicalized_lanelet_pose, options);
+}
+
+void VehicleEntity::requestAcquirePosition(
   const geometry_msgs::msg::Pose & map_pose, const RouteOption & options)
 {
-  behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
   if (
     const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
       map_pose, status_->getBoundingBox(), false,
@@ -200,7 +206,9 @@ void VehicleEntity::requestAssignRoute(
     return;
   }
   behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
+
   route_planner_.setWaypoints(waypoints);
+
   std::vector<geometry_msgs::msg::Pose> goal_poses;
   for (const auto & waypoint : waypoints) {
     goal_poses.emplace_back(static_cast<geometry_msgs::msg::Pose>(waypoint));
@@ -209,9 +217,22 @@ void VehicleEntity::requestAssignRoute(
 }
 
 void VehicleEntity::requestAssignRoute(
+  const std::vector<LaneletPose> & waypoints, const RouteOption & options)
+{
+  std::vector<CanonicalizedLaneletPose> canonicalized_waypoints;
+  canonicalized_waypoints.reserve(waypoints.size());
+  std::transform(
+    waypoints.begin(), waypoints.end(), std::back_inserter(canonicalized_waypoints),
+    [](const auto & waypoint) { return CanonicalizedLaneletPose(waypoint); });
+
+  requestAssignRoute(canonicalized_waypoints, options);
+}
+
+void VehicleEntity::requestAssignRoute(
   const std::vector<geometry_msgs::msg::Pose> & waypoints, const RouteOption & options)
 {
   std::vector<CanonicalizedLaneletPose> route;
+  route.reserve(waypoints.size());
   for (const auto & waypoint : waypoints) {
     if (
       const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
