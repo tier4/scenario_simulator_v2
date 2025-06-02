@@ -26,7 +26,7 @@ jobs:
     name: BuildAndRun
     runs-on: ${{ matrix.runs_on }}
     timeout-minutes: 180
-    container: osrf/ros:${{ matrix.rosdistro }}-desktop
+    container: ros:${{ matrix.rosdistro }}
     env:
       DEBIAN_FRONTEND: noninteractive
     strategy:
