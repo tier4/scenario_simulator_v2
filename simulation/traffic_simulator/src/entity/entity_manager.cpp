@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <geometry/distance.hpp>
 #include <geometry/vector3/operator.hpp>
 #include <std_msgs/msg/header.hpp>
 #include <traffic_simulator/entity/entity_manager.hpp>
@@ -75,20 +76,27 @@ auto EntityManager::update(const double current_time, const double step_time) ->
     entity_ptr->setOtherStatus(all_status);
   }
   all_status.clear();
+
+  std::shared_ptr<EuclideanDistancesMap> distances = calculateEuclideanDistances();
+
   for (const auto & [name, entity_ptr] : entities_) {
-    all_status.try_emplace(name, updateNpcLogic(name, current_time, step_time));
+    all_status.try_emplace(name, updateNpcLogic(name, current_time, step_time, distances));
   }
   for (const auto & [name, entity_ptr] : entities_) {
     entity_ptr->setOtherStatus(all_status);
   }
   traffic_simulator_msgs::msg::EntityStatusWithTrajectoryArray status_array_msg;
   for (const auto & [name, status] : all_status) {
+    auto & entity = getEntity(name);
     traffic_simulator_msgs::msg::EntityStatusWithTrajectory status_with_trajectory;
-    status_with_trajectory.waypoint = getWaypoints(name);
-    for (const auto & goal : getGoalPoses<geometry_msgs::msg::Pose>(name)) {
+    status_with_trajectory.waypoint =
+      npc_logic_started_ ? entity.getWaypoints() : traffic_simulator_msgs::msg::WaypointsArray();
+    for (const auto & goal : entity.getGoalPoses()) {
       status_with_trajectory.goal_pose.push_back(goal);
     }
-    if (const auto obstacle = getObstacle(name); obstacle) {
+    if (
+      const std::optional<traffic_simulator_msgs::msg::Obstacle> obstacle =
+        npc_logic_started_ ? entity.getObstacle() : std::nullopt) {
       status_with_trajectory.obstacle = obstacle.value();
       status_with_trajectory.obstacle_find = true;
     } else {
@@ -108,8 +116,8 @@ auto EntityManager::update(const double current_time, const double step_time) ->
 }
 
 auto EntityManager::updateNpcLogic(
-  const std::string & name, const double current_time, const double step_time)
-  -> const CanonicalizedEntityStatus &
+  const std::string & name, const double current_time, const double step_time,
+  const std::shared_ptr<EuclideanDistancesMap> & distances) -> const CanonicalizedEntityStatus &
 {
   if (configuration_.verbose) {
     std::cout << "update " << name << " behavior" << std::endl;
@@ -117,9 +125,10 @@ auto EntityManager::updateNpcLogic(
   auto & entity = getEntity(name);
   // Update npc completely if logic has started, otherwise update Autoware only - if it is Ego
   if (npc_logic_started_) {
+    entity.setEuclideanDistancesMap(distances);
     entity.onUpdate(current_time, step_time);
   } else if (entity.is<entity::EgoEntity>()) {
-    getEgoEntity(name).updateFieldOperatorApplication();
+    entity.as<EgoEntity>().updateFieldOperatorApplication();
   }
   return entity.getCanonicalizedStatus();
 }
@@ -229,7 +238,7 @@ auto EntityManager::isAnyEgoSpawned() const -> bool
 auto EntityManager::getFirstEgoName() const -> std::optional<std::string>
 {
   for (const auto & [name, entity_ptr] : entities_) {
-    if (entity_ptr->template is<EgoEntity>()) {
+    if (entity_ptr->is<EgoEntity>()) {
       return entity_ptr->getName();
     }
   }
@@ -279,7 +288,7 @@ auto EntityManager::getEntity(const std::string & name) -> entity::EntityBase &
   if (const auto it = entities_.find(name); it != entities_.end()) {
     return *(it->second);
   } else {
-    THROW_SEMANTIC_ERROR("Entity ", std::quoted(name), " does not exist.");
+    THROW_SEMANTIC_ERROR("Entity : ", std::quoted(name), " does not exist.");
   }
 }
 
@@ -288,7 +297,7 @@ auto EntityManager::getEntity(const std::string & name) const -> const entity::E
   if (const auto it = entities_.find(name); it != entities_.end()) {
     return *(it->second);
   } else {
-    THROW_SEMANTIC_ERROR("Entity ", std::quoted(name), " does not exist.");
+    THROW_SEMANTIC_ERROR("Entity : ", std::quoted(name), " does not exist.");
   }
 }
 
@@ -324,12 +333,12 @@ auto EntityManager::resetBehaviorPlugin(
       "Entity :", name, "is MiscObjectEntity.",
       "You cannot reset behavior plugin of MiscObjectEntity.");
   } else if (reference_entity.is<VehicleEntity>()) {
-    const auto parameters = getVehicleParameters(name);
+    const auto parameters = reference_entity.as<VehicleEntity>().getParameters();
     despawnEntity(name);
     spawnEntity<VehicleEntity>(
       name, status.getMapPose(), parameters, status.getTime(), behavior_plugin_name);
   } else if (reference_entity.is<PedestrianEntity>()) {
-    const auto parameters = getPedestrianParameters(name);
+    const auto parameters = reference_entity.as<PedestrianEntity>().getParameters();
     despawnEntity(name);
     spawnEntity<PedestrianEntity>(
       name, status.getMapPose(), parameters, status.getTime(), behavior_plugin_name);
@@ -355,46 +364,19 @@ auto EntityManager::getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapU
   return hdmap_utils_ptr_;
 }
 
-auto EntityManager::getObstacle(const std::string & name)
-  -> std::optional<traffic_simulator_msgs::msg::Obstacle>
+auto EntityManager::calculateEuclideanDistances() -> std::shared_ptr<EuclideanDistancesMap>
 {
-  if (not npc_logic_started_) {
-    return std::nullopt;
-  } else {
-    return entities_.at(name)->getObstacle();
+  std::shared_ptr<EuclideanDistancesMap> distances = std::make_shared<EuclideanDistancesMap>();
+  for (auto && [name_from, entity_from] : entities_) {
+    for (auto && [name_to, entity_to] : entities_) {
+      if (const auto pair = std::minmax(name_from, name_to);
+          distances->find(pair) == distances->end() && name_from != name_to) {
+        distances->emplace(
+          pair, math::geometry::getDistance(entity_from->getMapPose(), entity_to->getMapPose()));
+      }
+    }
   }
-}
-
-auto EntityManager::getPedestrianParameters(const std::string & name) const
-  -> const traffic_simulator_msgs::msg::PedestrianParameters &
-{
-  if (const auto entity_ptr = dynamic_cast<PedestrianEntity const *>(entities_.at(name).get())) {
-    return entity_ptr->pedestrian_parameters;
-  }
-  THROW_SIMULATION_ERROR(
-    "EntityType: ", getEntity(name).getEntityTypename(), ", does not have pedestrian parameter.",
-    "Please check description of the scenario and entity type of the Entity: " + name);
-}
-
-auto EntityManager::getVehicleParameters(const std::string & name) const
-  -> const traffic_simulator_msgs::msg::VehicleParameters &
-{
-  if (const auto vehicle = dynamic_cast<VehicleEntity const *>(entities_.at(name).get())) {
-    return vehicle->vehicle_parameters;
-  }
-  THROW_SIMULATION_ERROR(
-    "EntityType: ", getEntity(name).getEntityTypename(), ", does not have pedestrian parameter.",
-    "Please check description of the scenario and entity type of the Entity: " + name);
-}
-
-auto EntityManager::getWaypoints(const std::string & name)
-  -> traffic_simulator_msgs::msg::WaypointsArray
-{
-  if (not npc_logic_started_) {
-    return traffic_simulator_msgs::msg::WaypointsArray();
-  } else {
-    return entities_.at(name)->getWaypoints();
-  }
+  return distances;
 }
 }  // namespace entity
 }  // namespace traffic_simulator

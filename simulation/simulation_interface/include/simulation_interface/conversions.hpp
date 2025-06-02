@@ -168,6 +168,7 @@ void toMsg(const rosgraph_msgs::Clock & proto, rosgraph_msgs::msg::Clock & time)
 void toProto(const std_msgs::msg::Header & header, std_msgs::Header & proto);
 void toMsg(const std_msgs::Header & proto, std_msgs::msg::Header & header);
 
+// clang-format off
 #define DEFINE_CONVERSION(PACKAGE, TYPENAME)                               \
   auto toProto(const PACKAGE::msg::TYPENAME &, PACKAGE::TYPENAME &)->void; \
   auto toMsg(const PACKAGE::TYPENAME &, PACKAGE::msg::TYPENAME &)->void
@@ -254,6 +255,7 @@ auto toMsg(
   traffic_light_bulb_state.color = convert_color(proto.color());
   traffic_light_bulb_state.confidence = proto.confidence();
 }
+// clang-format off
 
 auto toProtobufMessage(const traffic_simulator_msgs::msg::Vertex &)
   -> traffic_simulator_msgs::Vertex;

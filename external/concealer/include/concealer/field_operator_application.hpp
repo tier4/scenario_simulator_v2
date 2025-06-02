@@ -40,7 +40,6 @@
 #include <tier4_external_api_msgs/msg/emergency.hpp>
 #include <tier4_external_api_msgs/srv/engage.hpp>
 #include <tier4_external_api_msgs/srv/set_velocity_limit.hpp>
-#include <tier4_planning_msgs/msg/trajectory.hpp>
 #include <tier4_rtc_msgs/msg/cooperate_status_array.hpp>
 #include <tier4_rtc_msgs/srv/auto_mode_with_module.hpp>
 #include <tier4_rtc_msgs/srv/cooperate_commands.hpp>
@@ -78,7 +77,6 @@ struct FieldOperatorApplication : public rclcpp::Node
 #if __has_include(<autoware_adapi_v1_msgs/msg/route_state.hpp>)
   using RouteState                      = autoware_adapi_v1_msgs::msg::RouteState;
 #endif
-  using Trajectory                      = tier4_planning_msgs::msg::Trajectory;
   using TurnIndicatorsCommand           = autoware_vehicle_msgs::msg::TurnIndicatorsCommand;
 
   using ClearRoute                      = autoware_adapi_v1_msgs::srv::ClearRoute;
@@ -105,7 +103,6 @@ struct FieldOperatorApplication : public rclcpp::Node
 #if __has_include(<autoware_adapi_v1_msgs/msg/route_state.hpp>)
   Subscriber<RouteState>                      getRouteState;
 #endif
-  Subscriber<Trajectory>                      getTrajectory;
   Subscriber<TurnIndicatorsCommand>           getTurnIndicatorsCommand;
 
   Service<ClearRoute>             requestClearRoute;
@@ -127,14 +124,19 @@ struct FieldOperatorApplication : public rclcpp::Node
 
   template <typename Thunk = void (*)()>
   auto waitForAutowareStateToBe(
-    const LegacyAutowareState & state, Thunk thunk = [] {})
+    const LegacyAutowareState & from_state, const LegacyAutowareState & to_state,
+    Thunk thunk = [] {})
   {
     thunk();
 
-    while (not finalized.load() and getLegacyAutowareState().value != state.value) {
+    auto not_to_be = [&](auto current_state) {
+      return from_state.value <= current_state.value and current_state.value < to_state.value;
+    };
+
+    while (not finalized.load() and not_to_be(getLegacyAutowareState())) {
       if (time_limit <= std::chrono::steady_clock::now()) {
         throw common::AutowareError(
-          "Simulator waited for the Autoware state to transition to ", state,
+          "Simulator waited for the Autoware state to transition to ", to_state,
           ", but time is up. The current Autoware state is ", getLegacyAutowareState());
       } else {
         thunk();
@@ -157,13 +159,11 @@ struct FieldOperatorApplication : public rclcpp::Node
 
   auto initialize(const geometry_msgs::msg::Pose &) -> void;
 
-  auto plan(const std::vector<geometry_msgs::msg::PoseStamped> &) -> void;
+  auto plan(const std::vector<geometry_msgs::msg::PoseStamped> &, const bool) -> void;
 
   auto clearRoute() -> void;
 
   auto getLegacyAutowareState() const -> LegacyAutowareState;
-
-  auto getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray;
 
   auto requestAutoModeForCooperation(const std::string &, bool) -> void;
 

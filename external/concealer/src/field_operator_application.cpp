@@ -145,13 +145,12 @@ FieldOperatorApplication::FieldOperatorApplication(const pid_t pid)
     minimum_risk_maneuver_behavior = behavior_name_of(message.behavior);
   }),
 #if __has_include(<autoware_adapi_v1_msgs/msg/operation_mode_state.hpp>)
-  getOperationModeState("/api/operation_mode/state", rclcpp::QoS(1), *this),
+  getOperationModeState("/api/operation_mode/state", rclcpp::QoS(1).transient_local(), *this),
 #endif
   getPathWithLaneId("/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", rclcpp::QoS(1), *this),
 #if __has_include(<autoware_adapi_v1_msgs/msg/route_state.hpp>)
-  getRouteState("/api/routing/state", rclcpp::QoS(1), *this),
+  getRouteState("/api/routing/state", rclcpp::QoS(1).transient_local(), *this),
 #endif
-  getTrajectory("/api/iv_msgs/planning/scenario_planning/trajectory", rclcpp::QoS(1), *this),
   getTurnIndicatorsCommand("/control/command/turn_indicators_cmd", rclcpp::QoS(1), *this),
   requestClearRoute("/api/routing/clear_route", *this),
   requestCooperateCommands("/api/external/set/rtc_commands", *this),
@@ -270,8 +269,19 @@ auto FieldOperatorApplication::engage() -> void
           "The simulator attempted to request Autoware to engage, but was aborted because "
           "Autoware's current state is ",
           state, ".");
+      case LegacyAutowareState::initializing:
+        // The initial pose has been sent but has not yet reached Autoware.
+        waitForAutowareStateToBe(
+          LegacyAutowareState::initializing, LegacyAutowareState::waiting_for_route);
+        [[fallthrough]];
+      case LegacyAutowareState::waiting_for_route:
+        // The route has been sent but has not yet reached Autoware.
+        waitForAutowareStateToBe(
+          LegacyAutowareState::waiting_for_route, LegacyAutowareState::planning);
+        [[fallthrough]];
       case LegacyAutowareState::planning:
-        waitForAutowareStateToBe(LegacyAutowareState::waiting_for_engage);
+        waitForAutowareStateToBe(
+          LegacyAutowareState::planning, LegacyAutowareState::waiting_for_engage);
         [[fallthrough]];
       case LegacyAutowareState::waiting_for_engage:
         requestEngage(
@@ -281,7 +291,11 @@ auto FieldOperatorApplication::engage() -> void
             return request;
           }(),
           30);
+        waitForAutowareStateToBe(
+          LegacyAutowareState::waiting_for_engage, LegacyAutowareState::driving);
         time_limit = std::decay_t<decltype(time_limit)>::max();
+        break;
+      case LegacyAutowareState::driving:
         break;
     }
   });
@@ -300,17 +314,6 @@ auto FieldOperatorApplication::engaged() const -> bool
   return task_queue.empty() and getLegacyAutowareState().value == LegacyAutowareState::driving;
 }
 
-auto FieldOperatorApplication::getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray
-{
-  traffic_simulator_msgs::msg::WaypointsArray waypoints;
-
-  for (const auto & point : getTrajectory().points) {
-    waypoints.waypoints.emplace_back(point.pose.position);
-  }
-
-  return waypoints;
-}
-
 auto FieldOperatorApplication::initialize(const geometry_msgs::msg::Pose & initial_pose) -> void
 {
   if (not std::exchange(initialized, true)) {
@@ -321,6 +324,10 @@ auto FieldOperatorApplication::initialize(const geometry_msgs::msg::Pose & initi
             "The simulator attempted to initialize Autoware, but aborted because Autoware's "
             "current state is ",
             state, ".");
+        case LegacyAutowareState::undefined:
+          waitForAutowareStateToBe(
+            LegacyAutowareState::undefined, LegacyAutowareState::initializing);
+          [[fallthrough]];
         case LegacyAutowareState::initializing:
           requestInitialPose(
             [&]() {
@@ -336,18 +343,21 @@ auto FieldOperatorApplication::initialize(const geometry_msgs::msg::Pose & initi
               return request;
             }(),
             30);
+          waitForAutowareStateToBe(
+            LegacyAutowareState::initializing, LegacyAutowareState::waiting_for_route);
           break;
       }
     });
   }
 }
 
-auto FieldOperatorApplication::plan(const std::vector<geometry_msgs::msg::PoseStamped> & route)
+auto FieldOperatorApplication::plan(
+  const std::vector<geometry_msgs::msg::PoseStamped> & route, const bool allow_goal_modification)
   -> void
 {
   assert(not route.empty());
 
-  task_queue.delay([this, route] {
+  task_queue.delay([this, route, allow_goal_modification]() {
     switch (const auto state = getLegacyAutowareState(); state.value) {
       default:
         throw common::AutowareError(
@@ -355,8 +365,9 @@ auto FieldOperatorApplication::plan(const std::vector<geometry_msgs::msg::PoseSt
           "current state is ",
           state, ".");
       case LegacyAutowareState::initializing:
+        // The initial pose has been sent but has not yet reached Autoware.
       case LegacyAutowareState::arrived_goal:
-        waitForAutowareStateToBe(LegacyAutowareState::waiting_for_route);
+        waitForAutowareStateToBe(state, LegacyAutowareState::waiting_for_route);
         [[fallthrough]];
       case LegacyAutowareState::waiting_for_route:
         requestSetRoutePoints(
@@ -381,18 +392,21 @@ auto FieldOperatorApplication::plan(const std::vector<geometry_msgs::msg::PoseSt
 
                [1] https://github.com/autowarefoundation/autoware_adapi_msgs/commit/805f8ebd3ca24564844df9889feeaf183101fbef
                [2] https://github.com/autowarefoundation/autoware_adapi_msgs/commit/cf310bd038673b6cbef3ae3b61dfe607212de419
-             */
+            */
             if constexpr (
               DetectMember_option<SetRoutePoints::Request>::value and
               DetectMember_allow_goal_modification<
                 decltype(std::declval<SetRoutePoints::Request>().option)>::value) {
-              request->option.allow_goal_modification = common::getParameter<bool>(
-                get_node_parameters_interface(), "allow_goal_modification");
+              request->option.allow_goal_modification = allow_goal_modification;
             }
 
             return request;
           }(),
           30);
+        waitForAutowareStateToBe(
+          LegacyAutowareState::waiting_for_route, LegacyAutowareState::planning);
+        waitForAutowareStateToBe(
+          LegacyAutowareState::planning, LegacyAutowareState::waiting_for_engage);
         break;
     }
   });
