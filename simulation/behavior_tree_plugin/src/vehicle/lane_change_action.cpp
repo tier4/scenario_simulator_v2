@@ -88,19 +88,23 @@ void LaneChangeAction::getBlackBoardValues()
   }
 }
 
-BT::NodeStatus LaneChangeAction::tick()
+bool LaneChangeAction::checkPreconditions()
 {
-  getBlackBoardValues();
   if (request_ != traffic_simulator::behavior::Request::LANE_CHANGE) {
     curve_ = std::nullopt;
     current_s_ = 0;
-    return BT::NodeStatus::FAILURE;
-  }
-  if (!lane_change_parameters_) {
+    return false;
+  } else if (!lane_change_parameters_) {
     curve_ = std::nullopt;
     current_s_ = 0;
-    return BT::NodeStatus::FAILURE;
+    return false;
+  } else {
+    return true;
   }
+}
+
+BT::NodeStatus LaneChangeAction::doAction()
+{
   if (!curve_) {
     if (request_ == traffic_simulator::behavior::Request::LANE_CHANGE) {
       if (!canonicalized_entity_status_->isInLanelet()) {
@@ -170,6 +174,9 @@ BT::NodeStatus LaneChangeAction::tick()
           case traffic_simulator::lane_change::Constraint::Type::TIME:
             lane_change_velocity_ = curve_->getLength() / lane_change_parameters_->constraint.value;
             break;
+        }
+        if (target_speed_) {
+          lane_change_velocity_ = std::clamp(lane_change_velocity_, 0.0, target_speed_.value());
         }
       } else {
         return BT::NodeStatus::FAILURE;

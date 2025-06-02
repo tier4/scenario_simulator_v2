@@ -31,7 +31,6 @@ StopAtCrossingEntityAction::StopAtCrossingEntityAction(
   const std::string & name, const BT::NodeConfiguration & config)
 : entity_behavior::VehicleActionNode(name, config)
 {
-  in_stop_sequence_ = false;
 }
 
 const std::optional<traffic_simulator_msgs::msg::Obstacle>
@@ -83,27 +82,25 @@ std::optional<double> StopAtCrossingEntityAction::calculateTargetSpeed(double cu
   return current_velocity;
 }
 
-BT::NodeStatus StopAtCrossingEntityAction::tick()
+bool StopAtCrossingEntityAction::checkPreconditions()
 {
-  getBlackBoardValues();
   if (
     request_ != traffic_simulator::behavior::Request::NONE &&
     request_ != traffic_simulator::behavior::Request::FOLLOW_LANE) {
-    in_stop_sequence_ = false;
-    return BT::NodeStatus::FAILURE;
+    return false;
+  } else if (!canonicalized_entity_status_->isInLanelet()) {
+    return false;
+  } else if (!behavior_parameter_.see_around) {
+    return false;
+  } else if (!getRightOfWayEntities(route_lanelets_).empty()) {
+    return false;
+  } else {
+    return true;
   }
-  if (!canonicalized_entity_status_->isInLanelet()) {
-    in_stop_sequence_ = false;
-    return BT::NodeStatus::FAILURE;
-  }
-  if (!behavior_parameter_.see_around) {
-    in_stop_sequence_ = false;
-    return BT::NodeStatus::FAILURE;
-  }
-  if (getRightOfWayEntities(route_lanelets_).size() != 0) {
-    in_stop_sequence_ = false;
-    return BT::NodeStatus::FAILURE;
-  }
+}
+
+BT::NodeStatus StopAtCrossingEntityAction::doAction()
+{
   const auto waypoints = calculateWaypoints();
   if (waypoints.waypoints.empty()) {
     return BT::NodeStatus::FAILURE;
@@ -111,38 +108,25 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
   if (trajectory == nullptr) {
     return BT::NodeStatus::FAILURE;
   }
-  distance_to_stop_target_ = getDistanceToConflictingEntity(route_lanelets_, *trajectory);
+  std::optional<double> target_linear_speed;
   auto distance_to_stopline =
     traffic_simulator::distance::distanceToStopLine(route_lanelets_, *trajectory);
   const auto distance_to_front_entity = getDistanceToFrontEntity(*trajectory);
-  if (!distance_to_stop_target_) {
-    in_stop_sequence_ = false;
+  distance_to_stop_target_ = getDistanceToConflictingEntity(route_lanelets_, *trajectory);
+  if (distance_to_stop_target_) {
+    target_linear_speed = calculateTargetSpeed(canonicalized_entity_status_->getTwist().linear.x);
+  } else {
     return BT::NodeStatus::FAILURE;
   }
   if (distance_to_front_entity) {
     if (distance_to_front_entity.value() <= distance_to_stop_target_.value()) {
-      in_stop_sequence_ = false;
       return BT::NodeStatus::FAILURE;
     }
   }
   if (distance_to_stopline) {
     if (distance_to_stopline.value() <= distance_to_stop_target_.value()) {
-      in_stop_sequence_ = false;
       return BT::NodeStatus::FAILURE;
     }
-  }
-  std::optional<double> target_linear_speed;
-  if (distance_to_stop_target_) {
-    target_linear_speed = calculateTargetSpeed(canonicalized_entity_status_->getTwist().linear.x);
-  } else {
-    target_linear_speed = std::nullopt;
-  }
-  if (!distance_to_stop_target_) {
-    setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(0));
-    setOutput("waypoints", waypoints);
-    setOutput("obstacle", calculateObstacle(waypoints));
-    in_stop_sequence_ = false;
-    return BT::NodeStatus::SUCCESS;
   }
   if (target_speed_) {
     if (target_speed_.value() > target_linear_speed.value()) {
@@ -154,7 +138,6 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
   setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(target_speed_.value()));
   setOutput("waypoints", waypoints);
   setOutput("obstacle", calculateObstacle(waypoints));
-  in_stop_sequence_ = true;
   return BT::NodeStatus::RUNNING;
 }
 }  // namespace follow_lane_sequence
