@@ -150,6 +150,15 @@ auto VehicleBehaviorTree::update(const double current_time, const double step_ti
   }
 }
 
+auto VehicleBehaviorTree::postUpdate() -> void
+{
+  traffic_simulator_msgs::msg::PolylineTrajectory updated_polyline_trajectory;
+  if (tree_.rootBlackboard()->get(
+        getPolylineTrajectoryKey() + "_updated", updated_polyline_trajectory)) {
+    setPolylineTrajectory(updated_polyline_trajectory);
+  }
+}
+
 auto VehicleBehaviorTree::tickOnce(const double current_time, const double step_time)
   -> BT::NodeStatus
 {

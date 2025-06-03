@@ -39,6 +39,7 @@ class VehicleBehaviorTree : public BehaviorPluginBase
 {
 public:
   auto update(const double current_time, const double step_time) -> void override;
+  auto postUpdate() -> void override;
   void configure(const rclcpp::Logger & logger) override;
   auto getCurrentAction() -> const std::string & override;
 

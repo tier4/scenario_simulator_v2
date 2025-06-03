@@ -42,6 +42,15 @@ void PedestrianBehaviorTree::configure(const rclcpp::Logger & logger)
   setRequest(traffic_simulator::behavior::Request::NONE);
 }
 
+auto PedestrianBehaviorTree::postUpdate() -> void
+{
+  traffic_simulator_msgs::msg::PolylineTrajectory updated_polyline_trajectory;
+  if (tree_.rootBlackboard()->get(
+        getPolylineTrajectoryKey() + "_updated", updated_polyline_trajectory)) {
+    setPolylineTrajectory(updated_polyline_trajectory);
+  }
+}
+
 auto PedestrianBehaviorTree::createBehaviorTree(const std::string & format_path) -> BT::Tree
 {
   auto xml_doc = pugi::xml_document();
