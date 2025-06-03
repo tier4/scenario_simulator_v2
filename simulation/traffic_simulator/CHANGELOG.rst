@@ -24,6 +24,28 @@ Changelog for package traffic_simulator
 16.4.2 (2025-05-23)
 -------------------
 
+16.5.0 (2025-06-03)
+-------------------
+* Merge pull request `#1611 <https://github.com/tier4/scenario_simulator_v2/issues/1611>`_ from tier4/feature/set_route
+* Merge branch 'master' into feature/set_route
+* Merge branch 'master' into feature/set_route
+* Rename use_lane_level_specification_for_waypoints to use_lane_ids_for_routing
+* Use algorithm functions instead of for loop code
+* Stop using deprecated version of FieldOperatorApplication::plan in EgoEntity::requestReplanRoute
+* Merge branch 'master' into feature/set_route
+* Add an exception when failed to get current lanelet in EgoEntity::requestAssignRoute
+* Rename FieldOperatorApplication::setRoute/setRoutePoints to plan
+* configration => configuration
+* use setRoutePoints instead of plan in EgoEntity::requestAssignRoute
+* Use route and waypoint appropriately (route = waypoints + goal)
+* Interpolate and unique lanelet array for set route API
+* Switch by use_lane_level_specification_for_waypoints flag in EgoEntity::requestAssignRoute
+* Change redirect target of requestAssignRoute(lanelet_pose[])
+* Adjust name of (traffic_simulator::)RouteOption
+* Define conversion of RouteOption from v1 to v2
+* Add RouteOption v2
+* Contributors: Kotaro Yoshimoto
+
 16.4.6 (2025-06-02)
 -------------------
 
