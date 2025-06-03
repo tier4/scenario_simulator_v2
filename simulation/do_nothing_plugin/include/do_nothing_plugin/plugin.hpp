@@ -75,8 +75,8 @@ private:                                                               \
   DEFINE_GETTER_SETTER(CanonicalizedEntityStatus, std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>,    canonicalized_entity_status_)
   DEFINE_GETTER_SETTER(CurrentTime,               double,                                                           current_time_)
   DEFINE_GETTER_SETTER(HdMapUtils,                std::shared_ptr<hdmap_utils::HdMapUtils>,                         hdmap_utils_)
-  DEFINE_GETTER_SETTER(PolylineTrajectory,        traffic_simulator_msgs::msg::PolylineTrajectory,                  polyline_trajectory)
-  DEFINE_GETTER_SETTER(Request,                   traffic_simulator::behavior::Request,                             request)
+  DEFINE_GETTER_SETTER(PolylineTrajectory,        traffic_simulator_msgs::msg::PolylineTrajectory,                  polyline_trajectory_)
+  DEFINE_GETTER_SETTER(Request,                   traffic_simulator::behavior::Request,                             request_)
   DEFINE_GETTER_SETTER(StepTime,                  double,                                                           step_time_)
   // clang-format on
 #undef DEFINE_GETTER_SETTER

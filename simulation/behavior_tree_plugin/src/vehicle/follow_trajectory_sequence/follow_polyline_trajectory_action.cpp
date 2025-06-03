@@ -51,6 +51,7 @@ auto FollowPolylineTrajectoryAction::providedPorts() -> BT::PortsList
   auto ports = VehicleActionNode::providedPorts();
   ports.emplace(BT::InputPort<decltype(polyline_trajectory)>("polyline_trajectory"));
   ports.emplace(BT::InputPort<decltype(target_speed_)>("target_speed"));
+  ports.emplace(BT::OutputPort<decltype(polyline_trajectory)>("polyline_trajectory"));
   return ports;
 }
 
@@ -88,6 +89,7 @@ BT::NodeStatus FollowPolylineTrajectoryAction::doAction()
     setCanonicalizedEntityStatus(entity_status_updated.value());
     setOutput("waypoints", calculateWaypoints());
     setOutput("obstacle", calculateObstacle(calculateWaypoints()));
+    setOutput("polyline_trajectory", polyline_trajectory);
     return BT::NodeStatus::RUNNING;
   } else {
     return BT::NodeStatus::SUCCESS;
