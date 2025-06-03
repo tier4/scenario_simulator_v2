@@ -84,21 +84,24 @@ std::optional<double> StopAtStopLineAction::calculateTargetSpeed(double current_
   return current_velocity;
 }
 
-BT::NodeStatus StopAtStopLineAction::tick()
+bool StopAtStopLineAction::checkPreconditions()
 {
-  getBlackBoardValues();
   if (
     request_ != traffic_simulator::behavior::Request::NONE &&
     request_ != traffic_simulator::behavior::Request::FOLLOW_LANE) {
-    return BT::NodeStatus::FAILURE;
+    return false;
+  } else if (!behavior_parameter_.see_around) {
+    return false;
+  } else if (traffic_simulator::route::isNeedToRightOfWay(
+               route_lanelets_, getOtherEntitiesCanonicalizedLaneletPoses())) {
+    return false;
+  } else {
+    return true;
   }
-  if (!behavior_parameter_.see_around) {
-    return BT::NodeStatus::FAILURE;
-  }
-  if (traffic_simulator::route::isNeedToRightOfWay(
-        route_lanelets_, getOtherEntitiesCanonicalizedLaneletPoses())) {
-    return BT::NodeStatus::FAILURE;
-  }
+}
+
+BT::NodeStatus StopAtStopLineAction::doAction()
+{
   const auto waypoints = calculateWaypoints();
   if (waypoints.waypoints.empty()) {
     return BT::NodeStatus::FAILURE;

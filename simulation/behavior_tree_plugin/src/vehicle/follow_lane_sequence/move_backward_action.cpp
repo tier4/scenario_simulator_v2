@@ -52,17 +52,21 @@ const traffic_simulator_msgs::msg::WaypointsArray MoveBackwardAction::calculateW
 
 void MoveBackwardAction::getBlackBoardValues() { VehicleActionNode::getBlackBoardValues(); }
 
-BT::NodeStatus MoveBackwardAction::tick()
+bool MoveBackwardAction::checkPreconditions()
 {
-  getBlackBoardValues();
   if (
     request_ != traffic_simulator::behavior::Request::NONE &&
     request_ != traffic_simulator::behavior::Request::FOLLOW_LANE) {
-    return BT::NodeStatus::FAILURE;
+    return false;
+  } else if (!canonicalized_entity_status_->isInLanelet()) {
+    return false;
+  } else {
+    return true;
   }
-  if (!canonicalized_entity_status_->isInLanelet()) {
-    return BT::NodeStatus::FAILURE;
-  }
+}
+
+BT::NodeStatus MoveBackwardAction::doAction()
+{
   const auto waypoints = calculateWaypoints();
   if (waypoints.waypoints.empty()) {
     return BT::NodeStatus::FAILURE;
