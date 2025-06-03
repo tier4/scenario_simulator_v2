@@ -155,6 +155,37 @@ void CppScenarioNode::spawnEgoEntity(
   }
 }
 
+auto CppScenarioNode::spawnEgoEntity(
+  const traffic_simulator::CanonicalizedLaneletPose & spawn_lanelet_pose,
+  const traffic_simulator_msgs::msg::VehicleParameters & parameters) -> void
+{
+  api_.updateFrame();
+  std::this_thread::sleep_for(std::chrono::duration<double>(1.0 / 20.0));
+  api_.spawn(
+    "ego", spawn_lanelet_pose, parameters, traffic_simulator::VehicleBehavior::autoware(),
+    ego_model_);
+  auto & ego_entity = api_.getEgoEntity("ego");
+  ego_entity.setParameter<bool>("allow_goal_modification", true);
+  api_.attachLidarSensor("ego", 0.0);
+
+  api_.attachDetectionSensor("ego", 200.0, true, 0.0, 0, 0.0, 0.0);
+
+  api_.attachOccupancyGridSensor([this] {
+    simulation_api_schema::OccupancyGridSensorConfiguration configuration;
+    // clang-format off
+      configuration.set_architecture_type(api_.getROS2Parameter<std::string>("architecture_type", "awf/universe/20240605"));
+      configuration.set_entity("ego");
+      configuration.set_filter_by_range(true);
+      configuration.set_height(200);
+      configuration.set_range(300);
+      configuration.set_resolution(0.5);
+      configuration.set_update_duration(0.1);
+      configuration.set_width(200);
+    // clang-format on
+    return configuration;
+  }());
+}
+
 auto CppScenarioNode::isVehicle(const std::string & name) const -> bool
 {
   return api_.getEntity(name).getEntityType().type ==

@@ -53,6 +53,10 @@ public:
     const std::vector<traffic_simulator::CanonicalizedLaneletPose> & goal_lanelet_pose,
     const traffic_simulator_msgs::msg::VehicleParameters & parameters);
 
+  auto spawnEgoEntity(
+    const traffic_simulator::CanonicalizedLaneletPose & spawn_lanelet_pose,
+    const traffic_simulator_msgs::msg::VehicleParameters & parameters) -> void;
+
   auto isVehicle(const std::string & name) const -> bool;
 
   auto isPedestrian(const std::string & name) const -> bool;
