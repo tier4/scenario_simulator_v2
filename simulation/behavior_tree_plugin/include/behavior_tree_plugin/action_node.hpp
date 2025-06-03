@@ -120,6 +120,8 @@ protected:
   lanelet::Ids route_lanelets_;
   traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter_;
 
+  virtual bool checkPreconditions() { return true; }
+  virtual BT::NodeStatus doAction() = 0;
   auto getDistanceToTargetEntity(
     const math::geometry::CatmullRomSplineInterface & spline,
     const traffic_simulator::CanonicalizedEntityStatus & status) const -> std::optional<double>;
@@ -139,6 +141,7 @@ private:
     -> std::vector<traffic_simulator::CanonicalizedEntityStatus>;
   auto isOtherEntityAtConsideredAltitude(
     const traffic_simulator::CanonicalizedEntityStatus & entity_status) const -> bool;
+  auto tick() -> BT::NodeStatus override;
 
   std::shared_ptr<EuclideanDistancesMap> euclidean_distances_map_;
 };

@@ -51,6 +51,15 @@ ActionNode::ActionNode(const std::string & name, const BT::NodeConfiguration & c
 
 auto ActionNode::executeTick() -> BT::NodeStatus { return BT::ActionNodeBase::executeTick(); }
 
+auto ActionNode::tick() -> BT::NodeStatus
+{
+  getBlackBoardValues();
+  if (!checkPreconditions()) {
+    return BT::NodeStatus::FAILURE;
+  }
+  return doAction();
+}
+
 auto ActionNode::getBlackBoardValues() -> void
 {
   if (!getInput<traffic_simulator::behavior::Request>("request", request_)) {
