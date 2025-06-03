@@ -98,6 +98,10 @@ public:
     -> traffic_simulator::EntityStatus;
 
 protected:
+  virtual bool checkPreconditions() { return true; }
+  virtual BT::NodeStatus doAction() = 0;
+  auto tick() -> BT::NodeStatus override;
+
   traffic_simulator::behavior::Request request_;
   std::shared_ptr<traffic_simulator::TrafficLightsBase> traffic_lights_;
   std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus> canonicalized_entity_status_;

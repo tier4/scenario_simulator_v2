@@ -38,6 +38,25 @@ Changelog for package scenario_test_runner
 16.4.2 (2025-05-23)
 -------------------
 
+16.5.0 (2025-06-03)
+-------------------
+* Merge pull request `#1611 <https://github.com/tier4/scenario_simulator_v2/issues/1611>`_ from tier4/feature/set_route
+* Merge branch 'master' into feature/set_route
+* Merge branch 'master' into feature/set_route
+* Stop using dot in prameter name because it is not allowed in OpenSCENARIO
+* Rename use_lane_level_specification_for_waypoints to use_lane_ids_for_routing
+* Merge branch 'master' into feature/set_route
+* Fix parameter name in RoutingAction.AcquirePositionAction-allow_goal_modification.yaml
+* Fix parameter name in RoutingAction.AssignRouteAction-use_lane_level_specification_for_waypoint.yaml
+* Add sample scenario RoutingAction.AssignRouteAction-use_lane_level_specification_for_waypoint.yaml
+* Contributors: Kotaro Yoshimoto
+
+16.4.6 (2025-06-02)
+-------------------
+
+16.4.5 (2025-05-30)
+-------------------
+
 16.4.4 (2025-05-28)
 -------------------
 * Merge remote-tracking branch 'origin/master' into feature/delay_curventure_calculation
