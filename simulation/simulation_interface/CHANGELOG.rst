@@ -24,6 +24,13 @@ Changelog for package simulation_interface
 16.4.2 (2025-05-23)
 -------------------
 
+16.5.0 (2025-06-03)
+-------------------
+* Merge branch 'master' into feature/set_route
+* Merge branch 'master' into feature/set_route
+* Merge branch 'master' into feature/set_route
+* Contributors: Kotaro Yoshimoto
+
 16.4.6 (2025-06-02)
 -------------------
 
