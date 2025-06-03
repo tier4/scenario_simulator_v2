@@ -71,21 +71,24 @@ const traffic_simulator_msgs::msg::WaypointsArray FollowFrontEntityAction::calcu
   }
 }
 
-BT::NodeStatus FollowFrontEntityAction::tick()
+bool FollowFrontEntityAction::checkPreconditions()
 {
-  getBlackBoardValues();
   if (
     request_ != traffic_simulator::behavior::Request::NONE &&
     request_ != traffic_simulator::behavior::Request::FOLLOW_LANE) {
-    return BT::NodeStatus::FAILURE;
+    return false;
+  } else if (traffic_simulator::route::isNeedToRightOfWay(
+               route_lanelets_, getOtherEntitiesCanonicalizedLaneletPoses())) {
+    return false;
+  } else if (!behavior_parameter_.see_around) {
+    return false;
+  } else {
+    return true;
   }
-  if (traffic_simulator::route::isNeedToRightOfWay(
-        route_lanelets_, getOtherEntitiesCanonicalizedLaneletPoses())) {
-    return BT::NodeStatus::FAILURE;
-  }
-  if (!behavior_parameter_.see_around) {
-    return BT::NodeStatus::FAILURE;
-  }
+}
+
+BT::NodeStatus FollowFrontEntityAction::doAction()
+{
   const auto waypoints = calculateWaypoints();
   if (waypoints.waypoints.empty()) {
     return BT::NodeStatus::FAILURE;

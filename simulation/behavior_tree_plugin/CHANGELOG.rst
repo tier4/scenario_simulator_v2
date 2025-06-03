@@ -24,6 +24,25 @@ Changelog for package behavior_tree_plugin
 16.4.2 (2025-05-23)
 -------------------
 
+16.5.0 (2025-06-03)
+-------------------
+* Merge branch 'master' into feature/set_route
+* Merge branch 'master' into feature/set_route
+* Merge branch 'master' into feature/set_route
+* Contributors: Kotaro Yoshimoto
+
+16.4.6 (2025-06-02)
+-------------------
+
+16.4.5 (2025-05-30)
+-------------------
+* Merge pull request `#1612 <https://github.com/tier4/scenario_simulator_v2/issues/1612>`_ from tier4/refactor/behavior_tree_5
+  Refactor ActionNode to isolate side effects via pure virtual methods
+* Fix inverted right-of-way entity check
+* Refactored code for better clarity
+* Refactor ActionNode to isolate side effects via pure virtual methods
+* Contributors: Masaya Kataoka, Taiga Takano
+
 16.4.4 (2025-05-28)
 -------------------
 * Merge remote-tracking branch 'origin/master' into feature/delay_curventure_calculation
