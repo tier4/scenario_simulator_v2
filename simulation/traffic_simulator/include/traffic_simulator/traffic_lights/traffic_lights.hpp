@@ -45,7 +45,7 @@ public:
   ~ConventionalTrafficLights() override = default;
 
 private:
-  auto update() const -> void
+  auto update() const -> void override
   {
     backward_compatible_publisher_ptr_->publish(
       clock_ptr_->now(), generateUpdateTrafficLightsRequest());
