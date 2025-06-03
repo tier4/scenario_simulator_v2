@@ -21,6 +21,7 @@
 #include <autoware_adapi_v1_msgs/srv/change_operation_mode.hpp>
 #include <autoware_adapi_v1_msgs/srv/clear_route.hpp>
 #include <autoware_adapi_v1_msgs/srv/initialize_localization.hpp>
+#include <autoware_adapi_v1_msgs/srv/set_route.hpp>
 #include <autoware_adapi_v1_msgs/srv/set_route_points.hpp>
 #include <autoware_control_msgs/msg/control.hpp>
 #include <autoware_vehicle_msgs/msg/gear_command.hpp>
@@ -83,6 +84,7 @@ struct FieldOperatorApplication : public rclcpp::Node
   using CooperateCommands               = tier4_rtc_msgs::srv::CooperateCommands;
   using Engage                          = tier4_external_api_msgs::srv::Engage;
   using InitializeLocalization          = autoware_adapi_v1_msgs::srv::InitializeLocalization;
+  using SetRoute                        = autoware_adapi_v1_msgs::srv::SetRoute;
   using SetRoutePoints                  = autoware_adapi_v1_msgs::srv::SetRoutePoints;
   using AutoModeWithModule              = tier4_rtc_msgs::srv::AutoModeWithModule;
   using SetVelocityLimit                = tier4_external_api_msgs::srv::SetVelocityLimit;
@@ -109,6 +111,7 @@ struct FieldOperatorApplication : public rclcpp::Node
   Service<CooperateCommands>      requestCooperateCommands;
   Service<Engage>                 requestEngage;
   Service<InitializeLocalization> requestInitialPose;
+  Service<SetRoute>               requestSetRoute;
   Service<SetRoutePoints>         requestSetRoutePoints;
   Service<AutoModeWithModule>     requestSetRtcAutoMode;
   Service<SetVelocityLimit>       requestSetVelocityLimit;
@@ -159,7 +162,24 @@ struct FieldOperatorApplication : public rclcpp::Node
 
   auto initialize(const geometry_msgs::msg::Pose &) -> void;
 
-  auto plan(const std::vector<geometry_msgs::msg::PoseStamped> &, const bool) -> void;
+  [[deprecated(
+    "This function was deprecated since version 16.5.0 (released on 20250603). It will be deleted "
+    "after a half-year transition period (~20251203). Please use other overloads instead.")]] auto
+  plan(const std::vector<geometry_msgs::msg::PoseStamped> &, const bool) -> void;
+
+#if __has_include(<autoware_adapi_v1_msgs/msg/route_option.hpp>)
+  using RouteOption = autoware_adapi_v1_msgs::msg::RouteOption;
+#else
+  using RouteOption = void;
+#endif
+
+  auto plan(
+    const geometry_msgs::msg::Pose & goal, const std::vector<geometry_msgs::msg::Pose> &,
+    const RouteOption &) -> void;
+
+  auto plan(
+    const geometry_msgs::msg::Pose & goal,
+    const std::vector<autoware_adapi_v1_msgs::msg::RouteSegment> &, const RouteOption &) -> void;
 
   auto clearRoute() -> void;
 

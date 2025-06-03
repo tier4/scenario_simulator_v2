@@ -34,7 +34,8 @@ class LaneChangeAction : public entity_behavior::VehicleActionNode
 {
 public:
   LaneChangeAction(const std::string & name, const BT::NodeConfiguration & config);
-  BT::NodeStatus tick() override;
+  bool checkPreconditions() override;
+  BT::NodeStatus doAction() override;
   static BT::PortsList providedPorts()
   {
     return BT::PortsList(

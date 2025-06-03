@@ -103,15 +103,19 @@ bool FollowLaneAction::detectObstacleInLane(
     return false;
   }
 }
-
-BT::NodeStatus FollowLaneAction::tick()
+bool FollowLaneAction::checkPreconditions()
 {
-  getBlackBoardValues();
   if (
     request_ != traffic_simulator::behavior::Request::NONE &&
     request_ != traffic_simulator::behavior::Request::FOLLOW_LANE) {
-    return BT::NodeStatus::FAILURE;
+    return false;
+  } else {
+    return true;
   }
+}
+
+BT::NodeStatus FollowLaneAction::doAction()
+{
   if (!canonicalized_entity_status_->isInLanelet()) {
     stopEntity();
     return BT::NodeStatus::RUNNING;

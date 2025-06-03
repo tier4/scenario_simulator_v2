@@ -85,20 +85,23 @@ std::optional<double> YieldAction::calculateTargetSpeed()
   return canonicalized_entity_status_->getTwist().linear.x;
 }
 
-BT::NodeStatus YieldAction::tick()
+bool YieldAction::checkPreconditions()
 {
-  getBlackBoardValues();
   if (
     request_ != traffic_simulator::behavior::Request::NONE &&
     request_ != traffic_simulator::behavior::Request::FOLLOW_LANE) {
-    return BT::NodeStatus::FAILURE;
+    return false;
+  } else if (!behavior_parameter_.see_around) {
+    return false;
+  } else if (!canonicalized_entity_status_->isInLanelet()) {
+    return false;
+  } else {
+    return true;
   }
-  if (!behavior_parameter_.see_around) {
-    return BT::NodeStatus::FAILURE;
-  }
-  if (!canonicalized_entity_status_->isInLanelet()) {
-    return BT::NodeStatus::FAILURE;
-  }
+}
+
+BT::NodeStatus YieldAction::doAction()
+{
   if (!isNeedToRightOfWay(route_lanelets_)) {
     if (!target_speed_) {
       target_speed_ = hdmap_utils_->getSpeedLimit(route_lanelets_);
