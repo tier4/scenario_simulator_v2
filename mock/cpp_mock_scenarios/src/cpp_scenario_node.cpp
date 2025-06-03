@@ -123,26 +123,8 @@ void CppScenarioNode::spawnEgoEntity(
   api_.spawn(
     "ego", spawn_lanelet_pose, parameters, traffic_simulator::VehicleBehavior::autoware(),
     ego_model_);
+  configureEgoEntity();
   auto & ego_entity = api_.getEgoEntity("ego");
-  ego_entity.setParameter<bool>("allow_goal_modification", true);
-  api_.attachLidarSensor("ego", 0.0);
-
-  api_.attachDetectionSensor("ego", 200.0, true, 0.0, 0, 0.0, 0.0);
-
-  api_.attachOccupancyGridSensor([this] {
-    simulation_api_schema::OccupancyGridSensorConfiguration configuration;
-    // clang-format off
-      configuration.set_architecture_type(api_.getROS2Parameter<std::string>("architecture_type", "awf/universe/20240605"));
-      configuration.set_entity("ego");
-      configuration.set_filter_by_range(true);
-      configuration.set_height(200);
-      configuration.set_range(300);
-      configuration.set_resolution(0.5);
-      configuration.set_update_duration(0.1);
-      configuration.set_width(200);
-    // clang-format on
-    return configuration;
-  }());
   ego_entity.requestAssignRoute(goal_lanelet_poses);
 
   using namespace std::chrono_literals;
@@ -164,6 +146,11 @@ auto CppScenarioNode::spawnEgoEntity(
   api_.spawn(
     "ego", spawn_lanelet_pose, parameters, traffic_simulator::VehicleBehavior::autoware(),
     ego_model_);
+  configureEgoEntity();
+}
+
+auto CppScenarioNode::configureEgoEntity() -> void
+{
   auto & ego_entity = api_.getEgoEntity("ego");
   ego_entity.setParameter<bool>("allow_goal_modification", true);
   api_.attachLidarSensor("ego", 0.0);

@@ -88,6 +88,7 @@ private:
   }
 
   void checkConfiguration(const traffic_simulator::Configuration & configuration);
+  auto configureEgoEntity() -> void;
 };
 
 }  // namespace cpp_mock_scenarios
