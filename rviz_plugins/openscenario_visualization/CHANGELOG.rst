@@ -24,6 +24,15 @@ Changelog for package openscenario_visualization
 16.4.2 (2025-05-23)
 -------------------
 
+16.5.1 (2025-06-03)
+-------------------
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, ぐるぐる
+
 16.5.0 (2025-06-03)
 -------------------
 * Merge branch 'master' into feature/set_route
