@@ -409,8 +409,8 @@ auto HdMapUtils::getTrafficLightIds() const -> lanelet::Ids
 }
 
 auto HdMapUtils::getTrafficLightBulbPosition(
-  const lanelet::Id traffic_light_id, const std::string & color_name) const
-  -> std::optional<geometry_msgs::msg::Point>
+  const lanelet::Id traffic_light_id, const std::string & color_name,
+  const bool allow_infer_position) const -> std::optional<geometry_msgs::msg::Point>
 {
   lanelet::ConstLanelets all_lanelets = lanelet::utils::query::laneletLayer(lanelet_map_ptr_);
   auto autoware_traffic_lights = lanelet::utils::query::autowareTrafficLights(all_lanelets);
@@ -441,6 +441,39 @@ auto HdMapUtils::getTrafficLightBulbPosition(
       }
     }
   }
+
+  if (!allow_infer_position) {
+    return std::nullopt;
+  }
+
+  // In case of a traffic light without bulbs, we can check the base string
+  // to get the position of the traffic light
+  const auto position_scale = color_name == "red" ? 0.25 : (color_name == "yellow" ? 0.5 : 0.75);
+  for (const auto & light : autoware_traffic_lights) {
+    for (auto & traffic_light : light->trafficLights()) {
+      if (traffic_light.id() != traffic_light_id) continue;
+      if (!traffic_light.isLineString()) continue;
+      const auto base_string = static_cast<lanelet::ConstLineString3d>(traffic_light);
+      if (!base_string.hasAttribute("height")) continue;
+      const auto height = base_string.attribute("height").asDouble();
+      if (!height) continue;
+
+      const auto x1 = base_string.front().x();
+      const auto y1 = base_string.front().y();
+      const auto z1 = base_string.front().z();
+
+      const auto x2 = base_string.back().x();
+      const auto y2 = base_string.back().y();
+
+      geometry_msgs::msg::Point point;
+      point.x = x1 * position_scale + x2 * (1 - position_scale);
+      point.y = y1 * position_scale + y2 * (1 - position_scale);
+      point.z = z1 + *height / 2.0;
+
+      return point;
+    }
+  }
+
   return std::nullopt;
 }
 

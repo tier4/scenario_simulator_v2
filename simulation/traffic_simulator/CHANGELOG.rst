@@ -24,6 +24,25 @@ Changelog for package traffic_simulator
 16.4.2 (2025-05-23)
 -------------------
 
+16.5.1 (2025-06-03)
+-------------------
+* Merge pull request `#1597 <https://github.com/tier4/scenario_simulator_v2/issues/1597>`_ from tier4/feature/render-omitted-light-bulb
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Add new line on EOF to lanelet map
+* Add infer test
+* Remove unnecessary operator
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* update tests for multiple traffic light
+* Add support for render bulbs without state
+* Refactor constant
+* Activate bulb position inference
+* Fix missing override
+* Add bulb position inference feature to HdMapUtils
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, f0reachARR, ぐるぐる
+
 16.5.0 (2025-06-03)
 -------------------
 * Merge pull request `#1611 <https://github.com/tier4/scenario_simulator_v2/issues/1611>`_ from tier4/feature/set_route
