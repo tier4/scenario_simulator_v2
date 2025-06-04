@@ -166,15 +166,9 @@ TrafficLight::TrafficLight(const lanelet::Id lanelet_id)
   regulatory_elements_ids(
     traffic_lights::trafficLightRegulatoryElementIdsFromTrafficLightId(way_id)),
   positions{
-    std::make_pair(
-      Bulb(Color::green, Status::solid_on, Shape::circle).hash(),
-      traffic_lights::bulbPosition(way_id, "green")),
-    std::make_pair(
-      Bulb(Color::yellow, Status::solid_on, Shape::circle).hash(),
-      traffic_lights::bulbPosition(way_id, "yellow")),
-    std::make_pair(
-      Bulb(Color::red, Status::solid_on, Shape::circle).hash(),
-      traffic_lights::bulbPosition(way_id, "red")),
+    std::make_pair(Color::green, traffic_lights::bulbPosition(way_id, "green", true)),
+    std::make_pair(Color::yellow, traffic_lights::bulbPosition(way_id, "yellow", true)),
+    std::make_pair(Color::red, traffic_lights::bulbPosition(way_id, "red", true)),
   }
 {
 }

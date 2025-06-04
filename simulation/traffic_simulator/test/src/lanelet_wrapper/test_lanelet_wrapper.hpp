@@ -37,6 +37,12 @@ class LaneletWrapperTest_StandardMap : public testing::Test
 protected:
   LaneletWrapperTest_StandardMap() { activateLaneletWrapper("standard_map"); }
 };
+class LaneletWrapperTest_WithoutLightBulb : public testing::Test
+{
+protected:
+  LaneletWrapperTest_WithoutLightBulb() { activateLaneletWrapper("minimal_map"); }
+};
+
 class LaneletWrapperTest_WithRoadShoulderMap : public testing::Test
 {
 protected:

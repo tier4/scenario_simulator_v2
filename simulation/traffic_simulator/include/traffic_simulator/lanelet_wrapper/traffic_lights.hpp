@@ -38,7 +38,8 @@ auto toAutowareTrafficLights(const lanelet::Id traffic_light_id)
 
 auto trafficLightIds() -> lanelet::Ids;
 
-auto trafficLightBulbPosition(const lanelet::Id traffic_light_id, const std::string & color_name)
+auto trafficLightBulbPosition(
+  const lanelet::Id traffic_light_id, const std::string &, const bool allow_infer_position = false)
   -> std::optional<Point>;
 
 auto trafficLightStopLineIds(const lanelet::Id traffic_light_id) -> lanelet::Ids;

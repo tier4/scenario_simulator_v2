@@ -136,6 +136,57 @@ TEST_F(LaneletWrapperTest_StandardMap, getTrafficLightBulbPosition_correct)
 /**
  * @note Test basic functionality.
  * Test traffic light position obtaining
+ * with a traffic light and bulb color specified.
+ */
+TEST_F(LaneletWrapperTest_WithoutLightBulb, getTrafficLightBulbPositionInfer_correct)
+{
+  const lanelet::Id light_id = 34802;
+  const double epsilon = 0.1;
+
+  {
+    const auto return_bulb_position =
+      traffic_lights::trafficLightBulbPosition(light_id, "green", true);
+
+    EXPECT_TRUE(return_bulb_position.has_value());
+    EXPECT_POINT_NEAR(return_bulb_position.value(), makePoint(3761.05, 73755.30, 5.35), epsilon);
+  }
+
+  {
+    const auto return_bulb_position =
+      traffic_lights::trafficLightBulbPosition(light_id, "yellow", true);
+
+    EXPECT_TRUE(return_bulb_position.has_value());
+    EXPECT_POINT_NEAR(return_bulb_position.value(), makePoint(3760.60, 73755.07, 5.35), epsilon);
+  }
+
+  {
+    const auto return_bulb_position =
+      traffic_lights::trafficLightBulbPosition(light_id, "red", true);
+
+    EXPECT_TRUE(return_bulb_position.has_value());
+    EXPECT_POINT_NEAR(return_bulb_position.value(), makePoint(3760.16, 73754.87, 5.35), epsilon);
+  }
+
+  {
+    EXPECT_FALSE(traffic_lights::trafficLightBulbPosition(light_id, "green").has_value());
+  }
+
+  {
+    EXPECT_FALSE(traffic_lights::trafficLightBulbPosition(light_id, "yellow").has_value());
+  }
+
+  {
+    EXPECT_FALSE(traffic_lights::trafficLightBulbPosition(light_id, "red").has_value());
+  }
+
+  {
+    EXPECT_FALSE(traffic_lights::trafficLightBulbPosition(light_id, "pink").has_value());
+  }
+}
+
+/**
+ * @note Test basic functionality.
+ * Test traffic light position obtaining
  * with an id of a traffic light that does not exist
  * - the goal is to test the branch when no traffic light is selected.
  */
