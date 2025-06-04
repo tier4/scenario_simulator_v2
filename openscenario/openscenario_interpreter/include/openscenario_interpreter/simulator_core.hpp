@@ -73,6 +73,26 @@ public:
   class CoordinateSystemConversion
   {
   protected:
+    /// @brief Returns true if the entity exists or the argument is not an entity name
+    template <typename PossibleEntityType>
+    static auto doesEntityExistIfIsEntityName(const PossibleEntityType & possible_entity_name)
+      -> bool
+    {
+      if constexpr (std::is_convertible_v<PossibleEntityType, std::string>) {
+        return core->isEntityExist(possible_entity_name);
+      }
+      return true;
+    }
+
+    template <typename PossibleFirstEntityType, typename PossibleSecondEntityType>
+    static auto doesEntityExistIfIsEntityName(
+      const PossibleFirstEntityType & first_possible_entity_name,
+      const PossibleSecondEntityType & second_possible_entity_name) -> bool
+    {
+      return doesEntityExistIfIsEntityName(first_possible_entity_name) and
+             doesEntityExistIfIsEntityName(second_possible_entity_name);
+    }
+
     static auto convertToNativeLanePosition(const NativeWorldPosition & map_pose)
       -> NativeLanePosition
     {
@@ -102,21 +122,82 @@ public:
       return traffic_simulator::pose::toMapPose(lanelet_pose);
     }
 
+    template <typename FirstEntityNameOrMapPositionType, typename SecondEntityNameOrMapPositionType>
     static auto makeNativeRelativeWorldPosition(
-      const NativeWorldPosition & from_map_pose, const std::string & to_entity_name)
+      const FirstEntityNameOrMapPositionType & from_entity_name_or_map_position,
+      const SecondEntityNameOrMapPositionType & to_entity_name_or_map_position)
       -> NativeRelativeWorldPosition
     {
-      if (!core->isEntityExist(to_entity_name)) {
-        throw Error("Reference entity ", std::quoted(to_entity_name), " not exist.");
-      } else if (const auto relative_pose = core->relativePose(from_map_pose, to_entity_name);
-                 !relative_pose) {
-        throw Error(
-          "Cannot transform WorldPosition = [", from_map_pose.position.x, ", ",
-          from_map_pose.position.y, ", ", from_map_pose.position.z, "] in relation to ",
-          std::quoted(to_entity_name), " pose.");
-      } else {
-        return relative_pose.value();
+      if (doesEntityExistIfIsEntityName(
+            from_entity_name_or_map_position, to_entity_name_or_map_position)) {
+        if (
+          const auto relative_pose =
+            core->relativePose(from_entity_name_or_map_position, to_entity_name_or_map_position)) {
+          return relative_pose.value();
+        }
       }
+      return traffic_simulator::pose::quietNaNPose();
+    }
+
+    template <
+      typename FirstEntityNameOrLanePositionType, typename SecondEntityNameOrLanePositionType>
+    static auto makeNativeRelativeLanePosition(
+      const FirstEntityNameOrLanePositionType & from_entity_name_or_lane_position,
+      const SecondEntityNameOrLanePositionType & to_entity_name_or_lane_position,
+      const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined)
+      -> NativeRelativeLanePosition
+    {
+      traffic_simulator::RoutingConfiguration routing_configuration;
+      routing_configuration.allow_lane_change =
+        (routing_algorithm == RoutingAlgorithm::value_type::shortest);
+
+      if (doesEntityExistIfIsEntityName(
+            from_entity_name_or_lane_position, to_entity_name_or_lane_position)) {
+        if (
+          const auto relative_lanelet_pose = core->relativeLaneletPose(
+            from_entity_name_or_lane_position, to_entity_name_or_lane_position,
+            routing_configuration)) {
+          return relative_lanelet_pose.value();
+        }
+      }
+      return traffic_simulator::pose::quietNaNLaneletPose();
+    }
+
+    template <typename EntityNameOrLanePositionType>
+    static auto makeNativeBoundingBoxRelativeLanePosition(
+      const std::string & from_entity_name,
+      const EntityNameOrLanePositionType & to_entity_name_or_lane_position,
+      const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined)
+      -> NativeRelativeLanePosition
+    {
+      traffic_simulator::RoutingConfiguration routing_configuration;
+      routing_configuration.allow_lane_change =
+        (routing_algorithm == RoutingAlgorithm::value_type::shortest);
+
+      if (doesEntityExistIfIsEntityName(from_entity_name, to_entity_name_or_lane_position)) {
+        if (
+          const auto relative_lanelet_pose = core->boundingBoxRelativeLaneletPose(
+            from_entity_name, to_entity_name_or_lane_position, routing_configuration)) {
+          return relative_lanelet_pose.value();
+        }
+      }
+      return traffic_simulator::pose::quietNaNLaneletPose();
+    }
+
+    template <typename EntityNameOrMapPositionType>
+    static auto makeNativeBoundingBoxRelativeWorldPosition(
+      const std::string & from_entity_name,
+      const EntityNameOrMapPositionType & to_entity_name_or_map_position)
+      -> NativeRelativeWorldPosition
+    {
+      if (doesEntityExistIfIsEntityName(from_entity_name, to_entity_name_or_map_position)) {
+        if (
+          const auto relative_pose =
+            core->boundingBoxRelativePose(from_entity_name, to_entity_name_or_map_position)) {
+          return relative_pose.value();
+        }
+      }
+      return traffic_simulator::pose::quietNaNPose();
     }
   };
 

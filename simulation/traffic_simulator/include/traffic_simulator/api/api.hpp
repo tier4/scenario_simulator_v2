@@ -277,6 +277,26 @@ public:
     const geometry_msgs::msg::Pose & from_map_pose, const std::string & to_entity_name)
     -> std::optional<geometry_msgs::msg::Pose>;
 
+  auto relativeLaneletPose(
+    const std::string & from_entity_name, const std::string & to_entity_name,
+    const RoutingConfiguration & routing_configuration) -> std::optional<LaneletPose>;
+
+  auto relativeLaneletPose(
+    const std::string & from_entity_name, const LaneletPose & to_lanelet_pose,
+    const RoutingConfiguration & routing_configuration) -> std::optional<LaneletPose>;
+
+  auto relativeLaneletPose(
+    const LaneletPose & from_lanelet_pose, const LaneletPose & to_lanelet_pose,
+    const RoutingConfiguration & routing_configuration) -> std::optional<LaneletPose>;
+
+  auto boundingBoxRelativeLaneletPose(
+    const std::string & from_entity_name, const std::string & to_entity_name,
+    const RoutingConfiguration & routing_configuration) -> std::optional<LaneletPose>;
+
+  auto boundingBoxRelativeLaneletPose(
+    const std::string & from_entity_name, const LaneletPose & to_lanelet_pose,
+    const RoutingConfiguration & routing_configuration) -> std::optional<LaneletPose>;
+
   auto relativeSpeed(const std::string & from_entity_name, const std::string & to_entity_name)
     -> Eigen::Vector3d;
 
