@@ -40,6 +40,11 @@ class HdMapUtilsTest_StandardMap : public testing::Test
 protected:
   HdMapUtilsTest_StandardMap() { activateLaneletWrapper("standard_map"); }
 };
+class HdMapUtilsTest_WithoutLightBulb : public testing::Test
+{
+protected:
+  HdMapUtilsTest_WithoutLightBulb() { activateLaneletWrapper("minimal_map"); }
+};
 class HdMapUtilsTest_WithRoadShoulderMap : public testing::Test
 {
 protected:
@@ -1142,6 +1147,68 @@ TEST_F(HdMapUtilsTest_StandardMap, getTrafficLightBulbPosition_correct)
 
     EXPECT_TRUE(return_bulb_position.has_value());
     EXPECT_POINT_NEAR(return_bulb_position.value(), makePoint(3760.16, 73754.87, 5.35), epsilon);
+  }
+
+  {
+    EXPECT_FALSE(
+      traffic_simulator::lanelet_wrapper::traffic_lights::trafficLightBulbPosition(light_id, "pink")
+        .has_value());
+  }
+}
+
+/**
+ * @note Test basic functionality.
+ * Test traffic light position obtaining
+ * with a traffic light and bulb color specified.
+ */
+TEST_F(HdMapUtilsTest_WithoutLightBulb, getTrafficLightBulbPositionInfer_correct)
+{
+  const lanelet::Id light_id = 34802;
+  const double epsilon = 0.1;
+
+  {
+    const auto return_bulb_position =
+      traffic_simulator::lanelet_wrapper::traffic_lights::trafficLightBulbPosition(
+        light_id, "green", true);
+
+    EXPECT_TRUE(return_bulb_position.has_value());
+    EXPECT_POINT_NEAR(return_bulb_position.value(), makePoint(3761.05, 73755.30, 5.35), epsilon);
+  }
+
+  {
+    const auto return_bulb_position =
+      traffic_simulator::lanelet_wrapper::traffic_lights::trafficLightBulbPosition(
+        light_id, "yellow", true);
+
+    EXPECT_TRUE(return_bulb_position.has_value());
+    EXPECT_POINT_NEAR(return_bulb_position.value(), makePoint(3760.60, 73755.07, 5.35), epsilon);
+  }
+
+  {
+    const auto return_bulb_position =
+      traffic_simulator::lanelet_wrapper::traffic_lights::trafficLightBulbPosition(
+        light_id, "red", true);
+
+    EXPECT_TRUE(return_bulb_position.has_value());
+    EXPECT_POINT_NEAR(return_bulb_position.value(), makePoint(3760.16, 73754.87, 5.35), epsilon);
+  }
+
+  {
+    EXPECT_FALSE(traffic_simulator::lanelet_wrapper::traffic_lights::trafficLightBulbPosition(
+                   light_id, "green")
+                   .has_value());
+  }
+
+  {
+    EXPECT_FALSE(traffic_simulator::lanelet_wrapper::traffic_lights::trafficLightBulbPosition(
+                   light_id, "yellow")
+                   .has_value());
+  }
+
+  {
+    EXPECT_FALSE(
+      traffic_simulator::lanelet_wrapper::traffic_lights::trafficLightBulbPosition(light_id, "red")
+        .has_value());
   }
 
   {
