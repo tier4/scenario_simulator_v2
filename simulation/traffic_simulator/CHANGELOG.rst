@@ -24,6 +24,9 @@ Changelog for package traffic_simulator
 16.4.2 (2025-05-23)
 -------------------
 
+16.5.2 (2025-06-04)
+-------------------
+
 16.5.1 (2025-06-03)
 -------------------
 * Merge pull request `#1597 <https://github.com/tier4/scenario_simulator_v2/issues/1597>`_ from tier4/feature/render-omitted-light-bulb
