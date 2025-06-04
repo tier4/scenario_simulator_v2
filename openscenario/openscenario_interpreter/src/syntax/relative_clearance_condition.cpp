@@ -94,8 +94,8 @@ auto RelativeClearanceCondition::evaluate() -> Object
       } else {
         int relative_lateral_lane;
         try {
-          relative_lateral_lane =
-            lateralRelativeLanes(triggering_entity, target_entity, RoutingAlgorithm::shortest);
+          relative_lateral_lane = evaluateLateralRelativeLanes(
+            triggering_entity, target_entity, RoutingAlgorithm::shortest);
         } catch (const std::exception &) {
           // occurring errors means that the target entity is not in the specified range,
           // under the assumption that relative lane range is defined in routable range .
@@ -113,11 +113,15 @@ auto RelativeClearanceCondition::evaluate() -> Object
     auto is_in_longitudinal_range = [&]() {
       auto relative_longitudinal = [&]() {
         if (free_space) {
-          return longitudinalLaneBoundingBoxDistance(
-            triggering_entity, target_entity, RoutingAlgorithm::shortest);
+          return static_cast<traffic_simulator::LaneletPose>(
+                   makeNativeBoundingBoxRelativeLanePosition(
+                     triggering_entity, target_entity, RoutingAlgorithm::shortest))
+            .s;
         } else {
-          return longitudinalLaneDistance(
-            triggering_entity, target_entity, RoutingAlgorithm::shortest);
+          return static_cast<traffic_simulator::LaneletPose>(
+                   makeNativeRelativeLanePosition(
+                     triggering_entity, target_entity, RoutingAlgorithm::shortest))
+            .s;
         }
       }();
 

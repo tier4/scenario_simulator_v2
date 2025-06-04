@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/cmath/hypot.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
@@ -51,13 +52,33 @@ auto ReachPositionCondition::description() const -> String
 auto ReachPositionCondition::evaluate() -> Object
 {
   // TODO USE DistanceCondition::distance
-  /// @note here is no check if entity exists
+  const auto distance = overload(
+    [&](const WorldPosition & position, auto && triggering_entity) {
+      const auto pose = makeNativeRelativeWorldPosition(
+        triggering_entity, static_cast<geometry_msgs::msg::Pose>(position));
+      return hypot(pose.position.x, pose.position.y, pose.position.z);
+    },
+    [&](const RelativeWorldPosition & position, auto && triggering_entity) {
+      const auto pose = makeNativeRelativeWorldPosition(
+        triggering_entity, static_cast<geometry_msgs::msg::Pose>(position));
+      return hypot(pose.position.x, pose.position.y, pose.position.z);
+    },
+    [&](const RelativeObjectPosition & position, auto && triggering_entity) {
+      const auto pose = makeNativeRelativeWorldPosition(
+        triggering_entity, static_cast<geometry_msgs::msg::Pose>(position));
+      return hypot(pose.position.x, pose.position.y, pose.position.z);
+    },
+    [&](const LanePosition & position, auto && triggering_entity) {
+      const auto pose = makeNativeRelativeWorldPosition(
+        triggering_entity, static_cast<geometry_msgs::msg::Pose>(position));
+      return hypot(pose.position.x, pose.position.y, pose.position.z);
+    });
+
   results.clear();
+
   return asBoolean(triggering_entities.apply([&](const auto & triggering_entity) {
-    results.push_back(triggering_entity.apply([&](const auto & object) {
-      const auto pose = static_cast<geometry_msgs::msg::Pose>(position);
-      return euclideanDistance(object, pose);
-    }));
+    results.push_back(triggering_entity.apply(
+      [&](const auto & object) { return apply<double>(distance, position, object); }));
     return not results.back().size() or compare(results.back(), tolerance).min();
   }));
 }

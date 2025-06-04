@@ -41,7 +41,7 @@ inline namespace syntax
    </xsd:complexType>
 */
 struct RelativeClearanceCondition : private Scope,
-                                    private SimulatorCore::DistanceConditionEvaluation,
+                                    private SimulatorCore::CoordinateSystemConversion,
                                     private SimulatorCore::ConditionEvaluation
 {
   /*
