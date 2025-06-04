@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/cmath/hypot.hpp>
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/syntax/entities.hpp>  // TEMPORARY (TODO REMOVE THIS LINE)
@@ -68,7 +69,7 @@ auto RelativeDistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::longitudinal, RoutingAlgorithm::undefined, false>(
   const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
 {
-  return std::abs(longitudinalEntityDistance(triggering_entity, entity_ref));
+  return std::abs(makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.x);
 }
 
 template <>
@@ -80,7 +81,8 @@ auto RelativeDistanceCondition::distance<
      @note This implementation differs from the OpenSCENARIO standard. See the
      section "6.4. Distances" in the OpenSCENARIO User Guide.
   */
-  return std::abs(longitudinalEntityBoundingBoxDistance(triggering_entity, entity_ref));
+  return std::abs(
+    makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref).position.x);
 }
 
 template <>
@@ -88,7 +90,7 @@ auto RelativeDistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::lateral, RoutingAlgorithm::undefined, false>(
   const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
 {
-  return std::abs(lateralEntityDistance(triggering_entity, entity_ref));
+  return std::abs(makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.y);
 }
 
 template <>
@@ -100,7 +102,8 @@ auto RelativeDistanceCondition::distance<
      @note This implementation differs from the OpenSCENARIO standard. See the
      section "6.4. Distances" in the OpenSCENARIO User Guide.
   */
-  return std::abs(lateralEntityBoundingBoxDistance(triggering_entity, entity_ref));
+  return std::abs(
+    makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref).position.y);
 }
 
 template <>
@@ -108,7 +111,9 @@ auto RelativeDistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, RoutingAlgorithm::undefined,
   true>(const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
 {
-  return euclideanBoundingBoxDistance(triggering_entity, entity_ref);
+  const auto relative_world =
+    makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref);
+  return hypot(relative_world.position.x, relative_world.position.y, relative_world.position.z);
 }
 
 template <>
@@ -116,7 +121,8 @@ auto RelativeDistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, RoutingAlgorithm::undefined,
   false>(const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
 {
-  return euclideanDistance(triggering_entity, entity_ref);
+  const auto relative_world = makeNativeRelativeWorldPosition(triggering_entity, entity_ref);
+  return hypot(relative_world.position.x, relative_world.position.y, relative_world.position.z);
 }
 
 template <>
@@ -136,7 +142,9 @@ auto RelativeDistanceCondition::distance<
      Interpreter support OpenSCENARIO 1.2 RoutingAlgorithm, this behavior will
      be enabled only when routingAlgorithm == undefined.
   */
-  return lateralLaneDistance(triggering_entity, entity_ref);
+  return static_cast<traffic_simulator::LaneletPose>(
+           makeNativeRelativeLanePosition(triggering_entity, entity_ref))
+    .offset;
 }
 
 template <>
@@ -156,7 +164,9 @@ auto RelativeDistanceCondition::distance<
      Interpreter support OpenSCENARIO 1.2 RoutingAlgorithm, this behavior will
      be enabled only when routingAlgorithm == undefined.
   */
-  return lateralLaneBoundingBoxDistance(triggering_entity, entity_ref);
+  return static_cast<traffic_simulator::LaneletPose>(
+           makeNativeBoundingBoxRelativeLanePosition(triggering_entity, entity_ref))
+    .offset;
 }
 
 template <>
@@ -176,7 +186,9 @@ auto RelativeDistanceCondition::distance<
      Interpreter support OpenSCENARIO 1.2 RoutingAlgorithm, this behavior will
      be enabled only when routingAlgorithm == undefined.
   */
-  return longitudinalLaneDistance(triggering_entity, entity_ref);
+  return static_cast<traffic_simulator::LaneletPose>(
+           makeNativeRelativeLanePosition(triggering_entity, entity_ref))
+    .s;
 }
 
 template <>
@@ -196,7 +208,9 @@ auto RelativeDistanceCondition::distance<
      Interpreter support OpenSCENARIO 1.2 RoutingAlgorithm, this behavior will
      be enabled only when routingAlgorithm == undefined.
   */
-  return longitudinalLaneBoundingBoxDistance(triggering_entity, entity_ref);
+  return static_cast<traffic_simulator::LaneletPose>(
+           makeNativeBoundingBoxRelativeLanePosition(triggering_entity, entity_ref))
+    .s;
 }
 
 template <>
@@ -204,8 +218,10 @@ auto RelativeDistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::lateral, RoutingAlgorithm::shortest, true>(
   const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
 {
-  return std::abs(
-    lateralLaneBoundingBoxDistance(triggering_entity, entity_ref, RoutingAlgorithm::shortest));
+  return std::abs(static_cast<traffic_simulator::LaneletPose>(
+                    makeNativeBoundingBoxRelativeLanePosition(
+                      triggering_entity, entity_ref, RoutingAlgorithm::shortest))
+                    .offset);
 }
 
 template <>
@@ -213,7 +229,10 @@ auto RelativeDistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::lateral, RoutingAlgorithm::shortest, false>(
   const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
 {
-  return std::abs(lateralLaneDistance(triggering_entity, entity_ref, RoutingAlgorithm::shortest));
+  return std::abs(
+    static_cast<traffic_simulator::LaneletPose>(
+      makeNativeRelativeLanePosition(triggering_entity, entity_ref, RoutingAlgorithm::shortest))
+      .offset);
 }
 
 template <>
@@ -221,8 +240,10 @@ auto RelativeDistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::longitudinal, RoutingAlgorithm::shortest, true>(
   const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
 {
-  return std::abs(
-    longitudinalLaneBoundingBoxDistance(triggering_entity, entity_ref, RoutingAlgorithm::shortest));
+  return std::abs(static_cast<traffic_simulator::LaneletPose>(
+                    makeNativeBoundingBoxRelativeLanePosition(
+                      triggering_entity, entity_ref, RoutingAlgorithm::shortest))
+                    .s);
 }
 
 template <>
@@ -231,7 +252,9 @@ auto RelativeDistanceCondition::distance<
   const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
 {
   return std::abs(
-    longitudinalLaneDistance(triggering_entity, entity_ref, RoutingAlgorithm::shortest));
+    static_cast<traffic_simulator::LaneletPose>(
+      makeNativeRelativeLanePosition(triggering_entity, entity_ref, RoutingAlgorithm::shortest))
+      .s);
 }
 
 #define SWITCH_COORDINATE_SYSTEM(FUNCTION, ...)                                         \

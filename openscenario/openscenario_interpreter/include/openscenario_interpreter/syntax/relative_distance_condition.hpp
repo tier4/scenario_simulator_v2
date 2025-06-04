@@ -48,7 +48,7 @@ inline namespace syntax
      <xsd:attribute name="routingAlgorithm" type="RoutingAlgorithm"/>
    </xsd:complexType>
 */
-struct RelativeDistanceCondition : private Scope, private SimulatorCore::DistanceConditionEvaluation
+struct RelativeDistanceCondition : private Scope, private SimulatorCore::CoordinateSystemConversion
 {
   /*
      Definition of the coordinate system to be used for calculations. If not
