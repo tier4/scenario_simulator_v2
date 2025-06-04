@@ -18,6 +18,9 @@ Changelog for package zmqpp_vendor
 16.4.2 (2025-05-23)
 -------------------
 
+16.5.2 (2025-06-04)
+-------------------
+
 16.5.1 (2025-06-03)
 -------------------
 * Merge branch 'master' into feature/render-omitted-light-bulb
