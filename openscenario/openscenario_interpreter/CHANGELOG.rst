@@ -35,6 +35,36 @@ Changelog for package openscenario_interpreter
 16.4.2 (2025-05-23)
 -------------------
 
+16.5.2 (2025-06-04)
+-------------------
+
+16.5.1 (2025-06-03)
+-------------------
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, ぐるぐる
+
+16.5.0 (2025-06-03)
+-------------------
+* Merge pull request `#1611 <https://github.com/tier4/scenario_simulator_v2/issues/1611>`_ from tier4/feature/set_route
+* Merge branch 'master' into feature/set_route
+* Merge branch 'master' into feature/set_route
+* Stop using dot in prameter name because it is not allowed in OpenSCENARIO
+* Rename use_lane_level_specification_for_waypoints to use_lane_ids_for_routing
+* Merge branch 'master' into feature/set_route
+* Refactor AssignRouteAction::start
+* Rename special parameter AssignRouteAction.use_lane_level_specification_for_waypoints to RoutingAction.use_lane_level_specification_for_waypoints
+* Handle allow_goal_modification in AcquirePositionAction
+* Handle allow_goal_modification in AssignRouteAction
+* Collect parameter and use option in AssignRouteAction::start
+* Contributors: Kotaro Yoshimoto
+
+16.4.6 (2025-06-02)
+-------------------
+
 16.4.5 (2025-05-30)
 -------------------
 
