@@ -35,6 +35,83 @@ Changelog for package scenario_test_runner
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+16.4.2 (2025-05-23)
+-------------------
+
+16.5.2 (2025-06-04)
+-------------------
+
+16.5.1 (2025-06-03)
+-------------------
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, ぐるぐる
+
+16.5.0 (2025-06-03)
+-------------------
+* Merge pull request `#1611 <https://github.com/tier4/scenario_simulator_v2/issues/1611>`_ from tier4/feature/set_route
+* Merge branch 'master' into feature/set_route
+* Merge branch 'master' into feature/set_route
+* Stop using dot in prameter name because it is not allowed in OpenSCENARIO
+* Rename use_lane_level_specification_for_waypoints to use_lane_ids_for_routing
+* Merge branch 'master' into feature/set_route
+* Fix parameter name in RoutingAction.AcquirePositionAction-allow_goal_modification.yaml
+* Fix parameter name in RoutingAction.AssignRouteAction-use_lane_level_specification_for_waypoint.yaml
+* Add sample scenario RoutingAction.AssignRouteAction-use_lane_level_specification_for_waypoint.yaml
+* Contributors: Kotaro Yoshimoto
+
+16.4.6 (2025-06-02)
+-------------------
+
+16.4.5 (2025-05-30)
+-------------------
+
+16.4.4 (2025-05-28)
+-------------------
+* Merge remote-tracking branch 'origin/master' into feature/delay_curventure_calculation
+* Merge branch 'master' into feature/delay_curventure_calculation
+* Merge remote-tracking branch 'origin/master' into feature/delay_curventure_calculation
+* Merge remote-tracking branch 'origin/master' into feature/speed_up
+* Contributors: Masaya Kataoka
+
+16.4.3 (2025-05-27)
+-------------------
+* Merge branch 'master' into refactor/behavior-tree-2
+* Bump version of scenario_simulator_v2 from version version 16.4.1 to version 16.4.2
+* Merge branch 'master' into refactor/behavior-tree-2
+* Contributors: Kotaro Yoshimoto, Taiga
+
+16.4.1 (2025-05-23)
+-------------------
+* Merge branch 'master' into refactor/behavior-tree-1
+* Merge branch 'master' into refactor/behavior-tree-1
+* Contributors: Taiga
+
+16.4.0 (2025-05-22)
+-------------------
+* Merge pull request `#1590 <https://github.com/tier4/scenario_simulator_v2/issues/1590>`_ from tier4/feature/change_allow_goal_modification
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Add legacy and new way to specify allow_goal_modification comment in scenario
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Add test scenario for allow_goal_modification
+* Contributors: Kotaro Yoshimoto
+
+16.3.11 (2025-05-21)
+--------------------
+* Merge branch 'master' into refactor/lanelet_matching
+* Merge branch 'master' into refactor/lanelet_matching
+* Merge branch 'master' into refactor/lanelet_matching
+* Merge branch 'master' into refactor/lanelet_matching
+* Merge commit '2be47bbd1a1a69ba584d2a37b11b3140e40f5f3d' into refactor/lanelet_matching
+* Contributors: Koki Suzuki, Masaya Kataoka, koki suzuki
+
 16.3.10 (2025-05-20)
 --------------------
 * Merge pull request `#1598 <https://github.com/tier4/scenario_simulator_v2/issues/1598>`_ from tier4/fix/agnocastpreload

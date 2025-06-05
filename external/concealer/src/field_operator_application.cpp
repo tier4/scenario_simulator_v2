@@ -156,7 +156,8 @@ FieldOperatorApplication::FieldOperatorApplication(const pid_t pid)
   requestCooperateCommands("/api/external/set/rtc_commands", *this),
   requestEngage("/api/external/set/engage", *this),
   requestInitialPose("/api/localization/initialize", *this),
-  // NOTE: /api/routing/set_route_points takes a long time to return. But the specified duration is not decided by any technical reasons.
+  // NOTE: routing takes a long time to return. But the specified duration is not decided by any technical reasons.
+  requestSetRoute("/api/routing/set_route", *this, std::chrono::seconds(10)),
   requestSetRoutePoints("/api/routing/set_route_points", *this, std::chrono::seconds(10)),
   requestSetRtcAutoMode("/api/external/set/rtc_auto_mode", *this),
   requestSetVelocityLimit("/api/autoware/set/velocity_limit", *this),
@@ -351,12 +352,73 @@ auto FieldOperatorApplication::initialize(const geometry_msgs::msg::Pose & initi
   }
 }
 
-auto FieldOperatorApplication::plan(const std::vector<geometry_msgs::msg::PoseStamped> & route)
+auto FieldOperatorApplication::plan(
+  const std::vector<geometry_msgs::msg::PoseStamped> & route, const bool allow_goal_modification)
   -> void
 {
   assert(not route.empty());
 
-  task_queue.delay([this, route] {
+  std::vector<geometry_msgs::msg::Pose> waypoints;
+  if (route.size() > 1) {
+    std::transform(
+      route.begin(), route.end() - 1, std::back_inserter(waypoints),
+      [](const auto & stamped_pose) { return stamped_pose.pose; });
+  }
+
+  RouteOption route_option;
+  if (DetectMember_allow_goal_modification<RouteOption>::value) {
+    route_option.allow_goal_modification = allow_goal_modification;
+  }
+
+  plan(route.back().pose, waypoints, route_option);
+}
+
+template <
+  typename Request, typename Waypoint,
+  typename = std::enable_if_t<
+    std::is_same_v<Request, autoware_adapi_v1_msgs::srv::SetRoutePoints::Request> ||
+    std::is_same_v<Request, autoware_adapi_v1_msgs::srv::SetRoute::Request> > >
+static auto make(
+  const geometry_msgs::msg::Pose & goal, const std::vector<Waypoint> & waypoints,
+  const FieldOperatorApplication::RouteOption & option) -> std::shared_ptr<Request>
+{
+  auto request = std::make_shared<Request>();
+
+  request->header.frame_id = "map";
+  request->goal = goal;
+
+  if constexpr (std::is_same_v<Request, autoware_adapi_v1_msgs::srv::SetRoutePoints::Request>) {
+    request->waypoints.assign(waypoints.begin(), waypoints.end());
+  } else if constexpr (std::is_same_v<Request, autoware_adapi_v1_msgs::srv::SetRoute::Request>) {
+    request->segments.assign(waypoints.begin(), waypoints.end());
+  }
+
+  /*
+     NOTE: The autoware_adapi_v1_msgs::srv::SetRoutePoints::Request
+     type was created on 2022/09/05 [1], and the
+     autoware_adapi_v1_msgs::msg::Option type data member was added
+     to the autoware_adapi_v1_msgs::srv::SetRoutePoints::Request type
+     on 2023/04/12 [2]. Therefore, we cannot expect
+     autoware_adapi_v1_msgs::srv::SetRoutePoints::Request to always
+     have a data member `option`.
+
+     [1] https://github.com/autowarefoundation/autoware_adapi_msgs/commit/805f8ebd3ca24564844df9889feeaf183101fbef
+     [2] https://github.com/autowarefoundation/autoware_adapi_msgs/commit/cf310bd038673b6cbef3ae3b61dfe607212de419
+  */
+  if constexpr (
+    DetectMember_option<Request>::value and
+    DetectMember_allow_goal_modification<decltype(std::declval<Request>().option)>::value) {
+    request->option.allow_goal_modification = option.allow_goal_modification;
+  }
+
+  return request;
+}
+
+auto FieldOperatorApplication::plan(
+  const geometry_msgs::msg::Pose & goal, const std::vector<geometry_msgs::msg::Pose> & waypoints,
+  const RouteOption & option) -> void
+{
+  task_queue.delay([this, goal, waypoints, option]() {
     switch (const auto state = getLegacyAutowareState(); state.value) {
       default:
         throw common::AutowareError(
@@ -369,40 +431,35 @@ auto FieldOperatorApplication::plan(const std::vector<geometry_msgs::msg::PoseSt
         waitForAutowareStateToBe(state, LegacyAutowareState::waiting_for_route);
         [[fallthrough]];
       case LegacyAutowareState::waiting_for_route:
-        requestSetRoutePoints(
-          [&]() {
-            auto request = std::make_shared<SetRoutePoints::Request>();
+        requestSetRoutePoints(make<SetRoutePoints::Request>(goal, waypoints, option), 30);
+        waitForAutowareStateToBe(
+          LegacyAutowareState::waiting_for_route, LegacyAutowareState::planning);
+        waitForAutowareStateToBe(
+          LegacyAutowareState::planning, LegacyAutowareState::waiting_for_engage);
+        break;
+    }
+  });
+}
 
-            request->header = route.back().header;
-            request->goal = route.back().pose;
-
-            for (const auto & each : route | boost::adaptors::sliced(0, route.size() - 1)) {
-              request->waypoints.push_back(each.pose);
-            }
-
-            /*
-               NOTE: The autoware_adapi_v1_msgs::srv::SetRoutePoints::Request
-               type was created on 2022/09/05 [1], and the
-               autoware_adapi_v1_msgs::msg::Option type data member was added
-               to the autoware_adapi_v1_msgs::srv::SetRoutePoints::Request type
-               on 2023/04/12 [2]. Therefore, we cannot expect
-               autoware_adapi_v1_msgs::srv::SetRoutePoints::Request to always
-               have a data member `option`.
-
-               [1] https://github.com/autowarefoundation/autoware_adapi_msgs/commit/805f8ebd3ca24564844df9889feeaf183101fbef
-               [2] https://github.com/autowarefoundation/autoware_adapi_msgs/commit/cf310bd038673b6cbef3ae3b61dfe607212de419
-            */
-            if constexpr (
-              DetectMember_option<SetRoutePoints::Request>::value and
-              DetectMember_allow_goal_modification<
-                decltype(std::declval<SetRoutePoints::Request>().option)>::value) {
-              request->option.allow_goal_modification = common::getParameter<bool>(
-                get_node_parameters_interface(), "allow_goal_modification");
-            }
-
-            return request;
-          }(),
-          30);
+auto FieldOperatorApplication::plan(
+  const geometry_msgs::msg::Pose & goal,
+  const std::vector<autoware_adapi_v1_msgs::msg::RouteSegment> & waypoints,
+  const RouteOption & option) -> void
+{
+  task_queue.delay([this, goal, waypoints, option]() {
+    switch (const auto state = getLegacyAutowareState(); state.value) {
+      default:
+        throw common::AutowareError(
+          "The simulator attempted to send a goal to Autoware, but was aborted because Autoware's "
+          "current state is ",
+          state, ".");
+      case LegacyAutowareState::initializing:
+        // The initial pose has been sent but has not yet reached Autoware.
+      case LegacyAutowareState::arrived_goal:
+        waitForAutowareStateToBe(state, LegacyAutowareState::waiting_for_route);
+        [[fallthrough]];
+      case LegacyAutowareState::waiting_for_route:
+        requestSetRoute(make<SetRoute::Request>(goal, waypoints, option), 30);
         waitForAutowareStateToBe(
           LegacyAutowareState::waiting_for_route, LegacyAutowareState::planning);
         waitForAutowareStateToBe(

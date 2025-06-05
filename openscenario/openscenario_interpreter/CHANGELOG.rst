@@ -32,6 +32,90 @@ Changelog for package openscenario_interpreter
 * add publish_empty_context parameter
 * Contributors: Masaya Kataoka
 
+16.4.2 (2025-05-23)
+-------------------
+
+16.5.2 (2025-06-04)
+-------------------
+
+16.5.1 (2025-06-03)
+-------------------
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, ぐるぐる
+
+16.5.0 (2025-06-03)
+-------------------
+* Merge pull request `#1611 <https://github.com/tier4/scenario_simulator_v2/issues/1611>`_ from tier4/feature/set_route
+* Merge branch 'master' into feature/set_route
+* Merge branch 'master' into feature/set_route
+* Stop using dot in prameter name because it is not allowed in OpenSCENARIO
+* Rename use_lane_level_specification_for_waypoints to use_lane_ids_for_routing
+* Merge branch 'master' into feature/set_route
+* Refactor AssignRouteAction::start
+* Rename special parameter AssignRouteAction.use_lane_level_specification_for_waypoints to RoutingAction.use_lane_level_specification_for_waypoints
+* Handle allow_goal_modification in AcquirePositionAction
+* Handle allow_goal_modification in AssignRouteAction
+* Collect parameter and use option in AssignRouteAction::start
+* Contributors: Kotaro Yoshimoto
+
+16.4.6 (2025-06-02)
+-------------------
+
+16.4.5 (2025-05-30)
+-------------------
+
+16.4.4 (2025-05-28)
+-------------------
+* Merge remote-tracking branch 'origin/master' into feature/delay_curventure_calculation
+* Merge branch 'master' into feature/delay_curventure_calculation
+* Merge remote-tracking branch 'origin/master' into feature/delay_curventure_calculation
+* Merge remote-tracking branch 'origin/master' into feature/speed_up
+* Contributors: Masaya Kataoka
+
+16.4.3 (2025-05-27)
+-------------------
+* Merge branch 'master' into refactor/behavior-tree-2
+* Bump version of scenario_simulator_v2 from version version 16.4.1 to version 16.4.2
+* Merge branch 'master' into refactor/behavior-tree-2
+* Contributors: Kotaro Yoshimoto, Taiga
+
+16.4.1 (2025-05-23)
+-------------------
+* Merge branch 'master' into refactor/behavior-tree-1
+* Merge branch 'master' into refactor/behavior-tree-1
+* Contributors: Taiga
+
+16.4.0 (2025-05-22)
+-------------------
+* Merge pull request `#1590 <https://github.com/tier4/scenario_simulator_v2/issues/1590>`_ from tier4/feature/change_allow_goal_modification
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Rename RouteOptions -> RouteOption
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Resolve allow_goal_modification from parameter and property in AcquirePositionAction::start
+* Use traffic_simulator::RouteOptions in AcquirePositionAction::start
+* Delete argument workaround in ActionApplication::applyAcquirePositionAction
+* Rename Properties::exists to contains
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Merge branch 'master' into feature/change_allow_goal_modification
+* feat: resolve AcquirePositionAction.allow_goal_modification parameter and pass to ego entity
+* chore: add allow_goal_modification parameter of ego entity only if allowGoalModification parameter is defined in Controller.Properties
+* Contributors: Kotaro Yoshimoto
+
+16.3.11 (2025-05-21)
+--------------------
+* Merge branch 'master' into refactor/lanelet_matching
+* Merge branch 'master' into refactor/lanelet_matching
+* Merge branch 'master' into refactor/lanelet_matching
+* Merge branch 'master' into refactor/lanelet_matching
+* Merge commit '2be47bbd1a1a69ba584d2a37b11b3140e40f5f3d' into refactor/lanelet_matching
+* Contributors: Koki Suzuki, Masaya Kataoka, koki suzuki
+
 16.3.10 (2025-05-20)
 --------------------
 * Merge branch 'master' into fix/agnocastpreload
