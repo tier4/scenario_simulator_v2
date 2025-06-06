@@ -38,6 +38,13 @@ Changelog for package scenario_test_runner
 16.4.2 (2025-05-23)
 -------------------
 
+16.5.3 (2025-06-06)
+-------------------
+* Merge branch 'master' into refactor/behavior_tree_4
+* Merge branch 'master' into refactor/behavior_tree_4
+* Merge branch 'master' into refactor/behavior_tree_4
+* Contributors: Kotaro Yoshimoto, Taiga
+
 16.5.2 (2025-06-04)
 -------------------
 
