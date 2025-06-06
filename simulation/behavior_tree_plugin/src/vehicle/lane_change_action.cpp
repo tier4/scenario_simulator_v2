@@ -47,33 +47,18 @@ const traffic_simulator_msgs::msg::WaypointsArray LaneChangeAction::calculateWay
   if (!lane_change_parameters_) {
     THROW_SIMULATION_ERROR("lane change parameter is null");
   }
-  if (canonicalized_entity_status_->getTwist().linear.x >= 0) {
-    traffic_simulator_msgs::msg::WaypointsArray waypoints;
-    double horizon = getHorizon();
-    auto following_lanelets =
-      hdmap_utils_->getFollowingLanelets(lane_change_parameters_->target.lanelet_id, 0);
-    double l = curve_->getLength();
-    double rest_s = current_s_ + horizon - l;
-    if (rest_s < 0) {
-      const auto curve_waypoints =
-        curve_->getTrajectory(current_s_, current_s_ + horizon, 1.0, true);
-      waypoints.waypoints = curve_waypoints;
-    } else {
-      std::vector<geometry_msgs::msg::Point> center_points =
-        hdmap_utils_->getCenterPoints(following_lanelets);
-      // DIFFERENT SPLINE - recalculation needed
-      math::geometry::CatmullRomSpline spline(center_points);
-      const auto straight_waypoints = spline.getTrajectory(target_s_, target_s_ + rest_s, 1.0);
-      waypoints.waypoints = straight_waypoints;
-      const auto curve_waypoints = curve_->getTrajectory(current_s_, l, 1.0, true);
-      std::copy(
-        straight_waypoints.begin(), straight_waypoints.end(),
-        std::back_inserter(waypoints.waypoints));
-    }
-    return waypoints;
-  } else {
+  if (canonicalized_entity_status_->getTwist().linear.x < 0) {
     return traffic_simulator_msgs::msg::WaypointsArray();
   }
+
+  traffic_simulator_msgs::msg::WaypointsArray waypoints;
+  auto curve_length = curve_->getLength();
+  if (current_s_ < curve_length) {
+    waypoints.waypoints = curve_->getTrajectory(current_s_, curve_length, 1.0, true);
+  } else {
+    waypoints.waypoints = curve_->getTrajectory(curve_length, curve_length, 1.0, true);
+  }
+  return waypoints;
 }
 
 void LaneChangeAction::getBlackBoardValues()
