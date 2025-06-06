@@ -60,6 +60,10 @@ auto operator<<(boost::json::object & json, const Act & datum) -> boost::json::o
     maneuver_groups.push_back(std::move(act));
   }
 
+  json["StartTrigger"].emplace_object() << datum.start_trigger;
+
+  json["StopTrigger"].emplace_object() << datum.stop_trigger;
+
   return json;
 }
 }  // namespace syntax
