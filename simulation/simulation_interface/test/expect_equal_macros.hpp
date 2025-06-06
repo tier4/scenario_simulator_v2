@@ -143,7 +143,7 @@
   EXPECT_BOUNDING_BOX_EQ(MSG.bounding_box, PROTO.bounding_box());    \
   EXPECT_ACTION_STATUS_EQ(MSG.action_status, PROTO.action_status()); \
   EXPECT_POSE_EQ(MSG.pose, PROTO.pose());                            \
-  EXPECT_LANELET_POSE_EQ(MSG.lanelet_pose, PROTO.lanelet_pose());    \
+  EXPECT_LANELET_POSES_EQ(MSG.lanelet_poses, PROTO.lanelet_poses()); \
   EXPECT_EQ(MSG.lanelet_pose_valid, PROTO.lanelet_pose_valid());
 
 #define EXPECT_SENT_ENTITY_STATUS_EQ(MSG, PROTO)                     \

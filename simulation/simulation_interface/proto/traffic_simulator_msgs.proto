@@ -32,6 +32,7 @@ message LaneletPose {
   double s = 2;                  // S value in the lane coordinate.
   double offset = 3;             // Offset value in the lane coordinate.
   geometry_msgs.Vector3 rpy = 4; // RPY(roll/pitch/yaw) value in the lane coordinate.
+  bool lanelet_pose_valid = 5;   // If true, the lane matching of the entity is succeeded.
 }
 
 /**
@@ -76,7 +77,7 @@ message EntityStatus {
   BoundingBox bounding_box = 5;   // Bounding box of the entity.
   ActionStatus action_status = 6; // Action status of the entity.
   geometry_msgs.Pose pose = 7;    // Pose in map coordinate of the entity.
-  LaneletPose lanelet_pose = 8;   // Pose in lane coordinate of the entity.
+  repeated LaneletPose lanelet_poses = 8;   // Possible poses in lane coordinate of the entity.
   bool lanelet_pose_valid = 9;    // If true, the lane matching of the entity is succeeded.
 }
 
