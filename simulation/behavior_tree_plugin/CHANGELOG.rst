@@ -24,6 +24,11 @@ Changelog for package behavior_tree_plugin
 16.4.2 (2025-05-23)
 -------------------
 
+16.5.4 (2025-06-06)
+-------------------
+* Merge branch 'master' into fix/non-symlink-install-sun
+* Contributors: Kotaro Yoshimoto
+
 16.5.3 (2025-06-06)
 -------------------
 * Merge pull request `#1613 <https://github.com/tier4/scenario_simulator_v2/issues/1613>`_ from tier4/refactor/behavior_tree_4

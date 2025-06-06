@@ -24,6 +24,11 @@ Changelog for package openscenario_preprocessor
 16.4.2 (2025-05-23)
 -------------------
 
+16.5.4 (2025-06-06)
+-------------------
+* Merge branch 'master' into fix/non-symlink-install-sun
+* Contributors: Kotaro Yoshimoto
+
 16.5.3 (2025-06-06)
 -------------------
 * Merge branch 'master' into refactor/behavior_tree_4
