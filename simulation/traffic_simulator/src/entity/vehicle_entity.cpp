@@ -160,6 +160,16 @@ auto VehicleEntity::onUpdate(const double current_time, const double step_time) 
   behavior_plugin_ptr_->setReferenceTrajectory(spline_);
   /// @note CanonicalizedEntityStatus is updated here, it is not skipped even if isAtEndOfLanelets return true
   behavior_plugin_ptr_->update(current_time, step_time);
+
+  /// Try lane matching if the output of behavior plugin is not on lane.
+  if (
+    const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
+      status_->getMapPose(), getBoundingBox(), true,
+      getDefaultMatchingDistanceForLaneletPoseCalculation())) {
+    status_->set(
+      CanonicalizedEntityStatus(static_cast<EntityStatus>(*status_), canonicalized_lanelet_pose));
+  }
+
   if (const auto canonicalized_lanelet_pose = status_->getCanonicalizedLaneletPose()) {
     if (pose::isAtEndOfLanelets(canonicalized_lanelet_pose.value(), hdmap_utils_ptr_)) {
       stopAtCurrentPosition();
