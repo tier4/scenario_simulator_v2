@@ -31,6 +31,11 @@ auto lateralDistance(
   const RoutingConfiguration & routing_configuration = RoutingConfiguration())
   -> std::optional<double>;
 
+auto longitudinalDistance(
+  const LaneletPose & from, const LaneletPose & to,
+  const RoutingConfiguration & routing_configuration = RoutingConfiguration())
+  -> std::optional<double>;
+
 // StopLine
 auto distanceToStopLine(const lanelet::Ids & route_lanelets, const SplineInterface & route_spline)
   -> std::optional<double>;
