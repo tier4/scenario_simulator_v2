@@ -291,7 +291,7 @@ auto PedestrianEntity::onUpdate(const double current_time, const double step_tim
   /// Try lane matching if the output of behavior plugin is not on lane.
   if (
     const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
-      status_->getMapPose(), getBoundingBox(), true,
+      status_->getMapPose(), getBoundingBox(), route_planner_.getWholeRouteLanelets(), true,
       getDefaultMatchingDistanceForLaneletPoseCalculation())) {
     status_->set(
       CanonicalizedEntityStatus(static_cast<EntityStatus>(*status_), canonicalized_lanelet_pose));
