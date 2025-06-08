@@ -24,6 +24,49 @@ Changelog for package concealer
 16.4.2 (2025-05-23)
 -------------------
 
+16.5.4 (2025-06-06)
+-------------------
+* Merge branch 'master' into fix/non-symlink-install-sun
+* Contributors: Kotaro Yoshimoto
+
+16.5.3 (2025-06-06)
+-------------------
+* Merge branch 'master' into refactor/behavior_tree_4
+* Merge branch 'master' into refactor/behavior_tree_4
+* Merge branch 'master' into refactor/behavior_tree_4
+* Contributors: Kotaro Yoshimoto, Taiga
+
+16.5.2 (2025-06-04)
+-------------------
+
+16.5.1 (2025-06-03)
+-------------------
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, ぐるぐる
+
+16.5.0 (2025-06-03)
+-------------------
+* Merge pull request `#1611 <https://github.com/tier4/scenario_simulator_v2/issues/1611>`_ from tier4/feature/set_route
+* Update deprecation notice for FieldOperatorApplication::plan
+* Merge branch 'master' into feature/set_route
+* Update deprecation notice for FieldOperatorApplication::plan
+* Merge branch 'master' into feature/set_route
+* Use algorithm functions instead of for loop code
+* Limit Request type by concept idiom for make function in field_operator_application.cpp
+* Merge branch 'master' into feature/set_route
+* Mark conventional FieldOperatorApplication::plan as deprecated
+* Rename FieldOperatorApplication::setRoute/setRoutePoints to plan
+* Delete debug message
+* Implement FieldOperatorApplication::setRoute
+* Re-implement FieldOperatorApplication::plan with FieldOperatorApplication::setRoutePoints
+* Implement FieldOperatorApplication::setRoutePoints
+* Add /api/routing/set_route API to FieldOperatorApplication
+* Contributors: Kotaro Yoshimoto
+
 16.4.6 (2025-06-02)
 -------------------
 
