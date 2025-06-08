@@ -113,32 +113,9 @@ void CppScenarioNode::stop(Result result, const std::string & description)
   std::exit(0);
 }
 
-void CppScenarioNode::spawnEgoEntity(
-  const traffic_simulator::CanonicalizedLaneletPose & spawn_lanelet_pose,
-  const std::vector<traffic_simulator::CanonicalizedLaneletPose> & goal_lanelet_poses,
-  const traffic_simulator_msgs::msg::VehicleParameters & parameters)
-{
-  api_.updateFrame();
-  std::this_thread::sleep_for(std::chrono::duration<double>(1.0 / 20.0));
-  api_.spawn(
-    "ego", spawn_lanelet_pose, parameters, traffic_simulator::VehicleBehavior::autoware(),
-    ego_model_);
-  configureEgoEntity();
-  auto & ego_entity = api_.getEgoEntity("ego");
-  ego_entity.requestAssignRoute(goal_lanelet_poses);
-
-  using namespace std::chrono_literals;
-  while (!ego_entity.isEngaged()) {
-    if (ego_entity.isEngageable()) {
-      ego_entity.engage();
-    }
-    api_.updateFrame();
-    std::this_thread::sleep_for(std::chrono::duration<double>(1.0 / 20.0));
-  }
-}
-
 auto CppScenarioNode::spawnEgoEntity(
   const traffic_simulator::CanonicalizedLaneletPose & spawn_lanelet_pose,
+  const std::vector<traffic_simulator::CanonicalizedLaneletPose> & goal_lanelet_poses,
   const traffic_simulator_msgs::msg::VehicleParameters & parameters) -> void
 {
   api_.updateFrame();
@@ -146,11 +123,7 @@ auto CppScenarioNode::spawnEgoEntity(
   api_.spawn(
     "ego", spawn_lanelet_pose, parameters, traffic_simulator::VehicleBehavior::autoware(),
     ego_model_);
-  configureEgoEntity();
-}
 
-auto CppScenarioNode::configureEgoEntity() -> void
-{
   auto & ego_entity = api_.getEgoEntity("ego");
   ego_entity.setParameter<bool>("allow_goal_modification", true);
   api_.attachLidarSensor("ego", 0.0);
@@ -171,6 +144,19 @@ auto CppScenarioNode::configureEgoEntity() -> void
     // clang-format on
     return configuration;
   }());
+
+  if (!goal_lanelet_poses.empty()) {
+    ego_entity.requestAssignRoute(goal_lanelet_poses);
+
+    using namespace std::chrono_literals;
+    while (!ego_entity.isEngaged()) {
+      if (ego_entity.isEngageable()) {
+        ego_entity.engage();
+      }
+      api_.updateFrame();
+      std::this_thread::sleep_for(std::chrono::duration<double>(1.0 / 20.0));
+    }
+  }
 }
 
 auto CppScenarioNode::isVehicle(const std::string & name) const -> bool
