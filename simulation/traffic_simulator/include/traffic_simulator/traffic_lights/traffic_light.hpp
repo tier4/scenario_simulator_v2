@@ -438,7 +438,7 @@ struct TrafficLight
 
   std::set<Bulb> bulbs;
 
-  const std::map<Bulb::Hash, std::optional<geometry_msgs::msg::Point>> positions;
+  const std::map<Color, std::optional<geometry_msgs::msg::Point>> positions;
 
   auto clear() { bulbs.clear(); }
 
@@ -454,31 +454,45 @@ struct TrafficLight
   template <typename Markers, typename Now>
   auto draw(Markers & markers, const Now & now, const std::string & frame_id) const
   {
-    auto optional_position = [this](auto && bulb) {
-      try {
-        return positions.at(bulb.hash() & 0b1111'0000'1111'1111);  // NOTE: Ignore status
-      } catch (const std::out_of_range &) {
-        return std::optional<geometry_msgs::msg::Point>(std::nullopt);
-      }
+    auto create_bulb_marker = [&](const Color & color, const bool is_on) {
+      visualization_msgs::msg::Marker marker;
+      marker.header.stamp = now;
+      marker.header.frame_id = frame_id;
+      marker.action = visualization_msgs::msg::Marker::ADD;
+      marker.ns = "bulb";
+      marker.id = way_id << 2 | static_cast<int>(color.value);
+      marker.type = visualization_msgs::msg::Marker::SPHERE;
+      marker.pose.position = positions.at(color).value();
+      marker.pose.orientation = geometry_msgs::msg::Quaternion();
+      marker.scale.x = 0.3;
+      marker.scale.y = 0.3;
+      marker.scale.z = 0.3;
+      marker.color = color_names::makeColorMsg(boost::lexical_cast<std::string>(color));
+      marker.color.a = is_on ? 1.0 : 0.3;
+      return marker;
     };
 
+    std::set<Color> added_colors;
+
+    // Place on markers for actual bulbs
     for (const auto & bulb : bulbs) {
-      if (optional_position(bulb).has_value() and bulb.is(Shape::Category::circle)) {
-        visualization_msgs::msg::Marker marker;
-        marker.header.stamp = now;
-        marker.header.frame_id = frame_id;
-        marker.action = marker.ADD;
-        marker.ns = "bulb";
-        marker.id = way_id;
-        marker.type = marker.SPHERE;
-        marker.pose.position = optional_position(bulb).value();
-        marker.pose.orientation = geometry_msgs::msg::Quaternion();
-        marker.scale.x = 0.3;
-        marker.scale.y = 0.3;
-        marker.scale.z = 0.3;
-        marker.color =
-          color_names::makeColorMsg(boost::lexical_cast<std::string>(std::get<Color>(bulb.value)));
-        markers.push_back(marker);
+      // NOTE: Status is ignored intentionally
+      if (bulb.is(Shape::Category::circle)) {
+        const auto color = std::get<Color>(bulb.value);
+        const auto position = positions.find(color);
+        if (position == positions.end() or not position->second.has_value()) {
+          continue;
+        }
+
+        markers.push_back(create_bulb_marker(color, true));
+        added_colors.insert(color);
+      }
+    }
+
+    // Place solidOff markers for other positions
+    for (const auto & [color, position] : positions) {
+      if (position.has_value() and added_colors.find(color) == added_colors.end()) {
+        markers.push_back(create_bulb_marker(color, false));
       }
     }
   }

@@ -82,20 +82,22 @@ public:
 
   void requestAcquirePosition(const LaneletPose &) override;
 
-  void requestAcquirePosition(const LaneletPose &, const RouteOption &) override;
+  void requestAcquirePosition(const LaneletPose &, const traffic_simulator::RouteOption &) override;
 
   void requestAcquirePosition(const geometry_msgs::msg::Pose &) override;
 
-  void requestAcquirePosition(const geometry_msgs::msg::Pose &, const RouteOption &) override;
+  void requestAcquirePosition(
+    const geometry_msgs::msg::Pose &, const traffic_simulator::RouteOption &) override;
 
   void requestAssignRoute(const std::vector<LaneletPose> &) override;
 
-  void requestAssignRoute(const std::vector<LaneletPose> &, const RouteOption &) override;
+  void requestAssignRoute(
+    const std::vector<LaneletPose> &, const traffic_simulator::RouteOption &) override;
 
   void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) override;
 
   void requestAssignRoute(
-    const std::vector<geometry_msgs::msg::Pose> &, const RouteOption &) override;
+    const std::vector<geometry_msgs::msg::Pose> &, const traffic_simulator::RouteOption &) override;
 
   auto requestFollowTrajectory(
     const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &) -> void override;
@@ -173,7 +175,8 @@ public:
   auto getTurnIndicatorsCommandName() const -> std::string;
 
 protected:
-  void requestAssignRoute(const std::vector<CanonicalizedLaneletPose> &, const RouteOption &);
+  void requestAssignRoute(
+    const std::vector<CanonicalizedLaneletPose> &, const traffic_simulator::RouteOption &);
 };
 }  // namespace entity
 }  // namespace traffic_simulator

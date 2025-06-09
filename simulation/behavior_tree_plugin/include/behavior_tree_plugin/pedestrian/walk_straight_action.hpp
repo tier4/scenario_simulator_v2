@@ -44,7 +44,8 @@ class WalkStraightAction : public entity_behavior::PedestrianActionNode
 {
 public:
   WalkStraightAction(const std::string & name, const BT::NodeConfiguration & config);
-  BT::NodeStatus tick() override;
+  bool checkPreconditions() override;
+  BT::NodeStatus doAction() override;
   void getBlackBoardValues() override;
   static BT::PortsList providedPorts()
   {
