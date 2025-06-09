@@ -27,6 +27,21 @@ Changelog for package openscenario_utility
 16.4.2 (2025-05-23)
 -------------------
 
+16.5.4 (2025-06-06)
+-------------------
+* Merge pull request `#1622 <https://github.com/tier4/scenario_simulator_v2/issues/1622>`_ from tier4/fix/non-symlink-install-sun
+* Merge branch 'master' into fix/non-symlink-install-sun
+* update
+* Fix executable permission error when --symlink-install is not activated
+* Contributors: Kotaro Yoshimoto, Zhenfeng-Sun, f0reachARR
+
+16.5.3 (2025-06-06)
+-------------------
+* Merge branch 'master' into refactor/behavior_tree_4
+* Merge branch 'master' into refactor/behavior_tree_4
+* Merge branch 'master' into refactor/behavior_tree_4
+* Contributors: Kotaro Yoshimoto, Taiga
+
 16.5.2 (2025-06-04)
 -------------------
 
