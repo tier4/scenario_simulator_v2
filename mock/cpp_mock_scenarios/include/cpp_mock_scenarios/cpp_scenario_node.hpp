@@ -76,7 +76,7 @@ private:
     const std::string & scenario_filename, const bool verbose,
     const std::set<std::uint8_t> & auto_sink_entity_types = {}) -> traffic_simulator::Configuration
   {
-    /// @note Determine map path, prefer passed-in value, fall back to ROS2 parameter if empty
+    /// @note Determine map path, prefer passed-in value, fall back to ros-2 parameter if empty
     if (map_path.empty()) {
       declare_parameter<std::string>("map_path", "");
       get_parameter<std::string>("map_path", map_path);
