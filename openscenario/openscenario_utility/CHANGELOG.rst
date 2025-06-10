@@ -27,6 +27,16 @@ Changelog for package openscenario_utility
 16.4.2 (2025-05-23)
 -------------------
 
+16.5.5 (2025-06-10)
+-------------------
+* Merge branch 'master' into refactor/scenario_test_runner
+* Merge branch 'master' into refactor/scenario_test_runner
+* Merge branch 'master' into refactor/scenario_test_runner
+* Merge branch 'master' into refactor/scenario_test_runner
+* Merge branch 'master' into refactor/scenario_test_runner
+* Merge branch 'master' into refactor/scenario_test_runner
+* Contributors: Kotaro Yoshimoto
+
 16.5.4 (2025-06-06)
 -------------------
 * Merge pull request `#1622 <https://github.com/tier4/scenario_simulator_v2/issues/1622>`_ from tier4/fix/non-symlink-install-sun
