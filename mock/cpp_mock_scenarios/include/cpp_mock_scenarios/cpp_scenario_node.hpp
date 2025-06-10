@@ -72,10 +72,16 @@ private:
   rclcpp::TimerBase::SharedPtr update_timer_;
   int timeout_;
   auto configure(
-    const std::string & map_path, const std::string & lanelet2_map_file,
+    std::string map_path, const std::string & lanelet2_map_file,
     const std::string & scenario_filename, const bool verbose,
     const std::set<std::uint8_t> & auto_sink_entity_types = {}) -> traffic_simulator::Configuration
   {
+    /// @note Determine map path, prefer passed-in value, fall back to ROS2 parameter if empty
+    if (map_path.empty()) {
+      declare_parameter<std::string>("map_path", "");
+      get_parameter<std::string>("map_path", map_path);
+    }
+
     auto configuration = traffic_simulator::Configuration(
       map_path, lanelet2_map_file, scenario_filename, auto_sink_entity_types);
     configuration.verbose = verbose;
