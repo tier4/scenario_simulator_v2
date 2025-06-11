@@ -40,7 +40,7 @@ class VehicleBehaviorTree : public BehaviorPluginBase
 public:
   auto update(const double current_time, const double step_time) -> void override;
   void configure(const rclcpp::Logger & logger) override;
-  const std::string & getCurrentAction() const override;
+  auto getCurrentAction() -> const std::string & override;
 
   auto getBehaviorParameter() -> traffic_simulator_msgs::msg::BehaviorParameter override;
 

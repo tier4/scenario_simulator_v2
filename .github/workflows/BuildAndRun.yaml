@@ -35,7 +35,7 @@ jobs:
         rosdistro: [humble]
         runs_on: [ubuntu-22.04, ubuntu-22.04-arm]
         cmake_build_type: [RelWithDebInfo, Release] # Debug build type is currently unavailable. @TODO Fix problem and add Debug build.
-    steps:
+    steps:      
       - name: Suppress warnings
         run: git config --global --add safe.directory '*'
 

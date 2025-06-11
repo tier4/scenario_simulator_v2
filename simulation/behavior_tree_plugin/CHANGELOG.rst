@@ -21,6 +21,114 @@ Changelog for package behavior_tree_plugin
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+16.4.2 (2025-05-23)
+-------------------
+
+16.5.5 (2025-06-10)
+-------------------
+* Merge branch 'master' into refactor/scenario_test_runner
+* Merge branch 'master' into refactor/scenario_test_runner
+* Merge branch 'master' into refactor/scenario_test_runner
+* Merge branch 'master' into refactor/scenario_test_runner
+* Merge branch 'master' into refactor/scenario_test_runner
+* Merge branch 'master' into refactor/scenario_test_runner
+* Contributors: Kotaro Yoshimoto
+
+16.5.4 (2025-06-06)
+-------------------
+* Merge branch 'master' into fix/non-symlink-install-sun
+* Contributors: Kotaro Yoshimoto
+
+16.5.3 (2025-06-06)
+-------------------
+* Merge pull request `#1613 <https://github.com/tier4/scenario_simulator_v2/issues/1613>`_ from tier4/refactor/behavior_tree_4
+* Removed unnecessary logic and ensured correct behavior.
+* Merge branch 'master' into refactor/behavior_tree_4
+* Merge branch 'master' into refactor/behavior_tree_4
+* Merge branch 'master' into refactor/behavior_tree_4
+* remove unuse function
+* append curve_waypoints instead of straight_waypoints
+* Contributors: Kotaro Yoshimoto, Taiga, Taiga Takano
+
+16.5.2 (2025-06-04)
+-------------------
+
+16.5.1 (2025-06-03)
+-------------------
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, ぐるぐる
+
+16.5.0 (2025-06-03)
+-------------------
+* Merge branch 'master' into feature/set_route
+* Merge branch 'master' into feature/set_route
+* Merge branch 'master' into feature/set_route
+* Contributors: Kotaro Yoshimoto
+
+16.4.6 (2025-06-02)
+-------------------
+
+16.4.5 (2025-05-30)
+-------------------
+* Merge pull request `#1612 <https://github.com/tier4/scenario_simulator_v2/issues/1612>`_ from tier4/refactor/behavior_tree_5
+  Refactor ActionNode to isolate side effects via pure virtual methods
+* Fix inverted right-of-way entity check
+* Refactored code for better clarity
+* Refactor ActionNode to isolate side effects via pure virtual methods
+* Contributors: Masaya Kataoka, Taiga Takano
+
+16.4.4 (2025-05-28)
+-------------------
+* Merge remote-tracking branch 'origin/master' into feature/delay_curventure_calculation
+* Merge branch 'master' into feature/delay_curventure_calculation
+* Merge remote-tracking branch 'origin/master' into feature/delay_curventure_calculation
+* Merge remote-tracking branch 'origin/master' into feature/speed_up
+* Contributors: Masaya Kataoka
+
+16.4.3 (2025-05-27)
+-------------------
+* Merge pull request `#1606 <https://github.com/tier4/scenario_simulator_v2/issues/1606>`_ from tier4/refactor/behavior-tree-2
+  Refactor/behavior tree 2
+* fix format
+* rename kHungarian to snake_case
+* Merge branch 'master' into refactor/behavior-tree-2
+* Bump version of scenario_simulator_v2 from version version 16.4.1 to version 16.4.2
+* Merge branch 'master' into refactor/behavior-tree-2
+* Replaced hardcoded values with named constants.
+* Added a check for the value of `lane_change_velocity\_`.
+* Added lane matching failure condition in StopAtStopLineAction.
+* Avoided redundant checks for identical conditions in StopAtCrossingAction.
+* Removed unused `in_stop_sequence\_`.
+* Reviewed and simplified the logic in StopAtStopLineAction.
+* Removed unreachable section.
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, Taiga, Taiga Takano
+
+16.4.1 (2025-05-23)
+-------------------
+* Merge pull request `#1602 <https://github.com/tier4/scenario_simulator_v2/issues/1602>`_ from tier4/refactor/behavior-tree-1
+  Refactor/behavior_tree-1
+* Merge branch 'master' into refactor/behavior-tree-1
+* fix typo
+* Merge branch 'master' into refactor/behavior-tree-1
+* Changed unnecessarily public members to private.
+* Added trailing underscores to field names in ActionNode.
+* Changed the methods in `behavior_tree.hpp` to use trailing return types.
+* Contributors: Masaya Kataoka, Taiga, Taiga Takano
+
+16.4.0 (2025-05-22)
+-------------------
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Contributors: Kotaro Yoshimoto
+
 16.3.11 (2025-05-21)
 --------------------
 * Merge branch 'master' into refactor/lanelet_matching

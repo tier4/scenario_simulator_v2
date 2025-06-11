@@ -50,6 +50,23 @@ protected:
 
   hdmap_utils::HdMapUtils hdmap_utils;
 };
+class HdMapUtilsTest_WithoutLightBulb : public testing::Test
+{
+protected:
+  HdMapUtilsTest_WithoutLightBulb()
+  : hdmap_utils(
+      ament_index_cpp::get_package_share_directory("traffic_simulator") +
+        "/map/minimal_map/lanelet2_map.osm",
+      geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
+        .latitude(35.61836750154)
+        .longitude(139.78066608243)
+        .altitude(0.0))
+  {
+    activateLaneletWrapper("minimal_map");
+  }
+
+  hdmap_utils::HdMapUtils hdmap_utils;
+};
 class HdMapUtilsTest_WithRoadShoulderMap : public testing::Test
 {
 protected:
@@ -1454,6 +1471,57 @@ TEST_F(HdMapUtilsTest_StandardMap, getTrafficLightBulbPosition_correct)
 
     EXPECT_TRUE(return_bulb_position.has_value());
     EXPECT_POINT_NEAR(return_bulb_position.value(), makePoint(3760.16, 73754.87, 5.35), epsilon);
+  }
+
+  {
+    EXPECT_FALSE(hdmap_utils.getTrafficLightBulbPosition(light_id, "pink").has_value());
+  }
+}
+
+/**
+ * @note Test basic functionality.
+ * Test traffic light position obtaining
+ * with a traffic light and bulb color specified.
+ */
+TEST_F(HdMapUtilsTest_WithoutLightBulb, getTrafficLightBulbPositionInfer_correct)
+{
+  const lanelet::Id light_id = 34802;
+  const double epsilon = 0.1;
+
+  {
+    const auto return_bulb_position =
+      hdmap_utils.getTrafficLightBulbPosition(light_id, "green", true);
+
+    EXPECT_TRUE(return_bulb_position.has_value());
+    EXPECT_POINT_NEAR(return_bulb_position.value(), makePoint(3761.05, 73755.30, 5.35), epsilon);
+  }
+
+  {
+    const auto return_bulb_position =
+      hdmap_utils.getTrafficLightBulbPosition(light_id, "yellow", true);
+
+    EXPECT_TRUE(return_bulb_position.has_value());
+    EXPECT_POINT_NEAR(return_bulb_position.value(), makePoint(3760.60, 73755.07, 5.35), epsilon);
+  }
+
+  {
+    const auto return_bulb_position =
+      hdmap_utils.getTrafficLightBulbPosition(light_id, "red", true);
+
+    EXPECT_TRUE(return_bulb_position.has_value());
+    EXPECT_POINT_NEAR(return_bulb_position.value(), makePoint(3760.16, 73754.87, 5.35), epsilon);
+  }
+
+  {
+    EXPECT_FALSE(hdmap_utils.getTrafficLightBulbPosition(light_id, "green").has_value());
+  }
+
+  {
+    EXPECT_FALSE(hdmap_utils.getTrafficLightBulbPosition(light_id, "yellow").has_value());
+  }
+
+  {
+    EXPECT_FALSE(hdmap_utils.getTrafficLightBulbPosition(light_id, "red").has_value());
   }
 
   {
