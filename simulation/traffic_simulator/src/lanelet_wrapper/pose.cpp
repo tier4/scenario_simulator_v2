@@ -122,7 +122,8 @@ auto toLaneletPose(
         .lanelet_id(lanelet_id)
         .s(lanelet_pose_s.value())
         .offset(lanelet_pose_offset)
-        .rpy(lanelet_pose_rpy);
+        .rpy(lanelet_pose_rpy)
+        .lanelet_pose_valid(false);
     }
   }
 }
@@ -325,7 +326,8 @@ auto alongLaneletPose(
         .lanelet_id(end_of_road_lanelet_id.value())
         .s(lanelet_pose.s <= 0 ? 0 : lanelet_map::laneletLength(end_of_road_lanelet_id.value()))
         .offset(lanelet_pose.offset)
-        .rpy(lanelet_pose.rpy);
+        .rpy(lanelet_pose.rpy)
+        .lanelet_pose_valid(false);
     } else {
       THROW_SIMULATION_ERROR("Failed to find trailing lanelet_id.");
     }

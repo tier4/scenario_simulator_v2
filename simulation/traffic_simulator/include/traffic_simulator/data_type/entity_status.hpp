@@ -35,8 +35,8 @@ public:
     const EntityStatus & may_non_canonicalized_entity_status,
     const std::vector<std::optional<CanonicalizedLaneletPose>> & canonicalized_lanelet_poses);
   explicit CanonicalizedEntityStatus(
-      const EntityStatus & may_non_canonicalized_entity_status,
-      const std::optional<CanonicalizedLaneletPose> & canonicalized_lanelet_pose);
+    const EntityStatus & may_non_canonicalized_entity_status,
+    const std::optional<CanonicalizedLaneletPose> & canonicalized_lanelet_pose);
   CanonicalizedEntityStatus(const CanonicalizedEntityStatus & obj);
   explicit operator EntityStatus() const noexcept { return entity_status_; }
 
@@ -79,6 +79,14 @@ public:
   auto getType() const noexcept -> const EntityType & { return entity_status_.type; }
   auto getSubtype() const noexcept -> const EntitySubtype & { return entity_status_.subtype; }
   auto getBoundingBox() const noexcept -> const traffic_simulator_msgs::msg::BoundingBox &;
+  auto setCanonicalizedLaneletPosesValid(bool valid) -> void
+  {
+    for (auto & canonicalized_lanelet_pose : canonicalized_lanelet_poses_) {
+      if (canonicalized_lanelet_pose.has_value()) {
+        canonicalized_lanelet_pose.value().setLaneletPoseValid(valid);
+      }
+    }
+  }
 
 private:
   std::vector<std::optional<CanonicalizedLaneletPose>> canonicalized_lanelet_poses_;

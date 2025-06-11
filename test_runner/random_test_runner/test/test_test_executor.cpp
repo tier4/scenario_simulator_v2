@@ -78,7 +78,8 @@ auto getTestDescription() -> TestDescription
                            .lanelet_id(34513)
                            .s(10.0)
                            .offset(0.0)
-                           .rpy(geometry_msgs::msg::Vector3());
+                           .rpy(geometry_msgs::msg::Vector3())
+                           .lanelet_pose_valid(true);
 
   td.ego_goal_pose =
     geometry_msgs::build<geometry_msgs::msg::Pose>()
@@ -92,7 +93,8 @@ auto getTestDescription() -> TestDescription
                             .lanelet_id(34513)
                             .s(0.0)
                             .offset(0.0)
-                            .rpy(geometry_msgs::msg::Vector3());
+                            .rpy(geometry_msgs::msg::Vector3())
+                            .lanelet_pose_valid(true);
 
   return td;
 }

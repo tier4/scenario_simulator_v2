@@ -127,6 +127,7 @@ auto CanonicalizedEntityStatus::isInLanelet() const noexcept -> bool
       return true;
     }
   }
+  return false;
 }
 
 auto CanonicalizedEntityStatus::getBoundingBox() const noexcept

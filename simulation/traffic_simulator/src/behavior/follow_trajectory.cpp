@@ -67,10 +67,11 @@ auto makeUpdatedStatus(
   using math::geometry::normalize;
   using math::geometry::truncate;
 
-  const auto include_crosswalk = [](const auto & entity_type) {
-    return (traffic_simulator_msgs::msg::EntityType::PEDESTRIAN == entity_type.type) ||
-           (traffic_simulator_msgs::msg::EntityType::MISC_OBJECT == entity_type.type);
-  }(entity_status.type);
+  // WIP temporary removed since it is not used
+  // const auto include_crosswalk = [](const auto & entity_type) {
+  //   return (traffic_simulator_msgs::msg::EntityType::PEDESTRIAN == entity_type.type) ||
+  //          (traffic_simulator_msgs::msg::EntityType::MISC_OBJECT == entity_type.type);
+  // }(entity_status.type);
 
   auto distance_along_lanelet =
     [&](const geometry_msgs::msg::Point & from, const geometry_msgs::msg::Point & to) -> double {
@@ -374,12 +375,18 @@ auto makeUpdatedStatus(
                    const auto dx = target_position.x - position.x;
                    const auto dy = target_position.y - position.y;
                    /// @note if entity is on lane use pitch from lanelet, otherwise use pitch on target
+                   //  const auto pitch =
+                   //    entity_status.lanelet_pose_valid
+                   //      ? -math::geometry::convertQuaternionToEulerAngle(
+                   //           entity_status.pose.orientation)
+                   //           .y
+                   //      : std::atan2(target_position.z - position.z, std::hypot(dy, dx));
+                   // #############################################
+                   // WIP
+                   // #############################################
                    const auto pitch =
-                     entity_status.lanelet_pose_valid
-                       ? -math::geometry::convertQuaternionToEulerAngle(
-                            entity_status.pose.orientation)
-                            .y
-                       : std::atan2(target_position.z - position.z, std::hypot(dy, dx));
+                     std::atan2(target_position.z - position.z, std::hypot(dy, dx));
+                   // #############################################
                    const auto yaw = std::atan2(dy, dx);  // Use yaw on target
                    return geometry_msgs::build<geometry_msgs::msg::Vector3>()
                      .x(std::cos(pitch) * std::cos(yaw) * desired_speed)
@@ -574,24 +581,25 @@ auto makeUpdatedStatus(
       }
     }();
 
+    // WIP: this part is to heavy to refactor, so just return the first one
     /// @note If it is the transition between lanelets: overwrite position to improve precision
-    if (entity_status.lanelet_pose_valid) {
-      constexpr bool desired_velocity_is_global{true};
-      const auto canonicalized_lanelet_pose =
-        traffic_simulator::pose::toCanonicalizedLaneletPose(entity_status.lanelet_pose);
-      const auto estimated_next_canonicalized_lanelet_pose =
-        traffic_simulator::pose::toCanonicalizedLaneletPose(updated_status.pose, include_crosswalk);
-      if (canonicalized_lanelet_pose && estimated_next_canonicalized_lanelet_pose) {
-        const auto next_lanelet_id =
-          static_cast<LaneletPose>(estimated_next_canonicalized_lanelet_pose.value()).lanelet_id;
-        if (  /// @note Handle lanelet transition
-          const auto updated_position = pose::updatePositionForLaneletTransition(
-            canonicalized_lanelet_pose.value(), next_lanelet_id, desired_velocity,
-            desired_velocity_is_global, step_time)) {
-          updated_status.pose.position = updated_position.value();
-        }
-      }
-    }
+    // if (entity_status.lanelet_pose_valid) {
+    //   constexpr bool desired_velocity_is_global{true};
+    //   const auto canonicalized_lanelet_pose =
+    //     traffic_simulator::pose::toCanonicalizedLaneletPose(entity_status.lanelet_pose);
+    //   const auto estimated_next_canonicalized_lanelet_pose =
+    //     traffic_simulator::pose::toCanonicalizedLaneletPose(updated_status.pose, include_crosswalk);
+    //   if (canonicalized_lanelet_pose && estimated_next_canonicalized_lanelet_pose) {
+    //     const auto next_lanelet_id =
+    //       static_cast<LaneletPose>(estimated_next_canonicalized_lanelet_pose.value()).lanelet_id;
+    //     if (  /// @note Handle lanelet transition
+    //       const auto updated_position = pose::updatePositionForLaneletTransition(
+    //         canonicalized_lanelet_pose.value(), next_lanelet_id, desired_velocity,
+    //         desired_velocity_is_global, step_time)) {
+    //       updated_status.pose.position = updated_position.value();
+    //     }
+    //   }
+    // }
 
     updated_status.action_status.twist.linear.x = norm(desired_velocity);
 
@@ -600,8 +608,9 @@ auto makeUpdatedStatus(
     updated_status.action_status.twist.linear.z = 0;
 
     updated_status.action_status.twist.angular =
-      math::geometry::convertQuaternionToEulerAngle(math::geometry::getRotation(
-        entity_status.pose.orientation, updated_status.pose.orientation)) /
+      math::geometry::convertQuaternionToEulerAngle(
+        math::geometry::getRotation(
+          entity_status.pose.orientation, updated_status.pose.orientation)) /
       step_time;
 
     updated_status.action_status.accel.linear =
@@ -614,7 +623,9 @@ auto makeUpdatedStatus(
 
     updated_status.time = entity_status.time + step_time;
 
-    updated_status.lanelet_pose_valid = false;
+    for (auto & lanelet_pose : updated_status.lanelet_poses) {
+      lanelet_pose.lanelet_pose_valid = false;
+    }
 
     return updated_status;
   }

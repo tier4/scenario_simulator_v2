@@ -54,12 +54,12 @@ auto PedestrianActionNode::calculateUpdatedEntityStatusInWorldFrame(double targe
         entity_status_updated.pose, canonicalized_entity_status->getBoundingBox(),
         canonicalized_entity_status->getLaneletIds(), true,
         default_matching_distance_for_lanelet_pose_calculation)) {
-    entity_status_updated.lanelet_pose_valid = true;
-    entity_status_updated.lanelet_pose =
-      static_cast<traffic_simulator::LaneletPose>(canonicalized_lanelet_pose.value());
+    entity_status_updated.lanelet_poses.clear();
+    entity_status_updated.lanelet_poses.emplace_back(
+      static_cast<traffic_simulator::LaneletPose>(canonicalized_lanelet_pose.value()));
+    entity_status_updated.lanelet_poses.front().lanelet_pose_valid = true;
   } else {
-    entity_status_updated.lanelet_pose_valid = false;
-    entity_status_updated.lanelet_pose = traffic_simulator::LaneletPose();
+    entity_status_updated.lanelet_poses = std::vector<traffic_simulator::LaneletPose>();
   }
   return entity_status_updated;
 }

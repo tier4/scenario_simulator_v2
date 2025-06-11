@@ -225,7 +225,9 @@ BT::NodeStatus LaneChangeAction::tick()
       auto entity_status_updated =
         static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status);
       entity_status_updated.pose = pose;
-      entity_status_updated.lanelet_pose_valid = false;
+      for (auto & lanelet_pose : entity_status_updated.lanelet_poses) {
+        lanelet_pose.lanelet_pose_valid = false;
+      }
       entity_status_updated.action_status = canonicalized_entity_status->getActionStatus();
       setCanonicalizedEntityStatus(entity_status_updated);
       const auto waypoints = calculateWaypoints();
@@ -254,8 +256,8 @@ BT::NodeStatus LaneChangeAction::tick()
       lanelet_pose.lanelet_id = lane_change_parameters_->target.lanelet_id;
       lanelet_pose.s = s;
       lanelet_pose.offset = 0;
-      entity_status_updated.lanelet_pose = lanelet_pose;
-      entity_status_updated.lanelet_pose_valid = true;
+      lanelet_pose.lanelet_pose_valid = true;
+      entity_status_updated.lanelet_poses.emplace_back(lanelet_pose);
       entity_status_updated.pose = traffic_simulator::pose::toMapPose(lanelet_pose);
       entity_status_updated.action_status = canonicalized_entity_status->getActionStatus();
       setCanonicalizedEntityStatus(entity_status_updated);

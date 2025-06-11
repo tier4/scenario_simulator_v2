@@ -329,7 +329,9 @@ auto EgoEntity::setMapPose(const geometry_msgs::msg::Pose & map_pose) -> void
 {
   auto entity_status = static_cast<EntityStatus>(*status_);
   entity_status.pose = map_pose;
-  entity_status.lanelet_pose_valid = false;
+  for (auto & lanelet_pose : entity_status.lanelet_poses) {
+    lanelet_pose.lanelet_pose_valid = false;  // invalidate lanelet poses
+  }
   // prefer current lanelet on Autoware side
   status_->set(
     entity_status, helper::getUniqueValues(getRouteLanelets()),

@@ -307,17 +307,17 @@ auto ActionNode::getEntityStatus(const std::string & target_name) const
 
 /**
  * @note getDistanceToTargetEntity working schematics
- * 
- * 1. Check if route to target entity from reference entity exists, if not try to transform pose to other 
+ *
+ * 1. Check if route to target entity from reference entity exists, if not try to transform pose to other
  *    routable lanelet, within matching distance (findRoutableAlternativeLaneletPoseFrom).
  * 2. Calculate longitudinal distance between entities bounding boxes -> bounding_box_distance.
  * 3. Calculate longitudinal distance between entities poses -> longitudinal_distance.
- * 4. Calculate target entity bounding box distance to reference entity spline (minimal distance from all corners) 
+ * 4. Calculate target entity bounding box distance to reference entity spline (minimal distance from all corners)
  *    -> target_to_spline_distance.
  * 5. If target_to_spline_distance is less than half width of reference entity target entity is conflicting.
  * 6. Check corner case where target entity width is bigger than width of entity and target entity
  *    is exactly on the spline -> spline.getCollisionPointIn2D
- * 7. If target entity is conflicting return bounding_box_distance enlarged by half of the entity 
+ * 7. If target entity is conflicting return bounding_box_distance enlarged by half of the entity
  *    length.
  */
 auto ActionNode::getDistanceToTargetEntity(
@@ -329,9 +329,9 @@ auto ActionNode::getDistanceToTargetEntity(
     !isOtherEntityAtConsideredAltitude(status)) {
     return std::nullopt;
   }
-  /** 
-      * boundingBoxLaneLongitudinalDistance requires routing_configuration, 
-      * 'allow_lane_change = true' is needed to check distances to entities on neighbour lanelets 
+  /**
+      * boundingBoxLaneLongitudinalDistance requires routing_configuration,
+      * 'allow_lane_change = true' is needed to check distances to entities on neighbour lanelets
       */
   traffic_simulator::RoutingConfiguration routing_configuration;
   routing_configuration.allow_lane_change = true;
@@ -505,12 +505,16 @@ auto ActionNode::calculateUpdatedEntityStatus(
     entity_status_updated.action_status.accel = accel_new;
     entity_status_updated.action_status.linear_jerk = linear_jerk_new;
     /// @todo it will be moved to route::moveAlongLaneletPose(...)
-    entity_status_updated.lanelet_pose = traffic_simulator::lanelet_wrapper::pose::alongLaneletPose(
-      static_cast<traffic_simulator::LaneletPose>(canonicalized_lanelet_pose.value()),
-      route_lanelets, distance);
-    entity_status_updated.lanelet_pose_valid = true;
+    // WIP temporary fix for lanelet pose
+    entity_status_updated.lanelet_poses = std::vector<traffic_simulator::LaneletPose>{
+      traffic_simulator::lanelet_wrapper::pose::alongLaneletPose(
+        static_cast<traffic_simulator::LaneletPose>(canonicalized_lanelet_pose.value()),
+        route_lanelets, distance)};
+    for (auto & lanelet_pose : entity_status_updated.lanelet_poses) {
+      lanelet_pose.lanelet_pose_valid = true;
+    }
     entity_status_updated.pose =
-      traffic_simulator::pose::toMapPose(entity_status_updated.lanelet_pose);
+      traffic_simulator::pose::toMapPose(entity_status_updated.lanelet_poses.front());
     return entity_status_updated;
   } else {
     THROW_SIMULATION_ERROR(
@@ -595,8 +599,7 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
   auto entity_status_updated =
     static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status);
   entity_status_updated.time = current_time + step_time;
-  entity_status_updated.lanelet_pose = traffic_simulator::LaneletPose();
-  entity_status_updated.lanelet_pose_valid = false;
+  entity_status_updated.lanelet_poses = std::vector<traffic_simulator::LaneletPose>();
   entity_status_updated.pose = pose_new;
   entity_status_updated.action_status.twist = twist_new;
   entity_status_updated.action_status.accel = accel_new;

@@ -710,7 +710,8 @@ TEST_F(HdMapUtilsTest_StandardMap, toLaneletPose_correct)
       .lanelet_id(34600)
       .s(35.0)
       .offset(0.0)
-      .rpy(geometry_msgs::msg::Vector3());
+      .rpy(geometry_msgs::msg::Vector3())
+      .lanelet_pose_valid(true);
 
   EXPECT_TRUE(lanelet_pose.has_value());
   EXPECT_LANELET_POSE_NEAR(lanelet_pose.value(), reference_lanelet_pose, 0.1);
@@ -746,7 +747,8 @@ TEST_F(HdMapUtilsTest_StandardMap, toLaneletPose_negativeOffset)
       .lanelet_id(34600)
       .s(35.0)
       .offset(offset)
-      .rpy(geometry_msgs::msg::Vector3());
+      .rpy(geometry_msgs::msg::Vector3())
+      .lanelet_pose_valid(true);
 
   EXPECT_TRUE(lanelet_pose.has_value());
   EXPECT_LANELET_POSE_NEAR(lanelet_pose.value(), reference_lanelet_pose, 0.1);
@@ -814,7 +816,8 @@ TEST_F(HdMapUtilsTest_StandardMap, toLaneletPose_boundingBoxMatchPrevious)
       .lanelet_id(34600)
       .s(52.0)
       .offset(0.0)
-      .rpy(geometry_msgs::msg::Vector3()),
+      .rpy(geometry_msgs::msg::Vector3())
+      .lanelet_pose_valid(true),
     0.1);
 }
 
@@ -2249,7 +2252,7 @@ TEST_F(HdMapUtilsTest_IntersectionMap, getLongitudinalDistance_laneChange)
 
 /**
  * @note Test for isInIntersection function
- * 
+ *
  */
 TEST_F(HdMapUtilsTest_IntersectionMap, isInIntersection)
 {
