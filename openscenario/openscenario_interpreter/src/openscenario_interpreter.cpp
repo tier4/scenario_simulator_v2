@@ -265,8 +265,8 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
         if (record) {
           std::vector<std::string> options;
           options.push_back("-a");
-          options.push_back("--exclude");
-          options.push_back("/sensing/camera/.*");
+          //options.push_back("--exclude");
+          //options.push_back("/sensing/camera/.*");
           options.push_back("-o");
           options.push_back(boost::filesystem::path(osc_path).replace_extension("").string());
           if (record_storage_id != "") {
