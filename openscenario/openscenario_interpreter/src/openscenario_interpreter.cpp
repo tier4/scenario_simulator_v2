@@ -166,7 +166,7 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
                       },
                       each);
                   })) {
-              activateNonUserDefinedControllers();
+              SimulatorCore::activateNonUserDefinedControllers();
             }
           } else if (currentScenarioDefinition()) {
             currentScenarioDefinition()->evaluate();

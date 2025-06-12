@@ -17,6 +17,7 @@
 
 #include <simulation_api_schema.pb.h>
 
+#include <geometry/quaternion/get_rotation_matrix.hpp>
 #include <simulation_interface/conversions.hpp>
 #include <simulation_interface/zmq_multi_client.hpp>
 #include <std_msgs/msg/float64.hpp>
@@ -26,6 +27,7 @@
 #include <traffic_simulator/traffic/traffic_controller.hpp>
 #include <traffic_simulator/traffic/traffic_source.hpp>
 #include <traffic_simulator/traffic_lights/traffic_lights.hpp>
+#include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 
 namespace traffic_simulator
@@ -66,7 +68,7 @@ public:
     debug_marker_pub_(rclcpp::create_publisher<visualization_msgs::msg::MarkerArray>(
       node, "debug_marker", rclcpp::QoS(100), rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
     clock_(
-      common::getParameter<bool>(node_parameters_, "use_sim_time"),
+      common::getParameter<bool>(node_parameters_, "use_sim_time", true),
       std::forward<decltype(xs)>(xs)...),
     zeromq_client_(
       simulation_interface::protocol, configuration.simulator_host,
@@ -118,12 +120,7 @@ public:
   auto updateFrame() -> bool;
 
   // entities, ego - spawn
-  template <
-    typename PoseType, typename ParamsType,
-    typename = std::enable_if_t<std::disjunction_v<
-      std::is_same<std::decay_t<ParamsType>, traffic_simulator_msgs::msg::VehicleParameters>,
-      std::is_same<std::decay_t<ParamsType>, traffic_simulator_msgs::msg::PedestrianParameters>,
-      std::is_same<std::decay_t<ParamsType>, traffic_simulator_msgs::msg::MiscObjectParameters>>>>
+  template <typename PoseType, typename ParamsType>
   auto spawn(
     const std::string & name, const PoseType & pose, const ParamsType & parameters,
     const std::string & behavior = "", const std::string & model3d = "") -> entity::EntityBase &
@@ -131,6 +128,14 @@ public:
     using VehicleParameters = traffic_simulator_msgs::msg::VehicleParameters;
     using PedestrianParameters = traffic_simulator_msgs::msg::PedestrianParameters;
     using MiscObjectParameters = traffic_simulator_msgs::msg::MiscObjectParameters;
+
+    static_assert(
+      std::disjunction_v<
+        std::is_same<std::decay_t<ParamsType>, VehicleParameters>,
+        std::is_same<std::decay_t<ParamsType>, PedestrianParameters>,
+        std::is_same<std::decay_t<ParamsType>, MiscObjectParameters>>,
+      "ParamsType must be either a VehicleParameters, a PedestrianParameters, or a "
+      "MiscObjectParameters");
 
     auto register_to_entity_manager = [&]() -> entity::EntityBase & {
       if constexpr (std::is_same_v<ParamsType, VehicleParameters>) {
@@ -249,6 +254,61 @@ public:
   // entities - features
   auto checkCollision(
     const std::string & first_entity_name, const std::string & second_entity_name) const -> bool;
+
+  auto laneletRelativeYaw(const std::string & entity_name, const LaneletPose & lanelet_pose) const
+    -> std::optional<double>;
+
+  auto timeHeadway(const std::string & from_entity_name, const std::string & to_entity_name)
+    -> std::optional<double>;
+
+  auto boundingBoxDistance(const std::string & from_entity_name, const std::string & to_entity_name)
+    -> std::optional<double>;
+
+  auto relativePose(const std::string & from_entity_name, const std::string & to_entity_name)
+    -> std::optional<geometry_msgs::msg::Pose>;
+
+  auto relativePose(
+    const std::string & from_entity_name, const geometry_msgs::msg::Pose & to_map_pose)
+    -> std::optional<geometry_msgs::msg::Pose>;
+
+  auto relativePose(
+    const geometry_msgs::msg::Pose & from_map_pose, const std::string & to_entity_name)
+    -> std::optional<geometry_msgs::msg::Pose>;
+
+  auto boundingBoxRelativePose(
+    const std::string & from_entity_name, const geometry_msgs::msg::Pose & to_map_pose)
+    -> std::optional<geometry_msgs::msg::Pose>;
+
+  auto boundingBoxRelativePose(
+    const std::string & from_entity_name, const std::string & to_entity_name)
+    -> std::optional<geometry_msgs::msg::Pose>;
+
+  auto relativeLaneletPose(
+    const std::string & from_entity_name, const std::string & to_entity_name,
+    const RoutingConfiguration & routing_configuration) -> std::optional<LaneletPose>;
+
+  auto relativeLaneletPose(
+    const std::string & from_entity_name, const LaneletPose & to_lanelet_pose,
+    const RoutingConfiguration & routing_configuration) -> std::optional<LaneletPose>;
+
+  auto relativeLaneletPose(
+    const LaneletPose & from_lanelet_pose, const LaneletPose & to_lanelet_pose,
+    const RoutingConfiguration & routing_configuration) -> std::optional<LaneletPose>;
+
+  auto boundingBoxRelativeLaneletPose(
+    const std::string & from_entity_name, const std::string & to_entity_name,
+    const RoutingConfiguration & routing_configuration) -> std::optional<LaneletPose>;
+
+  auto boundingBoxRelativeLaneletPose(
+    const std::string & from_entity_name, const LaneletPose & to_lanelet_pose,
+    const RoutingConfiguration & routing_configuration) -> std::optional<LaneletPose>;
+
+  auto relativeSpeed(const std::string & from_entity_name, const std::string & to_entity_name)
+    -> Eigen::Vector3d;
+
+  auto countLaneChanges(
+    const std::string & from_entity_name, const std::string & to_entity_name,
+    const RoutingConfiguration & routing_configuration) const -> std::optional<std::pair<int, int>>;
 
   // traffics, lanelet
   auto getHdmapUtils() const -> const std::shared_ptr<hdmap_utils::HdMapUtils> &;

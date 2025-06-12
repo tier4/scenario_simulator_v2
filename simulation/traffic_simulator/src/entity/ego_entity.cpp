@@ -195,7 +195,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
   EntityBase::onPostUpdate(current_time, step_time);
 }
 
-void EgoEntity::requestAcquirePosition(const CanonicalizedLaneletPose & lanelet_pose)
+void EgoEntity::requestAcquirePosition(const LaneletPose & lanelet_pose)
 {
   traffic_simulator::RouteOption option;
   option.allow_goal_modification = get_parameter_or<bool>("allow_goal_modification", false);
@@ -210,7 +210,7 @@ void EgoEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose
 }
 
 void EgoEntity::requestAcquirePosition(
-  const CanonicalizedLaneletPose & lanelet_pose, const traffic_simulator::RouteOption & option)
+  const LaneletPose & lanelet_pose, const traffic_simulator::RouteOption & option)
 {
   requestAssignRoute({lanelet_pose}, option);
 }
@@ -221,15 +221,11 @@ void EgoEntity::requestAcquirePosition(
   requestAssignRoute({map_pose}, option);
 }
 
-void EgoEntity::requestAssignRoute(const std::vector<CanonicalizedLaneletPose> & route)
+void EgoEntity::requestAssignRoute(const std::vector<LaneletPose> & route)
 {
-  std::vector<geometry_msgs::msg::Pose> route_poses;
-  for (const auto & lanelet_pose : route) {
-    route_poses.push_back(static_cast<geometry_msgs::msg::Pose>(lanelet_pose));
-  }
   traffic_simulator::RouteOption option;
   option.allow_goal_modification = get_parameter_or<bool>("allow_goal_modification", false);
-  return requestAssignRoute(route_poses, option);
+  return requestAssignRoute(route, option);
 }
 
 void EgoEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> & route)
@@ -237,6 +233,18 @@ void EgoEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &
   traffic_simulator::RouteOption option;
   option.allow_goal_modification = get_parameter_or<bool>("allow_goal_modification", false);
   return requestAssignRoute(route, option);
+}
+
+void EgoEntity::requestAssignRoute(
+  const std::vector<LaneletPose> & route, const traffic_simulator::RouteOption & option)
+{
+  std::vector<CanonicalizedLaneletPose> canonicalized_route;
+  canonicalized_route.reserve(route.size());
+  std::transform(
+    route.begin(), route.end(), std::back_inserter(canonicalized_route),
+    [](const auto & lanelet_pose) { return CanonicalizedLaneletPose(lanelet_pose); });
+
+  requestAssignRoute(canonicalized_route, option);
 }
 
 void EgoEntity::requestAssignRoute(
@@ -384,6 +392,14 @@ auto EgoEntity::requestSpeedChange(
   THROW_SEMANTIC_ERROR(
     "The traffic_simulator's request to set speed to the Ego type entity is for initialization "
     "purposes only.");
+}
+
+auto EgoEntity::requestSynchronize(
+  const std::string & /*target_name*/, const LaneletPose & /*target_sync_pose*/,
+  const LaneletPose & /*entity_target*/, const double /*target_speed*/, const double /*tolerance*/)
+  -> bool
+{
+  THROW_SYNTAX_ERROR("Request synchronize is only for non-ego entities.");
 }
 
 auto EgoEntity::requestClearRoute() -> void { clearRoute(); }
