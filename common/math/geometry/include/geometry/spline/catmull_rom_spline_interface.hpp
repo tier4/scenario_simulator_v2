@@ -36,6 +36,37 @@ public:
     const std::optional<std::pair<double, double>> & s_range = std::nullopt) const = 0;
   virtual double getSquaredDistanceIn2D(
     const geometry_msgs::msg::Point & point, const double s) const = 0;
+
+  /// @brief Calculates nearest s value from given range and its squared distance in 2D
+  auto nearestS(const geometry_msgs::msg::Point & point, double s_start, double s_end) const
+    -> std::pair<double, double>
+  {
+    /**
+     * Convergence threshold for binary search.
+     * The search stops when the interval between `s_start` and `s_end` is below this value.
+     * The value 0.05 was chosen empirically to balance accuracy and performance.
+     * A smaller value improves precision but increases computation time.
+     */
+    constexpr double distance_accuracy{0.05};
+
+    /// @note it may be a good idea to develop spline.getSquaredDistanceIn2D(point, s_start, s_end);
+    auto s_start_distance = getSquaredDistanceIn2D(point, s_start);
+    auto s_end_distance = getSquaredDistanceIn2D(point, s_end);
+
+    while (std::abs(s_start - s_end) > distance_accuracy) {
+      double s_mid = s_start + (s_end - s_start) / 2.0;
+      double s_mid_distance = getSquaredDistanceIn2D(point, s_mid);
+      if (s_start_distance > s_end_distance) {
+        s_start = s_mid;
+        s_start_distance = s_mid_distance;
+      } else {
+        s_end = s_mid;
+        s_end_distance = s_mid_distance;
+      }
+    }
+    return std::make_pair(
+      std::min(s_start, s_end), s_start < s_end ? s_start_distance : s_end_distance);
+  }
 };
 }  // namespace geometry
 }  // namespace math
