@@ -88,7 +88,6 @@ public:
       BT::InputPort<traffic_simulator_msgs::msg::BehaviorParameter>("behavior_parameter"),
       BT::OutputPort<std::optional<traffic_simulator_msgs::msg::Obstacle>>("obstacle"),
       BT::OutputPort<traffic_simulator_msgs::msg::WaypointsArray>("waypoints"),
-      BT::OutputPort<traffic_simulator::behavior::Request>("request"),
       // clang-format on
     };
   }
