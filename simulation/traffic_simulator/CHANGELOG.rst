@@ -24,6 +24,72 @@ Changelog for package traffic_simulator
 16.4.2 (2025-05-23)
 -------------------
 
+16.5.5 (2025-06-10)
+-------------------
+* Merge branch 'master' into refactor/scenario_test_runner
+* Merge branch 'master' into refactor/scenario_test_runner
+* Merge branch 'master' into refactor/scenario_test_runner
+* Merge branch 'master' into refactor/scenario_test_runner
+* Merge branch 'master' into refactor/scenario_test_runner
+* Merge branch 'master' into refactor/scenario_test_runner
+* Contributors: Kotaro Yoshimoto
+
+16.5.4 (2025-06-06)
+-------------------
+* Merge branch 'master' into fix/non-symlink-install-sun
+* Contributors: Kotaro Yoshimoto
+
+16.5.3 (2025-06-06)
+-------------------
+* Merge branch 'master' into refactor/behavior_tree_4
+* Merge branch 'master' into refactor/behavior_tree_4
+* Merge branch 'master' into refactor/behavior_tree_4
+* Contributors: Kotaro Yoshimoto, Taiga
+
+16.5.2 (2025-06-04)
+-------------------
+
+16.5.1 (2025-06-03)
+-------------------
+* Merge pull request `#1597 <https://github.com/tier4/scenario_simulator_v2/issues/1597>`_ from tier4/feature/render-omitted-light-bulb
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Add new line on EOF to lanelet map
+* Add infer test
+* Remove unnecessary operator
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* update tests for multiple traffic light
+* Add support for render bulbs without state
+* Refactor constant
+* Activate bulb position inference
+* Fix missing override
+* Add bulb position inference feature to HdMapUtils
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, f0reachARR, ぐるぐる
+
+16.5.0 (2025-06-03)
+-------------------
+* Merge pull request `#1611 <https://github.com/tier4/scenario_simulator_v2/issues/1611>`_ from tier4/feature/set_route
+* Merge branch 'master' into feature/set_route
+* Merge branch 'master' into feature/set_route
+* Rename use_lane_level_specification_for_waypoints to use_lane_ids_for_routing
+* Use algorithm functions instead of for loop code
+* Stop using deprecated version of FieldOperatorApplication::plan in EgoEntity::requestReplanRoute
+* Merge branch 'master' into feature/set_route
+* Add an exception when failed to get current lanelet in EgoEntity::requestAssignRoute
+* Rename FieldOperatorApplication::setRoute/setRoutePoints to plan
+* configration => configuration
+* use setRoutePoints instead of plan in EgoEntity::requestAssignRoute
+* Use route and waypoint appropriately (route = waypoints + goal)
+* Interpolate and unique lanelet array for set route API
+* Switch by use_lane_level_specification_for_waypoints flag in EgoEntity::requestAssignRoute
+* Change redirect target of requestAssignRoute(lanelet_pose[])
+* Adjust name of (traffic_simulator::)RouteOption
+* Define conversion of RouteOption from v1 to v2
+* Add RouteOption v2
+* Contributors: Kotaro Yoshimoto
+
 16.4.6 (2025-06-02)
 -------------------
 
