@@ -151,10 +151,12 @@ auto ActionNode::getYieldStopDistance(const lanelet::Ids & following_lanelets) c
       const auto other_status = getOtherEntityStatus(right_of_way_id);
       if (!other_status.empty() && canonicalized_entity_status_->isInLanelet()) {
         const auto lanelet_pose = canonicalized_entity_status_->getLaneletPose();
-        const auto distance_forward = hdmap_utils_->getLongitudinalDistance(
-          lanelet_pose, traffic_simulator::helper::constructLaneletPose(lanelet, 0));
-        const auto distance_backward = hdmap_utils_->getLongitudinalDistance(
-          traffic_simulator::helper::constructLaneletPose(lanelet, 0), lanelet_pose);
+        const auto distance_forward =
+          traffic_simulator::lanelet_wrapper::distance::longitudinalDistance(
+            lanelet_pose, traffic_simulator::helper::constructLaneletPose(lanelet, 0));
+        const auto distance_backward =
+          traffic_simulator::lanelet_wrapper::distance::longitudinalDistance(
+            traffic_simulator::helper::constructLaneletPose(lanelet, 0), lanelet_pose);
         if (distance_forward) {
           distances.insert(distance_forward.value());
         } else if (distance_backward) {
@@ -364,7 +366,7 @@ auto ActionNode::getDistanceToTargetEntity(
       math::geometry::getDistance(bounding_box_map_points[0], bounding_box_map_points[2]);
     if (const auto longitudinal_distance = traffic_simulator::distance::longitudinalDistance(
           *from_lanelet_pose, *target_lanelet_pose, include_adjacent_lanelet,
-          include_opposite_direction, routing_configuration, hdmap_utils_);
+          include_opposite_direction, routing_configuration);
         !longitudinal_distance) {
       return std::nullopt;
     } else if (const auto bounding_box_distance =
