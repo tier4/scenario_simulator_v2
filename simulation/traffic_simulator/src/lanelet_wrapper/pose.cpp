@@ -95,7 +95,23 @@ auto toLaneletPose(
   constexpr double yaw_threshold_deg = 45.0;
 
   const auto lanelet_spline = lanelet_map::centerPointsSpline(lanelet_id);
-  if (const auto lanelet_pose_s = lanelet_spline->getSValue(map_pose, matching_distance);
+  if (const auto lanelet_pose_s = [&]() -> std::optional<double> {
+        if (const auto s_estimate = lanelet_spline->getSValue(map_pose, matching_distance);
+            !s_estimate) {
+          return std::nullopt;
+        } else {
+          /**
+           * @note Here matching_distance can be used, because it is the max possible distance
+           * between the spline and the point assuming the matching distance is used unchanged to
+           * calculate spline collision with the perpendicular line to the longitudinal (X) axis.
+           */
+          const auto [nearest_s, distance_squared] = lanelet_spline->nearestS(
+            map_pose.position, s_estimate.value() - matching_distance,
+            s_estimate.value() + matching_distance);
+
+          return nearest_s;
+        }
+      }();
       !lanelet_pose_s) {
     return std::nullopt;
   } else if (const auto pose_on_centerline = lanelet_spline->getPose(lanelet_pose_s.value());
