@@ -95,10 +95,12 @@ auto toLaneletPose(
   constexpr double yaw_threshold_deg = 45.0;
 
   const auto lanelet_spline = lanelet_map::centerPointsSpline(lanelet_id);
-  if (const auto lanelet_pose_s = [&]() -> std::optional<double> {
+  if (const auto [lanelet_pose_s, distance_squared] =
+        [&]() -> std::pair<std::optional<double>, double> {
+        /// @note If first optional has value then second double is valid
         if (const auto s_estimate = lanelet_spline->getSValue(map_pose, matching_distance);
             !s_estimate) {
-          return std::nullopt;
+          return std::make_pair(std::nullopt, 0.0);
         } else {
           /**
            * @note Here matching_distance can be used, because it is the max possible distance
@@ -109,7 +111,7 @@ auto toLaneletPose(
             map_pose.position, s_estimate.value() - matching_distance,
             s_estimate.value() + matching_distance);
 
-          return nearest_s;
+          return std::make_pair(nearest_s, distance_squared);
         }
       }();
       !lanelet_pose_s) {
@@ -126,8 +128,7 @@ auto toLaneletPose(
         std::fabs(lanelet_pose_rpy.z) < yaw_range_max_rad) {
       return std::nullopt;
     } else {
-      double lanelet_pose_offset = std::sqrt(
-        lanelet_spline->getSquaredDistanceIn2D(map_pose.position, lanelet_pose_s.value()));
+      double lanelet_pose_offset = std::sqrt(distance_squared);
       if (const double inner_product = math::geometry::innerProduct(
             lanelet_spline->getNormalVector(lanelet_pose_s.value()),
             lanelet_spline->getSquaredDistanceVector(map_pose.position, lanelet_pose_s.value()));
