@@ -1,129 +1,188 @@
-simulation:
-  AutowareUniverse:
-    ros__parameters:
-      /localization/kinematic_state:
-        version: 20240605 # architecture_type suffix (mandatory)
-        seed: 0 # If 0 is specified, a random seed value will be generated for each run.
-        nav_msgs::msg::Odometry:
+# cspell: ignore occlusionless
+
+/**:
+  ros__parameters:
+    /localization/kinematic_state:
+      version: 20240605 # architecture_type suffix (mandatory)
+      seed: 0 # If 0 is specified, a random seed value will be generated for each run.
+      nav_msgs::msg::Odometry:
+        speed_threshold: 0.1
+        pose:
           pose:
-            pose:
-              position:
-                # The data members of geometry_msgs::msg::Pose.position are x,
-                # y, z, which are world coordinates in
-                # `/localization/kinematic_state`. However, applying error to a
-                # position in world coordinates is unintuitive and tricky, so
-                # we accept the parameters as the entity's local coordinates.
-                # local_x, local_y, local_z express that. The simulator
-                # calculates the error in the local coordinates. It then
-                # transforms the error to the world coordinates, adds the error
-                # to the true position (world coordinates), and publishes it as
-                # `/localization/kinematic_state`.
-                local_x:
-                  error:
-                    additive:
-                      mean: 0.0
-                      standard_deviation: 0.0
-                    multiplicative:
-                      mean: 0.0
-                      standard_deviation: 0.0
-                local_y:
-                  error:
-                    additive:
-                      mean: 0.0
-                      standard_deviation: 0.0
-                    multiplicative:
-                      mean: 0.0
-                      standard_deviation: 0.0
-                local_z:
-                  error:
-                    additive:
-                      mean: 0.0
-                      standard_deviation: 0.0
-                    multiplicative:
-                      mean: 0.0
-                      standard_deviation: 0.0
-              orientation:
-                # The type of geometry_msgs::msg::Pose.orientation is
-                # Quaternion, and the actual orientation data members are x, y,
-                # z, and w. However, applying error to Quaternions can be
-                # unintuitive and tricky, so we accept the parameters as Euler
-                # angles here. The simulator internally converts Quaternion to
-                # Euler angles and applies the error to them. It then converts
-                # the error-applied Euler angles back to Quaternion and
-                # publishes them as `/localization/kinematic_state`.
-                r:
-                  error:
-                    additive:
-                      mean: 0.0
-                      standard_deviation: 0.0
-                    multiplicative:
-                      mean: 0.0
-                      standard_deviation: 0.0
-                p:
-                  error:
-                    additive:
-                      mean: 0.0
-                      standard_deviation: 0.0
-                    multiplicative:
-                      mean: 0.0
-                      standard_deviation: 0.0
-                y:
-                  error:
-                    additive:
-                      mean: 0.0
-                      standard_deviation: 0.0
-                    multiplicative:
-                      mean: 0.0
-                      standard_deviation: 0.0
+            position:
+              # The data members of geometry_msgs::msg::Pose.position are x, y,
+              # z, which are world coordinates in
+              # `/localization/kinematic_state`. However, applying error to a
+              # position in world coordinates is unintuitive and tricky, so we
+              # accept the parameters as the entity's local coordinates.
+              # local_x, local_y, local_z express that. The simulator
+              # calculates the error in the local coordinates. It then
+              # transforms the error to the world coordinates, adds the error
+              # to the true position (world coordinates), and publishes it as
+              # `/localization/kinematic_state`.
+              local_x:
+                error:
+                  additive:
+                    mean: 0.0
+                    standard_deviation: 0.0
+                  multiplicative:
+                    mean: 0.0
+                    standard_deviation: 0.0
+              local_y:
+                error:
+                  additive:
+                    mean: 0.0
+                    standard_deviation: 0.0
+                  multiplicative:
+                    mean: 0.0
+                    standard_deviation: 0.0
+              local_z:
+                error:
+                  additive:
+                    mean: 0.0
+                    standard_deviation: 0.0
+                  multiplicative:
+                    mean: 0.0
+                    standard_deviation: 0.0
+            orientation:
+              # The type of geometry_msgs::msg::Pose.orientation is Quaternion,
+              # and the actual orientation data members are x, y, z, and w.
+              # However, applying error to Quaternions can be unintuitive and
+              # tricky, so we accept the parameters as Euler angles here. The
+              # simulator internally converts Quaternion to Euler angles and
+              # applies the error to them. It then converts the error-applied
+              # Euler angles back to Quaternion and publishes them as
+              # `/localization/kinematic_state`.
+              r:
+                error:
+                  additive:
+                    mean: 0.0
+                    standard_deviation: 0.0
+                  multiplicative:
+                    mean: 0.0
+                    standard_deviation: 0.0
+              p:
+                error:
+                  additive:
+                    mean: 0.0
+                    standard_deviation: 0.0
+                  multiplicative:
+                    mean: 0.0
+                    standard_deviation: 0.0
+              y:
+                error:
+                  additive:
+                    mean: 0.0
+                    standard_deviation: 0.0
+                  multiplicative:
+                    mean: 0.0
+                    standard_deviation: 0.0
+        twist:
           twist:
-            twist:
-              linear:
-                x:
-                  error:
-                    additive:
-                      mean: 0.0
-                      standard_deviation: 0.0
-                    multiplicative:
-                      mean: 0.0
-                      standard_deviation: 0.0
-                y:
-                  error:
-                    additive:
-                      mean: 0.0
-                      standard_deviation: 0.0
-                    multiplicative:
-                      mean: 0.0
-                      standard_deviation: 0.0
-                z:
-                  error:
-                    additive:
-                      mean: 0.0
-                      standard_deviation: 0.0
-                    multiplicative:
-                      mean: 0.0
-                      standard_deviation: 0.0
-              angular:
-                x:
-                  error:
-                    additive:
-                      mean: 0.0
-                      standard_deviation: 0.0
-                    multiplicative:
-                      mean: 0.0
-                      standard_deviation: 0.0
-                y:
-                  error:
-                    additive:
-                      mean: 0.0
-                      standard_deviation: 0.0
-                    multiplicative:
-                      mean: 0.0
-                      standard_deviation: 0.0
-                z:
-                  error:
-                    additive:
-                      mean: 0.0
-                      standard_deviation: 0.0
-                    multiplicative:
-                      mean: 0.0
-                      standard_deviation: 0.0
+            linear:
+              x:
+                error:
+                  additive:
+                    mean: 0.0
+                    standard_deviation: 0.0
+                  multiplicative:
+                    mean: 0.0
+                    standard_deviation: 0.0
+              y:
+                error:
+                  additive:
+                    mean: 0.0
+                    standard_deviation: 0.0
+                  multiplicative:
+                    mean: 0.0
+                    standard_deviation: 0.0
+              z:
+                error:
+                  additive:
+                    mean: 0.0
+                    standard_deviation: 0.0
+                  multiplicative:
+                    mean: 0.0
+                    standard_deviation: 0.0
+            angular:
+              x:
+                error:
+                  additive:
+                    mean: 0.0
+                    standard_deviation: 0.0
+                  multiplicative:
+                    mean: 0.0
+                    standard_deviation: 0.0
+              y:
+                error:
+                  additive:
+                    mean: 0.0
+                    standard_deviation: 0.0
+                  multiplicative:
+                    mean: 0.0
+                    standard_deviation: 0.0
+              z:
+                error:
+                  additive:
+                    mean: 0.0
+                    standard_deviation: 0.0
+                  multiplicative:
+                    mean: 0.0
+                    standard_deviation: 0.0
+    /perception/object_recognition/detection/objects:
+      version: 20240605 # architecture_type suffix (mandatory)
+      seed: 0 # If 0 is specified, a random seed value will be generated for each run.
+      override_legacy_configuration: false
+      delay: 0.0 # This parameter is used only if `override_legacy_configuration` is true. If it is false, the value of `detectedObjectPublishingDelay` in `ObjectController.Properties` in the scenario file is used.
+      range: 300.0 # This parameter is used only if `override_legacy_configuration` is true. If it is false, the value of `detectionSensorRange` in `ObjectController.Properties` in the scenario file is used.
+      occlusionless: false # This parameter is used only if `override_legacy_configuration` is true. If it is false, the value of `isClairvoyant` in `ObjectController.Properties` in the scenario file is used.
+      noise:
+        model:
+          version: 1 # Any of [1, 2].
+        v1: # This clause is used only if `model.version` is 1.
+          position:
+            standard_deviation: 0.0 # This parameter is used only if `override_legacy_configuration` is true. If it is false, the value of `detectedObjectPositionStandardDeviation` in `ObjectController.Properties` in the scenario file is used.
+          missing_probability: 0.0 # This parameter is used only if `override_legacy_configuration` is true. If it is false, the value of `detectedObjectMissingProbability` in `ObjectController.Properties` in the scenario file is used.
+        v2: # This clause is used only if `model.version` is 2.
+          ellipse_y_radii: [10.0, 20.0, 40.0, 60.0, 80.0, 120.0, 150.0, 180.0, 1000.0]
+          distance:
+            autocorrelation_coefficient:
+              amplitude: 0.0
+              decay: 0.0
+              offset: 0.0
+            mean:
+              ellipse_normalized_x_radius: 1.0
+              values: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+            standard_deviation:
+              ellipse_normalized_x_radius: 1.0
+              values: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+          yaw:
+            autocorrelation_coefficient:
+              amplitude: 0.0
+              decay: 0.0
+              offset: 0.0
+            mean:
+              ellipse_normalized_x_radius: 1.0
+              values: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+            standard_deviation:
+              ellipse_normalized_x_radius: 1.0
+              values: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+          yaw_flip:
+            autocorrelation_coefficient:
+              amplitude: 0.0
+              decay: 0.0
+              offset: 0.0
+            speed_threshold: 0.1
+            rate: 0.0
+          true_positive:
+            autocorrelation_coefficient:
+              amplitude: 0.0
+              decay: 0.0
+              offset: 0.0
+            rate:
+              ellipse_normalized_x_radius: 1.0
+              values: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+    /perception/object_recognition/ground_truth/objects:
+      version: 20240605 # architecture_type suffix (mandatory)
+      override_legacy_configuration: false
+      delay: 0.0  # This parameter is used only if `override_legacy_configuration` is true. If it is false, the value of `detectedObjectGroundTruthPublishingDelay` in `ObjectController.Properties` in the scenario file is used.

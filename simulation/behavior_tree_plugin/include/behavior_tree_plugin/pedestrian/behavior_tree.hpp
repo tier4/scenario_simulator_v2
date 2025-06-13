@@ -40,7 +40,7 @@ class PedestrianBehaviorTree : public BehaviorPluginBase
 public:
   void configure(const rclcpp::Logger & logger) override;
   auto update(const double current_time, const double step_time) -> void override;
-  const std::string & getCurrentAction() const override;
+  auto getCurrentAction() -> const std::string & override;
 
 #define DEFINE_GETTER_SETTER(NAME, TYPE)                                                    \
   TYPE get##NAME() override { return tree_.rootBlackboard()->get<TYPE>(get##NAME##Key()); } \
@@ -70,6 +70,7 @@ public:
   DEFINE_GETTER_SETTER(TrafficLights,                                    std::shared_ptr<traffic_simulator::TrafficLightsBase>)
   DEFINE_GETTER_SETTER(VehicleParameters,                                traffic_simulator_msgs::msg::VehicleParameters)
   DEFINE_GETTER_SETTER(Waypoints,                                        traffic_simulator_msgs::msg::WaypointsArray)
+  DEFINE_GETTER_SETTER(EuclideanDistancesMap,                            std::shared_ptr<EuclideanDistancesMap>)
   // clang-format on
 
 #undef DEFINE_GETTER_SETTER

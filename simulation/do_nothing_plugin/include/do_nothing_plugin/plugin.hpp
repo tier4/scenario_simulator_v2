@@ -37,7 +37,7 @@ public:
    * @brief Get the Current Action object
    * @return const std::string& always return "do_nothing"
    */
-  const std::string & getCurrentAction() const override;
+  auto getCurrentAction() -> const std::string & override;
 
 /// @note Getters defined by this macro return default values and setters are behaved as no-operation functions.
 #define DEFINE_GETTER_SETTER(NAME, TYPE)        \
@@ -58,6 +58,7 @@ public:                                         \
   DEFINE_GETTER_SETTER(TrafficLights,                                    std::shared_ptr<traffic_simulator::TrafficLightsBase>)
   DEFINE_GETTER_SETTER(VehicleParameters,                                traffic_simulator_msgs::msg::VehicleParameters)
   DEFINE_GETTER_SETTER(Waypoints,                                        traffic_simulator_msgs::msg::WaypointsArray)
+  DEFINE_GETTER_SETTER(EuclideanDistancesMap,                            std::shared_ptr<EuclideanDistancesMap>)
   // clang-format on
 #undef DEFINE_GETTER_SETTER
 

@@ -12,14 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CONCEALER__GET_PARAMETER_HPP_
-#define CONCEALER__GET_PARAMETER_HPP_
+#ifndef COMMON__GET_PARAMETER_HPP_
+#define COMMON__GET_PARAMETER_HPP_
+
+#include <unistd.h>
 
 #include <rclcpp/rclcpp.hpp>
 
-namespace concealer
+namespace common
 {
-static constexpr auto default_architecture_type = "awf/universe/20240605";
+/**
+ * @brief Get the Node object for parameter obtaining.
+ * This provides a one node for parameter obtaining for the whole executable, as opposed to template
+ * function that creates a new node for each type of parameter. To guarantee the node name is unique
+ * (Autoware in some versions requires this to run) we append the process id.
+ */
+inline auto getParameterNode() -> rclcpp::Node &
+{
+  static rclcpp::Node node{
+    [](std::string name_base) { return name_base + "_pid" + std::to_string(getpid()); }(__func__),
+    "simulation"};
+  return node;
+}
 
 template <typename T>
 auto getParameter(
@@ -35,9 +49,8 @@ auto getParameter(
 template <typename T>
 auto getParameter(const std::string & name, T value = {})
 {
-  auto node = rclcpp::Node("get_parameter", "simulation");
-  return getParameter(node.get_node_parameters_interface(), name, value);
+  return getParameter(getParameterNode().get_node_parameters_interface(), name, value);
 }
-}  // namespace concealer
+}  // namespace common
 
-#endif  // CONCEALER__GET_PARAMETER_HPP_
+#endif  // COMMON__GET_PARAMETER_HPP_

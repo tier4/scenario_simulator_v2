@@ -46,7 +46,7 @@ public:
 
   ~MiscObjectEntity() override = default;
 
-  auto getGoalPoses() -> std::vector<CanonicalizedLaneletPose> override { return {}; }
+  auto getGoalPoses() -> std::vector<geometry_msgs::msg::Pose> override { return {}; }
 
   std::optional<traffic_simulator_msgs::msg::Obstacle> getObstacle() override
   {
@@ -67,22 +67,24 @@ public:
 
   void requestSpeedChange(const speed_change::RelativeTargetSpeed &, bool) override;
 
-  void requestAssignRoute(const std::vector<CanonicalizedLaneletPose> &) override
+  void requestAssignRoute(
+    const std::vector<CanonicalizedLaneletPose> &, const RouteOption &) override
   {
     THROW_SEMANTIC_ERROR("requestAssignRoute function cannot not use in MiscObjectEntity");
   }
 
-  void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) override
+  void requestAssignRoute(
+    const std::vector<geometry_msgs::msg::Pose> &, const RouteOption &) override
   {
     THROW_SEMANTIC_ERROR("requestAssignRoute function cannot not use in MiscObjectEntity");
   }
 
-  void requestAcquirePosition(const CanonicalizedLaneletPose &) override
+  void requestAcquirePosition(const CanonicalizedLaneletPose &, const RouteOption &) override
   {
     THROW_SEMANTIC_ERROR("requestAcquirePosition function cannot not use in MiscObjectEntity");
   }
 
-  void requestAcquirePosition(const geometry_msgs::msg::Pose &) override
+  void requestAcquirePosition(const geometry_msgs::msg::Pose &, const RouteOption &) override
   {
     THROW_SEMANTIC_ERROR("requestAcquirePosition function cannot not use in MiscObjectEntity");
   }

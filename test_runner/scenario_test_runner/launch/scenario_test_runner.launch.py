@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
+
 from ament_index_python.packages import get_package_share_directory
 
 from launch import LaunchDescription
@@ -83,7 +85,9 @@ def launch_setup(context, *args, **kwargs):
     launch_rviz                         = LaunchConfiguration("launch_rviz",                            default=False)
     launch_simple_sensor_simulator      = LaunchConfiguration("launch_simple_sensor_simulator",         default=True)
     output_directory                    = LaunchConfiguration("output_directory",                       default=Path("/tmp"))
+    override_parameters                 = LaunchConfiguration("override_parameters",                    default="")
     parameter_file_path                 = LaunchConfiguration("parameter_file_path",                    default=Path(get_package_share_directory("scenario_test_runner")) / "config/parameters.yaml")
+    pedestrian_ignore_see_around        = LaunchConfiguration("pedestrian_ignore_see_around",           default="blind")
     port                                = LaunchConfiguration("port",                                   default=5555)
     publish_empty_context               = LaunchConfiguration("publish_empty_context",                  default=False)
     record                              = LaunchConfiguration("record",                                 default=True)
@@ -112,7 +116,9 @@ def launch_setup(context, *args, **kwargs):
     print(f"launch_autoware                     := {launch_autoware.perform(context)}")
     print(f"launch_rviz                         := {launch_rviz.perform(context)}")
     print(f"output_directory                    := {output_directory.perform(context)}")
+    print(f"override_parameters                 := {override_parameters.perform(context)}")
     print(f"parameter_file_path                 := {parameter_file_path.perform(context)}")
+    print(f"pedestrian_ignore_see_around        := {pedestrian_ignore_see_around.perform(context)}")
     print(f"port                                := {port.perform(context)}")
     print(f"publish_empty_context               := {publish_empty_context.perform(context)}")
     print(f"record                              := {record.perform(context)}")
@@ -142,6 +148,7 @@ def launch_setup(context, *args, **kwargs):
             {"consider_pose_by_road_slope": consider_pose_by_road_slope},
             {"initialize_duration": initialize_duration},
             {"launch_autoware": launch_autoware},
+            {"pedestrian_ignore_see_around": pedestrian_ignore_see_around},
             {"port": port},
             {"publish_empty_context" : publish_empty_context},
             {"record": record},
@@ -186,6 +193,15 @@ def launch_setup(context, *args, **kwargs):
 
         return parameters
 
+    def make_agnocast_additional_environment():
+        if os.getenv('ENABLE_AGNOCAST', '') == '1':
+            return {
+                'LD_PRELOAD': f"/opt/ros/{os.environ['ROS_DISTRO']}/lib/libagnocast_heaphook.so:{os.getenv('LD_PRELOAD', '')}",
+                'AGNOCAST_MEMPOOL_SIZE': '134217728',
+            }
+        else:
+            return {}
+
     return [
         # fmt: off
         DeclareLaunchArgument("architecture_type",                   default_value=architecture_type                  ),
@@ -201,6 +217,7 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("launch_rviz",                         default_value=launch_rviz                        ),
         DeclareLaunchArgument("output_directory",                    default_value=output_directory                   ),
         DeclareLaunchArgument("parameter_file_path",                 default_value=parameter_file_path                ),
+        DeclareLaunchArgument("pedestrian_ignore_see_around",        default_value=pedestrian_ignore_see_around       ),
         DeclareLaunchArgument("publish_empty_context",               default_value=publish_empty_context              ),
         DeclareLaunchArgument("rviz_config",                         default_value=rviz_config                        ),
         DeclareLaunchArgument("scenario",                            default_value=scenario                           ),
@@ -224,6 +241,7 @@ def launch_setup(context, *args, **kwargs):
                 "--global-real-time-factor", global_real_time_factor,
                 "--global-timeout",          global_timeout,
                 "--output-directory",        output_directory,
+                "--override-parameters",     override_parameters,
                 "--scenario",                scenario,
                 # fmt: on
             ],
@@ -236,6 +254,7 @@ def launch_setup(context, *args, **kwargs):
             on_exit=ShutdownOnce(),
             parameters=make_parameters(),
             condition=IfCondition(launch_simple_sensor_simulator),
+            additional_env=make_agnocast_additional_environment(),
         ),
         # The `name` keyword overrides the name for all created nodes, so duplicated nodes appear.
         # For LifecycleNode the `name` parameter is required
