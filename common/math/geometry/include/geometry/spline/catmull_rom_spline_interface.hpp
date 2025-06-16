@@ -49,12 +49,15 @@ public:
      */
     constexpr double distance_accuracy{0.05};
 
+    s_start = std::clamp(s_start, 0.0, getLength());
+    s_end = std::clamp(s_end, 0.0, getLength());
+
     /// @note it may be a good idea to develop spline.getSquaredDistanceIn2D(point, s_start, s_end);
     auto s_start_distance = getSquaredDistanceIn2D(point, s_start);
     auto s_end_distance = getSquaredDistanceIn2D(point, s_end);
 
     while (std::abs(s_start - s_end) > distance_accuracy) {
-      double s_mid = s_start + (s_end - s_start) / 2.0;
+      double s_mid = (s_start + s_end) / 2.0;
       double s_mid_distance = getSquaredDistanceIn2D(point, s_mid);
       if (s_start_distance > s_end_distance) {
         s_start = s_mid;
