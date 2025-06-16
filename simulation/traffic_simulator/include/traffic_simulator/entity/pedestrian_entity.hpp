@@ -70,9 +70,11 @@ public:
 
   auto onUpdate(const double current_time, const double step_time) -> void override;
 
-  void requestAcquirePosition(const CanonicalizedLaneletPose & lanelet_pose) override;
+  void requestAcquirePosition(
+    const CanonicalizedLaneletPose & lanelet_pose, const RouteOption &) override;
 
-  void requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose) override;
+  void requestAcquirePosition(
+    const geometry_msgs::msg::Pose & map_pose, const RouteOption &) override;
 
   void requestWalkStraight() override;
 
@@ -98,9 +100,11 @@ public:
 
   void setDecelerationRateLimit(double deceleration) override;
 
-  void requestAssignRoute(const std::vector<CanonicalizedLaneletPose> & waypoints) override;
+  void requestAssignRoute(
+    const std::vector<CanonicalizedLaneletPose> & waypoints, const RouteOption &) override;
 
-  void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) override;
+  void requestAssignRoute(
+    const std::vector<geometry_msgs::msg::Pose> &, const RouteOption &) override;
 
   auto requestFollowTrajectory(
     const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &) -> void override;
