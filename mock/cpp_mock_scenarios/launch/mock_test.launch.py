@@ -128,7 +128,6 @@ def launch_setup(context, *args, **kwargs):
     use_sim_time                        = LaunchConfiguration("use_sim_time",                           default=False)
     vehicle_model                       = LaunchConfiguration("vehicle_model",                          default="")
     ego_model                           = LaunchConfiguration("ego_model",                              default="")
-    vehicle_id                          = LaunchConfiguration("vehicle_id",                             default="")
     scenario_package                    = LaunchConfiguration("package",                                default="cpp_mock_scenarios")
     junit_path                          = LaunchConfiguration("junit_path",                             default="/tmp/output.xunit.xml")
     # fmt: on
@@ -160,28 +159,6 @@ def launch_setup(context, *args, **kwargs):
     print(f"scenario_package                    := {scenario_package.perform(context)}")
     print(f"junit_path                          := {junit_path.perform(context)}")
 
-    def resolve_ego_model(vehicle_model: str, vehicle_id: str = "") -> str:
-        if vehicle_model == "sample_vehicle":
-            return "lexus_rx450h"
-        elif vehicle_model == "jpntaxi":
-            if vehicle_id == "8":
-                return "toyota_jpn_taxi_2_0"
-            elif vehicle_id == "awsim_jpt":
-                return "toyota_jpn_taxi"
-            else:
-                return "toyota_jpn_taxi"
-        elif vehicle_model == "j6_gen1":
-            return "bydj6"
-        elif vehicle_model == "j6_gen2":
-            return "bydj6_gen2"
-        else:
-            return "lexus_rx450h"
-
-    ego_model_val = ego_model.perform(context)
-
-    if not ego_model_val:
-        ego_model_val = resolve_ego_model(vehicle_model.perform(context), vehicle_id.perform(context))
-
     def make_parameters():
         parameters = [
             {"architecture_type": architecture_type},
@@ -203,7 +180,7 @@ def launch_setup(context, *args, **kwargs):
             {"global_frame_rate": global_frame_rate},
             {"global_timeout": global_timeout},
             {"junit_path": junit_path},
-            {"ego_model": ego_model_val},
+            {"ego_model": ego_model},
         ]
         parameters += make_vehicle_parameters()
         parameters += [parameter_file_path.perform(context)]
@@ -269,7 +246,6 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("simulate_localization",               default_value=simulate_localization              ),
         DeclareLaunchArgument("use_sim_time",                        default_value=use_sim_time                       ),
         DeclareLaunchArgument("vehicle_model",                       default_value=vehicle_model                      ),
-        DeclareLaunchArgument("vehicle_id",                          default_value=vehicle_id                         ),
         DeclareLaunchArgument("ego_model",                           default_value=ego_model                          ),
         DeclareLaunchArgument("scenario_package",                    default_value=scenario_package                   ),
         DeclareLaunchArgument("junit_path",                          default_value=junit_path                         ),
