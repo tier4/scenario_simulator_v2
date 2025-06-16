@@ -41,7 +41,7 @@ const std::optional<traffic_simulator_msgs::msg::Obstacle> LaneChangeAction::cal
 
 const traffic_simulator_msgs::msg::WaypointsArray LaneChangeAction::calculateWaypoints()
 {
-  if (canonicalized_entity_status_->getTwist().linear.x <= 0) {
+  if (canonicalized_entity_status_->getTwist().linear.x < 0) {
     return traffic_simulator_msgs::msg::WaypointsArray();
   } else if (!lane_change_parameters_) {
     THROW_SIMULATION_ERROR("lane change parameter is null");
@@ -49,8 +49,7 @@ const traffic_simulator_msgs::msg::WaypointsArray LaneChangeAction::calculateWay
     THROW_SIMULATION_ERROR("curve is null");
   } else {
     traffic_simulator_msgs::msg::WaypointsArray waypoints;
-    waypoints.waypoints = traffic_simulator::route::laneChangePoints(
-      curve_.value(), current_s_, target_s_, getHorizon(), lane_change_parameters_.value());
+    waypoints.waypoints = traffic_simulator::route::laneChangePoints(curve_.value(), current_s_);
     return waypoints;
   }
 }

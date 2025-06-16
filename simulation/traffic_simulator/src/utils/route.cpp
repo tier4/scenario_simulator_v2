@@ -170,19 +170,13 @@ auto laneChangeTrajectory(
   return std::nullopt;
 }
 
-auto laneChangePoints(
-  const Curve & curve, const double current_s, const double target_s, const double horizon,
-  const lane_change::Parameter & parameter) -> std::vector<Point>
+auto laneChangePoints(const Curve & curve, const double current_s) -> std::vector<Point>
 {
-  if (const double rest_s = current_s + horizon - curve.getLength(); rest_s < 0) {
-    return curve.getTrajectory(current_s, current_s + horizon, 1.0, true);
+  const auto curve_length = curve.getLength();
+  if (current_s < curve_length) {
+    return curve.getTrajectory(current_s, curve_length, 1.0, true);
   } else {
-    const auto following_lanelets = route::followingLanelets(parameter.target.lanelet_id, 0);
-    const auto center_points = lanelet_wrapper::lanelet_map::centerPoints(following_lanelets);
-    // DIFFERENT SPLINE - recalculation needed
-    const Spline spline(center_points);
-    /// @note not the same as original one - here were duplicates and curve_waypoints
-    return spline.getTrajectory(target_s, target_s + rest_s, 1.0);
+    return curve.getTrajectory(curve_length, curve_length, 1.0, true);
   }
 }
 
