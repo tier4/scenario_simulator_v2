@@ -18,7 +18,6 @@
 #include <simulation_interface/simulation_api_schema.pb.h>
 
 #include <array>
-#include <boost/math/constants/constants.hpp>
 #include <concealer/publisher.hpp>
 #include <geometry_msgs/msg/accel.hpp>
 #include <geometry_msgs/msg/twist.hpp>
@@ -71,12 +70,6 @@ protected:
   {
     return {std::pow(stddev, 2), 0, 0, 0, std::pow(stddev, 2), 0, 0, 0, std::pow(stddev, 2)};
   }
-
-  auto calculateCovariance(const double variance0, const double variance1, const double variance2)
-    const -> std::array<double, 9>
-  {
-    return {variance0, 0, 0, 0, variance1, 0, 0, 0, variance2};
-  };
 };
 
 template <typename MessageType>
@@ -103,51 +96,18 @@ public:
       return;
     }
 
-    /**
-     * @note Calculate covariance matrices based on some nominal values
-     * These values have no technical reason, they are an educated guess of what is reasonable
-     */
-    constexpr double nominal_angle{boost::math::constants::quarter_pi<double>()};
+    /// @note Hardcoded values as the ones used in legacy configuration by default
     // clang-format off
-    orientation_covariance_ = calculateCovariance(
-      calculateVariance(nominal_angle,
-        publish.getRandomizer().orientation_r_error.multiplicative.stddev(),
-        publish.getRandomizer().orientation_r_error.additive.stddev()),
-      calculateVariance(nominal_angle,
-        publish.getRandomizer().orientation_p_error.multiplicative.stddev(),
-        publish.getRandomizer().orientation_p_error.additive.stddev()),
-      calculateVariance(nominal_angle,
-        publish.getRandomizer().orientation_y_error.multiplicative.stddev(),
-        publish.getRandomizer().orientation_y_error.additive.stddev()));
+    constexpr std::array<double, 9> default_covariance = {
+      0.0001, 0.0,    0.0,
+      0.0,    0.0001, 0.0,
+      0.0,    0.0,    0.0001
+    };
     // clang-format on
 
-    constexpr double nominal_velocity{5.0};
-    // clang-format off
-    angular_velocity_covariance_ = calculateCovariance(
-      calculateVariance(nominal_velocity,
-        publish.getRandomizer().angular_velocity_x_error.multiplicative.stddev(),
-        publish.getRandomizer().angular_velocity_x_error.additive.stddev()),
-      calculateVariance(nominal_velocity,
-        publish.getRandomizer().angular_velocity_y_error.multiplicative.stddev(),
-        publish.getRandomizer().angular_velocity_y_error.additive.stddev()),
-      calculateVariance(nominal_velocity,
-        publish.getRandomizer().angular_velocity_z_error.multiplicative.stddev(),
-        publish.getRandomizer().angular_velocity_z_error.additive.stddev()));
-    // clang-format on
-
-    constexpr double nominal_acceleration{0.5};
-    // clang-format off
-    linear_acceleration_covariance_ = calculateCovariance(
-      calculateVariance(nominal_acceleration,
-        publish.getRandomizer().linear_acceleration_x_error.multiplicative.stddev(),
-        publish.getRandomizer().linear_acceleration_x_error.additive.stddev()),
-      calculateVariance(nominal_acceleration,
-        publish.getRandomizer().linear_acceleration_y_error.multiplicative.stddev(),
-        publish.getRandomizer().linear_acceleration_y_error.additive.stddev()),
-      calculateVariance(nominal_acceleration,
-        publish.getRandomizer().linear_acceleration_z_error.multiplicative.stddev(),
-        publish.getRandomizer().linear_acceleration_z_error.additive.stddev()));
-    // clang-format on
+    orientation_covariance_ = default_covariance;
+    angular_velocity_covariance_ = default_covariance;
+    linear_acceleration_covariance_ = default_covariance;
   }
 
   auto update(
@@ -169,14 +129,6 @@ private:
   auto generateMessage(
     const rclcpp::Time & current_ros_time,
     const traffic_simulator_msgs::msg::EntityStatus & status) const -> const MessageType;
-
-  static auto calculateVariance(
-    const double nominal_value, const double multiplicative_stddev, const double additive_stddev)
-    -> double
-  {
-    return std::pow(nominal_value, 2) * std::pow(multiplicative_stddev, 2) +
-           std::pow(additive_stddev, 2);
-  }
 
   const bool override_legacy_configuration_;
   const std::string entity_name_;
