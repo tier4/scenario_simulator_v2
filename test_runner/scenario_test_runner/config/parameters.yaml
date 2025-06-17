@@ -182,6 +182,50 @@
             rate:
               ellipse_normalized_x_radius: 1.0
               values: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+        v3:
+          custom_noise_1:
+            target:
+              type: [VEHICLE]
+              subtype: [CAR]
+              name: [car_1, car_2, car_3, car_4, car_5, car_6, car_7, car_8, car_9]
+            ellipse_y_radii: [ 10.0, 20.0, 40.0, 60.0, 80.0, 120.0, 150.0, 180.0, 1000.0 ]
+            distance:
+              autocorrelation_coefficient:
+                amplitude: 0.0
+                decay: 0.0
+                offset: 0.0
+              mean:
+                ellipse_normalized_x_radius: 1.0
+                values: [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ]
+              standard_deviation:
+                ellipse_normalized_x_radius: 1.0
+                values: [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ]
+            yaw:
+              autocorrelation_coefficient:
+                amplitude: 0.0
+                decay: 0.0
+                offset: 0.0
+              mean:
+                ellipse_normalized_x_radius: 1.0
+                values: [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ]
+              standard_deviation:
+                ellipse_normalized_x_radius: 1.0
+                values: [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ]
+            yaw_flip:
+              autocorrelation_coefficient:
+                amplitude: 0.0
+                decay: 0.0
+                offset: 0.0
+              speed_threshold: 0.1
+              rate: 0.0
+            true_positive:
+              autocorrelation_coefficient:
+                amplitude: 0.0
+                decay: 0.0
+                offset: 0.0
+              rate:
+                ellipse_normalized_x_radius: 1.0
+                values: [ 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 ]
     /perception/object_recognition/ground_truth/objects:
       version: 20240605 # architecture_type suffix (mandatory)
       override_legacy_configuration: false
