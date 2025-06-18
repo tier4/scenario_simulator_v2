@@ -40,6 +40,7 @@ class PedestrianBehaviorTree : public BehaviorPluginBase
 public:
   void configure(const rclcpp::Logger & logger) override;
   auto update(const double current_time, const double step_time) -> void override;
+  auto postUpdate() -> void override;
   auto getCurrentAction() -> const std::string & override;
 
 #define DEFINE_GETTER_SETTER(NAME, TYPE)                                                    \
@@ -61,7 +62,7 @@ public:
   DEFINE_GETTER_SETTER(Obstacle,                                         std::optional<traffic_simulator_msgs::msg::Obstacle>)
   DEFINE_GETTER_SETTER(OtherEntityStatus,                                EntityStatusDict)
   DEFINE_GETTER_SETTER(PedestrianParameters,                             traffic_simulator_msgs::msg::PedestrianParameters)
-  DEFINE_GETTER_SETTER(PolylineTrajectory,                               std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory>)
+  DEFINE_GETTER_SETTER(PolylineTrajectory,                               traffic_simulator_msgs::msg::PolylineTrajectory)
   DEFINE_GETTER_SETTER(ReferenceTrajectory,                              std::shared_ptr<math::geometry::CatmullRomSpline>)
   DEFINE_GETTER_SETTER(Request,                                          traffic_simulator::behavior::Request)
   DEFINE_GETTER_SETTER(RouteLanelets,                                    lanelet::Ids)
