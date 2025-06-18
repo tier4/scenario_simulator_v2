@@ -13,6 +13,7 @@ install(
 
 install(
   PROGRAMS ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/conversion.py
+           ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/scenario_validation.py
            ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/validation.py
   DESTINATION lib/${PROJECT_NAME})
 

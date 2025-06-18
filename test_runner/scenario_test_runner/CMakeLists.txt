@@ -12,7 +12,13 @@ install(
            ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/result_checker.py
            ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/lifecycle_controller.py
            ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/scenario.py
+           ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/shutdown_once.py
   DESTINATION lib/${PROJECT_NAME})
+
+install(
+  PROGRAMS ${CMAKE_CURRENT_SOURCE_DIR}/launch/scenario_test_runner.launch.py
+           ${CMAKE_CURRENT_SOURCE_DIR}/launch/replay_bag.launch.py
+  DESTINATION share/${PROJECT_NAME}/launch)
 
 install(
   DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/config

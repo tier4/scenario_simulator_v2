@@ -78,6 +78,10 @@ install(
   DESTINATION share/${PROJECT_NAME}
 )
 
+install(
+  PROGRAMS ${CMAKE_CURRENT_SOURCE_DIR}/launch/random_test.launch.py
+  DESTINATION share/${PROJECT_NAME}/launch)
+
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
