@@ -208,7 +208,8 @@ auto CanonicalizedEntityStatus::getCanonicalizedLaneletPose() const noexcept
   // WIP this part is to heavy to refactor, so just return the first one
   // ###########################################################
   if (canonicalized_lanelet_poses_.empty()) {
-    THROW_SEMANTIC_ERROR("Target entity status did not matched to lanelet pose.");
+    static const std::optional<CanonicalizedLaneletPose> empty_optional = std::nullopt;
+    return empty_optional;
   }
   return canonicalized_lanelet_poses_.front();
 }
