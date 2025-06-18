@@ -71,7 +71,8 @@ public:
       }
     }
     return std::make_pair(
-      std::min(s_start, s_end), s_start < s_end ? s_start_distance : s_end_distance);
+      s_start_distance < s_end_distance ? s_start : s_end,
+      std::min(s_start_distance, s_end_distance));
   }
 };
 }  // namespace geometry
