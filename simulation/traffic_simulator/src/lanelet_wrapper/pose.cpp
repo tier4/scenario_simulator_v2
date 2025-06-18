@@ -95,47 +95,46 @@ auto toLaneletPose(
   constexpr double yaw_threshold_deg = 45.0;
 
   const auto lanelet_spline = lanelet_map::centerPointsSpline(lanelet_id);
-  const auto s_estimate = lanelet_spline->getSValue(map_pose, matching_distance);
-  if (!s_estimate) {
-    return std::nullopt;
-  }
-
-  /**
-   * @note Here matching_distance can be used, because it is the max possible distance
-   * between the spline and the point assuming the matching distance is used unchanged to
-   * calculate spline collision with the perpendicular line to the longitudinal (X) axis.
-   */
-  const auto s_start =
-    std::clamp(s_estimate.value() - matching_distance, 0.0, lanelet_spline->getLength());
-  const auto s_end =
-    std::clamp(s_estimate.value() + matching_distance, 0.0, lanelet_spline->getLength());
-  const auto [lanelet_pose_s, distance_squared] =
-    lanelet_spline->nearestS(map_pose.position, s_start, s_end);
-
-  if (const auto pose_on_centerline = lanelet_spline->getPose(lanelet_pose_s);
-      !isAltitudeMatching(map_pose.position.z, pose_on_centerline.position.z)) {
+  if (const auto s_estimate = lanelet_spline->getSValue(map_pose, matching_distance); !s_estimate) {
     return std::nullopt;
   } else {
-    constexpr double yaw_range_min_rad = M_PI * yaw_threshold_deg / 180.0;
-    constexpr double yaw_range_max_rad = M_PI - yaw_range_min_rad;
-    if (const auto lanelet_pose_rpy = math::geometry::convertQuaternionToEulerAngle(
-          math::geometry::getRotation(pose_on_centerline.orientation, map_pose.orientation));
-        std::fabs(lanelet_pose_rpy.z) > yaw_range_min_rad and
-        std::fabs(lanelet_pose_rpy.z) < yaw_range_max_rad) {
+    /**
+     * @note Here matching_distance can be used, because it is the max possible distance
+     * between the spline and the point assuming the matching distance is used unchanged to
+     * calculate spline collision with the perpendicular line to the longitudinal (X) axis.
+     */
+    const auto s_start =
+      std::clamp(s_estimate.value() - matching_distance, 0.0, lanelet_spline->getLength());
+    const auto s_end =
+      std::clamp(s_estimate.value() + matching_distance, 0.0, lanelet_spline->getLength());
+    const auto [lanelet_pose_s, distance_squared] =
+      lanelet_spline->nearestS(map_pose.position, s_start, s_end);
+
+    if (const auto pose_on_centerline = lanelet_spline->getPose(lanelet_pose_s);
+        !isAltitudeMatching(map_pose.position.z, pose_on_centerline.position.z)) {
       return std::nullopt;
     } else {
-      double lanelet_pose_offset = std::sqrt(distance_squared);
-      if (const double inner_product = math::geometry::innerProduct(
-            lanelet_spline->getNormalVector(lanelet_pose_s),
-            lanelet_spline->getSquaredDistanceVector(map_pose.position, lanelet_pose_s));
-          inner_product < 0) {
-        lanelet_pose_offset = lanelet_pose_offset * -1;
+      constexpr double yaw_range_min_rad = M_PI * yaw_threshold_deg / 180.0;
+      constexpr double yaw_range_max_rad = M_PI - yaw_range_min_rad;
+      if (const auto lanelet_pose_rpy = math::geometry::convertQuaternionToEulerAngle(
+            math::geometry::getRotation(pose_on_centerline.orientation, map_pose.orientation));
+          std::fabs(lanelet_pose_rpy.z) > yaw_range_min_rad and
+          std::fabs(lanelet_pose_rpy.z) < yaw_range_max_rad) {
+        return std::nullopt;
+      } else {
+        double lanelet_pose_offset = std::sqrt(distance_squared);
+        if (const double inner_product = math::geometry::innerProduct(
+              lanelet_spline->getNormalVector(lanelet_pose_s),
+              lanelet_spline->getSquaredDistanceVector(map_pose.position, lanelet_pose_s));
+            inner_product < 0) {
+          lanelet_pose_offset = lanelet_pose_offset * -1;
+        }
+        return traffic_simulator_msgs::build<LaneletPose>()
+          .lanelet_id(lanelet_id)
+          .s(lanelet_pose_s)
+          .offset(lanelet_pose_offset)
+          .rpy(lanelet_pose_rpy);
       }
-      return traffic_simulator_msgs::build<LaneletPose>()
-        .lanelet_id(lanelet_id)
-        .s(lanelet_pose_s)
-        .offset(lanelet_pose_offset)
-        .rpy(lanelet_pose_rpy);
     }
   }
 }
