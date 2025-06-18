@@ -105,9 +105,12 @@ auto toLaneletPose(
    * between the spline and the point assuming the matching distance is used unchanged to
    * calculate spline collision with the perpendicular line to the longitudinal (X) axis.
    */
-  const auto [lanelet_pose_s, distance_squared] = lanelet_spline->nearestS(
-    map_pose.position, s_estimate.value() - matching_distance,
-    s_estimate.value() + matching_distance);
+  const auto s_start =
+    std::clamp(s_estimate.value() - matching_distance, 0.0, lanelet_spline->getLength());
+  const auto s_end =
+    std::clamp(s_estimate.value() + matching_distance, 0.0, lanelet_spline->getLength());
+  const auto [lanelet_pose_s, distance_squared] =
+    lanelet_spline->nearestS(map_pose.position, s_start, s_end);
 
   if (const auto pose_on_centerline = lanelet_spline->getPose(lanelet_pose_s);
       !isAltitudeMatching(map_pose.position.z, pose_on_centerline.position.z)) {
