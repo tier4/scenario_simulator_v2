@@ -87,7 +87,8 @@ auto RelativeDistanceCondition::distance<
       return std::abs(
         makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref).position.x);
     case Compatibility::standard:
-      const auto relative_world = makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref);
+      const auto relative_world =
+        makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref);
       return std::abs(relative_world.position.x);
   }
 }
@@ -115,7 +116,8 @@ auto RelativeDistanceCondition::distance<
       return std::abs(
         makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref).position.y);
     case Compatibility::standard:
-      const auto relative_world = makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref);
+      const auto relative_world =
+        makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref);
       return std::abs(relative_world.position.y);
   }
 }
