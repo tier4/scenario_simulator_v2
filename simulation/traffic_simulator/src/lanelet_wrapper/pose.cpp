@@ -94,6 +94,9 @@ auto toLaneletPose(
   /// it defines the maximum allowed rotation with respect to the lanelet centerline.
   constexpr double yaw_threshold_deg = 45.0;
 
+  constexpr double yaw_range_min_rad = M_PI * yaw_threshold_deg / 180.0;
+  constexpr double yaw_range_max_rad = M_PI - yaw_range_min_rad;
+
   const auto lanelet_spline = lanelet_map::centerPointsSpline(lanelet_id);
   if (const auto s_estimate = lanelet_spline->getSValue(map_pose, matching_distance); !s_estimate) {
     return std::nullopt;
@@ -114,8 +117,6 @@ auto toLaneletPose(
         !isAltitudeMatching(map_pose.position.z, pose_on_centerline.position.z)) {
       return std::nullopt;
     } else {
-      constexpr double yaw_range_min_rad = M_PI * yaw_threshold_deg / 180.0;
-      constexpr double yaw_range_max_rad = M_PI - yaw_range_min_rad;
       if (const auto lanelet_pose_rpy = math::geometry::convertQuaternionToEulerAngle(
             math::geometry::getRotation(pose_on_centerline.orientation, map_pose.orientation));
           std::fabs(lanelet_pose_rpy.z) > yaw_range_min_rad and
