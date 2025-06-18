@@ -50,7 +50,7 @@ public:
      */
     constexpr double distance_accuracy{0.05};
 
-    if (0.0 <= s_start and s_start <= getLength() and 0.0 <= s_end and s_end <= getLength()) {
+    if (s_start < 0.0 or getLength() < s_start or s_end < 0.0 or getLength() < s_end) {
       THROW_SIMULATION_ERROR(
         "Invalid s range: [", s_start, ", ", s_end, "] when spline length is ", getLength());
     }
