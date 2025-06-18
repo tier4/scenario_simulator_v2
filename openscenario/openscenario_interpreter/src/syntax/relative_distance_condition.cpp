@@ -77,12 +77,19 @@ auto RelativeDistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::longitudinal, RoutingAlgorithm::undefined, true>(
   const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
 {
-  /**
-     @note This implementation differs from the OpenSCENARIO standard. See the
-     section "6.4. Distances" in the OpenSCENARIO User Guide.
-  */
-  return std::abs(
-    makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref).position.x);
+  switch (compatibility) {
+    default:
+    case Compatibility::legacy:
+      /**
+         @note This implementation differs from the OpenSCENARIO standard. See the
+         section "6.4. Distances" in the OpenSCENARIO User Guide.
+      */
+      return std::abs(
+        makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref).position.x);
+    case Compatibility::standard:
+      const auto relative_world = makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref);
+      return std::abs(relative_world.position.x);
+  }
 }
 
 template <>
@@ -98,12 +105,19 @@ auto RelativeDistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::lateral, RoutingAlgorithm::undefined, true>(
   const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
 {
-  /**
-     @note This implementation differs from the OpenSCENARIO standard. See the
-     section "6.4. Distances" in the OpenSCENARIO User Guide.
-  */
-  return std::abs(
-    makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref).position.y);
+  switch (compatibility) {
+    default:
+    case Compatibility::legacy:
+      /**
+         @note This implementation differs from the OpenSCENARIO standard. See the
+         section "6.4. Distances" in the OpenSCENARIO User Guide.
+      */
+      return std::abs(
+        makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref).position.y);
+    case Compatibility::standard:
+      const auto relative_world = makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref);
+      return std::abs(relative_world.position.y);
+  }
 }
 
 template <>
@@ -113,7 +127,12 @@ auto RelativeDistanceCondition::distance<
 {
   const auto relative_world =
     makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref);
-  return hypot(relative_world.position.x, relative_world.position.y, relative_world.position.z);
+  switch (compatibility) {
+    default:
+    case Compatibility::legacy:
+    case Compatibility::standard:
+      return hypot(relative_world.position.x, relative_world.position.y, relative_world.position.z);
+  }
 }
 
 template <>

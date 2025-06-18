@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_DISTANCE_CONDITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_DISTANCE_CONDITION_HPP_
 
+#include <openscenario_interpreter/compatibility.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/coordinate_system.hpp>
@@ -91,6 +92,8 @@ struct RelativeDistanceCondition : private Scope, private SimulatorCore::Conditi
   const TriggeringEntities triggering_entities;
 
   std::vector<std::valarray<double>> results;  // for description
+
+  static inline auto compatibility = Compatibility::legacy;
 
   explicit RelativeDistanceCondition(const pugi::xml_node &, Scope &, const TriggeringEntities &);
 
