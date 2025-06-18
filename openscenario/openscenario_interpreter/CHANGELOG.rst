@@ -35,6 +35,11 @@ Changelog for package openscenario_interpreter
 16.4.2 (2025-05-23)
 -------------------
 
+16.5.7 (2025-06-18)
+-------------------
+* Merge branch 'master' into dependabot/pip/requests-2.32.4
+* Contributors: Masaya Kataoka
+
 16.5.6 (2025-06-12)
 -------------------
 * Merge pull request `#1620 <https://github.com/tier4/scenario_simulator_v2/issues/1620>`_ from tier4/add-start-trigger-context
