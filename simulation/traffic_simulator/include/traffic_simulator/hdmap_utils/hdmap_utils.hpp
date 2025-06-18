@@ -196,8 +196,9 @@ public:
   auto getTangentVector(const lanelet::Id, const double s) const
     -> std::optional<geometry_msgs::msg::Vector3>;
 
-  auto getTrafficLightBulbPosition(const lanelet::Id traffic_light_id, const std::string &) const
-    -> std::optional<geometry_msgs::msg::Point>;
+  auto getTrafficLightBulbPosition(
+    const lanelet::Id traffic_light_id, const std::string &,
+    const bool allow_infer_position = false) const -> std::optional<geometry_msgs::msg::Point>;
 
   auto getTrafficLightIds() const -> lanelet::Ids;
 

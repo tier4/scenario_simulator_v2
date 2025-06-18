@@ -19,11 +19,29 @@ namespace traffic_simulator
 {
 inline namespace route_option
 {
-inline namespace v1
+inline namespace v2
 {
 struct RouteOption
 {
   bool allow_goal_modification = false;
+  bool use_lane_ids_for_routing = false;
+};
+}  // namespace v2
+
+namespace v1
+{
+struct RouteOption
+{
+  bool allow_goal_modification = false;
+
+  // conversion without loss of information
+  operator v2::RouteOption() const
+  {
+    v2::RouteOption v2;
+    v2.allow_goal_modification = allow_goal_modification;
+    v2.use_lane_ids_for_routing = false;
+    return v2;
+  }
 };
 }  // namespace v1
 }  // namespace route_option

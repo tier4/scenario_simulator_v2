@@ -12,6 +12,56 @@ Changelog for package simple_cross_map
 16.4.2 (2025-05-23)
 -------------------
 
+16.5.6 (2025-06-12)
+-------------------
+* Merge branch 'master' into add-start-trigger-context
+* Merge branch 'master' into add-start-trigger-context
+* Contributors: Kotaro Yoshimoto
+
+16.5.5 (2025-06-10)
+-------------------
+* Merge branch 'master' into refactor/scenario_test_runner
+* Merge branch 'master' into refactor/scenario_test_runner
+* Merge branch 'master' into refactor/scenario_test_runner
+* Merge branch 'master' into refactor/scenario_test_runner
+* Merge branch 'master' into refactor/scenario_test_runner
+* Merge branch 'master' into refactor/scenario_test_runner
+* Contributors: Kotaro Yoshimoto
+
+16.5.4 (2025-06-06)
+-------------------
+* Merge branch 'master' into fix/non-symlink-install-sun
+* Contributors: Kotaro Yoshimoto
+
+16.5.3 (2025-06-06)
+-------------------
+* Merge branch 'master' into refactor/behavior_tree_4
+* Merge branch 'master' into refactor/behavior_tree_4
+* Merge branch 'master' into refactor/behavior_tree_4
+* Contributors: Kotaro Yoshimoto, Taiga
+
+16.5.2 (2025-06-04)
+-------------------
+
+16.5.1 (2025-06-03)
+-------------------
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, ぐるぐる
+
+16.5.0 (2025-06-03)
+-------------------
+* Merge branch 'master' into feature/set_route
+* Merge branch 'master' into feature/set_route
+* Merge branch 'master' into feature/set_route
+* Contributors: Kotaro Yoshimoto
+
+16.4.6 (2025-06-02)
+-------------------
+
 16.4.5 (2025-05-30)
 -------------------
 
