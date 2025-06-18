@@ -336,7 +336,7 @@ auto distanceToSpline(
   const double s_start = s_reference - bounding_box_diagonal_length / 2.0;
   const double s_end = s_reference + bounding_box_diagonal_length / 2.0;
 
-  double min_distance_squared = std::numeric_limits<double>::infinity();
+  auto min_distance_squared = std::numeric_limits<double>::infinity();
   for (const auto & point : bounding_box_map_points) {
     const auto [nearest_s, distance_squared] = spline.nearestS(point, s_start, s_end);
     min_distance_squared = std::min(min_distance_squared, distance_squared);
