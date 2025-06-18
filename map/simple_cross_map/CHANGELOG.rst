@@ -12,6 +12,11 @@ Changelog for package simple_cross_map
 16.4.2 (2025-05-23)
 -------------------
 
+16.5.7 (2025-06-18)
+-------------------
+* Merge branch 'master' into dependabot/pip/requests-2.32.4
+* Contributors: Masaya Kataoka
+
 16.5.6 (2025-06-12)
 -------------------
 * Merge branch 'master' into add-start-trigger-context
