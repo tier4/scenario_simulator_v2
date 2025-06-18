@@ -18,6 +18,7 @@
 #include <exception>
 #include <geometry_msgs/msg/point.hpp>
 #include <optional>
+#include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <utility>
 #include <vector>
@@ -49,8 +50,10 @@ public:
      */
     constexpr double distance_accuracy{0.05};
 
-    s_start = std::clamp(s_start, 0.0, getLength());
-    s_end = std::clamp(s_end, 0.0, getLength());
+    if (0.0 <= s_start and s_start <= getLength() and 0.0 <= s_end and s_end <= getLength()) {
+      THROW_SIMULATION_ERROR(
+        "Invalid s range: [", s_start, ", ", s_end, "] when spline length is ", getLength());
+    }
 
     /// @note it may be a good idea to develop spline.getSquaredDistanceIn2D(point, s_start, s_end);
     auto s_start_distance = getSquaredDistanceIn2D(point, s_start);
