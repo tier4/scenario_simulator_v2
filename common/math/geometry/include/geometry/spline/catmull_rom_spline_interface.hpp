@@ -38,7 +38,12 @@ public:
   virtual double getSquaredDistanceIn2D(
     const geometry_msgs::msg::Point & point, const double s) const = 0;
 
-  /// @brief Calculates nearest s value from given range and its squared distance in 2D
+  /**
+   * @brief Calculates nearest s value from given range and its squared distance in 2D.
+   * This function is guaranteed to work correctly only when the spline is convex or concave - the
+   * second derivative of the spline has the same sign over the whole span of the given range
+   * (either <= 0 or >= 0).
+   */
   auto nearestS(const geometry_msgs::msg::Point & point, double s_start, double s_end) const
     -> std::pair<double, double>
   {
