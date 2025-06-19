@@ -6,7 +6,7 @@
   <description>ROS message types for package openscenario_preprocessor</description>
   <maintainer email="kotaro.yoshimoto@tier4.jp">Kotaro Yoshimoto</maintainer>
   <license>Apache License 2.0</license>
-  <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>ament_cmake_auto</buildtool_depend>
   <buildtool_depend>rosidl_default_generators</buildtool_depend>
   <depend>builtin_interfaces</depend>
   <depend>rosidl_default_runtime</depend>
