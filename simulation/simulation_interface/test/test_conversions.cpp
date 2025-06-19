@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <geometry_msgs.pb.h>
 #include <gtest/gtest.h>
+#include <simulation_interface/geometry_msgs.pb.h>
 
 #include "expect_equal_macros.hpp"
 /**
