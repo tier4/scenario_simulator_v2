@@ -1,8 +1,7 @@
 name: Post check list
 on:
-  pull_request:
-    types: [opened, reopened]
-
+  pull_request_target:
+    types: [assigned, opened, synchronize, reopened, labeled, edited]
 jobs:
   post_check_list:
     name: Post check list
