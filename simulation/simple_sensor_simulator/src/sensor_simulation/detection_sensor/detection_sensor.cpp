@@ -332,7 +332,9 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
       return detected_entities;
     };
 
-    auto noise_v2 = [&](const auto & detected_entities, auto simulation_time) {
+    auto apply_v2_style_noise = [&](
+                                  const auto & detected_entities, auto simulation_time,
+                                  const std::string & parameter_prefix_namespace) {
       auto noised_detected_entities = std::decay_t<decltype(detected_entities)>();
 
       for (auto detected_entity : detected_entities) {
@@ -349,19 +351,22 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
         const auto interval =
           simulation_time - std::exchange(noise_output->second.simulation_time, simulation_time);
 
-        auto parameter = [this](const auto & name) {
+        auto parameter = [this](const auto & name, const std::string & prefix_namespace) {
           return common::getParameter<double>(
-            detected_objects_publisher->get_topic_name() + std::string(".noise.v2.") + name);
+            detected_objects_publisher->get_topic_name() + std::string(".noise.") +
+            prefix_namespace + "." + name);
         };
 
-        auto parameters = [this](const auto & name) {
-          const auto full_name =
-            detected_objects_publisher->get_topic_name() + std::string(".noise.v2.") + name;
+        auto parameters = [this](const auto & name, const std::string & prefix_namespace) {
+          const auto full_name = detected_objects_publisher->get_topic_name() +
+                                 std::string(".noise.") + prefix_namespace + "." + name;
           const auto parameters = common::getParameter<std::vector<double>>(full_name);
           static const auto size = parameters.size();
           if (parameters.size() != size) {
             throw common::Error(
-              "The sizes of the arrays given to the parameters of noise model version 2 must be "
+              "The sizes of the arrays given to the parameters of noise model version ",
+              prefix_namespace,
+              " must be "
               "the same. The parameter ",
               std::quoted(full_name), " is an array of size ", parameters.size(),
               ", and the other arrays are of size ", size, ".");
@@ -409,16 +414,22 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
              phi(dt) = amplitude * exp(-decay * dt) + offset
         */
         auto autocorrelation_coefficient = [&](const std::string & name) {
-          static const auto amplitude = parameter(name + ".autocorrelation_coefficient.amplitude");
-          static const auto decay = parameter(name + ".autocorrelation_coefficient.decay");
-          static const auto offset = parameter(name + ".autocorrelation_coefficient.offset");
+          static const auto amplitude =
+            parameter(name + ".autocorrelation_coefficient.amplitude", parameter_prefix_namespace);
+          static const auto decay =
+            parameter(name + ".autocorrelation_coefficient.decay", parameter_prefix_namespace);
+          static const auto offset =
+            parameter(name + ".autocorrelation_coefficient.offset", parameter_prefix_namespace);
           return std::clamp(amplitude * std::exp(-decay * interval) + offset, 0.0, 1.0);
         };
 
         auto selector = [&](const std::string & name) {
-          static const auto ellipse_y_radii = parameters("ellipse_y_radii");
-          return [&, ellipse_normalized_x_radius = parameter(name + ".ellipse_normalized_x_radius"),
-                  values = parameters(name + ".values")]() {
+          static const auto ellipse_y_radii =
+            parameters("ellipse_y_radii", parameter_prefix_namespace);
+          return [&,
+                  ellipse_normalized_x_radius =
+                    parameter(name + ".ellipse_normalized_x_radius", parameter_prefix_namespace),
+                  values = parameters(name + ".values", parameter_prefix_namespace)]() {
             /*
                If the parameter `<topic-name>.noise.v2.ellipse_y_radii`
                contains the value 0.0, division by zero will occur here.
@@ -454,8 +465,9 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
         }();
 
         noise_output->second.flip = [&]() {
-          static const auto speed_threshold = parameter("yaw_flip.speed_threshold");
-          static const auto rate = parameter("yaw_flip.rate");
+          static const auto speed_threshold =
+            parameter("yaw_flip.speed_threshold", parameter_prefix_namespace);
+          static const auto rate = parameter("yaw_flip.rate", parameter_prefix_namespace);
           return speed < speed_threshold and
                  markov_process_noise(
                    noise_output->second.flip, rate, autocorrelation_coefficient("yaw_flip"));
@@ -499,6 +511,10 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
       }
 
       return noised_detected_entities;
+    };
+
+    auto noise_v2 = [&](const auto & detected_entities, auto simulation_time) {
+      return apply_v2_style_noise(detected_entities, simulation_time, "v2");
     };
 
     auto noise = [&](auto &&... xs) {
