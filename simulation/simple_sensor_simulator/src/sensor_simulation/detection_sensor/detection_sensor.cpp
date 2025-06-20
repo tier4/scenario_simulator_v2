@@ -517,6 +517,11 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
       return apply_v2_style_noise(detected_entities, simulation_time, "v2");
     };
 
+    auto noise_v3 = [&](const auto & detected_entities, auto simulation_time) {
+      auto noised_detected_entities = std::decay_t<decltype(detected_entities)>();
+      return noised_detected_entities;
+    };
+
     auto noise = [&](auto &&... xs) {
       switch (noise_model_version) {
         default:
@@ -525,6 +530,8 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
           return noise_v1(std::forward<decltype(xs)>(xs)...);
         case 2:
           return noise_v2(std::forward<decltype(xs)>(xs)...);
+        case 3:
+          return noise_v3(std::forward<decltype(xs)>(xs)...);
       }
     };
 

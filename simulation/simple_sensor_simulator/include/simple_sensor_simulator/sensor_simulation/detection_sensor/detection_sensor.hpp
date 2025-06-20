@@ -177,6 +177,8 @@ public:
               case 1:
                 return configuration_.random_seed();
               case 2:
+                [[fallthrough]];
+              case 3:
                 return common::getParameter<int>(
                   detected_objects_publisher->get_topic_name() + std::string(".seed"));
             }
