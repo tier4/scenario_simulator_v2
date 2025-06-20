@@ -25,12 +25,15 @@
 #include <geometry/vector3/hypot.hpp>
 #include <memory>
 #include <random>
+#include <regex>
 #include <scenario_simulator_exception/exception.hpp>
 #include <simple_sensor_simulator/exception.hpp>
 #include <simple_sensor_simulator/sensor_simulation/detection_sensor/detection_sensor.hpp>
 #include <simulation_interface/conversions.hpp>
 #include <string>
+#include <string_view>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
+#include <unordered_set>
 #include <vector>
 
 namespace simple_sensor_simulator
@@ -521,7 +524,91 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
       auto noised_detected_entities = std::decay_t<decltype(detected_entities)>();
 
       auto get_first_matched_config_name =
-        [](const traffic_simulator_msgs::EntityStatus & entity) -> std::string { return ""; };
+        [this](const traffic_simulator_msgs::EntityStatus & entity) -> std::string {
+        auto matches_v3_target = [&](
+                                   const traffic_simulator_msgs::EntityStatus & entity,
+                                   const std::string & noise_config_name) -> bool {
+          auto entity_type_string = [](const traffic_simulator_msgs::EntityStatus & entity) {
+            switch (entity.type().type()) {
+              case traffic_simulator_msgs::EntityType::EGO:
+                return "EGO";
+              case traffic_simulator_msgs::EntityType::VEHICLE:
+                return "VEHICLE";
+              case traffic_simulator_msgs::EntityType::PEDESTRIAN:
+                return "PEDESTRIAN";
+              case traffic_simulator_msgs::EntityType::MISC_OBJECT:
+                return "MISC_OBJECT";
+              default:
+                throw common::Error(
+                  "Unknown entity type: " + std::to_string(static_cast<int>(entity.type().type())));
+            }
+          };
+
+          auto entity_subtype_string = [](const traffic_simulator_msgs::EntityStatus & entity) {
+            switch (entity.subtype().value()) {
+              case traffic_simulator_msgs::EntitySubtype::UNKNOWN:
+                return "UNKNOWN";
+              case traffic_simulator_msgs::EntitySubtype::CAR:
+                return "CAR";
+              case traffic_simulator_msgs::EntitySubtype::TRUCK:
+                return "TRUCK";
+              case traffic_simulator_msgs::EntitySubtype::BUS:
+                return "BUS";
+              case traffic_simulator_msgs::EntitySubtype::TRAILER:
+                return "TRAILER";
+              case traffic_simulator_msgs::EntitySubtype::MOTORCYCLE:
+                return "MOTORCYCLE";
+              case traffic_simulator_msgs::EntitySubtype::BICYCLE:
+                return "BICYCLE";
+              case traffic_simulator_msgs::EntitySubtype::PEDESTRIAN:
+                return "PEDESTRIAN";
+              default:
+                throw common::Error(
+                  "Unknown entity subtype: " +
+                  std::to_string(static_cast<int>(entity.subtype().value())));
+            }
+          };
+
+          auto matches_target_list =
+            [&](const std::vector<std::string> & targets, const std::string & entity_value) {
+              auto match_wildcard =
+                [](const std::string & pattern, const std::string & text) -> bool {
+                std::string regex_pattern;
+                for (char c : pattern) {
+                  regex_pattern += (c == '*') ? ".*" : (c == '?') ? "." : std::string(1, c);
+                }
+                return std::regex_match(text, std::regex(regex_pattern));
+              };
+              return std::any_of(targets.begin(), targets.end(), [&](const auto & target) {
+                return match_wildcard(target, entity_value);
+              });
+            };
+
+          const auto base_path = std::string(detected_objects_publisher->get_topic_name()) +
+                                 ".noise.v3." + noise_config_name + ".target.";
+
+          const auto types = common::getParameter<std::vector<std::string>>(base_path + "types");
+          const auto subtypes =
+            common::getParameter<std::vector<std::string>>(base_path + "subtypes");
+          const auto names = common::getParameter<std::vector<std::string>>(base_path + "names");
+
+          return matches_target_list(types, entity_type_string(entity)) &&
+                 matches_target_list(subtypes, entity_subtype_string(entity)) &&
+                 matches_target_list(names, entity.name());
+        };
+
+        // TODO(HansRobo)
+        const std::vector<std::string> v3_namespaces;
+
+        for (const auto & namespace_name : v3_namespaces) {
+          if (matches_v3_target(entity, namespace_name)) {
+            // return first matched namespace_name
+            return namespace_name;
+          }
+        }
+        // if no matched namespace_name is found, return an empty string
+        return "";
+      };
 
       for (const auto & entity : detected_entities) {
         if (const auto matched_config_name = get_first_matched_config_name(entity);
