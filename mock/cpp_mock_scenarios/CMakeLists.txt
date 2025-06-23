@@ -78,4 +78,9 @@ if(BUILD_TESTING)
   # add_cpp_mock_scenario_test(${PROJECT_NAME} "traffic_simulation_demo" "70")
 endif()
 
-ament_auto_package(CONFIG_EXTRAS "${PROJECT_NAME}_ament_cmake-extras.cmake")
+ament_auto_package(USE_SCOPED_HEADER_INSTALL_DIR
+  INSTALL_TO_SHARE
+    launch
+    rviz
+    cmake
+  CONFIG_EXTRAS "${PROJECT_NAME}_ament_cmake-extras.cmake")

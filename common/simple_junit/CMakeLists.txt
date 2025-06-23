@@ -33,4 +33,4 @@ if(BUILD_TESTING)
   target_link_libraries(test_simple_junit ${PROJECT_NAME})
 endif()
 
-ament_auto_package()
+ament_auto_package(USE_SCOPED_HEADER_INSTALL_DIR)

@@ -57,11 +57,11 @@ install(TARGETS simulation_interface
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
-  INCLUDES DESTINATION include)
+  INCLUDES DESTINATION include/${PROJECT_NAME})
 
 install(
   FILES ${PROTO_HDRS}
-  DESTINATION include
+  DESTINATION include/${PROJECT_NAME}
 )
 
 install(
@@ -76,4 +76,4 @@ if(BUILD_TESTING)
   target_link_libraries(test_conversion simulation_interface)
 endif()
 
-ament_auto_package()
+ament_auto_package(USE_SCOPED_HEADER_INSTALL_DIR)

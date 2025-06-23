@@ -51,9 +51,6 @@ ament_auto_add_library(openscenario_visualization_rviz_plugin SHARED
 
 target_include_directories(openscenario_visualization_rviz_plugin PRIVATE "${OGRE_PREFIX_DIR}/include")
 
-install(DIRECTORY icons DESTINATION share/openscenario_visualization)
-install(DIRECTORY include/ DESTINATION include)
-
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
@@ -61,4 +58,7 @@ endif()
 
 pluginlib_export_plugin_description_file(rviz_common plugins.xml)
 
-ament_auto_package()
+ament_auto_package(USE_SCOPED_HEADER_INSTALL_DIR
+  INSTALL_TO_SHARE
+  icons
+)

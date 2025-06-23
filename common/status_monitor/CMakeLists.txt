@@ -18,4 +18,4 @@ ament_auto_add_library(${PROJECT_NAME} SHARED src/${PROJECT_NAME}.cpp)
 
 target_link_libraries(${PROJECT_NAME} Boost::date_time Threads::Threads)
 
-ament_auto_package()
+ament_auto_package(USE_SCOPED_HEADER_INSTALL_DIR)

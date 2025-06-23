@@ -26,4 +26,4 @@ install(
   DIRECTORY config
   DESTINATION share/${PROJECT_NAME})
 
-ament_auto_package()
+ament_auto_package(USE_SCOPED_HEADER_INSTALL_DIR)
