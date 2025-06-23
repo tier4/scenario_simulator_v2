@@ -24,6 +24,16 @@ Changelog for package openscenario_interpreter_example
 16.4.2 (2025-05-23)
 -------------------
 
+16.5.10 (2025-06-23)
+--------------------
+* Merge branch 'master' into devin/1750224079-update-communication-docs
+* Contributors: Kotaro Yoshimoto
+
+16.5.9 (2025-06-23)
+-------------------
+* Merge branch 'master' into feature/use-add-pr-comment
+* Contributors: Kotaro Yoshimoto
+
 16.5.8 (2025-06-23)
 -------------------
 
