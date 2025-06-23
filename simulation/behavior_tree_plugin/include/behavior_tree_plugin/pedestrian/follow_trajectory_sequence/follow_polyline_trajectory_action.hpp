@@ -23,7 +23,7 @@ namespace pedestrian
 {
 struct FollowPolylineTrajectoryAction : public PedestrianActionNode
 {
-  std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> polyline_trajectory;
+  traffic_simulator_msgs::msg::PolylineTrajectory polyline_trajectory;
 
   using PedestrianActionNode::PedestrianActionNode;
 

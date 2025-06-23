@@ -161,21 +161,21 @@ auto CatmullRomSpline::getTrajectoryPoses(
 
 CatmullRomSpline::CatmullRomSpline(
   const geometry_msgs::msg::Point & start_point,
-  const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & trajectory)
+  const traffic_simulator_msgs::msg::PolylineTrajectory & trajectory)
 : CatmullRomSpline([start_point, trajectory] {
-    if (!trajectory) {
+    if (trajectory.shape.vertices.empty()) {
       THROW_SIMULATION_ERROR(
         "Trajectory is empty.",
         "This message is not originally intended to be displayed, if you see it, please contact "
         "the developer of traffic_simulator.");
     }
     std::vector<geometry_msgs::msg::Point> control_points;
-    control_points.reserve(trajectory->shape.vertices.size() + 2UL);
+    control_points.reserve(trajectory.shape.vertices.size() + 2UL);
     control_points.emplace_back(start_point);
-    for (const auto & vertex : trajectory->shape.vertices) {
+    for (const auto & vertex : trajectory.shape.vertices) {
       control_points.emplace_back(vertex.position.position);
     }
-    if (trajectory->closed) {
+    if (trajectory.closed) {
       control_points.emplace_back(control_points[0]);
     }
     return control_points;
