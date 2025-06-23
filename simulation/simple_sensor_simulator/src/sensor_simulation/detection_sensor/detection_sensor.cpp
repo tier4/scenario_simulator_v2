@@ -523,8 +523,36 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
     auto noise_v3 = [&](const auto & detected_entities, auto simulation_time) {
       auto noised_detected_entities = std::decay_t<decltype(detected_entities)>();
 
+      const auto v3_namespaces = [this]() -> std::vector<std::string> {
+        std::vector<std::string> namespaces;
+        const auto v3_prefix =
+          std::string(detected_objects_publisher->get_topic_name()) + ".noise.v3.";
+        const auto & param_node = common::getParameterNode();
+        const auto param_names =
+          param_node
+            .list_parameters({}, rcl_interfaces::srv::ListParameters::Request::DEPTH_RECURSIVE)
+            .names;
+
+        for (const auto & param_name : param_names) {
+          if (param_name.find(v3_prefix) == 0) {
+            const auto remainder = param_name.substr(v3_prefix.length());
+            const auto dot_pos = remainder.find('.');
+            if (dot_pos != std::string::npos) {
+              const auto namespace_name = remainder.substr(0, dot_pos);
+              if (
+                std::find(namespaces.begin(), namespaces.end(), namespace_name) ==
+                namespaces.end()) {
+                namespaces.push_back(namespace_name);
+              }
+            }
+          }
+        }
+
+        return namespaces;
+      }();
+
       auto get_first_matched_config_name =
-        [this](const traffic_simulator_msgs::EntityStatus & entity) -> std::string {
+        [this, &v3_namespaces](const traffic_simulator_msgs::EntityStatus & entity) -> std::string {
         auto matches_v3_target = [&](
                                    const traffic_simulator_msgs::EntityStatus & entity,
                                    const std::string & noise_config_name) -> bool {
@@ -596,9 +624,6 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
                  matches_target_list(subtypes, entity_subtype_string(entity)) &&
                  matches_target_list(names, entity.name());
         };
-
-        // TODO(HansRobo)
-        const std::vector<std::string> v3_namespaces;
 
         for (const auto & namespace_name : v3_namespaces) {
           if (matches_v3_target(entity, namespace_name)) {
