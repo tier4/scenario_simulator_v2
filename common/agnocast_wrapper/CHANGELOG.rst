@@ -5,6 +5,11 @@ Changelog for package agnocast_wrapper
 16.4.2 (2025-05-23)
 -------------------
 
+16.5.9 (2025-06-23)
+-------------------
+* Merge branch 'master' into feature/use-add-pr-comment
+* Contributors: Kotaro Yoshimoto
+
 16.5.8 (2025-06-23)
 -------------------
 
