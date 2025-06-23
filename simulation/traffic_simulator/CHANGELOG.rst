@@ -21,6 +21,208 @@ Changelog for package traffic_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+16.4.2 (2025-05-23)
+-------------------
+
+16.5.10 (2025-06-23)
+--------------------
+* Merge branch 'master' into devin/1750224079-update-communication-docs
+* Contributors: Kotaro Yoshimoto
+
+16.5.9 (2025-06-23)
+-------------------
+* Merge branch 'master' into feature/use-add-pr-comment
+* Contributors: Kotaro Yoshimoto
+
+16.5.8 (2025-06-23)
+-------------------
+
+16.5.7 (2025-06-18)
+-------------------
+* Merge branch 'master' into dependabot/pip/requests-2.32.4
+* Contributors: Masaya Kataoka
+
+16.5.6 (2025-06-12)
+-------------------
+* Merge branch 'master' into add-start-trigger-context
+* Merge branch 'master' into add-start-trigger-context
+* Contributors: Kotaro Yoshimoto
+
+16.5.5 (2025-06-10)
+-------------------
+* Merge branch 'master' into refactor/scenario_test_runner
+* Merge branch 'master' into refactor/scenario_test_runner
+* Merge branch 'master' into refactor/scenario_test_runner
+* Merge branch 'master' into refactor/scenario_test_runner
+* Merge branch 'master' into refactor/scenario_test_runner
+* Merge branch 'master' into refactor/scenario_test_runner
+* Contributors: Kotaro Yoshimoto
+
+16.5.4 (2025-06-06)
+-------------------
+* Merge branch 'master' into fix/non-symlink-install-sun
+* Contributors: Kotaro Yoshimoto
+
+16.5.3 (2025-06-06)
+-------------------
+* Merge branch 'master' into refactor/behavior_tree_4
+* Merge branch 'master' into refactor/behavior_tree_4
+* Merge branch 'master' into refactor/behavior_tree_4
+* Contributors: Kotaro Yoshimoto, Taiga
+
+16.5.2 (2025-06-04)
+-------------------
+
+16.5.1 (2025-06-03)
+-------------------
+* Merge pull request `#1597 <https://github.com/tier4/scenario_simulator_v2/issues/1597>`_ from tier4/feature/render-omitted-light-bulb
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Add new line on EOF to lanelet map
+* Add infer test
+* Remove unnecessary operator
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* update tests for multiple traffic light
+* Add support for render bulbs without state
+* Refactor constant
+* Activate bulb position inference
+* Fix missing override
+* Add bulb position inference feature to HdMapUtils
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, f0reachARR, ぐるぐる
+
+16.5.0 (2025-06-03)
+-------------------
+* Merge pull request `#1611 <https://github.com/tier4/scenario_simulator_v2/issues/1611>`_ from tier4/feature/set_route
+* Merge branch 'master' into feature/set_route
+* Merge branch 'master' into feature/set_route
+* Rename use_lane_level_specification_for_waypoints to use_lane_ids_for_routing
+* Use algorithm functions instead of for loop code
+* Stop using deprecated version of FieldOperatorApplication::plan in EgoEntity::requestReplanRoute
+* Merge branch 'master' into feature/set_route
+* Add an exception when failed to get current lanelet in EgoEntity::requestAssignRoute
+* Rename FieldOperatorApplication::setRoute/setRoutePoints to plan
+* configration => configuration
+* use setRoutePoints instead of plan in EgoEntity::requestAssignRoute
+* Use route and waypoint appropriately (route = waypoints + goal)
+* Interpolate and unique lanelet array for set route API
+* Switch by use_lane_level_specification_for_waypoints flag in EgoEntity::requestAssignRoute
+* Change redirect target of requestAssignRoute(lanelet_pose[])
+* Adjust name of (traffic_simulator::)RouteOption
+* Define conversion of RouteOption from v1 to v2
+* Add RouteOption v2
+* Contributors: Kotaro Yoshimoto
+
+16.4.6 (2025-06-02)
+-------------------
+
+16.4.5 (2025-05-30)
+-------------------
+
+16.4.4 (2025-05-28)
+-------------------
+* Merge pull request `#1609 <https://github.com/tier4/scenario_simulator_v2/issues/1609>`_ from tier4/feature/delay_curventure_calculation
+  Feature/delay curventure calculation
+* Merge remote-tracking branch 'origin/master' into feature/delay_curventure_calculation
+* Merge branch 'master' into feature/delay_curventure_calculation
+* Merge remote-tracking branch 'origin/master' into feature/delay_curventure_calculation
+* check waypoint duplication
+* fix spell error
+* Merge remote-tracking branch 'origin/master' into feature/speed_up
+* add error message
+* enable calculate route before requestFollowTrajectory
+* enable construct polyline trajectory from spline
+* reserve unoderd_map while construct
+* Contributors: Masaya Kataoka, Taiga
+
+16.4.3 (2025-05-27)
+-------------------
+* Merge branch 'master' into refactor/behavior-tree-2
+* Bump version of scenario_simulator_v2 from version version 16.4.1 to version 16.4.2
+* Merge branch 'master' into refactor/behavior-tree-2
+* Contributors: Kotaro Yoshimoto, Taiga
+
+16.4.1 (2025-05-23)
+-------------------
+* Merge pull request `#1602 <https://github.com/tier4/scenario_simulator_v2/issues/1602>`_ from tier4/refactor/behavior-tree-1
+  Refactor/behavior_tree-1
+* Merge branch 'master' into refactor/behavior-tree-1
+* Merge branch 'master' into refactor/behavior-tree-1
+* Changed the methods in `behavior_tree.hpp` to use trailing return types.
+* Contributors: Masaya Kataoka, Taiga, Taiga Takano
+
+16.4.0 (2025-05-22)
+-------------------
+* Merge pull request `#1590 <https://github.com/tier4/scenario_simulator_v2/issues/1590>`_ from tier4/feature/change_allow_goal_modification
+* Stop using C++ 20 feature to fix a build error
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Update deprecated notice in EntityBase class
+* Add inline namespaces to RouteOption for versioning
+* Rename RouteOptions -> RouteOption
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Adjust deprecation notice from EntityBase::requestAcquirePosition/requestAssignRoute
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Apply linter
+* Add deprecation notice
+* Modify MiscObjectEntity implementation to follow EntityBase
+* Modify EgoEntity implementation to follow EntityBase
+* Modify PedestrianEntity implementation to follow EntityBase
+* Modify VehicleEntity implementation to follow EntityBase
+* Add EgoEntity::requestAcquirePosition/requestAssignRoute with RouteOptions
+* Add traffic_simulator::RouteOptions struct
+* Merge branch 'master' into feature/change_allow_goal_modification
+* Merge branch 'master' into feature/change_allow_goal_modification
+* chore: override allow_goal_modification in EgoEntity::requestAssignRoute only if Controller.Properties.Property.allowGoalModification is defined
+* Add allow_goal_modification argument to EgoEntity::requestAcquirePosition / requestAssignRoute
+* Add allow_goal_modification argument to FieldOperatorApplication::plan
+* Contributors: Kotaro Yoshimoto
+
+16.3.11 (2025-05-21)
+--------------------
+* Merge pull request `#1579 <https://github.com/tier4/scenario_simulator_v2/issues/1579>`_ from tier4/refactor/lanelet_matching
+  [FIX] Lanelet matching with absolute distance
+* Merge branch 'master' into refactor/lanelet_matching
+* Merge branch 'master' into refactor/lanelet_matching
+* Merge branch 'master' into refactor/lanelet_matching
+* Merge branch 'master' into refactor/lanelet_matching
+* Improve lane matching by using absolute distance for nearest lane selection
+* Merge commit '2be47bbd1a1a69ba584d2a37b11b3140e40f5f3d' into refactor/lanelet_matching
+* Contributors: Koki Suzuki, Masaya Kataoka, Taiga, koki suzuki
+
+16.3.10 (2025-05-20)
+--------------------
+* Merge branch 'master' into fix/agnocastpreload
+* Merge branch 'master' into dependabot/pip/setuptools-78.1.1
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka
+
+16.3.9 (2025-05-20)
+-------------------
+
+16.3.8 (2025-05-19)
+-------------------
+
+16.3.7 (2025-05-15)
+-------------------
+* Merge pull request `#1589 <https://github.com/tier4/scenario_simulator_v2/issues/1589>`_ from tier4/fix/mics-objects-model3d
+  fix: add missing MiscObjectBehavior when calling spawn api
+* Merge branch 'master' into fix/mics-objects-model3d
+* Merge branch 'master' into fix/mics-objects-model3d
+* fix: add missing MiscObjectBehavior when calling spawn api
+* Contributors: Lukasz Chojnacki, Tatsuya Yamasaki
+
+16.3.6 (2025-05-14)
+-------------------
+* Merge branch 'master' into feature/arm64-buildtest
+* Merge branch 'master' into feature/arm64-buildtest
+* Contributors: Kotaro Yoshimoto, ぐるぐる
+
+16.3.5 (2025-05-12)
+-------------------
+* Merge branch 'master' into fix/missing-rviz-config-and-npc-start
+* Contributors: SzymonParapura
+
 16.3.4 (2025-05-12)
 -------------------
 
