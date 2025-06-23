@@ -13,6 +13,14 @@ Changelog for package openscenario_validator
 16.4.2 (2025-05-23)
 -------------------
 
+16.5.9 (2025-06-23)
+-------------------
+* Merge branch 'master' into feature/use-add-pr-comment
+* Contributors: Kotaro Yoshimoto
+
+16.5.8 (2025-06-23)
+-------------------
+
 16.5.7 (2025-06-18)
 -------------------
 * Merge branch 'master' into dependabot/pip/requests-2.32.4
