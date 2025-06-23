@@ -333,8 +333,10 @@ auto distanceToSpline(
   const auto bounding_box_diagonal_length =
     math::geometry::getDistance(bounding_box_map_points[0], bounding_box_map_points[2]);
 
-  const double s_start = s_reference - bounding_box_diagonal_length / 2.0;
-  const double s_end = s_reference + bounding_box_diagonal_length / 2.0;
+  const double s_start =
+    std::clamp(s_reference - bounding_box_diagonal_length / 2.0, 0.0, spline.getLength());
+  const double s_end =
+    std::clamp(s_reference + bounding_box_diagonal_length / 2.0, 0.0, spline.getLength());
 
   auto min_distance_squared = std::numeric_limits<double>::infinity();
   for (const auto & point : bounding_box_map_points) {
