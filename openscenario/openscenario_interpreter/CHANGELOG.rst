@@ -35,6 +35,33 @@ Changelog for package openscenario_interpreter
 16.4.2 (2025-05-23)
 -------------------
 
+16.5.10 (2025-06-23)
+--------------------
+* Merge branch 'master' into devin/1750224079-update-communication-docs
+* Contributors: Kotaro Yoshimoto
+
+16.5.9 (2025-06-23)
+-------------------
+* Merge branch 'master' into feature/use-add-pr-comment
+* Contributors: Kotaro Yoshimoto
+
+16.5.8 (2025-06-23)
+-------------------
+
+16.5.7 (2025-06-18)
+-------------------
+* Merge branch 'master' into dependabot/pip/requests-2.32.4
+* Contributors: Masaya Kataoka
+
+16.5.6 (2025-06-12)
+-------------------
+* Merge pull request `#1620 <https://github.com/tier4/scenario_simulator_v2/issues/1620>`_ from tier4/add-start-trigger-context
+* Merge branch 'master' into add-start-trigger-context
+* Merge branch 'master' into add-start-trigger-context
+* Export context StopTrigger in Storyboard
+* Export context StartTrigger and StopTrigger in Act
+* Contributors: Kotaro Yoshimoto
+
 16.5.5 (2025-06-10)
 -------------------
 * Merge branch 'master' into refactor/scenario_test_runner
