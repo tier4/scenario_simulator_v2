@@ -338,8 +338,9 @@ auto distanceToSpline(
 
   auto min_distance_squared = std::numeric_limits<double>::infinity();
   for (const auto & point : bounding_box_map_points) {
-    const auto [nearest_s, distance_squared] = spline.nearestS(point, s_start, s_end);
-    min_distance_squared = std::min(min_distance_squared, distance_squared);
+    const auto [s_nearest_estimate, distance_squared_nearest_estimate] =
+      spline.estimateNearestS(point, s_start, s_end);
+    min_distance_squared = std::min(min_distance_squared, distance_squared_nearest_estimate);
   }
   return std::sqrt(min_distance_squared);
 }

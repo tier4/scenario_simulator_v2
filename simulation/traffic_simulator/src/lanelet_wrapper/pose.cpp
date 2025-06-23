@@ -98,7 +98,7 @@ auto toLaneletPose(
   constexpr double yaw_range_max_rad = M_PI - yaw_range_min_rad;
 
   const auto lanelet_spline = lanelet_map::centerPointsSpline(lanelet_id);
-  if (const auto s_estimate = lanelet_spline->getSValue(map_pose, matching_distance); !s_estimate) {
+  if (const auto s_matched = lanelet_spline->getSValue(map_pose, matching_distance); !s_matched) {
     return std::nullopt;
   } else {
     /**
@@ -107,11 +107,24 @@ auto toLaneletPose(
      * calculate spline collision with the perpendicular line to the longitudinal (X) axis.
      */
     const auto s_start =
-      std::clamp(s_estimate.value() - matching_distance, 0.0, lanelet_spline->getLength());
+      std::clamp(s_matched.value() - matching_distance, 0.0, lanelet_spline->getLength());
     const auto s_end =
-      std::clamp(s_estimate.value() + matching_distance, 0.0, lanelet_spline->getLength());
-    const auto [lanelet_pose_s, distance_squared] =
-      lanelet_spline->nearestS(map_pose.position, s_start, s_end);
+      std::clamp(s_matched.value() + matching_distance, 0.0, lanelet_spline->getLength());
+
+    const auto [s_nearest_estimate, distance_squared_nearest_estimate] =
+      lanelet_spline->estimateNearestS(map_pose.position, s_start, s_end);
+
+    const auto distance_squared_matched =
+      lanelet_spline->getSquaredDistanceIn2D(map_pose.position, s_matched.value());
+
+    /// @note Try find estimate better than matched S. This can fail if Entity is parallel to lanelet
+    const bool is_nearest_estimate_better =
+      (distance_squared_nearest_estimate < distance_squared_matched);
+
+    const double lanelet_pose_s =
+      is_nearest_estimate_better ? s_nearest_estimate : s_matched.value();
+    const double distance_squared =
+      is_nearest_estimate_better ? distance_squared_nearest_estimate : distance_squared_matched;
 
     if (const auto pose_on_centerline = lanelet_spline->getPose(lanelet_pose_s);
         !isAltitudeMatching(map_pose.position.z, pose_on_centerline.position.z)) {
