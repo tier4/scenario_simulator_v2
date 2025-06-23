@@ -613,9 +613,9 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
       for (const auto & entity : detected_entities) {
         if (const auto matched_config_name = get_first_matched_config_name(entity);
             not matched_config_name.empty()) {
-          auto unnoised_entity = std::vector<traffic_simulator_msgs::EntityStatus>{entity};
+          auto vanilla_entity = std::vector<traffic_simulator_msgs::EntityStatus>{entity};
           auto noised_entity =
-            apply_v2_style_noise(unnoised_entity, simulation_time, "v3." + matched_config_name);
+            apply_v2_style_noise(vanilla_entity, simulation_time, "v3." + matched_config_name);
           noised_detected_entities.insert(
             noised_detected_entities.end(), noised_entity.begin(), noised_entity.end());
         } else {
