@@ -417,22 +417,20 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
              phi(dt) = amplitude * exp(-decay * dt) + offset
         */
         auto autocorrelation_coefficient = [&](const std::string & name) {
-          static const auto amplitude =
+          const auto amplitude =
             parameter(name + ".autocorrelation_coefficient.amplitude", parameter_prefix_namespace);
-          static const auto decay =
+          const auto decay =
             parameter(name + ".autocorrelation_coefficient.decay", parameter_prefix_namespace);
-          static const auto offset =
+          const auto offset =
             parameter(name + ".autocorrelation_coefficient.offset", parameter_prefix_namespace);
           return std::clamp(amplitude * std::exp(-decay * interval) + offset, 0.0, 1.0);
         };
 
         auto selector = [&](const std::string & name) {
-          static const auto ellipse_y_radii =
-            parameters("ellipse_y_radii", parameter_prefix_namespace);
-          return [&,
+          return [ellipse_y_radii = parameters("ellipse_y_radii", parameter_prefix_namespace),
                   ellipse_normalized_x_radius =
                     parameter(name + ".ellipse_normalized_x_radius", parameter_prefix_namespace),
-                  values = parameters(name + ".values", parameter_prefix_namespace)]() {
+                  values = parameters(name + ".values", parameter_prefix_namespace), &x, &y]() {
             /*
                If the parameter `<topic-name>.noise.v2.ellipse_y_radii`
                contains the value 0.0, division by zero will occur here.
@@ -452,32 +450,32 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
         };
 
         noise_output->second.distance_noise = [&]() {
-          static const auto mean = selector("distance.mean");
-          static const auto standard_deviation = selector("distance.standard_deviation");
+          const auto mean = selector("distance.mean");
+          const auto standard_deviation = selector("distance.standard_deviation");
           return autoregressive_noise(
             noise_output->second.distance_noise, mean(), standard_deviation(),
             autocorrelation_coefficient("distance"));
         }();
 
         noise_output->second.yaw_noise = [&]() {
-          static const auto mean = selector("yaw.mean");
-          static const auto standard_deviation = selector("yaw.standard_deviation");
+          const auto mean = selector("yaw.mean");
+          const auto standard_deviation = selector("yaw.standard_deviation");
           return autoregressive_noise(
             noise_output->second.yaw_noise, mean(), standard_deviation(),
             autocorrelation_coefficient("yaw"));
         }();
 
         noise_output->second.flip = [&]() {
-          static const auto speed_threshold =
+          const auto speed_threshold =
             parameter("yaw_flip.speed_threshold", parameter_prefix_namespace);
-          static const auto rate = parameter("yaw_flip.rate", parameter_prefix_namespace);
+          const auto rate = parameter("yaw_flip.rate", parameter_prefix_namespace);
           return speed < speed_threshold and
                  markov_process_noise(
                    noise_output->second.flip, rate, autocorrelation_coefficient("yaw_flip"));
         }();
 
         noise_output->second.true_positive = [&]() {
-          static const auto rate = selector("true_positive.rate");
+          const auto rate = selector("true_positive.rate");
           return markov_process_noise(
             noise_output->second.true_positive, rate(),
             autocorrelation_coefficient("true_positive"));
