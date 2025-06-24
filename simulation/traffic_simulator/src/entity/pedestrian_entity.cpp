@@ -129,6 +129,12 @@ auto PedestrianEntity::getRouteLanelets(double horizon) -> lanelet::Ids
   if (const auto canonicalized_lanelet_pose = status_->getCanonicalizedLaneletPose()) {
     return route_planner_.getRouteLanelets(canonicalized_lanelet_pose.value(), horizon);
   } else {
+    if (
+      const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
+        status_->getMapPose(), getBoundingBox(), route_planner_.getWholeRouteLanelets(), true,
+        getDefaultMatchingDistanceForLaneletPoseCalculation())) {
+      return route_planner_.getRouteLanelets(canonicalized_lanelet_pose.value(), horizon);
+    }
     return {};
   }
 }
@@ -287,15 +293,6 @@ auto PedestrianEntity::onUpdate(const double current_time, const double step_tim
   behavior_plugin_ptr_->setRouteLanelets(getRouteLanelets());
   /// @note CanonicalizedEntityStatus is updated here, it is not skipped even if isAtEndOfLanelets return true
   behavior_plugin_ptr_->update(current_time, step_time);
-
-  /// Try lane matching if the output of behavior plugin is not on lane.
-  if (
-    const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
-      status_->getMapPose(), getBoundingBox(), route_planner_.getWholeRouteLanelets(), true,
-      getDefaultMatchingDistanceForLaneletPoseCalculation())) {
-    status_->set(
-      CanonicalizedEntityStatus(static_cast<EntityStatus>(*status_), canonicalized_lanelet_pose));
-  }
 
   if (const auto canonicalized_lanelet_pose = status_->getCanonicalizedLaneletPose()) {
     if (pose::isAtEndOfLanelets(canonicalized_lanelet_pose.value(), hdmap_utils_ptr_)) {
