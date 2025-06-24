@@ -70,7 +70,7 @@ TEST(TestRandomizer, generate_10NPC)
   EXPECT_EQ(description.npcs_descriptions.size(), size_t(10));
   EXPECT_NPC_DESCRIPTION_NEAR(
     description.npcs_descriptions[0],
-    makeNPCDescription("npc0", 0.7308464889, makeLaneletPose(34624, 7.5543207194)), EPS)
+    makeNPCDescription("npc0", 0.7308464889, makeLaneletPose(34624, 7.7143039896)), EPS)
   EXPECT_NPC_DESCRIPTION_NEAR(
     description.npcs_descriptions[1],
     makeNPCDescription("npc1", 2.1743651011, makeLaneletPose(34642, 5.2207237465)), EPS);
@@ -82,16 +82,16 @@ TEST(TestRandomizer, generate_10NPC)
     makeNPCDescription("npc3", 0.5684689900, makeLaneletPose(34615, 21.0757887426)), EPS);
   EXPECT_NPC_DESCRIPTION_NEAR(
     description.npcs_descriptions[4],
-    makeNPCDescription("npc4", 1.6430120231, makeLaneletPose(34684, 5.5834935067)), EPS);
+    makeNPCDescription("npc4", 1.6430120231, makeLaneletPose(34684, 5.7548613860)), EPS);
   EXPECT_NPC_DESCRIPTION_NEAR(
     description.npcs_descriptions[5],
-    makeNPCDescription("npc5", 0.9952537087, makeLaneletPose(34690, 18.9720777813)), EPS);
+    makeNPCDescription("npc5", 0.9952537087, makeLaneletPose(34690, 19.1332552306)), EPS);
   EXPECT_NPC_DESCRIPTION_NEAR(
     description.npcs_descriptions[6],
     makeNPCDescription("npc6", 2.5068937586, makeLaneletPose(34762, 6.9548768523)), EPS);
   EXPECT_NPC_DESCRIPTION_NEAR(
     description.npcs_descriptions[7],
-    makeNPCDescription("npc7", 0.5976369610, makeLaneletPose(34976, 2.5577956602)), EPS);
+    makeNPCDescription("npc7", 0.5976369610, makeLaneletPose(34976, 2.5737414491)), EPS);
   EXPECT_NPC_DESCRIPTION_NEAR(
     description.npcs_descriptions[8],
     makeNPCDescription("npc8", 2.1763201035, makeLaneletPose(34621, 9.4524364223)), EPS);
@@ -116,14 +116,14 @@ TEST(TestRandomizer, generate_8NPC)
   EXPECT_LANELET_POSE_NEAR(
     description.ego_start_position, makeLaneletPose(34648, 11.3744011441), EPS);
   EXPECT_LANELET_POSE_NEAR(
-    description.ego_goal_position, makeLaneletPose(34507, 55.3754803281), EPS);
+    description.ego_goal_position, makeLaneletPose(34507, 55.4049670982), EPS);
   EXPECT_POSE_NEAR(
     description.ego_goal_pose,
     geometry_msgs::build<geometry_msgs::msg::Pose>()
       .position(geometry_msgs::build<geometry_msgs::msg::Point>()
-                  .x(3799.5102437521)
-                  .y(73815.1830249432)
-                  .z(-2.9975350010))
+                  .x(3799.5364806647)
+                  .y(73815.1964672476)
+                  .z(-2.9981662487))
       .orientation(geometry_msgs::build<geometry_msgs::msg::Quaternion>()
                      .x(0.0)
                      .y(0.0)

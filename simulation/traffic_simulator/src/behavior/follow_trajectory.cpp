@@ -82,6 +82,8 @@ auto makeUpdatedStatus(
     using geometry_msgs::msg::Pose;
     using geometry_msgs::msg::Vector3;
 
+    const RoutingConfiguration routing_configuration{allow_lane_change};
+
     const auto quaternion = convertDirectionToQuaternion(
       geometry_msgs::build<Vector3>().x(to.x - from.x).y(to.y - from.y).z(to.z - from.z));
     const auto from_pose = geometry_msgs::build<Pose>().position(from).orientation(quaternion);
@@ -95,9 +97,13 @@ auto makeUpdatedStatus(
         if (
           const auto longitudinal_distance = distance::longitudinalDistance(
             from_canonicalized_lanelet_pose.value(), to_canonicalized_lanelet_pose.value(),
-            include_adjacent_lanelet, include_opposite_direction,
-            RoutingConfiguration(allow_lane_change))) {
-          return std::abs(longitudinal_distance.value());
+            include_adjacent_lanelet, include_opposite_direction, routing_configuration)) {
+          if (
+            const auto lateral_distance = distance::lateralDistance(
+              from_canonicalized_lanelet_pose.value(), to_canonicalized_lanelet_pose.value(),
+              routing_configuration)) {
+            return std::hypot(longitudinal_distance.value(), lateral_distance.value());
+          }
         }
       }
     }
