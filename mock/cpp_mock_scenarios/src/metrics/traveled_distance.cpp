@@ -49,7 +49,7 @@ private:
     } else if (const auto difference = std::abs(
                  ego_entity.getCanonicalizedStatus().getLaneletPose().s -
                  ego_entity.getTraveledDistance());
-               difference > 0.001) {
+               difference > std::numeric_limits<double>::epsilon()) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }  // LCOV_EXCL_STOP
     else if (api_.getCurrentTime() >= 12) {
