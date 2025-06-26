@@ -214,9 +214,11 @@ auto make(const traffic_simulator_msgs::EntityStatus & status)
     switch (status.subtype().value()) {
       case traffic_simulator_msgs::EntitySubtype::BICYCLE:
       case traffic_simulator_msgs::EntitySubtype::MOTORCYCLE:
-        return autoware_perception_msgs::msg::DetectedObjectKinematics::SIGN_UNKNOWN;
-      default:
+      case traffic_simulator_msgs::EntitySubtype::PEDESTRIAN:
+      case traffic_simulator_msgs::EntitySubtype::UNKNOWN:
         return autoware_perception_msgs::msg::DetectedObjectKinematics::UNAVAILABLE;
+      default:
+        return autoware_perception_msgs::msg::DetectedObjectKinematics::SIGN_UNKNOWN;
     }
   }();
 
