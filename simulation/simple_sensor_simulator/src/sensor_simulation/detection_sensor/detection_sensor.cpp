@@ -611,7 +611,7 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
             };
 
           const auto base_path = std::string(detected_objects_publisher->get_topic_name()) +
-                                 ".noise.v3." + noise_config_name + ".target.";
+                                 ".noise.v3." + noise_config_name + ".noise_application_entities.";
 
           const auto types = common::getParameter<std::vector<std::string>>(base_path + "types");
           const auto subtypes =
