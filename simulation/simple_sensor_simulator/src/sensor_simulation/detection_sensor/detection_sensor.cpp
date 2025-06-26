@@ -31,9 +31,7 @@
 #include <simple_sensor_simulator/sensor_simulation/detection_sensor/detection_sensor.hpp>
 #include <simulation_interface/conversions.hpp>
 #include <string>
-#include <string_view>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
-#include <unordered_set>
 #include <vector>
 
 namespace simple_sensor_simulator
@@ -361,21 +359,9 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
         };
 
         auto parameters = [this](const auto & name, const std::string & prefix_namespace) {
-          const auto full_name = detected_objects_publisher->get_topic_name() +
-                                 std::string(".noise.") + prefix_namespace + "." + name;
-          const auto parameters = common::getParameter<std::vector<double>>(full_name);
-          static const auto size = parameters.size();
-          if (parameters.size() != size) {
-            throw common::Error(
-              "The sizes of the arrays given to the parameters of noise model version ",
-              prefix_namespace,
-              " must be "
-              "the same. The parameter ",
-              std::quoted(full_name), " is an array of size ", parameters.size(),
-              ", and the other arrays are of size ", size, ".");
-          } else {
-            return parameters;
-          }
+          return common::getParameter<std::vector<double>>(
+            detected_objects_publisher->get_topic_name() + std::string(".noise.") +
+            prefix_namespace + "." + name);
         };
 
         /*
@@ -430,22 +416,31 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
           return [ellipse_y_radii = parameters("ellipse_y_radii", parameter_prefix_namespace),
                   ellipse_normalized_x_radius =
                     parameter(name + ".ellipse_normalized_x_radius", parameter_prefix_namespace),
-                  values = parameters(name + ".values", parameter_prefix_namespace), &x, &y]() {
-            /*
-               If the parameter `<topic-name>.noise.v2.ellipse_y_radii`
-               contains the value 0.0, division by zero will occur here.
-               However, in that case, the distance will be NaN, which correctly
-               expresses the meaning that "the distance cannot be defined", and
-               this function will work without any problems (zero will be
-               returned).
-            */
-            const auto distance = std::hypot(x / ellipse_normalized_x_radius, y);
-            for (auto i = std::size_t(0); i < ellipse_y_radii.size(); ++i) {
-              if (distance < ellipse_y_radii[i]) {
-                return values[i];
+                  values = parameters(name + ".values", parameter_prefix_namespace), &x, &y,
+                  parameter_prefix_namespace, name]() {
+            if (ellipse_y_radii.size() == values.size()) {
+              /*
+                 If the parameter `<topic-name>.noise.v2.ellipse_y_radii`
+                 contains the value 0.0, division by zero will occur here.
+                 However, in that case, the distance will be NaN, which correctly
+                 expresses the meaning that "the distance cannot be defined", and
+                 this function will work without any problems (zero will be
+                 returned).
+              */
+              const auto distance = std::hypot(x / ellipse_normalized_x_radius, y);
+              for (auto i = std::size_t(0); i < ellipse_y_radii.size(); ++i) {
+                if (distance < ellipse_y_radii[i]) {
+                  return values[i];
+                }
               }
+              return 0.0;
+            } else {
+              throw common::Error(
+                "The sizes of the arrays ellipse_y_radii(", ellipse_y_radii.size(), ") and ", name,
+                ".ellipse_normalized_x_radius(", values.size(),
+                ") in the namespace for noise model version ", parameter_prefix_namespace,
+                " must be the same.");
             }
-            return 0.0;
           };
         };
 
