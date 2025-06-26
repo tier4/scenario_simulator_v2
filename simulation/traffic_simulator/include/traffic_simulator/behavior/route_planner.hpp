@@ -27,6 +27,7 @@ class RoutePlanner
 public:
   explicit RoutePlanner(const traffic_simulator::RoutingGraphType &);
 
+  auto getWholeRouteLanelets() const -> lanelet::Ids { return whole_lanelet_ids_; }
   auto getRouteLanelets(const CanonicalizedLaneletPose & entity_lanelet_pose, double horizon = 100)
     -> lanelet::Ids;
 
@@ -50,6 +51,7 @@ private:
      which is not iterable.
   */
   std::deque<traffic_simulator::CanonicalizedLaneletPose> waypoint_queue_;
+  lanelet::Ids whole_lanelet_ids_;
 };
 }  // namespace traffic_simulator
 
