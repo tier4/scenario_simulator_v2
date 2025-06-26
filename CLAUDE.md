@@ -21,13 +21,17 @@ This is the scenario_simulator_v2 project - a scenario testing framework for Aut
 
 ## Git Conventions
 - **Commit messages**: Write in English, keep concise and clear
-- **Pull requests**: Follow PULL_REQUEST_TEMPLATE.md structure:
+- **Pull requests**: Always create as Draft Pull Request initially, follow PULL_REQUEST_TEMPLATE.md structure:
   - **Abstract**: [Required] Short, clear summary
   - **Background**: [Optional] Context and circumstances (use N/A if not applicable)
   - **Details**: [Optional] Detailed explanation of changes (use N/A if not applicable)
   - **References**: [Optional] Standards, algorithms, articles referenced (use N/A if not applicable)
   - **Destructive Changes**: [Optional] Breaking changes with migration guide (use N/A if not applicable)
   - **Known Limitations**: [Optional] Limitations of the implementation (use N/A if not applicable)
+- **PR Labels**: Apply appropriate version bump labels:
+  - **bump patch**: No source code changes (docs, configs, etc.)
+  - **bump minor**: Backward compatible changes (new functions, features)
+  - **bump major**: Breaking changes (modified function signatures, removed APIs)
 
 ## Development Commands
 
