@@ -19,6 +19,16 @@ This is the scenario_simulator_v2 project - a scenario testing framework for Aut
 - **Build System**: Colcon/CMake
 - **Scenario Format**: OpenSCENARIO 1.2/1.3
 
+## Git Conventions
+- **Commit messages**: Write in English, keep concise and clear
+- **Pull requests**: Follow PULL_REQUEST_TEMPLATE.md structure:
+  - **Abstract**: [Required] Short, clear summary
+  - **Background**: [Optional] Context and circumstances
+  - **Details**: [Optional] Detailed explanation of changes
+  - **References**: [Optional] Standards, algorithms, articles referenced
+  - **Destructive Changes**: [Optional] Breaking changes with migration guide
+  - **Known Limitations**: [Optional] Limitations of the implementation
+
 ## Development Commands
 
 ### Formatting
