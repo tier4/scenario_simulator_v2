@@ -23,6 +23,7 @@
 #include <geometry/quaternion/get_normal_vector.hpp>
 #include <geometry/quaternion/get_rotation_matrix.hpp>
 #include <geometry/vector3/hypot.hpp>
+#include <iomanip>
 #include <memory>
 #include <random>
 #include <regex>
@@ -436,10 +437,12 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
               return 0.0;
             } else {
               throw common::Error(
-                "The sizes of the arrays ellipse_y_radii(", ellipse_y_radii.size(), ") and ", name,
-                ".ellipse_normalized_x_radius(", values.size(),
-                ") in the namespace for noise model version ", parameter_prefix_namespace,
-                " must be the same.");
+                "Array size mismatch: ", std::quoted("ellipse_y_radii"), " has ",
+                ellipse_y_radii.size(), " elements, but ", std::quoted(name + ".values"), " has ",
+                values.size(),
+                " elements. Both arrays must have the same size in namespace for noise model "
+                "version ",
+                std::quoted(parameter_prefix_namespace), ".");
             }
           };
         };
