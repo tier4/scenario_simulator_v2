@@ -80,11 +80,12 @@ target_include_directories(${PROJECT_NAME}_component PRIVATE
 )
 
 agnocast_wrapper_setup(${PROJECT_NAME}_component)
+
 if(DEFINED ENV{ENABLE_AGNOCAST_SIMULATOR} AND "$ENV{ENABLE_AGNOCAST_SIMULATOR}" STREQUAL "1")
-ament_target_dependencies(simple_sensor_simulator_component agnocastlib)
-target_include_directories(${PROJECT_NAME}_component PRIVATE
-  ${agnocastlib_INCLUDE_DIRS}
-)
+  ament_target_dependencies(simple_sensor_simulator_component agnocastlib)
+  target_include_directories(${PROJECT_NAME}_component PRIVATE
+    ${agnocastlib_INCLUDE_DIRS}
+  )
 endif()
 
 rclcpp_components_register_nodes(simple_sensor_simulator_component
@@ -105,7 +106,7 @@ install(TARGETS
 )
 
 install(TARGETS simple_sensor_simulator_component
-EXPORT export_simple_sensor_simulator_component
+  EXPORT export_simple_sensor_simulator_component
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin)
@@ -116,4 +117,11 @@ if(BUILD_TESTING)
 
   add_subdirectory(test)
 endif()
-ament_auto_package(USE_SCOPED_HEADER_INSTALL_DIR)
+
+if(($ENV{ROS_DISTRO} STREQUAL "jazzy" AND ${ament_cmake_auto_VERSION} VERSION_GREATER 2.5.3) OR
+  ($ENV{ROS_DISTRO} STREQUAL "humble" AND ${ament_cmake_auto_VERSION} VERSION_GREATER 1.3.11))
+  # For ROS 2 Jazzy and Humble, we need to use the scoped header install directory.
+  ament_auto_package(USE_SCOPED_HEADER_INSTALL_DIR)
+else()
+  ament_auto_package()
+endif()

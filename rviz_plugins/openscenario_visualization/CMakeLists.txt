@@ -58,7 +58,16 @@ endif()
 
 pluginlib_export_plugin_description_file(rviz_common plugins.xml)
 
-ament_auto_package(USE_SCOPED_HEADER_INSTALL_DIR
-  INSTALL_TO_SHARE
-  icons
-)
+if(($ENV{ROS_DISTRO} STREQUAL "jazzy" AND ${ament_cmake_auto_VERSION} VERSION_GREATER 2.5.3) OR
+  ($ENV{ROS_DISTRO} STREQUAL "humble" AND ${ament_cmake_auto_VERSION} VERSION_GREATER 1.3.11))
+  # For ROS 2 Jazzy and Humble, we need to use the scoped header install directory.
+  ament_auto_package(USE_SCOPED_HEADER_INSTALL_DIR
+    INSTALL_TO_SHARE
+    icons
+  )
+else()
+  ament_auto_package(
+    INSTALL_TO_SHARE
+    icons
+  )
+endif()

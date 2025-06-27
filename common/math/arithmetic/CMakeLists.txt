@@ -14,4 +14,10 @@ find_package(ament_cmake_auto REQUIRED)
 
 ament_auto_find_build_dependencies()
 
-ament_auto_package(USE_SCOPED_HEADER_INSTALL_DIR)
+if(($ENV{ROS_DISTRO} STREQUAL "jazzy" AND ${ament_cmake_auto_VERSION} VERSION_GREATER 2.5.3) OR
+  ($ENV{ROS_DISTRO} STREQUAL "humble" AND ${ament_cmake_auto_VERSION} VERSION_GREATER 1.3.11))
+  # For ROS 2 Jazzy and Humble, we need to use the scoped header install directory.
+  ament_auto_package(USE_SCOPED_HEADER_INSTALL_DIR)
+else()
+  ament_auto_package()
+endif()

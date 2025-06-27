@@ -39,6 +39,7 @@ ament_auto_add_executable(traffic_simulation_demo
 target_link_libraries(traffic_simulation_demo cpp_scenario_node)
 
 option(BUILD_CPP_MOCK_SCENARIOS "Building the C++ scenarios" OFF)
+
 if(BUILD_CPP_MOCK_SCENARIOS)
   add_subdirectory(src/behavior_plugin)
   add_subdirectory(src/collision)
@@ -58,9 +59,9 @@ if(BUILD_CPP_MOCK_SCENARIOS)
   add_subdirectory(src/synchronized_action)
   add_subdirectory(src/traffic_sink)
   add_subdirectory(src/traffic_source)
+
   # The scenarios recorded in this directory are commented out as they require EgoEntity and cannot be used for CI.
   # add_subdirectory(src/respawn_ego)
-
 endif()
 
 install(
@@ -75,12 +76,24 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 
   include(cmake/add_cpp_mock_scenario_test.cmake)
+
   # add_cpp_mock_scenario_test(${PROJECT_NAME} "traffic_simulation_demo" "70")
 endif()
 
-ament_auto_package(USE_SCOPED_HEADER_INSTALL_DIR
-  INSTALL_TO_SHARE
+if(($ENV{ROS_DISTRO} STREQUAL "jazzy" AND ${ament_cmake_auto_VERSION} VERSION_GREATER 2.5.3) OR
+  ($ENV{ROS_DISTRO} STREQUAL "humble" AND ${ament_cmake_auto_VERSION} VERSION_GREATER 1.3.11))
+  # For ROS 2 Jazzy and Humble, we need to use the scoped header install directory.
+  ament_auto_package(USE_SCOPED_HEADER_INSTALL_DIR
+    INSTALL_TO_SHARE
     launch
     rviz
     cmake
-  CONFIG_EXTRAS "${PROJECT_NAME}_ament_cmake-extras.cmake")
+    CONFIG_EXTRAS "${PROJECT_NAME}_ament_cmake-extras.cmake")
+else()
+  ament_auto_package(
+    INSTALL_TO_SHARE
+    launch
+    rviz
+    cmake
+    CONFIG_EXTRAS "${PROJECT_NAME}_ament_cmake-extras.cmake")
+endif()
