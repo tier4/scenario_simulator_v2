@@ -53,6 +53,30 @@ auto getParameter(const std::string & name, T value = {})
 {
   return getParameter(getParameterNode().get_node_parameters_interface(), name, value);
 }
+
+inline auto listChildParameterNamespaces(const std::string & base_path) -> std::vector<std::string>
+{
+  std::vector<std::string> namespaces;
+  const auto parameter_names =
+    getParameterNode()
+      .list_parameters({}, rcl_interfaces::srv::ListParameters::Request::DEPTH_RECURSIVE)
+      .names;
+
+  for (const auto & parameter_name : parameter_names) {
+    if (parameter_name.find(base_path) == 0) {
+      const auto remainder = parameter_name.substr(base_path.length());
+      const auto dot_pos = remainder.find('.');
+      if (dot_pos != std::string::npos) {
+        const auto namespace_name = remainder.substr(0, dot_pos);
+        if (std::find(namespaces.begin(), namespaces.end(), namespace_name) == namespaces.end()) {
+          namespaces.push_back(namespace_name);
+        }
+      }
+    }
+  }
+
+  return namespaces;
+}
 }  // namespace common
 
 #endif  // COMMON__GET_PARAMETER_HPP_
