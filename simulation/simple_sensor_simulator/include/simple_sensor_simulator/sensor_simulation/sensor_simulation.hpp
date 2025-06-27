@@ -15,7 +15,7 @@
 #ifndef SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__SENSOR_SIMULATION_HPP_
 #define SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__SENSOR_SIMULATION_HPP_
 
-#include <simulation_api_schema.pb.h>
+#include <simulation_interface/simulation_api_schema.pb.h>
 
 #include <agnocast_wrapper/agnocast_wrapper.hpp>
 #include <autoware_perception_msgs/msg/detected_objects.hpp>

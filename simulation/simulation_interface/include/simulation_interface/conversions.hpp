@@ -15,12 +15,12 @@
 #ifndef SIMULATION_INTERFACE__CONVERSIONS_HPP_
 #define SIMULATION_INTERFACE__CONVERSIONS_HPP_
 
-#include <builtin_interfaces.pb.h>
-#include <geometry_msgs.pb.h>
-#include <rosgraph_msgs.pb.h>
-#include <simulation_api_schema.pb.h>
-#include <std_msgs.pb.h>
-#include <traffic_simulator_msgs.pb.h>
+#include <simulation_interface/builtin_interfaces.pb.h>
+#include <simulation_interface/geometry_msgs.pb.h>
+#include <simulation_interface/rosgraph_msgs.pb.h>
+#include <simulation_interface/simulation_api_schema.pb.h>
+#include <simulation_interface/std_msgs.pb.h>
+#include <simulation_interface/traffic_simulator_msgs.pb.h>
 
 #include <autoware_control_msgs/msg/control.hpp>
 #include <autoware_vehicle_msgs/msg/gear_command.hpp>

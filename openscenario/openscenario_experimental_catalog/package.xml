@@ -6,6 +6,7 @@
   <description>TIER IV experimental catalogs for OpenSCENARIO</description>
   <maintainer email="tatsuya.yamasaki@tier4.jp">Tatsuya Yamasaki</maintainer>
   <license>Apache License 2.0</license>
+  <buildtool_depend>ament_cmake</buildtool_depend>
   <export>
     <build_type>ament_cmake</build_type>
   </export>
