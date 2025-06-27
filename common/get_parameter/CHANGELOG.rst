@@ -5,6 +5,11 @@ Changelog for package get_parameter
 16.4.2 (2025-05-23)
 -------------------
 
+16.5.11 (2025-06-26)
+--------------------
+* Merge branch 'master' into fix/lanelet_pose_in_do_nothing
+* Contributors: Masaya Kataoka
+
 16.5.10 (2025-06-23)
 --------------------
 * Merge branch 'master' into devin/1750224079-update-communication-docs
