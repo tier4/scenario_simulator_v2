@@ -1,0 +1,25 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 489916a..19ab1ac 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -230,9 +230,11 @@ endif()
+ # Install
+ # -------
+ install(TARGETS ${INSTALL_TARGET_LIST}
++        EXPORT zmqpp-targets
+         RUNTIME DESTINATION bin
+         LIBRARY DESTINATION lib
+-        ARCHIVE DESTINATION lib)
++        ARCHIVE DESTINATION lib
++        INCLUDES DESTINATION include)
+ 
+ install(DIRECTORY src/zmqpp DESTINATION include/
+         FILES_MATCHING PATTERN "*.hpp")
+@@ -240,3 +242,7 @@ install(DIRECTORY src/zmqpp DESTINATION include/
+ install(FILES
+         "${CMAKE_CURRENT_BINARY_DIR}/zmqpp_export.h"
+         DESTINATION "include")
++
++install(EXPORT zmqpp-targets
++        FILE zmqpp-config.cmake
++        DESTINATION lib/cmake/zmqpp)
