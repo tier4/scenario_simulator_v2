@@ -336,7 +336,7 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
 
     auto apply_v2_style_noise = [&](
                                   const auto & detected_entities, auto simulation_time,
-                                  const std::string & parameter_prefix_namespace) {
+                                  const std::string & version_namespace) {
       auto noised_detected_entities = std::decay_t<decltype(detected_entities)>();
 
       for (auto detected_entity : detected_entities) {
@@ -353,16 +353,16 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
         const auto interval =
           simulation_time - std::exchange(noise_output->second.simulation_time, simulation_time);
 
-        auto parameter = [this](const auto & name, const std::string & prefix_namespace) {
+        auto parameter = [this, version_namespace](const auto & name) {
           return common::getParameter<double>(
             detected_objects_publisher->get_topic_name() + std::string(".noise.") +
-            prefix_namespace + "." + name);
+            version_namespace + "." + name);
         };
 
-        auto parameters = [this](const auto & name, const std::string & prefix_namespace) {
+        auto parameters = [this, version_namespace](const auto & name) {
           return common::getParameter<std::vector<double>>(
             detected_objects_publisher->get_topic_name() + std::string(".noise.") +
-            prefix_namespace + "." + name);
+            version_namespace + "." + name);
         };
 
         /*
@@ -404,21 +404,16 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
              phi(dt) = amplitude * exp(-decay * dt) + offset
         */
         auto autocorrelation_coefficient = [&](const std::string & name) {
-          const auto amplitude =
-            parameter(name + ".autocorrelation_coefficient.amplitude", parameter_prefix_namespace);
-          const auto decay =
-            parameter(name + ".autocorrelation_coefficient.decay", parameter_prefix_namespace);
-          const auto offset =
-            parameter(name + ".autocorrelation_coefficient.offset", parameter_prefix_namespace);
+          const auto amplitude = parameter(name + ".autocorrelation_coefficient.amplitude");
+          const auto decay = parameter(name + ".autocorrelation_coefficient.decay");
+          const auto offset = parameter(name + ".autocorrelation_coefficient.offset");
           return std::clamp(amplitude * std::exp(-decay * interval) + offset, 0.0, 1.0);
         };
 
         auto selector = [&](const std::string & name) {
-          return [ellipse_y_radii = parameters("ellipse_y_radii", parameter_prefix_namespace),
-                  ellipse_normalized_x_radius =
-                    parameter(name + ".ellipse_normalized_x_radius", parameter_prefix_namespace),
-                  values = parameters(name + ".values", parameter_prefix_namespace), &x, &y,
-                  parameter_prefix_namespace, name]() {
+          return [ellipse_y_radii = parameters("ellipse_y_radii"),
+                  ellipse_normalized_x_radius = parameter(name + ".ellipse_normalized_x_radius"),
+                  values = parameters(name + ".values"), &x, &y, version_namespace, name]() {
             if (ellipse_y_radii.size() == values.size()) {
               /*
                  If the parameter `<topic-name>.noise.v2.ellipse_y_radii`
@@ -442,7 +437,7 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
                 values.size(),
                 " elements. Both arrays must have the same size in namespace for noise model "
                 "version ",
-                std::quoted(parameter_prefix_namespace), ".");
+                std::quoted(version_namespace), ".");
             }
           };
         };
@@ -464,9 +459,8 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
         }();
 
         noise_output->second.flip = [&]() {
-          const auto speed_threshold =
-            parameter("yaw_flip.speed_threshold", parameter_prefix_namespace);
-          const auto rate = parameter("yaw_flip.rate", parameter_prefix_namespace);
+          const auto speed_threshold = parameter("yaw_flip.speed_threshold");
+          const auto rate = parameter("yaw_flip.rate");
           return speed < speed_threshold and
                  markov_process_noise(
                    noise_output->second.flip, rate, autocorrelation_coefficient("yaw_flip"));
@@ -521,17 +515,17 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
 
       const auto v3_namespaces = [this]() -> std::vector<std::string> {
         std::vector<std::string> namespaces;
-        const auto v3_prefix =
+        const auto v3_base_path =
           std::string(detected_objects_publisher->get_topic_name()) + ".noise.v3.";
-        const auto & param_node = common::getParameterNode();
-        const auto param_names =
-          param_node
+        const auto & parameter_node = common::getParameterNode();
+        const auto parameter_names =
+          parameter_node
             .list_parameters({}, rcl_interfaces::srv::ListParameters::Request::DEPTH_RECURSIVE)
             .names;
 
-        for (const auto & param_name : param_names) {
-          if (param_name.find(v3_prefix) == 0) {
-            const auto remainder = param_name.substr(v3_prefix.length());
+        for (const auto & parameter_name : parameter_names) {
+          if (parameter_name.find(v3_base_path) == 0) {
+            const auto remainder = parameter_name.substr(v3_base_path.length());
             const auto dot_pos = remainder.find('.');
             if (dot_pos != std::string::npos) {
               const auto namespace_name = remainder.substr(0, dot_pos);
