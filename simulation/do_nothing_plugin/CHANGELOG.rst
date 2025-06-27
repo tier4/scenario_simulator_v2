@@ -24,6 +24,27 @@ Changelog for package do_nothing_plugin
 16.4.2 (2025-05-23)
 -------------------
 
+16.5.11 (2025-06-26)
+--------------------
+* Merge pull request `#1623 <https://github.com/tier4/scenario_simulator_v2/issues/1623>`_ from tier4/fix/lanelet_pose_in_do_nothing
+  Fix/lanelet pose in do nothing
+* enable set route lanelet in DoNothingPlugin
+* Merge branch 'master' into fix/lanelet_pose_in_do_nothing
+* Contributors: Masaya Kataoka, Taiga
+
+16.5.10 (2025-06-23)
+--------------------
+* Merge branch 'master' into devin/1750224079-update-communication-docs
+* Contributors: Kotaro Yoshimoto
+
+16.5.9 (2025-06-23)
+-------------------
+* Merge branch 'master' into feature/use-add-pr-comment
+* Contributors: Kotaro Yoshimoto
+
+16.5.8 (2025-06-23)
+-------------------
+
 16.5.7 (2025-06-18)
 -------------------
 * Merge branch 'master' into dependabot/pip/requests-2.32.4
