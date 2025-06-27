@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <autoware_perception_msgs/msg/detected_objects.hpp>
 #include <autoware_perception_msgs/msg/tracked_objects.hpp>
+#include <boost/lexical_cast.hpp>
 #include <boost/uuid/string_generator.hpp>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
@@ -31,6 +32,7 @@
 #include <simple_sensor_simulator/exception.hpp>
 #include <simple_sensor_simulator/sensor_simulation/detection_sensor/detection_sensor.hpp>
 #include <simulation_interface/conversions.hpp>
+#include <simulation_interface/operators.hpp>
 #include <string>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 #include <vector>
@@ -546,47 +548,6 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
         auto matches_v3_target = [&](
                                    const traffic_simulator_msgs::EntityStatus & entity,
                                    const std::string & noise_config_name) -> bool {
-          auto entity_type_string = [](const traffic_simulator_msgs::EntityStatus & entity) {
-            switch (entity.type().type()) {
-              case traffic_simulator_msgs::EntityType::EGO:
-                return "EGO";
-              case traffic_simulator_msgs::EntityType::VEHICLE:
-                return "VEHICLE";
-              case traffic_simulator_msgs::EntityType::PEDESTRIAN:
-                return "PEDESTRIAN";
-              case traffic_simulator_msgs::EntityType::MISC_OBJECT:
-                return "MISC_OBJECT";
-              default:
-                throw common::Error(
-                  "Unknown entity type: " + std::to_string(static_cast<int>(entity.type().type())));
-            }
-          };
-
-          auto entity_subtype_string = [](const traffic_simulator_msgs::EntityStatus & entity) {
-            switch (entity.subtype().value()) {
-              case traffic_simulator_msgs::EntitySubtype::UNKNOWN:
-                return "UNKNOWN";
-              case traffic_simulator_msgs::EntitySubtype::CAR:
-                return "CAR";
-              case traffic_simulator_msgs::EntitySubtype::TRUCK:
-                return "TRUCK";
-              case traffic_simulator_msgs::EntitySubtype::BUS:
-                return "BUS";
-              case traffic_simulator_msgs::EntitySubtype::TRAILER:
-                return "TRAILER";
-              case traffic_simulator_msgs::EntitySubtype::MOTORCYCLE:
-                return "MOTORCYCLE";
-              case traffic_simulator_msgs::EntitySubtype::BICYCLE:
-                return "BICYCLE";
-              case traffic_simulator_msgs::EntitySubtype::PEDESTRIAN:
-                return "PEDESTRIAN";
-              default:
-                throw common::Error(
-                  "Unknown entity subtype: " +
-                  std::to_string(static_cast<int>(entity.subtype().value())));
-            }
-          };
-
           auto matches_target_list =
             [&](const std::vector<std::string> & targets, const std::string & entity_value) {
               auto match_wildcard =
@@ -609,9 +570,10 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
           const auto subtypes =
             common::getParameter<std::vector<std::string>>(base_path + "subtypes");
           const auto names = common::getParameter<std::vector<std::string>>(base_path + "names");
-
-          return matches_target_list(types, entity_type_string(entity)) &&
-                 matches_target_list(subtypes, entity_subtype_string(entity)) &&
+          using simulation_interface::operator<<;
+          return matches_target_list(types, boost::lexical_cast<std::string>(entity.type())) &&
+                 matches_target_list(
+                   subtypes, boost::lexical_cast<std::string>(entity.subtype())) &&
                  matches_target_list(names, entity.name());
         };
 
