@@ -49,6 +49,7 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   output_directory("/tmp"),
   publish_empty_context(false),
   record(false),
+  record_option(""),
   record_storage_id("")
 {
   DECLARE_PARAMETER(local_frame_rate);
@@ -57,6 +58,7 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   DECLARE_PARAMETER(output_directory);
   DECLARE_PARAMETER(publish_empty_context);
   DECLARE_PARAMETER(record);
+  DECLARE_PARAMETER(record_option);
   DECLARE_PARAMETER(record_storage_id);
 
   SpeedCondition::compatibility =
@@ -119,6 +121,7 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
       GET_PARAMETER(output_directory);
       GET_PARAMETER(publish_empty_context);
       GET_PARAMETER(record);
+      GET_PARAMETER(record_option);
       GET_PARAMETER(record_storage_id);
 
       script = std::make_shared<OpenScenario>(osc_path);
