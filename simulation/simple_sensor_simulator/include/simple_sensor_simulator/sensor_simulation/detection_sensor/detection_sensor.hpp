@@ -17,6 +17,7 @@
 
 #include <simulation_api_schema.pb.h>
 
+#include <autoware_perception_msgs/msg/tracked_objects.hpp>
 #include <geometry/plane.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 #include <get_parameter/get_parameter.hpp>
