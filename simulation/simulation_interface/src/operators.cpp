@@ -12,14 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <scenario_simulator_exception/exception.hpp>
 #include <simulation_interface/conversions.hpp>
 #include <simulation_interface/operators.hpp>
 
-namespace simulation_interface
+namespace traffic_simulator_msgs
 {
 std::ostream & operator<<(
   std::ostream & os, const traffic_simulator_msgs::msg::EntityType & entity_type)
 {
+  using traffic_simulator_msgs::msg::EntityType;
   static const std::unordered_map<uint8_t, std::string> string_map = {
     {EntityType::EGO, "EGO"},
     {EntityType::VEHICLE, "VEHICLE"},
@@ -38,8 +40,8 @@ std::ostream & operator<<(
 
 std::ostream & operator<<(std::ostream & os, const traffic_simulator_msgs::EntityType & entity_type)
 {
-  const traffic_simulator_msgs::msg::EntityType message;
-  toMsg(entity_type, message);
+  traffic_simulator_msgs::msg::EntityType message;
+  simulation_interface::toMsg(entity_type, message);
   os << message;
   return os;
 }
@@ -47,6 +49,7 @@ std::ostream & operator<<(std::ostream & os, const traffic_simulator_msgs::Entit
 std::ostream & operator<<(
   std::ostream & os, const traffic_simulator_msgs::msg::EntitySubtype & entity_subtype)
 {
+  using traffic_simulator_msgs::msg::EntitySubtype;
   static const std::unordered_map<uint8_t, std::string> entity_names = {
     {EntitySubtype::UNKNOWN, "UNKNOWN"}, {EntitySubtype::CAR, "CAR"},
     {EntitySubtype::TRUCK, "TRUCK"},     {EntitySubtype::BUS, "BUS"},
@@ -64,11 +67,11 @@ std::ostream & operator<<(
 }
 
 std::ostream & operator<<(
-  std::ostream & os, const traffic_simulator_msgs::msg::EntitySubtype & entity_subtype)
+  std::ostream & os, const traffic_simulator_msgs::EntitySubtype & entity_subtype)
 {
-  const traffic_simulator_msgs::msg::EntitySubtype message;
-  toMsg(entity_subtype, message);
+  traffic_simulator_msgs::msg::EntitySubtype message;
+  simulation_interface::toMsg(entity_subtype, message);
   os << message;
   return os;
 }
-}  // namespace simulation_interface
+}  // namespace traffic_simulator_msgs

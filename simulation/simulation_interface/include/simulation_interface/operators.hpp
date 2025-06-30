@@ -21,7 +21,7 @@
 #include <traffic_simulator_msgs/msg/entity_subtype.hpp>
 #include <traffic_simulator_msgs/msg/entity_type.hpp>
 
-namespace simulation_interface
+namespace traffic_simulator_msgs
 {
 std::ostream & operator<<(std::ostream &, const traffic_simulator_msgs::msg::EntityType &);
 
@@ -30,6 +30,6 @@ std::ostream & operator<<(std::ostream &, const traffic_simulator_msgs::EntityTy
 std::ostream & operator<<(std::ostream &, const traffic_simulator_msgs::msg::EntitySubtype &);
 
 std::ostream & operator<<(std::ostream &, const traffic_simulator_msgs::EntitySubtype &);
-}  // namespace simulation_interface
+}  // namespace traffic_simulator_msgs
 
 #endif  // SIMULATION_INTERFACE__OPERATORS_HPP_
