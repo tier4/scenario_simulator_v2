@@ -17,6 +17,7 @@
 
 #include <simulation_api_schema.pb.h>
 
+#include <autoware_perception_msgs/msg/tracked_objects.hpp>
 #include <geometry/plane.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 #include <get_parameter/get_parameter.hpp>
@@ -177,6 +178,8 @@ public:
               case 1:
                 return configuration_.random_seed();
               case 2:
+                [[fallthrough]];
+              case 3:
                 return common::getParameter<int>(
                   detected_objects_publisher->get_topic_name() + std::string(".seed"));
             }
