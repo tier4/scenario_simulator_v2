@@ -517,24 +517,10 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
 
       auto get_first_matched_config_name =
         [this](const traffic_simulator_msgs::EntityStatus & entity) -> std::string {
-        auto matches_v3_target = [&](
-                                   const traffic_simulator_msgs::EntityStatus & entity,
-                                   const std::string & noise_config_name) -> bool {
-          auto matches_target_list =
-            [&](const std::vector<std::string> & targets, const std::string & entity_value) {
-              auto match_wildcard =
-                [](const std::string & pattern, const std::string & text) -> bool {
-                std::string regex_pattern;
-                for (char c : pattern) {
-                  regex_pattern += (c == '*') ? ".*" : (c == '?') ? "." : std::string(1, c);
-                }
-                return std::regex_match(text, std::regex(regex_pattern));
-              };
-              return std::any_of(targets.begin(), targets.end(), [&](const auto & target) {
-                return match_wildcard(target, entity_value);
-              });
-            };
-
+        auto matches_v3_noise_application_entities =
+          [&](
+            const traffic_simulator_msgs::EntityStatus & entity,
+            const std::string & noise_config_name) -> bool {
           const auto base_path = std::string(detected_objects_publisher->get_topic_name()) +
                                  ".noise.v3." + noise_config_name + ".noise_application_entities.";
 
@@ -542,17 +528,42 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
           const auto subtypes =
             common::getParameter<std::vector<std::string>>(base_path + "subtypes");
           const auto names = common::getParameter<std::vector<std::string>>(base_path + "names");
-          using simulation_interface::operator<<;
-          return matches_target_list(types, boost::lexical_cast<std::string>(entity.type())) &&
-                 matches_target_list(
-                   subtypes, boost::lexical_cast<std::string>(entity.subtype())) &&
-                 matches_target_list(names, entity.name());
+
+          auto string_with_wildcards_to_regex =
+            [](const std::string & string_with_wildcards) -> std::regex {
+            std::string regex_pattern;
+            for (char c : string_with_wildcards) {
+              regex_pattern += (c == '*') ? ".*" : (c == '?') ? "." : std::string(1, c);
+            }
+            return std::regex(regex_pattern);
+          };
+
+          return std::any_of(
+                   types.begin(), types.end(),
+                   [entity_type = boost::lexical_cast<std::string>(entity.type()),
+                    string_with_wildcards_to_regex](const auto & target) {
+                     return std::regex_match(entity_type, string_with_wildcards_to_regex(target));
+                   }) &&
+                 std::any_of(
+                   subtypes.begin(), subtypes.end(),
+                   [entity_subtype = boost::lexical_cast<std::string>(entity.type()),
+                    string_with_wildcards_to_regex](const auto & target) {
+                     return std::regex_match(
+                       entity_subtype, string_with_wildcards_to_regex(target));
+                   }) &&
+                 std::any_of(
+                   names.begin(), names.end(),
+                   [entity_name = entity.name(),
+                    string_with_wildcards_to_regex](const auto & target) {
+                     return std::regex_match(entity_name, string_with_wildcards_to_regex(target));
+                   });
         };
 
-        const std::string v3_base_path =  std::string(detected_objects_publisher->get_topic_name()) + ".noise.v3.";
+        const std::string v3_base_path =
+          std::string(detected_objects_publisher->get_topic_name()) + ".noise.v3.";
         const auto v3_namespaces = common::listChildParameterNamespaces(v3_base_path);
         for (const auto & namespace_name : v3_namespaces) {
-          if (matches_v3_target(entity, namespace_name)) {
+          if (matches_v3_noise_application_entities(entity, namespace_name)) {
             // return first matched namespace_name
             return namespace_name;
           }
