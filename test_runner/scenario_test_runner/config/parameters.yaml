@@ -183,54 +183,11 @@
               ellipse_normalized_x_radius: 1.0
               values: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
         v3: # This clause is used only if `model.version` is 3.
-          shaking_misc:
+          no_noise_to_all:
             noise_application_entities:
-              types: [MISC_OBJECT]
+              types: ["*"]
               subtypes: ["*"]
-              names: ["*misc*"]
-            ellipse_y_radii: [ 10.0, 20.0, 40.0, 60.0, 80.0, 120.0, 150.0, 180.0, 1000.0 ]
-            distance:
-              autocorrelation_coefficient:
-                amplitude: 0.0
-                decay: 0.0
-                offset: 0.0
-              mean:
-                ellipse_normalized_x_radius: 1.0
-                values: [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ]
-              standard_deviation:
-                ellipse_normalized_x_radius: 1.0
-                values: [ 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 ]
-            yaw:
-              autocorrelation_coefficient:
-                amplitude: 0.0
-                decay: 0.0
-                offset: 0.0
-              mean:
-                ellipse_normalized_x_radius: 1.0
-                values: [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ]
-              standard_deviation:
-                ellipse_normalized_x_radius: 1.0
-                values: [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ]
-            yaw_flip:
-              autocorrelation_coefficient:
-                amplitude: 0.0
-                decay: 0.0
-                offset: 0.0
-              speed_threshold: 0.1
-              rate: 0.0
-            true_positive:
-              autocorrelation_coefficient:
-                amplitude: 0.0
-                decay: 0.0
-                offset: 0.0
-              rate:
-                ellipse_normalized_x_radius: 1.0
-                values: [ 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 ]
-          flashing_pedestrian:
-            noise_application_entities:
-              types: [VEHICLE, PEDESTRIAN]
-              subtypes: ["*"]
-              names: ["?e?e*"]
+              names: ["*"]
             ellipse_y_radii: [ 10.0, 20.0, 40.0, 60.0, 80.0, 120.0, 150.0, 180.0, 1000.0 ]
             distance:
               autocorrelation_coefficient:
@@ -268,7 +225,7 @@
                 offset: 0.0
               rate:
                 ellipse_normalized_x_radius: 1.0
-                values: [ 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5 ]
+                values: [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ]
     /perception/object_recognition/ground_truth/objects:
       version: 20240605 # architecture_type suffix (mandatory)
       override_legacy_configuration: false
