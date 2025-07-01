@@ -534,25 +534,26 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
             return std::regex(regex_pattern);
           };
 
+          // clang-format off
           return std::any_of(
                    types.begin(), types.end(),
-                   [entity_type = boost::lexical_cast<std::string>(entity.type()),
-                    string_with_wildcards_to_regex](const auto & target) {
+                   [entity_type = boost::lexical_cast<std::string>(entity.type()), string_with_wildcards_to_regex]
+                   (const auto & target) {
                      return std::regex_match(entity_type, string_with_wildcards_to_regex(target));
                    }) &&
                  std::any_of(
                    subtypes.begin(), subtypes.end(),
-                   [entity_subtype = boost::lexical_cast<std::string>(entity.type()),
-                    string_with_wildcards_to_regex](const auto & target) {
-                     return std::regex_match(
-                       entity_subtype, string_with_wildcards_to_regex(target));
+                   [entity_subtype = boost::lexical_cast<std::string>(entity.type()), string_with_wildcards_to_regex]
+                   (const auto & target) {
+                     return std::regex_match(entity_subtype, string_with_wildcards_to_regex(target));
                    }) &&
                  std::any_of(
                    names.begin(), names.end(),
-                   [entity_name = entity.name(),
-                    string_with_wildcards_to_regex](const auto & target) {
+                   [entity_name = entity.name(), string_with_wildcards_to_regex]
+                   (const auto & target) {
                      return std::regex_match(entity_name, string_with_wildcards_to_regex(target));
                    });
+          // clang-format on
         };
 
         const std::string v3_base_path =
