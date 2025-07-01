@@ -84,13 +84,15 @@ is used.
 A positive `int` type value, default `1`. If a non-existent version is
 specified, it is an error.
 This parameter specifies the version of the noise model to be used. Currently,
-the following two noise models are implemented:
+the following three noise models are implemented:
 - version: 1 - Simple noise model with position randomization
 - version: 2 - Elliptically approximated model of noise variation with distance
   from the ego entity
+- version: 3 - An extension of the noise model from version 2 to allow different 
+  configurations to be applied to different groups of entities.
 
-The parameters specific to the models are placed under `noise.v1.` and
-`noise.v2`, respectively.
+The parameters specific to the models are placed under `noise.v1.`, `noise.v2`,
+and `noise.v3.`, respectively.
 
 ### `noise.v1.position.standard_deviation`
 
@@ -412,6 +414,47 @@ is searched from `ellipse_y_radii` and the elements with the same index are
 referenced from `values`. Therefore, the array size of this parameter must be
 the same as `ellipse_y_radii`. Otherwise, it is an error. This parameter is
 used only if the value of `noise.model.version` is `2`.
+
+### `noise.v3.<config_name>` (namespace)
+
+The v3 noise model allows you to define multiple named noise configurations.
+`<config_name>` is a user-defined noise configuration identifier.
+`<config_name>` acts as a namespace under `noise.v3`, and contains noise parameters
+that are same as `noise.v2`, as well as parameters for specifying the entities
+that will be subject to the noise.
+
+### `noise.v3.<config_name>.noise_application_entities` (namespace)
+
+`noise_application_entities` is a namespace that contains three property-filtering parameters, types, subtypes, and names.
+These filters are combined with an AND condition and applied to all entities present in the scenario to create a set of entities.
+Noise is then applied to this set of entities using noise parameters set to the same v3-child-namespace.
+However, the behavior is undefined if there are entities that belong to entity sets with multiple v3-child-namespaces.
+
+### `noise.v3.<config_name>.noise_application_entities.types`
+
+Array of `string` type value, mandatory.
+This parameter specifies which entity types this noise configuration should be applied to.
+See [traffic_simulator_msgs/EntityType.msg](https://github.com/tier4/scenario_simulator_v2/blob/284f34b11f701e917bf8b4bf018fab3e792dc7db/simulation/traffic_simulator_msgs/msg/EntityType.msg) to confirm valid entity types.
+Supports wildcard expressions `?` and `*` within each string.
+The array is evaluated as an entity filter that represents a condition to OR the entity sets that match each string.
+This parameter is used only if the value of `noise.model.version` is `3`.
+
+### `noise.v3.<config_name>.noise_application_entities.subtypes`
+
+Array of `string` type value, mandatory.
+This parameter specifies which entity types this noise configuration should be applied to.
+See [traffic_simulator_msgs/EntitySubtype.msg](https://github.com/tier4/scenario_simulator_v2/blob/284f34b11f701e917bf8b4bf018fab3e792dc7db/simulation/traffic_simulator_msgs/msg/EntitySubtype.msg) to confirm valid entity types.
+Supports wildcard expressions `?` and `*` within each string.
+The array is evaluated as an entity filter that represents a condition to OR the entity sets that match each string.
+This parameter is used only if the value of `noise.model.version` is `3`.
+
+### `noise.v3.<config_name>.noise_application_entities.names`
+
+Array of `string` type value, mandatory.
+This parameter specifies which entity types this noise configuration should be applied to.
+Supports wildcard expressions `?` and `*` within each string.
+The array is evaluated as an entity filter that represents a condition to OR the entity sets that match each string.
+This parameter is used only if the value of `noise.model.version` is `3`.
 
 ## /perception/object_recognition/ground_truth/objects
 
