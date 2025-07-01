@@ -12,6 +12,12 @@ Changelog for package simple_cross_map
 16.4.2 (2025-05-23)
 -------------------
 
+16.6.0 (2025-07-01)
+-------------------
+* Merge branch 'master' into feature/perception_noise_config_v3
+* Merge branch 'master' into feature/perception_noise_config_v3
+* Contributors: Kotaro Yoshimoto
+
 16.5.11 (2025-06-26)
 --------------------
 * Merge branch 'master' into fix/lanelet_pose_in_do_nothing
