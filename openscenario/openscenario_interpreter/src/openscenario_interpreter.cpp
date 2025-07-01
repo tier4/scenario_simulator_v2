@@ -24,6 +24,7 @@
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <openscenario_interpreter/syntax/speed_condition.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
+#include <sstream>
 #include <status_monitor/status_monitor.hpp>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
 
@@ -228,14 +229,22 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
       },
       [&]() {
         if (record) {
-          if (record_storage_id == "") {
-            record::start(
-              "-a", "-o", boost::filesystem::path(osc_path).replace_extension("").string());
-          } else {
-            record::start(
-              "-a", "-o", boost::filesystem::path(osc_path).replace_extension("").string(), "-s",
-              record_storage_id);
+          std::vector<std::string> options{
+            "-a", "-o", boost::filesystem::path(osc_path).replace_extension("").string()};
+
+          if (not record_storage_id.empty()) {
+            options.insert(options.end(), {"-s", record_storage_id});
           }
+
+          if (not record_option.empty()) {
+            // split the record_option string with space.
+            std::istringstream iss(record_option);
+            std::copy(
+              std::istream_iterator<std::string>(iss), std::istream_iterator<std::string>(),
+              std::back_inserter(options));
+          }
+
+          record::start(options);
         }
 
         SimulatorCore::activate(
