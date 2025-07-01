@@ -336,9 +336,9 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
       return detected_entities;
     };
 
-    auto apply_v2_style_noise = [&](
-                                  const auto & detected_entities, auto simulation_time,
-                                  const std::string & version_namespace) {
+    auto noise_v2 = [&](
+                      const auto & detected_entities, auto simulation_time,
+                      const std::string & version_namespace) {
       auto noised_detected_entities = std::decay_t<decltype(detected_entities)>();
 
       for (auto detected_entity : detected_entities) {
@@ -508,10 +508,6 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
       return noised_detected_entities;
     };
 
-    auto noise_v2 = [&](const auto & detected_entities, auto simulation_time) {
-      return apply_v2_style_noise(detected_entities, simulation_time, "v2");
-    };
-
     auto noise_v3 = [&](const auto & detected_entities, auto simulation_time) {
       auto noised_detected_entities = std::decay_t<decltype(detected_entities)>();
 
@@ -577,7 +573,7 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
             not matched_config_name.empty()) {
           auto vanilla_entity = std::vector<traffic_simulator_msgs::EntityStatus>{entity};
           auto noised_entity =
-            apply_v2_style_noise(vanilla_entity, simulation_time, "v3." + matched_config_name);
+            noise_v2(vanilla_entity, simulation_time, "v3." + matched_config_name);
           noised_detected_entities.insert(
             noised_detected_entities.end(), noised_entity.begin(), noised_entity.end());
         } else {
@@ -596,7 +592,7 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
         case 1:
           return noise_v1(std::forward<decltype(xs)>(xs)...);
         case 2:
-          return noise_v2(std::forward<decltype(xs)>(xs)...);
+          return noise_v2(std::forward<decltype(xs)>(xs)..., "v2");
         case 3:
           return noise_v3(std::forward<decltype(xs)>(xs)...);
       }
