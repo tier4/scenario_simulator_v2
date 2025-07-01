@@ -558,15 +558,37 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
 
         const std::string v3_base_path =
           std::string(detected_objects_publisher->get_topic_name()) + ".noise.v3.";
-        const auto v3_namespaces = common::listChildParameterNamespaces(v3_base_path);
-        for (const auto & namespace_name : v3_namespaces) {
-          if (matches_v3_noise_application_entities(entity, namespace_name)) {
-            // return first matched namespace_name
-            return namespace_name;
+
+        const auto parameter_names =
+          common::getParameterNode()
+            .list_parameters({}, rcl_interfaces::srv::ListParameters::Request::DEPTH_RECURSIVE)
+            .names;
+
+        auto extract_v3_child_namespace = [&](const std::string & parameter_name) -> std::string {
+          if (const auto next_dot_pos = parameter_name.find('.', v3_base_path.length());
+              next_dot_pos != std::string::npos) {
+            return parameter_name.substr(
+              v3_base_path.length(), next_dot_pos - v3_base_path.length());
           }
+          return "";
+        };
+
+        if (auto v3_matched_parameter = std::find_if(
+              parameter_names.begin(), parameter_names.end(),
+              [&](const auto & parameter_name) {
+                if (parameter_name.rfind(v3_base_path, 0) == 0) {
+                  if (auto child_namespace = extract_v3_child_namespace(parameter_name);
+                      child_namespace != "") {
+                    return matches_v3_noise_application_entities(entity, child_namespace);
+                  }
+                }
+                return false;
+              });
+            v3_matched_parameter != parameter_names.end()) {
+          return extract_v3_child_namespace(*v3_matched_parameter);
+        } else {
+          return "";
         }
-        // if no matched namespace_name is found, return an empty string
-        return "";
       };
 
       for (const auto & entity : detected_entities) {
