@@ -543,7 +543,7 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
                    }) &&
                  std::any_of(
                    subtypes.begin(), subtypes.end(),
-                   [entity_subtype = boost::lexical_cast<std::string>(entity.type()), string_with_wildcards_to_regex]
+                   [entity_subtype = boost::lexical_cast<std::string>(entity.subtype()), string_with_wildcards_to_regex]
                    (const auto & target) {
                      return std::regex_match(entity_subtype, string_with_wildcards_to_regex(target));
                    }) &&
