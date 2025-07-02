@@ -24,6 +24,9 @@ Changelog for package arithmetic
 16.4.2 (2025-05-23)
 -------------------
 
+16.6.1 (2025-07-02)
+-------------------
+
 16.6.0 (2025-07-01)
 -------------------
 * Merge branch 'master' into feature/perception_noise_config_v3
