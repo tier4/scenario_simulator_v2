@@ -27,8 +27,14 @@ auto RoutePlanner::setWaypoints(const std::vector<CanonicalizedLaneletPose> & wa
 {
   // Just setting waypoints to the queue, do not planning route.
   waypoint_queue_.clear();
+  whole_lanelet_ids_.clear();
   for (const auto & waypoint : waypoints) {
     waypoint_queue_.push_back(waypoint);
+    if (whole_lanelet_ids_.empty()) {
+      whole_lanelet_ids_.push_back(waypoint.getLaneletPose().lanelet_id);
+    } else if (whole_lanelet_ids_.back() != waypoint.getLaneletPose().lanelet_id) {
+      whole_lanelet_ids_.push_back(waypoint.getLaneletPose().lanelet_id);
+    }
   }
 }
 

@@ -24,6 +24,20 @@ Changelog for package openscenario_interpreter_example
 16.4.2 (2025-05-23)
 -------------------
 
+16.6.1 (2025-07-02)
+-------------------
+
+16.6.0 (2025-07-01)
+-------------------
+* Merge branch 'master' into feature/perception_noise_config_v3
+* Merge branch 'master' into feature/perception_noise_config_v3
+* Contributors: Kotaro Yoshimoto
+
+16.5.11 (2025-06-26)
+--------------------
+* Merge branch 'master' into fix/lanelet_pose_in_do_nothing
+* Contributors: Masaya Kataoka
+
 16.5.10 (2025-06-23)
 --------------------
 * Merge branch 'master' into devin/1750224079-update-communication-docs
