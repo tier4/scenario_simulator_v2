@@ -24,6 +24,12 @@ Changelog for package status_monitor
 16.4.2 (2025-05-23)
 -------------------
 
+16.7.0 (2025-07-03)
+-------------------
+* Merge branch 'master' into feature/record_option_for_rosbag
+* Merge branch 'master' into feature/record_option_for_rosbag
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
 16.6.1 (2025-07-02)
 -------------------
 
