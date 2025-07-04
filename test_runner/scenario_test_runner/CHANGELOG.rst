@@ -38,6 +38,16 @@ Changelog for package scenario_test_runner
 16.4.2 (2025-05-23)
 -------------------
 
+16.7.1 (2025-07-04)
+-------------------
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka
+
 16.7.0 (2025-07-03)
 -------------------
 * Merge pull request `#1639 <https://github.com/tier4/scenario_simulator_v2/issues/1639>`_ from tier4/feature/record_option_for_rosbag

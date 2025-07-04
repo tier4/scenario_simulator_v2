@@ -24,6 +24,16 @@ Changelog for package openscenario_msgs
 16.4.2 (2025-05-23)
 -------------------
 
+16.7.1 (2025-07-04)
+-------------------
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka
+
 16.7.0 (2025-07-03)
 -------------------
 * Merge branch 'master' into feature/record_option_for_rosbag
