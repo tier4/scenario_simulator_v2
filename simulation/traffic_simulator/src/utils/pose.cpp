@@ -15,6 +15,7 @@
 #include <geometry/bounding_box.hpp>
 #include <geometry/quaternion/euler_to_quaternion.hpp>
 #include <geometry/quaternion/quaternion_to_euler.hpp>
+#include <geometry/vector3/hypot.hpp>
 #include <geometry/vector3/norm.hpp>
 #include <geometry/vector3/normalize.hpp>
 #include <geometry/vector3/operator.hpp>
