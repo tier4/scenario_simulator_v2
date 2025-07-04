@@ -15,7 +15,7 @@
 #ifndef SIMULATION_INTERFACE__OPERATORS_HPP_
 #define SIMULATION_INTERFACE__OPERATORS_HPP_
 
-#include <traffic_simulator_msgs.pb.h>
+#include <simulation_interface/traffic_simulator_msgs.pb.h>
 
 #include <ostream>
 #include <traffic_simulator_msgs/msg/entity_subtype.hpp>
