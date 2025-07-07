@@ -94,10 +94,18 @@ auto makeUpdatedStatus(
       if (
         const auto to_canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
           to_pose, entity_status.bounding_box, include_crosswalk, matching_distance)) {
-        if (
-          const auto longitudinal_distance = distance::longitudinalDistance(
-            from_canonicalized_lanelet_pose.value(), to_canonicalized_lanelet_pose.value(),
-            include_adjacent_lanelet, include_opposite_direction, routing_configuration)) {
+        if (const auto longitudinal_distance = distance::longitudinalDistance(
+              from_canonicalized_lanelet_pose.value(), to_canonicalized_lanelet_pose.value(),
+              include_adjacent_lanelet, include_opposite_direction, routing_configuration);
+            longitudinal_distance.has_value()
+            /**
+             * DIRTY HACK!
+             * Negative longitudinal distance (calculated along lanelet in opposite direction)
+             * causes some scenarios to fail because of an unrelated issue with lanelet matching.
+             * The issue is caused by wrongly matched lanelet poses and thus wrong distances.
+             * When lanelet matching errors are fixed, this dirty hack can be removed.
+             */
+            and longitudinal_distance.value() >= 0.0) {
           if (
             const auto lateral_distance = distance::lateralDistance(
               from_canonicalized_lanelet_pose.value(), to_canonicalized_lanelet_pose.value(),
