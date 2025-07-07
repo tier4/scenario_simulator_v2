@@ -24,6 +24,12 @@ Changelog for package status_monitor
 16.4.2 (2025-05-23)
 -------------------
 
+16.7.2 (2025-07-07)
+-------------------
+* Merge branch 'master' into fix/zmqpp
+* Merge branch 'master' into fix/zmqpp
+* Contributors: Kotaro Yoshimoto
+
 16.7.1 (2025-07-04)
 -------------------
 * Merge pull request `#1631 <https://github.com/tier4/scenario_simulator_v2/issues/1631>`_ from tier4/refactor/cmakelists

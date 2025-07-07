@@ -27,6 +27,12 @@ Changelog for package embree_vendor
 16.4.2 (2025-05-23)
 -------------------
 
+16.7.2 (2025-07-07)
+-------------------
+* Merge branch 'master' into fix/zmqpp
+* Merge branch 'master' into fix/zmqpp
+* Contributors: Kotaro Yoshimoto
+
 16.7.1 (2025-07-04)
 -------------------
 * Merge branch 'master' into refactor/cmakelists
