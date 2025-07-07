@@ -16,7 +16,7 @@
 #define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_HPP_
 
 #include <lanelet2_core/geometry/Lanelet.h>
-#include <simulation_api_schema.pb.h>
+#include <simulation_interface/simulation_api_schema.pb.h>
 
 #include <color_names/color_names.hpp>
 #include <cstdint>
