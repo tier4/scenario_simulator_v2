@@ -15,7 +15,7 @@
 #ifndef TRAFFIC_SIMULATOR__API__API_HPP_
 #define TRAFFIC_SIMULATOR__API__API_HPP_
 
-#include <simulation_api_schema.pb.h>
+#include <simulation_interface/simulation_api_schema.pb.h>
 
 #include <simulation_interface/conversions.hpp>
 #include <simulation_interface/zmq_multi_client.hpp>

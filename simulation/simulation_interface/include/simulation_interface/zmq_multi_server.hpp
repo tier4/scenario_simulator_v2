@@ -15,7 +15,7 @@
 #ifndef SIMULATION_INTERFACE__ZMQ_MULTI_SERVER_HPP_
 #define SIMULATION_INTERFACE__ZMQ_MULTI_SERVER_HPP_
 
-#include <simulation_api_schema.pb.h>
+#include <simulation_interface/simulation_api_schema.pb.h>
 
 #include <functional>
 #include <rclcpp/rclcpp.hpp>
