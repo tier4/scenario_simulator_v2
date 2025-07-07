@@ -18,6 +18,30 @@ Changelog for package zmqpp_vendor
 16.4.2 (2025-05-23)
 -------------------
 
+16.7.2 (2025-07-07)
+-------------------
+* Merge pull request `#1634 <https://github.com/tier4/scenario_simulator_v2/issues/1634>`_ from tier4/fix/zmqpp
+* Merge branch 'master' into fix/zmqpp
+* Merge branch 'master' into fix/zmqpp
+* Use ament_vendor (https://github.com/tier4/zmqpp_vendor/pull/9)
+* Contributors: Kotaro Yoshimoto, f0reachARR
+
+16.7.1 (2025-07-04)
+-------------------
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka
+
+16.7.0 (2025-07-03)
+-------------------
+* Merge branch 'master' into feature/record_option_for_rosbag
+* Merge branch 'master' into feature/record_option_for_rosbag
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
 16.6.1 (2025-07-02)
 -------------------
 
