@@ -1,3 +1,7 @@
+# This file contains predefined input data for CI testing of random_test_runner.
+# It is automatically loaded during test execution in CI pipelines.
+# Do not rename or move this file without updating the workflow.sh script accordingly.
+
 random_test:
   test_name: random_test
   map_name: kashiwanoha_map
