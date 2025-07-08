@@ -24,6 +24,9 @@ Changelog for package simulation_interface
 16.4.2 (2025-05-23)
 -------------------
 
+16.7.3 (2025-07-08)
+-------------------
+
 16.7.2 (2025-07-07)
 -------------------
 * Merge branch 'master' into fix/zmqpp
