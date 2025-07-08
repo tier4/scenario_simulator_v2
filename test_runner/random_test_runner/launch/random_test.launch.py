@@ -153,9 +153,6 @@ class RandomTestRunnerLaunch(object):
 
         return declared_launch_arguments
 
-    def is_ego_spawned_as_npc(self, context):
-        return self.random_test_runner_launch_configuration["spawn_ego_as_npc"]\
-            .perform(context).strip().lower() == "true"
 
     def launch_setup(self, context, *args, **kwargs):
         test_param_file = self.random_test_runner_launch_configuration["test_parameters_filename"].perform(context)
@@ -174,8 +171,11 @@ class RandomTestRunnerLaunch(object):
                   "Parameters passed there override passed via arguments".format(test_param_file_path))
             parameters.append(test_param_file_path)
 
+        is_ego_spawned_as_npc = self.random_test_runner_launch_configuration["spawn_ego_as_npc"]\
+            .perform(context).strip().lower() == "true"
+
         # not tested for other architectures but required for "awf/universe"
-        if "awf/universe" in autoware_architecture and not self.is_ego_spawned_as_npc(context):
+        if "awf/universe" in autoware_architecture and not is_ego_spawned_as_npc:
             vehicle_model = self.autoware_launch_configuration["vehicle_model"].perform(context)
             if vehicle_model:
                 vehicle_model_description_dir = get_package_share_directory(vehicle_model + "_description")
