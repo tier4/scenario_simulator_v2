@@ -171,7 +171,7 @@ class RandomTestRunnerLaunch(object):
             parameters.append(test_param_file_path)
 
         # not tested for other architectures but required for "awf/universe"
-        if "awf/universe" in autoware_architecture and not spawn_ego_as_npc::
+        if "awf/universe" in autoware_architecture and not spawn_ego_as_npc
             vehicle_model = self.autoware_launch_configuration["vehicle_model"].perform(context)
             if vehicle_model:
                 vehicle_model_description_dir = get_package_share_directory(vehicle_model + "_description")
