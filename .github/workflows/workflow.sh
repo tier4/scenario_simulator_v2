@@ -30,7 +30,7 @@ random_output_dir="/tmp/random_test_runner"
 mkdir -p "$random_output_dir"
 
 ros2 launch random_test_runner random_test.launch.py \
-  output_directory:=$random_output_dir \
+  output_dir:=$random_output_dir \
   input_dir:=$ci_test_inputs_dir \
   test_timeout:=180.0 \
   spawn_ego_as_npc:=true
