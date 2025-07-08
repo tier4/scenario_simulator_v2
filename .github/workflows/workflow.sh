@@ -35,7 +35,7 @@ ros2 launch random_test_runner random_test.launch.py \
   test_timeout:=180.0 \
   spawn_ego_as_npc:=true
 
-ros2 run scenario_test_runner result_checker.py $random_output_dir/result.junit.xml
+ros2 run random_test_runner result_checker.py $random_output_dir/result.junit.xml
 random_test_exit_status=$?
 
 if [ $random_test_exit_status -ne 0 ]; then

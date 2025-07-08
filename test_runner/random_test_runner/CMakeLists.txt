@@ -33,6 +33,7 @@ endif()
 
 # find dependencies
 find_package(ament_cmake_auto REQUIRED)
+find_package(ament_cmake_python REQUIRED)
 include(FindProtobuf REQUIRED)
 
 # TODO(HansRobo): Remove this workaround once https://github.com/autowarefoundation/autoware_universe/issues/10410 is fixed
@@ -76,6 +77,11 @@ ament_auto_add_executable(${PROJECT_NAME}_node
 install(
   DIRECTORY launch rviz include param test/map test/ci_test_inputs
   DESTINATION share/${PROJECT_NAME}
+)
+
+install(
+  PROGRAMS scripts/result_checker.py
+  DESTINATION lib/${PROJECT_NAME}
 )
 
 if(BUILD_TESTING)
