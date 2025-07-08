@@ -180,6 +180,7 @@ void DoNothingBehavior::update(double current_time, double step_time)
 
   canonicalized_entity_status_->setTime(current_time);
   if (getRequest() == traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY) {
+    behavior = "follow_polyline_trajectory";
     canonicalized_entity_status_->set(
       interpolate_entity_status_on_polyline_trajectory(), getRouteLanelets(),
       getDefaultMatchingDistanceForLaneletPoseCalculation());
@@ -187,18 +188,16 @@ void DoNothingBehavior::update(double current_time, double step_time)
       getCurrentTime() + getStepTime() >=
       do_nothing_behavior::follow_trajectory::getLastVertexTimestamp(getPolylineTrajectory())) {
       setRequest(traffic_simulator::behavior::Request::NONE);
+      behavior = "do_nothing";
     }
   } else {
+    behavior = "do_nothing";
     canonicalized_entity_status_->set(
       static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status_),
       getRouteLanelets(), getDefaultMatchingDistanceForLaneletPoseCalculation());
   }
 }
-auto DoNothingBehavior::getCurrentAction() -> const std::string &
-{
-  static const std::string behavior = "do_nothing";
-  return behavior;
-}
+auto DoNothingBehavior::getCurrentAction() -> const std::string & { return behavior; }
 }  // namespace entity_behavior
 
 #include "pluginlib/class_list_macros.hpp"
