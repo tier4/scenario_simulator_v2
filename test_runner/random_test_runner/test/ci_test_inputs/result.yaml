@@ -1,0 +1,23 @@
+random_test:
+  test_name: random_test
+  map_name: kashiwanoha_map
+  ego_goal_s: 0
+  ego_goal_lanelet_id: -1
+  ego_goal_partial_randomization: false
+  ego_goal_partial_randomization_distance: 25
+  npc_count: 1
+  npc_min_speed: 0.5
+  npc_max_speed: 3
+  npc_min_spawn_distance_from_ego: 10
+  npc_max_spawn_distance_from_ego: 100
+  test_cases:
+    - seed: 3420637850
+    - seed: 3346476572
+    - seed: 3971326628
+    - seed: 3819743497
+    - seed: 1317897930
+    - seed: 4273330185
+    - seed: 1194178990
+    - seed: 2273463240
+    - seed: 1498868863
+    - seed: 1424502251
