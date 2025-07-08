@@ -28,6 +28,10 @@ repositories:
     type: git
     url: https://github.com/autowarefoundation/autoware_lanelet2_extension.git
     version: main
+  autoware_launch:
+    type: git
+    url: https://github.com/autowarefoundation/autoware_launch.git
+    version: main
   color_names:
     type: git
     url: https://github.com/OUXT-Polaris/color_names.git
