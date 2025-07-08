@@ -77,11 +77,16 @@ class RandomTestRunnerLaunch(object):
                 {"default": "/tmp",
                  "description": "Directory to which result.yaml and result.junit.xml files will be placed"},
 
-            "spawn_ego_as_npc": {
-                "default": "false", 
-                "description": "If true, the EGO will be spawned as a npc (not controlled by Autoware)."},
-
             "initialize_duration": {"default": 35, "description": "How long test runner will wait for Autoware to initialize"},
+
+            "spawn_ego_as_npc": 
+                {"default": "false", 
+                 "description": "If true, the EGO will be spawned as a npc (not controlled by Autoware)."},
+
+            "launch_rviz": 
+                {"default": "false", 
+                 "description": "If true, RViz will be launched to visualize the simulation. "
+                                "Recommended when running without Autoware (e.g., with spawn_ego_as_npc:=true)"},
 
             # test suite arguments #
             "test_name": {"default": "random_test",
@@ -224,6 +229,18 @@ class RandomTestRunnerLaunch(object):
                     PythonExpression([
                         "'", self.random_test_runner_launch_configuration["simulator_type"], "'",
                         ' == "simple_sensor_simulator"'
+                    ])
+                ),
+            ),
+            Node(
+                package="rviz2",
+                executable="rviz2",
+                name="rviz2",
+                output={"stderr": "log", "stdout": "log"},
+                arguments=["-d", self.autoware_launch_configuration["rviz_config"]],
+                condition=IfCondition(
+                    PythonExpression([
+                        "'", self.random_test_runner_launch_configuration["launch_rviz"], "' == 'true'"
                     ])
                 ),
             )
