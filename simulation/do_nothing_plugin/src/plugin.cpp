@@ -197,10 +197,7 @@ void DoNothingBehavior::update(double current_time, double step_time)
       getRouteLanelets(), getDefaultMatchingDistanceForLaneletPoseCalculation());
   }
 }
-auto DoNothingBehavior::getCurrentAction() -> const std::string &
-{
-  return behavior;
-}
+auto DoNothingBehavior::getCurrentAction() -> const std::string & { return behavior; }
 }  // namespace entity_behavior
 
 #include "pluginlib/class_list_macros.hpp"
