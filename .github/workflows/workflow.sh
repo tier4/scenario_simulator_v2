@@ -25,7 +25,7 @@ do
   fi
 done < "$file_path"
 
-ci_test_inputs_dir="$(ros2 pkg prefix random_test_runner)/share/random_test_runner/test/ci_test_inputs"
+ci_test_inputs_dir="$(ros2 pkg prefix random_test_runner)/share/random_test_runner/ci_test_inputs"
 random_output_dir="/tmp/random_test_runner"
 mkdir -p "$random_output_dir"
 
