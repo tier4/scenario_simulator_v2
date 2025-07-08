@@ -29,7 +29,6 @@
 
   <exec_depend>openscenario_visualization</exec_depend>
   <exec_depend>behavior_tree_plugin</exec_depend>
-  <exec_depend>ament_cmake_python</exec_depend>
 
   <export>
     <build_type>ament_cmake</build_type>
