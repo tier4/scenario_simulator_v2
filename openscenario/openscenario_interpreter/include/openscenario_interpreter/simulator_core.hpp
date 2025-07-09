@@ -650,7 +650,7 @@ public:
 
     static auto activateNonUserDefinedControllers() -> decltype(auto)
     {
-      return core->startNpcLogic();
+      return core->startNpcLogic(false);
     }
 
     template <typename... Ts>

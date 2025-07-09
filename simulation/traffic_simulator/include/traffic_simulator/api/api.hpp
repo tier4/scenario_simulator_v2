@@ -106,7 +106,7 @@ public:
 
   auto setSimulationStepTime(const double step_time) -> bool;
 
-  auto startNpcLogic() -> void;
+  auto startNpcLogic(bool status) -> void;
 
   auto isNpcLogicStarted() const -> bool;
 
@@ -126,7 +126,7 @@ public:
       std::is_same<std::decay_t<ParamsType>, traffic_simulator_msgs::msg::MiscObjectParameters>>>>
   auto spawn(
     const std::string & name, const PoseType & pose, const ParamsType & parameters,
-    const std::string & behavior = "", const std::string & model3d = "", const bool status) -> entity::EntityBase &
+    const std::string & behavior = "", const std::string & model3d = "") -> entity::EntityBase &
   {
     using VehicleParameters = traffic_simulator_msgs::msg::VehicleParameters;
     using PedestrianParameters = traffic_simulator_msgs::msg::PedestrianParameters;
