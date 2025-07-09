@@ -18,8 +18,6 @@
 #include <behaviortree_cpp_v3/action_node.h>
 
 #include <boost/algorithm/clamp.hpp>
-#include <context_gamma_planner/constraints/constraint_activator_base.hpp>
-#include <context_gamma_planner/constraints/constraint_base.hpp>
 #include <geometry/bounding_box.hpp>
 #include <geometry/spline/catmull_rom_spline.hpp>
 #include <geometry/transform.hpp>
@@ -57,7 +55,6 @@ public:
   static BT::PortsList providedPorts()
   {
     return {// clang-format off
-      BT::InputPort<std::shared_ptr<constraints::ConstraintActivatorBase>>("activator"),
       BT::InputPort<traffic_simulator::behavior::Request>("request"),
       BT::InputPort<std::shared_ptr<hdmap_utils::HdMapUtils>>("hdmap_utils"),
       BT::InputPort<std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>>("canonicalized_entity_status"),
@@ -86,7 +83,6 @@ public:
   auto getBlackBoardValues() -> void;
 
 protected:
-  std::shared_ptr<constraints::ConstraintActivatorBase> activator;
   traffic_simulator::behavior::Request request;
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils;
   std::shared_ptr<traffic_simulator::TrafficLightsBase> traffic_lights;

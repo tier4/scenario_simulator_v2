@@ -96,7 +96,6 @@ auto FollowPolylineTrajectoryPlannerBase::calculateNextGoalPoint()
   return std::nullopt;
 }
 
-/// @todo Re-consider speed planning algorithm.
 double FollowPolylineTrajectoryPlannerBase::getTargetSpeed(const double current_time) const
 {
   if (trajectory_->base_time > current_time) {

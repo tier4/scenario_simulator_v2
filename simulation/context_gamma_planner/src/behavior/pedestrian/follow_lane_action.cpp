@@ -54,14 +54,6 @@ BT::NodeStatus FollowLaneAction::tick()
   setOutput("waypoints", planner_.getWaypoints());
   setOutput("planning_speed", max_speed);
 
-  // update constraints
-  // activator->appendPedestrianRouteConstraint(
-  //   entity_status->getMapPose(), planner_.getNextGoalPose(), route_lanelets,
-  //   planner_.getGoalPoses());
-  // update constraints
-  activator->appendRoadEdgeConstraint(route_lanelets);
-  activator->appendPreviousRoadEdgeConstraint({entity_status->getLaneletPose().lanelet_id});
-
   return BT::NodeStatus::RUNNING;
 }
 }  // namespace pedestrian

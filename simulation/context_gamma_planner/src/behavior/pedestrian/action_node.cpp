@@ -33,10 +33,6 @@ void ActionNode::getBlackBoardValues()
         "pedestrian_parameters", pedestrian_parameters)) {
     THROW_SIMULATION_ERROR("failed to get input pedestrian_parameters in pedestrian::ActionNode");
   }
-  getInput("activator", activator);
-  if (activator == nullptr) {
-    THROW_SIMULATION_ERROR("constraint activator is nullptr");
-  }
 }
 }  // namespace pedestrian
 }  // namespace context_gamma_planner

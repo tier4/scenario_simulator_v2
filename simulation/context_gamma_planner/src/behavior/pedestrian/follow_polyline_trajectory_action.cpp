@@ -68,8 +68,6 @@ BT::NodeStatus FollowPolylineTrajectoryAction::tick()
   setOutput("waypoints", planner_.getWaypoints());
   setOutput("planning_speed", std::optional<double>(planner_.getTargetSpeed(current_time)));
 
-  // update constraints
-
   if (planner_.isReachedGoal()) {
     return BT::NodeStatus::SUCCESS;
   }

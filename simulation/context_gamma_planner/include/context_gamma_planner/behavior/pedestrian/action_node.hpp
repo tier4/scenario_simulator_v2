@@ -18,7 +18,6 @@
 #include <behaviortree_cpp_v3/action_node.h>
 
 #include <context_gamma_planner/behavior/action_node_base.hpp>
-#include <context_gamma_planner/constraints/pedestrian/constraint_activator.hpp>
 #include <memory>
 #include <string>
 #include <traffic_simulator_msgs/msg/pedestrian_parameters.hpp>

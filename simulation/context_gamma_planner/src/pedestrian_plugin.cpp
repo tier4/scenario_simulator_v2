@@ -103,7 +103,6 @@ auto PedestrianPlugin::getCurrentAction() -> const std::string &
  */
 void PedestrianPlugin::update(double current_time, double step_time)
 {
-  tryInitializeConstraintActivator();
   tickOnce(current_time, step_time);
   while (getCurrentAction() == "root") {
     tickOnce(current_time, step_time);
@@ -113,18 +112,6 @@ void PedestrianPlugin::update(double current_time, double step_time)
 
   auto next_goal = getNextGoal();
   std::cout << next_goal.x << ", " << next_goal.y << std::endl;
-  /// @note cleanup constraints
-  activator_ptr_->deactivateAllConstraints();
-}
-
-void PedestrianPlugin::tryInitializeConstraintActivator()
-{
-  if (activator_ptr_ == nullptr) {
-    activator_ptr_ =
-      std::make_shared<context_gamma_planner::pedestrian::constraints::ConstraintActivator>(
-        getHdMapUtils(), getTrafficLights());
-    setConstraintActivator(activator_ptr_);
-  }
 }
 
 /**

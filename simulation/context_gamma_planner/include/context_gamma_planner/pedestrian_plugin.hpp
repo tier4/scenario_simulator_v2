@@ -19,7 +19,6 @@
 #include <behaviortree_cpp_v3/loggers/bt_cout_logger.h>
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
-#include <context_gamma_planner/constraints/pedestrian/constraint_activator.hpp>
 #include <context_gamma_planner/transition_events/transition_events.hpp>
 #include <traffic_simulator/behavior/behavior_plugin_base.hpp>
 
@@ -93,37 +92,18 @@ public:
   }                                                                                       \
   void set##NAME(const TYPE & value) { tree_.rootBlackboard()->set<TYPE>(get##NAME##Key(), value); }
   // clang-format off
-  DEFINE_GETTER_SETTER(ConstraintActivator, "activator", std::shared_ptr<context_gamma_planner::constraints::ConstraintActivatorBase>)
   DEFINE_GETTER_SETTER(NextGoal, "next_goal", geometry_msgs::msg::Point)
   DEFINE_GETTER_SETTER(PlanningSpeed, "planning_speed", std::optional<double>)
   // clang-format on
 #undef DEFINE_GETTER_SETTER
 
 private:
-  std::shared_ptr<context_gamma_planner::pedestrian::constraints::ConstraintActivator>
-    activator_ptr_;
   BT::NodeStatus tickOnce(double current_time, double step_time);
   BT::BehaviorTreeFactory factory_;
   BT::Tree tree_;
   auto createBehaviorTree(const std::string & format_path) -> BT::Tree;
   std::shared_ptr<context_gamma_planner::LoggingEvent> logging_event_ptr_;
   std::shared_ptr<context_gamma_planner::ResetRequestEvent> reset_request_event_ptr_;
-  // RVO::RVOSimulator rvo_simulator_;
-  // std::shared_ptr<RVO::Agent> rvo_ego_;
-  // RVO::VisualizeMarker rvo_visualize_;
-
-  void tryInitializeConstraintActivator();
-  // void tryInitializeEgoInRVO();
-  // void reflectEgoInRVO(const traffic_simulator::EntityStatus & ego_status);
-  // void reflectNonEgoEntitiesInRVO();
-  // void updateNonEgoEntityInRVO(
-  //   std::shared_ptr<RVO::Agent> agent,
-  //   const traffic_simulator::entity_status::CanonicalizedEntityStatus & entity_status);
-  // void createNonEgoEntityInRVO(
-  //   const traffic_simulator::entity_status::CanonicalizedEntityStatus & entity_status);
-  // void updateRVO(double step_time);
-  // void updateSimulatorStatus();
-  // void visualize();
 };
 }  // namespace context_gamma_planner
 

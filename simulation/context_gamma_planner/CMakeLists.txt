@@ -8,7 +8,6 @@ endif()
 # find dependencies
 find_package(ament_cmake_auto REQUIRED)
 include(FindProtobuf REQUIRED)
-#find_package (glog 0.6.0 REQUIRED)
 
 
 ament_auto_find_build_dependencies()
@@ -18,12 +17,6 @@ ament_auto_add_library(context_gamma_planner SHARED
   src/behavior/pedestrian/action_node.cpp
   src/behavior/pedestrian/follow_lane_action.cpp
   src/behavior/pedestrian/follow_polyline_trajectory_action.cpp
-  src/constraints/constraint_activator_base.cpp
-  src/constraints/constraint_base.cpp
-  src/constraints/pedestrian/constraint_activator.cpp
-  src/constraints/road_edge_constraint.cpp
-  src/constraints/stop_line_constraint.cpp
-  src/constraints/traffic_light_constraint.cpp
   src/pedestrian_plugin.cpp
   src/planner/goal_planner_base.cpp
   src/planner/follow_polyline_trajectory_planner_base.cpp

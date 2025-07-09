@@ -21,8 +21,6 @@
 
 namespace context_gamma_planner
 {
-// void GoalPlannerBase::setRouteLanelets(const std::vector<lanelet::Id> & route) { route_ = route; }
-
 GoalPlannerBase::GoalPlannerBase(const double goal_threshold) : goal_threshold(goal_threshold) {}
 
 void GoalPlannerBase::setCurrentStatus(
