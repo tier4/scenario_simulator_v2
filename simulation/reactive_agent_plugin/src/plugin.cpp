@@ -31,8 +31,16 @@ void ReactiveAgentBehavior::update(double current_time, double step_time)
 {
   setCurrentTime(current_time);
   setStepTime(step_time);
-
-  std::cout << "SUPUER HELLO WORLD" << std::endl;
+  const auto poses = getGoalPoses();
+  std::cout << poses.size() << std::endl;
+  // if(poly){
+  //   std::cout << poly->shape.vertices.size() << std::endl;
+  // }else{
+  //   std::cout <<"NULL" << std::endl;
+  // }
+  // for(const auto & vertex: poly->shape.vertices){
+  //   std::cout << vertex.position.position.x << "," << vertex.position.position.y << std::endl;
+  // }
 }
 auto ReactiveAgentBehavior::getCurrentAction() -> const std::string &
 {
