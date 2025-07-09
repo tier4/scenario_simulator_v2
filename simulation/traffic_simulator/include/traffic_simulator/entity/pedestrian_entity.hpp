@@ -53,12 +53,6 @@ public:
       return name;
     }
 
-    static auto reactiveAgent() noexcept -> const std::string &
-    {
-      static const std::string name = "reactive_agent_plugin/ReactiveAgentPlugin";
-      return name;
-    }
-
     static auto defaultBehavior() noexcept -> const std::string & { return behaviorTree(); }
   };
 
