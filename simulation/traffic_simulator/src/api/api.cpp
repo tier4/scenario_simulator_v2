@@ -52,9 +52,9 @@ auto API::setSimulationStepTime(const double step_time) -> bool
   }
 }
 
-auto API::startNpcLogic(bool status) -> void
+auto API::startNpcLogic() -> void
 {
-  if (entity_manager_ptr_->isNpcLogicStarted() && status) {
+  if (entity_manager_ptr_->isNpcLogicStarted()) {
     THROW_SIMULATION_ERROR("NPC logics are already started.");
   } else {
     clock_.start();

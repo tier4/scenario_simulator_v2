@@ -65,7 +65,7 @@ void CppScenarioNode::update()
 void CppScenarioNode::start()
 {
   onInitialize();
-  api_.startNpcLogic(false);
+  api_.startNpcLogic();
   const auto rate =
     std::chrono::duration<double>(1.0 / get_parameter("global_frame_rate").as_double());
   update_timer_ = this->create_wall_timer(rate, std::bind(&CppScenarioNode::update, this));
