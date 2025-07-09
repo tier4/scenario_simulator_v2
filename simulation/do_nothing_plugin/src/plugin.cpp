@@ -192,7 +192,8 @@ void DoNothingBehavior::update(double current_time, double step_time)
     }
   } else {
     behavior = "do_nothing";
-    auto entity_status_with_zero_twist_accel = static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status_);
+    auto entity_status_with_zero_twist_accel =
+      static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status_);
     entity_status_with_zero_twist_accel.action_status.twist =
       geometry_msgs::build<geometry_msgs::msg::Twist>()
         .linear(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0).y(0).z(0))
@@ -202,8 +203,8 @@ void DoNothingBehavior::update(double current_time, double step_time)
         .linear(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0).y(0).z(0))
         .angular(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0).y(0).z(0));
     canonicalized_entity_status_->set(
-      entity_status_with_zero_twist_accel,
-      getRouteLanelets(), getDefaultMatchingDistanceForLaneletPoseCalculation());
+      entity_status_with_zero_twist_accel, getRouteLanelets(),
+      getDefaultMatchingDistanceForLaneletPoseCalculation());
   }
 }
 auto DoNothingBehavior::getCurrentAction() -> const std::string & { return behavior; }
