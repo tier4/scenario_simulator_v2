@@ -154,7 +154,7 @@ public:
                    local_parameters.axles.front_axle.track_width,
                    local_parameters.axles.rear_axle.track_width) *
                    0.5 +
-                 10.0;
+                 1.0;
         } else {
           return local_parameters.bounding_box.dimensions.y * 0.5 + 1.0;
         }
