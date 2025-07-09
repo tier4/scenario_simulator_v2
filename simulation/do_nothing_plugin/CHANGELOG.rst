@@ -24,6 +24,14 @@ Changelog for package do_nothing_plugin
 16.4.2 (2025-05-23)
 -------------------
 
+16.7.3 (2025-07-08)
+-------------------
+* Merge pull request `#1643 <https://github.com/tier4/scenario_simulator_v2/issues/1643>`_ from tier4/feature/action_for_do_nothing
+  Return "follow_polyline_trajectory" behavior in do_nothing behavior plugin
+* apply reformat
+* return "follow_polyline_trajectory" behavior in do_nothing behavior plugin
+* Contributors: Masaya Kataoka, Taiga
+
 16.7.2 (2025-07-07)
 -------------------
 * Merge branch 'master' into fix/zmqpp
