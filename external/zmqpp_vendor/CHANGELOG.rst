@@ -18,6 +18,9 @@ Changelog for package zmqpp_vendor
 16.4.2 (2025-05-23)
 -------------------
 
+16.7.3 (2025-07-08)
+-------------------
+
 16.7.2 (2025-07-07)
 -------------------
 * Merge pull request `#1634 <https://github.com/tier4/scenario_simulator_v2/issues/1634>`_ from tier4/fix/zmqpp
