@@ -35,7 +35,6 @@ public:
   void configure(const rclcpp::Logger & logger) override;
   /**
    * @brief Get the Current Action object
-   * @return const std::string& always return "do_nothing"
    */
   auto getCurrentAction() const -> const std::string & override;
 
@@ -79,6 +78,7 @@ private:                                                               \
   DEFINE_GETTER_SETTER(StepTime,                  double,                                                           step_time_)
   // clang-format on
 #undef DEFINE_GETTER_SETTER
+  std::string behavior = "do_nothing";  ///< The action name for this behavior plugin.
 };
 }  // namespace entity_behavior
 
