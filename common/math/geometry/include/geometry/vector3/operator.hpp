@@ -101,6 +101,13 @@ auto operator*(const T & a, const U & b)
 }
 
 template <
+  typename T, typename U, std::enable_if_t<std::conjunction_v<IsLikeVector3<T>, IsLikeVector3<U>>, std::nullptr_t> = nullptr>
+auto operator*(const T & a, const U & b)
+{
+  return a.x * b.x + a.y * b.y + a.z * b.z;
+}
+
+template <
   typename T, typename U,
   std::enable_if_t<std::conjunction_v<IsLikeVector3<T>, std::is_scalar<U>>, std::nullptr_t> =
     nullptr>
