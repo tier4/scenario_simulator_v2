@@ -230,18 +230,6 @@ class RandomTestRunnerLaunch(object):
                         ' == "simple_sensor_simulator"'
                     ])
                 ),
-            ),
-            Node(
-                package="rviz2",
-                executable="rviz2",
-                name="rviz2",
-                output={"stderr": "log", "stdout": "log"},
-                arguments=["-d", self.autoware_launch_configuration["rviz_config"]],
-                condition=IfCondition(
-                    PythonExpression([
-                        "'", self.random_test_runner_launch_configuration["launch_rviz"], "' == 'true'"
-                    ])
-                ),
             )
         ]
 
