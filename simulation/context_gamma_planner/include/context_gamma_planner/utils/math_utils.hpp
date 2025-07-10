@@ -26,8 +26,6 @@ using math::geometry::operator+=;
 
 namespace context_gamma_planner
 {
-namespace math
-{
 template <typename T>
 auto sqr(const T a)
 {
@@ -50,7 +48,6 @@ auto normalize(const T & a)
     }
   }
   return a / n;
-}
 }  // namespace math
 }  // namespace context_gamma_planner
 

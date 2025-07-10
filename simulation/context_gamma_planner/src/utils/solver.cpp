@@ -17,13 +17,13 @@
 namespace context_gamma_planner
 {
 auto applyConstraintOnLine(
-  const std::vector<line> & lines, const line & attention_line, const double radius,
+  const std::vector<line> & lines, const line & attention_line, const double limit_speed,
   const geometry_msgs::msg::Vector3 & opt_velocity, const bool direction_opt)
   -> std::optional<geometry_msgs::msg::Vector3>
 {
   const auto & [p, d] = attention_line;
   const auto dot_product = p * d;
-  const auto discriminant = math::sqr(dot_product) + math::sqr(radius) - math::sqr(p);
+  const auto discriminant = sqr(dot_product) + sqr(limit_speed) - sqr(p);
 
   if (discriminant < 0.0) {
     return std::nullopt;
@@ -34,8 +34,8 @@ auto applyConstraintOnLine(
   auto t_right = -dot_product + sqrt_discriminant;
 
   for (const auto & [pi, di] : lines) {
-    const auto denominator = math::det(d, di);
-    const auto numerator = math::det(di, p - pi);
+    const auto denominator = det(d, di);
+    const auto numerator = det(di, p - pi);
 
     if (std::fabs(denominator) <= RVO_EPSILON) {
       if (numerator < 0.0f) {
@@ -85,21 +85,22 @@ auto applyConstraintOnLine(
 }
 
 auto optimizeVelocityWithConstraints(
-  const std::vector<line> & lines, const double radius,
+  const std::vector<line> & lines, const double limit_speed,
   const geometry_msgs::msg::Vector3 & opt_velocity, const bool direction_opt)
   -> std::optional<geometry_msgs::msg::Vector3>
 {
   auto velocity = geometry_msgs::msg::Vector3();
   if (direction_opt) {
-    velocity = opt_velocity * radius;
-  } else if (math::sqr(opt_velocity) > math::sqr(radius)) {
-    velocity = math::normalize(opt_velocity) * radius;
+    velocity = opt_velocity * limit_speed;
+  } else if (sqr(opt_velocity) > sqr(limit_speed)) {
+    velocity = normalize(opt_velocity) * limit_speed;
   } else {
     velocity = opt_velocity;
   }
   for (const auto & line : lines) {
-    if (math::det(line.direction, line.point - velocity) > 0.0) {
-      const auto result = applyConstraintOnLine(lines, line, radius, opt_velocity, direction_opt);
+    if (det(line.direction, line.point - velocity) > 0.0) {
+      const auto result =
+        applyConstraintOnLine(lines, line, limit_speed, opt_velocity, direction_opt);
       if (result) {
         velocity = result.value();
       }

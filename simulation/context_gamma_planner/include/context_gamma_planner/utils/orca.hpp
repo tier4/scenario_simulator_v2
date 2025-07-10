@@ -12,35 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CONTEXT_GAMMA_PLANNER__UTILS_SOLVER_HPP_
-#define CONTEXT_GAMMA_PLANNER__UTILS_SOLVER_HPP_
+#ifndef CONTEXT_GAMMA_PLANNER__UTILS_ORCA_HPP_
+#define CONTEXT_GAMMA_PLANNER__UTILS_ORCA_HPP_
 
+#include <boost/geometry.hpp>
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
 #include <optional>
 #include <vector>
 
 #include "context_gamma_planner/utils/math_utils.hpp"
+#include "context_gamma_planner/utils/solver.hpp"
 
 namespace context_gamma_planner
 {
-constexpr double RVO_EPSILON = 0.00001f;
+using Point = boost::geometry::model::d2::point_xy<double>;
+using Polygon = boost::geometry::model::polygon<Point>;
 
-struct line
-{
-  geometry_msgs::msg::Point point;
-  geometry_msgs::msg::Vector3 direction;
-};
-
-auto applyConstraintOnLine(
-  const std::vector<line> & lines, const line & attention_line, const double limit_speed,
-  const geometry_msgs::msg::Vector3 & opt_velocity, const bool direction_opt)
-  -> std::optional<geometry_msgs::msg::Vector3>;
-
-auto optimizeVelocityWithConstraints(
-  const std::vector<line> & lines, const double limit_speed,
-  const geometry_msgs::msg::Vector3 & opt_velocity, const bool direction_opt)
-  -> std::optional<geometry_msgs::msg::Vector3>;
+auto calculate_orca_line(
+  const geometry_msgs::msg::Vector3 & ego_velocity,
+  const geometry_msgs::msg::Point & relative_position,
+  const geometry_msgs::msg::Vector3 & relative_velocity, const Polygon & ego_polygon,
+  const Polygon & other_polygon) -> line;
 }  // namespace context_gamma_planner
 
-#endif  // CONTEXT_GAMMA_PLANNER__UTILS_SOLVER_HPP_
+#endif  // CONTEXT_GAMMA_PLANNER__UTILS_ORCA_HPP_

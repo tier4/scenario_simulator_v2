@@ -20,7 +20,14 @@
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <context_gamma_planner/transition_events/transition_events.hpp>
+#include <context_gamma_planner/utils/collider.hpp>
+#include <geometry/quaternion/euler_to_quaternion.hpp>
+#include <geometry/quaternion/quaternion_to_euler.hpp>
+#include <geometry/vector3/norm.hpp>
+#include <geometry/vector3/operator.hpp>
 #include <traffic_simulator/behavior/behavior_plugin_base.hpp>
+
+#include "context_gamma_planner/utils/orca.hpp"
 
 namespace context_gamma_planner
 {
@@ -104,6 +111,7 @@ private:
   auto createBehaviorTree(const std::string & format_path) -> BT::Tree;
   std::shared_ptr<context_gamma_planner::LoggingEvent> logging_event_ptr_;
   std::shared_ptr<context_gamma_planner::ResetRequestEvent> reset_request_event_ptr_;
+  void updateEgoPose(const geometry_msgs::msg::Vector3 & velocity, const double step_time);
 };
 }  // namespace context_gamma_planner
 

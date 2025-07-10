@@ -25,6 +25,9 @@ ament_auto_add_library(context_gamma_planner SHARED
   src/transition_events/logging_event.cpp
   src/transition_events/reset_request_event.cpp
   src/transition_events/transition_event.cpp
+  src/utils/collider.cpp
+  src/utils/solver.cpp
+  src/utils/orca.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}

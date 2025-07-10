@@ -43,7 +43,6 @@ void PedestrianPlugin::configure(const rclcpp::Logger & logger)
   traffic_simulator_msgs::msg::Obstacle obstacle_msg;
   obstacle_msg.type = traffic_simulator_msgs::msg::Obstacle::ENTITY;
   setObstacle(obstacle_msg);
-  std::cout << "configure end" << std::endl;
 }
 
 /**
@@ -103,6 +102,8 @@ auto PedestrianPlugin::getCurrentAction() -> const std::string &
  */
 void PedestrianPlugin::update(double current_time, double step_time)
 {
+  using math::geometry::operator-;
+
   tickOnce(current_time, step_time);
   while (getCurrentAction() == "root") {
     tickOnce(current_time, step_time);
@@ -110,8 +111,50 @@ void PedestrianPlugin::update(double current_time, double step_time)
   if (getPlanningSpeed()) {
   }
 
+  auto transformLocalToGlobalVelocity =
+    [](const geometry_msgs::msg::Pose & pose, geometry_msgs::msg::Vector3 local_vel) {
+      const auto yaw = math::geometry::convertQuaternionToEulerAngle(pose.orientation).z;
+      local_vel.x = std::cos(yaw) * local_vel.x - std::sin(yaw) * local_vel.y;
+      local_vel.y = std::sin(yaw) * local_vel.x + std::cos(yaw) * local_vel.y;
+      return local_vel;
+    };
+  auto cast_to_vec = [](const geometry_msgs::msg::Point & p) {
+    auto result = geometry_msgs::msg::Vector3();
+    result.x = p.x;
+    result.y = p.y;
+    result.z = p.z;
+    return result;
+  };
+
   auto next_goal = getNextGoal();
-  std::cout << next_goal.x << ", " << next_goal.y << std::endl;
+  // std::cout << next_goal.x << ", " << next_goal.y << std::endl;
+  const auto ego_entity = getCanonicalizedEntityStatus();
+  const auto ego_pose = ego_entity->getMapPose();
+  const auto ego_vel = transformLocalToGlobalVelocity(ego_pose, ego_entity->getTwist().linear);
+  const auto ego_poly =
+    rotate_polygon(polygon_from_bbox(ego_entity->getBoundingBox()), ego_pose.orientation);
+
+  std::vector<line> orca_lines;
+  const auto other_entity_status = getOtherEntityStatus();
+  for (const auto & [other_name, other_entity] : other_entity_status) {
+    const auto other_pose = other_entity.getMapPose();
+    const auto other_vel =
+      transformLocalToGlobalVelocity(other_pose, other_entity.getTwist().linear);
+    const auto other_poly =
+      rotate_polygon(polygon_from_bbox(other_entity.getBoundingBox()), other_pose.orientation);
+
+    const auto relative_position = other_pose.position - ego_pose.position;
+    const auto relative_velocity = ego_vel - other_vel;
+
+    orca_lines.push_back(
+      calculate_orca_line(ego_vel, relative_position, relative_velocity, ego_poly, other_poly));
+  }
+
+  const auto optimized_velocity = optimizeVelocityWithConstraints(
+    orca_lines, 1.0, cast_to_vec(getNextGoal() - ego_pose.position), false);
+  if (optimized_velocity) {
+    updateEgoPose(optimized_velocity.value(), step_time);
+  }
 }
 
 /**
@@ -125,6 +168,23 @@ BT::NodeStatus PedestrianPlugin::tickOnce(double current_time, double step_time)
   setCurrentTime(current_time);
   setStepTime(step_time);
   return tree_.rootNode()->executeTick();
+}
+
+void PedestrianPlugin::updateEgoPose(
+  const geometry_msgs::msg::Vector3 & velocity, const double step_time)
+{
+  const auto ego_entity = getCanonicalizedEntityStatus();
+  auto map_pose = ego_entity->getMapPose();
+  map_pose.position.x += velocity.x * step_time;
+  map_pose.position.y += velocity.y * step_time;
+  if (velocity.x != 0.0 || velocity.y != 0.0) {
+    auto angular = geometry_msgs::msg::Vector3();
+    angular.set__z(std::atan2(velocity.y, velocity.x));
+    map_pose.orientation = math::geometry::convertEulerAngleToQuaternion(angular);
+  }
+
+  ego_entity->setMapPose(map_pose);
+  ego_entity->setLinearVelocity(math::geometry::norm(velocity));
 }
 
 }  // namespace context_gamma_planner
