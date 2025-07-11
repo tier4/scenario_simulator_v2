@@ -277,7 +277,7 @@ struct TrafficLight
           case Color::white:
             color_message = simulation_api_schema::TrafficLight_Color_WHITE;
             break;
-          case Color::unknown:
+          default:
             break;
         }
         return color_message;
@@ -335,7 +335,7 @@ struct TrafficLight
           case Shape::upper_right:
             shape_message = simulation_api_schema::TrafficLight_Shape_UP_RIGHT_ARROW;
             break;
-          case Shape::unknown:
+          default:
             break;
         }
         return shape_message;
@@ -368,7 +368,7 @@ struct TrafficLight
           case Color::white:
             color_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::WHITE;
             break;
-          case Color::unknown:
+          default:
             break;
         }
         return color_message;
@@ -426,7 +426,7 @@ struct TrafficLight
           case Shape::upper_right:
             shape_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::UP_RIGHT_ARROW;
             break;
-          case Shape::unknown:
+          default:
             break;
         }
         return shape_message;
