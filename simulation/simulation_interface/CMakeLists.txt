@@ -32,10 +32,23 @@ set(PROTO_FILES
   "proto/std_msgs.proto"
   "proto/traffic_simulator_msgs.proto"
 )
-protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${PROTO_FILES})
+set(PROTO_OUTPUT_DIR ${CMAKE_BINARY_DIR}/proto/${PROJECT_NAME})
+
+# Ensure the output directory exists
+file(MAKE_DIRECTORY ${PROTO_OUTPUT_DIR})
+
+protobuf_generate(
+  PROTOS ${PROTO_FILES}
+  APPEND_PATH
+  LANGUAGE cpp
+  OUT_VAR PROTO_SRCS
+  IMPORT_DIRS proto/
+  PROTOC_OUT_DIR ${PROTO_OUTPUT_DIR}
+)
+
 include_directories(
   include
-  ${CMAKE_BINARY_DIR}
+  ${CMAKE_BINARY_DIR}/proto/
 )
 
 ament_auto_add_library(simulation_interface SHARED
@@ -61,8 +74,8 @@ install(TARGETS simulation_interface
   INCLUDES DESTINATION include)
 
 install(
-  FILES ${PROTO_HDRS}
-  DESTINATION include
+  DIRECTORY ${CMAKE_BINARY_DIR}/proto/
+  DESTINATION include/
 )
 
 install(
