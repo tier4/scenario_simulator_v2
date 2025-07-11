@@ -44,6 +44,10 @@ public:
 
   auto update() -> void;
 
+  auto getInterpolatedRosTime() -> rclcpp::Time;
+
+  auto getInterpolatedRosTimeAsMsg() -> rosgraph_msgs::msg::Clock;
+
   const bool use_sim_time;
 
   double realtime_factor;
@@ -56,6 +60,8 @@ private:
   double seconds_since_the_simulator_started_ = 0.0;
 
   double seconds_at_the_start_of_the_scenario_ = std::numeric_limits<double>::quiet_NaN();
+
+  double interpolation_radio_ = 0.0;
 };
 }  // namespace traffic_simulator
 

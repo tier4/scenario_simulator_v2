@@ -29,6 +29,7 @@ SimulationClock::SimulationClock(bool use_sim_time, double realtime_factor, doub
 auto SimulationClock::update() -> void
 {
   seconds_since_the_simulator_started_ += realtime_factor / frame_rate_;
+  interpolation_radio_ = 0.0;
 }
 
 auto SimulationClock::getCurrentRosTimeAsMsg() -> rosgraph_msgs::msg::Clock
@@ -46,6 +47,26 @@ auto SimulationClock::getCurrentRosTime() -> rclcpp::Time
     return time_at_the_start_of_the_simulator_ +
            rclcpp::Duration::from_seconds(getCurrentSimulationTime());
   }
+}
+
+auto SimulationClock::getInterpolatedRosTimeAsMsg() -> rosgraph_msgs::msg::Clock
+{
+  rosgraph_msgs::msg::Clock clock;
+  clock.clock = getInterpolatedRosTime();
+  return clock;
+}
+
+auto SimulationClock::getInterpolatedRosTime() -> rclcpp::Time
+{
+  if (not use_sim_time) {
+    return now();
+  }
+
+  const auto one_frame = realtime_factor / frame_rate_;
+  interpolation_radio_ = std::min(1.0, interpolation_radio_ + 0.1);
+  return time_at_the_start_of_the_simulator_ +
+         rclcpp::Duration::from_seconds(
+           getCurrentSimulationTime() + interpolation_radio_ * one_frame);
 }
 
 auto SimulationClock::start() -> void

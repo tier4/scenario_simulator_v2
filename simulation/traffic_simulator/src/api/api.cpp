@@ -145,10 +145,20 @@ auto API::updateFrame() -> bool
 
   entity_manager_ptr_->broadcastEntityTransform();
   clock_.update();
-  clock_pub_->publish(clock_.getCurrentRosTimeAsMsg());
   debug_marker_pub_->publish(entity_manager_ptr_->makeDebugMarker());
   debug_marker_pub_->publish(traffic_controller_ptr_->makeDebugMarker());
   return true;
+}
+
+auto API::publishClock() -> void
+{
+  if (not configuration_.standalone_mode) {
+    if (clock_interpolation_enabled_) {
+      clock_pub_->publish(clock_.getInterpolatedRosTimeAsMsg());
+    } else {
+      clock_pub_->publish(clock_.getCurrentRosTimeAsMsg());
+    }
+  }
 }
 
 // sensors - attach

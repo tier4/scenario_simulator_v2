@@ -99,6 +99,8 @@ def launch_setup(context, *args, **kwargs):
     simulate_localization               = LaunchConfiguration("simulate_localization",                  default=True)
     speed_condition                     = LaunchConfiguration("speed_condition",                        default="legacy")
     use_sim_time                        = LaunchConfiguration("use_sim_time",                           default=False)
+    clock_period                        = LaunchConfiguration("clock_period",                           default=10)
+    clock_interpolation_enabled         = LaunchConfiguration("clock_interpolation_enabled",            default=True)
     vehicle_model                       = LaunchConfiguration("vehicle_model",                          default="")
     # fmt: on
 
@@ -129,6 +131,8 @@ def launch_setup(context, *args, **kwargs):
     print(f"simulate_localization               := {simulate_localization.perform(context)}")
     print(f"speed_condition                     := {speed_condition.perform(context)}")
     print(f"use_sim_time                        := {use_sim_time.perform(context)}")
+    print(f"clock_period                        := {clock_period.perform(context)}")
+    print(f"clock_interpolation_enabled         := {clock_interpolation_enabled.perform(context)}")
     print(f"vehicle_model                       := {vehicle_model.perform(context)}")
 
     def make_launch_prefix():
@@ -157,6 +161,8 @@ def launch_setup(context, *args, **kwargs):
             {"simulate_localization": simulate_localization},
             {"speed_condition": speed_condition},
             {"use_sim_time": use_sim_time},
+            {"clock_period": clock_period},
+            {"clock_interpolation_enabled": clock_interpolation_enabled},
             {"vehicle_model": vehicle_model},
         ]
 
@@ -223,6 +229,8 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("simulate_localization",               default_value=simulate_localization              ),
         DeclareLaunchArgument("speed_condition",                     default_value=speed_condition                    ),
         DeclareLaunchArgument("use_sim_time",                        default_value=use_sim_time                       ),
+        DeclareLaunchArgument("clock_period",                        default_value=clock_period                       ),
+        DeclareLaunchArgument("clock_interpolation_enabled",         default_value=clock_interpolation_enabled        ),
         DeclareLaunchArgument("vehicle_model",                       default_value=vehicle_model                      ),
         # fmt: on
         Node(

@@ -60,6 +60,13 @@ public:
   : configuration_(configuration),
     node_parameters_(
       rclcpp::node_interfaces::get_node_parameters_interface(std::forward<NodeT>(node))),
+    system_clock_(rclcpp::Clock::make_shared(RCL_SYSTEM_TIME)),
+    clock_publish_timer_(rclcpp::create_timer(
+      node, system_clock_,
+      std::chrono::milliseconds(common::getParameter<int>(node_parameters_, "clock_period", 10)),
+      std::bind(&API::publishClock, this))),
+    clock_interpolation_enabled_(
+      common::getParameter<bool>(node_parameters_, "clock_interpolation_enabled", true)),
     clock_pub_(rclcpp::create_publisher<rosgraph_msgs::msg::Clock>(
       node, "/clock", rclcpp::QoS(rclcpp::KeepLast(1)).best_effort(),
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
@@ -116,6 +123,8 @@ public:
 
   // update
   auto updateFrame() -> bool;
+
+  auto publishClock() -> void;
 
   // entities, ego - spawn
   template <
@@ -291,6 +300,12 @@ private:
   const Configuration configuration_;
 
   const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr node_parameters_;
+
+  rclcpp::Clock::SharedPtr system_clock_;
+
+  const rclcpp::TimerBase::SharedPtr clock_publish_timer_;
+
+  const bool clock_interpolation_enabled_;
 
   const rclcpp::Publisher<rosgraph_msgs::msg::Clock>::SharedPtr clock_pub_;
 
