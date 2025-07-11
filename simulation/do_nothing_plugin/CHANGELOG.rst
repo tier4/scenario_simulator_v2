@@ -24,6 +24,11 @@ Changelog for package do_nothing_plugin
 16.4.2 (2025-05-23)
 -------------------
 
+16.7.5 (2025-07-11)
+-------------------
+* Merge branch 'master' into feature/CODEOWNERS
+* Contributors: Kotaro Yoshimoto
+
 16.7.4 (2025-07-11)
 -------------------
 * Merge pull request `#1644 <https://github.com/tier4/scenario_simulator_v2/issues/1644>`_ from tier4/feature/twist_value_in_do_nothing

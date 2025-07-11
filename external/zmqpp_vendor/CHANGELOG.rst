@@ -18,6 +18,11 @@ Changelog for package zmqpp_vendor
 16.4.2 (2025-05-23)
 -------------------
 
+16.7.5 (2025-07-11)
+-------------------
+* Merge branch 'master' into feature/CODEOWNERS
+* Contributors: Kotaro Yoshimoto
+
 16.7.4 (2025-07-11)
 -------------------
 
