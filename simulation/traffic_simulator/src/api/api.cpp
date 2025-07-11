@@ -58,7 +58,7 @@ auto API::startNpcLogic() -> void
     THROW_SIMULATION_ERROR("NPC logics are already started.");
   } else {
     clock_.start();
-    entity_manager_ptr_->startNpcLogic(getCurrentTime());
+    //entity_manager_ptr_->startNpcLogic(getCurrentTime());
   }
 }
 
