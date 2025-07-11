@@ -203,24 +203,29 @@ auto PolylineTrajectoryPositioner::isNearestWaypointReachable(
 
 auto PolylineTrajectoryPositioner::validatedDistanceToNearestWaypoint() const -> double
 {
-  const double distance_to_nearest_waypoint =
-    distance::distanceAlongLanelet(
-      validated_entity_status_.pose(), validated_entity_status_.boundingBox(),
-      nearest_waypoint_pose_, validated_entity_status_.boundingBox(), matching_distance_,
-      hdmap_utils_ptr_)
-      .value_or(math::geometry::hypot(
-        validated_entity_status_.position(), nearest_waypoint_pose_.position));
-
-  /// @note FollowTrajectoryAction does not support backwards movement
-  if (distance_to_nearest_waypoint < 0.0) {
-    THROW_SIMULATION_ERROR(
-      "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
-      "following information to the developer: Vehicle ",
-      std::quoted(validated_entity_status_.name()),
-      "'s distance_to_nearest_waypoint is less than 0.0. The value is ",
-      distance_to_nearest_waypoint, ".");
+  const double distance_euclidean =
+    math::geometry::hypot(validated_entity_status_.position(), nearest_waypoint_pose_.position);
+  if (const std::optional<double> opt_distance_along_lanelet = distance::distanceAlongLanelet(
+        validated_entity_status_.pose(), validated_entity_status_.boundingBox(),
+        nearest_waypoint_pose_, validated_entity_status_.boundingBox(), matching_distance_,
+        hdmap_utils_ptr_);
+      opt_distance_along_lanelet.has_value()) {
+    if (opt_distance_along_lanelet.value() < 0.0) {
+      /// @note FollowTrajectoryAction does not support backwards movement
+      THROW_SIMULATION_ERROR(
+        "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
+        "following information to the developer: Vehicle ",
+        std::quoted(validated_entity_status_.name()),
+        "'s distance_to_nearest_waypoint is less than 0.0. The value is ",
+        opt_distance_along_lanelet.value(), ".");
+    } else if (opt_distance_along_lanelet.value() <= matching_distance_) {
+      /// @note If the waypoint is this close - use euclidean distance to avoid inaccuracies related to lanelet matching
+      return distance_euclidean;
+    } else {
+      return opt_distance_along_lanelet.value();
+    }
   } else {
-    return distance_to_nearest_waypoint;
+    return distance_euclidean;
   }
 }
 

@@ -20,6 +20,7 @@
 #include <traffic_simulator/lanelet_wrapper/lanelet_map.hpp>
 #include <traffic_simulator/lanelet_wrapper/pose.hpp>
 #include <traffic_simulator/utils/distance.hpp>
+#include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 
 namespace traffic_simulator
@@ -334,16 +335,17 @@ auto distanceAlongLanelet(
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<double>
 {
   /// @note due to this hardcoded value, the method cannot be used for calculations along a crosswalk (for pedestrians)
-  constexpr bool include_crosswalk{false};
+  constexpr bool include_crosswalk = false;
 
-  if (const auto from_lanelet_pose = lanelet_wrapper::pose::toLaneletPose(
+  if (const auto from_lanelet_pose = pose::toCanonicalizedLaneletPose(
         from_pose, from_bounding_box, include_crosswalk, matching_distance);
       from_lanelet_pose.has_value()) {
-    if (const auto to_lanelet_pose = lanelet_wrapper::pose::toLaneletPose(
+    if (const auto to_lanelet_pose = pose::toCanonicalizedLaneletPose(
           to_pose, to_bounding_box, include_crosswalk, matching_distance);
         to_lanelet_pose.has_value()) {
       return hdmap_utils_ptr->getLongitudinalDistance(
-        from_lanelet_pose.value(), to_lanelet_pose.value());
+        static_cast<LaneletPose>(from_lanelet_pose.value()),
+        static_cast<LaneletPose>(to_lanelet_pose.value()));
     }
   }
   return std::nullopt;
