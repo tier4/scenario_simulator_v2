@@ -25,6 +25,7 @@ CanonicalizedEntityStatus::CanonicalizedEntityStatus(
 : canonicalized_lanelet_poses_{canonicalized_lanelet_poses},
   entity_status_{may_non_canonicalized_entity_status}
 {
+  entity_status_.lanelet_poses.clear();
   for (const auto & canonicalized_lanelet_pose : canonicalized_lanelet_poses_) {
     if (canonicalized_lanelet_pose) {
       entity_status_.lanelet_poses.emplace_back(
