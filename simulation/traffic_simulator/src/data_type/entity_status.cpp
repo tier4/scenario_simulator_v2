@@ -122,13 +122,10 @@ auto CanonicalizedEntityStatus::getActionStatus() const noexcept
 
 auto CanonicalizedEntityStatus::isInLanelet() const noexcept -> bool
 {
-  // return canonicalized_lanelet_pose_.has_value();
-  for (const auto & canonicalized_lanelet_pose : canonicalized_lanelet_poses_) {
-    if (canonicalized_lanelet_pose.has_value()) {
-      return true;
-    }
+  if (canonicalized_lanelet_poses_.empty()) {
+    return false;
   }
-  return false;
+  return true;
 }
 
 auto CanonicalizedEntityStatus::getBoundingBox() const noexcept
