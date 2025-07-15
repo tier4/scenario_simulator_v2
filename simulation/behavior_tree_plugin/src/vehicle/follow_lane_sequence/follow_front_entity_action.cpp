@@ -75,7 +75,7 @@ bool FollowFrontEntityAction::checkPreconditions()
     request_ != traffic_simulator::behavior::Request::NONE &&
     request_ != traffic_simulator::behavior::Request::FOLLOW_LANE) {
     return false;
-  } else if (!getRightOfWayEntities(route_lanelets_).empty()) {
+  } else if (isNeedToRightOfWay(route_lanelets_)) {
     return false;
   } else if (!behavior_parameter_.see_around) {
     return false;
@@ -93,16 +93,22 @@ BT::NodeStatus FollowFrontEntityAction::doAction()
   if (trajectory == nullptr) {
     return BT::NodeStatus::FAILURE;
   }
-  auto distance_to_stopline =
+  const auto distance_to_stopline =
     traffic_simulator::distance::distanceToStopLine(route_lanelets_, *trajectory);
-  auto distance_to_conflicting_entity =
-    getDistanceToConflictingEntity(route_lanelets_, *trajectory);
+  const auto distance_to_conflicting_entity =
+    traffic_simulator::distance::distanceToNearestConflictingPose(
+      route_lanelets_, *trajectory, *canonicalized_entity_status_,
+      getOtherEntitiesCanonicalizedEntityStatuses());
   const auto front_entity_name = getFrontEntityName(*trajectory);
   if (!front_entity_name) {
     return BT::NodeStatus::FAILURE;
   }
   const auto & front_entity_status = getEntityStatus(front_entity_name.value());
-  distance_to_front_entity_ = getDistanceToTargetEntity(*trajectory, front_entity_status);
+  distance_to_front_entity_ = traffic_simulator::distance::splineDistanceToBoundingBox(
+    *trajectory, canonicalized_entity_status_->getCanonicalizedLaneletPose().value(),
+    canonicalized_entity_status_->getBoundingBox(),
+    front_entity_status.getCanonicalizedLaneletPose().value(),
+    front_entity_status.getBoundingBox());
   if (!distance_to_front_entity_) {
     return BT::NodeStatus::FAILURE;
   }
