@@ -35,7 +35,7 @@ public:
     const std::string & lanelet2_map_file, const std::string & scenario_filename,
     const bool verbose, const rclcpp::NodeOptions & option,
     const std::set<std::uint8_t> & auto_sink_entity_types = {});
-  void start();
+  void start(const bool start_scenario_clock = true);
   void stop(Result result, const std::string & description = "");
   void expectThrow() { exception_expect_ = true; }
   void expectNoThrow() { exception_expect_ = false; }
@@ -63,6 +63,7 @@ protected:
 
 private:
   std::string scenario_filename_;
+  std::string ego_model_;
   bool exception_expect_;
   std::string junit_path_;
   void update();
@@ -71,10 +72,16 @@ private:
   rclcpp::TimerBase::SharedPtr update_timer_;
   int timeout_;
   auto configure(
-    const std::string & map_path, const std::string & lanelet2_map_file,
+    std::string map_path, const std::string & lanelet2_map_file,
     const std::string & scenario_filename, const bool verbose,
     const std::set<std::uint8_t> & auto_sink_entity_types = {}) -> traffic_simulator::Configuration
   {
+    /// @note Determine map path, prefer passed-in value, fall back to ros-2 parameter if empty
+    if (map_path.empty()) {
+      declare_parameter<std::string>("map_path", "");
+      get_parameter<std::string>("map_path", map_path);
+    }
+
     auto configuration = traffic_simulator::Configuration(
       map_path, lanelet2_map_file, scenario_filename, auto_sink_entity_types);
     configuration.verbose = verbose;
