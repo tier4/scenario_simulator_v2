@@ -192,9 +192,19 @@ void DoNothingBehavior::update(double current_time, double step_time)
     }
   } else {
     behavior = "do_nothing";
+    auto entity_status_with_zero_twist_accel =
+      static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status_);
+    entity_status_with_zero_twist_accel.action_status.twist =
+      geometry_msgs::build<geometry_msgs::msg::Twist>()
+        .linear(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0).y(0).z(0))
+        .angular(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0).y(0).z(0));
+    entity_status_with_zero_twist_accel.action_status.accel =
+      geometry_msgs::build<geometry_msgs::msg::Accel>()
+        .linear(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0).y(0).z(0))
+        .angular(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0).y(0).z(0));
     canonicalized_entity_status_->set(
-      static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status_),
-      getRouteLanelets(), getDefaultMatchingDistanceForLaneletPoseCalculation());
+      entity_status_with_zero_twist_accel, getRouteLanelets(),
+      getDefaultMatchingDistanceForLaneletPoseCalculation());
   }
 }
 
