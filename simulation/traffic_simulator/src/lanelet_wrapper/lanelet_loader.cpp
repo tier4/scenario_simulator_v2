@@ -25,38 +25,48 @@ namespace traffic_simulator
 {
 namespace lanelet_wrapper
 {
-auto LaneletLoader::load(
-  const std::filesystem::path & lanelet_map_path, const std::filesystem::path & projector_info_path)
-  -> lanelet::LaneletMapPtr
+auto LaneletLoader::load(const std::filesystem::path & lanelet_map_path) -> lanelet::LaneletMapPtr
 {
   lanelet::ErrorMessages lanelet_errors;
   lanelet::LaneletMapPtr lanelet_map_ptr = [&]() {
-    if (auto map_projector_info = YAML::LoadFile(projector_info_path.string())) {
-      if (auto projector_type = map_projector_info["projector_type"]) {
-        auto projector_type_string = projector_type.as<std::string>();
-        // https://docs.web.auto/user-manuals/vector-map-builder/how-to-use/edit-maps#%E5%9C%B0%E5%9B%B3%E5%B0%84%E5%BD%B1%E6%83%85%E5%A0%B1-mapprojectorinfo-%E3%81%AE%E5%A4%89%E6%9B%B4
-        if (projector_type_string == "TransverseMercator") {
-          lanelet::Origin origin({0.0, 0.0});
-          if (auto map_origin_node = map_projector_info["map_origin"]) {
-            if (auto map_origin_latitude = map_origin_node["latitude"]) {
-              origin.position.lat = map_origin_latitude.as<double>();
-            }
-            if (auto map_origin_longitude = map_origin_node["longitude"]) {
-              origin.position.lon = map_origin_longitude.as<double>();
+    const auto projector_info_path = lanelet_map_path.parent_path() / "map_projector_info.yaml";
+    if (std::filesystem::exists(projector_info_path)) {
+      try {
+        if (auto map_projector_info = YAML::LoadFile(projector_info_path.string())) {
+          if (auto projector_type = map_projector_info["projector_type"]) {
+            auto projector_type_string = projector_type.as<std::string>();
+            // https://docs.web.auto/user-manuals/vector-map-builder/how-to-use/edit-maps#%E5%9C%B0%E5%9B%B3%E5%B0%84%E5%BD%B1%E6%83%85%E5%A0%B1-mapprojectorinfo-%E3%81%AE%E5%A4%89%E6%9B%B4
+            if (projector_type_string == "TransverseMercator") {
+              lanelet::Origin origin({0.0, 0.0});
+              if (auto map_origin_node = map_projector_info["map_origin"]) {
+                if (auto map_origin_latitude = map_origin_node["latitude"]) {
+                  origin.position.lat = map_origin_latitude.as<double>();
+                }
+                if (auto map_origin_longitude = map_origin_node["longitude"]) {
+                  origin.position.lon = map_origin_longitude.as<double>();
+                }
+              }
+              double scale_factor = 0.9996;
+              if (auto scale_factor_node = map_projector_info["scale_factor"]) {
+                scale_factor = scale_factor_node.as<double>();
+              }
+              lanelet::projection::TransverseMercatorProjector projector(origin, scale_factor);
+              return lanelet::load(lanelet_map_path.string(), projector, &lanelet_errors);
+            } else if (projector_type_string == "MGRS") {
+              lanelet::projection::MGRSProjector projector;
+              return lanelet::load(lanelet_map_path.string(), projector, &lanelet_errors);
             }
           }
-          double scale_factor = 0.9996;
-          if (auto scale_factor_node = map_projector_info["scale_factor"]) {
-            scale_factor = scale_factor_node.as<double>();
-          }
-          lanelet::projection::TransverseMercatorProjector projector(origin, scale_factor);
-          return lanelet::load(lanelet_map_path.string(), projector, &lanelet_errors);
-        } else if (projector_type_string == "MGRS") {
-          lanelet::projection::MGRSProjector projector;
-          return lanelet::load(lanelet_map_path.string(), projector, &lanelet_errors);
         }
+      } catch (const std::exception& e) {
+        THROW_SIMULATION_ERROR(
+          "Failed to load map projector info file: ", projector_info_path.string(),
+          ". Error: ", e.what());
       }
     }
+    // Default to MGRS if no valid projector configuration is found
+    lanelet::projection::MGRSProjector projector;
+    return lanelet::load(lanelet_map_path.string(), projector, &lanelet_errors);
   }();
 
   if (!lanelet_errors.empty()) {

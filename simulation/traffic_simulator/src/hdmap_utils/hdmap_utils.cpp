@@ -64,10 +64,9 @@ namespace hdmap_utils
 using namespace traffic_simulator::lanelet_wrapper;
 
 HdMapUtils::HdMapUtils(
-  const std::filesystem::path & lanelet2_map_path, const geographic_msgs::msg::GeoPoint &,
-  const std::filesystem::path & map_projector_info_path)
+  const boost::filesystem::path & lanelet2_map_path, const geographic_msgs::msg::GeoPoint &)
 {
-  lanelet_map_ptr_ = LaneletLoader::load(lanelet2_map_path, map_projector_info_path);
+  lanelet_map_ptr_ = LaneletLoader::load(lanelet2_map_path.string());
   routing_graphs_ = std::make_unique<RoutingGraphs>(lanelet_map_ptr_);
 }
 

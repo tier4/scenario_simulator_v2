@@ -25,9 +25,7 @@ namespace lanelet_wrapper
 class LaneletLoader
 {
 public:
-  static auto load(
-    const std::filesystem::path & lanelet_map_path,
-    const std::filesystem::path & projector_info_path) -> lanelet::LaneletMapPtr;
+  static auto load(const std::filesystem::path & lanelet_map_path) -> lanelet::LaneletMapPtr;
 
 private:
   static auto overwriteLaneletsCenterline(lanelet::LaneletMapPtr) -> void;

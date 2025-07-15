@@ -60,8 +60,6 @@ struct Configuration
    * ------------------------------------------------------------------------ */
   const Pathname map_path;
 
-  const Pathname map_projector_info_path;
-
   const Filename lanelet2_map_file;
 
   const Filename pointcloud_map_file;
