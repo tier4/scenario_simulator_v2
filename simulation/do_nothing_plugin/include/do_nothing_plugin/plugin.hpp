@@ -35,7 +35,6 @@ public:
   void configure(const rclcpp::Logger & logger) override;
   /**
    * @brief Get the Current Action object
-   * @return const std::string& always return "do_nothing"
    */
   auto getCurrentAction() -> const std::string & override;
 
@@ -53,7 +52,6 @@ public:                                         \
   DEFINE_GETTER_SETTER(OtherEntityStatus,                                EntityStatusDict)
   DEFINE_GETTER_SETTER(PedestrianParameters,                             traffic_simulator_msgs::msg::PedestrianParameters)
   DEFINE_GETTER_SETTER(ReferenceTrajectory,                              std::shared_ptr<math::geometry::CatmullRomSpline>)
-  DEFINE_GETTER_SETTER(RouteLanelets,                                    lanelet::Ids)
   DEFINE_GETTER_SETTER(TargetSpeed,                                      std::optional<double>)
   DEFINE_GETTER_SETTER(TrafficLights,                                    std::shared_ptr<traffic_simulator::TrafficLightsBase>)
   DEFINE_GETTER_SETTER(VehicleParameters,                                traffic_simulator_msgs::msg::VehicleParameters)
@@ -77,9 +75,11 @@ private:                                                               \
   DEFINE_GETTER_SETTER(HdMapUtils,                std::shared_ptr<hdmap_utils::HdMapUtils>,                         hdmap_utils_)
   DEFINE_GETTER_SETTER(PolylineTrajectory,        std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory>, polyline_trajectory)
   DEFINE_GETTER_SETTER(Request,                   traffic_simulator::behavior::Request,                             request)
+  DEFINE_GETTER_SETTER(RouteLanelets,             lanelet::Ids,                                                     route_lanelets_)
   DEFINE_GETTER_SETTER(StepTime,                  double,                                                           step_time_)
   // clang-format on
 #undef DEFINE_GETTER_SETTER
+  std::string behavior = "do_nothing";  ///< The action name for this behavior plugin.
 };
 }  // namespace entity_behavior
 

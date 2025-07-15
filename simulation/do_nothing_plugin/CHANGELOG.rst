@@ -24,6 +24,68 @@ Changelog for package do_nothing_plugin
 16.4.2 (2025-05-23)
 -------------------
 
+16.7.5 (2025-07-11)
+-------------------
+* Merge branch 'master' into feature/CODEOWNERS
+* Contributors: Kotaro Yoshimoto
+
+16.7.4 (2025-07-11)
+-------------------
+* Merge pull request `#1644 <https://github.com/tier4/scenario_simulator_v2/issues/1644>`_ from tier4/feature/twist_value_in_do_nothing
+  Initialize twist/accel values to zero in DoNothingBehavior when not following trajectory
+* apply reformat
+* Initialize twist/accel values to zero in DoNothingBehavior when not following trajectory
+  🤖 Generated with [Claude Code](https://claude.ai/code)
+  Co-Authored-By: Claude <noreply@anthropic.com>
+* Contributors: Masaya Kataoka, Taiga
+
+16.7.3 (2025-07-08)
+-------------------
+* Merge pull request `#1643 <https://github.com/tier4/scenario_simulator_v2/issues/1643>`_ from tier4/feature/action_for_do_nothing
+  Return "follow_polyline_trajectory" behavior in do_nothing behavior plugin
+* apply reformat
+* return "follow_polyline_trajectory" behavior in do_nothing behavior plugin
+* Contributors: Masaya Kataoka, Taiga
+
+16.7.2 (2025-07-07)
+-------------------
+* Merge branch 'master' into fix/zmqpp
+* Merge branch 'master' into fix/zmqpp
+* Contributors: Kotaro Yoshimoto
+
+16.7.1 (2025-07-04)
+-------------------
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka
+
+16.7.0 (2025-07-03)
+-------------------
+* Merge branch 'master' into feature/record_option_for_rosbag
+* Merge branch 'master' into feature/record_option_for_rosbag
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
+16.6.1 (2025-07-02)
+-------------------
+
+16.6.0 (2025-07-01)
+-------------------
+* Merge branch 'master' into feature/perception_noise_config_v3
+* Merge branch 'master' into feature/perception_noise_config_v3
+* Contributors: Kotaro Yoshimoto
+
+16.5.11 (2025-06-26)
+--------------------
+* Merge pull request `#1623 <https://github.com/tier4/scenario_simulator_v2/issues/1623>`_ from tier4/fix/lanelet_pose_in_do_nothing
+  Fix/lanelet pose in do nothing
+* enable set route lanelet in DoNothingPlugin
+* Merge branch 'master' into fix/lanelet_pose_in_do_nothing
+* Contributors: Masaya Kataoka, Taiga
+
 16.5.10 (2025-06-23)
 --------------------
 * Merge branch 'master' into devin/1750224079-update-communication-docs
