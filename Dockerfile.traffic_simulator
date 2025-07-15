@@ -1,18 +1,26 @@
 ARG ROS_DISTRO="humble"
 FROM ros:${ROS_DISTRO} AS build-stage
-SHELL ["/bin/bash", "-c"]
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NOWARNINGS=yes
 
 RUN --mount=type=cache,id=apt-cache-amd64,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,id=apt-lib-amd64,target=/var/lib/apt,sharing=locked \
-    apt-get update && apt-get -y install python3-pip python3-rospkg python3-rosdep software-properties-common ccache && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
+        python3-pip \
+        python3-rospkg \
+        python3-rosdep \
+        software-properties-common \
+        ccache && \
     add-apt-repository ppa:kisak/kisak-mesa -y && \
-    apt-get update && apt-get install libegl-mesa0 -y
+    apt-get update && \
+    apt-get install -y --no-install-recommends libegl-mesa0
 
+# Keep the cached APT files to speed up subsequent builds
 RUN rm -f /etc/apt/apt.conf.d/docker-clean && \
     echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
 
+# Copy all necessary source directories
 WORKDIR /home/ubuntu/Desktop/scenario_simulator_ws/src/scenario_simulator
 COPY ./simulation/traffic_simulator /home/ubuntu/Desktop/scenario_simulator_ws/src/scenario_simulator/simulation/traffic_simulator
 COPY ./simulation/traffic_simulator_msgs /home/ubuntu/Desktop/scenario_simulator_ws/src/scenario_simulator/simulation/traffic_simulator_msgs
@@ -26,21 +34,53 @@ RUN --mount=type=cache,id=apt-cache-amd64,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,id=apt-lib-amd64,target=/var/lib/apt,sharing=locked \
     source /opt/ros/${ROS_DISTRO}/setup.bash \
     && apt-get update \
-    && rosdep install -iy --from-paths . --rosdistro ${ROS_DISTRO} -t build -t buildtool -t exec
+    && rosdep install -iy --from-paths . --rosdistro ${ROS_DISTRO} -t build -t buildtool -t exec \
+    && pip install xmlschema
 
 WORKDIR /home/ubuntu/Desktop/scenario_simulator_ws
 
 ENV CC="/usr/lib/ccache/gcc"
 ENV CXX="/usr/lib/ccache/g++"
 ENV CCACHE_DIR="/ccache"
-RUN --mount=type=cache,target=/ccache source /opt/ros/${ROS_DISTRO}/setup.bash && \
-    colcon build --symlink-install \
-    --cmake-args \
+RUN bash -c "source /opt/ros/${ROS_DISTRO}/setup.bash && \
+    colcon build --cmake-args \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_C_COMPILER_LAUNCHER=ccache \
     -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
-    -DBUILD_TESTING=OFF
+    -DBUILD_TESTING=OFF"
+
+# ===================================================================
+# Runtime Stage: Create a minimal final image
+# ===================================================================
+FROM ros:${ROS_DISTRO}-ros-base AS runtime
+
+# Install runtime dependencies in a single layer and clean up
+RUN --mount=type=cache,id=apt-cache-amd64,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,id=apt-lib-amd64,target=/var/lib/apt,sharing=locked \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
+    software-properties-common python3-pip && \
+    add-apt-repository universe -y && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
+    ros-humble-rmw-cyclonedds-cpp libgoogle-glog0v5 libprotobuf23 libzmq5 \
+    libpugixml1v5 libtbb12 libboost-filesystem1.74.0 ros-humble-lanelet2-matching \
+    ros-humble-lanelet2-io ros-humble-lanelet2-routing libgeographic19 ros-humble-behaviortree-cpp-v3 && \
+    pip install xmlschema && \
+    apt-get remove --purge -y software-properties-common python3-pip && \
+    apt-get autoremove -y && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY --from=build-stage /home/ubuntu/Desktop/scenario_simulator_ws/install/ /home/ubuntu/Desktop/scenario_simulator_ws/install
+
+# Remove unnecessary development files from the copied artifacts
+RUN find /home/ubuntu/Desktop/scenario_simulator_ws/install -name cmake -type d -exec rm -rf {} + && \
+    find /home/ubuntu/Desktop/scenario_simulator_ws/install -name '*.a' -type f -delete && \
+    rm -rf /home/ubuntu/Desktop/scenario_simulator_ws/install/include
+
 COPY ./docker-entrypoint.sh /
 RUN chmod a+x /docker-entrypoint.sh
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
+
