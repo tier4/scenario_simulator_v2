@@ -165,12 +165,6 @@ public:
 
   auto getLanelets(const lanelet::Ids &) const -> lanelet::Lanelets;
 
-  auto getLongitudinalDistance(
-    const traffic_simulator_msgs::msg::LaneletPose & from_pose,
-    const traffic_simulator_msgs::msg::LaneletPose & to_pose,
-    const traffic_simulator::RoutingConfiguration & routing_configuration =
-      traffic_simulator::RoutingConfiguration()) const -> std::optional<double>;
-
   auto getNearbyLaneletIds(
     const geometry_msgs::msg::Point &, const double distance_threshold,
     const bool include_crosswalk, const std::size_t search_count = 5) const -> lanelet::Ids;
