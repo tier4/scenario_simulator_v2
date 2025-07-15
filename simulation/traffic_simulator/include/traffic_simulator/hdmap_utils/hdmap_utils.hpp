@@ -32,7 +32,6 @@
 #include <autoware_lanelet2_extension/utility/query.hpp>
 #include <autoware_lanelet2_extension/utility/utilities.hpp>
 #include <autoware_map_msgs/msg/lanelet_map_bin.hpp>
-#include <boost/filesystem.hpp>
 #include <geographic_msgs/msg/geo_point.hpp>
 #include <geometry/spline/catmull_rom_spline.hpp>
 #include <geometry/spline/catmull_rom_spline_interface.hpp>
@@ -63,7 +62,9 @@ enum class LaneletType { LANE, CROSSWALK };
 class HdMapUtils
 {
 public:
-  explicit HdMapUtils(const boost::filesystem::path &, const geographic_msgs::msg::GeoPoint &);
+  explicit HdMapUtils(
+    const std::filesystem::path &, const geographic_msgs::msg::GeoPoint &,
+    const std::filesystem::path &);
 
   auto canChangeLane(
     const lanelet::Id from, const lanelet::Id to,
@@ -347,8 +348,6 @@ private:
     -> geometry_msgs::msg::Vector3;
 
   auto mapCallback(const autoware_map_msgs::msg::LaneletMapBin &) const -> void;
-
-  auto overwriteLaneletsCenterline() -> void;
 
   auto resamplePoints(const lanelet::ConstLineString3d &, const std::int32_t num_segments) const
     -> lanelet::BasicPoints3d;

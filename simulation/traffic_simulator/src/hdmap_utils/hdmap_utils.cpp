@@ -20,7 +20,6 @@
 
 #include <algorithm>
 #include <autoware_lanelet2_extension/io/autoware_osm_parser.hpp>
-#include <autoware_lanelet2_extension/projection/mgrs_projector.hpp>
 #include <autoware_lanelet2_extension/utility/message_conversion.hpp>
 #include <autoware_lanelet2_extension/utility/query.hpp>
 #include <autoware_lanelet2_extension/utility/utilities.hpp>
@@ -33,6 +32,7 @@
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
 #include <deque>
+#include <filesystem>
 #include <geometry/quaternion/euler_to_quaternion.hpp>
 #include <geometry/quaternion/get_rotation.hpp>
 #include <geometry/quaternion/operator.hpp>
@@ -51,6 +51,7 @@
 #include <traffic_simulator/color_utils/color_utils.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/helper/helper.hpp>
+#include <traffic_simulator/lanelet_wrapper/lanelet_loader.hpp>
 #include <traffic_simulator/lanelet_wrapper/lanelet_map.hpp>
 #include <traffic_simulator/lanelet_wrapper/pose.hpp>
 #include <traffic_simulator/lanelet_wrapper/traffic_rules.hpp>
@@ -63,26 +64,11 @@ namespace hdmap_utils
 using namespace traffic_simulator::lanelet_wrapper;
 
 HdMapUtils::HdMapUtils(
-  const boost::filesystem::path & lanelet2_map_path, const geographic_msgs::msg::GeoPoint &)
+  const std::filesystem::path & lanelet2_map_path, const geographic_msgs::msg::GeoPoint &,
+  const std::filesystem::path & map_projector_info_path)
 {
-  lanelet::projection::MGRSProjector projector;
-
-  lanelet::ErrorMessages errors;
-
-  lanelet_map_ptr_ = lanelet::load(lanelet2_map_path.string(), projector, &errors);
-
+  lanelet_map_ptr_ = LaneletLoader::load(lanelet2_map_path, map_projector_info_path);
   routing_graphs_ = std::make_unique<RoutingGraphs>(lanelet_map_ptr_);
-
-  if (not errors.empty()) {
-    std::stringstream ss;
-    const auto * separator = "";
-    for (const auto & error : errors) {
-      ss << separator << error;
-      separator = "\n";
-    }
-    THROW_SIMULATION_ERROR("Failed to load lanelet map (", ss.str(), ")");
-  }
-  overwriteLaneletsCenterline();
 }
 
 auto HdMapUtils::countLaneChanges(
@@ -1108,16 +1094,6 @@ auto HdMapUtils::generateMarker() const -> visualization_msgs::msg::MarkerArray
   insertMarkerArray(
     markers, lanelet::visualization::generateLaneletIdMarker(crosswalk_lanelets, cl_lanelet_id));
   return markers;
-}
-
-auto HdMapUtils::overwriteLaneletsCenterline() -> void
-{
-  for (auto & lanelet_obj : lanelet_map_ptr_->laneletLayer) {
-    if (!lanelet_obj.hasCustomCenterline()) {
-      const auto fine_center_line = generateFineCenterline(lanelet_obj, 2.0);
-      lanelet_obj.setCenterline(fine_center_line);
-    }
-  }
 }
 
 auto HdMapUtils::findNearestIndexPair(
