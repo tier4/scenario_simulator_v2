@@ -160,9 +160,10 @@ void PedestrianPlugin::update(double current_time, double step_time)
       ego_vel, relative_position, relative_velocity, ego_bbox, ego_angle, other_bbox, other_angle,
       step_time));
   }
+  const auto planning_speed = getPlanningSpeed() ? getPlanningSpeed().value() : 0.0;
 
   const auto optimized_velocity = optimizeVelocityWithConstraints(
-    orca_lines, 1.0, cast_to_vec(getNextGoal() - ego_pose.position), false);
+    orca_lines, planning_speed, cast_to_vec(getNextGoal() - ego_pose.position), false);
   if (optimized_velocity) {
     updateEgoPose(optimized_velocity.value(), step_time);
   }
