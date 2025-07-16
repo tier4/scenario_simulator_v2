@@ -55,16 +55,21 @@ auto LaneletLoader::load(const std::filesystem::path & lanelet_map_path) -> lane
             } else if (projector_type_string == "MGRS") {
               lanelet::projection::MGRSProjector projector;
               return lanelet::load(lanelet_map_path.string(), projector, &lanelet_errors);
+            } else {
+              THROW_SIMULATION_ERROR(
+                "Unsupported projector type: ", projector_type_string,
+                ". Supported types are TransverseMercator and MGRS.");
             }
           }
         }
-      } catch (const std::exception& e) {
+      } catch (const YAML::Exception & e) {
         THROW_SIMULATION_ERROR(
-          "Failed to load map projector info file: ", projector_info_path.string(),
+          "Failed to load projector info from ", projector_info_path.string(),
           ". Error: ", e.what());
       }
     }
-    // Default to MGRS if no valid projector configuration is found
+
+    /// @note Default to MGRS if no projector configuration is found
     lanelet::projection::MGRSProjector projector;
     return lanelet::load(lanelet_map_path.string(), projector, &lanelet_errors);
   }();
