@@ -20,32 +20,28 @@ namespace context_gamma_planner
 auto calculate_orca_line(
   const geometry_msgs::msg::Vector3 & ego_velocity,
   const geometry_msgs::msg::Point & relative_position,
-  const geometry_msgs::msg::Vector3 & relative_velocity, const Polygon & ego_polygon,
-  const Polygon & other_polygon) -> line
+  const geometry_msgs::msg::Vector3 & relative_velocity,
+  const traffic_simulator_msgs::msg::BoundingBox & ego_bbox, const double ego_angle,
+  const traffic_simulator_msgs::msg::BoundingBox & other_bbox, const double other_angle,
+  const double step_time) -> line
 {
+  auto ellipseRadius = [](
+                         const traffic_simulator_msgs::msg::BoundingBox bbox,
+                         const double relative_angle, const double current_angle) {
+    const auto other_major_axis = bbox.dimensions.x * 0.5 * M_SQRT2;
+    const auto other_minor_axis = bbox.dimensions.y * 0.5 * M_SQRT2;
+
+    const float local_phi = relative_angle - current_angle;
+    const float cos_p = std::cos(local_phi);
+    const float sin_p = std::sin(local_phi);
+
+    return (other_major_axis * other_minor_axis) /
+           std::sqrt(
+             (other_minor_axis * cos_p) * (other_minor_axis * cos_p) +
+             (other_major_axis * sin_p) * (other_major_axis * sin_p));
+  };
+
   const auto inv_time_horizon = 1.0 / 5.0;
-
-  auto calcLineCoefficients = [](const geometry_msgs::msg::Point & position) {
-    const double m = (std::abs(position.x) > 1e-4) ? position.y / position.x : 0.0;
-    return m;
-  };
-
-  auto computeSignedDistanceRange = [](const Polygon & poly, const double a, const double b) {
-    auto distanceFromLine = [](const Point & p, const double a, const double b) {
-      return (a * p.x() - p.y() + b) / std::sqrt(a * a + 1.0);
-    };
-    std::vector<std::pair<double, Point>> signed_distance;
-    for (auto & pt : poly.outer()) {
-      const auto distance = distanceFromLine(pt, a, b);
-      signed_distance.emplace_back(distance, pt);
-    }
-    auto compare = [](const std::pair<double, Point> & a, const std::pair<double, Point> & b) {
-      return a.first < b.first;
-    };
-    const auto [max_dis, max_pt] =
-      *std::max_element(signed_distance.begin(), signed_distance.end(), compare);
-    return max_dis;
-  };
 
   auto cast_to_point = [](const geometry_msgs::msg::Vector3 & p) {
     auto result = geometry_msgs::msg::Point();
@@ -55,38 +51,54 @@ auto calculate_orca_line(
     return result;
   };
 
-  const auto m = calcLineCoefficients(relative_position);
-
   const auto dist_sq = sqr(relative_position);
 
-  const auto agent_radius = computeSignedDistanceRange(ego_polygon, m, 0.0);
-  const auto other_radius = computeSignedDistanceRange(other_polygon, m, 0.0);
+  const auto relative_angle = std::atan2(relative_position.y, relative_position.x);
 
-  const auto combined_radius = agent_radius + other_radius;
+  const auto ego_radius = ellipseRadius(ego_bbox, relative_angle, ego_angle);
+  const auto other_radius = ellipseRadius(other_bbox, M_PI + relative_angle, other_angle);
+
+  const auto combined_radius = ego_radius + other_radius;
   const auto combined_radius_sq = sqr(combined_radius);
-
-  const auto w = relative_velocity - relative_position * inv_time_horizon;
-  const auto w_length_sq = sqr(w);
-  const auto dot_product1 = w.x * relative_position.x + w.y * relative_position.y;
 
   geometry_msgs::msg::Vector3 direction;
   geometry_msgs::msg::Point u;
-  if (dot_product1 < 0.0f && dot_product1 * dot_product1 > combined_radius_sq * w_length_sq) {
-    const float w_length = std::sqrt(w_length_sq);
-    direction = w / w_length;
-    u = cast_to_point(direction) * (combined_radius * inv_time_horizon - w_length);
-  } else {
-    const auto leg = std::sqrt(dist_sq - combined_radius_sq);
-    if (det(relative_position, w) > 0.0f) {
-      direction.x = (relative_position.x * leg - relative_position.y * combined_radius) / dist_sq;
-      direction.y = (relative_position.x * combined_radius + relative_position.y * leg) / dist_sq;
+  if (dist_sq >= combined_radius_sq) {
+    const auto w = relative_velocity - relative_position * inv_time_horizon;
+    const auto w_length_sq = sqr(w);
+    const auto dot_product1 = w.x * relative_position.x + w.y * relative_position.y;
+    if (dot_product1 < 0.0f && dot_product1 * dot_product1 > combined_radius_sq * w_length_sq) {
+      const auto w_length = std::sqrt(w_length_sq);
+      const auto unit_w = w / w_length;
+      direction.x = unit_w.y;
+      direction.y = unit_w.x * -1.0;
+      u = cast_to_point(direction) * (combined_radius * inv_time_horizon - w_length);
     } else {
-      direction.x = (relative_position.x * leg + relative_position.y * combined_radius) / dist_sq;
-      direction.y = (-relative_position.x * combined_radius + relative_position.y * leg) / dist_sq;
-      direction = direction * -1.0;
+      const auto leg = std::sqrt(dist_sq - combined_radius_sq);
+      if (det(relative_position, w) > 0.0f) {
+        direction.x = (relative_position.x * leg - relative_position.y * combined_radius) / dist_sq;
+        direction.y = (relative_position.x * combined_radius + relative_position.y * leg) / dist_sq;
+      } else {
+        direction.x = (relative_position.x * leg + relative_position.y * combined_radius) / dist_sq;
+        direction.y =
+          (-relative_position.x * combined_radius + relative_position.y * leg) / dist_sq;
+        direction = direction * -1.0;
+      }
+      const auto dot_product2 =
+        relative_velocity.x * direction.x + relative_velocity.y * direction.y;
+      u = cast_to_point(direction * dot_product2 - relative_velocity);
     }
-    const auto dot_product2 = relative_velocity.x * direction.x + relative_velocity.y * direction.y;
-    u = cast_to_point(direction * dot_product2 - relative_velocity);
+
+  } else {
+    const auto inv_time_step = 1.0 / step_time;
+    const auto w = relative_velocity - relative_position * inv_time_step;
+    const auto w_length_sq = sqr(w);
+    const auto w_length = std::sqrt(w_length_sq);
+
+    const auto unit_w = w / w_length;
+    direction.x = unit_w.y;
+    direction.y = unit_w.x * -1.0;
+    u = cast_to_point(unit_w * (combined_radius * inv_time_step - w_length));
   }
   const auto point = cast_to_point(ego_velocity + u * 0.5);
   return {point, direction};

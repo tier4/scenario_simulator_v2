@@ -15,10 +15,10 @@
 #ifndef CONTEXT_GAMMA_PLANNER__UTILS_ORCA_HPP_
 #define CONTEXT_GAMMA_PLANNER__UTILS_ORCA_HPP_
 
-#include <boost/geometry.hpp>
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
 #include <optional>
+#include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <vector>
 
 #include "context_gamma_planner/utils/math_utils.hpp"
@@ -26,14 +26,13 @@
 
 namespace context_gamma_planner
 {
-using Point = boost::geometry::model::d2::point_xy<double>;
-using Polygon = boost::geometry::model::polygon<Point>;
-
 auto calculate_orca_line(
   const geometry_msgs::msg::Vector3 & ego_velocity,
   const geometry_msgs::msg::Point & relative_position,
-  const geometry_msgs::msg::Vector3 & relative_velocity, const Polygon & ego_polygon,
-  const Polygon & other_polygon) -> line;
+  const geometry_msgs::msg::Vector3 & relative_velocity,
+  const traffic_simulator_msgs::msg::BoundingBox & ego_bbox, const double ego_angle,
+  const traffic_simulator_msgs::msg::BoundingBox & other_bbox, const double other_angle,
+  const double step_time) -> line;
 }  // namespace context_gamma_planner
 
 #endif  // CONTEXT_GAMMA_PLANNER__UTILS_ORCA_HPP_

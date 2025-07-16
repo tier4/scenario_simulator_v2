@@ -112,12 +112,14 @@ void PedestrianPlugin::update(double current_time, double step_time)
   }
 
   auto transformLocalToGlobalVelocity =
-    [](const geometry_msgs::msg::Pose & pose, geometry_msgs::msg::Vector3 local_vel) {
-      const auto yaw = math::geometry::convertQuaternionToEulerAngle(pose.orientation).z;
-      local_vel.x = std::cos(yaw) * local_vel.x - std::sin(yaw) * local_vel.y;
-      local_vel.y = std::sin(yaw) * local_vel.x + std::cos(yaw) * local_vel.y;
-      return local_vel;
+    [](const geometry_msgs::msg::Pose & pose, const geometry_msgs::msg::Vector3 & local_vel) {
+      tf2::Quaternion q;
+      tf2::fromMsg(pose.orientation, q);
+      tf2::Vector3 lv(local_vel.x, local_vel.y, local_vel.z);
+      tf2::Vector3 gv = tf2::quatRotate(q, lv);
+      return tf2::toMsg(gv);
     };
+
   auto cast_to_vec = [](const geometry_msgs::msg::Point & p) {
     auto result = geometry_msgs::msg::Vector3();
     result.x = p.x;
@@ -126,28 +128,37 @@ void PedestrianPlugin::update(double current_time, double step_time)
     return result;
   };
 
-  auto next_goal = getNextGoal();
-  // std::cout << next_goal.x << ", " << next_goal.y << std::endl;
   const auto ego_entity = getCanonicalizedEntityStatus();
-  const auto ego_pose = ego_entity->getMapPose();
-  const auto ego_vel = transformLocalToGlobalVelocity(ego_pose, ego_entity->getTwist().linear);
-  const auto ego_poly =
-    rotate_polygon(polygon_from_bbox(ego_entity->getBoundingBox()), ego_pose.orientation);
+  auto ego_pose = ego_entity->getMapPose();
+  const auto ego_bbox = ego_entity->getBoundingBox();
+  const auto ego_speed = ego_entity->getTwist().linear;
+  const auto ego_vel = transformLocalToGlobalVelocity(ego_pose, ego_speed);
+  const auto ego_angle = math::geometry::convertQuaternionToEulerAngle(ego_pose.orientation).z;
+
+  ego_pose.position.x += ego_bbox.center.x * cos(ego_angle) + ego_bbox.center.y * sin(ego_angle);
+  ego_pose.position.y += ego_bbox.center.x * sin(ego_angle) + ego_bbox.center.y * cos(ego_angle);
 
   std::vector<line> orca_lines;
   const auto other_entity_status = getOtherEntityStatus();
   for (const auto & [other_name, other_entity] : other_entity_status) {
-    const auto other_pose = other_entity.getMapPose();
-    const auto other_vel =
-      transformLocalToGlobalVelocity(other_pose, other_entity.getTwist().linear);
-    const auto other_poly =
-      rotate_polygon(polygon_from_bbox(other_entity.getBoundingBox()), other_pose.orientation);
+    const auto other_bbox = other_entity.getBoundingBox();
+    auto other_pose = other_entity.getMapPose();
+    const auto other_speed = other_entity.getTwist().linear;
+    const auto other_vel = transformLocalToGlobalVelocity(other_pose, other_speed);
+    const auto other_angle =
+      math::geometry::convertQuaternionToEulerAngle(other_pose.orientation).z;
+
+    other_pose.position.x +=
+      other_bbox.center.x * cos(other_angle) + other_bbox.center.y * sin(other_angle);
+    other_pose.position.y +=
+      other_bbox.center.x * sin(other_angle) + other_bbox.center.y * cos(other_angle);
 
     const auto relative_position = other_pose.position - ego_pose.position;
     const auto relative_velocity = ego_vel - other_vel;
 
-    orca_lines.push_back(
-      calculate_orca_line(ego_vel, relative_position, relative_velocity, ego_poly, other_poly));
+    orca_lines.push_back(calculate_orca_line(
+      ego_vel, relative_position, relative_velocity, ego_bbox, ego_angle, other_bbox, other_angle,
+      step_time));
   }
 
   const auto optimized_velocity = optimizeVelocityWithConstraints(
