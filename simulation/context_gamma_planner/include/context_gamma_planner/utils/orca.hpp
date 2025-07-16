@@ -26,6 +26,10 @@
 
 namespace context_gamma_planner
 {
+auto ellipse_radius(
+  const traffic_simulator_msgs::msg::BoundingBox & bbox, const double relative_angle,
+  const double current_angle) -> double;
+
 auto calculate_orca_line(
   const geometry_msgs::msg::Vector3 & ego_velocity,
   const geometry_msgs::msg::Point & relative_position,
