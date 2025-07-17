@@ -28,7 +28,7 @@ namespace lanelet_wrapper
 auto produceTransverseMercatorProjector(const YAML::Node & map_projector_info)
   -> lanelet::projection::TransverseMercatorProjector
 {
-  auto getMandatoryAtrribute = [](const YAML::Node & node, const std::string & key) -> YAML::Node {
+  auto getMandatoryAttribute = [](const YAML::Node & node, const std::string & key) -> YAML::Node {
     if (auto value = node[key]) {
       return value;
     } else {
@@ -37,11 +37,11 @@ auto produceTransverseMercatorProjector(const YAML::Node & map_projector_info)
   };
 
   lanelet::Origin origin({0.0, 0.0});
-  if (auto map_origin_node = getMandatoryAtrribute(map_projector_info, "map_origin")) {
-    if (auto map_origin_latitude = getMandatoryAtrribute(map_origin_node, "latitude")) {
+  if (auto map_origin_node = getMandatoryAttribute(map_projector_info, "map_origin")) {
+    if (auto map_origin_latitude = getMandatoryAttribute(map_origin_node, "latitude")) {
       origin.position.lat = map_origin_latitude.as<double>();
     }
-    if (auto map_origin_longitude = getMandatoryAtrribute(map_origin_node, "longitude")) {
+    if (auto map_origin_longitude = getMandatoryAttribute(map_origin_node, "longitude")) {
       origin.position.lon = map_origin_longitude.as<double>();
     }
   }
