@@ -38,40 +38,17 @@ public:
 private:
   void onUpdate() override
   {
-    if (api_.getCurrentTime() >= 20) {
+    if (api_.getCurrentTime() >= 30) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
 
     // LCOV_EXCL_START
 
-    // const auto getOffset = [this](std::string name) {
-    //   auto offset =
-    //     api_.getEntity(name).getCanonicalizedLaneletPose().value().getLaneletPose().offset;
-    //   offset = std::abs(offset);
-    //   if (offset < 0.1) {
-    //     return 0.0;
-    //   } else {
-    //     return offset;
-    //   }
-    // };
-
-    // static double accumulated_offset_normal = 0.0;
-    // static double accumulated_offset_gamma = 0.0;
-
-    // accumulated_offset_normal += getOffset("__TEST__bob_normal");
-    // accumulated_offset_gamma += getOffset("bob_gamma");
-
-    // if (
-    //   api_.getEntity("bob_gamma").getMapPose().position.y > 73745.0 &&
-    //   api_.getEntity("__TEST__bob_normal").getMapPose().position.y > 73745.0) {
-    //   if (
-    //     accumulated_offset_gamma > accumulated_offset_normal &&
-    //     std::abs(accumulated_offset_gamma - accumulated_offset_normal) > 5.0) {
-    //     stop(cpp_mock_scenarios::Result::SUCCESS);
-    //   } else {
-    //     stop(cpp_mock_scenarios::Result::FAILURE);
-    //   }
-    // }
+    if (
+      api_.getEntity("bob_gamma").getMapPose().position.y > 73745.0 &&
+      api_.getEntity("__CONTEXT_GAMMA_IGNORE__bob_normal").getMapPose().position.y > 73745.0) {
+      stop(cpp_mock_scenarios::Result::SUCCESS);
+    }
     // LCOV_EXCL_STOP
   }
 
@@ -104,10 +81,10 @@ private:
     bob_gamma.requestAcquirePosition(goal_pose);
 
     api_.spawn(
-      "__TEST__bob_normal",
+      "__CONTEXT_GAMMA_IGNORE__bob_normal",
       traffic_simulator::helper::constructCanonicalizedLaneletPose(34378, 0.0, 0.0),
       getPedestrianParameters());
-    auto & bob_normal = api_.getEntity("__TEST__bob_normal");
+    auto & bob_normal = api_.getEntity("__CONTEXT_GAMMA_IGNORE__bob_normal");
     bob_normal.requestSpeedChange(
       0.5, traffic_simulator::speed_change::Transition::LINEAR,
       traffic_simulator::speed_change::Constraint(
