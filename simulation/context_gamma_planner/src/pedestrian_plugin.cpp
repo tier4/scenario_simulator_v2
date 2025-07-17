@@ -141,6 +141,10 @@ void PedestrianPlugin::update(double current_time, double step_time)
   std::vector<line> orca_lines;
   const auto other_entity_status = getOtherEntityStatus();
   for (const auto & [other_name, other_entity] : other_entity_status) {
+    if (other_name.find("__CONTEXT_GAMMA_IGNORE__") != std::string::npos) {
+      continue;
+    }
+
     const auto other_bbox = other_entity.getBoundingBox();
     auto other_pose = other_entity.getMapPose();
     const auto other_speed = other_entity.getTwist().linear;
