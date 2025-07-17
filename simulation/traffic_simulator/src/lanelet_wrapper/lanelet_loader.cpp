@@ -25,37 +25,36 @@ namespace traffic_simulator
 {
 namespace lanelet_wrapper
 {
-auto LaneletLoader::load(const std::filesystem::path & lanelet_map_path) -> lanelet::LaneletMapPtr
+auto produceTransverseMercatorProjector(const YAML::Node & map_projector_info)
+  -> lanelet::projection::TransverseMercatorProjector
 {
-  auto produceTransverseMercatorProjector =
-    [](const YAML::Node & map_projector_info) -> lanelet::projection::TransverseMercatorProjector {
-    auto getMandatoryAtrribute = [](
-                                   const YAML::Node & node, const std::string & key) -> YAML::Node {
-      if (auto value = node[key]) {
-        return value;
-      } else {
-        THROW_SIMULATION_ERROR("Missing mandatory Transverse Mercator projector info: ", key);
-      }
-    };
-
-    lanelet::Origin origin({0.0, 0.0});
-    if (auto map_origin_node = getMandatoryAtrribute(map_projector_info, "map_origin")) {
-      if (auto map_origin_latitude = getMandatoryAtrribute(map_origin_node, "latitude")) {
-        origin.position.lat = map_origin_latitude.as<double>();
-      }
-      if (auto map_origin_longitude = getMandatoryAtrribute(map_origin_node, "longitude")) {
-        origin.position.lon = map_origin_longitude.as<double>();
-      }
+  auto getMandatoryAtrribute = [](const YAML::Node & node, const std::string & key) -> YAML::Node {
+    if (auto value = node[key]) {
+      return value;
+    } else {
+      THROW_SIMULATION_ERROR("Missing mandatory Transverse Mercator projector info: ", key);
     }
-    double scale_factor = 0.9996;
-    if (auto scale_factor_node = map_projector_info["scale_factor"]) {
-      scale_factor = scale_factor_node.as<double>();
-    }
-    return lanelet::projection::TransverseMercatorProjector(origin, scale_factor);
   };
 
-  lanelet::ErrorMessages lanelet_errors;
+  lanelet::Origin origin({0.0, 0.0});
+  if (auto map_origin_node = getMandatoryAtrribute(map_projector_info, "map_origin")) {
+    if (auto map_origin_latitude = getMandatoryAtrribute(map_origin_node, "latitude")) {
+      origin.position.lat = map_origin_latitude.as<double>();
+    }
+    if (auto map_origin_longitude = getMandatoryAtrribute(map_origin_node, "longitude")) {
+      origin.position.lon = map_origin_longitude.as<double>();
+    }
+  }
+  double scale_factor = 0.9996;
+  if (auto scale_factor_node = map_projector_info["scale_factor"]) {
+    scale_factor = scale_factor_node.as<double>();
+  }
+  return lanelet::projection::TransverseMercatorProjector(origin, scale_factor);
+};
 
+auto LaneletLoader::load(const std::filesystem::path & lanelet_map_path) -> lanelet::LaneletMapPtr
+{
+  lanelet::ErrorMessages lanelet_errors;
   lanelet::LaneletMapPtr lanelet_map_ptr = [&]() {
     const auto projector_info_path = lanelet_map_path.parent_path() / "map_projector_info.yaml";
     if (std::filesystem::exists(projector_info_path)) {
