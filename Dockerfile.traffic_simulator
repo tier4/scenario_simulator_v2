@@ -1,5 +1,5 @@
 ARG ROS_DISTRO="humble"
-FROM ros:${ROS_DISTRO} AS build-stage
+FROM docker.io/library/ros:${ROS_DISTRO} AS build-stage
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NOWARNINGS=yes
 
@@ -52,7 +52,7 @@ RUN bash -c "source /opt/ros/${ROS_DISTRO}/setup.bash && \
 # ===================================================================
 # Runtime Stage: Create a minimal final image
 # ===================================================================
-FROM ros:${ROS_DISTRO}-ros-base AS runtime
+FROM docker.io/library/ros:${ROS_DISTRO}-ros-base AS runtime
 
 # Install runtime dependencies in a single layer and clean up
 RUN --mount=type=cache,id=apt-cache-amd64,target=/var/cache/apt,sharing=locked \
