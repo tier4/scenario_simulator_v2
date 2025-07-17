@@ -216,13 +216,18 @@ auto make(const traffic_simulator_msgs::EntityStatus & status)
 
   kinematics.orientation_availability = [&]() {
     switch (status.subtype().value()) {
-      case traffic_simulator_msgs::EntitySubtype::BICYCLE:
+      case traffic_simulator_msgs::EntitySubtype::CAR:
+      case traffic_simulator_msgs::EntitySubtype::TRUCK:
+      case traffic_simulator_msgs::EntitySubtype::BUS:
+      case traffic_simulator_msgs::EntitySubtype::TRAILER:
       case traffic_simulator_msgs::EntitySubtype::MOTORCYCLE:
+      case traffic_simulator_msgs::EntitySubtype::BICYCLE:
       case traffic_simulator_msgs::EntitySubtype::PEDESTRIAN:
+        return autoware_perception_msgs::msg::DetectedObjectKinematics::SIGN_UNKNOWN;
       case traffic_simulator_msgs::EntitySubtype::UNKNOWN:
         return autoware_perception_msgs::msg::DetectedObjectKinematics::UNAVAILABLE;
       default:
-        return autoware_perception_msgs::msg::DetectedObjectKinematics::SIGN_UNKNOWN;
+        return autoware_perception_msgs::msg::DetectedObjectKinematics::UNAVAILABLE;
     }
   }();
 
