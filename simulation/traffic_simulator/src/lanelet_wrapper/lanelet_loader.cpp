@@ -27,7 +27,34 @@ namespace lanelet_wrapper
 {
 auto LaneletLoader::load(const std::filesystem::path & lanelet_map_path) -> lanelet::LaneletMapPtr
 {
+  auto produceTransverseMercatorProjector = [](const YAML::Node & map_projector_info) -> lanelet::projection::TransverseMercatorProjector
+  {
+    auto getMandatoryAtrribute = [](const YAML::Node & node, const std::string & key) -> YAML::Node {
+      if (auto value = node[key]) {
+        return value;
+      } else {
+        THROW_SIMULATION_ERROR("Missing mandatory Transverse Mercator projector info: ", key);
+      }
+    };
+
+    lanelet::Origin origin({0.0, 0.0});
+    if (auto map_origin_node = getMandatoryAtrribute(map_projector_info, "map_origin")) {
+      if (auto map_origin_latitude = getMandatoryAtrribute(map_origin_node, "latitude")) {
+        origin.position.lat = map_origin_latitude.as<double>();
+      }
+      if (auto map_origin_longitude = getMandatoryAtrribute(map_origin_node, "longitude")) {
+        origin.position.lon = map_origin_longitude.as<double>();
+      }
+    }
+    double scale_factor = 0.9996;
+    if (auto scale_factor_node = map_projector_info["scale_factor"]) {
+      scale_factor = scale_factor_node.as<double>();
+    }
+    return lanelet::projection::TransverseMercatorProjector(origin, scale_factor);
+  };
+
   lanelet::ErrorMessages lanelet_errors;
+
   lanelet::LaneletMapPtr lanelet_map_ptr = [&]() {
     const auto projector_info_path = lanelet_map_path.parent_path() / "map_projector_info.yaml";
     if (std::filesystem::exists(projector_info_path)) {
@@ -37,24 +64,9 @@ auto LaneletLoader::load(const std::filesystem::path & lanelet_map_path) -> lane
             auto projector_type_string = projector_type.as<std::string>();
             // https://docs.web.auto/user-manuals/vector-map-builder/how-to-use/edit-maps#%E5%9C%B0%E5%9B%B3%E5%B0%84%E5%BD%B1%E6%83%85%E5%A0%B1-mapprojectorinfo-%E3%81%AE%E5%A4%89%E6%9B%B4
             if (projector_type_string == "TransverseMercator") {
-              lanelet::Origin origin({0.0, 0.0});
-              if (auto map_origin_node = map_projector_info["map_origin"]) {
-                if (auto map_origin_latitude = map_origin_node["latitude"]) {
-                  origin.position.lat = map_origin_latitude.as<double>();
-                }
-                if (auto map_origin_longitude = map_origin_node["longitude"]) {
-                  origin.position.lon = map_origin_longitude.as<double>();
-                }
-              }
-              double scale_factor = 0.9996;
-              if (auto scale_factor_node = map_projector_info["scale_factor"]) {
-                scale_factor = scale_factor_node.as<double>();
-              }
-              lanelet::projection::TransverseMercatorProjector projector(origin, scale_factor);
-              return lanelet::load(lanelet_map_path.string(), projector, &lanelet_errors);
+              return lanelet::load(lanelet_map_path.string(), produceTransverseMercatorProjector(map_projector_info), &lanelet_errors);
             } else if (projector_type_string == "MGRS") {
-              lanelet::projection::MGRSProjector projector;
-              return lanelet::load(lanelet_map_path.string(), projector, &lanelet_errors);
+              return lanelet::load(lanelet_map_path.string(), lanelet::projection::MGRSProjector(), &lanelet_errors);
             } else {
               THROW_SIMULATION_ERROR(
                 "Unsupported projector type: ", projector_type_string,
@@ -70,8 +82,7 @@ auto LaneletLoader::load(const std::filesystem::path & lanelet_map_path) -> lane
     }
 
     /// @note Default to MGRS if no projector configuration is found
-    lanelet::projection::MGRSProjector projector;
-    return lanelet::load(lanelet_map_path.string(), projector, &lanelet_errors);
+    return lanelet::load(lanelet_map_path.string(), lanelet::projection::MGRSProjector(), &lanelet_errors);
   }();
 
   if (!lanelet_errors.empty()) {
