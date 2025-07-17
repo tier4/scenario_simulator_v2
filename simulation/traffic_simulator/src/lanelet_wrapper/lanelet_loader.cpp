@@ -27,9 +27,10 @@ namespace lanelet_wrapper
 {
 auto LaneletLoader::load(const std::filesystem::path & lanelet_map_path) -> lanelet::LaneletMapPtr
 {
-  auto produceTransverseMercatorProjector = [](const YAML::Node & map_projector_info) -> lanelet::projection::TransverseMercatorProjector
-  {
-    auto getMandatoryAtrribute = [](const YAML::Node & node, const std::string & key) -> YAML::Node {
+  auto produceTransverseMercatorProjector =
+    [](const YAML::Node & map_projector_info) -> lanelet::projection::TransverseMercatorProjector {
+    auto getMandatoryAtrribute = [](
+                                   const YAML::Node & node, const std::string & key) -> YAML::Node {
       if (auto value = node[key]) {
         return value;
       } else {
@@ -64,9 +65,12 @@ auto LaneletLoader::load(const std::filesystem::path & lanelet_map_path) -> lane
             auto projector_type_string = projector_type.as<std::string>();
             // https://docs.web.auto/user-manuals/vector-map-builder/how-to-use/edit-maps#%E5%9C%B0%E5%9B%B3%E5%B0%84%E5%BD%B1%E6%83%85%E5%A0%B1-mapprojectorinfo-%E3%81%AE%E5%A4%89%E6%9B%B4
             if (projector_type_string == "TransverseMercator") {
-              return lanelet::load(lanelet_map_path.string(), produceTransverseMercatorProjector(map_projector_info), &lanelet_errors);
+              return lanelet::load(
+                lanelet_map_path.string(), produceTransverseMercatorProjector(map_projector_info),
+                &lanelet_errors);
             } else if (projector_type_string == "MGRS") {
-              return lanelet::load(lanelet_map_path.string(), lanelet::projection::MGRSProjector(), &lanelet_errors);
+              return lanelet::load(
+                lanelet_map_path.string(), lanelet::projection::MGRSProjector(), &lanelet_errors);
             } else {
               THROW_SIMULATION_ERROR(
                 "Unsupported projector type: ", projector_type_string,
@@ -82,7 +86,8 @@ auto LaneletLoader::load(const std::filesystem::path & lanelet_map_path) -> lane
     }
 
     /// @note Default to MGRS if no projector configuration is found
-    return lanelet::load(lanelet_map_path.string(), lanelet::projection::MGRSProjector(), &lanelet_errors);
+    return lanelet::load(
+      lanelet_map_path.string(), lanelet::projection::MGRSProjector(), &lanelet_errors);
   }();
 
   if (!lanelet_errors.empty()) {
