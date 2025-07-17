@@ -24,6 +24,22 @@ Changelog for package status_monitor
 16.4.2 (2025-05-23)
 -------------------
 
+16.7.6 (2025-07-15)
+-------------------
+* Merge branch 'master' into fix-orientation-availability
+* Contributors: Kotaro Yoshimoto
+
+16.7.5 (2025-07-11)
+-------------------
+* Merge branch 'master' into feature/CODEOWNERS
+* Contributors: Kotaro Yoshimoto
+
+16.7.4 (2025-07-11)
+-------------------
+
+16.7.3 (2025-07-08)
+-------------------
+
 16.7.2 (2025-07-07)
 -------------------
 * Merge branch 'master' into fix/zmqpp
