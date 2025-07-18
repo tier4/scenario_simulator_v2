@@ -25,27 +25,12 @@ namespace pedestrian
 class FollowLaneAction : public context_gamma_planner::pedestrian::ActionNode
 {
 public:
-  /**
-   * @brief Represents an action node in the behavior tree.
-   * @param name The name of the action node.
-   * @param config The configuration for the action node.
-   */
   FollowLaneAction(const std::string & name, const BT::NodeConfiguration & config);
 
-  /**
-   * @brief update function
-   * @return node status : RUNNING, SUCCESS, FAILURE, and IDLE.
-   */
   BT::NodeStatus tick() override;
 
-  /**
-   * @brief This function retrieves the values stored in the blackboard and performs any necessary operations.
-   */
   void getBlackBoardValues();
 
-  /**
-   * @brief A list of ports for a behavior tree node.
-   */
   static BT::PortsList providedPorts()
   {
     BT::PortsList ports = {};

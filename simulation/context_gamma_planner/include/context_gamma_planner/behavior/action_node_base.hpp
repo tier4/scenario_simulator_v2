@@ -41,17 +41,10 @@ class ActionNodeBase : public BT::ActionNodeBase
 public:
   ActionNodeBase(const std::string & name, const BT::NodeConfiguration & config);
   ~ActionNodeBase() override = default;
-  /// throws if the derived class return RUNNING.
   auto executeTick() -> BT::NodeStatus override;
 
-  /**
-   * @brief Halts the execution of the action node.
-   */
   void halt() override final { setStatus(BT::NodeStatus::IDLE); }
 
-  /**
-   * @brief A list of ports for a behavior tree node.
-   */
   static BT::PortsList providedPorts()
   {
     return {// clang-format off
@@ -77,9 +70,6 @@ public:
     // clang-format on
   }
 
-  /**
-   * @brief This function retrieves the values stored in the blackboard and performs any necessary operations.
-   */
   auto getBlackBoardValues() -> void;
 
 protected:

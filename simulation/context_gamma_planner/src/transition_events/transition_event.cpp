@@ -19,7 +19,6 @@
 namespace context_gamma_planner
 {
 TransitionEvent::TransitionEvent(BT::TreeNode * root_node)
-//: root_node_(root_node)
 {
   first_timestamp_ = std::chrono::high_resolution_clock::now();
   auto subscribeCallback = [this](

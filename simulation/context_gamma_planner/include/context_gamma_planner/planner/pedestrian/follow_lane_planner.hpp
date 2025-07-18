@@ -28,14 +28,9 @@ public:
   void setWaypoints(
     const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils,
     const std::vector<lanelet::Id> & route_ids);
-  /**
-   * @brief the next goal point for the vehicle.
-   * @return An optional containing the next goal point as a geometry_msgs::msg::Point, or an empty optional if the calculation fails.
-   */
+
   auto calculateNextGoalPoint() -> std::optional<geometry_msgs::msg::Point> override;
-  /**
-   * @brief Clears the goal planner.
-   */
+
   void clear() override;
 };
 }  // namespace pedestrian

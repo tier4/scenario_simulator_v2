@@ -29,17 +29,9 @@ namespace pedestrian
 class ActionNode : public ActionNodeBase
 {
 public:
-  /**
-   * @brief Represents an action node in the behavior tree.
-   * @param name The name of the action node.
-   * @param config The configuration for the action node.
-   */
   ActionNode(const std::string & name, const BT::NodeConfiguration & config);
   void getBlackBoardValues();
 
-  /**
-   * @brief A list of ports for a behavior tree node.
-   */
   static BT::PortsList providedPorts()
   {
     BT::PortsList ports = {

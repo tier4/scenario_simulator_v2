@@ -21,10 +21,7 @@
 
 namespace context_gamma_planner
 {
-/**
- * @brief Configures the PedestrianPlugin.
- * @param logger The logger object used for logging.
- */
+
 void PedestrianPlugin::configure(const rclcpp::Logger & logger)
 {
   std::cout << "pedestrian plugin configure start" << std::endl;
@@ -45,11 +42,6 @@ void PedestrianPlugin::configure(const rclcpp::Logger & logger)
   setObstacle(obstacle_msg);
 }
 
-/**
- * @brief Creates a behavior tree from an XML file.
- * @param format_path The path to the XML file.
- * @return The created behavior tree.
- */
 auto PedestrianPlugin::createBehaviorTree(const std::string & format_path) -> BT::Tree
 {
   auto xml_doc = pugi::xml_document();
@@ -86,20 +78,11 @@ auto PedestrianPlugin::createBehaviorTree(const std::string & format_path) -> BT
   return factory_.createTreeFromText(xml_str.str());
 }
 
-/**
- * @brief Get the current action.
- * @return const std::string& The current action.
- */
 auto PedestrianPlugin::getCurrentAction() -> const std::string &
 {
   return logging_event_ptr_->getCurrentAction();
 }
 
-/**
- * @brief Updates the pedestrian plugin.
- * @param current_time The current time.
- * @param step_time The time step.
- */
 void PedestrianPlugin::update(double current_time, double step_time)
 {
   using math::geometry::operator-;
@@ -173,12 +156,6 @@ void PedestrianPlugin::update(double current_time, double step_time)
   }
 }
 
-/**
- * @brief a single tick of the behavior tree.
- * @param current_time The current time.
- * @param step_time The time step.
- * @return The status of the behavior tree node.
- */
 BT::NodeStatus PedestrianPlugin::tickOnce(double current_time, double step_time)
 {
   setCurrentTime(current_time);

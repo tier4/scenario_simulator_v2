@@ -24,9 +24,7 @@ namespace pedestrian
 {
 FollowPolylineTrajectoryAction::FollowPolylineTrajectoryAction(
   const std::string & name, const BT::NodeConfiguration & config)
-: context_gamma_planner::pedestrian::ActionNode(name, config),
-  /// @note: The pedestrian has a small value of goal_threshold because of low speed
-  planner_(1.0)
+: context_gamma_planner::pedestrian::ActionNode(name, config), planner_(1.0)
 {
 }
 

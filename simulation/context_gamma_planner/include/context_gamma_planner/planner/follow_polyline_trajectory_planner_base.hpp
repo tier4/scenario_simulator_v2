@@ -24,26 +24,14 @@ class FollowPolylineTrajectoryPlannerBase : public GoalPlannerBase
 {
 public:
   FollowPolylineTrajectoryPlannerBase(const double goal_threshold);
-  /**
-   * @brief Sets the waypoints for the planner.
-   * @param trajectory The polyline trajectory containing the waypoints.
-   */
+
   void setWaypoints(
     const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> trajectory);
-  /**
-   * @brief the next goal point for the vehicle.
-   * @return An optional containing the next goal point as a geometry_msgs::msg::Point, or an empty optional if the calculation fails.
-   */
+
   auto calculateNextGoalPoint() -> std::optional<geometry_msgs::msg::Point> override;
-  /**
-   * @brief Get the target speed at a given time.
-   * @param current_time The current time.
-   * @return [m/s] The target speed at the given time.
-   */
+
   double getTargetSpeed(const double current_time) const;
-  /**
-   * @brief Clears the goal planner.
-   */
+
   void clear() override;
 
 private:
