@@ -65,7 +65,8 @@ RUN --mount=type=cache,id=apt-cache-amd64,target=/var/cache/apt,sharing=locked \
     apt-get install -y --no-install-recommends \
     ros-humble-rmw-cyclonedds-cpp libgoogle-glog0v5 libprotobuf23 libzmq5 \
     libpugixml1v5 libtbb12 libboost-filesystem1.74.0 ros-humble-lanelet2-matching \
-    ros-humble-lanelet2-io ros-humble-lanelet2-routing libgeographic19 ros-humble-behaviortree-cpp-v3 && \
+    ros-humble-lanelet2-io ros-humble-lanelet2-routing libgeographic19 \
+    ros-humble-behaviortree-cpp-v3 ros-humble-geographic-msgs && \
     pip install xmlschema && \
     apt-get remove --purge -y software-properties-common python3-pip && \
     apt-get autoremove -y && \
