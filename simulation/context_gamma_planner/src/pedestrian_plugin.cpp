@@ -12,12 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <context_gamma_planner/behavior/pedestrian/follow_lane_action.hpp>
-#include <context_gamma_planner/behavior/pedestrian/follow_polyline_trajectory_action.hpp>
-#include <context_gamma_planner/pedestrian_plugin.hpp>
-#include <iostream>
-#include <pugixml.hpp>
-#include <traffic_simulator/lanelet_wrapper/pose.hpp>
+#include "context_gamma_planner/pedestrian_plugin.hpp"
 
 namespace context_gamma_planner
 {

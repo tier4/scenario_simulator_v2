@@ -15,8 +15,8 @@
 #ifndef CONTEXT_GAMMA_PLANNER__BEHAVIOR__PEDESTRIAN__FOLLOW_LANE_ACTION_HPP_
 #define CONTEXT_GAMMA_PLANNER__BEHAVIOR__PEDESTRIAN__FOLLOW_LANE_ACTION_HPP_
 
-#include <context_gamma_planner/behavior/pedestrian/action_node.hpp>
-#include <context_gamma_planner/planner/pedestrian/follow_lane_planner.hpp>
+#include "context_gamma_planner/behavior/pedestrian/action_node.hpp"
+#include "context_gamma_planner/planner/pedestrian/follow_lane_planner.hpp"
 
 namespace context_gamma_planner
 {

@@ -12,11 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <context_gamma_planner/behavior/pedestrian/follow_polyline_trajectory_action.hpp>
-#include <scenario_simulator_exception/exception.hpp>
-#include <string>
-#include <traffic_simulator/helper/stop_watch.hpp>
-#include <vector>
+#include "context_gamma_planner/behavior/pedestrian/follow_polyline_trajectory_action.hpp"
 
 namespace context_gamma_planner
 {

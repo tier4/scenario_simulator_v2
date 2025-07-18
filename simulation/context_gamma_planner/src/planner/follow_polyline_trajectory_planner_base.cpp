@@ -12,12 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <algorithm>
-#include <cmath>
-#include <context_gamma_planner/planner/follow_polyline_trajectory_planner_base.hpp>
-#include <geometry/transform.hpp>
-#include <iostream>
-#include <scenario_simulator_exception/exception.hpp>
+#include "context_gamma_planner/planner/follow_polyline_trajectory_planner_base.hpp"
 
 namespace context_gamma_planner
 {

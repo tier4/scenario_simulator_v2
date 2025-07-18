@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <context_gamma_planner/behavior/action_node_base.hpp>
+#include "context_gamma_planner/behavior/action_node_base.hpp"
 
 namespace context_gamma_planner
 {

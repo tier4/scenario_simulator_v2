@@ -15,10 +15,13 @@
 #ifndef CONTEXT_GAMMA_PLANNER__PEDESTRIAN__FOLLOW_POLYLINE_TRAJECTORY_ACTION_HPP_
 #define CONTEXT_GAMMA_PLANNER__PEDESTRIAN__FOLLOW_POLYLINE_TRAJECTORY_ACTION_HPP_
 
-#include <context_gamma_planner/behavior/pedestrian/action_node.hpp>
-#include <context_gamma_planner/planner/pedestrian/follow_polyline_trajectory_planner.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 #include <string>
+#include <traffic_simulator/helper/stop_watch.hpp>
 #include <vector>
+
+#include "context_gamma_planner/behavior/pedestrian/action_node.hpp"
+#include "context_gamma_planner/planner/pedestrian/follow_polyline_trajectory_planner.hpp"
 
 namespace context_gamma_planner
 {

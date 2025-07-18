@@ -17,10 +17,12 @@
 
 #include <behaviortree_cpp_v3/action_node.h>
 
-#include <context_gamma_planner/behavior/action_node_base.hpp>
 #include <memory>
+#include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <traffic_simulator_msgs/msg/pedestrian_parameters.hpp>
+
+#include "context_gamma_planner/behavior/action_node_base.hpp"
 
 namespace context_gamma_planner
 {

@@ -15,7 +15,9 @@
 #ifndef CONTEXT_GAMMA_PLANNER__TRANSITION_EVENTS__TRANSITION_EVENTS_HPP_
 #define CONTEXT_GAMMA_PLANNER__TRANSITION_EVENTS__TRANSITION_EVENTS_HPP_
 
-#include "logging_event.hpp"
-#include "reset_request_event.hpp"
+#include <behaviortree_cpp_v3/loggers/bt_cout_logger.h>
+
+#include "context_gamma_planner/transition_events/logging_event.hpp"
+#include "context_gamma_planner/transition_events/reset_request_event.hpp"
 
 #endif  // CONTEXT_GAMMA_PLANNER__TRANSITION_EVENTS__TRANSITION_EVENTS_HPP_

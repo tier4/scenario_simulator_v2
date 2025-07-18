@@ -15,9 +15,12 @@
 #ifndef CONTEXT_GAMMA_PLANNER__TRANSITION_EVENTS__LOGGING_EVENT_HPP_
 #define CONTEXT_GAMMA_PLANNER__TRANSITION_EVENTS__LOGGING_EVENT_HPP_
 
-#include <context_gamma_planner/transition_events/transition_event.hpp>
+#include <behaviortree_cpp_v3/loggers/bt_cout_logger.h>
+
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
+
+#include "context_gamma_planner/transition_events/transition_event.hpp"
 
 namespace context_gamma_planner
 {

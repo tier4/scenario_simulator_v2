@@ -12,10 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <context_gamma_planner/behavior/pedestrian/action_node.hpp>
-#include <memory>
-#include <scenario_simulator_exception/exception.hpp>
-#include <string>
+#include "context_gamma_planner/behavior/pedestrian/action_node.hpp"
 
 namespace context_gamma_planner
 {
