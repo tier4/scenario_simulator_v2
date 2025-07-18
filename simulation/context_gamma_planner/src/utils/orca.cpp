@@ -44,14 +44,6 @@ auto calculate_orca_line(
 {
   const auto inv_time_horizon = 1.0 / 5.0;
 
-  auto cast_to_point = [](const geometry_msgs::msg::Vector3 & p) {
-    auto result = geometry_msgs::msg::Point();
-    result.x = p.x;
-    result.y = p.y;
-    result.z = p.z;
-    return result;
-  };
-
   const auto dist_sq = sqr(relative_position);
 
   const auto relative_angle = std::atan2(relative_position.y, relative_position.x);

@@ -21,6 +21,7 @@
 #include <vector>
 
 #include "context_gamma_planner/utils/math_utils.hpp"
+#include "context_gamma_planner/utils/ros_msg_converter.hpp"
 
 namespace context_gamma_planner
 {

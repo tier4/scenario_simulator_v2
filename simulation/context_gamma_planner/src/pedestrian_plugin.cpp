@@ -98,14 +98,6 @@ void PedestrianPlugin::update(double current_time, double step_time)
       return tf2::toMsg(gv);
     };
 
-  auto cast_to_vec = [](const geometry_msgs::msg::Point & p) {
-    auto result = geometry_msgs::msg::Vector3();
-    result.x = p.x;
-    result.y = p.y;
-    result.z = p.z;
-    return result;
-  };
-
   const auto ego_entity = getCanonicalizedEntityStatus();
   auto ego_pose = ego_entity->getMapPose();
   const auto ego_bbox = ego_entity->getBoundingBox();

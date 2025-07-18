@@ -57,14 +57,6 @@ auto applyConstraintOnLine(
     }
   }
 
-  auto cast_to_vec = [](const geometry_msgs::msg::Point & p) {
-    auto result = geometry_msgs::msg::Vector3();
-    result.x = p.x;
-    result.y = p.y;
-    result.z = p.z;
-    return result;
-  };
-
   if (direction_opt) {
     if (opt_velocity * d > 0.0) {
       return cast_to_vec(p) + d * t_right;
