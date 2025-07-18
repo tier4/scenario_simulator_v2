@@ -35,7 +35,6 @@ private:
   void callback(
     BT::Duration timestamp, const BT::TreeNode & node, BT::NodeStatus prev_status,
     BT::NodeStatus status) override;
-  //const std::shared_ptr<BT::TreeNode> root_node_;
   std::function<traffic_simulator::behavior::Request()> get_request_function_;
   std::function<void(const traffic_simulator::behavior::Request &)> set_request_function_;
 };

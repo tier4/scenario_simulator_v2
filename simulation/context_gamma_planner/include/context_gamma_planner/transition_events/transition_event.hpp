@@ -33,7 +33,6 @@ protected:
     BT::Duration timestamp, const BT::TreeNode & node, BT::NodeStatus prev_status,
     BT::NodeStatus status) = 0;
   void updateCurrentAction(const BT::NodeStatus & status, const BT::TreeNode & node);
-  //std::shared_ptr<BT::TreeNode> root_node_;
   BT::TimePoint first_timestamp_;
   std::vector<BT::TreeNode::StatusChangeSubscriber> subscribers_;
   BT::TimestampType type_;
