@@ -1,0 +1,22 @@
+# Git files
+.git
+.gitignore
+.gitattributes
+
+# Docker files
+.dockerignore
+Dockerfile*
+docker-bake.hcl
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Build artifacts
+build/
+install/
+log/
+*.swp
+
