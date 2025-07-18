@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef context_gamma_planner__TRANSITION_EVENTS__TRANSITION_EVENTS_HPP_
-#define context_gamma_planner__TRANSITION_EVENTS__TRANSITION_EVENTS_HPP_
+#ifndef CONTEXT_GAMMA_PLANNER__TRANSITION_EVENTS__TRANSITION_EVENTS_HPP_
+#define CONTEXT_GAMMA_PLANNER__TRANSITION_EVENTS__TRANSITION_EVENTS_HPP_
 
 #include "logging_event.hpp"
 #include "reset_request_event.hpp"
 
-#endif  // context_gamma_planner__TRANSITION_EVENTS__TRANSITION_EVENTS_HPP_
+#endif  // CONTEXT_GAMMA_PLANNER__TRANSITION_EVENTS__TRANSITION_EVENTS_HPP_

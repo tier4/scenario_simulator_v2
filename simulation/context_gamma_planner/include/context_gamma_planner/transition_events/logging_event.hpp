@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef context_gamma_planner__TRANSITION_EVENTS__LOGGING_EVENT_HPP_
-#define context_gamma_planner__TRANSITION_EVENTS__LOGGING_EVENT_HPP_
+#ifndef CONTEXT_GAMMA_PLANNER__TRANSITION_EVENTS__LOGGING_EVENT_HPP_
+#define CONTEXT_GAMMA_PLANNER__TRANSITION_EVENTS__LOGGING_EVENT_HPP_
 
 #include <context_gamma_planner/transition_events/transition_event.hpp>
 #include <memory>
@@ -36,4 +36,4 @@ private:
 };
 }  // namespace context_gamma_planner
 
-#endif  // context_gamma_planner__TRANSITION_EVENTS__LOGGING_EVENT_HPP_
+#endif  // CONTEXT_GAMMA_PLANNER__TRANSITION_EVENTS__LOGGING_EVENT_HPP_

@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef context_gamma_planner__TRANSITION_EVENTS__TRANSITION_EVENT_HPP_
-#define context_gamma_planner__TRANSITION_EVENTS__TRANSITION_EVENT_HPP_
+#ifndef CONTEXT_GAMMA_PLANNER__TRANSITION_EVENTS__TRANSITION_EVENT_HPP_
+#define CONTEXT_GAMMA_PLANNER__TRANSITION_EVENTS__TRANSITION_EVENT_HPP_
 
 #include <behaviortree_cpp_v3/loggers/bt_cout_logger.h>
 
@@ -41,4 +41,4 @@ protected:
 };
 }  // namespace context_gamma_planner
 
-#endif  // context_gamma_planner__TRANSITION_EVENTS__TRANSITION_EVENT_HPP_
+#endif  // CONTEXT_GAMMA_PLANNER__TRANSITION_EVENTS__TRANSITION_EVENT_HPP_
