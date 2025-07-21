@@ -31,7 +31,7 @@ auto produceTransverseMercatorProjector(const YAML::Node & map_projector_info)
   static constexpr double default_scale_factor = 0.9996;
 
   const auto getMandatoryAttribute =
-    [](const YAML::Node & node, const std::string & key) -> const YAML::Node & {
+    [](const YAML::Node & node, const std::string & key) -> YAML::Node {
     if (auto value = node[key]) {
       return value;
     } else {
