@@ -29,8 +29,6 @@ auto produceTransverseMercatorProjector(const YAML::Node & map_projector_info)
   -> lanelet::projection::TransverseMercatorProjector
 {
   static constexpr double default_scale_factor = 0.9996;
-  static constexpr double default_origin_lat = 0.0;
-  static constexpr double default_origin_lon = 0.0;
 
   const auto getMandatoryAttribute =
     [](const YAML::Node & node, const std::string & key) -> const YAML::Node & {
@@ -41,7 +39,7 @@ auto produceTransverseMercatorProjector(const YAML::Node & map_projector_info)
     }
   };
 
-  lanelet::Origin origin({default_origin_lat, default_origin_lon});
+  lanelet::Origin origin({0.0, 0.0});
   const auto & map_origin_node = getMandatoryAttribute(map_projector_info, "map_origin");
   origin.position.lat = getMandatoryAttribute(map_origin_node, "latitude").as<double>();
   origin.position.lon = getMandatoryAttribute(map_origin_node, "longitude").as<double>();
