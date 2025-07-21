@@ -74,11 +74,19 @@ auto LaneletLoader::load(const std::filesystem::path & lanelet_map_path) -> lane
                 "Unsupported projector type: ", projector_type_string,
                 ". Supported types are TransverseMercator and MGRS.");
             }
+          } else {
+            THROW_SIMULATION_ERROR(
+              "Missing projector_type in ", map_projector_info_path.string(),
+              ". projector_type is required when map_projector_info.yaml exists.");
           }
+        } else {
+          THROW_SIMULATION_ERROR(
+            "Empty or invalid YAML content in ", map_projector_info_path.string(),
+            ". File exists but cannot be parsed.");
         }
       } catch (const YAML::Exception & e) {
         THROW_SIMULATION_ERROR(
-          "Failed to load projector info from ", projector_info_path.string(),
+          "Failed to load projector info from ", map_projector_info_path.string(),
           ". Error: ", e.what());
       }
     }
@@ -97,8 +105,8 @@ auto LaneletLoader::load(const std::filesystem::path & lanelet_map_path) -> lane
     THROW_SIMULATION_ERROR(ss.str());
   }
 
-  if (lanelet_map_ptr->laneletLayer.empty()) {
-    THROW_SIMULATION_ERROR("Lanelet layer is empty!");
+  if (!lanelet_map_ptr || lanelet_map_ptr->laneletLayer.empty()) {
+    THROW_SIMULATION_ERROR("Failed to load lanelet map: returned nullptr or lanelet layer is empty!");
   }
 
   overwriteLaneletsCenterline(lanelet_map_ptr);
