@@ -28,7 +28,12 @@ namespace lanelet_wrapper
 auto produceTransverseMercatorProjector(const YAML::Node & map_projector_info)
   -> lanelet::projection::TransverseMercatorProjector
 {
-  auto getMandatoryAttribute = [](const YAML::Node & node, const std::string & key) -> YAML::Node {
+  static constexpr double default_scale_factor = 0.9996;
+  static constexpr double default_origin_lat = 0.0;
+  static constexpr double default_origin_lon = 0.0;
+
+  const auto getMandatoryAttribute =
+    [](const YAML::Node & node, const std::string & key) -> const YAML::Node & {
     if (auto value = node[key]) {
       return value;
     } else {
@@ -36,34 +41,30 @@ auto produceTransverseMercatorProjector(const YAML::Node & map_projector_info)
     }
   };
 
-  lanelet::Origin origin({0.0, 0.0});
-  if (auto map_origin_node = getMandatoryAttribute(map_projector_info, "map_origin")) {
-    if (auto map_origin_latitude = getMandatoryAttribute(map_origin_node, "latitude")) {
-      origin.position.lat = map_origin_latitude.as<double>();
-    }
-    if (auto map_origin_longitude = getMandatoryAttribute(map_origin_node, "longitude")) {
-      origin.position.lon = map_origin_longitude.as<double>();
-    }
-  }
-  double scale_factor = 0.9996;
-  if (auto scale_factor_node = map_projector_info["scale_factor"]) {
-    scale_factor = scale_factor_node.as<double>();
-  }
+  lanelet::Origin origin({default_origin_lat, default_origin_lon});
+  const auto & map_origin_node = getMandatoryAttribute(map_projector_info, "map_origin");
+  origin.position.lat = getMandatoryAttribute(map_origin_node, "latitude").as<double>();
+  origin.position.lon = getMandatoryAttribute(map_origin_node, "longitude").as<double>();
+
+  const auto scale_factor = map_projector_info["scale_factor"]
+                              ? map_projector_info["scale_factor"].as<double>()
+                              : default_scale_factor;
   return lanelet::projection::TransverseMercatorProjector(origin, scale_factor);
 };
 
 auto LaneletLoader::load(const std::filesystem::path & lanelet_map_path) -> lanelet::LaneletMapPtr
 {
   lanelet::ErrorMessages lanelet_errors;
-  lanelet::LaneletMapPtr lanelet_map_ptr = [&]() {
-    const auto projector_info_path = lanelet_map_path.parent_path() / "map_projector_info.yaml";
-    if (std::filesystem::exists(projector_info_path)) {
+  lanelet::LaneletMapPtr lanelet_map_ptr = [&lanelet_map_path, &lanelet_errors]() {
+    if (const auto map_projector_info_path =
+          lanelet_map_path.parent_path() / "map_projector_info.yaml";
+        std::filesystem::exists(map_projector_info_path)) {
       try {
-        if (auto map_projector_info = YAML::LoadFile(projector_info_path.string())) {
-          if (auto projector_type = map_projector_info["projector_type"]) {
-            auto projector_type_string = projector_type.as<std::string>();
-            // https://docs.web.auto/user-manuals/vector-map-builder/how-to-use/edit-maps#%E5%9C%B0%E5%9B%B3%E5%B0%84%E5%BD%B1%E6%83%85%E5%A0%B1-mapprojectorinfo-%E3%81%AE%E5%A4%89%E6%9B%B4
-            if (projector_type_string == "TransverseMercator") {
+        if (const auto map_projector_info = YAML::LoadFile(map_projector_info_path.string())) {
+          if (const auto projector_type = map_projector_info["projector_type"]) {
+            /// @note https://docs.web.auto/user-manuals/vector-map-builder/how-to-use/edit-maps#%E5%9C%B0%E5%9B%B3%E5%B0%84%E5%BD%B1%E6%83%85%E5%A0%B1-mapprojectorinfo-%E3%81%AE%E5%A4%89%E6%9B%B4
+            if (const auto projector_type_string = projector_type.as<std::string>();
+                projector_type_string == "TransverseMercator") {
               return lanelet::load(
                 lanelet_map_path.string(), produceTransverseMercatorProjector(map_projector_info),
                 &lanelet_errors);
