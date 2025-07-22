@@ -24,6 +24,11 @@ Changelog for package cpp_mock_scenarios
 16.4.2 (2025-05-23)
 -------------------
 
+16.8.1 (2025-07-22)
+-------------------
+* Merge branch 'master' into fix-orientation-availability
+* Contributors: Kotaro Yoshimoto
+
 16.8.0 (2025-07-22)
 -------------------
 * Merge pull request `#1625 <https://github.com/tier4/scenario_simulator_v2/issues/1625>`_ from tier4/feat/cpp_mock_scenarios_awsim_support
