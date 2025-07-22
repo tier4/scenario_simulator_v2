@@ -24,14 +24,16 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- TrafficSignalState -----------------------------------------------------
- *
- *  <xsd:complexType name="TrafficSignalState">
- *    <xsd:attribute name="trafficSignalId" type="String" use="required"/>
- *    <xsd:attribute name="state" type="String" use="required"/>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   TrafficSignalState (OpenSCENARIO XML 1.3.1)
+
+   State of a traffic signal for this phase. One state per phase and traffic signal.
+
+   <xsd:complexType name="TrafficSignalState">
+     <xsd:attribute name="state" type="String" use="required"/>
+     <xsd:attribute name="trafficSignalId" type="String" use="required"/>
+   </xsd:complexType>
+*/
 struct TrafficSignalState : private SimulatorCore::NonStandardOperation
 {
   /* ---- NOTE -----------------------------------------------------------------
