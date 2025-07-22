@@ -24,6 +24,78 @@ Changelog for package simple_sensor_simulator
 16.4.2 (2025-05-23)
 -------------------
 
+16.7.6 (2025-07-15)
+-------------------
+* Merge pull request `#1635 <https://github.com/tier4/scenario_simulator_v2/issues/1635>`_ from tier4/fix-orientation-availability
+* Merge branch 'master' into fix-orientation-availability
+* fix orientation_availability
+* Contributors: Kotaro Yoshimoto, xtk8532704
+
+16.7.5 (2025-07-11)
+-------------------
+* Merge branch 'master' into feature/CODEOWNERS
+* Contributors: Kotaro Yoshimoto
+
+16.7.4 (2025-07-11)
+-------------------
+
+16.7.3 (2025-07-08)
+-------------------
+
+16.7.2 (2025-07-07)
+-------------------
+* Merge branch 'master' into fix/zmqpp
+* Merge branch 'master' into fix/zmqpp
+* Contributors: Kotaro Yoshimoto
+
+16.7.1 (2025-07-04)
+-------------------
+* Merge pull request `#1631 <https://github.com/tier4/scenario_simulator_v2/issues/1631>`_ from tier4/refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Isolate protoc output into project named directory
+* Add or update xml-model
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, f0reachARR
+
+16.7.0 (2025-07-03)
+-------------------
+* Merge branch 'master' into feature/record_option_for_rosbag
+* Merge branch 'master' into feature/record_option_for_rosbag
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
+16.6.1 (2025-07-02)
+-------------------
+
+16.6.0 (2025-07-01)
+-------------------
+* Merge pull request `#1633 <https://github.com/tier4/scenario_simulator_v2/issues/1633>`_ from tier4/feature/perception_noise_config_v3
+* Delete common::listChildParameterNamespaces and refactor noise_v3
+* Fix wrongly used entity type in entity subtype context
+* Format detection_sensor.cpp manually
+* Rename apply_v2_style_noise to noise_v2 and use it directly
+* refactor get_first_matched_config_name in detection_sensor.cpp
+* Add missing header in detection_sensor.hpp
+* extract lambda function to common::listChildParameterNamespaces
+* Use boost::lexical_cast to stringify entity type/subtype
+* Improve variable/argument names
+* Improve the parameter array size mismatch exception message in detection_sensor.cpp
+* Merge branch 'master' into feature/perception_noise_config_v3
+* Refactor parameter size restriction for noise model v2/v3
+* Fix parameter name in detection_sensor.cpp
+* Stop using static in apply_v2_style_noise function to reuse correctly
+* Implement list-up feature of namespaces under noise v3
+* Fix cspell errors
+* Merge branch 'master' into feature/perception_noise_config_v3
+* Add basic get_first_matched_config_name implementation for noise v3 in simple_sensor_simulator
+* Add basic noise v3 implementation structure in simple_sensor_simulator
+* Add empty noise v3 implementation in simple_sensor_simulator
+* Commonize perception noise v2 for future noise v3 in simple_sensor_simulator
+* Contributors: Kotaro Yoshimoto
+
 16.5.11 (2025-06-26)
 --------------------
 * Merge branch 'master' into fix/lanelet_pose_in_do_nothing

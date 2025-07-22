@@ -24,6 +24,7 @@
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <openscenario_interpreter/syntax/speed_condition.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
+#include <sstream>
 #include <status_monitor/status_monitor.hpp>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
 
@@ -49,6 +50,7 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   output_directory("/tmp"),
   publish_empty_context(false),
   record(false),
+  record_option(""),
   record_storage_id("")
 {
   DECLARE_PARAMETER(local_frame_rate);
@@ -57,6 +59,7 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   DECLARE_PARAMETER(output_directory);
   DECLARE_PARAMETER(publish_empty_context);
   DECLARE_PARAMETER(record);
+  DECLARE_PARAMETER(record_option);
   DECLARE_PARAMETER(record_storage_id);
 
   SpeedCondition::compatibility =
@@ -119,6 +122,7 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
       GET_PARAMETER(output_directory);
       GET_PARAMETER(publish_empty_context);
       GET_PARAMETER(record);
+      GET_PARAMETER(record_option);
       GET_PARAMETER(record_storage_id);
 
       script = std::make_shared<OpenScenario>(osc_path);
@@ -225,14 +229,22 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
       },
       [&]() {
         if (record) {
-          if (record_storage_id == "") {
-            record::start(
-              "-a", "-o", boost::filesystem::path(osc_path).replace_extension("").string());
-          } else {
-            record::start(
-              "-a", "-o", boost::filesystem::path(osc_path).replace_extension("").string(), "-s",
-              record_storage_id);
+          std::vector<std::string> options{
+            "-a", "-o", boost::filesystem::path(osc_path).replace_extension("").string()};
+
+          if (not record_storage_id.empty()) {
+            options.insert(options.end(), {"-s", record_storage_id});
           }
+
+          if (not record_option.empty()) {
+            // split the record_option string with space.
+            std::istringstream iss(record_option);
+            std::copy(
+              std::istream_iterator<std::string>(iss), std::istream_iterator<std::string>(),
+              std::back_inserter(options));
+          }
+
+          record::start(options);
         }
 
         SimulatorCore::activate(
