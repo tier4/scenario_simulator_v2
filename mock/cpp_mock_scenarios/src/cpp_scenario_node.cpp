@@ -35,6 +35,8 @@ CppScenarioNode::CppScenarioNode(
   get_parameter<std::string>("junit_path", junit_path_);
   declare_parameter<int>("global_timeout", 10.0);
   get_parameter<int>("global_timeout", timeout_);
+  declare_parameter<std::string>("ego_model", "");
+  get_parameter<std::string>("ego_model", ego_model_);
 
   traffic_simulator::lanelet_pose::CanonicalizedLaneletPose::setConsiderPoseByRoadSlope([&]() {
     if (not has_parameter("consider_pose_by_road_slope")) {
@@ -62,10 +64,14 @@ void CppScenarioNode::update()
   }
 }
 
-void CppScenarioNode::start()
+void CppScenarioNode::start(const bool start_scenario_clock)
 {
   onInitialize();
-  api_.startNpcLogic();
+  /// @note If true (default), start the scenario clock immediately.
+  /// For AWSIM + Autoware integration, set to false and start manually after EGO reaches the expected state.
+  if (start_scenario_clock) {
+    api_.startNpcLogic();
+  }
   const auto rate =
     std::chrono::duration<double>(1.0 / get_parameter("global_frame_rate").as_double());
   update_timer_ = this->create_wall_timer(rate, std::bind(&CppScenarioNode::update, this));
@@ -98,14 +104,17 @@ void CppScenarioNode::stop(Result result, const std::string & description)
   std::exit(0);
 }
 
-void CppScenarioNode::spawnEgoEntity(
+auto CppScenarioNode::spawnEgoEntity(
   const traffic_simulator::CanonicalizedLaneletPose & spawn_lanelet_pose,
   const std::vector<traffic_simulator::CanonicalizedLaneletPose> & goal_lanelet_poses,
-  const traffic_simulator_msgs::msg::VehicleParameters & parameters)
+  const traffic_simulator_msgs::msg::VehicleParameters & parameters) -> void
 {
   api_.updateFrame();
   std::this_thread::sleep_for(std::chrono::duration<double>(1.0 / 20.0));
-  api_.spawn("ego", spawn_lanelet_pose, parameters, traffic_simulator::VehicleBehavior::autoware());
+  api_.spawn(
+    "ego", spawn_lanelet_pose, parameters, traffic_simulator::VehicleBehavior::autoware(),
+    ego_model_);
+
   auto & ego_entity = api_.getEgoEntity("ego");
   ego_entity.setParameter<bool>("allow_goal_modification", true);
   api_.attachLidarSensor("ego", 0.0);
@@ -126,15 +135,17 @@ void CppScenarioNode::spawnEgoEntity(
     // clang-format on
     return configuration;
   }());
-  ego_entity.requestAssignRoute(goal_lanelet_poses);
 
-  using namespace std::chrono_literals;
-  while (!ego_entity.isEngaged()) {
-    if (ego_entity.isEngageable()) {
-      ego_entity.engage();
+  if (!goal_lanelet_poses.empty()) {
+    ego_entity.requestAssignRoute(goal_lanelet_poses);
+
+    while (!ego_entity.isEngaged()) {
+      if (ego_entity.isEngageable()) {
+        ego_entity.engage();
+      }
+      api_.updateFrame();
+      std::this_thread::sleep_for(std::chrono::duration<double>(1.0 / 20.0));
     }
-    api_.updateFrame();
-    std::this_thread::sleep_for(std::chrono::duration<double>(1.0 / 20.0));
   }
 }
 
