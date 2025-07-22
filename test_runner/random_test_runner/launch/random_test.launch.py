@@ -47,9 +47,6 @@ class RandomTestRunnerLaunch(object):
             "vehicle_model": {"default": "sample_vehicle", "description": "Ego vehicle model"},
             "autoware_launch_file": {"default": "planning_simulator.launch.xml", "description": "Launch file name for Autoware running"},
             "autoware_launch_package": {"default": "autoware_launch", "description": "Launch file package name for Autoware running"},
-            "rviz_config": {
-                "default": os.path.join(get_package_share_directory("traffic_simulator"), "config", "scenario_simulator_v2.rviz"), 
-                "description": "RViz config file"},
         }
 
         self.random_test_arguments = {
@@ -78,6 +75,15 @@ class RandomTestRunnerLaunch(object):
                  "description": "Directory to which result.yaml and result.junit.xml files will be placed"},
 
             "initialize_duration": {"default": 35, "description": "How long test runner will wait for Autoware to initialize"},
+
+            "spawn_ego_as_npc": 
+                {"default": "false", 
+                 "description": "If true, the EGO will be spawned as a npc (not controlled by Autoware)."},
+
+            "launch_rviz": 
+                {"default": "false", 
+                 "description": "If true, RViz will be launched to visualize the simulation. "
+                                "Recommended when running without Autoware (e.g., with spawn_ego_as_npc:=true)"},
 
             # test suite arguments #
             "test_name": {"default": "random_test",
@@ -149,6 +155,7 @@ class RandomTestRunnerLaunch(object):
 
         return declared_launch_arguments
 
+
     def launch_setup(self, context, *args, **kwargs):
         test_param_file = self.random_test_runner_launch_configuration["test_parameters_filename"].perform(context)
         print("Test param file '{}'".format(test_param_file))
@@ -166,8 +173,11 @@ class RandomTestRunnerLaunch(object):
                   "Parameters passed there override passed via arguments".format(test_param_file_path))
             parameters.append(test_param_file_path)
 
+        is_ego_spawned_as_npc = self.random_test_runner_launch_configuration["spawn_ego_as_npc"]\
+            .perform(context).strip().lower() == "true"
+
         # not tested for other architectures but required for "awf/universe"
-        if "awf/universe" in autoware_architecture:
+        if "awf/universe" in autoware_architecture and not is_ego_spawned_as_npc:
             vehicle_model = self.autoware_launch_configuration["vehicle_model"].perform(context)
             if vehicle_model:
                 vehicle_model_description_dir = get_package_share_directory(vehicle_model + "_description")
@@ -186,6 +196,7 @@ class RandomTestRunnerLaunch(object):
             package="random_test_runner",
             executable="random_test_runner_node",
             namespace="simulation",
+            name="random_test_runner_node",
             output="screen",
             arguments=[("__log_level:=info")],
             parameters=parameters
@@ -209,6 +220,7 @@ class RandomTestRunnerLaunch(object):
                 package="simple_sensor_simulator",
                 executable="simple_sensor_simulator_node",
                 namespace="simulation",
+                name="simple_sensor_simulator_node",
                 output="log",
                 arguments=[("__log_level:=warn")],
                 parameters=[{"port": 8080}],
