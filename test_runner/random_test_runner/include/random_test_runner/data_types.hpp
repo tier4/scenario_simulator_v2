@@ -125,9 +125,9 @@ DEFINE_FMT_FORMATTER(
 
 DEFINE_FMT_FORMATTER(
   traffic_simulator::EntityStatus,
-  "name {}, lanelet_pose: {}, pose: {}, action_status:{}"
-  "time {}: lanelet_pose_valid: {}, type: {}",
-  v.name, v.lanelet_pose, v.pose, v.action_status, v.time, v.lanelet_pose_valid, v.type)
+  "name {}, lanelet_poses: {}, pose: {}, action_status:{}"
+  "time {}:, type: {}",
+  v.name, v.lanelet_poses, v.pose, v.action_status, v.time, v.type)
 
 DEFINE_FMT_FORMATTER(
   TestControlParameters,

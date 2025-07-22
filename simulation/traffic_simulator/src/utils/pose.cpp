@@ -50,7 +50,8 @@ auto quietNaNLaneletPose() -> LaneletPose
     .rpy(geometry_msgs::build<geometry_msgs::msg::Vector3>()
            .x(std::numeric_limits<double>::quiet_NaN())
            .y(std::numeric_limits<double>::quiet_NaN())
-           .z(std::numeric_limits<double>::quiet_NaN()));
+           .z(std::numeric_limits<double>::quiet_NaN()))
+    .lanelet_pose_valid(false);
 }
 
 /// @note Conversions
@@ -477,14 +478,16 @@ auto transformToCanonicalizedLaneletPose(
                                             .lanelet_id(end_of_road_lanelet_id.value())
                                             .s(0.0)
                                             .offset(lanelet_pose.value().offset)
-                                            .rpy(lanelet_pose.value().rpy));
+                                            .rpy(lanelet_pose.value().rpy)
+                                            .lanelet_pose_valid(false));
         } else {
           return CanonicalizedLaneletPose(
             traffic_simulator_msgs::build<LaneletPose>()
               .lanelet_id(end_of_road_lanelet_id.value())
               .s(lanelet_wrapper::lanelet_map::laneletLength(end_of_road_lanelet_id.value()))
               .offset(lanelet_pose.value().offset)
-              .rpy(lanelet_pose.value().rpy));
+              .rpy(lanelet_pose.value().rpy)
+              .lanelet_pose_valid(true));
         }
       } else {
         THROW_SIMULATION_ERROR("Failed to find trailing lanelet_id for LaneletPose estimation.");
