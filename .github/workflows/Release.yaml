@@ -61,7 +61,7 @@ jobs:
       - name: Get old version
         id: old_version
         run: |
-          echo "old_version=$(catkin_package_version)" >> $GITHUB_OUTPUT  
+          echo "old_version=$(catkin_package_version)" >> $GITHUB_OUTPUT
 
       - name: Pull head branch
         run: git pull ${{ github.event.pull_request.head.repo.clone_url }} ${{ github.head_ref }}
