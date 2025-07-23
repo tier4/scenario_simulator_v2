@@ -39,7 +39,7 @@ public:
       BT::InputPort<traffic_simulator_msgs::msg::PedestrianParameters>("pedestrian_parameters")};
     BT::PortsList parent_ports = context_gamma_planner::ActionNodeBase::providedPorts();
     for (const auto & parent_port : parent_ports) {
-      ports.emplace(parent_port.first, parent_port.second);
+      ports.try_emplace(parent_port.first, parent_port.second);
     }
     return ports;
   }
