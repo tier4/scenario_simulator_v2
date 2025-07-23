@@ -15,13 +15,6 @@
 #ifndef CONTEXT_GAMMA_PLANNER__PEDESTRIAN__FOLLOW_POLYLINE_TRAJECTORY_PLANNER_HPP_
 #define CONTEXT_GAMMA_PLANNER__PEDESTRIAN__FOLLOW_POLYLINE_TRAJECTORY_PLANNER_HPP_
 
-#include <algorithm>
-#include <cmath>
-#include <geometry/transform.hpp>
-#include <iostream>
-#include <scenario_simulator_exception/exception.hpp>
-#include <traffic_simulator_msgs/msg/polyline_trajectory.hpp>
-
 #include "context_gamma_planner/planner/follow_polyline_trajectory_planner_base.hpp"
 
 namespace context_gamma_planner

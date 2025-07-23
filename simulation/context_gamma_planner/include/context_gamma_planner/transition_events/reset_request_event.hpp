@@ -16,8 +16,6 @@
 #define CONTEXT_GAMMA_PLANNER__TRANSITION_EVENTS__RESET_REQUEST_EVENT_HPP_
 
 #include <context_gamma_planner/transition_events/transition_event.hpp>
-#include <memory>
-#include <rclcpp/rclcpp.hpp>
 #include <traffic_simulator/data_type/behavior.hpp>
 
 namespace context_gamma_planner

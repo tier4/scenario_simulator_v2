@@ -18,7 +18,6 @@
 #include <algorithm>
 #include <cmath>
 #include <geometry/transform.hpp>
-#include <iostream>
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator_msgs/msg/polyline_trajectory.hpp>
 

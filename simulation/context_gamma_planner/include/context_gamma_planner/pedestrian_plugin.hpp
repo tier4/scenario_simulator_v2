@@ -16,17 +16,14 @@
 #define CONTEXT_GAMMA_PLANNER__PEDESTRIAN_PLUGIN_BASE_HPP_
 
 #include <behaviortree_cpp_v3/bt_factory.h>
-#include <behaviortree_cpp_v3/loggers/bt_cout_logger.h>
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <geometry/quaternion/euler_to_quaternion.hpp>
 #include <geometry/quaternion/quaternion_to_euler.hpp>
 #include <geometry/vector3/norm.hpp>
 #include <geometry/vector3/operator.hpp>
-#include <iostream>
 #include <pugixml.hpp>
 #include <traffic_simulator/behavior/behavior_plugin_base.hpp>
-#include <traffic_simulator/lanelet_wrapper/pose.hpp>
 
 #include "context_gamma_planner/behavior/pedestrian/follow_lane_action.hpp"
 #include "context_gamma_planner/behavior/pedestrian/follow_polyline_trajectory_action.hpp"

@@ -16,11 +16,8 @@
 #define CONTEXT_GAMMA_PLANNER__GOAL_PLANNER_BASE_HPP_
 
 #include <algorithm>
-#include <cmath>
 #include <deque>
-#include <geometry/transform.hpp>
 #include <geometry_msgs/msg/pose.hpp>
-#include <iostream>
 #include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/data_type/entity_status.hpp>

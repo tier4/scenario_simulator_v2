@@ -17,21 +17,15 @@
 
 #include <behaviortree_cpp_v3/action_node.h>
 
-#include <boost/algorithm/clamp.hpp>
-#include <geometry/bounding_box.hpp>
-#include <geometry/spline/catmull_rom_spline.hpp>
-#include <geometry/transform.hpp>
 #include <memory>
 #include <string>
 #include <traffic_simulator/behavior/behavior_plugin_base.hpp>
 #include <traffic_simulator/data_type/behavior.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
-#include <traffic_simulator/helper/stop_watch.hpp>
 #include <traffic_simulator/traffic_lights/traffic_lights_base.hpp>
 #include <traffic_simulator_msgs/msg/obstacle.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
-#include <unordered_map>
 #include <vector>
 
 namespace context_gamma_planner

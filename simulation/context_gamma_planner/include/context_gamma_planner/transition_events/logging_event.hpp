@@ -17,8 +17,8 @@
 
 #include <behaviortree_cpp_v3/loggers/bt_cout_logger.h>
 
-#include <memory>
 #include <rclcpp/rclcpp.hpp>
+#include <string>
 
 #include "context_gamma_planner/transition_events/transition_event.hpp"
 

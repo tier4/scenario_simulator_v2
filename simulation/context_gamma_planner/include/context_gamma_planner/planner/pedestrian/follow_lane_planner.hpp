@@ -15,10 +15,7 @@
 #ifndef CONTEXT_GAMMA_PLANNER__PEDESTRIAN__FOLLOW_LANE_PLANNER_HPP_
 #define CONTEXT_GAMMA_PLANNER__PEDESTRIAN__FOLLOW_LANE_PLANNER_HPP_
 
-#include <algorithm>
 #include <cmath>
-#include <geometry/transform.hpp>
-#include <iostream>
 #include <scenario_simulator_exception/exception.hpp>
 
 #include "context_gamma_planner/planner/goal_planner_base.hpp"
