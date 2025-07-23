@@ -85,8 +85,6 @@ void PedestrianPlugin::update(double current_time, double step_time)
   while (getCurrentAction() == "root") {
     tickOnce(current_time, step_time);
   }
-  if (getPlanningSpeed()) {
-  }
 
   auto transformLocalToGlobalVelocity =
     [](const geometry_msgs::msg::Pose & pose, const geometry_msgs::msg::Vector3 & local_vel) {
