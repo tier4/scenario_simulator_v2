@@ -66,12 +66,13 @@ struct TrafficSignalState : private SimulatorCore::NonStandardOperation
 
   auto traffic_signal_type() const -> TrafficSignalType;
 
-private:
   struct ParsedTrafficSignalID
   {
     lanelet::Id lanelet_id;
 
     TrafficSignalType traffic_signal_type;
+
+    explicit ParsedTrafficSignalID(const String & traffic_signal_id);
   };
 
   const ParsedTrafficSignalID parsed_traffic_signal_id;
