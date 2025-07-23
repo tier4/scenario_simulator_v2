@@ -25,8 +25,8 @@ class ResetRequestEvent : public TransitionEvent
 public:
   ResetRequestEvent(
     BT::TreeNode * root_node,
-    std::function<traffic_simulator::behavior::Request()> get_request_function,
-    std::function<void(const traffic_simulator::behavior::Request &)> set_request_function);
+    const std::function<traffic_simulator::behavior::Request()> & get_request_function,
+    const std::function<void(const traffic_simulator::behavior::Request &)> & set_request_function);
   virtual ~ResetRequestEvent() = default;
 
   const std::string & getCurrentAction() const;

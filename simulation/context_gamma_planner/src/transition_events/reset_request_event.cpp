@@ -18,8 +18,8 @@ namespace context_gamma_planner
 {
 ResetRequestEvent::ResetRequestEvent(
   BT::TreeNode * root_node,
-  std::function<traffic_simulator::behavior::Request()> get_request_function,
-  std::function<void(const traffic_simulator::behavior::Request &)> set_request_function)
+  const std::function<traffic_simulator::behavior::Request()> & get_request_function,
+  const std::function<void(const traffic_simulator::behavior::Request &)> & set_request_function)
 : TransitionEvent(root_node),
   get_request_function_(get_request_function),
   set_request_function_(set_request_function)
