@@ -22,6 +22,20 @@ auto laneletLength(const lanelet::Id lanelet_id) -> double
 {
   return lanelet_wrapper::lanelet_map::laneletLength(lanelet_id);
 }
+auto laneletAltitude(
+  const lanelet::Id & lanelet_id, const geometry_msgs::msg::Pose & pose,
+  const double matching_distance) -> std::optional<double>
+{
+  return lanelet_wrapper::lanelet_map::laneletAltitude(lanelet_id, pose, matching_distance);
+}
+
+auto nearbyLaneletIds(
+  const Pose & pose, const double distance_thresh, const bool include_crosswalk,
+  const std::size_t search_count) -> lanelet::Ids
+{
+  return lanelet_wrapper::lanelet_map::nearbyLaneletIds(
+    pose.position, distance_thresh, include_crosswalk, search_count);
+}
 
 auto noNextLaneletPoses() -> std::vector<std::pair<lanelet::Id, Pose>>
 {
