@@ -48,7 +48,6 @@ jobs:
           fetch-tags: true
 
       - name: Setup git(after merge)
-        if: github.event.pull_request.merged == true
         run: |
           git config --global user.name  "Release Bot"
           git config --global user.email "action@github.com"
