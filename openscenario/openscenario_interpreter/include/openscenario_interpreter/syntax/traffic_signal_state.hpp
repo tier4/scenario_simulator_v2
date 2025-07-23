@@ -42,7 +42,8 @@ struct TrafficSignalState : private SimulatorCore::NonStandardOperation
    *  listed in TrafficSignal list of the RoadNetwork.
    *
    *  In the TIER IV OpenSCENARIO implementation, it is the Lanelet ID (positive
-   *  integer) of the traffic light.
+   *  integer) of the traffic light, optionally followed by a space and the
+   *  signal type ("v2i"). For example: "34802" or "34802 v2i".
    *
    * ------------------------------------------------------------------------ */
   const String traffic_signal_id;
@@ -60,6 +61,20 @@ struct TrafficSignalState : private SimulatorCore::NonStandardOperation
   auto evaluate() const -> Object;
 
   auto id() const -> lanelet::Id;
+
+  enum class TrafficSignalType { CONVENTIONAL, V2I };
+
+  auto traffic_signal_type() const -> TrafficSignalType;
+
+private:
+  struct ParsedTrafficSignalID
+  {
+    lanelet::Id lanelet_id;
+
+    TrafficSignalType traffic_signal_type;
+  };
+
+  const ParsedTrafficSignalID parsed_traffic_signal_id;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

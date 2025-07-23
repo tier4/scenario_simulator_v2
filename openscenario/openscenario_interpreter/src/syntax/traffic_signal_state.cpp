@@ -22,19 +22,31 @@ inline namespace syntax
 {
 TrafficSignalState::TrafficSignalState(const pugi::xml_node & node, Scope & scope)
 : traffic_signal_id(readAttribute<String>("trafficSignalId", node, scope)),
-  state(readAttribute<String>("state", node, scope))
+  state(readAttribute<String>("state", node, scope)),
+  parsed_traffic_signal_id()
 {
 }
 
 auto TrafficSignalState::evaluate() const -> Object
 {
-  setConventionalTrafficLightsState(id(), state);
+  switch (traffic_signal_type()) {
+    case TrafficSignalType::CONVENTIONAL:
+      setConventionalTrafficLightsState(id(), state);
+      break;
+    case TrafficSignalType::V2I:
+      setV2ITrafficLightsState(id(), state);
+      break;
+    default:
+      throw Error("Unknown traffic signal type has set to TrafficSignalState");
+  }
   return unspecified;
 }
 
-auto TrafficSignalState::id() const -> lanelet::Id
+auto TrafficSignalState::id() const -> lanelet::Id { return parsed_traffic_signal_id.lanelet_id; }
+
+auto TrafficSignalState::traffic_signal_type() const -> TrafficSignalState::TrafficSignalType
 {
-  return boost::lexical_cast<lanelet::Id>(traffic_signal_id);
+  return parsed_traffic_signal_id.traffic_signal_type;
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
