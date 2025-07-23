@@ -20,7 +20,6 @@ ActionNodeBase::ActionNodeBase(const std::string & name, const BT::NodeConfigura
 : BT::ActionNodeBase(name, config)
 {
 }
-auto ActionNodeBase::executeTick() -> BT::NodeStatus { return BT::ActionNodeBase::executeTick(); }
 auto ActionNodeBase::getBlackBoardValues() -> void
 {
   if (!getInput<traffic_simulator::behavior::Request>("request", request)) {

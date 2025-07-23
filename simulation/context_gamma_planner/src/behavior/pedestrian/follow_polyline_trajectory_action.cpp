@@ -14,10 +14,9 @@
 
 #include "context_gamma_planner/behavior/pedestrian/follow_polyline_trajectory_action.hpp"
 
-namespace context_gamma_planner
+namespace context_gamma_planner::pedestrian
 {
-namespace pedestrian
-{
+
 FollowPolylineTrajectoryAction::FollowPolylineTrajectoryAction(
   const std::string & name, const BT::NodeConfiguration & config)
 : context_gamma_planner::pedestrian::ActionNode(name, config), planner_(1.0)
@@ -68,5 +67,4 @@ BT::NodeStatus FollowPolylineTrajectoryAction::tick()
 
   return BT::NodeStatus::RUNNING;
 }
-}  // namespace pedestrian
-}  // namespace context_gamma_planner
+}  // namespace context_gamma_planner::pedestrian

@@ -20,10 +20,9 @@
 
 #include "context_gamma_planner/planner/goal_planner_base.hpp"
 
-namespace context_gamma_planner
+namespace context_gamma_planner::pedestrian
 {
-namespace pedestrian
-{
+
 class FollowLanePlanner : public GoalPlannerBase
 {
 public:
@@ -36,7 +35,6 @@ public:
 
   void clear() override;
 };
-}  // namespace pedestrian
-}  // namespace context_gamma_planner
+}  // namespace context_gamma_planner::pedestrian
 
 #endif  // CONTEXT_GAMMA_PLANNER__PEDESTRIAN__FOLLOW_LANE_PLANNER_HPP_

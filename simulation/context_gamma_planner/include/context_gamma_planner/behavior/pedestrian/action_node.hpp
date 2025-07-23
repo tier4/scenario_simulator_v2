@@ -24,10 +24,9 @@
 
 #include "context_gamma_planner/behavior/action_node_base.hpp"
 
-namespace context_gamma_planner
+namespace context_gamma_planner::pedestrian
 {
-namespace pedestrian
-{
+
 class ActionNode : public ActionNodeBase
 {
 public:
@@ -46,7 +45,6 @@ public:
   }
   traffic_simulator_msgs::msg::PedestrianParameters pedestrian_parameters;
 };
-}  // namespace pedestrian
-}  // namespace context_gamma_planner
+}  // namespace context_gamma_planner::pedestrian
 
 #endif  // CONTEXT_GAMMA_PLANNER__PEDESTRIAN__PEDESTRIAN_ACTION_NODE_HPP_

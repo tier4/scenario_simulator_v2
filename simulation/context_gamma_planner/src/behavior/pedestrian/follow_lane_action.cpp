@@ -14,10 +14,9 @@
 
 #include "context_gamma_planner/behavior/pedestrian/follow_lane_action.hpp"
 
-namespace context_gamma_planner
+namespace context_gamma_planner::pedestrian
 {
-namespace pedestrian
-{
+
 FollowLaneAction::FollowLaneAction(const std::string & name, const BT::NodeConfiguration & config)
 : context_gamma_planner::pedestrian::ActionNode(name, config), planner_(3.0)
 {
@@ -56,5 +55,4 @@ BT::NodeStatus FollowLaneAction::tick()
 
   return BT::NodeStatus::RUNNING;
 }
-}  // namespace pedestrian
-}  // namespace context_gamma_planner
+}  // namespace context_gamma_planner::pedestrian

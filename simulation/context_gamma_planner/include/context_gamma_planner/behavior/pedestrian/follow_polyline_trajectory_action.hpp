@@ -23,10 +23,9 @@
 #include "context_gamma_planner/behavior/pedestrian/action_node.hpp"
 #include "context_gamma_planner/planner/pedestrian/follow_polyline_trajectory_planner.hpp"
 
-namespace context_gamma_planner
+namespace context_gamma_planner::pedestrian
 {
-namespace pedestrian
-{
+
 class FollowPolylineTrajectoryAction : public context_gamma_planner::pedestrian::ActionNode
 {
 public:
@@ -52,7 +51,6 @@ private:
   std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> polyline_trajectory_;
   FollowPolylineTrajectoryPlanner planner_;
 };
-}  // namespace pedestrian
-}  // namespace context_gamma_planner
+}  // namespace context_gamma_planner::pedestrian
 
 #endif  // CONTEXT_GAMMA_PLANNER__PEDESTRIAN__FOLLOW_POLYLINE_TRAJECTORY_ACTION_HPP_

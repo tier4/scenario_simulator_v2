@@ -18,9 +18,7 @@
 #include "context_gamma_planner/behavior/pedestrian/action_node.hpp"
 #include "context_gamma_planner/planner/pedestrian/follow_lane_planner.hpp"
 
-namespace context_gamma_planner
-{
-namespace pedestrian
+namespace context_gamma_planner::pedestrian
 {
 class FollowLaneAction : public context_gamma_planner::pedestrian::ActionNode
 {
@@ -44,7 +42,6 @@ public:
 private:
   FollowLanePlanner planner_;
 };
-}  // namespace pedestrian
-}  // namespace context_gamma_planner
+}  // namespace context_gamma_planner::pedestrian
 
 #endif  // CONTEXT_GAMMA_PLANNER__BEHAVIOR__PEDESTRIAN__FOLLOW_LANE_ACTION_HPP_

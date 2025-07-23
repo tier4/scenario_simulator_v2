@@ -17,16 +17,14 @@
 
 #include "context_gamma_planner/planner/follow_polyline_trajectory_planner_base.hpp"
 
-namespace context_gamma_planner
+namespace context_gamma_planner::pedestrian
 {
-namespace pedestrian
-{
+
 class FollowPolylineTrajectoryPlanner : public FollowPolylineTrajectoryPlannerBase
 {
 public:
   FollowPolylineTrajectoryPlanner(const double goal_threshold);
 };
-}  // namespace pedestrian
-}  // namespace context_gamma_planner
+}  // namespace context_gamma_planner::pedestrian
 
 #endif  // CONTEXT_GAMMA_PLANNER__PEDESTRIAN__FOLLOW_POLYLINE_TRAJECTORY_PLANNER_HPP_

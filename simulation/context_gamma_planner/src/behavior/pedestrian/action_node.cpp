@@ -14,10 +14,9 @@
 
 #include "context_gamma_planner/behavior/pedestrian/action_node.hpp"
 
-namespace context_gamma_planner
+namespace context_gamma_planner::pedestrian
 {
-namespace pedestrian
-{
+
 ActionNode::ActionNode(const std::string & name, const BT::NodeConfiguration & config)
 : ActionNodeBase(name, config)
 {
@@ -31,5 +30,4 @@ void ActionNode::getBlackBoardValues()
     THROW_SIMULATION_ERROR("failed to get input pedestrian_parameters in pedestrian::ActionNode");
   }
 }
-}  // namespace pedestrian
-}  // namespace context_gamma_planner
+}  // namespace context_gamma_planner::pedestrian

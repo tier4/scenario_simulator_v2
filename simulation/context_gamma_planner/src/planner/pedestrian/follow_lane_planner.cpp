@@ -14,10 +14,9 @@
 
 #include "context_gamma_planner/planner/pedestrian/follow_lane_planner.hpp"
 
-namespace context_gamma_planner
+namespace context_gamma_planner::pedestrian
 {
-namespace pedestrian
-{
+
 FollowLanePlanner::FollowLanePlanner(const double goal_threshold) : GoalPlannerBase(goal_threshold)
 {
 }
@@ -68,5 +67,4 @@ auto FollowLanePlanner::calculateNextGoalPoint() -> std::optional<geometry_msgs:
 
 void FollowLanePlanner::clear() { goal_poses_.clear(); }
 
-}  // namespace pedestrian
-}  // namespace context_gamma_planner
+}  // namespace context_gamma_planner::pedestrian
