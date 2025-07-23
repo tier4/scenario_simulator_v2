@@ -41,7 +41,7 @@ void GoalPlannerBase::appendGoalPoses(const std::vector<geometry_msgs::msg::Pose
 
 void GoalPlannerBase::appendGoalPoints(const std::vector<geometry_msgs::msg::Point> & goal_points)
 {
-  for (const auto point : goal_points) {
+  for (const auto & point : goal_points) {
     geometry_msgs::msg::Pose pose;
     pose.position = point;
     goal_poses_.emplace_back(pose);

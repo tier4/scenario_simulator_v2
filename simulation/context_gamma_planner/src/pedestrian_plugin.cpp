@@ -114,7 +114,7 @@ void PedestrianPlugin::update(double current_time, double step_time)
       continue;
     }
 
-    const auto other_bbox = other_entity.getBoundingBox();
+    const auto & other_bbox = other_entity.getBoundingBox();
     auto other_pose = other_entity.getMapPose();
     const auto other_speed = other_entity.getTwist().linear;
     const auto other_vel = transformLocalToGlobalVelocity(other_pose, other_speed);
