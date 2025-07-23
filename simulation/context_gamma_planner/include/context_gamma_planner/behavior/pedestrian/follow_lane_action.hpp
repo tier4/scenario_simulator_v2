@@ -33,8 +33,8 @@ public:
   {
     BT::PortsList ports = {};
     BT::PortsList parent_ports = context_gamma_planner::pedestrian::ActionNode::providedPorts();
-    for (const auto & parent_port : parent_ports) {
-      ports.try_emplace(parent_port.first, parent_port.second);
+    for (const auto & [port_name, port_info] : parent_ports) {
+      ports.try_emplace(port_name, port_info);
     }
     return ports;
   }
