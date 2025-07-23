@@ -35,9 +35,7 @@ class ActionNodeBase : public BT::ActionNodeBase
 public:
   ActionNodeBase(const std::string & name, const BT::NodeConfiguration & config);
   ~ActionNodeBase() override = default;
-  auto executeTick() -> BT::NodeStatus override;
-
-  void halt() override final { setStatus(BT::NodeStatus::IDLE); }
+  void halt() final { setStatus(BT::NodeStatus::IDLE); }
 
   static BT::PortsList providedPorts()
   {
