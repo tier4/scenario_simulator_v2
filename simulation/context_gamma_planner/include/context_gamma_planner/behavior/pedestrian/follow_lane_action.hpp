@@ -40,7 +40,7 @@ public:
   }
 
 private:
-  FollowLanePlanner planner_;
+  FollowLanePlanner planner_{3.0};
 };
 }  // namespace context_gamma_planner::pedestrian
 

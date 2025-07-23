@@ -18,7 +18,7 @@ namespace context_gamma_planner::pedestrian
 {
 
 FollowLaneAction::FollowLaneAction(const std::string & name, const BT::NodeConfiguration & config)
-: context_gamma_planner::pedestrian::ActionNode(name, config), planner_(3.0)
+: context_gamma_planner::pedestrian::ActionNode(name, config)
 {
 }
 

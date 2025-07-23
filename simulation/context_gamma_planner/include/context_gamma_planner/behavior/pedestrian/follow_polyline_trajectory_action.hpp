@@ -49,7 +49,7 @@ public:
 
 private:
   std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> polyline_trajectory_;
-  FollowPolylineTrajectoryPlanner planner_;
+  FollowPolylineTrajectoryPlanner planner_{1.0};
 };
 }  // namespace context_gamma_planner::pedestrian
 

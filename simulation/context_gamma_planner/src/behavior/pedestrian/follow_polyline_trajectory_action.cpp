@@ -19,7 +19,7 @@ namespace context_gamma_planner::pedestrian
 
 FollowPolylineTrajectoryAction::FollowPolylineTrajectoryAction(
   const std::string & name, const BT::NodeConfiguration & config)
-: context_gamma_planner::pedestrian::ActionNode(name, config), planner_(1.0)
+: context_gamma_planner::pedestrian::ActionNode(name, config)
 {
 }
 
