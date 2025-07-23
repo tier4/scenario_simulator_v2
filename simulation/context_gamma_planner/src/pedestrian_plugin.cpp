@@ -19,7 +19,6 @@ namespace context_gamma_planner
 
 void PedestrianPlugin::configure(const rclcpp::Logger & logger)
 {
-  std::cout << "pedestrian plugin configure start" << std::endl;
   std::string path = ament_index_cpp::get_package_share_directory("context_gamma_planner") +
                      "/config/pedestrian_behavior.xml";
   factory_.registerNodeType<context_gamma_planner::pedestrian::FollowLaneAction>("FollowLane");
