@@ -86,17 +86,6 @@ auto makePose(
     orientation);
 }
 
-auto makeHdMapUtilsSharedPointer() -> std::shared_ptr<hdmap_utils::HdMapUtils>
-{
-  return std::make_shared<hdmap_utils::HdMapUtils>(
-    ament_index_cpp::get_package_share_directory("traffic_simulator") +
-      "/map/standard_map/lanelet2_map.osm",
-    geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
-      .latitude(35.9037067912303)
-      .longitude(139.9337945139059)
-      .altitude(0.0));
-}
-
 auto activateLaneletWrapper(const std::string map_name) -> void
 {
   const auto lanelet_path = ament_index_cpp::get_package_share_directory("traffic_simulator") +
