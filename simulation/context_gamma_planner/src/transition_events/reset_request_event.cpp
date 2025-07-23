@@ -31,10 +31,10 @@ void ResetRequestEvent::callback(
   BT::NodeStatus status)
 {
   TransitionEvent::updateCurrentAction(status, node);
-  if (status == BT::NodeStatus::SUCCESS || status == BT::NodeStatus::FAILURE) {
-    if (getRequestString(get_request_function_()) == current_action_) {
-      set_request_function_(traffic_simulator::behavior::Request::NONE);
-    }
+  if (
+    (status == BT::NodeStatus::SUCCESS || status == BT::NodeStatus::FAILURE) &&
+    getRequestString(get_request_function_()) == current_action_) {
+    set_request_function_(traffic_simulator::behavior::Request::NONE);
   }
 }
 }  // namespace context_gamma_planner

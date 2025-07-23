@@ -26,10 +26,10 @@ FollowPolylineTrajectoryAction::FollowPolylineTrajectoryAction(
 void FollowPolylineTrajectoryAction::getBlackBoardValues()
 {
   ActionNode::getBlackBoardValues();
-  if (request == traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY) {
-    if (!getInput("polyline_trajectory", polyline_trajectory_)) {
-      THROW_SIMULATION_ERROR("failed to get input polyline_trajectory in ActionNode");
-    }
+  if (
+    request == traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY &&
+    !getInput("polyline_trajectory", polyline_trajectory_)) {
+    THROW_SIMULATION_ERROR("failed to get input polyline_trajectory in ActionNode");
   }
 }
 
