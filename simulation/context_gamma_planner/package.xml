@@ -3,22 +3,21 @@
 <package format="3">
   <name>context_gamma_planner</name>
   <version>16.7.6</version>
-  <description>TODO: Package description</description>
-  <maintainer email="ms.kataoka@gmail.com">masaya</maintainer>
-  <license>TODO: License declaration</license>
+  <description>
+      A simulation plugin for reactive, context-aware trajectory planning with dynamic obstacle avoidance.
+  </description>
+  <maintainer email="taiga.takano.2@tier4.jp">Taiga Takano</maintainer>
+  <license>Apache 2.0</license>
 
+  <buildtool_depend>ament_cmake</buildtool_depend>
   <buildtool_depend>ament_cmake_auto</buildtool_depend>
-  <buildtool_depend>ament_cmake_python</buildtool_depend>
 
   <depend>rclcpp</depend>
   <depend>pluginlib</depend>
   <depend>traffic_simulator</depend>
   <depend>behaviortree_cpp_v3</depend>
-  <depend>cpp_mock_scenarios</depend>
   <depend>geometry</depend>
   <depend>libgoogle-glog-dev</depend>
-  <depend>python3-xmlschema</depend>
-  <depend>rclpy</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_cmake_clang_format</test_depend>
