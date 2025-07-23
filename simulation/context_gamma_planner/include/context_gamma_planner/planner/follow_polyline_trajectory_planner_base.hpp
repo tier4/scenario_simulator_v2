@@ -29,6 +29,7 @@ class FollowPolylineTrajectoryPlannerBase : public GoalPlannerBase
 {
 public:
   FollowPolylineTrajectoryPlannerBase(const double goal_threshold);
+  virtual ~FollowPolylineTrajectoryPlannerBase() = default;
 
   void setWaypoints(
     const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> trajectory);

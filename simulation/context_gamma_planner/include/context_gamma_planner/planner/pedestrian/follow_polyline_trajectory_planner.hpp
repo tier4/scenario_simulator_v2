@@ -24,6 +24,7 @@ class FollowPolylineTrajectoryPlanner : public FollowPolylineTrajectoryPlannerBa
 {
 public:
   FollowPolylineTrajectoryPlanner(const double goal_threshold);
+  virtual ~FollowPolylineTrajectoryPlanner() = default;
 };
 }  // namespace context_gamma_planner::pedestrian
 

@@ -27,6 +27,8 @@ public:
     BT::TreeNode * root_node,
     std::function<traffic_simulator::behavior::Request()> get_request_function,
     std::function<void(const traffic_simulator::behavior::Request &)> set_request_function);
+  virtual ~ResetRequestEvent() = default;
+
   const std::string & getCurrentAction() const;
 
 private:

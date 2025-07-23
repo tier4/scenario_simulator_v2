@@ -25,6 +25,7 @@ class TransitionEvent
 {
 public:
   TransitionEvent(BT::TreeNode * root_node);
+  virtual ~TransitionEvent() = default;
 
 protected:
   virtual void callback(

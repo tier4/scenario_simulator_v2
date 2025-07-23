@@ -30,6 +30,7 @@ class GoalPlannerBase
 {
 public:
   GoalPlannerBase(const double goal_threshold);
+  virtual ~GoalPlannerBase() = default;
 
   void setCurrentStatus(
     const std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus> & status);
