@@ -47,7 +47,7 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
 
-      - name: Setup git
+      - name: Setup git(after merge)
         run: |
           git config --global user.name  "Release Bot"
           git config --global user.email "action@github.com"
