@@ -31,7 +31,7 @@ TransitionEvent::TransitionEvent(BT::TreeNode * root_node)
     }
   };
   auto visitor = [this, subscribeCallback](BT::TreeNode * node) {
-    subscribers_.push_back(node->subscribeToStatusChange(std::move(subscribeCallback)));
+    subscribers_.push_back(node->subscribeToStatusChange(subscribeCallback));
   };
   BT::applyRecursiveVisitor(root_node, visitor);
 }
