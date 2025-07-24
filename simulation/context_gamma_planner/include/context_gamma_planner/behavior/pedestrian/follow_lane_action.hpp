@@ -27,7 +27,7 @@ public:
 
   BT::NodeStatus tick() override;
 
-  void getBlackBoardValues();
+  void getBlackBoardValues() override;
 
   static BT::PortsList providedPorts()
   {

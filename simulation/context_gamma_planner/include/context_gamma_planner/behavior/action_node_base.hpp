@@ -62,7 +62,7 @@ public:
     // clang-format on
   }
 
-  auto getBlackBoardValues() -> void;
+  virtual auto getBlackBoardValues() -> void;
 
 protected:
   traffic_simulator::behavior::Request request;

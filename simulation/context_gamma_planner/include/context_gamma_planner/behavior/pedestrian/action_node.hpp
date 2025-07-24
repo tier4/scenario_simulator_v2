@@ -31,7 +31,7 @@ class ActionNode : public ActionNodeBase
 {
 public:
   ActionNode(const std::string & name, const BT::NodeConfiguration & config);
-  void getBlackBoardValues();
+  void getBlackBoardValues() override;
 
   static BT::PortsList providedPorts()
   {
