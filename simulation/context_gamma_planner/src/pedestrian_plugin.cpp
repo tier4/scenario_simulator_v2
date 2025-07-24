@@ -28,8 +28,8 @@ void PedestrianPlugin::configure(const rclcpp::Logger & logger)
   logging_event_ptr_ =
     std::make_shared<context_gamma_planner::LoggingEvent>(tree_.rootNode(), logger);
   reset_request_event_ptr_ = std::make_shared<context_gamma_planner::ResetRequestEvent>(
-    tree_.rootNode(), [&]() { return getRequest(); },
-    [&](traffic_simulator::behavior::Request request) { return setRequest(request); });
+    tree_.rootNode(), [this]() { return getRequest(); },
+    [this](traffic_simulator::behavior::Request request) { return setRequest(request); });
   setRequest(traffic_simulator::behavior::Request::NONE);
   traffic_simulator_msgs::msg::Obstacle obstacle_msg;
   obstacle_msg.type = traffic_simulator_msgs::msg::Obstacle::ENTITY;
