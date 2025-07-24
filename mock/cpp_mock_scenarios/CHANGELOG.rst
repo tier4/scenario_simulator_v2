@@ -24,6 +24,50 @@ Changelog for package cpp_mock_scenarios
 16.4.2 (2025-05-23)
 -------------------
 
+16.8.3 (2025-07-24)
+-------------------
+* Merge branch 'master' into patch-1
+* Merge branch 'master' into patch-1
+* Merge branch 'master' into patch-1
+* Contributors: Kotaro Yoshimoto
+
+16.8.2 (2025-07-24)
+-------------------
+
+16.8.1 (2025-07-22)
+-------------------
+* Merge branch 'master' into fix-orientation-availability
+* Contributors: Kotaro Yoshimoto
+
+16.8.0 (2025-07-22)
+-------------------
+* Merge pull request `#1625 <https://github.com/tier4/scenario_simulator_v2/issues/1625>`_ from tier4/feat/cpp_mock_scenarios_awsim_support
+  CppMockScenarios AWSIM support
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* fix(CppMockScenarios) Added map_path parameter to load a path to lanelet2 file when runing a scenario with AWSIM
+* fix(CppMockScenarios) Added ego_model to load appropriet asset-key when run scenarios with AWSIM
+* fix(CppMockScenarios) Added ego_model to load appropriet asset-key when run scenarios with AWSIM
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* fix(CppMockScenario) Fix issue with comment
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* ref(CppMockScenarios): Handle  map_path parameter in configure method
+* ref(CppScenarioNode): Refactor spawnEgoEntity to unify goal assignemnt
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* ref(CppMockScenarios): Refactor spawnEgoEntity methods
+* feat(CppMockScenarios): Add spawningEgoEntity without requesting a path generation
+* fix(CppMockScenarios): Revert mock_test.launch.py changes
+* fix(CppMockScenario) : Allow map_path override via ROS2 parameter when empty in constructor
+* feat(CppMockScenario) Add support for 'map_path' launch argument
+  - Added map_path as a launch argument with default empty string
+* feat: add ego_model launch argument for specifying AWSIM EGO 3D model
+  - Added a new launch argument `ego_model` with default value `""` to support specifying the 3D asset name for the EGO vehicle model in AWSIM.
+  Supported values include: 'jpntaxi', 'jpntaxi20', 'bydj6', 'bydj6_gen2', 'lexus_rx450h'.
+* feat(CppMockScenarios) Add AWSIM support
+  - Added 'ego_model' to support spawninig specific ego model in AWSIM.
+  - Introduced optional delayed scenario clock start (api\_.startNpcLogic()) using start(false).
+* Contributors: Robotec, SzymonParapura, Taiga
+
 16.7.6 (2025-07-15)
 -------------------
 * Merge branch 'master' into fix-orientation-availability
