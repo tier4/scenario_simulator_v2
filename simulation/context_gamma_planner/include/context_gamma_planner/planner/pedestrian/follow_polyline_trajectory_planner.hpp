@@ -23,7 +23,7 @@ namespace context_gamma_planner::pedestrian
 class FollowPolylineTrajectoryPlanner : public FollowPolylineTrajectoryPlannerBase
 {
 public:
-  FollowPolylineTrajectoryPlanner(const double goal_threshold);
+  explicit FollowPolylineTrajectoryPlanner(const double goal_threshold);
   ~FollowPolylineTrajectoryPlanner() final = default;
 };
 }  // namespace context_gamma_planner::pedestrian

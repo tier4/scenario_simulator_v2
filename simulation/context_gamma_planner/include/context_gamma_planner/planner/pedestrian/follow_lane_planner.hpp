@@ -26,7 +26,7 @@ namespace context_gamma_planner::pedestrian
 class FollowLanePlanner : public GoalPlannerBase
 {
 public:
-  FollowLanePlanner(const double goal_threshold);
+  explicit FollowLanePlanner(const double goal_threshold);
   ~FollowLanePlanner() final = default;
 
   void setWaypoints(

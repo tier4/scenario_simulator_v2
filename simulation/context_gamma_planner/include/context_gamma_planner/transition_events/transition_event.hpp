@@ -24,7 +24,7 @@ namespace context_gamma_planner
 class TransitionEvent
 {
 public:
-  TransitionEvent(BT::TreeNode * root_node);
+  explicit TransitionEvent(BT::TreeNode * root_node);
   virtual ~TransitionEvent() = default;
 
 protected:

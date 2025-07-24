@@ -28,7 +28,7 @@ namespace context_gamma_planner
 class FollowPolylineTrajectoryPlannerBase : public GoalPlannerBase
 {
 public:
-  FollowPolylineTrajectoryPlannerBase(const double goal_threshold);
+  explicit FollowPolylineTrajectoryPlannerBase(const double goal_threshold);
   ~FollowPolylineTrajectoryPlannerBase() override = default;
 
   void setWaypoints(

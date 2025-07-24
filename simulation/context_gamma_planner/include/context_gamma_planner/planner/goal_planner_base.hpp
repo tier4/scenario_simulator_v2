@@ -29,7 +29,7 @@ namespace context_gamma_planner
 class GoalPlannerBase
 {
 public:
-  GoalPlannerBase(const double goal_threshold);
+  explicit GoalPlannerBase(const double goal_threshold);
   virtual ~GoalPlannerBase() = default;
 
   void setCurrentStatus(
