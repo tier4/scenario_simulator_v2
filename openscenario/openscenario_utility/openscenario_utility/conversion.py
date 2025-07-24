@@ -139,7 +139,10 @@ def from_yaml(keyword, node):
                 #
                 # => @tag: { ... }
                 #
-                result["@" + tag] = str(value)
+                if isinstance(value, bool):
+                    result["@" + tag] = str(value).lower()
+                else:
+                    result["@" + tag] = str(value)
             else:
                 #
                 # Tag: { ... }
