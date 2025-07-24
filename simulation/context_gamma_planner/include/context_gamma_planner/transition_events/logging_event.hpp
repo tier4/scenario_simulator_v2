@@ -28,7 +28,7 @@ class LoggingEvent : public TransitionEvent
 {
 public:
   LoggingEvent(BT::TreeNode * root_node, const rclcpp::Logger & logger);
-  virtual ~LoggingEvent() = default;
+  ~LoggingEvent() final = default;
 
   const std::string & getCurrentAction() const;
 

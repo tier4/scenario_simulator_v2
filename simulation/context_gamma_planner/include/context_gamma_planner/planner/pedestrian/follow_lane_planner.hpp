@@ -27,7 +27,7 @@ class FollowLanePlanner : public GoalPlannerBase
 {
 public:
   FollowLanePlanner(const double goal_threshold);
-  virtual ~FollowLanePlanner() = default;
+  ~FollowLanePlanner() final = default;
 
   void setWaypoints(
     const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils,
