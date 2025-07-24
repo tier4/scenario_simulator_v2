@@ -24,6 +24,23 @@ Changelog for package openscenario_preprocessor_msgs
 16.4.2 (2025-05-23)
 -------------------
 
+16.8.2 (2025-07-24)
+-------------------
+
+16.8.1 (2025-07-22)
+-------------------
+* Merge branch 'master' into fix-orientation-availability
+* Contributors: Kotaro Yoshimoto
+
+16.8.0 (2025-07-22)
+-------------------
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* Contributors: SzymonParapura, Taiga
+
 16.7.6 (2025-07-15)
 -------------------
 * Merge branch 'master' into fix-orientation-availability
