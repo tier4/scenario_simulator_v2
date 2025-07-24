@@ -24,6 +24,9 @@ Changelog for package simple_sensor_simulator
 16.4.2 (2025-05-23)
 -------------------
 
+16.8.2 (2025-07-24)
+-------------------
+
 16.8.1 (2025-07-22)
 -------------------
 * Merge pull request `#1653 <https://github.com/tier4/scenario_simulator_v2/issues/1653>`_ from tier4/fix-orientation-availability

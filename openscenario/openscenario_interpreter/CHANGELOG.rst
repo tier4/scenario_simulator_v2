@@ -35,6 +35,9 @@ Changelog for package openscenario_interpreter
 16.4.2 (2025-05-23)
 -------------------
 
+16.8.2 (2025-07-24)
+-------------------
+
 16.8.1 (2025-07-22)
 -------------------
 * Merge branch 'master' into fix-orientation-availability
