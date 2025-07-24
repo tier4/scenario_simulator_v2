@@ -18,6 +18,39 @@ Changelog for package zmqpp_vendor
 16.4.2 (2025-05-23)
 -------------------
 
+16.8.2 (2025-07-24)
+-------------------
+
+16.8.1 (2025-07-22)
+-------------------
+* Merge branch 'master' into fix-orientation-availability
+* Contributors: Kotaro Yoshimoto
+
+16.8.0 (2025-07-22)
+-------------------
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* Contributors: SzymonParapura, Taiga
+
+16.7.6 (2025-07-15)
+-------------------
+* Merge branch 'master' into fix-orientation-availability
+* Contributors: Kotaro Yoshimoto
+
+16.7.5 (2025-07-11)
+-------------------
+* Merge branch 'master' into feature/CODEOWNERS
+* Contributors: Kotaro Yoshimoto
+
+16.7.4 (2025-07-11)
+-------------------
+
+16.7.3 (2025-07-08)
+-------------------
+
 16.7.2 (2025-07-07)
 -------------------
 * Merge pull request `#1634 <https://github.com/tier4/scenario_simulator_v2/issues/1634>`_ from tier4/fix/zmqpp
