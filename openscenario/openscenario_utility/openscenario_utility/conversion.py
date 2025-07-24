@@ -40,6 +40,17 @@ def iota(start, step, stop):
         start = start + step
 
 
+def normalize_yaml_bools(obj):
+    if isinstance(obj, dict):
+        return {k: normalize_yaml_bools(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [normalize_yaml_bools(i) for i in obj]
+    elif isinstance(obj, bool):
+        return "true" if obj else "false"
+    else:
+        return obj
+
+
 class MacroExpander:
     def __init__(self, rules, schema):
 
@@ -170,6 +181,7 @@ def convert(input: Path, output: Path, verbose: bool = True):
     )
 
     yaml = load_yaml(input)
+    yaml = normalize_yaml_bools(yaml)
 
     macroexpand = MacroExpander(yaml.pop("ScenarioModifiers", None), schema)
 
@@ -190,9 +202,7 @@ def convert(input: Path, output: Path, verbose: bool = True):
     else:
         paths = macroexpand(
             xmlschema.XMLResource(xosc)
-            .tostring()
-            .replace("True", "true")
-            .replace("False", "false"),
+            .tostring(),
             output,
             input.stem,
         )
