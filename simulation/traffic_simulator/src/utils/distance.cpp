@@ -20,6 +20,7 @@
 #include <traffic_simulator/lanelet_wrapper/lanelet_map.hpp>
 #include <traffic_simulator/lanelet_wrapper/pose.hpp>
 #include <traffic_simulator/utils/distance.hpp>
+#include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 
 namespace traffic_simulator
@@ -95,7 +96,7 @@ auto longitudinalDistance(
     /**
      * @brief A matching distance of about 1.5*lane widths is given as the matching distance to match the
      * Entity present on the adjacent Lanelet.
-     * The length of the horizontal bar must intersect with the adjacent lanelet, 
+     * The length of the horizontal bar must intersect with the adjacent lanelet,
      * so it is always 10m regardless of the entity type.
      */
     constexpr double matching_distance = 5.0;
@@ -324,6 +325,30 @@ auto distanceToCrosswalk(
     auto polygon = hdmap_utils_ptr->getLaneletPolygon(target_crosswalk_id);
     return spline.getCollisionPointIn2D(polygon);
   }
+}
+
+auto distanceAlongLanelet(
+  const geometry_msgs::msg::Pose & from_pose,
+  const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
+  const geometry_msgs::msg::Pose & to_pose,
+  const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box, const double matching_distance,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<double>
+{
+  /// @note due to this hardcoded value, the method cannot be used for calculations along a crosswalk (for pedestrians)
+  constexpr bool include_crosswalk = false;
+
+  if (const auto from_lanelet_pose = pose::toCanonicalizedLaneletPose(
+        from_pose, from_bounding_box, include_crosswalk, matching_distance);
+      from_lanelet_pose.has_value()) {
+    if (const auto to_lanelet_pose = pose::toCanonicalizedLaneletPose(
+          to_pose, to_bounding_box, include_crosswalk, matching_distance);
+        to_lanelet_pose.has_value()) {
+      return hdmap_utils_ptr->getLongitudinalDistance(
+        static_cast<LaneletPose>(from_lanelet_pose.value()),
+        static_cast<LaneletPose>(to_lanelet_pose.value()));
+    }
+  }
+  return std::nullopt;
 }
 
 auto distanceToSpline(

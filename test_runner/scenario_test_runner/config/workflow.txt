@@ -27,3 +27,7 @@ $(find-pkg-share scenario_test_runner)/scenario/EntitySelection/SpeedAction_Spee
 $(find-pkg-share scenario_test_runner)/scenario/EntitySelection/TeleportAction_CollisionCondition_StandStillCondition.yaml
 $(find-pkg-share scenario_test_runner)/scenario/EntitySelection/TimeHeadwayCondition.yaml
 $(find-pkg-share scenario_test_runner)/scenario/collision_condition_by_type.yaml
+$(find-pkg-share scenario_test_runner)/scenario/FTA-only_destination_with_time_constraint.yaml
+$(find-pkg-share scenario_test_runner)/scenario/FTA-some_waypoints_with_time_constraint.yaml
+$(find-pkg-share scenario_test_runner)/scenario/FTA-with_target_speed_and_no_time_constraint.yaml
+$(find-pkg-share scenario_test_runner)/scenario/FTA-with_global_positions.yaml
