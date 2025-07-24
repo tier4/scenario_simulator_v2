@@ -20,6 +20,8 @@
 #include <autoware_vehicle_msgs/msg/control_mode_report.hpp>
 #include <autoware_vehicle_msgs/msg/gear_command.hpp>
 #include <autoware_vehicle_msgs/msg/gear_report.hpp>
+#include <autoware_vehicle_msgs/msg/hazard_lights_command.hpp>
+#include <autoware_vehicle_msgs/msg/hazard_lights_report.hpp>
 #include <autoware_vehicle_msgs/msg/steering_report.hpp>
 #include <autoware_vehicle_msgs/msg/turn_indicators_command.hpp>
 #include <autoware_vehicle_msgs/msg/turn_indicators_report.hpp>
@@ -49,6 +51,8 @@ public:
   using ControlModeReport           = autoware_vehicle_msgs::msg::ControlModeReport;
   using GearCommand                 = autoware_vehicle_msgs::msg::GearCommand;
   using GearReport                  = autoware_vehicle_msgs::msg::GearReport;
+  using HazardLightsCommand         = autoware_vehicle_msgs::msg::HazardLightsCommand;
+  using HazardLightsReport          = autoware_vehicle_msgs::msg::HazardLightsReport;
   using Odometry                    = nav_msgs::msg::Odometry;
   using PoseWithCovarianceStamped   = geometry_msgs::msg::PoseWithCovarianceStamped;
   using SteeringReport              = autoware_vehicle_msgs::msg::SteeringReport;
@@ -58,6 +62,7 @@ public:
 
   Subscriber<Control>                  getCommand;
   Subscriber<GearCommand>              getGearCommand;
+  Subscriber<HazardLightsCommand>      getHazardLightsCommand;
   Subscriber<TurnIndicatorsCommand>    getTurnIndicatorsCommand;
   Subscriber<priority::PathWithLaneId> getPathWithLaneId;
 
@@ -66,6 +71,7 @@ public:
   Publisher<PoseWithCovarianceStamped>    setPose;
   Publisher<SteeringReport>               setSteeringReport;
   Publisher<GearReport>                   setGearReport;
+  Publisher<HazardLightsReport>            setHazardLightsReport;
   Publisher<ControlModeReport>            setControlModeReport;
   Publisher<VelocityReport>               setVelocityReport;
   Publisher<TurnIndicatorsReport>         setTurnIndicatorsReport;

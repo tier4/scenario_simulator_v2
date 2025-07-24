@@ -26,6 +26,7 @@ AutowareUniverse::AutowareUniverse(bool simulate_localization) try
 : rclcpp::Node("concealer", "simulation"),
   getCommand("/control/command/control_cmd", rclcpp::QoS(1), *this),
   getGearCommand("/control/command/gear_cmd", rclcpp::QoS(1), *this),
+  getHazardLightsCommand("/control/command/hazard_lights_cmd", rclcpp::QoS(1), *this),
   getTurnIndicatorsCommand("/control/command/turn_indicators_cmd", rclcpp::QoS(1), *this),
   getPathWithLaneId(
     "/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", rclcpp::QoS(1),
@@ -46,6 +47,7 @@ AutowareUniverse::AutowareUniverse(bool simulate_localization) try
   setGearReport("/vehicle/status/gear_status", *this),
   setControlModeReport("/vehicle/status/control_mode", *this),
   setVelocityReport("/vehicle/status/velocity_status", *this),
+  setHazardLightsReport("/vehicle/status/hazard_lights_status", *this),
   setTurnIndicatorsReport("/vehicle/status/turn_indicators_status", *this),
   control_mode_request_server(create_service<ControlModeCommand>(
     "/control/control_mode_request",
@@ -130,6 +132,15 @@ AutowareUniverse::AutowareUniverse(bool simulate_localization) try
         return message;
       }());
 
+      setHazardLightsReport([this]() {
+        HazardLightsReport message;
+        message.stamp = get_clock()->now();
+
+        auto hazard_lights_command = getHazardLightsCommand();
+        message.report = hazard_lights_command.command == HazardLightsCommand::NO_COMMAND ? HazardLightsReport::DISABLE : hazard_lights_command.command;
+        return message;
+      }());
+
       setSteeringReport([this]() {
         SteeringReport message;
         message.stamp = get_clock()->now();
@@ -153,7 +164,7 @@ AutowareUniverse::AutowareUniverse(bool simulate_localization) try
         message.stamp = get_clock()->now();
 
         auto turn_indicators_command = getTurnIndicatorsCommand();
-        message.report = turn_indicators_command.command == TurnIndicatorsCommand::NO_COMMAND 
+        message.report = turn_indicators_command.command == TurnIndicatorsCommand::NO_COMMAND
                           ? TurnIndicatorsReport::DISABLE
                           : turn_indicators_command.command;
 
