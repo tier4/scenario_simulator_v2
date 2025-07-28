@@ -24,6 +24,97 @@ Changelog for package kashiwanoha_map
 16.4.2 (2025-05-23)
 -------------------
 
+16.8.3 (2025-07-24)
+-------------------
+* Merge branch 'master' into patch-1
+* Merge branch 'master' into patch-1
+* Merge branch 'master' into patch-1
+* Contributors: Kotaro Yoshimoto
+
+16.8.2 (2025-07-24)
+-------------------
+
+16.8.1 (2025-07-22)
+-------------------
+* Merge branch 'master' into fix-orientation-availability
+* Contributors: Kotaro Yoshimoto
+
+16.8.0 (2025-07-22)
+-------------------
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* Contributors: SzymonParapura, Taiga
+
+16.7.6 (2025-07-15)
+-------------------
+* Merge branch 'master' into fix-orientation-availability
+* Contributors: Kotaro Yoshimoto
+
+16.7.5 (2025-07-11)
+-------------------
+* Merge branch 'master' into feature/CODEOWNERS
+* Contributors: Kotaro Yoshimoto
+
+16.7.4 (2025-07-11)
+-------------------
+
+16.7.3 (2025-07-08)
+-------------------
+
+16.7.2 (2025-07-07)
+-------------------
+* Merge branch 'master' into fix/zmqpp
+* Merge branch 'master' into fix/zmqpp
+* Contributors: Kotaro Yoshimoto
+
+16.7.1 (2025-07-04)
+-------------------
+* Merge pull request `#1631 <https://github.com/tier4/scenario_simulator_v2/issues/1631>`_ from tier4/refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Remove unused test_depend
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, f0reachARR
+
+16.7.0 (2025-07-03)
+-------------------
+* Merge branch 'master' into feature/record_option_for_rosbag
+* Merge branch 'master' into feature/record_option_for_rosbag
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
+16.6.1 (2025-07-02)
+-------------------
+
+16.6.0 (2025-07-01)
+-------------------
+* Merge branch 'master' into feature/perception_noise_config_v3
+* Merge branch 'master' into feature/perception_noise_config_v3
+* Contributors: Kotaro Yoshimoto
+
+16.5.11 (2025-06-26)
+--------------------
+* Merge branch 'master' into fix/lanelet_pose_in_do_nothing
+* Contributors: Masaya Kataoka
+
+16.5.10 (2025-06-23)
+--------------------
+* Merge branch 'master' into devin/1750224079-update-communication-docs
+* Contributors: Kotaro Yoshimoto
+
+16.5.9 (2025-06-23)
+-------------------
+* Merge branch 'master' into feature/use-add-pr-comment
+* Contributors: Kotaro Yoshimoto
+
+16.5.8 (2025-06-23)
+-------------------
+
 16.5.7 (2025-06-18)
 -------------------
 * Merge branch 'master' into dependabot/pip/requests-2.32.4

@@ -76,6 +76,7 @@ jobs:
         shell: bash
 
       - name: Install Build Wrapper
+        if: github.event.pull_request.head.repo.fork == false
         uses: SonarSource/sonarqube-scan-action/install-build-wrapper@v4.2.1
         id: build_wrapper
         env:
@@ -87,8 +88,10 @@ jobs:
         # See also: https://gitlab.com/libeigen/eigen/-/issues/2326
         run: |
           source /opt/ros/${{ matrix.rosdistro }}/setup.bash
-          ${{ steps.build_wrapper.outputs.build-wrapper-binary }} --out-dir src/scenario_simulator_v2/bw-output \
-          colcon build --symlink-install \
+          if [[ -n "${{ steps.build_wrapper.outputs.build-wrapper-binary }}" ]]; then
+            COMMAND_PREFIX="${{ steps.build_wrapper.outputs.build-wrapper-binary }} --out-dir src/scenario_simulator_v2/bw-output"
+          fi
+          $COMMAND_PREFIX colcon build --symlink-install \
           --cmake-args \
             -DCMAKE_BUILD_TYPE=${{ matrix.cmake_build_type }} \
             -DBUILD_CPP_MOCK_SCENARIOS=ON \
@@ -141,7 +144,7 @@ jobs:
         shell: bash
 
       - uses: actions/github-script@v7
-        if: steps.optional-scenario-test.outputs.failure > 0 && matrix.runs_on != 'ubuntu-22.04-arm'
+        if: steps.optional-scenario-test.outputs.failure > 0 && matrix.runs_on != 'ubuntu-22.04-arm' && github.event.pull_request.head.repo.fork == false
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -176,7 +179,7 @@ jobs:
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v4.2.1
         # In ARM build, SonarQube result should be same as x86 build because no test runs
-        if: matrix.runs_on != 'ubuntu-22.04-arm'
+        if: matrix.runs_on != 'ubuntu-22.04-arm' && github.event.pull_request.head.repo.fork == false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
