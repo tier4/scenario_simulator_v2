@@ -191,6 +191,115 @@ auto toLaneletPose(
 }
 
 auto toLaneletPoses(
+  const Pose & map_pose, const lanelet::Id lanelet_id, const double matching_distance)
+  -> std::vector<LaneletPose>
+{
+  /// @note yaw_threshold_deg is used to determine whether the entity is going straight,
+  /// it defines the maximum allowed rotation with respect to the lanelet centerline.
+  constexpr double yaw_threshold_deg = 45.0;
+
+  const auto lanelet_spline = lanelet_map::centerPointsSpline(lanelet_id);
+  if (const auto lanelet_pose_s = lanelet_spline->getSValue(map_pose, matching_distance);
+      !lanelet_pose_s) {
+    return {};
+  } else if (const auto pose_on_centerline = lanelet_spline->getPose(lanelet_pose_s.value());
+             !isAltitudeMatching(map_pose.position.z, pose_on_centerline.position.z)) {
+    return {};
+  } else {
+    constexpr double yaw_range_min_rad = M_PI * yaw_threshold_deg / 180.0;
+    constexpr double yaw_range_max_rad = M_PI - yaw_range_min_rad;
+    if (const auto lanelet_pose_rpy = math::geometry::convertQuaternionToEulerAngle(
+          math::geometry::getRotation(pose_on_centerline.orientation, map_pose.orientation));
+        std::fabs(lanelet_pose_rpy.z) > yaw_range_min_rad and
+        std::fabs(lanelet_pose_rpy.z) < yaw_range_max_rad) {
+      return {};
+    } else {
+      double lanelet_pose_offset = std::sqrt(
+        lanelet_spline->getSquaredDistanceIn2D(map_pose.position, lanelet_pose_s.value()));
+      if (const double inner_product = math::geometry::innerProduct(
+            lanelet_spline->getNormalVector(lanelet_pose_s.value()),
+            lanelet_spline->getSquaredDistanceVector(map_pose.position, lanelet_pose_s.value()));
+          inner_product < 0) {
+        lanelet_pose_offset = lanelet_pose_offset * -1;
+      }
+      return {traffic_simulator_msgs::build<LaneletPose>()
+                .lanelet_id(lanelet_id)
+                .s(lanelet_pose_s.value())
+                .offset(lanelet_pose_offset)
+                .rpy(lanelet_pose_rpy)
+                .lanelet_pose_valid(false)};
+    }
+  }
+}
+
+auto toLaneletPoses(
+  const Pose & map_pose, const lanelet::Ids & lanelet_ids, const double matching_distance)
+  -> std::vector<LaneletPose>
+{
+  if (lanelet_ids.empty()) {
+    return {};
+  }
+  std::vector<LaneletPose> lanelet_poses;
+  for (const auto & lanelet_id : lanelet_ids) {
+    if (const auto lanelet_pose = toLaneletPose(map_pose, lanelet_id, matching_distance);
+        lanelet_pose) {
+      lanelet_poses.push_back(lanelet_pose.value());
+    }
+  }
+  return lanelet_poses;
+}
+
+auto toLaneletPoses(
+  const Pose & map_pose, const bool include_crosswalk, const double matching_distance)
+  -> std::vector<LaneletPose>
+{
+  /// @note Hardcoded parameter, this value has no technical basis and is determined based on experimentation.
+  /// @todo Add doxygen comments as soon as you know the meaning and rationale of the value.
+  constexpr double distance_threshold{0.1};
+  constexpr std::size_t search_count{5};
+  const auto nearby_lanelet_ids = lanelet_map::nearbyLaneletIds(
+    map_pose.position, distance_threshold, include_crosswalk, search_count);
+  return toLaneletPoses(map_pose, nearby_lanelet_ids, matching_distance);
+}
+
+auto toLaneletPoses(
+  const Pose & map_pose, const BoundingBox & bounding_box, const bool include_crosswalk,
+  const double matching_distance, const RoutingGraphType type) -> std::vector<LaneletPose>
+{
+  const auto lanelet_ids_using_bounding_box = matchToLanes(
+    map_pose, bounding_box, include_crosswalk, matching_distance,
+    DEFAULT_MATCH_TO_LANE_REDUCTION_RATIO, type);
+
+  if (lanelet_ids_using_bounding_box.empty()) {
+    return toLaneletPoses(map_pose, include_crosswalk, matching_distance);
+  } else if (const auto lanelet_poses_using_bounding_box =
+               toLaneletPoses(map_pose, lanelet_ids_using_bounding_box, matching_distance);
+             !lanelet_poses_using_bounding_box.empty()) {
+    return lanelet_poses_using_bounding_box;
+  }
+
+  for (const auto & previous_lanelet_id :
+       lanelet_map::previousLaneletIds(lanelet_ids_using_bounding_box, type)) {
+    if (const auto lanelet_poses_in_previous_lanelet =
+          toLaneletPoses(map_pose, lanelet::Ids{previous_lanelet_id}, matching_distance);
+        !lanelet_poses_in_previous_lanelet.empty()) {
+      return lanelet_poses_in_previous_lanelet;
+    }
+  }
+
+  for (const auto & next_lanelet_id :
+       lanelet_map::nextLaneletIds(lanelet_ids_using_bounding_box, type)) {
+    if (
+      const auto lanelet_poses_in_next_lanelet =
+        toLaneletPoses(map_pose, lanelet::Ids{next_lanelet_id}, matching_distance);
+      !lanelet_poses_in_next_lanelet.empty()) {
+      return lanelet_poses_in_next_lanelet;
+    }
+  }
+  return toLaneletPoses(map_pose, include_crosswalk, matching_distance);
+}
+
+auto toLaneletPoses(
   const Pose & map_pose, const lanelet::Id lanelet_id, const double matching_distance,
   const bool include_opposite_direction, const RoutingGraphType type) -> std::vector<LaneletPose>
 {
@@ -479,6 +588,30 @@ auto matchToLane(
   }
 }
 
+auto matchToLanes(
+  const geometry_msgs::msg::Pose & pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
+  const bool include_crosswalk, const double matching_distance, const double reduction_ratio,
+  const traffic_simulator::RoutingGraphType type) -> std::vector<lanelet::Id>
+{
+  /// @note findMatchingLanes returns a container sorted by distance - increasing, but not absolute value
+  if (
+    const auto matching_lanes =
+      findMatchingLanes(pose, bbox, include_crosswalk, matching_distance, reduction_ratio, type)) {
+    std::set<std::pair<double, lanelet::Id>> sorted_lanes;
+    for (const auto & lane : *matching_lanes) {
+      sorted_lanes.insert(std::make_pair(std::abs(lane.first), lane.second));
+    }
+    std::vector<lanelet::Id> lanelet_ids;
+    lanelet_ids.reserve(sorted_lanes.size());
+    for (const auto & lane : sorted_lanes) {
+      lanelet_ids.push_back(lane.second);
+    }
+    return lanelet_ids;
+  } else {
+    return {};
+  }
+}
+
 auto leftLaneletIds(
   const lanelet::Id lanelet_id, const RoutingGraphType type, const bool include_opposite_direction)
   -> lanelet::Ids
@@ -488,8 +621,9 @@ auto leftLaneletIds(
       "lanelet_wrapper::pose::leftLaneletIds with include_opposite_direction=true is not "
       "implemented yet.");
   } else {
-    return lanelet_map::laneletIds(LaneletWrapper::routingGraph(type)->lefts(
-      LaneletWrapper::map()->laneletLayer.get(lanelet_id)));
+    return lanelet_map::laneletIds(
+      LaneletWrapper::routingGraph(type)->lefts(
+        LaneletWrapper::map()->laneletLayer.get(lanelet_id)));
   }
 }
 
@@ -503,8 +637,9 @@ auto rightLaneletIds(
       "implemented "
       "yet.");
   } else {
-    return lanelet_map::laneletIds(LaneletWrapper::routingGraph(type)->rights(
-      LaneletWrapper::map()->laneletLayer.get(lanelet_id)));
+    return lanelet_map::laneletIds(
+      LaneletWrapper::routingGraph(type)->rights(
+        LaneletWrapper::map()->laneletLayer.get(lanelet_id)));
   }
 }
 }  // namespace pose
