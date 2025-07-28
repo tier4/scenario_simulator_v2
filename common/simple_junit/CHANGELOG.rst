@@ -24,6 +24,13 @@ Changelog for package junit_exporter
 16.4.2 (2025-05-23)
 -------------------
 
+16.8.3 (2025-07-24)
+-------------------
+* Merge branch 'master' into patch-1
+* Merge branch 'master' into patch-1
+* Merge branch 'master' into patch-1
+* Contributors: Kotaro Yoshimoto
+
 16.8.2 (2025-07-24)
 -------------------
 
