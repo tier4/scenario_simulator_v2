@@ -27,6 +27,19 @@ Changelog for package openscenario_utility
 16.4.2 (2025-05-23)
 -------------------
 
+16.8.3 (2025-07-24)
+-------------------
+* Merge pull request `#1648 <https://github.com/tier4/scenario_simulator_v2/issues/1648>`_ from tier4/patch-1
+  fix bool conversion issue
+* Merge branch 'master' into patch-1
+* Merge branch 'master' into patch-1
+* Merge branch 'master' into patch-1
+* fix bool conversion issue
+* Contributors: Andy Zhang, Kotaro Yoshimoto
+
+16.8.2 (2025-07-24)
+-------------------
+
 16.8.1 (2025-07-22)
 -------------------
 * Merge branch 'master' into fix-orientation-availability
