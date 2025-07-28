@@ -45,6 +45,7 @@
   <depend>visualization_msgs</depend>
   <depend>geometry</depend>
   <depend>get_parameter</depend>
+  <depend>yaml-cpp</depend>
 
   <test_depend>ament_cmake_gtest</test_depend>
   <test_depend>ament_lint_auto</test_depend>
