@@ -21,6 +21,7 @@ find_package(Boost COMPONENTS filesystem)
 find_package(lanelet2_matching REQUIRED)
 find_package(tinyxml2_vendor REQUIRED)
 find_package(pluginlib REQUIRED)
+find_package(yaml-cpp REQUIRED)
 include(FindProtobuf REQUIRED)
 
 ament_auto_find_build_dependencies()
@@ -95,6 +96,7 @@ target_link_libraries(traffic_simulator
   zmq
   stdc++fs
   Boost::filesystem
+  yaml-cpp
   ${PROTOBUF_LIBRARY})
 
 install(
