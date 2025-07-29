@@ -21,20 +21,35 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+TrafficSignalState::TrafficSignalType::TrafficSignalType(const std::string & string)
+: value([&]() {
+    if (string == "conventional") {
+      return conventional;
+    } else if (string == "v2i") {
+      return v2i;
+    } else {
+      throw Error(
+        "TrafficSignalState: Invalid traffic signal type '", string,
+        "'. Valid values are 'conventional' or 'v2i'.");
+    }
+  }())
+{
+}
+
 TrafficSignalState::TrafficSignalState(const pugi::xml_node & node, Scope & scope)
 : traffic_signal_id(readAttribute<String>("trafficSignalId", node, scope)),
   state(readAttribute<String>("state", node, scope)),
-  parsed_traffic_signal_id(traffic_signal_id)
+  parsed_traffic_signal_id(parseTrafficSignalId(traffic_signal_id))
 {
 }
 
 auto TrafficSignalState::evaluate() const -> Object
 {
   switch (traffic_signal_type()) {
-    case TrafficSignalType::CONVENTIONAL:
+    case TrafficSignalType::conventional:
       setConventionalTrafficLightsState(id(), state);
       break;
-    case TrafficSignalType::V2I:
+    case TrafficSignalType::v2i:
       setV2ITrafficLightsState(id(), state);
       break;
     default:
@@ -43,47 +58,35 @@ auto TrafficSignalState::evaluate() const -> Object
   return unspecified;
 }
 
-auto TrafficSignalState::id() const -> lanelet::Id { return parsed_traffic_signal_id.lanelet_id; }
-
-auto TrafficSignalState::traffic_signal_type() const -> TrafficSignalState::TrafficSignalType
-{
-  return parsed_traffic_signal_id.traffic_signal_type;
-}
-
-TrafficSignalState::ParsedTrafficSignalID::ParsedTrafficSignalID(const String & traffic_signal_id)
+auto TrafficSignalState::parseTrafficSignalId(const std::string & traffic_signal_id)
+  -> std::pair<lanelet::Id, TrafficSignalType>
 {
   std::vector<std::string> parts;
   boost::split(parts, traffic_signal_id, boost::is_space(), boost::token_compress_on);
 
-  if (parts.empty()) {
-    throw Error("TrafficSignalState: trafficSignalId cannot be empty");
-  }
-
+  lanelet::Id id;
   try {
-    lanelet_id = boost::lexical_cast<lanelet::Id>(parts[0]);
+    id = boost::lexical_cast<lanelet::Id>(parts[0]);
   } catch (const boost::bad_lexical_cast &) {
     throw Error(
       "TrafficSignalState: Invalid traffic signal ID '", parts[0],
       "'. Expected a numeric lanelet ID.");
   }
 
-  traffic_signal_type = [&]() {
-    if (parts.size() == 1) {
-      return TrafficSignalType::CONVENTIONAL;
-    } else if (parts.size() == 2) {
-      if (parts[1] == "v2i") {
-        return TrafficSignalType::V2I;
-      } else {
+  TrafficSignalType type = [&]() {
+    switch (parts.size()) {
+      case 1:
+        return TrafficSignalType(TrafficSignalType::conventional);
+      case 2:
+        return TrafficSignalType(parts[1]);
+      default:
         throw Error(
-          "TrafficSignalState: Invalid traffic signal type '", parts[1],
-          "'. Valid value is only 'v2i'.");
-      }
-    } else {
-      throw Error(
-        "TrafficSignalState: trafficSignalId '", traffic_signal_id,
-        "' has invalid format. Expected format: '<id>' or '<id> <type>'.");
+          "TrafficSignalState: trafficSignalId '", traffic_signal_id,
+          "' has invalid format. Expected format: '<id>' or '<id> <type>'.");
     }
   }();
+
+  return {id, type};
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

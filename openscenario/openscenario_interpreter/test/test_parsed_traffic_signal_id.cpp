@@ -16,84 +16,68 @@
 
 #include <openscenario_interpreter/syntax/traffic_signal_state.hpp>
 
-TEST(ParsedTrafficSignalID, ValidId)
-{
-  const std::string traffic_signal_id = "34802";
-  openscenario_interpreter::syntax::TrafficSignalState::ParsedTrafficSignalID parsed(
-    traffic_signal_id);
+using openscenario_interpreter::syntax::TrafficSignalState;
+using TrafficSignalType = TrafficSignalState::TrafficSignalType;
 
-  EXPECT_EQ(parsed.lanelet_id, 34802);
-  EXPECT_EQ(
-    parsed.traffic_signal_type,
-    openscenario_interpreter::syntax::TrafficSignalState::TrafficSignalType::CONVENTIONAL);
+TEST(ParseTrafficSignalID, ValidId)
+{
+  const auto [id, type] = TrafficSignalState::parseTrafficSignalId("34802");
+  EXPECT_EQ(id, 34802);
+  EXPECT_EQ(type.value, TrafficSignalType::conventional);
 }
 
-TEST(ParsedTrafficSignalID, ValidIdWithV2IType)
+TEST(ParseTrafficSignalID, ValidIdWithV2IType)
 {
-  const std::string traffic_signal_id = "34802 v2i";
-  openscenario_interpreter::syntax::TrafficSignalState::ParsedTrafficSignalID parsed(
-    traffic_signal_id);
-
-  EXPECT_EQ(parsed.lanelet_id, 34802);
-  EXPECT_EQ(
-    parsed.traffic_signal_type,
-    openscenario_interpreter::syntax::TrafficSignalState::TrafficSignalType::V2I);
+  const auto [id, type] = TrafficSignalState::parseTrafficSignalId("34802 v2i");
+  EXPECT_EQ(id, 34802);
+  EXPECT_EQ(type.value, TrafficSignalType::v2i);
 }
 
-TEST(ParsedTrafficSignalID, ValidIdWithMultipleSpaces)
+TEST(ParseTrafficSignalID, ValidIdWithMultipleSpaces)
 {
-  const std::string traffic_signal_id = "34802    v2i";
-  openscenario_interpreter::syntax::TrafficSignalState::ParsedTrafficSignalID parsed(
-    traffic_signal_id);
-
-  EXPECT_EQ(parsed.lanelet_id, 34802);
-  EXPECT_EQ(
-    parsed.traffic_signal_type,
-    openscenario_interpreter::syntax::TrafficSignalState::TrafficSignalType::V2I);
+  const auto [id, type] = TrafficSignalState::parseTrafficSignalId("34802    v2i");
+  EXPECT_EQ(id, 34802);
+  EXPECT_EQ(type.value, TrafficSignalType::v2i);
 }
 
-TEST(ParsedTrafficSignalID, EmptyString)
+TEST(ParseTrafficSignalID, EmptyString)
 {
-  const std::string traffic_signal_id = "";
+  EXPECT_THROW(TrafficSignalState::parseTrafficSignalId(""), openscenario_interpreter::Error);
+}
+
+TEST(ParseTrafficSignalID, InvalidId)
+{
   EXPECT_THROW(
-    {
-      openscenario_interpreter::syntax::TrafficSignalState::ParsedTrafficSignalID parsed(
-        traffic_signal_id);
-    },
-    openscenario_interpreter::Error);
+    TrafficSignalState::parseTrafficSignalId("invalid"), openscenario_interpreter::Error);
 }
 
-TEST(ParsedTrafficSignalID, InvalidId)
+TEST(ParseTrafficSignalID, InvalidType)
 {
-  const std::string traffic_signal_id = "invalid";
   EXPECT_THROW(
-    {
-      openscenario_interpreter::syntax::TrafficSignalState::ParsedTrafficSignalID parsed(
-        traffic_signal_id);
-    },
-    openscenario_interpreter::Error);
+    TrafficSignalState::parseTrafficSignalId("34802 invalid"), openscenario_interpreter::Error);
 }
 
-TEST(ParsedTrafficSignalID, InvalidType)
+TEST(ParseTrafficSignalID, TooManyParts)
 {
-  const std::string traffic_signal_id = "34802 invalid";
   EXPECT_THROW(
-    {
-      openscenario_interpreter::syntax::TrafficSignalState::ParsedTrafficSignalID parsed(
-        traffic_signal_id);
-    },
-    openscenario_interpreter::Error);
+    TrafficSignalState::parseTrafficSignalId("34802 v2i extra"), openscenario_interpreter::Error);
 }
 
-TEST(ParsedTrafficSignalID, TooManyParts)
+TEST(TrafficSignalType, FromStringConventional)
 {
-  const std::string traffic_signal_id = "34802 v2i extra";
-  EXPECT_THROW(
-    {
-      openscenario_interpreter::syntax::TrafficSignalState::ParsedTrafficSignalID parsed(
-        traffic_signal_id);
-    },
-    openscenario_interpreter::Error);
+  TrafficSignalType type("conventional");
+  EXPECT_EQ(type.value, TrafficSignalType::conventional);
+}
+
+TEST(TrafficSignalType, FromStringV2I)
+{
+  TrafficSignalType type("v2i");
+  EXPECT_EQ(type.value, TrafficSignalType::v2i);
+}
+
+TEST(TrafficSignalType, FromStringInvalid)
+{
+  EXPECT_THROW(TrafficSignalType("invalid"), openscenario_interpreter::Error);
 }
 
 int main(int argc, char ** argv)
