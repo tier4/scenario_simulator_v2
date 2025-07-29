@@ -14,8 +14,10 @@
 
 #include <lanelet2_core/geometry/Lanelet.h>
 #include <lanelet2_io/io_handlers/Serialize.h>
+#include <yaml-cpp/yaml.h>
 
 #include <autoware_lanelet2_extension/projection/mgrs_projector.hpp>
+#include <autoware_lanelet2_extension/projection/transverse_mercator_projector.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/lanelet_wrapper/lanelet_loader.hpp>
@@ -24,14 +26,78 @@ namespace traffic_simulator
 {
 namespace lanelet_wrapper
 {
+auto produceTransverseMercatorProjector(const YAML::Node & map_projector_info)
+  -> lanelet::projection::TransverseMercatorProjector
+{
+  static constexpr double default_scale_factor = 0.9996;
+
+  const auto getMandatoryAttribute =
+    [](const YAML::Node & node, const std::string & key) -> YAML::Node {
+    if (auto value = node[key]) {
+      return value;
+    } else {
+      THROW_SIMULATION_ERROR("Missing mandatory Transverse Mercator projector info: ", key);
+    }
+  };
+
+  lanelet::Origin origin({0.0, 0.0});
+  const auto & map_origin_node = getMandatoryAttribute(map_projector_info, "map_origin");
+  origin.position.lat = getMandatoryAttribute(map_origin_node, "latitude").as<double>();
+  origin.position.lon = getMandatoryAttribute(map_origin_node, "longitude").as<double>();
+
+  const auto scale_factor = map_projector_info["scale_factor"]
+                              ? map_projector_info["scale_factor"].as<double>()
+                              : default_scale_factor;
+  return lanelet::projection::TransverseMercatorProjector(origin, scale_factor);
+};
+
 auto LaneletLoader::load(const std::filesystem::path & lanelet_map_path) -> lanelet::LaneletMapPtr
 {
-  lanelet::projection::MGRSProjector mgrs_projector;
   lanelet::ErrorMessages lanelet_errors;
-  lanelet::LaneletMapPtr lanelet_map_ptr =
-    lanelet::load(lanelet_map_path.string(), mgrs_projector, &lanelet_errors);
+  lanelet::LaneletMapPtr lanelet_map_ptr = [&lanelet_map_path, &lanelet_errors]() {
+    if (const auto map_projector_info_path =
+          lanelet_map_path.parent_path() / "map_projector_info.yaml";
+        not std::filesystem::exists(map_projector_info_path)) {
+      /// @note Default to MGRS if no projector configuration is found
+      return lanelet::load(
+        lanelet_map_path.string(), lanelet::projection::MGRSProjector(), &lanelet_errors);
+    } else {
+      try {
+        if (const auto map_projector_info = YAML::LoadFile(map_projector_info_path.string());
+            not map_projector_info) {
+          THROW_SIMULATION_ERROR(
+            "Empty or invalid YAML content in ", map_projector_info_path.string(),
+            ". File exists but cannot be parsed.");
+        } else if (const auto projector_type = map_projector_info["projector_type"];
+                   not projector_type) {
+          THROW_SIMULATION_ERROR(
+            "Missing projector_type in ", map_projector_info_path.string(),
+            ". projector_type is required when map_projector_info.yaml exists.");
+        } else {
+          /// @note https://docs.web.auto/user-manuals/vector-map-builder/how-to-use/edit-maps#%E5%9C%B0%E5%9B%B3%E5%B0%84%E5%BD%B1%E6%83%85%E5%A0%B1-mapprojectorinfo-%E3%81%AE%E5%A4%89%E6%9B%B4
+          if (const auto projector_type_string = projector_type.as<std::string>();
+              projector_type_string == "TransverseMercator") {
+            return lanelet::load(
+              lanelet_map_path.string(), produceTransverseMercatorProjector(map_projector_info),
+              &lanelet_errors);
+          } else if (projector_type_string == "MGRS") {
+            return lanelet::load(
+              lanelet_map_path.string(), lanelet::projection::MGRSProjector(), &lanelet_errors);
+          } else {
+            THROW_SIMULATION_ERROR(
+              "Unsupported projector type: ", projector_type_string,
+              ". Supported types are TransverseMercator and MGRS.");
+          }
+        }
+      } catch (const YAML::Exception & e) {
+        THROW_SIMULATION_ERROR(
+          "Failed to load projector info from ", map_projector_info_path.string(),
+          ". Error: ", e.what());
+      }
+    }
+  }();
 
-  if (!lanelet_errors.empty()) {
+  if (not lanelet_errors.empty()) {
     std::stringstream ss;
     ss << "Failed to load lanelet map, errors:\n";
     for (const auto & error : lanelet_errors) {
@@ -40,12 +106,13 @@ auto LaneletLoader::load(const std::filesystem::path & lanelet_map_path) -> lane
     THROW_SIMULATION_ERROR(ss.str());
   }
 
-  if (lanelet_map_ptr->laneletLayer.empty()) {
-    THROW_SIMULATION_ERROR("Lanelet layer is empty!");
+  if (lanelet_map_ptr and not lanelet_map_ptr->laneletLayer.empty()) {
+    overwriteLaneletsCenterline(lanelet_map_ptr);
+    return lanelet_map_ptr;
+  } else {
+    THROW_SIMULATION_ERROR(
+      "Failed to load lanelet map: returned nullptr or lanelet layer is empty!");
   }
-
-  overwriteLaneletsCenterline(lanelet_map_ptr);
-  return lanelet_map_ptr;
 }
 
 auto LaneletLoader::convertMapToBin(const lanelet::LaneletMapPtr lanelet_map_ptr)
