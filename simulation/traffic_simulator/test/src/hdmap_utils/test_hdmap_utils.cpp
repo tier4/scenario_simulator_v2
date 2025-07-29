@@ -84,23 +84,6 @@ protected:
 
   hdmap_utils::HdMapUtils hdmap_utils;
 };
-class HdMapUtilsTest_EmptyMap : public testing::Test
-{
-protected:
-  HdMapUtilsTest_EmptyMap()
-  : hdmap_utils(
-      ament_index_cpp::get_package_share_directory("traffic_simulator") +
-        "/map/empty/lanelet2_map.osm",
-      geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
-        .latitude(0.0)
-        .longitude(0.0)
-        .altitude(0.0))
-  {
-    activateLaneletWrapper("empty");
-  }
-
-  hdmap_utils::HdMapUtils hdmap_utils;
-};
 class HdMapUtilsTest_FourTrackHighwayMap : public testing::Test
 {
 protected:
@@ -196,6 +179,23 @@ TEST(HdMapUtils, Construct_invalid)
   EXPECT_THROW(
     auto hdmap_utils = hdmap_utils::HdMapUtils(
       ament_index_cpp::get_package_share_directory("traffic_simulator") + "invalid_path",
+      geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
+        .latitude(35.61836750154)
+        .longitude(139.78066608243)
+        .altitude(0.0)),
+    std::runtime_error);
+}
+
+/**
+ * @note Test basic functionality.
+ * Test initialization correctness with an empty lanelet map.
+ */
+TEST(HdMapUtils, Construct_emptyMap)
+{
+  EXPECT_THROW(
+    auto hdmap_utils = hdmap_utils::HdMapUtils(
+      ament_index_cpp::get_package_share_directory("traffic_simulator") +
+        "/map/empty/lanelet2_map.osm",
       geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
         .latitude(35.61836750154)
         .longitude(139.78066608243)
@@ -2109,14 +2109,6 @@ TEST_F(HdMapUtilsTest_StandardMap, stopLineIds_standardMap)
 TEST_F(HdMapUtilsTest_IntersectionMap, stopLineIds_intersectionMap)
 {
   EXPECT_EQ(traffic_simulator::lanelet_wrapper::lanelet_map::stopLineIds(), (lanelet::Ids{6960}));
-}
-
-/**
- * @note Test function behavior when used with an empty map.
- */
-TEST_F(HdMapUtilsTest_EmptyMap, stopLineIds_emptyMap)
-{
-  EXPECT_THROW(traffic_simulator::lanelet_wrapper::lanelet_map::stopLineIds(), std::runtime_error);
 }
 
 /**
