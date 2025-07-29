@@ -24,6 +24,129 @@ Changelog for package traffic_simulator
 16.4.2 (2025-05-23)
 -------------------
 
+16.9.0 (2025-07-28)
+-------------------
+* Merge pull request `#1650 <https://github.com/tier4/scenario_simulator_v2/issues/1650>`_ from tier4/feature/transverse_mercator_projection_support
+* Merge branch 'master' into feature/transverse_mercator_projection_support
+* Fix: avoid returning reference to temporary YAML::Node, Returning by value is safe and efficient, as `YAML::Node` is a lightweight shared_ptr-like wrapper
+* refactor: improve lanelet loader error handling and reduce nesting
+* fix: add exception if projector_type is not defined
+* Remove unnecessary constexprs
+* refactor: enhance lanelet loader with const correctness and reduced allocations
+* fix typo
+* extracted TM projector producer as a function
+* test fix
+* clang format
+* projector config content error handling
+* headers cleanup
+* Merge remote-tracking branch 'origin/master' into feature/transverse_mercator_projection_support
+* error handling, small cleanup
+* transverse mercator support with projection parameters location assumption
+* init commit from Yoshimoto-san's patch
+* Contributors: Dawid Moszynski, Dawid Moszyński, Kotaro Yoshimoto, Piotr Zyskowski
+
+16.8.3 (2025-07-24)
+-------------------
+* Merge branch 'master' into patch-1
+* Merge branch 'master' into patch-1
+* Merge branch 'master' into patch-1
+* Contributors: Kotaro Yoshimoto
+
+16.8.2 (2025-07-24)
+-------------------
+
+16.8.1 (2025-07-22)
+-------------------
+* Merge branch 'master' into fix-orientation-availability
+* Contributors: Kotaro Yoshimoto
+
+16.8.0 (2025-07-22)
+-------------------
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* Contributors: SzymonParapura, Taiga
+
+16.7.6 (2025-07-15)
+-------------------
+* Merge branch 'master' into fix-orientation-availability
+* Contributors: Kotaro Yoshimoto
+
+16.7.5 (2025-07-11)
+-------------------
+* Merge branch 'master' into feature/CODEOWNERS
+* Contributors: Kotaro Yoshimoto
+
+16.7.4 (2025-07-11)
+-------------------
+
+16.7.3 (2025-07-08)
+-------------------
+
+16.7.2 (2025-07-07)
+-------------------
+* Merge branch 'master' into fix/zmqpp
+* Merge branch 'master' into fix/zmqpp
+* Contributors: Kotaro Yoshimoto
+
+16.7.1 (2025-07-04)
+-------------------
+* Merge pull request `#1631 <https://github.com/tier4/scenario_simulator_v2/issues/1631>`_ from tier4/refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Isolate protoc output into project named directory
+* Add or update xml-model
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, f0reachARR
+
+16.7.0 (2025-07-03)
+-------------------
+* Merge branch 'master' into feature/record_option_for_rosbag
+* Merge branch 'master' into feature/record_option_for_rosbag
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
+16.6.1 (2025-07-02)
+-------------------
+
+16.6.0 (2025-07-01)
+-------------------
+* Merge branch 'master' into feature/perception_noise_config_v3
+* Merge branch 'master' into feature/perception_noise_config_v3
+* Contributors: Kotaro Yoshimoto
+
+16.5.11 (2025-06-26)
+--------------------
+* Merge pull request `#1623 <https://github.com/tier4/scenario_simulator_v2/issues/1623>`_ from tier4/fix/lanelet_pose_in_do_nothing
+  Fix/lanelet pose in do nothing
+* enable set route lanelet in DoNothingPlugin
+* Merge branch 'master' into fix/lanelet_pose_in_do_nothing
+* modify lane matching step
+* Try lane matching if the output of behavior plugin is not on lane.
+* Contributors: Masaya Kataoka, Taiga
+
+16.5.10 (2025-06-23)
+--------------------
+* Merge branch 'master' into devin/1750224079-update-communication-docs
+* Contributors: Kotaro Yoshimoto
+
+16.5.9 (2025-06-23)
+-------------------
+* Merge branch 'master' into feature/use-add-pr-comment
+* Contributors: Kotaro Yoshimoto
+
+16.5.8 (2025-06-23)
+-------------------
+
+16.5.7 (2025-06-18)
+-------------------
+* Merge branch 'master' into dependabot/pip/requests-2.32.4
+* Contributors: Masaya Kataoka
+
 16.5.6 (2025-06-12)
 -------------------
 * Merge branch 'master' into add-start-trigger-context
