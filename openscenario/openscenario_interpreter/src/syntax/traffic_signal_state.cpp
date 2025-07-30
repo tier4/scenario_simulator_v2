@@ -45,7 +45,7 @@ TrafficSignalState::TrafficSignalState(const pugi::xml_node & node, Scope & scop
 
 auto TrafficSignalState::evaluate() const -> Object
 {
-  switch (traffic_signal_type()) {
+  switch (trafficSignalType()) {
     case TrafficSignalType::conventional:
       setConventionalTrafficLightsState(id(), state);
       break;

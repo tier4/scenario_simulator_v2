@@ -76,7 +76,7 @@ struct TrafficSignalState : private SimulatorCore::NonStandardOperation
 
   auto id() const -> lanelet::Id { return parsed_traffic_signal_id.first; }
 
-  auto traffic_signal_type() const -> TrafficSignalType { return parsed_traffic_signal_id.second; }
+  auto trafficSignalType() const -> TrafficSignalType { return parsed_traffic_signal_id.second; }
 
 private:
   const std::pair<lanelet::Id, TrafficSignalType> parsed_traffic_signal_id;
