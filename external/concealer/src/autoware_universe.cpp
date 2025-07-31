@@ -185,12 +185,9 @@ AutowareUniverse::AutowareUniverse(bool simulate_localization) try
     try {
       int spin_count = 0;
       while (rclcpp::ok() and not is_stop_requested.load()) {
-        try {
+        
           rclcpp::spin_some(get_node_base_interface());
-        } catch (const std::exception& e) {
-          std::cerr << "[AutowareUniverse] ERROR in spin_some: " << e.what() << std::endl;
-          throw;
-        }
+        
         spin_count++;
         if (spin_count % 1000 == 0) {
           std::cerr << "[AutowareUniverse] Spinner thread alive - spin count: " << spin_count << std::endl;
