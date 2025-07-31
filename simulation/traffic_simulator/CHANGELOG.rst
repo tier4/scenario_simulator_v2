@@ -24,6 +24,11 @@ Changelog for package traffic_simulator
 16.4.2 (2025-05-23)
 -------------------
 
+16.10.0 (2025-07-31)
+--------------------
+* Merge branch 'master' into feature/traffic_signal_state_v2i
+* Contributors: Kotaro Yoshimoto
+
 16.9.0 (2025-07-28)
 -------------------
 * Merge pull request `#1650 <https://github.com/tier4/scenario_simulator_v2/issues/1650>`_ from tier4/feature/transverse_mercator_projection_support

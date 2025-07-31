@@ -38,6 +38,13 @@ Changelog for package scenario_test_runner
 16.4.2 (2025-05-23)
 -------------------
 
+16.10.0 (2025-07-31)
+--------------------
+* Merge pull request `#1654 <https://github.com/tier4/scenario_simulator_v2/issues/1654>`_ from tier4/feature/traffic_signal_state_v2i
+* Merge branch 'master' into feature/traffic_signal_state_v2i
+* Add v2i traffic signal state in TrafficSignalControllerAction.yaml
+* Contributors: Kotaro Yoshimoto
+
 16.9.0 (2025-07-28)
 -------------------
 * Merge branch 'master' into feature/transverse_mercator_projection_support
