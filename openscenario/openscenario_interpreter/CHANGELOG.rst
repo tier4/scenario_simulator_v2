@@ -35,6 +35,19 @@ Changelog for package openscenario_interpreter
 16.4.2 (2025-05-23)
 -------------------
 
+16.10.0 (2025-07-31)
+--------------------
+* Merge pull request `#1654 <https://github.com/tier4/scenario_simulator_v2/issues/1654>`_ from tier4/feature/traffic_signal_state_v2i
+* Rename TrafficSignalState::traffic_signal_type to trafficSignalType
+* Implement TrafficSignalType struct instead of enum
+* Merge branch 'master' into feature/traffic_signal_state_v2i
+* Delete unused commented-out code in test_parsed_traffic_signal_id.cpp
+* Add tests for TrafficSignalState::ParsedTrafficSignalID
+* Implement constructor of TrafficSignalState::ParsedTrafficSignalID
+* Add TrafficSignalState::ParsedTrafficSignalID to support traffic signal type specification in trafficSignalId attribute
+* Update xsd comment to OpenSCENARIO 1.3.1 for TrafficSignalState
+* Contributors: Kotaro Yoshimoto
+
 16.9.0 (2025-07-28)
 -------------------
 * Merge branch 'master' into feature/transverse_mercator_projection_support

@@ -12,6 +12,11 @@ Changelog for package simple_cross_map
 16.4.2 (2025-05-23)
 -------------------
 
+16.10.0 (2025-07-31)
+--------------------
+* Merge branch 'master' into feature/traffic_signal_state_v2i
+* Contributors: Kotaro Yoshimoto
+
 16.9.0 (2025-07-28)
 -------------------
 * Merge branch 'master' into feature/transverse_mercator_projection_support
