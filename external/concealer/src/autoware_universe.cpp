@@ -75,6 +75,7 @@ AutowareUniverse::AutowareUniverse(bool simulate_localization) try
     std::chrono::milliseconds(
       20),  // Autoware.Universe requires localization topics to send data at 50Hz
     [this]() {
+      try {
       setAcceleration([this]() {
         AccelWithCovarianceStamped message;
         message.header.stamp = get_clock()->now();
@@ -115,12 +116,20 @@ AutowareUniverse::AutowareUniverse(bool simulate_localization) try
       }());
 
       setTransform(current_pose.load());
+      } catch (const std::exception& e) {
+        std::cerr << "[AutowareUniverse] ERROR: Exception in localization_update_timer: " << e.what() << std::endl;
+        throw;
+      } catch (...) {
+        std::cerr << "[AutowareUniverse] ERROR: Unknown exception in localization_update_timer!" << std::endl;
+        throw;
+      }
     })),
   vehicle_state_update_timer(rclcpp::create_timer(
     this, get_clock(),
     std::chrono::milliseconds(
       33),  // Autoware.Universe requires vehicle state topics to send data at 30Hz
     [this]() {
+      try {
       setControlModeReport(getControlModeReport());
 
       setGearReport([this]() {
@@ -159,21 +168,39 @@ AutowareUniverse::AutowareUniverse(bool simulate_localization) try
 
         return message;
       }());
+      } catch (const std::exception& e) {
+        std::cerr << "[AutowareUniverse] ERROR: Exception in vehicle_state_update_timer: " << e.what() << std::endl;
+        throw;
+      } catch (...) {
+        std::cerr << "[AutowareUniverse] ERROR: Unknown exception in vehicle_state_update_timer!" << std::endl;
+        throw;
+      }
     })),
   spinner(std::thread([this]() {
+    std::cerr << "[AutowareUniverse] Spinner thread started" << std::endl;
     try {
+      int spin_count = 0;
       while (rclcpp::ok() and not is_stop_requested.load()) {
         rclcpp::spin_some(get_node_base_interface());
+        spin_count++;
+        if (spin_count % 1000 == 0) {
+          std::cerr << "[AutowareUniverse] Spinner thread alive - spin count: " << spin_count << std::endl;
+        }
       }
+      std::cerr << "[AutowareUniverse] Spinner thread exiting normally (total spins: " << spin_count << ")" << std::endl;
     } catch (...) {
+      std::cerr << "[AutowareUniverse] ERROR: Spinner thread caught exception and stopping!" << std::endl;
       thrown = std::current_exception();
       is_thrown.store(true);
     }
   }))
 {
+  std::cerr << "[AutowareUniverse] Starting constructor with simulate_localization=" << simulate_localization << std::endl;
+  std::cerr << "[AutowareUniverse] Constructor completed successfully! Starting spinner thread." << std::endl;
 }
 catch (...)
 {
+  std::cerr << "[AutowareUniverse] ERROR: Constructor caught exception during initialization!" << std::endl;
   thrown = std::current_exception();
   is_thrown.store(true);
 }
@@ -181,13 +208,16 @@ catch (...)
 
 AutowareUniverse::~AutowareUniverse()
 {
+  std::cerr << "[AutowareUniverse] Destructor called - stopping spinner thread" << std::endl;
   is_stop_requested.store(true);
   spinner.join();
+  std::cerr << "[AutowareUniverse] Destructor completed" << std::endl;
 }
 
 auto AutowareUniverse::rethrow() -> void
 {
   if (is_thrown.load()) {
+    std::cerr << "[AutowareUniverse] ERROR: Re-throwing stored exception!" << std::endl;
     throw thrown;
   }
 }
