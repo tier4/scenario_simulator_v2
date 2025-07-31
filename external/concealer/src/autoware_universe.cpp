@@ -178,16 +178,27 @@ AutowareUniverse::AutowareUniverse(bool simulate_localization) try
     })),
   spinner(std::thread([this]() {
     std::cerr << "[AutowareUniverse] Spinner thread started" << std::endl;
+    std::cerr << "[AutowareUniverse] Initial rclcpp::ok() = " << rclcpp::ok() << std::endl;
+    std::cerr << "[AutowareUniverse] Initial is_stop_requested = " << is_stop_requested.load() << std::endl;
+    std::cerr << "[AutowareUniverse] Node name: " << get_name() << std::endl;
+    std::cerr << "[AutowareUniverse] Node namespace: " << get_namespace() << std::endl;
     try {
       int spin_count = 0;
       while (rclcpp::ok() and not is_stop_requested.load()) {
-        rclcpp::spin_some(get_node_base_interface());
+        try {
+          rclcpp::spin_some(get_node_base_interface());
+        } catch (const std::exception& e) {
+          std::cerr << "[AutowareUniverse] ERROR in spin_some: " << e.what() << std::endl;
+          throw;
+        }
         spin_count++;
         if (spin_count % 1000 == 0) {
           std::cerr << "[AutowareUniverse] Spinner thread alive - spin count: " << spin_count << std::endl;
         }
       }
-      std::cerr << "[AutowareUniverse] Spinner thread exiting normally (total spins: " << spin_count << ")" << std::endl;
+      std::cerr << "[AutowareUniverse] Spinner thread exiting: rclcpp::ok()=" << rclcpp::ok() 
+                << ", is_stop_requested=" << is_stop_requested.load()
+                << ", total spins=" << spin_count << std::endl;
     } catch (...) {
       std::cerr << "[AutowareUniverse] ERROR: Spinner thread caught exception and stopping!" << std::endl;
       thrown = std::current_exception();
