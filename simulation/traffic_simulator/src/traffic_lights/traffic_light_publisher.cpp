@@ -123,7 +123,7 @@ auto TrafficLightPublisher<autoware_perception_msgs::msg::TrafficLightGroupArray
         }
 
         // Add predictions for V2I traffic lights
-        if constexpr (has_predictions<decltype(traffic_light_group_message)>::value) {
+        if constexpr (HasMemberPredictions<decltype(traffic_light_group_message)>::value) {
           if (predictions != nullptr) {
             auto it = predictions->find(relation_id);
             if (it != predictions->end()) {
@@ -167,13 +167,5 @@ auto TrafficLightPublisher<autoware_perception_msgs::msg::TrafficLightGroupArray
   return message;
 }
 
-template <>
-auto TrafficLightPublisher<autoware_perception_msgs::msg::TrafficLightGroupArray>::generateMessage(
-  const rclcpp::Time & current_ros_time,
-  const simulation_api_schema::UpdateTrafficLightsRequest & request, const std::string & frame)
-  -> std::unique_ptr<autoware_perception_msgs::msg::TrafficLightGroupArray>
-{
-  return generateMessage(current_ros_time, request, frame, nullptr);
-}
 #endif  // __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)
 }  // namespace traffic_simulator

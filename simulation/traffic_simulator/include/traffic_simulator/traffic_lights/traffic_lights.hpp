@@ -85,22 +85,10 @@ public:
     PredictedState predicted_state;
     predicted_state.predicted_time = now + rclcpp::Duration(std::chrono::duration<double>(time_ahead_seconds));
     predicted_state.state = state;
-    predicted_state.reliability = 1.0f;  // Simulation data is considered reliable
+    predicted_state.reliability = 1.0f;
     predicted_state.information_source = "SIMULATION";
     predictions_[lanelet_id].push_back(predicted_state);
   }
-
-  auto getPredictions(const lanelet::Id lanelet_id) const -> std::vector<PredictedState>
-  {
-    auto it = predictions_.find(lanelet_id);
-    if (it != predictions_.end()) {
-      return it->second;
-    }
-    return {};
-  }
-
-
-  auto getPredictionsMap() const -> const TrafficLightPredictions & { return predictions_; }
 
 private:
   auto update() const -> void override

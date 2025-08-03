@@ -30,12 +30,8 @@ class TrafficLightPublisherBase
 public:
   virtual auto publish(
     const rclcpp::Time & current_ros_time,
-    const simulation_api_schema::UpdateTrafficLightsRequest & request) const -> void = 0;
-
-  virtual auto publish(
-    const rclcpp::Time & current_ros_time,
     const simulation_api_schema::UpdateTrafficLightsRequest & request,
-    const TrafficLightPredictions * predictions) const -> void = 0;
+    const TrafficLightPredictions * predictions = nullptr) const -> void = 0;
 
   virtual ~TrafficLightPublisherBase() = default;
 };
@@ -63,16 +59,8 @@ public:
 
   auto publish(
     const rclcpp::Time & current_ros_time,
-    const simulation_api_schema::UpdateTrafficLightsRequest & request) const -> void override
-  {
-    traffic_light_state_array_publisher_->publish(
-      generateMessage(current_ros_time, request, frame_));
-  }
-
-  auto publish(
-    const rclcpp::Time & current_ros_time,
     const simulation_api_schema::UpdateTrafficLightsRequest & request,
-    const TrafficLightPredictions * predictions) const -> void override
+    const TrafficLightPredictions * predictions = nullptr) const -> void override
   {
     traffic_light_state_array_publisher_->publish(
       generateMessage(current_ros_time, request, frame_, predictions));

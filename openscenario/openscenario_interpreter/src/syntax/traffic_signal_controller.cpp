@@ -118,8 +118,8 @@ auto TrafficSignalController::updatePredictions() -> void
   std::set<lanelet::Id> v2i_traffic_light_ids;
   for (const auto & phase : phases) {
     for (const auto & traffic_signal_state : phase.traffic_signal_states) {
-      if (traffic_signal_state.traffic_signal_type() == TrafficSignalType::V2I) {
-        v2i_traffic_light_ids.insert(traffic_signal_state.lanelet_id());
+      if (traffic_signal_state.trafficSignalType() == TrafficSignalState::TrafficSignalType::v2i) {
+        v2i_traffic_light_ids.insert(traffic_signal_state.id());
       }
     }
   }
@@ -157,8 +157,8 @@ auto TrafficSignalController::updatePredictions() -> void
       if (accumulated_time <= prediction_horizon_seconds) {
         // For each V2I traffic signal in the phase, record its state at this time
         for (const auto & traffic_signal_state : (*phase_iter).traffic_signal_states) {
-          if (traffic_signal_state.traffic_signal_type() == TrafficSignalType::V2I) {
-            predictions_by_id[traffic_signal_state.lanelet_id()].emplace_back(
+          if (traffic_signal_state.trafficSignalType() == TrafficSignalState::TrafficSignalType::v2i) {
+            predictions_by_id[traffic_signal_state.id()].emplace_back(
               accumulated_time, traffic_signal_state.state);
           }
         }
@@ -239,7 +239,7 @@ auto TrafficSignalController::generatePredictions(double prediction_horizon_seco
     if (accumulated_time <= prediction_horizon_seconds) {
       // For each V2I traffic signal in the phase, get its state
       for (const auto & traffic_signal_state : (*phase_iter).traffic_signal_states) {
-        if (traffic_signal_state.traffic_signal_type() == TrafficSignalType::V2I) {
+        if (traffic_signal_state.trafficSignalType() == TrafficSignalState::TrafficSignalType::v2i) {
           // Create a prediction entry for this specific signal and time
           predictions.emplace_back(accumulated_time, traffic_signal_state.state);
         }
