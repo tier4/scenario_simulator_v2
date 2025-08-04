@@ -19,10 +19,12 @@
 #include <chrono>
 #include <filesystem>
 #include <fstream>
+#include <iostream>
 #include <mutex>
 #include <thread>
 #include <unordered_map>
 #include <utility>
+#include <boost/lexical_cast.hpp>
 
 namespace common
 {
@@ -83,13 +85,21 @@ public:
   auto touch(Name && name)
   {
     auto lock = std::scoped_lock<std::mutex>(mutex);
+    auto current_thread_id = std::this_thread::get_id();
 
-    if (auto iter = statuses.find(std::this_thread::get_id()); iter != std::end(statuses)) {
+    if (auto iter = statuses.find(current_thread_id); iter != std::end(statuses)) {
       [[maybe_unused]] auto && [id, status] = *iter;
 
       const auto now = std::chrono::high_resolution_clock::now();
-
       const auto this_access_interval = now - status.last_access;
+
+      // Log only if interval is unusually long to catch potential issues
+      auto interval_ms = std::chrono::duration_cast<std::chrono::milliseconds>(this_access_interval).count();
+      if (interval_ms > 5000) {  // Log if more than 5 seconds since last touch
+        std::cout << "[StatusMonitor] Warning: Long interval for " << status.name 
+                  << " (thread " << boost::lexical_cast<std::string>(id) << "): " 
+                  << interval_ms << "ms" << std::endl;
+      }
 
       status.minimum_access_interval =
         std::min<std::decay_t<decltype(status.minimum_access_interval)>>(
@@ -101,7 +111,9 @@ public:
 
       status.last_access = now;
     } else {
-      statuses.emplace(std::this_thread::get_id(), std::forward<decltype(name)>(name));
+      std::cout << "[StatusMonitor] Registering new thread: " << std::forward<decltype(name)>(name) 
+                << " (ID: " << boost::lexical_cast<std::string>(current_thread_id) << ")" << std::endl;
+      statuses.emplace(current_thread_id, std::forward<decltype(name)>(name));
     }
   }
 
