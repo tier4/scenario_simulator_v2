@@ -245,8 +245,13 @@ auto ActionNode::getDistanceToFrontEntity(
   const math::geometry::CatmullRomSplineInterface & spline) const -> std::optional<double>
 {
   if (const auto entity_name = getFrontEntityName(spline)) {
+    std::cout << "getDistanceToFrontEntity: " << entity_name.value() << std::endl;
+
     return getDistanceToTargetEntity(spline, getEntityStatus(entity_name.value()));
   } else {
+    std::cout << "getDistanceToFrontEntity: "
+              << "NULL" << std::endl;
+
     return std::nullopt;
   }
 }
@@ -272,21 +277,17 @@ auto ActionNode::getFrontEntityName(const math::geometry::CatmullRomSplineInterf
     }
 
     for (const auto & [euclidean_distance, name] : local_euclidean_distances_map_) {
-      const auto quaternion = math::geometry::getRotation(
-        canonicalized_entity_status_->getMapPose().orientation,
-        other_entity_status_.at(name).getMapPose().orientation);
-      /**
-       * @note hard-coded parameter, if the Yaw value of RPY is in ~1.5708 -> 1.5708, entity is a candidate of front entity.
-       */
-      if (
-        std::fabs(math::geometry::convertQuaternionToEulerAngle(quaternion).z) <=
-        boost::math::constants::half_pi<double>()) {
-        const auto longitudinal_distance =
-          getDistanceToTargetEntity(spline, other_entity_status_.at(name));
-
-        if (longitudinal_distance && longitudinal_distance.value() < horizon) {
-          return name;
-        }
+      const auto self_pos = canonicalized_entity_status_->getMapPose().position;
+      const auto other_pos = other_entity_status_.at(name).getMapPose().position;
+      const auto dx = other_pos.x - self_pos.x;
+      const auto dy = other_pos.y - self_pos.y;
+      const auto self_yaw = math::geometry::convertQuaternionToEulerAngle(
+                              canonicalized_entity_status_->getMapPose().orientation)
+                              .z;
+      const auto vec_yaw = std::atan2(dy, dx);
+      const auto yaw_diff = std::atan2(std::sin(vec_yaw - self_yaw), std::cos(vec_yaw - self_yaw));
+      if (std::fabs(yaw_diff) <= boost::math::constants::half_pi<double>()) {
+        return name;
       }
     }
   }
