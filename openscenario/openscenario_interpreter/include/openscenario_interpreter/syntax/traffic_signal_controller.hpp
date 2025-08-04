@@ -105,9 +105,6 @@ public:
 
   auto shouldChangePhaseToBegin() -> bool;
 
-  auto generatePredictions(double prediction_horizon_seconds = 30.0) const
-    -> std::vector<std::tuple<double, std::string>>;
-
   auto updatePredictions() -> void;
 };
 }  // namespace syntax

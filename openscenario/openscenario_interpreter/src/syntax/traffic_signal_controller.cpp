@@ -114,7 +114,6 @@ auto TrafficSignalController::evaluate() -> Object
 
 auto TrafficSignalController::updatePredictions() -> void
 {
-  // First, collect all V2I traffic light IDs in this controller
   std::set<lanelet::Id> v2i_traffic_light_ids;
   for (const auto & phase : phases) {
     for (const auto & traffic_signal_state : phase.traffic_signal_states) {
@@ -124,52 +123,35 @@ auto TrafficSignalController::updatePredictions() -> void
     }
   }
 
-  // Generate predictions and organize them by traffic light ID
   std::unordered_map<lanelet::Id, std::vector<std::tuple<double, std::string>>> predictions_by_id;
 
   if (current_phase != std::end(phases)) {
     const auto current_time = evaluateSimulationTime();
     const auto current_phase_elapsed = current_time - current_phase_started_at;
-    double remaining_time_in_current_phase = (*current_phase).duration - current_phase_elapsed;
+    const double remaining_time_in_current_phase = (*current_phase).duration - current_phase_elapsed;
     double accumulated_time = 0.0;
 
-    // Start from current phase and iterate through phases
     auto phase_iter = current_phase;
-    bool is_first_phase = true;
-    const double prediction_horizon_seconds = 30.0;
-    size_t phase_count = 0;
 
-    // Generate predictions for all phase transitions within the horizon
-    while (accumulated_time < prediction_horizon_seconds) {
-      // Move to next phase (or stay on current for first iteration)
-      if (!is_first_phase) {
-        ++phase_iter;
-        if (phase_iter == std::end(phases)) {
-          phase_iter = phases.begin();
-        }
+    // Process current phase with remaining time
+    accumulated_time += remaining_time_in_current_phase;
+    for (const auto & traffic_signal_state : (*phase_iter).traffic_signal_states) {
+      if (traffic_signal_state.trafficSignalType() == TrafficSignalState::TrafficSignalType::v2i) {
+        predictions_by_id[traffic_signal_state.id()].emplace_back(
+          accumulated_time, traffic_signal_state.state);
       }
+    }
 
-      // Add time for the current/remaining phase
-      double phase_duration =
-        (is_first_phase) ? remaining_time_in_current_phase : static_cast<double>((*phase_iter).duration);
-      accumulated_time += phase_duration;
-
-      if (accumulated_time <= prediction_horizon_seconds) {
-        // For each V2I traffic signal in the phase, record its state at this time
-        for (const auto & traffic_signal_state : (*phase_iter).traffic_signal_states) {
-          if (traffic_signal_state.trafficSignalType() == TrafficSignalState::TrafficSignalType::v2i) {
-            predictions_by_id[traffic_signal_state.id()].emplace_back(
-              accumulated_time, traffic_signal_state.state);
-          }
+    // Process next 5 phases (total of 6 phases including current)
+    for (size_t i = 0; i < 5; ++i) {
+      ++phase_iter;  // CircularIterator automatically wraps to begin when reaching end
+      accumulated_time += (*phase_iter).duration;
+      
+      for (const auto & traffic_signal_state : (*phase_iter).traffic_signal_states) {
+        if (traffic_signal_state.trafficSignalType() == TrafficSignalState::TrafficSignalType::v2i) {
+          predictions_by_id[traffic_signal_state.id()].emplace_back(
+            accumulated_time, traffic_signal_state.state);
         }
-      }
-
-      is_first_phase = false;
-      phase_count++;
-
-      // After we've gone through all phases once, reset remaining time
-      if (phase_count == phases.size()) {
-        remaining_time_in_current_phase = (*current_phase).duration;
       }
     }
   }
@@ -200,62 +182,5 @@ auto TrafficSignalController::shouldChangePhaseToBegin() -> bool
   }
 }
 
-auto TrafficSignalController::generatePredictions(double prediction_horizon_seconds) const
-  -> std::vector<std::tuple<double, std::string>>
-{
-  std::vector<std::tuple<double, std::string>> predictions;
-
-  if (current_phase == std::end(phases) || phases.empty()) {
-    return predictions;
-  }
-
-  const auto current_time = evaluateSimulationTime();
-  const auto current_phase_elapsed = current_time - current_phase_started_at;
-
-  // Calculate remaining time in current phase
-  double remaining_time_in_current_phase = (*current_phase).duration - current_phase_elapsed;
-  double accumulated_time = 0.0;
-
-  // Start from current phase and iterate through phases
-  auto phase_iter = current_phase;
-  bool is_first_phase = true;
-  size_t phase_count = 0;
-
-  // Generate predictions for all phase transitions within the horizon
-  while (accumulated_time < prediction_horizon_seconds) {
-    // Move to next phase (or stay on current for first iteration)
-    if (!is_first_phase) {
-      ++phase_iter;
-      if (phase_iter == std::end(phases)) {
-        phase_iter = phases.begin();
-      }
-    }
-
-    // Add time for the current/remaining phase
-    double phase_duration =
-      (is_first_phase) ? remaining_time_in_current_phase : static_cast<double>((*phase_iter).duration);
-    accumulated_time += phase_duration;
-
-    if (accumulated_time <= prediction_horizon_seconds) {
-      // For each V2I traffic signal in the phase, get its state
-      for (const auto & traffic_signal_state : (*phase_iter).traffic_signal_states) {
-        if (traffic_signal_state.trafficSignalType() == TrafficSignalState::TrafficSignalType::v2i) {
-          // Create a prediction entry for this specific signal and time
-          predictions.emplace_back(accumulated_time, traffic_signal_state.state);
-        }
-      }
-    }
-
-    is_first_phase = false;
-    phase_count++;
-
-    // After we've gone through all phases once, reset remaining time
-    if (phase_count == phases.size()) {
-      remaining_time_in_current_phase = (*current_phase).duration;
-    }
-  }
-
-  return predictions;
-}
 }  // namespace syntax
 }  // namespace openscenario_interpreter
