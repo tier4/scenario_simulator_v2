@@ -783,9 +783,9 @@ public:
     }
 
     template <typename... Ts>
-    static auto setV2ITrafficLightPrediction(Ts &&... xs) -> decltype(auto)
+    static auto setV2ITrafficLightsStatePrediction(Ts &&... xs) -> decltype(auto)
     {
-      return core->getV2ITrafficLights()->setPrediction(std::forward<decltype(xs)>(xs)...);
+      return core->getV2ITrafficLights()->setTrafficLightsStatePrediction(std::forward<decltype(xs)>(xs)...);
     }
   };
 };

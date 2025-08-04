@@ -159,7 +159,7 @@ auto TrafficSignalController::updatePredictions() -> void
   // Set predictions for each V2I traffic light
   for (const auto & [lanelet_id, predictions] : predictions_by_id) {
     for (const auto & [time_offset, state] : predictions) {
-      setV2ITrafficLightPrediction(lanelet_id, state, time_offset);
+      setV2ITrafficLightsStatePrediction(lanelet_id, state, time_offset);
     }
   }
 }

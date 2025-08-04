@@ -16,6 +16,49 @@
 
 namespace traffic_simulator
 {
+  auto V2ITrafficLights::setTrafficLightsStatePrediction(const lanelet::Id lanelet_id, const std::string &state,
+    double time_ahead_seconds) -> void {
+    std::cout << "setTrafficLightsStatePrediction: " << lanelet_id << ", " << state << ", " << time_ahead_seconds << std::endl;
+    // TrafficLightのvectorを作成
+    std::vector<simulation_api_schema::TrafficLight> traffic_light_states;
+    
+    // 既存のTrafficLightを取得してstateを解析
+    auto traffic_lights = getTrafficLights(lanelet_id);
+    if (!traffic_lights.empty()) {
+      auto & traffic_light = traffic_lights.front().get();
+      TrafficLight temp_traffic_light = traffic_light;
+      temp_traffic_light.set(state);
+      
+      // 各bulbをsimulation_api_schema::TrafficLightに変換
+      for (const auto & bulb : temp_traffic_light.bulbs) {
+        auto traffic_light_proto = static_cast<simulation_api_schema::TrafficLight>(bulb);
+        traffic_light_proto.set_confidence(temp_traffic_light.confidence);
+        traffic_light_states.push_back(traffic_light_proto);
+      }
+    }
+    
+    // 予測時刻を計算
+    const auto predicted_time = clock_ptr_->now() + rclcpp::Duration(std::chrono::duration<double>(time_ahead_seconds));
+    
+    // 同じ時刻のエントリがあるか確認
+    auto & predictions_for_id = predictions_[lanelet_id];
+    auto it = std::find_if(predictions_for_id.begin(), predictions_for_id.end(),
+                           [&predicted_time](const auto & pair) {
+                             // 時刻の差が小さい場合は同じ時刻とみなす（1ミリ秒以内）
+                             return std::abs((pair.first - predicted_time).seconds()) < 0.001;
+                           });
+    
+    if (it != predictions_for_id.end()) {
+      // 同じ時刻のエントリが存在する場合は追加
+      for (const auto & traffic_light_state : traffic_light_states) {
+        it->second.push_back(traffic_light_state);
+      }
+    } else {
+      std::pair<rclcpp::Time, std::vector<simulation_api_schema::TrafficLight>> new_prediction{predicted_time, traffic_light_states};
+      predictions_for_id.emplace_back(new_prediction);
+    }
+  }
+
 auto TrafficLights::isAnyTrafficLightChanged() -> bool
 {
   return conventional_traffic_lights_->isAnyTrafficLightChanged() or

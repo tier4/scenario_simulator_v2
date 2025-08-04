@@ -93,5 +93,7 @@ protected:
   const std::unique_ptr<TrafficLightMarkerPublisher> marker_publisher_ptr_;
   ConfigurableRateUpdater rate_updater_;
 };
+
+using TrafficLightStatePredictions = std::unordered_map<lanelet::Id, std::vector<std::pair<rclcpp::Time, std::vector<simulation_api_schema::TrafficLight>>>>;
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHTS_BASE_HPP_

@@ -24,7 +24,6 @@
 #include <autoware_perception_msgs/msg/traffic_light_group_array.hpp>
 #endif
 
-#include <traffic_simulator/traffic_lights/traffic_light_prediction.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_publisher.hpp>
 #include <traffic_simulator/traffic_lights/traffic_lights_base.hpp>
 
@@ -62,8 +61,6 @@ private:
 class V2ITrafficLights : public TrafficLightsBase
 {
 public:
-  using PredictedState = TrafficLightPredictedState;
-
   template <typename NodeTypePointer>
   explicit V2ITrafficLights(
     const NodeTypePointer & node_ptr, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
@@ -78,17 +75,7 @@ public:
 
   ~V2ITrafficLights() override = default;
 
-  auto setPrediction(
-    const lanelet::Id lanelet_id, const std::string & state, double time_ahead_seconds) -> void
-  {
-    const auto now = clock_ptr_->now();
-    PredictedState predicted_state;
-    predicted_state.predicted_time = now + rclcpp::Duration(std::chrono::duration<double>(time_ahead_seconds));
-    predicted_state.state = state;
-    predicted_state.reliability = 1.0f;
-    predicted_state.information_source = "SIMULATION";
-    predictions_[lanelet_id].push_back(predicted_state);
-  }
+  auto setTrafficLightsStatePrediction(const lanelet::Id lanelet_id, const std::string & state, double time_ahead_seconds) -> void ;
 
 private:
   auto update() const -> void override
@@ -96,18 +83,12 @@ private:
     predictions_.clear();
     const auto now = clock_ptr_->now();
     const auto request = generateUpdateTrafficLightsRequest();
-    publishWithPredictions(now, request);
+    publisher_ptr_->publish(now, request, &predictions_);
+    legacy_topic_publisher_ptr_->publish(now, request, &predictions_);
     if (isAnyTrafficLightChanged()) {
       marker_publisher_ptr_->deleteMarkers();
     }
     marker_publisher_ptr_->drawMarkers(traffic_lights_map_);
-  }
-
-  auto publishWithPredictions(const rclcpp::Time & current_ros_time, const simulation_api_schema::UpdateTrafficLightsRequest & request) const -> void
-  {
-    // Use the new publish method that accepts predictions map pointer
-    publisher_ptr_->publish(current_ros_time, request, &predictions_);
-    legacy_topic_publisher_ptr_->publish(current_ros_time, request, &predictions_);
   }
 
   template <typename NodeTypePointer>
@@ -149,7 +130,7 @@ private:
   const std::unique_ptr<TrafficLightPublisherBase> publisher_ptr_;
   const std::unique_ptr<TrafficLightPublisherBase> legacy_topic_publisher_ptr_;
 
-  mutable TrafficLightPredictions predictions_;
+  mutable TrafficLightStatePredictions predictions_;
 };
 
 class TrafficLights
