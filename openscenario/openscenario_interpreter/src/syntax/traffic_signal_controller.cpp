@@ -73,6 +73,8 @@ auto TrafficSignalController::changePhaseTo(std::list<Phase>::iterator next) -> 
   current_phase_started_at = evaluateSimulationTime();
   current_phase = next;
 
+  updatePredictions();
+
   return current_phase != std::end(phases) ? (*current_phase).evaluate() : unspecified;
 }
 
@@ -106,14 +108,14 @@ auto TrafficSignalController::evaluate() -> Object
   } else if (currentPhaseExceeded()) {
     return changePhaseTo(std::next(current_phase));
   } else {
-    // Generate predictions for V2I traffic lights
-    updatePredictions();
     return unspecified;
   }
 }
 
 auto TrafficSignalController::updatePredictions() -> void
 {
+  clearV2ITrafficLightsStatePrediction();
+  
   std::set<lanelet::Id> v2i_traffic_light_ids;
   for (const auto & phase : phases) {
     for (const auto & traffic_signal_state : phase.traffic_signal_states) {
@@ -135,7 +137,8 @@ auto TrafficSignalController::updatePredictions() -> void
   if (current_phase != std::end(phases)) {
     const auto current_time = evaluateSimulationTime();
     const auto current_phase_elapsed = current_time - current_phase_started_at;
-    const double remaining_time_in_current_phase = (*current_phase).duration - current_phase_elapsed;
+    const double remaining_time_in_current_phase =
+      (*current_phase).duration - current_phase_elapsed;
     double accumulated_time = 0.0;
 
     auto phase_iter = current_phase;
@@ -145,7 +148,8 @@ auto TrafficSignalController::updatePredictions() -> void
       accumulated_time += phase_time_seconds;
       bool is_added = false;
       for (const auto & traffic_signal_state : (*phase).traffic_signal_states) {
-        if (traffic_signal_state.trafficSignalType() == TrafficSignalState::TrafficSignalType::v2i) {
+        if (
+          traffic_signal_state.trafficSignalType() == TrafficSignalState::TrafficSignalType::v2i) {
           is_added = true;
           predictions_by_id[traffic_signal_state.id()].emplace_back(
             accumulated_time, traffic_signal_state.state);
@@ -154,12 +158,12 @@ auto TrafficSignalController::updatePredictions() -> void
       return is_added;
     };
 
-    if (process_phase(phase_iter, remaining_time_in_current_phase))
-    {
+    if (process_phase(phase_iter, remaining_time_in_current_phase)) {
       ++processed_phases_number;
     }
 
     while (processed_phases_number < OUTPUT_PREDICTION_SIZE) {
+      ++phase_iter;
       if (processed_phases_number == 0 && accumulated_time > cycleTime()) {
         break;
       } else if (process_phase(phase_iter, (*phase_iter).duration)) {

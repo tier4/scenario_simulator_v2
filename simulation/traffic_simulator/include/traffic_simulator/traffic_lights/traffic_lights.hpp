@@ -75,7 +75,10 @@ public:
 
   ~V2ITrafficLights() override = default;
 
-  auto setTrafficLightsStatePrediction(const lanelet::Id lanelet_id, const std::string & state, double time_ahead_seconds) -> void ;
+  auto setTrafficLightsStatePrediction(
+    const lanelet::Id lanelet_id, const std::string & state, double time_ahead_seconds) -> void;
+
+  auto clearTrafficLightsStatePrediction() -> void;
 
 private:
   auto update() const -> void override
@@ -88,7 +91,6 @@ private:
       marker_publisher_ptr_->deleteMarkers();
     }
     marker_publisher_ptr_->drawMarkers(traffic_lights_map_);
-    predictions_.clear();
   }
 
   template <typename NodeTypePointer>

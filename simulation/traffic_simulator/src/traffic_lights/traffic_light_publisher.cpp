@@ -103,13 +103,13 @@ auto TrafficLightPublisher<traffic_simulator_msgs::msg::TrafficLightArrayV1>::ge
 template <>
 auto TrafficLightPublisher<autoware_perception_msgs::msg::TrafficLightGroupArray>::generateMessage(
   const rclcpp::Time & current_ros_time,
-  const simulation_api_schema::UpdateTrafficLightsRequest & request, const std::string &,
+  const simulation_api_schema::UpdateTrafficLightsRequest & request, const std::string & topic_name,
   const TrafficLightStatePredictions * predictions)
   -> std::unique_ptr<autoware_perception_msgs::msg::TrafficLightGroupArray>
 {
-  using autoware_perception_msgs::msg::TrafficLightGroup;
-  using autoware_perception_msgs::msg::TrafficLightElement;
   using autoware_perception_msgs::msg::PredictedTrafficLightState;
+  using autoware_perception_msgs::msg::TrafficLightElement;
+  using autoware_perception_msgs::msg::TrafficLightGroup;
 
   // request: 物理的信号機の配列（relations入り）
   // メッセージ: relation_idの配列
@@ -127,8 +127,10 @@ auto TrafficLightPublisher<autoware_perception_msgs::msg::TrafficLightGroupArray
       ss << "HasMemberPredictions: true" << std::endl;
       if (predictions) {
         ss << "Predictions: enable, traffic_light_id: " << traffic_light.id() << std::endl;
-        if (auto prediction_phases = predictions->find(traffic_light.id()); prediction_phases != predictions->end()) {
-          ss << static_cast<int>(prediction_phases->second.size()) << " phases is found" << std::endl;
+        if (auto prediction_phases = predictions->find(traffic_light.id());
+            prediction_phases != predictions->end()) {
+          ss << static_cast<int>(prediction_phases->second.size()) << " phases is found"
+             << std::endl;
           for (const auto & [stamp, bulbs] : prediction_phases->second) {
             PredictedTrafficLightState phase_message;
             phase_message.predicted_stamp = stamp;
