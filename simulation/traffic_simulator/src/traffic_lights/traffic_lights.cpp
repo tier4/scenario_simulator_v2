@@ -16,6 +16,17 @@
 
 namespace traffic_simulator
 {
+auto V2ITrafficLights::setTrafficLightsStatePrediction(
+  const lanelet::Id lanelet_way_id, const std::string & state, double time_ahead_seconds) -> void
+{
+  // TODO: implement
+}
+
+auto V2ITrafficLights::clearTrafficLightsStatePrediction() -> void
+{
+  // TODO: implement
+}
+
 auto TrafficLights::isAnyTrafficLightChanged() -> bool
 {
   return conventional_traffic_lights_->isAnyTrafficLightChanged() or
