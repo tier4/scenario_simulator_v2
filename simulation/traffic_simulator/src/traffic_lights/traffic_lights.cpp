@@ -16,32 +16,57 @@
 
 namespace traffic_simulator
 {
-  auto V2ITrafficLights::setTrafficLightsStatePrediction(const lanelet::Id lanelet_id, const std::string &state,
-    double time_ahead_seconds) -> void {
-    std::stringstream ss;
-    ss << "setTrafficLightsStatePrediction: " << lanelet_id << ", " << state << ", " << time_ahead_seconds;
-    
-    // 予測時刻を計算
-    const auto predicted_time = clock_ptr_->now() + rclcpp::Duration(std::chrono::duration<double>(time_ahead_seconds));
-    
-    // 同じ時刻のエントリがあるか確認
-    auto & predictions_for_id = predictions_[lanelet_id];
-    auto it = std::find_if(predictions_for_id.begin(), predictions_for_id.end(),
-                           [&predicted_time](const auto & pair) {
-                             // 時刻の差が小さい場合は同じ時刻とみなす（1ミリ秒以内）
-                             return std::abs((pair.first - predicted_time).seconds()) < 0.001;
-                           });
+auto V2ITrafficLights::setTrafficLightsStatePrediction(
+  const lanelet::Id lanelet_id, const std::string & state, double time_ahead_seconds) -> void
+{
+  std::stringstream ss;
+  ss << "[setTrafficLightsStatePrediction] " << lanelet_id << " " << state << " " << time_ahead_seconds;
+  // 予測時刻を計算
+  const auto predicted_time =
+    clock_ptr_->now() + rclcpp::Duration(std::chrono::duration<double>(time_ahead_seconds));
 
-    TrafficLight::Bulb bulb(state);
-    auto bulb_proto = static_cast<simulation_api_schema::TrafficLight>(bulb);
-    if (it != predictions_for_id.end()) {
-      // 同じ時刻のエントリが存在する場合は追加
-      it->second.push_back(bulb_proto);
-    } else {
-      predictions_for_id.emplace_back(predicted_time, std::vector<simulation_api_schema::TrafficLight>{bulb_proto});
+  // 同じ時刻のエントリがあるか確認
+  auto & predictions_for_id = predictions_[lanelet_id];
+  auto it = std::find_if(
+    predictions_for_id.begin(), predictions_for_id.end(), [&predicted_time](const auto & pair) {
+      // 時刻の差が小さい場合は同じ時刻とみなす（1ミリ秒以内）
+      return std::abs((pair.first - predicted_time).seconds()) < 0.001;
+    });
+
+  TrafficLight::Bulb bulb(state);
+  auto bulb_proto = static_cast<simulation_api_schema::TrafficLight>(bulb);
+  if (it != predictions_for_id.end()) {
+    // 同じ時刻のエントリが存在する場合、重複しているかチェック
+    bool duplicate_found = false;
+    for (const auto & existing_bulb : it->second) {
+      if (
+        existing_bulb.color() == bulb_proto.color() &&
+        existing_bulb.shape() == bulb_proto.shape() &&
+        existing_bulb.status() == bulb_proto.status()) {
+        duplicate_found = true;
+        break;
+      }
     }
-    std::cout << ss.str() << std::endl;
+    if (duplicate_found) {
+      std::cout
+        << "[V2ITrafficLights::setTrafficLightsStatePrediction] state duplication detected!!!"
+        << std::endl;
+    }
+    ss << ", added!";
+    it->second.push_back(bulb_proto);
+  } else {
+    ss << ", created!";
+    predictions_for_id.emplace_back(
+      predicted_time, std::vector<simulation_api_schema::TrafficLight>{bulb_proto});
   }
+  std::cout << ss.str() << std::endl;
+}
+
+auto V2ITrafficLights::clearTrafficLightsStatePrediction() -> void
+{
+  std::cout << "clearTrafficLightsStatePrediction" << std::endl;
+  predictions_.clear();
+}
 
 auto TrafficLights::isAnyTrafficLightChanged() -> bool
 {

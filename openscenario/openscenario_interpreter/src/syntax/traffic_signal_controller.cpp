@@ -172,7 +172,9 @@ auto TrafficSignalController::updatePredictions() -> void
     }
   }
 
+  std::cout << "[updatePredictions] " << static_cast<int>(predictions_by_id.size()) << std::endl;
   for (const auto & [lanelet_id, predictions] : predictions_by_id) {
+    std::cout << "[updatePredictions]\t" << static_cast<int>(predictions.size()) << " predictions for " << lanelet_id << std::endl;
     for (const auto & [time_offset, state] : predictions) {
       setV2ITrafficLightsStatePrediction(lanelet_id, state, time_offset);
     }
