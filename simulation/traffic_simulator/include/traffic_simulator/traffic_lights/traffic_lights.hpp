@@ -80,7 +80,6 @@ public:
 private:
   auto update() const -> void override
   {
-    predictions_.clear();
     const auto now = clock_ptr_->now();
     const auto request = generateUpdateTrafficLightsRequest();
     publisher_ptr_->publish(now, request, &predictions_);
@@ -89,6 +88,7 @@ private:
       marker_publisher_ptr_->deleteMarkers();
     }
     marker_publisher_ptr_->drawMarkers(traffic_lights_map_);
+    predictions_.clear();
   }
 
   template <typename NodeTypePointer>

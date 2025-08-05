@@ -129,10 +129,10 @@ auto TrafficLightPublisher<autoware_perception_msgs::msg::TrafficLightGroupArray
         ss << "Predictions: enable, traffic_light_id: " << traffic_light.id() << std::endl;
         if (auto prediction_phases = predictions->find(traffic_light.id()); prediction_phases != predictions->end()) {
           ss << static_cast<int>(prediction_phases->second.size()) << " phases is found" << std::endl;
-          for (auto phase : prediction_phases->second) {
+          for (const auto & [stamp, bulbs] : prediction_phases->second) {
             PredictedTrafficLightState phase_message;
-            phase_message.predicted_stamp = phase.first;
-            for (const auto & bulb : phase.second) {
+            phase_message.predicted_stamp = stamp;
+            for (const auto & bulb : bulbs) {
               TrafficLightElement light_bulb_message;
               simulation_interface::toMsg<TrafficLightElement>(bulb, light_bulb_message);
               phase_message.simultaneous_elements.push_back(light_bulb_message);
@@ -146,7 +146,7 @@ auto TrafficLightPublisher<autoware_perception_msgs::msg::TrafficLightGroupArray
         }
       }
     }
-    std::cout << ss.str() << std::endl;
+    std::cout << ss.str();
   }
 
   auto message = std::make_unique<autoware_perception_msgs::msg::TrafficLightGroupArray>();
