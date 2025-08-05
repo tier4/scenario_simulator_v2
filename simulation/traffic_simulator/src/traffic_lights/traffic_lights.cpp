@@ -38,7 +38,6 @@ auto V2ITrafficLights::setTrafficLightsStatePrediction(
     predictions_for_current_traffic_light.emplace_back(
       predicted_time, std::vector<simulation_api_schema::TrafficLight>{bulb_proto});
   }
-  std::cout << ss.str() << std::endl;
 }
 
 auto V2ITrafficLights::clearTrafficLightsStatePrediction() -> void
