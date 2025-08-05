@@ -159,6 +159,7 @@ public:
 
     catch (const SpecialAction<EXIT_SUCCESS> & action)  // from CustomCommandAction::exitSuccess
     {
+      RCLCPP_INFO(get_logger(), "[LifecycleDebug] Caught EXIT_SUCCESS, setting result to Pass");
       set<common::junit::Pass>();
       return handle(action);
     }

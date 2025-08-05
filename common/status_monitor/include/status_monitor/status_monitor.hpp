@@ -22,6 +22,7 @@
 #include <iostream>
 #include <mutex>
 #include <thread>
+#include <type_traits>
 #include <unordered_map>
 #include <utility>
 #include <boost/lexical_cast.hpp>
@@ -72,7 +73,7 @@ class StatusMonitor
 
   static inline std::atomic_bool terminating;
 
-  static inline std::chrono::seconds threshold = std::chrono::seconds(10);
+  static inline std::chrono::seconds threshold = std::chrono::seconds(7);
 
   static inline std::mutex mutex;
 
@@ -144,9 +145,24 @@ public:
   template <typename Thunk>
   auto overrideThreshold(const std::chrono::seconds & t, Thunk thunk) -> decltype(auto)
   {
+    std::cout << "[StatusMonitor] Overriding threshold from " << threshold.count() 
+              << "s to " << t.count() << "s" << std::endl;
     auto exchanger = ScopedExchanger(threshold, t);
 
-    return thunk();
+    try {
+      if constexpr (std::is_void_v<decltype(thunk())>) {
+        thunk();
+        std::cout << "[StatusMonitor] Restoring threshold back to " << threshold.count() << "s" << std::endl;
+      } else {
+        auto result = thunk();
+        std::cout << "[StatusMonitor] Restoring threshold back to " << threshold.count() << "s" << std::endl;
+        return result;
+      }
+    } catch (...) {
+      std::cout << "[StatusMonitor] Exception during threshold override, restoring to " 
+                << threshold.count() << "s" << std::endl;
+      throw;
+    }
   }
 
   auto write() const -> void;

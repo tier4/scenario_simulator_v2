@@ -179,6 +179,10 @@ auto StatusMonitor::write() const -> void
         std::cout << "[StatusMonitor]   Max access interval (ms): " << std::chrono::duration_cast<std::chrono::milliseconds>(status.maximum_access_interval).count() << std::endl;
         std::cout << "[StatusMonitor]   System terminating flag: " << (terminating.load(std::memory_order_acquire) ? "true" : "false") << std::endl;
         std::cout << "[StatusMonitor]   Total monitored threads: " << statuses.size() << std::endl;
+        
+        // Additional debug info to understand threshold changes
+        std::cout << "[StatusMonitor]   Reference count: " << count << std::endl;
+        std::cout << "[StatusMonitor]   Watchdog iteration count available in log above" << std::endl;
       }
     }
   }

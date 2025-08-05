@@ -149,9 +149,11 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
 
 auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 {
+  RCLCPP_INFO(get_logger(), "[LifecycleDebug] on_activate() called");
   auto evaluate_storyboard = [this]() {
     withExceptionHandler(
       [this](auto &&...) {
+        RCLCPP_INFO(get_logger(), "[LifecycleDebug] Calling deactivate() from error handler");
         publishCurrentContext();
         deactivate();
       },
@@ -295,6 +297,7 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 
 auto Interpreter::on_deactivate(const rclcpp_lifecycle::State &) -> Result
 {
+  RCLCPP_INFO(get_logger(), "[LifecycleDebug] on_deactivate() called");
   reset();
 
   return Interpreter::Result::SUCCESS;  // => Inactive
@@ -343,6 +346,7 @@ auto Interpreter::publishCurrentContext() const -> void
 
 auto Interpreter::reset() -> void
 {
+  RCLCPP_INFO(get_logger(), "[LifecycleDebug] reset() called - stopping timer");
   timer.reset();  // Stop scenario evaluation
 
   if (publisher_of_context->is_activated()) {
@@ -376,8 +380,16 @@ auto Interpreter::reset() -> void
      threshold value of the status monitor and long enough for the simulator
      core to be deactivated.
   */
+  RCLCPP_INFO(get_logger(), "[LifecycleDebug] Starting SimulatorCore::deactivate with threshold override");
+  auto start_time = std::chrono::high_resolution_clock::now();
   common::status_monitor.overrideThreshold(
-    std::chrono::seconds(get_parameter("initialize_duration").as_int()), SimulatorCore::deactivate);
+    std::chrono::seconds(get_parameter("initialize_duration").as_int()), 
+    [this, start_time]() {
+      SimulatorCore::deactivate();
+      auto end_time = std::chrono::high_resolution_clock::now();
+      auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
+      RCLCPP_INFO(get_logger(), "[LifecycleDebug] SimulatorCore::deactivate completed in %ld ms", duration);
+    });
 
   scenarios.pop_front();
 
