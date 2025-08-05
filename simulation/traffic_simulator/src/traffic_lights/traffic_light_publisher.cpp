@@ -113,7 +113,7 @@ auto TrafficLightPublisher<autoware_perception_msgs::msg::TrafficLightGroupArray
 
   std::unordered_map<lanelet::Id, TrafficLightGroup> traffic_light_group_map;
   for (const auto & traffic_light : request.states()) {
-    for (auto bulb_status : traffic_light.traffic_light_status()) {
+    for (const auto & bulb_status : traffic_light.traffic_light_status()) {
       TrafficLightElement light_bulb_message;
       simulation_interface::toMsg<TrafficLightElement>(bulb_status, light_bulb_message);
       for (const auto & relation_id : traffic_light.relation_ids()) {
