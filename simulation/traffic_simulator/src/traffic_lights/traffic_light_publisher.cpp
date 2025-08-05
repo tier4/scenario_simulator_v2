@@ -111,31 +111,32 @@ auto TrafficLightPublisher<autoware_perception_msgs::msg::TrafficLightGroupArray
   using autoware_perception_msgs::msg::TrafficLightElement;
   using autoware_perception_msgs::msg::TrafficLightGroup;
 
+  // NOTE: key is relation ID
   std::unordered_map<lanelet::Id, TrafficLightGroup> traffic_light_group_map;
-  for (const auto & traffic_light : request.states()) {
-    for (const auto & bulb_status : traffic_light.traffic_light_status()) {
-      TrafficLightElement light_bulb_message;
-      simulation_interface::toMsg<TrafficLightElement>(bulb_status, light_bulb_message);
-      for (const auto & relation_id : traffic_light.relation_ids()) {
-        traffic_light_group_map[relation_id].elements.push_back(light_bulb_message);
+  for (const auto & way_id_level_traffic_light : request.states()) {
+    for (const auto & bulb_proto : way_id_level_traffic_light.traffic_light_status()) {
+      TrafficLightElement bulb_message;
+      simulation_interface::toMsg<TrafficLightElement>(bulb_proto, bulb_message);
+      for (const auto & relation_id : way_id_level_traffic_light.relation_ids()) {
+        traffic_light_group_map[relation_id].elements.push_back(bulb_message);
       }
     }
     if constexpr (HasMemberPredictions<TrafficLightGroup>::value) {
       if (predictions) {
-        if (auto prediction_phases = predictions->find(traffic_light.id());
+        if (auto prediction_phases = predictions->find(way_id_level_traffic_light.id());
             prediction_phases != predictions->end()) {
           for (const auto & [stamp, bulbs] : prediction_phases->second) {
-            PredictedTrafficLightState phase_message;
-            phase_message.predicted_stamp = stamp;
-            for (const auto & bulb : bulbs) {
-              TrafficLightElement light_bulb_message;
-              simulation_interface::toMsg<TrafficLightElement>(bulb, light_bulb_message);
-              phase_message.simultaneous_elements.push_back(light_bulb_message);
+            PredictedTrafficLightState prediction_phase_message;
+            prediction_phase_message.predicted_stamp = stamp;
+            for (const auto & bulb_proto : bulbs) {
+              TrafficLightElement bulb_message;
+              simulation_interface::toMsg<TrafficLightElement>(bulb_proto, bulb_message);
+              prediction_phase_message.simultaneous_elements.push_back(bulb_message);
             }
-            phase_message.information_source = "SIMULATION";
-            phase_message.reliability = 1.0;
-            for (const auto & relation_id : traffic_light.relation_ids()) {
-              traffic_light_group_map[relation_id].predictions.push_back(phase_message);
+            prediction_phase_message.information_source = "SIMULATION";
+            prediction_phase_message.reliability = 1.0;
+            for (const auto & relation_id : way_id_level_traffic_light.relation_ids()) {
+              traffic_light_group_map[relation_id].predictions.push_back(prediction_phase_message);
             }
           }
         }
