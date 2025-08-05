@@ -160,7 +160,9 @@ AutowareUniverse::AutowareUniverse(bool simulate_localization) try
         return message;
       }());
     })),
-  spinner(std::thread([this]() {
+   spinner()
+  {
+    spinner = std::thread([this]() {
     try {
       while (rclcpp::ok() and not is_stop_requested.load()) {
         rclcpp::spin_some(get_node_base_interface());
@@ -169,8 +171,7 @@ AutowareUniverse::AutowareUniverse(bool simulate_localization) try
       thrown = std::current_exception();
       is_thrown.store(true);
     }
-  }))
-{
+  });
 }
 catch (...)
 {
