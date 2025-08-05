@@ -114,27 +114,18 @@ auto TrafficSignalController::evaluate() -> Object
 
 auto TrafficSignalController::updatePredictions() -> void
 {
-  clearV2ITrafficLightsStatePrediction();
-  
-  std::set<lanelet::Id> v2i_traffic_light_ids;
-  for (const auto & phase : phases) {
-    for (const auto & traffic_signal_state : phase.traffic_signal_states) {
-      if (traffic_signal_state.trafficSignalType() == TrafficSignalState::TrafficSignalType::v2i) {
-        v2i_traffic_light_ids.insert(traffic_signal_state.id());
-      }
-    }
-  }
+  if (current_phase != std::end(phases)) {
+    clearV2ITrafficLightsStatePrediction();
 
-  std::unordered_map<lanelet::Id, std::vector<std::tuple<double, std::string>>> predictions_by_id;
-  /*
+    std::unordered_map<lanelet::Id, std::vector<std::tuple<double, std::string>>> predictions_by_id;
+    /*
     NOTE:
       This parameter was set with the help of developers familiar with the implementation
       of ROS driver nodes for V2I traffic lights.
       However, the specifications, including this parameter, may change in the future.
    */
-  constexpr size_t OUTPUT_PREDICTION_SIZE = 6;
+    constexpr size_t OUTPUT_PREDICTION_SIZE = 6;
 
-  if (current_phase != std::end(phases)) {
     const auto current_time = evaluateSimulationTime();
     const auto current_phase_elapsed = current_time - current_phase_started_at;
     const double remaining_time_in_current_phase =
@@ -170,13 +161,11 @@ auto TrafficSignalController::updatePredictions() -> void
         ++processed_phases_number;
       }
     }
-  }
 
-  std::cout << "[updatePredictions] " << static_cast<int>(predictions_by_id.size()) << std::endl;
-  for (const auto & [lanelet_id, predictions] : predictions_by_id) {
-    std::cout << "[updatePredictions]\t" << static_cast<int>(predictions.size()) << " predictions for " << lanelet_id << std::endl;
-    for (const auto & [time_offset, state] : predictions) {
-      setV2ITrafficLightsStatePrediction(lanelet_id, state, time_offset);
+    for (const auto & [lanelet_id, predictions] : predictions_by_id) {
+      for (const auto & [time_offset, state] : predictions) {
+        setV2ITrafficLightsStatePrediction(lanelet_id, state, time_offset);
+      }
     }
   }
 }
