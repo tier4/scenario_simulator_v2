@@ -19,7 +19,23 @@ namespace traffic_simulator
 auto V2ITrafficLights::setTrafficLightsStatePrediction(
   const lanelet::Id lanelet_way_id, const std::string & state, double time_ahead_seconds) -> void
 {
-  // TODO: implement
+  const auto predicted_time =
+    clock_ptr_->now() + rclcpp::Duration(std::chrono::duration<double>(time_ahead_seconds));
+  auto & predictions_for_current_traffic_light = predictions_[lanelet_way_id];
+  auto bulb_proto = static_cast<simulation_api_schema::TrafficLight>(TrafficLight::Bulb(state));
+  if (auto prediction = std::find_if(
+        predictions_for_current_traffic_light.begin(), predictions_for_current_traffic_light.end(),
+        [&predicted_time](const auto & pair) {
+          constexpr double TIME_EPSILON = 0.001;  // 1ms
+          return std::abs((pair.first - predicted_time).seconds()) < TIME_EPSILON;
+        });
+      prediction != predictions_for_current_traffic_light.end()) {
+    // merge into existing prediction
+    prediction->second.push_back(bulb_proto);
+  } else {
+    predictions_for_current_traffic_light.emplace_back(
+      predicted_time, std::vector<simulation_api_schema::TrafficLight>{bulb_proto});
+  }
 }
 
 auto V2ITrafficLights::clearTrafficLightsStatePrediction() -> void { predictions_.clear(); }
