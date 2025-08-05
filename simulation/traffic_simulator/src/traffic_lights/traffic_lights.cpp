@@ -29,9 +29,11 @@ auto V2ITrafficLights::setTrafficLightsStatePrediction(
   TrafficLight::Bulb bulb(state);
   auto bulb_proto = static_cast<simulation_api_schema::TrafficLight>(bulb);
   if (auto prediction = std::find_if(
-    predictions_for_current_traffic_light.begin(), predictions_for_current_traffic_light.end(), [&predicted_time](const auto & pair) {
-      return std::abs((pair.first - predicted_time).seconds()) < 0.001;
-    }); prediction != predictions_for_current_traffic_light.end()) {
+        predictions_for_current_traffic_light.begin(), predictions_for_current_traffic_light.end(),
+        [&predicted_time](const auto & pair) {
+          return std::abs((pair.first - predicted_time).seconds()) < 0.001;
+        });
+      prediction != predictions_for_current_traffic_light.end()) {
     // merge into existing prediction
     prediction->second.push_back(bulb_proto);
   } else {
@@ -40,10 +42,7 @@ auto V2ITrafficLights::setTrafficLightsStatePrediction(
   }
 }
 
-auto V2ITrafficLights::clearTrafficLightsStatePrediction() -> void
-{
-  predictions_.clear();
-}
+auto V2ITrafficLights::clearTrafficLightsStatePrediction() -> void { predictions_.clear(); }
 
 auto TrafficLights::isAnyTrafficLightChanged() -> bool
 {
