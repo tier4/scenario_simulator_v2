@@ -22,10 +22,7 @@ auto V2ITrafficLights::setTrafficLightsStatePrediction(
   // TODO: implement
 }
 
-auto V2ITrafficLights::clearTrafficLightsStatePrediction() -> void
-{
-  // TODO: implement
-}
+auto V2ITrafficLights::clearTrafficLightsStatePrediction() -> void { predictions_.clear(); }
 
 auto TrafficLights::isAnyTrafficLightChanged() -> bool
 {

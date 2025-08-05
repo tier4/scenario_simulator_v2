@@ -31,7 +31,8 @@ namespace traffic_simulator
 template <>
 auto TrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>::generateMessage(
   const rclcpp::Time & current_ros_time,
-  const simulation_api_schema::UpdateTrafficLightsRequest & request, const std::string &)
+  const simulation_api_schema::UpdateTrafficLightsRequest & request, const std::string &,
+  const TrafficLightStatePredictions *)
   -> std::unique_ptr<autoware_perception_msgs::msg::TrafficSignalArray>
 {
   auto message = std::make_unique<autoware_perception_msgs::msg::TrafficSignalArray>();
@@ -63,7 +64,8 @@ auto TrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>::g
 template <>
 auto TrafficLightPublisher<traffic_simulator_msgs::msg::TrafficLightArrayV1>::generateMessage(
   const rclcpp::Time &, const simulation_api_schema::UpdateTrafficLightsRequest & request,
-  const std::string &) -> std::unique_ptr<traffic_simulator_msgs::msg::TrafficLightArrayV1>
+  const std::string &, const TrafficLightStatePredictions *)
+  -> std::unique_ptr<traffic_simulator_msgs::msg::TrafficLightArrayV1>
 {
   auto message = std::make_unique<traffic_simulator_msgs::msg::TrafficLightArrayV1>();
 
@@ -87,7 +89,8 @@ auto TrafficLightPublisher<traffic_simulator_msgs::msg::TrafficLightArrayV1>::ge
 template <>
 auto TrafficLightPublisher<autoware_perception_msgs::msg::TrafficLightGroupArray>::generateMessage(
   const rclcpp::Time & current_ros_time,
-  const simulation_api_schema::UpdateTrafficLightsRequest & request, const std::string &)
+  const simulation_api_schema::UpdateTrafficLightsRequest & request, const std::string &,
+  const TrafficLightStatePredictions * predictions)
   -> std::unique_ptr<autoware_perception_msgs::msg::TrafficLightGroupArray>
 {
   auto message = std::make_unique<autoware_perception_msgs::msg::TrafficLightGroupArray>();
