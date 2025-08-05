@@ -19,8 +19,6 @@ namespace traffic_simulator
 auto V2ITrafficLights::setTrafficLightsStatePrediction(
   const lanelet::Id lanelet_id, const std::string & state, double time_ahead_seconds) -> void
 {
-  std::stringstream ss;
-  ss << "[setTrafficLightsStatePrediction] " << lanelet_id << " " << state << " " << time_ahead_seconds;
   // 予測時刻を計算
   const auto predicted_time =
     clock_ptr_->now() + rclcpp::Duration(std::chrono::duration<double>(time_ahead_seconds));
@@ -64,7 +62,6 @@ auto V2ITrafficLights::setTrafficLightsStatePrediction(
 
 auto V2ITrafficLights::clearTrafficLightsStatePrediction() -> void
 {
-  std::cout << "clearTrafficLightsStatePrediction" << std::endl;
   predictions_.clear();
 }
 

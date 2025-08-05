@@ -103,7 +103,7 @@ auto TrafficLightPublisher<traffic_simulator_msgs::msg::TrafficLightArrayV1>::ge
 template <>
 auto TrafficLightPublisher<autoware_perception_msgs::msg::TrafficLightGroupArray>::generateMessage(
   const rclcpp::Time & current_ros_time,
-  const simulation_api_schema::UpdateTrafficLightsRequest & request, const std::string & topic_name,
+  const simulation_api_schema::UpdateTrafficLightsRequest & request, const std::string &,
   const TrafficLightStatePredictions * predictions)
   -> std::unique_ptr<autoware_perception_msgs::msg::TrafficLightGroupArray>
 {
@@ -111,8 +111,6 @@ auto TrafficLightPublisher<autoware_perception_msgs::msg::TrafficLightGroupArray
   using autoware_perception_msgs::msg::TrafficLightElement;
   using autoware_perception_msgs::msg::TrafficLightGroup;
 
-  // request: 物理的信号機の配列（relations入り）
-  // メッセージ: relation_idの配列
   std::unordered_map<lanelet::Id, TrafficLightGroup> traffic_light_group_map;
   for (const auto & traffic_light : request.states()) {
     for (auto bulb_status : traffic_light.traffic_light_status()) {
@@ -122,15 +120,10 @@ auto TrafficLightPublisher<autoware_perception_msgs::msg::TrafficLightGroupArray
         traffic_light_group_map[relation_id].elements.push_back(light_bulb_message);
       }
     }
-    std::stringstream ss;
     if constexpr (HasMemberPredictions<TrafficLightGroup>::value) {
-      ss << "HasMemberPredictions: true" << std::endl;
       if (predictions) {
-        ss << "Predictions: enable, traffic_light_id: " << traffic_light.id() << std::endl;
         if (auto prediction_phases = predictions->find(traffic_light.id());
             prediction_phases != predictions->end()) {
-          ss << static_cast<int>(prediction_phases->second.size()) << " phases is found"
-             << std::endl;
           for (const auto & [stamp, bulbs] : prediction_phases->second) {
             PredictedTrafficLightState phase_message;
             phase_message.predicted_stamp = stamp;
@@ -148,7 +141,6 @@ auto TrafficLightPublisher<autoware_perception_msgs::msg::TrafficLightGroupArray
         }
       }
     }
-    std::cout << ss.str();
   }
 
   auto message = std::make_unique<autoware_perception_msgs::msg::TrafficLightGroupArray>();
