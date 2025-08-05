@@ -176,7 +176,11 @@ AutowareUniverse::AutowareUniverse(bool simulate_localization) try
         throw;
       }
     })),
-  spinner(std::thread([this]() {
+  spinner()
+{
+  std::cerr << "[AutowareUniverse] Starting constructor with simulate_localization=" << simulate_localization << std::endl;
+
+  spinner = std::thread([this]() {
     std::cerr << "[AutowareUniverse] Spinner thread started" << std::endl;
     std::cerr << "[AutowareUniverse] Initial rclcpp::ok() = " << rclcpp::ok() << std::endl;
     std::cerr << "[AutowareUniverse] Initial is_stop_requested = " << is_stop_requested.load() << std::endl;
@@ -204,10 +208,9 @@ AutowareUniverse::AutowareUniverse(bool simulate_localization) try
       thrown = std::current_exception();
       is_thrown.store(true);
     }
-  }))
-{
-  std::cerr << "[AutowareUniverse] Starting constructor with simulate_localization=" << simulate_localization << std::endl;
-  std::cerr << "[AutowareUniverse] Constructor completed successfully! Starting spinner thread." << std::endl;
+  });
+
+  std::cerr << "[AutowareUniverse] Constructor completed successfully! Spinner thread started." << std::endl;
 }
 catch (...)
 {
