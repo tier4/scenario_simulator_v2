@@ -5,6 +5,19 @@ Changelog for package agnocast_wrapper
 16.4.2 (2025-05-23)
 -------------------
 
+17.0.0 (2025-08-06)
+-------------------
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Contributors: Grzegorz Maj, Kotaro Yoshimoto, Masaya Kataoka, Mateusz Palczuk
+
 16.11.0 (2025-08-01)
 --------------------
 * Merge branch 'master' into RJD-1769/centerline
