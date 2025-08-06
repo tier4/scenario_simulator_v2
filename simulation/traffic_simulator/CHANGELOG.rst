@@ -24,6 +24,70 @@ Changelog for package traffic_simulator
 16.4.2 (2025-05-23)
 -------------------
 
+16.11.0 (2025-08-01)
+--------------------
+* Merge pull request `#1587 <https://github.com/tier4/scenario_simulator_v2/issues/1587>`_ from tier4/RJD-1769/centerline
+* Merge branch 'master' into RJD-1769/centerline
+* Delete unused HdMapUtils::overwriteLaneletsCenterline
+* Add use_custom_centerline argument and switch behavior
+* Merge remote-tracking branch 'origin/master' into RJD-1769/centerline
+  # Conflicts:
+  #	simulation/traffic_simulator/src/hdmap_utils/hdmap_utils.cpp
+* Merge branch 'master' into RJD-1769/centerline
+* Merge branch 'master' into RJD-1769/centerline
+* RJD-1769 Force creating centerline for all lanelets
+* Contributors: Grzegorz Maj, Kotaro Yoshimoto
+
+16.10.0 (2025-07-31)
+--------------------
+* Merge branch 'master' into feature/traffic_signal_state_v2i
+* Contributors: Kotaro Yoshimoto
+
+16.9.0 (2025-07-28)
+-------------------
+* Merge pull request `#1650 <https://github.com/tier4/scenario_simulator_v2/issues/1650>`_ from tier4/feature/transverse_mercator_projection_support
+* Merge branch 'master' into feature/transverse_mercator_projection_support
+* Fix: avoid returning reference to temporary YAML::Node, Returning by value is safe and efficient, as `YAML::Node` is a lightweight shared_ptr-like wrapper
+* refactor: improve lanelet loader error handling and reduce nesting
+* fix: add exception if projector_type is not defined
+* Remove unnecessary constexprs
+* refactor: enhance lanelet loader with const correctness and reduced allocations
+* fix typo
+* extracted TM projector producer as a function
+* test fix
+* clang format
+* projector config content error handling
+* headers cleanup
+* Merge remote-tracking branch 'origin/master' into feature/transverse_mercator_projection_support
+* error handling, small cleanup
+* transverse mercator support with projection parameters location assumption
+* init commit from Yoshimoto-san's patch
+* Contributors: Dawid Moszynski, Dawid Moszyński, Kotaro Yoshimoto, Piotr Zyskowski
+
+16.8.3 (2025-07-24)
+-------------------
+* Merge branch 'master' into patch-1
+* Merge branch 'master' into patch-1
+* Merge branch 'master' into patch-1
+* Contributors: Kotaro Yoshimoto
+
+16.8.2 (2025-07-24)
+-------------------
+
+16.8.1 (2025-07-22)
+-------------------
+* Merge branch 'master' into fix-orientation-availability
+* Contributors: Kotaro Yoshimoto
+
+16.8.0 (2025-07-22)
+-------------------
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* Contributors: SzymonParapura, Taiga
+
 16.7.6 (2025-07-15)
 -------------------
 * Merge branch 'master' into fix-orientation-availability

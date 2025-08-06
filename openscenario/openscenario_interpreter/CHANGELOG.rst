@@ -35,6 +35,59 @@ Changelog for package openscenario_interpreter
 16.4.2 (2025-05-23)
 -------------------
 
+16.11.0 (2025-08-01)
+--------------------
+* Merge branch 'master' into RJD-1769/centerline
+* Merge remote-tracking branch 'origin/master' into RJD-1769/centerline
+  # Conflicts:
+  #	simulation/traffic_simulator/src/hdmap_utils/hdmap_utils.cpp
+* Merge branch 'master' into RJD-1769/centerline
+* Merge branch 'master' into RJD-1769/centerline
+* Contributors: Grzegorz Maj, Kotaro Yoshimoto
+
+16.10.0 (2025-07-31)
+--------------------
+* Merge pull request `#1654 <https://github.com/tier4/scenario_simulator_v2/issues/1654>`_ from tier4/feature/traffic_signal_state_v2i
+* Rename TrafficSignalState::traffic_signal_type to trafficSignalType
+* Implement TrafficSignalType struct instead of enum
+* Merge branch 'master' into feature/traffic_signal_state_v2i
+* Delete unused commented-out code in test_parsed_traffic_signal_id.cpp
+* Add tests for TrafficSignalState::ParsedTrafficSignalID
+* Implement constructor of TrafficSignalState::ParsedTrafficSignalID
+* Add TrafficSignalState::ParsedTrafficSignalID to support traffic signal type specification in trafficSignalId attribute
+* Update xsd comment to OpenSCENARIO 1.3.1 for TrafficSignalState
+* Contributors: Kotaro Yoshimoto
+
+16.9.0 (2025-07-28)
+-------------------
+* Merge branch 'master' into feature/transverse_mercator_projection_support
+* Merge remote-tracking branch 'origin/master' into feature/transverse_mercator_projection_support
+* Contributors: Dawid Moszyński, Piotr Zyskowski
+
+16.8.3 (2025-07-24)
+-------------------
+* Merge branch 'master' into patch-1
+* Merge branch 'master' into patch-1
+* Merge branch 'master' into patch-1
+* Contributors: Kotaro Yoshimoto
+
+16.8.2 (2025-07-24)
+-------------------
+
+16.8.1 (2025-07-22)
+-------------------
+* Merge branch 'master' into fix-orientation-availability
+* Contributors: Kotaro Yoshimoto
+
+16.8.0 (2025-07-22)
+-------------------
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* Contributors: SzymonParapura, Taiga
+
 16.7.6 (2025-07-15)
 -------------------
 * Merge branch 'master' into fix-orientation-availability
