@@ -135,6 +135,14 @@ auto TrafficSignalController::updatePredictions() -> void
             accumulated_time, traffic_signal_state.state);
         }
       }
+      if (not is_added) {
+        // if not extract prediction from V2I traffic light, try extraction from conventional traffic light
+        for (const auto & traffic_signal_state : (*phase).traffic_signal_states) {
+          is_added = true;
+          predictions_by_id[traffic_signal_state.id()].emplace_back(
+            accumulated_time, traffic_signal_state.state);
+        }
+      }
       return is_added;
     };
 

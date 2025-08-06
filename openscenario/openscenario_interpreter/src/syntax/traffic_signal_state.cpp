@@ -48,6 +48,7 @@ auto TrafficSignalState::evaluate() const -> Object
   switch (trafficSignalType()) {
     case TrafficSignalType::conventional:
       setConventionalTrafficLightsState(id(), state);
+      setV2ITrafficLightsState(id(), state);
       break;
     case TrafficSignalType::v2i:
       setV2ITrafficLightsState(id(), state);
