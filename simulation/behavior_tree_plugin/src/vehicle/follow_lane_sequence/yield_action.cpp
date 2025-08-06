@@ -115,6 +115,8 @@ BT::NodeStatus YieldAction::doAction()
     const auto obstacle = calculateObstacle(waypoints);
     setOutput("waypoints", waypoints);
     setOutput("obstacle", obstacle);
+    std::cout << "YieldAction" << std::endl;
+
     return BT::NodeStatus::SUCCESS;
   }
   distance_to_stop_target_ = getYieldStopDistance(route_lanelets_);
@@ -130,6 +132,8 @@ BT::NodeStatus YieldAction::doAction()
   const auto obstacle = calculateObstacle(waypoints);
   setOutput("waypoints", waypoints);
   setOutput("obstacle", obstacle);
+  std::cout << "YieldAction" << std::endl;
+
   return BT::NodeStatus::RUNNING;
 }
 }  // namespace follow_lane_sequence

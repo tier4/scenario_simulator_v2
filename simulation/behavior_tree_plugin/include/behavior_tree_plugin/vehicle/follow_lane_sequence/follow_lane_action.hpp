@@ -17,6 +17,8 @@
 
 #include <behavior_tree_plugin/vehicle/behavior_tree.hpp>
 #include <behavior_tree_plugin/vehicle/vehicle_action_node.hpp>
+#include <geometry/vector3/norm.hpp>
+#include <geometry/vector3/operator.hpp>
 #include <optional>
 #include <string>
 #include <vector>

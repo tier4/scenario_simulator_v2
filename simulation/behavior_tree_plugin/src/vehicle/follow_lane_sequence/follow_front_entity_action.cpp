@@ -125,6 +125,8 @@ BT::NodeStatus FollowFrontEntityAction::doAction()
     const auto obstacle = calculateObstacle(waypoints);
     setOutput("waypoints", waypoints);
     setOutput("obstacle", obstacle);
+    std::cout << "FollowFrontEntityAction1" << std::endl;
+
     return BT::NodeStatus::RUNNING;
   }
   if (
@@ -135,19 +137,16 @@ BT::NodeStatus FollowFrontEntityAction::doAction()
       calculateUpdatedEntityStatus(front_entity_linear_velocity + speed_step));
     setOutput("waypoints", waypoints);
     setOutput("obstacle", calculateObstacle(waypoints));
-    return BT::NodeStatus::RUNNING;
-  } else if (
-    distance_to_front_entity_.value() <=
-    calculateStopDistance(behavior_parameter_.dynamic_constraints)) {
-    setCanonicalizedEntityStatus(
-      calculateUpdatedEntityStatus(front_entity_linear_velocity - speed_step));
-    setOutput("waypoints", waypoints);
-    setOutput("obstacle", calculateObstacle(waypoints));
+    std::cout << "FollowFrontEntityAction2" << std::endl;
+
     return BT::NodeStatus::RUNNING;
   } else {
     setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(front_entity_linear_velocity));
     setOutput("waypoints", waypoints);
     setOutput("obstacle", calculateObstacle(waypoints));
+    std::cout << "FollowFrontEntityAction4: " << front_entity_linear_velocity * 3.6 << " km/h"
+              << std::endl;
+
     return BT::NodeStatus::RUNNING;
   }
 }

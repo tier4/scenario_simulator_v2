@@ -131,6 +131,8 @@ BT::NodeStatus StopAtTrafficLightAction::doAction()
   const auto obstacle = calculateObstacle(waypoints);
   setOutput("waypoints", waypoints);
   setOutput("obstacle", obstacle);
+  std::cout << "StopAtTrafficLightAction" << std::endl;
+
   return BT::NodeStatus::RUNNING;
 }
 }  // namespace follow_lane_sequence
