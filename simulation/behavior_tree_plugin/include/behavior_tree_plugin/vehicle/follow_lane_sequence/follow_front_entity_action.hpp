@@ -45,7 +45,8 @@ private:
   std::optional<double> distance_to_front_entity_;
   static constexpr double waypoint_interval = 1.0;
   static constexpr double front_entity_margin = 5.0;
-  static constexpr double speed_step = 2.0;
+  static constexpr double tau_velocity_track = 2.0;
+  static constexpr double margin_tolerance = 1.0;
 };
 }  // namespace follow_lane_sequence
 }  // namespace vehicle
