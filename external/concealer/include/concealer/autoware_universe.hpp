@@ -82,8 +82,6 @@ private:
 
   const rclcpp::TimerBase::SharedPtr vehicle_state_update_timer;
 
-  std::thread spinner;
-
   std::atomic<bool> is_stop_requested = false;
 
   std::atomic<std::uint8_t> current_control_mode = ControlModeReport::AUTONOMOUS;
@@ -91,6 +89,8 @@ private:
   std::atomic<bool> is_thrown = false;
 
   std::exception_ptr thrown;
+
+  std::thread spinner;
 
 public:
   CONCEALER_PUBLIC explicit AutowareUniverse(bool);
