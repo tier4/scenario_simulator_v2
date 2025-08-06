@@ -308,7 +308,7 @@ auto ActionNode::getEntityStatus(const std::string & target_name) const
  *    routable lanelet, within matching distance (findRoutableAlternativeLaneletPoseFrom).
  * 2. Calculate longitudinal distance between entities bounding boxes -> bounding_box_distance.
  * 3. Calculate longitudinal distance between entities poses -> longitudinal_distance.
- * 4. Calculate target entity bounding box distance to reference entity spline (minimal distance from all corners) 
+ * 4. Calculate target entity bounding box distance to reference entity spline (minimal distance from all corners)
  *    -> target_to_spline_distance.
  * 5. If target_to_spline_distance is less than half width of reference entity target entity is conflicting.
  * 6. Check corner case where target entity width is bigger than width of entity and target entity

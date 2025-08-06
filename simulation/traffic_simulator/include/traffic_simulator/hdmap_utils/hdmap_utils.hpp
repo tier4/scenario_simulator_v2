@@ -326,8 +326,6 @@ private:
 
   auto mapCallback(const autoware_map_msgs::msg::LaneletMapBin &) const -> void;
 
-  auto overwriteLaneletsCenterline() -> void;
-
   auto resamplePoints(const lanelet::ConstLineString3d &, const std::int32_t num_segments) const
     -> lanelet::BasicPoints3d;
 
