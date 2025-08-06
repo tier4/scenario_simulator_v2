@@ -27,11 +27,13 @@ OpenSCENARIO:
               duration: 10
               TrafficSignalState:
                 - { trafficSignalId: '34802', state: 'green' }
+                - { trafficSignalId: '34802 v2i', state: 'green' }
                 - { trafficSignalId: '34802', state: 'none' }
             - name: phase-2
               duration: 10
               TrafficSignalState:
                 - { trafficSignalId: '34802', state: 'yellow' }
+                - { trafficSignalId: '34802 v2i', state: 'yellow' }
             - name: dummy-phase (for debugging corner case)
               duration: 0
               TrafficSignalState: []
@@ -39,6 +41,7 @@ OpenSCENARIO:
               duration: 30
               TrafficSignalState:
                 - { trafficSignalId: '34802', state: 'red' }
+                - { trafficSignalId: '34802 v2i', state: 'red' }
                 - { trafficSignalId: '34802', state: 'left' }
         - name: empty-controller (for debugging corner case)
           Phase: []
