@@ -45,7 +45,6 @@ ament_auto_add_library(traffic_simulator SHARED
   src/entity/misc_object_entity.cpp
   src/entity/pedestrian_entity.cpp
   src/entity/vehicle_entity.cpp
-  src/hdmap_utils/hdmap_utils.cpp
   src/helper/helper.cpp
   src/helper/ostream_helpers.cpp
   src/job/job.cpp
@@ -73,6 +72,7 @@ ament_auto_add_library(traffic_simulator SHARED
   src/utils/lanelet_map.cpp
   src/utils/pose.cpp
   src/utils/route.cpp
+  src/utils/traffic_lights.cpp
 )
 
 ament_auto_add_library(visualization_component SHARED
