@@ -24,14 +24,16 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- TrafficSignalState -----------------------------------------------------
- *
- *  <xsd:complexType name="TrafficSignalState">
- *    <xsd:attribute name="trafficSignalId" type="String" use="required"/>
- *    <xsd:attribute name="state" type="String" use="required"/>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   TrafficSignalState (OpenSCENARIO XML 1.3.1)
+
+   State of a traffic signal for this phase. One state per phase and traffic signal.
+
+   <xsd:complexType name="TrafficSignalState">
+     <xsd:attribute name="state" type="String" use="required"/>
+     <xsd:attribute name="trafficSignalId" type="String" use="required"/>
+   </xsd:complexType>
+*/
 struct TrafficSignalState : private SimulatorCore::NonStandardOperation
 {
   /* ---- NOTE -----------------------------------------------------------------
@@ -40,7 +42,8 @@ struct TrafficSignalState : private SimulatorCore::NonStandardOperation
    *  listed in TrafficSignal list of the RoadNetwork.
    *
    *  In the TIER IV OpenSCENARIO implementation, it is the Lanelet ID (positive
-   *  integer) of the traffic light.
+   *  integer) of the traffic light, optionally followed by a space and the
+   *  signal type ("v2i"). For example: "34802" or "34802 v2i".
    *
    * ------------------------------------------------------------------------ */
   const String traffic_signal_id;
@@ -57,7 +60,26 @@ struct TrafficSignalState : private SimulatorCore::NonStandardOperation
 
   auto evaluate() const -> Object;
 
-  auto id() const -> lanelet::Id;
+  struct TrafficSignalType
+  {
+    enum value_type { conventional, v2i } value;
+
+    explicit TrafficSignalType(value_type value) : value(value) {}
+
+    explicit TrafficSignalType(const std::string &);
+
+    constexpr operator value_type() const noexcept { return value; }
+  };
+
+  static auto parseTrafficSignalId(const std::string & traffic_signal_id)
+    -> std::pair<lanelet::Id, TrafficSignalType>;
+
+  auto id() const -> lanelet::Id { return parsed_traffic_signal_id.first; }
+
+  auto trafficSignalType() const -> TrafficSignalType { return parsed_traffic_signal_id.second; }
+
+private:
+  const std::pair<lanelet::Id, TrafficSignalType> parsed_traffic_signal_id;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
