@@ -24,6 +24,36 @@ Changelog for package status_monitor
 16.4.2 (2025-05-23)
 -------------------
 
+17.0.0 (2025-08-06)
+-------------------
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Contributors: Grzegorz Maj, Kotaro Yoshimoto, Masaya Kataoka, Mateusz Palczuk, Tatsuya Yamasaki
+
+16.11.0 (2025-08-01)
+--------------------
+* Merge branch 'master' into RJD-1769/centerline
+* Merge remote-tracking branch 'origin/master' into RJD-1769/centerline
+  # Conflicts:
+  #	simulation/traffic_simulator/src/hdmap_utils/hdmap_utils.cpp
+* Merge branch 'master' into RJD-1769/centerline
+* Merge branch 'master' into RJD-1769/centerline
+* Contributors: Grzegorz Maj, Kotaro Yoshimoto
+
+16.10.0 (2025-07-31)
+--------------------
+* Merge branch 'master' into feature/traffic_signal_state_v2i
+* Contributors: Kotaro Yoshimoto
+
 16.9.0 (2025-07-28)
 -------------------
 * Merge branch 'master' into feature/transverse_mercator_projection_support

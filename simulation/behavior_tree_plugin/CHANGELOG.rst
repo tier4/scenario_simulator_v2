@@ -24,6 +24,43 @@ Changelog for package behavior_tree_plugin
 16.4.2 (2025-05-23)
 -------------------
 
+17.0.0 (2025-08-06)
+-------------------
+* Merge pull request `#1559 <https://github.com/tier4/scenario_simulator_v2/issues/1559>`_ from tier4/refactor/get_loungitudinal_distance
+  HdMapUtils refactor `lanelet_wrapper::distance::longitudinalDistance`
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Fix missing trailing underscores after merge
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* remove `hdmap_utils` from `follow_polyline_trajectory_action`
+* remove `hdmap_utils` from `boundingBoxLaneLongitudinalDistance`
+* remove `hdmap_utils` from `longitudinalDistance`
+* move `getLongitudinalDistance` method
+* Contributors: Grzegorz Maj, Kotaro Yoshimoto, Masaya Kataoka, Mateusz Palczuk, Tatsuya Yamasaki, abco20
+
+16.11.0 (2025-08-01)
+--------------------
+* Merge branch 'master' into RJD-1769/centerline
+* Merge remote-tracking branch 'origin/master' into RJD-1769/centerline
+  # Conflicts:
+  #	simulation/traffic_simulator/src/hdmap_utils/hdmap_utils.cpp
+* Merge branch 'master' into RJD-1769/centerline
+* Merge branch 'master' into RJD-1769/centerline
+* Contributors: Grzegorz Maj, Kotaro Yoshimoto
+
+16.10.0 (2025-07-31)
+--------------------
+* Merge branch 'master' into feature/traffic_signal_state_v2i
+* Contributors: Kotaro Yoshimoto
+
 16.9.0 (2025-07-28)
 -------------------
 * Merge branch 'master' into feature/transverse_mercator_projection_support
