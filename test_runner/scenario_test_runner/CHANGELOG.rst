@@ -38,6 +38,9 @@ Changelog for package scenario_test_runner
 16.4.2 (2025-05-23)
 -------------------
 
+17.0.2 (2025-08-07)
+-------------------
+
 17.0.1 (2025-08-07)
 -------------------
 * Merge branch 'master' into fix/spinner

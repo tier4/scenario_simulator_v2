@@ -114,7 +114,7 @@ Random test runner will load `result.yaml` file and rerun test.
    
 ### Preparing Unity project
 
- Follow [Setup Unity Project tutorial](https://tier4.github.io/AWSIM/GettingStarted/SetupUnityProject/)
+ Follow [Setup Unity Project tutorial](https://tier4.github.io/AWSIM/DeveloperGuide/SetupUnityProject/)
 
 ### Running the demo
 
