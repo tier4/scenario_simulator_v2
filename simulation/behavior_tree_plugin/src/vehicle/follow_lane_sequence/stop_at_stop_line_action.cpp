@@ -138,6 +138,8 @@ BT::NodeStatus StopAtStopLineAction::doAction()
         setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(target_speed_.value()));
         setOutput("waypoints", waypoints);
         setOutput("obstacle", calculateObstacle(waypoints));
+        std::cout << "StopAtStopLineAction" << std::endl;
+
         return BT::NodeStatus::RUNNING;
       }
     }
@@ -157,6 +159,8 @@ BT::NodeStatus StopAtStopLineAction::doAction()
   setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(target_speed_.value()));
   setOutput("waypoints", waypoints);
   setOutput("obstacle", calculateObstacle(waypoints));
+  std::cout << "StopAtStopLineAction" << std::endl;
+
   return BT::NodeStatus::RUNNING;
 }
 }  // namespace follow_lane_sequence

@@ -247,8 +247,13 @@ auto ActionNode::getDistanceToFrontEntity(
   const math::geometry::CatmullRomSplineInterface & spline) const -> std::optional<double>
 {
   if (const auto entity_name = getFrontEntityName(spline)) {
+    std::cout << "getDistanceToFrontEntity: " << entity_name.value() << std::endl;
+
     return getDistanceToTargetEntity(spline, getEntityStatus(entity_name.value()));
   } else {
+    std::cout << "getDistanceToFrontEntity: "
+              << "NULL" << std::endl;
+
     return std::nullopt;
   }
 }
@@ -259,7 +264,10 @@ auto ActionNode::getFrontEntityName(const math::geometry::CatmullRomSplineInterf
   if (euclidean_distances_map_ != nullptr) {
     std::map<double, std::string> local_euclidean_distances_map_;
     const double stop_distance = calculateStopDistance(behavior_parameter_.dynamic_constraints);
+    // 停止距離とスプラインの長さのうち大きい方を前方探索範囲（horizon）とします。
     const double horizon = spline.getLength() > stop_distance ? spline.getLength() : stop_distance;
+
+    // horizon 円にあるObjectを収集
     for (const auto & [name_pair, euclidean_distance] : *euclidean_distances_map_) {
       /**
        * @note Euclidean distance is here used as a "rough" distance to filter only NPCs which possibly are in range of current horizon. Because euclidean distance is the shortest possible distance comparing it with horizon will never omit NPCs for which actual lane distance is in range of horizon.
@@ -272,25 +280,28 @@ auto ActionNode::getFrontEntityName(const math::geometry::CatmullRomSplineInterf
         }
       }
     }
-
+    // target
+    // 前方判定
+    std::optional<std::string> closest_front_name;
+    double min_distance = std::numeric_limits<double>::max();
     for (const auto & [euclidean_distance, name] : local_euclidean_distances_map_) {
-      const auto quaternion = math::geometry::getRotation(
-        canonicalized_entity_status_->getMapPose().orientation,
-        other_entity_status_.at(name).getMapPose().orientation);
-      /**
-       * @note hard-coded parameter, if the Yaw value of RPY is in ~1.5708 -> 1.5708, entity is a candidate of front entity.
-       */
-      if (
-        std::fabs(math::geometry::convertQuaternionToEulerAngle(quaternion).z) <=
-        boost::math::constants::half_pi<double>()) {
-        const auto longitudinal_distance =
-          getDistanceToTargetEntity(spline, other_entity_status_.at(name));
-
-        if (longitudinal_distance && longitudinal_distance.value() < horizon) {
-          return name;
+      const auto self_pos = canonicalized_entity_status_->getMapPose().position;
+      const auto other_pos = other_entity_status_.at(name).getMapPose().position;
+      const auto dx = other_pos.x - self_pos.x;
+      const auto dy = other_pos.y - self_pos.y;
+      const auto self_yaw = math::geometry::convertQuaternionToEulerAngle(
+                              canonicalized_entity_status_->getMapPose().orientation)
+                              .z;
+      const auto vec_yaw = std::atan2(dy, dx);
+      const auto yaw_diff = std::atan2(std::sin(vec_yaw - self_yaw), std::cos(vec_yaw - self_yaw));
+      if (std::fabs(yaw_diff) <= boost::math::constants::half_pi<double>()) {
+        if (euclidean_distance < min_distance) {
+          min_distance = euclidean_distance;
+          closest_front_name = name;
         }
       }
     }
+    return closest_front_name;
   }
   return std::nullopt;
 }

@@ -79,6 +79,9 @@ bool FollowLaneAction::checkPreconditions()
 
 BT::NodeStatus FollowLaneAction::doAction()
 {
+  std::cout << "======== doAction ========" << std::endl;
+  std::cout << canonicalized_entity_status_->getName() << std::endl;
+
   if (!canonicalized_entity_status_->isInLanelet()) {
     stopEntity();
     const auto waypoints = traffic_simulator_msgs::msg::WaypointsArray{};
@@ -88,21 +91,35 @@ BT::NodeStatus FollowLaneAction::doAction()
   }
   const auto waypoints = calculateWaypoints();
   if (waypoints.waypoints.empty()) {
+    std::cout << "============A=============" << std::endl;
+
     return BT::NodeStatus::FAILURE;
   }
   if (behavior_parameter_.see_around) {
     if (getRightOfWayEntities(route_lanelets_).size() != 0) {
+      std::cout << "============B=============" << std::endl;
+
       return BT::NodeStatus::FAILURE;
     }
     if (trajectory == nullptr) {
+      std::cout << "============C=============" << std::endl;
+
       return BT::NodeStatus::FAILURE;
     }
     const auto distance_to_front_entity = getDistanceToFrontEntity(*trajectory);
     if (distance_to_front_entity) {
+      std::cout << "distance_to_front_entity: " << distance_to_front_entity.value() << std::endl;
+      std::cout << "calculateStopDistance: "
+                << calculateStopDistance(behavior_parameter_.dynamic_constraints) +
+                     vehicle_parameters.bounding_box.dimensions.x + front_entity_stop_margin
+                << std::endl;
+
       if (
         distance_to_front_entity.value() <=
         calculateStopDistance(behavior_parameter_.dynamic_constraints) +
           vehicle_parameters.bounding_box.dimensions.x + front_entity_stop_margin) {
+        std::cout << "============D=============" << std::endl;
+
         return BT::NodeStatus::FAILURE;
       }
     }
@@ -110,6 +127,8 @@ BT::NodeStatus FollowLaneAction::doAction()
       getDistanceToTrafficLightStopLine(route_lanelets_, *trajectory);
     if (distance_to_traffic_stop_line) {
       if (distance_to_traffic_stop_line.value() <= getHorizon()) {
+        std::cout << "============E=============" << std::endl;
+
         return BT::NodeStatus::FAILURE;
       }
     }
@@ -123,6 +142,8 @@ BT::NodeStatus FollowLaneAction::doAction()
         calculateStopDistance(behavior_parameter_.dynamic_constraints) +
           vehicle_parameters.bounding_box.dimensions.x * bounding_box_half_factor +
           stop_line_margin) {
+        std::cout << "============F=============" << std::endl;
+
         return BT::NodeStatus::FAILURE;
       }
     }
@@ -131,6 +152,8 @@ BT::NodeStatus FollowLaneAction::doAction()
         distance_to_conflicting_entity.value() <
         (vehicle_parameters.bounding_box.dimensions.x + conflicting_entity_margin +
          calculateStopDistance(behavior_parameter_.dynamic_constraints))) {
+        std::cout << "============G=============" << std::endl;
+
         return BT::NodeStatus::FAILURE;
       }
     }
@@ -141,6 +164,7 @@ BT::NodeStatus FollowLaneAction::doAction()
   setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(target_speed_.value()));
   setOutput("waypoints", waypoints);
   setOutput("obstacle", calculateObstacle(waypoints));
+  std::cout << "============H=============" << std::endl;
   return BT::NodeStatus::RUNNING;
 }
 }  // namespace follow_lane_sequence
