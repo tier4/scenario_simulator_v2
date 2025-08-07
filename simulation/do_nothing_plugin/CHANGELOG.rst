@@ -24,6 +24,11 @@ Changelog for package do_nothing_plugin
 16.4.2 (2025-05-23)
 -------------------
 
+17.0.1 (2025-08-07)
+-------------------
+* Merge branch 'master' into fix/spinner
+* Contributors: Kotaro Yoshimoto
+
 17.0.0 (2025-08-06)
 -------------------
 * Merge branch 'master' into refactor/get_loungitudinal_distance

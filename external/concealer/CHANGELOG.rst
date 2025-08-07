@@ -24,6 +24,16 @@ Changelog for package concealer
 16.4.2 (2025-05-23)
 -------------------
 
+17.0.1 (2025-08-07)
+-------------------
+* Merge pull request `#1661 <https://github.com/tier4/scenario_simulator_v2/issues/1661>`_ from tier4/fix/spinner
+* Merge branch 'master' into fix/spinner
+* Fix concealer::AutowareUniverse class member definition order with consideration of initialization dependencies
+* Revert "fix(concealer): fix spinner thread start timing"
+  This reverts commit fd01f977e94033db3157c1dd0226d4a48bf3214e.
+* fix(concealer): fix spinner thread start timing
+* Contributors: Kotaro Yoshimoto, kosuke55
+
 17.0.0 (2025-08-06)
 -------------------
 * Merge branch 'master' into refactor/get_loungitudinal_distance
