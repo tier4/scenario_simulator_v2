@@ -47,7 +47,7 @@ traffic_simulator::CanonicalizedEntityStatus getCanonicalizedEntityStatus(
   entity_status.pose.position.y = y;
   entity_status.pose.position.z = z;
   /// @note set invalid LaneletPose so pass std::nullopt
-  return traffic_simulator::CanonicalizedEntityStatus(entity_status, std::nullopt);
+  return traffic_simulator::CanonicalizedEntityStatus(entity_status, std::vector<traffic_simulator::CanonicalizedLaneletPose>{});
 }
 
 inline traffic_simulator_msgs::msg::LaneletPose makeLaneletPose(
