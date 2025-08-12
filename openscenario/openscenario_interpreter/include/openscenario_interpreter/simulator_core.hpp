@@ -83,8 +83,10 @@ public:
       constexpr bool include_crosswalk{false};
       if (
         const auto result =
-          traffic_simulator::pose::toCanonicalizedLaneletPose(pose, include_crosswalk)) {
-        return result.value();
+          traffic_simulator::pose::toCanonicalizedLaneletPoses(pose, include_crosswalk);
+        !result.empty()) {
+          // WIP just use first lanelet pose, should be changed in the future
+        return result.front();
       } else {
         throw Error(
           "The specified WorldPosition = [", pose.position.x, ", ", pose.position.y, ", ",
@@ -151,9 +153,11 @@ public:
       -> traffic_simulator::LaneletPose
     {
       if (const auto to_entity = core->getEntityPointer(to_entity_name)) {
-        if (const auto to_lanelet_pose = to_entity->getCanonicalizedLaneletPose()) {
+        if (const auto to_lanelet_poses = to_entity->getCanonicalizedLaneletPoses();
+            !to_lanelet_poses.empty()) {
           return makeNativeRelativeLanePosition(
-            from_entity_name, to_lanelet_pose.value(), routing_algorithm);
+            // WIP just use first lanelet pose, should be changed in the future
+            from_entity_name, to_lanelet_poses.front(), routing_algorithm);
         }
       }
       return traffic_simulator::pose::quietNaNLaneletPose();
@@ -165,9 +169,10 @@ public:
       -> traffic_simulator::LaneletPose
     {
       if (const auto from_entity = core->getEntityPointer(from_entity_name)) {
-        if (const auto from_lanelet_pose = from_entity->getCanonicalizedLaneletPose()) {
+        if (const auto from_lanelet_poses = from_entity->getCanonicalizedLaneletPoses();
+            !from_lanelet_poses.empty()) {
           return makeNativeRelativeLanePosition(
-            from_lanelet_pose.value(), to_lanelet_pose, routing_algorithm);
+            from_lanelet_poses.front(), to_lanelet_pose, routing_algorithm);
         }
       }
       return traffic_simulator::pose::quietNaNLaneletPose();
@@ -191,10 +196,13 @@ public:
     {
       if (const auto from_entity = core->getEntityPointer(from_entity_name)) {
         if (const auto to_entity = core->getEntityPointer(to_entity_name)) {
-          if (const auto from_lanelet_pose = from_entity->getCanonicalizedLaneletPose()) {
-            if (const auto to_lanelet_pose = to_entity->getCanonicalizedLaneletPose()) {
+          if (const auto from_lanelet_poses = from_entity->getCanonicalizedLaneletPoses();
+              !from_lanelet_poses.empty()) {
+            if (const auto to_lanelet_poses = to_entity->getCanonicalizedLaneletPoses();
+                !to_lanelet_poses.empty()) {
               return makeNativeBoundingBoxRelativeLanePosition(
-                from_lanelet_pose.value(), from_entity->getBoundingBox(), to_lanelet_pose.value(),
+                // WIP just use first lanelet pose, should be changed in the future
+                from_lanelet_poses.front(), from_entity->getBoundingBox(), to_lanelet_poses.front(),
                 to_entity->getBoundingBox(), routing_algorithm);
             }
           }
@@ -208,9 +216,11 @@ public:
       const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined)
     {
       if (const auto from_entity = core->getEntityPointer(from_entity_name)) {
-        if (const auto from_lanelet_pose = from_entity->getCanonicalizedLaneletPose()) {
+        if (const auto from_lanelet_poses = from_entity->getCanonicalizedLaneletPoses();
+            !from_lanelet_poses.empty()) {
           return makeNativeBoundingBoxRelativeLanePosition(
-            from_lanelet_pose.value(), from_entity->getBoundingBox(), to_lanelet_pose,
+            // WIP just use first lanelet pose, should be changed in the future
+            from_lanelet_poses.front(), from_entity->getBoundingBox(), to_lanelet_pose,
             traffic_simulator_msgs::msg::BoundingBox(), routing_algorithm);
         }
       }
@@ -268,17 +278,20 @@ public:
       const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined) -> int
     {
       if (
-        const auto from_lanelet_pose =
-          core->getEntity(from_entity_name).getCanonicalizedLaneletPose()) {
+        const auto from_lanelet_poses =
+          core->getEntity(from_entity_name).getCanonicalizedLaneletPoses();
+        !from_lanelet_poses.empty()) {
         if (
-          const auto to_lanelet_pose =
-            core->getEntity(to_entity_name).getCanonicalizedLaneletPose()) {
+          const auto to_lanelet_poses =
+            core->getEntity(to_entity_name).getCanonicalizedLaneletPoses();
+          !to_lanelet_poses.empty()) {
           traffic_simulator::RoutingConfiguration routing_configuration;
           routing_configuration.allow_lane_change =
             (routing_algorithm == RoutingAlgorithm::value_type::shortest);
           if (
             const auto lane_changes = traffic_simulator::distance::countLaneChanges(
-              from_lanelet_pose.value(), to_lanelet_pose.value(), routing_configuration,
+              // WIP just use first lanelet pose, should be changed in the future
+              from_lanelet_poses.front(), to_lanelet_poses.front(), routing_configuration,
               core->getHdmapUtils())) {
             return lane_changes.value().first - lane_changes.value().second;
           }
@@ -680,9 +693,11 @@ public:
     static auto evaluateRelativeHeading(const EntityRef & entity_ref)
     {
       if (const auto entity = core->getEntityPointer(entity_ref)) {
-        if (const auto canonicalized_lanelet_pose = entity->getCanonicalizedLaneletPose()) {
+        if (const auto canonicalized_lanelet_poses = entity->getCanonicalizedLaneletPoses();
+            !canonicalized_lanelet_poses.empty()) {
           return static_cast<Double>(std::abs(
-            static_cast<traffic_simulator::LaneletPose>(canonicalized_lanelet_pose.value()).rpy.z));
+            // WIP just use first lanelet pose, should be changed in the future
+            static_cast<traffic_simulator::LaneletPose>(canonicalized_lanelet_poses.front()).rpy.z));
         }
       }
       return Double::nan();
