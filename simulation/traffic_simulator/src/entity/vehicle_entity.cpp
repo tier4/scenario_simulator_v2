@@ -118,6 +118,12 @@ auto VehicleEntity::getRouteLanelets(double horizon) -> lanelet::Ids
     // WIP, this part is to heavy to refactor, so just return the first one
     return route_planner_.getRouteLanelets(canonicalized_lanelet_poses.front(), horizon);
   } else {
+    if (
+      const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
+        status_->getMapPose(), getBoundingBox(), route_planner_.getWholeRouteLanelets(), true,
+        getDefaultMatchingDistanceForLaneletPoseCalculation())) {
+      return route_planner_.getRouteLanelets(canonicalized_lanelet_pose.value(), horizon);
+    }
     return {};
   }
 }

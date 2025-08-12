@@ -83,7 +83,7 @@ private:
         // WIP just use first lanelet pose, should be changed in the future
         from_entity.getCanonicalizedLaneletPoses().front(),
         to_entity.getCanonicalizedLaneletPoses().front(), false, false,
-        traffic_simulator::RoutingConfiguration(), api_.getHdmapUtils());
+        traffic_simulator::RoutingConfiguration());
     }
     return std::nullopt;
   }

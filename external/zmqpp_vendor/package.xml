@@ -2,13 +2,13 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>zmqpp_vendor</name>
-  <version>16.5.5</version>
+  <version>17.0.2</version>
   <description>Vendor package for zmqpp</description>
   <maintainer email="masaya.kataoka@tier4.jp">Masaya Kataoka</maintainer>
   <license>Apache License 2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
-  <buildtool_depend>ament_cmake_auto</buildtool_depend>
+  <buildtool_depend>ament_cmake_vendor_package</buildtool_depend>
   <buildtool_depend>git</buildtool_depend>
 
   <depend>libzmq3-dev</depend>

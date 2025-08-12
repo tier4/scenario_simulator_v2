@@ -26,6 +26,7 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/behavior/follow_trajectory.hpp>
 #include <traffic_simulator/behavior/follow_waypoint_controller.hpp>
+#include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 
 namespace traffic_simulator
@@ -47,9 +48,8 @@ auto any(F f, T && x, Ts &&... xs)
 auto makeUpdatedStatus(
   const traffic_simulator_msgs::msg::EntityStatus & entity_status,
   traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
-  const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils, const double step_time,
-  double matching_distance, std::optional<double> target_speed) -> std::optional<EntityStatus>
+  const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter, const double step_time,
+  const double matching_distance, std::optional<double> target_speed) -> std::optional<EntityStatus>
 {
   using math::arithmetic::isApproximatelyEqualTo;
   using math::arithmetic::isDefinitelyLessThan;
@@ -61,41 +61,61 @@ auto makeUpdatedStatus(
   using math::geometry::operator+=;
 
   using math::geometry::CatmullRomSpline;
+  using math::geometry::convertDirectionToQuaternion;
   using math::geometry::hypot;
   using math::geometry::innerProduct;
   using math::geometry::norm;
   using math::geometry::normalize;
   using math::geometry::truncate;
 
-  // WIP temporary removed since it is not used
-  // const auto include_crosswalk = [](const auto & entity_type) {
-  //   return (traffic_simulator_msgs::msg::EntityType::PEDESTRIAN == entity_type.type) ||
-  //          (traffic_simulator_msgs::msg::EntityType::MISC_OBJECT == entity_type.type);
-  // }(entity_status.type);
+  constexpr bool include_adjacent_lanelet{false};
+  constexpr bool include_opposite_direction{false};
+  constexpr bool allow_lane_change{true};
+
+  const auto include_crosswalk = [](const auto & entity_type) {
+    return (traffic_simulator_msgs::msg::EntityType::PEDESTRIAN == entity_type.type) ||
+           (traffic_simulator_msgs::msg::EntityType::MISC_OBJECT == entity_type.type);
+  }(entity_status.type);
 
   auto distance_along_lanelet =
     [&](const geometry_msgs::msg::Point & from, const geometry_msgs::msg::Point & to) -> double {
-    const auto quaternion = math::geometry::convertDirectionToQuaternion(
-      geometry_msgs::build<geometry_msgs::msg::Vector3>()
-        .x(to.x - from.x)
-        .y(to.y - from.y)
-        .z(to.z - from.z));
-    const auto from_pose =
-      geometry_msgs::build<geometry_msgs::msg::Pose>().position(from).orientation(quaternion);
-    const auto to_pose =
-      geometry_msgs::build<geometry_msgs::msg::Pose>().position(to).orientation(quaternion);
-    if (const auto from_lanelet_poses = pose::toCanonicalizedLaneletPoses(
-          from_pose, entity_status.bounding_box, false, matching_distance);
-        !from_lanelet_poses.empty()) {
-      if (const auto to_lanelet_poses = pose::toCanonicalizedLaneletPoses(
-            to_pose, entity_status.bounding_box, false, matching_distance);
-          !to_lanelet_poses.empty()) {
-        if (const auto distance = hdmap_utils->getLongitudinalDistance(
-          // WIP only taking the first pose
-              static_cast<LaneletPose>(from_lanelet_poses.front()),
-              static_cast<LaneletPose>(to_lanelet_poses.front()));
-            distance) {
-          return distance.value();
+    using geometry_msgs::msg::Pose;
+    using geometry_msgs::msg::Vector3;
+
+    const RoutingConfiguration routing_configuration{allow_lane_change};
+
+    const auto quaternion = convertDirectionToQuaternion(
+      geometry_msgs::build<Vector3>().x(to.x - from.x).y(to.y - from.y).z(to.z - from.z));
+    const auto from_pose = geometry_msgs::build<Pose>().position(from).orientation(quaternion);
+    if (
+      const auto from_canonicalized_lanelet_poses = pose::toCanonicalizedLaneletPoses(
+        from_pose, entity_status.bounding_box, include_crosswalk, matching_distance);
+        !from_canonicalized_lanelet_poses.empty()) {
+      const auto to_pose = geometry_msgs::build<Pose>().position(to).orientation(quaternion);
+      if (
+        const auto to_canonicalized_lanelet_poses = pose::toCanonicalizedLaneletPoses(
+          to_pose, entity_status.bounding_box, include_crosswalk, matching_distance);
+          !to_canonicalized_lanelet_poses.empty()) {
+        if (const auto longitudinal_distance = distance::longitudinalDistance(
+              // WIP only taking the first pose
+              from_canonicalized_lanelet_poses.front(), to_canonicalized_lanelet_poses.front(),
+              include_adjacent_lanelet, include_opposite_direction, routing_configuration);
+            longitudinal_distance.has_value()
+            /**
+             * DIRTY HACK!
+             * Negative longitudinal distance (calculated along lanelet in opposite direction)
+             * causes some scenarios to fail because of an unrelated issue with lanelet matching.
+             * The issue is caused by wrongly matched lanelet poses and thus wrong distances.
+             * When lanelet matching errors are fixed, this dirty hack can be removed.
+             */
+            and longitudinal_distance.value() >= 0.0) {
+          if (
+            const auto lateral_distance = distance::lateralDistance(
+              // WIP only taking the first pose
+              from_canonicalized_lanelet_poses.front(), to_canonicalized_lanelet_poses.front(),
+              routing_configuration)) {
+            return std::hypot(longitudinal_distance.value(), lateral_distance.value());
+          }
         }
       }
     }
@@ -135,8 +155,8 @@ auto makeUpdatedStatus(
     }
 
     return makeUpdatedStatus(
-      entity_status, polyline_trajectory, behavior_parameter, hdmap_utils, step_time,
-      matching_distance, target_speed);
+      entity_status, polyline_trajectory, behavior_parameter, step_time, matching_distance,
+      target_speed);
   };
 
   auto is_infinity_or_nan = [](auto x) constexpr { return std::isinf(x) or std::isnan(x); };

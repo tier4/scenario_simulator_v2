@@ -84,23 +84,6 @@ protected:
 
   hdmap_utils::HdMapUtils hdmap_utils;
 };
-class HdMapUtilsTest_EmptyMap : public testing::Test
-{
-protected:
-  HdMapUtilsTest_EmptyMap()
-  : hdmap_utils(
-      ament_index_cpp::get_package_share_directory("traffic_simulator") +
-        "/map/empty/lanelet2_map.osm",
-      geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
-        .latitude(0.0)
-        .longitude(0.0)
-        .altitude(0.0))
-  {
-    activateLaneletWrapper("empty");
-  }
-
-  hdmap_utils::HdMapUtils hdmap_utils;
-};
 class HdMapUtilsTest_FourTrackHighwayMap : public testing::Test
 {
 protected:
@@ -196,6 +179,23 @@ TEST(HdMapUtils, Construct_invalid)
   EXPECT_THROW(
     auto hdmap_utils = hdmap_utils::HdMapUtils(
       ament_index_cpp::get_package_share_directory("traffic_simulator") + "invalid_path",
+      geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
+        .latitude(35.61836750154)
+        .longitude(139.78066608243)
+        .altitude(0.0)),
+    std::runtime_error);
+}
+
+/**
+ * @note Test basic functionality.
+ * Test initialization correctness with an empty lanelet map.
+ */
+TEST(HdMapUtils, Construct_emptyMap)
+{
+  EXPECT_THROW(
+    auto hdmap_utils = hdmap_utils::HdMapUtils(
+      ament_index_cpp::get_package_share_directory("traffic_simulator") +
+        "/map/empty/lanelet2_map.osm",
       geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
         .latitude(35.61836750154)
         .longitude(139.78066608243)
@@ -935,16 +935,6 @@ TEST_F(HdMapUtilsTest_StandardMap, getClosestLaneletId_onlyCrosswalkNearButExclu
 
     EXPECT_FALSE(result.has_value());
   }
-}
-
-/**
- * @note Test function behavior when the map contains no lanelets - the goal is to test
- * the branch when findNearest does not find anything and returns an empty vector.
- */
-TEST_F(HdMapUtilsTest_EmptyMap, getClosestLaneletId_emptyMap)
-{
-  EXPECT_FALSE(
-    hdmap_utils.getClosestLaneletId(makePose(makePoint(3.0, 5.0)), 7.0, false).has_value());
 }
 
 /**
@@ -2155,7 +2145,7 @@ TEST_F(HdMapUtilsTest_StandardMap, getLongitudinalDistance_sameLanelet)
   ASSERT_TRUE(pose_from.has_value());
   ASSERT_TRUE(pose_to.has_value());
 
-  const auto result_distance = hdmap_utils.getLongitudinalDistance(
+  const auto result_distance = traffic_simulator::lanelet_wrapper::distance::longitudinalDistance(
     pose_from.value(), pose_to.value(), traffic_simulator::RoutingConfiguration());
 
   ASSERT_TRUE(result_distance.has_value());
@@ -2176,8 +2166,9 @@ TEST_F(HdMapUtilsTest_StandardMap, getLongitudinalDistance_sameLaneletBehind)
   ASSERT_TRUE(pose_from.has_value());
   ASSERT_TRUE(pose_to.has_value());
 
-  const auto longitudinal_distance = hdmap_utils.getLongitudinalDistance(
-    pose_from.value(), pose_to.value(), traffic_simulator::RoutingConfiguration());
+  const auto longitudinal_distance =
+    traffic_simulator::lanelet_wrapper::distance::longitudinalDistance(
+      pose_from.value(), pose_to.value(), traffic_simulator::RoutingConfiguration());
   EXPECT_FALSE(longitudinal_distance.has_value());
 }
 
@@ -2195,7 +2186,7 @@ TEST_F(HdMapUtilsTest_StandardMap, getLongitudinalDistance_differentLanelet)
   ASSERT_TRUE(pose_from.has_value());
   ASSERT_TRUE(pose_to.has_value());
 
-  const auto result_distance = hdmap_utils.getLongitudinalDistance(
+  const auto result_distance = traffic_simulator::lanelet_wrapper::distance::longitudinalDistance(
     pose_from.value(), pose_to.value(), traffic_simulator::RoutingConfiguration());
 
   ASSERT_TRUE(result_distance.has_value());
@@ -2218,9 +2209,8 @@ TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLongitudinalDistance_differentLane
   ASSERT_TRUE(pose_from.has_value());
   ASSERT_TRUE(pose_to.has_value());
 
-  EXPECT_FALSE(hdmap_utils
-                 .getLongitudinalDistance(
-                   pose_from.value(), pose_to.value(), traffic_simulator::RoutingConfiguration())
+  EXPECT_FALSE(traffic_simulator::lanelet_wrapper::distance::longitudinalDistance(
+                 pose_from.value(), pose_to.value(), traffic_simulator::RoutingConfiguration())
                  .has_value());
 }
 
@@ -2235,7 +2225,8 @@ TEST_F(HdMapUtilsTest_KashiwanohaMap, getLongitudinalDistance_PullRequest1348)
   traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
   lane_changeable_routing_configuration.allow_lane_change = true;
   EXPECT_NO_THROW(EXPECT_DOUBLE_EQ(
-    hdmap_utils.getLongitudinalDistance(pose_from, pose_to, lane_changeable_routing_configuration)
+    traffic_simulator::lanelet_wrapper::distance::longitudinalDistance(
+      pose_from, pose_to, lane_changeable_routing_configuration)
       .value(),
     54.18867466433655977198213804513216018676757812500000));
 }
@@ -2256,11 +2247,13 @@ TEST_F(HdMapUtilsTest_IntersectionMap, getLongitudinalDistance_laneChange)
     const auto pose_to = traffic_simulator::helper::constructLaneletPose(659L, 5.0);
 
     const auto without_lane_change =
-      hdmap_utils.getLongitudinalDistance(pose_from, pose_to, default_routing_configuration);
+      traffic_simulator::lanelet_wrapper::distance::longitudinalDistance(
+        pose_from, pose_to, default_routing_configuration);
     EXPECT_FALSE(without_lane_change.has_value());
 
-    const auto with_lane_change = hdmap_utils.getLongitudinalDistance(
-      pose_from, pose_to, lane_changeable_routing_configuration);
+    const auto with_lane_change =
+      traffic_simulator::lanelet_wrapper::distance::longitudinalDistance(
+        pose_from, pose_to, lane_changeable_routing_configuration);
     ASSERT_TRUE(with_lane_change.has_value());
     EXPECT_NEAR(with_lane_change.value(), 157.0, 1.0);
   }
@@ -2269,11 +2262,13 @@ TEST_F(HdMapUtilsTest_IntersectionMap, getLongitudinalDistance_laneChange)
     const auto pose_to = traffic_simulator::helper::constructLaneletPose(658L, 5.0);
 
     const auto without_lane_change =
-      hdmap_utils.getLongitudinalDistance(pose_from, pose_to, default_routing_configuration);
+      traffic_simulator::lanelet_wrapper::distance::longitudinalDistance(
+        pose_from, pose_to, default_routing_configuration);
     EXPECT_FALSE(without_lane_change.has_value());
 
-    const auto with_lane_change = hdmap_utils.getLongitudinalDistance(
-      pose_from, pose_to, lane_changeable_routing_configuration);
+    const auto with_lane_change =
+      traffic_simulator::lanelet_wrapper::distance::longitudinalDistance(
+        pose_from, pose_to, lane_changeable_routing_configuration);
     ASSERT_TRUE(with_lane_change.has_value());
     EXPECT_NEAR(with_lane_change.value(), 161.0, 1.0);
   }
@@ -2282,11 +2277,13 @@ TEST_F(HdMapUtilsTest_IntersectionMap, getLongitudinalDistance_laneChange)
     const auto pose_to = traffic_simulator::helper::constructLaneletPose(657L, 5.0);
 
     const auto without_lane_change =
-      hdmap_utils.getLongitudinalDistance(pose_from, pose_to, default_routing_configuration);
+      traffic_simulator::lanelet_wrapper::distance::longitudinalDistance(
+        pose_from, pose_to, default_routing_configuration);
     EXPECT_FALSE(without_lane_change.has_value());
 
-    const auto with_lane_change = hdmap_utils.getLongitudinalDistance(
-      pose_from, pose_to, lane_changeable_routing_configuration);
+    const auto with_lane_change =
+      traffic_simulator::lanelet_wrapper::distance::longitudinalDistance(
+        pose_from, pose_to, lane_changeable_routing_configuration);
     ASSERT_TRUE(with_lane_change.has_value());
     EXPECT_NEAR(with_lane_change.value(), 161.0, 1.0);
   }
@@ -2295,11 +2292,13 @@ TEST_F(HdMapUtilsTest_IntersectionMap, getLongitudinalDistance_laneChange)
     const auto pose_to = traffic_simulator::helper::constructLaneletPose(666L, 5.0);
 
     const auto without_lane_change =
-      hdmap_utils.getLongitudinalDistance(pose_from, pose_to, default_routing_configuration);
+      traffic_simulator::lanelet_wrapper::distance::longitudinalDistance(
+        pose_from, pose_to, default_routing_configuration);
     EXPECT_FALSE(without_lane_change.has_value());
 
-    const auto with_lane_change = hdmap_utils.getLongitudinalDistance(
-      pose_from, pose_to, lane_changeable_routing_configuration);
+    const auto with_lane_change =
+      traffic_simulator::lanelet_wrapper::distance::longitudinalDistance(
+        pose_from, pose_to, lane_changeable_routing_configuration);
     ASSERT_TRUE(with_lane_change.has_value());
     EXPECT_NEAR(with_lane_change.value(), 250.0, 1.0);
   }
@@ -2308,11 +2307,13 @@ TEST_F(HdMapUtilsTest_IntersectionMap, getLongitudinalDistance_laneChange)
     const auto pose_to = traffic_simulator::helper::constructLaneletPose(665L, 5.0);
 
     const auto without_lane_change =
-      hdmap_utils.getLongitudinalDistance(pose_from, pose_to, default_routing_configuration);
+      traffic_simulator::lanelet_wrapper::distance::longitudinalDistance(
+        pose_from, pose_to, default_routing_configuration);
     EXPECT_FALSE(without_lane_change.has_value());
 
-    const auto with_lane_change = hdmap_utils.getLongitudinalDistance(
-      pose_from, pose_to, lane_changeable_routing_configuration);
+    const auto with_lane_change =
+      traffic_simulator::lanelet_wrapper::distance::longitudinalDistance(
+        pose_from, pose_to, lane_changeable_routing_configuration);
     ASSERT_TRUE(with_lane_change.has_value());
     EXPECT_NEAR(with_lane_change.value(), 253.0, 1.0);
   }
@@ -2376,14 +2377,6 @@ TEST_F(HdMapUtilsTest_StandardMap, stopLineIds_standardMap)
 TEST_F(HdMapUtilsTest_IntersectionMap, stopLineIds_intersectionMap)
 {
   EXPECT_EQ(traffic_simulator::lanelet_wrapper::lanelet_map::stopLineIds(), (lanelet::Ids{6960}));
-}
-
-/**
- * @note Test function behavior when used with an empty map.
- */
-TEST_F(HdMapUtilsTest_EmptyMap, stopLineIds_emptyMap)
-{
-  EXPECT_THROW(traffic_simulator::lanelet_wrapper::lanelet_map::stopLineIds(), std::runtime_error);
 }
 
 /**
