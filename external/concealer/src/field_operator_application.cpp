@@ -330,6 +330,7 @@ auto FieldOperatorApplication::initialize(const geometry_msgs::msg::Pose & initi
             LegacyAutowareState::undefined, LegacyAutowareState::initializing);
           [[fallthrough]];
         case LegacyAutowareState::initializing:
+        case LegacyAutowareState::waiting_for_route:
           requestInitialPose(
             [&]() {
               auto request =
