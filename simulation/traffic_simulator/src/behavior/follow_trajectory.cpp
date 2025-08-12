@@ -84,15 +84,16 @@ auto makeUpdatedStatus(
       geometry_msgs::build<geometry_msgs::msg::Pose>().position(from).orientation(quaternion);
     const auto to_pose =
       geometry_msgs::build<geometry_msgs::msg::Pose>().position(to).orientation(quaternion);
-    if (const auto from_lanelet_pose = pose::toCanonicalizedLaneletPose(
+    if (const auto from_lanelet_poses = pose::toCanonicalizedLaneletPoses(
           from_pose, entity_status.bounding_box, false, matching_distance);
-        from_lanelet_pose) {
-      if (const auto to_lanelet_pose = pose::toCanonicalizedLaneletPose(
+        !from_lanelet_poses.empty()) {
+      if (const auto to_lanelet_poses = pose::toCanonicalizedLaneletPoses(
             to_pose, entity_status.bounding_box, false, matching_distance);
-          to_lanelet_pose) {
+          !to_lanelet_poses.empty()) {
         if (const auto distance = hdmap_utils->getLongitudinalDistance(
-              static_cast<LaneletPose>(from_lanelet_pose.value()),
-              static_cast<LaneletPose>(to_lanelet_pose.value()));
+          // WIP only taking the first pose
+              static_cast<LaneletPose>(from_lanelet_poses.front()),
+              static_cast<LaneletPose>(to_lanelet_poses.front()));
             distance) {
           return distance.value();
         }

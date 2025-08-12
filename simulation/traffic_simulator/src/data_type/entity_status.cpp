@@ -21,41 +21,34 @@ inline namespace entity_status
 {
 CanonicalizedEntityStatus::CanonicalizedEntityStatus(
   const EntityStatus & may_non_canonicalized_entity_status,
-  const std::vector<std::optional<CanonicalizedLaneletPose>> & canonicalized_lanelet_poses)
+  const std::vector<CanonicalizedLaneletPose> & canonicalized_lanelet_poses)
 : canonicalized_lanelet_poses_{canonicalized_lanelet_poses},
   entity_status_{may_non_canonicalized_entity_status}
 {
   entity_status_.lanelet_poses.clear();
   for (const auto & canonicalized_lanelet_pose : canonicalized_lanelet_poses_) {
-    if (canonicalized_lanelet_pose) {
-      entity_status_.lanelet_poses.emplace_back(
-        static_cast<LaneletPose>(canonicalized_lanelet_pose.value()));
-      /*
+    entity_status_.lanelet_poses.emplace_back(static_cast<LaneletPose>(canonicalized_lanelet_pose));
+    /*
         The position in Oz axis and orientation based on LaneletPose are rewritten to
         the used msg::Pose (map_pose) since such adjustment relative to the lanelet is necessary,
         The position in Ox and Oy axis is not rewritten because the map_pose retrieved via
         lanelet_pose = pose::toCanonicalizedLaneletPose(map_pose), then map_pose pose::toMapPose(lanelet_pose)
         can be slightly different from the original one (especially if the entity changes lane).
       */
-      const auto map_pose_based_on_lanelet_pose =
-        static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose.value());
-      entity_status_.pose.position.z = map_pose_based_on_lanelet_pose.position.z;
-      entity_status_.pose.orientation = map_pose_based_on_lanelet_pose.orientation;
-    } else {
-      entity_status_.lanelet_poses.emplace_back(LaneletPose());
-    }
-    assert(
-      entity_status_.lanelet_poses.back().lanelet_pose_valid ==
-      canonicalized_lanelet_pose.has_value());
+    const auto map_pose_based_on_lanelet_pose =
+      static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose);
+    entity_status_.pose.position.z = map_pose_based_on_lanelet_pose.position.z;
+    entity_status_.pose.orientation = map_pose_based_on_lanelet_pose.orientation;
   }
+  assert(entity_status_.lanelet_poses.empty() == canonicalized_lanelet_poses_.empty());
 }
 
 CanonicalizedEntityStatus::CanonicalizedEntityStatus(
   const EntityStatus & may_non_canonicalized_entity_status,
-  const std::optional<CanonicalizedLaneletPose> & canonicalized_lanelet_pose)
+  const CanonicalizedLaneletPose & canonicalized_lanelet_pose)
 : CanonicalizedEntityStatus(
     may_non_canonicalized_entity_status,
-    std::vector<std::optional<CanonicalizedLaneletPose>>{canonicalized_lanelet_pose})
+    std::vector<CanonicalizedLaneletPose>{canonicalized_lanelet_pose})
 {
 }
 
@@ -83,7 +76,7 @@ auto CanonicalizedEntityStatus::set(
     getType().type == traffic_simulator_msgs::msg::EntityType::PEDESTRIAN ||
     getType().type == traffic_simulator_msgs::msg::EntityType::MISC_OBJECT;
 
-  std::vector<std::optional<CanonicalizedLaneletPose>> canonicalized_lanelet_poses;
+  std::vector<CanonicalizedLaneletPose> canonicalized_lanelet_poses;
   // if (status.lanelet_pose_valid) {
   //   canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(status.lanelet_poses);
   // } else {
@@ -93,11 +86,16 @@ auto CanonicalizedEntityStatus::set(
   // }
   for (const auto & lanelet_pose : status.lanelet_poses) {
     if (lanelet_pose.lanelet_pose_valid) {
-      canonicalized_lanelet_poses.emplace_back(pose::toCanonicalizedLaneletPose(lanelet_pose));
+      for (const auto & canonicalized_lanelet_pose :
+           pose::toCanonicalizedLaneletPoses({lanelet_pose})) {
+        canonicalized_lanelet_poses.emplace_back(canonicalized_lanelet_pose);
+      }
     } else {
-      canonicalized_lanelet_poses.emplace_back(
-        pose::toCanonicalizedLaneletPose(
-          status.pose, getBoundingBox(), lanelet_ids, include_crosswalk, matching_distance));
+      for (const auto & canonicalized_lanelet_pose :
+           pose::toCanonicalizedLaneletPoses(
+             status.pose, getBoundingBox(), lanelet_ids, include_crosswalk, matching_distance)) {
+        canonicalized_lanelet_poses.emplace_back(canonicalized_lanelet_pose);
+      }
     }
   }
   set(CanonicalizedEntityStatus(status, canonicalized_lanelet_poses));
@@ -154,7 +152,7 @@ auto CanonicalizedEntityStatus::getAltitude() const -> double
   if (canonicalized_lanelet_poses_.empty()) {
     THROW_SEMANTIC_ERROR("Target entity status did not matched to lanelet pose.");
   }
-  return canonicalized_lanelet_poses_.front()->getAltitude();
+  return canonicalized_lanelet_poses_.front().getAltitude();
 }
 
 auto CanonicalizedEntityStatus::getLaneletPose() const -> LaneletPose
@@ -170,7 +168,7 @@ auto CanonicalizedEntityStatus::getLaneletPose() const -> LaneletPose
   if (canonicalized_lanelet_poses_.empty()) {
     THROW_SEMANTIC_ERROR("Target entity status did not matched to lanelet pose.");
   }
-  return canonicalized_lanelet_poses_.front()->getLaneletPose();
+  return canonicalized_lanelet_poses_.front().getLaneletPose();
 }
 
 auto CanonicalizedEntityStatus::getLaneletPoses() const -> const std::vector<LaneletPose> &
@@ -190,7 +188,7 @@ auto CanonicalizedEntityStatus::getLaneletId() const -> lanelet::Id
   if (canonicalized_lanelet_poses_.empty()) {
     THROW_SEMANTIC_ERROR("Target entity status did not matched to lanelet pose.");
   }
-  return canonicalized_lanelet_poses_.front()->getLaneletId();
+  return canonicalized_lanelet_poses_.front().getLaneletId();
 }
 
 auto CanonicalizedEntityStatus::getLaneletIds() const -> lanelet::Ids
@@ -198,18 +196,10 @@ auto CanonicalizedEntityStatus::getLaneletIds() const -> lanelet::Ids
   return isInLanelet() ? lanelet::Ids{getLaneletId()} : lanelet::Ids{};
 }
 
-auto CanonicalizedEntityStatus::getCanonicalizedLaneletPose() const noexcept
-  -> const std::optional<CanonicalizedLaneletPose> &
+auto CanonicalizedEntityStatus::getCanonicalizedLaneletPoses() const noexcept
+  -> const std::vector<CanonicalizedLaneletPose> &
 {
-  // return canonicalized_lanelet_pose_;
-  // ###########################################################
-  // WIP this part is to heavy to refactor, so just return the first one
-  // ###########################################################
-  if (canonicalized_lanelet_poses_.empty()) {
-    static const std::optional<CanonicalizedLaneletPose> empty_optional = std::nullopt;
-    return empty_optional;
-  }
-  return canonicalized_lanelet_poses_.front();
+  return canonicalized_lanelet_poses_;
 }
 
 auto CanonicalizedEntityStatus::setTwist(const geometry_msgs::msg::Twist & twist) -> void

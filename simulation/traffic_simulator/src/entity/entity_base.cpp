@@ -76,13 +76,13 @@ auto EntityBase::get2DPolygon() const -> std::vector<geometry_msgs::msg::Point>
   return math::geometry::toPolygon2D(getBoundingBox());
 }
 
-auto EntityBase::getCanonicalizedLaneletPose() const -> std::optional<CanonicalizedLaneletPose>
+auto EntityBase::getCanonicalizedLaneletPoses() const -> std::vector<CanonicalizedLaneletPose>
 {
-  return status_->getCanonicalizedLaneletPose();
+  return status_->getCanonicalizedLaneletPoses();
 }
 
-auto EntityBase::getCanonicalizedLaneletPose(const double matching_distance) const
-  -> std::optional<CanonicalizedLaneletPose>
+auto EntityBase::getCanonicalizedLaneletPoses(const double matching_distance) const
+  -> std::vector<CanonicalizedLaneletPose>
 {
   const auto include_crosswalk = [](const auto & entity_type) {
     return (traffic_simulator_msgs::msg::EntityType::PEDESTRIAN == entity_type.type) ||
@@ -90,7 +90,7 @@ auto EntityBase::getCanonicalizedLaneletPose(const double matching_distance) con
   }(getEntityType());
 
   // prefer the current lanelet
-  return pose::toCanonicalizedLaneletPose(
+  return pose::toCanonicalizedLaneletPoses(
     status_->getMapPose(), status_->getBoundingBox(), status_->getLaneletIds(), include_crosswalk,
     matching_distance);
 }
@@ -110,10 +110,11 @@ auto EntityBase::isNearbyPosition(
 auto EntityBase::isInLanelet(const lanelet::Id lanelet_id, std::optional<double> tolerance) const
   -> bool
 {
-  if (const auto lanelet_pose = getCanonicalizedLaneletPose()) {
+  if (const auto lanelet_poses = getCanonicalizedLaneletPoses(); !lanelet_poses.empty()) {
     const auto tolerance_value =
       tolerance ? tolerance.value() : getDefaultMatchingDistanceForLaneletPoseCalculation();
-    return pose::isInLanelet(lanelet_pose.value(), lanelet_id, tolerance_value, hdmap_utils_ptr_);
+      // WIP only taking the first pose
+    return pose::isInLanelet(lanelet_poses.front(), lanelet_id, tolerance_value, hdmap_utils_ptr_);
   }
   return false;
 }
@@ -635,9 +636,10 @@ auto EntityBase::setStatus(
   const LaneletPose & lanelet_pose, const traffic_simulator_msgs::msg::ActionStatus & action_status)
   -> void
 {
-  if (const auto canonicalized_lanelet_pose = toCanonicalizedLaneletPose(lanelet_pose);
-      canonicalized_lanelet_pose.has_value()) {
-    setStatus(canonicalized_lanelet_pose.value(), action_status);
+  if (const auto canonicalized_lanelet_poses = toCanonicalizedLaneletPoses({lanelet_pose});
+      !canonicalized_lanelet_poses.empty()) {
+    // WIP only taking the first pose
+    setStatus(canonicalized_lanelet_poses.front(), action_status);
   } else {
     std::stringstream ss;
     ss << "Status can not be set. lanelet pose: " << lanelet_pose
@@ -778,8 +780,8 @@ auto EntityBase::requestSynchronize(
 
   job_list_.append(
     [this, target_name, target_sync_pose, entity_target, target_speed](double) {
-      const auto entity_lanelet_pose = getCanonicalizedLaneletPose();
-      if (!entity_lanelet_pose.has_value()) {
+      const auto entity_lanelet_poses = getCanonicalizedLaneletPoses();
+      if (entity_lanelet_poses.empty()) {
         THROW_SEMANTIC_ERROR(
           "Failed to get lanelet pose of the entity. Check if the entity is on the lane."
           "If so please contact the developer since there might be an undiscovered bug.");
@@ -787,9 +789,9 @@ auto EntityBase::requestSynchronize(
 
       RoutingConfiguration lane_changeable_routing_configuration;
       lane_changeable_routing_configuration.allow_lane_change = true;
-
+      // WIP only taking the first pose
       const auto entity_distance = longitudinalDistance(
-        entity_lanelet_pose.value(), entity_target, true, false,
+        entity_lanelet_poses.front(), entity_target, true, false,
         lane_changeable_routing_configuration, hdmap_utils_ptr_);
       if (!entity_distance.has_value()) {
         THROW_SEMANTIC_ERROR(

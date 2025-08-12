@@ -33,10 +33,10 @@ class CanonicalizedEntityStatus
 public:
   explicit CanonicalizedEntityStatus(
     const EntityStatus & may_non_canonicalized_entity_status,
-    const std::vector<std::optional<CanonicalizedLaneletPose>> & canonicalized_lanelet_poses);
+    const std::vector<CanonicalizedLaneletPose> & canonicalized_lanelet_poses);
   explicit CanonicalizedEntityStatus(
     const EntityStatus & may_non_canonicalized_entity_status,
-    const std::optional<CanonicalizedLaneletPose> & canonicalized_lanelet_pose);
+    const CanonicalizedLaneletPose & canonicalized_lanelet_pose);
   CanonicalizedEntityStatus(const CanonicalizedEntityStatus & obj);
   explicit operator EntityStatus() const noexcept { return entity_status_; }
 
@@ -73,8 +73,8 @@ public:
   auto getLaneletIds() const -> lanelet::Ids;
   auto getLaneletPose() const -> LaneletPose;
   auto getLaneletPoses() const -> const std::vector<LaneletPose> &;
-  auto getCanonicalizedLaneletPose() const noexcept
-    -> const std::optional<CanonicalizedLaneletPose> &;
+  auto getCanonicalizedLaneletPoses() const noexcept
+    -> const std::vector<CanonicalizedLaneletPose> &;
   auto getName() const noexcept -> const std::string & { return entity_status_.name; }
   auto getType() const noexcept -> const EntityType & { return entity_status_.type; }
   auto getSubtype() const noexcept -> const EntitySubtype & { return entity_status_.subtype; }
@@ -82,14 +82,13 @@ public:
   auto setCanonicalizedLaneletPosesValid(bool valid) -> void
   {
     for (auto & canonicalized_lanelet_pose : canonicalized_lanelet_poses_) {
-      if (canonicalized_lanelet_pose.has_value()) {
-        canonicalized_lanelet_pose.value().setLaneletPoseValid(valid);
-      }
+      // WIP not considered yet
+      canonicalized_lanelet_pose.setLaneletPoseValid(valid);
     }
   }
 
 private:
-  std::vector<std::optional<CanonicalizedLaneletPose>> canonicalized_lanelet_poses_;
+  std::vector<CanonicalizedLaneletPose> canonicalized_lanelet_poses_;
   EntityStatus entity_status_;
 };
 }  // namespace entity_status
