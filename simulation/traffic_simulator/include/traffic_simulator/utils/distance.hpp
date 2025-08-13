@@ -121,8 +121,8 @@ auto distanceAlongLanelet(
   const geometry_msgs::msg::Pose & from_pose,
   const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
   const geometry_msgs::msg::Pose & to_pose,
-  const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box, const double matching_distance,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<double>;
+  const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box, const double matching_distance)
+  -> std::optional<double>;
 
 // spline
 auto distanceToSpline(

@@ -34,7 +34,6 @@ struct PolylineTrajectoryPositioner
 {
 public:
   explicit PolylineTrajectoryPositioner(
-    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
     const ValidatedEntityStatus & validated_entity_status,
     const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
     const std::optional<double> target_speed, const double matching_distance,

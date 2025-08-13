@@ -71,7 +71,7 @@ bool FollowPolylineTrajectoryAction::checkPreconditions()
   }
 }
 
-BT::NodeStatus FollowPolylineTrajectoryAction::doAction()
+auto FollowPolylineTrajectoryAction::doAction() -> BT::NodeStatus
 {
   const auto getTargetSpeed = [this]() -> double {
     return target_speed_.value_or(canonicalized_entity_status_->getTwist().linear.x);

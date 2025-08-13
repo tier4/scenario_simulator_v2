@@ -33,12 +33,10 @@ namespace follow_trajectory
 {
 
 PolylineTrajectoryPositioner::PolylineTrajectoryPositioner(
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
   const ValidatedEntityStatus & validated_entity_status,
   const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
   const std::optional<double> target_speed, const double matching_distance, const double step_time)
-: hdmap_utils_ptr_(hdmap_utils_ptr),
-  validated_entity_status_(validated_entity_status),
+: validated_entity_status_(validated_entity_status),
   polyline_trajectory_(polyline_trajectory),
   step_time_(step_time),
   matching_distance_(matching_distance),
@@ -207,8 +205,7 @@ auto PolylineTrajectoryPositioner::validatedDistanceToNearestWaypoint() const ->
     math::geometry::hypot(validated_entity_status_.position(), nearest_waypoint_pose_.position);
   if (const std::optional<double> opt_distance_along_lanelet = distance::distanceAlongLanelet(
         validated_entity_status_.pose(), validated_entity_status_.boundingBox(),
-        nearest_waypoint_pose_, validated_entity_status_.boundingBox(), matching_distance_,
-        hdmap_utils_ptr_);
+        nearest_waypoint_pose_, validated_entity_status_.boundingBox(), matching_distance_);
       opt_distance_along_lanelet.has_value()) {
     if (opt_distance_along_lanelet.value() < 0.0) {
       /// @note FollowTrajectoryAction does not support backwards movement
@@ -245,7 +242,7 @@ auto PolylineTrajectoryPositioner::validatedTotalRemainingDistance() const -> do
         return total_distance + distance::distanceAlongLanelet(
                                   vertex.position, validated_entity_status_.boundingBox(),
                                   next_vertex->position, validated_entity_status_.boundingBox(),
-                                  matching_distance_, hdmap_utils_ptr_)
+                                  matching_distance_)
                                   .value_or(math::geometry::hypot(
                                     vertex.position.position, next_vertex->position.position));
       });
