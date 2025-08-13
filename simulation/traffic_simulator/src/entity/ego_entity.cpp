@@ -46,17 +46,16 @@ EgoEntity::EgoEntity(
       auto parameters =
         common::getParameter<std::vector<std::string>>(node_parameters, "autoware.", {});
       const std::string vehicle_id;
-      // clang-format off
-      try{
+
+      try {
          vehicle_id = common::getParameter<std::string>(node_parameters, "vehicle_id"));
-      } catch (...)
-      {
+      } catch (...) {
         vehicle_id = std::to_string(common::getParameter<int>(node_parameters, "vehicle_id"));
       }
-      if(vehicle_id != "default" && !vehicle_id.empty())
-      {
+      if (vehicle_id != "default" && !vehicle_id.empty()) {
         parameters.push_back("vehicle_id:=" + vehicle_id);
       }
+      // clang-format off
       parameters.push_back("map_path:=" + configuration.map_path.string());
       parameters.push_back("lanelet2_map_file:=" + configuration.getLanelet2MapFile());
       parameters.push_back("pointcloud_map_file:=" + configuration.getPointCloudMapFile());
