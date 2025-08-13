@@ -24,6 +24,29 @@ Changelog for package openscenario_msgs
 16.4.2 (2025-05-23)
 -------------------
 
+17.0.2 (2025-08-07)
+-------------------
+
+17.0.1 (2025-08-07)
+-------------------
+* Merge branch 'master' into fix/spinner
+* Contributors: Kotaro Yoshimoto
+
+17.0.0 (2025-08-06)
+-------------------
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Contributors: Grzegorz Maj, Kotaro Yoshimoto, Masaya Kataoka, Mateusz Palczuk, Tatsuya Yamasaki
+
 16.11.0 (2025-08-01)
 --------------------
 * Merge branch 'master' into RJD-1769/centerline
