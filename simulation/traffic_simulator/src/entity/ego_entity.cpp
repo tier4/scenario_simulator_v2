@@ -45,10 +45,10 @@ EgoEntity::EgoEntity(
         architecture_type.find("awf/universe") != std::string::npos) {
       auto parameters =
         common::getParameter<std::vector<std::string>>(node_parameters, "autoware.", {});
-      const std::string vehicle_id;
+      std::string vehicle_id;
 
       try {
-         vehicle_id = common::getParameter<std::string>(node_parameters, "vehicle_id"));
+        vehicle_id = common::getParameter<std::string>(node_parameters, "vehicle_id");
       } catch (...) {
         vehicle_id = std::to_string(common::getParameter<int>(node_parameters, "vehicle_id"));
       }
