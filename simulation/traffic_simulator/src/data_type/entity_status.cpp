@@ -91,8 +91,7 @@ auto CanonicalizedEntityStatus::set(
         canonicalized_lanelet_poses.emplace_back(canonicalized_lanelet_pose);
       }
     } else {
-      for (const auto & canonicalized_lanelet_pose :
-           pose::toCanonicalizedLaneletPoses(
+      for (const auto & canonicalized_lanelet_pose : pose::toCanonicalizedLaneletPoses(
              status.pose, getBoundingBox(), lanelet_ids, include_crosswalk, matching_distance)) {
         canonicalized_lanelet_poses.emplace_back(canonicalized_lanelet_pose);
       }

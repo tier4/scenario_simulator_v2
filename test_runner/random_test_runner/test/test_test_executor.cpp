@@ -235,7 +235,8 @@ TEST(TestExecutor, UpdateNoNPCs)
     MockAPI, TestDescription(), JunitXmlReporterTestCase(test_case), 20.0,
     ArchitectureType::AWF_UNIVERSE, rclcpp::get_logger("test_executor_test"));
   traffic_simulator::CanonicalizedEntityStatus status(
-    traffic_simulator_msgs::msg::EntityStatus(), std::vector<traffic_simulator::CanonicalizedLaneletPose>{});
+    traffic_simulator_msgs::msg::EntityStatus(),
+    std::vector<traffic_simulator::CanonicalizedLaneletPose>{});
 
   EXPECT_CALL(*MockAPI, isNpcLogicStarted)
     .Times(1)

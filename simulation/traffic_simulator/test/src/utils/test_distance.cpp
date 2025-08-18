@@ -261,8 +261,8 @@ TEST_F(distanceTest_StandardMap, longitudinalDistance_noAdjacent_noOpposite_noCh
     const auto pose_from =
       traffic_simulator::toCanonicalizedLaneletPoses(makePose(3800.05, 73715.77, 0.5, 30.0), false);
     ASSERT_TRUE(!pose_from.empty());
-    const auto pose_to =
-      traffic_simulator::toCanonicalizedLaneletPoses(makePose(3841.26, 73748.80, 0.5, 110.0), false);
+    const auto pose_to = traffic_simulator::toCanonicalizedLaneletPoses(
+      makePose(3841.26, 73748.80, 0.5, 110.0), false);
     ASSERT_TRUE(!pose_to.empty());
 
     // WIP just use the first canonicalized lanelet pose for now

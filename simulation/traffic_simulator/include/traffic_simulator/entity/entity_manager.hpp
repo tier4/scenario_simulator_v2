@@ -171,11 +171,10 @@ public:
         entity_status.pose = pose;
         const auto canonicalized_lanelet_poses = pose::toCanonicalizedLaneletPoses(
           pose, parameters.bounding_box, include_crosswalk, matching_distance);
-          // WIP only taking the first pose
+        // WIP only taking the first pose
         if (canonicalized_lanelet_poses.empty()) {
           THROW_SYNTAX_ERROR(
-            "Failed to convert geometry_msgs::msg::Pose to CanonicalizedLaneletPose. "
-          );
+            "Failed to convert geometry_msgs::msg::Pose to CanonicalizedLaneletPose. ");
         }
         return CanonicalizedEntityStatus(entity_status, canonicalized_lanelet_poses.front());
       }

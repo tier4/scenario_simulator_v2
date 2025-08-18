@@ -31,9 +31,8 @@ PedestrianEntity::PedestrianEntity(
 : EntityBase(name, entity_status, hdmap_utils_ptr),
   plugin_name(plugin_name),
   pedestrian_parameters(parameters),
-  loader_(
-    pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase>(
-      "traffic_simulator", "entity_behavior::BehaviorPluginBase")),
+  loader_(pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase>(
+    "traffic_simulator", "entity_behavior::BehaviorPluginBase")),
   behavior_plugin_ptr_(loader_.createSharedInstance(plugin_name)),
   route_planner_(traffic_simulator::RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER, hdmap_utils_ptr_)
 {
@@ -72,10 +71,9 @@ void PedestrianEntity::requestAssignRoute(
 {
   std::vector<CanonicalizedLaneletPose> route;
   for (const auto & waypoint : waypoints) {
-    if (
-      const auto canonicalized_lanelet_poses = pose::toCanonicalizedLaneletPoses(
-        waypoint, getBoundingBox(), true, getDefaultMatchingDistanceForLaneletPoseCalculation());
-      !canonicalized_lanelet_poses.empty()) {
+    if (const auto canonicalized_lanelet_poses = pose::toCanonicalizedLaneletPoses(
+          waypoint, getBoundingBox(), true, getDefaultMatchingDistanceForLaneletPoseCalculation());
+        !canonicalized_lanelet_poses.empty()) {
       // WIP only taking the first pose
       route.emplace_back(canonicalized_lanelet_poses.front());
     } else {
@@ -95,10 +93,10 @@ auto PedestrianEntity::requestFollowTrajectory(
     const auto curve = math::geometry::CatmullRomSpline(status_->getMapPose().position, parameter);
     /// @note Hard coded parameter: 1.0 is a sample resolution of the trajectory. (Unit: m)
     for (const auto & waypoint : curve.getTrajectoryPoses(0.0, curve.getLength(), 1.0)) {
-      if (
-        const auto canonicalized_lanelet_poses = pose::toCanonicalizedLaneletPoses(
-          waypoint, getBoundingBox(), true,
-          getDefaultMatchingDistanceForLaneletPoseCalculation()); !canonicalized_lanelet_poses.empty()) {
+      if (const auto canonicalized_lanelet_poses = pose::toCanonicalizedLaneletPoses(
+            waypoint, getBoundingBox(), true,
+            getDefaultMatchingDistanceForLaneletPoseCalculation());
+          !canonicalized_lanelet_poses.empty()) {
         // WIP only taking the first pose
         route_lanelets.push_back(canonicalized_lanelet_poses.front().getLaneletId());
       }
@@ -135,11 +133,10 @@ auto PedestrianEntity::getRouteLanelets(double horizon) -> lanelet::Ids
     // WIP, this part is to heavy to refactor, so just return the first one
     return route_planner_.getRouteLanelets(canonicalized_lanelet_poses.front(), horizon);
   } else {
-    if (
-      const auto canonicalized_lanelet_poses = pose::toCanonicalizedLaneletPoses(
-        status_->getMapPose(), getBoundingBox(), route_planner_.getWholeRouteLanelets(), true,
-        getDefaultMatchingDistanceForLaneletPoseCalculation());
-      !canonicalized_lanelet_poses.empty()) {
+    if (const auto canonicalized_lanelet_poses = pose::toCanonicalizedLaneletPoses(
+          status_->getMapPose(), getBoundingBox(), route_planner_.getWholeRouteLanelets(), true,
+          getDefaultMatchingDistanceForLaneletPoseCalculation());
+        !canonicalized_lanelet_poses.empty()) {
       return route_planner_.getRouteLanelets(canonicalized_lanelet_poses.front(), horizon);
     }
     return {};

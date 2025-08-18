@@ -289,10 +289,9 @@ auto toLaneletPoses(
 
   for (const auto & next_lanelet_id :
        lanelet_map::nextLaneletIds(lanelet_ids_using_bounding_box, type)) {
-    if (
-      const auto lanelet_poses_in_next_lanelet =
-        toLaneletPoses(map_pose, lanelet::Ids{next_lanelet_id}, matching_distance);
-      !lanelet_poses_in_next_lanelet.empty()) {
+    if (const auto lanelet_poses_in_next_lanelet =
+          toLaneletPoses(map_pose, lanelet::Ids{next_lanelet_id}, matching_distance);
+        !lanelet_poses_in_next_lanelet.empty()) {
       return lanelet_poses_in_next_lanelet;
     }
   }
@@ -621,9 +620,8 @@ auto leftLaneletIds(
       "lanelet_wrapper::pose::leftLaneletIds with include_opposite_direction=true is not "
       "implemented yet.");
   } else {
-    return lanelet_map::laneletIds(
-      LaneletWrapper::routingGraph(type)->lefts(
-        LaneletWrapper::map()->laneletLayer.get(lanelet_id)));
+    return lanelet_map::laneletIds(LaneletWrapper::routingGraph(type)->lefts(
+      LaneletWrapper::map()->laneletLayer.get(lanelet_id)));
   }
 }
 
@@ -637,9 +635,8 @@ auto rightLaneletIds(
       "implemented "
       "yet.");
   } else {
-    return lanelet_map::laneletIds(
-      LaneletWrapper::routingGraph(type)->rights(
-        LaneletWrapper::map()->laneletLayer.get(lanelet_id)));
+    return lanelet_map::laneletIds(LaneletWrapper::routingGraph(type)->rights(
+      LaneletWrapper::map()->laneletLayer.get(lanelet_id)));
   }
 }
 }  // namespace pose

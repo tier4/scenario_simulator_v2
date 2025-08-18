@@ -87,14 +87,12 @@ auto makeUpdatedStatus(
     const auto quaternion = convertDirectionToQuaternion(
       geometry_msgs::build<Vector3>().x(to.x - from.x).y(to.y - from.y).z(to.z - from.z));
     const auto from_pose = geometry_msgs::build<Pose>().position(from).orientation(quaternion);
-    if (
-      const auto from_canonicalized_lanelet_poses = pose::toCanonicalizedLaneletPoses(
-        from_pose, entity_status.bounding_box, include_crosswalk, matching_distance);
+    if (const auto from_canonicalized_lanelet_poses = pose::toCanonicalizedLaneletPoses(
+          from_pose, entity_status.bounding_box, include_crosswalk, matching_distance);
         !from_canonicalized_lanelet_poses.empty()) {
       const auto to_pose = geometry_msgs::build<Pose>().position(to).orientation(quaternion);
-      if (
-        const auto to_canonicalized_lanelet_poses = pose::toCanonicalizedLaneletPoses(
-          to_pose, entity_status.bounding_box, include_crosswalk, matching_distance);
+      if (const auto to_canonicalized_lanelet_poses = pose::toCanonicalizedLaneletPoses(
+            to_pose, entity_status.bounding_box, include_crosswalk, matching_distance);
           !to_canonicalized_lanelet_poses.empty()) {
         if (const auto longitudinal_distance = distance::longitudinalDistance(
               // WIP only taking the first pose
@@ -629,9 +627,8 @@ auto makeUpdatedStatus(
     updated_status.action_status.twist.linear.z = 0;
 
     updated_status.action_status.twist.angular =
-      math::geometry::convertQuaternionToEulerAngle(
-        math::geometry::getRotation(
-          entity_status.pose.orientation, updated_status.pose.orientation)) /
+      math::geometry::convertQuaternionToEulerAngle(math::geometry::getRotation(
+        entity_status.pose.orientation, updated_status.pose.orientation)) /
       step_time;
 
     updated_status.action_status.accel.linear =

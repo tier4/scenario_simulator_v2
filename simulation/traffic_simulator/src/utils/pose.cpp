@@ -34,11 +34,10 @@ inline namespace pose
 auto quietNaNPose() -> geometry_msgs::msg::Pose
 {
   return geometry_msgs::build<geometry_msgs::msg::Pose>()
-    .position(
-      geometry_msgs::build<geometry_msgs::msg::Point>()
-        .x(std::numeric_limits<double>::quiet_NaN())
-        .y(std::numeric_limits<double>::quiet_NaN())
-        .z(std::numeric_limits<double>::quiet_NaN()))
+    .position(geometry_msgs::build<geometry_msgs::msg::Point>()
+                .x(std::numeric_limits<double>::quiet_NaN())
+                .y(std::numeric_limits<double>::quiet_NaN())
+                .z(std::numeric_limits<double>::quiet_NaN()))
     .orientation(geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0).y(0).z(0).w(1));
 }
 
@@ -48,11 +47,10 @@ auto quietNaNLaneletPose() -> LaneletPose
     .lanelet_id(std::numeric_limits<std::int64_t>::max())
     .s(std::numeric_limits<double>::quiet_NaN())
     .offset(std::numeric_limits<double>::quiet_NaN())
-    .rpy(
-      geometry_msgs::build<geometry_msgs::msg::Vector3>()
-        .x(std::numeric_limits<double>::quiet_NaN())
-        .y(std::numeric_limits<double>::quiet_NaN())
-        .z(std::numeric_limits<double>::quiet_NaN()))
+    .rpy(geometry_msgs::build<geometry_msgs::msg::Vector3>()
+           .x(std::numeric_limits<double>::quiet_NaN())
+           .y(std::numeric_limits<double>::quiet_NaN())
+           .z(std::numeric_limits<double>::quiet_NaN()))
     .lanelet_pose_valid(false);
 }
 
@@ -494,11 +492,10 @@ auto transformToCanonicalizedLaneletPose(
   const lanelet::Ids & unique_route_lanelets, const bool include_crosswalk,
   const double matching_distance) -> std::optional<CanonicalizedLaneletPose>
 {
-  if (
-    const auto canonicalized_lanelet_poses = toCanonicalizedLaneletPoses(
-      map_pose, bounding_box, unique_route_lanelets, include_crosswalk, matching_distance);
-    !canonicalized_lanelet_poses.empty()) {
-      // WIP just return the first one
+  if (const auto canonicalized_lanelet_poses = toCanonicalizedLaneletPoses(
+        map_pose, bounding_box, unique_route_lanelets, include_crosswalk, matching_distance);
+      !canonicalized_lanelet_poses.empty()) {
+    // WIP just return the first one
     return canonicalized_lanelet_poses.front();
   }
   /// @note Hard coded parameter. 2.0 is a matching threshold for lanelet.

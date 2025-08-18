@@ -81,11 +81,10 @@ public:
     static auto convert(const NativeWorldPosition & pose) -> NativeLanePosition
     {
       constexpr bool include_crosswalk{false};
-      if (
-        const auto result =
-          traffic_simulator::pose::toCanonicalizedLaneletPoses(pose, include_crosswalk);
-        !result.empty()) {
-          // WIP just use first lanelet pose, should be changed in the future
+      if (const auto result =
+            traffic_simulator::pose::toCanonicalizedLaneletPoses(pose, include_crosswalk);
+          !result.empty()) {
+        // WIP just use first lanelet pose, should be changed in the future
         return result.front();
       } else {
         throw Error(
@@ -277,14 +276,12 @@ public:
       const std::string & from_entity_name, const std::string & to_entity_name,
       const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined) -> int
     {
-      if (
-        const auto from_lanelet_poses =
-          core->getEntity(from_entity_name).getCanonicalizedLaneletPoses();
-        !from_lanelet_poses.empty()) {
-        if (
-          const auto to_lanelet_poses =
-            core->getEntity(to_entity_name).getCanonicalizedLaneletPoses();
-          !to_lanelet_poses.empty()) {
+      if (const auto from_lanelet_poses =
+            core->getEntity(from_entity_name).getCanonicalizedLaneletPoses();
+          !from_lanelet_poses.empty()) {
+        if (const auto to_lanelet_poses =
+              core->getEntity(to_entity_name).getCanonicalizedLaneletPoses();
+            !to_lanelet_poses.empty()) {
           traffic_simulator::RoutingConfiguration routing_configuration;
           routing_configuration.allow_lane_change =
             (routing_algorithm == RoutingAlgorithm::value_type::shortest);
@@ -697,7 +694,8 @@ public:
             !canonicalized_lanelet_poses.empty()) {
           return static_cast<Double>(std::abs(
             // WIP just use first lanelet pose, should be changed in the future
-            static_cast<traffic_simulator::LaneletPose>(canonicalized_lanelet_poses.front()).rpy.z));
+            static_cast<traffic_simulator::LaneletPose>(canonicalized_lanelet_poses.front())
+              .rpy.z));
         }
       }
       return Double::nan();

@@ -451,12 +451,13 @@ TEST_F(
   MiscObjectEntityTest_HdMapUtils, getCanonicalizedLaneletPose_notOnRoadAndCrosswalkNotPedestrian)
 {
   EXPECT_FALSE(!traffic_simulator::entity::MiscObjectEntity(
-                 entity_name,
-                 makeCanonicalizedEntityStatus(
-                   makePose(makePoint(3810.0, 73745.0)), makeBoundingBox(), 1.0, 0.0, entity_name,
-                   traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
-                 hdmap_utils_ptr, traffic_simulator_msgs::msg::MiscObjectParameters{})
-                 .getCanonicalizedLaneletPoses(5.0).empty());
+                  entity_name,
+                  makeCanonicalizedEntityStatus(
+                    makePose(makePoint(3810.0, 73745.0)), makeBoundingBox(), 1.0, 0.0, entity_name,
+                    traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
+                  hdmap_utils_ptr, traffic_simulator_msgs::msg::MiscObjectParameters{})
+                  .getCanonicalizedLaneletPoses(5.0)
+                  .empty());
 }
 
 /**
@@ -468,13 +469,14 @@ TEST_F(MiscObjectEntityTest_HdMapUtils, getCanonicalizedLaneletPose_onRoadAndCro
 {
   EXPECT_TRUE(
     !traffic_simulator::entity::MiscObjectEntity(
-      entity_name,
-      makeCanonicalizedEntityStatus(
-        makePose(makePoint(3766.1, 73738.2), makeQuaternionFromYaw((120.0) * M_PI / 180.0)),
-        makeBoundingBox(), 1.0, 0.0, entity_name,
-        traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
-      hdmap_utils_ptr, traffic_simulator_msgs::msg::MiscObjectParameters{})
-      .getCanonicalizedLaneletPoses(1.0).empty());
+       entity_name,
+       makeCanonicalizedEntityStatus(
+         makePose(makePoint(3766.1, 73738.2), makeQuaternionFromYaw((120.0) * M_PI / 180.0)),
+         makeBoundingBox(), 1.0, 0.0, entity_name,
+         traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
+       hdmap_utils_ptr, traffic_simulator_msgs::msg::MiscObjectParameters{})
+       .getCanonicalizedLaneletPoses(1.0)
+       .empty());
 }
 
 /**
@@ -487,11 +489,12 @@ TEST_F(
 {
   EXPECT_FALSE(
     !traffic_simulator::entity::MiscObjectEntity(
-      entity_name,
-      makeCanonicalizedEntityStatus(
-        makePose(makePoint(3764.5, 73737.5), makeQuaternionFromYaw((120.0) * M_PI / 180.0)),
-        makeBoundingBox(), 1.0, 0.0, entity_name,
-        traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
-      hdmap_utils_ptr, traffic_simulator_msgs::msg::MiscObjectParameters{})
-      .getCanonicalizedLaneletPoses(1.0).empty());
+       entity_name,
+       makeCanonicalizedEntityStatus(
+         makePose(makePoint(3764.5, 73737.5), makeQuaternionFromYaw((120.0) * M_PI / 180.0)),
+         makeBoundingBox(), 1.0, 0.0, entity_name,
+         traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
+       hdmap_utils_ptr, traffic_simulator_msgs::msg::MiscObjectParameters{})
+       .getCanonicalizedLaneletPoses(1.0)
+       .empty());
 }

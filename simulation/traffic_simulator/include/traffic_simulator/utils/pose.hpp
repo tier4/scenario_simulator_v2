@@ -118,7 +118,7 @@ auto getShortestOffsetLaneletPose(
   const std::vector<CanonicalizedLaneletPose> & canonicalized_lanelet_poses)
   -> std::optional<CanonicalizedLaneletPose>;
 
-  namespace pedestrian
+namespace pedestrian
 {
 auto transformToCanonicalizedLaneletPose(
   const geometry_msgs::msg::Pose & map_pose,

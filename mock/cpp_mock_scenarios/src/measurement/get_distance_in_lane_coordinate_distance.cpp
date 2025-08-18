@@ -50,7 +50,8 @@ private:
       return traffic_simulator::distance::lateralDistance(
         // WIP just use first lanelet pose, should be changed in the future
         from_entity.getCanonicalizedLaneletPoses().front(),
-        to_entity.getCanonicalizedLaneletPoses().front(), traffic_simulator::RoutingConfiguration());
+        to_entity.getCanonicalizedLaneletPoses().front(),
+        traffic_simulator::RoutingConfiguration());
     }
     return std::nullopt;
   };

@@ -358,8 +358,9 @@ auto ActionNode::getDistanceToTargetEntity(
           // WIP just use first lanelet pose, should be changed in the future
           status.getCanonicalizedLaneletPoses().front(), target_bounding_box);
       target_lanelet_pose) {
-        // WIP just use first lanelet pose, should be changed in the future
-    const auto & from_lanelet_pose = canonicalized_entity_status_->getCanonicalizedLaneletPoses().front();
+    // WIP just use first lanelet pose, should be changed in the future
+    const auto & from_lanelet_pose =
+      canonicalized_entity_status_->getCanonicalizedLaneletPoses().front();
     const auto & from_bounding_box = canonicalized_entity_status_->getBoundingBox();
     const auto bounding_box_map_points = math::geometry::transformPoints(
       static_cast<geometry_msgs::msg::Pose>(*target_lanelet_pose),
@@ -507,10 +508,9 @@ auto ActionNode::calculateUpdatedEntityStatus(
   const double linear_jerk_new = std::get<2>(dynamics);
   const geometry_msgs::msg::Accel accel_new = std::get<1>(dynamics);
   const geometry_msgs::msg::Twist twist_new = std::get<0>(dynamics);
-  if (
-    const auto canonicalized_lanelet_poses =
-      canonicalized_entity_status_->getCanonicalizedLaneletPoses();
-    !canonicalized_lanelet_poses.empty()){
+  if (const auto canonicalized_lanelet_poses =
+        canonicalized_entity_status_->getCanonicalizedLaneletPoses();
+      !canonicalized_lanelet_poses.empty()) {
     const auto distance =
       (twist_new.linear.x + canonicalized_entity_status_->getTwist().linear.x) / 2.0 * step_time_;
     auto entity_status_updated =
@@ -587,10 +587,11 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
           traffic_simulator::pose::toCanonicalizedLaneletPoses(
             updated_pose, status->getBoundingBox(), include_crosswalk, matching_distance);
         if (!estimated_next_canonicalized_lanelet_poses.empty()) {
-          const auto next_lanelet_id = static_cast<traffic_simulator::LaneletPose>(
-            // WIP just use first lanelet pose, should be changed in the future
-                                         estimated_next_canonicalized_lanelet_poses.front())
-                                         .lanelet_id;
+          const auto next_lanelet_id =
+            static_cast<traffic_simulator::LaneletPose>(
+              // WIP just use first lanelet pose, should be changed in the future
+              estimated_next_canonicalized_lanelet_poses.front())
+              .lanelet_id;
           if (  /// @note Handle lanelet transition
             const auto updated_position =
               traffic_simulator::pose::updatePositionForLaneletTransition(

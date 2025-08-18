@@ -72,10 +72,9 @@ auto makePose(const double x, const double y, const double z, const double yaw_d
    */
   return geometry_msgs::build<geometry_msgs::msg::Pose>()
     .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(x).y(y).z(z))
-    .orientation(
-      math::geometry::convertEulerAngleToQuaternion(
-        geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0.0).y(0.0).z(
-          convertDegToRad(yaw_deg))));
+    .orientation(math::geometry::convertEulerAngleToQuaternion(
+      geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0.0).y(0.0).z(
+        convertDegToRad(yaw_deg))));
 }
 
 auto makePose(
@@ -122,17 +121,15 @@ auto makeEntityStatus(
 {
   return traffic_simulator_msgs::build<traffic_simulator::EntityStatus>()
     .type(traffic_simulator_msgs::build<traffic_simulator_msgs::msg::EntityType>().type(type))
-    .subtype(
-      traffic_simulator_msgs::build<traffic_simulator_msgs::msg::EntitySubtype>().value(
-        traffic_simulator_msgs::msg::EntitySubtype::UNKNOWN))
+    .subtype(traffic_simulator_msgs::build<traffic_simulator_msgs::msg::EntitySubtype>().value(
+      traffic_simulator_msgs::msg::EntitySubtype::UNKNOWN))
     .time(0.0)
     .name(name)
     .bounding_box(bbox)
     .action_status(traffic_simulator::helper::constructActionStatus(speed, 0.0, 0.0, 0.0))
     .pose(traffic_simulator::pose::toMapPose(pose))
-    .lanelet_poses(
-      std::vector<traffic_simulator_msgs::msg::LaneletPose>{
-        static_cast<traffic_simulator::LaneletPose>(pose)});
+    .lanelet_poses(std::vector<traffic_simulator_msgs::msg::LaneletPose>{
+      static_cast<traffic_simulator::LaneletPose>(pose)});
 }
 
 auto makeEntityStatus(
@@ -143,9 +140,8 @@ auto makeEntityStatus(
 {
   return traffic_simulator_msgs::build<traffic_simulator::EntityStatus>()
     .type(traffic_simulator_msgs::build<traffic_simulator_msgs::msg::EntityType>().type(type))
-    .subtype(
-      traffic_simulator_msgs::build<traffic_simulator_msgs::msg::EntitySubtype>().value(
-        traffic_simulator_msgs::msg::EntitySubtype::UNKNOWN))
+    .subtype(traffic_simulator_msgs::build<traffic_simulator_msgs::msg::EntitySubtype>().value(
+      traffic_simulator_msgs::msg::EntitySubtype::UNKNOWN))
     .time(0.0)
     .name(name)
     .bounding_box(bbox)

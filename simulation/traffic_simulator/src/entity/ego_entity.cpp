@@ -264,7 +264,7 @@ void EgoEntity::requestAssignRoute(
     routing_configuration.allow_lane_change = true;
     if (auto current_lanelet_poses = getCanonicalizedLaneletPoses();
         !current_lanelet_poses.empty()) {
-          // WIP only taking the first pose
+      // WIP only taking the first pose
       route_segments.push_back(make_segment(current_lanelet_poses.front().getLaneletId()));
     } else {
       throw common::Error(

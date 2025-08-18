@@ -187,10 +187,9 @@ auto TrafficSource::isPoseValid(
     return {true, std::nullopt};
   }
 
-  if (
-    auto canonicalized_lanelet_poses = pose::toCanonicalizedLaneletPoses(
-      pose, std::holds_alternative<PedestrianParameter>(parameter));
-    !canonicalized_lanelet_poses.empty()) {
+  if (auto canonicalized_lanelet_poses = pose::toCanonicalizedLaneletPoses(
+        pose, std::holds_alternative<PedestrianParameter>(parameter));
+      !canonicalized_lanelet_poses.empty()) {
     /// @note reset orientation - to align the entity with lane
     canonicalized_lanelet_poses.front().alignOrientationToLanelet();
     /// @note Step 3: check whether the bounding box can be outside lanelet
