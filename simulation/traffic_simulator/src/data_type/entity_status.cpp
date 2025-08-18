@@ -40,7 +40,7 @@ CanonicalizedEntityStatus::CanonicalizedEntityStatus(
     entity_status_.pose.position.z = map_pose_based_on_lanelet_pose.position.z;
     entity_status_.pose.orientation = map_pose_based_on_lanelet_pose.orientation;
   }
-  assert(entity_status_.lanelet_poses.empty() == canonicalized_lanelet_poses_.empty());
+  assert(entity_status_.lanelet_poses.size() == canonicalized_lanelet_poses_.size());
 }
 
 CanonicalizedEntityStatus::CanonicalizedEntityStatus(
