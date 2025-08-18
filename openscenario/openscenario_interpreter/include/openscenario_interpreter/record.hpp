@@ -36,12 +36,13 @@ namespace record
 {
 extern pid_t process_id;
 
-template <typename... Ts>
-auto start(Ts &&... xs) -> pid_t
+inline auto start(const std::vector<std::string> & args) -> pid_t
 {
-  const std::vector<std::string> command{
+  std::vector<std::string> command{
     "python3", boost::algorithm::replace_all_copy(concealer::dollar("which ros2"), "\n", ""), "bag",
-    "record", std::forward<decltype(xs)>(xs)...};
+    "record"};
+
+  command.insert(command.end(), args.begin(), args.end());
 
   switch (process_id = fork()) {
     case -1:

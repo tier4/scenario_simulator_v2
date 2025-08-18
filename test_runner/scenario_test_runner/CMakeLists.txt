@@ -8,7 +8,10 @@ find_package(ament_cmake_python REQUIRED)
 ament_python_install_package(${PROJECT_NAME})
 
 install(
-  DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/
+  PROGRAMS ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/scenario_test_runner.py
+           ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/result_checker.py
+           ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/lifecycle_controller.py
+           ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/scenario.py
   DESTINATION lib/${PROJECT_NAME})
 
 install(

@@ -24,6 +24,269 @@ Changelog for package traffic_simulator
 16.4.2 (2025-05-23)
 -------------------
 
+17.0.4 (2025-08-18)
+-------------------
+* Merge branch 'master' into HansRobo-patch-2
+* Merge branch 'master' into HansRobo-patch-2
+* Merge branch 'master' into HansRobo-patch-2
+* Contributors: Kotaro Yoshimoto
+
+17.0.3 (2025-08-18)
+-------------------
+
+17.0.2 (2025-08-07)
+-------------------
+
+17.0.1 (2025-08-07)
+-------------------
+* Merge branch 'master' into fix/spinner
+* Contributors: Kotaro Yoshimoto
+
+17.0.0 (2025-08-06)
+-------------------
+* Merge pull request `#1559 <https://github.com/tier4/scenario_simulator_v2/issues/1559>`_ from tier4/refactor/get_loungitudinal_distance
+  HdMapUtils refactor `lanelet_wrapper::distance::longitudinalDistance`
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Add DIRTY HACK to make the scenarios pass
+* Add more precise distance calculation in FTA
+  This also fixes the issue where FTA would crash because of negative distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Update simulation/traffic_simulator/src/utils/pose.cpp
+* Return absolute value of distance in distance_along_lanelet in follow_trajectory
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* fix format
+* remove `hdmap_utils` from `follow_polyline_trajectory_action`
+* remove `hdmap_utils` from `isInLanelet`
+* remove `hdmap_utils`from `boundingBoxRelativeLaneletPose`
+* remove `hdmap_utils` from `relativeLaneletPose`
+* remove `hdmap_utils` from `boundingBoxLaneLongitudinalDistance`
+* remove `hdmap_utils` from `longitudinalDistance`
+* Add constructors to RoutingConfiguration
+* move `getLongitudinalDistance` method
+* Contributors: Grzegorz Maj, Kotaro Yoshimoto, Masaya Kataoka, Mateusz Palczuk, Tatsuya Yamasaki, abco20
+
+16.11.0 (2025-08-01)
+--------------------
+* Merge pull request `#1587 <https://github.com/tier4/scenario_simulator_v2/issues/1587>`_ from tier4/RJD-1769/centerline
+* Merge branch 'master' into RJD-1769/centerline
+* Delete unused HdMapUtils::overwriteLaneletsCenterline
+* Add use_custom_centerline argument and switch behavior
+* Merge remote-tracking branch 'origin/master' into RJD-1769/centerline
+  # Conflicts:
+  #	simulation/traffic_simulator/src/hdmap_utils/hdmap_utils.cpp
+* Merge branch 'master' into RJD-1769/centerline
+* Merge branch 'master' into RJD-1769/centerline
+* RJD-1769 Force creating centerline for all lanelets
+* Contributors: Grzegorz Maj, Kotaro Yoshimoto
+
+16.10.0 (2025-07-31)
+--------------------
+* Merge branch 'master' into feature/traffic_signal_state_v2i
+* Contributors: Kotaro Yoshimoto
+
+16.9.0 (2025-07-28)
+-------------------
+* Merge pull request `#1650 <https://github.com/tier4/scenario_simulator_v2/issues/1650>`_ from tier4/feature/transverse_mercator_projection_support
+* Merge branch 'master' into feature/transverse_mercator_projection_support
+* Fix: avoid returning reference to temporary YAML::Node, Returning by value is safe and efficient, as `YAML::Node` is a lightweight shared_ptr-like wrapper
+* refactor: improve lanelet loader error handling and reduce nesting
+* fix: add exception if projector_type is not defined
+* Remove unnecessary constexprs
+* refactor: enhance lanelet loader with const correctness and reduced allocations
+* fix typo
+* extracted TM projector producer as a function
+* test fix
+* clang format
+* projector config content error handling
+* headers cleanup
+* Merge remote-tracking branch 'origin/master' into feature/transverse_mercator_projection_support
+* error handling, small cleanup
+* transverse mercator support with projection parameters location assumption
+* init commit from Yoshimoto-san's patch
+* Contributors: Dawid Moszynski, Dawid Moszyński, Kotaro Yoshimoto, Piotr Zyskowski
+
+16.8.3 (2025-07-24)
+-------------------
+* Merge branch 'master' into patch-1
+* Merge branch 'master' into patch-1
+* Merge branch 'master' into patch-1
+* Contributors: Kotaro Yoshimoto
+
+16.8.2 (2025-07-24)
+-------------------
+
+16.8.1 (2025-07-22)
+-------------------
+* Merge branch 'master' into fix-orientation-availability
+* Contributors: Kotaro Yoshimoto
+
+16.8.0 (2025-07-22)
+-------------------
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* Contributors: SzymonParapura, Taiga
+
+16.7.6 (2025-07-15)
+-------------------
+* Merge branch 'master' into fix-orientation-availability
+* Contributors: Kotaro Yoshimoto
+
+16.7.5 (2025-07-11)
+-------------------
+* Merge branch 'master' into feature/CODEOWNERS
+* Contributors: Kotaro Yoshimoto
+
+16.7.4 (2025-07-11)
+-------------------
+
+16.7.3 (2025-07-08)
+-------------------
+
+16.7.2 (2025-07-07)
+-------------------
+* Merge branch 'master' into fix/zmqpp
+* Merge branch 'master' into fix/zmqpp
+* Contributors: Kotaro Yoshimoto
+
+16.7.1 (2025-07-04)
+-------------------
+* Merge pull request `#1631 <https://github.com/tier4/scenario_simulator_v2/issues/1631>`_ from tier4/refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Isolate protoc output into project named directory
+* Add or update xml-model
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, f0reachARR
+
+16.7.0 (2025-07-03)
+-------------------
+* Merge branch 'master' into feature/record_option_for_rosbag
+* Merge branch 'master' into feature/record_option_for_rosbag
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
+16.6.1 (2025-07-02)
+-------------------
+
+16.6.0 (2025-07-01)
+-------------------
+* Merge branch 'master' into feature/perception_noise_config_v3
+* Merge branch 'master' into feature/perception_noise_config_v3
+* Contributors: Kotaro Yoshimoto
+
+16.5.11 (2025-06-26)
+--------------------
+* Merge pull request `#1623 <https://github.com/tier4/scenario_simulator_v2/issues/1623>`_ from tier4/fix/lanelet_pose_in_do_nothing
+  Fix/lanelet pose in do nothing
+* enable set route lanelet in DoNothingPlugin
+* Merge branch 'master' into fix/lanelet_pose_in_do_nothing
+* modify lane matching step
+* Try lane matching if the output of behavior plugin is not on lane.
+* Contributors: Masaya Kataoka, Taiga
+
+16.5.10 (2025-06-23)
+--------------------
+* Merge branch 'master' into devin/1750224079-update-communication-docs
+* Contributors: Kotaro Yoshimoto
+
+16.5.9 (2025-06-23)
+-------------------
+* Merge branch 'master' into feature/use-add-pr-comment
+* Contributors: Kotaro Yoshimoto
+
+16.5.8 (2025-06-23)
+-------------------
+
+16.5.7 (2025-06-18)
+-------------------
+* Merge branch 'master' into dependabot/pip/requests-2.32.4
+* Contributors: Masaya Kataoka
+
+16.5.6 (2025-06-12)
+-------------------
+* Merge branch 'master' into add-start-trigger-context
+* Merge branch 'master' into add-start-trigger-context
+* Contributors: Kotaro Yoshimoto
+
+16.5.5 (2025-06-10)
+-------------------
+* Merge branch 'master' into refactor/scenario_test_runner
+* Merge branch 'master' into refactor/scenario_test_runner
+* Merge branch 'master' into refactor/scenario_test_runner
+* Merge branch 'master' into refactor/scenario_test_runner
+* Merge branch 'master' into refactor/scenario_test_runner
+* Merge branch 'master' into refactor/scenario_test_runner
+* Contributors: Kotaro Yoshimoto
+
+16.5.4 (2025-06-06)
+-------------------
+* Merge branch 'master' into fix/non-symlink-install-sun
+* Contributors: Kotaro Yoshimoto
+
+16.5.3 (2025-06-06)
+-------------------
+* Merge branch 'master' into refactor/behavior_tree_4
+* Merge branch 'master' into refactor/behavior_tree_4
+* Merge branch 'master' into refactor/behavior_tree_4
+* Contributors: Kotaro Yoshimoto, Taiga
+
+16.5.2 (2025-06-04)
+-------------------
+
+16.5.1 (2025-06-03)
+-------------------
+* Merge pull request `#1597 <https://github.com/tier4/scenario_simulator_v2/issues/1597>`_ from tier4/feature/render-omitted-light-bulb
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Add new line on EOF to lanelet map
+* Add infer test
+* Remove unnecessary operator
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* update tests for multiple traffic light
+* Add support for render bulbs without state
+* Refactor constant
+* Activate bulb position inference
+* Fix missing override
+* Add bulb position inference feature to HdMapUtils
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, f0reachARR, ぐるぐる
+
+16.5.0 (2025-06-03)
+-------------------
+* Merge pull request `#1611 <https://github.com/tier4/scenario_simulator_v2/issues/1611>`_ from tier4/feature/set_route
+* Merge branch 'master' into feature/set_route
+* Merge branch 'master' into feature/set_route
+* Rename use_lane_level_specification_for_waypoints to use_lane_ids_for_routing
+* Use algorithm functions instead of for loop code
+* Stop using deprecated version of FieldOperatorApplication::plan in EgoEntity::requestReplanRoute
+* Merge branch 'master' into feature/set_route
+* Add an exception when failed to get current lanelet in EgoEntity::requestAssignRoute
+* Rename FieldOperatorApplication::setRoute/setRoutePoints to plan
+* configration => configuration
+* use setRoutePoints instead of plan in EgoEntity::requestAssignRoute
+* Use route and waypoint appropriately (route = waypoints + goal)
+* Interpolate and unique lanelet array for set route API
+* Switch by use_lane_level_specification_for_waypoints flag in EgoEntity::requestAssignRoute
+* Change redirect target of requestAssignRoute(lanelet_pose[])
+* Adjust name of (traffic_simulator::)RouteOption
+* Define conversion of RouteOption from v1 to v2
+* Add RouteOption v2
+* Contributors: Kotaro Yoshimoto
+
 16.4.6 (2025-06-02)
 -------------------
 

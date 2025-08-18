@@ -24,6 +24,229 @@ Changelog for package cpp_mock_scenarios
 16.4.2 (2025-05-23)
 -------------------
 
+17.0.4 (2025-08-18)
+-------------------
+* Merge branch 'master' into HansRobo-patch-2
+* Merge branch 'master' into HansRobo-patch-2
+* Merge branch 'master' into HansRobo-patch-2
+* Contributors: Kotaro Yoshimoto
+
+17.0.3 (2025-08-18)
+-------------------
+
+17.0.2 (2025-08-07)
+-------------------
+
+17.0.1 (2025-08-07)
+-------------------
+* Merge branch 'master' into fix/spinner
+* Contributors: Kotaro Yoshimoto
+
+17.0.0 (2025-08-06)
+-------------------
+* Merge pull request `#1559 <https://github.com/tier4/scenario_simulator_v2/issues/1559>`_ from tier4/refactor/get_loungitudinal_distance
+  HdMapUtils refactor `lanelet_wrapper::distance::longitudinalDistance`
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* remove `hdmap_utils` from `longitudinalDistance`
+* Contributors: Grzegorz Maj, Kotaro Yoshimoto, Masaya Kataoka, Mateusz Palczuk, Tatsuya Yamasaki, abco20
+
+16.11.0 (2025-08-01)
+--------------------
+* Merge branch 'master' into RJD-1769/centerline
+* Merge remote-tracking branch 'origin/master' into RJD-1769/centerline
+  # Conflicts:
+  #	simulation/traffic_simulator/src/hdmap_utils/hdmap_utils.cpp
+* Merge branch 'master' into RJD-1769/centerline
+* Merge branch 'master' into RJD-1769/centerline
+* Contributors: Grzegorz Maj, Kotaro Yoshimoto
+
+16.10.0 (2025-07-31)
+--------------------
+* Merge branch 'master' into feature/traffic_signal_state_v2i
+* Contributors: Kotaro Yoshimoto
+
+16.9.0 (2025-07-28)
+-------------------
+* Merge branch 'master' into feature/transverse_mercator_projection_support
+* Merge remote-tracking branch 'origin/master' into feature/transverse_mercator_projection_support
+* Contributors: Dawid Moszyński, Piotr Zyskowski
+
+16.8.3 (2025-07-24)
+-------------------
+* Merge branch 'master' into patch-1
+* Merge branch 'master' into patch-1
+* Merge branch 'master' into patch-1
+* Contributors: Kotaro Yoshimoto
+
+16.8.2 (2025-07-24)
+-------------------
+
+16.8.1 (2025-07-22)
+-------------------
+* Merge branch 'master' into fix-orientation-availability
+* Contributors: Kotaro Yoshimoto
+
+16.8.0 (2025-07-22)
+-------------------
+* Merge pull request `#1625 <https://github.com/tier4/scenario_simulator_v2/issues/1625>`_ from tier4/feat/cpp_mock_scenarios_awsim_support
+  CppMockScenarios AWSIM support
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* fix(CppMockScenarios) Added map_path parameter to load a path to lanelet2 file when runing a scenario with AWSIM
+* fix(CppMockScenarios) Added ego_model to load appropriet asset-key when run scenarios with AWSIM
+* fix(CppMockScenarios) Added ego_model to load appropriet asset-key when run scenarios with AWSIM
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* fix(CppMockScenario) Fix issue with comment
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* ref(CppMockScenarios): Handle  map_path parameter in configure method
+* ref(CppScenarioNode): Refactor spawnEgoEntity to unify goal assignemnt
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* ref(CppMockScenarios): Refactor spawnEgoEntity methods
+* feat(CppMockScenarios): Add spawningEgoEntity without requesting a path generation
+* fix(CppMockScenarios): Revert mock_test.launch.py changes
+* fix(CppMockScenario) : Allow map_path override via ROS2 parameter when empty in constructor
+* feat(CppMockScenario) Add support for 'map_path' launch argument
+  - Added map_path as a launch argument with default empty string
+* feat: add ego_model launch argument for specifying AWSIM EGO 3D model
+  - Added a new launch argument `ego_model` with default value `""` to support specifying the 3D asset name for the EGO vehicle model in AWSIM.
+  Supported values include: 'jpntaxi', 'jpntaxi20', 'bydj6', 'bydj6_gen2', 'lexus_rx450h'.
+* feat(CppMockScenarios) Add AWSIM support
+  - Added 'ego_model' to support spawninig specific ego model in AWSIM.
+  - Introduced optional delayed scenario clock start (api\_.startNpcLogic()) using start(false).
+* Contributors: Robotec, SzymonParapura, Taiga
+
+16.7.6 (2025-07-15)
+-------------------
+* Merge branch 'master' into fix-orientation-availability
+* Contributors: Kotaro Yoshimoto
+
+16.7.5 (2025-07-11)
+-------------------
+* Merge branch 'master' into feature/CODEOWNERS
+* Contributors: Kotaro Yoshimoto
+
+16.7.4 (2025-07-11)
+-------------------
+
+16.7.3 (2025-07-08)
+-------------------
+
+16.7.2 (2025-07-07)
+-------------------
+* Merge branch 'master' into fix/zmqpp
+* Merge branch 'master' into fix/zmqpp
+* Contributors: Kotaro Yoshimoto
+
+16.7.1 (2025-07-04)
+-------------------
+* Merge pull request `#1631 <https://github.com/tier4/scenario_simulator_v2/issues/1631>`_ from tier4/refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Add missing ament_cmake_auto
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, f0reachARR
+
+16.7.0 (2025-07-03)
+-------------------
+* Merge branch 'master' into feature/record_option_for_rosbag
+* Merge branch 'master' into feature/record_option_for_rosbag
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
+16.6.1 (2025-07-02)
+-------------------
+
+16.6.0 (2025-07-01)
+-------------------
+* Merge branch 'master' into feature/perception_noise_config_v3
+* Merge branch 'master' into feature/perception_noise_config_v3
+* Contributors: Kotaro Yoshimoto
+
+16.5.11 (2025-06-26)
+--------------------
+* fix test case
+* Merge branch 'master' into fix/lanelet_pose_in_do_nothing
+* modify threashold
+* set torelance
+* Contributors: Masaya Kataoka
+
+16.5.10 (2025-06-23)
+--------------------
+* Merge branch 'master' into devin/1750224079-update-communication-docs
+* Contributors: Kotaro Yoshimoto
+
+16.5.9 (2025-06-23)
+-------------------
+* Merge branch 'master' into feature/use-add-pr-comment
+* Contributors: Kotaro Yoshimoto
+
+16.5.8 (2025-06-23)
+-------------------
+
+16.5.7 (2025-06-18)
+-------------------
+* Merge branch 'master' into dependabot/pip/requests-2.32.4
+* Contributors: Masaya Kataoka
+
+16.5.6 (2025-06-12)
+-------------------
+* Merge branch 'master' into add-start-trigger-context
+* Merge branch 'master' into add-start-trigger-context
+* Contributors: Kotaro Yoshimoto
+
+16.5.5 (2025-06-10)
+-------------------
+* Merge branch 'master' into refactor/scenario_test_runner
+* Merge branch 'master' into refactor/scenario_test_runner
+* Merge branch 'master' into refactor/scenario_test_runner
+* Merge branch 'master' into refactor/scenario_test_runner
+* Merge branch 'master' into refactor/scenario_test_runner
+* Merge branch 'master' into refactor/scenario_test_runner
+* Contributors: Kotaro Yoshimoto
+
+16.5.4 (2025-06-06)
+-------------------
+* Merge branch 'master' into fix/non-symlink-install-sun
+* Contributors: Kotaro Yoshimoto
+
+16.5.3 (2025-06-06)
+-------------------
+* Merge branch 'master' into refactor/behavior_tree_4
+* Merge branch 'master' into refactor/behavior_tree_4
+* Merge branch 'master' into refactor/behavior_tree_4
+* Contributors: Kotaro Yoshimoto, Taiga
+
+16.5.2 (2025-06-04)
+-------------------
+
+16.5.1 (2025-06-03)
+-------------------
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Merge branch 'master' into feature/render-omitted-light-bulb
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, ぐるぐる
+
+16.5.0 (2025-06-03)
+-------------------
+* Merge branch 'master' into feature/set_route
+* Merge branch 'master' into feature/set_route
+* Merge branch 'master' into feature/set_route
+* Contributors: Kotaro Yoshimoto
+
 16.4.6 (2025-06-02)
 -------------------
 

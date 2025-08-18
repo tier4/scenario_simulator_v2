@@ -91,6 +91,7 @@ def launch_setup(context, *args, **kwargs):
     port                                = LaunchConfiguration("port",                                   default=5555)
     publish_empty_context               = LaunchConfiguration("publish_empty_context",                  default=False)
     record                              = LaunchConfiguration("record",                                 default=True)
+    record_option                       = LaunchConfiguration("record_option",                          default="")
     record_storage_id                   = LaunchConfiguration("record_storage_id",                      default="")
     rviz_config                         = LaunchConfiguration("rviz_config",                            default=default_rviz_config_file())
     scenario                            = LaunchConfiguration("scenario",                               default=Path("/dev/null"))
@@ -98,6 +99,7 @@ def launch_setup(context, *args, **kwargs):
     sigterm_timeout                     = LaunchConfiguration("sigterm_timeout",                        default=8)
     simulate_localization               = LaunchConfiguration("simulate_localization",                  default=True)
     speed_condition                     = LaunchConfiguration("speed_condition",                        default="legacy")
+    use_custom_centerline               = LaunchConfiguration("use_custom_centerline",                  default=True)
     use_sim_time                        = LaunchConfiguration("use_sim_time",                           default=False)
     vehicle_model                       = LaunchConfiguration("vehicle_model",                          default="")
     # fmt: on
@@ -121,6 +123,7 @@ def launch_setup(context, *args, **kwargs):
     print(f"port                                := {port.perform(context)}")
     print(f"publish_empty_context               := {publish_empty_context.perform(context)}")
     print(f"record                              := {record.perform(context)}")
+    print(f"record_option                       := {record_option.perform(context)}")
     print(f"record_storage_id                   := {record_storage_id.perform(context)}")
     print(f"rviz_config                         := {rviz_config.perform(context)}")
     print(f"scenario                            := {scenario.perform(context)}")
@@ -128,6 +131,7 @@ def launch_setup(context, *args, **kwargs):
     print(f"sigterm_timeout                     := {sigterm_timeout.perform(context)}")
     print(f"simulate_localization               := {simulate_localization.perform(context)}")
     print(f"speed_condition                     := {speed_condition.perform(context)}")
+    print(f"use_custom_centerline               := {use_custom_centerline.perform(context)}")
     print(f"use_sim_time                        := {use_sim_time.perform(context)}")
     print(f"vehicle_model                       := {vehicle_model.perform(context)}")
 
@@ -150,12 +154,14 @@ def launch_setup(context, *args, **kwargs):
             {"port": port},
             {"publish_empty_context" : publish_empty_context},
             {"record": record},
+            {"record_option": record_option},
             {"record_storage_id": record_storage_id},
             {"rviz_config": rviz_config},
             {"sensor_model": sensor_model},
             {"sigterm_timeout": sigterm_timeout},
             {"simulate_localization": simulate_localization},
             {"speed_condition": speed_condition},
+            {"use_custom_centerline": use_custom_centerline},
             {"use_sim_time": use_sim_time},
             {"vehicle_model": vehicle_model},
         ]
@@ -216,12 +222,14 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("parameter_file_path",                 default_value=parameter_file_path                ),
         DeclareLaunchArgument("pedestrian_ignore_see_around",        default_value=pedestrian_ignore_see_around       ),
         DeclareLaunchArgument("publish_empty_context",               default_value=publish_empty_context              ),
+        DeclareLaunchArgument("record_option",                       default_value=record_option                      ),
         DeclareLaunchArgument("rviz_config",                         default_value=rviz_config                        ),
         DeclareLaunchArgument("scenario",                            default_value=scenario                           ),
         DeclareLaunchArgument("sensor_model",                        default_value=sensor_model                       ),
         DeclareLaunchArgument("sigterm_timeout",                     default_value=sigterm_timeout                    ),
         DeclareLaunchArgument("simulate_localization",               default_value=simulate_localization              ),
         DeclareLaunchArgument("speed_condition",                     default_value=speed_condition                    ),
+        DeclareLaunchArgument("use_custom_centerline",               default_value=use_custom_centerline              ),
         DeclareLaunchArgument("use_sim_time",                        default_value=use_sim_time                       ),
         DeclareLaunchArgument("vehicle_model",                       default_value=vehicle_model                      ),
         # fmt: on

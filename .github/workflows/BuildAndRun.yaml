@@ -36,19 +36,6 @@ jobs:
         runs_on: [ubuntu-22.04, ubuntu-22.04-arm]
         cmake_build_type: [RelWithDebInfo, Release] # Debug build type is currently unavailable. @TODO Fix problem and add Debug build.
     steps:
-# workaround until the fix release in the official ros image
-      - name: Delete old ros2 apt source
-        run: |
-          rm /etc/apt/sources.list.d/ros2-latest.list
-          rm /usr/share/keyrings/ros2-latest-archive-keyring.gpg
-
-      - name: Setup new ros2 apt source
-        run: |
-          sudo apt-get update && sudo apt-get install curl
-          export ROS_APT_SOURCE_VERSION=$(curl -s https://api.github.com/repos/ros-infrastructure/ros-apt-source/releases/latest | grep -F "tag_name" | awk -F\" '{print $4}')
-          curl -L -o /tmp/ros2-apt-source.deb "https://github.com/ros-infrastructure/ros-apt-source/releases/download/${ROS_APT_SOURCE_VERSION}/ros2-apt-source_${ROS_APT_SOURCE_VERSION}.$(. /etc/os-release && echo $VERSION_CODENAME)_all.deb" 
-          sudo apt install /tmp/ros2-apt-source.deb
-      
       - name: Suppress warnings
         run: git config --global --add safe.directory '*'
 
@@ -82,7 +69,6 @@ jobs:
         run: |
           apt-get update
           apt-get install -y python3-pip python3-colcon-lcov-result lcov unzip gcovr
-          pip3 install xmlschema==3.4.5 # xmlschema workaround (4.x occurs errors)
           rosdep update --include-eol-distros
           rosdep install -iy --from-paths src --rosdistro ${{ matrix.rosdistro }}
           colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml
@@ -90,6 +76,7 @@ jobs:
         shell: bash
 
       - name: Install Build Wrapper
+        if: github.event.pull_request.head.repo.fork == false
         uses: SonarSource/sonarqube-scan-action/install-build-wrapper@v4.2.1
         id: build_wrapper
         env:
@@ -101,8 +88,10 @@ jobs:
         # See also: https://gitlab.com/libeigen/eigen/-/issues/2326
         run: |
           source /opt/ros/${{ matrix.rosdistro }}/setup.bash
-          ${{ steps.build_wrapper.outputs.build-wrapper-binary }} --out-dir src/scenario_simulator_v2/bw-output \
-          colcon build --symlink-install \
+          if [[ -n "${{ steps.build_wrapper.outputs.build-wrapper-binary }}" ]]; then
+            COMMAND_PREFIX="${{ steps.build_wrapper.outputs.build-wrapper-binary }} --out-dir src/scenario_simulator_v2/bw-output"
+          fi
+          $COMMAND_PREFIX colcon build --symlink-install \
           --cmake-args \
             -DCMAKE_BUILD_TYPE=${{ matrix.cmake_build_type }} \
             -DBUILD_CPP_MOCK_SCENARIOS=ON \
@@ -155,7 +144,7 @@ jobs:
         shell: bash
 
       - uses: actions/github-script@v7
-        if: steps.optional-scenario-test.outputs.failure > 0 && matrix.runs_on != 'ubuntu-22.04-arm'
+        if: steps.optional-scenario-test.outputs.failure > 0 && matrix.runs_on != 'ubuntu-22.04-arm' && github.event.pull_request.head.repo.fork == false
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -189,8 +178,10 @@ jobs:
 
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v4.2.1
+        id: sonarcloud
         # In ARM build, SonarQube result should be same as x86 build because no test runs
-        if: matrix.runs_on != 'ubuntu-22.04-arm'
+        if: matrix.runs_on != 'ubuntu-22.04-arm' && github.event.pull_request.head.repo.fork == false
+        continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -205,3 +196,10 @@ jobs:
 #          source install/local_setup.bash
 #          ./src/scenario_simulator_v2/.github/workflows/workflow.sh ./src/scenario_simulator_v2_scenarios/workflow/basic.txt
 #        shell: bash
+
+      - name: Report error if SonarQube scan failed
+        if: steps.sonarcloud.outcome == 'failure'
+        uses: mshick/add-pr-comment@v2
+        with:
+          message: "This PR has failed the SonarQube scan. Please check the details in the SonarQube dashboard."
+          message-id: "sonarcloud-scan-failure"

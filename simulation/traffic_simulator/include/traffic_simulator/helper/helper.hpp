@@ -15,7 +15,7 @@
 #ifndef TRAFFIC_SIMULATOR__HELPER__HELPER_HPP_
 #define TRAFFIC_SIMULATOR__HELPER__HELPER_HPP_
 
-#include <simulation_api_schema.pb.h>
+#include <simulation_interface/simulation_api_schema.pb.h>
 
 #include <algorithm>
 #include <cmath>

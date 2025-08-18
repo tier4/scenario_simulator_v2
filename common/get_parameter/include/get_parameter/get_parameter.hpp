@@ -29,9 +29,14 @@ namespace common
  */
 inline auto getParameterNode() -> rclcpp::Node &
 {
+  if (not rclcpp::ok()) {
+    rclcpp::init(0, nullptr);
+  }
   static rclcpp::Node node{
     [](std::string name_base) { return name_base + "_pid" + std::to_string(getpid()); }(__func__),
-    "simulation"};
+    "simulation",
+    // NOTE: enable automatically_declare_parameters_from_overrides to read parameters from yaml without declaration
+    rclcpp::NodeOptions().automatically_declare_parameters_from_overrides(true)};
   return node;
 }
 

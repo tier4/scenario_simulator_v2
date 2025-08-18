@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>traffic_simulator</name>
-  <version>16.4.6</version>
+  <version>17.0.4</version>
   <description>control traffic flow</description>
 
   <maintainer email="masaya.kataoka@tier4.jp">masaya kataoka</maintainer>
@@ -44,6 +45,7 @@
   <depend>visualization_msgs</depend>
   <depend>geometry</depend>
   <depend>get_parameter</depend>
+  <depend>yaml-cpp</depend>
 
   <test_depend>ament_cmake_gtest</test_depend>
   <test_depend>ament_lint_auto</test_depend>
