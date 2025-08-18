@@ -35,7 +35,7 @@ jobs:
         rosdistro: [humble]
         runs_on: [ubuntu-22.04, ubuntu-22.04-arm]
         cmake_build_type: [RelWithDebInfo, Release] # Debug build type is currently unavailable. @TODO Fix problem and add Debug build.
-    steps:      
+    steps:
       - name: Suppress warnings
         run: git config --global --add safe.directory '*'
 
@@ -179,8 +179,10 @@ jobs:
 
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v4.2.1
+        id: sonarcloud
         # In ARM build, SonarQube result should be same as x86 build because no test runs
         if: matrix.runs_on != 'ubuntu-22.04-arm' && github.event.pull_request.head.repo.fork == false
+        continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -195,3 +197,10 @@ jobs:
 #          source install/local_setup.bash
 #          ./src/scenario_simulator_v2/.github/workflows/workflow.sh ./src/scenario_simulator_v2_scenarios/workflow/basic.txt
 #        shell: bash
+
+      - name: Report error if SonarQube scan failed
+        if: steps.sonarcloud.outcome == 'failure'
+        uses: mshick/add-pr-comment@v2
+        with:
+          message: "This PR has failed the SonarQube scan. Please check the details in the SonarQube dashboard."
+          message-id: "sonarcloud-scan-failure"
