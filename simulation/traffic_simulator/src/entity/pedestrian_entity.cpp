@@ -136,10 +136,11 @@ auto PedestrianEntity::getRouteLanelets(double horizon) -> lanelet::Ids
     return route_planner_.getRouteLanelets(canonicalized_lanelet_poses.front(), horizon);
   } else {
     if (
-      const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
+      const auto canonicalized_lanelet_poses = pose::toCanonicalizedLaneletPoses(
         status_->getMapPose(), getBoundingBox(), route_planner_.getWholeRouteLanelets(), true,
-        getDefaultMatchingDistanceForLaneletPoseCalculation())) {
-      return route_planner_.getRouteLanelets(canonicalized_lanelet_pose.value(), horizon);
+        getDefaultMatchingDistanceForLaneletPoseCalculation());
+      !canonicalized_lanelet_poses.empty()) {
+      return route_planner_.getRouteLanelets(canonicalized_lanelet_poses.front(), horizon);
     }
     return {};
   }
