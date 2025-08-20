@@ -12,6 +12,12 @@ Changelog for package simple_cross_map
 16.4.2 (2025-05-23)
 -------------------
 
+17.1.2 (2025-08-20)
+-------------------
+* Merge branch 'master' into refactor/planning-topic-update
+* Merge branch 'master' into refactor/planning-topic-update
+* Contributors: Kotaro Yoshimoto
+
 17.1.1 (2025-08-20)
 -------------------
 * Merge branch 'master' into fix/actions-permission
