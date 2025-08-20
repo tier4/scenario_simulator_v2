@@ -24,6 +24,11 @@ Changelog for package real_time_factor_control_rviz_plugin
 16.4.2 (2025-05-23)
 -------------------
 
+17.1.3 (2025-08-20)
+-------------------
+* Merge branch 'master' into hotfix/actions-permission
+* Contributors: Kotaro Yoshimoto
+
 17.1.2 (2025-08-20)
 -------------------
 * Merge branch 'master' into refactor/planning-topic-update
