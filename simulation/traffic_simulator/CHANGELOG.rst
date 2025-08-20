@@ -24,6 +24,14 @@ Changelog for package traffic_simulator
 16.4.2 (2025-05-23)
 -------------------
 
+17.1.2 (2025-08-20)
+-------------------
+* Merge pull request `#1664 <https://github.com/tier4/scenario_simulator_v2/issues/1664>`_ from xmfcx/refactor/planning-topic-update
+* Merge branch 'master' into refactor/planning-topic-update
+* Merge branch 'master' into refactor/planning-topic-update
+* refactor: change planning output topic name to /planning/trajectory
+* Contributors: Kotaro Yoshimoto, M. Fatih Cırıt
+
 17.1.1 (2025-08-20)
 -------------------
 * Merge branch 'master' into fix/actions-permission
