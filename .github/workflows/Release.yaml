@@ -35,14 +35,18 @@ jobs:
     outputs:
       new_version: ${{ steps.new_version.outputs.new_version }}
     steps:
+      # Fetch the pull request information (even if the workflow is triggered by a push event).
       - uses: 8BitJonny/gh-get-current-pr@3.0.0
         id: pull-request
 
-      - name: Store PR body
-        id: pull-request-body
-        run: echo "pr-body=$PR" >> $GITHUB_OUTPUT
-        env:
-          PR: ${{ steps.pull-request.outputs.pr || '{}' }}
+      # Currently Pull Request body is not used, but it can be useful in the future.
+      # Uncomment the following lines if you want to access the PR body.
+      #
+      # - name: Store PR body
+      #   id: pull-request-body
+      #   run: echo "pr-body=$PR" >> $GITHUB_OUTPUT
+      #   env:
+      #     PR: ${{ steps.pull-request.outputs.pr || '{}' }}
 
       - name: Install catkin-pkg
         run: apt update && apt install -y python3-catkin-pkg git curl
