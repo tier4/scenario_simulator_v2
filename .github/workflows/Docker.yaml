@@ -11,8 +11,14 @@ on:
       - "!mkdocs.yml"
       - "!pyproject.toml"
       - "!poetry.lock"
-  release:
-    types: ["published"]
+  push:
+    tags:
+      - "*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: version of the scenario_simulator_v2
+        required: true
 
 jobs:
   push_traffic_sim_docker:
@@ -63,7 +69,7 @@ jobs:
             traffic_simulator_${{ matrix.rosdistro }}
 
       - name: Build and push
-        if: github.event_name == 'release'
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         uses: docker/bake-action@v6.3.0
         with:
           files: |
@@ -72,7 +78,7 @@ jobs:
           set: |
             *.cache-to=type=gha,mode=max
             *.cache-from=type=gha
-            *.tags=ghcr.io/tier4/scenario_simulator_v2:traffic_simulator_${{ matrix.rosdistro }}-${{ steps.version.outputs.version }}
+            *.tags=ghcr.io/tier4/scenario_simulator_v2:traffic_simulator_${{ matrix.rosdistro }}-${{ github.event.inputs.version || steps.version.outputs.version }}
             *.tags=ghcr.io/tier4/scenario_simulator_v2:traffic_simulator-latest
           push: true
           targets: |
@@ -137,7 +143,7 @@ jobs:
             ${{ matrix.rosdistro }}_base_${{ matrix.arch }}
 
       - name: Build and push (${{ matrix.arch }})
-        if: github.event_name == 'release'
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         uses: docker/bake-action@v6.3.0
         with:
           files: |
@@ -146,7 +152,7 @@ jobs:
           set: |
             *.cache-to=type=gha,mode=max
             *.cache-from=type=gha
-            *.tags=ghcr.io/tier4/scenario_simulator_v2:humble-${{ steps.version.outputs.version }}
+            *.tags=ghcr.io/tier4/scenario_simulator_v2:humble-${{ github.event.inputs.version || steps.version.outputs.version }}
             *.tags=ghcr.io/tier4/scenario_simulator_v2:humble-latest
           push: true
           targets: |
