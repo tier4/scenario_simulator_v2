@@ -161,7 +161,9 @@ FieldOperatorApplication::FieldOperatorApplication(const pid_t pid)
   requestSetRoutePoints("/api/routing/set_route_points", *this, std::chrono::seconds(10)),
   requestSetRtcAutoMode("/api/external/set/rtc_auto_mode", *this),
   requestSetVelocityLimit("/api/autoware/set/velocity_limit", *this),
-  requestEnableAutowareControl("/api/operation_mode/enable_autoware_control", *this)
+  requestEnableAutowareControl("/api/operation_mode/enable_autoware_control", *this),
+  requestDisableAutowareControl("/api/operation_mode/disable_autoware_control", *this),
+  requestChangeToStop("/api/operation_mode/change_to_stop", *this)
 {
 }
 // clang-format on
@@ -319,6 +321,8 @@ auto FieldOperatorApplication::initialize(const geometry_msgs::msg::Pose & initi
 {
   if (not std::exchange(initialized, true)) {
     task_queue.delay([this, initial_pose]() {
+      requestChangeToStop(std::make_shared<ChangeOperationMode::Request>(), 30);
+      requestDisableAutowareControl(std::make_shared<ChangeOperationMode::Request>(), 30);
       switch (const auto state = getLegacyAutowareState(); state.value) {
         default:
           throw common::AutowareError(

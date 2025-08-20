@@ -116,6 +116,8 @@ struct FieldOperatorApplication : public rclcpp::Node
   Service<AutoModeWithModule>     requestSetRtcAutoMode;
   Service<SetVelocityLimit>       requestSetVelocityLimit;
   Service<ChangeOperationMode>    requestEnableAutowareControl;
+  Service<ChangeOperationMode>    requestDisableAutowareControl;
+  Service<ChangeOperationMode>    requestChangeToStop;
   // clang-format on
 
   /*
@@ -136,7 +138,14 @@ struct FieldOperatorApplication : public rclcpp::Node
       return from_state.value <= current_state.value and current_state.value < to_state.value;
     };
 
+    RCLCPP_INFO_STREAM(
+      get_logger(), "Waiting for Autoware state to be "
+                      << to_state << " from " << from_state
+                      << " (current_state: " << getLegacyAutowareState() << ")");
+
     while (not finalized.load() and not_to_be(getLegacyAutowareState())) {
+      RCLCPP_INFO_STREAM(
+        get_logger(), "[not to be] Current Autoware state is " << getLegacyAutowareState());
       if (time_limit <= std::chrono::steady_clock::now()) {
         throw common::AutowareError(
           "Simulator waited for the Autoware state to transition to ", to_state,
