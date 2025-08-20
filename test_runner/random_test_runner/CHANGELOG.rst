@@ -24,6 +24,22 @@ Changelog for package random_test_runner
 16.4.2 (2025-05-23)
 -------------------
 
+17.1.0 (2025-08-19)
+-------------------
+* Merge branch 'master' into RJD-1907/ss2_vehicle_id_and_localization
+* Merge branch 'master' into RJD-1907/ss2_vehicle_id_and_localization
+* Contributors: Grzegorz Maj, Kotaro Yoshimoto
+
+17.0.4 (2025-08-18)
+-------------------
+* Merge branch 'master' into HansRobo-patch-2
+* Merge branch 'master' into HansRobo-patch-2
+* Merge branch 'master' into HansRobo-patch-2
+* Contributors: Kotaro Yoshimoto
+
+17.0.3 (2025-08-18)
+-------------------
+
 17.0.2 (2025-08-07)
 -------------------
 

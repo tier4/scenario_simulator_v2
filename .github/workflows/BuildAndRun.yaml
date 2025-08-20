@@ -69,7 +69,6 @@ jobs:
         run: |
           apt-get update
           apt-get install -y python3-pip python3-colcon-lcov-result lcov unzip gcovr
-          pip3 install xmlschema==3.4.5 # xmlschema workaround (4.x occurs errors)
           rosdep update --include-eol-distros
           rosdep install -iy --from-paths src --rosdistro ${{ matrix.rosdistro }}
           colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml
@@ -179,8 +178,10 @@ jobs:
 
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v4.2.1
+        id: sonarcloud
         # In ARM build, SonarQube result should be same as x86 build because no test runs
         if: matrix.runs_on != 'ubuntu-22.04-arm' && github.event.pull_request.head.repo.fork == false
+        continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -195,3 +196,10 @@ jobs:
 #          source install/local_setup.bash
 #          ./src/scenario_simulator_v2/.github/workflows/workflow.sh ./src/scenario_simulator_v2_scenarios/workflow/basic.txt
 #        shell: bash
+
+      - name: Report error if SonarQube scan failed
+        if: steps.sonarcloud.outcome == 'failure'
+        uses: mshick/add-pr-comment@v2
+        with:
+          message: "This PR has failed the SonarQube scan. Please check the details in the SonarQube dashboard."
+          message-id: "sonarcloud-scan-failure"
