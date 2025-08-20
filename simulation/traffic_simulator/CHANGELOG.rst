@@ -24,6 +24,189 @@ Changelog for package traffic_simulator
 16.4.2 (2025-05-23)
 -------------------
 
+17.1.3 (2025-08-20)
+-------------------
+* Merge branch 'master' into hotfix/actions-permission
+* Contributors: Kotaro Yoshimoto
+
+17.1.2 (2025-08-20)
+-------------------
+* Merge pull request `#1664 <https://github.com/tier4/scenario_simulator_v2/issues/1664>`_ from xmfcx/refactor/planning-topic-update
+* Merge branch 'master' into refactor/planning-topic-update
+* Merge branch 'master' into refactor/planning-topic-update
+* refactor: change planning output topic name to /planning/trajectory
+* Contributors: Kotaro Yoshimoto, M. Fatih Cırıt
+
+17.1.1 (2025-08-20)
+-------------------
+* Merge branch 'master' into fix/actions-permission
+* Merge branch 'master' into fix/actions-permission
+* Contributors: ぐるぐる
+
+17.1.0 (2025-08-19)
+-------------------
+* Merge pull request `#1667 <https://github.com/tier4/scenario_simulator_v2/issues/1667>`_ from tier4/RJD-1907/ss2_vehicle_id_and_localization
+* Merge branch 'master' into RJD-1907/ss2_vehicle_id_and_localization
+* Merge branch 'master' into RJD-1907/ss2_vehicle_id_and_localization
+* Resolve build issue
+* Improved code formatting
+* RJD-1907 Add support for vehicle_id and initialize_localization
+* Contributors: Grzegorz Maj, Kotaro Yoshimoto
+
+17.0.4 (2025-08-18)
+-------------------
+* Merge branch 'master' into HansRobo-patch-2
+* Merge branch 'master' into HansRobo-patch-2
+* Merge branch 'master' into HansRobo-patch-2
+* Contributors: Kotaro Yoshimoto
+
+17.0.3 (2025-08-18)
+-------------------
+
+17.0.2 (2025-08-07)
+-------------------
+
+17.0.1 (2025-08-07)
+-------------------
+* Merge branch 'master' into fix/spinner
+* Contributors: Kotaro Yoshimoto
+
+17.0.0 (2025-08-06)
+-------------------
+* Merge pull request `#1559 <https://github.com/tier4/scenario_simulator_v2/issues/1559>`_ from tier4/refactor/get_loungitudinal_distance
+  HdMapUtils refactor `lanelet_wrapper::distance::longitudinalDistance`
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Add DIRTY HACK to make the scenarios pass
+* Add more precise distance calculation in FTA
+  This also fixes the issue where FTA would crash because of negative distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Update simulation/traffic_simulator/src/utils/pose.cpp
+* Return absolute value of distance in distance_along_lanelet in follow_trajectory
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* fix format
+* remove `hdmap_utils` from `follow_polyline_trajectory_action`
+* remove `hdmap_utils` from `isInLanelet`
+* remove `hdmap_utils`from `boundingBoxRelativeLaneletPose`
+* remove `hdmap_utils` from `relativeLaneletPose`
+* remove `hdmap_utils` from `boundingBoxLaneLongitudinalDistance`
+* remove `hdmap_utils` from `longitudinalDistance`
+* Add constructors to RoutingConfiguration
+* move `getLongitudinalDistance` method
+* Contributors: Grzegorz Maj, Kotaro Yoshimoto, Masaya Kataoka, Mateusz Palczuk, Tatsuya Yamasaki, abco20
+
+16.11.0 (2025-08-01)
+--------------------
+* Merge pull request `#1587 <https://github.com/tier4/scenario_simulator_v2/issues/1587>`_ from tier4/RJD-1769/centerline
+* Merge branch 'master' into RJD-1769/centerline
+* Delete unused HdMapUtils::overwriteLaneletsCenterline
+* Add use_custom_centerline argument and switch behavior
+* Merge remote-tracking branch 'origin/master' into RJD-1769/centerline
+  # Conflicts:
+  #	simulation/traffic_simulator/src/hdmap_utils/hdmap_utils.cpp
+* Merge branch 'master' into RJD-1769/centerline
+* Merge branch 'master' into RJD-1769/centerline
+* RJD-1769 Force creating centerline for all lanelets
+* Contributors: Grzegorz Maj, Kotaro Yoshimoto
+
+16.10.0 (2025-07-31)
+--------------------
+* Merge branch 'master' into feature/traffic_signal_state_v2i
+* Contributors: Kotaro Yoshimoto
+
+16.9.0 (2025-07-28)
+-------------------
+* Merge pull request `#1650 <https://github.com/tier4/scenario_simulator_v2/issues/1650>`_ from tier4/feature/transverse_mercator_projection_support
+* Merge branch 'master' into feature/transverse_mercator_projection_support
+* Fix: avoid returning reference to temporary YAML::Node, Returning by value is safe and efficient, as `YAML::Node` is a lightweight shared_ptr-like wrapper
+* refactor: improve lanelet loader error handling and reduce nesting
+* fix: add exception if projector_type is not defined
+* Remove unnecessary constexprs
+* refactor: enhance lanelet loader with const correctness and reduced allocations
+* fix typo
+* extracted TM projector producer as a function
+* test fix
+* clang format
+* projector config content error handling
+* headers cleanup
+* Merge remote-tracking branch 'origin/master' into feature/transverse_mercator_projection_support
+* error handling, small cleanup
+* transverse mercator support with projection parameters location assumption
+* init commit from Yoshimoto-san's patch
+* Contributors: Dawid Moszynski, Dawid Moszyński, Kotaro Yoshimoto, Piotr Zyskowski
+
+16.8.3 (2025-07-24)
+-------------------
+* Merge branch 'master' into patch-1
+* Merge branch 'master' into patch-1
+* Merge branch 'master' into patch-1
+* Contributors: Kotaro Yoshimoto
+
+16.8.2 (2025-07-24)
+-------------------
+
+16.8.1 (2025-07-22)
+-------------------
+* Merge branch 'master' into fix-orientation-availability
+* Contributors: Kotaro Yoshimoto
+
+16.8.0 (2025-07-22)
+-------------------
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* Merge branch 'master' into feat/cpp_mock_scenarios_awsim_support
+* Contributors: SzymonParapura, Taiga
+
+16.7.6 (2025-07-15)
+-------------------
+* Merge branch 'master' into fix-orientation-availability
+* Contributors: Kotaro Yoshimoto
+
+16.7.5 (2025-07-11)
+-------------------
+* Merge branch 'master' into feature/CODEOWNERS
+* Contributors: Kotaro Yoshimoto
+
+16.7.4 (2025-07-11)
+-------------------
+
+16.7.3 (2025-07-08)
+-------------------
+
+16.7.2 (2025-07-07)
+-------------------
+* Merge branch 'master' into fix/zmqpp
+* Merge branch 'master' into fix/zmqpp
+* Contributors: Kotaro Yoshimoto
+
+16.7.1 (2025-07-04)
+-------------------
+* Merge pull request `#1631 <https://github.com/tier4/scenario_simulator_v2/issues/1631>`_ from tier4/refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Merge branch 'master' into refactor/cmakelists
+* Isolate protoc output into project named directory
+* Add or update xml-model
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, f0reachARR
+
+16.7.0 (2025-07-03)
+-------------------
+* Merge branch 'master' into feature/record_option_for_rosbag
+* Merge branch 'master' into feature/record_option_for_rosbag
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
 16.6.1 (2025-07-02)
 -------------------
 
