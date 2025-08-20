@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>agnocast_wrapper</name>
+  <version>17.1.1</version>
+  <description>A wrapper package for agnocast</description>
+  <maintainer email="mateusz.palczuk@robotec.ai">Mateusz Palczuk</maintainer>
+  <license>Apache License 2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>ament_cmake_auto</buildtool_depend>
+
+  <depend>rclcpp</depend>
+  <!-- <depend>agnocastlib</depend> agnocastlib is an optional dependency only required when USE_AGNOCAST_ENABLED is defined, therefore must be ignored here -->
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

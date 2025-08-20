@@ -106,14 +106,6 @@ public:
                             traffic_simulator::RoutingConfiguration().routing_graph_type) const
     -> lanelet::Ids;
 
-  auto getDistanceToStopLine(
-    const lanelet::Ids & route_lanelets,
-    const math::geometry::CatmullRomSplineInterface & spline) const -> std::optional<double>;
-
-  auto getDistanceToStopLine(
-    const lanelet::Ids & route_lanelets,
-    const std::vector<geometry_msgs::msg::Point> & waypoints) const -> std::optional<double>;
-
   auto getDistanceToTrafficLightStopLine(
     const lanelet::Ids & route_lanelets,
     const math::geometry::CatmullRomSplineInterface & spline) const -> std::optional<double>;
@@ -173,18 +165,6 @@ public:
 
   auto getLanelets(const lanelet::Ids &) const -> lanelet::Lanelets;
 
-  auto getLateralDistance(
-    const traffic_simulator_msgs::msg::LaneletPose & from,
-    const traffic_simulator_msgs::msg::LaneletPose & to,
-    const traffic_simulator::RoutingConfiguration & routing_configuration =
-      traffic_simulator::RoutingConfiguration()) const -> std::optional<double>;
-
-  auto getLongitudinalDistance(
-    const traffic_simulator_msgs::msg::LaneletPose & from_pose,
-    const traffic_simulator_msgs::msg::LaneletPose & to_pose,
-    const traffic_simulator::RoutingConfiguration & routing_configuration =
-      traffic_simulator::RoutingConfiguration()) const -> std::optional<double>;
-
   auto getNearbyLaneletIds(
     const geometry_msgs::msg::Point &, const double distance_threshold,
     const bool include_crosswalk, const std::size_t search_count = 5) const -> lanelet::Ids;
@@ -213,17 +193,12 @@ public:
                             traffic_simulator::RoutingConfiguration().routing_graph_type) const
     -> double;
 
-  auto getStopLineIds() const -> lanelet::Ids;
-
-  auto getStopLineIdsOnPath(const lanelet::Ids & route_lanelets) const -> lanelet::Ids;
-
-  auto getStopLinePolygon(const lanelet::Id) const -> std::vector<geometry_msgs::msg::Point>;
-
   auto getTangentVector(const lanelet::Id, const double s) const
     -> std::optional<geometry_msgs::msg::Vector3>;
 
-  auto getTrafficLightBulbPosition(const lanelet::Id traffic_light_id, const std::string &) const
-    -> std::optional<geometry_msgs::msg::Point>;
+  auto getTrafficLightBulbPosition(
+    const lanelet::Id traffic_light_id, const std::string &,
+    const bool allow_infer_position = false) const -> std::optional<geometry_msgs::msg::Point>;
 
   auto getTrafficLightIds() const -> lanelet::Ids;
 
@@ -352,10 +327,6 @@ private:
     const traffic_simulator::lane_change::TrajectoryShape,
     const double tangent_vector_size = 100) const -> math::geometry::HermiteCurve;
 
-  auto getStopLines() const -> lanelet::ConstLineStrings3d;
-
-  auto getStopLinesOnPath(const lanelet::Ids &) const -> lanelet::ConstLineStrings3d;
-
   auto getTrafficLightRegulatoryElementsOnPath(const lanelet::Ids &) const
     -> std::vector<std::shared_ptr<const lanelet::autoware::AutowareTrafficLight>>;
 
@@ -372,8 +343,6 @@ private:
     -> geometry_msgs::msg::Vector3;
 
   auto mapCallback(const autoware_map_msgs::msg::LaneletMapBin &) const -> void;
-
-  auto overwriteLaneletsCenterline() -> void;
 
   auto resamplePoints(const lanelet::ConstLineString3d &, const std::int32_t num_segments) const
     -> lanelet::BasicPoints3d;

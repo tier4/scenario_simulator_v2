@@ -81,6 +81,11 @@ auto VehicleEntity::getDefaultMatchingDistanceForLaneletPoseCalculation() const 
          1.5;
 }
 
+auto VehicleEntity::getParameters() const -> const traffic_simulator_msgs::msg::VehicleParameters &
+{
+  return vehicle_parameters;
+}
+
 auto VehicleEntity::getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter
 {
   return behavior_plugin_ptr_->getBehaviorParameter();
@@ -92,9 +97,13 @@ auto VehicleEntity::getEntityTypename() const -> const std::string &
   return result;
 }
 
-auto VehicleEntity::getGoalPoses() -> std::vector<CanonicalizedLaneletPose>
+auto VehicleEntity::getGoalPoses() -> std::vector<geometry_msgs::msg::Pose>
 {
-  return route_planner_.getGoalPoses();
+  std::vector<geometry_msgs::msg::Pose> poses;
+  for (const auto & lanelet_pose : route_planner_.getGoalPoses()) {
+    poses.push_back(pose::toMapPose(lanelet_pose));
+  }
+  return poses;
 }
 
 auto VehicleEntity::getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle>
@@ -107,6 +116,12 @@ auto VehicleEntity::getRouteLanelets(double horizon) -> lanelet::Ids
   if (const auto canonicalized_lanelet_pose = status_->getCanonicalizedLaneletPose()) {
     return route_planner_.getRouteLanelets(canonicalized_lanelet_pose.value(), horizon);
   } else {
+    if (
+      const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
+        status_->getMapPose(), getBoundingBox(), route_planner_.getWholeRouteLanelets(), true,
+        getDefaultMatchingDistanceForLaneletPoseCalculation())) {
+      return route_planner_.getRouteLanelets(canonicalized_lanelet_pose.value(), horizon);
+    }
     return {};
   }
 }
@@ -135,6 +150,7 @@ auto VehicleEntity::onUpdate(const double current_time, const double step_time) 
   behavior_plugin_ptr_->setTargetSpeed(target_speed_);
   auto route_lanelets = getRouteLanelets();
   behavior_plugin_ptr_->setRouteLanelets(route_lanelets);
+  behavior_plugin_ptr_->setEuclideanDistancesMap(euclidean_distances_map_);
 
   // recalculate spline only when input data changes
   if (previous_route_lanelets_ != route_lanelets) {
@@ -150,6 +166,7 @@ auto VehicleEntity::onUpdate(const double current_time, const double step_time) 
   behavior_plugin_ptr_->setReferenceTrajectory(spline_);
   /// @note CanonicalizedEntityStatus is updated here, it is not skipped even if isAtEndOfLanelets return true
   behavior_plugin_ptr_->update(current_time, step_time);
+
   if (const auto canonicalized_lanelet_pose = status_->getCanonicalizedLaneletPose()) {
     if (pose::isAtEndOfLanelets(canonicalized_lanelet_pose.value(), hdmap_utils_ptr_)) {
       stopAtCurrentPosition();
@@ -159,7 +176,8 @@ auto VehicleEntity::onUpdate(const double current_time, const double step_time) 
   EntityBase::onPostUpdate(current_time, step_time);
 }
 
-void VehicleEntity::requestAcquirePosition(const CanonicalizedLaneletPose & lanelet_pose)
+void VehicleEntity::requestAcquirePosition(
+  const CanonicalizedLaneletPose & lanelet_pose, const RouteOption &)
 {
   behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
   if (status_->isInLanelet()) {
@@ -168,20 +186,22 @@ void VehicleEntity::requestAcquirePosition(const CanonicalizedLaneletPose & lane
   behavior_plugin_ptr_->setGoalPoses({static_cast<geometry_msgs::msg::Pose>(lanelet_pose)});
 }
 
-void VehicleEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose)
+void VehicleEntity::requestAcquirePosition(
+  const geometry_msgs::msg::Pose & map_pose, const RouteOption & options)
 {
   behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
   if (
     const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
       map_pose, status_->getBoundingBox(), false,
       getDefaultMatchingDistanceForLaneletPoseCalculation())) {
-    requestAcquirePosition(canonicalized_lanelet_pose.value());
+    requestAcquirePosition(canonicalized_lanelet_pose.value(), options);
   } else {
     THROW_SEMANTIC_ERROR("Goal of the vehicle entity should be on lane.");
   }
 }
 
-void VehicleEntity::requestAssignRoute(const std::vector<CanonicalizedLaneletPose> & waypoints)
+void VehicleEntity::requestAssignRoute(
+  const std::vector<CanonicalizedLaneletPose> & waypoints, const RouteOption &)
 {
   if (!isInLanelet()) {
     return;
@@ -195,7 +215,8 @@ void VehicleEntity::requestAssignRoute(const std::vector<CanonicalizedLaneletPos
   behavior_plugin_ptr_->setGoalPoses(goal_poses);
 }
 
-void VehicleEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> & waypoints)
+void VehicleEntity::requestAssignRoute(
+  const std::vector<geometry_msgs::msg::Pose> & waypoints, const RouteOption & options)
 {
   std::vector<CanonicalizedLaneletPose> route;
   for (const auto & waypoint : waypoints) {
@@ -208,28 +229,37 @@ void VehicleEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pos
       THROW_SEMANTIC_ERROR("Waypoint of vehicle entity should be on lane.");
     }
   }
-  requestAssignRoute(route);
+  requestAssignRoute(route, options);
 }
 
 auto VehicleEntity::requestFollowTrajectory(
   const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & parameter) -> void
 {
-  behavior_plugin_ptr_->setPolylineTrajectory(parameter);
-  behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_POLYLINE_TRAJECTORY);
-  std::vector<CanonicalizedLaneletPose> waypoints;
-  for (const auto & vertex : parameter->shape.vertices) {
-    if (
-      const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
-        vertex.position, status_->getBoundingBox(), false,
-        getDefaultMatchingDistanceForLaneletPoseCalculation())) {
-      waypoints.emplace_back(canonicalized_lanelet_pose.value());
-    } else {
-      /// @todo such a protection most likely makes sense, but test scenario
-      /// RoutingAction.FollowTrajectoryAction-star has waypoints outside lanelet2
-      // THROW_SEMANTIC_ERROR("FollowTrajectory waypoint should be on lane.");
+  if (parameter) {
+    behavior_plugin_ptr_->setPolylineTrajectory(parameter);
+    behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_POLYLINE_TRAJECTORY);
+
+    std::vector<CanonicalizedLaneletPose> waypoints;
+    lanelet::Ids route_lanelets;
+    const auto curve = math::geometry::CatmullRomSpline(status_->getMapPose().position, parameter);
+    /// @note Hard coded parameter: 1.0 is a sample resolution of the trajectory. (Unit: m)
+    for (const auto & waypoint : curve.getTrajectoryPoses(0.0, curve.getLength(), 1.0)) {
+      if (
+        const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
+          waypoint, getBoundingBox(), true,
+          getDefaultMatchingDistanceForLaneletPoseCalculation())) {
+        route_lanelets.push_back(canonicalized_lanelet_pose.value().getLaneletId());
+        waypoints.emplace_back(canonicalized_lanelet_pose.value());
+      }
     }
+    behavior_plugin_ptr_->setRouteLanelets(route_lanelets);
+    route_planner_.setWaypoints(waypoints);
+  } else {
+    THROW_SIMULATION_ERROR(
+      "Traffic simulator send requests of FollowTrajectory, but the trajectory is empty.",
+      "This message is not originally intended to be displayed, if you see it, please "
+      "contact the developer of traffic_simulator.");
   }
-  route_planner_.setWaypoints(waypoints);
 }
 
 auto VehicleEntity::requestLaneChange(const lanelet::Id to_lanelet_id) -> void

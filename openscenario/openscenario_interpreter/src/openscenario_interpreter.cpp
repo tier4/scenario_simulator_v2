@@ -24,6 +24,7 @@
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <openscenario_interpreter/syntax/speed_condition.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
+#include <sstream>
 #include <status_monitor/status_monitor.hpp>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
 
@@ -49,6 +50,7 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   output_directory("/tmp"),
   publish_empty_context(false),
   record(false),
+  record_option(""),
   record_storage_id("")
 {
   DECLARE_PARAMETER(local_frame_rate);
@@ -57,11 +59,12 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   DECLARE_PARAMETER(output_directory);
   DECLARE_PARAMETER(publish_empty_context);
   DECLARE_PARAMETER(record);
+  DECLARE_PARAMETER(record_option);
   DECLARE_PARAMETER(record_storage_id);
 
-  declare_parameter<std::string>("speed_condition", "legacy");
   SpeedCondition::compatibility =
-    boost::lexical_cast<Compatibility>(get_parameter("speed_condition").as_string());
+    boost::lexical_cast<Compatibility>(common::getParameter<std::string>(
+      get_node_parameters_interface(), "speed_condition", "legacy"));
 }
 
 Interpreter::~Interpreter() {}
@@ -119,18 +122,15 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
       GET_PARAMETER(output_directory);
       GET_PARAMETER(publish_empty_context);
       GET_PARAMETER(record);
+      GET_PARAMETER(record_option);
       GET_PARAMETER(record_storage_id);
 
       script = std::make_shared<OpenScenario>(osc_path);
 
       // CanonicalizedLaneletPose is also used on the OpenScenarioInterpreter side as NativeLanePose.
       // so canonicalization takes place here - it uses the value of the consider_pose_by_road_slope parameter
-      traffic_simulator::lanelet_pose::CanonicalizedLaneletPose::setConsiderPoseByRoadSlope([&]() {
-        if (not has_parameter("consider_pose_by_road_slope")) {
-          declare_parameter("consider_pose_by_road_slope", false);
-        }
-        return get_parameter("consider_pose_by_road_slope").as_bool();
-      }());
+      traffic_simulator::lanelet_pose::CanonicalizedLaneletPose::setConsiderPoseByRoadSlope(
+        common::getParameter<bool>("consider_pose_by_road_slope"));
 
       if (script->category.is<ScenarioDefinition>()) {
         scenarios = {std::dynamic_pointer_cast<ScenarioDefinition>(script->category)};
@@ -147,44 +147,6 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
     });
 }
 
-auto Interpreter::engage() const -> void
-{
-  for (const auto & [name, scenario_object] : currentScenarioDefinition()->entities) {
-    if (
-      scenario_object.template is<ScenarioObject>() and
-      scenario_object.template as<ScenarioObject>().is_added and
-      scenario_object.template as<ScenarioObject>().object_controller.isAutoware()) {
-      NonStandardOperation::engage(name);
-    }
-  }
-}
-
-auto Interpreter::engageable() const -> bool
-{
-  return std::all_of(
-    std::cbegin(currentScenarioDefinition()->entities),
-    std::cend(currentScenarioDefinition()->entities), [this](const auto & each) {
-      const auto & [name, scenario_object] = each;
-      return not scenario_object.template is<ScenarioObject>() or
-             not scenario_object.template as<ScenarioObject>().is_added or
-             not scenario_object.template as<ScenarioObject>().object_controller.isAutoware() or
-             NonStandardOperation::isEngageable(name);
-    });
-}
-
-auto Interpreter::engaged() const -> bool
-{
-  return std::all_of(
-    std::cbegin(currentScenarioDefinition()->entities),
-    std::cend(currentScenarioDefinition()->entities), [this](const auto & each) {
-      const auto & [name, scenario_object] = each;
-      return not scenario_object.template is<ScenarioObject>() or
-             not scenario_object.template as<ScenarioObject>().is_added or
-             not scenario_object.template as<ScenarioObject>().object_controller.isAutoware() or
-             NonStandardOperation::isEngaged(name);
-    });
-}
-
 auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 {
   auto evaluate_storyboard = [this]() {
@@ -196,12 +158,19 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
       [this]() {
         const auto evaluate_time = execution_timer.invoke("evaluate", [this]() {
           if (std::isnan(evaluateSimulationTime())) {
-            if (not waiting_for_engagement_to_be_completed and engageable()) {
-              engage();
-              waiting_for_engagement_to_be_completed = true;  // NOTE: DIRTY HACK!!!
-            } else if (engaged()) {
+            if (std::all_of(
+                  currentScenarioDefinition()->entities.begin(),
+                  currentScenarioDefinition()->entities.end(), [this](const auto & each) {
+                    return std::apply(
+                      [this](const auto & name, const Object & object) {
+                        return not object.is<ScenarioObject>() or
+                               not object.as<ScenarioObject>().is_added or
+                               not object.as<ScenarioObject>().object_controller.isAutoware() or
+                               NonStandardOperation::isEngaged(name);
+                      },
+                      each);
+                  })) {
               activateNonUserDefinedControllers();
-              waiting_for_engagement_to_be_completed = false;  // NOTE: DIRTY HACK!!!
             }
           } else if (currentScenarioDefinition()) {
             currentScenarioDefinition()->evaluate();
@@ -260,14 +229,22 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
       },
       [&]() {
         if (record) {
-          if (record_storage_id == "") {
-            record::start(
-              "-a", "-o", boost::filesystem::path(osc_path).replace_extension("").string());
-          } else {
-            record::start(
-              "-a", "-o", boost::filesystem::path(osc_path).replace_extension("").string(), "-s",
-              record_storage_id);
+          std::vector<std::string> options{
+            "-a", "-o", boost::filesystem::path(osc_path).replace_extension("").string()};
+
+          if (not record_storage_id.empty()) {
+            options.insert(options.end(), {"-s", record_storage_id});
           }
+
+          if (not record_option.empty()) {
+            // split the record_option string with space.
+            std::istringstream iss(record_option);
+            std::copy(
+              std::istream_iterator<std::string>(iss), std::istream_iterator<std::string>(),
+              std::back_inserter(options));
+          }
+
+          record::start(options);
         }
 
         SimulatorCore::activate(
@@ -296,6 +273,15 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 
         if (currentScenarioDefinition()) {
           currentScenarioDefinition()->storyboard.init.evaluateInstantaneousActions();
+
+          for (const auto & [name, object] : currentScenarioDefinition()->entities) {
+            if (
+              object.template is<ScenarioObject>() and
+              object.template as<ScenarioObject>().is_added and
+              object.template as<ScenarioObject>().object_controller.isAutoware()) {
+              NonStandardOperation::engage(name);
+            }
+          }
         } else {
           throw Error("No script evaluable.");
         }

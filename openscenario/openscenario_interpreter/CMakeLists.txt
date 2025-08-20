@@ -52,11 +52,13 @@ ament_export_include_directories(${boost_json_SOURCE_DIR}/include)
 #  libopenscenario_interpreter
 # ------------------------------------------------------------------------------
 file(GLOB ${PROJECT_NAME}_POSIX_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/posix/*.cpp)
+file(GLOB ${PROJECT_NAME}_READER_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/reader/*.cpp)
 file(GLOB ${PROJECT_NAME}_SYNTAX_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/syntax/*.cpp)
 file(GLOB ${PROJECT_NAME}_UTILITY_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/utility/*.cpp)
 
 ament_auto_add_library(${PROJECT_NAME} SHARED
   ${${PROJECT_NAME}_POSIX_SOURCES}
+  ${${PROJECT_NAME}_READER_SOURCES}
   ${${PROJECT_NAME}_SYNTAX_SOURCES}
   ${${PROJECT_NAME}_UTILITY_SOURCES}
   src/compatibility.cpp
@@ -101,7 +103,9 @@ if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
   ament_add_gtest(test_syntax test/test_syntax.cpp)
+  ament_add_gtest(test_parsed_traffic_signal_id test/test_parsed_traffic_signal_id.cpp)
   target_link_libraries(test_syntax ${PROJECT_NAME})
+  target_link_libraries(test_parsed_traffic_signal_id ${PROJECT_NAME})
 endif()
 
 ament_auto_package()

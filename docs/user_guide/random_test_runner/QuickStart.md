@@ -114,7 +114,7 @@ Random test runner will load `result.yaml` file and rerun test.
    
 ### Preparing Unity project
 
- Follow [Setup Unity Project tutorial](https://tier4.github.io/AWSIM/GettingStarted/SetupUnityProject/)
+ Follow [Setup Unity Project tutorial](https://tier4.github.io/AWSIM/DeveloperGuide/SetupUnityProject/)
 
 ### Running the demo
 
@@ -125,7 +125,7 @@ Random test runner will load `result.yaml` file and rerun test.
 ```bash
 ros2 launch random_test_runner random_test.launch.py map_name:=shinjuku_map simulator_type:=awsim \
 npc_count:=5 initialize_duration:=260 sensor_model:=awsim_sensor_kit  vehicle_model:=sample_vehicle  \
-autoware_launch_file:=e2e_simulator.launch.xml autoware_architecture:="awf/universe/20230906"
+autoware_launch_file:=e2e_simulator.launch.xml autoware_architecture:="awf/universe/20250130"
 ```
 
 ![Random test runner launched](img/random_test_runner_awsim.png)

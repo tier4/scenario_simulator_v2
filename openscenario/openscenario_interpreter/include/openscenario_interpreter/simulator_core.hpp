@@ -182,7 +182,7 @@ public:
       routing_configuration.allow_lane_change =
         (routing_algorithm == RoutingAlgorithm::value_type::shortest);
       return traffic_simulator::pose::relativeLaneletPose(
-        from_lanelet_pose, to_lanelet_pose, routing_configuration, core->getHdmapUtils());
+        from_lanelet_pose, to_lanelet_pose, routing_configuration);
     }
 
     static auto makeNativeBoundingBoxRelativeLanePosition(
@@ -230,7 +230,7 @@ public:
         (routing_algorithm == RoutingAlgorithm::value_type::shortest);
       return traffic_simulator::pose::boundingBoxRelativeLaneletPose(
         from_lanelet_pose, from_bounding_box, to_lanelet_pose, to_bounding_box,
-        routing_configuration, core->getHdmapUtils());
+        routing_configuration);
     }
 
     static auto makeNativeBoundingBoxRelativeWorldPosition(
@@ -300,7 +300,7 @@ public:
     }
 
     template <typename... Ts>
-    static auto applyAddEntityAction(Ts &&... xs)
+    static auto applyAddEntityAction(Ts &&... xs) -> decltype(auto)
     {
       return core->spawn(std::forward<decltype(xs)>(xs)...);
     }
@@ -377,7 +377,7 @@ public:
           };
 
           // clang-format off
-          configuration.set_architecture_type(core->getROS2Parameter<std::string>("architecture_type", "awf/universe/20240605"));
+          configuration.set_architecture_type(common::getParameter<std::string>("architecture_type", "awf/universe/20240605"));
           configuration.set_entity(entity_ref);
           configuration.set_horizontal_resolution(degree_to_radian(controller.properties.template get<Double>("pointcloudHorizontalResolution", 1.0)));
           configuration.set_lidar_sensor_delay(controller.properties.template get<Double>("pointcloudPublishingDelay"));
@@ -401,7 +401,7 @@ public:
         core->attachDetectionSensor([&]() {
           simulation_api_schema::DetectionSensorConfiguration configuration;
           // clang-format off
-          configuration.set_architecture_type(core->getROS2Parameter<std::string>("architecture_type", "awf/universe/20240605"));
+          configuration.set_architecture_type(common::getParameter<std::string>("architecture_type", "awf/universe/20240605"));
           configuration.set_entity(entity_ref);
           configuration.set_detect_all_objects_in_range(controller.properties.template get<Boolean>("isClairvoyant"));
           configuration.set_object_recognition_delay(controller.properties.template get<Double>("detectedObjectPublishingDelay"));
@@ -418,7 +418,7 @@ public:
         core->attachOccupancyGridSensor([&]() {
           simulation_api_schema::OccupancyGridSensorConfiguration configuration;
           // clang-format off
-          configuration.set_architecture_type(core->getROS2Parameter<std::string>("architecture_type", "awf/universe/20240605"));
+          configuration.set_architecture_type(common::getParameter<std::string>("architecture_type", "awf/universe/20240605"));
           configuration.set_entity(entity_ref);
           configuration.set_filter_by_range(controller.properties.template get<Boolean>("isClairvoyant"));
           configuration.set_height(200);
@@ -433,15 +433,17 @@ public:
         core->attachPseudoTrafficLightDetector([&]() {
           simulation_api_schema::PseudoTrafficLightDetectorConfiguration configuration;
           configuration.set_architecture_type(
-            core->getROS2Parameter<std::string>("architecture_type", "awf/universe/20240605"));
+            common::getParameter<std::string>("architecture_type", "awf/universe/20240605"));
           return configuration;
         }());
 
         auto & ego_entity = core->getEgoEntity(entity_ref);
 
-        ego_entity.setParameter<bool>(
-          "allow_goal_modification",
-          controller.properties.template get<Boolean>("allowGoalModification"));
+        if (controller.properties.contains("allowGoalModification")) {
+          ego_entity.setParameter<bool>(
+            "allow_goal_modification",
+            controller.properties.template get<Boolean>("allowGoalModification"));
+        }
 
         for (const auto & module :
              [](std::string manual_modules_string) {

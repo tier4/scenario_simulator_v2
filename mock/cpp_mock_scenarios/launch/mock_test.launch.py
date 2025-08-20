@@ -107,6 +107,7 @@ def launch_setup(context, *args, **kwargs):
     autoware_launch_package             = LaunchConfiguration("autoware_launch_package",                default=default_autoware_launch_package_of(architecture_type.perform(context)))
     consider_acceleration_by_road_slope = LaunchConfiguration("consider_acceleration_by_road_slope",    default=False)
     consider_pose_by_road_slope         = LaunchConfiguration("consider_pose_by_road_slope",            default=True)
+    enable_perf                         = LaunchConfiguration("enable_perf",                            default=False)
     global_frame_rate                   = LaunchConfiguration("global_frame_rate",                      default=20.0)
     global_real_time_factor             = LaunchConfiguration("global_real_time_factor",                default=1.0)
     global_timeout                      = LaunchConfiguration("global_timeout",                         default=180)
@@ -126,8 +127,10 @@ def launch_setup(context, *args, **kwargs):
     simulate_localization               = LaunchConfiguration("simulate_localization",                  default=True)
     use_sim_time                        = LaunchConfiguration("use_sim_time",                           default=False)
     vehicle_model                       = LaunchConfiguration("vehicle_model",                          default="")
+    ego_model                           = LaunchConfiguration("ego_model",                              default="")
     scenario_package                    = LaunchConfiguration("package",                                default="cpp_mock_scenarios")
     junit_path                          = LaunchConfiguration("junit_path",                             default="/tmp/output.xunit.xml")
+    map_path                            = LaunchConfiguration("map_path",                               default="")
     # fmt: on
 
     print(f"architecture_type                   := {architecture_type.perform(context)}")
@@ -135,6 +138,7 @@ def launch_setup(context, *args, **kwargs):
     print(f"autoware_launch_package             := {autoware_launch_package.perform(context)}")
     print(f"consider_acceleration_by_road_slope := {consider_acceleration_by_road_slope.perform(context)}")
     print(f"consider_pose_by_road_slope         := {consider_pose_by_road_slope.perform(context)}")
+    print(f"enable_perf                         := {enable_perf.perform(context)}")
     print(f"global_frame_rate                   := {global_frame_rate.perform(context)}")
     print(f"global_real_time_factor             := {global_real_time_factor.perform(context)}")
     print(f"global_timeout                      := {global_timeout.perform(context)}")
@@ -177,10 +181,19 @@ def launch_setup(context, *args, **kwargs):
             {"global_frame_rate": global_frame_rate},
             {"global_timeout": global_timeout},
             {"junit_path": junit_path},
+            {"ego_model": ego_model},
+            {"map_path": map_path},
         ]
         parameters += make_vehicle_parameters()
         parameters += [parameter_file_path.perform(context)]
         return parameters
+
+    def make_launch_prefix():
+        if enable_perf.perform(context) == "True":
+            return "perf record -F 10000"
+        else:
+            return ""
+
 
     def make_vehicle_parameters():
         parameters = []
@@ -219,6 +232,7 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("autoware_launch_package",             default_value=autoware_launch_package            ),
         DeclareLaunchArgument("consider_acceleration_by_road_slope", default_value=consider_acceleration_by_road_slope),
         DeclareLaunchArgument("consider_pose_by_road_slope",         default_value=consider_pose_by_road_slope        ),
+        DeclareLaunchArgument("enable_perf",                         default_value=enable_perf                        ),
         DeclareLaunchArgument("global_frame_rate",                   default_value=global_frame_rate                  ),
         DeclareLaunchArgument("global_real_time_factor",             default_value=global_real_time_factor            ),
         DeclareLaunchArgument("global_timeout",                      default_value=global_timeout                     ),
@@ -234,8 +248,10 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("simulate_localization",               default_value=simulate_localization              ),
         DeclareLaunchArgument("use_sim_time",                        default_value=use_sim_time                       ),
         DeclareLaunchArgument("vehicle_model",                       default_value=vehicle_model                      ),
+        DeclareLaunchArgument("ego_model",                           default_value=ego_model                          ),
         DeclareLaunchArgument("scenario_package",                    default_value=scenario_package                   ),
         DeclareLaunchArgument("junit_path",                          default_value=junit_path                         ),
+        DeclareLaunchArgument("map_path",                            default_value=map_path                           ),
         # fmt: on
         cpp_scenario_node,
         Node(
@@ -253,6 +269,7 @@ def launch_setup(context, *args, **kwargs):
             name="visualizer",
             output="screen",
             remappings=[("/simulation/entity/status", "/entity/status")],
+            prefix=make_launch_prefix(),
         ),
         Node(
             package="rviz2",
