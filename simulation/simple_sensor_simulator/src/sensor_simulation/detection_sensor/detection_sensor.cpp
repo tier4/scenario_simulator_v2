@@ -614,6 +614,24 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
       return noised_detected_entities;
     };
 
+    auto noise_v4 = [&](const auto & detected_entities, auto simulation_time) {
+      auto get_noised_entity = [&](
+                                 const auto & detected_entity, auto simulation_time,
+                                 const std::string & version_namespace) { return detected_entity; };
+      auto noised_detected_entities = std::decay_t<decltype(detected_entities)>();
+      for (const auto & entity : detected_entities) {
+        if (const auto matched_config_name = get_first_matched_config_name(entity, "v4");
+            not matched_config_name.empty()) {
+          noised_detected_entities.push_back(
+            get_noised_entity(entity, simulation_time, "v4." + matched_config_name));
+        } else {
+          // If no matched config is found, keep the original entity as is.
+          noised_detected_entities.push_back(entity);
+        }
+      }
+      return noised_detected_entities;
+    };
+
     auto noise = [&](auto &&... xs) {
       switch (noise_model_version) {
         default:
@@ -624,6 +642,8 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
           return noise_v2(std::forward<decltype(xs)>(xs)..., "v2");
         case 3:
           return noise_v3(std::forward<decltype(xs)>(xs)...);
+        case 4:
+          return noise_v4(std::forward<decltype(xs)>(xs)...);
       }
     };
 
