@@ -518,14 +518,17 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
     auto noise_v3 = [&](const auto & detected_entities, auto simulation_time) {
       auto noised_detected_entities = std::decay_t<decltype(detected_entities)>();
 
-      auto get_first_matched_config_name =
-        [this](const traffic_simulator_msgs::EntityStatus & entity) -> std::string {
-        auto matches_v3_noise_application_entities =
+      auto get_first_matched_config_name = [this](
+                                             const traffic_simulator_msgs::EntityStatus & entity,
+                                             const std::string & version) -> std::string {
+        const std::string version_base_path =
+          std::string(detected_objects_publisher->get_topic_name()) + ".noise." + version + ".";
+        auto matches_noise_application_entities =
           [&](
             const traffic_simulator_msgs::EntityStatus & entity,
             const std::string & noise_config_name) -> bool {
-          const auto base_path = std::string(detected_objects_publisher->get_topic_name()) +
-                                 ".noise.v3." + noise_config_name + ".noise_application_entities.";
+          const auto base_path =
+            version_base_path + noise_config_name + ".noise_application_entities.";
 
           const auto types = common::getParameter<std::vector<std::string>>(base_path + "types");
           const auto subtypes =
@@ -563,43 +566,40 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
           // clang-format on
         };
 
-        const std::string v3_base_path =
-          std::string(detected_objects_publisher->get_topic_name()) + ".noise.v3.";
-
         const auto parameter_names =
           common::getParameterNode()
             .list_parameters({}, rcl_interfaces::srv::ListParameters::Request::DEPTH_RECURSIVE)
             .names;
 
-        auto extract_v3_child_namespace = [&](const std::string & parameter_name) -> std::string {
-          if (const auto next_dot_pos = parameter_name.find('.', v3_base_path.length());
+        auto extract_child_namespace = [&](const std::string & parameter_name) -> std::string {
+          if (const auto next_dot_pos = parameter_name.find('.', version_base_path.length());
               next_dot_pos != std::string::npos) {
             return parameter_name.substr(
-              v3_base_path.length(), next_dot_pos - v3_base_path.length());
+              version_base_path.length(), next_dot_pos - version_base_path.length());
           }
           return "";
         };
 
-        if (auto v3_matched_parameter = std::find_if(
+        if (auto matched_parameter = std::find_if(
               parameter_names.begin(), parameter_names.end(),
               [&](const auto & parameter_name) {
-                if (parameter_name.rfind(v3_base_path, 0) == 0) {
-                  if (auto child_namespace = extract_v3_child_namespace(parameter_name);
+                if (parameter_name.rfind(version_base_path, 0) == 0) {
+                  if (auto child_namespace = extract_child_namespace(parameter_name);
                       child_namespace != "") {
-                    return matches_v3_noise_application_entities(entity, child_namespace);
+                    return matches_noise_application_entities(entity, child_namespace);
                   }
                 }
                 return false;
               });
-            v3_matched_parameter != parameter_names.end()) {
-          return extract_v3_child_namespace(*v3_matched_parameter);
+            matched_parameter != parameter_names.end()) {
+          return extract_child_namespace(*matched_parameter);
         } else {
           return "";
         }
       };
 
       for (const auto & entity : detected_entities) {
-        if (const auto matched_config_name = get_first_matched_config_name(entity);
+        if (const auto matched_config_name = get_first_matched_config_name(entity, "v3");
             not matched_config_name.empty()) {
           auto vanilla_entity = std::vector<traffic_simulator_msgs::EntityStatus>{entity};
           auto noised_entity =
