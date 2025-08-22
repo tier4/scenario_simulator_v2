@@ -84,8 +84,14 @@ void Preprocessor::preprocessScenario(ScenarioSet & scenario)
   using openscenario_interpreter::ParameterValueDistribution;
 
   if (validateXOSC(scenario.path)) {
-    if (auto script = std::make_shared<OpenScenario>(scenario.path);
-        script->category.is<ParameterValueDistribution>()) {
+    std::shared_ptr<OpenScenario> script;
+    try{
+      auto script = std::make_shared<OpenScenario>(scenario.path);
+    }
+    catch (const common::SyntaxError & e) {
+      throw common::Error("Failed to parse OpenSCENARIO file: " + scenario.path.string() << " Error: " << e.what());
+    } 
+    if (script->category.is<ParameterValueDistribution>()) {
       auto base_scenario_path =
         script->category.as<ParameterValueDistribution>().scenario_file.filepath;
       if (boost::filesystem::exists(base_scenario_path)) {
