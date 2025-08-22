@@ -603,11 +603,13 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
     auto noise_v3 = [&](const auto & detected_entities, auto simulation_time) {
       auto noised_detected_entities = std::decay_t<decltype(detected_entities)>();
       for (const auto & entity : detected_entities) {
-        if (const auto matched_config_name = get_first_matched_config_name(entity, "v3");
-            not matched_config_name.empty()) {
+        if (auto [noise_output, success] = noise_outputs.emplace(entity.name(), simulation_time);
+            success) {
+          noise_output->second.config_name = get_first_matched_config_name(entity, "v3");
+        } else if (not noise_output->second.config_name.empty()) {
           auto vanilla_entity = std::vector<traffic_simulator_msgs::EntityStatus>{entity};
-          auto noised_entity =
-            noise_v2(vanilla_entity, simulation_time, "v3." + matched_config_name);
+          const std::string config_namespace = "v3." + noise_output->second.config_name;
+          auto noised_entity = noise_v2(vanilla_entity, simulation_time, config_namespace);
           noised_detected_entities.insert(
             noised_detected_entities.end(), noised_entity.begin(), noised_entity.end());
         } else {
