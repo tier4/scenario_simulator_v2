@@ -623,16 +623,66 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
 
     auto noise_v4 = [&](const auto & detected_entities, auto simulation_time) {
       auto get_noised_entity = [&](
-                                 const auto & detected_entity, auto simulation_time,
-                                 const std::string & version_namespace) { return detected_entity; };
+                                 const auto & vanilla_entity, auto simulation_time,
+                                 const std::string & parameter_base_path) {
+        auto [noise_output, success] =
+          noise_outputs.emplace(vanilla_entity.name(), simulation_time);
+        const auto interval =
+          simulation_time - std::exchange(noise_output->second.simulation_time, simulation_time);
+
+        noise_output->second.v4_position_x_noise = [&]() {
+          const auto mean = common::getParameter<double>(parameter_base_path + "position.x.mean");
+          const auto standard_deviation =
+            common::getParameter<double>(parameter_base_path + "position.x.standard_deviation");
+          return autoregressive_noise(
+            noise_output->second.v4_position_x_noise, mean, standard_deviation,
+            autocorrelation_coefficient(parameter_base_path + "position.x", interval));
+        }();
+
+        noise_output->second.v4_position_y_noise = [&]() {
+          const auto mean = common::getParameter<double>(parameter_base_path + "position.y.mean");
+          const auto standard_deviation =
+            common::getParameter<double>(parameter_base_path + "position.y.standard_deviation");
+          return autoregressive_noise(
+            noise_output->second.v4_position_y_noise, mean, standard_deviation,
+            autocorrelation_coefficient(parameter_base_path + "position.y", interval));
+        }();
+
+        noise_output->second.v4_rotation_noise = [&]() {
+          const auto mean = common::getParameter<double>(parameter_base_path + "rotation.mean");
+          const auto standard_deviation =
+            common::getParameter<double>(parameter_base_path + "rotation.standard_deviation");
+          return autoregressive_noise(
+            noise_output->second.v4_rotation_noise, mean, standard_deviation,
+            autocorrelation_coefficient(parameter_base_path + "rotation", interval));
+        }();
+
+        noise_output->second.true_positive = [&]() {
+          const auto rate =
+            common::getParameter<double>(parameter_base_path + "true_positive.rate");
+          return markov_process_noise(
+            noise_output->second.true_positive, rate,
+            autocorrelation_coefficient(parameter_base_path + "true_positive", interval));
+        }();
+        if (not noise_output->second.true_positive) {
+          return vanilla_entity;
+        } else {
+          auto noised_entity = vanilla_entity;
+          // TODO(Kotaro Yoshimoto): apply noise_v4
+          return noised_entity;
+        }
+      };
       auto noised_detected_entities = std::decay_t<decltype(detected_entities)>();
       for (const auto & entity : detected_entities) {
         if (auto [noise_output, success] = noise_outputs.emplace(entity.name(), simulation_time);
             success) {
           noise_output->second.config_name = get_first_matched_config_name(entity, "v4");
         } else if (not noise_output->second.config_name.empty()) {
+          const std::string parameter_base_path =
+            std::string(detected_objects_publisher->get_topic_name()) + ".noise.v4." +
+            noise_output->second.config_name + ".";
           noised_detected_entities.push_back(
-            get_noised_entity(entity, simulation_time, "v4." + noise_output->second.config_name));
+            get_noised_entity(entity, simulation_time, parameter_base_path));
         } else {
           // If no matched config is found, keep the original entity as is.
           noised_detected_entities.push_back(entity);
