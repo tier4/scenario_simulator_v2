@@ -20,6 +20,7 @@
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
+#include <geometry/bounding_box.hpp>
 #include <geometry/quaternion/get_angle_difference.hpp>
 #include <geometry/quaternion/get_normal_vector.hpp>
 #include <geometry/quaternion/get_rotation_matrix.hpp>
@@ -667,9 +668,68 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
         if (not noise_output->second.true_positive) {
           return vanilla_entity;
         } else {
-          auto noised_entity = vanilla_entity;
-          // TODO(Kotaro Yoshimoto): apply noise_v4
-          return noised_entity;
+          math::geometry::boost_point ego_baselink_2d(
+            ego_entity_status->pose().position().x(), ego_entity_status->pose().position().y());
+
+          // we will apply noises to this point for the entity
+          const auto noise_base = [&]() {
+            traffic_simulator_msgs::msg::BoundingBox entity_bounding_box;
+            simulation_interface::toMsg(vanilla_entity.bounding_box(), entity_bounding_box);
+            geometry_msgs::msg::Pose entity_pose;
+            simulation_interface::toMsg(vanilla_entity.pose(), entity_pose);
+            return math::geometry::getClosestPointOnPolygon(
+              ego_baselink_2d, math::geometry::toPolygon2D(entity_pose, entity_bounding_box));
+          }();
+
+          // x and y components in the world coordinate of y unit vector in the noise coordinate system
+          if (const auto [is_too_close, y_unit_x, y_unit_y] =
+                [&]() -> std::tuple<bool, double, double> {
+                const auto dx = noise_base.x() - ego_baselink_2d.x();
+                const auto dy = noise_base.y() - ego_baselink_2d.y();
+                if (auto y_length = std::hypot(dx, dy); y_length < 1e-6) {
+                  return {true, 0.0, 0.0};
+                } else {
+                  return {false, dx / y_length, dy / y_length};
+                }
+                return {dx, dy, std::hypot(dx, dy)};
+              }();
+              is_too_close) {
+            // If ego and entity are too close, skip the noise application
+            return vanilla_entity;
+          } else {
+            // calculate position noise and calculate final coordinates
+            const auto [final_x, final_y] = [&]() -> std::tuple<double, double> {
+              // calculate rotation noise around noise_base
+              const auto [rotated_offset_x, rotated_offset_y] =
+                [&]() -> std::tuple<double, double> {
+                const auto baselink_offset_x =
+                  vanilla_entity.pose().position().x() - noise_base.x();
+                const auto baselink_offset_y =
+                  vanilla_entity.pose().position().y() - noise_base.y();
+                const auto cos_rotation = std::cos(noise_output->second.v4_rotation_noise);
+                const auto sin_rotation = std::sin(noise_output->second.v4_rotation_noise);
+                return {
+                  baselink_offset_x * cos_rotation - baselink_offset_y * sin_rotation,
+                  baselink_offset_x * sin_rotation + baselink_offset_y * cos_rotation};
+              }();
+              const auto x_unit_x = y_unit_y;
+              const auto x_unit_y = -y_unit_x;
+              const auto rotated_baselink_x = noise_base.x() + rotated_offset_x;
+              const auto rotated_baselink_y = noise_base.y() + rotated_offset_y;
+              const auto & x_noise = noise_output->second.v4_position_x_noise;
+              const auto & y_noise = noise_output->second.v4_position_y_noise;
+              const auto noise_world_x = x_noise * x_unit_x + y_noise * y_unit_x;
+              const auto noise_world_y = x_noise * x_unit_y + y_noise * y_unit_y;
+              return {rotated_baselink_x + noise_world_x, rotated_baselink_y + noise_world_y};
+            }();
+
+            // apply position noise to entity
+            auto noised_entity = vanilla_entity;
+            noised_entity.mutable_pose()->mutable_position()->set_x(final_x);
+            noised_entity.mutable_pose()->mutable_position()->set_y(final_y);
+
+            return noised_entity;
+          }
         }
       };
       auto noised_detected_entities = std::decay_t<decltype(detected_entities)>();
