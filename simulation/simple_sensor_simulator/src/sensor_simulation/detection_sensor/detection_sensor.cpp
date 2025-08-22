@@ -627,10 +627,12 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
                                  const std::string & version_namespace) { return detected_entity; };
       auto noised_detected_entities = std::decay_t<decltype(detected_entities)>();
       for (const auto & entity : detected_entities) {
-        if (const auto matched_config_name = get_first_matched_config_name(entity, "v4");
-            not matched_config_name.empty()) {
+        if (auto [noise_output, success] = noise_outputs.emplace(entity.name(), simulation_time);
+            success) {
+          noise_output->second.config_name = get_first_matched_config_name(entity, "v4");
+        } else if (not noise_output->second.config_name.empty()) {
           noised_detected_entities.push_back(
-            get_noised_entity(entity, simulation_time, "v4." + matched_config_name));
+            get_noised_entity(entity, simulation_time, "v4." + noise_output->second.config_name));
         } else {
           // If no matched config is found, keep the original entity as is.
           noised_detected_entities.push_back(entity);
