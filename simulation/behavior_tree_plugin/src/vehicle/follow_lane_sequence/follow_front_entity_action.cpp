@@ -127,29 +127,48 @@ BT::NodeStatus FollowFrontEntityAction::doAction()
     setOutput("obstacle", obstacle);
     return BT::NodeStatus::RUNNING;
   }
-  if (
-    distance_to_front_entity_.value() >=
-    (calculateStopDistance(behavior_parameter_.dynamic_constraints) +
-     vehicle_parameters.bounding_box.dimensions.x + front_entity_margin)) {
-    setCanonicalizedEntityStatus(
-      calculateUpdatedEntityStatus(front_entity_linear_velocity + speed_step));
-    setOutput("waypoints", waypoints);
-    setOutput("obstacle", calculateObstacle(waypoints));
-    return BT::NodeStatus::RUNNING;
-  } else if (
-    distance_to_front_entity_.value() <=
-    calculateStopDistance(behavior_parameter_.dynamic_constraints)) {
-    setCanonicalizedEntityStatus(
-      calculateUpdatedEntityStatus(front_entity_linear_velocity - speed_step));
-    setOutput("waypoints", waypoints);
-    setOutput("obstacle", calculateObstacle(waypoints));
-    return BT::NodeStatus::RUNNING;
+  const auto apply_speed_limit = [&](double v) -> double {
+    return std::clamp(v, 0.0, target_speed_.value());
+  };
+
+  const auto self_avoidance_circle_radius =
+    std::sqrt(
+      std::pow(vehicle_parameters.bounding_box.dimensions.x, 2.0) +
+      std::pow(vehicle_parameters.bounding_box.dimensions.y, 2.0)) /
+    2.0;
+
+  const auto front_entity_gap = distance_to_front_entity_.value() - self_avoidance_circle_radius;
+  const auto minimum_stop_distance = calculateStopDistance(behavior_parameter_.dynamic_constraints);
+  const auto abs_gap_margin_diff = std::abs(front_entity_gap - front_entity_margin);
+
+  std::optional<traffic_simulator_msgs::msg::Obstacle> obstacle;
+  if (front_entity_gap <= minimum_stop_distance) {
+    // Dangerous approach
+    setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(0.0));
+    obstacle = calculateObstacle(waypoints);
+  } else if (abs_gap_margin_diff < margin_tolerance) {
+    // Within margin tolerance
+    const auto request_velocity = apply_speed_limit(front_entity_linear_velocity);
+    std::cout << "request_velocity: " << request_velocity << std::endl;
+    setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(request_velocity));
+    obstacle = calculateObstacle(waypoints);
+  } else if (front_entity_gap < front_entity_margin) {
+    // Below the margin
+    const auto request_velocity = apply_speed_limit(front_entity_linear_velocity - speed_step);
+    std::cout << "request_velocity: " << request_velocity << std::endl;
+    setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(request_velocity));
+    obstacle = calculateObstacle(waypoints);
   } else {
-    setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(front_entity_linear_velocity));
-    setOutput("waypoints", waypoints);
-    setOutput("obstacle", calculateObstacle(waypoints));
-    return BT::NodeStatus::RUNNING;
+    // Too far apart
+    const auto request_velocity = apply_speed_limit(front_entity_linear_velocity + speed_step);
+    std::cout << "request_velocity: " << request_velocity << std::endl;
+    setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(request_velocity));
+    obstacle = calculateObstacle(waypoints);
   }
+
+  setOutput("waypoints", waypoints);
+  setOutput("obstacle", obstacle);
+  return BT::NodeStatus::RUNNING;
 }
 }  // namespace follow_lane_sequence
 }  // namespace vehicle
