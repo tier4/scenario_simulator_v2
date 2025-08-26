@@ -162,7 +162,6 @@ FieldOperatorApplication::FieldOperatorApplication(const pid_t pid)
   requestSetRtcAutoMode("/api/external/set/rtc_auto_mode", *this),
   requestSetVelocityLimit("/api/autoware/set/velocity_limit", *this),
   requestEnableAutowareControl("/api/operation_mode/enable_autoware_control", *this),
-  requestDisableAutowareControl("/api/operation_mode/disable_autoware_control", *this),
   requestChangeToStop("/api/operation_mode/change_to_stop", *this)
 // clang-format on
 {
