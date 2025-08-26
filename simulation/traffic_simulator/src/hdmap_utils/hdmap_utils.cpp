@@ -689,34 +689,11 @@ auto HdMapUtils::getTrafficLightIds() const -> lanelet::Ids
 }
 
 auto HdMapUtils::getTrafficLightBulbPosition(
-  const lanelet::Id traffic_light_id, const std::string & color_name,
-  const bool allow_infer_position) const -> std::optional<geometry_msgs::msg::Point>
+  const lanelet::Id traffic_light_id, const std::string & color_name, const bool) const
+  -> std::optional<geometry_msgs::msg::Point>
 {
   lanelet::ConstLanelets all_lanelets = lanelet::utils::query::laneletLayer(lanelet_map_ptr_);
   auto autoware_traffic_lights = lanelet::utils::query::autowareTrafficLights(all_lanelets);
-
-  auto isBulbOfExpectedColor = [color_name](auto bulb) -> bool {
-    return bulb.hasAttribute("color") and !bulb.hasAttribute("arrow") and
-           bulb.attribute("color").value().compare(color_name) == 0;
-  };
-
-  for (const auto & light : autoware_traffic_lights) {
-    for (auto three_light_bulbs : light->lightBulbs()) {
-      for (auto bulb : static_cast<lanelet::ConstLineString3d>(three_light_bulbs)) {
-        if (isBulbOfExpectedColor(bulb)) {
-          geometry_msgs::msg::Point point;
-          point.x = bulb.x();
-          point.y = bulb.y();
-          point.z = bulb.z();
-          return point;
-        }
-      }
-    }
-  }
-
-  if (!allow_infer_position) {
-    return std::nullopt;
-  }
 
   // In case of a traffic light without bulbs, we can check the base string
   // to get the position of the traffic light
@@ -1158,10 +1135,11 @@ auto HdMapUtils::getLaneletsForTrafficLights() const
 
     for (const auto & traffic_light : traffic_lights) {
       for (const auto & light : traffic_light->trafficLights()) {
-        traffic_light_to_lanelets_map.try_emplace(light.id())
-          .first->second.emplace_back(lanelet.id());
-        std::cerr << "Traffic Light id: " << light.id() << " lanelet id: " << lanelet.id()
-                  << std::endl;
+        if (isTrafficLight(light.id())) {
+          traffic_light_to_lanelets_map.try_emplace(light.id())
+            .first->second.emplace_back(lanelet.id());
+          s
+        }
       }
     }
   }
