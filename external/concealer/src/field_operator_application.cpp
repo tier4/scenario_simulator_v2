@@ -164,9 +164,15 @@ FieldOperatorApplication::FieldOperatorApplication(const pid_t pid)
   requestEnableAutowareControl("/api/operation_mode/enable_autoware_control", *this),
   requestDisableAutowareControl("/api/operation_mode/disable_autoware_control", *this),
   requestChangeToStop("/api/operation_mode/change_to_stop", *this)
-{
-}
 // clang-format on
+{
+  task_queue.delay([this] {
+    /*
+       To ensure that Autoware is in a safe state, request to change to stop
+    */
+    requestChangeToStop(std::make_shared<ChangeOperationMode::Request>(), 30);
+  });
+}
 
 FieldOperatorApplication::~FieldOperatorApplication()
 {
