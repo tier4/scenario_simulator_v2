@@ -12,6 +12,7 @@
 
   <depend>boost</depend>
   <depend>nlohmann-json-dev</depend>
+  <depend>rclcpp</depend>
 
   <export>
     <build_type>ament_cmake</build_type>

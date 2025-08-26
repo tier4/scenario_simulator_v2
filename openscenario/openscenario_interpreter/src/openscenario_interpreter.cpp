@@ -384,7 +384,11 @@ auto Interpreter::reset() -> void
     result);
 
   if (record) {
-    record::stop();
+    /*
+    openscenario_interpreter::record::stop() is also slower,
+    as it sleeps for 3s and then waits until rosbag saving is finished.
+    */
+    common::status_monitor.overrideThreshold(simulator_core_shutdown_threshold, record::stop);
   }
 }
 }  // namespace openscenario_interpreter
