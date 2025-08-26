@@ -1138,7 +1138,6 @@ auto HdMapUtils::getLaneletsForTrafficLights() const
         if (isTrafficLight(light.id())) {
           traffic_light_to_lanelets_map.try_emplace(light.id())
             .first->second.emplace_back(lanelet.id());
-          s
         }
       }
     }
