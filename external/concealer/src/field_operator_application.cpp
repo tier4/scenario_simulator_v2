@@ -326,8 +326,6 @@ auto FieldOperatorApplication::initialize(const geometry_msgs::msg::Pose & initi
 {
   if (not std::exchange(initialized, true)) {
     task_queue.delay([this, initial_pose]() {
-      requestChangeToStop(std::make_shared<ChangeOperationMode::Request>(), 30);
-      requestDisableAutowareControl(std::make_shared<ChangeOperationMode::Request>(), 30);
       switch (const auto state = getLegacyAutowareState(); state.value) {
         default:
           throw common::AutowareError(
