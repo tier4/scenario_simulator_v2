@@ -1158,17 +1158,21 @@ auto HdMapUtils::getLaneletsForTrafficLights() const
   std::unordered_map<TrafficLightId, lanelet::Ids> traffic_light_to_lanelets_map;
 
   for (const auto & lanelet : lanelet_map_ptr_->laneletLayer) {
+    if (lanelet.hasAttribute(lanelet::AttributeName::Subtype)) {
+      const auto subtype = lanelet.attribute(lanelet::AttributeName::Subtype).value();
+      if (subtype == lanelet::AttributeValueString::Crosswalk) {
+        continue;
+      }
+    }
     const auto traffic_lights =
       lanelet.regulatoryElementsAs<const lanelet::autoware::AutowareTrafficLight>();
 
     for (const auto & traffic_light : traffic_lights) {
-      for (const auto & light_bulb : traffic_light->lightBulbs()) {
-        if (!light_bulb.hasAttribute("traffic_light_id")) {
-          continue;
-        } else if (auto traffic_light_id = light_bulb.attribute("traffic_light_id").asId()) {
-          traffic_light_to_lanelets_map.try_emplace(*traffic_light_id)
-            .first->second.emplace_back(lanelet.id());
-        }
+      for (const auto & light : traffic_light->trafficLights()) {
+        traffic_light_to_lanelets_map.try_emplace(light.id())
+          .first->second.emplace_back(lanelet.id());
+        std::cerr << "Traffic Light id: " << light.id() << " lanelet id: " << lanelet.id()
+                  << std::endl;
       }
     }
   }
