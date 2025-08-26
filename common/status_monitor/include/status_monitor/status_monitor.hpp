@@ -128,16 +128,16 @@ public:
 
   struct ScopedUpdater
   {
-    StatusMonitor * monitor;
-    explicit ScopedUpdater(StatusMonitor * m) : monitor(m) { monitor->touch(""); }
-    ~ScopedUpdater() { monitor->touch(""); }
+    StatusMonitor & monitor;
+    explicit ScopedUpdater(StatusMonitor & m) : monitor(m) { monitor.touch(""); }
+    ~ScopedUpdater() { monitor.touch(""); }
   };
 
   template <typename Thunk>
   auto overrideThreshold(const std::chrono::seconds & t, Thunk thunk) -> decltype(auto)
   {
     auto exchanger = ScopedExchanger(threshold, t);
-    auto updater = ScopedUpdater(this);
+    auto updater = ScopedUpdater(*this);
 
     return thunk();
   }
