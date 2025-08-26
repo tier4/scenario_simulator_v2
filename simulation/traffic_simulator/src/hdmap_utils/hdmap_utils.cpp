@@ -695,12 +695,6 @@ auto HdMapUtils::getTrafficLightBulbPosition(
   lanelet::ConstLanelets all_lanelets = lanelet::utils::query::laneletLayer(lanelet_map_ptr_);
   auto autoware_traffic_lights = lanelet::utils::query::autowareTrafficLights(all_lanelets);
 
-  auto areBulbsAssignedToTrafficLight = [traffic_light_id](auto red_yellow_green_bulbs) -> bool {
-    return red_yellow_green_bulbs.hasAttribute("traffic_light_id") and
-           red_yellow_green_bulbs.attribute("traffic_light_id").asId() and
-           red_yellow_green_bulbs.attribute("traffic_light_id").asId().value() == traffic_light_id;
-  };
-
   auto isBulbOfExpectedColor = [color_name](auto bulb) -> bool {
     return bulb.hasAttribute("color") and !bulb.hasAttribute("arrow") and
            bulb.attribute("color").value().compare(color_name) == 0;
@@ -708,15 +702,13 @@ auto HdMapUtils::getTrafficLightBulbPosition(
 
   for (const auto & light : autoware_traffic_lights) {
     for (auto three_light_bulbs : light->lightBulbs()) {
-      if (areBulbsAssignedToTrafficLight(three_light_bulbs)) {
-        for (auto bulb : static_cast<lanelet::ConstLineString3d>(three_light_bulbs)) {
-          if (isBulbOfExpectedColor(bulb)) {
-            geometry_msgs::msg::Point point;
-            point.x = bulb.x();
-            point.y = bulb.y();
-            point.z = bulb.z();
-            return point;
-          }
+      for (auto bulb : static_cast<lanelet::ConstLineString3d>(three_light_bulbs)) {
+        if (isBulbOfExpectedColor(bulb)) {
+          geometry_msgs::msg::Point point;
+          point.x = bulb.x();
+          point.y = bulb.y();
+          point.z = bulb.z();
+          return point;
         }
       }
     }
@@ -1124,12 +1116,9 @@ auto HdMapUtils::getTrafficLights(const lanelet::Id traffic_light_id) const
   lanelet::ConstLanelets all_lanelets = lanelet::utils::query::laneletLayer(lanelet_map_ptr_);
   auto autoware_traffic_lights = lanelet::utils::query::autowareTrafficLights(all_lanelets);
   for (const auto & light : autoware_traffic_lights) {
-    for (auto light_string : light->lightBulbs()) {
-      if (light_string.hasAttribute("traffic_light_id")) {
-        auto id = light_string.attribute("traffic_light_id").asId();
-        if (id == traffic_light_id) {
-          ret.emplace_back(light);
-        }
+    for (auto light_string : light->trafficLights()) {
+      if (light_string.id() == traffic_light_id) {
+        ret.emplace_back(light);
       }
     }
   }
