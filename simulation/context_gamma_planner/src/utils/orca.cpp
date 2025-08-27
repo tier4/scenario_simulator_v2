@@ -17,23 +17,6 @@
 namespace context_gamma_planner
 {
 
-auto ellipse_radius(
-  const traffic_simulator_msgs::msg::BoundingBox & bbox, const double relative_angle,
-  const double current_angle) -> double
-{
-  const auto other_major_axis = bbox.dimensions.x * 0.5 * M_SQRT2;
-  const auto other_minor_axis = bbox.dimensions.y * 0.5 * M_SQRT2;
-
-  const auto local_phi = relative_angle - current_angle;
-  const auto cos_p = std::cos(local_phi);
-  const auto sin_p = std::sin(local_phi);
-
-  return (other_major_axis * other_minor_axis) /
-         std::sqrt(
-           (other_minor_axis * cos_p) * (other_minor_axis * cos_p) +
-           (other_major_axis * sin_p) * (other_major_axis * sin_p));
-}
-
 auto calculate_orca_line(
   const geometry_msgs::msg::Vector3 & ego_velocity,
   const geometry_msgs::msg::Point & relative_position,
@@ -48,8 +31,28 @@ auto calculate_orca_line(
 
   const auto relative_angle = std::atan2(relative_position.y, relative_position.x);
 
-  const auto ego_radius = ellipse_radius(ego_bbox, relative_angle, ego_angle);
-  const auto other_radius = ellipse_radius(other_bbox, M_PI + relative_angle, other_angle);
+  // Approximate a w x h rectangle with the unique axis-aligned ellipse through (±w/2, ±h/2).
+  // This yields a^2 = w^2/2 and b^2 = h^2/2 (minimal-area enclosing ellipse),
+  // i.e., a = w / sqrt(2), b = h / sqrt(2).
+  // Support radius for direction delta = (relativeAngle - currentAngle):
+  //   r(delta) = (a*b) / sqrt((b*cos delta)^2 + (a*sin delta)^2).
+  auto computeBBoxEllipseRadiu = [](
+                                   const traffic_simulator_msgs::msg::BoundingBox & bbox,
+                                   const double relative_angle, const double current_angle) {
+    const auto other_major_axis = bbox.dimensions.x * 0.5 * M_SQRT2;
+    const auto other_minor_axis = bbox.dimensions.y * 0.5 * M_SQRT2;
+
+    const auto local_phi = relative_angle - current_angle;
+    const auto cos_p = std::cos(local_phi);
+    const auto sin_p = std::sin(local_phi);
+
+    return (other_major_axis * other_minor_axis) /
+           std::sqrt(
+             (other_minor_axis * cos_p) * (other_minor_axis * cos_p) +
+             (other_major_axis * sin_p) * (other_major_axis * sin_p));
+  };
+  const auto ego_radius = computeBBoxEllipseRadiu(ego_bbox, relative_angle, ego_angle);
+  const auto other_radius = computeBBoxEllipseRadiu(other_bbox, M_PI + relative_angle, other_angle);
 
   const auto combined_radius = ego_radius + other_radius;
   const auto combined_radius_sq = sqr(combined_radius);
