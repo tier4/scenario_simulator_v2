@@ -341,14 +341,14 @@ public:
       // Optional per-entity lateral collision margin (meters)
       // If omitted: leave unset (std::nullopt) to preserve legacy behavior.
       try {
-        entity.setLateralCollisionMargin(
-          controller.properties.template get<Double>("lateralCollisionMargin"));
-      } catch (...) {
-        try {
+        if (controller.properties.contains("lateralCollisionMargin")) {
+          entity.setLateralCollisionMargin(
+            controller.properties.template get<Double>("lateralCollisionMargin"));
+        } else {
           entity.setLateralCollisionMargin(std::nullopt);
-        } catch (...) {
-          // Some entity types may not support this setter; ignore silently.
         }
+      } catch (...) {
+        // Some entity types may not support this setter; ignore silently.
       }
 
       entity.setBehaviorParameter([&]() {
