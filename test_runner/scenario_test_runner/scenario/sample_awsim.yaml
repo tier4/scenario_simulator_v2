@@ -101,7 +101,7 @@ OpenSCENARIO:
                     LanePosition:
                       roadId: ''
                       laneId: '225'
-                      s: POSE_IN_LANE
+                      s: ${POSE_IN_LANE}
                       offset: -0.1748
                       Orientation:
                         type: relative
