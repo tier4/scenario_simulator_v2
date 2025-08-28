@@ -108,6 +108,9 @@ auto ActionNode::getBlackBoardValues() -> void
         "behavior_parameter", behavior_parameter_)) {
     behavior_parameter_ = traffic_simulator_msgs::msg::BehaviorParameter();
   }
+  if (!getInput<double>("lateral_collision_margin", lateral_collision_margin_)) {
+    lateral_collision_margin_ = 0.0;  // default: no extra lateral margin
+  }
 }
 
 auto ActionNode::getHorizon() const -> double
@@ -380,11 +383,12 @@ auto ActionNode::getDistanceToTargetEntity(
       const auto target_bounding_box_distance =
         bounding_box_distance.value() + from_bounding_box.dimensions.x / 2.0;
 
-      /// @note if the distance of the target entity to the spline is smaller than the width of the reference entity
+      /// @note If the lateral distance of the target entity to the spline is smaller than
+      /// half the width of the reference entity plus configurable margin, it is conflicting.
       if (const auto target_to_spline_distance = traffic_simulator::distance::distanceToSpline(
             static_cast<geometry_msgs::msg::Pose>(*target_lanelet_pose), target_bounding_box,
             spline, longitudinal_distance.value());
-          target_to_spline_distance <= from_bounding_box.dimensions.y / 2.0) {
+          target_to_spline_distance <= from_bounding_box.dimensions.y / 2.0 + lateral_collision_margin_) {
         return target_bounding_box_distance;
       }
       /// @note if the distance of the target entity to the spline cannot be calculated because a collision occurs

@@ -329,6 +329,11 @@ public:
 
   virtual auto setVelocityLimit(const double) -> void = 0;
 
+  // Optional per-entity lateral collision margin (meters).
+  // Default no-op for entities that do not use BT-based lateral collision checks.
+  virtual void setLateralCollisionMargin(double) {}
+  virtual double getLateralCollisionMargin() const { return 0.0; }
+
   virtual auto setMapPose(const geometry_msgs::msg::Pose & map_pose) -> void;
 
   /*   */ auto setTwist(const geometry_msgs::msg::Twist & twist) -> void;

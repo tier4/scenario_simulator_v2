@@ -338,6 +338,15 @@ public:
       entity.setVelocityLimit(controller.properties.template get<Double>(
         "maxSpeed", std::numeric_limits<Double::value_type>::max()));
 
+      // Optional per-entity lateral collision margin (meters)
+      // If omitted, defaults to 0 and preserves prior behavior.
+      try {
+        entity.setLateralCollisionMargin(
+          controller.properties.template get<Double>("lateralCollisionMargin", 0.0));
+      } catch (...) {
+        // Some entity types may not support this setter; ignore silently.
+      }
+
       entity.setBehaviorParameter([&]() {
         auto message = entity.getBehaviorParameter();
         message.see_around = not controller.properties.template get<Boolean>("isBlind");
