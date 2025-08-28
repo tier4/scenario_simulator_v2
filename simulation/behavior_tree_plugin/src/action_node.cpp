@@ -388,7 +388,8 @@ auto ActionNode::getDistanceToTargetEntity(
       if (const auto target_to_spline_distance = traffic_simulator::distance::distanceToSpline(
             static_cast<geometry_msgs::msg::Pose>(*target_lanelet_pose), target_bounding_box,
             spline, longitudinal_distance.value());
-          target_to_spline_distance <= from_bounding_box.dimensions.y / 2.0 + lateral_collision_margin_) {
+          target_to_spline_distance <=
+          from_bounding_box.dimensions.y / 2.0 + lateral_collision_margin_) {
         return target_bounding_box_distance;
       }
       /// @note if the distance of the target entity to the spline cannot be calculated because a collision occurs
