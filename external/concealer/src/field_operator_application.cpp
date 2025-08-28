@@ -318,6 +318,8 @@ auto FieldOperatorApplication::engaged() const -> bool
 auto FieldOperatorApplication::initialize(const geometry_msgs::msg::Pose & initial_pose) -> void
 {
   if (not std::exchange(initialized, true)) {
+    RCLCPP_INFO(
+      rclcpp::get_logger("concealer::FieldOperatorApplication::initialize"), "initialize");
     task_queue.delay([this, initial_pose]() {
       switch (const auto state = getLegacyAutowareState(); state.value) {
         default:
@@ -326,10 +328,19 @@ auto FieldOperatorApplication::initialize(const geometry_msgs::msg::Pose & initi
             "current state is ",
             state, ".");
         case LegacyAutowareState::undefined:
+          RCLCPP_INFO(
+            rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication::initialize"),
+            "LegacyAutowareState::undefined");
           waitForAutowareStateToBe(
             LegacyAutowareState::undefined, LegacyAutowareState::initializing);
+          RCLCPP_INFO(
+            rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication::initialize"),
+            "waitForAutowareStateToBe: undefined-initializing");
           [[fallthrough]];
         case LegacyAutowareState::initializing:
+          RCLCPP_INFO(
+            rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication::initialize"),
+            "LegacyAutowareState::initializing");
           requestInitialPose(
             [&]() {
               auto request =
@@ -344,8 +355,14 @@ auto FieldOperatorApplication::initialize(const geometry_msgs::msg::Pose & initi
               return request;
             }(),
             30);
+          RCLCPP_INFO(
+            rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication::initialize"),
+            "requestInitialPose");
           waitForAutowareStateToBe(
             LegacyAutowareState::initializing, LegacyAutowareState::waiting_for_route);
+          RCLCPP_INFO(
+            rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication::initialize"),
+            "waitForAutowareStateToBe: initializing-waiting_for_route");
           break;
       }
     });

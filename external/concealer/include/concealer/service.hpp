@@ -50,6 +50,10 @@ public:
 
   auto operator()(const typename T::Request::SharedPtr & request, std::size_t attempts_count)
   {
+    RCLCPP_INFO(
+      rclcpp::get_logger("DEBUG/concealer::Service::operator()"), "Service request: %s",
+      typeid(request).name());
+
     while (!client->service_is_ready()) {
       interval.sleep();
     }
@@ -92,6 +96,9 @@ public:
       if (auto future = client->async_send_request(request);
           future.wait_for(interval.period()) == std::future_status::ready and
           receive(future.get())) {
+        RCLCPP_INFO(
+          rclcpp::get_logger("DEBUG/concealer::Service::operator()"), "Service response: %s",
+          typeid(future.get()).name());
         return;
       }
     }
