@@ -34,8 +34,8 @@ auto applyConstraintOnLine(
   auto t_right = -dot_product + sqrt_discriminant;
 
   for (const auto & [pi, di] : lines) {
-    const auto denominator = det(d, di);
-    const auto numerator = det(di, p - pi);
+    const auto denominator = math::geometry::cross_2d(d, di);
+    const auto numerator = math::geometry::cross_2d(di, p - pi);
 
     if (std::fabs(denominator) <= RVO_EPSILON) {
       if (numerator < 0.0f) {
@@ -85,12 +85,12 @@ auto optimizeVelocityWithConstraints(
   if (direction_opt) {
     velocity = opt_velocity * limit_speed;
   } else if (sqr(opt_velocity) > sqr(limit_speed)) {
-    velocity = normalize(opt_velocity) * limit_speed;
+    velocity = math::geometry::normalize(opt_velocity) * limit_speed;
   } else {
     velocity = opt_velocity;
   }
   for (const auto & line : lines) {
-    if (det(line.direction, line.point - velocity) > 0.0) {
+    if (math::geometry::cross_2d(line.direction, line.point - velocity) > 0.0) {
       const auto result =
         applyConstraintOnLine(lines, line, limit_speed, opt_velocity, direction_opt);
       if (result) {

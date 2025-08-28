@@ -12,25 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CONTEXT_GAMMA_PLANNER__UTILS_MATH_UTILS_HPP_
-#define CONTEXT_GAMMA_PLANNER__UTILS_MATH_UTILS_HPP_
+#ifndef GEOMETRY__CROSS_2D__HYPOT_HPP_
+#define GEOMETRY__CROSS_2D__HYPOT_HPP_
 
 #include <cmath>
-#include <geometry/vector3/operator.hpp>
+#include <geometry/vector3/is_like_vector3.hpp>
 
-using math::geometry::operator-;
-using math::geometry::operator+;
-using math::geometry::operator*;
-using math::geometry::operator/;
-using math::geometry::operator+=;
-
-namespace context_gamma_planner
+namespace math
 {
-template <typename T>
-auto sqr(const T a)
+namespace geometry
 {
-  return a * a;
+template <
+  typename T, typename U,
+  std::enable_if_t<std::conjunction_v<IsLikeVector3<T>, IsLikeVector3<U>>, std::nullptr_t> =
+    nullptr>
+auto cross_2d(const T & a, const U & b)
+{
+  return a.x * b.y - a.y * b.x;
 }
-}  // namespace context_gamma_planner
+}  // namespace geometry
+}  // namespace math
 
 #endif  // CONTEXT_GAMMA_PLANNER__UTILS_MATH_UTILS_HPP_

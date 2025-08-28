@@ -15,6 +15,7 @@
 #ifndef CONTEXT_GAMMA_PLANNER__UTILS_ORCA_HPP_
 #define CONTEXT_GAMMA_PLANNER__UTILS_ORCA_HPP_
 
+#include <geometry/vector3/cross_2d.hpp>
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
 #include <optional>
