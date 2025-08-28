@@ -390,8 +390,6 @@ auto ActionNode::getDistanceToTargetEntity(
       const double threshold =
         lateral_collision_margin_.value_or(from_bounding_box.dimensions.y * 0.5);
 
-      std::cout << threshold << ", " << from_bounding_box.dimensions.y * 0.5 << std::endl;
-
       if (lateral_distance_to_spline <= threshold) {
         return target_bounding_box_distance;
       }
