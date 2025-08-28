@@ -331,8 +331,8 @@ public:
 
   // Optional per-entity lateral collision margin (meters).
   // Default no-op for entities that do not use BT-based lateral collision checks.
-  virtual void setLateralCollisionMargin(double) {}
-  virtual double getLateralCollisionMargin() const { return 0.0; }
+  virtual void setLateralCollisionMargin(const std::optional<double> &) {}
+  virtual std::optional<double> getLateralCollisionMargin() const { return std::nullopt; }
 
   virtual auto setMapPose(const geometry_msgs::msg::Pose & map_pose) -> void;
 

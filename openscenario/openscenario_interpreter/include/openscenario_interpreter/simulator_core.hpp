@@ -339,12 +339,16 @@ public:
         "maxSpeed", std::numeric_limits<Double::value_type>::max()));
 
       // Optional per-entity lateral collision margin (meters)
-      // If omitted, defaults to 0 and preserves prior behavior.
+      // If omitted: leave unset (std::nullopt) to preserve legacy behavior.
       try {
         entity.setLateralCollisionMargin(
-          controller.properties.template get<Double>("lateralCollisionMargin", 0.0));
+          controller.properties.template get<Double>("lateralCollisionMargin"));
       } catch (...) {
-        // Some entity types may not support this setter; ignore silently.
+        try {
+          entity.setLateralCollisionMargin(std::nullopt);
+        } catch (...) {
+          // Some entity types may not support this setter; ignore silently.
+        }
       }
 
       entity.setBehaviorParameter([&]() {
