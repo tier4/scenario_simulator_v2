@@ -23,6 +23,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <memory>
+#include <rclcpp/rclcpp.hpp>
 #include <type_traits>
 
 namespace concealer
@@ -35,6 +36,14 @@ namespace concealer
  * -------------------------------------------------------------------------- */
 auto execute(const std::vector<std::string> & f_xs) -> int
 {
+  std::string command_str = "";
+  for (size_t i = 0; i < f_xs.size(); ++i) {
+    if (i > 0) command_str += " ";
+    command_str += f_xs[i];
+  }
+  RCLCPP_INFO(
+    rclcpp::get_logger("DEBUG/concealer::execute"), "Executing command: %s", command_str.c_str());
+
   std::vector<std::vector<char>> buffer;
 
   buffer.resize(f_xs.size());

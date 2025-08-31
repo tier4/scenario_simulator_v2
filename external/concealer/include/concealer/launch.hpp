@@ -19,6 +19,7 @@
 #include <concealer/execute.hpp>
 #include <cstdlib>
 #include <iostream>
+#include <rclcpp/rclcpp.hpp>
 #include <string>
 #include <system_error>
 #include <type_traits>
@@ -52,6 +53,8 @@ auto ros2_launch(
     std::cout << std::system_error(errno, std::system_category()).what() << std::endl;
     std::exit(EXIT_FAILURE);
   } else {
+    RCLCPP_INFO(
+      rclcpp::get_logger("DEBUG/concealer::ros2_launch"), "Autoware launched pid=%d", process_id);
     return process_id;
   }
 }
