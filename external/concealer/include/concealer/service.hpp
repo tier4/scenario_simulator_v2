@@ -54,7 +54,14 @@ public:
       rclcpp::get_logger("DEBUG/concealer::Service::operator()"), "Service request: %s",
       typeid(request).name());
 
+    constexpr auto max_wait_time = std::chrono::seconds(60);
+    const auto max_response_timestamp = std::chrono::steady_clock::now() + max_wait_time;
     while (!client->service_is_ready()) {
+      if (std::chrono::steady_clock::now() > max_response_timestamp) {
+        throw common::scenario_simulator_exception::AutowareError(
+          "Service ", std::quoted(name), " not ready ", max_wait_time,
+          " seconds after the request");
+      }
       interval.sleep();
     }
 
