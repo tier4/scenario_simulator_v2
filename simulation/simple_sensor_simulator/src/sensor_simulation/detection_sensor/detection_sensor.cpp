@@ -697,36 +697,39 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
             // If ego and entity are too close, skip the noise application
             return vanilla_entity;
           } else {
-            // calculate position noise and calculate final coordinates
-            const auto [final_x, final_y] = [&]() -> std::tuple<double, double> {
-              // calculate rotation noise around noise_base
-              const auto [rotated_offset_x, rotated_offset_y] =
-                [&]() -> std::tuple<double, double> {
-                const auto baselink_offset_x =
-                  vanilla_entity.pose().position().x() - noise_base.x();
-                const auto baselink_offset_y =
-                  vanilla_entity.pose().position().y() - noise_base.y();
-                const auto cos_rotation = std::cos(noise_output->second.v4_rotation_noise);
-                const auto sin_rotation = std::sin(noise_output->second.v4_rotation_noise);
-                return {
-                  baselink_offset_x * cos_rotation - baselink_offset_y * sin_rotation,
-                  baselink_offset_x * sin_rotation + baselink_offset_y * cos_rotation};
-              }();
-              const auto x_unit_x = y_unit_y;
-              const auto x_unit_y = -y_unit_x;
-              const auto rotated_baselink_x = noise_base.x() + rotated_offset_x;
-              const auto rotated_baselink_y = noise_base.y() + rotated_offset_y;
-              const auto & x_noise = noise_output->second.v4_position_x_noise;
-              const auto & y_noise = noise_output->second.v4_position_y_noise;
-              const auto noise_world_x = x_noise * x_unit_x + y_noise * y_unit_x;
-              const auto noise_world_y = x_noise * x_unit_y + y_noise * y_unit_y;
-              return {rotated_baselink_x + noise_world_x, rotated_baselink_y + noise_world_y};
+            const auto [final_pos, final_orientation] =
+              [&]() -> std::tuple<tf2::Vector3, tf2::Quaternion> {
+              tf2::Quaternion rotation_noise(
+                tf2::Vector3(0, 0, 1), noise_output->second.v4_rotation_noise);
+
+              // Apply rotation to entity position around noise_base
+              tf2::Vector3 entity_pos(
+                vanilla_entity.pose().position().x(), vanilla_entity.pose().position().y(), 0.0);
+              tf2::Vector3 noise_base_pos(noise_base.x(), noise_base.y(), 0.0);
+              tf2::Vector3 offset = entity_pos - noise_base_pos;
+              tf2::Vector3 rotated_offset = tf2::quatRotate(rotation_noise, offset);
+              tf2::Vector3 rotated_pos = noise_base_pos + rotated_offset;
+
+              // Create local coordinate system and apply position noise
+              tf2::Vector3 y_unit(y_unit_x, y_unit_y, 0.0);
+              tf2::Vector3 x_unit(y_unit_y, -y_unit_x, 0.0);
+              tf2::Vector3 noise_world = noise_output->second.v4_position_x_noise * x_unit +
+                                         noise_output->second.v4_position_y_noise * y_unit;
+
+              tf2::Quaternion original_orientation(
+                vanilla_entity.pose().orientation().x(), vanilla_entity.pose().orientation().y(),
+                vanilla_entity.pose().orientation().z(), vanilla_entity.pose().orientation().w());
+
+              return {rotated_pos + noise_world, original_orientation * rotation_noise};
             }();
 
-            // apply position noise to entity
             auto noised_entity = vanilla_entity;
-            noised_entity.mutable_pose()->mutable_position()->set_x(final_x);
-            noised_entity.mutable_pose()->mutable_position()->set_y(final_y);
+            noised_entity.mutable_pose()->mutable_position()->set_x(final_pos.x());
+            noised_entity.mutable_pose()->mutable_position()->set_y(final_pos.y());
+            noised_entity.mutable_pose()->mutable_orientation()->set_x(final_orientation.getX());
+            noised_entity.mutable_pose()->mutable_orientation()->set_y(final_orientation.getY());
+            noised_entity.mutable_pose()->mutable_orientation()->set_z(final_orientation.getZ());
+            noised_entity.mutable_pose()->mutable_orientation()->set_w(final_orientation.getW());
 
             return noised_entity;
           }
