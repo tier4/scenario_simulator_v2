@@ -625,7 +625,8 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
     auto noise_v4 = [&](const auto & detected_entities, auto simulation_time) {
       auto get_noised_entity = [&](
                                  const auto & vanilla_entity, auto simulation_time,
-                                 const std::string & parameter_base_path) {
+                                 const std::string & parameter_base_path)
+        -> std::optional<std::decay_t<decltype(vanilla_entity)>> {
         auto [noise_output, success] =
           noise_outputs.emplace(vanilla_entity.name(), simulation_time);
         const auto interval =
@@ -658,29 +659,52 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
             autocorrelation_coefficient(parameter_base_path + "rotation", interval));
         }();
 
+        math::geometry::boost_point ego_baselink_2d(
+          ego_entity_status->pose().position().x(), ego_entity_status->pose().position().y());
+
+        // we will apply noises to this point for the entity
+        const auto noise_base = [&]() {
+          traffic_simulator_msgs::msg::BoundingBox entity_bounding_box;
+          simulation_interface::toMsg(vanilla_entity.bounding_box(), entity_bounding_box);
+          geometry_msgs::msg::Pose entity_pose;
+          simulation_interface::toMsg(vanilla_entity.pose(), entity_pose);
+          return math::geometry::getClosestPointOnPolygon(
+            ego_baselink_2d, math::geometry::toPolygon2D(entity_pose, entity_bounding_box));
+        }();
+
         noise_output->second.true_positive = [&]() {
-          const auto rate =
-            common::getParameter<double>(parameter_base_path + "true_positive.rate");
-          return markov_process_noise(
-            noise_output->second.true_positive, rate,
-            autocorrelation_coefficient(parameter_base_path + "true_positive", interval));
+          const auto distance_thresholds = common::getParameter<std::vector<double>>(
+            parameter_base_path + "true_positive.rate.distance_thresholds");
+          const auto rate_values = common::getParameter<std::vector<double>>(
+            parameter_base_path + "true_positive.rate.values");
+
+          if (distance_thresholds.size() != rate_values.size()) {
+            throw common::Error(
+              "Array size mismatch: ", parameter_base_path,
+              "true_positive.distance_thresholds has ", distance_thresholds.size(),
+              " elements, but ", parameter_base_path, "true_positive.rate.values has ",
+              rate_values.size(), " elements. Both arrays must have the same size.");
+          } else {
+            // Find the first threshold greater than the calculated distance
+            const auto rate = [&, distance_to_noise_base = std::hypot(
+                                    noise_base.x() - ego_baselink_2d.x(),
+                                    noise_base.y() - ego_baselink_2d.y())]() -> double {
+              for (size_t i = 0; i < distance_thresholds.size(); ++i) {
+                if (distance_to_noise_base < distance_thresholds[i]) {
+                  return rate_values[i];
+                }
+              }
+              return 0.0;  // If distance exceeds all thresholds
+            }();
+
+            return markov_process_noise(
+              noise_output->second.true_positive, rate,
+              autocorrelation_coefficient(parameter_base_path + "true_positive", interval));
+          }
         }();
         if (not noise_output->second.true_positive) {
-          return vanilla_entity;
+          return std::nullopt;
         } else {
-          math::geometry::boost_point ego_baselink_2d(
-            ego_entity_status->pose().position().x(), ego_entity_status->pose().position().y());
-
-          // we will apply noises to this point for the entity
-          const auto noise_base = [&]() {
-            traffic_simulator_msgs::msg::BoundingBox entity_bounding_box;
-            simulation_interface::toMsg(vanilla_entity.bounding_box(), entity_bounding_box);
-            geometry_msgs::msg::Pose entity_pose;
-            simulation_interface::toMsg(vanilla_entity.pose(), entity_pose);
-            return math::geometry::getClosestPointOnPolygon(
-              ego_baselink_2d, math::geometry::toPolygon2D(entity_pose, entity_bounding_box));
-          }();
-
           // x and y components in the world coordinate of y unit vector in the noise coordinate system
           if (const auto [is_too_close, y_unit_x, y_unit_y] =
                 [&]() -> std::tuple<bool, double, double> {
@@ -744,8 +768,10 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
           const std::string parameter_base_path =
             std::string(detected_objects_publisher->get_topic_name()) + ".noise.v4." +
             noise_output->second.config_name + ".";
-          noised_detected_entities.push_back(
-            get_noised_entity(entity, simulation_time, parameter_base_path));
+          if (auto noised_entity = get_noised_entity(entity, simulation_time, parameter_base_path);
+              noised_entity) {
+            noised_detected_entities.push_back(noised_entity.value());
+          }
         } else {
           // If no matched config is found, keep the original entity as is.
           noised_detected_entities.push_back(entity);
