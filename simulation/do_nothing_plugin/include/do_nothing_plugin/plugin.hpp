@@ -46,8 +46,10 @@ public:                                         \
   // clang-format off
   DEFINE_GETTER_SETTER(DebugMarker,                                      std::vector<visualization_msgs::msg::Marker>)
   DEFINE_GETTER_SETTER(DefaultMatchingDistanceForLaneletPoseCalculation, double)
+  DEFINE_GETTER_SETTER(EuclideanDistancesMap,                            std::shared_ptr<EuclideanDistancesMap>)
   DEFINE_GETTER_SETTER(GoalPoses,                                        std::vector<geometry_msgs::msg::Pose>)
   DEFINE_GETTER_SETTER(LaneChangeParameters,                             traffic_simulator::lane_change::Parameter)
+  DEFINE_GETTER_SETTER(LateralCollisionMargin,                           std::optional<double>)
   DEFINE_GETTER_SETTER(Obstacle,                                         std::optional<traffic_simulator_msgs::msg::Obstacle>)
   DEFINE_GETTER_SETTER(OtherEntityStatus,                                EntityStatusDict)
   DEFINE_GETTER_SETTER(PedestrianParameters,                             traffic_simulator_msgs::msg::PedestrianParameters)
@@ -56,8 +58,6 @@ public:                                         \
   DEFINE_GETTER_SETTER(TrafficLights,                                    std::shared_ptr<traffic_simulator::TrafficLightsBase>)
   DEFINE_GETTER_SETTER(VehicleParameters,                                traffic_simulator_msgs::msg::VehicleParameters)
   DEFINE_GETTER_SETTER(Waypoints,                                        traffic_simulator_msgs::msg::WaypointsArray)
-  DEFINE_GETTER_SETTER(EuclideanDistancesMap,                            std::shared_ptr<EuclideanDistancesMap>)
-  DEFINE_GETTER_SETTER(LateralCollisionMargin,                           std::optional<double>)
   // clang-format on
 #undef DEFINE_GETTER_SETTER
 
