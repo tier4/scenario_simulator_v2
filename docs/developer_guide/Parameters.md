@@ -471,6 +471,8 @@ which differs from the elliptical coordinate system used in v2/v3.
 - **Y-axis (radial direction)**: From the ego vehicle base-link to the origin
 - **X-axis (tangential direction)**: Perpendicular to the Y-axis in a right-handed coordinate system
 
+![noise v4 coordinate system](./images/parameters/noise_v4.png)
+
 ### `noise.v4.<config_name>.position.<x/y>.mean`
 
 A `double` type value, default `0.0`.
