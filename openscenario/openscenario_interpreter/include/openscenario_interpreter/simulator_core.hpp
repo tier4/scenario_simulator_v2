@@ -338,11 +338,11 @@ public:
       entity.setVelocityLimit(controller.properties.template get<Double>(
         "maxSpeed", std::numeric_limits<Double::value_type>::max()));
 
-      if (controller.properties.contains("lateralCollisionMargin")) {
-        entity.setLateralCollisionMargin(
-          controller.properties.template get<Double>("lateralCollisionMargin"));
+      if (controller.properties.contains("lateralCollisionThreshold")) {
+        entity.setLateralCollisionThreshold(
+          controller.properties.template get<Double>("lateralCollisionThreshold"));
       } else {
-        entity.setLateralCollisionMargin(std::nullopt);
+        entity.setLateralCollisionThreshold(std::nullopt);
       }
       entity.setBehaviorParameter([&]() {
         auto message = entity.getBehaviorParameter();

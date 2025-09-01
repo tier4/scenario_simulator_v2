@@ -131,14 +131,9 @@ public:
   void setTrafficLights(const std::shared_ptr<traffic_simulator::TrafficLightsBase> &) override;
 
   // Per-entity lateral collision margin (meters)
-  void setLateralCollisionMargin(const std::optional<double> & value)
+  void setLateralCollisionThreshold(const std::optional<double> & value)
   {
-    behavior_plugin_ptr_->setLateralCollisionMargin(value);
-  }
-
-  std::optional<double> getLateralCollisionMargin() const
-  {
-    return behavior_plugin_ptr_->getLateralCollisionMargin();
+    behavior_plugin_ptr_->setLateralCollisionThreshold(value);
   }
 
   const traffic_simulator_msgs::msg::VehicleParameters vehicle_parameters;

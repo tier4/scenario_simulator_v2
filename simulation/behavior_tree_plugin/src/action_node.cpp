@@ -108,8 +108,9 @@ auto ActionNode::getBlackBoardValues() -> void
         "behavior_parameter", behavior_parameter_)) {
     behavior_parameter_ = traffic_simulator_msgs::msg::BehaviorParameter();
   }
-  if (!getInput<std::optional<double>>("lateral_collision_margin", lateral_collision_margin_)) {
-    lateral_collision_margin_ = std::nullopt;  // default: not set
+  if (!getInput<std::optional<double>>(
+        "lateral_collision_threshold", lateral_collision_threshold_)) {
+    lateral_collision_threshold_ = std::nullopt;  // default: not set
   }
 }
 
@@ -388,7 +389,8 @@ auto ActionNode::getDistanceToTargetEntity(
         longitudinal_distance.value());
 
       const double threshold =
-        lateral_collision_margin_.value_or(from_bounding_box.dimensions.y * 0.5);
+        lateral_collision_threshold_.value_or(from_bounding_box.dimensions.y * 0.5);
+      std::cout << threshold << ", " << from_bounding_box.dimensions.y * 0.5 << std::endl;
 
       if (lateral_distance_to_spline <= threshold) {
         return target_bounding_box_distance;
