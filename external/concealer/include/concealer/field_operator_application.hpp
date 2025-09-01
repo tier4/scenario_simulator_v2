@@ -130,6 +130,12 @@ struct FieldOperatorApplication : public rclcpp::Node
     const LegacyAutowareState & from_state, const LegacyAutowareState & to_state,
     Thunk thunk = [] {})
   {
+    RCLCPP_WARN(
+      rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication"),
+      "Start waiting for Autoware state to transition from %s to %s", 
+      (std::stringstream{} << from_state).str().c_str(),
+      (std::stringstream{} << to_state).str().c_str());
+      
     thunk();
 
     auto not_to_be = [&](auto current_state) {
@@ -142,9 +148,26 @@ struct FieldOperatorApplication : public rclcpp::Node
           "Simulator waited for the Autoware state to transition to ", to_state,
           ", but time is up. The current Autoware state is ", getLegacyAutowareState());
       } else {
+        RCLCPP_WARN(
+          rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication"),
+          "Waiting for Autoware state transition. Current state: %s, Target state: %s",
+          (std::stringstream{} << getLegacyAutowareState()).str().c_str(),
+          (std::stringstream{} << to_state).str().c_str());
         thunk();
         rclcpp::GenericRate<std::chrono::steady_clock>(std::chrono::seconds(1)).sleep();
       }
+    }
+
+    if (finalized.load()) {
+      RCLCPP_WARN(
+        rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication"),
+        "Waiting interrupted due to finalization. Current state: %s",
+        (std::stringstream{} << getLegacyAutowareState()).str().c_str());
+    } else {
+      RCLCPP_WARN(
+        rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication"),
+        "Autoware state transition completed. Final state: %s",
+        (std::stringstream{} << getLegacyAutowareState()).str().c_str());
     }
   }
 

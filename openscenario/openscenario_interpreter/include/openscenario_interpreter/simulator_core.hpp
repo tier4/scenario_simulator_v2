@@ -335,8 +335,15 @@ public:
       const std::string & entity_ref, Controller && controller) -> void
     {
       auto & entity = core->getEntity(entity_ref);
-      entity.setVelocityLimit(controller.properties.template get<Double>(
-        "maxSpeed", std::numeric_limits<Double::value_type>::max()));
+      auto const limit = controller.properties.template get<Double>(
+        "maxSpeed", std::numeric_limits<Double::value_type>::max());
+      RCLCPP_WARN(
+        rclcpp::get_logger("DEBUG/intrpreter::simulator_core::applyAssignControllerAction"),
+        "start setVelocityLimit: %f", limit);
+      entity.setVelocityLimit(limit);
+      RCLCPP_WARN(
+        rclcpp::get_logger("DEBUG/intrpreter::simulator_core::applyAssignControllerAction"),
+        "done setVelocityLimit: %f", limit);
 
       entity.setBehaviorParameter([&]() {
         auto message = entity.getBehaviorParameter();

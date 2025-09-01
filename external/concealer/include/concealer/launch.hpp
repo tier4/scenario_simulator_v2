@@ -53,7 +53,7 @@ auto ros2_launch(
     std::cout << std::system_error(errno, std::system_category()).what() << std::endl;
     std::exit(EXIT_FAILURE);
   } else {
-    RCLCPP_INFO(
+    RCLCPP_WARN(
       rclcpp::get_logger("DEBUG/concealer::ros2_launch"), "Autoware launched pid=%d", process_id);
     return process_id;
   }

@@ -19,6 +19,7 @@
 #include <nav_msgs/msg/odometry.hpp>
 #include <random>
 #include <rclcpp/rclcpp.hpp>
+#include <chrono>
 
 namespace concealer
 {
@@ -101,17 +102,51 @@ class Publisher
 
   Randomizer<Message> randomize;
 
+  std::string topic_name;
+  
+  mutable std::size_t message_count = 0;
+  mutable std::chrono::steady_clock::time_point last_message_time = std::chrono::steady_clock::now();
+  mutable std::chrono::steady_clock::time_point first_message_time;
+  mutable bool first_message_sent = false;
+
 public:
   template <typename Node>
   explicit Publisher(const std::string & topic, Node & node)
   : publisher(node.template create_publisher<Message>(topic, rclcpp::QoS(1).reliable())),
-    randomize(node.get_node_parameters_interface(), topic)
+    randomize(node.get_node_parameters_interface(), topic),
+    topic_name(topic)
   {
+    RCLCPP_WARN(
+      rclcpp::get_logger("DEBUG/concealer::Publisher"),
+      "Created publisher for topic %s", topic.c_str());
   }
 
   template <typename... Ts>
   auto operator()(Ts &&... xs) -> decltype(auto)
   {
+    ++message_count;
+    
+    if (message_count <= 3 || (message_count % 50 == 0 && message_count<=150)) {
+      auto now = std::chrono::steady_clock::now();
+      
+      if (!first_message_sent) {
+        first_message_time = now;
+        first_message_sent = true;
+      }
+      
+      double frequency = 0.0;
+      if (message_count > 1) {
+        auto time_diff = std::chrono::duration<double>(now - first_message_time).count();
+        frequency = (message_count - 1) / time_diff;
+      }
+      
+      RCLCPP_WARN(
+        rclcpp::get_logger("DEBUG/concealer::Publisher"),
+        "Publishing message [no. %zu] on topic %s (freq: %.2f Hz)", message_count, topic_name.c_str(), frequency);
+        
+      last_message_time = now;
+    }
+    
     return publisher->publish(randomize(std::forward<decltype(xs)>(xs)...));
   }
 };

@@ -41,7 +41,7 @@ auto execute(const std::vector<std::string> & f_xs) -> int
     if (i > 0) command_str += " ";
     command_str += f_xs[i];
   }
-  RCLCPP_INFO(
+  RCLCPP_WARN(
     rclcpp::get_logger("DEBUG/concealer::execute"), "Executing command: %s", command_str.c_str());
 
   std::vector<std::vector<char>> buffer;

@@ -50,20 +50,31 @@ public:
 
   auto operator()(const typename T::Request::SharedPtr & request, std::size_t attempts_count)
   {
-    RCLCPP_INFO(
-      rclcpp::get_logger("DEBUG/concealer::Service::operator()"), "Service request: %s",
-      typeid(request).name());
+    RCLCPP_WARN(
+      rclcpp::get_logger("DEBUG/concealer::Service"), "Service request: %s",
+      name.c_str());
 
-    constexpr auto max_wait_time = std::chrono::seconds(60);
+    constexpr auto max_wait_time = std::chrono::seconds(15);
     const auto max_response_timestamp = std::chrono::steady_clock::now() + max_wait_time;
-    while (!client->service_is_ready()) {
+    const auto start_time = std::chrono::steady_clock::now();
+    while (rclcpp::ok() and not client->service_is_ready()) {
       if (std::chrono::steady_clock::now() > max_response_timestamp) {
         throw common::scenario_simulator_exception::AutowareError(
-          "Service ", std::quoted(name), " not ready ", max_wait_time,
+          "Service ", std::quoted(name), " not ready ", max_wait_time.count(),
           " seconds after the request");
       }
+      const auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start_time).count();
+      RCLCPP_WARN(
+        rclcpp::get_logger("DEBUG/concealer::Service"),
+        "Waiting for service %s to be ready... (elapsed: %ld ms)", name.c_str(), elapsed_ms);
+      
       interval.sleep();
     }
+
+    const auto total_wait_time_ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start_time).count();
+    RCLCPP_WARN(
+      rclcpp::get_logger("DEBUG/concealer::Service"),
+      "Service %s is now ready (total wait time: %ld ms)", name.c_str(), total_wait_time_ms);
 
     auto receive = [this](const auto & response) {
       if constexpr (DetectMember_status<typename T::Response>::value) {
@@ -100,13 +111,21 @@ public:
     };
 
     for (std::size_t attempt = 0; attempt < attempts_count; ++attempt, interval.sleep()) {
+      RCLCPP_WARN(
+        rclcpp::get_logger("DEBUG/concealer::Service"),
+        "Sending request to service %s (attempt %zu/%zu)", name.c_str(), attempt, attempts_count);
+      
       if (auto future = client->async_send_request(request);
           future.wait_for(interval.period()) == std::future_status::ready and
           receive(future.get())) {
-        RCLCPP_INFO(
-          rclcpp::get_logger("DEBUG/concealer::Service::operator()"), "Service response: %s",
-          typeid(future.get()).name());
+        RCLCPP_WARN(
+          rclcpp::get_logger("DEBUG/concealer::Service"), 
+          "Service %s responded successfully on attempt %zu", name.c_str(), attempt);
         return;
+      } else {
+        RCLCPP_WARN(
+          rclcpp::get_logger("DEBUG/concealer::Service"),
+          "Service %s request failed on attempt %zu", name.c_str(), attempt);
       }
     }
 
