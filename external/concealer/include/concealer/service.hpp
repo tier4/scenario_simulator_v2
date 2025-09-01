@@ -54,7 +54,7 @@ public:
       rclcpp::get_logger("DEBUG/concealer::Service"), "Service request: %s",
       name.c_str());
 
-    constexpr auto max_wait_time = std::chrono::seconds(15);
+    constexpr auto max_wait_time = std::chrono::seconds(25);
     const auto max_response_timestamp = std::chrono::steady_clock::now() + max_wait_time;
     const auto start_time = std::chrono::steady_clock::now();
     while (rclcpp::ok() and not client->service_is_ready()) {
