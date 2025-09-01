@@ -135,6 +135,7 @@ public:
   {
     behavior_plugin_ptr_->setLateralCollisionMargin(value);
   }
+
   std::optional<double> getLateralCollisionMargin() const
   {
     return behavior_plugin_ptr_->getLateralCollisionMargin();
