@@ -24,6 +24,16 @@ Changelog for package do_nothing_plugin
 16.4.2 (2025-05-23)
 -------------------
 
+17.2.0 (2025-09-02)
+-------------------
+* Merge pull request `#1678 <https://github.com/tier4/scenario_simulator_v2/issues/1678>`_ from tier4/feature/openscenario-per-entity-lateral-collision-margin
+  Feature/openscenario per entity lateral collision margin
+* refactor: Rename lateralCollisionMargin to lateralCollisionThreshold for consistency
+* Sort getter/setter macro definitions in alphabetical order
+* feat: Update LateralCollisionMargin to use std::optional for improved handling
+* feat: Add `LateralCollisionMargin` getter and setter to behavior tree and do nothing plugin
+* Contributors: Taiga, Taiga Takano
+
 17.1.4 (2025-08-27)
 -------------------
 

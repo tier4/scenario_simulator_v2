@@ -35,6 +35,17 @@ Changelog for package openscenario_interpreter
 16.4.2 (2025-05-23)
 -------------------
 
+17.2.0 (2025-09-02)
+-------------------
+* Merge pull request `#1678 <https://github.com/tier4/scenario_simulator_v2/issues/1678>`_ from tier4/feature/openscenario-per-entity-lateral-collision-margin
+  Feature/openscenario per entity lateral collision margin
+* refactor: Rename lateralCollisionMargin to lateralCollisionThreshold for consistency
+* Remove unnecessary try-catch blocks
+* feat: Enhance lateral collision margin handling with optional check
+* feat: Update LateralCollisionMargin to use std::optional for improved handling
+* Add `lateral_collision_margin`  to vehicle ActionNode
+* Contributors: Taiga, Taiga Takano
+
 17.1.4 (2025-08-27)
 -------------------
 
