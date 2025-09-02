@@ -28,7 +28,7 @@
 
 namespace context_gamma_planner
 {
-auto calculate_orca_line(
+auto calculateOrcaLine(
   const geometry_msgs::msg::Vector3 & ego_velocity,
   const geometry_msgs::msg::Point & relative_position,
   const geometry_msgs::msg::Vector3 & relative_velocity,

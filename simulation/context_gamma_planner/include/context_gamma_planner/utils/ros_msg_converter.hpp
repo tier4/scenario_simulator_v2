@@ -20,8 +20,8 @@
 
 namespace context_gamma_planner
 {
-auto cast_to_vec(const geometry_msgs::msg::Point & p) -> geometry_msgs::msg::Vector3;
-auto cast_to_point(const geometry_msgs::msg::Vector3 & p) -> geometry_msgs::msg::Point;
+auto castToVec(const geometry_msgs::msg::Point & p) -> geometry_msgs::msg::Vector3;
+auto castToPoint(const geometry_msgs::msg::Vector3 & p) -> geometry_msgs::msg::Point;
 }  // namespace context_gamma_planner
 
 #endif  // CONTEXT_GAMMA_PLANNER__UTILS_ROS_MSG_CONVERTER_HPP_

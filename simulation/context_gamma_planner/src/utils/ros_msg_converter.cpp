@@ -16,7 +16,7 @@
 
 namespace context_gamma_planner
 {
-auto cast_to_vec(const geometry_msgs::msg::Point & p) -> geometry_msgs::msg::Vector3
+auto castToVec(const geometry_msgs::msg::Point & p) -> geometry_msgs::msg::Vector3
 {
   auto result = geometry_msgs::msg::Vector3();
   result.x = p.x;
@@ -24,7 +24,7 @@ auto cast_to_vec(const geometry_msgs::msg::Point & p) -> geometry_msgs::msg::Vec
   result.z = p.z;
   return result;
 }
-auto cast_to_point(const geometry_msgs::msg::Vector3 & p) -> geometry_msgs::msg::Point
+auto castToPoint(const geometry_msgs::msg::Vector3 & p) -> geometry_msgs::msg::Point
 {
   auto result = geometry_msgs::msg::Point();
   result.x = p.x;

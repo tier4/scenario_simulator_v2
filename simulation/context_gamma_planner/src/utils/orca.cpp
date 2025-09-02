@@ -17,7 +17,7 @@
 namespace context_gamma_planner
 {
 
-auto calculate_orca_line(
+auto calculateOrcaLine(
   const geometry_msgs::msg::Vector3 & ego_velocity,
   const geometry_msgs::msg::Point & relative_position,
   const geometry_msgs::msg::Vector3 & relative_velocity,
@@ -68,7 +68,7 @@ auto calculate_orca_line(
       const auto unit_w = w / w_length;
       direction.x = unit_w.y;
       direction.y = unit_w.x * -1.0;
-      u = cast_to_point(direction) * (combined_radius * inv_time_horizon - w_length);
+      u = castToPoint(direction) * (combined_radius * inv_time_horizon - w_length);
     } else {
       const auto leg = std::sqrt(dist_sq - combined_radius_sq);
       if (math::geometry::cross2d(relative_position, w) > 0.0f) {
@@ -82,7 +82,7 @@ auto calculate_orca_line(
       }
       const auto dot_product2 =
         relative_velocity.x * direction.x + relative_velocity.y * direction.y;
-      u = cast_to_point(direction * dot_product2 - relative_velocity);
+      u = castToPoint(direction * dot_product2 - relative_velocity);
     }
 
   } else {
@@ -94,9 +94,9 @@ auto calculate_orca_line(
     const auto unit_w = w / w_length;
     direction.x = unit_w.y;
     direction.y = unit_w.x * -1.0;
-    u = cast_to_point(unit_w * (combined_radius * inv_time_step - w_length));
+    u = castToPoint(unit_w * (combined_radius * inv_time_step - w_length));
   }
-  const auto point = cast_to_point(ego_velocity + u * 0.5);
+  const auto point = castToPoint(ego_velocity + u * 0.5);
   return {point, direction};
 }
 
