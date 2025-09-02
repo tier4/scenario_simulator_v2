@@ -71,7 +71,7 @@ auto calculate_orca_line(
       u = cast_to_point(direction) * (combined_radius * inv_time_horizon - w_length);
     } else {
       const auto leg = std::sqrt(dist_sq - combined_radius_sq);
-      if (math::geometry::cross_2d(relative_position, w) > 0.0f) {
+      if (math::geometry::cross2d(relative_position, w) > 0.0f) {
         direction.x = (relative_position.x * leg - relative_position.y * combined_radius) / dist_sq;
         direction.y = (relative_position.x * combined_radius + relative_position.y * leg) / dist_sq;
       } else {
