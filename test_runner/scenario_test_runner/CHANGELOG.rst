@@ -38,6 +38,12 @@ Changelog for package scenario_test_runner
 16.4.2 (2025-05-23)
 -------------------
 
+17.2.0 (2025-09-02)
+-------------------
+
+17.1.4 (2025-08-27)
+-------------------
+
 17.1.3 (2025-08-20)
 -------------------
 * Merge branch 'master' into hotfix/actions-permission
