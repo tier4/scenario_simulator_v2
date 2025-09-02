@@ -345,6 +345,12 @@ public:
         rclcpp::get_logger("DEBUG/intrpreter::simulator_core::applyAssignControllerAction"),
         "done setVelocityLimit: %f", limit);
 
+      if (controller.properties.contains("lateralCollisionThreshold")) {
+        entity.setLateralCollisionThreshold(
+          controller.properties.template get<Double>("lateralCollisionThreshold"));
+      } else {
+        entity.setLateralCollisionThreshold(std::nullopt);
+      }
       entity.setBehaviorParameter([&]() {
         auto message = entity.getBehaviorParameter();
         message.see_around = not controller.properties.template get<Boolean>("isBlind");
