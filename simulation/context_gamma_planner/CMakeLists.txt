@@ -12,22 +12,7 @@ include(FindProtobuf REQUIRED)
 
 ament_auto_find_build_dependencies()
 
-ament_auto_add_library(context_gamma_planner SHARED
-  src/behavior/action_node_base.cpp
-  src/behavior/pedestrian/action_node.cpp
-  src/behavior/pedestrian/follow_lane_action.cpp
-  src/behavior/pedestrian/follow_polyline_trajectory_action.cpp
-  src/pedestrian_plugin.cpp
-  src/planner/goal_planner_base.cpp
-  src/planner/follow_polyline_trajectory_planner_base.cpp
-  src/planner/pedestrian/follow_lane_planner.cpp
-  src/planner/pedestrian/follow_polyline_trajectory_planner.cpp
-  src/transition_events/logging_event.cpp
-  src/transition_events/reset_request_event.cpp
-  src/transition_events/transition_event.cpp
-  src/orca/orca.cpp
-  src/orca/solver.cpp
-)
+ament_auto_add_library(${PROJECT_NAME} SHARED DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 target_link_libraries(${PROJECT_NAME}
   glog
