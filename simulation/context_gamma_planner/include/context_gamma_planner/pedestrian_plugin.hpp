@@ -78,6 +78,7 @@ public:
   DEFINE_GETTER_SETTER(Waypoints,            traffic_simulator_msgs::msg::WaypointsArray)
   DEFINE_GETTER_SETTER(GoalPoses,            std::vector<geometry_msgs::msg::Pose>)
   DEFINE_GETTER_SETTER(EuclideanDistancesMap,std::shared_ptr<EuclideanDistancesMap>)
+  DEFINE_GETTER_SETTER(LateralCollisionThreshold,                        std::optional<double>)
   // clang-format on
 
 #undef DEFINE_GETTER_SETTER
