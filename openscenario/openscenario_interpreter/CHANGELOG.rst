@@ -35,6 +35,19 @@ Changelog for package openscenario_interpreter
 16.4.2 (2025-05-23)
 -------------------
 
+17.2.1 (2025-09-02)
+-------------------
+* Merge pull request `#1675 <https://github.com/tier4/scenario_simulator_v2/issues/1675>`_ from tier4/RJD-1919/fix_health_check
+* Merge branch 'master' into RJD-1919/fix_health_check
+* Merge branch 'master' into RJD-1919/fix_health_check
+* Merge branch 'master' into RJD-1919/fix_health_check
+* thresholdOverride to touch on entry and exit
+* Merge branch 'RJD-1919/fix_health_check' of github.com:tier4/scenario_simulator_v2 into RJD-1919/fix_health_check
+* restore the timeout to match initialize_duration
+* Merge branch 'master' into RJD-1919/fix_health_check
+* mitigate health check error
+* Contributors: Kotaro Yoshimoto, Michał Ciasnocha, robomic
+
 17.2.0 (2025-09-02)
 -------------------
 * Merge pull request `#1678 <https://github.com/tier4/scenario_simulator_v2/issues/1678>`_ from tier4/feature/openscenario-per-entity-lateral-collision-margin
