@@ -43,7 +43,7 @@ public:
     const std::string & name, Node & node,
     const std::chrono::nanoseconds & interval = std::chrono::seconds(3))
   : name(name),
-    client(node.template create_client<T>(name, rmw_qos_profile_default)),
+    client(node.template create_client<T>(name, rmw_qos_profile_services_default)),
     interval(interval)
   {
   }
@@ -54,7 +54,7 @@ public:
       rclcpp::get_logger("DEBUG/concealer::Service"), "Service request: %s",
       name.c_str());
 
-    constexpr auto max_wait_time = std::chrono::seconds(25);
+    constexpr auto max_wait_time = std::chrono::seconds(180);
     const auto max_response_timestamp = std::chrono::steady_clock::now() + max_wait_time;
     const auto start_time = std::chrono::steady_clock::now();
     while (rclcpp::ok() and not client->service_is_ready()) {

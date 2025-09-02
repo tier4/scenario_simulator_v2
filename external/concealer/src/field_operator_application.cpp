@@ -691,6 +691,109 @@ auto FieldOperatorApplication::getLegacyAutowareState() const -> LegacyAutowareS
 
 auto FieldOperatorApplication::spinSome() -> void
 {
+  static constexpr std::chrono::milliseconds discovery_interval{200};
+
+  static constexpr std::array<std::string_view, 9> ros2_parameter_service_suffixes = {
+    "/describe_parameters", "/get_parameter_types", "/get_parameters",
+    "/list_parameters",     "/set_parameters",      "/set_parameters_atomically",
+    "/list_nodes",          "/load_node",           "/unload_node"};
+
+  const auto now = std::chrono::steady_clock::now();
+  if (now - last_node_discovery_check_ >= discovery_interval) {
+    last_node_discovery_check_ = now;
+    
+    const auto node_names_and_namespaces = get_node_graph_interface()->get_node_names_and_namespaces();
+    const std::size_t current_count = node_names_and_namespaces.size();
+    if (current_count == known_nodes_.size()) {
+      return;
+    }
+
+    static thread_local std::string full_name;
+    static thread_local std::vector<std::pair<std::string, std::string>> new_nodes; 
+    static thread_local std::string log_buffer;
+    
+    new_nodes.clear();
+    if (current_count > known_nodes_.size()) {
+      new_nodes.reserve(current_count - known_nodes_.size());
+    }
+    
+    for (const auto& [name, namespace_] : node_names_and_namespaces) {
+      if (namespace_.size() == 1) {  
+        full_name = name;
+      } else {
+        full_name.assign(namespace_).append("/").append(name);
+      }
+      
+      auto [iter, inserted] = known_nodes_.emplace(full_name);
+      if (inserted) {
+        new_nodes.emplace_back(name, namespace_); 
+      }
+    }
+    
+    if (!new_nodes.empty()) {
+      log_buffer.assign("New nodes (")
+                .append(std::to_string(new_nodes.size()))
+                .append("): ");
+      
+      for (std::size_t i = 0; i < new_nodes.size(); ++i) {
+        if (i) {
+          log_buffer.append(", ");
+        }
+        const auto& [name, namespace_] = new_nodes[i];
+        if (namespace_.size() == 1) {
+          log_buffer.append(name);
+        } else {
+          log_buffer.append(namespace_).append("/").append(name);
+        }
+      }
+      
+      RCLCPP_WARN(rclcpp::get_logger("DEBUG/concealer::NodeDiscovery"), "%s", log_buffer.c_str());
+      
+      for (const auto& [node_name, namespace_] : new_nodes) {
+        const auto services = get_node_graph_interface()->get_service_names_and_types_by_node(
+          node_name, namespace_);
+        
+        if (services.empty()) {
+          continue;
+        }
+        
+        static thread_local std::string service_log;
+        static thread_local std::string full_node_name;
+        service_log.clear();
+        
+        if (namespace_.size() == 1) {
+          full_node_name = node_name;
+        } else {
+          full_node_name.assign(namespace_).append("/").append(node_name);
+        }
+        
+        service_log.assign("Node ").append(full_node_name).append(" services: ");
+        std::size_t service_count = 0;
+        
+        for (const auto& [service_name, service_types] : services) {
+          bool is_parameter_service = false;
+          for (const auto& parameter_suffix : ros2_parameter_service_suffixes) {
+            if (service_name.find(parameter_suffix) != std::string::npos) {
+              is_parameter_service = true;
+              break;
+            }
+          }
+          
+          if (!is_parameter_service) {
+            if (service_count++) {
+              service_log.append(", ");
+            }
+            service_log.append(service_name);
+          }
+        }
+        
+        if (service_count) {
+          RCLCPP_WARN(rclcpp::get_logger("DEBUG/concealer::ServiceDiscovery"), "%s", service_log.c_str());
+        }
+      }
+    }
+  }
+  
   task_queue.rethrow();
 
   if (rclcpp::ok()) {

@@ -17,6 +17,7 @@
 
 #include <sys/wait.h>
 
+#include <unordered_set>
 #include <autoware_adapi_v1_msgs/msg/mrm_state.hpp>
 #include <autoware_adapi_v1_msgs/srv/change_operation_mode.hpp>
 #include <autoware_adapi_v1_msgs/srv/clear_route.hpp>
@@ -117,6 +118,10 @@ struct FieldOperatorApplication : public rclcpp::Node
   Service<SetVelocityLimit>       requestSetVelocityLimit;
   Service<ChangeOperationMode>    requestEnableAutowareControl;
   // clang-format on
+
+  // For tracking ROS2 node discovery
+  mutable std::unordered_set<std::string> known_nodes_;
+  mutable std::chrono::steady_clock::time_point last_node_discovery_check_;
 
   /*
      The task queue must be deconstructed before any services, so it must be
