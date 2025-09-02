@@ -28,8 +28,8 @@
 
 #include "context_gamma_planner/behavior/pedestrian/follow_lane_action.hpp"
 #include "context_gamma_planner/behavior/pedestrian/follow_polyline_trajectory_action.hpp"
-#include "context_gamma_planner/transition_events/transition_events.hpp"
 #include "context_gamma_planner/orca/orca.hpp"
+#include "context_gamma_planner/transition_events/transition_events.hpp"
 
 namespace context_gamma_planner
 {

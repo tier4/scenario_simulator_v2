@@ -21,9 +21,15 @@ auto applyConstraintOnLine(
   const geometry_msgs::msg::Vector3 & opt_velocity, const bool direction_opt)
   -> std::optional<geometry_msgs::msg::Vector3>
 {
+  using math::geometry::operator+;
+
+  using math::geometry::operator-;
+  using math::geometry::operator*;
+
   const auto & [p, d] = attention_line;
-  const auto dot_product = p * d;
-  const auto discriminant = sqr(dot_product) + sqr(limit_speed) - sqr(p);
+  const auto dot_product = math::geometry::innerProduct(p, d);
+  const auto discriminant =
+    dot_product * dot_product + limit_speed * limit_speed - math::geometry::innerProduct(p, p);
 
   if (discriminant < 0.0) {
     return std::nullopt;
@@ -58,13 +64,13 @@ auto applyConstraintOnLine(
   }
 
   if (direction_opt) {
-    if (opt_velocity * d > 0.0) {
+    if (math::geometry::innerProduct(opt_velocity, d) > 0.0) {
       return math::geometry::castToVec(p) + d * t_right;
     } else {
       return math::geometry::castToVec(p) + d * t_left;
     }
   } else {
-    const auto t = d * (opt_velocity - p);
+    const auto t = math::geometry::innerProduct(d, (opt_velocity - p));
 
     if (t < t_left) {
       return math::geometry::castToVec(p) + d * t_left;
@@ -81,10 +87,13 @@ auto optimizeVelocityWithConstraints(
   const geometry_msgs::msg::Vector3 & opt_velocity, const bool direction_opt)
   -> std::optional<geometry_msgs::msg::Vector3>
 {
+  using math::geometry::operator-;
+  using math::geometry::operator*;
+
   auto velocity = geometry_msgs::msg::Vector3();
   if (direction_opt) {
     velocity = opt_velocity * limit_speed;
-  } else if (sqr(opt_velocity) > sqr(limit_speed)) {
+  } else if (math::geometry::innerProduct(opt_velocity, opt_velocity) > limit_speed * limit_speed) {
     velocity = math::geometry::normalize(opt_velocity) * limit_speed;
   } else {
     velocity = opt_velocity;

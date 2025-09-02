@@ -16,6 +16,7 @@
 #define CONTEXT_GAMMA_PLANNER__ORCA_ORCA_HPP_
 
 #include <geometry/vector3/cross_2d.hpp>
+#include <geometry/vector3/inner_product.hpp>
 #include <geometry/vector3/ros_msg_converter.hpp>
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
@@ -23,7 +24,6 @@
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <vector>
 
-#include "context_gamma_planner/utils/math_utils.hpp"
 #include "context_gamma_planner/orca/solver.hpp"
 
 namespace context_gamma_planner

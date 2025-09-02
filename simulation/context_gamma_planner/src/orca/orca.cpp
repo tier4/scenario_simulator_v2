@@ -25,9 +25,14 @@ auto calculateOrcaLine(
   const traffic_simulator_msgs::msg::BoundingBox & other_bbox, const double other_angle,
   const double step_time) -> line
 {
+  using math::geometry::operator+;
+  using math::geometry::operator-;
+  using math::geometry::operator*;
+  using math::geometry::operator/;
+
   const auto inv_time_horizon = 1.0 / 5.0;
 
-  const auto dist_sq = sqr(relative_position);
+  const auto dist_sq = math::geometry::innerProduct(relative_position, relative_position);
 
   const auto relative_angle = std::atan2(relative_position.y, relative_position.x);
 
@@ -56,13 +61,13 @@ auto calculateOrcaLine(
     computeBBoxEllipseRadius(other_bbox, M_PI + relative_angle, other_angle);
 
   const auto combined_radius = ego_radius + other_radius;
-  const auto combined_radius_sq = sqr(combined_radius);
+  const auto combined_radius_sq = combined_radius * combined_radius;
 
   geometry_msgs::msg::Vector3 direction;
   geometry_msgs::msg::Point u;
   if (dist_sq >= combined_radius_sq) {
     const auto w = relative_velocity - relative_position * inv_time_horizon;
-    const auto w_length_sq = sqr(w);
+    const auto w_length_sq = math::geometry::innerProduct(w, w);
     const auto dot_product1 = w.x * relative_position.x + w.y * relative_position.y;
     if (dot_product1 < 0.0f && dot_product1 * dot_product1 > combined_radius_sq * w_length_sq) {
       const auto w_length = std::sqrt(w_length_sq);
@@ -89,7 +94,7 @@ auto calculateOrcaLine(
   } else {
     const auto inv_time_step = 1.0 / step_time;
     const auto w = relative_velocity - relative_position * inv_time_step;
-    const auto w_length_sq = sqr(w);
+    const auto w_length_sq = math::geometry::innerProduct(w, w);
     const auto w_length = std::sqrt(w_length_sq);
 
     const auto unit_w = w / w_length;
