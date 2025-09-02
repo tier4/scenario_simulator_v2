@@ -153,7 +153,7 @@ class ScenarioTestRunner(LifecycleController):
                     break
                 elif ((time.time() - start) > self.global_timeout
                         if self.global_timeout is not None else False):
-                    self.get_logger().error("The simulation has timed out. Forcibly inactivate. (" + self.global_timeout + " sec)")
+                    self.get_logger().error("The simulation has timed out. Forcibly inactivate. (" + str(self.global_timeout) + " sec)")
                     self.deactivate_node()
                     break
                 else:
