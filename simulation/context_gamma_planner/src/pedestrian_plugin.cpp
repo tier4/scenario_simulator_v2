@@ -134,7 +134,8 @@ void PedestrianPlugin::update(double current_time, double step_time)
   const auto planning_speed = getPlanningSpeed() ? getPlanningSpeed().value() : 0.0;
 
   const auto optimized_velocity = optimizeVelocityWithConstraints(
-    orca_lines, planning_speed, castToVec(getNextGoal() - ego_pose.position), false);
+    orca_lines, planning_speed, math::geometry::castToVec(getNextGoal() - ego_pose.position),
+    false);
   if (optimized_velocity) {
     updateEgoPose(optimized_velocity.value(), step_time);
   }

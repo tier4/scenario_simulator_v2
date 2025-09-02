@@ -59,19 +59,19 @@ auto applyConstraintOnLine(
 
   if (direction_opt) {
     if (opt_velocity * d > 0.0) {
-      return castToVec(p) + d * t_right;
+      return math::geometry::castToVec(p) + d * t_right;
     } else {
-      return castToVec(p) + d * t_left;
+      return math::geometry::castToVec(p) + d * t_left;
     }
   } else {
     const auto t = d * (opt_velocity - p);
 
     if (t < t_left) {
-      return castToVec(p) + d * t_left;
+      return math::geometry::castToVec(p) + d * t_left;
     } else if (t > t_right) {
-      return castToVec(p) + d * t_right;
+      return math::geometry::castToVec(p) + d * t_right;
     } else {
-      return castToVec(p) + d * t;
+      return math::geometry::castToVec(p) + d * t;
     }
   }
 }

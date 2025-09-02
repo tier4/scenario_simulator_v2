@@ -22,6 +22,7 @@
 #include <geometry/quaternion/quaternion_to_euler.hpp>
 #include <geometry/vector3/norm.hpp>
 #include <geometry/vector3/operator.hpp>
+#include <geometry/vector3/ros_msg_converter.hpp>
 #include <pugixml.hpp>
 #include <traffic_simulator/behavior/behavior_plugin_base.hpp>
 
@@ -29,7 +30,6 @@
 #include "context_gamma_planner/behavior/pedestrian/follow_polyline_trajectory_action.hpp"
 #include "context_gamma_planner/transition_events/transition_events.hpp"
 #include "context_gamma_planner/utils/orca.hpp"
-#include "context_gamma_planner/utils/ros_msg_converter.hpp"
 
 namespace context_gamma_planner
 {

@@ -37,8 +37,8 @@ auto calculateOrcaLine(
   // Support radius for direction delta = (relativeAngle - currentAngle):
   //   r(delta) = (a*b) / sqrt((b*cos delta)^2 + (a*sin delta)^2).
   auto computeBBoxEllipseRadius = [](
-                                   const traffic_simulator_msgs::msg::BoundingBox & bbox,
-                                   const double relative_angle, const double current_angle) {
+                                    const traffic_simulator_msgs::msg::BoundingBox & bbox,
+                                    const double relative_angle, const double current_angle) {
     const auto other_major_axis = bbox.dimensions.x * 0.5 * M_SQRT2;
     const auto other_minor_axis = bbox.dimensions.y * 0.5 * M_SQRT2;
 
@@ -52,7 +52,8 @@ auto calculateOrcaLine(
              (other_major_axis * sin_p) * (other_major_axis * sin_p));
   };
   const auto ego_radius = computeBBoxEllipseRadius(ego_bbox, relative_angle, ego_angle);
-  const auto other_radius = computeBBoxEllipseRadius(other_bbox, M_PI + relative_angle, other_angle);
+  const auto other_radius =
+    computeBBoxEllipseRadius(other_bbox, M_PI + relative_angle, other_angle);
 
   const auto combined_radius = ego_radius + other_radius;
   const auto combined_radius_sq = sqr(combined_radius);
@@ -68,7 +69,7 @@ auto calculateOrcaLine(
       const auto unit_w = w / w_length;
       direction.x = unit_w.y;
       direction.y = unit_w.x * -1.0;
-      u = castToPoint(direction) * (combined_radius * inv_time_horizon - w_length);
+      u = math::geometry::castToPoint(direction) * (combined_radius * inv_time_horizon - w_length);
     } else {
       const auto leg = std::sqrt(dist_sq - combined_radius_sq);
       if (math::geometry::cross2d(relative_position, w) > 0.0f) {
@@ -82,7 +83,7 @@ auto calculateOrcaLine(
       }
       const auto dot_product2 =
         relative_velocity.x * direction.x + relative_velocity.y * direction.y;
-      u = castToPoint(direction * dot_product2 - relative_velocity);
+      u = math::geometry::castToPoint(direction * dot_product2 - relative_velocity);
     }
 
   } else {
@@ -94,9 +95,9 @@ auto calculateOrcaLine(
     const auto unit_w = w / w_length;
     direction.x = unit_w.y;
     direction.y = unit_w.x * -1.0;
-    u = castToPoint(unit_w * (combined_radius * inv_time_step - w_length));
+    u = math::geometry::castToPoint(unit_w * (combined_radius * inv_time_step - w_length));
   }
-  const auto point = castToPoint(ego_velocity + u * 0.5);
+  const auto point = math::geometry::castToPoint(ego_velocity + u * 0.5);
   return {point, direction};
 }
 

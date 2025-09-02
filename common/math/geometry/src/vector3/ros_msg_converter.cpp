@@ -12,16 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CONTEXT_GAMMA_PLANNER__UTILS_ROS_MSG_CONVERTER_HPP_
-#define CONTEXT_GAMMA_PLANNER__UTILS_ROS_MSG_CONVERTER_HPP_
+#include <geometry/vector3/ros_msg_converter.hpp>
 
-#include <geometry_msgs/msg/point.hpp>
-#include <geometry_msgs/msg/vector3.hpp>
-
-namespace context_gamma_planner
+namespace math
 {
-auto castToVec(const geometry_msgs::msg::Point & p) -> geometry_msgs::msg::Vector3;
-auto castToPoint(const geometry_msgs::msg::Vector3 & p) -> geometry_msgs::msg::Point;
-}  // namespace context_gamma_planner
-
-#endif  // CONTEXT_GAMMA_PLANNER__UTILS_ROS_MSG_CONVERTER_HPP_
+namespace geometry
+{
+auto castToVec(const geometry_msgs::msg::Point & p) -> geometry_msgs::msg::Vector3
+{
+  auto result = geometry_msgs::msg::Vector3();
+  result.x = p.x;
+  result.y = p.y;
+  result.z = p.z;
+  return result;
+}
+auto castToPoint(const geometry_msgs::msg::Vector3 & p) -> geometry_msgs::msg::Point
+{
+  auto result = geometry_msgs::msg::Point();
+  result.x = p.x;
+  result.y = p.y;
+  result.z = p.z;
+  return result;
+}
+}  // namespace geometry
+}  // namespace math

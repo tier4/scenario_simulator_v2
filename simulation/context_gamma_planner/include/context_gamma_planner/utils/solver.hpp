@@ -17,13 +17,13 @@
 
 #include <geometry/vector3/cross_2d.hpp>
 #include <geometry/vector3/normalize.hpp>
+#include <geometry/vector3/ros_msg_converter.hpp>
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
 #include <optional>
 #include <vector>
 
 #include "context_gamma_planner/utils/math_utils.hpp"
-#include "context_gamma_planner/utils/ros_msg_converter.hpp"
 
 namespace context_gamma_planner
 {
