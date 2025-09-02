@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CONTEXT_GAMMA_PLANNER__UTILS_SOLVER_HPP_
-#define CONTEXT_GAMMA_PLANNER__UTILS_SOLVER_HPP_
+#ifndef CONTEXT_GAMMA_PLANNER__ORCA_SOLVER_HPP_
+#define CONTEXT_GAMMA_PLANNER__ORCA_SOLVER_HPP_
 
 #include <geometry/vector3/cross_2d.hpp>
 #include <geometry/vector3/normalize.hpp>
@@ -46,4 +46,4 @@ auto optimizeVelocityWithConstraints(
   -> std::optional<geometry_msgs::msg::Vector3>;
 }  // namespace context_gamma_planner
 
-#endif  // CONTEXT_GAMMA_PLANNER__UTILS_SOLVER_HPP_
+#endif  // CONTEXT_GAMMA_PLANNER__ORCA_SOLVER_HPP_

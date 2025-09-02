@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CONTEXT_GAMMA_PLANNER__UTILS_ORCA_HPP_
-#define CONTEXT_GAMMA_PLANNER__UTILS_ORCA_HPP_
+#ifndef CONTEXT_GAMMA_PLANNER__ORCA_ORCA_HPP_
+#define CONTEXT_GAMMA_PLANNER__ORCA_ORCA_HPP_
 
 #include <geometry/vector3/cross_2d.hpp>
 #include <geometry_msgs/msg/point.hpp>
@@ -24,7 +24,7 @@
 
 #include "context_gamma_planner/utils/math_utils.hpp"
 #include "context_gamma_planner/utils/ros_msg_converter.hpp"
-#include "context_gamma_planner/utils/solver.hpp"
+#include "context_gamma_planner/orca/solver.hpp"
 
 namespace context_gamma_planner
 {
@@ -37,4 +37,4 @@ auto calculateOrcaLine(
   const double step_time) -> line;
 }  // namespace context_gamma_planner
 
-#endif  // CONTEXT_GAMMA_PLANNER__UTILS_ORCA_HPP_
+#endif  // CONTEXT_GAMMA_PLANNER__ORCA_ORCA_HPP_
