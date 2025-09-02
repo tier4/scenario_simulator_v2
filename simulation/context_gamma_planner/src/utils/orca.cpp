@@ -36,7 +36,7 @@ auto calculate_orca_line(
   // i.e., a = w / sqrt(2), b = h / sqrt(2).
   // Support radius for direction delta = (relativeAngle - currentAngle):
   //   r(delta) = (a*b) / sqrt((b*cos delta)^2 + (a*sin delta)^2).
-  auto computeBBoxEllipseRadiu = [](
+  auto computeBBoxEllipseRadius = [](
                                    const traffic_simulator_msgs::msg::BoundingBox & bbox,
                                    const double relative_angle, const double current_angle) {
     const auto other_major_axis = bbox.dimensions.x * 0.5 * M_SQRT2;
@@ -51,8 +51,8 @@ auto calculate_orca_line(
              (other_minor_axis * cos_p) * (other_minor_axis * cos_p) +
              (other_major_axis * sin_p) * (other_major_axis * sin_p));
   };
-  const auto ego_radius = computeBBoxEllipseRadiu(ego_bbox, relative_angle, ego_angle);
-  const auto other_radius = computeBBoxEllipseRadiu(other_bbox, M_PI + relative_angle, other_angle);
+  const auto ego_radius = computeBBoxEllipseRadius(ego_bbox, relative_angle, ego_angle);
+  const auto other_radius = computeBBoxEllipseRadius(other_bbox, M_PI + relative_angle, other_angle);
 
   const auto combined_radius = ego_radius + other_radius;
   const auto combined_radius_sq = sqr(combined_radius);
