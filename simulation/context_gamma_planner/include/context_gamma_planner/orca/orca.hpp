@@ -12,38 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CONTEXT_GAMMA_PLANNER__UTILS_SOLVER_HPP_
-#define CONTEXT_GAMMA_PLANNER__UTILS_SOLVER_HPP_
+#ifndef CONTEXT_GAMMA_PLANNER__ORCA_ORCA_HPP_
+#define CONTEXT_GAMMA_PLANNER__ORCA_ORCA_HPP_
 
 #include <geometry/vector3/cross_2d.hpp>
-#include <geometry/vector3/normalize.hpp>
 #include <geometry/vector3/ros_msg_converter.hpp>
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
 #include <optional>
+#include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <vector>
 
 #include "context_gamma_planner/utils/math_utils.hpp"
+#include "context_gamma_planner/orca/solver.hpp"
 
 namespace context_gamma_planner
 {
-constexpr double RVO_EPSILON = 0.00001f;
-
-struct line
-{
-  geometry_msgs::msg::Point point;
-  geometry_msgs::msg::Vector3 direction;
-};
-
-auto applyConstraintOnLine(
-  const std::vector<line> & lines, const line & attention_line, const double limit_speed,
-  const geometry_msgs::msg::Vector3 & opt_velocity, const bool direction_opt)
-  -> std::optional<geometry_msgs::msg::Vector3>;
-
-auto optimizeVelocityWithConstraints(
-  const std::vector<line> & lines, const double limit_speed,
-  const geometry_msgs::msg::Vector3 & opt_velocity, const bool direction_opt)
-  -> std::optional<geometry_msgs::msg::Vector3>;
+auto calculateOrcaLine(
+  const geometry_msgs::msg::Vector3 & ego_velocity,
+  const geometry_msgs::msg::Point & relative_position,
+  const geometry_msgs::msg::Vector3 & relative_velocity,
+  const traffic_simulator_msgs::msg::BoundingBox & ego_bbox, const double ego_angle,
+  const traffic_simulator_msgs::msg::BoundingBox & other_bbox, const double other_angle,
+  const double step_time) -> line;
 }  // namespace context_gamma_planner
 
-#endif  // CONTEXT_GAMMA_PLANNER__UTILS_SOLVER_HPP_
+#endif  // CONTEXT_GAMMA_PLANNER__ORCA_ORCA_HPP_
