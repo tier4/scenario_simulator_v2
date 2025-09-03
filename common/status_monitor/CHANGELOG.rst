@@ -24,6 +24,13 @@ Changelog for package status_monitor
 16.4.2 (2025-05-23)
 -------------------
 
+17.3.0 (2025-09-03)
+-------------------
+* Merge branch 'master' into feature/noise_v4
+* Merge branch 'master' into feature/noise_v4
+* Merge branch 'master' into feature/noise_v4
+* Contributors: Kotaro Yoshimoto
+
 17.2.1 (2025-09-02)
 -------------------
 * Merge pull request `#1675 <https://github.com/tier4/scenario_simulator_v2/issues/1675>`_ from tier4/RJD-1919/fix_health_check

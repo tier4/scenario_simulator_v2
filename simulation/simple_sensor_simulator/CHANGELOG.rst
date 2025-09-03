@@ -24,6 +24,25 @@ Changelog for package simple_sensor_simulator
 16.4.2 (2025-05-23)
 -------------------
 
+17.3.0 (2025-09-03)
+-------------------
+* Merge pull request `#1680 <https://github.com/tier4/scenario_simulator_v2/issues/1680>`_ from tier4/feature/noise_v4
+* Merge branch 'master' into feature/noise_v4
+* Merge branch 'master' into feature/noise_v4
+* Merge branch 'master' into feature/noise_v4
+* Implement true_positive in noise v4
+* Apply rotation noise for entity orienration in noise v4
+* Implement noise_v4 application phases
+* Implement noise_v4 outputs calculation
+* Use the same logic structure in noise_v4 as in noise_v3
+* Optimize get_first_matched_config_name call in noise_v3
+* Commonize noise helper functions in noise_v2 for noise_v4
+* Modify DetectionSensor::NoiseOutput for noise v4
+* Add an empty implementation of noise_v4
+* Move get_first_matched_config_name to a larger scope to use in noise_v4
+* Commonize for get_first_matched_config_name in noise_v3 for preparation of noise_v4
+* Contributors: Kotaro Yoshimoto
+
 17.2.1 (2025-09-02)
 -------------------
 * Merge branch 'master' into RJD-1919/fix_health_check
