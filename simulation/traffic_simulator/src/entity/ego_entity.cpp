@@ -453,6 +453,9 @@ auto EgoEntity::requestSpeedChange(
 
 auto EgoEntity::setVelocityLimit(double value) -> void  //
 {
+  RCLCPP_WARN(
+    rclcpp::get_logger("DEBUG/traffic_simulator::EgoEntity"),
+    "setVelocityLimit: Setting velocity limit to %.2f m/s", value);
   behavior_parameter_.dynamic_constraints.max_speed = value;
   FieldOperatorApplication::setVelocityLimit(value);
 }

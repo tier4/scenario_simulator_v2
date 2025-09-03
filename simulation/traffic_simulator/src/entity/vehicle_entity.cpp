@@ -294,6 +294,9 @@ auto VehicleEntity::getMaxDeceleration() const -> double
 
 void VehicleEntity::setVelocityLimit(double linear_velocity)
 {
+  RCLCPP_WARN(
+    rclcpp::get_logger("DEBUG/traffic_simulator::VehicleEntity"),
+    "setVelocityLimit: Setting velocity limit to %.2f m/s", linear_velocity);
   if (linear_velocity < 0.0) {
     THROW_SEMANTIC_ERROR("Acceleration limit should be over zero.");
   }

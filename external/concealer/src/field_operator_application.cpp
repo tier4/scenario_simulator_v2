@@ -163,6 +163,10 @@ FieldOperatorApplication::FieldOperatorApplication(const pid_t pid)
   requestSetVelocityLimit("/api/autoware/set/velocity_limit", *this),
   requestEnableAutowareControl("/api/operation_mode/enable_autoware_control", *this)
 {
+  std::cerr << "[WARN][DEBUG/concealer::FieldOperatorApplication] FieldOperatorApplication Constructor finished, rclcpp::ok() = " << (rclcpp::ok() ? "true" : "false") << std::endl;
+  if (rclcpp::ok()) {
+    RCLCPP_WARN(rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication"), "FieldOperatorApplication Constructor finished, rclcpp::ok() = true");
+  }
 }
 // clang-format on
 
@@ -243,14 +247,14 @@ FieldOperatorApplication::~FieldOperatorApplication()
 
 auto FieldOperatorApplication::clearRoute() -> void
 {
-  task_queue.delay([this] {
+  task_queue.delay("clearRoute",[this] {
     /*
        Since this service tends to be available long after the launch of
        Autoware, set the attempts_count to a high value. There is no technical
        basis for the number 30.
     */
     RCLCPP_WARN(
-      rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication"),
+      rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication::TaskQueue"),
       "clearRoute: Sending clear route request");
     requestClearRoute(std::make_shared<ClearRoute::Request>(), 30);
   });
@@ -258,11 +262,11 @@ auto FieldOperatorApplication::clearRoute() -> void
 
 auto FieldOperatorApplication::enableAutowareControl() -> void
 {
-  task_queue.delay([this]() {
-    auto request = std::make_shared<ChangeOperationMode::Request>();
+  task_queue.delay("enableAutowareControl",[this]() {
     RCLCPP_WARN(
-      rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication"),
+      rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication::TaskQueue"),
       "enableAutowareControl: Sending enable autoware control request");
+    auto request = std::make_shared<ChangeOperationMode::Request>();
     requestEnableAutowareControl(request, 30);
   });
 }
@@ -270,9 +274,12 @@ auto FieldOperatorApplication::enableAutowareControl() -> void
 auto FieldOperatorApplication::engage() -> void
 {
   RCLCPP_WARN(rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication"), "engage: Starting engage process");
-  task_queue.delay([this]() {
+  task_queue.delay("engage",[this]() {
     switch (const auto state = getLegacyAutowareState(); state.value) {
       default:
+        RCLCPP_WARN(
+          rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication::TaskQueue"),
+          "engage: throw");
         throw common::AutowareError(
           "The simulator attempted to request Autoware to engage, but was aborted because "
           "Autoware's current state is ",
@@ -280,7 +287,7 @@ auto FieldOperatorApplication::engage() -> void
       case LegacyAutowareState::initializing:
         // The initial pose has been sent but has not yet reached Autoware.
         RCLCPP_WARN(
-          rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication"),
+          rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication::TaskQueue"),
           "engage: State is initializing, waiting for transition to waiting_for_route");
         waitForAutowareStateToBe(
           LegacyAutowareState::initializing, LegacyAutowareState::waiting_for_route);
@@ -288,21 +295,21 @@ auto FieldOperatorApplication::engage() -> void
       case LegacyAutowareState::waiting_for_route:
         // The route has been sent but has not yet reached Autoware.
         RCLCPP_WARN(
-          rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication"),
+          rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication::TaskQueue"),
           "engage: State is waiting_for_route, waiting for transition to planning");
         waitForAutowareStateToBe(
           LegacyAutowareState::waiting_for_route, LegacyAutowareState::planning);
         [[fallthrough]];
       case LegacyAutowareState::planning:
         RCLCPP_WARN(
-          rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication"),
+          rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication::TaskQueue"),
           "engage: State is planning, waiting for transition to waiting_for_engage");
         waitForAutowareStateToBe(
           LegacyAutowareState::planning, LegacyAutowareState::waiting_for_engage);
         [[fallthrough]];
       case LegacyAutowareState::waiting_for_engage:
         RCLCPP_WARN(
-          rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication"),
+          rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication::TaskQueue"),
           "engage: State is waiting_for_engage, sending engage request");
         requestEngage(
           [&]() {
@@ -312,13 +319,16 @@ auto FieldOperatorApplication::engage() -> void
           }(),
           30);
         RCLCPP_WARN(
-          rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication"),
+          rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication::TaskQueue"),
           "engage: Waiting for transition from waiting_for_engage to driving");
         waitForAutowareStateToBe(
           LegacyAutowareState::waiting_for_engage, LegacyAutowareState::driving);
         time_limit = std::decay_t<decltype(time_limit)>::max();
         break;
       case LegacyAutowareState::driving:
+        RCLCPP_WARN(
+            rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication::TaskQueue"),
+            "engage: driving");
         break;
     }
   });
@@ -342,23 +352,26 @@ auto FieldOperatorApplication::initialize(const geometry_msgs::msg::Pose & initi
   if (not std::exchange(initialized, true)) {
     RCLCPP_WARN(
       rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication"), "initialize: Starting initialization process");
-    task_queue.delay([this, initial_pose]() {
+    task_queue.delay("initialize",[this, initial_pose]() {
       switch (const auto state = getLegacyAutowareState(); state.value) {
         default:
+          RCLCPP_WARN(
+            rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication::TaskQueue"),
+            "initialize: throw");
           throw common::AutowareError(
             "The simulator attempted to initialize Autoware, but aborted because Autoware's "
             "current state is ",
             state, ".");
         case LegacyAutowareState::undefined:
           RCLCPP_WARN(
-            rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication"),
+            rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication::TaskQueue"),
             "initialize: State is undefined, waiting for transition to initializing");
           waitForAutowareStateToBe(
             LegacyAutowareState::undefined, LegacyAutowareState::initializing);
           [[fallthrough]];
         case LegacyAutowareState::initializing:
           RCLCPP_WARN(
-            rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication"),
+            rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication::TaskQueue"),
             "initialize: State is initializing, sending initial pose request");
           requestInitialPose(
             [&]() {
@@ -375,7 +388,7 @@ auto FieldOperatorApplication::initialize(const geometry_msgs::msg::Pose & initi
             }(),
             30);
           RCLCPP_WARN(
-            rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication"),
+            rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication::TaskQueue"),
             "initialize: Waiting for transition from initializing to waiting_for_route");
           waitForAutowareStateToBe(
             LegacyAutowareState::initializing, LegacyAutowareState::waiting_for_route);
@@ -452,9 +465,12 @@ auto FieldOperatorApplication::plan(
   const RouteOption & option) -> void
 {
   RCLCPP_WARN(rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication"), "plan: Starting planning process with route points");
-  task_queue.delay([this, goal, waypoints, option]() {
+  task_queue.delay("plan_poses",[this, goal, waypoints, option]() {
     switch (const auto state = getLegacyAutowareState(); state.value) {
       default:
+        RCLCPP_WARN(
+          rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication::TaskQueue"),
+          "plan_poses: throw");
         throw common::AutowareError(
           "The simulator attempted to send a goal to Autoware, but was aborted because Autoware's "
           "current state is ",
@@ -462,29 +478,29 @@ auto FieldOperatorApplication::plan(
       case LegacyAutowareState::initializing:
         // The initial pose has been sent but has not yet reached Autoware.
         RCLCPP_WARN(
-          rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication"),
-          "plan: State is initializing, waiting for transition to waiting_for_route");
+          rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication::TaskQueue"),
+          "plan_poses: State is initializing, waiting for transition to waiting_for_route");
         waitForAutowareStateToBe(state, LegacyAutowareState::waiting_for_route);
         [[fallthrough]];
       case LegacyAutowareState::arrived_goal:
         RCLCPP_WARN(
-          rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication"),
-          "plan: State is arrived_goal, waiting for transition to waiting_for_route");
+          rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication::TaskQueue"),
+          "plan_poses: State is arrived_goal, waiting for transition to waiting_for_route");
         waitForAutowareStateToBe(state, LegacyAutowareState::waiting_for_route);
         [[fallthrough]];
       case LegacyAutowareState::waiting_for_route:
         RCLCPP_WARN(
-          rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication"),
-          "plan: State is waiting_for_route, sending route points request");
+          rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication::TaskQueue"),
+          "plan_poses: State is waiting_for_route, sending route points request");
         requestSetRoutePoints(make<SetRoutePoints::Request>(goal, waypoints, option), 30);
         RCLCPP_WARN(
-          rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication"),
-          "plan: Waiting for transition from waiting_for_route to planning");
+          rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication::TaskQueue"),
+          "plan_poses: Waiting for transition from waiting_for_route to planning");
         waitForAutowareStateToBe(
           LegacyAutowareState::waiting_for_route, LegacyAutowareState::planning);
         RCLCPP_WARN(
-          rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication"),
-          "plan: Waiting for transition from planning to waiting_for_engage");
+          rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication::TaskQueue"),
+          "plan_poses: Waiting for transition from planning to waiting_for_engage");
         waitForAutowareStateToBe(
           LegacyAutowareState::planning, LegacyAutowareState::waiting_for_engage);
         break;
@@ -498,9 +514,12 @@ auto FieldOperatorApplication::plan(
   const RouteOption & option) -> void
 {
   RCLCPP_WARN(rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication"), "plan: Starting planning process with route segments");
-  task_queue.delay([this, goal, waypoints, option]() {
+  task_queue.delay("plan_segments",[this, goal, waypoints, option]() {
     switch (const auto state = getLegacyAutowareState(); state.value) {
       default:
+        RCLCPP_WARN(
+          rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication::TaskQueue"),
+          "plan_segments: throw");
         throw common::AutowareError(
           "The simulator attempted to send a goal to Autoware, but was aborted because Autoware's "
           "current state is ",
@@ -508,29 +527,29 @@ auto FieldOperatorApplication::plan(
       case LegacyAutowareState::initializing:
         // The initial pose has been sent but has not yet reached Autoware.
         RCLCPP_WARN(
-          rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication"),
-          "plan: State is initializing, waiting for transition to waiting_for_route (segments)");
+          rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication::TaskQueue"),
+          "plan_segments: State is initializing, waiting for transition to waiting_for_route (segments)");
         waitForAutowareStateToBe(state, LegacyAutowareState::waiting_for_route);
         [[fallthrough]];
       case LegacyAutowareState::arrived_goal:
         RCLCPP_WARN(
-          rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication"),
-          "plan: State is arrived_goal, waiting for transition to waiting_for_route (segments)");
+          rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication::TaskQueue"),
+          "plan_segments: State is arrived_goal, waiting for transition to waiting_for_route (segments)");
         waitForAutowareStateToBe(state, LegacyAutowareState::waiting_for_route);
         [[fallthrough]];
       case LegacyAutowareState::waiting_for_route:
         RCLCPP_WARN(
-          rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication"),
-          "plan: Sending route segments request");
+          rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication::TaskQueue"),
+          "plan_segments: Sending route segments request");
         requestSetRoute(make<SetRoute::Request>(goal, waypoints, option), 30);
         RCLCPP_WARN(
-          rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication"),
-          "plan: Waiting for transition from waiting_for_route to planning (segments)");
+          rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication::TaskQueue"),
+          "plan_segments: Waiting for transition from waiting_for_route to planning (segments)");
         waitForAutowareStateToBe(
           LegacyAutowareState::waiting_for_route, LegacyAutowareState::planning);
         RCLCPP_WARN(
-          rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication"),
-          "plan: Waiting for transition from planning to waiting_for_engage (segments)");
+          rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication::TaskQueue"),
+          "plan_segments: Waiting for transition from planning to waiting_for_engage (segments)");
         waitForAutowareStateToBe(
           LegacyAutowareState::planning, LegacyAutowareState::waiting_for_engage);
         break;
@@ -546,7 +565,10 @@ auto FieldOperatorApplication::requestAutoModeForCooperation(
      `rtc_auto_mode_manager` package is present.
   */
   if (not isPackageExists("rtc_auto_mode_manager")) {
-    task_queue.delay([this, module_name, enable]() {
+    task_queue.delay("requestAutoModeForCooperation",[this, module_name, enable]() {
+      RCLCPP_WARN(
+        rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication::TaskQueue"),
+        "requestAutoModeForCooperation: Setting RTC auto mode for module '%s' to %s", module_name.c_str(), enable ? "enabled" : "disabled");
       auto request = std::make_shared<AutoModeWithModule::Request>();
       request->module.type = toModuleType<tier4_rtc_msgs::msg::Module>(module_name);
       request->enable = enable;
@@ -554,9 +576,6 @@ auto FieldOperatorApplication::requestAutoModeForCooperation(
          We attempt to resend the service up to 30 times, but this number of
          times was determined by heuristics, not for any technical reason.
       */
-      RCLCPP_WARN(
-        rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication"),
-        "requestAutoModeForCooperation: Setting RTC auto mode for module '%s' to %s", module_name.c_str(), enable ? "enabled" : "disabled");
       requestSetRtcAutoMode(request, 30);
     });
   } else {
@@ -650,9 +669,9 @@ auto FieldOperatorApplication::sendCooperateCommand(
     request->stamp = cooperate_status_array.stamp;
     request->commands.push_back(cooperate_command);
 
-    task_queue.delay([this, request]() { 
+    task_queue.delay("sendCooperateCommand",[this, request]() { 
       RCLCPP_WARN(
-        rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication"),
+        rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication::TaskQueue"),
         "sendCooperateCommand: Sending cooperate command request");
       requestCooperateCommands(request, 30); 
     });
@@ -663,7 +682,13 @@ auto FieldOperatorApplication::sendCooperateCommand(
 
 auto FieldOperatorApplication::setVelocityLimit(double velocity_limit) -> void
 {
-  task_queue.delay([this, velocity_limit]() {
+  RCLCPP_WARN(
+    rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication"),
+    "setVelocityLimit: Setting velocity limit to %.2f m/s", velocity_limit);
+  task_queue.delay("setVelocityLimit",[this, velocity_limit]() {
+    RCLCPP_WARN(
+      rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication::TaskQueue"),
+      "setVelocityLimit: init request");
     auto request = std::make_shared<SetVelocityLimit::Request>();
     request->velocity = velocity_limit;
     /*
@@ -671,9 +696,12 @@ auto FieldOperatorApplication::setVelocityLimit(double velocity_limit) -> void
        times was determined by heuristics, not for any technical reason.
     */
     RCLCPP_WARN(
-      rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication"),
-      "setVelocityLimit: Setting velocity limit to %.2f m/s", velocity_limit);
+      rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication::TaskQueue"),
+      "setVelocityLimit: start request, setting velocity limit to %.2f m/s", velocity_limit);
     requestSetVelocityLimit(request, 30);
+    RCLCPP_WARN(
+      rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication::TaskQueue"),
+      "setVelocityLimit: request done");
   });
 }
 

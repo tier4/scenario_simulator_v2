@@ -6,9 +6,10 @@ Panels:
       Expanded:
         - /Sensing1/LiDAR1/ConcatenatePointCloud1/Autocompute Value Bounds1
         - /Simulation1
+        - /Simulation1/Condition Group1
         - /Simulation1/Simple Sensor Simulator1
       Splitter Ratio: 0.557669460773468
-    Tree Height: 832
+    Tree Height: 436
   - Class: rviz_common/Selection
     Name: Selection
   - Class: rviz_common/Tool Properties
@@ -270,6 +271,7 @@ Visualization Manager:
               Light Traffic Color: 255; 153; 153
               Name: SignalDisplay
               Primary Color: 174; 174; 174
+              Signal Blinking Mode: Static
               Signal Color: 0; 230; 120
               Speed Limit Topic: /planning/scenario_planning/current_max_velocity
               Speed Topic: /vehicle/status/velocity_status
@@ -341,21 +343,24 @@ Visualization Manager:
           Namespaces:
             center_lane_line: false
             center_line_arrows: false
-            crosswalk_lanelet_id: true
-            crosswalk_lanelets: true
+            curbstone: true
             lane_start_bound: false
             lanelet direction: true
             lanelet_id: false
             left_lane_bound: true
+            no_parking_area: true
             parking_lots: true
             parking_space: true
+            partitions: true
             right_lane_bound: true
+            road_borders: true
             road_lanelets: false
-            stop_lines: true
-            traffic_light: true
-            traffic_light_id: false
-            traffic_light_reg_elem_id: false
-            traffic_light_triangle: true
+            shoulder_center_lane_line: true
+            shoulder_center_line_arrows: true
+            shoulder_lane_start_bound: true
+            shoulder_left_lane_bound: true
+            shoulder_right_lane_bound: true
+            shoulder_road_lanelets: true
           Topic:
             Depth: 5
             Durability Policy: Transient Local
@@ -951,12 +956,7 @@ Visualization Manager:
               Enabled: true
               Name: RouteArea
               Namespaces:
-                end_lanelets: true
-                goal_lanelets: true
-                lane_start_bound: false
-                left_lane_bound: false
-                right_lane_bound: false
-                route_lanelets: true
+                {}
               Topic:
                 Depth: 5
                 Durability Policy: Transient Local
@@ -1036,6 +1036,9 @@ Visualization Manager:
                 Radius: 0.10000000149011612
                 Value: false
               View Text Slope:
+                Scale: 0.30000001192092896
+                Value: false
+              View Text Time:
                 Scale: 0.30000001192092896
                 Value: false
               View Text Velocity:
@@ -2573,6 +2576,9 @@ Visualization Manager:
                       View Text Slope:
                         Scale: 0.30000001192092896
                         Value: false
+                      View Text Time:
+                        Scale: 0.30000001192092896
+                        Value: false
                       View Text Velocity:
                         Scale: 0.30000001192092896
                         Value: false
@@ -3028,6 +3034,9 @@ Visualization Manager:
           View Text Slope:
             Scale: 0.30000001192092896
             Value: false
+          View Text Time:
+            Scale: 0.30000001192092896
+            Value: false
           View Text Velocity:
             Scale: 0.30000001192092896
             Value: false
@@ -3073,6 +3082,9 @@ Visualization Manager:
             Radius: 0.10000000149011612
             Value: true
           View Text Slope:
+            Scale: 0.30000001192092896
+            Value: false
+          View Text Time:
             Scale: 0.30000001192092896
             Value: false
           View Text Velocity:
@@ -3186,20 +3198,57 @@ Visualization Manager:
               Value: true
               Visibility:
                 Control:
-                  "": true
+                  Debug/AEB: true
+                  Debug/MPC: true
+                  Debug/PurePursuit: true
+                  Predicted Trajectory: true
+                  Resampled Reference Trajectory: true
+                  Stop Reason: true
                   Value: false
+                  VirtualWall:
+                    Value: true
+                    VirtualWall (AEB): true
+                    VirtualWall (velocity control): true
                 Debug:
                   Control: true
                   Localization:
-                    "": true
+                    EKFPoseHistory: true
+                    NDT pointclouds: true
+                    NDTLoadedPCDMap: true
+                    NDTPoseHistory: true
                     Value: true
                   Map: true
                   Perception:
-                    "": true
+                    CameraLidarFusion(purple): true
+                    Centerpoint(red1): true
+                    CenterpointROIFusion(red2): true
+                    CenterpointValidator(red3): true
+                    Detection(yellow): true
+                    DetectionByTracker(orange): true
+                    PointPainting(light_green1): true
+                    PointPaintingROIFusion(light_green2): true
+                    PointPaintingValidator(light_green3): true
+                    Prediction(light_blue): true
+                    RadarFarObjects(white): true
+                    Tracking(green): true
                     Value: true
                   Planning:
-                    "":
-                      "": true
+                    Objects Of Interest:
+                      AvoidanceByLCLeft: true
+                      AvoidanceByLCRight: true
+                      AvoidanceLeft: true
+                      AvoidanceRight: true
+                      BlindSpot: true
+                      Crosswalk: true
+                      DetectionArea: true
+                      GoalPlanner: true
+                      Intersection: true
+                      LaneChangeLeft: true
+                      LaneChangeRight: true
+                      NoStoppingArea: true
+                      ObstacleCruise: true
+                      StartPlanner: true
+                      TrafficLight: true
                       Value: true
                     Value: true
                   Sensing:
@@ -3208,26 +3257,187 @@ Visualization Manager:
                     Value: true
                   Value: true
                 Localization:
-                  "":
-                    "": true
+                  EKF:
+                    PoseHistory: true
+                    Value: true
+                  NDT:
+                    Aligned: true
+                    Initial: true
+                    MonteCarloInitialPose: true
+                    PoseHistory: true
+                    PoseWithCovAligned: true
+                    PoseWithCovInitial: true
                     Value: true
                   Value: false
                 Map:
-                  "": true
+                  Lanelet2VectorMap: true
+                  PointCloudMap: true
                   Value: false
                 Perception:
-                  "":
-                    "": true
+                  ObjectRecognition:
+                    Detection:
+                      DetectedObjects: true
+                      Value: true
+                    Prediction:
+                      Maneuver: true
+                      PredictedObjects: true
+                      Value: true
+                    Tracking:
+                      TrackedObjects: true
+                      Value: true
+                    Value: true
+                  OccupancyGrid:
+                    Map: true
+                    Value: true
+                  Segmentation:
+                    NoGroundPointCloud: true
+                    Value: true
+                  TrafficLight:
+                    MapBasedDetectionResult: true
+                    RecognitionResultOnImage: true
                     Value: true
                   Value: false
                 Planning:
-                  "":
-                    "": true
+                  Diagnostic:
+                    PlanningErrorMarker: true
+                    Value: true
+                  MissionPlanning:
+                    GoalPose: true
+                    MissionDetailsDisplay: true
+                    RouteArea: true
+                    Value: true
+                  ScenarioPlanning:
+                    LaneDriving:
+                      BehaviorPlanning:
+                        (old)PathChangeCandidate_LaneChange: true
+                        Bound: true
+                        DebugMarker:
+                          Arrow: true
+                          Blind Spot: true
+                          Crosswalk: true
+                          DetectionArea: true
+                          DynamicObstacleAvoidance: true
+                          GoalPlanner: true
+                          Intersection: true
+                          LaneFollowing: true
+                          LeftLaneChange: true
+                          NoDrivableLane: true
+                          NoStoppingArea: true
+                          OcclusionSpot: true
+                          RightLaneChange: true
+                          RunOut: true
+                          SideShift: true
+                          SpeedBump: true
+                          StartPlanner: true
+                          StaticObstacleAvoidance: true
+                          StopLine: true
+                          TrafficLight: true
+                          Value: true
+                          VirtualTrafficLight: true
+                        InfoMarker:
+                          Info (AvoidanceByLC): true
+                          Info (DynamicObstacleAvoidance): true
+                          Info (ExtLaneChangeLeft): true
+                          Info (ExtLaneChangeRight): true
+                          Info (GoalPlanner): true
+                          Info (LaneChangeLeft): true
+                          Info (LaneChangeRight): true
+                          Info (StartPlanner): true
+                          Info (StaticObstacleAvoidance): true
+                          Value: true
+                        Path: true
+                        PathChangeCandidate_Avoidance: true
+                        PathChangeCandidate_AvoidanceByLC: true
+                        PathChangeCandidate_ExternalRequestLaneChangeLeft: true
+                        PathChangeCandidate_ExternalRequestLaneChangeRight: true
+                        PathChangeCandidate_GoalPlanner: true
+                        PathChangeCandidate_LaneChangeLeft: true
+                        PathChangeCandidate_LaneChangeRight: true
+                        PathChangeCandidate_StartPlanner: true
+                        PathReference_Avoidance: true
+                        PathReference_AvoidanceByLC: true
+                        PathReference_GoalPlanner: true
+                        PathReference_LaneChangeLeft: true
+                        PathReference_LaneChangeRight: true
+                        PathReference_StartPlanner: true
+                        Value: true
+                        VirtualWall:
+                          Value: true
+                          VirtualWall (AvoidanceByLC): true
+                          VirtualWall (BlindSpot): true
+                          VirtualWall (Crosswalk): true
+                          VirtualWall (DetectionArea): true
+                          VirtualWall (ExtLaneChangeLeft): true
+                          VirtualWall (ExtLaneChangeRight): true
+                          VirtualWall (GoalPlanner): true
+                          VirtualWall (Intersection): true
+                          VirtualWall (LaneChangeLeft): true
+                          VirtualWall (LaneChangeRight): true
+                          VirtualWall (MergeFromPrivateArea): true
+                          VirtualWall (NoDrivableLane): true
+                          VirtualWall (NoStoppingArea): true
+                          VirtualWall (OcclusionSpot): true
+                          VirtualWall (RunOut): true
+                          VirtualWall (SpeedBump): true
+                          VirtualWall (StartPlanner): true
+                          VirtualWall (StaticObstacleAvoidance): true
+                          VirtualWall (StopLine): true
+                          VirtualWall (TrafficLight): true
+                          VirtualWall (VirtualTrafficLight): true
+                          VirtualWall (Walkway): true
+                      MotionPlanning:
+                        DebugMarker:
+                          MotionVelocityPlanner:
+                            DynamicObstacleStop: true
+                            ObstacleCruise: true
+                            ObstacleSlowDown: true
+                            ObstacleStop: true
+                            ObstacleVelocityLimiter: true
+                            OutOfLane: true
+                            Value: true
+                          ObstacleAvoidance: true
+                          ObstacleCruise:
+                            DebugMarker: true
+                            Value: true
+                          ObstacleStop: true
+                          SurroundObstacleChecker:
+                            Footprint: true
+                            FootprintOffset: true
+                            FootprintRecoverOffset: true
+                            SurroundObstacleCheck: true
+                            Value: true
+                          Value: true
+                        Trajectory: true
+                        Value: true
+                        VirtualWall:
+                          Value: true
+                          VirtualWall (DynamicObstacleStop): true
+                          VirtualWall (MotionVelocitySmoother): true
+                          VirtualWall (ObstacleAvoidance): true
+                          VirtualWall (ObstacleCruise Cruise): true
+                          VirtualWall (ObstacleCruise SlowDown): true
+                          VirtualWall (ObstacleCruise Stop): true
+                          VirtualWall (ObstacleStop): true
+                          VirtualWall (ObstacleVelocityLimiter): true
+                          VirtualWall (OutOfLane): true
+                          VirtualWall (SurroundObstacle): true
+                      Value: true
+                    ModifiedGoal: true
+                    Parking:
+                      Costmap: true
+                      PartialPoseArray: true
+                      PoseArray: true
+                      Value: true
+                    ScenarioTrajectory: true
                     Value: true
                   Value: false
                 Sensing:
-                  "":
-                    "": true
+                  GNSS:
+                    PoseWithCovariance: true
+                    Value: true
+                  LiDAR:
+                    ConcatenatePointCloud: true
+                    MeasurementRange: true
                     Value: true
                   Value: true
                 Simulation:
@@ -3243,8 +3453,15 @@ Visualization Manager:
                   Traffic Light Marker: true
                   Value: true
                 System:
-                  "": true
+                  Grid: true
+                  MRM Summary: true
+                  TF: true
                   Value: false
+                  Vehicle:
+                    PolarGridDisplay: true
+                    SignalDisplay: true
+                    Value: true
+                    VehicleModel: true
                 Value: true
               Zoom Factor: 1
             - Alpha: 1
@@ -4322,7 +4539,6 @@ Visualization Manager:
           Namespaces:
             center_lane_line: true
             center_line_arrows: true
-            crosswalk_lanelets: true
             lane_start_bound: true
             lanelet direction: true
             lanelet_id: true
@@ -4331,9 +4547,6 @@ Visualization Manager:
             parking_space: true
             right_lane_bound: true
             road_lanelets: true
-            stop_lines: true
-            traffic_light: true
-            traffic_light_triangle: true
           Topic:
             Depth: 5
             Durability Policy: Transient Local
@@ -4359,10 +4572,10 @@ Visualization Manager:
           Length: 2000
           Name: Condition Group
           Text Color: 255; 255; 255
-          Top: 450
+          Top: 30
           Topic: /simulation/context
           Value: true
-          Value Scale: 35
+          Value Scale: 12
           Width: 2000
         - Class: rviz_default_plugins/MarkerArray
           Enabled: true
@@ -4588,7 +4801,7 @@ Visualization Manager:
   Value: true
   Views:
     Current:
-      Angle: 0
+      Angle: 0.010000002570450306
       Class: rviz_default_plugins/TopDownOrtho
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
@@ -4598,11 +4811,11 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Scale: 10
+      Scale: 24.423542022705078
       Target Frame: entities
       Value: TopDownOrtho (rviz_default_plugins)
-      X: 66.42724609375
-      Y: -19.859375
+      X: 0.11422425508499146
+      Y: 157.41299438476562
     Saved:
       - Class: rviz_default_plugins/ThirdPersonFollower
         Distance: 18
@@ -4646,12 +4859,12 @@ Window Geometry:
     collapsed: false
   Displays:
     collapsed: false
-  Height: 1565
+  Height: 971
   Hide Left Dock: false
   Hide Right Dock: false
   PointcloudOnCamera:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd0000000400000000000001ee000005c3fc020000000ffb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000003d0000037d000000c900fffffffc000003c000000240000000c10100001cfa000000020100000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000000ffffffff0000009d00fffffffb00000024004100750074006f00770061007200650053007400610074006500500061006e0065006c0100000000ffffffff000000c100fffffffb0000000a005600690065007700730100000000000001ee0000010000fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000000c00430061006d0065007200610100000682000000eb0000000000000000fb0000000a0049006d0061006700650100000505000002680000000000000000fb0000002c0049006e0069007400690061006c0050006f007300650042007500740074006f006e00500061006e0065006c000000068f000000de0000000000000000fb0000002c0049006e0069007400690061006c0050006f007300650042007500740074006f006e00500061006e0065006c000000068f000000de0000000000000000fb00000030005200650063006f0067006e006900740069006f006e0052006500730075006c0074004f006e0049006d006100670065000000047a000001860000002800fffffffb0000002a004100750074006f0077006100720065004400610074006500540069006d006500500061006e0065006c0000000332000000720000004100fffffffb000000240050006f0069006e00740063006c006f00750064004f006e00430061006d006500720061000000039d000000560000002800ffffff00000001000001ab000005c3fc0200000002fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000e7a0000005afc0100000001fb0000000a00560069006500770073030000004e00000080000002e1000001970000000300000e7a0000005afc0100000002fb0000000800540069006d0065010000000000000e7a0000000000000000fb0000000800540069006d0065010000000000000450000000000000000000000909000005c300000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd0000000400000000000001ee00000368fc020000000ffb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005500fffffffb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000004200000208000000d200fffffffc0000025900000151000000c20100001dfa000000020100000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000000ffffffff0000009600fffffffb00000024004100750074006f00770061007200650053007400610074006500500061006e0065006c0100000000ffffffff000000b300fffffffb0000000a005600690065007700730100000000000001ee0000019b00fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000000c00430061006d0065007200610100000682000000eb0000000000000000fb0000000a0049006d0061006700650100000505000002680000000000000000fb0000002c0049006e0069007400690061006c0050006f007300650042007500740074006f006e00500061006e0065006c000000068f000000de0000000000000000fb0000002c0049006e0069007400690061006c0050006f007300650042007500740074006f006e00500061006e0065006c000000068f000000de0000000000000000fb00000030005200650063006f0067006e006900740069006f006e0052006500730075006c0074004f006e0049006d006100670065000000047a000001860000003100fffffffb0000002a004100750074006f0077006100720065004400610074006500540069006d006500500061006e0065006c0000000332000000720000004900fffffffb000000240050006f0069006e00740063006c006f00750064004f006e00430061006d006500720061000000039d000000560000003100ffffff00000001000001ab000005c3fc0200000002fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000e7a0000005afc0100000001fb0000000a00560069006500770073030000004e00000080000002e1000001970000000300000e7a0000005afc0100000002fb0000000800540069006d0065010000000000000e7a0000000000000000fb0000000800540069006d006501000000000000045000000000000000000000030a0000036800000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   RecognitionResultOnImage:
     collapsed: false
   Selection:
@@ -4660,6 +4873,6 @@ Window Geometry:
     collapsed: false
   Views:
     collapsed: false
-  Width: 2813
-  X: 1510
-  Y: 27
+  Width: 1287
+  X: 126
+  Y: 572
