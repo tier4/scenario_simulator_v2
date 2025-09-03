@@ -84,15 +84,17 @@ is used.
 A positive `int` type value, default `1`. If a non-existent version is
 specified, it is an error.
 This parameter specifies the version of the noise model to be used. Currently,
-the following three noise models are implemented:
+the following four noise models are implemented:
 - version: 1 - Simple noise model with position randomization
 - version: 2 - Elliptically approximated model of noise variation with distance
   from the ego entity
 - version: 3 - An extension of the noise model from version 2 to allow different 
   configurations to be applied to different groups of entities.
+- version: 4 - A noise model based on a unique coordinate system 
+  with the closest point of the bounding box as the origin.
 
 The parameters specific to the models are placed under `noise.v1.`, `noise.v2`,
-and `noise.v3.`, respectively.
+`noise.v3.`, and `noise.v4.`, respectively.
 
 ### `noise.v1.position.standard_deviation`
 
@@ -455,6 +457,140 @@ This parameter specifies which entity types this noise configuration should be a
 Supports wildcard expressions `?` and `*` within each string.
 The array is evaluated as an entity filter that represents a condition to OR the entity sets that match each string.
 This parameter is used only if the value of `noise.model.version` is `3`.
+
+### `noise.v4.<config_name>` (namespace)
+
+The v4 noise model extends v3 with enhanced position and rotation noise capabilities. 
+`<config_name>` is a user-defined noise configuration identifier that acts as a namespace under `noise.v4`, 
+same as in `noise.v3`.
+
+The noise v4 model uses a dynamic local coordinate system for each entity, 
+which differs from the elliptical coordinate system used in v2/v3.
+
+- **Origin**: the closest point on the entity's bounding box from the base-link of the ego vehicle
+- **Y-axis (radial direction)**: From the ego vehicle base-link to the origin
+- **X-axis (tangential direction)**: Perpendicular to the Y-axis in a right-handed coordinate system
+
+![noise v4 coordinate system](./images/parameters/noise_v4.png)
+
+### `noise.v4.<config_name>.position.<x/y>.mean`
+
+A `double` type value, default `0.0`.
+The mean value for the X/Y-axis position noise distribution. 
+The noise models the time series as AR(1) model. 
+This parameter is used only if the value of `noise.model.version` is `4`.
+
+### `noise.v4.<config_name>.position.<x/y>.standard_deviation`
+
+A positive `double` type value, default `0.0`.
+The standard deviation for the X/Y-axis position noise distribution. 
+The noise models the time series as AR(1) model. 
+This parameter is used only if the value of `noise.model.version` is `4`.
+
+### `noise.v4.<config_name>.position.<x/y>.autocorrelation_coefficient.amplitude`
+
+A positive `double` type value, default `0.0`.
+The parameter of the autocorrelation coefficient used in the generation of X/Y-axis position noise. 
+This parameter is used only if the value of `noise.model.version` is `4`.
+
+### `noise.v4.<config_name>.position.<x/y>.autocorrelation_coefficient.decay`
+
+A positive `double` type value, default `0.0`.
+The parameter of the autocorrelation coefficient used in the generation of X/Y-axis position noise. 
+This parameter is used only if the value of `noise.model.version` is `4`.
+
+### `noise.v4.<config_name>.position.<x/y>.autocorrelation_coefficient.offset`
+
+A positive `double` type value, default `0.0`.
+The parameter of the autocorrelation coefficient used in the generation of X/Y-axis position noise. 
+This parameter is used only if the value of `noise.model.version` is `4`.
+
+### `noise.v4.<config_name>.rotation` (namespace)
+
+The rotation noise in noise v4 model applies angular noise around the closest point on the entity's bounding box 
+to the ego vehicle (the origin of noise coordinate), rather than around the entity's base-link.
+
+### `noise.v4.<config_name>.rotation.mean`
+
+A `double` type value, default `0.0`.
+The mean value for the rotation noise distribution. 
+The unit is radians. The noise models the time series as AR(1) model. 
+This parameter is used only if the value of `noise.model.version` is `4`.
+
+### `noise.v4.<config_name>.rotation.standard_deviation`
+
+A positive `double` type value, default `0.0`.
+The standard deviation for the rotation noise distribution. The unit is radians. 
+The noise models the time series as AR(1) model. This parameter is used only if the value of `noise.model.version` is `4`.
+
+### `noise.v4.<config_name>.rotation.autocorrelation_coefficient.amplitude`
+
+A positive `double` type value, default `0.0`.
+The parameter of the autocorrelation coefficient used in the generation of rotation noise. 
+This parameter is used only if the value of `noise.model.version` is `4`.
+
+### `noise.v4.<config_name>.rotation.autocorrelation_coefficient.decay`
+
+A positive `double` type value, default `0.0`.
+The parameter of the autocorrelation coefficient used in the generation of rotation noise. 
+This parameter is used only if the value of `noise.model.version` is `4`.
+
+### `noise.v4.<config_name>.rotation.autocorrelation_coefficient.offset`
+
+A positive `double` type value, default `0.0`.
+The parameter of the autocorrelation coefficient used in the generation of rotation noise. 
+This parameter is used only if the value of `noise.model.version` is `4`.
+
+### `noise.v4.<config_name>.true_positive` (namespace)
+
+The true positive parameters in noise v4 model control the detection probability of entities based on distance from the ego vehicle. 
+Unlike v2's elliptical coordinate system, v4 uses direct distance measurement to the closest point on the entity's bounding box.
+
+### `noise.v4.<config_name>.true_positive.rate.distance_thresholds`
+
+Array of positive double type values, default `[1000.0]`. Units are in meters.
+Distance thresholds used to determine which detection rate to apply. 
+The distance is calculated from the ego vehicle base-link to the closest point on the entity's bounding box. 
+This parameter is used only if the value of `noise.model.version` is `4`.
+
+### `noise.v4.<config_name>.true_positive.rate.values`
+
+Array of double type values between `0.0` and `1.0`, default `[1.0]`.
+Each element represents the detection probability for the corresponding distance range. 
+The array size must match `distance_thresholds`. 
+The first threshold greater than the calculated distance determines which rate value to use. 
+This parameter is used only if the value of `noise.model.version` is `4`.
+
+### `noise.v4.<config_name>.true_positive.autocorrelation_coefficient.amplitude`
+
+A positive `double` type value, default `0.0`.
+The parameter of the autocorrelation coefficient used in the generation of true positive noise. 
+The noise models the time series as Markov process. 
+This parameter is used only if the value of `noise.model.version` is `4`.
+
+### `noise.v4.<config_name>.true_positive.autocorrelation_coefficient.decay`
+
+A positive `double` type value, default `0.0`.
+The parameter of the autocorrelation coefficient used in the generation of true positive noise. 
+The noise models the time series as Markov process. 
+This parameter is used only if the value of `noise.model.version` is `4`.
+
+### `noise.v4.<config_name>.true_positive.autocorrelation_coefficient.offset`
+
+A positive `double` type value, default `0.0`.
+The parameter of the autocorrelation coefficient used in the generation of true positive noise. 
+The noise models the time series as Markov process. 
+This parameter is used only if the value of `noise.model.version` is `4`.
+
+### `noise.v4.<config_name>.noise_application_entities` (namespace)
+
+Entity filtering parameters with the same structure as `noise.v3`. 
+See [`noise.v3.<config_name>.noise_application_entities`](#noisev3config_namenoise_application_entities-namespace) for detailed explanation.
+Like noise v3, noise v4 also has the parameters below in this namespace.
+
+- `noise.v4.<config_name>.noise_application_entities.types`
+- `noise.v4.<config_name>.noise_application_entities.subtypes`
+- `noise.v4.<config_name>.noise_application_entities.names`
 
 ## /perception/object_recognition/ground_truth/objects
 
