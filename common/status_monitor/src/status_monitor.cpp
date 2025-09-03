@@ -17,6 +17,7 @@
 #include <cstdint>
 #include <iostream>
 #include <nlohmann/json.hpp>
+#include <rclcpp/rclcpp.hpp>
 #include <sstream>
 #include <status_monitor/status_monitor.hpp>
 
@@ -91,32 +92,31 @@ auto StatusMonitor::write() const -> void
 
   json["threads"] = nlohmann::json::array();
 
-  if (not statuses.empty()) {
-    for (auto && [id, status] : statuses) {
-      nlohmann::json thread;
+  for (auto && [id, status] : statuses) {
+    nlohmann::json thread;
 
-      thread["good"] = status.good();
+    thread["good"] = status.good();
 
-      thread["maximum_access_interval_ms"] =
-        std::chrono::duration_cast<std::chrono::milliseconds>(status.maximum_access_interval)
-          .count();
+    thread["maximum_access_interval_ms"] =
+      std::chrono::duration_cast<std::chrono::milliseconds>(status.maximum_access_interval).count();
 
-      thread["minimum_access_interval_ms"] =
-        std::chrono::duration_cast<std::chrono::milliseconds>(status.minimum_access_interval)
-          .count();
+    thread["minimum_access_interval_ms"] =
+      std::chrono::duration_cast<std::chrono::milliseconds>(status.minimum_access_interval).count();
 
-      thread["thread_id"] = boost::lexical_cast<std::string>(id);
+    thread["thread_id"] = boost::lexical_cast<std::string>(id);
 
-      thread["name"] = status.name;
+    thread["name"] = status.name;
 
-      thread["since_last_access_ms"] =
-        std::chrono::duration_cast<std::chrono::milliseconds>(status.since_last_access()).count();
+    const auto since_last_access_ms =
+      std::chrono::duration_cast<std::chrono::milliseconds>(status.since_last_access()).count();
+    thread["since_last_access_ms"] = since_last_access_ms;
 
-      json["threads"].push_back(thread);
+    json["threads"].push_back(thread);
 
-      if (not status.good()) {
-        std::cout << status.name << " of " << name() << " is probably unresponsive." << std::endl;
-      }
+    if (not status.good()) {
+      RCLCPP_ERROR(
+        rclcpp::get_logger("status_monitor"), "%s of %s unresponsive for %ld ms.",
+        status.name.c_str(), name().c_str(), since_last_access_ms);
     }
   }
 
