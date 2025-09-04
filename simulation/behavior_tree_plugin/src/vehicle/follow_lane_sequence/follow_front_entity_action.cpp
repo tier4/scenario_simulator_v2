@@ -129,23 +129,19 @@ BT::NodeStatus FollowFrontEntityAction::doAction()
     return BT::NodeStatus::RUNNING;
   }
 
-  const double radius =
-    std::hypot(
-      vehicle_parameters.bounding_box.dimensions.x, vehicle_parameters.bounding_box.dimensions.y) *
-    0.5;
   const double min_stop = calculateStopDistance(behavior_parameter_.dynamic_constraints);
 
   const double requested = [&]() -> double {
-    const double adjusted = distance_to_front_entity_.value() - radius;
+    const double adjusted = distance_to_front_entity_.value();
     if (adjusted <= min_stop) {
       // Dangerous approach
       return 0.0;
     }
-    if (std::abs(adjusted - front_entity_margin) < margin_tolerance) {
+    if (std::abs(adjusted - front_entity_margin + min_stop) < margin_tolerance) {
       // Within margin tolerance
       return front_entity_linear_velocity;
     }
-    if (adjusted < front_entity_margin) {
+    if (adjusted < front_entity_margin + min_stop) {
       // Below the margin
       return front_entity_linear_velocity - speed_step;
     }
