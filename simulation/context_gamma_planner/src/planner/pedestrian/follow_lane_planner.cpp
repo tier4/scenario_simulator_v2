@@ -33,6 +33,8 @@ void FollowLanePlanner::setWaypoints(
   }
 }
 
+// Sync to a nearby waypoint, drop reached points,
+// and return the next unreached target (or nullopt).
 auto FollowLanePlanner::calculateNextGoalPoint() -> std::optional<geometry_msgs::msg::Point>
 {
   if (!status_) {
@@ -43,6 +45,8 @@ auto FollowLanePlanner::calculateNextGoalPoint() -> std::optional<geometry_msgs:
     THROW_SIMULATION_ERROR("Goal poses should be set before you want to calculate goal pose.");
   }
   while (!goal_poses_.empty()) {
+    // 1) Skip leading points that are farther than goal_threshold
+    //    until we arrive at a neighborhood (distance < threshold).
     if (
       std::hypot(
         (status_->getMapPose().position.x - goal_poses_.front().position.x),
@@ -52,7 +56,13 @@ auto FollowLanePlanner::calculateNextGoalPoint() -> std::optional<geometry_msgs:
       break;
     }
   }
+  // If everything was discarded without finding a nearby point, stop safely.
+  if (goal_poses_.empty()) {
+    return std::nullopt;
+  }
   while (goal_poses_.size() > 1) {
+    // 2) Treat points within goal_threshold as reached and drop them.
+    //    The first point at or beyond the threshold becomes the next target.
     if (
       std::hypot(
         (status_->getMapPose().position.x - goal_poses_.front().position.x),
