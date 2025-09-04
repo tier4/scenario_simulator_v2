@@ -24,6 +24,16 @@ Changelog for package behavior_tree_plugin
 16.4.2 (2025-05-23)
 -------------------
 
+17.4.0 (2025-09-04)
+-------------------
+* Merge pull request `#1672 <https://github.com/tier4/scenario_simulator_v2/issues/1672>`_ from tier4/feature/use-yaw-diff-for-front-detection
+  Replace quaternion-based orientation check with yaw-difference front …
+* Merge branch 'feature/use-yaw-diff-for-front-detection' of github.com:tier4/scenario_simulator_v2 into feature/use-yaw-diff-for-front-detection
+* Merge branch 'master' into feature/use-yaw-diff-for-front-detection
+* Refactor getFrontEntityName to improve entity selection based on spline distance
+* Replace quaternion-based orientation check with yaw-difference front detection
+* Contributors: Taiga, Taiga Takano
+
 17.3.0 (2025-09-03)
 -------------------
 * Merge branch 'master' into feature/noise_v4
