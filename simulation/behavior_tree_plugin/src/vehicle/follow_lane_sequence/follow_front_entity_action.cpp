@@ -132,9 +132,8 @@ BT::NodeStatus FollowFrontEntityAction::doAction()
   };
 
   const auto self_avoidance_circle_radius =
-    std::sqrt(
-      std::pow(vehicle_parameters.bounding_box.dimensions.x, 2.0) +
-      std::pow(vehicle_parameters.bounding_box.dimensions.y, 2.0)) /
+    std::hypot(
+      vehicle_parameters.bounding_box.dimensions.x, vehicle_parameters.bounding_box.dimensions.y) /
     2.0;
 
   const auto front_entity_gap = distance_to_front_entity_.value() - self_avoidance_circle_radius;
@@ -142,28 +141,22 @@ BT::NodeStatus FollowFrontEntityAction::doAction()
   const auto abs_gap_margin_diff = std::abs(front_entity_gap - front_entity_margin);
 
   std::optional<traffic_simulator_msgs::msg::Obstacle> obstacle;
+  obstacle = calculateObstacle(waypoints);
   if (front_entity_gap <= minimum_stop_distance) {
     // Dangerous approach
     setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(0.0));
-    obstacle = calculateObstacle(waypoints);
   } else if (abs_gap_margin_diff < margin_tolerance) {
     // Within margin tolerance
     const auto request_velocity = apply_speed_limit(front_entity_linear_velocity);
-    std::cout << "request_velocity: " << request_velocity << std::endl;
     setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(request_velocity));
-    obstacle = calculateObstacle(waypoints);
   } else if (front_entity_gap < front_entity_margin) {
     // Below the margin
     const auto request_velocity = apply_speed_limit(front_entity_linear_velocity - speed_step);
-    std::cout << "request_velocity: " << request_velocity << std::endl;
     setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(request_velocity));
-    obstacle = calculateObstacle(waypoints);
   } else {
     // Too far apart
     const auto request_velocity = apply_speed_limit(front_entity_linear_velocity + speed_step);
-    std::cout << "request_velocity: " << request_velocity << std::endl;
     setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(request_velocity));
-    obstacle = calculateObstacle(waypoints);
   }
 
   setOutput("waypoints", waypoints);
