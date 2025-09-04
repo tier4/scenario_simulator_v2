@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <behavior_tree_plugin/vehicle/behavior_tree.hpp>
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/follow_front_entity_action.hpp>
+#include <cmath>
 #include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
@@ -127,38 +128,34 @@ BT::NodeStatus FollowFrontEntityAction::doAction()
     setOutput("obstacle", obstacle);
     return BT::NodeStatus::RUNNING;
   }
-  const auto apply_speed_limit = [&](double v) -> double {
-    return std::clamp(v, 0.0, target_speed_.value());
-  };
 
-  const auto self_avoidance_circle_radius =
+  const double radius =
     std::hypot(
-      vehicle_parameters.bounding_box.dimensions.x, vehicle_parameters.bounding_box.dimensions.y) /
-    2.0;
+      vehicle_parameters.bounding_box.dimensions.x, vehicle_parameters.bounding_box.dimensions.y) *
+    0.5;
+  const double min_stop = calculateStopDistance(behavior_parameter_.dynamic_constraints);
 
-  const auto front_entity_gap = distance_to_front_entity_.value() - self_avoidance_circle_radius;
-  const auto minimum_stop_distance = calculateStopDistance(behavior_parameter_.dynamic_constraints);
-  const auto abs_gap_margin_diff = std::abs(front_entity_gap - front_entity_margin);
-
-  std::optional<traffic_simulator_msgs::msg::Obstacle> obstacle;
-  obstacle = calculateObstacle(waypoints);
-  if (front_entity_gap <= minimum_stop_distance) {
-    // Dangerous approach
-    setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(0.0));
-  } else if (abs_gap_margin_diff < margin_tolerance) {
-    // Within margin tolerance
-    const auto request_velocity = apply_speed_limit(front_entity_linear_velocity);
-    setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(request_velocity));
-  } else if (front_entity_gap < front_entity_margin) {
-    // Below the margin
-    const auto request_velocity = apply_speed_limit(front_entity_linear_velocity - speed_step);
-    setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(request_velocity));
-  } else {
+  const double requested = [&]() -> double {
+    const double adjusted = distance_to_front_entity_.value() - radius;
+    if (adjusted <= min_stop) {
+      // Dangerous approach
+      return 0.0;
+    }
+    if (std::abs(adjusted - front_entity_margin) < margin_tolerance) {
+      // Within margin tolerance
+      return front_entity_linear_velocity;
+    }
+    if (adjusted < front_entity_margin) {
+      // Below the margin
+      return front_entity_linear_velocity - speed_step;
+    }
     // Too far apart
-    const auto request_velocity = apply_speed_limit(front_entity_linear_velocity + speed_step);
-    setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(request_velocity));
-  }
+    return front_entity_linear_velocity + speed_step;
+  }();
 
+  const double clamped = std::clamp(requested, 0.0, target_speed_.value());
+  setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(clamped));
+  const auto obstacle = calculateObstacle(waypoints);
   setOutput("waypoints", waypoints);
   setOutput("obstacle", obstacle);
   return BT::NodeStatus::RUNNING;
