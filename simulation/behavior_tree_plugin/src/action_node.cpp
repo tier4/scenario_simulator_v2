@@ -277,8 +277,11 @@ auto ActionNode::getFrontEntityName(const math::geometry::CatmullRomSplineInterf
     const auto self_yaw = math::geometry::convertQuaternionToEulerAngle(
                             canonicalized_entity_status_->getMapPose().orientation)
                             .z;
-    std::optional<std::string> closest_front_name;
-    double min_distance = std::numeric_limits<double>::max();
+    // Iterate by increasing euclidean distance and compute the
+    // actual spline-based distance using getDistanceToTargetEntity.
+    // Select the entity that yields the minimal valid distance.
+    std::optional<std::string> best_name;
+    double best_distance = std::numeric_limits<double>::infinity();
     for (const auto & [euclidean_distance, name] : local_euclidean_distances_map_) {
       const auto other_pos = other_entity_status_.at(name).getMapPose().position;
       const auto dx = other_pos.x - self_pos.x;
@@ -286,13 +289,17 @@ auto ActionNode::getFrontEntityName(const math::geometry::CatmullRomSplineInterf
       const auto vec_yaw = std::atan2(dy, dx);
       const auto yaw_diff = std::atan2(std::sin(vec_yaw - self_yaw), std::cos(vec_yaw - self_yaw));
       if (std::fabs(yaw_diff) <= boost::math::constants::half_pi<double>()) {
-        if (euclidean_distance < min_distance) {
-          min_distance = euclidean_distance;
-          closest_front_name = name;
+        if (const auto distance_opt = getDistanceToTargetEntity(spline, getEntityStatus(name));
+            distance_opt.has_value()) {
+          const auto dist = distance_opt.value();
+          if (dist < best_distance) {
+            best_distance = dist;
+            best_name = name;
+          }
         }
       }
     }
-    return closest_front_name;
+    return best_name;
   }
   return std::nullopt;
 }
