@@ -48,12 +48,12 @@ public:
   virtual auto calculateNextGoalPoint() -> std::optional<geometry_msgs::msg::Point> = 0;
 
   virtual void clear() = 0;
-  const double goal_threshold;
 
 protected:
   std::optional<traffic_simulator::CanonicalizedEntityStatus> status_;
   std::deque<geometry_msgs::msg::Pose> goal_poses_;
   double max_speed_ = 0.0;
+  const double goal_threshold;
 };
 }  // namespace context_gamma_planner
 
