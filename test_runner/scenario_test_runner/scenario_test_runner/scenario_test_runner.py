@@ -298,6 +298,8 @@ def main(args=None):
 
     args = parser.parse_args()
 
+    print(f"[Debug::ScenarioTestRunner] ROS2 status: {'OK' if rclpy.ok() else 'NOT OK'}", flush=True)
+
     test_runner = ScenarioTestRunner(
         global_frame_rate=args.global_frame_rate,
         global_real_time_factor=args.global_real_time_factor,
