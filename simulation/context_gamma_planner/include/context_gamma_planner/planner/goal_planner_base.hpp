@@ -39,7 +39,7 @@ public:
 
   void appendGoalPoints(const std::vector<geometry_msgs::msg::Point> & goal_points);
 
-  void setMaxSpeed(const double & max_speed);
+  void setMaxSpeed(const double max_speed);
 
   double getMaxSpeed() const { return max_speed_; }
 

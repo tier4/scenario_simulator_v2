@@ -48,7 +48,7 @@ void GoalPlannerBase::appendGoalPoints(const std::vector<geometry_msgs::msg::Poi
   }
 }
 
-void GoalPlannerBase::setMaxSpeed(const double & max_speed) { max_speed_ = max_speed; }
+void GoalPlannerBase::setMaxSpeed(const double max_speed) { max_speed_ = max_speed; }
 
 std::vector<geometry_msgs::msg::Pose> GoalPlannerBase::getGoalPoses() const
 {
