@@ -34,20 +34,6 @@ traffic_simulator_msgs::msg::WaypointsArray GoalPlannerBase::getWaypoints() cons
   return waypoints;
 }
 
-void GoalPlannerBase::appendGoalPoses(const std::vector<geometry_msgs::msg::Pose> & goal_poses)
-{
-  goal_poses_.insert(goal_poses_.end(), goal_poses.begin(), goal_poses.end());
-}
-
-void GoalPlannerBase::appendGoalPoints(const std::vector<geometry_msgs::msg::Point> & goal_points)
-{
-  for (const auto & point : goal_points) {
-    geometry_msgs::msg::Pose pose;
-    pose.position = point;
-    goal_poses_.emplace_back(pose);
-  }
-}
-
 void GoalPlannerBase::setMaxSpeed(const double max_speed) { max_speed_ = max_speed; }
 
 std::vector<geometry_msgs::msg::Pose> GoalPlannerBase::getGoalPoses() const

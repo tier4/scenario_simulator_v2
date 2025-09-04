@@ -35,10 +35,6 @@ public:
   void setCurrentStatus(
     const std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus> & status);
 
-  void appendGoalPoses(const std::vector<geometry_msgs::msg::Pose> & goal_poses);
-
-  void appendGoalPoints(const std::vector<geometry_msgs::msg::Point> & goal_points);
-
   void setMaxSpeed(const double max_speed);
 
   double getMaxSpeed() const { return max_speed_; }
@@ -46,8 +42,6 @@ public:
   std::vector<geometry_msgs::msg::Pose> getGoalPoses() const;
 
   traffic_simulator_msgs::msg::WaypointsArray getWaypoints() const;
-
-  geometry_msgs::msg::Pose getNextGoalPose() const { return goal_poses_.front(); }
 
   bool isReachedGoal() const { return goal_poses_.empty(); }
 
