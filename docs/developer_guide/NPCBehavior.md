@@ -188,3 +188,41 @@ When this behavior is used, entity can only be moved by specifying its pose, vel
 When using this behavior, any consistency in physical behavior is ignored. Changes in posture, velocity, acceleration, and jerk over time will not occur.  
 The EntityStatus value will continue to be the value specified and updated via the `API::setEntityStatus` function, etc.  
 This behavior was developed primarily to drive the simulator from Autoware rosbag data.  
+
+## Shared Property: Lateral Collision Threshold (`lateralCollisionThreshold`)
+
+**Terminology** — *Acting entity* means the entity currently executing the BT action. It does **not** mean an Autoware-operated vehicle.
+
+**Summary** — Allows you to override, per entity, the distance threshold (meters) used for lateral collision checks. If unspecified, the legacy behavior uses half of the **acting entity’s width**.
+
+**Purpose** — To adjust, per scenario and per entity, the sensitivity to “lateral interference” near lanes (e.g., lane splitting or side-by-side travel). This threshold is used in the collision-candidate computation inside the `ActionNode`.
+
+**Specification**
+
+* **Specifying from OpenSCENARIO**
+  Set `name="lateralCollisionThreshold"` (value is a real number in meters) in `ObjectController/Controller/Properties/Property` to apply it to that entity. If the property is absent, `std::nullopt` is set and the default behavior (**width × 0.5 of the acting entity**) is used.
+
+* **Handling in BT (Behavior Tree)**
+  The common base `ActionNode` for all BT actions adds `InputPort<std::optional<double>>("lateral_collision_threshold")`, which allows overriding the value. Internally it is used as:
+  `threshold = lateral_collision_threshold_.value_or(from_bounding_box.dimensions.y * 0.5)`
+  (i.e., half of the **acting entity’s bounding-box width** when unspecified)
+
+* **Scope**
+  Enabled in the Vehicle / Pedestrian BT plugins. Do-Nothing does not perform BT-based collision checks, so there is no effect by default (a setter is provided in the API).
+
+* **Compatibility**
+  Existing scenarios see no behavioral change if the property is unspecified (legacy value = **acting entity width / 2**).
+
+**Default behavior** — When the property is unspecified, collision candidates are evaluated using the threshold **“acting entity width / 2.”**
+
+**Example (YAML)** —
+
+```yaml
+ObjectController:
+  Controller:
+    name: '...'
+    Properties:
+      Property:
+        - name: "lateralCollisionThreshold"
+          value: "0.8"   # unit: m
+```

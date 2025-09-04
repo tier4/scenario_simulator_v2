@@ -108,6 +108,10 @@ auto ActionNode::getBlackBoardValues() -> void
         "behavior_parameter", behavior_parameter_)) {
     behavior_parameter_ = traffic_simulator_msgs::msg::BehaviorParameter();
   }
+  if (!getInput<std::optional<double>>(
+        "lateral_collision_threshold", lateral_collision_threshold_)) {
+    lateral_collision_threshold_ = std::nullopt;  // default: not set
+  }
 }
 
 auto ActionNode::getHorizon() const -> double
@@ -382,11 +386,14 @@ auto ActionNode::getDistanceToTargetEntity(
       const auto target_bounding_box_distance =
         bounding_box_distance.value() + from_bounding_box.dimensions.x / 2.0;
 
-      /// @note if the distance of the target entity to the spline is smaller than the width of the reference entity
-      if (const auto target_to_spline_distance = traffic_simulator::distance::distanceToSpline(
-            static_cast<geometry_msgs::msg::Pose>(*target_lanelet_pose), target_bounding_box,
-            spline, longitudinal_distance.value());
-          target_to_spline_distance <= from_bounding_box.dimensions.y / 2.0) {
+      const auto lateral_distance_to_spline = traffic_simulator::distance::distanceToSpline(
+        static_cast<geometry_msgs::msg::Pose>(*target_lanelet_pose), target_bounding_box, spline,
+        longitudinal_distance.value());
+
+      const double threshold =
+        lateral_collision_threshold_.value_or(from_bounding_box.dimensions.y * 0.5);
+
+      if (lateral_distance_to_spline <= threshold) {
         return target_bounding_box_distance;
       }
       /// @note if the distance of the target entity to the spline cannot be calculated because a collision occurs
