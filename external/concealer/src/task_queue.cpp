@@ -21,9 +21,10 @@
 namespace concealer
 {
 TaskQueue::TaskQueue()
-: dispatcher([this] {
-    auto const ros_ok_value = rclcpp::ok();
-    auto const finalized_value = finalized.load(std::memory_order_acquire);
+: finalized{false}, thrown{nullptr}, dispatcher([this] {
+    std::cerr << "[WARN][DEBUG/concealer::FieldOperatorApplication::TaskQueue] TaskQueue dispatcher thread init" << std::endl;
+    auto ros_ok_value = rclcpp::ok();
+    auto finalized_value = finalized.load(std::memory_order_acquire);
     try {
       while (ros_ok_value and not finalized_value) {
         if (not empty()) {
@@ -39,6 +40,8 @@ TaskQueue::TaskQueue()
           }
           std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
+        ros_ok_value = rclcpp::ok();
+        finalized_value = finalized.load(std::memory_order_acquire);
       }
     } catch (...) {
       std::cerr << "[WARN][DEBUG/concealer::FieldOperatorApplication::TaskQueue] Exception" << std::endl;
@@ -59,7 +62,7 @@ TaskQueue::TaskQueue()
 {
   std::cerr << "[WARN][DEBUG/concealer::FieldOperatorApplication::TaskQueue] TaskQueue constructor finished, rclcpp::ok() = " << (rclcpp::ok() ? "true" : "false") << std::endl;
   if (rclcpp::ok()) {
-    RCLCPP_WARN(rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication::TaskQueue]"), "TaskQueue constructor finished, rclcpp::ok() = true");
+    RCLCPP_WARN(rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication::TaskQueue"), "TaskQueue constructor finished, rclcpp::ok() = true");
   }
 }
 

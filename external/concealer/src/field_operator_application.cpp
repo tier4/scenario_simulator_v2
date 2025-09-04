@@ -752,11 +752,6 @@ auto FieldOperatorApplication::spinSome() -> void
         full_name.assign(namespace_).append("/").append(name);
       }
       
-      /// @note temporary filter for /autoware_api/internal/velocity
-      if (full_name != "/autoware_api/internal/velocity") {
-        continue;
-      }
-      
       auto [iter, inserted] = known_nodes_.emplace(full_name);
       if (inserted) {
         new_nodes.emplace_back(name, namespace_); 
