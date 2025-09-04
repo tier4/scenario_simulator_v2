@@ -51,13 +51,11 @@ public:
   template <typename F>
   auto delay(std::string const & name, F && f) -> void
   {
-    RCLCPP_WARN(rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication::TaskQueue"), "call delay for: %s", name.c_str());
     rethrow();
     auto lock = std::unique_lock(thunks_mutex);
     thunks.emplace(std::forward<F>(f));
-    size_t queue_size = thunks.size();
     lock.unlock();
-    RCLCPP_WARN(rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication::TaskQueue"), "Task '%s' added, queue size now: %zu", name.c_str(), queue_size);
+    RCLCPP_WARN(rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication::TaskQueue"), "Task '%s' added", name.c_str());
   }
 
   auto empty() const -> bool;
