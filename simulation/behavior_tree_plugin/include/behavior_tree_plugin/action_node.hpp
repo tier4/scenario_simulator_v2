@@ -86,6 +86,7 @@ public:
       BT::InputPort<traffic_simulator::behavior::Request>("request"),
       BT::InputPort<std::shared_ptr<EuclideanDistancesMap>>("euclidean_distances_map"),
       BT::InputPort<traffic_simulator_msgs::msg::BehaviorParameter>("behavior_parameter"),
+      BT::InputPort<std::optional<double>>("lateral_collision_threshold"),
       BT::OutputPort<std::optional<traffic_simulator_msgs::msg::Obstacle>>("obstacle"),
       BT::OutputPort<traffic_simulator_msgs::msg::WaypointsArray>("waypoints"),
       BT::OutputPort<traffic_simulator::behavior::Request>("request"),
@@ -117,6 +118,7 @@ protected:
   EntityStatusDict other_entity_status_;
   lanelet::Ids route_lanelets_;
   traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter_;
+  std::optional<double> lateral_collision_threshold_;
 
   virtual bool checkPreconditions() { return true; }
   virtual BT::NodeStatus doAction() = 0;

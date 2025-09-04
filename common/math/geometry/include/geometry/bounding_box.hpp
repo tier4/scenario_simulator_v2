@@ -70,6 +70,8 @@ std::vector<geometry_msgs::msg::Point> getPointsFromBbox(
   const double length_extension_front = 0.0, const double length_extension_rear = 0.0);
 DistancesFromCenterToEdge getDistancesFromCenterToEdge(
   const traffic_simulator_msgs::msg::BoundingBox & bounding_box);
+boost_point getClosestPointOnPolygon(
+  const boost_point & query_point, const boost_polygon & polygon);
 
 }  // namespace geometry
 }  // namespace math
