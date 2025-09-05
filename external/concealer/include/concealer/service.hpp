@@ -43,14 +43,24 @@ public:
     const std::string & name, Node & node,
     const std::chrono::nanoseconds & interval = std::chrono::seconds(3))
   : name(name),
-    client(node.template create_client<T>(name, rmw_qos_profile_default)),
+    client(node.template create_client<T>(name, rmw_qos_profile_services_default)),
     interval(interval)
   {
   }
 
-  auto operator()(const typename T::Request::SharedPtr & request, std::size_t attempts_count)
+  auto operator()(
+    const typename T::Request::SharedPtr & request, std::size_t attempts_count,
+    std::chrono::seconds availability_timeout = std::chrono::seconds(180))
   {
-    while (!client->service_is_ready()) {
+    const auto availability_deadline = std::chrono::steady_clock::now() + availability_timeout;
+
+    while (rclcpp::ok() and not client->service_is_ready()) {
+      const auto now = std::chrono::steady_clock::now();
+      if (now > availability_deadline) {
+        throw common::scenario_simulator_exception::AutowareError(
+          "Service ", std::quoted(name), " not ready after ", availability_timeout.count(),
+          " seconds");
+      }
       interval.sleep();
     }
 
