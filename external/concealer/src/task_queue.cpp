@@ -60,9 +60,9 @@ TaskQueue::TaskQueue()
     } 
   })
 {
-  std::cerr << "[WARN][DEBUG/concealer::FieldOperatorApplication::TaskQueue] TaskQueue constructor finished, rclcpp::ok() = " << (rclcpp::ok() ? "true" : "false") << std::endl;
+  std::cerr << "[WARN][DEBUG/concealer::FieldOperatorApplication::TaskQueue] TaskQueue constructor finished: rclcpp::ok() = " << (rclcpp::ok() ? "true" : "false")<<", finalized = " << (finalized.load(std::memory_order_acquire) ? "true" : "false") << std::endl;
   if (rclcpp::ok()) {
-    RCLCPP_WARN(rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication::TaskQueue"), "TaskQueue constructor finished, rclcpp::ok() = true");
+    RCLCPP_WARN(rclcpp::get_logger("DEBUG/concealer::FieldOperatorApplication::TaskQueue"), "TaskQueue constructor finished: rclcpp::ok() = %s, finalized = %s", rclcpp::ok() ? "true" : "false", finalized.load(std::memory_order_acquire) ? "true" : "false");
   }
 }
 
