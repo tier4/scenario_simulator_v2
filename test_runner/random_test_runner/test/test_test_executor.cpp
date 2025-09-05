@@ -78,7 +78,8 @@ auto getTestDescription() -> TestDescription
                            .lanelet_id(34513)
                            .s(10.0)
                            .offset(0.0)
-                           .rpy(geometry_msgs::msg::Vector3());
+                           .rpy(geometry_msgs::msg::Vector3())
+                           .lanelet_pose_valid(true);
 
   td.ego_goal_pose =
     geometry_msgs::build<geometry_msgs::msg::Pose>()
@@ -92,7 +93,8 @@ auto getTestDescription() -> TestDescription
                             .lanelet_id(34513)
                             .s(0.0)
                             .offset(0.0)
-                            .rpy(geometry_msgs::msg::Vector3());
+                            .rpy(geometry_msgs::msg::Vector3())
+                            .lanelet_pose_valid(true);
 
   return td;
 }
@@ -233,7 +235,8 @@ TEST(TestExecutor, UpdateNoNPCs)
     MockAPI, TestDescription(), JunitXmlReporterTestCase(test_case), 20.0,
     ArchitectureType::AWF_UNIVERSE, rclcpp::get_logger("test_executor_test"));
   traffic_simulator::CanonicalizedEntityStatus status(
-    traffic_simulator_msgs::msg::EntityStatus(), std::nullopt);
+    traffic_simulator_msgs::msg::EntityStatus(),
+    std::vector<traffic_simulator::CanonicalizedLaneletPose>{});
 
   EXPECT_CALL(*MockAPI, isNpcLogicStarted)
     .Times(1)

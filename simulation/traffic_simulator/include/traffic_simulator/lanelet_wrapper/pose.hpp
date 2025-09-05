@@ -52,6 +52,24 @@ auto toLaneletPose(
   -> std::optional<LaneletPose>;
 
 auto toLaneletPoses(
+  const Pose & map_pose, const lanelet::Id lanelet_id, const double matching_distance = 1.0)
+  -> std::vector<LaneletPose>;
+
+auto toLaneletPoses(
+  const Pose & map_pose, const lanelet::Ids & lanelet_ids, const double matching_distance = 1.0)
+  -> std::vector<LaneletPose>;
+
+auto toLaneletPoses(
+  const Pose & map_pose, const bool include_crosswalk, const double matching_distance = 1.0)
+  -> std::vector<LaneletPose>;
+
+auto toLaneletPoses(
+  const Pose & map_pose, const BoundingBox & bounding_box, const bool include_crosswalk,
+  const double matching_distance = 1.0,
+  const RoutingGraphType type = RoutingConfiguration().routing_graph_type)
+  -> std::vector<LaneletPose>;
+
+auto toLaneletPoses(
   const Pose & map_pose, const lanelet::Id lanelet_id, const double matching_distance = 5.0,
   const bool include_opposite_direction = true,
   const RoutingGraphType type = RoutingConfiguration().routing_graph_type)
@@ -59,19 +77,19 @@ auto toLaneletPoses(
 
 /**
  * @brief Retrieves alternative lanelet poses based on the reference lanelet pose.
- * 
- * This method computes alternative lanelet poses in the previous and next lanelets 
- * relative to a given reference lanelet pose. It recursively explores the neighboring 
+ *
+ * This method computes alternative lanelet poses in the previous and next lanelets
+ * relative to a given reference lanelet pose. It recursively explores the neighboring
  * lanelets until no further alternatives are found. The decision of whether a pose belongs
  * to a previous or next lanelet is based on the `s` value of the reference pose:
  * - If `s` is negative, the pose is assumed to be on the previous lanelet.
  * - If `s` exceeds the lanelet length, the pose is assumed to be on the next lanelet.
- * - If `s` is within the valid range of the lanelet (from 0 to the lanelet's length), 
+ * - If `s` is within the valid range of the lanelet (from 0 to the lanelet's length),
  *   the reference lanelet pose is returned directly.
- * 
- * @param reference_lanelet_pose The reference pose on a lanelet, used to determine its position 
+ *
+ * @param reference_lanelet_pose The reference pose on a lanelet, used to determine its position
  *                                and compute alternatives in neighboring lanelets.
- * 
+ *
  * @return A vector of alternative `LaneletPose` objects representing poses in the neighboring
  *         lanelets, or the reference pose if no alternatives are found.
  */
@@ -106,6 +124,11 @@ auto matchToLane(
   const double reduction_ratio = DEFAULT_MATCH_TO_LANE_REDUCTION_RATIO,
   const RoutingGraphType type = RoutingConfiguration().routing_graph_type)
   -> std::optional<lanelet::Id>;
+
+auto matchToLanes(
+  const geometry_msgs::msg::Pose & pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
+  const bool include_crosswalk, const double matching_distance, const double reduction_ratio,
+  const traffic_simulator::RoutingGraphType type) -> std::vector<lanelet::Id>;
 
 auto leftLaneletIds(
   const lanelet::Id lanelet_id, const RoutingGraphType type, const bool include_opposite_direction)
