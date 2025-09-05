@@ -24,6 +24,19 @@ Changelog for package behavior_tree_plugin
 16.4.2 (2025-05-23)
 -------------------
 
+17.5.0 (2025-09-05)
+-------------------
+* Merge pull request `#1673 <https://github.com/tier4/scenario_simulator_v2/issues/1673>`_ from tier4/fix/approach-stop-and-gap-tolerance
+  Fix aggressive approach: stop within min distance, track gap tolerance
+* Refactor doAction in FollowFrontEntityAction to improve distance calculations and enhance stability
+* Refactor margin tolerance calculation in FollowFrontEntityAction to use vehicle radius for improved accuracy
+* Refactor doAction in FollowFrontEntityAction to adjust distance calculations for improved safety and responsiveness
+* Refactor doAction in FollowFrontEntityAction to enhance readability and streamline velocity adjustments
+* Refactor obstacle calculation in FollowFrontEntityAction::doAction to improve clarity and efficiency
+* Merge branch 'master' into fix/approach-stop-and-gap-tolerance
+* prevent dangerous approach; stop within min distance and clamp requested velocity
+* Contributors: Taiga, Taiga Takano
+
 17.4.0 (2025-09-04)
 -------------------
 * Merge pull request `#1672 <https://github.com/tier4/scenario_simulator_v2/issues/1672>`_ from tier4/feature/use-yaw-diff-for-front-detection

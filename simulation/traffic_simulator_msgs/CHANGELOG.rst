@@ -24,6 +24,11 @@ Changelog for package openscenario_msgs
 16.4.2 (2025-05-23)
 -------------------
 
+17.5.0 (2025-09-05)
+-------------------
+* Merge branch 'master' into fix/approach-stop-and-gap-tolerance
+* Contributors: Taiga
+
 17.4.0 (2025-09-04)
 -------------------
 * Merge branch 'feature/use-yaw-diff-for-front-detection' of github.com:tier4/scenario_simulator_v2 into feature/use-yaw-diff-for-front-detection
