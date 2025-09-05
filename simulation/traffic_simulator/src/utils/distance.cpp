@@ -20,6 +20,7 @@
 #include <traffic_simulator/lanelet_wrapper/lanelet_map.hpp>
 #include <traffic_simulator/lanelet_wrapper/pose.hpp>
 #include <traffic_simulator/utils/distance.hpp>
+#include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 
 namespace traffic_simulator
@@ -94,7 +95,7 @@ auto longitudinalDistance(
     /**
      * @brief A matching distance of about 1.5*lane widths is given as the matching distance to match the
      * Entity present on the adjacent Lanelet.
-     * The length of the horizontal bar must intersect with the adjacent lanelet, 
+     * The length of the horizontal bar must intersect with the adjacent lanelet,
      * so it is always 10m regardless of the entity type.
      */
     constexpr double matching_distance = 5.0;
@@ -321,6 +322,35 @@ auto distanceToCrosswalk(
     auto polygon = hdmap_utils_ptr->getLaneletPolygon(target_crosswalk_id);
     return spline.getCollisionPointIn2D(polygon);
   }
+}
+
+auto distanceAlongLanelet(
+  const geometry_msgs::msg::Pose & from_pose,
+  const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
+  const geometry_msgs::msg::Pose & to_pose,
+  const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box, const double matching_distance)
+  -> std::optional<double>
+{
+  /// @note due to this hardcoded value, the method cannot be used for calculations along a crosswalk (for pedestrians)
+  constexpr bool include_crosswalk = false;
+  constexpr bool include_adjacent_lanelet = false;
+  constexpr bool include_opposite_direction = false;
+  constexpr bool allow_lane_change = true;
+
+  const auto routing_configuration = traffic_simulator::RoutingConfiguration{allow_lane_change};
+
+  if (const auto from_canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
+        from_pose, from_bounding_box, include_crosswalk, matching_distance);
+      from_canonicalized_lanelet_pose.has_value()) {
+    if (const auto to_canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
+          to_pose, to_bounding_box, include_crosswalk, matching_distance);
+        to_canonicalized_lanelet_pose.has_value()) {
+      return distance::longitudinalDistance(
+        from_canonicalized_lanelet_pose.value(), to_canonicalized_lanelet_pose.value(),
+        include_adjacent_lanelet, include_opposite_direction, routing_configuration);
+    }
+  }
+  return std::nullopt;
 }
 
 auto distanceToSpline(
