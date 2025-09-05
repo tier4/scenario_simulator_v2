@@ -24,6 +24,50 @@ Changelog for package behavior_tree_plugin
 16.4.2 (2025-05-23)
 -------------------
 
+17.4.0 (2025-09-04)
+-------------------
+* Merge pull request `#1672 <https://github.com/tier4/scenario_simulator_v2/issues/1672>`_ from tier4/feature/use-yaw-diff-for-front-detection
+  Replace quaternion-based orientation check with yaw-difference front …
+* Merge branch 'feature/use-yaw-diff-for-front-detection' of github.com:tier4/scenario_simulator_v2 into feature/use-yaw-diff-for-front-detection
+* Merge branch 'master' into feature/use-yaw-diff-for-front-detection
+* Refactor getFrontEntityName to improve entity selection based on spline distance
+* Replace quaternion-based orientation check with yaw-difference front detection
+* Contributors: Taiga, Taiga Takano
+
+17.3.0 (2025-09-03)
+-------------------
+* Merge branch 'master' into feature/noise_v4
+* Merge branch 'master' into feature/noise_v4
+* Merge branch 'master' into feature/noise_v4
+* Contributors: Kotaro Yoshimoto
+
+17.2.1 (2025-09-02)
+-------------------
+* Merge branch 'master' into RJD-1919/fix_health_check
+* Merge branch 'master' into RJD-1919/fix_health_check
+* Merge branch 'master' into RJD-1919/fix_health_check
+* Merge branch 'RJD-1919/fix_health_check' of github.com:tier4/scenario_simulator_v2 into RJD-1919/fix_health_check
+* Merge branch 'master' into RJD-1919/fix_health_check
+* Contributors: Kotaro Yoshimoto, Michał Ciasnocha, robomic
+
+17.2.0 (2025-09-02)
+-------------------
+* Merge pull request `#1678 <https://github.com/tier4/scenario_simulator_v2/issues/1678>`_ from tier4/feature/openscenario-per-entity-lateral-collision-margin
+  Feature/openscenario per entity lateral collision margin
+* refactor: Remove debug output for threshold calculation in getDistanceToTargetEntity method
+* refactor: Rename lateralCollisionMargin to lateralCollisionThreshold for consistency
+* Sort getter/setter macro definitions in alphabetical order
+* refactor: Remove debug output from getDistanceToTargetEntity function
+* refactor: Simplify distance comparison logic in getDistanceToTargetEntity
+* feat: Update LateralCollisionMargin to use std::optional for improved handling
+* fix format
+* feat: Add `LateralCollisionMargin` getter and setter to behavior tree and do nothing plugin
+* Add `lateral_collision_margin`  to vehicle ActionNode
+* Contributors: Taiga, Taiga Takano
+
+17.1.4 (2025-08-27)
+-------------------
+
 17.1.3 (2025-08-20)
 -------------------
 * Merge branch 'master' into hotfix/actions-permission

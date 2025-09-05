@@ -61,9 +61,11 @@ public:
   DEFINE_GETTER_SETTER(CurrentTime,                                      "current_time",                                   double)
   DEFINE_GETTER_SETTER(DebugMarker,                                      "debug_marker",                                   std::vector<visualization_msgs::msg::Marker>)
   DEFINE_GETTER_SETTER(DefaultMatchingDistanceForLaneletPoseCalculation, "matching_distance_for_lanelet_pose_calculation", double)
+  DEFINE_GETTER_SETTER(EuclideanDistancesMap,                            "euclidean_distances_map",                        std::shared_ptr<EuclideanDistancesMap>)
   DEFINE_GETTER_SETTER(GoalPoses,                                        "goal_poses",                                     std::vector<geometry_msgs::msg::Pose>)
   DEFINE_GETTER_SETTER(HdMapUtils,                                       "hdmap_utils",                                    std::shared_ptr<hdmap_utils::HdMapUtils>)
   DEFINE_GETTER_SETTER(LaneChangeParameters,                             "lane_change_parameters",                         traffic_simulator::lane_change::Parameter)
+  DEFINE_GETTER_SETTER(LateralCollisionThreshold,                        "lateral_collision_threshold",                    std::optional<double>)
   DEFINE_GETTER_SETTER(Obstacle,                                         "obstacle",                                       std::optional<traffic_simulator_msgs::msg::Obstacle>)
   DEFINE_GETTER_SETTER(OtherEntityStatus,                                "other_entity_status",                            EntityStatusDict)
   DEFINE_GETTER_SETTER(PedestrianParameters,                             "pedestrian_parameters",                          traffic_simulator_msgs::msg::PedestrianParameters)
@@ -76,7 +78,6 @@ public:
   DEFINE_GETTER_SETTER(TrafficLights,                                    "traffic_lights",                                 std::shared_ptr<traffic_simulator::TrafficLightsBase>)
   DEFINE_GETTER_SETTER(VehicleParameters,                                "vehicle_parameters",                             traffic_simulator_msgs::msg::VehicleParameters)
   DEFINE_GETTER_SETTER(Waypoints,                                        "waypoints",                                      traffic_simulator_msgs::msg::WaypointsArray)
-  DEFINE_GETTER_SETTER(EuclideanDistancesMap,                            "euclidean_distances_map",                        std::shared_ptr<EuclideanDistancesMap>)
   // clang-format on
 #undef DEFINE_GETTER_SETTER
 };
