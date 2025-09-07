@@ -55,10 +55,9 @@ public:
     const auto availability_deadline = std::chrono::steady_clock::now() + availability_timeout;
 
     while (rclcpp::ok() and not client->service_is_ready()) {
-      const auto now = std::chrono::steady_clock::now();
-      if (now > availability_deadline) {
+      if (std::chrono::steady_clock::now() > availability_deadline) {
         throw common::scenario_simulator_exception::AutowareError(
-          "Service ", std::quoted(name), " not ready after ", availability_timeout.count(),
+          "Service ", std::quoted(name), " is not ready after ", availability_timeout.count(),
           " seconds");
       }
       interval.sleep();
