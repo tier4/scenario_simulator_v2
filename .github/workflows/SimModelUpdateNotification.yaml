@@ -1,6 +1,6 @@
 name: Simulation Model Update Notification
 on:
-  pull_request:
+  pull_request_target:
     paths:
       - simulation/simple_sensor_simulator/include/simple_sensor_simulator/vehicle_simulation/vehicle_model/**.hpp
       - simulation/simple_sensor_simulator/src/vehicle_simulation/vehicle_model/**.cpp

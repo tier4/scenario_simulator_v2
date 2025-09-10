@@ -24,6 +24,79 @@ Changelog for package do_nothing_plugin
 16.4.2 (2025-05-23)
 -------------------
 
+17.5.0 (2025-09-05)
+-------------------
+* Merge branch 'master' into fix/approach-stop-and-gap-tolerance
+* Contributors: Taiga
+
+17.4.0 (2025-09-04)
+-------------------
+* Merge branch 'feature/use-yaw-diff-for-front-detection' of github.com:tier4/scenario_simulator_v2 into feature/use-yaw-diff-for-front-detection
+* Merge branch 'master' into feature/use-yaw-diff-for-front-detection
+* Contributors: Taiga, Taiga Takano
+
+17.3.0 (2025-09-03)
+-------------------
+* Merge branch 'master' into feature/noise_v4
+* Merge branch 'master' into feature/noise_v4
+* Merge branch 'master' into feature/noise_v4
+* Contributors: Kotaro Yoshimoto
+
+17.2.1 (2025-09-02)
+-------------------
+* Merge branch 'master' into RJD-1919/fix_health_check
+* Merge branch 'master' into RJD-1919/fix_health_check
+* Merge branch 'master' into RJD-1919/fix_health_check
+* Merge branch 'RJD-1919/fix_health_check' of github.com:tier4/scenario_simulator_v2 into RJD-1919/fix_health_check
+* Merge branch 'master' into RJD-1919/fix_health_check
+* Contributors: Kotaro Yoshimoto, Michał Ciasnocha, robomic
+
+17.2.0 (2025-09-02)
+-------------------
+* Merge pull request `#1678 <https://github.com/tier4/scenario_simulator_v2/issues/1678>`_ from tier4/feature/openscenario-per-entity-lateral-collision-margin
+  Feature/openscenario per entity lateral collision margin
+* refactor: Rename lateralCollisionMargin to lateralCollisionThreshold for consistency
+* Sort getter/setter macro definitions in alphabetical order
+* feat: Update LateralCollisionMargin to use std::optional for improved handling
+* feat: Add `LateralCollisionMargin` getter and setter to behavior tree and do nothing plugin
+* Contributors: Taiga, Taiga Takano
+
+17.1.4 (2025-08-27)
+-------------------
+
+17.1.3 (2025-08-20)
+-------------------
+* Merge branch 'master' into hotfix/actions-permission
+* Contributors: Kotaro Yoshimoto
+
+17.1.2 (2025-08-20)
+-------------------
+* Merge branch 'master' into refactor/planning-topic-update
+* Merge branch 'master' into refactor/planning-topic-update
+* Contributors: Kotaro Yoshimoto
+
+17.1.1 (2025-08-20)
+-------------------
+* Merge branch 'master' into fix/actions-permission
+* Merge branch 'master' into fix/actions-permission
+* Contributors: ぐるぐる
+
+17.1.0 (2025-08-19)
+-------------------
+* Merge branch 'master' into RJD-1907/ss2_vehicle_id_and_localization
+* Merge branch 'master' into RJD-1907/ss2_vehicle_id_and_localization
+* Contributors: Grzegorz Maj, Kotaro Yoshimoto
+
+17.0.4 (2025-08-18)
+-------------------
+* Merge branch 'master' into HansRobo-patch-2
+* Merge branch 'master' into HansRobo-patch-2
+* Merge branch 'master' into HansRobo-patch-2
+* Contributors: Kotaro Yoshimoto
+
+17.0.3 (2025-08-18)
+-------------------
+
 17.0.2 (2025-08-07)
 -------------------
 
