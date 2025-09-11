@@ -24,6 +24,9 @@ Changelog for package behavior_tree_plugin
 16.4.2 (2025-05-23)
 -------------------
 
+17.5.1 (2025-09-11)
+-------------------
+
 17.5.0 (2025-09-05)
 -------------------
 * Merge pull request `#1673 <https://github.com/tier4/scenario_simulator_v2/issues/1673>`_ from tier4/fix/approach-stop-and-gap-tolerance

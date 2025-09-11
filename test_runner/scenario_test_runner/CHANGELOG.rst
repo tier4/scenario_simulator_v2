@@ -38,6 +38,9 @@ Changelog for package scenario_test_runner
 16.4.2 (2025-05-23)
 -------------------
 
+17.5.1 (2025-09-11)
+-------------------
+
 17.5.0 (2025-09-05)
 -------------------
 * Merge branch 'master' into fix/approach-stop-and-gap-tolerance

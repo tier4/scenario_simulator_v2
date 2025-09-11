@@ -24,6 +24,14 @@ Changelog for package concealer
 16.4.2 (2025-05-23)
 -------------------
 
+17.5.1 (2025-09-11)
+-------------------
+* Merge pull request `#1682 <https://github.com/tier4/scenario_simulator_v2/issues/1682>`_ from tier4/fix/RJD-1918-fix-task-queue-service-is-ready-check
+* ref(concealer): remove unnecessary variable
+* fix(concealer): fix declaration and initialization order in TaskQueue
+* fix(concealer): add availability_timeout to Service
+* Contributors: Dawid Moszynski, Kotaro Yoshimoto
+
 17.5.0 (2025-09-05)
 -------------------
 * Merge branch 'master' into fix/approach-stop-and-gap-tolerance
