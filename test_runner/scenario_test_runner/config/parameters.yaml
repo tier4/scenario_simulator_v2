@@ -247,7 +247,7 @@
                   offset: 0.0
                 mean: 0.0
                 standard_deviation: 0.0
-            rotation:
+            yaw:
               autocorrelation_coefficient:
                 amplitude: 0.0
                 decay: 0.0

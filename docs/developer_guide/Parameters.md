@@ -505,37 +505,37 @@ A positive `double` type value, default `0.0`.
 The parameter of the autocorrelation coefficient used in the generation of X/Y-axis position noise. 
 This parameter is used only if the value of `noise.model.version` is `4`.
 
-### `noise.v4.<config_name>.rotation` (namespace)
+### `noise.v4.<config_name>.yaw` (namespace)
 
-The rotation noise in noise v4 model applies angular noise around the closest point on the entity's bounding box 
+The rotation yaw noise in noise v4 model applies angular noise around the closest point on the entity's bounding box 
 to the ego vehicle (the origin of noise coordinate), rather than around the entity's base-link.
 
-### `noise.v4.<config_name>.rotation.mean`
+### `noise.v4.<config_name>.yaw.mean`
 
 A `double` type value, default `0.0`.
 The mean value for the rotation noise distribution. 
 The unit is radians. The noise models the time series as AR(1) model. 
 This parameter is used only if the value of `noise.model.version` is `4`.
 
-### `noise.v4.<config_name>.rotation.standard_deviation`
+### `noise.v4.<config_name>.yaw.standard_deviation`
 
 A positive `double` type value, default `0.0`.
 The standard deviation for the rotation noise distribution. The unit is radians. 
 The noise models the time series as AR(1) model. This parameter is used only if the value of `noise.model.version` is `4`.
 
-### `noise.v4.<config_name>.rotation.autocorrelation_coefficient.amplitude`
+### `noise.v4.<config_name>.yaw.autocorrelation_coefficient.amplitude`
 
 A positive `double` type value, default `0.0`.
 The parameter of the autocorrelation coefficient used in the generation of rotation noise. 
 This parameter is used only if the value of `noise.model.version` is `4`.
 
-### `noise.v4.<config_name>.rotation.autocorrelation_coefficient.decay`
+### `noise.v4.<config_name>.yaw.autocorrelation_coefficient.decay`
 
 A positive `double` type value, default `0.0`.
 The parameter of the autocorrelation coefficient used in the generation of rotation noise. 
 This parameter is used only if the value of `noise.model.version` is `4`.
 
-### `noise.v4.<config_name>.rotation.autocorrelation_coefficient.offset`
+### `noise.v4.<config_name>.yaw.autocorrelation_coefficient.offset`
 
 A positive `double` type value, default `0.0`.
 The parameter of the autocorrelation coefficient used in the generation of rotation noise. 

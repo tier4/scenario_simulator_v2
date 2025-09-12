@@ -659,10 +659,10 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
         noise_output->second.v4_rotation_noise = [&]() {
           const auto mean = common::getParameter<double>(parameter_base_path + "rotation.mean");
           const auto standard_deviation =
-            common::getParameter<double>(parameter_base_path + "rotation.standard_deviation");
+            common::getParameter<double>(parameter_base_path + "yaw.standard_deviation");
           return autoregressive_noise(
             noise_output->second.v4_rotation_noise, mean, standard_deviation,
-            autocorrelation_coefficient(parameter_base_path + "rotation", interval));
+            autocorrelation_coefficient(parameter_base_path + "yaw", interval));
         }();
 
         math::geometry::boost_point ego_baselink_2d(
