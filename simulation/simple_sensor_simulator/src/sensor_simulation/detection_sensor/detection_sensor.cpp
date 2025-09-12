@@ -393,6 +393,18 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
         return std::clamp(amplitude * std::exp(-decay * interval) + offset, 0.0, 1.0);
       };
 
+    auto yaw_flip = [&](
+                      bool previous_flip, double speed, double interval,
+                      const std::string & parameter_base_path) -> bool {
+      const auto speed_threshold =
+        common::getParameter<double>(parameter_base_path + "yaw_flip.speed_threshold");
+      const auto rate = common::getParameter<double>(parameter_base_path + "yaw_flip.rate");
+      return speed < speed_threshold and
+             markov_process_noise(
+               previous_flip, rate,
+               autocorrelation_coefficient(parameter_base_path + "yaw_flip", interval));
+    };
+
     auto noise_v2 = [&](
                       const auto & detected_entities, auto simulation_time,
                       const std::string & version_namespace) {
@@ -472,14 +484,8 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
             autocorrelation_coefficient(version_base_path + "yaw", interval));
         }();
 
-        noise_output->second.flip = [&]() {
-          const auto speed_threshold = parameter("yaw_flip.speed_threshold");
-          const auto rate = parameter("yaw_flip.rate");
-          return speed < speed_threshold and
-                 markov_process_noise(
-                   noise_output->second.flip, rate,
-                   autocorrelation_coefficient(version_base_path + "yaw_flip", interval));
-        }();
+        noise_output->second.flip =
+          yaw_flip(noise_output->second.flip, speed, interval, version_base_path);
 
         noise_output->second.true_positive = [&]() {
           const auto rate = selector("true_positive.rate");
@@ -672,6 +678,9 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
             ego_baselink_2d, math::geometry::toPolygon2D(entity_pose, entity_bounding_box));
         }();
 
+        noise_output->second.flip =
+          yaw_flip(noise_output->second.flip, speed, interval, parameter_base_path);
+
         noise_output->second.true_positive = [&]() {
           const auto distance_thresholds = common::getParameter<std::vector<double>>(
             parameter_base_path + "true_positive.rate.distance_thresholds");
@@ -744,7 +753,12 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
                 vanilla_entity.pose().orientation().x(), vanilla_entity.pose().orientation().y(),
                 vanilla_entity.pose().orientation().z(), vanilla_entity.pose().orientation().w());
 
-              return {rotated_pos + noise_world, original_orientation * rotation_noise};
+              tf2::Quaternion flip_rotation = noise_output->second.flip
+                                                ? tf2::Quaternion(tf2::Vector3(0, 0, 1), M_PI)
+                                                : tf2::Quaternion::getIdentity();
+
+              return {
+                rotated_pos + noise_world, original_orientation * rotation_noise * flip_rotation};
             }();
 
             auto noised_entity = vanilla_entity;

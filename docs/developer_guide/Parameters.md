@@ -541,6 +541,18 @@ A positive `double` type value, default `0.0`.
 The parameter of the autocorrelation coefficient used in the generation of rotation noise. 
 This parameter is used only if the value of `noise.model.version` is `4`.
 
+### `noise.v4.<config_name>.yaw_flip` (namespace)
+
+The yaw-flip noise in noise v4 model is basically same to one in noise v2.
+See [`yaw_flip` documentation of noise v2](#noisev2yaw_flipautocorrelation_coefficientamplitude) for detailed explanation.
+Like noise v2, noise v4 also has the parameters below in this namespace.
+
+- `noise.v4.<config_name>.yaw_flip.autocorrelation_coefficient.amplitude`
+- `noise.v4.<config_name>.yaw_flip.autocorrelation_coefficient.decay`
+- `noise.v4.<config_name>.yaw_flip.autocorrelation_coefficient.offset`
+- `noise.v4.<config_name>.yaw_flip.rate`
+- `noise.v4.<config_name>.yaw_flip.speed_threshold`
+
 ### `noise.v4.<config_name>.true_positive` (namespace)
 
 The true positive parameters in noise v4 model control the detection probability of entities based on distance from the ego vehicle. 
