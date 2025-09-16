@@ -747,43 +747,35 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
             // If ego and entity are too close, skip the noise application
             return vanilla_entity;
           } else {
-            const auto [final_pos, final_orientation] =
-              [&]() -> std::tuple<tf2::Vector3, tf2::Quaternion> {
-              tf2::Quaternion rotation_noise(tf2::Vector3(0, 0, 1), noise_output->second.yaw_noise);
+            tf2::Quaternion yaw_rotation_noise(
+              tf2::Vector3(0, 0, 1), noise_output->second.yaw_noise);
 
-              // Apply rotation to entity position around noise_base
-              tf2::Vector3 entity_pos(
-                vanilla_entity.pose().position().x(), vanilla_entity.pose().position().y(), 0.0);
-              tf2::Vector3 noise_base_pos(noise_base.x(), noise_base.y(), 0.0);
-              tf2::Vector3 offset = entity_pos - noise_base_pos;
-              tf2::Vector3 rotated_offset = tf2::quatRotate(rotation_noise, offset);
-              tf2::Vector3 rotated_pos = noise_base_pos + rotated_offset;
+            geometry_msgs::msg::Pose original_pose;
+            simulation_interface::toMsg(vanilla_entity.pose(), original_pose);
 
-              // Create local coordinate system and apply position noise
-              tf2::Vector3 y_unit(y_unit_x, y_unit_y, 0.0);
-              tf2::Vector3 x_unit(y_unit_y, -y_unit_x, 0.0);
-              tf2::Vector3 noise_world = noise_output->second.v4_position_x_noise * x_unit +
-                                         noise_output->second.v4_position_y_noise * y_unit;
+            tf2::Vector3 entity_position;
+            tf2::fromMsg(original_pose.position, entity_position);
+            tf2::Vector3 noise_base_pos(noise_base.x(), noise_base.y(), 0.0);
+            tf2::Vector3 offset = entity_position - noise_base_pos;
+            const auto position_after_yaw_noise =
+              noise_base_pos + tf2::quatRotate(yaw_rotation_noise, offset);
 
-              tf2::Quaternion original_orientation(
-                vanilla_entity.pose().orientation().x(), vanilla_entity.pose().orientation().y(),
-                vanilla_entity.pose().orientation().z(), vanilla_entity.pose().orientation().w());
+            tf2::Vector3 y_unit(y_unit_x, y_unit_y, 0.0);
+            tf2::Vector3 x_unit(y_unit_y, -y_unit_x, 0.0);
+            const auto noise_world = noise_output->second.v4_position_x_noise * x_unit +
+                                     noise_output->second.v4_position_y_noise * y_unit;
 
-              tf2::Quaternion flip_rotation = noise_output->second.flip
-                                                ? tf2::Quaternion(tf2::Vector3(0, 0, 1), M_PI)
-                                                : tf2::Quaternion::getIdentity();
-
-              return {
-                rotated_pos + noise_world, original_orientation * rotation_noise * flip_rotation};
-            }();
+            const auto final_position = position_after_yaw_noise + noise_world;
+            tf2::Quaternion original_orientation;
+            tf2::fromMsg(original_pose.orientation, original_orientation);
+            const auto final_orientation = original_orientation * yaw_rotation_noise;
 
             auto noised_entity = vanilla_entity;
-            noised_entity.mutable_pose()->mutable_position()->set_x(final_pos.x());
-            noised_entity.mutable_pose()->mutable_position()->set_y(final_pos.y());
-            noised_entity.mutable_pose()->mutable_orientation()->set_x(final_orientation.getX());
-            noised_entity.mutable_pose()->mutable_orientation()->set_y(final_orientation.getY());
-            noised_entity.mutable_pose()->mutable_orientation()->set_z(final_orientation.getZ());
-            noised_entity.mutable_pose()->mutable_orientation()->set_w(final_orientation.getW());
+            noised_entity.mutable_pose()->mutable_position()->set_x(final_position.x());
+            noised_entity.mutable_pose()->mutable_position()->set_y(final_position.y());
+            simulation_interface::toProto(
+              tf2::toMsg(final_orientation), *noised_entity.mutable_pose()->mutable_orientation());
+
             if (noise_output->second.flip) {
               apply_yaw_flip(noised_entity);
             }
