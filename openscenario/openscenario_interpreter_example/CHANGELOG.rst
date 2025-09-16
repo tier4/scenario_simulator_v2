@@ -24,6 +24,12 @@ Changelog for package openscenario_interpreter_example
 16.4.2 (2025-05-23)
 -------------------
 
+17.5.2 (2025-09-16)
+-------------------
+* Merge branch 'master' into fix/no-autoware-launch
+* Merge branch 'master' into fix/no-autoware-launch
+* Contributors: ぐるぐる
+
 17.5.1 (2025-09-11)
 -------------------
 
