@@ -659,12 +659,12 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
             autocorrelation_coefficient(parameter_base_path + "position.y", interval));
         }();
 
-        noise_output->second.v4_rotation_noise = [&]() {
-          const auto mean = common::getParameter<double>(parameter_base_path + "rotation.mean");
+        noise_output->second.yaw_noise = [&]() {
+          const auto mean = common::getParameter<double>(parameter_base_path + "yaw.mean");
           const auto standard_deviation =
             common::getParameter<double>(parameter_base_path + "yaw.standard_deviation");
           return autoregressive_noise(
-            noise_output->second.v4_rotation_noise, mean, standard_deviation,
+            noise_output->second.yaw_noise, mean, standard_deviation,
             autocorrelation_coefficient(parameter_base_path + "yaw", interval));
         }();
 
@@ -709,8 +709,7 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
           } else {
             const auto [final_pos, final_orientation] =
               [&]() -> std::tuple<tf2::Vector3, tf2::Quaternion> {
-              tf2::Quaternion rotation_noise(
-                tf2::Vector3(0, 0, 1), noise_output->second.v4_rotation_noise);
+              tf2::Quaternion rotation_noise(tf2::Vector3(0, 0, 1), noise_output->second.yaw_noise);
 
               // Apply rotation to entity position around noise_base
               tf2::Vector3 entity_pos(
