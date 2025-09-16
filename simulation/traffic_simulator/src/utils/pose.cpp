@@ -115,8 +115,6 @@ auto toCanonicalizedLaneletPoses(const std::vector<LaneletPose> & lanelet_poses)
       }
       return canonicalized_poses;
     } catch (const common::SemanticError &) {
-      THROW_SEMANTIC_ERROR(
-        "One of the lanelet poses is invalid, ask for help from the developer team.");
       return {};
     }
   }
@@ -515,12 +513,13 @@ auto transformToCanonicalizedLaneletPose(
         const auto end_of_road_lanelet_id =
           std::get<std::optional<lanelet::Id>>(canonicalized_tuple)) {
         if (lanelet_pose.value().s < 0) {
-          return CanonicalizedLaneletPose(traffic_simulator_msgs::build<LaneletPose>()
-                                            .lanelet_id(end_of_road_lanelet_id.value())
-                                            .s(0.0)
-                                            .offset(lanelet_pose.value().offset)
-                                            .rpy(lanelet_pose.value().rpy)
-                                            .lanelet_pose_valid(false));
+          return CanonicalizedLaneletPose(
+            traffic_simulator_msgs::build<LaneletPose>()
+              .lanelet_id(end_of_road_lanelet_id.value())
+              .s(0.0)
+              .offset(lanelet_pose.value().offset)
+              .rpy(lanelet_pose.value().rpy)
+              .lanelet_pose_valid(false));
         } else {
           return CanonicalizedLaneletPose(
             traffic_simulator_msgs::build<LaneletPose>()
