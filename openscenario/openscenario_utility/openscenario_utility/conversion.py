@@ -105,7 +105,7 @@ class MacroExpander:
         return paths
 
 
-def load_yaml(path):
+def load_yaml(path: Path):
     if path.exists():
         with path.open("r") as file:
             return yaml.safe_load(file)
@@ -186,12 +186,13 @@ def convert(input: Path, output: Path, verbose: bool = True):
 
     macroexpand = MacroExpander(yaml.pop("ScenarioModifiers", None), schema)
 
+    # Just convert to XML, no validation (performed later)
     xosc = schema.encode(
         from_yaml("OpenSCENARIO", yaml),
         indent=2,
         preserve_root=True,
         unordered=True,  # Reorder elements
-        validation="skip",  # The "strict" mode is too strict than we would like.
+        validation="skip",
     )
 
     paths = macroexpand(
