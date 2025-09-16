@@ -172,9 +172,6 @@ auto CanonicalizedEntityStatus::getLaneletPose() const -> LaneletPose
 
 auto CanonicalizedEntityStatus::getLaneletPoses() const -> const std::vector<LaneletPose> &
 {
-  if (canonicalized_lanelet_poses_.empty()) {
-    THROW_SEMANTIC_ERROR("Target entity status did not matched to lanelet pose.");
-  }
   return entity_status_.lanelet_poses;
 }
 
