@@ -90,17 +90,16 @@ class MacroExpander:
             else:
                 paths.append(output.joinpath(basename + ".xosc"))
 
+            try:
+                self.schema.validate(target)
+            except xmlschema.XMLSchemaValidationError as exception:
+                print("File: " + str(paths[-1]), file=stderr)
+                print("", file=stderr)
+                print("Error: " + str(exception), file=stderr)
+                exit()
+
             with paths[-1].open(mode="w") as file:
                 file.write(target)
-
-                try:
-                    self.schema.validate(target)
-
-                except xmlschema.XMLSchemaValidationError as exception:
-                    print("File: " + str(paths[-1]), file=stderr)
-                    print("", file=stderr)
-                    print("Error: " + str(exception), file=stderr)
-                    exit()
 
         return paths
 
