@@ -668,6 +668,10 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
             autocorrelation_coefficient(parameter_base_path + "yaw", interval));
         }();
 
+        const auto speed = std::hypot(
+          vanilla_entity.action_status().twist().linear().x(),
+          vanilla_entity.action_status().twist().linear().y());
+
         math::geometry::boost_point ego_baselink_2d(
           ego_entity_status->pose().position().x(), ego_entity_status->pose().position().y());
 
@@ -680,6 +684,10 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
           return math::geometry::getClosestPointOnPolygon(
             ego_baselink_2d, math::geometry::toPolygon2D(entity_pose, entity_bounding_box));
         }();
+
+        auto selector = create_selector(
+          parameter_base_path, noise_base.x() - ego_baselink_2d.x(),
+          noise_base.y() - ego_baselink_2d.y());
 
         noise_output->second.flip =
           yaw_flip(noise_output->second.flip, speed, interval, parameter_base_path);
