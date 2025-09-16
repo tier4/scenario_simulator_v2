@@ -441,6 +441,14 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
                autocorrelation_coefficient(parameter_base_path + "yaw_flip", interval));
     };
 
+    auto true_positive = [&](
+                           bool previous_true_positive, double interval,
+                           const std::string & parameter_base_path, double rate) -> bool {
+      return markov_process_noise(
+        previous_true_positive, rate,
+        autocorrelation_coefficient(parameter_base_path + "true_positive", interval));
+    };
+
     auto noise_v2 = [&](
                       const auto & detected_entities, auto simulation_time,
                       const std::string & version_namespace) {
@@ -485,12 +493,9 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
         noise_output->second.flip =
           yaw_flip(noise_output->second.flip, speed, interval, version_base_path);
 
-        noise_output->second.true_positive = [&]() {
-          const auto rate = selector("true_positive.rate");
-          return markov_process_noise(
-            noise_output->second.true_positive, rate(),
-            autocorrelation_coefficient(version_base_path + "true_positive", interval));
-        }();
+        noise_output->second.true_positive = true_positive(
+          noise_output->second.true_positive, interval, version_base_path,
+          selector("true_positive.rate")());
 
         if (noise_output->second.true_positive) {
           const auto angle = std::atan2(y, x);
