@@ -24,6 +24,7 @@
 #include <geometry/quaternion/get_angle_difference.hpp>
 #include <geometry/quaternion/get_normal_vector.hpp>
 #include <geometry/quaternion/get_rotation_matrix.hpp>
+#include <geometry/transform.hpp>
 #include <geometry/vector3/hypot.hpp>
 #include <iomanip>
 #include <memory>
@@ -449,6 +450,37 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
         autocorrelation_coefficient(parameter_base_path + "true_positive", interval));
     };
 
+    auto apply_yaw_flip = [&](traffic_simulator_msgs::EntityStatus & entity) -> void {
+      geometry_msgs::msg::Point local_center_point;
+      simulation_interface::toMsg(entity.bounding_box().center(), local_center_point);
+
+      geometry_msgs::msg::Pose original_pose;
+      simulation_interface::toMsg(entity.pose(), original_pose);
+
+      tf2::Quaternion original_orientation;
+      tf2::fromMsg(original_pose.orientation, original_orientation);
+      const tf2::Quaternion flip_rotation(
+        tf2::Vector3(0, 0, 1), boost::math::constants::pi<double>());
+
+      geometry_msgs::msg::Pose flipped_center_pose;
+      flipped_center_pose.position =
+        math::geometry::transformPoint(original_pose, local_center_point);
+      flipped_center_pose.orientation = tf2::toMsg(original_orientation * flip_rotation);
+
+      geometry_msgs::msg::Point center_offset_negative;
+      center_offset_negative.x = -entity.bounding_box().center().x();
+      center_offset_negative.y = -entity.bounding_box().center().y();
+      center_offset_negative.z = -entity.bounding_box().center().z();
+
+      const auto new_base_link_position =
+        math::geometry::transformPoint(flipped_center_pose, center_offset_negative);
+
+      simulation_interface::toProto(
+        new_base_link_position, *entity.mutable_pose()->mutable_position());
+      simulation_interface::toProto(
+        flipped_center_pose.orientation, *entity.mutable_pose()->mutable_orientation());
+    };
+
     auto noise_v2 = [&](
                       const auto & detected_entities, auto simulation_time,
                       const std::string & version_namespace) {
@@ -752,6 +784,9 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
             noised_entity.mutable_pose()->mutable_orientation()->set_y(final_orientation.getY());
             noised_entity.mutable_pose()->mutable_orientation()->set_z(final_orientation.getZ());
             noised_entity.mutable_pose()->mutable_orientation()->set_w(final_orientation.getW());
+            if (noise_output->second.flip) {
+              apply_yaw_flip(noised_entity);
+            }
 
             return noised_entity;
           }
