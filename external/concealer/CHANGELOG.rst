@@ -24,6 +24,19 @@ Changelog for package concealer
 16.4.2 (2025-05-23)
 -------------------
 
+17.5.2 (2025-09-16)
+-------------------
+* Merge pull request `#1665 <https://github.com/tier4/scenario_simulator_v2/issues/1665>`_ from tier4/fix/no-autoware-launch
+* Merge branch 'master' into fix/no-autoware-launch
+* Add comment for requestChangeToStop
+* Merge branch 'master' into fix/no-autoware-launch
+* Remove unnecessary stop
+* Remove unused code
+* Request stop before Autoware operation
+* Request state to be stop before (re-)initialize
+* Allow `waiting_for_route` in startup to address pre-launched Autoware
+* Contributors: Kotaro Yoshimoto, f0reachARR, ぐるぐる
+
 17.5.1 (2025-09-11)
 -------------------
 * Merge pull request `#1682 <https://github.com/tier4/scenario_simulator_v2/issues/1682>`_ from tier4/fix/RJD-1918-fix-task-queue-service-is-ready-check
