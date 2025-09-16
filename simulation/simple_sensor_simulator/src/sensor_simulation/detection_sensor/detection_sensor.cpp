@@ -393,6 +393,42 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
         return std::clamp(amplitude * std::exp(-decay * interval) + offset, 0.0, 1.0);
       };
 
+    auto create_selector = [](const std::string & parameter_base_path, double x, double y) {
+      return [parameter_base_path, x, y](const std::string & name) {
+        return [=]() {
+          const auto ellipse_y_radii =
+            common::getParameter<std::vector<double>>(parameter_base_path + "ellipse_y_radii");
+          const auto ellipse_normalized_x_radius = common::getParameter<double>(
+            parameter_base_path + name + ".ellipse_normalized_x_radius");
+          const auto values =
+            common::getParameter<std::vector<double>>(parameter_base_path + name + ".values");
+          if (ellipse_y_radii.size() == values.size()) {
+            /*
+               If the parameter `ellipse_y_radii` contains the value 0.0,
+               division by zero will occur here.
+               However, in that case, the distance will be NaN, which correctly
+               expresses the meaning that "the distance cannot be defined", and
+               this function will work without any problems (zero will be
+               returned).
+            */
+            const auto distance = std::hypot(x / ellipse_normalized_x_radius, y);
+            for (auto i = std::size_t(0); i < ellipse_y_radii.size(); ++i) {
+              if (distance < ellipse_y_radii[i]) {
+                return values[i];
+              }
+            }
+            return 0.0;
+          } else {
+            throw common::Error(
+              "Array size mismatch: ", std::quoted(parameter_base_path + "ellipse_y_radii"),
+              " has ", ellipse_y_radii.size(), " elements, but ",
+              std::quoted(parameter_base_path + name + ".values"), " has ", values.size(),
+              " elements. Both arrays must have the same size.");
+          }
+        };
+      };
+    };
+
     auto yaw_flip = [&](
                       bool previous_flip, double speed, double interval,
                       const std::string & parameter_base_path) -> bool {
@@ -428,45 +464,7 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
           std::string(detected_objects_publisher->get_topic_name()) + ".noise." +
           version_namespace + ".";
 
-        auto parameter = [this, version_base_path](const auto & name) {
-          return common::getParameter<double>(version_base_path + name);
-        };
-
-        auto parameters = [this, version_base_path](const auto & name) {
-          return common::getParameter<std::vector<double>>(version_base_path + name);
-        };
-
-        auto selector = [&](const std::string & name) {
-          return [ellipse_y_radii = parameters("ellipse_y_radii"),
-                  ellipse_normalized_x_radius = parameter(name + ".ellipse_normalized_x_radius"),
-                  values = parameters(name + ".values"), &x, &y, version_namespace, name]() {
-            if (ellipse_y_radii.size() == values.size()) {
-              /*
-                 If the parameter `<topic-name>.noise.v2.ellipse_y_radii`
-                 contains the value 0.0, division by zero will occur here.
-                 However, in that case, the distance will be NaN, which correctly
-                 expresses the meaning that "the distance cannot be defined", and
-                 this function will work without any problems (zero will be
-                 returned).
-              */
-              const auto distance = std::hypot(x / ellipse_normalized_x_radius, y);
-              for (auto i = std::size_t(0); i < ellipse_y_radii.size(); ++i) {
-                if (distance < ellipse_y_radii[i]) {
-                  return values[i];
-                }
-              }
-              return 0.0;
-            } else {
-              throw common::Error(
-                "Array size mismatch: ", std::quoted("ellipse_y_radii"), " has ",
-                ellipse_y_radii.size(), " elements, but ", std::quoted(name + ".values"), " has ",
-                values.size(),
-                " elements. Both arrays must have the same size in namespace for noise model "
-                "version ",
-                std::quoted(version_namespace), ".");
-            }
-          };
-        };
+        auto selector = create_selector(version_base_path, x, y);
 
         noise_output->second.distance_noise = [&]() {
           const auto mean = selector("distance.mean");
