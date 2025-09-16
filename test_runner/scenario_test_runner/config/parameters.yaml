@@ -232,6 +232,7 @@
               types: ["*"]
               subtypes: ["*"]
               names: ["*"]
+            ellipse_y_radii: [ 10.0, 20.0, 40.0, 60.0, 80.0, 120.0, 150.0, 180.0, 1000.0 ]
             position:
               x:
                 autocorrelation_coefficient:
@@ -267,8 +268,8 @@
                 decay: 0.0
                 offset: 0.0
               rate:
-                distance_thresholds: [ 1000.0 ]
-                values: [ 1.0 ]
+                ellipse_normalized_x_radius: 1.0
+                values: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
     /perception/object_recognition/ground_truth/objects:
       version: 20240605 # architecture_type suffix (mandatory)
       override_legacy_configuration: false

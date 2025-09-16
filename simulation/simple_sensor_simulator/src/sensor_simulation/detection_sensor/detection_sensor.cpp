@@ -684,36 +684,10 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
         noise_output->second.flip =
           yaw_flip(noise_output->second.flip, speed, interval, parameter_base_path);
 
-        noise_output->second.true_positive = [&]() {
-          const auto distance_thresholds = common::getParameter<std::vector<double>>(
-            parameter_base_path + "true_positive.rate.distance_thresholds");
-          const auto rate_values = common::getParameter<std::vector<double>>(
-            parameter_base_path + "true_positive.rate.values");
+        noise_output->second.true_positive = true_positive(
+          noise_output->second.true_positive, interval, parameter_base_path,
+          selector("true_positive.rate")());
 
-          if (distance_thresholds.size() != rate_values.size()) {
-            throw common::Error(
-              "Array size mismatch: ", parameter_base_path,
-              "true_positive.distance_thresholds has ", distance_thresholds.size(),
-              " elements, but ", parameter_base_path, "true_positive.rate.values has ",
-              rate_values.size(), " elements. Both arrays must have the same size.");
-          } else {
-            // Find the first threshold greater than the calculated distance
-            const auto rate = [&, distance_to_noise_base = std::hypot(
-                                    noise_base.x() - ego_baselink_2d.x(),
-                                    noise_base.y() - ego_baselink_2d.y())]() -> double {
-              for (size_t i = 0; i < distance_thresholds.size(); ++i) {
-                if (distance_to_noise_base < distance_thresholds[i]) {
-                  return rate_values[i];
-                }
-              }
-              return 0.0;  // If distance exceeds all thresholds
-            }();
-
-            return markov_process_noise(
-              noise_output->second.true_positive, rate,
-              autocorrelation_coefficient(parameter_base_path + "true_positive", interval));
-          }
-        }();
         if (not noise_output->second.true_positive) {
           return std::nullopt;
         } else {
