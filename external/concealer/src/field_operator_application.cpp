@@ -147,7 +147,7 @@ FieldOperatorApplication::FieldOperatorApplication(const pid_t pid)
 #if __has_include(<autoware_adapi_v1_msgs/msg/operation_mode_state.hpp>)
   getOperationModeState("/api/operation_mode/state", rclcpp::QoS(1).transient_local(), *this),
 #endif
-  getPathWithLaneId("/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", rclcpp::QoS(1), *this),
+  getRoute("/api/routing/route", rclcpp::QoS(1), *this),
 #if __has_include(<autoware_adapi_v1_msgs/msg/route_state.hpp>)
   getRouteState("/api/routing/state", rclcpp::QoS(1).transient_local(), *this),
 #endif
