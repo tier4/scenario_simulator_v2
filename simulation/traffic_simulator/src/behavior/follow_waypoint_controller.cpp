@@ -94,7 +94,7 @@ auto FollowWaypointController::getTimeRequiredForNonAcceleration(const double ac
 {
   const double acceleration_rate =
     (acceleration > 0.0) ? max_deceleration_rate : max_acceleration_rate;
-  return (std::abs(acceleration) / (acceleration_rate * step_time)) * step_time;
+  return std::ceil(std::abs(acceleration) / (acceleration_rate * step_time)) * step_time;
 }
 
 auto FollowWaypointController::getAccelerationLimits(
