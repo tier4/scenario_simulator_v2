@@ -24,6 +24,11 @@ Changelog for package concealer
 16.4.2 (2025-05-23)
 -------------------
 
+17.5.3 (2025-09-17)
+-------------------
+* Merge branch 'master' into fix/macro-xml-validation
+* Contributors: Kotaro Yoshimoto
+
 17.5.2 (2025-09-16)
 -------------------
 * Merge pull request `#1665 <https://github.com/tier4/scenario_simulator_v2/issues/1665>`_ from tier4/fix/no-autoware-launch

@@ -27,6 +27,15 @@ Changelog for package openscenario_utility
 16.4.2 (2025-05-23)
 -------------------
 
+17.5.3 (2025-09-17)
+-------------------
+* Merge pull request `#1683 <https://github.com/tier4/scenario_simulator_v2/issues/1683>`_ from tier4/fix/macro-xml-validation
+* Merge branch 'master' into fix/macro-xml-validation
+* Reorder validation
+* Update comment
+* Fix XML validation when ScenarioModifier is used
+* Contributors: Kotaro Yoshimoto, f0reachARR
+
 17.5.2 (2025-09-16)
 -------------------
 * Merge branch 'master' into fix/no-autoware-launch
