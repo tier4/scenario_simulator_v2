@@ -13,6 +13,11 @@ Changelog for package openscenario_validator
 16.4.2 (2025-05-23)
 -------------------
 
+17.5.3 (2025-09-17)
+-------------------
+* Merge branch 'master' into fix/macro-xml-validation
+* Contributors: Kotaro Yoshimoto
+
 17.5.2 (2025-09-16)
 -------------------
 * Merge branch 'master' into fix/no-autoware-launch
