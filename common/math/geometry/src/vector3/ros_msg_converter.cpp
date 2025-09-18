@@ -12,22 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef GEOMETRY__VECTOR3__NORM_HPP_
-#define GEOMETRY__VECTOR3__NORM_HPP_
-
-#include <cmath>
-#include <geometry/vector3/is_like_vector3.hpp>
+#include <geometry/vector3/ros_msg_converter.hpp>
 
 namespace math
 {
 namespace geometry
 {
-template <typename T, std::enable_if_t<IsLikeVector3<T>::value, std::nullptr_t> = nullptr>
-auto norm(const T & v)
+auto castToVec(const geometry_msgs::msg::Point & p) -> geometry_msgs::msg::Vector3
 {
-  return std::hypot(v.x, v.y, v.z);
+  auto result = geometry_msgs::msg::Vector3();
+  result.x = p.x;
+  result.y = p.y;
+  result.z = p.z;
+  return result;
+}
+auto castToPoint(const geometry_msgs::msg::Vector3 & p) -> geometry_msgs::msg::Point
+{
+  auto result = geometry_msgs::msg::Point();
+  result.x = p.x;
+  result.y = p.y;
+  result.z = p.z;
+  return result;
 }
 }  // namespace geometry
 }  // namespace math
-
-#endif  // GEOMETRY__VECTOR3__NORM_HPP_
