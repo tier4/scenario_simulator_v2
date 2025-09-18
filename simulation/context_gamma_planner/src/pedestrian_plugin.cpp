@@ -98,8 +98,9 @@ void PedestrianPlugin::update(double current_time, double step_time)
   const auto ego_entity = getCanonicalizedEntityStatus();
   auto ego_pose = ego_entity->getMapPose();
   const auto ego_bbox = ego_entity->getBoundingBox();
-  const auto ego_speed = ego_entity->getTwist().linear;
-  const auto ego_vel = transformLocalToGlobalVelocity(ego_pose, ego_speed);
+  const auto ego_local_linear_velocity = ego_entity->getTwist().linear;
+  const auto ego_global_linear_velocity =
+    transformLocalToGlobalVelocity(ego_pose, ego_local_linear_velocity);
   const auto ego_angle = math::geometry::convertQuaternionToEulerAngle(ego_pose.orientation).z;
 
   ego_pose.position.x += ego_bbox.center.x * cos(ego_angle) + ego_bbox.center.y * sin(ego_angle);
@@ -114,8 +115,9 @@ void PedestrianPlugin::update(double current_time, double step_time)
 
     const auto & other_bbox = other_entity.getBoundingBox();
     auto other_pose = other_entity.getMapPose();
-    const auto other_speed = other_entity.getTwist().linear;
-    const auto other_vel = transformLocalToGlobalVelocity(other_pose, other_speed);
+    const auto other_local_linear_velocity = other_entity.getTwist().linear;
+    const auto other_global_linear_velocity =
+      transformLocalToGlobalVelocity(other_pose, other_local_linear_velocity);
     const auto other_angle =
       math::geometry::convertQuaternionToEulerAngle(other_pose.orientation).z;
 
@@ -125,11 +127,11 @@ void PedestrianPlugin::update(double current_time, double step_time)
       other_bbox.center.x * sin(other_angle) + other_bbox.center.y * cos(other_angle);
 
     const auto relative_position = other_pose.position - ego_pose.position;
-    const auto relative_velocity = ego_vel - other_vel;
+    const auto relative_velocity = ego_global_linear_velocity - other_global_linear_velocity;
 
     orca_lines.push_back(calculateOrcaLine(
-      ego_vel, relative_position, relative_velocity, ego_bbox, ego_angle, other_bbox, other_angle,
-      step_time));
+      ego_global_linear_velocity, relative_position, relative_velocity, ego_bbox, ego_angle,
+      other_bbox, other_angle, step_time));
   }
   const auto planning_speed = getPlanningSpeed() ? getPlanningSpeed().value() : 0.0;
 
