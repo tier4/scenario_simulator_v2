@@ -16,17 +16,30 @@
 
 namespace context_gamma_planner
 {
+namespace
+{
+using math::geometry::operator+;
+using math::geometry::operator-;
+using math::geometry::operator*;
+
+inline double det(const geometry_msgs::msg::Vector3 & a, const geometry_msgs::msg::Vector3 & b)
+{
+  return math::geometry::cross2d(a, b);
+}
+}  // namespace
+
 auto applyConstraintOnLine(
-  const std::vector<line> & constraint_lines, const line & target_constraint_line,
-  const double maximum_speed, const geometry_msgs::msg::Vector3 & preferred_velocity,
-  const bool prioritize_direction_alignment) -> std::optional<geometry_msgs::msg::Vector3>
+  const std::vector<line> & constraint_lines, std::size_t line_no, const double maximum_speed,
+  const geometry_msgs::msg::Vector3 & preferred_velocity, const bool prioritize_direction_alignment)
+  -> std::optional<geometry_msgs::msg::Vector3>
 {
   using math::geometry::operator+;
-
   using math::geometry::operator-;
   using math::geometry::operator*;
 
-  const auto & [constraint_point, constraint_direction] = target_constraint_line;
+  const auto & constraint_point = constraint_lines[line_no].point;
+  const auto & constraint_direction = constraint_lines[line_no].direction;
+
   const auto point_direction_projection =
     math::geometry::innerProduct(constraint_point, constraint_direction);
   const auto discriminant = point_direction_projection * point_direction_projection +
@@ -41,12 +54,10 @@ auto applyConstraintOnLine(
   auto parameter_lower_bound = -point_direction_projection - sqrt_discriminant;
   auto parameter_upper_bound = -point_direction_projection + sqrt_discriminant;
 
-  // NOTE: RVO2 keeps agent positions in a k-d tree and achieves roughly O(N log N)
-  // neighbor queries, while this approach checks every pair directly, so it remains
-  // a simpler but O(N^2) brute-force pass for now.
-  for (const auto & constraint_line : constraint_lines) {
-    const auto & other_constraint_point = constraint_line.point;
-    const auto & other_constraint_direction = constraint_line.direction;
+  // Only consider previously satisfied constraints [0, line_no)
+  for (std::size_t i = 0; i < line_no; ++i) {
+    const auto & other_constraint_point = constraint_lines[i].point;
+    const auto & other_constraint_direction = constraint_lines[i].direction;
     const auto denominator =
       math::geometry::cross2d(constraint_direction, other_constraint_direction);
     const auto numerator = math::geometry::cross2d(
@@ -97,37 +108,101 @@ auto applyConstraintOnLine(
   }
 }
 
+// Solve the 2D linear program over the set of lines. Returns the index of the first
+// constraint that failed, or lines.size() if all constraints are satisfied.
+static std::size_t linearProgram2(
+  const std::vector<line> & lines, double radius, const geometry_msgs::msg::Vector3 & opt_velocity,
+  bool direction_opt, geometry_msgs::msg::Vector3 & result)
+{
+  if (direction_opt) {
+    result = opt_velocity * radius;
+  } else if (math::geometry::innerProduct(opt_velocity, opt_velocity) > radius * radius) {
+    result = math::geometry::normalize(opt_velocity) * radius;
+  } else {
+    result = opt_velocity;
+  }
+
+  for (std::size_t i = 0; i < lines.size(); ++i) {
+    if (math::geometry::cross2d(lines[i].direction, lines[i].point - result) > 0.0) {
+      const auto temp_result = result;
+      const auto new_result = applyConstraintOnLine(lines, i, radius, opt_velocity, direction_opt);
+      if (!new_result) {
+        result = temp_result;
+        return i;
+      }
+      result = new_result.value();
+    }
+  }
+
+  return lines.size();
+}
+
+// Handle failure at `begin_line` by searching along intersections of constraint boundaries.
+static void linearProgram3(
+  const std::vector<line> & lines, std::size_t begin_line, double radius,
+  geometry_msgs::msg::Vector3 & result)
+{
+  double distance = 0.0;
+  std::vector<line> proj_lines;
+
+  for (std::size_t i = begin_line; i < lines.size(); ++i) {
+    const auto violation = math::geometry::cross2d(lines[i].direction, lines[i].point - result);
+    if (violation > distance) {
+      proj_lines.clear();
+
+      for (std::size_t j = 0; j < i; ++j) {
+        line l;
+        const double determinant = math::geometry::cross2d(lines[i].direction, lines[j].direction);
+
+        if (std::fabs(determinant) <= ORCA_EPSILON) {
+          if (math::geometry::innerProduct(lines[i].direction, lines[j].direction) > 0.0) {
+            // Line i and line j point in the same direction.
+            continue;
+          } else {
+            // Line i and line j point in opposite direction.
+            l.point = (lines[i].point + lines[j].point) * 0.5;
+          }
+        } else {
+          l.point = lines[i].point +
+                    lines[i].direction * (math::geometry::cross2d(
+                                            lines[j].direction, lines[i].point - lines[j].point) /
+                                          determinant);
+        }
+
+        l.direction = math::geometry::normalize(lines[j].direction - lines[i].direction);
+        proj_lines.push_back(l);
+      }
+
+      const auto temp_result = result;
+      geometry_msgs::msg::Vector3 dir_opt;
+      dir_opt.x = -lines[i].direction.y;
+      dir_opt.y = lines[i].direction.x;
+      dir_opt.z = 0.0;
+
+      if (linearProgram2(proj_lines, radius, dir_opt, true, result) < proj_lines.size()) {
+        // This should in principle not happen; keep previous result.
+        result = temp_result;
+      }
+
+      distance = math::geometry::cross2d(lines[i].direction, lines[i].point - result);
+    }
+  }
+}
+
 auto optimizeVelocityWithConstraints(
   const std::vector<line> & constraint_lines, const double maximum_speed,
   const geometry_msgs::msg::Vector3 & preferred_velocity, const bool prioritize_direction_alignment)
   -> std::optional<geometry_msgs::msg::Vector3>
 {
-  using math::geometry::operator-;
-  using math::geometry::operator*;
+  geometry_msgs::msg::Vector3 result;
+  const auto line_fail = linearProgram2(
+    constraint_lines, maximum_speed, preferred_velocity, prioritize_direction_alignment, result);
 
-  auto optimized_velocity = geometry_msgs::msg::Vector3();
-  if (prioritize_direction_alignment) {
-    optimized_velocity = preferred_velocity * maximum_speed;
-  } else if (
-    math::geometry::innerProduct(preferred_velocity, preferred_velocity) >
-    maximum_speed * maximum_speed) {
-    optimized_velocity = math::geometry::normalize(preferred_velocity) * maximum_speed;
-  } else {
-    optimized_velocity = preferred_velocity;
+  if (line_fail < constraint_lines.size()) {
+    // We have no obstacle lines in this usage; start from the failing line.
+    linearProgram3(constraint_lines, line_fail, maximum_speed, result);
   }
 
-  for (const auto & constraint_line : constraint_lines) {
-    if (
-      math::geometry::cross2d(
-        constraint_line.direction, constraint_line.point - optimized_velocity) > 0.0) {
-      const auto adjusted_velocity = applyConstraintOnLine(
-        constraint_lines, constraint_line, maximum_speed, preferred_velocity,
-        prioritize_direction_alignment);
-      if (adjusted_velocity) {
-        optimized_velocity = adjusted_velocity.value();
-      }
-    }
-  }
-  return optimized_velocity;
+  return result;
 }
 }  // namespace context_gamma_planner
