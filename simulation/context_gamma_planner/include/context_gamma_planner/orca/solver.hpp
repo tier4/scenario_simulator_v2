@@ -36,13 +36,13 @@ struct line
 };
 
 auto applyConstraintOnLine(
-  const std::vector<line> & lines, const line & attention_line, const double limit_speed,
-  const geometry_msgs::msg::Vector3 & opt_velocity, const bool direction_opt)
-  -> std::optional<geometry_msgs::msg::Vector3>;
+  const std::vector<line> & constraint_lines, const line & target_constraint_line,
+  const double maximum_speed, const geometry_msgs::msg::Vector3 & preferred_velocity,
+  const bool prioritize_direction_alignment) -> std::optional<geometry_msgs::msg::Vector3>;
 
 auto optimizeVelocityWithConstraints(
-  const std::vector<line> & lines, const double limit_speed,
-  const geometry_msgs::msg::Vector3 & opt_velocity, const bool direction_opt)
+  const std::vector<line> & constraint_lines, const double maximum_speed,
+  const geometry_msgs::msg::Vector3 & preferred_velocity, const bool prioritize_direction_alignment)
   -> std::optional<geometry_msgs::msg::Vector3>;
 }  // namespace context_gamma_planner
 

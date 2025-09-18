@@ -17,31 +17,37 @@
 namespace context_gamma_planner
 {
 auto applyConstraintOnLine(
-  const std::vector<line> & lines, const line & attention_line, const double limit_speed,
-  const geometry_msgs::msg::Vector3 & opt_velocity, const bool direction_opt)
-  -> std::optional<geometry_msgs::msg::Vector3>
+  const std::vector<line> & constraint_lines, const line & target_constraint_line,
+  const double maximum_speed, const geometry_msgs::msg::Vector3 & preferred_velocity,
+  const bool prioritize_direction_alignment) -> std::optional<geometry_msgs::msg::Vector3>
 {
   using math::geometry::operator+;
 
   using math::geometry::operator-;
   using math::geometry::operator*;
 
-  const auto & [p, d] = attention_line;
-  const auto dot_product = math::geometry::innerProduct(p, d);
-  const auto discriminant =
-    dot_product * dot_product + limit_speed * limit_speed - math::geometry::innerProduct(p, p);
+  const auto & [constraint_point, constraint_direction] = target_constraint_line;
+  const auto point_direction_projection =
+    math::geometry::innerProduct(constraint_point, constraint_direction);
+  const auto discriminant = point_direction_projection * point_direction_projection +
+                            maximum_speed * maximum_speed -
+                            math::geometry::innerProduct(constraint_point, constraint_point);
 
   if (discriminant < 0.0) {
     return std::nullopt;
   }
 
   const auto sqrt_discriminant = std::sqrt(discriminant);
-  auto t_left = -dot_product - sqrt_discriminant;
-  auto t_right = -dot_product + sqrt_discriminant;
+  auto parameter_lower_bound = -point_direction_projection - sqrt_discriminant;
+  auto parameter_upper_bound = -point_direction_projection + sqrt_discriminant;
 
-  for (const auto & [pi, di] : lines) {
-    const auto denominator = math::geometry::cross2d(d, di);
-    const auto numerator = math::geometry::cross2d(di, p - pi);
+  for (const auto & constraint_line : constraint_lines) {
+    const auto & other_constraint_point = constraint_line.point;
+    const auto & other_constraint_direction = constraint_line.direction;
+    const auto denominator =
+      math::geometry::cross2d(constraint_direction, other_constraint_direction);
+    const auto numerator = math::geometry::cross2d(
+      other_constraint_direction, constraint_point - other_constraint_point);
 
     if (std::fabs(denominator) <= ORCA_EPSILON) {
       if (numerator < 0.0f) {
@@ -51,62 +57,74 @@ auto applyConstraintOnLine(
       }
     }
 
-    const auto t = numerator / denominator;
+    const auto intersection_parameter = numerator / denominator;
 
     if (denominator >= 0.0f) {
-      t_right = std::min(t_right, t);
+      parameter_upper_bound = std::min(parameter_upper_bound, intersection_parameter);
     } else {
-      t_left = std::max(t_left, t);
+      parameter_lower_bound = std::max(parameter_lower_bound, intersection_parameter);
     }
-    if (t_left > t_right) {
+    if (parameter_lower_bound > parameter_upper_bound) {
       return std::nullopt;
     }
   }
 
-  if (direction_opt) {
-    if (math::geometry::innerProduct(opt_velocity, d) > 0.0) {
-      return math::geometry::castToVec(p) + d * t_right;
+  if (prioritize_direction_alignment) {
+    if (math::geometry::innerProduct(preferred_velocity, constraint_direction) > 0.0) {
+      return math::geometry::castToVec(constraint_point) +
+             constraint_direction * parameter_upper_bound;
     } else {
-      return math::geometry::castToVec(p) + d * t_left;
+      return math::geometry::castToVec(constraint_point) +
+             constraint_direction * parameter_lower_bound;
     }
   } else {
-    const auto t = math::geometry::innerProduct(d, (opt_velocity - p));
+    const auto preferred_parameter =
+      math::geometry::innerProduct(constraint_direction, (preferred_velocity - constraint_point));
 
-    if (t < t_left) {
-      return math::geometry::castToVec(p) + d * t_left;
-    } else if (t > t_right) {
-      return math::geometry::castToVec(p) + d * t_right;
+    if (preferred_parameter < parameter_lower_bound) {
+      return math::geometry::castToVec(constraint_point) +
+             constraint_direction * parameter_lower_bound;
+    } else if (preferred_parameter > parameter_upper_bound) {
+      return math::geometry::castToVec(constraint_point) +
+             constraint_direction * parameter_upper_bound;
     } else {
-      return math::geometry::castToVec(p) + d * t;
+      return math::geometry::castToVec(constraint_point) +
+             constraint_direction * preferred_parameter;
     }
   }
 }
 
 auto optimizeVelocityWithConstraints(
-  const std::vector<line> & lines, const double limit_speed,
-  const geometry_msgs::msg::Vector3 & opt_velocity, const bool direction_opt)
+  const std::vector<line> & constraint_lines, const double maximum_speed,
+  const geometry_msgs::msg::Vector3 & preferred_velocity, const bool prioritize_direction_alignment)
   -> std::optional<geometry_msgs::msg::Vector3>
 {
   using math::geometry::operator-;
   using math::geometry::operator*;
 
-  auto velocity = geometry_msgs::msg::Vector3();
-  if (direction_opt) {
-    velocity = opt_velocity * limit_speed;
-  } else if (math::geometry::innerProduct(opt_velocity, opt_velocity) > limit_speed * limit_speed) {
-    velocity = math::geometry::normalize(opt_velocity) * limit_speed;
+  auto optimized_velocity = geometry_msgs::msg::Vector3();
+  if (prioritize_direction_alignment) {
+    optimized_velocity = preferred_velocity * maximum_speed;
+  } else if (
+    math::geometry::innerProduct(preferred_velocity, preferred_velocity) >
+    maximum_speed * maximum_speed) {
+    optimized_velocity = math::geometry::normalize(preferred_velocity) * maximum_speed;
   } else {
-    velocity = opt_velocity;
+    optimized_velocity = preferred_velocity;
   }
-  for (const auto & line : lines) {
-    if (math::geometry::cross2d(line.direction, line.point - velocity) > 0.0) {
-      const auto result =
-        applyConstraintOnLine(lines, line, limit_speed, opt_velocity, direction_opt);
-      if (result) {
-        velocity = result.value();
+
+  for (const auto & constraint_line : constraint_lines) {
+    if (
+      math::geometry::cross2d(
+        constraint_line.direction, constraint_line.point - optimized_velocity) > 0.0) {
+      const auto adjusted_velocity = applyConstraintOnLine(
+        constraint_lines, constraint_line, maximum_speed, preferred_velocity,
+        prioritize_direction_alignment);
+      if (adjusted_velocity) {
+        optimized_velocity = adjusted_velocity.value();
       }
     }
   }
-  return velocity;
+  return optimized_velocity;
 }
 }  // namespace context_gamma_planner
