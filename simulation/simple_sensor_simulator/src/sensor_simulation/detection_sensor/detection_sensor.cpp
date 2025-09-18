@@ -673,33 +673,6 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
         const auto interval =
           simulation_time - std::exchange(noise_output->second.simulation_time, simulation_time);
 
-        noise_output->second.v4_position_x_noise = [&]() {
-          const auto mean = common::getParameter<double>(parameter_base_path + "position.x.mean");
-          const auto standard_deviation =
-            common::getParameter<double>(parameter_base_path + "position.x.standard_deviation");
-          return autoregressive_noise(
-            noise_output->second.v4_position_x_noise, mean, standard_deviation,
-            autocorrelation_coefficient(parameter_base_path + "position.x", interval));
-        }();
-
-        noise_output->second.v4_position_y_noise = [&]() {
-          const auto mean = common::getParameter<double>(parameter_base_path + "position.y.mean");
-          const auto standard_deviation =
-            common::getParameter<double>(parameter_base_path + "position.y.standard_deviation");
-          return autoregressive_noise(
-            noise_output->second.v4_position_y_noise, mean, standard_deviation,
-            autocorrelation_coefficient(parameter_base_path + "position.y", interval));
-        }();
-
-        noise_output->second.yaw_noise = [&]() {
-          const auto mean = common::getParameter<double>(parameter_base_path + "yaw.mean");
-          const auto standard_deviation =
-            common::getParameter<double>(parameter_base_path + "yaw.standard_deviation");
-          return autoregressive_noise(
-            noise_output->second.yaw_noise, mean, standard_deviation,
-            autocorrelation_coefficient(parameter_base_path + "yaw", interval));
-        }();
-
         const auto speed = std::hypot(
           vanilla_entity.action_status().twist().linear().x(),
           vanilla_entity.action_status().twist().linear().y());
@@ -720,6 +693,30 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
         auto selector = create_selector(
           parameter_base_path, noise_base.x() - ego_baselink_2d.x(),
           noise_base.y() - ego_baselink_2d.y());
+
+        noise_output->second.v4_position_x_noise = [&]() {
+          const auto mean = selector("position.x.mean");
+          const auto standard_deviation = selector("position.x.standard_deviation");
+          return autoregressive_noise(
+            noise_output->second.v4_position_x_noise, mean(), standard_deviation(),
+            autocorrelation_coefficient(parameter_base_path + "position.x", interval));
+        }();
+
+        noise_output->second.v4_position_y_noise = [&]() {
+          const auto mean = selector("position.y.mean");
+          const auto standard_deviation = selector("position.y.standard_deviation");
+          return autoregressive_noise(
+            noise_output->second.v4_position_y_noise, mean(), standard_deviation(),
+            autocorrelation_coefficient(parameter_base_path + "position.y", interval));
+        }();
+
+        noise_output->second.yaw_noise = [&]() {
+          const auto mean = selector("yaw.mean");
+          const auto standard_deviation = selector("yaw.standard_deviation");
+          return autoregressive_noise(
+            noise_output->second.yaw_noise, mean(), standard_deviation(),
+            autocorrelation_coefficient(parameter_base_path + "yaw", interval));
+        }();
 
         noise_output->second.flip =
           yaw_flip(noise_output->second.flip, speed, interval, parameter_base_path);
