@@ -43,7 +43,7 @@ auto applyConstraintOnLine(
     const auto denominator = math::geometry::cross2d(d, di);
     const auto numerator = math::geometry::cross2d(di, p - pi);
 
-    if (std::fabs(denominator) <= RVO_EPSILON) {
+    if (std::fabs(denominator) <= ORCA_EPSILON) {
       if (numerator < 0.0f) {
         return std::nullopt;
       } else {

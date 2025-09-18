@@ -27,7 +27,7 @@
 
 namespace context_gamma_planner
 {
-constexpr double RVO_EPSILON = 0.00001f;
+constexpr double ORCA_EPSILON = 0.00001f;
 
 struct line
 {
