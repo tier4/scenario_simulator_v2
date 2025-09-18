@@ -41,6 +41,9 @@ auto applyConstraintOnLine(
   auto parameter_lower_bound = -point_direction_projection - sqrt_discriminant;
   auto parameter_upper_bound = -point_direction_projection + sqrt_discriminant;
 
+  // NOTE: RVO2 keeps agent positions in a k-d tree and achieves roughly O(N log N)
+  // neighbor queries, while this approach checks every pair directly, so it remains
+  // a simpler but O(N^2) brute-force pass for now.
   for (const auto & constraint_line : constraint_lines) {
     const auto & other_constraint_point = constraint_line.point;
     const auto & other_constraint_direction = constraint_line.direction;
