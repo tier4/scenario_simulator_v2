@@ -110,7 +110,7 @@ auto applyConstraintOnLine(
 
 // Solve the 2D linear program over the set of lines. Returns the index of the first
 // constraint that failed, or lines.size() if all constraints are satisfied.
-static std::size_t linearProgram2(
+static std::size_t solveLinearProgramForConstraints(
   const std::vector<line> & lines, double radius, const geometry_msgs::msg::Vector3 & opt_velocity,
   bool direction_opt, geometry_msgs::msg::Vector3 & result)
 {
@@ -138,7 +138,7 @@ static std::size_t linearProgram2(
 }
 
 // Handle failure at `begin_line` by searching along intersections of constraint boundaries.
-static void linearProgram3(
+static void resolveConstraintViolationViaIntersectionSearch(
   const std::vector<line> & lines, std::size_t begin_line, double radius,
   geometry_msgs::msg::Vector3 & result)
 {
@@ -179,7 +179,9 @@ static void linearProgram3(
       dir_opt.y = lines[i].direction.x;
       dir_opt.z = 0.0;
 
-      if (linearProgram2(proj_lines, radius, dir_opt, true, result) < proj_lines.size()) {
+      if (
+        solveLinearProgramForConstraints(proj_lines, radius, dir_opt, true, result) <
+        proj_lines.size()) {
         // This should in principle not happen; keep previous result.
         result = temp_result;
       }
@@ -195,12 +197,13 @@ auto optimizeVelocityWithConstraints(
   -> std::optional<geometry_msgs::msg::Vector3>
 {
   geometry_msgs::msg::Vector3 result;
-  const auto line_fail = linearProgram2(
+  const auto line_fail = solveLinearProgramForConstraints(
     constraint_lines, maximum_speed, preferred_velocity, prioritize_direction_alignment, result);
 
   if (line_fail < constraint_lines.size()) {
     // We have no obstacle lines in this usage; start from the failing line.
-    linearProgram3(constraint_lines, line_fail, maximum_speed, result);
+    resolveConstraintViolationViaIntersectionSearch(
+      constraint_lines, line_fail, maximum_speed, result);
   }
 
   return result;
