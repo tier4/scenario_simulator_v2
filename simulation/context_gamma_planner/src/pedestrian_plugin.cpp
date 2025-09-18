@@ -103,7 +103,7 @@ void PedestrianPlugin::update(double current_time, double step_time)
     transformLocalToGlobalVelocity(ego_pose, ego_local_linear_velocity);
   const auto ego_angle = math::geometry::convertQuaternionToEulerAngle(ego_pose.orientation).z;
 
-  ego_pose.position.x += ego_bbox.center.x * cos(ego_angle) + ego_bbox.center.y * sin(ego_angle);
+  ego_pose.position.x += ego_bbox.center.x * cos(ego_angle) - ego_bbox.center.y * sin(ego_angle);
   ego_pose.position.y += ego_bbox.center.x * sin(ego_angle) + ego_bbox.center.y * cos(ego_angle);
 
   std::vector<line> orca_lines;
@@ -122,7 +122,7 @@ void PedestrianPlugin::update(double current_time, double step_time)
       math::geometry::convertQuaternionToEulerAngle(other_pose.orientation).z;
 
     other_pose.position.x +=
-      other_bbox.center.x * cos(other_angle) + other_bbox.center.y * sin(other_angle);
+      other_bbox.center.x * cos(other_angle) - other_bbox.center.y * sin(other_angle);
     other_pose.position.y +=
       other_bbox.center.x * sin(other_angle) + other_bbox.center.y * cos(other_angle);
 
