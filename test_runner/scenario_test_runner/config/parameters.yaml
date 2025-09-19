@@ -240,7 +240,7 @@
       occlusionless: false # This parameter is used only if `override_legacy_configuration` is true. If it is false, the value of `isClairvoyant` in `ObjectController.Properties` in the scenario file is used.
       noise:
         model:
-          version: 1 # Any of [1, 2, 3].
+          version: 1 # Any of [1, 2, 3, 4].
         v1: # This clause is used only if `model.version` is 1.
           position:
             standard_deviation: 0.0 # This parameter is used only if `override_legacy_configuration` is true. If it is false, the value of `detectedObjectPositionStandardDeviation` in `ObjectController.Properties` in the scenario file is used.
@@ -328,6 +328,42 @@
               rate:
                 ellipse_normalized_x_radius: 1.0
                 values: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+        v4: # This clause is used only if `model.version` is 4.
+          no_noise_to_all:
+            noise_application_entities:
+              types: ["*"]
+              subtypes: ["*"]
+              names: ["*"]
+            position:
+              x:
+                autocorrelation_coefficient:
+                  amplitude: 0.0
+                  decay: 0.0
+                  offset: 0.0
+                mean: 0.0
+                standard_deviation: 0.0
+              y:
+                autocorrelation_coefficient:
+                  amplitude: 0.0
+                  decay: 0.0
+                  offset: 0.0
+                mean: 0.0
+                standard_deviation: 0.0
+            rotation:
+              autocorrelation_coefficient:
+                amplitude: 0.0
+                decay: 0.0
+                offset: 0.0
+              mean: 0.0
+              standard_deviation: 0.0
+            true_positive:
+              autocorrelation_coefficient:
+                amplitude: 0.0
+                decay: 0.0
+                offset: 0.0
+              rate:
+                distance_thresholds: [ 1000.0 ]
+                values: [ 1.0 ]
     /perception/object_recognition/ground_truth/objects:
       version: 20240605 # architecture_type suffix (mandatory)
       override_legacy_configuration: false

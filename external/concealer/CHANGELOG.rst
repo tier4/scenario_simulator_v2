@@ -24,6 +24,155 @@ Changelog for package concealer
 16.4.2 (2025-05-23)
 -------------------
 
+17.5.3 (2025-09-17)
+-------------------
+* Merge branch 'master' into fix/macro-xml-validation
+* Contributors: Kotaro Yoshimoto
+
+17.5.2 (2025-09-16)
+-------------------
+* Merge pull request `#1665 <https://github.com/tier4/scenario_simulator_v2/issues/1665>`_ from tier4/fix/no-autoware-launch
+* Merge branch 'master' into fix/no-autoware-launch
+* Add comment for requestChangeToStop
+* Merge branch 'master' into fix/no-autoware-launch
+* Remove unnecessary stop
+* Remove unused code
+* Request stop before Autoware operation
+* Request state to be stop before (re-)initialize
+* Allow `waiting_for_route` in startup to address pre-launched Autoware
+* Contributors: Kotaro Yoshimoto, f0reachARR, ぐるぐる
+
+17.5.1 (2025-09-11)
+-------------------
+* Merge pull request `#1682 <https://github.com/tier4/scenario_simulator_v2/issues/1682>`_ from tier4/fix/RJD-1918-fix-task-queue-service-is-ready-check
+* ref(concealer): remove unnecessary variable
+* fix(concealer): fix declaration and initialization order in TaskQueue
+* fix(concealer): add availability_timeout to Service
+* Contributors: Dawid Moszynski, Kotaro Yoshimoto
+
+17.5.0 (2025-09-05)
+-------------------
+* Merge branch 'master' into fix/approach-stop-and-gap-tolerance
+* Contributors: Taiga
+
+17.4.0 (2025-09-04)
+-------------------
+* Merge branch 'feature/use-yaw-diff-for-front-detection' of github.com:tier4/scenario_simulator_v2 into feature/use-yaw-diff-for-front-detection
+* Merge branch 'master' into feature/use-yaw-diff-for-front-detection
+* Contributors: Taiga, Taiga Takano
+
+17.3.0 (2025-09-03)
+-------------------
+* Merge branch 'master' into feature/noise_v4
+* Merge branch 'master' into feature/noise_v4
+* Merge branch 'master' into feature/noise_v4
+* Contributors: Kotaro Yoshimoto
+
+17.2.1 (2025-09-02)
+-------------------
+* Merge branch 'master' into RJD-1919/fix_health_check
+* Merge branch 'master' into RJD-1919/fix_health_check
+* Merge branch 'RJD-1919/fix_health_check' of github.com:tier4/scenario_simulator_v2 into RJD-1919/fix_health_check
+* Merge branch 'master' into RJD-1919/fix_health_check
+* Contributors: Kotaro Yoshimoto, Michał Ciasnocha, robomic
+
+17.2.0 (2025-09-02)
+-------------------
+
+17.1.4 (2025-08-27)
+-------------------
+
+17.1.3 (2025-08-20)
+-------------------
+* Merge branch 'master' into hotfix/actions-permission
+* Contributors: Kotaro Yoshimoto
+
+17.1.2 (2025-08-20)
+-------------------
+* Merge branch 'master' into refactor/planning-topic-update
+* Merge branch 'master' into refactor/planning-topic-update
+* Contributors: Kotaro Yoshimoto
+
+17.1.1 (2025-08-20)
+-------------------
+* Merge branch 'master' into fix/actions-permission
+* Merge branch 'master' into fix/actions-permission
+* Contributors: ぐるぐる
+
+17.1.0 (2025-08-19)
+-------------------
+* Merge pull request `#1667 <https://github.com/tier4/scenario_simulator_v2/issues/1667>`_ from tier4/RJD-1907/ss2_vehicle_id_and_localization
+* Merge branch 'master' into RJD-1907/ss2_vehicle_id_and_localization
+* Merge branch 'master' into RJD-1907/ss2_vehicle_id_and_localization
+* RJD-1907 Add support for vehicle_id and initialize_localization
+* Contributors: Grzegorz Maj, Kotaro Yoshimoto
+
+17.0.4 (2025-08-18)
+-------------------
+* Merge branch 'master' into HansRobo-patch-2
+* Merge branch 'master' into HansRobo-patch-2
+* Merge branch 'master' into HansRobo-patch-2
+* Contributors: Kotaro Yoshimoto
+
+17.0.3 (2025-08-18)
+-------------------
+
+17.0.2 (2025-08-07)
+-------------------
+
+17.0.1 (2025-08-07)
+-------------------
+* Merge pull request `#1661 <https://github.com/tier4/scenario_simulator_v2/issues/1661>`_ from tier4/fix/spinner
+* Merge branch 'master' into fix/spinner
+* Fix concealer::AutowareUniverse class member definition order with consideration of initialization dependencies
+* Revert "fix(concealer): fix spinner thread start timing"
+  This reverts commit fd01f977e94033db3157c1dd0226d4a48bf3214e.
+* fix(concealer): fix spinner thread start timing
+* Contributors: Kotaro Yoshimoto, kosuke55
+
+17.0.0 (2025-08-06)
+-------------------
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Merge branch 'master' into refactor/get_loungitudinal_distance
+* Contributors: Grzegorz Maj, Kotaro Yoshimoto, Masaya Kataoka, Mateusz Palczuk, Tatsuya Yamasaki
+
+16.11.0 (2025-08-01)
+--------------------
+* Merge branch 'master' into RJD-1769/centerline
+* Merge remote-tracking branch 'origin/master' into RJD-1769/centerline
+  # Conflicts:
+  #	simulation/traffic_simulator/src/hdmap_utils/hdmap_utils.cpp
+* Merge branch 'master' into RJD-1769/centerline
+* Merge branch 'master' into RJD-1769/centerline
+* Contributors: Grzegorz Maj, Kotaro Yoshimoto
+
+16.10.0 (2025-07-31)
+--------------------
+* Merge branch 'master' into feature/traffic_signal_state_v2i
+* Contributors: Kotaro Yoshimoto
+
+16.9.0 (2025-07-28)
+-------------------
+* Merge branch 'master' into feature/transverse_mercator_projection_support
+* Merge remote-tracking branch 'origin/master' into feature/transverse_mercator_projection_support
+* Contributors: Dawid Moszyński, Piotr Zyskowski
+
+16.8.3 (2025-07-24)
+-------------------
+* Merge branch 'master' into patch-1
+* Merge branch 'master' into patch-1
+* Merge branch 'master' into patch-1
+* Contributors: Kotaro Yoshimoto
+
 16.8.2 (2025-07-24)
 -------------------
 

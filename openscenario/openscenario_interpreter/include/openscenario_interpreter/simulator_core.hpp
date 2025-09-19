@@ -182,7 +182,7 @@ public:
       routing_configuration.allow_lane_change =
         (routing_algorithm == RoutingAlgorithm::value_type::shortest);
       return traffic_simulator::pose::relativeLaneletPose(
-        from_lanelet_pose, to_lanelet_pose, routing_configuration, core->getHdmapUtils());
+        from_lanelet_pose, to_lanelet_pose, routing_configuration);
     }
 
     static auto makeNativeBoundingBoxRelativeLanePosition(
@@ -230,7 +230,7 @@ public:
         (routing_algorithm == RoutingAlgorithm::value_type::shortest);
       return traffic_simulator::pose::boundingBoxRelativeLaneletPose(
         from_lanelet_pose, from_bounding_box, to_lanelet_pose, to_bounding_box,
-        routing_configuration, core->getHdmapUtils());
+        routing_configuration);
     }
 
     static auto makeNativeBoundingBoxRelativeWorldPosition(
@@ -338,6 +338,12 @@ public:
       entity.setVelocityLimit(controller.properties.template get<Double>(
         "maxSpeed", std::numeric_limits<Double::value_type>::max()));
 
+      if (controller.properties.contains("lateralCollisionThreshold")) {
+        entity.setLateralCollisionThreshold(
+          controller.properties.template get<Double>("lateralCollisionThreshold"));
+      } else {
+        entity.setLateralCollisionThreshold(std::nullopt);
+      }
       entity.setBehaviorParameter([&]() {
         auto message = entity.getBehaviorParameter();
         message.see_around = not controller.properties.template get<Boolean>("isBlind");

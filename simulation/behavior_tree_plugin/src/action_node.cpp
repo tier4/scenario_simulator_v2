@@ -108,6 +108,10 @@ auto ActionNode::getBlackBoardValues() -> void
         "behavior_parameter", behavior_parameter_)) {
     behavior_parameter_ = traffic_simulator_msgs::msg::BehaviorParameter();
   }
+  if (!getInput<std::optional<double>>(
+        "lateral_collision_threshold", lateral_collision_threshold_)) {
+    lateral_collision_threshold_ = std::nullopt;  // default: not set
+  }
 }
 
 auto ActionNode::getHorizon() const -> double
@@ -151,10 +155,12 @@ auto ActionNode::getYieldStopDistance(const lanelet::Ids & following_lanelets) c
       const auto other_status = getOtherEntityStatus(right_of_way_id);
       if (!other_status.empty() && canonicalized_entity_status_->isInLanelet()) {
         const auto lanelet_pose = canonicalized_entity_status_->getLaneletPose();
-        const auto distance_forward = hdmap_utils_->getLongitudinalDistance(
-          lanelet_pose, traffic_simulator::helper::constructLaneletPose(lanelet, 0));
-        const auto distance_backward = hdmap_utils_->getLongitudinalDistance(
-          traffic_simulator::helper::constructLaneletPose(lanelet, 0), lanelet_pose);
+        const auto distance_forward =
+          traffic_simulator::lanelet_wrapper::distance::longitudinalDistance(
+            lanelet_pose, traffic_simulator::helper::constructLaneletPose(lanelet, 0));
+        const auto distance_backward =
+          traffic_simulator::lanelet_wrapper::distance::longitudinalDistance(
+            traffic_simulator::helper::constructLaneletPose(lanelet, 0), lanelet_pose);
         if (distance_forward) {
           distances.insert(distance_forward.value());
         } else if (distance_backward) {
@@ -271,24 +277,33 @@ auto ActionNode::getFrontEntityName(const math::geometry::CatmullRomSplineInterf
       }
     }
 
+    const auto self_pos = canonicalized_entity_status_->getMapPose().position;
+    const auto self_yaw = math::geometry::convertQuaternionToEulerAngle(
+                            canonicalized_entity_status_->getMapPose().orientation)
+                            .z;
+    // Iterate by increasing euclidean distance and compute the
+    // actual spline-based distance using getDistanceToTargetEntity.
+    // Select the entity that yields the minimal valid distance.
+    std::optional<std::string> best_name;
+    double best_distance = std::numeric_limits<double>::infinity();
     for (const auto & [euclidean_distance, name] : local_euclidean_distances_map_) {
-      const auto quaternion = math::geometry::getRotation(
-        canonicalized_entity_status_->getMapPose().orientation,
-        other_entity_status_.at(name).getMapPose().orientation);
-      /**
-       * @note hard-coded parameter, if the Yaw value of RPY is in ~1.5708 -> 1.5708, entity is a candidate of front entity.
-       */
-      if (
-        std::fabs(math::geometry::convertQuaternionToEulerAngle(quaternion).z) <=
-        boost::math::constants::half_pi<double>()) {
-        const auto longitudinal_distance =
-          getDistanceToTargetEntity(spline, other_entity_status_.at(name));
-
-        if (longitudinal_distance && longitudinal_distance.value() < horizon) {
-          return name;
+      const auto other_pos = other_entity_status_.at(name).getMapPose().position;
+      const auto dx = other_pos.x - self_pos.x;
+      const auto dy = other_pos.y - self_pos.y;
+      const auto vec_yaw = std::atan2(dy, dx);
+      const auto yaw_diff = std::atan2(std::sin(vec_yaw - self_yaw), std::cos(vec_yaw - self_yaw));
+      if (std::fabs(yaw_diff) <= boost::math::constants::half_pi<double>()) {
+        if (const auto distance_opt = getDistanceToTargetEntity(spline, getEntityStatus(name));
+            distance_opt.has_value()) {
+          const auto dist = distance_opt.value();
+          if (dist < best_distance) {
+            best_distance = dist;
+            best_name = name;
+          }
         }
       }
     }
+    return best_name;
   }
   return std::nullopt;
 }
@@ -364,7 +379,7 @@ auto ActionNode::getDistanceToTargetEntity(
       math::geometry::getDistance(bounding_box_map_points[0], bounding_box_map_points[2]);
     if (const auto longitudinal_distance = traffic_simulator::distance::longitudinalDistance(
           *from_lanelet_pose, *target_lanelet_pose, include_adjacent_lanelet,
-          include_opposite_direction, routing_configuration, hdmap_utils_);
+          include_opposite_direction, routing_configuration);
         !longitudinal_distance) {
       return std::nullopt;
     } else if (const auto bounding_box_distance =
@@ -378,11 +393,14 @@ auto ActionNode::getDistanceToTargetEntity(
       const auto target_bounding_box_distance =
         bounding_box_distance.value() + from_bounding_box.dimensions.x / 2.0;
 
-      /// @note if the distance of the target entity to the spline is smaller than the width of the reference entity
-      if (const auto target_to_spline_distance = traffic_simulator::distance::distanceToSpline(
-            static_cast<geometry_msgs::msg::Pose>(*target_lanelet_pose), target_bounding_box,
-            spline, longitudinal_distance.value());
-          target_to_spline_distance <= from_bounding_box.dimensions.y / 2.0) {
+      const auto lateral_distance_to_spline = traffic_simulator::distance::distanceToSpline(
+        static_cast<geometry_msgs::msg::Pose>(*target_lanelet_pose), target_bounding_box, spline,
+        longitudinal_distance.value());
+
+      const double threshold =
+        lateral_collision_threshold_.value_or(from_bounding_box.dimensions.y * 0.5);
+
+      if (lateral_distance_to_spline <= threshold) {
         return target_bounding_box_distance;
       }
       /// @note if the distance of the target entity to the spline cannot be calculated because a collision occurs

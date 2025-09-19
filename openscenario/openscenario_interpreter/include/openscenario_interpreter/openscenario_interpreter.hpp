@@ -49,6 +49,9 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode,
                     private SimulatorCore::ConditionEvaluation,
                     private SimulatorCore::NonStandardOperation
 {
+  /// @note Needs to be longer than the SIGINT + SIGTERM signals timeout duration.
+  static inline constexpr std::chrono::seconds simulator_core_shutdown_threshold{30};
+
   using Context = openscenario_interpreter_msgs::msg::Context;
 
   const rclcpp_lifecycle::LifecyclePublisher<Context>::SharedPtr publisher_of_context;
