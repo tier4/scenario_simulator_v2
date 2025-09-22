@@ -84,19 +84,19 @@ auto CanonicalizedEntityStatus::set(
   //   canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
   //     status.pose, getBoundingBox(), lanelet_ids, include_crosswalk, matching_distance);
   // }
-  for (const auto & lanelet_pose : status.lanelet_poses) {
-    if (lanelet_pose.lanelet_pose_valid) {
-      for (const auto & canonicalized_lanelet_pose :
-           pose::toCanonicalizedLaneletPoses({lanelet_pose})) {
-        canonicalized_lanelet_poses.emplace_back(canonicalized_lanelet_pose);
-      }
-    } else {
-      for (const auto & canonicalized_lanelet_pose : pose::toCanonicalizedLaneletPoses(
-             status.pose, getBoundingBox(), lanelet_ids, include_crosswalk, matching_distance)) {
-        canonicalized_lanelet_poses.emplace_back(canonicalized_lanelet_pose);
-      }
+  // for (const auto & lanelet_pose : status.lanelet_poses) {
+    // if (lanelet_pose.lanelet_pose_valid) {
+    //   for (const auto & canonicalized_lanelet_pose :
+    //        pose::toCanonicalizedLaneletPoses({lanelet_pose})) {
+    //     canonicalized_lanelet_poses.emplace_back(canonicalized_lanelet_pose);
+    //   }
+    // } else {
+    for (const auto & canonicalized_lanelet_pose : pose::toCanonicalizedLaneletPoses(
+            status.pose, getBoundingBox(), lanelet_ids, include_crosswalk, matching_distance)) {
+      canonicalized_lanelet_poses.emplace_back(canonicalized_lanelet_pose);
     }
-  }
+    // }
+  // }
   set(CanonicalizedEntityStatus(status, canonicalized_lanelet_poses));
 }
 
