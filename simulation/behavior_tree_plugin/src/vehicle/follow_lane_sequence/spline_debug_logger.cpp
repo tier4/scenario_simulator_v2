@@ -45,6 +45,7 @@ namespace
 namespace bg = boost::geometry;
 using BoostPoint = bg::model::d2::point_xy<double>;
 using BoostPolygon = bg::model::polygon<BoostPoint>;
+// RViz 表示で使用する共通設定値。
 constexpr char kFrameId[] = "map";
 constexpr double kFillAlpha = 0.4;
 constexpr double kOutlineAlpha = 0.9;
@@ -64,6 +65,7 @@ auto getImmediatePublisher() -> ImmediateMarkerPublisher &
   std::lock_guard<std::mutex> lock(mutex);
   if (!handles.publisher) {
     try {
+      // 即時可視化用の専用ノードとパブリッシャを遅延生成する。
       handles.node = rclcpp::Node::make_shared("spline_debug_logger_immediate");
       auto qos = rclcpp::QoS(rclcpp::KeepLast(1)).transient_local();
       handles.publisher = handles.node->create_publisher<visualization_msgs::msg::MarkerArray>(
@@ -82,6 +84,7 @@ auto makeOutlineMarker(
   const std::string & ns, int32_t id, const rclcpp::Time & stamp, const double z_offset,
   const std::vector<BoostPolygon> & polygons) -> visualization_msgs::msg::Marker
 {
+  // TRIANGLE_LIST では重複が多くなるため、外枠のみを線で描画する。
   visualization_msgs::msg::Marker marker;
   marker.header.frame_id = kFrameId;
   marker.header.stamp = stamp;
@@ -119,6 +122,7 @@ auto makeOutlineMarker(
 
 auto makeDeleteMarker(const std::string & ns, int32_t id) -> visualization_msgs::msg::Marker
 {
+  // RViz 上の古いマーカーを明示的に消すためのユーティリティ。
   visualization_msgs::msg::Marker marker;
   marker.header.frame_id = kFrameId;
   marker.header.stamp = rclcpp::Clock(RCL_ROS_TIME).now();
@@ -134,6 +138,7 @@ auto publishImmediate(const std::vector<visualization_msgs::msg::Marker> & marke
   if (!handles.publisher) {
     return;
   }
+  // behavior_tree_plugin 側の出力とは別に、即時に RViz を更新する。
   visualization_msgs::msg::MarkerArray array_msg;
   array_msg.markers = markers;
   handles.publisher->publish(array_msg);
@@ -148,6 +153,7 @@ auto logSplineDebugInfo(
   const std::unordered_map<std::string, traffic_simulator::CanonicalizedEntityStatus> &
     other_entity_status) -> std::vector<visualization_msgs::msg::Marker>
 {
+  // 処理時間を測定するために開始時刻を記録する。
   const auto start = std::chrono::steady_clock::now();
   std::vector<visualization_msgs::msg::Marker> markers;
   const auto entity_name =
@@ -159,6 +165,7 @@ auto logSplineDebugInfo(
 
     std::vector<BoostPolygon> triangle_polygons;
     triangle_polygons.reserve(debug_polygon.size() / 3);
+    // CatmullRomSpline::getPolygon が返す三角形メッシュを Boost.Geometry のポリゴンへ変換する。
     for (std::size_t index = 0; index + 2 < debug_polygon.size(); index += 3) {
       BoostPolygon polygon;
       auto & outer = polygon.outer();
@@ -172,6 +179,7 @@ auto logSplineDebugInfo(
 
     std::vector<BoostPolygon> boost_polygons;
     if (!triangle_polygons.empty()) {
+      // 三角形群を union_ で順次マージし、多角形の外形へとまとめる。
       std::vector<BoostPolygon> current = {triangle_polygons.front()};
       for (std::size_t idx = 1; idx < triangle_polygons.size(); ++idx) {
         std::vector<BoostPolygon> next;
@@ -217,6 +225,7 @@ auto logSplineDebugInfo(
       std::vector<std::pair<std::string, const traffic_simulator::CanonicalizedEntityStatus *>>
         entity_statuses;
       const auto own_status_ptr = canonicalized_entity_status ? canonicalized_entity_status.get() : nullptr;
+      // 他車および自車のステータスを名前順で並べ、重複を避けながら処理する。
       for (const auto & [name, status] : other_entity_status) {
         entity_statuses.emplace_back(name, &status);
       }
@@ -238,6 +247,7 @@ auto logSplineDebugInfo(
         }
 
         bool intersects_trajectory = false;
+        // 自車以外との交差をチェックし、検出時はログとテキストマーカーを出す。
         if (!(canonicalized_entity_status && name == entity_name)) {
           for (const auto & trajectory_triangle : boost_polygons) {
             if (bg::intersects(trajectory_triangle, boost_polygon)) {
@@ -289,6 +299,7 @@ auto logSplineDebugInfo(
         }
 
         if (intersects_trajectory) {
+          // 交差が判明したエンティティには赤色のテキストを上部に表示する。
           visualization_msgs::msg::Marker text_marker;
           text_marker.header.frame_id = kFrameId;
           text_marker.header.stamp = stamp;
@@ -330,6 +341,7 @@ auto logSplineDebugInfo(
   const auto end = std::chrono::steady_clock::now();
   const auto elapsed_ms =
     std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(end - start);
+  // RViz publish を除いた処理時間をデバッグとして出力する。
   std::cout << "[" << action_name << "] spline debug processing time: " << elapsed_ms.count()
             << " ms" << std::endl;
   publishImmediate(markers);
