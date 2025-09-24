@@ -18,6 +18,7 @@
 #include <geometry/spline/catmull_rom_spline.hpp>
 
 #include <boost/geometry.hpp>
+#include <boost/geometry/algorithms/union.hpp>
 #include <boost/geometry/algorithms/intersects.hpp>
 
 #include <geometry_msgs/msg/point.hpp>
@@ -156,8 +157,8 @@ auto logSplineDebugInfo(
     math::geometry::CatmullRomSpline debug_spline(waypoints.waypoints);
     const auto debug_polygon = debug_spline.getPolygon(1.0, 30);
 
-    std::vector<BoostPolygon> boost_polygons;
-    boost_polygons.reserve(debug_polygon.size() / 3);
+    std::vector<BoostPolygon> triangle_polygons;
+    triangle_polygons.reserve(debug_polygon.size() / 3);
     for (std::size_t index = 0; index + 2 < debug_polygon.size(); index += 3) {
       BoostPolygon polygon;
       auto & outer = polygon.outer();
@@ -166,7 +167,27 @@ auto logSplineDebugInfo(
       outer.emplace_back(debug_polygon[index + 2].x, debug_polygon[index + 2].y);
       outer.push_back(outer.front());
       bg::correct(polygon);
-      boost_polygons.push_back(polygon);
+      triangle_polygons.push_back(polygon);
+    }
+
+    std::vector<BoostPolygon> boost_polygons;
+    if (!triangle_polygons.empty()) {
+      std::vector<BoostPolygon> current = {triangle_polygons.front()};
+      for (std::size_t idx = 1; idx < triangle_polygons.size(); ++idx) {
+        std::vector<BoostPolygon> next;
+        for (const auto & polygon : current) {
+          std::vector<BoostPolygon> union_result;
+          bg::union_(polygon, triangle_polygons[idx], union_result);
+          if (!union_result.empty()) {
+            next.insert(next.end(), union_result.begin(), union_result.end());
+          } else {
+            next.push_back(polygon);
+            next.push_back(triangle_polygons[idx]);
+          }
+        }
+        current = next;
+      }
+      boost_polygons = current;
     }
 
     std::cout << "[" << action_name << "] [" << entity_name << "] debug polygon size="
