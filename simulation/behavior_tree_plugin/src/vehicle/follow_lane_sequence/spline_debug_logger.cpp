@@ -152,7 +152,7 @@ auto makeQuadrilateralOutlineMarker(
 // Catmull-Rom 曲線を等分し、各区間を四角形に展開して判定用ポリゴンを構築する。
 auto buildQuadrilateralData(
   const math::geometry::CatmullRomSpline & spline, const double width,
-  const std::size_t num_segments, const double z_offset) -> QuadrilateralData
+  const std::size_t num_segments) -> QuadrilateralData
 {
   QuadrilateralData data;
   if (num_segments == 0) {
@@ -169,7 +169,7 @@ auto buildQuadrilateralData(
     geometry_msgs::msg::Point bound_point;
     bound_point.x = center_point.x + direction * 0.5 * width * std::cos(theta);
     bound_point.y = center_point.y + direction * 0.5 * width * std::sin(theta);
-    bound_point.z = center_point.z + z_offset;
+    bound_point.z = 1.0;
     return bound_point;
   };
 
@@ -460,16 +460,14 @@ void logSplineDebugInfo(
   const auto stamp = rclcpp::Clock(RCL_ROS_TIME).now();
   try {
     math::geometry::CatmullRomSpline debug_spline(waypoints.waypoints);
-    constexpr double kLaneWidth = 1.0;
-    constexpr std::size_t kNumSegments = 30;
-    constexpr double kZOffset = 0.0;
-    const auto quadrilateral_data = buildQuadrilateralData(debug_spline, kLaneWidth, kNumSegments, kZOffset);
+    constexpr double kLaneWidth = 2.0;
+    constexpr std::size_t kNumSegments = 50;
+    const auto quadrilateral_data = buildQuadrilateralData(debug_spline, kLaneWidth, kNumSegments);
+    const auto collision_infos = detectEntityCollisions(
+      quadrilateral_data.polygons, canonicalized_entity_status, other_entity_status, entity_name);
 
     auto spline_markers = createSplineMarkers(ns, stamp, quadrilateral_data);
     markers.insert(markers.end(), spline_markers.begin(), spline_markers.end());
-
-    const auto collision_infos = detectEntityCollisions(
-      quadrilateral_data.polygons, canonicalized_entity_status, other_entity_status, entity_name);
     auto entity_markers = createEntityMarkers(
       ns, stamp, collision_infos, canonicalized_entity_status, entity_name);
     markers.insert(markers.end(), entity_markers.begin(), entity_markers.end());
