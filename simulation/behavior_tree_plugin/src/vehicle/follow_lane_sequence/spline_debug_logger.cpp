@@ -22,6 +22,8 @@
 
 #include <geometry_msgs/msg/point.hpp>
 
+#include <chrono>
+
 #include <rclcpp/clock.hpp>
 #include <rclcpp/duration.hpp>
 #include <rclcpp/rclcpp.hpp>
@@ -46,7 +48,7 @@ constexpr char kFrameId[] = "map";
 constexpr double kFillAlpha = 0.4;
 constexpr double kOutlineAlpha = 0.9;
 constexpr double kOutlineWidth = 0.1;
-constexpr double kLifetimeSeconds = 0.2;
+constexpr double kLifetimeSeconds = 0.0;
 
 struct ImmediateMarkerPublisher
 {
@@ -73,30 +75,6 @@ auto getImmediatePublisher() -> ImmediateMarkerPublisher &
     }
   }
   return handles;
-}
-
-auto makeTriangleMarker(
-  const std::string & ns, int32_t id, const rclcpp::Time & stamp,
-  const std::vector<geometry_msgs::msg::Point> & points) -> visualization_msgs::msg::Marker
-{
-  visualization_msgs::msg::Marker marker;
-  marker.header.frame_id = kFrameId;
-  marker.header.stamp = stamp;
-  marker.ns = ns;
-  marker.id = id;
-  marker.type = visualization_msgs::msg::Marker::TRIANGLE_LIST;
-  marker.action = visualization_msgs::msg::Marker::ADD;
-  marker.scale.x = 1.0;
-  marker.scale.y = 1.0;
-  marker.scale.z = 1.0;
-  marker.color.r = 0.0F;
-  marker.color.g = 0.6F;
-  marker.color.b = 1.0F;
-  marker.color.a = kFillAlpha;
-  marker.points = points;
-  marker.colors = std::vector<std_msgs::msg::ColorRGBA>(points.size(), marker.color);
-  marker.lifetime = rclcpp::Duration::from_seconds(kLifetimeSeconds);
-  return marker;
 }
 
 auto makeOutlineMarker(
@@ -169,13 +147,14 @@ auto logSplineDebugInfo(
   const std::unordered_map<std::string, traffic_simulator::CanonicalizedEntityStatus> &
     other_entity_status) -> std::vector<visualization_msgs::msg::Marker>
 {
+  const auto start = std::chrono::steady_clock::now();
   std::vector<visualization_msgs::msg::Marker> markers;
   const auto entity_name =
     canonicalized_entity_status ? canonicalized_entity_status->getName() : std::string("unknown");
   const auto ns = action_name + "_" + entity_name;
   try {
     math::geometry::CatmullRomSpline debug_spline(waypoints.waypoints);
-    const auto debug_polygon = debug_spline.getPolygon(1.0, 10);
+    const auto debug_polygon = debug_spline.getPolygon(1.0, 30);
 
     std::vector<BoostPolygon> boost_polygons;
     boost_polygons.reserve(debug_polygon.size() / 3);
@@ -212,7 +191,6 @@ auto logSplineDebugInfo(
                                  [](double sum, const auto & point) { return sum + point.z; }) /
                                static_cast<double>(debug_polygon.size());
 
-      markers.emplace_back(makeTriangleMarker(ns, 0, stamp, debug_polygon));
       markers.emplace_back(makeOutlineMarker(ns, 1, stamp, average_z, boost_polygons));
 
       std::vector<std::pair<std::string, const traffic_simulator::CanonicalizedEntityStatus *>>
@@ -238,10 +216,12 @@ auto logSplineDebugInfo(
           return;
         }
 
+        bool intersects_trajectory = false;
         if (!(canonicalized_entity_status && name == entity_name)) {
           for (const auto & trajectory_triangle : boost_polygons) {
             if (bg::intersects(trajectory_triangle, boost_polygon)) {
-              std::cout << "[ intersects ]" << entity_name << " npc trajectoryとnpc " << name << "は交点を持っている"
+              intersects_trajectory = true;
+              std::cout << entity_name << " npc trajectoryとnpc " << name << "は交点を持っている"
                         << std::endl;
               break;
             }
@@ -286,6 +266,31 @@ auto logSplineDebugInfo(
           marker.points.push_back(marker.points.front());
           markers.emplace_back(std::move(marker));
         }
+
+        if (intersects_trajectory) {
+          visualization_msgs::msg::Marker text_marker;
+          text_marker.header.frame_id = kFrameId;
+          text_marker.header.stamp = stamp;
+          text_marker.ns = ns + ":intersection_text";
+          text_marker.id = marker_id;
+          text_marker.type = visualization_msgs::msg::Marker::TEXT_VIEW_FACING;
+          text_marker.action = visualization_msgs::msg::Marker::ADD;
+          text_marker.scale.z = 2.0;
+          text_marker.color.r = 1.0F;
+          text_marker.color.g = 0.0F;
+          text_marker.color.b = 0.0F;
+          text_marker.color.a = 1.0F;
+          text_marker.pose.position = status.getMapPose().position;
+          text_marker.pose.position.z += status.getBoundingBox().center.z +
+                                         0.5 * status.getBoundingBox().dimensions.z + 1.0;
+          text_marker.pose.orientation.x = 0.0;
+          text_marker.pose.orientation.y = 0.0;
+          text_marker.pose.orientation.z = 0.0;
+          text_marker.pose.orientation.w = 1.0;
+          text_marker.text = entity_name + " npc trajectoryとnpc " + name + "は交点を持っている";
+          text_marker.lifetime = rclcpp::Duration::from_seconds(kLifetimeSeconds);
+          markers.emplace_back(std::move(text_marker));
+        }
       };
 
       const int32_t base_id = 10;
@@ -301,6 +306,11 @@ auto logSplineDebugInfo(
   } catch (const std::exception & e) {
     std::cout << "[" << action_name << "] spline debug error: " << e.what() << std::endl;
   }
+  const auto end = std::chrono::steady_clock::now();
+  const auto elapsed_ms =
+    std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(end - start);
+  std::cout << "[" << action_name << "] spline debug processing time: " << elapsed_ms.count()
+            << " ms" << std::endl;
   publishImmediate(markers);
   return markers;
 }
