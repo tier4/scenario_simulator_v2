@@ -19,7 +19,6 @@
 
 #include <boost/geometry.hpp>
 #include <boost/geometry/algorithms/intersects.hpp>
-#include <boost/geometry/algorithms/perimeter.hpp>
 
 #include <geometry_msgs/msg/point.hpp>
 
@@ -53,13 +52,12 @@ constexpr char kFrameId[] = "map";
 constexpr double kFillAlpha = 0.4;
 constexpr double kOutlineAlpha = 0.9;
 constexpr double kOutlineWidth = 0.1;
-constexpr double kLifetimeSeconds = 0.0;
+constexpr double kLifetimeSeconds = 0.1;
 
 struct QuadrilateralData
 {
   std::vector<std::array<geometry_msgs::msg::Point, 4>> quadrilaterals;
   std::vector<BoostPolygon> polygons;
-  double average_z{0.0};
 };
 
 // インデックスに応じて可視化用のベースカラーを決定する。
@@ -151,18 +149,6 @@ auto makeQuadrilateralOutlineMarker(
   return marker;
 }
 
-// 一度に全ての既存マーカーを無効化する DELETEALL マーカーを作成する。
-auto makeDeleteAllMarker(const rclcpp::Time & stamp) -> visualization_msgs::msg::Marker
-{
-  visualization_msgs::msg::Marker marker;
-  marker.header.frame_id = kFrameId;
-  marker.header.stamp = stamp;
-  marker.ns = "spline_debug";
-  marker.id = 0;
-  marker.action = visualization_msgs::msg::Marker::DELETEALL;
-  return marker;
-}
-
 // Catmull-Rom 曲線を等分し、各区間を四角形に展開して判定用ポリゴンを構築する。
 auto buildQuadrilateralData(
   const math::geometry::CatmullRomSpline & spline, const double width,
@@ -197,15 +183,11 @@ auto buildQuadrilateralData(
     left_bounds.emplace_back(computeBoundPoint(s, -1.0));
   }
 
-  double accumulated_z = 0.0;
   data.quadrilaterals.reserve(num_segments);
   data.polygons.reserve(num_segments);
   for (std::size_t i = 0; i < num_segments; ++i) {
     std::array<geometry_msgs::msg::Point, 4> quad{
       right_bounds[i], left_bounds[i], left_bounds[i + 1], right_bounds[i + 1]};
-    for (const auto & point : quad) {
-      accumulated_z += point.z;
-    }
     data.quadrilaterals.emplace_back(quad);
 
     BoostPolygon polygon;
@@ -218,10 +200,6 @@ auto buildQuadrilateralData(
     outer.push_back(outer.front());
     bg::correct(polygon);
     data.polygons.emplace_back(polygon);
-  }
-
-  if (!data.quadrilaterals.empty()) {
-    data.average_z = accumulated_z / (static_cast<double>(data.quadrilaterals.size()) * 4.0);
   }
   return data;
 }
@@ -268,52 +246,89 @@ auto intersectsTrajectory(
   return false;
 }
 
-// 軌道と交差する可能性のあるエンティティの枠と警告テキストを生成する。
-auto createEntityMarkers(
-  const std::string & ns, const rclcpp::Time & stamp,
+struct EntityCollisionInfo
+{
+  std::string name;
+  const traffic_simulator::CanonicalizedEntityStatus * status;
+  BoostPolygon polygon;
+  bool intersects_trajectory;
+};
+
+auto detectEntityCollisions(
   const std::vector<BoostPolygon> & trajectory_polygons,
   const std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus> & canonicalized_entity_status,
-  const std::unordered_map<std::string, traffic_simulator::CanonicalizedEntityStatus> & other_entity_status,
-  const std::string & entity_name) -> std::vector<visualization_msgs::msg::Marker>
+  const std::unordered_map<std::string, traffic_simulator::CanonicalizedEntityStatus> &
+    other_entity_status,
+  const std::string & entity_name) -> std::vector<EntityCollisionInfo>
 {
-  std::vector<visualization_msgs::msg::Marker> markers;
+  std::vector<EntityCollisionInfo> collisions;
   if (trajectory_polygons.empty()) {
-    return markers;
+    return collisions;
   }
 
-  std::vector<std::pair<std::string, const traffic_simulator::CanonicalizedEntityStatus *>>
-    entity_statuses;
-  const auto own_status_ptr = canonicalized_entity_status ? canonicalized_entity_status.get() : nullptr;
+  std::vector<std::pair<std::string, const traffic_simulator::CanonicalizedEntityStatus *>> entity_statuses;
+  entity_statuses.reserve(other_entity_status.size() + 1);
   for (const auto & [name, status] : other_entity_status) {
     entity_statuses.emplace_back(name, &status);
   }
-  if (own_status_ptr != nullptr) {
-    entity_statuses.emplace_back(entity_name, own_status_ptr);
+  if (canonicalized_entity_status) {
+    entity_statuses.emplace_back(entity_name, canonicalized_entity_status.get());
   }
+
   std::sort(
     entity_statuses.begin(), entity_statuses.end(),
     [](const auto & lhs, const auto & rhs) { return lhs.first < rhs.first; });
 
-  const int32_t base_id = 10;
   for (std::size_t idx = 0; idx < entity_statuses.size(); ++idx) {
     if (idx > 0 && entity_statuses[idx].first == entity_statuses[idx - 1].first) {
       continue;
     }
 
-    const auto & name = entity_statuses[idx].first;
-    const auto & status = *entity_statuses[idx].second;
-    const auto boost_polygon = math::geometry::toPolygon2D(status.getMapPose(), status.getBoundingBox());
-    const auto & outer = boost_polygon.outer();
-    if (outer.size() < 3) {
+    const auto * status = entity_statuses[idx].second;
+    if (status == nullptr) {
       continue;
     }
 
-    bool intersects_trajectory = false;
-    if (!(canonicalized_entity_status && name == entity_name)) {
-      intersects_trajectory = intersectsTrajectory(trajectory_polygons, boost_polygon);
-      if (intersects_trajectory) {
-        std::cout << entity_name << " npc trajectoryとnpc " << name << "は交点を持っている" << std::endl;
-      }
+    auto polygon = math::geometry::toPolygon2D(status->getMapPose(), status->getBoundingBox());
+    if (polygon.outer().size() < 3) {
+      continue;
+    }
+
+    bool intersects = false;
+    if (!(canonicalized_entity_status && entity_statuses[idx].first == entity_name)) {
+      intersects = intersectsTrajectory(trajectory_polygons, polygon);
+    }
+
+    collisions.emplace_back(EntityCollisionInfo{
+      entity_statuses[idx].first, status, std::move(polygon), intersects});
+  }
+
+  return collisions;
+}
+
+// 軌道と交差する可能性のあるエンティティの枠と警告テキストを生成する。
+auto createEntityMarkers(
+  const std::string & ns, const rclcpp::Time & stamp,
+  const std::vector<EntityCollisionInfo> & collision_infos,
+  const std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus> & canonicalized_entity_status,
+  const std::string & entity_name) -> std::vector<visualization_msgs::msg::Marker>
+{
+  std::vector<visualization_msgs::msg::Marker> markers;
+  if (collision_infos.empty()) {
+    return markers;
+  }
+
+  const int32_t base_id = 10;
+  for (std::size_t idx = 0; idx < collision_infos.size(); ++idx) {
+    const auto & info = collision_infos[idx];
+    const auto & name = info.name;
+    if (info.status == nullptr) {
+      continue;
+    }
+    const auto & status = *info.status;
+    const auto & outer = info.polygon.outer();
+    if (outer.size() < 3) {
+      continue;
     }
 
     visualization_msgs::msg::Marker marker;
@@ -355,7 +370,7 @@ auto createEntityMarkers(
       markers.emplace_back(std::move(marker));
     }
 
-    if (intersects_trajectory) {
+    if (info.intersects_trajectory) {
       visualization_msgs::msg::Marker text_marker;
       text_marker.header.frame_id = kFrameId;
       text_marker.header.stamp = stamp;
@@ -428,13 +443,13 @@ auto publishImmediate(const std::vector<visualization_msgs::msg::Marker> & marke
 }  // namespace
 
 // スプラインに基づくデバッグ情報を生成し、RViz に表示する。
-auto logSplineDebugInfo(
+void logSplineDebugInfo(
   const std::string & action_name,
   const traffic_simulator_msgs::msg::WaypointsArray & waypoints,
   const std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus> &
     canonicalized_entity_status,
   const std::unordered_map<std::string, traffic_simulator::CanonicalizedEntityStatus> &
-    other_entity_status) -> std::vector<visualization_msgs::msg::Marker>
+    other_entity_status)
 {
   // 処理時間を測定するために開始時刻を記録する。
   const auto start = std::chrono::steady_clock::now();
@@ -450,29 +465,13 @@ auto logSplineDebugInfo(
     constexpr double kZOffset = 0.0;
     const auto quadrilateral_data = buildQuadrilateralData(debug_spline, kLaneWidth, kNumSegments, kZOffset);
 
-    std::cout << "[" << action_name << "] [" << entity_name << "] quadrilateral count="
-              << quadrilateral_data.quadrilaterals.size();
-    if (!quadrilateral_data.quadrilaterals.empty()) {
-      const auto & first_point = quadrilateral_data.quadrilaterals.front().front();
-      const auto & last_point = quadrilateral_data.quadrilaterals.back().back();
-      std::cout << " first=(" << first_point.x << ", " << first_point.y << ", " << first_point.z
-                << ")";
-      std::cout << " last=(" << last_point.x << ", " << last_point.y << ", " << last_point.z
-                << ")";
-      std::cout << " average_z=" << quadrilateral_data.average_z;
-    }
-    double trajectory_outer_perimeter = 0.0;
-    for (const auto & polygon : quadrilateral_data.polygons) {
-      trajectory_outer_perimeter += bg::perimeter(polygon.outer());
-    }
-    std::cout << " trajectory outer perimeter=" << trajectory_outer_perimeter << std::endl;
-
     auto spline_markers = createSplineMarkers(ns, stamp, quadrilateral_data);
     markers.insert(markers.end(), spline_markers.begin(), spline_markers.end());
 
+    const auto collision_infos = detectEntityCollisions(
+      quadrilateral_data.polygons, canonicalized_entity_status, other_entity_status, entity_name);
     auto entity_markers = createEntityMarkers(
-      ns, stamp, quadrilateral_data.polygons, canonicalized_entity_status, other_entity_status,
-      entity_name);
+      ns, stamp, collision_infos, canonicalized_entity_status, entity_name);
     markers.insert(markers.end(), entity_markers.begin(), entity_markers.end());
 
   } catch (const std::exception & e) {
@@ -484,15 +483,8 @@ auto logSplineDebugInfo(
   // RViz publish を除いた処理時間をデバッグとして出力する。
   std::cout << "[" << action_name << "] spline debug processing time: " << elapsed_ms.count()
             << " ms" << std::endl;
-  const auto delete_all_marker = makeDeleteAllMarker(stamp);
-  publishImmediate(std::vector<visualization_msgs::msg::Marker>{delete_all_marker});
   if (!markers.empty()) {
     publishImmediate(markers);
   }
-  std::vector<visualization_msgs::msg::Marker> returned_markers;
-  returned_markers.reserve(markers.size() + 1);
-  returned_markers.emplace_back(delete_all_marker);
-  returned_markers.insert(returned_markers.end(), markers.begin(), markers.end());
-  return returned_markers;
 }
 }  // namespace entity_behavior::vehicle::follow_lane_sequence

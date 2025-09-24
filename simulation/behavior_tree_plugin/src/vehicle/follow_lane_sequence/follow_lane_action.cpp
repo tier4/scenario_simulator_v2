@@ -90,9 +90,7 @@ BT::NodeStatus FollowLaneAction::doAction()
   }
   const auto waypoints = calculateWaypoints();
 
-  const auto debug_markers =
-    logSplineDebugInfo("FollowLaneAction", waypoints, canonicalized_entity_status_, other_entity_status_);
-  setOutput("debug_marker", debug_markers);
+  logSplineDebugInfo("FollowLaneAction", waypoints, canonicalized_entity_status_, other_entity_status_);
 
   if (waypoints.waypoints.empty()) {
     return BT::NodeStatus::FAILURE;
