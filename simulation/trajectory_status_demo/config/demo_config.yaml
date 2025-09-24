@@ -1,44 +1,48 @@
 trajectory_status_demo_node:
   ros__parameters:
     # Simulation parameters
-    step_time: 0.1
-    matching_distance: 1.0
-    target_speed: 15.0
+    matching_distance: 2.2425000000000001599e+00
+#    target_speed: 0.0
+
+    # Time configuration
+    time:
+      initial_time: 5.3166666666665598484e+01
+      timer_interval_ms: 33  # ~30 FPS (1000/30)
 
     # Entity configuration
     entity:
-      name: "demo_vehicle"
+      name: "ego"
       type: 1  # VEHICLE (EntityType::VEHICLE)
       subtype: 0  # CAR (EntitySubtype::CAR)
 
       # Initial pose
       pose:
         position:
-          x: 0.0
-          y: 0.0
-          z: 0.0
+          x: 1.6035437913421460507e+03
+          y: 4.4703852694643956056e+02
+          z: 1.0000000000000000000e+02
         orientation:
-          x: 0.0
-          y: 0.0
-          z: 0.0
-          w: 1.0
+          x:  0.0000000000000000000e+00
+          y: -0.0000000000000000000e+00
+          z:  9.9998399642613033933e-01
+          w:  5.6574633560355159015e-03
 
       # Bounding box
       bounding_box:
         center:
-          x: 0.0
-          y: 0.0
-          z: 0.0
+          x: 1.35
+          y: 0.00
+          z: 1.25
         dimensions:
-          x: 4.5  # length
-          y: 2.0  # width
-          z: 1.5  # height
+          x: 4.4  # length
+          y: 1.695  # width
+          z: 2.5  # height
 
       # Initial action status (velocity and acceleration)
       action_status:
         twist:
           linear:
-            x: 10.0  # forward speed m/s
+            x: 1.6821565207624418203e+00  # forward speed m/s
             y: 0.0
             z: 0.0
           angular:
@@ -47,7 +51,7 @@ trajectory_status_demo_node:
             z: 0.0
         accel:
           linear:
-            x: 0.0
+            x: -2.2967905111703434962e+00
             y: 0.0
             z: 0.0
           angular:
@@ -69,11 +73,11 @@ trajectory_status_demo_node:
     # Behavior parameters
     behavior:
       dynamic_constraints:
-        max_speed: 30.0  # m/s
-        max_acceleration: 3.0  # m/s^2
-        max_acceleration_rate: 5.0  # m/s^3
-        max_deceleration: 5.0  # m/s^2
-        max_deceleration_rate: 8.0  # m/s^3
+        max_speed: 5.0000000000000000000e+01
+        max_acceleration: 1.0000000000000000000e+01
+        max_acceleration_rate: 3.0000000000000000000e+00
+        max_deceleration: 1.0000000000000000000e+01
+        max_deceleration_rate: 3.0000000000000000000e+00
 
       lane_change_distance: 20.0
       stop_margin: 3.0
@@ -82,9 +86,9 @@ trajectory_status_demo_node:
 
     # Trajectory configuration
     trajectory:
-      initial_distance_offset: 0.0
+      initial_distance_offset: 1.0
       dynamic_constraints_ignorable: true
       closed: false
-      waypoint_x: 100.0
-      waypoint_y: 0.0
-      waypoint_z: 0.0
+      waypoint_x: 1.6027313508500953958e+03
+      waypoint_y: 4.4704772009243697539e+02
+      waypoint_z: 1.0000000000000000000e+02

@@ -15,6 +15,8 @@
 #include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
 #include <traffic_simulator/behavior/follow_trajectory.hpp>
 #include <traffic_simulator/data_type/entity_status.hpp>
+#include <geometry/quaternion/direction_to_quaternion.hpp>
+#include <traffic_simulator/utils/lanelet_map.hpp>
 
 class TrajectoryStatusDemoNode : public rclcpp::Node
 {
@@ -25,46 +27,57 @@ public:
 
         declareParameters();
 
-        // Timer to run the demo periodically
+        // Get time configuration and setup timer
+        auto timer_interval_ms = this->get_parameter("time.timer_interval_ms").as_int();
         timer_ = this->create_wall_timer(
-            std::chrono::milliseconds(1000),
+            std::chrono::milliseconds(timer_interval_ms),
             std::bind(&TrajectoryStatusDemoNode::runDemo, this)
         );
 
-        simulation_time_ = 0.0;
+        simulation_time_ = this->get_parameter("time.initial_time").as_double();
+        traffic_simulator::lanelet_map::activate("/home/pzyskowski/projects/tier/deliverable/2025_Q3/WP6-ss2-regular/rjd-1921/scenario/map/lanelet2_map.osm");
     }
 
 private:
+
+    traffic_simulator_msgs::msg::EntityStatus status_;
+    traffic_simulator_msgs::msg::PolylineTrajectory polyline_trajectory_;
+    bool once = true;
+
     void runDemo()
     {
         try {
-            // Get simulation parameters
-            auto step_time = this->get_parameter("step_time").as_double();
-            auto matching_distance = this->get_parameter("matching_distance").as_double();
-            auto target_speed = this->get_parameter("target_speed").as_double();
+          // Get simulation parameters
+          auto step_time = 1.0/30.0;
+          auto matching_distance = this->get_parameter("matching_distance").as_double();
+          auto target_speed = this->get_parameter("target_speed").as_double();
 
+          if (once) {
             // Create EntityStatus from configuration
-            auto entity_status = createEntityStatusFromConfig();
+            status_ = createEntityStatusFromConfig();
 
             // Create PolylineTrajectory from configuration
-            auto polyline_trajectory = createPolylineTrajectoryFromConfig();
+            polyline_trajectory_ = createPolylineTrajectoryFromConfig();
+            once = false;
+          }
 
             // Create BehaviorParameter from configuration
             auto behavior_parameter = createBehaviorParameterFromConfig();
 
+
             RCLCPP_INFO(this->get_logger(),
                 "Calling makeUpdatedStatus with position: [%.2f, %.2f, %.2f], speed: %.2f m/s",
-                entity_status.pose.position.x, entity_status.pose.position.y, entity_status.pose.position.z,
-                entity_status.action_status.twist.linear.x);
+                status_.pose.position.x, status_.pose.position.y, status_.pose.position.z,
+                status_.action_status.twist.linear.x);
 
             // Call the makeUpdatedStatus API
             auto updated_status = traffic_simulator::follow_trajectory::makeUpdatedStatus(
-                entity_status,
-                polyline_trajectory,
+                status_,
+                polyline_trajectory_,
                 behavior_parameter,
                 step_time,
                 matching_distance,
-                target_speed
+                status_.action_status.twist.linear.x
             );
 
             if (updated_status.has_value()) {
@@ -77,13 +90,15 @@ private:
                     updated_status->time);
 
                 // Update simulation time for next iteration
+                status_ = *updated_status;
                 simulation_time_ = updated_status->time;
 
                 // Update entity position parameters for next iteration
-                updateEntityParameters(*updated_status);
+//                updateEntityParameters(*updated_status);
 
             } else {
                 RCLCPP_WARN(this->get_logger(), "makeUpdatedStatus returned no value");
+                rclcpp::shutdown();
             }
 
         } catch (const std::exception& e) {
@@ -94,9 +109,12 @@ private:
     void declareParameters()
     {
         // Simulation parameters
-        this->declare_parameter<double>("step_time", 0.1);
         this->declare_parameter<double>("matching_distance", 1.0);
         this->declare_parameter<double>("target_speed", 15.0);
+
+        // Time configuration
+        this->declare_parameter<double>("time.initial_time", 0.0);
+        this->declare_parameter<int>("time.timer_interval_ms", 33);
 
         // Entity parameters
         this->declare_parameter<std::string>("entity.name", "demo_vehicle");
@@ -162,6 +180,7 @@ private:
         this->declare_parameter<double>("trajectory.waypoint_x", 100.0);
         this->declare_parameter<double>("trajectory.waypoint_y", 0.0);
         this->declare_parameter<double>("trajectory.waypoint_z", 0.0);
+        this->declare_parameter<double>("trajectory.base_time", 0.0);
     }
 
     traffic_simulator_msgs::msg::EntityStatus createEntityStatusFromConfig()
