@@ -1,19 +1,90 @@
 trajectory_status_demo_node:
   ros__parameters:
-    # Initial vehicle position
-    initial_x: 0.0
-    initial_y: 0.0
-    initial_z: 0.0
-
-    # Initial speed (m/s)
-    initial_speed: 10.0
-
     # Simulation parameters
     step_time: 0.1
     matching_distance: 1.0
     target_speed: 15.0
 
-    # Target waypoint
-    waypoint_x: 100.0
-    waypoint_y: 0.0
-    waypoint_z: 0.0
+    # Entity configuration
+    entity:
+      name: "demo_vehicle"
+      type: 1  # VEHICLE (EntityType::VEHICLE)
+      subtype: 0  # CAR (EntitySubtype::CAR)
+
+      # Initial pose
+      pose:
+        position:
+          x: 0.0
+          y: 0.0
+          z: 0.0
+        orientation:
+          x: 0.0
+          y: 0.0
+          z: 0.0
+          w: 1.0
+
+      # Bounding box
+      bounding_box:
+        center:
+          x: 0.0
+          y: 0.0
+          z: 0.0
+        dimensions:
+          x: 4.5  # length
+          y: 2.0  # width
+          z: 1.5  # height
+
+      # Initial action status (velocity and acceleration)
+      action_status:
+        twist:
+          linear:
+            x: 10.0  # forward speed m/s
+            y: 0.0
+            z: 0.0
+          angular:
+            x: 0.0
+            y: 0.0
+            z: 0.0
+        accel:
+          linear:
+            x: 0.0
+            y: 0.0
+            z: 0.0
+          angular:
+            x: 0.0
+            y: 0.0
+            z: 0.0
+
+      # Lanelet pose configuration
+      lanelet_pose_valid: false
+      lanelet_pose:
+        lanelet_id: 0
+        s: 0.0
+        offset: 0.0
+        rpy:
+          x: 0.0
+          y: 0.0
+          z: 0.0
+
+    # Behavior parameters
+    behavior:
+      dynamic_constraints:
+        max_speed: 30.0  # m/s
+        max_acceleration: 3.0  # m/s^2
+        max_acceleration_rate: 5.0  # m/s^3
+        max_deceleration: 5.0  # m/s^2
+        max_deceleration_rate: 8.0  # m/s^3
+
+      lane_change_distance: 20.0
+      stop_margin: 3.0
+      follow_distance: 20.0
+      see_around: true
+
+    # Trajectory configuration
+    trajectory:
+      initial_distance_offset: 0.0
+      dynamic_constraints_ignorable: true
+      closed: false
+      waypoint_x: 100.0
+      waypoint_y: 0.0
+      waypoint_z: 0.0

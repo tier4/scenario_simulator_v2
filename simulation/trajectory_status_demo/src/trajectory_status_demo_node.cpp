@@ -23,17 +23,7 @@ public:
     {
         RCLCPP_INFO(this->get_logger(), "TrajectoryStatusDemo node starting...");
 
-        // Parameters for initial conditions
-        this->declare_parameter<double>("initial_x", 0.0);
-        this->declare_parameter<double>("initial_y", 0.0);
-        this->declare_parameter<double>("initial_z", 0.0);
-        this->declare_parameter<double>("initial_speed", 10.0);
-        this->declare_parameter<double>("step_time", 0.1);
-        this->declare_parameter<double>("matching_distance", 1.0);
-        this->declare_parameter<double>("target_speed", 15.0);
-        this->declare_parameter<double>("waypoint_x", 100.0);
-        this->declare_parameter<double>("waypoint_y", 0.0);
-        this->declare_parameter<double>("waypoint_z", 0.0);
+        declareParameters();
 
         // Timer to run the demo periodically
         timer_ = this->create_wall_timer(
@@ -48,34 +38,24 @@ private:
     void runDemo()
     {
         try {
-            // Get parameters
-            auto initial_x = this->get_parameter("initial_x").as_double();
-            auto initial_y = this->get_parameter("initial_y").as_double();
-            auto initial_z = this->get_parameter("initial_z").as_double();
-            auto initial_speed = this->get_parameter("initial_speed").as_double();
+            // Get simulation parameters
             auto step_time = this->get_parameter("step_time").as_double();
             auto matching_distance = this->get_parameter("matching_distance").as_double();
             auto target_speed = this->get_parameter("target_speed").as_double();
-            auto waypoint_x = this->get_parameter("waypoint_x").as_double();
-            auto waypoint_y = this->get_parameter("waypoint_y").as_double();
-            auto waypoint_z = this->get_parameter("waypoint_z").as_double();
 
-            // Create EntityStatus with initial conditions
-            auto entity_status = createEntityStatus(
-                initial_x, initial_y, initial_z, initial_speed, simulation_time_
-            );
+            // Create EntityStatus from configuration
+            auto entity_status = createEntityStatusFromConfig();
 
-            // Create PolylineTrajectory with waypoint
-            auto polyline_trajectory = createPolylineTrajectory(
-                waypoint_x, waypoint_y, waypoint_z
-            );
+            // Create PolylineTrajectory from configuration
+            auto polyline_trajectory = createPolylineTrajectoryFromConfig();
 
-            // Create BehaviorParameter
-            auto behavior_parameter = createBehaviorParameter();
+            // Create BehaviorParameter from configuration
+            auto behavior_parameter = createBehaviorParameterFromConfig();
 
             RCLCPP_INFO(this->get_logger(),
-                "Calling makeUpdatedStatus with initial position: [%.2f, %.2f, %.2f], speed: %.2f m/s",
-                initial_x, initial_y, initial_z, initial_speed);
+                "Calling makeUpdatedStatus with position: [%.2f, %.2f, %.2f], speed: %.2f m/s",
+                entity_status.pose.position.x, entity_status.pose.position.y, entity_status.pose.position.z,
+                entity_status.action_status.twist.linear.x);
 
             // Call the makeUpdatedStatus API
             auto updated_status = traffic_simulator::follow_trajectory::makeUpdatedStatus(
@@ -99,11 +79,8 @@ private:
                 // Update simulation time for next iteration
                 simulation_time_ = updated_status->time;
 
-                // Update parameters with new position for next iteration
-                this->set_parameter(rclcpp::Parameter("initial_x", updated_status->pose.position.x));
-                this->set_parameter(rclcpp::Parameter("initial_y", updated_status->pose.position.y));
-                this->set_parameter(rclcpp::Parameter("initial_z", updated_status->pose.position.z));
-                this->set_parameter(rclcpp::Parameter("initial_speed", updated_status->action_status.twist.linear.x));
+                // Update entity position parameters for next iteration
+                updateEntityParameters(*updated_status);
 
             } else {
                 RCLCPP_WARN(this->get_logger(), "makeUpdatedStatus returned no value");
@@ -114,73 +91,150 @@ private:
         }
     }
 
-    traffic_simulator_msgs::msg::EntityStatus createEntityStatus(
-        double x, double y, double z, double speed, double time)
+    void declareParameters()
+    {
+        // Simulation parameters
+        this->declare_parameter<double>("step_time", 0.1);
+        this->declare_parameter<double>("matching_distance", 1.0);
+        this->declare_parameter<double>("target_speed", 15.0);
+
+        // Entity parameters
+        this->declare_parameter<std::string>("entity.name", "demo_vehicle");
+        this->declare_parameter<int>("entity.type", 1);
+        this->declare_parameter<int>("entity.subtype", 0);
+
+        // Entity pose
+        this->declare_parameter<double>("entity.pose.position.x", 0.0);
+        this->declare_parameter<double>("entity.pose.position.y", 0.0);
+        this->declare_parameter<double>("entity.pose.position.z", 0.0);
+        this->declare_parameter<double>("entity.pose.orientation.x", 0.0);
+        this->declare_parameter<double>("entity.pose.orientation.y", 0.0);
+        this->declare_parameter<double>("entity.pose.orientation.z", 0.0);
+        this->declare_parameter<double>("entity.pose.orientation.w", 1.0);
+
+        // Entity bounding box
+        this->declare_parameter<double>("entity.bounding_box.center.x", 0.0);
+        this->declare_parameter<double>("entity.bounding_box.center.y", 0.0);
+        this->declare_parameter<double>("entity.bounding_box.center.z", 0.0);
+        this->declare_parameter<double>("entity.bounding_box.dimensions.x", 4.5);
+        this->declare_parameter<double>("entity.bounding_box.dimensions.y", 2.0);
+        this->declare_parameter<double>("entity.bounding_box.dimensions.z", 1.5);
+
+        // Entity action status
+        this->declare_parameter<double>("entity.action_status.twist.linear.x", 10.0);
+        this->declare_parameter<double>("entity.action_status.twist.linear.y", 0.0);
+        this->declare_parameter<double>("entity.action_status.twist.linear.z", 0.0);
+        this->declare_parameter<double>("entity.action_status.twist.angular.x", 0.0);
+        this->declare_parameter<double>("entity.action_status.twist.angular.y", 0.0);
+        this->declare_parameter<double>("entity.action_status.twist.angular.z", 0.0);
+        this->declare_parameter<double>("entity.action_status.accel.linear.x", 0.0);
+        this->declare_parameter<double>("entity.action_status.accel.linear.y", 0.0);
+        this->declare_parameter<double>("entity.action_status.accel.linear.z", 0.0);
+        this->declare_parameter<double>("entity.action_status.accel.angular.x", 0.0);
+        this->declare_parameter<double>("entity.action_status.accel.angular.y", 0.0);
+        this->declare_parameter<double>("entity.action_status.accel.angular.z", 0.0);
+
+        // Entity lanelet pose
+        this->declare_parameter<bool>("entity.lanelet_pose_valid", false);
+        this->declare_parameter<int>("entity.lanelet_pose.lanelet_id", 0);
+        this->declare_parameter<double>("entity.lanelet_pose.s", 0.0);
+        this->declare_parameter<double>("entity.lanelet_pose.offset", 0.0);
+        this->declare_parameter<double>("entity.lanelet_pose.rpy.x", 0.0);
+        this->declare_parameter<double>("entity.lanelet_pose.rpy.y", 0.0);
+        this->declare_parameter<double>("entity.lanelet_pose.rpy.z", 0.0);
+
+        // Behavior parameters
+        this->declare_parameter<double>("behavior.dynamic_constraints.max_speed", 30.0);
+        this->declare_parameter<double>("behavior.dynamic_constraints.max_acceleration", 3.0);
+        this->declare_parameter<double>("behavior.dynamic_constraints.max_acceleration_rate", 5.0);
+        this->declare_parameter<double>("behavior.dynamic_constraints.max_deceleration", 5.0);
+        this->declare_parameter<double>("behavior.dynamic_constraints.max_deceleration_rate", 8.0);
+        this->declare_parameter<double>("behavior.lane_change_distance", 20.0);
+        this->declare_parameter<double>("behavior.stop_margin", 3.0);
+        this->declare_parameter<double>("behavior.follow_distance", 20.0);
+        this->declare_parameter<bool>("behavior.see_around", true);
+
+        // Trajectory parameters
+        this->declare_parameter<double>("trajectory.initial_distance_offset", 0.0);
+        this->declare_parameter<bool>("trajectory.dynamic_constraints_ignorable", true);
+        this->declare_parameter<bool>("trajectory.closed", false);
+        // Single waypoint parameters
+        this->declare_parameter<double>("trajectory.waypoint_x", 100.0);
+        this->declare_parameter<double>("trajectory.waypoint_y", 0.0);
+        this->declare_parameter<double>("trajectory.waypoint_z", 0.0);
+    }
+
+    traffic_simulator_msgs::msg::EntityStatus createEntityStatusFromConfig()
     {
         traffic_simulator_msgs::msg::EntityStatus entity_status;
 
-        // Set entity type
-        entity_status.type.type = traffic_simulator_msgs::msg::EntityType::VEHICLE;
-        entity_status.subtype.value = traffic_simulator_msgs::msg::EntitySubtype::CAR;
+        // Set entity type and name
+        entity_status.name = this->get_parameter("entity.name").as_string();
+        entity_status.type.type = this->get_parameter("entity.type").as_int();
+        entity_status.subtype.value = this->get_parameter("entity.subtype").as_int();
 
-        // Set time and name
-        entity_status.time = time;
-        entity_status.name = "demo_vehicle";
+        // Set time
+        entity_status.time = simulation_time_;
 
         // Set pose
-        entity_status.pose.position.x = x;
-        entity_status.pose.position.y = y;
-        entity_status.pose.position.z = z;
-        entity_status.pose.orientation.w = 1.0; // Identity quaternion
-        entity_status.pose.orientation.x = 0.0;
-        entity_status.pose.orientation.y = 0.0;
-        entity_status.pose.orientation.z = 0.0;
+        entity_status.pose.position.x = this->get_parameter("entity.pose.position.x").as_double();
+        entity_status.pose.position.y = this->get_parameter("entity.pose.position.y").as_double();
+        entity_status.pose.position.z = this->get_parameter("entity.pose.position.z").as_double();
+        entity_status.pose.orientation.x = this->get_parameter("entity.pose.orientation.x").as_double();
+        entity_status.pose.orientation.y = this->get_parameter("entity.pose.orientation.y").as_double();
+        entity_status.pose.orientation.z = this->get_parameter("entity.pose.orientation.z").as_double();
+        entity_status.pose.orientation.w = this->get_parameter("entity.pose.orientation.w").as_double();
 
         // Set bounding box
-        entity_status.bounding_box.center.x = 0.0;
-        entity_status.bounding_box.center.y = 0.0;
-        entity_status.bounding_box.center.z = 0.0;
-        entity_status.bounding_box.dimensions.x = 4.5; // length
-        entity_status.bounding_box.dimensions.y = 2.0; // width
-        entity_status.bounding_box.dimensions.z = 1.5; // height
+        entity_status.bounding_box.center.x = this->get_parameter("entity.bounding_box.center.x").as_double();
+        entity_status.bounding_box.center.y = this->get_parameter("entity.bounding_box.center.y").as_double();
+        entity_status.bounding_box.center.z = this->get_parameter("entity.bounding_box.center.z").as_double();
+        entity_status.bounding_box.dimensions.x = this->get_parameter("entity.bounding_box.dimensions.x").as_double();
+        entity_status.bounding_box.dimensions.y = this->get_parameter("entity.bounding_box.dimensions.y").as_double();
+        entity_status.bounding_box.dimensions.z = this->get_parameter("entity.bounding_box.dimensions.z").as_double();
 
         // Set action status (velocity and acceleration)
-        entity_status.action_status.twist.linear.x = speed;
-        entity_status.action_status.twist.linear.y = 0.0;
-        entity_status.action_status.twist.linear.z = 0.0;
-        entity_status.action_status.twist.angular.x = 0.0;
-        entity_status.action_status.twist.angular.y = 0.0;
-        entity_status.action_status.twist.angular.z = 0.0;
+        entity_status.action_status.twist.linear.x = this->get_parameter("entity.action_status.twist.linear.x").as_double();
+        entity_status.action_status.twist.linear.y = this->get_parameter("entity.action_status.twist.linear.y").as_double();
+        entity_status.action_status.twist.linear.z = this->get_parameter("entity.action_status.twist.linear.z").as_double();
+        entity_status.action_status.twist.angular.x = this->get_parameter("entity.action_status.twist.angular.x").as_double();
+        entity_status.action_status.twist.angular.y = this->get_parameter("entity.action_status.twist.angular.y").as_double();
+        entity_status.action_status.twist.angular.z = this->get_parameter("entity.action_status.twist.angular.z").as_double();
 
-        entity_status.action_status.accel.linear.x = 0.0;
-        entity_status.action_status.accel.linear.y = 0.0;
-        entity_status.action_status.accel.linear.z = 0.0;
-        entity_status.action_status.accel.angular.x = 0.0;
-        entity_status.action_status.accel.angular.y = 0.0;
-        entity_status.action_status.accel.angular.z = 0.0;
+        entity_status.action_status.accel.linear.x = this->get_parameter("entity.action_status.accel.linear.x").as_double();
+        entity_status.action_status.accel.linear.y = this->get_parameter("entity.action_status.accel.linear.y").as_double();
+        entity_status.action_status.accel.linear.z = this->get_parameter("entity.action_status.accel.linear.z").as_double();
+        entity_status.action_status.accel.angular.x = this->get_parameter("entity.action_status.accel.angular.x").as_double();
+        entity_status.action_status.accel.angular.y = this->get_parameter("entity.action_status.accel.angular.y").as_double();
+        entity_status.action_status.accel.angular.z = this->get_parameter("entity.action_status.accel.angular.z").as_double();
 
-        // Set lanelet pose as invalid for this demo
-        entity_status.lanelet_pose_valid = false;
+        // Set lanelet pose
+        entity_status.lanelet_pose_valid = this->get_parameter("entity.lanelet_pose_valid").as_bool();
+        entity_status.lanelet_pose.lanelet_id = this->get_parameter("entity.lanelet_pose.lanelet_id").as_int();
+        entity_status.lanelet_pose.s = this->get_parameter("entity.lanelet_pose.s").as_double();
+        entity_status.lanelet_pose.offset = this->get_parameter("entity.lanelet_pose.offset").as_double();
+        entity_status.lanelet_pose.rpy.x = this->get_parameter("entity.lanelet_pose.rpy.x").as_double();
+        entity_status.lanelet_pose.rpy.y = this->get_parameter("entity.lanelet_pose.rpy.y").as_double();
+        entity_status.lanelet_pose.rpy.z = this->get_parameter("entity.lanelet_pose.rpy.z").as_double();
 
         return entity_status;
     }
 
-    traffic_simulator_msgs::msg::PolylineTrajectory createPolylineTrajectory(
-        double waypoint_x, double waypoint_y, double waypoint_z)
+    traffic_simulator_msgs::msg::PolylineTrajectory createPolylineTrajectoryFromConfig()
     {
         traffic_simulator_msgs::msg::PolylineTrajectory trajectory;
 
-        // Set trajectory parameters
-        trajectory.initial_distance_offset = 0.0;
-        trajectory.dynamic_constraints_ignorable = true; // Use position following mode
+        // Set trajectory parameters from config
+        trajectory.initial_distance_offset = this->get_parameter("trajectory.initial_distance_offset").as_double();
+        trajectory.dynamic_constraints_ignorable = this->get_parameter("trajectory.dynamic_constraints_ignorable").as_bool();
         trajectory.base_time = std::numeric_limits<double>::quiet_NaN(); // Absolute timing
-        trajectory.closed = false;
+        trajectory.closed = this->get_parameter("trajectory.closed").as_bool();
 
-        // Create a single waypoint
+        // Create waypoints from config
         traffic_simulator_msgs::msg::Vertex waypoint;
-        waypoint.position.position.x = waypoint_x;
-        waypoint.position.position.y = waypoint_y;
-        waypoint.position.position.z = waypoint_z;
+        waypoint.position.position.x = this->get_parameter("trajectory.waypoint_x").as_double();
+        waypoint.position.position.y = this->get_parameter("trajectory.waypoint_y").as_double();
+        waypoint.position.position.z = this->get_parameter("trajectory.waypoint_z").as_double();
         waypoint.time = std::numeric_limits<double>::quiet_NaN(); // No specific arrival time
 
         trajectory.shape.vertices.push_back(waypoint);
@@ -188,24 +242,42 @@ private:
         return trajectory;
     }
 
-    traffic_simulator_msgs::msg::BehaviorParameter createBehaviorParameter()
+    traffic_simulator_msgs::msg::BehaviorParameter createBehaviorParameterFromConfig()
     {
         traffic_simulator_msgs::msg::BehaviorParameter behavior_param;
 
-        // Set dynamic constraints
-        behavior_param.dynamic_constraints.max_speed = 30.0; // m/s
-        behavior_param.dynamic_constraints.max_acceleration = 3.0; // m/s^2
-        behavior_param.dynamic_constraints.max_acceleration_rate = 5.0; // m/s^3
-        behavior_param.dynamic_constraints.max_deceleration = 5.0; // m/s^2
-        behavior_param.dynamic_constraints.max_deceleration_rate = 8.0; // m/s^3
+        // Set dynamic constraints from config
+        behavior_param.dynamic_constraints.max_speed = this->get_parameter("behavior.dynamic_constraints.max_speed").as_double();
+        behavior_param.dynamic_constraints.max_acceleration = this->get_parameter("behavior.dynamic_constraints.max_acceleration").as_double();
+        behavior_param.dynamic_constraints.max_acceleration_rate = this->get_parameter("behavior.dynamic_constraints.max_acceleration_rate").as_double();
+        behavior_param.dynamic_constraints.max_deceleration = this->get_parameter("behavior.dynamic_constraints.max_deceleration").as_double();
+        behavior_param.dynamic_constraints.max_deceleration_rate = this->get_parameter("behavior.dynamic_constraints.max_deceleration_rate").as_double();
 
-        // Set other behavior parameters
-        behavior_param.lane_change_distance = 20.0;
-        behavior_param.stop_margin = 3.0;
-        behavior_param.follow_distance = 20.0;
-        behavior_param.see_around = true;
+        // Set other behavior parameters from config
+        behavior_param.lane_change_distance = this->get_parameter("behavior.lane_change_distance").as_double();
+        behavior_param.stop_margin = this->get_parameter("behavior.stop_margin").as_double();
+        behavior_param.follow_distance = this->get_parameter("behavior.follow_distance").as_double();
+        behavior_param.see_around = this->get_parameter("behavior.see_around").as_bool();
 
         return behavior_param;
+    }
+
+    void updateEntityParameters(const traffic_simulator::EntityStatus& updated_status)
+    {
+        // Update entity position parameters for next iteration
+        this->set_parameter(rclcpp::Parameter("entity.pose.position.x", updated_status.pose.position.x));
+        this->set_parameter(rclcpp::Parameter("entity.pose.position.y", updated_status.pose.position.y));
+        this->set_parameter(rclcpp::Parameter("entity.pose.position.z", updated_status.pose.position.z));
+        this->set_parameter(rclcpp::Parameter("entity.pose.orientation.x", updated_status.pose.orientation.x));
+        this->set_parameter(rclcpp::Parameter("entity.pose.orientation.y", updated_status.pose.orientation.y));
+        this->set_parameter(rclcpp::Parameter("entity.pose.orientation.z", updated_status.pose.orientation.z));
+        this->set_parameter(rclcpp::Parameter("entity.pose.orientation.w", updated_status.pose.orientation.w));
+        this->set_parameter(rclcpp::Parameter("entity.action_status.twist.linear.x", updated_status.action_status.twist.linear.x));
+        this->set_parameter(rclcpp::Parameter("entity.action_status.twist.linear.y", updated_status.action_status.twist.linear.y));
+        this->set_parameter(rclcpp::Parameter("entity.action_status.twist.linear.z", updated_status.action_status.twist.linear.z));
+        this->set_parameter(rclcpp::Parameter("entity.action_status.twist.angular.x", updated_status.action_status.twist.angular.x));
+        this->set_parameter(rclcpp::Parameter("entity.action_status.twist.angular.y", updated_status.action_status.twist.angular.y));
+        this->set_parameter(rclcpp::Parameter("entity.action_status.twist.angular.z", updated_status.action_status.twist.angular.z));
     }
 
     rclcpp::TimerBase::SharedPtr timer_;
