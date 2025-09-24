@@ -18,6 +18,7 @@
 #include <geometry/spline/catmull_rom_spline.hpp>
 
 #include <boost/geometry.hpp>
+#include <boost/geometry/algorithms/intersects.hpp>
 
 #include <geometry_msgs/msg/point.hpp>
 
@@ -216,11 +217,12 @@ auto logSplineDebugInfo(
 
       std::vector<std::pair<std::string, const traffic_simulator::CanonicalizedEntityStatus *>>
         entity_statuses;
-      if (canonicalized_entity_status) {
-        entity_statuses.emplace_back(entity_name, canonicalized_entity_status.get());
-      }
+      const auto own_status_ptr = canonicalized_entity_status ? canonicalized_entity_status.get() : nullptr;
       for (const auto & [name, status] : other_entity_status) {
         entity_statuses.emplace_back(name, &status);
+      }
+      if (own_status_ptr != nullptr) {
+        entity_statuses.emplace_back(entity_name, own_status_ptr);
       }
       std::sort(
         entity_statuses.begin(), entity_statuses.end(),
@@ -234,6 +236,16 @@ auto logSplineDebugInfo(
         const auto & outer = boost_polygon.outer();
         if (outer.size() < 3) {
           return;
+        }
+
+        if (!(canonicalized_entity_status && name == entity_name)) {
+          for (const auto & trajectory_triangle : boost_polygons) {
+            if (bg::intersects(trajectory_triangle, boost_polygon)) {
+              std::cout << "[ intersects ]" << entity_name << " npc trajectoryとnpc " << name << "は交点を持っている"
+                        << std::endl;
+              break;
+            }
+          }
         }
 
         visualization_msgs::msg::Marker marker;
@@ -278,6 +290,9 @@ auto logSplineDebugInfo(
 
       const int32_t base_id = 10;
       for (std::size_t idx = 0; idx < entity_statuses.size(); ++idx) {
+        if (idx > 0 && entity_statuses[idx].first == entity_statuses[idx - 1].first) {
+          continue;
+        }
         make_box_marker(
           entity_statuses[idx].first, *entity_statuses[idx].second,
           base_id + static_cast<int32_t>(idx));
