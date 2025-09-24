@@ -94,8 +94,8 @@ BT::NodeStatus FollowFrontEntityAction::doAction()
     setOutput("debug_marker", std::vector<visualization_msgs::msg::Marker>{});
     return BT::NodeStatus::FAILURE;
   }
-  const auto debug_markers =
-    logSplineDebugInfo("FollowFrontEntityAction", waypoints, canonicalized_entity_status_);
+  const auto debug_markers = logSplineDebugInfo(
+    "FollowFrontEntityAction", waypoints, canonicalized_entity_status_, other_entity_status_);
   setOutput("debug_marker", debug_markers);
   if (trajectory == nullptr) {
     return BT::NodeStatus::FAILURE;

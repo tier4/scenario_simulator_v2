@@ -14,6 +14,7 @@
 
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/spline_debug_logger.hpp>
 
+#include <geometry/bounding_box.hpp>
 #include <geometry/spline/catmull_rom_spline.hpp>
 
 #include <boost/geometry.hpp>
@@ -24,9 +25,11 @@
 #include <rclcpp/duration.hpp>
 #include <std_msgs/msg/color_rgba.hpp>
 
+#include <algorithm>
 #include <exception>
 #include <iostream>
 #include <numeric>
+#include <unordered_map>
 
 namespace entity_behavior::vehicle::follow_lane_sequence
 {
@@ -120,7 +123,9 @@ auto logSplineDebugInfo(
   const std::string & action_name,
   const traffic_simulator_msgs::msg::WaypointsArray & waypoints,
   const std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus> &
-    canonicalized_entity_status) -> std::vector<visualization_msgs::msg::Marker>
+    canonicalized_entity_status,
+  const std::unordered_map<std::string, traffic_simulator::CanonicalizedEntityStatus> &
+    other_entity_status) -> std::vector<visualization_msgs::msg::Marker>
 {
   std::vector<visualization_msgs::msg::Marker> markers;
   const auto entity_name =
@@ -169,6 +174,76 @@ auto logSplineDebugInfo(
 
     markers.emplace_back(makeTriangleMarker(ns, 0, stamp, debug_polygon));
     markers.emplace_back(makeOutlineMarker(ns, 1, stamp, average_z, boost_polygons));
+
+    std::vector<std::pair<std::string, const traffic_simulator::CanonicalizedEntityStatus *>>
+      entity_statuses;
+    if (canonicalized_entity_status) {
+      entity_statuses.emplace_back(entity_name, canonicalized_entity_status.get());
+    }
+    for (const auto & [name, status] : other_entity_status) {
+      if (name == entity_name) {
+        continue;
+      }
+      entity_statuses.emplace_back(name, &status);
+    }
+    std::sort(entity_statuses.begin(), entity_statuses.end(), [](const auto & lhs, const auto & rhs) {
+      return lhs.first < rhs.first;
+    });
+
+    const auto make_box_marker = [&](const std::string & name,
+                                     const traffic_simulator::CanonicalizedEntityStatus & status,
+                                     const int32_t marker_id) {
+      const auto boost_polygon = math::geometry::toPolygon2D(status.getMapPose(), status.getBoundingBox());
+      const auto & outer = boost_polygon.outer();
+      if (outer.size() < 3) {
+        return;
+      }
+
+      visualization_msgs::msg::Marker marker;
+      marker.header.frame_id = kFrameId;
+      marker.header.stamp = stamp;
+      marker.ns = ns + ":entity";
+      marker.id = marker_id;
+      marker.type = visualization_msgs::msg::Marker::LINE_STRIP;
+      marker.action = visualization_msgs::msg::Marker::ADD;
+      marker.scale.x = kOutlineWidth;
+
+      std_msgs::msg::ColorRGBA color;
+      color.a = 1.0F;
+      if (name == entity_name) {
+        color.r = 0.0F;
+        color.g = 1.0F;
+        color.b = 0.0F;
+      } else if (name == "ego" || name == "Ego") {
+        color.r = 1.0F;
+        color.g = 0.2F;
+        color.b = 0.2F;
+      } else {
+        color.r = 1.0F;
+        color.g = 1.0F;
+        color.b = 0.0F;
+      }
+      marker.color = color;
+
+      const double base_z = status.getMapPose().position.z + status.getBoundingBox().center.z;
+      for (const auto & point : outer) {
+        geometry_msgs::msg::Point geometry_point;
+        geometry_point.x = point.x();
+        geometry_point.y = point.y();
+        geometry_point.z = base_z;
+        marker.points.push_back(geometry_point);
+      }
+      if (!marker.points.empty()) {
+        marker.points.push_back(marker.points.front());
+        markers.emplace_back(std::move(marker));
+      }
+    };
+
+    const int32_t base_id = 10;
+    for (std::size_t idx = 0; idx < entity_statuses.size(); ++idx) {
+      make_box_marker(
+        entity_statuses[idx].first, *entity_statuses[idx].second, base_id + static_cast<int32_t>(idx));
+    }
   } catch (const std::exception & e) {
     std::cout << "[" << action_name << "] spline debug error: " << e.what() << std::endl;
   }
