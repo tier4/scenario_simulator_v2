@@ -14,6 +14,7 @@
 
 #include <behavior_tree_plugin/vehicle/behavior_tree.hpp>
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/follow_lane_action.hpp>
+#include <behavior_tree_plugin/vehicle/follow_lane_sequence/spline_debug_logger.hpp>
 #include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
@@ -87,9 +88,13 @@ BT::NodeStatus FollowLaneAction::doAction()
     return BT::NodeStatus::RUNNING;
   }
   const auto waypoints = calculateWaypoints();
+
+  logSplineDebugInfo("FollowLaneAction", waypoints, canonicalized_entity_status_);
+
   if (waypoints.waypoints.empty()) {
     return BT::NodeStatus::FAILURE;
   }
+
   if (behavior_parameter_.see_around) {
     if (getRightOfWayEntities(route_lanelets_).size() != 0) {
       return BT::NodeStatus::FAILURE;

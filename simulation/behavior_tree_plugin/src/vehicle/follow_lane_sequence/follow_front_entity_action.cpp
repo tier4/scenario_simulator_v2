@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <behavior_tree_plugin/vehicle/behavior_tree.hpp>
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/follow_front_entity_action.hpp>
+#include <behavior_tree_plugin/vehicle/follow_lane_sequence/spline_debug_logger.hpp>
 #include <cmath>
 #include <optional>
 #include <scenario_simulator_exception/exception.hpp>
@@ -91,6 +92,7 @@ BT::NodeStatus FollowFrontEntityAction::doAction()
   if (waypoints.waypoints.empty()) {
     return BT::NodeStatus::FAILURE;
   }
+  logSplineDebugInfo("FollowFrontEntityAction", waypoints, canonicalized_entity_status_);
   if (trajectory == nullptr) {
     return BT::NodeStatus::FAILURE;
   }
