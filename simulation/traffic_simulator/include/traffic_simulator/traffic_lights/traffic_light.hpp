@@ -47,13 +47,15 @@ struct TrafficLight
       yellow,
       red,
       white,
+      unknown,
     } value;
 
     // clang-format off
-    static_assert(static_cast<std::uint8_t>(green ) == 0b0000'0000);
-    static_assert(static_cast<std::uint8_t>(yellow) == 0b0000'0001);
-    static_assert(static_cast<std::uint8_t>(red   ) == 0b0000'0010);
-    static_assert(static_cast<std::uint8_t>(white ) == 0b0000'0011);
+    static_assert(static_cast<std::uint8_t>(green  ) == 0b0000'0000);
+    static_assert(static_cast<std::uint8_t>(yellow ) == 0b0000'0001);
+    static_assert(static_cast<std::uint8_t>(red    ) == 0b0000'0010);
+    static_assert(static_cast<std::uint8_t>(white  ) == 0b0000'0011);
+    static_assert(static_cast<std::uint8_t>(unknown) == 0b0000'0100);
     // clang-format on
 
     constexpr Color(const Value value = green) : value(value) {}
@@ -66,6 +68,7 @@ struct TrafficLight
       std::make_pair("red", red),
       std::make_pair("white", white),
       std::make_pair("yellow", yellow),
+      std::make_pair("unknown", unknown),
 
       // BACKWARD COMPATIBILITY
       std::make_pair("Green", green),
@@ -134,26 +137,29 @@ struct TrafficLight
       circle,
       cross,
       arrow,
+      unknown,
     };
 
     // clang-format off
-    static_assert(static_cast<std::uint8_t>(Category::circle) == 0b0000'0000);
-    static_assert(static_cast<std::uint8_t>(Category::cross ) == 0b0000'0001);
-    static_assert(static_cast<std::uint8_t>(Category::arrow ) == 0b0000'0010);
+    static_assert(static_cast<std::uint8_t>(Category::circle ) == 0b0000'0000);
+    static_assert(static_cast<std::uint8_t>(Category::cross  ) == 0b0000'0001);
+    static_assert(static_cast<std::uint8_t>(Category::arrow  ) == 0b0000'0010);
+    static_assert(static_cast<std::uint8_t>(Category::unknown) == 0b0000'0011);
     // clang-format on
 
     enum Value : std::uint16_t {
       // clang-format off
-      circle      =                      static_cast<std::uint8_t>(Category::circle),
-      cross       =                      static_cast<std::uint8_t>(Category::cross ),
-      left        = (0b0000'1000 << 8) | static_cast<std::uint8_t>(Category::arrow ),
-      down        = (0b0000'0100 << 8) | static_cast<std::uint8_t>(Category::arrow ),
-      up          = (0b0000'0010 << 8) | static_cast<std::uint8_t>(Category::arrow ),
-      right       = (0b0000'0001 << 8) | static_cast<std::uint8_t>(Category::arrow ),
-      lower_left  = (0b0000'1100 << 8) | static_cast<std::uint8_t>(Category::arrow ),
-      upper_left  = (0b0000'1010 << 8) | static_cast<std::uint8_t>(Category::arrow ),
-      lower_right = (0b0000'0101 << 8) | static_cast<std::uint8_t>(Category::arrow ),
-      upper_right = (0b0000'0011 << 8) | static_cast<std::uint8_t>(Category::arrow ),
+      circle      =                      static_cast<std::uint8_t>(Category::circle ),
+      cross       =                      static_cast<std::uint8_t>(Category::cross  ),
+      left        = (0b0000'1000 << 8) | static_cast<std::uint8_t>(Category::arrow  ),
+      down        = (0b0000'0100 << 8) | static_cast<std::uint8_t>(Category::arrow  ),
+      up          = (0b0000'0010 << 8) | static_cast<std::uint8_t>(Category::arrow  ),
+      right       = (0b0000'0001 << 8) | static_cast<std::uint8_t>(Category::arrow  ),
+      lower_left  = (0b0000'1100 << 8) | static_cast<std::uint8_t>(Category::arrow  ),
+      upper_left  = (0b0000'1010 << 8) | static_cast<std::uint8_t>(Category::arrow  ),
+      lower_right = (0b0000'0101 << 8) | static_cast<std::uint8_t>(Category::arrow  ),
+      upper_right = (0b0000'0011 << 8) | static_cast<std::uint8_t>(Category::arrow  ),
+      unknown     =                      static_cast<std::uint8_t>(Category::unknown),
       // clang-format on
     } value;
 
@@ -168,6 +174,7 @@ struct TrafficLight
     static_assert(static_cast<std::uint16_t>(upper_left ) == 0b0000'1010'0000'0010);
     static_assert(static_cast<std::uint16_t>(lower_right) == 0b0000'0101'0000'0010);
     static_assert(static_cast<std::uint16_t>(upper_right) == 0b0000'0011'0000'0010);
+    static_assert(static_cast<std::uint16_t>(unknown    ) == 0b0000'0000'0000'0011);
     // clang-format on
 
     constexpr Shape(const Value value = circle) : value(value) {}
@@ -185,6 +192,7 @@ struct TrafficLight
       std::make_pair("upperLeft", Shape::upper_left),
       std::make_pair("lowerRight", Shape::lower_right),
       std::make_pair("upperRight", Shape::upper_right),
+      std::make_pair("unknown", Shape::unknown),
 
       // BACKWARD COMPATIBILITY
       std::make_pair("straight", Shape::up),
@@ -269,6 +277,11 @@ struct TrafficLight
           case Color::white:
             color_message = simulation_api_schema::TrafficLight_Color_WHITE;
             break;
+          case Color::unknown:
+            color_message = simulation_api_schema::TrafficLight_Color_UNKNOWN_COLOR;
+            break;
+          default:
+            throw common::SyntaxError(std::get<Color>(value), " is not supported color.");
         }
         return color_message;
       };
@@ -288,6 +301,8 @@ struct TrafficLight
           case Status::unknown:
             status_message = simulation_api_schema::TrafficLight_Status_UNKNOWN_STATUS;
             break;
+          default:
+            throw common::SyntaxError(std::get<Status>(value), " is not supported status.");
         }
         return status_message;
       };
@@ -325,6 +340,10 @@ struct TrafficLight
           case Shape::upper_right:
             shape_message = simulation_api_schema::TrafficLight_Shape_UP_RIGHT_ARROW;
             break;
+          case Shape::unknown:
+            shape_message = simulation_api_schema::TrafficLight_Shape_UNKNOWN_SHAPE;
+          default:
+            throw common::SyntaxError(std::get<Shape>(value), " is not supported as a shape.");
         }
         return shape_message;
       };
