@@ -14,6 +14,7 @@
   <depend>get_parameter</depend>
   <depend>pluginlib</depend>
   <depend>rclcpp</depend>
+  <depend>visualization_msgs</depend>
   <depend>traffic_simulator</depend>
 
   <test_depend>ament_lint_auto</test_depend>

@@ -144,6 +144,7 @@ auto VehicleBehaviorTree::getCurrentAction() -> const std::string &
 
 auto VehicleBehaviorTree::update(const double current_time, const double step_time) -> void
 {
+  setDebugMarker({});
   tickOnce(current_time, step_time);
   while (getCurrentAction() == "root") {
     tickOnce(current_time, step_time);

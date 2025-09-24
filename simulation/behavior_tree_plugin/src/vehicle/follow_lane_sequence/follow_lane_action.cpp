@@ -20,6 +20,7 @@
 #include <string>
 #include <traffic_simulator/helper/stop_watch.hpp>
 #include <vector>
+#include <visualization_msgs/msg/marker.hpp>
 
 namespace entity_behavior
 {
@@ -89,7 +90,9 @@ BT::NodeStatus FollowLaneAction::doAction()
   }
   const auto waypoints = calculateWaypoints();
 
-  logSplineDebugInfo("FollowLaneAction", waypoints, canonicalized_entity_status_);
+  const auto debug_markers =
+    logSplineDebugInfo("FollowLaneAction", waypoints, canonicalized_entity_status_);
+  setOutput("debug_marker", debug_markers);
 
   if (waypoints.waypoints.empty()) {
     return BT::NodeStatus::FAILURE;

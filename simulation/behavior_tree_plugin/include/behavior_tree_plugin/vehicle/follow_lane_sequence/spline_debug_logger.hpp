@@ -17,17 +17,19 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
+#include <visualization_msgs/msg/marker.hpp>
 
 namespace entity_behavior::vehicle::follow_lane_sequence
 {
-void logSplineDebugInfo(
+auto logSplineDebugInfo(
   const std::string & action_name,
   const traffic_simulator_msgs::msg::WaypointsArray & waypoints,
   const std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus> &
-    canonicalized_entity_status);
+    canonicalized_entity_status) -> std::vector<visualization_msgs::msg::Marker>;
 }  // namespace entity_behavior::vehicle::follow_lane_sequence
 
 #endif  // BEHAVIOR_TREE_PLUGIN__VEHICLE__FOLLOW_LANE_SEQUENCE__SPLINE_DEBUG_LOGGER_HPP_

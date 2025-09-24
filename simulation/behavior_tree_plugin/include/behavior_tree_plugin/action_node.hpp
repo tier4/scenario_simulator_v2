@@ -34,6 +34,7 @@
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/obstacle.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
+#include <visualization_msgs/msg/marker.hpp>
 #include <unordered_map>
 #include <vector>
 
@@ -89,6 +90,7 @@ public:
       BT::InputPort<std::optional<double>>("lateral_collision_threshold"),
       BT::OutputPort<std::optional<traffic_simulator_msgs::msg::Obstacle>>("obstacle"),
       BT::OutputPort<traffic_simulator_msgs::msg::WaypointsArray>("waypoints"),
+      BT::OutputPort<std::vector<visualization_msgs::msg::Marker>>("debug_marker"),
       BT::OutputPort<traffic_simulator::behavior::Request>("request"),
       // clang-format on
     };

@@ -34,6 +34,7 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
+#include <visualization_msgs/msg/marker.hpp>
 
 namespace entity_behavior
 {
@@ -53,6 +54,7 @@ auto ActionNode::executeTick() -> BT::NodeStatus { return BT::ActionNodeBase::ex
 
 auto ActionNode::tick() -> BT::NodeStatus
 {
+  setOutput("debug_marker", std::vector<visualization_msgs::msg::Marker>{});
   getBlackBoardValues();
   if (!checkPreconditions()) {
     return BT::NodeStatus::FAILURE;

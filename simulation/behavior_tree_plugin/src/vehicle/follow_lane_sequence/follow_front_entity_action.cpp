@@ -21,6 +21,7 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <vector>
+#include <visualization_msgs/msg/marker.hpp>
 
 namespace entity_behavior
 {
@@ -90,9 +91,12 @@ BT::NodeStatus FollowFrontEntityAction::doAction()
 {
   const auto waypoints = calculateWaypoints();
   if (waypoints.waypoints.empty()) {
+    setOutput("debug_marker", std::vector<visualization_msgs::msg::Marker>{});
     return BT::NodeStatus::FAILURE;
   }
-  logSplineDebugInfo("FollowFrontEntityAction", waypoints, canonicalized_entity_status_);
+  const auto debug_markers =
+    logSplineDebugInfo("FollowFrontEntityAction", waypoints, canonicalized_entity_status_);
+  setOutput("debug_marker", debug_markers);
   if (trajectory == nullptr) {
     return BT::NodeStatus::FAILURE;
   }
