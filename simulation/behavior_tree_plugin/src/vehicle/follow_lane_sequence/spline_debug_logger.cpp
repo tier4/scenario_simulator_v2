@@ -23,11 +23,14 @@
 
 #include <rclcpp/clock.hpp>
 #include <rclcpp/duration.hpp>
+#include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/color_rgba.hpp>
+#include <visualization_msgs/msg/marker_array.hpp>
 
 #include <algorithm>
 #include <exception>
 #include <iostream>
+#include <mutex>
 #include <numeric>
 #include <unordered_map>
 
@@ -42,7 +45,34 @@ constexpr char kFrameId[] = "map";
 constexpr double kFillAlpha = 0.4;
 constexpr double kOutlineAlpha = 0.9;
 constexpr double kOutlineWidth = 0.1;
-constexpr double kLifetimeSeconds = 1.0;
+constexpr double kLifetimeSeconds = 0.2;
+
+struct ImmediateMarkerPublisher
+{
+  std::shared_ptr<rclcpp::Node> node;
+  rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr publisher;
+};
+
+auto getImmediatePublisher() -> ImmediateMarkerPublisher &
+{
+  static ImmediateMarkerPublisher handles;
+  static std::mutex mutex;
+  std::lock_guard<std::mutex> lock(mutex);
+  if (!handles.publisher) {
+    try {
+      handles.node = rclcpp::Node::make_shared("spline_debug_logger_immediate");
+      auto qos = rclcpp::QoS(rclcpp::KeepLast(1)).transient_local();
+      handles.publisher = handles.node->create_publisher<visualization_msgs::msg::MarkerArray>(
+        "/simulation/spline_debug_polygon", qos);
+    } catch (const std::exception & e) {
+      std::cerr << "[spline_debug_logger] failed to create immediate marker publisher: " << e.what()
+                << std::endl;
+      handles.node.reset();
+      handles.publisher.reset();
+    }
+  }
+  return handles;
+}
 
 auto makeTriangleMarker(
   const std::string & ns, int32_t id, const rclcpp::Time & stamp,
@@ -117,6 +147,17 @@ auto makeDeleteMarker(const std::string & ns, int32_t id) -> visualization_msgs:
   marker.action = visualization_msgs::msg::Marker::DELETE;
   return marker;
 }
+
+auto publishImmediate(const std::vector<visualization_msgs::msg::Marker> & markers) -> void
+{
+  auto & handles = getImmediatePublisher();
+  if (!handles.publisher) {
+    return;
+  }
+  visualization_msgs::msg::MarkerArray array_msg;
+  array_msg.markers = markers;
+  handles.publisher->publish(array_msg);
+}
 }  // namespace
 
 auto logSplineDebugInfo(
@@ -164,89 +205,88 @@ auto logSplineDebugInfo(
     if (debug_polygon.empty()) {
       markers.emplace_back(makeDeleteMarker(ns, 0));
       markers.emplace_back(makeDeleteMarker(ns, 1));
-      return markers;
-    }
+    } else {
+      const double average_z = std::accumulate(
+                                 debug_polygon.begin(), debug_polygon.end(), 0.0,
+                                 [](double sum, const auto & point) { return sum + point.z; }) /
+                               static_cast<double>(debug_polygon.size());
 
-    const double average_z = std::accumulate(
-                               debug_polygon.begin(), debug_polygon.end(), 0.0,
-                               [](double sum, const auto & point) { return sum + point.z; }) /
-                             static_cast<double>(debug_polygon.size());
+      markers.emplace_back(makeTriangleMarker(ns, 0, stamp, debug_polygon));
+      markers.emplace_back(makeOutlineMarker(ns, 1, stamp, average_z, boost_polygons));
 
-    markers.emplace_back(makeTriangleMarker(ns, 0, stamp, debug_polygon));
-    markers.emplace_back(makeOutlineMarker(ns, 1, stamp, average_z, boost_polygons));
-
-    std::vector<std::pair<std::string, const traffic_simulator::CanonicalizedEntityStatus *>>
-      entity_statuses;
-    if (canonicalized_entity_status) {
-      entity_statuses.emplace_back(entity_name, canonicalized_entity_status.get());
-    }
-    for (const auto & [name, status] : other_entity_status) {
-      if (name == entity_name) {
-        continue;
+      std::vector<std::pair<std::string, const traffic_simulator::CanonicalizedEntityStatus *>>
+        entity_statuses;
+      if (canonicalized_entity_status) {
+        entity_statuses.emplace_back(entity_name, canonicalized_entity_status.get());
       }
-      entity_statuses.emplace_back(name, &status);
-    }
-    std::sort(entity_statuses.begin(), entity_statuses.end(), [](const auto & lhs, const auto & rhs) {
-      return lhs.first < rhs.first;
-    });
-
-    const auto make_box_marker = [&](const std::string & name,
-                                     const traffic_simulator::CanonicalizedEntityStatus & status,
-                                     const int32_t marker_id) {
-      const auto boost_polygon = math::geometry::toPolygon2D(status.getMapPose(), status.getBoundingBox());
-      const auto & outer = boost_polygon.outer();
-      if (outer.size() < 3) {
-        return;
+      for (const auto & [name, status] : other_entity_status) {
+        entity_statuses.emplace_back(name, &status);
       }
+      std::sort(
+        entity_statuses.begin(), entity_statuses.end(),
+        [](const auto & lhs, const auto & rhs) { return lhs.first < rhs.first; });
 
-      visualization_msgs::msg::Marker marker;
-      marker.header.frame_id = kFrameId;
-      marker.header.stamp = stamp;
-      marker.ns = ns + ":entity";
-      marker.id = marker_id;
-      marker.type = visualization_msgs::msg::Marker::LINE_STRIP;
-      marker.action = visualization_msgs::msg::Marker::ADD;
-      marker.scale.x = kOutlineWidth;
+      const auto make_box_marker = [&](const std::string & name,
+                                       const traffic_simulator::CanonicalizedEntityStatus & status,
+                                       const int32_t marker_id) {
+        const auto boost_polygon =
+          math::geometry::toPolygon2D(status.getMapPose(), status.getBoundingBox());
+        const auto & outer = boost_polygon.outer();
+        if (outer.size() < 3) {
+          return;
+        }
 
-      std_msgs::msg::ColorRGBA color;
-      color.a = 1.0F;
-      if (name == entity_name) {
-        color.r = 0.0F;
-        color.g = 1.0F;
-        color.b = 0.0F;
-      } else if (name == "ego" || name == "Ego") {
-        color.r = 1.0F;
-        color.g = 0.2F;
-        color.b = 0.2F;
-      } else {
-        color.r = 1.0F;
-        color.g = 1.0F;
-        color.b = 0.0F;
+        visualization_msgs::msg::Marker marker;
+        marker.header.frame_id = kFrameId;
+        marker.header.stamp = stamp;
+        marker.ns = ns + ":entity";
+        marker.id = marker_id;
+        marker.type = visualization_msgs::msg::Marker::LINE_STRIP;
+        marker.action = visualization_msgs::msg::Marker::ADD;
+        marker.scale.x = kOutlineWidth;
+
+        std_msgs::msg::ColorRGBA color;
+        color.a = 1.0F;
+        if (canonicalized_entity_status && name == entity_name) {
+          color.r = 0.0F;
+          color.g = 1.0F;
+          color.b = 0.0F;
+        } else if (name == "ego" || name == "Ego") {
+          color.r = 1.0F;
+          color.g = 0.2F;
+          color.b = 0.2F;
+        } else {
+          color.r = 1.0F;
+          color.g = 1.0F;
+          color.b = 0.0F;
+        }
+        marker.color = color;
+
+        const double base_z = status.getMapPose().position.z + status.getBoundingBox().center.z;
+        for (const auto & point : outer) {
+          geometry_msgs::msg::Point geometry_point;
+          geometry_point.x = point.x();
+          geometry_point.y = point.y();
+          geometry_point.z = base_z;
+          marker.points.push_back(geometry_point);
+        }
+        if (!marker.points.empty()) {
+          marker.points.push_back(marker.points.front());
+          markers.emplace_back(std::move(marker));
+        }
+      };
+
+      const int32_t base_id = 10;
+      for (std::size_t idx = 0; idx < entity_statuses.size(); ++idx) {
+        make_box_marker(
+          entity_statuses[idx].first, *entity_statuses[idx].second,
+          base_id + static_cast<int32_t>(idx));
       }
-      marker.color = color;
-
-      const double base_z = status.getMapPose().position.z + status.getBoundingBox().center.z;
-      for (const auto & point : outer) {
-        geometry_msgs::msg::Point geometry_point;
-        geometry_point.x = point.x();
-        geometry_point.y = point.y();
-        geometry_point.z = base_z;
-        marker.points.push_back(geometry_point);
-      }
-      if (!marker.points.empty()) {
-        marker.points.push_back(marker.points.front());
-        markers.emplace_back(std::move(marker));
-      }
-    };
-
-    const int32_t base_id = 10;
-    for (std::size_t idx = 0; idx < entity_statuses.size(); ++idx) {
-      make_box_marker(
-        entity_statuses[idx].first, *entity_statuses[idx].second, base_id + static_cast<int32_t>(idx));
     }
   } catch (const std::exception & e) {
     std::cout << "[" << action_name << "] spline debug error: " << e.what() << std::endl;
   }
+  publishImmediate(markers);
   return markers;
 }
 }  // namespace entity_behavior::vehicle::follow_lane_sequence
