@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
+
 from ament_index_python.packages import get_package_share_directory
 
 from launch import LaunchDescription
@@ -83,10 +85,13 @@ def launch_setup(context, *args, **kwargs):
     launch_rviz                         = LaunchConfiguration("launch_rviz",                            default=False)
     launch_simple_sensor_simulator      = LaunchConfiguration("launch_simple_sensor_simulator",         default=True)
     output_directory                    = LaunchConfiguration("output_directory",                       default=Path("/tmp"))
+    override_parameters                 = LaunchConfiguration("override_parameters",                    default="")
     parameter_file_path                 = LaunchConfiguration("parameter_file_path",                    default=Path(get_package_share_directory("scenario_test_runner")) / "config/parameters.yaml")
+    pedestrian_ignore_see_around        = LaunchConfiguration("pedestrian_ignore_see_around",           default="blind")
     port                                = LaunchConfiguration("port",                                   default=5555)
     publish_empty_context               = LaunchConfiguration("publish_empty_context",                  default=False)
     record                              = LaunchConfiguration("record",                                 default=True)
+    record_option                       = LaunchConfiguration("record_option",                          default="")
     record_storage_id                   = LaunchConfiguration("record_storage_id",                      default="")
     rviz_config                         = LaunchConfiguration("rviz_config",                            default=default_rviz_config_file())
     scenario                            = LaunchConfiguration("scenario",                               default=Path("/dev/null"))
@@ -94,8 +99,11 @@ def launch_setup(context, *args, **kwargs):
     sigterm_timeout                     = LaunchConfiguration("sigterm_timeout",                        default=8)
     simulate_localization               = LaunchConfiguration("simulate_localization",                  default=True)
     speed_condition                     = LaunchConfiguration("speed_condition",                        default="legacy")
+    use_custom_centerline               = LaunchConfiguration("use_custom_centerline",                  default=True)
     use_sim_time                        = LaunchConfiguration("use_sim_time",                           default=False)
     vehicle_model                       = LaunchConfiguration("vehicle_model",                          default="")
+    vehicle_id                          = LaunchConfiguration("vehicle_id",                             default="default")
+    initialize_localization             = LaunchConfiguration("initialize_localization",                default=10)
     # fmt: on
 
     print(f"architecture_type                   := {architecture_type.perform(context)}")
@@ -111,10 +119,13 @@ def launch_setup(context, *args, **kwargs):
     print(f"launch_autoware                     := {launch_autoware.perform(context)}")
     print(f"launch_rviz                         := {launch_rviz.perform(context)}")
     print(f"output_directory                    := {output_directory.perform(context)}")
+    print(f"override_parameters                 := {override_parameters.perform(context)}")
     print(f"parameter_file_path                 := {parameter_file_path.perform(context)}")
+    print(f"pedestrian_ignore_see_around        := {pedestrian_ignore_see_around.perform(context)}")
     print(f"port                                := {port.perform(context)}")
     print(f"publish_empty_context               := {publish_empty_context.perform(context)}")
     print(f"record                              := {record.perform(context)}")
+    print(f"record_option                       := {record_option.perform(context)}")
     print(f"record_storage_id                   := {record_storage_id.perform(context)}")
     print(f"rviz_config                         := {rviz_config.perform(context)}")
     print(f"scenario                            := {scenario.perform(context)}")
@@ -122,8 +133,11 @@ def launch_setup(context, *args, **kwargs):
     print(f"sigterm_timeout                     := {sigterm_timeout.perform(context)}")
     print(f"simulate_localization               := {simulate_localization.perform(context)}")
     print(f"speed_condition                     := {speed_condition.perform(context)}")
+    print(f"use_custom_centerline               := {use_custom_centerline.perform(context)}")
     print(f"use_sim_time                        := {use_sim_time.perform(context)}")
     print(f"vehicle_model                       := {vehicle_model.perform(context)}")
+    print(f"vehicle_id                          := {vehicle_id.perform(context)}")
+    print(f"initialize_localization             := {initialize_localization.perform(context)}")
 
     def make_launch_prefix():
         if enable_perf.perform(context) == "True":
@@ -140,17 +154,22 @@ def launch_setup(context, *args, **kwargs):
             {"consider_pose_by_road_slope": consider_pose_by_road_slope},
             {"initialize_duration": initialize_duration},
             {"launch_autoware": launch_autoware},
+            {"pedestrian_ignore_see_around": pedestrian_ignore_see_around},
             {"port": port},
             {"publish_empty_context" : publish_empty_context},
             {"record": record},
+            {"record_option": record_option},
             {"record_storage_id": record_storage_id},
             {"rviz_config": rviz_config},
             {"sensor_model": sensor_model},
             {"sigterm_timeout": sigterm_timeout},
             {"simulate_localization": simulate_localization},
             {"speed_condition": speed_condition},
+            {"use_custom_centerline": use_custom_centerline},
             {"use_sim_time": use_sim_time},
             {"vehicle_model": vehicle_model},
+            {"vehicle_id": vehicle_id},
+            {"initialize_localization": initialize_localization},
         ]
 
         def collect_vehicle_parameters():
@@ -183,6 +202,15 @@ def launch_setup(context, *args, **kwargs):
 
         return parameters
 
+    def make_agnocast_additional_environment():
+        if os.getenv('ENABLE_AGNOCAST', '') == '1':
+            return {
+                'LD_PRELOAD': f"/opt/ros/{os.environ['ROS_DISTRO']}/lib/libagnocast_heaphook.so:{os.getenv('LD_PRELOAD', '')}",
+                'AGNOCAST_MEMPOOL_SIZE': '134217728',
+            }
+        else:
+            return {}
+
     return [
         # fmt: off
         DeclareLaunchArgument("architecture_type",                   default_value=architecture_type                  ),
@@ -198,15 +226,19 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("launch_rviz",                         default_value=launch_rviz                        ),
         DeclareLaunchArgument("output_directory",                    default_value=output_directory                   ),
         DeclareLaunchArgument("parameter_file_path",                 default_value=parameter_file_path                ),
+        DeclareLaunchArgument("pedestrian_ignore_see_around",        default_value=pedestrian_ignore_see_around       ),
         DeclareLaunchArgument("publish_empty_context",               default_value=publish_empty_context              ),
+        DeclareLaunchArgument("record_option",                       default_value=record_option                      ),
         DeclareLaunchArgument("rviz_config",                         default_value=rviz_config                        ),
         DeclareLaunchArgument("scenario",                            default_value=scenario                           ),
         DeclareLaunchArgument("sensor_model",                        default_value=sensor_model                       ),
         DeclareLaunchArgument("sigterm_timeout",                     default_value=sigterm_timeout                    ),
         DeclareLaunchArgument("simulate_localization",               default_value=simulate_localization              ),
         DeclareLaunchArgument("speed_condition",                     default_value=speed_condition                    ),
+        DeclareLaunchArgument("use_custom_centerline",               default_value=use_custom_centerline              ),
         DeclareLaunchArgument("use_sim_time",                        default_value=use_sim_time                       ),
         DeclareLaunchArgument("vehicle_model",                       default_value=vehicle_model                      ),
+        DeclareLaunchArgument("initialize_localization",             default_value=initialize_localization            ),
         # fmt: on
         Node(
             package="scenario_test_runner",
@@ -221,6 +253,7 @@ def launch_setup(context, *args, **kwargs):
                 "--global-real-time-factor", global_real_time_factor,
                 "--global-timeout",          global_timeout,
                 "--output-directory",        output_directory,
+                "--override-parameters",     override_parameters,
                 "--scenario",                scenario,
                 # fmt: on
             ],
@@ -233,6 +266,7 @@ def launch_setup(context, *args, **kwargs):
             on_exit=ShutdownOnce(),
             parameters=make_parameters(),
             condition=IfCondition(launch_simple_sensor_simulator),
+            additional_env=make_agnocast_additional_environment(),
         ),
         # The `name` keyword overrides the name for all created nodes, so duplicated nodes appear.
         # For LifecycleNode the `name` parameter is required

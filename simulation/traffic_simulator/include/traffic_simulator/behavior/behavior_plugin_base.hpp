@@ -36,14 +36,17 @@ namespace entity_behavior
 using EntityStatusDict =
   std::unordered_map<std::string, traffic_simulator::CanonicalizedEntityStatus>;
 
+using EuclideanDistancesMap = std::unordered_map<std::pair<std::string, std::string>, double>;
+
 class BehaviorPluginBase
 {
 public:
   virtual ~BehaviorPluginBase() = default;
   virtual void configure(const rclcpp::Logger & logger) = 0;
   virtual auto update(const double current_time, const double step_time) -> void = 0;
-  virtual const std::string & getCurrentAction() const = 0;
+  virtual auto getCurrentAction() -> const std::string & = 0;
 
+  // clang-format off
 #define DEFINE_GETTER_SETTER(NAME, KEY, TYPE)      \
   virtual TYPE get##NAME() = 0;                    \
   virtual void set##NAME(const TYPE & value) = 0;  \
@@ -53,15 +56,16 @@ public:
     return key;                                    \
   }
 
-  // clang-format off
   DEFINE_GETTER_SETTER(BehaviorParameter,                                "behavior_parameter",                             traffic_simulator_msgs::msg::BehaviorParameter)
   DEFINE_GETTER_SETTER(CanonicalizedEntityStatus,                        "canonicalized_entity_status",                    std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>)
   DEFINE_GETTER_SETTER(CurrentTime,                                      "current_time",                                   double)
   DEFINE_GETTER_SETTER(DebugMarker,                                      "debug_marker",                                   std::vector<visualization_msgs::msg::Marker>)
   DEFINE_GETTER_SETTER(DefaultMatchingDistanceForLaneletPoseCalculation, "matching_distance_for_lanelet_pose_calculation", double)
+  DEFINE_GETTER_SETTER(EuclideanDistancesMap,                            "euclidean_distances_map",                        std::shared_ptr<EuclideanDistancesMap>)
   DEFINE_GETTER_SETTER(GoalPoses,                                        "goal_poses",                                     std::vector<geometry_msgs::msg::Pose>)
   DEFINE_GETTER_SETTER(HdMapUtils,                                       "hdmap_utils",                                    std::shared_ptr<hdmap_utils::HdMapUtils>)
   DEFINE_GETTER_SETTER(LaneChangeParameters,                             "lane_change_parameters",                         traffic_simulator::lane_change::Parameter)
+  DEFINE_GETTER_SETTER(LateralCollisionThreshold,                        "lateral_collision_threshold",                    std::optional<double>)
   DEFINE_GETTER_SETTER(Obstacle,                                         "obstacle",                                       std::optional<traffic_simulator_msgs::msg::Obstacle>)
   DEFINE_GETTER_SETTER(OtherEntityStatus,                                "other_entity_status",                            EntityStatusDict)
   DEFINE_GETTER_SETTER(PedestrianParameters,                             "pedestrian_parameters",                          traffic_simulator_msgs::msg::PedestrianParameters)

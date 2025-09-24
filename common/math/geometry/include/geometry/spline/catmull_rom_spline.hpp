@@ -19,8 +19,10 @@
 #include <geometry/spline/catmull_rom_spline_interface.hpp>
 #include <geometry/spline/hermite_curve.hpp>
 #include <geometry_msgs/msg/point.hpp>
+#include <memory>
 #include <optional>
 #include <string>
+#include <traffic_simulator_msgs/msg/polyline_trajectory.hpp>
 #include <utility>
 #include <vector>
 
@@ -33,6 +35,9 @@ class CatmullRomSpline : public CatmullRomSplineInterface
 public:
   CatmullRomSpline() = default;
   explicit CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> & control_points);
+  explicit CatmullRomSpline(
+    const geometry_msgs::msg::Point & start_point,
+    const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & trajectory);
   auto getLength() const -> double override { return total_length_; }
   auto getMaximum2DCurvature() const -> double;
   auto getPoint(const double s) const -> geometry_msgs::msg::Point;
@@ -43,6 +48,8 @@ public:
   auto getTrajectory(
     const double start_s, const double end_s, const double resolution,
     const double offset = 0.0) const -> std::vector<geometry_msgs::msg::Point>;
+  auto getTrajectoryPoses(const double start_s, const double end_s, const double resolution) const
+    -> std::vector<geometry_msgs::msg::Pose>;
   auto getSValue(const geometry_msgs::msg::Pose & pose, double threshold_distance = 3.0) const
     -> std::optional<double>;
   auto getSquaredDistanceIn2D(const geometry_msgs::msg::Point & point, const double s) const
@@ -50,14 +57,16 @@ public:
   auto getSquaredDistanceVector(const geometry_msgs::msg::Point & point, const double s) const
     -> geometry_msgs::msg::Vector3;
   auto getCollisionPointsIn2D(
-    const std::vector<geometry_msgs::msg::Point> & polygon,
-    const bool search_backward = false) const -> std::set<double>;
+    const std::vector<geometry_msgs::msg::Point> & polygon, const bool search_backward = false,
+    const std::optional<std::pair<double, double>> & s_range = std::nullopt) const
+    -> std::set<double>;
   auto getCollisionPointIn2D(
     const geometry_msgs::msg::Point & point0, const geometry_msgs::msg::Point & point1,
     const bool search_backward = false) const -> std::optional<double>;
   auto getCollisionPointIn2D(
-    const std::vector<geometry_msgs::msg::Point> & polygon,
-    const bool search_backward = false) const -> std::optional<double> override;
+    const std::vector<geometry_msgs::msg::Point> & polygon, const bool search_backward = false,
+    const std::optional<std::pair<double, double>> & s_range = std::nullopt) const
+    -> std::optional<double> override;
   auto getPolygon(const double width, const size_t num_points = 30, const double z_offset = 0)
     -> std::vector<geometry_msgs::msg::Point>;
   const std::vector<geometry_msgs::msg::Point> control_points;
@@ -76,7 +85,8 @@ private:
   std::vector<LineSegment> line_segments_;
   std::vector<HermiteCurve> curves_;
   std::vector<double> length_list_;
-  std::vector<double> maximum_2d_curvatures_;
+  /// @note Since curvature calculation requires a large computational cost, it is inefficient to calculate it in the member initializer list and must be calculated when the getMaximum2DCurvature function is first called.
+  mutable std::vector<double> maximum_2d_curvatures_;
   double total_length_;
 };
 }  // namespace geometry
