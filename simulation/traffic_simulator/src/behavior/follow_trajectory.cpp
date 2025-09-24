@@ -51,6 +51,31 @@ auto makeUpdatedStatus(
   const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter, const double step_time,
   const double matching_distance, std::optional<double> target_speed) -> std::optional<EntityStatus>
 {
+  std::cout << std::endl << std::endl << std::endl;
+  std::cout << std::string(80, '-') << std::endl;
+  std::cout << "----------------- makeUpdatedStatus  time: " << entity_status.time << " -----------------" << std::endl;
+  std::cout << std::string(80, '-') << std::endl;
+  static bool once = true;
+  if (once) {
+    std::cout << "[CSV_DATA];time[s];" << "step_time[s];" << "condition;"
+              << "x;y;z;"
+              << "goal_x;goal_y;goal_z;"
+              << "speed[m/s];" << "acceleration[m/s^2];" << "min_acceleration[m/s^2];" << "max_acceleration[m/s^2];"
+              << "desired_acceleration[m/s^2];" << "desired_speed[m/s];" << "distance_to_front_waypoint[m];" << "remaining_time_to_arrival_to_front_waypoint[s];"
+              << "distance[m];" << "remaining_time[s];" << "remaining_time_to_arrival_to_front_waypoint[s];"
+              << "arrive_during_this_frame?;" << "not_too_early?;"
+              << "current_velocity.x;current_velocity.y;current_velocity.z;"
+              << "desired_velocity.x;desired_velocity.y;desired_velocity.z;"
+              << std::endl;
+    std::cout << "[GLOBAL_CSV];time;x;y;z;omega;vx;ax;omega_x;omega_y;omega_z;alpha_x;alpha_y;alpha_z;time;x;y;z;omega;vx;ax;omega_x;omega_y;omega_z;alpha_x;alpha_y;alpha_z" << std::endl;
+    once = false;
+  }
+  std::cout << "[GLOBAL_CSV];" << entity_status.time << ";" << entity_status.pose.position.x << "; " << entity_status.pose.position.y << "; " << entity_status.pose.position.z
+            << "; "<< math::geometry::convertQuaternionToEulerAngle(entity_status.pose.orientation).z
+            << "; " << entity_status.action_status.twist.linear.x
+            << "; " << entity_status.action_status.accel.linear.x
+            << "; "<< entity_status.action_status.twist.angular.x << "; " << entity_status.action_status.twist.angular.y << "; " << entity_status.action_status.twist.angular.z
+            << "; " << entity_status.action_status.accel.angular.x << "; " << entity_status.action_status.accel.angular.y << "; " << entity_status.action_status.accel.angular.z << ";NEWLINEHERE" << std::endl;
   using math::arithmetic::isApproximatelyEqualTo;
   using math::arithmetic::isDefinitelyLessThan;
 
@@ -176,8 +201,10 @@ auto makeUpdatedStatus(
      See https://www.researchgate.net/publication/2495826_Steering_Behaviors_For_Autonomous_Characters
   */
   if (polyline_trajectory.shape.vertices.empty()) {
+    std::cout << "----------------- makeUpdatedStatus end: Condition 1 no waypoint -----------------" << std::endl;
     return std::nullopt;
   } else if (const auto position = entity_status.pose.position; any(is_infinity_or_nan, position)) {
+    std::cout << "----------------- makeUpdatedStatus end: Condition 2 invalid position -----------------" << std::endl;
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
@@ -191,6 +218,7 @@ auto makeUpdatedStatus(
     */
     const auto target_position = polyline_trajectory.shape.vertices.front().position.position;
     any(is_infinity_or_nan, target_position)) {
+    std::cout << "----------------- makeUpdatedStatus end: Condition 3 invalid target position -----------------" << std::endl;
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
@@ -212,6 +240,7 @@ auto makeUpdatedStatus(
        miraculously becomes zero.
     */
     isDefinitelyLessThan(distance_to_front_waypoint, std::numeric_limits<double>::epsilon())) {
+    std::cout << "----------------- makeUpdatedStatus end: Condition 4 reached waypoint -----------------" << std::endl;
     return discard_the_front_waypoint_and_recurse();
   } else if (
     const auto [distance, remaining_time] =
@@ -284,9 +313,29 @@ auto makeUpdatedStatus(
         }
       }();
     isDefinitelyLessThan(distance, std::numeric_limits<double>::epsilon())) {
+    std::cout << "----------------- makeUpdatedStatus end: Condition 5 reached waypoint -----------------" << std::endl;
+    std::cout << "[CSV_DATA];" << entity_status.time << ";" << step_time << ";Condition 5 reached"
+              << ";" << entity_status.pose.position.x << ";" << entity_status.pose.position.y << ";" << entity_status.pose.position.z
+              << ";" << target_position.x << ";" << target_position.y << ";" << target_position.z
+              << ";" << ";" << ";" << ";"
+              << ";" << ";" << ";" << distance_to_front_waypoint << ";"
+              << ";" << distance << ";" << remaining_time << ";"
+              << ";"
+              << ";" << std::endl;
+
     return discard_the_front_waypoint_and_recurse();
   } else if (const auto acceleration = entity_status.action_status.accel.linear.x;  // [m/s^2]
              std::isinf(acceleration) or std::isnan(acceleration)) {
+    std::cout << "----------------- makeUpdatedStatus end: Condition 6 invalid acceleration -----------------" << std::endl;
+    std::cout << "[CSV_DATA];" << entity_status.time << ";" << step_time << ";Condition 6 invalid acceleration"
+              << ";" << entity_status.pose.position.x << ";" << entity_status.pose.position.y << ";" << entity_status.pose.position.z
+              << ";" << target_position.x << ";" << target_position.y << ";" << target_position.z
+              << ";" << ";" << acceleration << ";" << ";"
+              << ";" << ";" << ";" << distance_to_front_waypoint << ";"
+              << ";" << distance << ";" << remaining_time << ";"
+              << ";"
+              << ";" << std::endl;
+
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
@@ -298,6 +347,7 @@ auto makeUpdatedStatus(
                    step_time /* [s] */,
                +behavior_parameter.dynamic_constraints.max_acceleration /* [m/s^2] */);
              std::isinf(max_acceleration) or std::isnan(max_acceleration)) {
+    std::cout << "----------------- makeUpdatedStatus end: Condition 7 invalid max acceleration -----------------" << std::endl;
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
@@ -309,6 +359,7 @@ auto makeUpdatedStatus(
                    step_time /* [s] */,
                -behavior_parameter.dynamic_constraints.max_deceleration /* [m/s^2] */);
              std::isinf(min_acceleration) or std::isnan(min_acceleration)) {
+    std::cout << "----------------- makeUpdatedStatus end: Condition 8 invalid min acceleration -----------------" << std::endl;
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
@@ -316,6 +367,7 @@ auto makeUpdatedStatus(
       "'s minimum acceleration value is NaN or infinity. The value is ", min_acceleration, ". ");
   } else if (const auto speed = entity_status.action_status.twist.linear.x;  // [m/s]
              std::isinf(speed) or std::isnan(speed)) {
+    std::cout << "----------------- makeUpdatedStatus end: Condition 9 invalid speed -----------------" << std::endl;
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
@@ -368,6 +420,7 @@ auto makeUpdatedStatus(
       }
     }();
     std::isinf(desired_acceleration) or std::isnan(desired_acceleration)) {
+    std::cout << "----------------- makeUpdatedStatus end: Condition 10 invalid desired acceleration -----------------" << std::endl;
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
@@ -376,6 +429,7 @@ auto makeUpdatedStatus(
       ". ");
   } else if (const auto desired_speed = speed + desired_acceleration * step_time;
              std::isinf(desired_speed) or std::isnan(desired_speed)) {
+    std::cout << "----------------- makeUpdatedStatus end: Condition 11 invalid desired speed -----------------" << std::endl;
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
@@ -399,6 +453,7 @@ auto makeUpdatedStatus(
                             .y
                        : std::atan2(target_position.z - position.z, std::hypot(dy, dx));
                    const auto yaw = std::atan2(dy, dx);  // Use yaw on target
+                   std::cout << std::scientific << "yaw: " << yaw << " [rad]" << std::endl;
                    return geometry_msgs::build<geometry_msgs::msg::Vector3>()
                      .x(std::cos(pitch) * std::cos(yaw) * desired_speed)
                      .y(std::cos(pitch) * std::sin(yaw) * desired_speed)
@@ -417,6 +472,7 @@ auto makeUpdatedStatus(
                  }
                }();
              any(is_infinity_or_nan, desired_velocity)) {
+    std::cout << "----------------- makeUpdatedStatus end: Condition 12 invalid desired velocity -----------------" << std::endl;
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
@@ -436,10 +492,28 @@ auto makeUpdatedStatus(
                }();
              (speed * step_time) > distance_to_front_waypoint &&
              innerProduct(desired_velocity, current_velocity) < 0.0) {
+    std::cout << "----------------- makeUpdatedStatus end: Condition 13 overshoot -----------------" << std::endl;
+    std::cout << "innerProduct(desired_velocity, current_velocity) == "
+              << innerProduct(desired_velocity, current_velocity) << " < 0" << std::endl;
+    std::cout << "speed * step_time == " << speed << " * " << step_time << " == "
+              << speed * step_time << " > distance_to_front_waypoint == " << distance_to_front_waypoint
+              << std::endl;
+    std::cout << "[CSV_DATA];" << entity_status.time << ";" << step_time << ";Condition 13 overshoot"
+              << ";" << entity_status.pose.position.x << ";" << entity_status.pose.position.y << ";" << entity_status.pose.position.z
+              << ";" << target_position.x << ";" << target_position.y << ";" << target_position.z
+              << ";" << speed << ";" << acceleration << ";" << min_acceleration << ";" << max_acceleration
+              << ";" << desired_acceleration << ";" << desired_speed << ";" << distance_to_front_waypoint << ";"
+              << ";" << distance << ";" << remaining_time << ";"
+              << ";"
+              << ";"
+              << ";" << current_velocity.x << ";" << current_velocity.y << ";" << current_velocity.z
+              << ";" << desired_velocity.x << ";" << desired_velocity.y << ";" << desired_velocity.z
+              << ";" << std::endl;
     return discard_the_front_waypoint_and_recurse();
   } else if (auto predicted_state_opt = follow_waypoint_controller.getPredictedWaypointArrivalState(
                desired_acceleration, remaining_time, distance, acceleration, speed);
              !std::isinf(remaining_time) && !predicted_state_opt.has_value()) {
+    std::cout << "----------------- makeUpdatedStatus end: Condition 14 cannot reach -----------------" << std::endl;
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: FollowWaypointController for vehicle ",
@@ -450,9 +524,21 @@ auto makeUpdatedStatus(
       follow_waypoint_controller);
   } else {
     auto remaining_time_to_arrival_to_front_waypoint = predicted_state_opt->travel_time;
-    if constexpr (false) {
+    if constexpr (true) {
       // clang-format off
-      std::cout << std::fixed << std::boolalpha << std::string(80, '-') << std::endl;
+      std::cout << std::boolalpha << std::setprecision(10) << std::scientific << std::string(80, '-') << std::endl;
+
+      std::cout << "[CSV_DATA];" << entity_status.time << ";" << step_time << ";Condition 0 normal"
+      << ";" << entity_status.pose.position.x << ";" << entity_status.pose.position.y << ";" << entity_status.pose.position.z
+      << ";" << target_position.x << ";" << target_position.y << ";" << target_position.z
+      << ";" << speed << ";" << acceleration << ";" << min_acceleration << ";" << max_acceleration
+      << ";" << desired_acceleration << ";" << desired_speed << ";" << distance_to_front_waypoint << ";" << remaining_time_to_arrival_to_front_waypoint
+      << ";" << distance << ";" << remaining_time << ";" << remaining_time_to_arrival_to_front_waypoint
+      << ";" << isDefinitelyLessThan(remaining_time_to_arrival_to_front_waypoint, step_time)
+      << ";" << (std::isnan(remaining_time_to_front_waypoint) or remaining_time_to_front_waypoint < remaining_time_to_arrival_to_front_waypoint + step_time)
+      << ";" << current_velocity.x << ";" << current_velocity.y << ";" << current_velocity.z
+      << ";" << desired_velocity.x << ";" << desired_velocity.y << ";" << desired_velocity.z
+      << ";" << std::endl;
 
       std::cout << "acceleration "
                 << "== " << acceleration
@@ -540,6 +626,7 @@ auto makeUpdatedStatus(
         /// maximum speed including braking - in this case accuracy of arrival is checked
         if (follow_waypoint_controller.areConditionsOfArrivalMet(
               acceleration, speed, distance_to_front_waypoint)) {
+          std::cout << "----------------- makeUpdatedStatus end: RETURN REACHED LAST WAYPOINT -----------------" << std::endl;
           return discard_the_front_waypoint_and_recurse();
         }
       } else {
@@ -547,6 +634,7 @@ auto makeUpdatedStatus(
         /// irrelevant
         if (auto this_step_distance = (speed + desired_acceleration * step_time) * step_time;
             this_step_distance > distance_to_front_waypoint) {
+          std::cout << "----------------- makeUpdatedStatus end: RETURN REACHED INTERMEDIATE WAYPOINT -----------------" << std::endl;
           return discard_the_front_waypoint_and_recurse();
         }
       }
@@ -561,6 +649,7 @@ auto makeUpdatedStatus(
     } else if (isDefinitelyLessThan(remaining_time_to_front_waypoint, step_time / 2.0)) {
       if (follow_waypoint_controller.areConditionsOfArrivalMet(
             acceleration, speed, distance_to_front_waypoint)) {
+        std::cout << "----------------- makeUpdatedStatus end: RETURN REACHED WAYPOINT WITH ARRIVAL TIME -----------------" << std::endl;
         return discard_the_front_waypoint_and_recurse();
       } else {
         throw common::SimulationError(
@@ -572,6 +661,7 @@ auto makeUpdatedStatus(
           " from that waypoint which is greater than the accepted accuracy.");
       }
     }
+    std::cout << "Not stopped at waypoint." << std::endl;
 
     /*
        Note: If obstacle avoidance is to be implemented, the steering behavior
@@ -630,9 +720,20 @@ auto makeUpdatedStatus(
       (updated_status.action_status.twist.angular - entity_status.action_status.twist.angular) /
       step_time;
 
+
     updated_status.time = entity_status.time + step_time;
 
     updated_status.lanelet_pose_valid = false;
+
+    std::cout << "[GLOBAL_CSV];" << updated_status.time << ";" << updated_status.pose.position.x << "; " << updated_status.pose.position.y << ";" << updated_status.pose.position.z
+              << ";" << math::geometry::convertQuaternionToEulerAngle(updated_status.pose.orientation).z
+              << "; " << updated_status.action_status.twist.linear.x << "; " << updated_status.action_status.accel.linear.x
+              << ";" <<  updated_status.action_status.twist.angular.x << "; " << updated_status.action_status.twist.angular.y << "; " << updated_status.action_status.twist.angular.z
+              << "; " << updated_status.action_status.accel.angular.x << "; " << updated_status.action_status.accel.angular.y << "; " << updated_status.action_status.accel.angular.z << std::endl;
+
+    std::cout << std::string(80, '>') << std::endl;
+    std::cout << "----------------- makeUpdatedStatus end: RETURN STATE -----------------" << std::endl;
+    std::cout << std::string(80, '>') << std::endl;
 
     return updated_status;
   }

@@ -18,11 +18,15 @@ namespace traffic_simulator
 {
 namespace follow_trajectory
 {
+  static bool want_logs = false;
+
 auto FollowWaypointController::getAnalyticalAccelerationForLastSteps(
   const double remaining_time, const double remaining_distance, const double acceleration,
   const double speed) const -> double
 {
+  std::cout << "getAnalyticalAccelerationForLastSteps called remaining_time " << remaining_time << " remaining_distance " << remaining_distance << " acceleration " << acceleration << " speed " << speed << std::endl;
   if (remaining_time <= step_time * 2.0) {
+    std::cout << "ANALYTICAL ACCELERATION FOR LAST STEP Condition 1 with breaking " << with_breaking << std::endl;
     if (!with_breaking || (std::abs(speed) < local_epsilon)) {
       // Step in which the acceleration is set to 0.0.
       return clampAcceleration(0.0, acceleration, speed);
@@ -34,6 +38,7 @@ auto FollowWaypointController::getAnalyticalAccelerationForLastSteps(
         ", remaining_distance: ", remaining_distance, ". ", *this);
     }
   } else if (remaining_time <= step_time * 3.0) {
+    std::cout << "ANALYTICAL ACCELERATION FOR LAST STEP Condition 2 with breaking " << with_breaking << std::endl;
     if (with_breaking) {
       // Step in which the speed is set to 0.0.
       return clampAcceleration(-speed / step_time, acceleration, speed);
@@ -46,6 +51,7 @@ auto FollowWaypointController::getAnalyticalAccelerationForLastSteps(
       return clampAcceleration(numerator / std::pow(step_time, 2), acceleration, speed);
     }
   } else if (remaining_time <= step_time * 4.0) {
+    std::cout << "ANALYTICAL ACCELERATION FOR LAST STEP Condition 3 with breaking " << with_breaking << std::endl;
     if (with_breaking) {
       /*
          Step in which acceleration is set to ensure that the remaining
@@ -94,30 +100,40 @@ auto FollowWaypointController::getTimeRequiredForNonAcceleration(const double ac
 {
   const double acceleration_rate =
     (acceleration > 0.0) ? max_deceleration_rate : max_acceleration_rate;
+  if (want_logs) std::cout << std::boolalpha << std::setprecision(10) << std::scientific << " acceleration " << acceleration << " acceleration_rate " << acceleration_rate << " step_time " << step_time << " min accel_rate " << max_deceleration_rate << " max accel_rate " << max_acceleration_rate << std::endl;
+
   return std::ceil(std::abs(acceleration) / (acceleration_rate * step_time)) * step_time;
 }
 
 auto FollowWaypointController::getAccelerationLimits(
   const double acceleration, const double speed) const -> std::pair<double, double>
 {
+  if (want_logs) std::cout << std::boolalpha << std::setprecision(10) << std::scientific << std::endl;
   const auto time_for_non_acceleration = [&, acceleration]() {
     if (std::abs(acceleration) < local_epsilon) {
+      if (want_logs) std::cout << "TIME - Condition 1 " << acceleration << " local epsilon " << local_epsilon << std::endl;
       return 0.0;
     } else {
       auto result = getTimeRequiredForNonAcceleration(acceleration);
+      if (want_logs) std::cout << "TIME - Condition 2 " << result << " for acceleration " << acceleration << std::endl;
       return (result < step_time) ? step_time : result;
     }
   }();
+  if (want_logs) std::cout << "TIME FOR NON ACCELERATION " << time_for_non_acceleration << std::endl;
 
   const auto local_min_acceleration = [&]() {
     const auto local_min_acceleration = acceleration - max_deceleration_rate * step_time;
+    if (want_logs) std::cout << "LOCAL MIN ACCELERATION CANDIDATE " << local_min_acceleration << std::endl;
     if (std::abs(speed) < local_epsilon) {
+      if (want_logs) std::cout << "MIN - Condition 1 " << speed << " local epsilon " << local_epsilon << std::endl;
       // If the speed is equal to 0.0, it should no longer be decreased.
       return std::max(0.0, local_min_acceleration);
     } else if (time_for_non_acceleration > local_epsilon) {
+      if (want_logs) std::cout << "MIN - Condition 2 " << time_for_non_acceleration << " local epsilon " << local_epsilon << std::endl;
       // If the acceleration is not 0.0, ensure that there will be sufficient time to set it to 0.0.
       return std::max(-speed / time_for_non_acceleration, local_min_acceleration);
     } else {
+      if (want_logs) std::cout << "MIN - Condition 3 max_deceleration " << max_deceleration << " local_min_acceleration " << local_min_acceleration << " speed " << speed << " step_time " << step_time << std::endl;
       /*
          Otherwise, return an acceleration limited by constraints: it cannot be less than
          -max_deceleration, it cannot be less than local_min_acceleration (resulting from the max
@@ -127,19 +143,25 @@ auto FollowWaypointController::getAccelerationLimits(
       return std::max(-max_deceleration, std::max(local_min_acceleration, -speed / step_time));
     }
   }();
+  if (want_logs) std::cout << "LOCAL MIN ACCELERATION " << local_min_acceleration << std::endl;
 
   const auto local_max_acceleration = [&]() {
     const auto local_max_acceleration = acceleration + max_acceleration_rate * step_time;
+    if (want_logs) std::cout << "LOCAL MAX ACCELERATION CANDIDATE " << local_max_acceleration << std::endl;
     if (std::abs(speed - target_speed) < local_epsilon) {
+      if (want_logs) std::cout << "MAX - Condition 1 " << speed << " target_speed " << target_speed << " local epsilon " << local_epsilon << std::endl;
       // If the speed is equal to target_speed, it should no longer be increased.
       return std::min(0.0, local_max_acceleration);
     } else if (speed > target_speed) {
+      if (want_logs) std::cout << "MAX - Condition 2 " << speed << " target_speed " << target_speed << std::endl;
       // If speed is too high, assume that the max acceleration is equal to the min acceleration.
       return local_min_acceleration;
     } else if (time_for_non_acceleration > local_epsilon) {
+      if (want_logs) std::cout << "MAX - Condition 3 " << time_for_non_acceleration << " local epsilon " << local_epsilon << std::endl;
       // If the acceleration is not 0.0, ensure that there will be sufficient time to set it to 0.0.
       return std::min((target_speed - speed) / time_for_non_acceleration, local_max_acceleration);
     } else {
+      if (want_logs) std::cout << "MAX - Condition 4 max_acceleration " << max_acceleration << " local_max_acceleration " << local_max_acceleration << " target_speed " << target_speed << " speed " << speed << " step_time " << step_time << std::endl;
       /*
          Otherwise, return an acceleration limited by constraints: it cannot be greater than
          max_acceleration, it cannot be greater than local_max_acceleration (resulting from the max
@@ -150,15 +172,19 @@ auto FollowWaypointController::getAccelerationLimits(
         max_acceleration, std::min(local_max_acceleration, (target_speed - speed) / step_time));
     }
   }();
+  if (want_logs) std::cout << "LOCAL MAX ACCELERATION " << local_max_acceleration << std::endl;
 
   /// @todo
   if (local_max_acceleration < local_min_acceleration) {
+    if (want_logs) std::cout << "WARNING: local_max_acceleration < local_min_acceleration, max: " << local_max_acceleration << " min: " << local_min_acceleration << " for speed: " << speed << " acceleration: " << acceleration << " time_for_non_acceleration: " << time_for_non_acceleration << " step_time: " << step_time << " target_speed: " << target_speed << std::endl;
     // Such a case occurs, even without braking, it requires further investigation - this solves it.
     return {local_max_acceleration, local_max_acceleration};
   } else {
+    if (want_logs) std::cout << "VALID LIMITS: max: " << local_max_acceleration << " min: " << local_min_acceleration << " for speed: " << speed << " acceleration: " << acceleration << " time_for_non_acceleration: " << time_for_non_acceleration << " step_time: " << step_time << " target_speed: " << target_speed << std::endl;
     // Check the validity of the limits.
     const double speed_min = speed + local_min_acceleration * step_time;
     const double speed_max = speed + local_max_acceleration * step_time;
+    if (want_logs) std::cout << "SPEED MIN " << speed_min << " SPEED MAX " << speed_max << std::endl;
     if (
       speed_max < -local_epsilon || speed_max > std::max(max_speed, target_speed) + local_epsilon ||
       speed_min < -local_epsilon || speed_min > std::max(max_speed, target_speed) + local_epsilon) {
@@ -167,6 +193,7 @@ auto FollowWaypointController::getAccelerationLimits(
         "] for acceleration: ", acceleration, " and speed: ", speed, " -> speed_min: ", speed_min,
         " speed_max: ", speed_max, ". ", *this);
     } else {
+      if (want_logs) std::cout << "CORRECT LIMITS [ " << local_min_acceleration << ", " << local_max_acceleration << " ] for acceleration: " << acceleration << " and speed: " << speed << std::endl;
       return {local_min_acceleration, local_max_acceleration};
     }
   }
@@ -209,13 +236,18 @@ auto FollowWaypointController::getPredictedWaypointArrivalState(
   const double acceleration, const double speed) const -> std::optional<PredictedState>
 {
   const auto brakeUntilImmobility = [&](PredictedState & state) -> bool {
+    std::cout << ">>>>> brakeUntilImmobility " << std::endl;
+    int step = 0;
     while (!state.isImmobile(local_epsilon)) {
+      step++;
       if (state.travel_time >= remaining_time) {
+        std::cout << "FAILED TO BRAKE IN TIME " << state.travel_time << " >= " << remaining_time << std::endl;
         return false;
       } else {
         moveStraight(state, state.acceleration - max_deceleration_rate * step_time);
       }
     }
+    std::cout << "BRAKING STEPS " << step << " TOTAL TIME " << state.travel_time << std::endl;
     return true;
   };
 
@@ -296,8 +328,14 @@ auto FollowWaypointController::getPredictedWaypointArrivalState(
 auto FollowWaypointController::getAcceleration(
   const double remaining_distance, const double acceleration, const double speed) const -> double
 {
+  std::cout << std::scientific << std::setprecision(10) << ">>>>> getAcceleration without time remaining_distance: " << remaining_distance
+            << " acceleration: " << acceleration << " speed: " << speed << std::endl;
+  want_logs = true;
   const auto [local_min_acceleration, local_max_acceleration] =
     getAccelerationLimits(acceleration, speed);
+  want_logs = false;
+  std::cout << "local_min_acceleration: " << local_min_acceleration
+            << " local_max_acceleration: " << local_max_acceleration << std::endl;
 
   const double step_acceleration =
     (local_max_acceleration - local_min_acceleration) / number_of_acceleration_candidates;
@@ -305,23 +343,47 @@ auto FollowWaypointController::getAcceleration(
   auto min_distance_diff = std::numeric_limits<double>::lowest();
 
   std::optional<double> best_acceleration = std::nullopt;
+//  double remaining_time = std::numeric_limits<double>::infinity();
 
+  std::cout << "STEP ACCELERATION " << number_of_acceleration_candidates << std::endl;
   for (std::size_t i = 0; i <= number_of_acceleration_candidates; ++i) {
     const double candidate_acceleration = local_min_acceleration + i * step_acceleration;
+    std::cout << i << ": CANDIDATE ACCELERATION " << candidate_acceleration << std::endl;
 
     if (const auto predicted_state_opt = getPredictedStopStateWithoutConsideringTime(
           candidate_acceleration, remaining_distance, acceleration, speed);
         predicted_state_opt) {
+      std::cout << ">>> CANDIDATE ACCELERATION " << candidate_acceleration << " POSSIBLE - PREDICTED STATE " << *predicted_state_opt << std::endl;
+      std::cout << ">>> DISTANCE DIFF " << remaining_distance - predicted_state_opt->traveled_distance << std::endl;
+      std::cout << ">>> MIN DISTANCE DIFF " << min_distance_diff << std::endl;
+
       if (const auto distance_diff = remaining_distance - predicted_state_opt->traveled_distance;
           (distance_diff >= 0 || min_distance_diff < 0) &&
           (std::abs(distance_diff) < std::abs(min_distance_diff))) {
+        std::cout << i << ": CANDIDATE ACCELERATION " << candidate_acceleration << " BEST SO FAR" << std::endl;
         min_distance_diff = distance_diff;
         best_acceleration = candidate_acceleration;
+//        remaining_time = predicted_state_opt->travel_time;
       }
+    } else {
+      std::cout << i << ": CANDIDATE ACCELERATION " << candidate_acceleration << " IGNORED - NO STOPPING POSSIBLE" << std::endl;
     }
   }
 
+//  std::cout << "REMAINING TIME " << remaining_time << std::endl;
+//
+//  if (with_breaking && remaining_time <= step_time * 4) {
+//    std::cout << ">>>>>>>>> getAcceleration: Condition 4a: with breaking " << with_breaking << " remaining_time " << remaining_time << std::endl;
+//    return getAnalyticalAccelerationForLastSteps(
+//        remaining_time, remaining_distance, acceleration, speed);
+//  } else if (remaining_time <= step_time * 3) {
+//    std::cout << ">>>>>>>>> getAcceleration: Condition 4b: without breaking " << with_breaking << " remaining_time " << remaining_time << std::endl;
+//    return getAnalyticalAccelerationForLastSteps(
+//        remaining_time, remaining_distance, acceleration, speed);
+//  }
+//
   if (best_acceleration.has_value()) {
+    std::cout << "BEST ACCELERATION " << best_acceleration.value() << std::endl;
     return best_acceleration.value();
   } else {
     throw ControllerError(
@@ -334,10 +396,19 @@ auto FollowWaypointController::getAcceleration(
   const double remaining_time_source, const double remaining_distance, const double acceleration,
   const double speed) const -> double
 {
+  std::cout << std::scientific << std::setprecision(10)
+            << ">>>>> getAcceleration with time remaining_time_source: " << remaining_time_source
+            << " remaining_distance: " << remaining_distance
+            << " acceleration: " << acceleration << " speed: " << speed << std::endl;
+  want_logs = true;
   const auto [local_min_acceleration, local_max_acceleration] =
     getAccelerationLimits(acceleration, speed);
+  want_logs = false;
+  std::cout << "local_min_acceleration: " << local_min_acceleration
+            << " local_max_acceleration: " << local_max_acceleration << std::endl;
 
   if ((speed + local_min_acceleration * step_time) * step_time > remaining_distance) {
+    std::cout << ">>>>>>>>> getAcceleration: Condition 1: speeed " << speed << " local_min_acceleration " << local_min_acceleration << " step_time " << step_time << " remaining_distance " << remaining_distance << std::endl;
     /*
        If in the current conditions, the waypoint will be reached in this step
        even with the lowest possible acceleration set, this prevents cases in
@@ -345,28 +416,36 @@ auto FollowWaypointController::getAcceleration(
        can be done.
     */
     return local_min_acceleration;
-  } else if (std::abs(local_min_acceleration - local_max_acceleration) < local_epsilon) {
+  } else
+    if (std::abs(local_min_acceleration - local_max_acceleration) < local_epsilon) {
+    std::cout << ">>>>>>>>> getAcceleration: Condition 2: local_min_acceleration " << local_min_acceleration << " local_max_acceleration " << local_max_acceleration << " local_epsilon " << local_epsilon << std::endl;
     /*
        If the range is so tight that there is no choice.
     */
     return local_min_acceleration;
   } else if (std::isinf(remaining_time_source)) {
+    std::cout << ">>>>>>>>> getAcceleration: Condition 3: remaining_time_source is inf" << std::endl;
     /*
        If remaining time is no specified - this is the case when every next
        point of the trajectory has no specified time.
     */
     return getAcceleration(remaining_distance, acceleration, speed);
   } else {
+    std::cout << ">>>>>>>>> getAcceleration: Condition 4: normal case" << std::endl;
     const auto remaining_time =
       roundTimeToFullStepsWithTolerance(remaining_time_source, step_time_tolerance);
+
+    std::cout << ">>>>>>>>>>>>>> remaining_time rounded to full steps: " << remaining_time << std::endl;
 
     /*
        If last steps, increase accuracy by using analytical calculations.
     */
     if (with_breaking && remaining_time <= step_time * 4) {
+      std::cout << ">>>>>>>>> getAcceleration: Condition 4a: with breaking " << with_breaking << " remaining_time " << remaining_time << std::endl;
       return getAnalyticalAccelerationForLastSteps(
         remaining_time, remaining_distance, acceleration, speed);
     } else if (remaining_time <= step_time * 3) {
+      std::cout << ">>>>>>>>> getAcceleration: Condition 4b: without breaking " << with_breaking << " remaining_time " << remaining_time << std::endl;
       return getAnalyticalAccelerationForLastSteps(
         remaining_time, remaining_distance, acceleration, speed);
     }
@@ -388,6 +467,7 @@ auto FollowWaypointController::getAcceleration(
     // Create a lambda for candidate selection
     std::optional<double> best_acceleration = std::nullopt;
     const auto considerCandidate = [&](double candidate_acceleration) -> void {
+      std::cout << " CONSIDER CANDIDATE ACCELERATION " << candidate_acceleration << std::endl;
       if (
         const auto predicted_state_opt = getPredictedWaypointArrivalState(
           candidate_acceleration, remaining_time, remaining_distance, acceleration, speed)) {
@@ -401,6 +481,7 @@ auto FollowWaypointController::getAcceleration(
       }
     };
 
+    std::cout << ">>>>>>>>>>>>>> Search for the best acceleration in range: [" << local_min_acceleration << ", " << local_max_acceleration << "]" << std::endl;
     // Consider the borderline values and precise value of 0
     considerCandidate(local_min_acceleration);
     if (local_min_acceleration < 0.0 && local_max_acceleration > 0.0) {
@@ -417,6 +498,7 @@ auto FollowWaypointController::getAcceleration(
        step_time) is met however, at the moment this change affects other
        behaviors - this requires further investigation.
     */
+    std::cout << " >>>>>>>>>>>>>>> STEP ACCELERATION SEARCH " << std::endl;
     if (const double step_acceleration =
           (local_max_acceleration - local_min_acceleration) / number_of_acceleration_candidates;
         step_acceleration > local_epsilon) {
@@ -424,11 +506,14 @@ auto FollowWaypointController::getAcceleration(
         considerCandidate(local_min_acceleration + i * step_acceleration);
       }
     }
+    std::cout << ">>>>>>>>>>>>>> BEST ACCELERATION " << (best_acceleration.has_value() ? std::to_string(best_acceleration.value()) : "NO VALUE") << " min_time_diff " << min_time_diff << " min_distance_diff " << min_distance_diff << std::endl;
 
     if (best_acceleration.has_value()) {
       if (min_time_diff <= -step_time + step_time_tolerance) {
+        std::cout << ">>>>>>>>>>>>>> ARRIVE EARLY, USE MAX ACCELERATION " << std::endl;
         return local_max_acceleration;
       } else if (min_time_diff >= step_time - step_time_tolerance) {
+        std::cout << ">>>>>>>>>>>>>> ARRIVE LATE, USE MIN ACCELERATION " << std::endl;
         return local_min_acceleration;
       } else if (
         std::abs(min_time_diff) < step_time && min_distance_diff > predicted_distance_tolerance) {
@@ -438,6 +523,7 @@ auto FollowWaypointController::getAcceleration(
           "specified "
           "time is not too short for the constraints involved.");
       } else {
+        std::cout << ">>>>>>>>>>>>>> ARRIVE ON TIME, USE BEST ACCELERATION " << std::endl;
         return best_acceleration.value();
       }
     } else {

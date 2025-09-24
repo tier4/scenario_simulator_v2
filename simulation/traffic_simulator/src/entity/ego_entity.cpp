@@ -64,6 +64,7 @@ EgoEntity::EgoEntity(
       parameters.push_back("rviz_config:=" + common::getParameter<std::string>(node_parameters, "rviz_config"));
       parameters.push_back("scenario_simulation:=true");
       parameters.push_back("use_foa:=false");
+      parameters.push_back("rviz:=false");
       parameters.push_back("perception/enable_traffic_light:=" + std::string(architecture_type >= "awf/universe/20230906" ? "true" : "false"));
       parameters.push_back("use_sim_time:=" + std::string(common::getParameter<bool>(node_parameters, "use_sim_time", false) ? "true" : "false"));
       parameters.push_back("localization_sim_mode:=" + std::string(common::getParameter<bool>(node_parameters, "simulate_localization") ? "api" : "pose_twist_estimator"));
