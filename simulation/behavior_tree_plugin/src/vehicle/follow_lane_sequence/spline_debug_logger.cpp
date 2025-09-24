@@ -256,7 +256,6 @@ struct EntityCollisionInfo
 
 auto detectEntityCollisions(
   const std::vector<BoostPolygon> & trajectory_polygons,
-  const std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus> & canonicalized_entity_status,
   const std::unordered_map<std::string, traffic_simulator::CanonicalizedEntityStatus> &
     other_entity_status,
   const std::string & entity_name) -> std::vector<EntityCollisionInfo>
@@ -266,43 +265,28 @@ auto detectEntityCollisions(
     return collisions;
   }
 
+  // 他エンティティと自車両（必要なら）から判定対象リストを構築する。
   std::vector<std::pair<std::string, const traffic_simulator::CanonicalizedEntityStatus *>> entity_statuses;
   entity_statuses.reserve(other_entity_status.size() + 1);
   for (const auto & [name, status] : other_entity_status) {
+    if (entity_name == name){ continue; }
     entity_statuses.emplace_back(name, &status);
   }
-  if (canonicalized_entity_status) {
-    entity_statuses.emplace_back(entity_name, canonicalized_entity_status.get());
-  }
-
-  std::sort(
-    entity_statuses.begin(), entity_statuses.end(),
-    [](const auto & lhs, const auto & rhs) { return lhs.first < rhs.first; });
 
   for (std::size_t idx = 0; idx < entity_statuses.size(); ++idx) {
-    if (idx > 0 && entity_statuses[idx].first == entity_statuses[idx - 1].first) {
-      continue;
-    }
-
+    // 交差判定に用いる車両のフットプリントを生成。
     const auto * status = entity_statuses[idx].second;
-    if (status == nullptr) {
-      continue;
-    }
-
     auto polygon = math::geometry::toPolygon2D(status->getMapPose(), status->getBoundingBox());
     if (polygon.outer().size() < 3) {
       continue;
     }
 
-    bool intersects = false;
-    if (!(canonicalized_entity_status && entity_statuses[idx].first == entity_name)) {
-      intersects = intersectsTrajectory(trajectory_polygons, polygon);
-    }
+    const auto intersects = intersectsTrajectory(trajectory_polygons, polygon);
 
+    // 判定結果を保持し、後段のマーカー生成で使用する。
     collisions.emplace_back(EntityCollisionInfo{
       entity_statuses[idx].first, status, std::move(polygon), intersects});
   }
-
   return collisions;
 }
 
@@ -461,10 +445,10 @@ void logSplineDebugInfo(
   try {
     math::geometry::CatmullRomSpline debug_spline(waypoints.waypoints);
     constexpr double kLaneWidth = 2.0;
-    constexpr std::size_t kNumSegments = 50;
+    constexpr std::size_t kNumSegments = 10;
     const auto quadrilateral_data = buildQuadrilateralData(debug_spline, kLaneWidth, kNumSegments);
     const auto collision_infos = detectEntityCollisions(
-      quadrilateral_data.polygons, canonicalized_entity_status, other_entity_status, entity_name);
+      quadrilateral_data.polygons, other_entity_status, entity_name);
 
     auto spline_markers = createSplineMarkers(ns, stamp, quadrilateral_data);
     markers.insert(markers.end(), spline_markers.begin(), spline_markers.end());
