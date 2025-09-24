@@ -1,0 +1,19 @@
+trajectory_status_demo_node:
+  ros__parameters:
+    # Initial vehicle position
+    initial_x: 0.0
+    initial_y: 0.0
+    initial_z: 0.0
+
+    # Initial speed (m/s)
+    initial_speed: 10.0
+
+    # Simulation parameters
+    step_time: 0.1
+    matching_distance: 1.0
+    target_speed: 15.0
+
+    # Target waypoint
+    waypoint_x: 100.0
+    waypoint_y: 0.0
+    waypoint_z: 0.0
