@@ -231,16 +231,7 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
         if (record) {
           std::vector<std::string> options{
             "-o", boost::filesystem::path(osc_path).replace_extension("").string(),
-            "-e", "^/vehicle.*",
-            "-e", "^/simulation.*",
-            "-e", "^/system.*",
-            "-e", "^/localization.*",
-            "-e", "^/planning.*",
-            "-e", "^/control.*",
-            "-e", "^/autoware.*",
-            "-e", "^/tf.*",
-            "-e", "^/viz.*",
-            "/diagnostics"};
+            "/tf", "/viz/base_link"};
 
           if (not record_storage_id.empty()) {
             options.insert(options.end(), {"-s", record_storage_id});
