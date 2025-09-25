@@ -51,6 +51,7 @@ public:
   {
     return entity_behavior::PedestrianActionNode::providedPorts();
   }
+  bool detectObstacleInFront(const bool see_around) const;
 };
 }  // namespace pedestrian
 }  // namespace entity_behavior
