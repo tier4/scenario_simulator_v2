@@ -77,7 +77,7 @@ jobs:
 
       - name: Install Build Wrapper
         if: github.event.pull_request.head.repo.fork == false
-        uses: SonarSource/sonarqube-scan-action/install-build-wrapper@v4.2.1
+        uses: SonarSource/sonarqube-scan-action/install-build-wrapper@v6.0.0
         id: build_wrapper
         env:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
@@ -177,7 +177,7 @@ jobs:
           retention-days: 1
 
       - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@v4.2.1
+        uses: SonarSource/sonarqube-scan-action@v6.0.0
         id: sonarcloud
         # In ARM build, SonarQube result should be same as x86 build because no test runs
         if: matrix.runs_on != 'ubuntu-22.04-arm' && github.event.pull_request.head.repo.fork == false
