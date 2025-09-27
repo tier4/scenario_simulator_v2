@@ -64,7 +64,6 @@ EgoEntity::EgoEntity(
       parameters.push_back("rviz_config:=" + common::getParameter<std::string>(node_parameters, "rviz_config"));
       parameters.push_back("scenario_simulation:=true");
       parameters.push_back("use_foa:=false");
-      parameters.push_back("rviz:=false");
       parameters.push_back("perception/enable_traffic_light:=" + std::string(architecture_type >= "awf/universe/20230906" ? "true" : "false"));
       parameters.push_back("use_sim_time:=" + std::string(common::getParameter<bool>(node_parameters, "use_sim_time", false) ? "true" : "false"));
       parameters.push_back("localization_sim_mode:=" + std::string(common::getParameter<bool>(node_parameters, "simulate_localization") ? "api" : "pose_twist_estimator"));
@@ -183,70 +182,6 @@ void EgoEntity::onUpdate(double current_time, double step_time)
   EntityBase::onUpdate(current_time, step_time);
 
   if (is_controlled_by_simulator_) {
-    std::cout << std::endl << std::endl << std::endl;
-    std::cout << "_______________ EgoEntity::onUpdate" << std::endl;
-
-    auto printStatus = [&]() -> void {
-      auto s = static_cast<traffic_simulator::EntityStatus>(*status_);
-      std::cout << "Entity status: " << std::endl
-                << std::setprecision(19)
-                << "time: " << s.time << std::endl
-                << "name: " << s.name << std::endl
-                << "type: " << s.type.type << std::endl
-                << "subtype: " << s.subtype.value << std::endl
-                << "pose:.position.x: " << s.pose.position.x << std::endl
-                << "pose.position.y: " << s.pose.position.y << std::endl
-                << "pose.position.z: " << s.pose.position.z << std::endl
-                << "pose.orientation.x: " << s.pose.orientation.x << std::endl
-                << "pose.orientation.y: " << s.pose.orientation.y << std::endl
-                << "pose.orientation.z: " << s.pose.orientation.z << std::endl
-                << "pose.orientation.w: " << s.pose.orientation.w << std::endl
-                << "twist.linear.x: " << s.action_status.twist.linear.x << std::endl
-                << "twist.linear.y: " << s.action_status.twist.linear.y << std::endl
-                << "twist.linear.z: " << s.action_status.twist.linear.z << std::endl
-                << "twist.angular.x: " << s.action_status.twist.angular.x << std::endl
-                << "twist.angular.y: " << s.action_status.twist.angular.y << std::endl
-                << "twist.angular.z: " << s.action_status.twist.angular.z << std::endl
-                << "accel.linear.x: " << s.action_status.accel.linear.x << std::endl
-                << "accel.linear.y: " << s.action_status.accel.linear.y << std::endl
-                << "accel.linear.z: " << s.action_status.accel.linear.z << std::endl
-                << "accel.angular.x: " << s.action_status.accel.angular.x << std::endl
-                << "accel.angular.y: " << s.action_status.accel.angular.y << std::endl
-                << "accel.angular.z: " << s.action_status.accel.angular.z << std::endl
-                << "bounding_box.center.x: " << status_->getBoundingBox().center.x << std::endl
-                << "bounding_box.center.y: " << status_->getBoundingBox().center.y << std::endl
-                << "bounding_box.center.z: " << status_->getBoundingBox().center.z << std::endl
-                << "bounding_box.dimensions.x: " << status_->getBoundingBox().dimensions.x << std::endl
-                << "bounding_box.dimensions.y: " << status_->getBoundingBox().dimensions.y << std::endl
-                << "bounding_box.dimensions.z: " << status_->getBoundingBox().dimensions.z << std::endl
-                << "behavior.dynamic_constraints.max_speed: " << behavior_parameter_.dynamic_constraints.max_speed << std::endl
-                << "behavior.dynamic_constraints.max_acceleration: " << behavior_parameter_.dynamic_constraints.max_acceleration << std::endl
-                << "behavior.dynamic_constraints.max_acceleration_rate: " << behavior_parameter_.dynamic_constraints.max_acceleration_rate << std::endl
-                << "behavior.dynamic_constraints.max_deceleration: " << behavior_parameter_.dynamic_constraints.max_deceleration << std::endl
-                << "behavior.dynamic_constraints.max_deceleration_rate: " << behavior_parameter_.dynamic_constraints.max_deceleration_rate << std::endl
-                << "behavior.lane_change_distance: " << behavior_parameter_.lane_change_distance << std::endl
-                << "behavior.stop_margin: " << behavior_parameter_.stop_margin << std::endl
-                << "behavior.follow_distance: " << behavior_parameter_.follow_distance << std::endl
-                << "behavior.see_around: " << behavior_parameter_.see_around << std::endl
-                << "target_speed: " << (target_speed_ ? target_speed_.value() : status_->getTwist().linear.x) << std::endl
-                << "matchint_distance: " << getDefaultMatchingDistanceForLaneletPoseCalculation() << std::endl;
-      // Print me a polyline trajectory in this format
-      if (!polyline_trajectory_->shape.vertices.empty()) {
-        std::cout << "polyline_trajectory_.x " << polyline_trajectory_->shape.vertices.front().position.position.x << std::endl
-                  << "polyline_trajectory_.y " << polyline_trajectory_->shape.vertices.front().position.position.y << std::endl
-                  << "polyline_trajectory_.z " << polyline_trajectory_->shape.vertices.front().position.position.z << std::endl
-                  << "polyline_trajectory_.time " << polyline_trajectory_->shape.vertices.front().time << std::endl
-                  << "polyline_trajectory_.initial_distance_offset " << polyline_trajectory_->initial_distance_offset << std::endl
-                  << "polyline_trajectory_.dynamic_constraints_ignorable " << polyline_trajectory_->dynamic_constraints_ignorable << std::endl
-                  << "poluline_trajectory_.base_time " << polyline_trajectory_->base_time << std::endl
-                  << "polyline_trajectory_.closed " << polyline_trajectory_->closed << std::endl;
-      } else {
-        std::cout << "polyline_trajectory is empty." << std::endl;
-      }
-    };
-
-    printStatus();
-
     if (
       const auto non_canonicalized_updated_status =
         traffic_simulator::follow_trajectory::makeUpdatedStatus(
