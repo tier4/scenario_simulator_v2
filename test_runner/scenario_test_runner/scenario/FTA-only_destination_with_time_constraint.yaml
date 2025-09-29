@@ -124,6 +124,13 @@ OpenSCENARIO:
                                                     s: 10.4819
                                                     offset: 0.0
                                                     Orientation: *ORIENTATION_ZERO
+                                              - Position:
+                                                  LanePosition:
+                                                    roadId: ''
+                                                    laneId: '34654'
+                                                    s: 15.0000
+                                                    offset: 0.0
+                                                    Orientation: *ORIENTATION_ZERO
                                               - Position: &POSITION_EGO_DESTINATION
                                                   LanePosition:
                                                     roadId: ''

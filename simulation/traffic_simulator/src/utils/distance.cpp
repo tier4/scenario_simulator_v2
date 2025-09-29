@@ -331,6 +331,7 @@ auto distanceAlongLanelet(
   const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box, const double matching_distance)
   -> std::optional<double>
 {
+  /// @note original source code: https://github.com/tier4/scenario_simulator_v2/blob/e0b2c122a5ff4e592a7ee68be6bb150f0512d44b/simulation/traffic_simulator/src/behavior/follow_trajectory.cpp#L80-L119
   /// @note due to this hardcoded value, the method cannot be used for calculations along a crosswalk (for pedestrians)
   constexpr bool include_crosswalk = false;
   constexpr bool include_adjacent_lanelet = false;
@@ -345,9 +346,25 @@ auto distanceAlongLanelet(
     if (const auto to_canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
           to_pose, to_bounding_box, include_crosswalk, matching_distance);
         to_canonicalized_lanelet_pose.has_value()) {
-      return distance::longitudinalDistance(
-        from_canonicalized_lanelet_pose.value(), to_canonicalized_lanelet_pose.value(),
-        include_adjacent_lanelet, include_opposite_direction, routing_configuration);
+      if (const auto longitudinal_distance = traffic_simulator::distance::longitudinalDistance(
+            from_canonicalized_lanelet_pose.value(), to_canonicalized_lanelet_pose.value(),
+            include_adjacent_lanelet, include_opposite_direction, routing_configuration);
+          longitudinal_distance.has_value()
+          /**
+             * DIRTY HACK!
+             * Negative longitudinal distance (calculated along lanelet in opposite direction)
+             * causes some scenarios to fail because of an unrelated issue with lanelet matching.
+             * The issue is caused by wrongly matched lanelet poses and thus wrong distances.
+             * When lanelet matching errors are fixed, this dirty hack can be removed.
+             */
+          and longitudinal_distance.value() >= 0.0) {
+        if (
+          const auto lateral_distance = distance::lateralDistance(
+            from_canonicalized_lanelet_pose.value(), to_canonicalized_lanelet_pose.value(),
+            routing_configuration)) {
+          return std::hypot(longitudinal_distance.value(), lateral_distance.value());
+        }
+      }
     }
   }
   return std::nullopt;
