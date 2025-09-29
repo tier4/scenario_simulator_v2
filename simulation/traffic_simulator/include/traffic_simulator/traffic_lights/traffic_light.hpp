@@ -342,6 +342,7 @@ struct TrafficLight
             break;
           case Shape::unknown:
             shape_message = simulation_api_schema::TrafficLight_Shape_UNKNOWN_SHAPE;
+            break;
           default:
             throw common::SyntaxError(std::get<Shape>(value), " is not supported as a shape.");
         }
@@ -374,6 +375,9 @@ struct TrafficLight
             break;
           case Color::white:
             color_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::WHITE;
+            break;
+          case Color::unknown:
+            color_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::UNKNOWN;
             break;
         }
         return color_message;
@@ -430,6 +434,9 @@ struct TrafficLight
             break;
           case Shape::upper_right:
             shape_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::UP_RIGHT_ARROW;
+            break;
+          case Shape::unknown:
+            shape_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::UNKNOWN;
             break;
         }
         return shape_message;
