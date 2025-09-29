@@ -38,6 +38,16 @@ Changelog for package scenario_test_runner
 16.4.2 (2025-05-23)
 -------------------
 
+17.6.0 (2025-09-29)
+-------------------
+* Merge pull request `#1685 <https://github.com/tier4/scenario_simulator_v2/issues/1685>`_ from tier4/fix/noise_v4
+* Merge branch 'master' into fix/noise_v4
+* use elliptical model for x,y,yaw in noise_v4
+* use same true positive calculation algorithm to noise_v2 in noise_v4
+* rename noise.v4.<config_name>.rotation into noise.v4.<config_name>.yaw
+* Implement yaw_flip noise for noise_v4
+* Contributors: Kotaro Yoshimoto
+
 17.5.3 (2025-09-17)
 -------------------
 * Merge branch 'master' into fix/macro-xml-validation

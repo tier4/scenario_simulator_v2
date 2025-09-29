@@ -24,6 +24,11 @@ Changelog for package concealer
 16.4.2 (2025-05-23)
 -------------------
 
+17.6.0 (2025-09-29)
+-------------------
+* Merge branch 'master' into fix/noise_v4
+* Contributors: Kotaro Yoshimoto
+
 17.5.3 (2025-09-17)
 -------------------
 * Merge branch 'master' into fix/macro-xml-validation
