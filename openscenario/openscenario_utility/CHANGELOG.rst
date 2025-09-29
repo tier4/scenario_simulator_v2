@@ -27,6 +27,11 @@ Changelog for package openscenario_utility
 16.4.2 (2025-05-23)
 -------------------
 
+17.6.0 (2025-09-29)
+-------------------
+* Merge branch 'master' into fix/noise_v4
+* Contributors: Kotaro Yoshimoto
+
 17.5.3 (2025-09-17)
 -------------------
 * Merge pull request `#1683 <https://github.com/tier4/scenario_simulator_v2/issues/1683>`_ from tier4/fix/macro-xml-validation
