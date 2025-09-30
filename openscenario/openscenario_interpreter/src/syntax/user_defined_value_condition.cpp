@@ -102,7 +102,7 @@ struct MagicSubscription : private T
 
   ~MagicSubscription()
   {
-    if (not--count) {
+    if (not --count) {
       node.reset();
     }
   }
