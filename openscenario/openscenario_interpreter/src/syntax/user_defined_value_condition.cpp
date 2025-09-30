@@ -43,13 +43,15 @@ struct MagicSubscription : private T
 
     std::exception_ptr thrown;
 
+    rclcpp::executors::SingleThreadedExecutor executor;
+
     std::thread thread;
 
     explicit Node()
     : rclcpp::Node("magic_subscription"), thread([this]() {
         while (rclcpp::ok() and not stop_requested) {
           try {
-            rclcpp::spin_some(get_node_base_interface());
+            executor.spin_some();
           } catch (...) {
             auto lock = std::lock_guard(exception_mutex);
             thrown = std::current_exception();
@@ -57,6 +59,7 @@ struct MagicSubscription : private T
         }
       })
     {
+      executor.add_node(get_node_base_interface());
     }
 
     ~Node()
@@ -99,7 +102,7 @@ struct MagicSubscription : private T
 
   ~MagicSubscription()
   {
-    if (not --count) {
+    if (not--count) {
       node.reset();
     }
   }
