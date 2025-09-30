@@ -53,6 +53,7 @@ Q_SIGNALS:
 protected:
   Ui::ContextPanel * ui_;
   rclcpp::Node::SharedPtr node_;
+  rclcpp::executors::SingleThreadedExecutor executor_;
   std::vector<std::string> topics_;
 
 private:
