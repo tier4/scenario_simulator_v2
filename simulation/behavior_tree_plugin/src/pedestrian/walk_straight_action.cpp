@@ -42,100 +42,95 @@ WalkStraightAction::WalkStraightAction(
   const std::string & name, const BT::NodeConfiguration & config)
 : entity_behavior::PedestrianActionNode(name, config)
 {
-  auto parameterToSeeAroundMode = [](std::string_view parameter) {
-    if (parameter == "blind") {
-      return SeeAroundMode::blind;
-    } else if (parameter == "aware") {
-      return SeeAroundMode::aware;
-    } else {
-      THROW_SIMULATION_ERROR("Unknown see_around mode. It must be \"blind\" or \"aware\".");
-    }
-  };
-
-  should_respect_see_around = parameterToSeeAroundMode(
-    common::getParameter<std::string>("pedestrian_ignore_see_around", "blind"));
 }
 
 void WalkStraightAction::getBlackBoardValues() { PedestrianActionNode::getBlackBoardValues(); }
 
-bool checkPointIsInfront(
-  const geometry_msgs::msg::Pose & pose, const geometry_msgs::msg::Point & point)
+bool isPointInFront(
+  const geometry_msgs::msg::Pose & pose, const geometry_msgs::msg::Point & target_point)
 {
   const auto self_yaw = math::geometry::convertQuaternionToEulerAngle(pose.orientation).z;
-  const auto dx = point.x - pose.position.x;
-  const auto dy = point.y - pose.position.y;
-  const auto vec_yaw = std::atan2(dy, dx);
-  const auto yaw_diff = std::atan2(std::sin(vec_yaw - self_yaw), std::cos(vec_yaw - self_yaw));
+  const auto angle_to_target_point =
+    std::atan2(target_point.y - pose.position.y, target_point.x - pose.position.x);
+  const auto yaw_difference = std::atan2(
+    std::sin(angle_to_target_point - self_yaw), std::cos(angle_to_target_point - self_yaw));
+  return std::fabs(yaw_difference) <= boost::math::constants::half_pi<double>();
+}
 
-  return std::fabs(yaw_diff) <= boost::math::constants::half_pi<double>();
+bool WalkStraightAction::isEntityColliding(
+  const traffic_simulator::entity_status::CanonicalizedEntityStatus & entity_status,
+  const double & detection_horizon) const
+{
+  using math::geometry::operator*;
+
+  const auto & pedestrian_pose = canonicalized_entity_status_->getMapPose();
+  const auto bounding_box_map_points = math::geometry::transformPoints(
+    pedestrian_pose,
+    math::geometry::getPointsFromBbox(canonicalized_entity_status_->getBoundingBox()));
+  std::vector<geometry_msgs::msg::Point> bounding_box_front_points;
+  for (const auto & point : bounding_box_map_points) {
+    if (isPointInFront(pedestrian_pose, point)) {
+      bounding_box_front_points.push_back(point);
+    }
+  }
+
+  const auto detection_horizon_vector =
+    math::geometry::normalize(
+      math::geometry::convertQuaternionToEulerAngle(pedestrian_pose.orientation)) *
+    detection_horizon;
+  std::vector<geometry_msgs::msg::Point> detection_area_points;
+
+  for (const auto & point : bounding_box_front_points) {
+    detection_area_points.push_back(point);
+    geometry_msgs::msg::Point front_detection_point;
+    front_detection_point.x = point.x + detection_horizon_vector.x;
+    front_detection_point.y = point.y + detection_horizon_vector.z;
+    front_detection_point.z = point.z + detection_horizon_vector.y;
+    detection_area_points.push_back(front_detection_point);
+  }
+
+  const auto detection_area_polygon = math::geometry::toBoostPolygon(detection_area_points);
+  const auto other_entity_polygon =
+    math::geometry::toPolygon2D(entity_status.getMapPose(), entity_status.getBoundingBox());
+
+  if (
+    boost::geometry::intersects(detection_area_polygon, other_entity_polygon) ||
+    boost::geometry::intersects(other_entity_polygon, detection_area_polygon)) {
+    return true;
+  } else if (boost::geometry::disjoint(detection_area_polygon, other_entity_polygon)) {
+    return false;
+  } else {
+    return true;
+  }
 }
 
 bool WalkStraightAction::detectObstacleInFront(const bool see_around) const
 {
-  if (should_respect_see_around == SeeAroundMode::blind) {
-    return false;
-  }
-
-  if (!see_around) {
-    return false;
-  }
-
-  auto hasObstacleInFrontOfPedestrian = [this](double distance) {
+  auto isObstacleInFrontOfPedestrian = [this](const double & detection_horizon) {
     using math::geometry::operator-;
-    using math::geometry::operator*;
-
     const auto & pedestrian_pose = canonicalized_entity_status_->getMapPose();
-
     for (const auto & [_, entity_status] : other_entity_status_) {
       const auto & other_position = entity_status.getMapPose().position;
-      const auto norm = math::geometry::norm(other_position - pedestrian_pose.position);
-      if (norm > distance) continue;
-
-      if (checkPointIsInfront(pedestrian_pose, other_position)) {
-        // is in front of pedestrian check if collide
-        const auto bounding_box_map_points = math::geometry::transformPoints(
-          pedestrian_pose,
-          math::geometry::getPointsFromBbox(canonicalized_entity_status_->getBoundingBox()));
-
-        std::vector<geometry_msgs::msg::Point> front_points;
-        std::vector<geometry_msgs::msg::Point> check_area_points;
-        for (const auto & point : bounding_box_map_points) {
-          if (checkPointIsInfront(pedestrian_pose, point)) {
-            front_points.push_back(point);
-          }
-        }
-        auto orientation_vector =
-          math::geometry::normalize(
-            math::geometry::convertQuaternionToEulerAngle(pedestrian_pose.orientation)) *
-          distance;
-        for (auto & point : front_points) {
-          check_area_points.push_back(point);
-          point.x += orientation_vector.x;
-          point.y += orientation_vector.z;
-          point.z += orientation_vector.y;
-          check_area_points.push_back(point);
-        }
-        const auto check_polygon = math::geometry::toBoostPolygon(check_area_points);
-        const auto poly =
-          math::geometry::toPolygon2D(entity_status.getMapPose(), entity_status.getBoundingBox());
+      if (const auto distance = math::geometry::norm(other_position - pedestrian_pose.position);
+          distance <= detection_horizon) {
         if (
-          boost::geometry::intersects(check_polygon, poly) ||
-          boost::geometry::intersects(poly, check_polygon)) {
+          isPointInFront(pedestrian_pose, other_position) &&
+          isEntityColliding(entity_status, detection_horizon)) {
           return true;
-        } else if (boost::geometry::disjoint(check_polygon, poly)) {
-          return false;
         }
-        return true;
       }
     }
     return false;
   };
 
-  const double min_stop = calculateStopDistance(behavior_parameter_.dynamic_constraints);
-  const double stable_distance =
-    min_stop + canonicalized_entity_status_->getBoundingBox().dimensions.x;
-
-  return hasObstacleInFrontOfPedestrian(stable_distance);
+  if (not see_around || should_respect_see_around == SeeAroundMode::blind) {
+    return false;
+  } else {
+    const double detection_horizon =
+      calculateStopDistance(behavior_parameter_.dynamic_constraints) +
+      canonicalized_entity_status_->getBoundingBox().dimensions.x;
+    return isObstacleInFrontOfPedestrian(detection_horizon);
+  }
 }
 
 bool WalkStraightAction::checkPreconditions()
@@ -149,8 +144,8 @@ BT::NodeStatus WalkStraightAction::doAction()
     target_speed_ = 1.111;
   }
 
-  const auto obstacle_detector_result = detectObstacleInFront(behavior_parameter_.see_around);
-  target_speed_ = obstacle_detector_result ? 0.0 : target_speed_;
+  const auto is_obstacle_in_front = detectObstacleInFront(behavior_parameter_.see_around);
+  target_speed_ = is_obstacle_in_front ? 0.0 : target_speed_;
 
   setCanonicalizedEntityStatus(calculateUpdatedEntityStatusInWorldFrame(target_speed_.value()));
   return BT::NodeStatus::RUNNING;
