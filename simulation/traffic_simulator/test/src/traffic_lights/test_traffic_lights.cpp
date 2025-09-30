@@ -120,7 +120,7 @@ TEST_F(TrafficLightsTest, startTrafficLightsUpdate)
   this->lights->startTrafficLightsUpdate(20.0, 10.0);
   const auto end = std::chrono::system_clock::now() + 1s;
   while (std::chrono::system_clock::now() < end) {
-    rclcpp::spin_some(this->node_ptr);
+    this->executor.spin_some();
   }
 
   // verify contents of messages
