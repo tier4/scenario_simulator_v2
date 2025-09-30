@@ -34,7 +34,7 @@ TEST_F(LidarSensorTest, update_correct)
   lidar_->update(current_simulation_time_, status_, current_ros_time_);
 
   // Spin the node to process callbacks
-  rclcpp::spin_some(node_);
+  executor_.spin_some();
 
   ASSERT_TRUE(received_msg_);
   const auto total_num_of_points = received_msg_->width * received_msg_->height;
@@ -56,7 +56,7 @@ TEST_F(LidarSensorTest, update_goBackInTime)
   lidar_->update(current_simulation_time_, status_, rclcpp::Time(1));
 
   // Spin the node to process callbacks
-  rclcpp::spin_some(node_);
+  executor_.spin_some();
 
   EXPECT_TRUE(lidar_->getDetectedObjects().empty());
 }
@@ -72,7 +72,7 @@ TEST_F(LidarSensorTest, getDetectedObjects)
   lidar_->update(current_simulation_time_, status_, current_ros_time_);
 
   // Spin the node to process callbacks
-  rclcpp::spin_some(node_);
+  executor_.spin_some();
 
   const auto & detected_objects = lidar_->getDetectedObjects();
 

@@ -37,6 +37,7 @@ protected:
   {
     rclcpp::init(0, nullptr);
     node_ = std::make_shared<rclcpp::Node>("lidar_sensor_test_node");
+    executor_.add_node(node_);
     makeRosInterface();
     initializeEntityStatuses();
 
@@ -46,6 +47,7 @@ protected:
   ~LidarSensorTest() { rclcpp::shutdown(); }
 
   rclcpp::Node::SharedPtr node_;
+  rclcpp::executors::SingleThreadedExecutor executor_;
   agnocast_wrapper::PublisherPtr<sensor_msgs::msg::PointCloud2> publisher_;
   agnocast_wrapper::SubscriptionPtr<sensor_msgs::msg::PointCloud2> subscription_;
 
