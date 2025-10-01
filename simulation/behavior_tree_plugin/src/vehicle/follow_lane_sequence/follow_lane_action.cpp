@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <algorithm>
 #include <behavior_tree_plugin/vehicle/behavior_tree.hpp>
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/follow_lane_action.hpp>
+#include <behavior_tree_plugin/vehicle/follow_lane_sequence/spline_debug_calculator.hpp>
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/spline_debug_logger.hpp>
 #include <optional>
 #include <scenario_simulator_exception/exception.hpp>
@@ -95,6 +97,9 @@ BT::NodeStatus FollowLaneAction::doAction()
   if (waypoints.waypoints.empty()) {
     return BT::NodeStatus::FAILURE;
   }
+  if (waypoints.waypoints.size() < 2) {
+    return BT::NodeStatus::FAILURE;
+  }
 
   if (behavior_parameter_.see_around) {
     if (getRightOfWayEntities(route_lanelets_).size() != 0) {
@@ -103,7 +108,17 @@ BT::NodeStatus FollowLaneAction::doAction()
     if (trajectory == nullptr) {
       return BT::NodeStatus::FAILURE;
     }
-    const auto distance_to_front_entity = getDistanceToFrontEntity(*trajectory);
+    std::optional<double> distance_to_front_entity;
+    constexpr std::size_t kCollisionSegments = 50;
+    const double detection_width = std::max(vehicle_parameters.bounding_box.dimensions.y, 2.0);
+    math::geometry::CatmullRomSpline detection_spline(waypoints.waypoints);
+    const auto quadrilateral_data =
+      buildQuadrilateralData(detection_spline, detection_width, kCollisionSegments);
+    const auto collision_infos = detectEntityCollisions(
+      quadrilateral_data, other_entity_status_, canonicalized_entity_status_->getName());
+    if (!collision_infos.empty() && collision_infos.front().range >= 0.0) {
+      distance_to_front_entity = collision_infos.front().range;
+    }
     if (distance_to_front_entity) {
       if (
         distance_to_front_entity.value() <=

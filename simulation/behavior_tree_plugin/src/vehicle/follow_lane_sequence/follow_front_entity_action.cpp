@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <behavior_tree_plugin/vehicle/behavior_tree.hpp>
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/follow_front_entity_action.hpp>
+#include <behavior_tree_plugin/vehicle/follow_lane_sequence/spline_debug_calculator.hpp>
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/spline_debug_logger.hpp>
 #include <cmath>
 #include <optional>
@@ -99,17 +100,30 @@ BT::NodeStatus FollowFrontEntityAction::doAction()
   if (trajectory == nullptr) {
     return BT::NodeStatus::FAILURE;
   }
+  if (waypoints.waypoints.size() < 2) {
+    return BT::NodeStatus::FAILURE;
+  }
+  distance_to_front_entity_.reset();
   auto distance_to_stopline =
     traffic_simulator::distance::distanceToStopLine(route_lanelets_, *trajectory);
   auto distance_to_conflicting_entity =
     getDistanceToConflictingEntity(route_lanelets_, *trajectory);
-  const auto front_entity_name = getFrontEntityName(*trajectory);
-  if (!front_entity_name) {
+  constexpr std::size_t kCollisionSegments = 50;
+  const double detection_width = std::max(vehicle_parameters.bounding_box.dimensions.y, 2.0);
+  math::geometry::CatmullRomSpline detection_spline(waypoints.waypoints);
+  const auto quadrilateral_data =
+    buildQuadrilateralData(detection_spline, detection_width, kCollisionSegments);
+  const auto collision_infos = detectEntityCollisions(
+    quadrilateral_data, other_entity_status_, canonicalized_entity_status_->getName());
+  if (collision_infos.empty()) {
     return BT::NodeStatus::FAILURE;
   }
-  const auto & front_entity_status = getEntityStatus(front_entity_name.value());
-  distance_to_front_entity_ = getDistanceToTargetEntity(*trajectory, front_entity_status);
-  if (!distance_to_front_entity_) {
+  const auto & front_collision = collision_infos.front();
+  if (!front_collision.status) {
+    return BT::NodeStatus::FAILURE;
+  }
+  distance_to_front_entity_ = front_collision.range;
+  if (!distance_to_front_entity_ || distance_to_front_entity_.value() < 0.0) {
     return BT::NodeStatus::FAILURE;
   }
   if (distance_to_conflicting_entity) {
@@ -125,7 +139,7 @@ BT::NodeStatus FollowFrontEntityAction::doAction()
   if (!target_speed_) {
     target_speed_ = hdmap_utils_->getSpeedLimit(route_lanelets_);
   }
-  const double front_entity_linear_velocity = front_entity_status.getTwist().linear.x;
+  const double front_entity_linear_velocity = front_collision.status->getTwist().linear.x;
   if (target_speed_.value() <= front_entity_linear_velocity) {
     setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(target_speed_.value()));
     const auto obstacle = calculateObstacle(waypoints);
