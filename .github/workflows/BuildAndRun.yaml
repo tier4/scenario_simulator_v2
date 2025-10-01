@@ -103,6 +103,7 @@ jobs:
             -DCMAKE_CXX_FLAGS='-fprofile-arcs -ftest-coverage -Wno-error=class-memaccess' \
             -DCMAKE_C_FLAGS='-fprofile-arcs -ftest-coverage' \
             --packages-up-to ${{ steps.list_packages.outputs.package_list }}
+          rm -rf build/
         shell: bash
 
       - name: Colcon test
