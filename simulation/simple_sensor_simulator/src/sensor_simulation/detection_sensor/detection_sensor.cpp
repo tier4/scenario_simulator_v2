@@ -24,6 +24,7 @@
 #include <geometry/quaternion/get_angle_difference.hpp>
 #include <geometry/quaternion/get_normal_vector.hpp>
 #include <geometry/quaternion/get_rotation_matrix.hpp>
+#include <geometry/transform.hpp>
 #include <geometry/vector3/hypot.hpp>
 #include <iomanip>
 #include <memory>
@@ -393,6 +394,93 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
         return std::clamp(amplitude * std::exp(-decay * interval) + offset, 0.0, 1.0);
       };
 
+    auto create_selector = [](const std::string & parameter_base_path, double x, double y) {
+      return [parameter_base_path, x, y](const std::string & name) {
+        return [=]() {
+          const auto ellipse_y_radii =
+            common::getParameter<std::vector<double>>(parameter_base_path + "ellipse_y_radii");
+          const auto ellipse_normalized_x_radius = common::getParameter<double>(
+            parameter_base_path + name + ".ellipse_normalized_x_radius");
+          const auto values =
+            common::getParameter<std::vector<double>>(parameter_base_path + name + ".values");
+          if (ellipse_y_radii.size() == values.size()) {
+            /*
+               If the parameter `ellipse_y_radii` contains the value 0.0,
+               division by zero will occur here.
+               However, in that case, the distance will be NaN, which correctly
+               expresses the meaning that "the distance cannot be defined", and
+               this function will work without any problems (zero will be
+               returned).
+            */
+            const auto distance = std::hypot(x / ellipse_normalized_x_radius, y);
+            for (auto i = std::size_t(0); i < ellipse_y_radii.size(); ++i) {
+              if (distance < ellipse_y_radii[i]) {
+                return values[i];
+              }
+            }
+            return 0.0;
+          } else {
+            throw common::Error(
+              "Array size mismatch: ", std::quoted(parameter_base_path + "ellipse_y_radii"),
+              " has ", ellipse_y_radii.size(), " elements, but ",
+              std::quoted(parameter_base_path + name + ".values"), " has ", values.size(),
+              " elements. Both arrays must have the same size.");
+          }
+        };
+      };
+    };
+
+    auto yaw_flip = [&](
+                      bool previous_flip, double speed, double interval,
+                      const std::string & parameter_base_path) -> bool {
+      const auto speed_threshold =
+        common::getParameter<double>(parameter_base_path + "yaw_flip.speed_threshold");
+      const auto rate = common::getParameter<double>(parameter_base_path + "yaw_flip.rate");
+      return speed < speed_threshold and
+             markov_process_noise(
+               previous_flip, rate,
+               autocorrelation_coefficient(parameter_base_path + "yaw_flip", interval));
+    };
+
+    auto true_positive = [&](
+                           bool previous_true_positive, double interval,
+                           const std::string & parameter_base_path, double rate) -> bool {
+      return markov_process_noise(
+        previous_true_positive, rate,
+        autocorrelation_coefficient(parameter_base_path + "true_positive", interval));
+    };
+
+    auto apply_yaw_flip = [&](traffic_simulator_msgs::EntityStatus & entity) -> void {
+      geometry_msgs::msg::Point local_center_point;
+      simulation_interface::toMsg(entity.bounding_box().center(), local_center_point);
+
+      geometry_msgs::msg::Pose original_pose;
+      simulation_interface::toMsg(entity.pose(), original_pose);
+
+      tf2::Quaternion original_orientation;
+      tf2::fromMsg(original_pose.orientation, original_orientation);
+      const tf2::Quaternion flip_rotation(
+        tf2::Vector3(0, 0, 1), boost::math::constants::pi<double>());
+
+      geometry_msgs::msg::Pose flipped_center_pose;
+      flipped_center_pose.position =
+        math::geometry::transformPoint(original_pose, local_center_point);
+      flipped_center_pose.orientation = tf2::toMsg(original_orientation * flip_rotation);
+
+      geometry_msgs::msg::Point center_offset_negative;
+      center_offset_negative.x = -entity.bounding_box().center().x();
+      center_offset_negative.y = -entity.bounding_box().center().y();
+      center_offset_negative.z = -entity.bounding_box().center().z();
+
+      const auto new_base_link_position =
+        math::geometry::transformPoint(flipped_center_pose, center_offset_negative);
+
+      simulation_interface::toProto(
+        new_base_link_position, *entity.mutable_pose()->mutable_position());
+      simulation_interface::toProto(
+        flipped_center_pose.orientation, *entity.mutable_pose()->mutable_orientation());
+    };
+
     auto noise_v2 = [&](
                       const auto & detected_entities, auto simulation_time,
                       const std::string & version_namespace) {
@@ -416,45 +504,7 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
           std::string(detected_objects_publisher->get_topic_name()) + ".noise." +
           version_namespace + ".";
 
-        auto parameter = [this, version_base_path](const auto & name) {
-          return common::getParameter<double>(version_base_path + name);
-        };
-
-        auto parameters = [this, version_base_path](const auto & name) {
-          return common::getParameter<std::vector<double>>(version_base_path + name);
-        };
-
-        auto selector = [&](const std::string & name) {
-          return [ellipse_y_radii = parameters("ellipse_y_radii"),
-                  ellipse_normalized_x_radius = parameter(name + ".ellipse_normalized_x_radius"),
-                  values = parameters(name + ".values"), &x, &y, version_namespace, name]() {
-            if (ellipse_y_radii.size() == values.size()) {
-              /*
-                 If the parameter `<topic-name>.noise.v2.ellipse_y_radii`
-                 contains the value 0.0, division by zero will occur here.
-                 However, in that case, the distance will be NaN, which correctly
-                 expresses the meaning that "the distance cannot be defined", and
-                 this function will work without any problems (zero will be
-                 returned).
-              */
-              const auto distance = std::hypot(x / ellipse_normalized_x_radius, y);
-              for (auto i = std::size_t(0); i < ellipse_y_radii.size(); ++i) {
-                if (distance < ellipse_y_radii[i]) {
-                  return values[i];
-                }
-              }
-              return 0.0;
-            } else {
-              throw common::Error(
-                "Array size mismatch: ", std::quoted("ellipse_y_radii"), " has ",
-                ellipse_y_radii.size(), " elements, but ", std::quoted(name + ".values"), " has ",
-                values.size(),
-                " elements. Both arrays must have the same size in namespace for noise model "
-                "version ",
-                std::quoted(version_namespace), ".");
-            }
-          };
-        };
+        auto selector = create_selector(version_base_path, x, y);
 
         noise_output->second.distance_noise = [&]() {
           const auto mean = selector("distance.mean");
@@ -472,21 +522,12 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
             autocorrelation_coefficient(version_base_path + "yaw", interval));
         }();
 
-        noise_output->second.flip = [&]() {
-          const auto speed_threshold = parameter("yaw_flip.speed_threshold");
-          const auto rate = parameter("yaw_flip.rate");
-          return speed < speed_threshold and
-                 markov_process_noise(
-                   noise_output->second.flip, rate,
-                   autocorrelation_coefficient(version_base_path + "yaw_flip", interval));
-        }();
+        noise_output->second.flip =
+          yaw_flip(noise_output->second.flip, speed, interval, version_base_path);
 
-        noise_output->second.true_positive = [&]() {
-          const auto rate = selector("true_positive.rate");
-          return markov_process_noise(
-            noise_output->second.true_positive, rate(),
-            autocorrelation_coefficient(version_base_path + "true_positive", interval));
-        }();
+        noise_output->second.true_positive = true_positive(
+          noise_output->second.true_positive, interval, version_base_path,
+          selector("true_positive.rate")());
 
         if (noise_output->second.true_positive) {
           const auto angle = std::atan2(y, x);
@@ -632,32 +673,9 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
         const auto interval =
           simulation_time - std::exchange(noise_output->second.simulation_time, simulation_time);
 
-        noise_output->second.v4_position_x_noise = [&]() {
-          const auto mean = common::getParameter<double>(parameter_base_path + "position.x.mean");
-          const auto standard_deviation =
-            common::getParameter<double>(parameter_base_path + "position.x.standard_deviation");
-          return autoregressive_noise(
-            noise_output->second.v4_position_x_noise, mean, standard_deviation,
-            autocorrelation_coefficient(parameter_base_path + "position.x", interval));
-        }();
-
-        noise_output->second.v4_position_y_noise = [&]() {
-          const auto mean = common::getParameter<double>(parameter_base_path + "position.y.mean");
-          const auto standard_deviation =
-            common::getParameter<double>(parameter_base_path + "position.y.standard_deviation");
-          return autoregressive_noise(
-            noise_output->second.v4_position_y_noise, mean, standard_deviation,
-            autocorrelation_coefficient(parameter_base_path + "position.y", interval));
-        }();
-
-        noise_output->second.v4_rotation_noise = [&]() {
-          const auto mean = common::getParameter<double>(parameter_base_path + "rotation.mean");
-          const auto standard_deviation =
-            common::getParameter<double>(parameter_base_path + "rotation.standard_deviation");
-          return autoregressive_noise(
-            noise_output->second.v4_rotation_noise, mean, standard_deviation,
-            autocorrelation_coefficient(parameter_base_path + "rotation", interval));
-        }();
+        const auto speed = std::hypot(
+          vanilla_entity.action_status().twist().linear().x(),
+          vanilla_entity.action_status().twist().linear().y());
 
         math::geometry::boost_point ego_baselink_2d(
           ego_entity_status->pose().position().x(), ego_entity_status->pose().position().y());
@@ -672,36 +690,41 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
             ego_baselink_2d, math::geometry::toPolygon2D(entity_pose, entity_bounding_box));
         }();
 
-        noise_output->second.true_positive = [&]() {
-          const auto distance_thresholds = common::getParameter<std::vector<double>>(
-            parameter_base_path + "true_positive.rate.distance_thresholds");
-          const auto rate_values = common::getParameter<std::vector<double>>(
-            parameter_base_path + "true_positive.rate.values");
+        auto selector = create_selector(
+          parameter_base_path, noise_base.x() - ego_baselink_2d.x(),
+          noise_base.y() - ego_baselink_2d.y());
 
-          if (distance_thresholds.size() != rate_values.size()) {
-            throw common::Error(
-              "Array size mismatch: ", parameter_base_path,
-              "true_positive.distance_thresholds has ", distance_thresholds.size(),
-              " elements, but ", parameter_base_path, "true_positive.rate.values has ",
-              rate_values.size(), " elements. Both arrays must have the same size.");
-          } else {
-            // Find the first threshold greater than the calculated distance
-            const auto rate = [&, distance_to_noise_base = std::hypot(
-                                    noise_base.x() - ego_baselink_2d.x(),
-                                    noise_base.y() - ego_baselink_2d.y())]() -> double {
-              for (size_t i = 0; i < distance_thresholds.size(); ++i) {
-                if (distance_to_noise_base < distance_thresholds[i]) {
-                  return rate_values[i];
-                }
-              }
-              return 0.0;  // If distance exceeds all thresholds
-            }();
-
-            return markov_process_noise(
-              noise_output->second.true_positive, rate,
-              autocorrelation_coefficient(parameter_base_path + "true_positive", interval));
-          }
+        noise_output->second.v4_position_x_noise = [&]() {
+          const auto mean = selector("position.x.mean");
+          const auto standard_deviation = selector("position.x.standard_deviation");
+          return autoregressive_noise(
+            noise_output->second.v4_position_x_noise, mean(), standard_deviation(),
+            autocorrelation_coefficient(parameter_base_path + "position.x", interval));
         }();
+
+        noise_output->second.v4_position_y_noise = [&]() {
+          const auto mean = selector("position.y.mean");
+          const auto standard_deviation = selector("position.y.standard_deviation");
+          return autoregressive_noise(
+            noise_output->second.v4_position_y_noise, mean(), standard_deviation(),
+            autocorrelation_coefficient(parameter_base_path + "position.y", interval));
+        }();
+
+        noise_output->second.yaw_noise = [&]() {
+          const auto mean = selector("yaw.mean");
+          const auto standard_deviation = selector("yaw.standard_deviation");
+          return autoregressive_noise(
+            noise_output->second.yaw_noise, mean(), standard_deviation(),
+            autocorrelation_coefficient(parameter_base_path + "yaw", interval));
+        }();
+
+        noise_output->second.flip =
+          yaw_flip(noise_output->second.flip, speed, interval, parameter_base_path);
+
+        noise_output->second.true_positive = true_positive(
+          noise_output->second.true_positive, interval, parameter_base_path,
+          selector("true_positive.rate")());
+
         if (not noise_output->second.true_positive) {
           return std::nullopt;
         } else {
@@ -721,39 +744,38 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
             // If ego and entity are too close, skip the noise application
             return vanilla_entity;
           } else {
-            const auto [final_pos, final_orientation] =
-              [&]() -> std::tuple<tf2::Vector3, tf2::Quaternion> {
-              tf2::Quaternion rotation_noise(
-                tf2::Vector3(0, 0, 1), noise_output->second.v4_rotation_noise);
+            tf2::Quaternion yaw_rotation_noise(
+              tf2::Vector3(0, 0, 1), noise_output->second.yaw_noise);
 
-              // Apply rotation to entity position around noise_base
-              tf2::Vector3 entity_pos(
-                vanilla_entity.pose().position().x(), vanilla_entity.pose().position().y(), 0.0);
-              tf2::Vector3 noise_base_pos(noise_base.x(), noise_base.y(), 0.0);
-              tf2::Vector3 offset = entity_pos - noise_base_pos;
-              tf2::Vector3 rotated_offset = tf2::quatRotate(rotation_noise, offset);
-              tf2::Vector3 rotated_pos = noise_base_pos + rotated_offset;
+            geometry_msgs::msg::Pose original_pose;
+            simulation_interface::toMsg(vanilla_entity.pose(), original_pose);
 
-              // Create local coordinate system and apply position noise
-              tf2::Vector3 y_unit(y_unit_x, y_unit_y, 0.0);
-              tf2::Vector3 x_unit(y_unit_y, -y_unit_x, 0.0);
-              tf2::Vector3 noise_world = noise_output->second.v4_position_x_noise * x_unit +
-                                         noise_output->second.v4_position_y_noise * y_unit;
+            tf2::Vector3 entity_position;
+            tf2::fromMsg(original_pose.position, entity_position);
+            tf2::Vector3 noise_base_pos(noise_base.x(), noise_base.y(), 0.0);
+            tf2::Vector3 offset = entity_position - noise_base_pos;
+            const auto position_after_yaw_noise =
+              noise_base_pos + tf2::quatRotate(yaw_rotation_noise, offset);
 
-              tf2::Quaternion original_orientation(
-                vanilla_entity.pose().orientation().x(), vanilla_entity.pose().orientation().y(),
-                vanilla_entity.pose().orientation().z(), vanilla_entity.pose().orientation().w());
+            tf2::Vector3 y_unit(y_unit_x, y_unit_y, 0.0);
+            tf2::Vector3 x_unit(y_unit_y, -y_unit_x, 0.0);
+            const auto noise_world = noise_output->second.v4_position_x_noise * x_unit +
+                                     noise_output->second.v4_position_y_noise * y_unit;
 
-              return {rotated_pos + noise_world, original_orientation * rotation_noise};
-            }();
+            const auto final_position = position_after_yaw_noise + noise_world;
+            tf2::Quaternion original_orientation;
+            tf2::fromMsg(original_pose.orientation, original_orientation);
+            const auto final_orientation = original_orientation * yaw_rotation_noise;
 
             auto noised_entity = vanilla_entity;
-            noised_entity.mutable_pose()->mutable_position()->set_x(final_pos.x());
-            noised_entity.mutable_pose()->mutable_position()->set_y(final_pos.y());
-            noised_entity.mutable_pose()->mutable_orientation()->set_x(final_orientation.getX());
-            noised_entity.mutable_pose()->mutable_orientation()->set_y(final_orientation.getY());
-            noised_entity.mutable_pose()->mutable_orientation()->set_z(final_orientation.getZ());
-            noised_entity.mutable_pose()->mutable_orientation()->set_w(final_orientation.getW());
+            noised_entity.mutable_pose()->mutable_position()->set_x(final_position.x());
+            noised_entity.mutable_pose()->mutable_position()->set_y(final_position.y());
+            simulation_interface::toProto(
+              tf2::toMsg(final_orientation), *noised_entity.mutable_pose()->mutable_orientation());
+
+            if (noise_output->second.flip) {
+              apply_yaw_flip(noised_entity);
+            }
 
             return noised_entity;
           }

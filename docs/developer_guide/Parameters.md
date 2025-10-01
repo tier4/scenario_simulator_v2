@@ -473,18 +473,34 @@ which differs from the elliptical coordinate system used in v2/v3.
 
 ![noise v4 coordinate system](./images/parameters/noise_v4.png)
 
-### `noise.v4.<config_name>.position.<x/y>.mean`
+### `noise.v4.<config_name>.ellipse_y_radii`
 
-A `double` type value, default `0.0`.
-The mean value for the X/Y-axis position noise distribution. 
-The noise models the time series as AR(1) model. 
+Array of positive double type values, default `[10.0, 20.0, 40.0, 60.0, 80.0, 120.0, 150.0, 180.0, 1000.0]`. Units are in meters.
+See [`ellipse_y_radii` documentation of noise v2](#noisev2ellipse_y_radii) for detailed explanation.
 This parameter is used only if the value of `noise.model.version` is `4`.
 
-### `noise.v4.<config_name>.position.<x/y>.standard_deviation`
+### `noise.v4.<config_name>.position.<x/y>.mean.ellipse_normalized_x_radius`
 
-A positive `double` type value, default `0.0`.
-The standard deviation for the X/Y-axis position noise distribution. 
-The noise models the time series as AR(1) model. 
+A positive `double` type value, default `1.0`.
+See [`ellipse_normalized_x_radius` documentation of noise v2](#noisev2distancemeanellipse_normalized_x_radius) for detailed explanation.
+This parameter is used only if the value of `noise.model.version` is `4`.
+
+### `noise.v4.<config_name>.position.<x/y>.mean.values`
+
+Array of double type values, default `[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]`.
+See [`values` documentation of noise v2](#noisev2distancemeanvalues) for detailed explanation.
+This parameter is used only if the value of `noise.model.version` is `4`.
+
+### `noise.v4.<config_name>.position.<x/y>.standard_deviation.ellipse_normalized_x_radius`
+
+A positive `double` type value, default `1.0`.
+See [`ellipse_normalized_x_radius` documentation of noise v2](#noisev2distancestandarddeviationellipse_normalized_x_radius) for detailed explanation.
+This parameter is used only if the value of `noise.model.version` is `4`.
+
+### `noise.v4.<config_name>.position.<x/y>.standard_deviation.values`
+
+Array of positive double type values, default `[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]`.
+See [`values` documentation of noise v2](#noisev2distancestandarddeviationvalues) for detailed explanation.
 This parameter is used only if the value of `noise.model.version` is `4`.
 
 ### `noise.v4.<config_name>.position.<x/y>.autocorrelation_coefficient.amplitude`
@@ -505,60 +521,80 @@ A positive `double` type value, default `0.0`.
 The parameter of the autocorrelation coefficient used in the generation of X/Y-axis position noise. 
 This parameter is used only if the value of `noise.model.version` is `4`.
 
-### `noise.v4.<config_name>.rotation` (namespace)
+### `noise.v4.<config_name>.yaw` (namespace)
 
-The rotation noise in noise v4 model applies angular noise around the closest point on the entity's bounding box 
+The rotation yaw noise in noise v4 model applies angular noise around the closest point on the entity's bounding box 
 to the ego vehicle (the origin of noise coordinate), rather than around the entity's base-link.
 
-### `noise.v4.<config_name>.rotation.mean`
+### `noise.v4.<config_name>.yaw.mean.ellipse_normalized_x_radius`
 
-A `double` type value, default `0.0`.
-The mean value for the rotation noise distribution. 
-The unit is radians. The noise models the time series as AR(1) model. 
+A positive `double` type value, default `1.0`.
+See [`ellipse_normalized_x_radius` documentation of noise v2](#noisev2yawmeanellipse_normalized_x_radius) for detailed explanation.
 This parameter is used only if the value of `noise.model.version` is `4`.
 
-### `noise.v4.<config_name>.rotation.standard_deviation`
+### `noise.v4.<config_name>.yaw.mean.values`
 
-A positive `double` type value, default `0.0`.
-The standard deviation for the rotation noise distribution. The unit is radians. 
-The noise models the time series as AR(1) model. This parameter is used only if the value of `noise.model.version` is `4`.
+Array of double type values, default `[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]`.
+See [`values` documentation of noise v2](#noisev2yawmeanvalues) for detailed explanation.
+The unit is radians. This parameter is used only if the value of `noise.model.version` is `4`.
 
-### `noise.v4.<config_name>.rotation.autocorrelation_coefficient.amplitude`
+### `noise.v4.<config_name>.yaw.standard_deviation.ellipse_normalized_x_radius`
+
+A positive `double` type value, default `1.0`.
+See [`ellipse_normalized_x_radius` documentation of noise v2](#noisev2yawstandarddeviationellipse_normalized_x_radius) for detailed explanation.
+This parameter is used only if the value of `noise.model.version` is `4`.
+
+### `noise.v4.<config_name>.yaw.standard_deviation.values`
+
+Array of positive double type values, default `[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]`.
+See [`values` documentation of noise v2](#noisev2yawstandarddeviationvalues) for detailed explanation.
+The unit is radians. This parameter is used only if the value of `noise.model.version` is `4`.
+
+### `noise.v4.<config_name>.yaw.autocorrelation_coefficient.amplitude`
 
 A positive `double` type value, default `0.0`.
 The parameter of the autocorrelation coefficient used in the generation of rotation noise. 
 This parameter is used only if the value of `noise.model.version` is `4`.
 
-### `noise.v4.<config_name>.rotation.autocorrelation_coefficient.decay`
+### `noise.v4.<config_name>.yaw.autocorrelation_coefficient.decay`
 
 A positive `double` type value, default `0.0`.
 The parameter of the autocorrelation coefficient used in the generation of rotation noise. 
 This parameter is used only if the value of `noise.model.version` is `4`.
 
-### `noise.v4.<config_name>.rotation.autocorrelation_coefficient.offset`
+### `noise.v4.<config_name>.yaw.autocorrelation_coefficient.offset`
 
 A positive `double` type value, default `0.0`.
 The parameter of the autocorrelation coefficient used in the generation of rotation noise. 
 This parameter is used only if the value of `noise.model.version` is `4`.
+
+### `noise.v4.<config_name>.yaw_flip` (namespace)
+
+The yaw-flip noise in noise v4 model is basically same to one in noise v2.
+See [`yaw_flip` documentation of noise v2](#noisev2yaw_flipautocorrelation_coefficientamplitude) for detailed explanation.
+Like noise v2, noise v4 also has the parameters below in this namespace.
+
+- `noise.v4.<config_name>.yaw_flip.autocorrelation_coefficient.amplitude`
+- `noise.v4.<config_name>.yaw_flip.autocorrelation_coefficient.decay`
+- `noise.v4.<config_name>.yaw_flip.autocorrelation_coefficient.offset`
+- `noise.v4.<config_name>.yaw_flip.rate`
+- `noise.v4.<config_name>.yaw_flip.speed_threshold`
 
 ### `noise.v4.<config_name>.true_positive` (namespace)
 
-The true positive parameters in noise v4 model control the detection probability of entities based on distance from the ego vehicle. 
-Unlike v2's elliptical coordinate system, v4 uses direct distance measurement to the closest point on the entity's bounding box.
+The true positive parameters in noise v4 model control the detection probability of entities based on distance from the ego vehicle.
+Like v2/v3, v4 uses elliptical coordinate system to determine the detection rate based on the distance from the ego vehicle.
 
-### `noise.v4.<config_name>.true_positive.rate.distance_thresholds`
+### `noise.v4.<config_name>.true_positive.rate.ellipse_normalized_x_radius`
 
-Array of positive double type values, default `[1000.0]`. Units are in meters.
-Distance thresholds used to determine which detection rate to apply. 
-The distance is calculated from the ego vehicle base-link to the closest point on the entity's bounding box. 
+A positive `double` type value, default `1.0`.
+See [`ellipse_normalized_x_radius` documentation of noise v2](#noisev2true_positiverateellipse_normalized_x_radius) for detailed explanation.
 This parameter is used only if the value of `noise.model.version` is `4`.
 
 ### `noise.v4.<config_name>.true_positive.rate.values`
 
-Array of double type values between `0.0` and `1.0`, default `[1.0]`.
-Each element represents the detection probability for the corresponding distance range. 
-The array size must match `distance_thresholds`. 
-The first threshold greater than the calculated distance determines which rate value to use. 
+Array of double type values between `0.0` and `1.0`, default `[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]`.
+See [`values` documentation of noise v2](#noisev2true_positiveratevalues) for detailed explanation.
 This parameter is used only if the value of `noise.model.version` is `4`.
 
 ### `noise.v4.<config_name>.true_positive.autocorrelation_coefficient.amplitude`
