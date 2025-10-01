@@ -80,6 +80,10 @@ bool WalkStraightAction::isEntityColliding(
     detection_horizon;
   std::vector<geometry_msgs::msg::Point> detection_area_points;
 
+  // For the two front bounding box points, first add the original point, then a point
+  // shifted forward in the pedestrian's facing direction (orientation * detection_horizon).
+  // The original points define the base of the detection area, while the shifted points
+  // define the far edge, together forming the detection zone in front of the pedestrian
   for (const auto & point : bounding_box_front_points) {
     detection_area_points.push_back(point);
     geometry_msgs::msg::Point front_detection_point;
@@ -104,9 +108,9 @@ bool WalkStraightAction::isEntityColliding(
   }
 }
 
-bool WalkStraightAction::detectObstacleInFront(const bool see_around) const
+bool WalkStraightAction::isObstacleInFront(const bool see_around) const
 {
-  auto isObstacleInFrontOfPedestrian = [this](const double & detection_horizon) {
+  auto isObstacleInFrontOfPedestrian = [this](const double detection_horizon) {
     using math::geometry::operator-;
     const auto & pedestrian_pose = canonicalized_entity_status_->getMapPose();
     for (const auto & [_, entity_status] : other_entity_status_) {
@@ -144,7 +148,7 @@ BT::NodeStatus WalkStraightAction::doAction()
     target_speed_ = 1.111;
   }
 
-  const auto is_obstacle_in_front = detectObstacleInFront(behavior_parameter_.see_around);
+  const auto is_obstacle_in_front = isObstacleInFront(behavior_parameter_.see_around);
   target_speed_ = is_obstacle_in_front ? 0.0 : target_speed_;
 
   setCanonicalizedEntityStatus(calculateUpdatedEntityStatusInWorldFrame(target_speed_.value()));
