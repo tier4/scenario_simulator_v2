@@ -24,7 +24,6 @@
 #include <rclcpp/clock.hpp>
 #include <rclcpp/duration.hpp>
 #include <rclcpp/rclcpp.hpp>
-#include <std_msgs/msg/color_rgba.hpp>
 #include <visualization_msgs/msg/marker_array.hpp>
 
 #include <algorithm>
@@ -44,31 +43,14 @@ namespace
 {
 // RViz 表示で使用する共通設定値。
 constexpr char kFrameId[] = "map";
-constexpr double kFillAlpha = 0.4;
-constexpr double kOutlineAlpha = 0.9;
-constexpr double kOutlineWidth = 0.1;
+constexpr double kFillAlpha = 0.5;
 constexpr double kLifetimeSeconds = 0.1;
-
-// インデックスに応じて可視化用のベースカラーを決定する。
-auto generateBaseColor(const std::size_t index) -> std::array<float, 3>
-{
-  constexpr std::array<std::array<float, 3>, 8> palette = {
-    std::array<float, 3>{0.90F, 0.30F, 0.30F},
-    std::array<float, 3>{0.30F, 0.80F, 0.35F},
-    std::array<float, 3>{0.30F, 0.45F, 0.90F},
-    std::array<float, 3>{0.90F, 0.80F, 0.30F},
-    std::array<float, 3>{0.85F, 0.30F, 0.90F},
-    std::array<float, 3>{0.30F, 0.90F, 0.90F},
-    std::array<float, 3>{0.65F, 0.40F, 0.95F},
-    std::array<float, 3>{0.95F, 0.55F, 0.35F}};
-  return palette[index % palette.size()];
-}
 
 // 区間四角形を TRIANGLE_LIST マーカーとして塗り潰し描画する。
 auto makeQuadrilateralFillMarker(
   const std::string & ns, int32_t id, const rclcpp::Time & stamp,
-  const std::vector<std::array<geometry_msgs::msg::Point, 4>> & quadrilaterals,
-  const std::vector<std_msgs::msg::ColorRGBA> & colors) -> visualization_msgs::msg::Marker
+  const std::vector<std::array<geometry_msgs::msg::Point, 4>> & quadrilaterals)
+  -> visualization_msgs::msg::Marker
 {
   visualization_msgs::msg::Marker marker;
   marker.header.frame_id = kFrameId;
@@ -82,22 +64,21 @@ auto makeQuadrilateralFillMarker(
   marker.scale.y = 1.0;
   marker.scale.z = 1.0;
   marker.lifetime = rclcpp::Duration::from_seconds(kLifetimeSeconds);
+  marker.color.r = 0.5F;
+  marker.color.g = 0.5F;
+  marker.color.b = 0.5F;
+  marker.color.a = static_cast<float>(kFillAlpha);
   marker.points.reserve(quadrilaterals.size() * 6);
-  marker.colors.reserve(quadrilaterals.size() * 6);
 
   for (std::size_t idx = 0; idx < quadrilaterals.size(); ++idx) {
     const auto & quad = quadrilaterals[idx];
-    const auto & color = colors[idx];
     const auto add_triangle = [&](
                                    const geometry_msgs::msg::Point & a,
                                    const geometry_msgs::msg::Point & b,
                                    const geometry_msgs::msg::Point & c) {
       marker.points.push_back(a);
-      marker.colors.push_back(color);
       marker.points.push_back(b);
-      marker.colors.push_back(color);
       marker.points.push_back(c);
-      marker.colors.push_back(color);
     };
     add_triangle(quad[0], quad[1], quad[2]);
     add_triangle(quad[0], quad[2], quad[3]);
@@ -106,230 +87,15 @@ auto makeQuadrilateralFillMarker(
   return marker;
 }
 
-// 区間四角形の輪郭線を LINE_LIST マーカーとして生成する。
-auto makeQuadrilateralOutlineMarker(
-  const std::string & ns, int32_t id, const rclcpp::Time & stamp,
-  const std::vector<std::array<geometry_msgs::msg::Point, 4>> & quadrilaterals,
-  const std::vector<std_msgs::msg::ColorRGBA> & colors) -> visualization_msgs::msg::Marker
-{
-  visualization_msgs::msg::Marker marker;
-  marker.header.frame_id = kFrameId;
-  marker.header.stamp = stamp;
-  marker.ns = ns;
-  marker.id = id;
-  marker.type = visualization_msgs::msg::Marker::LINE_LIST;
-  marker.action = visualization_msgs::msg::Marker::ADD;
-  marker.scale.x = kOutlineWidth;
-  marker.lifetime = rclcpp::Duration::from_seconds(kLifetimeSeconds);
-
-  for (std::size_t idx = 0; idx < quadrilaterals.size(); ++idx) {
-    const auto & quad = quadrilaterals[idx];
-    const auto & color = colors[idx];
-    for (std::size_t vertex = 0; vertex < quad.size(); ++vertex) {
-      const auto & from = quad[vertex];
-      const auto & to = quad[(vertex + 1) % quad.size()];
-      marker.points.push_back(from);
-      marker.colors.push_back(color);
-      marker.points.push_back(to);
-      marker.colors.push_back(color);
-    }
-  }
-
-  return marker;
-}
-
-// 四角形群を RViz 表示用の塗り潰し／輪郭マーカーへ変換する。
+// 四角形群を RViz 表示用の塗り潰しマーカーへ変換する。
 auto createSplineMarkers(
   const std::string & ns, const rclcpp::Time & stamp, const QuadrilateralData & data)
   -> std::vector<visualization_msgs::msg::Marker>
 {
-  std::vector<std_msgs::msg::ColorRGBA> fill_colors;
-  fill_colors.reserve(data.quadrilaterals.size());
-  for (std::size_t idx = 0; idx < data.quadrilaterals.size(); ++idx) {
-    const auto base_color = generateBaseColor(idx);
-    std_msgs::msg::ColorRGBA color;
-    color.r = base_color[0];
-    color.g = base_color[1];
-    color.b = base_color[2];
-    color.a = static_cast<float>(kFillAlpha);
-    fill_colors.emplace_back(color);
-  }
-  auto outline_colors = fill_colors;
-  for (auto & color : outline_colors) {
-    color.a = static_cast<float>(kOutlineAlpha);
-  }
-
   std::vector<visualization_msgs::msg::Marker> markers;
-  markers.reserve(2);
-  markers.emplace_back(makeQuadrilateralFillMarker(
-    ns + ":quadrilateral_fill", 0, stamp, data.quadrilaterals, fill_colors));
-  markers.emplace_back(makeQuadrilateralOutlineMarker(
-    ns + ":quadrilateral_outline", 0, stamp, data.quadrilaterals, outline_colors));
-  return markers;
-}
-
-// 軌道座標系上の range 位置に垂直線マーカーを生成する。
-auto createRangeMarker(
-  const std::string & ns, const rclcpp::Time & stamp,
-  const math::geometry::CatmullRomSpline & spline, const QuadrilateralData & data,
-  const EntityCollisionInfo & info, const double default_lane_width)
-  -> std::optional<visualization_msgs::msg::Marker>
-{
-  if (!info.intersects_trajectory || !std::isfinite(info.range)) {
-    return std::nullopt;
-  }
-
-  const double spline_length = spline.getLength();
-  if (spline_length <= 0.0) {
-    return std::nullopt;
-  }
-
-  const double clamped_s = std::clamp(info.range, 0.0, spline_length);
-  const auto tangent = spline.getTangentVector(clamped_s);
-  const double tangent_norm = std::hypot(tangent.x, tangent.y);
-  if (tangent_norm < 1.0e-6) {
-    return std::nullopt;
-  }
-
-  double half_width = 0.5 * default_lane_width;
-  constexpr double kRangeTolerance = 1.0e-3;
-  for (std::size_t idx = 0; idx < data.longitudinal_ranges.size(); ++idx) {
-    const auto & [start_s, end_s] = data.longitudinal_ranges[idx];
-    if ((clamped_s + kRangeTolerance) < start_s || (clamped_s - kRangeTolerance) > end_s) {
-      continue;
-    }
-    if (idx < data.quadrilaterals.size()) {
-      const auto & quad = data.quadrilaterals[idx];
-      const double dx = quad[0].x - quad[1].x;
-      const double dy = quad[0].y - quad[1].y;
-      const double width = std::hypot(dx, dy);
-      if (width > 1.0e-6) {
-        half_width = 0.5 * width;
-      }
-    }
-    break;
-  }
-
-  const auto center = spline.getPoint(clamped_s);
-  const double normal_x = -tangent.y / tangent_norm;
-  const double normal_y = tangent.x / tangent_norm;
-
-  geometry_msgs::msg::Point start_point = center;
-  start_point.x += normal_x * half_width;
-  start_point.y += normal_y * half_width;
-
-  geometry_msgs::msg::Point end_point = center;
-  end_point.x -= normal_x * half_width;
-  end_point.y -= normal_y * half_width;
-
-  visualization_msgs::msg::Marker marker;
-  marker.header.frame_id = kFrameId;
-  marker.header.stamp = stamp;
-  marker.ns = ns + ":range";
-  marker.id = 0;
-  marker.type = visualization_msgs::msg::Marker::LINE_STRIP;
-  marker.action = visualization_msgs::msg::Marker::ADD;
-  marker.scale.x = 0.5;
-  marker.color.r = 1.0F;
-  marker.color.g = 0.0F;
-  marker.color.b = 0.0F;
-  marker.color.a = 1.0F;
-  marker.lifetime = rclcpp::Duration::from_seconds(kLifetimeSeconds);
-  marker.points.push_back(start_point);
-  marker.points.push_back(end_point);
-  return marker;
-}
-
-// 軌道と交差する可能性のあるエンティティの枠と警告テキストを生成する。
-auto createEntityMarkers(
-  const std::string & ns, const rclcpp::Time & stamp,
-  const std::vector<EntityCollisionInfo> & collision_infos,
-  const std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus> & canonicalized_entity_status,
-  const std::string & entity_name) -> std::vector<visualization_msgs::msg::Marker>
-{
-  std::vector<visualization_msgs::msg::Marker> markers;
-  if (collision_infos.empty()) {
-    return markers;
-  }
-
-  const int32_t base_id = 10;
-  for (std::size_t idx = 0; idx < collision_infos.size(); ++idx) {
-    const auto & info = collision_infos[idx];
-    const auto & name = info.name;
-    if (info.status == nullptr) {
-      continue;
-    }
-    const auto & status = *info.status;
-    const auto & outer = info.polygon.outer();
-    if (outer.size() < 3) {
-      continue;
-    }
-
-    visualization_msgs::msg::Marker marker;
-    marker.header.frame_id = kFrameId;
-    marker.header.stamp = stamp;
-    marker.ns = ns + ":entity";
-    marker.id = base_id + static_cast<int32_t>(idx);
-    marker.type = visualization_msgs::msg::Marker::LINE_STRIP;
-    marker.action = visualization_msgs::msg::Marker::ADD;
-    marker.scale.x = kOutlineWidth;
-
-    std_msgs::msg::ColorRGBA color;
-    color.a = 1.0F;
-    if (canonicalized_entity_status && name == entity_name) {
-      color.r = 0.0F;
-      color.g = 1.0F;
-      color.b = 0.0F;
-    } else if (name == "ego" || name == "Ego") {
-      color.r = 1.0F;
-      color.g = 0.2F;
-      color.b = 0.2F;
-    } else {
-      color.r = 1.0F;
-      color.g = 1.0F;
-      color.b = 0.0F;
-    }
-    marker.color = color;
-
-    const double base_z = status.getMapPose().position.z + status.getBoundingBox().center.z;
-    for (const auto & point : outer) {
-      geometry_msgs::msg::Point geometry_point;
-      geometry_point.x = point.x();
-      geometry_point.y = point.y();
-      geometry_point.z = base_z;
-      marker.points.push_back(geometry_point);
-    }
-    if (!marker.points.empty()) {
-      marker.points.push_back(marker.points.front());
-      markers.emplace_back(std::move(marker));
-    }
-
-    if (info.intersects_trajectory) {
-      visualization_msgs::msg::Marker text_marker;
-      text_marker.header.frame_id = kFrameId;
-      text_marker.header.stamp = stamp;
-      text_marker.ns = ns + ":intersection_text";
-      text_marker.id = base_id + static_cast<int32_t>(idx);
-      text_marker.type = visualization_msgs::msg::Marker::TEXT_VIEW_FACING;
-      text_marker.action = visualization_msgs::msg::Marker::ADD;
-      text_marker.scale.z = 2.0;
-      text_marker.color.r = 1.0F;
-      text_marker.color.g = 0.0F;
-      text_marker.color.b = 0.0F;
-      text_marker.color.a = 1.0F;
-      text_marker.pose.position = status.getMapPose().position;
-      text_marker.pose.position.z += status.getBoundingBox().center.z +
-                                     0.5 * status.getBoundingBox().dimensions.z + 1.0;
-      text_marker.pose.orientation.x = 0.0;
-      text_marker.pose.orientation.y = 0.0;
-      text_marker.pose.orientation.z = 0.0;
-      text_marker.pose.orientation.w = 1.0;
-      text_marker.text = entity_name + " npc trajectoryとnpc " + name + "は交点を持っている";
-      text_marker.lifetime = rclcpp::Duration::from_seconds(kLifetimeSeconds);
-      markers.emplace_back(std::move(text_marker));
-    }
-  }
-
+  markers.reserve(1);
+  markers.emplace_back(
+    makeQuadrilateralFillMarker(ns + ":quadrilateral", 0, stamp, data.quadrilaterals));
   return markers;
 }
 
@@ -387,6 +153,7 @@ void logSplineDebugInfo(
 {
   // 処理時間を測定するために開始時刻を記録する。
   const auto start = std::chrono::steady_clock::now();
+  static_cast<void>(other_entity_status);
   std::vector<visualization_msgs::msg::Marker> markers;
   const auto entity_name =
     canonicalized_entity_status ? canonicalized_entity_status->getName() : std::string("unknown");
@@ -397,21 +164,9 @@ void logSplineDebugInfo(
     constexpr double kLaneWidth = 2.0;
     constexpr std::size_t kNumSegments = 50;
     const auto quadrilateral_data = buildQuadrilateralData(debug_spline, kLaneWidth, kNumSegments);
-    const auto collision_infos = detectEntityCollisions(
-      quadrilateral_data, other_entity_status, entity_name);
 
     auto spline_markers = createSplineMarkers(ns, stamp, quadrilateral_data);
     markers.insert(markers.end(), spline_markers.begin(), spline_markers.end());
-    auto entity_markers = createEntityMarkers(
-      ns, stamp, collision_infos, canonicalized_entity_status, entity_name);
-    markers.insert(markers.end(), entity_markers.begin(), entity_markers.end());
-
-    for (const auto & info : collision_infos) {
-      if (auto range_marker = createRangeMarker(
-            ns, stamp, debug_spline, quadrilateral_data, info, kLaneWidth)) {
-        markers.emplace_back(std::move(*range_marker));
-      }
-    }
 
   } catch (const std::exception & e) {
     std::cout << "[" << action_name << "] spline debug error: " << e.what() << std::endl;
@@ -420,8 +175,8 @@ void logSplineDebugInfo(
   const auto elapsed_ms =
     std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(end - start);
   // RViz publish を除いた処理時間をデバッグとして出力する。
-  // std::cout << "[" << action_name << "] spline debug processing time: " << elapsed_ms.count()
-  //           << " ms" << std::endl;
+  std::cout << "[" << action_name << "] spline debug processing time: " << elapsed_ms.count()
+            << " ms" << std::endl;
   if (!markers.empty()) {
     publishImmediate(markers);
   }
