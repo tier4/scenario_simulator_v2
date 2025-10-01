@@ -27,10 +27,13 @@
 #include <std_msgs/msg/color_rgba.hpp>
 #include <visualization_msgs/msg/marker_array.hpp>
 
+#include <algorithm>
 #include <array>
+#include <cmath>
 #include <exception>
 #include <iostream>
 #include <mutex>
+#include <optional>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -163,6 +166,78 @@ auto createSplineMarkers(
   markers.emplace_back(makeQuadrilateralOutlineMarker(
     ns + ":quadrilateral_outline", 0, stamp, data.quadrilaterals, outline_colors));
   return markers;
+}
+
+// 軌道座標系上の range 位置に垂直線マーカーを生成する。
+auto createRangeMarker(
+  const std::string & ns, const rclcpp::Time & stamp,
+  const math::geometry::CatmullRomSpline & spline, const QuadrilateralData & data,
+  const EntityCollisionInfo & info, const double default_lane_width)
+  -> std::optional<visualization_msgs::msg::Marker>
+{
+  if (!info.intersects_trajectory || !std::isfinite(info.range)) {
+    return std::nullopt;
+  }
+
+  const double spline_length = spline.getLength();
+  if (spline_length <= 0.0) {
+    return std::nullopt;
+  }
+
+  const double clamped_s = std::clamp(info.range, 0.0, spline_length);
+  const auto tangent = spline.getTangentVector(clamped_s);
+  const double tangent_norm = std::hypot(tangent.x, tangent.y);
+  if (tangent_norm < 1.0e-6) {
+    return std::nullopt;
+  }
+
+  double half_width = 0.5 * default_lane_width;
+  constexpr double kRangeTolerance = 1.0e-3;
+  for (std::size_t idx = 0; idx < data.longitudinal_ranges.size(); ++idx) {
+    const auto & [start_s, end_s] = data.longitudinal_ranges[idx];
+    if ((clamped_s + kRangeTolerance) < start_s || (clamped_s - kRangeTolerance) > end_s) {
+      continue;
+    }
+    if (idx < data.quadrilaterals.size()) {
+      const auto & quad = data.quadrilaterals[idx];
+      const double dx = quad[0].x - quad[1].x;
+      const double dy = quad[0].y - quad[1].y;
+      const double width = std::hypot(dx, dy);
+      if (width > 1.0e-6) {
+        half_width = 0.5 * width;
+      }
+    }
+    break;
+  }
+
+  const auto center = spline.getPoint(clamped_s);
+  const double normal_x = -tangent.y / tangent_norm;
+  const double normal_y = tangent.x / tangent_norm;
+
+  geometry_msgs::msg::Point start_point = center;
+  start_point.x += normal_x * half_width;
+  start_point.y += normal_y * half_width;
+
+  geometry_msgs::msg::Point end_point = center;
+  end_point.x -= normal_x * half_width;
+  end_point.y -= normal_y * half_width;
+
+  visualization_msgs::msg::Marker marker;
+  marker.header.frame_id = kFrameId;
+  marker.header.stamp = stamp;
+  marker.ns = ns + ":range";
+  marker.id = 0;
+  marker.type = visualization_msgs::msg::Marker::LINE_STRIP;
+  marker.action = visualization_msgs::msg::Marker::ADD;
+  marker.scale.x = 0.5;
+  marker.color.r = 1.0F;
+  marker.color.g = 0.0F;
+  marker.color.b = 0.0F;
+  marker.color.a = 1.0F;
+  marker.lifetime = rclcpp::Duration::from_seconds(kLifetimeSeconds);
+  marker.points.push_back(start_point);
+  marker.points.push_back(end_point);
+  return marker;
 }
 
 // 軌道と交差する可能性のあるエンティティの枠と警告テキストを生成する。
@@ -320,7 +395,7 @@ void logSplineDebugInfo(
   try {
     math::geometry::CatmullRomSpline debug_spline(waypoints.waypoints);
     constexpr double kLaneWidth = 2.0;
-    constexpr std::size_t kNumSegments = 10;
+    constexpr std::size_t kNumSegments = 50;
     const auto quadrilateral_data = buildQuadrilateralData(debug_spline, kLaneWidth, kNumSegments);
     const auto collision_infos = detectEntityCollisions(
       quadrilateral_data, other_entity_status, entity_name);
@@ -330,6 +405,13 @@ void logSplineDebugInfo(
     auto entity_markers = createEntityMarkers(
       ns, stamp, collision_infos, canonicalized_entity_status, entity_name);
     markers.insert(markers.end(), entity_markers.begin(), entity_markers.end());
+
+    for (const auto & info : collision_infos) {
+      if (auto range_marker = createRangeMarker(
+            ns, stamp, debug_spline, quadrilateral_data, info, kLaneWidth)) {
+        markers.emplace_back(std::move(*range_marker));
+      }
+    }
 
   } catch (const std::exception & e) {
     std::cout << "[" << action_name << "] spline debug error: " << e.what() << std::endl;

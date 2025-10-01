@@ -9,6 +9,8 @@
 #include <boost/geometry/algorithms/intersects.hpp>
 
 #include <cmath>
+#include <limits>
+#include <optional>
 #include <utility>
 
 // スプライン軌道を交差判定に使える幾何データへ変換する処理群の実装。
@@ -117,6 +119,9 @@ auto detectEntityCollisions(
     entity_statuses.emplace_back(name, &status);
   }
 
+  std::optional<EntityCollisionInfo> nearest_collision;
+  double nearest_range = std::numeric_limits<double>::infinity();
+
   for (std::size_t idx = 0; idx < entity_statuses.size(); ++idx) {
     const auto * status = entity_statuses[idx].second;
     // エンティティの姿勢とバウンディングボックスから2Dポリゴンを生成。
@@ -127,8 +132,19 @@ auto detectEntityCollisions(
 
     // 軌道候補と交差するかを判定し、結果を蓄積する。
     const auto [intersects, range] = intersectsTrajectory(data, polygon);
-    collisions.emplace_back(EntityCollisionInfo{
-      entity_statuses[idx].first, status, std::move(polygon), intersects});
+    if (!intersects || range < 0.0) {
+      continue;
+    }
+
+    if (range < nearest_range) {
+      nearest_range = range;
+      nearest_collision = EntityCollisionInfo{
+        entity_statuses[idx].first, status, std::move(polygon), intersects, range};
+    }
+  }
+
+  if (nearest_collision.has_value()) {
+    collisions.emplace_back(std::move(*nearest_collision));
   }
   return collisions;
 }

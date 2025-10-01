@@ -51,6 +51,7 @@ struct EntityCollisionInfo
   const traffic_simulator::CanonicalizedEntityStatus * status;
   BoostPolygon polygon;
   bool intersects_trajectory;
+  double range;
 };
 
 auto buildQuadrilateralData(
