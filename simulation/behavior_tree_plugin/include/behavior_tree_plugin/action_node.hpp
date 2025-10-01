@@ -19,9 +19,11 @@
 
 #include <algorithm>
 #include <geometry/spline/catmull_rom_spline.hpp>
+#include <geometry_msgs/msg/point.hpp>
 #include <memory>
 #include <optional>
 #include <string>
+#include <utility>
 #include <traffic_simulator/behavior/behavior_plugin_base.hpp>
 #include <traffic_simulator/data_type/behavior.hpp>
 #include <traffic_simulator/data_type/entity_status.hpp>
@@ -56,7 +58,7 @@ public:
   auto getDistanceToFrontEntity(const math::geometry::CatmullRomSplineInterface & spline) const
     -> std::optional<double>;
   auto getFrontEntityNameAndDistanceByTrajectory(
-    const math::geometry::CatmullRomSpline & spline, const double width,
+    const std::vector<geometry_msgs::msg::Point> & waypoints, const double width,
     const std::size_t num_segments) const -> std::optional<std::pair<std::string, double>>;
   auto getDistanceToTrafficLightStopLine(
     const lanelet::Ids & route_lanelets,

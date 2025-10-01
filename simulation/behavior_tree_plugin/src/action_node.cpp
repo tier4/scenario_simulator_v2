@@ -450,9 +450,13 @@ auto detectEntityCollisions(
 }  // namespace
 
 auto ActionNode::getFrontEntityNameAndDistanceByTrajectory(
-  const math::geometry::CatmullRomSpline & spline, const double width,
+  const std::vector<geometry_msgs::msg::Point> & waypoints, const double width,
   const std::size_t num_segments) const -> std::optional<std::pair<std::string, double>>
 {
+  if (waypoints.size() < 2) {
+    return std::nullopt;
+  }
+  const math::geometry::CatmullRomSpline spline(waypoints);
   const auto quadrilateral_data = buildQuadrilateralData(spline, width, num_segments);
   if (
     const auto collision = detectEntityCollisions(
