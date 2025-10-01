@@ -13,12 +13,9 @@
 // limitations under the License.
 
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/spline_debug_logger.hpp>
+#include <behavior_tree_plugin/vehicle/follow_lane_sequence/spline_debug_calculator.hpp>
 
-#include <geometry/bounding_box.hpp>
 #include <geometry/spline/catmull_rom_spline.hpp>
-
-#include <boost/geometry.hpp>
-#include <boost/geometry/algorithms/intersects.hpp>
 
 #include <geometry_msgs/msg/point.hpp>
 
@@ -30,9 +27,7 @@
 #include <std_msgs/msg/color_rgba.hpp>
 #include <visualization_msgs/msg/marker_array.hpp>
 
-#include <algorithm>
 #include <array>
-#include <cmath>
 #include <exception>
 #include <iostream>
 #include <mutex>
@@ -44,21 +39,12 @@ namespace entity_behavior::vehicle::follow_lane_sequence
 {
 namespace
 {
-namespace bg = boost::geometry;
-using BoostPoint = bg::model::d2::point_xy<double>;
-using BoostPolygon = bg::model::polygon<BoostPoint>;
 // RViz 表示で使用する共通設定値。
 constexpr char kFrameId[] = "map";
 constexpr double kFillAlpha = 0.4;
 constexpr double kOutlineAlpha = 0.9;
 constexpr double kOutlineWidth = 0.1;
 constexpr double kLifetimeSeconds = 0.1;
-
-struct QuadrilateralData
-{
-  std::vector<std::array<geometry_msgs::msg::Point, 4>> quadrilaterals;
-  std::vector<BoostPolygon> polygons;
-};
 
 // インデックスに応じて可視化用のベースカラーを決定する。
 auto generateBaseColor(const std::size_t index) -> std::array<float, 3>
@@ -149,61 +135,6 @@ auto makeQuadrilateralOutlineMarker(
   return marker;
 }
 
-// Catmull-Rom 曲線を等分し、各区間を四角形に展開して判定用ポリゴンを構築する。
-auto buildQuadrilateralData(
-  const math::geometry::CatmullRomSpline & spline, const double width,
-  const std::size_t num_segments) -> QuadrilateralData
-{
-  QuadrilateralData data;
-  if (num_segments == 0) {
-    return data;
-  }
-
-  const double total_length = spline.getLength();
-  const double step_size = num_segments > 0 ? total_length / static_cast<double>(num_segments) : 0.0;
-
-  const auto computeBoundPoint = [&](const double s, const double direction) {
-    geometry_msgs::msg::Vector3 normal_vector = spline.getNormalVector(s);
-    const double theta = std::atan2(normal_vector.y, normal_vector.x);
-    geometry_msgs::msg::Point center_point = spline.getPoint(s);
-    geometry_msgs::msg::Point bound_point;
-    bound_point.x = center_point.x + direction * 0.5 * width * std::cos(theta);
-    bound_point.y = center_point.y + direction * 0.5 * width * std::sin(theta);
-    bound_point.z = 1.0;
-    return bound_point;
-  };
-
-  std::vector<geometry_msgs::msg::Point> left_bounds;
-  std::vector<geometry_msgs::msg::Point> right_bounds;
-  left_bounds.reserve(num_segments + 1);
-  right_bounds.reserve(num_segments + 1);
-  for (std::size_t i = 0; i <= num_segments; ++i) {
-    const double s = step_size * static_cast<double>(i);
-    right_bounds.emplace_back(computeBoundPoint(s, 1.0));
-    left_bounds.emplace_back(computeBoundPoint(s, -1.0));
-  }
-
-  data.quadrilaterals.reserve(num_segments);
-  data.polygons.reserve(num_segments);
-  for (std::size_t i = 0; i < num_segments; ++i) {
-    std::array<geometry_msgs::msg::Point, 4> quad{
-      right_bounds[i], left_bounds[i], left_bounds[i + 1], right_bounds[i + 1]};
-    data.quadrilaterals.emplace_back(quad);
-
-    BoostPolygon polygon;
-    auto & outer = polygon.outer();
-    outer.reserve(5);
-    outer.emplace_back(quad[0].x, quad[0].y);
-    outer.emplace_back(quad[1].x, quad[1].y);
-    outer.emplace_back(quad[2].x, quad[2].y);
-    outer.emplace_back(quad[3].x, quad[3].y);
-    outer.push_back(outer.front());
-    bg::correct(polygon);
-    data.polygons.emplace_back(polygon);
-  }
-  return data;
-}
-
 // 四角形群を RViz 表示用の塗り潰し／輪郭マーカーへ変換する。
 auto createSplineMarkers(
   const std::string & ns, const rclcpp::Time & stamp, const QuadrilateralData & data)
@@ -232,62 +163,6 @@ auto createSplineMarkers(
   markers.emplace_back(makeQuadrilateralOutlineMarker(
     ns + ":quadrilateral_outline", 0, stamp, data.quadrilaterals, outline_colors));
   return markers;
-}
-
-// 生成済み軌道ポリゴンと対象ポリゴンの交差有無を調べる。
-auto intersectsTrajectory(
-  const std::vector<BoostPolygon> & trajectory_polygons, const BoostPolygon & target_polygon) -> bool
-{
-  for (const auto & trajectory_polygon : trajectory_polygons) {
-    if (bg::intersects(trajectory_polygon, target_polygon)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-struct EntityCollisionInfo
-{
-  std::string name;
-  const traffic_simulator::CanonicalizedEntityStatus * status;
-  BoostPolygon polygon;
-  bool intersects_trajectory;
-};
-
-auto detectEntityCollisions(
-  const std::vector<BoostPolygon> & trajectory_polygons,
-  const std::unordered_map<std::string, traffic_simulator::CanonicalizedEntityStatus> &
-    other_entity_status,
-  const std::string & entity_name) -> std::vector<EntityCollisionInfo>
-{
-  std::vector<EntityCollisionInfo> collisions;
-  if (trajectory_polygons.empty()) {
-    return collisions;
-  }
-
-  // 他エンティティと自車両（必要なら）から判定対象リストを構築する。
-  std::vector<std::pair<std::string, const traffic_simulator::CanonicalizedEntityStatus *>> entity_statuses;
-  entity_statuses.reserve(other_entity_status.size() + 1);
-  for (const auto & [name, status] : other_entity_status) {
-    if (entity_name == name){ continue; }
-    entity_statuses.emplace_back(name, &status);
-  }
-
-  for (std::size_t idx = 0; idx < entity_statuses.size(); ++idx) {
-    // 交差判定に用いる車両のフットプリントを生成。
-    const auto * status = entity_statuses[idx].second;
-    auto polygon = math::geometry::toPolygon2D(status->getMapPose(), status->getBoundingBox());
-    if (polygon.outer().size() < 3) {
-      continue;
-    }
-
-    const auto intersects = intersectsTrajectory(trajectory_polygons, polygon);
-
-    // 判定結果を保持し、後段のマーカー生成で使用する。
-    collisions.emplace_back(EntityCollisionInfo{
-      entity_statuses[idx].first, status, std::move(polygon), intersects});
-  }
-  return collisions;
 }
 
 // 軌道と交差する可能性のあるエンティティの枠と警告テキストを生成する。
