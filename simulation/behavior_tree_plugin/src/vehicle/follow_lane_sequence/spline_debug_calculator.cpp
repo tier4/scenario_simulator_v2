@@ -84,25 +84,26 @@ namespace
 {
 // 軌道ポリゴン集合と対象ポリゴンの交差有無を調べるユーティリティ。
 auto intersectsTrajectory(
-  const std::vector<BoostPolygon> & trajectory_polygons, const BoostPolygon & target_polygon) -> bool
+  const QuadrilateralData & trajectory_polygons, const BoostPolygon & target_polygon) -> std::pair<bool, double>
 {
-  for (const auto & trajectory_polygon : trajectory_polygons) {
-    if (bg::intersects(trajectory_polygon, target_polygon)) {
-      return true;
+  const auto num = trajectory_polygons.polygons.size();
+  for (std::size_t i = 0; i < num; ++i) {
+    if (bg::intersects(trajectory_polygons.polygons.at(i), target_polygon)) {
+      return std::make_pair(true, trajectory_polygons.longitudinal_ranges.at(i).first);
     }
   }
-  return false;
+  return std::make_pair(false, -1.0);
 }
 }  // namespace
 
 auto detectEntityCollisions(
-  const std::vector<BoostPolygon> & trajectory_polygons,
+  const QuadrilateralData & data,
   const std::unordered_map<std::string, traffic_simulator::CanonicalizedEntityStatus> &
     other_entity_status,
   const std::string & entity_name) -> std::vector<EntityCollisionInfo>
 {
   std::vector<EntityCollisionInfo> collisions;
-  if (trajectory_polygons.empty()) {
+  if (data.polygons.empty()) {
     return collisions;
   }
 
@@ -125,8 +126,7 @@ auto detectEntityCollisions(
     }
 
     // 軌道候補と交差するかを判定し、結果を蓄積する。
-    const auto intersects = intersectsTrajectory(trajectory_polygons, polygon);
-
+    const auto [intersects, range] = intersectsTrajectory(data, polygon);
     collisions.emplace_back(EntityCollisionInfo{
       entity_statuses[idx].first, status, std::move(polygon), intersects});
   }

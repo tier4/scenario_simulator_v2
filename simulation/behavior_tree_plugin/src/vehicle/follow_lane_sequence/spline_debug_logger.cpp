@@ -323,7 +323,7 @@ void logSplineDebugInfo(
     constexpr std::size_t kNumSegments = 10;
     const auto quadrilateral_data = buildQuadrilateralData(debug_spline, kLaneWidth, kNumSegments);
     const auto collision_infos = detectEntityCollisions(
-      quadrilateral_data.polygons, other_entity_status, entity_name);
+      quadrilateral_data, other_entity_status, entity_name);
 
     auto spline_markers = createSplineMarkers(ns, stamp, quadrilateral_data);
     markers.insert(markers.end(), spline_markers.begin(), spline_markers.end());
@@ -338,8 +338,8 @@ void logSplineDebugInfo(
   const auto elapsed_ms =
     std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(end - start);
   // RViz publish を除いた処理時間をデバッグとして出力する。
-  std::cout << "[" << action_name << "] spline debug processing time: " << elapsed_ms.count()
-            << " ms" << std::endl;
+  // std::cout << "[" << action_name << "] spline debug processing time: " << elapsed_ms.count()
+  //           << " ms" << std::endl;
   if (!markers.empty()) {
     publishImmediate(markers);
   }

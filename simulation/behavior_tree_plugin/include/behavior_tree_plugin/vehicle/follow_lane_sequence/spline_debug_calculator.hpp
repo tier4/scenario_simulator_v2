@@ -58,7 +58,7 @@ auto buildQuadrilateralData(
   -> QuadrilateralData;
 
 auto detectEntityCollisions(
-  const std::vector<BoostPolygon> & trajectory_polygons,
+  const QuadrilateralData & data,
   const std::unordered_map<std::string, traffic_simulator::CanonicalizedEntityStatus> &
     other_entity_status,
   const std::string & entity_name) -> std::vector<EntityCollisionInfo>;
