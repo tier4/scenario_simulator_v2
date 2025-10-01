@@ -23,7 +23,6 @@
 #include <memory>
 #include <optional>
 #include <string>
-#include <utility>
 #include <traffic_simulator/behavior/behavior_plugin_base.hpp>
 #include <traffic_simulator/data_type/behavior.hpp>
 #include <traffic_simulator/data_type/entity_status.hpp>
@@ -37,6 +36,7 @@
 #include <traffic_simulator_msgs/msg/obstacle.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 namespace entity_behavior

@@ -103,10 +103,10 @@ BT::NodeStatus FollowFrontEntityAction::doAction()
   distance_to_front_entity_ = std::nullopt;
   if (use_trajectory_based_detection) {
     constexpr std::size_t kTrajectorySegments = 50;
-    const double detection_width =
-      std::max(vehicle_parameters.bounding_box.dimensions.y, 2.0);
-    if (const auto front_entity_info = getFrontEntityNameAndDistanceByTrajectory(
-          waypoints.waypoints, detection_width, kTrajectorySegments)) {
+    const double detection_width = std::max(vehicle_parameters.bounding_box.dimensions.y, 2.0);
+    if (
+      const auto front_entity_info = getFrontEntityNameAndDistanceByTrajectory(
+        waypoints.waypoints, detection_width, kTrajectorySegments)) {
       front_entity_name = front_entity_info->first;
       distance_to_front_entity_ = front_entity_info->second;
     }

@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <algorithm>
 #include <behavior_tree_plugin/vehicle/behavior_tree.hpp>
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/follow_lane_action.hpp>
-#include <algorithm>
 #include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
@@ -102,10 +102,10 @@ BT::NodeStatus FollowLaneAction::doAction()
     constexpr bool use_trajectory_based_detection = true;
     if (use_trajectory_based_detection) {
       constexpr std::size_t kTrajectorySegments = 50;
-      const double detection_width =
-        std::max(vehicle_parameters.bounding_box.dimensions.y, 2.0);
-      if (const auto front_entity_info = getFrontEntityNameAndDistanceByTrajectory(
-            waypoints.waypoints, detection_width, kTrajectorySegments)) {
+      const double detection_width = std::max(vehicle_parameters.bounding_box.dimensions.y, 2.0);
+      if (
+        const auto front_entity_info = getFrontEntityNameAndDistanceByTrajectory(
+          waypoints.waypoints, detection_width, kTrajectorySegments)) {
         distance_to_front_entity = front_entity_info->second;
       }
     } else {
