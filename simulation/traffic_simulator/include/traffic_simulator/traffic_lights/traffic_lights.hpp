@@ -76,7 +76,7 @@ public:
   ~V2ITrafficLights() override = default;
 
   auto setTrafficLightsStatePrediction(
-    const lanelet::Id lanelet_way_id, const std::string & state, double time_ahead_seconds) -> void;
+    const lanelet::Id lanelet_id, const std::string & state, double time_ahead_seconds) -> void;
 
   auto clearTrafficLightsStatePrediction() -> void;
 

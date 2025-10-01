@@ -17,11 +17,21 @@
 namespace traffic_simulator
 {
 auto V2ITrafficLights::setTrafficLightsStatePrediction(
-  const lanelet::Id lanelet_way_id, const std::string & state, double time_ahead_seconds) -> void
+  const lanelet::Id lanelet_id, const std::string & state, double time_ahead_seconds) -> void
 {
+  if (hdmap_utils_->isTrafficLightRegulatoryElement(lanelet_id)) {
+    const auto & regulatory_element = hdmap_utils_->getTrafficLightRegulatoryElement(lanelet_id);
+    for (auto && traffic_light : regulatory_element->trafficLights()) {
+      // call with traffic light way id
+      setTrafficLightsStatePrediction(traffic_light.id(), state, time_ahead_seconds);
+    }
+  } else if (not hdmap_utils_->isTrafficLight(lanelet_id)) {
+    throw common::scenario_simulator_exception::Error(
+      "Given lanelet ID ", lanelet_id, " is neither a traffic light ID not a traffic relation ID.");
+  }
   const auto predicted_time =
     clock_ptr_->now() + rclcpp::Duration(std::chrono::duration<double>(time_ahead_seconds));
-  auto & predictions_for_current_traffic_light = predictions_[lanelet_way_id];
+  auto & predictions_for_current_traffic_light = predictions_[lanelet_id];
   auto bulb_proto = static_cast<simulation_api_schema::TrafficLight>(TrafficLight::Bulb(state));
   if (auto prediction = std::find_if(
         predictions_for_current_traffic_light.begin(), predictions_for_current_traffic_light.end(),
