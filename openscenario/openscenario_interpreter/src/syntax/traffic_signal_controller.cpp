@@ -71,6 +71,8 @@ auto TrafficSignalController::changePhaseTo(std::list<Phase>::iterator next) -> 
   current_phase_started_at = evaluateSimulationTime();
   current_phase = next;
 
+  updatePredictions();
+
   return current_phase != std::end(phases) ? (*current_phase).evaluate() : unspecified;
 }
 
