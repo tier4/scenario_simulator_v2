@@ -55,6 +55,9 @@ public:
     -> double;
   auto getDistanceToFrontEntity(const math::geometry::CatmullRomSplineInterface & spline) const
     -> std::optional<double>;
+  auto getFrontEntityNameAndDistanceByTrajectory(
+    const math::geometry::CatmullRomSpline & spline, const double width,
+    const std::size_t num_segments) const -> std::optional<std::pair<std::string, double>>;
   auto getDistanceToTrafficLightStopLine(
     const lanelet::Ids & route_lanelets,
     const math::geometry::CatmullRomSplineInterface & spline) const -> std::optional<double>;
