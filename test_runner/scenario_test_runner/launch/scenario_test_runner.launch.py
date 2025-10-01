@@ -101,6 +101,7 @@ def launch_setup(context, *args, **kwargs):
     speed_condition                     = LaunchConfiguration("speed_condition",                        default="legacy")
     use_custom_centerline               = LaunchConfiguration("use_custom_centerline",                  default=True)
     use_sim_time                        = LaunchConfiguration("use_sim_time",                           default=False)
+    use_trajectory_based_front_entity_detection = LaunchConfiguration("use_trajectory_based_front_entity_detection", default=False)
     vehicle_model                       = LaunchConfiguration("vehicle_model",                          default="")
     vehicle_id                          = LaunchConfiguration("vehicle_id",                             default="default")
     initialize_localization             = LaunchConfiguration("initialize_localization",                default=10)
@@ -135,6 +136,7 @@ def launch_setup(context, *args, **kwargs):
     print(f"speed_condition                     := {speed_condition.perform(context)}")
     print(f"use_custom_centerline               := {use_custom_centerline.perform(context)}")
     print(f"use_sim_time                        := {use_sim_time.perform(context)}")
+    print(f"use_trajectory_based_front_entity_detection      := {use_trajectory_based_front_entity_detection.perform(context)}")
     print(f"vehicle_model                       := {vehicle_model.perform(context)}")
     print(f"vehicle_id                          := {vehicle_id.perform(context)}")
     print(f"initialize_localization             := {initialize_localization.perform(context)}")
@@ -167,6 +169,10 @@ def launch_setup(context, *args, **kwargs):
             {"speed_condition": speed_condition},
             {"use_custom_centerline": use_custom_centerline},
             {"use_sim_time": use_sim_time},
+            {
+                "use_trajectory_based_front_entity_detection":
+                    use_trajectory_based_front_entity_detection
+            },
             {"vehicle_model": vehicle_model},
             {"vehicle_id": vehicle_id},
             {"initialize_localization": initialize_localization},
@@ -237,6 +243,10 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("speed_condition",                     default_value=speed_condition                    ),
         DeclareLaunchArgument("use_custom_centerline",               default_value=use_custom_centerline              ),
         DeclareLaunchArgument("use_sim_time",                        default_value=use_sim_time                       ),
+        DeclareLaunchArgument(
+            "use_trajectory_based_front_entity_detection",
+            default_value=use_trajectory_based_front_entity_detection,
+        ),
         DeclareLaunchArgument("vehicle_model",                       default_value=vehicle_model                      ),
         DeclareLaunchArgument("initialize_localization",             default_value=initialize_localization            ),
         # fmt: on

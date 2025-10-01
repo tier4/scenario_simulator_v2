@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <behavior_tree_plugin/vehicle/behavior_tree.hpp>
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/follow_lane_action.hpp>
+#include <get_parameter/get_parameter.hpp>
 #include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
@@ -30,6 +31,8 @@ namespace follow_lane_sequence
 FollowLaneAction::FollowLaneAction(const std::string & name, const BT::NodeConfiguration & config)
 : entity_behavior::VehicleActionNode(name, config)
 {
+  use_trajectory_based_front_entity_detection_ =
+    common::getParameter<bool>("use_trajectory_based_front_entity_detection", false);
 }
 
 const std::optional<traffic_simulator_msgs::msg::Obstacle> FollowLaneAction::calculateObstacle(
@@ -99,8 +102,7 @@ BT::NodeStatus FollowLaneAction::doAction()
       return BT::NodeStatus::FAILURE;
     }
     std::optional<double> distance_to_front_entity;
-    constexpr bool use_trajectory_based_detection = true;
-    if (use_trajectory_based_detection) {
+    if (use_trajectory_based_front_entity_detection_) {
       constexpr std::size_t kTrajectorySegments = 50;
       const double detection_width = std::max(vehicle_parameters.bounding_box.dimensions.y, 2.0);
       if (
