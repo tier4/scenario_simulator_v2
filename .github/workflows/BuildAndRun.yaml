@@ -73,6 +73,10 @@ jobs:
           rosdep install -iy --from-paths src --rosdistro ${{ matrix.rosdistro }}
           colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml
           colcon mixin update default
+          df -h
+          apt-get clean
+          rm -rf /var/lib/apt/lists/*
+          df -h
         shell: bash
 
       - name: Install Build Wrapper
