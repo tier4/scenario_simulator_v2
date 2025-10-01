@@ -98,15 +98,32 @@ BT::NodeStatus FollowFrontEntityAction::doAction()
     traffic_simulator::distance::distanceToStopLine(route_lanelets_, *trajectory);
   auto distance_to_conflicting_entity =
     getDistanceToConflictingEntity(route_lanelets_, *trajectory);
-  const auto front_entity_name = getFrontEntityName(*trajectory);
+  constexpr bool use_trajectory_based_detection = true;
+  std::optional<std::string> front_entity_name;
+  distance_to_front_entity_ = std::nullopt;
+  if (use_trajectory_based_detection) {
+    constexpr std::size_t kTrajectorySegments = 50;
+    const double detection_width =
+      std::max(vehicle_parameters.bounding_box.dimensions.y, 2.0);
+    if (const auto front_entity_info = getFrontEntityNameAndDistanceByTrajectory(
+          waypoints.waypoints, detection_width, kTrajectorySegments)) {
+      front_entity_name = front_entity_info->first;
+      distance_to_front_entity_ = front_entity_info->second;
+    }
+  } else {
+    front_entity_name = getFrontEntityName(*trajectory);
+    if (front_entity_name) {
+      const auto & front_entity_status = getEntityStatus(front_entity_name.value());
+      distance_to_front_entity_ = getDistanceToTargetEntity(*trajectory, front_entity_status);
+    }
+  }
   if (!front_entity_name) {
     return BT::NodeStatus::FAILURE;
   }
-  const auto & front_entity_status = getEntityStatus(front_entity_name.value());
-  distance_to_front_entity_ = getDistanceToTargetEntity(*trajectory, front_entity_status);
   if (!distance_to_front_entity_) {
     return BT::NodeStatus::FAILURE;
   }
+  const auto & front_entity_status = getEntityStatus(front_entity_name.value());
   if (distance_to_conflicting_entity) {
     if (distance_to_front_entity_.value() > distance_to_conflicting_entity.value()) {
       return BT::NodeStatus::FAILURE;

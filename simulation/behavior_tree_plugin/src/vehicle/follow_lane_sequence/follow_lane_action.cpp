@@ -14,6 +14,7 @@
 
 #include <behavior_tree_plugin/vehicle/behavior_tree.hpp>
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/follow_lane_action.hpp>
+#include <algorithm>
 #include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
@@ -97,7 +98,19 @@ BT::NodeStatus FollowLaneAction::doAction()
     if (trajectory == nullptr) {
       return BT::NodeStatus::FAILURE;
     }
-    const auto distance_to_front_entity = getDistanceToFrontEntity(*trajectory);
+    std::optional<double> distance_to_front_entity;
+    constexpr bool use_trajectory_based_detection = true;
+    if (use_trajectory_based_detection) {
+      constexpr std::size_t kTrajectorySegments = 50;
+      const double detection_width =
+        std::max(vehicle_parameters.bounding_box.dimensions.y, 2.0);
+      if (const auto front_entity_info = getFrontEntityNameAndDistanceByTrajectory(
+            waypoints.waypoints, detection_width, kTrajectorySegments)) {
+        distance_to_front_entity = front_entity_info->second;
+      }
+    } else {
+      distance_to_front_entity = getDistanceToFrontEntity(*trajectory);
+    }
     if (distance_to_front_entity) {
       if (
         distance_to_front_entity.value() <=
