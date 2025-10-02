@@ -54,10 +54,11 @@ auto constructCanonicalizedLaneletPose(
   lanelet::Id lanelet_id, double s, double offset, double roll, double pitch, double yaw)
   -> CanonicalizedLaneletPose
 {
-  if (
-    auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
-      traffic_simulator::helper::constructLaneletPose(lanelet_id, s, offset, roll, pitch, yaw))) {
-    return canonicalized_lanelet_pose.value();
+  if (auto canonicalized_lanelet_poses = pose::toCanonicalizedLaneletPoses(
+        {traffic_simulator::helper::constructLaneletPose(lanelet_id, s, offset, roll, pitch, yaw)});
+      !canonicalized_lanelet_poses.empty()) {
+    // WIP only taking the first pose
+    return canonicalized_lanelet_poses.front();
   } else {
     THROW_SEMANTIC_ERROR(
       "Lanelet pose (id=", lanelet_id, ",s=", s, ",offset=", offset, ",rpy.x=", roll,
