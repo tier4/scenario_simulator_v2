@@ -12,6 +12,9 @@ Changelog for package simple_cross_map
 16.4.2 (2025-05-23)
 -------------------
 
+17.6.1 (2025-10-02)
+-------------------
+
 17.6.0 (2025-09-29)
 -------------------
 * Merge branch 'master' into fix/noise_v4
