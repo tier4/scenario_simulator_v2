@@ -174,6 +174,18 @@ auto FollowWaypointController::getAccelerationLimits(
     }
   }();
 
+
+  /*
+      It can occur when local_min_acceleration is equal to local_max_acceleration, leaving no choice.
+
+      This happens when the vehicle must reach both zero speed and zero acceleration simultaneously.
+      For example: with current acceleration = -5.0 m/s² and low speed that keeps decreasing,
+      entity must increase acceleration in the next steps to reach speed equal to 0.0 and acceleration = 0.0
+      at the same moment.
+
+      In such cases, local_min_acceleration (needed to reach acceleration equal to 0.0 at speed 0.0) can be equal to local_max_acceleration
+      (the maximum increase allowed by max_acceleration_rate constraint).
+  */
   if (
     local_max_acceleration < local_min_acceleration and
     std::abs(local_max_acceleration - local_min_acceleration) > local_epsilon) {
@@ -362,14 +374,15 @@ auto FollowWaypointController::getAcceleration(
 
 
   if(verbose_each_acceleration_candidate) {
-    std::cout << "acc: " << acceleration <<" speed: "<<speed<< " target speed: "<< target_speed << " remaining distance: "<<remaining_distance<< ", min acc: " << local_min_acceleration << ", max acc: " << local_max_acceleration << std::endl;
+    std::cout << " ---- ACCELERATION CANDIDATES ----- " << std::endl;
+    std::cout << " acc: " << acceleration <<" speed: "<<speed<< " target speed: "<< target_speed << " remaining distance: "<<remaining_distance<< ", min acc: " << local_min_acceleration << ", max acc: " << local_max_acceleration << std::endl;
     for (const auto& candidate : candidates) {
       std::cout << std::fixed << std::setprecision(32);
       if (std::isnan(candidate.distance_diff)) {
-        std::cout << "\033[31m" << candidate.index << " " << candidate.acceleration << " " << candidate.distance_diff << "     \033[0m";
+        std::cout << "\033[31m" << "IDX: "<<candidate.index << " ACC: " << candidate.acceleration << " FINAL DISTANCE ERROR: " << -candidate.distance_diff << "     \033[0m";
         std::cout << std::endl;
       } else {
-        std::cout <<candidate.index << " " << candidate.acceleration << " " << candidate.distance_diff;
+        std::cout <<" IDX: "<<candidate.index << " ACC: " << candidate.acceleration << " FINAL DISTANCE ERROR: " << -candidate.distance_diff;
         if (candidate.index == best_candidate_index) {
           if (std::abs(candidate.acceleration - local_min_acceleration) < local_epsilon) {
             std::cout << " \033[33mBEST MIN\033[0m";  
@@ -384,15 +397,17 @@ auto FollowWaypointController::getAcceleration(
         std::cout << std::endl;
       }
     }
+    std::cout << " -------- " << std::endl;
     std::cout << std::endl;
   }
 
   if(verbose_only_best_acceleration_candidate) {
-    std::cout << "acc: " << acceleration <<" speed: "<<speed<< " target speed: "<< target_speed << " remaining distance: "<<remaining_distance<< ", min acc: " << local_min_acceleration << ", max acc: " << local_max_acceleration << std::endl;
+    std::cout << " ---- BEST ACCELERATION CANDIDATE ----- " << std::endl;
+    std::cout << " acc: " << acceleration <<" speed: "<<speed<< " target speed: "<< target_speed << " remaining distance: "<<remaining_distance<< ", min acc: " << local_min_acceleration << ", max acc: " << local_max_acceleration << std::endl;
     for (const auto& candidate : candidates) {
       std::cout << std::fixed << std::setprecision(32);
       if (candidate.index == best_candidate_index) {
-        std::cout <<candidate.index << " " << candidate.acceleration << " " << candidate.distance_diff;
+        std::cout <<" IDX: "<<candidate.index << " ACC: " << candidate.acceleration << " FINAL DISTANCE ERROR: " << -candidate.distance_diff;
         if (std::abs(candidate.acceleration - local_min_acceleration) < 1e-9) {
           std::cout << " \033[33mBEST MIN\033[0m";  // Yellow
         } else if (std::abs(candidate.acceleration - local_max_acceleration) < 1e-9) {
@@ -403,6 +418,7 @@ auto FollowWaypointController::getAcceleration(
          std::cout << std::endl;
       } 
     }
+    std::cout << " -------- " << std::endl;
     std::cout << std::endl;
   }
 
@@ -432,21 +448,8 @@ auto FollowWaypointController::getAcceleration(
     if (verbose_each_acceleration_candidate || verbose_only_best_acceleration_candidate) {
       std::cout << "This step is not accurate, overshooting is unavoidable! remaining distance: "
                 << remaining_distance << ", future distance: " << future_distance
-                << ", difference: " << remaining_distance - future_distance << std::endl;
+                << ", final distance error: " << future_distance - remaining_distance << std::endl;
     }
-    return local_min_acceleration;
-  } else if (std::abs(local_min_acceleration - local_max_acceleration) < local_epsilon) {
-    /*
-       This occurs when local_min_acceleration equals local_max_acceleration, leaving no choice.
-
-       This happens when the vehicle must reach both zero speed and zero acceleration simultaneously.
-       For example: with current acceleration = -5.0 m/s² and low speed that keeps decreasing,
-       entity must increase acceleration in the next steps to reach speed equal to 0.0 and acceleration = 0.0
-       at the same moment.
-
-       In such cases, local_min_acceleration (needed to reach acceleration equal to 0.0 at speed 0.0) can be equal to local_max_acceleration
-       (the maximum increase allowed by max_acceleration_rate constraint).
-    */
     return local_min_acceleration;
   } else if (std::isinf(remaining_time_source)) {
     /*
