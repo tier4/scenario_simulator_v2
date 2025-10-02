@@ -33,6 +33,10 @@ namespace traffic_simulator
 {
 namespace follow_trajectory
 {
+constexpr auto verbose_precision = 32;
+constexpr auto verbose_status_changes = true;
+constexpr auto verbose_discard_reason = true;
+
 template <typename F, typename T, typename... Ts>
 auto any(F f, T && x, Ts &&... xs)
 {
@@ -51,6 +55,8 @@ auto makeUpdatedStatus(
   const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter, const double step_time,
   const double matching_distance, std::optional<double> target_speed) -> std::optional<EntityStatus>
 {
+  std::cout << std::fixed << std::setprecision(verbose_precision);
+
   using math::arithmetic::isApproximatelyEqualTo;
   using math::arithmetic::isDefinitelyLessThan;
 
@@ -141,13 +147,15 @@ auto makeUpdatedStatus(
       not std::isnan(polyline_trajectory.shape.vertices.front().time)) {
       polyline_trajectory.base_time = entity_status.time;
     }
-    const auto& discarded_waypoint = polyline_trajectory.shape.vertices.front();
-    std::cout << std::fixed << std::setprecision(64);
-    std::cout << "DISCARD WAYPOINT "<<(polyline_trajectory.shape.vertices.size() - 1) <<": x=" << discarded_waypoint.position.position.x
-              << ", y=" << discarded_waypoint.position.position.y
-              << ", z=" << discarded_waypoint.position.position.z
-              << ", time=" << discarded_waypoint.time
-              << " at current_time=" << entity_status.time << std::endl;
+    if (verbose_discard_reason) {
+      const auto & discarded_waypoint = polyline_trajectory.shape.vertices.front();
+      std::cout << "DISCARD WAYPOINT NR " << (polyline_trajectory.shape.vertices.size() - 1)
+                << ": x=" << discarded_waypoint.position.position.x
+                << ", y=" << discarded_waypoint.position.position.y
+                << ", z=" << discarded_waypoint.position.position.z
+                << ", waypoint_time=" << discarded_waypoint.time
+                << ", current_time=" << entity_status.time << std::endl;
+    }
 
     if (std::rotate(
           std::begin(polyline_trajectory.shape.vertices),
@@ -189,32 +197,92 @@ auto makeUpdatedStatus(
   const auto& angular_acceleration = entity_status.action_status.accel.angular;
   const auto waypoint_count = polyline_trajectory.shape.vertices.size();
 
-  std::cout << "=== BEFORE UPDATE ===" << std::endl;
-  std::cout << std::fixed << std::setprecision(64);
-  std::cout << "Current Time: " << entity_status.time << std::endl;
-  std::cout << "Current Position: x=" << position.x << ", y=" << position.y << ", z=" << position.z << std::endl;
-  std::cout << "Current Orientation: x=" << entity_status.pose.orientation.x << ", y=" << entity_status.pose.orientation.y << ", z=" << entity_status.pose.orientation.z << ", w=" << entity_status.pose.orientation.w << std::endl;
-  std::cout << "Current Linear velocity: x=" << linear_velocity.x << ", y=" << linear_velocity.y << ", z=" << linear_velocity.z << std::endl;
-  std::cout << "Current Angular velocity: x=" << angular_velocity.x << ", y=" << angular_velocity.y << ", z=" << angular_velocity.z << std::endl;
-  std::cout << "Current Linear acceleration: x=" << linear_acceleration.x << ", y=" << linear_acceleration.y << ", z=" << linear_acceleration.z << std::endl;
-  std::cout << "Current Angular acceleration: x=" << angular_acceleration.x << ", y=" << angular_acceleration.y << ", z=" << angular_acceleration.z << std::endl;
-  std::cout << "Waypoints count: " << waypoint_count << std::endl;
+  if(verbose_status_changes) {
+    std::cout << std::endl << "===============================" << std::endl<< std::endl << std::endl;
+    std::cout << "=== BEFORE UPDATE ===" << std::endl;
+    std::cout << "Current Time: " << entity_status.time << std::endl;
+    std::cout << "Current Position: x=" << position.x << ", y=" << position.y << ", z=" << position.z << std::endl;
+    std::cout << "Current Orientation: x=" << entity_status.pose.orientation.x << ", y=" << entity_status.pose.orientation.y << ", z=" << entity_status.pose.orientation.z << ", w=" << entity_status.pose.orientation.w << " (yaw=" << math::geometry::convertQuaternionToEulerAngle(entity_status.pose.orientation).z << ")" << std::endl;
+    std::cout << "Current Linear velocity: x=" << linear_velocity.x << ", y=" << linear_velocity.y << ", z=" << linear_velocity.z << std::endl;
+    std::cout << "Current Angular velocity: x=" << angular_velocity.x << ", y=" << angular_velocity.y << ", z=" << angular_velocity.z << std::endl;
+    std::cout << "Current Linear acceleration: x=" << linear_acceleration.x << ", y=" << linear_acceleration.y << ", z=" << linear_acceleration.z << std::endl;
+    std::cout << "Current Angular acceleration: x=" << angular_acceleration.x << ", y=" << angular_acceleration.y << ", z=" << angular_acceleration.z << std::endl;
+    if (!polyline_trajectory.shape.vertices.empty()) {
+      const auto& nearest_waypoint = polyline_trajectory.shape.vertices.front().position.position;
+      std::cout << "Waypoints count: " << waypoint_count << std::endl;
+      std::cout << "Nearest waypoint: x=" << nearest_waypoint.x << ", y=" << nearest_waypoint.y << ", z=" << nearest_waypoint.z << std::endl;
 
-  if (!polyline_trajectory.shape.vertices.empty()) {
-    const auto& nearest_waypoint = polyline_trajectory.shape.vertices.front().position.position;
-    std::cout << "Nearest waypoint: x=" << nearest_waypoint.x << ", y=" << nearest_waypoint.y << ", z=" << nearest_waypoint.z << std::endl;
-
-    const auto dx = nearest_waypoint.x - position.x;
-    const auto dy = nearest_waypoint.y - position.y;
-    const auto dz = nearest_waypoint.z - position.z;
-    const auto distance = std::sqrt(dx*dx + dy*dy + dz*dz);
-    std::cout << "Euclidean distance to nearest waypoint: " << distance << std::endl;
-  } else {
-    std::cout << "No waypoints available" << std::endl;
+      std::cout << "Euclidean distance to nearest waypoint: " << hypot(position, nearest_waypoint) << std::endl;
+    } else {
+      std::cout << "No waypoints available" << std::endl;
+    }
   }
 
-  if (polyline_trajectory.shape.vertices.empty()) {
+  if (polyline_trajectory.shape.vertices.empty() and std::abs(entity_status.action_status.twist.linear.x) < FollowWaypointController::local_epsilon && std::abs(entity_status.action_status.accel.linear.x) < FollowWaypointController::local_epsilon) {
     return std::nullopt;
+  } else if (polyline_trajectory.shape.vertices.empty()) {
+    const auto current_velocity = [&]() {
+      const auto pitch =
+        -math::geometry::convertQuaternionToEulerAngle(entity_status.pose.orientation).y;
+      const auto yaw =
+        math::geometry::convertQuaternionToEulerAngle(entity_status.pose.orientation).z;
+      return geometry_msgs::build<geometry_msgs::msg::Vector3>()
+        .x(std::cos(pitch) * std::cos(yaw) * entity_status.action_status.twist.linear.x)
+        .y(std::cos(pitch) * std::sin(yaw) * entity_status.action_status.twist.linear.x)
+        .z(std::sin(pitch) * entity_status.action_status.twist.linear.x);
+    }();
+
+    const auto acceleration = entity_status.action_status.accel.linear.x;
+    const auto speed = entity_status.action_status.twist.linear.x;
+    const auto max_acceleration_rate =  behavior_parameter.dynamic_constraints.max_acceleration_rate;
+    const auto N = std::max(1.0, std::round(sqrt(2 * speed / max_acceleration_rate) / step_time));
+    const auto a_min_for_simultaneous_zero = speed > 0.0 ? -(speed / (N * step_time)) - (max_acceleration_rate * step_time * (N - 1) / 2.0) : 0.0;
+    
+    const auto desired_acceleration = std::max(-speed / step_time, std::max(a_min_for_simultaneous_zero, acceleration - max_acceleration_rate * step_time));
+    const auto desired_speed = speed + desired_acceleration * step_time;
+    const auto desired_velocity = [&]() {
+      const auto pitch =
+        -math::geometry::convertQuaternionToEulerAngle(entity_status.pose.orientation).y;
+      const auto yaw =
+        math::geometry::convertQuaternionToEulerAngle(entity_status.pose.orientation).z;
+      return geometry_msgs::build<geometry_msgs::msg::Vector3>()
+        .x(std::cos(pitch) * std::cos(yaw) * desired_speed)
+        .y(std::cos(pitch) * std::sin(yaw) * desired_speed)
+        .z(std::sin(pitch) * desired_speed);
+    }();
+
+    auto updated_status = entity_status;
+    updated_status.pose.position += (current_velocity + desired_velocity) * 0.5 * step_time;
+    updated_status.pose.orientation = entity_status.pose.orientation;
+    updated_status.action_status.twist.linear.x = norm(desired_velocity);
+    updated_status.action_status.twist.linear.y = 0;
+    updated_status.action_status.twist.linear.z = 0;
+    updated_status.action_status.twist.angular =
+      math::geometry::convertQuaternionToEulerAngle(math::geometry::getRotation(
+        entity_status.pose.orientation, updated_status.pose.orientation)) /
+      step_time;
+    updated_status.action_status.accel.linear =
+      (updated_status.action_status.twist.linear - entity_status.action_status.twist.linear) /
+      step_time;
+    updated_status.action_status.accel.angular =
+      (updated_status.action_status.twist.angular - entity_status.action_status.twist.angular) /
+      step_time;
+    updated_status.time = entity_status.time + step_time;
+    updated_status.lanelet_pose_valid = false;
+    if (verbose_status_changes) {
+        std::cout << "=== AFTER FIXED UPDATE ===" << std::endl;
+        const auto current_distance = (current_velocity + desired_velocity) * 0.5 * step_time;
+        const auto saved_position = entity_status.pose.position + current_distance;
+        std::cout << "This step distance: " << norm(current_distance) << " x=" << current_distance.x << ", y=" << current_distance.y << ", z=" << current_distance.z << std::endl;
+        std::cout << "Future Position (using desired_velocity  ): x=" << saved_position.x << ", y=" << saved_position.y << ", z=" << saved_position.z << std::endl;
+        std::cout << "Future Position (after lanelet transition): x=" << updated_status.pose.position.x << ", y=" << updated_status.pose.position.y << ", z=" << updated_status.pose.position.z << std::endl;
+        std::cout << "Future Orientation: x=" << updated_status.pose.orientation.x << ", y=" << updated_status.pose.orientation.y << ", z=" << updated_status.pose.orientation.z << ", w=" << updated_status.pose.orientation.w << " (yaw=" << math::geometry::convertQuaternionToEulerAngle(updated_status.pose.orientation).z << ")" << std::endl;
+        std::cout << "Future Linear velocity: x=" << updated_status.action_status.twist.linear.x << ", y=" << updated_status.action_status.twist.linear.y << ", z=" << updated_status.action_status.twist.linear.z << std::endl;
+        std::cout << "Future Angular velocity: x=" << updated_status.action_status.twist.angular.x << ", y=" << updated_status.action_status.twist.angular.y << ", z=" << updated_status.action_status.twist.angular.z << std::endl;
+        std::cout << "Future Linear acceleration: x=" << updated_status.action_status.accel.linear.x << ", y=" << updated_status.action_status.accel.linear.y << ", z=" << updated_status.action_status.accel.linear.z << std::endl;
+        std::cout << "Future Angular acceleration: x=" << updated_status.action_status.accel.angular.x << ", y=" << updated_status.action_status.accel.angular.y << ", z=" << updated_status.action_status.accel.angular.z << std::endl;
+    }
+    return updated_status;
   } else if (const auto position = entity_status.pose.position; any(is_infinity_or_nan, position)) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
@@ -250,8 +318,11 @@ auto makeUpdatedStatus(
        miraculously becomes zero.
     */
     isDefinitelyLessThan(distance_to_front_waypoint, std::numeric_limits<double>::epsilon())) {
-    std::cout << std::fixed << std::setprecision(64);
-    std::cout << "DISCARD WAYPOINT " << (polyline_trajectory.shape.vertices.size() - 1) << " REASON: distance_to_front_waypoint is too small (< epsilon = " << std::numeric_limits<double>::epsilon() << ")" << std::endl;
+    if (verbose_discard_reason) {
+      std::cout << "DISCARD WAYPOINT NR " << (polyline_trajectory.shape.vertices.size() - 1)
+                << " REASON: distance_to_front_waypoint is too small (< epsilon = "
+                << std::numeric_limits<double>::epsilon() << ")" << std::endl;
+    }
     return discard_the_front_waypoint_and_recurse();
   } else if (
     const auto [distance, remaining_time] =
@@ -324,8 +395,11 @@ auto makeUpdatedStatus(
         }
       }();
     isDefinitelyLessThan(distance, std::numeric_limits<double>::epsilon())) {
-    std::cout << std::fixed << std::setprecision(64);
-    std::cout << "DISCARD WAYPOINT " << (polyline_trajectory.shape.vertices.size() - 1) << " REASON: total distance is too small (< epsilon = " << std::numeric_limits<double>::epsilon() << ")" << std::endl;
+    if (verbose_discard_reason) {
+      std::cout << "DISCARD WAYPOINT " << (polyline_trajectory.shape.vertices.size() - 1)
+                << " REASON: total distance is too small (< epsilon = "
+                << std::numeric_limits<double>::epsilon() << ")" << std::endl;
+    }
     return discard_the_front_waypoint_and_recurse();
   } else if (const auto acceleration = entity_status.action_status.accel.linear.x;  // [m/s^2]
              std::isinf(acceleration) or std::isnan(acceleration)) {
@@ -400,27 +474,6 @@ auto makeUpdatedStatus(
     */
     const auto desired_acceleration = [&]() -> double {
       try {
-      std::cout << "=== MORE ===" << std::endl;
-      std::cout << std::fixed << std::setprecision(64);
-      std::cout << "Remaining time used in controller: " << remaining_time << std::endl;
-      std::cout << "Remaining time to front waypoint: " << remaining_time_to_front_waypoint << std::endl;
-      std::cout << "Distance used in controller: " << distance << std::endl;
-      std::cout << "Distance calculation method: ";
-      if (!is_breaking_waypoint()) {
-        const auto total_distance_to_waypoint_with_time = distance - distance_to_front_waypoint;
-        std::cout << "distance_to_front_waypoint + total_distance_to_waypoint_with_time" << std::endl;
-        std::cout << "  - total_distance_to_waypoint_with_time: " << total_distance_to_waypoint_with_time << std::endl;
-        std::cout << "  - calculated by summing distance_along_lanelet between consecutive waypoints" << std::endl;
-        std::cout << "    from current position to first_waypoint_with_arrival_time_specified" << std::endl;
-      } else {
-        std::cout << "simple distance_to_front_waypoint (breaking waypoint)" << std::endl;
-      }
-      std::cout << "  - distance_to_front_waypoint: " << distance_to_front_waypoint << std::endl;
-      std::cout << "  - distance_to_front_waypoint calculated via distance_along_lanelet (lanelet-based)" << std::endl;
-      std::cout << "Acceleration: " << acceleration << std::endl;
-      std::cout << "Speed: " << speed << std::endl;
-      std::cout << "  ---  " << std::endl;
-
         return follow_waypoint_controller.getAcceleration(
           remaining_time, distance, acceleration, speed);
       } catch (const ControllerError & e) {
@@ -497,12 +550,18 @@ auto makeUpdatedStatus(
                    .y(std::cos(pitch) * std::sin(yaw) * speed)
                    .z(std::sin(pitch) * speed);
                }();
-             (speed * step_time) > distance_to_front_waypoint &&
+             distance_to_front_waypoint < FollowWaypointController::finish_distance_tolerance &&
              innerProduct(desired_velocity, current_velocity) < 0.0) {
-    std::cout << std::fixed << std::setprecision(64);
-    std::cout << "DISCARD WAYPOINT " << (polyline_trajectory.shape.vertices.size() - 1) << " REASON: vehicle would overshoot waypoint and is moving in opposite direction" << std::endl;
-    std::cout << "  speed * step_time = " << (speed * step_time) << " > distance_to_front_waypoint = " << distance_to_front_waypoint << std::endl;
-    std::cout << "  innerProduct(desired_velocity, current_velocity) = " << innerProduct(desired_velocity, current_velocity) << " < 0" << std::endl;
+    if (verbose_discard_reason) {
+      std::cout << "DISCARD WAYPOINT " << (polyline_trajectory.shape.vertices.size() - 1)
+                << " REASON: vehicle is moving in opposite direction" << std::endl;
+      std::cout << "distance in this step = "
+                << (speed + desired_acceleration * step_time * 0.5) * step_time
+                << ",  distance_to_front_waypoint = " << distance_to_front_waypoint << " < "
+                << FollowWaypointController::finish_distance_tolerance << std::endl;
+      std::cout << ",  innerProduct(desired_velocity, current_velocity) = "
+                << innerProduct(desired_velocity, current_velocity) << " < 0" << std::endl;
+    }
     return discard_the_front_waypoint_and_recurse();
   } else if (auto predicted_state_opt = follow_waypoint_controller.getPredictedWaypointArrivalState(
                desired_acceleration, remaining_time, distance, acceleration, speed);
@@ -602,22 +661,43 @@ auto makeUpdatedStatus(
     if (std::isnan(remaining_time_to_front_waypoint)) {
       /// @note If the nearest waypoint is arrived at in this step without a specific arrival time, it will
       /// be considered as achieved
+      const auto this_step_distance = norm(current_velocity + desired_velocity) * 0.5 * step_time;
       if (std::isinf(remaining_time) && polyline_trajectory.shape.vertices.size() == 1) {
         /// @note If the trajectory has only waypoints with unspecified time, the last one is followed using
         /// maximum speed including braking - in this case accuracy of arrival is checked
-        if (follow_waypoint_controller.areConditionsOfArrivalMet(
-              acceleration, speed, distance_to_front_waypoint)) {
-          std::cout << "DISCARD WAYPOINT " << (polyline_trajectory.shape.vertices.size() - 1) << " REASON: conditions of arrival met for last waypoint with unspecified time" << std::endl;
+        if (
+          this_step_distance - FollowWaypointController::finish_distance_tolerance >
+          distance_to_front_waypoint) {
+          throw common::Error(
+            "Too much overshoot of the last waypoint detected for vehicle ",
+            std::quoted(entity_status.name),
+            ". Overshoot distance: ", this_step_distance - distance_to_front_waypoint,
+            " m (this step distance: ", this_step_distance,
+            " m, remaining distance: ", distance_to_front_waypoint,
+            " m, overshoot tolerance: ", FollowWaypointController::finish_distance_tolerance,
+            "). This error indicates a bug in the algorithm - report the details to the "
+            "developer.");
+        } else if (follow_waypoint_controller.areConditionsOfArrivalMet(
+                     acceleration, speed, distance_to_front_waypoint)) {
+          if (verbose_discard_reason) {
+            std::cout
+              << "DISCARD WAYPOINT " << (polyline_trajectory.shape.vertices.size() - 1)
+              << " REASON: conditions of arrival met for last waypoint with unspecified time"
+              << std::endl;
+          }
           return discard_the_front_waypoint_and_recurse();
         }
       } else {
         /// @note If it is an intermediate waypoint with an unspecified time, the accuracy of the arrival is
-        /// irrelevant 
-        if (auto this_step_distance = (speed + desired_acceleration * step_time) * step_time;
-            this_step_distance > distance_to_front_waypoint) {
-          std::cout << std::fixed << std::setprecision(64);
-          std::cout << "DISCARD WAYPOINT " << (polyline_trajectory.shape.vertices.size() - 1) << " REASON: intermediate waypoint - this step would overshoot waypoint" << std::endl;
-          std::cout << "  this_step_distance = " << this_step_distance << " > distance_to_front_waypoint = " << distance_to_front_waypoint << std::endl;
+        /// irrelevant and even a large overshoot is acceptable
+        if (this_step_distance > distance_to_front_waypoint) {
+          std::cout << std::fixed << std::setprecision(verbose_precision);
+          std::cout << "DISCARD WAYPOINT " << (polyline_trajectory.shape.vertices.size() - 1)
+                    << " REASON: intermediate waypoint - this step would overshoot waypoint"
+                    << std::endl;
+          std::cout << "  this_step_distance = " << this_step_distance
+                    << " > distance_to_front_waypoint = " << distance_to_front_waypoint
+                    << std::endl;
           return discard_the_front_waypoint_and_recurse();
         }
       }
@@ -653,24 +733,10 @@ auto makeUpdatedStatus(
        steering.
     */
 
-    // Debug: Print calculated values
-    const auto clamped_acceleration = std::clamp(desired_acceleration, min_acceleration, max_acceleration);
-    const auto desired_speed = speed + desired_acceleration * step_time;
-    std::cout << std::fixed << std::setprecision(64);
-    std::cout << "Target speed: " << (target_speed ? std::to_string(*target_speed) : "not specified") << std::endl;
-    std::cout << "Matching distance: " << matching_distance << std::endl;
-    std::cout << "Min acceleration limit: " << min_acceleration << std::endl;
-    std::cout << "Max acceleration limit: " << max_acceleration << std::endl;
-    std::cout << "  ---  " << std::endl;
-    std::cout << "Raw desired acceleration: " << desired_acceleration << std::endl;
-    std::cout << "Clamped acceleration: " << clamped_acceleration << std::endl;
-    std::cout << "Calculated speed: " << desired_speed << std::endl;
-    std::cout << "Calculated desired_velocity: x=" << desired_velocity.x << ", y=" << desired_velocity.y << ", z=" << desired_velocity.z << std::endl;
-    std::cout << "  ---  " << std::endl;
 
     auto updated_status = entity_status;
 
-    updated_status.pose.position += desired_velocity * step_time;
+    updated_status.pose.position += (current_velocity + desired_velocity) * 0.5 * step_time;
 
     updated_status.pose.orientation = [&]() {
       if (desired_velocity.y == 0 && desired_velocity.x == 0 && desired_velocity.z == 0) {
@@ -723,17 +789,20 @@ auto makeUpdatedStatus(
     updated_status.time = entity_status.time + step_time;
 
     updated_status.lanelet_pose_valid = false;
-    
-    std::cout << "=== AFTER UPDATE ===" << std::endl;
-    const auto saved_position = entity_status.pose.position + desired_velocity * step_time;
-    std::cout << "Future Position (using desired_velocity  ): x=" << saved_position.x << ", y=" << saved_position.y << ", z=" << saved_position.z << std::endl;
-    std::cout << "Future Position (after lanelet transition): x=" << updated_status.pose.position.x << ", y=" << updated_status.pose.position.y << ", z=" << updated_status.pose.position.z << std::endl;
-    std::cout << "Future Orientation: x=" << updated_status.pose.orientation.x << ", y=" << updated_status.pose.orientation.y << ", z=" << updated_status.pose.orientation.z << ", w=" << updated_status.pose.orientation.w << std::endl;
-    std::cout << "Future Linear velocity: x=" << updated_status.action_status.twist.linear.x << ", y=" << updated_status.action_status.twist.linear.y << ", z=" << updated_status.action_status.twist.linear.z << std::endl;
-    std::cout << "Future Angular velocity: x=" << updated_status.action_status.twist.angular.x << ", y=" << updated_status.action_status.twist.angular.y << ", z=" << updated_status.action_status.twist.angular.z << std::endl;
-    std::cout << "Future Linear acceleration: x=" << updated_status.action_status.accel.linear.x << ", y=" << updated_status.action_status.accel.linear.y << ", z=" << updated_status.action_status.accel.linear.z << std::endl;
-    std::cout << "Future Angular acceleration: x=" << updated_status.action_status.accel.angular.x << ", y=" << updated_status.action_status.accel.angular.y << ", z=" << updated_status.action_status.accel.angular.z << std::endl;
-    std::cout << "===============================" << std::endl << std::endl << std::endl;
+
+    if (verbose_status_changes) {
+      std::cout << "=== AFTER UPDATE ===" << std::endl;
+      const auto current_distance = (current_velocity + desired_velocity) * 0.5 * step_time;
+      const auto saved_position = entity_status.pose.position + current_distance;
+      std::cout << "This step distance: " << norm(current_distance) << " x=" << current_distance.x << ", y=" << current_distance.y << ", z=" << current_distance.z << std::endl;
+      std::cout << "Future Position (using desired_velocity  ): x=" << saved_position.x << ", y=" << saved_position.y << ", z=" << saved_position.z << std::endl;
+      std::cout << "Future Position (after lanelet transition): x=" << updated_status.pose.position.x << ", y=" << updated_status.pose.position.y << ", z=" << updated_status.pose.position.z << std::endl;
+      std::cout << "Future Orientation: x=" << updated_status.pose.orientation.x << ", y=" << updated_status.pose.orientation.y << ", z=" << updated_status.pose.orientation.z << ", w=" << updated_status.pose.orientation.w << " (yaw=" << math::geometry::convertQuaternionToEulerAngle(updated_status.pose.orientation).z << ")" << std::endl;
+      std::cout << "Future Linear velocity: x=" << updated_status.action_status.twist.linear.x << ", y=" << updated_status.action_status.twist.linear.y << ", z=" << updated_status.action_status.twist.linear.z << std::endl;
+      std::cout << "Future Angular velocity: x=" << updated_status.action_status.twist.angular.x << ", y=" << updated_status.action_status.twist.angular.y << ", z=" << updated_status.action_status.twist.angular.z << std::endl;
+      std::cout << "Future Linear acceleration: x=" << updated_status.action_status.accel.linear.x << ", y=" << updated_status.action_status.accel.linear.y << ", z=" << updated_status.action_status.accel.linear.z << std::endl;
+      std::cout << "Future Angular acceleration: x=" << updated_status.action_status.accel.angular.x << ", y=" << updated_status.action_status.accel.angular.y << ", z=" << updated_status.action_status.accel.angular.z << std::endl;
+    }
     return updated_status;
   }
 }

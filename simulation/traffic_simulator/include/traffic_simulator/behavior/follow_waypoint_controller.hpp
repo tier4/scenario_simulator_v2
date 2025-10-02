@@ -51,9 +51,10 @@ struct PredictedState
 
   auto moveStraight(const double step_acceleration, const double step_time) -> void
   {
-    acceleration = step_acceleration;
-    speed += acceleration * step_time;
-    traveled_distance += speed * step_time;
+    const auto desired_speed = speed + step_acceleration * step_time;
+    traveled_distance += (speed + desired_speed) * 0.5 * step_time;
+    acceleration = (desired_speed - speed) / step_time;
+    speed = desired_speed;
     travel_time += step_time;
   }
 
@@ -85,14 +86,6 @@ class FollowWaypointController
 
   const double target_speed;
 
-  /*
-     Achieving official epsilon (1e-16) accuracy when using doubles is
-     difficult for this reason the controller uses less accuracy.
-
-     There is no technical basis for this value, it was determined based on
-     Dawid Moszynski experiments.
-  */
-  static constexpr double local_epsilon = 1e-12;
 
   /*
      Acceptable time step inaccuracy, allowing the time to be rounded up to the
@@ -102,15 +95,6 @@ class FollowWaypointController
      Dawid Moszynski experiments.
   */
   static constexpr double step_time_tolerance = 1e-6;
-
-  /*
-     Accuracy of the final arrival distance at a waypoint with a specified
-     time.
-
-     There is no technical basis for this value, it was determined based on
-     Dawid Moszynski experiments.
-  */
-  static constexpr double finish_distance_tolerance = 1e-2;
 
   /*
      Accuracy of the predicted arrival distance at the waypoint with the
@@ -220,6 +204,24 @@ class FollowWaypointController
     const double speed) const -> std::optional<PredictedState>;
 
 public:
+  /*
+     Achieving official epsilon (1e-16) accuracy when using doubles is
+     difficult for this reason the controller uses less accuracy.
+
+     There is no technical basis for this value, it was determined based on
+     Dawid Moszynski experiments.
+  */
+  static constexpr double local_epsilon = 1e-12;
+
+  /*
+     Accuracy of the final arrival distance at a waypoint with a specified
+     time.
+
+     There is no technical basis for this value, it was determined based on
+     Dawid Moszynski experiments.
+  */
+  static constexpr double finish_distance_tolerance = 1e-2;
+
   explicit constexpr FollowWaypointController(
     const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter,
     const double step_time, const bool with_breaking,
