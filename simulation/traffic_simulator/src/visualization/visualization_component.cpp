@@ -47,6 +47,7 @@
 #include <color_names/color_names.hpp>
 #include <geometry/spline/catmull_rom_spline.hpp>
 #include <geometry/transform.hpp>
+#include <get_parameter/get_parameter.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
 #include <string>
@@ -63,6 +64,10 @@ VisualizationComponent::VisualizationComponent(const rclcpp::NodeOptions & optio
     this->create_subscription<traffic_simulator_msgs::msg::EntityStatusWithTrajectoryArray>(
       "entity/status", 1,
       std::bind(&VisualizationComponent::entityStatusCallback, this, std::placeholders::_1));
+  use_trajectory_based_front_entity_detection_ =
+    common::getParameter<bool>("use_trajectory_based_front_entity_detection", false);
+  trajectory_based_detection_width_ =
+    common::getParameter<double>("trajectory_based_detection_width", -1.0);
 }
 
 void VisualizationComponent::entityStatusCallback(
@@ -407,8 +412,17 @@ const visualization_msgs::msg::MarkerArray VisualizationComponent::generateMarke
     waypoints_marker.id = 4;
     waypoints_marker.action = visualization_msgs::msg::Marker::ADD;
     waypoints_marker.type = visualization_msgs::msg::Marker::TRIANGLE_LIST;
-    size_t num_points = 20;
-    waypoints_marker.points = spline.getPolygon(status.bounding_box.dimensions.y, num_points);
+    size_t num_points = 50;
+    if (use_trajectory_based_front_entity_detection_) {
+      trajectory_based_detection_width_ = (trajectory_based_detection_width_ < 0.0)
+                                            ? status.bounding_box.dimensions.y
+                                            : trajectory_based_detection_width_;
+      waypoints_marker.points = spline.getPolygon(trajectory_based_detection_width_, num_points);
+
+    } else {
+      waypoints_marker.points =
+        spline.getPolygon(status.bounding_box.dimensions.y * 2.0, num_points);
+    }
     waypoints_marker.color = color;
     waypoints_marker.color.a = 0.8;
     waypoints_marker.colors =
