@@ -36,12 +36,10 @@ jobs:
         cmake_build_type: [RelWithDebInfo, Release] # Debug build type is currently unavailable. @TODO Fix problem and add Debug build.
     steps:
       - name: free disk
-        run: |
-          df -h
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /usr/local/lib/android
-          sudo rm -rf /opt/hostedtoolcache
-          df -h
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+
       - name: Suppress warnings
         run: git config --global --add safe.directory '*'
 
