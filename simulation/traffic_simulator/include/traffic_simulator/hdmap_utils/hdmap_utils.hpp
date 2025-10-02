@@ -106,22 +106,6 @@ public:
                             traffic_simulator::RoutingConfiguration().routing_graph_type) const
     -> lanelet::Ids;
 
-  auto getDistanceToTrafficLightStopLine(
-    const lanelet::Ids & route_lanelets,
-    const math::geometry::CatmullRomSplineInterface & spline) const -> std::optional<double>;
-
-  auto getDistanceToTrafficLightStopLine(
-    const lanelet::Ids & route_lanelets,
-    const std::vector<geometry_msgs::msg::Point> & waypoints) const -> std::optional<double>;
-
-  auto getDistanceToTrafficLightStopLine(
-    const math::geometry::CatmullRomSplineInterface & spline,
-    const lanelet::Id traffic_light_id) const -> std::optional<double>;
-
-  auto getDistanceToTrafficLightStopLine(
-    const std::vector<geometry_msgs::msg::Point> & waypoints,
-    const lanelet::Id traffic_light_id) const -> std::optional<double>;
-
   auto getFollowingLanelets(
     const lanelet::Id current_lanelet_id, const lanelet::Ids & route, const double horizon = 100,
     const bool include_current_lanelet_id = true,
