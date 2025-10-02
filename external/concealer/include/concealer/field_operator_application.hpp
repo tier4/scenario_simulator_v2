@@ -119,6 +119,8 @@ struct FieldOperatorApplication : public rclcpp::Node
   Service<ChangeOperationMode>    requestChangeToStop;
   // clang-format on
 
+  rclcpp::executors::SingleThreadedExecutor executor;
+
   /*
      The task queue must be deconstructed before any services, so it must be
      the last class data member. (Class data members are constructed in
