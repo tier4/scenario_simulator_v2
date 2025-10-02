@@ -421,7 +421,7 @@ const visualization_msgs::msg::MarkerArray VisualizationComponent::generateMarke
 
     } else {
       waypoints_marker.points =
-        spline.getPolygon(status.bounding_box.dimensions.y * 2.0, num_points);
+        spline.getPolygon(status.bounding_box.dimensions.y, num_points);
     }
     waypoints_marker.color = color;
     waypoints_marker.color.a = 0.8;
