@@ -24,6 +24,9 @@ Changelog for package simple_sensor_simulator
 16.4.2 (2025-05-23)
 -------------------
 
+17.6.1 (2025-10-02)
+-------------------
+
 17.6.0 (2025-09-29)
 -------------------
 * Merge pull request `#1685 <https://github.com/tier4/scenario_simulator_v2/issues/1685>`_ from tier4/fix/noise_v4
