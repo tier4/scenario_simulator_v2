@@ -33,7 +33,6 @@ namespace entity_behavior
 {
 namespace pedestrian
 {
-enum class SeeAroundMode { blind, aware };
 
 class FollowLaneAction : public entity_behavior::PedestrianActionNode
 {
@@ -47,9 +46,6 @@ public:
     return entity_behavior::PedestrianActionNode::providedPorts();
   }
   bool detectObstacleInLane(const lanelet::Ids pedestrian_lanes, const bool see_around) const;
-
-private:
-  SeeAroundMode should_respect_see_around;
 };
 }  // namespace pedestrian
 }  // namespace entity_behavior
