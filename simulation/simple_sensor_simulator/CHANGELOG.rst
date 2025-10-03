@@ -24,6 +24,33 @@ Changelog for package simple_sensor_simulator
 16.4.2 (2025-05-23)
 -------------------
 
+17.6.2 (2025-10-02)
+-------------------
+* Merge pull request `#1688 <https://github.com/tier4/scenario_simulator_v2/issues/1688>`_ from tier4/fix/spin-some-deprecated
+* Merge branch 'master' into fix/spin-some-deprecated
+* Fix context is null error
+* Replace spin_some in simple_sensor_simulator
+* Contributors: Kotaro Yoshimoto, f0reachARR
+
+17.6.1 (2025-10-02)
+-------------------
+
+17.6.0 (2025-09-29)
+-------------------
+* Merge pull request `#1685 <https://github.com/tier4/scenario_simulator_v2/issues/1685>`_ from tier4/fix/noise_v4
+* Merge branch 'master' into fix/noise_v4
+* use elliptical model for x,y,yaw in noise_v4
+* Apply noise v4 correctly
+* Implement yaw flip noise correctly
+* Add missing parts for noise_v4
+* rename rotation to yaw in noise_v4
+* use same true positive calculation algorithm to noise_v2 in noise_v4
+* commonize true positive calculation algorithm in noise_v2
+* Add create_selector lambda function to make selector lambda more common
+* rename noise.v4.<config_name>.rotation into noise.v4.<config_name>.yaw
+* Implement yaw_flip noise for noise_v4
+* Contributors: Kotaro Yoshimoto
+
 17.5.3 (2025-09-17)
 -------------------
 * Merge branch 'master' into fix/macro-xml-validation

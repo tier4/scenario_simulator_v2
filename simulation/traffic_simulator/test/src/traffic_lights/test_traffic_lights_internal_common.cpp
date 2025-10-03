@@ -197,7 +197,7 @@ TYPED_TEST(TrafficLightsInternalTest, startUpdate_publishMarkers)
   this->lights->startUpdate(20.0);
   const auto end = std::chrono::system_clock::now() + 1s;
   while (std::chrono::system_clock::now() < end) {
-    rclcpp::spin_some(this->node_ptr);
+    this->executor.spin_some();
   }
 
   const auto verify_delete_marker =
@@ -301,7 +301,7 @@ TYPED_TEST(TrafficLightsInternalTest, resetUpdate_publishMarkers)
     this->lights->startUpdate(20.0);
     const auto first_end = std::chrono::system_clock::now() + 0.5s;
     while (std::chrono::system_clock::now() < first_end) {
-      rclcpp::spin_some(this->node_ptr);
+      this->executor.spin_some();
     }
   }
 
@@ -318,7 +318,7 @@ TYPED_TEST(TrafficLightsInternalTest, resetUpdate_publishMarkers)
     this->lights->resetUpdate(10.0);
     const auto second_end = std::chrono::system_clock::now() + 0.5s;
     while (std::chrono::system_clock::now() < second_end) {
-      rclcpp::spin_some(this->node_ptr);
+      this->executor.spin_some();
     }
   }
 

@@ -24,6 +24,21 @@ Changelog for package openscenario_visualization
 16.4.2 (2025-05-23)
 -------------------
 
+17.6.2 (2025-10-02)
+-------------------
+* Merge pull request `#1688 <https://github.com/tier4/scenario_simulator_v2/issues/1688>`_ from tier4/fix/spin-some-deprecated
+* Merge branch 'master' into fix/spin-some-deprecated
+* Replace spin_some in ContextPanel
+* Contributors: Kotaro Yoshimoto, f0reachARR
+
+17.6.1 (2025-10-02)
+-------------------
+
+17.6.0 (2025-09-29)
+-------------------
+* Merge branch 'master' into fix/noise_v4
+* Contributors: Kotaro Yoshimoto
+
 17.5.3 (2025-09-17)
 -------------------
 * Merge branch 'master' into fix/macro-xml-validation
