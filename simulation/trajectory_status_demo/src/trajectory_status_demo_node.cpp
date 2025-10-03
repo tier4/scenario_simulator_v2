@@ -17,6 +17,11 @@
 #include <traffic_simulator/data_type/entity_status.hpp>
 #include <geometry/quaternion/direction_to_quaternion.hpp>
 #include <traffic_simulator/utils/lanelet_map.hpp>
+#include <iostream>
+#include <sstream>
+#include <iomanip>
+#include <fstream>
+#include <ament_index_cpp/get_package_share_directory.hpp>
 
 class TrajectoryStatusDemoNode : public rclcpp::Node
 {
@@ -35,11 +40,21 @@ public:
         );
 
         simulation_time_ = this->get_parameter("time.initial_time").as_double();
-        traffic_simulator::lanelet_map::activate("/home/pzyskowski/projects/tier/deliverable/2025_Q3/WP6-ss2-regular/rjd-1921/scenario/map/lanelet2_map.osm");
+        traffic_simulator::lanelet_map::activate("/home/dmoszynski/robotecai/autoware/sources/autoware_maps/prd_jt_cicd_virtual_A’_dev/lanelet2_map.osm");
+
+        // Get package source directory and create CSV file in src folder
+        std::string package_share_dir = ament_index_cpp::get_package_share_directory("trajectory_status_demo");
+        std::string package_src_dir = package_share_dir + "/../../../../src/simulator/scenario_simulator/simulation/trajectory_status_demo/src";
+        std::string csv_path = package_src_dir + "/trajectory_data.csv";
+
+        RCLCPP_INFO(this->get_logger(), "Creating CSV file at: %s", csv_path.c_str());
+        csv_file_.open(csv_path);
+        csv_file_ << "time,pos_x,pos_y,pos_z,velocity,acceleration,remaining_distance\n";
     }
 
 private:
 
+    std::ofstream csv_file_;
     traffic_simulator_msgs::msg::EntityStatus status_;
     traffic_simulator_msgs::msg::PolylineTrajectory polyline_trajectory_;
     bool once = true;
@@ -65,11 +80,6 @@ private:
             auto behavior_parameter = createBehaviorParameterFromConfig();
 
 
-            RCLCPP_INFO(this->get_logger(),
-                "Calling makeUpdatedStatus with position: [%.2f, %.2f, %.2f], speed: %.2f m/s",
-                status_.pose.position.x, status_.pose.position.y, status_.pose.position.z,
-                status_.action_status.twist.linear.x);
-
             // Call the makeUpdatedStatus API
             auto updated_status = traffic_simulator::follow_trajectory::makeUpdatedStatus(
                 status_,
@@ -81,20 +91,28 @@ private:
             );
 
             if (updated_status.has_value()) {
-                RCLCPP_INFO(this->get_logger(),
-                    "Updated status - Position: [%.2f, %.2f, %.2f], Speed: %.2f m/s, Time: %.2f s",
-                    updated_status->pose.position.x,
-                    updated_status->pose.position.y,
-                    updated_status->pose.position.z,
-                    updated_status->action_status.twist.linear.x,
-                    updated_status->time);
+                // Calculate remaining distance to waypoint
+                double remaining_distance = 0.0;
+                if (!polyline_trajectory_.shape.vertices.empty()) {
+                    const auto& waypoint = polyline_trajectory_.shape.vertices.front().position.position;
+                    double dx = waypoint.x - updated_status->pose.position.x;
+                    double dy = waypoint.y - updated_status->pose.position.y;
+                    double dz = waypoint.z - updated_status->pose.position.z;
+                    remaining_distance = std::sqrt(dx*dx + dy*dy + dz*dz);
+                }
+
+                csv_file_ << updated_status->time << ","
+                         << updated_status->pose.position.x << ","
+                         << updated_status->pose.position.y << ","
+                         << updated_status->pose.position.z << ","
+                         << updated_status->action_status.twist.linear.x << ","
+                         << updated_status->action_status.accel.linear.x << ","
+                         << remaining_distance << "\n";
+                csv_file_.flush();
 
                 // Update simulation time for next iteration
                 status_ = *updated_status;
                 simulation_time_ = updated_status->time;
-
-                // Update entity position parameters for next iteration
-//                updateEntityParameters(*updated_status);
 
             } else {
                 RCLCPP_WARN(this->get_logger(), "makeUpdatedStatus returned no value");

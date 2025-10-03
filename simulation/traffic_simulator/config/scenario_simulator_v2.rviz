@@ -8,7 +8,7 @@ Panels:
         - /Simulation1
         - /Simulation1/Simple Sensor Simulator1
       Splitter Ratio: 0.557669460773468
-    Tree Height: 827
+    Tree Height: 798
   - Class: rviz_common/Selection
     Name: Selection
   - Class: rviz_common/Tool Properties
@@ -81,6 +81,11 @@ Visualization Manager:
                 Expand Link Details: false
                 Expand Tree: false
                 Link Tree Style: Links in Alphabetic Order
+                ars408_front_center:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                  Value: true
                 base_link:
                   Alpha: 1
                   Show Axes: false
@@ -140,7 +145,43 @@ Visualization Manager:
                   Alpha: 1
                   Show Axes: false
                   Show Trail: false
+                camera6/camera_link:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                  Value: true
+                camera6/camera_optical_link:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                camera7/camera_link:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                  Value: true
+                camera7/camera_optical_link:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
                 gnss_link:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                  Value: true
+                livox_front_left:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                livox_front_left_base_link:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                  Value: true
+                livox_front_right:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                livox_front_right_base_link:
                   Alpha: 1
                   Show Axes: false
                   Show Trail: false
@@ -154,24 +195,6 @@ Visualization Manager:
                   Show Axes: false
                   Show Trail: false
                   Value: true
-                traffic_light_left_camera/camera_link:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                  Value: true
-                traffic_light_left_camera/camera_optical_link:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                traffic_light_right_camera/camera_link:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                  Value: true
-                traffic_light_right_camera/camera_optical_link:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
                 velodyne_left:
                   Alpha: 1
                   Show Axes: false
@@ -331,8 +354,15 @@ Visualization Manager:
             right_lane_bound: true
             road_borders: true
             road_lanelets: false
+            shoulder_center_lane_line: true
+            shoulder_center_line_arrows: true
+            shoulder_lane_start_bound: true
+            shoulder_left_lane_bound: true
+            shoulder_right_lane_bound: true
+            shoulder_road_lanelets: true
             stop_lines: true
             walkway_lanelets: true
+            waypoints: true
           Topic:
             Depth: 5
             Durability Policy: Transient Local
@@ -3196,36 +3226,11 @@ Visualization Manager:
                     Value: true
                   Map: true
                   Perception:
-                    CameraLidarFusion(purple): true
-                    Centerpoint(red1): true
-                    CenterpointROIFusion(red2): true
-                    CenterpointValidator(red3): true
-                    Detection(yellow): true
-                    DetectionByTracker(orange): true
-                    PointPainting(light_green1): true
-                    PointPaintingROIFusion(light_green2): true
-                    PointPaintingValidator(light_green3): true
-                    Prediction(light_blue): true
-                    RadarFarObjects(white): true
-                    Tracking(green): true
+                    "": true
                     Value: true
                   Planning:
-                    Objects Of Interest:
-                      AvoidanceByLCLeft: true
-                      AvoidanceByLCRight: true
-                      AvoidanceLeft: true
-                      AvoidanceRight: true
-                      BlindSpot: true
-                      Crosswalk: true
-                      DetectionArea: true
-                      GoalPlanner: true
-                      Intersection: true
-                      LaneChangeLeft: true
-                      LaneChangeRight: true
-                      NoStoppingArea: true
-                      ObstacleCruise: true
-                      StartPlanner: true
-                      TrafficLight: true
+                    "":
+                      "": true
                       Value: true
                     Value: true
                   Sensing:
@@ -4789,9 +4794,9 @@ Visualization Manager:
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0
-        Y: 0
-        Z: 0
+        X: 3.5538692474365234
+        Y: 7.800246238708496
+        Z: 3.814697265625e-06
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
@@ -4849,7 +4854,7 @@ Window Geometry:
   Hide Right Dock: false
   PointcloudOnCamera:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd0000000400000000000001ee000005bffc020000000ffb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005d00fffffffb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000003f0000037b000000cc00fffffffc000003c00000023e000000c80100001efa000000020100000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000000ffffffff0000009a00fffffffb00000024004100750074006f00770061007200650053007400610074006500500061006e0065006c0100000000ffffffff000000be00fffffffb0000000a005600690065007700730100000000000001ee0000010000fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000000c00430061006d0065007200610100000682000000eb0000000000000000fb0000000a0049006d0061006700650100000505000002680000000000000000fb0000002c0049006e0069007400690061006c0050006f007300650042007500740074006f006e00500061006e0065006c000000068f000000de0000000000000000fb0000002c0049006e0069007400690061006c0050006f007300650042007500740074006f006e00500061006e0065006c000000068f000000de0000000000000000fb00000030005200650063006f0067006e006900740069006f006e0052006500730075006c0074004f006e0049006d006100670065000000047a000001860000002900fffffffb0000002a004100750074006f0077006100720065004400610074006500540069006d006500500061006e0065006c0000000332000000720000004400fffffffb000000240050006f0069006e00740063006c006f00750064004f006e00430061006d006500720061000000039d000000560000002900ffffff00000001000001ab000005c3fc0200000002fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000e7a0000005afc0100000001fb0000000a00560069006500770073030000004e00000080000002e1000001970000000300000e7a0000005afc0100000002fb0000000800540069006d0065010000000000000e7a0000000000000000fb0000000800540069006d0065010000000000000450000000000000000000000909000005bf00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd0000000400000000000001ee000005bafc020000000ffb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005500fffffffb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000004200000372000000d200fffffffc000003c300000239000000c20100001dfa000000020100000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000000ffffffff0000009600fffffffb00000024004100750074006f00770061007200650053007400610074006500500061006e0065006c0100000000ffffffff000000b300fffffffb0000000a005600690065007700730100000000000001ee0000019b00fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000000c00430061006d0065007200610100000682000000eb0000000000000000fb0000000a0049006d0061006700650100000505000002680000000000000000fb0000002c0049006e0069007400690061006c0050006f007300650042007500740074006f006e00500061006e0065006c000000068f000000de0000000000000000fb0000002c0049006e0069007400690061006c0050006f007300650042007500740074006f006e00500061006e0065006c000000068f000000de0000000000000000fb00000030005200650063006f0067006e006900740069006f006e0052006500730075006c0074004f006e0049006d006100670065000000047a000001860000003100fffffffb0000002a004100750074006f0077006100720065004400610074006500540069006d006500500061006e0065006c0000000332000000720000004900fffffffb000000240050006f0069006e00740063006c006f00750064004f006e00430061006d006500720061000000039d000000560000003100ffffff00000001000001ab000005c3fc0200000002fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000e7a0000005afc0100000001fb0000000a00560069006500770073030000004e00000080000002e1000001970000000300000e7a0000005afc0100000002fb0000000800540069006d0065010000000000000e7a0000000000000000fb0000000800540069006d0065010000000000000450000000000000000000000900000005ba00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   RecognitionResultOnImage:
     collapsed: false
   Selection:
@@ -4859,5 +4864,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 2813
-  X: 1027
-  Y: 27
+  X: 1876
+  Y: 183
