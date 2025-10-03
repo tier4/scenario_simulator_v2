@@ -21,6 +21,9 @@
 #include <iostream>
 #include <limits>
 #include <optional>
+#include <geometry/vector3/hypot.hpp>
+#include <geometry/quaternion/quaternion_to_euler.hpp>
+#include <geometry_msgs/msg/vector3.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
@@ -68,6 +71,60 @@ struct PredictedState
   {
     stream << std::setprecision(16) << std::fixed;
     stream << "PredictedState: acceleration: " << state.acceleration << ", speed: " << state.speed
+           << ", distance: " << state.traveled_distance << ", time: " << state.travel_time << ". ";
+    return stream;
+  }
+};
+
+struct PredictedEntityStatus
+{
+  traffic_simulator_msgs::msg::EntityStatus entity_status;
+  double traveled_distance;
+  double travel_time;
+
+  explicit PredictedEntityStatus(const traffic_simulator_msgs::msg::EntityStatus & status)
+  : entity_status(status),
+    traveled_distance(0.0),
+    travel_time(0.0)
+  {
+  }
+
+  auto moveStraight(
+    const double step_acceleration, const double step_time,
+    const std::function<traffic_simulator_msgs::msg::EntityStatus(const traffic_simulator_msgs::msg::EntityStatus &, const geometry_msgs::msg::Vector3 &, bool)> & update_entity_status,
+    const std::function<double(const geometry_msgs::msg::Point &, const geometry_msgs::msg::Point &)> & distance_along_lanelet) -> void
+  {
+    const auto previous_position = entity_status.pose.position;
+
+    const auto desired_speed = entity_status.action_status.twist.linear.x + step_acceleration * step_time;
+    const auto desired_velocity = [&]() {
+      const auto pitch =
+        -math::geometry::convertQuaternionToEulerAngle(entity_status.pose.orientation).y;
+      const auto yaw =
+        math::geometry::convertQuaternionToEulerAngle(entity_status.pose.orientation).z;
+      return geometry_msgs::build<geometry_msgs::msg::Vector3>()
+        .x(std::cos(pitch) * std::cos(yaw) * desired_speed)
+        .y(std::cos(pitch) * std::sin(yaw) * desired_speed)
+        .z(std::sin(pitch) * desired_speed);
+    }();
+    entity_status = update_entity_status(entity_status, desired_velocity, false);
+
+    traveled_distance += distance_along_lanelet(previous_position, entity_status.pose.position);
+    travel_time += step_time;
+  }
+
+  auto isImmobile(const double tolerance) const
+  {
+    return std::abs(entity_status.action_status.twist.linear.x) < tolerance &&
+           std::abs(entity_status.action_status.accel.linear.x) < tolerance;
+  }
+
+  template <typename StreamType>
+  friend auto operator<<(StreamType & stream, const PredictedEntityStatus & state) -> StreamType &
+  {
+    stream << std::setprecision(16) << std::fixed;
+    stream << "PredictedEntityStatus: acceleration: " << state.entity_status.action_status.accel.linear.x
+           << ", speed: " << state.entity_status.action_status.twist.linear.x
            << ", distance: " << state.traveled_distance << ", time: " << state.travel_time << ". ";
     return stream;
   }
@@ -203,6 +260,12 @@ class FollowWaypointController
     const double step_acceleration, const double remaining_distance, const double acceleration,
     const double speed) const -> std::optional<PredictedState>;
 
+  auto getPredictedStopEntityStatusWithoutConsideringTime(
+    const double step_acceleration, const double remaining_distance,
+    const traffic_simulator_msgs::msg::EntityStatus & entity_status,
+    const std::function<traffic_simulator_msgs::msg::EntityStatus(const traffic_simulator_msgs::msg::EntityStatus &, const geometry_msgs::msg::Vector3 &, bool)> & update_entity_status,
+    const std::function<double(const geometry_msgs::msg::Point &, const geometry_msgs::msg::Point &)> & distance_along_lanelet) const -> std::optional<PredictedEntityStatus>;
+
 public:
   /*
      Achieving official epsilon (1e-16) accuracy when using doubles is
@@ -279,15 +342,20 @@ public:
      next point of the trajectory has no specified time.
   */
   auto getAcceleration(
-    const double remaining_distance, const double acceleration, const double speed) const -> double;
+    const double remaining_distance,
+    const traffic_simulator_msgs::msg::EntityStatus & entity_status,
+    const std::function<traffic_simulator_msgs::msg::EntityStatus(const traffic_simulator_msgs::msg::EntityStatus &, const geometry_msgs::msg::Vector3 &, bool)> & update_entity_status,
+    const std::function<double(const geometry_msgs::msg::Point &, const geometry_msgs::msg::Point &)> & distance_along_lanelet) const -> double;
 
   /*
      This allows the best acceleration to be found for the current conditions,
      taking into account the arrival time.
   */
   auto getAcceleration(
-    const double remaining_time_source, const double remaining_distance, const double acceleration,
-    const double speed) const -> double;
+    const double remaining_time_source, const double remaining_distance,
+    const traffic_simulator_msgs::msg::EntityStatus & entity_status,
+    const std::function<traffic_simulator_msgs::msg::EntityStatus(const traffic_simulator_msgs::msg::EntityStatus &, const geometry_msgs::msg::Vector3 &, bool)> & update_entity_status,
+    const std::function<double(const geometry_msgs::msg::Point &, const geometry_msgs::msg::Point &)> & distance_along_lanelet) const -> double;
 
   auto areConditionsOfArrivalMet(
     const double acceleration, const double speed, const double distance) const -> double

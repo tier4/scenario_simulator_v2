@@ -234,6 +234,28 @@ auto FollowWaypointController::getPredictedStopStateWithoutConsideringTime(
   return breaking_check;
 }
 
+auto FollowWaypointController::getPredictedStopEntityStatusWithoutConsideringTime(
+  const double step_acceleration, const double remaining_distance,
+  const traffic_simulator_msgs::msg::EntityStatus & entity_status,
+  const std::function<traffic_simulator_msgs::msg::EntityStatus(const traffic_simulator_msgs::msg::EntityStatus &, const geometry_msgs::msg::Vector3 &, bool)> & update_entity_status,
+  const std::function<double(const geometry_msgs::msg::Point &, const geometry_msgs::msg::Point &)> & distance_along_lanelet) const -> std::optional<PredictedEntityStatus>
+{
+  PredictedEntityStatus breaking_check(entity_status);
+  breaking_check.moveStraight(step_acceleration, step_time, update_entity_status, distance_along_lanelet);
+  while (!breaking_check.isImmobile(local_epsilon)) {
+    if (breaking_check.traveled_distance > remaining_distance + predicted_distance_tolerance) {
+      return std::nullopt;
+    } else {
+      auto [local_min_acceleration, local_max_acceleration] = getAccelerationLimits(
+        breaking_check.entity_status.action_status.accel.linear.x,
+        breaking_check.entity_status.action_status.twist.linear.x);
+      breaking_check.moveStraight(
+        local_min_acceleration, step_time, update_entity_status, distance_along_lanelet);
+    }
+  }
+  return breaking_check;
+}
+
 auto FollowWaypointController::getPredictedWaypointArrivalState(
   const double step_acceleration, const double remaining_time, const double remaining_distance,
   const double acceleration, const double speed) const -> std::optional<PredictedState>
@@ -324,8 +346,13 @@ auto FollowWaypointController::getPredictedWaypointArrivalState(
 }
 
 auto FollowWaypointController::getAcceleration(
-  const double remaining_distance, const double acceleration, const double speed) const -> double
+  const double remaining_distance,
+  const traffic_simulator_msgs::msg::EntityStatus & entity_status,
+  const std::function<traffic_simulator_msgs::msg::EntityStatus(const traffic_simulator_msgs::msg::EntityStatus &, const geometry_msgs::msg::Vector3 &, bool)> & update_entity_status,
+  const std::function<double(const geometry_msgs::msg::Point &, const geometry_msgs::msg::Point &)> & distance_along_lanelet) const -> double
 {
+  const auto acceleration = entity_status.action_status.accel.linear.x;
+  const auto speed = entity_status.action_status.twist.linear.x;
   const auto [local_min_acceleration, local_max_acceleration] =
     getAccelerationLimits(acceleration, speed);
 
@@ -347,8 +374,8 @@ auto FollowWaypointController::getAcceleration(
   for (std::size_t i = 0; i <= number_of_acceleration_candidates; ++i) {
     const double candidate_acceleration = local_min_acceleration + i * step_acceleration;
 
-    if (const auto predicted_state_opt = getPredictedStopStateWithoutConsideringTime(
-          candidate_acceleration, remaining_distance, acceleration, speed);
+    if (const auto predicted_state_opt = getPredictedStopEntityStatusWithoutConsideringTime(
+          candidate_acceleration, remaining_distance, entity_status, update_entity_status, distance_along_lanelet);
         predicted_state_opt) {
       const auto distance_diff = remaining_distance - predicted_state_opt->traveled_distance;
       candidates.push_back({i, candidate_acceleration, distance_diff});
@@ -432,9 +459,13 @@ auto FollowWaypointController::getAcceleration(
 }
 
 auto FollowWaypointController::getAcceleration(
-  const double remaining_time_source, const double remaining_distance, const double acceleration,
-  const double speed) const -> double
+  const double remaining_time_source, const double remaining_distance,
+  const traffic_simulator_msgs::msg::EntityStatus & entity_status,
+  const std::function<traffic_simulator_msgs::msg::EntityStatus(const traffic_simulator_msgs::msg::EntityStatus &, const geometry_msgs::msg::Vector3 &, bool)> & update_entity_status,
+  const std::function<double(const geometry_msgs::msg::Point &, const geometry_msgs::msg::Point &)> & distance_along_lanelet) const -> double
 {
+  const auto acceleration = entity_status.action_status.accel.linear.x;
+  const auto speed = entity_status.action_status.twist.linear.x;
   const auto [local_min_acceleration, local_max_acceleration] =
     getAccelerationLimits(acceleration, speed);
 
@@ -456,7 +487,7 @@ auto FollowWaypointController::getAcceleration(
        If remaining time is no specified - this is the case when every next
        point of the trajectory has no specified time.
     */
-    return getAcceleration(remaining_distance, acceleration, speed);
+    return getAcceleration(remaining_distance, entity_status, update_entity_status, distance_along_lanelet);
   } else {
     const auto remaining_time =
       roundTimeToFullStepsWithTolerance(remaining_time_source, step_time_tolerance);

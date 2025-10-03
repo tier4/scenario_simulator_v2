@@ -531,7 +531,7 @@ auto makeUpdatedStatus(
     const auto desired_acceleration = [&]() -> double {
       try {
         return follow_waypoint_controller.getAcceleration(
-          remaining_time, distance, acceleration, speed);
+          remaining_time, distance, entity_status, update_entity_status, distance_along_lanelet);
       } catch (const ControllerError & e) {
         throw common::Error(
           "Vehicle ", std::quoted(entity_status.name),
