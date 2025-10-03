@@ -148,9 +148,7 @@ BT::NodeStatus WalkStraightAction::doAction()
     target_speed_ = 1.111;
   }
 
-  const auto is_obstacle_in_front = isObstacleInFront(behavior_parameter_.see_around);
-  target_speed_ = is_obstacle_in_front ? 0.0 : target_speed_;
-
+  target_speed_ = isObstacleInFront(behavior_parameter_.see_around) ? 0.0 : target_speed_;
   setCanonicalizedEntityStatus(calculateUpdatedEntityStatusInWorldFrame(target_speed_.value()));
   return BT::NodeStatus::RUNNING;
 }
