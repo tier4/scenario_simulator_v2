@@ -182,8 +182,9 @@ auto makeUpdatedStatus(
            std::prev(polyline_trajectory.shape.vertices.end());
   };
 
-  auto update_entity_status = [&entity_status,
-                               step_time, include_crosswalk](const geometry_msgs::msg::Vector3 & desired_velocity)
+  auto update_entity_status = [step_time, include_crosswalk](
+                                const traffic_simulator_msgs::msg::EntityStatus & entity_status,
+                                const geometry_msgs::msg::Vector3 & desired_velocity, bool verbose)
     -> traffic_simulator_msgs::msg::EntityStatus {
     const auto current_velocity = [&]() {
       const auto pitch =
@@ -199,7 +200,7 @@ auto makeUpdatedStatus(
     auto updated_status = entity_status;
     updated_status.pose.position += (current_velocity + desired_velocity) * 0.5 * step_time;
 
-      updated_status.pose.orientation = [&]() {
+    updated_status.pose.orientation = [&]() {
       if (desired_velocity.y == 0 && desired_velocity.x == 0 && desired_velocity.z == 0) {
         /// @note do not change orientation if there is no designed_velocity vector
         return entity_status.pose.orientation;
@@ -209,26 +210,25 @@ auto makeUpdatedStatus(
       }
     }();
 
-      /// @note if it is the transition between lanelets: overwrite position to improve precision
-      if (entity_status.lanelet_pose_valid) {
-        constexpr bool desired_velocity_is_global{true};
-        const auto canonicalized_lanelet_pose =
-          traffic_simulator::pose::toCanonicalizedLaneletPose(entity_status.lanelet_pose);
-        const auto estimated_next_canonicalized_lanelet_pose =
-          traffic_simulator::pose::toCanonicalizedLaneletPose(
-            updated_status.pose, include_crosswalk);
-        if (canonicalized_lanelet_pose && estimated_next_canonicalized_lanelet_pose) {
-          const auto next_lanelet_id =
-            static_cast<LaneletPose>(estimated_next_canonicalized_lanelet_pose.value()).lanelet_id;
-          /// @note Handle lanelet transition
-          if (
-            const auto updated_position = pose::updatePositionForLaneletTransition(
-              canonicalized_lanelet_pose.value(), next_lanelet_id, desired_velocity,
-              desired_velocity_is_global, step_time)) {
-            updated_status.pose.position = updated_position.value();
-          }
+    /// @note if it is the transition between lanelets: overwrite position to improve precision
+    if (entity_status.lanelet_pose_valid) {
+      constexpr bool desired_velocity_is_global{true};
+      const auto canonicalized_lanelet_pose =
+        traffic_simulator::pose::toCanonicalizedLaneletPose(entity_status.lanelet_pose);
+      const auto estimated_next_canonicalized_lanelet_pose =
+        traffic_simulator::pose::toCanonicalizedLaneletPose(updated_status.pose, include_crosswalk);
+      if (canonicalized_lanelet_pose && estimated_next_canonicalized_lanelet_pose) {
+        const auto next_lanelet_id =
+          static_cast<LaneletPose>(estimated_next_canonicalized_lanelet_pose.value()).lanelet_id;
+        /// @note Handle lanelet transition
+        if (
+          const auto updated_position = pose::updatePositionForLaneletTransition(
+            canonicalized_lanelet_pose.value(), next_lanelet_id, desired_velocity,
+            desired_velocity_is_global, step_time)) {
+          updated_status.pose.position = updated_position.value();
         }
       }
+    }
 
     updated_status.action_status.twist.linear.x = norm(desired_velocity);
     updated_status.action_status.twist.linear.y = 0;
@@ -246,18 +246,18 @@ auto makeUpdatedStatus(
     updated_status.time = entity_status.time + step_time;
     updated_status.lanelet_pose_valid = false;
 
-    if (verbose_status_changes) {
-        std::cout << "=== AFTER UPDATE ===" << std::endl;
-        const auto current_distance = (current_velocity + desired_velocity) * 0.5 * step_time;
-        const auto saved_position = entity_status.pose.position + current_distance;
-        std::cout << "This step distance: " << norm(current_distance) << " x=" << current_distance.x << ", y=" << current_distance.y << ", z=" << current_distance.z << std::endl;
-        std::cout << "Future Position (using desired_velocity  ): x=" << saved_position.x << ", y=" << saved_position.y << ", z=" << saved_position.z << std::endl;
-        std::cout << "Future Position (after lanelet transition): x=" << updated_status.pose.position.x << ", y=" << updated_status.pose.position.y << ", z=" << updated_status.pose.position.z << std::endl;
-        std::cout << "Future Orientation: x=" << updated_status.pose.orientation.x << ", y=" << updated_status.pose.orientation.y << ", z=" << updated_status.pose.orientation.z << ", w=" << updated_status.pose.orientation.w << " (yaw=" << math::geometry::convertQuaternionToEulerAngle(updated_status.pose.orientation).z << ")" << std::endl;
-        std::cout << "Future Linear velocity: x=" << updated_status.action_status.twist.linear.x << ", y=" << updated_status.action_status.twist.linear.y << ", z=" << updated_status.action_status.twist.linear.z << std::endl;
-        std::cout << "Future Angular velocity: x=" << updated_status.action_status.twist.angular.x << ", y=" << updated_status.action_status.twist.angular.y << ", z=" << updated_status.action_status.twist.angular.z << std::endl;
-        std::cout << "Future Linear acceleration: x=" << updated_status.action_status.accel.linear.x << ", y=" << updated_status.action_status.accel.linear.y << ", z=" << updated_status.action_status.accel.linear.z << std::endl;
-        std::cout << "Future Angular acceleration: x=" << updated_status.action_status.accel.angular.x << ", y=" << updated_status.action_status.accel.angular.y << ", z=" << updated_status.action_status.accel.angular.z << std::endl;
+    if (verbose) {
+      std::cout << "=== AFTER UPDATE ===" << std::endl;
+      const auto current_distance = (current_velocity + desired_velocity) * 0.5 * step_time;
+      const auto saved_position = entity_status.pose.position + current_distance;
+      std::cout << "This step distance: " << norm(current_distance) << " x=" << current_distance.x << ", y=" << current_distance.y << ", z=" << current_distance.z << std::endl;
+      std::cout << "Future Position (using desired_velocity  ): x=" << saved_position.x << ", y=" << saved_position.y << ", z=" << saved_position.z << std::endl;
+      std::cout << "Future Position (after lanelet transition): x=" << updated_status.pose.position.x << ", y=" << updated_status.pose.position.y << ", z=" << updated_status.pose.position.z << std::endl;
+      std::cout << "Future Orientation: x=" << updated_status.pose.orientation.x << ", y=" << updated_status.pose.orientation.y << ", z=" << updated_status.pose.orientation.z << ", w=" << updated_status.pose.orientation.w << " (yaw=" << math::geometry::convertQuaternionToEulerAngle(updated_status.pose.orientation).z << ")" << std::endl;
+      std::cout << "Future Linear velocity: x=" << updated_status.action_status.twist.linear.x << ", y=" << updated_status.action_status.twist.linear.y << ", z=" << updated_status.action_status.twist.linear.z << std::endl;
+      std::cout << "Future Angular velocity: x=" << updated_status.action_status.twist.angular.x << ", y=" << updated_status.action_status.twist.angular.y << ", z=" << updated_status.action_status.twist.angular.z << std::endl;
+      std::cout << "Future Linear acceleration: x=" << updated_status.action_status.accel.linear.x << ", y=" << updated_status.action_status.accel.linear.y << ", z=" << updated_status.action_status.accel.linear.z << std::endl;
+      std::cout << "Future Angular acceleration: x=" << updated_status.action_status.accel.angular.x << ", y=" << updated_status.action_status.accel.angular.y << ", z=" << updated_status.action_status.accel.angular.z << std::endl;
     }
     return updated_status;
   };
@@ -269,7 +269,6 @@ auto makeUpdatedStatus(
 
      See https://www.researchgate.net/publication/2495826_Steering_Behaviors_For_Autonomous_Characters
   */
-  // Debug: Print entity status information
   const auto& position = entity_status.pose.position;
   const auto& linear_velocity = entity_status.action_status.twist.linear;
   const auto& angular_velocity = entity_status.action_status.twist.angular;
@@ -289,10 +288,26 @@ auto makeUpdatedStatus(
     std::cout << "Current Angular acceleration: x=" << angular_acceleration.x << ", y=" << angular_acceleration.y << ", z=" << angular_acceleration.z << std::endl;
     if (!polyline_trajectory.shape.vertices.empty()) {
       const auto& nearest_waypoint = polyline_trajectory.shape.vertices.front().position.position;
+      auto first_waypoint_with_arrival_time_specified = std::find_if(
+        polyline_trajectory.shape.vertices.begin(), polyline_trajectory.shape.vertices.end(),
+        [](auto && vertex) { return not std::isnan(vertex.time); });
+
+      const auto remaining_time_to_timed_waypoint =
+        (first_waypoint_with_arrival_time_specified != std::end(polyline_trajectory.shape.vertices))
+        ? ((not std::isnan(polyline_trajectory.base_time) ? polyline_trajectory.base_time : 0.0) +
+           first_waypoint_with_arrival_time_specified->time - entity_status.time)
+        : std::numeric_limits<double>::infinity();
+
       std::cout << "Waypoints count: " << waypoint_count << std::endl;
       std::cout << "Nearest waypoint: x=" << nearest_waypoint.x << ", y=" << nearest_waypoint.y << ", z=" << nearest_waypoint.z << std::endl;
-
       std::cout << "Euclidean distance to nearest waypoint: " << hypot(position, nearest_waypoint) << std::endl;
+      std::cout << "Remaining time: ";
+      if (std::isinf(remaining_time_to_timed_waypoint)) {
+        std::cout << "infinity (no waypoint with specified time)";
+      } else {
+        std::cout << remaining_time_to_timed_waypoint << " s";
+      }
+      std::cout << std::endl;
     } else {
       std::cout << "No waypoints available" << std::endl;
     }
@@ -323,7 +338,7 @@ auto makeUpdatedStatus(
       std::cout << "=== FIX AFTER OVERSHOOT ===" << std::endl;
     }
 
-    return update_entity_status(desired_velocity);
+    return update_entity_status(entity_status, desired_velocity, verbose_status_changes);
   } else if (const auto position = entity_status.pose.position; any(is_infinity_or_nan, position)) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
@@ -788,7 +803,7 @@ auto makeUpdatedStatus(
        steering.
     */
 
-    return update_entity_status(desired_velocity);
+    return update_entity_status(entity_status, desired_velocity, verbose_status_changes);
   }
 }
 }  // namespace follow_trajectory
