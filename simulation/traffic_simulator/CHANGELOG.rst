@@ -24,6 +24,14 @@ Changelog for package traffic_simulator
 16.4.2 (2025-05-23)
 -------------------
 
+17.6.2 (2025-10-02)
+-------------------
+* Merge pull request `#1688 <https://github.com/tier4/scenario_simulator_v2/issues/1688>`_ from tier4/fix/spin-some-deprecated
+* Merge branch 'master' into fix/spin-some-deprecated
+* Fix TrafficLightsTest error
+* Replace spin_some in traffic_simulator test
+* Contributors: Kotaro Yoshimoto, f0reachARR
+
 17.6.1 (2025-10-02)
 -------------------
 

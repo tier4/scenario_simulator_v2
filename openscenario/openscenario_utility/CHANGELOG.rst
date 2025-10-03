@@ -27,6 +27,11 @@ Changelog for package openscenario_utility
 16.4.2 (2025-05-23)
 -------------------
 
+17.6.2 (2025-10-02)
+-------------------
+* Merge branch 'master' into fix/spin-some-deprecated
+* Contributors: Kotaro Yoshimoto
+
 17.6.1 (2025-10-02)
 -------------------
 
