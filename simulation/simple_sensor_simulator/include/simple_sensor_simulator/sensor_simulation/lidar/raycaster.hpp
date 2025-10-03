@@ -76,16 +76,16 @@ private:
   std::vector<Eigen::Matrix3d> rotation_matrices_;
 
   static void intersect(
-    int thread_id, int thread_count, RTCScene scene,
-    pcl::PointCloud<pcl::PointXYZI>::Ptr thread_cloud, geometry_msgs::msg::Pose origin,
-    std::reference_wrapper<std::set<unsigned int>> ref_thread_detected_ids, double max_distance,
+    RTCScene scene, pcl::PointCloud<pcl::PointXYZI>::Ptr cloud,
+    const geometry_msgs::msg::Pose & origin,
+    std::reference_wrapper<std::set<unsigned int>> ref_detected_ids, double max_distance,
     double min_distance,
     std::reference_wrapper<const std::vector<Eigen::Matrix3d>> ref_rotation_matrices)
   {
     auto & rotation_matrices = ref_rotation_matrices.get();
-    auto & thread_detected_ids = ref_thread_detected_ids.get();
+    auto & detected_ids = ref_detected_ids.get();
     const auto orientation_matrix = math::geometry::getRotationMatrix(origin.orientation);
-    for (unsigned int i = thread_id; i < rotation_matrices.size(); i += thread_count) {
+    for (unsigned int i = 0; i < rotation_matrices.size(); ++i) {
       RTCRayHit rayhit = {};
       rayhit.ray.org_x = origin.position.x;
       rayhit.ray.org_y = origin.position.y;
@@ -111,8 +111,8 @@ private:
           p.y = rotation_matrices.at(i)(1) * distance;
           p.z = rotation_matrices.at(i)(2) * distance;
         }
-        thread_cloud->emplace_back(p);
-        thread_detected_ids.insert(rayhit.hit.geomID);
+        cloud->emplace_back(p);
+        detected_ids.insert(rayhit.hit.geomID);
       }
     }
   }
