@@ -26,11 +26,9 @@
 #include <behavior_tree_plugin/pedestrian/walk_straight_action.hpp>
 #include <geometry/bounding_box.hpp>
 #include <geometry/distance.hpp>
-#include <geometry/quaternion/get_normal_vector.hpp>
 #include <geometry/quaternion/quaternion_to_euler.hpp>
 #include <geometry/transform.hpp>
 #include <geometry/vector3/norm.hpp>
-#include <geometry/vector3/normalize.hpp>
 #include <geometry/vector3/operator.hpp>
 #include <string>
 
@@ -61,7 +59,16 @@ bool WalkStraightAction::isEntityColliding(
   const traffic_simulator::entity_status::CanonicalizedEntityStatus & entity_status,
   const double & detection_horizon) const
 {
-  using math::geometry::operator*;
+  auto translatePoint =
+    [](const geometry_msgs::msg::Point & p, const double yaw, const double distance) {
+      geometry_msgs::msg::Point result;
+
+      result.x = p.x + distance * std::cos(yaw);
+      result.y = p.y + distance * std::sin(yaw);
+      result.z = p.z;
+
+      return result;
+    };
 
   const auto & pedestrian_pose = canonicalized_entity_status_->getMapPose();
   const auto bounding_box_map_points = math::geometry::transformPoints(
@@ -73,24 +80,17 @@ bool WalkStraightAction::isEntityColliding(
       bounding_box_front_points.push_back(point);
     }
   }
-
-  const auto detection_horizon_vector =
-    math::geometry::normalize(
-      math::geometry::convertQuaternionToEulerAngle(pedestrian_pose.orientation)) *
-    detection_horizon;
+  const auto self_yaw =
+    math::geometry::convertQuaternionToEulerAngle(pedestrian_pose.orientation).z;
   std::vector<geometry_msgs::msg::Point> detection_area_points;
 
   // For the two front bounding box points, first add the original point, then a point
-  // shifted forward in the pedestrian's facing direction (orientation * detection_horizon).
+  // shifted forward in the pedestrian's facing direction (self_yaw and detection_horizon).
   // The original points define the base of the detection area, while the shifted points
   // define the far edge, together forming the detection zone in front of the pedestrian
   for (const auto & point : bounding_box_front_points) {
     detection_area_points.push_back(point);
-    geometry_msgs::msg::Point front_detection_point;
-    front_detection_point.x = point.x + detection_horizon_vector.x;
-    front_detection_point.y = point.y + detection_horizon_vector.z;
-    front_detection_point.z = point.z + detection_horizon_vector.y;
-    detection_area_points.push_back(front_detection_point);
+    detection_area_points.push_back(translatePoint(point, self_yaw, detection_horizon));
   }
 
   const auto detection_area_polygon = math::geometry::toBoostPolygon(detection_area_points);
@@ -132,7 +132,7 @@ bool WalkStraightAction::isObstacleInFront(const bool see_around) const
   } else {
     const double detection_horizon =
       calculateStopDistance(behavior_parameter_.dynamic_constraints) +
-      canonicalized_entity_status_->getBoundingBox().dimensions.x;
+      canonicalized_entity_status_->getBoundingBox().dimensions.x + front_entity_margin;
     return isObstacleInFrontOfPedestrian(detection_horizon);
   }
 }
