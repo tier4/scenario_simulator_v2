@@ -108,10 +108,10 @@ BT::NodeStatus FollowLaneAction::doAction()
     }
     std::optional<double> distance_to_front_entity;
     if (use_trajectory_based_front_entity_detection_) {
-      constexpr std::size_t kTrajectorySegments = 50;
+      constexpr std::size_t trajectory_segments = 50;
       if (
         const auto front_entity_info = getFrontEntityNameAndDistanceByTrajectory(
-          waypoints.waypoints, trajectory_based_detection_width_, kTrajectorySegments)) {
+          waypoints.waypoints, trajectory_based_detection_width_, trajectory_segments)) {
         distance_to_front_entity = front_entity_info->second;
       }
     } else {
