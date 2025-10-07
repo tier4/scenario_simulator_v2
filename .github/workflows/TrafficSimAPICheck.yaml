@@ -5,7 +5,6 @@ on:
     workflows: ["BuildAndRun"]
     types:
       - completed
-  push:
 
 jobs:
   api_check:
@@ -18,10 +17,10 @@ jobs:
       matrix:
         runs_on: [ubuntu-22.04, ubuntu-22.04-arm]
     steps:
-      - name: Install libabigail-tools
+      - name: Install abigail-tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y libabigail-tools
+          sudo apt-get install -y abigail-tools
 
       - name: Lookup previous workflow run
         id: previous_run
