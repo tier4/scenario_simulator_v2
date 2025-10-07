@@ -21,6 +21,7 @@ from itertools import product
 from pathlib import Path
 from re import sub
 from sys import exit, stderr
+from typing import List
 from pkg_resources import resource_string
 
 import math
@@ -52,7 +53,7 @@ def normalize_yaml_bools(obj):
 
 
 class MacroExpander:
-    def __init__(self, rules, schema):
+    def __init__(self, rules, schema: xmlschema.XMLSchema):
 
         self.rules = rules
 
@@ -76,7 +77,7 @@ class MacroExpander:
                     )
 
     def __call__(self, xosc: str, output: Path, basename: str):
-        paths = []
+        paths: List[Path] = []
 
         for index, bindings in enumerate(product(*self.specs)):
             target = deepcopy(xosc)
@@ -89,22 +90,21 @@ class MacroExpander:
             else:
                 paths.append(output.joinpath(basename + ".xosc"))
 
+            try:
+                self.schema.validate(target)
+            except xmlschema.XMLSchemaValidationError as exception:
+                print("File: " + str(paths[-1]), file=stderr)
+                print("", file=stderr)
+                print("Error: " + str(exception), file=stderr)
+                exit()
+
             with paths[-1].open(mode="w") as file:
                 file.write(target)
-
-                try:
-                    self.schema.validate(target)
-
-                except xmlschema.XMLSchemaValidationError as exception:
-                    print("File: " + str(paths[-1]), file=stderr)
-                    print("", file=stderr)
-                    print("Error: " + str(exception), file=stderr)
-                    exit()
 
         return paths
 
 
-def load_yaml(path):
+def load_yaml(path: Path):
     if path.exists():
         with path.open("r") as file:
             return yaml.safe_load(file)
@@ -185,33 +185,26 @@ def convert(input: Path, output: Path, verbose: bool = True):
 
     macroexpand = MacroExpander(yaml.pop("ScenarioModifiers", None), schema)
 
-    xosc, errors = schema.encode(
+    # Just convert to XML, no validation (performed later)
+    xosc = schema.encode(
         from_yaml("OpenSCENARIO", yaml),
         indent=2,
         preserve_root=True,
         unordered=True,  # Reorder elements
-        validation="lax",  # The "strict" mode is too strict than we would like.
+        validation="skip",
     )
 
-    if not schema.is_valid(xosc) and len(errors) != 0:
-        print(
-            "Error: " + str(errors[0]), file=stderr
-        )  # Other than the first is not important.
-        exit()
+    paths = macroexpand(
+        xmlschema.XMLResource(xosc).tostring(),
+        output,
+        input.stem,
+    )
 
-    else:
-        paths = macroexpand(
-            xmlschema.XMLResource(xosc)
-            .tostring(),
-            output,
-            input.stem,
-        )
+    if verbose:
+        for each in paths:
+            print(each)
 
-        if verbose:
-            for each in paths:
-                print(each)
-
-        return paths
+    return paths
 
 
 def main():
