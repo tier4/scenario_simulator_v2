@@ -5,6 +5,9 @@ on:
     workflows: ["BuildAndRun"]
     types:
       - completed
+  push:
+    branches:
+      - "*"
 
 jobs:
   api_check:
