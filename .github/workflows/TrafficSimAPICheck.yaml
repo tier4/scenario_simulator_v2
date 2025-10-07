@@ -37,7 +37,7 @@ jobs:
           cd ../RefactoringMiner
           ./gradlew build -x test
           ./gradlew install
-          echo "$PWD/install/RefactoringMiner/bin" >> $GITHUB_PATH
+          echo "$PWD/build/install/RefactoringMiner/bin" >> $GITHUB_PATH
 
       - name: Lookup previous workflow run
         id: previous_run
