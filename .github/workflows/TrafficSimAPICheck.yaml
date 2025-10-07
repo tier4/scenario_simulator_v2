@@ -46,16 +46,16 @@ jobs:
         if: steps.previous_run.outputs.result != 'null'
         uses: actions/download-artifact@v5
         with:
-          run-id: ${{ steps.previous_run.outputs.result }}
+          run-id: "18302761945"
           name: install-${{ matrix.runs_on }}-RelWithDebInfo
           path: previous
 
       - name: Download current install artifact
         uses: actions/download-artifact@v5
-        if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success'
+        # if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success'
         with:
           name: install-${{ matrix.runs_on }}-RelWithDebInfo
-          run-id: ${{ github.event.workflow_run.id }}
+          run-id: "18302761945"
           path: current
 
       - name: Call ABIDIFF
