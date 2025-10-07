@@ -62,4 +62,4 @@ jobs:
 
       - name: Call ABIDIFF
         run: |
-          abidiff --fail-no-debug-info --drop-private-types previous/install/lib/libtraffic_simulator.so current/install/lib/libtraffic_simulator.so
+          abidiff --fail-no-debug-info --drop-private-types previous/lib/libtraffic_simulator.so current/lib/libtraffic_simulator.so
