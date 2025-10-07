@@ -36,6 +36,8 @@ auto API::init() -> bool
 
 auto API::setVerbose(const bool verbose) -> void { entity_manager_ptr_->setVerbose(verbose); }
 
+void API::test() { std::cout << "test" << std::endl; }
+
 auto API::setSimulationStepTime(const double step_time) -> bool
 {
   /**

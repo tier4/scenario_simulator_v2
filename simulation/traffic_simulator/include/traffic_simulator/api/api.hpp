@@ -104,6 +104,8 @@ public:
 
   auto setVerbose(const bool verbose) -> void;
 
+  void test();
+
   auto setSimulationStepTime(const double step_time) -> bool;
 
   auto startNpcLogic() -> void;
