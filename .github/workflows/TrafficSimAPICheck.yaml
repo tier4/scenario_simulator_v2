@@ -6,8 +6,6 @@ on:
     types:
       - completed
   push:
-    branches:
-      - "*"
 
 jobs:
   api_check:
