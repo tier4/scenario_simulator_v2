@@ -49,6 +49,7 @@ jobs:
           run-id: "18302761945"
           name: install-${{ matrix.runs_on }}-RelWithDebInfo
           path: previous
+          github-token: ${{ secrets.GH_PAT }}
 
       - name: Download current install artifact
         uses: actions/download-artifact@v5
@@ -57,6 +58,7 @@ jobs:
           name: install-${{ matrix.runs_on }}-RelWithDebInfo
           run-id: "18302761945"
           path: current
+          github-token: ${{ secrets.GH_PAT }}
 
       - name: Call ABIDIFF
         run: |
