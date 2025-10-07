@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.5)
 project(traffic_simulator)
 
+add_compile_options(-Wno-error=class-memaccess)
+
 if(NOT CMAKE_C_STANDARD)
   set(CMAKE_C_STANDARD 99)
 endif()
