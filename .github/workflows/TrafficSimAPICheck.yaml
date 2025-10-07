@@ -21,12 +21,15 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y abigail-tools
-
+      - uses: actions/setup-java@v5
+        with:
+          distribution: "temurin" # See 'Supported distributions' for available options
+          java-version: "21"
       - name: Install RefactoringMinerPP
         run: |
           wget https://apt.llvm.org/llvm.sh
           sudo bash llvm.sh 18
-          sudo apt install -y libclang-18-dev openjdk-21-jdk
+          sudo apt install -y libclang-18-dev
           git clone https://github.com/f0reachARR/RefactoringMinerPP
           cd RefactoringMinerPP/tools/cap
           make
