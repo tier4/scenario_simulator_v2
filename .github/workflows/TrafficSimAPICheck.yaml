@@ -22,6 +22,19 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y abigail-tools
 
+      - name: Install RefactoringMinerPP
+        run: |
+          wget https://apt.llvm.org/llvm.sh
+          sudo bash llvm.sh 18
+          git clone https://github.com/f0reachARR/RefactoringMinerPP
+          cd RefactoringMinerPP/tools/cap
+          make
+          sudo cp cap /usr/local/bin/
+          cd ../RefactoringMiner
+          ./gradlew build -x test
+          ./gradlew install
+          echo "$PWD/install/RefactoringMiner/bin" >> $GITHUB_PATH
+
       - name: Lookup previous workflow run
         id: previous_run
         uses: actions/github-script@v6
@@ -61,9 +74,17 @@ jobs:
           github-token: ${{ secrets.GH_PAT }}
 
       - name: Call ABIDIFF
+        continue-on-error: true
         run: |
           abidiff --fail-no-debug-info --drop-private-types \
           --header-file1 previous/traffic_simulator/include/traffic_simulator/api/api.hpp \
           --header-file2 current/traffic_simulator/include/traffic_simulator/api/api.hpp \
           previous/traffic_simulator/lib/libtraffic_simulator.so \
           current/traffic_simulator/lib/libtraffic_simulator.so
+
+      - name: Call RefactoringMinerPP
+        continue-on-error: true
+        run: |
+          cap previous/traffic_simulator/include/traffic_simulator/api/api.hpp previous.json
+          cap current/traffic_simulator/include/traffic_simulator/api/api.hpp current.json
+          RefactoringMiner -cpp previous.json current.json
