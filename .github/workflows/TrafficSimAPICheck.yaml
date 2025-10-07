@@ -1,0 +1,96 @@
+name: Check API compatibility
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["BuildAndRun"]
+    types:
+      - completed
+
+jobs:
+  api_check:
+    name: TrafficSim API Check
+    runs-on: ${{ matrix.runs_on }}
+    env:
+      DEBIAN_FRONTEND: noninteractive
+    strategy:
+      fail-fast: false
+      matrix:
+        runs_on: [ubuntu-22.04, ubuntu-22.04-arm]
+    steps:
+      - name: Install abigail-tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y abigail-tools
+
+      # - uses: actions/setup-java@v5
+      #   with:
+      #     distribution: "temurin" # See 'Supported distributions' for available options
+      #     java-version: "17"
+      # - name: Install RefactoringMinerPP
+      #   run: |
+      #     wget https://apt.llvm.org/llvm.sh
+      #     sudo bash llvm.sh 18
+      #     sudo apt install -y libclang-18-dev
+      #     git clone https://github.com/f0reachARR/RefactoringMinerPP
+      #     cd RefactoringMinerPP/tools/cap
+      #     make
+      #     sudo cp cap /usr/local/bin/
+      #     cd ../RefactoringMiner
+      #     ./gradlew build -x test
+      #     ./gradlew install
+      #     echo "$PWD/build/install/RefactoringMiner/bin" >> $GITHUB_PATH
+
+      - name: Lookup previous workflow run
+        id: previous_run
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const runs = await github.rest.actions.listWorkflowRuns({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'BuildAndRun.yaml',
+              branch: 'master',
+              event: 'schedule',
+              status: 'success',
+            });
+            if (runs.data.total_count === 0) {
+              throw new Error('No previous successful scheduled workflow run found');
+            }
+            const run = runs.data.workflow_runs[0];
+            return run.id;
+          result-encoding: string
+
+      - name: Download previous install artifact
+        if: steps.previous_run.outputs.result != 'null'
+        uses: actions/download-artifact@v5
+        with:
+          run-id: "${{ steps.previous_run.outputs.result }}"
+          name: install-${{ matrix.runs_on }}-RelWithDebInfo
+          path: previous
+          github-token: ${{ secrets.GH_PAT }}
+
+      - name: Download current install artifact
+        uses: actions/download-artifact@v5
+        if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success'
+        with:
+          name: install-${{ matrix.runs_on }}-RelWithDebInfo
+          run-id: ${{ github.event.workflow_run.id }}
+          path: current
+          github-token: ${{ secrets.GH_PAT }}
+
+      - name: Call ABIDIFF
+        if: steps.previous_run.outputs.result != 'null' && (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
+        continue-on-error: true
+        run: |
+          abidiff --fail-no-debug-info --drop-private-types \
+          --header-file1 previous/traffic_simulator/include/traffic_simulator/api/api.hpp \
+          --header-file2 current/traffic_simulator/include/traffic_simulator/api/api.hpp \
+          previous/traffic_simulator/lib/libtraffic_simulator.so \
+          current/traffic_simulator/lib/libtraffic_simulator.so
+
+      # - name: Call RefactoringMinerPP
+      #   continue-on-error: true
+      #   run: |
+      #     cap previous/traffic_simulator/include/traffic_simulator/api/api.hpp previous.json
+      #     cap current/traffic_simulator/include/traffic_simulator/api/api.hpp current.json
+      #     RefactoringMiner -cpp previous.json current.json
