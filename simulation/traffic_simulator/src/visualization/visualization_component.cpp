@@ -385,10 +385,19 @@ const visualization_msgs::msg::MarkerArray VisualizationComponent::generateMarke
   text_action.scale.z = 0.4;
   text_action.lifetime = rclcpp::Duration::from_seconds(0.1);
   text_action.text = status.action_status.current_action;
-  if (status.lanelet_pose_valid) {
-    text_action.text = text_action.text + "\nid:" + std::to_string(status.lanelet_pose.lanelet_id) +
-                       "\ns:" + std::to_string(status.lanelet_pose.s) +
-                       "\noffset:" + std::to_string(status.lanelet_pose.offset);
+  // WIP
+  // if (status.lanelet_pose_valid) {
+  //   text_action.text = text_action.text + "\nid:" + std::to_string(status.lanelet_pose.lanelet_id) +
+  //                      "\ns:" + std::to_string(status.lanelet_pose.s) +
+  //                      "\noffset:" + std::to_string(status.lanelet_pose.offset);
+  // }
+  for (const auto & lanelet_pose : status.lanelet_poses) {
+    if (lanelet_pose.lanelet_pose_valid) {
+      text_action.text += "\nid:" + std::to_string(lanelet_pose.lanelet_id) +
+                          "\ns:" + std::to_string(lanelet_pose.s) +
+                          "\noffset:" + std::to_string(lanelet_pose.offset);
+      break;  // only show first lanelet pose
+    }
   }
   const auto & velocity = status.action_status.twist.linear;
   double speed =
