@@ -27,6 +27,9 @@ Changelog for package embree_vendor
 16.4.2 (2025-05-23)
 -------------------
 
+17.7.1 (2025-10-07)
+-------------------
+
 17.7.0 (2025-10-07)
 -------------------
 * Merge branch 'master' into feature/whole_new_front_entity_detection_logic
