@@ -71,73 +71,77 @@ def default_rviz_config_file():
 
 def launch_setup(context, *args, **kwargs):
     # fmt: off
-    architecture_type                   = LaunchConfiguration("architecture_type",                      default="awf/universe/20240605")
-    autoware_launch_file                = LaunchConfiguration("autoware_launch_file",                   default=default_autoware_launch_file_of(architecture_type.perform(context)))
-    autoware_launch_package             = LaunchConfiguration("autoware_launch_package",                default=default_autoware_launch_package_of(architecture_type.perform(context)))
-    consider_acceleration_by_road_slope = LaunchConfiguration("consider_acceleration_by_road_slope",    default=False)
-    consider_pose_by_road_slope         = LaunchConfiguration("consider_pose_by_road_slope",            default=True)
-    enable_perf                         = LaunchConfiguration("enable_perf",                            default=False)
-    global_frame_rate                   = LaunchConfiguration("global_frame_rate",                      default=30.0)
-    global_real_time_factor             = LaunchConfiguration("global_real_time_factor",                default=1.0)
-    global_timeout                      = LaunchConfiguration("global_timeout",                         default=180)
-    initialize_duration                 = LaunchConfiguration("initialize_duration",                    default=30)
-    launch_autoware                     = LaunchConfiguration("launch_autoware",                        default=True)
-    launch_rviz                         = LaunchConfiguration("launch_rviz",                            default=False)
-    launch_simple_sensor_simulator      = LaunchConfiguration("launch_simple_sensor_simulator",         default=True)
-    output_directory                    = LaunchConfiguration("output_directory",                       default=Path("/tmp"))
-    override_parameters                 = LaunchConfiguration("override_parameters",                    default="")
-    parameter_file_path                 = LaunchConfiguration("parameter_file_path",                    default=Path(get_package_share_directory("scenario_test_runner")) / "config/parameters.yaml")
-    pedestrian_ignore_see_around        = LaunchConfiguration("pedestrian_ignore_see_around",           default="blind")
-    port                                = LaunchConfiguration("port",                                   default=5555)
-    publish_empty_context               = LaunchConfiguration("publish_empty_context",                  default=False)
-    record                              = LaunchConfiguration("record",                                 default=True)
-    record_option                       = LaunchConfiguration("record_option",                          default="")
-    record_storage_id                   = LaunchConfiguration("record_storage_id",                      default="")
-    rviz_config                         = LaunchConfiguration("rviz_config",                            default=default_rviz_config_file())
-    scenario                            = LaunchConfiguration("scenario",                               default=Path("/dev/null"))
-    sensor_model                        = LaunchConfiguration("sensor_model",                           default="")
-    sigterm_timeout                     = LaunchConfiguration("sigterm_timeout",                        default=8)
-    simulate_localization               = LaunchConfiguration("simulate_localization",                  default=True)
-    speed_condition                     = LaunchConfiguration("speed_condition",                        default="legacy")
-    use_custom_centerline               = LaunchConfiguration("use_custom_centerline",                  default=True)
-    use_sim_time                        = LaunchConfiguration("use_sim_time",                           default=False)
-    vehicle_model                       = LaunchConfiguration("vehicle_model",                          default="")
-    vehicle_id                          = LaunchConfiguration("vehicle_id",                             default="default")
-    initialize_localization             = LaunchConfiguration("initialize_localization",                default=10)
+    architecture_type                           = LaunchConfiguration("architecture_type",                           default="awf/universe/20240605")
+    autoware_launch_file                        = LaunchConfiguration("autoware_launch_file",                        default=default_autoware_launch_file_of(architecture_type.perform(context)))
+    autoware_launch_package                     = LaunchConfiguration("autoware_launch_package",                     default=default_autoware_launch_package_of(architecture_type.perform(context)))
+    consider_acceleration_by_road_slope         = LaunchConfiguration("consider_acceleration_by_road_slope",         default=False)
+    consider_pose_by_road_slope                 = LaunchConfiguration("consider_pose_by_road_slope",                 default=True)
+    enable_perf                                 = LaunchConfiguration("enable_perf",                                 default=False)
+    global_frame_rate                           = LaunchConfiguration("global_frame_rate",                           default=30.0)
+    global_real_time_factor                     = LaunchConfiguration("global_real_time_factor",                     default=1.0)
+    global_timeout                              = LaunchConfiguration("global_timeout",                              default=180)
+    initialize_duration                         = LaunchConfiguration("initialize_duration",                         default=30)
+    initialize_localization                     = LaunchConfiguration("initialize_localization",                     default=10)
+    launch_autoware                             = LaunchConfiguration("launch_autoware",                             default=True)
+    launch_rviz                                 = LaunchConfiguration("launch_rviz",                                 default=False)
+    launch_simple_sensor_simulator              = LaunchConfiguration("launch_simple_sensor_simulator",              default=True)
+    output_directory                            = LaunchConfiguration("output_directory",                            default=Path("/tmp"))
+    override_parameters                         = LaunchConfiguration("override_parameters",                         default="")
+    parameter_file_path                         = LaunchConfiguration("parameter_file_path",                         default=Path(get_package_share_directory("scenario_test_runner")) / "config/parameters.yaml")
+    pedestrian_ignore_see_around                = LaunchConfiguration("pedestrian_ignore_see_around",                default="blind")
+    port                                        = LaunchConfiguration("port",                                        default=5555)
+    publish_empty_context                       = LaunchConfiguration("publish_empty_context",                       default=False)
+    record                                      = LaunchConfiguration("record",                                      default=True)
+    record_option                               = LaunchConfiguration("record_option",                               default="")
+    record_storage_id                           = LaunchConfiguration("record_storage_id",                           default="")
+    rviz_config                                 = LaunchConfiguration("rviz_config",                                 default=default_rviz_config_file())
+    scenario                                    = LaunchConfiguration("scenario",                                    default=Path("/dev/null"))
+    sensor_model                                = LaunchConfiguration("sensor_model",                                default="")
+    sigterm_timeout                             = LaunchConfiguration("sigterm_timeout",                             default=8)
+    simulate_localization                       = LaunchConfiguration("simulate_localization",                       default=True)
+    speed_condition                             = LaunchConfiguration("speed_condition",                             default="legacy")
+    trajectory_based_detection_width            = LaunchConfiguration("trajectory_based_detection_width",            default=-1.0)
+    use_custom_centerline                       = LaunchConfiguration("use_custom_centerline",                       default=True)
+    use_sim_time                                = LaunchConfiguration("use_sim_time",                                default=False)
+    use_trajectory_based_front_entity_detection = LaunchConfiguration("use_trajectory_based_front_entity_detection", default=False)
+    vehicle_model                               = LaunchConfiguration("vehicle_model",                               default="")
+    vehicle_id                                  = LaunchConfiguration("vehicle_id",                                  default="default")
     # fmt: on
 
-    print(f"architecture_type                   := {architecture_type.perform(context)}")
-    print(f"autoware_launch_file                := {autoware_launch_file.perform(context)}")
-    print(f"autoware_launch_package             := {autoware_launch_package.perform(context)}")
-    print(f"consider_acceleration_by_road_slope := {consider_acceleration_by_road_slope.perform(context)}")
-    print(f"consider_pose_by_road_slope         := {consider_pose_by_road_slope.perform(context)}")
-    print(f"enable_perf                         := {enable_perf.perform(context)}")
-    print(f"global_frame_rate                   := {global_frame_rate.perform(context)}")
-    print(f"global_real_time_factor             := {global_real_time_factor.perform(context)}")
-    print(f"global_timeout                      := {global_timeout.perform(context)}")
-    print(f"initialize_duration                 := {initialize_duration.perform(context)}")
-    print(f"launch_autoware                     := {launch_autoware.perform(context)}")
-    print(f"launch_rviz                         := {launch_rviz.perform(context)}")
-    print(f"output_directory                    := {output_directory.perform(context)}")
-    print(f"override_parameters                 := {override_parameters.perform(context)}")
-    print(f"parameter_file_path                 := {parameter_file_path.perform(context)}")
-    print(f"pedestrian_ignore_see_around        := {pedestrian_ignore_see_around.perform(context)}")
-    print(f"port                                := {port.perform(context)}")
-    print(f"publish_empty_context               := {publish_empty_context.perform(context)}")
-    print(f"record                              := {record.perform(context)}")
-    print(f"record_option                       := {record_option.perform(context)}")
-    print(f"record_storage_id                   := {record_storage_id.perform(context)}")
-    print(f"rviz_config                         := {rviz_config.perform(context)}")
-    print(f"scenario                            := {scenario.perform(context)}")
-    print(f"sensor_model                        := {sensor_model.perform(context)}")
-    print(f"sigterm_timeout                     := {sigterm_timeout.perform(context)}")
-    print(f"simulate_localization               := {simulate_localization.perform(context)}")
-    print(f"speed_condition                     := {speed_condition.perform(context)}")
-    print(f"use_custom_centerline               := {use_custom_centerline.perform(context)}")
-    print(f"use_sim_time                        := {use_sim_time.perform(context)}")
-    print(f"vehicle_model                       := {vehicle_model.perform(context)}")
-    print(f"vehicle_id                          := {vehicle_id.perform(context)}")
-    print(f"initialize_localization             := {initialize_localization.perform(context)}")
+    print(f"architecture_type                           := {architecture_type.perform(context)}")
+    print(f"autoware_launch_file                        := {autoware_launch_file.perform(context)}")
+    print(f"autoware_launch_package                     := {autoware_launch_package.perform(context)}")
+    print(f"consider_acceleration_by_road_slope         := {consider_acceleration_by_road_slope.perform(context)}")
+    print(f"consider_pose_by_road_slope                 := {consider_pose_by_road_slope.perform(context)}")
+    print(f"enable_perf                                 := {enable_perf.perform(context)}")
+    print(f"global_frame_rate                           := {global_frame_rate.perform(context)}")
+    print(f"global_real_time_factor                     := {global_real_time_factor.perform(context)}")
+    print(f"global_timeout                              := {global_timeout.perform(context)}")
+    print(f"initialize_duration                         := {initialize_duration.perform(context)}")
+    print(f"initialize_localization                     := {initialize_localization.perform(context)}")
+    print(f"launch_autoware                             := {launch_autoware.perform(context)}")
+    print(f"launch_rviz                                 := {launch_rviz.perform(context)}")
+    print(f"output_directory                            := {output_directory.perform(context)}")
+    print(f"override_parameters                         := {override_parameters.perform(context)}")
+    print(f"parameter_file_path                         := {parameter_file_path.perform(context)}")
+    print(f"pedestrian_ignore_see_around                := {pedestrian_ignore_see_around.perform(context)}")
+    print(f"port                                        := {port.perform(context)}")
+    print(f"publish_empty_context                       := {publish_empty_context.perform(context)}")
+    print(f"record                                      := {record.perform(context)}")
+    print(f"record_option                               := {record_option.perform(context)}")
+    print(f"record_storage_id                           := {record_storage_id.perform(context)}")
+    print(f"rviz_config                                 := {rviz_config.perform(context)}")
+    print(f"scenario                                    := {scenario.perform(context)}")
+    print(f"sensor_model                                := {sensor_model.perform(context)}")
+    print(f"sigterm_timeout                             := {sigterm_timeout.perform(context)}")
+    print(f"simulate_localization                       := {simulate_localization.perform(context)}")
+    print(f"speed_condition                             := {speed_condition.perform(context)}")
+    print(f"trajectory_based_detection_width            := {trajectory_based_detection_width.perform(context)}")
+    print(f"use_custom_centerline                       := {use_custom_centerline.perform(context)}")
+    print(f"use_sim_time                                := {use_sim_time.perform(context)}")
+    print(f"use_trajectory_based_front_entity_detection := {use_trajectory_based_front_entity_detection.perform(context)}")
+    print(f"vehicle_model                               := {vehicle_model.perform(context)}")
+    print(f"vehicle_id                                  := {vehicle_id.perform(context)}")
 
     def make_launch_prefix():
         if enable_perf.perform(context) == "True":
@@ -153,6 +157,7 @@ def launch_setup(context, *args, **kwargs):
             {"consider_acceleration_by_road_slope": consider_acceleration_by_road_slope},
             {"consider_pose_by_road_slope": consider_pose_by_road_slope},
             {"initialize_duration": initialize_duration},
+            {"initialize_localization": initialize_localization},
             {"launch_autoware": launch_autoware},
             {"pedestrian_ignore_see_around": pedestrian_ignore_see_around},
             {"port": port},
@@ -165,11 +170,12 @@ def launch_setup(context, *args, **kwargs):
             {"sigterm_timeout": sigterm_timeout},
             {"simulate_localization": simulate_localization},
             {"speed_condition": speed_condition},
+            {"trajectory_based_detection_width": trajectory_based_detection_width},
             {"use_custom_centerline": use_custom_centerline},
             {"use_sim_time": use_sim_time},
+            {"use_trajectory_based_front_entity_detection": use_trajectory_based_front_entity_detection},
             {"vehicle_model": vehicle_model},
             {"vehicle_id": vehicle_id},
-            {"initialize_localization": initialize_localization},
         ]
 
         def collect_vehicle_parameters():
@@ -213,32 +219,34 @@ def launch_setup(context, *args, **kwargs):
 
     return [
         # fmt: off
-        DeclareLaunchArgument("architecture_type",                   default_value=architecture_type                  ),
-        DeclareLaunchArgument("autoware_launch_file",                default_value=autoware_launch_file               ),
-        DeclareLaunchArgument("autoware_launch_package",             default_value=autoware_launch_package            ),
-        DeclareLaunchArgument("consider_acceleration_by_road_slope", default_value=consider_acceleration_by_road_slope),
-        DeclareLaunchArgument("consider_pose_by_road_slope",         default_value=consider_pose_by_road_slope        ),
-        DeclareLaunchArgument("enable_perf",                         default_value=enable_perf                        ),
-        DeclareLaunchArgument("global_frame_rate",                   default_value=global_frame_rate                  ),
-        DeclareLaunchArgument("global_real_time_factor",             default_value=global_real_time_factor            ),
-        DeclareLaunchArgument("global_timeout",                      default_value=global_timeout                     ),
-        DeclareLaunchArgument("launch_autoware",                     default_value=launch_autoware                    ),
-        DeclareLaunchArgument("launch_rviz",                         default_value=launch_rviz                        ),
-        DeclareLaunchArgument("output_directory",                    default_value=output_directory                   ),
-        DeclareLaunchArgument("parameter_file_path",                 default_value=parameter_file_path                ),
-        DeclareLaunchArgument("pedestrian_ignore_see_around",        default_value=pedestrian_ignore_see_around       ),
-        DeclareLaunchArgument("publish_empty_context",               default_value=publish_empty_context              ),
-        DeclareLaunchArgument("record_option",                       default_value=record_option                      ),
-        DeclareLaunchArgument("rviz_config",                         default_value=rviz_config                        ),
-        DeclareLaunchArgument("scenario",                            default_value=scenario                           ),
-        DeclareLaunchArgument("sensor_model",                        default_value=sensor_model                       ),
-        DeclareLaunchArgument("sigterm_timeout",                     default_value=sigterm_timeout                    ),
-        DeclareLaunchArgument("simulate_localization",               default_value=simulate_localization              ),
-        DeclareLaunchArgument("speed_condition",                     default_value=speed_condition                    ),
-        DeclareLaunchArgument("use_custom_centerline",               default_value=use_custom_centerline              ),
-        DeclareLaunchArgument("use_sim_time",                        default_value=use_sim_time                       ),
-        DeclareLaunchArgument("vehicle_model",                       default_value=vehicle_model                      ),
-        DeclareLaunchArgument("initialize_localization",             default_value=initialize_localization            ),
+        DeclareLaunchArgument("architecture_type",                           default_value=architecture_type                          ),
+        DeclareLaunchArgument("autoware_launch_file",                        default_value=autoware_launch_file                       ),
+        DeclareLaunchArgument("autoware_launch_package",                     default_value=autoware_launch_package                    ),
+        DeclareLaunchArgument("consider_acceleration_by_road_slope",         default_value=consider_acceleration_by_road_slope        ),
+        DeclareLaunchArgument("consider_pose_by_road_slope",                 default_value=consider_pose_by_road_slope                ),
+        DeclareLaunchArgument("enable_perf",                                 default_value=enable_perf                                ),
+        DeclareLaunchArgument("global_frame_rate",                           default_value=global_frame_rate                          ),
+        DeclareLaunchArgument("global_real_time_factor",                     default_value=global_real_time_factor                    ),
+        DeclareLaunchArgument("global_timeout",                              default_value=global_timeout                             ),        
+        DeclareLaunchArgument("initialize_localization",                     default_value=initialize_localization                    ),
+        DeclareLaunchArgument("launch_autoware",                             default_value=launch_autoware                            ),
+        DeclareLaunchArgument("launch_rviz",                                 default_value=launch_rviz                                ),
+        DeclareLaunchArgument("output_directory",                            default_value=output_directory                           ),
+        DeclareLaunchArgument("parameter_file_path",                         default_value=parameter_file_path                        ),
+        DeclareLaunchArgument("pedestrian_ignore_see_around",                default_value=pedestrian_ignore_see_around               ),
+        DeclareLaunchArgument("publish_empty_context",                       default_value=publish_empty_context                      ),
+        DeclareLaunchArgument("record_option",                               default_value=record_option                              ),
+        DeclareLaunchArgument("rviz_config",                                 default_value=rviz_config                                ),
+        DeclareLaunchArgument("scenario",                                    default_value=scenario                                   ),
+        DeclareLaunchArgument("sensor_model",                                default_value=sensor_model                               ),
+        DeclareLaunchArgument("sigterm_timeout",                             default_value=sigterm_timeout                            ),
+        DeclareLaunchArgument("simulate_localization",                       default_value=simulate_localization                      ),
+        DeclareLaunchArgument("speed_condition",                             default_value=speed_condition                            ),
+        DeclareLaunchArgument("trajectory_based_detection_width",            default_value=trajectory_based_detection_width           ),
+        DeclareLaunchArgument("use_custom_centerline",                       default_value=use_custom_centerline                      ),
+        DeclareLaunchArgument("use_sim_time",                                default_value=use_sim_time                               ),
+        DeclareLaunchArgument("use_trajectory_based_front_entity_detection", default_value=use_trajectory_based_front_entity_detection),
+        DeclareLaunchArgument("vehicle_model",                               default_value=vehicle_model                              ),
         # fmt: on
         Node(
             package="scenario_test_runner",
