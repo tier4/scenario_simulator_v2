@@ -24,6 +24,13 @@ Changelog for package openscenario_visualization
 16.4.2 (2025-05-23)
 -------------------
 
+17.6.3 (2025-10-06)
+-------------------
+* Merge branch 'master' into RJD-1921/fta-acceleration-fix
+* Merge branch 'master' into RJD-1921/fta-acceleration-fix
+* Merge branch 'master' into RJD-1921/fta-acceleration-fix
+* Contributors: Dawid Moszyński
+
 17.6.2 (2025-10-02)
 -------------------
 * Merge pull request `#1688 <https://github.com/tier4/scenario_simulator_v2/issues/1688>`_ from tier4/fix/spin-some-deprecated

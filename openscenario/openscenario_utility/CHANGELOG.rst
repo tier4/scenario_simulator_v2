@@ -27,6 +27,13 @@ Changelog for package openscenario_utility
 16.4.2 (2025-05-23)
 -------------------
 
+17.6.3 (2025-10-06)
+-------------------
+* Merge branch 'master' into RJD-1921/fta-acceleration-fix
+* Merge branch 'master' into RJD-1921/fta-acceleration-fix
+* Merge branch 'master' into RJD-1921/fta-acceleration-fix
+* Contributors: Dawid Moszyński
+
 17.6.2 (2025-10-02)
 -------------------
 * Merge branch 'master' into fix/spin-some-deprecated
