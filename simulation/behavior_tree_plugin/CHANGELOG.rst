@@ -24,6 +24,22 @@ Changelog for package behavior_tree_plugin
 16.4.2 (2025-05-23)
 -------------------
 
+17.7.0 (2025-10-07)
+-------------------
+* Merge pull request `#1691 <https://github.com/tier4/scenario_simulator_v2/issues/1691>`_ from tier4/feature/whole_new_front_entity_detection_logic
+  Whole new front entity detection logic
+* Merge branch 'master' into feature/whole_new_front_entity_detection_logic
+* Rename constant kTrajectorySegments to trajectory_segments for consistency
+* Merge branch 'master' into feature/whole_new_front_entity_detection_logic
+* Merge branch 'master' into feature/whole_new_front_entity_detection_logic
+* Add trajectory-based detection width parameter to FollowFrontEntityAction and FollowLaneAction
+* Add trajectory-based front entity detection configuration to FollowFrontEntityAction and FollowLaneAction
+* Fix format
+* Enhance front entity detection in FollowFrontEntityAction and FollowLaneAction using trajectory-based approach
+* Refactor getFrontEntityNameAndDistanceByTrajectory to accept waypoints as input and handle insufficient waypoints case
+* Add getFrontEntityNameAndDistanceByTrajectory method to ActionNode
+* Contributors: Kotaro Yoshimoto, Taiga, Taiga Takano
+
 17.6.3 (2025-10-06)
 -------------------
 * Merge branch 'master' into RJD-1921/fta-acceleration-fix
