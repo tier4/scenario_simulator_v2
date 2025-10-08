@@ -109,36 +109,47 @@ auto FollowWaypointController::getTimeRequiredForNonAcceleration(const double ac
   return std::ceil(std::abs(acceleration) / (acceleration_rate * step_time)) * step_time;
 }
 
-auto FollowWaypointController::accelerationWithJerkConstraint(const double current_speed, const double target_speed, const double acceleration_rate) const -> double
+auto FollowWaypointController::accelerationWithJerkConstraint(
+  const double current_speed, const double target_speed, const double acceleration_rate) const
+  -> double
 {
-    /// @note use absolute value of acceleration_rate to ensure it is always positive
-    const auto jerk_magnitude = std::abs(acceleration_rate);
+  /// @note use absolute value of acceleration_rate to ensure it is always positive
+  const auto jerk_magnitude = std::abs(acceleration_rate);
 
-    /// @note minimal number of discrete steps required to reach target_speed based on the maximum jerk and the time step
-    const auto minimum_discrete_steps = std::max(1.0, std::round(std::sqrt(2 * std::abs(target_speed - current_speed) / jerk_magnitude) / step_time));
+  /// @note minimal number of discrete steps required to reach target_speed based on the maximum jerk and the time step
+  const auto minimum_discrete_steps = std::max(
+    1.0,
+    std::round(std::sqrt(2 * std::abs(target_speed - current_speed) / jerk_magnitude) / step_time));
 
-    /// @note acceleration (without jerk correction) required to reach target_speed assuming constant acceleration over the discrete steps
-    const auto base_acceleration = (target_speed - current_speed) / (minimum_discrete_steps * step_time);
+  /// @note acceleration (without jerk correction) required to reach target_speed assuming constant acceleration over the discrete steps
+  const auto base_acceleration =
+    (target_speed - current_speed) / (minimum_discrete_steps * step_time);
 
-    /// @note sign of the jerk correction based on whether we are accelerating or decelerating
-    const auto sign = (target_speed >= current_speed) ? 1.0 : -1.0;
+  /// @note sign of the jerk correction based on whether we are accelerating or decelerating
+  const auto sign = (target_speed >= current_speed) ? 1.0 : -1.0;
 
-    /// @note correction term due to linear change of acceleration (jerk),
-    /// this ensures that after all discrete steps, the final speed matches target_speed
-    const auto jerk_correction = sign * jerk_magnitude * step_time * (minimum_discrete_steps - 1.0) / 2.0;
+  /// @note correction term due to linear change of acceleration (jerk),
+  /// this ensures that after all discrete steps, the final speed matches target_speed
+  const auto jerk_correction =
+    sign * jerk_magnitude * step_time * (minimum_discrete_steps - 1.0) / 2.0;
 
-    return base_acceleration + jerk_correction;
+  return base_acceleration + jerk_correction;
 }
 
 auto FollowWaypointController::getAccelerationLimits(
   const double acceleration, const double speed) const -> std::pair<double, double>
 {
-  const auto min_acceleration_zero_speed = accelerationWithJerkConstraint(speed, 0.0, max_deceleration_rate);
-  const auto max_acceleration_target_speed = accelerationWithJerkConstraint(speed, target_speed, max_acceleration_rate);
+  const auto min_acceleration_zero_speed =
+    accelerationWithJerkConstraint(speed, 0.0, max_deceleration_rate);
+  const auto max_acceleration_target_speed =
+    accelerationWithJerkConstraint(speed, target_speed, max_acceleration_rate);
 
-  const auto local_min_acceleration = std::max(std::max(min_acceleration_zero_speed, -max_deceleration), acceleration - max_deceleration_rate * step_time);
-  const auto local_max_acceleration = std::min(std::min(max_acceleration_target_speed, max_acceleration), acceleration + max_acceleration_rate * step_time);
-
+  const auto local_min_acceleration = std::max(
+    std::max(min_acceleration_zero_speed, -max_deceleration),
+    acceleration - max_deceleration_rate * step_time);
+  const auto local_max_acceleration = std::min(
+    std::min(max_acceleration_target_speed, max_acceleration),
+    acceleration + max_acceleration_rate * step_time);
 
   /*
       It can occur when local_min_acceleration is equal to local_max_acceleration, leaving no choice.
@@ -159,7 +170,7 @@ auto FollowWaypointController::getAccelerationLimits(
       ") < local_min_acceleration (", local_min_acceleration, ") for acceleration: ", acceleration,
       " and speed: ", speed, ". Target speed: ", target_speed, ". ", *this);
   }
-  
+
   const double min_speed = speed + local_min_acceleration * step_time;
   const double max_speed = speed + local_max_acceleration * step_time;
   if (
@@ -169,7 +180,7 @@ auto FollowWaypointController::getAccelerationLimits(
       "Incorrect acceleration limits [", local_min_acceleration, ", ", local_max_acceleration,
       "] for acceleration: ", acceleration, " and speed: ", speed, " -> min_speed: ", min_speed,
       " max_speed: ", max_speed, ". ", *this);
-  } 
+  }
 
   return {local_min_acceleration, local_max_acceleration};
 }
@@ -184,20 +195,33 @@ auto FollowWaypointController::moveStraight(
 auto FollowWaypointController::getPredictedStopEntityStatusWithoutConsideringTime(
   const double step_acceleration, const double remaining_distance,
   const traffic_simulator_msgs::msg::EntityStatus & entity_status,
-  const std::function<traffic_simulator_msgs::msg::EntityStatus(const traffic_simulator_msgs::msg::EntityStatus &, const geometry_msgs::msg::Vector3 &, bool)> & update_entity_status,
-  const std::function<double(const geometry_msgs::msg::Point &, const geometry_msgs::msg::Point &)> & distance_along_lanelet) const -> std::optional<PredictedEntityStatus>
+  const std::function<traffic_simulator_msgs::msg::EntityStatus(
+    const traffic_simulator_msgs::msg::EntityStatus &, const geometry_msgs::msg::Vector3 &, bool)> &
+    update_entity_status,
+  const std::function<double(
+    const geometry_msgs::msg::Point &, const geometry_msgs::msg::Point &)> & distance_along_lanelet)
+  const -> std::optional<PredictedEntityStatus>
 {
   PredictedEntityStatus predicted_status(entity_status);
-  predicted_status.moveStraight(step_acceleration, step_time, update_entity_status, distance_along_lanelet);
+  predicted_status.moveStraight(
+    step_acceleration, step_time, update_entity_status, distance_along_lanelet);
   while (!predicted_status.isImmobile(local_epsilon)) {
     if (predicted_status.traveled_distance > remaining_distance + predicted_distance_tolerance) {
       return std::nullopt;
-    } else if(predicted_status.getSpeed() + (predicted_status.getAcceleration() + max_acceleration_rate * step_time) * step_time < 0.0) {
-      const auto min_acceleration_zero_speed = std::max(accelerationWithJerkConstraint(predicted_status.getSpeed(), 0.0, max_deceleration_rate), -max_deceleration);
-      predicted_status.moveStraight(min_acceleration_zero_speed, step_time, update_entity_status, distance_along_lanelet);
+    } else if (
+      predicted_status.getSpeed() +
+        (predicted_status.getAcceleration() + max_acceleration_rate * step_time) * step_time <
+      0.0) {
+      const auto min_acceleration_zero_speed = std::max(
+        accelerationWithJerkConstraint(predicted_status.getSpeed(), 0.0, max_deceleration_rate),
+        -max_deceleration);
+      predicted_status.moveStraight(
+        min_acceleration_zero_speed, step_time, update_entity_status, distance_along_lanelet);
     } else {
-      auto [local_min_acceleration, local_max_acceleration] = getAccelerationLimits(predicted_status.getAcceleration(), predicted_status.getSpeed());
-      predicted_status.moveStraight(local_min_acceleration, step_time, update_entity_status, distance_along_lanelet);
+      auto [local_min_acceleration, local_max_acceleration] =
+        getAccelerationLimits(predicted_status.getAcceleration(), predicted_status.getSpeed());
+      predicted_status.moveStraight(
+        local_min_acceleration, step_time, update_entity_status, distance_along_lanelet);
     }
   }
   return predicted_status;
@@ -293,10 +317,13 @@ auto FollowWaypointController::getPredictedWaypointArrivalState(
 }
 
 auto FollowWaypointController::getAcceleration(
-  const double remaining_distance,
-  const traffic_simulator_msgs::msg::EntityStatus & entity_status,
-  const std::function<traffic_simulator_msgs::msg::EntityStatus(const traffic_simulator_msgs::msg::EntityStatus &, const geometry_msgs::msg::Vector3 &, bool)> & update_entity_status,
-  const std::function<double(const geometry_msgs::msg::Point &, const geometry_msgs::msg::Point &)> & distance_along_lanelet) const -> double
+  const double remaining_distance, const traffic_simulator_msgs::msg::EntityStatus & entity_status,
+  const std::function<traffic_simulator_msgs::msg::EntityStatus(
+    const traffic_simulator_msgs::msg::EntityStatus &, const geometry_msgs::msg::Vector3 &, bool)> &
+    update_entity_status,
+  const std::function<double(
+    const geometry_msgs::msg::Point &, const geometry_msgs::msg::Point &)> & distance_along_lanelet)
+  const -> double
 {
   const auto acceleration = entity_status.action_status.accel.linear.x;
   const auto speed = entity_status.action_status.twist.linear.x;
@@ -310,7 +337,8 @@ auto FollowWaypointController::getAcceleration(
 
   std::optional<double> best_acceleration = std::nullopt;
 
-  struct CandidateInfo {
+  struct CandidateInfo
+  {
     std::size_t index;
     double acceleration;
     double distance_diff;
@@ -321,7 +349,8 @@ auto FollowWaypointController::getAcceleration(
   for (std::size_t i = 0; i <= number_of_acceleration_candidates; ++i) {
     const double candidate_acceleration = local_min_acceleration + i * step_acceleration;
     if (const auto predicted_state_opt = getPredictedStopEntityStatusWithoutConsideringTime(
-          candidate_acceleration, remaining_distance, entity_status, update_entity_status, distance_along_lanelet);
+          candidate_acceleration, remaining_distance, entity_status, update_entity_status,
+          distance_along_lanelet);
         predicted_state_opt) {
       const auto distance_diff = remaining_distance - predicted_state_opt->traveled_distance;
       candidates.push_back({i, candidate_acceleration, distance_diff});
@@ -354,18 +383,27 @@ auto FollowWaypointController::getAcceleration(
     }
   }
 
-  if(verbose_each_acceleration_candidate || verbose_only_best_acceleration_candidate) {
-    std::cout << (verbose_each_acceleration_candidate ? " ---- ACCELERATION CANDIDATES ----- " : " ---- BEST ACCELERATION CANDIDATE ----- ") << std::endl;
-    std::cout << " INPUT: acc: " << acceleration <<" speed: "<<speed<< " target speed: "<< target_speed << " remaining distance: "<<remaining_distance<< ", min acc: " << local_min_acceleration << ", max acc: " << local_max_acceleration << std::endl;
-    for (const auto& candidate : candidates) {
+  if (verbose_each_acceleration_candidate || verbose_only_best_acceleration_candidate) {
+    std::cout << (verbose_each_acceleration_candidate ? " ---- ACCELERATION CANDIDATES ----- "
+                                                      : " ---- BEST ACCELERATION CANDIDATE ----- ")
+              << std::endl;
+    std::cout << " INPUT: acc: " << acceleration << " speed: " << speed
+              << " target speed: " << target_speed << " remaining distance: " << remaining_distance
+              << ", min acc: " << local_min_acceleration << ", max acc: " << local_max_acceleration
+              << std::endl;
+    for (const auto & candidate : candidates) {
       if (verbose_only_best_acceleration_candidate && candidate.index != best_candidate_index) {
         continue;
       }
       std::cout << std::fixed << std::setprecision(32);
       if (std::isnan(candidate.distance_diff)) {
-        std::cout << "\033[31m" << "IDX: "<<candidate.index << " ACC: " << candidate.acceleration << " FINAL DISTANCE ERROR: " << -candidate.distance_diff << "     \033[0m" << std::endl;
+        std::cout << "\033[31m"
+                  << "IDX: " << candidate.index << " ACC: " << candidate.acceleration
+                  << " FINAL DISTANCE ERROR: " << -candidate.distance_diff << "     \033[0m"
+                  << std::endl;
       } else {
-        std::cout <<" IDX: "<<candidate.index << " ACC: " << candidate.acceleration << " FINAL DISTANCE ERROR: " << -candidate.distance_diff;
+        std::cout << " IDX: " << candidate.index << " ACC: " << candidate.acceleration
+                  << " FINAL DISTANCE ERROR: " << -candidate.distance_diff;
         if (candidate.index == best_candidate_index) {
           if (std::abs(candidate.acceleration - local_min_acceleration) < local_epsilon) {
             std::cout << " \033[33mBEST MIN\033[0m";
@@ -396,8 +434,12 @@ auto FollowWaypointController::getAcceleration(
 auto FollowWaypointController::getAcceleration(
   const double remaining_time_source, const double remaining_distance,
   const traffic_simulator_msgs::msg::EntityStatus & entity_status,
-  const std::function<traffic_simulator_msgs::msg::EntityStatus(const traffic_simulator_msgs::msg::EntityStatus &, const geometry_msgs::msg::Vector3 &, bool)> & update_entity_status,
-  const std::function<double(const geometry_msgs::msg::Point &, const geometry_msgs::msg::Point &)> & distance_along_lanelet) const -> double
+  const std::function<traffic_simulator_msgs::msg::EntityStatus(
+    const traffic_simulator_msgs::msg::EntityStatus &, const geometry_msgs::msg::Vector3 &, bool)> &
+    update_entity_status,
+  const std::function<double(
+    const geometry_msgs::msg::Point &, const geometry_msgs::msg::Point &)> & distance_along_lanelet)
+  const -> double
 {
   const auto acceleration = entity_status.action_status.accel.linear.x;
   const auto speed = entity_status.action_status.twist.linear.x;
@@ -409,7 +451,8 @@ auto FollowWaypointController::getAcceleration(
   const auto [local_min_acceleration, local_max_acceleration] =
     getAccelerationLimits(acceleration, speed);
 
-  if (const auto future_distance = (speed + local_min_acceleration * step_time * 0.5) * step_time; future_distance > remaining_distance) {
+  if (const auto future_distance = (speed + local_min_acceleration * step_time * 0.5) * step_time;
+      future_distance > remaining_distance) {
     /*
        If in the current conditions, the waypoint will be reached in this step
        even with the lowest possible acceleration set, this prevents cases in
@@ -427,7 +470,8 @@ auto FollowWaypointController::getAcceleration(
        If remaining time is no specified - this is the case when every next
        point of the trajectory has no specified time.
     */
-    return getAcceleration(remaining_distance, entity_status, update_entity_status, distance_along_lanelet);
+    return getAcceleration(
+      remaining_distance, entity_status, update_entity_status, distance_along_lanelet);
   } else {
     const auto remaining_time =
       roundTimeToFullStepsWithTolerance(remaining_time_source, step_time_tolerance);
