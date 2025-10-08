@@ -172,7 +172,8 @@ auto FollowWaypointController::getAccelerationLimits(
     std::abs(local_max_acceleration - local_min_acceleration) > local_epsilon) {
     throw ControllerError(
       "Contradictory acceleration limits: local_max_acceleration (", local_max_acceleration,
-      ") < local_min_acceleration (", local_min_acceleration, ") => difference: ", (local_max_acceleration - local_min_acceleration),
+      ") < local_min_acceleration (", local_min_acceleration,
+      ") => difference: ", (local_max_acceleration - local_min_acceleration),
       " for acceleration: ", acceleration, " and speed: ", speed, ". Target speed: ", target_speed,
       ". ", *this);
   }
@@ -190,7 +191,6 @@ auto FollowWaypointController::getAccelerationLimits(
 
   return {local_min_acceleration, local_max_acceleration};
 }
-
 
 auto FollowWaypointController::getPredictedStopEntityStatusWithoutConsideringTime(
   const double step_acceleration, const double remaining_distance,
@@ -237,7 +237,8 @@ auto FollowWaypointController::getPredictedWaypointArrivalState(
     const geometry_msgs::msg::Point &, const geometry_msgs::msg::Point &)> & distance_along_lanelet)
   const -> std::optional<PredictedEntityStatus>
 {
-  const auto brakeUntilImmobility = [&](PredictedEntityStatus & predicted_status) -> auto {
+  const auto brakeUntilImmobility = [&](PredictedEntityStatus & predicted_status) -> auto
+  {
     while (!predicted_status.isImmobile(local_epsilon)) {
       if (predicted_status.travel_time >= remaining_time) {
         return false;
@@ -492,7 +493,7 @@ auto FollowWaypointController::getAcceleration(
                 << ", final distance error: " << future_distance - remaining_distance << std::endl;
     }
     return local_min_acceleration;
-  } else if (std::abs(local_min_acceleration-local_max_acceleration) < local_epsilon) {
+  } else if (std::abs(local_min_acceleration - local_max_acceleration) < local_epsilon) {
     /*
        If there is no choice of acceleration - return this value.
     */
@@ -500,7 +501,7 @@ auto FollowWaypointController::getAcceleration(
       std::cout << "No choice of acceleration, min and max are equal: " << local_min_acceleration
                 << std::endl;
     }
-    return local_min_acceleration;  
+    return local_min_acceleration;
   } else if (std::isinf(remaining_time_source)) {
     /*
        If remaining time is no specified - this is the case when every next
@@ -577,7 +578,9 @@ auto FollowWaypointController::getAcceleration(
           best_candidate_index = candidate_index;
         }
       } else {
-        candidates.push_back({candidate_index, candidate_acceleration, std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN()});
+        candidates.push_back(
+          {candidate_index, candidate_acceleration, std::numeric_limits<double>::quiet_NaN(),
+           std::numeric_limits<double>::quiet_NaN()});
       }
       ++candidate_index;
     };
@@ -615,8 +618,7 @@ auto FollowWaypointController::getAcceleration(
         if (std::isnan(candidate.time_diff) || std::isnan(candidate.distance_diff)) {
           std::cout << "\033[31m"
                     << "IDX: " << candidate.index << " ACC: " << candidate.acceleration
-                    << " FAILED     \033[0m"
-                    << std::endl;
+                    << " FAILED     \033[0m" << std::endl;
         } else {
           std::cout << " IDX: " << candidate.index << " ACC: " << candidate.acceleration
                     << " FINAL TIME ERROR: " << -candidate.time_diff
