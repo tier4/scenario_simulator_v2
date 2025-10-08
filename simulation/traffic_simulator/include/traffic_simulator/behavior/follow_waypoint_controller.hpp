@@ -43,37 +43,6 @@ struct ControllerError : public common::Error
   }
 };
 
-struct PredictedState
-{
-  double acceleration;
-  double speed;
-  double traveled_distance;
-  double travel_time;
-
-  auto moveStraight(const double step_acceleration, const double step_time) -> void
-  {
-    const auto desired_speed = speed + step_acceleration * step_time;
-    traveled_distance += (speed + desired_speed) * 0.5 * step_time;
-    acceleration = (desired_speed - speed) / step_time;
-    speed = desired_speed;
-    travel_time += step_time;
-  }
-
-  auto isImmobile(const double tolerance) const
-  {
-    return std::abs(speed) < tolerance && std::abs(acceleration) < tolerance;
-  }
-
-  template <typename StreamType>
-  friend auto operator<<(StreamType & stream, const PredictedState & state) -> StreamType &
-  {
-    stream << std::setprecision(16) << std::fixed;
-    stream << "PredictedState: acceleration: " << state.acceleration << ", speed: " << state.speed
-           << ", distance: " << state.traveled_distance << ", time: " << state.travel_time << ". ";
-    return stream;
-  }
-};
-
 struct PredictedEntityStatus
 {
   static constexpr bool use_distance_along_lanelet = false;
@@ -83,6 +52,13 @@ struct PredictedEntityStatus
 
   explicit PredictedEntityStatus(const traffic_simulator_msgs::msg::EntityStatus & status)
   : traveled_distance(0.0), travel_time(0.0), entity_status_(status)
+  {
+  }
+
+  explicit PredictedEntityStatus(
+    const traffic_simulator_msgs::msg::EntityStatus & status, const double traveled_distance,
+    const double travel_time)
+  : traveled_distance(traveled_distance), travel_time(travel_time), entity_status_(status)
   {
   }
 
@@ -122,6 +98,10 @@ struct PredictedEntityStatus
     travel_time += step_time;
   }
 
+  auto getEntityStatus() const -> const traffic_simulator_msgs::msg::EntityStatus &
+  {
+    return entity_status_;
+  }
   auto getSpeed() const -> double { return entity_status_.action_status.twist.linear.x; }
   auto getAcceleration() const -> double { return entity_status_.action_status.accel.linear.x; }
 
@@ -257,8 +237,6 @@ class FollowWaypointController
   auto clampAcceleration(
     const double candidate_acceleration, const double acceleration, const double speed) const
     -> double;
-
-  auto moveStraight(PredictedState & state, const double candidate_acceleration) const -> void;
 
   auto getPredictedStopEntityStatusWithoutConsideringTime(
     const double step_acceleration, const double remaining_distance,
@@ -436,7 +414,13 @@ public:
   */
   auto getPredictedWaypointArrivalState(
     const double step_acceleration, const double remaining_time, const double remaining_distance,
-    const double acceleration, const double speed) const -> std::optional<PredictedState>;
+    const traffic_simulator_msgs::msg::EntityStatus & entity_status,
+    const std::function<traffic_simulator_msgs::msg::EntityStatus(
+      const traffic_simulator_msgs::msg::EntityStatus &, const geometry_msgs::msg::Vector3 &,
+      bool)> & update_entity_status,
+    const std::function<
+      double(const geometry_msgs::msg::Point &, const geometry_msgs::msg::Point &)> &
+      distance_along_lanelet) const -> std::optional<PredictedEntityStatus>;
   /*
      This allows the best acceleration to be found for the current conditions,
      without taking into account the arrival time - this is the case when every
