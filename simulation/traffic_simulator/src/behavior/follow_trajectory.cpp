@@ -612,7 +612,7 @@ auto makeUpdatedStatus(
       std::cout
         << "DISCARD WAYPOINT NR " << (polyline_trajectory.shape.vertices.size() - 1)
         << " REASON: algorithm attempts to set velocity in the opposite direction, overshoot "
-           "occured and the final waypoint is behind the vehicle. However overshoot distance equal to "
+           "occurred and the final waypoint is behind the vehicle. However overshoot distance equal to "
         << distance_to_front_waypoint << " is acceptable: ";
       std::cout << "distance in this step = "
                 << (speed + desired_acceleration * step_time * 0.5) * step_time
