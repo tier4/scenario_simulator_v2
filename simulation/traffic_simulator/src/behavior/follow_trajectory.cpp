@@ -201,12 +201,12 @@ auto makeUpdatedStatus(
     updated_status.pose.position += (current_velocity + desired_velocity) * 0.5 * step_time;
 
     updated_status.pose.orientation = [&]() {
-      if (desired_velocity.y == 0 && desired_velocity.x == 0 && desired_velocity.z == 0) {
-        /// @note do not change orientation if there is no designed_velocity vector
-        return entity_status.pose.orientation;
-      } else {
-        /// @note if there is a designed_velocity vector, set the orientation in the direction of it
+      if (norm(desired_velocity) > std::numeric_limits<double>::epsilon()) {
+        /// @note if there is a designed_velocity vector with sufficient magnitude, set the orientation in the direction of it
         return math::geometry::convertDirectionToQuaternion(desired_velocity);
+      } else {
+        /// @note do not change orientation if desired_velocity vector is too small to determine reliable direction
+        return entity_status.pose.orientation;
       }
     }();
 
@@ -248,10 +248,10 @@ auto makeUpdatedStatus(
 
     if (verbose) {
       std::cout << "=== AFTER UPDATE ===" << std::endl;
-      const auto current_distance = (current_velocity + desired_velocity) * 0.5 * step_time;
-      const auto saved_position = entity_status.pose.position + current_distance;
-      std::cout << "This step distance: " << norm(current_distance) << " x=" << current_distance.x << ", y=" << current_distance.y << ", z=" << current_distance.z << std::endl;
-      std::cout << "Future Position (using desired_velocity  ): x=" << saved_position.x << ", y=" << saved_position.y << ", z=" << saved_position.z << std::endl;
+      const auto this_step_distance = (current_velocity + desired_velocity) * 0.5 * step_time;
+      const auto no_transition_position = entity_status.pose.position + this_step_distance;
+      std::cout << "This step distance: " << norm(this_step_distance) << " x=" << this_step_distance.x << ", y=" << this_step_distance.y << ", z=" << this_step_distance.z << std::endl;
+      std::cout << "Future Position (using desired_velocity  ): x=" << no_transition_position.x << ", y=" << no_transition_position.y << ", z=" << no_transition_position.z << std::endl;
       std::cout << "Future Position (after lanelet transition): x=" << updated_status.pose.position.x << ", y=" << updated_status.pose.position.y << ", z=" << updated_status.pose.position.z << std::endl;
       std::cout << "Future Orientation: x=" << updated_status.pose.orientation.x << ", y=" << updated_status.pose.orientation.y << ", z=" << updated_status.pose.orientation.z << ", w=" << updated_status.pose.orientation.w << " (yaw=" << math::geometry::convertQuaternionToEulerAngle(updated_status.pose.orientation).z << ")" << std::endl;
       std::cout << "Future Linear velocity: x=" << updated_status.action_status.twist.linear.x << ", y=" << updated_status.action_status.twist.linear.y << ", z=" << updated_status.action_status.twist.linear.z << std::endl;
@@ -314,16 +314,16 @@ auto makeUpdatedStatus(
   }
 
   if (polyline_trajectory.shape.vertices.empty() and std::abs(entity_status.action_status.twist.linear.x) < FollowWaypointController::local_epsilon && std::abs(entity_status.action_status.accel.linear.x) < FollowWaypointController::local_epsilon) {
+    std::cout << "Average time spent in getAcceleration: " << PredictedEntityStatus::timing_stats.getAverageTime() << " us over " << PredictedEntityStatus::timing_stats.getSampleCount() << " samples." << std::endl;
     return std::nullopt;
   } else if (polyline_trajectory.shape.vertices.empty()) {
-    const auto acceleration = entity_status.action_status.accel.linear.x;
-    const auto speed = entity_status.action_status.twist.linear.x;
-    const auto max_acceleration_rate =  behavior_parameter.dynamic_constraints.max_acceleration_rate;
-    const auto N = std::max(1.0, std::round(sqrt(2 * speed / max_acceleration_rate) / step_time));
-    const auto a_min_for_simultaneous_zero = speed > 0.0 ? -(speed / (N * step_time)) - (max_acceleration_rate * step_time * (N - 1) / 2.0) : 0.0;
-    
-    const auto desired_acceleration = std::max(-speed / step_time, std::max(a_min_for_simultaneous_zero, acceleration - max_acceleration_rate * step_time));
-    const auto desired_speed = speed + desired_acceleration * step_time;
+    const auto follow_waypoint_controller = FollowWaypointController(behavior_parameter, step_time, true, 0.0);
+    const auto desired_acceleration = std::max(
+      follow_waypoint_controller.accelerationWithJerkConstraint(
+        entity_status.action_status.twist.linear.x, 0.0,
+        behavior_parameter.dynamic_constraints.max_deceleration_rate),
+      -behavior_parameter.dynamic_constraints.max_deceleration);
+    const auto desired_speed = entity_status.action_status.twist.linear.x + desired_acceleration * step_time;
     const auto desired_velocity = [&]() {
       const auto pitch =
         -math::geometry::convertQuaternionToEulerAngle(entity_status.pose.orientation).y;
@@ -607,7 +607,7 @@ auto makeUpdatedStatus(
                    .z(std::sin(pitch) * speed);
                }();
              distance_to_front_waypoint < FollowWaypointController::finish_distance_tolerance &&
-             innerProduct(desired_velocity, current_velocity) < 0.0) {
+             ((speed <= 0.0 && desired_acceleration < -std::numeric_limits<double>::epsilon()) || (norm(desired_velocity) > std::numeric_limits<double>::epsilon() && innerProduct(desired_velocity, current_velocity) < 0.0))) {
     if (verbose_discard_reason) {
       std::cout
         << "DISCARD WAYPOINT NR " << (polyline_trajectory.shape.vertices.size() - 1)
@@ -620,109 +620,11 @@ auto makeUpdatedStatus(
                 << FollowWaypointController::finish_distance_tolerance;
       std::cout << ",  innerProduct(desired_velocity, current_velocity) = "
                 << innerProduct(desired_velocity, current_velocity) << " < 0" << std::endl;
+      std::cout<< "current_velocity: "<< current_velocity.x << ", "<<current_velocity.y<<", "<<current_velocity.z<<std::endl;
+      std::cout<< "desired_velocity: "<< desired_velocity.x << ", "<<desired_velocity.y<<", "<<desired_velocity.z<<std::endl;
     }
     return discard_the_front_waypoint_and_recurse();
-  } else if (innerProduct(desired_velocity, current_velocity) < 0.0) {
-    throw common::Error(
-      "Too much overshoot for vehicle ", std::quoted(entity_status.name),
-      " - algorithm attempts to set velocity in the opposite direction, overshoot "
-      "occured and the final waypoint is behind the vehicle. Overshoot distance equal to ",
-      distance_to_front_waypoint, " is NOT acceptable!");
-  } else if (auto predicted_state_opt = follow_waypoint_controller.getPredictedWaypointArrivalState(
-               desired_acceleration, remaining_time, distance, acceleration, speed);
-             !std::isinf(remaining_time) && !predicted_state_opt.has_value()) {
-    throw common::Error(
-      "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
-      "following information to the developer: FollowWaypointController for vehicle ",
-      std::quoted(entity_status.name),
-      " calculated invalid acceleration:", " desired_acceleration: ", desired_acceleration,
-      ", remaining_time_to_front_waypoint: ", remaining_time_to_front_waypoint,
-      ", distance: ", distance, ", acceleration: ", acceleration, ", speed: ", speed, ". ",
-      follow_waypoint_controller);
   } else {
-    auto remaining_time_to_arrival_to_front_waypoint = predicted_state_opt->travel_time;
-    if constexpr (false) {
-      // clang-format off
-      std::cout << std::fixed << std::boolalpha << std::string(80, '-') << std::endl;
-
-      std::cout << "acceleration "
-                << "== " << acceleration
-                << std::endl;
-
-      std::cout << "min_acceleration "
-                << "== std::max(acceleration - max_deceleration_rate * step_time, -max_deceleration) "
-                << "== std::max(" << acceleration << " - " << behavior_parameter.dynamic_constraints.max_deceleration_rate << " * " << step_time << ", " << -behavior_parameter.dynamic_constraints.max_deceleration << ") "
-                << "== std::max(" << acceleration << " - " << behavior_parameter.dynamic_constraints.max_deceleration_rate * step_time << ", " << -behavior_parameter.dynamic_constraints.max_deceleration << ") "
-                << "== std::max(" << (acceleration - behavior_parameter.dynamic_constraints.max_deceleration_rate * step_time) << ", " << -behavior_parameter.dynamic_constraints.max_deceleration << ") "
-                << "== " << min_acceleration
-                << std::endl;
-
-      std::cout << "max_acceleration "
-                << "== std::min(acceleration + max_acceleration_rate * step_time, +max_acceleration) "
-                << "== std::min(" << acceleration << " + " << behavior_parameter.dynamic_constraints.max_acceleration_rate << " * " << step_time << ", " << behavior_parameter.dynamic_constraints.max_acceleration << ") "
-                << "== std::min(" << acceleration << " + " << behavior_parameter.dynamic_constraints.max_acceleration_rate * step_time << ", " << behavior_parameter.dynamic_constraints.max_acceleration << ") "
-                << "== std::min(" << (acceleration + behavior_parameter.dynamic_constraints.max_acceleration_rate * step_time) << ", " << behavior_parameter.dynamic_constraints.max_acceleration << ") "
-                << "== " << max_acceleration
-                << std::endl;
-
-      std::cout << "min_acceleration < acceleration < max_acceleration "
-                << "== " << min_acceleration << " < " << acceleration << " < " << max_acceleration << std::endl;
-
-      std::cout << "desired_acceleration "
-                << "== 2 * distance / std::pow(remaining_time, 2) - 2 * speed / remaining_time "
-                << "== 2 * " << distance << " / " << std::pow(remaining_time, 2) << " - 2 * " << speed << " / " << remaining_time << " "
-                << "== " << (2 * distance / std::pow(remaining_time, 2)) << " - " << (2 * speed / remaining_time) << " "
-                << "== " << desired_acceleration << " "
-                << "(acceleration < desired_acceleration == " << (acceleration < desired_acceleration) << " == need to " <<(acceleration < desired_acceleration ? "accelerate" : "decelerate") << ")"
-                << std::endl;
-
-      std::cout << "desired_speed "
-                << "== speed + std::clamp(desired_acceleration, min_acceleration, max_acceleration) * step_time "
-                << "== " << speed << " + std::clamp(" << desired_acceleration << ", " << min_acceleration << ", " << max_acceleration << ") * " << step_time << " "
-                << "== " << speed << " + " << std::clamp(desired_acceleration, min_acceleration, max_acceleration) << " * " << step_time << " "
-                << "== " << speed << " + " << std::clamp(desired_acceleration, min_acceleration, max_acceleration) * step_time << " "
-                << "== " << desired_speed
-                << std::endl;
-
-      std::cout << "distance_to_front_waypoint "
-                << "== " << distance_to_front_waypoint
-                << std::endl;
-
-      std::cout << "remaining_time_to_arrival_to_front_waypoint "
-                << "== " << remaining_time_to_arrival_to_front_waypoint
-                << std::endl;
-
-      std::cout << "distance "
-                << "== " << distance
-                << std::endl;
-
-      std::cout << "remaining_time "
-                << "== " << remaining_time
-                << std::endl;
-
-      std::cout << "remaining_time_to_arrival_to_front_waypoint "
-                << "("
-                << "== distance_to_front_waypoint / desired_speed "
-                << "== " << distance_to_front_waypoint << " / " << desired_speed << " "
-                << "== " << remaining_time_to_arrival_to_front_waypoint
-                << ")"
-                << std::endl;
-
-      std::cout << "arrive during this frame? "
-                << "== remaining_time_to_arrival_to_front_waypoint < step_time "
-                << "== " << remaining_time_to_arrival_to_front_waypoint << " < " << step_time << " "
-                << "== " << isDefinitelyLessThan(remaining_time_to_arrival_to_front_waypoint, step_time)
-                << std::endl;
-
-      std::cout << "not too early? "
-                << "== std::isnan(remaining_time_to_front_waypoint) or remaining_time_to_front_waypoint < remaining_time_to_arrival_to_front_waypoint + step_time "
-                << "== std::isnan(" << remaining_time_to_front_waypoint << ") or " << remaining_time_to_front_waypoint << " < " << remaining_time_to_arrival_to_front_waypoint << " + " << step_time << " "
-                << "== " << std::isnan(remaining_time_to_front_waypoint) << " or " << isDefinitelyLessThan(remaining_time_to_front_waypoint, remaining_time_to_arrival_to_front_waypoint + step_time) << " "
-                << "== " << (std::isnan(remaining_time_to_front_waypoint) or isDefinitelyLessThan(remaining_time_to_front_waypoint, remaining_time_to_arrival_to_front_waypoint + step_time))
-                << std::endl;
-      // clang-format on
-    }
-
     if (std::isnan(remaining_time_to_front_waypoint)) {
       /// @note If the nearest waypoint is arrived at in this step without a specific arrival time, it will
       /// be considered as achieved
@@ -731,8 +633,7 @@ auto makeUpdatedStatus(
         /// @note If the trajectory has only waypoints with unspecified time, the last one is followed using
         /// maximum speed including braking - in this case accuracy of arrival is checked
         if (
-          this_step_distance - FollowWaypointController::finish_distance_tolerance >
-          distance_to_front_waypoint) {
+          this_step_distance > distance_to_front_waypoint + FollowWaypointController::finish_distance_tolerance) {
           throw common::Error(
             "Too much overshoot of the last waypoint detected for vehicle ",
             std::quoted(entity_status.name),
@@ -802,7 +703,6 @@ auto makeUpdatedStatus(
        known by the name "collision avoidance" should be synthesized here into
        steering.
     */
-
     return update_entity_status(entity_status, desired_velocity, verbose_status_changes);
   }
 }

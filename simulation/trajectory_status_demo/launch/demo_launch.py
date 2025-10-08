@@ -10,7 +10,7 @@ def generate_launch_description():
     package_dir = get_package_share_directory('trajectory_status_demo')
 
     # Path to config file
-    config_file = os.path.join(package_dir, 'config', 'demo_config_dawid_new_issue_4.yaml')
+    config_file = os.path.join(package_dir, 'config', 'demo_config_dawid_latest_issue2.yaml')
 
     # Path to Python plotting script (in the package source directory)
     plot_script = os.path.join(package_dir, '../../../../src/simulator/scenario_simulator/simulation/trajectory_status_demo/plot_trajectory.py')

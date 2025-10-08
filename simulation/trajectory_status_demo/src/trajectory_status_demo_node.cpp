@@ -65,7 +65,7 @@ private:
           // Get simulation parameters
           auto step_time = 1.0/30.0;
           auto matching_distance = this->get_parameter("matching_distance").as_double();
-          auto target_speed = this->get_parameter("target_speed").as_double();
+        //   auto target_speed = this->get_parameter("target_speed").as_double();
 
           if (once) {
             // Create EntityStatus from configuration
@@ -91,36 +91,43 @@ private:
             );
 
             if (updated_status.has_value()) {
-                // Calculate remaining distance to waypoint
-                double remaining_distance = 0.0;
-                if (!polyline_trajectory_.shape.vertices.empty()) {
-                    const auto& waypoint = polyline_trajectory_.shape.vertices.front().position.position;
-                    double dx = waypoint.x - updated_status->pose.position.x;
-                    double dy = waypoint.y - updated_status->pose.position.y;
-                    double dz = waypoint.z - updated_status->pose.position.z;
-                    remaining_distance = std::sqrt(dx*dx + dy*dy + dz*dz);
-                }
+              const auto canonicalized_lanelet_pose =
+                traffic_simulator::pose::toCanonicalizedLaneletPose(
+                  updated_status->pose, updated_status->bounding_box, {}, false, matching_distance);
+              updated_status = static_cast<traffic_simulator_msgs::msg::EntityStatus>(
+                traffic_simulator::entity_status::CanonicalizedEntityStatus(
+                  updated_status.value(), canonicalized_lanelet_pose));
 
-                csv_file_ << updated_status->time << ","
-                         << updated_status->pose.position.x << ","
-                         << updated_status->pose.position.y << ","
-                         << updated_status->pose.position.z << ","
-                         << updated_status->action_status.twist.linear.x << ","
-                         << updated_status->action_status.accel.linear.x << ","
-                         << remaining_distance << "\n";
-                csv_file_.flush();
+              // Calculate remaining distance to waypoint
+              double remaining_distance = 0.0;
+              if (!polyline_trajectory_.shape.vertices.empty()) {
+                const auto & waypoint =
+                  polyline_trajectory_.shape.vertices.front().position.position;
+                double dx = waypoint.x - updated_status->pose.position.x;
+                double dy = waypoint.y - updated_status->pose.position.y;
+                double dz = waypoint.z - updated_status->pose.position.z;
+                remaining_distance = std::sqrt(dx * dx + dy * dy + dz * dz);
+              }
 
-                // Update simulation time for next iteration
-                status_ = *updated_status;
-                simulation_time_ = updated_status->time;
+              csv_file_ << updated_status->time << "," << updated_status->pose.position.x << ","
+                        << updated_status->pose.position.y << "," << updated_status->pose.position.z
+                        << "," << updated_status->action_status.twist.linear.x << ","
+                        << updated_status->action_status.accel.linear.x << "," << remaining_distance
+                        << "\n";
+              csv_file_.flush();
+
+              // Update simulation time for next iteration
+              status_ = *updated_status;
+              simulation_time_ = updated_status->time;
 
             } else {
-                RCLCPP_WARN(this->get_logger(), "makeUpdatedStatus returned no value");
-                rclcpp::shutdown();
+              RCLCPP_WARN(this->get_logger(), "makeUpdatedStatus returned no value");
+              rclcpp::shutdown();
             }
 
         } catch (const std::exception& e) {
             RCLCPP_ERROR(this->get_logger(), "Exception in runDemo: %s", e.what());
+            timer_->cancel();
         }
     }
 

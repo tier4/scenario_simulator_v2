@@ -16,6 +16,7 @@
 #define TRAFFIC_SIMULATOR__BEHAVIOR__FOLLOW_WAYPOINT_CONTROLLER_HPP_
 
 #include <algorithm>
+#include <chrono>
 #include <cmath>
 #include <iomanip>
 #include <iostream>
@@ -78,14 +79,15 @@ struct PredictedState
 
 struct PredictedEntityStatus
 {
-  traffic_simulator_msgs::msg::EntityStatus entity_status;
+  static constexpr bool use_distance_along_lanelet = true;
+
   double traveled_distance;
   double travel_time;
 
   explicit PredictedEntityStatus(const traffic_simulator_msgs::msg::EntityStatus & status)
-  : entity_status(status),
-    traveled_distance(0.0),
-    travel_time(0.0)
+  : traveled_distance(0.0),
+    travel_time(0.0),
+    entity_status_(status)
   {
   }
 
@@ -94,40 +96,93 @@ struct PredictedEntityStatus
     const std::function<traffic_simulator_msgs::msg::EntityStatus(const traffic_simulator_msgs::msg::EntityStatus &, const geometry_msgs::msg::Vector3 &, bool)> & update_entity_status,
     const std::function<double(const geometry_msgs::msg::Point &, const geometry_msgs::msg::Point &)> & distance_along_lanelet) -> void
   {
-    const auto previous_position = entity_status.pose.position;
+    const auto current_speed = entity_status_.action_status.twist.linear.x;
+    const auto current_position = entity_status_.pose.position;
 
-    const auto desired_speed = entity_status.action_status.twist.linear.x + step_acceleration * step_time;
-    const auto desired_velocity = [&]() {
-      const auto pitch =
-        -math::geometry::convertQuaternionToEulerAngle(entity_status.pose.orientation).y;
-      const auto yaw =
-        math::geometry::convertQuaternionToEulerAngle(entity_status.pose.orientation).z;
-      return geometry_msgs::build<geometry_msgs::msg::Vector3>()
-        .x(std::cos(pitch) * std::cos(yaw) * desired_speed)
-        .y(std::cos(pitch) * std::sin(yaw) * desired_speed)
-        .z(std::sin(pitch) * desired_speed);
-    }();
-    entity_status = update_entity_status(entity_status, desired_velocity, false);
+    const auto desired_speed = current_speed + step_acceleration * step_time;
 
-    traveled_distance += distance_along_lanelet(previous_position, entity_status.pose.position);
+    if (use_distance_along_lanelet) {
+      const auto desired_velocity = [&]() {
+        const auto pitch =
+          -math::geometry::convertQuaternionToEulerAngle(entity_status_.pose.orientation).y;
+        const auto yaw =
+          math::geometry::convertQuaternionToEulerAngle(entity_status_.pose.orientation).z;
+        return geometry_msgs::build<geometry_msgs::msg::Vector3>()
+          .x(std::cos(pitch) * std::cos(yaw) * desired_speed)
+          .y(std::cos(pitch) * std::sin(yaw) * desired_speed)
+          .z(std::sin(pitch) * desired_speed);
+      }();
+
+      entity_status_ = update_entity_status(entity_status_, desired_velocity, false);
+      traveled_distance += distance_along_lanelet(current_position, entity_status_.pose.position);
+    } else {
+      entity_status_.action_status.twist.linear.x = desired_speed;
+      entity_status_.action_status.accel.linear.x = (desired_speed - current_speed) / step_time;
+      traveled_distance += (current_speed + desired_speed) * 0.5 * step_time;
+    }
     travel_time += step_time;
   }
 
+  auto getSpeed() const -> double { return entity_status_.action_status.twist.linear.x; }
+  auto getAcceleration() const -> double { return entity_status_.action_status.accel.linear.x; }
+
   auto isImmobile(const double tolerance) const
   {
-    return std::abs(entity_status.action_status.twist.linear.x) < tolerance &&
-           std::abs(entity_status.action_status.accel.linear.x) < tolerance;
+    return std::abs(entity_status_.action_status.twist.linear.x) < tolerance &&
+           std::abs(entity_status_.action_status.accel.linear.x) < tolerance;
   }
+
+  struct TimingStats
+  {
+    void start()
+    {
+      start_time_ = std::chrono::high_resolution_clock::now();
+    }
+
+    void end()
+    {
+      auto end_time = std::chrono::high_resolution_clock::now();
+      auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time_).count();
+      total_time_ += duration;
+      sample_count_++;
+    }
+
+    auto getAverageTime() const -> double
+    {
+      return sample_count_ > 0 ? static_cast<double>(total_time_) / sample_count_ : 0.0;
+    }
+
+    auto getSampleCount() const -> long long
+    {
+      return sample_count_;
+    }
+
+    void reset()
+    {
+      total_time_ = 0;
+      sample_count_ = 0;
+    }
+
+  private:
+    std::chrono::high_resolution_clock::time_point start_time_;
+    long long total_time_ = 0;
+    long long sample_count_ = 0;
+  };
+
+  static TimingStats timing_stats;
 
   template <typename StreamType>
   friend auto operator<<(StreamType & stream, const PredictedEntityStatus & state) -> StreamType &
   {
     stream << std::setprecision(16) << std::fixed;
-    stream << "PredictedEntityStatus: acceleration: " << state.entity_status.action_status.accel.linear.x
-           << ", speed: " << state.entity_status.action_status.twist.linear.x
+    stream << "PredictedEntityStatus: acceleration: " << state.entity_status_.action_status.accel.linear.x
+           << ", speed: " << state.entity_status_.action_status.twist.linear.x
            << ", distance: " << state.traveled_distance << ", time: " << state.travel_time << ". ";
     return stream;
   }
+
+  private:
+      traffic_simulator_msgs::msg::EntityStatus entity_status_;
 };
 
 class FollowWaypointController
@@ -299,6 +354,103 @@ public:
     target_speed{(target_speed) ? target_speed.value() : max_speed}
   {
   }
+
+  /**
+   * @brief Calculate the optimal acceleration for a single discrete step
+   *        to reach a desired target speed while respecting a maximum jerk constraint.
+   *
+   * This method computes the acceleration to be applied in the current time step
+   * so that the final speed after a series of discrete steps equals the target speed,
+   * assuming constant jerk (linear change of acceleration) over all steps.
+   *
+   * @param current_speed The current speed at the start of the step [m/s].
+   * @param target_speed  The desired target speed to reach after N discrete steps [m/s].
+   * @param max_jerk      The maximum allowed rate of change of acceleration [m/s³].
+   * @return The optimal acceleration to apply in the current step [m/s²].
+   *
+   * @note
+   * Algorithm derivation for discrete-time motion with constant jerk:
+   *
+   * 1. Estimating the number of steps N:
+   *
+   *    For motion with constant jerk j, the velocity change over time t is:
+   *
+   *      Δv = a₀·t + 0.5·j·t²
+   *
+   *    Assuming we start from rest (a₀ = 0) for the jerk phase, the time required is:
+   *
+   *      t = sqrt(2·|Δv| / j)
+   *
+   *    Converting to discrete steps with step_time dt:
+   *
+   *      N = round(t / dt) = round(sqrt(2·|Δv| / j) / dt)
+   *
+   *    where Δv = target_speed - current_speed, and N ≥ 1.
+   *
+   * 2. Computing base acceleration:
+   *
+   *    Without jerk, uniform acceleration to reach Δv over N steps would be:
+   *
+   *      a_base = Δv / (N·dt)
+   *
+   * 3. Deriving the jerk correction:
+   *
+   *    Why we need jerk correction: If we simply used a_base (constant acceleration),
+   *    we would ignore the constraint that acceleration must change smoothly with
+   *    limited jerk. By applying constant jerk, acceleration increases/decreases
+   *    linearly over time, which means we accumulate additional velocity change
+   *    beyond what a_base alone would provide. The jerk correction compensates for
+   *    this by adjusting the initial acceleration a[0] so that the total velocity
+   *    change after N steps exactly matches the desired Δv.
+   *
+   *    With constant jerk j applied over N steps, acceleration changes linearly:
+   *
+   *      a[k] = a[0] + j·dt·k,  for k = 0, 1, ..., N-1
+   *
+   *    Total velocity change is the sum of accelerations times dt:
+   *
+   *      Δv = dt · Σ(a[k]) = dt · Σ(a[0] + j·dt·k)
+   *         = dt · [N·a[0] + j·dt·Σ(k)]
+   *         = dt · [N·a[0] + j·dt·(0 + 1 + ... + (N-1))]
+   *         = dt · [N·a[0] + j·dt·(N·(N-1)/2)]
+   *
+   *    Solving for a[0] (the initial acceleration to apply):
+   *
+   *      a[0] = Δv/(N·dt) - j·dt·(N-1)/2
+   *
+   *    Breaking this into components:
+   *
+   *      a[0] = a_base + a_correction
+   *
+   *    where:
+   *      - a_base = Δv/(N·dt)  (uniform acceleration component)
+   *      - a_correction = -j·dt·(N-1)/2  (jerk correction)
+   *
+   *    However, the sign of jerk depends on acceleration/deceleration direction:
+   *      - For acceleration (Δv > 0): jerk is positive, correction is positive
+   *      - For deceleration (Δv < 0): jerk is negative, correction is negative
+   *
+   *    Therefore:
+   *
+   *      a_correction = sign(Δv) · j · dt · (N-1) / 2
+   *
+   * 4. Final formula:
+   *
+   *      a_optimal = a_base + a_correction
+   *                = Δv/(N·dt) + sign(Δv)·j·dt·(N-1)/2
+   *
+   * @note
+   * - This is a discrete approximation; small errors may occur due to rounding of N.
+   * - The method does not clip the acceleration to physical limits; the caller must
+   *   apply additional clamping to ensure the acceleration remains within
+   *   max_acceleration and max_deceleration bounds.
+   * - The formula is symmetric for acceleration and deceleration; only the sign of
+   *   the jerk correction term changes based on the velocity difference direction.
+   */
+
+  auto accelerationWithJerkConstraint(
+    const double current_speed, const double target_speed, const double acceleration_rate) const
+    -> double;
 
   /*
      This is a debugging method, it is not worth giving it much attention.
