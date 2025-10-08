@@ -76,7 +76,7 @@ struct PredictedState
 
 struct PredictedEntityStatus
 {
-  static constexpr bool use_distance_along_lanelet = true;
+  static constexpr bool use_distance_along_lanelet = false;
 
   double traveled_distance;
   double travel_time;
