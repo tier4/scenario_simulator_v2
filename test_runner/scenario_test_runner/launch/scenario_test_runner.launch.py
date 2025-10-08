@@ -85,6 +85,7 @@ def launch_setup(context, *args, **kwargs):
     launch_autoware                             = LaunchConfiguration("launch_autoware",                             default=True)
     launch_rviz                                 = LaunchConfiguration("launch_rviz",                                 default=False)
     launch_simple_sensor_simulator              = LaunchConfiguration("launch_simple_sensor_simulator",              default=True)
+    launch_visualization                        = LaunchConfiguration("launch_visualization",                        default=True)
     output_directory                            = LaunchConfiguration("output_directory",                            default=Path("/tmp"))
     override_parameters                         = LaunchConfiguration("override_parameters",                         default="")
     parameter_file_path                         = LaunchConfiguration("parameter_file_path",                         default=Path(get_package_share_directory("scenario_test_runner")) / "config/parameters.yaml")
@@ -121,6 +122,7 @@ def launch_setup(context, *args, **kwargs):
     print(f"initialize_localization                     := {initialize_localization.perform(context)}")
     print(f"launch_autoware                             := {launch_autoware.perform(context)}")
     print(f"launch_rviz                                 := {launch_rviz.perform(context)}")
+    print(f"launch_visualization                        := {launch_visualization.perform(context)}")
     print(f"output_directory                            := {output_directory.perform(context)}")
     print(f"override_parameters                         := {override_parameters.perform(context)}")
     print(f"parameter_file_path                         := {parameter_file_path.perform(context)}")
@@ -302,6 +304,7 @@ def launch_setup(context, *args, **kwargs):
             executable="visualization_node",
             namespace="simulation",
             name="visualizer",
+            condition=IfCondition(launch_visualization),
             output="screen",
         ),
         Node(
