@@ -262,10 +262,14 @@ auto EgoEntitySimulation::overwrite(
         [[fallthrough]];
 
       case VehicleModelType::DELAY_STEER_VEL:
-        if (std::abs(status.action_status.twist.linear.x) < min_linear_velocity_for_steer_calculation) {
+        if (
+          std::abs(status.action_status.twist.linear.x) <
+          min_linear_velocity_for_steer_calculation) {
           state(4) = 0.0;
         } else {
-          state(4) = std::atan((status.action_status.twist.angular.z * wheel_base_) / status.action_status.twist.linear.x);
+          state(4) = std::atan(
+            (status.action_status.twist.angular.z * wheel_base_) /
+            status.action_status.twist.linear.x);
         }
         [[fallthrough]];
 
@@ -380,8 +384,7 @@ auto EgoEntitySimulation::getCurrentTwist() const -> geometry_msgs::msg::Twist
   return current_twist;
 }
 
-auto EgoEntitySimulation::getCurrentPose(const double pitch_angle) const
-  -> geometry_msgs::msg::Pose
+auto EgoEntitySimulation::getCurrentPose(const double pitch_angle) const -> geometry_msgs::msg::Pose
 {
   using math::geometry::operator*;
   const auto relative_position =
