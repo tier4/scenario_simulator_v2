@@ -16,15 +16,12 @@
 #define TRAFFIC_SIMULATOR__BEHAVIOR__FOLLOW_WAYPOINT_CONTROLLER_HPP_
 
 #include <algorithm>
-#include <chrono>
 #include <cmath>
 #include <iomanip>
 #include <iostream>
 #include <limits>
 #include <optional>
-#include <geometry/vector3/hypot.hpp>
 #include <geometry/quaternion/quaternion_to_euler.hpp>
-#include <geometry_msgs/msg/vector3.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
@@ -130,55 +127,6 @@ struct PredictedEntityStatus
   {
     return std::abs(entity_status_.action_status.twist.linear.x) < tolerance &&
            std::abs(entity_status_.action_status.accel.linear.x) < tolerance;
-  }
-
-  struct TimingStats
-  {
-    void start()
-    {
-      start_time_ = std::chrono::high_resolution_clock::now();
-    }
-
-    void end()
-    {
-      auto end_time = std::chrono::high_resolution_clock::now();
-      auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time_).count();
-      total_time_ += duration;
-      sample_count_++;
-    }
-
-    auto getAverageTime() const -> double
-    {
-      return sample_count_ > 0 ? static_cast<double>(total_time_) / sample_count_ : 0.0;
-    }
-
-    auto getSampleCount() const -> long long
-    {
-      return sample_count_;
-    }
-
-    void reset()
-    {
-      total_time_ = 0;
-      sample_count_ = 0;
-    }
-
-  private:
-    std::chrono::high_resolution_clock::time_point start_time_;
-    long long total_time_ = 0;
-    long long sample_count_ = 0;
-  };
-
-  static TimingStats timing_stats;
-
-  template <typename StreamType>
-  friend auto operator<<(StreamType & stream, const PredictedEntityStatus & state) -> StreamType &
-  {
-    stream << std::setprecision(16) << std::fixed;
-    stream << "PredictedEntityStatus: acceleration: " << state.entity_status_.action_status.accel.linear.x
-           << ", speed: " << state.entity_status_.action_status.twist.linear.x
-           << ", distance: " << state.traveled_distance << ", time: " << state.travel_time << ". ";
-    return stream;
   }
 
   private:
@@ -310,10 +258,6 @@ class FollowWaypointController
     -> double;
 
   auto moveStraight(PredictedState & state, const double candidate_acceleration) const -> void;
-
-  auto getPredictedStopStateWithoutConsideringTime(
-    const double step_acceleration, const double remaining_distance, const double acceleration,
-    const double speed) const -> std::optional<PredictedState>;
 
   auto getPredictedStopEntityStatusWithoutConsideringTime(
     const double step_acceleration, const double remaining_distance,

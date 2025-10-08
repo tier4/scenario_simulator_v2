@@ -148,12 +148,11 @@ auto makeUpdatedStatus(
       polyline_trajectory.base_time = entity_status.time;
     }
     if (verbose_discard_reason) {
-      const auto & discarded_waypoint = polyline_trajectory.shape.vertices.front();
       std::cout << "DISCARD WAYPOINT NR " << (polyline_trajectory.shape.vertices.size() - 1)
-                << ": x=" << discarded_waypoint.position.position.x
-                << ", y=" << discarded_waypoint.position.position.y
-                << ", z=" << discarded_waypoint.position.position.z
-                << ", waypoint_time=" << discarded_waypoint.time
+                << ": x=" << polyline_trajectory.shape.vertices.front().position.position.x
+                << ", y=" << polyline_trajectory.shape.vertices.front().position.position.y
+                << ", z=" << polyline_trajectory.shape.vertices.front().position.position.z
+                << ", waypoint_time=" << polyline_trajectory.shape.vertices.front().time
                 << ", current_time=" << entity_status.time << std::endl;
     }
 
@@ -269,19 +268,20 @@ auto makeUpdatedStatus(
 
      See https://www.researchgate.net/publication/2495826_Steering_Behaviors_For_Autonomous_Characters
   */
-  const auto& position = entity_status.pose.position;
-  const auto& linear_velocity = entity_status.action_status.twist.linear;
-  const auto& angular_velocity = entity_status.action_status.twist.angular;
-  const auto& linear_acceleration = entity_status.action_status.accel.linear;
-  const auto& angular_acceleration = entity_status.action_status.accel.angular;
-  const auto waypoint_count = polyline_trajectory.shape.vertices.size();
+
 
   if(verbose_status_changes) {
+    const auto& position = entity_status.pose.position;
+    const auto& orientation = entity_status.pose.orientation;
+    const auto& linear_velocity = entity_status.action_status.twist.linear;
+    const auto& angular_velocity = entity_status.action_status.twist.angular;
+    const auto& linear_acceleration = entity_status.action_status.accel.linear;
+    const auto& angular_acceleration = entity_status.action_status.accel.angular;
     std::cout << std::endl << "===============================" << std::endl<< std::endl << std::endl;
     std::cout << "=== BEFORE UPDATE ===" << std::endl;
     std::cout << "Current Time: " << entity_status.time << std::endl;
     std::cout << "Current Position: x=" << position.x << ", y=" << position.y << ", z=" << position.z << std::endl;
-    std::cout << "Current Orientation: x=" << entity_status.pose.orientation.x << ", y=" << entity_status.pose.orientation.y << ", z=" << entity_status.pose.orientation.z << ", w=" << entity_status.pose.orientation.w << " (yaw=" << math::geometry::convertQuaternionToEulerAngle(entity_status.pose.orientation).z << ")" << std::endl;
+    std::cout << "Current Orientation: x=" << orientation.x << ", y=" << orientation.y << ", z=" << orientation.z << ", w=" << orientation.w << " (yaw=" << math::geometry::convertQuaternionToEulerAngle(orientation).z << ")" << std::endl;
     std::cout << "Current Linear velocity: x=" << linear_velocity.x << ", y=" << linear_velocity.y << ", z=" << linear_velocity.z << std::endl;
     std::cout << "Current Angular velocity: x=" << angular_velocity.x << ", y=" << angular_velocity.y << ", z=" << angular_velocity.z << std::endl;
     std::cout << "Current Linear acceleration: x=" << linear_acceleration.x << ", y=" << linear_acceleration.y << ", z=" << linear_acceleration.z << std::endl;
@@ -298,9 +298,9 @@ auto makeUpdatedStatus(
            first_waypoint_with_arrival_time_specified->time - entity_status.time)
         : std::numeric_limits<double>::infinity();
 
-      std::cout << "Waypoints count: " << waypoint_count << std::endl;
+      std::cout << "Waypoints count: " << polyline_trajectory.shape.vertices.size() << std::endl;
       std::cout << "Nearest waypoint: x=" << nearest_waypoint.x << ", y=" << nearest_waypoint.y << ", z=" << nearest_waypoint.z << std::endl;
-      std::cout << "Euclidean distance to nearest waypoint: " << hypot(position, nearest_waypoint) << std::endl;
+      std::cout << "Euclidean distance to nearest waypoint: " << hypot(entity_status.pose.position, nearest_waypoint) << std::endl;
       std::cout << "Remaining time: ";
       if (std::isinf(remaining_time_to_timed_waypoint)) {
         std::cout << "infinity (no waypoint with specified time)";
@@ -314,7 +314,6 @@ auto makeUpdatedStatus(
   }
 
   if (polyline_trajectory.shape.vertices.empty() and std::abs(entity_status.action_status.twist.linear.x) < FollowWaypointController::local_epsilon && std::abs(entity_status.action_status.accel.linear.x) < FollowWaypointController::local_epsilon) {
-    std::cout << "Average time spent in getAcceleration: " << PredictedEntityStatus::timing_stats.getAverageTime() << " us over " << PredictedEntityStatus::timing_stats.getSampleCount() << " samples." << std::endl;
     return std::nullopt;
   } else if (polyline_trajectory.shape.vertices.empty()) {
     const auto follow_waypoint_controller = FollowWaypointController(behavior_parameter, step_time, true, 0.0);
@@ -334,6 +333,7 @@ auto makeUpdatedStatus(
         .y(std::cos(pitch) * std::sin(yaw) * desired_speed)
         .z(std::sin(pitch) * desired_speed);
     }();
+    
     if (verbose_status_changes) {
       std::cout << "=== FIX AFTER OVERSHOOT ===" << std::endl;
     }
