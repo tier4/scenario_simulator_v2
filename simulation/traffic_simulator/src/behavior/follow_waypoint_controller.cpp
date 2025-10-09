@@ -167,9 +167,7 @@ auto FollowWaypointController::getAccelerationLimits(
       In such cases, local_min_acceleration (needed to reach acceleration equal to 0.0 at speed 0.0) can be equal to local_max_acceleration
       (the maximum increase allowed by max_acceleration_rate constraint).
   */
-  if (
-    local_max_acceleration < local_min_acceleration and
-    std::abs(local_max_acceleration - local_min_acceleration) > local_epsilon) {
+  if (local_max_acceleration + local_epsilon < local_min_acceleration - local_epsilon) {
     throw ControllerError(
       "Contradictory acceleration limits: local_max_acceleration (", local_max_acceleration,
       ") < local_min_acceleration (", local_min_acceleration,
@@ -474,6 +472,9 @@ auto FollowWaypointController::getAcceleration(
   if (auto max_acceleration = (acceleration + max_acceleration_rate * step_time);
       speed + max_acceleration * step_time < 0.0) {
     return max_acceleration;
+  } else if (auto min_acceleration = (acceleration - max_deceleration_rate * step_time);
+             speed + min_acceleration * step_time > target_speed) {
+    return min_acceleration;
   }
 
   const auto [local_min_acceleration, local_max_acceleration] =

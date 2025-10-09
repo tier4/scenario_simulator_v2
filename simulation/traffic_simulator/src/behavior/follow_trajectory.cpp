@@ -644,7 +644,7 @@ auto makeUpdatedStatus(
                    .y(std::cos(pitch) * std::sin(yaw) * speed)
                    .z(std::sin(pitch) * speed);
                }();
-             distance_to_front_waypoint < FollowWaypointController::finish_distance_tolerance &&
+             distance_to_front_waypoint < FollowWaypointController::acceptable_overshoot_distance &&
              ((speed <= 0.0 && desired_acceleration < -std::numeric_limits<double>::epsilon()) ||
               (norm(desired_velocity) > std::numeric_limits<double>::epsilon() &&
                innerProduct(desired_velocity, current_velocity) < 0.0))) {
@@ -658,7 +658,7 @@ auto makeUpdatedStatus(
       std::cout << "distance in this step = "
                 << (speed + desired_acceleration * step_time * 0.5) * step_time
                 << ",  distance_to_front_waypoint = " << distance_to_front_waypoint << " < "
-                << FollowWaypointController::finish_distance_tolerance;
+                << FollowWaypointController::acceptable_overshoot_distance;
       std::cout << ",  innerProduct(desired_velocity, current_velocity) = "
                 << innerProduct(desired_velocity, current_velocity) << " < 0" << std::endl;
       std::cout << "current_velocity: " << current_velocity.x << ", " << current_velocity.y << ", "
@@ -677,14 +677,14 @@ auto makeUpdatedStatus(
         /// maximum speed including braking - in this case accuracy of arrival is checked
         if (
           this_step_distance >
-          distance_to_front_waypoint + FollowWaypointController::finish_distance_tolerance) {
+          distance_to_front_waypoint + FollowWaypointController::acceptable_overshoot_distance) {
           throw common::Error(
             "Too much overshoot of the last waypoint detected for vehicle ",
             std::quoted(entity_status.name),
             ". Overshoot distance: ", this_step_distance - distance_to_front_waypoint,
             " m (this step distance: ", this_step_distance,
             " m, remaining distance: ", distance_to_front_waypoint,
-            " m, overshoot tolerance: ", FollowWaypointController::finish_distance_tolerance,
+            " m, overshoot tolerance: ", FollowWaypointController::acceptable_overshoot_distance,
             "). This error indicates a bug in the algorithm - report the details to the "
             "developer.");
         } else if (follow_waypoint_controller.areConditionsOfArrivalMet(

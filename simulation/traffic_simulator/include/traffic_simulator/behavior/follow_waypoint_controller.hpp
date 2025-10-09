@@ -138,6 +138,15 @@ class FollowWaypointController
   static constexpr double step_time_tolerance = 1e-6;
 
   /*
+     Accuracy of the remaining distance to the waypoint at the moment
+     of arrival with a specified time.
+
+     There is no technical basis for this value; it was determined based on
+     Dawid Moszynski  experiments.
+  */
+  static constexpr double remaining_distance_tolerance = 1e-2;
+
+  /*
      Accuracy of the predicted arrival distance at the waypoint with the
      specified time it is only used to detect in advance that it is most likely
      impossible to arrive at a sufficient final accuracy.
@@ -259,13 +268,13 @@ public:
   static constexpr double local_epsilon = 1e-12;
 
   /*
-     Accuracy of the final arrival distance at a waypoint with a specified
-     time.
+     Maximum allowable distance the vehicle may travel past the
+     final waypoint.
 
-     There is no technical basis for this value, it was determined based on
-     Dawid Moszynski experiments.
+     There is no technical basis for this value; it was determined based on
+     Dawid Moszynski  experiments.
   */
-  static constexpr double finish_distance_tolerance = 1e-2;
+  static constexpr double acceptable_overshoot_distance = 1e-1;
 
   explicit constexpr FollowWaypointController(
     const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter,
@@ -454,7 +463,7 @@ public:
     const double acceleration, const double speed, const double distance) const -> double
   {
     return (!with_breaking || std::abs(speed) < local_epsilon) &&
-           std::abs(acceleration) < local_epsilon && distance < finish_distance_tolerance;
+           std::abs(acceleration) < local_epsilon && distance < remaining_distance_tolerance;
   }
 };
 }  // namespace follow_trajectory
