@@ -415,7 +415,8 @@ const visualization_msgs::msg::MarkerArray VisualizationComponent::generateMarke
     size_t num_points = 50;
     if (use_trajectory_based_front_entity_detection_) {
       waypoints_marker.points = spline.getPolygon(
-        status.bounding_box.dimensions.y + trajectory_based_detection_offset_, num_points);
+        std::max(0.0, status.bounding_box.dimensions.y + trajectory_based_detection_offset_),
+        num_points);
     } else {
       waypoints_marker.points = spline.getPolygon(status.bounding_box.dimensions.y, num_points);
     }
