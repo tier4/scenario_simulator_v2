@@ -306,6 +306,7 @@ def launch_setup(context, *args, **kwargs):
             name="visualizer",
             condition=IfCondition(launch_visualization),
             output="screen",
+            parameters=make_parameters(),
         ),
         Node(
             package="rviz2",
