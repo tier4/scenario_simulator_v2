@@ -65,8 +65,8 @@ struct PredictedEntityStatus
   auto moveStraight(
     const double step_acceleration, const double step_time,
     const std::function<traffic_simulator_msgs::msg::EntityStatus(
-      const traffic_simulator_msgs::msg::EntityStatus &, const geometry_msgs::msg::Vector3 &,
-      bool)> & update_entity_status,
+      const traffic_simulator_msgs::msg::EntityStatus &, const geometry_msgs::msg::Vector3 &)> &
+      update_entity_status,
     const std::function<
       double(const geometry_msgs::msg::Point &, const geometry_msgs::msg::Point &)> &
       distance_along_lanelet) -> void
@@ -88,7 +88,7 @@ struct PredictedEntityStatus
           .z(std::sin(pitch) * desired_speed);
       }();
 
-      entity_status_ = update_entity_status(entity_status_, desired_velocity, false);
+      entity_status_ = update_entity_status(entity_status_, desired_velocity);
       traveled_distance += distance_along_lanelet(current_position, entity_status_.pose.position);
     } else {
       entity_status_.action_status.twist.linear.x = desired_speed;
@@ -251,8 +251,8 @@ class FollowWaypointController
     const double step_acceleration, const double remaining_distance,
     const traffic_simulator_msgs::msg::EntityStatus & entity_status,
     const std::function<traffic_simulator_msgs::msg::EntityStatus(
-      const traffic_simulator_msgs::msg::EntityStatus &, const geometry_msgs::msg::Vector3 &,
-      bool)> & update_entity_status,
+      const traffic_simulator_msgs::msg::EntityStatus &, const geometry_msgs::msg::Vector3 &)> &
+      update_entity_status,
     const std::function<
       double(const geometry_msgs::msg::Point &, const geometry_msgs::msg::Point &)> &
       distance_along_lanelet) const -> std::optional<PredictedEntityStatus>;
@@ -425,8 +425,8 @@ public:
     const double step_acceleration, const double remaining_time, const double remaining_distance,
     const traffic_simulator_msgs::msg::EntityStatus & entity_status,
     const std::function<traffic_simulator_msgs::msg::EntityStatus(
-      const traffic_simulator_msgs::msg::EntityStatus &, const geometry_msgs::msg::Vector3 &,
-      bool)> & update_entity_status,
+      const traffic_simulator_msgs::msg::EntityStatus &, const geometry_msgs::msg::Vector3 &)> &
+      update_entity_status,
     const std::function<
       double(const geometry_msgs::msg::Point &, const geometry_msgs::msg::Point &)> &
       distance_along_lanelet) const -> std::optional<PredictedEntityStatus>;
@@ -439,8 +439,8 @@ public:
     const double remaining_distance,
     const traffic_simulator_msgs::msg::EntityStatus & entity_status,
     const std::function<traffic_simulator_msgs::msg::EntityStatus(
-      const traffic_simulator_msgs::msg::EntityStatus &, const geometry_msgs::msg::Vector3 &,
-      bool)> & update_entity_status,
+      const traffic_simulator_msgs::msg::EntityStatus &, const geometry_msgs::msg::Vector3 &)> &
+      update_entity_status,
     const std::function<
       double(const geometry_msgs::msg::Point &, const geometry_msgs::msg::Point &)> &
       distance_along_lanelet) const -> double;
@@ -453,8 +453,8 @@ public:
     const double remaining_time_source, const double remaining_distance,
     const traffic_simulator_msgs::msg::EntityStatus & entity_status,
     const std::function<traffic_simulator_msgs::msg::EntityStatus(
-      const traffic_simulator_msgs::msg::EntityStatus &, const geometry_msgs::msg::Vector3 &,
-      bool)> & update_entity_status,
+      const traffic_simulator_msgs::msg::EntityStatus &, const geometry_msgs::msg::Vector3 &)> &
+      update_entity_status,
     const std::function<
       double(const geometry_msgs::msg::Point &, const geometry_msgs::msg::Point &)> &
       distance_along_lanelet) const -> double;

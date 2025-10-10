@@ -16,7 +16,6 @@
 #include <concealer/field_operator_application.hpp>
 #include <concealer/launch.hpp>
 #include <functional>
-#include <geometry/quaternion/quaternion_to_euler.hpp>
 #include <memory>
 #include <optional>
 #include <string>
@@ -192,35 +191,6 @@ void EgoEntity::onUpdate(double current_time, double step_time)
       // prefer current lanelet on ss2 side
       setStatus(non_canonicalized_updated_status.value(), status_->getLaneletIds());
     } else {
-      const auto entity_status = static_cast<traffic_simulator::EntityStatus>(*status_);
-      const auto & position = entity_status.pose.position;
-      const auto & orientation = entity_status.pose.orientation;
-      const auto & linear_velocity = entity_status.action_status.twist.linear;
-      const auto & angular_velocity = entity_status.action_status.twist.angular;
-      const auto & linear_acceleration = entity_status.action_status.accel.linear;
-      const auto & angular_acceleration = entity_status.action_status.accel.angular;
-
-      std::cout << std::endl
-                << "===============================" << std::endl
-                << std::endl
-                << std::endl;
-      std::cout << "=== FINISH ===" << std::endl;
-      std::cout << "Enable Autoware Time: " << entity_status.time << std::endl;
-      std::cout << "Enable Autoware Position: x=" << position.x << ", y=" << position.y
-                << ", z=" << position.z << std::endl;
-      std::cout << "Enable Autoware Orientation: x=" << orientation.x << ", y=" << orientation.y
-                << ", z=" << orientation.z << ", w=" << orientation.w
-                << " (yaw=" << math::geometry::convertQuaternionToEulerAngle(orientation).z << ")"
-                << std::endl;
-      std::cout << "Enable Autoware Linear velocity: x=" << linear_velocity.x
-                << ", y=" << linear_velocity.y << ", z=" << linear_velocity.z << std::endl;
-      std::cout << "Enable Autoware Angular velocity: x=" << angular_velocity.x
-                << ", y=" << angular_velocity.y << ", z=" << angular_velocity.z << std::endl;
-      std::cout << "Enable Autoware Linear acceleration: x=" << linear_acceleration.x
-                << ", y=" << linear_acceleration.y << ", z=" << linear_acceleration.z << std::endl;
-      std::cout << "Enable Autoware Angular acceleration: x=" << angular_acceleration.x
-                << ", y=" << angular_acceleration.y << ", z=" << angular_acceleration.z << std::endl
-                << std::endl;
       enableAutowareControl();
       is_controlled_by_simulator_ = false;
     }
