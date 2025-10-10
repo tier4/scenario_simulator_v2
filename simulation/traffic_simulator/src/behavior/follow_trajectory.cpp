@@ -21,6 +21,7 @@
 #include <geometry/vector3/norm.hpp>
 #include <geometry/vector3/normalize.hpp>
 #include <geometry/vector3/operator.hpp>
+#include <geometry/vector3/scalar_to_direction_vector.hpp>
 #include <geometry/vector3/truncate.hpp>
 #include <iostream>
 #include <scenario_simulator_exception/exception.hpp>
@@ -66,6 +67,7 @@ auto makeUpdatedStatus(
   using math::geometry::innerProduct;
   using math::geometry::norm;
   using math::geometry::normalize;
+  using math::geometry::scalarToDirectionVector;
   using math::geometry::truncate;
 
   constexpr bool include_adjacent_lanelet{false};
@@ -149,6 +151,7 @@ auto makeUpdatedStatus(
         not polyline_trajectory.closed) {
       polyline_trajectory.shape.vertices.pop_back();
     }
+
     return makeUpdatedStatus(
       entity_status, polyline_trajectory, behavior_parameter, step_time, matching_distance,
       target_speed);
@@ -167,22 +170,16 @@ auto makeUpdatedStatus(
            std::prev(polyline_trajectory.shape.vertices.end());
   };
 
-  auto update_entity_status = [step_time, include_crosswalk](
-                                const traffic_simulator_msgs::msg::EntityStatus & entity_status,
-                                const geometry_msgs::msg::Vector3 & desired_velocity)
+  const auto update_entity_status =
+    [step_time, include_crosswalk](
+      const traffic_simulator_msgs::msg::EntityStatus & entity_status,
+      const geometry_msgs::msg::Vector3 & desired_velocity)
     -> traffic_simulator_msgs::msg::EntityStatus {
-    const auto current_velocity = [&]() {
-      const auto pitch =
-        -math::geometry::convertQuaternionToEulerAngle(entity_status.pose.orientation).y;
-      const auto yaw =
-        math::geometry::convertQuaternionToEulerAngle(entity_status.pose.orientation).z;
-      return geometry_msgs::build<geometry_msgs::msg::Vector3>()
-        .x(std::cos(pitch) * std::cos(yaw) * entity_status.action_status.twist.linear.x)
-        .y(std::cos(pitch) * std::sin(yaw) * entity_status.action_status.twist.linear.x)
-        .z(std::sin(pitch) * entity_status.action_status.twist.linear.x);
-    }();
-
     auto updated_status = entity_status;
+
+    const auto current_velocity = scalarToDirectionVector(
+      entity_status.action_status.twist.linear.x, entity_status.pose.orientation);
+
     updated_status.pose.position += (current_velocity + desired_velocity) * 0.5 * step_time;
 
     updated_status.pose.orientation = [&]() {
@@ -205,7 +202,7 @@ auto makeUpdatedStatus(
       if (canonicalized_lanelet_pose && estimated_next_canonicalized_lanelet_pose) {
         const auto next_lanelet_id =
           static_cast<LaneletPose>(estimated_next_canonicalized_lanelet_pose.value()).lanelet_id;
-        /// @note Handle lanelet transition
+        /// @note handle lanelet transition
         if (
           const auto updated_position = pose::updatePositionForLaneletTransition(
             canonicalized_lanelet_pose.value(), next_lanelet_id, desired_velocity,
@@ -218,20 +215,92 @@ auto makeUpdatedStatus(
     updated_status.action_status.twist.linear.x = norm(desired_velocity);
     updated_status.action_status.twist.linear.y = 0;
     updated_status.action_status.twist.linear.z = 0;
+
     updated_status.action_status.twist.angular =
       math::geometry::convertQuaternionToEulerAngle(math::geometry::getRotation(
         entity_status.pose.orientation, updated_status.pose.orientation)) /
       step_time;
+
     updated_status.action_status.accel.linear =
       (updated_status.action_status.twist.linear - entity_status.action_status.twist.linear) /
       step_time;
+
     updated_status.action_status.accel.angular =
       (updated_status.action_status.twist.angular - entity_status.action_status.twist.angular) /
       step_time;
+
     updated_status.time = entity_status.time + step_time;
     updated_status.lanelet_pose_valid = false;
-
     return updated_status;
+  };
+
+  const auto is_immobile = [&entity_status]() {
+    return std::abs(entity_status.action_status.twist.linear.x) <
+             FollowWaypointController::local_epsilon &&
+           std::abs(entity_status.action_status.accel.linear.x) <
+             FollowWaypointController::local_epsilon;
+  };
+
+  const auto constrained_brake_velocity = [&behavior_parameter, step_time](
+                                            const double speed, const auto & orientation) {
+    const auto controller = FollowWaypointController(behavior_parameter, step_time, true, 0.0);
+    const auto deceleration = std::max(
+      controller.accelerationWithJerkConstraint(
+        speed, 0.0, behavior_parameter.dynamic_constraints.max_deceleration_rate),
+      -behavior_parameter.dynamic_constraints.max_deceleration);
+    return scalarToDirectionVector(speed + deceleration * step_time, orientation);
+  };
+
+  const auto is_desired_velocity_opposite =
+    [](const auto & desired_velocity, const auto & current_velocity) {
+      /*
+       Check if desired velocity has opposite direction to current velocity.
+       Desired velocity must have non-zero magnitude (norm > epsilon) to have a valid direction.
+       If current_velocity is zero (0,0,0), inner product is 0.0 which is not < 0.0, so returns false.
+       Only when both velocities are non-zero and point in opposite directions, inner product < 0.0.
+    */
+      return norm(desired_velocity) > std::numeric_limits<double>::epsilon() &&
+             innerProduct(desired_velocity, current_velocity) < 0.0;
+    };
+
+  const auto is_waypoint_overshot_and_can_be_discarded =
+    [&is_desired_velocity_opposite, &entity_status](
+      const double distance_to_front_waypoint, const auto & desired_velocity,
+      const double desired_acceleration) -> bool {
+    /*
+       Waypoint can be considered overshot only if within acceptable_overshoot_distance.
+       Waypoint is overshot and should be discarded if:
+       (1) moving backward (speed < 0) or stopped (speed == 0) with negative acceleration (will move backward)
+       (2) desired velocity direction is reversed relative to current velocity (passed the waypoint)
+    */
+    const auto speed = entity_status.action_status.twist.linear.x;
+    const auto current_velocity = scalarToDirectionVector(speed, entity_status.pose.orientation);
+    return distance_to_front_waypoint <= FollowWaypointController::acceptable_overshoot_distance &&
+           ((speed <= 0.0 && desired_acceleration < -std::numeric_limits<double>::epsilon()) ||
+            is_desired_velocity_opposite(desired_velocity, current_velocity));
+  };
+
+  const auto is_waypoint_overshot_and_cannot_be_discarded =
+    [&is_desired_velocity_opposite, &entity_status](
+      const double distance_to_front_waypoint, const auto & desired_velocity,
+      const double desired_acceleration) -> bool {
+    /*
+       Check if waypoint was already overshot beyond acceptable_overshoot_distance.
+       This should NEVER be true - waypoint should have been discarded by is_waypoint_overshot_and_can_be_discarded()
+       or step execution should have been prevented earlier.
+
+       Returns true if:
+       - Waypoint is overshot (desired_velocity is opposite to current_velocity, or moving backward with negative acceleration)
+       - Distance is beyond acceptable tolerance (distance_to_front_waypoint > acceptable_overshoot_distance)
+
+       This indicates inconsistent distance calculations - distance_along_lanelet likely returned
+       different values across simulation steps due to lanelet projection issues.
+    */
+    const auto speed = entity_status.action_status.twist.linear.x;
+    const auto current_velocity = scalarToDirectionVector(speed, entity_status.pose.orientation);
+    return distance_to_front_waypoint > FollowWaypointController::acceptable_overshoot_distance &&
+           ((speed <= 0.0 && desired_acceleration < -std::numeric_limits<double>::epsilon()) ||
+            is_desired_velocity_opposite(desired_velocity, current_velocity));
   };
 
   /*
@@ -241,36 +310,13 @@ auto makeUpdatedStatus(
 
      See https://www.researchgate.net/publication/2495826_Steering_Behaviors_For_Autonomous_Characters
   */
-
-  if (
-    polyline_trajectory.shape.vertices.empty() and
-    std::abs(entity_status.action_status.twist.linear.x) <
-      FollowWaypointController::local_epsilon &&
-    std::abs(entity_status.action_status.accel.linear.x) <
-      FollowWaypointController::local_epsilon) {
+  if (polyline_trajectory.shape.vertices.empty() and is_immobile()) {
     return std::nullopt;
   } else if (polyline_trajectory.shape.vertices.empty()) {
-    const auto follow_waypoint_controller =
-      FollowWaypointController(behavior_parameter, step_time, true, 0.0);
-    const auto desired_acceleration = std::max(
-      follow_waypoint_controller.accelerationWithJerkConstraint(
-        entity_status.action_status.twist.linear.x, 0.0,
-        behavior_parameter.dynamic_constraints.max_deceleration_rate),
-      -behavior_parameter.dynamic_constraints.max_deceleration);
-    const auto desired_speed =
-      entity_status.action_status.twist.linear.x + desired_acceleration * step_time;
-    const auto desired_velocity = [&]() {
-      const auto pitch =
-        -math::geometry::convertQuaternionToEulerAngle(entity_status.pose.orientation).y;
-      const auto yaw =
-        math::geometry::convertQuaternionToEulerAngle(entity_status.pose.orientation).z;
-      return geometry_msgs::build<geometry_msgs::msg::Vector3>()
-        .x(std::cos(pitch) * std::cos(yaw) * desired_speed)
-        .y(std::cos(pitch) * std::sin(yaw) * desired_speed)
-        .z(std::sin(pitch) * desired_speed);
-    }();
-
-    return update_entity_status(entity_status, desired_velocity);
+    /// @note if no waypoints and vehicle is still moving, apply constrained deceleration to bring it to immobile state
+    return update_entity_status(
+      entity_status, constrained_brake_velocity(
+                       entity_status.action_status.twist.linear.x, entity_status.pose.orientation));
   } else if (const auto position = entity_status.pose.position; any(is_infinity_or_nan, position)) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
@@ -517,49 +563,75 @@ auto makeUpdatedStatus(
       std::quoted(entity_status.name),
       "'s desired velocity contains NaN or infinity. The value is [", desired_velocity.x, ", ",
       desired_velocity.y, ", ", desired_velocity.z, "].");
-  } else if (const auto current_velocity =
-               [&]() {
-                 const auto pitch =
-                   -math::geometry::convertQuaternionToEulerAngle(entity_status.pose.orientation).y;
-                 const auto yaw =
-                   math::geometry::convertQuaternionToEulerAngle(entity_status.pose.orientation).z;
-                 return geometry_msgs::build<geometry_msgs::msg::Vector3>()
-                   .x(std::cos(pitch) * std::cos(yaw) * speed)
-                   .y(std::cos(pitch) * std::sin(yaw) * speed)
-                   .z(std::sin(pitch) * speed);
-               }();
-             distance_to_front_waypoint < FollowWaypointController::acceptable_overshoot_distance &&
-             ((speed <= 0.0 && desired_acceleration < -std::numeric_limits<double>::epsilon()) ||
-              (norm(desired_velocity) > std::numeric_limits<double>::epsilon() &&
-               innerProduct(desired_velocity, current_velocity) < 0.0))) {
+  } else if (is_waypoint_overshot_and_can_be_discarded(
+               distance_to_front_waypoint, desired_velocity, desired_acceleration)) {
+    /*
+       Waypoint is overshot (within acceptable_overshoot_distance), desired_velocity now points in opposite direction to current velocity.
+       Following this desired_velocity would cause unexpected 180-degree turn, so discard the waypoint.
+    */
     return discard_the_front_waypoint_and_recurse();
+  } else if (is_waypoint_overshot_and_cannot_be_discarded(
+               distance_to_front_waypoint, desired_velocity, desired_acceleration)) {
+    /*
+       CRITICAL: Waypoint is overshot with distance >= acceptable_overshoot_distance but was not caught earlier.
+       This should never happen - waypoint should have been discarded or exception thrown before reaching here.
+       Indicates inconsistent distance_along_lanelet calculations across simulation steps.
+    */
+    throw common::Error(
+      "CRITICAL: Waypoint overshoot beyond acceptable distance detected for vehicle ",
+      std::quoted(entity_status.name), " at time ", entity_status.time,
+      "s. Distance to waypoint: ", distance_to_front_waypoint,
+      " m (>= acceptable overshoot tolerance: ",
+      FollowWaypointController::acceptable_overshoot_distance,
+      " m). This should never happen - waypoint should have been discarded by "
+      "is_waypoint_overshot_and_can_be_discarded() or exception thrown earlier. "
+      "This indicates a BUG: inconsistent distance_along_lanelet calculations across simulation "
+      "steps. "
+      "Report this to the developer with full scenario details.");
   } else {
     if (std::isnan(remaining_time_to_front_waypoint)) {
-      /// @note If the nearest waypoint is arrived at in this step without a specific arrival time, it will
+      /// @note if the nearest waypoint is arrived at in this step without a specific arrival time, it will
       /// be considered as achieved
+      const auto current_velocity = scalarToDirectionVector(speed, entity_status.pose.orientation);
       const auto this_step_distance = norm(current_velocity + desired_velocity) * 0.5 * step_time;
       if (std::isinf(remaining_time) && polyline_trajectory.shape.vertices.size() == 1) {
-        /// @note If the trajectory has only waypoints with unspecified time, the last one is followed using
-        /// maximum speed including braking - in this case accuracy of arrival is checked
+        /*
+           Last waypoint with unspecified time: check overshoot before executing the step.
+           this_step_distance is predicted travel distance in this step.
+           If predicted overshoot (this_step_distance - distance_to_front_waypoint) > acceptable_overshoot_distance:
+             throw exception NOW to prevent excessive overshoot that cannot be handled
+           If predicted overshoot <= acceptable_overshoot_distance:
+             continue (step will be executed later, overshoot will be acceptable, waypoint will be discarded)
+        */
         if (
           this_step_distance >
           distance_to_front_waypoint + FollowWaypointController::acceptable_overshoot_distance) {
           throw common::Error(
-            "Too much overshoot of the last waypoint detected for vehicle ",
-            std::quoted(entity_status.name),
-            ". Overshoot distance: ", this_step_distance - distance_to_front_waypoint,
+            "Prevented excessive overshoot of the last waypoint for vehicle ",
+            std::quoted(entity_status.name), " at time ", entity_status.time,
+            "s. Executing this step would cause overshoot of ",
+            this_step_distance - distance_to_front_waypoint,
             " m (this step distance: ", this_step_distance,
             " m, remaining distance: ", distance_to_front_waypoint,
-            " m, overshoot tolerance: ", FollowWaypointController::acceptable_overshoot_distance,
-            "). This error indicates a bug in the algorithm - report the details to the "
+            " m), which exceeds acceptable overshoot tolerance of ",
+            FollowWaypointController::acceptable_overshoot_distance,
+            " m. Step execution blocked to prevent unacceptable overshoot. "
+            "This likely indicates that the initial entity state at the start of "
+            "FollowTrajectoryAction "
+            "makes precise stopping at the last waypoint impossible (e.g., too high speed, too "
+            "close distance). "
+            "If the initial conditions appear correct, report the scenario details to the "
             "developer.");
         } else if (follow_waypoint_controller.areConditionsOfArrivalMet(
                      acceleration, speed, distance_to_front_waypoint)) {
           return discard_the_front_waypoint_and_recurse();
         }
       } else {
-        /// @note If it is an intermediate waypoint with an unspecified time, the accuracy of the arrival is
-        /// irrelevant and even a large overshoot is acceptable
+        /*
+           Intermediate waypoint (not last): discard just before overshoot, regardless of overshoot magnitude.
+           Accuracy is less important for intermediate waypoints, so large overshoot is acceptable.
+           If this_step_distance > distance_to_front_waypoint: waypoint will be overshot, discard it now.
+        */
         if (this_step_distance > distance_to_front_waypoint) {
           return discard_the_front_waypoint_and_recurse();
         }

@@ -62,14 +62,11 @@ struct PredictedEntityStatus
   {
   }
 
-  auto moveStraight(
+  template <typename UpdateEntityStatusFunc, typename DistanceAlongLaneletFunc>
+  auto step(
     const double step_acceleration, const double step_time,
-    const std::function<traffic_simulator_msgs::msg::EntityStatus(
-      const traffic_simulator_msgs::msg::EntityStatus &, const geometry_msgs::msg::Vector3 &)> &
-      update_entity_status,
-    const std::function<
-      double(const geometry_msgs::msg::Point &, const geometry_msgs::msg::Point &)> &
-      distance_along_lanelet) -> void
+    const UpdateEntityStatusFunc & update_entity_status,
+    const DistanceAlongLaneletFunc & distance_along_lanelet) -> void
   {
     const auto current_speed = entity_status_.action_status.twist.linear.x;
     const auto current_position = entity_status_.pose.position;
@@ -91,6 +88,8 @@ struct PredictedEntityStatus
       entity_status_ = update_entity_status(entity_status_, desired_velocity);
       traveled_distance += distance_along_lanelet(current_position, entity_status_.pose.position);
     } else {
+      /// @note 1D kinematic update: set speed and acceleration directly,
+      /// integrate distance using trapezoidal method assuming constant acceleration
       entity_status_.action_status.twist.linear.x = desired_speed;
       entity_status_.action_status.accel.linear.x = (desired_speed - current_speed) / step_time;
       traveled_distance += (current_speed + desired_speed) * 0.5 * step_time;
@@ -105,7 +104,7 @@ struct PredictedEntityStatus
   auto getSpeed() const -> double { return entity_status_.action_status.twist.linear.x; }
   auto getAcceleration() const -> double { return entity_status_.action_status.accel.linear.x; }
 
-  auto isImmobile(const double tolerance) const
+  auto isImmobile(const double tolerance) const -> bool
   {
     return std::abs(entity_status_.action_status.twist.linear.x) < tolerance &&
            std::abs(entity_status_.action_status.accel.linear.x) < tolerance;
@@ -141,8 +140,8 @@ class FollowWaypointController
      Accuracy of the remaining distance to the waypoint at the moment
      of arrival with a specified time.
 
-     There is no technical basis for this value; it was determined based on
-     Dawid Moszynski  experiments.
+     There is no technical basis for this value, it was determined based on
+     Dawid Moszynski experiments.
   */
   static constexpr double remaining_distance_tolerance = 1e-2;
 
@@ -235,11 +234,30 @@ class FollowWaypointController
   */
   auto getTimeRequiredForNonAcceleration(const double acceleration) const -> double;
 
-  /*
-     This allows the calculation of acceleration limits that meet the
-     constraints. The limits depend on the current acceleration, the current
-     speed and the limits on the change in acceleration (rate).
-  */
+  /**
+   * @brief Calculate acceleration limits with jerk constraints.
+   *
+   * Computes the valid range [min_acceleration, max_acceleration] that respects:
+   * - Jerk constraints (maximum allowed rate of acceleration change)
+   * - Speed must remain within valid range after applying the acceleration
+   * - Acceleration bounds (max_acceleration, -max_deceleration)
+   *
+   * @param acceleration The current acceleration value [m/s²].
+   * @param speed The current speed value [m/s].
+   * @return std::pair<double, double> [min_acceleration, max_acceleration] valid range [m/s²].
+   *
+   * @note PRECONDITIONS - This method assumes normal operating conditions:
+   * 1. Applying any valid acceleration from the returned range will result in speed >= 0.0
+   *    (vehicle will not move backward after this step)
+   * 2. Applying any valid acceleration from the returned range will result in speed <= target_speed
+   *    (vehicle will not exceed target speed after this step)
+   *
+   * These preconditions must be satisfied before calling this method.
+   * If the vehicle is in an abnormal state where these conditions cannot be met
+   * (e.g., even maximum acceleration would result in negative speed, or even maximum
+   * braking would result in speed > target_speed), then clampAcceleration() must be
+   * called first to handle these edge cases and return corrective acceleration.
+   */
   auto getAccelerationLimits(const double acceleration, const double speed) const
     -> std::pair<double, double>;
 
@@ -271,8 +289,8 @@ public:
      Maximum allowable distance the vehicle may travel past the
      final waypoint.
 
-     There is no technical basis for this value; it was determined based on
-     Dawid Moszynski  experiments.
+     There is no technical basis for this value, it was determined based on
+     Dawid Moszynski experiments.
   */
   static constexpr double acceptable_overshoot_distance = 1e-1;
 
@@ -377,10 +395,10 @@ public:
    *
    * @note
    * - This is a discrete approximation; small errors may occur due to rounding of N.
-   * - The method does not clip the acceleration to physical limits; the caller must
+   * - The method does not clip the acceleration to physical limits, so the caller must
    *   apply additional clamping to ensure the acceleration remains within
    *   max_acceleration and max_deceleration bounds.
-   * - The formula is symmetric for acceleration and deceleration; only the sign of
+   * - The formula is symmetric for acceleration and deceleration - only the sign of
    *   the jerk correction term changes based on the velocity difference direction.
    */
 

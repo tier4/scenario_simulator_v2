@@ -22,9 +22,22 @@ auto FollowWaypointController::clampAcceleration(
   const double candidate_acceleration, const double acceleration, const double speed) const
   -> double
 {
+  /*
+     If even maximum jerk-constrained acceleration would still result in negative speed after this step,
+     the vehicle is in backward motion state. Return maximum braking to return to positive speed.
+  */
   if (speed + (acceleration + max_acceleration_rate * step_time) * step_time < 0.0) {
+    return std::min(
+      accelerationWithJerkConstraint(speed, 0.0, max_acceleration_rate), max_acceleration);
+    /*
+     If even minimum jerk-constrained acceleration (maximum braking) would still result in speed exceeding
+     target_speed after this step, the vehicle is moving too fast. Return maximum braking to reduce speed.
+  */
+  } else if (
+    speed + (acceleration - max_deceleration_rate * step_time) * step_time > target_speed) {
     return std::max(
-      accelerationWithJerkConstraint(speed, 0.0, max_deceleration_rate), -max_deceleration);
+      accelerationWithJerkConstraint(speed, target_speed, max_deceleration_rate),
+      -max_deceleration);
   } else {
     auto [local_min_acceleration, local_max_acceleration] =
       getAccelerationLimits(acceleration, speed);
@@ -115,20 +128,20 @@ auto FollowWaypointController::accelerationWithJerkConstraint(
   const double current_speed, const double target_speed, const double acceleration_rate) const
   -> double
 {
+  const auto delta_speed = target_speed - current_speed;
+
   /// @note use absolute value of acceleration_rate to ensure it is always positive
   const auto jerk_magnitude = std::abs(acceleration_rate);
 
-  /// @note minimal number of discrete steps required to reach target_speed based on the maximum jerk and the time step
-  const auto minimum_discrete_steps = std::max(
-    1.0,
-    std::round(std::sqrt(2 * std::abs(target_speed - current_speed) / jerk_magnitude) / step_time));
+  /// @note minimal number of discrete steps required to reach target_speed based on maximum jerk and time step
+  const auto minimum_discrete_steps =
+    std::max(1.0, std::round(std::sqrt(2 * std::abs(delta_speed) / jerk_magnitude) / step_time));
 
-  /// @note acceleration (without jerk correction) required to reach target_speed assuming constant acceleration over the discrete steps
-  const auto base_acceleration =
-    (target_speed - current_speed) / (minimum_discrete_steps * step_time);
+  /// @note acceleration (without jerk correction) required to reach target_speed assuming constant acceleration
+  const auto base_acceleration = delta_speed / (minimum_discrete_steps * step_time);
 
   /// @note sign of the jerk correction based on whether we are accelerating or decelerating
-  const auto sign = (target_speed >= current_speed) ? 1.0 : -1.0;
+  const auto sign = (delta_speed >= 0.0) ? 1.0 : -1.0;
 
   /// @note correction term due to linear change of acceleration (jerk),
   /// this ensures that after all discrete steps, the final speed matches target_speed
@@ -141,6 +154,7 @@ auto FollowWaypointController::accelerationWithJerkConstraint(
 auto FollowWaypointController::getAccelerationLimits(
   const double acceleration, const double speed) const -> std::pair<double, double>
 {
+  /// @note see header file for detailed preconditions and assumptions
   const auto min_acceleration_zero_speed =
     accelerationWithJerkConstraint(speed, 0.0, max_deceleration_rate);
   const auto max_acceleration_target_speed =
@@ -198,24 +212,21 @@ auto FollowWaypointController::getPredictedStopEntityStatusWithoutConsideringTim
   const -> std::optional<PredictedEntityStatus>
 {
   PredictedEntityStatus predicted_status(entity_status);
-  predicted_status.moveStraight(
-    step_acceleration, step_time, update_entity_status, distance_along_lanelet);
+  predicted_status.step(step_acceleration, step_time, update_entity_status, distance_along_lanelet);
   while (!predicted_status.isImmobile(local_epsilon)) {
     if (predicted_status.traveled_distance > remaining_distance + predicted_distance_tolerance) {
       return std::nullopt;
-    } else if (
-      predicted_status.getSpeed() +
-        (predicted_status.getAcceleration() + max_acceleration_rate * step_time) * step_time <
-      0.0) {
-      const auto min_acceleration_zero_speed = std::max(
-        accelerationWithJerkConstraint(predicted_status.getSpeed(), 0.0, max_deceleration_rate),
-        -max_deceleration);
-      predicted_status.moveStraight(
-        min_acceleration_zero_speed, step_time, update_entity_status, distance_along_lanelet);
+    }
+    const auto acceleration = predicted_status.getAcceleration();
+    const auto speed = predicted_status.getSpeed();
+    /// @note clampAcceleration handles edge cases (negative speed or speed > target_speed) by returning corrective acceleration
+    if (const auto clamped = clampAcceleration(acceleration, acceleration, speed);
+        clamped != acceleration) {
+      predicted_status.step(clamped, step_time, update_entity_status, distance_along_lanelet);
     } else {
       auto [local_min_acceleration, local_max_acceleration] =
-        getAccelerationLimits(predicted_status.getAcceleration(), predicted_status.getSpeed());
-      predicted_status.moveStraight(
+        getAccelerationLimits(acceleration, speed);
+      predicted_status.step(
         local_min_acceleration, step_time, update_entity_status, distance_along_lanelet);
     }
   }
@@ -236,84 +247,81 @@ auto FollowWaypointController::getPredictedWaypointArrivalState(
     while (!predicted_status.isImmobile(local_epsilon)) {
       if (predicted_status.travel_time >= remaining_time) {
         return false;
-      } else if (
-        predicted_status.getSpeed() +
-          (predicted_status.getAcceleration() + max_acceleration_rate * step_time) * step_time <
-        0.0) {
-        const auto min_acceleration_zero_speed = std::max(
-          accelerationWithJerkConstraint(predicted_status.getSpeed(), 0.0, max_deceleration_rate),
-          -max_deceleration);
-        predicted_status.moveStraight(
-          min_acceleration_zero_speed, step_time, update_entity_status, distance_along_lanelet);
+      }
+      const auto acceleration = predicted_status.getAcceleration();
+      const auto speed = predicted_status.getSpeed();
+      /// @note clampAcceleration handles edge cases (negative speed or speed > target_speed) by returning corrective acceleration.
+      if (const auto clamped = clampAcceleration(acceleration, acceleration, speed);
+          clamped != acceleration) {
+        predicted_status.step(clamped, step_time, update_entity_status, distance_along_lanelet);
       } else {
         auto [local_min_acceleration, local_max_acceleration] =
-          getAccelerationLimits(predicted_status.getAcceleration(), predicted_status.getSpeed());
-        predicted_status.moveStraight(
+          getAccelerationLimits(acceleration, speed);
+        predicted_status.step(
           local_min_acceleration, step_time, update_entity_status, distance_along_lanelet);
       }
     }
     return true;
   };
 
-  PredictedEntityStatus predicted_status(entity_status);
+  /// @todo rename state -> predicted_status
+  PredictedEntityStatus state(entity_status);
   if (remaining_time < step_time) {
-    return predicted_status;
+    return state;
   } else {
     // First step with acceleration equal to step_acceleration.
-    predicted_status.moveStraight(
-      clampAcceleration(
-        step_acceleration, predicted_status.getAcceleration(), predicted_status.getSpeed()),
-      step_time, update_entity_status, distance_along_lanelet);
+    state.step(
+      clampAcceleration(step_acceleration, state.getAcceleration(), state.getSpeed()), step_time,
+      update_entity_status, distance_along_lanelet);
 
     if (with_breaking) {
       // Predict the current (before acceleration zeroing) braking time required for stopping.
-      PredictedEntityStatus breaking_predicted_status = predicted_status;
-      if (!brakeUntilImmobility(breaking_predicted_status)) {
+      PredictedEntityStatus breaking_check = state;
+      if (!brakeUntilImmobility(breaking_check)) {
         // If complete immobility is not possible - ignore this candidate.
         return std::nullopt;
-      } else if (std::abs(breaking_predicted_status.travel_time - remaining_time) <= step_time) {
+      } else if (std::abs(breaking_check.travel_time - remaining_time) <= step_time) {
         // If it is breaking time - consider this candidate.
-        return breaking_predicted_status;
+        return breaking_check;
       }
     }
 
     // If it is not braking time, more time left for driving with constant speed.
-    while (std::abs(predicted_status.getAcceleration()) > 0.0) {
-      if (predicted_status.travel_time >= remaining_time) {
+    while (std::abs(state.getAcceleration()) > 0.0) {
+      if (state.travel_time >= remaining_time) {
         throw ControllerError(
           "It is not the braking time, but there is no time to achieve acceleration equal "
           "to 0.0 - the trajectory does not meet the constraint of having an acceleration "
           "equal to 0.0 on arrival at the followed waypoint, speed: ",
-          predicted_status.getSpeed(), ", acceleration: ", predicted_status.getAcceleration(),
+          state.getSpeed(), ", acceleration: ", state.getAcceleration(),
           ", remaining_time: ", remaining_time, ", remaining_distance: ", remaining_distance,
           " step_acceleration: ", step_acceleration, ". ", *this);
       } else {
-        predicted_status.moveStraight(
-          clampAcceleration(0.0, predicted_status.getAcceleration(), predicted_status.getSpeed()),
-          step_time, update_entity_status, distance_along_lanelet);
+        state.step(
+          clampAcceleration(0.0, state.getAcceleration(), state.getSpeed()), step_time,
+          update_entity_status, distance_along_lanelet);
       }
     }
 
-    if (std::abs(predicted_status.getSpeed()) <= local_epsilon) {
+    if (std::abs(state.getSpeed()) <= local_epsilon) {
       // If the previous steps caused the constant speed to be extremely low - ignore this.
       return std::nullopt;
     } else {
-      const double const_speed_value = predicted_status.getSpeed();
+      const double const_speed_value = state.getSpeed();
 
       if (with_breaking) {
         // Predict the current (after acceleration zeroing) braking time required for stopping.
-        if (!brakeUntilImmobility(predicted_status)) {
+        if (!brakeUntilImmobility(state)) {
           // If complete immobility is not possible - ignore this candidate.
           return std::nullopt;
-        } else if (std::abs(predicted_status.travel_time - remaining_time) <= step_time) {
+        } else if (std::abs(state.travel_time - remaining_time) <= step_time) {
           // If it is breaking time - consider this candidate.
-          return predicted_status;
+          return state;
         }
       }
 
       // Count the distance and time of movement with constant speed, use this to prediction.
-      if (const double const_speed_distance =
-            remaining_distance - predicted_status.traveled_distance;
+      if (const double const_speed_distance = remaining_distance - state.traveled_distance;
           const_speed_distance >= std::numeric_limits<double>::max() * const_speed_value) {
         throw ControllerError(
           "Exceeded the range of the variable type <double> (", const_speed_distance, "/",
@@ -327,9 +335,8 @@ auto FollowWaypointController::getPredictedWaypointArrivalState(
           roundTimeToFullStepsWithTolerance(const_speed_time, step_time_tolerance);
         const double rounded_const_speed_distance = rounded_const_speed_time * const_speed_value;
         return PredictedEntityStatus{
-          predicted_status.getEntityStatus(),
-          rounded_const_speed_distance + predicted_status.traveled_distance,
-          rounded_const_speed_time + predicted_status.travel_time};
+          state.getEntityStatus(), rounded_const_speed_distance + state.traveled_distance,
+          rounded_const_speed_time + state.travel_time};
       }
     }
   }
@@ -410,29 +417,34 @@ auto FollowWaypointController::getAcceleration(
 {
   const auto acceleration = entity_status.action_status.accel.linear.x;
   const auto speed = entity_status.action_status.twist.linear.x;
-  if (auto max_acceleration = (acceleration + max_acceleration_rate * step_time);
-      speed + max_acceleration * step_time < 0.0) {
-    return max_acceleration;
-  } else if (auto min_acceleration = (acceleration - max_deceleration_rate * step_time);
-             speed + min_acceleration * step_time > target_speed) {
-    return min_acceleration;
+
+  /*
+     Check if vehicle is in abnormal state (negative speed or speed exceeding target_speed).
+     clampAcceleration handles two edge cases:
+     (1) Negative speed: vehicle moving backward, apply maximum braking to return to positive speed
+     (2) Speed > target_speed: vehicle too fast, apply maximum braking to reduce speed
+     If either condition is detected, immediately return the corrective acceleration.
+     This prevents the algorithm from attempting normal waypoint-tracking calculations in unsupported states.
+  */
+  if (const auto clamp_acceleration = clampAcceleration(acceleration, acceleration, speed);
+      clamp_acceleration != acceleration) {
+    return clamp_acceleration;
   }
 
   const auto [local_min_acceleration, local_max_acceleration] =
     getAccelerationLimits(acceleration, speed);
 
-  if (const auto future_distance = (speed + local_min_acceleration * step_time * 0.5) * step_time;
-      future_distance > remaining_distance) {
+  if ((speed + local_min_acceleration * step_time * 0.5) * step_time > remaining_distance) {
     /*
        If in the current conditions, the waypoint will be reached in this step
        even with the lowest possible acceleration set, this prevents cases in
-       which the entity is extremely close to waypoint and nothing
-       more can be done.
+       which the controller is started extremely close to waypoint and nothing
+       can be done.
     */
     return local_min_acceleration;
   } else if (std::abs(local_min_acceleration - local_max_acceleration) < local_epsilon) {
     /*
-       If there is no choice of acceleration - return this value.
+       If the range is so tight that there is no choice.
     */
     return local_min_acceleration;
   } else if (std::isinf(remaining_time_source)) {
