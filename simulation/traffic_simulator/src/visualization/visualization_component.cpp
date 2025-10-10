@@ -66,8 +66,8 @@ VisualizationComponent::VisualizationComponent(const rclcpp::NodeOptions & optio
       std::bind(&VisualizationComponent::entityStatusCallback, this, std::placeholders::_1));
   use_trajectory_based_front_entity_detection_ =
     common::getParameter<bool>("use_trajectory_based_front_entity_detection", false);
-  trajectory_based_detection_width_ =
-    common::getParameter<double>("trajectory_based_detection_width", -1.0);
+  trajectory_based_detection_offset_ =
+    common::getParameter<double>("trajectory_based_detection_offset", 0.0);
 }
 
 void VisualizationComponent::entityStatusCallback(
@@ -414,11 +414,9 @@ const visualization_msgs::msg::MarkerArray VisualizationComponent::generateMarke
     waypoints_marker.type = visualization_msgs::msg::Marker::TRIANGLE_LIST;
     size_t num_points = 50;
     if (use_trajectory_based_front_entity_detection_) {
-      trajectory_based_detection_width_ = (trajectory_based_detection_width_ < 0.0)
-                                            ? status.bounding_box.dimensions.y
-                                            : trajectory_based_detection_width_;
-      waypoints_marker.points = spline.getPolygon(trajectory_based_detection_width_, num_points);
-
+      waypoints_marker.points = spline.getPolygon(
+        std::max(0.0, status.bounding_box.dimensions.y + trajectory_based_detection_offset_),
+        num_points);
     } else {
       waypoints_marker.points = spline.getPolygon(status.bounding_box.dimensions.y, num_points);
     }

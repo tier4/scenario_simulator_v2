@@ -457,7 +457,8 @@ auto ActionNode::getFrontEntityNameAndDistanceByTrajectory(
     return std::nullopt;
   }
   const math::geometry::CatmullRomSpline spline(waypoints);
-  const auto quadrilateral_data = buildQuadrilateralData(spline, width, num_segments);
+  const auto quadrilateral_data =
+    buildQuadrilateralData(spline, std::max(0.0, width), num_segments);
   if (
     const auto collision = detectEntityCollisions(
       quadrilateral_data, other_entity_status_, canonicalized_entity_status_->getName())) {

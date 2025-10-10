@@ -33,11 +33,8 @@ FollowLaneAction::FollowLaneAction(const std::string & name, const BT::NodeConfi
 {
   use_trajectory_based_front_entity_detection_ =
     common::getParameter<bool>("use_trajectory_based_front_entity_detection", false);
-  trajectory_based_detection_width_ =
-    common::getParameter<double>("trajectory_based_detection_width", -1.0);
-  trajectory_based_detection_width_ = (trajectory_based_detection_width_ < 0.0)
-                                        ? vehicle_parameters.bounding_box.dimensions.y
-                                        : trajectory_based_detection_width_;
+  trajectory_based_detection_offset_ =
+    common::getParameter<double>("trajectory_based_detection_offset", 0.0);
 }
 
 const std::optional<traffic_simulator_msgs::msg::Obstacle> FollowLaneAction::calculateObstacle(
@@ -111,7 +108,9 @@ BT::NodeStatus FollowLaneAction::doAction()
       constexpr std::size_t trajectory_segments = 50;
       if (
         const auto front_entity_info = getFrontEntityNameAndDistanceByTrajectory(
-          waypoints.waypoints, trajectory_based_detection_width_, trajectory_segments)) {
+          waypoints.waypoints,
+          vehicle_parameters.bounding_box.dimensions.y + trajectory_based_detection_offset_,
+          trajectory_segments)) {
         distance_to_front_entity = front_entity_info->second;
       }
     } else {
