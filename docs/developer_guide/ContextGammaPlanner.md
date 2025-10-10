@@ -20,7 +20,7 @@ ros2 launch cpp_mock_scenarios mock_test.launch.py \
 
 ## How to Customize a Scenario
 
-To enable the Context Gamma Planner, simply pass `traffic_simulator::PedestrianBehavior::contextGamma()` as the **4th argument** to the NPC creation function `api_.spawn()`.
+To enable the Context Gamma Planner in a C++ scenario, simply pass `traffic_simulator::PedestrianBehavior::contextGamma()` as the **4th argument** to the NPC creation function `api_.spawn()`. Support for OpenSCENARIO scenarios is described below.
 
 Example from the `parked_at_crosswalk` scenario:
 
@@ -43,6 +43,29 @@ api_.spawn(
   traffic_simulator::helper::constructCanonicalizedLaneletPose(34378, 0.0, 0.0),
   getPedestrianParameters()
 );
+```
+
+## Using Context Gamma Planner with OpenSCENARIO
+
+When authoring an OpenSCENARIO scenario, assign the `context_gamma_planner/PedestrianPlugin` controller to the pedestrian entity so it uses the Context Gamma Planner:
+
+```yaml
+      - name: npc
+        Pedestrian:
+          name: ''
+          mass: 60
+          model: ""
+          pedestrianCategory: pedestrian
+          BoundingBox:
+            Center: { x: 0, y: 0, z: 1 }
+            Dimensions: { width: 0.8, length: 0.8, height: 2 }
+          Properties:
+            Property: []
+        ObjectController:
+          Controller:
+            name: 'context_gamma_planner/PedestrianPlugin'
+            Properties:
+              Property: []
 ```
 
 ## Known Limitations
