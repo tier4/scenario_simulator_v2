@@ -24,14 +24,16 @@ auto FollowWaypointController::clampAcceleration(
 {
   /*
      If even maximum jerk-constrained acceleration would still result in negative speed after this step,
-     the vehicle is in backward motion state. Return maximum braking to return to positive speed.
+     the vehicle is in backward motion state. Return acceleration that reaches speed = 0.0 with acc = 0.0,
+     constrained by max_acceleration.
   */
   if (speed + (acceleration + max_acceleration_rate * step_time) * step_time < 0.0) {
     return std::min(
       accelerationWithJerkConstraint(speed, 0.0, max_acceleration_rate), max_acceleration);
     /*
      If even minimum jerk-constrained acceleration (maximum braking) would still result in speed exceeding
-     target_speed after this step, the vehicle is moving too fast. Return maximum braking to reduce speed.
+     target_speed after this step, the vehicle is moving too fast. Return acceleration that reaches
+     target_speed with acc = 0.0, constrained by max_deceleration.
   */
   } else if (
     speed + (acceleration - max_deceleration_rate * step_time) * step_time > target_speed) {
@@ -419,16 +421,16 @@ auto FollowWaypointController::getAcceleration(
   const auto speed = entity_status.action_status.twist.linear.x;
 
   /*
-     Check if vehicle is in abnormal state (negative speed or speed exceeding target_speed).
-     clampAcceleration handles two edge cases:
-     (1) Negative speed: vehicle moving backward, apply maximum braking to return to positive speed
-     (2) Speed > target_speed: vehicle too fast, apply maximum braking to reduce speed
-     If either condition is detected, immediately return the corrective acceleration.
-     This prevents the algorithm from attempting normal waypoint-tracking calculations in unsupported states.
+     Handle edge cases where vehicle is in abnormal state:
+     (1) Negative speed: apply maximum acceleration to return to positive speed
+     (2) Speed exceeding target_speed: apply maximum deceleration to reduce speed
   */
-  if (const auto clamp_acceleration = clampAcceleration(acceleration, acceleration, speed);
-      clamp_acceleration != acceleration) {
-    return clamp_acceleration;
+  if (const auto max_acceleration = (acceleration + max_acceleration_rate * step_time);
+      speed + max_acceleration * step_time < 0.0) {
+    return max_acceleration;
+  } else if (const auto min_acceleration = (acceleration - max_deceleration_rate * step_time);
+             speed + min_acceleration * step_time > target_speed) {
+    return min_acceleration;
   }
 
   const auto [local_min_acceleration, local_max_acceleration] =
