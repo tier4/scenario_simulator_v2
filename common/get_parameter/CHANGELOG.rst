@@ -5,6 +5,13 @@ Changelog for package get_parameter
 16.4.2 (2025-05-23)
 -------------------
 
+17.8.0 (2025-10-10)
+-------------------
+* Merge branch 'master' into RJD-1930/see_around
+* Merge branch 'master' into RJD-1930/see_around
+* Merge branch 'master' into RJD-1930/see_around
+* Contributors: Grzegorz Maj, Taiga
+
 17.7.2 (2025-10-08)
 -------------------
 
