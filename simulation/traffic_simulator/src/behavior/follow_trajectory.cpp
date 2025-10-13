@@ -281,7 +281,7 @@ auto makeUpdatedStatus(
   };
 
   const auto is_waypoint_overshot_and_cannot_be_discarded =
-    [&is_desired_velocity_opposite, &entity_status](
+    [step_time, &is_desired_velocity_opposite, &entity_status, &behavior_parameter](
       const double distance_to_front_waypoint, const auto & desired_velocity,
       const double desired_acceleration) -> bool {
     /*
@@ -291,14 +291,19 @@ auto makeUpdatedStatus(
 
        Returns true if:
        - Waypoint is overshot (desired_velocity is opposite to current_velocity, or moving backward with negative acceleration)
-       - Distance is beyond acceptable tolerance (distance_to_front_waypoint > acceptable_overshoot_distance)
+       - Distance is beyond acceptable tolerance but within reasonable range for overshoot detection
 
-       This indicates inconsistent distance calculations - distance_along_lanelet likely returned
-       different values across simulation steps due to lanelet projection issues.
+       Note: Upper bound prevents false positives when waypoints are not strictly on lanelet path
+       and next waypoint requires turning back (appears "behind" vehicle) but is far enough
+       to not be considered overshot.
     */
     const auto speed = entity_status.action_status.twist.linear.x;
     const auto current_velocity = scalarToDirectionVector(speed, entity_status.pose.orientation);
+    const auto max_distance_for_overshoot_detection =
+      behavior_parameter.dynamic_constraints.max_speed * step_time +
+      0.5 * behavior_parameter.dynamic_constraints.max_acceleration * step_time * step_time;
     return distance_to_front_waypoint > FollowWaypointController::acceptable_overshoot_distance &&
+           distance_to_front_waypoint < max_distance_for_overshoot_detection &&
            ((speed <= 0.0 && desired_acceleration < -std::numeric_limits<double>::epsilon()) ||
             is_desired_velocity_opposite(desired_velocity, current_velocity));
   };
