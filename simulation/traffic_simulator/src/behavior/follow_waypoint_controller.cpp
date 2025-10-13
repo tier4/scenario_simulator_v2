@@ -245,7 +245,8 @@ auto FollowWaypointController::getPredictedWaypointArrivalState(
     const geometry_msgs::msg::Point &, const geometry_msgs::msg::Point &)> & distance_along_lanelet)
   const -> std::optional<PredictedEntityStatus>
 {
-  const auto brakeUntilImmobility = [&](PredictedEntityStatus & predicted_status) -> auto {
+  const auto brakeUntilImmobility = [&](PredictedEntityStatus & predicted_status) -> auto
+  {
     while (!predicted_status.isImmobile(local_epsilon)) {
       if (predicted_status.travel_time >= remaining_time) {
         return false;
