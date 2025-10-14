@@ -46,6 +46,8 @@ public:
 private:
   const VehicleModelType vehicle_model_type_;
 
+  const double wheel_base_;
+
   const std::shared_ptr<SimModelInterface> vehicle_model_ptr_;
 
   std::optional<double> previous_linear_velocity_, previous_angular_velocity_;
@@ -75,7 +77,7 @@ public:
   auto calculateAccelerationBySlope() const -> double;
 
 private:
-  auto getCurrentPose(const double pitch_angle) const -> geometry_msgs::msg::Pose;
+  auto getCurrentPose(const double pitch_angle = 0.0) const -> geometry_msgs::msg::Pose;
 
   auto getCurrentTwist() const -> geometry_msgs::msg::Twist;
 
