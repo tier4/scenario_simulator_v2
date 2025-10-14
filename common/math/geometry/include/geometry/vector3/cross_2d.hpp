@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef GEOMETRY__VECTOR3__NORM_HPP_
-#define GEOMETRY__VECTOR3__NORM_HPP_
+#ifndef GEOMETRY__CROSS_2D__HYPOT_HPP_
+#define GEOMETRY__CROSS_2D__HYPOT_HPP_
 
 #include <cmath>
 #include <geometry/vector3/is_like_vector3.hpp>
@@ -22,12 +22,15 @@ namespace math
 {
 namespace geometry
 {
-template <typename T, std::enable_if_t<IsLikeVector3<T>::value, std::nullptr_t> = nullptr>
-auto norm(const T & v)
+template <
+  typename T, typename U,
+  std::enable_if_t<std::conjunction_v<IsLikeVector3<T>, IsLikeVector3<U>>, std::nullptr_t> =
+    nullptr>
+auto cross2d(const T & a, const U & b)
 {
-  return std::hypot(v.x, v.y, v.z);
+  return a.x * b.y - a.y * b.x;
 }
 }  // namespace geometry
 }  // namespace math
 
-#endif  // GEOMETRY__VECTOR3__NORM_HPP_
+#endif  // CONTEXT_GAMMA_PLANNER__UTILS_MATH_UTILS_HPP_

@@ -12,22 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef GEOMETRY__VECTOR3__NORM_HPP_
-#define GEOMETRY__VECTOR3__NORM_HPP_
+#ifndef CONTEXT_GAMMA_PLANNER__TRANSITION_EVENTS__TRANSITION_EVENTS_HPP_
+#define CONTEXT_GAMMA_PLANNER__TRANSITION_EVENTS__TRANSITION_EVENTS_HPP_
 
-#include <cmath>
-#include <geometry/vector3/is_like_vector3.hpp>
+#include "context_gamma_planner/transition_events/logging_event.hpp"
+#include "context_gamma_planner/transition_events/reset_request_event.hpp"
 
-namespace math
-{
-namespace geometry
-{
-template <typename T, std::enable_if_t<IsLikeVector3<T>::value, std::nullptr_t> = nullptr>
-auto norm(const T & v)
-{
-  return std::hypot(v.x, v.y, v.z);
-}
-}  // namespace geometry
-}  // namespace math
-
-#endif  // GEOMETRY__VECTOR3__NORM_HPP_
+#endif  // CONTEXT_GAMMA_PLANNER__TRANSITION_EVENTS__TRANSITION_EVENTS_HPP_

@@ -12,22 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef GEOMETRY__VECTOR3__NORM_HPP_
-#define GEOMETRY__VECTOR3__NORM_HPP_
+#include "context_gamma_planner/planner/pedestrian/follow_polyline_trajectory_planner.hpp"
 
-#include <cmath>
-#include <geometry/vector3/is_like_vector3.hpp>
+namespace context_gamma_planner::pedestrian
+{
 
-namespace math
+FollowPolylineTrajectoryPlanner::FollowPolylineTrajectoryPlanner(const double goal_threshold)
+: FollowPolylineTrajectoryPlannerBase(goal_threshold)
 {
-namespace geometry
-{
-template <typename T, std::enable_if_t<IsLikeVector3<T>::value, std::nullptr_t> = nullptr>
-auto norm(const T & v)
-{
-  return std::hypot(v.x, v.y, v.z);
 }
-}  // namespace geometry
-}  // namespace math
 
-#endif  // GEOMETRY__VECTOR3__NORM_HPP_
+}  // namespace context_gamma_planner::pedestrian

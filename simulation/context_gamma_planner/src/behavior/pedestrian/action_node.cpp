@@ -12,22 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef GEOMETRY__VECTOR3__NORM_HPP_
-#define GEOMETRY__VECTOR3__NORM_HPP_
+#include "context_gamma_planner/behavior/pedestrian/action_node.hpp"
 
-#include <cmath>
-#include <geometry/vector3/is_like_vector3.hpp>
+namespace context_gamma_planner::pedestrian
+{
 
-namespace math
+ActionNode::ActionNode(const std::string & name, const BT::NodeConfiguration & config)
+: ActionNodeBase(name, config)
 {
-namespace geometry
-{
-template <typename T, std::enable_if_t<IsLikeVector3<T>::value, std::nullptr_t> = nullptr>
-auto norm(const T & v)
-{
-  return std::hypot(v.x, v.y, v.z);
 }
-}  // namespace geometry
-}  // namespace math
 
-#endif  // GEOMETRY__VECTOR3__NORM_HPP_
+void ActionNode::getBlackBoardValues()
+{
+  ActionNodeBase::getBlackBoardValues();
+  if (!getInput<traffic_simulator_msgs::msg::PedestrianParameters>(
+        "pedestrian_parameters", pedestrian_parameters)) {
+    THROW_SIMULATION_ERROR("failed to get input pedestrian_parameters in pedestrian::ActionNode");
+  }
+}
+}  // namespace context_gamma_planner::pedestrian
