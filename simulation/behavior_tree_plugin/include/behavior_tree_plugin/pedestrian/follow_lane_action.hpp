@@ -46,9 +46,14 @@ public:
   {
     return entity_behavior::PedestrianActionNode::providedPorts();
   }
-  bool detectObstacleInLane(const lanelet::Ids pedestrian_lanes, const bool see_around) const;
+  bool detectObstacleInLane(
+    const lanelet::Ids pedestrian_lanes, const bool see_around,
+    const std::vector<geometry_msgs::msg::Point> & waypoints) const;
   traffic_simulator_msgs::msg::WaypointsArray calculateWaypoints(
     const lanelet::Ids & following_lanelets) const;
+
+private:
+  bool use_trajectory_based_front_entity_detection_;
 };
 }  // namespace pedestrian
 }  // namespace entity_behavior

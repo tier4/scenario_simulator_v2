@@ -30,12 +30,15 @@ namespace pedestrian
 FollowLaneAction::FollowLaneAction(const std::string & name, const BT::NodeConfiguration & config)
 : entity_behavior::PedestrianActionNode(name, config)
 {
+  use_trajectory_based_front_entity_detection_ =
+    common::getParameter<bool>("use_trajectory_based_front_entity_detection", false);
 }
 
 void FollowLaneAction::getBlackBoardValues() { PedestrianActionNode::getBlackBoardValues(); }
 
 bool FollowLaneAction::detectObstacleInLane(
-  const lanelet::Ids pedestrian_lanes, const bool see_around) const
+  const lanelet::Ids pedestrian_lanes, const bool see_around,
+  const std::vector<geometry_msgs::msg::Point> & waypoints) const
 {
   if (should_respect_see_around == SeeAroundMode::blind) {
     return false;
@@ -89,10 +92,21 @@ bool FollowLaneAction::detectObstacleInLane(
     return false;
   };
 
-  if (hasObstacleInPedestrianLanes(pedestrian_lanes, 10) && hasObstacleInFrontOfPedestrian()) {
-    return true;
+  if (use_trajectory_based_front_entity_detection_) {
+    constexpr std::size_t trajectory_segments = 50;
+    if (
+      const auto front_entity_info = getFrontEntityNameAndDistanceByTrajectory(
+        waypoints, pedestrian_parameters.bounding_box.dimensions.y, trajectory_segments)) {
+      return true;
+    } else {
+      return false;
+    }
   } else {
-    return false;
+    if (hasObstacleInPedestrianLanes(pedestrian_lanes, 10) && hasObstacleInFrontOfPedestrian()) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }
 
@@ -142,6 +156,7 @@ traffic_simulator_msgs::msg::WaypointsArray FollowLaneAction::calculateWaypoints
 
   return waypoints;
 }
+
 bool FollowLaneAction::checkPreconditions()
 {
   if (
@@ -166,13 +181,12 @@ BT::NodeStatus FollowLaneAction::doAction()
   if (!target_speed_) {
     target_speed_ = hdmap_utils_->getSpeedLimit(following_lanelets);
   }
-
+  const auto waypoints = calculateWaypoints(following_lanelets);
   const auto obstacle_detector_result =
-    detectObstacleInLane(following_lanelets, behavior_parameter_.see_around);
+    detectObstacleInLane(following_lanelets, behavior_parameter_.see_around, waypoints.waypoints);
   target_speed_ = obstacle_detector_result ? 0.0 : target_speed_;
 
   setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(target_speed_.value()));
-  const auto waypoints = calculateWaypoints(following_lanelets);
   setOutput("waypoints", waypoints);
   setOutput("obstacle", std::optional<traffic_simulator_msgs::msg::Obstacle>());
   return BT::NodeStatus::RUNNING;
