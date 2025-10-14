@@ -229,6 +229,10 @@ jobs:
           message: "This PR has failed the SonarQube scan. Please check the details in the SonarQube dashboard."
           message-id: "sonarcloud-scan-failure"
 
+      - name: Store Pull Request number to artifact
+        if: github.event_name == 'pull_request'
+        run: echo "PR_NUMBER=${{ github.event.number }}" > install/pr_number.txt
+
       - name: Upload install directory
         uses: actions/upload-artifact@v4
         if: (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && matrix.cmake_build_type == 'RelWithDebInfo'

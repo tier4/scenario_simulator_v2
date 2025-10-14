@@ -100,13 +100,45 @@ jobs:
       - name: Call ABIDIFF
         if: steps.previous_run.outputs.result != 'null' && (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
         continue-on-error: true
+        id: abidiff
         run: |
           abidiff --fail-no-debug-info --drop-private-types \
           --header-file1 previous/traffic_simulator/include/traffic_simulator/api/api.hpp \
           --header-file2 current/traffic_simulator/include/traffic_simulator/api/api.hpp \
           --keep "traffic_simulator::API.*" \
           previous/traffic_simulator/lib/libtraffic_simulator.so \
-          current/traffic_simulator/lib/libtraffic_simulator.so
+          current/traffic_simulator/lib/libtraffic_simulator.so | tee abidiff.log
+          echo "exit_code=$?" >> $GITHUB_OUTPUT
+
+          abidiff_log=$(cat abidiff.log)
+          echo "abidiff_log<<EOF" >> $GITHUB_OUTPUT
+          echo "$abidiff_log" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Get PR number
+        if: github.event_name == 'workflow_run'
+        id: get-pr-number
+        run: |
+          PR_NUMBER=$(cat current/pr_number.txt | sed 's/PR_NUMBER=//')
+          echo "number=$PR_NUMBER" >> $GITHUB_OUTPUT
+
+      - name: Upload abidiff log
+        if: steps.abidiff.outputs.exit_code != '0'
+        uses: mshick/add-pr-comment@v2
+        with:
+          message: |
+            ## :warning: API compatibility check failed :warning:
+            The public API of `traffic_simulator::API` has changed. Please check the [abidiff log](#) for details.
+
+            <details>
+            <summary>Click to expand abidiff log</summary>
+
+            ```
+            ${{ steps.abidiff.outputs.abidiff_log }}
+            ```
+            </details>
+          message-id: "abidiff-log"
+          issue: ${{ steps.get-pr-number.outputs.number }}
 
       # - name: Call RefactoringMinerPP
       #   continue-on-error: true
