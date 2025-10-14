@@ -24,6 +24,20 @@ Changelog for package traffic_simulator
 16.4.2 (2025-05-23)
 -------------------
 
+17.9.0 (2025-10-14)
+-------------------
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Remove unuse code
+* Add reactive agent plugin implementation and configuration files
+* Contributors: Taiga, Taiga Takano
+
 17.8.0 (2025-10-10)
 -------------------
 * Merge branch 'master' into RJD-1930/see_around
