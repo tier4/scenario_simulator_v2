@@ -146,3 +146,18 @@ jobs:
       #     cap previous/traffic_simulator/include/traffic_simulator/api/api.hpp previous.json
       #     cap current/traffic_simulator/include/traffic_simulator/api/api.hpp current.json
       #     RefactoringMiner -cpp previous.json current.json
+
+      # - name: Add "interface breaking" label
+      #   if: steps.abidiff.outputs.exit_code != '0' && github.event_name == 'workflow_run'
+      #   uses: actions/github-script@v6
+      #   with:
+      #     script: |
+      #       const prNumber = ${{ steps.get-pr-number.outputs.number }};
+      #       if (prNumber) {
+      #         await github.rest.issues.addLabels({
+      #           issue_number: prNumber,
+      #           owner: context.repo.owner,
+      #           repo: context.repo.repo,
+      #           labels: ['interface breaking']
+      #         });
+      #       }
