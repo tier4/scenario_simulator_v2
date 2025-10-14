@@ -1,6 +1,19 @@
 name: Check API compatibility
 on:
   workflow_dispatch:
+    inputs:
+      run_id:
+        description: "Run ID of the workflow to compare against (optional)"
+        required: false
+        default: ""
+      base_run_id:
+        description: "Base Run ID of the workflow to compare against (optional)"
+        required: false
+        default: ""
+      base_branch:
+        description: "Base branch to compare against (default: master)"
+        required: false
+        default: "master"
   workflow_run:
     workflows: ["BuildAndRun"]
     types:
@@ -45,11 +58,18 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
+            const runIdInput = context.payload.inputs?.base_run_id || '';
+            if (runIdInput) {
+              return runIdInput;
+            }
+
+            // Find the most recent successful scheduled run on the specified base branch
+            const baseBranch = context.payload.inputs?.base_branch || 'master';
             const runs = await github.rest.actions.listWorkflowRuns({
               owner: context.repo.owner,
               repo: context.repo.repo,
               workflow_id: 'BuildAndRun.yaml',
-              branch: 'master',
+              branch: baseBranch,
               event: 'schedule',
               status: 'success',
             });
@@ -71,10 +91,9 @@ jobs:
 
       - name: Download current install artifact
         uses: actions/download-artifact@v5
-        if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success'
         with:
           name: install-${{ matrix.runs_on }}-RelWithDebInfo
-          run-id: ${{ github.event.workflow_run.id }}
+          run-id: ${{ github.event.workflow_run.id || github.event.inputs.run_id }}
           path: current
           github-token: ${{ secrets.GH_PAT }}
 
