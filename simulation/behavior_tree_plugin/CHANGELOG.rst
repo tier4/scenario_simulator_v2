@@ -24,6 +24,18 @@ Changelog for package behavior_tree_plugin
 16.4.2 (2025-05-23)
 -------------------
 
+17.9.0 (2025-10-14)
+-------------------
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Contributors: Taiga
+
 17.8.0 (2025-10-10)
 -------------------
 * Merge pull request `#1690 <https://github.com/tier4/scenario_simulator_v2/issues/1690>`_ from tier4/RJD-1930/see_around
