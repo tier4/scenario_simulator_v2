@@ -14,9 +14,13 @@
 
 #include <algorithm>
 #include <behavior_tree_plugin/pedestrian/follow_lane_action.hpp>
+#include <cmath>
+#include <geometry/spline/catmull_rom_spline.hpp>
 #include <iostream>
 #include <memory>
+#include <optional>
 #include <string>
+#include <traffic_simulator_msgs/msg/obstacle.hpp>
 #include <vector>
 
 namespace entity_behavior
@@ -91,6 +95,53 @@ bool FollowLaneAction::detectObstacleInLane(
     return false;
   }
 }
+
+traffic_simulator_msgs::msg::WaypointsArray FollowLaneAction::calculateWaypoints(
+  const lanelet::Ids & following_lanelets) const
+{
+  traffic_simulator_msgs::msg::WaypointsArray waypoints;
+  if (!canonicalized_entity_status_->isInLanelet()) {
+    return waypoints;
+  }
+  if (following_lanelets.empty()) {
+    waypoints.waypoints.push_back(canonicalized_entity_status_->getMapPose().position);
+    return waypoints;
+  }
+
+  const auto center_points = hdmap_utils_->getCenterPoints(following_lanelets);
+  if (center_points.size() < 2) {
+    waypoints.waypoints.push_back(canonicalized_entity_status_->getMapPose().position);
+    return waypoints;
+  }
+
+  math::geometry::CatmullRomSpline spline(center_points);
+  const auto lanelet_pose = canonicalized_entity_status_->getLaneletPose();
+  const double start_s = std::clamp(lanelet_pose.s, 0.0, spline.getLength());
+  const double end_s = std::min(start_s + getHorizon(), spline.getLength());
+  constexpr double interval = 1.0;
+
+  auto append_if_different = [&waypoints](const geometry_msgs::msg::Point & point) -> void {
+    if (waypoints.waypoints.empty()) {
+      waypoints.waypoints.push_back(point);
+      return;
+    }
+    const auto & last = waypoints.waypoints.back();
+    constexpr double epsilon = 1.0e-3;
+    if (
+      std::hypot(last.x - point.x, last.y - point.y) > epsilon ||
+      std::fabs(last.z - point.z) > epsilon) {
+      waypoints.waypoints.push_back(point);
+    }
+  };
+
+  append_if_different(canonicalized_entity_status_->getMapPose().position);
+  for (double s = start_s; s < end_s; s += interval) {
+    append_if_different(spline.getPoint(s));
+  }
+  append_if_different(spline.getPoint(end_s));
+
+  return waypoints;
+}
 bool FollowLaneAction::checkPreconditions()
 {
   if (
@@ -106,10 +157,12 @@ BT::NodeStatus FollowLaneAction::doAction()
 {
   if (!canonicalized_entity_status_->isInLanelet()) {
     stopEntity();
+    setOutput("waypoints", traffic_simulator_msgs::msg::WaypointsArray());
+    setOutput("obstacle", std::optional<traffic_simulator_msgs::msg::Obstacle>());
     return BT::NodeStatus::RUNNING;
   }
-  auto following_lanelets =
-    hdmap_utils_->getFollowingLanelets(canonicalized_entity_status_->getLaneletId());
+  auto following_lanelets = hdmap_utils_->getFollowingLanelets(
+    canonicalized_entity_status_->getLaneletId(), getHorizon(), true);
   if (!target_speed_) {
     target_speed_ = hdmap_utils_->getSpeedLimit(following_lanelets);
   }
@@ -119,6 +172,9 @@ BT::NodeStatus FollowLaneAction::doAction()
   target_speed_ = obstacle_detector_result ? 0.0 : target_speed_;
 
   setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(target_speed_.value()));
+  const auto waypoints = calculateWaypoints(following_lanelets);
+  setOutput("waypoints", waypoints);
+  setOutput("obstacle", std::optional<traffic_simulator_msgs::msg::Obstacle>());
   return BT::NodeStatus::RUNNING;
 }
 }  // namespace pedestrian

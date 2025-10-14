@@ -27,6 +27,7 @@
 #include <string>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
+#include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 #include <vector>
 
 namespace entity_behavior
@@ -46,6 +47,8 @@ public:
     return entity_behavior::PedestrianActionNode::providedPorts();
   }
   bool detectObstacleInLane(const lanelet::Ids pedestrian_lanes, const bool see_around) const;
+  traffic_simulator_msgs::msg::WaypointsArray calculateWaypoints(
+    const lanelet::Ids & following_lanelets) const;
 };
 }  // namespace pedestrian
 }  // namespace entity_behavior
