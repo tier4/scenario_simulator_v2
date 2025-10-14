@@ -24,6 +24,16 @@ Changelog for package simple_sensor_simulator
 16.4.2 (2025-05-23)
 -------------------
 
+17.9.1 (2025-10-14)
+-------------------
+* Merge pull request `#1693 <https://github.com/tier4/scenario_simulator_v2/issues/1693>`_ from tier4/fix/RJD-1921-fix-steering-when-autoware-is-overwritten
+* Merge branch 'master' into fix/RJD-1921-fix-steering-when-autoware-is-overwritten
+* Merge branch 'master' into fix/RJD-1921-fix-steering-when-autoware-is-overwritten
+* Merge branch 'master' into fix/RJD-1921-fix-steering-when-autoware-is-overwritten
+* style(simple_sensor_simulator): apply clang reformat
+* fix(simple_sensor_simulator):  ensure steering is overwritten in the overwrite method
+* Contributors: Dawid Moszynski, Dawid Moszyński, Kotaro Yoshimoto
+
 17.9.0 (2025-10-14)
 -------------------
 * Merge branch 'master' into feature/ra
