@@ -24,6 +24,132 @@ Changelog for package traffic_simulator
 16.4.2 (2025-05-23)
 -------------------
 
+17.9.1 (2025-10-14)
+-------------------
+* Merge branch 'master' into fix/RJD-1921-fix-steering-when-autoware-is-overwritten
+* Merge branch 'master' into fix/RJD-1921-fix-steering-when-autoware-is-overwritten
+* Merge branch 'master' into fix/RJD-1921-fix-steering-when-autoware-is-overwritten
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto
+
+17.9.0 (2025-10-14)
+-------------------
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Remove unuse code
+* Add reactive agent plugin implementation and configuration files
+* Contributors: Taiga, Taiga Takano
+
+17.8.0 (2025-10-10)
+-------------------
+* Merge branch 'master' into RJD-1930/see_around
+* Merge branch 'master' into RJD-1930/see_around
+* Merge branch 'master' into RJD-1930/see_around
+* Contributors: Grzegorz Maj, Taiga
+
+17.7.2 (2025-10-08)
+-------------------
+
+17.7.1 (2025-10-07)
+-------------------
+
+17.7.0 (2025-10-07)
+-------------------
+* Merge pull request `#1691 <https://github.com/tier4/scenario_simulator_v2/issues/1691>`_ from tier4/feature/whole_new_front_entity_detection_logic
+  Whole new front entity detection logic
+* Merge branch 'master' into feature/whole_new_front_entity_detection_logic
+* Merge branch 'master' into feature/whole_new_front_entity_detection_logic
+* Merge branch 'master' into feature/whole_new_front_entity_detection_logic
+* Merge branch 'master' into feature/whole_new_front_entity_detection_logic
+* Refactor waypoints_marker points assignment for clarity
+* fix
+* Add trajectory-based front entity detection parameters to VisualizationComponent
+* Contributors: Kotaro Yoshimoto, Taiga, Taiga Takano
+
+17.6.3 (2025-10-06)
+-------------------
+* Merge pull request `#1684 <https://github.com/tier4/scenario_simulator_v2/issues/1684>`_ from tier4/RJD-1921/fta-acceleration-fix
+* Merge branch 'master' into RJD-1921/fta-acceleration-fix
+* Merge branch 'master' into RJD-1921/fta-acceleration-fix
+* Merge branch 'master' into RJD-1921/fta-acceleration-fix
+* getTimeRequirementForNonAcceleration step time rounding fix
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Piotr Zyskowski
+
+17.6.2 (2025-10-02)
+-------------------
+* Merge pull request `#1688 <https://github.com/tier4/scenario_simulator_v2/issues/1688>`_ from tier4/fix/spin-some-deprecated
+* Merge branch 'master' into fix/spin-some-deprecated
+* Fix TrafficLightsTest error
+* Replace spin_some in traffic_simulator test
+* Contributors: Kotaro Yoshimoto, f0reachARR
+
+17.6.1 (2025-10-02)
+-------------------
+
+17.6.0 (2025-09-29)
+-------------------
+* Merge branch 'master' into fix/noise_v4
+* Contributors: Kotaro Yoshimoto
+
+17.5.3 (2025-09-17)
+-------------------
+* Merge branch 'master' into fix/macro-xml-validation
+* Contributors: Kotaro Yoshimoto
+
+17.5.2 (2025-09-16)
+-------------------
+* Merge branch 'master' into fix/no-autoware-launch
+* Merge branch 'master' into fix/no-autoware-launch
+* Contributors: ぐるぐる
+
+17.5.1 (2025-09-11)
+-------------------
+
+17.5.0 (2025-09-05)
+-------------------
+* Merge branch 'master' into fix/approach-stop-and-gap-tolerance
+* Contributors: Taiga
+
+17.4.0 (2025-09-04)
+-------------------
+* Merge branch 'feature/use-yaw-diff-for-front-detection' of github.com:tier4/scenario_simulator_v2 into feature/use-yaw-diff-for-front-detection
+* Merge branch 'master' into feature/use-yaw-diff-for-front-detection
+* Contributors: Taiga, Taiga Takano
+
+17.3.0 (2025-09-03)
+-------------------
+* Merge branch 'master' into feature/noise_v4
+* Merge branch 'master' into feature/noise_v4
+* Merge branch 'master' into feature/noise_v4
+* Contributors: Kotaro Yoshimoto
+
+17.2.1 (2025-09-02)
+-------------------
+* Merge branch 'master' into RJD-1919/fix_health_check
+* Merge branch 'master' into RJD-1919/fix_health_check
+* Merge branch 'master' into RJD-1919/fix_health_check
+* Merge branch 'RJD-1919/fix_health_check' of github.com:tier4/scenario_simulator_v2 into RJD-1919/fix_health_check
+* Merge branch 'master' into RJD-1919/fix_health_check
+* Contributors: Kotaro Yoshimoto, Michał Ciasnocha, robomic
+
+17.2.0 (2025-09-02)
+-------------------
+* Merge pull request `#1678 <https://github.com/tier4/scenario_simulator_v2/issues/1678>`_ from tier4/feature/openscenario-per-entity-lateral-collision-margin
+  Feature/openscenario per entity lateral collision margin
+* refactor: Rename lateralCollisionMargin to lateralCollisionThreshold for consistency
+* refactor: Remove unnecessary blank line before clang-format directive
+* refactor: Remove unused getLateralCollisionMargin method
+* feat: Add newline for improved readability before getLateralCollisionMargin method
+* Sort getter/setter macro definitions in alphabetical order
+* feat: Update LateralCollisionMargin to use std::optional for improved handling
+* Add `lateral_collision_margin`  to vehicle ActionNode
+* Contributors: Taiga, Taiga Takano
+
 17.1.4 (2025-08-27)
 -------------------
 

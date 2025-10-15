@@ -38,6 +38,125 @@ Changelog for package scenario_test_runner
 16.4.2 (2025-05-23)
 -------------------
 
+17.9.1 (2025-10-14)
+-------------------
+* Merge branch 'master' into fix/RJD-1921-fix-steering-when-autoware-is-overwritten
+* Merge branch 'master' into fix/RJD-1921-fix-steering-when-autoware-is-overwritten
+* Merge branch 'master' into fix/RJD-1921-fix-steering-when-autoware-is-overwritten
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto
+
+17.9.0 (2025-10-14)
+-------------------
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Contributors: Taiga
+
+17.8.0 (2025-10-10)
+-------------------
+* Merge branch 'master' into RJD-1930/see_around
+* Merge branch 'master' into RJD-1930/see_around
+* Merge branch 'master' into RJD-1930/see_around
+* Contributors: Grzegorz Maj, Taiga
+
+17.7.2 (2025-10-08)
+-------------------
+* Merge pull request `#1695 <https://github.com/tier4/scenario_simulator_v2/issues/1695>`_ from tier4/feature/supress_visualization_node
+  enable supress visualization
+* enable supress visualization
+* Contributors: Masaya Kataoka, Masaya kataoka
+
+17.7.1 (2025-10-07)
+-------------------
+
+17.7.0 (2025-10-07)
+-------------------
+* Merge pull request `#1691 <https://github.com/tier4/scenario_simulator_v2/issues/1691>`_ from tier4/feature/whole_new_front_entity_detection_logic
+  Whole new front entity detection logic
+* Merge branch 'master' into feature/whole_new_front_entity_detection_logic
+* Refactor
+* Merge branch 'master' into feature/whole_new_front_entity_detection_logic
+* Merge branch 'master' into feature/whole_new_front_entity_detection_logic
+* Add trajectory-based detection width parameter to FollowFrontEntityAction and FollowLaneAction
+* Add configuration for trajectory-based front entity detection in launch setup
+* Add trajectory-based front entity detection configuration to FollowFrontEntityAction and FollowLaneAction
+* Contributors: Kotaro Yoshimoto, Taiga, Taiga Takano
+
+17.6.3 (2025-10-06)
+-------------------
+* Merge branch 'master' into RJD-1921/fta-acceleration-fix
+* Merge branch 'master' into RJD-1921/fta-acceleration-fix
+* Merge branch 'master' into RJD-1921/fta-acceleration-fix
+* Contributors: Dawid Moszyński
+
+17.6.2 (2025-10-02)
+-------------------
+* Merge branch 'master' into fix/spin-some-deprecated
+* Contributors: Kotaro Yoshimoto
+
+17.6.1 (2025-10-02)
+-------------------
+
+17.6.0 (2025-09-29)
+-------------------
+* Merge pull request `#1685 <https://github.com/tier4/scenario_simulator_v2/issues/1685>`_ from tier4/fix/noise_v4
+* Merge branch 'master' into fix/noise_v4
+* use elliptical model for x,y,yaw in noise_v4
+* use same true positive calculation algorithm to noise_v2 in noise_v4
+* rename noise.v4.<config_name>.rotation into noise.v4.<config_name>.yaw
+* Implement yaw_flip noise for noise_v4
+* Contributors: Kotaro Yoshimoto
+
+17.5.3 (2025-09-17)
+-------------------
+* Merge branch 'master' into fix/macro-xml-validation
+* Contributors: Kotaro Yoshimoto
+
+17.5.2 (2025-09-16)
+-------------------
+* Merge branch 'master' into fix/no-autoware-launch
+* Merge branch 'master' into fix/no-autoware-launch
+* Contributors: ぐるぐる
+
+17.5.1 (2025-09-11)
+-------------------
+
+17.5.0 (2025-09-05)
+-------------------
+* Merge branch 'master' into fix/approach-stop-and-gap-tolerance
+* Contributors: Taiga
+
+17.4.0 (2025-09-04)
+-------------------
+* Merge branch 'feature/use-yaw-diff-for-front-detection' of github.com:tier4/scenario_simulator_v2 into feature/use-yaw-diff-for-front-detection
+* Merge branch 'master' into feature/use-yaw-diff-for-front-detection
+* Contributors: Taiga, Taiga Takano
+
+17.3.0 (2025-09-03)
+-------------------
+* Merge pull request `#1680 <https://github.com/tier4/scenario_simulator_v2/issues/1680>`_ from tier4/feature/noise_v4
+* Merge branch 'master' into feature/noise_v4
+* Merge branch 'master' into feature/noise_v4
+* Merge branch 'master' into feature/noise_v4
+* Add v4 section for noise v4 in parameters.yaml
+* Contributors: Kotaro Yoshimoto
+
+17.2.1 (2025-09-02)
+-------------------
+* Merge branch 'master' into RJD-1919/fix_health_check
+* Merge branch 'master' into RJD-1919/fix_health_check
+* Merge branch 'RJD-1919/fix_health_check' of github.com:tier4/scenario_simulator_v2 into RJD-1919/fix_health_check
+* Merge branch 'master' into RJD-1919/fix_health_check
+* Contributors: Kotaro Yoshimoto, Michał Ciasnocha, robomic
+
+17.2.0 (2025-09-02)
+-------------------
+
 17.1.4 (2025-08-27)
 -------------------
 

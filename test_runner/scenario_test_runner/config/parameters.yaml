@@ -138,7 +138,7 @@
       occlusionless: false # This parameter is used only if `override_legacy_configuration` is true. If it is false, the value of `isClairvoyant` in `ObjectController.Properties` in the scenario file is used.
       noise:
         model:
-          version: 1 # Any of [1, 2, 3].
+          version: 1 # Any of [1, 2, 3, 4].
         v1: # This clause is used only if `model.version` is 1.
           position:
             standard_deviation: 0.0 # This parameter is used only if `override_legacy_configuration` is true. If it is false, the value of `detectedObjectPositionStandardDeviation` in `ObjectController.Properties` in the scenario file is used.
@@ -208,6 +208,62 @@
               mean:
                 ellipse_normalized_x_radius: 1.0
                 values: [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ]
+              standard_deviation:
+                ellipse_normalized_x_radius: 1.0
+                values: [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ]
+            yaw_flip:
+              autocorrelation_coefficient:
+                amplitude: 0.0
+                decay: 0.0
+                offset: 0.0
+              speed_threshold: 0.1
+              rate: 0.0
+            true_positive:
+              autocorrelation_coefficient:
+                amplitude: 0.0
+                decay: 0.0
+                offset: 0.0
+              rate:
+                ellipse_normalized_x_radius: 1.0
+                values: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+        v4: # This clause is used only if `model.version` is 4.
+          no_noise_to_all:
+            noise_application_entities:
+              types: ["*"]
+              subtypes: ["*"]
+              names: ["*"]
+            ellipse_y_radii: [ 10.0, 20.0, 40.0, 60.0, 80.0, 120.0, 150.0, 180.0, 1000.0 ]
+            position:
+              x:
+                autocorrelation_coefficient:
+                  amplitude: 0.0
+                  decay: 0.0
+                  offset: 0.0
+                mean:
+                  ellipse_normalized_x_radius: 1.0
+                  values: [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ]
+                standard_deviation:
+                  ellipse_normalized_x_radius: 1.0
+                  values: [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ]
+              y:
+                autocorrelation_coefficient:
+                  amplitude: 0.0
+                  decay: 0.0
+                  offset: 0.0
+                mean:
+                  ellipse_normalized_x_radius: 1.0
+                  values: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+                standard_deviation:
+                  ellipse_normalized_x_radius: 1.0
+                  values: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+            yaw:
+              autocorrelation_coefficient:
+                amplitude: 0.0
+                decay: 0.0
+                offset: 0.0
+              mean:
+                ellipse_normalized_x_radius: 1.0
+                values: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
               standard_deviation:
                 ellipse_normalized_x_radius: 1.0
                 values: [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ]
