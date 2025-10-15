@@ -24,6 +24,12 @@ Changelog for package random_test_runner
 16.4.2 (2025-05-23)
 -------------------
 
+18.0.0 (2025-10-15)
+-------------------
+* Merge branch 'master' into feature/small_fix_new_front_entity_detection_logic
+* Merge branch 'master' into feature/small_fix_new_front_entity_detection_logic
+* Contributors: Taiga
+
 17.9.1 (2025-10-14)
 -------------------
 * Merge branch 'master' into fix/RJD-1921-fix-steering-when-autoware-is-overwritten

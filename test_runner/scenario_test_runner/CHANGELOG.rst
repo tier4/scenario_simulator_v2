@@ -38,6 +38,16 @@ Changelog for package scenario_test_runner
 16.4.2 (2025-05-23)
 -------------------
 
+18.0.0 (2025-10-15)
+-------------------
+* Merge pull request `#1697 <https://github.com/tier4/scenario_simulator_v2/issues/1697>`_ from tier4/feature/small_fix_new_front_entity_detection_logic
+  Fix trajectory-based front entity detection offset handling
+* Merge branch 'master' into feature/small_fix_new_front_entity_detection_logic
+* Merge branch 'master' into feature/small_fix_new_front_entity_detection_logic
+* Fixed an issue where the parameter was not propagated.
+* Switch path width parameter from override mode to offset mode.
+* Contributors: Taiga, Taiga Takano
+
 17.9.1 (2025-10-14)
 -------------------
 * Merge branch 'master' into fix/RJD-1921-fix-steering-when-autoware-is-overwritten
