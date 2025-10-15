@@ -50,6 +50,8 @@ WalkStraightAction::WalkStraightAction(
 {
   use_trajectory_based_front_entity_detection_ =
     common::getParameter<bool>("use_trajectory_based_front_entity_detection", false);
+  trajectory_based_detection_offset_ =
+    common::getParameter<double>("trajectory_based_detection_offset", 0.0);
 }
 
 void WalkStraightAction::getBlackBoardValues() { PedestrianActionNode::getBlackBoardValues(); }
@@ -129,7 +131,9 @@ bool WalkStraightAction::isObstacleInFront(
     constexpr std::size_t trajectory_segments = 50;
     if (
       const auto front_entity_info = getFrontEntityNameAndDistanceByTrajectory(
-        waypoints, canonicalized_entity_status_->getBoundingBox().dimensions.y,
+        waypoints,
+        canonicalized_entity_status_->getBoundingBox().dimensions.y +
+          trajectory_based_detection_offset_,
         trajectory_segments)) {
       return true;
     } else {

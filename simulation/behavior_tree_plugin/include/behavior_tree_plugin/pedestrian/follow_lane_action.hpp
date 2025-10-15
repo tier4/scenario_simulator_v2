@@ -54,6 +54,7 @@ public:
 
 private:
   bool use_trajectory_based_front_entity_detection_;
+  double trajectory_based_detection_offset_;
 };
 }  // namespace pedestrian
 }  // namespace entity_behavior

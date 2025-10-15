@@ -62,7 +62,8 @@ private:
   auto calculateWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray;
 
   static constexpr double front_entity_margin = 2.0;
-  bool use_trajectory_based_front_entity_detection_{false};
+  bool use_trajectory_based_front_entity_detection_;
+  double trajectory_based_detection_offset_;
 };
 }  // namespace pedestrian
 }  // namespace entity_behavior

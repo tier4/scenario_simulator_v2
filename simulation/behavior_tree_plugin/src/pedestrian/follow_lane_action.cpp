@@ -32,6 +32,8 @@ FollowLaneAction::FollowLaneAction(const std::string & name, const BT::NodeConfi
 {
   use_trajectory_based_front_entity_detection_ =
     common::getParameter<bool>("use_trajectory_based_front_entity_detection", false);
+  trajectory_based_detection_offset_ =
+    common::getParameter<double>("trajectory_based_detection_offset", 0.0);
 }
 
 void FollowLaneAction::getBlackBoardValues() { PedestrianActionNode::getBlackBoardValues(); }
@@ -96,7 +98,9 @@ bool FollowLaneAction::detectObstacleInLane(
     constexpr std::size_t trajectory_segments = 50;
     if (
       const auto front_entity_info = getFrontEntityNameAndDistanceByTrajectory(
-        waypoints, pedestrian_parameters.bounding_box.dimensions.y, trajectory_segments)) {
+        waypoints,
+        pedestrian_parameters.bounding_box.dimensions.y + trajectory_based_detection_offset_,
+        trajectory_segments)) {
       return true;
     } else {
       return false;
