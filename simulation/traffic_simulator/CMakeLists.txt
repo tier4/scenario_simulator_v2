@@ -13,6 +13,7 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 endif()
 
+# cspell: ignore TOLOWER memaccess
 # silence Eigen NEON memcpy warning for ARM architecture
 string(TOLOWER "${CMAKE_SYSTEM_PROCESSOR}" SYS_PROC_LOWER)
 if(SYS_PROC_LOWER STREQUAL "aarch64" OR SYS_PROC_LOWER STREQUAL "arm64")
