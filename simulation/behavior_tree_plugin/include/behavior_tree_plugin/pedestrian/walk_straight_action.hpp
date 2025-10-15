@@ -34,6 +34,7 @@
 #include <string>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
+#include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 #include <vector>
 
 namespace entity_behavior
@@ -57,6 +58,7 @@ private:
   bool isEntityColliding(
     const traffic_simulator::entity_status::CanonicalizedEntityStatus & entity_status,
     const double & detection_horizon) const;
+  auto calculateWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray;
 
   static constexpr double front_entity_margin = 2.0;
 };

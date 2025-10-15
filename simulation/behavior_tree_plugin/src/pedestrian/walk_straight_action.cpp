@@ -23,14 +23,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <algorithm>
 #include <behavior_tree_plugin/pedestrian/walk_straight_action.hpp>
+#include <cmath>
 #include <geometry/bounding_box.hpp>
 #include <geometry/distance.hpp>
 #include <geometry/quaternion/quaternion_to_euler.hpp>
+#include <geometry/spline/catmull_rom_spline.hpp>
 #include <geometry/transform.hpp>
 #include <geometry/vector3/norm.hpp>
 #include <geometry/vector3/operator.hpp>
+#include <limits>
 #include <string>
+#include <traffic_simulator_msgs/msg/obstacle.hpp>
+#include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 
 namespace entity_behavior
 {
@@ -137,6 +143,75 @@ bool WalkStraightAction::isObstacleInFront(const bool see_around) const
   }
 }
 
+auto WalkStraightAction::calculateWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray
+{
+  traffic_simulator_msgs::msg::WaypointsArray waypoints;
+  const auto pose = canonicalized_entity_status_->getMapPose();
+
+  auto append_if_different = [&waypoints](const geometry_msgs::msg::Point & point) {
+    if (waypoints.waypoints.empty()) {
+      waypoints.waypoints.push_back(point);
+      return;
+    }
+    const auto & last = waypoints.waypoints.back();
+    constexpr double epsilon = 1.0e-3;
+    if (
+      std::hypot(last.x - point.x, last.y - point.y) > epsilon ||
+      std::fabs(last.z - point.z) > epsilon) {
+      waypoints.waypoints.push_back(point);
+    }
+  };
+
+  append_if_different(pose.position);
+
+  if (canonicalized_entity_status_->isInLanelet()) {
+    auto lanelets_to_follow = route_lanelets_;
+    if (lanelets_to_follow.empty()) {
+      lanelets_to_follow = hdmap_utils_->getFollowingLanelets(
+        canonicalized_entity_status_->getLaneletId(), getHorizon(), true);
+    }
+
+    if (!lanelets_to_follow.empty()) {
+      const auto center_points = hdmap_utils_->getCenterPoints(lanelets_to_follow);
+      if (center_points.size() >= 2) {
+        math::geometry::CatmullRomSpline spline(center_points);
+        const auto lanelet_pose = canonicalized_entity_status_->getLaneletPose();
+        const double start_s = std::clamp(lanelet_pose.s, 0.0, spline.getLength());
+        const double end_s = std::min(start_s + getHorizon(), spline.getLength());
+        constexpr double interval = 1.0;
+
+        for (double s = start_s; s < end_s; s += interval) {
+          append_if_different(spline.getPoint(s));
+        }
+        append_if_different(spline.getPoint(end_s));
+        return waypoints;
+      }
+    }
+  }
+
+  const auto yaw = math::geometry::convertQuaternionToEulerAngle(pose.orientation).z;
+  const double horizon = getHorizon();
+  constexpr double interval = 1.0;
+
+  geometry_msgs::msg::Point point = pose.position;
+  double accumulated = 0.0;
+  while (accumulated + interval <= horizon) {
+    point.x += interval * std::cos(yaw);
+    point.y += interval * std::sin(yaw);
+    append_if_different(point);
+    accumulated += interval;
+  }
+
+  const double remaining = horizon - accumulated;
+  if (remaining > std::numeric_limits<double>::epsilon()) {
+    point.x += remaining * std::cos(yaw);
+    point.y += remaining * std::sin(yaw);
+    append_if_different(point);
+  }
+
+  return waypoints;
+}
+
 bool WalkStraightAction::checkPreconditions()
 {
   return request_ == traffic_simulator::behavior::Request::WALK_STRAIGHT;
@@ -150,6 +225,8 @@ BT::NodeStatus WalkStraightAction::doAction()
 
   target_speed_ = isObstacleInFront(behavior_parameter_.see_around) ? 0.0 : target_speed_;
   setCanonicalizedEntityStatus(calculateUpdatedEntityStatusInWorldFrame(target_speed_.value()));
+  setOutput("waypoints", calculateWaypoints());
+  setOutput("obstacle", std::optional<traffic_simulator_msgs::msg::Obstacle>());
   return BT::NodeStatus::RUNNING;
 }
 }  // namespace pedestrian
