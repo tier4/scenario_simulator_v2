@@ -24,6 +24,25 @@ Changelog for package random_test_runner
 16.4.2 (2025-05-23)
 -------------------
 
+17.9.1 (2025-10-14)
+-------------------
+* Merge branch 'master' into fix/RJD-1921-fix-steering-when-autoware-is-overwritten
+* Merge branch 'master' into fix/RJD-1921-fix-steering-when-autoware-is-overwritten
+* Merge branch 'master' into fix/RJD-1921-fix-steering-when-autoware-is-overwritten
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto
+
+17.9.0 (2025-10-14)
+-------------------
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Contributors: Taiga
+
 17.8.0 (2025-10-10)
 -------------------
 * Merge branch 'master' into RJD-1930/see_around
