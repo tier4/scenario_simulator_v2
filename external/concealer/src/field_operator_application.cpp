@@ -165,6 +165,8 @@ FieldOperatorApplication::FieldOperatorApplication(const pid_t pid)
   requestChangeToStop("/api/operation_mode/change_to_stop", *this)
 // clang-format on
 {
+  executor.add_node(get_node_base_interface());
+
   /*
      In case of reusing the same Autoware instance for multiple scenarios (launch_autoware:=False),
      we need to ensure that Autoware is in a safe STOP state before starting the next scenario.
@@ -652,7 +654,8 @@ auto FieldOperatorApplication::spinSome() -> void
         }
       }
     }
-    rclcpp::spin_some(get_node_base_interface());
+
+    executor.spin_some();
   }
 }
 }  // namespace concealer
