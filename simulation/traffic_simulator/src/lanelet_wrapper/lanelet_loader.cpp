@@ -30,7 +30,7 @@ namespace lanelet_wrapper
 auto produceTransverseMercatorProjector(const YAML::Node & map_projector_info)
   -> lanelet::projection::TransverseMercatorProjector
 {
-  static constexpr double default_scale_factor = 0.9996;
+  // static constexpr double default_scale_factor = 0.9996;
 
   const auto getMandatoryAttribute =
     [](const YAML::Node & node, const std::string & key) -> YAML::Node {
@@ -46,10 +46,10 @@ auto produceTransverseMercatorProjector(const YAML::Node & map_projector_info)
   origin.position.lat = getMandatoryAttribute(map_origin_node, "latitude").as<double>();
   origin.position.lon = getMandatoryAttribute(map_origin_node, "longitude").as<double>();
 
-  const auto scale_factor = map_projector_info["scale_factor"]
-                              ? map_projector_info["scale_factor"].as<double>()
-                              : default_scale_factor;
-  return lanelet::projection::TransverseMercatorProjector(origin, scale_factor);
+  // const auto scale_factor = map_projector_info["scale_factor"]
+  //                             ? map_projector_info["scale_factor"].as<double>()
+  //                             : default_scale_factor;
+  return lanelet::projection::TransverseMercatorProjector(origin);
 };
 
 auto LaneletLoader::load(const std::filesystem::path & lanelet_map_path) -> lanelet::LaneletMapPtr
