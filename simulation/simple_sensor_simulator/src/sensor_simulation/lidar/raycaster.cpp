@@ -12,13 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <algorithm>
-#include <iostream>
+#include <geometry/quaternion/euler_to_quaternion.hpp>
+#include <geometry_msgs/msg/vector3.hpp>
 #include <simple_sensor_simulator/sensor_simulation/lidar/lidar_sensor.hpp>
 #include <simple_sensor_simulator/sensor_simulation/lidar/raycaster.hpp>
 #include <string>
 #include <unordered_map>
-#include <utility>
 #include <vector>
 
 namespace simple_sensor_simulator

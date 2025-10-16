@@ -19,7 +19,6 @@
 #include <pcl_conversions/pcl_conversions.h>
 
 #include <algorithm>
-#include <geometry/quaternion/euler_to_quaternion.hpp>
 #include <geometry/quaternion/get_rotation_matrix.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 #include <memory>
@@ -28,7 +27,6 @@
 #include <simple_sensor_simulator/sensor_simulation/primitives/box.hpp>
 #include <simple_sensor_simulator/sensor_simulation/primitives/primitive.hpp>
 #include <string>
-#include <unordered_map>
 #include <utility>
 #include <vector>
 
