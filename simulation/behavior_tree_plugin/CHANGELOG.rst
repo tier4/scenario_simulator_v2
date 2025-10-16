@@ -24,6 +24,110 @@ Changelog for package behavior_tree_plugin
 16.4.2 (2025-05-23)
 -------------------
 
+18.0.1 (2025-10-16)
+-------------------
+* Merge branch 'master' into refactor/lidar_sensor
+* Contributors: Kotaro Yoshimoto
+
+18.0.0 (2025-10-15)
+-------------------
+* Merge pull request `#1697 <https://github.com/tier4/scenario_simulator_v2/issues/1697>`_ from tier4/feature/small_fix_new_front_entity_detection_logic
+  Fix trajectory-based front entity detection offset handling
+* Merge branch 'master' into feature/small_fix_new_front_entity_detection_logic
+* Merge branch 'master' into feature/small_fix_new_front_entity_detection_logic
+* Filter out invalid trajectory_based_detection_offset\_ values
+* Switch path width parameter from override mode to offset mode.
+* Contributors: Taiga, Taiga Takano
+
+17.9.1 (2025-10-14)
+-------------------
+* Merge branch 'master' into fix/RJD-1921-fix-steering-when-autoware-is-overwritten
+* Merge branch 'master' into fix/RJD-1921-fix-steering-when-autoware-is-overwritten
+* Merge branch 'master' into fix/RJD-1921-fix-steering-when-autoware-is-overwritten
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto
+
+17.9.0 (2025-10-14)
+-------------------
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Contributors: Taiga
+
+17.8.0 (2025-10-10)
+-------------------
+* Merge pull request `#1690 <https://github.com/tier4/scenario_simulator_v2/issues/1690>`_ from tier4/RJD-1930/see_around
+  RJD-1930 Add see_around for WalkStraightAction
+* Merge branch 'master' into RJD-1930/see_around
+* Merge branch 'master' into RJD-1930/see_around
+* Merge branch 'master' into RJD-1930/see_around
+* Remove not needed boolean
+* Fix point translation problem and front margin
+* Add comment and minor changes
+* Changed names and structure
+* RJD-1930 Add see_around for WalkStraightAction
+* Contributors: Grzegorz Maj, Taiga
+
+17.7.2 (2025-10-08)
+-------------------
+
+17.7.1 (2025-10-07)
+-------------------
+
+17.7.0 (2025-10-07)
+-------------------
+* Merge pull request `#1691 <https://github.com/tier4/scenario_simulator_v2/issues/1691>`_ from tier4/feature/whole_new_front_entity_detection_logic
+  Whole new front entity detection logic
+* Merge branch 'master' into feature/whole_new_front_entity_detection_logic
+* Rename constant kTrajectorySegments to trajectory_segments for consistency
+* Merge branch 'master' into feature/whole_new_front_entity_detection_logic
+* Merge branch 'master' into feature/whole_new_front_entity_detection_logic
+* Add trajectory-based detection width parameter to FollowFrontEntityAction and FollowLaneAction
+* Add trajectory-based front entity detection configuration to FollowFrontEntityAction and FollowLaneAction
+* Fix format
+* Enhance front entity detection in FollowFrontEntityAction and FollowLaneAction using trajectory-based approach
+* Refactor getFrontEntityNameAndDistanceByTrajectory to accept waypoints as input and handle insufficient waypoints case
+* Add getFrontEntityNameAndDistanceByTrajectory method to ActionNode
+* Contributors: Kotaro Yoshimoto, Taiga, Taiga Takano
+
+17.6.3 (2025-10-06)
+-------------------
+* Merge branch 'master' into RJD-1921/fta-acceleration-fix
+* Merge branch 'master' into RJD-1921/fta-acceleration-fix
+* Merge branch 'master' into RJD-1921/fta-acceleration-fix
+* Contributors: Dawid Moszyński
+
+17.6.2 (2025-10-02)
+-------------------
+* Merge branch 'master' into fix/spin-some-deprecated
+* Contributors: Kotaro Yoshimoto
+
+17.6.1 (2025-10-02)
+-------------------
+
+17.6.0 (2025-09-29)
+-------------------
+* Merge branch 'master' into fix/noise_v4
+* Contributors: Kotaro Yoshimoto
+
+17.5.3 (2025-09-17)
+-------------------
+* Merge branch 'master' into fix/macro-xml-validation
+* Contributors: Kotaro Yoshimoto
+
+17.5.2 (2025-09-16)
+-------------------
+* Merge branch 'master' into fix/no-autoware-launch
+* Merge branch 'master' into fix/no-autoware-launch
+* Contributors: ぐるぐる
+
+17.5.1 (2025-09-11)
+-------------------
+
 17.5.0 (2025-09-05)
 -------------------
 * Merge pull request `#1673 <https://github.com/tier4/scenario_simulator_v2/issues/1673>`_ from tier4/fix/approach-stop-and-gap-tolerance

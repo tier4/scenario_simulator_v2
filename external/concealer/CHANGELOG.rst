@@ -24,6 +24,105 @@ Changelog for package concealer
 16.4.2 (2025-05-23)
 -------------------
 
+18.0.1 (2025-10-16)
+-------------------
+* Merge branch 'master' into refactor/lidar_sensor
+* Contributors: Kotaro Yoshimoto
+
+18.0.0 (2025-10-15)
+-------------------
+* Merge branch 'master' into feature/small_fix_new_front_entity_detection_logic
+* Merge branch 'master' into feature/small_fix_new_front_entity_detection_logic
+* Contributors: Taiga
+
+17.9.1 (2025-10-14)
+-------------------
+* Merge branch 'master' into fix/RJD-1921-fix-steering-when-autoware-is-overwritten
+* Merge branch 'master' into fix/RJD-1921-fix-steering-when-autoware-is-overwritten
+* Merge branch 'master' into fix/RJD-1921-fix-steering-when-autoware-is-overwritten
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto
+
+17.9.0 (2025-10-14)
+-------------------
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Contributors: Taiga
+
+17.8.0 (2025-10-10)
+-------------------
+* Merge branch 'master' into RJD-1930/see_around
+* Merge branch 'master' into RJD-1930/see_around
+* Merge branch 'master' into RJD-1930/see_around
+* Contributors: Grzegorz Maj, Taiga
+
+17.7.2 (2025-10-08)
+-------------------
+
+17.7.1 (2025-10-07)
+-------------------
+
+17.7.0 (2025-10-07)
+-------------------
+* Merge branch 'master' into feature/whole_new_front_entity_detection_logic
+* Merge branch 'master' into feature/whole_new_front_entity_detection_logic
+* Merge branch 'master' into feature/whole_new_front_entity_detection_logic
+* Contributors: Kotaro Yoshimoto, Taiga
+
+17.6.3 (2025-10-06)
+-------------------
+* Merge branch 'master' into RJD-1921/fta-acceleration-fix
+* Merge branch 'master' into RJD-1921/fta-acceleration-fix
+* Merge branch 'master' into RJD-1921/fta-acceleration-fix
+* Contributors: Dawid Moszyński
+
+17.6.2 (2025-10-02)
+-------------------
+* Merge pull request `#1688 <https://github.com/tier4/scenario_simulator_v2/issues/1688>`_ from tier4/fix/spin-some-deprecated
+* Merge branch 'master' into fix/spin-some-deprecated
+* Remove spin_some in AutowareUniverse
+* Remove spin_some in FieldOperatorApplication
+* Contributors: Kotaro Yoshimoto, f0reachARR
+
+17.6.1 (2025-10-02)
+-------------------
+
+17.6.0 (2025-09-29)
+-------------------
+* Merge branch 'master' into fix/noise_v4
+* Contributors: Kotaro Yoshimoto
+
+17.5.3 (2025-09-17)
+-------------------
+* Merge branch 'master' into fix/macro-xml-validation
+* Contributors: Kotaro Yoshimoto
+
+17.5.2 (2025-09-16)
+-------------------
+* Merge pull request `#1665 <https://github.com/tier4/scenario_simulator_v2/issues/1665>`_ from tier4/fix/no-autoware-launch
+* Merge branch 'master' into fix/no-autoware-launch
+* Add comment for requestChangeToStop
+* Merge branch 'master' into fix/no-autoware-launch
+* Remove unnecessary stop
+* Remove unused code
+* Request stop before Autoware operation
+* Request state to be stop before (re-)initialize
+* Allow `waiting_for_route` in startup to address pre-launched Autoware
+* Contributors: Kotaro Yoshimoto, f0reachARR, ぐるぐる
+
+17.5.1 (2025-09-11)
+-------------------
+* Merge pull request `#1682 <https://github.com/tier4/scenario_simulator_v2/issues/1682>`_ from tier4/fix/RJD-1918-fix-task-queue-service-is-ready-check
+* ref(concealer): remove unnecessary variable
+* fix(concealer): fix declaration and initialization order in TaskQueue
+* fix(concealer): add availability_timeout to Service
+* Contributors: Dawid Moszynski, Kotaro Yoshimoto
+
 17.5.0 (2025-09-05)
 -------------------
 * Merge branch 'master' into fix/approach-stop-and-gap-tolerance

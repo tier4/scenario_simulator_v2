@@ -94,7 +94,7 @@ class DetectionSensor : public DetectionSensorBase
     bool true_positive, flip;
 
     // for noise v4
-    double v4_position_x_noise, v4_position_y_noise, v4_rotation_noise;
+    double v4_position_x_noise, v4_position_y_noise;
 
     std::string config_name;
 
@@ -106,7 +106,6 @@ class DetectionSensor : public DetectionSensorBase
       flip(false),
       v4_position_x_noise(0.0),
       v4_position_y_noise(0.0),
-      v4_rotation_noise(0.0),
       config_name("")
     {
     }
