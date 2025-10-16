@@ -107,30 +107,15 @@ const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
     geometry_ids_.insert({id, pair.first});
   }
 
-  // Run as many threads as physical cores (which is usually /2 virtual threads)
-  // In heavy loads virtual threads (hyper-threading) add little to the overall performance
-  // This also minimizes cost of creating a thread (roughly 10us on Intel/Linux)
-  int thread_count = std::thread::hardware_concurrency() / 2;
-  // Per thread data structures:
-  std::vector<std::thread> threads(thread_count);
-  std::vector<std::set<unsigned int>> thread_detected_ids(thread_count);
-  std::vector<pcl::PointCloud<pcl::PointXYZI>::Ptr> thread_cloud(thread_count);
+  std::set<unsigned int> detected_ids;
 
   rtcCommitScene(scene_);
-  for (unsigned int i = 0; i < threads.size(); ++i) {
-    thread_cloud[i] = pcl::PointCloud<pcl::PointXYZI>::Ptr(new pcl::PointCloud<pcl::PointXYZI>());
-    threads[i] = std::thread(
-      intersect, i, thread_count, scene_, thread_cloud[i], origin, std::ref(thread_detected_ids[i]),
-      max_distance, min_distance, std::ref(rotation_matrices_));
-  }
-  for (unsigned int i = 0; i < threads.size(); ++i) {
-    threads[i].join();
-    (*cloud) += *(thread_cloud[i]);
-  }
-  for (auto && detected_ids_in_thread : thread_detected_ids) {
-    for (const auto & id : detected_ids_in_thread) {
-      detected_objects_.emplace_back(geometry_ids_[id]);
-    }
+  intersect(
+    scene_, cloud, origin, std::ref(detected_ids), max_distance, min_distance,
+    std::ref(rotation_matrices_));
+
+  for (const auto & id : detected_ids) {
+    detected_objects_.emplace_back(geometry_ids_[id]);
   }
 
   for (const auto & id : geometry_ids_) {
