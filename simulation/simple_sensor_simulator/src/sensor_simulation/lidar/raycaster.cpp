@@ -110,9 +110,7 @@ const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
   std::set<unsigned int> detected_ids;
 
   rtcCommitScene(scene_);
-  intersect(
-    scene_, cloud, origin, std::ref(detected_ids), max_distance, min_distance,
-    std::ref(rotation_matrices_));
+  intersect(cloud, origin, detected_ids, max_distance, min_distance);
 
   for (const auto & id : detected_ids) {
     detected_objects_.emplace_back(geometry_ids_[id]);

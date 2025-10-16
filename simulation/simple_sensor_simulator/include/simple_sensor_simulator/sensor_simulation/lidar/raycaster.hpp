@@ -75,17 +75,12 @@ private:
   std::unordered_map<unsigned int, std::string> geometry_ids_;
   std::vector<Eigen::Matrix3d> rotation_matrices_;
 
-  static void intersect(
-    RTCScene scene, pcl::PointCloud<pcl::PointXYZI>::Ptr cloud,
-    const geometry_msgs::msg::Pose & origin,
-    std::reference_wrapper<std::set<unsigned int>> ref_detected_ids, double max_distance,
-    double min_distance,
-    std::reference_wrapper<const std::vector<Eigen::Matrix3d>> ref_rotation_matrices)
+  void intersect(
+    pcl::PointCloud<pcl::PointXYZI>::Ptr cloud, const geometry_msgs::msg::Pose & origin,
+    std::set<unsigned int> & detected_ids, double max_distance, double min_distance)
   {
-    auto & rotation_matrices = ref_rotation_matrices.get();
-    auto & detected_ids = ref_detected_ids.get();
     const auto orientation_matrix = math::geometry::getRotationMatrix(origin.orientation);
-    for (unsigned int i = 0; i < rotation_matrices.size(); ++i) {
+    for (unsigned int i = 0; i < rotation_matrices_.size(); ++i) {
       RTCRayHit rayhit = {};
       rayhit.ray.org_x = origin.position.x;
       rayhit.ray.org_y = origin.position.y;
@@ -96,20 +91,21 @@ private:
       rayhit.ray.tnear = min_distance;
       rayhit.ray.flags = false;
 
-      const auto rotation_mat = orientation_matrix * rotation_matrices.at(i);
+      const auto & ray_direction = rotation_matrices_.at(i);
+      const auto rotation_mat = orientation_matrix * ray_direction;
       rayhit.ray.dir_x = rotation_mat(0);
       rayhit.ray.dir_y = rotation_mat(1);
       rayhit.ray.dir_z = rotation_mat(2);
       rayhit.hit.geomID = RTC_INVALID_GEOMETRY_ID;
-      rtcIntersect1(scene, &rayhit);
+      rtcIntersect1(scene_, &rayhit);
 
       if (rayhit.hit.geomID != RTC_INVALID_GEOMETRY_ID) {
         double distance = rayhit.ray.tfar;
         pcl::PointXYZI p;
         {
-          p.x = rotation_matrices.at(i)(0) * distance;
-          p.y = rotation_matrices.at(i)(1) * distance;
-          p.z = rotation_matrices.at(i)(2) * distance;
+          p.x = ray_direction(0) * distance;
+          p.y = ray_direction(1) * distance;
+          p.z = ray_direction(2) * distance;
         }
         cloud->emplace_back(p);
         detected_ids.insert(rayhit.hit.geomID);
