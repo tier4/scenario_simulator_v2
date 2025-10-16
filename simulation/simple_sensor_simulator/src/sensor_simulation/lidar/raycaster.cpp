@@ -93,9 +93,8 @@ std::vector<geometry_msgs::msg::Quaternion> Raycaster::getDirections(
 
 const std::vector<std::string> & Raycaster::getDetectedObject() const { return detected_objects_; }
 
-const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
-  const std::string & frame_id, const rclcpp::Time & stamp, const geometry_msgs::msg::Pose & origin,
-  double max_distance, double min_distance)
+pcl::PointCloud<pcl::PointXYZI>::Ptr Raycaster::raycast(
+  const geometry_msgs::msg::Pose & origin, double max_distance, double min_distance)
 {
   detected_objects_ = {};
   std::unordered_map<uint32_t, size_t> geometry_id_to_entity_index;
@@ -123,10 +122,6 @@ const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
 
   entities_.clear();
 
-  sensor_msgs::msg::PointCloud2 pointcloud_msg;
-  pcl::toROSMsg(*cloud, pointcloud_msg);
-  pointcloud_msg.header.frame_id = frame_id;
-  pointcloud_msg.header.stamp = stamp;
-  return pointcloud_msg;
+  return cloud;
 }
 }  // namespace simple_sensor_simulator

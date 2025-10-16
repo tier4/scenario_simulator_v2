@@ -22,11 +22,9 @@
 #include <geometry/quaternion/euler_to_quaternion.hpp>
 #include <geometry/quaternion/get_rotation_matrix.hpp>
 #include <geometry_msgs/msg/pose.hpp>
-#include <geometry_msgs/msg/vector3.hpp>
 #include <memory>
 #include <optional>
 #include <random>
-#include <sensor_msgs/msg/point_cloud2.hpp>
 #include <simple_sensor_simulator/sensor_simulation/primitives/box.hpp>
 #include <simple_sensor_simulator/sensor_simulation/primitives/primitive.hpp>
 #include <string>
@@ -64,8 +62,8 @@ public:
     }
     entities_.emplace_back(name, std::make_unique<T>(std::forward<Ts>(xs)...));
   }
-  const sensor_msgs::msg::PointCloud2 raycast(
-    const std::string & frame_id, const rclcpp::Time & stamp,
+
+  pcl::PointCloud<pcl::PointXYZI>::Ptr raycast(
     const geometry_msgs::msg::Pose & origin, double max_distance = 300, double min_distance = 0);
   const std::vector<std::string> & getDetectedObject() const;
   void setDirection(
