@@ -12,8 +12,10 @@ on:
       - "!pyproject.toml"
       - "!poetry.lock"
   push:
-    tags:
-      - "*"
+    branches:
+      - master
+    paths:
+      - "**/package.xml"
   workflow_dispatch:
     inputs:
       version:
