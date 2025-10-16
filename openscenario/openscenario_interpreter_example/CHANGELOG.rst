@@ -24,6 +24,11 @@ Changelog for package openscenario_interpreter_example
 16.4.2 (2025-05-23)
 -------------------
 
+18.0.1 (2025-10-16)
+-------------------
+* Merge branch 'master' into refactor/lidar_sensor
+* Contributors: Kotaro Yoshimoto
+
 18.0.0 (2025-10-15)
 -------------------
 * Merge branch 'master' into feature/small_fix_new_front_entity_detection_logic

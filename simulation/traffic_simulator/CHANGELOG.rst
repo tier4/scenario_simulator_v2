@@ -24,6 +24,11 @@ Changelog for package traffic_simulator
 16.4.2 (2025-05-23)
 -------------------
 
+18.0.1 (2025-10-16)
+-------------------
+* Merge branch 'master' into refactor/lidar_sensor
+* Contributors: Kotaro Yoshimoto
+
 18.0.0 (2025-10-15)
 -------------------
 * Merge pull request `#1697 <https://github.com/tier4/scenario_simulator_v2/issues/1697>`_ from tier4/feature/small_fix_new_front_entity_detection_logic
