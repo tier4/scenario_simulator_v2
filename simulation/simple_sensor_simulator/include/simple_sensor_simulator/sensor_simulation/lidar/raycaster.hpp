@@ -18,11 +18,13 @@
 #include <embree4/rtcore.h>
 #include <pcl_conversions/pcl_conversions.h>
 
+#include <algorithm>
 #include <geometry/quaternion/euler_to_quaternion.hpp>
 #include <geometry/quaternion/get_rotation_matrix.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
 #include <memory>
+#include <optional>
 #include <random>
 #include <sensor_msgs/msg/point_cloud2.hpp>
 #include <simple_sensor_simulator/sensor_simulation/primitives/box.hpp>
@@ -40,14 +42,27 @@ public:
   Raycaster();
   explicit Raycaster(std::string embree_config);
   ~Raycaster();
-  template <typename T, typename... Ts>
-  void addPrimitive(std::string name, Ts &&... xs)
+
+  struct Entity
   {
-    if (primitive_ptrs_.count(name) != 0) {
-      throw std::runtime_error("primitive " + name + " already exist.");
+    const std::string name;
+    std::unique_ptr<primitives::Primitive> primitive;
+    std::optional<uint32_t> geometry_id;
+
+    Entity(const std::string & entity_name, std::unique_ptr<primitives::Primitive> entity_primitive)
+    : name(entity_name), primitive(std::move(entity_primitive))
+    {
     }
-    auto primitive_ptr = std::make_unique<T>(std::forward<Ts>(xs)...);
-    primitive_ptrs_.emplace(name, std::move(primitive_ptr));
+  };
+
+  template <typename T, typename... Ts>
+  void addPrimitive(const std::string & name, Ts &&... xs)
+  {
+    if (std::any_of(
+          entities_.begin(), entities_.end(), [&name](const auto & e) { return e.name == name; })) {
+      throw std::runtime_error("primitive " + name + " already exists.");
+    }
+    entities_.emplace_back(name, std::make_unique<T>(std::forward<Ts>(xs)...));
   }
   const sensor_msgs::msg::PointCloud2 raycast(
     const std::string & frame_id, const rclcpp::Time & stamp,
@@ -66,13 +81,12 @@ private:
   double previous_horizontal_angle_end_;
   double previous_horizontal_resolution_;
   std::vector<double> previous_vertical_angles_;
-  std::unordered_map<std::string, std::unique_ptr<primitives::Primitive>> primitive_ptrs_;
+  std::vector<Entity> entities_;
   RTCDevice device_;
   RTCScene scene_;
   std::random_device seed_gen_;
   std::default_random_engine engine_;
   std::vector<std::string> detected_objects_;
-  std::unordered_map<unsigned int, std::string> geometry_ids_;
   std::vector<Eigen::Matrix3d> rotation_matrices_;
 
   void intersect(

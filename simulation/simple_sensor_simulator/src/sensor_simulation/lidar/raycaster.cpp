@@ -24,15 +24,12 @@
 namespace simple_sensor_simulator
 {
 Raycaster::Raycaster()
-: primitive_ptrs_(0),
-  device_(rtcNewDevice(nullptr)),
-  scene_(rtcNewScene(device_)),
-  engine_(seed_gen_())
+: entities_(), device_(rtcNewDevice(nullptr)), scene_(rtcNewScene(device_)), engine_(seed_gen_())
 {
 }
 
 Raycaster::Raycaster(std::string embree_config)
-: primitive_ptrs_(0),
+: entities_(),
   device_(rtcNewDevice(embree_config.c_str())),
   scene_(rtcNewScene(device_)),
   engine_(seed_gen_())
@@ -101,10 +98,12 @@ const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
   double max_distance, double min_distance)
 {
   detected_objects_ = {};
+  std::unordered_map<uint32_t, size_t> geometry_id_to_entity_index;
   pcl::PointCloud<pcl::PointXYZI>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZI>());
-  for (auto & pair : primitive_ptrs_) {
-    auto id = pair.second->addToScene(device_, scene_);
-    geometry_ids_.insert({id, pair.first});
+  for (size_t entity_idx = 0; entity_idx < entities_.size(); ++entity_idx) {
+    auto & entity = entities_[entity_idx];
+    entity.geometry_id = entity.primitive->addToScene(device_, scene_);
+    geometry_id_to_entity_index[entity.geometry_id.value()] = entity_idx;
   }
 
   std::set<unsigned int> detected_ids;
@@ -113,15 +112,16 @@ const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
   intersect(cloud, origin, detected_ids, max_distance, min_distance);
 
   for (const auto & id : detected_ids) {
-    detected_objects_.emplace_back(geometry_ids_[id]);
+    detected_objects_.emplace_back(entities_.at(geometry_id_to_entity_index[id]).name);
   }
 
-  for (const auto & id : geometry_ids_) {
-    rtcDetachGeometry(scene_, id.first);
+  for (auto & entity : entities_) {
+    if (entity.geometry_id.has_value()) {
+      rtcDetachGeometry(scene_, entity.geometry_id.value());
+    }
   }
 
-  geometry_ids_.clear();
-  primitive_ptrs_.clear();
+  entities_.clear();
 
   sensor_msgs::msg::PointCloud2 pointcloud_msg;
   pcl::toROSMsg(*cloud, pointcloud_msg);
