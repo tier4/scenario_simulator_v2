@@ -27,13 +27,14 @@ auto LidarSensor<sensor_msgs::msg::PointCloud2>::raycast(
   const std::vector<traffic_simulator_msgs::EntityStatus> & entities,
   const rclcpp::Time & current_ros_time) -> sensor_msgs::msg::PointCloud2
 {
-  std::optional<geometry_msgs::msg::Pose> ego_pose;
+  std::optional<geometry_msgs::msg::Pose> lidar_pose;
 
   for (const auto & entity : entities) {
     if (configuration_.entity() == entity.name()) {
       geometry_msgs::msg::Pose pose;
       simulation_interface::toMsg(entity.pose(), pose);
-      ego_pose = pose;
+      lidar_pose = pose;
+      lidar_pose->position.z += entity.bounding_box().dimensions().z();
     } else {
       geometry_msgs::msg::Pose pose;
       simulation_interface::toMsg(entity.pose(), pose);
@@ -54,12 +55,12 @@ auto LidarSensor<sensor_msgs::msg::PointCloud2>::raycast(
     }
   }
 
-  if (ego_pose) {
+  if (lidar_pose) {
     std::vector<double> vertical_angles;
     for (const auto vertical_angle : configuration_.vertical_angles()) {
       vertical_angles.push_back(vertical_angle);
     }
-    const auto pointcloud = raycaster_.raycast("base_link", current_ros_time, ego_pose.value());
+    const auto pointcloud = raycaster_.raycast("base_link", current_ros_time, lidar_pose.value());
     detected_objects_ = raycaster_.getDetectedObject();
     return pointcloud;
   } else {
