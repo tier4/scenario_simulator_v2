@@ -18,6 +18,9 @@ Changelog for package zmqpp_vendor
 16.4.2 (2025-05-23)
 -------------------
 
+18.0.2 (2025-10-17)
+-------------------
+
 18.0.1 (2025-10-16)
 -------------------
 * Merge branch 'master' into refactor/lidar_sensor
