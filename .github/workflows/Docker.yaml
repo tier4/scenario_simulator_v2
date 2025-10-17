@@ -93,8 +93,7 @@ jobs:
     strategy:
       matrix:
         rosdistro: [humble]
-        # arch: [amd64, arm64]
-        arch: [amd64]
+        arch: [amd64, arm64]
 
     steps:
       - name: Free Disk Space (Ubuntu)
