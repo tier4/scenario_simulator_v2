@@ -24,6 +24,9 @@ Changelog for package real_time_factor_control_rviz_plugin
 16.4.2 (2025-05-23)
 -------------------
 
+18.0.2 (2025-10-17)
+-------------------
+
 18.0.1 (2025-10-16)
 -------------------
 * Merge branch 'master' into refactor/lidar_sensor

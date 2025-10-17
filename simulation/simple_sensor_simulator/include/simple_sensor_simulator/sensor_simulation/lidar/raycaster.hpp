@@ -18,17 +18,15 @@
 #include <embree4/rtcore.h>
 #include <pcl_conversions/pcl_conversions.h>
 
-#include <geometry/quaternion/euler_to_quaternion.hpp>
+#include <algorithm>
 #include <geometry/quaternion/get_rotation_matrix.hpp>
 #include <geometry_msgs/msg/pose.hpp>
-#include <geometry_msgs/msg/vector3.hpp>
 #include <memory>
+#include <optional>
 #include <random>
-#include <sensor_msgs/msg/point_cloud2.hpp>
 #include <simple_sensor_simulator/sensor_simulation/primitives/box.hpp>
 #include <simple_sensor_simulator/sensor_simulation/primitives/primitive.hpp>
 #include <string>
-#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -40,17 +38,30 @@ public:
   Raycaster();
   explicit Raycaster(std::string embree_config);
   ~Raycaster();
-  template <typename T, typename... Ts>
-  void addPrimitive(std::string name, Ts &&... xs)
+
+  struct Entity
   {
-    if (primitive_ptrs_.count(name) != 0) {
-      throw std::runtime_error("primitive " + name + " already exist.");
+    const std::string name;
+    std::unique_ptr<primitives::Primitive> primitive;
+    std::optional<uint32_t> geometry_id;
+
+    Entity(const std::string & entity_name, std::unique_ptr<primitives::Primitive> entity_primitive)
+    : name(entity_name), primitive(std::move(entity_primitive))
+    {
     }
-    auto primitive_ptr = std::make_unique<T>(std::forward<Ts>(xs)...);
-    primitive_ptrs_.emplace(name, std::move(primitive_ptr));
+  };
+
+  template <typename T, typename... Ts>
+  void addPrimitive(const std::string & name, Ts &&... xs)
+  {
+    if (std::any_of(
+          entities_.begin(), entities_.end(), [&name](const auto & e) { return e.name == name; })) {
+      throw std::runtime_error("primitive " + name + " already exists.");
+    }
+    entities_.emplace_back(name, std::make_unique<T>(std::forward<Ts>(xs)...));
   }
-  const sensor_msgs::msg::PointCloud2 raycast(
-    const std::string & frame_id, const rclcpp::Time & stamp,
+
+  pcl::PointCloud<pcl::PointXYZI>::Ptr raycast(
     const geometry_msgs::msg::Pose & origin, double max_distance = 300, double min_distance = 0);
   const std::vector<std::string> & getDetectedObject() const;
   void setDirection(
@@ -66,26 +77,20 @@ private:
   double previous_horizontal_angle_end_;
   double previous_horizontal_resolution_;
   std::vector<double> previous_vertical_angles_;
-  std::unordered_map<std::string, std::unique_ptr<primitives::Primitive>> primitive_ptrs_;
+  std::vector<Entity> entities_;
   RTCDevice device_;
   RTCScene scene_;
   std::random_device seed_gen_;
   std::default_random_engine engine_;
   std::vector<std::string> detected_objects_;
-  std::unordered_map<unsigned int, std::string> geometry_ids_;
   std::vector<Eigen::Matrix3d> rotation_matrices_;
 
-  static void intersect(
-    RTCScene scene, pcl::PointCloud<pcl::PointXYZI>::Ptr cloud,
-    const geometry_msgs::msg::Pose & origin,
-    std::reference_wrapper<std::set<unsigned int>> ref_detected_ids, double max_distance,
-    double min_distance,
-    std::reference_wrapper<const std::vector<Eigen::Matrix3d>> ref_rotation_matrices)
+  void intersect(
+    pcl::PointCloud<pcl::PointXYZI>::Ptr cloud, const geometry_msgs::msg::Pose & origin,
+    std::set<unsigned int> & detected_ids, double max_distance, double min_distance)
   {
-    auto & rotation_matrices = ref_rotation_matrices.get();
-    auto & detected_ids = ref_detected_ids.get();
     const auto orientation_matrix = math::geometry::getRotationMatrix(origin.orientation);
-    for (unsigned int i = 0; i < rotation_matrices.size(); ++i) {
+    for (unsigned int i = 0; i < rotation_matrices_.size(); ++i) {
       RTCRayHit rayhit = {};
       rayhit.ray.org_x = origin.position.x;
       rayhit.ray.org_y = origin.position.y;
@@ -96,20 +101,21 @@ private:
       rayhit.ray.tnear = min_distance;
       rayhit.ray.flags = false;
 
-      const auto rotation_mat = orientation_matrix * rotation_matrices.at(i);
+      const auto & ray_direction = rotation_matrices_.at(i);
+      const auto rotation_mat = orientation_matrix * ray_direction;
       rayhit.ray.dir_x = rotation_mat(0);
       rayhit.ray.dir_y = rotation_mat(1);
       rayhit.ray.dir_z = rotation_mat(2);
       rayhit.hit.geomID = RTC_INVALID_GEOMETRY_ID;
-      rtcIntersect1(scene, &rayhit);
+      rtcIntersect1(scene_, &rayhit);
 
       if (rayhit.hit.geomID != RTC_INVALID_GEOMETRY_ID) {
         double distance = rayhit.ray.tfar;
         pcl::PointXYZI p;
         {
-          p.x = rotation_matrices.at(i)(0) * distance;
-          p.y = rotation_matrices.at(i)(1) * distance;
-          p.z = rotation_matrices.at(i)(2) * distance;
+          p.x = ray_direction(0) * distance;
+          p.y = ray_direction(1) * distance;
+          p.z = ray_direction(2) * distance;
         }
         cloud->emplace_back(p);
         detected_ids.insert(rayhit.hit.geomID);
