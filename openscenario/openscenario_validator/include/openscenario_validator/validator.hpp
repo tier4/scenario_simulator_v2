@@ -18,6 +18,7 @@
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <boost/filesystem.hpp>
 #include <iostream>
+#include <memory>
 #include <sstream>
 #include <stdexcept>
 #include <system_error>
