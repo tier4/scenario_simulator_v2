@@ -12,27 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <algorithm>
-#include <iostream>
+#include <geometry/quaternion/euler_to_quaternion.hpp>
+#include <geometry_msgs/msg/vector3.hpp>
 #include <simple_sensor_simulator/sensor_simulation/lidar/lidar_sensor.hpp>
 #include <simple_sensor_simulator/sensor_simulation/lidar/raycaster.hpp>
 #include <string>
 #include <unordered_map>
-#include <utility>
 #include <vector>
 
 namespace simple_sensor_simulator
 {
 Raycaster::Raycaster()
-: primitive_ptrs_(0),
-  device_(rtcNewDevice(nullptr)),
-  scene_(rtcNewScene(device_)),
-  engine_(seed_gen_())
+: entities_(), device_(rtcNewDevice(nullptr)), scene_(rtcNewScene(device_)), engine_(seed_gen_())
 {
 }
 
 Raycaster::Raycaster(std::string embree_config)
-: primitive_ptrs_(0),
+: entities_(),
   device_(rtcNewDevice(embree_config.c_str())),
   scene_(rtcNewScene(device_)),
   engine_(seed_gen_())
@@ -96,39 +92,35 @@ std::vector<geometry_msgs::msg::Quaternion> Raycaster::getDirections(
 
 const std::vector<std::string> & Raycaster::getDetectedObject() const { return detected_objects_; }
 
-const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
-  const std::string & frame_id, const rclcpp::Time & stamp, const geometry_msgs::msg::Pose & origin,
-  double max_distance, double min_distance)
+pcl::PointCloud<pcl::PointXYZI>::Ptr Raycaster::raycast(
+  const geometry_msgs::msg::Pose & origin, double max_distance, double min_distance)
 {
   detected_objects_ = {};
+  std::unordered_map<uint32_t, size_t> geometry_id_to_entity_index;
   pcl::PointCloud<pcl::PointXYZI>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZI>());
-  for (auto & pair : primitive_ptrs_) {
-    auto id = pair.second->addToScene(device_, scene_);
-    geometry_ids_.insert({id, pair.first});
+  for (size_t entity_idx = 0; entity_idx < entities_.size(); ++entity_idx) {
+    auto & entity = entities_[entity_idx];
+    entity.geometry_id = entity.primitive->addToScene(device_, scene_);
+    geometry_id_to_entity_index[entity.geometry_id.value()] = entity_idx;
   }
 
   std::set<unsigned int> detected_ids;
 
   rtcCommitScene(scene_);
-  intersect(
-    scene_, cloud, origin, std::ref(detected_ids), max_distance, min_distance,
-    std::ref(rotation_matrices_));
+  intersect(cloud, origin, detected_ids, max_distance, min_distance);
 
   for (const auto & id : detected_ids) {
-    detected_objects_.emplace_back(geometry_ids_[id]);
+    detected_objects_.emplace_back(entities_.at(geometry_id_to_entity_index[id]).name);
   }
 
-  for (const auto & id : geometry_ids_) {
-    rtcDetachGeometry(scene_, id.first);
+  for (auto & entity : entities_) {
+    if (entity.geometry_id.has_value()) {
+      rtcDetachGeometry(scene_, entity.geometry_id.value());
+    }
   }
 
-  geometry_ids_.clear();
-  primitive_ptrs_.clear();
+  entities_.clear();
 
-  sensor_msgs::msg::PointCloud2 pointcloud_msg;
-  pcl::toROSMsg(*cloud, pointcloud_msg);
-  pointcloud_msg.header.frame_id = frame_id;
-  pointcloud_msg.header.stamp = stamp;
-  return pointcloud_msg;
+  return cloud;
 }
 }  // namespace simple_sensor_simulator
