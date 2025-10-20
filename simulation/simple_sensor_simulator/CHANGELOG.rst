@@ -24,6 +24,9 @@ Changelog for package simple_sensor_simulator
 16.4.2 (2025-05-23)
 -------------------
 
+18.0.3 (2025-10-20)
+-------------------
+
 18.0.2 (2025-10-17)
 -------------------
 * Merge pull request `#1703 <https://github.com/tier4/scenario_simulator_v2/issues/1703>`_ from tier4/refactor/lidar_sensor_raycaster
