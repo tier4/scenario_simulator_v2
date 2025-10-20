@@ -14,7 +14,7 @@ RUN rm -f /etc/apt/apt.conf.d/docker-clean && \
     echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
 
 WORKDIR /home/ubuntu/Desktop/scenario_simulator_ws/src/scenario_simulator
-COPY . $WORKDIR
+COPY . .
 
 WORKDIR /home/ubuntu/Desktop/scenario_simulator_ws/
 RUN mkdir -p /home/ubuntu/Desktop/scenario_simulator_ws/src/scenario_simulator/external
