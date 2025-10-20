@@ -99,7 +99,7 @@ Raycaster::RaycastResult Raycaster::raycast(
   }
 
   std::vector<uint32_t> point_geometry_ids;
-  RaycastResult result;
+  RaycastResult result(entities);
 
   rtcCommitScene(scene_);
   intersect(result.cloud, origin, point_geometry_ids, max_distance, min_distance);
