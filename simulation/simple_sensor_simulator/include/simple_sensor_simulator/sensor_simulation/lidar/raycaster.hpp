@@ -41,28 +41,31 @@ public:
 
   struct Entity
   {
-    const std::string name;
+    const traffic_simulator_msgs::EntityStatus& entity_status;
     std::unique_ptr<primitives::Primitive> primitive;
     std::optional<uint32_t> geometry_id;
 
-    Entity(const std::string & entity_name, std::unique_ptr<primitives::Primitive> entity_primitive)
-    : name(entity_name), primitive(std::move(entity_primitive))
-    {
-    }
+    explicit Entity(const traffic_simulator_msgs::EntityStatus& status);
+
+    const std::string& name() const { return entity_status.name(); }
   };
 
   struct RaycastResult
   {
     pcl::PointCloud<pcl::PointXYZI>::Ptr cloud;
     std::vector<size_t> point_to_entity_index;
+    const std::vector<Entity>& raycast_entities;
 
-    RaycastResult() : cloud(new pcl::PointCloud<pcl::PointXYZI>) {}
+    explicit RaycastResult(const std::vector<Entity>& entities)
+    : cloud(new pcl::PointCloud<pcl::PointXYZI>), raycast_entities(entities)
+    {
+    }
 
-    std::set<std::string> getDetectedEntityNames(const std::vector<Entity> & raycast_entities) const
+    std::set<std::string> getDetectedEntityNames() const
     {
       std::set<std::string> detected_entity_names;
       for (const auto & entity_idx : point_to_entity_index) {
-        detected_entity_names.insert(raycast_entities[entity_idx].name);
+        detected_entity_names.insert(raycast_entities[entity_idx].name());
       }
       return detected_entity_names;
     }
