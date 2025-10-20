@@ -23,15 +23,12 @@
 namespace simple_sensor_simulator
 {
 Raycaster::Raycaster()
-: entities_(), device_(rtcNewDevice(nullptr)), scene_(rtcNewScene(device_)), engine_(seed_gen_())
+: device_(rtcNewDevice(nullptr)), scene_(rtcNewScene(device_)), engine_(seed_gen_())
 {
 }
 
 Raycaster::Raycaster(std::string embree_config)
-: entities_(),
-  device_(rtcNewDevice(embree_config.c_str())),
-  scene_(rtcNewScene(device_)),
-  engine_(seed_gen_())
+: device_(rtcNewDevice(embree_config.c_str())), scene_(rtcNewScene(device_)), engine_(seed_gen_())
 {
 }
 
@@ -91,13 +88,14 @@ std::vector<geometry_msgs::msg::Quaternion> Raycaster::getDirections(
 }
 
 Raycaster::RaycastResult Raycaster::raycast(
-  const geometry_msgs::msg::Pose & origin, double max_distance, double min_distance)
+  const geometry_msgs::msg::Pose & origin, std::vector<Entity> & entities, double max_distance,
+  double min_distance)
 {
   RaycastResult result;
   std::unordered_map<uint32_t, size_t> geometry_id_to_entity_index;
   pcl::PointCloud<pcl::PointXYZI>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZI>());
-  for (size_t entity_idx = 0; entity_idx < entities_.size(); ++entity_idx) {
-    auto & entity = entities_[entity_idx];
+  for (size_t entity_idx = 0; entity_idx < entities.size(); ++entity_idx) {
+    auto & entity = entities[entity_idx];
     entity.geometry_id = entity.primitive->addToScene(device_, scene_);
     geometry_id_to_entity_index[entity.geometry_id.value()] = entity_idx;
   }
@@ -110,17 +108,15 @@ Raycaster::RaycastResult Raycaster::raycast(
   for (const auto & geometry_id : point_geometry_ids) {
     auto it = geometry_id_to_entity_index.find(geometry_id);
     if (it != geometry_id_to_entity_index.end()) {
-      result.detected_unique_entity_names.insert(entities_[it->second].name);
+      result.detected_unique_entity_names.insert(entities[it->second].name);
     }
   }
 
-  for (auto & entity : entities_) {
+  for (auto & entity : entities) {
     if (entity.geometry_id.has_value()) {
       rtcDetachGeometry(scene_, entity.geometry_id.value());
     }
   }
-
-  entities_.clear();
 
   result.cloud = cloud;
   return result;

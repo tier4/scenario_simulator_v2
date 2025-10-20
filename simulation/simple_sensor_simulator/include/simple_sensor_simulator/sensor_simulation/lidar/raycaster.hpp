@@ -57,18 +57,9 @@ public:
     std::set<std::string> detected_unique_entity_names;
   };
 
-  template <typename T, typename... Ts>
-  void addPrimitive(const std::string & name, Ts &&... xs)
-  {
-    if (std::any_of(
-          entities_.begin(), entities_.end(), [&name](const auto & e) { return e.name == name; })) {
-      throw std::runtime_error("primitive " + name + " already exists.");
-    }
-    entities_.emplace_back(name, std::make_unique<T>(std::forward<Ts>(xs)...));
-  }
-
   RaycastResult raycast(
-    const geometry_msgs::msg::Pose & origin, double max_distance = 300, double min_distance = 0);
+    const geometry_msgs::msg::Pose & origin, std::vector<Entity> & entities,
+    double max_distance = 300, double min_distance = 0);
   void setDirection(
     const simulation_api_schema::LidarConfiguration & configuration,
     double horizontal_angle_start = 0, double horizontal_angle_end = 2 * M_PI);
@@ -82,7 +73,6 @@ private:
   double previous_horizontal_angle_end_;
   double previous_horizontal_resolution_;
   std::vector<double> previous_vertical_angles_;
-  std::vector<Entity> entities_;
   RTCDevice device_;
   RTCScene scene_;
   std::random_device seed_gen_;
