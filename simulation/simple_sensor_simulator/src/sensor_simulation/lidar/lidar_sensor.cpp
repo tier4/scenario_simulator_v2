@@ -37,21 +37,7 @@ auto LidarSensor<sensor_msgs::msg::PointCloud2>::raycast(
       simulation_interface::toMsg(entity.pose(), pose);
       ego_pose = pose;
     } else {
-      geometry_msgs::msg::Pose pose;
-      simulation_interface::toMsg(entity.pose(), pose);
-      auto rotation = math::geometry::getRotationMatrix(pose.orientation);
-      geometry_msgs::msg::Point center_point;
-      simulation_interface::toMsg(entity.bounding_box().center(), center_point);
-      Eigen::Vector3d center(center_point.x, center_point.y, center_point.z);
-      center = rotation * center;
-      pose.position.x = pose.position.x + center.x();
-      pose.position.y = pose.position.y + center.y();
-      pose.position.z = pose.position.z + center.z();
-      raycast_entities.emplace_back(
-        entity.name(),
-        std::make_unique<simple_sensor_simulator::primitives::Box>(
-          entity.bounding_box().dimensions().x(), entity.bounding_box().dimensions().y(),
-          entity.bounding_box().dimensions().z(), pose));
+      raycast_entities.emplace_back(entity);
     }
   }
 

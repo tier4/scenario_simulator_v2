@@ -16,12 +16,32 @@
 #include <geometry_msgs/msg/vector3.hpp>
 #include <simple_sensor_simulator/sensor_simulation/lidar/lidar_sensor.hpp>
 #include <simple_sensor_simulator/sensor_simulation/lidar/raycaster.hpp>
+#include <simulation_interface/conversions.hpp>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
 namespace simple_sensor_simulator
 {
+Raycaster::Entity::Entity(const traffic_simulator_msgs::EntityStatus & status)
+: entity_status(status)
+{
+  geometry_msgs::msg::Pose pose;
+  simulation_interface::toMsg(entity_status.pose(), pose);
+  auto rotation = math::geometry::getRotationMatrix(pose.orientation);
+  geometry_msgs::msg::Point center_point;
+  simulation_interface::toMsg(entity_status.bounding_box().center(), center_point);
+  Eigen::Vector3d center(center_point.x, center_point.y, center_point.z);
+  center = rotation * center;
+  pose.position.x = pose.position.x + center.x();
+  pose.position.y = pose.position.y + center.y();
+  pose.position.z = pose.position.z + center.z();
+
+  primitive = std::make_unique<simple_sensor_simulator::primitives::Box>(
+    entity_status.bounding_box().dimensions().x(), entity_status.bounding_box().dimensions().y(),
+    entity_status.bounding_box().dimensions().z(), pose);
+}
+
 Raycaster::Raycaster()
 : device_(rtcNewDevice(nullptr)), scene_(rtcNewScene(device_)), engine_(seed_gen_())
 {
