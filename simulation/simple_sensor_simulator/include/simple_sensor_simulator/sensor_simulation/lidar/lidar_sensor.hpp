@@ -35,7 +35,7 @@ protected:
   simulation_api_schema::LidarConfiguration configuration_;
 
   Raycaster raycaster_;
-  std::vector<std::string> detected_objects_;
+  std::set<std::string> detected_objects_;
 
   explicit LidarSensorBase(
     const double current_simulation_time,
@@ -51,7 +51,7 @@ public:
     const double current_simulation_time, const std::vector<traffic_simulator_msgs::EntityStatus> &,
     const rclcpp::Time & current_ros_time) -> void = 0;
 
-  auto getDetectedObjects() const -> const std::vector<std::string> & { return detected_objects_; }
+  auto getDetectedObjects() const -> const std::set<std::string> & { return detected_objects_; }
 };
 
 template <typename T>

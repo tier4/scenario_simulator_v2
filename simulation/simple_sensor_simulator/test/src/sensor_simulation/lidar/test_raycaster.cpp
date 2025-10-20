@@ -42,9 +42,9 @@ TEST_F(RaycasterTest, addPrimitive_twoIdenticalNames)
  */
 TEST_F(RaycasterTest, raycast_empty)
 {
-  const auto cloud = raycaster_->raycast(origin_);
+  const auto result = raycaster_->raycast(origin_);
 
-  EXPECT_EQ(cloud->points.size(), 0);
+  EXPECT_EQ(result.cloud->points.size(), 0);
 }
 
 /**
@@ -54,9 +54,9 @@ TEST_F(RaycasterTest, raycast_box)
 {
   raycaster_->addPrimitive<primitives::Box>(
     box_name_, box_depth_, box_width_, box_height_, box_pose_);
-  const auto cloud = raycaster_->raycast(origin_);
+  const auto result = raycaster_->raycast(origin_);
 
-  EXPECT_GT(cloud->points.size(), 0);
+  EXPECT_GT(result.cloud->points.size(), 0);
 }
 
 /**
@@ -74,9 +74,9 @@ TEST_F(RaycasterTest, setDirection_oneBox)
 
   raycaster_->setDirection(config);
 
-  const auto cloud = raycaster_->raycast(origin_);
+  const auto result = raycaster_->raycast(origin_);
 
-  EXPECT_GT(cloud->points.size(), 0);
+  EXPECT_GT(result.cloud->points.size(), 0);
 }
 
 /**
@@ -105,26 +105,26 @@ TEST_F(RaycasterTest, setDirection_manyBoxes)
 
   raycaster_->setDirection(config);
 
-  const auto cloud = raycaster_->raycast(origin_);
+  const auto result = raycaster_->raycast(origin_);
 
-  EXPECT_GT(cloud->points.size(), 0);
+  EXPECT_GT(result.cloud->points.size(), 0);
 }
 
 /**
  * @note Test basic functionality. Test detected objects obtaining from the statuses list containing
  * Ego.
  */
-TEST_F(RaycasterTest, getDetectedObjects)
+TEST_F(RaycasterTest, detected_unique_entity_names)
 {
   raycaster_->addPrimitive<primitives::Box>(
     box_name_, box_depth_, box_width_, box_height_, box_pose_);
 
-  raycaster_->raycast(origin_);
+  auto result = raycaster_->raycast(origin_);
 
-  const auto & detected_objects = raycaster_->getDetectedObject();
+  const auto & detected_objects = result.detected_unique_entity_names;
 
   ASSERT_FALSE(detected_objects.empty());
-  EXPECT_EQ(detected_objects[0], box_name_);
+  EXPECT_EQ(detected_objects.count(box_name_), 1);
 }
 
 int main(int argc, char ** argv)

@@ -59,10 +59,10 @@ auto LidarSensor<sensor_msgs::msg::PointCloud2>::raycast(
     for (const auto vertical_angle : configuration_.vertical_angles()) {
       vertical_angles.push_back(vertical_angle);
     }
-    const auto cloud = raycaster_.raycast(ego_pose.value());
-    detected_objects_ = raycaster_.getDetectedObject();
+    const auto result = raycaster_.raycast(ego_pose.value());
+    detected_objects_ = result.detected_unique_entity_names;
     sensor_msgs::msg::PointCloud2 pointcloud_msg;
-    pcl::toROSMsg(*(cloud), pointcloud_msg);
+    pcl::toROSMsg(*(result.cloud), pointcloud_msg);
     pointcloud_msg.header.frame_id = "base_link";
     pointcloud_msg.header.stamp = current_ros_time;
     return pointcloud_msg;

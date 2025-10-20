@@ -90,12 +90,10 @@ std::vector<geometry_msgs::msg::Quaternion> Raycaster::getDirections(
   return directions_;
 }
 
-const std::vector<std::string> & Raycaster::getDetectedObject() const { return detected_objects_; }
-
-pcl::PointCloud<pcl::PointXYZI>::Ptr Raycaster::raycast(
+Raycaster::RaycastResult Raycaster::raycast(
   const geometry_msgs::msg::Pose & origin, double max_distance, double min_distance)
 {
-  detected_objects_ = {};
+  RaycastResult result;
   std::unordered_map<uint32_t, size_t> geometry_id_to_entity_index;
   pcl::PointCloud<pcl::PointXYZI>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZI>());
   for (size_t entity_idx = 0; entity_idx < entities_.size(); ++entity_idx) {
@@ -112,7 +110,7 @@ pcl::PointCloud<pcl::PointXYZI>::Ptr Raycaster::raycast(
   for (const auto & geometry_id : point_geometry_ids) {
     auto it = geometry_id_to_entity_index.find(geometry_id);
     if (it != geometry_id_to_entity_index.end()) {
-      detected_objects_.emplace_back(entities_[it->second].name);
+      result.detected_unique_entity_names.insert(entities_[it->second].name);
     }
   }
 
@@ -124,6 +122,7 @@ pcl::PointCloud<pcl::PointXYZI>::Ptr Raycaster::raycast(
 
   entities_.clear();
 
-  return cloud;
+  result.cloud = cloud;
+  return result;
 }
 }  // namespace simple_sensor_simulator

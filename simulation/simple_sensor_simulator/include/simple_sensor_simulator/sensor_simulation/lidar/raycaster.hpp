@@ -51,6 +51,12 @@ public:
     }
   };
 
+  struct RaycastResult
+  {
+    pcl::PointCloud<pcl::PointXYZI>::Ptr cloud;
+    std::set<std::string> detected_unique_entity_names;
+  };
+
   template <typename T, typename... Ts>
   void addPrimitive(const std::string & name, Ts &&... xs)
   {
@@ -61,9 +67,8 @@ public:
     entities_.emplace_back(name, std::make_unique<T>(std::forward<Ts>(xs)...));
   }
 
-  pcl::PointCloud<pcl::PointXYZI>::Ptr raycast(
+  RaycastResult raycast(
     const geometry_msgs::msg::Pose & origin, double max_distance = 300, double min_distance = 0);
-  const std::vector<std::string> & getDetectedObject() const;
   void setDirection(
     const simulation_api_schema::LidarConfiguration & configuration,
     double horizontal_angle_start = 0, double horizontal_angle_end = 2 * M_PI);
@@ -82,7 +87,6 @@ private:
   RTCScene scene_;
   std::random_device seed_gen_;
   std::default_random_engine engine_;
-  std::vector<std::string> detected_objects_;
   std::vector<Eigen::Matrix3d> rotation_matrices_;
 
   void intersect(
