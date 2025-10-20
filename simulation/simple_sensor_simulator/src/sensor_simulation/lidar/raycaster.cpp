@@ -91,9 +91,7 @@ Raycaster::RaycastResult Raycaster::raycast(
   const geometry_msgs::msg::Pose & origin, std::vector<Entity> & entities, double max_distance,
   double min_distance)
 {
-  RaycastResult result;
   std::unordered_map<uint32_t, size_t> geometry_id_to_entity_index;
-  pcl::PointCloud<pcl::PointXYZI>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZI>());
   for (size_t entity_idx = 0; entity_idx < entities.size(); ++entity_idx) {
     auto & entity = entities[entity_idx];
     entity.geometry_id = entity.primitive->addToScene(device_, scene_);
@@ -101,9 +99,10 @@ Raycaster::RaycastResult Raycaster::raycast(
   }
 
   std::vector<uint32_t> point_geometry_ids;
+  RaycastResult result;
 
   rtcCommitScene(scene_);
-  intersect(cloud, origin, point_geometry_ids, max_distance, min_distance);
+  intersect(result.cloud, origin, point_geometry_ids, max_distance, min_distance);
 
   // Convert geometry IDs to entity indices
   result.point_to_entity_index.reserve(point_geometry_ids.size());
@@ -120,7 +119,6 @@ Raycaster::RaycastResult Raycaster::raycast(
     }
   }
 
-  result.cloud = cloud;
   return result;
 }
 }  // namespace simple_sensor_simulator

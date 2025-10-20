@@ -56,6 +56,8 @@ public:
     pcl::PointCloud<pcl::PointXYZI>::Ptr cloud;
     std::vector<size_t> point_to_entity_index;
 
+    RaycastResult() : cloud(new pcl::PointCloud<pcl::PointXYZI>) {}
+
     std::set<std::string> getDetectedEntityNames(const std::vector<Entity> & raycast_entities) const
     {
       std::set<std::string> detected_entity_names;
