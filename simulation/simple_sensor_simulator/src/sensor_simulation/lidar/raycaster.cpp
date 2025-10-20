@@ -104,13 +104,16 @@ pcl::PointCloud<pcl::PointXYZI>::Ptr Raycaster::raycast(
     geometry_id_to_entity_index[entity.geometry_id.value()] = entity_idx;
   }
 
-  std::set<unsigned int> detected_ids;
+  std::vector<uint32_t> point_geometry_ids;
 
   rtcCommitScene(scene_);
-  intersect(cloud, origin, detected_ids, max_distance, min_distance);
+  intersect(cloud, origin, point_geometry_ids, max_distance, min_distance);
 
-  for (const auto & id : detected_ids) {
-    detected_objects_.emplace_back(entities_.at(geometry_id_to_entity_index[id]).name);
+  for (const auto & geometry_id : point_geometry_ids) {
+    auto it = geometry_id_to_entity_index.find(geometry_id);
+    if (it != geometry_id_to_entity_index.end()) {
+      detected_objects_.emplace_back(entities_[it->second].name);
+    }
   }
 
   for (auto & entity : entities_) {

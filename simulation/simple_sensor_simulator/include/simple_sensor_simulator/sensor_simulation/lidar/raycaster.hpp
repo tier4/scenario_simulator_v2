@@ -87,7 +87,7 @@ private:
 
   void intersect(
     pcl::PointCloud<pcl::PointXYZI>::Ptr cloud, const geometry_msgs::msg::Pose & origin,
-    std::set<unsigned int> & detected_ids, double max_distance, double min_distance)
+    std::vector<uint32_t> & point_geometry_ids, double max_distance, double min_distance)
   {
     const auto orientation_matrix = math::geometry::getRotationMatrix(origin.orientation);
     for (unsigned int i = 0; i < rotation_matrices_.size(); ++i) {
@@ -118,7 +118,7 @@ private:
           p.z = ray_direction(2) * distance;
         }
         cloud->emplace_back(p);
-        detected_ids.insert(rayhit.hit.geomID);
+        point_geometry_ids.push_back(rayhit.hit.geomID);
       }
     }
   }
