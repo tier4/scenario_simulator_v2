@@ -28,6 +28,8 @@ auto LidarSensor<sensor_msgs::msg::PointCloud2>::raycast(
   const rclcpp::Time & current_ros_time) -> sensor_msgs::msg::PointCloud2
 {
   std::optional<geometry_msgs::msg::Pose> ego_pose;
+  std::vector<Raycaster::Entity> raycast_entities;
+  raycast_entities.reserve(entities.size());
 
   for (const auto & entity : entities) {
     if (configuration_.entity() == entity.name()) {
@@ -45,24 +47,19 @@ auto LidarSensor<sensor_msgs::msg::PointCloud2>::raycast(
       pose.position.x = pose.position.x + center.x();
       pose.position.y = pose.position.y + center.y();
       pose.position.z = pose.position.z + center.z();
-      raycaster_.addPrimitive<simple_sensor_simulator::primitives::Box>(
-        entity.name(),                           //
-        entity.bounding_box().dimensions().x(),  //
-        entity.bounding_box().dimensions().y(),  //
-        entity.bounding_box().dimensions().z(),  //
-        pose);
+      raycast_entities.emplace_back(
+        entity.name(),
+        std::make_unique<simple_sensor_simulator::primitives::Box>(
+          entity.bounding_box().dimensions().x(), entity.bounding_box().dimensions().y(),
+          entity.bounding_box().dimensions().z(), pose));
     }
   }
 
   if (ego_pose) {
-    std::vector<double> vertical_angles;
-    for (const auto vertical_angle : configuration_.vertical_angles()) {
-      vertical_angles.push_back(vertical_angle);
-    }
-    const auto cloud = raycaster_.raycast(ego_pose.value());
-    detected_objects_ = raycaster_.getDetectedObject();
+    const auto result = raycaster_.raycast(ego_pose.value(), raycast_entities);
+    detected_objects_ = result.getDetectedEntityNames(raycast_entities);
     sensor_msgs::msg::PointCloud2 pointcloud_msg;
-    pcl::toROSMsg(*(cloud), pointcloud_msg);
+    pcl::toROSMsg(*(result.cloud), pointcloud_msg);
     pointcloud_msg.header.frame_id = "base_link";
     pointcloud_msg.header.stamp = current_ros_time;
     return pointcloud_msg;

@@ -15,26 +15,15 @@
 #include "test_raycaster.hpp"
 
 /**
- * @note Test basic functionality. Test adding a primitive to scene correctness with a Box.
+ * @note Test basic functionality. Test creating a Box entity.
  */
-TEST_F(RaycasterTest, addPrimitive_box)
+TEST_F(RaycasterTest, createEntity_box)
 {
-  EXPECT_NO_THROW(raycaster_->addPrimitive<primitives::Box>(
-    box_name_, box_depth_, box_width_, box_height_, box_pose_));
-}
-
-/**
- * @note Test function behavior when adding two Boxes with identical names to a scene.
- */
-TEST_F(RaycasterTest, addPrimitive_twoIdenticalNames)
-{
-  raycaster_->addPrimitive<primitives::Box>(
-    box_name_, box_depth_, box_width_, box_height_, box_pose_);
-
-  EXPECT_THROW(
-    raycaster_->addPrimitive<primitives::Box>(
-      box_name_, box_depth_, box_width_, box_height_, box_pose_),
-    std::runtime_error);
+  std::vector<Raycaster::Entity> entities;
+  EXPECT_NO_THROW(entities.emplace_back(
+    box_name_, std::make_unique<primitives::Box>(box_depth_, box_width_, box_height_, box_pose_)));
+  EXPECT_EQ(entities.size(), 1);
+  EXPECT_EQ(entities[0].name, box_name_);
 }
 
 /**
@@ -42,9 +31,10 @@ TEST_F(RaycasterTest, addPrimitive_twoIdenticalNames)
  */
 TEST_F(RaycasterTest, raycast_empty)
 {
-  const auto cloud = raycaster_->raycast(origin_);
+  std::vector<Raycaster::Entity> entities;
+  const auto result = raycaster_->raycast(origin_, entities);
 
-  EXPECT_EQ(cloud->points.size(), 0);
+  EXPECT_EQ(result.cloud->points.size(), 0);
 }
 
 /**
@@ -52,11 +42,12 @@ TEST_F(RaycasterTest, raycast_empty)
  */
 TEST_F(RaycasterTest, raycast_box)
 {
-  raycaster_->addPrimitive<primitives::Box>(
-    box_name_, box_depth_, box_width_, box_height_, box_pose_);
-  const auto cloud = raycaster_->raycast(origin_);
+  std::vector<Raycaster::Entity> entities;
+  entities.emplace_back(
+    box_name_, std::make_unique<primitives::Box>(box_depth_, box_width_, box_height_, box_pose_));
+  const auto result = raycaster_->raycast(origin_, entities);
 
-  EXPECT_GT(cloud->points.size(), 0);
+  EXPECT_GT(result.cloud->points.size(), 0);
 }
 
 /**
@@ -65,8 +56,9 @@ TEST_F(RaycasterTest, raycast_box)
  */
 TEST_F(RaycasterTest, setDirection_oneBox)
 {
-  raycaster_->addPrimitive<primitives::Box>(
-    box_name_, box_depth_, box_width_, box_height_, box_pose_);
+  std::vector<Raycaster::Entity> entities;
+  entities.emplace_back(
+    box_name_, std::make_unique<primitives::Box>(box_depth_, box_width_, box_height_, box_pose_));
 
   simulation_api_schema::LidarConfiguration config;
   config.add_vertical_angles(0.0);  // Only one vertical angle for a horizontal ring
@@ -74,9 +66,9 @@ TEST_F(RaycasterTest, setDirection_oneBox)
 
   raycaster_->setDirection(config);
 
-  const auto cloud = raycaster_->raycast(origin_);
+  const auto result = raycaster_->raycast(origin_, entities);
 
-  EXPECT_GT(cloud->points.size(), 0);
+  EXPECT_GT(result.cloud->points.size(), 0);
 }
 
 /**
@@ -86,6 +78,7 @@ TEST_F(RaycasterTest, setDirection_oneBox)
  */
 TEST_F(RaycasterTest, setDirection_manyBoxes)
 {
+  std::vector<Raycaster::Entity> entities;
   constexpr double radius = 5.0;
   constexpr int num_boxes = 10;
   constexpr double angle_increment = 2.0 * M_PI / num_boxes;
@@ -96,7 +89,8 @@ TEST_F(RaycasterTest, setDirection_manyBoxes)
       utils::makePose(radius * cos(angle), radius * sin(angle), 0.0, 0.0, 0.0, 0.0, 1.0);
 
     const std::string name = "box" + std::to_string(i);
-    raycaster_->addPrimitive<primitives::Box>(name, box_depth_, box_width_, box_height_, box_pose);
+    entities.emplace_back(
+      name, std::make_unique<primitives::Box>(box_depth_, box_width_, box_height_, box_pose));
   }
 
   simulation_api_schema::LidarConfiguration config;
@@ -105,26 +99,27 @@ TEST_F(RaycasterTest, setDirection_manyBoxes)
 
   raycaster_->setDirection(config);
 
-  const auto cloud = raycaster_->raycast(origin_);
+  const auto result = raycaster_->raycast(origin_, entities);
 
-  EXPECT_GT(cloud->points.size(), 0);
+  EXPECT_GT(result.cloud->points.size(), 0);
 }
 
 /**
  * @note Test basic functionality. Test detected objects obtaining from the statuses list containing
  * Ego.
  */
-TEST_F(RaycasterTest, getDetectedObjects)
+TEST_F(RaycasterTest, detected_unique_entity_names)
 {
-  raycaster_->addPrimitive<primitives::Box>(
-    box_name_, box_depth_, box_width_, box_height_, box_pose_);
+  std::vector<Raycaster::Entity> entities;
+  entities.emplace_back(
+    box_name_, std::make_unique<primitives::Box>(box_depth_, box_width_, box_height_, box_pose_));
 
-  raycaster_->raycast(origin_);
+  auto result = raycaster_->raycast(origin_, entities);
 
-  const auto & detected_objects = raycaster_->getDetectedObject();
+  const auto detected_objects = result.getDetectedEntityNames(entities);
 
   ASSERT_FALSE(detected_objects.empty());
-  EXPECT_EQ(detected_objects[0], box_name_);
+  EXPECT_EQ(detected_objects.count(box_name_), 1);
 }
 
 int main(int argc, char ** argv)
