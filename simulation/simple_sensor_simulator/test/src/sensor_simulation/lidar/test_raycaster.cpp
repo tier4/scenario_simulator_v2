@@ -116,7 +116,7 @@ TEST_F(RaycasterTest, detected_unique_entity_names)
 
   auto result = raycaster_->raycast(origin_, entities);
 
-  const auto & detected_objects = result.detected_unique_entity_names;
+  const auto detected_objects = result.getDetectedEntityNames(entities);
 
   ASSERT_FALSE(detected_objects.empty());
   EXPECT_EQ(detected_objects.count(box_name_), 1);

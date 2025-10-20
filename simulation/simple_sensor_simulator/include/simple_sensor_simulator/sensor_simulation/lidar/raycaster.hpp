@@ -54,7 +54,16 @@ public:
   struct RaycastResult
   {
     pcl::PointCloud<pcl::PointXYZI>::Ptr cloud;
-    std::set<std::string> detected_unique_entity_names;
+    std::vector<size_t> point_to_entity_index;
+
+    std::set<std::string> getDetectedEntityNames(const std::vector<Entity> & raycast_entities) const
+    {
+      std::set<std::string> detected_entity_names;
+      for (const auto & entity_idx : point_to_entity_index) {
+        detected_entity_names.insert(raycast_entities[entity_idx].name);
+      }
+      return detected_entity_names;
+    }
   };
 
   RaycastResult raycast(

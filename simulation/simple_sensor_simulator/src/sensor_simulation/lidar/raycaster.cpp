@@ -105,10 +105,12 @@ Raycaster::RaycastResult Raycaster::raycast(
   rtcCommitScene(scene_);
   intersect(cloud, origin, point_geometry_ids, max_distance, min_distance);
 
+  // Convert geometry IDs to entity indices
+  result.point_to_entity_index.reserve(point_geometry_ids.size());
   for (const auto & geometry_id : point_geometry_ids) {
     auto it = geometry_id_to_entity_index.find(geometry_id);
     if (it != geometry_id_to_entity_index.end()) {
-      result.detected_unique_entity_names.insert(entities[it->second].name);
+      result.point_to_entity_index.push_back(it->second);
     }
   }
 
