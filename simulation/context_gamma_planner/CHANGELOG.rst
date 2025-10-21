@@ -2,6 +2,13 @@
 Changelog for package context_gamma_planner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+18.0.5 (2025-10-21)
+-------------------
+* Merge branch 'master' into fix/build_error_on_noble
+* Merge branch 'master' into fix/build_error_on_noble
+* Merge branch 'master' into fix/build_error_on_noble
+* Contributors: Kotaro Yoshimoto
+
 18.0.4 (2025-10-20)
 -------------------
 * Merge branch 'master' into patch/arm-suppress-warning
