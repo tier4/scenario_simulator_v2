@@ -15,18 +15,29 @@
 #ifndef SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__LIDAR__LIDAR_SENSOR_HPP_
 #define SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__LIDAR__LIDAR_SENSOR_HPP_
 
-#include <simulation_interface/simulation_api_schema.pb.h>
-
-#include <agnocast_wrapper/agnocast_wrapper.hpp>
+// Standard library headers
+#include <memory>
 #include <queue>
+#include <set>
+#include <string>
+#include <utility>
+#include <vector>
+
+// Third-party headers
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/point_cloud2.hpp>
+#include <simulation_interface/simulation_api_schema.pb.h>
+
+// Project headers
+#include <agnocast_wrapper/agnocast_wrapper.hpp>
+#include <get_parameter/get_parameter.hpp>
+#include <simple_sensor_simulator/sensor_simulation/lidar/lidar_noise_v1_processor.hpp>
+#include <simple_sensor_simulator/sensor_simulation/lidar/lidar_performance_monitor.hpp>
 #include <simple_sensor_simulator/sensor_simulation/lidar/raycaster.hpp>
-#include <string>
-#include <vector>
 
 namespace simple_sensor_simulator
 {
+
 class LidarSensorBase
 {
 protected:
@@ -61,8 +72,13 @@ class LidarSensor : public LidarSensorBase
 
   std::queue<std::pair<sensor_msgs::msg::PointCloud2, double>> queue_pointcloud_;
 
-  auto raycast(const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &)
-    -> T;
+  std::unique_ptr<LidarNoiseV1Processor> noise_processor_ = nullptr;
+
+  LidarPerformanceMonitor performance_monitor_;
+
+  auto raycast(
+    const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &,
+    double current_simulation_time) -> T;
 
 public:
   explicit LidarSensor(
@@ -72,6 +88,14 @@ public:
   : LidarSensorBase(current_simulation_time, configuration), publisher_ptr_(publisher_ptr)
   {
     raycaster_.setDirection(configuration);
+    const std::string topic_name = publisher_ptr_->get_topic_name();
+    const auto noise_model_version =
+      common::getParameter<int>(std::string(topic_name) + ".noise.model.version");
+    if (noise_model_version >= 1) {
+      const auto seed = common::getParameter<int>(std::string(topic_name) + ".seed");
+      noise_processor_ =
+        std::make_unique<LidarNoiseV1Processor>(topic_name, noise_model_version, seed);
+    }
   }
 
   auto update(
@@ -83,8 +107,8 @@ public:
       current_simulation_time - previous_simulation_time_ - configuration_.scan_duration() >=
       -0.002) {
       previous_simulation_time_ = current_simulation_time;
-      queue_pointcloud_.push(
-        std::make_pair(raycast(status, current_ros_time), current_simulation_time));
+      queue_pointcloud_.push(std::make_pair(
+        raycast(status, current_ros_time, current_simulation_time), current_simulation_time));
     } else {
       detected_objects_.clear();
     }
@@ -107,8 +131,8 @@ private:
 
 template <>
 auto LidarSensor<sensor_msgs::msg::PointCloud2>::raycast(
-  const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &)
-  -> sensor_msgs::msg::PointCloud2;
+  const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &,
+  double current_simulation_time) -> sensor_msgs::msg::PointCloud2;
 }  // namespace simple_sensor_simulator
 
 #endif  // SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__LIDAR__LIDAR_SENSOR_HPP_

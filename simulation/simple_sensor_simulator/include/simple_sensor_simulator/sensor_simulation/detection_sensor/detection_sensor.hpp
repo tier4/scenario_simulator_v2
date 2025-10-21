@@ -27,6 +27,7 @@
 #include <random>
 #include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
+#include <simple_sensor_simulator/sensor_simulation/noise_parameter_selector.hpp>
 #include <string>
 #include <unordered_map>
 #include <utility>

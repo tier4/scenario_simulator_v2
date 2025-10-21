@@ -12,20 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <memory>
-#include <optional>
-#include <simple_sensor_simulator/exception.hpp>
+// Implementation-only includes
 #include <simple_sensor_simulator/sensor_simulation/lidar/lidar_sensor.hpp>
+
+#include <optional>
+#include <pcl/point_cloud.h>
+#include <pcl/point_types.h>
+#include <pcl_conversions/pcl_conversions.h>
+#include <simple_sensor_simulator/exception.hpp>
 #include <simulation_interface/conversions.hpp>
-#include <string>
-#include <vector>
 
 namespace simple_sensor_simulator
 {
 template <>
 auto LidarSensor<sensor_msgs::msg::PointCloud2>::raycast(
   const std::vector<traffic_simulator_msgs::EntityStatus> & entities,
-  const rclcpp::Time & current_ros_time) -> sensor_msgs::msg::PointCloud2
+  const rclcpp::Time & current_ros_time, double current_simulation_time)
+  -> sensor_msgs::msg::PointCloud2
 {
   std::optional<geometry_msgs::msg::Pose> ego_pose;
   std::vector<Raycaster::Entity> raycast_entities;
@@ -42,8 +45,38 @@ auto LidarSensor<sensor_msgs::msg::PointCloud2>::raycast(
   }
 
   if (ego_pose) {
-    const auto result = raycaster_.raycast(ego_pose.value(), raycast_entities);
-    detected_objects_ = result.getDetectedEntityNames(raycast_entities);
+    // Use geometry-aware raycast to get points with entity association
+    auto raycast_measurement =
+      performance_monitor_.startMeasurement(LidarPerformanceMonitor::MetricType::RAYCAST);
+    auto result = raycaster_.raycast(ego_pose.value(), raycast_entities);
+    detected_objects_ = result.getDetectedEntityNames();
+
+    // Record raycast performance metrics
+    performance_monitor_.addSample(
+      LidarPerformanceMonitor::MetricType::RAYCAST_ADD_ENTITIES, result.time_add_entities_us);
+    performance_monitor_.addSample(
+      LidarPerformanceMonitor::MetricType::RAYCAST_COMMIT_SCENE, result.time_commit_scene_us);
+    performance_monitor_.addSample(
+      LidarPerformanceMonitor::MetricType::RAYCAST_INTERSECT, result.time_intersect_us);
+    performance_monitor_.addSample(
+      LidarPerformanceMonitor::MetricType::RAYCAST_CONVERT_IDS, result.time_convert_ids_us);
+    performance_monitor_.addSample(
+      LidarPerformanceMonitor::MetricType::RAYCAST_REMOVE_ENTITIES, result.time_remove_entities_us);
+    performance_monitor_.recordRaycastInfo(
+      result.beam_count, result.entity_count, result.cloud->size());
+
+    // Apply noise if noise processor is available
+    if (noise_processor_) {
+      auto noise_measurement =
+        performance_monitor_.startMeasurement(LidarPerformanceMonitor::MetricType::NOISE);
+
+      noise_processor_->applyNoise(result, current_simulation_time, ego_pose.value());
+    }
+
+    // Output statistics periodically
+    performance_monitor_.outputStats(noise_processor_ != nullptr);
+
+    // Convert to standard PointCloud2 message
     sensor_msgs::msg::PointCloud2 pointcloud_msg;
     pcl::toROSMsg(*(result.cloud), pointcloud_msg);
     pointcloud_msg.header.frame_id = "base_link";
@@ -53,4 +86,5 @@ auto LidarSensor<sensor_msgs::msg::PointCloud2>::raycast(
     throw simple_sensor_simulator::SimulationRuntimeError("failed to find ego vehicle");
   }
 }
+
 }  // namespace simple_sensor_simulator

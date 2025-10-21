@@ -1,7 +1,7 @@
 ScenarioModifiers:
   ScenarioModifier:
     - name: LANE_ID
-      list: [34513, 34510, 34564]
+      list: [34513]
 OpenSCENARIO:
   FileHeader:
     author: 'Tatsuya Yamasaki'
@@ -21,7 +21,7 @@ OpenSCENARIO:
   Entities:
     ScenarioObject:
       - name: ego
-        CatalogReference:
+        CatalogReference: &SAMPLE_VEHICLE
           catalogName: sample_vehicle
           entryName: sample_vehicle
         ObjectController:
@@ -33,6 +33,10 @@ OpenSCENARIO:
                   value: "1.5"
                 - name: minJerk
                   value: "-1.5"
+      - name: car_1
+        CatalogReference: *SAMPLE_VEHICLE
+      - name: car_2
+        CatalogReference: *SAMPLE_VEHICLE
   Storyboard:
     Init:
       Actions:
@@ -64,6 +68,44 @@ OpenSCENARIO:
                           h: 0
                           p: 0
                           r: 0
+          - entityRef: car_1
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ""
+                      laneId: 34513
+                      s: 10
+                      offset: 0
+                      Orientation: &DEFAULT_ORIENTATION
+                        type: relative
+                        h: 0
+                        p: 0
+                        r: 0
+              - LongitudinalAction: &SPEED_ACTION_ZERO
+                  SpeedAction:
+                    SpeedActionDynamics:
+                      dynamicsDimension: time
+                      value: 0
+                      dynamicsShape: step
+                    SpeedActionTarget:
+                      AbsoluteTargetSpeed:
+                        value: 0
+          - entityRef: car_2
+            PrivateAction:
+              - TeleportAction:
+                  Position: &POSITION_1
+                    LanePosition:
+                      roadId: ""
+                      laneId: 34462
+                      s: 10
+                      offset: 0
+                      Orientation:
+                        type: relative
+                        h: 0
+                        p: 0
+                        r: 0
+              - LongitudinalAction: *SPEED_ACTION_ZERO
     Story:
       - name: ''
         Act:
@@ -144,7 +186,7 @@ OpenSCENARIO:
                                   conditionEdge: none
                                   ByValueCondition:
                                     SimulationTimeCondition:
-                                      value: 180
+                                      value: 30
                                       rule: greaterThan
                         Action:
                           - name: ''

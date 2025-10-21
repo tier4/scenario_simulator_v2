@@ -33,6 +33,7 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <simple_sensor_simulator/exception.hpp>
 #include <simple_sensor_simulator/sensor_simulation/detection_sensor/detection_sensor.hpp>
+#include <simple_sensor_simulator/sensor_simulation/noise_parameter_selector.hpp>
 #include <simulation_interface/conversions.hpp>
 #include <simulation_interface/operators.hpp>
 #include <string>
@@ -394,42 +395,6 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
         return std::clamp(amplitude * std::exp(-decay * interval) + offset, 0.0, 1.0);
       };
 
-    auto create_selector = [](const std::string & parameter_base_path, double x, double y) {
-      return [parameter_base_path, x, y](const std::string & name) {
-        return [=]() {
-          const auto ellipse_y_radii =
-            common::getParameter<std::vector<double>>(parameter_base_path + "ellipse_y_radii");
-          const auto ellipse_normalized_x_radius = common::getParameter<double>(
-            parameter_base_path + name + ".ellipse_normalized_x_radius");
-          const auto values =
-            common::getParameter<std::vector<double>>(parameter_base_path + name + ".values");
-          if (ellipse_y_radii.size() == values.size()) {
-            /*
-               If the parameter `ellipse_y_radii` contains the value 0.0,
-               division by zero will occur here.
-               However, in that case, the distance will be NaN, which correctly
-               expresses the meaning that "the distance cannot be defined", and
-               this function will work without any problems (zero will be
-               returned).
-            */
-            const auto distance = std::hypot(x / ellipse_normalized_x_radius, y);
-            for (auto i = std::size_t(0); i < ellipse_y_radii.size(); ++i) {
-              if (distance < ellipse_y_radii[i]) {
-                return values[i];
-              }
-            }
-            return 0.0;
-          } else {
-            throw common::Error(
-              "Array size mismatch: ", std::quoted(parameter_base_path + "ellipse_y_radii"),
-              " has ", ellipse_y_radii.size(), " elements, but ",
-              std::quoted(parameter_base_path + name + ".values"), " has ", values.size(),
-              " elements. Both arrays must have the same size.");
-          }
-        };
-      };
-    };
-
     auto yaw_flip = [&](
                       bool previous_flip, double speed, double interval,
                       const std::string & parameter_base_path) -> bool {
@@ -504,7 +469,7 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
           std::string(detected_objects_publisher->get_topic_name()) + ".noise." +
           version_namespace + ".";
 
-        auto selector = create_selector(version_base_path, x, y);
+        auto selector = noise_parameter_selector::createEllipticalParameterSelector(version_base_path, x, y);
 
         noise_output->second.distance_noise = [&]() {
           const auto mean = selector("distance.mean");
@@ -562,92 +527,13 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
       return noised_detected_entities;
     };
 
-    auto get_first_matched_config_name = [this](
-                                           const traffic_simulator_msgs::EntityStatus & entity,
-                                           const std::string & version) -> std::string {
-      const std::string version_base_path =
-        std::string(detected_objects_publisher->get_topic_name()) + ".noise." + version + ".";
-      auto matches_noise_application_entities =
-        [&](
-          const traffic_simulator_msgs::EntityStatus & entity,
-          const std::string & noise_config_name) -> bool {
-        const auto base_path =
-          version_base_path + noise_config_name + ".noise_application_entities.";
-
-        const auto types = common::getParameter<std::vector<std::string>>(base_path + "types");
-        const auto subtypes =
-          common::getParameter<std::vector<std::string>>(base_path + "subtypes");
-        const auto names = common::getParameter<std::vector<std::string>>(base_path + "names");
-
-        auto string_with_wildcards_to_regex =
-          [](const std::string & string_with_wildcards) -> std::regex {
-          std::string regex_pattern;
-          for (char c : string_with_wildcards) {
-            regex_pattern += (c == '*') ? ".*" : (c == '?') ? "." : std::string(1, c);
-          }
-          return std::regex(regex_pattern);
-        };
-
-        // clang-format off
-          return std::any_of(
-                   types.begin(), types.end(),
-                   [entity_type = boost::lexical_cast<std::string>(entity.type()), string_with_wildcards_to_regex]
-                   (const auto & target) {
-                     return std::regex_match(entity_type, string_with_wildcards_to_regex(target));
-                   }) &&
-                 std::any_of(
-                   subtypes.begin(), subtypes.end(),
-                   [entity_subtype = boost::lexical_cast<std::string>(entity.subtype()), string_with_wildcards_to_regex]
-                   (const auto & target) {
-                     return std::regex_match(entity_subtype, string_with_wildcards_to_regex(target));
-                   }) &&
-                 std::any_of(
-                   names.begin(), names.end(),
-                   [entity_name = entity.name(), string_with_wildcards_to_regex]
-                   (const auto & target) {
-                     return std::regex_match(entity_name, string_with_wildcards_to_regex(target));
-                   });
-        // clang-format on
-      };
-
-      const auto parameter_names =
-        common::getParameterNode()
-          .list_parameters({}, rcl_interfaces::srv::ListParameters::Request::DEPTH_RECURSIVE)
-          .names;
-
-      auto extract_child_namespace = [&](const std::string & parameter_name) -> std::string {
-        if (const auto next_dot_pos = parameter_name.find('.', version_base_path.length());
-            next_dot_pos != std::string::npos) {
-          return parameter_name.substr(
-            version_base_path.length(), next_dot_pos - version_base_path.length());
-        }
-        return "";
-      };
-
-      if (auto matched_parameter = std::find_if(
-            parameter_names.begin(), parameter_names.end(),
-            [&](const auto & parameter_name) {
-              if (parameter_name.rfind(version_base_path, 0) == 0) {
-                if (auto child_namespace = extract_child_namespace(parameter_name);
-                    child_namespace != "") {
-                  return matches_noise_application_entities(entity, child_namespace);
-                }
-              }
-              return false;
-            });
-          matched_parameter != parameter_names.end()) {
-        return extract_child_namespace(*matched_parameter);
-      } else {
-        return "";
-      }
-    };
-
     auto noise_v3 = [&](const auto & detected_entities, auto simulation_time) {
       auto noised_detected_entities = std::decay_t<decltype(detected_entities)>();
       for (const auto & entity : detected_entities) {
         if (auto [noise_output, success] = noise_outputs.emplace(entity.name(), simulation_time);
             success) {
-          noise_output->second.config_name = get_first_matched_config_name(entity, "v3");
+          noise_output->second.config_name = noise_parameter_selector::findMatchingNoiseConfigForEntity(
+            entity, "v3", detected_objects_publisher->get_topic_name());
         } else if (not noise_output->second.config_name.empty()) {
           auto vanilla_entity = std::vector<traffic_simulator_msgs::EntityStatus>{entity};
           const std::string config_namespace = "v3." + noise_output->second.config_name;
@@ -690,7 +576,7 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
             ego_baselink_2d, math::geometry::toPolygon2D(entity_pose, entity_bounding_box));
         }();
 
-        auto selector = create_selector(
+        auto selector = noise_parameter_selector::createEllipticalParameterSelector(
           parameter_base_path, noise_base.x() - ego_baselink_2d.x(),
           noise_base.y() - ego_baselink_2d.y());
 
@@ -785,7 +671,8 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
       for (const auto & entity : detected_entities) {
         if (auto [noise_output, success] = noise_outputs.emplace(entity.name(), simulation_time);
             success) {
-          noise_output->second.config_name = get_first_matched_config_name(entity, "v4");
+          noise_output->second.config_name = noise_parameter_selector::findMatchingNoiseConfigForEntity(
+            entity, "v4", detected_objects_publisher->get_topic_name());
         } else if (not noise_output->second.config_name.empty()) {
           const std::string parameter_base_path =
             std::string(detected_objects_publisher->get_topic_name()) + ".noise.v4." +
