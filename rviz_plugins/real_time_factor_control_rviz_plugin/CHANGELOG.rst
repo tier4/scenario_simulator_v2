@@ -24,6 +24,13 @@ Changelog for package real_time_factor_control_rviz_plugin
 16.4.2 (2025-05-23)
 -------------------
 
+18.0.4 (2025-10-20)
+-------------------
+* Merge branch 'master' into patch/arm-suppress-warning
+* Merge branch 'master' into patch/arm-suppress-warning
+* Merge branch 'master' into patch/arm-suppress-warning
+* Contributors: Kotaro Yoshimoto
+
 18.0.3 (2025-10-20)
 -------------------
 
