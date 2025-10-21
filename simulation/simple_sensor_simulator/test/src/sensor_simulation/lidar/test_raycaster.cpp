@@ -42,12 +42,9 @@ TEST_F(RaycasterTest, addPrimitive_twoIdenticalNames)
  */
 TEST_F(RaycasterTest, raycast_empty)
 {
-  const auto cloud = raycaster_->raycast(frame_id_, stamp_, origin_);
-  const auto total_num_of_points = cloud.width * cloud.height;
+  const auto cloud = raycaster_->raycast(origin_);
 
-  EXPECT_EQ(total_num_of_points, 0);
-  EXPECT_EQ(cloud.header.frame_id, frame_id_);
-  EXPECT_EQ(cloud.header.stamp, stamp_);
+  EXPECT_EQ(cloud->points.size(), 0);
 }
 
 /**
@@ -57,13 +54,9 @@ TEST_F(RaycasterTest, raycast_box)
 {
   raycaster_->addPrimitive<primitives::Box>(
     box_name_, box_depth_, box_width_, box_height_, box_pose_);
+  const auto cloud = raycaster_->raycast(origin_);
 
-  const auto cloud = raycaster_->raycast(frame_id_, stamp_, origin_);
-  const auto total_num_of_points = cloud.width * cloud.height;
-
-  EXPECT_GT(total_num_of_points, 0);
-  EXPECT_EQ(cloud.header.frame_id, frame_id_);
-  EXPECT_EQ(cloud.header.stamp, stamp_);
+  EXPECT_GT(cloud->points.size(), 0);
 }
 
 /**
@@ -81,12 +74,9 @@ TEST_F(RaycasterTest, setDirection_oneBox)
 
   raycaster_->setDirection(config);
 
-  const auto cloud = raycaster_->raycast(frame_id_, stamp_, origin_);
-  const auto total_num_of_points = cloud.width * cloud.height;
+  const auto cloud = raycaster_->raycast(origin_);
 
-  EXPECT_GT(total_num_of_points, 0);
-  EXPECT_EQ(cloud.header.frame_id, frame_id_);
-  EXPECT_EQ(cloud.header.stamp, stamp_);
+  EXPECT_GT(cloud->points.size(), 0);
 }
 
 /**
@@ -115,12 +105,9 @@ TEST_F(RaycasterTest, setDirection_manyBoxes)
 
   raycaster_->setDirection(config);
 
-  const auto cloud = raycaster_->raycast(frame_id_, stamp_, origin_);
-  const auto total_num_of_points = cloud.width * cloud.height;
+  const auto cloud = raycaster_->raycast(origin_);
 
-  EXPECT_GT(total_num_of_points, 0);
-  EXPECT_EQ(cloud.header.frame_id, frame_id_);
-  EXPECT_EQ(cloud.header.stamp, stamp_);
+  EXPECT_GT(cloud->points.size(), 0);
 }
 
 /**
@@ -132,7 +119,7 @@ TEST_F(RaycasterTest, getDetectedObjects)
   raycaster_->addPrimitive<primitives::Box>(
     box_name_, box_depth_, box_width_, box_height_, box_pose_);
 
-  raycaster_->raycast(frame_id_, stamp_, origin_);
+  raycaster_->raycast(origin_);
 
   const auto & detected_objects = raycaster_->getDetectedObject();
 

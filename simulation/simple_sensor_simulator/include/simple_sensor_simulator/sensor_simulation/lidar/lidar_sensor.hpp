@@ -18,8 +18,6 @@
 #include <simulation_interface/simulation_api_schema.pb.h>
 
 #include <agnocast_wrapper/agnocast_wrapper.hpp>
-#include <geometry/quaternion/get_rotation_matrix.hpp>
-#include <memory>
 #include <queue>
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/point_cloud2.hpp>
