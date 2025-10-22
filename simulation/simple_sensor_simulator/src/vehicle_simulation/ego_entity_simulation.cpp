@@ -33,6 +33,8 @@ EgoEntitySimulation::EgoEntitySimulation(
 : autoware(std::make_unique<concealer::AutowareUniverse>(
     common::getParameter<bool>("simulate_localization"))),
   vehicle_model_type_(getVehicleModelType()),
+  wheel_base_(common::getParameter(
+    "wheel_base", parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x)),
   vehicle_model_ptr_(makeSimulationModel(vehicle_model_type_, step_time, parameters)),
   status_(initial_status, std::nullopt),
   initial_pose_(status_.getMapPose()),
@@ -223,6 +225,8 @@ auto EgoEntitySimulation::overwrite(
   using math::geometry::convertQuaternionToEulerAngle;
   using math::geometry::getRotationMatrix;
 
+  constexpr double min_linear_velocity_for_steer_calculation = 1e-9;
+
   autoware->rethrow();
 
   /*
@@ -245,8 +249,7 @@ auto EgoEntitySimulation::overwrite(
       relative_orientation.y = q.y();
       relative_orientation.z = q.z();
       relative_orientation.w = q.w();
-      return convertQuaternionToEulerAngle(relative_orientation).z -
-             (previous_linear_velocity_ ? *previous_angular_velocity_ : 0) * step_time;
+      return convertQuaternionToEulerAngle(relative_orientation).z;
     }();
 
     switch (auto state = Eigen::VectorXd(vehicle_model_ptr_->getDimX()); vehicle_model_type_) {
@@ -258,7 +261,15 @@ auto EgoEntitySimulation::overwrite(
         [[fallthrough]];
 
       case VehicleModelType::DELAY_STEER_VEL:
-        state(4) = 0;
+        if (
+          std::abs(status.action_status.twist.linear.x) <
+          min_linear_velocity_for_steer_calculation) {
+          state(4) = 0.0;
+        } else {
+          state(4) = std::atan(
+            (status.action_status.twist.angular.z * wheel_base_) /
+            status.action_status.twist.linear.x);
+        }
         [[fallthrough]];
 
       case VehicleModelType::IDEAL_STEER_ACC:
@@ -372,8 +383,7 @@ auto EgoEntitySimulation::getCurrentTwist() const -> geometry_msgs::msg::Twist
   return current_twist;
 }
 
-auto EgoEntitySimulation::getCurrentPose(const double pitch_angle = 0.) const
-  -> geometry_msgs::msg::Pose
+auto EgoEntitySimulation::getCurrentPose(const double pitch_angle) const -> geometry_msgs::msg::Pose
 {
   using math::geometry::operator*;
   const auto relative_position =

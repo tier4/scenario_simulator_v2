@@ -50,6 +50,14 @@ public:
   {
     return entity_behavior::PedestrianActionNode::providedPorts();
   }
+
+private:
+  bool isObstacleInFront(const bool see_around) const;
+  bool isEntityColliding(
+    const traffic_simulator::entity_status::CanonicalizedEntityStatus & entity_status,
+    const double & detection_horizon) const;
+
+  static constexpr double front_entity_margin = 2.0;
 };
 }  // namespace pedestrian
 }  // namespace entity_behavior

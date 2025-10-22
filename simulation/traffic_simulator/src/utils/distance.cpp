@@ -221,7 +221,8 @@ auto splineDistanceToBoundingBox(
   const CanonicalizedLaneletPose & from_lanelet_pose,
   const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
   const CanonicalizedLaneletPose & target_lanelet_pose,
-  const traffic_simulator_msgs::msg::BoundingBox & target_bounding_box) -> std::optional<double>
+  const traffic_simulator_msgs::msg::BoundingBox & target_bounding_box,
+  const double lateral_collision_threshold) -> std::optional<double>
 {
   const auto [min_range, max_range] = spline.getAltitudeRange();
   if (not lanelet_wrapper::pose::isAltitudeWithinRange(
@@ -263,11 +264,15 @@ auto splineDistanceToBoundingBox(
       const auto target_bounding_box_distance =
         bounding_box_distance.value() + from_bounding_box.dimensions.x / 2.0;
 
-      /// @note if the distance of the target entity to the spline is smaller than the width of the reference entity
-      if (const auto target_to_spline_distance = traffic_simulator::distance::distanceToSpline(
-            static_cast<geometry_msgs::msg::Pose>(target_lanelet_pose_alternative.value()),
-            target_bounding_box, spline, longitudinal_distance.value());
-          target_to_spline_distance <= from_bounding_box.dimensions.y / 2.0) {
+      const auto target_to_spline_distance = traffic_simulator::distance::distanceToSpline(
+        static_cast<geometry_msgs::msg::Pose>(target_lanelet_pose_alternative.value()),
+        target_bounding_box, spline, longitudinal_distance.value());
+
+      const double threshold = lateral_collision_threshold < 0.0
+                                 ? from_bounding_box.dimensions.y / 2.0
+                                 : lateral_collision_threshold;
+
+      if (target_to_spline_distance <= threshold) {
         return target_bounding_box_distance;
       }
       /// @note if the distance of the target entity to the spline cannot be calculated because a collision occurs

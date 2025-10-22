@@ -14,6 +14,7 @@
 
 #include <algorithm>
 #include <behavior_tree_plugin/action_node.hpp>
+#include <cmath>
 #include <geometry/bounding_box.hpp>
 #include <geometry/distance.hpp>
 #include <geometry/quaternion/euler_to_quaternion.hpp>
@@ -21,6 +22,7 @@
 #include <geometry/quaternion/get_rotation_matrix.hpp>
 #include <geometry/quaternion/quaternion_to_euler.hpp>
 #include <geometry/vector3/operator.hpp>
+#include <limits>
 #include <memory>
 #include <optional>
 #include <rclcpp/rclcpp.hpp>
@@ -108,6 +110,10 @@ auto ActionNode::getBlackBoardValues() -> void
   if (!getInput<traffic_simulator_msgs::msg::BehaviorParameter>(
         "behavior_parameter", behavior_parameter_)) {
     behavior_parameter_ = traffic_simulator_msgs::msg::BehaviorParameter();
+  }
+  if (!getInput<std::optional<double>>(
+        "lateral_collision_threshold", lateral_collision_threshold_)) {
+    lateral_collision_threshold_ = std::nullopt;  // default: not set
   }
 }
 
@@ -210,7 +216,8 @@ auto ActionNode::getDistanceToFrontEntity(
       return traffic_simulator::distance::splineDistanceToBoundingBox(
         spline, canonicalized_entity_status_->getCanonicalizedLaneletPose().value(),
         canonicalized_entity_status_->getBoundingBox(),
-        front_entity_canonicalized_lanelet_pose.value(), front_entity_status.getBoundingBox());
+        front_entity_canonicalized_lanelet_pose.value(), front_entity_status.getBoundingBox(),
+        lateral_collision_threshold_.value_or(-1.0));
     }
   }
   return std::nullopt;
@@ -245,29 +252,42 @@ auto ActionNode::getFrontEntityName(const math::geometry::CatmullRomSplineInterf
       }
     }
 
+    const auto self_pos = canonicalized_entity_status_->getMapPose().position;
+    const auto self_yaw = math::geometry::convertQuaternionToEulerAngle(
+                            canonicalized_entity_status_->getMapPose().orientation)
+                            .z;
+    // Iterate by increasing euclidean distance and compute the
+    // actual spline-based distance using getDistanceToTargetEntity.
+    // Select the entity that yields the minimal valid distance.
+    std::optional<std::string> best_name;
+    double best_distance = std::numeric_limits<double>::infinity();
     for (const auto & [euclidean_distance, name] : local_euclidean_distances_map) {
       const auto & other_status = other_entity_status_.at(name);
       if (
         const auto & other_canonicalized_lanelet_pose =
           other_status.getCanonicalizedLaneletPose()) {
-        const auto quaternion = math::geometry::getRotation(
-          canonicalized_entity_status_->getMapPose().orientation,
-          other_status.getMapPose().orientation);
-        const auto yaw = math::geometry::convertQuaternionToEulerAngle(quaternion).z;
-
-        if (std::fabs(yaw) <= front_entity_angle_threshold) {
-          const auto longitudinal_distance =
-            traffic_simulator::distance::splineDistanceToBoundingBox(
-              spline, canonicalized_entity_status_->getCanonicalizedLaneletPose().value(),
-              canonicalized_entity_status_->getBoundingBox(),
-              other_canonicalized_lanelet_pose.value(), other_status.getBoundingBox());
-
-          if (longitudinal_distance && longitudinal_distance.value() < horizon) {
-            return name;
+        const auto other_pos = other_status.getMapPose().position;
+        const auto dx = other_pos.x - self_pos.x;
+        const auto dy = other_pos.y - self_pos.y;
+        const auto vec_yaw = std::atan2(dy, dx);
+        const auto yaw_diff =
+          std::atan2(std::sin(vec_yaw - self_yaw), std::cos(vec_yaw - self_yaw));
+        if (std::fabs(yaw_diff) <= front_entity_angle_threshold) {
+          if (const auto distance_opt = traffic_simulator::distance::splineDistanceToBoundingBox(
+                spline, canonicalized_entity_status_->getCanonicalizedLaneletPose().value(),
+                canonicalized_entity_status_->getBoundingBox(),
+                other_canonicalized_lanelet_pose.value(), other_status.getBoundingBox());
+              distance_opt.has_value()) {
+            const auto dist = distance_opt.value();
+            if (dist < best_distance) {
+              best_distance = dist;
+              best_name = name;
+            }
           }
         }
       }
     }
+    return best_name;
   }
   return std::nullopt;
 }
@@ -280,6 +300,142 @@ auto ActionNode::getEntityStatus(const std::string & target_name) const
   } else {
     THROW_SEMANTIC_ERROR("Other entity ", std::quoted(target_name), " does not exist.");
   }
+}
+
+namespace
+{
+namespace bg = boost::geometry;
+using BoostPolygon = math::geometry::boost_polygon;
+
+struct QuadrilateralData
+{
+  std::vector<BoostPolygon> polygons;
+  std::vector<double> longitudinal_starts;
+};
+
+auto buildQuadrilateralData(
+  const math::geometry::CatmullRomSpline & spline, const double width,
+  const std::size_t num_segments) -> QuadrilateralData
+{
+  QuadrilateralData data;
+  if (num_segments == 0) {
+    return data;
+  }
+
+  const double total_length = spline.getLength();
+  const double step_size =
+    num_segments > 0 ? total_length / static_cast<double>(num_segments) : 0.0;
+
+  // Helper that computes the left/right boundary points from the spline center at distance s.
+  const auto compute_bound_point = [&](const double s, const double direction) {
+    geometry_msgs::msg::Vector3 normal_vector = spline.getNormalVector(s);
+    const double theta = std::atan2(normal_vector.y, normal_vector.x);
+    geometry_msgs::msg::Point center_point = spline.getPoint(s);
+    geometry_msgs::msg::Point bound_point;
+    bound_point.x = center_point.x + direction * 0.5 * width * std::cos(theta);
+    bound_point.y = center_point.y + direction * 0.5 * width * std::sin(theta);
+    bound_point.z = center_point.z;
+    return bound_point;
+  };
+
+  // Precompute left/right boundary coordinates for every segment endpoint.
+  std::vector<geometry_msgs::msg::Point> left_bounds;
+  std::vector<geometry_msgs::msg::Point> right_bounds;
+  left_bounds.reserve(num_segments + 1);
+  right_bounds.reserve(num_segments + 1);
+  for (std::size_t i = 0; i <= num_segments; ++i) {
+    const double s = step_size * static_cast<double>(i);
+    right_bounds.emplace_back(compute_bound_point(s, 1.0));
+    left_bounds.emplace_back(compute_bound_point(s, -1.0));
+  }
+
+  data.polygons.reserve(num_segments);
+  data.longitudinal_starts.reserve(num_segments);
+  for (std::size_t i = 0; i < num_segments; ++i) {
+    data.longitudinal_starts.emplace_back(step_size * static_cast<double>(i));
+
+    BoostPolygon polygon;
+    auto & outer = polygon.outer();
+    outer.reserve(5);
+    // Add a closing point because Boost.Geometry requires the first and last points to match.
+    outer.emplace_back(right_bounds[i].x, right_bounds[i].y);
+    outer.emplace_back(left_bounds[i].x, left_bounds[i].y);
+    outer.emplace_back(left_bounds[i + 1].x, left_bounds[i + 1].y);
+    outer.emplace_back(right_bounds[i + 1].x, right_bounds[i + 1].y);
+    outer.push_back(outer.front());
+    bg::correct(polygon);
+    data.polygons.emplace_back(std::move(polygon));
+  }
+  return data;
+}
+
+auto intersectsTrajectory(
+  const QuadrilateralData & trajectory_polygons, const BoostPolygon & target_polygon)
+  -> std::optional<double>
+{
+  const auto num = trajectory_polygons.polygons.size();
+  for (std::size_t i = 0; i < num; ++i) {
+    if (bg::intersects(trajectory_polygons.polygons.at(i), target_polygon)) {
+      return trajectory_polygons.longitudinal_starts.at(i);
+    }
+  }
+  return std::nullopt;
+}
+
+auto detectEntityCollisions(
+  const QuadrilateralData & data,
+  const std::unordered_map<std::string, traffic_simulator::CanonicalizedEntityStatus> &
+    other_entity_status,
+  const std::string & entity_name) -> std::optional<std::pair<std::string, double>>
+{
+  if (data.polygons.empty()) {
+    return std::nullopt;
+  }
+
+  std::optional<std::pair<std::string, double>> nearest_collision;
+  double nearest_range = std::numeric_limits<double>::infinity();
+
+  for (const auto & [name, status] : other_entity_status) {
+    if (entity_name == name) {
+      continue;
+    }
+    // Generate a 2D polygon from the entity pose and bounding box.
+    auto polygon = math::geometry::toPolygon2D(status.getMapPose(), status.getBoundingBox());
+    if (polygon.outer().size() < 3) {
+      continue;
+    }
+
+    // Determine whether it intersects the candidate trajectory and accumulate the result.
+    if (const auto range = intersectsTrajectory(data, polygon)) {
+      const double start = range.value();
+      if (start < nearest_range) {
+        nearest_range = start;
+        nearest_collision = std::make_pair(name, start);
+      }
+    }
+  }
+
+  return nearest_collision;
+}
+
+}  // namespace
+
+auto ActionNode::getFrontEntityNameAndDistanceByTrajectory(
+  const std::vector<geometry_msgs::msg::Point> & waypoints, const double width,
+  const std::size_t num_segments) const -> std::optional<std::pair<std::string, double>>
+{
+  if (waypoints.size() < 2) {
+    return std::nullopt;
+  }
+  const math::geometry::CatmullRomSpline spline(waypoints);
+  const auto quadrilateral_data =
+    buildQuadrilateralData(spline, std::max(0.0, width), num_segments);
+  if (
+    const auto collision = detectEntityCollisions(
+      quadrilateral_data, other_entity_status_, canonicalized_entity_status_->getName())) {
+    return collision;
+  }
+  return std::nullopt;
 }
 
 auto ActionNode::calculateUpdatedEntityStatus(
