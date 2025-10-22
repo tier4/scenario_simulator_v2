@@ -2,6 +2,11 @@
 Changelog for package context_gamma_planner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+18.0.6 (2025-10-22)
+-------------------
+* Merge branch 'master' into fix/duplicated_nodes
+* Contributors: Kotaro Yoshimoto
+
 18.0.5 (2025-10-21)
 -------------------
 * Merge branch 'master' into fix/build_error_on_noble
