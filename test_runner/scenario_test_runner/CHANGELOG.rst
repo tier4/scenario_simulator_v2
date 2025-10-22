@@ -38,6 +38,13 @@ Changelog for package scenario_test_runner
 16.4.2 (2025-05-23)
 -------------------
 
+18.0.6 (2025-10-22)
+-------------------
+* Merge pull request `#1706 <https://github.com/tier4/scenario_simulator_v2/issues/1706>`_ from tier4/fix/duplicated_nodes
+* Merge branch 'master' into fix/duplicated_nodes
+* Remove name attribute from traffic_simulator visualization node to avoid duplicate node name on parameter node
+* Contributors: Kotaro Yoshimoto
+
 18.0.5 (2025-10-21)
 -------------------
 * Merge branch 'master' into fix/build_error_on_noble

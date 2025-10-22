@@ -13,6 +13,11 @@ Changelog for package openscenario_validator
 16.4.2 (2025-05-23)
 -------------------
 
+18.0.6 (2025-10-22)
+-------------------
+* Merge branch 'master' into fix/duplicated_nodes
+* Contributors: Kotaro Yoshimoto
+
 18.0.5 (2025-10-21)
 -------------------
 * Merge pull request `#1704 <https://github.com/tier4/scenario_simulator_v2/issues/1704>`_ from tier4/fix/build_error_on_noble
