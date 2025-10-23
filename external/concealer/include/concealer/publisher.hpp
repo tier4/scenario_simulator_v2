@@ -167,7 +167,16 @@ struct NormalDistribution<sensor_msgs::msg::Imu> : public RandomNumberEngine
                                   angular_velocity_z_error,
                                   linear_acceleration_x_error,
                                   linear_acceleration_y_error,
-                                  linear_acceleration_z_error;
+                                  linear_acceleration_z_error,
+                                  orientation_covariance_diagonal_roll_roll_error,
+                                  orientation_covariance_diagonal_pitch_pitch_error,
+                                  orientation_covariance_diagonal_yaw_yaw_error,
+                                  angular_velocity_covariance_diagonal_x_x_error,
+                                  angular_velocity_covariance_diagonal_y_y_error,
+                                  angular_velocity_covariance_diagonal_z_z_error,
+                                  linear_acceleration_covariance_diagonal_x_x_error,
+                                  linear_acceleration_covariance_diagonal_y_y_error,
+                                  linear_acceleration_covariance_diagonal_z_z_error;
   // clang-format on
 
   /// @note set this to false to disable randomization

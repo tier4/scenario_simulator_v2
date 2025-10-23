@@ -221,15 +221,24 @@ NormalDistribution<sensor_msgs::msg::Imu>::NormalDistribution(
   const std::string & topic)
 : RandomNumberEngine(node, topic),
   // clang-format off
-  orientation_r_error(        node, topic + ".sensor_msgs::msg::Imu.orientation.r.error"),
-  orientation_p_error(        node, topic + ".sensor_msgs::msg::Imu.orientation.p.error"),
-  orientation_y_error(        node, topic + ".sensor_msgs::msg::Imu.orientation.y.error"),
-  angular_velocity_x_error(   node, topic + ".sensor_msgs::msg::Imu.angular_velocity.x.error"),
-  angular_velocity_y_error(   node, topic + ".sensor_msgs::msg::Imu.angular_velocity.y.error"),
-  angular_velocity_z_error(   node, topic + ".sensor_msgs::msg::Imu.angular_velocity.z.error"),
-  linear_acceleration_x_error(node, topic + ".sensor_msgs::msg::Imu.linear_acceleration.x.error"),
-  linear_acceleration_y_error(node, topic + ".sensor_msgs::msg::Imu.linear_acceleration.y.error"),
-  linear_acceleration_z_error(node, topic + ".sensor_msgs::msg::Imu.linear_acceleration.z.error")
+  orientation_r_error(                              node, topic + ".sensor_msgs::msg::Imu.orientation.r.error"),
+  orientation_p_error(                              node, topic + ".sensor_msgs::msg::Imu.orientation.p.error"),
+  orientation_y_error(                              node, topic + ".sensor_msgs::msg::Imu.orientation.y.error"),
+  angular_velocity_x_error(                         node, topic + ".sensor_msgs::msg::Imu.angular_velocity.x.error"),
+  angular_velocity_y_error(                         node, topic + ".sensor_msgs::msg::Imu.angular_velocity.y.error"),
+  angular_velocity_z_error(                         node, topic + ".sensor_msgs::msg::Imu.angular_velocity.z.error"),
+  linear_acceleration_x_error(                      node, topic + ".sensor_msgs::msg::Imu.linear_acceleration.x.error"),
+  linear_acceleration_y_error(                      node, topic + ".sensor_msgs::msg::Imu.linear_acceleration.y.error"),
+  linear_acceleration_z_error(                      node, topic + ".sensor_msgs::msg::Imu.linear_acceleration.z.error"),
+  orientation_covariance_diagonal_roll_roll_error(  node, topic + ".sensor_msgs::msg::Imu.orientation_covariance.roll_roll.error"),
+  orientation_covariance_diagonal_pitch_pitch_error(node, topic + ".sensor_msgs::msg::Imu.orientation_covariance.pitch_pitch.error"),
+  orientation_covariance_diagonal_yaw_yaw_error(    node, topic + ".sensor_msgs::msg::Imu.orientation_covariance.yaw_yaw.error"),
+  angular_velocity_covariance_diagonal_x_x_error(   node, topic + ".sensor_msgs::msg::Imu.angular_velocity_covariance.x_x.error"),
+  angular_velocity_covariance_diagonal_y_y_error(   node, topic + ".sensor_msgs::msg::Imu.angular_velocity_covariance.y_y.error"),
+  angular_velocity_covariance_diagonal_z_z_error(   node, topic + ".sensor_msgs::msg::Imu.angular_velocity_covariance.z_z.error"),
+  linear_acceleration_covariance_diagonal_x_x_error(node, topic + ".sensor_msgs::msg::Imu.linear_acceleration_covariance.x_x.error"),
+  linear_acceleration_covariance_diagonal_y_y_error(node, topic + ".sensor_msgs::msg::Imu.linear_acceleration_covariance.y_y.error"),
+  linear_acceleration_covariance_diagonal_z_z_error(node, topic + ".sensor_msgs::msg::Imu.linear_acceleration_covariance.z_z.error")
 // clang-format on
 {
 }
@@ -257,6 +266,27 @@ auto NormalDistribution<sensor_msgs::msg::Imu>::operator()(sensor_msgs::msg::Imu
   imu.linear_acceleration.x = linear_acceleration_x_error.apply(engine, imu.linear_acceleration.x);
   imu.linear_acceleration.y = linear_acceleration_y_error.apply(engine, imu.linear_acceleration.y);
   imu.linear_acceleration.z = linear_acceleration_z_error.apply(engine, imu.linear_acceleration.z);
+
+  imu.orientation_covariance.at(3 * 0 + 0) =
+    orientation_covariance_diagonal_roll_roll_error.apply(engine, 0.0);
+  imu.orientation_covariance.at(3 * 1 + 1) =
+    orientation_covariance_diagonal_pitch_pitch_error.apply(engine, 0.0);
+  imu.orientation_covariance.at(3 * 2 + 2) =
+    orientation_covariance_diagonal_yaw_yaw_error.apply(engine, 0.0);
+
+  imu.angular_velocity_covariance.at(3 * 0 + 0) =
+    angular_velocity_covariance_diagonal_x_x_error.apply(engine, 0.0);
+  imu.angular_velocity_covariance.at(3 * 1 + 1) =
+    angular_velocity_covariance_diagonal_y_y_error.apply(engine, 0.0);
+  imu.angular_velocity_covariance.at(3 * 2 + 2) =
+    angular_velocity_covariance_diagonal_z_z_error.apply(engine, 0.0);
+
+  imu.linear_acceleration_covariance.at(3 * 0 + 0) =
+    linear_acceleration_covariance_diagonal_x_x_error.apply(engine, 0.0);
+  imu.linear_acceleration_covariance.at(3 * 1 + 1) =
+    linear_acceleration_covariance_diagonal_y_y_error.apply(engine, 0.0);
+  imu.linear_acceleration_covariance.at(3 * 2 + 2) =
+    linear_acceleration_covariance_diagonal_z_z_error.apply(engine, 0.0);
 
   return imu;
 }

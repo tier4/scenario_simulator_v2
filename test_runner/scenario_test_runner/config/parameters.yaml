@@ -526,3 +526,78 @@
               multiplicative:
                 mean: 0.0
                 standard_deviation: 0.0
+        orientation_covariance:
+          roll_roll:
+            error:
+              additive:
+                mean: 0.0001
+                standard_deviation: 0.0
+              multiplicative:
+                mean: 0.0
+                standard_deviation: 0.0
+          pitch_pitch:
+            error:
+              additive:
+                mean: 0.0001
+                standard_deviation: 0.0
+              multiplicative:
+                mean: 0.0
+                standard_deviation: 0.0
+          yaw_yaw:
+            error:
+              additive:
+                mean: 0.0001
+                standard_deviation: 0.0
+              multiplicative:
+                mean: 0.0
+                standard_deviation: 0.0
+        angular_velocity_covariance:
+          x_x:
+            error:
+              additive:
+                mean: 0.0001
+                standard_deviation: 0.0
+              multiplicative:
+                mean: 0.0
+                standard_deviation: 0.0
+          y_y:
+            error:
+              additive:
+                mean: 0.0001
+                standard_deviation: 0.0
+              multiplicative:
+                mean: 0.0
+                standard_deviation: 0.0
+          z_z:
+            error:
+              additive:
+                mean: 0.0001
+                standard_deviation: 0.0
+              multiplicative:
+                mean: 0.0
+                standard_deviation: 0.0
+        linear_acceleration_covariance:
+          x_x:
+            error:
+              additive:
+                mean: 0.0001
+                standard_deviation: 0.0
+              multiplicative:
+                mean: 0.0
+                standard_deviation: 0.0
+          y_y:
+            error:
+              additive:
+                mean: 0.0001
+                standard_deviation: 0.0
+              multiplicative:
+                mean: 0.0
+                standard_deviation: 0.0
+          z_z:
+            error:
+              additive:
+                mean: 0.0001
+                standard_deviation: 0.0
+              multiplicative:
+                mean: 0.0
+                standard_deviation: 0.0
