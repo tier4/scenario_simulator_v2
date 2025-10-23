@@ -87,27 +87,9 @@ public:
     frame_id_(configuration.frame_id()),
     publish(topic, node)
   {
-    /**
-     * @note By default publisher randomization will be active, so we need to deactivate it
-     * If legacy is not overriden we don't want to recalculate covariance matrices, so return early
-     */
     if (not override_legacy_configuration_) {
       publish.getRandomizer().active = false;
-      return;
     }
-
-    /// @note Hardcoded values as the ones used in legacy configuration by default
-    // clang-format off
-    constexpr std::array<double, 9> default_covariance = {
-      0.0001, 0.0,    0.0,
-      0.0,    0.0001, 0.0,
-      0.0,    0.0,    0.0001
-    };
-    // clang-format on
-
-    orientation_covariance_ = default_covariance;
-    angular_velocity_covariance_ = default_covariance;
-    linear_acceleration_covariance_ = default_covariance;
   }
 
   auto update(

@@ -129,34 +129,6 @@
                   multiplicative:
                     mean: 0.0
                     standard_deviation: 0.0
-    /vehicle/status/velocity_status:
-      version: 20240605 # architecture_type suffix (mandatory)
-      seed: 0 # If 0 is specified, a random seed value will be generated for each run.
-      autoware_vehicle_msgs::msg::VelocityReport:
-        longitudinal_velocity:
-          error:
-            additive:
-              mean: 0.0
-              standard_deviation: 0.0
-            multiplicative:
-              mean: 0.0
-              standard_deviation: 0.0
-        lateral_velocity:
-          error:
-            additive:
-              mean: 0.0
-              standard_deviation: 0.0
-            multiplicative:
-              mean: 0.0
-              standard_deviation: 0.0
-        heading_rate:
-          error:
-            additive:
-              mean: 0.0
-              standard_deviation: 0.0
-            multiplicative:
-              mean: 0.0
-              standard_deviation: 0.0
     /localization/pose_estimator/pose_with_covariance:
       version: 20240605 # architecture_type suffix (mandatory)
       seed: 0 # If 0 is specified, a random seed value will be generated for each run.
@@ -280,6 +252,34 @@
                 multiplicative:
                   mean: 0.0
                   standard_deviation: 0.0
+    /vehicle/status/velocity_status:
+      version: 20240605 # architecture_type suffix (mandatory)
+      seed: 0 # If 0 is specified, a random seed value will be generated for each run.
+      autoware_vehicle_msgs::msg::VelocityReport:
+        longitudinal_velocity:
+          error:
+            additive:
+              mean: 0.0
+              standard_deviation: 0.0
+            multiplicative:
+              mean: 0.0
+              standard_deviation: 0.0
+        lateral_velocity:
+          error:
+            additive:
+              mean: 0.0
+              standard_deviation: 0.0
+            multiplicative:
+              mean: 0.0
+              standard_deviation: 0.0
+        heading_rate:
+          error:
+            additive:
+              mean: 0.0
+              standard_deviation: 0.0
+            multiplicative:
+              mean: 0.0
+              standard_deviation: 0.0
     /perception/object_recognition/detection/objects:
       version: 20240605 # architecture_type suffix (mandatory)
       seed: 0 # If 0 is specified, a random seed value will be generated for each run.
@@ -555,6 +555,81 @@
               additive:
                 mean: 0.0
                 standard_deviation: 0.01
+              multiplicative:
+                mean: 0.0
+                standard_deviation: 0.0
+        orientation_covariance:
+          roll_roll:
+            error:
+              additive:
+                mean: 0.0001
+                standard_deviation: 0.0
+              multiplicative:
+                mean: 0.0
+                standard_deviation: 0.0
+          pitch_pitch:
+            error:
+              additive:
+                mean: 0.0001
+                standard_deviation: 0.0
+              multiplicative:
+                mean: 0.0
+                standard_deviation: 0.0
+          yaw_yaw:
+            error:
+              additive:
+                mean: 0.0001
+                standard_deviation: 0.0
+              multiplicative:
+                mean: 0.0
+                standard_deviation: 0.0
+        angular_velocity_covariance:
+          x_x:
+            error:
+              additive:
+                mean: 0.0001
+                standard_deviation: 0.0
+              multiplicative:
+                mean: 0.0
+                standard_deviation: 0.0
+          y_y:
+            error:
+              additive:
+                mean: 0.0001
+                standard_deviation: 0.0
+              multiplicative:
+                mean: 0.0
+                standard_deviation: 0.0
+          z_z:
+            error:
+              additive:
+                mean: 0.0001
+                standard_deviation: 0.0
+              multiplicative:
+                mean: 0.0
+                standard_deviation: 0.0
+        linear_acceleration_covariance:
+          x_x:
+            error:
+              additive:
+                mean: 0.0001
+                standard_deviation: 0.0
+              multiplicative:
+                mean: 0.0
+                standard_deviation: 0.0
+          y_y:
+            error:
+              additive:
+                mean: 0.0001
+                standard_deviation: 0.0
+              multiplicative:
+                mean: 0.0
+                standard_deviation: 0.0
+          z_z:
+            error:
+              additive:
+                mean: 0.0001
+                standard_deviation: 0.0
               multiplicative:
                 mean: 0.0
                 standard_deviation: 0.0
