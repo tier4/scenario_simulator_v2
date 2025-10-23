@@ -28,7 +28,7 @@ jobs:
       - name: Install Python dependencies
         run: |
           cd scenario_simulator_v2
-          uv install --no-interaction
+          uv sync --locked --all-extras --dev
 
       - name: Check updates
         shell: bash
