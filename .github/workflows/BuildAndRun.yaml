@@ -235,7 +235,7 @@ jobs:
 
       - name: Upload install directory
         uses: actions/upload-artifact@v4
-        if: (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && matrix.cmake_build_type == 'RelWithDebInfo'
+        if: matrix.cmake_build_type == 'RelWithDebInfo'
         with:
           name: install-${{ matrix.runs_on }}-${{ matrix.cmake_build_type }}
           path: install
