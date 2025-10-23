@@ -24,6 +24,17 @@ Changelog for package scenario_simulator_v2
 16.4.2 (2025-05-23)
 -------------------
 
+18.0.9 (2025-10-23)
+-------------------
+* Merge branch 'master' into feature/ci-dependabot
+* Contributors: Kotaro Yoshimoto
+
+18.0.8 (2025-10-23)
+-------------------
+* Merge branch 'master' into feature/api-changes-automation
+* Merge branch 'master' into feature/api-changes-automation
+* Contributors: ぐるぐる
+
 18.0.7 (2025-10-23)
 -------------------
 * Merge branch 'master' into refactor/raycaster_2
