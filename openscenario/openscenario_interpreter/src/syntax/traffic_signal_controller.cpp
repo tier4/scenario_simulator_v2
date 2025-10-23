@@ -121,13 +121,12 @@ auto TrafficSignalController::updatePredictions() -> void
       However, the specifications, including this parameter, may change in the future.
    */
     constexpr size_t OUTPUT_PREDICTION_SIZE = 6;
-    double accumulated_time = 0.0;
+    double accumulated_time = (*current_phase).duration - (evaluateSimulationTime() - current_phase_started_at);
     auto phase_iterator = current_phase;
     std::size_t extracted_phases_number = 0;
     std::unordered_map<lanelet::Id, std::vector<std::pair<double, std::string>>> predictions_by_id;
 
     auto extract_prediction = [&](const auto & phase, const double phase_time_seconds) -> bool {
-      accumulated_time += phase_time_seconds;
       bool is_added = false;
       for (const auto & traffic_signal_state : (*phase).traffic_signal_states) {
         if (
@@ -145,6 +144,7 @@ auto TrafficSignalController::updatePredictions() -> void
             accumulated_time, traffic_signal_state.state);
         }
       }
+      accumulated_time += phase_time_seconds;
       return is_added;
     };
 
