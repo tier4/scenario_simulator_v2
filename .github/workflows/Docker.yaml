@@ -10,7 +10,7 @@ on:
       - ".github/workflows/Docker.yaml"
       - "!mkdocs.yml"
       - "!pyproject.toml"
-      - "!poetry.lock"
+      - "!uv.lock"
   push:
     branches:
       - master
