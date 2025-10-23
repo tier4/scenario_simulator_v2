@@ -45,6 +45,8 @@ public:
     const auto lanelet_path = ament_index_cpp::get_package_share_directory("traffic_simulator") +
                               "/map/standard_map/lanelet2_map.osm";
     traffic_simulator::lanelet_map::activate(lanelet_path);
+
+    executor.add_node(node_ptr);
   }
 
   const lanelet::Id id{34836};
@@ -52,6 +54,8 @@ public:
   const lanelet::Id signal_id{34806};
 
   const rclcpp::Node::SharedPtr node_ptr = rclcpp::Node::make_shared("TrafficLightsInternalTest");
+
+  rclcpp::executors::SingleThreadedExecutor executor;
 
   const std::string path = ament_index_cpp::get_package_share_directory("traffic_simulator") +
                            "/map/standard_map/lanelet2_map.osm";
