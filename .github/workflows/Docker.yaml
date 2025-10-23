@@ -58,7 +58,7 @@ jobs:
 
       - name: Build
         if: github.event_name == 'pull_request'
-        uses: docker/bake-action@v6.3.0
+        uses: docker/bake-action@v6.9.0
         with:
           files: |
             ./docker-bake.hcl
@@ -72,7 +72,7 @@ jobs:
 
       - name: Build and push
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-        uses: docker/bake-action@v6.3.0
+        uses: docker/bake-action@v6.9.0
         with:
           files: |
             ./docker-bake.hcl
@@ -132,7 +132,7 @@ jobs:
 
       - name: Build (${{ matrix.arch }})
         if: github.event_name == 'pull_request'
-        uses: docker/bake-action@v6.3.0
+        uses: docker/bake-action@v6.9.0
         with:
           files: |
             ./docker-bake.hcl
@@ -146,7 +146,7 @@ jobs:
 
       - name: Build and push (${{ matrix.arch }})
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-        uses: docker/bake-action@v6.3.0
+        uses: docker/bake-action@v6.9.0
         with:
           files: |
             ./docker-bake.hcl
