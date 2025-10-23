@@ -98,7 +98,6 @@ jobs:
           github-token: ${{ secrets.GH_PAT }}
 
       - name: Call ABIDIFF
-        if: steps.previous_run.outputs.result != 'null' && (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
         continue-on-error: true
         id: abidiff
         run: |
@@ -113,6 +112,12 @@ jobs:
           echo "abidiff_log<<EOF" >> $GITHUB_OUTPUT
           cat abidiff.log >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Show abidiff result
+        if: steps.abidiff.outputs.exit_code != '0'
+        run: |
+          echo "ABI differences detected:"
+          echo "${{ steps.abidiff.outputs.abidiff_log }}"
 
       - name: Get PR number
         if: github.event_name == 'workflow_run'
