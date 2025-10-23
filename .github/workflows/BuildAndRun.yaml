@@ -55,7 +55,7 @@ jobs:
         with:
           repository: RobotecAI/scenario_simulator_v2_scenarios
           path: src/scenario_simulator_v2_scenarios
-      
+
       - name: Cache apt and rosdep
         id: cache-apt-rosdep
         uses: actions/cache@v4
@@ -72,7 +72,7 @@ jobs:
         uses: ros-tooling/setup-ros@v0.7
         with:
           required-ros-distributions: ${{ matrix.rosdistro }}
-  
+
       - name: Search packages in this repository
         id: list_packages
         run: |
@@ -215,12 +215,12 @@ jobs:
           args: >
             --define sonar.cfamily.compile-commands="src/scenario_simulator_v2/bw-output/compile_commands.json"
           projectBaseDir: src/scenario_simulator_v2/
-#      - name: Basic test
-#        run: |
-#          source install/setup.bash
-#          source install/local_setup.bash
-#          ./src/scenario_simulator_v2/.github/workflows/workflow.sh ./src/scenario_simulator_v2_scenarios/workflow/basic.txt
-#        shell: bash
+      #      - name: Basic test
+      #        run: |
+      #          source install/setup.bash
+      #          source install/local_setup.bash
+      #          ./src/scenario_simulator_v2/.github/workflows/workflow.sh ./src/scenario_simulator_v2_scenarios/workflow/basic.txt
+      #        shell: bash
 
       - name: Report error if SonarQube scan failed
         if: steps.sonarcloud.outcome == 'failure'
@@ -228,3 +228,14 @@ jobs:
         with:
           message: "This PR has failed the SonarQube scan. Please check the details in the SonarQube dashboard."
           message-id: "sonarcloud-scan-failure"
+
+      - name: Store Pull Request number to artifact
+        if: github.event_name == 'pull_request'
+        run: echo "PR_NUMBER=${{ github.event.number }}" > install/pr_number.txt
+
+      - name: Upload install directory
+        uses: actions/upload-artifact@v4
+        if: matrix.cmake_build_type == 'RelWithDebInfo'
+        with:
+          name: install-${{ matrix.runs_on }}-${{ matrix.cmake_build_type }}
+          path: install
