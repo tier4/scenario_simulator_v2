@@ -35,10 +35,16 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y abigail-tools
 
+      # TODO: Use RefactoringMinerPP to detect API changes in more precise way
+      # Currently, RefactoringMinerPP shows incorrect results due to matching problems.
+      # Integration with RefactoringMiner 3.0 may help to improve the accuracy, but work in progress.
+      # After fixing the problems, uncomment the commented out steps to enable RefactoringMinerPP.
+
       # - uses: actions/setup-java@v5
       #   with:
       #     distribution: "temurin" # See 'Supported distributions' for available options
       #     java-version: "17"
+
       # - name: Install RefactoringMinerPP
       #   run: |
       #     wget https://apt.llvm.org/llvm.sh
@@ -151,6 +157,9 @@ jobs:
       #     cap current/traffic_simulator/include/traffic_simulator/api/api.hpp current.json
       #     RefactoringMiner -cpp previous.json current.json
 
+      # TODO: Add label when interface breaking changes are detected
+      # Currently, to observe the results of ABIDIFF, we do not automatically add labels.
+      #
       # - name: Add "interface breaking" label
       #   if: steps.abidiff.outputs.exit_code != '0' && github.event_name == 'workflow_run'
       #   uses: actions/github-script@v6
