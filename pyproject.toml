@@ -11,7 +11,7 @@ dependencies = [
     "mkdocs-material>=9.1.19,<10",
     "pymdown-extensions~=10.1",
     "fontawesome-markdown>=0.2.6,<0.3",
-    "markdown==3.3.0",
+    "markdown>=3.3.0",
     "python-markdown-math>=0.8,<0.9",
     "plantuml-markdown>=3.9.2,<4",
     "mkdocs-codeinclude-plugin>=0.2.1,<0.3",
@@ -26,3 +26,6 @@ dependencies = [
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.uv.sources]
+fontawesome-markdown = { git = "https://github.com/jordanauge/fontawesome-markdown", rev = "c00e2d0beb00f0e581b8a108e6205047e73dc492" }
