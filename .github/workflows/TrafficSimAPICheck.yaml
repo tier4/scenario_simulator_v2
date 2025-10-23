@@ -108,11 +108,10 @@ jobs:
           --keep "traffic_simulator::API.*" \
           previous/traffic_simulator/lib/libtraffic_simulator.so \
           current/traffic_simulator/lib/libtraffic_simulator.so | tee abidiff.log
-          echo "exit_code=$?" >> $GITHUB_OUTPUT
+          echo "exit_code=${PIPESTATUS[0]}" >> $GITHUB_OUTPUT
 
-          abidiff_log=$(cat abidiff.log)
           echo "abidiff_log<<EOF" >> $GITHUB_OUTPUT
-          echo "$abidiff_log" >> $GITHUB_OUTPUT
+          cat abidiff.log >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Get PR number
@@ -123,12 +122,12 @@ jobs:
           echo "number=$PR_NUMBER" >> $GITHUB_OUTPUT
 
       - name: Upload abidiff log
-        if: steps.abidiff.outputs.exit_code != '0'
+        if: steps.abidiff.outputs.exit_code != '0' && github.event_name == 'workflow_run'
         uses: mshick/add-pr-comment@v2
         with:
           message: |
-            ## :warning: API compatibility check failed :warning:
-            The public API of `traffic_simulator::API` has changed. Please check the [abidiff log](#) for details.
+            The public API of `traffic_simulator::API` has changed. Please check logs.
+            (This is experimental and work in progress. You do not need to care about this message now.)
 
             <details>
             <summary>Click to expand abidiff log</summary>
