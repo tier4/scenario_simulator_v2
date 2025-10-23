@@ -38,6 +38,12 @@ Changelog for package scenario_test_runner
 16.4.2 (2025-05-23)
 -------------------
 
+18.0.7 (2025-10-23)
+-------------------
+* Merge branch 'master' into refactor/raycaster_2
+* Merge branch 'master' into refactor/raycaster_2
+* Contributors: Kotaro Yoshimoto
+
 18.0.6 (2025-10-22)
 -------------------
 * Merge pull request `#1706 <https://github.com/tier4/scenario_simulator_v2/issues/1706>`_ from tier4/fix/duplicated_nodes
