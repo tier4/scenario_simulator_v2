@@ -61,7 +61,7 @@ jobs:
 
       - name: Lookup previous workflow run
         id: previous_run
-        uses: actions/github-script@v6
+        uses: actions/github-script@v8
         with:
           script: |
             const runIdInput = context.payload.inputs?.base_run_id || '';
