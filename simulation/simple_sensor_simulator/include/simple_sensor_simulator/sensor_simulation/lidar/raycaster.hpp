@@ -41,29 +41,39 @@ public:
 
   struct Entity
   {
-    const std::string name;
+    const traffic_simulator_msgs::EntityStatus & entity_status;
     std::unique_ptr<primitives::Primitive> primitive;
     std::optional<uint32_t> geometry_id;
 
-    Entity(const std::string & entity_name, std::unique_ptr<primitives::Primitive> entity_primitive)
-    : name(entity_name), primitive(std::move(entity_primitive))
+    explicit Entity(const traffic_simulator_msgs::EntityStatus & status);
+
+    const std::string & name() const { return entity_status.name(); }
+  };
+
+  struct RaycastResult
+  {
+    pcl::PointCloud<pcl::PointXYZI>::Ptr cloud;
+    std::vector<size_t> point_to_entity_index;
+    const std::vector<Entity> & raycast_entities;
+
+    explicit RaycastResult(const std::vector<Entity> & entities)
+    : cloud(new pcl::PointCloud<pcl::PointXYZI>), raycast_entities(entities)
     {
+    }
+
+    std::set<std::string> getDetectedEntityNames() const
+    {
+      std::set<std::string> detected_entity_names;
+      for (const auto & entity_idx : point_to_entity_index) {
+        detected_entity_names.insert(raycast_entities[entity_idx].name());
+      }
+      return detected_entity_names;
     }
   };
 
-  template <typename T, typename... Ts>
-  void addPrimitive(const std::string & name, Ts &&... xs)
-  {
-    if (std::any_of(
-          entities_.begin(), entities_.end(), [&name](const auto & e) { return e.name == name; })) {
-      throw std::runtime_error("primitive " + name + " already exists.");
-    }
-    entities_.emplace_back(name, std::make_unique<T>(std::forward<Ts>(xs)...));
-  }
-
-  pcl::PointCloud<pcl::PointXYZI>::Ptr raycast(
-    const geometry_msgs::msg::Pose & origin, double max_distance = 300, double min_distance = 0);
-  const std::vector<std::string> & getDetectedObject() const;
+  RaycastResult raycast(
+    const geometry_msgs::msg::Pose & origin, std::vector<Entity> & entities,
+    double max_distance = 300, double min_distance = 0);
   void setDirection(
     const simulation_api_schema::LidarConfiguration & configuration,
     double horizontal_angle_start = 0, double horizontal_angle_end = 2 * M_PI);
@@ -77,17 +87,15 @@ private:
   double previous_horizontal_angle_end_;
   double previous_horizontal_resolution_;
   std::vector<double> previous_vertical_angles_;
-  std::vector<Entity> entities_;
   RTCDevice device_;
   RTCScene scene_;
   std::random_device seed_gen_;
   std::default_random_engine engine_;
-  std::vector<std::string> detected_objects_;
   std::vector<Eigen::Matrix3d> rotation_matrices_;
 
   void intersect(
     pcl::PointCloud<pcl::PointXYZI>::Ptr cloud, const geometry_msgs::msg::Pose & origin,
-    std::set<unsigned int> & detected_ids, double max_distance, double min_distance)
+    std::vector<uint32_t> & point_geometry_ids, double max_distance, double min_distance)
   {
     const auto orientation_matrix = math::geometry::getRotationMatrix(origin.orientation);
     for (unsigned int i = 0; i < rotation_matrices_.size(); ++i) {
@@ -118,7 +126,7 @@ private:
           p.z = ray_direction(2) * distance;
         }
         cloud->emplace_back(p);
-        detected_ids.insert(rayhit.hit.geomID);
+        point_geometry_ids.push_back(rayhit.hit.geomID);
       }
     }
   }

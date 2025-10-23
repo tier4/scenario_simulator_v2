@@ -24,6 +24,36 @@ Changelog for package simple_sensor_simulator
 16.4.2 (2025-05-23)
 -------------------
 
+18.0.9 (2025-10-23)
+-------------------
+* Merge branch 'master' into feature/ci-dependabot
+* Contributors: Kotaro Yoshimoto
+
+18.0.8 (2025-10-23)
+-------------------
+* Merge branch 'master' into feature/api-changes-automation
+* Merge branch 'master' into feature/api-changes-automation
+* Contributors: ぐるぐる
+
+18.0.7 (2025-10-23)
+-------------------
+* Merge pull request `#1707 <https://github.com/tier4/scenario_simulator_v2/issues/1707>`_ from tier4/refactor/raycaster_2
+* Merge branch 'master' into refactor/raycaster_2
+* Merge branch 'master' into refactor/raycaster_2
+* Move primitive construction into Raycaster::Entity::Entity
+* Add raycast_entities to RaycastResult as a member
+* Initialize Raycaster::RaycastResult::cloud in constructor
+* Optimize `Raycaster::RaycastResult` members
+* Remove `Raycaster::entities\_` to reduce internal states
+* Add `Raycaster::RaycastResult` to handle result of raycast function
+* Refactor Raycaster to use `std::vector` instead of `std::set` for geometry IDs
+* Contributors: Kotaro Yoshimoto
+
+18.0.6 (2025-10-22)
+-------------------
+* Merge branch 'master' into fix/duplicated_nodes
+* Contributors: Kotaro Yoshimoto
+
 18.0.5 (2025-10-21)
 -------------------
 * Merge branch 'master' into fix/build_error_on_noble
