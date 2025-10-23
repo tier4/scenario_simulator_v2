@@ -5,6 +5,9 @@ Changelog for package agnocast_wrapper
 16.4.2 (2025-05-23)
 -------------------
 
+18.0.10 (2025-10-23)
+--------------------
+
 18.0.9 (2025-10-23)
 -------------------
 * Merge branch 'master' into feature/ci-dependabot
