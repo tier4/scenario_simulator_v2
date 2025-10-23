@@ -1,0 +1,96 @@
+name: Build and run with Jazzy
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: 0 0 * * *
+  push:
+    branches:
+      - master
+jobs:
+  job1:
+    name: BuildAndRun
+    runs-on: ${{ matrix.runs_on }}
+    container:
+      image: ros:${{ matrix.rosdistro }}
+    timeout-minutes: 180
+    env:
+      DEBIAN_FRONTEND: noninteractive
+      PIP_BREAK_SYSTEM_PACKAGES: 1
+    strategy:
+      fail-fast: false
+      matrix:
+        rosdistro: [jazzy]
+        runs_on: [ubuntu-24.04]
+        cmake_build_type: [Release]
+    steps:
+      - name: Setup workspace
+        run: mkdir -p src/scenario_simulator_v2
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          path: src/scenario_simulator_v2
+  
+      - name: Install dependencies
+        run: |
+          vcs import src < src/scenario_simulator_v2/dependency_humble.repos
+          rm -rf src/agnocast # currently, agnocast occurs build errors with ROS 2 Jazzy
+
+      - name: Resolve rosdep and install colcon mixin
+        run: |
+          apt-get update
+          apt-get install -y python3-pip python3-colcon-lcov-result lcov unzip gcovr libunwind-dev
+          rosdep update
+          rosdep install -iy --from-paths src --rosdistro ${{ matrix.rosdistro }}
+          colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml
+          colcon mixin update default
+        shell: bash
+
+      - name: Build
+        run: |
+          source /opt/ros/${{ matrix.rosdistro }}/setup.bash
+          colcon build --symlink-install \
+          --event-handlers console_cohesion+ \
+          --cmake-args \
+            -DCMAKE_BUILD_TYPE=${{ matrix.cmake_build_type }} \
+            -DBUILD_CPP_MOCK_SCENARIOS=ON \
+            -DBUILD_TESTING=true \
+            -DCMAKE_CXX_FLAGS='-fprofile-arcs -ftest-coverage -Wno-error=class-memaccess -Wno-unused-local-typedefs -Wno-error=redundant-move -Wno-error=pessimizing-move' \
+            -DCMAKE_C_FLAGS='-fprofile-arcs -ftest-coverage'
+        shell: bash
+
+      - name: Colcon test
+        continue-on-error: true # currently, clang-format test on Jazzy is different one on Humble
+        run: |
+          source install/setup.bash
+          colcon test --event-handlers console_cohesion+
+          colcon lcov-result
+        shell: bash
+
+      - name: Show test result
+        if: always()
+        continue-on-error: true
+        run: |
+          source /opt/ros/${{ matrix.rosdistro }}/setup.bash
+          source install/local_setup.bash
+          colcon test-result --verbose
+        shell: bash
+
+      - name: Scenario test
+        continue-on-error: true
+        run: |
+          source install/setup.bash
+          source install/local_setup.bash
+          ./src/scenario_simulator_v2/.github/workflows/workflow.sh ./src/scenario_simulator_v2/test_runner/scenario_test_runner/config/workflow.txt global_frame_rate:=20
+        shell: bash
+
+      - name: Scenario test (optional)
+        id: optional-scenario-test
+        run: |
+          source install/setup.bash
+          source install/local_setup.bash
+          # execute scenarios but ignore the return code
+          ./src/scenario_simulator_v2/.github/workflows/workflow.sh ./src/scenario_simulator_v2/test_runner/scenario_test_runner/config/optional_workflow.txt global_frame_rate:=20 || true
+          ./src/scenario_simulator_v2/.github/workflows/generate_workflow_report.sh /tmp/scenario_workflow/optional_workflow
+        shell: bash
