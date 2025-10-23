@@ -148,12 +148,18 @@ NormalDistribution<geometry_msgs::msg::PoseWithCovarianceStamped>::NormalDistrib
   const std::string & topic)
 : RandomNumberEngine(node, topic),
   // clang-format off
-  position_local_x_error(node, topic + ".geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_x.error"),
-  position_local_y_error(node, topic + ".geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_y.error"),
-  position_local_z_error(node, topic + ".geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_z.error"),
-  orientation_r_error(   node, topic + ".geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.r.error"),
-  orientation_p_error(   node, topic + ".geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.p.error"),
-  orientation_y_error(   node, topic + ".geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.y.error")
+  position_local_x_error(               node, topic + ".geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_x.error"),
+  position_local_y_error(               node, topic + ".geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_y.error"),
+  position_local_z_error(               node, topic + ".geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_z.error"),
+  orientation_r_error(                  node, topic + ".geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.r.error"),
+  orientation_p_error(                  node, topic + ".geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.p.error"),
+  orientation_y_error(                  node, topic + ".geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.y.error"),
+  covariance_diagonal_x_x_error(        node, topic + ".geometry_msgs::msg::PoseWithCovarianceStamped.pose.covariance.x_x.error"),
+  covariance_diagonal_y_y_error(        node, topic + ".geometry_msgs::msg::PoseWithCovarianceStamped.pose.covariance.y_y.error"),
+  covariance_diagonal_z_z_error(        node, topic + ".geometry_msgs::msg::PoseWithCovarianceStamped.pose.covariance.z_z.error"),
+  covariance_diagonal_roll_roll_error(  node, topic + ".geometry_msgs::msg::PoseWithCovarianceStamped.pose.covariance.roll_roll.error"),
+  covariance_diagonal_pitch_pitch_error(node, topic + ".geometry_msgs::msg::PoseWithCovarianceStamped.pose.covariance.pitch_pitch.error"),
+  covariance_diagonal_yaw_yaw_error(    node, topic + ".geometry_msgs::msg::PoseWithCovarianceStamped.pose.covariance.yaw_yaw.error")
 // clang-format on
 {
 }
@@ -193,6 +199,19 @@ auto NormalDistribution<geometry_msgs::msg::PoseWithCovarianceStamped>::operator
   pose.orientation.y = q.y();
   pose.orientation.z = q.z();
   pose.orientation.w = q.w();
+
+  pose_with_covariance_stamped.pose.covariance.at(6 * 0 + 0) =
+    covariance_diagonal_x_x_error.apply(engine, 0.0);
+  pose_with_covariance_stamped.pose.covariance.at(6 * 1 + 1) =
+    covariance_diagonal_y_y_error.apply(engine, 0.0);
+  pose_with_covariance_stamped.pose.covariance.at(6 * 2 + 2) =
+    covariance_diagonal_z_z_error.apply(engine, 0.0);
+  pose_with_covariance_stamped.pose.covariance.at(6 * 3 + 3) =
+    covariance_diagonal_roll_roll_error.apply(engine, 0.0);
+  pose_with_covariance_stamped.pose.covariance.at(6 * 4 + 4) =
+    covariance_diagonal_pitch_pitch_error.apply(engine, 0.0);
+  pose_with_covariance_stamped.pose.covariance.at(6 * 5 + 5) =
+    covariance_diagonal_yaw_yaw_error.apply(engine, 0.0);
 
   return pose_with_covariance_stamped;
 }

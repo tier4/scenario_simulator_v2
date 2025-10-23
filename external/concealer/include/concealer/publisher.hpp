@@ -139,7 +139,13 @@ struct NormalDistribution<geometry_msgs::msg::PoseWithCovarianceStamped> : publi
                                   position_local_z_error,
                                   orientation_r_error,
                                   orientation_p_error,
-                                  orientation_y_error;
+                                  orientation_y_error,
+                                  covariance_diagonal_x_x_error,
+                                  covariance_diagonal_y_y_error,
+                                  covariance_diagonal_z_z_error,
+                                  covariance_diagonal_roll_roll_error,
+                                  covariance_diagonal_pitch_pitch_error,
+                                  covariance_diagonal_yaw_yaw_error;
   // clang-format on
 
   explicit NormalDistribution(

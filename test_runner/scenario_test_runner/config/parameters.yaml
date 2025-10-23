@@ -203,6 +203,55 @@
                   multiplicative:
                     mean: 0.0
                     standard_deviation: 0.0
+          covariance:
+            x_x:
+              error:
+                additive:
+                  mean: 0.0225
+                  standard_deviation: 0.0
+                multiplicative:
+                  mean: 0.0
+                  standard_deviation: 0.0
+            y_y:
+              error:
+                additive:
+                  mean: 0.0225
+                  standard_deviation: 0.0
+                multiplicative:
+                  mean: 0.0
+                  standard_deviation: 0.0
+            z_z:
+              error:
+                additive:
+                  mean: 0.0225
+                  standard_deviation: 0.0
+                multiplicative:
+                  mean: 0.0
+                  standard_deviation: 0.0
+            roll_roll:
+              error:
+                additive:
+                  mean: 0.000625
+                  standard_deviation: 0.0
+                multiplicative:
+                  mean: 0.0
+                  standard_deviation: 0.0
+            pitch_pitch:
+              error:
+                additive:
+                  mean: 0.000625
+                  standard_deviation: 0.0
+                multiplicative:
+                  mean: 0.0
+                  standard_deviation: 0.0
+            yaw_yaw:
+              error:
+                additive:
+                  mean: 0.000625
+                  standard_deviation: 0.0
+                multiplicative:
+                  mean: 0.0
+                  standard_deviation: 0.0
     /vehicle/status/velocity_status:
       version: 20240605 # architecture_type suffix (mandatory)
       seed: 0 # If 0 is specified, a random seed value will be generated for each run.
