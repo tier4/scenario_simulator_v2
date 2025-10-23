@@ -2,6 +2,9 @@
 Changelog for package context_gamma_planner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+18.0.10 (2025-10-23)
+--------------------
+
 18.0.9 (2025-10-23)
 -------------------
 * Merge branch 'master' into feature/ci-dependabot

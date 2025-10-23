@@ -27,11 +27,11 @@ jobs:
       - name: Setup workspace
         run: mkdir -p src/scenario_simulator_v2
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
           path: src/scenario_simulator_v2
-  
+
       - name: Install dependencies
         run: |
           vcs import src < src/scenario_simulator_v2/dependency_humble.repos
