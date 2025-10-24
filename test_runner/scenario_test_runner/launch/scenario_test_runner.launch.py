@@ -303,7 +303,6 @@ def launch_setup(context, *args, **kwargs):
             package="traffic_simulator",
             executable="visualization_node",
             namespace="simulation",
-            name="visualizer",
             condition=IfCondition(launch_visualization),
             output="screen",
             parameters=make_parameters(),
