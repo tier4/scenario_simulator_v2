@@ -456,7 +456,7 @@
             error:
               additive:
                 mean: 0.0
-                standard_deviation: 0.01
+                standard_deviation: 0.0
               multiplicative:
                 mean: 0.0
                 standard_deviation: 0.0
@@ -464,7 +464,7 @@
             error:
               additive:
                 mean: 0.0
-                standard_deviation: 0.01
+                standard_deviation: 0.0
               multiplicative:
                 mean: 0.0
                 standard_deviation: 0.0
@@ -472,7 +472,7 @@
             error:
               additive:
                 mean: 0.0
-                standard_deviation: 0.01
+                standard_deviation: 0.0
               multiplicative:
                 mean: 0.0
                 standard_deviation: 0.0
@@ -481,7 +481,7 @@
             error:
               additive:
                 mean: 0.0
-                standard_deviation: 0.01
+                standard_deviation: 0.0
               multiplicative:
                 mean: 0.0
                 standard_deviation: 0.0
@@ -489,7 +489,7 @@
             error:
               additive:
                 mean: 0.0
-                standard_deviation: 0.01
+                standard_deviation: 0.0
               multiplicative:
                 mean: 0.0
                 standard_deviation: 0.0
@@ -497,7 +497,7 @@
             error:
               additive:
                 mean: 0.0
-                standard_deviation: 0.01
+                standard_deviation: 0.0
               multiplicative:
                 mean: 0.0
                 standard_deviation: 0.0
@@ -506,7 +506,7 @@
             error:
               additive:
                 mean: 0.0
-                standard_deviation: 0.01
+                standard_deviation: 0.0
               multiplicative:
                 mean: 0.0
                 standard_deviation: 0.0
@@ -514,7 +514,7 @@
             error:
               additive:
                 mean: 0.0
-                standard_deviation: 0.01
+                standard_deviation: 0.0
               multiplicative:
                 mean: 0.0
                 standard_deviation: 0.0
@@ -522,7 +522,7 @@
             error:
               additive:
                 mean: 0.0
-                standard_deviation: 0.01
+                standard_deviation: 0.0
               multiplicative:
                 mean: 0.0
                 standard_deviation: 0.0
