@@ -185,31 +185,6 @@ auto WalkStraightAction::calculateWaypoints() const -> traffic_simulator_msgs::m
 
   append_if_different(pose.position);
 
-  if (canonicalized_entity_status_->isInLanelet()) {
-    auto lanelets_to_follow = route_lanelets_;
-    if (lanelets_to_follow.empty()) {
-      lanelets_to_follow = hdmap_utils_->getFollowingLanelets(
-        canonicalized_entity_status_->getLaneletId(), getHorizon(), true);
-    }
-
-    if (!lanelets_to_follow.empty()) {
-      const auto center_points = hdmap_utils_->getCenterPoints(lanelets_to_follow);
-      if (center_points.size() >= 2) {
-        math::geometry::CatmullRomSpline spline(center_points);
-        const auto lanelet_pose = canonicalized_entity_status_->getLaneletPose();
-        const double start_s = std::clamp(lanelet_pose.s, 0.0, spline.getLength());
-        const double end_s = std::min(start_s + getHorizon(), spline.getLength());
-        constexpr double interval = 1.0;
-
-        for (double s = start_s; s < end_s; s += interval) {
-          append_if_different(spline.getPoint(s));
-        }
-        append_if_different(spline.getPoint(end_s));
-        return waypoints;
-      }
-    }
-  }
-
   const auto yaw = math::geometry::convertQuaternionToEulerAngle(pose.orientation).z;
   const double horizon = getHorizon();
   constexpr double interval = 1.0;
