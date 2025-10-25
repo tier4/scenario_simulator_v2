@@ -12,15 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Implementation-only includes
-#include <simple_sensor_simulator/sensor_simulation/lidar/lidar_sensor.hpp>
-
+#include <memory>
 #include <optional>
-#include <pcl/point_cloud.h>
-#include <pcl/point_types.h>
-#include <pcl_conversions/pcl_conversions.h>
 #include <simple_sensor_simulator/exception.hpp>
+#include <simple_sensor_simulator/sensor_simulation/lidar/lidar_sensor.hpp>
 #include <simulation_interface/conversions.hpp>
+#include <string>
+#include <vector>
 
 namespace simple_sensor_simulator
 {
@@ -72,6 +70,8 @@ auto LidarSensor<sensor_msgs::msg::PointCloud2>::raycast(
 
       noise_processor_->applyNoise(result, current_simulation_time, ego_pose.value());
     }
+    const auto result = raycaster_.raycast(ego_pose.value(), raycast_entities);
+    detected_objects_ = result.getDetectedEntityNames();
 
     // Output statistics periodically
     performance_monitor_.outputStats(noise_processor_ != nullptr);
@@ -86,5 +86,4 @@ auto LidarSensor<sensor_msgs::msg::PointCloud2>::raycast(
     throw simple_sensor_simulator::SimulationRuntimeError("failed to find ego vehicle");
   }
 }
-
 }  // namespace simple_sensor_simulator

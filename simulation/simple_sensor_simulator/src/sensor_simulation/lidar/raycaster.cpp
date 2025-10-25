@@ -12,12 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <simple_sensor_simulator/sensor_simulation/lidar/raycaster.hpp>
-
-#include <chrono>
 #include <geometry/quaternion/euler_to_quaternion.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
 #include <simple_sensor_simulator/sensor_simulation/lidar/lidar_sensor.hpp>
+#include <simple_sensor_simulator/sensor_simulation/lidar/raycaster.hpp>
 #include <simulation_interface/conversions.hpp>
 #include <string>
 #include <unordered_map>
@@ -25,7 +23,7 @@
 
 namespace simple_sensor_simulator
 {
-Raycaster::Entity::Entity(const traffic_simulator_msgs::EntityStatus& status)
+Raycaster::Entity::Entity(const traffic_simulator_msgs::EntityStatus & status)
 : entity_status(status)
 {
   geometry_msgs::msg::Pose pose;
@@ -50,9 +48,7 @@ Raycaster::Raycaster()
 }
 
 Raycaster::Raycaster(std::string embree_config)
-: device_(rtcNewDevice(embree_config.c_str())),
-  scene_(rtcNewScene(device_)),
-  engine_(seed_gen_())
+: device_(rtcNewDevice(embree_config.c_str())), scene_(rtcNewScene(device_)), engine_(seed_gen_())
 {
 }
 
@@ -111,12 +107,10 @@ std::vector<geometry_msgs::msg::Quaternion> Raycaster::getDirections(
   return directions_;
 }
 
-
 Raycaster::RaycastResult Raycaster::raycast(
   const geometry_msgs::msg::Pose & origin, std::vector<Entity> & entities, double max_distance,
   double min_distance)
 {
-  RaycastResult result(entities);
   result.entity_count = entities.size();
   result.beam_count = rotation_matrices_.size();
 
@@ -133,10 +127,12 @@ Raycaster::RaycastResult Raycaster::raycast(
     std::chrono::duration_cast<std::chrono::microseconds>(end_add - start_add).count();
 
   std::vector<uint32_t> point_geometry_ids;
+  RaycastResult result(entities);
 
   // Phase 2: Commit scene
   auto start_commit = std::chrono::high_resolution_clock::now();
   rtcCommitScene(scene_);
+  intersect(result.cloud, origin, point_geometry_ids, max_distance, min_distance);
   auto end_commit = std::chrono::high_resolution_clock::now();
   result.time_commit_scene_us =
     std::chrono::duration_cast<std::chrono::microseconds>(end_commit - start_commit).count();
@@ -148,6 +144,13 @@ Raycaster::RaycastResult Raycaster::raycast(
   result.time_intersect_us =
     std::chrono::duration_cast<std::chrono::microseconds>(end_intersect - start_intersect).count();
 
+  // Convert geometry IDs to entity indices
+  result.point_to_entity_index.reserve(point_geometry_ids.size());
+  for (const auto & geometry_id : point_geometry_ids) {
+    auto it = geometry_id_to_entity_index.find(geometry_id);
+    if (it != geometry_id_to_entity_index.end()) {
+      result.point_to_entity_index.push_back(it->second);
+    }
   // Phase 4: Convert geometry IDs to entity indices
   auto start_convert = std::chrono::high_resolution_clock::now();
   result.point_to_entity_index.reserve(point_geometry_ids.size());
@@ -161,6 +164,7 @@ Raycaster::RaycastResult Raycaster::raycast(
   result.time_convert_ids_us =
     std::chrono::duration_cast<std::chrono::microseconds>(end_convert - start_convert).count();
 
+  for (auto & entity : entities) {
   // Phase 5: Remove entities from scene
   auto start_remove = std::chrono::high_resolution_clock::now();
   for (auto & entity : entities) {

@@ -42,20 +42,20 @@ public:
 
   struct Entity
   {
-    const traffic_simulator_msgs::EntityStatus& entity_status;
+    const traffic_simulator_msgs::EntityStatus & entity_status;
     std::unique_ptr<primitives::Primitive> primitive;
     std::optional<uint32_t> geometry_id;
 
-    explicit Entity(const traffic_simulator_msgs::EntityStatus& status);
+    explicit Entity(const traffic_simulator_msgs::EntityStatus & status);
 
-    const std::string& name() const { return entity_status.name(); }
+    const std::string & name() const { return entity_status.name(); }
   };
 
   struct RaycastResult
   {
     pcl::PointCloud<pcl::PointXYZI>::Ptr cloud;
     std::vector<size_t> point_to_entity_index;
-    const std::vector<Entity>& raycast_entities;
+    const std::vector<Entity> & raycast_entities;
 
     // Performance metrics (in microseconds)
     double time_add_entities_us = 0.0;
@@ -66,7 +66,7 @@ public:
     size_t beam_count = 0;
     size_t entity_count = 0;
 
-    explicit RaycastResult(const std::vector<Entity>& entities)
+    explicit RaycastResult(const std::vector<Entity> & entities)
     : cloud(new pcl::PointCloud<pcl::PointXYZI>), raycast_entities(entities)
     {
     }
