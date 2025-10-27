@@ -439,7 +439,7 @@
       delay: 0.0  # This parameter is used only if `override_legacy_configuration` is true. If it is false, the value of `detectedObjectGroundTruthPublishingDelay` in `ObjectController.Properties` in the scenario file is used.
     /sensing/imu/imu_data:
       version: 20240605 # architecture_type suffix (mandatory)
-      override_legacy_configuration: false # This parameter (if true) disables legacy configuration and overrides it with the following parameters
+      override_legacy_configuration: true # This parameter (if true) disables legacy configuration and overrides it with the following parameters
       # The following parameters are used only if `override_legacy_configuration` is true.
       seed: 0 # If 0 is specified, a random seed value will be generated for each run.
       sensor_msgs::msg::Imu:
