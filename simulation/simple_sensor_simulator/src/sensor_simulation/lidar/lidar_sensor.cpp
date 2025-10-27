@@ -49,20 +49,6 @@ auto LidarSensor<sensor_msgs::msg::PointCloud2>::raycast(
     auto result = raycaster_.raycast(ego_pose.value(), raycast_entities);
     detected_objects_ = result.getDetectedEntityNames();
 
-    // Record raycast performance metrics
-    performance_monitor_.addSample(
-      LidarPerformanceMonitor::MetricType::RAYCAST_ADD_ENTITIES, result.time_add_entities_us);
-    performance_monitor_.addSample(
-      LidarPerformanceMonitor::MetricType::RAYCAST_COMMIT_SCENE, result.time_commit_scene_us);
-    performance_monitor_.addSample(
-      LidarPerformanceMonitor::MetricType::RAYCAST_INTERSECT, result.time_intersect_us);
-    performance_monitor_.addSample(
-      LidarPerformanceMonitor::MetricType::RAYCAST_CONVERT_IDS, result.time_convert_ids_us);
-    performance_monitor_.addSample(
-      LidarPerformanceMonitor::MetricType::RAYCAST_REMOVE_ENTITIES, result.time_remove_entities_us);
-    performance_monitor_.recordRaycastInfo(
-      result.beam_count, result.entity_count, result.cloud->size());
-
     // Apply noise if noise processor is available
     if (noise_processor_) {
       auto noise_measurement =
@@ -70,11 +56,6 @@ auto LidarSensor<sensor_msgs::msg::PointCloud2>::raycast(
 
       noise_processor_->applyNoise(result, current_simulation_time, ego_pose.value());
     }
-    const auto result = raycaster_.raycast(ego_pose.value(), raycast_entities);
-    detected_objects_ = result.getDetectedEntityNames();
-
-    // Output statistics periodically
-    performance_monitor_.outputStats(noise_processor_ != nullptr);
 
     // Convert to standard PointCloud2 message
     sensor_msgs::msg::PointCloud2 pointcloud_msg;
