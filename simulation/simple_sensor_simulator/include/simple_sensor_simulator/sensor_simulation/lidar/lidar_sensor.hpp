@@ -15,26 +15,21 @@
 #ifndef SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__LIDAR__LIDAR_SENSOR_HPP_
 #define SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__LIDAR__LIDAR_SENSOR_HPP_
 
-// Standard library headers
-#include <memory>
-#include <queue>
-#include <set>
-#include <string>
-#include <utility>
-#include <vector>
-
-// Third-party headers
 #include <simulation_interface/simulation_api_schema.pb.h>
 
-#include <rclcpp/rclcpp.hpp>
-#include <sensor_msgs/msg/point_cloud2.hpp>
-
-// Project headers
 #include <agnocast_wrapper/agnocast_wrapper.hpp>
 #include <get_parameter/get_parameter.hpp>
+#include <memory>
+#include <queue>
+#include <rclcpp/rclcpp.hpp>
+#include <sensor_msgs/msg/point_cloud2.hpp>
+#include <set>
 #include <simple_sensor_simulator/sensor_simulation/lidar/lidar_noise_v1_processor.hpp>
 #include <simple_sensor_simulator/sensor_simulation/lidar/lidar_performance_monitor.hpp>
 #include <simple_sensor_simulator/sensor_simulation/lidar/raycaster.hpp>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace simple_sensor_simulator
 {
@@ -94,8 +89,7 @@ public:
       common::getParameter<int>(std::string(topic_name) + ".noise.model.version");
     if (noise_model_version >= 1) {
       const auto seed = common::getParameter<int>(std::string(topic_name) + ".seed");
-      noise_processor_ =
-        std::make_unique<LidarNoiseV1Processor>(topic_name, noise_model_version, seed);
+      noise_processor_ = std::make_unique<LidarNoiseV1Processor>(topic_name, seed);
     }
   }
 

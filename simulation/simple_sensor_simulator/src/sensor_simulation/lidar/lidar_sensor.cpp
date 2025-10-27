@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <pcl_conversions/pcl_conversions.h>
+
 #include <memory>
 #include <optional>
 #include <simple_sensor_simulator/exception.hpp>
@@ -54,7 +56,7 @@ auto LidarSensor<sensor_msgs::msg::PointCloud2>::raycast(
       auto noise_measurement =
         performance_monitor_.startMeasurement(LidarPerformanceMonitor::MetricType::NOISE);
 
-      noise_processor_->applyNoise(result, current_simulation_time, ego_pose.value());
+      noise_processor_->applyNoise(result, ego_pose.value());
     }
 
     // Convert to standard PointCloud2 message

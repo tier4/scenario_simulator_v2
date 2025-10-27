@@ -28,6 +28,7 @@
 #include <simple_sensor_simulator/sensor_simulation/primitives/box.hpp>
 #include <simple_sensor_simulator/sensor_simulation/primitives/primitive.hpp>
 #include <string>
+#include <traffic_simulator_msgs/msg/entity_status.hpp>
 #include <utility>
 #include <vector>
 
@@ -56,15 +57,6 @@ public:
     pcl::PointCloud<pcl::PointXYZI>::Ptr cloud;
     std::vector<size_t> point_to_entity_index;
     const std::vector<Entity> & raycast_entities;
-
-    // Performance metrics (in microseconds)
-    double time_add_entities_us = 0.0;
-    double time_commit_scene_us = 0.0;
-    double time_intersect_us = 0.0;
-    double time_convert_ids_us = 0.0;
-    double time_remove_entities_us = 0.0;
-    size_t beam_count = 0;
-    size_t entity_count = 0;
 
     explicit RaycastResult(const std::vector<Entity> & entities)
     : cloud(new pcl::PointCloud<pcl::PointXYZI>), raycast_entities(entities)

@@ -28,7 +28,7 @@ namespace simple_sensor_simulator
 
 class LidarNoiseV1Processor
 {
-private:
+public:
   struct NoiseParameters
   {
     double radial_distance_mean;
@@ -63,54 +63,46 @@ private:
   {
     const std::string config_name;
     const std::string parameter_base_path;
-
-    // Cached parameters for fast access
     const std::vector<double> ellipse_y_radii;
-    const std::vector<double> ellipse_y_radii_squared;  // Precomputed for fast comparison
-
-    // Distance parameters (radial and tangential)
+    const std::vector<double> ellipse_y_radii_squared;  // Precomputed
     const DistanceNoiseParams radial_distance;
     const DistanceNoiseParams tangential_distance;
-
     const double true_positive_rate_ellipse_normalized_x_radius;
     const std::vector<double> true_positive_rate_values;
 
     EntityNoiseConfig(const std::string & topic_name, const std::string & config_name);
   };
 
-  std::unordered_map<std::string, EntityNoiseConfig> noise_configs_;  // config_name -> config
-  std::unordered_map<std::string, const EntityNoiseConfig *>
-    entity_to_config_;  // entity_name -> config
-  std::default_random_engine random_engine_;
-  int noise_model_version_;
-  std::string topic_name_;
+  explicit LidarNoiseV1Processor(const std::string & topic_name, int seed);
 
-  // Reusable distribution objects (to avoid per-point instantiation overhead)
+  void applyNoise(Raycaster::RaycastResult & result, const geometry_msgs::msg::Pose & ego_pose);
+
+private:
+  std::unordered_map<std::string, EntityNoiseConfig> noise_configs_;
+  std::unordered_map<std::string, const EntityNoiseConfig *> entity_to_config_;
+  std::default_random_engine random_engine_;
+  std::string topic_name_;
   std::uniform_real_distribution<double> uniform_distribution_;
   std::normal_distribution<double> radial_distribution_;
   std::normal_distribution<double> tangential_distribution_;
 
-public:
-  explicit LidarNoiseV1Processor(const std::string & topic_name, int noise_model_version, int seed);
-
-  void applyNoise(
-    Raycaster::RaycastResult & result, double simulation_time,
-    const geometry_msgs::msg::Pose & ego_pose);
-
-private:
   void loadAllNoiseConfigs();
+
+  const EntityNoiseConfig * findOrAssignConfigForEntity(
+    const std::string & entity_name, const traffic_simulator_msgs::EntityStatus & entity_status);
 
   auto getNoiseParameters(
     const traffic_simulator_msgs::EntityStatus & entity, const geometry_msgs::msg::Pose & ego_pose)
     -> NoiseParameters;
 
-  /**
-   * @brief Apply noise to a single point
-   * @param point The point to modify (input/output)
-   * @param params Noise parameters for this point
-   * @return true if the point should be removed (based on true_positive rate), false otherwise
-   */
   bool applyNoiseToPoint(pcl::PointXYZI & point, const NoiseParameters & params);
+
+  static void removeMarkedPoints(
+    pcl::PointCloud<pcl::PointXYZI>::Ptr & cloud, const std::vector<bool> & points_to_remove);
+
+  static double getValueFromEllipse(
+    double x, double y, double ellipse_normalized_x_radius,
+    const std::vector<double> & ellipse_y_radii_squared, const std::vector<double> & values);
 };
 
 }  // namespace simple_sensor_simulator

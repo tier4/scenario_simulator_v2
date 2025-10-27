@@ -14,7 +14,6 @@
 
 #include <geometry/quaternion/euler_to_quaternion.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
-#include <simple_sensor_simulator/sensor_simulation/lidar/lidar_sensor.hpp>
 #include <simple_sensor_simulator/sensor_simulation/lidar/raycaster.hpp>
 #include <simulation_interface/conversions.hpp>
 #include <string>
@@ -111,71 +110,34 @@ Raycaster::RaycastResult Raycaster::raycast(
   const geometry_msgs::msg::Pose & origin, std::vector<Entity> & entities, double max_distance,
   double min_distance)
 {
-  result.entity_count = entities.size();
-  result.beam_count = rotation_matrices_.size();
+  RaycastResult result(entities);
 
-  // Phase 1: Add entities to scene
-  auto start_add = std::chrono::high_resolution_clock::now();
   std::unordered_map<uint32_t, size_t> geometry_id_to_entity_index;
   for (size_t entity_idx = 0; entity_idx < entities.size(); ++entity_idx) {
     auto & entity = entities[entity_idx];
     entity.geometry_id = entity.primitive->addToScene(device_, scene_);
     geometry_id_to_entity_index[entity.geometry_id.value()] = entity_idx;
   }
-  auto end_add = std::chrono::high_resolution_clock::now();
-  result.time_add_entities_us =
-    std::chrono::duration_cast<std::chrono::microseconds>(end_add - start_add).count();
 
   std::vector<uint32_t> point_geometry_ids;
-  RaycastResult result(entities);
 
-  // Phase 2: Commit scene
-  auto start_commit = std::chrono::high_resolution_clock::now();
   rtcCommitScene(scene_);
   intersect(result.cloud, origin, point_geometry_ids, max_distance, min_distance);
-  auto end_commit = std::chrono::high_resolution_clock::now();
-  result.time_commit_scene_us =
-    std::chrono::duration_cast<std::chrono::microseconds>(end_commit - start_commit).count();
 
-  // Phase 3: Intersect (raycast)
-  auto start_intersect = std::chrono::high_resolution_clock::now();
-  intersect(result.cloud, origin, point_geometry_ids, max_distance, min_distance);
-  auto end_intersect = std::chrono::high_resolution_clock::now();
-  result.time_intersect_us =
-    std::chrono::duration_cast<std::chrono::microseconds>(end_intersect - start_intersect).count();
-
-  // Convert geometry IDs to entity indices
   result.point_to_entity_index.reserve(point_geometry_ids.size());
   for (const auto & geometry_id : point_geometry_ids) {
     auto it = geometry_id_to_entity_index.find(geometry_id);
     if (it != geometry_id_to_entity_index.end()) {
       result.point_to_entity_index.push_back(it->second);
     }
-    // Phase 4: Convert geometry IDs to entity indices
-    auto start_convert = std::chrono::high_resolution_clock::now();
-    result.point_to_entity_index.reserve(point_geometry_ids.size());
-    for (const auto & geometry_id : point_geometry_ids) {
-      auto it = geometry_id_to_entity_index.find(geometry_id);
-      if (it != geometry_id_to_entity_index.end()) {
-        result.point_to_entity_index.push_back(it->second);
-      }
-    }
-    auto end_convert = std::chrono::high_resolution_clock::now();
-    result.time_convert_ids_us =
-      std::chrono::duration_cast<std::chrono::microseconds>(end_convert - start_convert).count();
+  }
 
-    for (auto & entity : entities) {
-      // Phase 5: Remove entities from scene
-      auto start_remove = std::chrono::high_resolution_clock::now();
-      for (auto & entity : entities) {
-        if (entity.geometry_id.has_value()) {
-          rtcDetachGeometry(scene_, entity.geometry_id.value());
-        }
-      }
-      auto end_remove = std::chrono::high_resolution_clock::now();
-      result.time_remove_entities_us =
-        std::chrono::duration_cast<std::chrono::microseconds>(end_remove - start_remove).count();
-
-      return result;
+  for (auto & entity : entities) {
+    if (entity.geometry_id.has_value()) {
+      rtcDetachGeometry(scene_, entity.geometry_id.value());
     }
-  }  // namespace simple_sensor_simulator
+  }
+
+  return result;
+}
+}  // namespace simple_sensor_simulator
