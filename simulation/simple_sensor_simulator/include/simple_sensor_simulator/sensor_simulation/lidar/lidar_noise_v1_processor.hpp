@@ -16,11 +16,10 @@
 #define SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__LIDAR__LIDAR_NOISE_V1_PROCESSOR_HPP_
 
 #include <geometry_msgs/msg/pose.hpp>
-#include <simple_sensor_simulator/sensor_simulation/lidar/raycaster.hpp>
-#include <traffic_simulator_msgs/msg/entity_status.hpp>
-
 #include <random>
+#include <simple_sensor_simulator/sensor_simulation/lidar/raycaster.hpp>
 #include <string>
+#include <traffic_simulator_msgs/msg/entity_status.hpp>
 #include <unordered_map>
 #include <vector>
 
@@ -57,8 +56,7 @@ private:
     double std_dev_ellipse_normalized_x_radius;
     std::vector<double> std_dev_values;
 
-    DistanceNoiseParams(
-      const std::string & param_base_path, const std::string & direction_name);
+    DistanceNoiseParams(const std::string & param_base_path, const std::string & direction_name);
   };
 
   struct EntityNoiseConfig
@@ -81,7 +79,8 @@ private:
   };
 
   std::unordered_map<std::string, EntityNoiseConfig> noise_configs_;  // config_name -> config
-  std::unordered_map<std::string, const EntityNoiseConfig*> entity_to_config_;  // entity_name -> config
+  std::unordered_map<std::string, const EntityNoiseConfig *>
+    entity_to_config_;  // entity_name -> config
   std::default_random_engine random_engine_;
   int noise_model_version_;
   std::string topic_name_;
@@ -102,8 +101,8 @@ private:
   void loadAllNoiseConfigs();
 
   auto getNoiseParameters(
-    const traffic_simulator_msgs::EntityStatus & entity,
-    const geometry_msgs::msg::Pose & ego_pose) -> NoiseParameters;
+    const traffic_simulator_msgs::EntityStatus & entity, const geometry_msgs::msg::Pose & ego_pose)
+    -> NoiseParameters;
 
   /**
    * @brief Apply noise to a single point

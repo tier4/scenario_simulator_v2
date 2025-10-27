@@ -24,9 +24,10 @@
 #include <vector>
 
 // Third-party headers
+#include <simulation_interface/simulation_api_schema.pb.h>
+
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/point_cloud2.hpp>
-#include <simulation_interface/simulation_api_schema.pb.h>
 
 // Project headers
 #include <agnocast_wrapper/agnocast_wrapper.hpp>

@@ -12,11 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <simple_sensor_simulator/sensor_simulation/lidar/lidar_noise_v1_processor.hpp>
-
-#include <simple_sensor_simulator/sensor_simulation/noise_parameter_selector.hpp>
-
 #include <cmath>
+#include <simple_sensor_simulator/sensor_simulation/lidar/lidar_noise_v1_processor.hpp>
+#include <simple_sensor_simulator/sensor_simulation/noise_parameter_selector.hpp>
 #include <string>
 #include <vector>
 
@@ -42,7 +40,8 @@ LidarNoiseV1Processor::DistanceNoiseParams::DistanceNoiseParams(
   mean_values(common::getParameter<std::vector<double>>(
     param_base_path + "distance." + direction_name + ".mean.values")),
   std_dev_ellipse_normalized_x_radius(common::getParameter<double>(
-    param_base_path + "distance." + direction_name + ".standard_deviation.ellipse_normalized_x_radius")),
+    param_base_path + "distance." + direction_name +
+    ".standard_deviation.ellipse_normalized_x_radius")),
   std_dev_values(common::getParameter<std::vector<double>>(
     param_base_path + "distance." + direction_name + ".standard_deviation.values"))
 {
@@ -52,7 +51,8 @@ LidarNoiseV1Processor::EntityNoiseConfig::EntityNoiseConfig(
   const std::string & topic_name, const std::string & config_name)
 : config_name(config_name),
   parameter_base_path(topic_name + ".noise.v1." + config_name + "."),
-  ellipse_y_radii(common::getParameter<std::vector<double>>(parameter_base_path + "ellipse_y_radii")),
+  ellipse_y_radii(
+    common::getParameter<std::vector<double>>(parameter_base_path + "ellipse_y_radii")),
   ellipse_y_radii_squared([this]() {
     std::vector<double> squared;
     squared.reserve(ellipse_y_radii.size());
@@ -63,8 +63,8 @@ LidarNoiseV1Processor::EntityNoiseConfig::EntityNoiseConfig(
   }()),
   radial_distance(parameter_base_path, "radial"),
   tangential_distance(parameter_base_path, "tangential"),
-  true_positive_rate_ellipse_normalized_x_radius(
-    common::getParameter<double>(parameter_base_path + "true_positive.rate.ellipse_normalized_x_radius")),
+  true_positive_rate_ellipse_normalized_x_radius(common::getParameter<double>(
+    parameter_base_path + "true_positive.rate.ellipse_normalized_x_radius")),
   true_positive_rate_values(
     common::getParameter<std::vector<double>>(parameter_base_path + "true_positive.rate.values"))
 {
@@ -82,14 +82,15 @@ void LidarNoiseV1Processor::loadAllNoiseConfigs()
 }
 
 auto LidarNoiseV1Processor::getNoiseParameters(
-  const traffic_simulator_msgs::EntityStatus & entity,
-  const geometry_msgs::msg::Pose & ego_pose) -> NoiseParameters
+  const traffic_simulator_msgs::EntityStatus & entity, const geometry_msgs::msg::Pose & ego_pose)
+  -> NoiseParameters
 {
   // Find or assign config for this entity
   auto it = entity_to_config_.find(entity.name());
   if (it == entity_to_config_.end()) {
     // First time seeing this entity - find matching config
-    const auto config_name = noise_parameter_selector::findMatchingNoiseConfigForEntity(entity, "v1", topic_name_);
+    const auto config_name =
+      noise_parameter_selector::findMatchingNoiseConfigForEntity(entity, "v1", topic_name_);
     if (config_name.empty()) {
       // No noise configuration for this entity
       it = entity_to_config_.emplace(entity.name(), nullptr).first;
@@ -132,16 +133,16 @@ auto LidarNoiseV1Processor::getNoiseParameters(
     x, y, config->radial_distance.mean_ellipse_normalized_x_radius, config->ellipse_y_radii_squared,
     config->radial_distance.mean_values);
   params.radial_distance_std_dev = get_value_from_ellipse(
-    x, y, config->radial_distance.std_dev_ellipse_normalized_x_radius, config->ellipse_y_radii_squared,
-    config->radial_distance.std_dev_values);
+    x, y, config->radial_distance.std_dev_ellipse_normalized_x_radius,
+    config->ellipse_y_radii_squared, config->radial_distance.std_dev_values);
 
   // Get tangential distance noise parameters from cached values
   params.tangential_distance_mean = get_value_from_ellipse(
-    x, y, config->tangential_distance.mean_ellipse_normalized_x_radius, config->ellipse_y_radii_squared,
-    config->tangential_distance.mean_values);
+    x, y, config->tangential_distance.mean_ellipse_normalized_x_radius,
+    config->ellipse_y_radii_squared, config->tangential_distance.mean_values);
   params.tangential_distance_std_dev = get_value_from_ellipse(
-    x, y, config->tangential_distance.std_dev_ellipse_normalized_x_radius, config->ellipse_y_radii_squared,
-    config->tangential_distance.std_dev_values);
+    x, y, config->tangential_distance.std_dev_ellipse_normalized_x_radius,
+    config->ellipse_y_radii_squared, config->tangential_distance.std_dev_values);
 
   // Get true_positive rate from cached values
   params.true_positive_rate = get_value_from_ellipse(
@@ -163,14 +164,12 @@ bool LidarNoiseV1Processor::applyNoiseToPoint(
   }
 
   // Generate noise for THIS POINT independently (update distribution parameters)
-  radial_distribution_.param(
-    std::normal_distribution<double>::param_type(
-      params.radial_distance_mean, params.radial_distance_std_dev));
+  radial_distribution_.param(std::normal_distribution<double>::param_type(
+    params.radial_distance_mean, params.radial_distance_std_dev));
   const double radial_noise = radial_distribution_(random_engine_);
 
-  tangential_distribution_.param(
-    std::normal_distribution<double>::param_type(
-      params.tangential_distance_mean, params.tangential_distance_std_dev));
+  tangential_distribution_.param(std::normal_distribution<double>::param_type(
+    params.tangential_distance_mean, params.tangential_distance_std_dev));
   const double tangential_noise = tangential_distribution_(random_engine_);
 
   // Calculate radial vector (from sensor to point)
@@ -214,7 +213,7 @@ void LidarNoiseV1Processor::applyNoise(
   }
 
   // Build index-based config lookup for fast access in point loop
-  std::vector<const EntityNoiseConfig*> entity_idx_to_config(raycast_entities.size(), nullptr);
+  std::vector<const EntityNoiseConfig *> entity_idx_to_config(raycast_entities.size(), nullptr);
 
   for (size_t entity_idx = 0; entity_idx < raycast_entities.size(); ++entity_idx) {
     const auto & entity_status = raycast_entities[entity_idx].entity_status;
@@ -224,8 +223,8 @@ void LidarNoiseV1Processor::applyNoise(
     auto it = entity_to_config_.find(entity_name);
     if (it == entity_to_config_.end()) {
       // First time seeing this entity - find matching config
-      const auto config_name =
-        noise_parameter_selector::findMatchingNoiseConfigForEntity(entity_status, "v1", topic_name_);
+      const auto config_name = noise_parameter_selector::findMatchingNoiseConfigForEntity(
+        entity_status, "v1", topic_name_);
       if (config_name.empty()) {
         entity_to_config_[entity_name] = nullptr;
         entity_idx_to_config[entity_idx] = nullptr;

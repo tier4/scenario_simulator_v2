@@ -469,7 +469,8 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
           std::string(detected_objects_publisher->get_topic_name()) + ".noise." +
           version_namespace + ".";
 
-        auto selector = noise_parameter_selector::createEllipticalParameterSelector(version_base_path, x, y);
+        auto selector =
+          noise_parameter_selector::createEllipticalParameterSelector(version_base_path, x, y);
 
         noise_output->second.distance_noise = [&]() {
           const auto mean = selector("distance.mean");
@@ -532,8 +533,9 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
       for (const auto & entity : detected_entities) {
         if (auto [noise_output, success] = noise_outputs.emplace(entity.name(), simulation_time);
             success) {
-          noise_output->second.config_name = noise_parameter_selector::findMatchingNoiseConfigForEntity(
-            entity, "v3", detected_objects_publisher->get_topic_name());
+          noise_output->second.config_name =
+            noise_parameter_selector::findMatchingNoiseConfigForEntity(
+              entity, "v3", detected_objects_publisher->get_topic_name());
         } else if (not noise_output->second.config_name.empty()) {
           auto vanilla_entity = std::vector<traffic_simulator_msgs::EntityStatus>{entity};
           const std::string config_namespace = "v3." + noise_output->second.config_name;
@@ -671,8 +673,9 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
       for (const auto & entity : detected_entities) {
         if (auto [noise_output, success] = noise_outputs.emplace(entity.name(), simulation_time);
             success) {
-          noise_output->second.config_name = noise_parameter_selector::findMatchingNoiseConfigForEntity(
-            entity, "v4", detected_objects_publisher->get_topic_name());
+          noise_output->second.config_name =
+            noise_parameter_selector::findMatchingNoiseConfigForEntity(
+              entity, "v4", detected_objects_publisher->get_topic_name());
         } else if (not noise_output->second.config_name.empty()) {
           const std::string parameter_base_path =
             std::string(detected_objects_publisher->get_topic_name()) + ".noise.v4." +

@@ -151,31 +151,31 @@ Raycaster::RaycastResult Raycaster::raycast(
     if (it != geometry_id_to_entity_index.end()) {
       result.point_to_entity_index.push_back(it->second);
     }
-  // Phase 4: Convert geometry IDs to entity indices
-  auto start_convert = std::chrono::high_resolution_clock::now();
-  result.point_to_entity_index.reserve(point_geometry_ids.size());
-  for (const auto & geometry_id : point_geometry_ids) {
-    auto it = geometry_id_to_entity_index.find(geometry_id);
-    if (it != geometry_id_to_entity_index.end()) {
-      result.point_to_entity_index.push_back(it->second);
+    // Phase 4: Convert geometry IDs to entity indices
+    auto start_convert = std::chrono::high_resolution_clock::now();
+    result.point_to_entity_index.reserve(point_geometry_ids.size());
+    for (const auto & geometry_id : point_geometry_ids) {
+      auto it = geometry_id_to_entity_index.find(geometry_id);
+      if (it != geometry_id_to_entity_index.end()) {
+        result.point_to_entity_index.push_back(it->second);
+      }
     }
-  }
-  auto end_convert = std::chrono::high_resolution_clock::now();
-  result.time_convert_ids_us =
-    std::chrono::duration_cast<std::chrono::microseconds>(end_convert - start_convert).count();
+    auto end_convert = std::chrono::high_resolution_clock::now();
+    result.time_convert_ids_us =
+      std::chrono::duration_cast<std::chrono::microseconds>(end_convert - start_convert).count();
 
-  for (auto & entity : entities) {
-  // Phase 5: Remove entities from scene
-  auto start_remove = std::chrono::high_resolution_clock::now();
-  for (auto & entity : entities) {
-    if (entity.geometry_id.has_value()) {
-      rtcDetachGeometry(scene_, entity.geometry_id.value());
+    for (auto & entity : entities) {
+      // Phase 5: Remove entities from scene
+      auto start_remove = std::chrono::high_resolution_clock::now();
+      for (auto & entity : entities) {
+        if (entity.geometry_id.has_value()) {
+          rtcDetachGeometry(scene_, entity.geometry_id.value());
+        }
+      }
+      auto end_remove = std::chrono::high_resolution_clock::now();
+      result.time_remove_entities_us =
+        std::chrono::duration_cast<std::chrono::microseconds>(end_remove - start_remove).count();
+
+      return result;
     }
-  }
-  auto end_remove = std::chrono::high_resolution_clock::now();
-  result.time_remove_entities_us =
-    std::chrono::duration_cast<std::chrono::microseconds>(end_remove - start_remove).count();
-
-  return result;
-}
-}  // namespace simple_sensor_simulator
+  }  // namespace simple_sensor_simulator

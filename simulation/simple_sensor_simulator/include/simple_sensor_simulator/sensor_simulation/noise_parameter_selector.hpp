@@ -16,7 +16,6 @@
 #define SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__NOISE_PARAMETER_SELECTOR_HPP_
 
 #include <simulation_interface/simulation_api_schema.pb.h>
-#include <simulation_interface/operators.hpp>
 
 #include <boost/math/constants/constants.hpp>
 #include <boost/uuid/string_generator.hpp>
@@ -26,6 +25,7 @@
 #include <regex>
 #include <scenario_simulator_exception/exception.hpp>
 #include <set>
+#include <simulation_interface/operators.hpp>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -34,7 +34,8 @@ namespace simple_sensor_simulator
 {
 namespace noise_parameter_selector
 {
-inline auto createEllipticalParameterSelector(const std::string & parameter_base_path, double x, double y)
+inline auto createEllipticalParameterSelector(
+  const std::string & parameter_base_path, double x, double y)
 {
   return [parameter_base_path, x, y](const std::string & name) {
     return [=]() {
