@@ -24,6 +24,20 @@ Changelog for package traffic_simulator
 16.4.2 (2025-05-23)
 -------------------
 
+18.1.0 (2025-10-27)
+-------------------
+* Merge pull request `#1701 <https://github.com/tier4/scenario_simulator_v2/issues/1701>`_ from tier4/feature/trajectory_base_detection_for_pedestrian
+  Add Trajectory-Based Pedestrian Front Entity Detection Algorithm
+* Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
+* Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
+* Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
+* Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
+* Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
+* Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
+* Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
+* Improve visualization of predicted pedestrian paths.
+* Contributors: Kotaro Yoshimoto, Taiga, Taiga Takano
+
 18.0.10 (2025-10-23)
 --------------------
 
