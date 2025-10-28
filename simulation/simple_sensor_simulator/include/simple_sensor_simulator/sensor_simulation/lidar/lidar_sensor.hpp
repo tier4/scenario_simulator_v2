@@ -24,7 +24,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/point_cloud2.hpp>
 #include <set>
-#include <simple_sensor_simulator/sensor_simulation/lidar/lidar_noise_v1_processor.hpp>
+#include <simple_sensor_simulator/sensor_simulation/lidar/lidar_noise_model_v1.hpp>
 #include <simple_sensor_simulator/sensor_simulation/lidar/lidar_performance_monitor.hpp>
 #include <simple_sensor_simulator/sensor_simulation/lidar/raycaster.hpp>
 #include <string>
@@ -68,7 +68,7 @@ class LidarSensor : public LidarSensorBase
 
   std::queue<std::pair<sensor_msgs::msg::PointCloud2, double>> queue_pointcloud_;
 
-  std::unique_ptr<LidarNoiseV1Processor> noise_processor_ = nullptr;
+  std::unique_ptr<LidarNoiseModel> noise_model_ = nullptr;
 
   LidarPerformanceMonitor performance_monitor_;
 
@@ -89,7 +89,7 @@ public:
       common::getParameter<int>(std::string(topic_name) + ".noise.model.version");
     if (noise_model_version >= 1) {
       const auto seed = common::getParameter<int>(std::string(topic_name) + ".seed");
-      noise_processor_ = std::make_unique<LidarNoiseV1Processor>(topic_name, seed);
+      noise_model_ = std::make_unique<LidarNoiseModel>(topic_name, seed);
     }
   }
 
