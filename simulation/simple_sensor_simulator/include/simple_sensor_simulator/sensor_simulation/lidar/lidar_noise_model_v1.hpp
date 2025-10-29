@@ -29,51 +29,35 @@ namespace simple_sensor_simulator
 class LidarNoiseModel
 {
 public:
-  struct DistanceParams
-  {
-    double mean_ellipse_normalized_x_radius;
-    std::vector<double> mean_values;
-    double std_dev_ellipse_normalized_x_radius;
-    std::vector<double> std_dev_values;
-
-    DistanceParams(const std::string & param_base_path, const std::string & direction_name);
-  };
-
   struct Config
   {
-    struct PositionParams
+    struct DistanceBin
     {
-      double true_positive_rate;
-      std::string config_name;
+      double ellipse_y_radius_squared;
+      std::bernoulli_distribution detection_distribution;
       std::normal_distribution<double> radial_distribution;
       std::normal_distribution<double> tangential_distribution;
 
-      PositionParams()
-      : true_positive_rate(1.0),
-        config_name(""),
-        radial_distribution(0.0, 0.0),
-        tangential_distribution(0.0, 0.0)
+      DistanceBin(
+        double y_radius_sq, double r_mean, double r_stddev, double t_mean, double t_stddev,
+        double tpr)
+      : ellipse_y_radius_squared(y_radius_sq),
+        detection_distribution(tpr),
+        radial_distribution(r_mean, r_stddev),
+        tangential_distribution(t_mean, t_stddev)
       {
       }
     };
 
-    const std::string config_name;
-    const std::string parameter_base_path;
-    const std::vector<double> ellipse_y_radii;
-    const std::vector<double> ellipse_y_radii_squared;  // Precomputed
-    const DistanceParams radial_distance;
-    const DistanceParams tangential_distance;
     const double true_positive_rate_ellipse_normalized_x_radius;
-    const std::vector<double> true_positive_rate_values;
+    std::vector<DistanceBin> distance_bins_;
 
     Config(const std::string & topic_name, const std::string & config_name);
 
-    PositionParams getPositionParams(double x, double y) const;
+    DistanceBin & getDistanceBin(double x, double y);
 
   private:
-    static double getValueFromEllipse(
-      double x, double y, double ellipse_normalized_x_radius,
-      const std::vector<double> & ellipse_y_radii_squared, const std::vector<double> & values);
+    size_t getBinIndex(double x, double y) const;
   };
 
   explicit LidarNoiseModel(const std::string & topic_name, int seed);
@@ -82,14 +66,13 @@ public:
 
 private:
   std::unordered_map<std::string, Config> configs_;
-  std::unordered_map<std::string, const Config *> entity_to_config_;
+  std::unordered_map<std::string, Config *> entity_to_config_;
   std::default_random_engine random_engine_;
   std::string topic_name_;
-  std::uniform_real_distribution<double> uniform_distribution_;
 
   void loadConfigs();
 
-  const Config * getConfigFor(
+  Config * getConfigFor(
     const std::string & entity_name, const traffic_simulator_msgs::EntityStatus & entity_status);
 
   static void removeMarkedPoints(

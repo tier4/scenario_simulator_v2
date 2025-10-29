@@ -22,46 +22,44 @@ namespace simple_sensor_simulator
 {
 
 LidarNoiseModel::LidarNoiseModel(const std::string & topic_name, int seed)
-: random_engine_(seed == 0 ? std::random_device{}() : seed),
-  topic_name_(topic_name),
-  uniform_distribution_(0.0, 1.0)
+: random_engine_(seed == 0 ? std::random_device{}() : seed), topic_name_(topic_name)
 {
   loadConfigs();
 }
 
-LidarNoiseModel::DistanceParams::DistanceParams(
-  const std::string & param_base_path, const std::string & direction_name)
-: mean_ellipse_normalized_x_radius(common::getParameter<double>(
-    param_base_path + "distance." + direction_name + ".mean.ellipse_normalized_x_radius")),
-  mean_values(common::getParameter<std::vector<double>>(
-    param_base_path + "distance." + direction_name + ".mean.values")),
-  std_dev_ellipse_normalized_x_radius(common::getParameter<double>(
-    param_base_path + "distance." + direction_name +
-    ".standard_deviation.ellipse_normalized_x_radius")),
-  std_dev_values(common::getParameter<std::vector<double>>(
-    param_base_path + "distance." + direction_name + ".standard_deviation.values"))
-{
-}
-
 LidarNoiseModel::Config::Config(const std::string & topic_name, const std::string & config_name)
-: config_name(config_name),
-  parameter_base_path(topic_name + ".noise.v1." + config_name + "."),
-  ellipse_y_radii(
-    common::getParameter<std::vector<double>>(parameter_base_path + "ellipse_y_radii")),
-  ellipse_y_radii_squared([this]() {
-    std::vector<double> squared;
-    squared.reserve(ellipse_y_radii.size());
-    for (const auto & radius : ellipse_y_radii) {
-      squared.push_back(radius * radius);
-    }
-    return squared;
+: true_positive_rate_ellipse_normalized_x_radius([&]() {
+    const std::string param_base = topic_name + ".noise.v1." + config_name + ".";
+    return common::getParameter<double>(
+      param_base + "true_positive.rate.ellipse_normalized_x_radius");
   }()),
-  radial_distance(parameter_base_path, "radial"),
-  tangential_distance(parameter_base_path, "tangential"),
-  true_positive_rate_ellipse_normalized_x_radius(common::getParameter<double>(
-    parameter_base_path + "true_positive.rate.ellipse_normalized_x_radius")),
-  true_positive_rate_values(
-    common::getParameter<std::vector<double>>(parameter_base_path + "true_positive.rate.values"))
+  distance_bins_([&]() {
+    const std::string param_base = topic_name + ".noise.v1." + config_name + ".";
+
+    // Load all required parameters locally
+    const auto ellipse_y_radii =
+      common::getParameter<std::vector<double>>(param_base + "ellipse_y_radii");
+    const auto radial_mean =
+      common::getParameter<std::vector<double>>(param_base + "distance.radial.mean.values");
+    const auto radial_stddev = common::getParameter<std::vector<double>>(
+      param_base + "distance.radial.standard_deviation.values");
+    const auto tangential_mean =
+      common::getParameter<std::vector<double>>(param_base + "distance.tangential.mean.values");
+    const auto tangential_stddev = common::getParameter<std::vector<double>>(
+      param_base + "distance.tangential.standard_deviation.values");
+    const auto tpr_values =
+      common::getParameter<std::vector<double>>(param_base + "true_positive.rate.values");
+
+    // Create distance bins
+    std::vector<DistanceBin> bins;
+    bins.reserve(ellipse_y_radii.size());
+    for (size_t i = 0; i < ellipse_y_radii.size(); ++i) {
+      bins.emplace_back(
+        ellipse_y_radii[i] * ellipse_y_radii[i], radial_mean[i], radial_stddev[i],
+        tangential_mean[i], tangential_stddev[i], tpr_values[i]);
+    }
+    return bins;
+  }())
 {
 }
 
@@ -73,61 +71,35 @@ void LidarNoiseModel::loadConfigs()
   }
 }
 
-double LidarNoiseModel::Config::getValueFromEllipse(
-  double x, double y, double ellipse_normalized_x_radius,
-  const std::vector<double> & ellipse_y_radii_squared, const std::vector<double> & values)
+size_t LidarNoiseModel::Config::getBinIndex(double x, double y) const
 {
-  // Ellipse formula: (x/a)^2 + (y/b)^2 < 1
-  const double x_normalized = x / ellipse_normalized_x_radius;
+  // Use true_positive_rate ellipse parameters as representative for bin determination
+  const double x_normalized = x / true_positive_rate_ellipse_normalized_x_radius;
   const double distance_squared = x_normalized * x_normalized + y * y;
 
-  for (size_t i = 0; i < ellipse_y_radii_squared.size(); ++i) {
-    if (distance_squared < ellipse_y_radii_squared[i]) {
-      return values[i];
+  for (size_t i = 0; i < distance_bins_.size(); ++i) {
+    if (distance_squared < distance_bins_[i].ellipse_y_radius_squared) {
+      return i;
     }
   }
-  return 0.0;
+  // Return last bin index if beyond all ellipses
+  return distance_bins_.empty() ? 0 : distance_bins_.size() - 1;
 }
 
-LidarNoiseModel::Config::PositionParams LidarNoiseModel::Config::getPositionParams(
-  double x, double y) const
+LidarNoiseModel::Config::DistanceBin & LidarNoiseModel::Config::getDistanceBin(double x, double y)
 {
-  PositionParams params;
-  params.config_name = config_name;
-
-  const double radial_mean = getValueFromEllipse(
-    x, y, radial_distance.mean_ellipse_normalized_x_radius, ellipse_y_radii_squared,
-    radial_distance.mean_values);
-  const double radial_std_dev = getValueFromEllipse(
-    x, y, radial_distance.std_dev_ellipse_normalized_x_radius, ellipse_y_radii_squared,
-    radial_distance.std_dev_values);
-
-  const double tangential_mean = getValueFromEllipse(
-    x, y, tangential_distance.mean_ellipse_normalized_x_radius, ellipse_y_radii_squared,
-    tangential_distance.mean_values);
-  const double tangential_std_dev = getValueFromEllipse(
-    x, y, tangential_distance.std_dev_ellipse_normalized_x_radius, ellipse_y_radii_squared,
-    tangential_distance.std_dev_values);
-
-  params.true_positive_rate = getValueFromEllipse(
-    x, y, true_positive_rate_ellipse_normalized_x_radius, ellipse_y_radii_squared,
-    true_positive_rate_values);
-
-  params.radial_distribution = std::normal_distribution<double>(radial_mean, radial_std_dev);
-  params.tangential_distribution =
-    std::normal_distribution<double>(tangential_mean, tangential_std_dev);
-
-  return params;
+  const size_t bin_index = getBinIndex(x, y);
+  return distance_bins_[bin_index];
 }
 
-const LidarNoiseModel::Config * LidarNoiseModel::getConfigFor(
+LidarNoiseModel::Config * LidarNoiseModel::getConfigFor(
   const std::string & entity_name, const traffic_simulator_msgs::EntityStatus & entity_status)
 {
   if (auto it = entity_to_config_.find(entity_name); it != entity_to_config_.end()) {
     return it->second;
   }
 
-  const Config * config_ptr = nullptr;
+  Config * config_ptr = nullptr;
   if (const auto config_name = noise_parameter_selector::findMatchingNoiseConfigForEntity(
         entity_status, "v1", topic_name_);
       not config_name.empty()) {
@@ -191,28 +163,28 @@ void LidarNoiseModel::applyNoise(
     }
 
     const auto & entity_status = raycast_entities[entity_idx].entity_status;
-    const auto * config = getConfigFor(entity_status.name(), entity_status);
+    auto * config = getConfigFor(entity_status.name(), entity_status);
     if (config == nullptr) {
       continue;
     }
 
     const auto x = entity_status.pose().position().x() - ego_pose.position.x;
     const auto y = entity_status.pose().position().y() - ego_pose.position.y;
-    const auto params = config->getPositionParams(x, y);
+    auto & bin = config->getDistanceBin(x, y);
 
     // Apply noise to all points from this entity
     for (size_t i : point_indices) {
       auto & point = cloud->points[i];
 
       // Check if point is detected (true positive rate)
-      if (uniform_distribution_(random_engine_) >= params.true_positive_rate) {
+      if (!bin.detection_distribution(random_engine_)) {
         points_to_remove[i] = true;
         continue;
       }
 
       // Generate noise using pre-configured distributions
-      const double radial_noise = params.radial_distribution(random_engine_);
-      const double tangential_noise = params.tangential_distribution(random_engine_);
+      const double radial_noise = bin.radial_distribution(random_engine_);
+      const double tangential_noise = bin.tangential_distribution(random_engine_);
 
       // Apply noise to point coordinates
       const double distance = std::hypot(point.x, point.y, point.z);
