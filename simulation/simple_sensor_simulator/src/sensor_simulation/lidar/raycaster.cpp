@@ -16,22 +16,39 @@
 #include <geometry_msgs/msg/vector3.hpp>
 #include <simple_sensor_simulator/sensor_simulation/lidar/lidar_sensor.hpp>
 #include <simple_sensor_simulator/sensor_simulation/lidar/raycaster.hpp>
+#include <simulation_interface/conversions.hpp>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
 namespace simple_sensor_simulator
 {
+Raycaster::Entity::Entity(const traffic_simulator_msgs::EntityStatus & status)
+: entity_status(status)
+{
+  geometry_msgs::msg::Pose pose;
+  simulation_interface::toMsg(entity_status.pose(), pose);
+  auto rotation = math::geometry::getRotationMatrix(pose.orientation);
+  geometry_msgs::msg::Point center_point;
+  simulation_interface::toMsg(entity_status.bounding_box().center(), center_point);
+  Eigen::Vector3d center(center_point.x, center_point.y, center_point.z);
+  center = rotation * center;
+  pose.position.x = pose.position.x + center.x();
+  pose.position.y = pose.position.y + center.y();
+  pose.position.z = pose.position.z + center.z();
+
+  primitive = std::make_unique<simple_sensor_simulator::primitives::Box>(
+    entity_status.bounding_box().dimensions().x(), entity_status.bounding_box().dimensions().y(),
+    entity_status.bounding_box().dimensions().z(), pose);
+}
+
 Raycaster::Raycaster()
-: entities_(), device_(rtcNewDevice(nullptr)), scene_(rtcNewScene(device_)), engine_(seed_gen_())
+: device_(rtcNewDevice(nullptr)), scene_(rtcNewScene(device_)), engine_(seed_gen_())
 {
 }
 
 Raycaster::Raycaster(std::string embree_config)
-: entities_(),
-  device_(rtcNewDevice(embree_config.c_str())),
-  scene_(rtcNewScene(device_)),
-  engine_(seed_gen_())
+: device_(rtcNewDevice(embree_config.c_str())), scene_(rtcNewScene(device_)), engine_(seed_gen_())
 {
 }
 
@@ -90,37 +107,38 @@ std::vector<geometry_msgs::msg::Quaternion> Raycaster::getDirections(
   return directions_;
 }
 
-const std::vector<std::string> & Raycaster::getDetectedObject() const { return detected_objects_; }
-
-pcl::PointCloud<pcl::PointXYZI>::Ptr Raycaster::raycast(
-  const geometry_msgs::msg::Pose & origin, double max_distance, double min_distance)
+Raycaster::RaycastResult Raycaster::raycast(
+  const geometry_msgs::msg::Pose & origin, std::vector<Entity> & entities, double max_distance,
+  double min_distance)
 {
-  detected_objects_ = {};
   std::unordered_map<uint32_t, size_t> geometry_id_to_entity_index;
-  pcl::PointCloud<pcl::PointXYZI>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZI>());
-  for (size_t entity_idx = 0; entity_idx < entities_.size(); ++entity_idx) {
-    auto & entity = entities_[entity_idx];
+  for (size_t entity_idx = 0; entity_idx < entities.size(); ++entity_idx) {
+    auto & entity = entities[entity_idx];
     entity.geometry_id = entity.primitive->addToScene(device_, scene_);
     geometry_id_to_entity_index[entity.geometry_id.value()] = entity_idx;
   }
 
-  std::set<unsigned int> detected_ids;
+  std::vector<uint32_t> point_geometry_ids;
+  RaycastResult result(entities);
 
   rtcCommitScene(scene_);
-  intersect(cloud, origin, detected_ids, max_distance, min_distance);
+  intersect(result.cloud, origin, point_geometry_ids, max_distance, min_distance);
 
-  for (const auto & id : detected_ids) {
-    detected_objects_.emplace_back(entities_.at(geometry_id_to_entity_index[id]).name);
+  // Convert geometry IDs to entity indices
+  result.point_to_entity_index.reserve(point_geometry_ids.size());
+  for (const auto & geometry_id : point_geometry_ids) {
+    auto it = geometry_id_to_entity_index.find(geometry_id);
+    if (it != geometry_id_to_entity_index.end()) {
+      result.point_to_entity_index.push_back(it->second);
+    }
   }
 
-  for (auto & entity : entities_) {
+  for (auto & entity : entities) {
     if (entity.geometry_id.has_value()) {
       rtcDetachGeometry(scene_, entity.geometry_id.value());
     }
   }
 
-  entities_.clear();
-
-  return cloud;
+  return result;
 }
 }  // namespace simple_sensor_simulator
