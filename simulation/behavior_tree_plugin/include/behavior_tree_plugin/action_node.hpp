@@ -19,6 +19,7 @@
 
 #include <algorithm>
 #include <geometry/spline/catmull_rom_spline.hpp>
+#include <geometry_msgs/msg/point.hpp>
 #include <memory>
 #include <optional>
 #include <string>
@@ -34,6 +35,7 @@
 #include <traffic_simulator_msgs/msg/obstacle.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 namespace entity_behavior
@@ -51,6 +53,9 @@ public:
     -> double;
   auto getDistanceToFrontEntity(const math::geometry::CatmullRomSplineInterface & spline) const
     -> std::optional<double>;
+  auto getFrontEntityNameAndDistanceByTrajectory(
+    const std::vector<geometry_msgs::msg::Point> & waypoints, const double width,
+    const std::size_t num_segments) const -> std::optional<std::pair<std::string, double>>;
   auto getYieldStopDistance(const lanelet::Ids & following_lanelets) const -> std::optional<double>;
   auto stopEntity() const -> void;
   auto getHorizon() const -> double;
@@ -80,6 +85,7 @@ public:
       BT::InputPort<traffic_simulator::behavior::Request>("request"),
       BT::InputPort<std::shared_ptr<EuclideanDistancesMap>>("euclidean_distances_map"),
       BT::InputPort<traffic_simulator_msgs::msg::BehaviorParameter>("behavior_parameter"),
+      BT::InputPort<std::optional<double>>("lateral_collision_threshold"),
       BT::OutputPort<std::optional<traffic_simulator_msgs::msg::Obstacle>>("obstacle"),
       BT::OutputPort<traffic_simulator_msgs::msg::WaypointsArray>("waypoints"),
       BT::OutputPort<traffic_simulator::behavior::Request>("request"),
@@ -114,8 +120,9 @@ protected:
   std::optional<double> target_speed_;
   EntityStatusDict other_entity_status_;
   lanelet::Ids route_lanelets_;
-  std::shared_ptr<EuclideanDistancesMap> euclidean_distances_map_;
   traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter_;
+  std::optional<double> lateral_collision_threshold_;
+  std::shared_ptr<EuclideanDistancesMap> euclidean_distances_map_;
 };
 }  // namespace entity_behavior
 
