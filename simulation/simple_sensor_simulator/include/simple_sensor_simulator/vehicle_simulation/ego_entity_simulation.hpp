@@ -20,7 +20,6 @@
 #include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model.hpp>
 #include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
 #include <traffic_simulator_msgs/msg/polyline_trajectory.hpp>
 #include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
@@ -70,8 +69,6 @@ private:
   Eigen::Vector3d world_relative_position_;
 
 public:
-  const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
-
   const traffic_simulator_msgs::msg::VehicleParameters vehicle_parameters;
 
   auto calculateAccelerationBySlope() const -> double;
@@ -93,8 +90,7 @@ public:
   explicit EgoEntitySimulation(
     const traffic_simulator_msgs::msg::EntityStatus &,
     const traffic_simulator_msgs::msg::VehicleParameters &, double,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> &, const rclcpp::Parameter & use_sim_time,
-    const bool consider_acceleration_by_road_slope);
+    const rclcpp::Parameter & use_sim_time, const bool consider_acceleration_by_road_slope);
 
   auto overwrite(
     const traffic_simulator_msgs::msg::EntityStatus & status, const double current_time,
