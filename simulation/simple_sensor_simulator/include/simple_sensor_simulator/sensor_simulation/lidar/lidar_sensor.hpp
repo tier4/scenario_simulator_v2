@@ -68,7 +68,7 @@ class LidarSensor : public LidarSensorBase
 
   std::queue<std::pair<sensor_msgs::msg::PointCloud2, double>> queue_pointcloud_;
 
-  std::unique_ptr<LidarNoiseModel> noise_model_ = nullptr;
+  std::unique_ptr<LidarNoiseModelV1> noise_model_ = nullptr;
 
   LidarPerformanceMonitor performance_monitor_;
 
@@ -89,7 +89,7 @@ public:
       common::getParameter<int>(std::string(topic_name) + ".noise.model.version");
     if (noise_model_version >= 1) {
       const auto seed = common::getParameter<int>(std::string(topic_name) + ".seed");
-      noise_model_ = std::make_unique<LidarNoiseModel>(topic_name, seed);
+      noise_model_ = std::make_unique<LidarNoiseModelV1>(topic_name, seed);
     }
   }
 

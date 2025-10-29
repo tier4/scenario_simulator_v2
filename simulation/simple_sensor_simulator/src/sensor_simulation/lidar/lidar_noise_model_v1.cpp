@@ -21,13 +21,13 @@
 namespace simple_sensor_simulator
 {
 
-LidarNoiseModel::LidarNoiseModel(const std::string & topic_name, int seed)
+LidarNoiseModelV1::LidarNoiseModelV1(const std::string & topic_name, int seed)
 : random_engine_(seed == 0 ? std::random_device{}() : seed), topic_name_(topic_name)
 {
   loadConfigs();
 }
 
-LidarNoiseModel::Config::Config(const std::string & topic_name, const std::string & config_name)
+LidarNoiseModelV1::Config::Config(const std::string & topic_name, const std::string & config_name)
 : true_positive_rate_ellipse_normalized_x_radius([&]() {
     const std::string param_base = topic_name + ".noise.v1." + config_name + ".";
     return common::getParameter<double>(
@@ -63,7 +63,7 @@ LidarNoiseModel::Config::Config(const std::string & topic_name, const std::strin
 {
 }
 
-void LidarNoiseModel::loadConfigs()
+void LidarNoiseModelV1::loadConfigs()
 {
   const auto config_names = noise_parameter_selector::listAvailableNoiseConfigs(topic_name_, "v1");
   for (const auto & config_name : config_names) {
@@ -71,7 +71,7 @@ void LidarNoiseModel::loadConfigs()
   }
 }
 
-size_t LidarNoiseModel::Config::getBinIndex(double x, double y) const
+size_t LidarNoiseModelV1::Config::getBinIndex(double x, double y) const
 {
   // Use true_positive_rate ellipse parameters as representative for bin determination
   const double x_normalized = x / true_positive_rate_ellipse_normalized_x_radius;
@@ -86,13 +86,14 @@ size_t LidarNoiseModel::Config::getBinIndex(double x, double y) const
   return distance_bins_.empty() ? 0 : distance_bins_.size() - 1;
 }
 
-LidarNoiseModel::Config::DistanceBin & LidarNoiseModel::Config::getDistanceBin(double x, double y)
+LidarNoiseModelV1::Config::DistanceBin & LidarNoiseModelV1::Config::getDistanceBin(
+  double x, double y)
 {
   const size_t bin_index = getBinIndex(x, y);
   return distance_bins_[bin_index];
 }
 
-LidarNoiseModel::Config * LidarNoiseModel::getConfigFor(
+LidarNoiseModelV1::Config * LidarNoiseModelV1::getConfigFor(
   const std::string & entity_name, const traffic_simulator_msgs::EntityStatus & entity_status)
 {
   if (auto it = entity_to_config_.find(entity_name); it != entity_to_config_.end()) {
@@ -110,7 +111,7 @@ LidarNoiseModel::Config * LidarNoiseModel::getConfigFor(
   return config_ptr;
 }
 
-void LidarNoiseModel::removeMarkedPoints(
+void LidarNoiseModelV1::removeMarkedPoints(
   pcl::PointCloud<pcl::PointXYZI>::Ptr & cloud, const std::vector<bool> & points_to_remove)
 {
   const size_t cloud_size = cloud->size();
@@ -130,7 +131,7 @@ void LidarNoiseModel::removeMarkedPoints(
   cloud->height = 1;
 }
 
-void LidarNoiseModel::applyNoise(
+void LidarNoiseModelV1::applyNoise(
   Raycaster::RaycastResult & result, const geometry_msgs::msg::Pose & ego_pose)
 {
   auto & cloud = result.cloud;

@@ -26,7 +26,7 @@
 namespace simple_sensor_simulator
 {
 
-class LidarNoiseModel
+class LidarNoiseModelV1
 {
 public:
   struct Config
@@ -60,7 +60,7 @@ public:
     size_t getBinIndex(double x, double y) const;
   };
 
-  explicit LidarNoiseModel(const std::string & topic_name, int seed);
+  explicit LidarNoiseModelV1(const std::string & topic_name, int seed);
 
   void applyNoise(Raycaster::RaycastResult & result, const geometry_msgs::msg::Pose & ego_pose);
 
