@@ -74,7 +74,8 @@ auto splineDistanceToBoundingBox(
   const CanonicalizedLaneletPose & from_lanelet_pose,
   const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
   const CanonicalizedLaneletPose & target_lanelet_pose,
-  const traffic_simulator_msgs::msg::BoundingBox & target_bounding_box) -> std::optional<double>;
+  const traffic_simulator_msgs::msg::BoundingBox & target_bounding_box,
+  const double lateral_collision_threshold = -1.0) -> std::optional<double>;
 
 // Bounds
 auto distanceToLaneBound(

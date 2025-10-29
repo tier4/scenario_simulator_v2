@@ -5,6 +5,7 @@ nav:
     - AutowareAPI.md
     - BehaviorPlugin.md
     - CONTRIBUTING.md
+    - ContextGammaPlanner.md
     - Communication.md
     - ConfiguringLocalizationTopics.md
     - ConfiguringPerceptionTopics.md

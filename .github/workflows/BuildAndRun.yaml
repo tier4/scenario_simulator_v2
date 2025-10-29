@@ -26,7 +26,6 @@ jobs:
     name: BuildAndRun
     runs-on: ${{ matrix.runs_on }}
     timeout-minutes: 180
-    container: ros:${{ matrix.rosdistro }}
     env:
       DEBIAN_FRONTEND: noninteractive
     strategy:
@@ -35,7 +34,12 @@ jobs:
         rosdistro: [humble]
         runs_on: [ubuntu-22.04, ubuntu-22.04-arm]
         cmake_build_type: [RelWithDebInfo, Release] # Debug build type is currently unavailable. @TODO Fix problem and add Debug build.
-    steps:      
+    steps:
+      - name: free disk
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+
       - name: Suppress warnings
         run: git config --global --add safe.directory '*'
 
@@ -51,7 +55,24 @@ jobs:
         with:
           repository: RobotecAI/scenario_simulator_v2_scenarios
           path: src/scenario_simulator_v2_scenarios
+      
+      - name: Cache apt and rosdep
+        id: cache-apt-rosdep
+        uses: actions/cache@v4
+        with:
+          path: |
+            /var/cache/apt/archives
+            /var/lib/apt/lists
+            /etc/ros/rosdep
+          key: ${{ runner.os }}-ros-${{ matrix.rosdistro }}-apt-${{ hashFiles('**/package.xml', '**/dependency_*.repos') }}
+          restore-keys: |
+            ${{ runner.os }}-ros-${{ matrix.rosdistro }}-apt-
 
+      - name: Setup ROS environment
+        uses: ros-tooling/setup-ros@v0.7
+        with:
+          required-ros-distributions: ${{ matrix.rosdistro }}
+  
       - name: Search packages in this repository
         id: list_packages
         run: |
@@ -67,13 +88,16 @@ jobs:
 
       - name: Resolve rosdep and install colcon mixin
         run: |
-          apt-get update
-          apt-get install -y python3-pip python3-colcon-lcov-result lcov unzip gcovr
-          pip3 install xmlschema==3.4.5 # xmlschema workaround (4.x occurs errors)
+          sudo apt-get update
+          sudo apt-get install -y python3-pip python3-colcon-lcov-result lcov unzip gcovr libunwind-dev
           rosdep update --include-eol-distros
           rosdep install -iy --from-paths src --rosdistro ${{ matrix.rosdistro }}
           colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml
           colcon mixin update default
+          df -h
+          sudo apt-get clean
+          sudo rm -rf /var/lib/apt/lists/*
+          df -h
         shell: bash
 
       - name: Install Build Wrapper
@@ -179,8 +203,10 @@ jobs:
 
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v4.2.1
+        id: sonarcloud
         # In ARM build, SonarQube result should be same as x86 build because no test runs
         if: matrix.runs_on != 'ubuntu-22.04-arm' && github.event.pull_request.head.repo.fork == false
+        continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -195,3 +221,10 @@ jobs:
 #          source install/local_setup.bash
 #          ./src/scenario_simulator_v2/.github/workflows/workflow.sh ./src/scenario_simulator_v2_scenarios/workflow/basic.txt
 #        shell: bash
+
+      - name: Report error if SonarQube scan failed
+        if: steps.sonarcloud.outcome == 'failure'
+        uses: mshick/add-pr-comment@v2
+        with:
+          message: "This PR has failed the SonarQube scan. Please check the details in the SonarQube dashboard."
+          message-id: "sonarcloud-scan-failure"

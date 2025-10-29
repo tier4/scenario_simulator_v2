@@ -27,18 +27,6 @@ namespace pedestrian
 FollowLaneAction::FollowLaneAction(const std::string & name, const BT::NodeConfiguration & config)
 : entity_behavior::PedestrianActionNode(name, config)
 {
-  auto parameterToSeeAroundMode = [](std::string_view parameter) {
-    if (parameter == "blind") {
-      return SeeAroundMode::blind;
-    } else if (parameter == "aware") {
-      return SeeAroundMode::aware;
-    } else {
-      THROW_SIMULATION_ERROR("Unknown see_around mode. It must be \"blind\" or \"aware\".");
-    }
-  };
-
-  should_respect_see_around = parameterToSeeAroundMode(
-    common::getParameter<std::string>("pedestrian_ignore_see_around", "blind"));
 }
 
 void FollowLaneAction::getBlackBoardValues() { PedestrianActionNode::getBlackBoardValues(); }
