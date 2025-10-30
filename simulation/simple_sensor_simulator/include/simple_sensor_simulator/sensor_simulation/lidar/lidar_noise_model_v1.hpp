@@ -21,7 +21,6 @@
 #include <random>
 #include <simple_sensor_simulator/sensor_simulation/lidar/raycaster.hpp>
 #include <string>
-#include <traffic_simulator_msgs/msg/entity_status.hpp>
 #include <unordered_map>
 #include <vector>
 

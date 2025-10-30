@@ -15,18 +15,12 @@
 #ifndef SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__NOISE_PARAMETER_SELECTOR_HPP_
 #define SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__NOISE_PARAMETER_SELECTOR_HPP_
 
-#include <simulation_interface/simulation_api_schema.pb.h>
-
 #include <boost/math/constants/constants.hpp>
-#include <boost/uuid/string_generator.hpp>
-#include <boost/uuid/uuid_generators.hpp>
 #include <execution>
 #include <get_parameter/get_parameter.hpp>
 #include <regex>
 #include <scenario_simulator_exception/exception.hpp>
-#include <set>
 #include <simulation_interface/operators.hpp>
-#include <sstream>
 #include <string>
 #include <vector>
 
@@ -46,6 +40,14 @@ inline auto createEllipticalParameterSelector(
       const auto values =
         common::getParameter<std::vector<double>>(parameter_base_path + name + ".values");
       if (ellipse_y_radii.size() == values.size()) {
+        /*
+           If the parameter `ellipse_y_radii` contains the value 0.0,
+           division by zero will occur here.
+           However, in that case, the distance will be NaN, which correctly
+           expresses the meaning that "the distance cannot be defined", and
+           this function will work without any problems (zero will be
+           returned).
+        */
         const auto distance = std::hypot(x / ellipse_normalized_x_radius, y);
         for (auto i = std::size_t(0); i < ellipse_y_radii.size(); ++i) {
           if (distance < ellipse_y_radii[i]) {
@@ -64,8 +66,6 @@ inline auto createEllipticalParameterSelector(
   };
 }
 
-// Extract config name from parameter name given a version base path
-// Returns empty string if extraction fails
 inline auto parseConfigNameFromParameter(
   const std::string & parameter_name, const std::string & version_base_path) -> std::string
 {
@@ -77,7 +77,6 @@ inline auto parseConfigNameFromParameter(
   return "";
 }
 
-// Get all noise config names for a given topic and version
 inline auto listAvailableNoiseConfigs(const std::string & topic_name, const std::string & version)
   -> std::vector<std::string>
 {
@@ -117,12 +116,6 @@ inline auto findMatchingNoiseConfigForEntity(
     const auto subtypes = common::getParameter<std::vector<std::string>>(base_path + "subtypes");
     const auto names = common::getParameter<std::vector<std::string>>(base_path + "names");
 
-    auto to_string = [](const auto & obj) {
-      std::ostringstream oss;
-      oss << obj;
-      return oss.str();
-    };
-
     auto string_with_wildcards_to_regex =
       [](const std::string & string_with_wildcards) -> std::regex {
       std::string regex_pattern;
@@ -134,13 +127,13 @@ inline auto findMatchingNoiseConfigForEntity(
 
     return std::any_of(
              types.begin(), types.end(),
-             [entity_type = to_string(entity.type()),
+             [entity_type = boost::lexical_cast<std::string>(entity.type()),
               string_with_wildcards_to_regex](const auto & target) {
                return std::regex_match(entity_type, string_with_wildcards_to_regex(target));
              }) &&
            std::any_of(
              subtypes.begin(), subtypes.end(),
-             [entity_subtype = to_string(entity.subtype()),
+             [entity_subtype = boost::lexical_cast<std::string>(entity.subtype()),
               string_with_wildcards_to_regex](const auto & target) {
                return std::regex_match(entity_subtype, string_with_wildcards_to_regex(target));
              }) &&
@@ -173,7 +166,6 @@ inline auto findMatchingNoiseConfigForEntity(
     return "";
   }
 }
-
 }  // namespace noise_parameter_selector
 }  // namespace simple_sensor_simulator
 

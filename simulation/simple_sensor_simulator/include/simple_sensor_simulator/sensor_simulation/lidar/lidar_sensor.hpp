@@ -24,12 +24,10 @@
 #include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <sensor_msgs/msg/point_cloud2.hpp>
-#include <set>
 #include <simple_sensor_simulator/sensor_simulation/lidar/lidar_noise_model_v1.hpp>
 #include <simple_sensor_simulator/sensor_simulation/lidar/lidar_performance_monitor.hpp>
 #include <simple_sensor_simulator/sensor_simulation/lidar/raycaster.hpp>
 #include <string>
-#include <utility>
 #include <vector>
 
 namespace simple_sensor_simulator

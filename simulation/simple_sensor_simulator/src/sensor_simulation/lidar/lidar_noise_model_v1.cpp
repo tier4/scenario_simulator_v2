@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <algorithm>
 #include <cmath>
 #include <simple_sensor_simulator/sensor_simulation/lidar/lidar_noise_model_v1.hpp>
 #include <simple_sensor_simulator/sensor_simulation/noise_parameter_selector.hpp>
@@ -101,19 +102,12 @@ std::optional<std::reference_wrapper<LidarNoiseModelV1::Config>> LidarNoiseModel
 void LidarNoiseModelV1::removeMarkedPoints(
   pcl::PointCloud<pcl::PointXYZI>::Ptr & cloud, const std::vector<bool> & points_to_remove)
 {
-  const size_t cloud_size = cloud->size();
-  auto write_it = cloud->points.begin();
+  size_t index = 0;
+  auto new_end = std::remove_if(cloud->points.begin(), cloud->points.end(), [&](const auto &) {
+    return points_to_remove[index++];
+  });
 
-  for (size_t i = 0; i < cloud_size; ++i) {
-    if (!points_to_remove[i]) {
-      if (write_it != cloud->points.begin() + i) {
-        *write_it = cloud->points[i];
-      }
-      ++write_it;
-    }
-  }
-
-  cloud->points.resize(std::distance(cloud->points.begin(), write_it));
+  cloud->points.erase(new_end, cloud->points.end());
   cloud->width = cloud->points.size();
   cloud->height = 1;
 }
@@ -131,10 +125,11 @@ void LidarNoiseModelV1::applyNoise(
 
   std::vector<std::vector<size_t>> entity_to_point_indices(raycast_entities.size());
   for (size_t i = 0; i < cloud->size(); ++i) {
-    if (const size_t entity_idx = point_entity_indices[i]; entity_idx >= raycast_entities.size()) {
+    if (const size_t entity_index = point_entity_indices[i];
+        entity_index >= raycast_entities.size()) {
       points_to_remove[i] = true;
     } else {
-      entity_to_point_indices[entity_idx].push_back(i);
+      entity_to_point_indices[entity_index].push_back(i);
     }
   }
 

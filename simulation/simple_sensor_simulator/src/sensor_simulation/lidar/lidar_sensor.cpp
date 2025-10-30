@@ -49,11 +49,10 @@ auto LidarSensor<sensor_msgs::msg::PointCloud2>::raycast(
     auto result = raycaster_.raycast(ego_pose.value(), raycast_entities);
     detected_objects_ = result.getDetectedEntityNames();
 
-    if (noise_model_V1_) {
+    if (noise_model_v1_) {
       auto noise_measurement =
         performance_monitor_.startMeasurement(LidarPerformanceMonitor::MetricType::NOISE);
-
-      noise_model_V1_->applyNoise(result, ego_pose.value());
+      noise_model_v1_->applyNoise(result, ego_pose.value());
     }
 
     sensor_msgs::msg::PointCloud2 pointcloud_msg;
