@@ -66,6 +66,42 @@ inline auto createEllipticalParameterSelector(
   };
 }
 
+inline auto parseConfigNameFromParameter(
+  const std::string & parameter_name, const std::string & version_base_path) -> std::string
+{
+  if (const auto next_dot_pos = parameter_name.find('.', version_base_path.length());
+      next_dot_pos != std::string::npos) {
+    return parameter_name.substr(
+      version_base_path.length(), next_dot_pos - version_base_path.length());
+  }
+  return "";
+}
+
+inline auto listAvailableNoiseConfigs(const std::string & topic_name, const std::string & version)
+  -> std::vector<std::string>
+{
+  const std::string version_base_path = topic_name + ".noise." + version + ".";
+
+  // Get all parameter names
+  const auto parameter_names =
+    common::getParameterNode()
+      .list_parameters({}, rcl_interfaces::srv::ListParameters::Request::DEPTH_RECURSIVE)
+      .names;
+
+  // Extract unique config names from parameters
+  std::set<std::string> config_names_set;
+  for (const auto & parameter_name : parameter_names) {
+    if (parameter_name.rfind(version_base_path, 0) == 0) {
+      const auto config_name = parseConfigNameFromParameter(parameter_name, version_base_path);
+      if (!config_name.empty()) {
+        config_names_set.insert(config_name);
+      }
+    }
+  }
+
+  return std::vector<std::string>(config_names_set.begin(), config_names_set.end());
+}
+
 inline auto findMatchingNoiseConfigForEntity(
   const traffic_simulator_msgs::EntityStatus & entity, const std::string & version,
   const std::string & topic_name) -> std::string
@@ -113,28 +149,19 @@ inline auto findMatchingNoiseConfigForEntity(
       .list_parameters({}, rcl_interfaces::srv::ListParameters::Request::DEPTH_RECURSIVE)
       .names;
 
-  auto extract_child_namespace = [&](const std::string & parameter_name) -> std::string {
-    if (const auto next_dot_pos = parameter_name.find('.', version_base_path.length());
-        next_dot_pos != std::string::npos) {
-      return parameter_name.substr(
-        version_base_path.length(), next_dot_pos - version_base_path.length());
-    }
-    return "";
-  };
-
   if (auto matched_parameter = std::find_if(
         parameter_names.begin(), parameter_names.end(),
         [&](const auto & parameter_name) {
           if (parameter_name.rfind(version_base_path, 0) == 0) {
-            if (auto child_namespace = extract_child_namespace(parameter_name);
-                child_namespace != "") {
-              return matches_noise_application_entities(entity, child_namespace);
+            if (auto config_name = parseConfigNameFromParameter(parameter_name, version_base_path);
+                !config_name.empty()) {
+              return matches_noise_application_entities(entity, config_name);
             }
           }
           return false;
         });
       matched_parameter != parameter_names.end()) {
-    return extract_child_namespace(*matched_parameter);
+    return parseConfigNameFromParameter(*matched_parameter, version_base_path);
   } else {
     return "";
   }
