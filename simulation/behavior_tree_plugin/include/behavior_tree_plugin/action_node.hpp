@@ -142,8 +142,6 @@ private:
     -> std::vector<traffic_simulator::CanonicalizedEntityStatus>;
   auto getConflictingEntityStatusOnLane(const lanelet::Ids & route_lanelets) const
     -> std::vector<traffic_simulator::CanonicalizedEntityStatus>;
-  auto getOtherEntityStatus(lanelet::Id lanelet_id) const
-    -> std::vector<traffic_simulator::CanonicalizedEntityStatus>;
   auto isOtherEntityAtConsideredAltitude(
     const traffic_simulator::CanonicalizedEntityStatus & entity_status) const -> bool;
   auto tick() -> BT::NodeStatus override;
