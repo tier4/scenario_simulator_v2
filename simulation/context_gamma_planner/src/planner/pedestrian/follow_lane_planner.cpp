@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <traffic_simulator/lanelet_wrapper/lanelet_map.hpp>
-
 #include "context_gamma_planner/planner/pedestrian/follow_lane_planner.hpp"
+
+#include <traffic_simulator/lanelet_wrapper/lanelet_map.hpp>
 
 namespace context_gamma_planner::pedestrian
 {
