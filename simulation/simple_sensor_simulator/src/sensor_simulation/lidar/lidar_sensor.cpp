@@ -44,21 +44,18 @@ auto LidarSensor<sensor_msgs::msg::PointCloud2>::raycast(
   }
 
   if (ego_pose) {
-    // Use geometry-aware raycast to get points with entity association
     auto raycast_measurement =
       performance_monitor_.startMeasurement(LidarPerformanceMonitor::MetricType::RAYCAST);
     auto result = raycaster_.raycast(ego_pose.value(), raycast_entities);
     detected_objects_ = result.getDetectedEntityNames();
 
-    // Apply noise if noise model is available
-    if (noise_model_) {
+    if (noise_model_V1_) {
       auto noise_measurement =
         performance_monitor_.startMeasurement(LidarPerformanceMonitor::MetricType::NOISE);
 
-      noise_model_->applyNoise(result, ego_pose.value());
+      noise_model_V1_->applyNoise(result, ego_pose.value());
     }
 
-    // Convert to standard PointCloud2 message
     sensor_msgs::msg::PointCloud2 pointcloud_msg;
     pcl::toROSMsg(*(result.cloud), pointcloud_msg);
     pointcloud_msg.header.frame_id = "base_link";

@@ -41,12 +41,12 @@ public:
       std::normal_distribution<double> tangential_distribution;
 
       DistanceBin(
-        double y_radius_sq, double r_mean, double r_stddev, double t_mean, double t_stddev,
-        double tpr)
-      : ellipse_y_radius_squared(y_radius_sq),
-        detection_distribution(tpr),
-        radial_distribution(r_mean, r_stddev),
-        tangential_distribution(t_mean, t_stddev)
+        double ellipse_y_radius, double radial_mean, double radial_stddev, double tangential_mean,
+        double tangential_stddev, double true_positive_rate)
+      : ellipse_y_radius_squared(ellipse_y_radius * ellipse_y_radius),
+        detection_distribution(true_positive_rate),
+        radial_distribution(radial_mean, radial_stddev),
+        tangential_distribution(tangential_mean, tangential_stddev)
       {
       }
     };
