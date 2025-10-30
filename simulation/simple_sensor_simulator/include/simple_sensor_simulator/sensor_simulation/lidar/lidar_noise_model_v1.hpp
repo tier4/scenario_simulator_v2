@@ -15,7 +15,9 @@
 #ifndef SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__LIDAR__LIDAR_NOISE_MODEL_V1_HPP_
 #define SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__LIDAR__LIDAR_NOISE_MODEL_V1_HPP_
 
+#include <functional>
 #include <geometry_msgs/msg/pose.hpp>
+#include <optional>
 #include <random>
 #include <simple_sensor_simulator/sensor_simulation/lidar/raycaster.hpp>
 #include <string>
@@ -55,9 +57,6 @@ public:
     Config(const std::string & topic_name, const std::string & config_name);
 
     DistanceBin & getDistanceBin(double x, double y);
-
-  private:
-    size_t getBinIndex(double x, double y) const;
   };
 
   explicit LidarNoiseModelV1(const std::string & topic_name, int seed);
@@ -66,11 +65,11 @@ public:
 
 private:
   std::unordered_map<std::string, Config> configs_;
-  std::unordered_map<std::string, Config *> entity_to_config_;
+  std::unordered_map<std::string, std::optional<std::reference_wrapper<Config>>> entity_to_config_;
   std::default_random_engine random_engine_;
   std::string topic_name_;
 
-  Config * getConfigFor(
+  std::optional<std::reference_wrapper<Config>> getConfigFor(
     const std::string & entity_name, const traffic_simulator_msgs::EntityStatus & entity_status);
 
   static void removeMarkedPoints(

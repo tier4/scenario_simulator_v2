@@ -20,7 +20,6 @@
 
 namespace simple_sensor_simulator
 {
-
 LidarNoiseModelV1::LidarNoiseModelV1(const std::string & topic_name, int seed)
 : random_engine_(seed == 0 ? std::random_device{}() : seed), topic_name_(topic_name)
 {
@@ -32,28 +31,26 @@ LidarNoiseModelV1::LidarNoiseModelV1(const std::string & topic_name, int seed)
 
 LidarNoiseModelV1::Config::Config(const std::string & topic_name, const std::string & config_name)
 : true_positive_rate_ellipse_normalized_x_radius([&]() {
-    const std::string param_base = topic_name + ".noise.v1." + config_name + ".";
+    const std::string base_path = topic_name + ".noise.v1." + config_name + ".";
     return common::getParameter<double>(
-      param_base + "true_positive.rate.ellipse_normalized_x_radius");
+      base_path + "true_positive.rate.ellipse_normalized_x_radius");
   }()),
   distance_bins_([&]() {
-    const std::string param_base = topic_name + ".noise.v1." + config_name + ".";
+    const std::string base_path = topic_name + ".noise.v1." + config_name + ".";
 
-    // Load all required parameters locally
     const auto ellipse_y_radii =
-      common::getParameter<std::vector<double>>(param_base + "ellipse_y_radii");
+      common::getParameter<std::vector<double>>(base_path + "ellipse_y_radii");
     const auto radial_mean =
-      common::getParameter<std::vector<double>>(param_base + "distance.radial.mean.values");
+      common::getParameter<std::vector<double>>(base_path + "distance.radial.mean.values");
     const auto radial_stddev = common::getParameter<std::vector<double>>(
-      param_base + "distance.radial.standard_deviation.values");
+      base_path + "distance.radial.standard_deviation.values");
     const auto tangential_mean =
-      common::getParameter<std::vector<double>>(param_base + "distance.tangential.mean.values");
+      common::getParameter<std::vector<double>>(base_path + "distance.tangential.mean.values");
     const auto tangential_stddev = common::getParameter<std::vector<double>>(
-      param_base + "distance.tangential.standard_deviation.values");
+      base_path + "distance.tangential.standard_deviation.values");
     const auto tpr_values =
-      common::getParameter<std::vector<double>>(param_base + "true_positive.rate.values");
+      common::getParameter<std::vector<double>>(base_path + "true_positive.rate.values");
 
-    // Create distance bins
     std::vector<DistanceBin> bins;
     bins.reserve(ellipse_y_radii.size());
     for (size_t i = 0; i < ellipse_y_radii.size(); ++i) {
@@ -66,44 +63,39 @@ LidarNoiseModelV1::Config::Config(const std::string & topic_name, const std::str
 {
 }
 
-size_t LidarNoiseModelV1::Config::getBinIndex(double x, double y) const
+LidarNoiseModelV1::Config::DistanceBin & LidarNoiseModelV1::Config::getDistanceBin(
+  double x, double y)
 {
-  // Use true_positive_rate ellipse parameters as representative for bin determination
+  assert(distance_bins_.empty());
   const double x_normalized = x / true_positive_rate_ellipse_normalized_x_radius;
   const double distance_squared = x_normalized * x_normalized + y * y;
 
   for (size_t i = 0; i < distance_bins_.size(); ++i) {
     if (distance_squared < distance_bins_[i].ellipse_y_radius_squared) {
-      return i;
+      return distance_bins_[i];
     }
   }
-  // Return last bin index if beyond all ellipses
-  return distance_bins_.empty() ? 0 : distance_bins_.size() - 1;
+  return distance_bins_[distance_bins_.size() - 1];
 }
 
-LidarNoiseModelV1::Config::DistanceBin & LidarNoiseModelV1::Config::getDistanceBin(
-  double x, double y)
-{
-  const size_t bin_index = getBinIndex(x, y);
-  return distance_bins_[bin_index];
-}
-
-LidarNoiseModelV1::Config * LidarNoiseModelV1::getConfigFor(
+std::optional<std::reference_wrapper<LidarNoiseModelV1::Config>> LidarNoiseModelV1::getConfigFor(
   const std::string & entity_name, const traffic_simulator_msgs::EntityStatus & entity_status)
 {
-  if (auto it = entity_to_config_.find(entity_name); it != entity_to_config_.end()) {
-    return it->second;
-  }
+  if (auto config_itr = entity_to_config_.find(entity_name);
+      config_itr != entity_to_config_.end()) {
+    return config_itr->second;
+  } else {
+    std::optional<std::reference_wrapper<Config>> result = std::nullopt;
+    if (const auto config_name = noise_parameter_selector::findMatchingNoiseConfigForEntity(
+          entity_status, "v1", topic_name_);
+        not config_name.empty()) {
+      result = std::ref(configs_.at(config_name));
+    }
 
-  Config * config_ptr = nullptr;
-  if (const auto config_name = noise_parameter_selector::findMatchingNoiseConfigForEntity(
-        entity_status, "v1", topic_name_);
-      not config_name.empty()) {
-    config_ptr = &configs_.at(config_name);
+    // cache result
+    entity_to_config_[entity_name] = result;
+    return result;
   }
-
-  entity_to_config_[entity_name] = config_ptr;
-  return config_ptr;
 }
 
 void LidarNoiseModelV1::removeMarkedPoints(
@@ -129,29 +121,23 @@ void LidarNoiseModelV1::removeMarkedPoints(
 void LidarNoiseModelV1::applyNoise(
   Raycaster::RaycastResult & result, const geometry_msgs::msg::Pose & ego_pose)
 {
-  auto & cloud = result.cloud;
-  const auto & point_entity_indices = result.point_to_entity_index;
-  const auto & raycast_entities = result.raycast_entities;
+  auto & [cloud, point_entity_indices, raycast_entities] = result;
 
-  if (!cloud || cloud->empty() || point_entity_indices.size() != cloud->size()) {
+  if (not cloud or cloud->empty() or point_entity_indices.size() != cloud->size()) {
     return;
   }
 
-  const size_t cloud_size = cloud->size();
-  std::vector<bool> points_to_remove(cloud_size, false);
+  std::vector<bool> points_to_remove(cloud->size(), false);
 
-  // Group points by entity
   std::vector<std::vector<size_t>> entity_to_point_indices(raycast_entities.size());
-  for (size_t i = 0; i < cloud_size; ++i) {
-    const size_t entity_idx = point_entity_indices[i];
-    if (entity_idx >= raycast_entities.size()) {
+  for (size_t i = 0; i < cloud->size(); ++i) {
+    if (const size_t entity_idx = point_entity_indices[i]; entity_idx >= raycast_entities.size()) {
       points_to_remove[i] = true;
     } else {
       entity_to_point_indices[entity_idx].push_back(i);
     }
   }
 
-  // Process points grouped by entity
   for (size_t entity_idx = 0; entity_idx < raycast_entities.size(); ++entity_idx) {
     const auto & point_indices = entity_to_point_indices[entity_idx];
     if (point_indices.empty()) {
@@ -159,47 +145,38 @@ void LidarNoiseModelV1::applyNoise(
     }
 
     const auto & entity_status = raycast_entities[entity_idx].entity_status;
-    auto * config = getConfigFor(entity_status.name(), entity_status);
-    if (config == nullptr) {
+    auto config = getConfigFor(entity_status.name(), entity_status);
+    if (not config.has_value()) {
       continue;
     }
 
     const auto x = entity_status.pose().position().x() - ego_pose.position.x;
     const auto y = entity_status.pose().position().y() - ego_pose.position.y;
-    auto & bin = config->getDistanceBin(x, y);
+    auto & bin = config->get().getDistanceBin(x, y);
 
     // Apply noise to all points from this entity
     for (size_t i : point_indices) {
-      auto & point = cloud->points[i];
-
-      // Check if point is detected (true positive rate)
-      if (!bin.detection_distribution(random_engine_)) {
+      if (not bin.detection_distribution(random_engine_)) {
         points_to_remove[i] = true;
-        continue;
+      } else {
+        auto & point = cloud->points[i];
+        const double radial_noise = bin.radial_distribution(random_engine_);
+        const double tangential_noise = bin.tangential_distribution(random_engine_);
+
+        const double distance = std::hypot(point.x, point.y, point.z);
+        const double radial_x = point.x / distance;
+        const double radial_y = point.y / distance;
+        const double radial_z = point.z / distance;
+        const double tangential_x = radial_y;
+        const double tangential_y = -radial_x;
+
+        point.x += radial_x * radial_noise + tangential_x * tangential_noise;
+        point.y += radial_y * radial_noise + tangential_y * tangential_noise;
+        point.z += radial_z * radial_noise;
       }
-
-      // Generate noise using pre-configured distributions
-      const double radial_noise = bin.radial_distribution(random_engine_);
-      const double tangential_noise = bin.tangential_distribution(random_engine_);
-
-      // Apply noise to point coordinates
-      const double distance = std::hypot(point.x, point.y, point.z);
-      const double radial_x = point.x / distance;
-      const double radial_y = point.y / distance;
-      const double radial_z = point.z / distance;
-      const double noised_distance = distance + radial_noise;
-
-      // Tangential direction: perpendicular to radial in XY plane
-      const double tangential_x = radial_y;
-      const double tangential_y = -radial_x;
-
-      point.x = static_cast<float>(radial_x * noised_distance + tangential_x * tangential_noise);
-      point.y = static_cast<float>(radial_y * noised_distance + tangential_y * tangential_noise);
-      point.z = static_cast<float>(radial_z * noised_distance);
     }
   }
 
   removeMarkedPoints(cloud, points_to_remove);
 }
-
 }  // namespace simple_sensor_simulator
