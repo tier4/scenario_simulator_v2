@@ -113,7 +113,7 @@ auto CppScenarioNode::spawnEgoEntity(
   std::this_thread::sleep_for(std::chrono::duration<double>(1.0 / 20.0));
   api_.spawn(
     "ego", spawn_lanelet_pose, parameters, traffic_simulator::VehicleBehavior::autoware(),
-    ego_model_);
+    "lexus_rx450h");
 
   auto & ego_entity = api_.getEgoEntity("ego");
   ego_entity.setParameter<bool>("allow_goal_modification", true);
@@ -135,18 +135,8 @@ auto CppScenarioNode::spawnEgoEntity(
     // clang-format on
     return configuration;
   }());
-
-  if (!goal_lanelet_poses.empty()) {
-    ego_entity.requestAssignRoute(goal_lanelet_poses);
-
-    while (!ego_entity.isEngaged()) {
-      if (ego_entity.isEngageable()) {
-        ego_entity.engage();
-      }
-      api_.updateFrame();
-      std::this_thread::sleep_for(std::chrono::duration<double>(1.0 / 20.0));
-    }
-  }
+  ego_entity.requestAssignRoute(goal_lanelet_poses);
+  api_.updateFrame();
 }
 
 auto CppScenarioNode::isVehicle(const std::string & name) const -> bool
