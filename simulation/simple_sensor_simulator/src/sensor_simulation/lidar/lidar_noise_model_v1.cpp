@@ -63,9 +63,88 @@ LidarNoiseModelV1::Config::Config(const std::string & topic_name, const std::str
 {
 }
 
+LidarNoiseModelV1::Config::DistanceBin & LidarNoiseModelV1::Config::getDistanceBin(
+  double x, double y)
+{
+  assert(distance_bins_.empty());
+  const double x_normalized = x / true_positive_rate_ellipse_normalized_x_radius;
+  const double distance_squared = x_normalized * x_normalized + y * y;
+
+  for (size_t i = 0; i < distance_bins_.size(); ++i) {
+    if (distance_squared < distance_bins_[i].ellipse_y_radius_squared) {
+      return distance_bins_[i];
+    }
+  }
+  return distance_bins_[distance_bins_.size() - 1];
+}
+
+std::optional<std::reference_wrapper<LidarNoiseModelV1::Config>> LidarNoiseModelV1::getConfigFor(
+  const std::string & entity_name, const traffic_simulator_msgs::EntityStatus & entity_status)
+{
+  if (auto config_itr = entity_to_config_.find(entity_name);
+      config_itr != entity_to_config_.end()) {
+    return config_itr->second;
+  } else {
+    std::optional<std::reference_wrapper<Config>> result = std::nullopt;
+    if (const auto config_name = noise_parameter_selector::findMatchingNoiseConfigForEntity(
+          entity_status, "v1", topic_name_);
+        not config_name.empty()) {
+      result = std::ref(configs_.at(config_name));
+    }
+
+    // cache result
+    entity_to_config_[entity_name] = result;
+    return result;
+  }
+}
+
 void LidarNoiseModelV1::applyNoise(
   Raycaster::RaycastResult & result, const geometry_msgs::msg::Pose & ego_pose)
 {
-  // TODO
+  auto & [cloud, point_entity_indices, raycast_entities] = result;
+
+  if (not cloud or cloud->empty() or point_entity_indices.size() != cloud->size()) {
+    return;
+  }
+
+  std::vector<std::vector<size_t>> entity_to_point_indices(raycast_entities.size());
+  for (size_t i = 0; i < cloud->size(); ++i) {
+    entity_to_point_indices[point_entity_indices[i]].push_back(i);
+  }
+
+  for (size_t entity_idx = 0; entity_idx < raycast_entities.size(); ++entity_idx) {
+    const auto & point_indices = entity_to_point_indices[entity_idx];
+    if (point_indices.empty()) {
+      continue;
+    }
+
+    const auto & entity_status = raycast_entities[entity_idx].entity_status;
+    auto config = getConfigFor(entity_status.name(), entity_status);
+    if (not config.has_value()) {
+      continue;
+    }
+
+    const auto x = entity_status.pose().position().x() - ego_pose.position.x;
+    const auto y = entity_status.pose().position().y() - ego_pose.position.y;
+    auto & bin = config->get().getDistanceBin(x, y);
+
+    // Apply noise to all points from this entity
+    for (size_t i : point_indices) {
+      auto & point = cloud->points[i];
+      const double radial_noise = bin.radial_distribution(random_engine_);
+      const double tangential_noise = bin.tangential_distribution(random_engine_);
+
+      const double distance = std::hypot(point.x, point.y, point.z);
+      const double radial_x = point.x / distance;
+      const double radial_y = point.y / distance;
+      const double radial_z = point.z / distance;
+      const double tangential_x = radial_y;
+      const double tangential_y = -radial_x;
+
+      point.x += radial_x * radial_noise + tangential_x * tangential_noise;
+      point.y += radial_y * radial_noise + tangential_y * tangential_noise;
+      point.z += radial_z * radial_noise;
+    }
+  }
 }
 }  // namespace simple_sensor_simulator
