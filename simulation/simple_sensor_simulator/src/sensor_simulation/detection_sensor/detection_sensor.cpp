@@ -33,6 +33,7 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <simple_sensor_simulator/exception.hpp>
 #include <simple_sensor_simulator/sensor_simulation/detection_sensor/detection_sensor.hpp>
+#include <simple_sensor_simulator/sensor_simulation/noise_parameter_selector.hpp>
 #include <simulation_interface/conversions.hpp>
 #include <simulation_interface/operators.hpp>
 #include <string>
@@ -394,42 +395,6 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
         return std::clamp(amplitude * std::exp(-decay * interval) + offset, 0.0, 1.0);
       };
 
-    auto create_selector = [](const std::string & parameter_base_path, double x, double y) {
-      return [parameter_base_path, x, y](const std::string & name) {
-        return [=]() {
-          const auto ellipse_y_radii =
-            common::getParameter<std::vector<double>>(parameter_base_path + "ellipse_y_radii");
-          const auto ellipse_normalized_x_radius = common::getParameter<double>(
-            parameter_base_path + name + ".ellipse_normalized_x_radius");
-          const auto values =
-            common::getParameter<std::vector<double>>(parameter_base_path + name + ".values");
-          if (ellipse_y_radii.size() == values.size()) {
-            /*
-               If the parameter `ellipse_y_radii` contains the value 0.0,
-               division by zero will occur here.
-               However, in that case, the distance will be NaN, which correctly
-               expresses the meaning that "the distance cannot be defined", and
-               this function will work without any problems (zero will be
-               returned).
-            */
-            const auto distance = std::hypot(x / ellipse_normalized_x_radius, y);
-            for (auto i = std::size_t(0); i < ellipse_y_radii.size(); ++i) {
-              if (distance < ellipse_y_radii[i]) {
-                return values[i];
-              }
-            }
-            return 0.0;
-          } else {
-            throw common::Error(
-              "Array size mismatch: ", std::quoted(parameter_base_path + "ellipse_y_radii"),
-              " has ", ellipse_y_radii.size(), " elements, but ",
-              std::quoted(parameter_base_path + name + ".values"), " has ", values.size(),
-              " elements. Both arrays must have the same size.");
-          }
-        };
-      };
-    };
-
     auto yaw_flip = [&](
                       bool previous_flip, double speed, double interval,
                       const std::string & parameter_base_path) -> bool {
@@ -504,7 +469,8 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
           std::string(detected_objects_publisher->get_topic_name()) + ".noise." +
           version_namespace + ".";
 
-        auto selector = create_selector(version_base_path, x, y);
+        auto selector =
+          noise_parameter_selector::createEllipticalParameterSelector(version_base_path, x, y);
 
         noise_output->second.distance_noise = [&]() {
           const auto mean = selector("distance.mean");
@@ -690,7 +656,7 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
             ego_baselink_2d, math::geometry::toPolygon2D(entity_pose, entity_bounding_box));
         }();
 
-        auto selector = create_selector(
+        auto selector = noise_parameter_selector::createEllipticalParameterSelector(
           parameter_base_path, noise_base.x() - ego_baselink_2d.x(),
           noise_base.y() - ego_baselink_2d.y());
 
