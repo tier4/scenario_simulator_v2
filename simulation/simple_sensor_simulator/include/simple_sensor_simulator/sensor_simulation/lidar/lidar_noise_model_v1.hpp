@@ -70,8 +70,6 @@ private:
   std::default_random_engine random_engine_;
   std::string topic_name_;
 
-  void loadConfigs();
-
   Config * getConfigFor(
     const std::string & entity_name, const traffic_simulator_msgs::EntityStatus & entity_status);
 

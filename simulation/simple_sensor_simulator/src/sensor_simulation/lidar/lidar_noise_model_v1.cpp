@@ -24,7 +24,10 @@ namespace simple_sensor_simulator
 LidarNoiseModelV1::LidarNoiseModelV1(const std::string & topic_name, int seed)
 : random_engine_(seed == 0 ? std::random_device{}() : seed), topic_name_(topic_name)
 {
-  loadConfigs();
+  const auto config_names = noise_parameter_selector::listAvailableNoiseConfigs(topic_name_, "v1");
+  for (const auto & config_name : config_names) {
+    configs_.try_emplace(config_name, topic_name_, config_name);
+  }
 }
 
 LidarNoiseModelV1::Config::Config(const std::string & topic_name, const std::string & config_name)
@@ -61,14 +64,6 @@ LidarNoiseModelV1::Config::Config(const std::string & topic_name, const std::str
     return bins;
   }())
 {
-}
-
-void LidarNoiseModelV1::loadConfigs()
-{
-  const auto config_names = noise_parameter_selector::listAvailableNoiseConfigs(topic_name_, "v1");
-  for (const auto & config_name : config_names) {
-    configs_.try_emplace(config_name, topic_name_, config_name);
-  }
 }
 
 size_t LidarNoiseModelV1::Config::getBinIndex(double x, double y) const
