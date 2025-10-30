@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <geometry/spline/catmull_rom_spline.hpp>
-
 #include "context_gamma_planner/planner/follow_polyline_trajectory_planner_base.hpp"
+
+#include <geometry/spline/catmull_rom_spline.hpp>
 
 namespace context_gamma_planner
 {
