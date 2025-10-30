@@ -84,7 +84,7 @@ public:
 
 // The blackboard value not defined in entity_behavior::BehaviorPluginBase is defined below.
 #define DEFINE_GETTER_SETTER(NAME, KEY, TYPE)                                             \
-  auto get##NAME##Key() const -> const std::string &                                      \
+  auto get##NAME##Key() const->const std::string &                                        \
   {                                                                                       \
     static const std::string key = KEY;                                                   \
     return key;                                                                           \
