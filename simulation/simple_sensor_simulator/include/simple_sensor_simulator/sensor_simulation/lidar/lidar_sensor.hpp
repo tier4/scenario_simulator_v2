@@ -18,9 +18,13 @@
 #include <simulation_interface/simulation_api_schema.pb.h>
 
 #include <agnocast_wrapper/agnocast_wrapper.hpp>
+#include <get_parameter/get_parameter.hpp>
+#include <memory>
 #include <queue>
 #include <rclcpp/rclcpp.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 #include <sensor_msgs/msg/point_cloud2.hpp>
+#include <simple_sensor_simulator/sensor_simulation/lidar/lidar_noise_model_v1.hpp>
 #include <simple_sensor_simulator/sensor_simulation/lidar/raycaster.hpp>
 #include <string>
 #include <vector>
@@ -61,6 +65,8 @@ class LidarSensor : public LidarSensorBase
 
   std::queue<std::pair<sensor_msgs::msg::PointCloud2, double>> queue_pointcloud_;
 
+  std::unique_ptr<LidarNoiseModelV1> noise_model_v1_ = nullptr;
+
   auto raycast(const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &)
     -> T;
 
@@ -72,6 +78,17 @@ public:
   : LidarSensorBase(current_simulation_time, configuration), publisher_ptr_(publisher_ptr)
   {
     raycaster_.setDirection(configuration);
+    const std::string topic_name = publisher_ptr_->get_topic_name();
+    const auto noise_model_version =
+      common::getParameter<int>(std::string(topic_name) + ".noise.model.version");
+    if (noise_model_version == 1) {
+      const auto seed = common::getParameter<int>(std::string(topic_name) + ".seed");
+      noise_model_v1_ = std::make_unique<LidarNoiseModelV1>(topic_name, seed);
+    } else {
+      throw common::Error(
+        "Unexpected noise model version for LiDAR sensor: ", noise_model_version,
+        ". Expected version is 1 for now.");
+    }
   }
 
   auto update(
