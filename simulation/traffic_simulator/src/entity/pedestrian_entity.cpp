@@ -14,6 +14,7 @@
 
 #include <algorithm>
 #include <memory>
+#include <stdexcept>
 #include <string>
 #include <traffic_simulator/entity/pedestrian_entity.hpp>
 #include <traffic_simulator/utils/pose.hpp>
@@ -152,7 +153,17 @@ auto PedestrianEntity::getGoalPoses() -> std::vector<geometry_msgs::msg::Pose>
 
 const traffic_simulator_msgs::msg::WaypointsArray PedestrianEntity::getWaypoints()
 {
-  return traffic_simulator_msgs::msg::WaypointsArray();
+  try {
+    return behavior_plugin_ptr_->getWaypoints();
+  } catch (const std::runtime_error &) {
+    if (!status_->isInLanelet()) {
+      THROW_SIMULATION_ERROR(
+        "Failed to calculate waypoints in NPC logics, please check Entity : ", name,
+        " is in a lane coordinate.");
+    } else {
+      THROW_SIMULATION_ERROR("Failed to calculate waypoint in NPC logics.");
+    }
+  }
 }
 
 void PedestrianEntity::requestWalkStraight()
