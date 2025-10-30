@@ -70,6 +70,9 @@ private:
 
   std::optional<std::reference_wrapper<Config>> getConfigFor(
     const std::string & entity_name, const traffic_simulator_msgs::EntityStatus & entity_status);
+
+  static void removeMarkedPoints(
+    pcl::PointCloud<pcl::PointXYZI>::Ptr & cloud, const std::vector<bool> & points_to_remove);
 };
 
 }  // namespace simple_sensor_simulator

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <algorithm>
 #include <cmath>
 #include <simple_sensor_simulator/sensor_simulation/lidar/lidar_noise_model_v1.hpp>
 #include <simple_sensor_simulator/sensor_simulation/noise_parameter_selector.hpp>
@@ -98,6 +99,19 @@ std::optional<std::reference_wrapper<LidarNoiseModelV1::Config>> LidarNoiseModel
   }
 }
 
+void LidarNoiseModelV1::removeMarkedPoints(
+  pcl::PointCloud<pcl::PointXYZI>::Ptr & cloud, const std::vector<bool> & points_to_remove)
+{
+  size_t index = 0;
+  auto new_end = std::remove_if(cloud->points.begin(), cloud->points.end(), [&](const auto &) {
+    return points_to_remove[index++];
+  });
+
+  cloud->points.erase(new_end, cloud->points.end());
+  cloud->width = cloud->points.size();
+  cloud->height = 1;
+}
+
 void LidarNoiseModelV1::applyNoise(
   Raycaster::RaycastResult & result, const geometry_msgs::msg::Pose & ego_pose)
 {
@@ -107,9 +121,16 @@ void LidarNoiseModelV1::applyNoise(
     return;
   }
 
+  std::vector<bool> points_to_remove(cloud->size(), false);
+
   std::vector<std::vector<size_t>> entity_to_point_indices(raycast_entities.size());
   for (size_t i = 0; i < cloud->size(); ++i) {
-    entity_to_point_indices[point_entity_indices[i]].push_back(i);
+    if (const size_t entity_index = point_entity_indices[i];
+        entity_index >= raycast_entities.size()) {
+      points_to_remove[i] = true;
+    } else {
+      entity_to_point_indices[entity_index].push_back(i);
+    }
   }
 
   for (size_t entity_idx = 0; entity_idx < raycast_entities.size(); ++entity_idx) {
@@ -130,21 +151,27 @@ void LidarNoiseModelV1::applyNoise(
 
     // Apply noise to all points from this entity
     for (size_t i : point_indices) {
-      auto & point = cloud->points[i];
-      const double radial_noise = bin.radial_distribution(random_engine_);
-      const double tangential_noise = bin.tangential_distribution(random_engine_);
+      if (not bin.detection_distribution(random_engine_)) {
+        points_to_remove[i] = true;
+      } else {
+        auto & point = cloud->points[i];
+        const double radial_noise = bin.radial_distribution(random_engine_);
+        const double tangential_noise = bin.tangential_distribution(random_engine_);
 
-      const double distance = std::hypot(point.x, point.y, point.z);
-      const double radial_x = point.x / distance;
-      const double radial_y = point.y / distance;
-      const double radial_z = point.z / distance;
-      const double tangential_x = radial_y;
-      const double tangential_y = -radial_x;
+        const double distance = std::hypot(point.x, point.y, point.z);
+        const double radial_x = point.x / distance;
+        const double radial_y = point.y / distance;
+        const double radial_z = point.z / distance;
+        const double tangential_x = radial_y;
+        const double tangential_y = -radial_x;
 
-      point.x += radial_x * radial_noise + tangential_x * tangential_noise;
-      point.y += radial_y * radial_noise + tangential_y * tangential_noise;
-      point.z += radial_z * radial_noise;
+        point.x += radial_x * radial_noise + tangential_x * tangential_noise;
+        point.y += radial_y * radial_noise + tangential_y * tangential_noise;
+        point.z += radial_z * radial_noise;
+      }
     }
   }
+
+  removeMarkedPoints(cloud, points_to_remove);
 }
 }  // namespace simple_sensor_simulator
