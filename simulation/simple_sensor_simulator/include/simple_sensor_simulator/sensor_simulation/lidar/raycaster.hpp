@@ -19,7 +19,6 @@
 #include <pcl_conversions/pcl_conversions.h>
 
 #include <algorithm>
-#include <chrono>
 #include <geometry/quaternion/get_rotation_matrix.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 #include <memory>
@@ -28,7 +27,6 @@
 #include <simple_sensor_simulator/sensor_simulation/primitives/box.hpp>
 #include <simple_sensor_simulator/sensor_simulation/primitives/primitive.hpp>
 #include <string>
-#include <traffic_simulator_msgs/msg/entity_status.hpp>
 #include <utility>
 #include <vector>
 

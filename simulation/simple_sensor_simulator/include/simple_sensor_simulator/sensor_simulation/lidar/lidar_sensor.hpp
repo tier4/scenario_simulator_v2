@@ -33,7 +33,6 @@
 
 namespace simple_sensor_simulator
 {
-
 class LidarSensorBase
 {
 protected:
@@ -72,9 +71,8 @@ class LidarSensor : public LidarSensorBase
 
   LidarPerformanceMonitor performance_monitor_;
 
-  auto raycast(
-    const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &,
-    double current_simulation_time) -> T;
+  auto raycast(const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &)
+    -> T;
 
 public:
   explicit LidarSensor(
@@ -102,8 +100,8 @@ public:
       current_simulation_time - previous_simulation_time_ - configuration_.scan_duration() >=
       -0.002) {
       previous_simulation_time_ = current_simulation_time;
-      queue_pointcloud_.push(std::make_pair(
-        raycast(status, current_ros_time, current_simulation_time), current_simulation_time));
+      queue_pointcloud_.push(
+        std::make_pair(raycast(status, current_ros_time), current_simulation_time));
     } else {
       detected_objects_.clear();
     }
@@ -126,8 +124,8 @@ private:
 
 template <>
 auto LidarSensor<sensor_msgs::msg::PointCloud2>::raycast(
-  const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &,
-  double current_simulation_time) -> sensor_msgs::msg::PointCloud2;
+  const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &)
+  -> sensor_msgs::msg::PointCloud2;
 }  // namespace simple_sensor_simulator
 
 #endif  // SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__LIDAR__LIDAR_SENSOR_HPP_

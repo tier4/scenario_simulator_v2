@@ -27,8 +27,7 @@ namespace simple_sensor_simulator
 template <>
 auto LidarSensor<sensor_msgs::msg::PointCloud2>::raycast(
   const std::vector<traffic_simulator_msgs::EntityStatus> & entities,
-  const rclcpp::Time & current_ros_time, double current_simulation_time)
-  -> sensor_msgs::msg::PointCloud2
+  const rclcpp::Time & current_ros_time) -> sensor_msgs::msg::PointCloud2
 {
   std::optional<geometry_msgs::msg::Pose> ego_pose;
   std::vector<Raycaster::Entity> raycast_entities;

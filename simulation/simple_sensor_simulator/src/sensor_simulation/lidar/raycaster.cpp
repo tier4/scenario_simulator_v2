@@ -110,8 +110,6 @@ Raycaster::RaycastResult Raycaster::raycast(
   const geometry_msgs::msg::Pose & origin, std::vector<Entity> & entities, double max_distance,
   double min_distance)
 {
-  RaycastResult result(entities);
-
   std::unordered_map<uint32_t, size_t> geometry_id_to_entity_index;
   for (size_t entity_idx = 0; entity_idx < entities.size(); ++entity_idx) {
     auto & entity = entities[entity_idx];
@@ -120,10 +118,12 @@ Raycaster::RaycastResult Raycaster::raycast(
   }
 
   std::vector<uint32_t> point_geometry_ids;
+  RaycastResult result(entities);
 
   rtcCommitScene(scene_);
   intersect(result.cloud, origin, point_geometry_ids, max_distance, min_distance);
 
+  // Convert geometry IDs to entity indices
   result.point_to_entity_index.reserve(point_geometry_ids.size());
   for (const auto & geometry_id : point_geometry_ids) {
     auto it = geometry_id_to_entity_index.find(geometry_id);
