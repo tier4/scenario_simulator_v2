@@ -24,6 +24,12 @@ Changelog for package simple_sensor_simulator
 16.4.2 (2025-05-23)
 -------------------
 
+18.1.1 (2025-10-31)
+-------------------
+* Merge pull request `#1723 <https://github.com/tier4/scenario_simulator_v2/issues/1723>`_ from tier4/fix/publish_lateral_acceleration_abs
+* fix lateral acceleration
+* Contributors: Kotaro Yoshimoto, xtk8532704
+
 18.1.0 (2025-10-27)
 -------------------
 * Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian

@@ -2,6 +2,9 @@
 Changelog for package context_gamma_planner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+18.1.1 (2025-10-31)
+-------------------
+
 18.1.0 (2025-10-27)
 -------------------
 * Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
