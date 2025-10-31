@@ -1,0 +1,2 @@
+ament_add_gtest(test_imu_sensor test_imu_sensor.cpp)
+target_link_libraries(test_imu_sensor simple_sensor_simulator_component ${Protobuf_LIBRARIES})
