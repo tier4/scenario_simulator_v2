@@ -79,15 +79,21 @@ public:
   {
     raycaster_.setDirection(configuration);
     const std::string topic_name = publisher_ptr_->get_topic_name();
-    const auto noise_model_version =
-      common::getParameter<int>(std::string(topic_name) + ".noise.model.version");
-    if (noise_model_version == 1) {
-      const auto seed = common::getParameter<int>(std::string(topic_name) + ".seed");
-      noise_model_v1_ = std::make_unique<LidarNoiseModelV1>(topic_name, seed);
+    const std::string version_parameter_name = topic_name + ".noise.model.version";
+
+    if (auto & parameter_node = common::getParameterNode();
+        parameter_node.has_parameter(version_parameter_name)) {
+      const auto version = common::getParameter<int>(version_parameter_name);
+      if (version == 1) {
+        const auto seed = common::getParameter<int>(topic_name + ".seed");
+        noise_model_v1_ = std::make_unique<LidarNoiseModelV1>(topic_name, seed);
+      } else {
+        throw common::Error(
+          "Unexpected noise model version for LiDAR sensor: ", version,
+          ". Expected version is 1 for now.");
+      }
     } else {
-      throw common::Error(
-        "Unexpected noise model version for LiDAR sensor: ", noise_model_version,
-        ". Expected version is 1 for now.");
+      // If parameter doesn't exist, no noise model is used
     }
   }
 
