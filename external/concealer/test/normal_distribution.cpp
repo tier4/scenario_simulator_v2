@@ -391,3 +391,143 @@ TEST(NormalDistribution_nav_msgs_msg_Odometry, when_all_parameters_are_given)
   ASSERT_DOUBLE_EQ(randomized_odometry.twist.twist.angular.z,   44.530605885302229    );
   // clang-format on
 }
+
+TEST(NormalDistribution_autoware_vehicle_msgs_msg_VelocityReport, when_no_parameters_are_given)
+{
+  if (not std::exchange(rclcpp_initialized, true)) {
+    rclcpp::init(0, nullptr);
+  }
+
+  auto node = rclcpp::Node("node_name", "simulation");
+
+  // clang-format off
+  ASSERT_FALSE(node.has_parameter("/topic_name.seed"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.autoware_vehicle_msgs::msg::VelocityReport.longitudinal_velocity.error.additive.mean"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.autoware_vehicle_msgs::msg::VelocityReport.longitudinal_velocity.error.additive.standard_deviation"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.autoware_vehicle_msgs::msg::VelocityReport.longitudinal_velocity.error.multiplicative.mean"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.autoware_vehicle_msgs::msg::VelocityReport.longitudinal_velocity.error.multiplicative.standard_deviation"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.autoware_vehicle_msgs::msg::VelocityReport.lateral_velocity.error.additive.mean"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.autoware_vehicle_msgs::msg::VelocityReport.lateral_velocity.error.additive.standard_deviation"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.autoware_vehicle_msgs::msg::VelocityReport.lateral_velocity.error.multiplicative.mean"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.autoware_vehicle_msgs::msg::VelocityReport.lateral_velocity.error.multiplicative.standard_deviation"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.autoware_vehicle_msgs::msg::VelocityReport.heading_rate.error.additive.mean"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.autoware_vehicle_msgs::msg::VelocityReport.heading_rate.error.additive.standard_deviation"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.autoware_vehicle_msgs::msg::VelocityReport.heading_rate.error.multiplicative.mean"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.autoware_vehicle_msgs::msg::VelocityReport.heading_rate.error.multiplicative.standard_deviation"));
+  // clang-format on
+
+  auto randomize = concealer::NormalDistribution<autoware_vehicle_msgs::msg::VelocityReport>(
+    node.get_node_parameters_interface(), "/topic_name");
+
+  // clang-format off
+  ASSERT_EQ(randomize.seed,                                                0);
+  ASSERT_EQ(randomize.longitudinal_velocity_error.additive.mean(),         0);
+  ASSERT_EQ(randomize.longitudinal_velocity_error.additive.stddev(),       0);
+  ASSERT_EQ(randomize.longitudinal_velocity_error.multiplicative.mean(),   0);
+  ASSERT_EQ(randomize.longitudinal_velocity_error.multiplicative.stddev(), 0);
+  ASSERT_EQ(randomize.lateral_velocity_error.additive.mean(),              0);
+  ASSERT_EQ(randomize.lateral_velocity_error.additive.stddev(),            0);
+  ASSERT_EQ(randomize.lateral_velocity_error.multiplicative.mean(),        0);
+  ASSERT_EQ(randomize.lateral_velocity_error.multiplicative.stddev(),      0);
+  ASSERT_EQ(randomize.heading_rate_error.additive.mean(),                  0);
+  ASSERT_EQ(randomize.heading_rate_error.additive.stddev(),                0);
+  ASSERT_EQ(randomize.heading_rate_error.multiplicative.mean(),            0);
+  ASSERT_EQ(randomize.heading_rate_error.multiplicative.stddev(),          0);
+  // clang-format on
+
+  const auto velocity_report = autoware_vehicle_msgs::msg::VelocityReport();
+
+  const auto randomized_velocity_report = randomize(velocity_report);
+
+  // clang-format off
+  ASSERT_EQ(randomized_velocity_report.longitudinal_velocity, 0);
+  ASSERT_EQ(randomized_velocity_report.lateral_velocity,      0);
+  ASSERT_EQ(randomized_velocity_report.heading_rate,          0);
+  // clang-format on
+}
+
+TEST(NormalDistribution_autoware_vehicle_msgs_msg_VelocityReport, when_all_parameters_are_given)
+{
+  if (not std::exchange(rclcpp_initialized, true)) {
+    rclcpp::init(0, nullptr);
+  }
+
+  auto node = rclcpp::Node("node_name", "simulation");
+
+  // clang-format off
+  ASSERT_FALSE(node.has_parameter("/topic_name.seed"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.autoware_vehicle_msgs::msg::VelocityReport.longitudinal_velocity.error.additive.mean"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.autoware_vehicle_msgs::msg::VelocityReport.longitudinal_velocity.error.additive.standard_deviation"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.autoware_vehicle_msgs::msg::VelocityReport.longitudinal_velocity.error.multiplicative.mean"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.autoware_vehicle_msgs::msg::VelocityReport.longitudinal_velocity.error.multiplicative.standard_deviation"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.autoware_vehicle_msgs::msg::VelocityReport.lateral_velocity.error.additive.mean"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.autoware_vehicle_msgs::msg::VelocityReport.lateral_velocity.error.additive.standard_deviation"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.autoware_vehicle_msgs::msg::VelocityReport.lateral_velocity.error.multiplicative.mean"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.autoware_vehicle_msgs::msg::VelocityReport.lateral_velocity.error.multiplicative.standard_deviation"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.autoware_vehicle_msgs::msg::VelocityReport.heading_rate.error.additive.mean"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.autoware_vehicle_msgs::msg::VelocityReport.heading_rate.error.additive.standard_deviation"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.autoware_vehicle_msgs::msg::VelocityReport.heading_rate.error.multiplicative.mean"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.autoware_vehicle_msgs::msg::VelocityReport.heading_rate.error.multiplicative.standard_deviation"));
+  // clang-format on
+
+  // clang-format off
+  node.declare_parameter<int   >("/topic_name.seed",                                                                                                     1);
+  node.declare_parameter<double>("/topic_name.autoware_vehicle_msgs::msg::VelocityReport.longitudinal_velocity.error.additive.mean",                     2);
+  node.declare_parameter<double>("/topic_name.autoware_vehicle_msgs::msg::VelocityReport.longitudinal_velocity.error.additive.standard_deviation",       3);
+  node.declare_parameter<double>("/topic_name.autoware_vehicle_msgs::msg::VelocityReport.longitudinal_velocity.error.multiplicative.mean",               4);
+  node.declare_parameter<double>("/topic_name.autoware_vehicle_msgs::msg::VelocityReport.longitudinal_velocity.error.multiplicative.standard_deviation", 5);
+  node.declare_parameter<double>("/topic_name.autoware_vehicle_msgs::msg::VelocityReport.lateral_velocity.error.additive.mean",                          6);
+  node.declare_parameter<double>("/topic_name.autoware_vehicle_msgs::msg::VelocityReport.lateral_velocity.error.additive.standard_deviation",            7);
+  node.declare_parameter<double>("/topic_name.autoware_vehicle_msgs::msg::VelocityReport.lateral_velocity.error.multiplicative.mean",                    8);
+  node.declare_parameter<double>("/topic_name.autoware_vehicle_msgs::msg::VelocityReport.lateral_velocity.error.multiplicative.standard_deviation",      9);
+  node.declare_parameter<double>("/topic_name.autoware_vehicle_msgs::msg::VelocityReport.heading_rate.error.additive.mean",                             10);
+  node.declare_parameter<double>("/topic_name.autoware_vehicle_msgs::msg::VelocityReport.heading_rate.error.additive.standard_deviation",               11);
+  node.declare_parameter<double>("/topic_name.autoware_vehicle_msgs::msg::VelocityReport.heading_rate.error.multiplicative.mean",                       12);
+  node.declare_parameter<double>("/topic_name.autoware_vehicle_msgs::msg::VelocityReport.heading_rate.error.multiplicative.standard_deviation",         13);
+  // clang-format on
+
+  // clang-format off
+  ASSERT_TRUE(node.has_parameter("/topic_name.seed"));
+  ASSERT_TRUE(node.has_parameter("/topic_name.autoware_vehicle_msgs::msg::VelocityReport.longitudinal_velocity.error.additive.mean"));
+  ASSERT_TRUE(node.has_parameter("/topic_name.autoware_vehicle_msgs::msg::VelocityReport.longitudinal_velocity.error.additive.standard_deviation"));
+  ASSERT_TRUE(node.has_parameter("/topic_name.autoware_vehicle_msgs::msg::VelocityReport.longitudinal_velocity.error.multiplicative.mean"));
+  ASSERT_TRUE(node.has_parameter("/topic_name.autoware_vehicle_msgs::msg::VelocityReport.longitudinal_velocity.error.multiplicative.standard_deviation"));
+  ASSERT_TRUE(node.has_parameter("/topic_name.autoware_vehicle_msgs::msg::VelocityReport.lateral_velocity.error.additive.mean"));
+  ASSERT_TRUE(node.has_parameter("/topic_name.autoware_vehicle_msgs::msg::VelocityReport.lateral_velocity.error.additive.standard_deviation"));
+  ASSERT_TRUE(node.has_parameter("/topic_name.autoware_vehicle_msgs::msg::VelocityReport.lateral_velocity.error.multiplicative.mean"));
+  ASSERT_TRUE(node.has_parameter("/topic_name.autoware_vehicle_msgs::msg::VelocityReport.lateral_velocity.error.multiplicative.standard_deviation"));
+  ASSERT_TRUE(node.has_parameter("/topic_name.autoware_vehicle_msgs::msg::VelocityReport.heading_rate.error.additive.mean"));
+  ASSERT_TRUE(node.has_parameter("/topic_name.autoware_vehicle_msgs::msg::VelocityReport.heading_rate.error.additive.standard_deviation"));
+  ASSERT_TRUE(node.has_parameter("/topic_name.autoware_vehicle_msgs::msg::VelocityReport.heading_rate.error.multiplicative.mean"));
+  ASSERT_TRUE(node.has_parameter("/topic_name.autoware_vehicle_msgs::msg::VelocityReport.heading_rate.error.multiplicative.standard_deviation"));
+  // clang-format on
+
+  auto randomize = concealer::NormalDistribution<autoware_vehicle_msgs::msg::VelocityReport>(
+    node.get_node_parameters_interface(), "/topic_name");
+
+  // clang-format off
+  ASSERT_EQ(randomize.seed,                                                1);
+  ASSERT_EQ(randomize.longitudinal_velocity_error.additive.mean(),         2);
+  ASSERT_EQ(randomize.longitudinal_velocity_error.additive.stddev(),       3);
+  ASSERT_EQ(randomize.longitudinal_velocity_error.multiplicative.mean(),   4);
+  ASSERT_EQ(randomize.longitudinal_velocity_error.multiplicative.stddev(), 5);
+  ASSERT_EQ(randomize.lateral_velocity_error.additive.mean(),              6);
+  ASSERT_EQ(randomize.lateral_velocity_error.additive.stddev(),            7);
+  ASSERT_EQ(randomize.lateral_velocity_error.multiplicative.mean(),        8);
+  ASSERT_EQ(randomize.lateral_velocity_error.multiplicative.stddev(),      9);
+  ASSERT_EQ(randomize.heading_rate_error.additive.mean(),                 10);
+  ASSERT_EQ(randomize.heading_rate_error.additive.stddev(),               11);
+  ASSERT_EQ(randomize.heading_rate_error.multiplicative.mean(),           12);
+  ASSERT_EQ(randomize.heading_rate_error.multiplicative.stddev(),         13);
+  // clang-format on
+
+  const auto velocity_report = autoware_vehicle_msgs::msg::VelocityReport();
+
+  const auto randomized_velocity_report = randomize(velocity_report);
+
+  // clang-format off
+  ASSERT_FLOAT_EQ(randomized_velocity_report.longitudinal_velocity, 4.06047  );
+  ASSERT_FLOAT_EQ(randomized_velocity_report.lateral_velocity,     19.565622 );
+  ASSERT_FLOAT_EQ(randomized_velocity_report.heading_rate,          2.8688359);
+  // clang-format on
+}
