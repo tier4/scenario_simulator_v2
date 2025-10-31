@@ -14,7 +14,6 @@
 
 #include <geometry/quaternion/euler_to_quaternion.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
-#include <simple_sensor_simulator/sensor_simulation/lidar/lidar_sensor.hpp>
 #include <simple_sensor_simulator/sensor_simulation/lidar/raycaster.hpp>
 #include <simulation_interface/conversions.hpp>
 #include <string>
