@@ -26,7 +26,6 @@ jobs:
     name: BuildAndRun
     runs-on: ${{ matrix.runs_on }}
     timeout-minutes: 180
-    container: ros:${{ matrix.rosdistro }}
     env:
       DEBIAN_FRONTEND: noninteractive
     strategy:
@@ -36,6 +35,11 @@ jobs:
         runs_on: [ubuntu-22.04, ubuntu-22.04-arm]
         cmake_build_type: [RelWithDebInfo, Release] # Debug build type is currently unavailable. @TODO Fix problem and add Debug build.
     steps:
+      - name: free disk
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+
       - name: Suppress warnings
         run: git config --global --add safe.directory '*'
 
@@ -52,6 +56,23 @@ jobs:
           repository: RobotecAI/scenario_simulator_v2_scenarios
           path: src/scenario_simulator_v2_scenarios
 
+      - name: Cache apt and rosdep
+        id: cache-apt-rosdep
+        uses: actions/cache@v4
+        with:
+          path: |
+            /var/cache/apt/archives
+            /var/lib/apt/lists
+            /etc/ros/rosdep
+          key: ${{ runner.os }}-ros-${{ matrix.rosdistro }}-apt-${{ hashFiles('**/package.xml', '**/dependency_*.repos') }}
+          restore-keys: |
+            ${{ runner.os }}-ros-${{ matrix.rosdistro }}-apt-
+
+      - name: Setup ROS environment
+        uses: ros-tooling/setup-ros@v0.7
+        with:
+          required-ros-distributions: ${{ matrix.rosdistro }}
+
       - name: Search packages in this repository
         id: list_packages
         run: |
@@ -67,17 +88,21 @@ jobs:
 
       - name: Resolve rosdep and install colcon mixin
         run: |
-          apt-get update
-          apt-get install -y python3-pip python3-colcon-lcov-result lcov unzip gcovr
+          sudo apt-get update
+          sudo apt-get install -y python3-pip python3-colcon-lcov-result lcov unzip gcovr libunwind-dev
           rosdep update --include-eol-distros
           rosdep install -iy --from-paths src --rosdistro ${{ matrix.rosdistro }}
           colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml
           colcon mixin update default
+          df -h
+          sudo apt-get clean
+          sudo rm -rf /var/lib/apt/lists/*
+          df -h
         shell: bash
 
       - name: Install Build Wrapper
         if: github.event.pull_request.head.repo.fork == false
-        uses: SonarSource/sonarqube-scan-action/install-build-wrapper@v4.2.1
+        uses: SonarSource/sonarqube-scan-action/install-build-wrapper@v6.0.0
         id: build_wrapper
         env:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
@@ -177,7 +202,7 @@ jobs:
           retention-days: 1
 
       - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@v4.2.1
+        uses: SonarSource/sonarqube-scan-action@v6.0.0
         id: sonarcloud
         # In ARM build, SonarQube result should be same as x86 build because no test runs
         if: matrix.runs_on != 'ubuntu-22.04-arm' && github.event.pull_request.head.repo.fork == false
@@ -190,12 +215,12 @@ jobs:
           args: >
             --define sonar.cfamily.compile-commands="src/scenario_simulator_v2/bw-output/compile_commands.json"
           projectBaseDir: src/scenario_simulator_v2/
-#      - name: Basic test
-#        run: |
-#          source install/setup.bash
-#          source install/local_setup.bash
-#          ./src/scenario_simulator_v2/.github/workflows/workflow.sh ./src/scenario_simulator_v2_scenarios/workflow/basic.txt
-#        shell: bash
+      #      - name: Basic test
+      #        run: |
+      #          source install/setup.bash
+      #          source install/local_setup.bash
+      #          ./src/scenario_simulator_v2/.github/workflows/workflow.sh ./src/scenario_simulator_v2_scenarios/workflow/basic.txt
+      #        shell: bash
 
       - name: Report error if SonarQube scan failed
         if: steps.sonarcloud.outcome == 'failure'
@@ -203,3 +228,14 @@ jobs:
         with:
           message: "This PR has failed the SonarQube scan. Please check the details in the SonarQube dashboard."
           message-id: "sonarcloud-scan-failure"
+
+      - name: Store Pull Request number to artifact
+        if: github.event_name == 'pull_request'
+        run: echo "PR_NUMBER=${{ github.event.number }}" > install/pr_number.txt
+
+      - name: Upload install directory
+        uses: actions/upload-artifact@v4
+        if: matrix.cmake_build_type == 'RelWithDebInfo'
+        with:
+          name: install-${{ matrix.runs_on }}-${{ matrix.cmake_build_type }}
+          path: install

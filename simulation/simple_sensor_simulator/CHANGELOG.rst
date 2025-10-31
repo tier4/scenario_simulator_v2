@@ -24,6 +24,246 @@ Changelog for package simple_sensor_simulator
 16.4.2 (2025-05-23)
 -------------------
 
+18.1.0 (2025-10-27)
+-------------------
+* Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
+* Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
+* Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
+* Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
+* Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
+* Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
+* Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
+* Contributors: Kotaro Yoshimoto, Taiga
+
+18.0.10 (2025-10-23)
+--------------------
+
+18.0.9 (2025-10-23)
+-------------------
+* Merge branch 'master' into feature/ci-dependabot
+* Contributors: Kotaro Yoshimoto
+
+18.0.8 (2025-10-23)
+-------------------
+* Merge branch 'master' into feature/api-changes-automation
+* Merge branch 'master' into feature/api-changes-automation
+* Contributors: ぐるぐる
+
+18.0.7 (2025-10-23)
+-------------------
+* Merge pull request `#1707 <https://github.com/tier4/scenario_simulator_v2/issues/1707>`_ from tier4/refactor/raycaster_2
+* Merge branch 'master' into refactor/raycaster_2
+* Merge branch 'master' into refactor/raycaster_2
+* Move primitive construction into Raycaster::Entity::Entity
+* Add raycast_entities to RaycastResult as a member
+* Initialize Raycaster::RaycastResult::cloud in constructor
+* Optimize `Raycaster::RaycastResult` members
+* Remove `Raycaster::entities\_` to reduce internal states
+* Add `Raycaster::RaycastResult` to handle result of raycast function
+* Refactor Raycaster to use `std::vector` instead of `std::set` for geometry IDs
+* Contributors: Kotaro Yoshimoto
+
+18.0.6 (2025-10-22)
+-------------------
+* Merge branch 'master' into fix/duplicated_nodes
+* Contributors: Kotaro Yoshimoto
+
+18.0.5 (2025-10-21)
+-------------------
+* Merge branch 'master' into fix/build_error_on_noble
+* Merge branch 'master' into fix/build_error_on_noble
+* Merge branch 'master' into fix/build_error_on_noble
+* Contributors: Kotaro Yoshimoto
+
+18.0.4 (2025-10-20)
+-------------------
+* Merge branch 'master' into patch/arm-suppress-warning
+* Merge branch 'master' into patch/arm-suppress-warning
+* Merge branch 'master' into patch/arm-suppress-warning
+* Contributors: Kotaro Yoshimoto
+
+18.0.3 (2025-10-20)
+-------------------
+
+18.0.2 (2025-10-17)
+-------------------
+* Merge pull request `#1703 <https://github.com/tier4/scenario_simulator_v2/issues/1703>`_ from tier4/refactor/lidar_sensor_raycaster
+* Organize includes
+* Move pointcloud messaging functionality from the Raycaster class to the LidarSensor class
+* Add Raycaster::Entity struct to simplify code
+* Removed static attribute from Raycaster::intersect
+* Contributors: Kotaro Yoshimoto
+
+18.0.1 (2025-10-16)
+-------------------
+* Merge pull request `#1702 <https://github.com/tier4/scenario_simulator_v2/issues/1702>`_ from tier4/refactor/lidar_sensor
+* Merge branch 'master' into refactor/lidar_sensor
+* Stop using multiple threads for ray-tracing
+* Contributors: Kotaro Yoshimoto
+
+18.0.0 (2025-10-15)
+-------------------
+* Merge branch 'master' into feature/small_fix_new_front_entity_detection_logic
+* Merge branch 'master' into feature/small_fix_new_front_entity_detection_logic
+* Contributors: Taiga
+
+17.9.1 (2025-10-14)
+-------------------
+* Merge pull request `#1693 <https://github.com/tier4/scenario_simulator_v2/issues/1693>`_ from tier4/fix/RJD-1921-fix-steering-when-autoware-is-overwritten
+* Merge branch 'master' into fix/RJD-1921-fix-steering-when-autoware-is-overwritten
+* Merge branch 'master' into fix/RJD-1921-fix-steering-when-autoware-is-overwritten
+* Merge branch 'master' into fix/RJD-1921-fix-steering-when-autoware-is-overwritten
+* style(simple_sensor_simulator): apply clang reformat
+* fix(simple_sensor_simulator):  ensure steering is overwritten in the overwrite method
+* Contributors: Dawid Moszynski, Dawid Moszyński, Kotaro Yoshimoto
+
+17.9.0 (2025-10-14)
+-------------------
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Contributors: Taiga
+
+17.8.0 (2025-10-10)
+-------------------
+* Merge branch 'master' into RJD-1930/see_around
+* Merge branch 'master' into RJD-1930/see_around
+* Merge branch 'master' into RJD-1930/see_around
+* Contributors: Grzegorz Maj, Taiga
+
+17.7.2 (2025-10-08)
+-------------------
+
+17.7.1 (2025-10-07)
+-------------------
+
+17.7.0 (2025-10-07)
+-------------------
+* Merge branch 'master' into feature/whole_new_front_entity_detection_logic
+* Merge branch 'master' into feature/whole_new_front_entity_detection_logic
+* Merge branch 'master' into feature/whole_new_front_entity_detection_logic
+* Contributors: Kotaro Yoshimoto, Taiga
+
+17.6.3 (2025-10-06)
+-------------------
+* Merge branch 'master' into RJD-1921/fta-acceleration-fix
+* Merge branch 'master' into RJD-1921/fta-acceleration-fix
+* Merge branch 'master' into RJD-1921/fta-acceleration-fix
+* Contributors: Dawid Moszyński
+
+17.6.2 (2025-10-02)
+-------------------
+* Merge pull request `#1688 <https://github.com/tier4/scenario_simulator_v2/issues/1688>`_ from tier4/fix/spin-some-deprecated
+* Merge branch 'master' into fix/spin-some-deprecated
+* Fix context is null error
+* Replace spin_some in simple_sensor_simulator
+* Contributors: Kotaro Yoshimoto, f0reachARR
+
+17.6.1 (2025-10-02)
+-------------------
+
+17.6.0 (2025-09-29)
+-------------------
+* Merge pull request `#1685 <https://github.com/tier4/scenario_simulator_v2/issues/1685>`_ from tier4/fix/noise_v4
+* Merge branch 'master' into fix/noise_v4
+* use elliptical model for x,y,yaw in noise_v4
+* Apply noise v4 correctly
+* Implement yaw flip noise correctly
+* Add missing parts for noise_v4
+* rename rotation to yaw in noise_v4
+* use same true positive calculation algorithm to noise_v2 in noise_v4
+* commonize true positive calculation algorithm in noise_v2
+* Add create_selector lambda function to make selector lambda more common
+* rename noise.v4.<config_name>.rotation into noise.v4.<config_name>.yaw
+* Implement yaw_flip noise for noise_v4
+* Contributors: Kotaro Yoshimoto
+
+17.5.3 (2025-09-17)
+-------------------
+* Merge branch 'master' into fix/macro-xml-validation
+* Contributors: Kotaro Yoshimoto
+
+17.5.2 (2025-09-16)
+-------------------
+* Merge branch 'master' into fix/no-autoware-launch
+* Merge branch 'master' into fix/no-autoware-launch
+* Contributors: ぐるぐる
+
+17.5.1 (2025-09-11)
+-------------------
+
+17.5.0 (2025-09-05)
+-------------------
+* Merge branch 'master' into fix/approach-stop-and-gap-tolerance
+* Contributors: Taiga
+
+17.4.0 (2025-09-04)
+-------------------
+* Merge branch 'feature/use-yaw-diff-for-front-detection' of github.com:tier4/scenario_simulator_v2 into feature/use-yaw-diff-for-front-detection
+* Merge branch 'master' into feature/use-yaw-diff-for-front-detection
+* Contributors: Taiga, Taiga Takano
+
+17.3.0 (2025-09-03)
+-------------------
+* Merge pull request `#1680 <https://github.com/tier4/scenario_simulator_v2/issues/1680>`_ from tier4/feature/noise_v4
+* Merge branch 'master' into feature/noise_v4
+* Merge branch 'master' into feature/noise_v4
+* Merge branch 'master' into feature/noise_v4
+* Implement true_positive in noise v4
+* Apply rotation noise for entity orienration in noise v4
+* Implement noise_v4 application phases
+* Implement noise_v4 outputs calculation
+* Use the same logic structure in noise_v4 as in noise_v3
+* Optimize get_first_matched_config_name call in noise_v3
+* Commonize noise helper functions in noise_v2 for noise_v4
+* Modify DetectionSensor::NoiseOutput for noise v4
+* Add an empty implementation of noise_v4
+* Move get_first_matched_config_name to a larger scope to use in noise_v4
+* Commonize for get_first_matched_config_name in noise_v3 for preparation of noise_v4
+* Contributors: Kotaro Yoshimoto
+
+17.2.1 (2025-09-02)
+-------------------
+* Merge branch 'master' into RJD-1919/fix_health_check
+* Merge branch 'master' into RJD-1919/fix_health_check
+* Merge branch 'RJD-1919/fix_health_check' of github.com:tier4/scenario_simulator_v2 into RJD-1919/fix_health_check
+* Merge branch 'master' into RJD-1919/fix_health_check
+* Contributors: Kotaro Yoshimoto, Michał Ciasnocha, robomic
+
+17.2.0 (2025-09-02)
+-------------------
+
+17.1.4 (2025-08-27)
+-------------------
+
+17.1.3 (2025-08-20)
+-------------------
+* Merge branch 'master' into hotfix/actions-permission
+* Contributors: Kotaro Yoshimoto
+
+17.1.2 (2025-08-20)
+-------------------
+* Merge branch 'master' into refactor/planning-topic-update
+* Merge branch 'master' into refactor/planning-topic-update
+* Contributors: Kotaro Yoshimoto
+
+17.1.1 (2025-08-20)
+-------------------
+* Merge branch 'master' into fix/actions-permission
+* Merge branch 'master' into fix/actions-permission
+* Contributors: ぐるぐる
+
+17.1.0 (2025-08-19)
+-------------------
+* Merge branch 'master' into RJD-1907/ss2_vehicle_id_and_localization
+* Merge branch 'master' into RJD-1907/ss2_vehicle_id_and_localization
+* Contributors: Grzegorz Maj, Kotaro Yoshimoto
+
 17.0.4 (2025-08-18)
 -------------------
 * Merge branch 'master' into HansRobo-patch-2
