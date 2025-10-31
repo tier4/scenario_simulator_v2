@@ -67,7 +67,7 @@ LidarNoiseModelV1::Config::Config(const std::string & topic_name, const std::str
 LidarNoiseModelV1::Config::DistanceBin & LidarNoiseModelV1::Config::getDistanceBin(
   double x, double y)
 {
-  assert(distance_bins_.empty());
+  assert(not distance_bins_.empty());
   const double x_normalized = x / true_positive_rate_ellipse_normalized_x_radius;
   const double distance_squared = x_normalized * x_normalized + y * y;
 
