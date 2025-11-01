@@ -42,18 +42,20 @@ NormalDistribution<nav_msgs::msg::Odometry>::NormalDistribution(
 : RandomNumberEngine(node, topic),
   speed_threshold(
     common::getParameter<double>(node, topic + ".nav_msgs::msg::Odometry.speed_threshold")),
+  // clang-format off
   position_local_x_error(node, topic + ".nav_msgs::msg::Odometry.pose.pose.position.local_x.error"),
   position_local_y_error(node, topic + ".nav_msgs::msg::Odometry.pose.pose.position.local_y.error"),
   position_local_z_error(node, topic + ".nav_msgs::msg::Odometry.pose.pose.position.local_z.error"),
-  orientation_r_error(node, topic + ".nav_msgs::msg::Odometry.pose.pose.orientation.r.error"),
-  orientation_p_error(node, topic + ".nav_msgs::msg::Odometry.pose.pose.orientation.p.error"),
-  orientation_y_error(node, topic + ".nav_msgs::msg::Odometry.pose.pose.orientation.y.error"),
-  linear_x_error(node, topic + ".nav_msgs::msg::Odometry.twist.twist.linear.x.error"),
-  linear_y_error(node, topic + ".nav_msgs::msg::Odometry.twist.twist.linear.y.error"),
-  linear_z_error(node, topic + ".nav_msgs::msg::Odometry.twist.twist.linear.z.error"),
-  angular_x_error(node, topic + ".nav_msgs::msg::Odometry.twist.twist.angular.x.error"),
-  angular_y_error(node, topic + ".nav_msgs::msg::Odometry.twist.twist.angular.y.error"),
-  angular_z_error(node, topic + ".nav_msgs::msg::Odometry.twist.twist.angular.z.error")
+  orientation_r_error(   node, topic + ".nav_msgs::msg::Odometry.pose.pose.orientation.r.error"),
+  orientation_p_error(   node, topic + ".nav_msgs::msg::Odometry.pose.pose.orientation.p.error"),
+  orientation_y_error(   node, topic + ".nav_msgs::msg::Odometry.pose.pose.orientation.y.error"),
+  linear_x_error(        node, topic + ".nav_msgs::msg::Odometry.twist.twist.linear.x.error"),
+  linear_y_error(        node, topic + ".nav_msgs::msg::Odometry.twist.twist.linear.y.error"),
+  linear_z_error(        node, topic + ".nav_msgs::msg::Odometry.twist.twist.linear.z.error"),
+  angular_x_error(       node, topic + ".nav_msgs::msg::Odometry.twist.twist.angular.x.error"),
+  angular_y_error(       node, topic + ".nav_msgs::msg::Odometry.twist.twist.angular.y.error"),
+  angular_z_error(       node, topic + ".nav_msgs::msg::Odometry.twist.twist.angular.z.error")
+// clang-format on
 {
 }
 
@@ -115,11 +117,11 @@ NormalDistribution<autoware_vehicle_msgs::msg::VelocityReport>::NormalDistributi
 : RandomNumberEngine(node, topic),
   speed_threshold(common::getParameter<double>(
     node, topic + ".autoware_vehicle_msgs::msg::VelocityReport.speed_threshold")),
-  longitudinal_velocity_error(
-    node, topic + ".autoware_vehicle_msgs::msg::VelocityReport.longitudinal_velocity.error"),
-  lateral_velocity_error(
-    node, topic + ".autoware_vehicle_msgs::msg::VelocityReport.lateral_velocity.error"),
-  heading_rate_error(node, topic + ".autoware_vehicle_msgs::msg::VelocityReport.heading_rate.error")
+  // clang-format off
+  longitudinal_velocity_error(node, topic + ".autoware_vehicle_msgs::msg::VelocityReport.longitudinal_velocity.error"),
+  lateral_velocity_error(     node, topic + ".autoware_vehicle_msgs::msg::VelocityReport.lateral_velocity.error"),
+  heading_rate_error(         node, topic + ".autoware_vehicle_msgs::msg::VelocityReport.heading_rate.error")
+// clang-format on
 {
 }
 
@@ -139,6 +141,79 @@ auto NormalDistribution<autoware_vehicle_msgs::msg::VelocityReport>::operator()(
     velocity_report.heading_rate = heading_rate_error.apply(engine, velocity_report.heading_rate);
     return velocity_report;
   }
+}
+
+NormalDistribution<geometry_msgs::msg::PoseWithCovarianceStamped>::NormalDistribution(
+  const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node,
+  const std::string & topic)
+: RandomNumberEngine(node, topic),
+  // clang-format off
+  position_local_x_error(               node, topic + ".geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_x.error"),
+  position_local_y_error(               node, topic + ".geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_y.error"),
+  position_local_z_error(               node, topic + ".geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_z.error"),
+  orientation_r_error(                  node, topic + ".geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.r.error"),
+  orientation_p_error(                  node, topic + ".geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.p.error"),
+  orientation_y_error(                  node, topic + ".geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.y.error"),
+  covariance_diagonal_x_x_error(        node, topic + ".geometry_msgs::msg::PoseWithCovarianceStamped.pose.covariance.x_x.error"),
+  covariance_diagonal_y_y_error(        node, topic + ".geometry_msgs::msg::PoseWithCovarianceStamped.pose.covariance.y_y.error"),
+  covariance_diagonal_z_z_error(        node, topic + ".geometry_msgs::msg::PoseWithCovarianceStamped.pose.covariance.z_z.error"),
+  covariance_diagonal_roll_roll_error(  node, topic + ".geometry_msgs::msg::PoseWithCovarianceStamped.pose.covariance.roll_roll.error"),
+  covariance_diagonal_pitch_pitch_error(node, topic + ".geometry_msgs::msg::PoseWithCovarianceStamped.pose.covariance.pitch_pitch.error"),
+  covariance_diagonal_yaw_yaw_error(    node, topic + ".geometry_msgs::msg::PoseWithCovarianceStamped.pose.covariance.yaw_yaw.error")
+// clang-format on
+{
+}
+
+auto NormalDistribution<geometry_msgs::msg::PoseWithCovarianceStamped>::operator()(
+  geometry_msgs::msg::PoseWithCovarianceStamped pose_with_covariance_stamped)
+  -> geometry_msgs::msg::PoseWithCovarianceStamped
+{
+  geometry_msgs::msg::Pose & pose = pose_with_covariance_stamped.pose.pose;
+
+  const Eigen::Quaterniond orientation = Eigen::Quaterniond(
+    pose.orientation.w, pose.orientation.x, pose.orientation.y, pose.orientation.z);
+
+  Eigen::Vector3d local_position = Eigen::Vector3d(0.0, 0.0, 0.0);
+
+  local_position.x() = position_local_x_error.apply(engine, local_position.x());
+  local_position.y() = position_local_y_error.apply(engine, local_position.y());
+  local_position.z() = position_local_z_error.apply(engine, local_position.z());
+
+  const Eigen::Vector3d world_position = orientation.toRotationMatrix() * local_position;
+
+  pose.position.x += world_position.x();
+  pose.position.y += world_position.y();
+  pose.position.z += world_position.z();
+
+  Eigen::Vector3d euler = orientation.matrix().eulerAngles(0, 1, 2);
+
+  euler.x() = orientation_r_error.apply(engine, euler.x());
+  euler.y() = orientation_p_error.apply(engine, euler.y());
+  euler.z() = orientation_y_error.apply(engine, euler.z());
+
+  const Eigen::Quaterniond q = Eigen::AngleAxisd(euler.x(), Eigen::Vector3d::UnitX()) *
+                               Eigen::AngleAxisd(euler.y(), Eigen::Vector3d::UnitY()) *
+                               Eigen::AngleAxisd(euler.z(), Eigen::Vector3d::UnitZ());
+
+  pose.orientation.x = q.x();
+  pose.orientation.y = q.y();
+  pose.orientation.z = q.z();
+  pose.orientation.w = q.w();
+
+  pose_with_covariance_stamped.pose.covariance.at(6 * 0 + 0) =
+    covariance_diagonal_x_x_error.apply(engine, 0.0);
+  pose_with_covariance_stamped.pose.covariance.at(6 * 1 + 1) =
+    covariance_diagonal_y_y_error.apply(engine, 0.0);
+  pose_with_covariance_stamped.pose.covariance.at(6 * 2 + 2) =
+    covariance_diagonal_z_z_error.apply(engine, 0.0);
+  pose_with_covariance_stamped.pose.covariance.at(6 * 3 + 3) =
+    covariance_diagonal_roll_roll_error.apply(engine, 0.0);
+  pose_with_covariance_stamped.pose.covariance.at(6 * 4 + 4) =
+    covariance_diagonal_pitch_pitch_error.apply(engine, 0.0);
+  pose_with_covariance_stamped.pose.covariance.at(6 * 5 + 5) =
+    covariance_diagonal_yaw_yaw_error.apply(engine, 0.0);
+
+  return pose_with_covariance_stamped;
 }
 
 }  // namespace concealer
