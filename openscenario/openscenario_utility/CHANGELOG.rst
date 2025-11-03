@@ -27,6 +27,9 @@ Changelog for package openscenario_utility
 16.4.2 (2025-05-23)
 -------------------
 
+18.1.1 (2025-10-31)
+-------------------
+
 18.1.0 (2025-10-27)
 -------------------
 * Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
