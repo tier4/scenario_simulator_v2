@@ -15,6 +15,7 @@
 #ifndef CONCEALER__PUBLISHER_HPP_
 #define CONCEALER__PUBLISHER_HPP_
 
+#include <autoware_vehicle_msgs/msg/velocity_report.hpp>
 #include <get_parameter/get_parameter.hpp>
 #include <nav_msgs/msg/odometry.hpp>
 #include <random>
@@ -37,61 +38,94 @@ struct Identity
   }
 };
 
+template <typename ValueType>
+struct NormalDistributionError
+{
+  static_assert(std::is_floating_point_v<std::decay_t<ValueType> >, "Unsupported error type");
+
+  std::normal_distribution<ValueType> additive, multiplicative;
+
+  explicit NormalDistributionError(
+    const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node,
+    const std::string & prefix)
+  // clang-format off
+  : additive(
+      static_cast<ValueType>(common::getParameter<double>(node, prefix + ".additive.mean")),
+      static_cast<ValueType>(common::getParameter<double>(node, prefix + ".additive.standard_deviation"))),
+    multiplicative(
+      static_cast<ValueType>(common::getParameter<double>(node, prefix + ".multiplicative.mean")),
+      static_cast<ValueType>(common::getParameter<double>(node, prefix + ".multiplicative.standard_deviation")))
+  // clang-format on
+  {
+  }
+
+  auto apply(std::mt19937_64 & engine, const ValueType value) -> decltype(auto)
+  {
+    return value * (multiplicative(engine) + static_cast<ValueType>(1)) + additive(engine);
+  }
+};
+
 template <typename>
 struct NormalDistribution;
 
-template <>
-struct NormalDistribution<nav_msgs::msg::Odometry>
+/**
+ * @brief Provides common components for obtaining the seed and initializing the pseudo random number generator engine
+ * obtains the seed from the parameter <topic>.seed
+ * initializes `engine` appropriately
+ */
+struct RandomNumberEngine
 {
-  std::random_device::result_type seed;
-
-  std::random_device device;
+  const std::random_device::result_type seed;
 
   std::mt19937_64 engine;
 
+  explicit RandomNumberEngine(
+    const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node,
+    const std::string & topic);
+};
+
+template <>
+struct NormalDistribution<nav_msgs::msg::Odometry> : public RandomNumberEngine
+{
   double speed_threshold;
 
-  struct Error
-  {
-    std::normal_distribution<double> additive, multiplicative;
-
-    explicit Error(
-      const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node,
-      const std::string & prefix)
-    : additive(
-        common::getParameter<double>(node, prefix + ".additive.mean"),
-        common::getParameter<double>(node, prefix + ".additive.standard_deviation")),
-      multiplicative(
-        common::getParameter<double>(node, prefix + ".multiplicative.mean"),
-        common::getParameter<double>(node, prefix + ".multiplicative.standard_deviation"))
-    {
-    }
-
-    auto apply(std::mt19937_64 & engine, double value) -> decltype(auto)
-    {
-      return value * (multiplicative(engine) + 1.0) + additive(engine);
-    }
-  };
-
   // clang-format off
-  Error position_local_x_error,
-        position_local_y_error,
-        position_local_z_error,
-        orientation_r_error,
-        orientation_p_error,
-        orientation_y_error,
-        linear_x_error,
-        linear_y_error,
-        linear_z_error,
-        angular_x_error,
-        angular_y_error,
-        angular_z_error;
+  NormalDistributionError<double> position_local_x_error,
+                                  position_local_y_error,
+                                  position_local_z_error,
+                                  orientation_r_error,
+                                  orientation_p_error,
+                                  orientation_y_error,
+                                  linear_x_error,
+                                  linear_y_error,
+                                  linear_z_error,
+                                  angular_x_error,
+                                  angular_y_error,
+                                  angular_z_error;
   // clang-format on
 
   explicit NormalDistribution(
     const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr &, const std::string &);
 
   auto operator()(nav_msgs::msg::Odometry odometry) -> nav_msgs::msg::Odometry;
+};
+
+template <>
+struct NormalDistribution<autoware_vehicle_msgs::msg::VelocityReport> : public RandomNumberEngine
+{
+  double speed_threshold;
+
+  // clang-format off
+  NormalDistributionError<float> longitudinal_velocity_error,
+                                 lateral_velocity_error,
+                                 heading_rate_error;
+  // clang-format on
+
+  explicit NormalDistribution(
+    const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr &, const std::string &);
+
+  auto operator()(autoware_vehicle_msgs::msg::VelocityReport velocity_report)
+    -> autoware_vehicle_msgs::msg::VelocityReport;
 };
 
 template <typename Message, template <typename> typename Randomizer = Identity>
@@ -114,6 +148,9 @@ public:
   {
     return publisher->publish(randomize(std::forward<decltype(xs)>(xs)...));
   }
+
+  auto getRandomizer() const noexcept -> const Randomizer<Message> & { return randomize; }
+  auto getRandomizer() noexcept -> Randomizer<Message> & { return randomize; }
 };
 }  // namespace concealer
 

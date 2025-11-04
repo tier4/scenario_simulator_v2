@@ -213,7 +213,7 @@ jobs:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
         with:
           args: >
-            --define sonar.cfamily.compile-commands="src/scenario_simulator_v2/bw-output/compile_commands.json"
+            --define sonar.cfamily.compile-commands=src/scenario_simulator_v2/bw-output/compile_commands.json
           projectBaseDir: src/scenario_simulator_v2/
       #      - name: Basic test
       #        run: |
