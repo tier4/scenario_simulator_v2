@@ -2,6 +2,9 @@
 Changelog for package context_gamma_planner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+18.2.1 (2025-11-04)
+-------------------
+
 18.2.0 (2025-11-04)
 -------------------
 * Merge branch 'master' into feature/publisher-noise-velocity-report
