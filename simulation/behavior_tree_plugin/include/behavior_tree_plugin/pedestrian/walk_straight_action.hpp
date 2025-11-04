@@ -33,6 +33,7 @@
 #include <memory>
 #include <string>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
+#include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 #include <vector>
 
 namespace entity_behavior
@@ -50,6 +51,18 @@ public:
   {
     return entity_behavior::PedestrianActionNode::providedPorts();
   }
+
+private:
+  bool isObstacleInFront(
+    const bool see_around, const std::vector<geometry_msgs::msg::Point> waypoints) const;
+  bool isEntityColliding(
+    const traffic_simulator::entity_status::CanonicalizedEntityStatus & entity_status,
+    const double & detection_horizon) const;
+  auto calculateWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray;
+
+  static constexpr double front_entity_margin = 2.0;
+  bool use_trajectory_based_front_entity_detection_;
+  double trajectory_based_detection_offset_;
 };
 }  // namespace pedestrian
 }  // namespace entity_behavior

@@ -4,12 +4,15 @@ on:
     branches:
       - master
     types:
-      - closed
       - labeled
       - opened
       - reopened
       - synchronize
       - unlabeled
+  push:
+    branches:
+      - master
+
 concurrency: release
 
 jobs:
@@ -32,56 +35,59 @@ jobs:
     outputs:
       new_version: ${{ steps.new_version.outputs.new_version }}
     steps:
-      - name: Restore branch
-        if: github.event.pull_request.merged == true
-        uses: levonet/action-restore-branch@master
+      # Fetch the pull request information (even if the workflow is triggered by a push event).
+      - uses: 8BitJonny/gh-get-current-pr@3.0.0
+        id: pull-request
 
-      - name: Install bloom
-        run: apt update && apt install -y python3-bloom git curl
+      # Currently Pull Request body is not used, but it can be useful in the future.
+      # Uncomment the following lines if you want to access the PR body.
+      #
+      # - name: Store PR body
+      #   id: pull-request-body
+      #   run: echo "pr-body=$PR" >> $GITHUB_OUTPUT
+      #   env:
+      #     PR: ${{ steps.pull-request.outputs.pr || '{}' }}
+
+      - name: Install catkin-pkg
+        run: apt update && apt install -y python3-catkin-pkg git curl
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: master
           repository: ${{ github.event.pull_request.base.repo.full_name }}
           fetch-depth: 0
           fetch-tags: true
+          token: ${{ secrets.BLOOM_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
 
       - name: Setup git
         run: |
           git config --global user.name  "Release Bot"
           git config --global user.email "action@github.com"
-          git config --global --add safe.directory /__w/scenario_simulator_v2/scenario_simulator_v2
+          git config --global --add safe.directory $GITHUB_WORKSPACE
           git config pull.rebase false
-
-      - name: Setup git credential
-        if: github.event.pull_request.merged == true
-        run: git config --global credential.helper ${{ secrets.BLOOM_GITHUB_TOKEN }}
 
       - name: Get old version
         id: old_version
         run: |
           echo "old_version=$(catkin_package_version)" >> $GITHUB_OUTPUT
 
-      - name: Pull head branch
-        run: git pull ${{ github.event.pull_request.head.repo.clone_url }} ${{ github.head_ref }}
-
       - name: Bump patch version
-        if: (contains(github.event.pull_request.labels.*.name, 'bump patch'))
+        if: (contains(steps.pull-request.outputs.pr_labels, 'bump patch')) || (contains(github.event.pull_request.labels.*.name, 'bump patch'))
         run: |
           catkin_generate_changelog -y
           catkin_tag_changelog --bump patch
           catkin_package_version --bump patch
 
       - name: Bump minor version
-        if: (contains(github.event.pull_request.labels.*.name, 'bump minor'))
+        if: (contains(steps.pull-request.outputs.pr_labels, 'bump minor')) || (contains(github.event.pull_request.labels.*.name, 'bump minor'))
         run: |
           catkin_generate_changelog -y
           catkin_tag_changelog --bump minor
           catkin_package_version --bump minor
 
       - name: Bump major version
-        if: (contains(github.event.pull_request.labels.*.name, 'bump major'))
+        if: (contains(steps.pull-request.outputs.pr_labels, 'bump major')) || (contains(github.event.pull_request.labels.*.name, 'bump major'))
         run: |
           catkin_generate_changelog -y
           catkin_tag_changelog --bump major
@@ -93,13 +99,13 @@ jobs:
           echo "new_version=$(catkin_package_version)" >> $GITHUB_OUTPUT
 
       - name: Commit changes
-        if: github.event.pull_request.merged == true
+        if: steps.old_version.outputs.old_version != steps.new_version.outputs.new_version
         run: |
           git add .
           git commit -m "Bump version of scenario_simulator_v2 from version ${{ steps.old_version.outputs.old_version }} to version ${{ steps.new_version.outputs.new_version }}"
 
       - name: Pushing to the protected branch 'master'
-        if: github.event.pull_request.merged == true
+        if: github.event_name == 'push' && steps.old_version.outputs.old_version != steps.new_version.outputs.new_version
         uses: CasperWA/push-protected@v2
         with:
           token: ${{ secrets.BLOOM_GITHUB_TOKEN }}
@@ -110,13 +116,13 @@ jobs:
         id: linked_issues
         uses: hossainemruz/linked-issues@main
         with:
-          pr_url: ${{github.event.pull_request.html_url}}
+          pr_url: ${{ github.event.pull_request.html_url }}
           format: ExternalIssueRef
         continue-on-error: true
 
       - name: Update release description
         env:
-          PULL_REQUEST_BODY: ${{ github.event.pull_request.body }}
+          PULL_REQUEST_BODY: ${{ steps.pull-request.outputs.pr_body ||  github.event.pull_request.body }}
         run: |
           echo "$PULL_REQUEST_BODY" >> release_description.txt
           echo "" >> release_description.txt
@@ -130,31 +136,9 @@ jobs:
           run: cat release_description.txt
 
       - name: Create a GitHub release
-        if: github.event.pull_request.merged == true
+        if: github.event_name == 'push' && steps.old_version.outputs.old_version != steps.new_version.outputs.new_version
         uses: ncipollo/release-action@v1
         with:
           tag: ${{ steps.new_version.outputs.new_version }}
           name: ${{ steps.new_version.outputs.new_version }}
           body: ${{ steps.get_release_description.outputs.stdout }}
-
-      - name: Delete branch if merged
-        if: github.event.pull_request.merged == true
-        uses: actions/github-script@v5
-        with:
-          script: |
-            github.rest.git.deleteRef({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: `heads/${context.payload.pull_request.head.ref}`,
-            })
-
-      - name: Kick docker build action
-        if: github.event.pull_request.merged == true
-        run: |
-          curl -L \
-            -X POST \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: token ${{ secrets.BLOOM_GITHUB_TOKEN }}" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            https://api.github.com/repos/tier4/scenario_simulator_v2/actions/workflows/Docker.yaml/dispatches \
-            -d '{"ref":"master","inputs":{"version":"${{ steps.new_version.outputs.new_version }}"}}'

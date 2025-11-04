@@ -162,8 +162,10 @@ AutowareUniverse::AutowareUniverse(bool simulate_localization) try
     })),
   spinner(std::thread([this]() {
     try {
+      rclcpp::executors::SingleThreadedExecutor executor;
+      executor.add_node(get_node_base_interface());
       while (rclcpp::ok() and not is_stop_requested.load()) {
-        rclcpp::spin_some(get_node_base_interface());
+        executor.spin_some();
       }
     } catch (...) {
       thrown = std::current_exception();

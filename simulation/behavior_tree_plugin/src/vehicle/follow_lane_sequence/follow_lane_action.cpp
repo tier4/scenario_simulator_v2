@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <algorithm>
 #include <behavior_tree_plugin/vehicle/behavior_tree.hpp>
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/follow_lane_action.hpp>
+#include <get_parameter/get_parameter.hpp>
 #include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
@@ -31,6 +33,10 @@ namespace follow_lane_sequence
 FollowLaneAction::FollowLaneAction(const std::string & name, const BT::NodeConfiguration & config)
 : entity_behavior::VehicleActionNode(name, config)
 {
+  use_trajectory_based_front_entity_detection_ =
+    common::getParameter<bool>("use_trajectory_based_front_entity_detection", false);
+  trajectory_based_detection_offset_ =
+    common::getParameter<double>("trajectory_based_detection_offset", 0.0);
 }
 
 const std::optional<traffic_simulator_msgs::msg::Obstacle> FollowLaneAction::calculateObstacle(
@@ -100,7 +106,19 @@ BT::NodeStatus FollowLaneAction::doAction()
     if (trajectory == nullptr) {
       return BT::NodeStatus::FAILURE;
     }
-    const auto distance_to_front_entity = getDistanceToFrontEntity(*trajectory);
+    std::optional<double> distance_to_front_entity;
+    if (use_trajectory_based_front_entity_detection_) {
+      constexpr std::size_t trajectory_segments = 50;
+      if (
+        const auto front_entity_info = getFrontEntityNameAndDistanceByTrajectory(
+          waypoints.waypoints,
+          vehicle_parameters.bounding_box.dimensions.y + trajectory_based_detection_offset_,
+          trajectory_segments)) {
+        distance_to_front_entity = front_entity_info->second;
+      }
+    } else {
+      distance_to_front_entity = getDistanceToFrontEntity(*trajectory);
+    }
     if (distance_to_front_entity) {
       if (
         distance_to_front_entity.value() <=

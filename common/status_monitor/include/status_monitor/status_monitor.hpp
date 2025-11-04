@@ -34,8 +34,7 @@ class StatusMonitor
 
     std::chrono::high_resolution_clock::time_point last_access;
 
-    using duration =
-      decltype(std::chrono::high_resolution_clock::now() - std::chrono::high_resolution_clock::now());
+    using duration = std::chrono::high_resolution_clock::duration;
 
     duration minimum_access_interval;
 
@@ -92,12 +91,10 @@ public:
       const auto this_access_interval = now - status.last_access;
 
       status.minimum_access_interval =
-        std::min<std::decay_t<decltype(status.minimum_access_interval)>>(
-          status.minimum_access_interval, this_access_interval);
+        std::min(status.minimum_access_interval, this_access_interval);
 
       status.maximum_access_interval =
-        std::max<std::decay_t<decltype(status.maximum_access_interval)>>(
-          status.maximum_access_interval, this_access_interval);
+        std::max(status.maximum_access_interval, this_access_interval);
 
       status.last_access = now;
     } else {
@@ -129,10 +126,18 @@ public:
     ~ScopedExchanger() { locked_exchange(target.get(), value); }
   };
 
+  struct ScopedUpdater
+  {
+    StatusMonitor & monitor;
+    explicit ScopedUpdater(StatusMonitor & m) : monitor(m) { monitor.touch(""); }
+    ~ScopedUpdater() { monitor.touch(""); }
+  };
+
   template <typename Thunk>
   auto overrideThreshold(const std::chrono::seconds & t, Thunk thunk) -> decltype(auto)
   {
     auto exchanger = ScopedExchanger(threshold, t);
+    auto updater = ScopedUpdater(*this);
 
     return thunk();
   }

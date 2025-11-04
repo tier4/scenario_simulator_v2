@@ -37,6 +37,8 @@ public:
     const auto lanelet_path = ament_index_cpp::get_package_share_directory("traffic_simulator") +
                               "/map/standard_map/lanelet2_map.osm";
     traffic_simulator::lanelet_map::activate(lanelet_path);
+
+    executor.add_node(node_ptr);
   }
 
   const lanelet::Id id{34836};
@@ -48,6 +50,8 @@ public:
   const std::string yellow_state{"yellow flashing circle"};
 
   const rclcpp::Node::SharedPtr node_ptr = rclcpp::Node::make_shared("TrafficLightsTest");
+
+  rclcpp::executors::SingleThreadedExecutor executor;
 
   std::unique_ptr<traffic_simulator::TrafficLights> lights =
     std::make_unique<traffic_simulator::TrafficLights>(node_ptr, "awf/universe/20240605");
@@ -109,7 +113,7 @@ TEST_F(TrafficLightsTest, startTrafficLightsUpdate)
   this->lights->startTrafficLightsUpdate(20.0, 10.0);
   const auto end = std::chrono::system_clock::now() + 1s;
   while (std::chrono::system_clock::now() < end) {
-    rclcpp::spin_some(this->node_ptr);
+    this->executor.spin_some();
   }
 
   // verify contents of messages
