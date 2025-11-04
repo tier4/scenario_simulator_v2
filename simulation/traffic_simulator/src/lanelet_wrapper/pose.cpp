@@ -68,21 +68,7 @@ auto toMapPose(const LaneletPose & lanelet_pose, const bool fill_pitch) -> PoseS
 
 auto isAltitudeMatching(const double current_altitude, const double target_altitude) -> bool
 {
-  /**
-   * @brief Justification for using a fixed `altitude_threshold` value of 1.0 [m].
-   *
-   * Using a fixed `altitude_threshold` value of 1.0 [m] is justified because the
-   * entity's Z-position is always relative to its base. This eliminates the need
-   * to dynamically adjust the threshold based on the entity's dimensions, ensuring
-   * consistent altitude matching regardless of the entity type.
-   *
-   * The position of the entity is defined relative to its base, typically the center
-   * of the rear axle projected onto the ground in the case of vehicles.
-   *
-   * @note There is no technical basis for this value; it was determined based on experiments.
-   */
-  static constexpr double altitude_threshold = 1.0;
-  return std::abs(current_altitude - target_altitude) <= altitude_threshold;
+  return std::abs(current_altitude - target_altitude) <= ALTITUDE_THRESHOLD;
 }
 
 auto toLaneletPose(
