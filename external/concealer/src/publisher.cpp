@@ -34,7 +34,7 @@ RandomNumberEngine::RandomNumberEngine(
         " and less than or equal to ", std::random_device::max());
     }
   }()),
-  engine(seed ? seed : std::random_device{}())
+  engine(seed ? seed : std::random_device()())
 {
 }
 
@@ -62,15 +62,15 @@ NormalDistribution<nav_msgs::msg::Odometry>::NormalDistribution(
 auto NormalDistribution<nav_msgs::msg::Odometry>::operator()(nav_msgs::msg::Odometry odometry)
   -> nav_msgs::msg::Odometry
 {
-  if (const double speed = std::hypot(
-        odometry.twist.twist.linear.x, odometry.twist.twist.linear.y,
-        odometry.twist.twist.linear.z);
+  geometry_msgs::msg::Pose & pose = odometry.pose.pose;
+  geometry_msgs::msg::Twist & twist = odometry.twist.twist;
+
+  if (const double speed = std::hypot(twist.linear.x, twist.linear.y, twist.linear.z);
       speed < speed_threshold) {
     return odometry;
   } else {
     const Eigen::Quaterniond orientation = Eigen::Quaterniond(
-      odometry.pose.pose.orientation.w, odometry.pose.pose.orientation.x,
-      odometry.pose.pose.orientation.y, odometry.pose.pose.orientation.z);
+      pose.orientation.w, pose.orientation.x, pose.orientation.y, pose.orientation.z);
 
     Eigen::Vector3d local_position = Eigen::Vector3d(0.0, 0.0, 0.0);
 
@@ -80,9 +80,9 @@ auto NormalDistribution<nav_msgs::msg::Odometry>::operator()(nav_msgs::msg::Odom
 
     const Eigen::Vector3d world_position = orientation.toRotationMatrix() * local_position;
 
-    odometry.pose.pose.position.x += world_position.x();
-    odometry.pose.pose.position.y += world_position.y();
-    odometry.pose.pose.position.z += world_position.z();
+    pose.position.x += world_position.x();
+    pose.position.y += world_position.y();
+    pose.position.z += world_position.z();
 
     Eigen::Vector3d euler = orientation.matrix().eulerAngles(0, 1, 2);
 
@@ -94,18 +94,18 @@ auto NormalDistribution<nav_msgs::msg::Odometry>::operator()(nav_msgs::msg::Odom
                                  Eigen::AngleAxisd(euler.y(), Eigen::Vector3d::UnitY()) *
                                  Eigen::AngleAxisd(euler.z(), Eigen::Vector3d::UnitZ());
 
-    odometry.pose.pose.orientation.x = q.x();
-    odometry.pose.pose.orientation.y = q.y();
-    odometry.pose.pose.orientation.z = q.z();
-    odometry.pose.pose.orientation.w = q.w();
+    pose.orientation.x = q.x();
+    pose.orientation.y = q.y();
+    pose.orientation.z = q.z();
+    pose.orientation.w = q.w();
 
-    odometry.twist.twist.linear.x = linear_x_error.apply(engine, odometry.twist.twist.linear.x);
-    odometry.twist.twist.linear.y = linear_y_error.apply(engine, odometry.twist.twist.linear.y);
-    odometry.twist.twist.linear.z = linear_z_error.apply(engine, odometry.twist.twist.linear.z);
+    twist.linear.x = linear_x_error.apply(engine, twist.linear.x);
+    twist.linear.y = linear_y_error.apply(engine, twist.linear.y);
+    twist.linear.z = linear_z_error.apply(engine, twist.linear.z);
 
-    odometry.twist.twist.angular.x = angular_x_error.apply(engine, odometry.twist.twist.angular.x);
-    odometry.twist.twist.angular.y = angular_y_error.apply(engine, odometry.twist.twist.angular.y);
-    odometry.twist.twist.angular.z = angular_z_error.apply(engine, odometry.twist.twist.angular.z);
+    twist.angular.x = angular_x_error.apply(engine, twist.angular.x);
+    twist.angular.y = angular_y_error.apply(engine, twist.angular.y);
+    twist.angular.z = angular_z_error.apply(engine, twist.angular.z);
 
     return odometry;
   }
@@ -117,11 +117,11 @@ NormalDistribution<autoware_vehicle_msgs::msg::VelocityReport>::NormalDistributi
 : RandomNumberEngine(node, topic),
   speed_threshold(common::getParameter<double>(
     node, topic + ".autoware_vehicle_msgs::msg::VelocityReport.speed_threshold")),
-  // clang-format off
-  longitudinal_velocity_error(node, topic + ".autoware_vehicle_msgs::msg::VelocityReport.longitudinal_velocity.error"),
-  lateral_velocity_error(     node, topic + ".autoware_vehicle_msgs::msg::VelocityReport.lateral_velocity.error"),
-  heading_rate_error(         node, topic + ".autoware_vehicle_msgs::msg::VelocityReport.heading_rate.error")
-// clang-format on
+  longitudinal_velocity_error(
+    node, topic + ".autoware_vehicle_msgs::msg::VelocityReport.longitudinal_velocity.error"),
+  lateral_velocity_error(
+    node, topic + ".autoware_vehicle_msgs::msg::VelocityReport.lateral_velocity.error"),
+  heading_rate_error(node, topic + ".autoware_vehicle_msgs::msg::VelocityReport.heading_rate.error")
 {
 }
 
