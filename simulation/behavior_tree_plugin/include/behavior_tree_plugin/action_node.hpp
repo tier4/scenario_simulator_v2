@@ -71,6 +71,8 @@ public:
   auto getHorizon() const -> double;
   auto getOtherEntitiesCanonicalizedLaneletPoses() const
     -> std::vector<traffic_simulator::CanonicalizedLaneletPose>;
+  auto getOtherEntitiesCanonicalizedEntityStatuses() const
+    -> std::vector<traffic_simulator::CanonicalizedEntityStatus>;
 
   /// throws if the derived class return RUNNING.
   auto executeTick() -> BT::NodeStatus override;

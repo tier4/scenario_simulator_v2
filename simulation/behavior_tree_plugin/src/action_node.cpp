@@ -128,6 +128,17 @@ auto ActionNode::getOtherEntitiesCanonicalizedLaneletPoses() const
   return other_canonicalized_lanelet_poses;
 }
 
+auto ActionNode::getOtherEntitiesCanonicalizedEntityStatuses() const
+  -> std::vector<traffic_simulator::CanonicalizedEntityStatus>
+{
+  std::vector<traffic_simulator::CanonicalizedEntityStatus> other_status;
+  other_status.reserve(other_entity_status_.size());
+  for (const auto & [entity_name, entity_status] : other_entity_status_) {
+    other_status.push_back(entity_status);
+  }
+  return other_status;
+}
+
 auto ActionNode::getHorizon() const -> double
 {
   return std::clamp(canonicalized_entity_status_->getTwist().linear.x * 5.0, 20.0, 50.0);
