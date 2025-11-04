@@ -77,7 +77,7 @@ Currently, macOS and Windows are not supported.
 
     You can see the outputs like below.
 
-    ```bash
+    ```plaintext
     Thu Jun  2 05:52:32 2022       
     +-----------------------------------------------------------------------------+
     | NVIDIA-SMI 470.129.06   Driver Version: 470.129.06   CUDA Version: 11.4     |
