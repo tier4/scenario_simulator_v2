@@ -9,15 +9,15 @@ It is possible to modify the speed of simulation (the speed of time published on
 
 - When you run simulations on the command line, add an `global_real_time_factor`  parameter with a custom value (the default is 1.0).
 
-   ```bash
-   ros2 launch scenario_test_runner scenario_test_runner.launch.py \
-   architecture_type:=awf/universe/20250130 \
-   record:=false \
-   scenario:='$(find-pkg-share scenario_test_runner)/scenario/sample.yaml' \
-   sensor_model:=sample_sensor_kit \
-   vehicle_model:=sample_vehicle \
-   global_real_time_factor:="0.5"
-   ```
+    ```bash
+    ros2 launch scenario_test_runner scenario_test_runner.launch.py \
+        architecture_type:=awf/universe/20250130 \
+        record:=false \
+        scenario:='$(find-pkg-share scenario_test_runner)/scenario/sample.yaml' \
+        sensor_model:=sample_sensor_kit \
+        vehicle_model:=sample_vehicle \
+        global_real_time_factor:="0.5"
+    ```
 
 - The smaller the value you specify, the slower the simulation will progress.
 
@@ -43,16 +43,16 @@ It is possible to modify the speed of simulation (the speed of time published on
 
 Parameter `use_sim_time` of `openscenario_interpreter` is **false** by default and can be modified by passing it using command line.
 
-   ```bash
-   ros2 launch scenario_test_runner scenario_test_runner.launch.py \
-   architecture_type:=awf/universe/20250130 \
-   record:=false \
-   scenario:='$(find-pkg-share scenario_test_runner)/scenario/sample.yaml' \
-   sensor_model:=sample_sensor_kit \
-   vehicle_model:=sample_vehicle \
-   global_real_time_factor:="0.5" \
-   use_sim_time:=true
-   ```
+    ```bash
+    ros2 launch scenario_test_runner scenario_test_runner.launch.py \
+        architecture_type:=awf/universe/20250130 \
+        record:=false \
+        scenario:='$(find-pkg-share scenario_test_runner)/scenario/sample.yaml' \
+        sensor_model:=sample_sensor_kit \
+        vehicle_model:=sample_vehicle \
+        global_real_time_factor:="0.5" \
+        use_sim_time:=true
+    ```
 
 However, this impacts the time published on the `/clock` topic and the time used by `Autoware`.
 Details are shown in the table below:

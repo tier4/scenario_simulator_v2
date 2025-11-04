@@ -55,7 +55,7 @@ Which will run random tests with default parameters. Similarly to the image belo
 
 Detailed description of the possible parameters can be found under [Parameters](Usage.md#launch-arguments).
 
-##
+------
 
 After test is completed see `/tmp` directory. Among others, there will be two files:
 
@@ -64,7 +64,7 @@ After test is completed see `/tmp` directory. Among others, there will be two fi
 
 For the more specified information about output files please see [Results](Usage.md#results).
 
-##
+------
 
 It might happen that the random test runner will behave unexpectedly and the test will not launch correctly. For further details regarding known issues please see [Troubleshooting](Usage.md#troubleshooting).
 
