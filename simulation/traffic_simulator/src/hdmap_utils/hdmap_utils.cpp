@@ -201,12 +201,6 @@ auto HdMapUtils::getNearbyLaneletIds(
   return lanelet_ids;
 }
 
-auto HdMapUtils::getAltitude(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) const
-  -> double
-{
-  return pose::toMapPose(lanelet_pose).pose.position.z;
-}
-
 auto HdMapUtils::getCollisionPointInLaneCoordinate(
   const lanelet::Id lanelet_id, const lanelet::Id crossing_lanelet_id) const
   -> std::optional<double>
