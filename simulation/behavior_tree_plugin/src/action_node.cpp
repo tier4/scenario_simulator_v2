@@ -167,7 +167,7 @@ auto ActionNode::getYieldStopDistance(const lanelet::Ids & following_lanelets) c
       canonicalized_entity_status_->getCanonicalizedLaneletPose()) {
     if (const auto other_canonicalized_lanelet_poses = getOtherEntitiesCanonicalizedLaneletPoses();
         !other_canonicalized_lanelet_poses.empty()) {
-      traffic_simulator::distance::distanceToYieldStop(
+      return traffic_simulator::distance::distanceToYieldStop(
         canonicalized_lanelet_pose.value(), following_lanelets, other_canonicalized_lanelet_poses);
     }
   }
