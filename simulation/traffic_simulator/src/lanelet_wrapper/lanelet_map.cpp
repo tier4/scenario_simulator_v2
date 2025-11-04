@@ -331,6 +331,20 @@ auto conflictingCrosswalkIds(const lanelet::Ids & lanelet_ids) -> lanelet::Ids
   return conflicting_crosswalk_ids;
 }
 
+auto conflictingLaneIds(const lanelet::Ids & lanelet_ids, const RoutingGraphType type)
+  -> lanelet::Ids
+{
+  lanelet::Ids conflicting_lanes_ids;
+  for (const auto & lanelet_id : lanelet_ids) {
+    const auto & conflicting_lanelets = lanelet::utils::getConflictingLanelets(
+      LaneletWrapper::routingGraph(type), LaneletWrapper::map()->laneletLayer.get(lanelet_id));
+    for (const auto & conflicting_lanelet : conflicting_lanelets) {
+      conflicting_lanes_ids.push_back(conflicting_lanelet.id());
+    }
+  }
+  return conflicting_lanes_ids;
+}
+
 // Objects on path
 auto trafficSignsOnPath(const lanelet::Ids & lanelet_ids)
   -> std::vector<std::shared_ptr<const lanelet::TrafficSign>>

@@ -260,16 +260,7 @@ auto HdMapUtils::getConflictingLaneIds(
   const lanelet::Ids & lanelet_ids, const traffic_simulator::RoutingGraphType type) const
   -> lanelet::Ids
 {
-  lanelet::Ids ids;
-  for (const auto & lanelet_id : lanelet_ids) {
-    const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
-    const auto conflicting_lanelets =
-      lanelet::utils::getConflictingLanelets(routing_graphs_->routing_graph(type), lanelet);
-    for (const auto & conflicting_lanelet : conflicting_lanelets) {
-      ids.emplace_back(conflicting_lanelet.id());
-    }
-  }
-  return ids;
+  return lanelet_map::conflictingLaneIds(lanelet_ids, type);
 }
 
 auto HdMapUtils::getConflictingCrosswalkIds(const lanelet::Ids & lanelet_ids) const -> lanelet::Ids
