@@ -312,6 +312,25 @@ auto rightOfWayLaneletIds(const lanelet::Ids & lanelet_ids)
   return right_of_way_lanelets_ids;
 }
 
+auto conflictingCrosswalkIds(const lanelet::Ids & lanelet_ids) -> lanelet::Ids
+{
+  constexpr size_t routing_graph_id{1};
+  constexpr double height_clearance{4};
+  /// @note it is not clear if the distinction for crosswalks only is implemented here
+  lanelet::Ids conflicting_crosswalk_ids;
+  lanelet::routing::RoutingGraphContainer graphs_container(
+    {LaneletWrapper::routingGraph(RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER),
+     LaneletWrapper::routingGraph(RoutingGraphType::PEDESTRIAN)});
+  for (const auto & lanelet_id : lanelet_ids) {
+    const auto & conflicting_crosswalks = graphs_container.conflictingInGraph(
+      LaneletWrapper::map()->laneletLayer.get(lanelet_id), routing_graph_id, height_clearance);
+    for (const auto & conflicting_crosswalk : conflicting_crosswalks) {
+      conflicting_crosswalk_ids.push_back(conflicting_crosswalk.id());
+    }
+  }
+  return conflicting_crosswalk_ids;
+}
+
 // Objects on path
 auto trafficSignsOnPath(const lanelet::Ids & lanelet_ids)
   -> std::vector<std::shared_ptr<const lanelet::TrafficSign>>

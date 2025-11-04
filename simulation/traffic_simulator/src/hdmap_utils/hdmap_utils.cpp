@@ -274,24 +274,7 @@ auto HdMapUtils::getConflictingLaneIds(
 
 auto HdMapUtils::getConflictingCrosswalkIds(const lanelet::Ids & lanelet_ids) const -> lanelet::Ids
 {
-  lanelet::Ids ids;
-  std::vector<lanelet::routing::RoutingGraphConstPtr> graphs;
-  graphs.emplace_back(routing_graphs_->routing_graph(
-    traffic_simulator::RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER));
-  graphs.emplace_back(
-    routing_graphs_->routing_graph(traffic_simulator::RoutingGraphType::PEDESTRIAN));
-  lanelet::routing::RoutingGraphContainer container(graphs);
-  for (const auto & lanelet_id : lanelet_ids) {
-    const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
-    double height_clearance = 4;
-    size_t routing_graph_id = 1;
-    const auto conflicting_crosswalks =
-      container.conflictingInGraph(lanelet, routing_graph_id, height_clearance);
-    for (const auto & crosswalk : conflicting_crosswalks) {
-      ids.emplace_back(crosswalk.id());
-    }
-  }
-  return ids;
+  return lanelet_map::conflictingCrosswalkIds(lanelet_ids);
 }
 
 auto HdMapUtils::clipTrajectoryFromLaneletIds(

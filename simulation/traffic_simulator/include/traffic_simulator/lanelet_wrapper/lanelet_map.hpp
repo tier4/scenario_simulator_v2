@@ -112,6 +112,8 @@ auto rightOfWayLaneletIds(const lanelet::Ids & lanelet_ids)
 
 auto rightOfWayLaneletIds(const lanelet::Id lanelet_id) -> lanelet::Ids;
 
+auto conflictingCrosswalkIds(const lanelet::Ids & lanelet_ids) -> lanelet::Ids;
+
 // Objects on path
 auto trafficSignsOnPath(const lanelet::Ids & lanelet_ids)
   -> std::vector<std::shared_ptr<const lanelet::TrafficSign>>;
