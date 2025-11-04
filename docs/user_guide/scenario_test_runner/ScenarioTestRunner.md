@@ -21,7 +21,7 @@ RoadNetwork:
 
 and add the full path to your Lanelet2 map file based on your local setup. For example;
 
-```bash
+```yaml
 RoadNetwork:
     LogicFile:
       filepath: /home/user-name/maps/location-a/lanelet2_map.osc
@@ -30,19 +30,25 @@ RoadNetwork:
 #### 2. Modify "isEgo" Setting
 
 Find the following part in your YAML file;
-```bash
+
+```yaml
               Property:
                 - name: isEgo
                   value: "true"
 ```
+
 and change to;
 
-```bash
+```yaml
               Property:
                 - name: isEgo
                   value: "false"
 ```
-This is the setting to let Ego vehicle run without connecting to Autoware for testing the scenario. <font color="Red"> Please note that this "isEgo" setting is only for scenario testing, and you will need to revert it to "true" when you conduct the actual scenario simulation with Autoware. </font>
+
+This is the setting to let Ego vehicle run without connecting to Autoware for testing the scenario.
+
+!!! warning
+    Please note that this "isEgo" setting is only for scenario testing, and you will need to revert it to "true" when you conduct the actual scenario simulation with Autoware.
 
 ## How to Test Single Scenario
 

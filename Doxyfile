@@ -72,6 +72,7 @@ OUTPUT_LANGUAGE        = English
 RECURSIVE              = YES
 SKIP_FUNCTION_MACROS   = NO
 XML_OUTPUT             = build
+USE_MDFILE_AS_MAINPAGE = README.md
 
 FILE_PATTERNS += *.hpp
 FILE_PATTERNS += *.cpp
