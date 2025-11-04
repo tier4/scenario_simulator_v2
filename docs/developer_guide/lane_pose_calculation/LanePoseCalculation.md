@@ -15,7 +15,7 @@ These are the [timing immediately after the spawn of the Entity](Spawn.md), the 
     - The calculation of the pose in the lane coordinate system involves two steps: first, filtering by "which lanes can be matched," and then "calculating the pose in the specific lane coordinate system".  
     - The parameter that most affects the matching results is the length of the horizontal bar. This length depends on the type of entity and the timing of the calculation. If you want to check the length quickly, please check [this section](#quick-guide-to-horizontal-bar-lengths).
 
-### Quick guide to horizontal bar lengths 
+### Quick guide to horizontal bar lengths
 
 The unit of the table is meter.
 
@@ -32,7 +32,7 @@ $tread = \frac{max(t_f, t_r)}{2}$
 
 !!! Note
     The offsets of horizontal bar lengths are determined on an experience basis.
-    The fact that vehicles match to a lanelet affects many of the actions in the traffic_simulator, such as each Actions in the entity's BehaviorTree. 
+    The fact that vehicles match to a lanelet affects many of the actions in the traffic_simulator, such as each Actions in the entity's BehaviorTree.
     Therefore, this offset has been adjusted based on observations of the behavior in many scenarios within TIER IV.
 
 ### Detail of the lane coordinate system calculation algorithm for a specific lane
