@@ -8,7 +8,7 @@ This framework is designed for executing scenario tests with Autoware.
 
 C++ API documentation of scenario_simulator_v2 can be seen [here](https://tier4.github.io/scenario_simulator_v2-api-docs/index.html).
 
-<font color="#065479E">**This framework is designed to easily accommodate multiple simulators and scenario description formats.**</font>
+**This framework is designed to easily accommodate multiple simulators and scenario description formats.**
 
 ## Simple sensor simulator
 
