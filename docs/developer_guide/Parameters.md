@@ -656,3 +656,99 @@ Delays the publication of the topic by the specified number of seconds. This
 parameter is used only if `override_legacy_configuration` is true. If it is
 false, the value of `detectedObjectGroundTruthPublishingDelay` in
 `ObjectController.Properties` in the scenario file is used.
+
+## /perception/obstacle_segmentation/pointcloud
+
+### `version`
+
+An `int` type value in YYYYMMDD format, mandatory.
+See [`version` documentation of /perception/object_recognition/detection/objects](#version) for detailed explanation.
+
+### `seed`
+
+A positive `int` type value, default `0`. The seed value for the random number generator. If `0` is specified, a random seed value will be generated for each run.
+
+### `noise.model.version`
+
+A positive `int` type value, default `1`.
+This parameter specifies the version of the LiDAR point cloud noise model to be used. Currently, only version 1 is implemented.
+
+### `noise.v1.<config_name>` (namespace)
+
+The v1 noise model allows you to define multiple named noise configurations for LiDAR point clouds.
+`<config_name>` is a user-defined noise configuration identifier that acts as a namespace under `noise.v1`.
+
+Unlike detection noise models (v2/v3/v4) that apply noise to detected objects, the point cloud noise model applies noise to individual points in the LiDAR scan. This provides a more realistic simulation of LiDAR sensor characteristics, where each point can have independent position errors.
+
+### `noise.v1.<config_name>.ellipse_y_radii`
+
+Array of positive double type values, default `[10.0, 20.0, 40.0, 60.0, 80.0, 120.0, 150.0, 180.0, 1000.0]`. Units are in meters.
+See [`ellipse_y_radii` documentation of noise v2](#noisev2ellipse_y_radii) for detailed explanation.
+
+### `noise.v1.<config_name>.noise_application_entities` (namespace)
+
+Entity filtering parameters with the same structure as detection noise v3.
+See [`noise.v3.<config_name>.noise_application_entities`](#noisev3config_namenoise_application_entities-namespace) for detailed explanation.
+The point cloud noise v1 model has the following parameters in this namespace:
+
+- `noise.v1.<config_name>.noise_application_entities.types`
+- `noise.v1.<config_name>.noise_application_entities.subtypes`
+- `noise.v1.<config_name>.noise_application_entities.names`
+
+### `noise.v1.<config_name>.distance.radial` (namespace)
+
+The LiDAR point cloud noise model uses a radial-tangential coordinate system centered at the sensor (ego vehicle's base_link). The radial direction is the direction from the sensor to each point, representing the range measurement error. Noise in this direction simulates distance measurement inaccuracies of the LiDAR sensor.
+
+### `noise.v1.<config_name>.distance.radial.mean.ellipse_normalized_x_radius`
+
+A positive `double` type value, default `1.0`.
+See [`ellipse_normalized_x_radius` documentation of noise v2](#noisev2distancemeanellipse_normalized_x_radius) for the elliptical distance calculation.
+
+### `noise.v1.<config_name>.distance.radial.mean.values`
+
+Array of double type values, default `[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]`.
+Mean of the normal distribution for radial direction noise. The array size must be the same as `ellipse_y_radii`.
+
+### `noise.v1.<config_name>.distance.radial.standard_deviation.ellipse_normalized_x_radius`
+
+A positive `double` type value, default `1.0`.
+See [`ellipse_normalized_x_radius` documentation of noise v2](#noisev2distancemeanellipse_normalized_x_radius) for the elliptical distance calculation.
+
+### `noise.v1.<config_name>.distance.radial.standard_deviation.values`
+
+Array of positive double type values, default `[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]`.
+Standard deviation of the normal distribution for radial direction noise. The array size must be the same as `ellipse_y_radii`.
+
+### `noise.v1.<config_name>.distance.tangential` (namespace)
+
+The tangential direction is perpendicular to the radial direction, representing lateral position errors. For each point, a random tangential direction is chosen uniformly around the radial ray, and noise is applied in that direction. This simulates angular measurement inaccuracies and beam divergence effects of the LiDAR sensor.
+
+### `noise.v1.<config_name>.distance.tangential.mean.ellipse_normalized_x_radius`
+
+A positive `double` type value, default `1.0`.
+See [`ellipse_normalized_x_radius` documentation of noise v2](#noisev2distancemeanellipse_normalized_x_radius) for the elliptical distance calculation.
+
+### `noise.v1.<config_name>.distance.tangential.mean.values`
+
+Array of double type values, default `[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]`.
+Mean of the normal distribution for tangential direction noise. The array size must be the same as `ellipse_y_radii`.
+
+### `noise.v1.<config_name>.distance.tangential.standard_deviation.ellipse_normalized_x_radius`
+
+A positive `double` type value, default `1.0`.
+See [`ellipse_normalized_x_radius` documentation of noise v2](#noisev2distancemeanellipse_normalized_x_radius) for the elliptical distance calculation.
+
+### `noise.v1.<config_name>.distance.tangential.standard_deviation.values`
+
+Array of positive double type values, default `[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]`.
+Standard deviation of the normal distribution for tangential direction noise. The array size must be the same as `ellipse_y_radii`.
+
+### `noise.v1.<config_name>.true_positive.rate.ellipse_normalized_x_radius`
+
+A positive `double` type value, default `1.0`.
+See [`ellipse_normalized_x_radius` documentation of noise v2](#noisev2distancemeanellipse_normalized_x_radius) for detailed explanation.
+
+### `noise.v1.<config_name>.true_positive.rate.values`
+
+Array of double type values between `0.0` and `1.0`, default `[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]`.
+Each element represents the probability that a point will be kept in the point cloud (true positive rate). Points are randomly removed based on this probability, simulating point drop. The array size must be the same as `ellipse_y_radii`.

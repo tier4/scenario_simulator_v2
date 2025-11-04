@@ -24,6 +24,24 @@ Changelog for package simple_sensor_simulator
 16.4.2 (2025-05-23)
 -------------------
 
+18.3.0 (2025-11-04)
+-------------------
+* Merge pull request `#1725 <https://github.com/tier4/scenario_simulator_v2/issues/1725>`_ from tier4/feature/lidar_noise_v1
+* Merge branch 'master' into feature/lidar_noise_v1
+* Merge branch 'master' into feature/lidar_noise_v1
+* Merge branch 'master' into feature/lidar_noise_v1
+* Improve setup/teardown of LidarSensorTest
+* Fix assert in LidarNoiseModelV1
+* No noise model applied if version parameter is not declared
+* Remove unused include
+* Implement point cloud drop in LidarNoiseModelV1::applyNoise
+* Implement LidarNoiseModelV1::applyNoise except point cloud drop
+* Implement config loading part of LidarNoiseModelV1 class
+* Add noise_parameter_selector::listAvailableNoiseConfigs
+* extract get_first_matched_config_name lambda function to noise_parameter_selector::findMatchingNoiseConfigForEntity
+* extract create_selector lambda function to noise_parameter_selector::createEllipticalParameterSelector
+* Contributors: Kotaro Yoshimoto
+
 18.2.1 (2025-11-04)
 -------------------
 
