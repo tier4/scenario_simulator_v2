@@ -45,7 +45,7 @@ constexpr static double ALTITUDE_THRESHOLD = 1.0;
 
 auto toMapPose(const LaneletPose & lanelet_pose, const bool fill_pitch = true) -> PoseStamped;
 
-auto isAltitudeMatching(const double current_altitude, const double target_altitude) -> bool;
+auto isAltitudeWithinThreshold(const double current_altitude, const double target_altitude) -> bool;
 
 auto toLaneletPose(
   const Pose & map_pose, const lanelet::Id lanelet_id, const double matching_distance = 1.0)
