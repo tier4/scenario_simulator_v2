@@ -131,9 +131,6 @@ protected:
 
   virtual bool checkPreconditions() { return true; }
   virtual BT::NodeStatus doAction() = 0;
-  auto getDistanceToTargetEntity(
-    const math::geometry::CatmullRomSplineInterface & spline,
-    const traffic_simulator::CanonicalizedEntityStatus & status) const -> std::optional<double>;
 
 private:
   auto foundConflictingEntity(const lanelet::Ids & following_lanelets) const -> bool;
