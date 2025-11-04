@@ -1,4 +1,4 @@
-repo_url: https://github.com/tier4/scenario_simulator.auto
+repo_url: https://github.com/tier4/scenario_simulator_v2
 site_name: Scenario testing framework for Autoware
 theme:
   name: material
@@ -34,11 +34,12 @@ markdown_extensions:
   - codehilite: { guess_lang: false }
   - fontawesome_markdown
   - mdx_math
-  - plantuml_markdown: { server: http://www.plantuml.com/plantuml }
+  - plantuml_markdown: { server: https://www.plantuml.com/plantuml }
   - pymdownx.arithmatex
   - pymdownx.emoji: { emoji_generator: !!python/name:pymdownx.emoji.to_svg  }
   - pymdownx.highlight
   - pymdownx.superfences
+  - pymdownx.details
   - toc: { permalink: "#" }
   - pymdownx.superfences:
       custom_fences:
@@ -52,5 +53,5 @@ extra_css:
   - stylesheet/extra.css
   - https://unpkg.com/mermaid@8.0.0/dist/mermaid.css
 extra_javascript:
-  - http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML
+  - https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML
   - https://unpkg.com/mermaid/dist/mermaid.min.js
