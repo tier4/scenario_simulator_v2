@@ -174,6 +174,7 @@ auto EgoEntitySimulation::setAutowareStatus() -> void
   autoware->current_acceleration.store([this]() {
     geometry_msgs::msg::Accel message;
     message.linear.x = vehicle_model_ptr_->getAx();
+    message.linear.y = vehicle_model_ptr_->getWz() * vehicle_model_ptr_->getVx();
     return message;
   }());
 
@@ -407,6 +408,7 @@ auto EgoEntitySimulation::getCurrentAccel(const double step_time) const -> geome
   geometry_msgs::msg::Accel accel;
   if (previous_angular_velocity_) {
     accel.linear.x = vehicle_model_ptr_->getAx();
+    accel.linear.y = vehicle_model_ptr_->getWz() * vehicle_model_ptr_->getVx();
     accel.angular.z =
       (vehicle_model_ptr_->getWz() - previous_angular_velocity_.value()) / step_time;
   }
