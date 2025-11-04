@@ -16,10 +16,12 @@
 #define CONCEALER__PUBLISHER_HPP_
 
 #include <autoware_vehicle_msgs/msg/velocity_report.hpp>
+#include <geometry_msgs/msg/pose_with_covariance_stamped.hpp>
 #include <get_parameter/get_parameter.hpp>
 #include <nav_msgs/msg/odometry.hpp>
 #include <random>
 #include <rclcpp/rclcpp.hpp>
+#include <sensor_msgs/msg/imu.hpp>
 
 namespace concealer
 {
@@ -108,6 +110,82 @@ struct NormalDistribution<nav_msgs::msg::Odometry> : public RandomNumberEngine
     const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr &, const std::string &);
 
   auto operator()(nav_msgs::msg::Odometry odometry) -> nav_msgs::msg::Odometry;
+};
+
+template <>
+struct NormalDistribution<autoware_vehicle_msgs::msg::VelocityReport> : public RandomNumberEngine
+{
+  double speed_threshold;
+
+  // clang-format off
+  NormalDistributionError<float> longitudinal_velocity_error,
+                                 lateral_velocity_error,
+                                 heading_rate_error;
+  // clang-format on
+
+  explicit NormalDistribution(
+    const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr &, const std::string &);
+
+  auto operator()(autoware_vehicle_msgs::msg::VelocityReport velocity_report)
+    -> autoware_vehicle_msgs::msg::VelocityReport;
+};
+
+template <>
+struct NormalDistribution<geometry_msgs::msg::PoseWithCovarianceStamped> : public RandomNumberEngine
+{
+  // clang-format off
+  NormalDistributionError<double> position_local_x_error,
+                                  position_local_y_error,
+                                  position_local_z_error,
+                                  orientation_r_error,
+                                  orientation_p_error,
+                                  orientation_y_error,
+                                  covariance_diagonal_x_x_error,
+                                  covariance_diagonal_y_y_error,
+                                  covariance_diagonal_z_z_error,
+                                  covariance_diagonal_roll_roll_error,
+                                  covariance_diagonal_pitch_pitch_error,
+                                  covariance_diagonal_yaw_yaw_error;
+  // clang-format on
+
+  explicit NormalDistribution(
+    const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr &, const std::string &);
+
+  auto operator()(geometry_msgs::msg::PoseWithCovarianceStamped pose)
+    -> geometry_msgs::msg::PoseWithCovarianceStamped;
+};
+
+template <>
+struct NormalDistribution<sensor_msgs::msg::Imu> : public RandomNumberEngine
+{
+  // clang-format off
+  NormalDistributionError<double> orientation_r_error,
+                                  orientation_p_error,
+                                  orientation_y_error,
+                                  angular_velocity_x_error,
+                                  angular_velocity_y_error,
+                                  angular_velocity_z_error,
+                                  linear_acceleration_x_error,
+                                  linear_acceleration_y_error,
+                                  linear_acceleration_z_error,
+                                  orientation_covariance_diagonal_roll_roll_error,
+                                  orientation_covariance_diagonal_pitch_pitch_error,
+                                  orientation_covariance_diagonal_yaw_yaw_error,
+                                  angular_velocity_covariance_diagonal_x_x_error,
+                                  angular_velocity_covariance_diagonal_y_y_error,
+                                  angular_velocity_covariance_diagonal_z_z_error,
+                                  linear_acceleration_covariance_diagonal_x_x_error,
+                                  linear_acceleration_covariance_diagonal_y_y_error,
+                                  linear_acceleration_covariance_diagonal_z_z_error;
+  // clang-format on
+
+  /// @note set this to false to disable randomization
+  bool active{true};
+
+  explicit NormalDistribution(
+    const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr &, const std::string &);
+
+  auto operator()(sensor_msgs::msg::Imu imu) -> sensor_msgs::msg::Imu;
 };
 
 template <>
