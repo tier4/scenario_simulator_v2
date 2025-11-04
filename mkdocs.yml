@@ -35,7 +35,8 @@ markdown_extensions:
   - fontawesome_markdown
   - mdx_math
   - plantuml_markdown: { server: https://www.plantuml.com/plantuml }
-  - pymdownx.arithmatex
+  - pymdownx.arithmatex:
+      generic: true
   - pymdownx.emoji: { emoji_generator: !!python/name:pymdownx.emoji.to_svg  }
   - pymdownx.highlight
   - pymdownx.superfences
@@ -53,5 +54,5 @@ extra_css:
   - stylesheet/extra.css
   - https://unpkg.com/mermaid@8.0.0/dist/mermaid.css
 extra_javascript:
-  - https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML
+  - https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML
   - https://unpkg.com/mermaid/dist/mermaid.min.js
