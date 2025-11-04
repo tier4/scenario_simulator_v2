@@ -12,6 +12,9 @@ Changelog for package simple_cross_map
 16.4.2 (2025-05-23)
 -------------------
 
+18.2.1 (2025-11-04)
+-------------------
+
 18.2.0 (2025-11-04)
 -------------------
 * Merge branch 'master' into feature/publisher-noise-velocity-report
