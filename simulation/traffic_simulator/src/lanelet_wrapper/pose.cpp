@@ -71,6 +71,13 @@ auto isAltitudeWithinThreshold(const double current_altitude, const double targe
   return std::abs(current_altitude - target_altitude) <= ALTITUDE_THRESHOLD;
 }
 
+auto isAltitudeWithinRange(
+  const double current_altitude, const double min_altitude, const double max_altitude) -> bool
+{
+  return (current_altitude >= (min_altitude - ALTITUDE_THRESHOLD)) &&
+         (current_altitude <= (max_altitude + ALTITUDE_THRESHOLD));
+}
+
 auto toLaneletPose(
   const Pose & map_pose, const lanelet::Id lanelet_id, const double matching_distance)
   -> std::optional<LaneletPose>
