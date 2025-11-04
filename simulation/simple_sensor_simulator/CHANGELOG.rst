@@ -24,6 +24,34 @@ Changelog for package simple_sensor_simulator
 16.4.2 (2025-05-23)
 -------------------
 
+18.2.1 (2025-11-04)
+-------------------
+
+18.2.0 (2025-11-04)
+-------------------
+* Merge branch 'master' into feature/publisher-noise-velocity-report
+* Contributors: Kotaro Yoshimoto
+
+18.1.1 (2025-10-31)
+-------------------
+* Merge pull request `#1723 <https://github.com/tier4/scenario_simulator_v2/issues/1723>`_ from tier4/fix/publish_lateral_acceleration_abs
+* fix lateral acceleration
+* Contributors: Kotaro Yoshimoto, xtk8532704
+
+18.1.0 (2025-10-27)
+-------------------
+* Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
+* Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
+* Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
+* Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
+* Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
+* Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
+* Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
+* Contributors: Kotaro Yoshimoto, Taiga
+
+18.0.10 (2025-10-23)
+--------------------
+
 18.0.9 (2025-10-23)
 -------------------
 * Merge branch 'master' into feature/ci-dependabot
