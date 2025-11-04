@@ -42,12 +42,13 @@ auto LidarSensor<sensor_msgs::msg::PointCloud2>::raycast(
   }
 
   if (ego_pose) {
-    std::vector<double> vertical_angles;
-    for (const auto vertical_angle : configuration_.vertical_angles()) {
-      vertical_angles.push_back(vertical_angle);
-    }
-    const auto result = raycaster_.raycast(ego_pose.value(), raycast_entities);
+    auto result = raycaster_.raycast(ego_pose.value(), raycast_entities);
     detected_objects_ = result.getDetectedEntityNames();
+
+    if (noise_model_v1_) {
+      noise_model_v1_->applyNoise(result, ego_pose.value());
+    }
+
     sensor_msgs::msg::PointCloud2 pointcloud_msg;
     pcl::toROSMsg(*(result.cloud), pointcloud_msg);
     pointcloud_msg.header.frame_id = "base_link";
