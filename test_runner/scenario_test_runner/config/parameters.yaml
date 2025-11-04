@@ -314,3 +314,35 @@
       version: 20240605 # architecture_type suffix (mandatory)
       override_legacy_configuration: false
       delay: 0.0  # This parameter is used only if `override_legacy_configuration` is true. If it is false, the value of `detectedObjectGroundTruthPublishingDelay` in `ObjectController.Properties` in the scenario file is used.
+    /perception/obstacle_segmentation/pointcloud:
+      version: 20240605 # architecture_type suffix (mandatory)
+      seed: 0 # If 0 is specified, a random seed value will be generated for each run.
+      noise:
+        model:
+          version: 1 # LiDAR point cloud noise model version. Currently only v1 is supported.
+        v1: # This clause is used only if `model.version` is 1.
+          no_noise_to_all:
+            noise_application_entities:
+              types: ["*"]
+              subtypes: ["*"]
+              names: ["*"]
+            ellipse_y_radii: [10.0, 20.0, 40.0, 60.0, 80.0, 120.0, 150.0, 180.0, 1000.0]
+            distance:
+              radial:  # Radial direction (from sensor to point)
+                mean:
+                  ellipse_normalized_x_radius: 1.0
+                  values: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+                standard_deviation:
+                  ellipse_normalized_x_radius: 1.0
+                  values: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+              tangential:  # Tangential direction (perpendicular to radial)
+                mean:
+                  ellipse_normalized_x_radius: 1.0
+                  values: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+                standard_deviation:
+                  ellipse_normalized_x_radius: 1.0
+                  values: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+            true_positive:
+              rate:
+                ellipse_normalized_x_radius: 1.0
+                values: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
