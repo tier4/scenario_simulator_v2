@@ -7,21 +7,21 @@ It is possible to modify the speed of simulation (the speed of time published on
 
 ## Use parameter
 
- - When you run simulations on the command line, add an `global_real_time_factor`  parameter with a custom value (the default is 1.0). 
+- When you run simulations on the command line, add an `global_real_time_factor`  parameter with a custom value (the default is 1.0).
 
-   ```bash
-   ros2 launch scenario_test_runner scenario_test_runner.launch.py \
-   architecture_type:=awf/universe/20250130 \
-   record:=false \
-   scenario:='$(find-pkg-share scenario_test_runner)/scenario/sample.yaml' \
-   sensor_model:=sample_sensor_kit \
-   vehicle_model:=sample_vehicle \
-   global_real_time_factor:="0.5"
-   ``` 
+    ```bash
+    ros2 launch scenario_test_runner scenario_test_runner.launch.py \
+        architecture_type:=awf/universe/20250130 \
+        record:=false \
+        scenario:='$(find-pkg-share scenario_test_runner)/scenario/sample.yaml' \
+        sensor_model:=sample_sensor_kit \
+        vehicle_model:=sample_vehicle \
+        global_real_time_factor:="0.5"
+    ```
 
- - The smaller the value you specify, the slower the simulation will progress.
+- The smaller the value you specify, the slower the simulation will progress.
 
-## Use slider on run time 
+## Use slider on run time
 
 - When the simulation is started you can add the `RViz` panel by clicking `Panels -> Add new panel` in the top left corner of RViz.
 
@@ -39,22 +39,20 @@ It is possible to modify the speed of simulation (the speed of time published on
     <source src="/image/realtime_factor/video.mp4" type="video/mp4">
 </video>
 
-
 ## Configure `use_sim_time` parameter
 
 Parameter `use_sim_time` of `openscenario_interpreter` is **false** by default and can be modified by passing it using command line.
 
-
-   ```bash
-   ros2 launch scenario_test_runner scenario_test_runner.launch.py \
-   architecture_type:=awf/universe/20250130 \
-   record:=false \
-   scenario:='$(find-pkg-share scenario_test_runner)/scenario/sample.yaml' \
-   sensor_model:=sample_sensor_kit \
-   vehicle_model:=sample_vehicle \
-   global_real_time_factor:="0.5" \
-   use_sim_time:=true
-   ``` 
+    ```bash
+    ros2 launch scenario_test_runner scenario_test_runner.launch.py \
+        architecture_type:=awf/universe/20250130 \
+        record:=false \
+        scenario:='$(find-pkg-share scenario_test_runner)/scenario/sample.yaml' \
+        sensor_model:=sample_sensor_kit \
+        vehicle_model:=sample_vehicle \
+        global_real_time_factor:="0.5" \
+        use_sim_time:=true
+    ```
 
 However, this impacts the time published on the `/clock` topic and the time used by `Autoware`.
 Details are shown in the table below:
@@ -66,13 +64,13 @@ Details are shown in the table below:
 
 Below are also some bullet points explaining the impact of the `use_sim_time` parameter on `scenario_simulator_v2` and `Autoware`:
 
- - **`use_sim_time:=True` passed using command line**
-    - Both Autoware and scenario_simulator_v2 are launched with `use_sim_time=true`. 
-    - Time published on `/clock` is the **simulation time** (starting from 0). 
-    - Time published on `/clock` **can be** controlled by RViz plugin. 
+- **`use_sim_time:=True` passed using command line**
+    - Both Autoware and scenario_simulator_v2 are launched with `use_sim_time=true`.
+    - Time published on `/clock` is the **simulation time** (starting from 0).
+    - Time published on `/clock` **can be** controlled by RViz plugin.
     - Simulation time **can be** controlled by RViz plugin.
- - **`use_sim_time:=False` passed using command line (default value)**
-     - Both Autoware and scenario_simulator_v2 are launched with `use_sim_time=false`. 
-     - Time published on `/clock` is the **walltime**. 
-     - Time published on `/clock` **cannot be** controlled by RViz plugin. 
-     - Simulation time **can be** controlled by RViz plugin.
+- **`use_sim_time:=False` passed using command line (default value)**
+    - Both Autoware and scenario_simulator_v2 are launched with `use_sim_time=false`.
+    - Time published on `/clock` is the **walltime**.
+    - Time published on `/clock` **cannot be** controlled by RViz plugin.
+    - Simulation time **can be** controlled by RViz plugin.
