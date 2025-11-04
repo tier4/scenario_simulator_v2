@@ -17,7 +17,10 @@
         "no-duplicate-heading": false,
         "single-title": false,
         "heading-increment": false,
-        "first-line-heading": false
+        "first-line-heading": false,
+        "link-fragments": {
+            "ignore_case": true
+        }
     },
     "globs": [
         "docs/**/*.md"

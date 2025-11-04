@@ -4,7 +4,8 @@
 
 We use ZeroMQ Inter-Process communication to communicate with your simulator and traffic simulator.
 
-<font color="#065479E">_Note! Simple Sensor Simulator is just a reference implementation. We can adapt any kinds of autonomous driving simulators if we can develop ZeroMQ interface to your simulator._</font>
+!!!note
+  Simple Sensor Simulator is just a reference implementation. We can adapt any kinds of autonomous driving simulators if we can develop ZeroMQ interface to your simulator.
 
 ## What is ZeroMQ
 

@@ -15,8 +15,8 @@ The interpreter supports some substitution syntax of [the ROS 2 Launch system](h
 
 Substitution syntaxes can be nested and the substitution is performed from the innermost to the outermost in order.
 
-> [!IMPORTANT]
-> This substitution is performed only once during the reading of the attribute, so changes in parameters that occur during the simulation, such as those from `ParameterModifyAction`, do not affect the substitution.
+!!! warning
+    This substitution is performed only once during the reading of the attribute, so changes in parameters that occur during the simulation, such as those from `ParameterModifyAction`, do not affect the substitution.
 
 #### Available Syntax
 
@@ -216,8 +216,8 @@ ByValueCondition:
 
 Within the scenario, you can end the scenario simulation with a status of either `success` or `failure` by using `exitSuccess` and `exitFailure` from `CustomCommandAction`.
 
-> [!IMPORTANT]
-> `exitSuccess` and `exitFailure` terminate the simulation immediately without any state transitions in the lifecycle of a `StoryboardElement`. This means there is no way to detect simulations terminated by `exitSuccess` or `exitFailure` from within the scenario using conditions like `StoryboardElementStateCondition`.
+!!! warning
+    `exitSuccess` and `exitFailure` terminate the simulation immediately without any state transitions in the lifecycle of a `StoryboardElement`. This means there is no way to detect simulations terminated by `exitSuccess` or `exitFailure` from within the scenario using conditions like `StoryboardElementStateCondition`.
 
 Currently, the only way to know the result of the simulation is by viewing the status string printed to standard output. However, this method may change in the future.
 
@@ -569,7 +569,7 @@ Currently, the only way to know the result of the simulation is by viewing the s
 #### AssignControllerAction
 
 - Properties `activateAnimation`, `activateLateral`, `activateLighting`, and `activateLongitudinal` are ignored.
-  - The simulator behaves as if these properties are `false`.
+    - The simulator behaves as if these properties are `false`.
 - Property `ObjectController` created in version 1.3 is **not** supported.
 - Properties `Controller` and `CatalogReference` deprecated in version 1.3 are supported.
 
@@ -612,6 +612,7 @@ Currently, the only way to know the result of the simulation is by viewing the s
 - Property `alongRoute` deprecated in version 1.1 is **not** supported.
 - Property `Position` of types `RoadPosition`, `RelativeRoadPosition`, `RelativeLanePosition`, `RoutePosition`, `GeoPosition`, and `TrajectoryPosition` are **not** supported.
 - Not all combinations of properties for distance calculation are supported. Supported combinations are listed below:
+
   | coordinateSystem | relativeDistanceType | routingAlgorithm | freespace |
   |:----------------:|:--------------------:|:----------------:|:---------:|
   | entity           | euclidianDistance    | undefined        | false     |
@@ -660,7 +661,7 @@ Currently, the only way to know the result of the simulation is by viewing the s
 #### LaneChangeAction
 
 - Specifying `step` for `LaneChangeActionDynamics.dynamicsDimension` is **not** supported.
-  - Simulator may lead to an undefined behavior if `step` is specified.
+    - Simulator may lead to an undefined behavior if `step` is specified.
 
 #### LateralAction
 
@@ -717,9 +718,9 @@ Currently, the only way to know the result of the simulation is by viewing the s
 #### Pedestrian
 
 - Property `role` is ignored.
-  - The simulator does not take into account `role`.
+    - The simulator does not take into account `role`.
 - Property `model` deprecated version 1.1 is ignored but mandatory.
-  - Maybe this is simulator bug and need to be fixed.
+    - Maybe this is simulator bug and need to be fixed.
 
 #### PedestrianCategory
 
@@ -749,7 +750,7 @@ Currently, the only way to know the result of the simulation is by viewing the s
 #### Properties
 
 - Property `CustomContent` is ignored.
-  - The simulator does not take into account `CustomContent`.
+    - The simulator does not take into account `CustomContent`.
 
 #### ReachPositionCondition
 
@@ -763,12 +764,13 @@ Currently, the only way to know the result of the simulation is by viewing the s
 #### RelativeClearanceCondition
 
 - Property `oppositeLanes` is ignored.
-  - The simulator behaves as if `oppositeLanes` is `false`.
+    - The simulator behaves as if `oppositeLanes` is `false`.
 
 #### RelativeDistanceCondition
 
 - Property `Position` of types `RoadPosition`, `RelativeRoadPosition`, `RelativeLanePosition`, `RoutePosition`, `GeoPosition`, and `TrajectoryPosition` are **not** supported.
 - Not all combinations of properties for distance calculation are supported. Supported combinations are listed below:
+
   | coordinateSystem | relativeDistanceType | routingAlgorithm | freespace |
   |:----------------:|:--------------------:|:----------------:|:---------:|
   | entity           | euclidianDistance    | undefined        | false     |
@@ -815,14 +817,14 @@ Currently, the only way to know the result of the simulation is by viewing the s
 #### SpeedAction
 
 - Specifying `time` or `distance` for `SpeedActionDynamics.dynamicsDimension` is **not** supported.
-  - Simulator may lead to an undefined behavior if `time` or `distance` is specified.
+    - Simulator may lead to an undefined behavior if `time` or `distance` is specified.
 - Specifying `cubic` for `SpeedActionDynamics.dynamicsShape` is **not** supported.
-  - Simulator may lead to an undefined behavior if `cubic` is specified.
+    - Simulator may lead to an undefined behavior if `cubic` is specified.
 
 #### SpeedCondition
 
 - Property `direction` is ignored.
-  - The simulator behaves as if `direction` is not given.
+    - The simulator behaves as if `direction` is not given.
 
 #### StochasticDistributionType
 
@@ -831,7 +833,7 @@ Currently, the only way to know the result of the simulation is by viewing the s
 #### StoryboardElementStateCondition
 
 - [name prefix](https://releases.asam.net/OpenSCENARIO/1.0.0/ASAM_OpenSCENARIO_BS-1-2_User-Guide_V1-0-0.html#:~:text=A%20name%20prefix%20,new%20name%20reference.) in OpenSCENARIO User Guide 3.1.2. is **not** supported.
-  - The interpreter uses lexical scope instead. See [Scoping](#Scoping) for more details.
+    - The interpreter uses lexical scope instead. See [Scoping](#Scoping) for more details.
 
 #### Sun
 
@@ -846,7 +848,7 @@ Currently, the only way to know the result of the simulation is by viewing the s
 - Properties `coordinateSystem` and `relativeDistanceType` created in version 1.1 is ignored.
 - Property `alongRoute` deprecated in version 1.1 is ignored.
 - Property `freespace` is ignored.
-  - The simulator behaves as if `freespace` is `false`.
+    - The simulator behaves as if `freespace` is `false`.
 
 #### TimeToCollisionCondition
 
@@ -866,6 +868,6 @@ Currently, the only way to know the result of the simulation is by viewing the s
 #### Vehicle
 
 - Property `role` created in version 1.1 is ignored.
-  - The simulator does not take into account `role`.
+    - The simulator does not take into account `role`.
 - Property `mass` is ignored.
-  - The simulator behaves as if `mass` is not given.
+    - The simulator behaves as if `mass` is not given.
