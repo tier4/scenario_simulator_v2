@@ -9,13 +9,13 @@ An example of the result file is below:
 ```xml
 <?xml version="1.0"?>
 <testsuites>
-	<testsuite name="example_suite">
-		<testcase name="example_case">
-			<error type="InternalError" message="foo" />
-			<failure type="Failure" message="Expected success" />
-		</testcase>
-	</testsuite>
-	<testsuite name="example_suites" />
+ <testsuite name="example_suite">
+  <testcase name="example_case">
+   <error type="InternalError" message="foo" />
+   <failure type="Failure" message="Expected success" />
+  </testcase>
+ </testsuite>
+ <testsuite name="example_suites" />
 </testsuites>
 ```
 
@@ -101,13 +101,13 @@ If you run this code, result.junit.xml should be like below:
 ```xml
 <?xml version="1.0"?>
 <testsuites>
-	<testsuite name="example_suite">
-		<testcase name="example_case">
-			<error type="example_error" message="error_test_case" />
-			<failure type="example_failure" message="failure_test_case" />
-		</testcase>
-	</testsuite>
-	<testsuite name="example_suites" />
+ <testsuite name="example_suite">
+  <testcase name="example_case">
+   <error type="example_error" message="error_test_case" />
+   <failure type="example_failure" message="failure_test_case" />
+  </testcase>
+ </testsuite>
+ <testsuite name="example_suites" />
 </testsuites>
 ```
 
