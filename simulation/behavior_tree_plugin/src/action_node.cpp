@@ -224,10 +224,10 @@ auto ActionNode::getRightOfWayEntities() const
 }
 
 auto ActionNode::getDistanceToTrafficLightStopLine(
-  const lanelet::Ids & route_lanelets_,
+  const lanelet::Ids & route_lanelets,
   const math::geometry::CatmullRomSplineInterface & spline) const -> std::optional<double>
 {
-  if (const auto traffic_light_ids = hdmap_utils_->getTrafficLightIdsOnPath(route_lanelets_);
+  if (const auto traffic_light_ids = hdmap_utils_->getTrafficLightIdsOnPath(route_lanelets);
       !traffic_light_ids.empty()) {
     std::set<double> collision_points = {};
     for (const auto traffic_light_id : traffic_light_ids) {
@@ -506,14 +506,14 @@ auto ActionNode::isOtherEntityAtConsideredAltitude(
 }
 
 auto ActionNode::getDistanceToConflictingEntity(
-  const lanelet::Ids & route_lanelets_,
+  const lanelet::Ids & route_lanelets,
   const math::geometry::CatmullRomSplineInterface & spline) const -> std::optional<double>
 {
   if (not canonicalized_entity_status_->isInLanelet()) {
     return std::nullopt;
   }
-  auto crosswalk_entity_status = getConflictingEntityStatusOnCrossWalk(route_lanelets_);
-  auto lane_entity_status = getConflictingEntityStatusOnLane(route_lanelets_);
+  auto crosswalk_entity_status = getConflictingEntityStatusOnCrossWalk(route_lanelets);
+  auto lane_entity_status = getConflictingEntityStatusOnLane(route_lanelets);
   std::set<double> distances;
   for (const auto & status : crosswalk_entity_status) {
     const auto s = getDistanceToTargetEntityOnCrosswalk(spline, status);
@@ -590,7 +590,7 @@ auto ActionNode::foundConflictingEntity(const lanelet::Ids & following_lanelets)
 }
 
 auto ActionNode::calculateUpdatedEntityStatus(
-  const double local_target_speed_,
+  const double local_target_speed,
   const traffic_simulator_msgs::msg::DynamicConstraints & constraints) const
   -> traffic_simulator::EntityStatus
 {
@@ -598,7 +598,7 @@ auto ActionNode::calculateUpdatedEntityStatus(
     traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner(
       step_time_, canonicalized_entity_status_->getName());
   const auto dynamics = speed_planner.getDynamicStates(
-    local_target_speed_, constraints, canonicalized_entity_status_->getTwist(),
+    local_target_speed, constraints, canonicalized_entity_status_->getTwist(),
     canonicalized_entity_status_->getAccel());
 
   const double linear_jerk_new = std::get<2>(dynamics);
@@ -631,7 +631,7 @@ auto ActionNode::calculateUpdatedEntityStatus(
 }
 
 auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
-  const double local_target_speed_,
+  const double local_target_speed,
   const traffic_simulator_msgs::msg::DynamicConstraints & constraints) const
   -> traffic_simulator::EntityStatus
 {
@@ -696,7 +696,7 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
     traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner(
       step_time_, canonicalized_entity_status_->getName());
   const auto dynamics = speed_planner.getDynamicStates(
-    local_target_speed_, constraints, canonicalized_entity_status_->getTwist(),
+    local_target_speed, constraints, canonicalized_entity_status_->getTwist(),
     canonicalized_entity_status_->getAccel());
   const auto linear_jerk_new = std::get<2>(dynamics);
   const auto & accel_new = std::get<1>(dynamics);
