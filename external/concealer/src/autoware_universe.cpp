@@ -24,6 +24,7 @@ namespace concealer
 // clang-format off
 AutowareUniverse::AutowareUniverse(bool simulate_localization) try
 : rclcpp::Node("concealer", "simulation"),
+  ContinuousTransformBroadcaster<AutowareUniverse>(simulate_localization? "base_link" : "base_link_ground_truth"),
   getCommand("/control/command/control_cmd", rclcpp::QoS(1), *this),
   getGearCommand("/control/command/gear_cmd", rclcpp::QoS(1), *this),
   getTurnIndicatorsCommand("/control/command/turn_indicators_cmd", rclcpp::QoS(1), *this),
