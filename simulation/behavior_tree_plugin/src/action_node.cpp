@@ -505,39 +505,6 @@ auto ActionNode::isOtherEntityAtConsideredAltitude(
   }
 }
 
-auto ActionNode::getDistanceToConflictingEntity(
-  const lanelet::Ids & route_lanelets,
-  const math::geometry::CatmullRomSplineInterface & spline) const -> std::optional<double>
-{
-  if (not canonicalized_entity_status_->isInLanelet()) {
-    return std::nullopt;
-  }
-  auto crosswalk_entity_status = getConflictingEntityStatusOnCrossWalk(route_lanelets);
-  auto lane_entity_status = getConflictingEntityStatusOnLane(route_lanelets);
-  std::set<double> distances;
-  for (const auto & status : crosswalk_entity_status) {
-    const auto s = getDistanceToTargetEntityOnCrosswalk(spline, status);
-    if (s) {
-      distances.insert(s.value());
-    }
-  }
-  for (const auto & status : lane_entity_status) {
-    if (const auto conflicting_pose = status.getCanonicalizedLaneletPose()) {
-      if (
-        const auto distance_to_entity = traffic_simulator::distance::splineDistanceToBoundingBox(
-          spline, canonicalized_entity_status_->getCanonicalizedLaneletPose().value(),
-          canonicalized_entity_status_->getBoundingBox(), conflicting_pose.value(),
-          status.getBoundingBox())) {
-        distances.insert(distance_to_entity.value());
-      }
-    }
-  }
-  if (distances.empty()) {
-    return std::nullopt;
-  }
-  return *distances.begin();
-}
-
 auto ActionNode::getConflictingEntityStatusOnCrossWalk(const lanelet::Ids & route_lanelets_) const
   -> std::vector<traffic_simulator::CanonicalizedEntityStatus>
 {
