@@ -2,6 +2,12 @@
 Changelog for package context_gamma_planner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+18.3.2 (2025-11-06)
+-------------------
+* Merge branch 'master' into dependabot/github_actions/actions/checkout-5
+* Merge branch 'master' into dependabot/github_actions/actions/checkout-5
+* Contributors: Kotaro Yoshimoto, Taiga
+
 18.3.1 (2025-11-04)
 -------------------
 * Merge branch 'master' into fix/improve-docs
