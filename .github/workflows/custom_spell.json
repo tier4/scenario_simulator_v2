@@ -51,5 +51,11 @@
     "Parapura",
     "libagnocast",
     "agnocast"
+  ],
+  "overrides": [
+    {
+      "filename": "**/*.md",
+      "ignoreRegExpList": ["| GPU  Name.+$"]
+    }
   ]
 }
