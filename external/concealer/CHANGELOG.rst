@@ -24,6 +24,51 @@ Changelog for package concealer
 16.4.2 (2025-05-23)
 -------------------
 
+18.3.1 (2025-11-04)
+-------------------
+* Merge branch 'master' into fix/improve-docs
+* Merge branch 'master' into fix/improve-docs
+* Contributors: Kotaro Yoshimoto, ぐるぐる
+
+18.3.0 (2025-11-04)
+-------------------
+* Merge branch 'master' into feature/lidar_noise_v1
+* Merge branch 'master' into feature/lidar_noise_v1
+* Merge branch 'master' into feature/lidar_noise_v1
+* Contributors: Kotaro Yoshimoto
+
+18.2.1 (2025-11-04)
+-------------------
+
+18.2.0 (2025-11-04)
+-------------------
+* Merge pull request `#1726 <https://github.com/tier4/scenario_simulator_v2/issues/1726>`_ from tier4/feature/publisher-noise-velocity-report
+* Merge branch 'master' into feature/publisher-noise-velocity-report
+* Add NormalDistribution tests for VelocityReport message type
+* Add normal distribution noise for VelocityReport and use it
+* Revert Publisher::operator() to non-const and Publisher::randomize to non-mutable
+* Remove const from NormalDistribution members
+* Rename NormalDistributionBase to RandomNumberEngine
+* Use std::is_floating_point
+* Utilize references in Odometry normal distribution
+* Implement NormalDistributionBase
+* Move NormalDistrubution::Error to a standalone struct NormalDistributionError and make it a template to accept multiple floating point types
+* Contributors: Kotaro Yoshimoto, Mateusz Palczuk
+
+18.1.1 (2025-10-31)
+-------------------
+
+18.1.0 (2025-10-27)
+-------------------
+* Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
+* Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
+* Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
+* Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
+* Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
+* Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
+* Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
+* Contributors: Kotaro Yoshimoto, Taiga
+
 18.0.10 (2025-10-23)
 --------------------
 

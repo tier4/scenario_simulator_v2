@@ -5,9 +5,9 @@ This document provides instructions for users on how to visualize the internal i
 ## Table of Contents
 
 - [**Visualizing the Internal Information of the Simulator**](#visualizing-the-internal-information-of-the-simulator)
-  - [Table of Contents](#table-of-contents)
-  - [**Visualizing Entity Information**](#visualizing-entity-information)
-  - [**Visualizing the Status of ConditionGroups**](#visualizing-the-status-of-conditiongroups)
+    - [Table of Contents](#table-of-contents)
+    - [**Visualizing Entity Information**](#visualizing-entity-information)
+    - [**Visualizing the Status of ConditionGroups**](#visualizing-the-status-of-conditiongroups)
 
 ## **Visualizing Entity Information**
 
@@ -48,8 +48,8 @@ Each condition is described using three elements:
 - **Current Value**: The fulfillment status of the condition expressed in true/false
 - **Type**: Types of conditions, such as `ReachPositionCondition`, `CollisionCondition`, etc.
 
-To visualize the achievement status, check the `ConditionGroup` checkbox as demonstrated in the image below. 
-![condition group visualization](../image/condition_group.png "condition group visualization")") 
+To visualize the achievement status, check the `ConditionGroup` checkbox as demonstrated in the image below.
+![condition group visualization](../image/condition_group.png "condition group visualization")")
 
 If an `Event name` is defined in the `ConditionGroup`, that name will be reflected. If left blank, names like `ConditionGroup1`, `ConditionGroup2`, `ConditionGroup3`, etc. are automatically assigned. However, this information alone doesn't clarify if each `ConditionGroup` is linked to success or failure conditions. Therefore, when visualizing with rviz and you want this information to be apparent, we recommend explicitly defining the `Event name` as `SuccessCondition` or similar when creating the scenario file.
 
