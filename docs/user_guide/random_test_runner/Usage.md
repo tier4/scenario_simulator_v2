@@ -3,45 +3,44 @@
 - Full and partial randomization of the Ego goal position for multiple test cases.
 
 - NPCs customization:
-  - number of NPCs
-  - distance from the Ego
-  - velocities of NPC vehicles in the simulation.
+    - number of NPCs
+    - distance from the Ego
+    - velocities of NPC vehicles in the simulation.
 
 - Simulation related errors reporting:
-  - Ego being found stuck in one place for too long.
-  - Ego failing to reach the goal in a specified time.
-  - Collision between Ego and NPC.
+    - Ego being found stuck in one place for too long.
+    - Ego failing to reach the goal in a specified time.
+    - Collision between Ego and NPC.
 
 - Ego vehicle capabilities:
-  - Goal following
-  - Lane changing
-  - Stopping precisely on a designated line
-  - Yield at intersections
+    - Goal following
+    - Lane changing
+    - Stopping precisely on a designated line
+    - Yield at intersections
 
 - NPCs possible actions:
-  - Following the line.
-  - Following another entity.
+    - Following the line.
+    - Following another entity.
 
 # Limitations
 
 - Random test runner does not support traffic lights signalization.
 
 - NPCs actions:
-  - NPCs are not stopping to avoid collision when they are not following the colliding entity (eg. on the intersections).
-  - NPCs are not able to yield at the intersection.
-
+    - NPCs are not stopping to avoid collision when they are not following the colliding entity (eg. on the intersections).
+    - NPCs are not able to yield at the intersection.
 
 # Troubleshooting
 
 There are two known issues which block random test runner from initializing the test if either initial position or goal pose exceeds the drivable area.
 
-- If the initial position exceeds the drivable are: 
+- If the initial position exceeds the drivable are:
 
 Autoware will be launched, but the ego vehicle will not move, waiting for Autoware to change its state to WaitingForEngage. After a timeout the test will terminate and the runner will continue with the next test.
 
 After the test suite is completed, the `AutowareError` connected with the failed test will be logged to the `result.junit.xml` with the message: `Simulator waited for the Autoware state to transition to WaitingForEngage, but time is up. The current Autoware state is EMERGENCY.`
 
-- If the generated goal pose exceeds the drivable ares: 
+- If the generated goal pose exceeds the drivable ares:
 
 The test will be immediately stopped after launching the Autoware and similarly as in the first case the error will be logged and the runner will continue with the next test.
 
@@ -49,11 +48,12 @@ After the test suite is completed, the `scenario_simulator_error` connected with
 
 # Launch arguments
 
-This section describes arguments of the random test runner. All of them can be specified via command line, otherwise default value specified in the launch file is used. 
+This section describes arguments of the random test runner. All of them can be specified via command line, otherwise default value specified in the launch file is used.
 
 Parameters listed in [Node parameters](#node-parameters) section can be also specified in a yaml file which should be located in `<random_test_runner_directory>/param/`.
 
 Parameters have the following source precedence priorities:
+
 1. `*.yaml` file (applicable only for [Node parameters](#node-parameters))
 2. Command line
 3. Default values
@@ -77,10 +77,9 @@ and sensor model is used in the simulation
 | `sensor_model`      | `"sample_sensor_kit"`                   | Ego sensor model.                                                          |
 | `vehicle_model`     | `"sample_vehicle"`                     | Ego vehicle model.                                                         |
 
-
 ## Node parameters
 
-Random testing supports several parameters to control test execution. They can be supplied either directly from command 
+Random testing supports several parameters to control test execution. They can be supplied either directly from command
 line or via `*.yaml` file inside `<random_test_runner_directory>/param/`. Example of the yaml file specifying parameters can be found [here](#example-parameters-yaml-file).
 
 ### Parameters reference
@@ -121,6 +120,7 @@ Core test parameters. It sets map name, ego goal information and npc spawning pa
 | `npc_max_speed`                           | `3.0`               | Maximum speed of generated npcs                                                                                                                                           |
 | `npc_min_spawn_distance_from_ego`         | `10.0`              | Minimum distance of generated npcs from ego                                                                                                                               |
 | `npc_max_spawn_distance_from_ego`         | `100.0`             | Maximum distance of generated npcs from ego                                                                                                                               |
+
 #### Map package
 
 Package containing map information. This package needs to be built in the Autoware workspace. Package example can be found [here](https://github.com/tier4/AWSIM/releases/download/v1.2.0/shinjuku_map.zip).
@@ -128,17 +128,18 @@ Package containing map information. This package needs to be built in the Autowa
 The structure of the package needs to be as follows:
 
 - The root package directory, which contains:
-  - `package.xml` file
-  - `CMakeList.txt` file
-  - map directory, which contains:
-    - `.osm` file
-    - `.pcd` file
+    - `package.xml` file
+    - `CMakeList.txt` file
+    - map directory, which contains:
+        - `.osm` file
+        - `.pcd` file
 
 #### Lanelets positioning
 
 Lanelet position used to represent the ego goal includes two coordinate:
-  - the ID of the lanelet on which the target is located,
-  - the translation along the lanelet.
+
+- the ID of the lanelet on which the target is located,
+- the translation along the lanelet.
 
 On the example below two connected lanelets with IDs 101 and 100 are presented. The translation s is the distance between lanelet's beginning and the vehicle's rear axle position.
 
@@ -153,7 +154,8 @@ Test case parameters. Currently, only randomization seed.
 | `seed`          |   `-1`        | Randomization seed. If `-1`, seed will be generated for each test |
 
 ### Example parameters yaml file
-```
+
+```yaml
 /**:
   ros__parameters:
     # control parameters
@@ -175,7 +177,8 @@ After the test suite execution two files can be found in the specified output fo
 
 Stores parameters used to generate the test suite. This file might be used to rerun the tests as described in [Replay](QuickStart.md#how-to-replay).
 
-### Example `result.yaml`:
+### Example `result.yaml`
+
 ```yaml
 random_test:
   name: video_test
@@ -204,18 +207,19 @@ The file contains information about errors which occurred during test cases whic
 If the execution of the test finished with an error the stored information contains type of the error and the message describing the error.
 
 There are 3 types of error reported, related directly to the simulation, which are:
+
 1. `Stand still error` - reported when ego is found stuck in one place for too long.
 2. `Timeout error` - reported when ego fails to reach the goal in a specified time.
 3. `Collision error` - reported when collision between ego and npc appears,
 4. Exceptions caught during the runtime which includes:
-    - `AutowareError`, 
+    - `AutowareError`,
     - `scenario_simulator_exception`,
     - `std::runtime_error`.
 
-
 If any other error occurs during the random test runner execution, it will be stored along with the information that the `Unknown Error` has occurred.
 
-### Example `result.junit.xml`:
+### Example `result.junit.xml`
+
 ```xml
 <?xml version="1.0"?>
 <testsuites failures="0" errors="6" tests="5">

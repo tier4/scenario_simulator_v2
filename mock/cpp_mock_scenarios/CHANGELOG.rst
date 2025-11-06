@@ -24,6 +24,41 @@ Changelog for package cpp_mock_scenarios
 16.4.2 (2025-05-23)
 -------------------
 
+18.3.1 (2025-11-04)
+-------------------
+* Merge branch 'master' into fix/improve-docs
+* Merge branch 'master' into fix/improve-docs
+* Contributors: Kotaro Yoshimoto, ぐるぐる
+
+18.3.0 (2025-11-04)
+-------------------
+* Merge branch 'master' into feature/lidar_noise_v1
+* Merge branch 'master' into feature/lidar_noise_v1
+* Merge branch 'master' into feature/lidar_noise_v1
+* Contributors: Kotaro Yoshimoto
+
+18.2.1 (2025-11-04)
+-------------------
+
+18.2.0 (2025-11-04)
+-------------------
+* Merge branch 'master' into feature/publisher-noise-velocity-report
+* Contributors: Kotaro Yoshimoto
+
+18.1.1 (2025-10-31)
+-------------------
+
+18.1.0 (2025-10-27)
+-------------------
+* Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
+* Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
+* Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
+* Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
+* Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
+* Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
+* Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
+* Contributors: Kotaro Yoshimoto, Taiga
+
 18.0.10 (2025-10-23)
 --------------------
 
