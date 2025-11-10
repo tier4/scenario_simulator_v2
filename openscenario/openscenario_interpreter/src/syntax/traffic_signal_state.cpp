@@ -43,14 +43,20 @@ TrafficSignalState::TrafficSignalState(const pugi::xml_node & node, Scope & scop
 {
 }
 
-auto TrafficSignalState::evaluate() const -> Object
+auto TrafficSignalState::evaluate(bool overwrite) const -> Object
 {
   switch (trafficSignalType()) {
     case TrafficSignalType::conventional:
-      setConventionalTrafficLightsState(id(), state);
+      if (overwrite) {
+        clearConventionalTrafficLightsState(id());
+      }
+      addConventionalTrafficLightsState(id(), state);
       break;
     case TrafficSignalType::v2i:
-      setV2ITrafficLightsState(id(), state);
+      if (overwrite) {
+        clearV2ITrafficLightsState(id());
+      }
+      addV2ITrafficLightsState(id(), state);
       break;
     default:
       throw Error("Unknown traffic signal type has set to TrafficSignalState");

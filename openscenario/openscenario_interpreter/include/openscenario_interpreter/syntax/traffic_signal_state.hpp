@@ -58,7 +58,9 @@ struct TrafficSignalState : private SimulatorCore::NonStandardOperation
 
   explicit TrafficSignalState(const pugi::xml_node &, Scope &);
 
-  auto evaluate() const -> Object;
+  // NOTE: If overwrite is false, it will keep the states already added
+  //       and simply add the specified state.
+  auto evaluate(bool overwrite = true) const -> Object;
 
   struct TrafficSignalType
   {
