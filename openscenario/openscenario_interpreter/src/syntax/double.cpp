@@ -87,7 +87,8 @@ auto operator>>(std::istream & is, Double & datum) -> std::istream &
   std::smatch result;
 
   if (std::regex_match(token, result, infinity)) {
-    datum.data = (result.str(1) == "-" ? -1 : 1) * std::numeric_limits<Double::value_type>::max();
+    datum.data =
+      (result.str(1) == "-" ? -1 : 1) * std::numeric_limits<Double::value_type>::infinity();
   } else {
     datum.data = boost::lexical_cast<Double::value_type>(token);
   }

@@ -95,7 +95,7 @@ auto TrafficSignalController::currentPhaseSince() const -> double
 auto TrafficSignalController::cycleTime() const -> double
 {
   return std::accumulate(
-    std::cbegin(phases), std::cend(phases), 0,
+    std::cbegin(phases), std::cend(phases), 0.0,
     [](const auto & sum, const auto & phase) { return sum + phase.duration; });
 }
 
