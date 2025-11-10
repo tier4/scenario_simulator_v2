@@ -128,36 +128,33 @@ auto TrafficSignalController::updatePredictions() -> void
     std::unordered_map<lanelet::Id, std::vector<std::pair<double, std::string>>> predictions_by_id;
 
     auto extract_prediction = [&](const auto & phase, const double phase_time_seconds) -> bool {
-      if (std::isinf(accumulated_time) or std::isinf(phase_time_seconds)) {
-        return false;
-      } else {
-        bool is_added = false;
-        for (const auto & traffic_signal_state : (*phase).traffic_signal_states) {
-          if (
-            traffic_signal_state.trafficSignalType() ==
-            TrafficSignalState::TrafficSignalType::v2i) {
-            is_added = true;
-            predictions_by_id[traffic_signal_state.id()].emplace_back(
-              accumulated_time, traffic_signal_state.state);
-          }
+      bool is_added = false;
+      for (const auto & traffic_signal_state : (*phase).traffic_signal_states) {
+        if (
+          traffic_signal_state.trafficSignalType() == TrafficSignalState::TrafficSignalType::v2i) {
+          is_added = true;
+          predictions_by_id[traffic_signal_state.id()].emplace_back(
+            accumulated_time, traffic_signal_state.state);
         }
-        if (not is_added) {
-          // if not extract prediction from V2I traffic light, try extraction from conventional traffic light
-          for (const auto & traffic_signal_state : (*phase).traffic_signal_states) {
-            is_added = true;
-            predictions_by_id[traffic_signal_state.id()].emplace_back(
-              accumulated_time, traffic_signal_state.state);
-          }
-        }
-        accumulated_time += phase_time_seconds;
-        return is_added;
       }
+      if (not is_added) {
+        // if not extract prediction from V2I traffic light, try extraction from conventional traffic light
+        for (const auto & traffic_signal_state : (*phase).traffic_signal_states) {
+          is_added = true;
+          predictions_by_id[traffic_signal_state.id()].emplace_back(
+            accumulated_time, traffic_signal_state.state);
+        }
+      }
+      accumulated_time += phase_time_seconds;
+      return is_added;
     };
 
     while (extracted_phases_number < OUTPUT_PREDICTION_SIZE) {
       ++phase_iterator;
-      if (extracted_phases_number == 0 && accumulated_time > cycleTime()) {
-        // avoid infinite loop when no valid traffic lights on all phases
+      if (std::isinf(accumulated_time) or std::isinf((*phase_iterator).duration)) {
+        break;
+      } else if (extracted_phases_number == 0 && accumulated_time > cycleTime()) {
+        // avoid infinite loop when no valid traffic lights on all
         break;
       } else if (extract_prediction(phase_iterator, (*phase_iterator).duration)) {
         ++extracted_phases_number;
