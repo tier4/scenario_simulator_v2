@@ -23,14 +23,24 @@ inline namespace syntax
 Phase::Phase(const pugi::xml_node & node, Scope & scope)
 : name(readAttribute<String>("name", node, scope)),
   duration(readAttribute<Double>("duration", node, scope, Double::infinity())),
-  traffic_signal_states(readElements<TrafficSignalState, 0>("TrafficSignalState", node, scope))
+  traffic_signal_states(readElements<TrafficSignalState, 0>("TrafficSignalState", node, scope)),
+  grouped_states([this]() {
+    std::map<lanelet::Id, std::vector<const TrafficSignalState *>> groups;
+    for (const auto & traffic_signal_state : traffic_signal_states) {
+      groups[traffic_signal_state.id()].push_back(&traffic_signal_state);
+    }
+    return groups;
+  }())
 {
 }
 
 auto Phase::evaluate() const -> Object
 {
-  for (auto && traffic_signal_state : traffic_signal_states) {
-    traffic_signal_state.evaluate();
+  for (auto && [id, states] : grouped_states) {
+    for (size_t i = 0; i < states.size(); ++i) {
+      const bool overwrite = i == 0;  // clear state on first call
+      states[i]->evaluate(overwrite);
+    }
   }
 
   return unspecified;
