@@ -93,6 +93,7 @@ def launch_setup(context, *args, **kwargs):
     port                                        = LaunchConfiguration("port",                                        default=5555)
     publish_empty_context                       = LaunchConfiguration("publish_empty_context",                       default=False)
     record                                      = LaunchConfiguration("record",                                      default=True)
+    record_config_file                          = LaunchConfiguration("record_config_file",                          default="")
     record_option                               = LaunchConfiguration("record_option",                               default="")
     record_storage_id                           = LaunchConfiguration("record_storage_id",                           default="")
     rviz_config                                 = LaunchConfiguration("rviz_config",                                 default=default_rviz_config_file())
@@ -130,6 +131,7 @@ def launch_setup(context, *args, **kwargs):
     print(f"port                                        := {port.perform(context)}")
     print(f"publish_empty_context                       := {publish_empty_context.perform(context)}")
     print(f"record                                      := {record.perform(context)}")
+    print(f"record_config_file                          := {record_config_file.perform(context)}")
     print(f"record_option                               := {record_option.perform(context)}")
     print(f"record_storage_id                           := {record_storage_id.perform(context)}")
     print(f"rviz_config                                 := {rviz_config.perform(context)}")
@@ -165,6 +167,7 @@ def launch_setup(context, *args, **kwargs):
             {"port": port},
             {"publish_empty_context" : publish_empty_context},
             {"record": record},
+            {"record_config_file": record_config_file},
             {"record_option": record_option},
             {"record_storage_id": record_storage_id},
             {"rviz_config": rviz_config},
@@ -237,6 +240,7 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("parameter_file_path",                         default_value=parameter_file_path                        ),
         DeclareLaunchArgument("pedestrian_ignore_see_around",                default_value=pedestrian_ignore_see_around               ),
         DeclareLaunchArgument("publish_empty_context",                       default_value=publish_empty_context                      ),
+        DeclareLaunchArgument("record_config_file",                          default_value=record_config_file                         ),
         DeclareLaunchArgument("record_option",                               default_value=record_option                              ),
         DeclareLaunchArgument("rviz_config",                                 default_value=rviz_config                                ),
         DeclareLaunchArgument("scenario",                                    default_value=scenario                                   ),

@@ -77,6 +77,8 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode,
 
   bool record;
 
+  String record_config_file;
+
   String record_option;
 
   String record_storage_id;
