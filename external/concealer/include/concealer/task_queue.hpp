@@ -28,15 +28,15 @@ class TaskQueue
 {
   using Thunk = std::function<void()>;
 
-  std::queue<Thunk> thunks;
+  std::atomic<bool> finalized;
 
   mutable std::mutex thunks_mutex;
 
-  std::thread dispatcher;
-
-  std::atomic<bool> finalized = false;
+  std::queue<Thunk> thunks;
 
   std::exception_ptr thrown;
+
+  std::thread dispatcher;
 
   auto front() const -> Thunk;
 
