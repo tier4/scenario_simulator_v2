@@ -113,6 +113,15 @@ auto FollowTrajectoryAction::start() -> void
         : evaluateSimulationTime();
     parameter->closed = trajectory_ref.trajectory.as<Trajectory>().closed;
     parameter->shape = repack_trajectory();
+    parameter->follow_backwards = [this]() {
+      const auto & declarations = trajectory_ref.trajectory.as<Trajectory>().parameter_declarations;
+      if (auto it = std::find_if(declarations.begin(), declarations.end(),
+                                  [](const auto & p) { return p.name == "follow_backwards"; });
+          it != declarations.end()) {
+        return it->evaluate().as<Boolean>().data;
+      }
+      return false;
+    }();
 
     actor.apply([&](const auto & object) { applyFollowTrajectoryAction(object, parameter); });
   }
