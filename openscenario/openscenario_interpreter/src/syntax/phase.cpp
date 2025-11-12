@@ -38,8 +38,7 @@ auto Phase::evaluate() const -> Object
 {
   for (auto && [id, states] : grouped_states) {
     for (size_t i = 0; i < states.size(); ++i) {
-      const bool overwrite = i == 0;  // clear state on first call
-      states[i]->evaluate(overwrite);
+      states[i]->evaluate();
     }
   }
 

@@ -43,19 +43,13 @@ TrafficSignalState::TrafficSignalState(const pugi::xml_node & node, Scope & scop
 {
 }
 
-auto TrafficSignalState::evaluate(bool overwrite) const -> Object
+auto TrafficSignalState::evaluate() const -> Object
 {
   switch (trafficSignalType()) {
     case TrafficSignalType::conventional:
-      if (overwrite) {
-        clearConventionalTrafficLightsState(id());
-      }
       addConventionalTrafficLightsState(id(), state);
       break;
     case TrafficSignalType::v2i:
-      if (overwrite) {
-        clearV2ITrafficLightsState(id());
-      }
       addV2ITrafficLightsState(id(), state);
       break;
     default:
