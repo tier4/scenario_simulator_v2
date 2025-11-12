@@ -571,7 +571,8 @@ auto makeUpdatedStatus(
       } else {
         /// @note If it is an intermediate waypoint with an unspecified time, the accuracy of the arrival is
         /// irrelevant
-        if (auto this_step_distance = std::abs((speed + desired_acceleration * step_time) * step_time);
+        if (auto this_step_distance =
+              std::abs((speed + desired_acceleration * step_time) * step_time);
             this_step_distance > distance_to_front_waypoint) {
           return discard_the_front_waypoint_and_recurse();
         }
@@ -615,8 +616,10 @@ auto makeUpdatedStatus(
       } else {
         /// @note set the orientation in the direction of desired_velocity vector
         /// @note if driving backwards, reverse the orientation around z-axis
-        if (const auto orientation_from_velocity = convertDirectionToQuaternion(desired_velocity); polyline_trajectory.follow_backwards) {
-          const auto reverse_orientation_z = geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0.0).y(0.0).z(1.0).w(0.0);
+        if (const auto orientation_from_velocity = convertDirectionToQuaternion(desired_velocity);
+            polyline_trajectory.follow_backwards) {
+          const auto reverse_orientation_z =
+            geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0.0).y(0.0).z(1.0).w(0.0);
           return reverse_orientation_z * orientation_from_velocity;
         } else {
           return orientation_from_velocity;
@@ -643,7 +646,8 @@ auto makeUpdatedStatus(
       }
     }
 
-    updated_status.action_status.twist.linear.x = norm(desired_velocity) * (polyline_trajectory.follow_backwards ? -1.0 : 1.0);
+    updated_status.action_status.twist.linear.x =
+      norm(desired_velocity) * (polyline_trajectory.follow_backwards ? -1.0 : 1.0);
 
     updated_status.action_status.twist.linear.y = 0;
 
