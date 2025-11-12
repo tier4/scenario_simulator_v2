@@ -30,6 +30,16 @@ Changelog for package junit_exporter
 * Merge branch 'master' into dependabot/github_actions/actions/checkout-5
 * Contributors: Kotaro Yoshimoto, Taiga
 
+18.3.3 (2025-11-07)
+-------------------
+* Merge branch 'master' into dependabot/github_actions/actions/github-script-8
+* Bump version of scenario_simulator_v2 from version 18.3.1 to version 18.3.2
+* Merge branch 'master' into dependabot/github_actions/actions/github-script-8
+* Merge branch 'master' into dependabot/github_actions/actions/checkout-5
+* Merge branch 'master' into dependabot/github_actions/actions/github-script-8
+* Merge branch 'master' into dependabot/github_actions/actions/checkout-5
+* Contributors: Kotaro Yoshimoto, Taiga
+
 18.3.1 (2025-11-04)
 -------------------
 * Merge branch 'master' into fix/improve-docs
