@@ -645,6 +645,7 @@ auto toProtobufMessage(const traffic_simulator_msgs::msg::PolylineTrajectory & m
   proto.set_base_time(message.base_time);
   proto.set_closed(message.closed);
   *proto.mutable_shape() = toProtobufMessage(message.shape);
+  proto.set_follow_backwards(message.follow_backwards);
   return proto;
 }
 
@@ -657,6 +658,7 @@ auto toROS2Message(const traffic_simulator_msgs::PolylineTrajectory & proto)
   message.base_time = proto.base_time();
   message.closed = proto.closed();
   message.shape = toROS2Message(proto.shape());
+  message.follow_backwards = proto.follow_backwards();
   return message;
 }
 }  // namespace simulation_interface

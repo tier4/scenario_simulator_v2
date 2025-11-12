@@ -3,3 +3,4 @@ bool dynamic_constraints_ignorable
 float64 base_time
 bool closed
 traffic_simulator_msgs/Polyline shape
+bool follow_backwards

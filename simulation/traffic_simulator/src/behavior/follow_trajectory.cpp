@@ -429,10 +429,12 @@ auto makeUpdatedStatus(
                    -math::geometry::convertQuaternionToEulerAngle(entity_status.pose.orientation).y;
                  const auto yaw =
                    math::geometry::convertQuaternionToEulerAngle(entity_status.pose.orientation).z;
+                 const auto speed_with_direction =
+                   polyline_trajectory.follow_backwards ? -speed : speed;
                  return geometry_msgs::build<geometry_msgs::msg::Vector3>()
-                   .x(std::cos(pitch) * std::cos(yaw) * speed)
-                   .y(std::cos(pitch) * std::sin(yaw) * speed)
-                   .z(std::sin(pitch) * speed);
+                   .x(std::cos(pitch) * std::cos(yaw) * speed_with_direction)
+                   .y(std::cos(pitch) * std::sin(yaw) * speed_with_direction)
+                   .z(std::sin(pitch) * speed_with_direction);
                }();
              (speed * step_time) > distance_to_front_waypoint &&
              innerProduct(desired_velocity, current_velocity) < 0.0) {
@@ -584,11 +586,17 @@ auto makeUpdatedStatus(
 
     updated_status.pose.orientation = [&]() {
       if (desired_velocity.y == 0 && desired_velocity.x == 0 && desired_velocity.z == 0) {
-        /// @note Do not change orientation if there is no designed_velocity vector
+        /// @note do not change orientation if there is no designed_velocity vector
         return entity_status.pose.orientation;
       } else {
-        /// @note if there is a designed_velocity vector, set the orientation in the direction of it
-        return math::geometry::convertDirectionToQuaternion(desired_velocity);
+        /// @note set the orientation in the direction of desired_velocity vector
+        /// @note if driving backwards, reverse the orientation around z-axis
+        if (const auto orientation_from_velocity = convertDirectionToQuaternion(desired_velocity); polyline_trajectory.follow_backwards) {
+          const auto reverse_orientation_z = geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0.0).y(0.0).z(1.0).w(0.0);
+          return reverse_orientation_z * orientation_from_velocity;
+        } else {
+          return orientation_from_velocity;
+        }
       }
     }();
 
