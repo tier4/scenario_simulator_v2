@@ -53,7 +53,6 @@ public:
     -> double;
   auto getDistanceToFrontEntity(const math::geometry::CatmullRomSplineInterface & spline) const
     -> std::optional<double>;
-  auto isNeedToRightOfWay(const lanelet::Ids & following_lanelets) const -> bool;
   auto getFrontEntityNameAndDistanceByTrajectory(
     const std::vector<geometry_msgs::msg::Point> & waypoints, const double width,
     const std::size_t num_segments) const -> std::optional<std::pair<std::string, double>>;

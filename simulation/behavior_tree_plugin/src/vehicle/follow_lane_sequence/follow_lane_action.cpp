@@ -20,6 +20,7 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <traffic_simulator/helper/stop_watch.hpp>
+#include <traffic_simulator/utils/route.hpp>
 #include <vector>
 
 namespace entity_behavior
@@ -97,7 +98,8 @@ BT::NodeStatus FollowLaneAction::doAction()
     return BT::NodeStatus::FAILURE;
   }
   if (behavior_parameter_.see_around) {
-    if (isNeedToRightOfWay(route_lanelets_)) {
+    if (traffic_simulator::route::isNeedToRightOfWay(
+          route_lanelets_, getOtherEntitiesCanonicalizedLaneletPoses())) {
       return BT::NodeStatus::FAILURE;
     }
     if (trajectory == nullptr) {
@@ -157,7 +159,7 @@ BT::NodeStatus FollowLaneAction::doAction()
     }
   }
   if (!target_speed_) {
-    target_speed_ = hdmap_utils_->getSpeedLimit(route_lanelets_);
+    target_speed_ = traffic_simulator::route::speedLimit(route_lanelets_);
   }
   setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(target_speed_.value()));
   setOutput("waypoints", waypoints);
