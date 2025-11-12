@@ -177,8 +177,7 @@ auto makeUpdatedStatus(
     -> traffic_simulator_msgs::msg::EntityStatus {
     auto updated_status = entity_status;
 
-    const auto current_velocity = scalarToDirectionVector(
-      entity_status.action_status.twist.linear.x * (polyline_trajectory.follow_backwards ? -1.0 : 1.0), entity_status.pose.orientation);
+    const auto current_velocity = scalarToDirectionVector(entity_status.action_status.twist.linear.x, entity_status.pose.orientation);
 
     updated_status.pose.position += (current_velocity + desired_velocity) * 0.5 * step_time;
 
@@ -218,7 +217,7 @@ auto makeUpdatedStatus(
       }
     }
 
-    updated_status.action_status.twist.linear.x = norm(desired_velocity);
+    updated_status.action_status.twist.linear.x = norm(desired_velocity) * (polyline_trajectory.follow_backwards ? -1.0 : 1.0);
     updated_status.action_status.twist.linear.y = 0;
     updated_status.action_status.twist.linear.z = 0;
 
@@ -247,15 +246,14 @@ auto makeUpdatedStatus(
              FollowWaypointController::local_epsilon;
   };
 
-  const auto constrained_brake_velocity = [step_time, &polyline_trajectory, &behavior_parameter](
+  const auto constrained_brake_velocity = [&behavior_parameter, step_time](
                                             const double speed, const auto & orientation) {
     const auto controller = FollowWaypointController(behavior_parameter, step_time, true, 0.0);
     const auto deceleration = std::max(
       controller.accelerationWithJerkConstraint(
         speed, 0.0, behavior_parameter.dynamic_constraints.max_deceleration_rate),
       -behavior_parameter.dynamic_constraints.max_deceleration);
-    const auto brake_speed = speed + deceleration * step_time;
-    return scalarToDirectionVector(brake_speed * (polyline_trajectory.follow_backwards ? -1.0 : 1.0), orientation);
+    return scalarToDirectionVector(speed + deceleration * step_time, orientation);
   };
 
   const auto is_desired_velocity_opposite =
@@ -271,7 +269,7 @@ auto makeUpdatedStatus(
     };
 
   const auto is_waypoint_overshot_and_can_be_discarded =
-    [&is_desired_velocity_opposite, &entity_status, &polyline_trajectory](
+    [&is_desired_velocity_opposite, &entity_status](
       const double distance_to_front_waypoint, const auto & desired_velocity,
       const double desired_acceleration) -> bool {
     /*
@@ -281,14 +279,14 @@ auto makeUpdatedStatus(
        (2) desired velocity direction is reversed relative to current velocity (passed the waypoint)
     */
     const auto speed = entity_status.action_status.twist.linear.x;
-    const auto current_velocity = scalarToDirectionVector(speed * (polyline_trajectory.follow_backwards ? -1.0 : 1.0), entity_status.pose.orientation);
+    const auto current_velocity = scalarToDirectionVector(speed, entity_status.pose.orientation);
     return distance_to_front_waypoint <= FollowWaypointController::acceptable_overshoot_distance &&
-           ((speed <= 0.0 && desired_acceleration < -std::numeric_limits<double>::epsilon()) ||
+           ((std::abs(speed) < std::numeric_limits<double>::epsilon() && desired_acceleration < -std::numeric_limits<double>::epsilon()) ||
             is_desired_velocity_opposite(desired_velocity, current_velocity));
   };
 
   const auto is_waypoint_overshot_and_cannot_be_discarded =
-    [step_time, &is_desired_velocity_opposite, &entity_status, &polyline_trajectory, &behavior_parameter](
+    [step_time, &is_desired_velocity_opposite, &entity_status, &behavior_parameter](
       const double distance_to_front_waypoint, const auto & desired_velocity,
       const double desired_acceleration) -> bool {
     /*
@@ -305,13 +303,13 @@ auto makeUpdatedStatus(
        to not be considered overshot.
     */
     const auto speed = entity_status.action_status.twist.linear.x;
-    const auto current_velocity = scalarToDirectionVector(speed * (polyline_trajectory.follow_backwards ? -1.0 : 1.0), entity_status.pose.orientation);
+    const auto current_velocity = scalarToDirectionVector(speed, entity_status.pose.orientation);
     const auto max_distance_for_overshoot_detection =
       behavior_parameter.dynamic_constraints.max_speed * step_time +
       0.5 * behavior_parameter.dynamic_constraints.max_acceleration * step_time * step_time;
     return distance_to_front_waypoint > FollowWaypointController::acceptable_overshoot_distance &&
            distance_to_front_waypoint < max_distance_for_overshoot_detection &&
-           ((speed <= 0.0 && desired_acceleration < -std::numeric_limits<double>::epsilon()) ||
+           ((std::abs(speed) < std::numeric_limits<double>::epsilon() && desired_acceleration < -std::numeric_limits<double>::epsilon()) ||
             is_desired_velocity_opposite(desired_velocity, current_velocity));
   };
 
@@ -510,8 +508,41 @@ auto makeUpdatedStatus(
     */
     const auto desired_acceleration = [&]() -> double {
       try {
-        return follow_waypoint_controller.getAcceleration(
-          remaining_time, distance, entity_status, update_entity_status, distance_along_lanelet);
+        /*
+           WORKAROUND: Adapting FollowWaypointController for backward motion
+
+           FollowWaypointController was designed to handle only forward motion and expects
+           twist.linear.x >= 0. The makeUpdatedStatus function now supports backward motion
+           (when follow_backwards is true, twist.linear.x < 0), but FollowWaypointController
+           does not yet support negative speeds natively.
+
+           To obtain correct acceleration values from the controller while moving backwards:
+           1. Transform input: Negate speed and acceleration to make them positive (reflect to
+              forward motion domain where the controller operates correctly)
+           2. Controller computes: The controller calculates physically correct acceleration
+              magnitude based on distance, time constraints, and dynamic limits
+           3. Transform output: Negate the acceleration back to restore backward motion semantics
+
+           This approach ensures the controller's kinematic calculations (distance, velocity,
+           acceleration relationships) remain valid while working in its expected input domain.
+           The direction sign is consistently applied to both input and output, preserving
+           physical correctness.
+
+           TODO: Update FollowWaypointController to natively support negative speeds and remove
+           this workaround.
+        */
+        const double direction_sign = polyline_trajectory.follow_backwards ? -1.0 : 1.0;
+
+        auto entity_status_for_controller = entity_status;
+        entity_status_for_controller.action_status.twist.linear.x =
+          entity_status.action_status.twist.linear.x * direction_sign;
+        entity_status_for_controller.action_status.accel.linear.x =
+          entity_status.action_status.accel.linear.x * direction_sign;
+
+        const auto acceleration_from_controller = follow_waypoint_controller.getAcceleration(
+          remaining_time, distance, entity_status_for_controller, update_entity_status, distance_along_lanelet);
+
+        return acceleration_from_controller * direction_sign;
       } catch (const ControllerError & e) {
         throw common::Error(
           "Vehicle ", std::quoted(entity_status.name),
@@ -551,10 +582,11 @@ auto makeUpdatedStatus(
                             .y
                        : std::atan2(target_position.z - position.z, std::hypot(dy, dx));
                    const auto yaw = std::atan2(dy, dx);  // Use yaw on target
+                   const auto absolute_desired_speed = std::abs(desired_speed);
                    return geometry_msgs::build<geometry_msgs::msg::Vector3>()
-                     .x(std::cos(pitch) * std::cos(yaw) * desired_speed)
-                     .y(std::cos(pitch) * std::sin(yaw) * desired_speed)
-                     .z(std::sin(pitch) * desired_speed);
+                     .x(std::cos(pitch) * std::cos(yaw) * absolute_desired_speed)
+                     .y(std::cos(pitch) * std::sin(yaw) * absolute_desired_speed)
+                     .z(std::sin(pitch) * absolute_desired_speed);
                  } else {
                    /*
                       Note: The vector returned if
@@ -604,7 +636,7 @@ auto makeUpdatedStatus(
     if (std::isnan(remaining_time_to_front_waypoint)) {
       /// @note if the nearest waypoint is arrived at in this step without a specific arrival time, it will
       /// be considered as achieved
-      const auto current_velocity = scalarToDirectionVector(speed * (polyline_trajectory.follow_backwards ? -1.0 : 1.0), entity_status.pose.orientation);
+      const auto current_velocity = scalarToDirectionVector(speed, entity_status.pose.orientation);
       const auto this_step_distance = norm(current_velocity + desired_velocity) * 0.5 * step_time;
       if (std::isinf(remaining_time) && polyline_trajectory.shape.vertices.size() == 1) {
         /*
