@@ -358,8 +358,33 @@ auto makeUpdatedStatus(
     */
     const auto desired_acceleration = [&]() -> double {
       try {
-        return follow_waypoint_controller.getAcceleration(
-          remaining_time, distance, acceleration, speed);
+        /*
+           WORKAROUND: Adapting FollowWaypointController for backward motion
+
+           FollowWaypointController was designed to handle only forward motion and expects
+           speed >= 0. The makeUpdatedStatus function now supports backward motion
+           (when follow_backwards is true, speed < 0), but FollowWaypointController
+           does not yet support negative speeds natively.
+
+           To obtain correct acceleration values from the controller while moving backwards:
+           1. Transform input: Negate speed and acceleration to make them positive (reflect to
+              forward motion domain where the controller operates correctly)
+           2. Controller computes: The controller calculates physically correct acceleration
+              magnitude based on distance, time constraints, and dynamic limits
+           3. Transform output: Negate the acceleration back to restore backward motion semantics
+
+           This approach ensures the controller's kinematic calculations (distance, velocity,
+           acceleration relationships) remain valid while working in its expected input domain.
+           The direction sign is consistently applied to both input and output, preserving
+           physical correctness.
+
+           TODO: Update FollowWaypointController to natively support negative speeds and remove
+           this workaround.
+        */
+        const auto direction_sign = polyline_trajectory.follow_backwards ? -1.0 : 1.0;
+        const auto acceleration_from_controller = follow_waypoint_controller.getAcceleration(
+          remaining_time, distance, acceleration * direction_sign, speed * direction_sign);
+        return acceleration_from_controller * direction_sign;
       } catch (const ControllerError & e) {
         throw common::Error(
           "Vehicle ", std::quoted(entity_status.name),
@@ -399,10 +424,11 @@ auto makeUpdatedStatus(
                             .y
                        : std::atan2(target_position.z - position.z, std::hypot(dy, dx));
                    const auto yaw = std::atan2(dy, dx);  // Use yaw on target
+                   const auto absolute_desired_speed = std::abs(desired_speed);
                    return geometry_msgs::build<geometry_msgs::msg::Vector3>()
-                     .x(std::cos(pitch) * std::cos(yaw) * desired_speed)
-                     .y(std::cos(pitch) * std::sin(yaw) * desired_speed)
-                     .z(std::sin(pitch) * desired_speed);
+                     .x(std::cos(pitch) * std::cos(yaw) * absolute_desired_speed)
+                     .y(std::cos(pitch) * std::sin(yaw) * absolute_desired_speed)
+                     .z(std::sin(pitch) * absolute_desired_speed);
                  } else {
                    /*
                       Note: The vector returned if
@@ -429,18 +455,16 @@ auto makeUpdatedStatus(
                    -math::geometry::convertQuaternionToEulerAngle(entity_status.pose.orientation).y;
                  const auto yaw =
                    math::geometry::convertQuaternionToEulerAngle(entity_status.pose.orientation).z;
-                 const auto speed_with_direction =
-                   polyline_trajectory.follow_backwards ? -speed : speed;
                  return geometry_msgs::build<geometry_msgs::msg::Vector3>()
-                   .x(std::cos(pitch) * std::cos(yaw) * speed_with_direction)
-                   .y(std::cos(pitch) * std::sin(yaw) * speed_with_direction)
-                   .z(std::sin(pitch) * speed_with_direction);
+                   .x(std::cos(pitch) * std::cos(yaw) * speed)
+                   .y(std::cos(pitch) * std::sin(yaw) * speed)
+                   .z(std::sin(pitch) * speed);
                }();
-             (speed * step_time) > distance_to_front_waypoint &&
+             std::abs(speed * step_time) > distance_to_front_waypoint &&
              innerProduct(desired_velocity, current_velocity) < 0.0) {
     return discard_the_front_waypoint_and_recurse();
   } else if (auto predicted_state_opt = follow_waypoint_controller.getPredictedWaypointArrivalState(
-               desired_acceleration, remaining_time, distance, acceleration, speed);
+               desired_acceleration, remaining_time, distance, acceleration, std::abs(speed));
              !std::isinf(remaining_time) && !predicted_state_opt.has_value()) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
@@ -547,7 +571,7 @@ auto makeUpdatedStatus(
       } else {
         /// @note If it is an intermediate waypoint with an unspecified time, the accuracy of the arrival is
         /// irrelevant
-        if (auto this_step_distance = (speed + desired_acceleration * step_time) * step_time;
+        if (auto this_step_distance = std::abs((speed + desired_acceleration * step_time) * step_time);
             this_step_distance > distance_to_front_waypoint) {
           return discard_the_front_waypoint_and_recurse();
         }
@@ -619,7 +643,7 @@ auto makeUpdatedStatus(
       }
     }
 
-    updated_status.action_status.twist.linear.x = norm(desired_velocity);
+    updated_status.action_status.twist.linear.x = norm(desired_velocity) * (polyline_trajectory.follow_backwards ? -1.0 : 1.0);
 
     updated_status.action_status.twist.linear.y = 0;
 
