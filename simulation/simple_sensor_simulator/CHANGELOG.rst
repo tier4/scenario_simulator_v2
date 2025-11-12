@@ -24,6 +24,165 @@ Changelog for package simple_sensor_simulator
 16.4.2 (2025-05-23)
 -------------------
 
+18.3.2 (2025-11-06)
+-------------------
+* Merge branch 'master' into dependabot/github_actions/actions/checkout-5
+* Merge branch 'master' into dependabot/github_actions/actions/checkout-5
+* Contributors: Kotaro Yoshimoto, Taiga
+
+18.3.3 (2025-11-07)
+-------------------
+* Merge branch 'master' into dependabot/github_actions/actions/github-script-8
+* Bump version of scenario_simulator_v2 from version 18.3.1 to version 18.3.2
+* Merge branch 'master' into dependabot/github_actions/actions/github-script-8
+* Merge branch 'master' into dependabot/github_actions/actions/checkout-5
+* Merge branch 'master' into dependabot/github_actions/actions/github-script-8
+* Merge branch 'master' into dependabot/github_actions/actions/checkout-5
+* Contributors: Kotaro Yoshimoto, Taiga
+
+18.3.1 (2025-11-04)
+-------------------
+* Merge branch 'master' into fix/improve-docs
+* Merge branch 'master' into fix/improve-docs
+* Contributors: Kotaro Yoshimoto, ぐるぐる
+
+18.3.0 (2025-11-04)
+-------------------
+* Merge pull request `#1725 <https://github.com/tier4/scenario_simulator_v2/issues/1725>`_ from tier4/feature/lidar_noise_v1
+* Merge branch 'master' into feature/lidar_noise_v1
+* Merge branch 'master' into feature/lidar_noise_v1
+* Merge branch 'master' into feature/lidar_noise_v1
+* Improve setup/teardown of LidarSensorTest
+* Fix assert in LidarNoiseModelV1
+* No noise model applied if version parameter is not declared
+* Remove unused include
+* Implement point cloud drop in LidarNoiseModelV1::applyNoise
+* Implement LidarNoiseModelV1::applyNoise except point cloud drop
+* Implement config loading part of LidarNoiseModelV1 class
+* Add noise_parameter_selector::listAvailableNoiseConfigs
+* extract get_first_matched_config_name lambda function to noise_parameter_selector::findMatchingNoiseConfigForEntity
+* extract create_selector lambda function to noise_parameter_selector::createEllipticalParameterSelector
+* Contributors: Kotaro Yoshimoto
+
+18.2.1 (2025-11-04)
+-------------------
+
+18.2.0 (2025-11-04)
+-------------------
+* Merge branch 'master' into feature/publisher-noise-velocity-report
+* Contributors: Kotaro Yoshimoto
+
+18.1.1 (2025-10-31)
+-------------------
+* Merge pull request `#1723 <https://github.com/tier4/scenario_simulator_v2/issues/1723>`_ from tier4/fix/publish_lateral_acceleration_abs
+* fix lateral acceleration
+* Contributors: Kotaro Yoshimoto, xtk8532704
+
+18.1.0 (2025-10-27)
+-------------------
+* Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
+* Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
+* Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
+* Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
+* Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
+* Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
+* Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
+* Contributors: Kotaro Yoshimoto, Taiga
+
+18.0.10 (2025-10-23)
+--------------------
+
+18.0.9 (2025-10-23)
+-------------------
+* Merge branch 'master' into feature/ci-dependabot
+* Contributors: Kotaro Yoshimoto
+
+18.0.8 (2025-10-23)
+-------------------
+* Merge branch 'master' into feature/api-changes-automation
+* Merge branch 'master' into feature/api-changes-automation
+* Contributors: ぐるぐる
+
+18.0.7 (2025-10-23)
+-------------------
+* Merge pull request `#1707 <https://github.com/tier4/scenario_simulator_v2/issues/1707>`_ from tier4/refactor/raycaster_2
+* Merge branch 'master' into refactor/raycaster_2
+* Merge branch 'master' into refactor/raycaster_2
+* Move primitive construction into Raycaster::Entity::Entity
+* Add raycast_entities to RaycastResult as a member
+* Initialize Raycaster::RaycastResult::cloud in constructor
+* Optimize `Raycaster::RaycastResult` members
+* Remove `Raycaster::entities\_` to reduce internal states
+* Add `Raycaster::RaycastResult` to handle result of raycast function
+* Refactor Raycaster to use `std::vector` instead of `std::set` for geometry IDs
+* Contributors: Kotaro Yoshimoto
+
+18.0.6 (2025-10-22)
+-------------------
+* Merge branch 'master' into fix/duplicated_nodes
+* Contributors: Kotaro Yoshimoto
+
+18.0.5 (2025-10-21)
+-------------------
+* Merge branch 'master' into fix/build_error_on_noble
+* Merge branch 'master' into fix/build_error_on_noble
+* Merge branch 'master' into fix/build_error_on_noble
+* Contributors: Kotaro Yoshimoto
+
+18.0.4 (2025-10-20)
+-------------------
+* Merge branch 'master' into patch/arm-suppress-warning
+* Merge branch 'master' into patch/arm-suppress-warning
+* Merge branch 'master' into patch/arm-suppress-warning
+* Contributors: Kotaro Yoshimoto
+
+18.0.3 (2025-10-20)
+-------------------
+
+18.0.2 (2025-10-17)
+-------------------
+* Merge pull request `#1703 <https://github.com/tier4/scenario_simulator_v2/issues/1703>`_ from tier4/refactor/lidar_sensor_raycaster
+* Organize includes
+* Move pointcloud messaging functionality from the Raycaster class to the LidarSensor class
+* Add Raycaster::Entity struct to simplify code
+* Removed static attribute from Raycaster::intersect
+* Contributors: Kotaro Yoshimoto
+
+18.0.1 (2025-10-16)
+-------------------
+* Merge pull request `#1702 <https://github.com/tier4/scenario_simulator_v2/issues/1702>`_ from tier4/refactor/lidar_sensor
+* Merge branch 'master' into refactor/lidar_sensor
+* Stop using multiple threads for ray-tracing
+* Contributors: Kotaro Yoshimoto
+
+18.0.0 (2025-10-15)
+-------------------
+* Merge branch 'master' into feature/small_fix_new_front_entity_detection_logic
+* Merge branch 'master' into feature/small_fix_new_front_entity_detection_logic
+* Contributors: Taiga
+
+17.9.1 (2025-10-14)
+-------------------
+* Merge pull request `#1693 <https://github.com/tier4/scenario_simulator_v2/issues/1693>`_ from tier4/fix/RJD-1921-fix-steering-when-autoware-is-overwritten
+* Merge branch 'master' into fix/RJD-1921-fix-steering-when-autoware-is-overwritten
+* Merge branch 'master' into fix/RJD-1921-fix-steering-when-autoware-is-overwritten
+* Merge branch 'master' into fix/RJD-1921-fix-steering-when-autoware-is-overwritten
+* style(simple_sensor_simulator): apply clang reformat
+* fix(simple_sensor_simulator):  ensure steering is overwritten in the overwrite method
+* Contributors: Dawid Moszynski, Dawid Moszyński, Kotaro Yoshimoto
+
+17.9.0 (2025-10-14)
+-------------------
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Contributors: Taiga
+
 17.8.0 (2025-10-10)
 -------------------
 * Merge branch 'master' into RJD-1930/see_around

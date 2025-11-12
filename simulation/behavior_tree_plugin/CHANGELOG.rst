@@ -24,6 +24,144 @@ Changelog for package behavior_tree_plugin
 16.4.2 (2025-05-23)
 -------------------
 
+18.3.2 (2025-11-06)
+-------------------
+* Merge branch 'master' into dependabot/github_actions/actions/checkout-5
+* Merge branch 'master' into dependabot/github_actions/actions/checkout-5
+* Contributors: Kotaro Yoshimoto, Taiga
+
+18.3.3 (2025-11-07)
+-------------------
+* Merge branch 'master' into dependabot/github_actions/actions/github-script-8
+* Bump version of scenario_simulator_v2 from version 18.3.1 to version 18.3.2
+* Merge branch 'master' into dependabot/github_actions/actions/github-script-8
+* Merge branch 'master' into dependabot/github_actions/actions/checkout-5
+* Merge branch 'master' into dependabot/github_actions/actions/github-script-8
+* Merge branch 'master' into dependabot/github_actions/actions/checkout-5
+* Contributors: Kotaro Yoshimoto, Taiga
+
+18.3.1 (2025-11-04)
+-------------------
+* Merge branch 'master' into fix/improve-docs
+* Merge branch 'master' into fix/improve-docs
+* Contributors: Kotaro Yoshimoto, ぐるぐる
+
+18.3.0 (2025-11-04)
+-------------------
+* Merge branch 'master' into feature/lidar_noise_v1
+* Merge branch 'master' into feature/lidar_noise_v1
+* Merge branch 'master' into feature/lidar_noise_v1
+* Contributors: Kotaro Yoshimoto
+
+18.2.1 (2025-11-04)
+-------------------
+
+18.2.0 (2025-11-04)
+-------------------
+* Merge branch 'master' into feature/publisher-noise-velocity-report
+* Contributors: Kotaro Yoshimoto
+
+18.1.1 (2025-10-31)
+-------------------
+
+18.1.0 (2025-10-27)
+-------------------
+* Merge pull request `#1701 <https://github.com/tier4/scenario_simulator_v2/issues/1701>`_ from tier4/feature/trajectory_base_detection_for_pedestrian
+  Add Trajectory-Based Pedestrian Front Entity Detection Algorithm
+* Remove unused lanelet waypoint calculation from WalkStraightAction
+* Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
+* Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
+* Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
+* Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
+* Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
+* Support trajectory_based_detection_offset options
+* Add trajectory-based entity detection to WalkStraightAction
+* Add waypoints calculation to WalkStraightAction class
+* Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
+* Merge branch 'master' into feature/trajectory_base_detection_for_pedestrian
+* Added support for an option to use a trajectory-based logic for detecting obstacles in front of pedestrian NPCs.
+* Improve visualization of predicted pedestrian paths.
+* Contributors: Kotaro Yoshimoto, Taiga, Taiga Takano
+
+18.0.10 (2025-10-23)
+--------------------
+
+18.0.9 (2025-10-23)
+-------------------
+* Merge branch 'master' into feature/ci-dependabot
+* Contributors: Kotaro Yoshimoto
+
+18.0.8 (2025-10-23)
+-------------------
+* Merge branch 'master' into feature/api-changes-automation
+* Merge branch 'master' into feature/api-changes-automation
+* Contributors: ぐるぐる
+
+18.0.7 (2025-10-23)
+-------------------
+* Merge branch 'master' into refactor/raycaster_2
+* Merge branch 'master' into refactor/raycaster_2
+* Contributors: Kotaro Yoshimoto
+
+18.0.6 (2025-10-22)
+-------------------
+* Merge branch 'master' into fix/duplicated_nodes
+* Contributors: Kotaro Yoshimoto
+
+18.0.5 (2025-10-21)
+-------------------
+* Merge branch 'master' into fix/build_error_on_noble
+* Merge branch 'master' into fix/build_error_on_noble
+* Merge branch 'master' into fix/build_error_on_noble
+* Contributors: Kotaro Yoshimoto
+
+18.0.4 (2025-10-20)
+-------------------
+* Merge branch 'master' into patch/arm-suppress-warning
+* Merge branch 'master' into patch/arm-suppress-warning
+* Merge branch 'master' into patch/arm-suppress-warning
+* Contributors: Kotaro Yoshimoto
+
+18.0.3 (2025-10-20)
+-------------------
+
+18.0.2 (2025-10-17)
+-------------------
+
+18.0.1 (2025-10-16)
+-------------------
+* Merge branch 'master' into refactor/lidar_sensor
+* Contributors: Kotaro Yoshimoto
+
+18.0.0 (2025-10-15)
+-------------------
+* Merge pull request `#1697 <https://github.com/tier4/scenario_simulator_v2/issues/1697>`_ from tier4/feature/small_fix_new_front_entity_detection_logic
+  Fix trajectory-based front entity detection offset handling
+* Merge branch 'master' into feature/small_fix_new_front_entity_detection_logic
+* Merge branch 'master' into feature/small_fix_new_front_entity_detection_logic
+* Filter out invalid trajectory_based_detection_offset\_ values
+* Switch path width parameter from override mode to offset mode.
+* Contributors: Taiga, Taiga Takano
+
+17.9.1 (2025-10-14)
+-------------------
+* Merge branch 'master' into fix/RJD-1921-fix-steering-when-autoware-is-overwritten
+* Merge branch 'master' into fix/RJD-1921-fix-steering-when-autoware-is-overwritten
+* Merge branch 'master' into fix/RJD-1921-fix-steering-when-autoware-is-overwritten
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto
+
+17.9.0 (2025-10-14)
+-------------------
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Merge branch 'master' into feature/ra
+* Contributors: Taiga
+
 17.8.0 (2025-10-10)
 -------------------
 * Merge pull request `#1690 <https://github.com/tier4/scenario_simulator_v2/issues/1690>`_ from tier4/RJD-1930/see_around
