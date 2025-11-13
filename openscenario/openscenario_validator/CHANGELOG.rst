@@ -19,6 +19,12 @@ Changelog for package openscenario_validator
 * Merge branch 'master' into dependabot/github_actions/actions/checkout-5
 * Contributors: Kotaro Yoshimoto, Taiga
 
+18.3.5 (2025-11-13)
+-------------------
+* Merge branch 'master' into dependabot/github_actions/actions/download-artifact-6
+* Merge branch 'master' into dependabot/github_actions/actions/download-artifact-6
+* Contributors: Taiga
+
 18.3.4 (2025-11-13)
 -------------------
 * Merge branch 'master' into dependabot/github_actions/actions/upload-artifact-5
