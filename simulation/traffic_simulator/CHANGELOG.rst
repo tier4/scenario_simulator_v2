@@ -30,6 +30,14 @@ Changelog for package traffic_simulator
 * Merge branch 'master' into dependabot/github_actions/actions/checkout-5
 * Contributors: Kotaro Yoshimoto, Taiga
 
+18.3.6 (2025-11-13)
+-------------------
+* Merge pull request `#1734 <https://github.com/tier4/scenario_simulator_v2/issues/1734>`_ from tier4/fix/multiple_states_on_phase
+* Merge branch 'master' into fix/multiple_states_on_phase
+* Merge branch 'master' into fix/multiple_states_on_phase
+* add TrafficLightsBase::clearTrafficLightsState/addTrafficLightsState
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
 18.3.5 (2025-11-13)
 -------------------
 * Merge branch 'master' into dependabot/github_actions/actions/download-artifact-6
