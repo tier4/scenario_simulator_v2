@@ -12,9 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <tf2/LinearMath/Quaternion.h>
+
 #include <Eigen/Geometry>
 #include <concealer/publisher.hpp>
 #include <scenario_simulator_exception/exception.hpp>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 
 namespace concealer
 {
@@ -185,20 +188,20 @@ auto NormalDistribution<geometry_msgs::msg::PoseWithCovarianceStamped>::operator
   pose.position.y += world_position.y();
   pose.position.z += world_position.z();
 
-  Eigen::Vector3d euler = orientation.matrix().eulerAngles(0, 1, 2);
+  tf2::Quaternion original_orientation;
+  tf2::fromMsg(pose.orientation, original_orientation);
 
-  euler.x() = orientation_r_error.apply(engine, euler.x());
-  euler.y() = orientation_p_error.apply(engine, euler.y());
-  euler.z() = orientation_y_error.apply(engine, euler.z());
+  double roll_error = orientation_r_error.apply(engine, 0.0);
+  double pitch_error = orientation_p_error.apply(engine, 0.0);
+  double yaw_error = orientation_y_error.apply(engine, 0.0);
 
-  const Eigen::Quaterniond q = Eigen::AngleAxisd(euler.x(), Eigen::Vector3d::UnitX()) *
-                               Eigen::AngleAxisd(euler.y(), Eigen::Vector3d::UnitY()) *
-                               Eigen::AngleAxisd(euler.z(), Eigen::Vector3d::UnitZ());
+  tf2::Quaternion error_quaternion;
+  error_quaternion.setRPY(roll_error, pitch_error, yaw_error);
 
-  pose.orientation.x = q.x();
-  pose.orientation.y = q.y();
-  pose.orientation.z = q.z();
-  pose.orientation.w = q.w();
+  tf2::Quaternion noised_orientation = original_orientation * error_quaternion;
+  noised_orientation.normalize();
+
+  pose.orientation = tf2::toMsg(noised_orientation);
 
   pose_with_covariance_stamped.pose.covariance.at(6 * 0 + 0) =
     covariance_diagonal_x_x_error.apply(engine, 0.0);
