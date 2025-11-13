@@ -66,7 +66,7 @@ auto toMapPose(const LaneletPose & lanelet_pose, const bool fill_pitch) -> PoseS
   }
 }
 
-auto isAltitudeMatching(const double current_altitude, const double target_altitude) -> bool
+auto isAltitudeWithinThreshold(const double current_altitude, const double target_altitude) -> bool
 {
   /**
    * @brief Justification for using a fixed `altitude_threshold` value of 1.0 [m].
@@ -81,8 +81,14 @@ auto isAltitudeMatching(const double current_altitude, const double target_altit
    *
    * @note There is no technical basis for this value; it was determined based on experiments.
    */
-  static constexpr double altitude_threshold = 1.0;
-  return std::abs(current_altitude - target_altitude) <= altitude_threshold;
+  return std::abs(current_altitude - target_altitude) <= ALTITUDE_THRESHOLD;
+}
+
+auto isAltitudeWithinRange(
+  const double current_altitude, const double min_altitude, const double max_altitude) -> bool
+{
+  return (current_altitude >= (min_altitude - ALTITUDE_THRESHOLD)) &&
+         (current_altitude <= (max_altitude + ALTITUDE_THRESHOLD));
 }
 
 auto toLaneletPose(
@@ -98,7 +104,7 @@ auto toLaneletPose(
       !lanelet_pose_s) {
     return std::nullopt;
   } else if (const auto pose_on_centerline = lanelet_spline->getPose(lanelet_pose_s.value());
-             !isAltitudeMatching(map_pose.position.z, pose_on_centerline.position.z)) {
+             !isAltitudeWithinThreshold(map_pose.position.z, pose_on_centerline.position.z)) {
     return std::nullopt;
   } else {
     constexpr double yaw_range_min_rad = M_PI * yaw_threshold_deg / 180.0;
