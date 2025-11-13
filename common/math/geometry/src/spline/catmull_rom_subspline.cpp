@@ -23,6 +23,15 @@ namespace geometry
 {
 double CatmullRomSubspline::getLength() const { return end_s_ - start_s_; }
 
+std::pair<double, double> CatmullRomSubspline::getAltitudeRange() const
+{
+  if (spline_) {
+    return spline_->getAltitudeRange();
+  } else {
+    return {std::numeric_limits<double>::min(), std::numeric_limits<double>::max()};
+  }
+}
+
 std::optional<double> CatmullRomSubspline::getCollisionPointIn2D(
   const std::vector<geometry_msgs::msg::Point> & polygon, const bool search_backward,
   const std::optional<std::pair<double, double>> & s_range) const
