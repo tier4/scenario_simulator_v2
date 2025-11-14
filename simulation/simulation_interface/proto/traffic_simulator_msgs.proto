@@ -175,4 +175,5 @@ message PolylineTrajectory {
   double base_time = 3;
   bool closed = 4;
   Polyline shape = 5;
+  bool follow_backwards = 6;
 }
