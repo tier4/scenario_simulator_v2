@@ -19,27 +19,25 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-// DIRTY HACK?
-template <typename T>
-auto generateVector(const std::list<T> & list) -> std::vector<T>
-{
-  return std::vector<T>(list.begin(), list.end());
-}
-
 ProbabilityDistributionSet::ProbabilityDistributionSet(
   const pugi::xml_node & node, openscenario_interpreter::Scope & scope)
 : Scope(scope),
-  elements(
-    generateVector(readElements<ProbabilityDistributionSetElement, 1>("Element", node, scope))),
-  adaptor(elements),
-  distribute(adaptor.probabilities.begin(), adaptor.probabilities.end()),
-  random_engine(scope.seed)
+  elements([](const std::list<ProbabilityDistributionSetElement> & element_list) {
+    return std::vector<ProbabilityDistributionSetElement>(element_list.begin(), element_list.end());
+  }(readElements<ProbabilityDistributionSetElement, 1>("Element", node, scope))),
+  distribute([this]() -> std::discrete_distribution<std::size_t> {
+    std::vector<double> probabilities;
+    for (const auto & element : elements) {
+      probabilities.push_back(element.weight);
+    }
+    return {std::begin(probabilities), std::end(probabilities)};
+  }())
 {
 }
 
-auto ProbabilityDistributionSet::evaluate() -> Object
+auto ProbabilityDistributionSet::derive() -> Object
 {
-  size_t index = distribute(random_engine);
+  std::size_t index = distribute(random_engine);
   return elements.at(index);
 }
 }  // namespace syntax
