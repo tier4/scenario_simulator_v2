@@ -588,7 +588,7 @@ auto makeUpdatedStatus(
         return entity_status.pose.orientation;
       } else {
         /// @note if there is a designed_velocity vector, set the orientation in the direction of it
-        return math::geometry::convertDirectionToQuaternion(desired_velocity);
+        return convertDirectionToQuaternion(desired_velocity);
       }
     }();
 
