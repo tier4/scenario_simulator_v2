@@ -30,6 +30,11 @@ Changelog for package openscenario_interpreter_msgs
 * Merge branch 'master' into dependabot/github_actions/actions/checkout-5
 * Contributors: Kotaro Yoshimoto, Taiga
 
+18.3.7 (2025-11-14)
+-------------------
+* Merge branch 'master' into dependabot/github_actions/8BitJonny/gh-get-current-pr-4.0.0
+* Contributors: Kotaro Yoshimoto
+
 18.3.6 (2025-11-13)
 -------------------
 * Merge branch 'master' into fix/multiple_states_on_phase
