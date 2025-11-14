@@ -108,6 +108,53 @@ auto TrafficSignalController::evaluate() -> Object
   }
 }
 
+auto TrafficSignalController::updatePredictions() -> void
+{
+  if (current_phase != std::end(phases)) {
+    clearV2ITrafficLightsStatePrediction();
+    /*
+    NOTE:
+      This parameter was set with the help of developers familiar with the implementation
+      of ROS driver nodes for V2I traffic lights.
+      However, the specifications, including this parameter, may change in the future.
+   */
+    constexpr size_t OUTPUT_PREDICTION_SIZE = 6;
+    double accumulated_time = 0.0;
+    auto phase_iterator = current_phase;
+    std::size_t extracted_phases_number = 0;
+    std::unordered_map<lanelet::Id, std::vector<std::pair<double, std::string>>> predictions_by_id;
+
+    auto extract_prediction = [&](const auto & phase, const double phase_time_seconds) -> bool {
+      accumulated_time += phase_time_seconds;
+      bool is_added = false;
+      for (const auto & traffic_signal_state : (*phase).traffic_signal_states) {
+        if (
+          traffic_signal_state.trafficSignalType() == TrafficSignalState::TrafficSignalType::v2i) {
+          is_added = true;
+          predictions_by_id[traffic_signal_state.id()].emplace_back(
+            accumulated_time, traffic_signal_state.state);
+        }
+      }
+      return is_added;
+    };
+
+    while (extracted_phases_number < OUTPUT_PREDICTION_SIZE) {
+      ++phase_iterator;
+      if (extracted_phases_number == 0 && accumulated_time > cycleTime()) {
+        break;
+      } else if (extract_prediction(phase_iterator, (*phase_iterator).duration)) {
+        ++extracted_phases_number;
+      }
+    }
+
+    for (const auto & [lanelet_id, predictions] : predictions_by_id) {
+      for (const auto & [time_offset, state] : predictions) {
+        setV2ITrafficLightsStatePrediction(lanelet_id, state, time_offset);
+      }
+    }
+  }
+}
+
 auto TrafficSignalController::notifyBegin() -> void
 {
   change_to_begin_time = evaluateSimulationTime() + delay;
