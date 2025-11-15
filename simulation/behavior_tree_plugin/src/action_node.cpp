@@ -469,17 +469,17 @@ auto ActionNode::getFrontEntityNameAndDistanceByTrajectory(
 
 /**
  * @note getDistanceToTargetEntity working schematics
- * 
- * 1. Check if route to target entity from reference entity exists, if not try to transform pose to other 
+ *
+ * 1. Check if route to target entity from reference entity exists, if not try to transform pose to other
  *    routable lanelet, within matching distance (findRoutableAlternativeLaneletPoseFrom).
  * 2. Calculate longitudinal distance between entities bounding boxes -> bounding_box_distance.
  * 3. Calculate longitudinal distance between entities poses -> longitudinal_distance.
- * 4. Calculate target entity bounding box distance to reference entity spline (minimal distance from all corners) 
+ * 4. Calculate target entity bounding box distance to reference entity spline (minimal distance from all corners)
  *    -> target_to_spline_distance.
  * 5. If target_to_spline_distance is less than half width of reference entity target entity is conflicting.
  * 6. Check corner case where target entity width is bigger than width of entity and target entity
  *    is exactly on the spline -> spline.getCollisionPointIn2D
- * 7. If target entity is conflicting return bounding_box_distance enlarged by half of the entity 
+ * 7. If target entity is conflicting return bounding_box_distance enlarged by half of the entity
  *    length.
  */
 auto ActionNode::getDistanceToTargetEntity(
@@ -491,9 +491,9 @@ auto ActionNode::getDistanceToTargetEntity(
     !isOtherEntityAtConsideredAltitude(status)) {
     return std::nullopt;
   }
-  /** 
-      * boundingBoxLaneLongitudinalDistance requires routing_configuration, 
-      * 'allow_lane_change = true' is needed to check distances to entities on neighbour lanelets 
+  /**
+      * boundingBoxLaneLongitudinalDistance requires routing_configuration,
+      * 'allow_lane_change = true' is needed to check distances to entities on neighbour lanelets
       */
   traffic_simulator::RoutingConfiguration routing_configuration;
   routing_configuration.allow_lane_change = true;
@@ -506,9 +506,12 @@ auto ActionNode::getDistanceToTargetEntity(
   if (const auto & target_lanelet_pose =
         traffic_simulator::pose::findRoutableAlternativeLaneletPoseFrom(
           canonicalized_entity_status_->getLaneletId(),
-          status.getCanonicalizedLaneletPose().value(), target_bounding_box);
+          // WIP just use first lanelet pose, should be changed in the future
+          status.getCanonicalizedLaneletPoses().front(), target_bounding_box);
       target_lanelet_pose) {
-    const auto & from_lanelet_pose = canonicalized_entity_status_->getCanonicalizedLaneletPose();
+    // WIP just use first lanelet pose, should be changed in the future
+    const auto & from_lanelet_pose =
+      canonicalized_entity_status_->getCanonicalizedLaneletPoses().front();
     const auto & from_bounding_box = canonicalized_entity_status_->getBoundingBox();
     const auto bounding_box_map_points = math::geometry::transformPoints(
       static_cast<geometry_msgs::msg::Pose>(*target_lanelet_pose),
@@ -516,7 +519,7 @@ auto ActionNode::getDistanceToTargetEntity(
     const auto bounding_box_diagonal_length =
       math::geometry::getDistance(bounding_box_map_points[0], bounding_box_map_points[2]);
     if (const auto longitudinal_distance = traffic_simulator::distance::longitudinalDistance(
-          *from_lanelet_pose, *target_lanelet_pose, include_adjacent_lanelet,
+          from_lanelet_pose, *target_lanelet_pose, include_adjacent_lanelet,
           include_opposite_direction, routing_configuration);
         !longitudinal_distance) {
       return std::nullopt;
@@ -561,8 +564,9 @@ auto ActionNode::isOtherEntityAtConsideredAltitude(
 {
   if (canonicalized_entity_status_->isInLanelet() && entity_status.isInLanelet()) {
     return traffic_simulator::pose::isAltitudeMatching(
-      canonicalized_entity_status_->getCanonicalizedLaneletPose().value(),
-      entity_status.getCanonicalizedLaneletPose().value());
+      // WIP just use first lanelet pose, should be changed in the future
+      canonicalized_entity_status_->getCanonicalizedLaneletPoses().front(),
+      entity_status.getCanonicalizedLaneletPoses().front());
   } else {
     return false;
   }
@@ -658,9 +662,9 @@ auto ActionNode::calculateUpdatedEntityStatus(
   const double linear_jerk_new = std::get<2>(dynamics);
   const geometry_msgs::msg::Accel accel_new = std::get<1>(dynamics);
   const geometry_msgs::msg::Twist twist_new = std::get<0>(dynamics);
-  if (
-    const auto canonicalized_lanelet_pose =
-      canonicalized_entity_status_->getCanonicalizedLaneletPose()) {
+  if (const auto canonicalized_lanelet_poses =
+        canonicalized_entity_status_->getCanonicalizedLaneletPoses();
+      !canonicalized_lanelet_poses.empty()) {
     const auto distance =
       (twist_new.linear.x + canonicalized_entity_status_->getTwist().linear.x) / 2.0 * step_time_;
     auto entity_status_updated =
@@ -670,12 +674,17 @@ auto ActionNode::calculateUpdatedEntityStatus(
     entity_status_updated.action_status.accel = accel_new;
     entity_status_updated.action_status.linear_jerk = linear_jerk_new;
     /// @todo it will be moved to route::moveAlongLaneletPose(...)
-    entity_status_updated.lanelet_pose = traffic_simulator::lanelet_wrapper::pose::alongLaneletPose(
-      static_cast<traffic_simulator::LaneletPose>(canonicalized_lanelet_pose.value()),
-      route_lanelets_, distance);
-    entity_status_updated.lanelet_pose_valid = true;
+    // WIP temporary fix for lanelet pose
+    entity_status_updated.lanelet_poses = std::vector<traffic_simulator::LaneletPose>{
+      traffic_simulator::lanelet_wrapper::pose::alongLaneletPose(
+        // WIP just use first lanelet pose, should be changed in the future
+        static_cast<traffic_simulator::LaneletPose>(canonicalized_lanelet_poses.front()),
+        route_lanelets_, distance)};
+    for (auto & lanelet_pose : entity_status_updated.lanelet_poses) {
+      lanelet_pose.lanelet_pose_valid = true;
+    }
     entity_status_updated.pose =
-      traffic_simulator::pose::toMapPose(entity_status_updated.lanelet_pose);
+      traffic_simulator::pose::toMapPose(entity_status_updated.lanelet_poses.front());
     return entity_status_updated;
   } else {
     THROW_SIMULATION_ERROR(
@@ -726,18 +735,22 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
       updated_pose.position = status->getMapPose().position + delta_position;
 
       /// @note If it is the transition between lanelets: overwrite position to improve precision
-      if (const auto canonicalized_lanelet_pose = status->getCanonicalizedLaneletPose()) {
-        const auto estimated_next_canonicalized_lanelet_pose =
-          traffic_simulator::pose::toCanonicalizedLaneletPose(
+      if (const auto canonicalized_lanelet_poses = status->getCanonicalizedLaneletPoses();
+          !canonicalized_lanelet_poses.empty()) {
+        const auto estimated_next_canonicalized_lanelet_poses =
+          traffic_simulator::pose::toCanonicalizedLaneletPoses(
             updated_pose, status->getBoundingBox(), include_crosswalk, matching_distance);
-        if (estimated_next_canonicalized_lanelet_pose) {
-          const auto next_lanelet_id = static_cast<traffic_simulator::LaneletPose>(
-                                         estimated_next_canonicalized_lanelet_pose.value())
-                                         .lanelet_id;
+        if (!estimated_next_canonicalized_lanelet_poses.empty()) {
+          const auto next_lanelet_id =
+            static_cast<traffic_simulator::LaneletPose>(
+              // WIP just use first lanelet pose, should be changed in the future
+              estimated_next_canonicalized_lanelet_poses.front())
+              .lanelet_id;
           if (  /// @note Handle lanelet transition
             const auto updated_position =
               traffic_simulator::pose::updatePositionForLaneletTransition(
-                canonicalized_lanelet_pose.value(), next_lanelet_id, desired_twist.linear,
+                // WIP just use first lanelet pose, should be changed in the future
+                canonicalized_lanelet_poses.front(), next_lanelet_id, desired_twist.linear,
                 desired_velocity_is_global, time_step)) {
             updated_pose.position = updated_position.value();
           }
@@ -760,8 +773,7 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
   auto entity_status_updated =
     static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status_);
   entity_status_updated.time = current_time_ + step_time_;
-  entity_status_updated.lanelet_pose = traffic_simulator::LaneletPose();
-  entity_status_updated.lanelet_pose_valid = false;
+  entity_status_updated.lanelet_poses = std::vector<traffic_simulator::LaneletPose>();
   entity_status_updated.pose = pose_new;
   entity_status_updated.action_status.twist = twist_new;
   entity_status_updated.action_status.accel = accel_new;
