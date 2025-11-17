@@ -235,7 +235,9 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
       [&]() {
         if (record) {
           std::vector<std::string> options{
-            "-a", "-o", boost::filesystem::path(osc_path).replace_extension("").string()};
+            "-o", boost::filesystem::path(osc_path).replace_extension("").string()};
+
+          bool additional_all_option_needed = true;
 
           if (not record_config_file.empty()) {
             YAML::Node config = YAML::LoadFile(record_config_file);
@@ -243,6 +245,15 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
             for (const auto & item : config) {
               const auto key = item.first.as<std::string>();
               const YAML::Node & value = item.second;
+
+              // additional_all_option_needed
+              if (key == "all") {
+                // --all is set in general field process
+                additional_all_option_needed = false;
+              } else if (
+                key == "regex" && (value.IsScalar() or (value.IsSequence() && value.size() > 0))) {
+                additional_all_option_needed = false;
+              }
 
               // general field process
               if (value.IsScalar()) {
@@ -308,6 +319,10 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
             std::copy(
               std::istream_iterator<std::string>(iss), std::istream_iterator<std::string>(),
               std::back_inserter(options));
+          }
+
+          if (additional_all_option_needed) {
+            options.push_back("--all");
           }
 
           record::start(options);
