@@ -13,8 +13,11 @@
 // limitations under the License.
 
 #include <gtest/gtest.h>
+#include <tf2/LinearMath/Matrix3x3.h>
+#include <tf2/LinearMath/Quaternion.h>
 
 #include <concealer/publisher.hpp>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 
 auto rclcpp_initialized = false;
 
@@ -748,4 +751,41 @@ TEST(NormalDistribution_geometry_msgs_msg_PoseWithCovarianceStamped, when_all_pa
   ASSERT_DOUBLE_EQ(randomized_pose.pose.pose.orientation.z, -0.28514186053174795);
   ASSERT_DOUBLE_EQ(randomized_pose.pose.pose.orientation.w, -0.43907447796877608);
   // clang-format on
+}
+
+TEST(NormalDistribution_geometry_msgs_msg_PoseWithCovarianceStamped, multi_axes_check)
+{
+  if (not std::exchange(rclcpp_initialized, true)) {
+    rclcpp::init(0, nullptr);
+  }
+
+  auto node = rclcpp::Node("node_name", "simulation");
+  constexpr double error = M_PI / 4;
+  // clang-format off
+  node.declare_parameter("/topic_name.seed", 42);
+  node.declare_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.r.error.additive.mean", error);
+  node.declare_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.r.error.additive.standard_deviation", 0.0);
+  node.declare_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.p.error.additive.mean", error);
+  node.declare_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.p.error.additive.standard_deviation", 0.0);
+  node.declare_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.y.error.additive.mean", 0.0);
+  node.declare_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.y.error.additive.standard_deviation", 0.0);
+  // clang-format on
+
+  auto randomize = concealer::NormalDistribution<geometry_msgs::msg::PoseWithCovarianceStamped>(
+    node.get_node_parameters_interface(), "/topic_name");
+
+  const auto pose = geometry_msgs::msg::PoseWithCovarianceStamped();
+
+  const auto randomized_pose = randomize(pose);
+
+  tf2::Quaternion result_orientation;
+  tf2::fromMsg(randomized_pose.pose.pose.orientation, result_orientation);
+  double result_roll, result_pitch, result_yaw;
+  tf2::Matrix3x3(result_orientation).getRPY(result_roll, result_pitch, result_yaw);
+
+  constexpr double tolerance = 1e-6;  // this value is set by Kotaro Yoshimoto's experiment
+
+  EXPECT_NEAR(result_yaw, 0.0, tolerance);
+  EXPECT_NEAR(std::abs(result_roll), error, tolerance);
+  EXPECT_NEAR(std::abs(result_pitch), error, tolerance);
 }
