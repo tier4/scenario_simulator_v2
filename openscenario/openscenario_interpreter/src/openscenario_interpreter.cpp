@@ -246,13 +246,20 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 
               // general field process
               if (value.IsScalar()) {
-                // "field-name: value" => "--field-name value"
-                auto string_value = value.as<std::string>();
-                if (not string_value.empty()) {
-                  if (key != "topics") {
+                if (bool bool_value; YAML::convert<bool>::decode(value, bool_value)) {
+                  // "field-name: true" => "--field-name"
+                  if (bool_value) {
                     options.push_back("--" + key);
                   }
-                  options.push_back(string_value);
+                } else {
+                  // "field-name: value" => "--field-name value"
+                  auto string_value = value.as<std::string>();
+                  if (not string_value.empty()) {
+                    if (key != "topics") {
+                      options.push_back("--" + key);
+                    }
+                    options.push_back(string_value);
+                  }
                 }
               } else if (value.IsSequence() && value.size() > 0) {
                 if (key == "regex" || key == "exclude") {
