@@ -325,6 +325,11 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
             options.push_back("--all");
           }
 
+          // Notify the user of the final command
+          RCLCPP_INFO(
+            get_logger(), "record command: ros2 bag record %s",
+            boost::algorithm::join(options, " ").c_str());
+
           record::start(options);
         }
 
