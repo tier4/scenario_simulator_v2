@@ -14,6 +14,8 @@
 
 #define OPENSCENARIO_INTERPRETER_NO_EXTENSION
 
+#include <yaml-cpp/yaml.h>
+
 #include <algorithm>
 #include <boost/json.hpp>
 #include <openscenario_interpreter/openscenario_interpreter.hpp>
@@ -234,6 +236,60 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
         if (record) {
           std::vector<std::string> options{
             "-a", "-o", boost::filesystem::path(osc_path).replace_extension("").string()};
+
+          if (not record_config_file.empty()) {
+            YAML::Node config = YAML::LoadFile(record_config_file);
+
+            for (const auto & item : config) {
+              const auto key = item.first.as<std::string>();
+              const YAML::Node & value = item.second;
+
+              // general field process
+              if (value.IsScalar()) {
+                // "field-name: value" => "--field-name value"
+                auto string_value = value.as<std::string>();
+                if (not string_value.empty()) {
+                  if (key != "topics") {
+                    options.push_back("--" + key);
+                  }
+                  options.push_back(string_value);
+                }
+              } else if (value.IsSequence() && value.size() > 0) {
+                if (key == "regex" || key == "exclude") {
+                  // Combine array elements with OR (|) for regex options
+                  // regex:
+                  //   - pattern1
+                  //   - pattern2
+                  // => --regex "(pattern1|pattern2)"
+                  std::string combined_pattern;
+                  for (const auto & element : value) {
+                    if (auto pattern = element.as<std::string>(""); not pattern.empty()) {
+                      combined_pattern += pattern + "|";
+                    }
+                  }
+                  if (not combined_pattern.empty()) {
+                    combined_pattern.pop_back();  // remove last "|"
+                    options.push_back("--" + key);
+                    options.push_back("(" + combined_pattern + ")");
+                  }
+                } else {
+                  // For non-regex options like "topics", add each element separately
+                  // field-name:
+                  //   - value1
+                  //   - value2
+                  // => --field-name value1 --field-name value2
+                  for (const auto & element : value) {
+                    if (auto string = element.as<std::string>(""); not string.empty()) {
+                      if (key != "topics") {
+                        options.push_back("--" + key);
+                      }
+                      options.push_back(string);
+                    }
+                  }
+                }
+              }
+            }
+          }
 
           if (not record_storage_id.empty()) {
             options.insert(options.end(), {"-s", record_storage_id});
