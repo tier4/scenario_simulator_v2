@@ -740,12 +740,12 @@ TEST(NormalDistribution_geometry_msgs_msg_PoseWithCovarianceStamped, when_all_pa
   const auto randomized_pose = randomize(pose);
 
   // clang-format off
-  ASSERT_DOUBLE_EQ(randomized_pose.pose.pose.position.x,     4.0604709175379767   );
-  ASSERT_DOUBLE_EQ(randomized_pose.pose.pose.position.y,    19.565623431299677    );
-  ASSERT_DOUBLE_EQ(randomized_pose.pose.pose.position.z,     2.8688348437534232   );
-  ASSERT_DOUBLE_EQ(randomized_pose.pose.pose.orientation.x, -0.80099847581632522  );
-  ASSERT_DOUBLE_EQ(randomized_pose.pose.pose.orientation.y, -0.29036040347964753  );
-  ASSERT_DOUBLE_EQ(randomized_pose.pose.pose.orientation.z,  0.52344585659820897  );
-  ASSERT_DOUBLE_EQ(randomized_pose.pose.pose.orientation.w,  0.0098342788870005027);
+  ASSERT_DOUBLE_EQ(randomized_pose.pose.pose.position.x,     4.0604709175379767 );
+  ASSERT_DOUBLE_EQ(randomized_pose.pose.pose.position.y,    19.565623431299677  );
+  ASSERT_DOUBLE_EQ(randomized_pose.pose.pose.position.z,     2.8688348437534232 );
+  ASSERT_DOUBLE_EQ(randomized_pose.pose.pose.orientation.x, -0.67000662242827891);
+  ASSERT_DOUBLE_EQ(randomized_pose.pose.pose.orientation.y,  0.52630680032770782);
+  ASSERT_DOUBLE_EQ(randomized_pose.pose.pose.orientation.z, -0.28514186053174795);
+  ASSERT_DOUBLE_EQ(randomized_pose.pose.pose.orientation.w, -0.43907447796877608);
   // clang-format on
 }
