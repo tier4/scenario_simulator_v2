@@ -17,6 +17,7 @@ If you want to check detail, please check documents below.
 | MiscObject        | Does not exist.                                | Does not exist.                             |
 
 ## Vehicle NPC (with Behavior-Tree)
+
 Behavior tree of vehicle NPC is here.
 
 ```mermaid
@@ -55,8 +56,8 @@ graph TD
 | Yield                | Yield to right-of-way entity.                       | Right of way entity is moved.                      |                                                                                         |
 | MoveBackward         | Move backward on lane.                              | Another request and new goal point was suggested.  |                                                                                         |
 
-
 ### Behavior
+
 #### LaneChange
 
 By using `API::requestLaneChange` function, you send lane change request to target NPC.
@@ -131,7 +132,6 @@ You can send request with these parameters.
 | FORCE       | Changing lanes and fulfilling constraints ignoring dynamics.                | :heavy_check_mark: |
 | BEST_EFFORT | Changing lanes and trying to fulfill constraints without ignoring dynamics. |                    |
 
-
 ## Vehicle NPC (with Do-Nothing)
 
 When this behavior is used, entity can only be moved by specifying its pose, velocity, acceleration, jerk, etc. via the `API::setEntityStatus` function, etc.  
@@ -163,7 +163,7 @@ graph TD
 
 **Summary** - Specifies whether the behavior takes surrounding entities into consideration.
 
-**Purpose** - Prevents specific scenarios from failing, such as a pedestrian colliding with a stopped vehicle, by behaving considerately toward surrounding entities. 
+**Purpose** - Prevents specific scenarios from failing, such as a pedestrian colliding with a stopped vehicle, by behaving considerately toward surrounding entities.
 
 **Specification** - The vehicle stops only when it enters a lane currently occupied by another entity and the entity is located ahead.
 
@@ -172,7 +172,8 @@ graph TD
 **Default behavior** - If the property is not specified, the default value is `"false"`.
 
 **Example** -
-```
+
+```yaml
         ObjectController:
           Controller:
             name: '...'
@@ -197,7 +198,7 @@ This behavior was developed primarily to drive the simulator from Autoware rosba
 
 **Purpose** — To adjust, per scenario and per entity, the sensitivity to “lateral interference” near lanes (e.g., lane splitting or side-by-side travel). This threshold is used in the collision-candidate computation inside the `ActionNode`.
 
-**Specification**
+### Specification
 
 * **Specifying from OpenSCENARIO**
   Set `name="lateralCollisionThreshold"` (value is a real number in meters) in `ObjectController/Controller/Properties/Property` to apply it to that entity. If the property is absent, `std::nullopt` is set and the default behavior (**width × 0.5 of the acting entity**) is used.

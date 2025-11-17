@@ -46,12 +46,12 @@ jobs:
       - name: Setup workspace
         run: mkdir -p src/scenario_simulator_v2
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
           path: src/scenario_simulator_v2
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           repository: RobotecAI/scenario_simulator_v2_scenarios
           path: src/scenario_simulator_v2_scenarios
@@ -168,7 +168,7 @@ jobs:
           echo failure=$(grep -c "<failure"  /tmp/scenario_workflow/optional_workflow/failure_report.md) >> $GITHUB_OUTPUT
         shell: bash
 
-      - uses: actions/github-script@v7
+      - uses: actions/github-script@v8
         if: steps.optional-scenario-test.outputs.failure > 0 && matrix.runs_on != 'ubuntu-22.04-arm' && github.event.pull_request.head.repo.fork == false
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -186,7 +186,7 @@ jobs:
             })
 
       - name: Upload Lcov result
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: matrix.runs_on != 'ubuntu-22.04-arm'
         with:
           name: lcov-${{ matrix.cmake_build_type }}
@@ -194,7 +194,7 @@ jobs:
           retention-days: 1
 
       - name: Upload Gcov result
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: matrix.runs_on != 'ubuntu-22.04-arm'
         with:
           name: coverage${{ matrix.cmake_build_type }}.xml
@@ -234,7 +234,7 @@ jobs:
         run: echo "PR_NUMBER=${{ github.event.number }}" > install/pr_number.txt
 
       - name: Upload install directory
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: matrix.cmake_build_type == 'RelWithDebInfo'
         with:
           name: install-${{ matrix.runs_on }}-${{ matrix.cmake_build_type }}

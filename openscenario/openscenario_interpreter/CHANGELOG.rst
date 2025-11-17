@@ -35,6 +35,57 @@ Changelog for package openscenario_interpreter
 16.4.2 (2025-05-23)
 -------------------
 
+18.3.2 (2025-11-06)
+-------------------
+* Merge branch 'master' into dependabot/github_actions/actions/checkout-5
+* Merge branch 'master' into dependabot/github_actions/actions/checkout-5
+* Contributors: Kotaro Yoshimoto, Taiga
+
+18.3.7 (2025-11-14)
+-------------------
+* Merge branch 'master' into dependabot/github_actions/8BitJonny/gh-get-current-pr-4.0.0
+* Contributors: Kotaro Yoshimoto
+
+18.3.6 (2025-11-13)
+-------------------
+* Merge pull request `#1734 <https://github.com/tier4/scenario_simulator_v2/issues/1734>`_ from tier4/fix/multiple_states_on_phase
+* Merge branch 'master' into fix/multiple_states_on_phase
+* Merge branch 'master' into fix/multiple_states_on_phase
+* Treat V2I and conventional traffic lights independently and clear states in Phase::evaluate
+* Delete overwrite argument from TrafficSignalState::evaluate
+* Fixed a bug in Phase::evaluate where states were missing except for the last state when multiple states existed for the same ID
+* Add overwrite flag argument for TrafficSignalState::evaluate to call clear/add functions
+* Add clear/add interface of traffic lights to SimulatorCore::NonStandardOperation
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
+18.3.5 (2025-11-13)
+-------------------
+* Merge branch 'master' into dependabot/github_actions/actions/download-artifact-6
+* Merge branch 'master' into dependabot/github_actions/actions/download-artifact-6
+* Contributors: Taiga
+
+18.3.4 (2025-11-13)
+-------------------
+* Merge branch 'master' into dependabot/github_actions/actions/upload-artifact-5
+* Merge branch 'master' into dependabot/github_actions/actions/upload-artifact-5
+* Contributors: Taiga
+
+18.3.3 (2025-11-07)
+-------------------
+* Merge branch 'master' into dependabot/github_actions/actions/github-script-8
+* Bump version of scenario_simulator_v2 from version 18.3.1 to version 18.3.2
+* Merge branch 'master' into dependabot/github_actions/actions/github-script-8
+* Merge branch 'master' into dependabot/github_actions/actions/checkout-5
+* Merge branch 'master' into dependabot/github_actions/actions/github-script-8
+* Merge branch 'master' into dependabot/github_actions/actions/checkout-5
+* Contributors: Kotaro Yoshimoto, Taiga
+
+18.3.1 (2025-11-04)
+-------------------
+* Merge branch 'master' into fix/improve-docs
+* Merge branch 'master' into fix/improve-docs
+* Contributors: Kotaro Yoshimoto, ぐるぐる
+
 18.3.0 (2025-11-04)
 -------------------
 * Merge branch 'master' into feature/lidar_noise_v1

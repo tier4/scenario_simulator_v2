@@ -85,12 +85,13 @@ A positive `int` type value, default `1`. If a non-existent version is
 specified, it is an error.
 This parameter specifies the version of the noise model to be used. Currently,
 the following four noise models are implemented:
+
 - version: 1 - Simple noise model with position randomization
 - version: 2 - Elliptically approximated model of noise variation with distance
   from the ego entity
-- version: 3 - An extension of the noise model from version 2 to allow different 
+- version: 3 - An extension of the noise model from version 2 to allow different
   configurations to be applied to different groups of entities.
-- version: 4 - A noise model based on a unique coordinate system 
+- version: 4 - A noise model based on a unique coordinate system
   with the closest point of the bounding box as the origin.
 
 The parameters specific to the models are placed under `noise.v1.`, `noise.v2`,
@@ -460,11 +461,11 @@ This parameter is used only if the value of `noise.model.version` is `3`.
 
 ### `noise.v4.<config_name>` (namespace)
 
-The v4 noise model extends v3 with enhanced position and rotation noise capabilities. 
-`<config_name>` is a user-defined noise configuration identifier that acts as a namespace under `noise.v4`, 
+The v4 noise model extends v3 with enhanced position and rotation noise capabilities.
+`<config_name>` is a user-defined noise configuration identifier that acts as a namespace under `noise.v4`,
 same as in `noise.v3`.
 
-The noise v4 model uses a dynamic local coordinate system for each entity, 
+The noise v4 model uses a dynamic local coordinate system for each entity,
 which differs from the elliptical coordinate system used in v2/v3.
 
 - **Origin**: the closest point on the entity's bounding box from the base-link of the ego vehicle
@@ -506,24 +507,24 @@ This parameter is used only if the value of `noise.model.version` is `4`.
 ### `noise.v4.<config_name>.position.<x/y>.autocorrelation_coefficient.amplitude`
 
 A positive `double` type value, default `0.0`.
-The parameter of the autocorrelation coefficient used in the generation of X/Y-axis position noise. 
+The parameter of the autocorrelation coefficient used in the generation of X/Y-axis position noise.
 This parameter is used only if the value of `noise.model.version` is `4`.
 
 ### `noise.v4.<config_name>.position.<x/y>.autocorrelation_coefficient.decay`
 
 A positive `double` type value, default `0.0`.
-The parameter of the autocorrelation coefficient used in the generation of X/Y-axis position noise. 
+The parameter of the autocorrelation coefficient used in the generation of X/Y-axis position noise.
 This parameter is used only if the value of `noise.model.version` is `4`.
 
 ### `noise.v4.<config_name>.position.<x/y>.autocorrelation_coefficient.offset`
 
 A positive `double` type value, default `0.0`.
-The parameter of the autocorrelation coefficient used in the generation of X/Y-axis position noise. 
+The parameter of the autocorrelation coefficient used in the generation of X/Y-axis position noise.
 This parameter is used only if the value of `noise.model.version` is `4`.
 
 ### `noise.v4.<config_name>.yaw` (namespace)
 
-The rotation yaw noise in noise v4 model applies angular noise around the closest point on the entity's bounding box 
+The rotation yaw noise in noise v4 model applies angular noise around the closest point on the entity's bounding box
 to the ego vehicle (the origin of noise coordinate), rather than around the entity's base-link.
 
 ### `noise.v4.<config_name>.yaw.mean.ellipse_normalized_x_radius`
@@ -553,19 +554,19 @@ The unit is radians. This parameter is used only if the value of `noise.model.ve
 ### `noise.v4.<config_name>.yaw.autocorrelation_coefficient.amplitude`
 
 A positive `double` type value, default `0.0`.
-The parameter of the autocorrelation coefficient used in the generation of rotation noise. 
+The parameter of the autocorrelation coefficient used in the generation of rotation noise.
 This parameter is used only if the value of `noise.model.version` is `4`.
 
 ### `noise.v4.<config_name>.yaw.autocorrelation_coefficient.decay`
 
 A positive `double` type value, default `0.0`.
-The parameter of the autocorrelation coefficient used in the generation of rotation noise. 
+The parameter of the autocorrelation coefficient used in the generation of rotation noise.
 This parameter is used only if the value of `noise.model.version` is `4`.
 
 ### `noise.v4.<config_name>.yaw.autocorrelation_coefficient.offset`
 
 A positive `double` type value, default `0.0`.
-The parameter of the autocorrelation coefficient used in the generation of rotation noise. 
+The parameter of the autocorrelation coefficient used in the generation of rotation noise.
 This parameter is used only if the value of `noise.model.version` is `4`.
 
 ### `noise.v4.<config_name>.yaw_flip` (namespace)
@@ -600,27 +601,27 @@ This parameter is used only if the value of `noise.model.version` is `4`.
 ### `noise.v4.<config_name>.true_positive.autocorrelation_coefficient.amplitude`
 
 A positive `double` type value, default `0.0`.
-The parameter of the autocorrelation coefficient used in the generation of true positive noise. 
-The noise models the time series as Markov process. 
+The parameter of the autocorrelation coefficient used in the generation of true positive noise.
+The noise models the time series as Markov process.
 This parameter is used only if the value of `noise.model.version` is `4`.
 
 ### `noise.v4.<config_name>.true_positive.autocorrelation_coefficient.decay`
 
 A positive `double` type value, default `0.0`.
-The parameter of the autocorrelation coefficient used in the generation of true positive noise. 
-The noise models the time series as Markov process. 
+The parameter of the autocorrelation coefficient used in the generation of true positive noise.
+The noise models the time series as Markov process.
 This parameter is used only if the value of `noise.model.version` is `4`.
 
 ### `noise.v4.<config_name>.true_positive.autocorrelation_coefficient.offset`
 
 A positive `double` type value, default `0.0`.
-The parameter of the autocorrelation coefficient used in the generation of true positive noise. 
-The noise models the time series as Markov process. 
+The parameter of the autocorrelation coefficient used in the generation of true positive noise.
+The noise models the time series as Markov process.
 This parameter is used only if the value of `noise.model.version` is `4`.
 
 ### `noise.v4.<config_name>.noise_application_entities` (namespace)
 
-Entity filtering parameters with the same structure as `noise.v3`. 
+Entity filtering parameters with the same structure as `noise.v3`.
 See [`noise.v3.<config_name>.noise_application_entities`](#noisev3config_namenoise_application_entities-namespace) for detailed explanation.
 Like noise v3, noise v4 also has the parameters below in this namespace.
 
