@@ -30,6 +30,9 @@ Changelog for package real_time_factor_control_rviz_plugin
 * Merge branch 'master' into dependabot/github_actions/actions/checkout-5
 * Contributors: Kotaro Yoshimoto, Taiga
 
+18.3.9 (2025-11-18)
+-------------------
+
 18.3.8 (2025-11-18)
 -------------------
 
