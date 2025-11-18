@@ -526,3 +526,17 @@ TYPED_TEST(TrafficLightsInternalTest, generateAutowarePerceptionTrafficLightGrou
   EXPECT_NEAR(msg.traffic_light_groups[0].elements[1].confidence, expected_confidence, eps);
 }
 #endif  // __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)
+
+TYPED_TEST(TrafficLightsInternalTest, addAndClearTrafficLightsState)
+{
+  this->lights->addTrafficLightsState(this->id, "green solidOn circle");
+  this->lights->addTrafficLightsState(this->id, "red solidOn circle");
+
+  const auto state_before_clear = this->lights->getTrafficLightsComposedState(this->id);
+  EXPECT_TRUE(state_before_clear.find("green") != std::string::npos);
+  EXPECT_TRUE(state_before_clear.find("red") != std::string::npos);
+
+  this->lights->clearTrafficLightsState(this->id);
+  const auto state_after_clear = this->lights->getTrafficLightsComposedState(this->id);
+  EXPECT_TRUE(state_after_clear.empty());
+}
