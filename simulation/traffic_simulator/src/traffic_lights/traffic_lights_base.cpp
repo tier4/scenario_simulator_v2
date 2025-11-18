@@ -70,8 +70,21 @@ auto TrafficLightsBase::setTrafficLightsColor(
 auto TrafficLightsBase::setTrafficLightsState(
   const lanelet::Id lanelet_id, const std::string & state) -> void
 {
+  clearTrafficLightsState(lanelet_id);
+  addTrafficLightsState(lanelet_id, state);
+}
+
+auto TrafficLightsBase::clearTrafficLightsState(const lanelet::Id lanelet_id) -> void
+{
   for (const auto & traffic_light : getTrafficLights(lanelet_id)) {
     traffic_light.get().clear();
+  }
+}
+
+auto TrafficLightsBase::addTrafficLightsState(
+  const lanelet::Id lanelet_id, const std::string & state) -> void
+{
+  for (const auto & traffic_light : getTrafficLights(lanelet_id)) {
     traffic_light.get().set(state);
   }
 }
