@@ -65,6 +65,10 @@ public:
 
   auto setTrafficLightsState(const lanelet::Id lanelet_id, const std::string & state) -> void;
 
+  auto clearTrafficLightsState(const lanelet::Id lanelet_id) -> void;
+
+  auto addTrafficLightsState(const lanelet::Id lanelet_id, const std::string & state) -> void;
+
   auto setTrafficLightsConfidence(const lanelet::Id lanelet_id, const double confidence) -> void;
 
   auto getTrafficLightsComposedState(const lanelet::Id lanelet_id) -> std::string;
