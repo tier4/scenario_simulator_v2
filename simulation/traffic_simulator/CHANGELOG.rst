@@ -30,6 +30,13 @@ Changelog for package traffic_simulator
 * Merge branch 'master' into dependabot/github_actions/actions/checkout-5
 * Contributors: Kotaro Yoshimoto, Taiga
 
+18.4.2 (2025-11-20)
+-------------------
+* Merge pull request `#1744 <https://github.com/tier4/scenario_simulator_v2/issues/1744>`_ from tier4/fix/deprecation_error
+* Merge branch 'master' into fix/deprecation_error
+* Do not treat deprecation as an error
+* Contributors: Kotaro Yoshimoto
+
 18.4.1 (2025-11-20)
 -------------------
 
