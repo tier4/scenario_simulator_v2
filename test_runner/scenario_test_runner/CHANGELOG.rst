@@ -44,6 +44,19 @@ Changelog for package scenario_test_runner
 * Merge branch 'master' into dependabot/github_actions/actions/checkout-5
 * Contributors: Kotaro Yoshimoto, Taiga
 
+18.4.0 (2025-11-20)
+-------------------
+* Merge pull request `#1727 <https://github.com/tier4/scenario_simulator_v2/issues/1727>`_ from tier4/feature/publisher-noise-pose
+* Merge branch 'master' into feature/publisher-noise-pose
+* Merge branch 'master' into feature/publisher-noise-pose
+* Merge branch 'master' into feature/publisher-noise-pose
+* Merge branch 'master' into feature/publisher-noise-pose
+* Merge branch 'master' into feature/publisher-noise-pose
+* Add covariance diagonal elements errors for PoseWithCovarianceStamped
+* Add covariance diagonal elements errors for PoseWithCovarianceStamped
+* Add /localization/pose_estimator/pose_with_covariance parameters to parameters file
+* Contributors: Kotaro Yoshimoto, Mateusz Palczuk
+
 18.3.9 (2025-11-18)
 -------------------
 
