@@ -76,6 +76,14 @@ auto boundingBoxLaneLongitudinalDistance(
   const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
   const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box) -> std::optional<double>;
 
+auto splineDistanceToBoundingBox(
+  const math::geometry::CatmullRomSplineInterface & spline,
+  const CanonicalizedLaneletPose & from_lanelet_pose,
+  const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
+  const CanonicalizedLaneletPose & target_lanelet_pose,
+  const traffic_simulator_msgs::msg::BoundingBox & target_bounding_box,
+  const double lateral_collision_threshold = -1.0) -> std::optional<double>;
+
 // Bounds
 auto distanceToLaneBound(
   const geometry_msgs::msg::Pose & map_pose,
@@ -130,6 +138,15 @@ auto distanceToCrosswalk(Ts &&... xs)
 auto distanceToYieldStop(
   const CanonicalizedLaneletPose & reference_pose, const lanelet::Ids & following_lanelets,
   const std::vector<CanonicalizedLaneletPose> & other_poses) -> std::optional<double>;
+
+/*
+   Here it is required to pass the CanonicalizedEntityStatus vector, instead of just
+   the CanonicalizedLaneletPose vector, since it is necessary to know the msg::BoundingBox of each Entity
+*/
+auto distanceToNearestConflictingPose(
+  const lanelet::Ids & following_lanelets, const math::geometry::CatmullRomSplineInterface & spline,
+  const CanonicalizedEntityStatus & from_status,
+  const std::vector<CanonicalizedEntityStatus> & other_statuses) -> std::optional<double>;
 
 // spline
 auto distanceToSpline(
