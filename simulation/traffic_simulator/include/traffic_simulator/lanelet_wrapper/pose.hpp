@@ -29,9 +29,26 @@ namespace pose
 /// @sa https://github.com/tier4/scenario_simulator_v2/commit/4c8e9f496b061b00bec799159d59c33f2ba46b3a
 constexpr static double DEFAULT_MATCH_TO_LANE_REDUCTION_RATIO = 0.8;
 
+/*
+  Using a fixed `ALTITUDE_THRESHOLD` value of 1.0 [m] is justified because the
+  entity's Z-position is always relative to its base. This eliminates the
+  need to dynamically adjust the threshold based on the entity's dimensions,
+  ensuring consistent altitude matching regardless of the entity type.
+
+  The position of the entity is defined relative to its base, typically
+  the center of the rear axle projected onto the ground in the case of vehicles.
+
+  There is no technical basis for this value; it was determined based on
+  experiments.
+*/
+constexpr static double ALTITUDE_THRESHOLD = 1.0;
+
 auto toMapPose(const LaneletPose & lanelet_pose, const bool fill_pitch = true) -> PoseStamped;
 
-auto isAltitudeMatching(const double current_altitude, const double target_altitude) -> bool;
+auto isAltitudeWithinThreshold(const double current_altitude, const double target_altitude) -> bool;
+
+auto isAltitudeWithinRange(
+  const double current_altitude, const double min_altitude, const double max_altitude) -> bool;
 
 auto toLaneletPose(
   const Pose & map_pose, const lanelet::Id lanelet_id, const double matching_distance = 1.0)
