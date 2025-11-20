@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>agnocast_wrapper</name>
-  <version>18.4.1</version>
+  <version>18.4.2</version>
   <description>A wrapper package for agnocast</description>
   <maintainer email="mateusz.palczuk@robotec.ai">Mateusz Palczuk</maintainer>
   <license>Apache License 2.0</license>
