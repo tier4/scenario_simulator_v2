@@ -30,6 +30,21 @@ Changelog for package arithmetic
 * Merge branch 'master' into dependabot/github_actions/actions/checkout-5
 * Contributors: Kotaro Yoshimoto, Taiga
 
+18.4.0 (2025-11-20)
+-------------------
+* Merge branch 'master' into feature/publisher-noise-pose
+* Merge branch 'master' into feature/publisher-noise-pose
+* Merge branch 'master' into feature/publisher-noise-pose
+* Merge branch 'master' into feature/publisher-noise-pose
+* Merge branch 'master' into feature/publisher-noise-pose
+* Contributors: Kotaro Yoshimoto
+
+18.3.9 (2025-11-18)
+-------------------
+
+18.3.8 (2025-11-18)
+-------------------
+
 18.3.7 (2025-11-14)
 -------------------
 * Merge branch 'master' into dependabot/github_actions/8BitJonny/gh-get-current-pr-4.0.0
