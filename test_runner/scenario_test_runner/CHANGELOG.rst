@@ -44,6 +44,11 @@ Changelog for package scenario_test_runner
 * Merge branch 'master' into dependabot/github_actions/actions/checkout-5
 * Contributors: Kotaro Yoshimoto, Taiga
 
+18.4.2 (2025-11-20)
+-------------------
+* Merge branch 'master' into fix/deprecation_error
+* Contributors: Kotaro Yoshimoto
+
 18.4.1 (2025-11-20)
 -------------------
 
