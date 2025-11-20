@@ -13,8 +13,11 @@
 // limitations under the License.
 
 #include <gtest/gtest.h>
+#include <tf2/LinearMath/Matrix3x3.h>
+#include <tf2/LinearMath/Quaternion.h>
 
 #include <concealer/publisher.hpp>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 
 auto rclcpp_initialized = false;
 
@@ -530,4 +533,259 @@ TEST(NormalDistribution_autoware_vehicle_msgs_msg_VelocityReport, when_all_param
   ASSERT_FLOAT_EQ(randomized_velocity_report.lateral_velocity,     19.565622 );
   ASSERT_FLOAT_EQ(randomized_velocity_report.heading_rate,          2.8688359);
   // clang-format on
+}
+
+TEST(NormalDistribution_geometry_msgs_msg_PoseWithCovarianceStamped, when_no_parameters_are_given)
+{
+  if (not std::exchange(rclcpp_initialized, true)) {
+    rclcpp::init(0, nullptr);
+  }
+
+  auto node = rclcpp::Node("node_name", "simulation");
+
+  // clang-format off
+  ASSERT_FALSE(node.has_parameter("/topic_name.seed"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_x.error.additive.mean"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_x.error.additive.standard_deviation"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_x.error.multiplicative.mean"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_x.error.multiplicative.standard_deviation"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_y.error.additive.mean"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_y.error.additive.standard_deviation"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_y.error.multiplicative.mean"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_y.error.multiplicative.standard_deviation"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_z.error.additive.mean"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_z.error.additive.standard_deviation"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_z.error.multiplicative.mean"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_z.error.multiplicative.standard_deviation"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.r.error.additive.mean"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.r.error.additive.standard_deviation"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.r.error.multiplicative.mean"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.r.error.multiplicative.standard_deviation"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.p.error.additive.mean"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.p.error.additive.standard_deviation"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.p.error.multiplicative.mean"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.p.error.multiplicative.standard_deviation"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.y.error.additive.mean"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.y.error.additive.standard_deviation"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.y.error.multiplicative.mean"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.y.error.multiplicative.standard_deviation"));
+  // clang-format on
+
+  auto randomize = concealer::NormalDistribution<geometry_msgs::msg::PoseWithCovarianceStamped>(
+    node.get_node_parameters_interface(), "/topic_name");
+
+  ASSERT_EQ(randomize.seed, 0);
+  ASSERT_EQ(randomize.position_local_x_error.additive.mean(), 0);
+  ASSERT_EQ(randomize.position_local_x_error.additive.stddev(), 0);
+  ASSERT_EQ(randomize.position_local_x_error.multiplicative.mean(), 0);
+  ASSERT_EQ(randomize.position_local_x_error.multiplicative.stddev(), 0);
+  ASSERT_EQ(randomize.position_local_y_error.additive.mean(), 0);
+  ASSERT_EQ(randomize.position_local_y_error.additive.stddev(), 0);
+  ASSERT_EQ(randomize.position_local_y_error.multiplicative.mean(), 0);
+  ASSERT_EQ(randomize.position_local_y_error.multiplicative.stddev(), 0);
+  ASSERT_EQ(randomize.position_local_z_error.additive.mean(), 0);
+  ASSERT_EQ(randomize.position_local_z_error.additive.stddev(), 0);
+  ASSERT_EQ(randomize.position_local_z_error.multiplicative.mean(), 0);
+  ASSERT_EQ(randomize.position_local_z_error.multiplicative.stddev(), 0);
+  ASSERT_EQ(randomize.orientation_r_error.additive.mean(), 0);
+  ASSERT_EQ(randomize.orientation_r_error.additive.stddev(), 0);
+  ASSERT_EQ(randomize.orientation_r_error.multiplicative.mean(), 0);
+  ASSERT_EQ(randomize.orientation_r_error.multiplicative.stddev(), 0);
+  ASSERT_EQ(randomize.orientation_p_error.additive.mean(), 0);
+  ASSERT_EQ(randomize.orientation_p_error.additive.stddev(), 0);
+  ASSERT_EQ(randomize.orientation_p_error.multiplicative.mean(), 0);
+  ASSERT_EQ(randomize.orientation_p_error.multiplicative.stddev(), 0);
+  ASSERT_EQ(randomize.orientation_y_error.additive.mean(), 0);
+  ASSERT_EQ(randomize.orientation_y_error.additive.stddev(), 0);
+  ASSERT_EQ(randomize.orientation_y_error.multiplicative.mean(), 0);
+  ASSERT_EQ(randomize.orientation_y_error.multiplicative.stddev(), 0);
+
+  const auto pose = geometry_msgs::msg::PoseWithCovarianceStamped();
+
+  const auto randomized_pose = randomize(pose);
+
+  // clang-format off
+  ASSERT_EQ(randomized_pose.pose.pose.position.x,    0);
+  ASSERT_EQ(randomized_pose.pose.pose.position.y,    0);
+  ASSERT_EQ(randomized_pose.pose.pose.position.z,    0);
+  ASSERT_EQ(randomized_pose.pose.pose.orientation.x, 0);
+  ASSERT_EQ(randomized_pose.pose.pose.orientation.y, 0);
+  ASSERT_EQ(randomized_pose.pose.pose.orientation.z, 0);
+  ASSERT_EQ(randomized_pose.pose.pose.orientation.w, 1);
+  // clang-format on
+}
+
+TEST(NormalDistribution_geometry_msgs_msg_PoseWithCovarianceStamped, when_all_parameters_are_given)
+{
+  if (not std::exchange(rclcpp_initialized, true)) {
+    rclcpp::init(0, nullptr);
+  }
+
+  auto node = rclcpp::Node("node_name", "simulation");
+
+  // clang-format off
+  ASSERT_FALSE(node.has_parameter("/topic_name.seed"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_x.error.additive.mean"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_x.error.additive.standard_deviation"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_x.error.multiplicative.mean"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_x.error.multiplicative.standard_deviation"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_y.error.additive.mean"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_y.error.additive.standard_deviation"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_y.error.multiplicative.mean"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_y.error.multiplicative.standard_deviation"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_z.error.additive.mean"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_z.error.additive.standard_deviation"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_z.error.multiplicative.mean"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_z.error.multiplicative.standard_deviation"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.r.error.additive.mean"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.r.error.additive.standard_deviation"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.r.error.multiplicative.mean"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.r.error.multiplicative.standard_deviation"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.p.error.additive.mean"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.p.error.additive.standard_deviation"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.p.error.multiplicative.mean"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.p.error.multiplicative.standard_deviation"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.y.error.additive.mean"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.y.error.additive.standard_deviation"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.y.error.multiplicative.mean"));
+  ASSERT_FALSE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.y.error.multiplicative.standard_deviation"));
+  // clang-format on
+
+  // clang-format off
+  node.declare_parameter<int   >("/topic_name.seed",                                                                                                              1);
+  node.declare_parameter<double>("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_x.error.additive.mean",                      2);
+  node.declare_parameter<double>("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_x.error.additive.standard_deviation",        3);
+  node.declare_parameter<double>("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_x.error.multiplicative.mean",                4);
+  node.declare_parameter<double>("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_x.error.multiplicative.standard_deviation",  5);
+  node.declare_parameter<double>("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_y.error.additive.mean",                      6);
+  node.declare_parameter<double>("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_y.error.additive.standard_deviation",        7);
+  node.declare_parameter<double>("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_y.error.multiplicative.mean",                8);
+  node.declare_parameter<double>("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_y.error.multiplicative.standard_deviation",  9);
+  node.declare_parameter<double>("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_z.error.additive.mean",                     10);
+  node.declare_parameter<double>("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_z.error.additive.standard_deviation",       11);
+  node.declare_parameter<double>("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_z.error.multiplicative.mean",               12);
+  node.declare_parameter<double>("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_z.error.multiplicative.standard_deviation", 13);
+  node.declare_parameter<double>("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.r.error.additive.mean",                        14);
+  node.declare_parameter<double>("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.r.error.additive.standard_deviation",          15);
+  node.declare_parameter<double>("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.r.error.multiplicative.mean",                  16);
+  node.declare_parameter<double>("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.r.error.multiplicative.standard_deviation",    17);
+  node.declare_parameter<double>("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.p.error.additive.mean",                        18);
+  node.declare_parameter<double>("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.p.error.additive.standard_deviation",          19);
+  node.declare_parameter<double>("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.p.error.multiplicative.mean",                  20);
+  node.declare_parameter<double>("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.p.error.multiplicative.standard_deviation",    21);
+  node.declare_parameter<double>("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.y.error.additive.mean",                        22);
+  node.declare_parameter<double>("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.y.error.additive.standard_deviation",          23);
+  node.declare_parameter<double>("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.y.error.multiplicative.mean",                  24);
+  node.declare_parameter<double>("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.y.error.multiplicative.standard_deviation",    25);
+  // clang-format on
+
+  // clang-format off
+  ASSERT_TRUE(node.has_parameter("/topic_name.seed"));
+  ASSERT_TRUE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_x.error.additive.mean"));
+  ASSERT_TRUE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_x.error.additive.standard_deviation"));
+  ASSERT_TRUE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_x.error.multiplicative.mean"));
+  ASSERT_TRUE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_x.error.multiplicative.standard_deviation"));
+  ASSERT_TRUE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_y.error.additive.mean"));
+  ASSERT_TRUE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_y.error.additive.standard_deviation"));
+  ASSERT_TRUE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_y.error.multiplicative.mean"));
+  ASSERT_TRUE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_y.error.multiplicative.standard_deviation"));
+  ASSERT_TRUE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_z.error.additive.mean"));
+  ASSERT_TRUE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_z.error.additive.standard_deviation"));
+  ASSERT_TRUE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_z.error.multiplicative.mean"));
+  ASSERT_TRUE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.position.local_z.error.multiplicative.standard_deviation"));
+  ASSERT_TRUE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.r.error.additive.mean"));
+  ASSERT_TRUE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.r.error.additive.standard_deviation"));
+  ASSERT_TRUE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.r.error.multiplicative.mean"));
+  ASSERT_TRUE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.r.error.multiplicative.standard_deviation"));
+  ASSERT_TRUE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.p.error.additive.mean"));
+  ASSERT_TRUE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.p.error.additive.standard_deviation"));
+  ASSERT_TRUE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.p.error.multiplicative.mean"));
+  ASSERT_TRUE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.p.error.multiplicative.standard_deviation"));
+  ASSERT_TRUE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.y.error.additive.mean"));
+  ASSERT_TRUE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.y.error.additive.standard_deviation"));
+  ASSERT_TRUE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.y.error.multiplicative.mean"));
+  ASSERT_TRUE(node.has_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.y.error.multiplicative.standard_deviation"));
+  // clang-format on
+
+  auto randomize = concealer::NormalDistribution<geometry_msgs::msg::PoseWithCovarianceStamped>(
+    node.get_node_parameters_interface(), "/topic_name");
+
+  // clang-format off
+  ASSERT_EQ(randomize.seed,                                            1);
+  ASSERT_EQ(randomize.position_local_x_error.additive.mean(),          2);
+  ASSERT_EQ(randomize.position_local_x_error.additive.stddev(),        3);
+  ASSERT_EQ(randomize.position_local_x_error.multiplicative.mean(),    4);
+  ASSERT_EQ(randomize.position_local_x_error.multiplicative.stddev(),  5);
+  ASSERT_EQ(randomize.position_local_y_error.additive.mean(),          6);
+  ASSERT_EQ(randomize.position_local_y_error.additive.stddev(),        7);
+  ASSERT_EQ(randomize.position_local_y_error.multiplicative.mean(),    8);
+  ASSERT_EQ(randomize.position_local_y_error.multiplicative.stddev(),  9);
+  ASSERT_EQ(randomize.position_local_z_error.additive.mean(),         10);
+  ASSERT_EQ(randomize.position_local_z_error.additive.stddev(),       11);
+  ASSERT_EQ(randomize.position_local_z_error.multiplicative.mean(),   12);
+  ASSERT_EQ(randomize.position_local_z_error.multiplicative.stddev(), 13);
+  ASSERT_EQ(randomize.orientation_r_error.additive.mean(),            14);
+  ASSERT_EQ(randomize.orientation_r_error.additive.stddev(),          15);
+  ASSERT_EQ(randomize.orientation_r_error.multiplicative.mean(),      16);
+  ASSERT_EQ(randomize.orientation_r_error.multiplicative.stddev(),    17);
+  ASSERT_EQ(randomize.orientation_p_error.additive.mean(),            18);
+  ASSERT_EQ(randomize.orientation_p_error.additive.stddev(),          19);
+  ASSERT_EQ(randomize.orientation_p_error.multiplicative.mean(),      20);
+  ASSERT_EQ(randomize.orientation_p_error.multiplicative.stddev(),    21);
+  ASSERT_EQ(randomize.orientation_y_error.additive.mean(),            22);
+  ASSERT_EQ(randomize.orientation_y_error.additive.stddev(),          23);
+  ASSERT_EQ(randomize.orientation_y_error.multiplicative.mean(),      24);
+  ASSERT_EQ(randomize.orientation_y_error.multiplicative.stddev(),    25);
+  // clang-format on
+
+  const auto pose = geometry_msgs::msg::PoseWithCovarianceStamped();
+
+  const auto randomized_pose = randomize(pose);
+
+  // clang-format off
+  ASSERT_DOUBLE_EQ(randomized_pose.pose.pose.position.x,     4.0604709175379767 );
+  ASSERT_DOUBLE_EQ(randomized_pose.pose.pose.position.y,    19.565623431299677  );
+  ASSERT_DOUBLE_EQ(randomized_pose.pose.pose.position.z,     2.8688348437534232 );
+  ASSERT_DOUBLE_EQ(randomized_pose.pose.pose.orientation.x, -0.67000662242827891);
+  ASSERT_DOUBLE_EQ(randomized_pose.pose.pose.orientation.y,  0.52630680032770782);
+  ASSERT_DOUBLE_EQ(randomized_pose.pose.pose.orientation.z, -0.28514186053174795);
+  ASSERT_DOUBLE_EQ(randomized_pose.pose.pose.orientation.w, -0.43907447796877608);
+  // clang-format on
+}
+
+TEST(NormalDistribution_geometry_msgs_msg_PoseWithCovarianceStamped, multi_axes_check)
+{
+  if (not std::exchange(rclcpp_initialized, true)) {
+    rclcpp::init(0, nullptr);
+  }
+
+  auto node = rclcpp::Node("node_name", "simulation");
+  constexpr double error = M_PI / 4;
+  // clang-format off
+  node.declare_parameter("/topic_name.seed", 42);
+  node.declare_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.r.error.additive.mean", error);
+  node.declare_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.r.error.additive.standard_deviation", 0.0);
+  node.declare_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.p.error.additive.mean", error);
+  node.declare_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.p.error.additive.standard_deviation", 0.0);
+  node.declare_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.y.error.additive.mean", 0.0);
+  node.declare_parameter("/topic_name.geometry_msgs::msg::PoseWithCovarianceStamped.pose.pose.orientation.y.error.additive.standard_deviation", 0.0);
+  // clang-format on
+
+  auto randomize = concealer::NormalDistribution<geometry_msgs::msg::PoseWithCovarianceStamped>(
+    node.get_node_parameters_interface(), "/topic_name");
+
+  const auto pose = geometry_msgs::msg::PoseWithCovarianceStamped();
+
+  const auto randomized_pose = randomize(pose);
+
+  tf2::Quaternion result_orientation;
+  tf2::fromMsg(randomized_pose.pose.pose.orientation, result_orientation);
+  double result_roll, result_pitch, result_yaw;
+  tf2::Matrix3x3(result_orientation).getRPY(result_roll, result_pitch, result_yaw);
+
+  constexpr double tolerance = 1e-6;  // this value is set by Kotaro Yoshimoto's experiment
+
+  EXPECT_NEAR(result_yaw, 0.0, tolerance);
+  EXPECT_NEAR(std::abs(result_roll), error, tolerance);
+  EXPECT_NEAR(std::abs(result_pitch), error, tolerance);
 }

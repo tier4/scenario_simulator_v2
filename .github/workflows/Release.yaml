@@ -36,7 +36,7 @@ jobs:
       new_version: ${{ steps.new_version.outputs.new_version }}
     steps:
       # Fetch the pull request information (even if the workflow is triggered by a push event).
-      - uses: 8BitJonny/gh-get-current-pr@3.0.0
+      - uses: 8BitJonny/gh-get-current-pr@4.0.0
         id: pull-request
 
       # Currently Pull Request body is not used, but it can be useful in the future.
