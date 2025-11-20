@@ -30,6 +30,9 @@ Changelog for package scenario_simulator_v2
 * Merge branch 'master' into dependabot/github_actions/actions/checkout-5
 * Contributors: Kotaro Yoshimoto, Taiga
 
+18.4.1 (2025-11-20)
+-------------------
+
 18.4.0 (2025-11-20)
 -------------------
 * Merge branch 'master' into feature/publisher-noise-pose
