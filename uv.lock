@@ -192,7 +192,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "catkin-pkg", specifier = ">=1.0.0,<2" },
+    { name = "catkin-pkg", specifier = ">=1.1.0,<2" },
     { name = "fontawesome-markdown", git = "https://github.com/jordanauge/fontawesome-markdown?rev=c00e2d0beb00f0e581b8a108e6205047e73dc492" },
     { name = "markdown", specifier = ">=3.3.0" },
     { name = "mkdocs", specifier = ">=1.5.0,<2" },
