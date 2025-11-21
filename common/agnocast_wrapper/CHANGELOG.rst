@@ -11,6 +11,9 @@ Changelog for package agnocast_wrapper
 * Merge branch 'master' into dependabot/github_actions/actions/checkout-5
 * Contributors: Kotaro Yoshimoto, Taiga
 
+18.4.4 (2025-11-21)
+-------------------
+
 18.4.3 (2025-11-21)
 -------------------
 * Merge remote-tracking branch 'origin/master' into fix/poetry-to-uv
