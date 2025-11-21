@@ -20,6 +20,7 @@
   <depend>python3-xmlschema</depend>
   <depend>rclpy</depend>
   <depend>simple_sensor_simulator</depend>
+  <test_depend>replay_testing</test_depend>
   <export>
     <build_type>ament_cmake</build_type>
   </export>
