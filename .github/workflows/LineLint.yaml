@@ -9,4 +9,4 @@ jobs:
     name: Check if all files end in newline
     steps:
       - uses: actions/checkout@v5
-      - uses: fernandrone/linelint@0.0.4
+      - uses: fernandrone/linelint@0.0.6
