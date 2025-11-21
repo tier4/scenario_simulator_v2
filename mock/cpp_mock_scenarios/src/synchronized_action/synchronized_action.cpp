@@ -91,7 +91,8 @@ private:
   auto getSampleLaneletPose(const traffic_simulator::LaneletPose & lanelet_pose)
     -> std::optional<traffic_simulator::CanonicalizedLaneletPose>
   {
-    return traffic_simulator::pose::toCanonicalizedLaneletPose(lanelet_pose);
+    // WIP just use first lanelet pose, should be changed in the future
+    return traffic_simulator::pose::toCanonicalizedLaneletPoses({lanelet_pose}).front();
   }
 };
 }  // namespace cpp_mock_scenarios
