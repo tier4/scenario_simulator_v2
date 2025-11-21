@@ -125,7 +125,8 @@ private:
                   .time(2.0)
                   .position(trajectory_goal_pose));
               return vertices;
-            }()))));
+            }()))
+          .follow_backwards(false)));
   }
 };
 }  // namespace cpp_mock_scenarios

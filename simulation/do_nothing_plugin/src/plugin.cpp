@@ -33,7 +33,10 @@ bool checkPolylineTrajectory(
 {
   if (trajectory) {
     if (trajectory->closed) {
-      THROW_SIMULATION_ERROR("Currently, closed trajectory does not supported.");
+      THROW_SIMULATION_ERROR("Currently, closed trajectory is not supported.");
+    }
+    if (trajectory->follow_backwards) {
+      THROW_SIMULATION_ERROR("Currently, follow_backwards trajectory is not supported.");
     }
     if (!trajectory->dynamic_constraints_ignorable) {
       THROW_SIMULATION_ERROR(
