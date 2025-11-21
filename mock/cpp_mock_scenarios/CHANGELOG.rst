@@ -30,6 +30,52 @@ Changelog for package cpp_mock_scenarios
 * Merge branch 'master' into dependabot/github_actions/actions/checkout-5
 * Contributors: Kotaro Yoshimoto, Taiga
 
+18.4.2 (2025-11-20)
+-------------------
+* Merge branch 'master' into fix/deprecation_error
+* Contributors: Kotaro Yoshimoto
+
+18.4.1 (2025-11-20)
+-------------------
+
+18.4.0 (2025-11-20)
+-------------------
+* Merge branch 'master' into feature/publisher-noise-pose
+* Merge branch 'master' into feature/publisher-noise-pose
+* Merge branch 'master' into feature/publisher-noise-pose
+* Merge branch 'master' into feature/publisher-noise-pose
+* Merge branch 'master' into feature/publisher-noise-pose
+* Contributors: Kotaro Yoshimoto
+
+18.3.9 (2025-11-18)
+-------------------
+
+18.3.8 (2025-11-18)
+-------------------
+
+18.3.7 (2025-11-14)
+-------------------
+* Merge branch 'master' into dependabot/github_actions/8BitJonny/gh-get-current-pr-4.0.0
+* Contributors: Kotaro Yoshimoto
+
+18.3.6 (2025-11-13)
+-------------------
+* Merge branch 'master' into fix/multiple_states_on_phase
+* Merge branch 'master' into fix/multiple_states_on_phase
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
+18.3.5 (2025-11-13)
+-------------------
+* Merge branch 'master' into dependabot/github_actions/actions/download-artifact-6
+* Merge branch 'master' into dependabot/github_actions/actions/download-artifact-6
+* Contributors: Taiga
+
+18.3.4 (2025-11-13)
+-------------------
+* Merge branch 'master' into dependabot/github_actions/actions/upload-artifact-5
+* Merge branch 'master' into dependabot/github_actions/actions/upload-artifact-5
+* Contributors: Taiga
+
 18.3.3 (2025-11-07)
 -------------------
 * Merge branch 'master' into dependabot/github_actions/actions/github-script-8

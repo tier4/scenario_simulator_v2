@@ -88,7 +88,7 @@ jobs:
 
       - name: Download previous install artifact
         if: steps.previous_run.outputs.result != 'null'
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           run-id: "${{ steps.previous_run.outputs.result }}"
           name: install-${{ matrix.runs_on }}-RelWithDebInfo
@@ -96,7 +96,7 @@ jobs:
           github-token: ${{ secrets.GH_PAT }}
 
       - name: Download current install artifact
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           name: install-${{ matrix.runs_on }}-RelWithDebInfo
           run-id: ${{ github.event.workflow_run.id || github.event.inputs.run_id }}
