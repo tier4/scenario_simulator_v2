@@ -82,7 +82,7 @@ auto operator>>(std::istream & is, Double & datum) -> std::istream &
 
   is >> token;
 
-  static const std::regex infinity{R"([+-]?INF)"};
+  static const std::regex infinity{R"(([+-])?INF)"};
 
   std::smatch result;
 
