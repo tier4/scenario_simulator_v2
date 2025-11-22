@@ -12,13 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__BEHAVIOR__FOLLOW_TRAJECTORY_HPP_
-#define TRAFFIC_SIMULATOR__BEHAVIOR__FOLLOW_TRAJECTORY_HPP_
+#ifndef TRAFFIC_SIMULATOR__BEHAVIOR__FOLLOW_TRAJECTORY__FOLLOW_TRAJECTORY_HPP_
+#define TRAFFIC_SIMULATOR__BEHAVIOR__FOLLOW_TRAJECTORY__FOLLOW_TRAJECTORY_HPP_
 
 #include <optional>
+#include <traffic_simulator/behavior/follow_trajectory/follow_waypoint_controller.hpp>
+#include <traffic_simulator/behavior/follow_trajectory/polyline_trajectory_positioner.hpp>
+#include <traffic_simulator/behavior/follow_trajectory/validated_entity_status.hpp>
 #include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
-#include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
 #include <traffic_simulator_msgs/msg/polyline_trajectory.hpp>
 
@@ -26,12 +28,14 @@ namespace traffic_simulator
 {
 namespace follow_trajectory
 {
-auto makeUpdatedStatus(
-  const traffic_simulator_msgs::msg::EntityStatus &,
-  traffic_simulator_msgs::msg::PolylineTrajectory &,
-  const traffic_simulator_msgs::msg::BehaviorParameter &, double, double,
-  std::optional<double> target_speed = std::nullopt) -> std::optional<EntityStatus>;
+/// @note side effects on polyline_trajectory
+auto makeUpdatedEntityStatus(
+  const ValidatedEntityStatus & validated_entity_status,
+  traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
+  const double matching_distance, const std::optional<double> target_speed, const double step_time)
+  -> std::optional<EntityStatus>;
+
 }  // namespace follow_trajectory
 }  // namespace traffic_simulator
 
-#endif  // TRAFFIC_SIMULATOR__BEHAVIOR__FOLLOW_TRAJECTORY_HPP_
+#endif  // TRAFFIC_SIMULATOR__BEHAVIOR__FOLLOW_TRAJECTORY__FOLLOW_TRAJECTORY_HPP_
