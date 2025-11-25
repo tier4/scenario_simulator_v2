@@ -17,6 +17,7 @@
 
 #include <boost/filesystem.hpp>
 #include <iostream>
+#include <memory>
 #include <sstream>
 #include <stdexcept>
 #include <system_error>

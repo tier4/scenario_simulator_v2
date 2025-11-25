@@ -21,6 +21,7 @@
 #include <functional>
 #include <memory>
 #include <openscenario_interpreter/name.hpp>
+#include <openscenario_interpreter/object.hpp>
 #include <openscenario_interpreter/syntax/catalog_locations.hpp>
 
 #ifndef PARAMETER_VALUE_DISTRIBUTION_ONLY

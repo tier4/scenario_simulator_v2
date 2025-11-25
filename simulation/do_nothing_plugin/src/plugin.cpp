@@ -20,6 +20,7 @@
 #include <geometry/vector3/operator.hpp>
 #include <geometry_msgs/msg/accel.hpp>
 #include <geometry_msgs/msg/twist.hpp>
+#include <traffic_simulator/lanelet_wrapper/lanelet_map.hpp>
 
 namespace entity_behavior
 {
@@ -179,26 +180,34 @@ void DoNothingBehavior::update(double current_time, double step_time)
 
   canonicalized_entity_status_->setTime(current_time);
   if (getRequest() == traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY) {
+    behavior = "follow_polyline_trajectory";
     canonicalized_entity_status_->set(
-      interpolate_entity_status_on_polyline_trajectory(),
+      interpolate_entity_status_on_polyline_trajectory(), getRouteLanelets(),
       getDefaultMatchingDistanceForLaneletPoseCalculation());
     if (
       getCurrentTime() + getStepTime() >=
       do_nothing_behavior::follow_trajectory::getLastVertexTimestamp(getPolylineTrajectory())) {
       setRequest(traffic_simulator::behavior::Request::NONE);
+      behavior = "do_nothing";
     }
   } else {
+    behavior = "do_nothing";
+    auto entity_status_with_zero_twist_accel =
+      static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status_);
+    entity_status_with_zero_twist_accel.action_status.twist =
+      geometry_msgs::build<geometry_msgs::msg::Twist>()
+        .linear(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0).y(0).z(0))
+        .angular(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0).y(0).z(0));
+    entity_status_with_zero_twist_accel.action_status.accel =
+      geometry_msgs::build<geometry_msgs::msg::Accel>()
+        .linear(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0).y(0).z(0))
+        .angular(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0).y(0).z(0));
     canonicalized_entity_status_->set(
-      static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status_),
+      entity_status_with_zero_twist_accel, getRouteLanelets(),
       getDefaultMatchingDistanceForLaneletPoseCalculation());
   }
 }
-
-const std::string & DoNothingBehavior::getCurrentAction() const
-{
-  static const std::string behavior = "do_nothing";
-  return behavior;
-}
+auto DoNothingBehavior::getCurrentAction() -> const std::string & { return behavior; }
 }  // namespace entity_behavior
 
 #include "pluginlib/class_list_macros.hpp"

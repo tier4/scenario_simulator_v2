@@ -24,6 +24,7 @@ namespace concealer
 // clang-format off
 AutowareUniverse::AutowareUniverse(bool simulate_localization) try
 : rclcpp::Node("concealer", "simulation"),
+  ContinuousTransformBroadcaster<AutowareUniverse>(simulate_localization? "base_link" : "base_link_ground_truth"),
   getCommand("/control/command/control_cmd", rclcpp::QoS(1), *this),
   getGearCommand("/control/command/gear_cmd", rclcpp::QoS(1), *this),
   getTurnIndicatorsCommand("/control/command/turn_indicators_cmd", rclcpp::QoS(1), *this),
@@ -105,12 +106,6 @@ AutowareUniverse::AutowareUniverse(bool simulate_localization) try
         message.header.stamp = get_clock()->now();
         message.header.frame_id = "map";
         message.pose.pose = current_pose.load();
-        message.pose.covariance.at(6 * 0 + 0) = 0.0225;    // XYZRPY_COV_IDX::X_X
-        message.pose.covariance.at(6 * 1 + 1) = 0.0225;    // XYZRPY_COV_IDX::Y_Y
-        message.pose.covariance.at(6 * 2 + 2) = 0.0225;    // XYZRPY_COV_IDX::Z_Z
-        message.pose.covariance.at(6 * 3 + 3) = 0.000625;  // XYZRPY_COV_IDX::ROLL_ROLL
-        message.pose.covariance.at(6 * 4 + 4) = 0.000625;  // XYZRPY_COV_IDX::PITCH_PITCH
-        message.pose.covariance.at(6 * 5 + 5) = 0.000625;  // XYZRPY_COV_IDX::YAW_YAW
         return message;
       }());
 
@@ -151,14 +146,21 @@ AutowareUniverse::AutowareUniverse(bool simulate_localization) try
       setTurnIndicatorsReport([this]() {
         TurnIndicatorsReport message;
         message.stamp = get_clock()->now();
-        message.report = getTurnIndicatorsCommand().command;
+
+        auto turn_indicators_command = getTurnIndicatorsCommand();
+        message.report = turn_indicators_command.command == TurnIndicatorsCommand::NO_COMMAND 
+                          ? TurnIndicatorsReport::DISABLE
+                          : turn_indicators_command.command;
+
         return message;
       }());
     })),
   spinner(std::thread([this]() {
     try {
+      rclcpp::executors::SingleThreadedExecutor executor;
+      executor.add_node(get_node_base_interface());
       while (rclcpp::ok() and not is_stop_requested.load()) {
-        rclcpp::spin_some(get_node_base_interface());
+        executor.spin_some();
       }
     } catch (...) {
       thrown = std::current_exception();

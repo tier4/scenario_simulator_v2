@@ -1,0 +1,28 @@
+{
+    "config": {
+        "line-length": false,
+        "no-inline-html": {
+            "allowed_elements": [
+                "video",
+                "source",
+                "figure",
+                "iframe"
+            ]
+        },
+        "descriptive-link-text": false,
+        "MD007": {
+            "indent": 4
+        },
+        "MD046": false,
+        "no-duplicate-heading": false,
+        "single-title": false,
+        "heading-increment": false,
+        "first-line-heading": false
+    },
+    "globs": [
+        "docs/**/*.md"
+    ],
+    "ignores": [
+        "**/ReleaseNotes.md"
+    ]
+}

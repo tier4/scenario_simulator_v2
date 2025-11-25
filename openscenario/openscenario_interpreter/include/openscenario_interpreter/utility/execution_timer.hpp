@@ -17,6 +17,7 @@
 
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics.hpp>
+#include <boost/filesystem.hpp>
 #include <chrono>
 #include <cmath>
 #include <fstream>

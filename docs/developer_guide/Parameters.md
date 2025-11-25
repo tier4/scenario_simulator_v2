@@ -84,13 +84,18 @@ is used.
 A positive `int` type value, default `1`. If a non-existent version is
 specified, it is an error.
 This parameter specifies the version of the noise model to be used. Currently,
-the following two noise models are implemented:
+the following four noise models are implemented:
+
 - version: 1 - Simple noise model with position randomization
 - version: 2 - Elliptically approximated model of noise variation with distance
   from the ego entity
+- version: 3 - An extension of the noise model from version 2 to allow different
+  configurations to be applied to different groups of entities.
+- version: 4 - A noise model based on a unique coordinate system
+  with the closest point of the bounding box as the origin.
 
-The parameters specific to the models are placed under `noise.v1.` and
-`noise.v2`, respectively.
+The parameters specific to the models are placed under `noise.v1.`, `noise.v2`,
+`noise.v3.`, and `noise.v4.`, respectively.
 
 ### `noise.v1.position.standard_deviation`
 
@@ -413,6 +418,217 @@ referenced from `values`. Therefore, the array size of this parameter must be
 the same as `ellipse_y_radii`. Otherwise, it is an error. This parameter is
 used only if the value of `noise.model.version` is `2`.
 
+### `noise.v3.<config_name>` (namespace)
+
+The v3 noise model allows you to define multiple named noise configurations.
+`<config_name>` is a user-defined noise configuration identifier.
+`<config_name>` acts as a namespace under `noise.v3`, and contains noise parameters
+that are same as `noise.v2`, as well as parameters for specifying the entities
+that will be subject to the noise.
+
+### `noise.v3.<config_name>.noise_application_entities` (namespace)
+
+`noise_application_entities` is a namespace that contains three property-filtering parameters, types, subtypes, and names.
+These filters are combined with an AND condition and applied to all entities present in the scenario to create a set of entities.
+Noise is then applied to this set of entities using noise parameters set to the same v3-child-namespace.
+However, the behavior is undefined if there are entities that belong to entity sets with multiple v3-child-namespaces.
+
+### `noise.v3.<config_name>.noise_application_entities.types`
+
+Array of `string` type value, mandatory.
+This parameter specifies which entity types this noise configuration should be applied to.
+See [traffic_simulator_msgs/EntityType.msg](https://github.com/tier4/scenario_simulator_v2/blob/284f34b11f701e917bf8b4bf018fab3e792dc7db/simulation/traffic_simulator_msgs/msg/EntityType.msg) to confirm valid entity types.
+Supports wildcard expressions `?` and `*` within each string.
+The array is evaluated as an entity filter that represents a condition to OR the entity sets that match each string.
+This parameter is used only if the value of `noise.model.version` is `3`.
+
+### `noise.v3.<config_name>.noise_application_entities.subtypes`
+
+Array of `string` type value, mandatory.
+This parameter specifies which entity types this noise configuration should be applied to.
+See [traffic_simulator_msgs/EntitySubtype.msg](https://github.com/tier4/scenario_simulator_v2/blob/284f34b11f701e917bf8b4bf018fab3e792dc7db/simulation/traffic_simulator_msgs/msg/EntitySubtype.msg) to confirm valid entity types.
+Supports wildcard expressions `?` and `*` within each string.
+The array is evaluated as an entity filter that represents a condition to OR the entity sets that match each string.
+This parameter is used only if the value of `noise.model.version` is `3`.
+
+### `noise.v3.<config_name>.noise_application_entities.names`
+
+Array of `string` type value, mandatory.
+This parameter specifies which entity types this noise configuration should be applied to.
+Supports wildcard expressions `?` and `*` within each string.
+The array is evaluated as an entity filter that represents a condition to OR the entity sets that match each string.
+This parameter is used only if the value of `noise.model.version` is `3`.
+
+### `noise.v4.<config_name>` (namespace)
+
+The v4 noise model extends v3 with enhanced position and rotation noise capabilities.
+`<config_name>` is a user-defined noise configuration identifier that acts as a namespace under `noise.v4`,
+same as in `noise.v3`.
+
+The noise v4 model uses a dynamic local coordinate system for each entity,
+which differs from the elliptical coordinate system used in v2/v3.
+
+- **Origin**: the closest point on the entity's bounding box from the base-link of the ego vehicle
+- **Y-axis (radial direction)**: From the ego vehicle base-link to the origin
+- **X-axis (tangential direction)**: Perpendicular to the Y-axis in a right-handed coordinate system
+
+![noise v4 coordinate system](./images/parameters/noise_v4.png)
+
+### `noise.v4.<config_name>.ellipse_y_radii`
+
+Array of positive double type values, default `[10.0, 20.0, 40.0, 60.0, 80.0, 120.0, 150.0, 180.0, 1000.0]`. Units are in meters.
+See [`ellipse_y_radii` documentation of noise v2](#noisev2ellipse_y_radii) for detailed explanation.
+This parameter is used only if the value of `noise.model.version` is `4`.
+
+### `noise.v4.<config_name>.position.<x/y>.mean.ellipse_normalized_x_radius`
+
+A positive `double` type value, default `1.0`.
+See [`ellipse_normalized_x_radius` documentation of noise v2](#noisev2distancemeanellipse_normalized_x_radius) for detailed explanation.
+This parameter is used only if the value of `noise.model.version` is `4`.
+
+### `noise.v4.<config_name>.position.<x/y>.mean.values`
+
+Array of double type values, default `[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]`.
+See [`values` documentation of noise v2](#noisev2distancemeanvalues) for detailed explanation.
+This parameter is used only if the value of `noise.model.version` is `4`.
+
+### `noise.v4.<config_name>.position.<x/y>.standard_deviation.ellipse_normalized_x_radius`
+
+A positive `double` type value, default `1.0`.
+See [`ellipse_normalized_x_radius` documentation of noise v2](#noisev2distancestandarddeviationellipse_normalized_x_radius) for detailed explanation.
+This parameter is used only if the value of `noise.model.version` is `4`.
+
+### `noise.v4.<config_name>.position.<x/y>.standard_deviation.values`
+
+Array of positive double type values, default `[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]`.
+See [`values` documentation of noise v2](#noisev2distancestandarddeviationvalues) for detailed explanation.
+This parameter is used only if the value of `noise.model.version` is `4`.
+
+### `noise.v4.<config_name>.position.<x/y>.autocorrelation_coefficient.amplitude`
+
+A positive `double` type value, default `0.0`.
+The parameter of the autocorrelation coefficient used in the generation of X/Y-axis position noise.
+This parameter is used only if the value of `noise.model.version` is `4`.
+
+### `noise.v4.<config_name>.position.<x/y>.autocorrelation_coefficient.decay`
+
+A positive `double` type value, default `0.0`.
+The parameter of the autocorrelation coefficient used in the generation of X/Y-axis position noise.
+This parameter is used only if the value of `noise.model.version` is `4`.
+
+### `noise.v4.<config_name>.position.<x/y>.autocorrelation_coefficient.offset`
+
+A positive `double` type value, default `0.0`.
+The parameter of the autocorrelation coefficient used in the generation of X/Y-axis position noise.
+This parameter is used only if the value of `noise.model.version` is `4`.
+
+### `noise.v4.<config_name>.yaw` (namespace)
+
+The rotation yaw noise in noise v4 model applies angular noise around the closest point on the entity's bounding box
+to the ego vehicle (the origin of noise coordinate), rather than around the entity's base-link.
+
+### `noise.v4.<config_name>.yaw.mean.ellipse_normalized_x_radius`
+
+A positive `double` type value, default `1.0`.
+See [`ellipse_normalized_x_radius` documentation of noise v2](#noisev2yawmeanellipse_normalized_x_radius) for detailed explanation.
+This parameter is used only if the value of `noise.model.version` is `4`.
+
+### `noise.v4.<config_name>.yaw.mean.values`
+
+Array of double type values, default `[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]`.
+See [`values` documentation of noise v2](#noisev2yawmeanvalues) for detailed explanation.
+The unit is radians. This parameter is used only if the value of `noise.model.version` is `4`.
+
+### `noise.v4.<config_name>.yaw.standard_deviation.ellipse_normalized_x_radius`
+
+A positive `double` type value, default `1.0`.
+See [`ellipse_normalized_x_radius` documentation of noise v2](#noisev2yawstandarddeviationellipse_normalized_x_radius) for detailed explanation.
+This parameter is used only if the value of `noise.model.version` is `4`.
+
+### `noise.v4.<config_name>.yaw.standard_deviation.values`
+
+Array of positive double type values, default `[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]`.
+See [`values` documentation of noise v2](#noisev2yawstandarddeviationvalues) for detailed explanation.
+The unit is radians. This parameter is used only if the value of `noise.model.version` is `4`.
+
+### `noise.v4.<config_name>.yaw.autocorrelation_coefficient.amplitude`
+
+A positive `double` type value, default `0.0`.
+The parameter of the autocorrelation coefficient used in the generation of rotation noise.
+This parameter is used only if the value of `noise.model.version` is `4`.
+
+### `noise.v4.<config_name>.yaw.autocorrelation_coefficient.decay`
+
+A positive `double` type value, default `0.0`.
+The parameter of the autocorrelation coefficient used in the generation of rotation noise.
+This parameter is used only if the value of `noise.model.version` is `4`.
+
+### `noise.v4.<config_name>.yaw.autocorrelation_coefficient.offset`
+
+A positive `double` type value, default `0.0`.
+The parameter of the autocorrelation coefficient used in the generation of rotation noise.
+This parameter is used only if the value of `noise.model.version` is `4`.
+
+### `noise.v4.<config_name>.yaw_flip` (namespace)
+
+The yaw-flip noise in noise v4 model is basically same to one in noise v2.
+See [`yaw_flip` documentation of noise v2](#noisev2yaw_flipautocorrelation_coefficientamplitude) for detailed explanation.
+Like noise v2, noise v4 also has the parameters below in this namespace.
+
+- `noise.v4.<config_name>.yaw_flip.autocorrelation_coefficient.amplitude`
+- `noise.v4.<config_name>.yaw_flip.autocorrelation_coefficient.decay`
+- `noise.v4.<config_name>.yaw_flip.autocorrelation_coefficient.offset`
+- `noise.v4.<config_name>.yaw_flip.rate`
+- `noise.v4.<config_name>.yaw_flip.speed_threshold`
+
+### `noise.v4.<config_name>.true_positive` (namespace)
+
+The true positive parameters in noise v4 model control the detection probability of entities based on distance from the ego vehicle.
+Like v2/v3, v4 uses elliptical coordinate system to determine the detection rate based on the distance from the ego vehicle.
+
+### `noise.v4.<config_name>.true_positive.rate.ellipse_normalized_x_radius`
+
+A positive `double` type value, default `1.0`.
+See [`ellipse_normalized_x_radius` documentation of noise v2](#noisev2true_positiverateellipse_normalized_x_radius) for detailed explanation.
+This parameter is used only if the value of `noise.model.version` is `4`.
+
+### `noise.v4.<config_name>.true_positive.rate.values`
+
+Array of double type values between `0.0` and `1.0`, default `[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]`.
+See [`values` documentation of noise v2](#noisev2true_positiveratevalues) for detailed explanation.
+This parameter is used only if the value of `noise.model.version` is `4`.
+
+### `noise.v4.<config_name>.true_positive.autocorrelation_coefficient.amplitude`
+
+A positive `double` type value, default `0.0`.
+The parameter of the autocorrelation coefficient used in the generation of true positive noise.
+The noise models the time series as Markov process.
+This parameter is used only if the value of `noise.model.version` is `4`.
+
+### `noise.v4.<config_name>.true_positive.autocorrelation_coefficient.decay`
+
+A positive `double` type value, default `0.0`.
+The parameter of the autocorrelation coefficient used in the generation of true positive noise.
+The noise models the time series as Markov process.
+This parameter is used only if the value of `noise.model.version` is `4`.
+
+### `noise.v4.<config_name>.true_positive.autocorrelation_coefficient.offset`
+
+A positive `double` type value, default `0.0`.
+The parameter of the autocorrelation coefficient used in the generation of true positive noise.
+The noise models the time series as Markov process.
+This parameter is used only if the value of `noise.model.version` is `4`.
+
+### `noise.v4.<config_name>.noise_application_entities` (namespace)
+
+Entity filtering parameters with the same structure as `noise.v3`.
+See [`noise.v3.<config_name>.noise_application_entities`](#noisev3config_namenoise_application_entities-namespace) for detailed explanation.
+Like noise v3, noise v4 also has the parameters below in this namespace.
+
+- `noise.v4.<config_name>.noise_application_entities.types`
+- `noise.v4.<config_name>.noise_application_entities.subtypes`
+- `noise.v4.<config_name>.noise_application_entities.names`
+
 ## /perception/object_recognition/ground_truth/objects
 
 ### `version`
@@ -440,3 +656,99 @@ Delays the publication of the topic by the specified number of seconds. This
 parameter is used only if `override_legacy_configuration` is true. If it is
 false, the value of `detectedObjectGroundTruthPublishingDelay` in
 `ObjectController.Properties` in the scenario file is used.
+
+## /perception/obstacle_segmentation/pointcloud
+
+### `version`
+
+An `int` type value in YYYYMMDD format, mandatory.
+See [`version` documentation of /perception/object_recognition/detection/objects](#version) for detailed explanation.
+
+### `seed`
+
+A positive `int` type value, default `0`. The seed value for the random number generator. If `0` is specified, a random seed value will be generated for each run.
+
+### `noise.model.version`
+
+A positive `int` type value, default `1`.
+This parameter specifies the version of the LiDAR point cloud noise model to be used. Currently, only version 1 is implemented.
+
+### `noise.v1.<config_name>` (namespace)
+
+The v1 noise model allows you to define multiple named noise configurations for LiDAR point clouds.
+`<config_name>` is a user-defined noise configuration identifier that acts as a namespace under `noise.v1`.
+
+Unlike detection noise models (v2/v3/v4) that apply noise to detected objects, the point cloud noise model applies noise to individual points in the LiDAR scan. This provides a more realistic simulation of LiDAR sensor characteristics, where each point can have independent position errors.
+
+### `noise.v1.<config_name>.ellipse_y_radii`
+
+Array of positive double type values, default `[10.0, 20.0, 40.0, 60.0, 80.0, 120.0, 150.0, 180.0, 1000.0]`. Units are in meters.
+See [`ellipse_y_radii` documentation of noise v2](#noisev2ellipse_y_radii) for detailed explanation.
+
+### `noise.v1.<config_name>.noise_application_entities` (namespace)
+
+Entity filtering parameters with the same structure as detection noise v3.
+See [`noise.v3.<config_name>.noise_application_entities`](#noisev3config_namenoise_application_entities-namespace) for detailed explanation.
+The point cloud noise v1 model has the following parameters in this namespace:
+
+- `noise.v1.<config_name>.noise_application_entities.types`
+- `noise.v1.<config_name>.noise_application_entities.subtypes`
+- `noise.v1.<config_name>.noise_application_entities.names`
+
+### `noise.v1.<config_name>.distance.radial` (namespace)
+
+The LiDAR point cloud noise model uses a radial-tangential coordinate system centered at the sensor (ego vehicle's base_link). The radial direction is the direction from the sensor to each point, representing the range measurement error. Noise in this direction simulates distance measurement inaccuracies of the LiDAR sensor.
+
+### `noise.v1.<config_name>.distance.radial.mean.ellipse_normalized_x_radius`
+
+A positive `double` type value, default `1.0`.
+See [`ellipse_normalized_x_radius` documentation of noise v2](#noisev2distancemeanellipse_normalized_x_radius) for the elliptical distance calculation.
+
+### `noise.v1.<config_name>.distance.radial.mean.values`
+
+Array of double type values, default `[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]`.
+Mean of the normal distribution for radial direction noise. The array size must be the same as `ellipse_y_radii`.
+
+### `noise.v1.<config_name>.distance.radial.standard_deviation.ellipse_normalized_x_radius`
+
+A positive `double` type value, default `1.0`.
+See [`ellipse_normalized_x_radius` documentation of noise v2](#noisev2distancemeanellipse_normalized_x_radius) for the elliptical distance calculation.
+
+### `noise.v1.<config_name>.distance.radial.standard_deviation.values`
+
+Array of positive double type values, default `[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]`.
+Standard deviation of the normal distribution for radial direction noise. The array size must be the same as `ellipse_y_radii`.
+
+### `noise.v1.<config_name>.distance.tangential` (namespace)
+
+The tangential direction is perpendicular to the radial direction, representing lateral position errors. For each point, a random tangential direction is chosen uniformly around the radial ray, and noise is applied in that direction. This simulates angular measurement inaccuracies and beam divergence effects of the LiDAR sensor.
+
+### `noise.v1.<config_name>.distance.tangential.mean.ellipse_normalized_x_radius`
+
+A positive `double` type value, default `1.0`.
+See [`ellipse_normalized_x_radius` documentation of noise v2](#noisev2distancemeanellipse_normalized_x_radius) for the elliptical distance calculation.
+
+### `noise.v1.<config_name>.distance.tangential.mean.values`
+
+Array of double type values, default `[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]`.
+Mean of the normal distribution for tangential direction noise. The array size must be the same as `ellipse_y_radii`.
+
+### `noise.v1.<config_name>.distance.tangential.standard_deviation.ellipse_normalized_x_radius`
+
+A positive `double` type value, default `1.0`.
+See [`ellipse_normalized_x_radius` documentation of noise v2](#noisev2distancemeanellipse_normalized_x_radius) for the elliptical distance calculation.
+
+### `noise.v1.<config_name>.distance.tangential.standard_deviation.values`
+
+Array of positive double type values, default `[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]`.
+Standard deviation of the normal distribution for tangential direction noise. The array size must be the same as `ellipse_y_radii`.
+
+### `noise.v1.<config_name>.true_positive.rate.ellipse_normalized_x_radius`
+
+A positive `double` type value, default `1.0`.
+See [`ellipse_normalized_x_radius` documentation of noise v2](#noisev2distancemeanellipse_normalized_x_radius) for detailed explanation.
+
+### `noise.v1.<config_name>.true_positive.rate.values`
+
+Array of double type values between `0.0` and `1.0`, default `[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]`.
+Each element represents the probability that a point will be kept in the point cloud (true positive rate). Points are randomly removed based on this probability, simulating point drop. The array size must be the same as `ellipse_y_radii`.

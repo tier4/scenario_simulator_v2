@@ -40,7 +40,7 @@ class PedestrianBehaviorTree : public BehaviorPluginBase
 public:
   void configure(const rclcpp::Logger & logger) override;
   auto update(const double current_time, const double step_time) -> void override;
-  const std::string & getCurrentAction() const override;
+  auto getCurrentAction() -> const std::string & override;
 
 #define DEFINE_GETTER_SETTER(NAME, TYPE)                                                    \
   TYPE get##NAME() override { return tree_.rootBlackboard()->get<TYPE>(get##NAME##Key()); } \
@@ -55,9 +55,11 @@ public:
   DEFINE_GETTER_SETTER(CurrentTime,                                      double)
   DEFINE_GETTER_SETTER(DebugMarker,                                      std::vector<visualization_msgs::msg::Marker>)
   DEFINE_GETTER_SETTER(DefaultMatchingDistanceForLaneletPoseCalculation, double)
+  DEFINE_GETTER_SETTER(EuclideanDistancesMap,                            std::shared_ptr<EuclideanDistancesMap>)
   DEFINE_GETTER_SETTER(GoalPoses,                                        std::vector<geometry_msgs::msg::Pose>)
   DEFINE_GETTER_SETTER(HdMapUtils,                                       std::shared_ptr<hdmap_utils::HdMapUtils>)
   DEFINE_GETTER_SETTER(LaneChangeParameters,                             traffic_simulator::lane_change::Parameter)
+  DEFINE_GETTER_SETTER(LateralCollisionThreshold,                        std::optional<double>)
   DEFINE_GETTER_SETTER(Obstacle,                                         std::optional<traffic_simulator_msgs::msg::Obstacle>)
   DEFINE_GETTER_SETTER(OtherEntityStatus,                                EntityStatusDict)
   DEFINE_GETTER_SETTER(PedestrianParameters,                             traffic_simulator_msgs::msg::PedestrianParameters)

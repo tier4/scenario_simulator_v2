@@ -22,6 +22,14 @@ add_definitions("-DBOOST_ALLOW_DEPRECATED_HEADERS")
 find_package(ament_cmake_auto REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(PCL REQUIRED)
+find_package(agnocast_wrapper REQUIRED)
+
+if(DEFINED ENV{ENABLE_AGNOCAST_SIMULATOR} AND "$ENV{ENABLE_AGNOCAST_SIMULATOR}" STREQUAL "1")
+  message(WARNING "Building with agnocastlib dependency")
+  find_package(agnocastlib REQUIRED)
+else()
+  message(WARNING "Building without agnocastlib dependency")
+endif()
 
 ament_auto_find_build_dependencies()
 
@@ -34,6 +42,7 @@ include_directories(
 
 ament_auto_add_library(simple_sensor_simulator_component SHARED
   src/sensor_simulation/detection_sensor/detection_sensor.cpp
+  src/sensor_simulation/lidar/lidar_noise_model_v1.cpp
   src/sensor_simulation/lidar/lidar_sensor.cpp
   src/sensor_simulation/imu/imu_sensor.cpp
   src/sensor_simulation/lidar/raycaster.cpp
@@ -63,8 +72,22 @@ target_link_libraries(simple_sensor_simulator_component
   zmq
 )
 ament_target_dependencies(simple_sensor_simulator_component
+  agnocast_wrapper
   simulation_interface
 )
+
+target_include_directories(${PROJECT_NAME}_component PRIVATE
+  ${agnocast_wrapper_INCLUDE_DIRS}
+)
+
+agnocast_wrapper_setup(${PROJECT_NAME}_component)
+if(DEFINED ENV{ENABLE_AGNOCAST_SIMULATOR} AND "$ENV{ENABLE_AGNOCAST_SIMULATOR}" STREQUAL "1")
+ament_target_dependencies(simple_sensor_simulator_component agnocastlib)
+target_include_directories(${PROJECT_NAME}_component PRIVATE
+  ${agnocastlib_INCLUDE_DIRS}
+)
+endif()
+
 rclcpp_components_register_nodes(simple_sensor_simulator_component
   "simple_sensor_simulator::ScenarioSimulator")
 
@@ -74,6 +97,8 @@ ament_auto_add_executable(simple_sensor_simulator_node
 target_link_libraries(simple_sensor_simulator_node
   simple_sensor_simulator_component
 )
+
+agnocast_wrapper_setup(${PROJECT_NAME}_node)
 
 install(TARGETS
   simple_sensor_simulator_node
