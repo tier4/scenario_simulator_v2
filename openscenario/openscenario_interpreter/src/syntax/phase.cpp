@@ -23,14 +23,36 @@ inline namespace syntax
 Phase::Phase(const pugi::xml_node & node, Scope & scope)
 : name(readAttribute<String>("name", node, scope)),
   duration(readAttribute<Double>("duration", node, scope, Double::infinity())),
-  traffic_signal_states(readElements<TrafficSignalState, 0>("TrafficSignalState", node, scope))
+  traffic_signal_states(readElements<TrafficSignalState, 0>("TrafficSignalState", node, scope)),
+  grouped_states([this]() {
+    std::map<
+      std::pair<lanelet::Id, TrafficSignalState::TrafficSignalType>,
+      std::vector<const TrafficSignalState *>>
+      groups;
+    for (const auto & traffic_signal_state : traffic_signal_states) {
+      auto key =
+        std::make_pair(traffic_signal_state.id(), traffic_signal_state.trafficSignalType());
+      groups[key].push_back(&traffic_signal_state);
+    }
+    return groups;
+  }())
 {
 }
 
 auto Phase::evaluate() const -> Object
 {
-  for (auto && traffic_signal_state : traffic_signal_states) {
-    traffic_signal_state.evaluate();
+  for (const auto & [key, states] : grouped_states) {
+    const auto & [id, type] = key;
+    // clear states before adding
+    if (type == TrafficSignalState::TrafficSignalType::conventional) {
+      clearConventionalTrafficLightsState(id);
+    } else if (type == TrafficSignalState::TrafficSignalType::v2i) {
+      clearV2ITrafficLightsState(id);
+    }
+    // then add states
+    for (size_t i = 0; i < states.size(); ++i) {
+      states[i]->evaluate();
+    }
   }
 
   return unspecified;

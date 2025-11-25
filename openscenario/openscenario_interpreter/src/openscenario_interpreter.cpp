@@ -24,6 +24,7 @@
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <openscenario_interpreter/syntax/speed_condition.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
+#include <sstream>
 #include <status_monitor/status_monitor.hpp>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
 
@@ -49,6 +50,7 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   output_directory("/tmp"),
   publish_empty_context(false),
   record(false),
+  record_option(""),
   record_storage_id("")
 {
   DECLARE_PARAMETER(local_frame_rate);
@@ -57,6 +59,7 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   DECLARE_PARAMETER(output_directory);
   DECLARE_PARAMETER(publish_empty_context);
   DECLARE_PARAMETER(record);
+  DECLARE_PARAMETER(record_option);
   DECLARE_PARAMETER(record_storage_id);
 
   SpeedCondition::compatibility =
@@ -119,6 +122,7 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
       GET_PARAMETER(output_directory);
       GET_PARAMETER(publish_empty_context);
       GET_PARAMETER(record);
+      GET_PARAMETER(record_option);
       GET_PARAMETER(record_storage_id);
 
       script = std::make_shared<OpenScenario>(osc_path);
@@ -225,14 +229,22 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
       },
       [&]() {
         if (record) {
-          if (record_storage_id == "") {
-            record::start(
-              "-a", "-o", boost::filesystem::path(osc_path).replace_extension("").string());
-          } else {
-            record::start(
-              "-a", "-o", boost::filesystem::path(osc_path).replace_extension("").string(), "-s",
-              record_storage_id);
+          std::vector<std::string> options{
+            "-a", "-o", boost::filesystem::path(osc_path).replace_extension("").string()};
+
+          if (not record_storage_id.empty()) {
+            options.insert(options.end(), {"-s", record_storage_id});
           }
+
+          if (not record_option.empty()) {
+            // split the record_option string with space.
+            std::istringstream iss(record_option);
+            std::copy(
+              std::istream_iterator<std::string>(iss), std::istream_iterator<std::string>(),
+              std::back_inserter(options));
+          }
+
+          record::start(options);
         }
 
         SimulatorCore::activate(
@@ -307,7 +319,8 @@ auto Interpreter::on_shutdown(const rclcpp_lifecycle::State &) -> Result
   timer.reset();
   scenarios.clear();
   script.reset();
-  SimulatorCore::deactivate();
+  common::status_monitor.overrideThreshold(
+    simulator_core_shutdown_threshold, SimulatorCore::deactivate);
   return Interpreter::Result::SUCCESS;  // => Finalized
 }
 
@@ -346,26 +359,18 @@ auto Interpreter::reset() -> void
     output_time_publisher->on_deactivate();
   }
 
-  if (not has_parameter("initialize_duration")) {
-    declare_parameter<int>("initialize_duration", 30);
-  }
-
   /*
-     Although we have not analyzed the details yet, the process of deactivating
-     the simulator core takes quite a long time (especially the
-     traffic_simulator::API::despawnEntities function is slow). During the
-     process, the interpreter becomes unresponsive, which often resulted in the
-     status monitor thread judging the interpreter as "not good". Therefore, we
-     will increase the threshold of the judgment only during the process of
-     deactivating the simulator core.
-
-     The threshold value here is set to the value of initialize_duration, but
-     there is no rationale for this; it should be larger than the original
-     threshold value of the status monitor and long enough for the simulator
-     core to be deactivated.
+  Interpreter::reset() and Interpreter::on_shutdown() functions are slow,
+  because they call in sequence:
+  openscenario_interpreter::SimulatorCore::deactivate()
+  traffic_simulator::API::despawnEntities()
+  traffic_simulator::API::despawn()
+  traffic_simulator:entity::EntityManager::despawnEntity()
+  concealer::FieldOperatorApplication::~FieldOperatorApplication()
+  The destructor waits for autoware process group to die.
   */
   common::status_monitor.overrideThreshold(
-    std::chrono::seconds(get_parameter("initialize_duration").as_int()), SimulatorCore::deactivate);
+    simulator_core_shutdown_threshold, SimulatorCore::deactivate);
 
   scenarios.pop_front();
 
@@ -379,7 +384,11 @@ auto Interpreter::reset() -> void
     result);
 
   if (record) {
-    record::stop();
+    /*
+    openscenario_interpreter::record::stop() is also slower,
+    as it sleeps for 3s and then waits until rosbag saving is finished.
+    */
+    common::status_monitor.overrideThreshold(simulator_core_shutdown_threshold, record::stop);
   }
 }
 }  // namespace openscenario_interpreter

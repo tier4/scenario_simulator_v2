@@ -45,7 +45,16 @@ EgoEntity::EgoEntity(
         architecture_type.find("awf/universe") != std::string::npos) {
       auto parameters =
         common::getParameter<std::vector<std::string>>(node_parameters, "autoware.", {});
+      std::string vehicle_id;
 
+      try {
+        vehicle_id = common::getParameter<std::string>(node_parameters, "vehicle_id");
+      } catch (...) {
+        vehicle_id = std::to_string(common::getParameter<int>(node_parameters, "vehicle_id"));
+      }
+      if (vehicle_id != "default" && !vehicle_id.empty()) {
+        parameters.push_back("vehicle_id:=" + vehicle_id);
+      }
       // clang-format off
       parameters.push_back("map_path:=" + configuration.map_path.string());
       parameters.push_back("lanelet2_map_file:=" + configuration.getLanelet2MapFile());
@@ -177,8 +186,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
       const auto non_canonicalized_updated_status =
         traffic_simulator::follow_trajectory::makeUpdatedStatus(
           static_cast<traffic_simulator::EntityStatus>(*status_), *polyline_trajectory_,
-          behavior_parameter_, hdmap_utils_ptr_, step_time,
-          getDefaultMatchingDistanceForLaneletPoseCalculation(),
+          behavior_parameter_, step_time, getDefaultMatchingDistanceForLaneletPoseCalculation(),
           target_speed_ ? target_speed_.value() : status_->getTwist().linear.x)) {
       // prefer current lanelet on ss2 side
       setStatus(non_canonicalized_updated_status.value(), status_->getLaneletIds());

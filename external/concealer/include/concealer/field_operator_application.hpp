@@ -118,7 +118,10 @@ struct FieldOperatorApplication : public rclcpp::Node
   Service<AutoModeWithModule>     requestSetRtcAutoMode;
   Service<SetVelocityLimit>       requestSetVelocityLimit;
   Service<ChangeOperationMode>    requestEnableAutowareControl;
+  Service<ChangeOperationMode>    requestChangeToStop;
   // clang-format on
+
+  rclcpp::executors::SingleThreadedExecutor executor;
 
   /*
      The task queue must be deconstructed before any services, so it must be

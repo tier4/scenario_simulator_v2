@@ -1,0 +1,176 @@
+name: Check API compatibility
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: "Run ID of the workflow to compare against (optional)"
+        required: false
+        default: ""
+      base_run_id:
+        description: "Base Run ID of the workflow to compare against (optional)"
+        required: false
+        default: ""
+      base_branch:
+        description: "Base branch to compare against (default: master)"
+        required: false
+        default: "master"
+  workflow_run:
+    workflows: ["BuildAndRun"]
+    types:
+      - completed
+
+jobs:
+  api_check:
+    name: TrafficSim API Check
+    runs-on: ${{ matrix.runs_on }}
+    env:
+      DEBIAN_FRONTEND: noninteractive
+    strategy:
+      fail-fast: false
+      matrix:
+        runs_on: [ubuntu-22.04, ubuntu-22.04-arm]
+    steps:
+      - name: Install abigail-tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y abigail-tools
+
+      # TODO: Use RefactoringMinerPP to detect API changes in more precise way
+      # Currently, RefactoringMinerPP shows incorrect results due to matching problems.
+      # Integration with RefactoringMiner 3.0 may help to improve the accuracy, but work in progress.
+      # After fixing the problems, uncomment the commented out steps to enable RefactoringMinerPP.
+
+      # - uses: actions/setup-java@v5
+      #   with:
+      #     distribution: "temurin" # See 'Supported distributions' for available options
+      #     java-version: "17"
+
+      # - name: Install RefactoringMinerPP
+      #   run: |
+      #     wget https://apt.llvm.org/llvm.sh
+      #     sudo bash llvm.sh 18
+      #     sudo apt install -y libclang-18-dev
+      #     git clone https://github.com/f0reachARR/RefactoringMinerPP
+      #     cd RefactoringMinerPP/tools/cap
+      #     make
+      #     sudo cp cap /usr/local/bin/
+      #     cd ../RefactoringMiner
+      #     ./gradlew build -x test
+      #     ./gradlew install
+      #     echo "$PWD/build/install/RefactoringMiner/bin" >> $GITHUB_PATH
+
+      - name: Lookup previous workflow run
+        id: previous_run
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const runIdInput = context.payload.inputs?.base_run_id || '';
+            if (runIdInput) {
+              return runIdInput;
+            }
+
+            // Find the most recent successful scheduled run on the specified base branch
+            const baseBranch = context.payload.inputs?.base_branch || 'master';
+            const runs = await github.rest.actions.listWorkflowRuns({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'BuildAndRun.yaml',
+              branch: baseBranch,
+              event: 'schedule',
+              status: 'success',
+            });
+            if (runs.data.total_count === 0) {
+              throw new Error('No previous successful scheduled workflow run found');
+            }
+            const run = runs.data.workflow_runs[0];
+            return run.id;
+          result-encoding: string
+
+      - name: Download previous install artifact
+        if: steps.previous_run.outputs.result != 'null'
+        uses: actions/download-artifact@v6
+        with:
+          run-id: "${{ steps.previous_run.outputs.result }}"
+          name: install-${{ matrix.runs_on }}-RelWithDebInfo
+          path: previous
+          github-token: ${{ secrets.GH_PAT }}
+
+      - name: Download current install artifact
+        uses: actions/download-artifact@v6
+        with:
+          name: install-${{ matrix.runs_on }}-RelWithDebInfo
+          run-id: ${{ github.event.workflow_run.id || github.event.inputs.run_id }}
+          path: current
+          github-token: ${{ secrets.GH_PAT }}
+
+      - name: Call ABIDIFF
+        continue-on-error: true
+        id: abidiff
+        run: |
+          abidiff --fail-no-debug-info --drop-private-types \
+          --header-file1 previous/traffic_simulator/include/traffic_simulator/api/api.hpp \
+          --header-file2 current/traffic_simulator/include/traffic_simulator/api/api.hpp \
+          --keep "traffic_simulator::API.*" \
+          previous/traffic_simulator/lib/libtraffic_simulator.so \
+          current/traffic_simulator/lib/libtraffic_simulator.so | tee abidiff.log
+          echo "exit_code=${PIPESTATUS[0]}" >> $GITHUB_OUTPUT
+
+          echo "abidiff_log<<EOF" >> $GITHUB_OUTPUT
+          cat abidiff.log >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Show abidiff result
+        if: steps.abidiff.outputs.exit_code != '0'
+        run: |
+          echo "ABI differences detected:"
+          echo "${{ steps.abidiff.outputs.abidiff_log }}"
+
+      - name: Get PR number
+        if: github.event_name == 'workflow_run'
+        id: get-pr-number
+        run: |
+          PR_NUMBER=$(cat current/pr_number.txt | sed 's/PR_NUMBER=//')
+          echo "number=$PR_NUMBER" >> $GITHUB_OUTPUT
+
+      - name: Upload abidiff log
+        if: steps.abidiff.outputs.exit_code != '0' && github.event_name == 'workflow_run'
+        uses: mshick/add-pr-comment@v2
+        with:
+          message: |
+            The public API of `traffic_simulator::API` has changed. Please check logs.
+            (This is experimental and work in progress. You do not need to care about this message now.)
+
+            <details>
+            <summary>Click to expand abidiff log</summary>
+
+            ```
+            ${{ steps.abidiff.outputs.abidiff_log }}
+            ```
+            </details>
+          message-id: "abidiff-log"
+          issue: ${{ steps.get-pr-number.outputs.number }}
+
+      # - name: Call RefactoringMinerPP
+      #   continue-on-error: true
+      #   run: |
+      #     cap previous/traffic_simulator/include/traffic_simulator/api/api.hpp previous.json
+      #     cap current/traffic_simulator/include/traffic_simulator/api/api.hpp current.json
+      #     RefactoringMiner -cpp previous.json current.json
+
+      # TODO: Add label when interface breaking changes are detected
+      # Currently, to observe the results of ABIDIFF, we do not automatically add labels.
+      #
+      # - name: Add "interface breaking" label
+      #   if: steps.abidiff.outputs.exit_code != '0' && github.event_name == 'workflow_run'
+      #   uses: actions/github-script@v6
+      #   with:
+      #     script: |
+      #       const prNumber = ${{ steps.get-pr-number.outputs.number }};
+      #       if (prNumber) {
+      #         await github.rest.issues.addLabels({
+      #           issue_number: prNumber,
+      #           owner: context.repo.owner,
+      #           repo: context.repo.repo,
+      #           labels: ['interface breaking']
+      #         });
+      #       }

@@ -14,6 +14,7 @@
 
 #include <algorithm>
 #include <memory>
+#include <stdexcept>
 #include <string>
 #include <traffic_simulator/entity/pedestrian_entity.hpp>
 #include <traffic_simulator/utils/pose.hpp>
@@ -129,6 +130,12 @@ auto PedestrianEntity::getRouteLanelets(double horizon) -> lanelet::Ids
   if (const auto canonicalized_lanelet_pose = status_->getCanonicalizedLaneletPose()) {
     return route_planner_.getRouteLanelets(canonicalized_lanelet_pose.value(), horizon);
   } else {
+    if (
+      const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
+        status_->getMapPose(), getBoundingBox(), route_planner_.getWholeRouteLanelets(), true,
+        getDefaultMatchingDistanceForLaneletPoseCalculation())) {
+      return route_planner_.getRouteLanelets(canonicalized_lanelet_pose.value(), horizon);
+    }
     return {};
   }
 }
@@ -149,7 +156,17 @@ auto PedestrianEntity::getGoalPoses() -> std::vector<geometry_msgs::msg::Pose>
 
 const traffic_simulator_msgs::msg::WaypointsArray PedestrianEntity::getWaypoints()
 {
-  return traffic_simulator_msgs::msg::WaypointsArray();
+  try {
+    return behavior_plugin_ptr_->getWaypoints();
+  } catch (const std::runtime_error &) {
+    if (!status_->isInLanelet()) {
+      THROW_SIMULATION_ERROR(
+        "Failed to calculate waypoints in NPC logics, please check Entity : ", name,
+        " is in a lane coordinate.");
+    } else {
+      THROW_SIMULATION_ERROR("Failed to calculate waypoint in NPC logics.");
+    }
+  }
 }
 
 void PedestrianEntity::requestWalkStraight()
@@ -287,6 +304,7 @@ auto PedestrianEntity::onUpdate(const double current_time, const double step_tim
   behavior_plugin_ptr_->setRouteLanelets(getRouteLanelets());
   /// @note CanonicalizedEntityStatus is updated here, it is not skipped even if isAtEndOfLanelets return true
   behavior_plugin_ptr_->update(current_time, step_time);
+
   if (const auto canonicalized_lanelet_pose = status_->getCanonicalizedLaneletPose()) {
     if (pose::isAtEndOfLanelets(canonicalized_lanelet_pose.value(), hdmap_utils_ptr_)) {
       stopAtCurrentPosition();

@@ -155,16 +155,32 @@ FieldOperatorApplication::FieldOperatorApplication(const pid_t pid)
   requestClearRoute("/api/routing/clear_route", *this),
   requestCooperateCommands("/api/external/set/rtc_commands", *this),
   requestEngage("/api/external/set/engage", *this),
-  requestInitialPose("/api/localization/initialize", *this),
+  requestInitialPose("/api/localization/initialize", *this, std::chrono::seconds(common::getParameter<int>("initialize_localization"))),
   // NOTE: routing takes a long time to return. But the specified duration is not decided by any technical reasons.
   requestSetRoute("/api/routing/set_route", *this, std::chrono::seconds(10)),
   requestSetRoutePoints("/api/routing/set_route_points", *this, std::chrono::seconds(10)),
   requestSetRtcAutoMode("/api/external/set/rtc_auto_mode", *this),
   requestSetVelocityLimit("/api/autoware/set/velocity_limit", *this),
-  requestEnableAutowareControl("/api/operation_mode/enable_autoware_control", *this)
-{
-}
+  requestEnableAutowareControl("/api/operation_mode/enable_autoware_control", *this),
+  requestChangeToStop("/api/operation_mode/change_to_stop", *this)
 // clang-format on
+{
+  executor.add_node(get_node_base_interface());
+
+  /*
+     In case of reusing the same Autoware instance for multiple scenarios (launch_autoware:=False),
+     we need to ensure that Autoware is in a safe STOP state before starting the next scenario.
+     Without this, Autoware may start driving unexpectedly when the next scenario starts.
+  */
+  task_queue.delay([this] {
+    /*
+       To ensure that Autoware is in a safe state, request to change to stop.
+       Ideally, we should check the operation state and only request if it's not already in STOP mode.
+       TODO: Implement state check to avoid unnecessary requests (when LegacyAutowareState is being refactored).
+    */
+    requestChangeToStop(std::make_shared<ChangeOperationMode::Request>(), 30);
+  });
+}
 
 FieldOperatorApplication::~FieldOperatorApplication()
 {
@@ -330,6 +346,7 @@ auto FieldOperatorApplication::initialize(const geometry_msgs::msg::Pose & initi
             LegacyAutowareState::undefined, LegacyAutowareState::initializing);
           [[fallthrough]];
         case LegacyAutowareState::initializing:
+        case LegacyAutowareState::waiting_for_route:
           requestInitialPose(
             [&]() {
               auto request =
@@ -637,7 +654,8 @@ auto FieldOperatorApplication::spinSome() -> void
         }
       }
     }
-    rclcpp::spin_some(get_node_base_interface());
+
+    executor.spin_some();
   }
 }
 }  // namespace concealer

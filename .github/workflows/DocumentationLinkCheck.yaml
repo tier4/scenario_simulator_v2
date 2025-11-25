@@ -8,15 +8,16 @@ on:
   pull_request:
     paths:
       - "**/*.md"
+      - ".github/workflows/DocumentationLinkCheck.yaml"
 jobs:
   linkChecker:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Check documentation link
         id: lychee
-        uses: lycheeverse/lychee-action@v1.5.0
+        uses: lycheeverse/lychee-action@v2.7.0
         with:
           fail: true
           args: "--verbose --no-progress './**/*.md' './**/*.html' --timeout 1000 --max-concurrency 1 -T 1 --retry-wait-time 10"
