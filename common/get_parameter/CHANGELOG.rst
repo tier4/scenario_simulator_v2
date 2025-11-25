@@ -11,6 +11,9 @@ Changelog for package get_parameter
 * Merge branch 'master' into dependabot/github_actions/actions/checkout-5
 * Contributors: Kotaro Yoshimoto, Taiga
 
+18.4.5 (2025-11-25)
+-------------------
+
 18.4.4 (2025-11-21)
 -------------------
 
