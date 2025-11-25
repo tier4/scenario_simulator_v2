@@ -25,7 +25,7 @@ jobs:
         run: docker run --rm -v $(pwd)/simulation/simulation_interface/proto/:/protos -v $(pwd)/docs/proto_doc:/out pseudomuto/protoc-gen-doc --doc_opt=markdown,protobuf.md
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
 
       - name: Set up Python
         run: uv python install
