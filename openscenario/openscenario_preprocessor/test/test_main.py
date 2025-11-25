@@ -57,16 +57,13 @@ def run_preprocessor_test(scenario_name, desired_diff_num):
     assert diff_num == desired_diff_num
 
 def test_by_entity_condition_entity_condition_distance_condition_shortest():
-    # Expected diff: 48 lines - floating-point precision difference in distance values
-    # YAML->XML conversion produces higher precision numbers (e.g., "281.204631100853" -> "281.2046311008530210528988391160")
-    run_preprocessor_test("ByEntityCondition.EntityCondition.DistanceCondition.Shortest", 48)
+    run_preprocessor_test("ByEntityCondition.EntityCondition.DistanceCondition.Shortest", 0)
 
 def test_by_entity_condition_entity_condition_distance_condition():
     run_preprocessor_test("ByEntityCondition.EntityCondition.DistanceCondition", 0)
 
 def test_by_entity_condition_entity_condition_distance_condition_freespace():
-    # Expected diff: 6 lines - floating-point precision difference in freespace distance values
-    run_preprocessor_test("ByEntityCondition.EntityCondition.DistanceConditionFreespace", 6)
+    run_preprocessor_test("ByEntityCondition.EntityCondition.DistanceConditionFreespace", 0)
 
 def test_by_entity_condition_entity_condition_relative_clearance_condition_back():
     run_preprocessor_test("ByEntityCondition.EntityCondition.RelativeClearanceCondition-back", 0)
@@ -78,8 +75,7 @@ def test_by_entity_condition_entity_condition_relative_distance_condition():
     run_preprocessor_test("ByEntityCondition.EntityCondition.RelativeDistanceCondition", 0)
 
 def test_by_entity_condition_entity_condition_relative_distance_condition_freespace():
-    # Expected diff: 6 lines - floating-point precision difference in freespace distance values
-    run_preprocessor_test("ByEntityCondition.EntityCondition.RelativeDistanceConditionFreespace", 6)
+    run_preprocessor_test("ByEntityCondition.EntityCondition.RelativeDistanceConditionFreespace", 0)
 
 def test_by_entity_condition_entity_condition_relative_speed_condition():
     run_preprocessor_test("ByEntityCondition.EntityCondition.RelativeSpeedCondition", 0)
@@ -164,8 +160,7 @@ def test_routing_action_follow_trajectory_action_override():
     run_preprocessor_test("RoutingAction.FollowTrajectoryAction-override", 0)
 
 def test_routing_action_follow_trajectory_action_star():
-    # Expected diff: 10 lines - XML element order correction by XSD schema compliance (SimpleXMLFormatter)
-    run_preprocessor_test("RoutingAction.FollowTrajectoryAction-star", 10)
+    run_preprocessor_test("RoutingAction.FollowTrajectoryAction-star", 0)
 
 def test_routing_action_follow_trajectory_action_straight_bicycle():
     run_preprocessor_test("RoutingAction.FollowTrajectoryAction-straight-bicycle", 0)
