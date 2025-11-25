@@ -15,6 +15,8 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
 
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -22,20 +24,17 @@ jobs:
       - name: run protoc-gen-doc
         run: docker run --rm -v $(pwd)/simulation/simulation_interface/proto/:/protos -v $(pwd)/docs/proto_doc:/out pseudomuto/protoc-gen-doc --doc_opt=markdown,protobuf.md
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
       - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.10"
+        run: uv python install
 
-      - uses: abatilo/actions-poetry@v2
-        with:
-          poetry-version: "1.5.1"
-
-      - name: install
-        run: poetry install --no-interaction
+      - name: Install the project
+        run: uv sync --locked --all-extras --dev
 
       - name: Generate documentation
-        run: poetry run mkdocs build
+        run: uv run mkdocs build
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v5
