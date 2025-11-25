@@ -30,6 +30,26 @@ Changelog for package real_time_factor_control_rviz_plugin
 * Merge branch 'master' into dependabot/github_actions/actions/checkout-5
 * Contributors: Kotaro Yoshimoto, Taiga
 
+18.4.5 (2025-11-25)
+-------------------
+
+18.4.4 (2025-11-21)
+-------------------
+
+18.4.3 (2025-11-21)
+-------------------
+* Merge remote-tracking branch 'origin/master' into fix/poetry-to-uv
+  # Conflicts:
+  #	poetry.lock
+  #	pyproject.toml
+* Merge branch 'master' into fix/poetry-to-uv
+* Merge branch 'master' into fix/poetry-to-uv
+* Merge branch 'master' into fix/poetry-to-uv
+* Merge branch 'master' into fix/poetry-to-uv
+* Merge branch 'master' into fix/poetry-to-uv
+* Merge branch 'master' into fix/poetry-to-uv
+* Contributors: Kotaro Yoshimoto, Taiga, ぐるぐる
+
 18.4.2 (2025-11-20)
 -------------------
 * Merge branch 'master' into fix/deprecation_error
