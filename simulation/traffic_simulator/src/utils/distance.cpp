@@ -16,6 +16,7 @@
 #include <geometry/distance.hpp>
 #include <geometry/transform.hpp>
 #include <traffic_simulator/helper/helper.hpp>
+#include <traffic_simulator/lanelet_wrapper/distance.hpp>
 #include <traffic_simulator/lanelet_wrapper/lanelet_map.hpp>
 #include <traffic_simulator/lanelet_wrapper/pose.hpp>
 #include <traffic_simulator/utils/distance.hpp>
@@ -27,22 +28,21 @@ inline namespace distance
 {
 auto lateralDistance(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
-  const traffic_simulator::RoutingConfiguration & routing_configuration,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<double>
+  const RoutingConfiguration & routing_configuration) -> std::optional<double>
 {
-  return hdmap_utils_ptr->getLateralDistance(
+  return lanelet_wrapper::distance::lateralDistance(
     static_cast<LaneletPose>(from), static_cast<LaneletPose>(to), routing_configuration);
 }
 
 auto lateralDistance(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
-  double matching_distance, const traffic_simulator::RoutingConfiguration & routing_configuration,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<double>
+  double matching_distance, const RoutingConfiguration & routing_configuration)
+  -> std::optional<double>
 {
   if (
     std::abs(static_cast<LaneletPose>(from).offset) <= matching_distance &&
     std::abs(static_cast<LaneletPose>(to).offset) <= matching_distance) {
-    return lateralDistance(from, to, routing_configuration, hdmap_utils_ptr);
+    return lateralDistance(from, to, routing_configuration);
   } else {
     return std::nullopt;
   }
@@ -61,9 +61,8 @@ auto countLaneChanges(
 /// @sa https://github.com/tier4/scenario_simulator_v2/blob/729e4e6372cdba60e377ae097d032905b80763a9/docs/developer_guide/lane_pose_calculation/GetLongitudinalDistance.md
 auto longitudinalDistance(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
-  bool include_adjacent_lanelet, bool include_opposite_direction,
-  const traffic_simulator::RoutingConfiguration & routing_configuration,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<double>
+  bool const include_adjacent_lanelet, bool const include_opposite_direction,
+  const RoutingConfiguration & routing_configuration) -> std::optional<double>
 {
   if (!include_adjacent_lanelet) {
     auto to_canonicalized = static_cast<LaneletPose>(to);
@@ -75,10 +74,10 @@ auto longitudinalDistance(
       }
     }
 
-    const auto forward_distance = hdmap_utils_ptr->getLongitudinalDistance(
+    const auto forward_distance = lanelet_wrapper::distance::longitudinalDistance(
       static_cast<LaneletPose>(from), to_canonicalized, routing_configuration);
 
-    const auto backward_distance = hdmap_utils_ptr->getLongitudinalDistance(
+    const auto backward_distance = lanelet_wrapper::distance::longitudinalDistance(
       to_canonicalized, static_cast<LaneletPose>(from), routing_configuration);
 
     if (forward_distance && backward_distance) {
@@ -114,9 +113,9 @@ auto longitudinalDistance(
     for (const auto & from_pose : from_poses) {
       for (const auto & to_pose : to_poses) {
         if (
-          const auto distance = longitudinalDistance(
+          const auto distance = distance::longitudinalDistance(
             CanonicalizedLaneletPose(from_pose), CanonicalizedLaneletPose(to_pose), false,
-            include_opposite_direction, routing_configuration, hdmap_utils_ptr)) {
+            include_opposite_direction, routing_configuration)) {
           distances.emplace_back(distance.value());
         }
       }
@@ -146,11 +145,9 @@ auto boundingBoxLaneLateralDistance(
   const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
   const CanonicalizedLaneletPose & to,
   const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box,
-  const traffic_simulator::RoutingConfiguration & routing_configuration,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<double>
+  const RoutingConfiguration & routing_configuration) -> std::optional<double>
 {
-  if (const auto lateral_distance =
-        lateralDistance(from, to, routing_configuration, hdmap_utils_ptr);
+  if (const auto lateral_distance = lateralDistance(from, to, routing_configuration);
       lateral_distance) {
     const auto from_bounding_box_distances =
       math::geometry::getDistancesFromCenterToEdge(from_bounding_box);
@@ -173,15 +170,36 @@ auto boundingBoxLaneLongitudinalDistance(
   const CanonicalizedLaneletPose & from,
   const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
   const CanonicalizedLaneletPose & to,
-  const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box, bool include_adjacent_lanelet,
-  bool include_opposite_direction,
-  const traffic_simulator::RoutingConfiguration & routing_configuration,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<double>
+  const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box,
+  const bool include_adjacent_lanelet, const bool include_opposite_direction,
+  const RoutingConfiguration & routing_configuration) -> std::optional<double>
 {
-  if (const auto longitudinal_distance = longitudinalDistance(
-        from, to, include_adjacent_lanelet, include_opposite_direction, routing_configuration,
-        hdmap_utils_ptr);
+  if (const auto longitudinal_distance = distance::longitudinalDistance(
+        from, to, include_adjacent_lanelet, include_opposite_direction, routing_configuration);
       longitudinal_distance) {
+    const auto from_bounding_box_distances =
+      math::geometry::getDistancesFromCenterToEdge(from_bounding_box);
+    const auto to_bounding_box_distances =
+      math::geometry::getDistancesFromCenterToEdge(to_bounding_box);
+    auto bounding_box_distance = 0.0;
+    if (longitudinal_distance.value() > 0.0) {
+      bounding_box_distance =
+        -std::abs(from_bounding_box_distances.front) - std::abs(to_bounding_box_distances.rear);
+    } else if (longitudinal_distance.value() < 0.0) {
+      bounding_box_distance =
+        +std::abs(from_bounding_box_distances.rear) + std::abs(to_bounding_box_distances.front);
+    }
+    return longitudinal_distance.value() + bounding_box_distance;
+  }
+  return std::nullopt;
+}
+
+auto boundingBoxLaneLongitudinalDistance(
+  const std::optional<double> & longitudinal_distance,
+  const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
+  const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box) -> std::optional<double>
+{
+  if (longitudinal_distance) {
     const auto from_bounding_box_distances =
       math::geometry::getDistancesFromCenterToEdge(from_bounding_box);
     const auto to_bounding_box_distances =

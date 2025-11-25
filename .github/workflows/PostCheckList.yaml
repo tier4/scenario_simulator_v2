@@ -1,6 +1,6 @@
 name: Post check list
 on:
-  pull_request:
+  pull_request_target:
     types: [opened, reopened]
 
 jobs:
@@ -9,20 +9,13 @@ jobs:
     timeout-minutes: 10
     runs-on: ubuntu-22.04
     permissions:
-      actions: write
-      checks: write
-      contents: write
       deployments: write
       issues: write
-      packages: write
       pull-requests: write
-      repository-projects: write
-      security-events: write
-      statuses: write
     steps:
-      - uses: alawiii521/current-pr-comment@v1.0
+      - uses: mshick/add-pr-comment@v2
         with:
-          comment: |
+          message: |
             # Checklist for reviewers ☑️
             All references to "You" in the following text refer to the code reviewer.
             - [ ] Is this pull request written in a way that is easy to read from a third-party perspective?
@@ -31,4 +24,4 @@ jobs:
             - [ ] Labels of this pull request are valid?
             - [ ] All unit tests/integration tests are included in this pull request? If you think adding test cases is unnecessary, please describe why and cross out this line.
             - [ ] The documentation for this pull request is enough? If you think adding documents for this pull request is unnecessary, please describe why and cross out this line.
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          message-id: "post-check-list"

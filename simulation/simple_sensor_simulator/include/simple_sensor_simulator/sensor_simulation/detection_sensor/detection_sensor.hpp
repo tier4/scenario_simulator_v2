@@ -15,8 +15,9 @@
 #ifndef SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__DETECTION_SENSOR__DETECTION_SENSOR_HPP_
 #define SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__DETECTION_SENSOR__DETECTION_SENSOR_HPP_
 
-#include <simulation_api_schema.pb.h>
+#include <simulation_interface/simulation_api_schema.pb.h>
 
+#include <autoware_perception_msgs/msg/tracked_objects.hpp>
 #include <geometry/plane.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 #include <get_parameter/get_parameter.hpp>
@@ -86,16 +87,26 @@ class DetectionSensor : public DetectionSensorBase
 
   struct NoiseOutput
   {
-    double simulation_time, distance_noise, yaw_noise;
+    double simulation_time;
 
+    // for noise v2/v3
+    double distance_noise, yaw_noise;
     bool true_positive, flip;
+
+    // for noise v4
+    double v4_position_x_noise, v4_position_y_noise;
+
+    std::string config_name;
 
     explicit NoiseOutput(double simulation_time = 0.0)
     : simulation_time(simulation_time),
       distance_noise(0.0),
       yaw_noise(0.0),
       true_positive(true),
-      flip(false)
+      flip(false),
+      v4_position_x_noise(0.0),
+      v4_position_y_noise(0.0),
+      config_name("")
     {
     }
   };
@@ -177,6 +188,8 @@ public:
               case 1:
                 return configuration_.random_seed();
               case 2:
+                [[fallthrough]];
+              case 3:
                 return common::getParameter<int>(
                   detected_objects_publisher->get_topic_name() + std::string(".seed"));
             }

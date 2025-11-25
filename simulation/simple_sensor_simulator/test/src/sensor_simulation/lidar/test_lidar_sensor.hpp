@@ -17,6 +17,7 @@
 
 #include <gtest/gtest.h>
 
+#include <agnocast_wrapper/agnocast_wrapper.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/point_cloud2.hpp>
 #include <set>
@@ -31,28 +32,35 @@ using namespace simple_sensor_simulator;
 class LidarSensorTest : public ::testing::Test
 {
 protected:
+  static void SetUpTestSuite() { rclcpp::init(0, nullptr); }
+
+  static void TearDownTestSuite() { rclcpp::shutdown(); }
+
   LidarSensorTest()
   : config_(utils::constructLidarConfiguration("ego", "awf/universe/20240605", 0.0, 0.5))
   {
-    rclcpp::init(0, nullptr);
+    // Note: Executor must be created after rclcpp::init. If created before, it causes context is null error.
+    executor_ = std::make_shared<rclcpp::executors::SingleThreadedExecutor>();
     node_ = std::make_shared<rclcpp::Node>("lidar_sensor_test_node");
+    executor_->add_node(node_);
     makeRosInterface();
     initializeEntityStatuses();
 
     lidar_ = std::make_unique<LidarSensor<sensor_msgs::msg::PointCloud2>>(0.0, config_, publisher_);
   }
 
-  ~LidarSensorTest() { rclcpp::shutdown(); }
+  ~LidarSensorTest() = default;
 
   rclcpp::Node::SharedPtr node_;
-  rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr publisher_;
-  rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr subscription_;
+  rclcpp::executors::SingleThreadedExecutor::SharedPtr executor_;
+  agnocast_wrapper::PublisherPtr<sensor_msgs::msg::PointCloud2> publisher_;
+  agnocast_wrapper::SubscriptionPtr<sensor_msgs::msg::PointCloud2> subscription_;
 
   std::vector<EntityStatus> status_;
 
   std::unique_ptr<LidarSensorBase> lidar_;
   simulation_api_schema::LidarConfiguration config_;
-  sensor_msgs::msg::PointCloud2::SharedPtr received_msg_;
+  agnocast_wrapper::MessagePtr<sensor_msgs::msg::PointCloud2> received_msg_;
 
   double current_simulation_time_{1.0};
   rclcpp::Time current_ros_time_{1};
@@ -76,10 +84,13 @@ private:
 
   auto makeRosInterface() -> void
   {
-    publisher_ = node_->create_publisher<sensor_msgs::msg::PointCloud2>("lidar_output", 10);
-    subscription_ = node_->create_subscription<sensor_msgs::msg::PointCloud2>(
-      "lidar_output", 10,
-      [this](const sensor_msgs::msg::PointCloud2::SharedPtr msg) { received_msg_ = msg; });
+    publisher_ =
+      agnocast_wrapper::create_publisher<sensor_msgs::msg::PointCloud2>(node_, "lidar_output", 10);
+    subscription_ = agnocast_wrapper::create_subscription<sensor_msgs::msg::PointCloud2>(
+      node_, "lidar_output", 10,
+      [this](const agnocast_wrapper::MessagePtr<sensor_msgs::msg::PointCloud2> msg) {
+        received_msg_ = msg;
+      });
   }
 };
 #endif  // SIMPLE_SENSOR_SIMULATOR__TEST__TEST_LIDAR_SENSOR_HPP_

@@ -1,0 +1,200 @@
+ScenarioModifiers:
+  ScenarioModifier: []
+OpenSCENARIO:
+  FileHeader:
+    revMajor: 1
+    revMinor: 1
+    date: '2024-11-15T02:21:26.404Z'
+    description: ''
+    author: Tatsuya Yamasaki
+  ParameterDeclarations:
+    ParameterDeclaration: []
+  CatalogLocations:
+    VehicleCatalog:
+      Directory:
+        path: $(ros2 pkg prefix --share openscenario_experimental_catalog)/vehicle
+  RoadNetwork:
+    LogicFile:
+      filepath: $(ros2 pkg prefix --share kashiwanoha_map)/map
+  Entities:
+    ScenarioObject:
+      - name: ego
+        CatalogReference:
+          catalogName: sample_vehicle
+          entryName: sample_vehicle
+        ObjectController:
+          Controller:
+            name: 'Autoware'
+            Properties:
+              Property: []
+  Storyboard:
+    Init:
+      Actions:
+        Private:
+          - entityRef: ego
+            PrivateAction:
+              - TeleportAction:
+                  Position: &INITIAL_POSITION
+                    LanePosition:
+                      roadId: ''
+                      laneId: '34513'
+                      s: 5
+                      Orientation: &DEFAULT_ORIENTATION
+                        type: relative
+                        h: 0
+                        p: 0
+                        r: 0
+              - RoutingAction:
+                  AcquirePositionAction:
+                    Position: &STANDBY_POSITION
+                      LanePosition:
+                        roadId: ''
+                        laneId: '34513'
+                        s: 30
+                        Orientation: *DEFAULT_ORIENTATION
+    Story:
+      - name: ''
+        Act:
+          - name: act_reroute
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: act_reroute
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef:
+                    - entityRef: ego
+                Maneuver:
+                  - name: ''
+                    ParameterDeclarations:
+                      ParameterDeclaration:
+                        - name: RoutingAction__use_lane_ids_for_routing
+                          parameterType: boolean
+                          value: true
+                    Event:
+                      - name: reroute
+                        priority: parallel
+                        Action:
+                          - name: ''
+                            PrivateAction:
+                              RoutingAction:
+                                AssignRouteAction:
+                                  Route:
+                                    name: ''
+                                    closed: false
+                                    Waypoint:
+                                      - Position: &CHECK_POINT_0
+                                          LanePosition:
+                                            roadId: ''
+                                            laneId: '34606'
+                                            s: 15
+                                            Orientation: *DEFAULT_ORIENTATION
+                                        routeStrategy: shortest
+                                      - Position: &CHECK_POINT_1
+                                          LanePosition:
+                                            roadId: ''
+                                            laneId: '34600'
+                                            s: 30
+                                            Orientation: *DEFAULT_ORIENTATION
+                                        routeStrategy: shortest
+                                      - Position: &CHECK_POINT_2
+                                          LanePosition:
+                                            roadId: ''
+                                            laneId: '34630'
+                                            s: 13
+                                            Orientation: *DEFAULT_ORIENTATION
+                                        routeStrategy: shortest
+                                      - Position: &DESTINATION
+                                          LanePosition:
+                                            roadId: ''
+                                            laneId: '34741'
+                                            s: 25
+                                            Orientation: *DEFAULT_ORIENTATION
+                                        routeStrategy: shortest
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    UserDefinedValueCondition:
+                                      value: WAITING_FOR_ROUTE
+                                      name: ego.currentState
+                                      rule: equalTo
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ''
+                      delay: 0
+                      conditionEdge: none
+                      ByEntityCondition:
+                        TriggeringEntities:
+                          triggeringEntitiesRule: any
+                          EntityRef:
+                            - entityRef: ego
+                        EntityCondition:
+                          ReachPositionCondition:
+                            Position: *STANDBY_POSITION
+                            tolerance: 1
+          - name: _EndCondition
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ''
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef:
+                    - entityRef: ego
+                Maneuver:
+                  - name: ''
+                    Event:
+                      - name: ''
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      ReachPositionCondition:
+                                        Position: *DESTINATION
+                                        tolerance: 1
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitSuccess
+                      - name: ''
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 180
+                                      rule: greaterThan
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitFailure
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ''
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
+    StopTrigger:
+      ConditionGroup: []

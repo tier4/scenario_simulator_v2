@@ -123,6 +123,19 @@ public:
             return configuration;
           }());
 
+          api_->attachImuSensor(ego_name_, [&]() {
+            simulation_api_schema::ImuSensorConfiguration configuration;
+            configuration.set_entity(ego_name_);
+            configuration.set_frame_id("base_link");
+            configuration.set_add_gravity(true);
+            configuration.set_use_seed(true);
+            configuration.set_seed(0);
+            configuration.set_noise_standard_deviation_orientation(0.01);
+            configuration.set_noise_standard_deviation_twist(0.01);
+            configuration.set_noise_standard_deviation_acceleration(0.01);
+            return configuration;
+          }());
+
           ego_entity.template setParameter<bool>("allow_goal_modification", true);
         }
 
@@ -168,7 +181,7 @@ public:
       if (!api_->isNpcLogicStarted()) {
         if (api_->isEntityExist(ego_name_)) {
           auto & ego_entity = api_->getEgoEntity(ego_name_);
-          if (ego_entity.isEngageable()) {
+          if (ego_entity.isEngaged()) {
             api_->startNpcLogic();
           }
         } else {

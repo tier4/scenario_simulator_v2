@@ -4,7 +4,6 @@ SHELL ["/bin/bash", "-c"]
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NOWARNINGS=yes
 
-# cspell: ignore kisak
 RUN --mount=type=cache,id=apt-cache-amd64,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,id=apt-lib-amd64,target=/var/lib/apt,sharing=locked \
     apt-get update && apt-get -y install python3-pip python3-rospkg python3-rosdep software-properties-common ccache && \
@@ -15,7 +14,7 @@ RUN rm -f /etc/apt/apt.conf.d/docker-clean && \
     echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
 
 WORKDIR /home/ubuntu/Desktop/scenario_simulator_ws/src/scenario_simulator
-COPY . $WORKDIR
+COPY . .
 
 WORKDIR /home/ubuntu/Desktop/scenario_simulator_ws/
 RUN mkdir -p /home/ubuntu/Desktop/scenario_simulator_ws/src/scenario_simulator/external

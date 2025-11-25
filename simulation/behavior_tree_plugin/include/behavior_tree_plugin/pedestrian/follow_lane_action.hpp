@@ -19,26 +19,42 @@
 #include <behaviortree_cpp_v3/bt_factory.h>
 
 #include <behavior_tree_plugin/pedestrian/pedestrian_action_node.hpp>
+#include <geometry/vector3/norm.hpp>
+#include <geometry/vector3/operator.hpp>
+#include <get_parameter/get_parameter.hpp>
 #include <memory>
+#include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
+#include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 #include <vector>
 
 namespace entity_behavior
 {
 namespace pedestrian
 {
+
 class FollowLaneAction : public entity_behavior::PedestrianActionNode
 {
 public:
   FollowLaneAction(const std::string & name, const BT::NodeConfiguration & config);
-  BT::NodeStatus tick() override;
+  bool checkPreconditions() override;
+  BT::NodeStatus doAction() override;
   void getBlackBoardValues() override;
   static BT::PortsList providedPorts()
   {
     return entity_behavior::PedestrianActionNode::providedPorts();
   }
+  bool detectObstacleInLane(
+    const lanelet::Ids pedestrian_lanes, const bool see_around,
+    const std::vector<geometry_msgs::msg::Point> & waypoints) const;
+  traffic_simulator_msgs::msg::WaypointsArray calculateWaypoints(
+    const lanelet::Ids & following_lanelets) const;
+
+private:
+  bool use_trajectory_based_front_entity_detection_;
+  double trajectory_based_detection_offset_;
 };
 }  // namespace pedestrian
 }  // namespace entity_behavior
