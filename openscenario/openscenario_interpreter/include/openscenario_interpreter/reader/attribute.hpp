@@ -15,9 +15,12 @@
 #ifndef OPENSCENARIO_INTERPRETER__READER__ATTRIBUTE_HPP_
 #define OPENSCENARIO_INTERPRETER__READER__ATTRIBUTE_HPP_
 
+#ifndef PARAMETER_VALUE_DISTRIBUTION_ONLY
 #include <ament_index_cpp/get_package_share_directory.hpp>
-#include <boost/algorithm/string/replace.hpp>
 #include <concealer/execute.hpp>
+#endif  // PARAMETER_VALUE_DISTRIBUTION_ONLY
+
+#include <boost/algorithm/string/replace.hpp>
 #include <functional>
 #include <openscenario_interpreter/reader/evaluate.hpp>
 #include <openscenario_interpreter/syntax/parameter_type.hpp>

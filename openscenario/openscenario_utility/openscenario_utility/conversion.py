@@ -29,7 +29,25 @@ import xmlschema
 import yaml
 
 
+class StringPreservingLoader(yaml.SafeLoader):
+    """Custom YAML loader that preserves floating-point numbers as strings."""
+    pass
+
+
+def _preserve_float_string(loader, node):
+    """Preserve floating-point numbers as their original string representation."""
+    return loader.construct_scalar(node)
+
+
+# Register the custom constructor for float tags
+StringPreservingLoader.add_constructor(
+    'tag:yaml.org,2002:float',
+    _preserve_float_string
+)
+
+
 def iota(start, step, stop):
+    start, step, stop = float(start), float(step), float(stop)
     tol = 1e-10
     if math.isclose(step, 0.0, abs_tol=tol):
         yield start
@@ -107,7 +125,7 @@ class MacroExpander:
 def load_yaml(path: Path):
     if path.exists():
         with path.open("r") as file:
-            return yaml.safe_load(file)
+            return yaml.load(file, Loader=StringPreservingLoader)
     else:
         print(
             "\x1b[31mNo such file or directory: " + str(path) + "\x1b[0m", file=stderr

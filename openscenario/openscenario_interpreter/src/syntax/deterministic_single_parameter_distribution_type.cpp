@@ -25,8 +25,8 @@ DeterministicSingleParameterDistributionType::DeterministicSingleParameterDistri
 : Group(
     choice(tree, {
       { "DistributionSet",         [&](auto && node) { return make<DistributionSet        >(node, scope); } },
-      { "DistributionRange",       [&](auto && node) { return make<DistributionRange      >(node, scope); } },
-      { "UserDefinedDistribution", [&](auto && node) { return make<UserDefinedDistribution>(node, scope); } }
+      { "DistributionRange",       [&](auto && node) { return make<DistributionRange      >(node, scope); } }
+//      { "UserDefinedDistribution", [&](auto && node) { return make<UserDefinedDistribution>(node, scope); } }
     }))
 // clang-format on
 {
