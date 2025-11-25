@@ -205,7 +205,7 @@ jobs:
         uses: SonarSource/sonarqube-scan-action@v6.0.0
         id: sonarcloud
         # In ARM build, SonarQube result should be same as x86 build because no test runs
-        if: matrix.runs_on != 'ubuntu-22.04-arm' && github.event.pull_request.head.repo.fork == false
+        if: matrix.runs_on != 'ubuntu-22.04-arm' && github.event.pull_request.head.repo.fork == false && ${{ github.actor != 'dependabot[bot]' }}
         continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -223,7 +223,7 @@ jobs:
       #        shell: bash
 
       - name: Report error if SonarQube scan failed
-        if: steps.sonarcloud.outcome == 'failure'
+        if:  ${{ github.actor != 'dependabot[bot]' }} && steps.sonarcloud.outcome == 'failure'
         uses: mshick/add-pr-comment@v2
         with:
           message: "This PR has failed the SonarQube scan. Please check the details in the SonarQube dashboard."
