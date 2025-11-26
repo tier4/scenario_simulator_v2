@@ -44,6 +44,22 @@ Changelog for package scenario_test_runner
 * Merge branch 'master' into dependabot/github_actions/actions/checkout-5
 * Contributors: Kotaro Yoshimoto, Taiga
 
+18.5.0 (2025-11-26)
+-------------------
+* Merge pull request `#1742 <https://github.com/tier4/scenario_simulator_v2/issues/1742>`_ from tier4/feature/publisher-noise-imu
+* Merge branch 'master' into feature/publisher-noise-imu
+* Rollback meaningless velocity status parameters movement
+* Merge branch 'master' into feature/publisher-noise-imu
+* Merge branch 'master' into feature/publisher-noise-imu
+* Set imu data standard_deviation to zero
+* Add covariance diagonal elements errors for Imu
+* Add default IMU noise in new configuration to be the same as default in legacy configuration
+  This was done so that covariance matrices are calculated to be non-zero (their diagonal). Otherwise the Autoware gets confused and Ego starts shaking in RViz.
+* Fix parameter comments
+* Fix minor issue
+* Add /sensing/imu/imu_data parameters to parameters file
+* Contributors: Kotaro Yoshimoto, Mateusz Palczuk
+
 18.4.5 (2025-11-25)
 -------------------
 
