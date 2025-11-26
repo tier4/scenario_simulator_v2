@@ -30,6 +30,36 @@ Changelog for package simple_sensor_simulator
 * Merge branch 'master' into dependabot/github_actions/actions/checkout-5
 * Contributors: Kotaro Yoshimoto, Taiga
 
+18.5.0 (2025-11-26)
+-------------------
+* Merge pull request `#1742 <https://github.com/tier4/scenario_simulator_v2/issues/1742>`_ from tier4/feature/publisher-noise-imu
+* Merge branch 'master' into feature/publisher-noise-imu
+* Merge branch 'master' into feature/publisher-noise-imu
+* Merge branch 'master' into feature/publisher-noise-imu
+* Add covariance diagonal elements errors for Imu
+* Use hardcoded covariance matrices when new IMU noise configuration is used
+* Revert "Add covariance matrix validation"
+  This reverts commit c729976f88af4c39dccb1487f01258e9c933ee14.
+* Add covariance matrix validation
+  Ensure variances (diagonal) are not 0.0, or otherwise Autoware localization gets confused (only when simulate_localization:=false)
+* Revert Publisher::operator() to non-const and Publisher::randomize to non-mutable
+  Adjust ImuSensor + ImuSensorBase update member functions to non-const - similar to other sensors
+* Improve IMU NormalDistribution deactivation
+  Skip the randomization process altogether instead of disabling all errors and performing other operations that achieve nothing
+* Cleanup
+* Move NormalDistribution specialization for Imu to concealer package
+* Use boost::math::constants
+* Revert to previous calculateCovariance function and adapt new one to use the same convention
+* Add IMU sensor test descriptions
+* Improve IMU tests
+* Add IMU tests
+  Test applying noise using legacy parameters - simulation_api_schema
+* Implement legacy noise override switching
+* Adapt simple_sensor_simulator::ImuSensor to use concealer::Publisher
+  The previous noise mechanism is not in use
+  This required accessing Publisher::randomize to obtain normal distribution error standard deviations
+* Contributors: Kotaro Yoshimoto, Mateusz Palczuk
+
 18.4.5 (2025-11-25)
 -------------------
 

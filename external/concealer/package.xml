@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>concealer</name>
-  <version>18.4.5</version>
+  <version>18.5.0</version>
   <description>Provides a class 'Autoware' to conceal miscellaneous things to simplify Autoware management of the simulator.</description>
   <maintainer email="tatsuya.yamasaki@tier4.jp">Tatsuya Yamasaki</maintainer>
   <license>Apache License 2.0</license>
@@ -35,6 +35,8 @@
   <depend>tf2_geometry_msgs</depend>
   <depend>tf2_ros</depend>
   <depend>traffic_simulator_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>geometry</depend>
 
   <test_depend>ament_cmake_clang_format</test_depend>
   <test_depend>ament_cmake_copyright</test_depend>
