@@ -30,6 +30,21 @@ Changelog for package concealer
 * Merge branch 'master' into dependabot/github_actions/actions/checkout-5
 * Contributors: Kotaro Yoshimoto, Taiga
 
+18.5.0 (2025-11-26)
+-------------------
+* Merge pull request `#1742 <https://github.com/tier4/scenario_simulator_v2/issues/1742>`_ from tier4/feature/publisher-noise-imu
+* Merge branch 'master' into feature/publisher-noise-imu
+* Merge branch 'master' into feature/publisher-noise-imu
+* Merge branch 'master' into feature/publisher-noise-imu
+* Add covariance diagonal elements errors for Imu
+* Revert Publisher::operator() to non-const and Publisher::randomize to non-mutable
+  Adjust ImuSensor + ImuSensorBase update member functions to non-const - similar to other sensors
+* Improve IMU NormalDistribution deactivation
+  Skip the randomization process altogether instead of disabling all errors and performing other operations that achieve nothing
+* Move NormalDistribution specialization for Imu to concealer package
+* Implement legacy noise override switching
+* Contributors: Kotaro Yoshimoto, Mateusz Palczuk
+
 18.4.5 (2025-11-25)
 -------------------
 
