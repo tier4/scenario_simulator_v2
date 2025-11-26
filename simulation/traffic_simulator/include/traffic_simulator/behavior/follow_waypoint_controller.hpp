@@ -231,7 +231,13 @@ public:
     max_acceleration_rate{behavior_parameter.dynamic_constraints.max_acceleration_rate},
     max_deceleration{behavior_parameter.dynamic_constraints.max_deceleration},
     max_deceleration_rate{behavior_parameter.dynamic_constraints.max_deceleration_rate},
-    target_speed{(target_speed) ? target_speed.value() : max_speed}
+    /*
+       NOTE: std::abs() is applied to target_speed as part of the workaround for backward motion.
+       FollowWaypointController currently does not support negative speeds natively.
+       The caller (makeUpdatedStatus) handles direction by negating input/output values.
+       TODO: Remove std::abs() when controller is updated to support negative speeds natively.
+    */
+    target_speed{(target_speed) ? std::abs(target_speed.value()) : max_speed}
   {
   }
 
