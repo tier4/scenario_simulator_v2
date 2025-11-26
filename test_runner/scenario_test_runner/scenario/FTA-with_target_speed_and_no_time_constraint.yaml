@@ -1,0 +1,197 @@
+OpenSCENARIO:
+  FileHeader:
+    revMajor: 0
+    revMinor: 0
+    date: '2025-06-23T14:13:14.940Z'
+    description: ''
+    author: Michał Ciasnocha
+  ParameterDeclarations:
+    ParameterDeclaration: []
+  CatalogLocations:
+    VehicleCatalog:
+      Directory:
+        path: $(ros2 pkg prefix --share openscenario_experimental_catalog)/vehicle
+  RoadNetwork:
+    LogicFile:
+      filepath: $(ros2 pkg prefix --share kashiwanoha_map)/map
+  Entities:
+    ScenarioObject:
+      - name: ego
+        CatalogReference:
+          catalogName: sample_vehicle
+          entryName: sample_vehicle
+        ObjectController:
+          Controller:
+            name: ''
+            Properties:
+              Property: []
+  Storyboard:
+    Init:
+      Actions:
+        Private:
+          - entityRef: ego
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '34513'
+                      s: 29.5076
+                      offset: -0.0843
+                      Orientation: &ORIENTATION_ZERO
+                        type: relative
+                        h: 0
+                        p: -0.0
+                        r: 0
+              - LongitudinalAction:
+                  SpeedAction:
+                    SpeedActionDynamics:
+                      dynamicsDimension: time
+                      value: 0
+                      dynamicsShape: step
+                    SpeedActionTarget:
+                      AbsoluteTargetSpeed:
+                        value: 5
+    Story:
+      - name: ''
+        Act:
+          - name: ''
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ''
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef:
+                    - entityRef: ego
+                Maneuver:
+                  - name: ''
+                    Event:
+                      - name: ''
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 0
+                                      rule: greaterThan
+                        Action:
+                          - name: 'follow_trajectory'
+                            PrivateAction:
+                              - RoutingAction:
+                                  FollowTrajectoryAction:
+                                    initialDistanceOffset: 1
+                                    TimeReference:
+                                      Timing:
+                                        domainAbsoluteRelative: relative
+                                        offset: 0
+                                        scale: 1
+                                    TrajectoryFollowingMode:
+                                      followingMode: position
+                                    TrajectoryRef:
+                                      Trajectory:
+                                        closed: false
+                                        name: straight
+                                        Shape:
+                                          Polyline:
+                                            Vertex:
+                                              - Position:
+                                                  LanePosition:
+                                                    roadId: ''
+                                                    laneId: '34513'
+                                                    s: 40.8094
+                                                    offset: -0.1684
+                                                    Orientation: *ORIENTATION_ZERO
+                                              - Position:
+                                                  LanePosition:
+                                                    roadId: ''
+                                                    laneId: '34498'
+                                                    s: 5.253
+                                                    offset: 0.2477
+                                                    Orientation: *ORIENTATION_ZERO
+                                              - Position:
+                                                  LanePosition:
+                                                    roadId: ''
+                                                    laneId: '34498'
+                                                    s: 12.8714
+                                                    offset: 0.6223
+                                                    Orientation: *ORIENTATION_ZERO
+                                              - Position:
+                                                  LanePosition:
+                                                    roadId: ''
+                                                    laneId: '34408'
+                                                    s: 22.2865
+                                                    offset: -0.0543
+                                                    Orientation: *ORIENTATION_ZERO
+                                              - Position:
+                                                  LanePosition:
+                                                    roadId: ''
+                                                    laneId: '34645'
+                                                    s: 11.5812
+                                                    offset: 0.3208
+                                                    Orientation: *ORIENTATION_ZERO
+                                              - Position: &POSITION_EGO_DESTINATION
+                                                  LanePosition:
+                                                    roadId: ''
+                                                    laneId: '34621'
+                                                    s: 6.7489
+                                                    offset: 0.2485
+                                                    Orientation: *ORIENTATION_ZERO
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ''
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
+          - name: _EndCondition
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ''
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef:
+                    - entityRef: ego
+                Maneuver:
+                  - name: ''
+                    Event:
+                      - name: ''
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      ReachPositionCondition:
+                                        Position: *POSITION_EGO_DESTINATION
+                                        tolerance: 1
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitSuccess
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ''
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
+    StopTrigger:
+      ConditionGroup: []

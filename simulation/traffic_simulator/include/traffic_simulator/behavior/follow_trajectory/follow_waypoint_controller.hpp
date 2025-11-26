@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__BEHAVIOR__FOLLOW_WAYPOINT_CONTROLLER_HPP_
-#define TRAFFIC_SIMULATOR__BEHAVIOR__FOLLOW_WAYPOINT_CONTROLLER_HPP_
+#ifndef TRAFFIC_SIMULATOR__BEHAVIOR__FOLLOW_TRAJECTORY__FOLLOW_WAYPOINT_CONTROLLER_HPP_
+#define TRAFFIC_SIMULATOR__BEHAVIOR__FOLLOW_TRAJECTORY__FOLLOW_WAYPOINT_CONTROLLER_HPP_
 
 #include <algorithm>
 #include <cmath>
@@ -30,11 +30,11 @@ namespace traffic_simulator
 {
 namespace follow_trajectory
 {
-struct ControllerError : public common::Error
+struct ControllerError : public common::SimulationError
 {
   template <typename... Ts>
   explicit ControllerError(Ts &&... xs)
-  : common::Error(common::concatenate(
+  : common::SimulationError(common::concatenate(
       "An error occurred in the internal controller operation in the FollowTrajectoryAction. ",
       "Please report the following information to the developer: ",
       std::forward<decltype(xs)>(xs)...))
@@ -59,7 +59,7 @@ struct PredictedState
 
   auto isImmobile(const double tolerance) const
   {
-    return std::abs(speed) < tolerance && std::abs(acceleration) < tolerance;
+    return std::abs(speed) < tolerance and std::abs(acceleration) < tolerance;
   }
 
   template <typename StreamType>
@@ -129,7 +129,7 @@ class FollowWaypointController
      There is no technical basis for this value, it was determined based on
      Dawid Moszynski experiments.
   */
-  static constexpr std::size_t number_of_acceleration_candidates = 30;
+  static constexpr std::size_t number_of_acceleration_candidates = 30UL;
 
   /*
      This is a debugging method, it is not worth giving it much attention.
@@ -231,7 +231,7 @@ public:
     max_acceleration_rate{behavior_parameter.dynamic_constraints.max_acceleration_rate},
     max_deceleration{behavior_parameter.dynamic_constraints.max_deceleration},
     max_deceleration_rate{behavior_parameter.dynamic_constraints.max_deceleration_rate},
-    target_speed{(target_speed) ? target_speed.value() : max_speed}
+    target_speed{target_speed.value_or(max_speed)}
   {
   }
 
@@ -242,14 +242,14 @@ public:
     const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory) const
     -> std::string
   {
-    if (const auto & vertices = polyline_trajectory.shape.vertices; !vertices.empty()) {
+    if (const auto & vertices = polyline_trajectory.shape.vertices; not vertices.empty()) {
       std::stringstream waypoint_details;
       waypoint_details << "Currently followed waypoint: ";
+
       if (const auto first_waypoint_with_arrival_time_specified = std::find_if(
-            vertices.begin(), vertices.end(),
-            [](auto && vertex) { return not std::isnan(vertex.time); });
-          first_waypoint_with_arrival_time_specified !=
-          std::end(polyline_trajectory.shape.vertices)) {
+            vertices.cbegin(), vertices.cend(),
+            [](const auto & vertex) { return not std::isnan(vertex.time); });
+          first_waypoint_with_arrival_time_specified != vertices.cend()) {
         waypoint_details << "[" << first_waypoint_with_arrival_time_specified->position.position.x
                          << ", " << first_waypoint_with_arrival_time_specified->position.position.y
                          << "] with specified time equal to "
@@ -288,13 +288,13 @@ public:
     const double speed) const -> double;
 
   auto areConditionsOfArrivalMet(
-    const double acceleration, const double speed, const double distance) const -> double
+    const double acceleration, const double speed, const double distance) const -> bool
   {
-    return (!with_breaking || std::abs(speed) < local_epsilon) &&
-           std::abs(acceleration) < local_epsilon && distance < finish_distance_tolerance;
+    return (not with_breaking or std::abs(speed) < local_epsilon) and
+           std::abs(acceleration) < local_epsilon and distance < finish_distance_tolerance;
   }
 };
 }  // namespace follow_trajectory
 }  // namespace traffic_simulator
 
-#endif  // TRAFFIC_SIMULATOR__BEHAVIOR__FOLLOW_WAYPOINT_CONTROLLER_HPP_
+#endif  // TRAFFIC_SIMULATOR__BEHAVIOR__FOLLOW_TRAJECTORY__FOLLOW_WAYPOINT_CONTROLLER_HPP_

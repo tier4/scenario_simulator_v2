@@ -22,7 +22,7 @@
 #include <optional>
 #include <queue>
 #include <string>
-#include <traffic_simulator/behavior/follow_trajectory.hpp>
+#include <traffic_simulator/behavior/follow_trajectory/follow_trajectory.hpp>
 #include <traffic_simulator/behavior/longitudinal_speed_planning.hpp>
 #include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator/data_type/lane_change.hpp>
@@ -221,7 +221,7 @@ public:
   virtual auto requestLaneChange(const lanelet::Id) -> void
   {
     /**
-     * @note There are Entities such as MiscObjectEntity for which lane change is not possible,
+     * @note There are Entities such as MiscObjectEntity for which lane change is not possible, 
      * and since it is necessary to implement appropriate overrides for each Entity, no operation is performed on the base type.
      */
   }
@@ -229,7 +229,7 @@ public:
   virtual auto requestLaneChange(const lane_change::Parameter &) -> void
   {
     /**
-     * @note There are Entities such as MiscObjectEntity for which lane change is not possible,
+     * @note There are Entities such as MiscObjectEntity for which lane change is not possible, 
      * and since it is necessary to implement appropriate overrides for each Entity, no operation is performed on the base type.
      */
   }

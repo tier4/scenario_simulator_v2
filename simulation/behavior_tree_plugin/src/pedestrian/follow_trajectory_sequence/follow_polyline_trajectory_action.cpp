@@ -73,19 +73,18 @@ bool FollowPolylineTrajectoryAction::checkPreconditions()
 
 auto FollowPolylineTrajectoryAction::doAction() -> BT::NodeStatus
 {
-  auto getTargetSpeed = [&]() -> double {
-    if (target_speed_.has_value()) {
-      return target_speed_.value();
-    } else {
-      return canonicalized_entity_status_->getTwist().linear.x;
-    }
+  const auto getTargetSpeed = [this]() -> double {
+    return target_speed_.value_or(canonicalized_entity_status_->getTwist().linear.x);
   };
 
-  if (
-    const auto entity_status_updated = traffic_simulator::follow_trajectory::makeUpdatedStatus(
-      static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status_),
-      *polyline_trajectory, behavior_parameter_, step_time_,
-      default_matching_distance_for_lanelet_pose_calculation_, getTargetSpeed())) {
+  if (const auto entity_status_updated =
+        traffic_simulator::follow_trajectory::makeUpdatedEntityStatus(
+          traffic_simulator::follow_trajectory::ValidatedEntityStatus(
+            static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status_),
+            behavior_parameter_, step_time_),
+          *polyline_trajectory, default_matching_distance_for_lanelet_pose_calculation_,
+          getTargetSpeed(), step_time_);
+      entity_status_updated.has_value()) {
     setCanonicalizedEntityStatus(entity_status_updated.value());
     setOutput("waypoints", calculateWaypoints());
     setOutput("obstacle", calculateObstacle(calculateWaypoints()));
