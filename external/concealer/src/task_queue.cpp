@@ -20,7 +20,7 @@
 namespace concealer
 {
 TaskQueue::TaskQueue()
-: dispatcher([this] {
+: finalized{false}, thrown{nullptr}, dispatcher([this] {
     try {
       while (rclcpp::ok() and not finalized.load(std::memory_order_acquire)) {
         if (not empty()) {
