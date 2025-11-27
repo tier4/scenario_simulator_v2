@@ -149,10 +149,10 @@ public:
   /*   */ auto isInLanelet(
     const lanelet::Id lanelet_id, std::optional<double> tolerance = std::nullopt) const -> bool;
 
-  /*   */ auto getCanonicalizedLaneletPose() const -> std::optional<CanonicalizedLaneletPose>;
+  /*   */ auto getCanonicalizedLaneletPoses() const -> std::vector<CanonicalizedLaneletPose>;
 
-  /*   */ auto getCanonicalizedLaneletPose(const double matching_distance) const
-    -> std::optional<CanonicalizedLaneletPose>;
+  /*   */ auto getCanonicalizedLaneletPoses(const double matching_distance) const
+    -> std::vector<CanonicalizedLaneletPose>;
 
   virtual auto getMaxAcceleration() const -> double = 0;
 
