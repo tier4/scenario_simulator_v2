@@ -293,7 +293,8 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
     auto is_in_range = [&](const auto & status) {
       return not isEgoEntityStatusToWhichThisSensorIsAttached(status) and
              distance(status.pose(), ego_entity_status->pose()) <= range() and
-             isOnOrAboveEgoPlane(status.pose(), ego_entity_status->pose()) and
+             // This is for multi-level lanelet support. But it filters low obstacles and I disabled this temporary.
+             // isOnOrAboveEgoPlane(status.pose(), ego_entity_status->pose()) and
              (detect_all_objects_in_range() or
               std::find(
                 lidar_detected_entities.begin(), lidar_detected_entities.end(), status.name()) !=
