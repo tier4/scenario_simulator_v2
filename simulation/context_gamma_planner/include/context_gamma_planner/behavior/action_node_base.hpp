@@ -22,7 +22,6 @@
 #include <traffic_simulator/behavior/behavior_plugin_base.hpp>
 #include <traffic_simulator/data_type/behavior.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/traffic_lights/traffic_lights_base.hpp>
 #include <traffic_simulator_msgs/msg/obstacle.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
@@ -41,7 +40,6 @@ public:
   {
     return {// clang-format off
       BT::InputPort<traffic_simulator::behavior::Request>("request"),
-      BT::InputPort<std::shared_ptr<hdmap_utils::HdMapUtils>>("hdmap_utils"),
       BT::InputPort<std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>>("canonicalized_entity_status"),
       BT::InputPort<double>("current_time"),
       BT::InputPort<double>("step_time"),
@@ -56,7 +54,6 @@ public:
       BT::InputPort<entity_behavior::EntityStatusDict>("other_entity_status"),
       BT::InputPort<std::vector<lanelet::Id>>("route_lanelets"),
       BT::InputPort<std::shared_ptr<traffic_simulator::TrafficLightsBase>>("traffic_lights"),
-      BT::OutputPort<std::shared_ptr<hdmap_utils::HdMapUtils>>("hdmap_utils"),
       BT::OutputPort<std::optional<traffic_simulator_msgs::msg::Obstacle>>("obstacle"),
       BT::OutputPort<traffic_simulator_msgs::msg::WaypointsArray>("waypoints")};
     // clang-format on
@@ -66,7 +63,6 @@ public:
 
 protected:
   traffic_simulator::behavior::Request request;
-  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils;
   std::shared_ptr<traffic_simulator::TrafficLightsBase> traffic_lights;
   std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus> entity_status;
   double current_time;
