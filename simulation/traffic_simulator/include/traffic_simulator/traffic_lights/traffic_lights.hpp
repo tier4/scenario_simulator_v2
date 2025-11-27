@@ -75,13 +75,18 @@ public:
 
   ~V2ITrafficLights() override = default;
 
+  auto setTrafficLightsStatePrediction(
+    const lanelet::Id lanelet_way_id, const std::string & state, double time_ahead_seconds) -> void;
+
+  auto clearTrafficLightsStatePrediction() -> void;
+
 private:
   auto update() const -> void override
   {
     const auto now = clock_ptr_->now();
     const auto request = generateUpdateTrafficLightsRequest();
-    publisher_ptr_->publish(now, request);
-    legacy_topic_publisher_ptr_->publish(now, request);
+    publisher_ptr_->publish(now, request, &predictions_);
+    legacy_topic_publisher_ptr_->publish(now, request, &predictions_);
     if (isAnyTrafficLightChanged()) {
       marker_publisher_ptr_->deleteMarkers();
     }
@@ -126,6 +131,8 @@ private:
 
   const std::unique_ptr<TrafficLightPublisherBase> publisher_ptr_;
   const std::unique_ptr<TrafficLightPublisherBase> legacy_topic_publisher_ptr_;
+
+  mutable TrafficLightStatePredictions predictions_;
 };
 
 class TrafficLights
