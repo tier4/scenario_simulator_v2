@@ -94,7 +94,7 @@ auto longitudinalDistance(
     /**
      * @brief A matching distance of about 1.5*lane widths is given as the matching distance to match the
      * Entity present on the adjacent Lanelet.
-     * The length of the horizontal bar must intersect with the adjacent lanelet, 
+     * The length of the horizontal bar must intersect with the adjacent lanelet,
      * so it is always 10m regardless of the entity type.
      */
     constexpr double matching_distance = 5.0;
@@ -109,28 +109,24 @@ auto longitudinalDistance(
       matching_distance, include_opposite_direction, routing_configuration.routing_graph_type);
     to_poses.emplace_back(to);
 
-    std::vector<double> distances = {};
+    std::optional<double> min_distance = std::nullopt;
     for (const auto & from_pose : from_poses) {
       for (const auto & to_pose : to_poses) {
-        if (
-          const auto distance = distance::longitudinalDistance(
-            CanonicalizedLaneletPose(from_pose), CanonicalizedLaneletPose(to_pose), false,
-            include_opposite_direction, routing_configuration)) {
-          distances.emplace_back(distance.value());
+        if (const auto distance = distance::longitudinalDistance(
+              CanonicalizedLaneletPose(from_pose), CanonicalizedLaneletPose(to_pose), false,
+              include_opposite_direction, routing_configuration);
+            distance.has_value() and
+            (not min_distance.has_value() or
+             (std::abs(distance.value()) < std::abs(min_distance.value())))) {
+          min_distance = distance;
         }
       }
     }
-
-    if (!distances.empty()) {
-      return *std::min_element(distances.begin(), distances.end(), [](double a, double b) {
-        return std::abs(a) < std::abs(b);
-      });
-    } else {
-      return std::nullopt;
-    }
+    return min_distance;
   }
 }
 
+// BoundingBox
 auto boundingBoxDistance(
   const geometry_msgs::msg::Pose & from,
   const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
@@ -309,18 +305,51 @@ auto distanceToLaneBound(
     distanceToRightLaneBound(map_pose, bounding_box, lanelet_ids));
 }
 
-auto distanceToCrosswalk(
-  const traffic_simulator_msgs::msg::WaypointsArray & waypoints_array,
-  const lanelet::Id target_crosswalk_id,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<double>
+// Other objects
+auto distanceToYieldStop(
+  const CanonicalizedLaneletPose & reference_pose, const lanelet::Ids & following_lanelets,
+  const std::vector<CanonicalizedLaneletPose> & other_poses) -> std::optional<double>
 {
-  if (waypoints_array.waypoints.empty()) {
-    return std::nullopt;
-  } else {
-    math::geometry::CatmullRomSpline spline(waypoints_array.waypoints);
-    auto polygon = hdmap_utils_ptr->getLaneletPolygon(target_crosswalk_id);
-    return spline.getCollisionPointIn2D(polygon);
+  auto getPosesOnLanelet = [&other_poses](const auto & lanelet_id) {
+    std::vector<CanonicalizedLaneletPose> ret;
+    for (const auto & pose : other_poses) {
+      if (isSameLaneletId(pose, lanelet_id)) {
+        ret.emplace_back(pose);
+      }
+    }
+    return ret;
+  };
+
+  std::optional<double> min_distance = std::nullopt;
+  auto try_min_distance = [&min_distance](const double & distance) {
+    if (not min_distance.has_value() or distance < min_distance.value()) {
+      min_distance = distance;
+    }
+  };
+  for (const auto & lanelet_id : following_lanelets) {
+    const auto right_of_way_ids = lanelet_wrapper::lanelet_map::rightOfWayLaneletIds(lanelet_id);
+    for (const auto right_of_way_id : right_of_way_ids) {
+      const auto other_poses_on_lanelet = getPosesOnLanelet(right_of_way_id);
+      if (!other_poses_on_lanelet.empty()) {
+        const auto distance_forward = lanelet_wrapper::distance::longitudinalDistance(
+          static_cast<LaneletPose>(reference_pose),
+          helper::constructLaneletPose(lanelet_id, 0.0, 0.0), RoutingConfiguration());
+        const auto distance_backward = lanelet_wrapper::distance::longitudinalDistance(
+          helper::constructLaneletPose(lanelet_id, 0.0, 0.0),
+          static_cast<LaneletPose>(reference_pose), RoutingConfiguration());
+
+        if (distance_forward) {
+          try_min_distance(distance_forward.value());
+        } else if (distance_backward) {
+          try_min_distance(-distance_backward.value());
+        }
+      }
+    }
+    if (min_distance.has_value()) {
+      return min_distance.value();
+    }
   }
+  return std::nullopt;
 }
 
 auto distanceToSpline(

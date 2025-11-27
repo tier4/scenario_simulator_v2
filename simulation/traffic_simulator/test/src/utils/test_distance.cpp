@@ -20,6 +20,7 @@
 #include <numeric>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/utils/distance.hpp>
+#include <traffic_simulator/utils/lanelet_map.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
 
@@ -34,52 +35,19 @@ int main(int argc, char ** argv)
 class distanceTest_FourTrackHighwayMap : public testing::Test
 {
 protected:
-  distanceTest_FourTrackHighwayMap()
-  : hdmap_utils_ptr(std::make_shared<hdmap_utils::HdMapUtils>(
-      ament_index_cpp::get_package_share_directory("traffic_simulator") +
-        "/map/four_track_highway/lanelet2_map.osm",
-      geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
-        .latitude(35.22312494055522)
-        .longitude(138.8024583466017)
-        .altitude(0.0)))
-  {
-    activateLaneletWrapper("four_track_highway");
-  }
-  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr;
+  distanceTest_FourTrackHighwayMap() { activateLaneletWrapper("four_track_highway"); }
 };
 
 class distanceTest_StandardMap : public testing::Test
 {
 protected:
-  distanceTest_StandardMap()
-  : hdmap_utils_ptr(std::make_shared<hdmap_utils::HdMapUtils>(
-      ament_index_cpp::get_package_share_directory("traffic_simulator") +
-        "/map/standard_map/lanelet2_map.osm",
-      geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
-        .latitude(35.61836750154)
-        .longitude(139.78066608243)
-        .altitude(0.0)))
-  {
-    activateLaneletWrapper("standard_map");
-  }
-  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr;
+  distanceTest_StandardMap() { activateLaneletWrapper("standard_map"); }
 };
 
 class distanceTest_IntersectionMap : public testing::Test
 {
 protected:
-  distanceTest_IntersectionMap()
-  : hdmap_utils_ptr(std::make_shared<hdmap_utils::HdMapUtils>(
-      ament_index_cpp::get_package_share_directory("traffic_simulator") +
-        "/map/intersection/lanelet2_map.osm",
-      geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
-        .latitude(35.64200728302)
-        .longitude(139.74821144562)
-        .altitude(0.0)))
-  {
-    activateLaneletWrapper("intersection");
-  }
-  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr;
+  distanceTest_IntersectionMap() { activateLaneletWrapper("intersection"); }
 };
 
 /**
