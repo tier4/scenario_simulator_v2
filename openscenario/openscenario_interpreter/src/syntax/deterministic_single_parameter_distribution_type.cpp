@@ -20,13 +20,13 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 DeterministicSingleParameterDistributionType::DeterministicSingleParameterDistributionType(
-  const pugi::xml_node & node, Scope & scope)
+  const pugi::xml_node & tree, Scope & scope)
 // clang-format off
 : Group(
-    choice(node, {
+    choice(tree, {
       { "DistributionSet",         [&](auto && node) { return make<DistributionSet        >(node, scope); } },
       { "DistributionRange",       [&](auto && node) { return make<DistributionRange      >(node, scope); } },
-      { "UserDefinedDistribution", [&](auto && node) { return make<UserDefinedDistribution>(node, scope); } },
+      { "UserDefinedDistribution", [&](auto && node) { return make<UserDefinedDistribution>(node, scope); } }
     }))
 // clang-format on
 {

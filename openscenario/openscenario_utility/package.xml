@@ -8,10 +8,13 @@
   <license>Apache License 2.0</license>
   <buildtool_depend>ament_cmake</buildtool_depend>
   <buildtool_depend>ament_cmake_python</buildtool_depend>
+
   <depend>python3-numpy</depend>
   <depend>python3-xmlschema</depend>
   <depend>python3-yaml</depend>
+  <depend>rclcpp</depend>
   <depend>rclpy</depend>
+
   <export>
     <build_type>ament_cmake</build_type>
   </export>

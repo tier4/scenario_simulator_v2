@@ -39,10 +39,6 @@ struct DeterministicMultiParameterDistributionType : public ValueSetDistribution
   explicit DeterministicMultiParameterDistributionType(const pugi::xml_node &, Scope & scope);
 };
 
-//DEFINE_LAZY_VISITOR(
-//  DeterministicMultiParameterDistributionType,
-//  CASE(ValueSetDistribution),     //
-//);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__DETERMINISTIC_MULTI_PARAMETER_DISTRIBUTION_TYPE_HPP_
