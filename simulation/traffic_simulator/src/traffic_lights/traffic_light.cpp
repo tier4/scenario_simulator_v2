@@ -124,6 +124,8 @@ auto operator<<(std::ostream & os, const TrafficLight::Shape & shape) -> std::os
       return os << "lowerRight";
     case TrafficLight::Shape::upper_right:
       return os << "upperRight";
+    case TrafficLight::Shape::unknown:
+      return os << "unknown";
     default:
       return os;
   }

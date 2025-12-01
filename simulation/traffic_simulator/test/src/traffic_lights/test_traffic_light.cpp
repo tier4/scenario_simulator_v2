@@ -368,6 +368,17 @@ TEST(Shape, Shape)
     EXPECT_TRUE(boost::lexical_cast<Shape>("upperRight") == Shape::upper_right);
     EXPECT_TRUE(boost::lexical_cast<std::string>(shape) == "upperRight");
   }
+
+  {
+    const auto shape = Shape("unknown");
+
+    EXPECT_TRUE(shape == Shape::unknown);
+    EXPECT_TRUE(shape.is(Shape::unknown));
+    EXPECT_TRUE(shape.is(Shape::Category::unknown));
+    EXPECT_TRUE(shape.category() == Shape::Category::unknown);
+    EXPECT_TRUE(boost::lexical_cast<Shape>("unknown") == Shape::unknown);
+    EXPECT_TRUE(boost::lexical_cast<std::string>(shape) == "unknown");
+  }
 }
 
 /**
@@ -484,6 +495,17 @@ TEST(Shape, make)
     EXPECT_TRUE(boost::lexical_cast<Shape>("upperRight") == Shape::upper_right);
     EXPECT_TRUE(boost::lexical_cast<std::string>(shape) == "upperRight");
   }
+
+  {
+    const auto shape = Shape::make("unknown");
+
+    EXPECT_TRUE(shape == Shape::unknown);
+    EXPECT_TRUE(shape.is(Shape::unknown));
+    EXPECT_TRUE(shape.is(Shape::Category::unknown));
+    EXPECT_TRUE(shape.category() == Shape::Category::unknown);
+    EXPECT_TRUE(boost::lexical_cast<Shape>("unknown") == Shape::unknown);
+    EXPECT_TRUE(boost::lexical_cast<std::string>(shape) == "unknown");
+  }
 }
 
 /**
@@ -524,6 +546,7 @@ TEST(Bulb, hash)
   static_assert(Bulb(Color::green,  Status::solid_on,  Shape::upper_left ).hash() == 0b0000'0000'0000'0000'0000'1010'0000'0010);
   static_assert(Bulb(Color::green,  Status::solid_on,  Shape::lower_right).hash() == 0b0000'0000'0000'0000'0000'0101'0000'0010);
   static_assert(Bulb(Color::green,  Status::solid_on,  Shape::upper_right).hash() == 0b0000'0000'0000'0000'0000'0011'0000'0010);
+  static_assert(Bulb(Color::green,  Status::solid_on,  Shape::unknown    ).hash() == 0b0000'0000'0000'0000'0000'0000'0000'0011);
   // clang-format on
 }
 

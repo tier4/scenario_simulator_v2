@@ -148,6 +148,9 @@ TYPED_TEST(TrafficLightsInternalTest, setTrafficLightsState_shape)
 
   this->lights->setTrafficLightsState(this->id, stateFromShape("straight"));
   EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromShape("up"));
+
+  this->lights->setTrafficLightsState(this->id, stateFromShape("unknown"));
+  EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromShape("unknown"));
 }
 
 TYPED_TEST(TrafficLightsInternalTest, isAnyTrafficLightChanged)
