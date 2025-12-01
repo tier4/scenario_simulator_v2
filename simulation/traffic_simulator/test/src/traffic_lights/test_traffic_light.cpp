@@ -82,6 +82,15 @@ TEST(Color, Color)
     EXPECT_TRUE(boost::lexical_cast<Color>("amber") == Color::yellow);
     EXPECT_TRUE(boost::lexical_cast<std::string>(color) == "yellow");
   }
+
+  {
+    const auto color = Color("unknown");
+
+    EXPECT_TRUE(color == Color::unknown);
+    EXPECT_TRUE(color.is(Color::unknown));
+    EXPECT_TRUE(boost::lexical_cast<Color>("unknown") == Color::unknown);
+    EXPECT_TRUE(boost::lexical_cast<std::string>(color) == "unknown");
+  }
 }
 
 /**
@@ -133,6 +142,15 @@ TEST(Color, make)
     EXPECT_TRUE(color.is(Color::yellow));
     EXPECT_TRUE(boost::lexical_cast<Color>(color) == Color::yellow);
     EXPECT_TRUE(boost::lexical_cast<std::string>(color) == "yellow");
+  }
+
+  {
+    const auto color = Color::make("unknown");
+
+    EXPECT_TRUE(color == Color::unknown);
+    EXPECT_TRUE(color.is(Color::unknown));
+    EXPECT_TRUE(boost::lexical_cast<Color>(color) == Color::unknown);
+    EXPECT_TRUE(boost::lexical_cast<std::string>(color) == "unknown");
   }
 }
 
@@ -489,6 +507,7 @@ TEST(Bulb, hash)
   static_assert(Bulb(Color::yellow, Status::solid_on,  Shape::circle     ).hash() == 0b0000'0001'0000'0000'0000'0000'0000'0000);
   static_assert(Bulb(Color::red,    Status::solid_on,  Shape::circle     ).hash() == 0b0000'0010'0000'0000'0000'0000'0000'0000);
   static_assert(Bulb(Color::white,  Status::solid_on,  Shape::circle     ).hash() == 0b0000'0011'0000'0000'0000'0000'0000'0000);
+  static_assert(Bulb(Color::unknown, Status::solid_on, Shape::circle     ).hash() == 0b0000'0100'0000'0000'0000'0000'0000'0000);
 
   static_assert(Bulb(Color::green,  Status::solid_on,  Shape::circle     ).hash() == 0b0000'0000'0000'0000'0000'0000'0000'0000);
   static_assert(Bulb(Color::green,  Status::solid_off, Shape::circle     ).hash() == 0b0000'0000'0000'0001'0000'0000'0000'0000);
