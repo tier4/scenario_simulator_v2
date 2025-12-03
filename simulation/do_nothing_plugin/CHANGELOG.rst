@@ -30,6 +30,23 @@ Changelog for package do_nothing_plugin
 * Merge branch 'master' into dependabot/github_actions/actions/checkout-5
 * Contributors: Kotaro Yoshimoto, Taiga
 
+20.0.2 (2025-12-03)
+-------------------
+* Merge branch 'master' into fix/autoware-documentation-link
+* Contributors: Kotaro Yoshimoto
+
+20.0.1 (2025-12-03)
+-------------------
+* Merge branch 'master' into use-maximal-munch
+* Contributors: Kotaro Yoshimoto
+
+20.0.0 (2025-12-03)
+-------------------
+* Merge branch 'master' into fix/double-INF
+* Merge remote-tracking branch 'origin/fix/double-INF' into fix/double-INF
+* Merge branch 'master' into fix/double-INF
+* Contributors: Kotaro Yoshimoto
+
 19.0.3 (2025-11-27)
 -------------------
 
