@@ -32,10 +32,6 @@ auto ActionNodeBase::getBlackBoardValues() -> void
     THROW_SIMULATION_ERROR("failed to get input current_time in ActionNode");
   }
 
-  if (!getInput<std::shared_ptr<hdmap_utils::HdMapUtils>>("hdmap_utils", hdmap_utils)) {
-    THROW_SIMULATION_ERROR("failed to get input hdmap_utils in ActionNode");
-  }
-
   if (!getInput<std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>>(
         "canonicalized_entity_status", entity_status)) {
     THROW_SIMULATION_ERROR("failed to get input canonicalized_entity_status in ActionNode");

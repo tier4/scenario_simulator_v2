@@ -74,9 +74,6 @@ auto ActionNode::getBlackBoardValues() -> void
   if (!getInput<double>("current_time", current_time_)) {
     THROW_SIMULATION_ERROR("failed to get input current_time in ActionNode");
   }
-  if (!getInput<std::shared_ptr<hdmap_utils::HdMapUtils>>("hdmap_utils", hdmap_utils_)) {
-    THROW_SIMULATION_ERROR("failed to get input hdmap_utils in ActionNode");
-  }
   if (!getInput<std::shared_ptr<traffic_simulator::TrafficLightsBase>>(
         "traffic_lights", traffic_lights_)) {
     THROW_SIMULATION_ERROR("failed to get input traffic_lights in ActionNode");
