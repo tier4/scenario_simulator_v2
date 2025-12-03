@@ -16,8 +16,6 @@
 #ifndef TRAFFIC_SIMULATOR__LANELET_WRAPPER_DISTANCE_HPP_
 #define TRAFFIC_SIMULATOR__LANELET_WRAPPER_DISTANCE_HPP_
 
-#include <lanelet2_core/geometry/Lanelet.h>
-
 #include <traffic_simulator/lanelet_wrapper/lanelet_wrapper.hpp>
 
 namespace traffic_simulator
