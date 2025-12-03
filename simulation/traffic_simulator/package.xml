@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>traffic_simulator</name>
-  <version>19.0.3</version>
+  <version>20.0.3</version>
   <description>control traffic flow</description>
 
   <maintainer email="masaya.kataoka@tier4.jp">masaya kataoka</maintainer>
