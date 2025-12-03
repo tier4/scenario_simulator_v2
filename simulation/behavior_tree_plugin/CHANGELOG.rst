@@ -30,6 +30,20 @@ Changelog for package behavior_tree_plugin
 * Merge branch 'master' into dependabot/github_actions/actions/checkout-5
 * Contributors: Kotaro Yoshimoto, Taiga
 
+19.0.3 (2025-11-27)
+-------------------
+
+19.0.2 (2025-11-27)
+-------------------
+* Merge branch 'master' into fix/dependabot-uv
+* Merge branch 'master' into fix/dependabot-uv
+* Contributors: Kotaro Yoshimoto
+
+19.0.1 (2025-11-27)
+-------------------
+* Merge branch 'master' into skip-sonarqube-scan-for-dependabots
+* Contributors: Kotaro Yoshimoto
+
 19.0.0 (2025-11-27)
 -------------------
 * Merge pull request `#1478 <https://github.com/tier4/scenario_simulator_v2/issues/1478>`_ from tier4/ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
