@@ -493,9 +493,19 @@ public:
     }
 
     template <typename... Ts>
-    static auto applyFollowTrajectoryAction(const std::string & entity_ref, Ts &&... xs)
+    static auto applyFollowTrajectoryAction(
+      const std::string & entity_ref,
+      const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & parameter)
     {
-      return core->getEntity(entity_ref).requestFollowTrajectory(std::forward<decltype(xs)>(xs)...);
+      /// @note add current entity pose as the first waypoint in the trajectory
+      traffic_simulator_msgs::msg::Vertex initial_vertex;
+      initial_vertex.time = std::numeric_limits<double>::quiet_NaN();
+      initial_vertex.position = core->getEntity(entity_ref).getMapPose();
+      parameter->shape.vertices.insert(
+        parameter->shape.vertices.begin(),
+        initial_vertex
+      );
+      return core->getEntity(entity_ref).requestFollowTrajectory(parameter);
     }
 
     template <typename... Ts>

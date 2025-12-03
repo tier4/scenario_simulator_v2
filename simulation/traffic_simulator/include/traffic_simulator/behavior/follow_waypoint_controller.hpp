@@ -137,15 +137,6 @@ class FollowWaypointController
   static constexpr double step_time_tolerance = 1e-6;
 
   /*
-     Accuracy of the remaining distance to the waypoint at the moment
-     of arrival with a specified time.
-
-     There is no technical basis for this value, it was determined based on
-     Dawid Moszynski experiments.
-  */
-  static constexpr double remaining_distance_tolerance = 1e-2;
-
-  /*
      Accuracy of the predicted arrival distance at the waypoint with the
      specified time it is only used to detect in advance that it is most likely
      impossible to arrive at a sufficient final accuracy.
@@ -276,6 +267,15 @@ class FollowWaypointController
       distance_along_lanelet) const -> std::optional<PredictedEntityStatus>;
 
 public:
+  /*
+     Accuracy of the remaining distance to the waypoint at the moment
+     of arrival with a specified time.
+
+     There is no technical basis for this value, it was determined based on
+     Dawid Moszynski experiments.
+  */
+  static constexpr double remaining_distance_tolerance = 0.1;
+
   /*
      Achieving official epsilon (1e-16) accuracy when using doubles is
      difficult for this reason the controller uses less accuracy.
