@@ -30,6 +30,11 @@ Changelog for package behavior_tree_plugin
 * Merge branch 'master' into dependabot/github_actions/actions/checkout-5
 * Contributors: Kotaro Yoshimoto, Taiga
 
+20.0.1 (2025-12-03)
+-------------------
+* Merge branch 'master' into use-maximal-munch
+* Contributors: Kotaro Yoshimoto
+
 20.0.0 (2025-12-03)
 -------------------
 * Merge branch 'master' into fix/double-INF
