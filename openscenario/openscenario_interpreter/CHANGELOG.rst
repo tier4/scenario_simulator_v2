@@ -41,6 +41,17 @@ Changelog for package openscenario_interpreter
 * Merge branch 'master' into dependabot/github_actions/actions/checkout-5
 * Contributors: Kotaro Yoshimoto, Taiga
 
+20.0.0 (2025-12-03)
+-------------------
+* Merge pull request `#1738 <https://github.com/tier4/scenario_simulator_v2/issues/1738>`_ from tier4/fix/double-INF
+* Merge branch 'master' into fix/double-INF
+* Merge remote-tracking branch 'origin/fix/double-INF' into fix/double-INF
+* Fix regex in openscenario_interpreter::Double
+* Merge branch 'master' into fix/double-INF
+* Add unit tests for openscenario_interpreter::Double
+* Treat `INF` as std::numeric_limits<double>::infinity() in Double
+* Contributors: Kotaro Yoshimoto
+
 19.0.3 (2025-11-27)
 -------------------
 
