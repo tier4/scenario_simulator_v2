@@ -14,7 +14,7 @@ jobs:
     name: Generate documentation
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -56,7 +56,7 @@ jobs:
     name: Generate API documentation
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Install doxygen
         run: sudo apt-get install -y doxygen
