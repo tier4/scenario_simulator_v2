@@ -30,6 +30,12 @@ Changelog for package arithmetic
 * Merge branch 'master' into dependabot/github_actions/actions/checkout-5
 * Contributors: Kotaro Yoshimoto, Taiga
 
+20.0.3 (2025-12-03)
+-------------------
+* Merge branch 'master' into dependabot/github_actions/actions/checkout-6
+* Merge branch 'master' into dependabot/github_actions/actions/checkout-6
+* Contributors: Kotaro Yoshimoto
+
 20.0.2 (2025-12-03)
 -------------------
 * Merge branch 'master' into fix/autoware-documentation-link
