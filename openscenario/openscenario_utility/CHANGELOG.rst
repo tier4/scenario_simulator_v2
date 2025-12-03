@@ -33,6 +33,11 @@ Changelog for package openscenario_utility
 * Merge branch 'master' into dependabot/github_actions/actions/checkout-5
 * Contributors: Kotaro Yoshimoto, Taiga
 
+20.0.2 (2025-12-03)
+-------------------
+* Merge branch 'master' into fix/autoware-documentation-link
+* Contributors: Kotaro Yoshimoto
+
 20.0.1 (2025-12-03)
 -------------------
 * Merge pull request `#1756 <https://github.com/tier4/scenario_simulator_v2/issues/1756>`_ from tier4/use-maximal-munch

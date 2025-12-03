@@ -30,6 +30,11 @@ Changelog for package concealer
 * Merge branch 'master' into dependabot/github_actions/actions/checkout-5
 * Contributors: Kotaro Yoshimoto, Taiga
 
+20.0.2 (2025-12-03)
+-------------------
+* Merge branch 'master' into fix/autoware-documentation-link
+* Contributors: Kotaro Yoshimoto
+
 20.0.1 (2025-12-03)
 -------------------
 * Merge branch 'master' into use-maximal-munch
