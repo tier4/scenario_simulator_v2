@@ -121,7 +121,8 @@ auto makeUpdatedStatus(
   constexpr bool include_opposite_direction{false};
   constexpr bool allow_lane_change{true};
   constexpr bool desired_velocity_is_global{true};
-  constexpr bool verbose{false};
+  constexpr bool verbose_action{true};
+  constexpr bool verbose_move_action{false};
 
   const auto should_include_crosswalk =
     (entity_status.type.type == traffic_simulator_msgs::msg::EntityType::PEDESTRIAN) ||
@@ -657,9 +658,40 @@ auto makeUpdatedStatus(
   //                WAYPOINT HANDLING
   //  ==============================================
 
+  const auto log_waypoint_action = [&entity_status, &target_waypoint, &distance_to_target_waypoint,
+                                    &remaining_time_to_target_waypoint, &polyline_trajectory,
+                                    &is_target_waypoint_final, verbose_action, verbose_move_action](
+                                     std::string_view reason, std::string_view action,
+                                     const double this_step_distance = 0.0) {
+    if (not verbose_action) {
+      return;
+    } else if (not verbose_move_action and action == "Move") {
+      return;
+    } else {
+      const auto distance = distance_to_target_waypoint();
+      const auto remaining_time = remaining_time_to_target_waypoint();
+      const auto & target_pos = target_waypoint().position.position;
+      const auto waypoints_left = polyline_trajectory.shape.vertices.size() - 2;
+      const auto is_final = is_target_waypoint_final();
+
+      /// @note this_step_distance does not affect final waypoint handling logic, so it's not displayed for final waypoints
+      std::cout << std::fixed << std::setprecision(2)
+                << "[FTA-RESULT] Entity: " << entity_status.name << ", time: " << entity_status.time
+                << "s, step distance: "
+                << (is_final ? "N/A" : std::to_string(this_step_distance) + "m")
+                << " | Waypoint: type: "
+                << (is_final ? "final"
+                             : "intermediate (" + std::to_string(waypoints_left) + " left)")
+                << ", position: [" << target_pos.x << ", " << target_pos.y << ", " << target_pos.z
+                << "] | State: distance: " << distance << "m, remaining time: "
+                << (isfinite(remaining_time) ? std::to_string(remaining_time) + "s" : "N/A")
+                << " | Result: action: " << action << ", reason: " << reason << std::endl;
+    }
+  };
+
   const auto discard_previous_waypoint_and_recurse =
     [&entity_status, &polyline_trajectory, &behavior_parameter, &step_time, &matching_distance,
-     &target_speed, &target_waypoint, verbose]() {
+     &target_speed, &target_waypoint]() {
       /*
          The OpenSCENARIO standard does not define the behavior when the value of
          Timing.domainAbsoluteRelative is "relative". The standard only states
@@ -703,8 +735,10 @@ auto makeUpdatedStatus(
     /// @note handle intermediate waypoint without arrival time defined
     if (not isfinite(remaining_time)) {
       if (this_step_distance >= distance or distance < FollowWaypointController::local_epsilon) {
+        log_waypoint_action("Reached (no time)", "Recurse", this_step_distance);
         return discard_previous_waypoint_and_recurse();
       } else {
+        log_waypoint_action("Not reached (no time)", "Move", this_step_distance);
         return update_entity_status(entity_status, next_velocity);
       }
     }
@@ -713,8 +747,10 @@ auto makeUpdatedStatus(
     /// @note use step_time/2 threshold to account for floating point accumulation errors
     if (isDefinitelyLessThan(remaining_time, step_time / 2.0)) {
       if (this_step_distance >= distance or distance < FollowWaypointController::local_epsilon) {
+        log_waypoint_action("Reached on time", "Recurse", this_step_distance);
         return discard_previous_waypoint_and_recurse();
       } else {
+        log_waypoint_action("Time reached but distance too far", "Error", this_step_distance);
         throw common::Error(
           "Vehicle ", std::quoted(entity_status.name), " at time ", entity_status.time,
           "s (remaining time is ", remaining_time,
@@ -724,6 +760,7 @@ auto makeUpdatedStatus(
       }
     }
 
+    log_waypoint_action("Time not reached", "Move", this_step_distance);
     return update_entity_status(entity_status, next_velocity);
   };
 
@@ -739,9 +776,14 @@ auto makeUpdatedStatus(
     constexpr double distance_threshold = FollowWaypointController::remaining_distance_tolerance;
 
     if (is_entity_immobile() and distance <= distance_threshold) {
-      if (not isfinite(remaining_time) or isDefinitelyLessThan(remaining_time, step_time / 2.0)) {
+      if (not isfinite(remaining_time)) {
+        log_waypoint_action("Reached and immobile (no time)", "Complete");
+        return std::nullopt;
+      } else if (isDefinitelyLessThan(remaining_time, step_time / 2.0)) {
+        log_waypoint_action("Reached and immobile on time", "Complete");
         return std::nullopt;
       } else {
+        log_waypoint_action("Reached but time not reached", "Wait");
         /// @note distance sufficient and vehicle immobile, but arrival time not yet reached - wait with zero velocity
         return update_entity_status(
           entity_status, geometry_msgs::build<Vector3>().x(0.0).y(0.0).z(0.0));
@@ -749,6 +791,7 @@ auto makeUpdatedStatus(
     }
 
     if (is_entity_immobile() and distance > distance_threshold) {
+      log_waypoint_action("Immobile but distance exceeds threshold", "Error");
       throw common::Error(
         "Vehicle ", std::quoted(entity_status.name),
         " is immobile and only final waypoint left, but distance to final waypoint is ", distance,
@@ -756,6 +799,7 @@ auto makeUpdatedStatus(
     }
 
     if (distance <= distance_threshold) {
+      log_waypoint_action("Within threshold but moving", "Brake");
       /// @note distance within threshold but vehicle still moving - apply constrained braking to reach immobile state
       return update_entity_status(
         entity_status,
@@ -763,28 +807,13 @@ auto makeUpdatedStatus(
           entity_status.action_status.twist.linear.x, entity_status.pose.orientation));
     }
 
+    log_waypoint_action("Not reached yet", "Move");
     return update_entity_status(entity_status, desired_velocity());
   };
 
   //  ==============================================
   //                    EXECUTION
   //  ==============================================
-
-  if (verbose) {
-    std::cout << "   --------------------   " << std::endl;
-    std::cout << "speed: " << entity_status.action_status.twist.linear.x << std::endl;
-    std::cout << "acceleration: " << entity_status.action_status.accel.linear.x << std::endl;
-    std::cout << std::endl;
-    std::cout << "is_target_waypoint_final: " << is_target_waypoint_final() << std::endl;
-    std::cout << "is_entity_immobile: " << is_entity_immobile() << std::endl;
-    std::cout << "distance_to_target_waypoint: " << distance_to_target_waypoint() << std::endl;
-    std::cout << "distance_to_timed_or_final_waypoint: " << distance_to_timed_or_final_waypoint()
-              << std::endl;
-    std::cout << "remaining_time_to_target_waypoint: " << remaining_time_to_target_waypoint()
-              << std::endl;
-    std::cout << "remaining_time_to_nearest_timed_waypoint: "
-              << remaining_time_to_nearest_timed_waypoint() << std::endl;
-  }
 
   if (is_target_waypoint_final()) {
     return handle_final_waypoint(
