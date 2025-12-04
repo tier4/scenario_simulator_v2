@@ -171,56 +171,62 @@ auto makeUpdatedStatus(
   //                      DISTANCE
   //  ==============================================
 
+  /// @note returns distance between two positions along lanelet
+  /// @note falls back to Euclidean distance if lanelet matching fails
   const auto distance_along_lanelet =
     [&entity_status, &should_include_crosswalk, &matching_distance, &allow_lane_change,
      &include_adjacent_lanelet, &include_opposite_direction](const auto & from, const auto & to) {
       using geometry_msgs::msg::Pose;
 
       const RoutingConfiguration routing_configuration{allow_lane_change};
-
       const auto quaternion = convertDirectionToQuaternion(
         geometry_msgs::build<Vector3>().x(to.x - from.x).y(to.y - from.y).z(to.z - from.z));
+
       const auto from_pose = geometry_msgs::build<Pose>().position(from).orientation(quaternion);
-      if (
-        const auto from_canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
-          from_pose, entity_status.bounding_box, should_include_crosswalk, matching_distance)) {
-        const auto to_pose = geometry_msgs::build<Pose>().position(to).orientation(quaternion);
-        if (
-          const auto to_canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
-            to_pose, entity_status.bounding_box, should_include_crosswalk, matching_distance)) {
-          if (const auto longitudinal_distance = distance::longitudinalDistance(
-                from_canonicalized_lanelet_pose.value(), to_canonicalized_lanelet_pose.value(),
-                include_adjacent_lanelet, include_opposite_direction, routing_configuration);
-              longitudinal_distance.has_value()
-              /**
-               * DIRTY HACK!
-               * Negative longitudinal distance (calculated along lanelet in opposite direction)
-               * causes some scenarios to fail because of an unrelated issue with lanelet matching.
-               * The issue is caused by wrongly matched lanelet poses and thus wrong distances.
-               * When lanelet matching errors are fixed, this dirty hack can be removed.
-               */
-              and longitudinal_distance.value() >= 0.0) {
-            if (
-              const auto lateral_distance = distance::lateralDistance(
-                from_canonicalized_lanelet_pose.value(), to_canonicalized_lanelet_pose.value(),
-                routing_configuration)) {
-              return std::hypot(longitudinal_distance.value(), lateral_distance.value());
-            }
-          }
-        }
+      const auto from_canonicalized = pose::toCanonicalizedLaneletPose(
+        from_pose, entity_status.bounding_box, should_include_crosswalk, matching_distance);
+      if (not from_canonicalized) {
+        return hypot(from, to);
       }
-      return hypot(from, to);
+
+      const auto to_pose = geometry_msgs::build<Pose>().position(to).orientation(quaternion);
+      const auto to_canonicalized = pose::toCanonicalizedLaneletPose(
+        to_pose, entity_status.bounding_box, should_include_crosswalk, matching_distance);
+      if (not to_canonicalized) {
+        return hypot(from, to);
+      }
+
+      /**
+       * DIRTY HACK!
+       * Negative longitudinal distance (calculated along lanelet in opposite direction)
+       * causes some scenarios to fail because of an unrelated issue with lanelet matching.
+       * The issue is caused by wrongly matched lanelet poses and thus wrong distances.
+       * When lanelet matching errors are fixed, this dirty hack can be removed.
+       */
+      const auto longitudinal_distance = distance::longitudinalDistance(
+        from_canonicalized.value(), to_canonicalized.value(), include_adjacent_lanelet,
+        include_opposite_direction, routing_configuration);
+      if (not longitudinal_distance.has_value() or longitudinal_distance.value() < 0.0) {
+        return hypot(from, to);
+      }
+
+      const auto lateral_distance = distance::lateralDistance(
+        from_canonicalized.value(), to_canonicalized.value(), routing_configuration);
+      if (not lateral_distance) {
+        return hypot(from, to);
+      }
+
+      return std::hypot(longitudinal_distance.value(), lateral_distance.value());
     };
 
-  const auto distance_to_target_waypoint = [&target_waypoint, &entity_status,
-                                            &distance_along_lanelet]() {
-    return distance_along_lanelet(entity_status.pose.position, target_waypoint().position.position);
-  };
-
-  const auto total_distance_to_waypoint =
-    [&polyline_trajectory, &distance_along_lanelet](const auto waypoint_iterator) -> double {
-    auto accumulated_distance = 0.0;
-    /// @note start from vertices[1] (target waypoint), not vertices[0] (previous waypoint)
+  /// @note returns distance from entity to specified waypoint
+  const auto distance_to_waypoint =
+    [&entity_status, &target_waypoint, &polyline_trajectory, &distance_along_lanelet](
+      const auto waypoint_iterator) -> double {
+    /// @note distance from entity to target waypoint (vertices[1])
+    auto accumulated_distance =
+      distance_along_lanelet(entity_status.pose.position, target_waypoint().position.position);
+    /// @note start from vertices[1] (target waypoint), accumulate distance to waypoint_iterator
     for (auto current_waypoint_iter = std::begin(polyline_trajectory.shape.vertices) + 1;
          0 < std::distance(current_waypoint_iter, waypoint_iterator); ++current_waypoint_iter) {
       const auto & current_position = current_waypoint_iter->position.position;
@@ -230,15 +236,19 @@ auto makeUpdatedStatus(
     return accumulated_distance;
   };
 
-  const auto total_distance_to_timed_or_final_waypoint =
-    [&nearest_timed_waypoint, &polyline_trajectory, &distance_to_target_waypoint,
-     &total_distance_to_waypoint]() -> double {
+  /// @note returns distance from entity to target waypoint (vertices[1])
+  const auto distance_to_target_waypoint = [&polyline_trajectory, &distance_to_waypoint]() {
+    return distance_to_waypoint(polyline_trajectory.shape.vertices.begin() + 1);
+  };
+
+  /// @note returns distance from entity to nearest timed waypoint or final waypoint
+  const auto distance_to_timed_or_final_waypoint =
+    [&nearest_timed_waypoint, &polyline_trajectory, &distance_to_waypoint]() -> double {
     if (const auto timed_waypoint = nearest_timed_waypoint();
         timed_waypoint != std::end(polyline_trajectory.shape.vertices)) {
-      return distance_to_target_waypoint() + total_distance_to_waypoint(timed_waypoint);
+      return distance_to_waypoint(timed_waypoint);
     } else {
-      return distance_to_target_waypoint() +
-             total_distance_to_waypoint(std::end(polyline_trajectory.shape.vertices) - 1);
+      return distance_to_waypoint(std::end(polyline_trajectory.shape.vertices) - 1);
     }
   };
 
@@ -246,6 +256,9 @@ auto makeUpdatedStatus(
   //                        TIME
   //  ==============================================
 
+  /// @note returns remaining time to specified waypoint
+  /// @note returns quiet_NaN if waypoint has no time constraint
+  /// @note returns epsilon instead of 0.0 when exactly at arrival time
   const auto remaining_time_to_waypoint = [&polyline_trajectory,
                                            &entity_status](const auto & waypoint_vertex) {
     if (std::isnan(waypoint_vertex.time)) {
@@ -254,15 +267,17 @@ auto makeUpdatedStatus(
       const auto remaining_time =
         (not std::isnan(polyline_trajectory.base_time) ? polyline_trajectory.base_time : 0.0) +
         waypoint_vertex.time - entity_status.time;
-      /// @note return epsilon instead of 0.0 to avoid division by zero in downstream calculations
       return remaining_time != 0.0 ? remaining_time : std::numeric_limits<double>::epsilon();
     }
   };
 
+  /// @note returns remaining time to target waypoint (vertices[1])
   const auto remaining_time_to_target_waypoint = [&target_waypoint, &remaining_time_to_waypoint]() {
     return remaining_time_to_waypoint(target_waypoint());
   };
 
+  /// @note returns remaining time to nearest timed waypoint or final waypoint
+  /// @note returns infinity if no timed waypoints exist (indicates no time constraint, not NaN which would cause error in controller)
   const auto remaining_time_to_nearest_timed_waypoint =
     [&nearest_timed_waypoint, &polyline_trajectory, &remaining_time_to_waypoint]() {
       if (const auto timed_waypoint = nearest_timed_waypoint();
@@ -336,7 +351,7 @@ auto makeUpdatedStatus(
 
   const auto validate_arrival_time = [&entity_status, &polyline_trajectory, &nearest_timed_waypoint,
                                       &remaining_time_to_waypoint, &step_time,
-                                      &total_distance_to_waypoint]() {
+                                      &distance_to_waypoint]() {
     /// @note check if vehicle has not exceeded arrival time for timed waypoint
     if (const auto timed_waypoint = nearest_timed_waypoint();
         timed_waypoint != std::end(polyline_trajectory.shape.vertices)) {
@@ -349,7 +364,7 @@ auto makeUpdatedStatus(
           timed_waypoint->time, " (in ",
           (not std::isnan(polyline_trajectory.base_time) ? "absolute" : "relative"),
           " simulation time). Distance to this waypoint is: ",
-          total_distance_to_waypoint(timed_waypoint),
+          distance_to_waypoint(timed_waypoint),
           ". This may be due to unrealistic conditions of arrival time "
           "specification compared to vehicle parameters and dynamic constraints.");
       }
@@ -431,10 +446,22 @@ auto makeUpdatedStatus(
     }
   };
 
+  const auto step_displacement_vector = [&entity_status, &step_time](const auto & desired_velocity) {
+    const auto current_speed = std::abs(entity_status.action_status.twist.linear.x);
+    const auto desired_speed = norm(desired_velocity);
+    Vector3 step_direction;
+    if (desired_speed > std::numeric_limits<double>::epsilon()) {
+      step_direction = desired_velocity / desired_speed;
+    } else {
+      step_direction = scalarToDirectionVector(1.0, entity_status.pose.orientation);
+    }
+    return step_direction * (current_speed + desired_speed) * 0.5 * step_time;
+  };
+
   const auto update_entity_status = [step_time, should_include_crosswalk, &polyline_trajectory,
-                                     &previous_target_waypoint_direction, &validate_entity_status,
-                                     &validate_trajectory, &validate_acceleration_constraints,
-                                     &validate_arrival_time](
+                                     &previous_target_waypoint_direction, &step_displacement_vector,
+                                     &validate_entity_status, &validate_trajectory,
+                                     &validate_acceleration_constraints, &validate_arrival_time](
                                       const auto & entity_status, const auto & desired_velocity) {
     validate_entity_status();
     validate_trajectory();
@@ -442,11 +469,8 @@ auto makeUpdatedStatus(
     validate_arrival_time();
     auto updated_status = entity_status;
 
-    const auto current_velocity = scalarToDirectionVector(
-      entity_status.action_status.twist.linear.x, entity_status.pose.orientation);
-
     using math::geometry::operator+=;
-    updated_status.pose.position += (current_velocity + desired_velocity) * 0.5 * step_time;
+    updated_status.pose.position += step_displacement_vector(desired_velocity);
 
     updated_status.pose.orientation = previous_target_waypoint_direction(entity_status);
 
@@ -578,7 +602,7 @@ auto makeUpdatedStatus(
     double desired_acceleration = 0.0;
     try {
       desired_acceleration = follow_waypoint_controller.getAcceleration(
-        remaining_time_to_nearest_timed_waypoint(), total_distance_to_timed_or_final_waypoint(),
+        remaining_time_to_nearest_timed_waypoint(), distance_to_timed_or_final_waypoint(),
         entity_status, update_entity_status, distance_along_lanelet);
     } catch (const ControllerError & e) {
       throw common::Error(
@@ -639,10 +663,8 @@ auto makeUpdatedStatus(
 
   const auto handle_intermediate_waypoint =
     [&](const double distance, const double remaining_time) -> std::optional<EntityStatus> {
-    const auto current_velocity = scalarToDirectionVector(
-      entity_status.action_status.twist.linear.x, entity_status.pose.orientation);
     const auto next_velocity = desired_velocity();
-    const auto this_step_distance = norm(current_velocity + next_velocity) * 0.5 * step_time;
+    const auto this_step_distance = norm(step_displacement_vector(next_velocity));
 
     /// @note handle intermediate waypoint without arrival time defined
     if (std::isnan(remaining_time)) {
@@ -723,7 +745,7 @@ auto makeUpdatedStatus(
     std::cout << "is_entity_immobile: " << is_entity_immobile() << std::endl;
     std::cout << "distance_to_target_waypoint: " << distance_to_target_waypoint() << std::endl;
     std::cout << "distance_to_timed_or_final_waypoint: "
-              << total_distance_to_timed_or_final_waypoint() << std::endl;
+              << distance_to_timed_or_final_waypoint() << std::endl;
     std::cout << "remaining_time_to_target_waypoint: " << remaining_time_to_target_waypoint()
               << std::endl;
     std::cout << "remaining_time_to_nearest_timed_waypoint: "

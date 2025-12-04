@@ -501,10 +501,7 @@ public:
       traffic_simulator_msgs::msg::Vertex initial_vertex;
       initial_vertex.time = std::numeric_limits<double>::quiet_NaN();
       initial_vertex.position = core->getEntity(entity_ref).getMapPose();
-      parameter->shape.vertices.insert(
-        parameter->shape.vertices.begin(),
-        initial_vertex
-      );
+      parameter->shape.vertices.insert(parameter->shape.vertices.begin(), initial_vertex);
       return core->getEntity(entity_ref).requestFollowTrajectory(parameter);
     }
 
