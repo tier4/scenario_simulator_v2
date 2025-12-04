@@ -442,6 +442,19 @@ auto makeUpdatedStatus(
   //                  ENTITY UPDATE
   //  ==============================================
 
+  const auto step_displacement_vector = [&entity_status,
+                                         &step_time](const auto & desired_velocity) {
+    const auto current_speed = norm(entity_status.action_status.twist.linear);
+    const auto desired_speed = norm(desired_velocity);
+    Vector3 step_direction;
+    if (desired_speed > std::numeric_limits<double>::epsilon()) {
+      step_direction = desired_velocity / desired_speed;
+    } else {
+      step_direction = scalarToDirectionVector(1.0, entity_status.pose.orientation);
+    }
+    return step_direction * (current_speed + desired_speed) * 0.5 * step_time;
+  };
+
   const auto previous_target_waypoint_direction = [&previous_waypoint,
                                                    &target_waypoint](const auto & entity_status) {
     const auto waypoint_to_waypoint_direction =
@@ -453,55 +466,67 @@ auto makeUpdatedStatus(
     }
   };
 
-  const auto step_displacement_vector = [&entity_status,
-                                         &step_time](const auto & desired_velocity) {
-    const auto current_speed = std::abs(entity_status.action_status.twist.linear.x);
-    const auto desired_speed = norm(desired_velocity);
-    Vector3 step_direction;
-    if (desired_speed > std::numeric_limits<double>::epsilon()) {
-      step_direction = desired_velocity / desired_speed;
-    } else {
-      step_direction = scalarToDirectionVector(1.0, entity_status.pose.orientation);
+  /// @note refine position when entity crosses lanelet boundary during a single simulation step
+  /// @note detects transition by comparing current and updated lanelet_id, then adjusts position for precision
+  /// @note returns refined position if transition occurs and refinement succeeds, otherwise nullopt
+  const auto refine_position_for_lanelet_transition =
+    [&should_include_crosswalk, &step_time, &desired_velocity_is_global](
+      const auto & entity_status, const auto & updated_pose,
+      const auto & desired_velocity) -> std::optional<geometry_msgs::msg::Point> {
+    if (not entity_status.lanelet_pose_valid) {
+      return std::nullopt;
     }
-    return step_direction * (current_speed + desired_speed) * 0.5 * step_time;
+
+    const auto canonicalized_lanelet_pose =
+      traffic_simulator::pose::toCanonicalizedLaneletPose(entity_status.lanelet_pose);
+    if (not canonicalized_lanelet_pose) {
+      return std::nullopt;
+    }
+
+    const auto estimated_next_canonicalized_lanelet_pose =
+      traffic_simulator::pose::toCanonicalizedLaneletPose(updated_pose, should_include_crosswalk);
+    if (not estimated_next_canonicalized_lanelet_pose) {
+      return std::nullopt;
+    }
+
+    const auto next_lanelet_id =
+      static_cast<LaneletPose>(estimated_next_canonicalized_lanelet_pose.value()).lanelet_id;
+    return pose::updatePositionForLaneletTransition(
+      canonicalized_lanelet_pose.value(), next_lanelet_id, desired_velocity,
+      desired_velocity_is_global, step_time);
   };
 
-  const auto update_entity_status = [step_time, should_include_crosswalk, &polyline_trajectory,
-                                     &previous_target_waypoint_direction, &step_displacement_vector,
-                                     &validate_entity_status, &validate_trajectory,
-                                     &validate_acceleration_constraints, &validate_arrival_time](
-                                      const auto & entity_status, const auto & desired_velocity) {
+  const auto update_entity_status = [&](const auto & entity_status, const auto & desired_velocity) {
+    using math::geometry::operator+=;
+
     validate_entity_status();
     validate_trajectory();
     validate_acceleration_constraints();
     validate_arrival_time();
+    if (not isfinite(desired_velocity)) {
+      throw common::Error(
+        "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
+        "following information to the developer: Vehicle ",
+        std::quoted(entity_status.name),
+        "'s desired velocity contains NaN or infinity. The value is [", desired_velocity.x, ", ",
+        desired_velocity.y, ", ", desired_velocity.z, "].");
+    }
+
     auto updated_status = entity_status;
 
-    using math::geometry::operator+=;
     updated_status.pose.position += step_displacement_vector(desired_velocity);
 
     updated_status.pose.orientation = previous_target_waypoint_direction(entity_status);
 
-    /// @note if it is the transition between lanelets: overwrite position to improve precision
-    if (entity_status.lanelet_pose_valid) {
-      const auto canonicalized_lanelet_pose =
-        traffic_simulator::pose::toCanonicalizedLaneletPose(entity_status.lanelet_pose);
-      const auto estimated_next_canonicalized_lanelet_pose =
-        traffic_simulator::pose::toCanonicalizedLaneletPose(
-          updated_status.pose, should_include_crosswalk);
-      if (canonicalized_lanelet_pose and estimated_next_canonicalized_lanelet_pose) {
-        const auto next_lanelet_id =
-          static_cast<LaneletPose>(estimated_next_canonicalized_lanelet_pose.value()).lanelet_id;
-        /// @note handle lanelet transition
-        if (
-          const auto updated_position = pose::updatePositionForLaneletTransition(
-            canonicalized_lanelet_pose.value(), next_lanelet_id, desired_velocity,
-            desired_velocity_is_global, step_time)) {
-          updated_status.pose.position = updated_position.value();
-        }
-      }
+    /// @note if entity crosses lanelet boundary during this step, refine position for improved precision
+    if (
+      const auto refined_position = refine_position_for_lanelet_transition(
+        entity_status, updated_status.pose, desired_velocity)) {
+      updated_status.pose.position = refined_position.value();
     }
 
+    /// @note desired_velocity is in global frame, but twist.linear is in local (entity) frame
+    /// @note in local frame, vehicle moves only forward (x-axis), so y and z components are zero
     updated_status.action_status.twist.linear.x = norm(desired_velocity);
     updated_status.action_status.twist.linear.y = 0;
     updated_status.action_status.twist.linear.z = 0;
@@ -530,10 +555,12 @@ auto makeUpdatedStatus(
 
   const auto constrained_brake_velocity = [&behavior_parameter, step_time](
                                             const double speed, const auto & orientation) {
-    const auto controller = FollowWaypointController(behavior_parameter, step_time, true, 0.0);
+    constexpr double target_breaking_speed = 0.0;
+    const auto controller =
+      FollowWaypointController(behavior_parameter, step_time, true, target_breaking_speed);
     const auto deceleration = std::max(
       controller.accelerationWithJerkConstraint(
-        speed, 0.0, behavior_parameter.dynamic_constraints.max_deceleration_rate),
+        speed, target_breaking_speed, behavior_parameter.dynamic_constraints.max_deceleration_rate),
       -behavior_parameter.dynamic_constraints.max_deceleration);
     return scalarToDirectionVector(speed + deceleration * step_time, orientation);
   };
@@ -541,26 +568,28 @@ auto makeUpdatedStatus(
   const auto velocity_from_speed = [&polyline_trajectory, &entity_status](
                                      const auto & position, const auto & target_position,
                                      const double speed) {
+    const auto dx = target_position.x - position.x;
+    const auto dy = target_position.y - position.y;
+    /// @note use pitch from lanelet if entity is on lane, otherwise use pitch on target
+    const auto pitch =
+      entity_status.lanelet_pose_valid
+        ? -math::geometry::convertQuaternionToEulerAngle(entity_status.pose.orientation).y
+        : std::atan2(target_position.z - position.z, std::hypot(dy, dx));
+    /// @note always use yaw on target
+    const auto yaw = std::atan2(dy, dx);
+    return geometry_msgs::build<geometry_msgs::msg::Vector3>()
+      .x(std::cos(pitch) * std::cos(yaw) * speed)
+      .y(std::cos(pitch) * std::sin(yaw) * speed)
+      .z(std::sin(pitch) * speed);
+  };
+
+  const auto desired_velocity = [&]() {
     /*
        Note: The followingMode in OpenSCENARIO is passed as
        variable dynamic_constraints_ignorable. the value of the
        variable is `followingMode == position`.
     */
-    if (polyline_trajectory.dynamic_constraints_ignorable) {
-      const auto dx = target_position.x - position.x;
-      const auto dy = target_position.y - position.y;
-      /// @note use pitch from lanelet if entity is on lane, otherwise use pitch on target
-      const auto pitch =
-        entity_status.lanelet_pose_valid
-          ? -math::geometry::convertQuaternionToEulerAngle(entity_status.pose.orientation).y
-          : std::atan2(target_position.z - position.z, std::hypot(dy, dx));
-      /// @note always use yaw on target
-      const auto yaw = std::atan2(dy, dx);
-      return geometry_msgs::build<geometry_msgs::msg::Vector3>()
-        .x(std::cos(pitch) * std::cos(yaw) * speed)
-        .y(std::cos(pitch) * std::sin(yaw) * speed)
-        .z(std::sin(pitch) * speed);
-    } else {
+    if (not polyline_trajectory.dynamic_constraints_ignorable) {
       /*
          Note: The vector returned if
          dynamic_constraints_ignorable == true ignores parameters
@@ -571,9 +600,7 @@ auto makeUpdatedStatus(
       */
       throw common::SimulationError("The followingMode is only supported for position.");
     }
-  };
 
-  const auto desired_velocity = [&]() {
     /*
       The controller provides the ability to calculate acceleration using constraints from the
       behavior_parameter. The value is_nearest_timed_waypoint_final() determines whether the calculated
@@ -712,9 +739,7 @@ auto makeUpdatedStatus(
     constexpr double distance_threshold = FollowWaypointController::remaining_distance_tolerance;
 
     if (is_entity_immobile() and distance <= distance_threshold) {
-      if (
-        not isfinite(remaining_time) or
-        isDefinitelyLessThan(remaining_time, step_time / 2.0)) {
+      if (not isfinite(remaining_time) or isDefinitelyLessThan(remaining_time, step_time / 2.0)) {
         return std::nullopt;
       } else {
         /// @note distance sufficient and vehicle immobile, but arrival time not yet reached - wait with zero velocity
