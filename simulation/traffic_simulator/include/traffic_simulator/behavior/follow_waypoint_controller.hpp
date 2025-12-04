@@ -418,7 +418,7 @@ public:
       waypoint_details << "Currently followed waypoint: ";
       if (const auto first_waypoint_with_arrival_time_specified = std::find_if(
             vertices.begin(), vertices.end(),
-            [](auto && vertex) { return not std::isnan(vertex.time); });
+            [](auto && vertex) { return std::isfinite(vertex.time); });
           first_waypoint_with_arrival_time_specified !=
           std::end(polyline_trajectory.shape.vertices)) {
         waypoint_details << "[" << first_waypoint_with_arrival_time_specified->position.position.x

@@ -18,6 +18,7 @@
 #include <geometry/quaternion/quaternion_to_euler.hpp>
 #include <geometry/vector3/hypot.hpp>
 #include <geometry/vector3/inner_product.hpp>
+#include <geometry/vector3/is_finite.hpp>
 #include <geometry/vector3/norm.hpp>
 #include <geometry/vector3/normalize.hpp>
 #include <geometry/vector3/operator.hpp>
@@ -34,20 +35,6 @@ namespace traffic_simulator
 {
 namespace follow_trajectory
 {
-template <typename F, typename T, typename... Ts>
-auto any(F f, T && x, Ts &&... xs)
-{
-  if constexpr (math::geometry::IsLikeVector3<std::decay_t<decltype(x)>>::value) {
-    return any(f, x.x, x.y, x.z);
-  } else if constexpr (0 < sizeof...(xs)) {
-    return f(x) or any(f, std::forward<decltype(xs)>(xs)...);
-  } else {
-    return f(x);
-  }
-}
-
-const auto is_infinity_or_nan = [](auto x) constexpr { return std::isinf(x) or std::isnan(x); };
-
 /**
  * @brief Computes entity state after one simulation step along a polyline trajectory.
  *
@@ -122,6 +109,7 @@ auto makeUpdatedStatus(
   using math::geometry::operator*;
   using math::geometry::operator/;
   using math::geometry::operator+=;
+  using math::geometry::isfinite;
 
   using geometry_msgs::msg::Vector3;
   using math::geometry::convertDirectionToQuaternion;
@@ -155,7 +143,7 @@ auto makeUpdatedStatus(
     /// @note search starts from vertices[1], skipping previous_waypoint (vertices[0])
     return std::find_if(
       polyline_trajectory.shape.vertices.begin() + 1, polyline_trajectory.shape.vertices.end(),
-      [](auto && vertex) { return not std::isnan(vertex.time); });
+      [](auto && vertex) { return isfinite(vertex.time); });
   };
 
   const auto is_nearest_timed_waypoint_final = [&nearest_timed_waypoint, &polyline_trajectory]() {
@@ -221,8 +209,8 @@ auto makeUpdatedStatus(
 
   /// @note returns distance from entity to specified waypoint
   const auto distance_to_waypoint =
-    [&entity_status, &target_waypoint, &polyline_trajectory, &distance_along_lanelet](
-      const auto waypoint_iterator) -> double {
+    [&entity_status, &target_waypoint, &polyline_trajectory,
+     &distance_along_lanelet](const auto waypoint_iterator) -> double {
     /// @note distance from entity to target waypoint (vertices[1])
     auto accumulated_distance =
       distance_along_lanelet(entity_status.pose.position, target_waypoint().position.position);
@@ -242,8 +230,8 @@ auto makeUpdatedStatus(
   };
 
   /// @note returns distance from entity to nearest timed waypoint or final waypoint
-  const auto distance_to_timed_or_final_waypoint =
-    [&nearest_timed_waypoint, &polyline_trajectory, &distance_to_waypoint]() -> double {
+  const auto distance_to_timed_or_final_waypoint = [&nearest_timed_waypoint, &polyline_trajectory,
+                                                    &distance_to_waypoint]() -> double {
     if (const auto timed_waypoint = nearest_timed_waypoint();
         timed_waypoint != std::end(polyline_trajectory.shape.vertices)) {
       return distance_to_waypoint(timed_waypoint);
@@ -261,11 +249,11 @@ auto makeUpdatedStatus(
   /// @note returns epsilon instead of 0.0 when exactly at arrival time
   const auto remaining_time_to_waypoint = [&polyline_trajectory,
                                            &entity_status](const auto & waypoint_vertex) {
-    if (std::isnan(waypoint_vertex.time)) {
+    if (not isfinite(waypoint_vertex.time)) {
       return std::numeric_limits<double>::quiet_NaN();
     } else {
       const auto remaining_time =
-        (not std::isnan(polyline_trajectory.base_time) ? polyline_trajectory.base_time : 0.0) +
+        (isfinite(polyline_trajectory.base_time) ? polyline_trajectory.base_time : 0.0) +
         waypoint_vertex.time - entity_status.time;
       return remaining_time != 0.0 ? remaining_time : std::numeric_limits<double>::epsilon();
     }
@@ -277,14 +265,14 @@ auto makeUpdatedStatus(
   };
 
   /// @note returns remaining time to nearest timed waypoint or final waypoint
-  /// @note returns infinity if no timed waypoints exist (indicates no time constraint, not NaN which would cause error in controller)
+  /// @note returns quiet_NaN if no timed waypoints exist (indicates no time constraint)
   const auto remaining_time_to_nearest_timed_waypoint =
     [&nearest_timed_waypoint, &polyline_trajectory, &remaining_time_to_waypoint]() {
       if (const auto timed_waypoint = nearest_timed_waypoint();
           timed_waypoint != std::end(polyline_trajectory.shape.vertices)) {
         return remaining_time_to_waypoint(*timed_waypoint);
       } else {
-        return std::numeric_limits<double>::infinity();
+        return std::numeric_limits<double>::quiet_NaN();
       }
     };
 
@@ -292,35 +280,55 @@ auto makeUpdatedStatus(
   //                     VALIDATION
   //  ==============================================
 
-  const auto validate_entity_status = [&entity_status, &is_infinity_or_nan]() {
+  const auto validate_entity_status = [&entity_status]() {
     /// @note check entity position for NaN/infinity
-    if (const auto & position = entity_status.pose.position; any(is_infinity_or_nan, position)) {
+    if (const auto & position = entity_status.pose.position; not isfinite(position)) {
       throw common::Error(
         "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
         "following information to the developer: Vehicle ",
         std::quoted(entity_status.name),
         " coordinate value contains NaN or infinity. The value is [", position.x, ", ", position.y,
         ", ", position.z, "].");
-      /// @note check acceleration for NaN/infinity
-    } else if (const auto acceleration = entity_status.action_status.accel.linear.x;
-               std::isinf(acceleration) or std::isnan(acceleration)) {
+      /// @note check linear acceleration for NaN/infinity
+    } else if (const auto & linear_acceleration = entity_status.action_status.accel.linear;
+               not isfinite(linear_acceleration)) {
       throw common::Error(
         "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
         "following information to the developer: Vehicle ",
-        std::quoted(entity_status.name), "'s acceleration value is NaN or infinity. The value is ",
-        acceleration, ". ");
-      /// @note check speed for NaN/infinity
-    } else if (const auto speed = entity_status.action_status.twist.linear.x;
-               std::isinf(speed) or std::isnan(speed)) {
+        std::quoted(entity_status.name),
+        "'s linear acceleration value contains NaN or infinity. The value is [",
+        linear_acceleration.x, ", ", linear_acceleration.y, ", ", linear_acceleration.z, "].");
+      /// @note check angular acceleration for NaN/infinity
+    } else if (const auto & angular_acceleration = entity_status.action_status.accel.angular;
+               not isfinite(angular_acceleration)) {
       throw common::Error(
         "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
         "following information to the developer: Vehicle ",
-        std::quoted(entity_status.name), "'s speed value is NaN or infinity. The value is ", speed,
-        ". ");
+        std::quoted(entity_status.name),
+        "'s angular acceleration value contains NaN or infinity. The value is [",
+        angular_acceleration.x, ", ", angular_acceleration.y, ", ", angular_acceleration.z, "].");
+      /// @note check linear velocity for NaN/infinity
+    } else if (const auto & linear_velocity = entity_status.action_status.twist.linear;
+               not isfinite(linear_velocity)) {
+      throw common::Error(
+        "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
+        "following information to the developer: Vehicle ",
+        std::quoted(entity_status.name),
+        "'s linear velocity value contains NaN or infinity. The value is [", linear_velocity.x,
+        ", ", linear_velocity.y, ", ", linear_velocity.z, "].");
+      /// @note check angular velocity for NaN/infinity
+    } else if (const auto & angular_velocity = entity_status.action_status.twist.angular;
+               not isfinite(angular_velocity)) {
+      throw common::Error(
+        "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
+        "following information to the developer: Vehicle ",
+        std::quoted(entity_status.name),
+        "'s angular velocity value contains NaN or infinity. The value is [", angular_velocity.x,
+        ", ", angular_velocity.y, ", ", angular_velocity.z, "].");
     }
   };
 
-  const auto validate_trajectory = [&entity_status, &polyline_trajectory, &is_infinity_or_nan]() {
+  const auto validate_trajectory = [&entity_status, &polyline_trajectory]() {
     /// @note check trajectory has at least 2 waypoints (previous and target)
     if (polyline_trajectory.shape.vertices.size() < 2) {
       throw common::Error(
@@ -329,7 +337,7 @@ auto makeUpdatedStatus(
       /// @note check previous waypoint position for NaN/infinity
     } else if (const auto & previous_position =
                  polyline_trajectory.shape.vertices[0].position.position;
-               any(is_infinity_or_nan, previous_position)) {
+               not isfinite(previous_position)) {
       throw common::Error(
         "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
         "following information to the developer: Vehicle ",
@@ -339,7 +347,7 @@ auto makeUpdatedStatus(
       /// @note check target waypoint position for NaN/infinity
     } else if (const auto & target_position =
                  polyline_trajectory.shape.vertices[1].position.position;
-               any(is_infinity_or_nan, target_position)) {
+               not isfinite(target_position)) {
       throw common::Error(
         "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
         "following information to the developer: Vehicle ",
@@ -357,14 +365,13 @@ auto makeUpdatedStatus(
         timed_waypoint != std::end(polyline_trajectory.shape.vertices)) {
       /// @note allow delay of 1 step time due to floating point accumulation
       if (const auto remaining_time = remaining_time_to_waypoint(*timed_waypoint);
-          std::isfinite(remaining_time) && remaining_time < -step_time) {
+          isfinite(remaining_time) and remaining_time < -step_time) {
         throw common::Error(
           "Vehicle ", std::quoted(entity_status.name), " with current time: ", entity_status.time,
           " failed to reach the trajectory waypoint at the specified time. The specified time is ",
           timed_waypoint->time, " (in ",
-          (not std::isnan(polyline_trajectory.base_time) ? "absolute" : "relative"),
-          " simulation time). Distance to this waypoint is: ",
-          distance_to_waypoint(timed_waypoint),
+          (isfinite(polyline_trajectory.base_time) ? "absolute" : "relative"),
+          " simulation time). Distance to this waypoint is: ", distance_to_waypoint(timed_waypoint),
           ". This may be due to unrealistic conditions of arrival time "
           "specification compared to vehicle parameters and dynamic constraints.");
       }
@@ -379,7 +386,7 @@ auto makeUpdatedStatus(
         behavior_parameter.dynamic_constraints.max_acceleration_rate /* [m/s^3] */ *
           step_time /* [s] */,
       +behavior_parameter.dynamic_constraints.max_acceleration /* [m/s^2] */);
-    if (std::isinf(max_acceleration) or std::isnan(max_acceleration)) {
+    if (not isfinite(max_acceleration)) {
       throw common::Error(
         "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
         "following information to the developer: Vehicle ",
@@ -392,7 +399,7 @@ auto makeUpdatedStatus(
         behavior_parameter.dynamic_constraints.max_deceleration_rate /* [m/s^3] */ *
           step_time /* [s] */,
       -behavior_parameter.dynamic_constraints.max_deceleration /* [m/s^2] */);
-    if (std::isinf(min_acceleration) or std::isnan(min_acceleration)) {
+    if (not isfinite(min_acceleration)) {
       throw common::Error(
         "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
         "following information to the developer: Vehicle ",
@@ -401,12 +408,12 @@ auto makeUpdatedStatus(
     }
   };
 
-  const auto validate_desired_motion = [&entity_status, &is_infinity_or_nan](
+  const auto validate_desired_motion = [&entity_status](
                                          const double desired_acceleration,
                                          const double desired_speed,
                                          const auto & desired_velocity) {
     /// @note check desired acceleration for NaN/infinity
-    if (std::isinf(desired_acceleration) or std::isnan(desired_acceleration)) {
+    if (not isfinite(desired_acceleration)) {
       throw common::Error(
         "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
         "following information to the developer: Vehicle ",
@@ -414,14 +421,14 @@ auto makeUpdatedStatus(
         "'s desired acceleration value contains NaN or infinity. The value is ",
         desired_acceleration, ". ");
       /// @note check desired speed for NaN/infinity
-    } else if (std::isinf(desired_speed) or std::isnan(desired_speed)) {
+    } else if (not isfinite(desired_speed)) {
       throw common::Error(
         "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
         "following information to the developer: Vehicle ",
         std::quoted(entity_status.name), "'s desired speed value is NaN or infinity. The value is ",
         desired_speed, ". ");
       /// @note check desired velocity for NaN/infinity
-    } else if (any(is_infinity_or_nan, desired_velocity)) {
+    } else if (not isfinite(desired_velocity)) {
       throw common::Error(
         "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
         "following information to the developer: Vehicle ",
@@ -446,7 +453,8 @@ auto makeUpdatedStatus(
     }
   };
 
-  const auto step_displacement_vector = [&entity_status, &step_time](const auto & desired_velocity) {
+  const auto step_displacement_vector = [&entity_status,
+                                         &step_time](const auto & desired_velocity) {
     const auto current_speed = std::abs(entity_status.action_status.twist.linear.x);
     const auto desired_speed = norm(desired_velocity);
     Vector3 step_direction;
@@ -481,7 +489,7 @@ auto makeUpdatedStatus(
       const auto estimated_next_canonicalized_lanelet_pose =
         traffic_simulator::pose::toCanonicalizedLaneletPose(
           updated_status.pose, should_include_crosswalk);
-      if (canonicalized_lanelet_pose && estimated_next_canonicalized_lanelet_pose) {
+      if (canonicalized_lanelet_pose and estimated_next_canonicalized_lanelet_pose) {
         const auto next_lanelet_id =
           static_cast<LaneletPose>(estimated_next_canonicalized_lanelet_pose.value()).lanelet_id;
         /// @note handle lanelet transition
@@ -585,7 +593,7 @@ auto makeUpdatedStatus(
     */
     const auto follow_waypoint_controller = FollowWaypointController(
       behavior_parameter, step_time, is_nearest_timed_waypoint_final(),
-      std::isinf(remaining_time_to_nearest_timed_waypoint()) ? target_speed : std::nullopt);
+      not isfinite(remaining_time_to_nearest_timed_waypoint()) ? target_speed : std::nullopt);
 
     /*
       The desired acceleration is the acceleration at which the destination
@@ -622,11 +630,10 @@ auto makeUpdatedStatus(
   //                WAYPOINT HANDLING
   //  ==============================================
 
-  const auto discard_previous_waypoint_and_recurse = [&entity_status, &polyline_trajectory,
-                                                      &behavior_parameter, &step_time,
-                                                      &matching_distance, &target_speed,
-                                                      &target_waypoint, verbose]() {
-    /*
+  const auto discard_previous_waypoint_and_recurse =
+    [&entity_status, &polyline_trajectory, &behavior_parameter, &step_time, &matching_distance,
+     &target_speed, &target_waypoint, verbose]() {
+      /*
          The OpenSCENARIO standard does not define the behavior when the value of
          Timing.domainAbsoluteRelative is "relative". The standard only states
          "Definition of time value context as either absolute or relative", and
@@ -636,30 +643,30 @@ auto makeUpdatedStatus(
          Relative time starts from the start of FollowTrajectoryAction or from
          the time of reaching the previous "waypoint with arrival time".
 
-         Note: not std::isnan(polyline_trajectory.base_time) means
+         Note: isfinite(polyline_trajectory.base_time) means
          "Timing.domainAbsoluteRelative is relative".
 
-         Note: not std::isnan(previous_waypoint_vertex().time)
+         Note: isfinite(previous_waypoint_vertex().time)
          means "The waypoint about to be popped is the waypoint with the
          specified arrival time".
       */
-    if (not std::isnan(polyline_trajectory.base_time) and not std::isnan(target_waypoint().time)) {
-      polyline_trajectory.base_time = entity_status.time;
-    }
+      if (isfinite(polyline_trajectory.base_time) and isfinite(target_waypoint().time)) {
+        polyline_trajectory.base_time = entity_status.time;
+      }
 
-    std::rotate(
-      std::begin(polyline_trajectory.shape.vertices),
-      std::begin(polyline_trajectory.shape.vertices) + 1,
-      std::end(polyline_trajectory.shape.vertices));
+      std::rotate(
+        std::begin(polyline_trajectory.shape.vertices),
+        std::begin(polyline_trajectory.shape.vertices) + 1,
+        std::end(polyline_trajectory.shape.vertices));
 
-    if (not polyline_trajectory.closed) {
-      polyline_trajectory.shape.vertices.pop_back();
-    }
+      if (not polyline_trajectory.closed) {
+        polyline_trajectory.shape.vertices.pop_back();
+      }
 
-    return makeUpdatedStatus(
-      entity_status, polyline_trajectory, behavior_parameter, step_time, matching_distance,
-      target_speed);
-  };
+      return makeUpdatedStatus(
+        entity_status, polyline_trajectory, behavior_parameter, step_time, matching_distance,
+        target_speed);
+    };
 
   const auto handle_intermediate_waypoint =
     [&](const double distance, const double remaining_time) -> std::optional<EntityStatus> {
@@ -667,7 +674,7 @@ auto makeUpdatedStatus(
     const auto this_step_distance = norm(step_displacement_vector(next_velocity));
 
     /// @note handle intermediate waypoint without arrival time defined
-    if (std::isnan(remaining_time)) {
+    if (not isfinite(remaining_time)) {
       if (this_step_distance >= distance or distance < FollowWaypointController::local_epsilon) {
         return discard_previous_waypoint_and_recurse();
       } else {
@@ -705,7 +712,9 @@ auto makeUpdatedStatus(
     constexpr double distance_threshold = FollowWaypointController::remaining_distance_tolerance;
 
     if (is_entity_immobile() and distance <= distance_threshold) {
-      if (std::isnan(remaining_time) or isDefinitelyLessThan(remaining_time, step_time / 2.0)) {
+      if (
+        not isfinite(remaining_time) or
+        isDefinitelyLessThan(remaining_time, step_time / 2.0)) {
         return std::nullopt;
       } else {
         /// @note distance sufficient and vehicle immobile, but arrival time not yet reached - wait with zero velocity
@@ -744,8 +753,8 @@ auto makeUpdatedStatus(
     std::cout << "is_target_waypoint_final: " << is_target_waypoint_final() << std::endl;
     std::cout << "is_entity_immobile: " << is_entity_immobile() << std::endl;
     std::cout << "distance_to_target_waypoint: " << distance_to_target_waypoint() << std::endl;
-    std::cout << "distance_to_timed_or_final_waypoint: "
-              << distance_to_timed_or_final_waypoint() << std::endl;
+    std::cout << "distance_to_timed_or_final_waypoint: " << distance_to_timed_or_final_waypoint()
+              << std::endl;
     std::cout << "remaining_time_to_target_waypoint: " << remaining_time_to_target_waypoint()
               << std::endl;
     std::cout << "remaining_time_to_nearest_timed_waypoint: "

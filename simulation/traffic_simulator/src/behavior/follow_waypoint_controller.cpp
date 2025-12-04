@@ -94,7 +94,7 @@ auto FollowWaypointController::getAnalyticalAccelerationForLastSteps(
 auto FollowWaypointController::roundTimeToFullStepsWithTolerance(
   const double remaining_time_source, const double time_tolerance) const -> double
 {
-  if (std::isnan(remaining_time_source) || std::isinf(remaining_time_source)) {
+  if (not std::isfinite(remaining_time_source)) {
     throw ControllerError(
       "Value remaining_time_source (", remaining_time_source,
       ") is NaN or inf - it cannot be rounded.");
@@ -450,9 +450,9 @@ auto FollowWaypointController::getAcceleration(
        If the range is so tight that there is no choice.
     */
     return local_min_acceleration;
-  } else if (std::isinf(remaining_time_source)) {
+  } else if (not std::isfinite(remaining_time_source)) {
     /*
-       If remaining time is no specified - this is the case when every next
+       If remaining time is not specified - this is the case when every next
        point of the trajectory has no specified time.
     */
     return getAcceleration(
