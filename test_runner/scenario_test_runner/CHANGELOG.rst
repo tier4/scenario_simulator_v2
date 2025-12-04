@@ -44,6 +44,213 @@ Changelog for package scenario_test_runner
 * Merge branch 'master' into dependabot/github_actions/actions/checkout-5
 * Contributors: Kotaro Yoshimoto, Taiga
 
+20.0.3 (2025-12-03)
+-------------------
+* Merge branch 'master' into dependabot/github_actions/actions/checkout-6
+* Merge branch 'master' into dependabot/github_actions/actions/checkout-6
+* Contributors: Kotaro Yoshimoto
+
+20.0.2 (2025-12-03)
+-------------------
+* Merge branch 'master' into fix/autoware-documentation-link
+* Contributors: Kotaro Yoshimoto
+
+20.0.1 (2025-12-03)
+-------------------
+* Merge branch 'master' into use-maximal-munch
+* Contributors: Kotaro Yoshimoto
+
+20.0.0 (2025-12-03)
+-------------------
+* Merge branch 'master' into fix/double-INF
+* Merge remote-tracking branch 'origin/fix/double-INF' into fix/double-INF
+* Merge branch 'master' into fix/double-INF
+* Contributors: Kotaro Yoshimoto
+
+19.0.3 (2025-11-27)
+-------------------
+
+19.0.2 (2025-11-27)
+-------------------
+* Merge branch 'master' into fix/dependabot-uv
+* Merge branch 'master' into fix/dependabot-uv
+* Contributors: Kotaro Yoshimoto
+
+19.0.1 (2025-11-27)
+-------------------
+* Merge branch 'master' into skip-sonarqube-scan-for-dependabots
+* Contributors: Kotaro Yoshimoto
+
+19.0.0 (2025-11-27)
+-------------------
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge remote-tracking branch 'tier4/master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge remote-tracking branch 'tier4/master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge remote-tracking branch 'tier4/master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge remote-tracking branch 'tier4/master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge remote-tracking branch 'tier4/master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge tag '12.0.2' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge remote-tracking branch 'tier4/master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge remote-tracking branch 'tier4/master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge remote-tracking branch 'tier4/master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge remote-tracking branch 'tier4/master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge remote-tracking branch 'tier4/master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge remote-tracking branch 'origin/ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge remote-tracking branch 'origin/ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge remote-tracking branch 'origin/ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Contributors: Dawid Moszynski, Dawid Moszyński, Kotaro Yoshimoto, Masaya Kataoka, Mateusz Palczuk, Michał Ciasnocha, Tatsuya Yamasaki, robomic
+
+18.5.0 (2025-11-26)
+-------------------
+* Merge pull request `#1742 <https://github.com/tier4/scenario_simulator_v2/issues/1742>`_ from tier4/feature/publisher-noise-imu
+* Merge branch 'master' into feature/publisher-noise-imu
+* Rollback meaningless velocity status parameters movement
+* Merge branch 'master' into feature/publisher-noise-imu
+* Merge branch 'master' into feature/publisher-noise-imu
+* Set imu data standard_deviation to zero
+* Add covariance diagonal elements errors for Imu
+* Add default IMU noise in new configuration to be the same as default in legacy configuration
+  This was done so that covariance matrices are calculated to be non-zero (their diagonal). Otherwise the Autoware gets confused and Ego starts shaking in RViz.
+* Fix parameter comments
+* Fix minor issue
+* Add /sensing/imu/imu_data parameters to parameters file
+* Contributors: Kotaro Yoshimoto, Mateusz Palczuk
+
+18.4.5 (2025-11-25)
+-------------------
+
+18.4.4 (2025-11-21)
+-------------------
+
+18.4.3 (2025-11-21)
+-------------------
+* Merge remote-tracking branch 'origin/master' into fix/poetry-to-uv
+  # Conflicts:
+  #	poetry.lock
+  #	pyproject.toml
+* Merge branch 'master' into fix/poetry-to-uv
+* Merge branch 'master' into fix/poetry-to-uv
+* Merge branch 'master' into fix/poetry-to-uv
+* Merge branch 'master' into fix/poetry-to-uv
+* Merge branch 'master' into fix/poetry-to-uv
+* Merge branch 'master' into fix/poetry-to-uv
+* Contributors: Kotaro Yoshimoto, Taiga, ぐるぐる
+
+18.4.2 (2025-11-20)
+-------------------
+* Merge branch 'master' into fix/deprecation_error
+* Contributors: Kotaro Yoshimoto
+
+18.4.1 (2025-11-20)
+-------------------
+
+18.4.0 (2025-11-20)
+-------------------
+* Merge pull request `#1727 <https://github.com/tier4/scenario_simulator_v2/issues/1727>`_ from tier4/feature/publisher-noise-pose
+* Merge branch 'master' into feature/publisher-noise-pose
+* Merge branch 'master' into feature/publisher-noise-pose
+* Merge branch 'master' into feature/publisher-noise-pose
+* Merge branch 'master' into feature/publisher-noise-pose
+* Merge branch 'master' into feature/publisher-noise-pose
+* Add covariance diagonal elements errors for PoseWithCovarianceStamped
+* Add covariance diagonal elements errors for PoseWithCovarianceStamped
+* Add /localization/pose_estimator/pose_with_covariance parameters to parameters file
+* Contributors: Kotaro Yoshimoto, Mateusz Palczuk
+
+18.3.9 (2025-11-18)
+-------------------
+
+18.3.8 (2025-11-18)
+-------------------
+
+18.3.7 (2025-11-14)
+-------------------
+* Merge branch 'master' into dependabot/github_actions/8BitJonny/gh-get-current-pr-4.0.0
+* Contributors: Kotaro Yoshimoto
+
+18.3.6 (2025-11-13)
+-------------------
+* Merge branch 'master' into fix/multiple_states_on_phase
+* Merge branch 'master' into fix/multiple_states_on_phase
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
+18.3.5 (2025-11-13)
+-------------------
+* Merge branch 'master' into dependabot/github_actions/actions/download-artifact-6
+* Merge branch 'master' into dependabot/github_actions/actions/download-artifact-6
+* Contributors: Taiga
+
+18.3.4 (2025-11-13)
+-------------------
+* Merge branch 'master' into dependabot/github_actions/actions/upload-artifact-5
+* Merge branch 'master' into dependabot/github_actions/actions/upload-artifact-5
+* Contributors: Taiga
+
 18.3.3 (2025-11-07)
 -------------------
 * Merge branch 'master' into dependabot/github_actions/actions/github-script-8

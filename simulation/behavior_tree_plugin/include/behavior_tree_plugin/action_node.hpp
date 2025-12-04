@@ -69,6 +69,8 @@ public:
   auto getYieldStopDistance(const lanelet::Ids & following_lanelets) const -> std::optional<double>;
   auto stopEntity() const -> void;
   auto getHorizon() const -> double;
+  auto getOtherEntitiesCanonicalizedLaneletPoses() const
+    -> std::vector<traffic_simulator::CanonicalizedLaneletPose>;
 
   /// throws if the derived class return RUNNING.
   auto executeTick() -> BT::NodeStatus override;
@@ -139,8 +141,6 @@ private:
   auto getConflictingEntityStatusOnCrossWalk(const lanelet::Ids & route_lanelets) const
     -> std::vector<traffic_simulator::CanonicalizedEntityStatus>;
   auto getConflictingEntityStatusOnLane(const lanelet::Ids & route_lanelets) const
-    -> std::vector<traffic_simulator::CanonicalizedEntityStatus>;
-  auto getOtherEntityStatus(lanelet::Id lanelet_id) const
     -> std::vector<traffic_simulator::CanonicalizedEntityStatus>;
   auto isOtherEntityAtConsideredAltitude(
     const traffic_simulator::CanonicalizedEntityStatus & entity_status) const -> bool;
