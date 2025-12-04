@@ -58,7 +58,6 @@ TEST(EgoEntitySimulation, calculateAccelerationBySlope)
       traffic_simulator_msgs::msg::EntityStatus initial_status;
       initial_status.name = "ego";
       // use pitch-filled map pose
-      initial_status.lanelet_pose_valid = false;
       initial_status.pose =
         traffic_simulator::lanelet_wrapper::pose::toMapPose(lanelet_pose, true).pose;
 
