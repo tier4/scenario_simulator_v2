@@ -197,9 +197,14 @@ auto makeUpdatedStatus(
        * When lanelet matching errors are fixed, this dirty hack can be removed.
        */
       const auto longitudinal_distance = distance::longitudinalDistance(
-        from_canonicalized.value(), to_canonicalized.value(), include_adjacent_lanelet,
-        include_opposite_direction, routing_configuration);
-      if (not longitudinal_distance.has_value() or longitudinal_distance.value() < 0.0) {
+        from_canonicalized.value(),
+        to_canonicalized.value(),
+        include_adjacent_lanelet,
+        include_opposite_direction,
+        routing_configuration);
+      if (
+        not longitudinal_distance.has_value() or
+        longitudinal_distance.value() < 0.0) {
         return hypot(from, to);
       }
 
