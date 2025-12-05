@@ -113,6 +113,8 @@ auto makeUpdatedStatus(
 
   using geometry_msgs::msg::Vector3;
   using math::geometry::convertDirectionToQuaternion;
+  using math::geometry::convertQuaternionToEulerAngle;
+  using math::geometry::getRotation;
   using math::geometry::hypot;
   using math::geometry::norm;
   using math::geometry::scalarToDirectionVector;
@@ -121,6 +123,8 @@ auto makeUpdatedStatus(
   constexpr bool include_opposite_direction{false};
   constexpr bool allow_lane_change{true};
   constexpr bool desired_velocity_is_global{true};
+  /// @note debug
+  constexpr bool verbose_input_state{true};
   constexpr bool verbose_action{true};
   constexpr bool verbose_move_action{false};
 
@@ -212,6 +216,11 @@ auto makeUpdatedStatus(
   const auto distance_to_waypoint =
     [&entity_status, &target_waypoint, &polyline_trajectory,
      &distance_along_lanelet](const auto waypoint_iterator) -> double {
+    /// @note special case: distance from entity to previous waypoint (vertices[0])
+    if (waypoint_iterator == std::begin(polyline_trajectory.shape.vertices)) {
+      return distance_along_lanelet(
+        entity_status.pose.position, waypoint_iterator->position.position);
+    }
     /// @note distance from entity to target waypoint (vertices[1])
     auto accumulated_distance =
       distance_along_lanelet(entity_status.pose.position, target_waypoint().position.position);
@@ -461,7 +470,7 @@ auto makeUpdatedStatus(
     const auto waypoint_to_waypoint_direction =
       target_waypoint().position.position - previous_waypoint().position.position;
     if (norm(waypoint_to_waypoint_direction) > std::numeric_limits<double>::epsilon()) {
-      return math::geometry::convertDirectionToQuaternion(waypoint_to_waypoint_direction);
+      return convertDirectionToQuaternion(waypoint_to_waypoint_direction);
     } else {
       return entity_status.pose.orientation;
     }
@@ -533,8 +542,8 @@ auto makeUpdatedStatus(
     updated_status.action_status.twist.linear.z = 0;
 
     updated_status.action_status.twist.angular =
-      math::geometry::convertQuaternionToEulerAngle(math::geometry::getRotation(
-        entity_status.pose.orientation, updated_status.pose.orientation)) /
+      convertQuaternionToEulerAngle(
+        getRotation(entity_status.pose.orientation, updated_status.pose.orientation)) /
       step_time;
 
     updated_status.action_status.accel.linear =
@@ -572,10 +581,9 @@ auto makeUpdatedStatus(
     const auto dx = target_position.x - position.x;
     const auto dy = target_position.y - position.y;
     /// @note use pitch from lanelet if entity is on lane, otherwise use pitch on target
-    const auto pitch =
-      entity_status.lanelet_pose_valid
-        ? -math::geometry::convertQuaternionToEulerAngle(entity_status.pose.orientation).y
-        : std::atan2(target_position.z - position.z, std::hypot(dy, dx));
+    const auto pitch = entity_status.lanelet_pose_valid
+                         ? -convertQuaternionToEulerAngle(entity_status.pose.orientation).y
+                         : std::atan2(target_position.z - position.z, std::hypot(dy, dx));
     /// @note always use yaw on target
     const auto yaw = std::atan2(dy, dx);
     return geometry_msgs::build<geometry_msgs::msg::Vector3>()
@@ -791,11 +799,15 @@ auto makeUpdatedStatus(
     }
 
     if (is_entity_immobile() and distance > distance_threshold) {
-      log_waypoint_action("Immobile but distance exceeds threshold", "Error");
-      throw common::Error(
-        "Vehicle ", std::quoted(entity_status.name),
-        " is immobile and only final waypoint left, but distance to final waypoint is ", distance,
-        " m, which exceeds the threshold of ", distance_threshold, " m.");
+      /// @note only report error if entity progressed past previous waypoint but stopped too far from target
+      /// @note entities waiting near previous waypoint (e.g., target_speed=0.0 at trajectory start) are allowed to be immobile
+      if (distance < distance_to_waypoint(polyline_trajectory.shape.vertices.begin())) {
+        log_waypoint_action("Immobile but distance exceeds threshold", "Error");
+        throw common::Error(
+          "Vehicle ", std::quoted(entity_status.name),
+          " is immobile and only final waypoint left, but distance to final waypoint is ", distance,
+          " m, which exceeds the threshold of ", distance_threshold, " m.");
+      }
     }
 
     if (distance <= distance_threshold) {
@@ -814,6 +826,51 @@ auto makeUpdatedStatus(
   //  ==============================================
   //                    EXECUTION
   //  ==============================================
+
+  if (verbose_input_state) {
+    auto const orientation = convertQuaternionToEulerAngle(entity_status.pose.orientation);
+    auto const previous = previous_waypoint().position.position;
+    auto const target = target_waypoint().position.position;
+
+    std::cout << "  --------------------   " << std::endl;
+    std::cout << "name: " << entity_status.name << std::endl;
+    std::cout << "time: " << entity_status.time << std::endl;
+    std::cout << "lanelet_pose_valid: " << (entity_status.lanelet_pose_valid ? "true" : "false")
+              << std::endl;
+    std::cout << "position: " << entity_status.pose.position.x << ", "
+              << entity_status.pose.position.y << ", " << entity_status.pose.position.z
+              << std::endl;
+    std::cout << "orientation: " << orientation.x << ", " << orientation.y << ", " << orientation.z
+              << std::endl;
+    std::cout << "speed: " << entity_status.action_status.twist.linear.x << std::endl;
+    std::cout << "acceleration: " << entity_status.action_status.accel.linear.x << std::endl;
+    std::cout << "is_entity_immobile: " << is_entity_immobile() << std::endl;
+    std::cout << "  ---  " << std::endl;
+    std::cout << "target_speed: " << (target_speed ? std::to_string(target_speed.value()) : "N/A")
+              << std::endl;
+    std::cout << "target_time: "
+              << (isfinite(target_waypoint().time) ? std::to_string(target_waypoint().time) : "N/A")
+              << std::endl;
+    std::cout << "previous_waypoint: " << previous.x << ", " << previous.y << ", " << previous.z
+              << std::endl;
+    std::cout << "target_waypoint: " << target.x << ", " << target.y << ", " << target.z
+              << std::endl;
+    std::cout << "is_target_waypoint_final: " << is_target_waypoint_final() << std::endl;
+    std::cout << "distance_to_previous: "
+              << distance_to_waypoint(polyline_trajectory.shape.vertices.begin()) << std::endl;
+    std::cout << "distance_to_target: " << distance_to_target_waypoint() << std::endl;
+    std::cout << "distance_to_timed_or_final: " << distance_to_timed_or_final_waypoint()
+              << std::endl;
+    std::cout << "time_to_target: " << remaining_time_to_target_waypoint() << std::endl;
+    std::cout << "  ---  " << std::endl;
+    std::cout << "trajectory_base_time: "
+              << (isfinite(polyline_trajectory.base_time)
+                    ? std::to_string(polyline_trajectory.base_time)
+                    : "N/A")
+              << std::endl;
+    std::cout << "trajectory_closed: " << (polyline_trajectory.closed ? "true" : "false")
+              << std::endl;
+  }
 
   if (is_target_waypoint_final()) {
     return handle_final_waypoint(
