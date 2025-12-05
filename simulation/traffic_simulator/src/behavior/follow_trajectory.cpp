@@ -282,7 +282,7 @@ auto makeUpdatedStatus(
           timed_waypoint != std::end(polyline_trajectory.shape.vertices)) {
         return remaining_time_to_waypoint(*timed_waypoint);
       } else {
-        return std::numeric_limits<double>::infinity();
+        return std::numeric_limits<double>::quiet_NaN();
       }
     };
 
@@ -563,6 +563,18 @@ auto makeUpdatedStatus(
   //                      VELOCITY
   //  ==============================================
 
+  const auto constrained_brake_velocity = [&behavior_parameter, step_time](
+                                            const double speed, const auto & orientation) {
+    constexpr double target_breaking_speed = 0.0;
+    const auto controller =
+      FollowWaypointController(behavior_parameter, step_time, true, target_breaking_speed);
+    const auto deceleration = std::max(
+      controller.accelerationWithJerkConstraint(
+        speed, target_breaking_speed, behavior_parameter.dynamic_constraints.max_deceleration_rate),
+      -behavior_parameter.dynamic_constraints.max_deceleration);
+    return scalarToDirectionVector(speed + deceleration * step_time, orientation);
+  };
+
   const auto velocity_from_speed = [&polyline_trajectory, &entity_status](
                                      const auto & position, const auto & target_position,
                                      const double speed) {
@@ -635,7 +647,7 @@ auto makeUpdatedStatus(
     try {
       desired_acceleration = follow_waypoint_controller.getAcceleration(
         remaining_time_to_nearest_timed_waypoint(), distance_to_timed_or_final_waypoint(),
-        entity_status.action_status.accel.linear.x, entity_status.action_status.twist.linear.x);
+        entity_status, update_entity_status, distance_along_lanelet);
     } catch (const ControllerError & e) {
       throw common::Error(
         "Vehicle ", std::quoted(entity_status.name),
@@ -799,7 +811,12 @@ auto makeUpdatedStatus(
     }
 
     if (distance <= distance_threshold) {
-      /// @todo distance within threshold but vehicle still moving - apply constrained braking to reach immobile state
+      log_waypoint_action("Within threshold but moving", "Brake");
+      /// @note distance within threshold but vehicle still moving - apply constrained braking to reach immobile state
+      return update_entity_status(
+        entity_status,
+        constrained_brake_velocity(
+          entity_status.action_status.twist.linear.x, entity_status.pose.orientation));
     }
 
     log_waypoint_action("Not reached yet", "Move");
