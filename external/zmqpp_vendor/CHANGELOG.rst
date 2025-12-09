@@ -2,28 +2,6 @@
 Changelog for package zmqpp_vendor
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-0.0.2 (2022-05-24)
-------------------
-* Merge pull request `#5 <https://github.com/tier4/zmqpp_vendor/issues/5>`_ from tier4/fix/default_branch_name
-* fix default branch name
-* Merge pull request `#3 <https://github.com/tier4/zmqpp_vendor/issues/3>`_ from tier4/feature/add_22_04_support
-* Merge pull request `#2 <https://github.com/tier4/zmqpp_vendor/issues/2>`_ from tier4/feature/release_action
-* remove 22.04 support
-* add 22.04/18.04 support
-* add release action
-* Merge pull request `#1 <https://github.com/tier4/zmqpp_vendor/issues/1>`_ from cottsay/git_dep
-* Add missing buildtool_depend on git
-* Contributors: Masaya Kataoka, MasayaKataoka, Scott K Logan
-
-16.4.2 (2025-05-23)
--------------------
-
-18.3.2 (2025-11-06)
--------------------
-* Merge branch 'master' into dependabot/github_actions/actions/checkout-5
-* Merge branch 'master' into dependabot/github_actions/actions/checkout-5
-* Contributors: Kotaro Yoshimoto, Taiga
-
 20.0.3 (2025-12-03)
 -------------------
 * Merge branch 'master' into dependabot/github_actions/actions/checkout-6
@@ -192,6 +170,12 @@ Changelog for package zmqpp_vendor
 * Merge branch 'master' into dependabot/github_actions/actions/github-script-8
 * Merge branch 'master' into dependabot/github_actions/actions/checkout-5
 * Merge branch 'master' into dependabot/github_actions/actions/github-script-8
+* Merge branch 'master' into dependabot/github_actions/actions/checkout-5
+* Contributors: Kotaro Yoshimoto, Taiga
+
+18.3.2 (2025-11-06)
+-------------------
+* Merge branch 'master' into dependabot/github_actions/actions/checkout-5
 * Merge branch 'master' into dependabot/github_actions/actions/checkout-5
 * Contributors: Kotaro Yoshimoto, Taiga
 
@@ -631,6 +615,9 @@ Changelog for package zmqpp_vendor
 * Merge branch 'master' into refactor/behavior-tree-2
 * Contributors: Kotaro Yoshimoto, Taiga
 
+16.4.2 (2025-05-23)
+-------------------
+
 16.4.1 (2025-05-23)
 -------------------
 * Merge branch 'master' into refactor/behavior-tree-1
@@ -781,6 +768,19 @@ Changelog for package zmqpp_vendor
 * add white line at EoF
 * add zmqpp vendor package to the depends
 * Contributors: Masaya Kataoka
+
+0.0.2 (2022-05-24)
+------------------
+* Merge pull request `#5 <https://github.com/tier4/zmqpp_vendor/issues/5>`_ from tier4/fix/default_branch_name
+* fix default branch name
+* Merge pull request `#3 <https://github.com/tier4/zmqpp_vendor/issues/3>`_ from tier4/feature/add_22_04_support
+* Merge pull request `#2 <https://github.com/tier4/zmqpp_vendor/issues/2>`_ from tier4/feature/release_action
+* remove 22.04 support
+* add 22.04/18.04 support
+* add release action
+* Merge pull request `#1 <https://github.com/tier4/zmqpp_vendor/issues/1>`_ from cottsay/git_dep
+* Add missing buildtool_depend on git
+* Contributors: Masaya Kataoka, MasayaKataoka, Scott K Logan
 
 0.0.1 (2022-05-12)
 ------------------

@@ -2,15 +2,6 @@
 Changelog for package get_parameter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-16.4.2 (2025-05-23)
--------------------
-
-18.3.2 (2025-11-06)
--------------------
-* Merge branch 'master' into dependabot/github_actions/actions/checkout-5
-* Merge branch 'master' into dependabot/github_actions/actions/checkout-5
-* Contributors: Kotaro Yoshimoto, Taiga
-
 20.0.3 (2025-12-03)
 -------------------
 * Merge branch 'master' into dependabot/github_actions/actions/checkout-6
@@ -189,6 +180,12 @@ Changelog for package get_parameter
 * Merge branch 'master' into dependabot/github_actions/actions/github-script-8
 * Merge branch 'master' into dependabot/github_actions/actions/checkout-5
 * Merge branch 'master' into dependabot/github_actions/actions/github-script-8
+* Merge branch 'master' into dependabot/github_actions/actions/checkout-5
+* Contributors: Kotaro Yoshimoto, Taiga
+
+18.3.2 (2025-11-06)
+-------------------
+* Merge branch 'master' into dependabot/github_actions/actions/checkout-5
 * Merge branch 'master' into dependabot/github_actions/actions/checkout-5
 * Contributors: Kotaro Yoshimoto, Taiga
 
@@ -632,6 +629,9 @@ Changelog for package get_parameter
 * Bump version of scenario_simulator_v2 from version version 16.4.1 to version 16.4.2
 * Merge branch 'master' into refactor/behavior-tree-2
 * Contributors: Kotaro Yoshimoto, Taiga
+
+16.4.2 (2025-05-23)
+-------------------
 
 16.4.1 (2025-05-23)
 -------------------
