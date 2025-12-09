@@ -2,14 +2,11 @@
 Changelog for package agnocast_wrapper
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-16.4.2 (2025-05-23)
+20.0.4 (2025-12-09)
 -------------------
-
-18.3.2 (2025-11-06)
--------------------
-* Merge branch 'master' into dependabot/github_actions/actions/checkout-5
-* Merge branch 'master' into dependabot/github_actions/actions/checkout-5
-* Contributors: Kotaro Yoshimoto, Taiga
+* Merge pull request `#1764 <https://github.com/tier4/scenario_simulator_v2/issues/1764>`_ from tier4/sort-changelog
+* Sort CHANGELOG.rst
+* Contributors: Kotaro Yoshimoto
 
 20.0.3 (2025-12-03)
 -------------------
@@ -173,6 +170,12 @@ Changelog for package agnocast_wrapper
 * Merge branch 'master' into dependabot/github_actions/actions/github-script-8
 * Merge branch 'master' into dependabot/github_actions/actions/checkout-5
 * Merge branch 'master' into dependabot/github_actions/actions/github-script-8
+* Merge branch 'master' into dependabot/github_actions/actions/checkout-5
+* Contributors: Kotaro Yoshimoto, Taiga
+
+18.3.2 (2025-11-06)
+-------------------
+* Merge branch 'master' into dependabot/github_actions/actions/checkout-5
 * Merge branch 'master' into dependabot/github_actions/actions/checkout-5
 * Contributors: Kotaro Yoshimoto, Taiga
 
@@ -607,6 +610,9 @@ Changelog for package agnocast_wrapper
 * Bump version of scenario_simulator_v2 from version version 16.4.1 to version 16.4.2
 * Merge branch 'master' into refactor/behavior-tree-2
 * Contributors: Kotaro Yoshimoto, Taiga
+
+16.4.2 (2025-05-23)
+-------------------
 
 16.4.1 (2025-05-23)
 -------------------
