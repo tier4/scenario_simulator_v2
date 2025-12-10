@@ -139,6 +139,15 @@ auto distanceToYieldStop(
   const CanonicalizedLaneletPose & reference_pose, const lanelet::Ids & following_lanelets,
   const std::vector<CanonicalizedLaneletPose> & other_poses) -> std::optional<double>;
 
+/*
+  Here it is required to pass the CanonicalizedEntityStatus vector, instead of just
+  the CanonicalizedLaneletPose vector, since it is necessary to know the msg::BoundingBox of each Entity
+*/
+auto distanceToNearestConflictingPose(
+  const lanelet::Ids & following_lanelets, const math::geometry::CatmullRomSplineInterface & spline,
+  const CanonicalizedEntityStatus & from_status,
+  const std::vector<CanonicalizedEntityStatus> & other_statuses) -> std::optional<double>;
+
 // spline
 auto distanceToSpline(
   const geometry_msgs::msg::Pose & map_pose,

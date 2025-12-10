@@ -18,7 +18,9 @@
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/lanelet_wrapper/distance.hpp>
 #include <traffic_simulator/lanelet_wrapper/lanelet_map.hpp>
+#include <traffic_simulator/lanelet_wrapper/lanelet_wrapper.hpp>
 #include <traffic_simulator/lanelet_wrapper/pose.hpp>
+#include <traffic_simulator/lanelet_wrapper/route.hpp>
 #include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 
@@ -425,6 +427,64 @@ auto distanceToYieldStop(
     }
   }
   return std::nullopt;
+}
+
+auto distanceToNearestConflictingPose(
+  const lanelet::Ids & following_lanelets, const math::geometry::CatmullRomSplineInterface & spline,
+  const CanonicalizedEntityStatus & from_status,
+  const std::vector<CanonicalizedEntityStatus> & other_statuses) -> std::optional<double>
+{
+  if (not from_status.isInLanelet()) {
+    return std::nullopt;
+  }
+
+  auto conflicting_entities_on_lanelets =
+    [&other_statuses](
+      const lanelet::Ids & conflicting_ids) -> std::vector<CanonicalizedEntityStatus> {
+    std::vector<CanonicalizedEntityStatus> conflicting_entity_status;
+    for (const auto & status : other_statuses) {
+      if (
+        status.isInLanelet() &&
+        std::find(conflicting_ids.cbegin(), conflicting_ids.cend(), status.getLaneletId()) !=
+          conflicting_ids.cend()) {
+        conflicting_entity_status.push_back(status);
+      }
+    }
+    return conflicting_entity_status;
+  };
+
+  std::optional<double> min_distance = std::nullopt;
+  auto try_min_distance = [&min_distance](const double & distance) {
+    if (not min_distance.has_value() or distance < min_distance.value()) {
+      min_distance = distance;
+    }
+  };
+
+  const auto & conflicting_entities_on_crosswalk = conflicting_entities_on_lanelets(
+    lanelet_wrapper::lanelet_map::conflictingCrosswalkIds(following_lanelets));
+
+  for (const auto & status : conflicting_entities_on_crosswalk) {
+    if (const auto & pose = status.getCanonicalizedLaneletPose()) {
+      if (const auto s = distanceToCrosswalk(spline, pose->getLaneletId())) {
+        try_min_distance(s.value());
+      }
+    }
+  }
+
+  const auto & conflicting_entities_on_lane = conflicting_entities_on_lanelets(
+    lanelet_wrapper::lanelet_map::conflictingLaneIds(following_lanelets));
+
+  for (const auto & status : conflicting_entities_on_lane) {
+    if (const auto & pose = status.getCanonicalizedLaneletPose()) {
+      if (
+        const auto s = splineDistanceToBoundingBox(
+          spline, from_status.getCanonicalizedLaneletPose().value(), from_status.getBoundingBox(),
+          pose.value(), status.getBoundingBox())) {
+        try_min_distance(s.value());
+      }
+    }
+  }
+  return min_distance;
 }
 
 auto distanceToSpline(
