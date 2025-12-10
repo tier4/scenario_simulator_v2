@@ -46,6 +46,8 @@ auto operator<<(std::ostream & os, const TrafficLight::Color & color) -> std::os
       return os << "red";
     case TrafficLight::Color::white:
       return os << "white";
+    case TrafficLight::Color::unknown:
+      return os << "unknown";
     default:
       return os;
   }
@@ -123,6 +125,8 @@ auto operator<<(std::ostream & os, const TrafficLight::Shape & shape) -> std::os
       return os << "lowerRight";
     case TrafficLight::Shape::upper_right:
       return os << "upperRight";
+    case TrafficLight::Shape::unknown:
+      return os << "unknown";
     default:
       return os;
   }

@@ -71,6 +71,7 @@ public:
   auto getPolygon(const double width, const size_t num_points = 30, const double z_offset = 0)
     -> std::vector<geometry_msgs::msg::Point>;
   const std::vector<geometry_msgs::msg::Point> control_points;
+  auto getLengths() const -> const std::vector<double> & { return length_list_; }
   virtual ~CatmullRomSpline() = default;
 
 private:
