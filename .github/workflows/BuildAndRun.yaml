@@ -14,6 +14,7 @@ on:
       - ".github/workflows/BuildAndRun.yaml"
       - "!mkdocs.yml"
       - "!pyproject.toml"
+      - "!sonar-project.properties"
       - "!uv.lock"
   push:
     branches:
