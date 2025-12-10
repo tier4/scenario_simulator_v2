@@ -30,16 +30,16 @@ namespace pose
 constexpr static double DEFAULT_MATCH_TO_LANE_REDUCTION_RATIO = 0.8;
 
 /*
-    Using a fixed `ALTITUDE_THRESHOLD` value of 1.0 [m] is justified because the
-    entity's Z-position is always relative to its base. This eliminates the
-    need to dynamically adjust the threshold based on the entity's dimensions,
-    ensuring consistent altitude matching regardless of the entity type.
+  Using a fixed `ALTITUDE_THRESHOLD` value of 1.0 [m] is justified because the
+  entity's Z-position is always relative to its base. This eliminates the
+  need to dynamically adjust the threshold based on the entity's dimensions,
+  ensuring consistent altitude matching regardless of the entity type.
 
-    The position of the entity is defined relative to its base, typically
-    the center of the rear axle projected onto the ground in the case of vehicles.
+  The position of the entity is defined relative to its base, typically
+  the center of the rear axle projected onto the ground in the case of vehicles.
 
-    There is no technical basis for this value; it was determined based on
-    experiments.
+  There is no technical basis for this value; it was determined based on
+  experiments.
 */
 constexpr static double ALTITUDE_THRESHOLD = 1.0;
 
@@ -76,19 +76,19 @@ auto toLaneletPoses(
 
 /**
  * @brief Retrieves alternative lanelet poses based on the reference lanelet pose.
- * 
- * This method computes alternative lanelet poses in the previous and next lanelets 
- * relative to a given reference lanelet pose. It recursively explores the neighboring 
+ *
+ * This method computes alternative lanelet poses in the previous and next lanelets
+ * relative to a given reference lanelet pose. It recursively explores the neighboring
  * lanelets until no further alternatives are found. The decision of whether a pose belongs
  * to a previous or next lanelet is based on the `s` value of the reference pose:
  * - If `s` is negative, the pose is assumed to be on the previous lanelet.
  * - If `s` exceeds the lanelet length, the pose is assumed to be on the next lanelet.
- * - If `s` is within the valid range of the lanelet (from 0 to the lanelet's length), 
+ * - If `s` is within the valid range of the lanelet (from 0 to the lanelet's length),
  *   the reference lanelet pose is returned directly.
- * 
- * @param reference_lanelet_pose The reference pose on a lanelet, used to determine its position 
+ *
+ * @param reference_lanelet_pose The reference pose on a lanelet, used to determine its position
  *                                and compute alternatives in neighboring lanelets.
- * 
+ *
  * @return A vector of alternative `LaneletPose` objects representing poses in the neighboring
  *         lanelets, or the reference pose if no alternatives are found.
  */
