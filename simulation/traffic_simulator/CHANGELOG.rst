@@ -2,6 +2,16 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+21.1.0 (2025-12-10)
+-------------------
+* Merge pull request `#1757 <https://github.com/tier4/scenario_simulator_v2/issues/1757>`_ from tier4/feature/unknown
+* Merge branch 'master' into feature/unknown
+* Merge branch 'master' into feature/unknown
+* Support unknown in TrafficLight::Shape
+* Add tests for unknown in TrafficLight::Color
+* Support unknown in TrafficLight::Color
+* Contributors: Kotaro Yoshimoto
+
 21.0.0 (2025-12-10)
 -------------------
 * Merge pull request `#1731 <https://github.com/tier4/scenario_simulator_v2/issues/1731>`_ from tier4/ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance-step-2-part1

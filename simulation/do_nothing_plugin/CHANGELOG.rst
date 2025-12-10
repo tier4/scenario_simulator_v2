@@ -2,6 +2,12 @@
 Changelog for package do_nothing_plugin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+21.1.0 (2025-12-10)
+-------------------
+* Merge branch 'master' into feature/unknown
+* Merge branch 'master' into feature/unknown
+* Contributors: Kotaro Yoshimoto
+
 21.0.0 (2025-12-10)
 -------------------
 * Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance-step-2-part1
